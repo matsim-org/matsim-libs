@@ -25,7 +25,7 @@ import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 
-public class BatteryReplacementCharging implements BatteryCharging {
+public final class BatteryReplacementCharging implements BatteryCharging {
 	private final ElectricVehicle electricVehicle;
 	private final double timeForBatteryReplacement;
 	private Double chargingPowerEquivalent = null;
@@ -38,22 +38,18 @@ public class BatteryReplacementCharging implements BatteryCharging {
 	@Override
 	public double calcChargingPower(Charger charger) {
 		if (chargingPowerEquivalent == null) {
-			chargingPowerEquivalent = calcRemainingEnergyToCharge() / timeForBatteryReplacement;
+			Battery b = electricVehicle.getBattery();
+			chargingPowerEquivalent = (b.getCapacity() - b.getSoc()) / timeForBatteryReplacement;
 		}
 		return chargingPowerEquivalent;
 	}
 
-	private double calcRemainingEnergyToCharge() {
-		Battery b = electricVehicle.getBattery();
-		return b.getCapacity() - b.getSoc();
-	}
-
 	@Override
 	public double calcChargingTime(Charger charger, double energy) {
-		throw new UnsupportedOperationException("Not implemented yet");
+		throw new UnsupportedOperationException("Should not be called");
 	}
 
-	public static class Strategy implements ChargingStrategy {
+	public static final class Strategy implements ChargingStrategy {
 		private final Charger charger;
 		private final ChargingStrategy delegate;
 
@@ -78,8 +74,10 @@ public class BatteryReplacementCharging implements BatteryCharging {
 
 		@Override
 		public double calcRemainingTimeToCharge(ElectricVehicle ev) {
-			return ((BatteryReplacementCharging)ev.getChargingPower()).calcChargingTime(charger,
-					delegate.calcRemainingEnergyToCharge(ev));
+			BatteryReplacementCharging charging = (BatteryReplacementCharging)ev.getChargingPower();
+			return charging.chargingPowerEquivalent == null ? //
+					charging.timeForBatteryReplacement ://not charging now
+					calcRemainingEnergyToCharge(ev) / charging.chargingPowerEquivalent;//during charging
 		}
 	}
 }
