@@ -20,7 +20,6 @@ package org.matsim.contrib.bicycle;
 
 import java.util.Random;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -35,7 +34,6 @@ import org.matsim.vehicles.Vehicle;
  * based on RandomizingTimeDistanceTravelDisutility and adding more components
  */
 class BicycleTravelDisutility implements TravelDisutility {
-	private static final Logger LOG = Logger.getLogger(BicycleTravelDisutility.class);
 
 	private final double marginalCostOfTime_s;
 	private final double marginalCostOfDistance_m;
