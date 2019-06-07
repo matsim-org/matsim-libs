@@ -122,7 +122,7 @@ public class RunEDrtScenario {
 				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
 						charger -> new ChargeUpToMaxSocStrategy(MAX_RELATIVE_SOC)));
 				bind(ChargingPower.Factory.class).toInstance(FastThenSlowCharging::new);
-				//bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new BatteryReplacementCharge(240.0)));
+				//bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new BatteryReplacementCharging(240.0)));
 			}
 		});
 

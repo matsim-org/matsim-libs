@@ -38,7 +38,9 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
 import org.matsim.contrib.ev.charging.ChargingLogic;
+import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
@@ -60,7 +62,7 @@ import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
 import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 import vwExamples.utils.CreateEDRTVehiclesAndChargers;
 import vwExamples.utils.DrtTrajectoryAnalyzer.MyDrtTrajectoryAnalysisModule;
-import vwExamples.utils.customEV.BatteryReplacementCharge;
+import vwExamples.utils.customEV.BatteryReplacementCharging;
 import vwExamples.utils.customEV.CustomFastThenSlowCharging;
 import vwExamples.utils.customEdrtModule.CustomEDrtControlerCreator;
 
@@ -332,7 +334,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 	//				if (BatteryReplace) {
 	//					bind(ChargingLogic.Factory.class)
 	//							.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-	//									new BatteryReplacementCharge(BATTERYREPLACETIME)));
+	//									new BatteryReplacementCharging(BATTERYREPLACETIME)));
 	//				} else {
 	//					bind(ChargingLogic.Factory.class)
 	//							.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
@@ -361,15 +363,16 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 				if (BatteryReplace) {
 					bind(ChargingLogic.Factory.class).toProvider(
 							new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
-									charger -> new BatteryReplacementCharge(BATTERYREPLACETIME)));
+									charger -> new BatteryReplacementCharging(BATTERYREPLACETIME)));
 				} else {
 					bind(ChargingLogic.Factory.class).toProvider(
 							new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
-									charger -> new CustomFastThenSlowCharging(charger.getPower(), MAX_RELATIVE_SOC)));
+									charger -> new ChargeUpToMaxSocStrategy(MAX_RELATIVE_SOC)));
+					bind(ChargingPower.Factory.class).toInstance(CustomFastThenSlowCharging::new);
 				}
 
 				//				bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new FastThenSlowCharging(charger.getPower())));
-				//				//bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new BatteryReplacementCharge(240.0)));
+				//				//bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new BatteryReplacementCharging(240.0)));
 			}
 		});
 

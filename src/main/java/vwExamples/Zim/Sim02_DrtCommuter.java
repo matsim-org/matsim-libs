@@ -60,7 +60,7 @@ import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
 import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 import vwExamples.utils.CreateEDRTVehiclesAndChargers;
 import vwExamples.utils.DrtTrajectoryAnalyzer.MyDrtTrajectoryAnalysisModule;
-import vwExamples.utils.customEV.BatteryReplacementCharge;
+import vwExamples.utils.customEV.BatteryReplacementCharging;
 import vwExamples.utils.customEV.CustomFastThenSlowCharging;
 import vwExamples.utils.customEdrtModule.CustomEDrtControlerCreator;
 
@@ -350,7 +350,7 @@ public class Sim02_DrtCommuter {
 	//				if (BatteryReplace) {
 	//					bind(ChargingLogic.Factory.class)
 	//							.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-	//									new BatteryReplacementCharge(BATTERYREPLACETIME)));
+	//									new BatteryReplacementCharging(BATTERYREPLACETIME)));
 	//				} else {
 	//					bind(ChargingLogic.Factory.class)
 	//							.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
@@ -379,7 +379,7 @@ public class Sim02_DrtCommuter {
 				if (BatteryReplace) {
 					bind(ChargingLogic.Factory.class).toProvider(
 							new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
-									charger -> new BatteryReplacementCharge(BATTERYREPLACETIME)));
+									charger -> new BatteryReplacementCharging(BATTERYREPLACETIME)));
 				} else {
 					bind(ChargingLogic.Factory.class).toProvider(
 							new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
@@ -387,7 +387,7 @@ public class Sim02_DrtCommuter {
 				}
 
 				//				bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new FastThenSlowCharging(charger.getPower())));
-				//				//bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new BatteryReplacementCharge(240.0)));
+				//				//bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new BatteryReplacementCharging(240.0)));
 			}
 		});
 
