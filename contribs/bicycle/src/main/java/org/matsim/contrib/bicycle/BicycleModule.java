@@ -18,14 +18,19 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.vehicles.VehicleType;
 
 /**
  * @author smetzler, dziemke
  */
 public final class BicycleModule extends AbstractModule {
 	// necessary to have this public
+	
+	private static final Logger LOG = Logger.getLogger(BicycleModule.class);
 	
 	private final Scenario scenario;
 	
@@ -69,6 +74,23 @@ public final class BicycleModule extends AbstractModule {
 //                });
 //            }
 //        });
+		
+		// some consistency checks
+		
+		Id<VehicleType> bicycleVehTypeId = Id.create(bicycleConfigGroup.getBicycleMode(), VehicleType.class);
+		if (scenario.getVehicles().getVehicleTypes().get(bicycleVehTypeId) == null) {
+			LOG.warn("There is no vehicle type '" + bicycleConfigGroup.getBicycleMode() + "' specified in the vehicle types.");
+		} else {
+			if (scenario.getVehicles().getVehicleTypes().get(bicycleVehTypeId).getMaximumVelocity() - bicycleConfigGroup.getMaxBicycleSpeed() > 0.1) {
+				LOG.warn("There is an inconsistency in the specified maximum velocity for " + bicycleConfigGroup.getBicycleMode() + ":"
+						+ " Maximum speed specified in the 'bicycle' config group: " + bicycleConfigGroup.getMaxBicycleSpeed() + " vs."
+								+ " maximum speed specified for the vehicle type: " + scenario.getVehicles().getVehicleTypes().get(bicycleVehTypeId).getMaximumVelocity());
+			}
+		}
+		if (!scenario.getConfig().qsim().getMainModes().contains(bicycleConfigGroup.getBicycleMode())) {
+			LOG.warn(bicycleConfigGroup.getBicycleMode() + " not specified as main mode.");
+		}
+		
 	}
 	
 }
