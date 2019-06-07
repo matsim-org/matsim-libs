@@ -33,13 +33,12 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.contrib.ev.charging.ChargingStrategy;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
-import org.matsim.contrib.ev.data.Charger;
-import org.matsim.contrib.ev.data.ChargingInfrastructure;
-import org.matsim.contrib.ev.data.ElectricVehicle;
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
-import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 /**
@@ -50,7 +49,6 @@ public class EmptyVehicleChargingScheduler {
 	private final EDrtTaskFactoryImpl taskFactory;
 	private final Map<Id<Link>, Charger> linkToChargerMap;
 
-	@Inject
 	public EmptyVehicleChargingScheduler(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
 			MobsimTimer timer, DrtTaskFactory taskFactory, ChargingInfrastructure chargingInfrastructure) {
 		this.timer = timer;

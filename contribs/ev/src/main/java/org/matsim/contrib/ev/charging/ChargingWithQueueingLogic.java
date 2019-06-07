@@ -19,30 +19,32 @@
 
 package org.matsim.contrib.ev.charging;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
+
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.ev.data.Charger;
-import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.core.api.experimental.events.EventsManager;
 
-import java.util.*;
-
 public class ChargingWithQueueingLogic implements ChargingLogic {
-	private final ChargingStrategy chargingStrategy;
-
 	private final Charger charger;
+	private final ChargingStrategy chargingStrategy;
+	private final EventsManager eventsManager;
+
 	private final Map<Id<ElectricVehicle>, ElectricVehicle> pluggedVehicles = new LinkedHashMap<>();
 	private final Queue<ElectricVehicle> queuedVehicles = new LinkedList<>();
 	private final Map<Id<ElectricVehicle>, ChargingListener> listeners = new HashMap<>();
 
-	private EventsManager eventsManager;
-
-	public ChargingWithQueueingLogic(Charger charger, ChargingStrategy chargingStrategy) {
+	public ChargingWithQueueingLogic(Charger charger, ChargingStrategy chargingStrategy, EventsManager eventsManager) {
 		this.chargingStrategy = chargingStrategy;
 		this.charger = charger;
-	}
-
-	@Override
-	public void initEventsHandling(EventsManager eventsManager) {
 		this.eventsManager = eventsManager;
 	}
 
@@ -108,7 +110,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 		if (pluggedVehicles.put(ev.getId(), ev) != null) {
 			throw new IllegalArgumentException();
 		}
-		eventsManager.processEvent(new ChargingStartEvent(now, charger.getId(), ev.getId()));
+        eventsManager.processEvent(new ChargingStartEvent(now, charger.getId(), ev.getId(), charger.getChargerType()));
 		listeners.get(ev.getId()).notifyChargingStarted(ev, now);
 	}
 

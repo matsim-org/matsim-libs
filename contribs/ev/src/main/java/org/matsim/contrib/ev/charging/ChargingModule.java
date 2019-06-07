@@ -20,47 +20,37 @@
 
 package org.matsim.contrib.ev.charging;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.data.ChargingInfrastructure;
-import org.matsim.contrib.ev.data.file.ChargingInfrastructureProvider;
+import org.matsim.contrib.ev.EvModule;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
-import com.google.inject.Key;
-import com.google.inject.name.Names;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class ChargingModule extends AbstractModule {
-	private static ChargingLogic.Factory DEFAULT_CHARGING_LOGIC_FACTORY = charger -> new ChargingWithQueueingLogic(
-			charger, new FixedSpeedChargingStrategy(charger.getPower()));
-
-	private final EvConfigGroup evCfg;
-	private final Key<Network> networkKey;
-	private final ChargingLogic.Factory chargingLogicFactory;
-
-	public ChargingModule(EvConfigGroup evCfg) {
-		this(evCfg, Key.get(Network.class), DEFAULT_CHARGING_LOGIC_FACTORY);
-	}
-
-	public ChargingModule(EvConfigGroup evCfg, Key<Network> networkKey, ChargingLogic.Factory chargingLogicFactory) {
-		this.evCfg = evCfg;
-		this.networkKey = networkKey;
-		this.chargingLogicFactory = chargingLogicFactory;
-	}
-
 	@Override
 	public void install() {
-		bind(Network.class).annotatedWith(Names.named(ChargingInfrastructure.CHARGERS))
-				.to(networkKey)
-				.asEagerSingleton();
-		bind(ChargingInfrastructure.class).toProvider(
-				new ChargingInfrastructureProvider(evCfg.getChargersFileUrl(getConfig().getContext())))
-				.asEagerSingleton();
-		bind(ChargingLogic.Factory.class).toInstance(chargingLogicFactory);
+		bind(ChargingLogic.Factory.class).toProvider(new Provider<ChargingLogic.Factory>() {
+			@Inject
+			private EventsManager eventsManager;
 
-		bind(ChargingHandler.class).asEagerSingleton();
-		addMobsimListenerBinding().to(ChargingHandler.class);
+			@Override
+			public ChargingLogic.Factory get() {
+				return charger -> new ChargingWithQueueingLogic(charger,
+						new FixedSpeedChargingStrategy(charger.getPower()), eventsManager);
+			}
+		});
+
+		installQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				this.bind(ChargingHandler.class).asEagerSingleton();
+				this.addQSimComponentBinding(EvModule.EV_COMPONENT).to(ChargingHandler.class);
+			}
+		});
 	}
 }

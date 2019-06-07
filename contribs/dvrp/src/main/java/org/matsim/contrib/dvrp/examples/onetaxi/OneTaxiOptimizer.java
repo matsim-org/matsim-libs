@@ -85,8 +85,11 @@ final class OneTaxiOptimizer implements VrpOptimizer {
 
 	@Override
 	public void requestSubmitted(Request request) {
+		OneTaxiRequest req = (OneTaxiRequest)request;
+
 		eventsManager.processEvent(
-				new PassengerRequestAcceptedEvent(timer.getTimeOfDay(), TransportMode.taxi, request.getId()));
+				new PassengerRequestAcceptedEvent(timer.getTimeOfDay(), TransportMode.taxi, request.getId(),
+						req.getPassengerId()));
 
 		Schedule schedule = vehicle.getSchedule();
 		StayTask lastTask = (StayTask)Schedules.getLastTask(schedule);// only WaitTask possible here
@@ -106,7 +109,6 @@ final class OneTaxiOptimizer implements VrpOptimizer {
 				throw new IllegalStateException();
 		}
 
-		OneTaxiRequest req = (OneTaxiRequest)request;
 		Link fromLink = req.getFromLink();
 		Link toLink = req.getToLink();
 
@@ -135,7 +137,7 @@ final class OneTaxiOptimizer implements VrpOptimizer {
 
 		eventsManager.processEvent(
 				new PassengerRequestScheduledEvent(timer.getTimeOfDay(), TransportMode.taxi, request.getId(),
-						vehicle.getId(), t1, t4));
+						req.getPassengerId(), vehicle.getId(), t1, t4));
 	}
 
 	@Override
@@ -146,7 +148,7 @@ final class OneTaxiOptimizer implements VrpOptimizer {
 
 	/**
 	 * Simplified version. For something more advanced, see
-	 * {@link org.matsim.contrib.taxi.scheduler.TaxiScheduler#updateBeforeNextTask(DvrpVehicle)} in the taxi contrib
+	 * {@link org.matsim.contrib.taxi.scheduler(DvrpVehicle)} in the taxi contrib
 	 */
 	private void updateTimings() {
 		Schedule schedule = vehicle.getSchedule();

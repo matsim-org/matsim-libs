@@ -32,7 +32,7 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
  * @author michalm
  */
 public class FleetWriter extends MatsimXmlWriter {
-	private Stream<? extends DvrpVehicleSpecification> vehicleSpecifications;
+	private final Stream<? extends DvrpVehicleSpecification> vehicleSpecifications;
 
 	public FleetWriter(Stream<? extends DvrpVehicleSpecification> vehicleSpecifications) {
 		this.vehicleSpecifications = vehicleSpecifications;

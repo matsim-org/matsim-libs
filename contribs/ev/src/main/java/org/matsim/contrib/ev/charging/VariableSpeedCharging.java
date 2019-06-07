@@ -20,8 +20,8 @@
 
 package org.matsim.contrib.ev.charging;
 
-import org.matsim.contrib.ev.data.Battery;
-import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.Battery;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -38,28 +38,28 @@ public class VariableSpeedCharging implements ChargingStrategy {
 	}
 
 	public static VariableSpeedCharging createStrategyForTesla(double chargingPower, double maxRelativeSoc) {
-		Point pointA = new Point(0, 0.75);// 0% => 0.75 c
-		Point pointB = new Point(0.15, 1.5);// 15% => 1.5 c
-		Point pointC = new Point(0.5, 1.5);// 50% => 1.5 c
-		Point pointD = new Point(1.0, 0.05);// 100% => 0.05 c
+		Point pointA = new Point(0, 0.75);// 0% => 0.75 C
+		Point pointB = new Point(0.15, 1.5);// 15% => 1.5 C
+		Point pointC = new Point(0.5, 1.5);// 50% => 1.5 C
+		Point pointD = new Point(1.0, 0.05);// 100% => 0.05 C
 		return new VariableSpeedCharging(chargingPower, maxRelativeSoc, pointA, pointB, pointC, pointD);
 	}
 
 	public static VariableSpeedCharging createStrategyForNissanLeaf(double chargingPower, double maxRelativeSoc) {
-		Point pointA = new Point(0, 0.75);// 0% => 0.75 c
-		Point pointB = new Point(0.1, 1.75);// 15% => 1.5 c
-		Point pointC = new Point(0.6, 1.75);// 50% => 1.5 c
-		Point pointD = new Point(1.0, 0.05);// 100% => 0.05 c
+		Point pointA = new Point(0, 0.75);// 0% => 0.75 C
+		Point pointB = new Point(0.1, 1.75);// 10% => 1.75 C
+		Point pointC = new Point(0.6, 1.75);// 60% => 1.75 C
+		Point pointD = new Point(1.0, 0.05);// 100% => 0.05 C
 		return new VariableSpeedCharging(chargingPower, maxRelativeSoc, pointA, pointB, pointC, pointD);
 	}
 
 	private final double chargingPower;
 	private final double maxRelativeSoc;
 
-	private final Point pointA = new Point(0, 0.75);// 0% => 0.75 c
-	private final Point pointB = new Point(0.15, 1.5);// 15% => 1.5 c
-	private final Point pointC = new Point(0.5, 1.5);// 50% => 1.5 c
-	private final Point pointD = new Point(1.0, 0.05);// 100% => 0.05 c
+	private final Point pointA;
+	private final Point pointB;
+	private final Point pointC;
+	private final Point pointD;
 
 	//XXX To avoid infinite charging simulation at 0 or close to 1.0 ensure:
 	// 1. pointD.relativePower > 0.0
@@ -72,6 +72,11 @@ public class VariableSpeedCharging implements ChargingStrategy {
 		if (maxRelativeSoc <= 0 || maxRelativeSoc > 1) {
 			throw new IllegalArgumentException("maxRelativeSoc must be in (0,1]");
 		}
+
+		this.pointA = pointA;
+		this.pointB = pointB;
+		this.pointC = pointC;
+		this.pointD = pointD;
 
 		this.chargingPower = chargingPower;
 		this.maxRelativeSoc = maxRelativeSoc;

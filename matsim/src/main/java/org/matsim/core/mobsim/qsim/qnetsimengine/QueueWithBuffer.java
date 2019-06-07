@@ -244,8 +244,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 			// use the lastMovedTime that was (somehow) computed for that vehicle.)
 		}
 		final QNodeI toNode = qLink.getToNodeQ();
-		if ( toNode instanceof QNodeImpl ) {
-			((QNodeImpl) toNode).activateNode();
+		if ( toNode instanceof AbstractQNode ) {
+			((AbstractQNode) toNode).activateNode();
 			// yy for an "upstream" QLane, this activates the toNode too early.  Yet I think I founds this
 			// also in the original QLane code.  kai, sep'13
 		}

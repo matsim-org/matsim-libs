@@ -21,6 +21,7 @@ package org.matsim.contrib.taxi.benchmark;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkConfigConsistencyChecker;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkControlerModule;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkModule;
 import org.matsim.contrib.dvrp.fleet.Fleet;
@@ -61,7 +62,7 @@ public class RunTaxiBenchmark {
 		config.controler().setCreateGraphs(false);
 
 		DvrpConfigGroup.get(config).setNetworkMode(null);// to switch off network filtering
-		config.addConfigConsistencyChecker(new TaxiBenchmarkConfigConsistencyChecker());
+		config.addConfigConsistencyChecker(new DvrpBenchmarkConfigConsistencyChecker());
 		config.checkConsistency();
 
 		String mode = TaxiConfigGroup.get(config).getMode();

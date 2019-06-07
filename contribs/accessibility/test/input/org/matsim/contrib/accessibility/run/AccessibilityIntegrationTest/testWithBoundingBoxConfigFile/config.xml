@@ -3,8 +3,6 @@
 <config>
 <!-- ====================================================================== -->
 	<module name="accessibility" >
-		<!-- if only a sample of destinations should be used (reduces accuracy  not recommended except when necessary for computational speed reasons) -->
-		<param name="accessibilityDestinationSamplingRate" value="null" />
 		<!-- defines type of measure for accessibility computation. -->
 		<param name="accessibilityMeasureType" value="logSum" />
 		<!-- method to determine the area for which the accessibility will be computed; possible values: fromNetwork fromBoundingBox fromShapeFile fromFile  -->

@@ -19,7 +19,9 @@
 
 package org.matsim.contrib.ev.discharging;
 
-import com.google.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
@@ -30,12 +32,13 @@ import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.data.ElectricFleet;
-import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.MobsimScopeEventHandler;
+import org.matsim.contrib.ev.MobsimScopeEventHandling;
+import org.matsim.contrib.ev.fleet.ElectricFleet;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.google.inject.Inject;
 
 /**
  * Because in QSim and JDEQSim vehicles enter and leave traffic at the end of links, we skip the first link when
@@ -43,7 +46,8 @@ import java.util.Map;
  * aux discharge process (see {@link AuxDischargingHandler}).
  */
 public class DriveDischargingHandler
-		implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+		implements LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler,
+		MobsimScopeEventHandler {
 	private static class EVDrive {
 		private final Id<Vehicle> vehicleId;
 		private final ElectricVehicle ev;
@@ -62,17 +66,16 @@ public class DriveDischargingHandler
 
 	private final Network network;
 	private final Map<Id<ElectricVehicle>, ? extends ElectricVehicle> eVehicles;
-	private final boolean handleAuxDischarging;
 	private final Map<Id<Vehicle>, EVDrive> evDrives;
-    private Map<Id<Link>, Double> energyConsumptionPerLink = new HashMap<>();
+	private Map<Id<Link>, Double> energyConsumptionPerLink = new HashMap<>();
 
 	@Inject
-	public DriveDischargingHandler(ElectricFleet data, Network network, EvConfigGroup evCfg) {
+	public DriveDischargingHandler(ElectricFleet data, Network network, EvConfigGroup evCfg,
+			MobsimScopeEventHandling events) {
 		this.network = network;
 		eVehicles = data.getElectricVehicles();
-		handleAuxDischarging = evCfg
-                .getAuxDischargingSimulation() == EvConfigGroup.AuxDischargingSimulation.insideDriveDischargingHandler;
 		evDrives = new HashMap<>(eVehicles.size() / 10);
+		events.addMobsimScopeHandler(this);
 	}
 
 	@Override
@@ -106,24 +109,21 @@ public class DriveDischargingHandler
 			Link link = network.getLinks().get(linkId);
 			double tt = eventTime - evDrive.movedOverNodeTime;
 			ElectricVehicle ev = evDrive.ev;
-			double energy = ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt);
-			if (handleAuxDischarging) {
-				energy += ev.getAuxEnergyConsumption().calcEnergyConsumption(tt, eventTime);
+			double energy = ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt, eventTime - tt)
+					+ ev.getAuxEnergyConsumption().calcEnergyConsumption(eventTime - tt, tt, linkId);
+			//Energy consumption might be negative on links with negative slope
+			if (energy < 0) {
+				ev.getBattery().charge(Math.abs(energy));
+			} else {
+				ev.getBattery().discharge(energy);
 			}
-			ev.getBattery().discharge(energy);
-            double linkConsumption = energy + energyConsumptionPerLink.getOrDefault(linkId, 0.0);
-            energyConsumptionPerLink.put(linkId, linkConsumption);
+			double linkConsumption = energy + energyConsumptionPerLink.getOrDefault(linkId, 0.0);
+			energyConsumptionPerLink.put(linkId, linkConsumption);
 		}
 		return evDrive;
 	}
 
-	@Override
-    public void reset(int iteration) {
-        evDrives.clear();
-        energyConsumptionPerLink.clear();
-    }
-
-    public Map<Id<Link>, Double> getEnergyConsumptionPerLink() {
-        return energyConsumptionPerLink;
-    }
+	public Map<Id<Link>, Double> getEnergyConsumptionPerLink() {
+		return energyConsumptionPerLink;
+	}
 }

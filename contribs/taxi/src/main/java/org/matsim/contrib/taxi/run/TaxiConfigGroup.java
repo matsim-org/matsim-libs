@@ -21,6 +21,8 @@ package org.matsim.contrib.taxi.run;
 
 import java.net.URL;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
@@ -28,11 +30,13 @@ import javax.validation.constraints.Positive;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.run.Modal;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-public class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
+public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
 	public static final String GROUP_NAME = "taxi";
 
 	@SuppressWarnings("deprecation")
@@ -100,11 +104,6 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
 			"Specifies whether the simulation should interrupt if not all requests were performed when"
 					+ " an interation ends. Otherwise, a warning is given. True by default.";
 
-	public static final String OPTIMIZER_PARAMETER_SET = "optimizer";
-	static final String OPTIMIZER_PARAMETER_SET_EXP =
-			"Specifies the type and parameters of the TaxiOptimizer. See: TaxiOptimizerParams and classes"
-					+ " implementing it, e.g. AbstractTaxiOptimizerParams.";
-
 	@NotBlank
 	private String mode = TransportMode.taxi; // travel mode (passengers'/customers' perspective)
 
@@ -133,8 +132,30 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
 
 	private boolean printDetailedWarnings = true;
 
+	private final Function<String, AbstractTaxiOptimizerParams> taxiOptimizerParamsCreator;
+	private AbstractTaxiOptimizerParams taxiOptimizerParams;
+
 	public TaxiConfigGroup() {
+		this(DefaultTaxiOptimizerProvider::createParameterSet);
+	}
+
+	public TaxiConfigGroup(Function<String, AbstractTaxiOptimizerParams> taxiOptimizerParamsCreator) {
 		super(GROUP_NAME);
+		this.taxiOptimizerParamsCreator = taxiOptimizerParamsCreator;
+	}
+
+	@Override
+	protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
+
+		if (config.qsim().getNumberOfThreads() != 1) {
+			throw new RuntimeException("Only a single-threaded QSim allowed");
+		}
+
+		if (isVehicleDiversion() && !isOnlineVehicleTracker()) {
+			throw new RuntimeException(
+					TaxiConfigGroup.VEHICLE_DIVERSION + " requires " + TaxiConfigGroup.ONLINE_VEHICLE_TRACKER);
+		}
 	}
 
 	@Override
@@ -152,7 +173,6 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
 		map.put(TIME_PROFILES, TIME_PROFILES_EXP);
 		map.put(DETAILED_STATS, DETAILED_STATS_EXP);
 		map.put(BREAK_IF_NOT_ALL_REQUESTS_SERVED, BREAK_IF_NOT_ALL_REQUESTS_SERVED_EXP);
-		map.put(OPTIMIZER_PARAMETER_SET, OPTIMIZER_PARAMETER_SET_EXP);
 		map.put(PRINT_WARNINGS, PRINT_WARNINGS_EXP);
 		return map;
 	}
@@ -351,13 +371,39 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
 		this.breakSimulationIfNotAllRequestsServed = breakSimulationIfNotAllRequestsServed;
 	}
 
-	public ConfigGroup getOptimizerConfigGroup() {
-		return getParameterSets(OPTIMIZER_PARAMETER_SET).iterator().next();
+	public AbstractTaxiOptimizerParams getTaxiOptimizerParams() {
+		return taxiOptimizerParams;
 	}
 
-	public void setOptimizerConfigGroup(ConfigGroup optimizerCfg) {
-		clearParameterSetsForType(OPTIMIZER_PARAMETER_SET);
-		addParameterSet(optimizerCfg);
+	@Override
+	public ConfigGroup createParameterSet(String type) {
+		return Objects.requireNonNull(taxiOptimizerParamsCreator.apply(type),
+				"Unable to create a parameter set of type: " + type);
+	}
+
+	@Override
+	public void addParameterSet(ConfigGroup set) {
+		if (set instanceof AbstractTaxiOptimizerParams) {
+			if (taxiOptimizerParams != null) {
+				throw new IllegalStateException(
+						"Remove the existing taxi optimizer parameter set before adding a new one");
+			}
+			taxiOptimizerParams = (AbstractTaxiOptimizerParams)set;
+		}
+
+		super.addParameterSet(set);
+	}
+
+	@Override
+	public boolean removeParameterSet(ConfigGroup set) {
+		if (set instanceof AbstractTaxiOptimizerParams) {
+			if (taxiOptimizerParams == null) {
+				throw new IllegalStateException("The existing taxi optimizer param set is null. Cannot remove it.");
+			}
+			taxiOptimizerParams = null;
+		}
+
+		return super.removeParameterSet(set);
 	}
 
 	public URL getTaxisFileUrl(URL context) {

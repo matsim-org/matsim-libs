@@ -40,7 +40,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	// Well, I guess it can be injected as well?!
 	// bind( PrepareForSimImpl.class ) ;
 	// bind( PrepareForSim.class ).to( MyPrepareForSimImpl.class ) ;
-	
+
 	private static Logger log = Logger.getLogger(PrepareForSim.class);
 
 	private final GlobalConfigGroup globalConfigGroup;
