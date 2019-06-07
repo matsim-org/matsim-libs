@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
 
 import org.matsim.api.core.v01.Id;
@@ -43,9 +44,9 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 	private final Map<Id<ElectricVehicle>, ChargingListener> listeners = new HashMap<>();
 
 	public ChargingWithQueueingLogic(Charger charger, ChargingStrategy chargingStrategy, EventsManager eventsManager) {
-		this.chargingStrategy = chargingStrategy;
-		this.charger = charger;
-		this.eventsManager = eventsManager;
+		this.chargingStrategy = Objects.requireNonNull(chargingStrategy);
+		this.charger = Objects.requireNonNull(charger);
+		this.eventsManager = Objects.requireNonNull(eventsManager);
 	}
 
 	@Override
