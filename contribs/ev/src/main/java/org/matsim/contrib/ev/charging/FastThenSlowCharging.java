@@ -21,9 +21,9 @@ package org.matsim.contrib.ev.charging;
 /*
  * created by jbischoff, 16.11.2018
  *
- * This charging strategy mimics the typical behavior at fast-chargers:
+ * This charging model mimics the typical behavior at fast-chargers:
  * Up to 50%, full power (or up to 1.75* C) is applied, up to
- * 75% SOC, a maximum of 1.25 * C is applied. Untill full, maximum power is 0.5*C.
+ * 75% SOC, a maximum of 1.25 * C is applied. Until full, maximum power is 0.5*C.
  * C == battery capacity.
  * This charging behavior is based on research conducted at LTH / University of Lund
  */
