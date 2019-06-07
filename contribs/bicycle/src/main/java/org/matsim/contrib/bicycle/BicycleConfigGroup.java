@@ -28,6 +28,7 @@ import org.matsim.core.config.ConfigGroup;
  */
 public final class BicycleConfigGroup extends ConfigGroup {
 	// necessary to have this public
+	// TODO Change to reflective config group
 
 	public static final String GROUP_NAME = "bicycle";
 
@@ -35,6 +36,9 @@ public final class BicycleConfigGroup extends ConfigGroup {
 	private static final String INPUT_COMFORT = "marginalUtilityOfComfort_m";
 	private static final String INPUT_INFRASTRUCTURE = "marginalUtilityOfInfrastructure_m";
 	private static final String INPUT_GRADIENT = "marginalUtilityOfGradient_m_100m";
+	private static final String MAX_BICYCLE_SPEED = "maxBicycleSpeed";
+	private static final String BICYCLE_MODE = "bicycleMode";
+	private static final String MOTORIZED_INTERACTION = "motorizedInteraction";
 	
 	public static enum BicycleScoringType {legBased, linkBased};
 
@@ -43,6 +47,9 @@ public final class BicycleConfigGroup extends ConfigGroup {
 	private double marginalUtilityOfInfrastructure;
 	private double marginalUtilityOfGradient;
 	private BicycleScoringType bicycleScoringType = BicycleScoringType.legBased;
+	private double maxBicycleSpeed = 25.0/3.6;
+	private String bicycleMode = "bicycle";
+	private boolean motorizedInteraction = false;
 	
 	public BicycleConfigGroup() {
 		super(GROUP_NAME);
@@ -61,6 +68,12 @@ public final class BicycleConfigGroup extends ConfigGroup {
 			setMarginalUtilityOfInfrastructure_m(Double.parseDouble(value));
 		} else if (INPUT_GRADIENT.equals(key)) {
 			setMarginalUtilityOfGradient_m_100m(Double.parseDouble(value));
+		} else if (MAX_BICYCLE_SPEED.equals(key)) {
+			setMaxBicycleSpeed(Double.parseDouble(value));
+		} else if (BICYCLE_MODE.equals(key)) {
+			setBicycleMode(value);
+		} else if (MOTORIZED_INTERACTION.equals(key)) {
+			setMotorizedInteraction(Boolean.valueOf(value));
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -76,6 +89,12 @@ public final class BicycleConfigGroup extends ConfigGroup {
 			return Double.toString(getMarginalUtilityOfInfrastructure_m());
 		} else if (INPUT_GRADIENT.equals(key)) {
 			return Double.toString(getMarginalUtilityOfGradient_m_100m());
+		} else if (MAX_BICYCLE_SPEED.equals(key)) {
+			return Double.toString(getMaxBicycleSpeed());
+		} else if (BICYCLE_MODE.equals(key)) {
+			return getBicycleMode();
+		} else if (MOTORIZED_INTERACTION.equals(key)) {
+			return Boolean.toString(isMotorizedInteraction());
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -88,6 +107,7 @@ public final class BicycleConfigGroup extends ConfigGroup {
 		map.put(INPUT_COMFORT, getValue(INPUT_COMFORT));
 		map.put(INPUT_INFRASTRUCTURE, getValue(INPUT_INFRASTRUCTURE));
 		map.put(INPUT_GRADIENT, getValue(INPUT_GRADIENT));
+		map.put(MAX_BICYCLE_SPEED, getValue(MAX_BICYCLE_SPEED));
 		return map;
 	}
 
@@ -98,6 +118,7 @@ public final class BicycleConfigGroup extends ConfigGroup {
 		map.put(INPUT_COMFORT, "marginalUtilityOfSurfacetype");
 		map.put(INPUT_INFRASTRUCTURE, "marginalUtilityOfStreettype");
 		map.put(INPUT_GRADIENT, "marginalUtilityOfGradient");
+		map.put(MAX_BICYCLE_SPEED, "maxBicycleSpeed");
 		return map;
 	}
 	void setNetworkAttFile(String file) {
@@ -138,5 +159,29 @@ public final class BicycleConfigGroup extends ConfigGroup {
 
 	public BicycleScoringType getBicycleScoringType() {
 		return this.bicycleScoringType;
+	}
+	
+	public void setMaxBicycleSpeed(final double value) {
+		this.maxBicycleSpeed = value;
+	}
+
+	public double getMaxBicycleSpeed() {
+		return this.maxBicycleSpeed;
+	}
+	
+	public String getBicycleMode() {
+		return this.bicycleMode;
+	}
+
+	public void setBicycleMode(String bicycleMode) {
+		this.bicycleMode = bicycleMode;
+	}
+
+	public boolean isMotorizedInteraction() {
+		return motorizedInteraction;
+	}
+
+	public void setMotorizedInteraction(boolean motorizedInteraction) {
+		this.motorizedInteraction = motorizedInteraction;
 	}
 }

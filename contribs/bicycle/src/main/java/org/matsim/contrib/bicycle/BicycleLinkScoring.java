@@ -40,9 +40,7 @@ import org.matsim.vehicles.Vehicle;
  * This link-based scoring should be used when true times spent on an individual link are relevant
  * and for the scoring of the interaction with motorized traffic.
  */
-class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring {
-	private static final Logger LOG = Logger.getLogger(BicycleLinkScoring.class);
-	
+class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring {	
 	private final ScoringParameters params;
 	
 	private Scenario scenario;
@@ -153,9 +151,10 @@ class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring {
 	// Copied and adapted from CharyparNagelLegScoring
 	private double computeTimeDistanceBasedScoreComponent( double travelTime, double dist ) {
 		double tmpScore = 0.0;
-		ModeUtilityParameters modeParams = this.params.modeParams.get("bicycle");
+		BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) scenario.getConfig().getModules().get(BicycleConfigGroup.GROUP_NAME);
+		ModeUtilityParameters modeParams = this.params.modeParams.get(bicycleConfigGroup.getBicycleMode());
 		if (modeParams == null) {
-			throw new RuntimeException("no scoring parameters are defined for bicycle") ;
+			throw new RuntimeException("no scoring parameters are defined for " + bicycleConfigGroup.getBicycleMode()) ;
 		}
 		tmpScore += travelTime * modeParams.marginalUtilityOfTraveling_s;
 		if (modeParams.marginalUtilityOfDistance_m != 0.0 || modeParams.monetaryDistanceCostRate != 0.0) {
