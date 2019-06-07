@@ -30,9 +30,11 @@ import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
 import org.matsim.contrib.etaxi.optimizer.ETaxiOptimizerProvider;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
+import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
 import org.matsim.contrib.ev.charging.ChargingLogic;
+import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
-import org.matsim.contrib.ev.charging.VariableSpeedCharging;
+import org.matsim.contrib.ev.charging.FixedSpeedCharging;
 import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
 import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
 import org.matsim.contrib.ev.dvrp.OperatingVehicleProvider;
@@ -58,10 +60,6 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
  * each link over time. The default approach is to specify free-flow speeds in each time interval (usually 15 minutes).
  */
 public class RunETaxiBenchmark {
-	private static final double CHARGING_SPEED_FACTOR = 1.; // full speed
-	private static final double MAX_RELATIVE_SOC = 0.8;// up to 80% SOC
-	private static final double TEMPERATURE = 20;// oC
-
 	public static void run(String configFile, int runs) {
 		Config config = ConfigUtils.loadConfig(configFile,
 				new TaxiConfigGroup(ETaxiOptimizerProvider::createParameterSet), new DvrpConfigGroup(),
@@ -99,10 +97,9 @@ public class RunETaxiBenchmark {
 			@Override
 			public void install() {
 				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
-						charger -> VariableSpeedCharging.createForNissanLeaf(
-								charger.getPower() * CHARGING_SPEED_FACTOR, MAX_RELATIVE_SOC)));
-
-				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
+						charger -> new ChargeUpToMaxSocStrategy(0.8)));
+				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, 1));
+				bind(TemperatureService.class).toInstance(linkId -> 20);
 			}
 		});
 
@@ -116,8 +113,7 @@ public class RunETaxiBenchmark {
 	}
 
 	public static void main(String[] args) {
-		String cfg = "../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/" + //
-				"mielec_etaxi_benchmark_config.xml";
+		String cfg = "../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/mielec_etaxi_benchmark_config.xml";
 		run(cfg, 1);
 	}
 }
