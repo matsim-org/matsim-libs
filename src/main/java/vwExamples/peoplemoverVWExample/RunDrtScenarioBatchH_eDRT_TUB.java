@@ -39,6 +39,7 @@ import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
+import org.matsim.contrib.ev.charging.FastThenSlowCharging;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.temperature.TemperatureChangeConfigGroup;
@@ -58,7 +59,6 @@ import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
 import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 import vwExamples.utils.DrtTrajectoryAnalyzer.MyDrtTrajectoryAnalysisModule;
 import vwExamples.utils.customEV.BatteryReplacementCharging;
-import vwExamples.utils.customEV.CustomFastThenSlowCharging;
 import vwExamples.utils.customEdrtModule.CustomEDrtControlerCreator;
 
 /**
@@ -273,7 +273,7 @@ public class RunDrtScenarioBatchH_eDRT_TUB {
 					bind(ChargingLogic.Factory.class).toProvider(
 							new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
 									charger -> new ChargeUpToMaxSocStrategy(charger, MAX_RELATIVE_SOC)));
-					bind(ChargingPower.Factory.class).toInstance(CustomFastThenSlowCharging::new);
+					bind(ChargingPower.Factory.class).toInstance(FastThenSlowCharging::new);
 				}
 			}
 		});

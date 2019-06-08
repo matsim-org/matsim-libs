@@ -42,6 +42,7 @@ import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
+import org.matsim.contrib.ev.charging.FastThenSlowCharging;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.temperature.TemperatureChangeConfigGroup;
@@ -63,7 +64,6 @@ import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 import vwExamples.utils.CreateEDRTVehiclesAndChargers;
 import vwExamples.utils.DrtTrajectoryAnalyzer.MyDrtTrajectoryAnalysisModule;
 import vwExamples.utils.customEV.BatteryReplacementCharging;
-import vwExamples.utils.customEV.CustomFastThenSlowCharging;
 import vwExamples.utils.customEdrtModule.CustomEDrtControlerCreator;
 
 /**
@@ -356,7 +356,7 @@ public class Sim02_DrtCommuter {
 	//				} else {
 	//					bind(ChargingLogic.Factory.class)
 	//							.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-	//									new CustomFastThenSlowCharging(charger.getPower(), MAX_RELATIVE_SOC)));
+	//									new FastThenSlowCharging(charger.getPower(), MAX_RELATIVE_SOC)));
 	//				}
 	//			}
 	//		});
@@ -389,7 +389,7 @@ public class Sim02_DrtCommuter {
 					bind(ChargingLogic.Factory.class).toProvider(
 							new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
 									charger -> new ChargeUpToMaxSocStrategy(charger, MAX_RELATIVE_SOC)));
-					bind(ChargingPower.Factory.class).toInstance(CustomFastThenSlowCharging::new);
+					bind(ChargingPower.Factory.class).toInstance(FastThenSlowCharging::new);
 				}
 
 				//				bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new FastThenSlowCharging(charger.getPower())));
