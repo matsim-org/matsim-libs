@@ -63,7 +63,7 @@ public class FastThenSlowCharging implements BatteryCharging {
 		double startSoc = b.getSoc();
 		double endSoc = startSoc + energy;
 		if (endSoc > b.getCapacity()) {
-			throw new IllegalArgumentException("End SOC must not be higher than 100%");
+			throw new IllegalArgumentException("End SOC must not be greater than 100%");
 		}
 
 		double threshold1 = 0.5 * b.getCapacity();
