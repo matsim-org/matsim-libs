@@ -72,13 +72,51 @@ public class FastThenSlowChargingTest {
 
 	private void assertCalcChargingPower(double capacity_kWh, double soc_kWh, double chargerPower_kW,
 			double expectedChargingPower_kW) {
-		ElectricVehicleSpecification specification = ImmutableElectricVehicleSpecification.newBuilder()
-				.id(Id.create("ev_id", ElectricVehicle.class))
-				.vehicleType("vt")
-				.chargerTypes(ImmutableList.of("ct"))
-				.batteryCapacity(EvUnits.kWh_to_J(capacity_kWh))
-				.initialSoc(EvUnits.kWh_to_J(soc_kWh))
-				.build();
+		Charger charger = createCharger(chargerPower_kW);
+		ElectricVehicle electricVehicle = createElectricVehicle(capacity_kWh, soc_kWh);
+		Assertions.assertThat(electricVehicle.getChargingPower().calcChargingPower(charger))
+				.isCloseTo(EvUnits.kW_to_W(expectedChargingPower_kW), Percentage.withPercentage(1e-13));
+	}
+
+	@Test
+	public void calcChargingTime_singleSection() {
+		//fast charger (2 c)
+		assertCalcChargingTime(100, 0, 0, 200, 0);
+		assertCalcChargingTime(100, 0, 17.5, 200, 360);
+		assertCalcChargingTime(100, 50, 0, 200, 0);
+		assertCalcChargingTime(100, 50, 12.5, 200, 360);
+		assertCalcChargingTime(100, 75, 0, 200, 0);
+		assertCalcChargingTime(100, 75, 5, 200, 360);
+		assertCalcChargingTime(100, 100, 0, 200, 0);
+
+		//medium-speed charger (1 c)
+		assertCalcChargingTime(100, 0, 0, 100, 0);
+		assertCalcChargingTime(100, 0, 10, 100, 360);
+		assertCalcChargingTime(100, 50, 0, 100, 0);
+		assertCalcChargingTime(100, 50, 10, 100, 360);
+		assertCalcChargingTime(100, 75, 0, 100, 0);
+		assertCalcChargingTime(100, 75, 5, 100, 360);
+		assertCalcChargingTime(100, 100, 0, 100, 0);
+
+		//slow charger (0.4 c)
+		assertCalcChargingTime(100, 0, 0, 40, 0);
+		assertCalcChargingTime(100, 0, 4, 40, 360);
+		assertCalcChargingTime(100, 50, 0, 40, 0);
+		assertCalcChargingTime(100, 50, 4, 40, 360);
+		assertCalcChargingTime(100, 75, 0, 40, 0);
+		assertCalcChargingTime(100, 75, 4, 40, 360);
+		assertCalcChargingTime(100, 100, 0, 40, 0);
+	}
+
+	private void assertCalcChargingTime(double capacity_kWh, double soc_kWh, double energy_kWh, double chargerPower_kW,
+			double expectedChargingTime_s) {
+		Charger charger = createCharger(chargerPower_kW);
+		ElectricVehicle electricVehicle = createElectricVehicle(capacity_kWh, soc_kWh);
+		Assertions.assertThat(((FastThenSlowCharging)electricVehicle.getChargingPower()).calcChargingTime(charger,
+				EvUnits.kWh_to_J(energy_kWh))).isCloseTo(expectedChargingTime_s, Percentage.withPercentage(1e-13));
+	}
+
+	private Charger createCharger(double chargerPower_kW) {
 		ChargerSpecification chargerSpecification = ImmutableChargerSpecification.newBuilder()
 				.id(Id.create("charger_id", Charger.class))
 				.chargerType(ChargerSpecification.DEFAULT_CHARGER_TYPE)
@@ -86,16 +124,22 @@ public class FastThenSlowChargingTest {
 				.maxPower(EvUnits.kW_to_W(chargerPower_kW))
 				.plugCount(1)
 				.build();
-		Charger charger = ChargerImpl.create(chargerSpecification, new FakeLink(Id.createLinkId("link_id")),
+		return ChargerImpl.create(chargerSpecification, new FakeLink(Id.createLinkId("link_id")),
 				ch -> new ChargingWithQueueingLogic(ch, new ChargeUpToMaxSocStrategy(ch, 1), new EventsManagerImpl()));
+	}
 
-		ElectricVehicle electricVehicle = ElectricVehicleImpl.create(specification,
-				ev -> (link, travelTime, linkEnterTime) -> {
-					throw new UnsupportedOperationException();
-				}, ev -> (beginTime, duration, linkId) -> {
-					throw new UnsupportedOperationException();
-				}, FastThenSlowCharging::new);
-		Assertions.assertThat(electricVehicle.getChargingPower().calcChargingPower(charger))
-				.isCloseTo(EvUnits.kW_to_W(expectedChargingPower_kW), Percentage.withPercentage(1e-13));
+	private ElectricVehicle createElectricVehicle(double capacity_kWh, double soc_kWh) {
+		ElectricVehicleSpecification specification = ImmutableElectricVehicleSpecification.newBuilder()
+				.id(Id.create("ev_id", ElectricVehicle.class))
+				.vehicleType("vt")
+				.chargerTypes(ImmutableList.of("ct"))
+				.batteryCapacity(EvUnits.kWh_to_J(capacity_kWh))
+				.initialSoc(EvUnits.kWh_to_J(soc_kWh))
+				.build();
+		return ElectricVehicleImpl.create(specification, ev -> (link, travelTime, linkEnterTime) -> {
+			throw new UnsupportedOperationException();
+		}, ev -> (beginTime, duration, linkId) -> {
+			throw new UnsupportedOperationException();
+		}, FastThenSlowCharging::new);
 	}
 }
