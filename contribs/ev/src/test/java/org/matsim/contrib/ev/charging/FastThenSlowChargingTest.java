@@ -108,6 +108,24 @@ public class FastThenSlowChargingTest {
 		assertCalcChargingTime(100, 100, 0, 40, 0);
 	}
 
+	@Test
+	public void calcChargingTime_crossSection() {
+		//fast charger (2 c)
+		assertCalcChargingTime(100, 32.5, 17.5 + 12.5, 200, 2 * 360);
+		assertCalcChargingTime(100, 62.5, 12.5 + 5, 200, 2 * 360);
+		assertCalcChargingTime(100, 32.5, 17.5 + 12.5 + 12.5 + 5, 200, 4 * 360);
+
+		//medium-speed charger (1 c)
+		assertCalcChargingTime(100, 40, 10 + 10, 100, 2 * 360);
+		assertCalcChargingTime(100, 65, 10 + 5, 100, 2 * 360);
+		assertCalcChargingTime(100, 40, 10 + 10 + 5 + 10 + 5, 100, 4.5 * 360);
+
+		//slow charger (0.4 c)
+		assertCalcChargingTime(100, 46, 4 + 4, 40, 2 * 360);
+		assertCalcChargingTime(100, 71, 4 + 4, 40, 2 * 360);
+		assertCalcChargingTime(100, 46, 4 + 4 + 17 + 4 + 4, 40, 8.25 * 360);
+	}
+
 	private void assertCalcChargingTime(double capacity_kWh, double soc_kWh, double energy_kWh, double chargerPower_kW,
 			double expectedChargingTime_s) {
 		Charger charger = createCharger(chargerPower_kW);
