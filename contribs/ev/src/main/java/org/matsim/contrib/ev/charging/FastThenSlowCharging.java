@@ -32,7 +32,7 @@ import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 
-public class FastThenSlowCharging implements ChargingPower {
+public class FastThenSlowCharging implements BatteryCharging {
 	private final ElectricVehicle electricVehicle;
 
 	public FastThenSlowCharging(ElectricVehicle electricVehicle) {
@@ -51,5 +51,36 @@ public class FastThenSlowCharging implements ChargingPower {
 		} else {
 			return Math.min(charger.getPower(), 0.5 * c);
 		}
+	}
+
+	@Override
+	public double calcChargingTime(Charger charger, double energy) {
+		if (energy < 0) {
+			throw new IllegalArgumentException("Energy must be positive");
+		}
+
+		Battery b = electricVehicle.getBattery();
+		double startSoc = b.getSoc();
+		double endSoc = startSoc + energy;
+		if (endSoc > b.getCapacity()) {
+			throw new IllegalArgumentException("End SOC must not be higher than 100%");
+		}
+
+		double threshold1 = 0.5 * b.getCapacity();
+		double threshold2 = 0.75 * b.getCapacity();
+		double c = b.getCapacity() / 3600;
+
+		double energyA = startSoc >= threshold1 ? 0 : Math.min(threshold1, endSoc) - startSoc;
+		double timeA = energyA / Math.min(charger.getPower(), 1.75 * c);
+
+		double energyB = startSoc >= threshold2 || endSoc <= threshold1 ?
+				0 :
+				Math.min(threshold2, endSoc) - Math.max(threshold1, startSoc);
+		double timeB = energyB / Math.min(charger.getPower(), 1.25 * c);
+
+		double energyC = endSoc <= threshold2 ? 0 : endSoc - Math.max(threshold2, startSoc);
+		double timeC = energyC / Math.min(charger.getPower(), 0.5 * c);
+
+		return timeA + timeB + timeC;
 	}
 }
