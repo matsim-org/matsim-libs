@@ -24,17 +24,34 @@ import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 
+import com.google.common.base.MoreObjects;
+
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class VariableSpeedCharging implements ChargingPower {
+public class VariableSpeedCharging implements ChargingPower {//TODO upgrade to BatteryCharging
+
 	public static class Point {
 		private final double relativeSoc;
 		private final double relativePower;
 
 		public Point(double relativeSoc, double relativeSpeed) {
+			if (relativeSoc < 0 || relativeSoc > 1) {
+				throw new IllegalArgumentException("Relative SOC must be in [0,1]");
+			}
+			if (relativeSpeed <= 0) {//XXX To avoid infinite charging simulation (e.g. at SOC==0 or close to 1.0)
+				throw new IllegalArgumentException("Relative speed must be positive");
+			}
 			this.relativeSoc = relativeSoc;
 			this.relativePower = relativeSpeed;
+		}
+
+		@Override
+		public String toString() {
+			return MoreObjects.toStringHelper(this)
+					.add("relativeSoc", relativeSoc)
+					.add("relativePower", relativePower)
+					.toString();
 		}
 	}
 
@@ -60,11 +77,31 @@ public class VariableSpeedCharging implements ChargingPower {
 	private final Point pointC;
 	private final Point pointD;
 
-	//XXX To avoid infinite charging simulation at 0 or close to 1.0 ensure:
-	// 1. pointD.relativePower > 0.0
-	// 2. pointA.relativePower > 0.0
 	public VariableSpeedCharging(ElectricVehicle electricVehicle, Point pointA, Point pointB, Point pointC,
 			Point pointD) {
+		//checks whether the A-B-C-D profile
+		if (pointA.relativeSoc != 0) {
+			throw new IllegalArgumentException("PointA.relativeSoc must be 0");
+		}
+		if (pointD.relativeSoc != 1) {
+			throw new IllegalArgumentException("PointB.relativeSoc must be 1");
+		}
+		if (pointB.relativeSoc == 0) {
+			throw new IllegalArgumentException("PointB.relativeSoc must be greater than 0");
+		}
+		if (pointC.relativeSoc == 1) {
+			throw new IllegalArgumentException("PointB.relativeSoc must be less than 1");
+		}
+		if (pointB.relativeSoc >= pointC.relativeSoc) {
+			throw new IllegalArgumentException("PointB.relativeSoc must be less than PointC.relativeSoc");
+		}
+		if (pointA.relativePower > pointB.relativePower) {
+			throw new IllegalArgumentException("PointA.relativePower must not be greater than PointB.relativePower");
+		}
+		if (pointD.relativePower > pointC.relativePower) {
+			throw new IllegalArgumentException("PointD.relativePower must not be greater than PointC.relativePower");
+		}
+
 		this.electricVehicle = electricVehicle;
 		this.pointA = pointA;
 		this.pointB = pointB;
@@ -116,11 +153,11 @@ public class VariableSpeedCharging implements ChargingPower {
 	}
 
 	private Point adjustPointIfSlowerCharging(double chargingPower, double c, Point lowerPoint, Point higherPoint) {
-		if (chargingPower >= c * higherPoint.relativePower) {
+		double relativeChargingPower = chargingPower / c;
+		if (relativeChargingPower >= higherPoint.relativePower) {
 			return higherPoint;
 		}
 
-		double relativeChargingPower = chargingPower / c;
 		double a = (relativeChargingPower - lowerPoint.relativePower) / (higherPoint.relativePower
 				- lowerPoint.relativePower);
 		double relativeSoc = lowerPoint.relativeSoc + a * (higherPoint.relativeSoc - lowerPoint.relativeSoc);
