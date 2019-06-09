@@ -114,16 +114,34 @@ public class VariableSpeedCharging implements ChargingPower {//TODO upgrade to B
 		Battery b = electricVehicle.getBattery();
 		double relativeSoc = b.getSoc() / b.getCapacity();
 		double c = b.getCapacity() / 3600.;
+		double relativeChargerPower = charger.getPower() / c;
 
-		Point adjustedPointB = adjustPointIfSlowerCharging(charger.getPower(), c, pointA, pointB);
-		Point adjustedPointC = adjustPointIfSlowerCharging(charger.getPower(), c, pointD, pointC);
+		final Point adjustedPointA;
+		final Point adjustedPointB;
+		if (pointA.relativePower >= relativeChargerPower) {
+			adjustedPointA = new Point(0, relativeChargerPower);
+			adjustedPointB = new Point(pointB.relativeSoc, relativeChargerPower);
+		} else {
+			adjustedPointA = pointA;
+			adjustedPointB = adjustPointIfSlowerCharging(relativeChargerPower, pointA, pointB);
+		}
+
+		final Point adjustedPointD;
+		final Point adjustedPointC;
+		if (pointD.relativePower >= relativeChargerPower) {//rather unlikely
+			adjustedPointD = new Point(1, relativeChargerPower);
+			adjustedPointC = new Point(pointC.relativeSoc, relativeChargerPower);
+		} else {
+			adjustedPointD = pointD;
+			adjustedPointC = adjustPointIfSlowerCharging(relativeChargerPower, pointD, pointC);
+		}
 
 		if (relativeSoc <= adjustedPointB.relativeSoc) {
-			return c * approxRelativePower(relativeSoc, pointA, adjustedPointB);
+			return c * approxRelativePower(relativeSoc, adjustedPointA, adjustedPointB);
 		} else if (relativeSoc <= adjustedPointC.relativeSoc) {
 			return c * approxRelativePower(relativeSoc, adjustedPointB, adjustedPointC);
 		} else {
-			return c * approxRelativePower(relativeSoc, adjustedPointC, pointD);
+			return c * approxRelativePower(relativeSoc, adjustedPointC, adjustedPointD);
 		}
 	}
 
@@ -136,32 +154,49 @@ public class VariableSpeedCharging implements ChargingPower {//TODO upgrade to B
 		Battery b = electricVehicle.getBattery();
 		double relativeSoc = b.getSoc() / b.getCapacity();
 		double c = b.getCapacity() / 3600.;
+		double relativeChargerPower = charger.getPower() / c;
 
-		Point adjustedPointB = adjustPointIfSlowerCharging(charger.getPower(), c, pointA, pointB);
-		Point adjustedPointC = adjustPointIfSlowerCharging(charger.getPower(), c, pointD, pointC);
+		final Point adjustedPointA;
+		final Point adjustedPointB;
+		if (pointA.relativePower >= relativeChargerPower) {
+			adjustedPointA = new Point(0, relativeChargerPower);
+			adjustedPointB = new Point(pointB.relativeSoc, relativeChargerPower);
+		} else {
+			adjustedPointA = pointA;
+			adjustedPointB = adjustPointIfSlowerCharging(relativeChargerPower, pointA, pointB);
+		}
+
+		final Point adjustedPointD;
+		final Point adjustedPointC;
+		if (pointD.relativePower >= relativeChargerPower) {//rather unlikely
+			adjustedPointD = new Point(1, relativeChargerPower);
+			adjustedPointC = new Point(pointC.relativeSoc, relativeChargerPower);
+		} else {
+			adjustedPointD = pointD;
+			adjustedPointC = adjustPointIfSlowerCharging(relativeChargerPower, pointD, pointC);
+		}
 
 		if (relativeSoc <= adjustedPointB.relativeSoc) {
-			return approximateRemainingChargeTime(relativeSoc, pointA, adjustedPointB)//
+			return approximateRemainingChargeTime(relativeSoc, adjustedPointA, adjustedPointB)//
 					+ approxChargeTime(adjustedPointB, adjustedPointC)//
-					+ approxChargeTime(adjustedPointC, pointD);
+					+ approxChargeTime(adjustedPointC, adjustedPointD);
 		} else if (relativeSoc <= adjustedPointC.relativeSoc) {
 			return approximateRemainingChargeTime(relativeSoc, adjustedPointB, adjustedPointC)//
-					+ approxChargeTime(adjustedPointC, pointD);
+					+ approxChargeTime(adjustedPointC, adjustedPointD);
 		} else {
-			return approximateRemainingChargeTime(relativeSoc, adjustedPointC, pointD);
+			return approximateRemainingChargeTime(relativeSoc, adjustedPointC, adjustedPointD);
 		}
 	}
 
-	private Point adjustPointIfSlowerCharging(double chargingPower, double c, Point lowerPoint, Point higherPoint) {
-		double relativeChargingPower = chargingPower / c;
-		if (relativeChargingPower >= higherPoint.relativePower) {
+	private Point adjustPointIfSlowerCharging(double relativeChargerPower, Point lowerPoint, Point higherPoint) {
+		if (relativeChargerPower >= higherPoint.relativePower) {
 			return higherPoint;
 		}
 
-		double a = (relativeChargingPower - lowerPoint.relativePower) / (higherPoint.relativePower
+		double a = (relativeChargerPower - lowerPoint.relativePower) / (higherPoint.relativePower
 				- lowerPoint.relativePower);
 		double relativeSoc = lowerPoint.relativeSoc + a * (higherPoint.relativeSoc - lowerPoint.relativeSoc);
-		return new Point(relativeSoc, relativeChargingPower);
+		return new Point(relativeSoc, relativeChargerPower);
 	}
 
 	private double approximateRemainingChargeTime(double relativeSoc, Point point0, Point point1) {
