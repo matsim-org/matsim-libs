@@ -18,51 +18,31 @@
 
 package org.matsim.contrib.ev.charging;
 
-import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
 
 /**
  * @author michalm
  */
-public class FixedSpeedChargingStrategy implements ChargingStrategy {
-	private final double chargingPower;
-	private final double maxRelativeSoc;
+public class FixedSpeedCharging implements BatteryCharging {
+	private final double maxPower;
 
-	public FixedSpeedChargingStrategy(double chargingPower) {
-		this(chargingPower, 1);
-	}
-
-	// e.g. maxRelativeSoc = 0.8 to model linear (fast) charging up to 80% of the battery capacity
-	public FixedSpeedChargingStrategy(double chargingPower, double maxRelativeSoc) {
-		if (chargingPower <= 0) {
-			throw new IllegalArgumentException("chargingPower must be positive");
-		}
-		if (maxRelativeSoc <= 0 || maxRelativeSoc > 1) {
-			throw new IllegalArgumentException("maxRelativeSoc must be in (0,1]");
-		}
-
-		this.chargingPower = chargingPower;
-		this.maxRelativeSoc = maxRelativeSoc;
+	/**
+	 * @param electricVehicle
+	 * @param relativeSpeed   in C, where 1 C = full recharge in 1 hour
+	 */
+	public FixedSpeedCharging(ElectricVehicle electricVehicle, double relativeSpeed) {
+		double c = electricVehicle.getBattery().getCapacity() / 3600.;
+		maxPower = relativeSpeed * c;
 	}
 
 	@Override
-	public double calcEnergyCharge(ElectricVehicle ev, double chargePeriod) {
-		return chargingPower * chargePeriod;
+	public double calcChargingPower(Charger charger) {
+		return Math.min(maxPower, charger.getPower());
 	}
 
 	@Override
-	public boolean isChargingCompleted(ElectricVehicle ev) {
-		return calcRemainingEnergyToCharge(ev) <= 0;
-	}
-
-	@Override
-	public double calcRemainingEnergyToCharge(ElectricVehicle ev) {
-		Battery b = ev.getBattery();
-		return maxRelativeSoc * b.getCapacity() - b.getSoc();
-	}
-
-	@Override
-	public double calcRemainingTimeToCharge(ElectricVehicle ev) {
-		return calcRemainingEnergyToCharge(ev) / chargingPower;
+	public double calcChargingTime(Charger charger, double energy) {
+		return energy / calcChargingPower(charger);
 	}
 }

@@ -18,25 +18,16 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.ev.fleet;
+package org.matsim.contrib.ev.charging;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.ev.charging.ChargingPower;
-import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
-import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
+import org.matsim.contrib.ev.infrastructure.Charger;
 
-import com.google.common.collect.ImmutableMap;
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public interface BatteryCharging extends ChargingPower {
+	//XXX consider adding if/when needed
+	//double calcEnergyCharge(Charger charger, double chargePeriod);
 
-public class ElectricFleets {
-	public static ElectricFleet createDefaultFleet(ElectricFleetSpecification fleetSpecification,
-			DriveEnergyConsumption.Factory driveConsumptionFactory, AuxEnergyConsumption.Factory auxConsumptionFactory,
-			ChargingPower.Factory chargingFactory) {
-		ImmutableMap<Id<ElectricVehicle>, ? extends ElectricVehicle> vehicles = fleetSpecification.getVehicleSpecifications()
-				.values()
-				.stream()
-				.map(s -> ElectricVehicleImpl.create(s, driveConsumptionFactory, auxConsumptionFactory,
-						chargingFactory))
-				.collect(ImmutableMap.toImmutableMap(ElectricVehicle::getId, v -> v));
-		return () -> vehicles;
-	}
+	double calcChargingTime(Charger charger, double energy);
 }

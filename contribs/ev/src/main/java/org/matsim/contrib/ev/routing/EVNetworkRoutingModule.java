@@ -199,9 +199,12 @@ public final class EVNetworkRoutingModule implements RoutingModule {
 		Map<Link, Double> consumptions = new LinkedHashMap<>();
 		NetworkRoute route = (NetworkRoute)basicLeg.getRoute();
 		List<Link> links = NetworkUtils.getLinks(network, route.getLinkIds());
-		ElectricVehicle pseudoVehicle = ElectricVehicleImpl.create(ev, driveConsumptionFactory, auxConsumptionFactory);
-		DriveEnergyConsumption driveEnergyConsumption = driveConsumptionFactory.create(pseudoVehicle);
-		AuxEnergyConsumption auxEnergyConsumption = auxConsumptionFactory.create(pseudoVehicle);
+		ElectricVehicle pseudoVehicle = ElectricVehicleImpl.create(ev, driveConsumptionFactory, auxConsumptionFactory,
+				v -> charger -> {
+					throw new UnsupportedOperationException();
+				});
+		DriveEnergyConsumption driveEnergyConsumption = pseudoVehicle.getDriveEnergyConsumption();
+		AuxEnergyConsumption auxEnergyConsumption = pseudoVehicle.getAuxEnergyConsumption();
 		for (Link l : links) {
 			double travelT = travelTime.getLinkTravelTime(l, basicLeg.getDepartureTime(), null, null);
 			double consumption = driveEnergyConsumption.calcEnergyConsumption(l, travelT, Time.getUndefinedTime())

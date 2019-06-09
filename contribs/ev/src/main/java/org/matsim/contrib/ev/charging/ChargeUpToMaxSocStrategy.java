@@ -18,25 +18,35 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.ev.fleet;
+package org.matsim.contrib.ev.charging;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.ev.charging.ChargingPower;
-import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
-import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
+import org.matsim.contrib.ev.fleet.Battery;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
 
-import com.google.common.collect.ImmutableMap;
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public class ChargeUpToMaxSocStrategy implements ChargingStrategy {
+	private final Charger charger;
+	private final double maxRelativeSoc;
 
-public class ElectricFleets {
-	public static ElectricFleet createDefaultFleet(ElectricFleetSpecification fleetSpecification,
-			DriveEnergyConsumption.Factory driveConsumptionFactory, AuxEnergyConsumption.Factory auxConsumptionFactory,
-			ChargingPower.Factory chargingFactory) {
-		ImmutableMap<Id<ElectricVehicle>, ? extends ElectricVehicle> vehicles = fleetSpecification.getVehicleSpecifications()
-				.values()
-				.stream()
-				.map(s -> ElectricVehicleImpl.create(s, driveConsumptionFactory, auxConsumptionFactory,
-						chargingFactory))
-				.collect(ImmutableMap.toImmutableMap(ElectricVehicle::getId, v -> v));
-		return () -> vehicles;
+	public ChargeUpToMaxSocStrategy(Charger charger, double maxRelativeSoc) {
+		if (maxRelativeSoc < 0 || maxRelativeSoc > 1) {
+			throw new IllegalArgumentException();
+		}
+		this.charger = charger;
+		this.maxRelativeSoc = maxRelativeSoc;
+	}
+
+	@Override
+	public double calcRemainingEnergyToCharge(ElectricVehicle ev) {
+		Battery battery = ev.getBattery();
+		return maxRelativeSoc * battery.getCapacity() - battery.getSoc();
+	}
+
+	@Override
+	public double calcRemainingTimeToCharge(ElectricVehicle ev) {
+		return ((BatteryCharging)ev.getChargingPower()).calcChargingTime(charger, calcRemainingEnergyToCharge(ev));
 	}
 }
