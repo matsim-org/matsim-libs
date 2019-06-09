@@ -114,34 +114,13 @@ public class VariableSpeedCharging implements ChargingPower {//TODO upgrade to B
 		Battery b = electricVehicle.getBattery();
 		double relativeSoc = b.getSoc() / b.getCapacity();
 		double c = b.getCapacity() / 3600.;
-		double relativeChargerPower = charger.getPower() / c;
 
-		final Point adjustedPointA;
-		final Point adjustedPointB;
-		if (pointA.relativePower >= relativeChargerPower) {
-			adjustedPointA = new Point(0, relativeChargerPower);
-			adjustedPointB = new Point(pointB.relativeSoc, relativeChargerPower);
+		if (relativeSoc <= pointB.relativeSoc) {
+			return Math.min(charger.getPower(), c * approxRelativePower(relativeSoc, pointA, pointB));
+		} else if (relativeSoc <= pointC.relativeSoc) {
+			return Math.min(charger.getPower(), c * approxRelativePower(relativeSoc, pointB, pointC));
 		} else {
-			adjustedPointA = pointA;
-			adjustedPointB = adjustPointIfSlowerCharging(relativeChargerPower, pointA, pointB);
-		}
-
-		final Point adjustedPointD;
-		final Point adjustedPointC;
-		if (pointD.relativePower >= relativeChargerPower) {//rather unlikely
-			adjustedPointD = new Point(1, relativeChargerPower);
-			adjustedPointC = new Point(pointC.relativeSoc, relativeChargerPower);
-		} else {
-			adjustedPointD = pointD;
-			adjustedPointC = adjustPointIfSlowerCharging(relativeChargerPower, pointD, pointC);
-		}
-
-		if (relativeSoc <= adjustedPointB.relativeSoc) {
-			return c * approxRelativePower(relativeSoc, adjustedPointA, adjustedPointB);
-		} else if (relativeSoc <= adjustedPointC.relativeSoc) {
-			return c * approxRelativePower(relativeSoc, adjustedPointB, adjustedPointC);
-		} else {
-			return c * approxRelativePower(relativeSoc, adjustedPointC, adjustedPointD);
+			return Math.min(charger.getPower(), c * approxRelativePower(relativeSoc, pointC, pointD));
 		}
 	}
 
@@ -150,6 +129,7 @@ public class VariableSpeedCharging implements ChargingPower {//TODO upgrade to B
 		return point0.relativePower + a * (point1.relativePower - point0.relativePower);
 	}
 
+	//TODO convert to: calcChargingTime(Charger charger, double energy)
 	public double calcRemainingTimeToCharge(Charger charger) {
 		Battery b = electricVehicle.getBattery();
 		double relativeSoc = b.getSoc() / b.getCapacity();
