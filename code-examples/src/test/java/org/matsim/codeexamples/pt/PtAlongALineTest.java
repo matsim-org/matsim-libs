@@ -40,6 +40,8 @@ public class PtAlongALineTest{
 
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 		config.controler().setLastIteration( 0 );
+		
+		config.transit().setUseTransit(true);
 
 		Scenario scenario = ScenarioUtils.createScenario( config );
 		// don't load anything
@@ -110,39 +112,46 @@ public class PtAlongALineTest{
 			}
 		}
 
-		Node node0 = scenario.getNetwork().getNodes().get( Id.createNodeId( 0 ) );
-		Gbl.assertNotNull(node0);
+		Node node0 = nf.createNode( Id.createNodeId("trNode0"), new Coord(0,100.) );
+		scenario.getNetwork().addNode(node0);
 
-		Node nodeLast = scenario.getNetwork().getNodes().get( Id.createNodeId( 1000 ) ) ;
-		Gbl.assertNotNull( nodeLast );
+		Node node1 = nf.createNode( Id.createNodeId("trNode1"), new Coord(100.,100.) ) ;
+		scenario.getNetwork().addNode( node1 ) ;
 
-		Link loopLink0 = nf.createLink( Id.createLinkId( "loopLink0" ), node0, node0 ) ;
-		loopLink0.setLength( 100. );
-		scenario.getNetwork().addLink( loopLink0 );
+		Link trLink01 = nf.createLink( Id.createLinkId( "trLink01" ) , node0, node1 ) ;
+		scenario.getNetwork().addLink( trLink01 ) ;
 
-		Link loopLinkLast = nf.createLink( Id.createLinkId( "loopLinkLast" ), nodeLast, nodeLast ) ;
-		loopLink0.setLength( 100. );
-		scenario.getNetwork().addLink( loopLinkLast );
+		Node nodeLastm1 = nf.createNode( Id.createNodeId("trNodeLastm1") , new Coord( 100000.-100. ,100. ) ) ;
+		scenario.getNetwork().addNode( nodeLastm1) ;
 
-		Link longTransitLink = nf.createLink( Id.createLinkId( "longTransitLink" ), node0, nodeLast ) ;
-		longTransitLink.setLength( CoordUtils.calcEuclideanDistance( node0.getCoord(), nodeLast.getCoord() ) );
-		scenario.getNetwork().addLink( longTransitLink );
+		Link trLink1m1 = nf.createLink( Id.createLinkId( "trLink1m1" ) , node1, nodeLastm1 ) ;
+		scenario.getNetwork().addLink( trLink1m1 ) ;
+
+		Node nodeLast = nf.createNode(Id.createNodeId("trNodeLast"), new Coord(100000., 100.) ) ;
+		scenario.getNetwork().addNode(nodeLast);
+
+		Link trLinkm1Last = nf.createLink( Id.createLinkId( "trLinkm1Last" ) , nodeLastm1, nodeLast ) ;
+		scenario.getNetwork().addLink( trLinkm1Last ) ;
+
+
 
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleFactory sf = schedule.getFactory();;
 
 		Id<TransitStopFacility> facilityId0 = Id.create("StopFac0", TransitStopFacility.class ) ;
-		Coord coordinate0 = new Coord(0.,0.) ;
+		Coord coordinate0 = new Coord(100.,100.) ;
 		TransitStopFacility stopFacility0 = sf.createTransitStopFacility( facilityId0, coordinate0, false ) ;
+		stopFacility0.setLinkId(trLink01.getId());
 		schedule.addStopFacility( stopFacility0 );
 
 		Id<TransitStopFacility> facilityId10000 = Id.create("StopFac10000", TransitStopFacility.class ) ;
-		Coord coordinate10000 = new Coord(10000.,0.) ;
+		Coord coordinate10000 = new Coord(10000.,100.) ;
 		TransitStopFacility stopFacility10000 = sf.createTransitStopFacility( facilityId10000, coordinate10000, false ) ;
+		stopFacility10000.setLinkId(trLinkm1Last.getId());
 		schedule.addStopFacility( stopFacility10000 );
 
 		{
-			NetworkRoute route = pf.getRouteFactories().createRoute( NetworkRoute.class, loopLink0.getId(), loopLinkLast.getId() ) ;
+			NetworkRoute route = pf.getRouteFactories().createRoute( NetworkRoute.class,trLink01.getId(), trLinkm1Last.getId() ) ;
 
 			List<TransitRouteStop> stops = new ArrayList<>() ;
 			{
@@ -155,17 +164,19 @@ public class PtAlongALineTest{
 			}
 
 			TransitRoute transitRoute = sf.createTransitRoute( Id.create("route1",TransitRoute.class), route, stops, "bus" ) ;
-
+			Departure departure = sf.createDeparture(Id.create( "departure1", Departure.class) , 7.5*3600. )  ;
+			transitRoute.addDeparture(departure);
+			
 			TransitLine line = sf.createTransitLine( Id.create("line1", TransitLine.class) ) ;
 			line.addRoute( transitRoute );
 
 			schedule.addTransitLine( line );
 		}
-
+		
 		TransitScheduleValidator.ValidationResult result = TransitScheduleValidator.validateAll( schedule, scenario.getNetwork() );
 		TransitScheduleValidator.printResult( result );
 
-		System.exit(-1) ;
+//		System.exit(-1) ;
 
 		Controler controler = new Controler( scenario ) ;
 
