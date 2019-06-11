@@ -23,7 +23,6 @@ import org.matsim.facilities.ActivityOption;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.pt.utils.TransitScheduleValidator;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehiclesFactory;
@@ -116,33 +115,39 @@ public class PtAlongALineTest{
 
 		Node node0 = nf.createNode( Id.createNodeId("trNode0"), new Coord(0, deltaY ) );
 		scenario.getNetwork().addNode(node0);
-
+		// ---
 		Node node1 = nf.createNode( Id.createNodeId("trNode1"), new Coord(deltaX, deltaY ) ) ;
 		scenario.getNetwork().addNode( node1 ) ;
 		final Id<Link> TR_LINK_0_1_ID = Id.createLinkId( "trLink0-1" );
+		createAndAddTransitLink( scenario, node0, node1, TR_LINK_0_1_ID );
+		// ---
+		Node nodeMiddleLeft = nf.createNode( Id.createNodeId("trNodeMiddleLeft") , new Coord( 0.5*(lastNodeIdx-1)*deltaX , deltaY ) ) ;
+		scenario.getNetwork().addNode( nodeMiddleLeft) ;
+		final Id<Link> TR_LONG_LINK_LEFT_ID = Id.createLinkId( "trLinkLongLeft" );
 		{
-			Link trLink = nf.createLink( TR_LINK_0_1_ID, node0, node1 );
-			trLink.setFreespeed( 100. / 3.6 );
-			trLink.setCapacity( 100000. );
-			scenario.getNetwork().addLink( trLink );
+			createAndAddTransitLink( scenario, node1, nodeMiddleLeft, TR_LONG_LINK_LEFT_ID );
 		}
+		// ---
+		Node nodeMiddleRight = nf.createNode( Id.createNodeId("trNodeMiddleRight") , new Coord( 0.5*(lastNodeIdx+1)*deltaX , deltaY ) ) ;
+		scenario.getNetwork().addNode( nodeMiddleRight ) ;
+		final Id<Link> TR_LINK_MIDDLE_ID = Id.createLinkId( "trLinkMiddle" );
+		{
+			createAndAddTransitLink( scenario, nodeMiddleLeft, nodeMiddleRight, TR_LINK_MIDDLE_ID );
+		}
+		// ---
 		Node nodeLastm1 = nf.createNode( Id.createNodeId("trNodeLastm1") , new Coord( (lastNodeIdx-1)*deltaX , deltaY ) ) ;
 		scenario.getNetwork().addNode( nodeLastm1) ;
-		final Id<Link> TR_LONG_LINK_ID = Id.createLinkId( "trLinkLong" );
+		final Id<Link> TR_LONG_LINK_RIGHT_ID = Id.createLinkId( "trLinkLongRight" );
 		{
-			Link trLink = nf.createLink( TR_LONG_LINK_ID, node1, nodeLastm1 );
-			trLink.setFreespeed( 100. / 3.6 );
-			trLink.setCapacity( 100000. );
-			scenario.getNetwork().addLink( trLink );
+			createAndAddTransitLink( scenario, nodeMiddleRight, nodeLastm1, TR_LONG_LINK_RIGHT_ID );
 		}
+
+		// ---
 		Node nodeLast = nf.createNode(Id.createNodeId("trNodeLast"), new Coord(lastNodeIdx*deltaX, deltaY ) ) ;
 		scenario.getNetwork().addNode(nodeLast);
 		final Id<Link> TR_LINK_LASTM1_LAST_ID = Id.createLinkId( "trLinkLastm1-Last" );
 		{
-			Link trLink = nf.createLink( TR_LINK_LASTM1_LAST_ID, nodeLastm1, nodeLast );
-			trLink.setFreespeed( 100. / 3.6 );
-			trLink.setCapacity( 100000. );
-			scenario.getNetwork().addLink( trLink );
+			createAndAddTransitLink( scenario, nodeLastm1, nodeLast, TR_LINK_LASTM1_LAST_ID );
 		}
 
 
@@ -150,14 +155,22 @@ public class PtAlongALineTest{
 		TransitScheduleFactory tsf = schedule.getFactory();
 		VehiclesFactory tvf = scenario.getTransitVehicles().getFactory();
 
-		TransitStopFacility stopFacility0 = tsf.createTransitStopFacility( Id.create("StopFac0", TransitStopFacility.class ), new Coord(deltaX, deltaY ), false ) ;
-		stopFacility0.setLinkId( TR_LINK_0_1_ID);
+		TransitStopFacility stopFacility0 = tsf.createTransitStopFacility( Id.create( "StopFac0", TransitStopFacility.class ),
+			  new Coord( deltaX, deltaY ), false );
+		stopFacility0.setLinkId( TR_LINK_0_1_ID );
 		schedule.addStopFacility( stopFacility0 );
 
 		TransitStopFacility stopFacility10000 = tsf.createTransitStopFacility(
-			  Id.create("StopFac10000", TransitStopFacility.class ), new Coord((lastNodeIdx-1)*deltaX, deltaY ), false ) ;
-		stopFacility10000.setLinkId( TR_LINK_LASTM1_LAST_ID);
+			  Id.create( "StopFac10000", TransitStopFacility.class ), new Coord( (lastNodeIdx - 1) * deltaX, deltaY ), false );
+		stopFacility10000.setLinkId( TR_LINK_LASTM1_LAST_ID );
 		schedule.addStopFacility( stopFacility10000 );
+
+		TransitStopFacility stopFacility5000 = tsf.createTransitStopFacility(
+			  Id.create( "StopFac5000", TransitStopFacility.class ), new Coord( (lastNodeIdx - 1) * deltaX, deltaY ), false );
+		stopFacility5000.setLinkId( TR_LINK_MIDDLE_ID );
+		stopFacility5000.getAttributes().putAttribute( "drtAccessible", true );
+		stopFacility5000.getAttributes().putAttribute( "walkAccessible", false );
+		schedule.addStopFacility( stopFacility5000 );
 
 		VehicleType busType = tvf.createVehicleType( Id.create( "bus", VehicleType.class ) );
 		{
@@ -172,7 +185,9 @@ public class PtAlongALineTest{
 
 		{
 			List<Id<Link>> linkIds = new ArrayList<>() ;
-			linkIds.add( TR_LONG_LINK_ID ) ;
+			linkIds.add( TR_LONG_LINK_LEFT_ID ) ;
+			linkIds.add( TR_LINK_MIDDLE_ID ) ;
+			linkIds.add( TR_LONG_LINK_RIGHT_ID ) ;
 			NetworkRoute route = createNetworkRoute( TR_LINK_0_1_ID, linkIds, TR_LINK_LASTM1_LAST_ID, pf );
 
 			List<TransitRouteStop> stops = new ArrayList<>() ;
@@ -214,6 +229,13 @@ public class PtAlongALineTest{
 
 
 		controler.run() ;
+	}
+
+	private static void createAndAddTransitLink( Scenario scenario, Node node0, Node node1, Id<Link> TR_LINK_0_1_ID ){
+		Link trLink = scenario.getNetwork().getFactory().createLink( TR_LINK_0_1_ID, node0, node1 );
+		trLink.setFreespeed( 100. / 3.6 );
+		trLink.setCapacity( 100000. );
+		scenario.getNetwork().addLink( trLink );
 	}
 
 	private static NetworkRoute createNetworkRoute( Id<Link> TR_LINK_0_1_ID, List<Id<Link>> linkIds, Id<Link> TR_LINK_LASTM1_LAST_ID, PopulationFactory pf ){
