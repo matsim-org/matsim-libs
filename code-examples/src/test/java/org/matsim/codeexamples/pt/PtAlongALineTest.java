@@ -166,10 +166,10 @@ public class PtAlongALineTest{
 		schedule.addStopFacility( stopFacility10000 );
 
 		TransitStopFacility stopFacility5000 = tsf.createTransitStopFacility(
-			  Id.create( "StopFac5000", TransitStopFacility.class ), new Coord( (lastNodeIdx - 1) * deltaX, deltaY ), false );
+			  Id.create( "StopFac5000", TransitStopFacility.class ), new Coord( 0.5*(lastNodeIdx - 1) * deltaX, deltaY ), false );
 		stopFacility5000.setLinkId( TR_LINK_MIDDLE_ID );
-		stopFacility5000.getAttributes().putAttribute( "drtAccessible", true );
-		stopFacility5000.getAttributes().putAttribute( "walkAccessible", false );
+//		stopFacility5000.getAttributes().putAttribute( "drtAccessible", true );
+//		stopFacility5000.getAttributes().putAttribute( "walkAccessible", false );
 		schedule.addStopFacility( stopFacility5000 );
 
 		VehicleType busType = tvf.createVehicleType( Id.create( "bus", VehicleType.class ) );
@@ -196,7 +196,11 @@ public class PtAlongALineTest{
 				stops.add( stop ) ;
 			}
 			{
-				TransitRouteStop stop = tsf.createTransitRouteStop( stopFacility10000, 0., 0. );
+				TransitRouteStop stop = tsf.createTransitRouteStop( stopFacility5000, 1., 1. );
+				stops.add( stop ) ;
+			}
+			{
+				TransitRouteStop stop = tsf.createTransitRouteStop( stopFacility10000, 1., 1. );
 				stops.add( stop ) ;
 			}
 			{
