@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,25 +15,21 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
-package org.matsim.contrib.bicycle;
+ * *********************************************************************** *
+ */
+
+package org.matsim.contrib.ev.charging;
+
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
 
 /**
- * This is just an intermediate solution until 
- * <a href="https://matsim.atlassian.net/browse/MATSIM-700">https://matsim.atlassian.net/browse/MATSIM-700</a>
- * is fixed.
- * 
- * @author dziemke based on amit
+ * @author Michal Maciejewski (michalm)
  */
-@Deprecated
-class BicycleSpeedUtils {
-	static double getSpeed( final String travelMode ){
-		double speed;
-		if ( travelMode.equals( "bicycle" ) ) {
-			speed = 20.0/3.6;
-		} else {
-			throw new RuntimeException("No speed is set for travel mode " + travelMode + ".");
-		}
-		return speed;
+public interface ChargingPower {
+	interface Factory {
+		ChargingPower create(ElectricVehicle electricVehicle);
 	}
+
+	double calcChargingPower(Charger charger);
 }

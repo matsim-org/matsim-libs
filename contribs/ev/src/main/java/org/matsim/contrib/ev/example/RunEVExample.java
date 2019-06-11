@@ -22,17 +22,13 @@ package org.matsim.contrib.ev.example;/*
  */
 
 import java.io.IOException;
-import java.util.function.Function;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
-import org.matsim.contrib.ev.charging.ChargingStrategy;
-import org.matsim.contrib.ev.charging.FastThenSlowCharging;
 import org.matsim.contrib.ev.charging.VehicleChargingHandler;
-import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.routing.EVNetworkRoutingProvider;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -67,8 +63,6 @@ public class RunEVExample {
 		config.controler()
 				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Function<Charger, ChargingStrategy> chargingStrategyFactory = charger -> new FastThenSlowCharging(
-				charger.getPower());
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new EvModule());
 		controler.addOverridingModule(new AbstractModule() {

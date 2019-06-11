@@ -35,5 +35,4 @@ public class RunETaxiScenarioIT {
 		String configFile = "mielec_2014_02/mielec_etaxi_config_assignment.xml";
 		RunETaxiScenario.run(configFile, false);
 	}
-
 }

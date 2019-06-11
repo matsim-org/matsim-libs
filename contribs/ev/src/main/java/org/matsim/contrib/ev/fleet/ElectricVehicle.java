@@ -21,6 +21,7 @@
 package org.matsim.contrib.ev.fleet;
 
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 
@@ -30,6 +31,8 @@ public interface ElectricVehicle extends Identifiable<ElectricVehicle> {
 	DriveEnergyConsumption getDriveEnergyConsumption();
 
 	AuxEnergyConsumption getAuxEnergyConsumption();
+
+	ChargingPower getChargingPower();
 
 	Battery getBattery();
 

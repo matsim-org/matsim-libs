@@ -28,10 +28,11 @@ public final class BicycleLabels {
 	// I think that this should rather be used through a BicycleUtils class.  kai, may'19
 
 	public static final String GRADIENT = "gradient";
-	public static final String AVERAGE_ELEVATION = "average_elevation";
+	public static final String AVERAGE_ELEVATION = "averageElevation";
 	public static final String SURFACE = "surface";
 	public static final String SMOOTHNESS = "smoothness";
 	public static final String CYCLEWAY = "cycleway";
+	public static final String BICYCLE_INFRASTRUCTURE_SPEED_FACTOR = "bicycleInfrastructureSpeedFactor";
 
 	private BicycleLabels() {
 		// Don't allow to create instances of this class
