@@ -49,6 +49,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.withinday.events.ReplanningEvent;
 
 /**
@@ -144,10 +145,10 @@ public final class EditTrips {
 		} else if ( currentLeg.getRoute() instanceof ExperimentalTransitRoute ) {
 			// public transit leg
 			
-//			replanCurrentLegWithTransitRoute(newAct, routingMode, currentLeg, now, agent);
+			replanCurrentLegWithTransitRoute(newAct, routingMode, currentLeg, now, agent);
 			
 			// TODO: replace the short-cut solution below after fixing replanCurrentLegWithTransitRoute
-			replanCurrentLegWithGenericRoute(newAct, routingMode, currentLeg, now, agent);
+//			replanCurrentLegWithGenericRoute(newAct, routingMode, currentLeg, now, agent);
 		} else if ( currentLeg.getRoute() instanceof GenericRouteImpl ) {
 			// teleported leg
 			replanCurrentLegWithGenericRoute(newAct, routingMode, currentLeg, now, agent);
@@ -296,6 +297,9 @@ public final class EditTrips {
 		
 		log.debug("agent" + agent.getId() + " new plan: " + planElements.toString());
 		WithinDayAgentUtils.resetCaches(agent);
+
+		this.scenario.getPopulation().getPersonAttributes().putAttribute( agent.getId().toString(), AgentSnapshotInfo.marker, true ) ;
+
 	}
 	
 	/**
@@ -304,8 +308,7 @@ public final class EditTrips {
 	 * access_walk, egress_walk) from possible other modes using generic routes, but
 	 * hypothetically something else than teleportation.
 	 */
-	private void replanCurrentLegWithGenericRoute(Activity newAct, String routingMode, Leg currentLeg, double now,
-			MobsimAgent agent) {
+	private void replanCurrentLegWithGenericRoute(Activity newAct, String routingMode, Leg currentLeg, double now, MobsimAgent agent) {
 
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
 		
@@ -342,8 +345,11 @@ public final class EditTrips {
 			// replan from stage activity:
 			List<PlanElement> subTripPlanElements = tripElements.subList(tripElementsIndex + 1,tripElements.size()) ;// toIndex is exclusive
 			
-			//TODO: In the following step no trip is found. TripStructureUtils.getTrips looks as if having a stage activity at start might be the problem. But this means replanCurrentTripFromStageActivity also cannot work. There are no tests, so who knows...
-			Trip subTrip = TripStructureUtils.getTrips(subTripPlanElements, tripRouter.getStageActivityTypes()).get(0) ;
+			//TODO: In the following step no trip is found. TripStructureUtils.getTrips looks
+			//as if having a stage activity at start might be the problem. But this means
+			//replanCurrentTripFromStageActivity also cannot work. There are no tests, so who knows...
+			final List<Trip> trips = TripStructureUtils.getTrips( subTripPlanElements, tripRouter.getStageActivityTypes() );
+			Trip subTrip = trips.get(0 ) ;
 			final double dpTime = agent.getActivityEndTime() ;
 			this.replanFutureTrip(subTrip, WithinDayAgentUtils.getModifiablePlan(agent), routingMode, dpTime ) ;
 			
