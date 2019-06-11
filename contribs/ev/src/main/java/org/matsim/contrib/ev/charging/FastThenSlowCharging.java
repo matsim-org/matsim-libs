@@ -39,19 +39,20 @@ public class FastThenSlowCharging implements BatteryCharging {
 		this.electricVehicle = electricVehicle;
 	}
 
-	@Override
-	public double calcChargingPower(Charger charger) {
+
+	public double calcChargingPower(double maxPower) {
 		Battery b = electricVehicle.getBattery();
 		double relativeSoc = b.getSoc() / b.getCapacity();
 		double c = b.getCapacity() / 3600;
 		if (relativeSoc <= 0.5) {
-			return Math.min(charger.getPower(), 1.75 * c);
+			return Math.min(maxPower, 1.75 * c);
 		} else if (relativeSoc <= 0.75) {
-			return Math.min(charger.getPower(), 1.25 * c);
+			return Math.min(maxPower, 1.25 * c);
 		} else {
-			return Math.min(charger.getPower(), 0.5 * c);
+			return Math.min(maxPower, 0.5 * c);
 		}
 	}
+
 
 	@Override
 	public double calcChargingTime(Charger charger, double energy) {
@@ -82,5 +83,11 @@ public class FastThenSlowCharging implements BatteryCharging {
 		double timeC = energyC / Math.min(charger.getPower(), 0.5 * c);
 
 		return timeA + timeB + timeC;
+	}
+
+
+	@Override
+	public double calcChargingPower(Charger charger) {
+		return calcChargingPower(charger.getPower());
 	}
 }
