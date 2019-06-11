@@ -34,6 +34,19 @@ import java.util.Set;
 
 public class PtAlongALineTest{
 
+	private static final Id<Link> TR_LINK_0_1_ID = Id.createLinkId( "trLink0-1" );
+	private static final Id<Link> TR_LONG_LINK_LEFT_ID = Id.createLinkId( "trLinkLongLeft" );
+	private static final Id<Link> TR_LINK_MIDDLE_ID = Id.createLinkId( "trLinkMiddle" );
+	private static final Id<Link> TR_LONG_LINK_RIGHT_ID = Id.createLinkId( "trLinkLongRight" );
+	private static final Id<Link> TR_LINK_LASTM1_LAST_ID = Id.createLinkId( "trLinkLastm1-Last" );
+
+	private static final Id<TransitStopFacility> tr_stop_fac_0_ID = Id.create( "StopFac0", TransitStopFacility.class );
+	private static final Id<TransitStopFacility> tr_stop_fac_10000_ID = Id.create( "StopFac10000", TransitStopFacility.class );
+	private static final Id<TransitStopFacility> tr_stop_fac_5000_ID = Id.create( "StopFac5000", TransitStopFacility.class );
+
+	private static final Id<VehicleType> busTypeID = Id.create( "bus", VehicleType.class );
+
+
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test
@@ -53,32 +66,139 @@ public class PtAlongALineTest{
 		Scenario scenario = ScenarioUtils.createScenario( config );
 		// don't load anything
 
-		NetworkFactory nf = scenario.getNetwork().getFactory();
-		PopulationFactory pf = scenario.getPopulation().getFactory();
-		ActivityFacilitiesFactory ff = scenario.getActivityFacilities().getFactory();
-
-		// Construct a network and facilities along a line:
-		// 0 --(0-1)-- 1 --(2-1)-- 2 -- ...
-		// with a facility of same ID attached to each link.  Have home towards the left, and then select a shop facility, with frozen epsilons.
-
-		Node prevNode;
-		{
-			Node node = nf.createNode( Id.createNodeId( 0 ), new Coord( 0., 0. ) );
-			scenario.getNetwork().addNode( node );
-			prevNode = node;
-		}
 		final int lastNodeIdx = 1000;
 		final double deltaX = 100.;
-		for( int ii = 1 ; ii <= lastNodeIdx ; ii++ ){
-			Node node = nf.createNode( Id.createNodeId( ii ), new Coord( ii * deltaX, 0. ) );
-			scenario.getNetwork().addNode( node );
-			// ---
-			addLinkAndFacility( scenario, nf, ff, prevNode, node );
-			addLinkAndFacility( scenario, nf, ff, node, prevNode );
-			// ---
-			prevNode = node;
+
+		createAndAddCarNetwork( scenario, lastNodeIdx, deltaX );
+
+		createAndAddPopulation( scenario );
+
+		final double deltaY = 1000.;
+
+		createAndAddTransitNetwork( scenario, lastNodeIdx, deltaX, deltaY );
+
+		createAndAddTransitStopFacilities( scenario, lastNodeIdx, deltaX, deltaY );
+
+		createAndAddTransitVehicleType( scenario );
+
+		createAndAddTransitLine( scenario );
+
+		TransitScheduleValidator.printResult( TransitScheduleValidator.validateAll( scenario.getTransitSchedule(), scenario.getNetwork() ) );
+
+		Controler controler = new Controler( scenario ) ;
+
+		controler.run() ;
+	}
+
+	private static void createAndAddTransitLine( Scenario scenario ){
+		PopulationFactory pf = scenario.getPopulation().getFactory();
+		;
+		TransitSchedule schedule = scenario.getTransitSchedule();
+		TransitScheduleFactory tsf = schedule.getFactory();
+		VehiclesFactory tvf = scenario.getTransitVehicles().getFactory();
+
+		List<Id<Link>> linkIds = new ArrayList<>() ;
+		linkIds.add( TR_LONG_LINK_LEFT_ID ) ;
+		linkIds.add( TR_LINK_MIDDLE_ID ) ;
+		linkIds.add( TR_LONG_LINK_RIGHT_ID ) ;
+		NetworkRoute route = createNetworkRoute( TR_LINK_0_1_ID, linkIds, TR_LINK_LASTM1_LAST_ID, pf );
+
+		List<TransitRouteStop> stops = new ArrayList<>() ;
+		{
+			stops.add( tsf.createTransitRouteStop( schedule.getFacilities().get( tr_stop_fac_0_ID ), 0., 0. ) );
+			stops.add( tsf.createTransitRouteStop( schedule.getFacilities().get( tr_stop_fac_5000_ID ), 1., 1. ) );
+			stops.add( tsf.createTransitRouteStop( schedule.getFacilities().get( tr_stop_fac_10000_ID ), 1., 1. ) );
 		}
-		// ===
+		{
+			TransitRoute transitRoute = tsf.createTransitRoute( Id.create( "route1", TransitRoute.class ), route, stops, "bus" );
+			for ( int ii=0 ; ii<100 ; ii++ ){
+				String str = "tr_" + ii ;
+
+				scenario.getTransitVehicles().addVehicle( tvf.createVehicle( Id.createVehicleId( str ), scenario.getTransitVehicles().getVehicleTypes().get( busTypeID) ) );
+
+				Departure departure = tsf.createDeparture( Id.create( str, Departure.class ), 7. * 3600. + ii*300 ) ;
+				departure.setVehicleId( Id.createVehicleId( str ) );
+				transitRoute.addDeparture( departure );
+			}
+			TransitLine line = tsf.createTransitLine( Id.create( "line1", TransitLine.class ) );
+			line.addRoute( transitRoute );
+
+			schedule.addTransitLine( line );
+		}
+	}
+
+	private static void createAndAddTransitVehicleType( Scenario scenario ){
+		VehiclesFactory tvf = scenario.getTransitVehicles().getFactory();
+		VehicleType busType = tvf.createVehicleType( busTypeID );
+		{
+			VehicleCapacity capacity = tvf.createVehicleCapacity();
+			capacity.setSeats( 100 );
+			busType.setCapacity( capacity );
+		}
+		{
+			busType.setMaximumVelocity( 100. / 3.6 );
+		}
+		scenario.getTransitVehicles().addVehicleType( busType );
+	}
+
+	private static void createAndAddTransitStopFacilities( Scenario scenario, int lastNodeIdx, double deltaX, double deltaY ){
+		TransitSchedule schedule = scenario.getTransitSchedule();
+		TransitScheduleFactory tsf = schedule.getFactory();
+
+		TransitStopFacility stopFacility0 = tsf.createTransitStopFacility( tr_stop_fac_0_ID, new Coord( deltaX, deltaY ), false );
+		stopFacility0.setLinkId( TR_LINK_0_1_ID );
+		schedule.addStopFacility( stopFacility0 );
+
+		TransitStopFacility stopFacility5000 = tsf.createTransitStopFacility( tr_stop_fac_5000_ID, new Coord( 0.5 * (lastNodeIdx - 1) * deltaX, deltaY ), false );
+		stopFacility5000.setLinkId( TR_LINK_MIDDLE_ID );
+		//		stopFacility5000.getAttributes().putAttribute( "drtAccessible", true );
+		//		stopFacility5000.getAttributes().putAttribute( "walkAccessible", false );
+		schedule.addStopFacility( stopFacility5000 );
+
+		TransitStopFacility stopFacility10000 = tsf.createTransitStopFacility( tr_stop_fac_10000_ID, new Coord( (lastNodeIdx - 1) * deltaX, deltaY ), false );
+		stopFacility10000.setLinkId( TR_LINK_LASTM1_LAST_ID );
+		schedule.addStopFacility( stopFacility10000 );
+	}
+
+	private static void createAndAddTransitNetwork( Scenario scenario, int lastNodeIdx, double deltaX, double deltaY ){
+		NetworkFactory nf = scenario.getNetwork().getFactory();
+		;
+
+		Node node0 = nf.createNode( Id.createNodeId("trNode0" ), new Coord(0, deltaY ) );
+		scenario.getNetwork().addNode(node0);
+		// ---
+		Node node1 = nf.createNode( Id.createNodeId("trNode1"), new Coord(deltaX, deltaY ) ) ;
+		scenario.getNetwork().addNode( node1 ) ;
+		createAndAddTransitLink( scenario, node0, node1, TR_LINK_0_1_ID );
+		// ---
+		Node nodeMiddleLeft = nf.createNode( Id.createNodeId("trNodeMiddleLeft") , new Coord( 0.5*(lastNodeIdx-1)*deltaX , deltaY ) ) ;
+		scenario.getNetwork().addNode( nodeMiddleLeft) ;
+		{
+			createAndAddTransitLink( scenario, node1, nodeMiddleLeft, TR_LONG_LINK_LEFT_ID );
+		}
+		// ---
+		Node nodeMiddleRight = nf.createNode( Id.createNodeId("trNodeMiddleRight") , new Coord( 0.5*(lastNodeIdx+1)*deltaX , deltaY ) ) ;
+		scenario.getNetwork().addNode( nodeMiddleRight ) ;
+		{
+			createAndAddTransitLink( scenario, nodeMiddleLeft, nodeMiddleRight, TR_LINK_MIDDLE_ID );
+		}
+		// ---
+		Node nodeLastm1 = nf.createNode( Id.createNodeId("trNodeLastm1") , new Coord( (lastNodeIdx-1)*deltaX , deltaY ) ) ;
+		scenario.getNetwork().addNode( nodeLastm1) ;
+		{
+			createAndAddTransitLink( scenario, nodeMiddleRight, nodeLastm1, TR_LONG_LINK_RIGHT_ID );
+		}
+
+		// ---
+		Node nodeLast = nf.createNode(Id.createNodeId("trNodeLast"), new Coord(lastNodeIdx*deltaX, deltaY ) ) ;
+		scenario.getNetwork().addNode(nodeLast);
+		{
+			createAndAddTransitLink( scenario, nodeLastm1, nodeLast, TR_LINK_LASTM1_LAST_ID );
+		}
+	}
+
+	private static void createAndAddPopulation( Scenario scenario ){
+		PopulationFactory pf = scenario.getPopulation().getFactory();
 		List<ActivityFacility> facilitiesAsList = new ArrayList<>( scenario.getActivityFacilities().getFacilities().values() ) ;
 		final Id<ActivityFacility> activityFacilityId = facilitiesAsList.get( facilitiesAsList.size()-1 ).getId() ;
 		for( int jj = 0 ; jj < 1000 ; jj++ ){
@@ -110,129 +230,31 @@ public class PtAlongALineTest{
 				}
 			}
 		}
+	}
 
-		final double deltaY = 1000.;
+	private static void createAndAddCarNetwork( Scenario scenario, int lastNodeIdx, double deltaX ){
+		// Construct a network and facilities along a line:
+		// 0 --(0-1)-- 1 --(2-1)-- 2 -- ...
+		// with a facility of same ID attached to each link.
 
-		Node node0 = nf.createNode( Id.createNodeId("trNode0"), new Coord(0, deltaY ) );
-		scenario.getNetwork().addNode(node0);
-		// ---
-		Node node1 = nf.createNode( Id.createNodeId("trNode1"), new Coord(deltaX, deltaY ) ) ;
-		scenario.getNetwork().addNode( node1 ) ;
-		final Id<Link> TR_LINK_0_1_ID = Id.createLinkId( "trLink0-1" );
-		createAndAddTransitLink( scenario, node0, node1, TR_LINK_0_1_ID );
-		// ---
-		Node nodeMiddleLeft = nf.createNode( Id.createNodeId("trNodeMiddleLeft") , new Coord( 0.5*(lastNodeIdx-1)*deltaX , deltaY ) ) ;
-		scenario.getNetwork().addNode( nodeMiddleLeft) ;
-		final Id<Link> TR_LONG_LINK_LEFT_ID = Id.createLinkId( "trLinkLongLeft" );
+		NetworkFactory nf = scenario.getNetwork().getFactory();
+		ActivityFacilitiesFactory ff = scenario.getActivityFacilities().getFactory();
+
+		Node prevNode;
 		{
-			createAndAddTransitLink( scenario, node1, nodeMiddleLeft, TR_LONG_LINK_LEFT_ID );
+			Node node = nf.createNode( Id.createNodeId( 0 ), new Coord( 0., 0. ) );
+			scenario.getNetwork().addNode( node );
+			prevNode = node;
 		}
-		// ---
-		Node nodeMiddleRight = nf.createNode( Id.createNodeId("trNodeMiddleRight") , new Coord( 0.5*(lastNodeIdx+1)*deltaX , deltaY ) ) ;
-		scenario.getNetwork().addNode( nodeMiddleRight ) ;
-		final Id<Link> TR_LINK_MIDDLE_ID = Id.createLinkId( "trLinkMiddle" );
-		{
-			createAndAddTransitLink( scenario, nodeMiddleLeft, nodeMiddleRight, TR_LINK_MIDDLE_ID );
+		for( int ii = 1 ; ii <= lastNodeIdx ; ii++ ){
+			Node node = nf.createNode( Id.createNodeId( ii ), new Coord( ii * deltaX, 0. ) );
+			scenario.getNetwork().addNode( node );
+			// ---
+			addLinkAndFacility( scenario, nf, ff, prevNode, node );
+			addLinkAndFacility( scenario, nf, ff, node, prevNode );
+			// ---
+			prevNode = node;
 		}
-		// ---
-		Node nodeLastm1 = nf.createNode( Id.createNodeId("trNodeLastm1") , new Coord( (lastNodeIdx-1)*deltaX , deltaY ) ) ;
-		scenario.getNetwork().addNode( nodeLastm1) ;
-		final Id<Link> TR_LONG_LINK_RIGHT_ID = Id.createLinkId( "trLinkLongRight" );
-		{
-			createAndAddTransitLink( scenario, nodeMiddleRight, nodeLastm1, TR_LONG_LINK_RIGHT_ID );
-		}
-
-		// ---
-		Node nodeLast = nf.createNode(Id.createNodeId("trNodeLast"), new Coord(lastNodeIdx*deltaX, deltaY ) ) ;
-		scenario.getNetwork().addNode(nodeLast);
-		final Id<Link> TR_LINK_LASTM1_LAST_ID = Id.createLinkId( "trLinkLastm1-Last" );
-		{
-			createAndAddTransitLink( scenario, nodeLastm1, nodeLast, TR_LINK_LASTM1_LAST_ID );
-		}
-
-
-		TransitSchedule schedule = scenario.getTransitSchedule();
-		TransitScheduleFactory tsf = schedule.getFactory();
-		VehiclesFactory tvf = scenario.getTransitVehicles().getFactory();
-
-		TransitStopFacility stopFacility0 = tsf.createTransitStopFacility( Id.create( "StopFac0", TransitStopFacility.class ),
-			  new Coord( deltaX, deltaY ), false );
-		stopFacility0.setLinkId( TR_LINK_0_1_ID );
-		schedule.addStopFacility( stopFacility0 );
-
-		TransitStopFacility stopFacility10000 = tsf.createTransitStopFacility(
-			  Id.create( "StopFac10000", TransitStopFacility.class ), new Coord( (lastNodeIdx - 1) * deltaX, deltaY ), false );
-		stopFacility10000.setLinkId( TR_LINK_LASTM1_LAST_ID );
-		schedule.addStopFacility( stopFacility10000 );
-
-		TransitStopFacility stopFacility5000 = tsf.createTransitStopFacility(
-			  Id.create( "StopFac5000", TransitStopFacility.class ), new Coord( 0.5*(lastNodeIdx - 1) * deltaX, deltaY ), false );
-		stopFacility5000.setLinkId( TR_LINK_MIDDLE_ID );
-//		stopFacility5000.getAttributes().putAttribute( "drtAccessible", true );
-//		stopFacility5000.getAttributes().putAttribute( "walkAccessible", false );
-		schedule.addStopFacility( stopFacility5000 );
-
-		VehicleType busType = tvf.createVehicleType( Id.create( "bus", VehicleType.class ) );
-		{
-			VehicleCapacity capacity = tvf.createVehicleCapacity();
-			capacity.setSeats( 100 );
-			busType.setCapacity( capacity );
-		}
-		{
-			busType.setMaximumVelocity( 100./3.6 );
-		}
-		scenario.getTransitVehicles().addVehicleType( busType );
-
-		{
-			List<Id<Link>> linkIds = new ArrayList<>() ;
-			linkIds.add( TR_LONG_LINK_LEFT_ID ) ;
-			linkIds.add( TR_LINK_MIDDLE_ID ) ;
-			linkIds.add( TR_LONG_LINK_RIGHT_ID ) ;
-			NetworkRoute route = createNetworkRoute( TR_LINK_0_1_ID, linkIds, TR_LINK_LASTM1_LAST_ID, pf );
-
-			List<TransitRouteStop> stops = new ArrayList<>() ;
-			{
-				TransitRouteStop stop = tsf.createTransitRouteStop( stopFacility0, 0., 0. );
-				stops.add( stop ) ;
-			}
-			{
-				TransitRouteStop stop = tsf.createTransitRouteStop( stopFacility5000, 1., 1. );
-				stops.add( stop ) ;
-			}
-			{
-				TransitRouteStop stop = tsf.createTransitRouteStop( stopFacility10000, 1., 1. );
-				stops.add( stop ) ;
-			}
-			{
-				TransitRoute transitRoute = tsf.createTransitRoute( Id.create( "route1", TransitRoute.class ), route, stops, "bus" );
-				{
-					for ( int ii=0 ; ii<100 ; ii++ ){
-						String str = "tr_" + ii ;
-
-						scenario.getTransitVehicles().addVehicle( tvf.createVehicle( Id.createVehicleId( str ), busType ) );
-
-						Departure departure = tsf.createDeparture( Id.create( str, Departure.class ), 7. * 3600. + ii*300 ) ;
-						departure.setVehicleId( Id.createVehicleId( str ) );
-						transitRoute.addDeparture( departure );
-					}
-				}
-				TransitLine line = tsf.createTransitLine( Id.create( "line1", TransitLine.class ) );
-				line.addRoute( transitRoute );
-
-				schedule.addTransitLine( line );
-			}
-		}
-		
-		TransitScheduleValidator.ValidationResult result = TransitScheduleValidator.validateAll( schedule, scenario.getNetwork() );
-		TransitScheduleValidator.printResult( result );
-
-//		System.exit(-1) ;
-
-		Controler controler = new Controler( scenario ) ;
-
-
-
-		controler.run() ;
 	}
 
 	private static void createAndAddTransitLink( Scenario scenario, Node node0, Node node1, Id<Link> TR_LINK_0_1_ID ){
