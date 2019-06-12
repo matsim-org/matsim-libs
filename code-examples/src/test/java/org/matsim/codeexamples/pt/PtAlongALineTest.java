@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -26,6 +27,10 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehiclesFactory;
+
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -49,6 +54,13 @@ public class PtAlongALineTest{
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
+	
+
+    /**
+     * Test of Intermodal Access & Egress to pt using bike.There are three transit stops, and
+     * only the middle stop is accessible by bike. 
+     */
+	
 	@Test
 	public void testPtAlongALine() {
 
@@ -58,10 +70,17 @@ public class PtAlongALineTest{
 		config.controler().setLastIteration( 0 );
 
 		config.plansCalcRoute().getModeRoutingParams().get( TransportMode.walk ).setTeleportedModeSpeed( 3. );
+		config.plansCalcRoute().getModeRoutingParams().get( TransportMode.bike ).setTeleportedModeSpeed( 10. );
 
 		config.qsim().setEndTime( 24.*3600. );
 		
-		config.transit().setUseTransit(true);
+		config.transit().setUseTransit(true) ;
+		
+		configureScoring(config);
+		
+		
+		SwissRailRaptorConfigGroup configRaptor = createRaptorConfigGroup(1000000, 1000000);// (radius walk, radius bike)
+		config.addModule(configRaptor);
 
 		Scenario scenario = ScenarioUtils.createScenario( config );
 		// don't load anything
@@ -82,12 +101,61 @@ public class PtAlongALineTest{
 		createAndAddTransitVehicleType( scenario );
 
 		createAndAddTransitLine( scenario );
+		
 
 		TransitScheduleValidator.printResult( TransitScheduleValidator.validateAll( scenario.getTransitSchedule(), scenario.getNetwork() ) );
 
 		Controler controler = new Controler( scenario ) ;
-
+		
+		controler.addOverridingModule(new SwissRailRaptorModule()) ;
+		
 		controler.run() ;
+	}
+
+	private static void configureScoring(Config config) {
+		PlanCalcScoreConfigGroup.ModeParams accessWalk = new PlanCalcScoreConfigGroup.ModeParams("access_walk");
+        accessWalk.setMarginalUtilityOfTraveling(0);
+        config.planCalcScore().addModeParams(accessWalk);
+        
+        PlanCalcScoreConfigGroup.ModeParams transitWalk = new PlanCalcScoreConfigGroup.ModeParams("transit_walk");
+        transitWalk.setMarginalUtilityOfTraveling(0);
+        config.planCalcScore().addModeParams(transitWalk);
+        
+        PlanCalcScoreConfigGroup.ModeParams egressWalk = new PlanCalcScoreConfigGroup.ModeParams("egress_walk");
+        egressWalk.setMarginalUtilityOfTraveling(0);
+        config.planCalcScore().addModeParams(egressWalk);
+        
+        PlanCalcScoreConfigGroup.ModeParams bike = new PlanCalcScoreConfigGroup.ModeParams("bike");
+        bike.setMarginalUtilityOfTraveling(0);
+        config.planCalcScore().addModeParams(bike);
+        
+        PlanCalcScoreConfigGroup.ModeParams drt = new PlanCalcScoreConfigGroup.ModeParams("drt");
+        drt.setMarginalUtilityOfTraveling(0);
+        config.planCalcScore().addModeParams(drt);
+	}
+
+	private static SwissRailRaptorConfigGroup createRaptorConfigGroup(int radiusWalk, int radiusBike) {
+		SwissRailRaptorConfigGroup configRaptor = new SwissRailRaptorConfigGroup();
+		configRaptor.setUseIntermodalAccessEgress(true);
+		
+		// Walk
+		IntermodalAccessEgressParameterSet paramSetWalk = new IntermodalAccessEgressParameterSet();
+		paramSetWalk.setMode(TransportMode.walk);
+		paramSetWalk.setRadius(radiusWalk);
+		paramSetWalk.setPersonFilterAttribute(null);
+		paramSetWalk.setStopFilterAttribute(null);
+		configRaptor.addIntermodalAccessEgress(paramSetWalk );
+		
+		// Bike
+		IntermodalAccessEgressParameterSet paramSetBike = new IntermodalAccessEgressParameterSet();
+		paramSetBike.setMode(TransportMode.bike);
+		paramSetBike.setRadius(radiusBike);
+		paramSetBike.setPersonFilterAttribute(null);
+		paramSetBike.setStopFilterAttribute("bikeAccessible");
+		paramSetBike.setStopFilterValue("true");
+		configRaptor.addIntermodalAccessEgress(paramSetBike );
+		
+		return configRaptor;
 	}
 
 	private static void createAndAddTransitLine( Scenario scenario ){
@@ -153,6 +221,8 @@ public class PtAlongALineTest{
 		stopFacility5000.setLinkId( TR_LINK_MIDDLE_ID );
 		//		stopFacility5000.getAttributes().putAttribute( "drtAccessible", true );
 		//		stopFacility5000.getAttributes().putAttribute( "walkAccessible", false );
+		stopFacility5000.getAttributes().putAttribute( "bikeAccessible", "true");
+		
 		schedule.addStopFacility( stopFacility5000 );
 
 		TransitStopFacility stopFacility10000 = tsf.createTransitStopFacility( tr_stop_fac_10000_ID, new Coord( (lastNodeIdx - 1) * deltaX, deltaY ), false );
