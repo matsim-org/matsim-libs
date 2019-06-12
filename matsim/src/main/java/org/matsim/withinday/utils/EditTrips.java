@@ -248,6 +248,8 @@ public final class EditTrips {
 		 * 
 		 * gl may'19
 		 */
+
+		boolean wantsToLeaveStop = false ;
 		
 		TransitStopFacility currentOrNextStop = null;
 		List<? extends PlanElement> newTripElements = null;
@@ -266,6 +268,7 @@ public final class EditTrips {
 				// The agent will not board any bus at the transit stop and will walk away or
 				// do something else. We have to remove him from the list of waiting agents.
 				transitAgentTracker.removeAgentFromStop(ptPassengerAgent, currentOrNextStop.getId());
+				wantsToLeaveStop = true ;
 			}
 		} else {
 			// agent is on a vehicle
@@ -297,6 +300,11 @@ public final class EditTrips {
 		
 		log.debug("agent" + agent.getId() + " new plan: " + planElements.toString());
 		WithinDayAgentUtils.resetCaches(agent);
+
+		if ( wantsToLeaveStop ) {
+			((MobsimAgent) ptPassengerAgent).endLegAndComputeNextState( now );
+		}
+
 
 		this.scenario.getPopulation().getPersonAttributes().putAttribute( agent.getId().toString(), AgentSnapshotInfo.marker, true ) ;
 
