@@ -105,21 +105,19 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 
 	public Id<Link> getNextLinkRandomInAcceptableDistance(Id<Link> currentLinkId, Id<Link> endLinkId, Id<Vehicle> vehicleId, double firstDestLinkEnterTime, double timeOfDay, String mode) {
 
-		Id<Link> nextLink = null;
+        Link nextLink = null;
 		Link currentLink = network.getLinks().get(currentLinkId);
 		List<Link> keys = ParkingUtils.getOutgoingLinksForMode(currentLink, mode);
-		do{
-            if (!(nextLink == null)) keys.remove(nextLink);
-			
-			if(keys.size() == 0){	//no outlink in acceptable Distance
-				keys = ParkingUtils.getOutgoingLinksForMode(currentLink, mode);
-				logger.error("vehicle " + vehicleId + " finds no outlink in acceptable distance going out from link " + currentLinkId + ". it just takes a random next link");
-				return keys.get(random.nextInt(keys.size())).getId();
-			}
-			nextLink = keys.get(random.nextInt(keys.size())).getId();
-		}
-		while(!isDriverInAcceptableDistance(nextLink, endLinkId, firstDestLinkEnterTime, timeOfDay));
-		return nextLink;
+
+        int size = keys.size();
+        for (int i = 1; i <= size; i++) {
+            nextLink = keys.get(random.nextInt(keys.size()));
+            if (isDriverInAcceptableDistance(nextLink.getId(), endLinkId, firstDestLinkEnterTime, timeOfDay)) return nextLink.getId();
+            keys.remove(nextLink);
+        }
+        logger.error("vehicle " + vehicleId + " finds no outlink in acceptable distance going out from link " + currentLinkId + ". it just takes a random next link");
+        return keys.get(random.nextInt(keys.size())).getId();
+
 	}
 
 	//---------------------------------------------------park decision-----------------------------------------------------------------------
