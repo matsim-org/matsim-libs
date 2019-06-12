@@ -57,18 +57,24 @@ class BicycleLegScoring extends CharyparNagelLegScoring {
 		double legScore = super.calcLegScore(departureTime, arrivalTime, leg);
 
 		if (leg.getMode().equals(bicycleMode)) {
-			NetworkRoute networkRoute = (NetworkRoute) leg.getRoute();
 			
-			List<Id<Link>> linkIds = new ArrayList<>();
-			linkIds.addAll(networkRoute.getLinkIds());
-			linkIds.add(networkRoute.getEndLinkId());
-			
-			// Iterate over all links of the route
-			for (Id<Link> linkId : linkIds) {
-				double scoreOnLink = BicycleUtilityUtils.computeLinkBasedScore(network.getLinks().get(linkId),
-						marginalUtilityOfComfort_m, marginalUtilityOfInfrastructure_m, marginalUtilityOfGradient_m_100m);
-				// LOG.warn("----- link = " + linkId + " -- scoreOnLink = " + scoreOnLink);
-				legScore += scoreOnLink;
+			if (leg.getRoute().getStartLinkId().toString().equals(leg.getRoute().getEndLinkId().toString())) {
+				// start link and end link are the same --> generic route
+				
+			} else {
+				NetworkRoute networkRoute = (NetworkRoute) leg.getRoute();
+				
+				List<Id<Link>> linkIds = new ArrayList<>();
+				linkIds.addAll(networkRoute.getLinkIds());
+				linkIds.add(networkRoute.getEndLinkId());
+				
+				// Iterate over all links of the route
+				for (Id<Link> linkId : linkIds) {
+					double scoreOnLink = BicycleUtilityUtils.computeLinkBasedScore(network.getLinks().get(linkId),
+							marginalUtilityOfComfort_m, marginalUtilityOfInfrastructure_m, marginalUtilityOfGradient_m_100m);
+					// LOG.warn("----- link = " + linkId + " -- scoreOnLink = " + scoreOnLink);
+					legScore += scoreOnLink;
+				}
 			}
 		}
 		
