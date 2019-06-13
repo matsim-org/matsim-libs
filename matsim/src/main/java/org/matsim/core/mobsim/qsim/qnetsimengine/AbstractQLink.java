@@ -168,7 +168,7 @@ abstract class AbstractQLink implements QLinkI {
 	
 	/* package */ final boolean letVehicleArrive(QVehicle qveh) {
 		if (vehicleHandler.handleVehicleArrival(qveh, this.getLink())) {
-			addParkedVehicle(qveh);
+			addParkedVehicle(qveh, false);
 			double now = context.getSimTimer().getTimeOfDay();;
 			context.getEventsManager().processEvent(new VehicleLeavesTrafficEvent(now , qveh.getDriver().getId(), 
 					this.link.getId(), qveh.getId(), qveh.getDriver().getMode(), 1.0 ) ) ;

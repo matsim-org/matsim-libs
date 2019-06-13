@@ -36,21 +36,37 @@ import com.google.inject.Provides;
 public class VehicleHandlerTest {
 	@Test
 	public void testVehicleHandler() {
-		// This is a test where there is a link with a certain parking capacity. As soon as
-		// it is reached the link is blocking, until a vehicle is leaving the link again. In 
-		// this case there are three agents which do a longer stop on the capacitated link,
-		// but they all have the same route and plan. This means that if the capacity is 
+		// This is a test where there is a link with a certain parking capacity. As soon
+		// as
+		// it is reached the link is blocking, until a vehicle is leaving the link
+		// again. In
+		// this case there are three agents which do a longer stop on the capacitated
+		// link,
+		// but they all have the same route and plan. This means that if the capacity is
 		// above 3, all agents will perform their plans without any distraction. If the
-		// capacity is set to 2, the third agent needs to wait until the first of the 
+		// capacity is set to 2, the third agent needs to wait until the first of the
 		// previous ones is leaving, and so on ...
+
+		Result result;
 		
-		Assert.assertEquals(20203.0, runTestScenario(4), 1e-3);
-		Assert.assertEquals(20203.0, runTestScenario(3), 1e-3);
-		Assert.assertEquals(23003.0, runTestScenario(2), 1e-3);
-		Assert.assertEquals(33003.0, runTestScenario(1), 1e-3);
+		result = runTestScenario(4);
+		Assert.assertEquals(20203.0, result.latestArrivalTime, 1e-3);
+		Assert.assertEquals(3, result.initialCount);
+		
+		result = runTestScenario(3);
+		Assert.assertEquals(20203.0, result.latestArrivalTime, 1e-3);
+		Assert.assertEquals(3, result.initialCount);
+		
+		result = runTestScenario(2);
+		Assert.assertEquals(23003.0, result.latestArrivalTime, 1e-3);
+		Assert.assertEquals(3, result.initialCount);
+		
+		result = runTestScenario(1);
+		Assert.assertEquals(33003.0, result.latestArrivalTime, 1e-3);
+		Assert.assertEquals(3, result.initialCount);
 	}
 
-	public double runTestScenario(long capacity) {
+	public Result runTestScenario(long capacity) {
 		Scenario scenario = createScenario();
 		Controler controler = new Controler(scenario);
 
@@ -78,13 +94,22 @@ public class VehicleHandlerTest {
 		});
 
 		controler.run();
-		return arrivalHandler.latestArrivalTime;
+		
+		Result result = new Result();
+		result.latestArrivalTime = arrivalHandler.latestArrivalTime;
+		result.initialCount = vehicleHandler.initialCount;
+		return result;
+	}
+	
+	private class Result {
+		double latestArrivalTime;
+		long initialCount;
 	}
 
 	private class BlockingVehicleHandler implements VehicleHandler {
-		private final Id<Link> linkId = Id.createLinkId("CD");
 		private final long capacity;
 
+		long initialCount = 0;
 		long count = 0;
 
 		public BlockingVehicleHandler(long capacity) {
@@ -93,14 +118,14 @@ public class VehicleHandlerTest {
 
 		@Override
 		public void handleVehicleDeparture(QVehicle vehicle, Link link) {
-			if (link.getId().equals(linkId)) {
+			if (link.getId().equals(Id.createLinkId("CD"))) {
 				count--;
 			}
 		}
 
 		@Override
 		public boolean handleVehicleArrival(QVehicle vehicle, Link link) {
-			if (link.getId().equals(linkId)) {
+			if (link.getId().equals(Id.createLinkId("CD"))) {
 				if (count >= capacity) {
 					return false;
 				}
@@ -113,7 +138,11 @@ public class VehicleHandlerTest {
 
 		@Override
 		public void handleInitialVehicleArrival(QVehicle vehicle, Link link) {
-
+			if (link.getId().equals(Id.createLinkId("AB"))) {
+				initialCount++;
+			} else {
+				throw new IllegalStateException("Only AB should have initial vehicles.");
+			}
 		}
 	}
 
