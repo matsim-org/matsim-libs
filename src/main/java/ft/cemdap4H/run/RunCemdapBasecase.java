@@ -64,7 +64,7 @@ import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 
 public class RunCemdapBasecase {
 public static void main(String[] args) {
-	String runId = "vw240_cadON_mergedCounts";
+	String runId = "vw241_cadON_timeFix";
 	String pct = ".0.1";
 	
 	String configPath = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\config_0.1.xml"; 
@@ -72,7 +72,7 @@ public static void main(String[] args) {
 	Config config = ConfigUtils.loadConfig(configPath, new CadytsConfigGroup());
 	
 	
-	config.plans().setInputFile("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw240_cadON_mergedCounts.0.1\\vw240_cadON_mergedCounts.0.1.20.plans.xml.gz");
+	config.plans().setInputFile("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\input\\finishedPlans_0.1_timeFIX.xml.gz");
 	Scenario scenario = ScenarioUtils.loadScenario(config);
 	adjustPtNetworkCapacity(scenario.getNetwork(),config.qsim().getFlowCapFactor());
 	
@@ -86,14 +86,14 @@ public static void main(String[] args) {
 	
 	//Override Counts params
 	CountsConfigGroup countsccg = (CountsConfigGroup) config.getModules().get(CountsConfigGroup.GROUP_NAME);
-	countsccg.setInputFile("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\input\\Counts\\mergedCountsH.xml");
+	countsccg.setInputFile("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\input\\Counts\\counts_H_LSA.xml");
 	
 	
 	config.controler().setOutputDirectory("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\"+runId+pct);
 	config.controler().setRunId(runId+pct);
 	config.controler().setWritePlansInterval(50);
 	config.controler().setWriteEventsInterval(50);
-	config.controler().setLastIteration(150); //Number of simulation iterations
+	config.controler().setLastIteration(400); //Number of simulation iterations
 	
 	// tell the system to use the congested car router for the ride mode:
 	controler.addOverridingModule(new AbstractModule(){
