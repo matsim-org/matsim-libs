@@ -89,6 +89,7 @@ public class BicycleTest {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
+		config.controler().setCreateGraphs(false);
 		
 		new RunBicycleExample().run(config, false);
 
@@ -121,6 +122,7 @@ public class BicycleTest {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
+		config.controler().setCreateGraphs(false);
 		
 		new RunBicycleExample().run(config, false);
 		{
@@ -150,6 +152,7 @@ public class BicycleTest {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
+		config.controler().setCreateGraphs(false);
 		
 		new RunBicycleExample().run(config, false);
 
@@ -177,6 +180,7 @@ public class BicycleTest {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
+		config.controler().setCreateGraphs(false);
 		
 		new RunBicycleExample().run(config, false);
 
@@ -204,6 +208,7 @@ public class BicycleTest {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
+		config.controler().setCreateGraphs(false);
 		
 		new RunBicycleExample().run(config, false);
 
@@ -232,6 +237,7 @@ public class BicycleTest {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
+		config.controler().setCreateGraphs(false);
 		
 		new RunBicycleExample().run(config, false);
 
@@ -260,6 +266,9 @@ public class BicycleTest {
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		// 10 iterations
 		config.controler().setLastIteration(10);
+		config.controler().setWriteEventsInterval(10);
+		config.controler().setWritePlansInterval(10);
+		config.controler().setCreateGraphs(false);
 		
 		new RunBicycleExample().run(config, false);
 
@@ -287,6 +296,10 @@ public class BicycleTest {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(10);
+		config.controler().setLastIteration(10);
+		config.controler().setWriteEventsInterval(10);
+		config.controler().setWritePlansInterval(10);
+		config.controler().setCreateGraphs(false);
 		
 		// Activate link-based scoring
 		BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) config.getModules().get("bicycle");
@@ -312,8 +325,13 @@ public class BicycleTest {
 		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
 		config.addModule(new BicycleConfigGroup());
 
-		config.controler().setWriteEventsInterval(1);
-				
+		config.controler().setWriteEventsInterval(0);
+		config.controler().setWritePlansInterval(0);
+		config.controler().setCreateGraphs(false);
+		config.controler().setDumpDataAtEnd(false);
+		config.qsim().setStartTime(6. * 3600.);
+		config.qsim().setEndTime(10. * 3600.);
+		
 		List<String> mainModeList = new ArrayList<>();
 		mainModeList.add("bicycle");
 		mainModeList.add(TransportMode.car);
@@ -323,12 +341,7 @@ public class BicycleTest {
 		{
 			StrategySettings strategySettings = new StrategySettings();
 			strategySettings.setStrategyName("ChangeExpBeta");
-			strategySettings.setWeight(0.8);
-			config.strategy().addStrategySettings(strategySettings);
-		}{
-			StrategySettings strategySettings = new StrategySettings();
-			strategySettings.setStrategyName("ReRoute");
-			strategySettings.setWeight(0.2);
+			strategySettings.setWeight(1.0);
 			config.strategy().addStrategySettings(strategySettings);
 		}
 		
@@ -423,8 +436,13 @@ public class BicycleTest {
 		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
 		config.addModule(new BicycleConfigGroup());
 
-		config.controler().setWriteEventsInterval(1);
-				
+		config.controler().setWriteEventsInterval(0);
+		config.controler().setWritePlansInterval(0);
+		config.controler().setCreateGraphs(false);
+		config.controler().setDumpDataAtEnd(false);
+		config.qsim().setStartTime(6. * 3600.);
+		config.qsim().setEndTime(14. * 3600.);
+		
 		List<String> mainModeList = new ArrayList<>();
 		mainModeList.add("bicycle");
 		mainModeList.add(TransportMode.car);
@@ -434,12 +452,7 @@ public class BicycleTest {
 		{
 			StrategySettings strategySettings = new StrategySettings();
 			strategySettings.setStrategyName("ChangeExpBeta");
-			strategySettings.setWeight(0.8);
-			config.strategy().addStrategySettings(strategySettings);
-		}{
-			StrategySettings strategySettings = new StrategySettings();
-			strategySettings.setStrategyName("ReRoute");
-			strategySettings.setWeight(0.2);
+			strategySettings.setWeight(1.0);
 			config.strategy().addStrategySettings(strategySettings);
 		}
 		
