@@ -210,6 +210,8 @@ public final class EditTrips {
 			throw new RuntimeException("transit leg, but agent is not an PTPassengerAgent: not implemented! agent id: " + agent.getId());
 		}
 		PTPassengerAgent ptPassengerAgent = (PTPassengerAgent) agent;
+		
+		// DEBUG: E.g. agent 461 has vehicle=null, although shown in OTFVis as sitting on a bus
 		MobsimVehicle mobsimVehicle = ptPassengerAgent.getVehicle();
 		ExperimentalTransitRoute oldPtRoute = (ExperimentalTransitRoute) currentLeg.getRoute();
 
@@ -267,7 +269,6 @@ public final class EditTrips {
 			} else {
 				// The agent will not board any bus at the transit stop and will walk away or
 				// do something else. We have to remove him from the list of waiting agents.
-				transitAgentTracker.removeAgentFromStop(ptPassengerAgent, currentOrNextStop.getId());
 				wantsToLeaveStop = true ;
 			}
 		} else {
@@ -295,13 +296,14 @@ public final class EditTrips {
 
 		// (4) insert new trip after current leg:
 		for ( int ijk = 0 ; ijk < newTripElements.size() ; ijk++ ) {
-			planElements.add( pos, newTripElements.get(ijk) ) ;
+			planElements.add( pos + ijk, newTripElements.get(ijk) ) ;
 		}
 		
 		log.debug("agent" + agent.getId() + " new plan: " + planElements.toString());
 		WithinDayAgentUtils.resetCaches(agent);
 
 		if ( wantsToLeaveStop ) {
+			transitAgentTracker.removeAgentFromStop(ptPassengerAgent, currentOrNextStop.getId());
 			((MobsimAgent) ptPassengerAgent).endLegAndComputeNextState( now );
 		}
 
@@ -473,14 +475,14 @@ public final class EditTrips {
 					+ newTrip.get(2));
 			nextPtRoute = (ExperimentalTransitRoute) newCurrentLeg.getRoute();
 			indexNextPtRoute = 0;
-		} else if (newTrip.size() > 0 && newTrip.get(1) instanceof Leg
+		} else if (newTrip.size() > 1 && newTrip.get(1) instanceof Leg
 				&& ((Leg) newTrip.get(1)).getRoute() instanceof ExperimentalTransitRoute) {
 			// not sure whether this can actually happen
 			log.debug("new trip PlanElement 1 is pt leg " + newTrip.get(0) + " --- " + newTrip.get(1) + " --- "
 					+ newTrip.get(2));
 			nextPtRoute = (ExperimentalTransitRoute) ((Leg) newTrip.get(1)).getRoute();
 			indexNextPtRoute = 1;
-		} else if (newTrip.size() > 1 && newTrip.get(2) instanceof Leg
+		} else if (newTrip.size() > 2 && newTrip.get(2) instanceof Leg
 				&& ((Leg) newTrip.get(2)).getRoute() instanceof ExperimentalTransitRoute) {
 			// transit_walk + pt act + pt leg
 			log.debug("agent" + agent.getId() + " currentLeg" + currentLeg + " ----- new trip PlanElement 2 is pt leg " + newTrip.get(0) + " --- " + newTrip.get(1) + " --- "
