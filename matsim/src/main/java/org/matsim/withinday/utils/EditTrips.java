@@ -89,13 +89,13 @@ public final class EditTrips {
 		return findTripAtPlanElement(agent, pe);
 	}
 	public Trip findTripAtPlanElement(MobsimAgent agent, PlanElement pe) {
-		log.debug("plan element to be found=" + pe ) ;
+//		log.debug("plan element to be found=" + pe ) ;
 		List<Trip> trips = TripStructureUtils.getTrips( WithinDayAgentUtils.getModifiablePlan(agent), tripRouter.getStageActivityTypes() ) ;
 		for ( Trip trip : trips ) {
 			for ( PlanElement te : trip.getTripElements() ) {
-				log.debug("trip element to be compared with=" + te ) ;
+//				log.debug("trip element to be compared with=" + te ) ;
 				if ( te==pe ) {
-					log.debug("found trip element") ;
+//					log.debug("found trip element") ;
 					return trip;
 				}
 			}
@@ -471,10 +471,11 @@ public final class EditTrips {
 		int indexNextPtRoute = Integer.MIN_VALUE;
 		if (newCurrentLeg.getRoute() instanceof ExperimentalTransitRoute) {
 			// not sure whether this can actually happen
-			log.debug("new trip PlanElement 0 is pt leg " + newTrip.get(0) + " --- " + newTrip.get(1) + " --- "
-					+ newTrip.get(2));
+			log.debug("new trip PlanElement 0 is pt leg " + newTrip);
 			nextPtRoute = (ExperimentalTransitRoute) newCurrentLeg.getRoute();
 			indexNextPtRoute = 0;
+		} else if (newCurrentLeg.getRoute() instanceof GenericRouteImpl) {
+			log.debug("new trip PlanElement 0 is GenericRouteImpl (= walk/bike or similar) " + newTrip);
 		} else if (newTrip.size() > 1 && newTrip.get(1) instanceof Leg
 				&& ((Leg) newTrip.get(1)).getRoute() instanceof ExperimentalTransitRoute) {
 			// not sure whether this can actually happen
@@ -491,7 +492,7 @@ public final class EditTrips {
 			indexNextPtRoute = 2;
 		} else {
 			// other mode before maybe another pt leg might follow
-			log.debug("4" + newTrip.get(0) + " --- " + newTrip.get(1) + " --- " + newTrip.get(2));
+			log.debug("4" + newTrip);
 		}
 
 		if (nextPtRoute == null) {
@@ -499,12 +500,16 @@ public final class EditTrips {
 			currentLeg.setRoute(new ExperimentalTransitRoute(
 					scenario.getTransitSchedule().getFacilities().get(oldPtRoute.getAccessStopId()), nextStop,
 					oldPtRoute.getLineId(), oldPtRoute.getRouteId()));
-			// add pt interaction activities. transfer walk
+			// add pt interaction activities. transfer walk?
 			Activity act = PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE,
 					nextStop.getCoord(), nextStop.getLinkId());
 			act.setMaximumDuration(0.0);
 			newPlanElementsAfterMerge.add(act);
 			// it is not clear which mode a walk leg should have here in between two modes
+			
+			// TODO infill leg from pt stop to start of other mode necessary? Or automatically produced while routing new mode from pt stop facility?
+			
+			
 			for (int ijk = 0; ijk < newTrip.size(); ijk++) {
 				newPlanElementsAfterMerge.add(newPlanElementsAfterMerge.size(), newTrip.get(ijk));
 			}
@@ -597,9 +602,9 @@ public final class EditTrips {
 		final List<? extends PlanElement> newTrip = tripRouter.calcRoute(routingMode, fromFacility, toFacility,
 				departureTime, person);
 
-		log.debug("new trip:" + newTrip);
+//		log.debug("new trip:" + newTrip);
 		for (PlanElement pe : newTrip) {
-			log.debug(pe);
+//			log.debug(pe);
 		}
 
 		TripRouter.insertTrip(plan, trip.getOriginActivity(), newTrip, trip.getDestinationActivity());
