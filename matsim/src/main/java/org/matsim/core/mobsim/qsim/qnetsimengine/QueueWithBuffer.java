@@ -493,12 +493,13 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 
 			// Check if veh has reached destination:
 			if ( driver.isWantingToArriveOnCurrentLink() ) {
-				qLink.letVehicleArrive( veh );
-
-				// remove _after_ processing the arrival to keep link active:
-				removeVehicleFromQueue( veh ) ;
-
-				continue;
+				if (qLink.letVehicleArrive( veh )) {
+					// remove _after_ processing the arrival to keep link active:
+					removeVehicleFromQueue( veh ) ;
+					continue;
+				} else { // The current vehicle is not allowed to arrive, so it will block the link
+					return;
+				}
 			}
 
 			/* is there still any flow capacity left? */
