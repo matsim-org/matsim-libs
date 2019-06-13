@@ -14,15 +14,15 @@ public abstract class AbstractMobsimModule extends AbstractModule {
 	private Optional<Config> config = Optional.empty();
 	private Optional<AbstractMobsimModule> parent = Optional.empty();
 
-	public void setConfig(Config config) {
+	public final void setConfig(Config config) {
 		this.config = Optional.of(config);
 	}
 
-	public void setParent(AbstractMobsimModule parent) {
+	public final void setParent(AbstractMobsimModule parent) {
 		this.parent = Optional.of(parent);
 	}
 
-	protected Config getConfig() {
+	protected final Config getConfig() {
 		if (config.isPresent()) {
 			return config.get();
 		}

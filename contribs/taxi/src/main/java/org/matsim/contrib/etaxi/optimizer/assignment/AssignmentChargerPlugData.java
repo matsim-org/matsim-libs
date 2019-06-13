@@ -19,13 +19,14 @@
 
 package org.matsim.contrib.etaxi.optimizer.assignment;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Streams;
 import org.matsim.contrib.ev.charging.ChargingEstimations;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
-import org.matsim.contrib.ev.data.Charger;
+import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Streams;
 
 class AssignmentChargerPlugData {
 	static class ChargerPlug {

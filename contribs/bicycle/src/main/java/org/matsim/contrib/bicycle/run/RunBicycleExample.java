@@ -26,7 +26,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.bicycle.BicycleConfigGroup;
+import org.matsim.contrib.bicycle.BicycleLinkSpeedCalculator;
 import org.matsim.contrib.bicycle.BicycleModule;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -35,9 +37,15 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * @author dziemke
@@ -75,6 +83,11 @@ public class RunBicycleExample {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
 		config.plansCalcRoute().setRoutingRandomness(3.);
+		
+		if (considerMotorizedInteraction) {
+			BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) config.getModules().get(BicycleConfigGroup.GROUP_NAME);
+			bicycleConfigGroup.setMotorizedInteraction(considerMotorizedInteraction);
+		}
 				
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -89,11 +102,26 @@ public class RunBicycleExample {
 		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
 		Controler controler = new Controler(scenario);
-		BicycleModule bicycleModule = new BicycleModule();
-		if (considerMotorizedInteraction) {
-			bicycleModule.setConsiderMotorizedInteraction(true);
-		}
+		BicycleModule bicycleModule = new BicycleModule(scenario);
 		controler.addOverridingModule(bicycleModule);
+		
+		controler.addOverridingQSimModule(new AbstractQSimModule() {
+
+            @Override
+            protected void configureQSim() {
+                bind(QNetworkFactory.class).toProvider(new Provider<QNetworkFactory>() {
+                    @Inject
+                    private EventsManager events;
+
+                    @Override
+                    public QNetworkFactory get() {
+                        final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
+                        factory.setLinkSpeedCalculator(new BicycleLinkSpeedCalculator(scenario));
+                        return factory;
+                    }
+                });
+            }
+        });
 		
 		controler.run();
 	}
@@ -105,6 +133,7 @@ public class RunBicycleExample {
 		bicycleConfigGroup.addParam("marginalUtilityOfInfrastructure_m", "-0.0002");
 		bicycleConfigGroup.addParam("marginalUtilityOfComfort_m", "-0.0002");
 		bicycleConfigGroup.addParam("marginalUtilityOfGradient_m_100m", "-0.02");
+		bicycleConfigGroup.addParam("maxBicycleSpeed", "4.16666666");
 		
 		List<String> mainModeList = new ArrayList<>();
 		mainModeList.add("bicycle");

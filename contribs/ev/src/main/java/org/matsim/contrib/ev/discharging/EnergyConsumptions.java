@@ -20,14 +20,14 @@
 package org.matsim.contrib.ev.discharging;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 public class EnergyConsumptions {
 	public static void consumeFixedDriveEnergy(ElectricVehicle ev, double rate, Link link) {
 		ev.getBattery().discharge(rate * link.getLength());
 	}
 
-	public static void consumeFixedAuxEnergy(ElectricVehicle ev, double auxPower, double period) {
-		ev.getBattery().discharge(auxPower * period);
+	public static void consumeFixedAuxEnergy(ElectricVehicle ev, double auxPower, double duration) {
+		ev.getBattery().discharge(auxPower * duration);
 	}
 }

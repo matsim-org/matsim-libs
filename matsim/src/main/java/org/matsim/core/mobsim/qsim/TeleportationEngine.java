@@ -12,7 +12,7 @@ import org.matsim.vis.snapshotwriters.VisData;
  * 
  * @author kainagel
  */
-public interface TeleportationEngine extends DepartureHandler, MobsimEngine,
+interface TeleportationEngine extends DepartureHandler, MobsimEngine,
 VisData {
 
 }

@@ -23,10 +23,10 @@ import org.matsim.api.core.v01.network.Link;
 /**
  * @author dziemke
  */
-public class BicycleUtilityUtils {
+class BicycleUtilityUtils {
 	
-	public static double computeLinkBasedScore(Link link, double marginalUtilityOfComfort_m,
-			double marginalUtilityOfInfrastructure_m, double marginalUtilityOfGradient_m_100m) {
+	static double computeLinkBasedScore( Link link, double marginalUtilityOfComfort_m,
+							 double marginalUtilityOfInfrastructure_m, double marginalUtilityOfGradient_m_100m ) {
 		String surface = (String) link.getAttributes().getAttribute(BicycleLabels.SURFACE);
 		String type = (String) link.getAttributes().getAttribute("type");
 		String cyclewaytype = (String) link.getAttributes().getAttribute(BicycleLabels.CYCLEWAY);
@@ -44,20 +44,24 @@ public class BicycleUtilityUtils {
 		return (infrastructureDisutility + comfortDisutility + gradientDisutility);
 	}
 	
-	public static double getGradientFactor(Link link) {
+	static double getGradientFactor( Link link ) {
 		double gradient = 0.;
-		Double fromNodeZ = link.getFromNode().getCoord().getZ();
-		Double toNodeZ = link.getToNode().getCoord().getZ();
-		if ((fromNodeZ != null) && (toNodeZ != null)) {
-			if (toNodeZ > fromNodeZ) { // No positive utility for downhill, only negative for uphill
-				gradient = (toNodeZ - fromNodeZ) / link.getLength();
+		
+		if (link.getFromNode().getCoord().hasZ() && link.getToNode().getCoord().hasZ()) {
+			Double fromNodeZ = link.getFromNode().getCoord().getZ();
+			Double toNodeZ = link.getToNode().getCoord().getZ();
+			if ((fromNodeZ != null) && (toNodeZ != null)) {
+				if (toNodeZ > fromNodeZ) { // No positive utility for downhill, only negative for uphill
+					gradient = (toNodeZ - fromNodeZ) / link.getLength();
+				}
 			}
 		}
+		
 		return gradient;
 	}
 
 	// TODO Combine this with speeds?
-	public static double getComfortFactor(String surface, String type) {
+	static double getComfortFactor( String surface, String type ) {
 		double comfortFactor = 1.0;
 		if (surface != null) {
 			switch (surface) {
@@ -105,7 +109,7 @@ public class BicycleUtilityUtils {
 		return comfortFactor;
 	}
 
-	public static double getInfrastructureFactor(String type, String cyclewaytype) {
+	static double getInfrastructureFactor( String type, String cyclewaytype ) {
 		double infrastructureFactor = 1.0;
 		if (type != null) {
 			if (type.equals("trunk")) {

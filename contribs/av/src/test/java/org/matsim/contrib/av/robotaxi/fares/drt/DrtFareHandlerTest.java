@@ -22,7 +22,7 @@
  */
 package org.matsim.contrib.av.robotaxi.fares.drt;
 
-import org.apache.commons.lang.mutable.MutableDouble;
+import org.apache.commons.lang3.mutable.MutableDouble;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -81,7 +81,7 @@ public class DrtFareHandlerTest {
         events.processEvent(new PersonArrivalEvent(300.0, p1, Id.createLinkId("23"), TransportMode.drt));
 
         //fare: 1 (daily fee) + 1 (distance()+ 1 basefare + 1 (time)
-        Assert.assertEquals(-4.0, fare.getValue());
+		Assert.assertEquals(-4.0, fare.getValue(), 0);
         
         // test minFarePerTrip
         events.processEvent(new PersonDepartureEvent(0.0, p1, Id.createLinkId("45"), TransportMode.drt));
@@ -92,7 +92,7 @@ public class DrtFareHandlerTest {
          * fare new trip: 0 (daily fee already paid) + 0.1 (distance)+ 1 basefare + 0.1 (time) = 1.2 < minFarePerTrip = 1.5
          * --> new total fare: 4 (previous trip) + 1.5 (minFarePerTrip for new trip) = 5.5
          */
-        Assert.assertEquals(-5.5, fare.getValue());
+		Assert.assertEquals(-5.5, fare.getValue(), 0);
     }
 
 
