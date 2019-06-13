@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
-import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -45,13 +44,6 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  */
 
 public class RunDrtScenarioBatchWOBAV {
-
-    //Class to create the controller
-    public static Controler createControler(Config config, boolean otfvis) {
-        config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-        config.checkConsistency();
-        return DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis);
-    }
 
     public static void main(String[] args) {
 
@@ -129,7 +121,7 @@ public class RunDrtScenarioBatchWOBAV {
 
             //Define the MATSim Controler
             //Based on the prepared configuration this part creates a controller that runs
-            Controler controler = createControler(config, otfvis);
+			Controler controler = DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis);
 
 
             if (rebalancing == true) {

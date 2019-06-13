@@ -39,8 +39,8 @@ public class SelectOnlySelectedPlans {
         //Create a Scenario
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         //Fill this Scenario with a population.
-        new PopulationReader(scenario).readFile("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw234_nocad.0.1\\vw234_nocad.0.1.output_plans.xml.gz");
-        String randomOrderedPop = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw234_nocad.0.1\\vw234_nocad.0.1.output_plans_selected.xml.gz";
+        new PopulationReader(scenario).readFile("D:\\\\Matsim\\\\Axer\\\\Hannover\\\\ZIM\\\\input\\\\plans\\\\commuterdrt_vw235_nocad.1.0_20pct.output_plans.xml.gz");
+        String randomOrderedPop = "D:\\\\\\\\Matsim\\\\\\\\Axer\\\\\\\\Hannover\\\\\\\\ZIM\\\\\\\\input\\\\\\\\plans\\\\\\\\commuterdrt_vw235_nocad.1.0_20pct.output_plans_selected.xml.gz";
         StreamingPopulationWriter filteredPop = new StreamingPopulationWriter();
         filteredPop.startStreaming(randomOrderedPop);
 

@@ -20,7 +20,9 @@
 
 package vwExamples.peoplemoverVWExample;
 
-import electric.edrt.run.RunVWEDrtScenario;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
@@ -33,23 +35,15 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-import vwExamples.utils.CreateEDRTVehiclesAndChargers;
 
-import java.util.HashMap;
-import java.util.Map;
+import electric.edrt.run.RunVWEDrtScenario;
+import vwExamples.utils.CreateEDRTVehiclesAndChargers;
 
 /**
  * @author axer
  */
 
 public class RunDrtScenarioBatchBS_eDRT {
-
-    // Class to create the controller
-	//	public static Controler createControlerWithSingleModeDrt(Config config, boolean otfvis) {
-//		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-//		config.checkConsistency();
-	//		return DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis);
-//	}
 
     public static void main(String[] args) {
 
@@ -142,7 +136,6 @@ public class RunDrtScenarioBatchBS_eDRT {
         eDrt.setChargersFile(inbase + "\\chargers\\chargers.xml.gz");
         eDrt.setVehiclesFile(inbase + "\\fleets\\eFleet.xml.gz");
         eDrt.setAuxDischargeTimeStep(10);
-        eDrt.setAuxDischargingSimulation(EvConfigGroup.AuxDischargingSimulation.seperateAuxDischargingHandler);
         eDrt.setTimeProfiles(true);
 
 

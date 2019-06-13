@@ -20,8 +20,12 @@
 
 package vwExamples.peoplemoverVWExample;
 
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
-import electric.edrt.run.RunVWEDrtScenario;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -51,14 +55,16 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.*;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.ScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-import vwExamples.utils.CreateEDRTVehiclesAndChargers;
 
-import javax.inject.Inject;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
+import vwExamples.utils.CreateEDRTVehiclesAndChargers;
 
 //import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 
@@ -66,12 +72,6 @@ import java.util.Map;
 
 public class RunDrtScenarioBatchH_eDRT {
 
-	// Class to create the controller
-	// public static Controler createControler(Config config, boolean otfvis) {
-	// config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-	// config.checkConsistency();
-	// return DrtControlerCreator.createControler(config, otfvis);
-	// }
 	public static Controler createControler(Config config, boolean otfvis) {
 		return DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis);
 	}
@@ -191,7 +191,6 @@ public class RunDrtScenarioBatchH_eDRT {
 		eDrt.setChargersFile(inbase + "\\chargers\\chargers.xml.gz");
 		eDrt.setVehiclesFile(inbase + "\\fleets\\eFleet.xml.gz");
 		eDrt.setAuxDischargeTimeStep(10);
-		eDrt.setAuxDischargingSimulation(EvConfigGroup.AuxDischargingSimulation.seperateAuxDischargingHandler);
 		eDrt.setTimeProfiles(true);
 
 		// config.addModule(new ParkingRouterConfigGroup());

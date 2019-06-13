@@ -19,15 +19,17 @@
 package vwExamples.utils.customEdrtModule;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
+import org.matsim.contrib.ev.EvModule;
+import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
+import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -39,16 +41,23 @@ public class CustomEDrtControlerCreator {
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
 		DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore());
 
-		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-		config.checkConsistency();
-
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
 		ScenarioUtils.loadScenario(scenario);
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new CustomEDrtModule());
 		controler.addOverridingModule(new DvrpModule());
-		controler.configureQSimComponents(DvrpQSimComponents.activateModes(drtCfg.getMode()));
+		controler.addOverridingModule(new EvModule());
+		controler.addOverridingModule(new EvDvrpIntegrationModule());
+
+		controler.addOverridingQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				this.bind(AuxDischargingHandler.VehicleProvider.class).to(OperatingVehicleOutsideDepotProvider.class);
+			}
+		});
+
+		controler.configureQSimComponents(EvDvrpIntegrationModule.activateModes(drtCfg.getMode()));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());

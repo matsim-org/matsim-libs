@@ -35,73 +35,71 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetWriter;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
 import org.matsim.contrib.ev.EvUnits;
-import org.matsim.contrib.ev.data.BatteryImpl;
-import org.matsim.contrib.ev.data.Charger;
-import org.matsim.contrib.ev.data.ChargerImpl;
-import org.matsim.contrib.ev.data.ElectricVehicle;
-import org.matsim.contrib.ev.data.ElectricVehicleImpl;
-import org.matsim.contrib.ev.data.file.ChargerWriter;
-import org.matsim.contrib.ev.data.file.ElectricVehicleWriter;
+import org.matsim.contrib.ev.fleet.ElectricFleetWriter;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicleSpecification;
+import org.matsim.contrib.ev.fleet.ImmutableElectricVehicleSpecification;
+import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.contrib.ev.infrastructure.ChargerSpecification;
+import org.matsim.contrib.ev.infrastructure.ChargerWriter;
+import org.matsim.contrib.ev.infrastructure.ImmutableChargerSpecification;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- * @author  jbischoff
+ * @author jbischoff
  * This is an example script to create electric drt vehicle files. The vehicles are distributed along defined depots.
- *
  */
 public class CreateEDRTVehiclesAndChargers {
-	
+
 	static final int BATTERY_CAPACITY_KWH = 30;
 	static final int MIN_START_CAPACITY_KWH = 10;
 	static final int MAX_START_CAPACITY_KWH = 30;
-	
+
 	static final int CHARGINGPOWER_KW = 50;
-	
+
 	static final int SEATS = 8;
-	
+
 	static final String NETWORKFILE = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/drt_test_Scenarios/BS_DRT/input/network/modifiedNetwork.xml.gz";
 	static final String E_VEHICLE_FILE = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/drt_test_Scenarios/BS_DRT/input/edrt/e-vehicles_bs_100.xml";
 	static final String DRT_VEHICLE_FILE = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/drt_test_Scenarios/BS_DRT/input/edrt/e-drt_bs_100.xml";
 	static final String CHARGER_FILE = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/drt_test_Scenarios/BS_DRT/input/edrt/chargers_bs_100.xml";
-	
+
 	static final double OPERATIONSTARTTIME = 0.; //t0
-	static final double OPERATIONENDTIME = 30*3600.;	//t1
-	
+	static final double OPERATIONENDTIME = 30 * 3600.;    //t1
+
 	static final double FRACTION_OF_CHARGERS_PER_DEPOT = 0.4; //relative number of chargers to numbers of vehicle at location
-	
-	
+
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Map<Id<Link>,Integer> depotsAndVehicles = new HashMap<>();
+		Map<Id<Link>, Integer> depotsAndVehicles = new HashMap<>();
 		depotsAndVehicles.put(Id.createLinkId(40158), 25); //BS HBF
 		depotsAndVehicles.put(Id.createLinkId(8097), 25); //Zentrum SO
 		depotsAndVehicles.put(Id.createLinkId(13417), 25); //Zentrum N
 		depotsAndVehicles.put(Id.createLinkId(14915), 25); //Flugplatz
 		new CreateEDRTVehiclesAndChargers().run(depotsAndVehicles);
-		
-		
+
 	}
-	
-	private void run(Map<Id<Link>,Integer> depotsAndVehicles) {
+
+	private void run(Map<Id<Link>, Integer> depotsAndVehicles) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		List<DvrpVehicleSpecification> vehicles = new ArrayList<>();
-		List<ElectricVehicle> evehicles = new ArrayList<>();
-		List<Charger> chargers = new ArrayList<>();
+		List<ElectricVehicleSpecification> eVehicles = new ArrayList<>();
+		List<ChargerSpecification> chargers = new ArrayList<>();
 		Random random = MatsimRandom.getLocalInstance();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORKFILE);
 		for (Entry<Id<Link>, Integer> e : depotsAndVehicles.entrySet()) {
 			Link startLink;
-			startLink =  scenario.getNetwork().getLinks().get(e.getKey());
-			if(!startLink.getAllowedModes().contains(TransportMode.car)) {
+			startLink = scenario.getNetwork().getLinks().get(e.getKey());
+			if (!startLink.getAllowedModes().contains(TransportMode.car)) {
 				throw new RuntimeException("StartLink " + startLink.getId().toString() + " does not allow car mode.");
 			}
-			for (int i = 0; i< e.getValue();i++){
+			for (int i = 0; i < e.getValue(); i++) {
 
 				DvrpVehicleSpecification v = ImmutableDvrpVehicleSpecification.newBuilder()
 						.id(Id.create("taxi_" + startLink.getId().toString() + "_" + i, DvrpVehicle.class))
@@ -111,22 +109,29 @@ public class CreateEDRTVehiclesAndChargers {
 						.serviceEndTime(OPERATIONENDTIME)
 						.build();
 				vehicles.add(v);
-				double initialSoc_kWh = MIN_START_CAPACITY_KWH + random.nextDouble()*(MAX_START_CAPACITY_KWH-MIN_START_CAPACITY_KWH);
-				ElectricVehicle ev = new ElectricVehicleImpl(Id.create(v.getId(), ElectricVehicle.class),
-						new BatteryImpl(BATTERY_CAPACITY_KWH * EvUnits.J_PER_kWh, initialSoc_kWh * EvUnits.J_PER_kWh));
-				evehicles.add(ev);
-				
+				double initialSoc_kWh = MIN_START_CAPACITY_KWH + random.nextDouble() * (MAX_START_CAPACITY_KWH
+						- MIN_START_CAPACITY_KWH);
+				ElectricVehicleSpecification ev = ImmutableElectricVehicleSpecification.newBuilder()
+						.id(Id.create(v.getId(), ElectricVehicle.class))
+						.batteryCapacity(EvUnits.kWh_to_J(BATTERY_CAPACITY_KWH))
+						.initialSoc(EvUnits.kWh_to_J(initialSoc_kWh))
+						.build();
+				eVehicles.add(ev);
+
 			}
-			int chargersPerDepot = (int) (e.getValue()*FRACTION_OF_CHARGERS_PER_DEPOT);
-			Charger charger = new ChargerImpl(Id.create("charger_" + startLink.getId(), Charger.class),
-					CHARGINGPOWER_KW * EvUnits.W_PER_kW, chargersPerDepot, startLink);
+			int chargersPerDepot = (int)(e.getValue() * FRACTION_OF_CHARGERS_PER_DEPOT);
+			ChargerSpecification charger = ImmutableChargerSpecification.newBuilder()
+					.id(Id.create("charger_" + startLink.getId(), Charger.class))
+					.maxPower(CHARGINGPOWER_KW * EvUnits.W_PER_kW)
+					.plugCount(chargersPerDepot)
+					.linkId(startLink.getId()).chargerType(ChargerSpecification.DEFAULT_CHARGER_TYPE)
+					.build();
 			chargers.add(charger);
-			
+
 		}
 		new FleetWriter(vehicles.stream()).write(DRT_VEHICLE_FILE);
-		new ElectricVehicleWriter(evehicles).write(E_VEHICLE_FILE);
-		new ChargerWriter(chargers).write(CHARGER_FILE);
+		new ElectricFleetWriter(eVehicles.stream()).write(E_VEHICLE_FILE);
+		new ChargerWriter(chargers.stream()).write(CHARGER_FILE);
 	}
-	
 
 }

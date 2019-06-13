@@ -53,12 +53,11 @@ import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.contrib.edrt.EDrtActionCreator;
-import org.matsim.contrib.edrt.optimizer.EDrtOptimizer;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory;
-import org.matsim.contrib.edrt.optimizer.depot.NearestChargerAsDepot;
 import org.matsim.contrib.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.contrib.edrt.scheduler.EmptyVehicleChargingScheduler;
-import org.matsim.contrib.ev.data.ChargingInfrastructure;
+import org.matsim.contrib.ev.fleet.ElectricFleet;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -96,7 +95,8 @@ public class CustomEDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 						getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class))))
 				.asEagerSingleton();
 
-		bindModal(DepotFinder.class).to(NearestChargerAsDepot.class);
+
+        bindModal(DepotFinder.class).toProvider(modalProvider(getter -> new GetBestDepot(getter.get(ChargingInfrastructure.class), getter.get(ElectricFleet.class), getter.getModal(Fleet.class)))).asEagerSingleton();
 
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
 
@@ -111,7 +111,7 @@ public class CustomEDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 					@Inject
 					private ChargingInfrastructure chargingInfrastructure;
-
+					
 					@Override
 					public EmptyVehicleChargingScheduler get() {
 						DrtTaskFactory taskFactory = getModalInstance(DrtTaskFactory.class);

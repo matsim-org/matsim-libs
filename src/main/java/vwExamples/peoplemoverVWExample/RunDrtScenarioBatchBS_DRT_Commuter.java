@@ -20,7 +20,10 @@
 
 package vwExamples.peoplemoverVWExample;
 
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -29,7 +32,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
-import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -37,6 +39,7 @@ import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.temperature.TemperatureChangeConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
@@ -45,29 +48,15 @@ import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-import parking.ParkingRouterConfigGroup;
-import parking.ParkingRouterModule;
-import vwExamples.utils.CreateEDRTVehiclesAndChargers;
-import vwExamples.utils.DrtTrajectoryAnalyzer.MyDrtTrajectoryAnalysisModule;
-import vwExamples.utils.parking.createParkingNetwork.CreateParkingNetwork;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
+import vwExamples.utils.CreateEDRTVehiclesAndChargers;
 
 /**
  * @author axer
  */
 
 public class RunDrtScenarioBatchBS_DRT_Commuter {
-
-	
-//	// Class to create the controller
-		public static Controler createControler(Config config, boolean otfvis) {
-			config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-			config.checkConsistency();
-			return DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis);
-		}
 
 	public static void main(String[] args) throws IOException {
 		int count = 3;
@@ -130,9 +119,15 @@ public class RunDrtScenarioBatchBS_DRT_Commuter {
 //				inbase + "\\network\\drtServiceAreaNetwork_withPark.xml.gz");
 
 		config.network().setInputFile(inbase + "\\network\\drtServiceAreaNetwork.xml.gz");
+		
+		config.controler().setRoutingAlgorithmType(ControlerConfigGroup.RoutingAlgorithmType.Dijkstra);
 
 		// This part allows to change dynamically DRT config parameters
 		DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+		
+//		DvrpConfigGroup dvrp = (DvrpConfigGroup) config.getModules().get(DvrpConfigGroup.GROUP_NAME);
+//		dvrp.setTravelTimeEstimationAlpha(.15);
+//		dvrp.setTravelTimeEstimationBeta(600);
 
 		drt.setPrintDetailedWarnings(false);
 		// Parameters to setup the DRT service
@@ -200,7 +195,6 @@ public class RunDrtScenarioBatchBS_DRT_Commuter {
 		eDrt.setChargersFile(inbase + "\\chargers\\chargers.xml.gz");
 		eDrt.setVehiclesFile(inbase + "\\fleets\\eFleet.xml.gz");
 		eDrt.setAuxDischargeTimeStep(10);
-		eDrt.setAuxDischargingSimulation(EvConfigGroup.AuxDischargingSimulation.seperateAuxDischargingHandler);
 		eDrt.setTimeProfiles(true);
 
 //		config.addModule(new ParkingRouterConfigGroup());
@@ -222,8 +216,8 @@ public class RunDrtScenarioBatchBS_DRT_Commuter {
 		// Based on the prepared configuration this part creates a controller that runs
 		// Controler controler = createControlerWithSingleModeDrt(config, otfvis);
 
-		//Controler controler = electric.edrt.run.RunEDrtScenario.createControler(config);
-		Controler controler = createControler(config, false);
+//		Controler controler = electric.edrt.run.RunEDrtScenario.createControler(config);
+		Controler controler = DrtControlerCreator.createControlerWithSingleModeDrt(config, false);
 
 		if (rebalancing == true) {
 

@@ -20,7 +20,6 @@
 
 package vwExamples.peoplemoverVWExample;
 
-import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -35,13 +34,6 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  */
 
 public class RunDrtExampleSimulation {
-
-    //Class to create the controller
-    public static Controler createControler(Config config, boolean otfvis) {
-        config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-        config.checkConsistency();
-        return DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis);
-    }
 
     public static void main(String[] args) {
 
@@ -74,7 +66,7 @@ public class RunDrtExampleSimulation {
 
 
         //Initialize the controller
-        Controler controler = createControler(config, otfvis);
+		Controler controler = DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis);
 
         //Run the simulation
         controler.run();
