@@ -54,16 +54,43 @@ public class PtAlongALineTest{
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
-	
 
-    /**
-     * Test of Intermodal Access & Egress to pt using bike.There are three transit stops, and
-     * only the middle stop is accessible by bike. 
-     */
-	
+
+	/**
+	 * Test of Intermodal Access & Egress to pt using bike.There are three transit stops, and
+	 * only the middle stop is accessible by bike.
+	 */
+
 	@Test
 	public void testPtAlongALine() {
 
+		Config config = createConfig();
+
+		Scenario scenario = createScenario( config );
+
+		Controler controler = new Controler( scenario ) ;
+
+		controler.run() ;
+	}
+
+	@Test
+	public void testPtAlongALineWithRaptorAndDrt() {
+
+		Config config = createConfig();
+
+		SwissRailRaptorConfigGroup configRaptor = createRaptorConfigGroup(1000000, 1000000);// (radius walk, radius bike)
+		config.addModule(configRaptor);
+
+		Scenario scenario = createScenario( config );
+
+		Controler controler = new Controler( scenario ) ;
+
+		controler.addOverridingModule(new SwissRailRaptorModule()) ;
+
+		controler.run() ;
+	}
+
+	private Config createConfig(){
 		Config config = ConfigUtils.createConfig() ;
 
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );
@@ -73,15 +100,14 @@ public class PtAlongALineTest{
 		config.plansCalcRoute().getModeRoutingParams().get( TransportMode.bike ).setTeleportedModeSpeed( 10. );
 
 		config.qsim().setEndTime( 24.*3600. );
-		
-		config.transit().setUseTransit(true) ;
-		
-		configureScoring(config);
-		
-		
-		SwissRailRaptorConfigGroup configRaptor = createRaptorConfigGroup(1000000, 1000000);// (radius walk, radius bike)
-		config.addModule(configRaptor);
 
+		config.transit().setUseTransit(true) ;
+
+		configureScoring(config);
+		return config;
+	}
+
+	private Scenario createScenario( Config config ){
 		Scenario scenario = ScenarioUtils.createScenario( config );
 		// don't load anything
 
@@ -101,43 +127,37 @@ public class PtAlongALineTest{
 		createAndAddTransitVehicleType( scenario );
 
 		createAndAddTransitLine( scenario );
-		
 
 		TransitScheduleValidator.printResult( TransitScheduleValidator.validateAll( scenario.getTransitSchedule(), scenario.getNetwork() ) );
-
-		Controler controler = new Controler( scenario ) ;
-		
-		controler.addOverridingModule(new SwissRailRaptorModule()) ;
-		
-		controler.run() ;
+		return scenario;
 	}
 
 	private static void configureScoring(Config config) {
 		PlanCalcScoreConfigGroup.ModeParams accessWalk = new PlanCalcScoreConfigGroup.ModeParams("access_walk");
-        accessWalk.setMarginalUtilityOfTraveling(0);
-        config.planCalcScore().addModeParams(accessWalk);
-        
-        PlanCalcScoreConfigGroup.ModeParams transitWalk = new PlanCalcScoreConfigGroup.ModeParams("transit_walk");
-        transitWalk.setMarginalUtilityOfTraveling(0);
-        config.planCalcScore().addModeParams(transitWalk);
-        
-        PlanCalcScoreConfigGroup.ModeParams egressWalk = new PlanCalcScoreConfigGroup.ModeParams("egress_walk");
-        egressWalk.setMarginalUtilityOfTraveling(0);
-        config.planCalcScore().addModeParams(egressWalk);
-        
-        PlanCalcScoreConfigGroup.ModeParams bike = new PlanCalcScoreConfigGroup.ModeParams("bike");
-        bike.setMarginalUtilityOfTraveling(0);
-        config.planCalcScore().addModeParams(bike);
-        
-        PlanCalcScoreConfigGroup.ModeParams drt = new PlanCalcScoreConfigGroup.ModeParams("drt");
-        drt.setMarginalUtilityOfTraveling(0);
-        config.planCalcScore().addModeParams(drt);
+		accessWalk.setMarginalUtilityOfTraveling(0);
+		config.planCalcScore().addModeParams(accessWalk);
+
+		PlanCalcScoreConfigGroup.ModeParams transitWalk = new PlanCalcScoreConfigGroup.ModeParams("transit_walk");
+		transitWalk.setMarginalUtilityOfTraveling(0);
+		config.planCalcScore().addModeParams(transitWalk);
+
+		PlanCalcScoreConfigGroup.ModeParams egressWalk = new PlanCalcScoreConfigGroup.ModeParams("egress_walk");
+		egressWalk.setMarginalUtilityOfTraveling(0);
+		config.planCalcScore().addModeParams(egressWalk);
+
+		PlanCalcScoreConfigGroup.ModeParams bike = new PlanCalcScoreConfigGroup.ModeParams("bike");
+		bike.setMarginalUtilityOfTraveling(0);
+		config.planCalcScore().addModeParams(bike);
+
+		PlanCalcScoreConfigGroup.ModeParams drt = new PlanCalcScoreConfigGroup.ModeParams("drt");
+		drt.setMarginalUtilityOfTraveling(0);
+		config.planCalcScore().addModeParams(drt);
 	}
 
 	private static SwissRailRaptorConfigGroup createRaptorConfigGroup(int radiusWalk, int radiusBike) {
 		SwissRailRaptorConfigGroup configRaptor = new SwissRailRaptorConfigGroup();
 		configRaptor.setUseIntermodalAccessEgress(true);
-		
+
 		// Walk
 		IntermodalAccessEgressParameterSet paramSetWalk = new IntermodalAccessEgressParameterSet();
 		paramSetWalk.setMode(TransportMode.walk);
@@ -145,7 +165,7 @@ public class PtAlongALineTest{
 		paramSetWalk.setPersonFilterAttribute(null);
 		paramSetWalk.setStopFilterAttribute(null);
 		configRaptor.addIntermodalAccessEgress(paramSetWalk );
-		
+
 		// Bike
 		IntermodalAccessEgressParameterSet paramSetBike = new IntermodalAccessEgressParameterSet();
 		paramSetBike.setMode(TransportMode.bike);
@@ -154,7 +174,7 @@ public class PtAlongALineTest{
 		paramSetBike.setStopFilterAttribute("bikeAccessible");
 		paramSetBike.setStopFilterValue("true");
 		configRaptor.addIntermodalAccessEgress(paramSetBike );
-		
+
 		return configRaptor;
 	}
 
@@ -222,7 +242,7 @@ public class PtAlongALineTest{
 		//		stopFacility5000.getAttributes().putAttribute( "drtAccessible", true );
 		//		stopFacility5000.getAttributes().putAttribute( "walkAccessible", false );
 		stopFacility5000.getAttributes().putAttribute( "bikeAccessible", "true");
-		
+
 		schedule.addStopFacility( stopFacility5000 );
 
 		TransitStopFacility stopFacility10000 = tsf.createTransitStopFacility( tr_stop_fac_10000_ID, new Coord( (lastNodeIdx - 1) * deltaX, deltaY ), false );
