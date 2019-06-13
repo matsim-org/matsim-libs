@@ -18,27 +18,56 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle.run;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.matsim.utils.eventsfilecomparison.EventsFileComparator.Result.FILES_ARE_EQUAL;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.bicycle.BicycleConfigGroup;
 import org.matsim.contrib.bicycle.BicycleConfigGroup.BicycleScoringType;
+import org.matsim.contrib.bicycle.BicycleLinkSpeedCalculator;
+import org.matsim.contrib.bicycle.BicycleModule;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.matsim.utils.eventsfilecomparison.EventsFileComparator.Result.FILES_ARE_EQUAL;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * @author dziemke
@@ -108,7 +137,7 @@ public class BicycleTest {
 			assertEquals( "Different event files.", FILES_ARE_EQUAL, EventsFileComparator.compare( eventsFilenameReference, eventsFilenameNew ));
 		}
 	}
-	
+		
 	@Test
 	public void testPedestrian() {
 		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
@@ -277,4 +306,274 @@ public class BicycleTest {
 		new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
 		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
+	
+	@Test
+	public void testInfrastructureSpeedFactor() {
+		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
+		config.addModule(new BicycleConfigGroup());
+
+		config.controler().setWriteEventsInterval(1);
+				
+		List<String> mainModeList = new ArrayList<>();
+		mainModeList.add("bicycle");
+		mainModeList.add(TransportMode.car);
+		config.qsim().setMainModes(mainModeList);
+		
+		config.strategy().setMaxAgentPlanMemorySize(5);
+		{
+			StrategySettings strategySettings = new StrategySettings();
+			strategySettings.setStrategyName("ChangeExpBeta");
+			strategySettings.setWeight(0.8);
+			config.strategy().addStrategySettings(strategySettings);
+		}{
+			StrategySettings strategySettings = new StrategySettings();
+			strategySettings.setStrategyName("ReRoute");
+			strategySettings.setWeight(0.2);
+			config.strategy().addStrategySettings(strategySettings);
+		}
+		
+		ActivityParams homeActivity = new ActivityParams("home");
+		homeActivity.setTypicalDuration(12*60*60);
+		config.planCalcScore().addActivityParams(homeActivity);
+		
+		ActivityParams workActivity = new ActivityParams("work");
+		workActivity.setTypicalDuration(8*60*60);
+		config.planCalcScore().addActivityParams(workActivity);
+		
+		ModeParams bicycle = new ModeParams("bicycle");
+		bicycle.setConstant(0.);
+		bicycle.setMarginalUtilityOfDistance(-0.0004); // util/m
+		bicycle.setMarginalUtilityOfTraveling(-6.0); // util/h
+		bicycle.setMonetaryDistanceRate(0.);
+		config.planCalcScore().addModeParams(bicycle);
+		
+		config.plansCalcRoute().setNetworkModes(mainModeList);
+				
+		// link 2 has infrastructure speed factor = 1.0, all other links 0.01
+		config.network().setInputFile("network_infrastructure-speed-factor.xml");
+		config.plans().setInputFile("population_4.xml");
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controler().setLastIteration(0);
+		
+		config.global().setNumberOfThreads(1);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		
+		config.plansCalcRoute().setRoutingRandomness(3.);
+				
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create(TransportMode.car, VehicleType.class));
+		scenario.getVehicles().addVehicleType(car);
+
+		VehicleType bicycleVehType = VehicleUtils.getFactory().createVehicleType(Id.create("bicycle", VehicleType.class));
+		bicycleVehType.setMaximumVelocity(25.0/3.6);
+		bicycleVehType.setPcuEquivalents(0.25);
+		scenario.getVehicles().addVehicleType(bicycleVehType);
+
+		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
+
+		Controler controler = new Controler(scenario);
+		BicycleModule bicycleModule = new BicycleModule(scenario);
+		controler.addOverridingModule(bicycleModule);
+		
+		LinkDemandEventHandler linkHandler = new LinkDemandEventHandler();
+
+		controler.addOverridingModule(new AbstractModule() {
+			
+			@Override
+			public void install() {
+				this.addEventHandlerBinding().toInstance(linkHandler);
+			}
+		});
+		
+		controler.addOverridingQSimModule(new AbstractQSimModule() {
+
+            @Override
+            protected void configureQSim() {
+                bind(QNetworkFactory.class).toProvider(new Provider<QNetworkFactory>() {
+                    @Inject
+                    private EventsManager events;
+
+                    @Override
+                    public QNetworkFactory get() {
+                        final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
+                        factory.setLinkSpeedCalculator(new BicycleLinkSpeedCalculator(scenario));
+                        return factory;
+                    }
+                });
+            }
+        });
+		
+		controler.run();
+		
+		Assert.assertEquals("All bicycle users should use the longest but fastest route where the bicycle infrastructur speed factor is set to 1.0", 3, linkHandler.getLinkId2demand().get(Id.createLinkId("2")), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Only the car user should use the shortest route", 1, linkHandler.getLinkId2demand().get(Id.createLinkId("6")), MatsimTestUtils.EPSILON);
+		
+		Assert.assertEquals("Wrong travel time (car user)", Math.ceil( 10000 / (13.88) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(0), MatsimTestUtils.EPSILON);
+		
+		Assert.assertEquals("Wrong travel time (bicycle user)", 1.0 + Math.ceil( 13000 / (25.0 * 1.0/3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("2")).get(0), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong travel time (bicycle user)", 1.0 + Math.ceil( 13000 / (25.0 * 1.0/3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("2")).get(1), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong travel time (bicycle user)", 1.0 + Math.ceil( 13000 / (25.0 * 1.0/3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("2")).get(2), MatsimTestUtils.EPSILON);
+
+	}
+	
+	@Test
+	public void testInfrastructureSpeedFactorDistanceMoreRelevantThanTravelTime() {
+		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
+		config.addModule(new BicycleConfigGroup());
+
+		config.controler().setWriteEventsInterval(1);
+				
+		List<String> mainModeList = new ArrayList<>();
+		mainModeList.add("bicycle");
+		mainModeList.add(TransportMode.car);
+		config.qsim().setMainModes(mainModeList);
+		
+		config.strategy().setMaxAgentPlanMemorySize(5);
+		{
+			StrategySettings strategySettings = new StrategySettings();
+			strategySettings.setStrategyName("ChangeExpBeta");
+			strategySettings.setWeight(0.8);
+			config.strategy().addStrategySettings(strategySettings);
+		}{
+			StrategySettings strategySettings = new StrategySettings();
+			strategySettings.setStrategyName("ReRoute");
+			strategySettings.setWeight(0.2);
+			config.strategy().addStrategySettings(strategySettings);
+		}
+		
+		ActivityParams homeActivity = new ActivityParams("home");
+		homeActivity.setTypicalDuration(12*60*60);
+		config.planCalcScore().addActivityParams(homeActivity);
+		
+		ActivityParams workActivity = new ActivityParams("work");
+		workActivity.setTypicalDuration(8*60*60);
+		config.planCalcScore().addActivityParams(workActivity);
+		
+		ModeParams bicycle = new ModeParams("bicycle");
+		bicycle.setConstant(0.);
+		bicycle.setMarginalUtilityOfDistance(-999999); // util/m
+		bicycle.setMarginalUtilityOfTraveling(-6.0); // util/h
+		bicycle.setMonetaryDistanceRate(0.);
+		config.planCalcScore().addModeParams(bicycle);
+		
+		config.plansCalcRoute().setNetworkModes(mainModeList);
+				
+		// link 2 has infrastructure speed factor = 1.0, all other links 0.01
+		config.network().setInputFile("network_infrastructure-speed-factor.xml");
+		config.plans().setInputFile("population_4.xml");
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controler().setLastIteration(0);
+		
+		config.global().setNumberOfThreads(1);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		
+		config.plansCalcRoute().setRoutingRandomness(3.);
+				
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create(TransportMode.car, VehicleType.class));
+		scenario.getVehicles().addVehicleType(car);
+
+		VehicleType bicycleVehType = VehicleUtils.getFactory().createVehicleType(Id.create("bicycle", VehicleType.class));
+		bicycleVehType.setMaximumVelocity(25.0/3.6);
+		bicycleVehType.setPcuEquivalents(0.25);
+		scenario.getVehicles().addVehicleType(bicycleVehType);
+
+		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
+
+		Controler controler = new Controler(scenario);
+		BicycleModule bicycleModule = new BicycleModule(scenario);
+		controler.addOverridingModule(bicycleModule);
+		
+		LinkDemandEventHandler linkHandler = new LinkDemandEventHandler();
+
+		controler.addOverridingModule(new AbstractModule() {
+			
+			@Override
+			public void install() {
+				this.addEventHandlerBinding().toInstance(linkHandler);
+			}
+		});
+		
+		controler.addOverridingQSimModule(new AbstractQSimModule() {
+
+            @Override
+            protected void configureQSim() {
+                bind(QNetworkFactory.class).toProvider(new Provider<QNetworkFactory>() {
+                    @Inject
+                    private EventsManager events;
+
+                    @Override
+                    public QNetworkFactory get() {
+                        final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
+                        factory.setLinkSpeedCalculator(new BicycleLinkSpeedCalculator(scenario));
+                        return factory;
+                    }
+                });
+            }
+        });
+		
+		controler.run();
+		
+		Assert.assertEquals("All bicycle users should use the shortest route even though the bicycle infrastructur speed factor is set to 0.1", 4, linkHandler.getLinkId2demand().get(Id.createLinkId("6")), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong travel time (car user)", Math.ceil(10000 / 13.88 ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(0), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong travel time (bicycle user)", Math.ceil( 10000 / (25. * 0.1 / 3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(1), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong travel time (bicycle user)", Math.ceil( 10000 / (25. * 0.1 / 3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(2), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong travel time (bicycle user)", Math.ceil( 10000 / (25. * 0.1 / 3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(3), MatsimTestUtils.EPSILON);
+	}
+}
+
+class LinkDemandEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
+	
+	private Map<Id<Link>,Integer> linkId2demand = new HashMap<>();
+	private Map<Id<Link>,List<Double>> linkId2travelTimes = new HashMap<>();
+	
+	private Map<Id<Vehicle>, Double> vehicleId2lastEnterTime = new HashMap<>();
+
+	@Override
+	public void reset(int iteration) {
+		this.linkId2demand.clear();
+	}
+	
+	@Override
+	public void handleEvent(LinkLeaveEvent event) {
+		
+		if (this.linkId2demand.get(event.getLinkId()) != null) {
+			int agents = this.linkId2demand.get(event.getLinkId());
+			this.linkId2demand.put(event.getLinkId(), agents + 1);
+			
+		} else {
+			this.linkId2demand.put(event.getLinkId(), 1);
+		}
+		
+		if (vehicleId2lastEnterTime.get(event.getVehicleId()) != null) {
+			double tt = event.getTime() - vehicleId2lastEnterTime.get(event.getVehicleId());
+			linkId2travelTimes.get(event.getLinkId()).add(tt);
+		}
+	}
+
+	public Map<Id<Link>, Integer> getLinkId2demand() {
+		return linkId2demand;
+	}
+
+	public void setLinkId2demand(Map<Id<Link>, Integer> linkId2demand) {
+		this.linkId2demand = linkId2demand;
+	}
+
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
+		vehicleId2lastEnterTime.put(event.getVehicleId(), event.getTime());
+		
+		if (linkId2travelTimes.get(event.getLinkId()) == null) {
+			linkId2travelTimes.put(event.getLinkId(), new ArrayList<>());
+		}
+	}
+
+	public Map<Id<Link>, List<Double>> getLinkId2travelTimes() {
+		return linkId2travelTimes;
+	}
+	
 }
