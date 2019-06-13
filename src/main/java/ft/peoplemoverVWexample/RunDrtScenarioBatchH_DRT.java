@@ -82,13 +82,13 @@ public class RunDrtScenarioBatchH_DRT {
 		boolean enableCadyts = false;
 
 		// Enable or Disable rebalancing
-		String runId = "Moia_4";
+		String runId = "Moia_6";
 		boolean rebalancing = true;
 
 		String inbase = "D:\\Thiel\\Programme\\MatSim\\03_HannoverDRT\\input\\";
 		String outbase = "D:\\Thiel\\Programme\\MatSim\\03_HannoverDRT\\output\\";
 
-		final Config config = ConfigUtils.loadConfig(inbase + "config_H_DRT_0.1_0.25DRT.xml", new DrtConfigGroup(),
+		final Config config = ConfigUtils.loadConfig(inbase + "config_H_DRT_0.1_3xcar_DRT.xml", new DrtConfigGroup(),
 				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(), new TemperatureChangeConfigGroup(),
 				new CadytsConfigGroup());
 
@@ -98,8 +98,8 @@ public class RunDrtScenarioBatchH_DRT {
 
 		// config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		// Overwrite existing configuration parameters
-		config.plans().setInputFile(inbase + "\\plans\\vw234_nocad.0.1.output_plans.xml.gz");
-		config.controler().setLastIteration(140); // Number of simulation iterations
+		config.plans().setInputFile(inbase + "\\plans\\Moia_6.20.plans.xml.gz");
+		config.controler().setLastIteration(80); // Number of simulation iterations
 		config.controler().setWriteEventsInterval(20); // Write Events file every x-Iterations
 		config.controler().setWritePlansInterval(20); // Write Plan file every x-Iterations
 		config.qsim().setStartTime(0);

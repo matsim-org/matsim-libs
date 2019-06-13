@@ -33,8 +33,10 @@ import org.matsim.contrib.cadyts.car.CadytsCarModule;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
+import org.matsim.contrib.ev.temperature.TemperatureChangeConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -62,26 +64,36 @@ import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 
 public class RunCemdapBasecase {
 public static void main(String[] args) {
-	String runId = "vw235_nocad";
-	String pct = ".1.0";
+	String runId = "vw240_cadON_mergedCounts";
+	String pct = ".0.1";
 	
-	//String ttconfig = "E:\\Thiel\\Programme\\MatSim\\00_HannoverModel_1.0\\Input\\Cemdap\\config_0.1_tt_eq.xml"; 
+	String configPath = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\config_0.1.xml"; 
+		
+	Config config = ConfigUtils.loadConfig(configPath, new CadytsConfigGroup());
 	
 	
-	Config config = ConfigUtils.loadConfig(args[0], new CadytsConfigGroup());
-	//Config config = ConfigUtils.loadConfig(ttconfig, new CadytsConfigGroup());
-	config.plans().setInputFile("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw235_nocad.1.0\\ITERS\\it.100\\vw235_nocad.1.0.100.plans.xml.gz");
+	config.plans().setInputFile("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw240_cadON_mergedCounts.0.1\\vw240_cadON_mergedCounts.0.1.20.plans.xml.gz");
 	Scenario scenario = ScenarioUtils.loadScenario(config);
 	adjustPtNetworkCapacity(scenario.getNetwork(),config.qsim().getFlowCapFactor());
 	
 	Controler controler = new Controler(scenario);
 	controler.addOverridingModule(new CadytsCarModule());
 	
+	//Override cadyts params
+	CadytsConfigGroup ccg = (CadytsConfigGroup) config.getModules().get(CadytsConfigGroup.GROUP_NAME);
+	ccg.setStartTime(0);	
+	ccg.setEndTime(24*3600);
+	
+	//Override Counts params
+	CountsConfigGroup countsccg = (CountsConfigGroup) config.getModules().get(CountsConfigGroup.GROUP_NAME);
+	countsccg.setInputFile("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\input\\Counts\\mergedCountsH.xml");
+	
+	
 	config.controler().setOutputDirectory("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\"+runId+pct);
 	config.controler().setRunId(runId+pct);
-	config.controler().setWritePlansInterval(25);
-	config.controler().setWriteEventsInterval(25);
-	config.controler().setLastIteration(75); //Number of simulation iterations
+	config.controler().setWritePlansInterval(50);
+	config.controler().setWriteEventsInterval(50);
+	config.controler().setLastIteration(150); //Number of simulation iterations
 	
 	// tell the system to use the congested car router for the ride mode:
 	controler.addOverridingModule(new AbstractModule(){
@@ -100,27 +112,28 @@ public static void main(String[] args) {
 	
 	
 	// include cadyts into the plan scoring (this will add the cadyts corrections to the scores):
-//	controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-//		private final ScoringParametersForPerson parameters = new SubpopulationScoringParameters( scenario );
-//		@Inject CadytsContext cContext;
-//		@Override
-//		public ScoringFunction createNewScoringFunction(Person person) {
-//
-//			final ScoringParameters params = parameters.getScoringParameters( person );
-//			
-//			SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-//			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
-//			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
-//			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-//
-//			final CadytsScoring<Link> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config, cContext);
-//			final double cadytsScoringWeight = 20. * config.planCalcScore().getBrainExpBeta();
-//			scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
-//			scoringFunctionAccumulator.addScoringFunction(scoringFunction );
-//
-//			return scoringFunctionAccumulator;
-//		}
-//	}) ;
+	controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+		private final ScoringParametersForPerson parameters = new SubpopulationScoringParameters( scenario );
+		@Inject CadytsContext cContext;
+		@Override
+		public ScoringFunction createNewScoringFunction(Person person) {
+
+			final ScoringParameters params = parameters.getScoringParameters( person );
+			
+			SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
+			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
+			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
+			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+
+			final CadytsScoring<Link> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config, cContext);
+			final double cadytsScoringWeight = 20. * config.planCalcScore().getBrainExpBeta();
+			
+			scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
+			scoringFunctionAccumulator.addScoringFunction(scoringFunction );
+
+			return scoringFunctionAccumulator;
+		}
+	}) ;
 		
 	controler.run();
 	

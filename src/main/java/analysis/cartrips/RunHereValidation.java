@@ -30,9 +30,11 @@ package analysis.cartrips;
  */
 public class RunHereValidation {
 	public static void main(String[] args) {
-		String folder = "D:/runs-svn/vw_rufbus/vw205.1.0/";
-		String run = "vw205.1.0";
+		
+		
+		String folder = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw236_nocad.0.1\\";
+		String run = "vw236_nocad.0.1";
 				
-		RunTraveltimeValidationExample.main(new String[]{folder+run+".output_plans.xml.gz",folder+run+".output_events.xml.gz",folder+run+".output_network.xml.gz","EPSG:25832","nsybvUEVNq66QeKJxHbX","5HqydxSbE8NZAp1ZoS7VAg",folder,"2018-01-17","15000"});
+		RunTraveltimeValidationExample.main(new String[]{folder+run+".output_plans.xml.gz",folder+run+".output_events.xml.gz",folder+run+".output_network.xml.gz","EPSG:25832","MTIHglK7a71g2jG6GopJ","5dBURxwsfwPPcxgNhSAGbQ",folder,"2018-05-15","5000"});
 	}
 }

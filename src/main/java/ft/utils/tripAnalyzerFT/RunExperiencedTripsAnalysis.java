@@ -61,8 +61,8 @@ public class RunExperiencedTripsAnalysis {
 
     public static void main(String[] args) {
 
-        String runDirectory = "D:\\Thiel\\Programme\\MatSim\\03_HannoverDRT\\Output\\Moia_4\\";
-        String runId = "Moia_4.";
+        String runDirectory = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw236_nocad.0.1\\";
+        String runId = "vw236_nocad.0.1.";
         String runPrefix = runDirectory + "/" + runId;
 
         boolean useTransitSchedule = true;
@@ -77,6 +77,7 @@ public class RunExperiencedTripsAnalysis {
         monitoredModes.add("car");
         monitoredModes.add("walk");
         monitoredModes.add("bike");
+        monitoredModes.add("ride");
 
         readShape(shapeFile, shapeFeature);
 
@@ -93,26 +94,26 @@ public class RunExperiencedTripsAnalysis {
             public void run(Person person) {
 
             	//Take all agents
-//                relevantAgents.add(person.getId());
+                relevantAgents.add(person.getId());
 
 
             	//Take only specific agents
-				for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-					if (pe instanceof Activity) {
-						if (((Activity) pe).getType().contains("home")) {
-
-							Activity activity = ((Activity) pe);
-							Coord coord = activity.getCoord();
-							if (modalSplitEvaluator.isWithinZone(coord, zoneMap)) {
-								relevantAgents.add(person.getId());
-								// System.out.println(person.getId().toString());
-								break;
-
-							}
-
-						}
-					}
-				}
+//				for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
+//					if (pe instanceof Activity) {
+//						if (((Activity) pe).getType().contains("home")) {
+//
+//							Activity activity = ((Activity) pe);
+//							Coord coord = activity.getCoord();
+//							if (modalSplitEvaluator.isWithinZone(coord, zoneMap)) {
+//								relevantAgents.add(person.getId());
+//								// System.out.println(person.getId().toString());
+//								break;
+//
+//							}
+//
+//						}
+//					}
+//				}
 
             }
 
