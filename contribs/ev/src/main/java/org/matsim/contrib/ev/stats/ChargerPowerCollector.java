@@ -21,11 +21,7 @@ package org.matsim.contrib.ev.stats;/*
  * created by jbischoff, 26.10.2018
  */
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.inject.Inject;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.ev.EvUnits;
@@ -41,7 +37,10 @@ import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.core.utils.misc.Time;
 
-import com.google.inject.Inject;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ChargerPowerCollector
 		implements ChargingStartEventHandler, ChargingEndEventHandler, MobsimScopeEventHandler {
@@ -88,7 +87,7 @@ public class ChargerPowerCollector
 		return logList;
 	}
 
-	static class ChargingLogEntry implements Comparable<ChargingLogEntry> {
+	public static class ChargingLogEntry implements Comparable<ChargingLogEntry> {
 		private final double chargeStart;
 		private final double chargeEnd;
 		private final Charger charger;
@@ -144,6 +143,10 @@ public class ChargerPowerCollector
 		@Override
 		public int compareTo(ChargingLogEntry o) {
 			return Double.valueOf(chargeStart).compareTo(o.chargeStart);
+		}
+
+		public Id<ElectricVehicle> getVehicleId() {
+			return vehicleId;
 		}
 	}
 }
