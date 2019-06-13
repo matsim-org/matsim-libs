@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.HasPersonId;
 
-class RainOnPersonEvent extends Event implements HasPersonId {
+public class RainOnPersonEvent extends Event implements HasPersonId {
 
 	private Id<Person> personId;
 
