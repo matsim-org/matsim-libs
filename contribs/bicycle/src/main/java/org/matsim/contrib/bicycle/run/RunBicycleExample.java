@@ -129,11 +129,11 @@ public class RunBicycleExample {
 	public static void fillConfigWithBicycleStandardValues(Config config) {
 		config.controler().setWriteEventsInterval(1);
 		
-		BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) config.getModules().get(BicycleConfigGroup.GROUP_NAME);
-		bicycleConfigGroup.addParam("marginalUtilityOfInfrastructure_m", "-0.0002");
-		bicycleConfigGroup.addParam("marginalUtilityOfComfort_m", "-0.0002");
-		bicycleConfigGroup.addParam("marginalUtilityOfGradient_m_100m", "-0.02");
-		bicycleConfigGroup.addParam("maxBicycleSpeed", "4.16666666");
+		BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) config.getModules().get(BicycleConfigGroup.GROUP_NAME);	
+		bicycleConfigGroup.setMarginalUtilityOfInfrastructure_m(-0.0002);
+		bicycleConfigGroup.setMarginalUtilityOfComfort_m(-0.0002);
+		bicycleConfigGroup.setMarginalUtilityOfGradient_m_100m(-0.02);
+		bicycleConfigGroup.setMaxBicycleSpeedForRouting(4.16666666);
 		
 		List<String> mainModeList = new ArrayList<>();
 		mainModeList.add("bicycle");
