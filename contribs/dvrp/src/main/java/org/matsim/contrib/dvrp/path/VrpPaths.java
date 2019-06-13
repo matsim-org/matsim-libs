@@ -53,10 +53,15 @@ public class VrpPaths {
 			TravelTime travelTime) {
 		return createPath(fromLink, toLink, departureTime, pathData.path, travelTime);
 	}
-
+	
 	public static VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime, Path path,
 			TravelTime travelTime) {
-		if (fromLink == toLink) {
+		return createPath(fromLink, toLink, departureTime, path, travelTime, true);
+	}
+
+	public static VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime, Path path,
+			TravelTime travelTime, boolean considerZeroLengthPath) {
+		if (considerZeroLengthPath && fromLink == toLink) {
 			return createZeroLengthPath(fromLink, departureTime);
 		}
 
