@@ -72,9 +72,9 @@ public class SwitchEndTimeForDuration {
             }
         });
         spr.readFile(inputFile);
-
+        spw.closeStreaming();
         System.out.println("Persons modified " + i[1]);
         System.out.println("Activities modified " + i[0]);
     }
-//    TripsToLegsAlgorithm
+
 }
