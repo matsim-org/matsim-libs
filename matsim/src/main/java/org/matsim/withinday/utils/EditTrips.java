@@ -122,7 +122,8 @@ public final class EditTrips {
 
 		if ( currentPlanElement instanceof Activity ) {
 			// we are on a stage activity.  Take it from there:
-			replanCurrentTripFromStageActivity(tripElements, tripElementsIndex, agent, routingMode);
+			// TODO: this method fails with exception 
+			replanCurrentTripFromStageActivity(trip, tripElementsIndex, routingMode, now, agent);
 		} else {
 			// we are on a leg
 			replanCurrentTripFromLeg(trip.getDestinationActivity(), currentPlanElement, routingMode, now, agent);
@@ -151,7 +152,7 @@ public final class EditTrips {
 //			replanCurrentLegWithGenericRoute(newAct, routingMode, currentLeg, now, agent);
 		} else if ( currentLeg.getRoute() instanceof GenericRouteImpl ) {
 			// teleported leg
-			replanCurrentLegWithGenericRoute(newAct, routingMode, currentLeg, now, agent);
+//			replanCurrentLegWithGenericRoute(newAct, routingMode, currentLeg, now, agent);
 		} else {
 			throw new ReplanningException("not implemented for the route type of the current leg") ;
 			// Does not feel so hard: 
@@ -211,7 +212,6 @@ public final class EditTrips {
 		}
 		PTPassengerAgent ptPassengerAgent = (PTPassengerAgent) agent;
 		
-		// DEBUG: E.g. agent 461 has vehicle=null, although shown in OTFVis as sitting on a bus
 		MobsimVehicle mobsimVehicle = ptPassengerAgent.getVehicle();
 		ExperimentalTransitRoute oldPtRoute = (ExperimentalTransitRoute) currentLeg.getRoute();
 
@@ -357,7 +357,7 @@ public final class EditTrips {
 			
 			//TODO: In the following step no trip is found. TripStructureUtils.getTrips looks
 			//as if having a stage activity at start might be the problem. But this means
-			//replanCurrentTripFromStageActivity also cannot work. There are no tests, so who knows...
+			//replanCurrentTripFromStageActivity also cannot work and it does fail indeed :-(
 			final List<Trip> trips = TripStructureUtils.getTrips( subTripPlanElements, tripRouter.getStageActivityTypes() );
 			Trip subTrip = trips.get(0 ) ;
 			final double dpTime = agent.getActivityEndTime() ;
@@ -387,16 +387,59 @@ public final class EditTrips {
 		return newTrip;
 	}
 	// replan from stage activity:
-	private void replanCurrentTripFromStageActivity(final List<PlanElement> tripElements, int tripElementsIndex, 
-			MobsimAgent agent, String mainMode) {
-
-//		String mainMode = tripRouter.getMainModeIdentifier().identifyMainMode(tripElements) ;
-		// yyyy I wonder what this will do if we are already at the egress stage.  kai, oct'17
+	private void replanCurrentTripFromStageActivity(Trip trip, int tripElementsIndex, 
+			String mainMode, double now, MobsimAgent agent) {
 		
-		List<PlanElement> subTripPlanElements = tripElements.subList(tripElementsIndex,tripElements.size()-1) ;
-		Trip subTrip = TripStructureUtils.getTrips(subTripPlanElements, tripRouter.getStageActivityTypes()).get(0) ;
-		final double dpTime = agent.getActivityEndTime() ;
-		this.replanFutureTrip(subTrip, WithinDayAgentUtils.getModifiablePlan(agent), mainMode, dpTime ) ;
+		log.debug("entering replanCurrentTripFromStageActivity for agent" + agent.getId()) ;
+		
+		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
+		List<PlanElement> planElements = plan.getPlanElements() ;
+		Person person = plan.getPerson() ;
+		
+		if ( ! ( trip.getTripElements().get(tripElementsIndex) instanceof Activity) ) {
+			throw new RuntimeException("Expected a stage activity as current plan element");
+		}
+		Activity currentStageActivity = (Activity) trip.getTripElements().get(tripElementsIndex);
+		
+		// (1) get new trip from current position to new activity:
+		Facility currentLocationFacility = FacilitiesUtils.toFacility(currentStageActivity, scenario.getActivityFacilities());
+		List<? extends PlanElement> newTripElements = newTripToNewActivity(currentLocationFacility, trip.getDestinationActivity(), mainMode,
+				now, agent, person, scenario);
+
+		// (2) prune the new trip up to the current leg:
+		// do nothing ?!
+
+		// (2) modify current route:
+		// not necessary, we are at an activity ?!
+
+		// (3) remove remainder of old trip after current leg in plan:
+		int pos = WithinDayAgentUtils.getCurrentPlanElementIndex(agent) + 1 ;
+
+		while ( !planElements.get(pos).equals(trip.getDestinationActivity()) ) {
+			planElements.remove(pos) ;
+		}
+
+		// (4) insert new trip after current leg:
+		for ( int ijk = 1 ; ijk < newTripElements.size() ; ijk++ ) {
+			planElements.add( pos + ijk, newTripElements.get(ijk) ) ;
+		}
+		WithinDayAgentUtils.resetCaches(agent);
+		
+		// old and not working, because no Trip is found due to missing destination activity. 
+//
+////		String mainMode = tripRouter.getMainModeIdentifier().identifyMainMode(tripElements) ;
+//		// yyyy I wonder what this will do if we are already at the egress stage.  kai, oct'17
+//		
+//		// subList is inclusive for the fromIndex, but exclusive for the toIndex
+//		List<PlanElement> subTripPlanElements = trip.getTripElements().subList(tripElementsIndex, trip.getTripElements().size()) ;
+////		Trip subTrip = new Trip( (Activity) trip.getTripElements().get(tripElementsIndex),
+////				subTripPlanElements,
+////				trip.getDestinationActivity());
+//		List<PlanElement> subTripElementsWithDestination = new ArrayList<> (subTripPlanElements);
+//		subTripElementsWithDestination.add(trip.getDestinationActivity());
+//		Trip subTrip = TripStructureUtils.getTrips(subTripElementsWithDestination, tripRouter.getStageActivityTypes()).get(0) ;
+//		final double dpTime = agent.getActivityEndTime() ;
+//		this.replanFutureTrip(subTrip, WithinDayAgentUtils.getModifiablePlan(agent), mainMode, dpTime ) ;
 	}
 	// future:
 	public final static boolean insertEmptyTrip( Plan plan, Activity fromActivity, Activity toActivity, String mainMode, PopulationFactory pf ) {
