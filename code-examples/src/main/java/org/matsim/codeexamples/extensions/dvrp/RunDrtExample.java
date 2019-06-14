@@ -9,7 +9,6 @@ import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.drt.routing.DrtRoutingModule;
 import org.matsim.contrib.drt.run.*;
-import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
@@ -123,8 +122,8 @@ class RunDrtExample{
 			config.planCalcScore().addModeParams( modeParams );
 		}
 
-		config.addConfigConsistencyChecker( new DrtConfigConsistencyChecker() );
-		config.addConfigConsistencyChecker( new DvrpConfigConsistencyChecker() );
+//		config.addConfigConsistencyChecker( new DrtConfigConsistencyChecker() );
+//		config.addConfigConsistencyChecker( new DvrpConfigConsistencyChecker() );
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 

@@ -13,7 +13,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
-import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
@@ -21,7 +20,6 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetWriter;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
-import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
@@ -77,7 +75,7 @@ public class PtAlongALineTest{
 	 * only the middle stop is accessible by bike.
 	 */
 
-//	@Test
+	//	@Test
 	public void testPtAlongALine() {
 
 		Config config = createConfig();
@@ -89,7 +87,7 @@ public class PtAlongALineTest{
 		controler.run() ;
 	}
 
-//	@Test
+	//	@Test
 	public void testPtAlongALineWithRaptorAndDrt() {
 
 		Config config = createConfig();
@@ -105,7 +103,7 @@ public class PtAlongALineTest{
 
 		controler.run() ;
 	}
-	
+
 	@Test
 	public void testPtAlongALineWithRaptorAndDrtServiceArea() {
 
@@ -122,11 +120,11 @@ public class PtAlongALineTest{
 		}
 
 		config.plansCalcRoute().setInsertingAccessEgressWalk( true );
-		
+
 		DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
 		// TODO: How can we set the network mode of drt2? 
 		// TODO: Right now uncommenting the following line gives guice injection errors
-//		dvrpConfig.setNetworkMode(TransportMode.drt);
+		//		dvrpConfig.setNetworkMode(TransportMode.drt);
 
 		MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 		String drtVehiclesFile = "drt_vehicles.xml";
@@ -163,41 +161,46 @@ public class PtAlongALineTest{
 			PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("drt_walk");
 			config.planCalcScore().addModeParams(modeParams);
 		}
+		{
+			PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("drt2_walk");
+			config.planCalcScore().addModeParams(modeParams);
+		}
 
-		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-		config.addConfigConsistencyChecker(new DvrpConfigConsistencyChecker());
+		//		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
+		//		config.addConfigConsistencyChecker(new DvrpConfigConsistencyChecker());
+		// looks like this is no longer available?  kai, jun'19
 
 		{
-		SwissRailRaptorConfigGroup configRaptor = new SwissRailRaptorConfigGroup();
-		configRaptor.setUseIntermodalAccessEgress(true);
+			SwissRailRaptorConfigGroup configRaptor = new SwissRailRaptorConfigGroup();
+			configRaptor.setUseIntermodalAccessEgress(true);
 
-		// Walk
-		IntermodalAccessEgressParameterSet paramSetWalk = new IntermodalAccessEgressParameterSet();
-		paramSetWalk.setMode(TransportMode.walk);
-		paramSetWalk.setRadius(1000000);
-		paramSetWalk.setPersonFilterAttribute(null);
-		paramSetWalk.setStopFilterAttribute(null);
-		configRaptor.addIntermodalAccessEgress(paramSetWalk );
+			// Walk
+			IntermodalAccessEgressParameterSet paramSetWalk = new IntermodalAccessEgressParameterSet();
+			paramSetWalk.setMode(TransportMode.walk);
+			paramSetWalk.setRadius(1000000);
+			paramSetWalk.setPersonFilterAttribute(null);
+			paramSetWalk.setStopFilterAttribute(null);
+			configRaptor.addIntermodalAccessEgress(paramSetWalk );
 
-		// drt
-		IntermodalAccessEgressParameterSet paramSetDrt = new IntermodalAccessEgressParameterSet();
-		paramSetDrt.setMode(TransportMode.drt);
-		paramSetDrt.setRadius(1000000);
-		paramSetDrt.setPersonFilterAttribute(null);
-		paramSetDrt.setStopFilterAttribute(null);
-		configRaptor.addIntermodalAccessEgress(paramSetDrt);
-		
-		// drt2
-		IntermodalAccessEgressParameterSet paramSetDrt2 = new IntermodalAccessEgressParameterSet();
-		paramSetDrt2.setMode( "drt2" );
-		paramSetDrt2.setRadius(1000000);
-		paramSetDrt2.setPersonFilterAttribute(null);
-		paramSetDrt2.setStopFilterAttribute(null);
-		configRaptor.addIntermodalAccessEgress(paramSetDrt2);
-		
-		config.addModule(configRaptor);
+			// drt
+			IntermodalAccessEgressParameterSet paramSetDrt = new IntermodalAccessEgressParameterSet();
+			paramSetDrt.setMode(TransportMode.drt);
+			paramSetDrt.setRadius(1000000);
+			paramSetDrt.setPersonFilterAttribute(null);
+			paramSetDrt.setStopFilterAttribute(null);
+			configRaptor.addIntermodalAccessEgress(paramSetDrt);
+
+			// drt2
+			IntermodalAccessEgressParameterSet paramSetDrt2 = new IntermodalAccessEgressParameterSet();
+			paramSetDrt2.setMode( "drt2" );
+			paramSetDrt2.setRadius(1000000);
+			paramSetDrt2.setPersonFilterAttribute(null);
+			paramSetDrt2.setStopFilterAttribute(null);
+			configRaptor.addIntermodalAccessEgress(paramSetDrt2);
+
+			config.addModule(configRaptor);
 		}
-		
+
 		Scenario scenario = createScenario(config);
 
 		// TODO: reference somehow network creation, to ensure that these link ids exist
@@ -211,7 +214,7 @@ public class PtAlongALineTest{
 		createDrtVehiclesFile(drt2VehiclesFile, "DRT2-", 1, Id.createLinkId("1000-999"));
 
 		scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory(DrtRoute.class,
-				new DrtRouteFactory());
+			  new DrtRouteFactory());
 
 		Controler controler = new Controler(scenario);
 
@@ -511,23 +514,23 @@ public class PtAlongALineTest{
 		af.addActivityOption( option );
 		scenario.getActivityFacilities().addActivityFacility( af );
 	}
-	
+
 	private void createDrtVehiclesFile(String taxisFile, String vehPrefix, int numberofVehicles, Id<Link> startLinkId) {
 		List<DvrpVehicleSpecification> vehicles = new ArrayList<>();
 		for (int i = 0; i< numberofVehicles;i++){
 			//for multi-modal networks: Only links where drts can ride should be used.
 			DvrpVehicleSpecification v = ImmutableDvrpVehicleSpecification.newBuilder()
-					.id(Id.create(vehPrefix + i, DvrpVehicle.class))
-					.startLinkId(startLinkId)
-					.capacity(4)
-					.serviceBeginTime(0)
-					.serviceEndTime(36*3600)
-					.build();
-		    vehicles.add(v);
+													  .id(Id.create(vehPrefix + i, DvrpVehicle.class))
+													  .startLinkId(startLinkId)
+													  .capacity(4)
+													  .serviceBeginTime(0)
+													  .serviceEndTime(36*3600)
+													  .build();
+			vehicles.add(v);
 		}
 		new FleetWriter(vehicles.stream()).write(taxisFile);
 	}
-	
+
 	private void addDrtModeToAllLinksBtwnGivenNodes(Network network, int fromNodeNumber, int toNodeNumber, String drtMode) {
 		for (int i = fromNodeNumber; i < toNodeNumber; i++) {
 			Set<String> newAllowedModes = new HashSet<>();
@@ -536,7 +539,7 @@ public class PtAlongALineTest{
 			}
 			newAllowedModes.add(drtMode);
 			network.getLinks().get(Id.createLinkId( i + "-" + (i+1) )).setAllowedModes( newAllowedModes );
-			
+
 			newAllowedModes = new HashSet<>();
 			for (String mode: network.getLinks().get(Id.createLinkId( (i+1) + "-" + i )).getAllowedModes() ) {
 				newAllowedModes.add(mode);
