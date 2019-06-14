@@ -112,13 +112,16 @@ public class PtAlongALineTest{
 		Config config = createConfig();
 
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
-		Set<String> networkModes = new HashSet<>();
-		for ( String mode: config.plansCalcRoute().getNetworkModes()) {
-			networkModes.add(mode);
+		// yy why?  kai, jun'19
+
+		{
+			Set<String> networkModes = new HashSet<>( config.plansCalcRoute().getNetworkModes() );
+			networkModes.add( TransportMode.drt );
+			networkModes.add( "drt2" );
+			config.plansCalcRoute().setNetworkModes( networkModes );
 		}
-		networkModes.add(TransportMode.drt);
-		networkModes.add("drt2");
-		config.plansCalcRoute().setNetworkModes(networkModes);
+
+		config.plansCalcRoute().setInsertingAccessEgressWalk( true );
 		
 		DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
 		// TODO: How can we set the network mode of drt2? 
