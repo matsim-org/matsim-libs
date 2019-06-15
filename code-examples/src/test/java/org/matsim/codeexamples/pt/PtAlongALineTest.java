@@ -1,5 +1,8 @@
 package org.matsim.codeexamples.pt;
 
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -11,22 +14,17 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.drt.routing.DrtRoute;
-import org.matsim.contrib.drt.routing.DrtRouteFactory;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetWriter;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -42,14 +40,9 @@ import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehiclesFactory;
 
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
+import java.util.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import static org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
 
 public class PtAlongALineTest{
 
@@ -70,12 +63,7 @@ public class PtAlongALineTest{
 
 
 
-	/**
-	 * Test of Intermodal Access & Egress to pt using bike.There are three transit stops, and
-	 * only the middle stop is accessible by bike.
-	 */
-
-	//	@Test
+	@Test
 	public void testPtAlongALine() {
 
 		Config config = createConfig();
@@ -87,8 +75,12 @@ public class PtAlongALineTest{
 		controler.run() ;
 	}
 
-	//	@Test
-	public void testPtAlongALineWithRaptorAndDrt() {
+	/**
+	 * Test of Intermodal Access & Egress to pt using bike.There are three transit stops, and
+	 * only the middle stop is accessible by bike.
+	 */
+	@Test
+	public void testPtAlongALineWithRaptorAndBike() {
 
 		Config config = createConfig();
 
@@ -109,7 +101,7 @@ public class PtAlongALineTest{
 
 		Config config = createConfig();
 
-		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
+		config.qsim().setSimStarttimeInterpretation( StarttimeInterpretation.onlyUseStarttime );
 		// yy why?  kai, jun'19
 
 		{
@@ -121,50 +113,25 @@ public class PtAlongALineTest{
 
 		config.plansCalcRoute().setInsertingAccessEgressWalk( true );
 
-		DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
-		// TODO: How can we set the network mode of drt2? 
-		// TODO: Right now uncommenting the following line gives guice injection errors
-		//		dvrpConfig.setNetworkMode(TransportMode.drt);
+		{
+			ModeParams modeParams = new ModeParams(TransportMode.drt);
+			config.planCalcScore().addModeParams(modeParams);
+		}
+		{
+			ModeParams modeParams = new ModeParams("drt2");
+			config.planCalcScore().addModeParams(modeParams);
+		}
 
-		MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
-		String drtVehiclesFile = "drt_vehicles.xml";
-		String drt2VehiclesFile = "drt2_vehicles.xml";
-		{
-			DrtConfigGroup drtConfig = new DrtConfigGroup();
-			drtConfig.setMaxTravelTimeAlpha(1.3);
-			drtConfig.setVehiclesFile(drtVehiclesFile);
-			drtConfig.setMaxTravelTimeBeta(5. * 60.);
-			drtConfig.setStopDuration(60.);
-			drtConfig.setMaxWaitTime(Double.MAX_VALUE);
-			drtConfig.setMode(TransportMode.drt);
-			mm.addParameterSet(drtConfig);
-		}
-		{
-			DrtConfigGroup drtConfig = new DrtConfigGroup();
-			drtConfig.setMaxTravelTimeAlpha(1.3);
-			drtConfig.setVehiclesFile(drt2VehiclesFile);
-			drtConfig.setMaxTravelTimeBeta(5. * 60.);
-			drtConfig.setStopDuration(60.);
-			drtConfig.setMaxWaitTime(Double.MAX_VALUE);
-			drtConfig.setMode("drt2");
-			mm.addParameterSet(drtConfig);
-		}
-		{
-			PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.drt);
-			config.planCalcScore().addModeParams(modeParams);
-		}
-		{
-			PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("drt2");
-			config.planCalcScore().addModeParams(modeParams);
-		}
-		{
-			PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("drt_walk");
-			config.planCalcScore().addModeParams(modeParams);
-		}
-		{
-			PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("drt2_walk");
-			config.planCalcScore().addModeParams(modeParams);
-		}
+		config.transit().setUseTransit( true );
+
+		config.transit().setUsingTransitInMobsim( false );
+		config.qsim().setMainModes( Collections.emptyList() );
+		// (everything teleportation for debugging)
+
+		config.qsim().setVehiclesSource( VehiclesSource.modeVehicleTypesFromVehiclesData );
+		// (as of today, will also influence router. kai, jun'19)
+
+		config.controler().setLastIteration( 0 );
 
 		//		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
 		//		config.addConfigConsistencyChecker(new DvrpConfigConsistencyChecker());
@@ -181,6 +148,8 @@ public class PtAlongALineTest{
 			paramSetWalk.setPersonFilterAttribute(null);
 			paramSetWalk.setStopFilterAttribute(null);
 			configRaptor.addIntermodalAccessEgress(paramSetWalk );
+			// (in principle, walk as alternative to drt will not work, since drt is always faster.  Need to give the ASC to the router!  However, with
+			// the reduced drt network we should be able to see differentiation.)
 
 			// drt
 			IntermodalAccessEgressParameterSet paramSetDrt = new IntermodalAccessEgressParameterSet();
@@ -201,29 +170,90 @@ public class PtAlongALineTest{
 			config.addModule(configRaptor);
 		}
 
+		//		DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
+		// TODO: How can we set the network mode of drt2?
+		// TODO: Right now uncommenting the following line gives guice injection errors
+		//		dvrpConfig.setNetworkMode(TransportMode.drt);
+
+		//		MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
+		//		String drtVehiclesFile = "drt_vehicles.xml";
+		//		String drt2VehiclesFile = "drt2_vehicles.xml";
+		//		{
+		//			DrtConfigGroup drtConfig = new DrtConfigGroup();
+		//			drtConfig.setMaxTravelTimeAlpha(1.3);
+		//			drtConfig.setVehiclesFile(drtVehiclesFile);
+		//			drtConfig.setMaxTravelTimeBeta(5. * 60.);
+		//			drtConfig.setStopDuration(60.);
+		//			drtConfig.setMaxWaitTime(Double.MAX_VALUE);
+		//			drtConfig.setMode(TransportMode.drt);
+		//			mm.addParameterSet(drtConfig);
+		//		}
+		//		{
+		//			DrtConfigGroup drtConfig = new DrtConfigGroup();
+		//			drtConfig.setMaxTravelTimeAlpha(1.3);
+		//			drtConfig.setVehiclesFile(drt2VehiclesFile);
+		//			drtConfig.setMaxTravelTimeBeta(5. * 60.);
+		//			drtConfig.setStopDuration(60.);
+		//			drtConfig.setMaxWaitTime(Double.MAX_VALUE);
+		//			drtConfig.setMode("drt2");
+		//			mm.addParameterSet(drtConfig);
+		//		}
+
+
+		// ---
+
+		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.warn );
+
 		Scenario scenario = createScenario(config);
 
 		// TODO: reference somehow network creation, to ensure that these link ids exist
 		// add drt modes to the car links' allowed modes in their respective service area
-		addDrtModeToAllLinksBtwnGivenNodes(scenario.getNetwork(), 0, 50, TransportMode.drt);
+		addDrtModeToAllLinksBtwnGivenNodes(scenario.getNetwork(), 450, 500, TransportMode.drt);
 		addDrtModeToAllLinksBtwnGivenNodes(scenario.getNetwork(), 950, 1000, "drt2");
 
 		// TODO: avoid really writing out these files. However so far it is unclear how
 		// to configure DRT and load the vehicles otherwise
-		createDrtVehiclesFile(drtVehiclesFile, "DRT-", 10, Id.createLinkId("0-1"));
-		createDrtVehiclesFile(drt2VehiclesFile, "DRT2-", 1, Id.createLinkId("1000-999"));
+//		createDrtVehiclesFile(drtVehiclesFile, "DRT-", 10, Id.createLinkId("0-1"));
+//		createDrtVehiclesFile(drt2VehiclesFile, "DRT2-", 1, Id.createLinkId("1000-999"));
 
-		scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory(DrtRoute.class,
-			  new DrtRouteFactory());
+//		scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory(DrtRoute.class,
+//			  new DrtRouteFactory());
+
+		// The following is for the _router_, not the qsim!  kai, jun'19
+		VehiclesFactory vf = scenario.getVehicles().getFactory();
+		{
+			VehicleType vehType = vf.createVehicleType( Id.create( "drt2", VehicleType.class ) );
+			vehType.setMaximumVelocity( 50./3.6 );
+			scenario.getVehicles().addVehicleType( vehType );
+		}
+		{
+			VehicleType vehType = vf.createVehicleType( Id.create( TransportMode.drt, VehicleType.class ) );
+			vehType.setMaximumVelocity( 50./3.6 );
+			scenario.getVehicles().addVehicleType( vehType );
+		}
+		{
+			VehicleType vehType = vf.createVehicleType( Id.create( TransportMode.car, VehicleType.class ) );
+			vehType.setMaximumVelocity( 50./3.6 );
+			scenario.getVehicles().addVehicleType( vehType );
+		}
+
+		// ---
 
 		Controler controler = new Controler(scenario);
 
 		controler.addOverridingModule(new SwissRailRaptorModule());
 
-		controler.addOverridingModule(new DvrpModule());
-		controler.addOverridingModule(new MultiModeDrtModule());
+//		controler.addOverridingModule(new DvrpModule());
+//		controler.addOverridingModule(new MultiModeDrtModule());
+//
+//		controler.configureQSimComponents(DvrpQSimComponents.activateModes(TransportMode.drt, "drt2"));
 
-		controler.configureQSimComponents(DvrpQSimComponents.activateModes(TransportMode.drt, "drt2"));
+		controler.addOverridingModule( new AbstractModule(){
+			@Override
+			public void install(){
+				this.addTravelTimeBinding( "myMode" ).to( this.networkTravelTime() )
+			}
+		} )
 
 		controler.run();
 	}
@@ -271,23 +301,23 @@ public class PtAlongALineTest{
 	}
 
 	private static void configureScoring(Config config) {
-		PlanCalcScoreConfigGroup.ModeParams accessWalk = new PlanCalcScoreConfigGroup.ModeParams("access_walk");
+		ModeParams accessWalk = new ModeParams("access_walk");
 		accessWalk.setMarginalUtilityOfTraveling(0);
 		config.planCalcScore().addModeParams(accessWalk);
 
-		PlanCalcScoreConfigGroup.ModeParams transitWalk = new PlanCalcScoreConfigGroup.ModeParams("transit_walk");
+		ModeParams transitWalk = new ModeParams("transit_walk");
 		transitWalk.setMarginalUtilityOfTraveling(0);
 		config.planCalcScore().addModeParams(transitWalk);
 
-		PlanCalcScoreConfigGroup.ModeParams egressWalk = new PlanCalcScoreConfigGroup.ModeParams("egress_walk");
+		ModeParams egressWalk = new ModeParams("egress_walk");
 		egressWalk.setMarginalUtilityOfTraveling(0);
 		config.planCalcScore().addModeParams(egressWalk);
 
-		PlanCalcScoreConfigGroup.ModeParams bike = new PlanCalcScoreConfigGroup.ModeParams("bike");
+		ModeParams bike = new ModeParams("bike");
 		bike.setMarginalUtilityOfTraveling(0);
 		config.planCalcScore().addModeParams(bike);
 
-		PlanCalcScoreConfigGroup.ModeParams drt = new PlanCalcScoreConfigGroup.ModeParams("drt");
+		ModeParams drt = new ModeParams("drt");
 		drt.setMarginalUtilityOfTraveling(0);
 		config.planCalcScore().addModeParams(drt);
 	}
@@ -492,9 +522,9 @@ public class PtAlongALineTest{
 		scenario.getNetwork().addLink( trLink );
 	}
 
-	private static NetworkRoute createNetworkRoute( Id<Link> TR_LINK_0_1_ID, List<Id<Link>> linkIds, Id<Link> TR_LINK_LASTM1_LAST_ID, PopulationFactory pf ){
-		NetworkRoute route = pf.getRouteFactories().createRoute( NetworkRoute.class, TR_LINK_0_1_ID, TR_LINK_LASTM1_LAST_ID ) ;
-		route.setLinkIds( TR_LINK_0_1_ID, linkIds, TR_LINK_LASTM1_LAST_ID ) ;
+	private static NetworkRoute createNetworkRoute( Id<Link> startLinkId, List<Id<Link>> linkIds, Id<Link> endLinkId, PopulationFactory pf ){
+		NetworkRoute route = pf.getRouteFactories().createRoute( NetworkRoute.class, startLinkId, endLinkId ) ;
+		route.setLinkIds( startLinkId, linkIds, endLinkId ) ;
 		return route;
 	}
 
@@ -515,7 +545,7 @@ public class PtAlongALineTest{
 		scenario.getActivityFacilities().addActivityFacility( af );
 	}
 
-	private void createDrtVehiclesFile(String taxisFile, String vehPrefix, int numberofVehicles, Id<Link> startLinkId) {
+	private static void createDrtVehiclesFile(String taxisFile, String vehPrefix, int numberofVehicles, Id<Link> startLinkId) {
 		List<DvrpVehicleSpecification> vehicles = new ArrayList<>();
 		for (int i = 0; i< numberofVehicles;i++){
 			//for multi-modal networks: Only links where drts can ride should be used.
@@ -531,19 +561,13 @@ public class PtAlongALineTest{
 		new FleetWriter(vehicles.stream()).write(taxisFile);
 	}
 
-	private void addDrtModeToAllLinksBtwnGivenNodes(Network network, int fromNodeNumber, int toNodeNumber, String drtMode) {
+	private static void addDrtModeToAllLinksBtwnGivenNodes(Network network, int fromNodeNumber, int toNodeNumber, String drtMode) {
 		for (int i = fromNodeNumber; i < toNodeNumber; i++) {
-			Set<String> newAllowedModes = new HashSet<>();
-			for (String mode: network.getLinks().get(Id.createLinkId( i + "-" + (i+1) )).getAllowedModes() ) {
-				newAllowedModes.add(mode);
-			}
+			Set<String> newAllowedModes = new HashSet<>( network.getLinks().get( Id.createLinkId( i + "-" + (i + 1) ) ).getAllowedModes() );
 			newAllowedModes.add(drtMode);
 			network.getLinks().get(Id.createLinkId( i + "-" + (i+1) )).setAllowedModes( newAllowedModes );
 
-			newAllowedModes = new HashSet<>();
-			for (String mode: network.getLinks().get(Id.createLinkId( (i+1) + "-" + i )).getAllowedModes() ) {
-				newAllowedModes.add(mode);
-			}
+			newAllowedModes = new HashSet<>( network.getLinks().get( Id.createLinkId( (i + 1) + "-" + i ) ).getAllowedModes() );
 			newAllowedModes.add(drtMode);
 			network.getLinks().get(Id.createLinkId( (i+1) + "-" + i )).setAllowedModes( newAllowedModes );
 		}
