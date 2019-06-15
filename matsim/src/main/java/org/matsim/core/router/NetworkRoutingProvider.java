@@ -1,7 +1,7 @@
 package org.matsim.core.router;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -22,26 +22,15 @@ public class NetworkRoutingProvider implements Provider<RoutingModule> {
 	private static final Logger log = Logger.getLogger( NetworkRoutingProvider.class ) ;
 	
 	private final String routingMode;
-	@Inject
-    Map<String, TravelTime> travelTimes;
 
-	@Inject
-	Map<String, TravelDisutilityFactory> travelDisutilityFactories;
-
-	@Inject
-	SingleModeNetworksCache singleModeNetworksCache;
-
-	@Inject
-	PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
-
-	@Inject
-    Network network;
-
-	@Inject
-    PopulationFactory populationFactory;
-
-	@Inject
-    LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
+	@Inject Map<String, TravelTime> travelTimes;
+	@Inject Map<String, TravelDisutilityFactory> travelDisutilityFactories;
+	@Inject SingleModeNetworksCache singleModeNetworksCache;
+	@Inject PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
+	@Inject Network network;
+	@Inject PopulationFactory populationFactory;
+	@Inject LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
+	@Inject Scenario scenario ;
 	
 	/**
 	 * This is the older (and still more standard) constructor, where the routingMode and the resulting mode were the
@@ -108,8 +97,7 @@ public class NetworkRoutingProvider implements Provider<RoutingModule> {
 
 		// the following again refers to the (transport)mode, since it will determine the mode of the leg on the network:
 		if ( plansCalcRouteConfigGroup.isInsertingAccessEgressWalk() ) {
-			return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo,
-					plansCalcRouteConfigGroup) ;
+			return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, routeAlgo, scenario, filteredNetwork ) ;
 		} else {
 			return DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo);
 		}

@@ -21,6 +21,7 @@ package org.matsim.core.router;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -32,7 +33,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -43,6 +43,9 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +59,7 @@ import java.util.List;
  */
 public final class NetworkRoutingInclAccessEgressModule implements RoutingModule {
 	private static final Logger log = Logger.getLogger( NetworkRoutingInclAccessEgressModule.class );
+	private final Vehicle proxyVehicle;
 
 	private final class AccessEgressStageActivityTypes implements StageActivityTypes {
 		@Override public boolean isStageActivity(String activityType) {
@@ -81,26 +85,47 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	private final String mode;
 	private final PopulationFactory populationFactory;
 
-	private final Network network;
+	private final Network filteredNetwork;
 	private final LeastCostPathCalculator routeAlgo;
 	private String stageActivityType;
 
-	public NetworkRoutingInclAccessEgressModule(
-			final String mode,
-			final PopulationFactory populationFactory,
-			final Network network,
-			final LeastCostPathCalculator routeAlgo,
-			PlansCalcRouteConfigGroup calcRouteConfig) {
-		Gbl.assertNotNull(network);
-		Gbl.assertIf( network.getLinks().size()>0 ) ; // otherwise network for mode probably not defined
-		this.network = network;
+	NetworkRoutingInclAccessEgressModule(
+		  final String mode,
+		  final LeastCostPathCalculator routeAlgo, Scenario scenario, Network filteredNetwork ) {
+		Gbl.assertNotNull(scenario.getNetwork());
+		Gbl.assertIf( scenario.getNetwork().getLinks().size()>0 ) ; // otherwise network for mode probably not defined
+		this.filteredNetwork = filteredNetwork ;
 		this.routeAlgo = routeAlgo;
 		this.mode = mode;
-		this.populationFactory = populationFactory;
+		this.populationFactory = scenario.getPopulation().getFactory() ;
 		this.stageActivityType = PlanCalcScoreConfigGroup.createStageActivityType( mode );
-		if ( !calcRouteConfig.isInsertingAccessEgressWalk() ) {
+		if ( !scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) {
 			throw new RuntimeException("trying to use access/egress but not switched on in config.  "
 					+ "currently not supported; there are too many other problems") ;
+		}
+
+		// yyyyyy the following is a quick fix until Janek hopefully comes along with using the "true" vehicles.  kai, jun'19
+		switch( scenario.getConfig().qsim().getVehiclesSource() ) {
+			// yyyyyy it is confusing that this comes out of a qsim config group!  The config option would better be in the "vehicles" config group.
+			//  kai, jun'19
+			case defaultVehicle: {
+				VehicleType proxyVehicleType = VehicleUtils.getDefaultVehicleType();
+				proxyVehicle = scenario.getVehicles().getFactory().createVehicle( Id.createVehicleId( "proxyVehicle" ), proxyVehicleType );
+				break; }
+			case modeVehicleTypesFromVehiclesData: {
+				VehicleType proxyVehicleType = scenario.getVehicles().getVehicleTypes().get( Id.create( mode, VehicleType.class ) );
+				if ( proxyVehicleType==null ) {
+					throw new RuntimeException( "there is no mode vehicle type for mode=" + mode + " although vehiclesSource is set to " +
+											"modeVehicleTypesFromVehiclesData" ) ;
+				}
+				proxyVehicle = scenario.getVehicles().getFactory().createVehicle( Id.createVehicleId( "proxyVehicle" ), proxyVehicleType );
+				// (note: the network router is by mode, so we only need one mode vehicle here.  kai, jun'19)
+				break; }
+			case fromVehiclesData:
+				proxyVehicle = null ;
+				break;
+			default:
+				throw new IllegalStateException( "Unexpected value: " + scenario.getConfig().qsim().getVehiclesSource() );
 		}
 	}
 
@@ -116,9 +141,9 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		Gbl.assertNotNull(fromFacility);
 		Gbl.assertNotNull(toFacility);
 
-		Link accessActLink = FacilitiesUtils.decideOnLink(fromFacility, network );
+		Link accessActLink = FacilitiesUtils.decideOnLink(fromFacility, filteredNetwork );
 
-		Link egressActLink = FacilitiesUtils.decideOnLink(toFacility, network );
+		Link egressActLink = FacilitiesUtils.decideOnLink(toFacility, filteredNetwork );
 		
 		double now = departureTime ;
 
@@ -169,8 +194,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		//			log.warn( "===" );
 	}
 	
-	public static double addBushwhackingLegFromFacilityToLinkIfNecessary( final Facility fromFacility, final Person person,
-												     final Link accessActLink, double now, final List<PlanElement> result, final PopulationFactory populationFactory, final String stageActivityType ) {
+	public static double addBushwhackingLegFromFacilityToLinkIfNecessary( final Facility fromFacility, final Person person, final Link accessActLink,
+												    double now, final List<PlanElement> result, final PopulationFactory populationFactory, final String stageActivityType ) {
 		if ( fromFacility.getCoord() != null ) { // otherwise the trip starts directly on the link; no need to bushwhack
 
 			Coord accessActCoord  = accessActLink.getToNode().getCoord() ;
@@ -185,11 +210,9 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			// yyyy might be possible to set the link ids to null. kai & dominik, may'16
 			
 			result.add( accessLeg ) ;
-//				log.warn( accessLeg );
 
 			final Activity interactionActivity = createInteractionActivity(accessActCoord, accessActLink.getId(), stageActivityType );
 			result.add( interactionActivity ) ;
-//				log.warn( interactionActivity );
 		}
 		return now;
 	}
@@ -248,16 +271,17 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		Node startNode = fromLink.getToNode();	// start at the end of the "current" link
 		Node endNode = toLink.getFromNode(); // the target is the start of the link
 
+
 		if (toLink != fromLink) { // (a "true" route)
 
-			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);
+			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, proxyVehicle);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 
 			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
 			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
 			route.setTravelTime((int) path.travelTime);
 			route.setTravelCost(path.travelCost);
-			route.setDistance(RouteUtils.calcDistance(route, 1.0,1.0,this.network));
+			route.setDistance(RouteUtils.calcDistance(route, 1.0,1.0,this.filteredNetwork ) );
 			leg.setRoute(route);
 			travTime = (int) path.travelTime;
 

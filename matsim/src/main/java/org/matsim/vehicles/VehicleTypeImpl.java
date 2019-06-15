@@ -49,6 +49,11 @@ public class VehicleTypeImpl implements VehicleType {
 
 	private DoorOperationMode doorOperationMode = DoorOperationMode.serial;
 
+	@Override
+	public String toString() {
+		return "[ID=" + id + " | maxVelocity= " + maxVelocity + "]" ;
+	}
+
 	public VehicleTypeImpl(Id<VehicleType> typeId) {
 		this.id = typeId;
 	}
