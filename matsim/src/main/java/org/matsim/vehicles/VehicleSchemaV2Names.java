@@ -62,6 +62,7 @@ public interface VehicleSchemaV2Names {
 	public static final String MODE = "mode";
 	public static final String PASSENGERCAREQUIVALENTS = "passengerCarEquivalents";
 	public static final String PCE = "pce";
+	public static final String NETWORKMODE = "networkMode";
 	public static final String FLOWEFFICIENCYFACTOR = "flowEfficiencyFactor";
 	public static final String FACTOR = "factor";
 	public final static String ATTRIBUTES = "attributes";

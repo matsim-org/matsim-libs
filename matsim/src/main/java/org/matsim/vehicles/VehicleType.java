@@ -38,6 +38,7 @@ public class VehicleType implements Attributable {
 	private FreightCapacity freightCapacity;
 	private String description;
 	private VehicleCapacity capacity;
+	private String networkMode = "car";
 
 	private Id<VehicleType> id;
 
@@ -183,4 +184,12 @@ public class VehicleType implements Attributable {
 	public FreightCapacity getFreightCapacity() {
 		return freightCapacity;
 	}
+
+    public String getNetworkMode() {
+        return networkMode;
+    }
+
+    public void setNetworkMode(String networkMode) {
+        this.networkMode = networkMode;
+    }
 }

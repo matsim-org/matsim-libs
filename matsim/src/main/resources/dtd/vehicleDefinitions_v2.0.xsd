@@ -52,6 +52,11 @@
               <xs:attribute name="pce" type="xs:decimal" default="1.0"/>
             </xs:complexType>
           </xs:element>
+          <xs:element name="networkMode" minOccurs="0" maxOccurs="1">
+            <xs:complexType>
+              <xs:attribute name="networkMode" type="xs:string" default="car"/>
+            </xs:complexType>
+          </xs:element>
           <xs:element name="flowEfficiencyFactor" minOccurs="0" maxOccurs="1">
             <xs:complexType>
               <xs:attribute name="factor" type="xs:decimal" default="1.0"/>

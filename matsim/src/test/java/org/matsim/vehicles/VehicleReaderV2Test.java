@@ -84,6 +84,7 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 		assertEquals(1.5, vehTypeNormalCar.getFlowEfficiencyFactor());
 		assertEquals("abc", vehTypeNormalCar.getAttributes().getAttribute("Attribute1"));
 		assertEquals(1.3, (double) vehTypeNormalCar.getAttributes().getAttribute("Attribute2"), EPSILON);
+		assertEquals("pt", vehTypeNormalCar.getNetworkMode());
 	}
 
 	@Test
@@ -99,7 +100,7 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 		assertEquals(1.0, vehTypeDefaultCar.getFlowEfficiencyFactor());
 		assertEquals("def", vehTypeDefaultCar.getAttributes().getAttribute("Attribute1"));
 		assertEquals(2, vehTypeDefaultCar.getAttributes().getAttribute("Attribute2"));
-
+		assertEquals("car", vehTypeDefaultCar.getNetworkMode());				//Should this be the default? If yes, where should it be set? kmt jun'19
 	}
 
 	@Test

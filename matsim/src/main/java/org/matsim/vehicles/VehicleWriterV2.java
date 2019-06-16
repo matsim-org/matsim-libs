@@ -134,6 +134,13 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 			atts.clear();
 			atts.add(this.createTuple(VehicleSchemaV2Names.PCE, vt.getPcuEquivalents()));
 			this.writeStartTag(VehicleSchemaV2Names.PASSENGERCAREQUIVALENTS, atts, true);
+			if (vt.getNetworkMode() != null) {
+				atts.clear();
+				atts.add(this.createTuple(VehicleSchemaV2Names.NETWORKMODE, vt.getNetworkMode()));
+				this.writeStartTag(VehicleSchemaV2Names.NETWORKMODE, atts, true);
+			}
+
+
 			if (!Double.isNaN(vt.getFlowEfficiencyFactor())) {
                 atts.clear();
                 atts.add(this.createTuple(VehicleSchemaV2Names.FACTOR, vt.getFlowEfficiencyFactor()));

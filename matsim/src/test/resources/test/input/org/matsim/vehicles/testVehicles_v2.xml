@@ -35,6 +35,7 @@
     <costInformation fixedCostsPerDay="100.00" costsPerMeter="0.15" costsPerSecond="0.08"/>
   </costsInformation>
   <passengerCarEquivalents pce="2.0" />
+  <networkMode networkMode = "pt" />
   <flowEfficiencyFactor factor="1.5" />
 </vehicleType>
 

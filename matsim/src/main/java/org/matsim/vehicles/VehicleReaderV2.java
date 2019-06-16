@@ -140,6 +140,9 @@ class VehicleReaderV2 extends MatsimXmlParser{
 		else if (name.equalsIgnoreCase(VehicleSchemaV2Names.ATTRIBUTE)) {
 			attributesReader.startTag( name , atts , context, currAttributes );
 		}
+		else if( VehicleSchemaV2Names.NETWORKMODE.equalsIgnoreCase( name ) ){
+			this.currentVehType.setNetworkMode( atts.getValue( VehicleSchemaV2Names.NETWORKMODE ) );
+		}
 
 	}
 
