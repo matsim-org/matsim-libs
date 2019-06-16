@@ -49,8 +49,12 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.withinday.events.ReplanningEvent;
+
+import static org.matsim.core.population.PopulationUtils.createActivity;
+import static org.matsim.core.population.PopulationUtils.createLeg;
 
 /**
  * The methods here should modify trips, i.e. material between two non-stage-activities.
@@ -152,7 +156,8 @@ public final class EditTrips {
 //			replanCurrentLegWithGenericRoute(newAct, routingMode, currentLeg, now, agent);
 		} else if ( currentLeg.getRoute() instanceof GenericRouteImpl ) {
 			// teleported leg
-//			replanCurrentLegWithGenericRoute(newAct, routingMode, currentLeg, now, agent);
+			replanCurrentLegWithGenericRoute(newAct, routingMode, currentLeg, now, agent);
+//			log.error("replanning during teleportation not implemented") ;
 		} else {
 			throw new ReplanningException("not implemented for the route type of the current leg") ;
 			// Does not feel so hard: 
@@ -257,7 +262,7 @@ public final class EditTrips {
 		List<? extends PlanElement> newTripElements = null;
 		// (1) get new trip from current position to new activity:
 		if (mobsimVehicle == null) {
-			// agent is waiting for the next vehicle to arrive at the access stop
+			log.debug( "agent with ID=" + agent.getId() + " agent is waiting for the next vehicle to arrive at the access stop" ) ;
 			currentOrNextStop = scenario.getTransitSchedule().getFacilities().get(oldPtRoute.getAccessStopId());
 			newTripElements = newTripToNewActivity(currentOrNextStop, newAct, routingMode, now, agent, person, scenario);
 			if (newTripElements.get(0) instanceof Leg
@@ -272,7 +277,7 @@ public final class EditTrips {
 				wantsToLeaveStop = true ;
 			}
 		} else {
-			// agent is on a vehicle
+			log.debug( "agent with ID=" + agent.getId() + " is on a vehicle" );
 			// agent is asked whether she intends to leave at each stop, so no need to tell
 			// mobsim about changed plan in any particular way
 			TransitDriverAgent driver = (TransitDriverAgent) mobsimVehicle.getDriver();
@@ -298,8 +303,27 @@ public final class EditTrips {
 		for ( int ijk = 0 ; ijk < newTripElements.size() ; ijk++ ) {
 			planElements.add( pos + ijk, newTripElements.get(ijk) ) ;
 		}
-		
+
+		{
+			// some simplified output:
+			StringBuilder stb = new StringBuilder();
+			boolean first = true;
+			for( PlanElement planElement : planElements ){
+				if( first ){
+					first = false;
+				} else{
+					stb.append( "---" );
+				}
+				if( planElement instanceof Leg ){
+					stb.append( ((Leg) planElement).getMode() );
+				} else if( planElement instanceof Activity ){
+					stb.append( ((Activity) planElement).getType() );
+				}
+			}
+			log.debug( "agent" + agent.getId() + " new plan: " + stb.toString() );
+		}
 		log.debug("agent" + agent.getId() + " new plan: " + planElements.toString());
+
 		WithinDayAgentUtils.resetCaches(agent);
 
 		if ( wantsToLeaveStop ) {
@@ -309,7 +333,7 @@ public final class EditTrips {
 
 
 		this.scenario.getPopulation().getPersonAttributes().putAttribute( agent.getId().toString(), AgentSnapshotInfo.marker, true ) ;
-
+		this.scenario.getPopulation().getPersons().get( agent.getId() ).getAttributes().putAttribute( AgentSnapshotInfo.marker, true ) ;
 	}
 	
 	/**
@@ -347,22 +371,56 @@ public final class EditTrips {
 		
 		if ( tripRouter.getStageActivityTypes().isStageActivity(nextAct.getType()) ) {
 			Trip trip = findCurrentTrip( agent ) ;
-//			final PlanElement nextPlanElement = plan.getPlanElements().get(currPosPlanElements + 1);
-			final List<PlanElement> tripElements = trip.getTripElements();
-			int tripElementsIndex = tripElements.indexOf( nextAct ) ;
-//			replanCurrentTripFromStageActivity(tripElements, tripElementsIndex, agent, routingMode);
-			// almost exact copy from replanCurrentTripFromStageActivity, however sublist index different
-			// replan from stage activity:
-			List<PlanElement> subTripPlanElements = tripElements.subList(tripElementsIndex + 1,tripElements.size()) ;// toIndex is exclusive
-			
-			//TODO: In the following step no trip is found. TripStructureUtils.getTrips looks
-			//as if having a stage activity at start might be the problem. But this means
-			//replanCurrentTripFromStageActivity also cannot work and it does fail indeed :-(
-			final List<Trip> trips = TripStructureUtils.getTrips( subTripPlanElements, tripRouter.getStageActivityTypes() );
-			Trip subTrip = trips.get(0 ) ;
-			final double dpTime = agent.getActivityEndTime() ;
-			this.replanFutureTrip(subTrip, WithinDayAgentUtils.getModifiablePlan(agent), routingMode, dpTime ) ;
-			
+////			final PlanElement nextPlanElement = plan.getPlanElements().get(currPosPlanElements + 1);
+//			final List<PlanElement> tripElements = trip.getTripElements();
+//			int tripElementsIndex = tripElements.indexOf( nextAct ) ;
+////			replanCurrentTripFromStageActivity(tripElements, tripElementsIndex, agent, routingMode);
+//			// almost exact copy from replanCurrentTripFromStageActivity, however sublist index different
+//			// replan from stage activity:
+//			List<PlanElement> subTripPlanElements = tripElements.subList(tripElementsIndex + 1,tripElements.size()) ;// toIndex is exclusive
+//
+//			//TODO: In the following step no trip is found. TripStructureUtils.getTrips looks
+//			//as if having a stage activity at start might be the problem. But this means
+//			//replanCurrentTripFromStageActivity also cannot work and it does fail indeed :-(
+//			final List<Trip> trips = TripStructureUtils.getTrips( subTripPlanElements, tripRouter.getStageActivityTypes() );
+//			Trip subTrip = trips.get(0 ) ;
+//			final double dpTime = agent.getActivityEndTime() ;
+//			this.replanFutureTrip(subTrip, WithinDayAgentUtils.getModifiablePlan(agent), routingMode, dpTime ) ;
+
+//			// generate modifiable data structure:
+//			List<PlanElement> planElements = new ArrayList<>(  ) ;
+//			for ( int ii=tripElementsIndex ; ii<tripElements.size() ; ii++ ) {
+//				PlanElement pe = tripElements.get( ii );;
+//				if (pe instanceof Activity) {
+//					planElements.add(createActivity((Activity) pe));
+//				} else if (pe instanceof Leg) {
+//					planElements.add( createLeg( (Leg) pe ) ) ;
+//				} else {
+//					throw new IllegalArgumentException("unrecognized plan element type discovered");
+//				}
+//			}
+//			planElements.add( trip.getDestinationActivity() ) ;
+////			AttributesUtils.copyAttributesFromTo(in, out );
+//
+//			replanFutureTrip( planElements,
+//				  WithinDayAgentUtils.getModifiablePlan( agent ),
+//				  routingMode,
+//				  PopulationUtils.decideOnActivityEndTime( nextAct, now, scenario.getConfig() ),
+//				  tripRouter,
+//				  scenario ) ;
+
+			Facility fromFacility = FacilitiesUtils.toFacility(nextAct, scenario.getActivityFacilities());
+
+			Facility toFacility = FacilitiesUtils.toFacility(trip.getDestinationActivity(), scenario.getActivityFacilities());
+
+			double departureTime = PopulationUtils.decideOnActivityEndTime( nextAct, now, scenario.getConfig() );
+
+			final List<? extends PlanElement> newTrip = tripRouter.calcRoute(routingMode, fromFacility, toFacility, departureTime, null );
+			// yy fix missing person
+
+			TripRouter.insertTrip(plan, nextAct, newTrip, trip.getDestinationActivity() ) ;
+
+
 		} else {
 			/*
 			 * The agent is on a teleported leg and the trip will end at a real activity
@@ -374,10 +432,7 @@ public final class EditTrips {
 		WithinDayAgentUtils.resetCaches(agent);
 	}
 	
-	/**
-	 * @param fromFacility 
-	 */
-	private List<? extends PlanElement> newTripToNewActivity(Facility currentLocationFacility, Activity newAct, String mainMode, double now, 
+	private List<? extends PlanElement> newTripToNewActivity(Facility currentLocationFacility, Activity newAct, String mainMode, double now,
 			MobsimAgent agent, Person person, Scenario scenario) {
 		log.debug("entering newTripToNewActivity") ;
 
@@ -640,14 +695,14 @@ public final class EditTrips {
 
 		Facility fromFacility = FacilitiesUtils.toFacility(trip.getOriginActivity(), scenario.getActivityFacilities());
 		Facility toFacility = FacilitiesUtils.toFacility(trip.getDestinationActivity(),
-				scenario.getActivityFacilities());
+			  scenario.getActivityFacilities());
 
 		final List<? extends PlanElement> newTrip = tripRouter.calcRoute(routingMode, fromFacility, toFacility,
-				departureTime, person);
+			  departureTime, person);
 
-//		log.debug("new trip:" + newTrip);
+		//		log.debug("new trip:" + newTrip);
 		for (PlanElement pe : newTrip) {
-//			log.debug(pe);
+			//			log.debug(pe);
 		}
 
 		TripRouter.insertTrip(plan, trip.getOriginActivity(), newTrip, trip.getDestinationActivity());
