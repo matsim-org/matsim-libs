@@ -79,13 +79,15 @@ public final class BicycleModule extends AbstractModule {
 		
 		Id<VehicleType> bicycleVehTypeId = Id.create(bicycleConfigGroup.getBicycleMode(), VehicleType.class);
 		if (scenario.getVehicles().getVehicleTypes().get(bicycleVehTypeId) == null) {
-			LOG.warn("There is no vehicle type '" + bicycleConfigGroup.getBicycleMode() + "' specified in the vehicle types.");
+			LOG.warn("There is no vehicle type '" + bicycleConfigGroup.getBicycleMode() + "' specified in the vehicle types. "
+					+ "Can't check the consistency of the maximum velocity in the bicycle vehicle type and the bicycle config group. "
+					+ "Should at least be approximately the same and randomization should be enabled.");
 		} else {
 			
 			double mobsimSpeed = scenario.getVehicles().getVehicleTypes().get(bicycleVehTypeId).getMaximumVelocity();
-			if (Math.abs(mobsimSpeed - bicycleConfigGroup.getMaxBicycleSpeed()) > 0.1) {
+			if (Math.abs(mobsimSpeed - bicycleConfigGroup.getMaxBicycleSpeedForRouting()) > 0.1) {
 				LOG.warn("There is an inconsistency in the specified maximum velocity for " + bicycleConfigGroup.getBicycleMode() + ":"
-						+ " Maximum speed specified in the 'bicycle' config group (used for routing): " + bicycleConfigGroup.getMaxBicycleSpeed() + " vs."
+						+ " Maximum speed specified in the 'bicycle' config group (used for routing): " + bicycleConfigGroup.getMaxBicycleSpeedForRouting() + " vs."
 								+ " maximum speed specified for the vehicle type (used in mobsim): " + mobsimSpeed);
 					if (scenario.getConfig().plansCalcRoute().getRoutingRandomness() == 0.) {
 						throw new RuntimeException("The recommended way to deal with the inconsistency between routing and scoring/mobsim is to have a randomized router. Aborting... ");
