@@ -151,13 +151,9 @@ public final class EditTrips {
 			// public transit leg
 			
 			replanCurrentLegWithTransitRoute(newAct, routingMode, currentLeg, now, agent);
-			
-			// TODO: replace the short-cut solution below after fixing replanCurrentLegWithTransitRoute
-//			replanCurrentLegWithGenericRoute(newAct, routingMode, currentLeg, now, agent);
 		} else if ( currentLeg.getRoute() instanceof GenericRouteImpl ) {
 			// teleported leg
 			replanCurrentLegWithGenericRoute(newAct, routingMode, currentLeg, now, agent);
-//			log.error("replanning during teleportation not implemented") ;
 		} else {
 			throw new ReplanningException("not implemented for the route type of the current leg") ;
 			// Does not feel so hard: 
@@ -371,43 +367,46 @@ public final class EditTrips {
 		
 		if ( tripRouter.getStageActivityTypes().isStageActivity(nextAct.getType()) ) {
 			Trip trip = findCurrentTrip( agent ) ;
-////			final PlanElement nextPlanElement = plan.getPlanElements().get(currPosPlanElements + 1);
-//			final List<PlanElement> tripElements = trip.getTripElements();
-//			int tripElementsIndex = tripElements.indexOf( nextAct ) ;
-////			replanCurrentTripFromStageActivity(tripElements, tripElementsIndex, agent, routingMode);
-//			// almost exact copy from replanCurrentTripFromStageActivity, however sublist index different
-//			// replan from stage activity:
-//			List<PlanElement> subTripPlanElements = tripElements.subList(tripElementsIndex + 1,tripElements.size()) ;// toIndex is exclusive
-//
-//			//TODO: In the following step no trip is found. TripStructureUtils.getTrips looks
-//			//as if having a stage activity at start might be the problem. But this means
-//			//replanCurrentTripFromStageActivity also cannot work and it does fail indeed :-(
-//			final List<Trip> trips = TripStructureUtils.getTrips( subTripPlanElements, tripRouter.getStageActivityTypes() );
-//			Trip subTrip = trips.get(0 ) ;
-//			final double dpTime = agent.getActivityEndTime() ;
-//			this.replanFutureTrip(subTrip, WithinDayAgentUtils.getModifiablePlan(agent), routingMode, dpTime ) ;
-
-//			// generate modifiable data structure:
-//			List<PlanElement> planElements = new ArrayList<>(  ) ;
-//			for ( int ii=tripElementsIndex ; ii<tripElements.size() ; ii++ ) {
-//				PlanElement pe = tripElements.get( ii );;
-//				if (pe instanceof Activity) {
-//					planElements.add(createActivity((Activity) pe));
-//				} else if (pe instanceof Leg) {
-//					planElements.add( createLeg( (Leg) pe ) ) ;
-//				} else {
-//					throw new IllegalArgumentException("unrecognized plan element type discovered");
-//				}
+			
+			// gl 2019-06-14 variant
+//			List<PlanElement> planElements = plan.getPlanElements() ;
+//			Person person = plan.getPerson() ;
+//			int tripElementsIndex = trip.getTripElements().indexOf( currentLeg ) ;
+//			
+//			//trying to make it as similar as possible to replanCurrentTripFromStageActivity
+//			
+//			if ( ! ( trip.getTripElements().get(tripElementsIndex + 1) instanceof Activity) ) {
+//				throw new RuntimeException("Expected a stage activity as following plan element");
 //			}
-//			planElements.add( trip.getDestinationActivity() ) ;
-////			AttributesUtils.copyAttributesFromTo(in, out );
+//			Activity nextStageActivity = (Activity) trip.getTripElements().get(tripElementsIndex + 1);
+//			
+//			// (1) get new trip from current position to new activity:
+//			Facility currentLocationFacility = FacilitiesUtils.toFacility(nextStageActivity, scenario.getActivityFacilities());
+//			List<? extends PlanElement> newTripElements = newTripToNewActivity(currentLocationFacility, trip.getDestinationActivity(), routingMode,
+//					now, agent, person, scenario);
 //
-//			replanFutureTrip( planElements,
-//				  WithinDayAgentUtils.getModifiablePlan( agent ),
-//				  routingMode,
-//				  PopulationUtils.decideOnActivityEndTime( nextAct, now, scenario.getConfig() ),
-//				  tripRouter,
-//				  scenario ) ;
+//			// (2) prune the new trip up to the current leg:
+//			// do nothing ?!
+//
+//			// (2) modify current route:
+//			// unfortunately we cannot modify a teleportation already started
+//
+//			// (3) remove remainder of old trip after next stage activity in plan:
+//			// keep following stage activity, because we need an stage activity there anyway
+//			// TODO: have all stage activities duration 0s? -> should we shorten the duration?
+//			nextStageActivity.setMaximumDuration(0);
+//			int pos = WithinDayAgentUtils.getCurrentPlanElementIndex(agent) + 2 ;
+//
+//			while ( !planElements.get(pos).equals(trip.getDestinationActivity()) ) {
+//				planElements.remove(pos) ;
+//			}
+//
+//			// (4) insert new trip after current leg:
+//			for ( int ijk = 2 ; ijk < newTripElements.size() ; ijk++ ) {
+//				planElements.add( pos + ijk, newTripElements.get(ijk) ) ;
+//			}
+//			WithinDayAgentUtils.resetCaches(agent);
+//			
 
 			Facility fromFacility = FacilitiesUtils.toFacility(nextAct, scenario.getActivityFacilities());
 
@@ -467,14 +466,14 @@ public final class EditTrips {
 		// (2) modify current route:
 		// not necessary, we are at an activity ?!
 
-		// (3) remove remainder of old trip after current leg in plan:
+		// (3) remove remainder of old trip after current stage activity in plan:
 		int pos = WithinDayAgentUtils.getCurrentPlanElementIndex(agent) + 1 ;
 
 		while ( !planElements.get(pos).equals(trip.getDestinationActivity()) ) {
 			planElements.remove(pos) ;
 		}
 
-		// (4) insert new trip after current leg:
+		// (4) insert new trip after current activity:
 		for ( int ijk = 1 ; ijk < newTripElements.size() ; ijk++ ) {
 			planElements.add( pos + ijk, newTripElements.get(ijk) ) ;
 		}
