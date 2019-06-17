@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.NetworkRoutingInclAccessEgressModule;
 
 /**
@@ -51,7 +52,6 @@ public class FacilitiesUtils {
 	}
 
 	/**
-	 * @param network
 	 * @return sorted map containing containing the facilities as values and their ids as keys.
 	 */
 	public static SortedMap<Id<ActivityFacility>, ActivityFacility> getSortedFacilities(final ActivityFacilities facilities) {
@@ -123,5 +123,9 @@ public class FacilitiesUtils {
 	 */
 	public static Facility wrapActivity ( final Activity toWrap ) {
 		return new ActivityWrapperFacility( toWrap ) ;
+	}
+
+	public static Facility wrapLink( final Link link ) {
+		return new LinkWrapperFacility( link ) ;
 	}
 }
