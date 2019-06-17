@@ -94,7 +94,7 @@ class RunDrtExample{
 			DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore());
 		}
 
-		config.controler().setOutputDirectory("scenarios/multi_mode_one_shared_taxi/output");
+		config.controler().setOutputDirectory("output/RunDrtExample/multi_mode_one_shared_taxi");
 		config.controler().setLastIteration( 1 );
 		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 
