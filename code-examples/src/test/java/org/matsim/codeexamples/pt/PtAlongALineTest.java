@@ -248,13 +248,6 @@ public class PtAlongALineTest{
 //
 //		controler.configureQSimComponents(DvrpQSimComponents.activateModes(TransportMode.drt, "drt2"));
 
-		controler.addOverridingModule( new AbstractModule(){
-			@Override
-			public void install(){
-				this.addTravelTimeBinding( "myMode" ).to( this.networkTravelTime() )
-			}
-		} )
-
 		controler.run();
 	}
 
