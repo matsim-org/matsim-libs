@@ -29,6 +29,7 @@ import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
+import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -56,6 +57,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehiclesFactory;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -231,8 +233,6 @@ public class PtAlongALineTest{
 	@Test
 	public void testPtAlongALineWithRaptorAndDrtStopFilterAttribute() {
 
-
-
 		Path taxisA = Paths.get(".\\test\\input\\one_shared_taxi_vehicles_A.xml");
 		createDrtVehiclesFile(taxisA.toString(), "drtA", 200, Id.createLinkId("499-500"));
 
@@ -345,6 +345,9 @@ public class PtAlongALineTest{
 		controler.addOverridingModule(new MultiModeDrtModule());
 
 		controler.configureQSimComponents(DvrpQSimComponents.activateModes(TransportMode.drt));
+
+		// This will start otfvis.  Comment out if not needed.
+		controler.addOverridingModule( new OTFVisLiveModule() );
 
 		controler.run();
 	}
@@ -504,6 +507,9 @@ public class PtAlongALineTest{
 
 		controler.configureQSimComponents(DvrpQSimComponents.activateModes(TransportMode.drt, "drt2"));
 
+		// This will start otfvis.  Comment out if not needed.
+		controler.addOverridingModule( new OTFVisLiveModule() );
+
 		controler.run();
 	}
 
@@ -519,6 +525,16 @@ public class PtAlongALineTest{
 		config.qsim().setEndTime( 24.*3600. );
 
 		config.transit().setUseTransit(true) ;
+
+		// This configures otfvis:
+		OTFVisConfigGroup visConfig = ConfigUtils.addOrGetModule( config, OTFVisConfigGroup.class );
+		visConfig.setDrawTransitFacilities( false );
+		visConfig.setColoringScheme( OTFVisConfigGroup.ColoringScheme.bvg ) ;
+		visConfig.setDrawTime(true);
+		visConfig.setDrawNonMovingItems(true);
+		visConfig.setAgentSize(125);
+		visConfig.setLinkWidth(10);
+		visConfig.setShowTeleportedAgents( true );
 
 		configureScoring(config);
 		return config;
