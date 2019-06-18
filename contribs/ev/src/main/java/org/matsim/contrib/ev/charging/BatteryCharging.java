@@ -18,37 +18,16 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.ev.infrastructure;
+package org.matsim.contrib.ev.charging;
 
-import java.net.URL;
-
-import org.matsim.api.core.v01.network.Network;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.name.Named;
+import org.matsim.contrib.ev.infrastructure.Charger;
 
 /**
- * @author michalm
+ * @author Michal Maciejewski (michalm)
  */
-public class ChargingInfrastructureProvider implements Provider<ChargingInfrastructure> {
-	public static final String CHARGERS = "chargers";
+public interface BatteryCharging extends ChargingPower {
+	//XXX consider adding if/when needed
+	//double calcEnergyCharge(Charger charger, double chargePeriod);
 
-	@Inject
-	@Named(CHARGERS)
-	private Network network;
-
-	private final URL url;
-
-	public ChargingInfrastructureProvider(URL url) {
-		this.url = url;
-	}
-
-	@Override
-	public ChargingInfrastructure get() {
-		ChargingInfrastructureSpecification infrastructureSpecification = new ChargingInfrastructureSpecificationImpl();
-		new ChargerReader(infrastructureSpecification).parse(url);
-		return ChargingInfrastructures.createChargingInfrastructure(infrastructureSpecification,
-				network.getLinks()::get);
-	}
+	double calcChargingTime(Charger charger, double energy);
 }

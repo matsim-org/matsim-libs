@@ -18,42 +18,35 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.ev.stats;
+package org.matsim.contrib.ev.charging;
 
-import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.EvModule;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-
-import com.google.inject.Inject;
+import org.matsim.contrib.ev.fleet.Battery;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class EvStatsModule extends AbstractModule {
-	@Inject
-	private EvConfigGroup evCfg;
+public class ChargeUpToMaxSocStrategy implements ChargingStrategy {
+	private final Charger charger;
+	private final double maxRelativeSoc;
+
+	public ChargeUpToMaxSocStrategy(Charger charger, double maxRelativeSoc) {
+		if (maxRelativeSoc < 0 || maxRelativeSoc > 1) {
+			throw new IllegalArgumentException();
+		}
+		this.charger = charger;
+		this.maxRelativeSoc = maxRelativeSoc;
+	}
 
 	@Override
-	public void install() {
-		installQSimModule(new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				if (evCfg.getTimeProfiles()) {
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
-							SocHistogramTimeProfileCollectorProvider.class);
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
-							IndividualSocTimeProfileCollectorProvider.class);
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
-							ChargerOccupancyTimeProfileCollectorProvider.class);
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(ChargerOccupancyXYDataProvider.class);
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
-							VehicleTypeAggregatedSocTimeProfileCollectorProvider.class);
-					addQSimComponentBinding(EvModule.EV_COMPONENT).to(EvMobsimListener.class);
-					bind(ChargerPowerCollector.class).asEagerSingleton();
-					// add more time profiles if necessary
-				}
-			}
-		});
+	public double calcRemainingEnergyToCharge(ElectricVehicle ev) {
+		Battery battery = ev.getBattery();
+		return maxRelativeSoc * battery.getCapacity() - battery.getSoc();
+	}
+
+	@Override
+	public double calcRemainingTimeToCharge(ElectricVehicle ev) {
+		return ((BatteryCharging)ev.getChargingPower()).calcChargingTime(charger, calcRemainingEnergyToCharge(ev));
 	}
 }

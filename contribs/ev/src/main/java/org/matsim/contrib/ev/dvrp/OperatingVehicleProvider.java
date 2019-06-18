@@ -18,42 +18,37 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.ev.stats;
+package org.matsim.contrib.ev.dvrp;
 
-import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.EvModule;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicleLookup;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
+import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 import com.google.inject.Inject;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class EvStatsModule extends AbstractModule {
+public class OperatingVehicleProvider implements AuxDischargingHandler.VehicleProvider {
+	private final DvrpVehicleLookup dvrpVehicleLookup;
+
 	@Inject
-	private EvConfigGroup evCfg;
+	public OperatingVehicleProvider(DvrpVehicleLookup dvrpVehicleLookup) {
+		this.dvrpVehicleLookup = dvrpVehicleLookup;
+	}
 
 	@Override
-	public void install() {
-		installQSimModule(new AbstractQSimModule() {
-			@Override
-			protected void configureQSim() {
-				if (evCfg.getTimeProfiles()) {
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
-							SocHistogramTimeProfileCollectorProvider.class);
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
-							IndividualSocTimeProfileCollectorProvider.class);
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
-							ChargerOccupancyTimeProfileCollectorProvider.class);
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(ChargerOccupancyXYDataProvider.class);
-					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
-							VehicleTypeAggregatedSocTimeProfileCollectorProvider.class);
-					addQSimComponentBinding(EvModule.EV_COMPONENT).to(EvMobsimListener.class);
-					bind(ChargerPowerCollector.class).asEagerSingleton();
-					// add more time profiles if necessary
-				}
-			}
-		});
+	public ElectricVehicle getVehicle(ActivityStartEvent event) {
+		//assumes driverId == vehicleId
+		DvrpVehicle vehicle = dvrpVehicleLookup.lookupVehicle((Id<DvrpVehicle>)(Id<?>)event.getPersonId());
+
+		//do not discharge if (1) not a DVRP vehicle or (2) a DVRP vehicle that just completed the schedule
+		return vehicle == null || event.getActType().equals(VrpAgentLogic.AFTER_SCHEDULE_ACTIVITY_TYPE) ?
+				null :
+				((EvDvrpVehicle)vehicle).getElectricVehicle();
 	}
 }

@@ -31,12 +31,14 @@ import com.google.common.base.MoreObjects;
  * @author michalm
  */
 public class DvrpVehicleImpl implements DvrpVehicle {
-
 	private final DvrpVehicleSpecification specification;
 	private final Link startLink;
 	private final Schedule schedule;
 
 	public DvrpVehicleImpl(DvrpVehicleSpecification specification, Link startLink) {
+		if (!startLink.getId().equals(specification.getStartLinkId())) {
+			throw new IllegalArgumentException("startLink.id != specification.startLinkId");
+		}
 		this.specification = specification;
 		this.startLink = startLink;
 		schedule = new ScheduleImpl(specification);

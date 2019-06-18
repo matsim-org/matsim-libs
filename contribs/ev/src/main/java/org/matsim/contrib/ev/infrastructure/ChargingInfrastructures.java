@@ -22,6 +22,7 @@ package org.matsim.contrib.ev.infrastructure;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.util.LinkProvider;
 
 import com.google.common.collect.ImmutableMap;
@@ -31,11 +32,11 @@ import com.google.common.collect.ImmutableMap;
  */
 public class ChargingInfrastructures {
 	public static ChargingInfrastructure createChargingInfrastructure(
-			ChargingInfrastructureSpecification infrastructureSpecification, LinkProvider<Id<Link>> linkProvider) {
+			ChargingInfrastructureSpecification infrastructureSpecification, LinkProvider<Id<Link>> linkProvider,
+			ChargingLogic.Factory chargingLogicFactory) {
 		ImmutableMap<Id<Charger>, Charger> chargers = infrastructureSpecification.getChargerSpecifications()
 				.values()
-				.stream()
-				.map(s -> new ChargerImpl(s, linkProvider.apply(s.getLinkId())))
+				.stream().map(s -> ChargerImpl.create(s, linkProvider.apply(s.getLinkId()), chargingLogicFactory))
 				.collect(ImmutableMap.toImmutableMap(Charger::getId, ch -> ch));
 		return () -> chargers;
 	}

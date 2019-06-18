@@ -54,9 +54,7 @@ public final class MultiModeDrtConfigGroup extends ReflectiveConfigGroup impleme
 					"In the multi-mode DRT setup, DrtConfigGroup must not be defined at the config top level");
 		}
 
-		if (!MultiModals.isAllModesUnique(this)) {
-			throw new RuntimeException("DRT modes in MultiModeDrtConfigGroup are not unique");
-		}
+		MultiModals.requireAllModesUnique(this);
 	}
 
 	@Override

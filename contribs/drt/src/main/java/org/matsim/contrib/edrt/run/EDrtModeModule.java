@@ -40,6 +40,7 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.ev.dvrp.EvDvrpFleetModule;
@@ -69,6 +70,8 @@ public final class EDrtModeModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
+		DvrpModes.registerDvrpMode(binder(), getMode());
+
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
 
 		install(new EvDvrpFleetModule(getMode(), drtCfg.getVehiclesFile()));
