@@ -107,9 +107,9 @@ public class DrtRoutingInclAccessEgressModule implements RoutingModule {
 			// generate drt leg:
 			Leg leg ;
 
-			Link fromLink = getLink(fromFacility);
-			Link toLink = getLink(toFacility);
-			if (toLink == fromLink) {
+//			Link fromLink = getLink(fromFacility);
+//			Link toLink = getLink(toFacility);
+			if (accessActLink == egressActLink) {
 				if (drtCfg.isPrintDetailedWarnings()) {
 					LOGGER.error("Start and end stop are the same, agent will walk using mode "
 								   + drtStageActivityType.drtWalk
@@ -118,14 +118,15 @@ public class DrtRoutingInclAccessEgressModule implements RoutingModule {
 				}
 				leg = (Leg)walkRouter.calcRoute(fromFacility, toFacility, departureTime, person).get(0);
 				leg.setMode(drtStageActivityType.drtWalk);
+
 			} else{
 
-				VrpPathWithTravelData unsharedPath = VrpPaths.calcAndCreatePath( fromLink, toLink, departureTime, router, travelTime );
+				VrpPathWithTravelData unsharedPath = VrpPaths.calcAndCreatePath( accessActLink, egressActLink, departureTime, router, travelTime );
 				double unsharedRideTime = unsharedPath.getTravelTime();//includes first & last link
 				double maxTravelTime = getMaxTravelTime( drtCfg, unsharedRideTime );
 				double unsharedDistance = VrpPaths.calcDistance( unsharedPath );//includes last link
 
-				DrtRoute route = populationFactory.getRouteFactories().createRoute( DrtRoute.class, fromLink.getId(), toLink.getId() );
+				DrtRoute route = populationFactory.getRouteFactories().createRoute( DrtRoute.class, accessActLink.getId(), egressActLink.getId() );
 				route.setDistance( unsharedDistance );
 				route.setTravelTime( maxTravelTime );
 				route.setUnsharedRideTime( unsharedRideTime );
@@ -146,11 +147,6 @@ public class DrtRoutingInclAccessEgressModule implements RoutingModule {
 		}
 
 		return result ;
-	}
-
-	private Link getLink(Facility facility) {
-		Link link = network.getLinks().get(facility.getLinkId());
-		return link != null ? link : NetworkUtils.getNearestLink(network, facility.getCoord());
 	}
 
 	@Override
