@@ -351,59 +351,12 @@ public final class EditTrips {
 		
 		if ( tripRouter.getStageActivityTypes().isStageActivity(nextAct.getType()) ) {
 			Trip trip = findCurrentTrip( agent ) ;
-			
-			// gl 2019-06-14 variant
-//			List<PlanElement> planElements = plan.getPlanElements() ;
-//			Person person = plan.getPerson() ;
-//			int tripElementsIndex = trip.getTripElements().indexOf( currentLeg ) ;
-//			
-//			//trying to make it as similar as possible to replanCurrentTripFromStageActivity
-//			
-//			if ( ! ( trip.getTripElements().get(tripElementsIndex + 1) instanceof Activity) ) {
-//				throw new RuntimeException("Expected a stage activity as following plan element");
-//			}
-//			Activity nextStageActivity = (Activity) trip.getTripElements().get(tripElementsIndex + 1);
-//			
-//			// (1) get new trip from current position to new activity:
-//			Facility currentLocationFacility = FacilitiesUtils.toFacility(nextStageActivity, scenario.getActivityFacilities());
-//			List<? extends PlanElement> newTripElements = newTripToNewActivity(currentLocationFacility, trip.getDestinationActivity(), routingMode,
-//					now, agent, person, scenario);
-//
-//			// (2) prune the new trip up to the current leg:
-//			// do nothing ?!
-//
-//			// (2) modify current route:
-//			// unfortunately we cannot modify a teleportation already started
-//
-//			// (3) remove remainder of old trip after next stage activity in plan:
-//			// keep following stage activity, because we need an stage activity there anyway
-//			// TODO: have all stage activities duration 0s? -> should we shorten the duration?
-//			nextStageActivity.setMaximumDuration(0);
-//			int pos = WithinDayAgentUtils.getCurrentPlanElementIndex(agent) + 2 ;
-//
-//			while ( !planElements.get(pos).equals(trip.getDestinationActivity()) ) {
-//				planElements.remove(pos) ;
-//			}
-//
-//			// (4) insert new trip after current leg:
-//			for ( int ijk = 2 ; ijk < newTripElements.size() ; ijk++ ) {
-//				planElements.add( pos + ijk, newTripElements.get(ijk) ) ;
-//			}
-//			WithinDayAgentUtils.resetCaches(agent);
-//			
-
 			Facility fromFacility = FacilitiesUtils.toFacility(nextAct, scenario.getActivityFacilities());
-
 			Facility toFacility = FacilitiesUtils.toFacility(trip.getDestinationActivity(), scenario.getActivityFacilities());
-
 			double departureTime = PopulationUtils.decideOnActivityEndTime( nextAct, now, scenario.getConfig() );
-
 			final List<? extends PlanElement> newTrip = tripRouter.calcRoute(routingMode, fromFacility, toFacility, departureTime, null );
 			// yy fix missing person
-
 			TripRouter.insertTrip(plan, nextAct, newTrip, trip.getDestinationActivity() ) ;
-
-
 		} else {
 			/*
 			 * The agent is on a teleported leg and the trip will end at a real activity
@@ -461,21 +414,6 @@ public final class EditTrips {
 		}
 		WithinDayAgentUtils.resetCaches(agent);
 		
-		// old and not working, because no Trip is found due to missing destination activity. 
-//
-////		String mainMode = tripRouter.getMainModeIdentifier().identifyMainMode(tripElements) ;
-//		// yyyy I wonder what this will do if we are already at the egress stage.  kai, oct'17
-//		
-//		// subList is inclusive for the fromIndex, but exclusive for the toIndex
-//		List<PlanElement> subTripPlanElements = trip.getTripElements().subList(tripElementsIndex, trip.getTripElements().size()) ;
-////		Trip subTrip = new Trip( (Activity) trip.getTripElements().get(tripElementsIndex),
-////				subTripPlanElements,
-////				trip.getDestinationActivity());
-//		List<PlanElement> subTripElementsWithDestination = new ArrayList<> (subTripPlanElements);
-//		subTripElementsWithDestination.add(trip.getDestinationActivity());
-//		Trip subTrip = TripStructureUtils.getTrips(subTripElementsWithDestination, tripRouter.getStageActivityTypes()).get(0) ;
-//		final double dpTime = agent.getActivityEndTime() ;
-//		this.replanFutureTrip(subTrip, WithinDayAgentUtils.getModifiablePlan(agent), mainMode, dpTime ) ;
 	}
 	public static boolean insertEmptyTrip( Plan plan, Activity fromActivity, Activity toActivity, String mainMode, PopulationFactory pf ) {
 		List<Leg> list = Collections.singletonList( pf.createLeg( mainMode ) ) ;
@@ -645,15 +583,6 @@ public final class EditTrips {
 		return false;
 	}
 	
-	// utility methods (plans splicing):
-	private static void pruneUpToCurrentLeg(Leg currentLeg, List<? extends PlanElement> newTrip) {
-//		while ( newTrip.get(0) instanceof Leg && !((Leg)newTrip.get(0)).getMode().equals( currentLeg.getMode()) ) {
-//			newTrip.remove(0) ;
-//		}
-		// yyyyyy do nothing for time being and hope for the best.
-		log.warn("yyyyyy pruneUpToCurrentLeg needs to be fixed for multimodal trips & for access/egress routing.") ;
-	}
-
 	// static methods:
 	/**
 	 * In contrast to the other replanFutureLegRoute(...) method, the leg at the given index is replaced
