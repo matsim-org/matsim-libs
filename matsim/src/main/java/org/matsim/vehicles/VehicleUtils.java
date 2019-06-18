@@ -39,6 +39,7 @@ public class VehicleUtils {
 	private static final String ACCESSTIME = "accessTimeInSecondsPerPerson";
 	private static final String FUELCONSUMPTION = "fuelConsumptionLitersPerMeter";
 	private static final String FREIGHT_CAPACITY_UNITS = "freightCapacityInUnits";
+	private static final String HBEFA_TECHNOLOGY = "HBEFATechnology";
 
 	static {
 		VehicleCapacityImpl capacity = new VehicleCapacityImpl();
@@ -144,5 +145,12 @@ public class VehicleUtils {
 		vehicleType.getAttributes().putAttribute(FREIGHT_CAPACITY_UNITS, units);
 	}
 
+	public static String getHbefaTechnology(VehicleType vehicleType){
+		final Object attribute = vehicleType.getAttributes().getAttribute(HBEFA_TECHNOLOGY);
+		return (String) attribute;
+	}
 
+	public static void setHbefaTechnology(VehicleType vehicleType, String hbefaTechnology){
+		vehicleType.getAttributes().putAttribute(HBEFA_TECHNOLOGY, hbefaTechnology);
+	}
 }

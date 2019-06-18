@@ -45,7 +45,6 @@
               <xs:attribute name="meterPerSecond" type="xs:double" use="optional" default="INF"/>
             </xs:complexType>
           </xs:element>
-          <xs:element name="engineInformation" type="engineInformationType" minOccurs="0" maxOccurs="1" />
           <xs:element name="costsInformation" type="costInformationType" minOccurs="0" maxOccurs="1" />
           <xs:element name="passengerCarEquivalents" minOccurs="0" maxOccurs="1">
             <xs:complexType>
@@ -94,13 +93,6 @@
             </xs:element>
           </xs:sequence>
         </xs:complexType>
-      </xs:element>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType name="engineInformationType">
-    <xs:sequence>
-      <xs:element name="fuelType" type="fuelTypeType" minOccurs="1" maxOccurs="1">
       </xs:element>
     </xs:sequence>
   </xs:complexType>

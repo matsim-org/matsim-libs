@@ -80,11 +80,13 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 		assertEquals(23.23, VehicleUtils.getAccessTime(vehTypeNormalCar), EPSILON);
 		assertEquals(42.42, VehicleUtils.getEgressTime(vehTypeNormalCar), EPSILON);
 		assertEquals(DoorOperationMode.parallel, VehicleUtils.getDoorOperationMode(vehTypeNormalCar));
+		assertEquals("diesel", VehicleUtils.getHbefaTechnology(vehTypeNormalCar));
 		assertEquals(2.0, vehTypeNormalCar.getPcuEquivalents());
 		assertEquals(1.5, vehTypeNormalCar.getFlowEfficiencyFactor());
 		assertEquals("abc", vehTypeNormalCar.getAttributes().getAttribute("Attribute1"));
 		assertEquals(1.3, (double) vehTypeNormalCar.getAttributes().getAttribute("Attribute2"), EPSILON);
 		assertEquals("pt", vehTypeNormalCar.getNetworkMode());
+		assertEquals("diesel", VehicleUtils.getHbefaTechnology(vehTypeNormalCar));
 	}
 
 	@Test
