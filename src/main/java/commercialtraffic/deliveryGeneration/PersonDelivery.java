@@ -24,6 +24,7 @@ package commercialtraffic.deliveryGeneration;/*
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 
@@ -77,5 +78,9 @@ public class PersonDelivery {
                 filter(carrier -> carrier.getId().toString().startsWith(deliveryType)).map(Carrier::getId).
                 collect(Collectors.toSet());
 
+    }
+
+    public static Id<Carrier> getCarrierIdFromDriver(Id<Person> personId) {
+        return Id.create(personId.toString().split(CARRIERSPLIT)[1], Carrier.class);
     }
 }

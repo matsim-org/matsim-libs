@@ -112,7 +112,10 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
         Set<PlanElement> activitiesWithServcies = new HashSet<>();
         population.getPersons().values().forEach(p ->
         {
-            activitiesWithServcies.addAll(p.getSelectedPlan().getPlanElements().stream().filter(Activity.class::isInstance).filter(a -> a.getAttributes().getAsMap().containsKey(PersonDelivery.DELIEVERY_TYPE)).collect(Collectors.toSet()));
+            activitiesWithServcies.addAll(p.getSelectedPlan().getPlanElements().stream()
+                    .filter(Activity.class::isInstance)
+                    .filter(a -> a.getAttributes().getAsMap().containsKey(PersonDelivery.DELIEVERY_TYPE))
+                    .collect(Collectors.toSet()));
         });
         int i = 0;
         for (PlanElement pe : activitiesWithServcies) {
@@ -217,6 +220,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
 
                     } else if (tourElement instanceof Tour.TourActivity) {
                         Tour.TourActivity act = (Tour.TourActivity) tourElement;
+
                         Activity tourElementActivity = PopulationUtils.createActivityFromLinkId(act.getActivityType(), act.getLocation());
                         plan.addActivity(tourElementActivity);
                         if (lastTourElementActivity == null) {
@@ -239,7 +243,6 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
                 }
                 Id<Vehicle> vid = Id.createVehicleId(driverPerson.getId());
                 scenario.getVehicles().addVehicle(scenario.getVehicles().getFactory().createVehicle(vid, carrierVehicle.getVehicleType()));
-                ;
                 freightVehicles.add(vid);
                 freightDrivers.add(driverPerson.getId());
             }
