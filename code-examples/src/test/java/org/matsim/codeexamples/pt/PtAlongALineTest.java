@@ -3,6 +3,8 @@ package org.matsim.codeexamples.pt;
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
+import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -14,20 +16,35 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.drt.routing.DrtRoute;
+import org.matsim.contrib.drt.routing.DrtRouteFactory;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.DrtConfigs;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetWriter;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilitiesFactory;
@@ -40,6 +57,8 @@ import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehiclesFactory;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
@@ -61,8 +80,7 @@ public class PtAlongALineTest{
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
-
-
+	@Ignore
 	@Test
 	public void testPtAlongALine() {
 
@@ -79,6 +97,7 @@ public class PtAlongALineTest{
 	 * Test of Intermodal Access & Egress to pt using bike.There are three transit stops, and
 	 * only the middle stop is accessible by bike.
 	 */
+	@Ignore
 	@Test
 	public void testPtAlongALineWithRaptorAndBike() {
 
@@ -95,6 +114,241 @@ public class PtAlongALineTest{
 
 		controler.run() ;
 	}
+
+	/**
+	 * Test of Drt. 200 drt Vehicles are generated on Link 499-500, and all Agents rely on these
+	 * drts to get to their destination
+	 */
+	@Ignore
+	@Test
+	public void testDrtAlongALine() {
+
+		Path taxisA = Paths.get(".\\test\\input\\one_shared_taxi_vehicles_A.xml");
+
+		createDrtVehiclesFile(taxisA.toString(), "drtA", 200, Id.createLinkId("499-500"));
+
+		Config config = ConfigUtils.createConfig();
+
+		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
+		config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
+		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
+
+		config.transit().setUseTransit(true) ; // jr
+
+		DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
+
+		MultiModeDrtConfigGroup multiModeDrtCfg = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
+		{
+			DrtConfigGroup drtConfig = new DrtConfigGroup();
+			drtConfig.setMode("drt_A");
+			drtConfig.setStopDuration(60.);
+			drtConfig.setMaxWaitTime(900.);
+			drtConfig.setMaxTravelTimeAlpha(1.3);
+			drtConfig.setMaxTravelTimeBeta(10. * 60.);
+			drtConfig.setRequestRejection(false);
+			drtConfig.setVehiclesFile(taxisA.toString());
+			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
+			multiModeDrtCfg.addParameterSet(drtConfig);
+		}
+
+		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
+			DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore());
+		}
+
+		config.controler().setOutputDirectory( utils.getOutputDirectory() );
+		config.controler().setLastIteration(0);
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+
+		{
+			StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
+			stratSets.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice);
+			stratSets.setWeight(0.1);
+			config.strategy().addStrategySettings(stratSets);
+			//
+			config.subtourModeChoice().setModes(new String[]{TransportMode.car, "drt_A"});
+		}
+		{
+			StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
+			stratSets.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
+			stratSets.setWeight(1.);
+			config.strategy().addStrategySettings(stratSets);
+		}
+
+		{
+			PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("drt_A");
+			config.planCalcScore().addModeParams(modeParams);
+		}
+
+		{
+			PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("drt_A_walk");
+			config.planCalcScore().addModeParams(modeParams);
+		}
+
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		// ---
+
+		final int lastNodeIdx = 1000;
+		final double deltaX = 100.;
+
+		createAndAddCarNetwork( scenario, lastNodeIdx, deltaX );
+
+		createAndAddPopulation( scenario , "drt_A");
+
+		final double deltaY = 1000.;
+
+		createAndAddTransitNetwork( scenario, lastNodeIdx, deltaX, deltaY );
+
+		createAndAddTransitStopFacilities( scenario, lastNodeIdx, deltaX, deltaY );
+
+		createAndAddTransitVehicleType( scenario );
+
+		createAndAddTransitLine( scenario );
+
+		TransitScheduleValidator.printResult( TransitScheduleValidator.validateAll( scenario.getTransitSchedule(), scenario.getNetwork() ) );
+		// ---
+
+		scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory(DrtRoute.class, new DrtRouteFactory());
+
+
+		Controler controler = new Controler(scenario);
+
+		controler.addOverridingModule(new DvrpModule());
+		controler.addOverridingModule(new MultiModeDrtModule());
+
+		controler.configureQSimComponents(DvrpQSimComponents.activateModes("drt_A"));
+
+		controler.run();
+	}
+
+	/**
+	 * Test of Intermodal Access & Egress to pt using drt.
+	 * TODO: drt vehicles do not have links with which to travel to the pt stations.
+	 * TODO: Offer drt users the option to walk from the car link to the pt station.
+	 *
+	 */
+	@Ignore
+	@Test
+	public void testPtAlongALineWithRaptorAndDrtStopFilterAttribute() {
+
+
+
+		Path taxisA = Paths.get(".\\test\\input\\one_shared_taxi_vehicles_A.xml");
+		createDrtVehiclesFile(taxisA.toString(), "drtA", 200, Id.createLinkId("499-500"));
+
+		Config config = ConfigUtils.createConfig();
+
+////		--
+//		Set<String> networkModes = new HashSet<>( config.plansCalcRoute().getNetworkModes() );
+//		networkModes.add( TransportMode.drt );
+//		config.plansCalcRoute().setNetworkModes( networkModes );
+//		config.transit().setUsingTransitInMobsim( false );
+//		config.qsim().setMainModes( Collections.emptyList() );
+//		// (everything teleportation for debugging)
+////		--
+
+
+		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
+		config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
+		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
+		config.qsim().setEndTime( 24.*3600. );
+
+		config.controler().setOutputDirectory( utils.getOutputDirectory() );
+		config.controler().setLastIteration(0);
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+
+		config.transit().setUseTransit(true) ;
+		config.plansCalcRoute().getModeRoutingParams().get( TransportMode.walk ).setTeleportedModeSpeed( 3. );
+		config.plansCalcRoute().setInsertingAccessEgressWalk( true );
+
+		DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
+
+		MultiModeDrtConfigGroup multiModeDrtCfg = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
+		{
+			DrtConfigGroup drtConfig = new DrtConfigGroup();
+			drtConfig.setMode(TransportMode.drt);
+			drtConfig.setStopDuration(60.);
+			drtConfig.setMaxWaitTime(900.);
+			drtConfig.setMaxTravelTimeAlpha(1.3);
+			drtConfig.setMaxTravelTimeBeta(10. * 60.);
+			drtConfig.setRequestRejection(false);
+			drtConfig.setVehiclesFile(taxisA.toString());
+			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
+			multiModeDrtCfg.addParameterSet(drtConfig);
+		}
+
+		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
+			DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore());
+		}
+
+		// Swiss Rail Raptor
+		{
+			SwissRailRaptorConfigGroup configRaptor = new SwissRailRaptorConfigGroup();
+			configRaptor.setUseIntermodalAccessEgress(true);
+
+			// Walk
+			IntermodalAccessEgressParameterSet paramSetWalk = new IntermodalAccessEgressParameterSet();
+			paramSetWalk.setMode(TransportMode.walk);
+			paramSetWalk.setRadius(1000000);
+			paramSetWalk.setPersonFilterAttribute(null);
+			paramSetWalk.setStopFilterAttribute(null);
+			configRaptor.addIntermodalAccessEgress(paramSetWalk );
+
+
+			// Drt
+			IntermodalAccessEgressParameterSet paramSetDrt = new IntermodalAccessEgressParameterSet();
+			paramSetDrt.setMode(TransportMode.drt);
+			paramSetDrt.setRadius(1000000);
+			paramSetDrt.setPersonFilterAttribute(null);
+			paramSetDrt.setStopFilterAttribute(null);
+//			paramSetDrt.setStopFilterAttribute("drtAccessible");
+//			paramSetDrt.setStopFilterValue("true");
+			configRaptor.addIntermodalAccessEgress(paramSetDrt );
+
+			config.addModule(configRaptor);
+		}
+
+
+		{
+			StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
+			stratSets.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice);
+			stratSets.setWeight(0.1);
+			config.strategy().addStrategySettings(stratSets);
+			//
+			config.subtourModeChoice().setModes(new String[]{TransportMode.car, TransportMode.drt});
+		}
+		{
+			StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
+			stratSets.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
+			stratSets.setWeight(1.);
+			config.strategy().addStrategySettings(stratSets);
+		}
+
+		{
+			PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.drt);
+			config.planCalcScore().addModeParams(modeParams);
+		}
+		{
+			PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("drt_walk");
+			config.planCalcScore().addModeParams(modeParams);
+		}
+
+		Scenario scenario = createScenario(config) ;
+
+		scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory(DrtRoute.class, new DrtRouteFactory());
+
+
+		Controler controler = new Controler(scenario);
+
+		controler.addOverridingModule(new SwissRailRaptorModule()) ;
+		controler.addOverridingModule(new DvrpModule());
+		controler.addOverridingModule(new MultiModeDrtModule());
+
+		controler.configureQSimComponents(DvrpQSimComponents.activateModes(TransportMode.drt));
+
+		controler.run();
+	}
+
 
 	@Test
 	public void testPtAlongALineWithRaptorAndDrtServiceArea() {
@@ -277,7 +531,7 @@ public class PtAlongALineTest{
 
 		createAndAddCarNetwork( scenario, lastNodeIdx, deltaX );
 
-		createAndAddPopulation( scenario );
+		createAndAddPopulation( scenario , "pt");
 
 		final double deltaY = 1000.;
 
@@ -332,8 +586,8 @@ public class PtAlongALineTest{
 		paramSetBike.setMode(TransportMode.bike);
 		paramSetBike.setRadius(radiusBike);
 		paramSetBike.setPersonFilterAttribute(null);
-		paramSetBike.setStopFilterAttribute("bikeAccessible");
-		paramSetBike.setStopFilterValue("true");
+//		paramSetBike.setStopFilterAttribute("bikeAccessible");
+//		paramSetBike.setStopFilterValue("true");
 		configRaptor.addIntermodalAccessEgress(paramSetBike );
 
 		return configRaptor;
@@ -448,7 +702,7 @@ public class PtAlongALineTest{
 		}
 	}
 
-	private static void createAndAddPopulation( Scenario scenario ){
+	private static void createAndAddPopulation( Scenario scenario , String mode){
 		PopulationFactory pf = scenario.getPopulation().getFactory();
 		List<ActivityFacility> facilitiesAsList = new ArrayList<>( scenario.getActivityFacilities().getFacilities().values() ) ;
 		final Id<ActivityFacility> activityFacilityId = facilitiesAsList.get( facilitiesAsList.size()-1 ).getId() ;
@@ -470,7 +724,7 @@ public class PtAlongALineTest{
 				}
 				plan.addActivity( home );
 				{
-					Leg leg = pf.createLeg( "pt" );
+					Leg leg = pf.createLeg( mode );
 					leg.setDepartureTime( 7. * 3600. );
 					leg.setTravelTime( 1800. );
 					plan.addLeg( leg );
