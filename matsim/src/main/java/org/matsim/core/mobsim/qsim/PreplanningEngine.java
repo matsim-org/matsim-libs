@@ -76,7 +76,7 @@ public final class PreplanningEngine implements MobsimEngine {
 	private Map<MobsimAgent, TripInfoRequest> tripInfoRequestMap = new TreeMap<>( ( o1, o2 ) -> o1.getId().compareTo( o2.getId() ) ) ;
 	// yyyyyy can't have non-sorted maps here because we will get non-deterministic results. kai, mar'19
 
-	private final EditTrips editTrips;
+	private EditTrips editTrips;
 	private EditPlans editPlans = null;
 
 	private final TripRouter tripRouter;
@@ -85,7 +85,6 @@ public final class PreplanningEngine implements MobsimEngine {
 	@Inject
 	PreplanningEngine( TripRouter tripRouter, Scenario scenario ) {
 		this.tripRouter = tripRouter;
-		this.editTrips = new EditTrips(tripRouter, scenario);
 		this.population = scenario.getPopulation();
 		this.facilities = scenario.getActivityFacilities() ;
 		this.network = scenario.getNetwork() ;
@@ -109,6 +108,7 @@ public final class PreplanningEngine implements MobsimEngine {
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
+		this.editTrips = new EditTrips(internalInterface.getMobsim(), tripRouter, scenario);
 		this.editPlans = new EditPlans(internalInterface.getMobsim(), tripRouter, editTrips);
 		this.internalInterface = internalInterface ;
 	}
