@@ -1,24 +1,19 @@
-/**
- * 
- */
 package org.matsim.contrib.parking.parkingsearch.search;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.contrib.parking.parkingsearch.DynAgent.BenensonDynLeg;
-import org.matsim.contrib.parking.parkingsearch.search.ParkingSearchLogic;
+import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.contrib.parking.parkingsearch.sim.ParkingSearchConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.List;
+import java.util.Random;
 
 /**
  * @author schlenther
@@ -34,8 +29,8 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 	private Network network;
 	private static final double MIN_THRESHOLD_PROB_FUNCTION = 2;
 	private static final double MAX_THRESHOLD_PROB_FUNCTION = 4;
-	
-	//border lines for phase transitions: 1 -> 2 and 2->3
+
+    //thresholds for phase transitions: 1->2 and 2->3
 	private static final double THRESHOLD_OBSERVING_METER = 1000;
 	private static final double THRESHOLD_PARKING_METER = 500;
 	
@@ -57,14 +52,14 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 
 	}
 	//----------------------------------------------------phase transitions----------------------------------------------------------------------------
-	
-	public boolean goIntoObserving (Id<Link> currLinkId, Id<Link> endLinkId){
+
+    public boolean transitionToObservingBehaviour(Id<Link> currLinkId, Id<Link> endLinkId) {
 		double distToDest = NetworkUtils.getEuclideanDistance(
 				network.getLinks().get(currLinkId).getCoord(), network.getLinks().get(endLinkId).getCoord());
 		return distToDest < THRESHOLD_OBSERVING_METER ;
 	}
-	
-	public boolean goIntoParking (Id<Link> currLinkId, Id<Link> endLinkId){
+
+    public boolean transitionToParkingBehaviour(Id<Link> currLinkId, Id<Link> endLinkId) {
 		double distToDest = NetworkUtils.getEuclideanDistance(
 				network.getLinks().get(currLinkId).getCoord(), network.getLinks().get(endLinkId).getCoord());
 		return distToDest < THRESHOLD_PARKING_METER ;
@@ -76,57 +71,53 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 	 * 
 	 * @param currentLinkId
 	 * @param destinationLinkId
-	 * @param vehicleId
-	 * @param hasTriedDestLinkBefore
 	 * @return
 	 */
-	public Id<Link> getNextLinkBenensonRouting(Id<Link> currentLinkId, Id<Link> destinationLinkId, Id<Vehicle> vehicleId) {
+	public Id<Link> getNextLinkBenensonRouting(Id<Link> currentLinkId, Id<Link> destinationLinkId, String mode) {
 		Link currentLink = network.getLinks().get(currentLinkId);
-		//List<Id<Link>> nextNodes = new ArrayList<>();
-		
-		//es wird nicht die Distanz zur Aktivität, sondern zum fromNode des Aktivitätenlinks berechnet
+
+        //calculate the distance to fromNode of destination link instead of distance to activity
 		Node destination = network.getLinks().get(destinationLinkId).getFromNode();
 		
 		double distanceToDest = Double.MAX_VALUE;
 		Node nextNode;
 		Id<Link> nextLinkId = null;
 
-		for (Id<Link> outlinkId : currentLink.getToNode().getOutLinks().keySet()){
-			if(outlinkId.equals(destinationLinkId)){
-				return outlinkId;
+		for (Link outLink : ParkingUtils.getOutgoingLinksForMode(currentLink, mode)) {
+			Id<Link> outLinkId = outLink.getId();
+			if (outLinkId.equals(destinationLinkId)) {
+				return outLinkId;
 			}
-			nextNode = network.getLinks().get(outlinkId).getToNode();
+			nextNode = outLink.getToNode();
 			double dd = NetworkUtils.getEuclideanDistance(destination.getCoord(),nextNode.getCoord());
 			if( dd < distanceToDest){
-				nextLinkId = outlinkId;
+				nextLinkId = outLinkId;
 				distanceToDest = dd;
 			}
 			else if(dd == distanceToDest){
 				if (Math.random() > 0.5){
-					nextLinkId = outlinkId;
+					nextLinkId = outLinkId;
 				}
 			}
 		}
 		return nextLinkId;
 	}
 
-	public Id<Link> getNextLinkRandomInAcceptableDistance(Id<Link> currentLinkId, Id<Link> endLinkId, Id<Vehicle> vehicleId, double firstDestLinkEnterTime, double timeOfDay) {
+	public Id<Link> getNextLinkRandomInAcceptableDistance(Id<Link> currentLinkId, Id<Link> endLinkId, Id<Vehicle> vehicleId, double firstDestLinkEnterTime, double timeOfDay, String mode) {
 
-		Id<Link> nextLink = null;
+        Link nextLink = null;
 		Link currentLink = network.getLinks().get(currentLinkId);
-		List<Id<Link>> keys = new ArrayList<>(currentLink.getToNode().getOutLinks().keySet());
-		do{
-			if(!(nextLink == null)) keys.remove(keys.indexOf(nextLink));
-			
-			if(keys.size() == 0){	//no outlink in acceptable Distance
-				keys = new ArrayList<>(currentLink.getToNode().getOutLinks().keySet());
-				logger.error("vehicle " + vehicleId + " finds no outlink in acceptable distance going out from link " + currentLinkId + ". it just takes a random next link");
-				return keys.get(random.nextInt(keys.size()));
-			}
-			nextLink= keys.get(random.nextInt(keys.size()));	
-		}
-		while(!isDriverInAcceptableDistance(nextLink, endLinkId, firstDestLinkEnterTime, timeOfDay));
-		return nextLink;
+		List<Link> keys = ParkingUtils.getOutgoingLinksForMode(currentLink, mode);
+
+        int size = keys.size();
+        for (int i = 1; i <= size; i++) {
+            nextLink = keys.get(random.nextInt(keys.size()));
+            if (isDriverInAcceptableDistance(nextLink.getId(), endLinkId, firstDestLinkEnterTime, timeOfDay)) return nextLink.getId();
+            keys.remove(nextLink);
+        }
+        logger.error("vehicle " + vehicleId + " finds no outlink in acceptable distance going out from link " + currentLinkId + ". it just takes a random next link");
+        return keys.get(random.nextInt(keys.size())).getId();
+
 	}
 
 	//---------------------------------------------------park decision-----------------------------------------------------------------------
@@ -138,7 +129,7 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 	 * @param pUnoccupied
 	 * @param currentLinkId
 	 * @param endLinkId
-	 * @return
+     * @return whether vehicle should be parked here
 	 */
 	public boolean wantToParkHere (double pUnoccupied, Id<Link> currentLinkId, Id<Link> endLinkId) {
 		
@@ -147,15 +138,15 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 				network.getLinks().get(currentLinkId).getToNode().getCoord(), network.getLinks().get(endLinkId).getToNode().getCoord());
 		double expectedFreeSlots = (pUnoccupied*distToDest/configGroup.getAvgparkingslotlength());
 		double rnd = Math.random();
-		if(logForDebug)logger.error("\n current link: "+ currentLinkId + "\n expected slots: " + expectedFreeSlots + "\n probabilty to continue driving: " + getProbabilityOfContinueDriving(expectedFreeSlots) + "\n rnd: " + rnd);
-		if (rnd < getProbabilityOfContinueDriving(expectedFreeSlots)) return false;
-		else return true;
+        if (logForDebug)
+            logger.error("\n current link: " + currentLinkId + "\n expected slots: " + expectedFreeSlots + "\n probabilty to continue driving: " + getProbabilityOfContinuingToDrive(expectedFreeSlots) + "\n rnd: " + rnd);
+        return rnd >= getProbabilityOfContinuingToDrive(expectedFreeSlots);
 	}
 	
 	/**
-	 * linear probability function, depending on maximum and minimium threshold 
+     * linear probability function, depending on maximum and minimum threshold
 	 */
-	private double getProbabilityOfContinueDriving (double expectedFreeSlots){
+    private double getProbabilityOfContinuingToDrive(double expectedFreeSlots) {
 		
 		if (expectedFreeSlots < MIN_THRESHOLD_PROB_FUNCTION) return 0.0;
 		else if(expectedFreeSlots > MAX_THRESHOLD_PROB_FUNCTION) return 1.0;
@@ -167,11 +158,11 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 	 * 
 	 * @param currentLinkId
 	 * @param endLinkId
-	 * @param firstDestLinkEnterTimer
+     * @param firstDestLinkEnterTime
 	 * @param timeOfDay
 	 * @return
 	 */
-	private boolean isDriverInAcceptableDistance(Id<Link> currentLinkId, Id<Link> endLinkId,	double firstDestLinkEnterTime, double timeOfDay) {
+    private boolean isDriverInAcceptableDistance(Id<Link> currentLinkId, Id<Link> endLinkId, double firstDestLinkEnterTime, double timeOfDay) {
 
 		// if we're on the destinationLink, we always want to park
 		if(currentLinkId.equals(endLinkId)) return true;
@@ -194,7 +185,7 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 	}
 
 	@Override
-	public Id<Link> getNextLink(Id<Link> currentLinkId, Id<Vehicle> vehicleId) {
+	public Id<Link> getNextLink(Id<Link> currentLinkId, Id<Vehicle> vehicleId, String mode) {
 		throw new RuntimeException("this should not happen!");
 	}
 	

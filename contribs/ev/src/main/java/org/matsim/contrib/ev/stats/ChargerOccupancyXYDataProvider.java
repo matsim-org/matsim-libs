@@ -19,17 +19,18 @@
 
 package org.matsim.contrib.ev.stats;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
-import org.matsim.contrib.ev.data.Charger;
-import org.matsim.contrib.ev.data.ChargingInfrastructure;
+import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.util.XYDataCollector;
 import org.matsim.contrib.util.XYDataCollector.XYDataCalculator;
 import org.matsim.contrib.util.XYDataCollectors;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class ChargerOccupancyXYDataProvider implements Provider<MobsimListener> {
 	private final ChargingInfrastructure chargingInfrastructure;

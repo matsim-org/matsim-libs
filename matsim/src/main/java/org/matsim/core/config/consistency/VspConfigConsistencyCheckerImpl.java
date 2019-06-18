@@ -264,14 +264,14 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 //			log.log( lvl,  " found 'qsim.usingFastCapacityUpdate==false'; vsp should try out `true' and report. ") ;
 //		}
 		switch( config.qsim().getTrafficDynamics() ) {
-		case withHoles:
-		case kinematicWaves:
-			break;
-		case queue:
-		default:
-			log.log( lvl,  " found 'qsim.trafficDynamics==" + config.qsim().getTrafficDynamics() + "'; vsp standard is`" 
-					+ TrafficDynamics.kinematicWaves + "'." ) ;
-			break;
+			case kinematicWaves:
+				break;
+			case withHoles:
+			case queue:
+			default:
+				log.log( lvl,  " found 'qsim.trafficDynamics==" + config.qsim().getTrafficDynamics() + "'; vsp standard is`"
+							     + TrafficDynamics.kinematicWaves + "'." ) ;
+				break;
 		}
 		
 		if ( config.qsim()!=null && config.qsim().isRemoveStuckVehicles() ) {

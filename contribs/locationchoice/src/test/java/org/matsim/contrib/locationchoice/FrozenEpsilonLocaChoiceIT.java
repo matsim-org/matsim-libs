@@ -53,7 +53,7 @@ import java.util.Random;
 import java.util.Set;
 
 import static org.junit.Assert.*;
-import static org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype.*;
+import static org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype.bestResponse;
 import static org.matsim.contrib.locationchoice.LocationChoiceIT.localCreateConfig;
 import static org.matsim.contrib.locationchoice.LocationChoiceIT.localCreatePopWOnePerson;
 

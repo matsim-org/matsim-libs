@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE population SYSTEM "http://www.matsim.org/files/dtd/population_v6.dtd">
+
+<population>
+
+
+
+<!-- ====================================================================== -->
+
+	<person id="1">
+		<plan selected="yes">
+			<activity type="home" x="-20000.0" y="0.0" z="0.0" end_time="09:00:00" >
+			</activity>
+			<leg mode="bicycle">
+			</leg>
+			<activity type="work" x="5000.0" y="0.0" z="0.0" end_time="17:00:03" >
+			</activity>
+			<leg mode="bicycle">
+			</leg>
+			<activity type="home" x="-20000.0" y="0.0" z="0.0" >
+			</activity>
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="2">
+		<plan selected="yes">
+			<activity type="home" x="-20000.0" y="0.0" z="0.0" end_time="09:01:00" >
+			</activity>
+			<leg mode="bicycle">
+			</leg>
+			<activity type="work" x="5000.0" y="0.0" z="0.0" end_time="17:00:06" >
+			</activity>
+			<leg mode="bicycle">
+			</leg>
+			<activity type="home" x="-20000.0" y="0.0" z="0.0" >
+			</activity>
+		</plan>
+
+	</person>	
+
+<!-- ====================================================================== -->
+
+	<person id="3">
+		<plan selected="yes">
+			<activity type="home" x="-20000.0" y="0.0" z="0.0" end_time="09:02:00" >
+			</activity>
+			<leg mode="bicycle">
+			</leg>
+			<activity type="work" x="5000.0" y="0.0" z="0.0" end_time="17:00:09" >
+			</activity>
+			<leg mode="bicycle">
+			</leg>
+			<activity type="home" x="-20000.0" y="0.0" z="0.0" >
+			</activity>
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="4_car-user">
+		<plan selected="yes">
+			<activity type="home" x="-20000.0" y="0.0" z="0.0" end_time="06:00:00" >
+			</activity>
+			<leg mode="car">
+			</leg>
+			<activity type="work" x="5000.0" y="0.0" z="0.0" end_time="17:00:09" >
+			</activity>
+			<leg mode="car">
+			</leg>
+			<activity type="home" x="-20000.0" y="0.0" z="0.0" >
+			</activity>
+		</plan>
+
+	</person>
+
+</population>

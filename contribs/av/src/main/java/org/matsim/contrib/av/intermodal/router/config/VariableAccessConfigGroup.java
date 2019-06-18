@@ -32,7 +32,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  * @author  jbischoff
  *
  */
-public class VariableAccessConfigGroup extends ReflectiveConfigGroup {
+public final class VariableAccessConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUPNAME = "variableAccess";
 	private static final String STYLE = "VariableAccessStyle";

@@ -51,7 +51,7 @@ public class FleetModule extends AbstractDvrpModeModule {
 	@Override
 	public void install() {
 		bindModal(FleetSpecification.class).toProvider(() -> {
-			FleetSpecificationImpl fleetSpecification = new FleetSpecificationImpl();
+			FleetSpecification fleetSpecification = new FleetSpecificationImpl();
 			new FleetReader(fleetSpecification).parse(ConfigGroup.getInputFileURL(getConfig().getContext(), file));
 			return fleetSpecification;
 		}).asEagerSingleton();
@@ -67,7 +67,7 @@ public class FleetModule extends AbstractDvrpModeModule {
 					@Override
 					public Fleet get() {
 						FleetSpecification fleetSpecification = getModalInstance(FleetSpecification.class);
-						return FleetImpl.create(fleetSpecification, network.getLinks()::get);
+						return Fleets.createDefaultFleet(fleetSpecification, network.getLinks()::get);
 					}
 				}).asEagerSingleton();
 			}
