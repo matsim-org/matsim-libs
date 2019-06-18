@@ -54,7 +54,7 @@
           </xs:element>
           <xs:element name="networkMode" minOccurs="0" maxOccurs="1">
             <xs:complexType>
-              <xs:attribute name="networkMode" type="xs:string" default="car"/>
+              <xs:attribute name="networkMode" type="xs:string"/>
             </xs:complexType>
           </xs:element>
           <xs:element name="flowEfficiencyFactor" minOccurs="0" maxOccurs="1">
