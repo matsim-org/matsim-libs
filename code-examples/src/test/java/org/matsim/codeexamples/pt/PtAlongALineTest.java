@@ -238,14 +238,14 @@ public class PtAlongALineTest{
 
 		Config config = ConfigUtils.createConfig();
 
-////		--
-//		Set<String> networkModes = new HashSet<>( config.plansCalcRoute().getNetworkModes() );
-//		networkModes.add( TransportMode.drt );
-//		config.plansCalcRoute().setNetworkModes( networkModes );
-//		config.transit().setUsingTransitInMobsim( false );
-//		config.qsim().setMainModes( Collections.emptyList() );
-//		// (everything teleportation for debugging)
-////		--
+		////		--
+		//		Set<String> networkModes = new HashSet<>( config.plansCalcRoute().getNetworkModes() );
+		//		networkModes.add( TransportMode.drt );
+		//		config.plansCalcRoute().setNetworkModes( networkModes );
+		//		config.transit().setUsingTransitInMobsim( false );
+		//		config.qsim().setMainModes( Collections.emptyList() );
+		//		// (everything teleportation for debugging)
+		////		--
 
 
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
@@ -301,8 +301,8 @@ public class PtAlongALineTest{
 			paramSetDrt.setRadius(1000000);
 			paramSetDrt.setPersonFilterAttribute(null);
 			paramSetDrt.setStopFilterAttribute(null);
-//			paramSetDrt.setStopFilterAttribute("drtAccessible");
-//			paramSetDrt.setStopFilterValue("true");
+			//			paramSetDrt.setStopFilterAttribute("drtAccessible");
+			//			paramSetDrt.setStopFilterValue("true");
 			configRaptor.addIntermodalAccessEgress(paramSetDrt );
 
 			config.addModule(configRaptor);
@@ -424,41 +424,45 @@ public class PtAlongALineTest{
 			config.addModule(configRaptor);
 		}
 
-		//		DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
+		DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
 		// TODO: How can we set the network mode of drt2?
 		// TODO: Right now uncommenting the following line gives guice injection errors
 		//		dvrpConfig.setNetworkMode(TransportMode.drt);
 
-		//		MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
-		//		String drtVehiclesFile = "drt_vehicles.xml";
-		//		String drt2VehiclesFile = "drt2_vehicles.xml";
-		//		{
-		//			DrtConfigGroup drtConfig = new DrtConfigGroup();
-		//			drtConfig.setMaxTravelTimeAlpha(1.3);
-		//			drtConfig.setVehiclesFile(drtVehiclesFile);
-		//			drtConfig.setMaxTravelTimeBeta(5. * 60.);
-		//			drtConfig.setStopDuration(60.);
-		//			drtConfig.setMaxWaitTime(Double.MAX_VALUE);
-		//			drtConfig.setMode(TransportMode.drt);
-		//			mm.addParameterSet(drtConfig);
-		//		}
-		//		{
-		//			DrtConfigGroup drtConfig = new DrtConfigGroup();
-		//			drtConfig.setMaxTravelTimeAlpha(1.3);
-		//			drtConfig.setVehiclesFile(drt2VehiclesFile);
-		//			drtConfig.setMaxTravelTimeBeta(5. * 60.);
-		//			drtConfig.setStopDuration(60.);
-		//			drtConfig.setMaxWaitTime(Double.MAX_VALUE);
-		//			drtConfig.setMode("drt2");
-		//			mm.addParameterSet(drtConfig);
-		//		}
+		MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
+		String drtVehiclesFile = "drt_vehicles.xml";
+		String drt2VehiclesFile = "drt2_vehicles.xml";
+		{
+			DrtConfigGroup drtConfig = new DrtConfigGroup();
+			drtConfig.setMaxTravelTimeAlpha(1.3);
+			drtConfig.setVehiclesFile(drtVehiclesFile);
+			drtConfig.setMaxTravelTimeBeta(5. * 60.);
+			drtConfig.setStopDuration(60.);
+			drtConfig.setMaxWaitTime(Double.MAX_VALUE);
+			drtConfig.setMode(TransportMode.drt);
+			mm.addParameterSet(drtConfig);
+		}
+		{
+			DrtConfigGroup drtConfig = new DrtConfigGroup();
+			drtConfig.setMaxTravelTimeAlpha(1.3);
+			drtConfig.setVehiclesFile(drt2VehiclesFile);
+			drtConfig.setMaxTravelTimeBeta(5. * 60.);
+			drtConfig.setStopDuration(60.);
+			drtConfig.setMaxWaitTime(Double.MAX_VALUE);
+			drtConfig.setMode("drt2");
+			mm.addParameterSet(drtConfig);
+		}
 
+		for( DrtConfigGroup drtConfigGroup : mm.getModalElements() ){
+			DrtConfigs.adjustDrtConfig( drtConfigGroup, config.planCalcScore() );
+		}
 
 		// ---
 
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.warn );
 
 		Scenario scenario = createScenario(config);
+		scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory(DrtRoute.class, new DrtRouteFactory());
 
 		// TODO: reference somehow network creation, to ensure that these link ids exist
 		// add drt modes to the car links' allowed modes in their respective service area
@@ -467,11 +471,9 @@ public class PtAlongALineTest{
 
 		// TODO: avoid really writing out these files. However so far it is unclear how
 		// to configure DRT and load the vehicles otherwise
-//		createDrtVehiclesFile(drtVehiclesFile, "DRT-", 10, Id.createLinkId("0-1"));
-//		createDrtVehiclesFile(drt2VehiclesFile, "DRT2-", 1, Id.createLinkId("1000-999"));
+		createDrtVehiclesFile(drtVehiclesFile, "DRT-", 10, Id.createLinkId("0-1"));
+		createDrtVehiclesFile(drt2VehiclesFile, "DRT2-", 1, Id.createLinkId("1000-999"));
 
-//		scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory(DrtRoute.class,
-//			  new DrtRouteFactory());
 
 		// The following is for the _router_, not the qsim!  kai, jun'19
 		VehiclesFactory vf = scenario.getVehicles().getFactory();
@@ -497,10 +499,10 @@ public class PtAlongALineTest{
 
 		controler.addOverridingModule(new SwissRailRaptorModule());
 
-//		controler.addOverridingModule(new DvrpModule());
-//		controler.addOverridingModule(new MultiModeDrtModule());
-//
-//		controler.configureQSimComponents(DvrpQSimComponents.activateModes(TransportMode.drt, "drt2"));
+		controler.addOverridingModule(new DvrpModule());
+		controler.addOverridingModule(new MultiModeDrtModule());
+
+		controler.configureQSimComponents(DvrpQSimComponents.activateModes(TransportMode.drt, "drt2"));
 
 		controler.run();
 	}
@@ -586,8 +588,8 @@ public class PtAlongALineTest{
 		paramSetBike.setMode(TransportMode.bike);
 		paramSetBike.setRadius(radiusBike);
 		paramSetBike.setPersonFilterAttribute(null);
-//		paramSetBike.setStopFilterAttribute("bikeAccessible");
-//		paramSetBike.setStopFilterValue("true");
+		//		paramSetBike.setStopFilterAttribute("bikeAccessible");
+		//		paramSetBike.setStopFilterValue("true");
 		configRaptor.addIntermodalAccessEgress(paramSetBike );
 
 		return configRaptor;
