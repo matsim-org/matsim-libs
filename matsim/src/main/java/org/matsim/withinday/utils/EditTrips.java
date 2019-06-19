@@ -79,7 +79,7 @@ public final class EditTrips {
 			}
 		}
 		if (transitAgentTracker == null) {
-			throw new RuntimeException("no TransitStopAgentTracker found in qsim");
+			log.warn("no TransitStopAgentTracker found in qsim. Replanning of pt/transit legs will not work properly and will likely fail.");
 		}
 
 	}
@@ -307,6 +307,11 @@ public final class EditTrips {
 		WithinDayAgentUtils.resetCaches(agent);
 
 		if ( wantsToLeaveStop ) {
+			if (transitAgentTracker == null) {
+				log.error("Replanning a pt/transit leg, but there is no TransitStopAgentTracker found in qsim. Failing...");
+				throw new RuntimeException("no TransitStopAgentTracker found in qsim");
+			}
+
 			transitAgentTracker.removeAgentFromStop(ptPassengerAgent, currentOrNextStop.getId());
 			((MobsimAgent) ptPassengerAgent).endLegAndComputeNextState( now );
 		}
