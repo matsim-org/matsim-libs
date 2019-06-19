@@ -60,6 +60,7 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Perso
         this.population = population;
         this.scoreCalculator = scoreCalculator;
         this.eventsManager = eventsManager;
+        this.eventsManager.addHandler(this);
     }
 
     @Override
@@ -82,11 +83,14 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Perso
             ExpectedDelivery expectedDelivery = new ExpectedDelivery((String) activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_TYPE)
                     , PersonDelivery.getCarrierId(activity)
                     , event.getPersonId()
-                    , Double.parseDouble((String) activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_DURATION))
-                    , Double.parseDouble((String) activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_TIME_START))
-                    , Double.parseDouble((String) activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_TIME_END)));
+                    , (Integer) activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_DURATION)
+                    , (Integer) activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_TIME_START)
+                    , (Integer) activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_TIME_END));
 
-            currentExpectedDeliveriesPerLink.getOrDefault(event.getLinkId(), new HashSet<>()).add(expectedDelivery);
+            Set<ExpectedDelivery> set = currentExpectedDeliveriesPerLink.getOrDefault(event.getLinkId(), new HashSet<>());
+            set.add(expectedDelivery);
+            currentExpectedDeliveriesPerLink.put(event.getLinkId(), set);
+
         }
 
     }
@@ -121,6 +125,8 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Perso
     public void reset(int iteration) {
         activeDeliveryAgents.clear();
         actIdx.clear();
+        logEntries.clear();
+        currentExpectedDeliveriesPerLink.clear();
     }
 
     @Override

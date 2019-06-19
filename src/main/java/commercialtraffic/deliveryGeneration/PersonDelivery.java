@@ -81,6 +81,6 @@ public class PersonDelivery {
     }
 
     public static Id<Carrier> getCarrierIdFromDriver(Id<Person> personId) {
-        return Id.create(personId.toString().split(CARRIERSPLIT)[1], Carrier.class);
+        return Id.create(personId.toString().split(CARRIERSPLIT)[1] + CARRIERSPLIT + personId.toString().split(CARRIERSPLIT)[2], Carrier.class);
     }
 }

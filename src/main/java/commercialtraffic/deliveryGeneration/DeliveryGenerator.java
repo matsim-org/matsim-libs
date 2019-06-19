@@ -221,7 +221,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
                     } else if (tourElement instanceof Tour.TourActivity) {
                         Tour.TourActivity act = (Tour.TourActivity) tourElement;
 
-                        Activity tourElementActivity = PopulationUtils.createActivityFromLinkId(act.getActivityType(), act.getLocation());
+                        Activity tourElementActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.DELIVERY, act.getLocation());
                         plan.addActivity(tourElementActivity);
                         if (lastTourElementActivity == null) {
                             tourElementActivity.setMaximumDuration(act.getDuration());

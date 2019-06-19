@@ -21,8 +21,13 @@ package commercialtraffic.integration;/*
  * created by jbischoff, 03.05.2019
  */
 
+import commercialtraffic.analysis.CommercialTrafficAnalysisListener;
+import commercialtraffic.analysis.TourLengthAnalyzer;
 import commercialtraffic.deliveryGeneration.DeliveryGenerator;
 import commercialtraffic.replanning.ChangeDeliveryServiceOperator;
+import commercialtraffic.scoring.DefaultCommercialServiceScore;
+import commercialtraffic.scoring.DeliveryScoreCalculator;
+import commercialtraffic.scoring.ScoreCommercialServices;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
@@ -46,8 +51,13 @@ public class CommercialTrafficModule extends AbstractModule {
         new CarrierVehicleTypeReader(vehicleTypes).readFile(ctcg.getCarriersVehicleTypesFileUrl(getConfig().getContext()).getFile());
         new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
 
+        bind(DeliveryScoreCalculator.class).toInstance(new DefaultCommercialServiceScore(ctcg.getMaxDeliveryScore(), ctcg.getMinDeliveryScore(), ctcg.getZeroUtilityDelay()));
         bind(Carriers.class).toInstance(carriers);
+        bind(ScoreCommercialServices.class).asEagerSingleton();
+        bind(TourLengthAnalyzer.class).asEagerSingleton();
+
         addControlerListenerBinding().to(DeliveryGenerator.class);
+        addControlerListenerBinding().to(CommercialTrafficAnalysisListener.class);
 
         addPlanStrategyBinding(ChangeDeliveryServiceOperator.SELECTOR_NAME).toProvider(new Provider<PlanStrategy>() {
             @Inject
