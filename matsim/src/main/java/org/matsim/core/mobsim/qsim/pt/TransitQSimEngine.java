@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.HasAgentTracker;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
@@ -51,7 +52,7 @@ import javax.inject.Inject;
  * @author mrieser
  * @author mzilske
  */
-public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, AgentSource {
+public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, AgentSource, HasAgentTracker {
 
 
 	private Collection<MobsimAgent> ptDrivers;
