@@ -31,6 +31,8 @@ import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.DefaultVehicleHandler;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
@@ -51,6 +53,7 @@ public final class ConfigurableQNetworkFactory implements QNetworkFactory {
 	private NetsimInternalInterface netsimEngine ;
 	private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
 	private TurnAcceptanceLogic turnAcceptanceLogic = new DefaultTurnAcceptanceLogic() ;
+	private VehicleHandler vehicleHandler = new DefaultVehicleHandler();
 	private VehicleQ.Factory<QVehicle> vehicleQFactory = FIFOVehicleQ::new ;
 
 	public ConfigurableQNetworkFactory( EventsManager events, Scenario scenario ) {
@@ -81,6 +84,7 @@ public final class ConfigurableQNetworkFactory implements QNetworkFactory {
 			linkBuilder.setLaneFactory( laneFactory );
 		}
 		linkBuilder.setLinkSpeedCalculator( linkSpeedCalculator ) ;
+		linkBuilder.setVehicleHandler(vehicleHandler);
 
 		return linkBuilder.build(link, toQueueNode) ;
 	}
@@ -97,6 +101,9 @@ public final class ConfigurableQNetworkFactory implements QNetworkFactory {
 	}
 	public final void setTurnAcceptanceLogic( TurnAcceptanceLogic turnAcceptanceLogic ) {
 		this.turnAcceptanceLogic = turnAcceptanceLogic;
+	}
+	public final void setVehicleHandler(VehicleHandler vehicleHandler) {
+		this.vehicleHandler = vehicleHandler;
 	}
 	public final void setVehicleQFactory( VehicleQ.Factory<QVehicle> factory ) {
 		this.vehicleQFactory = factory ;

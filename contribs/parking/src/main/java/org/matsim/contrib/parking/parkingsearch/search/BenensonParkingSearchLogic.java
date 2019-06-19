@@ -12,6 +12,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.vehicles.Vehicle;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -105,18 +106,18 @@ public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 
 	public Id<Link> getNextLinkRandomInAcceptableDistance(Id<Link> currentLinkId, Id<Link> endLinkId, Id<Vehicle> vehicleId, double firstDestLinkEnterTime, double timeOfDay, String mode) {
 
-        Link nextLink = null;
+		Link nextLink;
 		Link currentLink = network.getLinks().get(currentLinkId);
-		List<Link> keys = ParkingUtils.getOutgoingLinksForMode(currentLink, mode);
-
-        int size = keys.size();
-        for (int i = 1; i <= size; i++) {
-            nextLink = keys.get(random.nextInt(keys.size()));
+		List<Link> outGoingLinks = ParkingUtils.getOutgoingLinksForMode(currentLink, mode);
+		List<Link> outGoingLinksCopy = new ArrayList<>(outGoingLinks);
+		int nrOfOutGoingLinks = outGoingLinks.size();
+		for (int i = 1; i <= nrOfOutGoingLinks; i++) {
+			nextLink = outGoingLinks.get(random.nextInt(outGoingLinks.size()));
             if (isDriverInAcceptableDistance(nextLink.getId(), endLinkId, firstDestLinkEnterTime, timeOfDay)) return nextLink.getId();
-            keys.remove(nextLink);
+			outGoingLinks.remove(nextLink);
         }
         logger.error("vehicle " + vehicleId + " finds no outlink in acceptable distance going out from link " + currentLinkId + ". it just takes a random next link");
-        return keys.get(random.nextInt(keys.size())).getId();
+		return outGoingLinksCopy.get(random.nextInt(outGoingLinksCopy.size())).getId();
 
 	}
 
