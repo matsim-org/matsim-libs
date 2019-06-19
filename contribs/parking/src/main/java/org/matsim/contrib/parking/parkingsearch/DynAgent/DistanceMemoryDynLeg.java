@@ -1,7 +1,5 @@
 package org.matsim.contrib.parking.parkingsearch.DynAgent;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.parkingsearch.events.StartParkingSearchEvent;
@@ -13,6 +11,8 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.List;
 
 /**
  * @author Work
@@ -65,7 +65,7 @@ public class DistanceMemoryDynLeg extends ParkingDynLeg {
 					}
 				}
 				// need to find the next link
-				Id<Link> nextLinkId = ((DistanceMemoryParkingSearchLogic)this.logic).getNextLink(currentLinkId,route.getEndLinkId(), vehicleId);
+				Id<Link> nextLinkId = ((DistanceMemoryParkingSearchLogic) this.logic).getNextLink(currentLinkId, route.getEndLinkId(), vehicleId, mode);
 				currentAndNextParkLink = new Tuple<Id<Link>, Id<Link>>(currentLinkId, nextLinkId);
 				return nextLinkId;
 			}

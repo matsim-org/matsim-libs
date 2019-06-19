@@ -37,7 +37,7 @@ public class NoVehicleTeleportationLogic implements VehicleTeleportationLogic {
 	 * @see playground.jbischoff.parking.manager.vehicleteleportationlogic.VehicleTeleportationLogic#getVehicleLocation(org.matsim.api.core.v01.Id, org.matsim.api.core.v01.Id, org.matsim.api.core.v01.Id)
 	 */
 	@Override
-	public Id<Link> getVehicleLocation(Id<Link> agentLinkId, Id<Vehicle> vehicleId, Id<Link> vehicleLinkId, double time) {
+	public Id<Link> getVehicleLocation(Id<Link> agentLinkId, Id<Vehicle> vehicleId, Id<Link> vehicleLinkId, double time, String mode) {
 		return vehicleLinkId;
 	}
 

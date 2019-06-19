@@ -40,7 +40,7 @@ class BicycleTravelTime implements TravelTime {
 		
 		// This is not yet available, but might be at some point, see https://matsim.atlassian.net/browse/MATSIM-700
 		// double bicycleVelocity = vehicle.getType().getMaximumVelocity()
-		double maxBicycleSpeed = ((BicycleConfigGroup) config.getModules().get(BicycleConfigGroup.GROUP_NAME)).getMaxBicycleSpeed();
+		double maxBicycleSpeed = ((BicycleConfigGroup) config.getModules().get(BicycleConfigGroup.GROUP_NAME)).getMaxBicycleSpeedForRouting();
 		double bicycleInfrastructureSpeedFactor = Double.parseDouble(link.getAttributes().getAttribute(BicycleLabels.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR).toString());
 		if (bicycleInfrastructureSpeedFactor > 1.0) {
 			throw new RuntimeException("A bicycle infrastructure speed factor of > 1.0 is not allowed as it would lead to exceeding the maximum biclce speed.");
