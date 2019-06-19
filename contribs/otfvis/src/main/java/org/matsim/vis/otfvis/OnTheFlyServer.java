@@ -118,6 +118,9 @@ public class OnTheFlyServer implements OTFLiveServer {
 		public double getTime() {
 			return ((QSim) visMobsim).getSimTimer().getTimeOfDay();
 		}
+
+		@Override
+		public Scenario getScenario() { return scenario ; }
 	}
 	
 	/**
