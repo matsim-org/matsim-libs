@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle;
 
+import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -44,13 +45,9 @@ public final class BicycleModule extends AbstractModule {
 		
 		BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) scenario.getConfig().getModules().get(BicycleConfigGroup.GROUP_NAME);
 
-		bind(BicycleTravelTime.class).asEagerSingleton();
-		addTravelTimeBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelTime.class);
-		bind(BicycleTravelDisutilityFactory.class).asEagerSingleton();
-		addTravelDisutilityFactoryBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelDisutilityFactory.class);
-		bindScoringFunctionFactory().toInstance(new BicycleScoringFunctionFactory());
-		// The following leads to "Tried proxying org.matsim.core.scoring.ScoringFunctionsForPopulation to support a circular dependency, but it is not an interface."
-//		bindScoringFunctionFactory().to(BicycleScoringFunctionFactory.class);
+		addTravelTimeBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelTime.class).in(Singleton.class);
+		addTravelDisutilityFactoryBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelDisutilityFactory.class).in(Singleton.class);
+		bindScoringFunctionFactory().to(BicycleScoringFunctionFactory.class).in(Singleton.class);
 		
 		if (bicycleConfigGroup.isMotorizedInteraction()) {
 			addMobsimListenerBinding().to(MotorizedInteractionEngine.class);
