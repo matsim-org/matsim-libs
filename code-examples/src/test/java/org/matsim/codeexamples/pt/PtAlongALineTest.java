@@ -3,7 +3,6 @@ package org.matsim.codeexamples.pt;
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
-import org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,15 +31,11 @@ import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.config.groups.ZoomEntry;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
@@ -59,11 +54,11 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
+import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-
-import static org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
 
 public class PtAlongALineTest{
 
@@ -86,9 +81,9 @@ public class PtAlongALineTest{
 	@Test
 	public void testPtAlongALine() {
 
-		Config config = createConfig();
+		Config config = createConfig( utils.getOutputDirectory() );
 
-		Scenario scenario = createScenario( config );
+		Scenario scenario = createScenario( config, 1000 );
 
 		Controler controler = new Controler( scenario ) ;
 
@@ -103,12 +98,12 @@ public class PtAlongALineTest{
 	@Test
 	public void testPtAlongALineWithRaptorAndBike() {
 
-		Config config = createConfig();
+		Config config = createConfig( utils.getOutputDirectory() );
 
 		SwissRailRaptorConfigGroup configRaptor = createRaptorConfigGroup(1000000, 1000000);// (radius walk, radius bike)
 		config.addModule(configRaptor);
 
-		Scenario scenario = createScenario( config );
+		Scenario scenario = createScenario( config, 1000 );
 
 		Controler controler = new Controler( scenario ) ;
 
@@ -125,7 +120,8 @@ public class PtAlongALineTest{
 	@Test
 	public void testDrtAlongALine() {
 
-		Path taxisA = Paths.get(".\\test\\input\\one_shared_taxi_vehicles_A.xml");
+		Path taxisA = Paths.get("./test/input/one_shared_taxi_vehicles_A.xml");
+		// (forward slash should also work on windows.  kai, jun'19)
 
 		createDrtVehiclesFile(taxisA.toString(), "drtA", 200, Id.createLinkId("499-500"));
 
@@ -195,7 +191,7 @@ public class PtAlongALineTest{
 
 		createAndAddCarNetwork( scenario, lastNodeIdx, deltaX );
 
-		createAndAddPopulation( scenario , "drt_A");
+		createAndAddPopulation( scenario , "drt_A", 1000);
 
 		final double deltaY = 1000.;
 
@@ -333,7 +329,7 @@ public class PtAlongALineTest{
 			config.planCalcScore().addModeParams(modeParams);
 		}
 
-		Scenario scenario = createScenario(config) ;
+		Scenario scenario = createScenario(config, 1000 ) ;
 
 		scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory(DrtRoute.class, new DrtRouteFactory());
 
@@ -353,170 +349,10 @@ public class PtAlongALineTest{
 	}
 
 
-	@Test
-	public void testPtAlongALineWithRaptorAndDrtServiceArea() {
-
-		Config config = createConfig();
-
-		config.qsim().setSimStarttimeInterpretation( StarttimeInterpretation.onlyUseStarttime );
-		// yy why?  kai, jun'19
-
-		{
-			Set<String> networkModes = new HashSet<>( config.plansCalcRoute().getNetworkModes() );
-			networkModes.add( TransportMode.drt );
-			networkModes.add( "drt2" );
-			config.plansCalcRoute().setNetworkModes( networkModes );
-		}
-
-		config.plansCalcRoute().setInsertingAccessEgressWalk( true );
-
-		{
-			ModeParams modeParams = new ModeParams(TransportMode.drt);
-			config.planCalcScore().addModeParams(modeParams);
-		}
-		{
-			ModeParams modeParams = new ModeParams("drt2");
-			config.planCalcScore().addModeParams(modeParams);
-		}
-
-		config.transit().setUseTransit( true );
-
-		config.transit().setUsingTransitInMobsim( false );
-		config.qsim().setMainModes( Collections.emptyList() );
-		// (everything teleportation for debugging)
-
-		config.qsim().setVehiclesSource( VehiclesSource.modeVehicleTypesFromVehiclesData );
-		// (as of today, will also influence router. kai, jun'19)
-
-		config.controler().setLastIteration( 0 );
-
-		//		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-		//		config.addConfigConsistencyChecker(new DvrpConfigConsistencyChecker());
-		// looks like this is no longer available?  kai, jun'19
-
-		{
-			SwissRailRaptorConfigGroup configRaptor = new SwissRailRaptorConfigGroup();
-			configRaptor.setUseIntermodalAccessEgress(true);
-
-			// Walk
-			IntermodalAccessEgressParameterSet paramSetWalk = new IntermodalAccessEgressParameterSet();
-			paramSetWalk.setMode(TransportMode.walk);
-			paramSetWalk.setRadius(1000000);
-			paramSetWalk.setPersonFilterAttribute(null);
-			paramSetWalk.setStopFilterAttribute(null);
-			configRaptor.addIntermodalAccessEgress(paramSetWalk );
-			// (in principle, walk as alternative to drt will not work, since drt is always faster.  Need to give the ASC to the router!  However, with
-			// the reduced drt network we should be able to see differentiation.)
-
-			// drt
-			IntermodalAccessEgressParameterSet paramSetDrt = new IntermodalAccessEgressParameterSet();
-			paramSetDrt.setMode(TransportMode.drt);
-			paramSetDrt.setRadius(1000000);
-			paramSetDrt.setPersonFilterAttribute(null);
-			paramSetDrt.setStopFilterAttribute(null);
-			configRaptor.addIntermodalAccessEgress(paramSetDrt);
-
-			// drt2
-			IntermodalAccessEgressParameterSet paramSetDrt2 = new IntermodalAccessEgressParameterSet();
-			paramSetDrt2.setMode( "drt2" );
-			paramSetDrt2.setRadius(1000000);
-			paramSetDrt2.setPersonFilterAttribute(null);
-			paramSetDrt2.setStopFilterAttribute(null);
-			configRaptor.addIntermodalAccessEgress(paramSetDrt2);
-
-			config.addModule(configRaptor);
-		}
-
-		DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
-		// TODO: How can we set the network mode of drt2?
-		// TODO: Right now uncommenting the following line gives guice injection errors
-		//		dvrpConfig.setNetworkMode(TransportMode.drt);
-
-		MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
-		String drtVehiclesFile = "drt_vehicles.xml";
-		String drt2VehiclesFile = "drt2_vehicles.xml";
-		{
-			DrtConfigGroup drtConfig = new DrtConfigGroup();
-			drtConfig.setMaxTravelTimeAlpha(1.3);
-			drtConfig.setVehiclesFile(drtVehiclesFile);
-			drtConfig.setMaxTravelTimeBeta(5. * 60.);
-			drtConfig.setStopDuration(60.);
-			drtConfig.setMaxWaitTime(Double.MAX_VALUE);
-			drtConfig.setMode(TransportMode.drt);
-			mm.addParameterSet(drtConfig);
-		}
-		{
-			DrtConfigGroup drtConfig = new DrtConfigGroup();
-			drtConfig.setMaxTravelTimeAlpha(1.3);
-			drtConfig.setVehiclesFile(drt2VehiclesFile);
-			drtConfig.setMaxTravelTimeBeta(5. * 60.);
-			drtConfig.setStopDuration(60.);
-			drtConfig.setMaxWaitTime(Double.MAX_VALUE);
-			drtConfig.setMode("drt2");
-			mm.addParameterSet(drtConfig);
-		}
-
-		for( DrtConfigGroup drtConfigGroup : mm.getModalElements() ){
-			DrtConfigs.adjustDrtConfig( drtConfigGroup, config.planCalcScore() );
-		}
-
-		// ---
-
-		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.warn );
-
-		Scenario scenario = createScenario(config);
-		scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory(DrtRoute.class, new DrtRouteFactory());
-
-		// TODO: reference somehow network creation, to ensure that these link ids exist
-		// add drt modes to the car links' allowed modes in their respective service area
-		addDrtModeToAllLinksBtwnGivenNodes(scenario.getNetwork(), 450, 500, TransportMode.drt);
-		addDrtModeToAllLinksBtwnGivenNodes(scenario.getNetwork(), 950, 1000, "drt2");
-
-		// TODO: avoid really writing out these files. However so far it is unclear how
-		// to configure DRT and load the vehicles otherwise
-		createDrtVehiclesFile(drtVehiclesFile, "DRT-", 10, Id.createLinkId("0-1"));
-		createDrtVehiclesFile(drt2VehiclesFile, "DRT2-", 1, Id.createLinkId("1000-999"));
-
-
-		// The following is for the _router_, not the qsim!  kai, jun'19
-		VehiclesFactory vf = scenario.getVehicles().getFactory();
-		{
-			VehicleType vehType = vf.createVehicleType( Id.create( "drt2", VehicleType.class ) );
-			vehType.setMaximumVelocity( 50./3.6 );
-			scenario.getVehicles().addVehicleType( vehType );
-		}
-		{
-			VehicleType vehType = vf.createVehicleType( Id.create( TransportMode.drt, VehicleType.class ) );
-			vehType.setMaximumVelocity( 50./3.6 );
-			scenario.getVehicles().addVehicleType( vehType );
-		}
-		{
-			VehicleType vehType = vf.createVehicleType( Id.create( TransportMode.car, VehicleType.class ) );
-			vehType.setMaximumVelocity( 50./3.6 );
-			scenario.getVehicles().addVehicleType( vehType );
-		}
-
-		// ---
-
-		Controler controler = new Controler(scenario);
-
-		controler.addOverridingModule(new SwissRailRaptorModule());
-
-		controler.addOverridingModule(new DvrpModule());
-		controler.addOverridingModule(new MultiModeDrtModule());
-
-		controler.configureQSimComponents(DvrpQSimComponents.activateModes(TransportMode.drt, "drt2"));
-
-		// This will start otfvis.  Comment out if not needed.
-		controler.addOverridingModule( new OTFVisLiveModule() );
-
-		controler.run();
-	}
-
-	private Config createConfig(){
+	static Config createConfig( String outputDir ){
 		Config config = ConfigUtils.createConfig() ;
 
-		config.controler().setOutputDirectory( utils.getOutputDirectory() );
+		config.controler().setOutputDirectory( outputDir ) ;
 		config.controler().setLastIteration( 0 );
 
 		config.plansCalcRoute().getModeRoutingParams().get( TransportMode.walk ).setTeleportedModeSpeed( 3. );
@@ -533,14 +369,23 @@ public class PtAlongALineTest{
 		visConfig.setDrawTime(true);
 		visConfig.setDrawNonMovingItems(true);
 		visConfig.setAgentSize(125);
-		visConfig.setLinkWidth(10);
+		visConfig.setLinkWidth(30);
 		visConfig.setShowTeleportedAgents( true );
+//		{
+//			BufferedImage image = null ;
+//			Rectangle2D zoomstore = new Rectangle2D.Double( 0., 0., +100.*1000., +10.*1000. ) ;
+//			ZoomEntry zoomEntry = new ZoomEntry( image, zoomstore, "*Initial*" ) ;
+//			visConfig.addZoom( zoomEntry );
+//		}
+
+		config.qsim().setSnapshotStyle( QSimConfigGroup.SnapshotStyle.kinematicWaves );
+		config.qsim().setTrafficDynamics( QSimConfigGroup.TrafficDynamics.kinematicWaves );
 
 		configureScoring(config);
 		return config;
 	}
 
-	private Scenario createScenario( Config config ){
+	static Scenario createScenario( Config config, long numberOfPersons ){
 		Scenario scenario = ScenarioUtils.createScenario( config );
 		// don't load anything
 
@@ -549,7 +394,7 @@ public class PtAlongALineTest{
 
 		createAndAddCarNetwork( scenario, lastNodeIdx, deltaX );
 
-		createAndAddPopulation( scenario , "pt");
+		createAndAddPopulation( scenario , "pt", numberOfPersons );
 
 		final double deltaY = 1000.;
 
@@ -566,17 +411,13 @@ public class PtAlongALineTest{
 	}
 
 	private static void configureScoring(Config config) {
-		ModeParams accessWalk = new ModeParams("access_walk");
+		ModeParams accessWalk = new ModeParams( TransportMode.non_network_walk );
 		accessWalk.setMarginalUtilityOfTraveling(0);
 		config.planCalcScore().addModeParams(accessWalk);
 
 		ModeParams transitWalk = new ModeParams("transit_walk");
 		transitWalk.setMarginalUtilityOfTraveling(0);
 		config.planCalcScore().addModeParams(transitWalk);
-
-		ModeParams egressWalk = new ModeParams("egress_walk");
-		egressWalk.setMarginalUtilityOfTraveling(0);
-		config.planCalcScore().addModeParams(egressWalk);
 
 		ModeParams bike = new ModeParams("bike");
 		bike.setMarginalUtilityOfTraveling(0);
@@ -587,7 +428,7 @@ public class PtAlongALineTest{
 		config.planCalcScore().addModeParams(drt);
 	}
 
-	private static SwissRailRaptorConfigGroup createRaptorConfigGroup(int radiusWalk, int radiusBike) {
+	static SwissRailRaptorConfigGroup createRaptorConfigGroup(int radiusWalk, int radiusBike) {
 		SwissRailRaptorConfigGroup configRaptor = new SwissRailRaptorConfigGroup();
 		configRaptor.setUseIntermodalAccessEgress(true);
 
@@ -720,11 +561,11 @@ public class PtAlongALineTest{
 		}
 	}
 
-	private static void createAndAddPopulation( Scenario scenario , String mode){
+	private static void createAndAddPopulation( Scenario scenario, String mode, long numberOfPersons ){
 		PopulationFactory pf = scenario.getPopulation().getFactory();
 		List<ActivityFacility> facilitiesAsList = new ArrayList<>( scenario.getActivityFacilities().getFacilities().values() ) ;
 		final Id<ActivityFacility> activityFacilityId = facilitiesAsList.get( facilitiesAsList.size()-1 ).getId() ;
-		for( int jj = 0 ; jj < 1000 ; jj++ ){
+		for( int jj = 0 ; jj < numberOfPersons ; jj++ ){
 			Person person = pf.createPerson( Id.createPersonId( jj ) );
 			{
 				scenario.getPopulation().addPerson( person );
@@ -810,7 +651,7 @@ public class PtAlongALineTest{
 		scenario.getActivityFacilities().addActivityFacility( af );
 	}
 
-	private static void createDrtVehiclesFile(String taxisFile, String vehPrefix, int numberofVehicles, Id<Link> startLinkId) {
+	static void createDrtVehiclesFile( String taxisFile, String vehPrefix, int numberofVehicles, Id<Link> startLinkId ) {
 		List<DvrpVehicleSpecification> vehicles = new ArrayList<>();
 		for (int i = 0; i< numberofVehicles;i++){
 			//for multi-modal networks: Only links where drts can ride should be used.
@@ -826,7 +667,7 @@ public class PtAlongALineTest{
 		new FleetWriter(vehicles.stream()).write(taxisFile);
 	}
 
-	private static void addDrtModeToAllLinksBtwnGivenNodes(Network network, int fromNodeNumber, int toNodeNumber, String drtMode) {
+	static void addDrtModeToAllLinksBtwnGivenNodes( Network network, int fromNodeNumber, int toNodeNumber, String drtMode ) {
 		for (int i = fromNodeNumber; i < toNodeNumber; i++) {
 			Set<String> newAllowedModes = new HashSet<>( network.getLinks().get( Id.createLinkId( i + "-" + (i + 1) ) ).getAllowedModes() );
 			newAllowedModes.add(drtMode);
