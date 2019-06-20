@@ -47,7 +47,7 @@ public class RunCommercialTraffic {
         commercialTrafficConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
         config.addModule(commercialTrafficConfigGroup);
         StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
-        changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
+        changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
         changeExpBeta.setWeight(0.5);
         config.strategy().addStrategySettings(changeExpBeta);
 
@@ -70,6 +70,7 @@ public class RunCommercialTraffic {
         config.planCalcScore().addActivityParams(work);
         config.controler().setLastIteration(10);
         config.controler().setWriteEventsInterval(1);
+        config.controler().setOutputDirectory("output/commercialtraffictestrun");
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         config.network().setInputFile("grid_network.xml");
         config.plans().setInputFile("testpop.xml");

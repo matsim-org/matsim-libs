@@ -23,25 +23,26 @@ package commercialtraffic.scoring;/*
 
 import com.google.inject.Inject;
 import commercialtraffic.deliveryGeneration.PersonDelivery;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
-public class ScoreCommercialServices implements ActivityStartEventHandler, PersonDepartureEventHandler, ActivityEndEventHandler {
+public class ScoreCommercialServices implements ActivityStartEventHandler, ActivityEndEventHandler {
 
 
     private final Population population;
@@ -51,7 +52,6 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Perso
     private final EventsManager eventsManager;
 
     private final Set<Id<Person>> activeDeliveryAgents = new HashSet<>();
-    private final Map<Id<Person>, Integer> actIdx = new HashMap<>();
     private final Map<Id<Link>, Set<ExpectedDelivery>> currentExpectedDeliveriesPerLink = new HashMap<>();
     private final List<DeliveryLogEntry> logEntries = new ArrayList<>();
 
@@ -65,35 +65,40 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Perso
 
     @Override
     public void handleEvent(ActivityStartEvent event) {
-        if (population.getPersons().containsKey(event.getPersonId())) {
-            incPersonIdx(event.getPersonId());
-            if (activeDeliveryAgents.contains(event.getPersonId())) {
-                handleFreightActivityStart(event);
-            } else {
-                handlePersonActivityStart(event);
-            }
-        }
-
-
-    }
-
-    private void handlePersonActivityStart(ActivityStartEvent event) {
-        Activity activity = (Activity) population.getPersons().get(event.getPersonId()).getSelectedPlan().getPlanElements().get(actIdx.get(event.getPersonId()));
-        if (activity.getAttributes().getAsMap().containsKey(PersonDelivery.DELIEVERY_TYPE)) {
-            ExpectedDelivery expectedDelivery = new ExpectedDelivery((String) activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_TYPE)
-                    , PersonDelivery.getCarrierId(activity)
-                    , event.getPersonId()
-                    , (Integer) activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_DURATION)
-                    , (Integer) activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_TIME_START)
-                    , (Integer) activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_TIME_END));
-
-            Set<ExpectedDelivery> set = currentExpectedDeliveriesPerLink.getOrDefault(event.getLinkId(), new HashSet<>());
-            set.add(expectedDelivery);
-            currentExpectedDeliveriesPerLink.put(event.getLinkId(), set);
-
+        if (activeDeliveryAgents.contains(event.getPersonId())) {
+            handleFreightActivityStart(event);
         }
 
     }
+
+
+    public void prepareTourArrivalsForDay() {
+        currentExpectedDeliveriesPerLink.clear();
+        Set<Plan> plans = population.getPersons().values().stream()
+                .map(p -> p.getSelectedPlan())
+                .filter(plan -> PersonDelivery.planExpectsDeliveries(plan)).collect(Collectors.toSet());
+        for (Plan plan : plans) {
+            plan.getPlanElements().stream().filter(Activity.class::isInstance).forEach(pe -> {
+                Activity activity = (Activity) pe;
+                if (activity.getAttributes().getAsMap().containsKey(PersonDelivery.DELIEVERY_TYPE)) {
+                    ExpectedDelivery expectedDelivery = new ExpectedDelivery((String) activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_TYPE)
+                            , PersonDelivery.getCarrierId(activity)
+                            , plan.getPerson().getId()
+                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_DURATION)))
+                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_TIME_START)))
+                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_TIME_END))));
+                    Set<ExpectedDelivery> set = currentExpectedDeliveriesPerLink.getOrDefault(activity.getLinkId(), new HashSet<>());
+                    set.add(expectedDelivery);
+                    currentExpectedDeliveriesPerLink.put(activity.getLinkId(), set);
+
+                }
+
+            });
+        }
+        Logger.getLogger(getClass()).info(currentExpectedDeliveriesPerLink.size() + " links expect deliveries");
+
+    }
+
 
     private void handleFreightActivityStart(ActivityStartEvent event) {
         if (event.getActType().equals(FreightConstants.END)) {
@@ -111,7 +116,9 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Perso
                 eventsManager.processEvent(new PersonMoneyEvent(event.getTime(), deliveryCandidate.getPersonId(), score));
                 logEntries.add(new DeliveryLogEntry(deliveryCandidate.getPersonId(), deliveryCandidate.getCarrier(), event.getTime(), score, event.getLinkId(), timeDifference, event.getPersonId()));
 
-            } else throw new RuntimeException("No available deliveries expected at link " + event.getLinkId());
+            } else {
+                Logger.getLogger(getClass()).warn("No available deliveries expected at link " + event.getLinkId());
+            }
         }
     }
 
@@ -124,24 +131,10 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Perso
     @Override
     public void reset(int iteration) {
         activeDeliveryAgents.clear();
-        actIdx.clear();
         logEntries.clear();
-        currentExpectedDeliveriesPerLink.clear();
-    }
-
-    @Override
-    public void handleEvent(PersonDepartureEvent event) {
-        if (population.getPersons().containsKey(event.getPersonId())) {
-            incPersonIdx(event.getPersonId());
-        }
-    }
-
-    private void incPersonIdx(Id<Person> personId) {
-        int idx = actIdx.getOrDefault(personId, 0);
-        idx++;
-        actIdx.put(personId, idx);
 
     }
+
 
     @Override
     public void handleEvent(ActivityEndEvent event) {

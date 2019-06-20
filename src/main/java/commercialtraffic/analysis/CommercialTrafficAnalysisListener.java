@@ -29,7 +29,9 @@ import org.apache.commons.csv.CSVPrinter;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -46,7 +48,7 @@ import java.util.DoubleSummaryStatistics;
 import java.util.Locale;
 
 
-public class CommercialTrafficAnalysisListener implements IterationEndsListener {
+public class CommercialTrafficAnalysisListener implements IterationEndsListener, BeforeMobsimListener {
 
     @Inject
     MatsimServices services;
@@ -137,5 +139,11 @@ public class CommercialTrafficAnalysisListener implements IterationEndsListener 
             }
 
         }
+    }
+
+    @Override
+    public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+        scoreCommercialServices.prepareTourArrivalsForDay();
+
     }
 }
