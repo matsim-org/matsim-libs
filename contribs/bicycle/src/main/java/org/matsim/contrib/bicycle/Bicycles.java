@@ -14,6 +14,6 @@ public class Bicycles {
 			protected void configureQSim() {
 				bind(QNetworkFactory.class).toProvider(BicycleModule.QNetworkFactoryProvider.class);
 			}
-		})
+        });
 	}
 }

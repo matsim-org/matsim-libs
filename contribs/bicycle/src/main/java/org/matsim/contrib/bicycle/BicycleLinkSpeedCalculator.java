@@ -1,6 +1,5 @@
 package org.matsim.contrib.bicycle;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
@@ -10,13 +9,10 @@ import javax.inject.Inject;
 public class BicycleLinkSpeedCalculator implements LinkSpeedCalculator {
 
 	@Inject
-	private Scenario scenario;
-
-	//private final BicycleConfigGroup bicycleConfigGroup;
+    private BicycleConfigGroup bicycleConfigGroup;
 
 	@Inject
 	private BicycleLinkSpeedCalculator() {
-		//bicycleConfigGroup = (BicycleConfigGroup) scenario.getConfig().getModules().get(BicycleConfigGroup.GROUP_NAME);
     }
 
 	@Override
@@ -42,7 +38,6 @@ public class BicycleLinkSpeedCalculator implements LinkSpeedCalculator {
     }
 
     private boolean isBike(QVehicle qVehicle) {
-		return true;
-		// return qVehicle.getVehicle().getType().getId().toString().equals(bicycleConfigGroup.getBicycleMode());
+        return qVehicle.getVehicle().getType().getId().toString().equals(bicycleConfigGroup.getBicycleMode());
     }
 }
