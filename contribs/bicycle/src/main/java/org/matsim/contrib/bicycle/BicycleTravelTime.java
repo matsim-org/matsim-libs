@@ -39,6 +39,10 @@ class BicycleTravelTime implements TravelTime {
 		this.bicycleConfigGroup = configGroup;
 	}
 
+    @Inject
+    private BicycleTravelTime() {
+    }
+
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 		if (hasNotAttribute(link, BicycleLabels.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR)) {
