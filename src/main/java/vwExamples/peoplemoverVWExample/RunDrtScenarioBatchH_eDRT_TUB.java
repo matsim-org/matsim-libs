@@ -20,10 +20,8 @@
 
 package vwExamples.peoplemoverVWExample;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
+import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
+import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -35,11 +33,7 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
-import org.matsim.contrib.ev.charging.ChargingLogic;
-import org.matsim.contrib.ev.charging.ChargingPower;
-import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
-import org.matsim.contrib.ev.charging.FastThenSlowCharging;
+import org.matsim.contrib.ev.charging.*;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.temperature.TemperatureChangeConfigGroup;
@@ -54,12 +48,13 @@ import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-
-import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
-import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 import vwExamples.utils.DrtTrajectoryAnalyzer.MyDrtTrajectoryAnalysisModule;
 import vwExamples.utils.customEV.BatteryReplacementCharging;
 import vwExamples.utils.customEdrtModule.CustomEDrtControlerCreator;
+
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author axer
@@ -75,7 +70,7 @@ public class RunDrtScenarioBatchH_eDRT_TUB {
 
 	public static void main(String[] args) throws IOException {
 
-		run(100, 0, "D:\\testInput");
+        run(100, 0, "D:/testInput");
 
 	}
 
@@ -85,11 +80,11 @@ public class RunDrtScenarioBatchH_eDRT_TUB {
 		String runId = "H5charger_1xRate_batteryRecharge_" + vehiclePerDepot + "_veh_idx" + iterationIdx;
 		boolean rebalancing = true;
 
-		final Config config = ConfigUtils.loadConfig(inbase + "\\hannover_edrt.xml", new DrtConfigGroup(),
+        final Config config = ConfigUtils.loadConfig(inbase + "/hannover_edrt.xml", new DrtConfigGroup(),
 				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(),
 				new TemperatureChangeConfigGroup());
 		config.controler().setRunId(runId);
-		config.controler().setOutputDirectory(inbase + "\\output\\" + runId); // Define dynamically the output dir
+        config.controler().setOutputDirectory(inbase + "/output/" + runId); // Define dynamically the output dir
 
 		adjustConfig(config, rebalancing);
 
@@ -151,7 +146,7 @@ public class RunDrtScenarioBatchH_eDRT_TUB {
 	private static void adjustConfig(Config config, boolean rebalancing) {
 		TemperatureChangeConfigGroup tcg = (TemperatureChangeConfigGroup)config.getModules()
 				.get(TemperatureChangeConfigGroup.GROUP_NAME);
-		tcg.setTempFile("temp\\temperatures_0.csv");
+        tcg.setTempFile("temp/temperatures_0.csv");
 		config.travelTimeCalculator().setTraveltimeBinSize(900);
 		Set<String> modes = new HashSet<>();
 		modes.add("car");
@@ -160,7 +155,7 @@ public class RunDrtScenarioBatchH_eDRT_TUB {
 
 		// config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		// Overwrite existing configuration parameters
-		config.plans().setInputFile("plans\\testdrtplans.xml.gz");
+        config.plans().setInputFile("plans/testdrtplans.xml.gz");
 		config.controler().setLastIteration(0); // Number of simulation iterations
 		config.controler().setWriteEventsInterval(0); // Write Events file every x-Iterations
 		config.controler().setWritePlansInterval(0); // Write Plan file every x-Iterations
@@ -170,7 +165,7 @@ public class RunDrtScenarioBatchH_eDRT_TUB {
 		String drtTag = "drt"; // drtTag is assigned to roads that should be used by the drt service
 		// Adding drtTag to the network in order to define a service area
 
-		config.network().setInputFile("network\\drtServiceAreaNetwork.xml.gz");
+        config.network().setInputFile("network/drtServiceAreaNetwork.xml.gz");
 
 		DrtConfigGroup drt = (DrtConfigGroup)config.getModules().get(DrtConfigGroup.GROUP_NAME);
 
@@ -181,17 +176,17 @@ public class RunDrtScenarioBatchH_eDRT_TUB {
 		drt.setStopDuration(30.0);
 		drt.setRequestRejection(true);
 
-		drt.setTransitStopFile("network\\virtualStops.xml");
+        drt.setTransitStopFile("network/virtualStops.xml");
 		drt.setMaxWalkDistance(800.0);
 
-		drt.setVehiclesFile("fleets\\fleet.xml.gz");
+        drt.setVehiclesFile("fleets/fleet.xml.gz");
 		drt.setIdleVehiclesReturnToDepots(true);
 		drt.setOperationalScheme("stopbased");
 		drt.setPlotDetailedCustomerStats(true);
 
 		EvConfigGroup eDrt = (EvConfigGroup)config.getModules().get(EvConfigGroup.GROUP_NAME);
-		eDrt.setChargersFile("chargers\\chargers.xml.gz");
-		eDrt.setVehiclesFile("fleets\\eFleet.xml.gz");
+        eDrt.setChargersFile("chargers/chargers.xml.gz");
+        eDrt.setVehiclesFile("fleets/eFleet.xml.gz");
 		eDrt.setAuxDischargeTimeStep(10);
 		eDrt.setTimeProfiles(true);
 
