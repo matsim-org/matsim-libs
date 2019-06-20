@@ -18,15 +18,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle.run;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.matsim.utils.eventsfilecomparison.EventsFileComparator.Result.FILES_ARE_EQUAL;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -66,8 +59,14 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.matsim.utils.eventsfilecomparison.EventsFileComparator.Result.FILES_ARE_EQUAL;
 
 /**
  * @author dziemke
@@ -417,7 +416,7 @@ public class BicycleTest {
                 });
             }
         });
-		
+		//TODO fix
 		controler.run();
 		
 		Assert.assertEquals("All bicycle users should use the longest but fastest route where the bicycle infrastructur speed factor is set to 1.0", 3, linkHandler.getLinkId2demand().get(Id.createLinkId("2")), MatsimTestUtils.EPSILON);
@@ -511,7 +510,7 @@ public class BicycleTest {
 			}
 		});
 		
-		controler.addOverridingQSimModule(new AbstractQSimModule() {
+/*		controler.addOverridingQSimModule(new AbstractQSimModule() {
 
             @Override
             protected void configureQSim() {
@@ -528,7 +527,8 @@ public class BicycleTest {
                 });
             }
         });
-		
+		*/
+//TODO fix
 		controler.run();
 		
 		Assert.assertEquals("All bicycle users should use the shortest route even though the bicycle infrastructur speed factor is set to 0.1", 4, linkHandler.getLinkId2demand().get(Id.createLinkId("6")), MatsimTestUtils.EPSILON);

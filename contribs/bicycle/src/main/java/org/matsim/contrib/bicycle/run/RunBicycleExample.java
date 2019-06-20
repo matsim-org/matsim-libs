@@ -18,17 +18,12 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle.run;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.bicycle.BicycleConfigGroup;
-import org.matsim.contrib.bicycle.BicycleLinkSpeedCalculator;
 import org.matsim.contrib.bicycle.BicycleModule;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -37,15 +32,12 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author dziemke
@@ -105,7 +97,7 @@ public class RunBicycleExample {
 		BicycleModule bicycleModule = new BicycleModule(scenario);
 		controler.addOverridingModule(bicycleModule);
 		
-		controler.addOverridingQSimModule(new AbstractQSimModule() {
+	/*	controler.addOverridingQSimModule(new AbstractQSimModule() {
 
             @Override
             protected void configureQSim() {
@@ -122,7 +114,7 @@ public class RunBicycleExample {
                 });
             }
         });
-		
+	*/
 		controler.run();
 	}
 	

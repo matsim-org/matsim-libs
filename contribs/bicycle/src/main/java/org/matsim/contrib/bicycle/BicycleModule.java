@@ -18,11 +18,17 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 import org.matsim.vehicles.VehicleType;
 
 /**
@@ -32,12 +38,12 @@ public final class BicycleModule extends AbstractModule {
 	// necessary to have this public
 	
 	private static final Logger LOG = Logger.getLogger(BicycleModule.class);
-	
-	private final Scenario scenario;
-	
-	public BicycleModule(Scenario scenario) {
+
+	private Scenario scenario;
+
+	public BicycleModule() {
 		// at some point let's replace this by some guice approach
-		this.scenario = scenario;
+		//	this.scenario = scenario;
 	}
 	
 	@Override
@@ -48,29 +54,47 @@ public final class BicycleModule extends AbstractModule {
 		addTravelTimeBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelTime.class).in(Singleton.class);
 		addTravelDisutilityFactoryBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelDisutilityFactory.class).in(Singleton.class);
 		bindScoringFunctionFactory().to(BicycleScoringFunctionFactory.class).in(Singleton.class);
+		bind(BicycleLinkSpeedCalculator.class);//.to(BicycleLinkSpeedCalculator.class);
+		bind(QNetworkFactoryProvider.class);
 		
 		if (bicycleConfigGroup.isMotorizedInteraction()) {
 			addMobsimListenerBinding().to(MotorizedInteractionEngine.class);
 		}
+		installQSimModule(new AbstractQSimModule() {
+
+			@Inject
+			private QNetworkFactoryProvider provider;
+
+			@Override
+			protected void configureQSim() {
+				bind(QNetworkFactory.class).toProvider(QNetworkFactoryProvider.class);
+			}
+		});
+
+
 		
-//		installQSimModule(new AbstractQSimModule() {
-//			@Inject Scenario scenario;
-//
-//            @Override
-//            protected void configureQSim() {
-//                bind(QNetworkFactory.class).toProvider(new Provider<QNetworkFactory>() {
-//                    @Inject
-//                    private EventsManager events;
-//
-//                    @Override
-//                    public QNetworkFactory get() {
-//                        final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
-//                        factory.setLinkSpeedCalculator(new BicycleLinkSpeedCalculator(scenario));
-//                        return factory;
-//                    }
-//                });
-//            }
-//        });
+		/*installQSimModule(new AbstractQSimModule() {
+			@Inject
+			Scenario scenario;
+
+            @Override
+            protected void configureQSim() {
+                bind(QNetworkFactory.class).toProvider(new Provider<QNetworkFactory>() {
+                    @Inject
+                    private EventsManager events;
+
+                    @Inject
+					private BicycleLinkSpeedCalculator calculator;
+
+                    @Override
+                    public QNetworkFactory get() {
+                        final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
+                        factory.setLinkSpeedCalculator(calculator);
+                        return factory;
+                    }
+                });
+            }
+        });*/
 		
 		// some consistency checks
 		
@@ -95,6 +119,25 @@ public final class BicycleModule extends AbstractModule {
 			LOG.warn(bicycleConfigGroup.getBicycleMode() + " not specified as main mode.");
 		}
 		
+	}
+
+	static class QNetworkFactoryProvider implements Provider<QNetworkFactory> {
+
+		@Inject
+		private Scenario scenario;
+
+		@Inject
+		private EventsManager events;
+
+		@Inject
+		private BicycleLinkSpeedCalculator calculator;
+
+		@Override
+		public QNetworkFactory get() {
+			final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
+			factory.setLinkSpeedCalculator(calculator);
+			return factory;
+		}
 	}
 	
 }
