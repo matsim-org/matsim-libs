@@ -18,48 +18,42 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
-
-import com.google.inject.Inject;
 
 /**
  * @author dziemke
  */
 class BicycleTravelTime implements TravelTime {
-	@Inject Config config;
+
+	@Inject
+	private BicycleConfigGroup bicycleConfigGroup;
+
+	/**
+	 * for unit testing
+	 */
+	BicycleTravelTime(BicycleConfigGroup configGroup) {
+		this.bicycleConfigGroup = configGroup;
+	}
 
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-		if (link.getAttributes().getAttribute(BicycleLabels.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR) == null) {
+		if (hasNotAttribute(link, BicycleLabels.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR)) {
 			throw new RuntimeException("Infrastructure speed factors must be set for all links that allow the bicycle mode!");
 		}
-		
+
 		// This is not yet available, but might be at some point, see https://matsim.atlassian.net/browse/MATSIM-700
 		// double bicycleVelocity = vehicle.getType().getMaximumVelocity()
-		double maxBicycleSpeed = ((BicycleConfigGroup) config.getModules().get(BicycleConfigGroup.GROUP_NAME)).getMaxBicycleSpeedForRouting();
-		double bicycleInfrastructureSpeedFactor = Double.parseDouble(link.getAttributes().getAttribute(BicycleLabels.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR).toString());
-		if (bicycleInfrastructureSpeedFactor > 1.0) {
-			throw new RuntimeException("A bicycle infrastructure speed factor of > 1.0 is not allowed as it would lead to exceeding the maximum biclce speed.");
-		}
-		
-		double infrastructureSpeed = maxBicycleSpeed * bicycleInfrastructureSpeedFactor;
-		
-		double gradientSpeed = computeGradientSpeed(link, infrastructureSpeed);
 
-		String surface = (String) link.getAttributes().getAttribute(BicycleLabels.SURFACE);
-		double surfaceSpeed = infrastructureSpeed;
-		if (surface != null) {
-			String type = (String) link.getAttributes().getAttribute("type");
-			surfaceSpeed = computeSurfaceSpeed(infrastructureSpeed, surface, type);
-		}
-		
-		double effectiveSpeed = Math.min(gradientSpeed, surfaceSpeed);
-		
-		return (link.getLength() / effectiveSpeed);
+		double maxBicycleSpeed = bicycleConfigGroup.getMaxBicycleSpeedForRouting();
+		double bicycleInfrastructureFactor = Double.parseDouble(link.getAttributes().getAttribute(BicycleLabels.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR).toString());
+		double surfaceFactor = computeSurfaceFactor(link);
+		double gradientFactor = computeGradientFactor(link);
+		double speed = maxBicycleSpeed * bicycleInfrastructureFactor * surfaceFactor * gradientFactor;
+		return link.getLength() / speed;
 	}
 
 	/**
@@ -69,66 +63,78 @@ class BicycleTravelTime implements TravelTime {
 	 * Negative gradients (downhill):
 	 * Not linear; highest speeds at 5% or 6% gradient; at gradients higher than 6% braking
 	 */
-	private double computeGradientSpeed(Link link, double vehicleLinkSpeed) {
-		
-		double gradientSpeedFactor = 1.;
-		
+	private double computeGradientFactor(Link link) {
+
+		double factor = 1;
 		if (link.getFromNode().getCoord().hasZ() && link.getToNode().getCoord().hasZ()) {
-			Double fromNodeZ = link.getFromNode().getCoord().getZ();
-			Double toNodeZ = link.getToNode().getCoord().getZ();
-			
-			if ((fromNodeZ != null) && (toNodeZ != null)) {
-				if (toNodeZ > fromNodeZ) { // No positive speed increase for downhill, only decrease for uphill
-					gradientSpeedFactor = 1 - 5. * ((toNodeZ - fromNodeZ) / link.getLength()); // 50% reducation at 10% up-slope
-				}
-			}
-			if (gradientSpeedFactor < 0.1) {
-				gradientSpeedFactor = 0.1;
+			double fromZ = link.getFromNode().getCoord().getZ();
+			double toZ = link.getToNode().getCoord().getZ();
+			if (toZ > fromZ) { // No positive speed increase for downhill, only decrease for uphill
+				double reduction = 1 - 5 * ((toZ - fromZ) / link.getLength());
+				factor = Math.max(0.1, reduction); // maximum reduction is 0.1
 			}
 		}
-		
-		return vehicleLinkSpeed * gradientSpeedFactor;
+
+		return factor;
 	}
-	
+
 	// TODO combine this with comfort
-	private double computeSurfaceSpeed(double vehicleLinkSpeed, String surface, String type) {
-		if (type == null || type.equals("cycleway")) {
-			return vehicleLinkSpeed; // Assuming that dedicated cycleways are on good surface like ashalt
+	private double computeSurfaceFactor(Link link) {
+		if (hasNotAttribute(link, BicycleLabels.WAY_TYPE)
+				|| link.getAttributes().getAttribute(BicycleLabels.WAY_TYPE).equals(BicycleLabels.CYCLEWAY)
+				|| hasNotAttribute(link, BicycleLabels.SURFACE)
+		) {
+			return 1.0;
 		}
-		double surfaceSpeedFactor;
+		//so, the link is NOT a cycleway, and has a surface attribute
+		String surface = link.getAttributes().getAttribute(BicycleLabels.SURFACE).toString();
 		switch (surface) {
 			case "paved":
-			case "asphalt": surfaceSpeedFactor = 1.; break;
-			case "cobblestone": surfaceSpeedFactor = 0.5; break;
-			case "cobblestone (bad)": surfaceSpeedFactor = 0.4; break;
+			case "asphalt":
+				return 1.0;
+
+			case "cobblestone (bad)":
+			case "grass":
+				return 0.4;
+
 			case "cobblestone;flattened":
 			case "cobblestone:flattened":
-			case "sett": surfaceSpeedFactor = 0.6; break;
-			case "concrete": surfaceSpeedFactor =  0.9; break;
+			case "sett":
+			case "earth":
+				return 0.6;
+
+			case "concrete":
+			case "asphalt;paving_stones:35":
+			case "compacted":
+				return 0.9;
+
 			case "concrete:lanes":
 			case "concrete_plates":
-			case "concrete:plates": surfaceSpeedFactor = 0.8; break;
+			case "concrete:plates":
+			case "paving_stones:3":
+				return 0.8;
+
 			case "paving_stones":
 			case "paving_stones:35":
-			case "paving_stones:30": surfaceSpeedFactor = 0.7; break;
-			case "unpaved": surfaceSpeedFactor = 0.5; break;
-			case "compacted": surfaceSpeedFactor = 0.9; break;
-			case "dirt": surfaceSpeedFactor = 0.5; break;
-			case "earth": surfaceSpeedFactor = 0.6; break;
+			case "paving_stones:30":
+			case "compressed":
+			case "bricks":
+			case "stone":
+			case "pebblestone":
 			case "fine_gravel":
 			case "gravel":
-			case "ground": surfaceSpeedFactor = 0.7; break;
-			case "wood": surfaceSpeedFactor =  0.5; break;
-			case "pebblestone": surfaceSpeedFactor = 0.7; break;
-			case "sand": surfaceSpeedFactor = 0.2; break;
-			case "bricks":
-			case "stone": surfaceSpeedFactor = 0.7; break;
-			case "grass": surfaceSpeedFactor = 0.4; break;
-			case "compressed": surfaceSpeedFactor =  0.7; break;
-			case "asphalt;paving_stones:35": surfaceSpeedFactor = 0.9; break;
-			case "paving_stones:3": surfaceSpeedFactor = 0.8; break;
-			default: surfaceSpeedFactor = 0.5;
+			case "ground":
+				return 0.7;
+
+			case "sand":
+				return 0.2;
+
+			default:
+				return 0.5;
 		}
-		return vehicleLinkSpeed * surfaceSpeedFactor;
+	}
+
+	private boolean hasNotAttribute(Link link, String attributeName) {
+		return link.getAttributes().getAttribute(attributeName) == null;
 	}
 }
