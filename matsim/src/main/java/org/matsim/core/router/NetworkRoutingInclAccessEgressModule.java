@@ -175,46 +175,70 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	public static void addBushwhackingLegFromLinkToFacilityIfNecessary( final Facility toFacility, final Person person,
 												   final Link egressActLink, double now, final List<PlanElement> result,
 												   final PopulationFactory populationFactory, final String stageActivityType ) {
-		if ( toFacility.getCoord() != null ) { // otherwise the trip ends directly on the link; no need to bushwhack
 
-			Coord egressActCoord = egressActLink.getToNode().getCoord() ;
-			Gbl.assertNotNull( egressActCoord );
+		log.warn( "do bushwhacking leg to facility=" + toFacility.toString() ) ;
 
-			final Activity interactionActivity = createInteractionActivity( egressActCoord, egressActLink.getId(), stageActivityType );
-			result.add( interactionActivity ) ;
-//				log.warn( interactionActivity );
-
-			Leg egressLeg = populationFactory.createLeg( TransportMode.egress_walk ) ;
-			egressLeg.setDepartureTime( now );
-			routeBushwhackingLeg(person, egressLeg, egressActCoord, toFacility.getCoord(), now, egressActLink.getId(),
-					egressActLink.getId(), populationFactory ) ;
-			result.add( egressLeg ) ;
-//				log.warn( egressLeg );
+		if( isNotNeedingBushwhackingLeg( toFacility ) ) {
+			return;
 		}
-		//			log.warn( "===" );
+
+		Coord startCoord = egressActLink.getToNode().getCoord() ;
+		Gbl.assertNotNull( startCoord );
+
+		final Id<Link> startLinkId = egressActLink.getId();
+		final Activity interactionActivity = createInteractionActivity( startCoord, startLinkId, stageActivityType );
+		result.add( interactionActivity ) ;
+
+		Id<Link> endLinkId = toFacility.getLinkId();
+		if ( endLinkId==null ) {
+			endLinkId = startLinkId;
+		}
+
+		Leg egressLeg = populationFactory.createLeg( TransportMode.non_network_walk ) ;
+		egressLeg.setDepartureTime( now );
+		routeBushwhackingLeg(person, egressLeg, startCoord, toFacility.getCoord(), now, startLinkId, endLinkId, populationFactory ) ;
+		result.add( egressLeg ) ;
+
 	}
-	
+
+	private static boolean isNotNeedingBushwhackingLeg( Facility toFacility ){
+		if ( toFacility.getCoord() == null ) {
+			// facility does not have a coordinate; we cannot bushwhack
+			return true;
+		}
+		if ( toFacility instanceof LinkWrapperFacility ) {
+			// trip ends on link; no need to bushwhack (this is, in fact, not totally clear: might be link on network of other mode)
+			return true;
+		}
+		return false;
+	}
+
 	public static double addBushwhackingLegFromFacilityToLinkIfNecessary( final Facility fromFacility, final Person person,
 												     final Link accessActLink, double now, final List<PlanElement> result, final PopulationFactory populationFactory, final String stageActivityType ) {
-		if ( fromFacility.getCoord() != null && ! ( fromFacility instanceof LinkWrapperFacility ) ) {
-			// otherwise the trip starts directly on the link; no need to bushwhack
-
-			Coord accessActCoord  = accessActLink.getToNode().getCoord() ;
-			// yyyy think about better solution: this may generate long walks along the link.
-			// (e.g. orthogonal projection)
-			Gbl.assertNotNull(accessActCoord);
-
-			Leg accessLeg = populationFactory.createLeg( TransportMode.access_walk ) ;
-			accessLeg.setDepartureTime( now );
-			now += routeBushwhackingLeg(person, accessLeg, fromFacility.getCoord(), accessActCoord, now, accessActLink.getId(),
-					accessActLink.getId(), populationFactory ) ;
-			// yyyy might be possible to set the link ids to null. kai & dominik, may'16
-			
-			result.add( accessLeg ) ;
-
-			final Activity interactionActivity = createInteractionActivity(accessActCoord, accessActLink.getId(), stageActivityType );
-			result.add( interactionActivity ) ;
+		if ( isNotNeedingBushwhackingLeg( fromFacility ) ) {
+			return now ;
 		}
+
+		Coord endCoord  = accessActLink.getToNode().getCoord() ;
+		// yyyy think about better solution: this may generate long walks along the link. (e.g. orthogonal projection)
+		Gbl.assertNotNull(endCoord);
+
+		Leg accessLeg = populationFactory.createLeg( TransportMode.non_network_walk ) ;
+		accessLeg.setDepartureTime( now );
+
+		final Id<Link> startLinkId = fromFacility.getLinkId() ;
+		if ( startLinkId==null ){
+			accessActLink.getId();
+		}
+
+		now += routeBushwhackingLeg(person, accessLeg, fromFacility.getCoord(), endCoord, now, startLinkId, accessActLink.getId(), populationFactory ) ;
+		// yyyy might be possible to set the link ids to null. kai & dominik, may'16
+
+		result.add( accessLeg ) ;
+
+		final Activity interactionActivity = createInteractionActivity(endCoord, accessActLink.getId(), stageActivityType );
+		result.add( interactionActivity ) ;
+
 		return now;
 	}
 	

@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
@@ -53,8 +52,8 @@ public class TransitActsRemover implements PlanAlgorithm {
 		List<String> accessModes = new ArrayList<>();
 		accessModes.add(TransportMode.transit_walk);
 		if (treatAccessEgressAsTransit){
-			accessModes.add(TransportMode.access_walk);
-			accessModes.add(TransportMode.egress_walk);
+			accessModes.add(TransportMode.non_network_walk );
+			accessModes.add(TransportMode.non_network_walk );
 		}
 		List<PlanElement> planElements = plan.getPlanElements();
 		for (int i = 0, n = planElements.size(); i < n; i++) {

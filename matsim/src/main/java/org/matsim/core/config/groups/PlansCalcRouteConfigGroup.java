@@ -230,12 +230,12 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		// the following two are deliberately different from "walk" since "walk" may become a network routing mode, but these two
 		// will not. kai, dec'15
 		{
-			final ModeRoutingParams walk = new ModeRoutingParams( TransportMode.access_walk );
+			final ModeRoutingParams walk = new ModeRoutingParams( TransportMode.non_network_walk );
 			walk.setTeleportedModeSpeed( 3.0 / 3.6 ); // 3.0 km/h --> m/s
 			addParameterSet( walk );
 		}
 		{
-			final ModeRoutingParams walk = new ModeRoutingParams( TransportMode.egress_walk );
+			final ModeRoutingParams walk = new ModeRoutingParams( TransportMode.non_network_walk );
 			walk.setTeleportedModeSpeed( 3.0 / 3.6 ); // 3.0 km/h --> m/s
 			addParameterSet( walk );
 		}
