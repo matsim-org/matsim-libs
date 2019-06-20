@@ -106,6 +106,10 @@ public class FacilitiesUtils {
 			Gbl.assertNotNull(accessActLink);
 		}
 		return accessActLink;
+
+		// I just found out that there are facilities that insist on links that may not be postal addresses since they cannot be reached by car.
+		// TransitStopFacility is an example.  kai, jun'19
+
 	}
 
 	public static Facility toFacility( final Activity toWrap, ActivityFacilities activityFacilities ){

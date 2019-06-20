@@ -45,8 +45,8 @@ public final class TransportPlanningMainModeIdentifier implements MainModeIdenti
 	private final List<String> modeHierarchy = new ArrayList<>() ;
 
 	public TransportPlanningMainModeIdentifier() {
-		modeHierarchy.add( TransportMode.access_walk ) ;
-		modeHierarchy.add( TransportMode.egress_walk ) ;
+		modeHierarchy.add( TransportMode.non_network_walk ) ;
+		modeHierarchy.add( TransportMode.non_network_walk ) ;
 		modeHierarchy.add( "undefined" ) ;
 		modeHierarchy.add( TransportMode.other ) ;
 		modeHierarchy.add( TransportMode.transit_walk ) ;
