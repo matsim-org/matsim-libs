@@ -19,17 +19,13 @@
 package org.matsim.contrib.bicycle;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 import org.matsim.vehicles.VehicleType;
 
 /**
@@ -52,9 +48,8 @@ public final class BicycleModule extends AbstractModule {
 		addTravelTimeBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelTime.class).in(Singleton.class);
 		addTravelDisutilityFactoryBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelDisutilityFactory.class).in(Singleton.class);
 		bindScoringFunctionFactory().to(BicycleScoringFunctionFactory.class).in(Singleton.class);
-        bind(BicycleLinkSpeedCalculator.class);
-		
-		if (bicycleConfigGroup.isMotorizedInteraction()) {
+
+        if (bicycleConfigGroup.isMotorizedInteraction()) {
 			addMobsimListenerBinding().to(MotorizedInteractionEngine.class);
 		}
         addControlerListenerBinding().to(ConsistencyCheck.class);
@@ -93,24 +88,4 @@ public final class BicycleModule extends AbstractModule {
             }
         }
     }
-
-	static class QNetworkFactoryProvider implements Provider<QNetworkFactory> {
-
-		@Inject
-		private Scenario scenario;
-
-		@Inject
-		private EventsManager events;
-
-		@Inject
-		private BicycleLinkSpeedCalculator calculator;
-
-		@Override
-		public QNetworkFactory get() {
-			final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
-			factory.setLinkSpeedCalculator(calculator);
-			return factory;
-		}
-	}
-	
 }

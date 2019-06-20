@@ -148,7 +148,6 @@ class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring {
 	// Copied and adapted from CharyparNagelLegScoring
 	private double computeTimeDistanceBasedScoreComponent( double travelTime, double dist ) {
 		double tmpScore = 0.0;
-		//BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) scenario.getConfig().getModules().get(BicycleConfigGroup.GROUP_NAME);
 		ModeUtilityParameters modeParams = this.params.modeParams.get(bicycleConfigGroup.getBicycleMode());
 		if (modeParams == null) {
 			throw new RuntimeException("no scoring parameters are defined for " + bicycleConfigGroup.getBicycleMode()) ;
