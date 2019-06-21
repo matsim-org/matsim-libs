@@ -35,13 +35,12 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.charts.XYLineChart;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.*;
@@ -99,9 +98,8 @@ public class CommercialTrafficAnalysisListener implements IterationEndsListener,
                         .filter(k -> k.getCarrierId().equals(carrierId))
                         .count());
             }
-            try {
-                BufferedWriter bw = IOUtils.getAppendingBufferedWriter(services.getControlerIO().getOutputFilename("output_marketshare_" + entry.getKey() + ".csv"));
-                CSVPrinter csvPrinter = new CSVPrinter(bw, CSVFormat.DEFAULT.withDelimiter(sep.charAt(0)));
+
+            try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(services.getControlerIO().getOutputFilename("output_marketshare_" + entry.getKey() + ".csv")), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND), CSVFormat.DEFAULT.withDelimiter(sep.charAt(0)))) {
                 if (firstIteration) {
                     csvPrinter.printRecord(carrierDeliveries.keySet());
                 }
@@ -114,8 +112,6 @@ public class CommercialTrafficAnalysisListener implements IterationEndsListener,
                     csvPrinter.print(format.format(value));
                 }
                 csvPrinter.println();
-                bw.flush();
-                bw.close();
 
 
             } catch (IOException e) {
@@ -170,24 +166,21 @@ public class CommercialTrafficAnalysisListener implements IterationEndsListener,
                     .filter(deliveryLogEntry -> deliveryLogEntry.getCarrierId().equals(carrier.getId()))
                     .mapToDouble(ScoreCommercialServices.DeliveryLogEntry::getTimeDifference)
                     .summaryStatistics();
-            BufferedWriter bw = IOUtils.getAppendingBufferedWriter(services.getControlerIO().getOutputFilename("carrierStats." + carrier.getId() + ".csv"));
-            try {
+
+            try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(services.getControlerIO().getOutputFilename("carrierStats." + carrier.getId() + ".csv")), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND), CSVFormat.DEFAULT.withDelimiter(sep.charAt(0)))) {
                 if (firstIteration) {
-                    bw.write("Iteration" + sep + "Carrier" + sep + "Tours" + sep + "Total Distance (km)" + sep + "Average Tour Distance (km)" + sep + "Deliveries" + sep + "AverageScore" + sep + "TotalScore" + sep + "AverageDelay" + sep + "MaximumDelay");
+                    csvPrinter.printRecord("Iteration", "Carrier", "Tours", "Total Distance (km)", "Average Tour Distance (km)", "Deliveries", "AverageScore", "TotalScore", "AverageDelay", "MaximumDelay");
                 }
-                bw.newLine();
-                bw.write(event.getIteration() + sep +
-                        carrier.getId() + sep +
-                        distances.getCount() + sep +
-                        format.format(distances.getSum() / 1000.) + sep +
-                        format.format(distances.getAverage() / 1000.) + sep +
-                        scores.getCount() + sep +
-                        format.format(scores.getAverage()) + sep +
-                        format.format(scores.getSum()) + sep +
-                        format.format(timeDerivations.getAverage()) + sep +
+                csvPrinter.printRecord(event.getIteration(),
+                        carrier.getId(),
+                        distances.getCount(),
+                        format.format(distances.getSum() / 1000.),
+                        format.format(distances.getAverage() / 1000.),
+                        scores.getCount(),
+                        format.format(scores.getAverage()),
+                        format.format(scores.getSum()),
+                        format.format(timeDerivations.getAverage()),
                         timeDerivations.getMax());
-                bw.flush();
-                bw.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
