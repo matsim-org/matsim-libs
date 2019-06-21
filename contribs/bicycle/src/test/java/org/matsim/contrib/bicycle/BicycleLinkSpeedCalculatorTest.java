@@ -78,10 +78,10 @@ public class BicycleLinkSpeedCalculatorTest {
         Link linkForComparison = createLinkWithNoGradientAndNoSpecialSurface();
         Link linkWithGradient = createLink(100, "paved", "not-a-cycle-way", 1.0);
 
-        BicycleLinkSpeedCalculator travelTime = new BicycleLinkSpeedCalculator(configGroup);
+		BicycleLinkSpeedCalculator calculator = new BicycleLinkSpeedCalculator(configGroup);
 
-        double comparisonSpeed = travelTime.getMaximumVelocityForLink(linkForComparison);
-        double gradientSpeed = travelTime.getMaximumVelocityForLink(linkWithGradient);
+		double comparisonSpeed = calculator.getMaximumVelocityForLink(linkForComparison);
+		double gradientSpeed = calculator.getMaximumVelocityForLink(linkWithGradient);
 
         assertTrue(comparisonSpeed > gradientSpeed);
     }
@@ -92,10 +92,10 @@ public class BicycleLinkSpeedCalculatorTest {
         Link linkForComparison = createLinkWithNoGradientAndNoSpecialSurface();
         Link linkWithReducedSpeed = createLink(0, "paved", "not-a-cycle-way", 0.5);
 
-        BicycleLinkSpeedCalculator travelTime = new BicycleLinkSpeedCalculator(configGroup);
+		BicycleLinkSpeedCalculator calculator = new BicycleLinkSpeedCalculator(configGroup);
 
-        double comparisonSpeed = travelTime.getMaximumVelocityForLink(linkForComparison);
-        double gradientSpeed = travelTime.getMaximumVelocityForLink(linkWithReducedSpeed);
+		double comparisonSpeed = calculator.getMaximumVelocityForLink(linkForComparison);
+		double gradientSpeed = calculator.getMaximumVelocityForLink(linkWithReducedSpeed);
 
         assertTrue(comparisonSpeed > gradientSpeed);
     }
@@ -106,10 +106,10 @@ public class BicycleLinkSpeedCalculatorTest {
         Link linkForComparison = createLinkWithNoGradientAndNoSpecialSurface();
         Link linkWithCobbleStone = createLink(0, "cobblestone", "not-a-cycle-way", 1.0);
 
-        BicycleLinkSpeedCalculator travelTime = new BicycleLinkSpeedCalculator(configGroup);
+		BicycleLinkSpeedCalculator calculator = new BicycleLinkSpeedCalculator(configGroup);
 
-        double comparisonSpeed = travelTime.getMaximumVelocityForLink(linkForComparison);
-        double gradientSpeed = travelTime.getMaximumVelocityForLink(linkWithCobbleStone);
+		double comparisonSpeed = calculator.getMaximumVelocityForLink(linkForComparison);
+		double gradientSpeed = calculator.getMaximumVelocityForLink(linkWithCobbleStone);
 
         assertTrue(comparisonSpeed > gradientSpeed);
     }
@@ -120,10 +120,10 @@ public class BicycleLinkSpeedCalculatorTest {
         Link linkForComparison = createLinkWithNoGradientAndNoSpecialSurface();
         Link linkWithCobbleStone = createLink(0, "some-surface", BicycleLabels.CYCLEWAY, 1.0);
 
-        BicycleLinkSpeedCalculator travelTime = new BicycleLinkSpeedCalculator(configGroup);
+		BicycleLinkSpeedCalculator calculator = new BicycleLinkSpeedCalculator(configGroup);
 
-        double comparisonSpeed = travelTime.getMaximumVelocityForLink(linkForComparison);
-        double gradientSpeed = travelTime.getMaximumVelocityForLink(linkWithCobbleStone);
+		double comparisonSpeed = calculator.getMaximumVelocityForLink(linkForComparison);
+		double gradientSpeed = calculator.getMaximumVelocityForLink(linkWithCobbleStone);
 
         assertEquals(comparisonSpeed, gradientSpeed, 0.0);
     }
