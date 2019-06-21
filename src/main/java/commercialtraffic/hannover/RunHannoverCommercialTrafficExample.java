@@ -50,17 +50,16 @@ public class RunHannoverCommercialTrafficExample {
         String runId = "haj-delivery";
 
         Config config = ConfigUtils.loadConfig(args[0], new CommercialTrafficConfigGroup());
+        config.controler().setOutputDirectory("output\\" + runId);
+        config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+        config.controler().setRunId(runId);
+
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
         adjustPtNetworkCapacity(scenario.getNetwork(), config.qsim().getFlowCapFactor());
 
         Controler controler = new Controler(scenario);
-        config.controler().setOutputDirectory("output\\" + runId);
-        config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-        config.controler().setRunId(runId);
-        config.controler().setWritePlansInterval(50);
-        config.controler().setWriteEventsInterval(50);
-        config.controler().setLastIteration(50); //Number of simulation iterations
+
 
         // tell the system to use the congested car router for the ride mode:
         controler.addOverridingModule(new AbstractModule() {

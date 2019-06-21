@@ -38,7 +38,7 @@ public class SampleFreightPlans {
 
     public static void main(String[] args) {
         String inputFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/commercialtraffic/example/data_from_VW/parcel_demand_0.1.xml.gz";
-        String outputFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/commercialtraffic/example/input/parcel_agents_0.1.xml.gz";
+        String outputFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/commercialtraffic/example/input/all_agents_0.1.xml.gz";
 
         List<String> operators = Arrays.asList("op1", "op2", "op3", "op4");
         Random random = MatsimRandom.getRandom();
@@ -62,8 +62,9 @@ public class SampleFreightPlans {
                                 a.getAttributes().putAttribute(PersonDelivery.DELIEVERY_TIME_END, timeWindowEnd);
                             }
                         });
-                spw.run(person);
+//                spw.run(person); //samples only agents with activities
             }
+            spw.run(person);
         });
 
         spr.readFile(inputFile);
