@@ -11,7 +11,8 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 public class BicycleQSimModule extends AbstractQSimModule {
     @Override
     protected void configureQSim() {
-        bind(BicycleLinkSpeedCalculator.class);
+        // if used together with BicyclesModule the BicycleLinkSpeedCalculator is already bound.
+        // otherwise it would have to be bound here
         bind(QNetworkFactory.class).toProvider(QNetworkFactoryProvider.class);
     }
 

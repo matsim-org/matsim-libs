@@ -48,6 +48,7 @@ public final class BicycleModule extends AbstractModule {
 		addTravelTimeBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelTime.class).in(Singleton.class);
 		addTravelDisutilityFactoryBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelDisutilityFactory.class).in(Singleton.class);
 		bindScoringFunctionFactory().to(BicycleScoringFunctionFactory.class).in(Singleton.class);
+		bind(BicycleLinkSpeedCalculator.class);
 
         if (bicycleConfigGroup.isMotorizedInteraction()) {
 			addMobsimListenerBinding().to(MotorizedInteractionEngine.class);
