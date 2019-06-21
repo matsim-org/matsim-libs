@@ -29,6 +29,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,7 +44,7 @@ public class PersonDelivery {
     public static final String SERVICE_OPERATOR = "operator";
     public static final String DELIEVERY_TIME_END = "deliveryTimeEnd";
 
-    private static final String CARRIERSPLIT = "_";
+    public static final String CARRIERSPLIT = "_";
 
 
     public static Id<Carrier> getCarrierId(Activity activity) {
@@ -90,4 +93,24 @@ public class PersonDelivery {
                 .filter(Activity.class::isInstance)
                 .anyMatch(planElement -> planElement.getAttributes().getAsMap().containsKey(DELIEVERY_TYPE));
     }
+
+    public static String getCarrierMarket(Id<Carrier> carrierId) {
+        return carrierId.toString().split(CARRIERSPLIT)[0];
+    }
+
+    public static String getCarrierOperator(Id<Carrier> carrierId) {
+        return carrierId.toString().split(CARRIERSPLIT)[1];
+    }
+
+    public static Map<String, Set<Id<Carrier>>> splitCarriersByMarket(Carriers carriers) {
+        Map<String, Set<Id<Carrier>>> carriersSplitByMarket = new HashMap<>();
+        for (Id<Carrier> carrierId : carriers.getCarriers().keySet()) {
+            String market = getCarrierMarket(carrierId);
+            Set<Id<Carrier>> carriersForMarket = carriersSplitByMarket.getOrDefault(market, new HashSet<>());
+            carriersForMarket.add(carrierId);
+            carriersSplitByMarket.put(market, carriersForMarket);
+        }
+        return carriersSplitByMarket;
+    }
+
 }

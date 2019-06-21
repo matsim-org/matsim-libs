@@ -27,6 +27,7 @@ import com.graphhopper.jsprit.core.algorithm.termination.VariationCoefficientTer
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
+import commercialtraffic.integration.CommercialTrafficChecker;
 import commercialtraffic.integration.CommercialTrafficConfigGroup;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -94,7 +95,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
         this.population = scenario.getPopulation();
         maxIterations = ctcg.getJspritIterations();
         carTT = travelTimes.get(TransportMode.car);
-        if (DeliveryConsistencyChecker.hasMissingAttributes(population)) {
+        if (CommercialTrafficChecker.hasMissingAttributes(population)) {
             throw new RuntimeException("Not all agents expectingg deliveries contain all required attributes fo receival. Please check the log for DeliveryConsistencyChecker. Aborting.");
         }
 

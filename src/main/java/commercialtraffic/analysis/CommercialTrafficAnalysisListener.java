@@ -26,6 +26,7 @@ import commercialtraffic.deliveryGeneration.PersonDelivery;
 import commercialtraffic.scoring.ScoreCommercialServices;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.core.controler.MatsimServices;
@@ -33,6 +34,7 @@ import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -42,10 +44,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.DoubleSummaryStatistics;
-import java.util.Locale;
+import java.util.*;
 
 
 public class CommercialTrafficAnalysisListener implements IterationEndsListener, BeforeMobsimListener {
@@ -64,6 +63,7 @@ public class CommercialTrafficAnalysisListener implements IterationEndsListener,
 
     private boolean firstIteration = true;
     private String sep = ";";
+    private Map<String, Map<Id<Carrier>, Map<Integer, Double>>> carrierShareHistories = new HashMap<>();
 
     DecimalFormat format = new DecimalFormat();
 
@@ -77,8 +77,62 @@ public class CommercialTrafficAnalysisListener implements IterationEndsListener,
 
         writeIterationCarrierStats(event);
         writeDeliveryStats(services.getControlerIO().getIterationFilename(event.getIteration(), "deliveryStats.csv"));
-
+        analyzeCarrierMarketShares(event.getIteration());
+        
         firstIteration = false;
+
+    }
+
+    private void analyzeCarrierMarketShares(int iteration) {
+
+
+        Map<String, Set<Id<Carrier>>> splitCarriersByMarket = PersonDelivery.splitCarriersByMarket(carriers);
+
+
+        for (Map.Entry<String, Set<Id<Carrier>>> entry : splitCarriersByMarket.entrySet()) {
+            Map<Id<Carrier>, Map<Integer, Double>> marketShareHistory = carrierShareHistories.getOrDefault(entry.getKey(), new HashMap<>());
+            carrierShareHistories.put(entry.getKey(), marketShareHistory);
+
+            Map<Id<Carrier>, Long> carrierDeliveries = new TreeMap<>();
+            for (Id<Carrier> carrierId : entry.getValue()) {
+                carrierDeliveries.put(carrierId, scoreCommercialServices.getLogEntries().stream()
+                        .filter(k -> k.getCarrierId().equals(carrierId))
+                        .count());
+            }
+            try {
+                BufferedWriter bw = IOUtils.getAppendingBufferedWriter(services.getControlerIO().getOutputFilename("output_marketshare_" + entry.getKey() + ".csv"));
+                CSVPrinter csvPrinter = new CSVPrinter(bw, CSVFormat.DEFAULT.withDelimiter(sep.charAt(0)));
+                if (firstIteration) {
+                    csvPrinter.printRecord(carrierDeliveries.keySet());
+                }
+                double sum = carrierDeliveries.values().stream().mapToDouble(Long::doubleValue).sum();
+                for (Map.Entry<Id<Carrier>, Long> del : carrierDeliveries.entrySet()) {
+                    Map<Integer, Double> history = marketShareHistory.getOrDefault(del.getKey(), new HashMap<>());
+                    marketShareHistory.put(del.getKey(), history);
+                    final double value = sum > 0 ? del.getValue() / sum : 0.0;
+                    history.put(iteration, value);
+                    csvPrinter.print(format.format(value));
+                }
+                csvPrinter.println();
+                bw.flush();
+                bw.close();
+
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            XYLineChart chart = new XYLineChart(entry.getKey() + " Carrier market Share Statistics", "iteration", "mode");
+            for (Map.Entry<Id<Carrier>, Map<Integer, Double>> idMapEntry : marketShareHistory.entrySet()) {
+                String carrier = idMapEntry.getKey().toString();
+                Map<Integer, Double> history = idMapEntry.getValue();
+                chart.addSeries(carrier, history);
+            }
+            chart.addMatsimLogo();
+            chart.saveAsPng(services.getControlerIO().getOutputFilename("output_marketshare_" + entry.getKey() + ".png"), 800, 600);
+
+        }
+
 
     }
 

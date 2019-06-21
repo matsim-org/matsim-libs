@@ -50,7 +50,10 @@ public class CommercialTrafficModule extends AbstractModule {
         CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
         new CarrierVehicleTypeReader(vehicleTypes).readFile(ctcg.getCarriersVehicleTypesFileUrl(getConfig().getContext()).getFile());
         new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
-
+        if (CommercialTrafficChecker.checkCarrierConsistency(carriers)) {
+            throw new RuntimeException("Carrier definition is invalid. Please check the log for details.");
+        }
+        ;
         bind(DeliveryScoreCalculator.class).toInstance(new DefaultCommercialServiceScore(ctcg.getMaxDeliveryScore(), ctcg.getMinDeliveryScore(), ctcg.getZeroUtilityDelay()));
         bind(Carriers.class).toInstance(carriers);
         bind(ScoreCommercialServices.class).asEagerSingleton();
@@ -64,7 +67,6 @@ public class CommercialTrafficModule extends AbstractModule {
             Config config;
             @Inject
             Carriers carriers;
-
             @Override
             public PlanStrategy get() {
                 final PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
