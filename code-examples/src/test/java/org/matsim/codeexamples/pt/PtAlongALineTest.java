@@ -352,6 +352,8 @@ public class PtAlongALineTest{
 	static Config createConfig( String outputDir ){
 		Config config = ConfigUtils.createConfig() ;
 
+		config.global().setNumberOfThreads( 1 );
+
 		config.controler().setOutputDirectory( outputDir ) ;
 		config.controler().setLastIteration( 0 );
 
@@ -667,7 +669,7 @@ public class PtAlongALineTest{
 		new FleetWriter(vehicles.stream()).write(taxisFile);
 	}
 
-	static void addDrtModeToAllLinksBtwnGivenNodes( Network network, int fromNodeNumber, int toNodeNumber, String drtMode ) {
+	static void addModeToAllLinksBtwnGivenNodes( Network network, int fromNodeNumber, int toNodeNumber, String drtMode ) {
 		for (int i = fromNodeNumber; i < toNodeNumber; i++) {
 			Set<String> newAllowedModes = new HashSet<>( network.getLinks().get( Id.createLinkId( i + "-" + (i + 1) ) ).getAllowedModes() );
 			newAllowedModes.add(drtMode);

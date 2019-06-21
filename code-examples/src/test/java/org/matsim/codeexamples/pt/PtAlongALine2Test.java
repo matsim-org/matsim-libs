@@ -24,7 +24,6 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehiclesFactory;
@@ -37,11 +36,10 @@ public class PtAlongALine2Test{
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	enum DrtMode { none, teleportBeeline, teleportBasedOnNetworkRoute, full }
-	private DrtMode drtMode = DrtMode.teleportBasedOnNetworkRoute ;
+	private DrtMode drtMode = DrtMode.full ;
 
 	@Test
 	public void testPtAlongALineWithRaptorAndDrtServiceArea() {
-
 
 		Config config = PtAlongALineTest.createConfig( utils.getOutputDirectory() );
 
@@ -52,23 +50,22 @@ public class PtAlongALine2Test{
 			case none:
 				break;
 			case teleportBeeline:
+				// (configure teleportation router)
 			{
 				PlansCalcRouteConfigGroup.ModeRoutingParams pars = new PlansCalcRouteConfigGroup.ModeRoutingParams();
 				pars.setMode( TransportMode.drt );
 				pars.setTeleportedModeSpeed( 100. / 3.6 );
 				config.plansCalcRoute().addModeRoutingParams( pars );
+			}{
+				PlansCalcRouteConfigGroup.ModeRoutingParams pars = new PlansCalcRouteConfigGroup.ModeRoutingParams();
+				pars.setMode( "drt2" );
+				pars.setTeleportedModeSpeed( 100. / 3.6 );
+				config.plansCalcRoute().addModeRoutingParams( pars );
 			}
-//			{
-//				PlansCalcRouteConfigGroup.ModeRoutingParams pars = new PlansCalcRouteConfigGroup.ModeRoutingParams();
-//				pars.setMode( "drt2" );
-//				pars.setTeleportedModeSpeed( 100. / 3.6 );
-//				config.plansCalcRoute().addModeRoutingParams( pars );
-//			}
 			break;
 			case teleportBasedOnNetworkRoute: {
-//				config.plansCalcRoute().removeModeRoutingParams( TransportMode.walk );
+				// (route as network route)
 				Set<String> networkModes = new HashSet<>( config.plansCalcRoute().getNetworkModes() );
-//				networkModes.add( TransportMode.walk ) ;
 				networkModes.add( TransportMode.drt );
 				networkModes.add( "drt2" );
 				config.plansCalcRoute().setNetworkModes( networkModes );
@@ -81,25 +78,16 @@ public class PtAlongALine2Test{
 
 		config.plansCalcRoute().setInsertingAccessEgressWalk( true );
 
-		switch( drtMode ) {
-			case none:
-				break;
-			case teleportBeeline:
-			case teleportBasedOnNetworkRoute:
-			case full:
+		if ( drtMode!=DrtMode.none ) {
+			// (scoring parameters for drt modes)
 			{
 				PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.drt);
 				config.planCalcScore().addModeParams(modeParams);
-			}
-			{
+			}{
 				PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("drt2");
 				config.planCalcScore().addModeParams(modeParams);
 			}
-				break;
-			default:
-				throw new IllegalStateException( "Unexpected value: " + drtMode );
 		}
-
 
 		config.qsim().setVehiclesSource( QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData );
 		// (as of today, will also influence router. kai, jun'19)
@@ -107,6 +95,8 @@ public class PtAlongALine2Test{
 		config.controler().setLastIteration( 0 );
 
 		{
+			// (raptor config)
+
 			SwissRailRaptorConfigGroup configRaptor = ConfigUtils.addOrGetModule( config, SwissRailRaptorConfigGroup.class ) ;
 
 			// Walk
@@ -143,10 +133,11 @@ public class PtAlongALine2Test{
 
 		}
 
-
-		String drtVehiclesFile = "drt_vehicles.xml";
-		String drt2VehiclesFile = "drt2_vehicles.xml";
 		if ( drtMode==DrtMode.full ){
+			// (configure full drt if applicable)
+
+			String drtVehiclesFile = "drt_vehicles.xml";
+			String drt2VehiclesFile = "drt2_vehicles.xml";
 
 			DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
 			// TODO: How can we set the network mode of drt2?
@@ -161,6 +152,7 @@ public class PtAlongALine2Test{
 				drtConfig.setMaxTravelTimeBeta( 5. * 60. );
 				drtConfig.setStopDuration( 60. );
 				drtConfig.setMaxWaitTime( Double.MAX_VALUE );
+				drtConfig.setRequestRejection( false );
 				drtConfig.setMode( TransportMode.drt );
 				mm.addParameterSet( drtConfig );
 			}
@@ -178,6 +170,12 @@ public class PtAlongALine2Test{
 			for( DrtConfigGroup drtConfigGroup : mm.getModalElements() ){
 				DrtConfigs.adjustDrtConfig( drtConfigGroup, config.planCalcScore() );
 			}
+
+			// TODO: avoid really writing out these files. However so far it is unclear how
+			// to configure DRT and load the vehicles otherwise
+			PtAlongALineTest.createDrtVehiclesFile(drtVehiclesFile, "DRT-", 10, Id.createLinkId("0-1" ) );
+			PtAlongALineTest.createDrtVehiclesFile(drt2VehiclesFile, "DRT2-", 1, Id.createLinkId("1000-999" ) );
+
 		}
 
 		// ---
@@ -189,16 +187,12 @@ public class PtAlongALine2Test{
 		Scenario scenario = PtAlongALineTest.createScenario(config , 100 );
 
 		if ( drtMode==DrtMode.full ) {
-				scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory( DrtRoute.class, new DrtRouteFactory() );
-				// TODO: avoid really writing out these files. However so far it is unclear how
-				// to configure DRT and load the vehicles otherwise
-				PtAlongALineTest.createDrtVehiclesFile(drtVehiclesFile, "DRT-", 10, Id.createLinkId("0-1" ) );
-				PtAlongALineTest.createDrtVehiclesFile(drt2VehiclesFile, "DRT2-", 1, Id.createLinkId("1000-999" ) );
+			scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory( DrtRoute.class, new DrtRouteFactory() );
 		}
 
 //		// TODO: reference somehow network creation, to ensure that these link ids exist
 //		// add drt modes to the car links' allowed modes in their respective service area
-		PtAlongALineTest.addDrtModeToAllLinksBtwnGivenNodes(scenario.getNetwork(), 0, 1000, TransportMode.drt );
+		PtAlongALineTest.addModeToAllLinksBtwnGivenNodes(scenario.getNetwork(), 0, 1000, TransportMode.drt );
 //		PtAlongALineTest.addDrtModeToAllLinksBtwnGivenNodes(scenario.getNetwork(), 950, 1000, "drt2" );
 
 
@@ -208,20 +202,13 @@ public class PtAlongALine2Test{
 			VehicleType vehType = vf.createVehicleType( Id.create( "drt2", VehicleType.class ) );
 			vehType.setMaximumVelocity( 50./3.6 );
 			scenario.getVehicles().addVehicleType( vehType );
-		}
-		{
+		}{
 			VehicleType vehType = vf.createVehicleType( Id.create( TransportMode.drt, VehicleType.class ) );
 			vehType.setMaximumVelocity( 50./3.6 );
 			scenario.getVehicles().addVehicleType( vehType );
-		}
-		{
+		}{
 			VehicleType vehType = vf.createVehicleType( Id.create( TransportMode.car, VehicleType.class ) );
 			vehType.setMaximumVelocity( 50./3.6 );
-			scenario.getVehicles().addVehicleType( vehType );
-		}
-		{
-			VehicleType vehType = vf.createVehicleType( Id.create( TransportMode.walk, VehicleType.class ) );
-			vehType.setMaximumVelocity( 4./3.6 );
 			scenario.getVehicles().addVehicleType( vehType );
 		}
 
