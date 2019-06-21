@@ -10,7 +10,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
-public class CommercialTrafficIT {
+public class CommercialTrafficIntegrationTest {
 
     @Test
     public void runCommercialTrafficIT() {
