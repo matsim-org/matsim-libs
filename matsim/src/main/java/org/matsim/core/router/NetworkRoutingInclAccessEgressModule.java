@@ -176,7 +176,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 												   final Link egressActLink, double now, final List<PlanElement> result,
 												   final PopulationFactory populationFactory, final String stageActivityType ) {
 
-		log.warn( "do bushwhacking leg to facility=" + toFacility.toString() ) ;
+		log.debug( "do bushwhacking leg from link=" + egressActLink.getId() + " to facility=" + toFacility.toString() ) ;
 
 		if( isNotNeedingBushwhackingLeg( toFacility ) ) {
 			return;

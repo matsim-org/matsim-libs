@@ -161,7 +161,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		@Override
 		public RoutingModule get() {
 			if ( config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
-				return new DrtRoutingInclAccessEgressModule( drtCfg, network, travelTime, getModalInstance( TravelDisutilityFactory.class ),
+				return new DrtInclAccessEgressRoutingModule( drtCfg, network, travelTime, getModalInstance( TravelDisutilityFactory.class ),
 					  populationFactory, walkRouter );
 			} else{
 				return new DrtRoutingModule( drtCfg, network, travelTime, getModalInstance( TravelDisutilityFactory.class ),
