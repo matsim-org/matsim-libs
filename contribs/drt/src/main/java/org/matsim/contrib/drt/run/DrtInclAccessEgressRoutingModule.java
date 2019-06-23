@@ -68,7 +68,7 @@ public class DrtInclAccessEgressRoutingModule implements RoutingModule {
 						    @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
 						    TravelDisutilityFactory travelDisutilityFactory, PopulationFactory populationFactory,
 						    @Named(TransportMode.walk) RoutingModule walkRouter ) {
-//		LOGGER.setLevel( Level.DEBUG );
+		LOGGER.setLevel( Level.DEBUG );
 
 		this.drtCfg = drtCfg;
 		this.network = network;
@@ -84,8 +84,7 @@ public class DrtInclAccessEgressRoutingModule implements RoutingModule {
 	}
 
 	@Override
-	public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime,
-			Person person) {
+	public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime, Person person) {
 		LOGGER.debug( "entering calcRoute ..." );
 		LOGGER.debug("fromFacility=" + fromFacility.toString() ) ;
 		LOGGER.debug( "toFacility=" + toFacility.toString() );
