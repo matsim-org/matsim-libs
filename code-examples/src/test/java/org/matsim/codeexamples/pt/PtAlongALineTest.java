@@ -348,6 +348,7 @@ public class PtAlongALineTest{
 		visConfig.setAgentSize(125);
 		visConfig.setLinkWidth(30);
 		visConfig.setShowTeleportedAgents( true );
+		visConfig.setDrawTransitFacilities( true );
 //		{
 //			BufferedImage image = null ;
 //			Rectangle2D zoomstore = new Rectangle2D.Double( 0., 0., +100.*1000., +10.*1000. ) ;
