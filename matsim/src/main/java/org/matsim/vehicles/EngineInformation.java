@@ -19,18 +19,22 @@
 
 package org.matsim.vehicles;
 
+import org.matsim.utils.objectattributes.attributable.Attributable;
+
 /**
  * @author dgrether
  */
-public interface EngineInformation {
+public interface EngineInformation extends Attributable {
 
 	public enum FuelType {diesel, gasoline, electricity, biodiesel}
 
+	@Deprecated // use VehicleUtils... method instead
 	public FuelType getFuelType();
 
 	@Deprecated // use VehicleUtils... method instead
 	public double getFuelConsumption();
 
+	@Deprecated // use VehicleUtils... method instead
 	public void setFuelType(FuelType fueltype);
 
 	@Deprecated // use VehicleUtils... method instead

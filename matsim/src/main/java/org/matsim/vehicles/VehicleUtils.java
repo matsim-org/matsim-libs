@@ -146,8 +146,13 @@ public class VehicleUtils {
 	}
 
 	public static String getHbefaTechnology(VehicleType vehicleType){
-		final Object attribute = vehicleType.getAttributes().getAttribute(HBEFA_TECHNOLOGY);
-		return (String) attribute;
+//		final Object attribute = vehicleType.getAttributes().getAttribute(HBEFA_TECHNOLOGY);
+//		return (String) attribute;
+		return getHbefaTechnology( vehicleType.getEngineInformation() ) ;
+	}
+
+	public static String getHbefaTechnology( EngineInformation ei ){
+		return (String) ei.getAttributes().getAttribute( HBEFA_TECHNOLOGY ) ;
 	}
 
 	public static void setHbefaTechnology(VehicleType vehicleType, String hbefaTechnology){

@@ -19,6 +19,8 @@
 
 package org.matsim.vehicles;
 
+import org.matsim.utils.objectattributes.attributable.Attributes;
+
 /**
  * @author dgrether
  */
@@ -26,6 +28,7 @@ public class EngineInformationImpl implements EngineInformation {
 
 	private FuelType fuelType;
 	private double gasConsumption;
+	private Attributes attributes = new Attributes() ;
 
 	/**
 	 *
@@ -66,4 +69,7 @@ public class EngineInformationImpl implements EngineInformation {
 		this.gasConsumption = literPerMeter ;
 	}
 
+	@Override public Attributes getAttributes(){
+		return attributes ;
+	}
 }

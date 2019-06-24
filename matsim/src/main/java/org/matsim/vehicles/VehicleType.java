@@ -35,7 +35,7 @@ public class VehicleType implements Attributable {
 	private double flowEfficiencyFactor = 1.0;
 	private EngineInformation engineInformation;
 	private CostInformation costInformation;
-	private FreightCapacity freightCapacity;
+//	private FreightCapacity freightCapacity;
 	private String description;
 	private VehicleCapacity capacity;
 	private String networkMode = "car";
@@ -142,7 +142,7 @@ public class VehicleType implements Attributable {
 	}
 
 	public void setFreightCapacity(FreightCapacity freightCapacity) {
-		this.freightCapacity = freightCapacity;
+		this.capacity.setFreightCapacity( freightCapacity );
 	}
 
 	public void setCostInformation(CostInformation costInformation) {
@@ -182,7 +182,7 @@ public class VehicleType implements Attributable {
 	}
 
 	public FreightCapacity getFreightCapacity() {
-		return freightCapacity;
+		return this.capacity.getFreightCapacity();
 	}
 
     public String getNetworkMode() {
