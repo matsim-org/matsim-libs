@@ -50,7 +50,7 @@ public class RunHannoverCommercialTrafficExample {
         String runId = "haj-delivery";
 
         Config config = ConfigUtils.loadConfig(args[0], new CommercialTrafficConfigGroup());
-        config.controler().setOutputDirectory("output\\" + runId);
+        config.controler().setOutputDirectory("output/" + runId);
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         config.controler().setRunId(runId);
 
