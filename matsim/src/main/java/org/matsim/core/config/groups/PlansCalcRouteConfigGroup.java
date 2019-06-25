@@ -146,11 +146,13 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 
 		/**
 		 * Currently not in xml interface.
-		 * 
+		 *
 		 * @param teleportedModeFreespeedLimit -- {@value #TELEPORTED_MODE_FREESPEED_LIMIT_CMT}
+		 * @return
 		 */
-		public final void setTeleportedModeFreespeedLimit(Double teleportedModeFreespeedLimit) {
+		public final ModeRoutingParams setTeleportedModeFreespeedLimit( Double teleportedModeFreespeedLimit ) {
 			this.teleportedModeFreespeedLimit = teleportedModeFreespeedLimit;
+			return this ;
 		}
 
 		@StringGetter(MODE)
@@ -159,9 +161,10 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter(MODE)
-		public void setMode(String mode) {
+		public ModeRoutingParams setMode( String mode ) {
 			testForLocked() ;
 			this.mode = mode;
+			return this ;
 		}
 
 		@StringGetter( "teleportedModeSpeed" )
@@ -170,12 +173,13 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter( "teleportedModeSpeed" )
-		public void setTeleportedModeSpeed(Double teleportedModeSpeed) {
+		public ModeRoutingParams setTeleportedModeSpeed( Double teleportedModeSpeed ) {
 			testForLocked() ;
 			if ( getTeleportedModeFreespeedFactor() != null && teleportedModeSpeed != null ) {
 				throw new IllegalStateException( "cannot set both speed and freespeed factor for "+getMode() );
 			}
 			this.teleportedModeSpeed = teleportedModeSpeed;
+			return this ;
 		}
 		
 		/**
@@ -188,21 +192,24 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		
 		/**
 		 * @param teleportedModeFreespeedFactor -- {@value #TELEPORTED_MODE_FREESPEED_FACTOR_CMT}
+		 * @return
 		 */
 		@StringSetter(TELEPORTED_MODE_FREESPEED_FACTOR)
-		public void setTeleportedModeFreespeedFactor(
-				Double teleportedModeFreespeedFactor) {
+		public ModeRoutingParams setTeleportedModeFreespeedFactor(
+				Double teleportedModeFreespeedFactor ) {
 			testForLocked() ;
 			if ( getTeleportedModeSpeed() != null && teleportedModeFreespeedFactor != null ) {
 				throw new IllegalStateException( "cannot set both speed and freespeed factor for "+getMode() );
 			}
 			this.teleportedModeFreespeedFactor = teleportedModeFreespeedFactor;
+			return this ;
 		}
 		
 		@StringSetter("beelineDistanceFactor")
-		public void setBeelineDistanceFactor( Double val ) {
+		public ModeRoutingParams setBeelineDistanceFactor( Double val ) {
 			testForLocked() ;
 			this.beelineDistanceFactorForMode = val ;
+			return this ;
 		}
 		@StringGetter("beelineDistanceFactor")
 		public Double getBeelineDistanceFactor() {
