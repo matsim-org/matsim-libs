@@ -210,7 +210,7 @@ public final class EVNetworkRoutingModule implements RoutingModule {
 			if (consumption > 0) {
 				pseudoVehicle.getBattery().discharge(consumption);
 			} else {
-				pseudoVehicle.getBattery().discharge(-consumption);
+				pseudoVehicle.getBattery().charge(-consumption);
 			}
 			double currentSoc = pseudoVehicle.getBattery().getSoc();
 			// to accomodate for ERS, where energy charge is directly implemented in the consumption model
