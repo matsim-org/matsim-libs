@@ -118,7 +118,7 @@ public class BicycleLinkSpeedCalculatorTest {
     public void getMaximumVelocityForLink_withCycleWay() {
 
         Link linkForComparison = createLinkWithNoGradientAndNoSpecialSurface();
-        Link linkWithCobbleStone = createLink(0, "some-surface", BicycleLabels.CYCLEWAY, 1.0);
+        Link linkWithCobbleStone = createLink(0, "some-surface", BicycleUtils.CYCLEWAY, 1.0);
 
 		BicycleLinkSpeedCalculator calculator = new BicycleLinkSpeedCalculator(configGroup);
 
@@ -137,7 +137,7 @@ public class BicycleLinkSpeedCalculatorTest {
         Node toNode = NetworkUtils.createAndAddNode(unusedNetwork, Id.createNodeId(UUID.randomUUID().toString()), to);
         Link link = NetworkUtils.createAndAddLink(unusedNetwork, Id.createLinkId(UUID.randomUUID().toString()),
                 fromNode, toNode, length, 1000, 1000, 1);
-        link.getAttributes().putAttribute(BicycleLabels.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR, 1.0);
+        link.getAttributes().putAttribute(BicycleUtils.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR, 1.0);
         return link;
     }
 
@@ -151,9 +151,9 @@ public class BicycleLinkSpeedCalculatorTest {
         Node toNode = NetworkUtils.createAndAddNode(unusedNetwork, Id.createNodeId(UUID.randomUUID().toString()), to);
         Link link = NetworkUtils.createAndAddLink(unusedNetwork, Id.createLinkId(UUID.randomUUID().toString()),
                 fromNode, toNode, length, 1000, 1000, 1);
-        link.getAttributes().putAttribute(BicycleLabels.SURFACE, surfaceType);
-        link.getAttributes().putAttribute(BicycleLabels.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR, speedFactor);
-        link.getAttributes().putAttribute(BicycleLabels.WAY_TYPE, wayType);
+        link.getAttributes().putAttribute(BicycleUtils.SURFACE, surfaceType);
+        link.getAttributes().putAttribute(BicycleUtils.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR, speedFactor);
+        link.getAttributes().putAttribute(BicycleUtils.WAY_TYPE, wayType);
         return link;
     }
 }

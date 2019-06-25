@@ -31,7 +31,7 @@ import org.matsim.vehicles.VehicleType;
 /**
  * @author smetzler, dziemke
  */
-public final class BicycleModule extends AbstractModule {
+final class BicycleModule extends AbstractModule {
 	// necessary to have this public
 	
 	private static final Logger LOG = Logger.getLogger(BicycleModule.class);
@@ -39,7 +39,7 @@ public final class BicycleModule extends AbstractModule {
     @Inject
     private BicycleConfigGroup bicycleConfigGroup;
 
-	public BicycleModule() {
+	BicycleModule() {
 	}
 	
 	@Override

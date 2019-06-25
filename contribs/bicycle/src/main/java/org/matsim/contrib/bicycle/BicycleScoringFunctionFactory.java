@@ -34,7 +34,7 @@ import org.matsim.core.scoring.functions.*;
 /**
  * @author dziemke
  */
-public final class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
+final class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
 	// ok to have this public final when the constructor is package-private/injected: can only used through injection
 
 	@Inject

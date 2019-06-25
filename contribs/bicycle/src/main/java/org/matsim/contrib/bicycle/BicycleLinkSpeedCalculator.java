@@ -6,7 +6,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCa
 
 import javax.inject.Inject;
 
-public class BicycleLinkSpeedCalculator implements LinkSpeedCalculator {
+class BicycleLinkSpeedCalculator implements LinkSpeedCalculator {
 
 	@Inject
     private BicycleConfigGroup bicycleConfigGroup;
@@ -32,7 +32,7 @@ public class BicycleLinkSpeedCalculator implements LinkSpeedCalculator {
     }
 
 	double getMaximumVelocityForLink(Link link) {
-		if (hasNotAttribute(link, BicycleLabels.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR)) {
+		if (hasNotAttribute(link, BicycleUtils.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR)) {
 			throw new RuntimeException("Infrastructure speed factors must be set for all links that allow the bicycle mode!");
 		}
 
@@ -40,7 +40,7 @@ public class BicycleLinkSpeedCalculator implements LinkSpeedCalculator {
 		// double bicycleVelocity = vehicle.getType().getMaximumVelocity()
 
 		double maxBicycleSpeed = bicycleConfigGroup.getMaxBicycleSpeedForRouting();
-		double bicycleInfrastructureFactor = Double.parseDouble(link.getAttributes().getAttribute(BicycleLabels.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR).toString());
+		double bicycleInfrastructureFactor = Double.parseDouble(link.getAttributes().getAttribute(BicycleUtils.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR).toString());
 		double surfaceFactor = computeSurfaceFactor(link);
 		double gradientFactor = computeGradientFactor(link);
 		return maxBicycleSpeed * bicycleInfrastructureFactor * surfaceFactor * gradientFactor;
@@ -78,14 +78,14 @@ public class BicycleLinkSpeedCalculator implements LinkSpeedCalculator {
 
 	// TODO combine this with comfort
 	private double computeSurfaceFactor(Link link) {
-		if (hasNotAttribute(link, BicycleLabels.WAY_TYPE)
-				|| link.getAttributes().getAttribute(BicycleLabels.WAY_TYPE).equals(BicycleLabels.CYCLEWAY)
-				|| hasNotAttribute(link, BicycleLabels.SURFACE)
+		if (hasNotAttribute(link, BicycleUtils.WAY_TYPE)
+				|| link.getAttributes().getAttribute(BicycleUtils.WAY_TYPE).equals(BicycleUtils.CYCLEWAY)
+				|| hasNotAttribute(link, BicycleUtils.SURFACE)
 		) {
 			return 1.0;
 		}
 		//so, the link is NOT a cycleway, and has a surface attribute
-		String surface = link.getAttributes().getAttribute(BicycleLabels.SURFACE).toString();
+		String surface = link.getAttributes().getAttribute(BicycleUtils.SURFACE).toString();
 		switch (surface) {
 			case "paved":
 			case "asphalt":

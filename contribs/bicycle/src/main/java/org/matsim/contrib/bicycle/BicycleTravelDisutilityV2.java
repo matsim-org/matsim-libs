@@ -65,10 +65,10 @@ class BicycleTravelDisutilityV2 implements TravelDisutility {
 	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
 		// TODO Needed as long as network mode filtering kicks out attributes; remove when possible, dz, sep'17
 		Link linkWithAttributes = network.getLinks().get(link.getId());
-		
-		String surface = (String) linkWithAttributes.getAttributes().getAttribute(BicycleLabels.SURFACE);
+
+		String surface = (String) linkWithAttributes.getAttributes().getAttribute(BicycleUtils.SURFACE);
 		String type = (String) linkWithAttributes.getAttributes().getAttribute("type");
-		String cyclewaytype = (String) linkWithAttributes.getAttributes().getAttribute(BicycleLabels.CYCLEWAY);
+		String cyclewaytype = (String) linkWithAttributes.getAttributes().getAttribute(BicycleUtils.CYCLEWAY);
 
 		double distance = linkWithAttributes.getLength();
 		
