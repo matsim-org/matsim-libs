@@ -20,9 +20,6 @@
 
 package org.matsim.pt.router;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -31,6 +28,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Removes all transit activities (like "pt -interaction") as well as the legs
@@ -41,8 +41,12 @@ import org.matsim.pt.PtConstants;
  * 
  * @author mrieser
  */
-public class TransitActsRemover implements PlanAlgorithm {
 
+/**
+ * Consider using TripsToLegsAlgorithm instead to circumvene problems with different types of access / egress legs and stage activities.
+ */
+@Deprecated
+public class TransitActsRemover implements PlanAlgorithm {
 
 	public void run(final Plan plan) {
 		run(plan,false);
