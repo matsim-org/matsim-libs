@@ -45,6 +45,13 @@ public class ImmutableChargerSpecification implements ChargerSpecification {
 		chargerType = Objects.requireNonNull(builder.chargerType);
 		maxPower = Objects.requireNonNull(builder.maxPower);
 		plugCount = Objects.requireNonNull(builder.plugCount);
+
+		if (maxPower < 0) {
+			throw new IllegalArgumentException("Negative maxPower of charger: " + id);
+		}
+		if (plugCount < 0) {
+			throw new IllegalArgumentException("Negative plugCount of charger: " + id);
+		}
 	}
 
 	public static Builder newBuilder() {

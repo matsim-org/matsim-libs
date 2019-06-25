@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.parking.parkingsearch.manager.vehicleteleportationlogic;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -29,8 +30,6 @@ import org.matsim.contrib.parking.parkingsearch.search.RandomParkingSearchLogic;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.vehicles.Vehicle;
-
-import com.google.inject.Inject;
 
 /**
  * teleports vehicle to  a location near the agent, if vehicle is more than  a certain threshold in metres away
@@ -57,14 +56,14 @@ public class VehicleTeleportationToNearbyParking implements VehicleTeleportation
 	}
 
 	@Override
-	public Id<Link> getVehicleLocation(Id<Link> agentLinkId, Id<Vehicle> vehicleId, Id<Link> vehicleLinkId, double time) {
+	public Id<Link> getVehicleLocation(Id<Link> agentLinkId, Id<Vehicle> vehicleId, Id<Link> vehicleLinkId, double time, String mode) {
 		double walkDistance = CoordUtils.calcEuclideanDistance(network.getLinks().get(vehicleLinkId).getCoord(), network.getLinks().get(agentLinkId).getCoord()) * this.beelineDistanceFactor;
 		if (walkDistance<=this.maximumWalkDistance){
 			return vehicleLinkId;
 		} 
 		Id<Link> parkingLinkId = agentLinkId;
 		while (!this.manager.reserveSpaceIfVehicleCanParkHere(vehicleId, parkingLinkId)){
-			parkingLinkId = parkingLogic.getNextLink(parkingLinkId,vehicleId);
+			parkingLinkId = parkingLogic.getNextLink(parkingLinkId, vehicleId, mode);
 		}
 		manager.parkVehicleHere(vehicleId, parkingLinkId, time);
 		return parkingLinkId;

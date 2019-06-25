@@ -34,5 +34,5 @@ public interface VehicleTeleportationLogic {
 	/* 
 	 * Teleports the vehicle (if necessary) to a meaningful location for the agent.
 	 */
-	Id<Link> getVehicleLocation(Id<Link> agentLinkId, Id<Vehicle> vehicleId, Id<Link> vehicleLinkId, double time);
+	Id<Link> getVehicleLocation(Id<Link> agentLinkId, Id<Vehicle> vehicleId, Id<Link> vehicleLinkId, double time, String mode);
 }

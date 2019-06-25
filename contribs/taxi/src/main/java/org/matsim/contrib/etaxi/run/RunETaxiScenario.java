@@ -25,9 +25,11 @@ import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.etaxi.optimizer.ETaxiOptimizerProvider;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
+import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
 import org.matsim.contrib.ev.charging.ChargingLogic;
+import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
-import org.matsim.contrib.ev.charging.VariableSpeedCharging;
+import org.matsim.contrib.ev.charging.FixedSpeedCharging;
 import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
 import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
 import org.matsim.contrib.ev.dvrp.OperatingVehicleProvider;
@@ -44,11 +46,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class RunETaxiScenario {
-	private static final String CONFIG_FILE = "mielec_2014_02/mielec_etaxi_config.xml";
-	private static final double CHARGING_SPEED_FACTOR = 1.; // full speed
-	private static final double MAX_RELATIVE_SOC = 0.8;// up to 80% SOC
-	private static final double TEMPERATURE = 20;// oC
-
 	public static void run(String configFile, boolean otfvis) {
 		Config config = ConfigUtils.loadConfig(configFile,
 				new TaxiConfigGroup(ETaxiOptimizerProvider::createParameterSet), new DvrpConfigGroup(),
@@ -80,12 +77,11 @@ public class RunETaxiScenario {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(ChargingLogic.Factory.class).toInstance(
-						charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-								VariableSpeedCharging.createStrategyForNissanLeaf(
-										charger.getPower() * CHARGING_SPEED_FACTOR, MAX_RELATIVE_SOC)));
-
-				bind(TemperatureService.class).toInstance(linkId -> TEMPERATURE);
+				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
+						charger -> new ChargeUpToMaxSocStrategy(charger, 0.8)));
+				//TODO switch to VariableSpeedCharging for Nissan
+				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, 1.5));
+				bind(TemperatureService.class).toInstance(linkId -> 20);
 			}
 		});
 
@@ -100,6 +96,6 @@ public class RunETaxiScenario {
 		// String configFile = "./src/main/resources/one_etaxi/one_etaxi_config.xml";
 		// String configFile =
 		// "../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/mielec_etaxi_config.xml";
-		RunETaxiScenario.run(CONFIG_FILE, false);
+		RunETaxiScenario.run("mielec_2014_02/mielec_etaxi_config.xml", false);
 	}
 }

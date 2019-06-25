@@ -28,6 +28,8 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.DefaultVehicleHandler;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
@@ -119,6 +121,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		private final NetsimEngineContext context;
 		private final NetsimInternalInterface netsimEngine;
 		private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
+		private VehicleHandler vehicleHandler = new DefaultVehicleHandler();
 
 		public Builder(NetsimEngineContext context, NetsimInternalInterface netsimEngine ) {
 			this.context = context;
@@ -130,7 +133,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		}
 
 		AbstractQLink build(Link link, QNodeI toNodeQ, List<ModelLane> lanes ) {
-			return new QLinkLanesImpl(link, toNodeQ, lanes, context, netsimEngine, linkSpeedCalculator ) ;
+			return new QLinkLanesImpl(link, toNodeQ, lanes, context, netsimEngine, linkSpeedCalculator, vehicleHandler ) ;
 		}
 
 	}
@@ -170,8 +173,8 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	 * @param linkSpeedCalculator
 	 */
 	private QLinkLanesImpl(final Link link, final QNodeI toNodeQ, List<ModelLane> lanes, NetsimEngineContext context,
-				   NetsimInternalInterface netsimEngine, LinkSpeedCalculator linkSpeedCalculator) {
-		super(link, toNodeQ, context, netsimEngine, linkSpeedCalculator);
+				   NetsimInternalInterface netsimEngine, LinkSpeedCalculator linkSpeedCalculator, VehicleHandler vehicleHandler) {
+		super(link, toNodeQ, context, netsimEngine, linkSpeedCalculator, vehicleHandler);
 		this.context = context ;
 		this.toQueueNode = toNodeQ;
 		this.laneQueues = new LinkedHashMap<>();

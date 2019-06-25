@@ -20,21 +20,34 @@
 
 package org.matsim.contrib.ev.infrastructure;
 
+import java.util.Objects;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 
 public class ChargerImpl implements Charger {
-	private ChargerSpecification specification;
-	private final Link link;
-	private ChargingLogic logic;
-
 	/**
 	 * @param specification charger specification
 	 * @param link          link at which the charger is located
+	 * @param logicFactory  ChargingLogic factory
 	 */
-	public ChargerImpl(ChargerSpecification specification, Link link) {
+	public static Charger create(ChargerSpecification specification, Link link, ChargingLogic.Factory logicFactory) {
+		if (!link.getId().equals(specification.getLinkId())) {
+			throw new IllegalArgumentException("link.id != specification.linkId");
+		}
+
+		ChargerImpl charger = new ChargerImpl(specification, link);
+		charger.logic = Objects.requireNonNull(logicFactory.create(charger));
+		return charger;
+	}
+
+	private final ChargerSpecification specification;
+	private final Link link;
+	private ChargingLogic logic;
+
+	private ChargerImpl(ChargerSpecification specification, Link link) {
 		this.specification = specification;
 		this.link = link;
 	}
@@ -42,11 +55,6 @@ public class ChargerImpl implements Charger {
 	@Override
 	public ChargingLogic getLogic() {
 		return logic;
-	}
-
-	@Override
-	public void setLogic(ChargingLogic logic) {
-		this.logic = logic;
 	}
 
 	@Override
@@ -75,7 +83,7 @@ public class ChargerImpl implements Charger {
 	}
 
 	//TODO in order to add a separate coord: adapt DTD, ChargerSpecification and ChargerReader/Writer
-	// Aditionally, the reader and writer should convert coordinates if CRS different than that of the network
+	// Additionally, the reader and writer should convert coordinates if CRS different than that of the network
 	@Override
 	public Coord getCoord() {
 		return link.getCoord();

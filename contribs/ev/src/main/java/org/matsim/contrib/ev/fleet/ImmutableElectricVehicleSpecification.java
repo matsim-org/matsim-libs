@@ -44,6 +44,10 @@ public final class ImmutableElectricVehicleSpecification implements ElectricVehi
 		chargerTypes = Objects.requireNonNull(builder.chargerTypes);
 		initialSoc = Objects.requireNonNull(builder.initialSoc);
 		batteryCapacity = Objects.requireNonNull(builder.batteryCapacity);
+
+		if (initialSoc < 0 || initialSoc > batteryCapacity) {
+			throw new IllegalArgumentException("Invalid initialSoc/batteryCapacity of vehicle: " + id);
+		}
 	}
 
 	public static Builder newBuilder() {

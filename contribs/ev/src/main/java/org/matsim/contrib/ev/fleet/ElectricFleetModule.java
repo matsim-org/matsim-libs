@@ -21,15 +21,11 @@
 package org.matsim.contrib.ev.fleet;
 
 import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.charging.ChargingLogic;
+import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
-import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 import com.google.inject.Inject;
@@ -59,32 +55,18 @@ public class ElectricFleetModule extends AbstractModule {
 					private ElectricFleetSpecification fleetSpecification;
 					@Inject
 					private DriveEnergyConsumption.Factory driveConsumptionFactory;
-					@Inject(optional = true)
+					@Inject
 					private AuxEnergyConsumption.Factory auxConsumptionFactory;
+					@Inject
+					private ChargingPower.Factory chargingPowerFactory;
 
 					@Override
 					public ElectricFleet get() {
 						return ElectricFleets.createDefaultFleet(fleetSpecification, driveConsumptionFactory,
-								auxConsumptionFactory);
+								auxConsumptionFactory, chargingPowerFactory);
 					}
 				}).asEagerSingleton();
 			}
 		});
-
-		addControlerListenerBinding().to(InitAtIterationStart.class);
-	}
-
-	private static class InitAtIterationStart implements IterationStartsListener {
-		@Inject
-		private ChargingInfrastructure chargingInfrastructure;
-		@Inject
-		private ChargingLogic.Factory logicFactory;
-		@Inject
-		private EventsManager eventsManager;
-
-		@Override
-		public void notifyIterationStarts(IterationStartsEvent event) {
-			chargingInfrastructure.initChargingLogics(logicFactory, eventsManager);
-		}
 	}
 }

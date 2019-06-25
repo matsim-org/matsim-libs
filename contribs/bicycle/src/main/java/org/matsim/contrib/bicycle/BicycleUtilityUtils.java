@@ -46,13 +46,17 @@ class BicycleUtilityUtils {
 	
 	static double getGradientFactor( Link link ) {
 		double gradient = 0.;
-		Double fromNodeZ = link.getFromNode().getCoord().getZ();
-		Double toNodeZ = link.getToNode().getCoord().getZ();
-		if ((fromNodeZ != null) && (toNodeZ != null)) {
-			if (toNodeZ > fromNodeZ) { // No positive utility for downhill, only negative for uphill
-				gradient = (toNodeZ - fromNodeZ) / link.getLength();
+		
+		if (link.getFromNode().getCoord().hasZ() && link.getToNode().getCoord().hasZ()) {
+			Double fromNodeZ = link.getFromNode().getCoord().getZ();
+			Double toNodeZ = link.getToNode().getCoord().getZ();
+			if ((fromNodeZ != null) && (toNodeZ != null)) {
+				if (toNodeZ > fromNodeZ) { // No positive utility for downhill, only negative for uphill
+					gradient = (toNodeZ - fromNodeZ) / link.getLength();
+				}
 			}
 		}
+		
 		return gradient;
 	}
 

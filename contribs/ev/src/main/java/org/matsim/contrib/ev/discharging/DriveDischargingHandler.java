@@ -103,6 +103,10 @@ public class DriveDischargingHandler
 		}
 	}
 
+	//XXX The current implementation is thread-safe because no other EventHandler modifies battery SOC
+	// (for instance, AUX discharging and battery charging modifies SOC outside event handling
+	// (as MobsimAfterSimStepListeners)
+	//TODO In the long term, it will be safer to move the discharging procedure to a MobsimAfterSimStepListener
 	private EVDrive dischargeVehicle(Id<Vehicle> vehicleId, Id<Link> linkId, double eventTime) {
 		EVDrive evDrive = evDrives.get(vehicleId);
 		if (evDrive != null && !evDrive.isOnFirstLink()) {// handle only our EVs, except for the first link
@@ -112,11 +116,14 @@ public class DriveDischargingHandler
 			double energy = ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt, eventTime - tt)
 					+ ev.getAuxEnergyConsumption().calcEnergyConsumption(eventTime - tt, tt, linkId);
 			//Energy consumption might be negative on links with negative slope
+			//XXX or maybe we should allow a negative energy in the discharge() method??
 			if (energy < 0) {
 				ev.getBattery().charge(Math.abs(energy));
 			} else {
 				ev.getBattery().discharge(energy);
 			}
+
+			//FIXME emit a DriveOnLinkEnergyConsumptionEvent instead of calculating it here...
 			double linkConsumption = energy + energyConsumptionPerLink.getOrDefault(linkId, 0.0);
 			energyConsumptionPerLink.put(linkId, linkConsumption);
 		}

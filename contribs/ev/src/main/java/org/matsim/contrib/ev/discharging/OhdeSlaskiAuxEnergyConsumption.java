@@ -32,7 +32,7 @@ public class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
 	private static final double c = 1748.1;// [W]
 
 	// precomputed values
-	private static final int MIN_TEMP = -20;//TODO reformat
+	private static final int MIN_TEMP = -20;
 	private static final int MAX_TEMP = 40;
 
 	// temp - air temp [oC]

@@ -570,8 +570,11 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		if ( mobsimEngine instanceof AgentTracker ) {
 			agentTrackers.add((AgentTracker) mobsimEngine);
 		}
-		if (mobsimEngine instanceof ActivityEngine) {
+		if (mobsimEngine instanceof ActivityEngine){
 			this.activityEngine = (ActivityEngine) mobsimEngine;
+		}
+		if ( mobsimEngine instanceof HasAgentTracker ) {
+			agentTrackers.add(((HasAgentTracker) mobsimEngine).getAgentTracker());
 		}
 		if (mobsimEngine instanceof NetsimEngine) {
 			this.netEngine = (NetsimEngine) mobsimEngine;

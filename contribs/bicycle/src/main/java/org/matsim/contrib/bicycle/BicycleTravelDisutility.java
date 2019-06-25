@@ -20,7 +20,6 @@ package org.matsim.contrib.bicycle;
 
 import java.util.Random;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -35,7 +34,6 @@ import org.matsim.vehicles.Vehicle;
  * based on RandomizingTimeDistanceTravelDisutility and adding more components
  */
 class BicycleTravelDisutility implements TravelDisutility {
-	private static final Logger LOG = Logger.getLogger(BicycleTravelDisutility.class);
 
 	private final double marginalCostOfTime_s;
 	private final double marginalCostOfDistance_m;
@@ -61,9 +59,9 @@ class BicycleTravelDisutility implements TravelDisutility {
 	
 	BicycleTravelDisutility(BicycleConfigGroup bicycleConfigGroup, PlanCalcScoreConfigGroup cnScoringGroup,
 			PlansCalcRouteConfigGroup plansCalcRouteConfigGroup, TravelTime timeCalculator, double normalization) {
-		final PlanCalcScoreConfigGroup.ModeParams bicycleParams = cnScoringGroup.getModes().get("bicycle");
+		final PlanCalcScoreConfigGroup.ModeParams bicycleParams = cnScoringGroup.getModes().get(bicycleConfigGroup.getBicycleMode());
 		if (bicycleParams == null) {
-			throw new NullPointerException("Bicycle is not part of the valid mode parameters " + cnScoringGroup.getModes().keySet());
+			throw new NullPointerException("Mode " + bicycleConfigGroup.getBicycleMode() + " is not part of the valid mode parameters " + cnScoringGroup.getModes().keySet());
 		}
 
 		this.marginalCostOfDistance_m = -(bicycleParams.getMonetaryDistanceRate() * cnScoringGroup.getMarginalUtilityOfMoney())
