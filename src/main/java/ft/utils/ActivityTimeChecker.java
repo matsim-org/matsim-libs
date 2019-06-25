@@ -48,7 +48,7 @@ public class ActivityTimeChecker {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		// Fill this Scenario with a population.
 		new PopulationReader(scenario).readFile(
-				"W:\\92_1896-alt\\K-GERUS-UA-Umwelt-und-Verkehr\\01_Projekte\\33_MatSim\\Falco\\vw219.output_plans.xml.gz");
+				"D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw243_cadON_ptSpeedAdj.0.1\\vw243_cadON_ptSpeedAdj.0.1.output_plans.xml.gz");
 		double actStartTime = 0;
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {

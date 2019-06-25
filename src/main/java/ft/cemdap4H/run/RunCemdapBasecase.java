@@ -64,15 +64,17 @@ import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 
 public class RunCemdapBasecase {
 public static void main(String[] args) {
-	String runId = "vw241_cadON_timeFix";
-	String pct = ".0.1";
+	String runId = "vw246";
+	String pct = ".1.0";
 	
-	String configPath = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\config_0.1.xml"; 
+	String configPath = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\config_1.0.xml"; 
 		
 	Config config = ConfigUtils.loadConfig(configPath, new CadytsConfigGroup());
 	
 	
-	config.plans().setInputFile("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\input\\finishedPlans_0.1_timeFIX.xml.gz");
+	config.plans().setInputFile("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw245_cadON_ptSpeedAdj.1.0\\ITERS\\it.100\\vw245_cadON_ptSpeedAdj.1.0.100.plans.xml.gz");
+	config.network().setInputFile("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\input\\network_editedPt.xml.gz");
+	
 	Scenario scenario = ScenarioUtils.loadScenario(config);
 	adjustPtNetworkCapacity(scenario.getNetwork(),config.qsim().getFlowCapFactor());
 	
@@ -93,7 +95,9 @@ public static void main(String[] args) {
 	config.controler().setRunId(runId+pct);
 	config.controler().setWritePlansInterval(50);
 	config.controler().setWriteEventsInterval(50);
-	config.controler().setLastIteration(400); //Number of simulation iterations
+	config.controler().setLastIteration(150); //Number of simulation iterations
+	
+	config.strategy().setFractionOfIterationsToDisableInnovation(0.75); //Fraction to disable Innovation
 	
 	// tell the system to use the congested car router for the ride mode:
 	controler.addOverridingModule(new AbstractModule(){
