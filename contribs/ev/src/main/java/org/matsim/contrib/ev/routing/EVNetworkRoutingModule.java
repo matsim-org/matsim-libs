@@ -207,11 +207,16 @@ public final class EVNetworkRoutingModule implements RoutingModule {
 
 			double consumption = driveEnergyConsumption.calcEnergyConsumption(l, travelT, Time.getUndefinedTime())
 					+ auxEnergyConsumption.calcEnergyConsumption(basicLeg.getDepartureTime(), travelT, l.getId());
+			if (consumption > 0) {
+				pseudoVehicle.getBattery().discharge(consumption);
+			} else {
+				pseudoVehicle.getBattery().discharge(-consumption);
+			}
 			double currentSoc = pseudoVehicle.getBattery().getSoc();
 			// to accomodate for ERS, where energy charge is directly implemented in the consumption model
-			consumption += (lastSoc - currentSoc);
-
-			consumptions.put(l, consumption);
+			double consumptionDiff = (lastSoc - currentSoc);
+			lastSoc = currentSoc;
+			consumptions.put(l, consumptionDiff);
 		}
 		return consumptions;
 	}
