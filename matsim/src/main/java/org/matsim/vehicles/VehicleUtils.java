@@ -22,6 +22,7 @@ package org.matsim.vehicles;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 
 /**
@@ -39,7 +40,10 @@ public class VehicleUtils {
 	private static final String ACCESSTIME = "accessTimeInSecondsPerPerson";
 	private static final String FUELCONSUMPTION = "fuelConsumptionLitersPerMeter";
 	private static final String FREIGHT_CAPACITY_UNITS = "freightCapacityInUnits";
+	private static final String HBEFA_VEHICLE_CATEGORY_= "HbefaVehicleCategory";
 	private static final String HBEFA_TECHNOLOGY = "HBEFATechnology";
+	private static final String HBEFA_SIZE_CLASS = "HbefaSizeClass";
+	private static final String HBEFA_EMISSIONS_CONCEPT = "EmissionsConcept";
 
 	static {
 		VehicleCapacityImpl capacity = new VehicleCapacityImpl();
@@ -137,6 +141,17 @@ public class VehicleUtils {
 		setFuelConsumption(vehicleType, literPerMeter);
 	}
 
+	public static void setEngineInformation(VehicleType vehicleType, Attributes currAttributes) {
+		vehicleType.setEngineInformation(new EngineInformationImpl());
+		if (currAttributes == null || currAttributes.isEmpty()){
+			log.warn("No Attributes were set for EngineInformation of vehicle type " + vehicleType);
+		} else {
+			for (String attribute : currAttributes.getAsMap().keySet()) {
+				vehicleType.getAttributes().putAttribute(attribute, currAttributes.getAttribute(attribute));
+			}
+		}
+	}
+
 	public static double getFreightCapacityUnits (VehicleType vehicleType) {
 		return (double) vehicleType.getAttributes().getAttribute(FREIGHT_CAPACITY_UNITS);
 	}
@@ -158,4 +173,33 @@ public class VehicleUtils {
 	public static void setHbefaTechnology(VehicleType vehicleType, String hbefaTechnology){
 		vehicleType.getAttributes().putAttribute(HBEFA_TECHNOLOGY, hbefaTechnology);
 	}
+
+	public static String getHbefaVehicleCategory(VehicleType vehicleType) {
+		return getHbefaVehicleCategory(vehicleType.getEngineInformation()) ;
+	}
+
+	public static String getHbefaVehicleCategory( EngineInformation ei ){
+		return (String) ei.getAttributes().getAttribute( HBEFA_VEHICLE_CATEGORY_ ) ;
+	}
+
+	public static String getHbefaSizeClass(VehicleType vehicleType) {
+		return getHbefaSizeClass(vehicleType.getEngineInformation());
+	}
+
+	private static String getHbefaSizeClass(EngineInformation ei) {
+		return (String) ei.getAttributes().getAttribute(HBEFA_SIZE_CLASS);
+	}
+
+	public static String getHbefaEmissionsConcept(VehicleType vehicleType) {
+		return getHbefaEmissionsConcept(vehicleType.getEngineInformation());
+	}
+
+	private static String getHbefaEmissionsConcept(EngineInformation ei) {
+		return (String) ei.getAttributes().getAttribute(HBEFA_EMISSIONS_CONCEPT);
+	}
+
+	//TODO Setter for
+	// private static final String HBEFA_VEHICLE_CATEGORY_= "HbefaVehicleCategory";
+	//	private static final String HBEFA_SIZE_CLASS = "HbefaSizeClass";
+	//	private static final String HBEFA_EMISSIONS_CONCEPT = "EmissionsConcept";
 }

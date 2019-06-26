@@ -75,18 +75,23 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 		assertEquals(0.15, vehTypeNormalCar.getCostInformation().getCostsPerMeter(), EPSILON);
 		assertEquals(0.08, vehTypeNormalCar.getCostInformation().getCostsPerSecond(), EPSILON);
 		assertNotNull(vehTypeNormalCar.getEngineInformation());
-		assertEquals(EngineInformation.FuelType.diesel, vehTypeNormalCar.getEngineInformation().getFuelType());
+//		assertEquals(EngineInformation.FuelType.diesel, vehTypeNormalCar.getEngineInformation().getFuelType());
+		assertEquals("pass. car", VehicleUtils.getHbefaVehicleCategory(vehTypeNormalCar));
+		assertEquals("petrol", VehicleUtils.getHbefaTechnology(vehTypeNormalCar));
+		assertEquals("&lt; 1,4L", VehicleUtils.getHbefaSizeClass(vehTypeNormalCar));
+		assertEquals("EURO-5", VehicleUtils.getHbefaEmissionsConcept(vehTypeNormalCar));
+
 		assertEquals(0.23, VehicleUtils.getFuelConsumption(vehTypeNormalCar), EPSILON);
 		assertEquals(23.23, VehicleUtils.getAccessTime(vehTypeNormalCar), EPSILON);
 		assertEquals(42.42, VehicleUtils.getEgressTime(vehTypeNormalCar), EPSILON);
 		assertEquals(DoorOperationMode.parallel, VehicleUtils.getDoorOperationMode(vehTypeNormalCar));
-		assertEquals("diesel", VehicleUtils.getHbefaTechnology(vehTypeNormalCar));
+
 		assertEquals(2.0, vehTypeNormalCar.getPcuEquivalents());
 		assertEquals(1.5, vehTypeNormalCar.getFlowEfficiencyFactor());
 		assertEquals("abc", vehTypeNormalCar.getAttributes().getAttribute("Attribute1"));
 		assertEquals(1.3, (double) vehTypeNormalCar.getAttributes().getAttribute("Attribute2"), EPSILON);
 		assertEquals("pt", vehTypeNormalCar.getNetworkMode());
-		assertEquals("diesel", VehicleUtils.getHbefaTechnology(vehTypeNormalCar));
+
 	}
 
 	@Test

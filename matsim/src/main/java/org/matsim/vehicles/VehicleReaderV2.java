@@ -16,7 +16,8 @@ class VehicleReaderV2 extends MatsimXmlParser{
 	private VehicleType currentVehType = null;
 	private VehicleCapacity currentCapacity = null;
 	private FreightCapacity currentFreightCapacity = null;
-	private EngineInformation.FuelType currentFuelType = null;
+	private EngineInformation currentEngineInformation = null;
+//	private EngineInformation.FuelType currentFuelType = null;
 	private double fixedCostsPerDay = Double.NaN;
 	private double costsPerMeter = Double.NaN;
 	private double costsPerSecond = Double.NaN;
@@ -24,6 +25,8 @@ class VehicleReaderV2 extends MatsimXmlParser{
 	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
 	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes =
 		  new org.matsim.utils.objectattributes.attributable.Attributes();
+	private org.matsim.utils.objectattributes.attributable.Attributes currEiAttributes =
+			new org.matsim.utils.objectattributes.attributable.Attributes();
 
 	public VehicleReaderV2( final Vehicles vehicles ){
 		log.info("Using " + this.getClass().getName());
@@ -36,16 +39,17 @@ class VehicleReaderV2 extends MatsimXmlParser{
 		if( VehicleSchemaV2Names.DESCRIPTION.equalsIgnoreCase( name ) && (content.trim().length() > 0) ){
 			this.currentVehType.setDescription( content.trim() );
 		} else if( VehicleSchemaV2Names.ENGINEINFORMATION.equalsIgnoreCase( name ) ){
-			VehicleUtils.setEngineInformation(this.currentVehType, this.currentFuelType, VehicleUtils.getFuelConsumption(this.currentVehType));
-			this.currentFuelType = null;
+				VehicleUtils.setEngineInformation(this.currentVehType, this.currentEngineInformation.getAttributes());
+				this.currentEngineInformation = null;
+				//TODO new settings from engineInformationAttributes
+			//VehicleUtils.setEngineInformation(this.currentVehType, this.currentFuelType, VehicleUtils.getFuelConsumption(this.currentVehType));
+			//this.currentFuelType = null;
 		} else if( VehicleSchemaV2Names.COSTSINFORMATION.equalsIgnoreCase( name ) ){
 			CostInformation currentCostInformation = this.builder.createCostInformation(this.fixedCostsPerDay, this.costsPerMeter, this.costsPerSecond);
 			this.currentVehType.setCostInformation(currentCostInformation);
 			this.fixedCostsPerDay = Double.NaN;
 			this.costsPerMeter = Double.NaN;
 			this.costsPerSecond = Double.NaN;
-		} else if( VehicleSchemaV2Names.FUELTYPE.equalsIgnoreCase( name ) ){
-			this.currentFuelType = this.parseFuelType( content.trim() );
 		} else if( VehicleSchemaV2Names.FREIGHTCAPACITY.equalsIgnoreCase( name ) ){
 			this.currentCapacity.setFreightCapacity( this.currentFreightCapacity);
 			this.currentFreightCapacity = null;
@@ -62,29 +66,6 @@ class VehicleReaderV2 extends MatsimXmlParser{
 		}
 	}
 
-	private EngineInformation.FuelType parseFuelType( final String content ){
-		if( EngineInformation.FuelType.gasoline.toString().equalsIgnoreCase( content ) ){
-			return EngineInformation.FuelType.gasoline;
-		} else if( EngineInformation.FuelType.diesel.toString().equalsIgnoreCase( content ) ){
-			return EngineInformation.FuelType.diesel;
-		} else if( EngineInformation.FuelType.electricity.toString().equalsIgnoreCase( content ) ){
-			return EngineInformation.FuelType.electricity;
-		} else if( EngineInformation.FuelType.biodiesel.toString().equalsIgnoreCase( content ) ){
-			return EngineInformation.FuelType.biodiesel;
-		} else{
-			throw new IllegalArgumentException( "Fuel type: " + content + " is not supported!" );
-		}
-	}
-
-//	private VehicleType.DoorOperationMode parseDoorOperationMode( final String modeString ){
-//		if( VehicleType.DoorOperationMode.serial.toString().equalsIgnoreCase( modeString ) ){
-//			return VehicleType.DoorOperationMode.serial;
-//		} else if( VehicleType.DoorOperationMode.parallel.toString().equalsIgnoreCase( modeString ) ){
-//			return VehicleType.DoorOperationMode.parallel;
-//		} else{
-//			throw new IllegalArgumentException( "Door operation mode " + modeString + " is not supported" );
-//		}
-//	}
 
 	@Override
 	public void startTag( final String name, final Attributes atts, final Stack<String> context ){
@@ -94,13 +75,15 @@ class VehicleReaderV2 extends MatsimXmlParser{
 			this.currentVehType.setLength( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.METER ) ) );
 		} else if( VehicleSchemaV2Names.WIDTH.equalsIgnoreCase( name ) ){
 			this.currentVehType.setWidth( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.METER ) ) );
-		} else if( VehicleSchemaV2Names.MAXIMUMVELOCITY.equalsIgnoreCase( name ) ){
-			double val = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.METERPERSECOND ) );
-			if( val == 1.0 ){
+		} else if( VehicleSchemaV2Names.MAXIMUMVELOCITY.equalsIgnoreCase( name ) ) {
+			double val = Double.parseDouble(atts.getValue(VehicleSchemaV2Names.METERPERSECOND));
+			if (val == 1.0) {
 				log.warn(
-					  "The vehicle type's maximum velocity is set to 1.0 meter per second, is this really intended? vehicletype = " + this.currentVehType.getId().toString() );
+						"The vehicle type's maximum velocity is set to 1.0 meter per second, is this really intended? vehicletype = " + this.currentVehType.getId().toString());
 			}
-			this.currentVehType.setMaximumVelocity( val );
+			this.currentVehType.setMaximumVelocity(val);
+		} else if( VehicleSchemaV2Names.ENGINEINFORMATION.equalsIgnoreCase( name ) ){
+			this.currentEngineInformation = new EngineInformationImpl();
 		} else if( VehicleSchemaV2Names.CAPACITY.equalsIgnoreCase( name ) ){
 			this.currentCapacity = this.builder.createVehicleCapacity();
 		} else if( VehicleSchemaV2Names.SEATS.equalsIgnoreCase( name ) ){
@@ -142,6 +125,16 @@ class VehicleReaderV2 extends MatsimXmlParser{
 		}
 		else if( VehicleSchemaV2Names.NETWORKMODE.equalsIgnoreCase( name ) ){
 			this.currentVehType.setNetworkMode( atts.getValue( VehicleSchemaV2Names.NETWORKMODE ) );
+		}
+
+		else if (name.equalsIgnoreCase(VehicleSchemaV2Names.EIATTRIBUTES)) {
+//			if (context.peek().equalsIgnoreCase(VehicleSchemaV2Names.VEHICLETYPE)) {
+				currEiAttributes = this.currentEngineInformation.getAttributes();
+				attributesReader.startTag( name , atts , context, currEiAttributes );
+//			}
+		}
+		else if (name.equalsIgnoreCase(VehicleSchemaV2Names.EIATTRIBUTE)) {
+			attributesReader.startTag( name , atts , context, currEiAttributes );
 		}
 
 	}

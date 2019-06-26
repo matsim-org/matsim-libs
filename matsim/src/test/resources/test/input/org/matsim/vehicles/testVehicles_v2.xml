@@ -14,7 +14,7 @@
     <attribute name="egressTimeInSecondsPerPerson" class="java.lang.Double">42.42</attribute>
     <attribute name="doorOperationMode" class="java.lang.String">parallel</attribute>
     <attribute name="freightCapacityInUnits" class="java.lang.Double">200</attribute>
-    <attribute name="HBEFATechnology" class="java.lang.String">diesel</attribute>
+
   </attributes>
   <description></description>
   <!-- capacity including driver -->
@@ -29,6 +29,14 @@
   <length meter="9.5" />
   <width meter="3" />
   <maximumVelocity meterPerSecond="42" />
+  <engineInformation>
+    <eiAttributes>
+      <eiAttribute name="HbefaVehicleCategory" class="java.lang.String">pass. car</eiAttribute>
+      <eiAttribute name="HbefaTechnology" class="java.lang.String">petrol</eiAttribute>
+      <eiAttribute name="HbefaSizeClass" class="java.lang.String">&lt; 1,4L</eiAttribute>
+      <eiAttribute name="HbefaEmissionsConcept" class="java.lang.String">EURO-5</eiAttribute>
+    </eiAttributes>
+  </engineInformation>
   <costsInformation>
     <costInformation fixedCostsPerDay="100.00" costsPerMeter="0.15" costsPerSecond="0.08"/>
   </costsInformation>

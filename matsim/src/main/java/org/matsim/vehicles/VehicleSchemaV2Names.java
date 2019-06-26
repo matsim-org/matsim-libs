@@ -67,5 +67,7 @@ public interface VehicleSchemaV2Names {
 	public static final String FACTOR = "factor";
 	public final static String ATTRIBUTES = "attributes";
 	public final static String ATTRIBUTE = "attribute";
+	public final static String EIATTRIBUTES = "eiAttributes";
+	public final static String EIATTRIBUTE = "eiAttribute";
 	
 }

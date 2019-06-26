@@ -49,6 +49,9 @@ public class EngineInformationImpl implements EngineInformation {
 		this.setFuelConsumption(Double.NaN);
 	}
 
+    public EngineInformationImpl() {
+    }
+
 	@Override
 	public FuelType getFuelType() {
 		return this.fuelType;
