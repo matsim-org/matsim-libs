@@ -23,10 +23,13 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.ev.EvModule;
+import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
 import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -44,6 +47,16 @@ public class CustomEDrtControlerCreator {
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new CustomEDrtModule());
 		controler.addOverridingModule(new DvrpModule());
+		controler.addOverridingModule(new EvModule());
+		controler.addOverridingModule(new EvDvrpIntegrationModule());
+
+		controler.addOverridingQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				this.bind(AuxDischargingHandler.VehicleProvider.class).to(OperatingVehicleOutsideDepotProvider.class);
+			}
+		});
+
 		controler.configureQSimComponents(EvDvrpIntegrationModule.activateModes(drtCfg.getMode()));
 
 		if (otfvis) {

@@ -20,8 +20,10 @@
 
 package vwExamples.peoplemoverVWExample;
 
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
-import electric.edrt.run.RunVWEDrtScenario;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -44,15 +46,14 @@ import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
+
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
+import electric.edrt.run.RunVWEDrtScenario;
 import parking.ParkingRouterConfigGroup;
 import parking.ParkingRouterModule;
 import vwExamples.utils.CreateEDRTVehiclesAndChargers;
 import vwExamples.utils.DrtTrajectoryAnalyzer.MyDrtTrajectoryAnalysisModule;
 import vwExamples.utils.parking.createParkingNetwork.CreateParkingNetwork;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author axer
@@ -185,7 +186,6 @@ public class RunDrtScenarioBatchBS_eDRT_withParking {
 		eDrt.setChargersFile(inbase + "\\chargers\\chargers.xml.gz");
 		eDrt.setVehiclesFile(inbase + "\\fleets\\eFleet.xml.gz");
 		eDrt.setAuxDischargeTimeStep(10);
-		eDrt.setAuxDischargingSimulation(EvConfigGroup.AuxDischargingSimulation.seperateAuxDischargingHandler);
 		eDrt.setTimeProfiles(true);
 
 		config.addModule(new ParkingRouterConfigGroup());

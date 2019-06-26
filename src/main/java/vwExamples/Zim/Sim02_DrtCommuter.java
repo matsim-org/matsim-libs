@@ -21,7 +21,6 @@
 package vwExamples.Zim;
 
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
-import electric.edrt.energyconsumption.VehicleAtChargerLinkTracker;
 import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
 import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 import org.matsim.api.core.v01.Id;
@@ -34,18 +33,15 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
-import org.matsim.contrib.edrt.run.EDrtControlerCreator;
-import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
 import org.matsim.contrib.ev.charging.ChargingLogic;
+import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.FastThenSlowCharging;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
-import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
-import org.matsim.contrib.ev.temperature.TemperatureChangeConfigGroup;
 import org.matsim.contrib.ev.temperature.TemperatureChangeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -58,9 +54,7 @@ import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import vwExamples.utils.CreateEDRTVehiclesAndChargers;
-import vwExamples.utils.DrtTrajectoryAnalyzer.MyDrtTrajectoryAnalysisModule;
-import vwExamples.utils.customEV.BatteryReplacementCharge;
-import vwExamples.utils.customEV.CustomFastThenSlowCharging;
+import vwExamples.utils.customEV.BatteryReplacementCharging;
 import vwExamples.utils.customEdrtModule.CustomEDrtControlerCreator;
 
 import java.io.IOException;
@@ -427,36 +421,32 @@ public class Sim02_DrtCommuter {
 		Controler controler = CustomEDrtControlerCreator.createControler(config, false);
 		controler.addOverridingModule(new TemperatureChangeModule());
 
-		controler.addOverridingModule(createEvDvrpIntegrationModule(DrtConfigGroup.get(config)));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(EDrtVehicleDataEntryFactoryProvider.class)
-						.toInstance(new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
-				bind(DriveEnergyConsumption.Factory.class)
-						.toInstance(evconsumption -> new VwDrtDriveEnergyConsumption());
-				bind(AuxEnergyConsumption.Factory.class)
-						.to(VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
+				bind(EDrtVehicleDataEntryFactoryProvider.class).toInstance(
+						new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
+				bind(DriveEnergyConsumption.Factory.class).toInstance(
+						evconsumption -> new VwDrtDriveEnergyConsumption());
+				bind(AuxEnergyConsumption.Factory.class).to(
+						VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
 
 				if (BatteryReplace) {
-					bind(ChargingLogic.Factory.class)
-							.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-									new BatteryReplacementCharge(BATTERYREPLACETIME)));
-					bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
+					bind(ChargingLogic.Factory.class).toProvider(
+							new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
+									charger -> new BatteryReplacementCharging.Strategy(charger,
+											new ChargeUpToMaxSocStrategy(charger, MAX_RELATIVE_SOC))));
+					bind(ChargingPower.Factory.class).toInstance(
+							ev -> new BatteryReplacementCharging(ev, BATTERYREPLACETIME));
 				} else {
-					bind(ChargingLogic.Factory.class)
-							.toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-									new CustomFastThenSlowCharging(charger.getPower(), MAX_RELATIVE_SOC)));
-					bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
+					bind(ChargingLogic.Factory.class).toProvider(
+							new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
+									charger -> new ChargeUpToMaxSocStrategy(charger, MAX_RELATIVE_SOC)));
+					bind(ChargingPower.Factory.class).toInstance(FastThenSlowCharging::new);
 				}
 
-				// bind(ChargingLogic.Factory.class).toInstance(charger -> new
-				// ChargingWithQueueingAndAssignmentLogic(charger, new
-				// FastThenSlowCharging(charger.getPower())));
-				// //bind(ChargingLogic.Factory.class).toInstance(charger -> new
-				// ChargingWithQueueingAndAssignmentLogic(charger, new
-				// BatteryReplacementCharge(240.0)));
-				// bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
+				//				bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new FastThenSlowCharging(charger.getPower())));
+				//				//bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new BatteryReplacementCharging(240.0)));
 			}
 		});
 
@@ -469,17 +459,4 @@ public class Sim02_DrtCommuter {
 	// .setTurnedOnPredicate(RunDrtScenarioBatchH_eDRT_KGERAK::isTurnedOn);
 	// }
 
-	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(DrtConfigGroup drtCfg) {
-		return new EvDvrpIntegrationModule(drtCfg.getMode())
-				.setAuxDischargingFactory(new VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory())
-				.setDriveDischargingFactory(f -> new VwDrtDriveEnergyConsumption())
-				.setTurnedOnPredicate(Sim02_DrtCommuter::isTurnedOn);
-	}
-
-	private static boolean isTurnedOn(DvrpVehicleSpecification vehicle, double time) {
-		if (vehicle.getServiceBeginTime() <= time && time <= vehicle.getServiceEndTime())
-			return true;
-		else
-			return false;
-	}
 }

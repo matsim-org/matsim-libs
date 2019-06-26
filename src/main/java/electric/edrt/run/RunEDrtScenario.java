@@ -22,18 +22,18 @@ package electric.edrt.run;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.av.maxspeed.DvrpTravelTimeWithMaxSpeedLimitModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicleSpecification;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.edrt.run.EDrtControlerCreator;
 import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
 import org.matsim.contrib.ev.charging.ChargingLogic;
+import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.FastThenSlowCharging;
-import org.matsim.contrib.ev.charging.FixedSpeedChargingStrategy;
+import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
-import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
 import org.matsim.contrib.ev.temperature.TemperatureChangeConfigGroup;
 import org.matsim.contrib.ev.temperature.TemperatureChangeModule;
 import org.matsim.core.config.Config;
@@ -42,15 +42,15 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import electric.edrt.energyconsumption.VehicleAtChargerLinkTracker;
 import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
 import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
+import vwExamples.utils.customEdrtModule.OperatingVehicleOutsideDepotProvider;
 
 public class RunEDrtScenario {
-	public static final double CHARGING_SPEED_FACTOR = 1.; // full speed
 	public static final double MAX_RELATIVE_SOC = 0.8;// charge up to 80% SOC
 	public static final double MIN_RELATIVE_SOC = 0.2;// send to chargers vehicles below 20% SOC
 	public static final double TEMPERATURE = 20;// oC
@@ -106,10 +106,10 @@ public class RunEDrtScenario {
 	}
 
 	public static Controler createControler(Config config) {
+		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
 		Controler controler = EDrtControlerCreator.createControler(config, false);
 		controler.addOverridingModule(new TemperatureChangeModule());
 
-		controler.addOverridingModule(createEvDvrpIntegrationModule(DrtConfigGroup.get(config)));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -119,25 +119,20 @@ public class RunEDrtScenario {
 						evconsumption -> new VwDrtDriveEnergyConsumption());
 				bind(AuxEnergyConsumption.Factory.class).to(
 						VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
-				bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new FastThenSlowCharging(charger.getPower())));
-				//bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new BatteryReplacementCharge(240.0)));
-				bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
+				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
+						charger -> new ChargeUpToMaxSocStrategy(charger, MAX_RELATIVE_SOC)));
+				bind(ChargingPower.Factory.class).toInstance(FastThenSlowCharging::new);
+				//bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new BatteryReplacementCharging(240.0)));
+			}
+		});
+
+		controler.addOverridingQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				this.bind(AuxDischargingHandler.VehicleProvider.class).to(OperatingVehicleOutsideDepotProvider.class);
 			}
 		});
 
 		return controler;
 	}
-
-	public static EvDvrpIntegrationModule createEvDvrpIntegrationModule(DrtConfigGroup drtCfg) {
-		return new EvDvrpIntegrationModule(drtCfg.getMode()).setChargingStrategyFactory(
-				charger -> new FixedSpeedChargingStrategy(charger.getPower() * CHARGING_SPEED_FACTOR, MAX_RELATIVE_SOC))
-				.setTemperatureProvider(() -> TEMPERATURE)
-				.setTurnedOnPredicate(RunEDrtScenario::isTurnedOn);
-	}
-
-    private static boolean isTurnedOn(DvrpVehicleSpecification vehicle, double time) {
-        if (vehicle.getServiceBeginTime() <= time && time <= vehicle.getServiceEndTime()) return true;
-        else return false;
-	}
-
 }

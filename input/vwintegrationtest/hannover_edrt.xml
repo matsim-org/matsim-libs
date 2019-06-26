@@ -1,0 +1,1408 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+    <module name="JDEQSim">
+        <param name="carSize" value="7.5"/>
+        <param name="endTime" value="undefined"/>
+        <param name="flowCapacityFactor" value="1.0"/>
+        <param name="gapTravelSpeed" value="15.0"/>
+        <param name="minimumInFlowCapacity" value="1800.0"/>
+        <param name="squeezeTime" value="1800.0"/>
+        <param name="storageCapacityFactor" value="1.0"/>
+    </module>
+    <module name="TimeAllocationMutator">
+        <!-- Default:true; Defines whether time mutation changes an activity's duration. -->
+        <param name="mutationAffectsDuration" value="true"/>
+        <!-- Default:1800.0; Defines how many seconds a time mutation can maximally shift a time. -->
+        <param name="mutationRange" value="7200.0"/>
+        <!-- false; Use individual settings for each subpopulation. If enabled but no settings are found, regular settings are uses as fallback. -->
+        <param name="useIndividualSettingsForSubpopulations" value="false"/>
+    </module>
+
+    <module name="changeMode">
+        <!-- Defines whether car availability is considered be considered or not. An agent has no car only if it has no license, or never access to a car. Default: true -->
+        <param name="ignoreCarAvailability" value="false"/>
+        <!-- Defines the mode switch behavior. Possible values [fromAllModesToSpecifiedModes, fromSpecifiedModesToSpecifiedModes] Default: fromSpecifiedModesToSpecifiedModes. -->
+        <param name="modeSwitchBehavior" value="fromSpecifiedModesToSpecifiedModes"/>
+        <!-- Defines all the modes available, including chain-based modes, seperated by commas -->
+        <param name="modes" value="car,pt"/>
+    </module>
+    <module name="controler">
+        <!-- Sets whether graphs showing some analyses should automatically be generated during the simulation. The generation of graphs usually takes a small amount of time that does not have any weight in big simulations, but add a significant overhead in smaller runs or in test cases where the graphical output is not even requested. -->
+        <param name="createGraphs" value="true"/>
+        <!-- true if at the end of a run, plans, network, config etc should be dumped to a file -->
+        <param name="dumpDataAtEnd" value="true"/>
+        <!-- Default=false. If enabled, the router takes travel times needed for turning moves into account. Cannot be used if the (Fast)AStarLandmarks routing or TravelTimeCalculator.separateModes is enabled. -->
+        <param name="enableLinkToLinkRouting" value="false"/>
+        <!-- Default=xml; Specifies the file format for writing events. Currently supported: xml.
+        Multiple values can be specified separated by commas (','). -->
+        <param name="eventsFileFormat" value="xml"/>
+        <!-- Default=0;  -->
+        <param name="firstIteration" value="0"/>
+        <!-- Default=1000;  -->
+        <param name="lastIteration" value="75"/>
+        <!-- Defines which mobility simulation will be used. Currently supported: qsim JDEQSim
+        Depending on the chosen mobsim, you'll have to add additional config modules to configure the corresponding mobsim.
+        For 'qsim', add a module 'qsim' to the config. -->
+        <param name="mobsim" value="qsim"/>
+        <param name="outputDirectory"
+               value="D:\Thiel\Programme\MatSim\01_HannoverModel_2.0\Simulation\output\vw235_nocad.1.0"/>
+        <!-- Possible values: failIfDirectoryExists, overwriteExistingFiles, deleteDirectoryIfExists -->
+        <param name="overwriteFiles" value="overwriteExistingFiles"/>
+        <!-- The type of routing (least cost path) algorithm used, may have the values: Dijkstra, FastDijkstra, AStarLandmarks or FastAStarLandmarks -->
+        <param name="routingAlgorithmType" value="Dijkstra"/>
+        <!-- An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc. -->
+        <param name="runId" value="vw235_nocad.1.0"/>
+        <!-- Comma-separated list of visualizer output file formats. `transims', `googleearth', and `otfvis'. -->
+        <param name="snapshotFormat" value=""/>
+        <!-- iterationNumber % writeEventsInterval == 0 defines in which iterations events are written to a file. `0' disables events writing completely. -->
+        <param name="writeEventsInterval" value="25"/>
+        <!-- iterationNumber % writePlansInterval == 0 defines (hopefully) in which iterations plans are written to a file. `0' disables plans writing completely.  Some plans in early iterations are always written -->
+        <param name="writePlansInterval" value="25"/>
+        <!-- iterationNumber % writeSnapshotsInterval == 0 defines in which iterations snapshots are written to a file. `0' disables snapshots writing completely -->
+        <param name="writeSnapshotsInterval" value="1"/>
+    </module>
+
+    <module name="facilities">
+        <!-- This defines how facilities should be created. Possible values: none fromFile setInScenario onePerActivityLinkInPlansFile onePerActivityLocationInPlansFile  -->
+        <param name="facilitiesSource" value="none"/>
+        <!-- A prefix to be used in activityFacility id. -->
+        <param name="idPrefix" value=""/>
+        <!-- The Coordinates Reference System in which the coordinates are expressed in the input file. At import, the coordinates will be converted to the coordinate system defined in "global", and willbe converted back at export. If not specified, no conversion happens. -->
+        <param name="inputCRS" value="null"/>
+        <param name="inputFacilitiesFile" value="null"/>
+        <param name="inputFacilityAttributesFile" value="null"/>
+    </module>
+    <module name="global">
+        <param name="coordinateSystem" value="Atlantis"/>
+        <param name="insistingOnDeprecatedConfigVersion" value="true"/>
+        <!-- "global" number of threads.  This number is used, e.g., for replanning, but NOT in the mobsim.  This can typically be set to as many cores as you have available, or possibly even slightly more. -->
+        <param name="numberOfThreads" value="1"/>
+        <param name="randomSeed" value="4711"/>
+    </module>
+    <module name="households">
+        <param name="inputFile" value="null"/>
+        <param name="inputHouseholdAttributesFile" value="null"/>
+    </module>
+    <module name="linkStats">
+        <!-- Specifies over how many iterations the link volumes should be averaged that are used for the link statistics. Use 1 or 0 to only use the link volumes of a single iteration. This values cannot be larger than the value specified for writeLinkStatsInterval -->
+        <param name="averageLinkStatsOverIterations" value="5"/>
+        <!-- Specifies how often the link stats should be calculated and written. Use 0 to disable the generation of link stats. -->
+        <param name="writeLinkStatsInterval" value="10"/>
+    </module>
+    <module name="network">
+        <!-- The Coordinates Reference System in which the coordinates are expressed in the input file. At import, the coordinates will be converted to the coordinate system defined in "global", and willbe converted back at export. If not specified, no conversion happens. -->
+        <param name="inputCRS" value="null"/>
+        <param name="inputChangeEventsFile" value="null"/>
+        <param name="inputNetworkFile" value="input\network.xml.gz"/>
+        <param name="laneDefinitionsFile" value="null"/>
+        <param name="timeVariantNetwork" value="false"/>
+    </module>
+    <module name="parallelEventHandling">
+        <!-- Estimated number of events during mobsim run. An optional optimization hint for the framework. -->
+        <param name="estimatedNumberOfEvents" value="null"/>
+        <!-- Number of threads for parallel events handler. _null_ means the framework decides by itself. 0 is currently not possible. -->
+        <param name="numberOfThreads" value="1"/>
+        <!-- If enabled, each event handler is assigned to its own thread. Note that enabling this feature disabled the numberOfThreads option! This feature is still experimental! -->
+        <param name="oneThreadPerHandler" value="false"/>
+        <!-- If enabled, it is ensured that all events that are created during a time step of the mobility simulation are processed before the next time step is simulated. E.g. neccessary when within-day replanning is used. -->
+        <param name="synchronizeOnSimSteps" value="true"/>
+    </module>
+    <module name="planCalcScore">
+        <!-- logit model scale parameter. default: 1.  Has name and default value for historical reasons (see Bryan Raney's phd thesis). -->
+        <param name="BrainExpBeta" value="1.0"/>
+        <param name="PathSizeLogitBeta" value="1.0"/>
+        <!-- fraction of iterations at which MSA score averaging is started. The matsim theory department suggests to use this together with switching off choice set innovation (where a similar switch exists), but it has not been tested yet. -->
+        <param name="fractionOfIterationsToStartScoreMSA" value="null"/>
+        <!-- new_score = (1-learningRate)*old_score + learningRate * score_from_mobsim.  learning rates close to zero emulate score averaging, but slow down initial convergence -->
+        <param name="learningRate" value="1.0"/>
+        <!-- There used to be a plateau between duration=0 and duration=zeroUtilityDuration. This caused durations to evolve to zero once they were below zeroUtilityDuration, causing problems.  Only use this switch if you need to be backwards compatible with some old results.  (changed nov'13) -->
+        <param name="usingOldScoringBelowZeroUtilityDuration" value="false"/>
+        <!-- write a plans file in each iteration directory which contains what each agent actually did, and the score it received. -->
+        <param name="writeExperiencedPlans" value="false"/>
+        <parameterset type="scoringParameters">
+            <param name="earlyDeparture" value="-0.0"/>
+            <param name="lateArrival" value="-18.0"/>
+            <param name="marginalUtilityOfMoney" value="1.0"/>
+            <param name="performing" value="6.0"/>
+            <param name="subpopulation" value="null"/>
+            <param name="utilityOfLineSwitch" value="-1.0"/>
+            <param name="waiting" value="-0.0"/>
+            <param name="waitingPt" value="-6.0"/>
+            <parameterset type="activityParams">
+                <param name="activityType" value="dummy"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <!-- typical duration of activity.  needs to be defined and non-zero.  in sec. -->
+                <param name="typicalDuration" value="02:00:00"/>
+                <!-- method to compute score at typical duration.  Options: | uniform | relative | Use uniform for backwards compatibility (all activities same score; higher proba to drop long acts). -->
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="car interaction"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="false"/>
+                <param name="typicalDuration" value="undefined"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="pt interaction"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="false"/>
+                <param name="typicalDuration" value="undefined"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="bike interaction"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="false"/>
+                <param name="typicalDuration" value="undefined"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="other interaction"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="false"/>
+                <param name="typicalDuration" value="undefined"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="walk interaction"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="false"/>
+                <param name="typicalDuration" value="undefined"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="work"/>
+                <param name="closingTime" value="18:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="08:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="shopping"/>
+                <param name="closingTime" value="21:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="08:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="01:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="leisure"/>
+                <param name="closingTime" value="21:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="10:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="01:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="education"/>
+                <param name="closingTime" value="18:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="08:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="08:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="other"/>
+                <param name="closingTime" value="23:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="01:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="home"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="14:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="home_23"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="23:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="home_22"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="22:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="home_24"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="24:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="leisure_1"/>
+                <param name="closingTime" value="21:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="10:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="01:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="home_7"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="07:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="home_6"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="06:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="home_5"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="05:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="home_4"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="04:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="home_3"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="03:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="home_2"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="02:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="home_1"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="01:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="leisure_9"/>
+                <param name="closingTime" value="21:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="10:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="09:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="leisure_8"/>
+                <param name="closingTime" value="21:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="10:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="08:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="leisure_10"/>
+                <param name="closingTime" value="21:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="10:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="10:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="leisure_7"/>
+                <param name="closingTime" value="21:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="10:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="07:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="leisure_6"/>
+                <param name="closingTime" value="21:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="10:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="06:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="leisure_5"/>
+                <param name="closingTime" value="21:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="10:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="05:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="leisure_4"/>
+                <param name="closingTime" value="21:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="10:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="04:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="home_9"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="09:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="leisure_3"/>
+                <param name="closingTime" value="21:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="10:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="03:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="leisure_2"/>
+                <param name="closingTime" value="21:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="10:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="02:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="home_8"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="08:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="other_10"/>
+                <param name="closingTime" value="23:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="10:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="home_12"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="12:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="home_11"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="11:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="home_14"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="14:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="home_13"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="13:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="home_16"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="16:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="home_15"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="15:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="home_18"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="18:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="home_17"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="17:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="home_19"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="19:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="shopping_10"/>
+                <param name="closingTime" value="21:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="08:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="10:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="home_21"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="21:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="home_20"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="20:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="shopping_2"/>
+                <param name="closingTime" value="21:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="08:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="02:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="shopping_1"/>
+                <param name="closingTime" value="21:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="08:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="01:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="shopping_4"/>
+                <param name="closingTime" value="21:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="08:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="04:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="shopping_3"/>
+                <param name="closingTime" value="21:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="08:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="03:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="home_10"/>
+                <param name="closingTime" value="undefined"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="undefined"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="10:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="shopping_6"/>
+                <param name="closingTime" value="21:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="08:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="06:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="shopping_5"/>
+                <param name="closingTime" value="21:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="08:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="05:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="shopping_8"/>
+                <param name="closingTime" value="21:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="08:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="08:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="work_1"/>
+                <param name="closingTime" value="18:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="01:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="shopping_7"/>
+                <param name="closingTime" value="21:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="08:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="07:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="shopping_9"/>
+                <param name="closingTime" value="21:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="08:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="09:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="work_4"/>
+                <param name="closingTime" value="18:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="04:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="work_5"/>
+                <param name="closingTime" value="18:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="05:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="other_9"/>
+                <param name="closingTime" value="23:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="09:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="work_2"/>
+                <param name="closingTime" value="18:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="02:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="other_8"/>
+                <param name="closingTime" value="23:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="08:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="work_3"/>
+                <param name="closingTime" value="18:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="03:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="other_7"/>
+                <param name="closingTime" value="23:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="07:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="work_12"/>
+                <param name="closingTime" value="18:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="12:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="work_8"/>
+                <param name="closingTime" value="18:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="08:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="other_6"/>
+                <param name="closingTime" value="23:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="06:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="work_9"/>
+                <param name="closingTime" value="18:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="09:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="work_11"/>
+                <param name="closingTime" value="18:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="11:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="other_5"/>
+                <param name="closingTime" value="23:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="05:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="work_6"/>
+                <param name="closingTime" value="18:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="06:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="work_10"/>
+                <param name="closingTime" value="18:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="10:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="other_4"/>
+                <param name="closingTime" value="23:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="04:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="work_7"/>
+                <param name="closingTime" value="18:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="07:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="other_3"/>
+                <param name="closingTime" value="23:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="03:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="other_2"/>
+                <param name="closingTime" value="23:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="02:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="other_1"/>
+                <param name="closingTime" value="23:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="01:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="work_14"/>
+                <param name="closingTime" value="18:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="14:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="activityParams">
+                <param name="activityType" value="work_13"/>
+                <param name="closingTime" value="18:00:00"/>
+                <param name="earliestEndTime" value="undefined"/>
+                <param name="latestStartTime" value="undefined"/>
+                <param name="minimalDuration" value="undefined"/>
+                <param name="openingTime" value="06:00:00"/>
+                <param name="priority" value="1.0"/>
+                <param name="scoringThisActivityAtAll" value="true"/>
+                <param name="typicalDuration" value="13:00:00"/>
+                <param name="typicalDurationScoreComputation" value="relative"/>
+            </parameterset>
+            <parameterset type="modeParams">
+                <!-- [utils] alternative-specific constant. -->
+                <param name="constant" value="-7.0"/>
+                <!-- [money] daily monetary constant. default=0 to be backwards compatible -->
+                <param name="dailyMonetaryConstant" value="0.0"/>
+                <!-- [utils] daily utility constant. default=0 to be backwards compatible -->
+                <param name="dailyUtilityConstant" value="0.0"/>
+                <!-- [utils/m] utility of traveling (e.g. walking or driving) per m, normally negative.  this is on top of the time (dis)utility. -->
+                <param name="marginalUtilityOfDistance_util_m" value="0.0"/>
+                <!-- [utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top of the opportunity cost of time -->
+                <param name="marginalUtilityOfTraveling_util_hr" value="-8.0"/>
+                <param name="mode" value="car"/>
+                <!-- [unit_of_money/m] conversion of distance into money. Normally negative. -->
+                <param name="monetaryDistanceRate" value="-1.0E-4"/>
+            </parameterset>
+            <parameterset type="modeParams">
+
+                <!-- [utils] alternative-specific constant.  no guarantee that this is used anywhere. default=0 to be backwards compatible for the time being -->
+                <param name="constant" value="0.0"/>
+
+                <!-- [utils/m] utility of walking per m, normally negative.  this is on top of the time (dis)utility. -->
+                <param name="marginalUtilityOfDistance_util_m" value="0.0"/>
+
+                <!-- [utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top of the opportunity cost of time -->
+                <param name="marginalUtilityOfTraveling_util_hr" value="0.0"/>
+
+                <param name="mode" value="drt"/>
+
+                <!-- [unit_of_money/m] conversion of distance into money. Normally negative. -->
+                <param name="monetaryDistanceRate" value="0.0"/>
+            </parameterset>
+
+
+            <parameterset type="modeParams">
+
+                <!-- [utils] alternative-specific constant.  no guarantee that this is used anywhere. default=0 to be backwards compatible for the time being -->
+                <param name="constant" value="0.0"/>
+
+                <!-- [utils/m] utility of walking per m, normally negative.  this is on top of the time (dis)utility. -->
+                <param name="marginalUtilityOfDistance_util_m" value="0.0"/>
+
+                <!-- [utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top of the opportunity cost of time -->
+                <param name="marginalUtilityOfTraveling_util_hr" value="0.0"/>
+
+                <param name="mode" value="drt_walk"/>
+
+                <!-- [unit_of_money/m] conversion of distance into money. Normally negative. -->
+                <param name="monetaryDistanceRate" value="0.0"/>
+            </parameterset>
+            <parameterset type="modeParams">
+                <param name="constant" value="-4.5"/>
+                <param name="dailyMonetaryConstant" value="0.0"/>
+                <param name="dailyUtilityConstant" value="0.0"/>
+                <param name="marginalUtilityOfDistance_util_m" value="0.0"/>
+                <param name="marginalUtilityOfTraveling_util_hr" value="-7.0"/>
+                <param name="mode" value="pt"/>
+                <param name="monetaryDistanceRate" value="0.0"/>
+            </parameterset>
+            <parameterset type="modeParams">
+                <param name="constant" value="0.0"/>
+                <param name="dailyMonetaryConstant" value="0.0"/>
+                <param name="dailyUtilityConstant" value="0.0"/>
+                <param name="marginalUtilityOfDistance_util_m" value="0.0"/>
+                <param name="marginalUtilityOfTraveling_util_hr" value="-2.5"/>
+                <param name="mode" value="walk"/>
+                <param name="monetaryDistanceRate" value="0.0"/>
+            </parameterset>
+            <parameterset type="modeParams">
+                <param name="constant" value="-5.25"/>
+                <param name="dailyMonetaryConstant" value="0.0"/>
+                <param name="dailyUtilityConstant" value="0.0"/>
+                <param name="marginalUtilityOfDistance_util_m" value="0.0"/>
+                <param name="marginalUtilityOfTraveling_util_hr" value="-7.75"/>
+                <param name="mode" value="bike"/>
+                <param name="monetaryDistanceRate" value="0.0"/>
+            </parameterset>
+            <parameterset type="modeParams">
+                <param name="constant" value="-15.0"/>
+                <param name="dailyMonetaryConstant" value="0.0"/>
+                <param name="dailyUtilityConstant" value="0.0"/>
+                <param name="marginalUtilityOfDistance_util_m" value="0.0"/>
+                <param name="marginalUtilityOfTraveling_util_hr" value="-16.0"/>
+                <param name="mode" value="ride"/>
+                <param name="monetaryDistanceRate" value="-1.0E-4"/>
+            </parameterset>
+            <parameterset type="modeParams">
+                <param name="constant" value="0.0"/>
+                <param name="dailyMonetaryConstant" value="0.0"/>
+                <param name="dailyUtilityConstant" value="0.0"/>
+                <param name="marginalUtilityOfDistance_util_m" value="0.0"/>
+                <param name="marginalUtilityOfTraveling_util_hr" value="-6.0"/>
+                <param name="mode" value="other"/>
+                <param name="monetaryDistanceRate" value="0.0"/>
+            </parameterset>
+        </parameterset>
+    </module>
+    <module name="plans">
+        <!-- String: minOfDurationAndEndTime tryEndTimeThenDuration endTimeOnly. Anything besides minOfDurationAndEndTime will internally use a different (simpler) version of the TimeAllocationMutator. -->
+        <param name="activityDurationInterpretation" value="tryEndTimeThenDuration"/>
+        <!-- The Coordinates Reference System in which the coordinates are expressed in the input file. At import, the coordinates will be converted to the coordinate system defined in "global", and willbe converted back at export. If not specified, no conversion happens. -->
+        <param name="inputCRS" value="null"/>
+        <!-- Path to a file containing person attributes (required file format: ObjectAttributes). -->
+        <param name="inputPersonAttributesFile" value="null"/>
+        <param name="inputPlansFile"
+               value="D:\Thiel\Programme\MatSim\01_HannoverModel_2.0\Simulation\output\vw235_nocad.1.0\ITERS\it.100\vw235_nocad.1.0.100.plans.xml.gz"/>
+        <!-- Defines how routes are stored in memory. Currently supported: LinkNetworkRoute, CompressedNetworkRoute. -->
+        <param name="networkRouteType" value="LinkNetworkRoute"/>
+        <!-- (not tested) will remove plan attributes that are presumably not used, such as activityStartTime. default=false. Use with Caution! -->
+        <param name="removingUnnecessaryPlanAttributes" value="false"/>
+        <!-- Name of the (Object)Attribute defining the subpopulation to which pertains a Person (as freight, through traffic, etc.). The attribute must be of String type.  Change away from default only in desperate situations. -->
+        <param name="subpopulationAttributeName" value="subpopulation"/>
+    </module>
+    <module name="planscalcroute">
+        <!-- All the modes for which the router is supposed to generate network routes (like car) -->
+        <param name="networkModes" value="car"/>
+        <parameterset type="teleportedModeParameters">
+            <param name="beelineDistanceFactor" value="1.3"/>
+            <param name="mode" value="bike"/>
+            <!-- Free-speed factor for a teleported mode. Travel time = teleportedModeFreespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. Please do not set teleportedModeFreespeedFactor as well as teleportedModeSpeed for the same mode, but if you do, +teleportedModeFreespeedFactor wins over teleportedModeSpeed. -->
+            <param name="teleportedModeFreespeedFactor" value="null"/>
+            <!-- Speed for a teleported mode. Travel time = (<beeline distance> * beelineDistanceFactor) / teleportedModeSpeed. Insert a line like this for every such mode. -->
+            <param name="teleportedModeSpeed" value="3.333"/>
+        </parameterset>
+        <parameterset type="teleportedModeParameters">
+            <param name="beelineDistanceFactor" value="1.3"/>
+            <param name="mode" value="walk"/>
+            <param name="teleportedModeFreespeedFactor" value="null"/>
+            <param name="teleportedModeSpeed" value="1.0"/>
+        </parameterset>
+        <parameterset type="teleportedModeParameters">
+            <param name="beelineDistanceFactor" value="1.3"/>
+            <param name="mode" value="access_walk"/>
+            <param name="teleportedModeFreespeedFactor" value="null"/>
+            <param name="teleportedModeSpeed" value="0.8333333333333333"/>
+        </parameterset>
+        <parameterset type="teleportedModeParameters">
+            <param name="beelineDistanceFactor" value="1.3"/>
+            <param name="mode" value="egress_walk"/>
+            <param name="teleportedModeFreespeedFactor" value="null"/>
+            <param name="teleportedModeSpeed" value="0.8333333333333333"/>
+        </parameterset>
+        <parameterset type="teleportedModeParameters">
+            <param name="beelineDistanceFactor" value="1.3"/>
+            <param name="mode" value="undefined"/>
+            <param name="teleportedModeFreespeedFactor" value="null"/>
+            <param name="teleportedModeSpeed" value="13.88888888888889"/>
+        </parameterset>
+        <parameterset type="teleportedModeParameters">
+            <param name="beelineDistanceFactor" value="1.3"/>
+            <param name="mode" value="ride"/>
+            <param name="teleportedModeFreespeedFactor" value="1.0"/>
+            <param name="teleportedModeSpeed" value="null"/>
+        </parameterset>
+        <parameterset type="teleportedModeParameters">
+            <param name="beelineDistanceFactor" value="1.3"/>
+            <param name="mode" value="pt"/>
+            <param name="teleportedModeFreespeedFactor" value="2.0"/>
+            <param name="teleportedModeSpeed" value="null"/>
+        </parameterset>
+    </module>
+    <module name="ptCounts">
+        <!-- factor by which to re-scale the simulated values.  necessary when simulation runs with something different from 100%.  needs to be adapted manually -->
+        <param name="countsScaleFactor" value="0.1"/>
+        <!-- distance to distanceFilterCenterNode to include counting stations. The unit of distance is the Euclidean distance implied by the coordinate system -->
+        <param name="distanceFilter" value="null"/>
+        <!-- node id for center node of distance filter -->
+        <param name="distanceFilterCenterNode" value="null"/>
+        <!-- input file containing the alighting (getting off) counts for pt -->
+        <param name="inputAlightCountsFile" value="null"/>
+        <!-- input file containing the boarding (getting on) counts for pt -->
+        <param name="inputBoardCountsFile" value="null"/>
+        <!-- input file containing the occupancy counts for pt -->
+        <param name="inputOccupancyCountsFile" value="null"/>
+        <!-- possible values: `html', `kml', `txt', `all' -->
+        <param name="outputformat" value="null"/>
+        <!-- every how many iterations (starting with 0) counts comparisons are generated -->
+        <param name="ptCountsInterval" value="10"/>
+    </module>
+    <module name="qsim">
+        <param name="endTime" value="30:00:00"/>
+        <param name="flowCapacityFactor" value="1.0"/>
+        <!-- decides if waiting vehicles enter the network after or before the already driving vehicles were moved. Default: false -->
+        <param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="false"/>
+        <!-- If link dynamics is set as SeepageQ, set to false if all seep modes should perform seepage. Default is true (better option). -->
+        <param name="isRestrictingSeepage" value="true"/>
+        <!-- If link dynamics is set as SeepageQ, set to true if seep mode do not consumes any space on the link. Default is false. -->
+        <param name="isSeepModeStorageFree" value="false"/>
+        <!-- default: FIFO; options: FIFO PassingQ SeepageQ -->
+        <param name="linkDynamics" value="FIFO"/>
+        <!-- The (initial) width of the links of the network. Use positive floating point values. This is used only for visualisation. -->
+        <param name="linkWidth" value="30.0"/>
+        <!-- [comma-separated list] Defines which modes are congested modes. Technically, these are the modes that the departure handler of the netsimengine handles.  Effective cell size, effective lane width, flow capacity factor, and storage capacity factor need to be set with diligence.  Need to be vehicular modes to make sense. -->
+        <param name="mainMode" value="car"/>
+        <!-- Shortens a link in the visualization, i.e. its start and end point are moved into towards the center. Does not affect traffic flow.  -->
+        <param name="nodeOffset" value="0.0"/>
+        <!-- Number of threads used for the QSim.  Note that this setting is independent from the "global" threads setting.  In contrast to earlier versions, the non-parallel special version is no longer there. -->
+        <param name="numberOfThreads" value="1"/>
+        <!-- Boolean. `true': stuck vehicles are removed, aborting the plan; `false': stuck vehicles are forced into the next link. `false' is probably the better choice. -->
+        <param name="removeStuckVehicles" value="false"/>
+        <!-- If link dynamics is set as SeepageQ, set a seep mode. Default is bike. -->
+        <param name="seepMode" value="bike"/>
+        <!-- Possible values: minOfEndtimeAndMobsimFinished, onlyUseEndtime -->
+        <param name="simEndtimeInterpretation" value="null"/>
+        <!-- Options: maxOfStarttimeAndEarliestActivityEnd onlyUseStarttime  -->
+        <param name="simStarttimeInterpretation" value="onlyUseStarttime"/>
+        <!-- snapshotStyle. One of: equiDist queue withHoles withHolesAndShowHoles kinematicWaves  -->
+        <param name="snapshotStyle" value="equiDist"/>
+        <param name="snapshotperiod" value="00:00:00"/>
+        <param name="startTime" value="undefined"/>
+        <param name="storageCapacityFactor" value="1.0"/>
+        <!-- time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move. -->
+        <param name="stuckTime" value="10.0"/>
+        <param name="timeStepSize" value="00:00:01"/>
+        <!-- options: queue withHoles kinematicWaves  -->
+        <param name="trafficDynamics" value="withHoles"/>
+        <!-- Set this parameter to true if lanes should be used, false if not. -->
+        <param name="useLanes" value="false"/>
+        <!-- If a route does not reference a vehicle, agents will use the vehicle with the same id as their own. -->
+        <param name="usePersonIdForMissingVehicleId" value="true"/>
+        <!-- If false, the qsim accumulates fractional flows up to one flow unit in every time step.  If true, flows are updated only if an agent wants to enter the link or an agent is added to buffer. Default is true. -->
+        <param name="usingFastCapacityUpdate" value="true"/>
+        <!-- if the qsim should use as many runners as there are threads (Christoph's dissertation version) or more of them, together with a thread pool (seems to be faster in some situations, but is not tested). -->
+        <param name="usingThreadpool" value="true"/>
+        <!-- Defines what happens if an agent wants to depart, but the specified vehicle is not available. One of: teleport wait exception  -->
+        <param name="vehicleBehavior" value="teleport"/>
+        <!-- If vehicles should all be the same default vehicle, or come from the vehicles file, or something else.  Possible values:  defaultVehicle modeVehicleTypesFromVehiclesData fromVehiclesData -->
+        <param name="vehiclesSource" value="defaultVehicle"/>
+    </module>
+    <module name="strategy">
+
+        <parameterset type="strategysettings">
+            <param name="disableAfterIteration" value="-1"/>
+            <param name="executionPath" value="null"/>
+            <param name="strategyName" value="KeepLastSelected"/>
+            <param name="subpopulation" value="null"/>
+            <param name="weight" value="1.0"/>
+        </parameterset>
+
+    </module>
+    <module name="subtourModeChoice">
+        <!-- Only for backwards compatibility.  Defines if only trips from modes list should change mode, or all trips.  Options: fromAllModesToSpecifiedModes fromSpecifiedModesToSpecifiedModes  -->
+        <param name="behavior" value="fromSpecifiedModesToSpecifiedModes"/>
+        <!-- Defines the chain-based modes, seperated by commas -->
+        <param name="chainBasedModes" value="car,bike"/>
+        <!-- Defines whether car availability must be considered or not. A agent has no car only if it has no license, or never access to a car -->
+        <param name="considerCarAvailability" value="true"/>
+        <!-- Defines all the modes available, including chain-based modes, seperated by commas -->
+        <param name="modes" value="car,bike,walk,pt,ride"/>
+    </module>
+
+    <module name="transit">
+        <!-- The Coordinates Reference System in which the coordinates are expressed in the input file. At import, the coordinates will be converted to the coordinate system defined in "global", and willbe converted back at export. If not specified, no conversion happens. -->
+        <param name="inputScheduleCRS" value="null"/>
+        <!-- Optional input file containing additional attributes for transit lines, stored as ObjectAttributes. -->
+        <param name="transitLinesAttributesFile" value="null"/>
+        <!-- Comma-separated list of transportation modes that are handled as transit. Defaults to 'pt'. -->
+        <param name="transitModes" value="pt"/>
+        <!-- Input file containing the transit schedule to be simulated. -->
+        <param name="transitScheduleFile" value="null"/>
+        <!-- Optional input file containing additional attributes for transit stop facilities, stored as ObjectAttributes. -->
+        <param name="transitStopsAttributesFile" value="null"/>
+        <!-- Set this parameter to true if transit should be simulated, false if not. -->
+        <param name="useTransit" value="false"/>
+        <!-- Input file containing the vehicles used by the departures in the transit schedule. -->
+        <param name="vehiclesFile" value="null"/>
+    </module>
+    <module name="transitRouter">
+        <!-- additional time the router allocates when a line switch happens. Can be interpreted as a 'safety' time that agents need to safely transfer from one line to another -->
+        <param name="additionalTransferTime" value="0.0"/>
+        <!-- Factor with which direct walk generalized cost is multiplied before it is compared to the pt generalized cost.  Set to a very high value to reduce direct walk results. -->
+        <param name="directWalkFactor" value="1.0"/>
+        <!-- step size to increase searchRadius if no stops are found -->
+        <param name="extensionRadius" value="200.0"/>
+        <!-- maximum beeline distance between stops that agents could transfer to by walking -->
+        <param name="maxBeelineWalkConnectionDistance" value="100.0"/>
+        <!-- the radius in which stop locations are searched, given a start or target coordinate -->
+        <param name="searchRadius" value="1000.0"/>
+    </module>
+    <module name="travelTimeCalculator">
+        <!-- Transport modes that will be respected by the travel time collector. 'car' is default, which includes also busses from the pt simulation module. Use this parameter in combination with 'filterModes' = true! -->
+        <param name="analyzedModes" value="car"/>
+        <param name="calculateLinkToLinkTravelTimes" value="false"/>
+        <param name="calculateLinkTravelTimes" value="true"/>
+        <!-- If true, link travel times from legs performed on modes not included in the 'analyzedModes' parameter are ignored. -->
+        <param name="filterModes" value="false"/>
+        <!-- The lenght (in sec) of the time period that is splited into time bins; an additional time bin is created to aggregate all travel times collected after maxTime -->
+        <param name="maxTime" value="108000"/>
+        <!-- If true, link travel times are measured and calculated separately for each mode in analyzedModes; other modes are ignored even if filterModes=false. -->
+        <param name="separateModes" value="false"/>
+        <!-- How to deal with congested time bins that have no link entry events. `optimistic' assumes free speed (too optimistic); 'experimental_LastMile' is experimental and probably too pessimistic. -->
+        <param name="travelTimeAggregator" value="optimistic"/>
+        <!-- The size of the time bin (in sec) into which the link travel times are aggregated for the router -->
+        <param name="travelTimeBinSize" value="900"/>
+        <!-- possible values: TravelTimeCalculatorArray TravelTimeCalculatorHashMap  -->
+        <param name="travelTimeCalculator" value="TravelTimeCalculatorArray"/>
+        <!-- How to deal with link entry times at different positions during the time bin. Currently supported: average, linearinterpolation -->
+        <param name="travelTimeGetter" value="average"/>
+    </module>
+    <module name="vehicles">
+        <param name="vehiclesFile" value="null"/>
+    </module>
+    <module name="vspExperimental">
+        <!-- (do not use except of you have to) There was a problem with pt interaction scoring.  Some people solved it by overwriting the parameters of the pt interaction activity type.  Doing this now throws an Exception.  If you still insist on doing this, set the following to true. -->
+        <param name="isAbleToOverwritePtInteractionParams" value="false"/>
+        <param name="isGeneratingBoardingDeniedEvent" value="false"/>
+        <!-- if an approximation of the opportunity cost of time is included into the radius calculation for location choice.`true' will be faster, but it is an approximation.  Default is `true'; `false' is available for backwards compatibility. -->
+        <param name="isUsingOpportunityCostOfTimeForLocationChoice" value="true"/>
+        <param name="logitScaleParamForPlansRemoval" value="1.0"/>
+        <!-- Options: | ignore | info | warn | abort | .  When violating VSP defaults, this results in nothing, logfile infos, logfile warnings, or aborts.  Members of VSP should use `abort' or talk to kai. -->
+        <param name="vspDefaultsCheckingLevel" value="ignore"/>
+        <!-- if true then writes output_events in output directory.  default is `false'. Will only work when lastIteration is multiple of events writing interval -->
+        <param name="writingOutputEvents" value="true"/>
+    </module>
+
+</config>

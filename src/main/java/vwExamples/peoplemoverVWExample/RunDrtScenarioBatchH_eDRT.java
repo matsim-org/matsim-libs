@@ -191,7 +191,6 @@ public class RunDrtScenarioBatchH_eDRT {
 		eDrt.setChargersFile(inbase + "\\chargers\\chargers.xml.gz");
 		eDrt.setVehiclesFile(inbase + "\\fleets\\eFleet.xml.gz");
 		eDrt.setAuxDischargeTimeStep(10);
-		eDrt.setAuxDischargingSimulation(EvConfigGroup.AuxDischargingSimulation.seperateAuxDischargingHandler);
 		eDrt.setTimeProfiles(true);
 
 		// config.addModule(new ParkingRouterConfigGroup());

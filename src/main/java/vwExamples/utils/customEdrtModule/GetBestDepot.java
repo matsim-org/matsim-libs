@@ -28,11 +28,12 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.ev.data.Charger;
-import org.matsim.contrib.ev.data.ChargingInfrastructure;
+import org.matsim.contrib.ev.infrastructure.*;
+//import org.matsim.contrib.ev.data.ChargingInfrastructure;
 import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructures;
 import org.matsim.core.network.NetworkUtils;
 
 import java.util.Collections;
@@ -105,8 +106,8 @@ public class GetBestDepot implements DepotFinder {
 			int queuedVehicles = entry.getValue().getLogic().getQueuedVehicles().size();
 			ChargerQueueMap.put(entry.getValue(), queuedVehicles);
 			
-			int chargedVehicles = entry.getValue().getLogic().getPluggedVehicles().size();
-			ChargerChargeMap.put(entry.getValue(), queuedVehicles);
+//			int chargedVehicles = entry.getValue().getLogic().getPluggedVehicles().size();
+//			ChargerChargeMap.put(entry.getValue(), queuedVehicles);
 		}
 
 	}
@@ -125,8 +126,8 @@ public class GetBestDepot implements DepotFinder {
 		if (isLocatedinHub) {
 			// Check if vehicle is at charger or at queue of an charger
 
-			Set<Entry<Id<Charger>, Charger>> chargerEntrys = chargingInfrastructure
-					.getChargersAtLink(currentLink.getId()).entrySet();
+			Set<Entry<Id<Charger>, Charger>> chargerEntrys = ChargingInfrastructures.getChargersAtLink(
+					chargingInfrastructure, currentLink.getId()).entrySet();
 
 			for (Entry<Id<Charger>, Charger> charger : chargerEntrys) {
 

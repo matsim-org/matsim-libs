@@ -21,6 +21,9 @@ package commercialtraffic;/*
  * created by jbischoff, 03.05.2019
  */
 
+import commercialtraffic.integration.CommercialTrafficConfigGroup;
+import commercialtraffic.integration.CommercialTrafficModule;
+import commercialtraffic.replanning.ChangeDeliveryServiceOperator;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -44,9 +47,16 @@ public class RunCommercialTraffic {
         commercialTrafficConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
         config.addModule(commercialTrafficConfigGroup);
         StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
-        changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
-        changeExpBeta.setWeight(1);
+        changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
+        changeExpBeta.setWeight(0.5);
         config.strategy().addStrategySettings(changeExpBeta);
+
+        StrategyConfigGroup.StrategySettings changeServiceOperator = new StrategyConfigGroup.StrategySettings();
+        changeServiceOperator.setStrategyName(ChangeDeliveryServiceOperator.SELECTOR_NAME);
+        changeServiceOperator.setWeight(0.5);
+        config.strategy().addStrategySettings(changeServiceOperator);
+
+
 
 
         config.strategy().setFractionOfIterationsToDisableInnovation(.8);
@@ -58,8 +68,9 @@ public class RunCommercialTraffic {
         work.setOpeningTime(8 * 3600);
         work.setClosingTime(8 * 3600);
         config.planCalcScore().addActivityParams(work);
-        config.controler().setLastIteration(1);
+        config.controler().setLastIteration(10);
         config.controler().setWriteEventsInterval(1);
+        config.controler().setOutputDirectory("output/commercialtraffictestrun");
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         config.network().setInputFile("grid_network.xml");
         config.plans().setInputFile("testpop.xml");

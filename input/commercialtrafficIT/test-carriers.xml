@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<carriers>
+    <carrier id="shopping_1">
+        <capabilities fleetSize="INFINITE">
+            <vehicles>
+                <vehicle id="carrier_2_lightVehicle_one" depotLinkId="111" typeId="small" earliestStart="06:00:00"
+                         latestEnd="16:00:00"/>
+            </vehicles>
+
+        </capabilities>
+    </carrier>
+
+    <carrier id="pizza_1">
+        <capabilities fleetSize="INFINITE">
+            <vehicles>
+                <vehicle id="carrier_1_lightVehicle_one" depotLinkId="111" typeId="small" earliestStart="06:00:00"
+                         latestEnd="16:00:00"/>
+            </vehicles>
+
+        </capabilities>
+
+
+    </carrier>
+
+    <carrier id="pizza_2">
+        <capabilities fleetSize="INFINITE">
+            <vehicles>
+                <vehicle id="carrier_2_lightVehicle_one" depotLinkId="111" typeId="small" earliestStart="06:00:00"
+                         latestEnd="16:00:00"/>
+            </vehicles>
+
+        </capabilities>
+
+
+    </carrier>
+
+</carriers>

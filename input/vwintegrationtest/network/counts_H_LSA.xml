@@ -1,0 +1,1116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<counts xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://matsim.org/files/dtd/counts_v1.xsd"
+        name="Untersuchungsraum" desc="DiMiDo" year="2013">
+    <!-- ====================================================================== -->
+
+    <count loc_id="353044" cs_id="Schlosswender Str. Nord-Ost">
+        <volume h="1" val="137"/>
+        <volume h="2" val="77"/>
+        <volume h="3" val="90"/>
+        <volume h="4" val="70"/>
+        <volume h="5" val="83"/>
+        <volume h="6" val="172"/>
+        <volume h="7" val="280"/>
+        <volume h="8" val="373"/>
+        <volume h="9" val="292"/>
+        <volume h="10" val="275"/>
+        <volume h="11" val="260"/>
+        <volume h="12" val="310"/>
+        <volume h="13" val="244"/>
+        <volume h="14" val="262"/>
+        <volume h="15" val="299"/>
+        <volume h="16" val="324"/>
+        <volume h="17" val="283"/>
+        <volume h="18" val="355"/>
+        <volume h="19" val="304"/>
+        <volume h="20" val="308"/>
+        <volume h="21" val="268"/>
+        <volume h="22" val="233"/>
+        <volume h="23" val="230"/>
+        <volume h="24" val="192"/>
+    </count>
+
+    <count loc_id="349083" cs_id="Königsworther Platz Süd-Ost">
+        <volume h="1" val="202"/>
+        <volume h="2" val="154"/>
+        <volume h="3" val="111"/>
+        <volume h="4" val="89"/>
+        <volume h="5" val="114"/>
+        <volume h="6" val="323"/>
+        <volume h="7" val="501"/>
+        <volume h="8" val="354"/>
+        <volume h="9" val="158"/>
+        <volume h="10" val="196"/>
+        <volume h="11" val="318"/>
+        <volume h="12" val="265"/>
+        <volume h="13" val="585"/>
+        <volume h="14" val="620"/>
+        <volume h="15" val="557"/>
+        <volume h="16" val="529"/>
+        <volume h="17" val="678"/>
+        <volume h="18" val="588"/>
+        <volume h="19" val="702"/>
+        <volume h="20" val="667"/>
+        <volume h="21" val="899"/>
+        <volume h="22" val="635"/>
+        <volume h="23" val="585"/>
+        <volume h="24" val="425"/>
+    </count>
+
+
+    <count loc_id="353050" cs_id="Nienburger Str. Nord-West">
+        <volume h="1" val="34"/>
+        <volume h="2" val="24"/>
+        <volume h="3" val="17"/>
+        <volume h="4" val="13"/>
+        <volume h="5" val="35"/>
+        <volume h="6" val="81"/>
+        <volume h="7" val="187"/>
+        <volume h="8" val="353"/>
+        <volume h="9" val="395"/>
+        <volume h="10" val="331"/>
+        <volume h="11" val="347"/>
+        <volume h="12" val="383"/>
+        <volume h="13" val="328"/>
+        <volume h="14" val="403"/>
+        <volume h="15" val="420"/>
+        <volume h="16" val="453"/>
+        <volume h="17" val="469"/>
+        <volume h="18" val="492"/>
+        <volume h="19" val="360"/>
+        <volume h="20" val="297"/>
+        <volume h="21" val="187"/>
+        <volume h="22" val="190"/>
+        <volume h="23" val="169"/>
+        <volume h="24" val="83"/>
+    </count>
+
+
+    <count loc_id="197414" cs_id="Bremer Damm West">
+        <volume h="1" val="94"/>
+        <volume h="2" val="63"/>
+        <volume h="3" val="62"/>
+        <volume h="4" val="59"/>
+        <volume h="5" val="151"/>
+        <volume h="6" val="660"/>
+        <volume h="7" val="1421"/>
+        <volume h="8" val="1704"/>
+        <volume h="9" val="1691"/>
+        <volume h="10" val="1587"/>
+        <volume h="11" val="1393"/>
+        <volume h="12" val="1367"/>
+        <volume h="13" val="1178"/>
+        <volume h="14" val="1274"/>
+        <volume h="15" val="1312"/>
+        <volume h="16" val="1395"/>
+        <volume h="17" val="1383"/>
+        <volume h="18" val="1461"/>
+        <volume h="19" val="1289"/>
+        <volume h="20" val="995"/>
+        <volume h="21" val="790"/>
+        <volume h="22" val="591"/>
+        <volume h="23" val="418"/>
+        <volume h="24" val="219"/>
+    </count>
+
+    <count loc_id="211647" cs_id="Berliner Allee Nord ">
+        <volume h="1" val="138"/>
+        <volume h="2" val="73"/>
+        <volume h="3" val="64"/>
+        <volume h="4" val="71"/>
+        <volume h="5" val="94"/>
+        <volume h="6" val="290"/>
+        <volume h="7" val="645"/>
+        <volume h="8" val="1119"/>
+        <volume h="9" val="1154"/>
+        <volume h="10" val="1045"/>
+        <volume h="11" val="1045"/>
+        <volume h="12" val="1023"/>
+        <volume h="13" val="1101"/>
+        <volume h="14" val="1178"/>
+        <volume h="15" val="1142"/>
+        <volume h="16" val="1295"/>
+        <volume h="17" val="1328"/>
+        <volume h="18" val="1246"/>
+        <volume h="19" val="1161"/>
+        <volume h="20" val="880"/>
+        <volume h="21" val="626"/>
+        <volume h="22" val="488"/>
+        <volume h="23" val="468"/>
+        <volume h="24" val="227"/>
+    </count>
+
+
+    <count loc_id="34712" cs_id="Marienstr. Ost">
+        <volume h="1" val="58"/>
+        <volume h="2" val="35"/>
+        <volume h="3" val="26"/>
+        <volume h="4" val="36"/>
+        <volume h="5" val="60"/>
+        <volume h="6" val="258"/>
+        <volume h="7" val="573"/>
+        <volume h="8" val="835"/>
+        <volume h="9" val="821"/>
+        <volume h="10" val="788"/>
+        <volume h="11" val="743"/>
+        <volume h="12" val="718"/>
+        <volume h="13" val="706"/>
+        <volume h="14" val="708"/>
+        <volume h="15" val="794"/>
+        <volume h="16" val="810"/>
+        <volume h="17" val="818"/>
+        <volume h="18" val="783"/>
+        <volume h="19" val="770"/>
+        <volume h="20" val="645"/>
+        <volume h="21" val="369"/>
+        <volume h="22" val="345"/>
+        <volume h="23" val="220"/>
+        <volume h="24" val="124"/>
+    </count>
+
+
+    <count loc_id="243418" cs_id="Sallstr. Süd">
+        <volume h="1" val="53"/>
+        <volume h="2" val="25"/>
+        <volume h="3" val="25"/>
+        <volume h="4" val="21"/>
+        <volume h="5" val="41"/>
+        <volume h="6" val="130"/>
+        <volume h="7" val="296"/>
+        <volume h="8" val="453"/>
+        <volume h="9" val="504"/>
+        <volume h="10" val="433"/>
+        <volume h="11" val="415"/>
+        <volume h="12" val="316"/>
+        <volume h="13" val="453"/>
+        <volume h="14" val="422"/>
+        <volume h="15" val="234"/>
+        <volume h="16" val="522"/>
+        <volume h="17" val="492"/>
+        <volume h="18" val="429"/>
+        <volume h="19" val="504"/>
+        <volume h="20" val="381"/>
+        <volume h="21" val="271"/>
+        <volume h="22" val="247"/>
+        <volume h="23" val="256"/>
+        <volume h="24" val="111"/>
+    </count>
+
+
+    <count loc_id="283527" cs_id="Marienstr. West ">
+        <volume h="1" val="45"/>
+        <volume h="2" val="24"/>
+        <volume h="3" val="15"/>
+        <volume h="4" val="11"/>
+        <volume h="5" val="28"/>
+        <volume h="6" val="117"/>
+        <volume h="7" val="326"/>
+        <volume h="8" val="486"/>
+        <volume h="9" val="496"/>
+        <volume h="10" val="479"/>
+        <volume h="11" val="488"/>
+        <volume h="12" val="500"/>
+        <volume h="13" val="505"/>
+        <volume h="14" val="484"/>
+        <volume h="15" val="596"/>
+        <volume h="16" val="583"/>
+        <volume h="17" val="550"/>
+        <volume h="18" val="496"/>
+        <volume h="19" val="534"/>
+        <volume h="20" val="385"/>
+        <volume h="21" val="257"/>
+        <volume h="22" val="230"/>
+        <volume h="23" val="293"/>
+        <volume h="24" val="114"/>
+    </count>
+
+    <count loc_id="199925" cs_id="Celler Str. Nord-Ost ">
+        <volume h="1" val="62"/>
+        <volume h="2" val="35"/>
+        <volume h="3" val="30"/>
+        <volume h="4" val="29"/>
+        <volume h="5" val="39"/>
+        <volume h="6" val="137"/>
+        <volume h="7" val="279"/>
+        <volume h="8" val="501"/>
+        <volume h="9" val="638"/>
+        <volume h="10" val="519"/>
+        <volume h="11" val="563"/>
+        <volume h="12" val="516"/>
+        <volume h="13" val="587"/>
+        <volume h="14" val="584"/>
+        <volume h="15" val="546"/>
+        <volume h="16" val="591"/>
+        <volume h="17" val="644"/>
+        <volume h="18" val="611"/>
+        <volume h="19" val="585"/>
+        <volume h="20" val="462"/>
+        <volume h="21" val="345"/>
+        <volume h="22" val="278"/>
+        <volume h="23" val="209"/>
+        <volume h="24" val="121"/>
+    </count>
+
+
+    <count loc_id="368985" cs_id="Hamburger Allee Süd-Ost">
+        <volume h="1" val="197"/>
+        <volume h="2" val="129"/>
+        <volume h="3" val="115"/>
+        <volume h="4" val="107"/>
+        <volume h="5" val="94"/>
+        <volume h="6" val="320"/>
+        <volume h="7" val="707"/>
+        <volume h="8" val="1185"/>
+        <volume h="9" val="1297"/>
+        <volume h="10" val="1197"/>
+        <volume h="11" val="1129"/>
+        <volume h="12" val="1168"/>
+        <volume h="13" val="1273"/>
+        <volume h="14" val="1395"/>
+        <volume h="15" val="1358"/>
+        <volume h="16" val="1524"/>
+        <volume h="17" val="1534"/>
+        <volume h="18" val="1495"/>
+        <volume h="19" val="1376"/>
+        <volume h="20" val="1035"/>
+        <volume h="21" val="903"/>
+        <volume h="22" val="781"/>
+        <volume h="23" val="594"/>
+        <volume h="24" val="380"/>
+    </count>
+
+
+    <count loc_id="309599" cs_id="Celler Str. Süd-West">
+        <volume h="1" val="246"/>
+        <volume h="2" val="186"/>
+        <volume h="3" val="151"/>
+        <volume h="4" val="92"/>
+        <volume h="5" val="127"/>
+        <volume h="6" val="229"/>
+        <volume h="7" val="449"/>
+        <volume h="8" val="711"/>
+        <volume h="9" val="753"/>
+        <volume h="10" val="831"/>
+        <volume h="11" val="737"/>
+        <volume h="12" val="713"/>
+        <volume h="13" val="745"/>
+        <volume h="14" val="881"/>
+        <volume h="15" val="805"/>
+        <volume h="16" val="967"/>
+        <volume h="17" val="893"/>
+        <volume h="18" val="846"/>
+        <volume h="19" val="923"/>
+        <volume h="20" val="915"/>
+        <volume h="21" val="739"/>
+        <volume h="22" val="576"/>
+        <volume h="23" val="526"/>
+        <volume h="24" val="418"/>
+    </count>
+
+
+    <count loc_id="66719" cs_id="Hamburger Allee Nord-West ">
+        <volume h="1" val="98"/>
+        <volume h="2" val="73"/>
+        <volume h="3" val="74"/>
+        <volume h="4" val="70"/>
+        <volume h="5" val="92"/>
+        <volume h="6" val="235"/>
+        <volume h="7" val="525"/>
+        <volume h="8" val="987"/>
+        <volume h="9" val="1086"/>
+        <volume h="10" val="1028"/>
+        <volume h="11" val="929"/>
+        <volume h="12" val="947"/>
+        <volume h="13" val="889"/>
+        <volume h="14" val="898"/>
+        <volume h="15" val="971"/>
+        <volume h="16" val="991"/>
+        <volume h="17" val="996"/>
+        <volume h="18" val="1023"/>
+        <volume h="19" val="898"/>
+        <volume h="20" val="695"/>
+        <volume h="21" val="517"/>
+        <volume h="22" val="456"/>
+        <volume h="23" val="390"/>
+        <volume h="24" val="241"/>
+    </count>
+
+    <count loc_id="143186" cs_id="Stelinger Str. Nord ">
+        <volume h="1" val="5"/>
+        <volume h="2" val="8"/>
+        <volume h="3" val="2"/>
+        <volume h="4" val="5"/>
+        <volume h="5" val="45"/>
+        <volume h="6" val="270"/>
+        <volume h="7" val="306"/>
+        <volume h="8" val="448"/>
+        <volume h="9" val="317"/>
+        <volume h="10" val="257"/>
+        <volume h="11" val="151"/>
+        <volume h="12" val="186"/>
+        <volume h="13" val="243"/>
+        <volume h="14" val="339"/>
+        <volume h="15" val="327"/>
+        <volume h="16" val="258"/>
+        <volume h="17" val="315"/>
+        <volume h="18" val="287"/>
+        <volume h="19" val="171"/>
+        <volume h="20" val="105"/>
+        <volume h="21" val="90"/>
+        <volume h="22" val="154"/>
+        <volume h="23" val="90"/>
+        <volume h="24" val="25"/>
+    </count>
+
+
+    <count loc_id="179824" cs_id="Mecklenheidestr. Ost ">
+        <volume h="1" val="38"/>
+        <volume h="2" val="28"/>
+        <volume h="3" val="15"/>
+        <volume h="4" val="15"/>
+        <volume h="5" val="43"/>
+        <volume h="6" val="291"/>
+        <volume h="7" val="514"/>
+        <volume h="8" val="286"/>
+        <volume h="9" val="259"/>
+        <volume h="10" val="290"/>
+        <volume h="11" val="263"/>
+        <volume h="12" val="305"/>
+        <volume h="13" val="340"/>
+        <volume h="14" val="757"/>
+        <volume h="15" val="823"/>
+        <volume h="16" val="878"/>
+        <volume h="17" val="706"/>
+        <volume h="18" val="651"/>
+        <volume h="19" val="478"/>
+        <volume h="20" val="316"/>
+        <volume h="21" val="244"/>
+        <volume h="22" val="400"/>
+        <volume h="23" val="660"/>
+        <volume h="24" val="66"/>
+    </count>
+
+
+    <count loc_id="54176" cs_id="Stoeckener Str. Süd ">
+        <volume h="1" val="18"/>
+        <volume h="2" val="18"/>
+        <volume h="3" val="11"/>
+        <volume h="4" val="14"/>
+        <volume h="5" val="36"/>
+        <volume h="6" val="257"/>
+        <volume h="7" val="240"/>
+        <volume h="8" val="348"/>
+        <volume h="9" val="297"/>
+        <volume h="10" val="239"/>
+        <volume h="11" val="196"/>
+        <volume h="12" val="236"/>
+        <volume h="13" val="286"/>
+        <volume h="14" val="385"/>
+        <volume h="15" val="321"/>
+        <volume h="16" val="375"/>
+        <volume h="17" val="475"/>
+        <volume h="18" val="421"/>
+        <volume h="19" val="275"/>
+        <volume h="20" val="186"/>
+        <volume h="21" val="236"/>
+        <volume h="22" val="228"/>
+        <volume h="23" val="95"/>
+        <volume h="24" val="37"/>
+    </count>
+
+
+    <count loc_id="358880" cs_id="Mecklenheidestr. West ">
+        <volume h="1" val="58"/>
+        <volume h="2" val="53"/>
+        <volume h="3" val="35"/>
+        <volume h="4" val="48"/>
+        <volume h="5" val="206"/>
+        <volume h="6" val="964"/>
+        <volume h="7" val="799"/>
+        <volume h="8" val="1217"/>
+        <volume h="9" val="979"/>
+        <volume h="10" val="691"/>
+        <volume h="11" val="598"/>
+        <volume h="12" val="520"/>
+        <volume h="13" val="768"/>
+        <volume h="14" val="999"/>
+        <volume h="15" val="610"/>
+        <volume h="16" val="595"/>
+        <volume h="17" val="622"/>
+        <volume h="18" val="620"/>
+        <volume h="19" val="571"/>
+        <volume h="20" val="391"/>
+        <volume h="21" val="422"/>
+        <volume h="22" val="728"/>
+        <volume h="23" val="212"/>
+        <volume h="24" val="93"/>
+    </count>
+
+    <count loc_id="90837" cs_id="Vahrenwalder Str. Nord ">
+        <volume h="1" val="311"/>
+        <volume h="2" val="203"/>
+        <volume h="3" val="183"/>
+        <volume h="4" val="186"/>
+        <volume h="5" val="248"/>
+        <volume h="6" val="756"/>
+        <volume h="7" val="1460"/>
+        <volume h="8" val="2274"/>
+        <volume h="9" val="2387"/>
+        <volume h="10" val="2387"/>
+        <volume h="11" val="2143"/>
+        <volume h="12" val="2232"/>
+        <volume h="13" val="2098"/>
+        <volume h="14" val="1767"/>
+        <volume h="15" val="1899"/>
+        <volume h="16" val="1817"/>
+        <volume h="17" val="1941"/>
+        <volume h="18" val="1811"/>
+        <volume h="19" val="1618"/>
+        <volume h="20" val="1478"/>
+        <volume h="21" val="1193"/>
+        <volume h="22" val="1058"/>
+        <volume h="23" val="983"/>
+        <volume h="24" val="668"/>
+    </count>
+
+
+    <count loc_id="266694" cs_id="Hamburger Allee Ost ">
+        <volume h="1" val="103"/>
+        <volume h="2" val="65"/>
+        <volume h="3" val="56"/>
+        <volume h="4" val="57"/>
+        <volume h="5" val="61"/>
+        <volume h="6" val="187"/>
+        <volume h="7" val="376"/>
+        <volume h="8" val="482"/>
+        <volume h="9" val="474"/>
+        <volume h="10" val="466"/>
+        <volume h="11" val="481"/>
+        <volume h="12" val="542"/>
+        <volume h="13" val="567"/>
+        <volume h="14" val="531"/>
+        <volume h="15" val="489"/>
+        <volume h="16" val="488"/>
+        <volume h="17" val="438"/>
+        <volume h="18" val="521"/>
+        <volume h="19" val="552"/>
+        <volume h="20" val="532"/>
+        <volume h="21" val="447"/>
+        <volume h="22" val="387"/>
+        <volume h="23" val="280"/>
+        <volume h="24" val="214"/>
+    </count>
+
+
+    <count loc_id="37702" cs_id="Vahrenwalder Str. Süd">
+        <volume h="1" val="221"/>
+        <volume h="2" val="119"/>
+        <volume h="3" val="103"/>
+        <volume h="4" val="108"/>
+        <volume h="5" val="146"/>
+        <volume h="6" val="489"/>
+        <volume h="7" val="1099"/>
+        <volume h="8" val="1512"/>
+        <volume h="9" val="1534"/>
+        <volume h="10" val="1541"/>
+        <volume h="11" val="1366"/>
+        <volume h="12" val="1372"/>
+        <volume h="13" val="1290"/>
+        <volume h="14" val="1488"/>
+        <volume h="15" val="1465"/>
+        <volume h="16" val="1623"/>
+        <volume h="17" val="1488"/>
+        <volume h="18" val="1469"/>
+        <volume h="19" val="1370"/>
+        <volume h="20" val="1197"/>
+        <volume h="21" val="1024"/>
+        <volume h="22" val="712"/>
+        <volume h="23" val="702"/>
+        <volume h="24" val="358"/>
+    </count>
+
+    <count loc_id="342763" cs_id="Bruehlstr. Nord ">
+        <volume h="1" val="47"/>
+        <volume h="2" val="23"/>
+        <volume h="3" val="31"/>
+        <volume h="4" val="28"/>
+        <volume h="5" val="17"/>
+        <volume h="6" val="94"/>
+        <volume h="7" val="241"/>
+        <volume h="8" val="377"/>
+        <volume h="9" val="567"/>
+        <volume h="10" val="558"/>
+        <volume h="11" val="406"/>
+        <volume h="12" val="491"/>
+        <volume h="13" val="425"/>
+        <volume h="14" val="428"/>
+        <volume h="15" val="498"/>
+        <volume h="16" val="578"/>
+        <volume h="17" val="533"/>
+        <volume h="18" val="455"/>
+        <volume h="19" val="473"/>
+        <volume h="20" val="351"/>
+        <volume h="21" val="238"/>
+        <volume h="22" val="165"/>
+        <volume h="23" val="125"/>
+        <volume h="24" val="89"/>
+    </count>
+
+
+    <count loc_id="100889" cs_id="Leibnitzufer Süd">
+        <volume h="1" val="140"/>
+        <volume h="2" val="100"/>
+        <volume h="3" val="51"/>
+        <volume h="4" val="56"/>
+        <volume h="5" val="143"/>
+        <volume h="6" val="224"/>
+        <volume h="7" val="303"/>
+        <volume h="8" val="327"/>
+        <volume h="9" val="307"/>
+        <volume h="10" val="313"/>
+        <volume h="11" val="265"/>
+        <volume h="12" val="274"/>
+        <volume h="13" val="252"/>
+        <volume h="14" val="396"/>
+        <volume h="15" val="471"/>
+        <volume h="16" val="531"/>
+        <volume h="17" val="198"/>
+        <volume h="18" val="352"/>
+        <volume h="19" val="395"/>
+        <volume h="20" val="416"/>
+        <volume h="21" val="327"/>
+        <volume h="22" val="331"/>
+        <volume h="23" val="410"/>
+        <volume h="24" val="319"/>
+    </count>
+
+
+    <count loc_id="143952" cs_id="Karl-Wiechert-Allee Nord">
+        <volume h="1" val="54"/>
+        <volume h="2" val="28"/>
+        <volume h="3" val="24"/>
+        <volume h="4" val="16"/>
+        <volume h="5" val="53"/>
+        <volume h="6" val="181"/>
+        <volume h="7" val="416"/>
+        <volume h="8" val="727"/>
+        <volume h="9" val="691"/>
+        <volume h="10" val="591"/>
+        <volume h="11" val="536"/>
+        <volume h="12" val="605"/>
+        <volume h="13" val="931"/>
+        <volume h="14" val="642"/>
+        <volume h="15" val="717"/>
+        <volume h="16" val="939"/>
+        <volume h="17" val="914"/>
+        <volume h="18" val="780"/>
+        <volume h="19" val="646"/>
+        <volume h="20" val="422"/>
+        <volume h="21" val="305"/>
+        <volume h="22" val="197"/>
+        <volume h="23" val="179"/>
+        <volume h="24" val="111"/>
+    </count>
+
+
+    <count loc_id="280412" cs_id="Baumschulenallee Ost ">
+        <volume h="1" val="18"/>
+        <volume h="2" val="14"/>
+        <volume h="3" val="10"/>
+        <volume h="4" val="10"/>
+        <volume h="5" val="37"/>
+        <volume h="6" val="135"/>
+        <volume h="7" val="237"/>
+        <volume h="8" val="477"/>
+        <volume h="9" val="491"/>
+        <volume h="10" val="385"/>
+        <volume h="11" val="309"/>
+        <volume h="12" val="315"/>
+        <volume h="13" val="287"/>
+        <volume h="14" val="286"/>
+        <volume h="15" val="320"/>
+        <volume h="16" val="345"/>
+        <volume h="17" val="279"/>
+        <volume h="18" val="285"/>
+        <volume h="19" val="246"/>
+        <volume h="20" val="181"/>
+        <volume h="21" val="119"/>
+        <volume h="22" val="93"/>
+        <volume h="23" val="51"/>
+        <volume h="24" val="32"/>
+    </count>
+
+
+    <count loc_id="82628" cs_id="Karl-Wiechert-Allee Süd-West ">
+        <volume h="1" val="41"/>
+        <volume h="2" val="23"/>
+        <volume h="3" val="8"/>
+        <volume h="4" val="19"/>
+        <volume h="5" val="33"/>
+        <volume h="6" val="150"/>
+        <volume h="7" val="329"/>
+        <volume h="8" val="884"/>
+        <volume h="9" val="1311"/>
+        <volume h="10" val="1192"/>
+        <volume h="11" val="1224"/>
+        <volume h="12" val="958"/>
+        <volume h="13" val="740"/>
+        <volume h="14" val="686"/>
+        <volume h="15" val="804"/>
+        <volume h="16" val="809"/>
+        <volume h="17" val="845"/>
+        <volume h="18" val="805"/>
+        <volume h="19" val="634"/>
+        <volume h="20" val="507"/>
+        <volume h="21" val="302"/>
+        <volume h="22" val="251"/>
+        <volume h="23" val="140"/>
+        <volume h="24" val="93"/>
+    </count>
+
+    <count loc_id="208449" cs_id="Eulenkamp Nord">
+        <volume h="1" val="44"/>
+        <volume h="2" val="19"/>
+        <volume h="3" val="23"/>
+        <volume h="4" val="31"/>
+        <volume h="5" val="51"/>
+        <volume h="6" val="185"/>
+        <volume h="7" val="345"/>
+        <volume h="8" val="437"/>
+        <volume h="9" val="534"/>
+        <volume h="10" val="400"/>
+        <volume h="11" val="403"/>
+        <volume h="12" val="359"/>
+        <volume h="13" val="415"/>
+        <volume h="14" val="464"/>
+        <volume h="15" val="501"/>
+        <volume h="16" val="519"/>
+        <volume h="17" val="507"/>
+        <volume h="18" val="480"/>
+        <volume h="19" val="421"/>
+        <volume h="20" val="379"/>
+        <volume h="21" val="230"/>
+        <volume h="22" val="194"/>
+        <volume h="23" val="153"/>
+        <volume h="24" val="70"/>
+    </count>
+
+
+    <count loc_id="238320" cs_id="Podbielskistr. Ost  ">
+        <volume h="1" val="86"/>
+        <volume h="2" val="44"/>
+        <volume h="3" val="19"/>
+        <volume h="4" val="47"/>
+        <volume h="5" val="59"/>
+        <volume h="6" val="207"/>
+        <volume h="7" val="517"/>
+        <volume h="8" val="911"/>
+        <volume h="9" val="1074"/>
+        <volume h="10" val="724"/>
+        <volume h="11" val="763"/>
+        <volume h="12" val="770"/>
+        <volume h="13" val="771"/>
+        <volume h="14" val="788"/>
+        <volume h="15" val="813"/>
+        <volume h="16" val="873"/>
+        <volume h="17" val="967"/>
+        <volume h="18" val="826"/>
+        <volume h="19" val="788"/>
+        <volume h="20" val="634"/>
+        <volume h="21" val="493"/>
+        <volume h="22" val="319"/>
+        <volume h="23" val="250"/>
+        <volume h="24" val="102"/>
+    </count>
+
+
+    <count loc_id="268933" cs_id="Klingerstr. Süd ">
+        <volume h="1" val="37"/>
+        <volume h="2" val="17"/>
+        <volume h="3" val="17"/>
+        <volume h="4" val="50"/>
+        <volume h="5" val="65"/>
+        <volume h="6" val="240"/>
+        <volume h="7" val="422"/>
+        <volume h="8" val="473"/>
+        <volume h="9" val="437"/>
+        <volume h="10" val="407"/>
+        <volume h="11" val="352"/>
+        <volume h="12" val="412"/>
+        <volume h="13" val="422"/>
+        <volume h="14" val="432"/>
+        <volume h="15" val="444"/>
+        <volume h="16" val="483"/>
+        <volume h="17" val="476"/>
+        <volume h="18" val="432"/>
+        <volume h="19" val="402"/>
+        <volume h="20" val="381"/>
+        <volume h="21" val="306"/>
+        <volume h="22" val="237"/>
+        <volume h="23" val="170"/>
+        <volume h="24" val="24"/>
+    </count>
+
+
+    <count loc_id="138678" cs_id="Podbielskistr. West ">
+        <volume h="1" val="44"/>
+        <volume h="2" val="21"/>
+        <volume h="3" val="27"/>
+        <volume h="4" val="32"/>
+        <volume h="5" val="36"/>
+        <volume h="6" val="96"/>
+        <volume h="7" val="251"/>
+        <volume h="8" val="741"/>
+        <volume h="9" val="761"/>
+        <volume h="10" val="545"/>
+        <volume h="11" val="493"/>
+        <volume h="12" val="564"/>
+        <volume h="13" val="627"/>
+        <volume h="14" val="629"/>
+        <volume h="15" val="641"/>
+        <volume h="16" val="834"/>
+        <volume h="17" val="965"/>
+        <volume h="18" val="834"/>
+        <volume h="19" val="700"/>
+        <volume h="20" val="535"/>
+        <volume h="21" val="405"/>
+        <volume h="22" val="281"/>
+        <volume h="23" val="173"/>
+        <volume h="24" val="21"/>
+    </count>
+
+    <count loc_id="360602" cs_id="Hildsheimer Str. Nord">
+        <volume h="1" val="146"/>
+        <volume h="2" val="93"/>
+        <volume h="3" val="69"/>
+        <volume h="4" val="79"/>
+        <volume h="5" val="176"/>
+        <volume h="6" val="267"/>
+        <volume h="7" val="601"/>
+        <volume h="8" val="742"/>
+        <volume h="9" val="825"/>
+        <volume h="10" val="919"/>
+        <volume h="11" val="1063"/>
+        <volume h="12" val="909"/>
+        <volume h="13" val="1124"/>
+        <volume h="14" val="1262"/>
+        <volume h="15" val="1197"/>
+        <volume h="16" val="1306"/>
+        <volume h="17" val="1470"/>
+        <volume h="18" val="1346"/>
+        <volume h="19" val="1251"/>
+        <volume h="20" val="1009"/>
+        <volume h="21" val="617"/>
+        <volume h="22" val="577"/>
+        <volume h="23" val="429"/>
+        <volume h="24" val="220"/>
+    </count>
+
+
+    <count loc_id="360396" cs_id="Behnstr. Ost">
+        <volume h="1" val="8"/>
+        <volume h="2" val="0"/>
+        <volume h="3" val="8"/>
+        <volume h="4" val="2"/>
+        <volume h="5" val="67"/>
+        <volume h="6" val="54"/>
+        <volume h="7" val="11"/>
+        <volume h="8" val="32"/>
+        <volume h="9" val="78"/>
+        <volume h="10" val="113"/>
+        <volume h="11" val="167"/>
+        <volume h="12" val="190"/>
+        <volume h="13" val="213"/>
+        <volume h="14" val="206"/>
+        <volume h="15" val="214"/>
+        <volume h="16" val="221"/>
+        <volume h="17" val="282"/>
+        <volume h="18" val="326"/>
+        <volume h="19" val="220"/>
+        <volume h="20" val="167"/>
+        <volume h="21" val="255"/>
+        <volume h="22" val="180"/>
+        <volume h="23" val="104"/>
+        <volume h="24" val="35"/>
+    </count>
+
+
+    <count loc_id="182672" cs_id="Hildesheimer Str. Süd ">
+        <volume h="1" val="50"/>
+        <volume h="2" val="36"/>
+        <volume h="3" val="27"/>
+        <volume h="4" val="32"/>
+        <volume h="5" val="87"/>
+        <volume h="6" val="307"/>
+        <volume h="7" val="504"/>
+        <volume h="8" val="638"/>
+        <volume h="9" val="778"/>
+        <volume h="10" val="804"/>
+        <volume h="11" val="867"/>
+        <volume h="12" val="1000"/>
+        <volume h="13" val="971"/>
+        <volume h="14" val="1029"/>
+        <volume h="15" val="1087"/>
+        <volume h="16" val="1153"/>
+        <volume h="17" val="1282"/>
+        <volume h="18" val="1306"/>
+        <volume h="19" val="1055"/>
+        <volume h="20" val="795"/>
+        <volume h="21" val="581"/>
+        <volume h="22" val="354"/>
+        <volume h="23" val="327"/>
+        <volume h="24" val="177"/>
+    </count>
+
+
+    <count loc_id="360600" cs_id="Wilkenburger Str. West ">
+        <volume h="1" val="10"/>
+        <volume h="2" val="6"/>
+        <volume h="3" val="76"/>
+        <volume h="4" val="59"/>
+        <volume h="5" val="57"/>
+        <volume h="6" val="366"/>
+        <volume h="7" val="492"/>
+        <volume h="8" val="530"/>
+        <volume h="9" val="428"/>
+        <volume h="10" val="345"/>
+        <volume h="11" val="401"/>
+        <volume h="12" val="362"/>
+        <volume h="13" val="360"/>
+        <volume h="14" val="394"/>
+        <volume h="15" val="369"/>
+        <volume h="16" val="455"/>
+        <volume h="17" val="454"/>
+        <volume h="18" val="438"/>
+        <volume h="19" val="382"/>
+        <volume h="20" val="350"/>
+        <volume h="21" val="245"/>
+        <volume h="22" val="315"/>
+        <volume h="23" val="296"/>
+        <volume h="24" val="125"/>
+    </count>
+
+    <count loc_id="124104" cs_id="Clausewitzstr. Nord">
+        <volume h="1" val="58"/>
+        <volume h="2" val="34"/>
+        <volume h="3" val="20"/>
+        <volume h="4" val="24"/>
+        <volume h="5" val="40"/>
+        <volume h="6" val="122"/>
+        <volume h="7" val="478"/>
+        <volume h="8" val="540"/>
+        <volume h="9" val="573"/>
+        <volume h="10" val="483"/>
+        <volume h="11" val="365"/>
+        <volume h="12" val="403"/>
+        <volume h="13" val="560"/>
+        <volume h="14" val="521"/>
+        <volume h="15" val="675"/>
+        <volume h="16" val="757"/>
+        <volume h="17" val="671"/>
+        <volume h="18" val="775"/>
+        <volume h="19" val="707"/>
+        <volume h="20" val="499"/>
+        <volume h="21" val="435"/>
+        <volume h="22" val="256"/>
+        <volume h="23" val="218"/>
+        <volume h="24" val="145"/>
+    </count>
+
+
+    <count loc_id="351842" cs_id="Hans-Boeckler-Allee Ost">
+        <volume h="1" val="141"/>
+        <volume h="2" val="94"/>
+        <volume h="3" val="74"/>
+        <volume h="4" val="67"/>
+        <volume h="5" val="160"/>
+        <volume h="6" val="675"/>
+        <volume h="7" val="1690"/>
+        <volume h="8" val="1892"/>
+        <volume h="9" val="2020"/>
+        <volume h="10" val="1879"/>
+        <volume h="11" val="1383"/>
+        <volume h="12" val="1309"/>
+        <volume h="13" val="1464"/>
+        <volume h="14" val="1410"/>
+        <volume h="15" val="1704"/>
+        <volume h="16" val="1709"/>
+        <volume h="17" val="1766"/>
+        <volume h="18" val="1890"/>
+        <volume h="19" val="1479"/>
+        <volume h="20" val="1002"/>
+        <volume h="21" val="750"/>
+        <volume h="22" val="637"/>
+        <volume h="23" val="612"/>
+        <volume h="24" val="318"/>
+    </count>
+
+
+    <count loc_id="5266" cs_id="Seligmannallee Süd ">
+        <volume h="1" val="8"/>
+        <volume h="2" val="10"/>
+        <volume h="3" val="3"/>
+        <volume h="4" val="22"/>
+        <volume h="5" val="14"/>
+        <volume h="6" val="28"/>
+        <volume h="7" val="56"/>
+        <volume h="8" val="63"/>
+        <volume h="9" val="63"/>
+        <volume h="10" val="101"/>
+        <volume h="11" val="93"/>
+        <volume h="12" val="134"/>
+        <volume h="13" val="181"/>
+        <volume h="14" val="162"/>
+        <volume h="15" val="188"/>
+        <volume h="16" val="240"/>
+        <volume h="17" val="257"/>
+        <volume h="18" val="256"/>
+        <volume h="19" val="162"/>
+        <volume h="20" val="52"/>
+        <volume h="21" val="33"/>
+        <volume h="22" val="25"/>
+        <volume h="23" val="29"/>
+        <volume h="24" val="21"/>
+    </count>
+
+
+    <count loc_id="351837" cs_id="Hans-Boeckler-Allee West">
+        <volume h="1" val="130"/>
+        <volume h="2" val="89"/>
+        <volume h="3" val="75"/>
+        <volume h="4" val="46"/>
+        <volume h="5" val="86"/>
+        <volume h="6" val="261"/>
+        <volume h="7" val="760"/>
+        <volume h="8" val="1006"/>
+        <volume h="9" val="1012"/>
+        <volume h="10" val="916"/>
+        <volume h="11" val="843"/>
+        <volume h="12" val="918"/>
+        <volume h="13" val="1059"/>
+        <volume h="14" val="928"/>
+        <volume h="15" val="1249"/>
+        <volume h="16" val="1310"/>
+        <volume h="17" val="1245"/>
+        <volume h="18" val="1264"/>
+        <volume h="19" val="989"/>
+        <volume h="20" val="820"/>
+        <volume h="21" val="850"/>
+        <volume h="22" val="670"/>
+        <volume h="23" val="528"/>
+        <volume h="24" val="326"/>
+    </count>
+
+    <count loc_id="281609" cs_id="A2 Ost West">
+        <volume h="1" val="1069"/>
+        <volume h="2" val="788"/>
+        <volume h="3" val="867"/>
+        <volume h="4" val="993"/>
+        <volume h="5" val="1299"/>
+        <volume h="6" val="2191"/>
+        <volume h="7" val="3198"/>
+        <volume h="8" val="3333"/>
+        <volume h="9" val="2746"/>
+        <volume h="10" val="2818"/>
+        <volume h="11" val="2585"/>
+        <volume h="12" val="2801"/>
+        <volume h="13" val="2845"/>
+        <volume h="14" val="2853"/>
+        <volume h="15" val="3153"/>
+        <volume h="16" val="3346"/>
+        <volume h="17" val="3154"/>
+        <volume h="18" val="2911"/>
+        <volume h="19" val="2623"/>
+        <volume h="20" val="1989"/>
+        <volume h="21" val="1813"/>
+        <volume h="22" val="1958"/>
+        <volume h="23" val="1336"/>
+        <volume h="24" val="1080"/>
+    </count>
+
+
+    <count loc_id="190533" cs_id="A2 West Ost">
+        <volume h="1" val="1214"/>
+        <volume h="2" val="958"/>
+        <volume h="3" val="824"/>
+        <volume h="4" val="897"/>
+        <volume h="5" val="1040"/>
+        <volume h="6" val="1589"/>
+        <volume h="7" val="2315"/>
+        <volume h="8" val="2279"/>
+        <volume h="9" val="2554"/>
+        <volume h="10" val="2805"/>
+        <volume h="11" val="3321"/>
+        <volume h="12" val="3175"/>
+        <volume h="13" val="3124"/>
+        <volume h="14" val="3342"/>
+        <volume h="15" val="3766"/>
+        <volume h="16" val="4134"/>
+        <volume h="17" val="4734"/>
+        <volume h="18" val="3924"/>
+        <volume h="19" val="3540"/>
+        <volume h="20" val="2743"/>
+        <volume h="21" val="2201"/>
+        <volume h="22" val="1984"/>
+        <volume h="23" val="1755"/>
+        <volume h="24" val="1429"/>
+    </count>
+
+    <count loc_id="221079" cs_id="A2 Ost West">
+        <volume h="1" val="886"/>
+        <volume h="2" val="765"/>
+        <volume h="3" val="735"/>
+        <volume h="4" val="846"/>
+        <volume h="5" val="1036"/>
+        <volume h="6" val="1576"/>
+        <volume h="7" val="2323"/>
+        <volume h="8" val="2726"/>
+        <volume h="9" val="2737"/>
+        <volume h="10" val="2803"/>
+        <volume h="11" val="2988"/>
+        <volume h="12" val="3107"/>
+        <volume h="13" val="3396"/>
+        <volume h="14" val="3820"/>
+        <volume h="15" val="4255"/>
+        <volume h="16" val="4585"/>
+        <volume h="17" val="4780"/>
+        <volume h="18" val="4569"/>
+        <volume h="19" val="4223"/>
+        <volume h="20" val="2980"/>
+        <volume h="21" val="2204"/>
+        <volume h="22" val="1771"/>
+        <volume h="23" val="1658"/>
+        <volume h="24" val="1083"/>
+    </count>
+
+
+    <count loc_id="221080" cs_id="A2 West Ost">
+        <volume h="1" val="1103"/>
+        <volume h="2" val="909"/>
+        <volume h="3" val="802"/>
+        <volume h="4" val="879"/>
+        <volume h="5" val="1206"/>
+        <volume h="6" val="2422"/>
+        <volume h="7" val="3712"/>
+        <volume h="8" val="4637"/>
+        <volume h="9" val="4409"/>
+        <volume h="10" val="4030"/>
+        <volume h="11" val="3667"/>
+        <volume h="12" val="3576"/>
+        <volume h="13" val="3622"/>
+        <volume h="14" val="3820"/>
+        <volume h="15" val="3764"/>
+        <volume h="16" val="3847"/>
+        <volume h="17" val="4035"/>
+        <volume h="18" val="3958"/>
+        <volume h="19" val="3536"/>
+        <volume h="20" val="2987"/>
+        <volume h="21" val="2541"/>
+        <volume h="22" val="2132"/>
+        <volume h="23" val="1820"/>
+        <volume h="24" val="1443"/>
+    </count>
+
+
+</counts>
