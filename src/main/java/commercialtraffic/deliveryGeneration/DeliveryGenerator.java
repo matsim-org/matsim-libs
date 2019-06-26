@@ -27,6 +27,7 @@ import com.graphhopper.jsprit.core.algorithm.termination.VariationCoefficientTer
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
+import commercialtraffic.integration.CarrierMode;
 import commercialtraffic.integration.CommercialTrafficChecker;
 import commercialtraffic.integration.CommercialTrafficConfigGroup;
 import org.matsim.api.core.v01.Id;
@@ -65,6 +66,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
 
     public final double firsttourTraveltimeBuffer;
     private final int maxIterations;
+    private final CarrierMode carrierMode;
 
     private Scenario scenario;
     private Population population;
@@ -86,11 +88,11 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
     }
 
     @Inject
-    public DeliveryGenerator(Scenario scenario, Map<String, TravelTime> travelTimes, Carriers carriers) {
+    public DeliveryGenerator(Scenario scenario, Map<String, TravelTime> travelTimes, Carriers carriers, CarrierMode carrierMode) {
         CommercialTrafficConfigGroup ctcg = CommercialTrafficConfigGroup.get(scenario.getConfig());
         this.hullcarriers = carriers;
         firsttourTraveltimeBuffer = ctcg.getFirstLegTraveltimeBufferFactor();
-
+        this.carrierMode = carrierMode;
         this.scenario = scenario;
         this.population = scenario.getPopulation();
         maxIterations = ctcg.getJspritIterations();
@@ -111,6 +113,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
         firsttourTraveltimeBuffer = 2;
         maxIterations = 100;
         carTT = new FreeSpeedTravelTime();
+        carrierMode = (m -> TransportMode.car);
     }
 
     private void generateIterationServices() {
@@ -207,7 +210,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
                         if (route == null)
                             throw new IllegalStateException("missing route for carrier " + carrier.getId());
                         route.setTravelTime(tourLeg.getExpectedTransportTime());
-                        Leg leg = PopulationUtils.createLeg(TransportMode.car);
+                        Leg leg = PopulationUtils.createLeg(carrierMode.getCarrierMode(carrier.getId()));
                         leg.setRoute(route);
                         leg.setDepartureTime(tourLeg.getExpectedDepartureTime());
                         leg.setTravelTime(tourLeg.getExpectedTransportTime());
