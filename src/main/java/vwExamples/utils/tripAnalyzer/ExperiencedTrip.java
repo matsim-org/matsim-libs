@@ -30,7 +30,7 @@ import java.util.*;
 /**
  * @author gleich
  */
-public class ExperiencedTrip {
+public class ExperiencedTrip  {
 	private final Id<Person> agent;
 	private final String activityBefore;
 	private final String activityAfter;
@@ -53,6 +53,8 @@ public class ExperiencedTrip {
 	private Map<String, Integer> mode2numberOfLegs = new HashMap<>();
 	private String tripClass;
 	private int subtourNr;
+	private Double startOfParking = null;
+	private Double endOfParking = null;
 
 	// Coords unavailable in events
 
@@ -88,7 +90,9 @@ public class ExperiencedTrip {
 		calcSumsOverAllLegs(monitoredModes);
 		findTransitStopsVisited();
 		this.tripClass = null;
+
 	}
+	
 
 	private void findTransitStopsVisited() {
 		for (ExperiencedLeg leg : legs) {
@@ -230,6 +234,16 @@ public class ExperiencedTrip {
 	int getSubTourNr() {
 		return this.subtourNr;
 
+	}
+	
+	void setParkingStart(Double time)
+	{
+		this.startOfParking=time;
+	}
+	
+	void setParkingEnd(Double time)
+	{
+		this.endOfParking=time;
 	}
 
 

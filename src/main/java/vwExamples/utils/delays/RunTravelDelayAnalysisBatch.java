@@ -87,7 +87,12 @@ public class RunTravelDelayAnalysisBatch {
 			String scenarioName = StringList[StringList.length - 1];
 			
 			Set<String> scenarioToBeAnalyzed = new HashSet<String>();
-			scenarioToBeAnalyzed.add("NoHubs_Both_InOutWithin3000_veh_idx0");
+			scenarioToBeAnalyzed.add("VW243_LocalLinkFlow_1.15_10pct"); //InOut
+			scenarioToBeAnalyzed.add("VW243_LocalLinkFlow_1.28_10pct");
+			scenarioToBeAnalyzed.add("VW243_CityCommuterDRT_10pct300_veh_idx0");
+			scenarioToBeAnalyzed.add("VW243_CityCommuterDRTAmpel2.0_10pct300_veh_idx0");
+			
+			
 
 			if (scenarioToBeAnalyzed.contains(scenarioName)) {
 				System.out.println("Start Delay Analysis: "+ scenarioName);

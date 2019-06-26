@@ -90,8 +90,8 @@ public class modalSplitTripsWithin {
 	String shapeFeature2 = "NO";
 
 	StageActivityTypes stageActs;
-	static String inFileName = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\commuterdrt_out_in_vw235_nocad.1.0_20pct.output_plans_selected.xml.gz";
-	static String OutFileName = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\commuterdrt_out_in_withinAll_vw235_nocad.1.0_20pct.output_plans_selected.xml.gz";
+	static String inFileName = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\w243_inOutDRT.xml.gz";
+	static String OutFileName = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\w243_inOutWithDRT.xml.gz";
 
 	static List<String> primaryActivies = new ArrayList<>();
 	static List<String> primaryLegModes = new ArrayList<>();

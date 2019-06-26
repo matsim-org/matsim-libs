@@ -58,7 +58,7 @@ public class TravelDelayCalculator implements PersonDepartureEventHandler, Perso
 	private Map<Id<Link>, MutableDouble> LinkFlowMap = new HashMap<>();
 	private Map<Id<Link>, MutableDouble> LinkDelayMap = new HashMap<>();
 	private Map<Id<Link>, List<Double>> CongestionIdxMap = new HashMap<>();
-	// private Set<Id<Person>> relevantAgents = new HashSet<>();
+
 
 	public TravelDelayCalculator(Network network, Geometry boundary) {
 		this.network = network;
@@ -153,6 +153,8 @@ public class TravelDelayCalculator implements PersonDepartureEventHandler, Perso
 		}
 
 	}
+	
+	
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
@@ -238,6 +240,9 @@ public class TravelDelayCalculator implements PersonDepartureEventHandler, Perso
 			this.FromTo.put(event.getPersonId(), new ArrayList<Coord>());
 			this.FromTo.get(event.getPersonId()).add(fromCoord);
 		}
+		
+		
+
 	}
 
 	@Override

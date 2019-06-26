@@ -82,7 +82,7 @@ public class Sim02_DrtCommuter {
 
 	static boolean BatteryReplace = false;
 
-	static int[] fleetRange = { 500 };
+	static int[] fleetRange = { 300 };
 	// static int[] fleetRange = {50,60,70};
 
 	public static void main(String[] args) throws IOException {
@@ -101,7 +101,7 @@ public class Sim02_DrtCommuter {
 	public static void run(int fleet, int iterationIdx) throws IOException {
 
 		// Enable or Disable rebalancing
-		String runId = "NoHubs_Both_InOutWithinAll10pct" + fleet + "_veh_idx" + iterationIdx;
+		String runId = "VW243_CityCommuterDRTAmpel2.0_10pct" + fleet + "_veh_idx" + iterationIdx;
 		boolean rebalancing = true;
 
 		String inbase = "D:\\Matsim\\Axer\\Hannover\\ZIM\\";
@@ -130,16 +130,16 @@ public class Sim02_DrtCommuter {
 		// config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		// Overwrite existing configuration parameters
 		config.plans().setInputFile(
-				inbase + "\\input\\plans\\commuterdrt_out_in_withinAll_vw235_nocad.1.0_20pct.output_plans_selected_10pct.xml.gz");
-		config.controler().setLastIteration(2); // Number of simulation iterations
+				inbase + "\\input\\plans\\w243_inOutWithDRT_selected.xml.gz");
+		config.controler().setLastIteration(6); // Number of simulation iterations
 		config.controler().setWriteEventsInterval(2); // Write Events file every x-Iterations
 		config.controler().setWritePlansInterval(2); // Write Plan file every x-Iterations
 		config.qsim().setStartTime(0);
 		config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 		 config.qsim().setFlowCapFactor(0.1);
-		 config.qsim().setStorageCapFactor(0.25);
+		 config.qsim().setStorageCapFactor(0.11);
 
-		String networkFilePath = inbase + "\\input\\network\\network.xml.gz";
+		String networkFilePath = inbase + "\\input\\network\\network_intersectionLinks_1.28_.xml.gz";
 		String shapeFilePath = inbase + "\\input\\shp\\Real_Region_Hannover.shp";
 		String shapeFeature = "NO"; // shapeFeature is used to read the shapeFilePath. All zones in shapeFile are
 									// used to generate a drt service area
@@ -155,10 +155,10 @@ public class Sim02_DrtCommuter {
 		drt.setPrintDetailedWarnings(false);
 		// Parameters to setup the DRT service
 		drt.setMaxTravelTimeBeta(900.0);
-		drt.setMaxTravelTimeAlpha(1.3);
+		drt.setMaxTravelTimeAlpha(1.4);
 		drt.setMaxWaitTime(900.0);
 		drt.setStopDuration(105);
-		drt.setRequestRejection(false);
+		drt.setRequestRejection(true);
 
 		// Create the virtual stops for the drt service
 		// VirtualStops are dynamically generated
@@ -206,14 +206,15 @@ public class Sim02_DrtCommuter {
 
 //		// City Hubs (these hubs are empty at the beginning of the simulation)
 //		depotsAndVehicles.put(Id.createLinkId(93695), 1); // 1
-		depotsAndVehicles.put(Id.createLinkId(181441), (int) (fleet*0.20*0.20)); // 2
-		depotsAndVehicles.put(Id.createLinkId(108498), (int) (fleet*0.20*0.20)); // 3
-		depotsAndVehicles.put(Id.createLinkId(279990), (int) (fleet*0.20*0.20)); // 4
+		int cityFleet = 100;
+		depotsAndVehicles.put(Id.createLinkId(181441), (int) (cityFleet*0.20)); // 2
+		depotsAndVehicles.put(Id.createLinkId(108498), (int) (cityFleet*0.20)); // 3
+		depotsAndVehicles.put(Id.createLinkId(279990), (int) (cityFleet*0.20)); // 4
 //		depotsAndVehicles.put(Id.createLinkId(150245), 1); // 5
 //		depotsAndVehicles.put(Id.createLinkId(25519), 1); // 6
 //		depotsAndVehicles.put(Id.createLinkId(95881), 1); // 7
 //		depotsAndVehicles.put(Id.createLinkId(254323), 1); // 8
-		depotsAndVehicles.put(Id.createLinkId(167788), (int) (fleet*0.20*0.20)); // 9
+		depotsAndVehicles.put(Id.createLinkId(167788), (int) (cityFleet*0.2)); // 9
 //		depotsAndVehicles.put(Id.createLinkId(335414), 1); // 10
 //		depotsAndVehicles.put(Id.createLinkId(105449), 1); // 11
 //		depotsAndVehicles.put(Id.createLinkId(317396), 1); // 12
@@ -222,7 +223,7 @@ public class Sim02_DrtCommuter {
 //		depotsAndVehicles.put(Id.createLinkId(337846), 1); // 14
 //		depotsAndVehicles.put(Id.createLinkId(319495), 1); // 15
 //		depotsAndVehicles.put(Id.createLinkId(93365), 1); // 16
-		depotsAndVehicles.put(Id.createLinkId(137655), (int) (fleet*0.20*0.20)); // 17
+		depotsAndVehicles.put(Id.createLinkId(137655), (int) (cityFleet*0.20)); // 17
 //		depotsAndVehicles.put(Id.createLinkId(55525), 1); // 18
 //		depotsAndVehicles.put(Id.createLinkId(166126), 1); // 19
 

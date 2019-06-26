@@ -6,11 +6,11 @@ import java.util.Set;
 
 public class ModalSplitSegment {
 	Set<String> acceptedMainModes;
-	int SegmentClassNr;
-	HashMap<String,ArrayList<Double>> mode2TripDistance;
+	String SegmentClassNr;
+	public HashMap<String,ArrayList<Double>> mode2TripDistance;
 	
 
-	ModalSplitSegment(int i, Set<String> acceptedMainModes)
+	ModalSplitSegment(String i, Set<String> acceptedMainModes)
 
 	{
 		this.SegmentClassNr = i;

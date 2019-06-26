@@ -90,8 +90,8 @@ public class modalSplitCommuterIn {
 	String shapeFeature2 = "NO";
 
 	StageActivityTypes stageActs;
-	static String inFileName = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\vw235_nocad.1.0.output_plans.xml.gz";
-	static String OutFileName = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\commuterdrt_vw235_nocad.1.0_20pct.output_plans_test.xml.gz";
+	static String inFileName = "D:\\Matsim\\Axer\\Hannover\\Base\\vw243_cadON_ptSpeedAdj.0.1\\vw243_cadON_ptSpeedAdj.0.1.output_plans.xml.gz";
+	static String OutFileName = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\w243_inDRT.xml.gz";
 
 	static List<String> primaryActivies = new ArrayList<>();
 	static List<String> primaryLegModes = new ArrayList<>();
