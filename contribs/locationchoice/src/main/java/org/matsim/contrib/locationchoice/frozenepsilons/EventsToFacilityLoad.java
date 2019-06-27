@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice.facilityload;
+package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import java.util.Iterator;
 import java.util.TreeMap;

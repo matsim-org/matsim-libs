@@ -1,4 +1,4 @@
-package org.matsim.contrib.locationchoice.zzunused;
+package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,7 +34,7 @@ public class BestReplyIT {
 		
 		
         Scenario scenario = ScenarioUtils.loadScenario(config);
-		RunLocationChoiceBestResponse.run(scenario);
+		RunLocationChoiceBestResponse.run(scenario );
 	}
 
 }
