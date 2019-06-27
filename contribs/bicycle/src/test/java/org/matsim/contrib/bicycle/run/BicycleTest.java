@@ -527,10 +527,6 @@ class LinkDemandEventHandler implements LinkEnterEventHandler, LinkLeaveEventHan
 		return linkId2demand;
 	}
 
-	public void setLinkId2demand(Map<Id<Link>, Integer> linkId2demand) {
-		this.linkId2demand = linkId2demand;
-	}
-
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		vehicleId2lastEnterTime.put(event.getVehicleId(), event.getTime());
