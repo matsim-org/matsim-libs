@@ -1,4 +1,4 @@
-package org.matsim.contrib.locationchoice;
+package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -15,11 +15,8 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel;
-import org.matsim.contrib.locationchoice.frozenepsilons.BestReplyLocationChoicePlanStrategy;
-import org.matsim.contrib.locationchoice.frozenepsilons.DCActivityWOFacilitiesScoringFunction;
-import org.matsim.contrib.locationchoice.frozenepsilons.DCScoringFunctionFactory;
-import org.matsim.contrib.locationchoice.frozenepsilons.DestinationChoiceContext;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -68,7 +65,7 @@ public class FrozenEpsilonLocaChoiceIT{
 	@Test
 	public void testLocationChoiceJan2013() {
 		//	CONFIG:
-		final Config config = localCreateConfig( this.utils.getPackageInputDirectory() + "config.xml");
+		final Config config = localCreateConfig( this.utils.getPackageInputDirectory() + "../config2.xml");
 
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
@@ -145,7 +142,7 @@ public class FrozenEpsilonLocaChoiceIT{
 	@Test
 	public void testLocationChoiceFeb2013NegativeScores() {
 		// config:
-		final Config config = localCreateConfig( utils.getPackageInputDirectory() + "config.xml");
+		final Config config = localCreateConfig( utils.getPackageInputDirectory() + "../config2.xml");
 
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 

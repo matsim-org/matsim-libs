@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scoring.SumScoringFunction;
 
-public class DCActivityWOFacilitiesScoringFunction implements SumScoringFunction.ActivityScoring {
+class DCActivityWOFacilitiesScoringFunction implements SumScoringFunction.ActivityScoring {
 	static final Logger log = Logger.getLogger(DCActivityWOFacilitiesScoringFunction.class);	
 	private DestinationScoring destinationChoiceScoring;	
 	private double score = 0. ;

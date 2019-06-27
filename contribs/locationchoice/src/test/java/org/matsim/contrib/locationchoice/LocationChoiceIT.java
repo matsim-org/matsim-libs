@@ -72,7 +72,7 @@ public class LocationChoiceIT extends MatsimTestCase {
 	 */
 	public void testLocationChoice() {
 
-		final Config config = localCreateConfig( this.getPackageInputDirectory() + "config.xml");
+		final Config config = localCreateConfig( this.getPackageInputDirectory() + "config2.xml");
 
 		final MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
@@ -136,7 +136,7 @@ public class LocationChoiceIT extends MatsimTestCase {
 	 * setup population with one person
 	 * @param workActEndTime TODO
 	 */
-	static Person localCreatePopWOnePerson( Scenario scenario, ActivityFacility facility1, double workActEndTime ) {
+	public static Person localCreatePopWOnePerson( Scenario scenario, ActivityFacility facility1, double workActEndTime ) {
 
 		Population population = scenario.getPopulation();
 
@@ -170,7 +170,7 @@ public class LocationChoiceIT extends MatsimTestCase {
 		return person;
 	}
 
-	static Config localCreateConfig( String configFileName ) {
+	public static Config localCreateConfig( String configFileName ) {
 		// setup config
 		Config config = ConfigUtils.loadConfig(configFileName, new DestinationChoiceConfigGroup() ) ;
 
