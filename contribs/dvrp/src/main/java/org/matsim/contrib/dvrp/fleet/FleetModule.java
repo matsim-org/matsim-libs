@@ -20,13 +20,14 @@
 
 package org.matsim.contrib.dvrp.fleet;
 
+import java.net.URL;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
-import org.matsim.core.config.ConfigGroup;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -35,16 +36,16 @@ import com.google.inject.name.Named;
  * @author Michal Maciejewski (michalm)
  */
 public class FleetModule extends AbstractDvrpModeModule {
-	private final String file;
+	private final URL fleetSpecificationUrl;
 	private final boolean updateVehicleStartLinkToLastLink;
 
-	public FleetModule(String mode, String file) {
-		this(mode, file, false);
+	public FleetModule(String mode, URL fleetSpecificationUrl) {
+		this(mode, fleetSpecificationUrl, false);
 	}
 
-	public FleetModule(String mode, String file, boolean updateVehicleStartLinkToLastLink) {
+	public FleetModule(String mode, URL fleetSpecificationUrl, boolean updateVehicleStartLinkToLastLink) {
 		super(mode);
-		this.file = file;
+		this.fleetSpecificationUrl = fleetSpecificationUrl;
 		this.updateVehicleStartLinkToLastLink = updateVehicleStartLinkToLastLink;
 	}
 
@@ -52,7 +53,7 @@ public class FleetModule extends AbstractDvrpModeModule {
 	public void install() {
 		bindModal(FleetSpecification.class).toProvider(() -> {
 			FleetSpecification fleetSpecification = new FleetSpecificationImpl();
-			new FleetReader(fleetSpecification).parse(ConfigGroup.getInputFileURL(getConfig().getContext(), file));
+			new FleetReader(fleetSpecification).parse(fleetSpecificationUrl);
 			return fleetSpecification;
 		}).asEagerSingleton();
 
