@@ -71,10 +71,10 @@ public class FrozenTastesConfigGroup extends ReflectiveConfigGroup implements De
 	
 	private static final String DESTINATIONSAMPLE_PCT = "destinationSamplePercent";
 
-	private static final String INTERNAL_PLAN_DATA_STRUCTURE = "internalPlanDataStructure";
+//	private static final String INTERNAL_PLAN_DATA_STRUCTURE = "internalPlanDataStructure";
 	private static final String USE_CONFIG_PARAMS_FOR_SCORING = "useConfigParamsForScoring";
 	private static final String USE_INDIVIDUAL_SCORING_PARAMETERS = "useIndividualScoringParameters";
-	private static final String RE_USE_TEMPORARY_PLANS = "reUseTemporaryPlans";
+//	private static final String RE_USE_TEMPORARY_PLANS = "reUseTemporaryPlans";
 	
 	//default values
 //	private static final double defaultScaleFactor = 1.0;
@@ -139,20 +139,20 @@ public class FrozenTastesConfigGroup extends ReflectiveConfigGroup implements De
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 
-		map.put(INTERNAL_PLAN_DATA_STRUCTURE, "During the location choice process, many alternative locations are evaluated. "
-				+ "For each of them, a temporary plan is created. By default, MATSim regular plan objects are used ('planImpl'). "
-				+ "However, using them results in a certain overhead and more objects to be cleared by the garbage collector. "
-				+ "Instead, an alternative data structure can be used ('lcPlan') - this is still experimental, so use the default ('planImpl') "
-				+ "unless you know what you are doing!  ");
+//		map.put(INTERNAL_PLAN_DATA_STRUCTURE, "During the location choice process, many alternative locations are evaluated. "
+//				+ "For each of them, a temporary plan is created. By default, MATSim regular plan objects are used ('planImpl'). "
+//				+ "However, using them results in a certain overhead and more objects to be cleared by the garbage collector. "
+//				+ "Instead, an alternative data structure can be used ('lcPlan') - this is still experimental, so use the default ('planImpl') "
+//				+ "unless you know what you are doing!  ");
 		map.put(USE_CONFIG_PARAMS_FOR_SCORING, "Default is 'true'. Parameter was already present in the DCScoringFunction.");
 		map.put(USE_INDIVIDUAL_SCORING_PARAMETERS, "MATSim supports individual scoring parameters for sub-populations or even single agents. "
 				+ "If you use global parameters, this can be set to 'false' (default is 'true').");
-		map.put(
-				RE_USE_TEMPORARY_PLANS,
-				"Default is 'false'. During the location choice process, many potential locations are evaluated. "
-						+ "For each of them, a copy of the person's current plan is created, which results in a huge workload for the "
-						+ "garbage collector as well as the memory bus. When this option is set to 'true', only one copy of the plan is created "
-						+ "and re-used for each checked location. Note that this is still experimental! cdobler oct'15" );
+//		map.put(
+//				RE_USE_TEMPORARY_PLANS,
+//				"Default is 'false'. During the location choice process, many potential locations are evaluated. "
+//						+ "For each of them, a copy of the person's current plan is created, which results in a huge workload for the "
+//						+ "garbage collector as well as the memory bus. When this option is set to 'true', only one copy of the plan is created "
+//						+ "and re-used for each checked location. Note that this is still experimental! cdobler oct'15" );
 		
 		return map;
 	}
@@ -161,6 +161,10 @@ public class FrozenTastesConfigGroup extends ReflectiveConfigGroup implements De
 	public double getRestraintFcnFactor() {
 		return this.restraintFcnFactor;
 	}
+
+	/**
+	 * penalty roughly is restr_factor * #persons^restr_exp
+	 */
 	@StringSetter( RESTR_FCN_FACTOR )
 	public void setRestraintFcnFactor(final double restraintFcnFactor) {
 		this.restraintFcnFactor = restraintFcnFactor;
@@ -169,16 +173,30 @@ public class FrozenTastesConfigGroup extends ReflectiveConfigGroup implements De
 	public double getRestraintFcnExp() {
 		return this.restraintFcnExp;
 	}
+	/**
+	 * penalty roughly is restr_factor * #persons^restr_exp
+	 */
 	@StringSetter( RESTR_FCN_EXP )
 	public void setRestraintFcnExp(final double restraintFcnExp) {
 		this.restraintFcnExp = restraintFcnExp;
 	}
+
+	/* (from somewhere else in code)
+	 * Scales the load of the facilities (for e.g. 10 % runs), assuming that only integers
+	 * can be used to scale a  x% scenario ((100 MOD x == 0) runs e.g. x=10%)
+	 */
+	@Override
 	@StringGetter( SCALEFACTOR )
 	public double getScaleFactor() {
 		return this.scaleFactor;
 	}
+
+	/**
+	 * inverse of population sample size
+	 */
+	@Override
 	@StringSetter( SCALEFACTOR )
-	public void setScaleFactor(final double scaleFactor) {
+	public void setScaleFactor( final double scaleFactor ) {
 		this.scaleFactor = scaleFactor;
 	}
 //	public double getRecursionTravelSpeedChange() {
@@ -207,19 +225,26 @@ public class FrozenTastesConfigGroup extends ReflectiveConfigGroup implements De
 //	public void setTravelSpeed_pt(final double travelSpeed_pt) {
 //		this.travelSpeed_pt = travelSpeed_pt;
 //	}
-@StringGetter( CENTER_NODE )
+//@StringGetter( CENTER_NODE )
 	public String getCenterNode() {
 		return this.centerNode;
 	}
-	@StringSetter( CENTER_NODE )
+
+	/**
+	 * restrict facility search to radius around centerNode (defined by node ID)
+	 */
+//	@StringSetter( CENTER_NODE )
 	public void setCenterNode(final String centerNode) {
 		this.centerNode = centerNode;
 	}
-	@StringGetter( RADIUS )
+//	@StringGetter( RADIUS )
 	public Double getRadius() {
 		return this.radius;
 	}
-	@StringSetter( RADIUS )
+	/**
+	 * restrict facility search to radius around centerNode (defined by node ID)
+	 */
+//	@StringSetter( RADIUS )
 	public void setRadius(final Double radius) {
 		this.radius = radius;
 	}
@@ -287,31 +312,32 @@ public class FrozenTastesConfigGroup extends ReflectiveConfigGroup implements De
 	public void setRandomSeed(long randomSeed) {
 		this.randomSeed = randomSeed;
 	}
-	// --------------------------------------------
-	// --------------------------------------------
 	@StringGetter( EPSDISTR )
 	public EpsilonDistributionTypes getEpsilonDistribution() {
 		return this.epsilonDistribution;
 	}
-	@Deprecated
-	public void setEpsilonDistribution(String epsilonDistribution) {
-		if (epsilonDistribution.equalsIgnoreCase( EpsilonDistributionTypes.gumbel.toString() )) {
-			this.epsilonDistribution = EpsilonDistributionTypes.gumbel;
-		} else if (epsilonDistribution.equalsIgnoreCase( EpsilonDistributionTypes.gaussian.toString() )) {
-			this.epsilonDistribution = EpsilonDistributionTypes.gaussian;
-		} else throw new RuntimeException("Unknown epsilon distribution type: " + epsilonDistribution + ". Aborting!");
-	}
-
+//	@Deprecated
+//	public void setEpsilonDistribution(String epsilonDistribution) {
+//		if (epsilonDistribution.equalsIgnoreCase( EpsilonDistributionTypes.gumbel.toString() )) {
+//			this.epsilonDistribution = EpsilonDistributionTypes.gumbel;
+//		} else if (epsilonDistribution.equalsIgnoreCase( EpsilonDistributionTypes.gaussian.toString() )) {
+//			this.epsilonDistribution = EpsilonDistributionTypes.gaussian;
+//		} else throw new RuntimeException("Unknown epsilon distribution type: " + epsilonDistribution + ". Aborting!");
+//	}
+//
 	@StringSetter( EPSDISTR )
 	public void setEpsilonDistribution(EpsilonDistributionTypes epsilonDistribution) {
 		this.epsilonDistribution = epsilonDistribution;
 	}
-	// --------------------------------------------
-	// --------------------------------------------
 	@StringGetter( SCALE_EPS )
 	public String getEpsilonScaleFactors() {
 		return this.epsilonScaleFactors;
 	}
+
+	/**
+	 * I think that this is how much to scale the epsilons for each activity type.  comma-separated list, corresponding to comma-separated list of flexible
+	 * activity types.
+	 */
 	@StringSetter( SCALE_EPS )
 	public void setEpsilonScaleFactors(String epsilonScaleFactors) {
 		this.epsilonScaleFactors = epsilonScaleFactors;
@@ -358,6 +384,10 @@ public class FrozenTastesConfigGroup extends ReflectiveConfigGroup implements De
 	public double getAnalysisBoundary() {
 		return this.analysisBoundary;
 	}
+
+	/**
+	 * Some distance cut-off for {@link DistanceStats}.  But with a more flexible data structure there this would not be necessary.
+	 */
 	@StringSetter( ANALYSIS_BOUNDARY )
 	public void setAnalysisBoundary(double analysisBoundary) {
 		this.analysisBoundary = analysisBoundary;
@@ -366,6 +396,10 @@ public class FrozenTastesConfigGroup extends ReflectiveConfigGroup implements De
 	public double getAnalysisBinSize() {
 		return this.analysisBinSize;
 	}
+
+	/**
+	 * Bin size for {@link DistanceStats}.
+	 */
 	@StringSetter( ANALYSIS_BINSIZE )
 	public void setAnalysisBinSize(double analysisBinSize) {
 		this.analysisBinSize = analysisBinSize;
@@ -388,10 +422,10 @@ public class FrozenTastesConfigGroup extends ReflectiveConfigGroup implements De
 	public double getDestinationSamplePercent() {
 		return this.destinationSamplePercent;
 	}
-	@Deprecated
-	public void setDestinationSamplePercent(String destinationSamplePercent) {
-		this.setDestinationSamplePercent(Double.parseDouble(destinationSamplePercent));
-	}
+//	@Deprecated
+//	public void setDestinationSamplePercent(String destinationSamplePercent) {
+//		this.setDestinationSamplePercent(Double.parseDouble(destinationSamplePercent));
+//	}
 	@StringSetter( DESTINATIONSAMPLE_PCT )
 	public void setDestinationSamplePercent(double destinationSamplePercent) {
 		this.destinationSamplePercent = destinationSamplePercent;

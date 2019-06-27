@@ -21,6 +21,7 @@
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -50,7 +51,7 @@ class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimListener,
 
 	//--------------------------------------------------------------------------------------------------
 
-	public FacilitiesLoadCalculator(TreeMap<Id, FacilityPenalty> facilityPenalties) {
+	FacilitiesLoadCalculator( TreeMap<Id, FacilityPenalty> facilityPenalties ) {
 		this.facilityPenalties = facilityPenalties;
 	}
 
@@ -58,18 +59,8 @@ class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimListener,
 	@Override
 	public void notifyStartup(final StartupEvent event) {
 		MatsimServices controler = event.getServices();
-		/*
-		 * Scales the load of the facilities (for e.g. 10 % runs), assuming that only integers
-		 * can be used to scale a  x% scenario ((100 MOD x == 0) runs e.g. x=10%)
-		 */
-		FrozenTastesConfigGroup dccg = (FrozenTastesConfigGroup) controler.getConfig().getModule( FrozenTastesConfigGroup.GROUP_NAME );
-		double scaleNumberOfPersons = dccg.getScaleFactor();
-        this.eventsToFacilityLoad = new EventsToFacilityLoad(
-        		controler.getScenario().getActivityFacilities(), 
-        		scaleNumberOfPersons,
-				this.facilityPenalties, 
-				((FrozenTastesConfigGroup)controler.getConfig().getModule("locationchoice" ))
-				);
+		FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule(controler.getConfig(), FrozenTastesConfigGroup.class ) ;
+		this.eventsToFacilityLoad = new EventsToFacilityLoad( controler.getScenario().getActivityFacilities(), this.facilityPenalties, dccg );
 		event.getServices().getEvents().addHandler(this.eventsToFacilityLoad);
 	}
 

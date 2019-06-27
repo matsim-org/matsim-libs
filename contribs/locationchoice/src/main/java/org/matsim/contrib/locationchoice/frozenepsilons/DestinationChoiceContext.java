@@ -81,17 +81,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 	private TObjectIntMap<Id<ActivityFacility>> facilityIndices;
 	private Map<Id<ActivityFacility>, ActivityFacilityWithIndex> faciliesWithIndexMap;
 	private TObjectIntMap<Id<Person>> personIndices;
-		
-	/**
-	 * If this is set to true, QuadTrees are stored in memory.
-	 * As a result...
-	 * - It is ensured that identical QuadTrees are not created multiple times.
-	 * - Code is sped up if QuadTrees are used multiple times (e.g. once in every MATSim iteration).
-	 * - Memory consumption is increased since the QuadTrees remain in memory!
-	 * This feature was added in nov'14. Its default value is false which was the value before
-	 * introduction the feature.
-	 */
-	private boolean cacheQuadTrees = false;
+
 	private Map<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType = new HashMap<String, QuadTree<ActivityFacilityWithIndex>>();
 	private TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 	
@@ -205,27 +195,37 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 		}
 	}
 	
-	public boolean cacheQuadTrees() {
-		return this.cacheQuadTrees;
-	}
+//	public boolean cacheQuadTrees() {
+//		return this.cacheQuadTrees;
+//	}
+//
+//	public void cacheQuadTrees(boolean cacheQuadTrees) {
+//		this.cacheQuadTrees = cacheQuadTrees;
+//		if (!cacheQuadTrees) {
+//			this.quadTreesOfType.clear();
+//			this.facilitiesOfType.clear();
+//		}
+//	}
 	
-	public void cacheQuadTrees(boolean cacheQuadTrees) {
-		this.cacheQuadTrees = cacheQuadTrees;
-		if (!cacheQuadTrees) {
-			this.quadTreesOfType.clear();
-			this.facilitiesOfType.clear();
-		}
-	}
-	
-	public Tuple<QuadTree<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> getQuadTreeAndFacilities(String activityType) {
-		if (this.cacheQuadTrees) {
+	Tuple<QuadTree<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> getQuadTreeAndFacilities( String activityType ) {
+		/**
+		 * If this is set to true, QuadTrees are stored in memory.
+		 * As a result...
+		 * - It is ensured that identical QuadTrees are not created multiple times.
+		 * - Code is sped up if QuadTrees are used multiple times (e.g. once in every MATSim iteration).
+		 * - Memory consumption is increased since the QuadTrees remain in memory!
+		 * This feature was added in nov'14. Its default value is false which was the value before
+		 * introduction the feature.
+		 */
+		boolean cacheQuadTrees = false;
+		if ( cacheQuadTrees ) {
 			QuadTree<ActivityFacilityWithIndex> quadTree = this.quadTreesOfType.get(activityType);
 			ActivityFacilityImpl[] facilities = this.facilitiesOfType.get(activityType);
-			if (quadTree == null || facilities == null) {				
+			if (quadTree == null || facilities == null) {
 				Tuple<QuadTree<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> tuple = getTuple(activityType);
 				this.quadTreesOfType.put(activityType, tuple.getFirst());
 				this.facilitiesOfType.put(activityType, tuple.getSecond());
-				
+
 				return tuple;
 			} else return new Tuple<>( quadTree, facilities );
 		} else return getTuple(activityType);
@@ -281,7 +281,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 		return params;
 	}
 
-	public boolean kValsAreRead() {
+	private boolean kValsAreRead() {
 		return (this.arekValsRead == 0);
 	}
 
@@ -317,11 +317,11 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 		return this.facilityIndices.get(id);
 	}
 	
-	public ObjectAttributes getPersonsBetas() {
+	ObjectAttributes getPersonsBetas() {
 		return personsBetas;
 	}
 
-	public ObjectAttributes getFacilitiesAttributes() {
+	ObjectAttributes getFacilitiesAttributes() {
 		return facilitiesAttributes;
 	}
 
@@ -330,7 +330,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 		return null;
 	}
 
-	public ObjectAttributes getPrefsAttributes() {
+	ObjectAttributes getPrefsAttributes() {
 		return prefsAttributes;
 	}
 
@@ -343,7 +343,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 		private final ActivityFacility activityFacility;
 		private final int index;
 		
-		public ActivityFacilityWithIndex(ActivityFacility activityFacility, int index) {
+		ActivityFacilityWithIndex( ActivityFacility activityFacility, int index ) {
 			this.activityFacility = activityFacility;
 			this.index = index;
 		}

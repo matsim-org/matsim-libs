@@ -41,18 +41,18 @@ import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroupI;
 
 class FacilityPenalty {
 
+	private final double scaleNumberOfPersons;
 	private FacilityLoad facilityLoad;
 	private double capacity = 0.0;
 	private static int numberOfTimeBins = 4*24;
-	private double scaleNumberOfPersons = 1;
 	private double sumCapacityPenaltyFactor = 0.0;
 	private double restraintFcnFactor = 0.0;
 	private double restraintFcnExp = 0.0;
 
-	public FacilityPenalty( double minCapacity, double scaleNumberOfPersons, DestinationChoiceConfigGroupI config ) {
+	FacilityPenalty( double minCapacity, DestinationChoiceConfigGroupI config ) {
 		this.capacity = minCapacity;
+		this.scaleNumberOfPersons = config.getScaleFactor() ;
 		this.facilityLoad = new FacilityLoad(FacilityPenalty.numberOfTimeBins, scaleNumberOfPersons);
-		this.scaleNumberOfPersons = scaleNumberOfPersons;
 		this.restraintFcnFactor = config.getRestraintFcnFactor();
 		this.restraintFcnExp = config.getRestraintFcnExp();
 	}
@@ -64,8 +64,7 @@ class FacilityPenalty {
 
 		for (int i=startTimeBinIndex; i<endTimeBinIndex+1; i++) {
 			if (this.capacity > 0) {
-			capPenaltyFactor += restraintFcnFactor*Math.pow(
-					(facilityload[i]-scaleNumberOfPersons)/(this.capacity), restraintFcnExp);
+				capPenaltyFactor += restraintFcnFactor*Math.pow( (facilityload[i]-scaleNumberOfPersons)/(this.capacity), restraintFcnExp);
 			}
 
 			/*
@@ -81,7 +80,7 @@ class FacilityPenalty {
 		return capPenaltyFactor;
 	}
 
-	public double getCapacityPenaltyFactor(double startTime, double endTime) {
+	double getCapacityPenaltyFactor( double startTime, double endTime ) {
 
 		if (startTime>24.0*3600.0 && endTime>24.0*3600.0) {
 			return 0.0;
@@ -95,7 +94,7 @@ class FacilityPenalty {
 		return calculateCapPenaltyFactor(startTimeBinIndex, endTimeBinIndex);
 	}
 
-	public FacilityLoad getFacilityLoad() {
+	FacilityLoad getFacilityLoad() {
 		return facilityLoad;
 	}
 

@@ -66,7 +66,7 @@ class FacilityLoad {
 		}
 	}
 	
-	public void addArrival(double time) {		
+	void addArrival( double time ) {
 		this.addToAllVisitors(this.scaleNumberOfPersons);
 		/* We do not handle times > 24h
 		 * We do not care about #arrivals==#departures after the last time bin
@@ -80,7 +80,7 @@ class FacilityLoad {
 		this.addToVisitorsPerDay(this.scaleNumberOfPersons);
 	}
 	
-	public void addDeparture(double time) {
+	void addDeparture( double time ) {
 		/* We do not handle times > 24h
 		 * We do not care about #arrivals==#departures after the last time bin
 		 */
@@ -92,11 +92,11 @@ class FacilityLoad {
 		//log.info("departure at: " + time + " bin: " + timeBinIndex);
 	}
 	
-	public void addToAllVisitors(double scaleNumberOfPersons) {
+	private void addToAllVisitors( double scaleNumberOfPersons ) {
 		this.allVisitors += scaleNumberOfPersons;
 	}
 	
-	public void addToVisitorsPerDay(double scaleNumberOfPersons) {
+	private void addToVisitorsPerDay( double scaleNumberOfPersons ) {
 		this.numberOfVisitorsPerDay += scaleNumberOfPersons;
 	}
 
@@ -104,7 +104,7 @@ class FacilityLoad {
 		return load;
 	}
 	
-	public double getLoadPerHour(int hour) {
+	double getLoadPerHour( int hour ) {
 		double hourlyLoad = 0.0;
 
 		for (int i = 0; i < 4 ; i++) {
@@ -114,11 +114,11 @@ class FacilityLoad {
 		return hourlyLoad/4;
 	}
 	
-	public double getNumberOfVisitorsPerDay() {
+	double getNumberOfVisitorsPerDay() {
 		return numberOfVisitorsPerDay;
 	}
 
-	public double getAllVisitors() {
+	double getAllVisitors() {
 		return this.allVisitors;
 	}
 
@@ -140,7 +140,7 @@ class FacilityLoad {
 	/* 
 	 * All values >= 86400s (24h) are merged into the last time bin
 	 */
-	public int timeBinIndex(double time) {
+	int timeBinIndex( double time ) {
 		int lastBinIndex = this.numberOfTimeBins-1;
 		int numberOfBinsPerHour = this.numberOfTimeBins/24;
 		int secondsPerBin = 3600/numberOfBinsPerHour;

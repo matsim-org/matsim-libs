@@ -42,10 +42,7 @@ class EventsToFacilityLoad implements ActivityStartEventHandler, ActivityEndEven
 	private TreeMap<Id, FacilityPenalty> facilityPenalties;
 	private final static Logger log = Logger.getLogger(EventsToFacilityLoad.class);
 
-	public EventsToFacilityLoad(final ActivityFacilities facilities, double scaleNumberOfPersons,
-			TreeMap<Id, FacilityPenalty> facilityPenalties, FrozenTastesConfigGroup config ) {
-		super();
-
+	EventsToFacilityLoad( final ActivityFacilities facilities, TreeMap<Id, FacilityPenalty> facilityPenalties, FrozenTastesConfigGroup config ) {
 		this.facilityPenalties = facilityPenalties;
 
 		log.info("facilities size: " + facilities.getFacilities().values().size());
@@ -66,7 +63,7 @@ class EventsToFacilityLoad implements ActivityStartEventHandler, ActivityEndEven
 					capacity = act.getCapacity();
 				}
 			}
-			this.facilityPenalties.put(f.getId(), new FacilityPenalty(capacity, scaleNumberOfPersons, config));
+			this.facilityPenalties.put(f.getId(), new FacilityPenalty(capacity, config) );
 		}
 		log.info("finished init");
 	}
