@@ -152,7 +152,24 @@ final class QNodeImpl extends AbstractQNode {
 		} 
 		
 		// randomize based on capacity
-		for (int auxCounter = 0; auxCounter < inLinksCounter; auxCounter++) {
+//		for (int auxCounter = 0; auxCounter < inLinksCounter; auxCounter++) {
+//			double rndNum = random.nextDouble() * inLinksCapSum;
+//			double selCap = 0.0;
+//			for (int i = 0; i < inLinksCounter; i++) {
+//				QLinkI link = this.tempLinks[i];
+//				if (link != null) {
+//					selCap += link.getLink().getCapacity(now);
+//					if (selCap >= rndNum) {
+//						inLinksCapSum -= link.getLink().getCapacity(now);
+//						this.tempLinks[i] = null;
+//						this.moveLink(link, now);
+//						break;
+//					}
+//				}
+//			}
+//		}
+		// randomize based on link capacity: select the vehicles (one by one) that are allowed to pass the node
+		while (inLinksCapSum > 0) {
 			double rndNum = random.nextDouble() * inLinksCapSum;
 			double selCap = 0.0;
 			for (int i = 0; i < inLinksCounter; i++) {
@@ -160,9 +177,13 @@ final class QNodeImpl extends AbstractQNode {
 				if (link != null) {
 					selCap += link.getLink().getCapacity(now);
 					if (selCap >= rndNum) {
-						inLinksCapSum -= link.getLink().getCapacity(now);
-						this.tempLinks[i] = null;
-						this.moveLink(link, now);
+						if ( ! moveFirstVehicleOnLink(now, link)) {
+							// the link is not able to move (more) vehicles in this time step
+							inLinksCapSum -= link.getLink().getCapacity(now);
+							this.tempLinks[i] = null;
+						} else {
+							// a vehicle has been moved. select the next link (could be the same again) that is allowed to move a vehicle. I.e. start again with the beginning of the while-loop
+						}
 						break;
 					}
 				}
@@ -171,17 +192,37 @@ final class QNodeImpl extends AbstractQNode {
 		
 		return true;
 	}
-	
-	private void moveLink(final QLinkI link, final double now){
+
+	/**
+	 * @return <code>true</code> if a vehicle was successfully moved over the node, <code>false</code>
+	 * otherwise (e.g. in case all next links are jammed)
+	 */
+	private boolean moveFirstVehicleOnLink(final double now, QLinkI link) {
 		for (QLaneI lane : link.getOfferingQLanes()) {
-			while (! lane.isNotOfferingVehicle()) {
+			if (! lane.isNotOfferingVehicle()) {
 				QVehicle veh = lane.getFirstVehicle();
-				if (! moveVehicleOverNode(veh, link, lane, now )) {
-					break;
+				if (moveVehicleOverNode(veh, link, lane, now)) {
+					// vehicle was moved. stop here
+					return true;
+				} else {
+					// vehicle was not moved, e.g. because the next link is jammed. try next lane
+					continue;
 				}
 			}
 		}
+		return false;
 	}
+	
+//	private void moveLink(final QLinkI link, final double now){
+//		for (QLaneI lane : link.getOfferingQLanes()) {
+//			while (! lane.isNotOfferingVehicle()) {
+//				QVehicle veh = lane.getFirstVehicle();
+//				if (! moveVehicleOverNode(veh, link, lane, now )) {
+//					break;
+//				}
+//			}
+//		}
+//	}
 	
 	
 	
