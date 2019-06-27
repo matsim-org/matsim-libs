@@ -44,7 +44,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.Map;
 
-public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
+class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 
 	private PlanStrategyImpl delegate;
 	@Inject private Config config ;
