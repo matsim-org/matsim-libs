@@ -26,7 +26,7 @@ import org.matsim.core.config.ConfigGroup;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class DestinationChoiceConfigGroup extends ConfigGroup {
+public class DestinationChoiceConfigGroup extends ConfigGroup implements DestinationChoiceConfigGroupI {
 
 	public enum Algotype { random, bestResponse, localSearchRecursive, localSearchSingleAct };
 	public enum EpsilonDistributionTypes { gumbel, gaussian };
