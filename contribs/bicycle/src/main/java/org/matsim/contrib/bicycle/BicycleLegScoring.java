@@ -36,7 +36,6 @@ import java.util.Set;
  * @author dziemke
  */
 class BicycleLegScoring extends CharyparNagelLegScoring {
-	// private static final Logger LOG = Logger.getLogger(BicycleLegScoring.class);
 
 	private final double marginalUtilityOfInfrastructure_m;
 	private final double marginalUtilityOfComfort_m;
@@ -56,16 +55,13 @@ class BicycleLegScoring extends CharyparNagelLegScoring {
 		// Get leg score from regular CharyparNagelLegScoring
 		double legScore = super.calcLegScore(departureTime, arrivalTime, leg);
 
-		if (leg.getMode().equals(bicycleMode)) {
-			
-			if (leg.getRoute().getStartLinkId().toString().equals(leg.getRoute().getEndLinkId().toString())) {
-				// start link and end link are the same --> generic route
-				
-			} else {
+		if (isBicycleMode(leg.getMode())) {
+
+			if (!isSameStartAndEnd(leg)) {
+
 				NetworkRoute networkRoute = (NetworkRoute) leg.getRoute();
-				
-				List<Id<Link>> linkIds = new ArrayList<>();
-				linkIds.addAll(networkRoute.getLinkIds());
+
+				List<Id<Link>> linkIds = new ArrayList<>(networkRoute.getLinkIds());
 				linkIds.add(networkRoute.getEndLinkId());
 				
 				// Iterate over all links of the route
@@ -79,5 +75,13 @@ class BicycleLegScoring extends CharyparNagelLegScoring {
 		}
 		
 		return legScore;
+	}
+
+	private boolean isBicycleMode(String mode) {
+		return mode.equals(bicycleMode);
+	}
+
+	private boolean isSameStartAndEnd(Leg leg) {
+		return leg.getRoute().getStartLinkId().toString().equals(leg.getRoute().getEndLinkId().toString());
 	}
 }
