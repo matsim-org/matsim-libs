@@ -22,13 +22,20 @@
  */
 package org.matsim.contrib.drt.routing;
 
+import java.util.List;
+
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -42,16 +49,17 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-
-import java.util.List;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author jbischoff
  */
 public class StopBasedDrtRoutingModuleTest {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void test() {
+	public void testCottbus() {
 		Scenario scenario = createTestScenario();
 		ActivityFacilities facilities = scenario.getActivityFacilities();;
 		final Double networkTravelSpeed = 0.83333;
@@ -112,11 +120,11 @@ public class StopBasedDrtRoutingModuleTest {
 		Config config = ConfigUtils.createConfig();
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 		drtConfigGroup.setMaxWalkDistance(200);
-		drtConfigGroup.setTransitStopFile("./src/test/resources/cottbus/drtstops.xml.gz");
+		drtConfigGroup.setTransitStopFile(utils.getInputDirectory() + "drtstops.xml.gz");
 		config.addModule(drtConfigGroup);
 
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
-		new MatsimNetworkReader(scenario.getNetwork()).readFile("./src/test/resources/cottbus/network.xml.gz");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(utils.getInputDirectory() + "network.xml.gz");
 		new TransitScheduleReader(scenario).readFile(drtConfigGroup.getTransitStopFile());
 		createSomeAgents(scenario);
 		return scenario;
