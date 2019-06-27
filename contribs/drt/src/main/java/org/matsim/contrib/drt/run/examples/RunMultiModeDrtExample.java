@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.drt.run.examples;
 
+import java.net.URL;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -39,11 +41,8 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  * @author michal.mac
  */
 public class RunMultiModeDrtExample {
-
-	private static final String CONFIG_FILE = "multi_mode_one_shared_taxi/multi_mode_one_shared_taxi_config.xml";
-
-	public static void run(boolean otfvis, int lastIteration) {
-		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+	public static void run(URL configUrl, boolean otfvis, int lastIteration) {
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 
 		DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.planCalcScore());
@@ -62,9 +61,5 @@ public class RunMultiModeDrtExample {
 		}
 
 		controler.run();
-	}
-
-	public static void main(String[] args) {
-		run(false, 0);
 	}
 }
