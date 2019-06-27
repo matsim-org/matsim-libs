@@ -52,7 +52,6 @@ public class RunRandomDynAgentExample {
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setLastIteration(0);
 		config.addConfigConsistencyChecker(new DynQSimConfigConsistencyChecker());
-		config.checkConsistency();
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 

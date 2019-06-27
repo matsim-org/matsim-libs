@@ -63,7 +63,6 @@ public class RunTaxiBenchmark {
 
 		DvrpConfigGroup.get(config).setNetworkMode(null);// to switch off network filtering
 		config.addConfigConsistencyChecker(new DvrpBenchmarkConfigConsistencyChecker());
-		config.checkConsistency();
 
 		String mode = TaxiConfigGroup.get(config).getMode();
 		Scenario scenario = loadBenchmarkScenario(config, 15 * 60, 30 * 3600);

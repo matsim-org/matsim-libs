@@ -72,7 +72,6 @@ public class RunETaxiBenchmark {
 		DvrpConfigGroup.get(config).setNetworkMode(null);// to switch off network filtering
 		config.controler().setLastIteration(runs - 1);
 		config.addConfigConsistencyChecker(new DvrpBenchmarkConfigConsistencyChecker());
-		config.checkConsistency();
 		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
 
 		Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
