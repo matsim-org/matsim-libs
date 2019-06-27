@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.locationchoice.frozenepsilons.DestinationChoiceContext.ActivityFacilityWithIndex;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
-import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
+//import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ScaleEpsilon;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
@@ -53,7 +53,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	private final ActivityFacilities facilities;
 	private final ObjectAttributes personsMaxDCScoreUnscaled;
 	private final ScaleEpsilon scaleEpsilon;
-	private final ActTypeConverter actTypeConverter;
+//	private final ActTypeConverter actTypeConverter;
 	private final DestinationSampler sampler;
 	private final DestinationChoiceContext lcContext;
 	private final MultiNodeDijkstra forwardMultiNodeDijkstra;
@@ -77,7 +77,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		this.facilities = lcContext.getScenario().getActivityFacilities();
 		this.personsMaxDCScoreUnscaled = personsMaxDCScoreUnscaled;
 		this.scaleEpsilon = lcContext.getScaleEpsilon();
-		this.actTypeConverter = lcContext.getConverter();
+//		this.actTypeConverter = lcContext.getConverter();
 		this.sampler = sampler;
 		this.lcContext = lcContext;
 		this.forwardMultiNodeDijkstra = forwardMultiNodeDijkstra;
@@ -130,8 +130,8 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 					final Coord coordPre = PopulationUtils.decideOnCoordForActivity( actPre, scenario ) ;
 					final Coord coordPost = PopulationUtils.decideOnCoordForActivity( actPost, scenario ) ;
 					double distanceDirect = CoordUtils.calcEuclideanDistance( coordPre, coordPost );
-					double maximumDistance = this.convertEpsilonIntoDistance(plan.getPerson(), 
-							this.actTypeConverter.convertType(actToMove.getType()));
+					double maximumDistance = this.convertEpsilonIntoDistance(plan.getPerson(),
+						  actToMove.getType() );
 
 					double maxRadius = (distanceDirect +  maximumDistance) / 2.0;
 
@@ -161,7 +161,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 
 		ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, scenario );
 
-		final String convertedType = this.actTypeConverter.convertType(actToMove.getType());
+		final String convertedType = actToMove.getType();
 		Gbl.assertNotNull(convertedType);
 		final QuadTree<ActivityFacilityWithIndex> quadTree = this.quadTreesOfType.get( convertedType );
 		Gbl.assertNotNull( quadTree );

@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
+//import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -39,16 +39,16 @@ class DistanceStats implements IterationEndsListener {
 	private Bins bins;
 	private String bestOrSelected = "selected";
 	private String type = null;
-	private ActTypeConverter actTypeConverter;
+//	private ActTypeConverter actTypeConverter;
 	private String mode;
 	
-	public DistanceStats(Config config, String bestOrSelected, String type, ActTypeConverter actTypeConverter, String mode) {
+	public DistanceStats( Config config, String bestOrSelected, String type, String mode ) {
 		
 		this.dccg = (FrozenTastesConfigGroup) config.getModule( FrozenTastesConfigGroup.GROUP_NAME );
 		this.analysisBoundary = this.dccg.getAnalysisBoundary(); 
 		this.bestOrSelected = bestOrSelected;
 		this.type = type;
-		this.actTypeConverter = actTypeConverter;
+//		this.actTypeConverter = actTypeConverter;
 		this.mode = mode;
 		this.bins = new Bins(this.dccg.getAnalysisBinSize(), analysisBoundary, type + "_" + mode + "_distance");
 	}
@@ -80,7 +80,7 @@ class DistanceStats implements IterationEndsListener {
 			}		
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
-					if (this.actTypeConverter.convertType(((Activity) pe).getType()).equals(this.actTypeConverter.convertType(type)) &&
+					if ( ((Activity) pe).getType().equals( type ) &&
 							PopulationUtils.getPreviousLeg(plan, (Activity)pe).getMode().equals(this.mode)) {
 						double distance = CoordUtils.calcEuclideanDistance(((Activity) pe).getCoord(), PopulationUtils.getPreviousActivity(plan, PopulationUtils.getPreviousLeg(plan, (Activity)pe)).getCoord()); 
 						this.bins.addVal(distance, 1.0);

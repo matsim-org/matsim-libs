@@ -27,6 +27,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 import java.util.Map;
 
 public class FrozenTastesConfigGroup extends ReflectiveConfigGroup implements DestinationChoiceConfigGroupI {
+	private final static Logger log = Logger.getLogger( FrozenTastesConfigGroup.class );
 	public static final String GROUP_NAME = "frozenTastes";
 
 	public enum Algotype { random, bestResponse, localSearchRecursive, localSearchSingleAct };
@@ -38,10 +39,10 @@ public class FrozenTastesConfigGroup extends ReflectiveConfigGroup implements De
 	private static final String RESTR_FCN_FACTOR = "restraintFcnFactor";
 	private static final String RESTR_FCN_EXP = "restraintFcnExp";
 	private static final String SCALEFACTOR = "scaleFactor";
-	private static final String GLOBALTRAVELSPEEDCHANGE = "recursionTravelSpeedChange";
+//	private static final String GLOBALTRAVELSPEEDCHANGE = "recursionTravelSpeedChange";
 	private static final String GLOBALTRAVELSPEED_CAR = "travelSpeed_car";
-	private static final String GLOBALTRAVELSPEED_PT = "travelSpeed_pt";
-	private static final String MAX_RECURSIONS = "maxRecursions";
+//	private static final String GLOBALTRAVELSPEED_PT = "travelSpeed_pt";
+//	private static final String MAX_RECURSIONS = "maxRecursions";
 	private static final String CENTER_NODE = "centerNode";
 	private static final String RADIUS = "radius";
 	private static final String FLEXIBLE_TYPES = "flexible_types";
@@ -54,8 +55,8 @@ public class FrozenTastesConfigGroup extends ReflectiveConfigGroup implements De
 	private static final String RANDOMSEED = "randomSeed";
 	private static final String EPSDISTR = "epsilonDistribution";
 	private static final String SCALE_EPS = "epsilonScaleFactors";
-	private static final String PROBCHOICESETSIZE = "probChoiceSetSize";
-	private static final String PROBCHOICEEXP = "probChoiceExponent";
+//	private static final String PROBCHOICESETSIZE = "probChoiceSetSize";
+//	private static final String PROBCHOICEEXP = "probChoiceExponent";
 	
 	private static final String PKVALS_FILE = "pkValuesFile";
 	private static final String FKVALS_FILE = "fkValuesFile";
@@ -129,8 +130,6 @@ public class FrozenTastesConfigGroup extends ReflectiveConfigGroup implements De
 	private boolean useConfigParamsForScoring = defaultUseConfigParamsForScoring;
 	private boolean useIndividualScoringParameters = defaultUseIndividualScoringParameters;
 //	private boolean reUseTemporaryPlans = defaultReUseTemporaryPlans;
-
-	private final static Logger log = Logger.getLogger( FrozenTastesConfigGroup.class );
 
 	public FrozenTastesConfigGroup() {
 		super(GROUP_NAME);

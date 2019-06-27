@@ -59,13 +59,13 @@ class DestinationChoiceInitializer implements StartupListener {
 		// now all done in DestinationChoiceContext. kai, mar'19
 
   		for (String actType : this.dcContext.getFlexibleTypes()) {
-  			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, dcContext.getConverter(), TransportMode.car) );
-  			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, dcContext.getConverter(), TransportMode.pt));
-  			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, dcContext.getConverter(), TransportMode.bike));
-  			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, dcContext.getConverter(), TransportMode.walk));
-  			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, dcContext.getConverter(), TransportMode.other));
-  			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, dcContext.getConverter(), TransportMode.ride));
-  			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, dcContext.getConverter(), TransportMode.transit_walk));
+  			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, TransportMode.car) );
+  			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, TransportMode.pt) );
+  			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, TransportMode.bike) );
+  			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, TransportMode.walk) );
+  			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, TransportMode.other) );
+  			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, TransportMode.ride) );
+  			controler.addControlerListener(new DistanceStats(controler.getConfig(), "best", actType, TransportMode.transit_walk) );
   		}
   		// having a distance analysis class is a good idea.  But there is not much of a point to use something that is hidden here.  kai, mar'19
 

@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
+//import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.contrib.locationchoice.utils.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.utils.TreesBuilder;
@@ -66,7 +66,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 	
 	private final Scenario scenario;
 	private ScaleEpsilon scaleEpsilon;
-	private ActTypeConverter actTypeConverter;
+//	private ActTypeConverter actTypeConverter;
 	private HashSet<String> flexibleTypes;
 	private ScoringParameters params;
 	private FrozenTastesConfigGroup dccg;
@@ -123,7 +123,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 			this.dccg = ConfigUtils.addOrGetModule( this.scenario.getConfig(), FrozenTastesConfigGroup.class );
 			ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler( this.dccg );
 			this.scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
-			this.actTypeConverter = defineFlexibleActivities.getConverter();
+//			this.actTypeConverter = defineFlexibleActivities.getConverter();
 			this.flexibleTypes = defineFlexibleActivities.getFlexibleTypes();
 
 			this.readOrCreateKVals( dccg.getRandomSeed() );
@@ -234,7 +234,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 	private Tuple<QuadTree<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> getTuple(String activityType) {
 
 		TreesBuilder treesBuilder = new TreesBuilder(CollectionUtils.stringToSet(activityType), this.scenario.getNetwork(), this.dccg);
-		treesBuilder.setActTypeConverter(this.getConverter());
+//		treesBuilder.setActTypeConverter(this.getConverter());
 		treesBuilder.createTrees(scenario.getActivityFacilities());
 		
 		ActivityFacilityImpl[] facilities = treesBuilder.getFacilitiesOfType().get(activityType);
@@ -269,9 +269,9 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 		return scaleEpsilon;
 	}
 
-	public ActTypeConverter getConverter() {
-		return actTypeConverter;
-	}
+//	public ActTypeConverter getConverter() {
+//		return actTypeConverter;
+//	}
 
 	public HashSet<String> getFlexibleTypes() {
 		return flexibleTypes;

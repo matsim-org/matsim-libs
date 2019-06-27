@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
+//import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.misc.Time;
@@ -45,7 +45,7 @@ class DCActivityScoringFunction extends org.matsim.deprecated.scoring.functions.
 	private final ScoringParameters params;
 	public static final int DEFAULT_PRIORITY = 1;
 	private final HashMap<String, Double> zeroUtilityDurations = new HashMap<String, Double>();
-	private ActTypeConverter converter;
+//	private ActTypeConverter converter;
 	private ObjectAttributes prefs;
 	private DestinationChoiceContext dcContext;
 	private FrozenTastesConfigGroup dccg;
@@ -58,7 +58,7 @@ class DCActivityScoringFunction extends org.matsim.deprecated.scoring.functions.
 		this.facilities = dcContext.getScenario().getActivityFacilities();
 		this.plan = plan;
 		this.params = dcContext.getParams();
-		this.converter = dcContext.getConverter();
+//		this.converter = dcContext.getConverter();
 		this.prefs = dcContext.getPrefsAttributes();
 		this.dcContext = dcContext;
 		this.dccg = (FrozenTastesConfigGroup) this.dcContext.getScenario().getConfig().getModule( FrozenTastesConfigGroup.GROUP_NAME );
@@ -198,8 +198,8 @@ class DCActivityScoringFunction extends org.matsim.deprecated.scoring.functions.
 				
 				double utilWait = this.params.marginalUtilityOfWaiting_s * duration;
 				tmpScore += Math.max(0, Math.max(utilPerf, utilWait));
-				
-				if (this.dcContext.getScaleEpsilon().isFlexibleType(this.converter.convertType(act.getType())) &&
+
+				if (this.dcContext.getScaleEpsilon().isFlexibleType( act.getType() ) &&
 						this.dccg.getRestraintFcnExp() > 0.0 &&
 						this.dccg.getRestraintFcnFactor() > 0.0) {
 					
@@ -227,9 +227,9 @@ class DCActivityScoringFunction extends org.matsim.deprecated.scoring.functions.
 		// openInterval[1] will be the closing time
 		double[] openInterval = new double[]{Time.UNDEFINED_TIME, Time.UNDEFINED_TIME};
 		boolean foundAct = false;
-		
-		if (act.getType().contains("interaction") || // yyyy might be too loose. kai, feb'16 
-				(this.converter.convertType(act.getType()).startsWith("h") && this.converter.isV1()) || 
+
+		if (act.getType().contains("interaction") || // yyyy might be too loose. kai, feb'16
+//				(act.getType().startsWith("h" ) && this.converter.isV1()) ||
 				act.getType().equals("home")) {
 			return openInterval;
 		} // pt interaction and home always open
@@ -241,7 +241,7 @@ class DCActivityScoringFunction extends org.matsim.deprecated.scoring.functions.
 
 		while (facilityActTypeIterator.hasNext() && !foundAct) {
 			facilityActType = facilityActTypeIterator.next();
-			if (this.converter.convertType(act.getType()).equals(this.converter.convertType(facilityActType))) { // TODO: check here actType conversions
+			if ( act.getType().equals( facilityActType )) { // TODO: check here actType conversions
 				foundAct = true;
 				// choose appropriate opentime: either wed, wkday or wk
 				// if none is given, use undefined opentimes
