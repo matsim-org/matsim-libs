@@ -33,6 +33,7 @@ import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
+import org.matsim.core.config.ConfigGroup;
 
 import com.google.inject.Singleton;
 
@@ -51,7 +52,7 @@ public class OneTaxiModule extends AbstractDvrpModeModule {
 	public void install() {
 		DvrpModes.registerDvrpMode(binder(), getMode());
 		addRoutingModuleBinding(getMode()).toInstance(new DynRoutingModule(getMode()));
-		install(new FleetModule(getMode(), taxisFile));
+		install(new FleetModule(getMode(), ConfigGroup.getInputFileURL(getConfig().getContext(), taxisFile)));
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class);
 
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
