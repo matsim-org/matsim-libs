@@ -36,15 +36,16 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 public class RunRandomDynAgentExample {
-	public static void run(URL networkUrl, boolean otfvis) {
+	public static void run(URL context, String networkFile, boolean otfvis) {
 		OTFVisConfigGroup otfvisConfig = new OTFVisConfigGroup();
 		otfvisConfig.setColoringScheme(ColoringScheme.byId);
 		otfvisConfig.setDrawNonMovingItems(true);
 
 		Config config = ConfigUtils.createConfig(otfvisConfig);
+		config.setContext(context);
 		config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
-		config.network().setInputFile(networkUrl.getFile());
+		config.network().setInputFile(networkFile);
 		config.controler().setOutputDirectory("./test/output/");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setLastIteration(0);
