@@ -36,7 +36,7 @@
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="test/output/mielec_taxi_2014_02_benchmark"/>
+		<param name="outputDirectory" value="test/output/mielec_taxi_benchmark"/>
 		<param name="overwriteFiles" value="deleteDirectoryIfExists"/>
 		<param name="writeEventsInterval" value="0"/>
 		<param name="writePlansInterval" value="0"/>
