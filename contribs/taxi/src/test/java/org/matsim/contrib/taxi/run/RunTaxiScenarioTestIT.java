@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.taxi.run;
 
+import java.net.URL;
 import java.util.Collections;
 
 import org.junit.Assert;
@@ -31,6 +32,8 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
@@ -54,9 +57,9 @@ public class RunTaxiScenarioTestIT {
 	}
 
 	private void runMielec(String plansFile, String taxisFile) {
-		String configFile = "mielec_2014_02/mielec_taxi_config.xml";
+		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_config.xml");
 		TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
-		Config config = ConfigUtils.loadConfig(configFile, taxiCfg, new DvrpConfigGroup(), new OTFVisConfigGroup());
+		Config config = ConfigUtils.loadConfig(configUrl, taxiCfg, new DvrpConfigGroup(), new OTFVisConfigGroup());
 		config.plans().setInputFile(plansFile);
 		taxiCfg.setTaxisFile(taxisFile);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
@@ -65,9 +68,9 @@ public class RunTaxiScenarioTestIT {
 	}
 
 	private void runMielecWithRejection(String plansFile, String taxisFile) {
-		String configFile = "mielec_2014_02/mielec_taxi_config.xml";
+		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_config.xml");
 		TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
-		Config config = ConfigUtils.loadConfig(configFile, taxiCfg, new DvrpConfigGroup(), new OTFVisConfigGroup());
+		Config config = ConfigUtils.loadConfig(configUrl, taxiCfg, new DvrpConfigGroup(), new OTFVisConfigGroup());
 		config.plans().setInputFile(plansFile);
 		taxiCfg.setTaxisFile(taxisFile);
 		taxiCfg.setBreakSimulationIfNotAllRequestsServed(false);
