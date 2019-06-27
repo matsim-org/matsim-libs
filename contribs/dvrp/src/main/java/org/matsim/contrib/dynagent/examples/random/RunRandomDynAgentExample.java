@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.dynagent.examples.random;
 
+import java.net.URL;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dynagent.run.DynQSimConfigConsistencyChecker;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
@@ -34,12 +36,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
 
 public class RunRandomDynAgentExample {
-	public static void run(boolean otfvis) {
-		String netFile = "./src/main/resources/grid_network.xml";
-		run(netFile, otfvis);
-	}
-
-	public static void run(String netFile, boolean otfvis) {
+	public static void run(URL networkUrl, boolean otfvis) {
 		OTFVisConfigGroup otfvisConfig = new OTFVisConfigGroup();
 		otfvisConfig.setColoringScheme(ColoringScheme.byId);
 		otfvisConfig.setDrawNonMovingItems(true);
@@ -47,7 +44,7 @@ public class RunRandomDynAgentExample {
 		Config config = ConfigUtils.createConfig(otfvisConfig);
 		config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
-		config.network().setInputFile(netFile);
+		config.network().setInputFile(networkUrl.getFile());
 		config.controler().setOutputDirectory("./test/output/");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setLastIteration(0);
@@ -64,9 +61,5 @@ public class RunRandomDynAgentExample {
 		}
 
 		controler.run();
-	}
-
-	public static void main(String[] args) {
-		run(true);
 	}
 }
