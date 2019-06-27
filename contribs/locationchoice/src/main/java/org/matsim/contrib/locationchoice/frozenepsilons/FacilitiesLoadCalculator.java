@@ -44,7 +44,7 @@ import java.util.TreeMap;
  *
  * @author anhorni
  */
-public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimListener, AfterMobsimListener, IterationEndsListener {
+class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimListener, AfterMobsimListener, IterationEndsListener {
 
 	private EventsToFacilityLoad eventsToFacilityLoad = null;
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;

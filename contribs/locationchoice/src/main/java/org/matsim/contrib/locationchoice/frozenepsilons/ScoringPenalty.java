@@ -23,7 +23,7 @@ package org.matsim.contrib.locationchoice.frozenepsilons;
 //import org.apache.log4j.Logger;
 
 
-public class ScoringPenalty {
+class ScoringPenalty {
 
 	private double startTime = 0;
 	private double endTime = 0;

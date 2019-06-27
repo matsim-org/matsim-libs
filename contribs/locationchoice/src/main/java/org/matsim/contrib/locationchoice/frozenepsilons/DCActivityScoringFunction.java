@@ -38,7 +38,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import java.util.*;
 
 // needs to be re-designed with delegation instead of inheritance. kai, oct'14
-public class DCActivityScoringFunction extends org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring {
+class DCActivityScoringFunction extends org.matsim.deprecated.scoring.functions.CharyparNagelActivityScoring {
 	static final Logger log = Logger.getLogger(DCActivityScoringFunction.class);
 	private DestinationScoring destinationChoiceScoring;	
 	private final ActivityFacilities facilities;

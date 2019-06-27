@@ -22,7 +22,7 @@ package org.matsim.contrib.locationchoice.frozenepsilons;
 
 //import org.apache.log4j.Logger;
 
-public class FacilityLoad {
+class FacilityLoad {
 	
 	//private final static Logger log = Logger.getLogger(FacilityLoad.class);
 	

@@ -38,7 +38,7 @@ import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
  *		Facility load has to be handled for hour 0..24 only (according to M.B.)
  */
 
-public class FacilityPenalty {
+class FacilityPenalty {
 
 	private FacilityLoad facilityLoad;
 	private double capacity = 0.0;

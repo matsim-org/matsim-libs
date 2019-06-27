@@ -38,7 +38,7 @@ import org.matsim.facilities.ActivityOption;
  * @author anhorni
  * Uses FacilityPenalty to manage the facililities' loads by taking care of activity start and end events.
  */
-public class EventsToFacilityLoad implements ActivityStartEventHandler, ActivityEndEventHandler {
+class EventsToFacilityLoad implements ActivityStartEventHandler, ActivityEndEventHandler {
 
 	private TreeMap<Id, FacilityPenalty> facilityPenalties;
 	private final static Logger log = Logger.getLogger(EventsToFacilityLoad.class);

@@ -35,7 +35,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.Collection;
 
-public class RunLocationChoiceFrozenEpsilons {
+class RunLocationChoiceFrozenEpsilons {
 	private static final String MY_LOCATION_CHOICE = "MyLocationChoice";
 	
 	public static void main(String[] args) {
