@@ -46,10 +46,9 @@ public class RunDrtExampleIT {
 
 	@Test
 	public void testRunDrtExample() {
-		String configFile = "./src/main/resources/drt_example/drtconfig_door2door.xml";
-		Config config = ConfigUtils.loadConfig(configFile, new DrtConfigGroup(), new DvrpConfigGroup(),
+		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
+		Config config = ConfigUtils.loadConfig(configUrl, new DrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
-		config.plans().setInputFile("cb-drtplans_test.xml.gz");
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
@@ -58,10 +57,9 @@ public class RunDrtExampleIT {
 
 	@Test
 	public void testRunDrtStopbasedExample() {
-		String configFile = "./src/main/resources/drt_example/drtconfig_stopbased.xml";
-		Config config = ConfigUtils.loadConfig(configFile, new DrtConfigGroup(), new DvrpConfigGroup(),
+		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_stop_based_drt_config.xml");
+		Config config = ConfigUtils.loadConfig(configUrl, new DrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
-		config.plans().setInputFile("cb-drtplans_test.xml.gz");
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
