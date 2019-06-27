@@ -26,7 +26,7 @@ class BicycleLinkSpeedCalculator implements LinkSpeedCalculator {
     public double getMaximumVelocity(QVehicle qVehicle, Link link, double time) {
 
         if (isBike(qVehicle))
-            return getMaximumVelocityForBike(qVehicle, link, time);
+			return getMaximumVelocityForLink(link);
         else
             return getDefaultMaximumVelocity(qVehicle, link, time);
     }
@@ -43,12 +43,9 @@ class BicycleLinkSpeedCalculator implements LinkSpeedCalculator {
 		double bicycleInfrastructureFactor = Double.parseDouble(link.getAttributes().getAttribute(BicycleUtils.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR).toString());
 		double surfaceFactor = computeSurfaceFactor(link);
 		double gradientFactor = computeGradientFactor(link);
-		return maxBicycleSpeed * bicycleInfrastructureFactor * surfaceFactor * gradientFactor;
+		double speed = maxBicycleSpeed * bicycleInfrastructureFactor * surfaceFactor * gradientFactor;
+		return Math.min(speed, link.getFreespeed());
 	}
-
-    private double getMaximumVelocityForBike(QVehicle qVehicle, Link link, double time) {
-		return Math.min(getMaximumVelocityForLink(link), link.getFreespeed(time));
-    }
 
     private double getDefaultMaximumVelocity(QVehicle qVehicle, Link link, double time) {
         return Math.min(qVehicle.getMaximumVelocity(), link.getFreespeed(time));

@@ -193,8 +193,8 @@ public class BicycleTest {
 		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
 		config.addModule(new BicycleConfigGroup());
 		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
-		
-		// Nodes 5-9 have a z-coordinate > 0, i.e. the links leading to those nodes have a slope
+
+		// Nodes 5-8 have a z-coordinate > 0, i.e. the links leading to those nodes have a slope
 		config.network().setInputFile("network_gradient.xml");
 		config.plans().setInputFile("population_1200.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
