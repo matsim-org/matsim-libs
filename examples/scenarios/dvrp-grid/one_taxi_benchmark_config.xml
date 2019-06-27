@@ -8,7 +8,7 @@
 		<param name="dropoffDuration" value="60"/>
 		<param name="onlineVehicleTracker" value="false"/>
 
-		<param name="taxisFile" value="../one_taxi/one_taxi_vehicles.xml"/>
+		<param name="taxisFile" value="one_taxi_vehicles.xml"/>
 
 		<param name="timeProfiles" value="false"/>
 		<param name="detailedStats" value="false"/>
@@ -17,13 +17,13 @@
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="../one_taxi/grid_network.xml"/>
+		<param name="inputNetworkFile" value="grid_network.xml"/>
 		<param name="timeVariantNetwork" value="true"/>
 		<param name="inputChangeEventsFile" value="one_taxi_benchmark_change_events.xml"/>
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="../one_taxi/one_taxi_population.xml"/>
+		<param name="inputPlansFile" value="one_taxi_population.xml"/>
 	</module>
 
 	<module name="qsim">

@@ -2,7 +2,7 @@
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
 	<module name="network">
-		<param name="inputNetworkFile" value="../grid_network.xml"/>
+		<param name="inputNetworkFile" value="grid_network.xml"/>
 	</module>
 
 	<module name="qsim">
@@ -19,8 +19,6 @@
 	<module name="otfvis">
 		<param name="coloringScheme" value="taxicab"/>
 		<param name="drawNonMovingItems" value="true"/>
-		<param name="agentSize" value="400"/>
-		<param name="linkWidth" value="10"/>
 	</module>
 
 	<module name="controler">

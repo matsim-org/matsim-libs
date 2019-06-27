@@ -9,7 +9,6 @@
 		<param name="onlineVehicleTracker" value="false"/>
 
 		<param name="taxisFile" value="one_taxi_vehicles.xml"/>
-		<param name="changeStartLinkToLastLinkInSchedule" value="true"/>
 
 		<param name="timeProfiles" value="true"/>
 		<param name="detailedStats" value="true"/>

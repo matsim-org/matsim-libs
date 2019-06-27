@@ -8,7 +8,7 @@
 		<param name="dropoffDuration" value="60"/>
 		<param name="onlineVehicleTracker" value="false"/>
 
-		<param name="taxisFile" value="../../contribs/dvrp/src/main/resources/one_taxi/one_taxi_vehicles.xml"/>
+		<param name="taxisFile" value="one_taxi_vehicles.xml"/>
 
 		<param name="timeProfiles" value="true"/>
 		<param name="detailedStats" value="true"/>
@@ -26,18 +26,16 @@
 		<param name="chargeTimeStep" value="5"/>
 		<param name="auxDischargeTimeStep" value="60"/>
 
-		<param name="chargersFile" value="src/main/resources/one_etaxi/one_etaxi_chargers.xml"/>
+		<param name="chargersFile" value="one_etaxi_chargers.xml"/>
 		<param name="timeProfiles" value="true"/>
 	</module>
 
 	<module name="network">
-		<param name="inputNetworkFile" value="../../contribs/dvrp/src/main/resources/grid_network.xml"/>
-		<!-- param name="timeVariantNetwork" value="false" / if timeVariantNetwork -->
-		<!-- param name="inputChangeEventsFile" value=""/ if timeVariantNetwork -->
+		<param name="inputNetworkFile" value="grid_network.xml"/>
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="../../contribs/dvrp/src/main/resources/one_taxi/one_taxi_population.xml"/>
+		<param name="inputPlansFile" value="one_taxi_population.xml"/>
 	</module>
 
 	<module name="qsim">
@@ -55,12 +53,13 @@
 		<param name="outputDirectory" value="test/output/one_etaxi"/>
 		<param name="overwriteFiles" value="deleteDirectoryIfExists"/>
 		<param name="firstIteration" value="0"/>
-		<param name="lastIteration" value="2"/>
+		<param name="lastIteration" value="0"/>
 	</module>
 
 	<module name="planCalcScore">
 		<param name="activityType_0" value="dummy"/>
 		<param name="activityTypicalDuration_0" value="24:00:00"/>
+		<param name="traveling_taxi" value="-6"/>
 	</module>
 
 	<module name="strategy">
