@@ -34,7 +34,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 @Deprecated // (I think)
 class DistanceStats implements IterationEndsListener {
 
-	private DestinationChoiceConfigGroup dccg;
+	private FrozenTastesConfigGroup dccg;
 	private double analysisBoundary;
 	private Bins bins;
 	private String bestOrSelected = "selected";
@@ -44,7 +44,7 @@ class DistanceStats implements IterationEndsListener {
 	
 	public DistanceStats(Config config, String bestOrSelected, String type, ActTypeConverter actTypeConverter, String mode) {
 		
-		this.dccg = (DestinationChoiceConfigGroup) config.getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+		this.dccg = (FrozenTastesConfigGroup) config.getModule( FrozenTastesConfigGroup.GROUP_NAME );
 		this.analysisBoundary = this.dccg.getAnalysisBoundary(); 
 		this.bestOrSelected = bestOrSelected;
 		this.type = type;

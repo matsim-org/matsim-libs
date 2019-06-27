@@ -48,7 +48,7 @@ class DCActivityScoringFunction extends org.matsim.deprecated.scoring.functions.
 	private ActTypeConverter converter;
 	private ObjectAttributes prefs;
 	private DestinationChoiceContext dcContext;
-	private DestinationChoiceConfigGroup dccg;
+	private FrozenTastesConfigGroup dccg;
 	private List<ScoringPenalty> penalty = null;
 
 	// needs to be re-designed with delegation instead of inheritance. kai, oct'14
@@ -61,7 +61,7 @@ class DCActivityScoringFunction extends org.matsim.deprecated.scoring.functions.
 		this.converter = dcContext.getConverter();
 		this.prefs = dcContext.getPrefsAttributes();
 		this.dcContext = dcContext;
-		this.dccg = (DestinationChoiceConfigGroup) this.dcContext.getScenario().getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+		this.dccg = (FrozenTastesConfigGroup) this.dcContext.getScenario().getConfig().getModule( FrozenTastesConfigGroup.GROUP_NAME );
 		this.penalty = new Vector<ScoringPenalty>();
 	}
 	

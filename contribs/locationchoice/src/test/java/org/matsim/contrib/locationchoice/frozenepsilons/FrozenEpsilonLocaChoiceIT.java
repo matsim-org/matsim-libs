@@ -50,9 +50,9 @@ import java.util.Random;
 import java.util.Set;
 
 import static org.junit.Assert.*;
-import static org.matsim.contrib.locationchoice.frozenepsilons.DestinationChoiceConfigGroup.Algotype.bestResponse;
+import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.Algotype.bestResponse;
 import static org.matsim.contrib.locationchoice.LocationChoiceIT.localCreatePopWOnePerson;
-import static org.matsim.contrib.locationchoice.frozenepsilons.DestinationChoiceConfigGroup.*;
+import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.*;
 
 public class FrozenEpsilonLocaChoiceIT{
 	private static final Logger log = Logger.getLogger( FrozenEpsilonLocaChoiceIT.class ) ;
@@ -70,7 +70,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 
-		DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule( config, DestinationChoiceConfigGroup.class );;
+		FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule( config, FrozenTastesConfigGroup.class );;
 
 		dccg.setAlgorithm( bestResponse );
 		// yy I don't think that this is honoured anywhere in the way this is plugged together here.  kai, mar'19
@@ -146,7 +146,7 @@ public class FrozenEpsilonLocaChoiceIT{
 
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 
-		final DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule(config, DestinationChoiceConfigGroup.class ) ;
+		final FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule(config, FrozenTastesConfigGroup.class ) ;
 
 		dccg.setAlgorithm( bestResponse );
 		// yy Don't think has an influence with setup here. kai, mar'19
@@ -259,7 +259,7 @@ public class FrozenEpsilonLocaChoiceIT{
 				throw new RuntimeException( Gbl.NOT_IMPLEMENTED ) ;
 		}
 
-		final DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule(config, DestinationChoiceConfigGroup.class ) ;
+		final FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule(config, FrozenTastesConfigGroup.class ) ;
 		switch( runType ) {
 			case shortRun:
 				dccg.setEpsilonScaleFactors("10.0" );
@@ -516,7 +516,7 @@ public class FrozenEpsilonLocaChoiceIT{
 
 	static Config localCreateConfig( String configFileName ) {
 		// setup config
-		Config config = ConfigUtils.loadConfig(configFileName, new DestinationChoiceConfigGroup() ) ;
+		Config config = ConfigUtils.loadConfig(configFileName, new FrozenTastesConfigGroup() ) ;
 
 		config.global().setNumberOfThreads(0);
 		config.controler().setFirstIteration(0);
@@ -524,7 +524,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		config.controler().setMobsim("qsim");
 		config.qsim().setSnapshotStyle( QSimConfigGroup.SnapshotStyle.queue ) ;
 
-		final DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule(config, DestinationChoiceConfigGroup.class ) ;
+		final FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule(config, FrozenTastesConfigGroup.class ) ;
 		dccg.setAlgorithm( Algotype.random );
 		dccg.setFlexibleTypes("work" );
 

@@ -32,7 +32,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 class RunLocationChoiceBestResponse {
 
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig(args[0], new DestinationChoiceConfigGroup() );
+		Config config = ConfigUtils.loadConfig(args[0], new FrozenTastesConfigGroup() );
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		run(scenario);
 	}
@@ -44,7 +44,7 @@ class RunLocationChoiceBestResponse {
 		scenario.addScenarioElement(DestinationChoiceContext.ELEMENT_NAME , dcContext);
 
 		DCScoringFunctionFactory dcScoringFunctionFactory = new DCScoringFunctionFactory(scenario, dcContext);
-		DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule( dcContext.getScenario().getConfig(), DestinationChoiceConfigGroup.class);
+		FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule( dcContext.getScenario().getConfig(), FrozenTastesConfigGroup.class );
 		if (dccg.getPrefsFile() == null && !scenario.getConfig().facilities().getInputFile().equals("null")) {
 			dcScoringFunctionFactory.setUsingConfigParamsForScoring(false);
 		} else {

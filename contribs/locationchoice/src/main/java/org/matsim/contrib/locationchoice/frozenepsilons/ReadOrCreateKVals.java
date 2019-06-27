@@ -55,7 +55,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 	 * This is important to know for reading (case 0) or computation of maxDCScore (case 1)
 	 */
 	public int run() {
-		DestinationChoiceConfigGroup dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+		FrozenTastesConfigGroup dccg = (FrozenTastesConfigGroup) scenario.getConfig().getModule( FrozenTastesConfigGroup.GROUP_NAME );
 		String pkValuesFileName = dccg.getpkValuesFile();
 		String fkValuesFileName = dccg.getfkValuesFile();
 		String maxEpsValuesFileName = dccg.getMaxEpsFile();

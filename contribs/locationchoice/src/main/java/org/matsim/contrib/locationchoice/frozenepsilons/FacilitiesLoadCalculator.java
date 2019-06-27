@@ -62,13 +62,13 @@ class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimListener,
 		 * Scales the load of the facilities (for e.g. 10 % runs), assuming that only integers
 		 * can be used to scale a  x% scenario ((100 MOD x == 0) runs e.g. x=10%)
 		 */
-		DestinationChoiceConfigGroup dccg = (DestinationChoiceConfigGroup) controler.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+		FrozenTastesConfigGroup dccg = (FrozenTastesConfigGroup) controler.getConfig().getModule( FrozenTastesConfigGroup.GROUP_NAME );
 		double scaleNumberOfPersons = dccg.getScaleFactor();
         this.eventsToFacilityLoad = new EventsToFacilityLoad(
         		controler.getScenario().getActivityFacilities(), 
         		scaleNumberOfPersons,
 				this.facilityPenalties, 
-				((DestinationChoiceConfigGroup)controler.getConfig().getModule("locationchoice"))
+				((FrozenTastesConfigGroup)controler.getConfig().getModule("locationchoice" ))
 				);
 		event.getServices().getEvents().addHandler(this.eventsToFacilityLoad);
 	}

@@ -64,13 +64,13 @@ class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 		 * Somehow this is ugly. Should be initialized in the constructor. But I do not know, how to initialize the lc scenario elements
 		 * such that they are already available at the time of constructing this object. ah feb'13
 		 */
-		DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule( config, DestinationChoiceConfigGroup.class ) ;
+		FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule( config, FrozenTastesConfigGroup.class ) ;
 
 		DestinationChoiceContext lcContext = (DestinationChoiceContext) scenario.getScenarioElement(DestinationChoiceContext.ELEMENT_NAME);
 
 		MaxDCScoreWrapper maxDcScoreWrapper = (MaxDCScoreWrapper)scenario.getScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME);
 
-		if ( !DestinationChoiceConfigGroup.Algotype.bestResponse.equals(dccg.getAlgorithm())) {
+		if ( !FrozenTastesConfigGroup.Algotype.bestResponse.equals(dccg.getAlgorithm() )) {
 			throw new RuntimeException("wrong class for selected location choice algorithm type; aborting ...") ;
 		}
 

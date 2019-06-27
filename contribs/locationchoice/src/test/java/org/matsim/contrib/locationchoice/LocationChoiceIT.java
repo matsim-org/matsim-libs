@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype;
+import org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup;
 import org.matsim.contrib.locationchoice.timegeography.LocationChoicePlanStrategy;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -172,7 +173,7 @@ public class LocationChoiceIT extends MatsimTestCase {
 
 	static Config localCreateConfig( String configFileName ) {
 		// setup config
-		Config config = ConfigUtils.loadConfig(configFileName, new DestinationChoiceConfigGroup() ) ;
+		Config config = ConfigUtils.loadConfig(configFileName, new DestinationChoiceConfigGroup() , new FrozenTastesConfigGroup() ) ;
 
 		config.global().setNumberOfThreads(0);
 		config.controler().setFirstIteration(0);

@@ -69,7 +69,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 	private ActTypeConverter actTypeConverter;
 	private HashSet<String> flexibleTypes;
 	private ScoringParameters params;
-	private DestinationChoiceConfigGroup dccg;
+	private FrozenTastesConfigGroup dccg;
 	private int arekValsRead = 1;
 	private ObjectAttributes personsBetas = new ObjectAttributes();
 	private ObjectAttributes facilitiesAttributes = new ObjectAttributes();
@@ -120,7 +120,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 		if ( params==null ){
 			this.params = new ScoringParameters.Builder( scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters( null ),
 				  scenario.getConfig().scenario() ).build();
-			this.dccg = ConfigUtils.addOrGetModule( this.scenario.getConfig(), DestinationChoiceConfigGroup.class );
+			this.dccg = ConfigUtils.addOrGetModule( this.scenario.getConfig(), FrozenTastesConfigGroup.class );
 			ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler( this.dccg );
 			this.scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
 			this.actTypeConverter = defineFlexibleActivities.getConverter();

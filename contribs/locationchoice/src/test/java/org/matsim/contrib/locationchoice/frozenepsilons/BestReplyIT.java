@@ -22,7 +22,7 @@ public class BestReplyIT {
 		// load chessboard scenario config:
         Config config = utils.loadConfig(
         		IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "config.xml"),
-				new DestinationChoiceConfigGroup()
+				new FrozenTastesConfigGroup()
 		);
   
         // override or add some material:

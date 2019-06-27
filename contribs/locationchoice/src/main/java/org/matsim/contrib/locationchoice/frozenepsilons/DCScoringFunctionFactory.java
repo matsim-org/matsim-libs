@@ -48,7 +48,7 @@ class DCScoringFunctionFactory implements ScoringFunctionFactory {
 		log.info("creating DCScoringFunctionFactory");
 		
 		// configure ScoringFunction according to config
-		DestinationChoiceConfigGroup dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+		FrozenTastesConfigGroup dccg = (FrozenTastesConfigGroup) scenario.getConfig().getModule( FrozenTastesConfigGroup.GROUP_NAME );
 		if (dccg != null) {
 			this.setUsingConfigParamsForScoring(dccg.getUseConfigParamsForScoring());
 			this.setUsingIndividualScoringParameters(dccg.getUseIndividualScoringParameters());

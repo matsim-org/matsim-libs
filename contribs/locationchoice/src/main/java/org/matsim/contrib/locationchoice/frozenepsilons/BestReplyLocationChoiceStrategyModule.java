@@ -83,8 +83,8 @@ final class BestReplyLocationChoiceStrategyModule extends AbstractMultithreadedM
 		this.travelTimes = travelTimes;
 		this.travelDisutilities = travelDisutilities;
 
-		DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule( lcContext.getScenario().getConfig(), DestinationChoiceConfigGroup.class );
-		if (!DestinationChoiceConfigGroup.Algotype.bestResponse.equals( dccg.getAlgorithm() )) {
+		FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule( lcContext.getScenario().getConfig(), FrozenTastesConfigGroup.class );
+		if (!FrozenTastesConfigGroup.Algotype.bestResponse.equals( dccg.getAlgorithm() )) {
 			throw new RuntimeException("wrong class for selected location choice algorithm type; aborting ...") ;
 		}
 		this.lcContext = lcContext;

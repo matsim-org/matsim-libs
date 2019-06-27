@@ -22,7 +22,7 @@
 	
 	<!-- ====================================================================== -->
 	
-	<module name="locationchoice">
+	<module name="frozenTastes">
 		<param name="flexible_types" value="shop,leisure"/>
 		<param name="algorithm" value="bestResponse" />	
 		<param name="destinationSamplePercent" value="50"/>
@@ -31,7 +31,7 @@
 		<param name="fkValuesFile" value="test/input/org/matsim/contrib/locationchoice/bestresponse/facilitiesKValues.xml"/>
 		<param name="maxDCScoreFile" value="test/input/org/matsim/contrib/locationchoice/bestresponse/personsMaxEpsUnscaled.xml"/>
 		
-		<param name="tt_approximationLevel" value="1" />
+<!--		<param name="tt_approximationLevel" value="1" />-->
 	</module>
 	 
   <!-- ====================================================================== -->

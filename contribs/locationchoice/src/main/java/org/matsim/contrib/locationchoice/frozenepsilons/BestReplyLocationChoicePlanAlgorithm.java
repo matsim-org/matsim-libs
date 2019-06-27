@@ -65,7 +65,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	private final Map<String, Double> beelineDistanceFactors;
 	private TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType;
 	private final TripRouter tripRouter;
-	private final DestinationChoiceConfigGroup dccg;
+	private final FrozenTastesConfigGroup dccg;
 	private final Scenario scenario;
 
 	public BestReplyLocationChoicePlanAlgorithm(
@@ -94,7 +94,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		this.tripRouter = tripRouter;
 
 		scenario = this.lcContext.getScenario();
-		this.dccg = ConfigUtils.addOrGetModule( scenario.getConfig(), DestinationChoiceConfigGroup.class ) ;
+		this.dccg = ConfigUtils.addOrGetModule( scenario.getConfig(), FrozenTastesConfigGroup.class ) ;
 	}
 
 	@Override
@@ -156,7 +156,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	}
 
 	private ChoiceSet createChoiceSetFromCircle(Plan plan, int personIndex,
-			final DestinationChoiceConfigGroup.ApproximationLevel travelTimeApproximationLevel,
+			final FrozenTastesConfigGroup.ApproximationLevel travelTimeApproximationLevel,
 			final Activity actToMove, double maxRadius, Coord center) {
 
 		ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, scenario );

@@ -43,7 +43,7 @@ class EventsToFacilityLoad implements ActivityStartEventHandler, ActivityEndEven
 	private final static Logger log = Logger.getLogger(EventsToFacilityLoad.class);
 
 	public EventsToFacilityLoad(final ActivityFacilities facilities, double scaleNumberOfPersons,
-			TreeMap<Id, FacilityPenalty> facilityPenalties, DestinationChoiceConfigGroup config) {
+			TreeMap<Id, FacilityPenalty> facilityPenalties, FrozenTastesConfigGroup config ) {
 		super();
 
 		this.facilityPenalties = facilityPenalties;
