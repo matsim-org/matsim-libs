@@ -30,8 +30,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
@@ -47,7 +45,7 @@ class ChoiceSet {
 
 	private final Network network;
 	private final DestinationChoiceConfigGroup dccg;
-	private ApproximationLevel approximationLevel;
+	private DestinationChoiceConfigGroup.ApproximationLevel approximationLevel;
 	private List<Id<ActivityFacility>> destinations = new LinkedList<>();
 	private List<Id<ActivityFacility>> notYetVisited = new LinkedList<>();
 	private final ActivityFacilities facilities;
@@ -71,7 +69,7 @@ class ChoiceSet {
 		return stb.toString() ;
 	}
 
-	ChoiceSet( ApproximationLevel approximationLevel, Scenario scenario ) {
+	ChoiceSet( DestinationChoiceConfigGroup.ApproximationLevel approximationLevel, Scenario scenario ) {
 		this.approximationLevel = approximationLevel;
 		this.facilities = scenario.getActivityFacilities();
 		this.scenario = scenario;

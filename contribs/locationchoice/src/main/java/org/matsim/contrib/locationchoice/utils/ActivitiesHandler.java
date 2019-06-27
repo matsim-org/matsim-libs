@@ -26,14 +26,14 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroupI;
 
 public class ActivitiesHandler {
 	private HashSet<String> flexibleTypes = new HashSet<String>();
-	private DestinationChoiceConfigGroup dcconfig;
+	private DestinationChoiceConfigGroupI dcconfig;
 	private ActTypeConverter converter = null;
 
-	public ActivitiesHandler(final DestinationChoiceConfigGroup dcconfig) {
+	public ActivitiesHandler(final DestinationChoiceConfigGroupI dcconfig ) {
 		this.dcconfig = dcconfig;
 		this.createActivityTypeConverter();
 		this.initFlexibleTypes(dcconfig);
@@ -104,7 +104,7 @@ public class ActivitiesHandler {
 		}
 	}
 
-	private void initFlexibleTypes(DestinationChoiceConfigGroup config) {
+	private void initFlexibleTypes(DestinationChoiceConfigGroupI config) {
 		String types = config.getFlexibleTypes();
 		if (!types.equals("null")) {
 			String[] entries = types.split(",", -1);

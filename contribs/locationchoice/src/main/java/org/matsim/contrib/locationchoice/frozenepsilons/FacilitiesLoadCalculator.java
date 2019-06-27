@@ -21,7 +21,6 @@
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;

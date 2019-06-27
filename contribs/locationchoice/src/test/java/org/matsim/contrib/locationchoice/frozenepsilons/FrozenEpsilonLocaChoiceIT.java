@@ -15,11 +15,10 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -43,6 +42,7 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.*;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import java.util.HashSet;
 import java.util.List;
@@ -50,9 +50,9 @@ import java.util.Random;
 import java.util.Set;
 
 import static org.junit.Assert.*;
-import static org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype.bestResponse;
-import static org.matsim.contrib.locationchoice.LocationChoiceIT.localCreateConfig;
+import static org.matsim.contrib.locationchoice.frozenepsilons.DestinationChoiceConfigGroup.Algotype.bestResponse;
 import static org.matsim.contrib.locationchoice.LocationChoiceIT.localCreatePopWOnePerson;
+import static org.matsim.contrib.locationchoice.frozenepsilons.DestinationChoiceConfigGroup.*;
 
 public class FrozenEpsilonLocaChoiceIT{
 	private static final Logger log = Logger.getLogger( FrozenEpsilonLocaChoiceIT.class ) ;
@@ -512,6 +512,43 @@ public class FrozenEpsilonLocaChoiceIT{
 		facility1.addActivityOption(new ActivityOptionImpl("work"));
 		// (as soon as you set a scoring function that looks if activity types match opportunities at facilities, you can only use
 		// an activity type that indeed is at the facility)
+	}
+
+	static Config localCreateConfig( String configFileName ) {
+		// setup config
+		Config config = ConfigUtils.loadConfig(configFileName, new DestinationChoiceConfigGroup() ) ;
+
+		config.global().setNumberOfThreads(0);
+		config.controler().setFirstIteration(0);
+		config.controler().setLastIteration(1);
+		config.controler().setMobsim("qsim");
+		config.qsim().setSnapshotStyle( QSimConfigGroup.SnapshotStyle.queue ) ;
+
+		final DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule(config, DestinationChoiceConfigGroup.class ) ;
+		dccg.setAlgorithm( Algotype.random );
+		dccg.setFlexibleTypes("work" );
+
+		PlanCalcScoreConfigGroup.ActivityParams home = new PlanCalcScoreConfigGroup.ActivityParams("home");
+		home.setTypicalDuration(12*60*60);
+		config.planCalcScore().addActivityParams(home);
+		PlanCalcScoreConfigGroup.ActivityParams work = new PlanCalcScoreConfigGroup.ActivityParams("work");
+		work.setTypicalDuration(12*60*60);
+		config.planCalcScore().addActivityParams(work);
+		PlanCalcScoreConfigGroup.ActivityParams shop = new PlanCalcScoreConfigGroup.ActivityParams("shop");
+		shop.setTypicalDuration(1.*60*60);
+		config.planCalcScore().addActivityParams(shop);
+
+		final StrategyConfigGroup.StrategySettings strategySettings = new StrategyConfigGroup.StrategySettings(Id.create("1", StrategyConfigGroup.StrategySettings.class ));
+		strategySettings.setStrategyName("MyLocationChoice");
+		strategySettings.setWeight(1.0);
+		config.strategy().addStrategySettings(strategySettings);
+
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class ).setEffectiveLaneWidth(1. ) ;
+		config.qsim().setLinkWidthForVis((float)1.) ;
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setShowTeleportedAgents(true) ;
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setDrawNonMovingItems(true) ;
+
+		return config;
 	}
 
 

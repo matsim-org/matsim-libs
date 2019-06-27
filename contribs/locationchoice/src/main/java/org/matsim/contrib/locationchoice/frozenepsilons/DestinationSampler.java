@@ -19,7 +19,6 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 
 /**
  * Chooses a stable sample of facilities for every person 

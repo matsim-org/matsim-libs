@@ -20,7 +20,6 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 
 /*
  * TODO: (discussion)
@@ -38,6 +37,8 @@ import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
  *		Facility load has to be handled for hour 0..24 only (according to M.B.)
  */
 
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroupI;
+
 class FacilityPenalty {
 
 	private FacilityLoad facilityLoad;
@@ -48,7 +49,7 @@ class FacilityPenalty {
 	private double restraintFcnFactor = 0.0;
 	private double restraintFcnExp = 0.0;
 
-	public FacilityPenalty( double minCapacity, double scaleNumberOfPersons, DestinationChoiceConfigGroup config ) {
+	public FacilityPenalty( double minCapacity, double scaleNumberOfPersons, DestinationChoiceConfigGroupI config ) {
 		this.capacity = minCapacity;
 		this.facilityLoad = new FacilityLoad(FacilityPenalty.numberOfTimeBins, scaleNumberOfPersons);
 		this.scaleNumberOfPersons = scaleNumberOfPersons;

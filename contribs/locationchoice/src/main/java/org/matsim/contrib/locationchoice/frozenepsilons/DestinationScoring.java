@@ -27,8 +27,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.EpsilonDistributionTypes;
 import org.matsim.contrib.locationchoice.utils.ScaleEpsilon;
 import org.matsim.core.config.Config;
 import org.matsim.facilities.ActivityFacility;
@@ -122,7 +120,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 		/*
 		 * generate the epsilons according to standard Gumbel or standard Gaussian distribution
 		 */
-		if (this.dccg.getEpsilonDistribution() == EpsilonDistributionTypes.gumbel) {
+		if (this.dccg.getEpsilonDistribution() == DestinationChoiceConfigGroup.EpsilonDistributionTypes.gumbel) {
 			// take a few draws to come to the "chaotic region"
 			for (int i = 0; i < 5; i++) {
 				rnd.nextDouble();

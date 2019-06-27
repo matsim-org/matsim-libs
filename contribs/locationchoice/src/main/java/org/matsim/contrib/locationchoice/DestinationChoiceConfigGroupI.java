@@ -6,4 +6,10 @@ public interface DestinationChoiceConfigGroupI{
 	String getCenterNode();
 
 	Double getRadius();
+
+	String getEpsilonScaleFactors();
+
+	double getRestraintFcnFactor();
+
+	double getRestraintFcnExp();
 }

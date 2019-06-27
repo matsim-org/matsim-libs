@@ -170,7 +170,7 @@ public class LocationChoiceIT extends MatsimTestCase {
 		return person;
 	}
 
-	public static Config localCreateConfig( String configFileName ) {
+	static Config localCreateConfig( String configFileName ) {
 		// setup config
 		Config config = ConfigUtils.loadConfig(configFileName, new DestinationChoiceConfigGroup() ) ;
 

@@ -24,8 +24,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.IterationEndsEvent;

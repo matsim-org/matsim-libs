@@ -28,7 +28,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -57,8 +56,7 @@ public class SamplerTest {
     @Test
     public void testSampler() {
         DestinationSampler sampler = new DestinationSampler(
-                context.getPersonsKValuesArray(), context.getFacilitiesKValuesArray(),
-                (DestinationChoiceConfigGroup) scenario.getConfig().getModule("locationchoice"));
+                context.getPersonsKValuesArray(), context.getFacilitiesKValuesArray(), ConfigUtils.addOrGetModule( scenario.getConfig(), DestinationChoiceConfigGroup.class  ) ) ;
         assertTrue(sampler.sample(context.getFacilityIndex(Id.create(1, ActivityFacility.class)), context.getPersonIndex(Id.create(1, Person.class))));
         assertTrue(!sampler.sample(context.getFacilityIndex(Id.create(1, ActivityFacility.class)), context.getPersonIndex(Id.create(2, Person.class))));
     }
