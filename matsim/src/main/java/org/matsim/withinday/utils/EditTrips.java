@@ -66,7 +66,6 @@ public final class EditTrips {
 	private EventsManager eventsManager;
 
 	public EditTrips( QSim qsim, TripRouter tripRouter, Scenario scenario ) {
-		log.setLevel( Level.DEBUG);
 		this.tripRouter = tripRouter;
 		this.scenario = scenario;
 		this.pf = scenario.getPopulation().getFactory() ;
