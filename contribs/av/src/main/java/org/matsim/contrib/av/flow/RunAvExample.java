@@ -18,13 +18,17 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.av.flow;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -35,84 +39,80 @@ import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
- * @author  jbischoff
+ * @author jbischoff
  * This is an example how to set different flow capacity consumptions for different vehicles. 
  * Two groups of agents, one equipped with AVs (having an improved flow of factor 2), the other one using ordinary cars are traveling on two different routes in a grid network
  * , highlighting the difference between vehicles.
  * Network flow capacities are the same on all links.
  * All agents try to depart at the same time. The queue is emptied twice as fast for the agents using an AV.
- *  
- */
-/**
  *
  */
-public class RunAVExample {
+public class RunAvExample {
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		
-		new RunAVExample().run(true);
-		
+
+		new RunAvExample().run(true);
+
 	}
-	
-	
-	public void run (boolean otfvis){
-		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig("flow/config.xml", new OTFVisConfigGroup()));
+
+	public void run(boolean otfvis) {
+		Scenario scenario = ScenarioUtils.loadScenario(
+				ConfigUtils.loadConfig("flow/config.xml", new OTFVisConfigGroup()));
 		addPopulation(scenario);
-		
+
 		VehicleType avType = new VehicleTypeImpl(Id.create("autonomousVehicleType", VehicleType.class));
 		avType.setFlowEfficiencyFactor(2.0);
 		scenario.getVehicles().addVehicleType(avType);
-		
-		for (int i = 0; i<192; i++){
+
+		for (int i = 0; i < 192; i++) {
 			//agents on lower route get AVs as vehicles, agents on upper route keep a standard vehicle (= default, if nothing is set)
-			Id<Vehicle> vid = Id.createVehicleId("lower_"+i);
+			Id<Vehicle> vid = Id.createVehicleId("lower_" + i);
 			Vehicle v = scenario.getVehicles().getFactory().createVehicle(vid, avType);
 			scenario.getVehicles().addVehicle(v);
 		}
-		
+
 		Controler controler = new Controler(scenario);
-		if (otfvis){
-		controler.addOverridingModule(new OTFVisLiveModule());
+		if (otfvis) {
+			controler.addOverridingModule(new OTFVisLiveModule());
 		}
 		controler.run();
 	}
 
-
 	static void addPopulation(Scenario scenario) {
-		
+
 		Population pop = scenario.getPopulation();
 		//192 agents on upper route and lower route
 		PopulationFactory f = pop.getFactory();
-		for (int i = 0; i<192; i++){
-			Person p = f.createPerson(Id.createPersonId("lower_"+i));
+		for (int i = 0; i < 192; i++) {
+			Person p = f.createPerson(Id.createPersonId("lower_" + i));
 			Plan plan = f.createPlan();
 			Activity act0 = f.createActivityFromLinkId("dummy", Id.createLinkId(122));
-			act0.setEndTime(8*3600);
+			act0.setEndTime(8 * 3600);
 			plan.addActivity(act0);
 			plan.addLeg(f.createLeg("car"));
 			Activity act1 = f.createActivityFromLinkId("dummy", Id.createLinkId(131));
 			plan.addActivity(act1);
 			p.addPlan(plan);
 			pop.addPerson(p);
-			
+
 		}
-		
-		for (int i = 0; i<192; i++){
-			Person p = f.createPerson(Id.createPersonId("upper_"+i));
+
+		for (int i = 0; i < 192; i++) {
+			Person p = f.createPerson(Id.createPersonId("upper_" + i));
 			Plan plan = f.createPlan();
 			Activity act0 = f.createActivityFromLinkId("dummy", Id.createLinkId(143));
-			act0.setEndTime(8*3600);
+			act0.setEndTime(8 * 3600);
 			plan.addActivity(act0);
 			plan.addLeg(f.createLeg("car"));
 			Activity act1 = f.createActivityFromLinkId("dummy", Id.createLinkId(152));
 			plan.addActivity(act1);
 			p.addPlan(plan);
 			pop.addPerson(p);
-			
+
 		}
-		
+
 	}
 }

@@ -33,7 +33,7 @@ import org.matsim.testcases.MatsimTestUtils;
 /**
  *
  */
-public class RunAVExampleIT {
+public class RunAvExampleIT {
 
     @Rule
     public MatsimTestUtils utils = new MatsimTestUtils();
@@ -41,7 +41,7 @@ public class RunAVExampleIT {
     @Test
     public void testAVFlowExample() {
 
-        new RunAVExample().run(false);
+		new RunAvExample().run(false);
     }
 
 }

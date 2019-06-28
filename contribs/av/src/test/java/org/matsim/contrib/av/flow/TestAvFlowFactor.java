@@ -35,14 +35,14 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-public class TestAVFlowFactor {
+public class TestAvFlowFactor {
 
 
     @Test
     public void testAVFlowFactor() {
 
         Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig("flow/config.xml", new OTFVisConfigGroup()));
-        RunAVExample.addPopulation(scenario);
+		RunAvExample.addPopulation(scenario);
 
         VehicleType avType = new VehicleTypeImpl(Id.create("autonomousVehicleType", VehicleType.class));
         avType.setFlowEfficiencyFactor(2.0);
