@@ -17,67 +17,76 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.av.flow;/*
+package org.matsim.contrib.av.flow;
+/*
  * created by jbischoff, 18.03.2019
  */
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-public class TestAVFlowFactor {
+public class TestAvFlowFactor {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
+	@Test
+	public void testAvFlowFactor() throws MalformedURLException {
+		URL configUrl = new File(utils.getPackageInputDirectory() + "config.xml").toURI().toURL();
+		Config config = ConfigUtils.loadConfig(configUrl, new OTFVisConfigGroup());
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		RunAvExample.addPopulation(scenario);
 
-    @Test
-    public void testAVFlowFactor() {
+		VehicleType avType = new VehicleTypeImpl(Id.create("autonomousVehicleType", VehicleType.class));
+		avType.setFlowEfficiencyFactor(2.0);
+		scenario.getVehicles().addVehicleType(avType);
 
-        Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig("flow/config.xml", new OTFVisConfigGroup()));
-        RunAVExample.addPopulation(scenario);
+		for (int i = 0; i < 192; i++) {
+			//agents on lower route get AVs as vehicles, agents on upper route keep a standard vehicle (= default, if nothing is set)
+			Id<Vehicle> vid = Id.createVehicleId("lower_" + i);
+			Vehicle v = scenario.getVehicles().getFactory().createVehicle(vid, avType);
+			scenario.getVehicles().addVehicle(v);
+		}
 
-        VehicleType avType = new VehicleTypeImpl(Id.create("autonomousVehicleType", VehicleType.class));
-        avType.setFlowEfficiencyFactor(2.0);
-        scenario.getVehicles().addVehicleType(avType);
+		Controler controler = new Controler(scenario);
+		VehicleTimeCounter vehicleTimeCounter = new VehicleTimeCounter();
+		controler.getEvents().addHandler(vehicleTimeCounter);
+		controler.run();
 
-        for (int i = 0; i < 192; i++) {
-            //agents on lower route get AVs as vehicles, agents on upper route keep a standard vehicle (= default, if nothing is set)
-            Id<Vehicle> vid = Id.createVehicleId("lower_" + i);
-            Vehicle v = scenario.getVehicles().getFactory().createVehicle(vid, avType);
-            scenario.getVehicles().addVehicle(v);
-        }
+		Assert.assertEquals(vehicleTimeCounter.lastAVEnterTime, 32598, 0.1);
+		Assert.assertEquals(vehicleTimeCounter.lastNonAVEnterTime, 36179, 0.1);
 
-        Controler controler = new Controler(scenario);
-        VehicleTimeCounter vehicleTimeCounter = new VehicleTimeCounter();
-        controler.getEvents().addHandler(vehicleTimeCounter);
-        controler.run();
+	}
 
-        Assert.assertEquals(vehicleTimeCounter.lastAVEnterTime, 32598, 0.1);
-        Assert.assertEquals(vehicleTimeCounter.lastNonAVEnterTime, 36179, 0.1);
+	class VehicleTimeCounter implements LinkEnterEventHandler {
+		double lastNonAVEnterTime;
+		double lastAVEnterTime;
 
-    }
-
-    class VehicleTimeCounter implements LinkEnterEventHandler {
-        double lastNonAVEnterTime;
-        double lastAVEnterTime;
-
-
-        @Override
-        public void handleEvent(LinkEnterEvent event) {
-            if (event.getLinkId().equals(Id.createLinkId(152))) {
-                lastNonAVEnterTime = event.getTime();
-            }
-            if (event.getLinkId().equals(Id.createLinkId(131))) {
-                lastAVEnterTime = event.getTime();
-            }
-        }
-    }
+		@Override
+		public void handleEvent(LinkEnterEvent event) {
+			if (event.getLinkId().equals(Id.createLinkId(152))) {
+				lastNonAVEnterTime = event.getTime();
+			}
+			if (event.getLinkId().equals(Id.createLinkId(131))) {
+				lastAVEnterTime = event.getTime();
+			}
+		}
+	}
 }

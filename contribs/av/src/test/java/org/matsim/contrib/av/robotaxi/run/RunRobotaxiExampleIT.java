@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,33 +15,24 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
-
-/**
- *
+ * *********************************************************************** *
  */
-package org.matsim.contrib.av.flow;
 
-import org.junit.Rule;
+package org.matsim.contrib.av.robotaxi.run;
+
+import java.net.URL;
+
 import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 
 /**
- * @author jbischoff
+ * @author Michal Maciejewski (michalm)
  */
-
-/**
- *
- */
-public class RunAVExampleIT {
-
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
-
-    @Test
-    public void testAVFlowExample() {
-
-        new RunAVExample().run(false);
-    }
-
+public class RunRobotaxiExampleIT {
+	@Test
+	public void testRun() {
+		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_config.xml");
+		RunRobotaxiExample.run(configUrl, false);
+	}
 }
