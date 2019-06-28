@@ -154,7 +154,7 @@ public class VehicleUtils {
 	}
 
 	public static double getFreightCapacityUnits (VehicleType vehicleType) {
-		return (double) vehicleType.getAttributes().getAttribute(FREIGHT_CAPACITY_UNITS);
+		return (int) vehicleType.getAttributes().getAttribute(FREIGHT_CAPACITY_UNITS);
 	}
 
 	public static void setFreightCapacityUnits(VehicleType vehicleType, double units) {
