@@ -6,7 +6,9 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.xml.sax.Attributes;
 
+import java.util.Map;
 import java.util.Stack;
+import java.util.stream.Collectors;
 
 class VehicleReaderV2 extends MatsimXmlParser{
 	private static final Logger log = Logger.getLogger( VehicleReaderV2.class ) ;
@@ -18,15 +20,13 @@ class VehicleReaderV2 extends MatsimXmlParser{
 	private FreightCapacity currentFreightCapacity = null;
 	private EngineInformation currentEngineInformation = null;
 //	private EngineInformation.FuelType currentFuelType = null;
-	private double fixedCostsPerDay = Double.NaN;
-	private double costsPerMeter = Double.NaN;
-	private double costsPerSecond = Double.NaN;
+//	private double fixedCostsPerDay = Double.NaN;
+//	private double costsPerMeter = Double.NaN;
+//	private double costsPerSecond = Double.NaN;
 
 	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
 	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes =
 		  new org.matsim.utils.objectattributes.attributable.Attributes();
-	private org.matsim.utils.objectattributes.attributable.Attributes currEiAttributes =
-			new org.matsim.utils.objectattributes.attributable.Attributes();
 
 	public VehicleReaderV2( final Vehicles vehicles ){
 		log.info("Using " + this.getClass().getName());
@@ -39,17 +39,19 @@ class VehicleReaderV2 extends MatsimXmlParser{
 		if( VehicleSchemaV2Names.DESCRIPTION.equalsIgnoreCase( name ) && (content.trim().length() > 0) ){
 			this.currentVehType.setDescription( content.trim() );
 		} else if( VehicleSchemaV2Names.ENGINEINFORMATION.equalsIgnoreCase( name ) ){
-				VehicleUtils.setEngineInformation(this.currentVehType, this.currentEngineInformation.getAttributes());
-				this.currentEngineInformation = null;
+			this.currentVehType.setEngineInformation( this.currentEngineInformation );
+			this.currentEngineInformation = null ;
+//				VehicleUtils.setEngineInformation(this.currentVehType, this.currentEngineInformation.getAttributes());
+//				this.currentEngineInformation = null;
 				//TODO new settings from engineInformationAttributes
 			//VehicleUtils.setEngineInformation(this.currentVehType, this.currentFuelType, VehicleUtils.getFuelConsumption(this.currentVehType));
 			//this.currentFuelType = null;
-		} else if( VehicleSchemaV2Names.COSTSINFORMATION.equalsIgnoreCase( name ) ){
-			CostInformation currentCostInformation = this.builder.createCostInformation(this.fixedCostsPerDay, this.costsPerMeter, this.costsPerSecond);
-			this.currentVehType.setCostInformation(currentCostInformation);
-			this.fixedCostsPerDay = Double.NaN;
-			this.costsPerMeter = Double.NaN;
-			this.costsPerSecond = Double.NaN;
+//		} else if( VehicleSchemaV2Names.COSTSINFORMATION.equalsIgnoreCase( name ) ){
+//			CostInformation currentCostInformation = this.builder.createCostInformation(this.fixedCostsPerDay, this.costsPerMeter, this.costsPerSecond);
+//			this.currentVehType.setCostInformation(currentCostInformation);
+//			this.fixedCostsPerDay = Double.NaN;
+//			this.costsPerMeter = Double.NaN;
+//			this.costsPerSecond = Double.NaN;
 		} else if( VehicleSchemaV2Names.FREIGHTCAPACITY.equalsIgnoreCase( name ) ){
 			this.currentCapacity.setFreightCapacity( this.currentFreightCapacity);
 			this.currentFreightCapacity = null;
@@ -97,9 +99,11 @@ class VehicleReaderV2 extends MatsimXmlParser{
 		} else if( VehicleSchemaV2Names.WEIGHT.equalsIgnoreCase( name ) ){
 			this.currentFreightCapacity.setWeight( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.TONS) ) );
 		} else if( VehicleSchemaV2Names.COSTINFORMATION.equalsIgnoreCase( name ) ){
-			this.fixedCostsPerDay = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.FIXEDCOSTSPERDAY) );
-			this.costsPerMeter = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERMETER ) );
-			this.costsPerSecond = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERSECOND ) );
+			double fixedCostsPerDay = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.FIXEDCOSTSPERDAY ) );
+			double costsPerMeter = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERMETER ) );
+			double costsPerSecond = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERSECOND ) );
+			CostInformation currentCostInformation = this.builder.createCostInformation(fixedCostsPerDay, costsPerMeter, costsPerSecond);
+			this.currentVehType.setCostInformation(currentCostInformation);
 		} else if( VehicleSchemaV2Names.VEHICLE.equalsIgnoreCase( name ) ){
 			Id<VehicleType> typeId = Id.create( atts.getValue( VehicleSchemaV2Names.TYPE ), VehicleType.class );
 			VehicleType type = this.vehicles.getVehicleTypes().get( typeId );
@@ -115,26 +119,38 @@ class VehicleReaderV2 extends MatsimXmlParser{
 		} else if( VehicleSchemaV2Names.FLOWEFFICIENCYFACTOR.equalsIgnoreCase( name ) ){
 			this.currentVehType.setFlowEfficiencyFactor( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.FACTOR) ) );
 		} else if (name.equalsIgnoreCase(VehicleSchemaV2Names.ATTRIBUTES)) {
-			if (context.peek().equalsIgnoreCase(VehicleSchemaV2Names.VEHICLETYPE)) {
+			log.warn( "attributes encountered; context.peek()=" + context.peek() ) ;
+			if (context.peek().equalsIgnoreCase(VehicleSchemaV2Names.VEHICLETYPE)){
 				currAttributes = this.currentVehType.getAttributes();
+				attributesReader.startTag( name, atts, context, currAttributes );
+			} else if (context.peek().equalsIgnoreCase(VehicleSchemaV2Names.ENGINEINFORMATION)) {
+				currAttributes = this.currentEngineInformation.getAttributes();
 				attributesReader.startTag( name , atts , context, currAttributes );
+			} else {
+				throw new RuntimeException("encountered attributes for context in which they are not registered; context=" + context ) ;
 			}
-		}
-		else if (name.equalsIgnoreCase(VehicleSchemaV2Names.ATTRIBUTE)) {
+		} else if (name.equalsIgnoreCase(VehicleSchemaV2Names.ATTRIBUTE)) {
 			attributesReader.startTag( name , atts , context, currAttributes );
-		}
-		else if( VehicleSchemaV2Names.NETWORKMODE.equalsIgnoreCase( name ) ){
+			log.warn("---") ;
+			for( Map.Entry<String, Object> entry : currAttributes.getAsMap().entrySet() ){
+				log.warn( "key=" + entry.getKey() + "; value=" + entry.getValue()) ;
+			}
+			log.warn("---") ;
+		} else if( VehicleSchemaV2Names.NETWORKMODE.equalsIgnoreCase( name ) ){
 			this.currentVehType.setNetworkMode( atts.getValue( VehicleSchemaV2Names.NETWORKMODE ) );
-		}
-
-		else if (name.equalsIgnoreCase(VehicleSchemaV2Names.EIATTRIBUTES)) {
-//			if (context.peek().equalsIgnoreCase(VehicleSchemaV2Names.VEHICLETYPE)) {
-				currEiAttributes = this.currentEngineInformation.getAttributes();
-				attributesReader.startTag( name , atts , context, currEiAttributes );
-//			}
-		}
-		else if (name.equalsIgnoreCase(VehicleSchemaV2Names.EIATTRIBUTE)) {
-			attributesReader.startTag( name , atts , context, currEiAttributes );
+			//		}
+			//		else if (name.equalsIgnoreCase(VehicleSchemaV2Names.EIATTRIBUTES)) {
+			////			if (context.peek().equalsIgnoreCase(VehicleSchemaV2Names.VEHICLETYPE)) {
+			//				currEiAttributes = this.currentEngineInformation.getAttributes();
+			//				attributesReader.startTag( name , atts , context, currEiAttributes );
+			////			}
+			//		}
+			//		else if (name.equalsIgnoreCase(VehicleSchemaV2Names.EIATTRIBUTE)) {
+			//			attributesReader.startTag( name , atts , context, currEiAttributes );
+		} else if ( name.equalsIgnoreCase( VehicleSchemaV2Names.DESCRIPTION ) ) {
+			this.currentVehType.setDescription( atts.getValue( VehicleSchemaV2Names.DESCRIPTION ) );
+		} else {
+			throw new RuntimeException("encountered unknown tag=" + name + " in context=" + context  ) ;
 		}
 
 	}

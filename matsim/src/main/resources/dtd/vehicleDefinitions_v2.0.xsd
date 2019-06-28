@@ -46,8 +46,18 @@
             </xs:complexType>
           </xs:element>
           <xs:element name="engineInformation" type="engineInformationType" minOccurs="0" maxOccurs="1" />
-          <xs:element name="costsInformation" type="costInformationType" minOccurs="0" maxOccurs="1" />
-          <xs:element name="passengerCarEquivalents" minOccurs="0" maxOccurs="1">
+<!--          <xs:element name="costsInformation" type="costInformationType" minOccurs="0" maxOccurs="1" />-->
+		<xs:element name="costInformation" minOccurs="0" maxOccurs="1">
+			<xs:complexType>
+				<xs:attribute name="fixedCostsPerDay" type="xs:decimal">
+				</xs:attribute>
+				<xs:attribute name="costsPerMeter" type="xs:decimal">
+				</xs:attribute>
+				<xs:attribute name="costsPerSecond" type="xs:decimal">
+				</xs:attribute>
+			</xs:complexType>
+		</xs:element>
+		<xs:element name="passengerCarEquivalents" minOccurs="0" maxOccurs="1">
             <xs:complexType>
               <xs:attribute name="pce" type="xs:decimal" default="1.0"/>
             </xs:complexType>
@@ -100,30 +110,30 @@
 
   <xs:complexType name="engineInformationType">
     <xs:sequence>
-      <xs:element name="eiAttributes" minOccurs="0" maxOccurs="1">
+      <xs:element name="attributes" minOccurs="0" maxOccurs="1">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="eiAttribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"></xs:element>
+            <xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"></xs:element>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="costInformationType">
-    <xs:sequence>
-      <xs:element name="costInformation" minOccurs="1" maxOccurs="1">
-        <xs:complexType>
-          <xs:attribute name="fixedCostsPerDay" type="xs:decimal">
-          </xs:attribute>
-          <xs:attribute name="costsPerMeter" type="xs:decimal">
-          </xs:attribute>
-          <xs:attribute name="costsPerSecond" type="xs:decimal">
-          </xs:attribute>
-        </xs:complexType>
-      </xs:element>
-    </xs:sequence>
-  </xs:complexType>
+<!--  <xs:complexType name="costInformationType">-->
+<!--    <xs:sequence>-->
+<!--      <xs:element name="costInformation" minOccurs="1" maxOccurs="1">-->
+<!--        <xs:complexType>-->
+<!--          <xs:attribute name="fixedCostsPerDay" type="xs:decimal">-->
+<!--          </xs:attribute>-->
+<!--          <xs:attribute name="costsPerMeter" type="xs:decimal">-->
+<!--          </xs:attribute>-->
+<!--          <xs:attribute name="costsPerSecond" type="xs:decimal">-->
+<!--          </xs:attribute>-->
+<!--        </xs:complexType>-->
+<!--      </xs:element>-->
+<!--    </xs:sequence>-->
+<!--  </xs:complexType>-->
 
 
   <xs:complexType name="vehicleDefType">

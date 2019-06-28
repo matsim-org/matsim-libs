@@ -76,10 +76,11 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 		assertEquals(0.08, vehTypeNormalCar.getCostInformation().getCostsPerSecond(), EPSILON);
 		assertNotNull(vehTypeNormalCar.getEngineInformation());
 //		assertEquals(EngineInformation.FuelType.diesel, vehTypeNormalCar.getEngineInformation().getFuelType());
-		assertEquals("pass. car", VehicleUtils.getHbefaVehicleCategory(vehTypeNormalCar));
-		assertEquals("petrol", VehicleUtils.getHbefaTechnology(vehTypeNormalCar));
-		assertEquals("&lt; 1,4L", VehicleUtils.getHbefaSizeClass(vehTypeNormalCar));
-		assertEquals("EURO-5", VehicleUtils.getHbefaEmissionsConcept(vehTypeNormalCar));
+		EngineInformation engineInformation = vehTypeNormalCar.getEngineInformation();;
+		assertEquals("pass. car", VehicleUtils.getHbefaVehicleCategory(engineInformation));
+		assertEquals("petrol", VehicleUtils.getHbefaTechnology(engineInformation));
+		assertEquals("&lt; 1,4L", VehicleUtils.getHbefaSizeClass(engineInformation));
+		assertEquals("EURO-5", VehicleUtils.getHbefaEmissionsConcept(engineInformation));
 
 		assertEquals(0.23, VehicleUtils.getFuelConsumption(vehTypeNormalCar), EPSILON);
 		assertEquals(23.23, VehicleUtils.getAccessTime(vehTypeNormalCar), EPSILON);
