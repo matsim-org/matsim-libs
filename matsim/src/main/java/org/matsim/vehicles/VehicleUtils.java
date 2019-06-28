@@ -41,7 +41,7 @@ public class VehicleUtils {
 	private static final String FUELCONSUMPTION = "fuelConsumptionLitersPerMeter";
 	private static final String FREIGHT_CAPACITY_UNITS = "freightCapacityInUnits";
 	private static final String HBEFA_VEHICLE_CATEGORY_= "HbefaVehicleCategory";
-	private static final String HBEFA_TECHNOLOGY = "HBEFATechnology";
+	private static final String HBEFA_TECHNOLOGY = "HbefaTechnology";
 	private static final String HBEFA_SIZE_CLASS = "HbefaSizeClass";
 	private static final String HBEFA_EMISSIONS_CONCEPT = "EmissionsConcept";
 
