@@ -72,15 +72,15 @@
       <xs:element name="attributes" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"></xs:element>
+			  <xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
     </xs:sequence>
     <xs:attribute name="seats" type="xs:nonNegativeInteger"/>
     <xs:attribute name="standingRoomInPersons" type="xs:nonNegativeInteger"/>
-    <xs:attribute name="volumeInCubicMeters" type="xs:double"></xs:attribute>
-    <xs:attribute name="weightInTons" type="xs:double"></xs:attribute>
+	  <xs:attribute name="volumeInCubicMeters" type="xs:double"/>
+	  <xs:attribute name="weightInTons" type="xs:double"/>
   </xs:complexType>
 
 	<xs:complexType name="engineInformationType">
@@ -88,7 +88,7 @@
 			<xs:element name="attributes" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"></xs:element>
+						<xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -100,21 +100,21 @@
         <xs:element name="attributes" minOccurs="0">
           <xs:complexType>
             <xs:sequence>
-              <xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"></xs:element>
+				<xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
           </xs:complexType>
         </xs:element>
       </xs:sequence>
-      <xs:attribute name="fixedCostsPerDay" type="xs:decimal"></xs:attribute>
-      <xs:attribute name="costsPerMeter" type="xs:decimal"></xs:attribute>
-      <xs:attribute name="costsPerSecond" type="xs:decimal"></xs:attribute>
+		<xs:attribute name="fixedCostsPerDay" type="xs:decimal"/>
+		<xs:attribute name="costsPerMeter" type="xs:decimal"/>
+		<xs:attribute name="costsPerSecond" type="xs:decimal"/>
 	</xs:complexType>
 
 
 
 	<xs:complexType name="vehicleDefType">
 		<xs:annotation>
-			<xs:documentation></xs:documentation>
+			<xs:documentation/>
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="matsimObjectType">
