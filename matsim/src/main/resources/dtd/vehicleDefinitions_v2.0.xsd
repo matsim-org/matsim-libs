@@ -12,7 +12,7 @@
 	<xs:element name="vehicleDefinitions">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="vehicleType" type="vehicleTypeType" minOccurs="1" maxOccurs="unbounded" />
+				<xs:element name="vehicleType" type="vehicleTypeType" maxOccurs="unbounded"/>
 				<xs:element name="vehicle" type="vehicleDefType" minOccurs="0" maxOccurs="unbounded" />
 			</xs:sequence>
 		</xs:complexType>
@@ -21,43 +21,43 @@
 		<xs:complexContent>
 			<xs:extension base="matsimObjectType">
 				<xs:sequence>
-					<xs:element name="attributes" minOccurs="0" maxOccurs="1">
+					<xs:element name="attributes" minOccurs="0">
 						<xs:complexType>
 							<xs:sequence>
-								<xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"></xs:element>
+                                <xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"/>
 							</xs:sequence>
 						</xs:complexType>
 					</xs:element>
-					<xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="1" />
-					<xs:element name="capacity" type="capacityType" minOccurs="0" maxOccurs="1"/>
-					<xs:element name="length" minOccurs="0" maxOccurs="1">
+					<xs:element name="description" type="xs:string" minOccurs="0"/>
+					<xs:element name="capacity" type="capacityType" minOccurs="0"/>
+					<xs:element name="length" minOccurs="0">
 						<xs:complexType>
 							<xs:attribute name="meter" type="xs:decimal" default="7.5"/>
 						</xs:complexType>
 					</xs:element>
-					<xs:element name="width" minOccurs="0" maxOccurs="1">
+					<xs:element name="width" minOccurs="0">
 						<xs:complexType>
 							<xs:attribute name="meter" type="xs:decimal" default="1"/>
 						</xs:complexType>
 					</xs:element>
-					<xs:element name="maximumVelocity" minOccurs="0" maxOccurs="1">
+					<xs:element name="maximumVelocity" minOccurs="0">
 						<xs:complexType>
-							<xs:attribute name="meterPerSecond" type="xs:double" use="optional" default="INF"/>
+							<xs:attribute name="meterPerSecond" type="xs:double" default="INF"/>
 						</xs:complexType>
 					</xs:element>
-					<xs:element name="engineInformation" type="engineInformationType" minOccurs="0" maxOccurs="1" />
-					<xs:element name="costInformation" type="costInformationType" minOccurs="0" maxOccurs="1"/>
-					<xs:element name="passengerCarEquivalents" minOccurs="0" maxOccurs="1">
+					<xs:element name="engineInformation" type="engineInformationType" minOccurs="0"/>
+					<xs:element name="costInformation" type="costInformationType" minOccurs="0"/>
+					<xs:element name="passengerCarEquivalents" minOccurs="0">
 						<xs:complexType>
 							<xs:attribute name="pce" type="xs:decimal" default="1.0"/>
 						</xs:complexType>
 					</xs:element>
-					<xs:element name="networkMode" minOccurs="0" maxOccurs="1">
+					<xs:element name="networkMode" minOccurs="0">
 						<xs:complexType>
 							<xs:attribute name="networkMode" type="xs:string"/>
 						</xs:complexType>
 					</xs:element>
-					<xs:element name="flowEfficiencyFactor" minOccurs="0" maxOccurs="1">
+					<xs:element name="flowEfficiencyFactor" minOccurs="0">
 						<xs:complexType>
 							<xs:attribute name="factor" type="xs:decimal" default="1.0"/>
 						</xs:complexType>
@@ -69,7 +69,7 @@
 
   <xs:complexType name="capacityType">
     <xs:sequence>
-      <xs:element name="attributes" minOccurs="0" maxOccurs="1">
+      <xs:element name="attributes" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
             <xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"></xs:element>
@@ -85,7 +85,7 @@
 
 	<xs:complexType name="engineInformationType">
 		<xs:sequence>
-			<xs:element name="attributes" minOccurs="0" maxOccurs="1">
+			<xs:element name="attributes" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
 						<xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"></xs:element>
@@ -97,7 +97,7 @@
 
 	<xs:complexType name="costInformationType">
       <xs:sequence>
-        <xs:element name="attributes" minOccurs="0" maxOccurs="1">
+        <xs:element name="attributes" minOccurs="0">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"></xs:element>
