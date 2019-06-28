@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.taxi.optimizer;
 
+import java.net.URL;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
@@ -50,11 +52,12 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	private final TravelTime travelTime;
 	private final TravelDisutility travelDisutility;
 	private final TaxiScheduler scheduler;
+	private final URL context;
 
 	public DefaultTaxiOptimizerProvider(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
 			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, MobsimTimer timer,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, TravelDisutility travelDisutility,
-			TaxiScheduler scheduler) {
+			TaxiScheduler scheduler, URL context) {
 		this.eventsManager = eventsManager;
 		this.taxiCfg = taxiCfg;
 		this.fleet = fleet;
@@ -63,6 +66,7 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 		this.travelTime = travelTime;
 		this.travelDisutility = travelDisutility;
 		this.scheduler = scheduler;
+		this.context = context;
 	}
 
 	@Override
@@ -79,7 +83,7 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 						travelTime, travelDisutility);
 			case ZonalTaxiOptimizerParams.SET_NAME:
 				return ZonalTaxiOptimizer.create(eventsManager, taxiCfg, fleet, scheduler, network, timer, travelTime,
-						travelDisutility);
+						travelDisutility, context);
 		}
 		throw new RuntimeException("Unsupported taxi optimizer type: " + taxiCfg.getTaxiOptimizerParams().getName());
 	}
