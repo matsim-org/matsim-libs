@@ -22,6 +22,10 @@
  */
 package org.matsim.contrib.av.flow;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
@@ -29,19 +33,13 @@ import org.matsim.testcases.MatsimTestUtils;
 /**
  * @author jbischoff
  */
-
-/**
- *
- */
 public class RunAvExampleIT {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
-
-    @Test
-    public void testAVFlowExample() {
-
-		new RunAvExample().run(false);
-    }
-
+	@Test
+	public void testAvFlowExample() throws MalformedURLException {
+		URL configUrl = new File(utils.getPackageInputDirectory() + "config.xml").toURI().toURL();
+		new RunAvExample().run(configUrl, false);
+	}
 }

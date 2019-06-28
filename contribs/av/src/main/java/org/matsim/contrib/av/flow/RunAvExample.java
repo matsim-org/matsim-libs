@@ -22,6 +22,8 @@
  */
 package org.matsim.contrib.av.flow;
 
+import java.net.URL;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -48,19 +50,8 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  *
  */
 public class RunAvExample {
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-
-		new RunAvExample().run(true);
-
-	}
-
-	public void run(boolean otfvis) {
-		Scenario scenario = ScenarioUtils.loadScenario(
-				ConfigUtils.loadConfig("flow/config.xml", new OTFVisConfigGroup()));
+	public void run(URL configUrl, boolean otfvis) {
+		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configUrl, new OTFVisConfigGroup()));
 		addPopulation(scenario);
 
 		VehicleType avType = new VehicleTypeImpl(Id.create("autonomousVehicleType", VehicleType.class));

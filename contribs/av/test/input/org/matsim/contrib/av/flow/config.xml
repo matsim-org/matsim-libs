@@ -2,13 +2,9 @@
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
 	
-
 	<module name="network">
 		<param name="inputNetworkFile" value="grid_network.xml" />
-		
 	</module>
-
-
 
 	<module name="qsim">
 		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true" />
