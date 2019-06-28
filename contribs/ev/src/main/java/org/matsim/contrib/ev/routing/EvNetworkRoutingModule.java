@@ -18,6 +18,12 @@
  * *********************************************************************** */
 package org.matsim.contrib.ev.routing;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -49,8 +55,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 
-import java.util.*;
-
 /**
  * This network Routing module adds stages for re-charging into the Route.
  * This wraps a "computer science" {@link LeastCostPathCalculator}, which routes from a node to another node, into something that
@@ -59,7 +63,7 @@ import java.util.*;
  * @author jfbischoff
  */
 
-public final class EVNetworkRoutingModule implements RoutingModule {
+public final class EvNetworkRoutingModule implements RoutingModule {
 
 	private final String mode;
 
@@ -74,10 +78,10 @@ public final class EVNetworkRoutingModule implements RoutingModule {
 	private final String stageActivityType;
 	private final String vehicleSuffix;
 
-	private final class EVCharingStageActivityType implements StageActivityTypes {
+	private final class EvCharingStageActivityType implements StageActivityTypes {
 		@Override
 		public boolean isStageActivity(String activityType) {
-			if (EVNetworkRoutingModule.this.stageActivityType.equals(activityType)) {
+			if (EvNetworkRoutingModule.this.stageActivityType.equals(activityType)) {
 				return true;
 			} else if (activityType.endsWith("interaction")) {
 				return true;
@@ -89,20 +93,20 @@ public final class EVNetworkRoutingModule implements RoutingModule {
 
 		@Override
 		public boolean equals(Object obj) {
-			if (!(obj instanceof EVCharingStageActivityType)) {
+			if (!(obj instanceof EvCharingStageActivityType)) {
 				return false;
 			}
-			EVCharingStageActivityType other = (EVCharingStageActivityType)obj;
-			return other.isStageActivity(EVNetworkRoutingModule.this.stageActivityType);
+			EvCharingStageActivityType other = (EvCharingStageActivityType)obj;
+			return other.isStageActivity(EvNetworkRoutingModule.this.stageActivityType);
 		}
 
 		@Override
 		public int hashCode() {
-			return EVNetworkRoutingModule.this.stageActivityType.hashCode();
+			return EvNetworkRoutingModule.this.stageActivityType.hashCode();
 		}
 	}
 
-	public EVNetworkRoutingModule(final String mode, final Network network, RoutingModule delegate,
+	public EvNetworkRoutingModule(final String mode, final Network network, RoutingModule delegate,
 			ElectricFleetSpecification electricFleet,
 			ChargingInfrastructureSpecification chargingInfrastructureSpecification, TravelTime travelTime,
 			DriveEnergyConsumption.Factory driveConsumptionFactory,
@@ -223,7 +227,7 @@ public final class EVNetworkRoutingModule implements RoutingModule {
 
 	@Override
 	public StageActivityTypes getStageActivityTypes() {
-		return new EVCharingStageActivityType();
+		return new EvCharingStageActivityType();
 	}
 
 	@Override

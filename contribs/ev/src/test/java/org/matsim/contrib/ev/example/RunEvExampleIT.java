@@ -2,10 +2,10 @@ package org.matsim.contrib.ev.example;
 
 import org.junit.Test;
 
-public class RunEVExampleIT {
+public class RunEvExampleIT {
 
     @Test
     public void run() {
-        new RunEVExample().run("config.xml");
+		new RunEvExample().run("config.xml");
     }
 }

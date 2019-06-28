@@ -25,8 +25,8 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-public class EVNetworkRoutingProvider implements Provider<RoutingModule> {
-	private static final Logger log = Logger.getLogger(EVNetworkRoutingProvider.class);
+public class EvNetworkRoutingProvider implements Provider<RoutingModule> {
+	private static final Logger log = Logger.getLogger(EvNetworkRoutingProvider.class);
 
 	private final String routingMode;
 	@Inject
@@ -68,7 +68,7 @@ public class EVNetworkRoutingProvider implements Provider<RoutingModule> {
 	 *
 	 * @param mode
 	 */
-	public EVNetworkRoutingProvider(String mode) {
+	public EvNetworkRoutingProvider(String mode) {
 		this(mode, mode);
 	}
 
@@ -80,7 +80,7 @@ public class EVNetworkRoutingProvider implements Provider<RoutingModule> {
 	 * @param mode
 	 * @param routingMode
 	 */
-	public EVNetworkRoutingProvider(String mode, String routingMode) {
+	public EvNetworkRoutingProvider(String mode, String routingMode) {
 		//		log.setLevel(Level.DEBUG);
 
 		this.mode = mode;
@@ -125,9 +125,9 @@ public class EVNetworkRoutingProvider implements Provider<RoutingModule> {
 
 		// the following again refers to the (transport)mode, since it will determine the mode of the leg on the network:
 		if (plansCalcRouteConfigGroup.isInsertingAccessEgressWalk()) {
-			throw new IllegalArgumentException("Bushwacking is not currently supported by the EV Routing module");
+			throw new IllegalArgumentException("Bushwacking is not currently supported by the EV routing module");
 		} else {
-			return new EVNetworkRoutingModule(mode, filteredNetwork,
+			return new EvNetworkRoutingModule(mode, filteredNetwork,
 					DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo),
 					electricFleetSpecification, chargingInfrastructureSpecification, travelTime,
 					driveConsumptionFactory,

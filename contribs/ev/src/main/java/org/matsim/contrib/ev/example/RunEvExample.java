@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.VehicleChargingHandler;
-import org.matsim.contrib.ev.routing.EVNetworkRoutingProvider;
+import org.matsim.contrib.ev.routing.EvNetworkRoutingProvider;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -38,8 +38,8 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class RunEVExample {
-	private static final Logger log = Logger.getLogger(RunEVExample.class);
+public class RunEvExample {
+	private static final Logger log = Logger.getLogger(RunEvExample.class);
 
 	public static void main(String[] args) throws IOException {
 
@@ -55,7 +55,7 @@ public class RunEVExample {
 			//load config file from resource path (see src/main/resources folder for the example)
 			configFile = "config.xml";
 		}
-		new RunEVExample().run(configFile);
+		new RunEvExample().run(configFile);
 	}
 
 	public void run(String configFile) {
@@ -68,7 +68,7 @@ public class RunEVExample {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addRoutingModuleBinding(TransportMode.car).toProvider(new EVNetworkRoutingProvider(TransportMode.car));
+				addRoutingModuleBinding(TransportMode.car).toProvider(new EvNetworkRoutingProvider(TransportMode.car));
 				installQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {
