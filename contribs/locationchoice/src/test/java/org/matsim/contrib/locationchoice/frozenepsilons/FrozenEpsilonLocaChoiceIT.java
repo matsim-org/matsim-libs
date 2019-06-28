@@ -350,23 +350,25 @@ public class FrozenEpsilonLocaChoiceIT{
 			}
 		}
 
-		final DestinationChoiceContext lcContext = new DestinationChoiceContext(scenario) ;
-		scenario.addScenarioElement(DestinationChoiceContext.ELEMENT_NAME, lcContext);
+//		final DestinationChoiceContext lcContext = new DestinationChoiceContext(scenario) ;
+//		scenario.addScenarioElement(DestinationChoiceContext.ELEMENT_NAME, lcContext);
 
 		// CONTROL(L)ER:
 		Controler controler = new Controler(scenario);
 		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 
 		// set scoring function
-		DCScoringFunctionFactory scoringFunctionFactory = new DCScoringFunctionFactory(controler.getScenario(), lcContext);
-		scoringFunctionFactory.setUsingConfigParamsForScoring(true) ;
-		controler.setScoringFunctionFactory(scoringFunctionFactory);
+//		DCScoringFunctionFactory scoringFunctionFactory = new DCScoringFunctionFactory(controler.getScenario(), lcContext);
+//		scoringFunctionFactory.setUsingConfigParamsForScoring(true) ;
+//		controler.setScoringFunctionFactory(scoringFunctionFactory);
+
+		FrozenTastes.configure( controler );
 
 		// bind locachoice strategy (selected in localCreateConfig):
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addPlanStrategyBinding("MyLocationChoice").to( BestReplyLocationChoicePlanStrategy.class );
+//				addPlanStrategyBinding("MyLocationChoice").to( BestReplyLocationChoicePlanStrategy.class );
 				addControlerListenerBinding().to( KaiAnalysisListener.class ).in( Singleton.class ) ;
 			}
 		});
