@@ -18,16 +18,20 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.av.intermodal;
+
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
- * @author  jbischoff
+ * @author jbischoff
  *
  */
 public class RunTaxiPTIntermodalExampleIT {
@@ -35,7 +39,8 @@ public class RunTaxiPTIntermodalExampleIT {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testIntermodalExample() {
-		new RunTaxiPTIntermodalExample().run(false);
+	public void testIntermodalExample() throws MalformedURLException {
+		URL configUrl = new File(utils.getClassInputDirectory() + "config.xml").toURI().toURL();
+		new RunTaxiPTIntermodalExample().run(configUrl, false);
 	}
 }
