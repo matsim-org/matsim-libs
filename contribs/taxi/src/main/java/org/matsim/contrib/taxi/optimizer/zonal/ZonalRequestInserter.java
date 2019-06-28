@@ -18,6 +18,7 @@
 
 package org.matsim.contrib.taxi.optimizer.zonal;
 
+import java.net.URL;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -66,7 +67,8 @@ public class ZonalRequestInserter implements UnplannedRequestInserter {
 
 	public ZonalRequestInserter(Fleet fleet, TaxiScheduler scheduler, MobsimTimer timer, Network network,
 			TravelTime travelTime, TravelDisutility travelDisutility, ZonalTaxiOptimizerParams params,
-			IdleTaxiZonalRegistry idleTaxiRegistry, UnplannedRequestZonalRegistry unplannedRequestRegistry) {
+			IdleTaxiZonalRegistry idleTaxiRegistry, UnplannedRequestZonalRegistry unplannedRequestRegistry,
+			URL context) {
 		this.fleet = fleet;
 		this.scheduler = scheduler;
 		this.dispatchFinder = new BestDispatchFinder(scheduler, network, timer, travelTime, travelDisutility);
@@ -74,7 +76,7 @@ public class ZonalRequestInserter implements UnplannedRequestInserter {
 				params.getRuleBasedTaxiOptimizerParams(), idleTaxiRegistry, unplannedRequestRegistry);
 
 		ZonalSystemParams zonalSystemParams = params.getZonalSystemParams();
-		zones = Zones.readZones(zonalSystemParams.getZonesXmlFile(), zonalSystemParams.getZonesShpFile());
+		zones = Zones.readZones(zonalSystemParams.getZonesXmlUrl(context), zonalSystemParams.getZonesShpUrl(context));
 		System.err.println("No conversion of SRS is done");
 
 		this.linkToZone = NetworkWithZonesUtils.createLinkToZoneMap(network,

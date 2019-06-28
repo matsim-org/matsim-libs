@@ -1,8 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -14,7 +15,8 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
 package org.matsim.contrib.etaxi.run;
 
@@ -25,25 +27,13 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 
 /**
- * @author michalm
+ * @author Michal Maciejewski (michalm)
  */
-public class RunETaxiScenarioIT {
-	@Test
-	public void testOneTaxi() {
-		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_etaxi_config.xml");
-		RunETaxiScenario.run(configUrl, false);
-	}
-
+public class RunETaxiBenchmarkTest {
 	@Test
 	public void testRuleBased() {
-		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_etaxi_config.xml");
-		RunETaxiScenario.run(configUrl, false);
+		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_etaxi_benchmark_config.xml");
+		RunETaxiBenchmark.run(configUrl, 2);
 	}
 
-	@Test
-	public void testAssignment() {
-		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("mielec"),
-				"mielec_etaxi_config_assignment.xml");
-		RunETaxiScenario.run(configUrl, false);
-	}
 }

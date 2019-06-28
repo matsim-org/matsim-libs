@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.zone.io;
 
+import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
 
@@ -35,12 +36,12 @@ public class ZoneShpReader {
 		this.zones = zones;
 	}
 
-	public void readZones(String file) {
-		readZones(file, ZoneShpWriter.ID_HEADER);
+	public void readZones(URL url) {
+		readZones(url, ZoneShpWriter.ID_HEADER);
 	}
 
-	public void readZones(String file, String idHeader) {
-		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(file);
+	public void readZones(URL url, String idHeader) {
+		Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(url);
 		if (features.size() != zones.size()) {
 			throw new RuntimeException("Features#: " + features.size() + "; zones#: " + zones.size());
 		}
