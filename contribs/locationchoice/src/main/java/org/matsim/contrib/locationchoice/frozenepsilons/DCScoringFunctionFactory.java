@@ -31,7 +31,7 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 
-public class DCScoringFunctionFactory implements ScoringFunctionFactory {
+class DCScoringFunctionFactory implements ScoringFunctionFactory {
 	
 	private final static Logger log = Logger.getLogger(DCScoringFunctionFactory.class);
 	
