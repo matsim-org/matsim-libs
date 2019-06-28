@@ -20,6 +20,8 @@
 package org.matsim.vehicles;
 
 
+import org.matsim.utils.objectattributes.attributable.Attributes;
+
 /**
  * @author dgrether
  */
@@ -28,7 +30,8 @@ public class FreightCapacityImpl implements FreightCapacity {
 	private double volume;
 	private double weight;
 	private int unit;
-	
+	private Attributes attributes = new Attributes() ;
+
 	public FreightCapacityImpl(){}
 	
 	@Override
@@ -53,4 +56,7 @@ public class FreightCapacityImpl implements FreightCapacity {
 	@Override
 	public int getUnits() {return this.unit; }
 
+	@Override public Attributes getAttributes(){
+		return this.attributes ;
+	}
 }

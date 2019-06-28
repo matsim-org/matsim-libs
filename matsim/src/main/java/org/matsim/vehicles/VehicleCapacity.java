@@ -20,10 +20,12 @@
 package org.matsim.vehicles;
 
 
+import org.matsim.utils.objectattributes.attributable.Attributable;
+
 /**
  * @author dgrether
  */
-public interface VehicleCapacity {
+public interface VehicleCapacity extends Attributable {
 	
 	public Integer getSeats();
 	

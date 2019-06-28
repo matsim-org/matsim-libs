@@ -6,9 +6,7 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.xml.sax.Attributes;
 
-import java.util.Map;
 import java.util.Stack;
-import java.util.stream.Collectors;
 
 class VehicleReaderV2 extends MatsimXmlParser{
 	private static final Logger log = Logger.getLogger( VehicleReaderV2.class ) ;
@@ -24,9 +22,8 @@ class VehicleReaderV2 extends MatsimXmlParser{
 //	private double costsPerMeter = Double.NaN;
 //	private double costsPerSecond = Double.NaN;
 
-	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
-	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes =
-		  new org.matsim.utils.objectattributes.attributable.Attributes();
+	private final AttributesXmlReaderDelegate attributesDelegate = new AttributesXmlReaderDelegate();
+	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes = null ;
 
 	public VehicleReaderV2( final Vehicles vehicles ){
 		log.info("Using " + this.getClass().getName());
@@ -59,13 +56,12 @@ class VehicleReaderV2 extends MatsimXmlParser{
 				this.currentVehType = null;
 				break;
 			case VehicleSchemaV2Names.ATTRIBUTES:
-				this.currAttributes = null;
-				break;
+				/* fall-through */
 			case VehicleSchemaV2Names.ATTRIBUTE:
-				this.attributesReader.endTag( name, content, context );
+				this.attributesDelegate.endTag( name, content, context );
 				break;
 			default:
-				throw new IllegalStateException( "Unexpected value: " + name );
+				// do nothing
 		}
 	}
 
@@ -75,6 +71,7 @@ class VehicleReaderV2 extends MatsimXmlParser{
 		switch( name ){
 			case VehicleSchemaV2Names.VEHICLETYPE:
 				this.currentVehType = this.builder.createVehicleType( Id.create( atts.getValue( VehicleSchemaV2Names.ID ), VehicleType.class ) );
+				this.currAttributes = this.currentVehType.getAttributes() ;
 				break;
 			case VehicleSchemaV2Names.LENGTH:
 				this.currentVehType.setLength( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.METER ) ) );
@@ -90,9 +87,11 @@ class VehicleReaderV2 extends MatsimXmlParser{
 				break;
 			case VehicleSchemaV2Names.ENGINEINFORMATION:
 				this.currentEngineInformation = new EngineInformationImpl();
+				this.currAttributes = this.currentEngineInformation.getAttributes() ;
 				break;
 			case VehicleSchemaV2Names.CAPACITY:
 				this.currentCapacity = this.builder.createVehicleCapacity();
+				this.currAttributes = this.currentCapacity.getAttributes() ;
 				break;
 			case VehicleSchemaV2Names.SEATS:
 				this.currentCapacity.setSeats( Integer.valueOf( atts.getValue( VehicleSchemaV2Names.PERSONS ) ) );
@@ -101,14 +100,19 @@ class VehicleReaderV2 extends MatsimXmlParser{
 				this.currentCapacity.setStandingRoom( Integer.valueOf( atts.getValue( VehicleSchemaV2Names.PERSONS ) ) );
 				break;
 			case VehicleSchemaV2Names.FREIGHTCAPACITY:
+				double weightInTons = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.WEIGHT ) ) ;
+				double volumeInCubicMeters = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.VOLUME ) ) ;
 				this.currentFreightCapacity = this.builder.createFreigthCapacity();
+				this.currentFreightCapacity.setVolume( volumeInCubicMeters );
+				this.currentFreightCapacity.setWeight( weightInTons );
+				this.currAttributes = this.currentFreightCapacity.getAttributes() ;
 				break;
-			case VehicleSchemaV2Names.VOLUME:
-				this.currentFreightCapacity.setVolume( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.CUBICMETERS ) ) );
-				break;
-			case VehicleSchemaV2Names.WEIGHT:
-				this.currentFreightCapacity.setWeight( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.TONS ) ) );
-				break;
+//			case VehicleSchemaV2Names.VOLUME:
+//				this.currentFreightCapacity.setVolume( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.CUBICMETERS ) ) );
+//				break;
+//			case VehicleSchemaV2Names.WEIGHT:
+//				this.currentFreightCapacity.setWeight( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.TONS ) ) );
+//				break;
 			case VehicleSchemaV2Names.COSTINFORMATION:
 				double fixedCostsPerDay = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.FIXEDCOSTSPERDAY ) );
 				double costsPerMeter = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERMETER ) );
@@ -134,19 +138,9 @@ class VehicleReaderV2 extends MatsimXmlParser{
 				this.currentVehType.setFlowEfficiencyFactor( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.FACTOR ) ) );
 				break;
 			case VehicleSchemaV2Names.ATTRIBUTES:
-				log.warn( "attributes encountered; context.peek()=" + context.peek() );
-				if( context.peek().equals( VehicleSchemaV2Names.VEHICLETYPE ) ){
-					currAttributes = this.currentVehType.getAttributes();
-					attributesReader.startTag( name, atts, context, currAttributes );
-				} else if( context.peek().equals( VehicleSchemaV2Names.ENGINEINFORMATION ) ){
-					currAttributes = this.currentEngineInformation.getAttributes();
-					attributesReader.startTag( name, atts, context, currAttributes );
-				} else{
-					throw new RuntimeException( "encountered attributes for context in which they are not registered; context=" + context );
-				}
-				break;
+				/* fall-through */
 			case VehicleSchemaV2Names.ATTRIBUTE:
-				attributesReader.startTag( name, atts, context, currAttributes );
+				attributesDelegate.startTag( name, atts, context, currAttributes );
 				break;
 			case VehicleSchemaV2Names.NETWORKMODE:
 				this.currentVehType.setNetworkMode( atts.getValue( VehicleSchemaV2Names.NETWORKMODE ) );

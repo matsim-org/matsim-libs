@@ -19,7 +19,9 @@
  * *********************************************************************** */
 package org.matsim.vehicles;
 
-public interface FreightCapacity {
+import org.matsim.utils.objectattributes.attributable.Attributable;
+
+public interface FreightCapacity extends Attributable {
 	
 	public double getVolume();
 
@@ -32,5 +34,9 @@ public interface FreightCapacity {
 	public int getUnits();
 
 	public void setUnits(int units);
+
+	double UNDEFINED_VOLUME =  Double.POSITIVE_INFINITY ;
+	double UNDEFINED_WEIGHT = Double.POSITIVE_INFINITY ;
+	double UNDEFINED_UNITS = Integer.MAX_VALUE ;
 	
 }

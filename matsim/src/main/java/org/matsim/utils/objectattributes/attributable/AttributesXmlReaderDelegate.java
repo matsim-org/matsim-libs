@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributesConverter;
 import org.matsim.utils.objectattributes.attributeconverters.BooleanConverter;
@@ -49,6 +50,7 @@ public class AttributesXmlReaderDelegate {
 		if (TAG_ATTRIBUTE.equals(name)) {
 			Object o = converter.convert(this.currentAttributeClass, content);
 			if (o == null) return;
+			Gbl.assertNotNull( this.currentAttributes );
 			this.currentAttributes.putAttribute( this.currentAttribute, o);
 		}
 	}

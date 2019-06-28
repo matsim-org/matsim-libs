@@ -180,12 +180,12 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 
 	private void writeFreightCapacity(FreightCapacity fc) throws UncheckedIOException {
 		this.writeStartTag(VehicleSchemaV2Names.FREIGHTCAPACITY, null);
-		if (fc.getVolume() != Double.NaN) {
+		if ( fc.getVolume() != FreightCapacity.UNDEFINED_VOLUME ) {
 			atts.clear();
 			atts.add(this.createTuple(VehicleSchemaV2Names.CUBICMETERS, Double.toString(fc.getVolume())));
 			this.writeStartTag(VehicleSchemaV2Names.VOLUME, atts, true);
 		}
-		if (fc.getWeight() != Double.NaN) {
+		if (fc.getWeight() != FreightCapacity.UNDEFINED_WEIGHT ) {
 			atts.clear();
 			atts.add(this.createTuple(VehicleSchemaV2Names.TONS, Double.toString(fc.getWeight())));
 			this.writeStartTag(VehicleSchemaV2Names.WEIGHT, atts, true);

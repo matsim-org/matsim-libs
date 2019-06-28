@@ -43,7 +43,7 @@ public class VehicleUtils {
 	private static final String HBEFA_VEHICLE_CATEGORY_= "HbefaVehicleCategory";
 	private static final String HBEFA_TECHNOLOGY = "HbefaTechnology";
 	private static final String HBEFA_SIZE_CLASS = "HbefaSizeClass";
-	private static final String HBEFA_EMISSIONS_CONCEPT = "EmissionsConcept";
+	private static final String HBEFA_EMISSIONS_CONCEPT = "HbefaEmissionsConcept";
 
 	static {
 		VehicleCapacityImpl capacity = new VehicleCapacityImpl();

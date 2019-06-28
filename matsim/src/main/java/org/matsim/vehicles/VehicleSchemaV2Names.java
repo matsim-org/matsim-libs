@@ -32,10 +32,10 @@ public interface VehicleSchemaV2Names {
 	public static final String PERSONS = "persons";
 	public static final String STANDINGROOM = "standingRoom";
 	public static final String FREIGHTCAPACITY = "freightCapacity";
-	public static final String VOLUME = "volume";
-	public static final String CUBICMETERS = "cubicMeters";
-	public static final String WEIGHT = "weight";
-	public static final String TONS = "tons";
+	public static final String VOLUME = "volumeInCubicMeters";
+//	public static final String CUBICMETERS = "cubicMeters";
+	public static final String WEIGHT = "weightInTons";
+//	public static final String TONS = "tons";
 //	public static final String UNIT = "unit";
 //	public static final String UNITS = "units";
 	public static final String LENGTH = "length";

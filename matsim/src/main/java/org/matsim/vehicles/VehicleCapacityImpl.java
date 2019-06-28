@@ -20,6 +20,8 @@
 package org.matsim.vehicles;
 
 
+import org.matsim.utils.objectattributes.attributable.Attributes;
+
 /**
  * @author dgrether
  */
@@ -28,7 +30,8 @@ public class VehicleCapacityImpl implements VehicleCapacity {
 	private Integer seats = null;
 	private Integer standingRoom = null;
 	private FreightCapacity freightCap = null;
-	
+	private Attributes attributes = new Attributes() ;
+
 	public VehicleCapacityImpl(){}
 	
 	@Override
@@ -60,5 +63,8 @@ public class VehicleCapacityImpl implements VehicleCapacity {
 	public void setStandingRoom(Integer standingRoom) {
 		this.standingRoom = standingRoom;
 	}
-	
+
+	@Override public Attributes getAttributes(){
+		return this.attributes ;
+	}
 }

@@ -18,13 +18,10 @@
 		</attributes>
 		<description>abc</description>
 		<!-- capacity including driver -->
-		<capacity>
-			<seats persons="5"/>
-			<standingRoom persons="20" />
-			<freightCapacity>
-				<volume cubicMeters="23.23"/>
-				<weight tons="9.5"/>
-			</freightCapacity>
+		<capacity seats="5" standingRoom="20" volumeInCubicMeters="23.23" weightInTons="9.5">
+			<attributes>
+				...
+			</attributes>
 		</capacity>
 		<length meter="9.5" />
 		<width meter="3" />
@@ -37,9 +34,11 @@
 				<attribute name="HbefaEmissionsConcept" class="java.lang.String">EURO-5</attribute>
 			</attributes>
 		</engineInformation>
-<!--		<costsInformation>-->
-			<costInformation fixedCostsPerDay="100.00" costsPerMeter="0.15" costsPerSecond="0.08"/>
-<!--		</costsInformation>-->
+		<costInformation fixedCostsPerDay="100.00" costsPerMeter="0.15" costsPerSecond="0.08">
+			<attributes>
+				...
+			</attributes>
+		</costInformation>
 		<passengerCarEquivalents pce="2.0" />
 		<networkMode networkMode = "pt" />
 		<flowEfficiencyFactor factor="1.5" />
