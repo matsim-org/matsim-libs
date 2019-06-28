@@ -18,7 +18,11 @@
 
 package org.matsim.contrib.edrt.run;
 
+import java.net.URL;
+
 import org.junit.Test;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 
 /**
  * @author michalm
@@ -26,7 +30,7 @@ import org.junit.Test;
 public class RunEDrtScenarioIT {
 	@Test
 	public void test() {
-		String configFile = "mielec_2014_02/mielec_edrt_config.xml";
-		RunEDrtScenario.run(configFile, false);
+		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_edrt_config.xml");
+		RunEDrtScenario.run(configUrl, false);
 	}
 }

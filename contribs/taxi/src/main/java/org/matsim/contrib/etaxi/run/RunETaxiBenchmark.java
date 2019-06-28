@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.etaxi.run;
 
+import java.net.URL;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkConfigConsistencyChecker;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkControlerModule;
@@ -60,8 +62,8 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
  * each link over time. The default approach is to specify free-flow speeds in each time interval (usually 15 minutes).
  */
 public class RunETaxiBenchmark {
-	public static void run(String configFile, int runs) {
-		Config config = ConfigUtils.loadConfig(configFile,
+	public static void run(URL configUrl, int runs) {
+		Config config = ConfigUtils.loadConfig(configUrl,
 				new TaxiConfigGroup(ETaxiOptimizerProvider::createParameterSet), new DvrpConfigGroup(),
 				new EvConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
@@ -72,7 +74,6 @@ public class RunETaxiBenchmark {
 		DvrpConfigGroup.get(config).setNetworkMode(null);// to switch off network filtering
 		config.controler().setLastIteration(runs - 1);
 		config.addConfigConsistencyChecker(new DvrpBenchmarkConfigConsistencyChecker());
-		config.checkConsistency();
 		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
 
 		Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
@@ -99,7 +100,7 @@ public class RunETaxiBenchmark {
 				bind(ChargingLogic.Factory.class).toProvider(new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
 						charger -> new ChargeUpToMaxSocStrategy(charger, 0.8)));
 				//TODO switch to VariableSpeedCharging for Nissan
-				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, 1.5));
+				bind(ChargingPower.Factory.class).toInstance(ev -> new FixedSpeedCharging(ev, 2.0));
 				bind(TemperatureService.class).toInstance(linkId -> 20);
 			}
 		});
@@ -111,10 +112,5 @@ public class RunETaxiBenchmark {
 				.build());
 
 		return controler;
-	}
-
-	public static void main(String[] args) {
-		String cfg = "../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/mielec_etaxi_benchmark_config.xml";
-		run(cfg, 1);
 	}
 }

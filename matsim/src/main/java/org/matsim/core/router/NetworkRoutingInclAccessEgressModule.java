@@ -171,7 +171,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	
 	public static double addBushwhackingLegFromFacilityToLinkIfNecessary( final Facility fromFacility, final Person person,
 												     final Link accessActLink, double now, final List<PlanElement> result, final PopulationFactory populationFactory, final String stageActivityType ) {
-		if ( fromFacility.getCoord() != null ) { // otherwise the trip starts directly on the link; no need to bushwhack
+		if ( fromFacility.getCoord() != null && ! ( fromFacility instanceof LinkWrapperFacility ) ) {
+			// otherwise the trip starts directly on the link; no need to bushwhack
 
 			Coord accessActCoord  = accessActLink.getToNode().getCoord() ;
 			// yyyy think about better solution: this may generate long walks along the link.

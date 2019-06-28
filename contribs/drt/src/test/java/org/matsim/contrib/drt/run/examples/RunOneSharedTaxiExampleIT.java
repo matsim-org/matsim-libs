@@ -18,7 +18,11 @@
 
 package org.matsim.contrib.drt.run.examples;
 
+import java.net.URL;
+
 import org.junit.Test;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 
 /**
  * @author michalm
@@ -26,6 +30,7 @@ import org.junit.Test;
 public class RunOneSharedTaxiExampleIT {
 	@Test
 	public void testRun() {
-		RunOneSharedTaxiExample.run(false, 1);
+		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_shared_taxi_config.xml");
+		RunOneSharedTaxiExample.run(configUrl, false, 1);
 	}
 }

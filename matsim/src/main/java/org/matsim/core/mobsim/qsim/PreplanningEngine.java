@@ -1,4 +1,25 @@
-package org.matsim.core.mobsim.qsim;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * PreplanningEngine.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.core.mobsim.qsim;
 
 import static org.matsim.core.config.groups.PlanCalcScoreConfigGroup.createStageActivityType;
 
@@ -76,7 +97,7 @@ public final class PreplanningEngine implements MobsimEngine {
 	private Map<MobsimAgent, TripInfoRequest> tripInfoRequestMap = new TreeMap<>( ( o1, o2 ) -> o1.getId().compareTo( o2.getId() ) ) ;
 	// yyyyyy can't have non-sorted maps here because we will get non-deterministic results. kai, mar'19
 
-	private final EditTrips editTrips;
+	private EditTrips editTrips;
 	private EditPlans editPlans = null;
 
 	private final TripRouter tripRouter;
@@ -85,7 +106,6 @@ public final class PreplanningEngine implements MobsimEngine {
 	@Inject
 	PreplanningEngine( TripRouter tripRouter, Scenario scenario ) {
 		this.tripRouter = tripRouter;
-		this.editTrips = new EditTrips(tripRouter, scenario);
 		this.population = scenario.getPopulation();
 		this.facilities = scenario.getActivityFacilities() ;
 		this.network = scenario.getNetwork() ;
@@ -109,6 +129,7 @@ public final class PreplanningEngine implements MobsimEngine {
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
+		this.editTrips = new EditTrips(internalInterface.getMobsim(), tripRouter, scenario);
 		this.editPlans = new EditPlans(internalInterface.getMobsim(), tripRouter, editTrips);
 		this.internalInterface = internalInterface ;
 	}

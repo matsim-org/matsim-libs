@@ -19,10 +19,6 @@
 
 package org.matsim.contrib.bicycle.network;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
@@ -30,7 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.bicycle.BicycleLabels;
+import org.matsim.contrib.bicycle.BicycleUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -38,6 +34,11 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author dziemke
@@ -58,7 +59,7 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 	private int countBicycle = 0;
 
 	private final String bicycleAsTransportModeName;
-	private final List<String> bicycleWayTags = Arrays.asList(BicycleLabels.CYCLEWAY, BicycleLabels.SURFACE, BicycleLabels.SMOOTHNESS, TAG_BICYCLE, TAG_ONEWAYBICYCLE);
+	private final List<String> bicycleWayTags = Arrays.asList(BicycleUtils.CYCLEWAY, BicycleUtils.SURFACE, BicycleUtils.SMOOTHNESS, TAG_BICYCLE, TAG_ONEWAYBICYCLE);
 	private final int maxWarnCount = 5;
 	private int warnCount = 0;
 
@@ -78,7 +79,7 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 
 		// adding bicycle way tags by default: Amit Feb'18
 //		List<String> bicycleWayTags = Arrays.asList(
-//				new String[]{BicycleLabels.CYCLEWAY, BicycleLabels.SURFACE, BicycleLabels.SMOOTHNESS, TAG_BICYCLE, TAG_ONEWAYBICYCLE});
+//				new String[]{BicycleUtils.CYCLEWAY, BicycleUtils.SURFACE, BicycleUtils.SMOOTHNESS, TAG_BICYCLE, TAG_ONEWAYBICYCLE});
 
 		Network network = NetworkUtils.createNetwork();
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(inputCRS, outputCRS);
@@ -211,30 +212,30 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 		if (  this.elevationDataParser!=null ){
 			// Gradient
 //		double gradient = (l.getToNode().getCoord().getZ() - l.getFromNode().getCoord().getZ()) / l.getLength();
-//		l.getAttributes().putAttribute(BicycleLabels.GRADIENT, gradient);
+//		l.getAttributes().putAttribute(BicycleUtils.GRADIENT, gradient);
 
 			// Elevation
 			double averageElevation = (l.getToNode().getCoord().getZ() + l.getFromNode().getCoord().getZ()) / 2;
-			l.getAttributes().putAttribute(BicycleLabels.AVERAGE_ELEVATION, averageElevation);
+			l.getAttributes().putAttribute(BicycleUtils.AVERAGE_ELEVATION, averageElevation);
 		}
 
 		// Smoothness
-		String smoothness = way.tags.get(BicycleLabels.SMOOTHNESS);
+		String smoothness = way.tags.get(BicycleUtils.SMOOTHNESS);
 		if (smoothness != null) {
-			l.getAttributes().putAttribute(BicycleLabels.SMOOTHNESS, smoothness);
+			l.getAttributes().putAttribute(BicycleUtils.SMOOTHNESS, smoothness);
 			this.countSmoothness++;
 		}
 
 		// Surface
-		String surface = way.tags.get(BicycleLabels.SURFACE);
+		String surface = way.tags.get(BicycleUtils.SURFACE);
 		if (surface != null) {
-			l.getAttributes().putAttribute(BicycleLabels.SURFACE, surface);
+			l.getAttributes().putAttribute(BicycleUtils.SURFACE, surface);
 			this.countSurfaceDirect++;
 		} else {
 			if (highwayType != null) {
 				// it used to be '&&' instead of '||' which will always be false. Most likely, it must be '||'. Amit Feb'18
 				if (defaults.hierarchy == 3 || defaults.hierarchy == 4) { // 3 = primary, 4 = secondary
-					l.getAttributes().putAttribute(BicycleLabels.SURFACE, "asphalt");
+					l.getAttributes().putAttribute(BicycleUtils.SURFACE, "asphalt");
 					this.countSurfaceInferred++;
 				} else {
 					if (warnCount <= maxWarnCount){
@@ -253,9 +254,9 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 		}
 
 		// Cycleway
-		String cyclewayType = way.tags.get(BicycleLabels.CYCLEWAY);
+		String cyclewayType = way.tags.get(BicycleUtils.CYCLEWAY);
 		if (cyclewayType != null) {
-			l.getAttributes().putAttribute(BicycleLabels.CYCLEWAY, cyclewayType);
+			l.getAttributes().putAttribute(BicycleUtils.CYCLEWAY, cyclewayType);
 			this.countCyclewayType++;
 		}
 
@@ -285,7 +286,7 @@ public final class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 				reverseDirectionAllowedForBicycles = true;
 			} 
 		}
-		String cyclewayType = way.tags.get(BicycleLabels.CYCLEWAY);
+		String cyclewayType = way.tags.get(BicycleUtils.CYCLEWAY);
 		if (cyclewayType != null) {
 			if ("opposite".equals(cyclewayType) || "opposite_track".equals(cyclewayType) || "opposite_lane".equals(cyclewayType)) {
 				reverseDirectionAllowedForBicycles = true;

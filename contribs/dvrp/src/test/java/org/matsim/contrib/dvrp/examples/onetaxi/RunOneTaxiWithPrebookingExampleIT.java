@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -39,6 +40,7 @@ import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dynagent.run.DynActivityEngine;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -54,6 +56,8 @@ import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
@@ -68,7 +72,9 @@ public class RunOneTaxiWithPrebookingExampleIT {
 	@Test
 	public void testRun() {
 		// load config
-		Config config = ConfigUtils.loadConfig(RunOneTaxiExample.CONFIG_FILE, new DvrpConfigGroup(),
+		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"),
+				"generic_dvrp_one_taxi_config.xml");
+		Config config = ConfigUtils.loadConfig(configUrl, new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 		config.controler().setLastIteration(0);
 
@@ -124,7 +130,9 @@ public class RunOneTaxiWithPrebookingExampleIT {
 
 		controler.addOverridingModule(new DvrpModule());
 
-		controler.addOverridingModule(new OneTaxiModule(RunOneTaxiExample.TAXIS_FILE));
+		controler.addOverridingModule(
+				new OneTaxiModule(ConfigGroup.getInputFileURL(config.getContext(), "one_taxi_vehicles.xml")));
+
 		// yyyy I find it unexpected to have an example as "module".  kai, mar'19
 
 		controler.addOverridingQSimModule(new AbstractQSimModule() {

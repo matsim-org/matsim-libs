@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.dvrp.examples.onetruck;
 
+import java.net.URL;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
@@ -40,11 +42,11 @@ import com.google.inject.name.Names;
  * @author Michal Maciejewski (michalm)
  */
 public class OneTruckModule extends AbstractDvrpModeModule {
-	private final String trucksFile;
+	private final URL fleetSpecificationUrl;
 
-	public OneTruckModule(String truckFile) {
+	public OneTruckModule(URL fleetSpecificationUrl) {
 		super(TransportMode.truck);
-		this.trucksFile = truckFile;
+		this.fleetSpecificationUrl = fleetSpecificationUrl;
 	}
 
 	@Override
@@ -52,7 +54,7 @@ public class OneTruckModule extends AbstractDvrpModeModule {
 		DvrpModes.registerDvrpMode(binder(), getMode());
 		bind(VehicleType.class).annotatedWith(Names.named(VrpAgentSourceQSimModule.DVRP_VEHICLE_TYPE))
 				.toInstance(createTruckType());
-		install(new FleetModule(getMode(), trucksFile));
+		install(new FleetModule(getMode(), fleetSpecificationUrl));
 
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override

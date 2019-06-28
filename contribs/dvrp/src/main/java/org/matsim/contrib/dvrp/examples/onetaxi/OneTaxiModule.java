@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
+import java.net.URL;
+
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
@@ -40,18 +42,18 @@ import com.google.inject.Singleton;
  * @author Michal Maciejewski (michalm)
  */
 public class OneTaxiModule extends AbstractDvrpModeModule {
-	private final String taxisFile;
+	private final URL fleetSpecificationUrl;
 
-	public OneTaxiModule(String taxisFile) {
+	public OneTaxiModule(URL fleetSpecificationUrl) {
 		super(TransportMode.taxi);
-		this.taxisFile = taxisFile;
+		this.fleetSpecificationUrl = fleetSpecificationUrl;
 	}
 
 	@Override
 	public void install() {
 		DvrpModes.registerDvrpMode(binder(), getMode());
 		addRoutingModuleBinding(getMode()).toInstance(new DynRoutingModule(getMode()));
-		install(new FleetModule(getMode(), taxisFile));
+		install(new FleetModule(getMode(), fleetSpecificationUrl));
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class);
 
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
