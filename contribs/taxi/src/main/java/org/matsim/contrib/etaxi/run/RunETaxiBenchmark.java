@@ -27,7 +27,6 @@ import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkControlerModule;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkModule;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
 import org.matsim.contrib.etaxi.optimizer.ETaxiOptimizerProvider;
 import org.matsim.contrib.ev.EvConfigGroup;
@@ -71,17 +70,24 @@ public class RunETaxiBenchmark {
 	}
 
 	public static Controler createControler(Config config, int runs) {
-		DvrpConfigGroup.get(config).setNetworkMode(null);// to switch off network filtering
 		config.controler().setLastIteration(runs - 1);
-		config.addConfigConsistencyChecker(new DvrpBenchmarkConfigConsistencyChecker());
-		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
+		config.controler().setDumpDataAtEnd(false);
+		config.controler().setWriteEventsInterval(0);
+		config.controler().setWritePlansInterval(0);
+		config.controler().setCreateGraphs(false);
 
+		DvrpConfigGroup.get(config).setNetworkMode(null);// to switch off network filtering
+		config.addConfigConsistencyChecker(new DvrpBenchmarkConfigConsistencyChecker());
+
+		String mode = TaxiConfigGroup.get(config).getMode();
 		Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
 
 		Controler controler = new Controler(scenario);
 		controler.setModules(new DvrpBenchmarkControlerModule());
-		controler.addOverridingModule(new ETaxiModule());
 		controler.addOverridingModule(new DvrpBenchmarkModule());
+		controler.configureQSimComponents(EvDvrpIntegrationModule.activateModes(mode));
+
+		controler.addOverridingModule(new ETaxiModule());
 		controler.addOverridingModule(new EvModule());
 		controler.addOverridingModule(new EvDvrpIntegrationModule());
 
@@ -91,8 +97,6 @@ public class RunETaxiBenchmark {
 				this.bind(AuxDischargingHandler.VehicleProvider.class).to(OperatingVehicleProvider.class);
 			}
 		});
-
-		controler.configureQSimComponents(DvrpQSimComponents.activateModes(taxiCfg.getMode()));
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -105,8 +109,7 @@ public class RunETaxiBenchmark {
 			}
 		});
 
-		controler.addOverridingModule(QSimScopeObjectListenerModule.builder(ETaxiBenchmarkStats.class)
-				.mode(taxiCfg.getMode())
+		controler.addOverridingModule(QSimScopeObjectListenerModule.builder(ETaxiBenchmarkStats.class).mode(mode)
 				.objectClass(Fleet.class)
 				.listenerCreator(getter -> new ETaxiBenchmarkStats(getter.get(OutputDirectoryHierarchy.class)))
 				.build());
