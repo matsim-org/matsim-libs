@@ -30,18 +30,12 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author  jbischoff
  *
  */
-/**
- *
- */
-public class RunIntermodalExampleIT {
-	
+public class RunTaxiPTIntermodalExampleIT {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testIntermodalExample() {
-
 		new RunTaxiPTIntermodalExample().run(false);
 	}
-	
 }
