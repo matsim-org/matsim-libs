@@ -29,6 +29,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroupI;
 
 public class ActivitiesHandler {
+	// this functionality would probably better sit in the config
+
 	private HashSet<String> flexibleTypes = new HashSet<String>();
 	private DestinationChoiceConfigGroupI dcconfig;
 

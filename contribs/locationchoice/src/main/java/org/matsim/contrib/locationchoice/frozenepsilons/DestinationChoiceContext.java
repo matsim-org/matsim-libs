@@ -58,7 +58,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * @author nagel
  *
  */
-class DestinationChoiceContext implements MatsimToplevelContainer {
+public class DestinationChoiceContext implements MatsimToplevelContainer {
 	
 	private static final Logger log = Logger.getLogger(DestinationChoiceContext.class);
 	

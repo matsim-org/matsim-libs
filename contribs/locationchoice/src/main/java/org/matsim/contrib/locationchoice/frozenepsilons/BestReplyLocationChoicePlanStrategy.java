@@ -43,7 +43,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.Map;
 
-class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
+public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 
 	private PlanStrategyImpl delegate;
 	@Inject private Config config ;
@@ -89,7 +89,7 @@ class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 				break;
 		}
 		delegate.addStrategyModule(new TripsToLegsModule(tripRouterProvider, config.global()));
-		delegate.addStrategyModule(new BestReplyLocationChoiceStrategyModule(tripRouterProvider, lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled(), scoringFunctionFactory, travelTimes, travelDisutilities) );
+		delegate.addStrategyModule(new BestReplyLocationChoiceStrategymodule(tripRouterProvider, lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled(), scoringFunctionFactory, travelTimes, travelDisutilities) );
 		delegate.addStrategyModule(new ReRoute(lcContext.getScenario(), tripRouterProvider));
 		
 		delegate.init(replanningContext);

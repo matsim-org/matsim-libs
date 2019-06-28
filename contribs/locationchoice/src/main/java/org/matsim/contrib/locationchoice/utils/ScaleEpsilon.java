@@ -25,7 +25,8 @@ import gnu.trove.map.hash.TObjectDoubleHashMap;
 import java.util.Set;
 
  public class ScaleEpsilon {
-	
+	 // this functionality would probably better sit in the config
+
 	private TObjectDoubleMap<String> epsilonFactors = new TObjectDoubleHashMap<>();
 	private final boolean useSimpleTypes = false; // demand v1: e.g., s0.5, ... s24.0 = s
 	

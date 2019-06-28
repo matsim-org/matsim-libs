@@ -22,8 +22,8 @@
 	</module>
 
 	<module name="frozenTastes">
-		<param name="restraintFcnFactor" value="0.131687242798"/> <!-- factor of the fac.cap.restraint function -->
-		<param name="restraintFcnExp" value="5.0"/> <!-- exponent of the fac.cap.restraint function -->
+<!--		<param name="restraintFcnFactor" value="0.131687242798"/> &lt;!&ndash; factor of the fac.cap.restraint function &ndash;&gt;-->
+<!--		<param name="restraintFcnExp" value="5.0"/> &lt;!&ndash; exponent of the fac.cap.restraint function &ndash;&gt;-->
 		<param name="scaleFactor" value="1"/> <!-- for sample scenarios, i.e. if 10% population then scalefactor = 10 -->
 <!--		<param name="recursionTravelSpeedChange" value="0.1"/>-->
 		<param name="travelSpeed_car" value="8.4333333333333333"/>  <!-- [m/s] MZ: 25.3 km/h + 20%  = 8.43 m/s -->

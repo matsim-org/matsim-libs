@@ -5,8 +5,6 @@ public interface DestinationChoiceConfigGroupI{
 
 	double getScaleFactor();
 
-	void setScaleFactor( double scaleFactor );
-
 	String getCenterNode();
 
 	Double getRadius();

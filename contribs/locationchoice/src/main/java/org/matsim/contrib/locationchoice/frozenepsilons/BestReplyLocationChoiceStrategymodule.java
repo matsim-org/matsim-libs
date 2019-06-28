@@ -54,9 +54,9 @@ import javax.inject.Provider;
  * Idea of this should be as follows: all persons and all facilities have k values.  frozen epsilon will be generated on the fly from those two values.  together with frozen
  * epsilon, the location choice is indeed best reply.
  */
-final class BestReplyLocationChoiceStrategyModule extends AbstractMultithreadedModule {
+final class BestReplyLocationChoiceStrategymodule extends AbstractMultithreadedModule {
 
-	private static final Logger log = Logger.getLogger( BestReplyLocationChoiceStrategyModule.class );
+	private static final Logger log = Logger.getLogger( BestReplyLocationChoiceStrategymodule.class );
 	private final Provider<TripRouter> tripRouterProvider;
 
 	private ObjectAttributes personsMaxEpsUnscaled;
@@ -75,7 +75,7 @@ final class BestReplyLocationChoiceStrategyModule extends AbstractMultithreadedM
 	private Map<String, TravelTime> travelTimes;
 	private Map<String, TravelDisutilityFactory> travelDisutilities;
 
-	public BestReplyLocationChoiceStrategyModule( Provider<TripRouter> tripRouterProvider, DestinationChoiceContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled,
+	public BestReplyLocationChoiceStrategymodule( Provider<TripRouter> tripRouterProvider, DestinationChoiceContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled,
 								    ScoringFunctionFactory scoringFunctionFactory, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilities ) {
 		super(lcContext.getScenario().getConfig().global());
 		this.tripRouterProvider = tripRouterProvider;

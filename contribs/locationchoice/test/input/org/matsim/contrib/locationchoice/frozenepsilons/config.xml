@@ -27,9 +27,9 @@
 		<param name="algorithm" value="bestResponse" />	
 		<param name="destinationSamplePercent" value="50"/>
 		<param name="epsilonScaleFactors" value="1.0, 1.0"/>
-		<param name="pkValuesFile" value="test/input/org/matsim/contrib/locationchoice/bestresponse/personsKValues.xml"/>
-		<param name="fkValuesFile" value="test/input/org/matsim/contrib/locationchoice/bestresponse/facilitiesKValues.xml"/>
-		<param name="maxDCScoreFile" value="test/input/org/matsim/contrib/locationchoice/bestresponse/personsMaxEpsUnscaled.xml"/>
+<!--		<param name="pkValuesFile" value="test/input/org/matsim/contrib/locationchoice/bestresponse/personsKValues.xml"/>-->
+<!--		<param name="fkValuesFile" value="test/input/org/matsim/contrib/locationchoice/bestresponse/facilitiesKValues.xml"/>-->
+<!--		<param name="maxDCScoreFile" value="test/input/org/matsim/contrib/locationchoice/bestresponse/personsMaxEpsUnscaled.xml"/>-->
 		
 <!--		<param name="tt_approximationLevel" value="1" />-->
 	</module>

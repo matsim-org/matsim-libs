@@ -39,6 +39,7 @@ import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
 
 public class TreesBuilder {
+	// this functionality would better be directly provided by the facilities container (similar to how network does it)
 
 	private Network network = null;
 	private static final Logger log = Logger.getLogger(TreesBuilder.class);
