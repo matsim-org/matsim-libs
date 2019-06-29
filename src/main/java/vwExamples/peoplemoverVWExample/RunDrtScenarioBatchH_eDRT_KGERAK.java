@@ -110,7 +110,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 
 		TemperatureChangeConfigGroup tcg = (TemperatureChangeConfigGroup)config.getModules()
 				.get(TemperatureChangeConfigGroup.GROUP_NAME);
-		tcg.setTempFile(inbase + "\\input\\temp\\temperatures_0.csv");
+		tcg.setTemperatureChangeFile(inbase + "\\input\\temp\\temperatures_0.csv");
 		config.travelTimeCalculator().setTraveltimeBinSize(900);
 		Set<String> modes = new HashSet<String>();
 		modes.add("car");

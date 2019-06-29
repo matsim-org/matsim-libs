@@ -20,8 +20,10 @@
 
 package vwExamples.peoplemoverVWExample;
 
-import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
-import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -33,7 +35,11 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.ev.EvConfigGroup;
-import org.matsim.contrib.ev.charging.*;
+import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
+import org.matsim.contrib.ev.charging.ChargingLogic;
+import org.matsim.contrib.ev.charging.ChargingPower;
+import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
+import org.matsim.contrib.ev.charging.FastThenSlowCharging;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.temperature.TemperatureChangeConfigGroup;
@@ -48,13 +54,12 @@ import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
+
+import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
+import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 import vwExamples.utils.DrtTrajectoryAnalyzer.MyDrtTrajectoryAnalysisModule;
 import vwExamples.utils.customEV.BatteryReplacementCharging;
 import vwExamples.utils.customEdrtModule.CustomEDrtControlerCreator;
-
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author axer
@@ -146,7 +151,7 @@ public class RunDrtScenarioBatchH_eDRT_TUB {
 	private static void adjustConfig(Config config, boolean rebalancing) {
 		TemperatureChangeConfigGroup tcg = (TemperatureChangeConfigGroup)config.getModules()
 				.get(TemperatureChangeConfigGroup.GROUP_NAME);
-        tcg.setTempFile("temp/temperatures_0.csv");
+		tcg.setTemperatureChangeFile("temp/temperatures_0.csv");
 		config.travelTimeCalculator().setTraveltimeBinSize(900);
 		Set<String> modes = new HashSet<>();
 		modes.add("car");
