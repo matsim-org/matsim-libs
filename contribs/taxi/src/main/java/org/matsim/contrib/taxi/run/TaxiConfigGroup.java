@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
-import javax.validation.constraints.Min;
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 
@@ -116,8 +116,8 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	@Positive
 	private double dropoffDuration = Double.NaN;// seconds
 
-	@Min(1)
-	private double AStarEuclideanOverdoFactor = 1.;
+	@DecimalMin("1.0")
+	private double AStarEuclideanOverdoFactor = 2.;
 
 	private boolean onlineVehicleTracker = false;
 	private boolean changeStartLinkToLastLinkInSchedule = false;
