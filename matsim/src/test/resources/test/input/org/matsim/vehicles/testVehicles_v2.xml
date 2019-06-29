@@ -12,7 +12,6 @@
 			<attribute name="accessTimeInSecondsPerPerson" class="java.lang.Double">23.23</attribute>
 			<attribute name="egressTimeInSecondsPerPerson" class="java.lang.Double">42.42</attribute>
 			<attribute name="doorOperationMode" class="java.lang.String">parallel</attribute>
-<!--			<attribute name="freightCapacityInUnits" class="java.lang.Double">200</attribute>-->
 		</attributes>
 		<description>abc</description>
 		<capacity seats="5" standingRoomInPersons="20" volumeInCubicMeters="23.23" weightInTons="9.5">
@@ -33,7 +32,7 @@
 		</engineInformation>
 		<costInformation fixedCostsPerDay="100.00" costsPerMeter="0.15" costsPerSecond="0.08">
 			<attributes>
-				<attribute name="costsPerSecondWaiting" class="java.lang.Double">0.06</attribute>
+				<attribute name="costsPerWaitingSecond" class="java.lang.Double">0.06</attribute>
 			</attributes>
 		</costInformation>
 		<passengerCarEquivalents pce="2.0" />
@@ -46,6 +45,23 @@
 			<attribute name="Attribute1" class="java.lang.String">def</attribute>
 			<attribute name="Attribute2" class="java.lang.Integer">2</attribute>
 		</attributes>
+	</vehicleType>
+
+	<vehicleType id="smallTruck">
+		<description>This is a small truck</description>
+		<capacity seats="2" volumeInCubicMeters="15"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaTechnology" class="java.lang.String">diesel</attribute>
+				<attribute name="HbefaEmissionsConcept" class="java.lang.String">EURO-6</attribute>
+			</attributes>
+		</engineInformation>
+		<costInformation fixedCostsPerDay="100.00" costsPerMeter="0.20" costsPerSecond="0.10">
+			<attributes>
+				<attribute name="costsPerWaitingSecond" class="java.lang.Double">0.05</attribute>
+				<attribute name="costsPerServiceSecond" class="java.lang.Double">0.15</attribute>
+			</attributes>
+		</costInformation>
 	</vehicleType>
 
 	<vehicle id="23" type="normal&amp;Car" />
