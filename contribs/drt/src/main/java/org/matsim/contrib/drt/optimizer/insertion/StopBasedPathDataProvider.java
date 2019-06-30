@@ -26,9 +26,9 @@ import javax.inject.Named;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.DetourLinksProvider.DetourLinksSet;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.ManyToManyPathData;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
@@ -63,8 +63,7 @@ public class StopBasedPathDataProvider implements PrecalculablePathDataProvider 
 
 		List<Link> stopLinks = schedule.getFacilities()
 				.values()
-				.stream()
-				.map(tsf -> network.getLinks().get(tsf.getLinkId()))//
+				.stream().map(tsf -> network.getLinks().get(tsf.getLinkId()))
 				.distinct()// more than one stop can be located on a link
 				.collect(ImmutableList.toImmutableList());
 		manyToManyPathData = new ManyToManyPathData(network, travelTime, travelDisutility, stopLinks,

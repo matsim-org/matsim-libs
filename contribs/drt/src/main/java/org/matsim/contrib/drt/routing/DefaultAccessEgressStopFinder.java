@@ -137,9 +137,9 @@ public class DefaultAccessEgressStopFinder implements AccessEgressStopFinder {
 		while (candidates.isEmpty()) {
 			double maxBeelineDistance = ((maxWalkDistance + extensionRadius) / walkBeelineFactor);
 			double maxSquaredBeelineDistance = maxBeelineDistance * maxBeelineDistance;
-			candidates = stops.values().stream()//
+			candidates = stops.values().stream()
 					.filter(s -> DistanceUtils.calculateSquaredDistance(coord, s.getCoord())
-							< maxSquaredBeelineDistance)//
+							< maxSquaredBeelineDistance)
 					.collect(Collectors.toSet());
 			extensionRadius += maxWalkDistance;
 		}

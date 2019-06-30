@@ -113,11 +113,10 @@ public class VehicleData {
 		this.currentTime = currentTime;
 		this.entryFactory = entryFactory;
 		try {
-			entries = forkJoinPool.submit(() -> vehicles.parallel()//
-					.map(v -> entryFactory.create(v, currentTime))//
-					.filter(Objects::nonNull)//
-					.collect(Collectors.toMap(e -> e.vehicle.getId(), e -> e)))//
-					.get();
+			entries = forkJoinPool.submit(() -> vehicles.parallel()
+					.map(v -> entryFactory.create(v, currentTime))
+					.filter(Objects::nonNull)
+					.collect(Collectors.toMap(e -> e.vehicle.getId(), e -> e))).get();
 		} catch (InterruptedException | ExecutionException e) {
 			throw new RuntimeException(e);
 		}
