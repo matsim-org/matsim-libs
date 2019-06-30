@@ -81,8 +81,6 @@ public class EvNetworkRoutingProvider implements Provider<RoutingModule> {
 	 * @param routingMode
 	 */
 	public EvNetworkRoutingProvider(String mode, String routingMode) {
-		//		log.setLevel(Level.DEBUG);
-
 		this.mode = mode;
 		this.routingMode = routingMode;
 	}
@@ -130,8 +128,7 @@ public class EvNetworkRoutingProvider implements Provider<RoutingModule> {
 			return new EvNetworkRoutingModule(mode, filteredNetwork,
 					DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo),
 					electricFleetSpecification, chargingInfrastructureSpecification, travelTime,
-					driveConsumptionFactory,
-					auxConsumptionFactory);
+					driveConsumptionFactory, auxConsumptionFactory);
 		}
 	}
 }
