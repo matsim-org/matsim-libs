@@ -18,7 +18,7 @@
 
 package org.matsim.contrib.drt.routing;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -132,7 +132,7 @@ public class DefaultAccessEgressStopFinder implements AccessEgressStopFinder {
 	}
 
 	private Set<TransitStopFacility> findStopCandidates(Coord coord) {
-		Set<TransitStopFacility> candidates = new HashSet<>();
+		Set<TransitStopFacility> candidates = new LinkedHashSet<>();
 		double extensionRadius = 0.0;
 		while (candidates.isEmpty()) {
 			double maxBeelineDistance = ((maxWalkDistance + extensionRadius) / walkBeelineFactor);
