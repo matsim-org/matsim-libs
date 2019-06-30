@@ -21,7 +21,6 @@ package org.matsim.contrib.ev.charging;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -41,7 +40,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 
 	private final Map<Id<ElectricVehicle>, ElectricVehicle> pluggedVehicles = new LinkedHashMap<>();
 	private final Queue<ElectricVehicle> queuedVehicles = new LinkedList<>();
-	private final Map<Id<ElectricVehicle>, ChargingListener> listeners = new HashMap<>();
+	private final Map<Id<ElectricVehicle>, ChargingListener> listeners = new LinkedHashMap<>();
 
 	public ChargingWithQueueingLogic(Charger charger, ChargingStrategy chargingStrategy, EventsManager eventsManager) {
 		this.chargingStrategy = Objects.requireNonNull(chargingStrategy);

@@ -17,13 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
 package org.matsim.contrib.drt.analysis.zonal;
 
-import com.google.inject.Provider;
-import com.google.inject.name.Named;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
@@ -34,24 +35,18 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
-import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
+import com.google.inject.Provider;
+import com.google.inject.name.Named;
 
 /**
  * @author jbischoff
- *
  */
 public class DrtZonalSystem {
 
-	private final Map<Id<Link>, String> link2zone = new HashMap<>();
+	private final Map<Id<Link>, String> link2zone = new LinkedHashMap<>();
 	private final Network network;
 	private final Map<String, Geometry> zones;
 
-	/**
-	 *
-	 */
 	public DrtZonalSystem(Network network, double cellSize) {
 		this.network = network;
 		zones = DrtGridUtils.createGridFromNetwork(network, cellSize);
