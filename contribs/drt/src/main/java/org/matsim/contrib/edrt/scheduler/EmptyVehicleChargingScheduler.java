@@ -53,7 +53,7 @@ public class EmptyVehicleChargingScheduler {
 			MobsimTimer timer, DrtTaskFactory taskFactory, ChargingInfrastructure chargingInfrastructure) {
 		this.timer = timer;
 		this.taskFactory = (EDrtTaskFactoryImpl)taskFactory;
-		linkToChargerMap = chargingInfrastructure.getChargers().values().stream()//
+		linkToChargerMap = chargingInfrastructure.getChargers().values().stream()
 				.collect(Collectors.toMap(c -> c.getLink().getId(), c -> c));
 	}
 
