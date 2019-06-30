@@ -68,21 +68,22 @@ public class VehicleData {
 
 			latestArrivalTime = calcLatestArrivalTime();
 			// essentially the min of the latest possible arrival times at this stop
-			
+
 			latestDepartureTime = calcLatestDepartureTime();
 			// essentially the min of the latest possible pickup times at this stop
-			
+
 			occupancyChange = task.getPickupRequests().size() - task.getDropoffRequests().size();
 		}
 
 		private double calcLatestArrivalTime() {
 			return getMaxTimeConstraint(
-					task.getDropoffRequests().stream().mapToDouble(DrtRequest::getLatestArrivalTime),
+					task.getDropoffRequests().values().stream().mapToDouble(DrtRequest::getLatestArrivalTime),
 					task.getBeginTime());
 		}
 
 		private double calcLatestDepartureTime() {
-			return getMaxTimeConstraint(task.getPickupRequests().stream().mapToDouble(DrtRequest::getLatestStartTime),
+			return getMaxTimeConstraint(
+					task.getPickupRequests().values().stream().mapToDouble(DrtRequest::getLatestStartTime),
 					task.getEndTime());
 		}
 

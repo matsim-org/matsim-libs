@@ -19,10 +19,11 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.Set;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.dynagent.FirstLastSimStepDynActivity;
@@ -36,17 +37,16 @@ import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 public class BusStopActivity extends FirstLastSimStepDynActivity implements PassengerPickupActivity {
 	private final PassengerEngine passengerEngine;
 	private final DynAgent driver;
-	private final Set<? extends PassengerRequest> dropoffRequests;
-	private final Set<? extends PassengerRequest> pickupRequests;
+	private final Map<Id<Request>, ? extends PassengerRequest> dropoffRequests;
+	private final Map<Id<Request>, ? extends PassengerRequest> pickupRequests;
 	private final double expectedEndTime;
 
 	private int passengersPickedUp = 0;
 
 	public BusStopActivity(PassengerEngine passengerEngine, DynAgent driver, StayTask task,
-			Set<? extends PassengerRequest> dropoffRequests, Set<? extends PassengerRequest> pickupRequests,
-			String activityType) {
+			Map<Id<Request>, ? extends PassengerRequest> dropoffRequests,
+			Map<Id<Request>, ? extends PassengerRequest> pickupRequests, String activityType) {
 		super(activityType);
-
 		this.passengerEngine = passengerEngine;
 		this.driver = driver;
 		this.dropoffRequests = dropoffRequests;
@@ -62,7 +62,7 @@ public class BusStopActivity extends FirstLastSimStepDynActivity implements Pass
 	@Override
 	protected void beforeFirstStep(double now) {
 		// TODO probably we should simulate it more accurately (passenger by passenger, not all at once...)
-		for (PassengerRequest request : dropoffRequests) {
+		for (PassengerRequest request : dropoffRequests.values()) {
 			passengerEngine.dropOffPassenger(driver, request, now);
 		}
 	}
@@ -70,7 +70,7 @@ public class BusStopActivity extends FirstLastSimStepDynActivity implements Pass
 	@Override
 	protected void simStep(double now) {
 		if (now == expectedEndTime) {
-			for (PassengerRequest request : pickupRequests) {
+			for (PassengerRequest request : pickupRequests.values()) {
 				if (passengerEngine.pickUpPassenger(this, driver, request, now)) {
 					passengersPickedUp++;
 				}
@@ -93,7 +93,7 @@ public class BusStopActivity extends FirstLastSimStepDynActivity implements Pass
 	}
 
 	private PassengerRequest getRequestForPassenger(Id<Person> passengerId) {
-		return pickupRequests.stream()
+		return pickupRequests.values().stream()
 				.filter(r -> passengerId.equals(r.getPassengerId()))
 				.findAny()
 				.orElseThrow(() -> new IllegalArgumentException("I am waiting for different passengers!"));
