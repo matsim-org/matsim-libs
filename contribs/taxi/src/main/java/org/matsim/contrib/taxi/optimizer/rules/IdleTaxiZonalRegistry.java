@@ -19,7 +19,6 @@
 
 package org.matsim.contrib.taxi.optimizer.rules;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +54,7 @@ public class IdleTaxiZonalRegistry {
 
 		vehiclesInZones = Maps.newHashMapWithExpectedSize(zonalSystem.getZones().size());
 		for (Id<Zone> id : zonalSystem.getZones().keySet()) {
-			vehiclesInZones.put(id, new HashMap<>());
+			vehiclesInZones.put(id, new LinkedHashMap<>());//LinkedHashMap to preserve iteration order
 		}
 	}
 
@@ -90,12 +89,13 @@ public class IdleTaxiZonalRegistry {
 	}
 
 	public Stream<DvrpVehicle> findNearestVehicles(Node node, int minCount, Predicate<DvrpVehicle> vehicleFilter) {
-		Predicate<DvrpVehicle> idleVehicleFilter = vehicleFilter == null ? scheduleInquiry::isIdle
-				: vehicleFilter.and(scheduleInquiry::isIdle);
+		Predicate<DvrpVehicle> idleVehicleFilter = vehicleFilter == null ?
+				scheduleInquiry::isIdle :
+				vehicleFilter.and(scheduleInquiry::isIdle);
 
-		return minCount >= vehicles.size() //
-				? vehicles.values().stream().filter(idleVehicleFilter)
-				: zonesSortedByDistance.get(zonalSystem.getZone(node).getId()).stream()//
+		return minCount >= vehicles.size() ?
+				vehicles.values().stream().filter(idleVehicleFilter) :
+				zonesSortedByDistance.get(zonalSystem.getZone(node).getId()).stream()//
 						.flatMap(z -> vehiclesInZones.get(z.getId()).values().stream())//
 						.filter(idleVehicleFilter)//
 						.limit(minCount);
