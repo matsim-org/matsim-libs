@@ -73,8 +73,9 @@ public class UnplannedRequestZonalRegistry {
 	}
 
 	public Stream<TaxiRequest> findNearestRequests(Node node, int minCount) {
-		return zonesSortedByDistance.get(zonalSystem.getZone(node).getId()).stream()//
-				.flatMap(z -> requestsInZones.get(z.getId()).values().stream())//
+		return zonesSortedByDistance.get(zonalSystem.getZone(node).getId())
+				.stream()
+				.flatMap(z -> requestsInZones.get(z.getId()).values().stream())
 				.limit(minCount);
 	}
 

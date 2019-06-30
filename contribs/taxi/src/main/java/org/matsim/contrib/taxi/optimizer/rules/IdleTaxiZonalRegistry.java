@@ -95,9 +95,10 @@ public class IdleTaxiZonalRegistry {
 
 		return minCount >= vehicles.size() ?
 				vehicles.values().stream().filter(idleVehicleFilter) :
-				zonesSortedByDistance.get(zonalSystem.getZone(node).getId()).stream()//
-						.flatMap(z -> vehiclesInZones.get(z.getId()).values().stream())//
-						.filter(idleVehicleFilter)//
+				zonesSortedByDistance.get(zonalSystem.getZone(node).getId())
+						.stream()
+						.flatMap(z -> vehiclesInZones.get(z.getId()).values().stream())
+						.filter(idleVehicleFilter)
 						.limit(minCount);
 	}
 
