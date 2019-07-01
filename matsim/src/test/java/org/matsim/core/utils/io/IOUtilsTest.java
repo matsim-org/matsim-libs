@@ -42,6 +42,7 @@ import org.matsim.testcases.MatsimTestUtils;
 /**
  * @author mrieser
  * @author dgrether
+ * @author sebhoerl
  */
 public class IOUtilsTest {
 
@@ -241,6 +242,30 @@ public class IOUtilsTest {
 		File file = new File(filename);
 		Assert.assertTrue("compressed file should be equal 62 bytes, but is " + file.length(), file.length() == 62);
 	}
+	
+	@Test
+	public void testGetBufferedWriter_append_bz2() throws IOException {
+		String filename = this.utils.getOutputDirectory() + "test.txt.bz2";
+		BufferedWriter writer = IOUtils.getAppendingBufferedWriter(filename);
+		writer.write("aaa");
+		writer.close();
+		try {
+			IOUtils.getAppendingBufferedWriter(filename);
+			Assert.fail("expected exception.");
+		} catch (IllegalArgumentException e) {
+			log.info("Catched expected exception.", e);
+		}
+	}
+
+	@Test
+	public void testGetBufferedWriter_bz2() throws IOException {
+		String filename = this.utils.getOutputDirectory() + "test.txt.bz2";
+		BufferedWriter writer = IOUtils.getBufferedWriter(filename);
+		writer.write("12345678901234567890123456789012345678901234567890");
+		writer.close();
+		File file = new File(filename);
+		Assert.assertTrue("compressed file should be equal 62 bytes, but is " + file.length(), file.length() == 62);
+	}
 
 	@Test
 	public void testGetInputStream_UTFwithoutBOM() throws IOException {
@@ -283,6 +308,19 @@ public class IOUtilsTest {
 	@Test
 	public void testGetInputStream_UTFwithBOM_Lz4() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt.lz4";
+		OutputStream out = IOUtils.getOutputStream(filename);
+		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
+		out.write("ABCdef".getBytes());
+		out.close();
+
+		InputStream in = IOUtils.getInputStream(filename);
+		Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+		in.close();
+	}
+	
+	@Test
+	public void testGetInputStream_UTFwithBOM_bz2() throws IOException {
+		String filename = utils.getOutputDirectory() + "test.txt.bz2";
 		OutputStream out = IOUtils.getOutputStream(filename);
 		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
 		out.write("ABCdef".getBytes());
@@ -375,6 +413,31 @@ public class IOUtilsTest {
 	@Test
 	public void testGetBufferedReader_UTFwithBOM_lz4() throws IOException {
 		String filename = utils.getOutputDirectory() + "test.txt.lz4";
+		OutputStream out = IOUtils.getOutputStream(filename);
+		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
+		out.write("ABCdef".getBytes());
+		out.close();
+		
+		{
+			BufferedReader in = IOUtils.getBufferedReader(filename);
+			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			in.close();
+		}
+		{
+			BufferedReader in = IOUtils.getBufferedReader(filename, IOUtils.CHARSET_UTF8);
+			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			in.close();
+		}
+		{
+			BufferedReader in = IOUtils.getBufferedReader(filename, IOUtils.CHARSET_WINDOWS_ISO88591);
+			Assert.assertEquals("ABCdef", new String(new byte[] { (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read(), (byte) in.read() }));
+			in.close();
+		}
+	}
+	
+	@Test
+	public void testGetBufferedReader_UTFwithBOM_bz2() throws IOException {
+		String filename = utils.getOutputDirectory() + "test.txt.bz2";
 		OutputStream out = IOUtils.getOutputStream(filename);
 		out.write(new byte[] {(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
 		out.write("ABCdef".getBytes());

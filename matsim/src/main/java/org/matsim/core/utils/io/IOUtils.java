@@ -20,8 +20,8 @@
 
 package org.matsim.core.utils.io;
 
-import net.jpountz.lz4.LZ4BlockInputStream;
-import net.jpountz.lz4.LZ4BlockOutputStream;
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedInputStream;
@@ -47,15 +47,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Locale;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 /** A class with some static utility functions for file-I/O. */
 public class IOUtils {
-
-	private static final String GZ = ".gz";
-	private static final String LZ4 = ".lz4";
+	private static final Map<String, String> COMPRESSIONS = new HashMap<>();
+	
+	static {
+		COMPRESSIONS.put("gz", CompressorStreamFactory.GZIP);
+		COMPRESSIONS.put("bz2", CompressorStreamFactory.BZIP2);
+		COMPRESSIONS.put("lz4", CompressorStreamFactory.LZ4_BLOCK);
+	}
 
 	public static final Charset CHARSET_UTF8 = StandardCharsets.UTF_8;
 	public static final Charset CHARSET_WINDOWS_ISO88591 = StandardCharsets.ISO_8859_1;
@@ -150,30 +154,42 @@ public class IOUtils {
 		return infile;
 	}
 
+	private static String getCompressionExtension(String filename) {
+		for (String compression : COMPRESSIONS.keySet()) {
+			if (filename.endsWith("." + compression)) {
+				return compression;
+			}
+		}
+		
+		return null;
+	}
 
 	/**
 	 * Tries to open the specified file for writing and returns a BufferedWriter for it.
-	 * Supports gzip-compression of the written data. The filename may contain the
-	 * ending ".gz". If no compression is to be used, the ending will be removed
+	 * Supports gzip-compression of the written data. The filename may contain a
+	 * compression ending (*.gz, *.bz2, *.lz4). If no compression is to be used, the ending will be removed
 	 * from the filename. If compression is to be used and the filename does not yet
-	 * have the ending ".gz", the ending will be added to it.
+	 * have a compression ending, the .gz ending will be added to it.
 	 *
 	 * @param filename The filename where to write the data.
-	 * @param useCompression whether the file should be gzip-compressed or not.
+	 * @param useCompression whether the file should be compressed or not.
 	 * @return BufferedWriter for the specified file.
 	 * @throws UncheckedIOException
 	 */
-	public static BufferedWriter getBufferedWriter(final String filename, final boolean useCompression) throws UncheckedIOException {
+	public static BufferedWriter getBufferedWriter(String filename, final boolean useCompression) throws UncheckedIOException {
 		if (filename == null) {
 			throw new UncheckedIOException(new FileNotFoundException("No filename given (filename == null)"));
 		}
-		if (useCompression && !filename.endsWith(GZ)) {
-			return getBufferedWriter(filename + GZ);
-		} else if (!useCompression && filename.endsWith(GZ)) {
-			return getBufferedWriter(filename.substring(0, filename.length() - 3));
-		} else {
-			return getBufferedWriter(filename);
+		
+		String compressionExtension = getCompressionExtension(filename);
+		
+		if (useCompression && compressionExtension == null) {
+			filename += ".gz";
+		} else if (!useCompression && compressionExtension != null) {
+			filename = filename.substring(0, filename.length() - compressionExtension.length() - 1);
 		}
+		
+		return getBufferedWriter(filename);
 	}
 
 
@@ -249,7 +265,7 @@ public class IOUtils {
 	 * @throws UncheckedIOException
 	 */
 	public static BufferedWriter getBufferedWriter(final String filename, final Charset charset, final boolean append) throws UncheckedIOException {
-		if (filename == null) {
+		if (filename == null) {;
 			throw new UncheckedIOException(new FileNotFoundException("No filename given (filename == null)"));
 		}
 		try {
@@ -305,58 +321,46 @@ public class IOUtils {
 
 	/**
 	 * Tries to open the specified file for reading and returns an InputStream for it.
-	 * Supports gzip-compressed files, such files are automatically decompressed.
-	 * If the file is not found, a gzip-compressed version of the file with the
-	 * added ending ".gz" will be searched for and used if found.
-	 *
-	 * @param filename The file to read, may contain the ending ".gz" to force reading a compressed file.
+	 * 
+	 * <ul>
+	 * <li>If the file is not found in the file system, we try to find it in the class path.</li>
+	 * <li>Depending on the file extension, we uncompress the file, for: *.gz, *.bz2, *.lz4</li>
+	 * </ul>
+	 * 
+	 * @param filename The file to read
 	 * @return InputStream for the specified file.
 	 * @throws UncheckedIOException
-	 *
-	 * <br> author dgrether
 	 */
 	public static InputStream getInputStream(final String filename) throws UncheckedIOException {
-		InputStream inputStream = null;
 		if (filename == null) {
 			throw new UncheckedIOException(new FileNotFoundException("No filename given (filename == null)"));
 		}
+
 		try {
-			// search in file system
+			InputStream inputStream = null;
+
 			if (new File(filename).exists()) {
-				if (filename.endsWith(GZ)) {
-					inputStream = new GZIPInputStream(new FileInputStream(filename));
-				}else if (filename.endsWith(LZ4)) {
-					inputStream = new UnicodeInputStream(new LZ4BlockInputStream(new FileInputStream(filename)));
-				} else {
-					inputStream = new FileInputStream(filename);
-				}
-			} else if (new File(filename + GZ).exists()) {
-				inputStream = new GZIPInputStream(new FileInputStream(filename + GZ));
-			}  else {
-				// search in classpath
-				InputStream stream = IOUtils.class.getClassLoader().getResourceAsStream(filename);
-				if (stream != null) {
-					if (filename.endsWith(GZ)) {
-						inputStream = new GZIPInputStream(stream);
-					}
-					else {
-						inputStream = stream;
-					}
-				} else {
-					stream = IOUtils.class.getClassLoader().getResourceAsStream(filename + GZ);
-					if (stream != null) {
-						inputStream = new GZIPInputStream(stream);
-					}
-				}
+				inputStream = new FileInputStream(filename);
+				log.info("Streaming file from file system: " + filename);
+			} else {
+				inputStream = IOUtils.class.getClassLoader().getResourceAsStream(filename);
+
 				if (inputStream != null) {
-					log.info("streaming file from classpath: " + filename);
+					log.info("Streaming file from classpath: " + filename);
+				} else {
+					throw new FileNotFoundException(filename);
 				}
 			}
-			if (inputStream == null) {
-				throw new FileNotFoundException(filename);
+			
+			String compressionExtension = getCompressionExtension(filename);
+			
+			if (compressionExtension != null) {
+				CompressorStreamFactory factory = new CompressorStreamFactory();
+				inputStream = factory.createCompressorInputStream(COMPRESSIONS.get(compressionExtension), inputStream);
 			}
-			return new BufferedInputStream(new UnicodeInputStream(inputStream));
-		} catch (IOException e) {
+
+			return new BufferedInputStream(inputStream);
+		} catch (FileNotFoundException | CompressorException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
@@ -378,35 +382,34 @@ public class IOUtils {
 	}
 
 	/**
-	 * Returns a buffered and optionally gzip-compressed output stream to the specified file.
-	 * If the given filename ends with ".gz", the written file content will be automatically 
-	 * compressed with the gzip-algorithm.
+	 * Returns a buffered and optionally compressed output stream to the specified file.
+	 * If the given filename ends with a compression extension (*.gz, *.bz2, *.lz4), the written file content will be automatically 
+	 * compressed with the respective algorithm.
 	 * 
 	 * @throws UncheckedIOException if the file cannot be created.
-	 * 
-	 * <br> author mrieser
 	 */
 	public static OutputStream getOutputStream(final String filename, boolean append) throws UncheckedIOException {
 		if (filename == null) {
 			throw new UncheckedIOException(new FileNotFoundException("No filename given (filename == null)"));
 		}
+		
 		try {
-			if (filename.toLowerCase(Locale.ROOT).endsWith(GZ)) {
-				File f = new File(filename);
-				if (append && f.exists() && (f.length() > 0)) {
-					throw new IllegalArgumentException("Appending to an existing gzip-compressed file is not supported.");
-				}
-				return new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(filename, append)));
-			} else if (filename.toLowerCase(Locale.ROOT).endsWith(LZ4)) {
-				File f = new File(filename);
-				if (append && f.exists() && (f.length() > 0)) {
-					throw new IllegalArgumentException("Appending to an existing lz4-compressed file is not supported.");
-				}
-				return new BufferedOutputStream(new LZ4BlockOutputStream(new FileOutputStream(filename)));
-			}else {
-				return new BufferedOutputStream(new FileOutputStream (filename, append));
+			String compressionExtension = getCompressionExtension(filename);
+			
+			if (compressionExtension != null && new File(filename).exists() && append) {
+				throw new IllegalArgumentException("Appending to a compressed file is not supported.");
 			}
-		} catch (IOException e) {
+			
+			OutputStream outputStream = new FileOutputStream(new File(filename), append);
+			
+			if (compressionExtension != null) {
+				CompressorStreamFactory factory = new CompressorStreamFactory();
+				outputStream = factory.createCompressorOutputStream(COMPRESSIONS.get(compressionExtension), outputStream);
+			}
+			
+			return new BufferedOutputStream(outputStream);
+		} catch (IOException | CompressorException e) {
+			
 			throw new UncheckedIOException(e);
 		}
 	}
@@ -421,15 +424,8 @@ public class IOUtils {
 		if (filename == null) {
 			throw new UncheckedIOException(new FileNotFoundException("No filename given (filename == null)"));
 		}
-		try {
-			if (filename.toLowerCase(Locale.ROOT).endsWith(GZ)) {
-				return new PrintStream(new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(filename))));
-			} else {
-				return new PrintStream(new BufferedOutputStream(new FileOutputStream (filename))) ;
-			}
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		
+		return new PrintStream(getOutputStream(filename));
 	}
 
 	// Compares two InputStreams.
