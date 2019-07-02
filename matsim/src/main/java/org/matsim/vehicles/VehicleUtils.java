@@ -44,6 +44,8 @@ public class VehicleUtils {
 	private static final String HBEFA_TECHNOLOGY = "HbefaTechnology";
 	private static final String HBEFA_SIZE_CLASS = "HbefaSizeClass";
 	private static final String HBEFA_EMISSIONS_CONCEPT = "HbefaEmissionsConcept";
+	private static final String COST_PER_SECOND_WAITING = "costsPerSecondWaiting";
+	private static final String COST_PER_SECOND_INSERVICE = "costsPerSecondInService";
 
 	static {
 		VehicleCapacityImpl capacity = new VehicleCapacityImpl();
@@ -62,6 +64,8 @@ public class VehicleUtils {
 	public static VehicleType getDefaultVehicleType() {
 		return DEFAULT_VEHICLE_TYPE;
 	}
+
+	//******** general VehicleType attributes ************
 
 	public static DoorOperationMode getDoorOperationMode( VehicleType vehicleType ){
 		final Object attribute = vehicleType.getAttributes().getAttribute( DOOR_OPERATION_MODE );
@@ -127,6 +131,7 @@ public class VehicleUtils {
 		vehicleType.getAttributes().putAttribute(FUELCONSUMPTION, literPerMeter);
 	}
 
+	//TODO: Remove here, because we now let in engineInformation as seperate field?
 	public static EngineInformation getEngineInformation(VehicleType vehicleType){
 		EngineInformation engineInformation = vehicleType.getEngineInformation();
 		//if not stored in the "old" format, organize values from the attributes. This will be probably changed in the future, kmt mar'19
@@ -136,11 +141,13 @@ public class VehicleUtils {
 		return engineInformation;
 	}
 
+	//TODO: Remove here, because we now let in engineInformation as seperate field?
 	public static void setEngineInformation(VehicleType vehicleType, EngineInformation.FuelType fuelType, double literPerMeter){
 		vehicleType.setEngineInformation(new EngineInformationImpl(fuelType));
 		setFuelConsumption(vehicleType, literPerMeter);
 	}
 
+	//TODO: Remove here, because we now let in engineInformation as seperate field?
 	public static void setEngineInformation(VehicleType vehicleType, Attributes currAttributes) {
 		vehicleType.setEngineInformation(new EngineInformationImpl());
 		if (currAttributes == null || currAttributes.isEmpty()){
@@ -153,12 +160,14 @@ public class VehicleUtils {
 		}
 	}
 
-	public static double getFreightCapacityUnits (VehicleType vehicleType) {
-		return (int) vehicleType.getAttributes().getAttribute(FREIGHT_CAPACITY_UNITS);
+	//******** EngineInformation attributes ************
+
+	public static double getFreightCapacityUnits (VehicleCapacity vehicleCapacity) {
+		return (int) vehicleCapacity.getAttributes().getAttribute(FREIGHT_CAPACITY_UNITS);
 	}
 
-	public static void setFreightCapacityUnits(VehicleType vehicleType, double units) {
-		vehicleType.getAttributes().putAttribute(FREIGHT_CAPACITY_UNITS, units);
+	public static void setFreightCapacityUnits(VehicleCapacity vehicleCapacity, double units) {
+		vehicleCapacity.getAttributes().putAttribute(FREIGHT_CAPACITY_UNITS, units);
 	}
 
 //	public static String getHbefaTechnology(VehicleType vehicleType){
@@ -166,6 +175,8 @@ public class VehicleUtils {
 ////		return (String) attribute;
 //		return getHbefaTechnology( vehicleType.getEngineInformation() ) ;
 //	}
+
+	//******** EngineInformation attributes ************
 
 	public static String getHbefaTechnology( EngineInformation ei ){
 		return (String) ei.getAttributes().getAttribute( HBEFA_TECHNOLOGY ) ;
@@ -211,8 +222,21 @@ public class VehicleUtils {
 		engineInformation.getAttributes().putAttribute( HBEFA_EMISSIONS_CONCEPT, emissionsConcept ) ;
 	}
 
-	//TODO Setter for
-	// private static final String HBEFA_VEHICLE_CATEGORY_= "HbefaVehicleCategory";
-	//	private static final String HBEFA_SIZE_CLASS = "HbefaSizeClass";
-	//	private static final String HBEFA_EMISSIONS_CONCEPT = "EmissionsConcept";
+	//******** CostInformation attributes ************
+	public static double getCostsPerSecondWaiting(CostInformation costInformation) {
+		return (double) costInformation.getAttributes().getAttribute(COST_PER_SECOND_WAITING);
+	}
+
+	public static void setCostsPerSecondWaiting(CostInformation costInformation, double costsPerSecond) {
+		costInformation.getAttributes().putAttribute(COST_PER_SECOND_WAITING, costsPerSecond);
+	}
+
+	public static double getCostsPerSecondInService(CostInformation costInformation) {
+		return (double) costInformation.getAttributes().getAttribute(COST_PER_SECOND_INSERVICE);
+	}
+
+	public static void setCostsPerSecondInService(CostInformation costInformation, double costsPerSecond) {
+		costInformation.getAttributes().putAttribute(COST_PER_SECOND_INSERVICE, costsPerSecond);
+	}
+
 }
