@@ -19,7 +19,9 @@
 
 package org.matsim.vehicles;
 
-public interface CostInformation {
+import org.matsim.utils.objectattributes.attributable.Attributable;
+
+public interface CostInformation extends Attributable {
 
     public double getFixedCosts();
     public double getCostsPerMeter();
