@@ -3,6 +3,11 @@
  */
 package org.matsim.codeexamples.extensions.dvrp;
 
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
+
+import java.net.URL;
+
 /**
  * Maybe somewhat in contrast to intuition, this example is not the simplest one, since it already plugs 3 things together:<ul>
  * <li> the optimizer (which optimizes the dispatch)
@@ -18,7 +23,9 @@ package org.matsim.codeexamples.extensions.dvrp;
 public class RunOneTaxiExample {
 
 	public static void main(String[] args) {
-		org.matsim.contrib.dvrp.examples.onetaxi.RunOneTaxiExample.main() ;
+		URL configUrl = IOUtils.newUrl( ExamplesUtils.getTestScenarioURL("dvrp-grid" ),
+			  "generic_dvrp_one_taxi_config.xml" );
+		org.matsim.contrib.dvrp.examples.onetaxi.RunOneTaxiExample.run(configUrl, "one_taxi_vehicles.xml", false, 0 );
 	}
 
 }

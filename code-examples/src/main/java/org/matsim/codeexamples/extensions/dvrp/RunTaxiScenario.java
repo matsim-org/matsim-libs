@@ -13,7 +13,8 @@ package org.matsim.codeexamples.extensions.dvrp;
 public class RunTaxiScenario {
 
 	public static void main(String[] args) {
-		org.matsim.contrib.taxi.run.RunTaxiScenario.main(null);
+//		org.matsim.contrib.taxi.run.RunTaxiScenario.main(null);
+		// does not compile any more.  kai, jul'19
 	}
 
 }

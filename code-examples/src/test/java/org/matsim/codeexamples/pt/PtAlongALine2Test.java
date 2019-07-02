@@ -18,6 +18,7 @@ import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
+import org.matsim.contrib.etaxi.optimizer.assignment.ETaxiToPlugAssignmentCostProvider;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -66,9 +67,17 @@ public class PtAlongALine2Test{
 		// (as of today, will also influence router. kai, jun'19)
 
 		if(  drtMode == DrtMode.teleportBeeline ){// (configure teleportation router)
-			config.plansCalcRoute().addModeRoutingParams( new ModeRoutingParams().setMode( TransportMode.drt ).setTeleportedModeSpeed( 100. / 3.6 ) );
+			{
+				ModeRoutingParams mrp = new ModeRoutingParams();
+				mrp.setMode( TransportMode.drt );
+				mrp.setTeleportedModeSpeed( 100. / 3.6 );
+				config.plansCalcRoute().addModeRoutingParams( mrp );
+			}
 			if( drt2 ){
-				config.plansCalcRoute().addModeRoutingParams( new ModeRoutingParams().setMode( "drt2" ).setTeleportedModeSpeed( 100. / 3.6 ) );
+				ModeRoutingParams mrp = new ModeRoutingParams();
+				mrp.setMode( "drt2" );
+				mrp.setTeleportedModeSpeed( 100. / 3.6 );
+				config.plansCalcRoute().addModeRoutingParams( mrp );
 			}
 			// teleportation router for walk or bike is automatically defined.
 		} else if( drtMode == DrtMode.teleportBasedOnNetworkRoute ){// (route as network route)
