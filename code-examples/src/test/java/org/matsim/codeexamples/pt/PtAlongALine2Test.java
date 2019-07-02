@@ -43,7 +43,7 @@ public class PtAlongALine2Test{
 
 	enum DrtMode { none, teleportBeeline, teleportBasedOnNetworkRoute, full }
 	private DrtMode drtMode = DrtMode.full ;
-	private boolean drt2 = false ;
+	private boolean drt2 = true ;
 
 	@Test
 	public void testPtAlongALineWithRaptorAndDrtServiceArea() {
@@ -91,6 +91,13 @@ public class PtAlongALine2Test{
 			config.plansCalcRoute().setNetworkModes( networkModes );
 		}
 
+		{
+			ModeRoutingParams wlk = new ModeRoutingParams(  ) ;
+			wlk.setMode( "wlk" ) ;
+			wlk.setTeleportedModeSpeed( 5./3.6 ) ;
+			config.plansCalcRoute().addModeRoutingParams( wlk );
+		}
+
 		// === RAPTOR: ===
 		{
 			SwissRailRaptorConfigGroup configRaptor = ConfigUtils.addOrGetModule( config, SwissRailRaptorConfigGroup.class ) ;
@@ -100,7 +107,8 @@ public class PtAlongALine2Test{
 				{
 					// Xxx
 					IntermodalAccessEgressParameterSet paramSetXxx = new IntermodalAccessEgressParameterSet();
-					paramSetXxx.setMode( TransportMode.walk );
+//					paramSetXxx.setMode( TransportMode.walk ); // this does not work because sbb raptor treats it in a special way
+					paramSetXxx.setMode( "wlk" );
 					paramSetXxx.setRadius( 1000000 );
 					configRaptor.addIntermodalAccessEgress( paramSetXxx );
 					// (in principle, walk as alternative to drt will not work, since drt is always faster.  Need to give the ASC to the router!  However, with
@@ -128,6 +136,14 @@ public class PtAlongALine2Test{
 		// === SCORING: ===
 
 		if ( drtMode!=DrtMode.none ) {
+//			{
+//				PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("access_walk");
+//				config.planCalcScore().addModeParams(modeParams);
+//			}
+//			{
+//				PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("egress_walk");
+//				config.planCalcScore().addModeParams(modeParams);
+//			}
 			// (scoring parameters for drt modes)
 			{
 				PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.drt);
@@ -137,6 +153,10 @@ public class PtAlongALine2Test{
 				PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("drt2");
 				config.planCalcScore().addModeParams(modeParams);
 			}
+		}
+		{
+			PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("wlk");
+			config.planCalcScore().addModeParams(modeParams);
 		}
 
 		config.qsim().setSimStarttimeInterpretation( QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime );
@@ -205,17 +225,9 @@ public class PtAlongALine2Test{
 
 		//		// TODO: reference somehow network creation, to ensure that these link ids exist
 		//		// add drt modes to the car links' allowed modes in their respective service area
-		PtAlongALineTest.addModeToAllLinksBtwnGivenNodes(scenario.getNetwork(), 0, 1000, TransportMode.drt );
-		// 600 = bad
-		// 606 = bad
-		// 608 = bad
-
-		// 609 = good
-		// 612 = good
-		// 625 = good
-		// 650 = good
+		PtAlongALineTest.addModeToAllLinksBtwnGivenNodes(scenario.getNetwork(), 0, 400, TransportMode.drt );
 		if ( drt2 ){
-			PtAlongALineTest.addModeToAllLinksBtwnGivenNodes( scenario.getNetwork(), 550, 1000, "drt2" );
+			PtAlongALineTest.addModeToAllLinksBtwnGivenNodes( scenario.getNetwork(), 600, 1000, "drt2" );
 		}
 
 
