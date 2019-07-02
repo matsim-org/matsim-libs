@@ -34,16 +34,23 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.*;
+
 public class PtAlongALine2Test{
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	enum DrtMode { none, teleportBeeline, teleportBasedOnNetworkRoute, full }
-	private DrtMode drtMode = DrtMode.teleportBasedOnNetworkRoute ;
+	private DrtMode drtMode = DrtMode.full ;
 	private boolean drt2 = false ;
 
 	@Test
 	public void testPtAlongALineWithRaptorAndDrtServiceArea() {
+		// Towards some understanding of what is going on here:
+		// * In many situations, a good solution is that drt drives to some transit stop, and from there directly to the destination.  The swiss rail
+		// raptor will return a cost "infinity" of such a solution, in which case the calling method falls back onto transit_walk.
+		// * If "walk" is defined as intermodal access, then swiss rail raptor will call the correct RoutingModule, but afterwards change the mode of all
+		// legs to non_network_mode.
 
 		Config config = PtAlongALineTest.createConfig( utils.getOutputDirectory() );
 
@@ -58,49 +65,29 @@ public class PtAlongALine2Test{
 		config.qsim().setVehiclesSource( QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData );
 		// (as of today, will also influence router. kai, jun'19)
 
-		switch ( drtMode ) {
-			case none:
-				break;
-			case teleportBeeline:
-				// (configure teleportation router)
-			{
-				PlansCalcRouteConfigGroup.ModeRoutingParams pars = new PlansCalcRouteConfigGroup.ModeRoutingParams();
-				pars.setMode( TransportMode.drt );
-				pars.setTeleportedModeSpeed( 100. / 3.6 );
-				config.plansCalcRoute().addModeRoutingParams( pars );
-			}
-			if ( drt2 ) {
-				PlansCalcRouteConfigGroup.ModeRoutingParams pars = new PlansCalcRouteConfigGroup.ModeRoutingParams();
-				pars.setMode( "drt2" );
-				pars.setTeleportedModeSpeed( 100. / 3.6 );
-				config.plansCalcRoute().addModeRoutingParams( pars );
+		if(  drtMode == DrtMode.teleportBeeline ){// (configure teleportation router)
+			config.plansCalcRoute().addModeRoutingParams( new ModeRoutingParams().setMode( TransportMode.drt ).setTeleportedModeSpeed( 100. / 3.6 ) );
+			if( drt2 ){
+				config.plansCalcRoute().addModeRoutingParams( new ModeRoutingParams().setMode( "drt2" ).setTeleportedModeSpeed( 100. / 3.6 ) );
 			}
 			// teleportation router for walk or bike is automatically defined.
-			break;
-			case teleportBasedOnNetworkRoute: {
-				// (route as network route)
-				Set<String> networkModes = new HashSet<>( config.plansCalcRoute().getNetworkModes() );
-				networkModes.add( TransportMode.drt );
-				if ( drt2 ){
-					networkModes.add( "drt2" );
-				}
-				config.plansCalcRoute().setNetworkModes( networkModes );
-				break; }
-			case full:
-				break;
-			default:
-				throw new IllegalStateException( "Unexpected value: " + drtMode );
+		} else if( drtMode == DrtMode.teleportBasedOnNetworkRoute ){// (route as network route)
+			//			config.plansCalcRoute().removeModeRoutingParams( TransportMode.walk );
+			Set<String> networkModes = new HashSet<>( config.plansCalcRoute().getNetworkModes() );
+			networkModes.add( TransportMode.drt );
+			//			networkModes.add( TransportMode.walk );
+			if( drt2 ){
+				networkModes.add( "drt2" );
+			}
+			config.plansCalcRoute().setNetworkModes( networkModes );
 		}
-		{
-			// (raptor config)
 
+		// === RAPTOR: ===
+		{
 			SwissRailRaptorConfigGroup configRaptor = ConfigUtils.addOrGetModule( config, SwissRailRaptorConfigGroup.class ) ;
 
-
 			if ( drtMode!=DrtMode.none){
-
 				configRaptor.setUseIntermodalAccessEgress(true);
-
 				{
 					// Xxx
 					IntermodalAccessEgressParameterSet paramSetXxx = new IntermodalAccessEgressParameterSet();
@@ -207,9 +194,9 @@ public class PtAlongALine2Test{
 			scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory( DrtRoute.class, new DrtRouteFactory() );
 		}
 
-//		// TODO: reference somehow network creation, to ensure that these link ids exist
-//		// add drt modes to the car links' allowed modes in their respective service area
-		PtAlongALineTest.addModeToAllLinksBtwnGivenNodes(scenario.getNetwork(), 0, 100, TransportMode.drt );
+		//		// TODO: reference somehow network creation, to ensure that these link ids exist
+		//		// add drt modes to the car links' allowed modes in their respective service area
+		PtAlongALineTest.addModeToAllLinksBtwnGivenNodes(scenario.getNetwork(), 0, 1000, TransportMode.drt );
 		// 600 = bad
 		// 606 = bad
 		// 608 = bad
@@ -231,15 +218,15 @@ public class PtAlongALine2Test{
 			scenario.getVehicles().addVehicleType( vehType );
 		}{
 			VehicleType vehType = vf.createVehicleType( Id.create( TransportMode.drt, VehicleType.class ) );
-			vehType.setMaximumVelocity( 500./3.6 );
+			vehType.setMaximumVelocity( 50./3.6 );
 			scenario.getVehicles().addVehicleType( vehType );
 		}{
 			VehicleType vehType = vf.createVehicleType( Id.create( TransportMode.car, VehicleType.class ) );
-			vehType.setMaximumVelocity( 500./3.6 );
+			vehType.setMaximumVelocity( 50./3.6 );
 			scenario.getVehicles().addVehicleType( vehType );
 		}
 
-		scenario.getPopulation().getPersons().values().removeIf( person -> !person.getId().toString().equals( "3" ) );
+		//		scenario.getPopulation().getPersons().values().removeIf( person -> !person.getId().toString().equals( "3" ) );
 
 		// ### CONTROLER: ###
 
@@ -256,6 +243,72 @@ public class PtAlongALine2Test{
 				controler.configureQSimComponents( DvrpQSimComponents.activateModes( TransportMode.drt ) );
 			}
 		}
+
+		// This will start otfvis.  Comment out if not needed.
+		controler.addOverridingModule( new OTFVisLiveModule() );
+
+		controler.run();
+	}
+
+	@Test
+	public void networkWalkDoesNotWorkWithRaptor() {
+
+		Config config = PtAlongALineTest.createConfig( utils.getOutputDirectory() );
+
+		// === GBL: ===
+
+		config.controler().setLastIteration( 0 );
+
+		// === ROUTER: ===
+
+		config.plansCalcRoute().setInsertingAccessEgressWalk( true );
+
+		config.qsim().setVehiclesSource( QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData );
+		// (as of today, will also influence router. kai, jun'19)
+
+		// remove teleportation walk router:
+		config.plansCalcRoute().removeModeRoutingParams( TransportMode.walk );
+
+		// add network walk router:
+		Set<String> networkModes = new HashSet<>( config.plansCalcRoute().getNetworkModes() );
+		networkModes.add( TransportMode.walk );
+		config.plansCalcRoute().setNetworkModes( networkModes );
+
+		// === RAPTOR: ===
+		{
+			SwissRailRaptorConfigGroup configRaptor = ConfigUtils.addOrGetModule( config, SwissRailRaptorConfigGroup.class ) ;
+
+			configRaptor.setUseIntermodalAccessEgress(true);
+			{
+				// Xxx
+				IntermodalAccessEgressParameterSet paramSetXxx = new IntermodalAccessEgressParameterSet();
+				paramSetXxx.setMode( TransportMode.walk );
+				paramSetXxx.setRadius( 1000000 );
+				configRaptor.addIntermodalAccessEgress( paramSetXxx );
+			}
+
+		}
+
+		// ### SCENARIO: ###
+
+		Scenario scenario = PtAlongALineTest.createScenario(config , 100 );
+
+		PtAlongALineTest.addModeToAllLinksBtwnGivenNodes(scenario.getNetwork(), 0, 1000, TransportMode.walk );
+
+
+		// The following is in particular for the _router_, not the qsim!  kai, jun'19
+		VehiclesFactory vf = scenario.getVehicles().getFactory();
+		{
+			VehicleType vehType = vf.createVehicleType( Id.create( TransportMode.walk, VehicleType.class ) );
+			vehType.setMaximumVelocity( 4./3.6 );
+			scenario.getVehicles().addVehicleType( vehType );
+		}
+
+		// ### CONTROLER: ###
+
+		Controler controler = new Controler(scenario);
+
+		controler.addOverridingModule(new SwissRailRaptorModule() ) ;
 
 		// This will start otfvis.  Comment out if not needed.
 		controler.addOverridingModule( new OTFVisLiveModule() );
