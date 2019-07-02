@@ -27,6 +27,8 @@
 		<param name="auxDischargeTimeStep" value="60"/>
 
 		<param name="chargersFile" value="one_etaxi_chargers.xml"/>
+		<param name="vehiclesFile" value="one_etaxi_evehicles.xml"/>
+
 		<param name="timeProfiles" value="true"/>
 	</module>
 

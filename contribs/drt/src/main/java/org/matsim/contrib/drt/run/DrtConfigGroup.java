@@ -24,7 +24,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.validation.constraints.Min;
+import javax.annotation.Nullable;
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -136,7 +137,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	// maxTravelTimeAlpha * unshared_ride_travel_time(fromLink, toLink) + maxTravelTimeBeta,
 	// where unshared_ride_travel_time(fromLink, toLink) is calculated with FastAStarEuclidean
 	// (hence AStarEuclideanOverdoFactor needs to be specified)
-	@Min(1)
+	@DecimalMin("1.0")
 	private double maxTravelTimeAlpha = Double.NaN;// [-]
 
 	@PositiveOrZero
@@ -157,13 +158,13 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	@PositiveOrZero
 	private double estimatedDrtSpeed = 25. / 3.6;// [m/s]
 
-	@Min(1)
+	@DecimalMin("1.0")
 	private double estimatedBeelineDistanceFactor = 1.3;// [-]
 
 	@NotNull
 	private String vehiclesFile = null;
 
-	// used only for stopbased DRT scheme
+	@Nullable
 	private String transitStopFile = null; // only for stopbased DRT scheme
 
 	private boolean plotDetailedCustomerStats = true;

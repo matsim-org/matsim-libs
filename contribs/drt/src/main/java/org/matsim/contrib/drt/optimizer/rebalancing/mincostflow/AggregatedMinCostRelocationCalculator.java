@@ -90,7 +90,9 @@ public class AggregatedMinCostRelocationCalculator implements MinCostRelocationC
 
 	private DvrpVehicle findNearestVehicle(List<DvrpVehicle> rebalancableVehicles, Link destinationLink) {
 		Coord toCoord = destinationLink.getFromNode().getCoord();
-		return rebalancableVehicles.stream().min(Comparator.comparing(v -> DistanceUtils.calculateSquaredDistance(//
-				Schedules.getLastLinkInSchedule(v).getToNode().getCoord(), toCoord))).get();
+		return rebalancableVehicles.stream()
+				.min(Comparator.comparing(v -> DistanceUtils.calculateSquaredDistance(
+						Schedules.getLastLinkInSchedule(v).getToNode().getCoord(), toCoord)))
+				.get();
 	}
 }

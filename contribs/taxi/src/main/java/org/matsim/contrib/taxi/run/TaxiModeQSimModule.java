@@ -91,8 +91,7 @@ public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 				TravelDisutility travelDisutility = getModalInstance(
 						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
 				return new DefaultTaxiOptimizerProvider(events, taxiCfg, fleet, network, timer, travelTime,
-						travelDisutility,
-						taxiScheduler).get();
+						travelDisutility, taxiScheduler, getConfig().getContext()).get();
 			}
 		});
 

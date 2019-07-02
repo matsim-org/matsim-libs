@@ -101,8 +101,8 @@ final class OneTruckOptimizer implements VrpOptimizer {
 		Link fromLink = req.getFromLink();
 		Link toLink = req.getToLink();
 
-		double t0 = schedule.getStatus() == ScheduleStatus.UNPLANNED ? //
-				Math.max(vehicle.getServiceBeginTime(), currentTime) : //
+		double t0 = schedule.getStatus() == ScheduleStatus.UNPLANNED ?
+				Math.max(vehicle.getServiceBeginTime(), currentTime) :
 				Schedules.getLastTask(schedule).getEndTime();
 
 		VrpPathWithTravelData pathToCustomer = VrpPaths.calcAndCreatePath(lastTask.getLink(), fromLink, t0, router,

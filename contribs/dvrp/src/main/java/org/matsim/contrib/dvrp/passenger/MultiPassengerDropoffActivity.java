@@ -19,8 +19,10 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.Set;
+import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.dynagent.FirstLastSimStepDynActivity;
@@ -28,12 +30,12 @@ import org.matsim.contrib.dynagent.FirstLastSimStepDynActivity;
 public class MultiPassengerDropoffActivity extends FirstLastSimStepDynActivity {
 	private final PassengerEngine passengerEngine;
 	private final DynAgent driver;
-	private final Set<? extends PassengerRequest> requests;
+	private final Map<Id<Request>, ? extends PassengerRequest> requests;
 
 	private final double departureTime;
 
 	public MultiPassengerDropoffActivity(PassengerEngine passengerEngine, DynAgent driver, StayTask dropoffTask,
-			Set<? extends PassengerRequest> requests, String activityType) {
+			Map<Id<Request>, ? extends PassengerRequest> requests, String activityType) {
 		super(activityType);
 
 		this.passengerEngine = passengerEngine;
@@ -51,7 +53,7 @@ public class MultiPassengerDropoffActivity extends FirstLastSimStepDynActivity {
 	@Override
 	protected void afterLastStep(double now) {
 		// dropoff at the end of stop activity
-		for (PassengerRequest request : requests) {
+		for (PassengerRequest request : requests.values()) {
 			passengerEngine.dropOffPassenger(driver, request, now);
 		}
 	}

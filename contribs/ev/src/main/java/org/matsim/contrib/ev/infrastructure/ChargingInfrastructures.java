@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.util.LinkProvider;
 
+import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableMap;
 
 /**
@@ -36,18 +37,15 @@ public class ChargingInfrastructures {
 			ChargingLogic.Factory chargingLogicFactory) {
 		ImmutableMap<Id<Charger>, Charger> chargers = infrastructureSpecification.getChargerSpecifications()
 				.values()
-				.stream().map(s -> ChargerImpl.create(s, linkProvider.apply(s.getLinkId()), chargingLogicFactory))
+				.stream()
+				.map(s -> ChargerImpl.create(s, linkProvider.apply(s.getLinkId()), chargingLogicFactory))
 				.collect(ImmutableMap.toImmutableMap(Charger::getId, ch -> ch));
 		return () -> chargers;
 	}
 
-	//FIXME calls to this method (used in event handlers) should be cached
-	public static ImmutableMap<Id<Charger>, Charger> getChargersAtLink(ChargingInfrastructure infrastructure,
-			Id<Link> linkId) {
+	public static ImmutableListMultimap<Id<Link>, Charger> getChargersAtLinks(ChargingInfrastructure infrastructure) {
 		return infrastructure.getChargers()
 				.values()
-				.stream()
-				.filter(charger -> charger.getLink().getId().equals(linkId))
-				.collect(ImmutableMap.toImmutableMap(Charger::getId, charger -> charger));
+				.stream().collect(ImmutableListMultimap.toImmutableListMultimap(c -> c.getLink().getId(), c -> c));
 	}
 }

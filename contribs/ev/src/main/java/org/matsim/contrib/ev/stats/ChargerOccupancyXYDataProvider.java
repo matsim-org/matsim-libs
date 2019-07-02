@@ -52,19 +52,19 @@ public class ChargerOccupancyXYDataProvider implements Provider<MobsimListener> 
 
 	public static XYDataCalculator<Charger> createChargerOccupancyCalculator(
 			final ChargingInfrastructure chargingInfrastructure, boolean relative) {
-		String[] header = relative ? //
-				new String[] { "plugs", "plugged_rel", "queued_rel", "assigned_rel" } //
-				: new String[] { "plugs", "plugged", "queued", "assigned" };
+		String[] header = relative ?
+				new String[] { "plugs", "plugged_rel", "queued_rel", "assigned_rel" } :
+				new String[] { "plugs", "plugged", "queued", "assigned" };
 
 		return XYDataCollectors.createCalculator(header, charger -> {
 			ChargingLogic logic = charger.getLogic();
 			int plugs = charger.getPlugs();
-			int assignedCount = logic instanceof ChargingWithQueueingAndAssignmentLogic //
-					? ((ChargingWithQueueingAndAssignmentLogic)logic).getAssignedVehicles().size()//
-					: 0;
+			int assignedCount = logic instanceof ChargingWithQueueingAndAssignmentLogic ?
+					((ChargingWithQueueingAndAssignmentLogic)logic).getAssignedVehicles().size() :
+					0;
 			return new String[] { charger.getPlugs() + "", //
-					getValue(logic.getPluggedVehicles().size(), plugs, relative), //
-					getValue(logic.getQueuedVehicles().size(), plugs, relative), //
+					getValue(logic.getPluggedVehicles().size(), plugs, relative),
+					getValue(logic.getQueuedVehicles().size(), plugs, relative),
 					getValue(assignedCount, plugs, relative) };
 		});
 	}

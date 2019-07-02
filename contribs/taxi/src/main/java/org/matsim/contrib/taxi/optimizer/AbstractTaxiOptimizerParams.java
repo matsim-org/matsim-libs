@@ -21,6 +21,8 @@ package org.matsim.contrib.taxi.optimizer;
 
 import java.util.Map;
 
+import javax.validation.constraints.Positive;
+
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
@@ -55,6 +57,7 @@ public abstract class AbstractTaxiOptimizerParams extends ReflectiveConfigGroup 
 	/**
 	 * @return {@value #REOPTIMIZATION_TIME_STEP_EXP}
 	 */
+	@Positive
 	public abstract int getReoptimizationTimeStep();
 
 	/**
