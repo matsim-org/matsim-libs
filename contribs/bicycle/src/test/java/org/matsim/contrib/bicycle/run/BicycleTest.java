@@ -18,15 +18,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle.run;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.matsim.utils.eventsfilecomparison.EventsFileComparator.Result.FILES_ARE_EQUAL;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -42,9 +33,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.bicycle.BicycleConfigGroup;
 import org.matsim.contrib.bicycle.BicycleConfigGroup.BicycleScoringType;
-import org.matsim.contrib.bicycle.BicycleLinkSpeedCalculator;
-import org.matsim.contrib.bicycle.BicycleModule;
-import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.contrib.bicycle.Bicycles;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -54,9 +43,6 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -66,8 +52,14 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.matsim.utils.eventsfilecomparison.EventsFileComparator.Result.FILES_ARE_EQUAL;
 
 /**
  * @author dziemke
@@ -201,8 +193,8 @@ public class BicycleTest {
 		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
 		config.addModule(new BicycleConfigGroup());
 		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
-		
-		// Nodes 5-9 have a z-coordinate > 0, i.e. the links leading to those nodes have a slope
+
+		// Nodes 5-8 have a z-coordinate > 0, i.e. the links leading to those nodes have a slope
 		config.network().setInputFile("network_gradient.xml");
 		config.plans().setInputFile("population_1200.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -319,7 +311,7 @@ public class BicycleTest {
 		new PopulationReader(scenarioCurrent).readFile(utils.getOutputDirectory() + "output_plans.xml.gz");
 		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
-	
+
 	@Test
 	public void testInfrastructureSpeedFactor() {
 		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
@@ -387,8 +379,7 @@ public class BicycleTest {
 		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
 		Controler controler = new Controler(scenario);
-		BicycleModule bicycleModule = new BicycleModule(scenario);
-		controler.addOverridingModule(bicycleModule);
+		Bicycles.addAsOverridingModule(controler);
 		
 		LinkDemandEventHandler linkHandler = new LinkDemandEventHandler();
 
@@ -399,25 +390,7 @@ public class BicycleTest {
 				this.addEventHandlerBinding().toInstance(linkHandler);
 			}
 		});
-		
-		controler.addOverridingQSimModule(new AbstractQSimModule() {
 
-            @Override
-            protected void configureQSim() {
-                bind(QNetworkFactory.class).toProvider(new Provider<QNetworkFactory>() {
-                    @Inject
-                    private EventsManager events;
-
-                    @Override
-                    public QNetworkFactory get() {
-                        final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
-                        factory.setLinkSpeedCalculator(new BicycleLinkSpeedCalculator(scenario));
-                        return factory;
-                    }
-                });
-            }
-        });
-		
 		controler.run();
 		
 		Assert.assertEquals("All bicycle users should use the longest but fastest route where the bicycle infrastructur speed factor is set to 1.0", 3, linkHandler.getLinkId2demand().get(Id.createLinkId("2")), MatsimTestUtils.EPSILON);
@@ -498,8 +471,7 @@ public class BicycleTest {
 		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
 		Controler controler = new Controler(scenario);
-		BicycleModule bicycleModule = new BicycleModule(scenario);
-		controler.addOverridingModule(bicycleModule);
+		Bicycles.addAsOverridingModule(controler);
 		
 		LinkDemandEventHandler linkHandler = new LinkDemandEventHandler();
 
@@ -510,25 +482,7 @@ public class BicycleTest {
 				this.addEventHandlerBinding().toInstance(linkHandler);
 			}
 		});
-		
-		controler.addOverridingQSimModule(new AbstractQSimModule() {
 
-            @Override
-            protected void configureQSim() {
-                bind(QNetworkFactory.class).toProvider(new Provider<QNetworkFactory>() {
-                    @Inject
-                    private EventsManager events;
-
-                    @Override
-                    public QNetworkFactory get() {
-                        final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory(events, scenario);
-                        factory.setLinkSpeedCalculator(new BicycleLinkSpeedCalculator(scenario));
-                        return factory;
-                    }
-                });
-            }
-        });
-		
 		controler.run();
 		
 		Assert.assertEquals("All bicycle users should use the shortest route even though the bicycle infrastructur speed factor is set to 0.1", 4, linkHandler.getLinkId2demand().get(Id.createLinkId("6")), MatsimTestUtils.EPSILON);
@@ -537,6 +491,7 @@ public class BicycleTest {
 		Assert.assertEquals("Wrong travel time (bicycle user)", Math.ceil( 10000 / (25. * 0.1 / 3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(2), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong travel time (bicycle user)", Math.ceil( 10000 / (25. * 0.1 / 3.6) ), linkHandler.getLinkId2travelTimes().get(Id.createLinkId("6")).get(3), MatsimTestUtils.EPSILON);
 	}
+
 }
 
 class LinkDemandEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
@@ -568,24 +523,20 @@ class LinkDemandEventHandler implements LinkEnterEventHandler, LinkLeaveEventHan
 		}
 	}
 
-	public Map<Id<Link>, Integer> getLinkId2demand() {
+	Map<Id<Link>, Integer> getLinkId2demand() {
 		return linkId2demand;
-	}
-
-	public void setLinkId2demand(Map<Id<Link>, Integer> linkId2demand) {
-		this.linkId2demand = linkId2demand;
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		vehicleId2lastEnterTime.put(event.getVehicleId(), event.getTime());
-		
-		if (linkId2travelTimes.get(event.getLinkId()) == null) {
+
+		if (!linkId2travelTimes.containsKey(event.getLinkId())) {
 			linkId2travelTimes.put(event.getLinkId(), new ArrayList<>());
 		}
 	}
 
-	public Map<Id<Link>, List<Double>> getLinkId2travelTimes() {
+	Map<Id<Link>, List<Double>> getLinkId2travelTimes() {
 		return linkId2travelTimes;
 	}
 	

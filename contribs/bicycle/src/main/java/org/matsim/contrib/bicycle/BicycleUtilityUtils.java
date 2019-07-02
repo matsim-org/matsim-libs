@@ -27,9 +27,9 @@ class BicycleUtilityUtils {
 	
 	static double computeLinkBasedScore( Link link, double marginalUtilityOfComfort_m,
 							 double marginalUtilityOfInfrastructure_m, double marginalUtilityOfGradient_m_100m ) {
-		String surface = (String) link.getAttributes().getAttribute(BicycleLabels.SURFACE);
+		String surface = (String) link.getAttributes().getAttribute(BicycleUtils.SURFACE);
 		String type = (String) link.getAttributes().getAttribute("type");
-		String cyclewaytype = (String) link.getAttributes().getAttribute(BicycleLabels.CYCLEWAY);
+		String cyclewaytype = (String) link.getAttributes().getAttribute(BicycleUtils.CYCLEWAY);
 
 		double distance = link.getLength();
 		

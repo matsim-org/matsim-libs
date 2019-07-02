@@ -86,9 +86,7 @@ public class TaxiToRequestAssignmentCostProvider {
 
 	private double calcPickupBeginTime(VehicleData.Entry departure, DestEntry<TaxiRequest> reqEntry,
 			PathData pathData) {
-		double travelTime = pathData == null ? //
-				params.getNullPathCost() : // no path (too far away)
-				pathData.getTravelTime();
+		double travelTime = pathData == null ? params.getNullPathCost() : pathData.getTravelTime();
 		return Math.max(reqEntry.destination.getEarliestStartTime(), departure.time + travelTime);
 	}
 }

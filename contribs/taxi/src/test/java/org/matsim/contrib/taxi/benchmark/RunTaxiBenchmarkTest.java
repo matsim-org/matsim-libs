@@ -19,12 +19,16 @@
 
 package org.matsim.contrib.taxi.benchmark;
 
+import java.net.URL;
+
 import org.junit.Test;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 
 public class RunTaxiBenchmarkTest {
 	@Test
 	public void testRunOneTaxi() {
-		String configFile = "./src/main/resources/one_taxi_benchmark/one_taxi_benchmark_config.xml";
-		RunTaxiBenchmark.run(configFile, 3);
+		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_taxi_benchmark_config.xml");
+		RunTaxiBenchmark.run(configUrl, 3);
 	}
 }

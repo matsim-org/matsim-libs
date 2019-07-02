@@ -19,8 +19,11 @@
 
 package org.matsim.contrib.ev.stats;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
@@ -30,10 +33,8 @@ import org.matsim.contrib.util.timeprofile.TimeProfiles;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class IndividualSocTimeProfileCollectorProvider implements Provider<MobsimListener> {
 	private final ElectricFleet evFleet;
@@ -63,8 +64,7 @@ public class IndividualSocTimeProfileCollectorProvider implements Provider<Mobsi
 		String[] header = selectedEvs.stream().map(ev -> ev.getId() + "").toArray(String[]::new);
 
 		return TimeProfiles.createProfileCalculator(header, () -> {
-			return selectedEvs.stream()//
-					.map(ev -> EvUnits.J_to_kWh(ev.getBattery().getSoc()))// in [kWh]
+			return selectedEvs.stream().map(ev -> EvUnits.J_to_kWh(ev.getBattery().getSoc()))/*in [kWh]*/
 					.toArray(Double[]::new);
 		});
 	}

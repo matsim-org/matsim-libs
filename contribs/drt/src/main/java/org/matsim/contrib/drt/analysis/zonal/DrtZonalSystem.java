@@ -17,12 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.contrib.drt.analysis.zonal;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -43,17 +40,13 @@ import com.google.inject.name.Named;
 
 /**
  * @author jbischoff
- *
  */
 public class DrtZonalSystem {
 
-	private final Map<Id<Link>, String> link2zone = new HashMap<>();
+	private final Map<Id<Link>, String> link2zone = new LinkedHashMap<>();
 	private final Network network;
 	private final Map<String, Geometry> zones;
 
-	/**
-	 * 
-	 */
 	public DrtZonalSystem(Network network, double cellSize) {
 		this.network = network;
 		zones = DrtGridUtils.createGridFromNetwork(network, cellSize);
@@ -78,7 +71,11 @@ public class DrtZonalSystem {
 		Point linkCoord = MGC.coord2Point(network.getLinks().get(linkId).getCoord());
 
 		for (Entry<String, Geometry> e : zones.entrySet()) {
-			if (e.getValue().contains(linkCoord)) {
+			if (e.getValue().intersects(linkCoord)) {
+				//if a link Coord borders two or more cells, the allocation to a cell is random.
+				// Seems hard to overcome, but most likely better than returning no zone at
+				// all and mostly not too relevant in non-grid networks.
+				// jb, june 2019
 				link2zone.put(linkId, e.getKey());
 				return e.getKey();
 			}

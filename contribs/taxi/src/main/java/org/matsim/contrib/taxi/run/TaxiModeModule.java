@@ -51,7 +51,8 @@ public final class TaxiModeModule extends AbstractDvrpModeModule {
 
 		addRoutingModuleBinding(getMode()).toInstance(new DynRoutingModule(getMode()));
 
-		install(new FleetModule(getMode(), taxiCfg.getTaxisFile(), taxiCfg.isChangeStartLinkToLastLinkInSchedule()));
+		install(new FleetModule(getMode(), taxiCfg.getTaxisFileUrl(getConfig().getContext()),
+				taxiCfg.isChangeStartLinkToLastLinkInSchedule()));
 
 		install(QSimScopeObjectListenerModule.builder(TaxiStatsDumper.class)
 				.mode(getMode())

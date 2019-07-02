@@ -22,7 +22,7 @@ package org.matsim.contrib.dvrp.run;
 import java.util.Map;
 
 import javax.annotation.Nullable;
-import javax.validation.constraints.Max;
+import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
@@ -93,7 +93,7 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 	private String mobsimMode = TransportMode.car;// used for events throwing and thus calculating travel times, etc.
 
 	@Positive
-	@Max(1)
+	@DecimalMax("1.0")
 	private double travelTimeEstimationAlpha = 0.05; // [-], 1 ==> TTs from the last iteration only
 
 	@PositiveOrZero

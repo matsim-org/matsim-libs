@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.taxi.run.examples;
 
+import java.net.URL;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
@@ -33,11 +35,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class RunTaxiExample {
-	private static final String CONFIG_FILE = "mielec_2014_02/mielec_taxi_config.xml";
-
-	public static void run(boolean otfvis, int lastIteration) {
+	public static void run(URL configUrl, boolean otfvis, int lastIteration) {
 		// load config
-		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new TaxiConfigGroup(), new DvrpConfigGroup(),
+		Config config = ConfigUtils.loadConfig(configUrl, new TaxiConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 		config.controler().setLastIteration(lastIteration);
 		String mode = TaxiConfigGroup.get(config).getMode();
@@ -57,9 +57,5 @@ public class RunTaxiExample {
 
 		// run simulation
 		controler.run();
-	}
-
-	public static void main(String[] args) {
-		RunTaxiExample.run(false, 0); // switch to 'true' to turn on visualisation
 	}
 }
