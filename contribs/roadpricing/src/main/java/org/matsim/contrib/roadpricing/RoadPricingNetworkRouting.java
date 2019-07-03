@@ -23,18 +23,18 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Custom router which routes on the "car" network, but uses a custom 
+ * Custom router which routes on the "car" network, but uses a custom
  * {@link TravelDisutility} which does *not* contain extra link cost.
- * The *regular* "car" router gets a {@link TravelDisutility} which makes 
- * "car" prohibitively expensive, and {@link PlansCalcRouteWithTollOrNot} uses 
+ * The *regular* "car" router gets a {@link TravelDisutility} which makes
+ * "car" prohibitively expensive, and {@link PlansCalcRouteWithTollOrNot} uses
  * this setup to calculate a best response plan (with paid toll or not).
- *
+ * <p>
  * TODO I'm sure this can be made easier and more flexible (michaz 2016)
  */
- class RoadPricingNetworkRouting implements Provider<RoutingModule> {
+class RoadPricingNetworkRouting implements Provider<RoutingModule> {
 
 	@Inject
-    Map<String, TravelTime> travelTimes;
+	Map<String, TravelTime> travelTimes;
 
 	@Inject
 	Map<String, TravelDisutilityFactory> travelDisutilityFactory;
@@ -43,30 +43,31 @@ import java.util.Set;
 	SingleModeNetworksCache singleModeNetworksCache;
 
 	@Inject
-    PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
-	
-	@Inject PlansCalcRouteConfigGroup plansCalcRouteConfigGroup ;
+	PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
 
 	@Inject
-    Network network;
+	PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
 
 	@Inject
-    PopulationFactory populationFactory;
+	Network network;
 
 	@Inject
-    LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
-	
+	PopulationFactory populationFactory;
+
+	@Inject
+	LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
+
 	private
 	Network filteredNetwork;
 
 	@Override
 	public RoutingModule get() {
-		if (filteredNetwork == null){
-		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
-		Set<String> modes = new HashSet<>();
-		modes.add(TransportMode.car);
-		filteredNetwork = NetworkUtils.createNetwork();
-		filter.filter(filteredNetwork, modes);
+		if (filteredNetwork == null) {
+			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
+			Set<String> modes = new HashSet<>();
+			modes.add(TransportMode.car);
+			filteredNetwork = NetworkUtils.createNetwork();
+			filter.filter(filteredNetwork, modes);
 		}
 		TravelDisutilityFactory travelDisutilityFactory = this.travelDisutilityFactory.get(PlansCalcRouteWithTollOrNot.CAR_WITH_PAYED_AREA_TOLL);
 		TravelTime travelTime = travelTimes.get(TransportMode.car);
@@ -75,7 +76,7 @@ import java.util.Set;
 						filteredNetwork,
 						travelDisutilityFactory.createTravelDisutility(travelTime),
 						travelTime);
-		if ( plansCalcRouteConfigGroup.isInsertingAccessEgressWalk() ) {
+		if (plansCalcRouteConfigGroup.isInsertingAccessEgressWalk()) {
 			return DefaultRoutingModules.createAccessEgressNetworkRouter(TransportMode.car, populationFactory,
 					filteredNetwork, routeAlgo, plansCalcRouteConfigGroup);
 		} else {

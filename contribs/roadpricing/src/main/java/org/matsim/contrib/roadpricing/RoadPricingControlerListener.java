@@ -37,14 +37,13 @@ import org.matsim.core.router.util.TravelDisutility;
  * Integrates the RoadPricing functionality into the MATSim Controler.  Does the 
  * following:
  * <p></p>
- * Initialization:
+ * <strike>Initialization:
  * <ul>
- * 		<li> Reads the road pricing scheme and adds it as a scenario element.
- * 		<li> Adds the {@link CalcPaidToll} events listener (to calculate the 
+ * 		<li> Adds the {@link RoadPricingTollCalculator} events listener (to calculate the
  * 			 toll per agent).
  * 		<li> Adds the toll to the {@link TravelDisutility} for the router (by 
  * 			 wrapping the pre-existing {@link TravelDisutility} object).
- * </ul>
+ * </ul></strike>
  * After mobsim:
  * <ul>
  * 		<li> Send toll as money events to agents.
@@ -58,12 +57,12 @@ class RoadPricingControlerListener implements StartupListener, IterationEndsList
 	final static private Logger log = Logger.getLogger(RoadPricingControlerListener.class);
 
 	private final RoadPricingScheme scheme;
-	private final CalcPaidToll calcPaidToll;
+	private final RoadPricingTollCalculator calcPaidToll;
 	private final CalcAverageTolledTripLength cattl;
 	private OutputDirectoryHierarchy controlerIO;
 
 	@Inject
-	RoadPricingControlerListener(RoadPricingScheme scheme, CalcPaidToll calcPaidToll, CalcAverageTolledTripLength cattl, OutputDirectoryHierarchy controlerIO) {
+	RoadPricingControlerListener(RoadPricingScheme scheme, RoadPricingTollCalculator calcPaidToll, CalcAverageTolledTripLength cattl, OutputDirectoryHierarchy controlerIO) {
 		this.scheme = scheme;
 		this.calcPaidToll = calcPaidToll;
 		this.cattl = cattl;
@@ -74,7 +73,7 @@ class RoadPricingControlerListener implements StartupListener, IterationEndsList
 	@Override
 	public void notifyStartup(final StartupEvent event) {}
 
-	
+
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {

@@ -59,6 +59,7 @@ public final class RoadPricingConfigGroup extends ReflectiveConfigGroup {
     public String getTollLinksFile() {
 		return this.tollLinksFile;
 	}
+
     @StringSetter(TOLL_LINKS_FILE)
 	public void setTollLinksFile(final String tollLinksFile) {
 		this.tollLinksFile = tollLinksFile;

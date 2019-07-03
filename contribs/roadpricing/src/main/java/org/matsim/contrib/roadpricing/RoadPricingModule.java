@@ -1,5 +1,6 @@
 package org.matsim.contrib.roadpricing;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -11,6 +12,7 @@ import org.matsim.contrib.roadpricing.ControlerDefaultsWithRoadPricingModule.Tra
 import com.google.inject.Singleton;
 
 public final class RoadPricingModule extends AbstractModule {
+	final private static Logger LOG = Logger.getLogger(RoadPricingModule.class);
 	
 	private RoadPricingScheme scheme;
 
@@ -22,10 +24,12 @@ public final class RoadPricingModule extends AbstractModule {
 	
 	@Override
 	public void install() {
+		LOG.warn(" !!! Creating RoadPricingConfigGroup !!!");
 		ConfigUtils.addOrGetModule(getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
 		
-		
-		// TODO sort out different ways to set toll schemes; reduce automagic 
+
+		// TODO sort out different ways to set toll schemes; reduce automagic
+		// TODO JWJ: is this still to "automagic"?
 		if ( scheme != null) {
 			// scheme has come in from the constructor, use that one:
 			bind(RoadPricingScheme.class).toInstance(scheme);
@@ -52,7 +56,7 @@ public final class RoadPricingModule extends AbstractModule {
 		// this is what makes the mobsim compute tolls and generate money events
 		// TODO yyyy could probably combine the following two:
 		addControlerListenerBinding().to(RoadPricingControlerListener.class);
-		bind(CalcPaidToll.class).in(Singleton.class);
+		bind(RoadPricingTollCalculator.class).in(Singleton.class);
 
 		// this is for analysis only:
 		bind(CalcAverageTolledTripLength.class).in(Singleton.class);

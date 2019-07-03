@@ -22,8 +22,6 @@
 
 package org.matsim.contrib.roadpricing;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.PlanStrategy;
@@ -46,7 +44,7 @@ import javax.inject.Provider;
 
 	@Override
 	public PlanStrategy get() {
-		PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan, Person>());
+		PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
 		builder.addStrategyModule(new AbstractMultithreadedModule(config.global()) {
 			@Override
 			public PlanAlgorithm getPlanAlgoInstance() {

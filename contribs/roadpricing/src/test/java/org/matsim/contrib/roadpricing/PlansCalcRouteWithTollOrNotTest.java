@@ -71,12 +71,12 @@ public class PlansCalcRouteWithTollOrNotTest {
 		Config config = matsimTestUtils.createConfig();
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-		Fixture.createNetwork2(scenario);
+		RoadPricingTestUtils.createNetwork2(scenario);
 
 		log.warn( "access/egress?" + config.plansCalcRoute().isInsertingAccessEgressWalk() );
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = new RoadPricingSchemeImpl();
+		RoadPricingSchemeImpl toll = RoadPricingUtils.createDefaultScheme();
 		toll.setType("area");
 		toll.addLink(Id.createLinkId("5"));
 		toll.addLink(Id.createLinkId("11"));
@@ -86,7 +86,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		 * is: 20s * (-6 EUR / h) = 20 * (-6) / 3600 = 0.03333
 		 */
 
-		Fixture.createPopulation2(scenario);
+		RoadPricingTestUtils.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
 
 		Id<Person> id1 = Id.createPersonId("1");
@@ -95,22 +95,22 @@ public class PlansCalcRouteWithTollOrNotTest {
 		log.warn( "access/egress?" + config.plansCalcRoute().isInsertingAccessEgressWalk() );
 		runOnAll(testee(scenario, toll), population);
 		log.warn( "access/egress?" + config.plansCalcRoute().isInsertingAccessEgressWalk() );
-		Fixture.compareRoutes("2 3 4 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
-		Fixture.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
+		RoadPricingTestUtils.compareRoutes("2 3 4 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
+		RoadPricingTestUtils.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
 
 		// case 2: now add a toll in the afternoon too, so it is cheaper to pay the toll
 		Cost afternoonCost = toll.createAndAddCost(14*3600, 18*3600, 0.12);
 		log.warn( "access/egress? " + config.plansCalcRoute().isInsertingAccessEgressWalk() );
 		runOnAll(testee(scenario, toll), population);
 		log.warn( "access/egress? " + config.plansCalcRoute().isInsertingAccessEgressWalk() );
-		Fixture.compareRoutes("2 5 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
-		Fixture.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
+		RoadPricingTestUtils.compareRoutes("2 5 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
+		RoadPricingTestUtils.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
 
 		// case 3: change the second leg to a non-car mode, than it should be the same as case 1
 		String oldMode = getLeg3(config, population, id1).getMode();
 		getLeg3(config, population, id1).setMode(TransportMode.pt);
 		runOnAll(testee(scenario, toll), population);
-		Fixture.compareRoutes("2 3 4 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
+		RoadPricingTestUtils.compareRoutes("2 3 4 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
 		// and change the mode back
 		getLeg3(config, population, id1).setMode(oldMode);
 
@@ -121,7 +121,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		toll.createAndAddCost(14*3600, 18*3600, 0.7);
 		// the agent should now decide to drive around
 		runOnAll(testee(scenario, toll), population);
-		Fixture.compareRoutes("2 3 4 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
+		RoadPricingTestUtils.compareRoutes("2 3 4 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
 	}
 
 	private static Leg getLeg1(Config config, Population population, Id<Person> id1) {
@@ -159,22 +159,22 @@ public class PlansCalcRouteWithTollOrNotTest {
 	public void testTolledActLink() {
 		Config config = matsimTestUtils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-		Fixture.createNetwork2(scenario);
+		RoadPricingTestUtils.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = new RoadPricingSchemeImpl();
+		RoadPricingSchemeImpl toll = RoadPricingUtils.createDefaultScheme();
 		toll.setType("area");
 		Id.createLinkId("7");
 		toll.createAndAddCost(6*3600, 10*3600, 0.06);
 
-		Fixture.createPopulation2(scenario);
+		RoadPricingTestUtils.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
 
 		runOnAll(testee(scenario, toll), population);
 		Id<Person> id1 = Id.createPersonId("1");
 
-		Fixture.compareRoutes("2 5 6", (NetworkRoute) getLeg1(config, population, id1).getRoute()); // agent should take shortest route
-		Fixture.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
+		RoadPricingTestUtils.compareRoutes("2 5 6", (NetworkRoute) getLeg1(config, population, id1).getRoute()); // agent should take shortest route
+		RoadPricingTestUtils.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
 	}
 
 	/**
@@ -185,24 +185,24 @@ public class PlansCalcRouteWithTollOrNotTest {
 	public void testAllAlternativesTolled() {
 		Config config = matsimTestUtils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-		Fixture.createNetwork2(scenario);
+		RoadPricingTestUtils.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = new RoadPricingSchemeImpl();
+		RoadPricingSchemeImpl toll = RoadPricingUtils.createDefaultScheme();
 		toll.setType("area");
 		toll.addLink(Id.createLinkId("3"));
 		toll.addLink(Id.createLinkId("5"));
 		toll.createAndAddCost(6*3600, 10*3600, 0.06);
 
-		Fixture.createPopulation2(scenario);
+		RoadPricingTestUtils.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
 
 
 		runOnAll(testee(scenario, toll), population);
 		Id<Person> id1 = Id.createPersonId("1");
 
-		Fixture.compareRoutes("2 5 6", (NetworkRoute) getLeg1(config, population, id1).getRoute()); // agent should take shortest route
-		Fixture.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
+		RoadPricingTestUtils.compareRoutes("2 5 6", (NetworkRoute) getLeg1(config, population, id1).getRoute()); // agent should take shortest route
+		RoadPricingTestUtils.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
 	}
 
 	private static Leg getLeg3(Config config, Population population, Id<Person> id1) {
@@ -233,16 +233,16 @@ public class PlansCalcRouteWithTollOrNotTest {
 	public void testOutsideTollTime() {
 		Config config = matsimTestUtils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-		Fixture.createNetwork2(scenario);
+		RoadPricingTestUtils.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = new RoadPricingSchemeImpl();
+		RoadPricingSchemeImpl toll = RoadPricingUtils.createDefaultScheme();
 		toll.setType("area");
 		toll.addLink(Id.createLinkId("5"));
 		toll.addLink(Id.createLinkId("11"));
 		toll.createAndAddCost(8*3600, 10*3600, 1.0); // high costs!
 
-		Fixture.createPopulation2(scenario);
+		RoadPricingTestUtils.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
 
 
@@ -251,8 +251,8 @@ public class PlansCalcRouteWithTollOrNotTest {
 		Leg leg1 = getLeg1(config, population, id1);
 		Leg leg2 = getLeg3(config, population, id1);
 
-		Fixture.compareRoutes("2 5 6", (NetworkRoute) leg1.getRoute()); // agent should take shortest route, as tolls are not active at that time
-		Fixture.compareRoutes("8 11 12", (NetworkRoute) leg2.getRoute());
+		RoadPricingTestUtils.compareRoutes("2 5 6", (NetworkRoute) leg1.getRoute()); // agent should take shortest route, as tolls are not active at that time
+		RoadPricingTestUtils.compareRoutes("8 11 12", (NetworkRoute) leg2.getRoute());
 	}
 
 }

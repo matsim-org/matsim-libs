@@ -36,9 +36,6 @@ import javax.inject.Provider;
 import java.net.URL;
 import java.util.Collections;
 
-/**
- * Only used for tests.
- */
 final class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
 
 	private final RoadPricingScheme roadPricingScheme;
@@ -60,6 +57,10 @@ final class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
 		install(AbstractModule.override(Collections.<AbstractModule>singletonList(new ControlerDefaultsModule()), new RoadPricingModule(roadPricingScheme)));
 	}
 
+
+	/**
+	 * This class binding ensure that there is a SINGLE, consistent RoadPricingScheme in the Scenario.
+	 */
 	static class RoadPricingInitializer {
 		@Inject
 		RoadPricingInitializer(RoadPricingScheme roadPricingScheme, Scenario scenario) {
@@ -68,13 +69,17 @@ final class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
 				scenario.addScenarioElement(RoadPricingScheme.ELEMENT_NAME, roadPricingScheme);
 			} else {
 				if (roadPricingScheme != scenarioRoadPricingScheme) {
-					throw new RuntimeException();
+					throw new RuntimeException("Trying to bind multiple, different RoadPricingSchemes (must be singleton)");
 				}
 			}
 		}
 	}
 
 
+	/**
+	 * Provides the {@link RoadPricingScheme} from either the given instance, or
+	 * read from file using the file specified in the {@link RoadPricingConfigGroup}.
+	 */
 	static class RoadPricingSchemeProvider implements Provider<RoadPricingScheme> {
 
 		private final Config config;
@@ -82,6 +87,7 @@ final class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
 
 		@Inject
 		RoadPricingSchemeProvider(Config config, Scenario scenario) {
+			/* TODO Check if we can get the Config from the Scenario */
 			this.config = config;
 			this.scenario = scenario;
 		}
@@ -100,12 +106,13 @@ final class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
 							+ "construct a zero toll file and insert that. ");
 				}
 				URL tollLinksFile = ConfigGroup.getInputFileURL(this.config.getContext(), rpConfig.getTollLinksFile());
-				RoadPricingSchemeImpl rpsImpl = new RoadPricingSchemeImpl();
+				RoadPricingSchemeImpl rpsImpl = RoadPricingUtils.createDefaultScheme();
 				new RoadPricingReaderXMLv1(rpsImpl).parse(tollLinksFile);
 				return rpsImpl;
 			}
 		}
 	}
+
 
 	static class TravelDisutilityIncludingTollFactoryProvider implements Provider<TravelDisutilityFactory> {
 
@@ -122,7 +129,6 @@ final class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
 		public TravelDisutilityFactory get() {
 			final Config config = scenario.getConfig();
 			final TravelDisutilityFactory originalTravelDisutilityFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
-			//			if (!scheme.getType().equals(RoadPricingScheme.TOLL_TYPE_AREA)) {
 			RoadPricingTravelDisutilityFactory travelDisutilityFactory = new RoadPricingTravelDisutilityFactory(
 					originalTravelDisutilityFactory, scheme, config.planCalcScore().getMarginalUtilityOfMoney()
 			);

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Fixture.java
+ * RoadPricingTestUtils.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -56,9 +56,9 @@ import junit.framework.TestCase;
  *
  * @author mrieser
  */
-/*package*/ class Fixture {
+/*package*/ class RoadPricingTestUtils {
 
-	private Fixture() {
+	private RoadPricingTestUtils() {
 		// static class
 	}
 
@@ -71,7 +71,7 @@ import junit.framework.TestCase;
 		 */
 		/* The vehicles can travel with 18km/h = 5m/s, so it should take them 20 seconds
 		 * to travel along one link.		 */
-		Network network = (Network) scenario.getNetwork();
+		Network network = scenario.getNetwork();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 100, (double) 0));
@@ -193,16 +193,16 @@ import junit.framework.TestCase;
 		Link link2 = network.getLinks().get(Id.create(2, Link.class));
 		Link link3 = network.getLinks().get(Id.create(3, Link.class));
 		Link link4 = network.getLinks().get(Id.create(4, Link.class));
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 1, "07:00"   , link0.getId(), NetworkUtils.getLinkIds("1 2 3"), link4.getId()), population); // toll in 1st time slot
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 2, "11:00"   , link0.getId(), NetworkUtils.getLinkIds("1 2 3"), link4.getId()), population); // toll in 2nd time slot
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 3, "16:00"   , link0.getId(), NetworkUtils.getLinkIds("1 2 3"), link4.getId()), population); // toll in 3rd time slot
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 4, "09:59:50", link0.getId(), NetworkUtils.getLinkIds("1 2 3"), link4.getId()), population); // toll in 1st and 2nd time slot
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 5, "08:00:00", link1.getId(), NetworkUtils.getLinkIds("2 3"), link4.getId()), population); // starts on the 2nd link
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 6, "09:00:00", link0.getId(), NetworkUtils.getLinkIds("1 2"), link3.getId()), population); // ends not on the last link
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 7, "08:30:00", link1.getId(), NetworkUtils.getLinkIds("2"), link3.getId()), population); // starts and ends not on the first/last link
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 8, "08:35:00", link1.getId(), NetworkUtils.getLinkIds(""), link2.getId()), population); // starts and ends not on the first/last link
-		Fixture.addPersonToPopulation(Fixture.createPerson1( 9, "08:40:00", link1.getId(), NetworkUtils.getLinkIds(""), link1.getId()), population); // two acts on the same link
-		Fixture.addPersonToPopulation(Fixture.createPerson1(10, "08:45:00", link2.getId(), NetworkUtils.getLinkIds(""), link3.getId()), population);
+		RoadPricingTestUtils.addPersonToPopulation(RoadPricingTestUtils.createPerson1( 1, "07:00"   , link0.getId(), NetworkUtils.getLinkIds("1 2 3"), link4.getId()), population); // toll in 1st time slot
+		RoadPricingTestUtils.addPersonToPopulation(RoadPricingTestUtils.createPerson1( 2, "11:00"   , link0.getId(), NetworkUtils.getLinkIds("1 2 3"), link4.getId()), population); // toll in 2nd time slot
+		RoadPricingTestUtils.addPersonToPopulation(RoadPricingTestUtils.createPerson1( 3, "16:00"   , link0.getId(), NetworkUtils.getLinkIds("1 2 3"), link4.getId()), population); // toll in 3rd time slot
+		RoadPricingTestUtils.addPersonToPopulation(RoadPricingTestUtils.createPerson1( 4, "09:59:50", link0.getId(), NetworkUtils.getLinkIds("1 2 3"), link4.getId()), population); // toll in 1st and 2nd time slot
+		RoadPricingTestUtils.addPersonToPopulation(RoadPricingTestUtils.createPerson1( 5, "08:00:00", link1.getId(), NetworkUtils.getLinkIds("2 3"), link4.getId()), population); // starts on the 2nd link
+		RoadPricingTestUtils.addPersonToPopulation(RoadPricingTestUtils.createPerson1( 6, "09:00:00", link0.getId(), NetworkUtils.getLinkIds("1 2"), link3.getId()), population); // ends not on the last link
+		RoadPricingTestUtils.addPersonToPopulation(RoadPricingTestUtils.createPerson1( 7, "08:30:00", link1.getId(), NetworkUtils.getLinkIds("2"), link3.getId()), population); // starts and ends not on the first/last link
+		RoadPricingTestUtils.addPersonToPopulation(RoadPricingTestUtils.createPerson1( 8, "08:35:00", link1.getId(), NetworkUtils.getLinkIds(""), link2.getId()), population); // starts and ends not on the first/last link
+		RoadPricingTestUtils.addPersonToPopulation(RoadPricingTestUtils.createPerson1( 9, "08:40:00", link1.getId(), NetworkUtils.getLinkIds(""), link1.getId()), population); // two acts on the same link
+		RoadPricingTestUtils.addPersonToPopulation(RoadPricingTestUtils.createPerson1(10, "08:45:00", link2.getId(), NetworkUtils.getLinkIds(""), link3.getId()), population);
 	}
 
 	private static void addPersonToPopulation(final Person person, final Population population) {
@@ -216,7 +216,7 @@ import junit.framework.TestCase;
 		Population population = scenario.getPopulation();
 		Network network = scenario.getNetwork();
 
-		Fixture.addPersonToPopulation(Fixture.createPerson2(1, "07:00", network.getLinks().get(Id.create("1", Link.class)), network.getLinks().get(Id.create("7", Link.class)), network.getLinks().get(Id.create("13", Link.class))), population);
+		RoadPricingTestUtils.addPersonToPopulation(RoadPricingTestUtils.createPerson2(1, "07:00", network.getLinks().get(Id.create("1", Link.class)), network.getLinks().get(Id.create("7", Link.class)), network.getLinks().get(Id.create("13", Link.class))), population);
 	}
 
 	private static Person createPerson1(final int personId, final String startTime, final Id<Link> homeLinkId, final List<Id<Link>> routeLinkIds, final Id<Link> workLinkId) {
@@ -252,8 +252,8 @@ import junit.framework.TestCase;
 	protected static Population createReferencePopulation1(final Config config) {
 		// run mobsim once without toll and get score for network1/population1
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
-		Fixture.createNetwork1(scenario);
-		Fixture.createPopulation1(scenario);
+		RoadPricingTestUtils.createNetwork1(scenario);
+		RoadPricingTestUtils.createPopulation1(scenario);
 		Population referencePopulation = scenario.getPopulation();
 		EventsManager events = EventsUtils.createEventsManager();
 		EventsToScore scoring = EventsToScore.createWithScoreUpdating(scenario, new CharyparNagelScoringFunctionFactory(scenario), events);

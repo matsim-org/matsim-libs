@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.roadpricing;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,36 +34,44 @@ import org.matsim.vehicles.Vehicle;
 
 /**
  * @author nagel
- *
  */
 public final class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme {
 	// needs to be public. kai, sep'14
-	
+
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger( RoadPricingSchemeUsingTollFactor.class ) ;
+	private static final Logger log = Logger.getLogger(RoadPricingSchemeUsingTollFactor.class);
 
-	private RoadPricingScheme delegate = null ;
-	private final TollFactor tollFactor ;
+	private RoadPricingScheme delegate;
+	private final TollFactor tollFactor;
 
-	public RoadPricingSchemeUsingTollFactor(RoadPricingScheme scheme, TollFactor tollFactor ) {
+	public RoadPricingSchemeUsingTollFactor(RoadPricingScheme scheme, TollFactor tollFactor) {
 		this.delegate = scheme;
 		this.tollFactor = tollFactor;
 
 	}
 
-	public RoadPricingSchemeUsingTollFactor( String pricingSchemeFileName, TollFactor tollFactor ) {
-		
+	/**
+	 *
+	 * @param pricingSchemeFileName the absolute path to the road pricing filename.
+	 *                              It is important that this must be <i>absolute</i>
+	 *                              as we do not have the {@link org.matsim.core.config.Config}
+	 *                              to provide context.
+	 * @param tollFactor the implementation instance of toll factors.
+	 */
+	public RoadPricingSchemeUsingTollFactor(String pricingSchemeFileName, TollFactor tollFactor) {
+
 		// read the road pricing scheme from file
-		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
+		RoadPricingSchemeImpl scheme = RoadPricingUtils.createDefaultScheme();
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
+		System.out.println(new File(pricingSchemeFileName).getAbsolutePath());
 		try {
-			rpReader.readFile( pricingSchemeFileName  );
+			rpReader.readFile(pricingSchemeFileName);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		this.delegate = scheme ;
-		this.tollFactor = tollFactor ;
-				
+		this.delegate = scheme;
+		this.tollFactor = tollFactor;
+
 	}
 
 	@Override
@@ -72,17 +81,17 @@ public final class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme
 
 	@Override
 	public Cost getLinkCostInfo(Id<Link> linkId, double time, Id<Person> personId, Id<Vehicle> vehicleId) {
-		Cost baseToll = delegate.getLinkCostInfo(linkId, time, personId, vehicleId );
+		Cost baseToll = delegate.getLinkCostInfo(linkId, time, personId, vehicleId);
 		if (baseToll == null) {
-			return null ;
+			return null;
 		}
 		final double tollFactorVal = tollFactor.getTollFactor(personId, vehicleId, linkId, time);
-		return new Cost( baseToll.startTime, baseToll.endTime, baseToll.amount * tollFactorVal );
+		return new Cost(baseToll.startTime, baseToll.endTime, baseToll.amount * tollFactorVal);
 	}
-	
+
 	@Override
-	public Cost getTypicalLinkCostInfo( Id<Link> linkId, double time ) {
-		return delegate.getTypicalLinkCostInfo(linkId, time) ;
+	public Cost getTypicalLinkCostInfo(Id<Link> linkId, double time) {
+		return delegate.getTypicalLinkCostInfo(linkId, time);
 	}
 
 	@Override
@@ -102,12 +111,12 @@ public final class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme
 
 	@Override
 	public Iterable<Cost> getTypicalCosts() {
-		return delegate.getTypicalCosts() ;
+		return delegate.getTypicalCosts();
 	}
 
 	@Override
 	public Map<Id<Link>, List<Cost>> getTypicalCostsForLink() {
-		return delegate.getTypicalCostsForLink() ;
+		return delegate.getTypicalCostsForLink();
 	}
 
 }

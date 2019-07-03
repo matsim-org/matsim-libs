@@ -3,7 +3,7 @@
 
 <roadpricing type="distance" name="distance-toll-1">
 
-	<description>distance toll for org.matsim.contrib.roadpricing.Fixture.createNetwork1().</description>
+	<description>distance toll for org.matsim.contrib.roadpricing.RoadPricingTestUtils.createNetwork1().</description>
 
 	<links>
 		<link id="1" />

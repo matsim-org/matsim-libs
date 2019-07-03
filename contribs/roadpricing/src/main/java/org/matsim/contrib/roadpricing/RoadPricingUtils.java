@@ -18,10 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.contrib.roadpricing;
+
+import org.matsim.api.core.v01.Scenario;
 
 /**
  * Utility to create different road pricing schemes.
@@ -37,5 +36,15 @@ public class RoadPricingUtils {
 	public static RoadPricingModule createModule(){ return new RoadPricingModule(); }
 
 	public static RoadPricingModule createModule(RoadPricingScheme scheme){ return new RoadPricingModule(scheme); }
+
+	public static RoadPricingSchemeImpl createDefaultScheme(){ return new RoadPricingSchemeImpl(); }
+
+	public static RoadPricingScheme getScheme(Scenario sc){
+		Object o = sc.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
+		if(o == null){
+			sc.addScenarioElement(RoadPricingScheme.ELEMENT_NAME, new RoadPricingSchemeImpl());
+		}
+		return (RoadPricingScheme) sc.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
+	}
 	
 }

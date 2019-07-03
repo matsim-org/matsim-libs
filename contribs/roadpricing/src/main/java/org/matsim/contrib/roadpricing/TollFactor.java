@@ -14,6 +14,6 @@ import org.matsim.vehicles.Vehicle;
  */
 public interface TollFactor {
 
-	public double getTollFactor(Id<Person> personId, Id<Vehicle> vehicleId, Id<Link> linkId, double time);
+	double getTollFactor(Id<Person> personId, Id<Vehicle> vehicleId, Id<Link> linkId, double time);
 
 }

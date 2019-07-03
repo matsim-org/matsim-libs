@@ -54,7 +54,7 @@ public final class RoadPricingSchemeImpl implements RoadPricingScheme {
 	private boolean cacheIsInvalid = true;
 	private Cost[] costCache = null;
 
-	public RoadPricingSchemeImpl() {
+	RoadPricingSchemeImpl() {
 		this.linkIds = new HashMap<>();
 		this.costs = new ArrayList<>();
 	}

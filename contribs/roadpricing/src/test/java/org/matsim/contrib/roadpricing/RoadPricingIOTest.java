@@ -20,17 +20,13 @@
 
 package org.matsim.contrib.roadpricing;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Iterator;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
-import org.xml.sax.SAXException;
+
+import java.io.File;
+import java.util.Iterator;
 
 /**
  * Tests Parsers and Writers for RoadPricingSchemes.
@@ -41,11 +37,8 @@ public class RoadPricingIOTest extends MatsimTestCase {
 
 	/**
 	 * Tests reader and writer to ensure that reading and writing does not modify the schemes.
-	 * @throws IOException
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
 	 */
-	public void testWriteReadWrite() throws SAXException, ParserConfigurationException, IOException {
+	public void testWriteReadWrite() {
 		final String origFile = this.getClassInputDirectory() + "roadpricing1.xml";
 		final String tmpFile1 = getOutputDirectory() + "roadpricing1.xml";
 		final String tmpFile2 = getOutputDirectory() + "roadpricing2.xml";
@@ -55,13 +48,13 @@ public class RoadPricingIOTest extends MatsimTestCase {
 		final Id<Link> id3 = Id.create(3, Link.class);
 
 		// first, read the scheme from file
-		RoadPricingSchemeImpl scheme1 = new RoadPricingSchemeImpl();
+		RoadPricingSchemeImpl scheme1 = RoadPricingUtils.createDefaultScheme();
 		RoadPricingReaderXMLv1 reader1 = new RoadPricingReaderXMLv1(scheme1);
 		reader1.readFile(origFile);
 
 		// compare it with what's expected
 		assertEquals("distance-toll-1", scheme1.getName());
-		assertEquals("distance toll for org.matsim.contrib.roadpricing.Fixture.createNetwork1().", scheme1.getDescription());
+		assertEquals("distance toll for org.matsim.contrib.roadpricing.RoadPricingTestUtils.createNetwork1().", scheme1.getDescription());
 		assertEquals(3, scheme1.getTolledLinkIds().size());
 		assertTrue(scheme1.getTolledLinkIds().contains(id1));
 		assertTrue(scheme1.getTolledLinkIds().contains(id2));
@@ -98,7 +91,7 @@ public class RoadPricingIOTest extends MatsimTestCase {
 		 * than the written one. Thus, read this file again and write it again and
 		 * compare them.
 		 */
-		RoadPricingSchemeImpl scheme2 = new RoadPricingSchemeImpl();
+		RoadPricingSchemeImpl scheme2 = RoadPricingUtils.createDefaultScheme();
 		RoadPricingReaderXMLv1 reader2 = new RoadPricingReaderXMLv1(scheme2);
 		reader2.readFile(tmpFile1);
 
