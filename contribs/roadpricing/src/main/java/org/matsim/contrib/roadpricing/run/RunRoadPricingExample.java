@@ -29,7 +29,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 /**
  * Basic "script" to use roadpricing.
  *
- * @author nagel
+ * <br><br>
+ * <b>Note:</b> Do not change the class name as it is referenced in the book.
+ *
+ * @author nagel, jwjoubert
  */
 public final class RunRoadPricingExample {
 	private static final String TEST_CONFIG = "./contribs/roadpricing/test/input/org/matsim/contrib/roadpricing/AvoidTolledRouteTest/config.xml";
@@ -37,6 +40,12 @@ public final class RunRoadPricingExample {
 	private Config config;
 	// to not change class name: referenced from book.  kai, dec'14
 
+	/**
+	 * Executing the road pricing example.
+	 * @param args optional arguments, the first which must be a <code>config.xml</code>
+	 *             file. If no arguments are passed, the class will use the config, and
+	 *             associated files from a test instance.
+	 */
 	public static void main(String[] args) {
 		new RunRoadPricingExample(args).run();
 	}

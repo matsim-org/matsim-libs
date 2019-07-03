@@ -76,7 +76,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		log.warn( "access/egress?" + config.plansCalcRoute().isInsertingAccessEgressWalk() );
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.createDefaultScheme();
+		RoadPricingSchemeImpl toll = RoadPricingUtils.createMutableScheme();
 		toll.setType("area");
 		toll.addLink(Id.createLinkId("5"));
 		toll.addLink(Id.createLinkId("11"));
@@ -162,7 +162,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		RoadPricingTestUtils.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.createDefaultScheme();
+		RoadPricingSchemeImpl toll = RoadPricingUtils.createMutableScheme();
 		toll.setType("area");
 		Id.createLinkId("7");
 		toll.createAndAddCost(6*3600, 10*3600, 0.06);
@@ -188,7 +188,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		RoadPricingTestUtils.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.createDefaultScheme();
+		RoadPricingSchemeImpl toll = RoadPricingUtils.createMutableScheme();
 		toll.setType("area");
 		toll.addLink(Id.createLinkId("3"));
 		toll.addLink(Id.createLinkId("5"));
@@ -236,7 +236,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		RoadPricingTestUtils.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.createDefaultScheme();
+		RoadPricingSchemeImpl toll = RoadPricingUtils.createMutableScheme();
 		toll.setType("area");
 		toll.addLink(Id.createLinkId("5"));
 		toll.addLink(Id.createLinkId("11"));

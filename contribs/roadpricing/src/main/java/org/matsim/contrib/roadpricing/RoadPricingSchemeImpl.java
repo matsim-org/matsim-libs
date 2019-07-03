@@ -20,11 +20,7 @@
 
 package org.matsim.contrib.roadpricing;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -41,15 +37,15 @@ import org.matsim.vehicles.Vehicle;
  */
 public final class RoadPricingSchemeImpl implements RoadPricingScheme {
 	// currently needs to be public. kai, sep'14
-	
-	private static Logger log = Logger.getLogger( RoadPricingSchemeImpl.class ) ;
+
+	private static Logger log = Logger.getLogger(RoadPricingSchemeImpl.class);
 
 	private Map<Id<Link>, List<Cost>> linkIds;
 
 	private String name = null;
 	private String type = null;
 	private String description = null;
-	private final ArrayList<Cost> costs ;
+	private final ArrayList<Cost> costs;
 
 	private boolean cacheIsInvalid = true;
 	private Cost[] costCache = null;
@@ -59,11 +55,11 @@ public final class RoadPricingSchemeImpl implements RoadPricingScheme {
 		this.costs = new ArrayList<>();
 	}
 
-	public void addLink(final Id<Link> linkId) {
+	void addLink(final Id<Link> linkId) {
 		this.linkIds.put(linkId, null);
 	}
 
-	public void setName(final String name) {
+	void setName(final String name) {
 		this.name = name;
 	}
 
@@ -72,7 +68,7 @@ public final class RoadPricingSchemeImpl implements RoadPricingScheme {
 		return this.name;
 	}
 
-	public void setType(final String type) {
+	void setType(final String type) {
 		this.type = type.intern();
 	}
 
@@ -81,7 +77,7 @@ public final class RoadPricingSchemeImpl implements RoadPricingScheme {
 		return this.type;
 	}
 
-	public void setDescription(final String description) {
+	void setDescription(final String description) {
 		this.description = description;
 	}
 
@@ -90,8 +86,8 @@ public final class RoadPricingSchemeImpl implements RoadPricingScheme {
 		return this.description;
 	}
 
-	private static int wrnCnt = 0 ;
-	
+	private static int wrnCnt = 0;
+
 	/**
 	 * This is (if I am right) adding a possible toll for <i>all</i> links.  kai, oct'14
 	 */
@@ -106,21 +102,18 @@ public final class RoadPricingSchemeImpl implements RoadPricingScheme {
 	void addLinkCost(Id<Link> linkId, double startTime, double endTime, double amount) {
 		warnAboutNoToll(startTime, endTime);
 		Cost cost = new Cost(startTime, endTime, amount);
-		List<Cost> cs = this.linkIds.get(linkId);
-		if (cs == null) {
-			cs = new ArrayList<>();
-			this.linkIds.put(linkId, cs);
-		}
+		List<Cost> cs = this.linkIds.computeIfAbsent(linkId, k -> new ArrayList<>());
 		cs.add(cost);
+		Collections.sort(cs);
 	}
 
 	private void warnAboutNoToll(double startTime, double endTime) {
-		if ( startTime==0. && endTime == 24.*3600. ) {
+		if (startTime == 0. && endTime == 24. * 3600.) {
 			if (wrnCnt < 1) {
-				wrnCnt++ ;
-				log.warn("startTime=0:00 and endTime=24:00 means NO toll after 24h (no wrap-around); make sure this is what you want" ) ;
-				if ( wrnCnt==1 ) {
-					log.warn( Gbl.ONLYONCE ) ;
+				wrnCnt++;
+				log.warn("startTime=0:00 and endTime=24:00 means NO toll after 24h (no wrap-around); make sure this is what you want");
+				if (wrnCnt == 1) {
+					log.warn(Gbl.ONLYONCE);
 				}
 			}
 		}
@@ -131,25 +124,31 @@ public final class RoadPricingSchemeImpl implements RoadPricingScheme {
 		this.costs.remove(cost);
 	}
 
-	public boolean removeLinkCost(final Id<Link> linkId, final Cost cost){
+	@SuppressWarnings("SimplifiableConditionalExpression")
+	@Deprecated
+	boolean removeLinkCost(final Id<Link> linkId, final Cost cost) {
 		List<Cost> c = this.linkIds.get(linkId);
 		return (c != null) ? c.remove(cost) : false;
 	}
 
 	@Override
-	public Set<Id<Link>> getTolledLinkIds() {
+	public final Set<Id<Link>> getTolledLinkIds() {
 		return this.linkIds.keySet();
 	}
+
 	@Override
-	public Map<Id<Link>, List<Cost>> getTypicalCostsForLink(){
+	public final Map<Id<Link>, List<Cost>> getTypicalCostsForLink() {
 		return this.linkIds;
 	}
+
 	@Override
-	public Iterable<Cost> getTypicalCosts() {
+	public final Iterable<Cost> getTypicalCosts() {
 		return this.costs;
 	}
 
-	/** @return all Cost objects as an array for faster iteration. */
+	/**
+	 * @return all Cost objects as an array for faster iteration.
+	 */
 	Cost[] getCostArray() {
 		if (this.cacheIsInvalid) buildCache();
 		return this.costCache.clone();
@@ -163,8 +162,8 @@ public final class RoadPricingSchemeImpl implements RoadPricingScheme {
 		if (this.cacheIsInvalid) buildCache(); //(*)
 
 		if (this.linkIds.containsKey(linkId)) {
-			// (linkId is in contained in list of tolled links)
-			
+			// (linkId is contained in list of tolled links)
+
 			List<Cost> linkSpecificCosts = this.linkIds.get(linkId);
 			if (linkSpecificCosts == null) {
 				// (It is expected to have links in the map with null as "value")
@@ -174,9 +173,8 @@ public final class RoadPricingSchemeImpl implements RoadPricingScheme {
 						return cost;
 					}
 				}
-			}
-			else {
-				for (Cost cost : linkSpecificCosts){
+			} else {
+				for (Cost cost : linkSpecificCosts) {
 					if ((time >= cost.startTime) && (time < cost.endTime)) {
 						return cost;
 					}
@@ -185,10 +183,10 @@ public final class RoadPricingSchemeImpl implements RoadPricingScheme {
 		}
 		return null;
 	}
-	
+
 	@Override
-	public Cost getTypicalLinkCostInfo( Id<Link> linkId, double time ) {
-		return this.getLinkCostInfo( linkId, time, null, null ) ;
+	public Cost getTypicalLinkCostInfo(Id<Link> linkId, double time) {
+		return this.getLinkCostInfo(linkId, time, null, null);
 	}
 
 	private void buildCache() {
@@ -196,13 +194,13 @@ public final class RoadPricingSchemeImpl implements RoadPricingScheme {
 		this.costCache = this.costs.toArray(this.costCache);
 		this.cacheIsInvalid = false;
 	}
-	
+
 	/**
 	 * A single, time-dependent toll-amount for a roadpricing scheme.
 	 *
 	 * @author mrieser
 	 */
-	static public class Cost {
+	static public class Cost implements Comparable<Cost> {
 		public final double startTime;
 		public final double endTime;
 		public final double amount;
@@ -212,10 +210,26 @@ public final class RoadPricingSchemeImpl implements RoadPricingScheme {
 			this.endTime = endTime;
 			this.amount = amount;
 		}
-		
+
 		@Override
 		public String toString() {
-			return "startTime: " + this.startTime + " endTime: " + this.endTime + " amount: " + this.amount ;
+			return "startTime: " + this.startTime + " endTime: " + this.endTime + " amount: " + this.amount;
+		}
+
+		@Override
+		public int compareTo(Cost o) {
+			return Double.compare(this.startTime, o.startTime);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if(!(obj instanceof Cost)){
+				throw new IllegalArgumentException("Can only compare two Cost elements");
+			}
+			Cost otherCost = (Cost) obj;
+			return this.startTime == otherCost.startTime &&
+					this.endTime == otherCost.endTime &&
+					this.amount == otherCost.amount;
 		}
 	}
 }

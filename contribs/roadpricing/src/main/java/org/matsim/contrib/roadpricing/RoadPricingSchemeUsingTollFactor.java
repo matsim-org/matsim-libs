@@ -61,7 +61,7 @@ public final class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme
 	public RoadPricingSchemeUsingTollFactor(String pricingSchemeFileName, TollFactor tollFactor) {
 
 		// read the road pricing scheme from file
-		RoadPricingSchemeImpl scheme = RoadPricingUtils.createDefaultScheme();
+		RoadPricingSchemeImpl scheme = RoadPricingUtils.createMutableScheme();
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
 		System.out.println(new File(pricingSchemeFileName).getAbsolutePath());
 		try {

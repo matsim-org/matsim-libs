@@ -40,6 +40,7 @@ public final class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 
 	private final RoadPricingScheme scheme;
 
+	@SuppressWarnings("WeakerAccess")
 	public RoadPricingWriterXMLv1(final RoadPricingScheme scheme) {
 		this.scheme = scheme;
 	}
@@ -58,58 +59,62 @@ public final class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 
 			// description
 			this.writer.write("\t<description>" + this.scheme.getDescription() + "</description>\n");
-	
+
 			// links
 			this.writer.write("\t<links>\n");
 			for (Id<Link> linkId : this.scheme.getTypicalCostsForLink().keySet()) {
-			  List<Cost> cs = this.scheme.getTypicalCostsForLink().get(linkId);
-			  this.writer.write("\t\t<link id=\"" + linkId.toString() + "\"");
-			  if (cs == null) {
-			    this.writer.write("/>\n");
-			  }
-			  else {
-			    this.writer.write(">\n");
-			    for (Cost c : cs) {
-			      this.writeCost(c);
-			    }
-			    this.writer.write("</link>");
-			  }
+				List<Cost> cs = this.scheme.getTypicalCostsForLink().get(linkId);
+				this.writer.write("\t\t<link id=\"" + linkId.toString() + "\"");
+				if (cs == null) {
+					this.writer.write("/>\n");
+				} else {
+					this.writer.write(">\n");
+					for (Cost c : cs) {
+						this.writeCost(c, false);
+					}
+					this.writer.write("\t\t</link>\n");
+				}
 			}
 			this.writer.write("\t</links>\n");
-	
+
 			// cost
 			if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType())) {
 				this.writer.write("\t<!-- amount: [monetary unit] / [link length unit] -->\n");
-			} else if (this.scheme.getType() == RoadPricingScheme.TOLL_TYPE_AREA) {
+			} else if (this.scheme.getType().equals(RoadPricingScheme.TOLL_TYPE_AREA)) {
 				this.writer.write("\t<!-- amount: [monetary unit] / [simulation] -->\n");
-			} else if (this.scheme.getType() == RoadPricingScheme.TOLL_TYPE_CORDON) {
+			} else if (this.scheme.getType().equals(RoadPricingScheme.TOLL_TYPE_CORDON)) {
 				this.writer.write("\t<!-- [monetary unit] / [travelling across a tolled link] -->\n");
 			}
-	
+
 			for (RoadPricingSchemeImpl.Cost cost : this.scheme.getTypicalCosts()) {
-			  this.writeCost(cost);
+				this.writeCost(cost, true);
 			}
-	
+
 			// finish
 			this.writer.write("</roadpricing>");
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
-	
-	private void writeCost(Cost cost) throws IOException {
-    this.writer.write("\t<cost ");
-    if (!Time.isUndefinedTime(cost.startTime)) {
-      this.writer.write("start_time=\"" + Time.writeTime(cost.startTime) + "\" ");
-    }
-    if (!Time.isUndefinedTime(cost.endTime) 
-    		&& cost.endTime != Double.POSITIVE_INFINITY
-    		// The toll reader converts undefined time to POSITIVE_INFINITY since otherwise it does not make sense.
-    		// This, however, means that we need to deal with this here as well.  kai, aug'14
-    		) {
-      this.writer.write("end_time=\"" + Time.writeTime(cost.endTime) + "\" ");
-    }
-    this.writer.write("amount=\"" + cost.amount + "\" />\n");
+
+
+	private void writeCost(Cost cost, boolean typical) throws IOException {
+		if (typical) {
+			this.writer.write("\t<cost ");
+		} else {
+			this.writer.write("\t\t\t<cost ");
+		}
+		if (!Time.isUndefinedTime(cost.startTime)) {
+			this.writer.write("start_time=\"" + Time.writeTime(cost.startTime) + "\" ");
+		}
+		if (!Time.isUndefinedTime(cost.endTime)
+				&& cost.endTime != Double.POSITIVE_INFINITY
+			// The toll reader converts undefined time to POSITIVE_INFINITY since otherwise it does not make sense.
+			// This, however, means that we need to deal with this here as well.  kai, aug'14
+		) {
+			this.writer.write("end_time=\"" + Time.writeTime(cost.endTime) + "\" ");
+		}
+		this.writer.write("amount=\"" + cost.amount + "\" />\n");
 	}
 
 }

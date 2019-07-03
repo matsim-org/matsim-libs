@@ -50,7 +50,7 @@ public final class RoadPricingModule extends AbstractModule {
 		addTravelDisutilityFactoryBinding("car_with_payed_area_toll").toInstance(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, getConfig().planCalcScore()));
 		addRoutingModuleBinding("car_with_payed_area_toll").toProvider(new RoadPricingNetworkRouting());
 		
-		// yyyy TODO It might be possible that the area stuff is adequatly resolved by the randomizing approach.  Would need to try 
+		// yyyy TODO It might be possible that the area stuff is adequately resolved by the randomizing approach.  Would need to try
 		// that out.  kai, sep'16
 
 		// this is what makes the mobsim compute tolls and generate money events

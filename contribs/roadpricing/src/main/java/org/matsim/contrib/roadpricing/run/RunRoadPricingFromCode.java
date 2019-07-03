@@ -17,34 +17,68 @@
  * *********************************************************************** */
 package org.matsim.contrib.roadpricing.run;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.roadpricing.RoadPricingConfigGroup;
-import org.matsim.contrib.roadpricing.RoadPricingUtils;
+import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
 
+/**
+ * Basic 'script' to run roadpricing. This example ahows how to, programatically,
+ * configure the roadpricing scheme instead of reading it from an XML file.
+ */
 public class RunRoadPricingFromCode {
 	private static final String TEST_CONFIG = "./contribs/roadpricing/test/input/org/matsim/contrib/roadpricing/AvoidTolledRouteTest/config.xml";
 
 	public static void main(String[] args) { run(); }
 
-
-	static void run(){
+	private static void run(){
 		/* Start with a known config file (with population, network, and scoring
 		parameteres specified) and just remove the road pricing file. */
-//		Config config = ConfigUtils.loadConfig(TEST_CONFIG, RoadPricingUtils.createConfigGroup());
-//		ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.class).setTollLinksFile(null);
-//		Config config = ConfigUtils.createConfig(RoadPricingUtils.createConfigGroup());
-		Config config = ConfigUtils.createConfig();
+		Config config = ConfigUtils.loadConfig(TEST_CONFIG, RoadPricingUtils.createConfigGroup());
+		ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.class).setTollLinksFile(null);
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setLastIteration(10);
 
 		Scenario sc = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(sc);
+
+		RoadPricingScheme scheme = createCustomRoadPricingScheme();
+
+		controler.addOverridingModule(RoadPricingUtils.createModule(scheme));
+
 		controler.run();
+	}
+
+
+	private static RoadPricingScheme createCustomRoadPricingScheme(){
+		RoadPricingSchemeImpl scheme = RoadPricingUtils.createMutableScheme();
+
+		/* Configure roadpricing scheme. */
+		RoadPricingUtils.setName(scheme, "custom");
+		RoadPricingUtils.setType(scheme, RoadPricingScheme.TOLL_TYPE_LINK);
+		RoadPricingUtils.setDescription(scheme, "Custom coded road pricing scheme");
+
+		/* Add the link-specific toll. */
+		RoadPricingUtils.addLinkSpecificCost(scheme,
+				Id.createLinkId("link_4_5"),
+				Time.parseTime("00:00:00"),
+				Time.parseTime("30:00:00"),
+				100.0);
+
+		/* Add general toll. */
+		RoadPricingUtils.addLink(scheme, Id.createLinkId("link_1_2"));
+		RoadPricingUtils.addLink(scheme, Id.createLinkId("link_2_1"));
+		RoadPricingUtils.createAndAddGeneralCost(scheme,
+				Time.parseTime("06:00:00"),
+				Time.parseTime("10:00:00"),
+				10.0);
+
+		return scheme;
 	}
 }

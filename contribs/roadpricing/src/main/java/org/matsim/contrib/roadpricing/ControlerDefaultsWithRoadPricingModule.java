@@ -106,7 +106,7 @@ final class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
 							+ "construct a zero toll file and insert that. ");
 				}
 				URL tollLinksFile = ConfigGroup.getInputFileURL(this.config.getContext(), rpConfig.getTollLinksFile());
-				RoadPricingSchemeImpl rpsImpl = RoadPricingUtils.createDefaultScheme();
+				RoadPricingSchemeImpl rpsImpl = RoadPricingUtils.createMutableScheme();
 				new RoadPricingReaderXMLv1(rpsImpl).parse(tollLinksFile);
 				return rpsImpl;
 			}

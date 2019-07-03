@@ -205,7 +205,7 @@ public class CalcPaidTollTest {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario( config );
 		RoadPricingTestUtils.createNetwork1(scenario);
 //        ConfigUtils.addOrGetModule(scenario.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
-        RoadPricingSchemeImpl scheme = RoadPricingUtils.createDefaultScheme();
+        RoadPricingSchemeImpl scheme = RoadPricingUtils.createMutableScheme();
 		scenario.addScenarioElement( RoadPricingScheme.ELEMENT_NAME , scheme);
 		RoadPricingReaderXMLv1 reader = new RoadPricingReaderXMLv1(scheme);
 		reader.readFile(tollFile);
