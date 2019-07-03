@@ -218,12 +218,17 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 				} else if (planElement instanceof Leg) {
 					Leg leg = (Leg) planElement;
 					Color color = Color.lightGray;
-					switch( leg.getMode() ) {
-						case TransportMode.car: color = Color.ORANGE; break ;
-						case TransportMode.pt: color = Color.YELLOW; break ;
-						case TransportMode.walk: color = Color.GREEN; break ;
-						case TransportMode.drt: color = Color.CYAN; break ;
-						case TransportMode.non_network_walk: color = Color.GREEN ;
+					String mode = leg.getMode();
+					if( mode.contains( TransportMode.car ) ){
+						color = Color.ORANGE;
+					} else if( mode.contains( TransportMode.pt ) ){
+						color = Color.YELLOW;
+					} else if( mode.contains( TransportMode.walk ) ){
+						color = Color.GREEN;
+					} else if( mode.contains( TransportMode.drt ) ){
+						color = Color.CYAN;
+					} else if( mode.equals( TransportMode.non_network_walk ) ){
+						color = Color.GREEN;
 					}
 					if ( leg.getRoute() instanceof NetworkRoute && level==Level.ROUTES) {
 						Link startLink = net.getLinks().get(leg.getRoute().getStartLinkId());
