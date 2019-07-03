@@ -72,7 +72,7 @@ class BicycleUtilityUtils {
 			case "sett": comfortFactor = .50; break;
 			case "cobblestone;flattened":
 			case "cobblestone:flattened": comfortFactor = .50; break;
-			case "concrete": comfortFactor = .100; break;
+			case "concrete": comfortFactor = 1.0; break;
 			case "concrete:lanes": comfortFactor = .95; break;
 			case "concrete_plates":
 			case "concrete:plates": comfortFactor = .90; break;
