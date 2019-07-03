@@ -21,17 +21,16 @@
  */
 package org.matsim.core.events.algorithms;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Basic event handler that collects the relation between vehicles and drivers.
@@ -59,7 +58,7 @@ public final class Vehicle2DriverEventHandler implements VehicleEntersTrafficEve
 	}
 	
 	/**
-	 * @param vehicleId
+	 * @param vehicleId the unique vehicle identifier.
 	 * @return person id of the driver
 	 */
 	public Id<Person> getDriverOfVehicle(Id<Vehicle> vehicleId){
