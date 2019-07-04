@@ -53,7 +53,7 @@ import static org.matsim.core.router.NetworkRoutingInclAccessEgressModule.*;
  * @author jbischoff
  * @author michalm (Michal Maciejewski)
  */
-public class DrtInclAccessEgressRoutingModule implements RoutingModule {
+class DrtInclAccessEgressRoutingModule implements RoutingModule {
 	private static final Logger LOGGER = Logger.getLogger( DrtInclAccessEgressRoutingModule.class );
 
 	private final DrtConfigGroup drtCfg;
