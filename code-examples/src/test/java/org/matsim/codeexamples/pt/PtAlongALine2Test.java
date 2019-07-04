@@ -42,7 +42,7 @@ public class PtAlongALine2Test{
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	enum DrtMode { none, teleportBeeline, teleportBasedOnNetworkRoute, full }
-	private DrtMode drtMode = DrtMode.full ;
+	private DrtMode drtMode = DrtMode.teleportBasedOnNetworkRoute ;
 	private boolean drt2 = true ;
 
 	@Test
@@ -93,7 +93,7 @@ public class PtAlongALine2Test{
 
 		{
 			ModeRoutingParams wlk = new ModeRoutingParams(  ) ;
-			wlk.setMode( "wlk" ) ;
+			wlk.setMode( "walk2" ) ;
 			wlk.setTeleportedModeSpeed( 5./3.6 ) ;
 			config.plansCalcRoute().addModeRoutingParams( wlk );
 		}
@@ -108,7 +108,7 @@ public class PtAlongALine2Test{
 					// Xxx
 					IntermodalAccessEgressParameterSet paramSetXxx = new IntermodalAccessEgressParameterSet();
 //					paramSetXxx.setMode( TransportMode.walk ); // this does not work because sbb raptor treats it in a special way
-					paramSetXxx.setMode( "wlk" );
+					paramSetXxx.setMode( "walk2" );
 					paramSetXxx.setRadius( 1000000 );
 					configRaptor.addIntermodalAccessEgress( paramSetXxx );
 					// (in principle, walk as alternative to drt will not work, since drt is always faster.  Need to give the ASC to the router!  However, with
@@ -135,8 +135,9 @@ public class PtAlongALine2Test{
 
 		// === SCORING: ===
 
+		double margUtlTravPt = config.planCalcScore().getModes().get( TransportMode.pt ).getMarginalUtilityOfTraveling();;
 		if ( drtMode!=DrtMode.none ) {
-//			{
+			//			{
 //				PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("access_walk");
 //				config.planCalcScore().addModeParams(modeParams);
 //			}
@@ -147,15 +148,18 @@ public class PtAlongALine2Test{
 			// (scoring parameters for drt modes)
 			{
 				PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.drt);
+				modeParams.setMarginalUtilityOfTraveling( margUtlTravPt );
 				config.planCalcScore().addModeParams(modeParams);
 			}
 			if ( drt2 ) {
 				PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("drt2");
+				modeParams.setMarginalUtilityOfTraveling( margUtlTravPt );
 				config.planCalcScore().addModeParams(modeParams);
 			}
 		}
 		{
-			PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("wlk");
+			PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("walk2");
+			modeParams.setMarginalUtilityOfTraveling( margUtlTravPt );
 			config.planCalcScore().addModeParams(modeParams);
 		}
 
@@ -235,19 +239,19 @@ public class PtAlongALine2Test{
 		VehiclesFactory vf = scenario.getVehicles().getFactory();
 		if ( drt2 ) {
 			VehicleType vehType = vf.createVehicleType( Id.create( "drt2", VehicleType.class ) );
-			vehType.setMaximumVelocity( 50./3.6 );
+			vehType.setMaximumVelocity( 25./3.6 );
 			scenario.getVehicles().addVehicleType( vehType );
 		}{
 			VehicleType vehType = vf.createVehicleType( Id.create( TransportMode.drt, VehicleType.class ) );
-			vehType.setMaximumVelocity( 50./3.6 );
+			vehType.setMaximumVelocity( 25./3.6 );
 			scenario.getVehicles().addVehicleType( vehType );
 		}{
 			VehicleType vehType = vf.createVehicleType( Id.create( TransportMode.car, VehicleType.class ) );
-			vehType.setMaximumVelocity( 50./3.6 );
+			vehType.setMaximumVelocity( 25./3.6 );
 			scenario.getVehicles().addVehicleType( vehType );
 		}
 
-		//		scenario.getPopulation().getPersons().values().removeIf( person -> !person.getId().toString().equals( "3" ) );
+		scenario.getPopulation().getPersons().values().removeIf( person -> !person.getId().toString().equals( "3" ) );
 
 		// ### CONTROLER: ###
 
