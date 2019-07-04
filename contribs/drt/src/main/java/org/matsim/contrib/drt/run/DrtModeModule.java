@@ -90,7 +90,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 			case stopbased:
 				bindModal(TransitSchedule.class).toInstance(readTransitSchedule());
 
-				bindModal(RoutingModule.class).toProvider(new DrtRoutingModuleProvider(drtCfg));//not singleton
+				bindModal(DrtRoutingModule.class).toProvider(new DrtRoutingModuleProvider(drtCfg));//not singleton
 
 				addRoutingModuleBinding(getMode()).toProvider(modalProvider(
 						getter -> new StopBasedDrtRoutingModule(getter.get(PopulationFactory.class),
@@ -133,7 +133,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		addControlerListenerBinding().to(modalKey(DrtRouteUpdater.class));
 	}
 
-	private static class DrtRoutingModuleProvider extends ModalProviders.AbstractProvider<RoutingModule> {
+	private static class DrtRoutingModuleProvider extends ModalProviders.AbstractProvider<DrtRoutingModule> {
 		private final DrtConfigGroup drtCfg;
 
 		@Inject
@@ -160,14 +160,14 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		}
 
 		@Override
-		public RoutingModule get() {
-			if ( config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
-				return new DrtInclAccessEgressRoutingModule( drtCfg, network, travelTime, getModalInstance( TravelDisutilityFactory.class ),
-					  populationFactory, walkRouter );
-			} else{
+		public DrtRoutingModule get() {
+//			if ( config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+//				return new DrtInclAccessEgressRoutingModule( drtCfg, network, travelTime, getModalInstance( TravelDisutilityFactory.class ),
+//					  populationFactory, walkRouter );
+//			} else{
 				return new DrtRoutingModule( drtCfg, network, travelTime, getModalInstance( TravelDisutilityFactory.class ),
 					  populationFactory, walkRouter );
-			}
+//			}
 		}
 	}
 
