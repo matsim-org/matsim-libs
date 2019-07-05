@@ -90,7 +90,7 @@ public class RunDrtScenarioBatchBS_eDRT_withParking {
 
 		TemperatureChangeConfigGroup tcg = (TemperatureChangeConfigGroup) config.getModules()
 				.get(TemperatureChangeConfigGroup.GROUP_NAME);
-		tcg.setTempFile(inbase + "\\temp\\temperatures_0.csv");
+		tcg.setTemperatureChangeFile(inbase + "\\temp\\temperatures_0.csv");
 
 		// config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		// Overwrite existing configuration parameters

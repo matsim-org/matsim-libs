@@ -65,7 +65,7 @@ public class RunVWEDrtScenario {
 
 		TemperatureChangeConfigGroup tcg = (TemperatureChangeConfigGroup)config.getModules()
 				.get(TemperatureChangeConfigGroup.GROUP_NAME);
-		tcg.setTempFile("temperatures.csv");
+		tcg.setTemperatureChangeFile("temperatures.csv");
 
 		DrtConfigGroup drt = (DrtConfigGroup)config.getModules().get(DrtConfigGroup.GROUP_NAME);
 

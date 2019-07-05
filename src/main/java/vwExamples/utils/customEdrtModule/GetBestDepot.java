@@ -18,32 +18,35 @@
 
 package vwExamples.utils.customEdrtModule;
 
-import org.apache.commons.lang.mutable.MutableInt;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
-import org.matsim.contrib.drt.schedule.DrtStayTask;
-import org.matsim.contrib.drt.schedule.DrtTask;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dvrp.schedule.Task;
-import org.matsim.contrib.ev.infrastructure.*;
-//import org.matsim.contrib.ev.data.ChargingInfrastructure;
-import org.matsim.contrib.ev.fleet.Battery;
-import org.matsim.contrib.ev.fleet.ElectricFleet;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.infrastructure.ChargingInfrastructures;
-import org.matsim.core.network.NetworkUtils;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang.mutable.MutableInt;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
+import org.matsim.contrib.drt.schedule.DrtStayTask;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
+import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.ev.fleet.Battery;
+import org.matsim.contrib.ev.fleet.ElectricFleet;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructures;
+import org.matsim.core.network.NetworkUtils;
+
+import com.google.common.collect.ImmutableListMultimap;
+
+//import org.matsim.contrib.ev.data.ChargingInfrastructure;
 
 /**
  * @author axer
@@ -57,7 +60,8 @@ public class GetBestDepot implements DepotFinder {
 	private final ChargingInfrastructure chargingInfrastructure;
 	private final Fleet fleet;
 	private final ElectricFleet electricFleet;
-	private final Map<DvrpVehicle,Id<Link>> vehicleHubMap;
+	private final Map<DvrpVehicle, Id<Link>> vehicleHubMap;
+	private final ImmutableListMultimap<Id<Link>, Charger> chargersAtLinks;
 
 	public GetBestDepot(ChargingInfrastructure chargingInfrastructure, ElectricFleet electricFleet, Fleet fleet) {
 		for (Charger c : chargingInfrastructure.getChargers().values()) {
@@ -71,6 +75,7 @@ public class GetBestDepot implements DepotFinder {
 		this.InitalHubCapacityMap = new HashMap<>();
 		this.chargingInfrastructure = chargingInfrastructure;
 		this.vehicleHubMap = new HashMap<>();
+		chargersAtLinks = ChargingInfrastructures.getChargersAtLinks(chargingInfrastructure);
 
 		getInitalHubCapacity();
 		setMinlHubCapacity();
@@ -85,8 +90,8 @@ public class GetBestDepot implements DepotFinder {
 		Battery b = ev.getBattery();
 		double relativeSoc = b.getSoc() / b.getCapacity();
 
-//		return getBestHubForIdleTime(vehicle);
-//		// These vehicles are searching for a charger
+		//		return getBestHubForIdleTime(vehicle);
+		//		// These vehicles are searching for a charger
 		if (relativeSoc < 0.5) {
 			return getBestCharger(vehicle);
 
@@ -105,9 +110,9 @@ public class GetBestDepot implements DepotFinder {
 
 			int queuedVehicles = entry.getValue().getLogic().getQueuedVehicles().size();
 			ChargerQueueMap.put(entry.getValue(), queuedVehicles);
-			
-//			int chargedVehicles = entry.getValue().getLogic().getPluggedVehicles().size();
-//			ChargerChargeMap.put(entry.getValue(), queuedVehicles);
+
+			//			int chargedVehicles = entry.getValue().getLogic().getPluggedVehicles().size();
+			//			ChargerChargeMap.put(entry.getValue(), queuedVehicles);
 		}
 
 	}
@@ -117,7 +122,7 @@ public class GetBestDepot implements DepotFinder {
 		ElectricVehicle ev = electricFleet.getElectricVehicles().get(vehicle.getId());
 
 		// Is vehicle in hub located?
-		DrtStayTask currentTask = (DrtStayTask) vehicle.getSchedule().getCurrentTask();
+		DrtStayTask currentTask = (DrtStayTask)vehicle.getSchedule().getCurrentTask();
 		Link currentLink = currentTask.getLink();
 
 		boolean isLocatedinHub = InitalHubCapacityMap.containsKey(currentLink);
@@ -126,14 +131,12 @@ public class GetBestDepot implements DepotFinder {
 		if (isLocatedinHub) {
 			// Check if vehicle is at charger or at queue of an charger
 
-			Set<Entry<Id<Charger>, Charger>> chargerEntrys = ChargingInfrastructures.getChargersAtLink(
-					chargingInfrastructure, currentLink.getId()).entrySet();
+			List<Charger> chargers = chargersAtLinks.get(currentLink.getId());
 
-			for (Entry<Id<Charger>, Charger> charger : chargerEntrys) {
-
-				boolean vehicleAtQueue = charger.getValue().getLogic().getQueuedVehicles().contains(ev);
-				boolean vehicleAtCharger = charger.getValue().getLogic().getPluggedVehicles().contains(ev);
-//				System.out.print(vehicleAtQueue + " || " + vehicleAtCharger +"\n");
+			for (Charger charger : chargers) {
+				boolean vehicleAtQueue = charger.getLogic().getQueuedVehicles().contains(ev);
+				boolean vehicleAtCharger = charger.getLogic().getPluggedVehicles().contains(ev);
+				//				System.out.print(vehicleAtQueue + " || " + vehicleAtCharger +"\n");
 				// If we see a vehicle at Queue or Charger it is not idle!
 				if ((vehicleAtQueue == true) || (vehicleAtCharger == true)) {
 					return false;
@@ -144,9 +147,7 @@ public class GetBestDepot implements DepotFinder {
 			// If loop has reached this point, we know it is not charging nor queued
 			return true;
 
-		}
-
-		else {
+		} else {
 			return false;
 		}
 
@@ -165,7 +166,7 @@ public class GetBestDepot implements DepotFinder {
 
 		//Copy values of InitalHubCapacityMap to CurrentHubCapacityMap
 		for (Entry<Link, MutableInt> intitalHubEntry : InitalHubCapacityMap.entrySet()) {
-			CurrentHubCapacityMap.put(intitalHubEntry.getKey(), new MutableInt(intitalHubEntry.getValue()) );
+			CurrentHubCapacityMap.put(intitalHubEntry.getKey(), new MutableInt(intitalHubEntry.getValue()));
 
 		}
 
@@ -175,7 +176,7 @@ public class GetBestDepot implements DepotFinder {
 
 			if (currentTask instanceof DrtStayTask) {
 
-				DrtStayTask currentStayTask = (DrtStayTask) vEntry.getValue().getSchedule().getCurrentTask();
+				DrtStayTask currentStayTask = (DrtStayTask)vEntry.getValue().getSchedule().getCurrentTask();
 				Link currentLink = currentStayTask.getLink();
 
 				// Is vehicle a charing or queuing vehicle
@@ -185,15 +186,13 @@ public class GetBestDepot implements DepotFinder {
 					if (CurrentHubCapacityMap.containsKey(currentLink)) {
 
 						CurrentHubCapacityMap.get(currentLink).decrement();
-						
-						
+
 						//Each vehicles which stays 
-						if (vehicleHubMap.containsKey(vEntry.getValue()))
-						{
-							
+						if (vehicleHubMap.containsKey(vEntry.getValue())) {
+
 							vehicleHubMap.remove(vEntry.getValue());
-//							System.out.println("Unregisterd vehicle: " + vEntry.getKey()  + "@ " +currentLink.getId());
-							
+							//							System.out.println("Unregisterd vehicle: " + vEntry.getKey()  + "@ " +currentLink.getId());
+
 						}
 					}
 					// else {
@@ -231,24 +230,21 @@ public class GetBestDepot implements DepotFinder {
 		}
 
 	}
-	
-	
+
 	public void setMinlHubCapacity() {
-		int minHubCapacity=100;
+		int minHubCapacity = 100;
 		// Get an update of the actual hub situation
 		// How many vehicles are in stay at a hub
-//		this.InitalHubCapacityMap.clear();
+		//		this.InitalHubCapacityMap.clear();
 
-		for (Entry<Link, MutableInt> hubEntry : InitalHubCapacityMap.entrySet())
-		{
-			if (hubEntry.getValue().toInteger() == 1)
-			{
+		for (Entry<Link, MutableInt> hubEntry : InitalHubCapacityMap.entrySet()) {
+			if (hubEntry.getValue().toInteger() == 1) {
 				System.out.println("Hub " + hubEntry.getKey().getId() + " with one inital vehicle detected");
 				hubEntry.getValue().setValue(minHubCapacity);
-				System.out.println("Set capacity to: " +hubEntry.getValue().intValue());
-				
+				System.out.println("Set capacity to: " + hubEntry.getValue().intValue());
+
 			}
-			
+
 		}
 
 	}
@@ -257,19 +253,19 @@ public class GetBestDepot implements DepotFinder {
 
 		currentHubCapacity();
 
-//		int i=0;
-//		System.out.println("-----------------------------------------------------");
-//		for (Entry<Link, MutableInt> hubEntry : CurrentHubCapacityMap.entrySet()) {
-//			i++;
-//			System.out.println(i+": "+ hubEntry.getKey().getId() + ": " + hubEntry.getValue());
-//
-//		}
-//		System.out.println("-----------------------------------------------------");
+		//		int i=0;
+		//		System.out.println("-----------------------------------------------------");
+		//		for (Entry<Link, MutableInt> hubEntry : CurrentHubCapacityMap.entrySet()) {
+		//			i++;
+		//			System.out.println(i+": "+ hubEntry.getKey().getId() + ": " + hubEntry.getValue());
+		//
+		//		}
+		//		System.out.println("-----------------------------------------------------");
 
 		Map<Link, Double> HubDistanceMap = new HashMap<>();
 		Link bestHub = null;
 
-		DrtStayTask currentTask = (DrtStayTask) vehicle.getSchedule().getCurrentTask();
+		DrtStayTask currentTask = (DrtStayTask)vehicle.getSchedule().getCurrentTask();
 		Link currentLink = currentTask.getLink();
 
 		// Calculate Distance to Hub
@@ -283,22 +279,21 @@ public class GetBestDepot implements DepotFinder {
 		// Select the nearest free hub
 		Map<Link, MutableInt> HubsWithRemaingCapacity = new HashMap<>();
 
-//		HubsWithRemaingCapacity.putAll(CurrentHubCapacityMap);
-//		System.out.println("-------------");
+		//		HubsWithRemaingCapacity.putAll(CurrentHubCapacityMap);
+		//		System.out.println("-------------");
 		//Copy values of InitalHubCapacityMap to CurrentHubCapacityMap
 		for (Entry<Link, MutableInt> currentHubEntry : CurrentHubCapacityMap.entrySet()) {
-			
+
 			int assignedVehicle = Collections.frequency(vehicleHubMap.values(), currentHubEntry.getKey().getId());
-						
+
 			int currentHubCapa = currentHubEntry.getValue().intValue();
-			
-//			System.out.println(currentHubEntry.getKey().getId()+" Capacity: "+currentHubCapa + " ||" +" Assigned: "+assignedVehicle + " ||" +" Remain: "+(currentHubCapa-assignedVehicle));
-			
-//			HubsWithRemaingCapacity.put(currentHubEntry.getKey(), new MutableInt(currentHubEntry.getValue()) );
-			HubsWithRemaingCapacity.put(currentHubEntry.getKey(), new MutableInt(currentHubCapa - assignedVehicle ) );
+
+			//			System.out.println(currentHubEntry.getKey().getId()+" Capacity: "+currentHubCapa + " ||" +" Assigned: "+assignedVehicle + " ||" +" Remain: "+(currentHubCapa-assignedVehicle));
+
+			//			HubsWithRemaingCapacity.put(currentHubEntry.getKey(), new MutableInt(currentHubEntry.getValue()) );
+			HubsWithRemaingCapacity.put(currentHubEntry.getKey(), new MutableInt(currentHubCapa - assignedVehicle));
 		}
-//		System.out.println("-------------");
-		
+		//		System.out.println("-------------");
 
 		HubsWithRemaingCapacity = filterByValue(HubsWithRemaingCapacity, value -> value.intValue() > 0);
 
@@ -313,28 +308,22 @@ public class GetBestDepot implements DepotFinder {
 				}
 
 			}
-			
-			
+
 			//Each vehicle that is send to a hub gets registered in the assignedVehicles map
-			
-			if (vehicleHubMap.containsKey(vehicle))
-			{
-//				System.out.println("Remove registered vehicle " + vehicle.getId() + " to allow new assignment " +bestHub.getId());
+
+			if (vehicleHubMap.containsKey(vehicle)) {
+				//				System.out.println("Remove registered vehicle " + vehicle.getId() + " to allow new assignment " +bestHub.getId());
 				vehicleHubMap.remove(vehicle);
 			} else {
-			
-			vehicleHubMap.put(vehicle, bestHub.getId());
-						
-//			System.out.println("Registered vehicle: " + vehicle.getId() + "@ " +bestHub.getId());
+
+				vehicleHubMap.put(vehicle, bestHub.getId());
+
+				//			System.out.println("Registered vehicle: " + vehicle.getId() + "@ " +bestHub.getId());
 			}
-			
-			
 
 			return bestHub;
 
-		}
-
-		else {
+		} else {
 			throw new RuntimeException("Overall hub capacity != Fleet size");
 		}
 
@@ -347,7 +336,7 @@ public class GetBestDepot implements DepotFinder {
 		Map<Charger, Double> ChargerDistanceMap = new HashMap<>();
 		Charger bestCharger = null;
 
-		DrtStayTask currentTask = (DrtStayTask) vehicle.getSchedule().getCurrentTask();
+		DrtStayTask currentTask = (DrtStayTask)vehicle.getSchedule().getCurrentTask();
 		Link currentLink = currentTask.getLink();
 
 		// Calculate Distance to Charger
@@ -358,16 +347,15 @@ public class GetBestDepot implements DepotFinder {
 		}
 
 		// Do we have charger with no Queue
-		Map<Charger, Integer> chagersWithNoQueue =  new HashMap<>(); 
-		
+		Map<Charger, Integer> chagersWithNoQueue = new HashMap<>();
+
 		//Copy values
 		for (Entry<Charger, Integer> ChargerQueueMapEntry : ChargerQueueMap.entrySet()) {
-			chagersWithNoQueue.put(ChargerQueueMapEntry.getKey(),ChargerQueueMapEntry.getValue() );
+			chagersWithNoQueue.put(ChargerQueueMapEntry.getKey(), ChargerQueueMapEntry.getValue());
 		}
-		
-		
+
 		chagersWithNoQueue = filterByValue(chagersWithNoQueue, value -> value == 0);
-		
+
 		if (chagersWithNoQueue.size() > 0) {
 			double distance = Double.MAX_VALUE;
 			for (Charger charger : chagersWithNoQueue.keySet()) {
@@ -379,14 +367,12 @@ public class GetBestDepot implements DepotFinder {
 				}
 
 			}
-//			 System.out.println("None queued charger:" + bestCharger.getId() + " available, distance to hub: " +
-//			 distance);
+			//			 System.out.println("None queued charger:" + bestCharger.getId() + " available, distance to hub: " +
+			//			 distance);
 			return bestCharger.getLink();
 
 			// All Chargers have Queues, we use the charger with the lowest queue
-		} else
-
-		{
+		} else {
 			int queue = Integer.MAX_VALUE;
 
 			for (Charger charger : ChargerQueueMap.keySet()) {

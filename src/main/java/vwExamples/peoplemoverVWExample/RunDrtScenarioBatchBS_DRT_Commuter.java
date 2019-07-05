@@ -87,7 +87,7 @@ public class RunDrtScenarioBatchBS_DRT_Commuter {
 
 		TemperatureChangeConfigGroup tcg = (TemperatureChangeConfigGroup) config.getModules()
 				.get(TemperatureChangeConfigGroup.GROUP_NAME);
-		tcg.setTempFile(inbase + "\\temp\\temperatures_7.csv");
+		tcg.setTemperatureChangeFile(inbase + "\\temp\\temperatures_7.csv");
 
 		// config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		// Overwrite existing configuration parameters

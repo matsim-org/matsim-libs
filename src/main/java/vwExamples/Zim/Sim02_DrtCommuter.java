@@ -20,9 +20,12 @@
 
 package vwExamples.Zim;
 
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
-import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
-import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -53,15 +56,13 @@ import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
+
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
+import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
+import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 import vwExamples.utils.CreateEDRTVehiclesAndChargers;
 import vwExamples.utils.customEV.BatteryReplacementCharging;
 import vwExamples.utils.customEdrtModule.CustomEDrtControlerCreator;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author axer
@@ -113,7 +114,7 @@ public class Sim02_DrtCommuter {
 		// With EV
 //		TemperatureChangeConfigGroup tcg = (TemperatureChangeConfigGroup) config.getModules()
 //				.get(TemperatureChangeConfigGroup.GROUP_NAME);
-//		tcg.setTempFile(inbase + "\\input\\temp\\temperatures_0.csv");
+		//		tcg.setTemperatureChangeFile(inbase + "\\input\\temp\\temperatures_0.csv");
 
 		config.travelTimeCalculator().setTraveltimeBinSize(900);
 		Set<String> modes = new HashSet<String>();
