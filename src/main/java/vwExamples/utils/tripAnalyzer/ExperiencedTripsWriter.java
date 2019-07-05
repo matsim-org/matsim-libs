@@ -162,7 +162,7 @@ public class ExperiencedTripsWriter {
 	private void initialize() throws IOException {
 		bw = IOUtils.getBufferedWriter(path);
 		// write header
-		bw.write("tripClass" + sep + "tripId" + sep + "agent" + sep + "tripNumber" + sep + "activityBefore" + sep
+		bw.write("tripClass" + sep + "beeline" + sep + "tripId" + sep + "agent" + sep + "tripNumber" + sep + "activityBefore" + sep
 				+ "activityAfter" + sep + "fromLinkId" + sep + "fromX" + sep + "fromY" + sep + "toLinkId" + sep + "toX"
 				+ sep + "toY" + sep + "startTime" + sep + "endTime" + sep + "totalTravelTime" + sep + "numberOfLegs"
 				+ sep + "transitStopsVisited");
@@ -230,7 +230,7 @@ public class ExperiencedTripsWriter {
 				for (ExperiencedTrip trip : triplist) {
 					String mainMode = trip.getMainMode();
 					String storeMode = null;
-					if (mainMode.equals("transit_walk"))
+					if (mainMode.contains("walk"))
 					{
 						storeMode = "walk";
 					}
@@ -275,7 +275,7 @@ public class ExperiencedTripsWriter {
 					for (ExperiencedTrip trip : triplist) {
 						String mainMode = trip.getMainMode();
 						String storeMode = null;
-						if (mainMode.equals("transit_walk"))
+						if (mainMode.contains("walk"))
 						{
 							storeMode = "walk";
 						}
@@ -313,7 +313,7 @@ public class ExperiencedTripsWriter {
 					for (ExperiencedTrip trip : triplist) {
 						String mainMode = trip.getMainMode();
 						String storeMode = null;
-						if (mainMode.equals("transit_walk"))
+						if (mainMode.contains("walk"))
 						{
 							storeMode = "walk";
 						}
@@ -352,7 +352,7 @@ public class ExperiencedTripsWriter {
 					if (tripWithinCity(trip)) {
 						String mainMode = trip.getMainMode();
 						String storeMode = null;
-						if (mainMode.equals("transit_walk"))
+						if (mainMode.contains("walk"))
 						{
 							storeMode = "walk";
 						}
@@ -394,7 +394,7 @@ public class ExperiencedTripsWriter {
 					for (ExperiencedTrip trip : triplist) {
 						String mainMode = trip.getMainMode();
 						String storeMode = null;
-						if (mainMode.equals("transit_walk"))
+						if (mainMode.contains("walk"))
 						{
 							storeMode = "walk";
 						}
@@ -436,7 +436,7 @@ public class ExperiencedTripsWriter {
 					for (ExperiencedTrip trip : triplist) {
 						String mainMode = trip.getMainMode();
 						String storeMode = null;
-						if (mainMode.equals("transit_walk"))
+						if (mainMode.contains("walk"))
 						{
 							storeMode = "walk";
 						}
@@ -506,7 +506,7 @@ public class ExperiencedTripsWriter {
 						for (ExperiencedTrip trip : triplist) {
 							String mainMode = trip.getMainMode();
 							String storeMode = null;
-							if (mainMode.equals("transit_walk"))
+							if (mainMode.contains("walk"))
 							{
 								storeMode = "walk";
 							}
@@ -857,25 +857,25 @@ public class ExperiencedTripsWriter {
 
 		Point from = beeline.getStartPoint();
 		Point to = beeline.getEndPoint();
-		Geometry geom = boundary;
+//		Geometry geom = boundary;
 
-		if (geom.contains(to) && !geom.contains(from)) {
+		if (boundary.contains(to) && !boundary.contains(from)) {
 			return "inbound";
 		}
 
-		else if (geom.contains(from) && !geom.contains(to)) {
+		else if (boundary.contains(from) && !boundary.contains(to)) {
 			return "outbound";
 		}
 
-		else if (!(geom.contains(from)) && !(geom.contains(to)) && (beeline.intersects(geom))) {
+		else if (!(boundary.contains(from)) && !(boundary.contains(to)) && (beeline.intersects(boundary))) {
 			return "through";
 		}
 
-		else if (!(geom.contains(from)) && !(geom.contains(to)) && !(beeline.intersects(geom))) {
+		else if (!(boundary.contains(from)) && !(boundary.contains(to)) && !(beeline.intersects(boundary))) {
 			return "outside";
 		}
 
-		else if (geom.contains(from) && geom.contains(to)) {
+		else if (boundary.contains(from) && boundary.contains(to)) {
 			return "inside";
 		} else
 			return "undefined";
@@ -1468,10 +1468,11 @@ public class ExperiencedTripsWriter {
 
 					LineString beeline = new LineSegment(start, end).toGeometry(f);
 
-//					String tripClass = intersectShape(beeline);
-					String tripClass = "disabled";
+					String tripClass = intersectShape(beeline);
+//					String tripClass = "disabled";
 
 					trip.setTripClass(tripClass);
+					trip.setBeeline(beeline);
 
 					writeExperiencedTrip(trip);
 					bw.newLine();
@@ -1623,7 +1624,7 @@ public class ExperiencedTripsWriter {
 		try {
 			Coord from = network.getLinks().get(trip.getFromLinkId()).getCoord();
 			Coord to = network.getLinks().get(trip.getToLinkId()).getCoord();
-			bw.write(trip.getTripClass() + sep + trip.getId() + sep + trip.getAgent() + sep + trip.getTripNumber() + sep
+			bw.write(trip.getTripClass()  + sep + trip.getBeeline() + sep + trip.getId() + sep + trip.getAgent() + sep + trip.getTripNumber() + sep
 					+ trip.getActivityBefore() + sep + trip.getActivityAfter() + sep + trip.getFromLinkId() + sep
 					+ from.getX() + sep + from.getY() + sep + trip.getToLinkId() + sep + to.getX() + sep + to.getY()
 					+ sep + convertSecondsToTimeString(trip.getStartTime()) + sep

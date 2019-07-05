@@ -19,6 +19,7 @@
 
 package vwExamples.utils.tripAnalyzer;
 
+import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -56,7 +57,7 @@ public class ExperiencedTrip {
 	private int subtourNr;
 	private Double startOfParking = null;
 	private Double endOfParking = null;
-
+	private String beeline;
 	// Coords unavailable in events
 
 	/**
@@ -92,6 +93,7 @@ public class ExperiencedTrip {
 		findTransitStopsVisited();
 		this.tripClass = null;
 
+		this.beeline = null;
 	}
 
 	private void findTransitStopsVisited() {
@@ -250,38 +252,58 @@ public class ExperiencedTrip {
 	}
 
 	String getMainMode() {
-		Set<String> acceptedMainModes = new HashSet<>(Arrays.asList("car", "pt", "drt", "walk", "ride", "bike","transit_walk","stayHome"));
+		Set<String> acceptedMainModes = new HashSet<>(Arrays.asList("car", "pt", "drt", "walk", "ride", "bike","stayHome"));
 
+		Set<String> seenModesForLegs = new HashSet<String>();
 		for (ExperiencedLeg leg : this.legs) {
 			String legMode = leg.getMode();
 
-			if (acceptedMainModes.contains(legMode)) {
-				return legMode;
-			}
+//			if (acceptedMainModes.contains(legMode)) {
+//				return legMode;
+//			}
 //			else if  (legMode.equals("transit_walk")) {
 //				return "walk";
 //			}
+			
+			seenModesForLegs.add(legMode);
 
 		}
 		
-		//Default mode not found, check for transit_walk
-		for (ExperiencedLeg leg : this.legs) {
-			String legMode = leg.getMode();
-
-			if (TransportMode.transit_walk.equals(legMode)) {
-				return legMode;
-			}
-//			else if  (legMode.equals("transit_walk")) {
-//				return "walk";
-//			}
-
+		//There is only one used mode
+		if (seenModesForLegs.size()==1)
+		{
+			String mode = seenModesForLegs.iterator().next();
+			return mode;
+			
 		}
-//
-//		if (mode2distance.get("transit_walk") > 0) {
-//			return "walk";
-//		}
+		
+		if (seenModesForLegs.size()>1)
+		{
+			Set<String> filteredPersons = acceptedMainModes.stream().flatMap(n -> seenModesForLegs.stream().filter(p -> n.equals(p))).collect(Collectors.toCollection(LinkedHashSet::new));
+			String mode = filteredPersons.iterator().next();
+			
+			if(acceptedMainModes.contains(mode))
+			{
+				return mode;
+			}
+			
+			else {
+				return "unknown";
+			}
+			
+		}
+		
 
 		return "unknown";
 
+	}
+	public void setBeeline(Geometry beeline)
+	{
+		this.beeline=beeline.toString();
+	}
+	
+	public String getBeeline()
+	{
+		return this.beeline;
 	}
 }
