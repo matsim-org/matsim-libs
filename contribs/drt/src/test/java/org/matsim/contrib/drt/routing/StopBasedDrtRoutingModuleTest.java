@@ -69,9 +69,8 @@ public class StopBasedDrtRoutingModuleTest {
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(scenario.getConfig());
 		AccessEgressStopFinder stopFinder = new DefaultAccessEgressStopFinder(scenario.getTransitSchedule(), drtCfg,
 				scenario.getConfig().plansCalcRoute(), scenario.getNetwork());
-		DrtRoutingModule drtRoutingModule = new DrtRoutingModule(drtCfg, scenario.getNetwork(),
-				new FreeSpeedTravelTime(), TimeAsTravelDisutility::new, scenario.getPopulation().getFactory(),
-				walkRouter);
+		DrtRoutingModule drtRoutingModule = new DrtRoutingModule( drtCfg, scenario.getNetwork(),
+				new FreeSpeedTravelTime(), TimeAsTravelDisutility::new, walkRouter, scenario );
 		StopBasedDrtRoutingModule stopBasedDRTRoutingModule = new StopBasedDrtRoutingModule(
 				scenario.getPopulation().getFactory(), drtRoutingModule, walkRouter, stopFinder, drtCfg);
 

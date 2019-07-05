@@ -145,14 +145,11 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		private TravelTime travelTime;
 
 		@Inject
-		private PopulationFactory populationFactory;
+		private Scenario scenario ;
 
 		@Inject
 		@Named(TransportMode.walk)
 		private RoutingModule walkRouter;
-
-		@Inject
-		private Config config ;
 
 		private DrtRoutingModuleProvider(DrtConfigGroup drtCfg) {
 			super(drtCfg.getMode());
@@ -165,8 +162,8 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 //				return new DrtInclAccessEgressRoutingModule( drtCfg, network, travelTime, getModalInstance( TravelDisutilityFactory.class ),
 //					  populationFactory, walkRouter );
 //			} else{
-				return new DrtRoutingModule( drtCfg, network, travelTime, getModalInstance( TravelDisutilityFactory.class ),
-					  populationFactory, walkRouter );
+				return new DrtRoutingModule( this.drtCfg, network, travelTime, getModalInstance( TravelDisutilityFactory.class ),
+					  walkRouter, scenario );
 //			}
 		}
 	}
