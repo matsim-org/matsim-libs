@@ -1,5 +1,6 @@
 package org.matsim.contrib.roadpricing;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -55,6 +56,9 @@ class RoadPricingNetworkRouting implements Provider<RoutingModule> {
 	PopulationFactory populationFactory;
 
 	@Inject
+	Scenario scenario ;
+
+	@Inject
 	LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 
 	private
@@ -77,8 +81,8 @@ class RoadPricingNetworkRouting implements Provider<RoutingModule> {
 						travelDisutilityFactory.createTravelDisutility(travelTime),
 						travelTime);
 		if (plansCalcRouteConfigGroup.isInsertingAccessEgressWalk()) {
-			return DefaultRoutingModules.createAccessEgressNetworkRouter(TransportMode.car, populationFactory,
-					filteredNetwork, routeAlgo, plansCalcRouteConfigGroup);
+			return DefaultRoutingModules.createAccessEgressNetworkRouter(TransportMode.car,
+					routeAlgo, scenario, filteredNetwork );
 		} else {
 			return DefaultRoutingModules.createPureNetworkRouter(TransportMode.car, populationFactory,
 					filteredNetwork, routeAlgo);

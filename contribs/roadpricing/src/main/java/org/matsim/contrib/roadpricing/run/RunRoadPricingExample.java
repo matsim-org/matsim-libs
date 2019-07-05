@@ -51,7 +51,7 @@ public final class RunRoadPricingExample {
 		new RunRoadPricingExample(args).run();
 	}
 
-	private RunRoadPricingExample(String[] args) {
+	public RunRoadPricingExample( String[] args ) {
 		if (args.length > 0) {
 			this.args = args;
 		} else{
@@ -80,7 +80,7 @@ public final class RunRoadPricingExample {
 		controler.run();
 	}
 
-	private Config prepareConfig() {
+	public Config prepareConfig() {
 		// load the config, telling it to "materialize" the road pricing section:
 		config = ConfigUtils.loadConfig(args[0], RoadPricingUtils.createConfigGroup());
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
