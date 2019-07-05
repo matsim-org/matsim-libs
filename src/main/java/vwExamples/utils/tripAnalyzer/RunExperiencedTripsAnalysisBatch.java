@@ -42,6 +42,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
@@ -56,7 +57,7 @@ public class RunExperiencedTripsAnalysisBatch {
 
 	public static void main(String[] args) {
 
-		run("D:\\Matsim\\Axer\\Hannover\\Base\\");
+		run("D:\\Matsim\\Axer\\Hannover\\ZIM\\output\\");
 	}
 
 	public static void run(String runDir) {
@@ -71,9 +72,11 @@ public class RunExperiencedTripsAnalysisBatch {
 			Set<String> scenarioToBeAnalyzed = new HashSet<String>();
 //			scenarioToBeAnalyzed.add("VW243_LocalLinkFlow_1.15_10pct"); //InOut
 //			scenarioToBeAnalyzed.add("VW243_LocalLinkFlow_1.28_10pct");
-//			scenarioToBeAnalyzed.add("VW243_CityCommuterDRT_10pct300_veh_idx0");
+			scenarioToBeAnalyzed.add("VW243_CityCommuterDRTAmpel2.0_10pct300_veh_idx0");
 //			scenarioToBeAnalyzed.add("VW243_CityCommuterDRTAmpel2.0_10pct300_veh_idx0");
-			scenarioToBeAnalyzed.add("vw243_cadON_ptSpeedAdj.0.1");
+//			scenarioToBeAnalyzed.add("VW243_HomeOffice_10pct");
+//			scenarioToBeAnalyzed.add("vw243_cadON_ptSpeedAdj.0.1");
+			
 			
 			
 
@@ -106,9 +109,11 @@ public class RunExperiencedTripsAnalysisBatch {
 		monitoredModes.add("walk");
 		monitoredModes.add("bike");
 		monitoredModes.add("ride");
+		monitoredModes.add("stayHome");
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(runPrefix + "output_network.xml.gz");
+//		new PopulationReader(scenario).readFile(runPrefix + "output_plans.xml.gz");
 
 		if (useTransitSchedule) {
 			new TransitScheduleReader(scenario).readFile(runPrefix + "output_transitSchedule.xml.gz");

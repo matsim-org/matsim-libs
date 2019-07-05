@@ -18,17 +18,25 @@
 
 package vwExamples.utils.delays;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.geotools.filter.expression.ThisPropertyAccessorFactory;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.locationtech.jts.geom.Geometry;
@@ -53,6 +61,7 @@ import org.matsim.core.population.io.StreamingPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
 import analysis.drtOccupancy.DynModeTripsAnalyser;
@@ -87,11 +96,11 @@ public class RunTravelDelayAnalysisBatch {
 			String scenarioName = StringList[StringList.length - 1];
 			
 			Set<String> scenarioToBeAnalyzed = new HashSet<String>();
-			scenarioToBeAnalyzed.add("VW243_LocalLinkFlow_1.15_10pct"); //InOut
-			scenarioToBeAnalyzed.add("VW243_LocalLinkFlow_1.28_10pct");
-			scenarioToBeAnalyzed.add("VW243_CityCommuterDRT_10pct300_veh_idx0");
-			scenarioToBeAnalyzed.add("VW243_CityCommuterDRTAmpel2.0_10pct300_veh_idx0");
-			
+			scenarioToBeAnalyzed.add("VW243_HomeOffice_10pct");
+//			scenarioToBeAnalyzed.add("VW243_LocalLinkFlow_1.28_10pct");
+//			scenarioToBeAnalyzed.add("VW243_CityCommuterDRT_10pct300_veh_idx0");
+//			scenarioToBeAnalyzed.add("VW243_CityCommuterDRTAmpel2.0_10pct300_veh_idx0");
+//			
 			
 
 			if (scenarioToBeAnalyzed.contains(scenarioName)) {
@@ -166,20 +175,21 @@ public class RunTravelDelayAnalysisBatch {
 				NetworkUtils.writeNetwork(network,
 						scenarioDir + "\\" + scenarioName + ".output_network_flow_delay.xml.gz");
 
-				// String netfile = scenarioDir + "\\" + scenarioName +
-				// ".output_network_flow_delay.xml.gz";
-				// String outputFileLs = scenarioDir + "\\" + scenarioName +
-				// ".output_network_flow_delay_l.shp";
-				// String outputFileP = scenarioDir + "\\" + scenarioName +
-				// ".output_network_flow_delay_p.shp";
-				// String[] params = {netfile,outputFileLs,outputFileP};
-				// Links2ESRIShape.main(params);
+//				 String netfile = scenarioDir + "\\" + scenarioName +
+//				 ".output_network_flow_delay.xml.gz";
+//				 String outputFileLs = scenarioDir + "\\" + scenarioName +
+//				 ".output_network_flow_delay_l.shp";
+//				 String outputFileP = scenarioDir + "\\" + scenarioName +
+//				 ".output_network_flow_delay_p.shp";
+//				 String[] params = {netfile,outputFileLs,outputFileP};
+//				 Links2ESRIShape.main(params);
 
 				createLinkAttributesList(network);
 				DynModeTripsAnalyser.collection2Text(LinkAttributesList,
 						scenarioDir + "\\" + scenarioName + ".linkData_delay_flow_city_hannover.csv",
 						"linkid;delay_h;flow_veh");
 
+//				writeTimeDependentFlow(scenarioDir + "\\" + scenarioName + ".LinkFlows.csv",tdc.getTimeDependentFlow());
 			}
 		}
 
@@ -209,6 +219,55 @@ public class RunTravelDelayAnalysisBatch {
 			LinkAttributesList.add(Entry);
 		}
 
+	}
+	
+	public static void writeTimeDependentFlow(String fileName, Map<Double, HashMap<Id<Link>,MutableInt>> timeDependentFlow) {
+		DecimalFormat format = new DecimalFormat();
+		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
+		format.setMinimumIntegerDigits(1);
+		format.setMaximumFractionDigits(2);
+		format.setGroupingUsed(false);
+
+		BufferedWriter bw = IOUtils.getBufferedWriter(fileName);
+
+		
+		SortedSet<Double> timeBins = new TreeSet<>(timeDependentFlow.keySet());
+				
+		
+		
+		try {
+
+			bw.write("hour;linkId;flowPerHour");
+			bw.newLine();
+			for (Double t : timeBins) {
+				
+				for (Entry<Id<Link>, MutableInt> linkEntry : timeDependentFlow.get(t).entrySet())
+				{
+					String row = t + ";" + linkEntry.getKey() + ";" + linkEntry.getValue();
+
+					bw.write(row);
+					bw.newLine();
+				}
+
+				
+
+			}
+
+			bw.flush();
+			bw.close();
+			// datasetrequ.addSeries(parkCount);
+			// // JFreeChart chart = chartProfile(splitParkings.size(), dataset, "Waiting
+			// // times", "Wait time (s)");
+			// JFreeChart chart2 = chartProfile(splitParkings.size(), datasetrequ, "Parked
+			// Vehicles over Time",
+			// "Total Parked Cars [-]");
+			// // ChartSaveUtils.saveAsPNG(chart, fileName, 1500, 1000);
+			// ChartSaveUtils.saveAsPNG(chart2, fileName + "_parkEvents", 1500, 1000);
+
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
 	}
 
 	public static void readShape(String shapeFile, String featureKeyInShapeFile) {

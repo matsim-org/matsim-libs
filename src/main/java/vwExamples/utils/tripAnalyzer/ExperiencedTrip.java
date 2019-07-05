@@ -26,11 +26,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author gleich
  */
-public class ExperiencedTrip  {
+public class ExperiencedTrip {
 	private final Id<Person> agent;
 	private final String activityBefore;
 	private final String activityAfter;
@@ -92,7 +93,6 @@ public class ExperiencedTrip  {
 		this.tripClass = null;
 
 	}
-	
 
 	private void findTransitStopsVisited() {
 		for (ExperiencedLeg leg : legs) {
@@ -231,40 +231,56 @@ public class ExperiencedTrip  {
 		this.subtourNr = subTourNr;
 
 	}
+
 	int getSubTourNr() {
 		return this.subtourNr;
 
 	}
-	
-	void setParkingStart(Double time)
-	{
-		this.startOfParking=time;
-	}
-	
-	void setParkingEnd(Double time)
-	{
-		this.endOfParking=time;
+
+	void setParkingStart(Double time) {
+		this.startOfParking = time;
 	}
 
+	void setParkingEnd(Double time) {
+		this.endOfParking = time;
+	}
 
 	public LinkedList<Id<TransitStopFacility>> getTransitStopsVisited() {
 		return transitStopsVisited;
 	}
 
 	String getMainMode() {
-		Set<String> acceptedMainModes = new HashSet<>(Arrays.asList("car", "pt", "drt", "walk", "ride", "bike"));
+		Set<String> acceptedMainModes = new HashSet<>(Arrays.asList("car", "pt", "drt", "walk", "ride", "bike","transit_walk","stayHome"));
 
-		for (String mode : acceptedMainModes) {
-			if (mode2distance.containsKey(mode)) {
-				double distance = mode2distance.get(mode);
+		for (ExperiencedLeg leg : this.legs) {
+			String legMode = leg.getMode();
 
-				if (distance > 0) {
-					return mode;
-				}
-
+			if (acceptedMainModes.contains(legMode)) {
+				return legMode;
 			}
+//			else if  (legMode.equals("transit_walk")) {
+//				return "walk";
+//			}
 
 		}
+		
+		//Default mode not found, check for transit_walk
+		for (ExperiencedLeg leg : this.legs) {
+			String legMode = leg.getMode();
+
+			if (TransportMode.transit_walk.equals(legMode)) {
+				return legMode;
+			}
+//			else if  (legMode.equals("transit_walk")) {
+//				return "walk";
+//			}
+
+		}
+//
+//		if (mode2distance.get("transit_walk") > 0) {
+//			return "walk";
+//		}
+
 		return "unknown";
 
 	}

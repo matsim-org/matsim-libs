@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.StringJoiner;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -69,6 +70,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.geometry.GeometryUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -99,6 +101,8 @@ public class ExperiencedTripsWriter {
 	private Map<String, Map<Double, Set<Id<Vehicle>>>> Zone2BinActiveVehicleMap;
 	private Map<String, MutableDouble> Mode2MileageMap;
 	private Set<ModalSplitSegment> ModalSplitSegments;
+	private Map<String, String> zone2WKTGeom;
+	int totalNumberTripToBeStored = 0;
 
 	public ExperiencedTripsWriter(String path, Map<Id<Person>, List<ExperiencedTrip>> agent2trips,
 			Map<String, Map<Double, Set<Id<Vehicle>>>> Zone2BinActiveVehicleMap,
@@ -116,6 +120,21 @@ public class ExperiencedTripsWriter {
 		this.Zone2BinActiveVehicleMap = Zone2BinActiveVehicleMap;
 		this.Mode2MileageMap = Mode2MileageMap;
 		this.ModalSplitSegments = new HashSet<ModalSplitSegment>();
+		
+
+		zone2WKTGeom = new HashMap<String, String>();
+
+		WKTWriter wktwriter = new WKTWriter();
+
+		for (String zoneId : zoneMap.keySet()) {
+
+			String zoneWKT = wktwriter.write(zoneMap.get(zoneId));
+			zone2WKTGeom.put(zoneId, zoneWKT);
+
+		}
+
+		// potentialHomieAgents = new HashSet<Id<Person>>();
+		// relevantAgents = new HashSet<Id<Person>>();
 
 		districtGeometryList = new ArrayList<Geometry>();
 		zoneId2ParkingEvents = new HashMap<String, List<ParkingEvent>>();
@@ -163,7 +182,7 @@ public class ExperiencedTripsWriter {
 	}
 
 	private void tourClassifier() {
-		Set<String> acceptedMainModes = new HashSet<>(Arrays.asList("car", "pt", "drt", "walk", "ride", "bike"));
+		Set<String> acceptedMainModes = new HashSet<>(Arrays.asList("car", "pt", "drt", "walk", "ride", "bike","stayHome"));
 
 		// Modal Split Classes:
 		// Class 1: tours (no spatial filtering, complete demand model)
@@ -186,6 +205,7 @@ public class ExperiencedTripsWriter {
 		ModalSplitSegment Class4 = new ModalSplitSegment("4", acceptedMainModes);
 		ModalSplitSegment Class5 = new ModalSplitSegment("5", acceptedMainModes);
 		ModalSplitSegment Class6 = new ModalSplitSegment("6", acceptedMainModes);
+		ModalSplitSegment Class7 = new ModalSplitSegment("7", acceptedMainModes);
 
 		ModalSplitSegments.add(Class1);
 		ModalSplitSegments.add(Class2);
@@ -193,26 +213,47 @@ public class ExperiencedTripsWriter {
 		ModalSplitSegments.add(Class4);
 		ModalSplitSegments.add(Class5);
 		ModalSplitSegments.add(Class6);
+		ModalSplitSegments.add(Class7);
 
+		//int seenTrips = 0;
 		// 1 Tour contains N Trips
 		for (Entry<String, List<ExperiencedTrip>> TourEntrySet : tourId2trips.entrySet()) {
 			// String tourId = TourEntrySet.getKey();
+			
+			
 			List<ExperiencedTrip> triplist = TourEntrySet.getValue();
 
 			// Handle Class 1: All trips of all tours are stored
 			{
 
+			
 				for (ExperiencedTrip trip : triplist) {
 					String mainMode = trip.getMainMode();
+					String storeMode = null;
+					if (mainMode.equals("transit_walk"))
+					{
+						storeMode = "walk";
+					}
+					else {
+						storeMode = mainMode;
+						
+					}
+					
+					if(mainMode.equals("unknown"))
+					{
+						System.out.println("Mode Missing! Check Code!");
+					}
+										
+					
 					if (trip.getMode2inVehicleOrMoveDistance().containsKey(mainMode)) {
 						double distance = trip.getMode2inVehicleOrMoveDistance().get(mainMode);
 
-						if (Class1.mode2TripDistance.containsKey(mainMode)) {
-							Class1.mode2TripDistance.get(mainMode).add(distance);
+						if (Class1.mode2TripDistance.containsKey(storeMode)) {
+							Class1.mode2TripDistance.get(storeMode).add(distance);
 
 						} else {
-							Class1.mode2TripDistance.put(mainMode, new ArrayList<Double>());
-							Class1.mode2TripDistance.get(mainMode).add(distance);
+							Class1.mode2TripDistance.put(storeMode, new ArrayList<Double>());
+							Class1.mode2TripDistance.get(storeMode).add(distance);
 
 						}
 
@@ -221,8 +262,10 @@ public class ExperiencedTripsWriter {
 					// Else mode is unknown and not analyzed
 					// E.g. pure transit_walks are not counted anyway
 
+					//seenTrips++;
 				}
 			}
+			//System.out.println("Seen trips: "+seenTrips);
 
 			// Class 2: All tours of city inhabitants (home activity is within city area) /
 			// MID modal split
@@ -231,15 +274,25 @@ public class ExperiencedTripsWriter {
 				if (livesInside(triplist)) {
 					for (ExperiencedTrip trip : triplist) {
 						String mainMode = trip.getMainMode();
+						String storeMode = null;
+						if (mainMode.equals("transit_walk"))
+						{
+							storeMode = "walk";
+						}
+						else {
+							storeMode = mainMode;
+							
+						}
+
 						if (trip.getMode2inVehicleOrMoveDistance().containsKey(mainMode)) {
 							double distance = trip.getMode2inVehicleOrMoveDistance().get(mainMode);
 
-							if (Class2.mode2TripDistance.containsKey(mainMode)) {
-								Class2.mode2TripDistance.get(mainMode).add(distance);
+							if (Class2.mode2TripDistance.containsKey(storeMode)) {
+								Class2.mode2TripDistance.get(storeMode).add(distance);
 
 							} else {
-								Class2.mode2TripDistance.put(mainMode, new ArrayList<Double>());
-								Class2.mode2TripDistance.get(mainMode).add(distance);
+								Class2.mode2TripDistance.put(storeMode, new ArrayList<Double>());
+								Class2.mode2TripDistance.get(storeMode).add(distance);
 
 							}
 
@@ -259,15 +312,25 @@ public class ExperiencedTripsWriter {
 				if (allActivitiesWithinCity(triplist)) {
 					for (ExperiencedTrip trip : triplist) {
 						String mainMode = trip.getMainMode();
+						String storeMode = null;
+						if (mainMode.equals("transit_walk"))
+						{
+							storeMode = "walk";
+						}
+						else {
+							storeMode = mainMode;
+							
+						}
+
 						if (trip.getMode2inVehicleOrMoveDistance().containsKey(mainMode)) {
 							double distance = trip.getMode2inVehicleOrMoveDistance().get(mainMode);
 
-							if (Class3.mode2TripDistance.containsKey(mainMode)) {
-								Class3.mode2TripDistance.get(mainMode).add(distance);
+							if (Class3.mode2TripDistance.containsKey(storeMode)) {
+								Class3.mode2TripDistance.get(storeMode).add(distance);
 
 							} else {
-								Class3.mode2TripDistance.put(mainMode, new ArrayList<Double>());
-								Class3.mode2TripDistance.get(mainMode).add(distance);
+								Class3.mode2TripDistance.put(storeMode, new ArrayList<Double>());
+								Class3.mode2TripDistance.get(storeMode).add(distance);
 
 							}
 
@@ -288,15 +351,25 @@ public class ExperiencedTripsWriter {
 				for (ExperiencedTrip trip : triplist) {
 					if (tripWithinCity(trip)) {
 						String mainMode = trip.getMainMode();
+						String storeMode = null;
+						if (mainMode.equals("transit_walk"))
+						{
+							storeMode = "walk";
+						}
+						else {
+							storeMode = mainMode;
+							
+						}
+
 						if (trip.getMode2inVehicleOrMoveDistance().containsKey(mainMode)) {
 							double distance = trip.getMode2inVehicleOrMoveDistance().get(mainMode);
 
-							if (Class4.mode2TripDistance.containsKey(mainMode)) {
-								Class4.mode2TripDistance.get(mainMode).add(distance);
+							if (Class4.mode2TripDistance.containsKey(storeMode)) {
+								Class4.mode2TripDistance.get(storeMode).add(distance);
 
 							} else {
-								Class4.mode2TripDistance.put(mainMode, new ArrayList<Double>());
-								Class4.mode2TripDistance.get(mainMode).add(distance);
+								Class4.mode2TripDistance.put(storeMode, new ArrayList<Double>());
+								Class4.mode2TripDistance.get(storeMode).add(distance);
 
 							}
 
@@ -320,17 +393,27 @@ public class ExperiencedTripsWriter {
 					// System.out.println(person.toString());
 					for (ExperiencedTrip trip : triplist) {
 						String mainMode = trip.getMainMode();
+						String storeMode = null;
+						if (mainMode.equals("transit_walk"))
+						{
+							storeMode = "walk";
+						}
+						else {
+							storeMode = mainMode;
+							
+						}
+
 						// System.out.println(trip.getSubTourNr() + "||" + mainMode);
 
 						if (trip.getMode2inVehicleOrMoveDistance().containsKey(mainMode)) {
 							double distance = trip.getMode2inVehicleOrMoveDistance().get(mainMode);
 
-							if (Class5.mode2TripDistance.containsKey(mainMode)) {
-								Class5.mode2TripDistance.get(mainMode).add(distance);
+							if (Class5.mode2TripDistance.containsKey(storeMode)) {
+								Class5.mode2TripDistance.get(storeMode).add(distance);
 
 							} else {
-								Class5.mode2TripDistance.put(mainMode, new ArrayList<Double>());
-								Class5.mode2TripDistance.get(mainMode).add(distance);
+								Class5.mode2TripDistance.put(storeMode, new ArrayList<Double>());
+								Class5.mode2TripDistance.get(storeMode).add(distance);
 
 							}
 
@@ -352,17 +435,27 @@ public class ExperiencedTripsWriter {
 					// System.out.println(person.toString());
 					for (ExperiencedTrip trip : triplist) {
 						String mainMode = trip.getMainMode();
+						String storeMode = null;
+						if (mainMode.equals("transit_walk"))
+						{
+							storeMode = "walk";
+						}
+						else {
+							storeMode = mainMode;
+							
+						}
+	
 						// System.out.println(trip.getSubTourNr() + "||" + mainMode);
 
 						if (trip.getMode2inVehicleOrMoveDistance().containsKey(mainMode)) {
 							double distance = trip.getMode2inVehicleOrMoveDistance().get(mainMode);
 
-							if (Class6.mode2TripDistance.containsKey(mainMode)) {
-								Class6.mode2TripDistance.get(mainMode).add(distance);
+							if (Class6.mode2TripDistance.containsKey(storeMode)) {
+								Class6.mode2TripDistance.get(storeMode).add(distance);
 
 							} else {
-								Class6.mode2TripDistance.put(mainMode, new ArrayList<Double>());
-								Class6.mode2TripDistance.get(mainMode).add(distance);
+								Class6.mode2TripDistance.put(storeMode, new ArrayList<Double>());
+								Class6.mode2TripDistance.get(storeMode).add(distance);
 
 							}
 
@@ -370,6 +463,77 @@ public class ExperiencedTripsWriter {
 						// ToDo
 						// Else mode is unknown and not analyzed
 						// E.g. pure transit_walks are not counted anyway
+
+					}
+
+				}
+
+			}
+
+			// Class 7: tours of home office candidates -->
+			// (all tours with work within city area, home outside) or
+			// (all tours with work outside city area, lives inside) or
+			// (all tours with home within city area and work within city area)
+			{
+				String chain = getActivityChain(triplist);
+//				if (chain.equals("home-work-home")) {
+//
+//					potentialHomieAgents.add(triplist.get(0).getAgent());
+//				}
+//				
+//				relevantAgents.add(triplist.get(0).getAgent());
+//
+//				if(relevantAgents.size()>0)
+//				{
+//				double r = (double) potentialHomieAgents.size( )/ (double) relevantAgents.size();
+//				System.out.println(r);
+//				}
+				
+				
+				if (isOutboundCommuterTour(triplist) || isInboundCommuterTour(triplist) || isWithinCommuterTour(triplist)) {
+//					relevantAgents.add(triplist.get(0).getAgent());
+
+//					String chain = getActivityChain(triplist);
+
+					// If chain is a simple home-work-home chain
+//					if (chain.equals("home-work-home")) {
+					if (true) {
+
+						//potentialHomieAgents.add(triplist.get(0).getAgent());
+
+						// Id<Person> person = triplist.get(0).getAgent();
+						// System.out.println(person.toString());
+						for (ExperiencedTrip trip : triplist) {
+							String mainMode = trip.getMainMode();
+							String storeMode = null;
+							if (mainMode.equals("transit_walk"))
+							{
+								storeMode = "walk";
+							}
+							else {
+								storeMode = mainMode;
+								
+							}
+							// System.out.println(trip.getSubTourNr() + "||" + mainMode);
+
+							if (trip.getMode2inVehicleOrMoveDistance().containsKey(mainMode)) {
+								double distance = trip.getMode2inVehicleOrMoveDistance().get(mainMode);
+
+								if (Class7.mode2TripDistance.containsKey(storeMode)) {
+									Class7.mode2TripDistance.get(storeMode).add(distance);
+
+								} else {
+									Class7.mode2TripDistance.put(storeMode, new ArrayList<Double>());
+									Class7.mode2TripDistance.get(storeMode).add(distance);
+
+								}
+
+							}
+							// ToDo
+							// Else mode is unknown and not analyzed
+							// E.g. pure transit_walks are not counted anyway
+
+						}
 
 					}
 
@@ -423,6 +587,42 @@ public class ExperiencedTripsWriter {
 
 	}
 
+	private String getActivityChain(List<ExperiencedTrip> triplist) {
+		StringJoiner joiner = new StringJoiner("-");
+
+		for (ExperiencedTrip trip : triplist) {
+			String act = trip.getActivityBefore();
+
+			if (act.contains("home")) {
+				act = "home";
+			} else if (act.contains("work")) {
+				act = "work";
+			} else if (act.contains("shopping")) {
+				act = "shopping";
+			} else if (act.contains("other")) {
+				act = "other";
+			} else if (act.contains("leisure")) {
+				act = "leisure";
+			}
+
+			joiner.add(act);
+		}
+		// Finalize with last act
+
+		joiner.add("home");
+
+		return joiner.toString();
+	}
+
+	private boolean isInboundCommuterTour(List<ExperiencedTrip> triplist) {
+
+		if (livesOutside(triplist) && worksInside(triplist)) {
+			return true;
+		}
+		return false;
+
+	}
+
 	private boolean isOutboundCommuterTour(List<ExperiencedTrip> triplist) {
 
 		if (worksOutside(triplist) && livesInside(triplist)) {
@@ -432,9 +632,9 @@ public class ExperiencedTripsWriter {
 
 	}
 
-	private boolean isInboundCommuterTour(List<ExperiencedTrip> triplist) {
+	private boolean isWithinCommuterTour(List<ExperiencedTrip> triplist) {
 
-		if (livesOutside(triplist) && worksInside(triplist)) {
+		if (worksInside(triplist) && livesInside(triplist)) {
 			return true;
 		}
 		return false;
@@ -576,37 +776,63 @@ public class ExperiencedTripsWriter {
 		String tourMatchKey = "home";
 		// int checkedToursCounter = 0;
 
+		
+		int realNumberTripStored = 0;
+		MutableInt subtourIdent = new MutableInt(0);
+		
+		
 		for (Entry<Id<Person>, List<ExperiencedTrip>> tripsPerPersonEntry : agent2trips.entrySet()) {
+			
 
 			// Id<Person> PersonId = tripsPerPersonEntry.getKey();
 			List<ExperiencedTrip> tripList = tripsPerPersonEntry.getValue();
 
-			int subtourNr = 0;
+			totalNumberTripToBeStored = totalNumberTripToBeStored + tripList.size();
+
 			List<ExperiencedTrip> tripsWithinTour = new ArrayList<ExperiencedTrip>();
-			String TourId = tripsPerPersonEntry.getKey().toString() + "__" + subtourNr;
+			
 
 			for (ExperiencedTrip trip : tripList) {
 
 				String actAfter = trip.getActivityAfter();
-				trip.setSubTourNr(subtourNr);
+//				trip.setSubTourNr(subtourIdent);
 				tripsWithinTour.add(trip);
 
 				if (actAfter.contains(tourMatchKey)) {
+//					subtourIdent++;
 					// Create new List of ExperiencedTrip --> Tour
 					// Save this tour
 					// Clear the tripsWithinTour
 					List<ExperiencedTrip> saveTripsWithinTour = new ArrayList<ExperiencedTrip>();
 					saveTripsWithinTour.addAll(tripsWithinTour);
+					
+//					if(tourId2trips.containsKey(TourId))
+//					{
+//						System.out.println("BUG Double tourId!");
+//					}
+					subtourIdent.increment();
+					String TourId = tripsPerPersonEntry.getKey().toString() + "_" + subtourIdent;
 					tourId2trips.put(TourId, saveTripsWithinTour);
-					subtourNr++;
+					realNumberTripStored = realNumberTripStored + saveTripsWithinTour.size();
+					
 					// checkedToursCounter++;
 					tripsWithinTour.clear();
+					
 
 				}
-
+//				System.out.println("Trip sorted into tour: "+realNumberTripStored +" || all trips: "+totalNumberTripToBeStored );
 			}
+			
+//			if (tripsWithinTour.size()>0)
+//			{
+//				System.out.println("Agent did not reach home!");
+//				
+//			}
+			
+			
 
 		}
+		
 
 		// System.out.print("Seen Tours #" + checkedToursCounter + "\n");
 
@@ -831,8 +1057,7 @@ public class ExperiencedTripsWriter {
 		SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm:ss");
 
 		BufferedWriter bw = IOUtils.getBufferedWriter(fileName + ".csv");
-		 BufferedWriter bw_rel = IOUtils.getBufferedWriter(fileName + "_relational" +
-		 ".csv");
+//		BufferedWriter bw_rel = IOUtils.getBufferedWriter(fileName + "_relational" + ".csv");
 
 		TimeSeriesCollection datasetrequ = new TimeSeriesCollection();
 		TimeSeries parkCount = new TimeSeries("Active Park Events");
@@ -900,74 +1125,70 @@ public class ExperiencedTripsWriter {
 			e.printStackTrace();
 		}
 
-		System.out.println("Start writing relational parking statistics");
-		 // Write content in relational file format
-		 try {
-		 // Write header timebin,zone,parkingDemand
-		 bw_rel.write("id;timebin;zone;parkingDemand;steet_m;density_km;geom");
-		 bw_rel.newLine();
-		
-		 // ToDo write header for zones
-		
-		 int rowId = 0;
-		 // Iterate over timebin
-		 for (Entry<Double, List<ParkingEvent>> e : splitParkings.entrySet()) {
-		
-		 for (String zoneId : zoneMap.keySet()) {
-		
-		 long parkings = 0;
-		
-		 if (!e.getValue().isEmpty()) {
-		 DescriptiveStatistics stats = new DescriptiveStatistics();
-		 for (ParkingEvent t : e.getValue()) {
-		
-		 if (t.getParkingZone() != null) {
-		 if (t.getParkingZone().equals(zoneId)) {
-		 stats.addValue(1.0);
-		 }
-		 }
-		
-		 }
-		 parkings = stats.getN();
-		
-		 WKTWriter wktwriter = new WKTWriter();
-		
-		 double densityPerKm = parkings /
-		 (zoneToStreetMeters.get(zoneId).doubleValue() / 1000.0);
-		
-		 bw_rel.write(rowId + ";" + Time.writeTime(e.getKey()) + ";" + zoneId + ";" +
-		 parkings + ";"
-		 + zoneToStreetMeters.get(zoneId) + ";" + densityPerKm + ";"
-		 + wktwriter.write(zoneMap.get(zoneId)));
-		 bw_rel.newLine();
-		 rowId++;
-		
-		 }
-		 // Minute h = new Minute(sdf2.parse(Time.writeTime(e.getKey())));
-		 //
-		 // parkCount.addOrUpdate(h, parkings);
-		 // Time;ValuePerZone
-		 // bw.write(Time.writeTime(e.getKey()) + ";" + parkings);
-		
-		 }
-		
-		 }
-		 bw_rel.flush();
-		 bw_rel.close();
-		 // datasetrequ.addSeries(parkCount);
-		 // // JFreeChart chart = chartProfile(splitParkings.size(), dataset, "Waiting
-		 // // times", "Wait time (s)");
-		 // JFreeChart chart2 = chartProfile(splitParkings.size(), datasetrequ,
-		
-		 //  "Parked Vehicles over Time",
-		 // "Total Parked Cars [-]");
-		 // // ChartSaveUtils.saveAsPNG(chart, fileName, 1500, 1000);
-		 // ChartSaveUtils.saveAsPNG(chart2, fileName + "_parkEvents", 1500, 1000);
-		
-		 } catch (IOException e) {
-		
-		 e.printStackTrace();
-		 }
+//		System.out.println("Start writing relational parking statistics");
+//		// Write content in relational file format
+//		try {
+//
+//			// Write header timebin,zone,parkingDemand
+//			bw_rel.write("id;timebin;zone;parkingDemand;steet_m;density_km;geom");
+//			bw_rel.newLine();
+//
+//			// ToDo write header for zones
+//
+//			int rowId = 0;
+//			// Iterate over timebin
+//			for (Entry<Double, List<ParkingEvent>> e : splitParkings.entrySet()) {
+//
+//				for (String zoneId : zoneMap.keySet()) {
+//
+//					long parkings = 0;
+//
+//					if (!e.getValue().isEmpty()) {
+//						DescriptiveStatistics stats = new DescriptiveStatistics();
+//						for (ParkingEvent t : e.getValue()) {
+//
+//							if (t.getParkingZone() != null) {
+//								if (t.getParkingZone().equals(zoneId)) {
+//									stats.addValue(1.0);
+//								}
+//							}
+//
+//						}
+//						parkings = stats.getN();
+//
+//						double densityPerKm = parkings / (zoneToStreetMeters.get(zoneId).doubleValue() / 1000.0);
+//
+//						bw_rel.write(rowId + ";" + Time.writeTime(e.getKey()) + ";" + zoneId + ";" + parkings + ";"
+//								+ zoneToStreetMeters.get(zoneId) + ";" + densityPerKm + ";" + zone2WKTGeom.get(zoneId));
+//						bw_rel.newLine();
+//						rowId++;
+//
+//					}
+//					// Minute h = new Minute(sdf2.parse(Time.writeTime(e.getKey())));
+//					//
+//					// parkCount.addOrUpdate(h, parkings);
+//					// Time;ValuePerZone
+//					// bw.write(Time.writeTime(e.getKey()) + ";" + parkings);
+//
+//				}
+//
+//			}
+//			bw_rel.flush();
+//			bw_rel.close();
+//			// datasetrequ.addSeries(parkCount);
+//			// // JFreeChart chart = chartProfile(splitParkings.size(), dataset, "Waiting
+//			// // times", "Wait time (s)");
+//			// JFreeChart chart2 = chartProfile(splitParkings.size(), datasetrequ,
+//
+//			// "Parked Vehicles over Time",
+//			// "Total Parked Cars [-]");
+//			// // ChartSaveUtils.saveAsPNG(chart, fileName, 1500, 1000);
+//			// ChartSaveUtils.saveAsPNG(chart2, fileName + "_parkEvents", 1500, 1000);
+//
+//		} catch (IOException e) {
+//
+//			e.printStackTrace();
+//		}
 
 	}
 
@@ -979,32 +1200,28 @@ public class ExperiencedTripsWriter {
 		format.setGroupingUsed(false);
 
 		BufferedWriter bw = IOUtils.getBufferedWriter(fileName + ".csv");
-	
-		
+
 		try {
-			//Write header
-			ModalSplitSegment dummyModalSplitForHeader   = ModalSplitSegments.iterator().next();
-			String header_modes = dummyModalSplitForHeader.mode2TripDistance.keySet().stream().map(Object::toString).collect(Collectors.joining(";"));
-			bw.write("modalSplitType"+";"+header_modes.toString());
-			
+			// Write header
+			ModalSplitSegment dummyModalSplitForHeader = ModalSplitSegments.iterator().next();
+			String header_modes = dummyModalSplitForHeader.mode2TripDistance.keySet().stream().map(Object::toString)
+					.collect(Collectors.joining(";"));
+			bw.write("modalSplitType" + ";" + header_modes.toString());
+
 			bw.newLine();
-			
-			for (ModalSplitSegment segment : ModalSplitSegments)
-			{
-				
-				String row= segment.SegmentClassNr;
+
+			for (ModalSplitSegment segment : ModalSplitSegments) {
+
+				String row = segment.SegmentClassNr;
 
 				for (Entry<String, ArrayList<Double>> e : segment.mode2TripDistance.entrySet()) {
 
-					
-					row = row+";"+e.getValue().size();
+					row = row + ";" + e.getValue().size();
 
 				}
 				bw.write(row);
 				bw.newLine();
 			}
-			
-
 
 			bw.flush();
 			bw.close();
@@ -1220,26 +1437,47 @@ public class ExperiencedTripsWriter {
 
 	public void writeExperiencedTrips() {
 		try {
+			GeometryFactory f = new GeometryFactory();
 			bw.newLine();
+			
+			Set<Double> writtenPcts = new HashSet<Double>();
+			int totalNumberOfTrips = totalNumberTripToBeStored;
+			
+			int writeCounter=0;
+			
 			for (List<ExperiencedTrip> tripList : agent2trips.values()) {
 				for (ExperiencedTrip trip : tripList) {
 
+					
+					double pct= Math.round(((double) writeCounter /  (double) totalNumberOfTrips) *100.0);
+					
+					
+					if ((pct%5)==0 && !writtenPcts.contains(pct))
+					{
+						System.out.println("Written trips: "+pct +" %");
+						writtenPcts.add(pct);
+//						System.out.println(writeCounter);
+					}
+					
+					
 					Coord from = network.getLinks().get(trip.getFromLinkId()).getCoord();
 					Coord to = network.getLinks().get(trip.getToLinkId()).getCoord();
 
 					Coordinate start = new Coordinate(from.getX(), from.getY());
 					Coordinate end = new Coordinate(to.getX(), to.getY());
 
-					GeometryFactory f = new GeometryFactory();
 					LineString beeline = new LineSegment(start, end).toGeometry(f);
 
-					String tripClass = intersectShape(beeline);
-//					String tripClass = "disabled";
+//					String tripClass = intersectShape(beeline);
+					String tripClass = "disabled";
 
 					trip.setTripClass(tripClass);
 
 					writeExperiencedTrip(trip);
 					bw.newLine();
+					writeCounter++;
+					
+					
 
 				}
 			}
