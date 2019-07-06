@@ -32,7 +32,6 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.ManyToManyPathData;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
@@ -56,14 +55,13 @@ public class StopBasedPathDataProvider implements PrecalculablePathDataProvider 
 	private Map<Id<Link>, PathData> pathsToDropoffMap;
 	private Map<Id<Link>, PathData> pathsFromDropoffMap;
 
-	public StopBasedPathDataProvider(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, TravelDisutility travelDisutility,
-			TransitSchedule schedule, TravelTimeCalculatorConfigGroup ttcConfig, DrtConfigGroup drtCfg) {
+	public StopBasedPathDataProvider(Network network, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
+			TravelDisutility travelDisutility, TransitSchedule schedule, TravelTimeCalculatorConfigGroup ttcConfig,
+			DrtConfigGroup drtCfg) {
 		stopDuration = drtCfg.getStopDuration();
 
 		List<Link> stopLinks = schedule.getFacilities()
-				.values()
-				.stream().map(tsf -> network.getLinks().get(tsf.getLinkId()))
+				.values().stream().map(tsf -> network.getLinks().get(tsf.getLinkId()))
 				.distinct()// more than one stop can be located on a link
 				.collect(ImmutableList.toImmutableList());
 		manyToManyPathData = new ManyToManyPathData(network, travelTime, travelDisutility, stopLinks,
