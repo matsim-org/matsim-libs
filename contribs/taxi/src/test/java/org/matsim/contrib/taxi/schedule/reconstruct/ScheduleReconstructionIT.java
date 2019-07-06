@@ -30,10 +30,10 @@ import org.junit.Test;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -55,8 +55,6 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.name.Named;
 
 public class ScheduleReconstructionIT {
 	@Rule
@@ -86,19 +84,17 @@ public class ScheduleReconstructionIT {
 		controler.addOverridingModule(new AbstractDvrpModeModule(taxiCfg.getMode()) {
 			@Override
 			public void install() {
-				bindModal(ScheduleReconstructor.class).toProvider(new Provider<ScheduleReconstructor>() {
-					@Inject
-					private @Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
-					Network network;
+				bindModal(ScheduleReconstructor.class).toProvider(
+						new ModalProviders.AbstractProvider<ScheduleReconstructor>(taxiCfg.getMode()) {
+							@Inject
+							private EventsManager eventsManager;
 
-					@Inject
-					private EventsManager eventsManager;
-
-					@Override
-					public ScheduleReconstructor get() {
-						return new ScheduleReconstructor(network, eventsManager, getMode());
-					}
-				}).asEagerSingleton();
+							@Override
+							public ScheduleReconstructor get() {
+								Network network = getModalInstance(Network.class);
+								return new ScheduleReconstructor(network, eventsManager, getMode());
+							}
+						}).asEagerSingleton();
 
 				installQSimModule(new AbstractDvrpModeQSimModule(taxiCfg.getMode()) {
 					@Override
