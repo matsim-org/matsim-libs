@@ -21,12 +21,9 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiPredicate;
-import java.util.stream.Collectors;
 
 @Log
 public class SupersonicOsmNetworkReader {
@@ -58,43 +55,24 @@ public class SupersonicOsmNetworkReader {
 	@SuppressWarnings("WeakerAccess")
 	public void read(Path inputFile) throws FileNotFoundException, OsmInputException {
 
-		var handler = parse(inputFile);
+        var nodesAndWays = parse(inputFile);
 		log.info("starting convertion \uD83D\uDE80");
-		convert(handler.ways, handler.nodes);
+        convert(nodesAndWays.ways, nodesAndWays.nodes);
+    }
 
-	}
+    private void convert(Collection<OsmWay> ways, Map<Long, LightOsmNode> nodes) {
 
-	private void convert(Collection<OsmWay> ways, Map<Long, OsmNode> nodes) {
-
-		// This introduces a side effect, since the mark nodes method will mutate the cache's state. But I don't know
-		// how to properly do this
-		NodesCache cache = new NodesCache(nodes.keySet());
-
-		log.info("filter for highways and mark necessary nodes");
-		var filteredWays = ways.parallelStream()
-				.filter(way -> {
-
-					var map = OsmModelUtil.getTagsAsMap(way);
-					return map.containsKey(HIGHWAY) && linkProperties.containsKey(map.get(HIGHWAY));
-				})
-				.peek(way -> this.markNodes(cache, way))
-				.collect(Collectors.toList());
-		// we need to collect here to finish the counting of visited nodes before actually creating matsim links
-
-		log.info("create links");
-		// convert ways to links
-		filteredWays.parallelStream()
-				.flatMap(way -> this.createNecessaryLinks(cache, nodes, way).stream())
+        log.info("filter for highways create a matsim network");
+        ways.parallelStream()
+                .filter(this::isStreetOfInterest)
+                .flatMap(way -> this.createNecessaryLinks(nodes, way).stream())
 				.forEach(this::addLinkToNetwork);
+
 		log.info("done");
 	}
 
 	private NodesAndWays parse(Path inputFile) throws FileNotFoundException, OsmInputException {
-		/*var reader = new PbfReader(inputFile.toFile(), true);
-		var handler = new ParsingHandler();
-		reader.setHandler(handler);
-		reader.read();
-		return handler;*/
+
 		log.info("start reading ways");
 
 		var waysReader = new PbfReader(inputFile.toFile(), false);
@@ -103,44 +81,39 @@ public class SupersonicOsmNetworkReader {
 		waysReader.read();
 
 		log.info("finished reading ways.");
-		log.info("Kept " + waysHandler.ways.size() + "/" + waysHandler.counter + "ways");
-		log.info("Marked " + waysHandler.nodeIds.size() + " nodes to be kept");
+        log.info("Kept " + waysHandler.getWays().size() + "/" + waysHandler.counter + "ways");
+        log.info("Marked " + waysHandler.getNodes().size() + " nodes to be kept");
 		log.info("starting to read nodes");
 
 		var nodesReader = new PbfReader(inputFile.toFile(), false);
-		var nodesHandler = new NodesHandler(waysHandler.getNodeIds());
+        var nodesHandler = new NodesHandler(waysHandler.getNodes());
 		nodesReader.setHandler(nodesHandler);
 		nodesReader.read();
 
 		log.info("finished reading nodes");
 
-		var result = new NodesAndWays(nodesHandler.nodes, waysHandler.ways);
-		nodesHandler = null;
-		waysHandler = null;
-		return result;
-	}
+        return new NodesAndWays(nodesHandler.nodes, waysHandler.ways);
+    }
 
-	private void markNodes(NodesCache cache, OsmWay way) {
-		for (int i = 0; i < way.getNumberOfNodes(); i++) {
-			long nodeId = way.getNodeId(i);
-			cache.markNode(nodeId);
-		}
-	}
-
-	private Collection<Link> createNecessaryLinks(NodesCache cache, Map<Long, OsmNode> nodes, OsmWay way) {
+    private Collection<Link> createNecessaryLinks(Map<Long, LightOsmNode> nodes, OsmWay way) {
 		long fromNodeId = way.getNodeId(0);
+        double linkLength = 0;
+        Coord segmentFromCoord = coordinateTransformation.transform(nodes.get(fromNodeId).getCoord());
 
 		List<Link> result = new ArrayList<>();
 		for (int i = 1, subId = 1; i < way.getNumberOfNodes(); i++, subId += 2) {
-			// take all nodes which are used by more than one way e.g. intersections. Definitely take the last node
-			//TODO there is no loop detection yet
-			if (cache.isNodeUsedByMoreThanOneWay(way.getNodeId(i)) || i == way.getNumberOfNodes() - 1) {
 
+            var toOsmNode = nodes.get(way.getNodeId(i));
+            var fromOsmNode = nodes.get(fromNodeId);
 
-				OsmNode fromOsmNode = nodes.get(fromNodeId);
-				OsmNode toOsmNode = nodes.get(way.getNodeId(i));
-				Coord fromCoord = coordinateTransformation.transform(new Coord(fromOsmNode.getLongitude(), fromOsmNode.getLatitude()));
-				Coord toCoord = coordinateTransformation.transform(new Coord(toOsmNode.getLongitude(), toOsmNode.getLatitude()));
+            Coord fromCoord = coordinateTransformation.transform(fromOsmNode.getCoord());
+            Coord toCoord = coordinateTransformation.transform(toOsmNode.getCoord());
+
+            double segmentLength = CoordUtils.calcEuclideanDistance(segmentFromCoord, toCoord);
+            linkLength += segmentLength;
+            segmentFromCoord = toCoord;
+
+            if (toOsmNode.getNumberOfWays() > 1 || i == way.getNumberOfNodes() - 1) {
 
 				// we should have filtered for these before, so no testing whether they are present
 				Map<String, String> tags = OsmModelUtil.getTagsAsMap(way);
@@ -151,15 +124,15 @@ public class SupersonicOsmNetworkReader {
 					Node fromNode = createNode(fromCoord, fromOsmNode.getId());
 					Node toNode = createNode(toCoord, toOsmNode.getId());
 					//if the way id is 1234 we will get a link id like 12340001, this is necessary because we need to generate unique
-					// ids. The osm wiki says ways have no more than 2000 nodes which means that i will never be creater 1999.
+                    // ids. The osm wiki says ways have no more than 2000 nodes which means that i will never be greater 1999.
 
 					if (!isOnewayReverse(tags)) {
-						Link forewardLink = createLink(way.getId() * 10000 + subId, way.getId(), tags, fromNode, toNode);
+                        Link forewardLink = createLink(way.getId() * 10000 + subId, way.getId(), tags, fromNode, toNode, linkLength);
 						result.add(forewardLink);
 					}
 
 					if (!isOneway(tags, properties)) {
-						Link reverseLink = createLink(way.getId() * 10000 + subId + 1, way.getId(), tags, toNode, fromNode);
+                        Link reverseLink = createLink(way.getId() * 10000 + subId + 1, way.getId(), tags, toNode, fromNode, linkLength);
 						result.add(reverseLink);
 					}
 				}
@@ -174,13 +147,13 @@ public class SupersonicOsmNetworkReader {
 		return network.getFactory().createNode(id, coord);
 	}
 
-	private Link createLink(long linkId, long wayId, Map<String, String> tags, Node fromNode, Node toNode) {
+    private Link createLink(long linkId, long wayId, Map<String, String> tags, Node fromNode, Node toNode, double length) {
 
 		String highwayType = tags.get(HIGHWAY);
 		LinkProperties properties = linkProperties.get(highwayType);
 
 		Link link = network.getFactory().createLink(Id.createLinkId(linkId), fromNode, toNode);
-		link.setLength(CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()));
+        link.setLength(length);
 		link.setFreespeed(getFreespeed(tags, link.getLength(), properties));
 		link.setCapacity(getLaneCapacity(link.getLength(), properties));
 		link.setNumberOfLanes(getNumberOfLanes(tags, properties));
@@ -278,31 +251,13 @@ public class SupersonicOsmNetworkReader {
 		}
 	}
 
-	@FunctionalInterface
-	public interface OsmFilter {
-
-		boolean filter(Coord coord, int linkLevel);
-	}
-
-	private static class NodesCache {
-
-		private ConcurrentMap<Long, Integer> nodes;
-
-		NodesCache(Collection<Long> nodes) {
-			this.nodes = nodes.parallelStream().collect(Collectors.toConcurrentMap(node -> node, node -> 0));
-		}
-
-		void markNode(long nodeId) {
-			nodes.merge(nodeId, 1, Integer::sum);
-		}
-
-		int getCount(long nodeId) {
-			return nodes.get(nodeId);
-		}
-
-		boolean isNodeUsedByMoreThanOneWay(long nodeId) {
-			return nodes.get(nodeId) > 1;
-		}
+    private boolean isStreetOfInterest(OsmWay way) {
+        for (int i = 0; i < way.getNumberOfTags(); i++) {
+            String tag = way.getTag(i).getKey();
+            String tagvalue = way.getTag(i).getValue();
+            if (tag.equals(HIGHWAY) && linkProperties.containsKey(tagvalue)) return true;
+        }
+        return false;
 	}
 
 	@RequiredArgsConstructor
@@ -397,130 +352,97 @@ public class SupersonicOsmNetworkReader {
 	private static class WayHandler implements OsmHandler {
 
 		private final Set<OsmWay> ways = new HashSet<>();
-		private final Set<Long> nodeIds = new HashSet<>();
+        private final Map<Long, Integer> nodes = new HashMap<>();
 
 		private int counter = 0;
 
-		@Override
-		public void handle(OsmBounds osmBounds) throws IOException {
-
+        private static boolean isStreet(OsmWay way) {
+            for (int i = 0; i < way.getNumberOfTags(); i++) {
+                String tag = way.getTag(i).getKey();
+                if (tag.equals(HIGHWAY)) return true;
+            }
+            return false;
 		}
 
 		@Override
-		public void handle(OsmNode osmNode) throws IOException {
-
-		}
-
-		@Override
-		public void handle(OsmWay osmWay) throws IOException {
+        public void handle(OsmWay osmWay) {
 			counter++;
 			if (isStreet(osmWay)) {
 				ways.add(osmWay);
 				for (int i = 0; i < osmWay.getNumberOfNodes(); i++) {
-					nodeIds.add(osmWay.getNodeId(i));
+                    nodes.merge(osmWay.getNodeId(i), 1, Integer::sum);
 				}
 			}
 		}
 
+        @Override
+        public void handle(OsmBounds osmBounds) {
+        }
+
+        @Override
+        public void handle(OsmNode osmNode) {
+        }
+
 		@Override
-		public void handle(OsmRelation osmRelation) throws IOException {
-
-		}
+        public void handle(OsmRelation osmRelation) {
+        }
 
 		@Override
-		public void complete() throws IOException {
+        public void complete() {
+        }
+    }
 
-		}
+    @RequiredArgsConstructor
+    @Getter
+    private static class LightOsmNode {
 
-		private boolean isStreet(OsmWay way) {
-			var map = OsmModelUtil.getTagsAsMap(way);
-			return map.containsKey(HIGHWAY);
-		}
-	}
+        private final long id;
+        private final int numberOfWays;
+        private final Coord coord;
+    }
 
 	@RequiredArgsConstructor
 	private static class NodesHandler implements OsmHandler {
 
-		private final Set<Long> nodeIdsOfInterest;
-		private final Map<Long, OsmNode> nodes = new HashMap<>();
+        private final Map<Long, Integer> nodeIdsOfInterest;
+        @Getter
+        private final Map<Long, LightOsmNode> nodes = new HashMap<>();
+        @Getter
+        private int counter = 0;
 
 		@Override
-		public void handle(OsmBounds osmBounds) throws IOException {
+        public void handle(OsmNode osmNode) {
 
-		}
+            counter++;
 
-		@Override
-		public void handle(OsmNode osmNode) throws IOException {
-
-			if (nodeIdsOfInterest.contains(osmNode.getId())) {
-				nodes.put(osmNode.getId(), osmNode);
+            if (nodeIdsOfInterest.containsKey(osmNode.getId())) {
+                Coord coord = new Coord(osmNode.getLongitude(), osmNode.getLatitude());
+                int numberOfWays = nodeIdsOfInterest.get(osmNode.getId());
+                nodes.put(osmNode.getId(), new LightOsmNode(osmNode.getId(), numberOfWays, coord));
 			}
 		}
 
-		@Override
-		public void handle(OsmWay osmWay) throws IOException {
-
-		}
-
-		@Override
-		public void handle(OsmRelation osmRelation) throws IOException {
-
-		}
+        @Override
+        public void handle(OsmBounds osmBounds) {
+        }
 
 		@Override
-		public void complete() throws IOException {
+        public void handle(OsmWay osmWay) {
+        }
 
-		}
+		@Override
+        public void handle(OsmRelation osmRelation) {
+        }
+
+		@Override
+        public void complete() {
+        }
 	}
 
 	@RequiredArgsConstructor
 	@Getter
 	private static class NodesAndWays {
-		private final Map<Long, OsmNode> nodes;
+        private final Map<Long, LightOsmNode> nodes;
 		private final Set<OsmWay> ways;
-	}
-
-	private static class ParsingHandler implements OsmHandler {
-
-		private Map<Long, OsmNode> nodes = new HashMap<>();
-		private Set<OsmWay> ways = new HashSet<>();
-		private boolean isAtNodes = false;
-
-		Map<Long, OsmNode> getNodes() {
-			return nodes;
-		}
-
-		Set<OsmWay> getWays() {
-			return ways;
-		}
-
-		@Override
-		public void handle(OsmBounds osmBounds) {
-			//ignore
-		}
-
-		@Override
-		public void handle(OsmNode osmNode) {
-			nodes.put(osmNode.getId(), osmNode);
-		}
-
-		@Override
-		public void handle(OsmWay osmWay) {
-			ways.add(osmWay);
-			if (!isAtNodes) {
-				log.info("first way");
-				log.info(nodes.size() + " nodes");
-			}
-		}
-
-		@Override
-		public void handle(OsmRelation osmRelation) {
-			//ignore
-		}
-
-		@Override
-		public void complete() {
-			//ignore
-		}
 	}
 }

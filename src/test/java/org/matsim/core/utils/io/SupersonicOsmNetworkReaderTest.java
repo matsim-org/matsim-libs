@@ -65,10 +65,9 @@ public class SupersonicOsmNetworkReaderTest {
 	@Test
 	public void test() throws FileNotFoundException, OsmInputException {
 
-		Path file = Paths.get("C:\\Users\\Janek\\Downloads\\nordrhein-westfalen-latest.osm.pbf");
-		Path output = Paths.get("C:\\Users\\Janek\\Desktop\\nordrhein-westfalen-latest.xml.gz");
+		Path file = Paths.get("G:\\Users\\Janek\\Downloads\\nordrhein-westfalen-latest.osm.pbf");
+		Path output = Paths.get("G:\\Users\\Janek\\Desktop\\nordrhein-westfalen-latest.xml.gz");
 		Network network = NetworkUtils.createNetwork();
-
 
 		Instant start = Instant.now();
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832");
@@ -94,8 +93,6 @@ public class SupersonicOsmNetworkReaderTest {
 	 * <p>
 	 * nodes 1 and 3 should be kept, node 2 should be removed to simplify link
 	 *
-	 * @throws IOException
-	 * @throws OsmInputException
 	 */
 	@Test
 	public void testSingleLink() throws IOException, OsmInputException {
@@ -121,8 +118,9 @@ public class SupersonicOsmNetworkReaderTest {
 
 		// now, test that the link has all the required properties
 		Link link = network.getLinks().values().iterator().next(); // get the only link
-		double expectedLength = CoordUtils.calcEuclideanDistance(new Coord(node1.getLongitude(), node1.getLatitude()), new Coord(node3.getLongitude(), node3.getLatitude()));
-		assertEquals(expectedLength, link.getLength(), 0);
+		double expectedLengthPart1 = CoordUtils.calcEuclideanDistance(new Coord(node1.getLongitude(), node1.getLatitude()), new Coord(node2.getLongitude(), node2.getLatitude()));
+		double expectedLengthPart2 = CoordUtils.calcEuclideanDistance(new Coord(node2.getLongitude(), node2.getLatitude()), new Coord(node3.getLongitude(), node3.getLatitude()));
+		assertEquals(expectedLengthPart1 + expectedLengthPart2, link.getLength(), 0);
 
 		var linkProperties = SupersonicOsmNetworkReader.LinkProperties.createMotorway();
 		assertEquals(linkProperties.freespeed, link.getFreespeed(), 0);
