@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.EmptyStageActivityTypes;
@@ -62,7 +61,7 @@ public class DrtRoutingModule implements RoutingModule {
 	private final RoutingModule walkRouter;
 	private final DrtStageActivityType drtStageActivityType;
 
-	public DrtRoutingModule(DrtConfigGroup drtCfg, @Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
+	public DrtRoutingModule(DrtConfigGroup drtCfg, Network network,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
 			TravelDisutilityFactory travelDisutilityFactory, PopulationFactory populationFactory,
 			@Named(TransportMode.walk) RoutingModule walkRouter) {
