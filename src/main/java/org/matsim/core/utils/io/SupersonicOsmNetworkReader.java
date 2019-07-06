@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 @Log
 public class SupersonicOsmNetworkReader {
@@ -37,19 +38,21 @@ public class SupersonicOsmNetworkReader {
 
 	private final Map<String, LinkProperties> linkProperties = LinkProperties.createLinkProperties();
 	private final BiPredicate<Coord, Integer> filter;
+    private final Predicate<Long> preserveNode;
 	private final CoordinateTransformation coordinateTransformation;
 
 	@Getter
 	private final Network network;
 
 	SupersonicOsmNetworkReader(Network network, CoordinateTransformation coordinateTransformation) {
-		this(network, coordinateTransformation, (coord, level) -> true);
-	}
+        this(network, coordinateTransformation, (coord, level) -> true, id -> false);
+    }
 
-	SupersonicOsmNetworkReader(Network network, CoordinateTransformation coordinateTransformation, BiPredicate<Coord, Integer> filter) {
+    SupersonicOsmNetworkReader(Network network, CoordinateTransformation coordinateTransformation, BiPredicate<Coord, Integer> filter, Predicate<Long> preserveNode) {
 		this.filter = filter;
 		this.network = network;
 		this.coordinateTransformation = coordinateTransformation;
+        this.preserveNode = preserveNode;
 	}
 
 	@SuppressWarnings("WeakerAccess")
@@ -113,7 +116,7 @@ public class SupersonicOsmNetworkReader {
             linkLength += segmentLength;
             segmentFromCoord = toCoord;
 
-            if (toOsmNode.getNumberOfWays() > 1 || i == way.getNumberOfNodes() - 1) {
+            if (toOsmNode.getNumberOfWays() > 1 || i == way.getNumberOfNodes() - 1 || this.preserveNode.test(toOsmNode.getId())) {
 
 				// we should have filtered for these before, so no testing whether they are present
 				Map<String, String> tags = OsmModelUtil.getTagsAsMap(way);
@@ -136,6 +139,7 @@ public class SupersonicOsmNetworkReader {
 						result.add(reverseLink);
 					}
 				}
+                linkLength = 0;
 				fromNodeId = toOsmNode.getId();
 			}
 		}
