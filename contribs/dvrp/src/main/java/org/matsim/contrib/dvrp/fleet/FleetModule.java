@@ -23,14 +23,10 @@ package org.matsim.contrib.dvrp.fleet;
 import java.net.URL;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
-
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -60,17 +56,9 @@ public class FleetModule extends AbstractDvrpModeModule {
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
 			protected void configureQSim() {
-				bindModal(Fleet.class).toProvider(new ModalProviders.AbstractProvider<Fleet>(getMode()) {
-					@Inject
-					@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
-					private Network network;
-
-					@Override
-					public Fleet get() {
-						FleetSpecification fleetSpecification = getModalInstance(FleetSpecification.class);
-						return Fleets.createDefaultFleet(fleetSpecification, network.getLinks()::get);
-					}
-				}).asEagerSingleton();
+				bindModal(Fleet.class).toProvider(ModalProviders.createProvider(getMode(),
+						getter -> Fleets.createDefaultFleet(getter.getModal(FleetSpecification.class),
+								getter.getModal(Network.class).getLinks()::get))).asEagerSingleton();
 			}
 		});
 
