@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -37,29 +38,34 @@ public class SupersonicOsmNetworkReader {
 	private static final Set<String> oneWayTags = new HashSet<>(Arrays.asList("yes", "true", "1"));
 	private static final Set<String> notOneWayTags = new HashSet<>(Arrays.asList("no", "false", "0"));
 
-
-
 	private final Map<String, LinkProperties> linkProperties = LinkProperties.createLinkProperties();
-	private final BiPredicate<Coord, Integer> filter;
-    private final Predicate<Long> preserveNode;
+    private final BiPredicate<Coord, Integer> linkFilter;
+    private final Predicate<Long> preserveNodeWithId;
+    private final Consumer<Link> afterLinkCreated;
 	private final CoordinateTransformation coordinateTransformation;
 
 	@Getter
 	private final Network network;
 
-	SupersonicOsmNetworkReader(Network network, CoordinateTransformation coordinateTransformation) {
-        this(network, coordinateTransformation, (coord, level) -> true, id -> false);
-    }
 
-    SupersonicOsmNetworkReader(Network network, CoordinateTransformation coordinateTransformation, BiPredicate<Coord, Integer> filter, Predicate<Long> preserveNode) {
-		this.filter = filter;
+    @lombok.Builder(builderClassName = "Builder")
+    private SupersonicOsmNetworkReader(Network network, CoordinateTransformation coordinateTransformation,
+                                       BiPredicate<Coord, Integer> linkFilter, Predicate<Long> preserveNodeWithId,
+                                       Consumer<Link> afterLinkCreated) {
+        this.linkFilter = linkFilter == null ? (coord, level) -> true : linkFilter;
+        this.afterLinkCreated = afterLinkCreated == null ? link -> {
+        } : afterLinkCreated;
+        this.preserveNodeWithId = preserveNodeWithId == null ? id -> false : preserveNodeWithId;
+
+        if (network == null || coordinateTransformation == null) {
+            throw new IllegalArgumentException("Target network and coordinate transformation are required parameters!");
+        }
 		this.network = network;
 		this.coordinateTransformation = coordinateTransformation;
-        this.preserveNode = preserveNode;
 	}
 
 	@SuppressWarnings("WeakerAccess")
-	public void read(Path inputFile) throws FileNotFoundException, OsmInputException {
+    public void read(Path inputFile) {
 
         var nodesAndWays = parse(inputFile);
 		log.info("starting convertion \uD83D\uDE80");
@@ -68,7 +74,7 @@ public class SupersonicOsmNetworkReader {
 
     private void convert(Collection<OsmWay> ways, Map<Long, LightOsmNode> nodes) {
 
-        log.info("filter for highways create a matsim network");
+        log.info("linkFilter for highways create a matsim network");
         ways.parallelStream()
                 .filter(this::isStreetOfInterest)
                 .flatMap(way -> this.createWaySegments(nodes, way))
@@ -78,28 +84,32 @@ public class SupersonicOsmNetworkReader {
 		log.info("done");
 	}
 
-	private NodesAndWays parse(Path inputFile) throws FileNotFoundException, OsmInputException {
+    private NodesAndWays parse(Path inputFile) {
 
 		log.info("start reading ways");
 
-		var waysReader = new PbfReader(inputFile.toFile(), false);
-		var waysHandler = new WayHandler();
-		waysReader.setHandler(waysHandler);
-		waysReader.read();
+        try {
+            var waysReader = new PbfReader(inputFile.toFile(), false);
+            var waysHandler = new WayHandler();
+            waysReader.setHandler(waysHandler);
+            waysReader.read();
 
-		log.info("finished reading ways.");
-        log.info("Kept " + waysHandler.getWays().size() + "/" + waysHandler.counter + "ways");
-        log.info("Marked " + waysHandler.getNodes().size() + " nodes to be kept");
-		log.info("starting to read nodes");
+            log.info("finished reading ways.");
+            log.info("Kept " + waysHandler.getWays().size() + "/" + waysHandler.counter + "ways");
+            log.info("Marked " + waysHandler.getNodes().size() + " nodes to be kept");
+            log.info("starting to read nodes");
 
-		var nodesReader = new PbfReader(inputFile.toFile(), false);
-        var nodesHandler = new NodesHandler(waysHandler.getNodes());
-		nodesReader.setHandler(nodesHandler);
-		nodesReader.read();
+            var nodesReader = new PbfReader(inputFile.toFile(), false);
+            var nodesHandler = new NodesHandler(waysHandler.getNodes());
+            nodesReader.setHandler(nodesHandler);
+            nodesReader.read();
 
-		log.info("finished reading nodes");
+            log.info("finished reading nodes");
 
-        return new NodesAndWays(nodesHandler.nodes, waysHandler.ways);
+            return new NodesAndWays(nodesHandler.nodes, waysHandler.ways);
+        } catch (FileNotFoundException | OsmInputException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Stream<WaySegment> createWaySegments(Map<Long, LightOsmNode> nodes, OsmWay way) {
@@ -118,7 +128,7 @@ public class SupersonicOsmNetworkReader {
             Coord toCoord = coordinateTransformation.transform(toOsmNode.getCoord());
             segmentLength += CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
 
-            if (toOsmNode.isUsedByMoreThanOneWay() || i == way.getNumberOfNodes() - 1 || this.preserveNode.test(toOsmNode.getId())) {
+            if (toOsmNode.isUsedByMoreThanOneWay() || i == way.getNumberOfNodes() - 1 || this.preserveNodeWithId.test(toOsmNode.getId())) {
 
                 segments.add(new WaySegment(
                         new LightOsmNode(fromNodeForSegment.getId(), fromNodeForSegment.getNumberOfWays(), fromCoord),
@@ -146,7 +156,7 @@ public class SupersonicOsmNetworkReader {
         var properties = linkProperties.get(highwayType);
         List<Link> result = new ArrayList<>();
 
-        if (filter.test(segment.getFromNode().getCoord(), properties.level) || filter.test(segment.getToNode().getCoord(), properties.level)) {
+        if (linkFilter.test(segment.getFromNode().getCoord(), properties.level) || linkFilter.test(segment.getToNode().getCoord(), properties.level)) {
             var fromNode = createNode(segment.getFromNode().getCoord(), segment.getFromNode().getId());
             var toNode = createNode(segment.getToNode().getCoord(), segment.getToNode().getId());
 
@@ -181,7 +191,7 @@ public class SupersonicOsmNetworkReader {
         link.setCapacity(getLaneCapacity(link.getLength(), properties) * link.getNumberOfLanes());
         link.getAttributes().putAttribute(NetworkUtils.ORIGID, segment.getOriginalWayId());
 		link.getAttributes().putAttribute(NetworkUtils.TYPE, highwayType);
-		// the original code has 'setOrModifyLinkAttributes' here
+        afterLinkCreated.accept(link);
 		return link;
 	}
 

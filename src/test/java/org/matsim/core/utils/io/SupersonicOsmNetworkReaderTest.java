@@ -1,7 +1,6 @@
 package org.matsim.core.utils.io;
 
 import com.slimjars.dist.gnu.trove.list.array.TLongArrayList;
-import de.topobyte.osm4j.core.access.OsmInputException;
 import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.core.model.impl.Node;
@@ -22,7 +21,6 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
@@ -31,6 +29,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -64,15 +63,20 @@ public class SupersonicOsmNetworkReaderTest {
 
 	@Test
 	@Ignore
-	public void test() throws FileNotFoundException, OsmInputException {
+	public void test() {
 
 		Path file = Paths.get("C:\\Users\\Janekdererste\\germany-latest.osm.pbf");
 		Path output = Paths.get("G:\\Users\\Janek\\Desktop\\nordrhein-westfalen-latest.xml.gz");
 		Network network = NetworkUtils.createNetwork();
+		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832");
 
 		Instant start = Instant.now();
-		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832");
-		new SupersonicOsmNetworkReader(network, coordinateTransformation, (coord, level) -> level < 7, id -> false).read(file);
+		new SupersonicOsmNetworkReader.Builder()
+				.network(network)
+				.coordinateTransformation(coordinateTransformation)
+				.build()
+				.read(file);
+
 		Duration duration = Duration.between(start, Instant.now());
 		System.out.println(duration.toString());
 
@@ -96,7 +100,7 @@ public class SupersonicOsmNetworkReaderTest {
 	 *
 	 */
 	@Test
-	public void singleLink() throws IOException, OsmInputException {
+	public void singleLink() {
 
 		var node1 = new Node(1, 0, 0);
 		var node2 = new Node(2, 100, 100);
@@ -105,14 +109,16 @@ public class SupersonicOsmNetworkReaderTest {
 		var tags = List.of(new Tag(SupersonicOsmNetworkReader.HIGHWAY, MOTORWAY));
 		var way = new Way(1, nodeReference, tags);
 
-		Path testfile = Paths.get("single-link-one-way.pbf");
+		Path file = Paths.get("single-link-one-way.pbf");
 
-		writeOsmData(List.of(node1, node2, node3), List.of(way), testfile);
+		writeOsmData(List.of(node1, node2, node3), List.of(way), file);
 
 		var network = NetworkUtils.createNetwork();
-		var reader = new SupersonicOsmNetworkReader(network, transformation);
-
-		reader.read(testfile);
+		new SupersonicOsmNetworkReader.Builder()
+				.network(network)
+				.coordinateTransformation(transformation)
+				.build()
+				.read(file);
 
 		assertEquals(1, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
@@ -153,7 +159,7 @@ public class SupersonicOsmNetworkReaderTest {
 	 * nodes 1 and 3 should be kept, node 2 should be removed to simplify link
 	 */
 	@Test
-	public void singleLinkPreserveMiddleNode() throws IOException, OsmInputException {
+	public void singleLinkPreserveMiddleNode() {
 
 		var node1 = new Node(1, 0, 0);
 		var node2 = new Node(2, 100, 100);
@@ -162,14 +168,18 @@ public class SupersonicOsmNetworkReaderTest {
 		var tags = List.of(new Tag(SupersonicOsmNetworkReader.HIGHWAY, MOTORWAY));
 		var way = new Way(1, nodeReference, tags);
 
-		Path testfile = Paths.get("single-link-preserve-node.pbf");
+		Path file = Paths.get("single-link-preserve-node.pbf");
 
-		writeOsmData(List.of(node1, node2, node3), List.of(way), testfile);
+		writeOsmData(List.of(node1, node2, node3), List.of(way), file);
 
 		var network = NetworkUtils.createNetwork();
-		var reader = new SupersonicOsmNetworkReader(network, transformation, (coord, level) -> true, id -> id == 2);
 
-		reader.read(testfile);
+		new SupersonicOsmNetworkReader.Builder()
+				.network(network)
+				.coordinateTransformation(transformation)
+				.preserveNodeWithId(id -> id == 2)
+				.build()
+				.read(file);
 
 		assertEquals(2, network.getLinks().size());
 		assertEquals(3, network.getNodes().size());
@@ -192,7 +202,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_withMaxSpeedTag() throws FileNotFoundException, OsmInputException {
+	public void singleLink_withMaxSpeedTag() {
 
 		var node1 = new Node(1, 0, 0);
 		var node2 = new Node(2, 10, 10);
@@ -205,9 +215,12 @@ public class SupersonicOsmNetworkReaderTest {
 		writeOsmData(List.of(node1, node2), List.of(wayWithMaxSpeed), file);
 
 		var network = NetworkUtils.createNetwork();
-		var reader = new SupersonicOsmNetworkReader(network, transformation);
 
-		reader.read(file);
+		new SupersonicOsmNetworkReader.Builder()
+				.network(network)
+				.coordinateTransformation(transformation)
+				.build()
+				.read(file);
 
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
@@ -218,7 +231,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_withMaxSpeedTag_milesPerHour() throws FileNotFoundException, OsmInputException {
+	public void singleLink_withMaxSpeedTag_milesPerHour() {
 		var node1 = new Node(1, 0, 0);
 		var node2 = new Node(2, 10, 10);
 		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
@@ -229,8 +242,11 @@ public class SupersonicOsmNetworkReaderTest {
 		writeOsmData(List.of(node1, node2), List.of(wayWithMaxSpeedMph), file);
 
 		var network = NetworkUtils.createNetwork();
-		var reader = new SupersonicOsmNetworkReader(network, transformation);
-		reader.read(file);
+		new SupersonicOsmNetworkReader.Builder()
+				.network(network)
+				.coordinateTransformation(transformation)
+				.build()
+				.read(file);
 
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
@@ -240,7 +256,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_withMaxSpeedTag_urbanLink() throws FileNotFoundException, OsmInputException {
+	public void singleLink_withMaxSpeedTag_urbanLink() {
 		var node1 = new Node(1, 0, 0);
 		var node2 = new Node(2, 10, 10);
 		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
@@ -252,8 +268,11 @@ public class SupersonicOsmNetworkReaderTest {
 		writeOsmData(List.of(node1, node2), List.of(wayWithMaxSpeedUrban), file);
 
 		var network = NetworkUtils.createNetwork();
-		var reader = new SupersonicOsmNetworkReader(network, transformation);
-		reader.read(file);
+		new SupersonicOsmNetworkReader.Builder()
+				.network(network)
+				.coordinateTransformation(transformation)
+				.build()
+				.read(file);
 
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
@@ -263,7 +282,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_withMaxSpeedTag_cantParseMaxSpeed() throws FileNotFoundException, OsmInputException {
+	public void singleLink_withMaxSpeedTag_cantParseMaxSpeed() {
 		var node1 = new Node(1, 0, 0);
 		var node2 = new Node(2, 10, 10);
 		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
@@ -275,8 +294,11 @@ public class SupersonicOsmNetworkReaderTest {
 		writeOsmData(List.of(node1, node2), List.of(wayWithInvalidMaxSpeed), file);
 
 		var network = NetworkUtils.createNetwork();
-		var reader = new SupersonicOsmNetworkReader(network, transformation);
-		reader.read(file);
+		new SupersonicOsmNetworkReader.Builder()
+				.network(network)
+				.coordinateTransformation(transformation)
+				.build()
+				.read(file);
 
 		assertEquals(1, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
@@ -286,7 +308,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_noMaxSpeedTag_ruralLink() throws FileNotFoundException, OsmInputException {
+	public void singleLink_noMaxSpeedTag_ruralLink() {
 
 		var node1 = new Node(1, 0, 0);
 		var node2 = new Node(2, 1000, 1000);
@@ -299,8 +321,11 @@ public class SupersonicOsmNetworkReaderTest {
 		writeOsmData(List.of(node1, node2), List.of(wayWithoutMaxSpeed), file);
 
 		var network = NetworkUtils.createNetwork();
-		var reader = new SupersonicOsmNetworkReader(network, transformation);
-		reader.read(file);
+		new SupersonicOsmNetworkReader.Builder()
+				.network(network)
+				.coordinateTransformation(transformation)
+				.build()
+				.read(file);
 
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
@@ -310,7 +335,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_noMaxSpeedTag_urbanLink() throws FileNotFoundException, OsmInputException {
+	public void singleLink_noMaxSpeedTag_urbanLink() {
 
 		var node1 = new Node(1, 0, 0);
 		var node2 = new Node(2, 10, 10);
@@ -323,8 +348,11 @@ public class SupersonicOsmNetworkReaderTest {
 		writeOsmData(List.of(node1, node2), List.of(wayWithoutMaxSpeed), file);
 
 		var network = NetworkUtils.createNetwork();
-		var reader = new SupersonicOsmNetworkReader(network, transformation);
-		reader.read(file);
+		new SupersonicOsmNetworkReader.Builder()
+				.network(network)
+				.coordinateTransformation(transformation)
+				.build()
+				.read(file);
 
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
@@ -336,7 +364,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_noLanesTag() throws FileNotFoundException, OsmInputException {
+	public void singleLink_noLanesTag() {
 
 		var node1 = new Node(1, 0, 0);
 		var node2 = new Node(2, 10, 10);
@@ -348,8 +376,11 @@ public class SupersonicOsmNetworkReaderTest {
 		writeOsmData(List.of(node1, node2), List.of(way), file);
 
 		var network = NetworkUtils.createNetwork();
-		var reader = new SupersonicOsmNetworkReader(network, transformation);
-		reader.read(file);
+		new SupersonicOsmNetworkReader.Builder()
+				.network(network)
+				.coordinateTransformation(transformation)
+				.build()
+				.read(file);
 
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
@@ -360,7 +391,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_withLanesTag() throws FileNotFoundException, OsmInputException {
+	public void singleLink_withLanesTag() {
 
 		var node1 = new Node(1, 0, 0);
 		var node2 = new Node(2, 10, 10);
@@ -373,8 +404,11 @@ public class SupersonicOsmNetworkReaderTest {
 		writeOsmData(List.of(node1, node2), List.of(way), file);
 
 		var network = NetworkUtils.createNetwork();
-		var reader = new SupersonicOsmNetworkReader(network, transformation);
-		reader.read(file);
+		new SupersonicOsmNetworkReader.Builder()
+				.network(network)
+				.coordinateTransformation(transformation)
+				.build()
+				.read(file);
 
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
@@ -385,7 +419,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_lanesTagOneWay() throws FileNotFoundException, OsmInputException {
+	public void singleLink_lanesTagOneWay() {
 		var node1 = new Node(1, 0, 0);
 		var node2 = new Node(2, 10, 10);
 		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
@@ -397,8 +431,11 @@ public class SupersonicOsmNetworkReaderTest {
 		writeOsmData(List.of(node1, node2), List.of(way), file);
 
 		var network = NetworkUtils.createNetwork();
-		var reader = new SupersonicOsmNetworkReader(network, transformation);
-		reader.read(file);
+		new SupersonicOsmNetworkReader.Builder()
+				.network(network)
+				.coordinateTransformation(transformation)
+				.build()
+				.read(file);
 
 		assertEquals(1, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
@@ -409,7 +446,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_lanesForewardAndBackwardTag() throws FileNotFoundException, OsmInputException {
+	public void singleLink_lanesForewardAndBackwardTag() {
 		var node1 = new Node(1, 0, 0);
 		var node2 = new Node(2, 10, 10);
 		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
@@ -421,8 +458,11 @@ public class SupersonicOsmNetworkReaderTest {
 		writeOsmData(List.of(node1, node2), List.of(way), file);
 
 		var network = NetworkUtils.createNetwork();
-		var reader = new SupersonicOsmNetworkReader(network, transformation);
-		reader.read(file);
+		new SupersonicOsmNetworkReader.Builder()
+				.network(network)
+				.coordinateTransformation(transformation)
+				.build()
+				.read(file);
 
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
@@ -435,7 +475,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_capacityLongLink() throws FileNotFoundException, OsmInputException {
+	public void singleLink_capacityLongLink() {
 
 		var node1 = new Node(1, 0, 0);
 		var node2 = new Node(2, 100, 100);
@@ -447,8 +487,11 @@ public class SupersonicOsmNetworkReaderTest {
 		writeOsmData(List.of(node1, node2), List.of(way), file);
 
 		var network = NetworkUtils.createNetwork();
-		var reader = new SupersonicOsmNetworkReader(network, transformation);
-		reader.read(file);
+		new SupersonicOsmNetworkReader.Builder()
+				.network(network)
+				.coordinateTransformation(transformation)
+				.build()
+				.read(file);
 
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
@@ -458,7 +501,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_capacityShortLink() throws FileNotFoundException, OsmInputException {
+	public void singleLink_capacityShortLink() {
 
 		var node1 = new Node(1, 0, 0);
 		var node2 = new Node(2, 10, 10);
@@ -470,8 +513,11 @@ public class SupersonicOsmNetworkReaderTest {
 		writeOsmData(List.of(node1, node2), List.of(way), file);
 
 		var network = NetworkUtils.createNetwork();
-		var reader = new SupersonicOsmNetworkReader(network, transformation);
-		reader.read(file);
+		new SupersonicOsmNetworkReader.Builder()
+				.network(network)
+				.coordinateTransformation(transformation)
+				.build()
+				.read(file);
 
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
@@ -494,7 +540,7 @@ public class SupersonicOsmNetworkReaderTest {
 	 * (0,2), id:4  (2,2), id:3
 	 */
 	@Test
-	public void twoIntersectingLinks() throws FileNotFoundException, OsmInputException {
+	public void twoIntersectingLinks() {
 
 		final var tags = List.of(new Tag("highway", MOTORWAY));
 		final List<OsmNode> nodes = List.of(new Node(1, 0, 0), new Node(2, 1, 1), new Node(3, 2, 2),
@@ -505,9 +551,11 @@ public class SupersonicOsmNetworkReaderTest {
 		writeOsmData(nodes, ways, file);
 
 		var network = NetworkUtils.createNetwork();
-		var reader = new SupersonicOsmNetworkReader(network, transformation);
-
-		reader.read(file);
+		new SupersonicOsmNetworkReader.Builder()
+				.network(network)
+				.coordinateTransformation(transformation)
+				.build()
+				.read(file);
 
 		assertEquals(5, network.getNodes().size());
 		assertEquals(4, network.getLinks().size());
@@ -529,6 +577,55 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(CoordUtils.calcEuclideanDistance(link3.getFromNode().getCoord(), link3.getToNode().getCoord()), link3.getLength(), 0);
 
 		var link4 = network.getLinks().get(Id.createLinkId(20003));
+		assertEquals(Id.createNodeId(2), link4.getFromNode().getId());
+		assertEquals(Id.createNodeId(5), link4.getToNode().getId());
+		assertEquals(CoordUtils.calcEuclideanDistance(link4.getFromNode().getCoord(), link4.getToNode().getCoord()), link4.getLength(), 0);
+	}
+
+	@Test
+	public void twoIntersectingLinks_withAfterLinkCreatedHook() {
+
+		final var tags = List.of(new Tag("highway", MOTORWAY));
+		final List<OsmNode> nodes = List.of(new Node(1, 0, 0), new Node(2, 1, 1), new Node(3, 2, 2),
+				new Node(4, 0, 2), new Node(5, 2, 0));
+		final List<OsmWay> ways = List.of(new Way(1, new TLongArrayList(new long[]{1, 2, 3}), tags),
+				new Way(2, new TLongArrayList(new long[]{4, 2, 5}), tags));
+		final var file = Paths.get("two-intersecting-links.pbf");
+		writeOsmData(nodes, ways, file);
+
+		var allowedModes = new HashSet<>(List.of(TransportMode.car, TransportMode.airplane));
+		var network = NetworkUtils.createNetwork();
+		new SupersonicOsmNetworkReader.Builder()
+				.network(network)
+				.coordinateTransformation(transformation)
+				.afterLinkCreated(link -> link.setAllowedModes(allowedModes))
+				.build()
+				.read(file);
+
+		assertEquals(5, network.getNodes().size());
+		assertEquals(4, network.getLinks().size());
+
+		// check whether the links were correctly split
+		var link1 = network.getLinks().get(Id.createLinkId(10001));
+		allowedModes.forEach(mode -> assertTrue(link1.getAllowedModes().contains(mode)));
+		assertEquals(Id.createNodeId(1), link1.getFromNode().getId());
+		assertEquals(Id.createNodeId(2), link1.getToNode().getId());
+		assertEquals(CoordUtils.calcEuclideanDistance(link1.getFromNode().getCoord(), link1.getToNode().getCoord()), link1.getLength(), 0);
+
+		var link2 = network.getLinks().get(Id.createLinkId(10003));
+		allowedModes.forEach(mode -> assertTrue(link2.getAllowedModes().contains(mode)));
+		assertEquals(Id.createNodeId(2), link2.getFromNode().getId());
+		assertEquals(Id.createNodeId(3), link2.getToNode().getId());
+		assertEquals(CoordUtils.calcEuclideanDistance(link2.getFromNode().getCoord(), link2.getToNode().getCoord()), link2.getLength(), 0);
+
+		var link3 = network.getLinks().get(Id.createLinkId(20001));
+		allowedModes.forEach(mode -> assertTrue(link3.getAllowedModes().contains(mode)));
+		assertEquals(Id.createNodeId(4), link3.getFromNode().getId());
+		assertEquals(Id.createNodeId(2), link3.getToNode().getId());
+		assertEquals(CoordUtils.calcEuclideanDistance(link3.getFromNode().getCoord(), link3.getToNode().getCoord()), link3.getLength(), 0);
+
+		var link4 = network.getLinks().get(Id.createLinkId(20003));
+		allowedModes.forEach(mode -> assertTrue(link4.getAllowedModes().contains(mode)));
 		assertEquals(Id.createNodeId(2), link4.getFromNode().getId());
 		assertEquals(Id.createNodeId(5), link4.getToNode().getId());
 		assertEquals(CoordUtils.calcEuclideanDistance(link4.getFromNode().getCoord(), link4.getToNode().getCoord()), link4.getLength(), 0);
