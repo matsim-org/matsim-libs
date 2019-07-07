@@ -24,7 +24,6 @@ import java.net.URL;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
@@ -38,7 +37,6 @@ import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import com.google.inject.Key;
 import com.google.inject.name.Names;
 
 /**
@@ -55,7 +53,7 @@ public class OneTruckModule extends AbstractDvrpModeModule {
 	@Override
 	public void install() {
 		DvrpModes.registerDvrpMode(binder(), getMode());
-		bindModal(Network.class).to(Key.get(Network.class, Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING)));
+		install(DvrpRoutingNetworkProvider.createDvrpModeRoutingNetworkModule(getMode(), false));
 
 		bind(VehicleType.class).annotatedWith(Names.named(VrpAgentSourceQSimModule.DVRP_VEHICLE_TYPE))
 				.toInstance(createTruckType());

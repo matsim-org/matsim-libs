@@ -24,9 +24,15 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 
 /**
  * @author michalm
@@ -52,5 +58,27 @@ public class DvrpRoutingNetworkProvider implements Provider<Network> {
 		Network dvrpNetwork = NetworkUtils.createNetwork();
 		new TransportModeNetworkFilter(network).filter(dvrpNetwork, Collections.singleton(dvrpCfg.getNetworkMode()));
 		return dvrpNetwork;
+	}
+
+	public static AbstractDvrpModeModule createDvrpModeRoutingNetworkModule(String mode,
+			boolean useModeFilteredSubnetwork) {
+		return new AbstractDvrpModeModule(mode) {
+			@Override
+			public void install() {
+				if (useModeFilteredSubnetwork) {
+					bindModal(Network.class).toProvider(ModalProviders.createProvider(getMode(), getter -> {
+						Network subnetwork = NetworkUtils.createNetwork();
+						new TransportModeNetworkFilter(
+								getter.getNamed(Network.class, DvrpRoutingNetworkProvider.DVRP_ROUTING)).
+								filter(subnetwork, Collections.singleton(getMode()));
+						new NetworkCleaner().run(subnetwork);
+						return subnetwork;
+					})).asEagerSingleton();
+				} else {
+					bindModal(Network.class).to(
+							Key.get(Network.class, Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING)));
+				}
+			}
+		};
 	}
 }
