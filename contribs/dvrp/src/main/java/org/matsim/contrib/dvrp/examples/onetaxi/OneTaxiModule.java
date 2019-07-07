@@ -23,12 +23,14 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 import java.net.URL;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.DefaultPassengerRequestValidator;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
+import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
@@ -36,7 +38,9 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
 
+import com.google.inject.Key;
 import com.google.inject.Singleton;
+import com.google.inject.name.Names;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -52,7 +56,9 @@ public class OneTaxiModule extends AbstractDvrpModeModule {
 	@Override
 	public void install() {
 		DvrpModes.registerDvrpMode(binder(), getMode());
+		bindModal(Network.class).to(Key.get(Network.class, Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING)));
 		addRoutingModuleBinding(getMode()).toInstance(new DynRoutingModule(getMode()));
+
 		install(new FleetModule(getMode(), fleetSpecificationUrl));
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class);
 
