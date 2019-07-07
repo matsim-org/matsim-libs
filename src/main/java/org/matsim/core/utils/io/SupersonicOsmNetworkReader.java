@@ -30,10 +30,12 @@ import java.util.function.Predicate;
 public class SupersonicOsmNetworkReader {
 
 	public static final String HIGHWAY = "highway";
+    public static final String MAXSPEED = "maxspeed";
 
 	private static final Set<String> reverseTags = new HashSet<>(Arrays.asList("-1", "reverse"));
 	private static final Set<String> oneWayTags = new HashSet<>(Arrays.asList("yes", "true", "1"));
 	private static final Set<String> notOneWayTags = new HashSet<>(Arrays.asList("no", "false", "0"));
+
 
 
 	private final Map<String, LinkProperties> linkProperties = LinkProperties.createLinkProperties();
@@ -130,12 +132,12 @@ public class SupersonicOsmNetworkReader {
                     // ids. The osm wiki says ways have no more than 2000 nodes which means that i will never be greater 1999.
 
 					if (!isOnewayReverse(tags)) {
-                        Link forewardLink = createLink(way.getId() * 10000 + subId, way.getId(), tags, fromNode, toNode, linkLength);
+                        Link forewardLink = createLink(way.getId() * 10000 + subId, way.getId(), tags, fromNode, toNode, linkLength, false);
 						result.add(forewardLink);
 					}
 
 					if (!isOneway(tags, properties)) {
-                        Link reverseLink = createLink(way.getId() * 10000 + subId + 1, way.getId(), tags, toNode, fromNode, linkLength);
+                        Link reverseLink = createLink(way.getId() * 10000 + subId + 1, way.getId(), tags, toNode, fromNode, linkLength, true);
 						result.add(reverseLink);
 					}
 				}
@@ -151,7 +153,7 @@ public class SupersonicOsmNetworkReader {
 		return network.getFactory().createNode(id, coord);
 	}
 
-    private Link createLink(long linkId, long wayId, Map<String, String> tags, Node fromNode, Node toNode, double length) {
+    private Link createLink(long linkId, long wayId, Map<String, String> tags, Node fromNode, Node toNode, double length, boolean isReverse) {
 
 		String highwayType = tags.get(HIGHWAY);
 		LinkProperties properties = linkProperties.get(highwayType);
@@ -159,8 +161,8 @@ public class SupersonicOsmNetworkReader {
 		Link link = network.getFactory().createLink(Id.createLinkId(linkId), fromNode, toNode);
         link.setLength(length);
 		link.setFreespeed(getFreespeed(tags, link.getLength(), properties));
-		link.setCapacity(getLaneCapacity(link.getLength(), properties));
-		link.setNumberOfLanes(getNumberOfLanes(tags, properties));
+        link.setNumberOfLanes(getNumberOfLanes(tags, isReverse, properties));
+        link.setCapacity(getLaneCapacity(link.getLength(), properties) * link.getNumberOfLanes());
 		link.getAttributes().putAttribute(NetworkUtils.ORIGID, wayId);
 		link.getAttributes().putAttribute(NetworkUtils.TYPE, highwayType);
 		// the original code has 'setOrModifyLinkAttributes' here
@@ -192,16 +194,13 @@ public class SupersonicOsmNetworkReader {
 		return false;
 	}
 
-	private double getFreespeed(Map<String, String> tags, double linkLenght, LinkProperties properties) {
-		if (tags.containsKey("maxspeed")) {
-			String tag = tags.get("maxspeed");
-			double speed = parseSpeedTag(tag, properties);
+    private double getFreespeed(Map<String, String> tags, double linkLength, LinkProperties properties) {
+        if (tags.containsKey(MAXSPEED)) {
+            double speed = parseSpeedTag(tags.get(MAXSPEED), properties);
 			double urbanSpeedFactor = speed <= 51 / 3.6 ? 0.5 : 1.0; // assume for links with max speed lower than 51km/h to be in urban areas. Reduce speed to reflect traffic lights and suc
 			return speed * urbanSpeedFactor;
 		} else {
-			// some weir locig invented by kai and ihab. if streets are less than 300m and of level primary, secondary or tertiary make the freesped
-			// higher the longer the link is...
-			return properties.level > LinkProperties.LEVEL_MOTORWAY && properties.level < LinkProperties.LEVEL_SMALLER_THAN_TERTIARY && linkLenght < 300 ? ((10 + (properties.freespeed - 10) / 300 * linkLenght) / 3.6) : properties.freespeed;
+            return calculateSpeedIfNoSpeedTag(properties, linkLength);
 		}
 	}
 
@@ -218,23 +217,44 @@ public class SupersonicOsmNetworkReader {
 		return properties.freespeed;
 	}
 
+    /*
+     * For links with unknown max speed we assume that links with a length of less than 300m are urban links. For urban
+     * links with a length of 0m the speed is 10km/h. For links with a length of 300m the speed is the default freespeed
+     * property for that highway type. For links with a length between 0 and 300m the speed is interpolated linearly.
+     *
+     * All links longer than 300m the default freesped property is assumed
+     */
+    private double calculateSpeedIfNoSpeedTag(LinkProperties properties, double linkLength) {
+        if (properties.level > LinkProperties.LEVEL_MOTORWAY && properties.level < LinkProperties.LEVEL_SMALLER_THAN_TERTIARY
+                && linkLength < 300) {
+            return ((10 + (properties.freespeed - 10) / 300 * linkLength) / 3.6);
+        }
+        return properties.freespeed;
+    }
+
 	private double getLaneCapacity(double linkLength, LinkProperties properties) {
 		double capacityFactor = linkLength < 100 ? 2 : 1;
 		return properties.laneCapacity * capacityFactor;
 	}
 
-	private double getNumberOfLanes(Map<String, String> tags, LinkProperties properties) {
-		if (tags.containsKey("lanes")) {
-			String tag = tags.get("lanes");
+    private double getNumberOfLanes(Map<String, String> tags, boolean isReverse, LinkProperties properties) {
 
-			try {
-				double totalNumberOfLanes = Double.parseDouble(tag);
-				// TODO do more magic with foreward and backward lanes here
-				return totalNumberOfLanes;
-			} catch (NumberFormatException e) {
-				return properties.lanesPerDirection;
-			}
+        try {
+            if (tags.containsKey("lanes")) {
+                String directionKey = isReverse ? "lanes:backward" : "lanes:forward";
+                if (tags.containsKey(directionKey)) {
+                    double directionLanes = Double.parseDouble(tags.get(directionKey));
+                    if (directionLanes > 0) return directionLanes;
+                }
+                // no forward lane tag, so use the regular lanes tag
+                double lanes = Double.parseDouble(tags.get("lanes"));
 
+                // lanes tag specifies lanes into both directions of a way, so cut it in half if it is not a oneway street
+                if (!isOneway(tags, properties)) return lanes / 2;
+                return lanes;
+            }
+        } catch (NumberFormatException e) {
+            return properties.lanesPerDirection;
 		}
 		return properties.lanesPerDirection;
 	}
