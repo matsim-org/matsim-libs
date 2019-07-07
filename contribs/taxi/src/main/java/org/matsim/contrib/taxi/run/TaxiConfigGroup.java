@@ -29,6 +29,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
@@ -165,6 +166,11 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 		if (isVehicleDiversion() && !isOnlineVehicleTracker()) {
 			throw new RuntimeException(
 					TaxiConfigGroup.VEHICLE_DIVERSION + " requires " + TaxiConfigGroup.ONLINE_VEHICLE_TRACKER);
+		}
+
+		if (useModeFilteredSubnetwork) {
+			DvrpRoutingNetworkProvider.
+					checkUseModeFilteredSubnetworkAllowed(config, mode);
 		}
 	}
 
