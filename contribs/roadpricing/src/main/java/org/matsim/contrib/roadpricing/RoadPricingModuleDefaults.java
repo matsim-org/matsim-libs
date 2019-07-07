@@ -36,15 +36,11 @@ import javax.inject.Provider;
 import java.net.URL;
 import java.util.Collections;
 
-final class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
+final class RoadPricingModuleDefaults extends AbstractModule {
 
 	private final RoadPricingScheme roadPricingScheme;
 
-	ControlerDefaultsWithRoadPricingModule() {
-		this.roadPricingScheme = null;
-	}
-
-	ControlerDefaultsWithRoadPricingModule(RoadPricingScheme roadPricingScheme) {
+	RoadPricingModuleDefaults(RoadPricingScheme roadPricingScheme) {
 		this.roadPricingScheme = roadPricingScheme;
 	}
 

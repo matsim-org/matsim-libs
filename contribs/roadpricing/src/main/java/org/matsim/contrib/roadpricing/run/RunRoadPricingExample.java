@@ -82,7 +82,8 @@ public final class RunRoadPricingExample {
 	private Config prepareConfig() {
 		// load the config, telling it to "materialize" the road pricing section:
 		config = ConfigUtils.loadConfig(args[0], RoadPricingUtils.createConfigGroup());
-		config. controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setLastIteration(10);
 		return config;
 	}
 

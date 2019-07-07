@@ -145,7 +145,9 @@ public class PlansCalcRouteWithTollOrNotTest {
 	private PlansCalcRouteWithTollOrNot testee(final Scenario scenario, final RoadPricingScheme toll) {
 		return Injector.createInjector(
 				scenario.getConfig(),
-				new ControlerDefaultsWithRoadPricingModule(toll),
+				new RoadPricingModuleDefaults(toll),
+				/* FIXME Check/understand why the following is INcorrect, jwj '19. What's the difference? */
+//				RoadPricingUtils.createModule(toll),
 				new ScenarioByInstanceModule(scenario),
 				new ControlerDefaultCoreListenersModule(),
 				new NewControlerModule())
@@ -210,15 +212,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		if ( !config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
 			return (Leg) (planElements.get(3));
 		} else {
-			StageActivityTypes adHocTypes = new StageActivityTypes(){
-				@Override public boolean isStageActivity(String activityType) {
-					if ( activityType.contains("interaction") ) {
-						return true ;
-					} else {
-						return false ;
-					}
-				}
-			} ;
+			StageActivityTypes adHocTypes = activityType -> activityType.contains("interaction");
 			List<Trip> trips = TripStructureUtils.getTrips(planElements, adHocTypes) ;
 			List<Leg> legs = trips.get(1).getLegsOnly() ;
 			if ( legs.size()==1 ) {
