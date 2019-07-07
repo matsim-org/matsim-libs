@@ -21,9 +21,9 @@ package org.matsim.contrib.dvrp.run;
 
 import java.util.Map;
 
-import javax.annotation.Nullable;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
@@ -32,6 +32,9 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dynagent.run.DynQSimConfigConsistencyChecker;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.utils.misc.StringUtils;
+
+import com.google.common.collect.ImmutableSet;
 
 public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 	private static final Logger log = Logger.getLogger(DvrpConfigGroup.class);
@@ -43,10 +46,14 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 		return (DvrpConfigGroup)config.getModule(GROUP_NAME);// will fail if not in the config
 	}
 
-	public static final String NETWORK_MODE = "networkMode";
-	static final String NETWORK_MODE_EXP = "Mode of which the network will be used for routing vehicles. "
-			+ "Default is car, i.e. the car network is used. "
-			+ "'null' means no network filtering - the scenario.network is used";
+	public static final String NETWORK_MODES = "networkModes";
+	static final String NETWORK_MODES_EXP = "Set of modes of which the network will be used for DVRP travel time "
+			+ "estimation and routing DVRP vehicles. "
+			+ "Each specific DVRP mode may use a subnetwork of this network for routing vehicles (e.g. DRT buses "
+			+ "travelling only along a specified links or serving a limited area). "
+			+ "Default is \"car\" (i.e. single-element set of modes), i.e. the car network is used. "
+			+ "Empty value \"\" (i.e. empty set of modes) means no network filtering, i.e. "
+			+ "the original scenario.network is used";
 
 	public static final String MOBSIM_MODE = "mobsimMode";
 	static final String MOBSIM_MODE_EXP =
@@ -86,8 +93,9 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 	// In DVRP 'time < currentTime' may only happen for backward path search, a adding proper search termination
 	// criterion should prevent this from happening
 
-	@Nullable
-	private String networkMode = TransportMode.car; // used for building route; null ==> no filtering (routing network equals scenario.network)
+	// used for building route; empty ==> no filtering (routing network equals scenario.network)
+	@NotNull
+	private ImmutableSet<String> networkModes = ImmutableSet.of(TransportMode.car);
 
 	@NotBlank
 	private String mobsimMode = TransportMode.car;// used for events throwing and thus calculating travel times, etc.
@@ -129,7 +137,7 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> map = super.getComments();
-		map.put(NETWORK_MODE, NETWORK_MODE_EXP);
+		map.put(NETWORK_MODES, NETWORK_MODES_EXP);
 		map.put(MOBSIM_MODE, MOBSIM_MODE_EXP);
 		map.put(TRAVEL_TIME_ESTIMATION_ALPHA, TRAVEL_TIME_ESTIMATION_ALPHA_EXP);
 		map.put(TRAVEL_TIME_ESTIMATION_BETA, TRAVEL_TIME_ESTIMATION_BETA_EXP);
@@ -137,19 +145,27 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	/**
-	 * @return {@value #NETWORK_MODE_EXP}
+	 * @return {@value #NETWORK_MODES_EXP}
 	 */
-	@StringGetter(NETWORK_MODE)
-	public String getNetworkMode() {
-		return networkMode;
+	@StringGetter(NETWORK_MODES)
+	public String getNetworkModesAsString() {
+		return String.join(",", networkModes);
+	}
+
+	public ImmutableSet<String> getNetworkModes() {
+		return networkModes;
 	}
 
 	/**
-	 * @param networkMode {@value #NETWORK_MODE_EXP}
+	 * @param networkModesString {@value #NETWORK_MODES_EXP}
 	 */
-	@StringSetter(NETWORK_MODE)
-	public void setNetworkMode(String networkMode) {
-		this.networkMode = networkMode;
+	@StringSetter(NETWORK_MODES)
+	public void setNetworkModesAsString(String networkModesString) {
+		this.networkModes = ImmutableSet.copyOf(StringUtils.explode(networkModesString, ','));
+	}
+
+	public void setNetworkModes(ImmutableSet<String> networkModes) {
+		this.networkModes = networkModes;
 	}
 
 	/**

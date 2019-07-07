@@ -51,13 +51,13 @@ public class DvrpRoutingNetworkProvider implements Provider<Network> {
 
 	@Override
 	public Network get() {
-		if (dvrpCfg.getNetworkMode() == null) { // no mode filtering
+		if (dvrpCfg.getNetworkModes().isEmpty()) { // no mode filtering
 			return network;
+		} else {
+			Network dvrpNetwork = NetworkUtils.createNetwork();
+			new TransportModeNetworkFilter(network).filter(dvrpNetwork, dvrpCfg.getNetworkModes());
+			return dvrpNetwork;
 		}
-
-		Network dvrpNetwork = NetworkUtils.createNetwork();
-		new TransportModeNetworkFilter(network).filter(dvrpNetwork, Collections.singleton(dvrpCfg.getNetworkMode()));
-		return dvrpNetwork;
 	}
 
 	public static AbstractDvrpModeModule createDvrpModeRoutingNetworkModule(String mode,
