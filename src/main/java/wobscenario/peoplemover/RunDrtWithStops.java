@@ -49,12 +49,12 @@ public class RunDrtWithStops {
 		DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
 		
 		drt.setEstimatedBeelineDistanceFactor(1.3);
-		drt.setEstimatedSpeed(30/3.6);
+		drt.setEstimatedDrtSpeed(30 / 3.6);
 		drt.setMaxWalkDistance(500);
 		drt.setMaxTravelTimeAlpha(1.5);
 		drt.setMaxTravelTimeBeta(300);
 		drt.setTransitStopFile("network/stopsWRS_300m.xml");
-		drt.setOperationalScheme(OperationalScheme.stopbased.toString());
+		drt.setOperationalScheme(OperationalScheme.stopbased);
 		int threads = Runtime.getRuntime().availableProcessors() - 1;
 		System.out.println(threads + " threads used for drt.");
 		drt.setNumberOfThreads(threads);
