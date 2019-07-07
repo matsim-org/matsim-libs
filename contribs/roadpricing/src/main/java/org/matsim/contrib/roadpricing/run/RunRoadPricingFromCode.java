@@ -19,7 +19,10 @@ package org.matsim.contrib.roadpricing.run;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.roadpricing.*;
+import org.matsim.contrib.roadpricing.RoadPricingConfigGroup;
+import org.matsim.contrib.roadpricing.RoadPricingScheme;
+import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl;
+import org.matsim.contrib.roadpricing.RoadPricingUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -34,12 +37,14 @@ import org.matsim.core.utils.misc.Time;
 public class RunRoadPricingFromCode {
 	private static final String TEST_CONFIG = "./contribs/roadpricing/test/input/org/matsim/contrib/roadpricing/AvoidTolledRouteTest/config.xml";
 
-	public static void main(String[] args) { run(); }
+	public static void main(String[] args) { run(args); }
 
-	private static void run(){
+	private static void run(String[] args){
+		if(args.length==0){ args = new String[]{TEST_CONFIG}; }
+
 		/* Start with a known config file (with population, network, and scoring
 		parameteres specified) and just remove the road pricing file. */
-		Config config = ConfigUtils.loadConfig(TEST_CONFIG, RoadPricingUtils.createConfigGroup());
+		Config config = ConfigUtils.loadConfig(args[0], RoadPricingUtils.createConfigGroup());
 		ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.class).setTollLinksFile(null);
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setLastIteration(10);
