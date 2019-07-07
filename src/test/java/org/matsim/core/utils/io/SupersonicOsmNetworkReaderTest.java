@@ -8,6 +8,7 @@ import de.topobyte.osm4j.core.model.impl.Tag;
 import de.topobyte.osm4j.core.model.impl.Way;
 import de.topobyte.osm4j.pbf.seq.PbfWriter;
 import lombok.extern.java.Log;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -61,7 +62,8 @@ public class SupersonicOsmNetworkReaderTest {
 		}
 	}
 
-	@Test
+    @Test
+    @Ignore
 	public void test() {
 
 		Path file = Paths.get("G:\\Users\\Janek\\Downloads\\nordrhein-westfalen-latest.osm.pbf");
@@ -82,10 +84,11 @@ public class SupersonicOsmNetworkReaderTest {
 		new NetworkWriter(network).write(output.toString());
 	}
 
-	@Test
+    @Test
+    @Ignore
 	public void testOldNetworkReader() {
 
-		Path file = Paths.get("G:\\Users\\Janek\\Downloads\\nordrhein-westfalen-latest.osm.pbf");
+        Path file = Paths.get("G:\\Users\\Janek\\Downloads\\nordrhein-westfalen-latest.osm\\nordrhein-westfalen-latest.osm");
 		Path output = Paths.get("G:\\Users\\Janek\\Desktop\\nordrhein-westfalen-latest-matsim-reader.xml.gz");
 		Network network = NetworkUtils.createNetwork();
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832");
