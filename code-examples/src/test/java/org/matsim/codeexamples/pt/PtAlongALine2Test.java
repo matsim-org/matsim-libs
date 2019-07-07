@@ -12,6 +12,7 @@ import org.locationtech.jts.awt.PointShapeFactory;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -22,6 +23,7 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
+import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
@@ -41,13 +43,16 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.*;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehiclesFactory;
+import org.matsim.withinday.replanning.identifiers.filter.TransportModeFilter;
 
 import java.util.*;
 
@@ -60,7 +65,7 @@ public class PtAlongALine2Test{
 
 	enum DrtMode { none, teleportBeeline, teleportBasedOnNetworkRoute, full }
 	private DrtMode drtMode = DrtMode.full ;
-	private boolean drt2 = false ;
+	private boolean drt2 = true ;
 
 	@Test
 	public void testPtAlongALineWithRaptorAndDrtServiceArea() {
@@ -199,9 +204,10 @@ public class PtAlongALine2Test{
 			String drt2VehiclesFile = "drt2_vehicles.xml";
 
 			DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
+
 			// TODO: How can we set the network mode of drt2?
 			// TODO: Right now uncommenting the following line gives guice injection errors
-			dvrpConfig.setNetworkMode(TransportMode.drt);
+//			dvrpConfig.setNetworkMode(TransportMode.drt);
 
 			MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule( config, MultiModeDrtConfigGroup.class );
 			{
@@ -245,7 +251,7 @@ public class PtAlongALine2Test{
 
 		// ### SCENARIO: ###
 
-		Scenario scenario = PtAlongALineTest.createScenario(config , 20 );
+		Scenario scenario = PtAlongALineTest.createScenario(config , 30 );
 
 		if ( drtMode==DrtMode.full ) {
 			scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory( DrtRoute.class, new DrtRouteFactory() );
@@ -288,7 +294,25 @@ public class PtAlongALine2Test{
 		if ( drtMode==DrtMode.full ){
 			controler.addOverridingModule( new DvrpModule() );
 			controler.addOverridingModule( new MultiModeDrtModule() );
+			controler.addOverridingModule(new AbstractDvrpModeModule(TransportMode.drt) {
+				@Override
+				public void install() {
+					Set<String> modes = Collections.singleton( TransportMode.drt ) ;
+					Network subNetwork = ScenarioUtils.createScenario( config ).getNetwork() ;
+					new TransportModeNetworkFilter( scenario.getNetwork() ).filter( subNetwork, modes );
+					bindModal( Network.class ).toInstance( subNetwork );
+				}
+			});
 			if ( drt2 ){
+				controler.addOverridingModule(new AbstractDvrpModeModule("drt2") {
+					@Override
+					public void install() {
+						Set<String> modes = Collections.singleton( "drt2" ) ;
+						Network subNetwork = ScenarioUtils.createScenario( config ).getNetwork() ;
+						new TransportModeNetworkFilter( scenario.getNetwork() ).filter( subNetwork, modes );
+						bindModal( Network.class ).toInstance( subNetwork );
+					}
+				});
 				controler.configureQSimComponents( DvrpQSimComponents.activateModes( TransportMode.drt, "drt2" ) );
 			} else{
 				controler.configureQSimComponents( DvrpQSimComponents.activateModes( TransportMode.drt ) );
