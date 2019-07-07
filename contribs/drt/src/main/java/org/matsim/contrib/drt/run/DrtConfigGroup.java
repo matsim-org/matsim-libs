@@ -410,9 +410,8 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @param operationalScheme -- {@value #OP_SCHEME_EXP}
 	 */
 	@StringSetter(OPERATIONAL_SCHEME)
-	public void setOperationalScheme(String operationalScheme) {
-
-		this.operationalScheme = OperationalScheme.valueOf(operationalScheme);
+	public void setOperationalScheme(OperationalScheme operationalScheme) {
+		this.operationalScheme = operationalScheme;
 	}
 
 	/**
@@ -466,7 +465,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @param-- {@value #ESTIMATED_DRT_SPEED_EXP}
 	 */
 	@StringSetter(ESTIMATED_DRT_SPEED)
-	public void setEstimatedSpeed(double estimatedSpeed) {
+	public void setEstimatedDrtSpeed(double estimatedSpeed) {
 		this.estimatedDrtSpeed = estimatedSpeed;
 	}
 
