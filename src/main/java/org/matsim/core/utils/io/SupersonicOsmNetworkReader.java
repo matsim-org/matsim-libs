@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 @Log
 public class SupersonicOsmNetworkReader {
@@ -70,7 +71,8 @@ public class SupersonicOsmNetworkReader {
         log.info("filter for highways create a matsim network");
         ways.parallelStream()
                 .filter(this::isStreetOfInterest)
-                .flatMap(way -> this.createNecessaryLinks(nodes, way).stream())
+                .flatMap(way -> this.createWaySegments(nodes, way))
+                .flatMap(this::createLinks)
 				.forEach(this::addLinkToNetwork);
 
 		log.info("done");
@@ -100,52 +102,58 @@ public class SupersonicOsmNetworkReader {
         return new NodesAndWays(nodesHandler.nodes, waysHandler.ways);
     }
 
-    private Collection<Link> createNecessaryLinks(Map<Long, LightOsmNode> nodes, OsmWay way) {
-		long fromNodeId = way.getNodeId(0);
-        double linkLength = 0;
-        Coord segmentFromCoord = coordinateTransformation.transform(nodes.get(fromNodeId).getCoord());
+    private Stream<WaySegment> createWaySegments(Map<Long, LightOsmNode> nodes, OsmWay way) {
 
-		List<Link> result = new ArrayList<>();
-		for (int i = 1, subId = 1; i < way.getNumberOfNodes(); i++, subId += 2) {
+        List<WaySegment> segments = new ArrayList<>();
+        long fromNodeId = way.getNodeId(0); // store the first waypoint
+        double segmentLength = 0;
 
-            var toOsmNode = nodes.get(way.getNodeId(i));
+        for (int i = 1; i < way.getNumberOfNodes(); i++) {
+
             var fromOsmNode = nodes.get(fromNodeId);
+            var toOsmNode = nodes.get(way.getNodeId(i));
 
             Coord fromCoord = coordinateTransformation.transform(fromOsmNode.getCoord());
             Coord toCoord = coordinateTransformation.transform(toOsmNode.getCoord());
+            segmentLength += CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
 
-            double segmentLength = CoordUtils.calcEuclideanDistance(segmentFromCoord, toCoord);
-            linkLength += segmentLength;
-            segmentFromCoord = toCoord;
+            if (toOsmNode.isUsedByMoreThanOneWay() || i == way.getNumberOfNodes() - 1 || this.preserveNode.test(toOsmNode.getId())) {
 
-            if (toOsmNode.getNumberOfWays() > 1 || i == way.getNumberOfNodes() - 1 || this.preserveNode.test(toOsmNode.getId())) {
+                segments.add(new WaySegment(
+                        new LightOsmNode(fromOsmNode.getId(), fromOsmNode.getNumberOfWays(), fromCoord),
+                        new LightOsmNode(toOsmNode.getId(), toOsmNode.getNumberOfWays(), toCoord),
+                        segmentLength, OsmModelUtil.getTagsAsMap(way), way.getId(),
+                        //if the way id is 1234 we will get a link id like 12340001, this is necessary because we need to generate unique
+                        // ids. The osm wiki says ways have no more than 2000 nodes which means that i will never be greater 1999.
+                        way.getId() * 10000 + i));
+                segmentLength = 0;
+                fromNodeId = toOsmNode.getId();
+            }
+        }
+        return segments.stream();
+    }
 
-				// we should have filtered for these before, so no testing whether they are present
-				Map<String, String> tags = OsmModelUtil.getTagsAsMap(way);
-				String highwayType = tags.get(HIGHWAY);
-				LinkProperties properties = linkProperties.get(highwayType);
+    private Stream<Link> createLinks(WaySegment segment) {
 
-				if (filter.test(fromCoord, properties.level) || filter.test(toCoord, properties.level)) {
-					Node fromNode = createNode(fromCoord, fromOsmNode.getId());
-					Node toNode = createNode(toCoord, toOsmNode.getId());
-					//if the way id is 1234 we will get a link id like 12340001, this is necessary because we need to generate unique
-                    // ids. The osm wiki says ways have no more than 2000 nodes which means that i will never be greater 1999.
+        var highwayType = segment.getTags().get(HIGHWAY);
+        var properties = linkProperties.get(highwayType);
+        List<Link> result = new ArrayList<>();
 
-					if (!isOnewayReverse(tags)) {
-                        Link forewardLink = createLink(way.getId() * 10000 + subId, way.getId(), tags, fromNode, toNode, linkLength, false);
-						result.add(forewardLink);
-					}
+        if (filter.test(segment.getFromNode().getCoord(), properties.level) || filter.test(segment.getToNode().getCoord(), properties.level)) {
+            var fromNode = createNode(segment.getFromNode().getCoord(), segment.getFromNode().getId());
+            var toNode = createNode(segment.getToNode().getCoord(), segment.getToNode().getId());
 
-					if (!isOneway(tags, properties)) {
-                        Link reverseLink = createLink(way.getId() * 10000 + subId + 1, way.getId(), tags, toNode, fromNode, linkLength, true);
-						result.add(reverseLink);
-					}
-				}
-                linkLength = 0;
-				fromNodeId = toOsmNode.getId();
+            if (!isOnewayReverse(segment.tags)) {
+                Link forewardLink = createLink(fromNode, toNode, segment, false);
+                result.add(forewardLink);
+            }
+
+            if (!isOneway(segment.getTags(), properties)) {
+                Link reverseLink = createLink(toNode, fromNode, segment, true);
+                result.add(reverseLink);
 			}
 		}
-		return result;
+        return result.stream();
 	}
 
 	private Node createNode(Coord coord, long nodeId) {
@@ -153,17 +161,18 @@ public class SupersonicOsmNetworkReader {
 		return network.getFactory().createNode(id, coord);
 	}
 
-    private Link createLink(long linkId, long wayId, Map<String, String> tags, Node fromNode, Node toNode, double length, boolean isReverse) {
+    private Link createLink(Node fromNode, Node toNode, WaySegment segment, boolean isReverse) {
 
-		String highwayType = tags.get(HIGHWAY);
+        String highwayType = segment.getTags().get(HIGHWAY);
 		LinkProperties properties = linkProperties.get(highwayType);
 
+        long linkId = isReverse ? segment.getSegmentId() + 1 : segment.getSegmentId();
 		Link link = network.getFactory().createLink(Id.createLinkId(linkId), fromNode, toNode);
-        link.setLength(length);
-		link.setFreespeed(getFreespeed(tags, link.getLength(), properties));
-        link.setNumberOfLanes(getNumberOfLanes(tags, isReverse, properties));
+        link.setLength(segment.getLength());
+        link.setFreespeed(getFreespeed(segment.getTags(), link.getLength(), properties));
+        link.setNumberOfLanes(getNumberOfLanes(segment.getTags(), isReverse, properties));
         link.setCapacity(getLaneCapacity(link.getLength(), properties) * link.getNumberOfLanes());
-		link.getAttributes().putAttribute(NetworkUtils.ORIGID, wayId);
+        link.getAttributes().putAttribute(NetworkUtils.ORIGID, segment.getOriginalWayId());
 		link.getAttributes().putAttribute(NetworkUtils.TYPE, highwayType);
 		// the original code has 'setOrModifyLinkAttributes' here
 		return link;
@@ -423,6 +432,10 @@ public class SupersonicOsmNetworkReader {
         private final long id;
         private final int numberOfWays;
         private final Coord coord;
+
+        boolean isUsedByMoreThanOneWay() {
+            return numberOfWays > 1;
+        }
     }
 
 	@RequiredArgsConstructor
@@ -469,4 +482,15 @@ public class SupersonicOsmNetworkReader {
         private final Map<Long, LightOsmNode> nodes;
 		private final Set<OsmWay> ways;
 	}
+
+    @RequiredArgsConstructor
+    @Getter
+    private static class WaySegment {
+        private final LightOsmNode fromNode;
+        private final LightOsmNode toNode;
+        private final double length;
+        private final Map<String, String> tags;
+        private final long originalWayId;
+        private final long segmentId;
+    }
 }
