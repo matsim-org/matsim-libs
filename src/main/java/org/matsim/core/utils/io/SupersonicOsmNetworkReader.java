@@ -106,9 +106,10 @@ public class SupersonicOsmNetworkReader {
 
         List<WaySegment> segments = new ArrayList<>();
         long fromNodeId = way.getNodeId(0); // store the first waypoint
+        var fromNodeForSegment = nodes.get(fromNodeId);
         double segmentLength = 0;
 
-        for (int i = 1; i < way.getNumberOfNodes(); i++) {
+        for (int i = 1, linkIdAppendix = 1; i < way.getNumberOfNodes(); i++, linkIdAppendix += 2) {
 
             var fromOsmNode = nodes.get(fromNodeId);
             var toOsmNode = nodes.get(way.getNodeId(i));
@@ -120,15 +121,21 @@ public class SupersonicOsmNetworkReader {
             if (toOsmNode.isUsedByMoreThanOneWay() || i == way.getNumberOfNodes() - 1 || this.preserveNode.test(toOsmNode.getId())) {
 
                 segments.add(new WaySegment(
-                        new LightOsmNode(fromOsmNode.getId(), fromOsmNode.getNumberOfWays(), fromCoord),
+                        new LightOsmNode(fromNodeForSegment.getId(), fromNodeForSegment.getNumberOfWays(), fromCoord),
                         new LightOsmNode(toOsmNode.getId(), toOsmNode.getNumberOfWays(), toCoord),
                         segmentLength, OsmModelUtil.getTagsAsMap(way), way.getId(),
                         //if the way id is 1234 we will get a link id like 12340001, this is necessary because we need to generate unique
                         // ids. The osm wiki says ways have no more than 2000 nodes which means that i will never be greater 1999.
-                        way.getId() * 10000 + i));
+                        // we have to increase the appendix by two for each segment, to leave room for backwards links
+                        way.getId() * 10000 + linkIdAppendix));
+
+                //prepare for next segment
                 segmentLength = 0;
-                fromNodeId = toOsmNode.getId();
+                fromNodeForSegment = toOsmNode;
             }
+
+            //prepare for next iteration
+            fromNodeId = toOsmNode.getId();
         }
         return segments.stream();
     }
@@ -144,8 +151,8 @@ public class SupersonicOsmNetworkReader {
             var toNode = createNode(segment.getToNode().getCoord(), segment.getToNode().getId());
 
             if (!isOnewayReverse(segment.tags)) {
-                Link forewardLink = createLink(fromNode, toNode, segment, false);
-                result.add(forewardLink);
+                Link forwardLink = createLink(fromNode, toNode, segment, false);
+                result.add(forwardLink);
             }
 
             if (!isOneway(segment.getTags(), properties)) {
