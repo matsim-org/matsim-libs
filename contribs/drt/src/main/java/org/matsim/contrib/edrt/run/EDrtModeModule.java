@@ -55,7 +55,9 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
 import com.google.inject.Inject;
+import com.google.inject.Key;
 import com.google.inject.name.Named;
+import com.google.inject.name.Names;
 
 /**
  * @author michalm (Michal Maciejewski)
@@ -72,6 +74,7 @@ public final class EDrtModeModule extends AbstractDvrpModeModule {
 	public void install() {
 		DvrpModes.registerDvrpMode(binder(), getMode());
 
+		bindModal(Network.class).to(Key.get(Network.class, Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING)));
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
 
 		install(new EvDvrpFleetModule(getMode(), drtCfg.getVehiclesFile()));
@@ -110,10 +113,6 @@ public final class EDrtModeModule extends AbstractDvrpModeModule {
 
 		bindModal(DrtRouteUpdater.class).toProvider(new ModalProviders.AbstractProvider<DrtRouteUpdater>(getMode()) {
 			@Inject
-			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
-			private Network network;
-
-			@Inject
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 			private TravelTime travelTime;
 
@@ -125,6 +124,7 @@ public final class EDrtModeModule extends AbstractDvrpModeModule {
 
 			@Override
 			public DefaultDrtRouteUpdater get() {
+				Network network = getModalInstance(Network.class);
 				return new DefaultDrtRouteUpdater(drtCfg, network, travelTime,
 						getModalInstance(TravelDisutilityFactory.class), population, config);
 			}
@@ -136,9 +136,6 @@ public final class EDrtModeModule extends AbstractDvrpModeModule {
 	private static class DrtRoutingModuleProvider extends ModalProviders.AbstractProvider<DrtRoutingModule> {
 
 		private final DrtConfigGroup drtCfg;
-		@Inject
-		@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
-		private Network network;
 
 		@Inject
 		@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
@@ -158,8 +155,9 @@ public final class EDrtModeModule extends AbstractDvrpModeModule {
 
 		@Override
 		public DrtRoutingModule get() {
-			return new DrtRoutingModule( drtCfg, network, travelTime, getModalInstance(TravelDisutilityFactory.class),
-					walkRouter, scenario);
+			Network network = getModalInstance(Network.class);
+			return new DrtRoutingModule(drtCfg, network, travelTime, getModalInstance(TravelDisutilityFactory.class),
+				  walkRouter, scenario );
 		}
 	}
 

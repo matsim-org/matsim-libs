@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -68,22 +67,20 @@ public class DrtRoutingModule implements RoutingModule {
 	private final DrtStageActivityType drtStageActivityType;
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfig;
 
-	public DrtRoutingModule( DrtConfigGroup drtCfg, @Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
+	public DrtRoutingModule( DrtConfigGroup drtCfg, Network network,
 					 @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
 					 TravelDisutilityFactory travelDisutilityFactory,
 					 @Named(TransportMode.walk) RoutingModule walkRouter, Scenario scenario ) {
-		// constructor was public when I found this, and has to remain public.  --> Now passing scenario as an argument so that
-		// we have at least some flexibility without having to change the argument list.  kai, jul'19
+		// constructor was public when I found it, and cannot be made package private.  Thus now passing scenario as argument so we have a bit more
+		// flexibility for changes without having to change the argument list every time.  kai, jul'19
 
-		LOGGER.setLevel( Level.DEBUG );
-
-		this.drtCfg = drtCfg ; // can't take out of normal config; don't know why.  kai, jul'19
-		this.plansCalcRouteConfig = ConfigUtils.addOrGetModule( scenario.getConfig(), PlansCalcRouteConfigGroup.class ) ;
+		this.drtCfg = drtCfg;
 		this.network = network;
 		this.travelTime = travelTime;
 		this.populationFactory = scenario.getPopulation().getFactory() ;
 		this.walkRouter = walkRouter;
 		this.drtStageActivityType = new DrtStageActivityType(drtCfg.getMode());
+		this.plansCalcRouteConfig = scenario.getConfig().plansCalcRoute() ;
 
 		// Euclidean with overdoFactor > 1.0 could lead to 'experiencedTT < unsharedRideTT',
 		// while the benefit would be a marginal reduction of computation time ==> so stick to 1.0

@@ -32,13 +32,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-
-import com.google.inject.name.Named;
 
 /**
  * @author michalm
@@ -47,8 +44,7 @@ public class AggregatedMinCostRelocationCalculator implements MinCostRelocationC
 	private final DrtZonalSystem zonalSystem;
 	private final Network network;
 
-	public AggregatedMinCostRelocationCalculator(DrtZonalSystem zonalSystem,
-			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network) {
+	public AggregatedMinCostRelocationCalculator(DrtZonalSystem zonalSystem, Network network) {
 		this.zonalSystem = zonalSystem;
 		this.network = network;
 	}

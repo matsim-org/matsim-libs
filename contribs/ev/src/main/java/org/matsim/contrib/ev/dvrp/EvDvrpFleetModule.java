@@ -27,7 +27,6 @@ import org.matsim.contrib.dvrp.fleet.FleetReader;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
 import org.matsim.contrib.dvrp.fleet.Fleets;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
@@ -35,7 +34,6 @@ import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.core.config.ConfigGroup;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -63,13 +61,10 @@ public class EvDvrpFleetModule extends AbstractDvrpModeModule {
 					@Inject
 					private ElectricFleet evFleet;
 
-					@Inject
-					@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
-					private Network network;
-
 					@Override
 					public Fleet get() {
 						FleetSpecification fleetSpecification = getModalInstance(FleetSpecification.class);
+						Network network = getModalInstance(Network.class);
 						return Fleets.createCustomFleet(fleetSpecification, s -> EvDvrpVehicle.create(
 								new DvrpVehicleImpl(s, network.getLinks().get(s.getStartLinkId())), evFleet));
 
