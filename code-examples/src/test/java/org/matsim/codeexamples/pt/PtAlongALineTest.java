@@ -56,11 +56,13 @@ import java.util.*;
 
 public class PtAlongALineTest{
 
+	private static final Id<Link> TR_LINK_m1_0_ID = Id.createLinkId( "trLinkm1-0" );
 	private static final Id<Link> TR_LINK_0_1_ID = Id.createLinkId( "trLink0-1" );
 	private static final Id<Link> TR_LONG_LINK_LEFT_ID = Id.createLinkId( "trLinkLongLeft" );
 	private static final Id<Link> TR_LINK_MIDDLE_ID = Id.createLinkId( "trLinkMiddle" );
 	private static final Id<Link> TR_LONG_LINK_RIGHT_ID = Id.createLinkId( "trLinkLongRight" );
 	private static final Id<Link> TR_LINK_LASTM1_LAST_ID = Id.createLinkId( "trLinkLastm1-Last" );
+	private static final Id<Link> TR_LINK_LAST_LASTp1_ID = Id.createLinkId( "trLinkLast-Lastp1" ) ;
 
 	private static final Id<TransitStopFacility> tr_stop_fac_0_ID = Id.create( "StopFac0", TransitStopFacility.class );
 	private static final Id<TransitStopFacility> tr_stop_fac_10000_ID = Id.create( "StopFac10000", TransitStopFacility.class );
@@ -438,10 +440,12 @@ public class PtAlongALineTest{
 		VehiclesFactory tvf = scenario.getTransitVehicles().getFactory();
 
 		List<Id<Link>> linkIds = new ArrayList<>() ;
+		linkIds.add( TR_LINK_0_1_ID ) ;
 		linkIds.add( TR_LONG_LINK_LEFT_ID ) ;
 		linkIds.add( TR_LINK_MIDDLE_ID ) ;
 		linkIds.add( TR_LONG_LINK_RIGHT_ID ) ;
-		NetworkRoute route = createNetworkRoute( TR_LINK_0_1_ID, linkIds, TR_LINK_LASTM1_LAST_ID, pf );
+		linkIds.add( TR_LINK_LASTM1_LAST_ID ) ;
+		NetworkRoute route = createNetworkRoute( TR_LINK_m1_0_ID, linkIds, TR_LINK_LAST_LASTp1_ID, pf );
 
 		List<TransitRouteStop> stops = new ArrayList<>() ;
 		{
@@ -505,8 +509,12 @@ public class PtAlongALineTest{
 		NetworkFactory nf = scenario.getNetwork().getFactory();
 		;
 
+		Node nodem1 = nf.createNode( Id.createNodeId("trNodeM1" ), new Coord(-100, deltaY ) );
+		scenario.getNetwork().addNode(nodem1);
+		// ---
 		Node node0 = nf.createNode( Id.createNodeId("trNode0" ), new Coord(0, deltaY ) );
 		scenario.getNetwork().addNode(node0);
+		createAndAddTransitLink( scenario, nodem1, node0, TR_LINK_m1_0_ID );
 		// ---
 		Node node1 = nf.createNode( Id.createNodeId("trNode1"), new Coord(deltaX, deltaY ) ) ;
 		scenario.getNetwork().addNode( node1 ) ;
@@ -520,22 +528,20 @@ public class PtAlongALineTest{
 		// ---
 		Node nodeMiddleRight = nf.createNode( Id.createNodeId("trNodeMiddleRight") , new Coord( 0.5*(lastNodeIdx+1)*deltaX , deltaY ) ) ;
 		scenario.getNetwork().addNode( nodeMiddleRight ) ;
-		{
-			createAndAddTransitLink( scenario, nodeMiddleLeft, nodeMiddleRight, TR_LINK_MIDDLE_ID );
-		}
+		createAndAddTransitLink( scenario, nodeMiddleLeft, nodeMiddleRight, TR_LINK_MIDDLE_ID );
 		// ---
 		Node nodeLastm1 = nf.createNode( Id.createNodeId("trNodeLastm1") , new Coord( (lastNodeIdx-1)*deltaX , deltaY ) ) ;
 		scenario.getNetwork().addNode( nodeLastm1) ;
-		{
-			createAndAddTransitLink( scenario, nodeMiddleRight, nodeLastm1, TR_LONG_LINK_RIGHT_ID );
-		}
+		createAndAddTransitLink( scenario, nodeMiddleRight, nodeLastm1, TR_LONG_LINK_RIGHT_ID );
 
 		// ---
 		Node nodeLast = nf.createNode(Id.createNodeId("trNodeLast"), new Coord(lastNodeIdx*deltaX, deltaY ) ) ;
 		scenario.getNetwork().addNode(nodeLast);
-		{
-			createAndAddTransitLink( scenario, nodeLastm1, nodeLast, TR_LINK_LASTM1_LAST_ID );
-		}
+		createAndAddTransitLink( scenario, nodeLastm1, nodeLast, TR_LINK_LASTM1_LAST_ID );
+		// ---
+		Node nodeLastp1 = nf.createNode(Id.createNodeId("trNodeLastp1"), new Coord(lastNodeIdx*deltaX+100., deltaY ) ) ;
+		scenario.getNetwork().addNode(nodeLastp1);
+		createAndAddTransitLink( scenario, nodeLast, nodeLastp1, TR_LINK_LAST_LASTp1_ID );
 	}
 
 	private static void createAndAddPopulation( Scenario scenario, String mode, long numberOfPersons ){

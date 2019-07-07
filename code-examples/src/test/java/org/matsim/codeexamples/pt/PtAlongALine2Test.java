@@ -30,11 +30,13 @@ import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -57,8 +59,8 @@ public class PtAlongALine2Test{
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	enum DrtMode { none, teleportBeeline, teleportBasedOnNetworkRoute, full }
-	private DrtMode drtMode = DrtMode.teleportBasedOnNetworkRoute ;
-	private boolean drt2 = true ;
+	private DrtMode drtMode = DrtMode.full ;
+	private boolean drt2 = false ;
 
 	@Test
 	public void testPtAlongALineWithRaptorAndDrtServiceArea() {
@@ -164,18 +166,18 @@ public class PtAlongALine2Test{
 			//			}
 			// (scoring parameters for drt modes)
 			{
-				PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.drt);
+				ModeParams modeParams = new ModeParams(TransportMode.drt);
 				modeParams.setMarginalUtilityOfTraveling( margUtlTravPt );
 				config.planCalcScore().addModeParams(modeParams);
 			}
 			if ( drt2 ) {
-				PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("drt2");
+				ModeParams modeParams = new ModeParams("drt2");
 				modeParams.setMarginalUtilityOfTraveling( margUtlTravPt );
 				config.planCalcScore().addModeParams(modeParams);
 			}
 		}
 		{
-			PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("walk2");
+			ModeParams modeParams = new ModeParams("walk2");
 			modeParams.setMarginalUtilityOfTraveling( margUtlTravPt );
 			config.planCalcScore().addModeParams(modeParams);
 		}
@@ -185,7 +187,7 @@ public class PtAlongALine2Test{
 		config.qsim().setSimStarttimeInterpretation( QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime );
 		// yy why?  kai, jun'19
 
-		config.qsim().setMainModes( Arrays.asList( TransportMode.car, TransportMode.drt, "drt2") );
+//		config.qsim().setMainModes( Arrays.asList( TransportMode.car ) );
 		// yyyy buses use the car network and so that needs to be defined as network mode.   !!!! :-( :-(
 
 		// === DRT: ===
@@ -199,7 +201,7 @@ public class PtAlongALine2Test{
 			DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
 			// TODO: How can we set the network mode of drt2?
 			// TODO: Right now uncommenting the following line gives guice injection errors
-			//		dvrpConfig.setNetworkMode(TransportMode.drt);
+			dvrpConfig.setNetworkMode(TransportMode.drt);
 
 			MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule( config, MultiModeDrtConfigGroup.class );
 			{
@@ -232,7 +234,7 @@ public class PtAlongALine2Test{
 			// to configure DRT and load the vehicles otherwise
 			PtAlongALineTest.createDrtVehiclesFile(drtVehiclesFile, "DRT-", 10, Id.createLinkId("0-1" ) );
 			if ( drt2 ){
-				PtAlongALineTest.createDrtVehiclesFile( drt2VehiclesFile, "DRT2-", 1, Id.createLinkId( "1000-999" ) );
+				PtAlongALineTest.createDrtVehiclesFile( drt2VehiclesFile, "DRT2-", 10, Id.createLinkId( "1000-999" ) );
 			}
 
 		}
@@ -243,7 +245,7 @@ public class PtAlongALine2Test{
 
 		// ### SCENARIO: ###
 
-		Scenario scenario = PtAlongALineTest.createScenario(config , 100 );
+		Scenario scenario = PtAlongALineTest.createScenario(config , 20 );
 
 		if ( drtMode==DrtMode.full ) {
 			scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory( DrtRoute.class, new DrtRouteFactory() );
@@ -275,7 +277,7 @@ public class PtAlongALine2Test{
 			scenario.getVehicles().addVehicleType( vehType );
 		}
 
-		scenario.getPopulation().getPersons().values().removeIf( person -> !person.getId().toString().equals( "3" ) );
+//		scenario.getPopulation().getPersons().values().removeIf( person -> !person.getId().toString().equals( "3" ) );
 
 		// ### CONTROLER: ###
 
@@ -381,17 +383,17 @@ public class PtAlongALine2Test{
 
 		double margUtlTravPt = config.planCalcScore().getModes().get( TransportMode.pt ).getMarginalUtilityOfTraveling();;
 		{
-			PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.drt);
+			ModeParams modeParams = new ModeParams(TransportMode.drt);
 			modeParams.setMarginalUtilityOfTraveling( margUtlTravPt );
 			config.planCalcScore().addModeParams(modeParams);
 		}
 		{
-				PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("drt2");
+				ModeParams modeParams = new ModeParams("drt2");
 				modeParams.setMarginalUtilityOfTraveling( margUtlTravPt );
 				config.planCalcScore().addModeParams(modeParams);
 		}
 		{
-			PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("walk2");
+			ModeParams modeParams = new ModeParams("walk2");
 			modeParams.setMarginalUtilityOfTraveling( margUtlTravPt );
 			config.planCalcScore().addModeParams(modeParams);
 		}
@@ -430,7 +432,7 @@ public class PtAlongALine2Test{
 		{
 			// (does not work without; I don't really know why. kai)
 			VehicleType vehType = vf.createVehicleType( Id.create( TransportMode.car, VehicleType.class ) );
-			vehType.setMaximumVelocity( 25./3.6 );
+			vehType.setMaximumVelocity( 100./3.6 );
 			scenario.getVehicles().addVehicleType( vehType );
 		}
 
@@ -447,9 +449,9 @@ public class PtAlongALine2Test{
 
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install(){
-				this.addControlerListenerBinding().toInstance( new IterationStartsListener(){
+				this.addControlerListenerBinding().toInstance( new IterationEndsListener(){
 					@Inject private Population population ;
-					@Override public void notifyIterationStarts( IterationStartsEvent event ){
+					@Override public void notifyIterationEnds( IterationEndsEvent event ){
 						for( Person person : population.getPersons().values() ){
 
 							// output to help with debugging:

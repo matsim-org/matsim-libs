@@ -22,7 +22,6 @@ import java.io.File;
 import org.junit.Test;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.roadpricing.RunRoadPricingExample;
 
 /**
  * @author vsp-gleich

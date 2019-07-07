@@ -21,11 +21,11 @@
 package org.matsim.codeexamples.extensions.roadpricing;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.roadpricing.RoadPricingConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.roadpricing.RoadPricingConfigGroup;
 
 
 /**
@@ -44,7 +44,7 @@ public class RunRoadpricingExample {
 			configFile = "scenarios/equil-extended/config-with-roadpricing.xml";
 		}
 
-		Config config = ConfigUtils.loadConfig(configFile, new RoadPricingConfigGroup());
+		Config config = ConfigUtils.loadConfig(configFile, new RoadPricingConfigGroup() );
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		

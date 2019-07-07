@@ -20,9 +20,9 @@ package org.matsim.codeexamples.extensions.roadpricing;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.contrib.roadpricing.run.RunRoadPricingExample;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.roadpricing.RunRoadPricingExample;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
