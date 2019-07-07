@@ -48,6 +48,14 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	static final String MODE_EXP = "Mode which will be handled by PassengerEngine and VrpOptimizer "
 			+ "(passengers'/customers' perspective)";
 
+	public static final String USE_MODE_FILTERED_SUBNETWORK = "useModeFilteredSubnetwork";
+	static final String USE_MODE_FILTERED_SUBNETWORK_EXP =
+			"Limit the operation of vehicles to links (of the 'dvrp_routing'"
+					+ " network) with 'allowedModes' containing this 'mode'."
+					+ " For backward compatibility, the value is set to false by default"
+					+ " -- this means that the vehicles are allowed to operate on all links of the 'dvrp_routing' network."
+					+ " The 'dvrp_routing' is defined by DvrpConfigGroup.networkModes)";
+
 	public static final String DESTINATION_KNOWN = "destinationKnown";
 	static final String DESTINATION_KNOWN_EXP =
 			"If false, the drop-off location remains unknown to the optimizer and scheduler"
@@ -107,6 +115,8 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	@NotBlank
 	private String mode = TransportMode.taxi; // travel mode (passengers'/customers' perspective)
 
+	private boolean useModeFilteredSubnetwork = false;
+
 	private boolean destinationKnown = false;
 	private boolean vehicleDiversion = false;
 
@@ -162,6 +172,7 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	public Map<String, String> getComments() {
 		Map<String, String> map = super.getComments();
 		map.put(MODE, MODE_EXP);
+		map.put(USE_MODE_FILTERED_SUBNETWORK, USE_MODE_FILTERED_SUBNETWORK_EXP);
 		map.put(DESTINATION_KNOWN, DESTINATION_KNOWN_EXP);
 		map.put(VEHICLE_DIVERSION, VEHICLE_DIVERSION_EXP);
 		map.put(PICKUP_DURATION, PICKUP_DURATION_EXP);
@@ -193,6 +204,22 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	@StringSetter(MODE)
 	public void setMode(String mode) {
 		this.mode = mode;
+	}
+
+	/**
+	 * @return {@value #USE_MODE_FILTERED_SUBNETWORK_EXP}
+	 */
+	@StringGetter(USE_MODE_FILTERED_SUBNETWORK)
+	public boolean isUseModeFilteredSubnetwork() {
+		return useModeFilteredSubnetwork;
+	}
+
+	/**
+	 * @param useModeFilteredSubnetwork {@value #USE_MODE_FILTERED_SUBNETWORK_EXP}
+	 */
+	@StringSetter(USE_MODE_FILTERED_SUBNETWORK)
+	public void setUseModeFilteredSubnetwork(boolean useModeFilteredSubnetwork) {
+		this.useModeFilteredSubnetwork = useModeFilteredSubnetwork;
 	}
 
 	/**
