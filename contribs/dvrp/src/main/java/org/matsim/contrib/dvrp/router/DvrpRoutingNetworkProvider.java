@@ -19,6 +19,7 @@
 package org.matsim.contrib.dvrp.router;
 
 import java.util.Collections;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -27,6 +28,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -66,6 +68,7 @@ public class DvrpRoutingNetworkProvider implements Provider<Network> {
 			@Override
 			public void install() {
 				if (useModeFilteredSubnetwork) {
+					checkUseModeFilteredSubnetworkAllowed(getConfig(), getMode());
 					bindModal(Network.class).toProvider(ModalProviders.createProvider(getMode(), getter -> {
 						Network subnetwork = NetworkUtils.createNetwork();
 						new TransportModeNetworkFilter(
@@ -80,5 +83,14 @@ public class DvrpRoutingNetworkProvider implements Provider<Network> {
 				}
 			}
 		};
+	}
+
+	public static void checkUseModeFilteredSubnetworkAllowed(Config config, String mode) {
+		Set<String> dvrpNetworkModes = DvrpConfigGroup.get(config).getNetworkModes();
+		if (!dvrpNetworkModes.isEmpty() && !dvrpNetworkModes.contains(mode)) {
+			throw new RuntimeException("DvrpConfigGroup.networkModes must contain DVRP mode: "
+					+ mode
+					+ " when 'useModeFilteredSubnetwork' is enabled for this mode");
+		}
 	}
 }
