@@ -8,13 +8,13 @@ import de.topobyte.osm4j.core.model.impl.Tag;
 import de.topobyte.osm4j.core.model.impl.Way;
 import de.topobyte.osm4j.pbf.seq.PbfWriter;
 import lombok.extern.java.Log;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -62,10 +62,9 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	@Ignore
 	public void test() {
 
-		Path file = Paths.get("C:\\Users\\Janekdererste\\germany-latest.osm.pbf");
+		Path file = Paths.get("G:\\Users\\Janek\\Downloads\\nordrhein-westfalen-latest.osm.pbf");
 		Path output = Paths.get("G:\\Users\\Janek\\Desktop\\nordrhein-westfalen-latest.xml.gz");
 		Network network = NetworkUtils.createNetwork();
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832");
@@ -80,7 +79,24 @@ public class SupersonicOsmNetworkReaderTest {
 		Duration duration = Duration.between(start, Instant.now());
 		System.out.println(duration.toString());
 
-		//new NetworkWriter(network).write(output.toString());
+		new NetworkWriter(network).write(output.toString());
+	}
+
+	@Test
+	public void testOldNetworkReader() {
+
+		Path file = Paths.get("G:\\Users\\Janek\\Downloads\\nordrhein-westfalen-latest.osm.pbf");
+		Path output = Paths.get("G:\\Users\\Janek\\Desktop\\nordrhein-westfalen-latest-matsim-reader.xml.gz");
+		Network network = NetworkUtils.createNetwork();
+		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832");
+
+		Instant start = Instant.now();
+		new OsmNetworkReader(network, coordinateTransformation, true, true).parse(file.toString());
+
+		Duration duration = Duration.between(start, Instant.now());
+		System.out.println(duration.toString());
+
+		new NetworkWriter(network).write(output.toString());
 	}
 
 	/**
@@ -526,6 +542,7 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(SupersonicOsmNetworkReader.LinkProperties.createTertiary().laneCapacity * 2, link.getCapacity(), 0);
 	}
 
+
 	/**
 	 * Two links
 	 * <p>
@@ -629,5 +646,57 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(Id.createNodeId(2), link4.getFromNode().getId());
 		assertEquals(Id.createNodeId(5), link4.getToNode().getId());
 		assertEquals(CoordUtils.calcEuclideanDistance(link4.getFromNode().getCoord(), link4.getToNode().getCoord()), link4.getLength(), 0);
+	}
+
+	/**
+	 * Two links
+	 * <p>
+	 * (0,0), id:1   (4,0), id:5
+	 * \        /
+	 * \      /
+	 * \    /
+	 * (2,2), id: 2       (4, 2), id:8
+	 * /    \	  -------/	|
+	 * \	/			|
+	 * (3,3), id:6 -(4, 3), id:7
+	 * /      \
+	 * /        \
+	 * (0,4), id:4  (4,4), id:3
+	 */
+	@Test
+	public void twoIntersectingLinks_oneWithLoop() {
+
+		final var tags = List.of(new Tag("highway", MOTORWAY));
+		final List<OsmNode> nodes = List.of(new Node(1, 0, 0), new Node(2, 1, 1), new Node(3, 2, 2),
+				new Node(4, 0, 2), new Node(5, 2, 0), new Node(6, 3, 3),
+				new Node(7, 4, 3), new Node(8, 4, 2));
+		final List<OsmWay> ways = List.of(new Way(1, new TLongArrayList(new long[]{1, 2, 6, 7, 8, 6, 3}), tags),
+				new Way(2, new TLongArrayList(new long[]{4, 2, 5}), tags));
+		final var file = Paths.get("two-intersecting-links-with-loop.pbf");
+		writeOsmData(nodes, ways, file);
+
+		var network = NetworkUtils.createNetwork();
+		new SupersonicOsmNetworkReader.Builder()
+				.network(network)
+				.coordinateTransformation(transformation)
+				.build()
+				.read(file);
+
+		assertEquals(8, network.getNodes().size());
+		assertEquals(8, network.getLinks().size());
+
+		// check for node 6 and if it has two incoming and two outgoing links
+		var node6 = network.getNodes().get(Id.createNodeId(6));
+		assertEquals(2, node6.getOutLinks().size());
+		assertEquals(2, node6.getInLinks().size());
+
+		// check for node7 and 8, and that they have one incoming and on outgoing link
+		var node7 = network.getNodes().get(Id.createNodeId(7));
+		assertEquals(1, node7.getInLinks().size());
+		assertEquals(1, node7.getOutLinks().size());
+
+		var node8 = network.getNodes().get(Id.createNodeId(7));
+		assertEquals(1, node8.getInLinks().size());
+		assertEquals(1, node8.getOutLinks().size());
 	}
 }
