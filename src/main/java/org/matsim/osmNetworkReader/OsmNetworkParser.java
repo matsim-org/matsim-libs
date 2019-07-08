@@ -19,9 +19,9 @@ import java.util.Map;
 import java.util.Set;
 
 @Log
-public class OsmNetworkParser {
+class OsmNetworkParser {
 
-	static NodesAndWays parse(Path inputFile, Map<String, SupersonicOsmNetworkReader.LinkProperties> linkProperties) {
+	static NodesAndWays parse(Path inputFile, Map<String, LinkProperties> linkProperties) {
 
 		log.info("start reading ways");
 
@@ -49,11 +49,12 @@ public class OsmNetworkParser {
 		}
 	}
 
-	private static boolean isStreetOfInterest(OsmWay way, Map<String, SupersonicOsmNetworkReader.LinkProperties> linkProperties) {
+	private static boolean isStreetOfInterest(OsmWay way, Map<String, LinkProperties> linkProperties) {
 		for (int i = 0; i < way.getNumberOfTags(); i++) {
 			String tag = way.getTag(i).getKey();
 			String tagvalue = way.getTag(i).getValue();
 			if (tag.equals(OsmTags.HIGHWAY) && linkProperties.containsKey(tagvalue)) return true;
+			if (tag.equals(OsmTags.HIGHWAY)) log.info("unknown highway tag: " + tagvalue);
 		}
 		return false;
 	}
@@ -63,7 +64,7 @@ public class OsmNetworkParser {
 
 		private final Set<OsmWay> ways = new HashSet<>();
 		private final Map<Long, Integer> nodes = new HashMap<>();
-		private final Map<String, SupersonicOsmNetworkReader.LinkProperties> linkProperties;
+		private final Map<String, LinkProperties> linkProperties;
 
 		private int counter = 0;
 

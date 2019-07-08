@@ -30,10 +30,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -71,11 +68,20 @@ public class SupersonicOsmNetworkReaderTest {
 		Path output = Paths.get("C:\\Users\\Janek\\Desktop\\bremen-latest.xml.gz");
 		Network network = NetworkUtils.createNetwork();
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832");
+		var linkProperties = Map.of(
+				"track", new LinkProperties(9, 1, 30.0 / 3.6, 1500, false),
+				"cycleway", new LinkProperties(9, 1, 30.0 / 3.6, 1500, false),
+				"service", new LinkProperties(9, 1, 10.0 / 3.6, 1000, false),
+
+				"footway", new LinkProperties(9, 1, 10.0 / 3.6, 600, false),
+				"pedestrian", new LinkProperties(9, 1, 10.0 / 3.6, 600, false),
+				"path", new LinkProperties(9, 1, 20.0 / 3.6, 600, false));
 
 		Instant start = Instant.now();
 		new SupersonicOsmNetworkReader.Builder()
 				.network(network)
 				.coordinateTransformation(coordinateTransformation)
+				.overridingLinkProperties(linkProperties)
 				.build()
 				.read(file);
 
@@ -149,7 +155,7 @@ public class SupersonicOsmNetworkReaderTest {
 		double expectedLengthPart2 = CoordUtils.calcEuclideanDistance(new Coord(node2.getLongitude(), node2.getLatitude()), new Coord(node3.getLongitude(), node3.getLatitude()));
 		assertEquals(expectedLengthPart1 + expectedLengthPart2, link.getLength(), 0);
 
-		var linkProperties = SupersonicOsmNetworkReader.LinkProperties.createMotorway();
+		var linkProperties = LinkProperties.createMotorway();
 		assertEquals(linkProperties.freespeed, link.getFreespeed(), 0);
 		assertEquals(linkProperties.laneCapacity * linkProperties.lanesPerDirection, link.getCapacity(), 0);
 		assertEquals(linkProperties.lanesPerDirection, link.getNumberOfLanes(), 0);
@@ -207,7 +213,7 @@ public class SupersonicOsmNetworkReaderTest {
 		// now, test that the link has all the required properties
 		Link link = network.getLinks().values().iterator().next(); // get the only link
 
-		var linkProperties = SupersonicOsmNetworkReader.LinkProperties.createMotorway();
+		var linkProperties = LinkProperties.createMotorway();
 		assertEquals(linkProperties.freespeed, link.getFreespeed(), 0);
 		assertEquals(linkProperties.laneCapacity * linkProperties.lanesPerDirection, link.getCapacity(), 0);
 		assertEquals(linkProperties.lanesPerDirection, link.getNumberOfLanes(), 0);
@@ -324,7 +330,7 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getNodes().size());
 
 		var link = network.getLinks().get(Id.createLinkId(10001));
-		assertEquals(SupersonicOsmNetworkReader.LinkProperties.createMotorway().freespeed, link.getFreespeed(), 0);
+		assertEquals(LinkProperties.createMotorway().freespeed, link.getFreespeed(), 0);
 	}
 
 	@Test
@@ -351,7 +357,7 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getNodes().size());
 
 		var link = network.getLinks().get(Id.createLinkId(10001));
-		assertEquals(SupersonicOsmNetworkReader.LinkProperties.createTertiary().freespeed, link.getFreespeed(), 0);
+		assertEquals(LinkProperties.createTertiary().freespeed, link.getFreespeed(), 0);
 	}
 
 	@Test
@@ -380,7 +386,7 @@ public class SupersonicOsmNetworkReaderTest {
 		var link = network.getLinks().get(Id.createLinkId(10001));
 
 		// the freespeed for 'urban' links (links without a speed tag and shorter than 300m) freespeed is reduced depending on the length of the link
-		assertTrue(SupersonicOsmNetworkReader.LinkProperties.createTertiary().freespeed > link.getFreespeed());
+		assertTrue(LinkProperties.createTertiary().freespeed > link.getFreespeed());
 	}
 
 	@Test
@@ -407,7 +413,7 @@ public class SupersonicOsmNetworkReaderTest {
 
 		var link = network.getLinks().get(Id.createLinkId(10001));
 
-		assertEquals(SupersonicOsmNetworkReader.LinkProperties.createTertiary().lanesPerDirection, link.getNumberOfLanes(), 0);
+		assertEquals(LinkProperties.createTertiary().lanesPerDirection, link.getNumberOfLanes(), 0);
 	}
 
 	@Test
@@ -517,7 +523,7 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getNodes().size());
 
 		var link = network.getLinks().get(Id.createLinkId(10001));
-		assertEquals(SupersonicOsmNetworkReader.LinkProperties.createTertiary().laneCapacity, link.getCapacity(), 0);
+		assertEquals(LinkProperties.createTertiary().laneCapacity, link.getCapacity(), 0);
 	}
 
 	@Test
@@ -543,7 +549,38 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getNodes().size());
 
 		var link = network.getLinks().get(Id.createLinkId(10001));
-		assertEquals(SupersonicOsmNetworkReader.LinkProperties.createTertiary().laneCapacity * 2, link.getCapacity(), 0);
+		assertEquals(LinkProperties.createTertiary().laneCapacity * 2, link.getCapacity(), 0);
+	}
+
+	@Test
+	public void singleLink_overridingLinkProperties() {
+
+		var node1 = new Node(1, 0, 0);
+		var node2 = new Node(2, 100, 100);
+		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
+		final var linkCategory = "some-category";
+		final var linkProperties = new LinkProperties(9, 1, 100, 100, false);
+
+		var way = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, linkCategory)));
+
+		Path file = Paths.get("single-link-overriding-link-properties.pbf");
+		writeOsmData(List.of(node1, node2), List.of(way), file);
+
+		var network = NetworkUtils.createNetwork();
+		new SupersonicOsmNetworkReader.Builder()
+				.network(network)
+				.coordinateTransformation(transformation)
+				.overridingLinkProperties(Map.of(linkCategory, linkProperties))
+				.build()
+				.read(file);
+
+		assertEquals(2, network.getLinks().size());
+		assertEquals(2, network.getNodes().size());
+
+		var link = network.getLinks().get(Id.createLinkId(10001));
+		assertEquals(linkProperties.laneCapacity, link.getCapacity(), 0);
+		assertEquals(linkProperties.lanesPerDirection, link.getNumberOfLanes(), 0);
+		assertEquals(linkProperties.freespeed, link.getFreespeed(), 0);
 	}
 
 
