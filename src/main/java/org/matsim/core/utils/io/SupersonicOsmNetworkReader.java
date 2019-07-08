@@ -72,11 +72,20 @@ public class SupersonicOsmNetworkReader {
         convert(nodesAndWays.ways, nodesAndWays.nodes);
     }
 
+	private static boolean isStreetOfInterest(OsmWay way, Map<String, LinkProperties> linkProperties) {
+		for (int i = 0; i < way.getNumberOfTags(); i++) {
+			String tag = way.getTag(i).getKey();
+			String tagvalue = way.getTag(i).getValue();
+			if (tag.equals(HIGHWAY) && linkProperties.containsKey(tagvalue)) return true;
+		}
+		return false;
+	}
+
     private void convert(Collection<OsmWay> ways, Map<Long, LightOsmNode> nodes) {
 
         log.info("linkFilter for highways create a matsim network");
         ways.parallelStream()
-                .filter(this::isStreetOfInterest)
+				.filter(way -> isStreetOfInterest(way, linkProperties))
                 .flatMap(way -> this.createWaySegments(nodes, way))
                 .flatMap(this::createLinks)
 				.forEach(this::addLinkToNetwork);
@@ -90,7 +99,7 @@ public class SupersonicOsmNetworkReader {
 
         try {
             var waysReader = new PbfReader(inputFile.toFile(), false);
-            var waysHandler = new WayHandler();
+			var waysHandler = new WayHandler(linkProperties);
             waysReader.setHandler(waysHandler);
             waysReader.read();
 
@@ -110,54 +119,6 @@ public class SupersonicOsmNetworkReader {
         } catch (FileNotFoundException | OsmInputException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private Stream<WaySegment> createWaySegments(Map<Long, LightOsmNode> nodes, OsmWay way) {
-
-        final var tags = OsmModelUtil.getTagsAsMap(way);
-        List<WaySegment> segments = new ArrayList<>();
-        long fromNodeId = way.getNodeId(0); // store the first waypoint
-        var fromNodeForSegment = nodes.get(fromNodeId);
-        double segmentLength = 0;
-
-        for (int i = 1, linkdIdPostfix = 1; i < way.getNumberOfNodes(); i++, linkdIdPostfix += 2) {
-
-            var fromOsmNode = nodes.get(fromNodeId);
-            var toOsmNode = nodes.get(way.getNodeId(i));
-
-            Coord fromCoord = coordinateTransformation.transform(fromOsmNode.getCoord());
-            Coord toCoord = coordinateTransformation.transform(toOsmNode.getCoord());
-            segmentLength += CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
-
-
-            if (fromNodeForSegment.getId() == toOsmNode.getId()) {
-                var loopSegments = handleLoop(nodes, fromNodeForSegment, toOsmNode, way, i, linkdIdPostfix);
-                segments.addAll(loopSegments);
-
-                // adjus all the stuff
-                linkdIdPostfix += loopSegments.size() * 2;
-                segmentLength = 0;
-                fromNodeForSegment = toOsmNode;
-            } else if (toOsmNode.isUsedByMoreThanOneWay() || i == way.getNumberOfNodes() - 1 || this.preserveNodeWithId.test(toOsmNode.getId())) {
-
-                segments.add(new WaySegment(
-                        new LightOsmNode(fromNodeForSegment.getId(), fromNodeForSegment.getNumberOfWays(), fromCoord),
-                        new LightOsmNode(toOsmNode.getId(), toOsmNode.getNumberOfWays(), toCoord),
-                        segmentLength, tags, way.getId(),
-                        //if the way id is 1234 we will get a link id like 12340001, this is necessary because we need to generate unique
-                        // ids. The osm wiki says ways have no more than 2000 nodes which means that i will never be greater 1999.
-                        // we have to increase the appendix by two for each segment, to leave room for backwards links
-                        way.getId() * 10000 + linkdIdPostfix));
-
-                //prepare for next segment
-                segmentLength = 0;
-                fromNodeForSegment = toOsmNode;
-            }
-
-            //prepare for next iteration
-            fromNodeId = toOsmNode.getId();
-        }
-        return segments.stream();
     }
 
     private Collection<WaySegment> handleLoop(Map<Long, LightOsmNode> nodes, LightOsmNode fromNode, LightOsmNode toNode, OsmWay way, int toNodeIndex, int idPostfix) {
@@ -343,13 +304,54 @@ public class SupersonicOsmNetworkReader {
 		}
 	}
 
-    private boolean isStreetOfInterest(OsmWay way) {
-        for (int i = 0; i < way.getNumberOfTags(); i++) {
-            String tag = way.getTag(i).getKey();
-            String tagvalue = way.getTag(i).getValue();
-            if (tag.equals(HIGHWAY) && linkProperties.containsKey(tagvalue)) return true;
-        }
-        return false;
+	private Stream<WaySegment> createWaySegments(Map<Long, LightOsmNode> nodes, OsmWay way) {
+
+		final var tags = OsmModelUtil.getTagsAsMap(way);
+		List<WaySegment> segments = new ArrayList<>();
+		long fromNodeId = way.getNodeId(0); // store the first waypoint
+		var fromNodeForSegmentWithoutTransform = nodes.get(fromNodeId);
+		var fromNodeForSegment = new LightOsmNode(fromNodeForSegmentWithoutTransform.getId(), fromNodeForSegmentWithoutTransform.getNumberOfWays(),
+				coordinateTransformation.transform(fromNodeForSegmentWithoutTransform.getCoord()));
+		double segmentLength = 0;
+
+		for (int i = 1, linkdIdPostfix = 1; i < way.getNumberOfNodes(); i++, linkdIdPostfix += 2) {
+
+			var fromOsmNode = nodes.get(fromNodeId);
+			var toOsmNode = nodes.get(way.getNodeId(i));
+
+			Coord fromCoord = coordinateTransformation.transform(fromOsmNode.getCoord());
+			Coord toCoord = coordinateTransformation.transform(toOsmNode.getCoord());
+			segmentLength += CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
+
+			if (fromNodeForSegment.getId() == toOsmNode.getId()) {
+				log.info("Detected loop. Keeping all the nodes which are part of the way");
+				var loopSegments = handleLoop(nodes, fromNodeForSegment, toOsmNode, way, i, linkdIdPostfix);
+				segments.addAll(loopSegments);
+
+				// adjus all the stuff
+				linkdIdPostfix += loopSegments.size() * 2;
+				segmentLength = 0;
+				fromNodeForSegment = toOsmNode;
+			} else if (toOsmNode.isUsedByMoreThanOneWay() || i == way.getNumberOfNodes() - 1 || this.preserveNodeWithId.test(toOsmNode.getId())) {
+
+				segments.add(new WaySegment(
+						new LightOsmNode(fromNodeForSegment.getId(), fromNodeForSegment.getNumberOfWays(), fromCoord),
+						new LightOsmNode(toOsmNode.getId(), toOsmNode.getNumberOfWays(), toCoord),
+						segmentLength, tags, way.getId(),
+						//if the way id is 1234 we will get a link id like 12340001, this is necessary because we need to generate unique
+						// ids. The osm wiki says ways have no more than 2000 nodes which means that i will never be greater 1999.
+						// we have to increase the appendix by two for each segment, to leave room for backwards links
+						way.getId() * 10000 + linkdIdPostfix));
+
+				//prepare for next segment
+				segmentLength = 0;
+				fromNodeForSegment = toOsmNode;
+			}
+
+			//prepare for next iteration
+			fromNodeId = toOsmNode.getId();
+		}
+		return segments.stream();
 	}
 
 	@RequiredArgsConstructor
@@ -440,52 +442,54 @@ public class SupersonicOsmNetworkReader {
 		}
 	}
 
+	@RequiredArgsConstructor
 	@Getter
 	private static class WayHandler implements OsmHandler {
 
 		private final Set<OsmWay> ways = new HashSet<>();
-        private final Map<Long, Integer> nodes = new HashMap<>();
+		private final Map<Long, Integer> nodes = new HashMap<>();
+		private final Map<String, LinkProperties> linkProperties;
 
 		private int counter = 0;
 
-        private static boolean isStreet(OsmWay way) {
-            for (int i = 0; i < way.getNumberOfTags(); i++) {
-                String tag = way.getTag(i).getKey();
-                if (tag.equals(HIGHWAY)) return true;
-            }
-            return false;
+		private static boolean isStreet(OsmWay way) {
+			for (int i = 0; i < way.getNumberOfTags(); i++) {
+				String tag = way.getTag(i).getKey();
+				if (tag.equals(HIGHWAY)) return true;
+			}
+			return false;
 		}
 
 		@Override
-        public void handle(OsmWay osmWay) {
+		public void handle(OsmWay osmWay) {
 			counter++;
-			if (isStreet(osmWay)) {
+			if (isStreetOfInterest(osmWay, linkProperties)) {
 				ways.add(osmWay);
 				for (int i = 0; i < osmWay.getNumberOfNodes(); i++) {
-                    nodes.merge(osmWay.getNodeId(i), 1, Integer::sum);
+					nodes.merge(osmWay.getNodeId(i), 1, Integer::sum);
 				}
 			}
-            if (counter % 100000 == 0) {
-                log.info("Read: " + counter + " ways");
-            }
+			if (counter % 100000 == 0) {
+				log.info("Read: " + counter + " ways");
+			}
 		}
 
-        @Override
-        public void handle(OsmBounds osmBounds) {
-        }
-
-        @Override
-        public void handle(OsmNode osmNode) {
-        }
+		@Override
+		public void handle(OsmBounds osmBounds) {
+		}
 
 		@Override
-        public void handle(OsmRelation osmRelation) {
-        }
+		public void handle(OsmNode osmNode) {
+		}
 
 		@Override
-        public void complete() {
-        }
-    }
+		public void handle(OsmRelation osmRelation) {
+		}
+
+		@Override
+		public void complete() {
+		}
+	}
 
     @RequiredArgsConstructor
     @Getter
