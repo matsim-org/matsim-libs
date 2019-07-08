@@ -15,12 +15,12 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-@SuppressWarnings("WeakerAccess")
 @Log
 public class SupersonicOsmNetworkReader {
 
@@ -62,6 +62,10 @@ public class SupersonicOsmNetworkReader {
 			}
 		}
 		this.linkProperties = linkProperties;
+	}
+
+	public void read(String inputFile) {
+		read(Paths.get(inputFile));
 	}
 
 	@SuppressWarnings("WeakerAccess")
