@@ -54,7 +54,6 @@ class OsmNetworkParser {
 			String tag = way.getTag(i).getKey();
 			String tagvalue = way.getTag(i).getValue();
 			if (tag.equals(OsmTags.HIGHWAY) && linkProperties.containsKey(tagvalue)) return true;
-			if (tag.equals(OsmTags.HIGHWAY)) log.info("unknown highway tag: " + tagvalue);
 		}
 		return false;
 	}
