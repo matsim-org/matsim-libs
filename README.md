@@ -26,6 +26,7 @@ The project is published via Jitpack. To include it into your project simply add
 The reader uses the builder pattern. With a simple set up you can convert your network the following way
 ```
 String file = "path/to/your/file.osm.pbf";
+CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832"); // you may choose your own target coordinate system, but UTM32 is a good choice if you run a simulatio in Germany
 Network network = NetworkUtils.createNetwork();
 
 new SupersonicOsmNetworkReader.Builder()
