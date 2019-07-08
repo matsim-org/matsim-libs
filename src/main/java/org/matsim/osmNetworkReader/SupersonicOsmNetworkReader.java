@@ -2,6 +2,7 @@ package org.matsim.osmNetworkReader;
 
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.core.model.util.OsmModelUtil;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -38,7 +39,7 @@ public class SupersonicOsmNetworkReader {
 	private final Network network;
 
 
-	@lombok.Builder(builderClassName = "Builder")
+	@lombok.Builder(builderClassName = "Builder", access = AccessLevel.PUBLIC)
 	private SupersonicOsmNetworkReader(Network network, CoordinateTransformation coordinateTransformation,
 									   Map<String, LinkProperties> overridingLinkProperties,
 									   BiPredicate<Coord, Integer> linkFilter, Predicate<Long> preserveNodeWithId,
