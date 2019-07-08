@@ -1,4 +1,4 @@
-package org.matsim.core.utils.io;
+package org.matsim.osmNetworkReader;
 
 import de.topobyte.osm4j.core.access.OsmHandler;
 import de.topobyte.osm4j.core.access.OsmInputException;

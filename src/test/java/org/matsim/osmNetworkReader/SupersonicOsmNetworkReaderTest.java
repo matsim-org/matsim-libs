@@ -1,4 +1,4 @@
-package org.matsim.core.utils.io;
+package org.matsim.osmNetworkReader;
 
 import com.slimjars.dist.gnu.trove.list.array.TLongArrayList;
 import de.topobyte.osm4j.core.model.iface.OsmNode;
@@ -21,6 +21,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.io.OsmNetworkReader;
 
 import java.io.IOException;
 import java.io.OutputStream;
