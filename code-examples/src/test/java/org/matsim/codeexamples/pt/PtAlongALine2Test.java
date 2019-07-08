@@ -224,7 +224,7 @@ public class PtAlongALine2Test{
 		// add drt modes to the car links' allowed modes in their respective service area
 		PtAlongALineTest.addModeToAllLinksBtwnGivenNodes(scenario.getNetwork(), 0, 400, TransportMode.drt );
 		if ( drt2 ){
-			PtAlongALineTest.addModeToAllLinksBtwnGivenNodes( scenario.getNetwork(), 600, 1000, "drt2" );
+			PtAlongALineTest.addModeToAllLinksBtwnGivenNodes( scenario.getNetwork(), 800, 1000, "drt2" );
 		}
 		// TODO: reference somehow network creation, to ensure that these link ids exist
 
