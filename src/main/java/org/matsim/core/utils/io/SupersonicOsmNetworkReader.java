@@ -121,6 +121,62 @@ public class SupersonicOsmNetworkReader {
         }
     }
 
+	private Stream<WaySegment> createWaySegments(Map<Long, LightOsmNode> nodes, OsmWay way) {
+
+		final var tags = OsmModelUtil.getTagsAsMap(way);
+		List<WaySegment> segments = new ArrayList<>();
+		double segmentLength = 0;
+
+		// set up first node for segment
+		long fromNodeId = way.getNodeId(0);
+		var fromNodeForSegmentWithoutTransform = nodes.get(fromNodeId);
+		var fromNodeForSegment = new LightOsmNode(fromNodeForSegmentWithoutTransform.getId(), fromNodeForSegmentWithoutTransform.getNumberOfWays(),
+				coordinateTransformation.transform(fromNodeForSegmentWithoutTransform.getCoord()));
+
+		for (int i = 1, linkdIdPostfix = 1; i < way.getNumberOfNodes(); i++, linkdIdPostfix += 2) {
+
+			// get the from and to nodes for a sub segment of the current way
+			var fromOsmNode = nodes.get(fromNodeId);
+			var toOsmNode = nodes.get(way.getNodeId(i));
+
+			// add the distance between those nodes to the overal length of segment
+			Coord fromCoord = coordinateTransformation.transform(fromOsmNode.getCoord());
+			Coord toCoord = coordinateTransformation.transform(toOsmNode.getCoord());
+			segmentLength += CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
+
+			if (fromNodeForSegment.getId() == toOsmNode.getId()) {
+				log.info("Detected loop. Keeping all the nodes which are part of the way");
+				var loopSegments = handleLoop(nodes, fromNodeForSegment, toOsmNode, way, i, linkdIdPostfix);
+				segments.addAll(loopSegments);
+
+				// set up next iteration
+				linkdIdPostfix += loopSegments.size() * 2;
+				segmentLength = 0;
+				fromNodeForSegment = toOsmNode;
+
+			} else if (toOsmNode.isUsedByMoreThanOneWay() || i == way.getNumberOfNodes() - 1 || this.preserveNodeWithId.test(toOsmNode.getId())) {
+				// create way segments between intersections or between the first and last node of a way or between nodes, which are upposed to be preserved
+
+				segments.add(new WaySegment(
+						new LightOsmNode(fromNodeForSegment.getId(), fromNodeForSegment.getNumberOfWays(), fromNodeForSegment.getCoord()),
+						new LightOsmNode(toOsmNode.getId(), toOsmNode.getNumberOfWays(), toCoord),
+						segmentLength, tags, way.getId(),
+						//if the way id is 1234 we will get a link id like 12340001, this is necessary because we need to generate unique
+						// ids. The osm wiki says ways have no more than 2000 nodes which means that i will never be greater 1999.
+						// we have to increase the appendix by two for each segment, to leave room for backwards links
+						way.getId() * 10000 + linkdIdPostfix));
+
+				//prepare for next segment
+				segmentLength = 0;
+				fromNodeForSegment = toOsmNode;
+			}
+
+			//prepare for next iteration
+			fromNodeId = toOsmNode.getId();
+		}
+		return segments.stream();
+	}
+
     private Collection<WaySegment> handleLoop(Map<Long, LightOsmNode> nodes, LightOsmNode fromNode, LightOsmNode toNode, OsmWay way, int toNodeIndex, int idPostfix) {
 
         List<WaySegment> result = new ArrayList<>();
@@ -302,56 +358,6 @@ public class SupersonicOsmNetworkReader {
 		} else {
 			throw new RuntimeException("ups");
 		}
-	}
-
-	private Stream<WaySegment> createWaySegments(Map<Long, LightOsmNode> nodes, OsmWay way) {
-
-		final var tags = OsmModelUtil.getTagsAsMap(way);
-		List<WaySegment> segments = new ArrayList<>();
-		long fromNodeId = way.getNodeId(0); // store the first waypoint
-		var fromNodeForSegmentWithoutTransform = nodes.get(fromNodeId);
-		var fromNodeForSegment = new LightOsmNode(fromNodeForSegmentWithoutTransform.getId(), fromNodeForSegmentWithoutTransform.getNumberOfWays(),
-				coordinateTransformation.transform(fromNodeForSegmentWithoutTransform.getCoord()));
-		double segmentLength = 0;
-
-		for (int i = 1, linkdIdPostfix = 1; i < way.getNumberOfNodes(); i++, linkdIdPostfix += 2) {
-
-			var fromOsmNode = nodes.get(fromNodeId);
-			var toOsmNode = nodes.get(way.getNodeId(i));
-
-			Coord fromCoord = coordinateTransformation.transform(fromOsmNode.getCoord());
-			Coord toCoord = coordinateTransformation.transform(toOsmNode.getCoord());
-			segmentLength += CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
-
-			if (fromNodeForSegment.getId() == toOsmNode.getId()) {
-				log.info("Detected loop. Keeping all the nodes which are part of the way");
-				var loopSegments = handleLoop(nodes, fromNodeForSegment, toOsmNode, way, i, linkdIdPostfix);
-				segments.addAll(loopSegments);
-
-				// adjus all the stuff
-				linkdIdPostfix += loopSegments.size() * 2;
-				segmentLength = 0;
-				fromNodeForSegment = toOsmNode;
-			} else if (toOsmNode.isUsedByMoreThanOneWay() || i == way.getNumberOfNodes() - 1 || this.preserveNodeWithId.test(toOsmNode.getId())) {
-
-				segments.add(new WaySegment(
-						new LightOsmNode(fromNodeForSegment.getId(), fromNodeForSegment.getNumberOfWays(), fromCoord),
-						new LightOsmNode(toOsmNode.getId(), toOsmNode.getNumberOfWays(), toCoord),
-						segmentLength, tags, way.getId(),
-						//if the way id is 1234 we will get a link id like 12340001, this is necessary because we need to generate unique
-						// ids. The osm wiki says ways have no more than 2000 nodes which means that i will never be greater 1999.
-						// we have to increase the appendix by two for each segment, to leave room for backwards links
-						way.getId() * 10000 + linkdIdPostfix));
-
-				//prepare for next segment
-				segmentLength = 0;
-				fromNodeForSegment = toOsmNode;
-			}
-
-			//prepare for next iteration
-			fromNodeId = toOsmNode.getId();
-		}
-		return segments.stream();
 	}
 
 	@RequiredArgsConstructor

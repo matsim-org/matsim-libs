@@ -66,8 +66,8 @@ public class SupersonicOsmNetworkReaderTest {
     @Ignore
 	public void test() {
 
-		Path file = Paths.get("G:\\Users\\Janek\\Downloads\\nordrhein-westfalen-latest.osm.pbf");
-		Path output = Paths.get("G:\\Users\\Janek\\Desktop\\nordrhein-westfalen-latest.xml.gz");
+		Path file = Paths.get("C:\\Users\\Janek\\Downloads\\bremen-latest.osm.pbf");
+		Path output = Paths.get("C:\\Users\\Janek\\Desktop\\bremen-latest.xml.gz");
 		Network network = NetworkUtils.createNetwork();
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832");
 
