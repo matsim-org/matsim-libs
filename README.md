@@ -50,7 +50,7 @@ for e.g. implementing counts it is possible to omit the simplification for certa
 prevents the reader to remove the node with id: 2.
 3. After creating a link the reader will call the 'afterLinkCreated' hook with the newly created link, the original osm
 tags, and a flag whether it is the forward or reverse direction of an osm-way. The below example sets the allowed 
-transport mode on all links to 'bike'.
+transport mode on all links to 'car' and 'bike'.
  
  ```
  String file = "path/to/your/file.osm.pbf";
@@ -63,7 +63,7 @@ transport mode on all links to 'bike'.
      .coordinateTransformation(coordinateTransformation)
      .linkFilter((coord, hierachyLevel) -> hierachyLevel == LinkProperties.LEVEL_MOTORWAY)
      .preserveNodeWithId(id -> id == 2)
-     .afterLinkCreated((link, osmTags, isReverse) -> link.setAllowedModes(Set.of(TransportMode.bike)))
+     .afterLinkCreated((link, osmTags, isReverse) -> link.setAllowedModes(Set.of(TransportMode.car, TransportMode.bike)))
      .build()
      .read(file);
  
