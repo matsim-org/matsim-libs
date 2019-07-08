@@ -31,8 +31,7 @@ import java.util.stream.Stream;
 @Log
 public class SupersonicOsmNetworkReader {
 
-	public static final String HIGHWAY = "highway";
-    public static final String MAXSPEED = "maxspeed";
+
 
 	private static final Set<String> reverseTags = new HashSet<>(Arrays.asList("-1", "reverse"));
 	private static final Set<String> oneWayTags = new HashSet<>(Arrays.asList("yes", "true", "1"));
@@ -76,7 +75,7 @@ public class SupersonicOsmNetworkReader {
 		for (int i = 0; i < way.getNumberOfTags(); i++) {
 			String tag = way.getTag(i).getKey();
 			String tagvalue = way.getTag(i).getValue();
-			if (tag.equals(HIGHWAY) && linkProperties.containsKey(tagvalue)) return true;
+			if (tag.equals(OsmTags.HIGHWAY) && linkProperties.containsKey(tagvalue)) return true;
 		}
 		return false;
 	}
@@ -85,7 +84,7 @@ public class SupersonicOsmNetworkReader {
 
         log.info("linkFilter for highways create a matsim network");
         ways.parallelStream()
-				.filter(way -> isStreetOfInterest(way, linkProperties))
+				//.filter(way -> isStreetOfInterest(way, linkProperties))
                 .flatMap(way -> this.createWaySegments(nodes, way))
                 .flatMap(this::createLinks)
 				.forEach(this::addLinkToNetwork);
@@ -211,7 +210,7 @@ public class SupersonicOsmNetworkReader {
 
     private Stream<Link> createLinks(WaySegment segment) {
 
-        var highwayType = segment.getTags().get(HIGHWAY);
+		var highwayType = segment.getTags().get(OsmTags.HIGHWAY);
         var properties = linkProperties.get(highwayType);
         List<Link> result = new ArrayList<>();
 
@@ -239,7 +238,7 @@ public class SupersonicOsmNetworkReader {
 
     private Link createLink(Node fromNode, Node toNode, WaySegment segment, boolean isReverse) {
 
-        String highwayType = segment.getTags().get(HIGHWAY);
+		String highwayType = segment.getTags().get(OsmTags.HIGHWAY);
 		LinkProperties properties = linkProperties.get(highwayType);
 
         long linkId = isReverse ? segment.getSegmentId() + 1 : segment.getSegmentId();
@@ -256,14 +255,14 @@ public class SupersonicOsmNetworkReader {
 
 	private boolean isOneway(Map<String, String> tags, LinkProperties properties) {
 
-		if (tags.containsKey("oneway")) {
-			String tag = tags.get("oneway");
+		if (tags.containsKey(OsmTags.ONEWAY)) {
+			String tag = tags.get(OsmTags.ONEWAY);
 			if (oneWayTags.contains(tag)) return true;
 			if (reverseTags.contains(tag) || notOneWayTags.contains(tag)) return false;
 		}
 
 		// no oneway tag
-		if ("roundabout".equals(tags.get("junction"))) return true;
+		if (OsmTags.ROUNDABOUT.equals(tags.get(OsmTags.JUNCTION))) return true;
 
 		// just return the default for this type of link
 		return properties.oneway;
@@ -271,8 +270,8 @@ public class SupersonicOsmNetworkReader {
 
 	private boolean isOnewayReverse(Map<String, String> tags) {
 
-		if (tags.containsKey("oneway")) {
-			String tag = tags.get("oneway");
+		if (tags.containsKey(OsmTags.ONEWAY)) {
+			String tag = tags.get(OsmTags.ONEWAY);
 			if (oneWayTags.contains(tag) || notOneWayTags.contains(tag)) return false;
 			return reverseTags.contains(tag);
 		}
@@ -280,8 +279,8 @@ public class SupersonicOsmNetworkReader {
 	}
 
     private double getFreespeed(Map<String, String> tags, double linkLength, LinkProperties properties) {
-        if (tags.containsKey(MAXSPEED)) {
-            double speed = parseSpeedTag(tags.get(MAXSPEED), properties);
+		if (tags.containsKey(OsmTags.MAXSPEED)) {
+			double speed = parseSpeedTag(tags.get(OsmTags.MAXSPEED), properties);
 			double urbanSpeedFactor = speed <= 51 / 3.6 ? 0.5 : 1.0; // assume for links with max speed lower than 51km/h to be in urban areas. Reduce speed to reflect traffic lights and suc
 			return speed * urbanSpeedFactor;
 		} else {
@@ -292,8 +291,8 @@ public class SupersonicOsmNetworkReader {
 	private double parseSpeedTag(String tag, LinkProperties properties) {
 
 		try {
-			if (tag.endsWith("mph"))
-				return Double.parseDouble(tag.replace("mph", "").trim()) * 1.609344 / 3.6;
+			if (tag.endsWith(OsmTags.MPH))
+				return Double.parseDouble(tag.replace(OsmTags.MPH, "").trim()) * 1.609344 / 3.6;
 			else
 				return Double.parseDouble(tag) / 3.6;
 		} catch (NumberFormatException e) {
@@ -325,14 +324,14 @@ public class SupersonicOsmNetworkReader {
     private double getNumberOfLanes(Map<String, String> tags, boolean isReverse, LinkProperties properties) {
 
         try {
-            if (tags.containsKey("lanes")) {
-                String directionKey = isReverse ? "lanes:backward" : "lanes:forward";
+			if (tags.containsKey(OsmTags.LANES)) {
+				String directionKey = isReverse ? OsmTags.LANES_BACKWARD : OsmTags.LANES_FORWARD;
                 if (tags.containsKey(directionKey)) {
                     double directionLanes = Double.parseDouble(tags.get(directionKey));
                     if (directionLanes > 0) return directionLanes;
                 }
                 // no forward lane tag, so use the regular lanes tag
-                double lanes = Double.parseDouble(tags.get("lanes"));
+				double lanes = Double.parseDouble(tags.get(OsmTags.LANES));
 
                 // lanes tag specifies lanes into both directions of a way, so cut it in half if it is not a oneway street
                 if (!isOneway(tags, properties)) return lanes / 2;
@@ -461,7 +460,7 @@ public class SupersonicOsmNetworkReader {
 		private static boolean isStreet(OsmWay way) {
 			for (int i = 0; i < way.getNumberOfTags(); i++) {
 				String tag = way.getTag(i).getKey();
-				if (tag.equals(HIGHWAY)) return true;
+				if (tag.equals(OsmTags.HIGHWAY)) return true;
 			}
 			return false;
 		}

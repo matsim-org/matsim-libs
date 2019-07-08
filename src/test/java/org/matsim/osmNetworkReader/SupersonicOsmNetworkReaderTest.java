@@ -126,7 +126,7 @@ public class SupersonicOsmNetworkReaderTest {
 		var node2 = new Node(2, 100, 100);
 		var node3 = new Node(3, 0, 200);
 		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId(), node3.getId()});
-		var tags = List.of(new Tag(SupersonicOsmNetworkReader.HIGHWAY, MOTORWAY));
+		var tags = List.of(new Tag(OsmTags.HIGHWAY, MOTORWAY));
 		var way = new Way(1, nodeReference, tags);
 
 		Path file = Paths.get("single-link-one-way.pbf");
@@ -185,7 +185,7 @@ public class SupersonicOsmNetworkReaderTest {
 		var node2 = new Node(2, 100, 100);
 		var node3 = new Node(3, 100, 0);
 		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId(), node3.getId()});
-		var tags = List.of(new Tag(SupersonicOsmNetworkReader.HIGHWAY, MOTORWAY));
+		var tags = List.of(new Tag(OsmTags.HIGHWAY, MOTORWAY));
 		var way = new Way(1, nodeReference, tags);
 
 		Path file = Paths.get("single-link-preserve-node.pbf");
@@ -228,8 +228,8 @@ public class SupersonicOsmNetworkReaderTest {
 		var node2 = new Node(2, 10, 10);
 		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
 
-		var wayWithMaxSpeed = new Way(1, nodeReference, List.of(new Tag(SupersonicOsmNetworkReader.HIGHWAY, TERTIARY),
-				new Tag(SupersonicOsmNetworkReader.MAXSPEED, "60")));
+		var wayWithMaxSpeed = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY),
+				new Tag(OsmTags.MAXSPEED, "60")));
 
 		Path file = Paths.get("single-link-with-max-speed.pbf");
 		writeOsmData(List.of(node1, node2), List.of(wayWithMaxSpeed), file);
@@ -255,8 +255,8 @@ public class SupersonicOsmNetworkReaderTest {
 		var node1 = new Node(1, 0, 0);
 		var node2 = new Node(2, 10, 10);
 		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
-		var wayWithMaxSpeedMph = new Way(1, nodeReference, List.of(new Tag(SupersonicOsmNetworkReader.HIGHWAY, TERTIARY),
-				new Tag(SupersonicOsmNetworkReader.MAXSPEED, "60 mph")));
+		var wayWithMaxSpeedMph = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY),
+				new Tag(OsmTags.MAXSPEED, "60 mph")));
 
 		Path file = Paths.get("single-link-with-max-speed-in-mph.pbf");
 		writeOsmData(List.of(node1, node2), List.of(wayWithMaxSpeedMph), file);
@@ -281,8 +281,8 @@ public class SupersonicOsmNetworkReaderTest {
 		var node2 = new Node(2, 10, 10);
 		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
 
-		var wayWithMaxSpeedUrban = new Way(1, nodeReference, List.of(new Tag(SupersonicOsmNetworkReader.HIGHWAY, TERTIARY),
-				new Tag(SupersonicOsmNetworkReader.MAXSPEED, "50")));
+		var wayWithMaxSpeedUrban = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY),
+				new Tag(OsmTags.MAXSPEED, "50")));
 
 		Path file = Paths.get("single-link-with-max-speed-urban-link.pbf");
 		writeOsmData(List.of(node1, node2), List.of(wayWithMaxSpeedUrban), file);
@@ -307,8 +307,8 @@ public class SupersonicOsmNetworkReaderTest {
 		var node2 = new Node(2, 10, 10);
 		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
 
-		var wayWithInvalidMaxSpeed = new Way(1, nodeReference, List.of(new Tag(SupersonicOsmNetworkReader.HIGHWAY, MOTORWAY),
-				new Tag(SupersonicOsmNetworkReader.MAXSPEED, "not a number")));
+		var wayWithInvalidMaxSpeed = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, MOTORWAY),
+				new Tag(OsmTags.MAXSPEED, "not a number")));
 
 		Path file = Paths.get("single-link-with-unknown-max-speed.pbf");
 		writeOsmData(List.of(node1, node2), List.of(wayWithInvalidMaxSpeed), file);
@@ -334,7 +334,7 @@ public class SupersonicOsmNetworkReaderTest {
 		var node2 = new Node(2, 1000, 1000);
 		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
 
-		var wayWithoutMaxSpeed = new Way(1, nodeReference, List.of(new Tag(SupersonicOsmNetworkReader.HIGHWAY, TERTIARY)
+		var wayWithoutMaxSpeed = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY)
 		));
 
 		Path file = Paths.get("single-link-no-max-speed-rural-link.pbf");
@@ -361,7 +361,7 @@ public class SupersonicOsmNetworkReaderTest {
 		var node2 = new Node(2, 10, 10);
 		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
 
-		var wayWithoutMaxSpeed = new Way(1, nodeReference, List.of(new Tag(SupersonicOsmNetworkReader.HIGHWAY, TERTIARY)
+		var wayWithoutMaxSpeed = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY)
 		));
 
 		Path file = Paths.get("single-link-no-max-speed-urban-link.pbf");
@@ -390,7 +390,7 @@ public class SupersonicOsmNetworkReaderTest {
 		var node2 = new Node(2, 10, 10);
 		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
 
-		var way = new Way(1, nodeReference, List.of(new Tag(SupersonicOsmNetworkReader.HIGHWAY, TERTIARY)));
+		var way = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY)));
 
 		Path file = Paths.get("single-link-with-no-lanes-tag.pbf");
 		writeOsmData(List.of(node1, node2), List.of(way), file);
@@ -417,7 +417,7 @@ public class SupersonicOsmNetworkReaderTest {
 		var node2 = new Node(2, 10, 10);
 		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
 
-		var way = new Way(1, nodeReference, List.of(new Tag(SupersonicOsmNetworkReader.HIGHWAY, TERTIARY),
+		var way = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY),
 				new Tag("lanes", "4")));
 
 		Path file = Paths.get("single-link-with-lanes-tag.pbf");
@@ -444,7 +444,7 @@ public class SupersonicOsmNetworkReaderTest {
 		var node2 = new Node(2, 10, 10);
 		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
 
-		var way = new Way(1, nodeReference, List.of(new Tag(SupersonicOsmNetworkReader.HIGHWAY, TERTIARY),
+		var way = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY),
 				new Tag("lanes", "4"), new Tag("oneway", "true")));
 
 		Path file = Paths.get("single-oneway-link-with-lanes-tag.pbf");
@@ -471,7 +471,7 @@ public class SupersonicOsmNetworkReaderTest {
 		var node2 = new Node(2, 10, 10);
 		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
 
-		var way = new Way(1, nodeReference, List.of(new Tag(SupersonicOsmNetworkReader.HIGHWAY, TERTIARY),
+		var way = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY),
 				new Tag("lanes", "4"), new Tag("lanes:forward", "4"), new Tag("lanes:backward", "1")));
 
 		Path file = Paths.get("single-link-with-lanes-forward-and-backward-tag.pbf");
@@ -501,7 +501,7 @@ public class SupersonicOsmNetworkReaderTest {
 		var node2 = new Node(2, 100, 100);
 		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
 
-		var way = new Way(1, nodeReference, List.of(new Tag(SupersonicOsmNetworkReader.HIGHWAY, TERTIARY)));
+		var way = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY)));
 
 		Path file = Paths.get("single-link-capacity-for-long-link.pbf");
 		writeOsmData(List.of(node1, node2), List.of(way), file);
@@ -527,7 +527,7 @@ public class SupersonicOsmNetworkReaderTest {
 		var node2 = new Node(2, 10, 10);
 		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
 
-		var way = new Way(1, nodeReference, List.of(new Tag(SupersonicOsmNetworkReader.HIGHWAY, TERTIARY)));
+		var way = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY)));
 
 		Path file = Paths.get("single-link-capacity-for-short-link.pbf");
 		writeOsmData(List.of(node1, node2), List.of(way), file);
