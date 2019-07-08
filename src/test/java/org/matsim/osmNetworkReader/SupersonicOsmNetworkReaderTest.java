@@ -656,7 +656,7 @@ public class SupersonicOsmNetworkReaderTest {
 		new SupersonicOsmNetworkReader.Builder()
 				.network(network)
 				.coordinateTransformation(transformation)
-				.afterLinkCreated(link -> link.setAllowedModes(allowedModes))
+				.afterLinkCreated((link, osmTags, isReverse) -> link.setAllowedModes(allowedModes))
 				.build()
 				.read(file);
 

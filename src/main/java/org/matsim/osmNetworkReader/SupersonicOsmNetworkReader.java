@@ -17,7 +17,6 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiPredicate;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -32,7 +31,7 @@ public class SupersonicOsmNetworkReader {
 	private final Map<String, LinkProperties> linkProperties;
 	private final BiPredicate<Coord, Integer> linkFilter;
 	private final Predicate<Long> preserveNodeWithId;
-	private final Consumer<Link> afterLinkCreated;
+	private final AfterLinkCreated afterLinkCreated;
 	private final CoordinateTransformation coordinateTransformation;
 
 	@Getter
@@ -43,17 +42,19 @@ public class SupersonicOsmNetworkReader {
 	private SupersonicOsmNetworkReader(Network network, CoordinateTransformation coordinateTransformation,
 									   Map<String, LinkProperties> overridingLinkProperties,
 									   BiPredicate<Coord, Integer> linkFilter, Predicate<Long> preserveNodeWithId,
-									   Consumer<Link> afterLinkCreated) {
+									   AfterLinkCreated afterLinkCreated) {
 		if (network == null || coordinateTransformation == null) {
 			throw new IllegalArgumentException("Target network and coordinate transformation are required parameters!");
 		}
 		this.network = network;
 		this.coordinateTransformation = coordinateTransformation;
 
+		// set default implementations if properties were not supplied by builder
 		this.linkFilter = linkFilter == null ? (coord, level) -> true : linkFilter;
-		this.afterLinkCreated = afterLinkCreated == null ? link -> {
+		this.afterLinkCreated = afterLinkCreated == null ? (link, tags, reverse) -> {
 		} : afterLinkCreated;
 		this.preserveNodeWithId = preserveNodeWithId == null ? id -> false : preserveNodeWithId;
+
 		var linkProperties = LinkProperties.createLinkProperties();
 		if (overridingLinkProperties != null) {
 			for (Map.Entry<String, LinkProperties> entry : overridingLinkProperties.entrySet()) {
@@ -211,7 +212,7 @@ public class SupersonicOsmNetworkReader {
 		link.setCapacity(getLaneCapacity(link.getLength(), properties) * link.getNumberOfLanes());
 		link.getAttributes().putAttribute(NetworkUtils.ORIGID, segment.getOriginalWayId());
 		link.getAttributes().putAttribute(NetworkUtils.TYPE, highwayType);
-		afterLinkCreated.accept(link);
+		afterLinkCreated.accept(link, segment.getTags(), isReverse);
 		return link;
 	}
 
@@ -331,5 +332,11 @@ public class SupersonicOsmNetworkReader {
 		private final Map<String, String> tags;
 		private final long originalWayId;
 		private final long segmentId;
+	}
+
+	@FunctionalInterface
+	public interface AfterLinkCreated {
+
+		void accept(Link link, Map<String, String> osmTags, boolean isReverse);
 	}
 }
