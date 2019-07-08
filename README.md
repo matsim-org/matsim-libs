@@ -26,14 +26,46 @@ The project is published via Jitpack. To include it into your project simply add
 The reader uses the builder pattern. With a simple set up you can convert your network the following way
 ```
 String file = "path/to/your/file.osm.pbf";
+String outputFile = "path/to/your/matsim-network.xml.gz";
 CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832"); // you may choose your own target coordinate system, but UTM32 is a good choice if you run a simulatio in Germany
 Network network = NetworkUtils.createNetwork();
 
 new SupersonicOsmNetworkReader.Builder()
-				.network(network)
-				.coordinateTransformation(coordinateTransformation)
-				.build()
-				.read(file);
+        .network(network)
+        .coordinateTransformation(coordinateTransformation)
+        .build()
+        .read(file);
 
-new NetworkWriter(network).write(output.toString());
+new NetworkWriter(network).write(outputFile);
 ```
+
+It is also possible to refine the result of the network parsing. The below example shows all possible features of the 
+reader.
+
+1. It is possible to apply a link filter. The below example includes all links which are of hierarchy level "motorway".
+For simplicity filtering for a coordinate is skipped but this is the place to test whether a coordinate is within a 
+certain area. This method is called for the from- and to nodes of a link.
+2. The reader generally tries to simplify the network as much as possible. If it is necessary to preserve certain nodes
+for e.g. implementing counts it is possible to omit the simplification for certain node ids. The below example 
+prevents the reader to remove the node with id: 2.
+3. After creating a link the reader will call the 'afterLinkCreated' hook with the newly created link, the original osm
+tags, and a flag whether it is the forward or reverse direction of an osm-way. The below example sets the allowed 
+transport mode on all links to 'bike'.
+ 
+ ```
+ String file = "path/to/your/file.osm.pbf";
+ String outputFile = "path/to/your/matsim-network.xml.gz";
+ CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832"); // you may choose your own target coordinate system, but UTM32 is a good choice if you run a simulatio in Germany
+ Network network = NetworkUtils.createNetwork();
+ 
+ new SupersonicOsmNetworkReader.Builder()
+     .network(network)
+     .coordinateTransformation(coordinateTransformation)
+     .linkFilter((coord, hierachyLevel) -> hierachyLevel == LinkProperties.LEVEL_MOTORWAY))
+     .preserveNodeWithId(id -> id == 2)
+     .afterLinkCreated((link, osmTags, isReverse) -> link.setAllowedModes(Set.of(TransportMode.bike))
+     .build()
+     .read(file);
+ 
+ new NetworkWriter(network).write(outputFile);
+ ```
