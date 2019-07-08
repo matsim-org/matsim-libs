@@ -3,6 +3,7 @@ package org.matsim.codeexamples.pt;
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
 import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -89,25 +90,14 @@ public class PtAlongALine2Test{
 		// (as of today, will also influence router. kai, jun'19)
 
 		if(  drtMode == DrtMode.teleportBeeline ){// (configure teleportation router)
-			{
-				ModeRoutingParams mrp = new ModeRoutingParams();
-				mrp.setMode( TransportMode.drt );
-				mrp.setTeleportedModeSpeed( 100. / 3.6 );
-				config.plansCalcRoute().addModeRoutingParams( mrp );
-			}
+				config.plansCalcRoute().addModeRoutingParams( new ModeRoutingParams().setMode( TransportMode.drt ).setTeleportedModeSpeed( 100. / 3.6 ) );
 			if( drt2 ){
-				ModeRoutingParams mrp = new ModeRoutingParams();
-				mrp.setMode( "drt2" );
-				mrp.setTeleportedModeSpeed( 100. / 3.6 );
-				config.plansCalcRoute().addModeRoutingParams( mrp );
+				config.plansCalcRoute().addModeRoutingParams( new ModeRoutingParams().setMode( "drt2" ).setTeleportedModeSpeed( 100. / 3.6 ) );
 			}
 			// teleportation router for walk or bike is automatically defined.
 		} else if( drtMode == DrtMode.teleportBasedOnNetworkRoute ){// (route as network route)
-			//			config.plansCalcRoute().removeModeRoutingParams( TransportMode.walk );
-			//			Set<String> networkModes = new HashSet<>( config.plansCalcRoute().getNetworkModes() );
 			Set<String> networkModes = new HashSet<>( );
 			networkModes.add( TransportMode.drt );
-			//			networkModes.add( TransportMode.walk );
 			if( drt2 ){
 				networkModes.add( "drt2" );
 			}
@@ -115,12 +105,7 @@ public class PtAlongALine2Test{
 		}
 
 		// set up walk2 so we don't need walk in raptor:
-		{
-			ModeRoutingParams wlk = new ModeRoutingParams(  ) ;
-			wlk.setMode( "walk2" ) ;
-			wlk.setTeleportedModeSpeed( 5./3.6 ) ;
-			config.plansCalcRoute().addModeRoutingParams( wlk );
-		}
+		config.plansCalcRoute().addModeRoutingParams( new ModeRoutingParams(  ).setMode( "walk2" ).setTeleportedModeSpeed( 5./3.6 ) );
 
 		// === RAPTOR: ===
 		{
@@ -161,39 +146,18 @@ public class PtAlongALine2Test{
 
 		double margUtlTravPt = config.planCalcScore().getModes().get( TransportMode.pt ).getMarginalUtilityOfTraveling();;
 		if ( drtMode!=DrtMode.none ) {
-			//			{
-			//				PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("access_walk");
-			//				config.planCalcScore().addModeParams(modeParams);
-			//			}
-			//			{
-			//				PlanCalcScoreConfigGroup.ModeParams modeParams = new PlanCalcScoreConfigGroup.ModeParams("egress_walk");
-			//				config.planCalcScore().addModeParams(modeParams);
-			//			}
 			// (scoring parameters for drt modes)
-			{
-				ModeParams modeParams = new ModeParams(TransportMode.drt);
-				modeParams.setMarginalUtilityOfTraveling( margUtlTravPt );
-				config.planCalcScore().addModeParams(modeParams);
-			}
+			config.planCalcScore().addModeParams( new ModeParams(TransportMode.drt).setMarginalUtilityOfTraveling( margUtlTravPt ) );
 			if ( drt2 ) {
-				ModeParams modeParams = new ModeParams("drt2");
-				modeParams.setMarginalUtilityOfTraveling( margUtlTravPt );
-				config.planCalcScore().addModeParams(modeParams);
+				config.planCalcScore().addModeParams( new ModeParams("drt2").setMarginalUtilityOfTraveling( margUtlTravPt ) );
 			}
 		}
-		{
-			ModeParams modeParams = new ModeParams("walk2");
-			modeParams.setMarginalUtilityOfTraveling( margUtlTravPt );
-			config.planCalcScore().addModeParams(modeParams);
-		}
+		config.planCalcScore().addModeParams( new ModeParams("walk2").setMarginalUtilityOfTraveling( margUtlTravPt ) );
 
 		// === QSIM: ===
 
 		config.qsim().setSimStarttimeInterpretation( QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime );
 		// yy why?  kai, jun'19
-
-//		config.qsim().setMainModes( Arrays.asList( TransportMode.car ) );
-		// yyyy buses use the car network and so that needs to be defined as network mode.   !!!! :-( :-(
 
 		// === DRT: ===
 
@@ -204,10 +168,7 @@ public class PtAlongALine2Test{
 			String drt2VehiclesFile = "drt2_vehicles.xml";
 
 			DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
-
-			// TODO: How can we set the network mode of drt2?
-			// TODO: Right now uncommenting the following line gives guice injection errors
-//			dvrpConfig.setNetworkMode(TransportMode.drt);
+			dvrpConfig.setNetworkModes( ImmutableSet.copyOf( Arrays.asList( TransportMode.drt, "drt2" ) ) ) ;
 
 			MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule( config, MultiModeDrtConfigGroup.class );
 			{
@@ -219,6 +180,7 @@ public class PtAlongALine2Test{
 				drtConfig.setMaxWaitTime( Double.MAX_VALUE );
 				drtConfig.setRequestRejection( false );
 				drtConfig.setMode( TransportMode.drt );
+				drtConfig.setUseModeFilteredSubnetwork( true );
 				mm.addParameterSet( drtConfig );
 			}
 			if ( drt2 ) {
@@ -228,7 +190,9 @@ public class PtAlongALine2Test{
 				drtConfig.setMaxTravelTimeBeta( 5. * 60. );
 				drtConfig.setStopDuration( 60. );
 				drtConfig.setMaxWaitTime( Double.MAX_VALUE );
+				drtConfig.setRequestRejection( false );
 				drtConfig.setMode( "drt2" );
+				drtConfig.setUseModeFilteredSubnetwork( true );
 				mm.addParameterSet( drtConfig );
 			}
 
@@ -257,15 +221,15 @@ public class PtAlongALine2Test{
 			scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory( DrtRoute.class, new DrtRouteFactory() );
 		}
 
-		//		// TODO: reference somehow network creation, to ensure that these link ids exist
-		//		// add drt modes to the car links' allowed modes in their respective service area
+		// add drt modes to the car links' allowed modes in their respective service area
 		PtAlongALineTest.addModeToAllLinksBtwnGivenNodes(scenario.getNetwork(), 0, 400, TransportMode.drt );
 		if ( drt2 ){
 			PtAlongALineTest.addModeToAllLinksBtwnGivenNodes( scenario.getNetwork(), 600, 1000, "drt2" );
 		}
+		// TODO: reference somehow network creation, to ensure that these link ids exist
 
 
-		// The following is for the _router_, not the qsim!  kai, jun'19
+		// The following is also for the router! kai, jun'19
 		VehiclesFactory vf = scenario.getVehicles().getFactory();
 		if ( drt2 ) {
 			VehicleType vehType = vf.createVehicleType( Id.create( "drt2", VehicleType.class ) );
@@ -294,25 +258,7 @@ public class PtAlongALine2Test{
 		if ( drtMode==DrtMode.full ){
 			controler.addOverridingModule( new DvrpModule() );
 			controler.addOverridingModule( new MultiModeDrtModule() );
-			controler.addOverridingModule(new AbstractDvrpModeModule(TransportMode.drt) {
-				@Override
-				public void install() {
-					Set<String> modes = Collections.singleton( TransportMode.drt ) ;
-					Network subNetwork = ScenarioUtils.createScenario( config ).getNetwork() ;
-					new TransportModeNetworkFilter( scenario.getNetwork() ).filter( subNetwork, modes );
-					bindModal( Network.class ).toInstance( subNetwork );
-				}
-			});
 			if ( drt2 ){
-				controler.addOverridingModule(new AbstractDvrpModeModule("drt2") {
-					@Override
-					public void install() {
-						Set<String> modes = Collections.singleton( "drt2" ) ;
-						Network subNetwork = ScenarioUtils.createScenario( config ).getNetwork() ;
-						new TransportModeNetworkFilter( scenario.getNetwork() ).filter( subNetwork, modes );
-						bindModal( Network.class ).toInstance( subNetwork );
-					}
-				});
 				controler.configureQSimComponents( DvrpQSimComponents.activateModes( TransportMode.drt, "drt2" ) );
 			} else{
 				controler.configureQSimComponents( DvrpQSimComponents.activateModes( TransportMode.drt ) );
