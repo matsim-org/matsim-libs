@@ -30,11 +30,11 @@ String outputFile = "path/to/your/matsim-network.xml.gz";
 CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832"); // you may choose your own target coordinate system, but UTM32 is a good choice if you run a simulatio in Germany
 Network network = NetworkUtils.createNetwork();
 
-new SupersonicOsmNetworkReader.Builder()
-        .network(network)
-        .coordinateTransformation(coordinateTransformation)
-        .build()
-        .read(file);
+SupersonicOsmNetworkReader.builder()
+     .network(network)
+     .coordinateTransformation(coordinateTransformation)
+     .build()
+     .read(file);
 
 new NetworkWriter(network).write(outputFile);
 ```
@@ -58,12 +58,12 @@ transport mode on all links to 'bike'.
  CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832"); // you may choose your own target coordinate system, but UTM32 is a good choice if you run a simulatio in Germany
  Network network = NetworkUtils.createNetwork();
  
- new SupersonicOsmNetworkReader.Builder()
+ SupersonicOsmNetworkReader.builder()
      .network(network)
      .coordinateTransformation(coordinateTransformation)
-     .linkFilter((coord, hierachyLevel) -> hierachyLevel == LinkProperties.LEVEL_MOTORWAY))
+     .linkFilter((coord, hierachyLevel) -> hierachyLevel == LinkProperties.LEVEL_MOTORWAY)
      .preserveNodeWithId(id -> id == 2)
-     .afterLinkCreated((link, osmTags, isReverse) -> link.setAllowedModes(Set.of(TransportMode.bike))
+     .afterLinkCreated((link, osmTags, isReverse) -> link.setAllowedModes(Set.of(TransportMode.bike)))
      .build()
      .read(file);
  
