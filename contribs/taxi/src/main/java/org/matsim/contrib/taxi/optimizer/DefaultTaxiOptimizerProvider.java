@@ -23,7 +23,6 @@ import java.net.URL;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizer;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizerParams;
@@ -55,9 +54,8 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 	private final URL context;
 
 	public DefaultTaxiOptimizerProvider(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, MobsimTimer timer,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, TravelDisutility travelDisutility,
-			TaxiScheduler scheduler, URL context) {
+			Network network, MobsimTimer timer, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
+			TravelDisutility travelDisutility, TaxiScheduler scheduler, URL context) {
 		this.eventsManager = eventsManager;
 		this.taxiCfg = taxiCfg;
 		this.fleet = fleet;

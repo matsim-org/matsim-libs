@@ -1122,9 +1122,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter(MODE)
-		public void setMode(final String mode) {
+		public ModeParams setMode(final String mode) {
 			testForLocked();
 			this.mode = mode;
+			return this ;
 		}
 		@StringGetter(MODE)
 		public String getMode() {
@@ -1132,9 +1133,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 		// ---
 		@StringSetter(MARGINAL_UTILITY_OF_TRAVELING)
-		public void setMarginalUtilityOfTraveling(double traveling) {
+		public ModeParams setMarginalUtilityOfTraveling(double traveling) {
 			testForLocked();
 			this.traveling = traveling;
+			return this ;
 		}
 		@StringGetter(MARGINAL_UTILITY_OF_TRAVELING)
 		public double getMarginalUtilityOfTraveling() {
@@ -1146,9 +1148,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			return distance;
 		}
 		@StringSetter("marginalUtilityOfDistance_util_m")
-		public void setMarginalUtilityOfDistance(double distance) {
+		public ModeParams setMarginalUtilityOfDistance(double distance) {
 			testForLocked();
 			this.distance = distance;
+			return this ;
 		}
 
 		/**
@@ -1163,9 +1166,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		 * @param constant -- {@value #CONSTANT_CMT}
 		 */
 		@StringSetter(CONSTANT)
-		public void setConstant(double constant) {
+		public ModeParams setConstant(double constant) {
 			testForLocked();
 			this.constant = constant;
+			return this ;
 		}
 		// ---
 		/**
@@ -1180,9 +1184,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		 * @param monetaryDistanceRate -- {@value #MONETARY_DISTANCE_RATE_CMT}
 		 */
 		@StringSetter(MONETARY_DISTANCE_RATE)
-		public void setMonetaryDistanceRate(double monetaryDistanceRate) {
+		public ModeParams setMonetaryDistanceRate(double monetaryDistanceRate) {
 			testForLocked();
 			this.monetaryDistanceRate = monetaryDistanceRate;
+			return this ;
 		}
 		@StringGetter(DAILY_MONETARY_CONSTANT)
 		public double getDailyMonetaryConstant() {
@@ -1190,8 +1195,9 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter(DAILY_MONETARY_CONSTANT)
-		public void setDailyMonetaryConstant(double dailyMonetaryConstant) {
+		public ModeParams setDailyMonetaryConstant(double dailyMonetaryConstant) {
 			this.dailyMonetaryConstant = dailyMonetaryConstant;
+			return this ;
 		}
 
 		@StringGetter(DAILY_UTILITY_CONSTANT)
@@ -1200,8 +1206,9 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter(DAILY_UTILITY_CONSTANT)
-		public void setDailyUtilityConstant(double dailyUtilityConstant) {
+		public ModeParams setDailyUtilityConstant(double dailyUtilityConstant) {
 			this.dailyUtilityConstant = dailyUtilityConstant;
+			return this ;
 		}
 
 

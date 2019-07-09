@@ -50,6 +50,8 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
+import com.google.common.collect.ImmutableSet;
+
 /**
  * For a fair and consistent benchmarking of taxi dispatching algorithms we assume that link travel times are
  * deterministic. To simulate this property, we remove (1) all other traffic, and (2) link capacity constraints (e.g. by
@@ -76,7 +78,7 @@ public class RunETaxiBenchmark {
 		config.controler().setWritePlansInterval(0);
 		config.controler().setCreateGraphs(false);
 
-		DvrpConfigGroup.get(config).setNetworkMode(null);// to switch off network filtering
+		DvrpConfigGroup.get(config).setNetworkModes(ImmutableSet.of());// to switch off network filtering
 		config.addConfigConsistencyChecker(new DvrpBenchmarkConfigConsistencyChecker());
 
 		String mode = TaxiConfigGroup.get(config).getMode();

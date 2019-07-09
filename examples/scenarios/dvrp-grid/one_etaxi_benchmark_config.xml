@@ -50,7 +50,7 @@
 	</module>
 
 	<module name="controler">
-		<param name="outputDirectory" value="test/output/one_taxi_benchmark"/>
+		<param name="outputDirectory" value="test/output/one_etaxi_benchmark"/>
 		<param name="overwriteFiles" value="deleteDirectoryIfExists"/>
 		<param name="writeEventsInterval" value="0"/>
 		<param name="writePlansInterval" value="0"/>

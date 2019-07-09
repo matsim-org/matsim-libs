@@ -71,6 +71,8 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 	public void install() {
 		DvrpModes.registerDvrpMode(binder(), getMode());
 
+		install(DvrpRoutingNetworkProvider.createDvrpModeRoutingNetworkModule(getMode(),
+				drtCfg.isUseModeFilteredSubnetwork()));
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
 
 		install(new FleetModule(getMode(), drtCfg.getVehiclesFileUrl(getConfig().getContext()),
@@ -110,10 +112,6 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 		bindModal(DrtRouteUpdater.class).toProvider(new ModalProviders.AbstractProvider<DrtRouteUpdater>(getMode()) {
 			@Inject
-			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
-			private Network network;
-
-			@Inject
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 			private TravelTime travelTime;
 
@@ -125,6 +123,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 			@Override
 			public DefaultDrtRouteUpdater get() {
+				Network network = getModalInstance(Network.class);
 				return new DefaultDrtRouteUpdater(drtCfg, network, travelTime,
 						getModalInstance(TravelDisutilityFactory.class), population, config);
 			}
@@ -137,15 +136,11 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		private final DrtConfigGroup drtCfg;
 
 		@Inject
-		@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
-		private Network network;
-
-		@Inject
 		@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 		private TravelTime travelTime;
 
 		@Inject
-		private PopulationFactory populationFactory;
+		private Scenario scenario ;
 
 		@Inject
 		@Named(TransportMode.walk)
@@ -158,8 +153,9 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 		@Override
 		public DrtRoutingModule get() {
+			Network network = getModalInstance(Network.class);
 			return new DrtRoutingModule(drtCfg, network, travelTime, getModalInstance(TravelDisutilityFactory.class),
-					populationFactory, walkRouter);
+				  walkRouter, scenario );
 		}
 	}
 

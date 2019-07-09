@@ -26,7 +26,6 @@ import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -46,9 +45,8 @@ public class EmptyVehicleRelocator {
 	private final DrtTaskFactory taskFactory;
 	private final LeastCostPathCalculator router;
 
-	public EmptyVehicleRelocator(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, TravelDisutility travelDisutility,
-			MobsimTimer timer, DrtTaskFactory taskFactory) {
+	public EmptyVehicleRelocator(Network network, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
+			TravelDisutility travelDisutility, MobsimTimer timer, DrtTaskFactory taskFactory) {
 		this.travelTime = travelTime;
 		this.timer = timer;
 		this.taskFactory = taskFactory;
