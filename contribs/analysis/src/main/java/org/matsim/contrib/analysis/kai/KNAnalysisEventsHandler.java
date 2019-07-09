@@ -127,7 +127,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 	private KNAnalysisEventsHandler( final Scenario scenario, final String otherTollLinkFile ) {
 		this( scenario ) ;
 		if ( otherTollLinkFile != null && !otherTollLinkFile.equals("") ) {
-			RoadPricingSchemeImpl scheme = RoadPricingUtils.createDefaultScheme();
+			RoadPricingSchemeImpl scheme = RoadPricingUtils.createMutableScheme();
 			RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
 			try {
 				rpReader.readFile( otherTollLinkFile  );
@@ -146,7 +146,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 
 		final String tollLinksFileName = ConfigUtils.addOrGetModule(this.scenario.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).getTollLinksFile();
 		if ( tollLinksFileName != null && !tollLinksFileName.equals("") ) {
-			RoadPricingSchemeImpl scheme = RoadPricingUtils.createDefaultScheme();
+			RoadPricingSchemeImpl scheme = RoadPricingUtils.createMutableScheme();
 			RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
 			try {
 				rpReader.readFile( tollLinksFileName  );

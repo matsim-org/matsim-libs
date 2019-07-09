@@ -78,7 +78,7 @@ public class TollTravelCostCalculatorTest {
 		RoadPricingTestUtils.createNetwork2((MutableScenario)scenario);
 		Network net = scenario.getNetwork() ;
 		
-		RoadPricingSchemeImpl scheme = RoadPricingUtils.createDefaultScheme();
+		RoadPricingSchemeImpl scheme = RoadPricingUtils.createMutableScheme();
 		scheme.setType(RoadPricingScheme.TOLL_TYPE_DISTANCE);
 		final Id<Link> link5Id = Id.create("5", Link.class);
 		scheme.addLink(link5Id);
@@ -127,7 +127,7 @@ public class TollTravelCostCalculatorTest {
 		RoadPricingTestUtils.createNetwork2(scenario);
 		Network network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.createDefaultScheme();
+		RoadPricingSchemeImpl toll = RoadPricingUtils.createMutableScheme();
 		toll.setType(RoadPricingScheme.TOLL_TYPE_DISTANCE);
 		toll.addLink(Id.create("5", Link.class));
 		toll.addLink(Id.create("11", Link.class));
@@ -212,7 +212,7 @@ public class TollTravelCostCalculatorTest {
 		RoadPricingTestUtils.createNetwork2(scenario);
 		Network network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.createDefaultScheme();
+		RoadPricingSchemeImpl toll = RoadPricingUtils.createMutableScheme();
 		toll.setType(RoadPricingScheme.TOLL_TYPE_LINK);
 		toll.addLink(Id.create("5", Link.class));
 		toll.addLink(Id.create("11", Link.class));
@@ -307,7 +307,7 @@ public class TollTravelCostCalculatorTest {
 		RoadPricingTestUtils.createNetwork2(scenario);
 		Network network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.createDefaultScheme();
+		RoadPricingSchemeImpl toll = RoadPricingUtils.createMutableScheme();
 		toll.setType(RoadPricingScheme.TOLL_TYPE_CORDON);
 		toll.addLink(Id.create("5", Link.class));
 		toll.addLink(Id.create("11", Link.class));

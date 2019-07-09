@@ -34,7 +34,7 @@ The interpretation of the cost.amount differs from type to type:
 - area:     amount = [monetary unit] / [day travelling in the area]
 - cordon:   amount = [monetary unit] / [travelling across a tolled link]
 
-In the case of the area toll and multiple cost.amounts, all amounts should be
+In the case of the area toll and multiple cost amounts, all amounts should be
 the same as it makes no sense to have differentiated tolls for the same area.
 (How much would a guy pay that travels during two time-ranges with different
 toll-amounts?)

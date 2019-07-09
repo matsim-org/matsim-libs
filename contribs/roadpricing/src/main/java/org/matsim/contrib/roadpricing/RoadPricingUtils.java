@@ -20,31 +20,63 @@
 
 package org.matsim.contrib.roadpricing;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 
 /**
  * Utility to create different road pricing schemes.
- * 
+ *
  * @author jwjoubert
  */
 public class RoadPricingUtils {
 
-	public static RoadPricingConfigGroup createConfigGroup(){
+	public static RoadPricingConfigGroup createConfigGroup() {
 		return new RoadPricingConfigGroup();
 	}
 
-	public static RoadPricingModule createModule(){ return new RoadPricingModule(); }
+	public static RoadPricingModule createModule() {
+		return new RoadPricingModule();
+	}
 
-	public static RoadPricingModule createModule(RoadPricingScheme scheme){ return new RoadPricingModule(scheme); }
+	public static RoadPricingModule createModule(RoadPricingScheme scheme) {
+		return new RoadPricingModule(scheme);
+	}
 
-	public static RoadPricingSchemeImpl createDefaultScheme(){ return new RoadPricingSchemeImpl(); }
+	public static RoadPricingSchemeImpl createMutableScheme() {
+		return new RoadPricingSchemeImpl();
+	}
 
-	public static RoadPricingScheme getScheme(Scenario sc){
+	public static RoadPricingScheme getScheme(Scenario sc) {
 		Object o = sc.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
-		if(o == null){
+		if (o == null) {
 			sc.addScenarioElement(RoadPricingScheme.ELEMENT_NAME, new RoadPricingSchemeImpl());
 		}
 		return (RoadPricingScheme) sc.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
 	}
-	
+
+	public static void setType(RoadPricingSchemeImpl scheme, String type) {
+		scheme.setType(type);
+	}
+
+	public static void setName(RoadPricingSchemeImpl scheme, String name){
+		scheme.setName(name);
+	}
+
+	public static void setDescription(RoadPricingSchemeImpl scheme, String description){
+		scheme.setDescription(description);
+	}
+
+	public static Cost createAndAddGeneralCost(RoadPricingSchemeImpl scheme, final double startTime, final double endTime, final double amount){
+		return scheme.createAndAddCost(startTime, endTime, amount);
+	}
+
+	public static void addLink(RoadPricingSchemeImpl scheme, Id<Link> linkId){
+		scheme.addLink(linkId);
+	}
+
+	public static void addLinkSpecificCost(RoadPricingSchemeImpl scheme, Id<Link> linkId, double startTime, double endTime, double amount){
+		scheme.addLinkCost(linkId, startTime, endTime, amount);
+	}
 }
