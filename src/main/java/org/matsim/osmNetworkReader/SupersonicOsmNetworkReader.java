@@ -5,7 +5,7 @@ import de.topobyte.osm4j.core.model.util.OsmModelUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -22,7 +22,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-@Log
+@Log4j2
 public class SupersonicOsmNetworkReader {
 
 	private static final Set<String> reverseTags = new HashSet<>(Arrays.asList("-1", "reverse"));
@@ -75,17 +75,15 @@ public class SupersonicOsmNetworkReader {
 		var nodesAndWays = OsmNetworkParser.parse(inputFile, linkProperties);
 		log.info("starting convertion \uD83D\uDE80");
 		convert(nodesAndWays.getWays(), nodesAndWays.getNodes());
+		log.info("finished convertion");
 	}
 
 	private void convert(Collection<OsmWay> ways, Map<Long, LightOsmNode> nodes) {
 
-		log.info("linkFilter for highways and create a matsim network");
 		ways.parallelStream()
 				.flatMap(way -> this.createWaySegments(nodes, way))
 				.flatMap(this::createLinks)
 				.forEach(this::addLinkToNetwork);
-
-		log.info("done");
 	}
 
 	private Stream<WaySegment> createWaySegments(Map<Long, LightOsmNode> nodes, OsmWay way) {

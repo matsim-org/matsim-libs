@@ -8,7 +8,7 @@ import de.topobyte.osm4j.core.model.iface.OsmRelation;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.pbf.seq.PbfReader;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
+import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.Coord;
 
 import java.io.FileNotFoundException;
@@ -18,7 +18,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-@Log
+@Log4j2
 class OsmNetworkParser {
 
 	static NodesAndWays parse(Path inputFile, Map<String, LinkProperties> linkProperties) {
@@ -42,7 +42,7 @@ class OsmNetworkParser {
 			nodesReader.read();
 
 			log.info("finished reading nodes");
-
+			log.info("Kept " + nodesHandler.nodes.size() + "/" + nodesHandler.counter + " nodes");
 			return new NodesAndWays(nodesHandler.nodes, waysHandler.ways);
 		} catch (FileNotFoundException | OsmInputException e) {
 			throw new RuntimeException(e);
