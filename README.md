@@ -18,7 +18,7 @@ The project is published via Jitpack. To include it into your project simply add
     <dependency>
         <groupId>com.github.Janekdererste</groupId>
         <artifactId>super-sonic-osm-network-reader</artifactId>
-        <version>0.1.1</version>
+        <version>0.1.2</version>
     </dependency>
 </dependencies>
 ```
