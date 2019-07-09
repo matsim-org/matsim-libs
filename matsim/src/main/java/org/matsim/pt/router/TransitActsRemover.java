@@ -56,8 +56,8 @@ public class TransitActsRemover implements PlanAlgorithm {
 		List<String> accessModes = new ArrayList<>();
 		accessModes.add(TransportMode.transit_walk);
 		if (treatAccessEgressAsTransit){
-			accessModes.add(TransportMode.access_walk);
-			accessModes.add(TransportMode.egress_walk);
+			accessModes.add(TransportMode.non_network_walk );
+			accessModes.add(TransportMode.non_network_walk );
 		}
 		List<PlanElement> planElements = plan.getPlanElements();
 		for (int i = 0, n = planElements.size(); i < n; i++) {

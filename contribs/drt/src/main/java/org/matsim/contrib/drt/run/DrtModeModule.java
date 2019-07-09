@@ -54,9 +54,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
 import com.google.inject.Inject;
-import com.google.inject.Key;
 import com.google.inject.name.Named;
-import com.google.inject.name.Names;
 
 /**
  * @author michalm (Michal Maciejewski)
@@ -73,7 +71,8 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 	public void install() {
 		DvrpModes.registerDvrpMode(binder(), getMode());
 
-		bindModal(Network.class).to(Key.get(Network.class, Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING)));
+		install(DvrpRoutingNetworkProvider.createDvrpModeRoutingNetworkModule(getMode(),
+				drtCfg.isUseModeFilteredSubnetwork()));
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
 
 		install(new FleetModule(getMode(), drtCfg.getVehiclesFileUrl(getConfig().getContext()),
@@ -141,7 +140,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		private TravelTime travelTime;
 
 		@Inject
-		private PopulationFactory populationFactory;
+		private Scenario scenario ;
 
 		@Inject
 		@Named(TransportMode.walk)
@@ -156,7 +155,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		public DrtRoutingModule get() {
 			Network network = getModalInstance(Network.class);
 			return new DrtRoutingModule(drtCfg, network, travelTime, getModalInstance(TravelDisutilityFactory.class),
-					populationFactory, walkRouter);
+				  walkRouter, scenario );
 		}
 	}
 
