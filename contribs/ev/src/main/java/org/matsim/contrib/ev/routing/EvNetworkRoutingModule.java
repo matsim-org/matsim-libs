@@ -18,12 +18,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.ev.routing;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -54,6 +48,8 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
+
+import java.util.*;
 
 /**
  * This network Routing module adds stages for re-charging into the Route.
@@ -180,7 +176,8 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 					stagedRoute.add(lastLeg);
 					Activity chargeAct = PopulationUtils.createActivityFromCoordAndLinkId(stageActivityType,
 							selectedChargerLink.getCoord(), selectedChargerLink.getId());
-					double estimatedChargingTime = (ev.getBatteryCapacity() * 1.25) / selectedCharger.getMaxPower();
+					double maxPowerEstimate = Math.min(selectedCharger.getMaxPower(), ev.getBatteryCapacity() / 3.6);
+					double estimatedChargingTime = (ev.getBatteryCapacity() * 1.5) / maxPowerEstimate;
 					chargeAct.setMaximumDuration(estimatedChargingTime);
 					lastArrivaltime += chargeAct.getMaximumDuration();
 					stagedRoute.add(chargeAct);
