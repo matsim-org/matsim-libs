@@ -30,7 +30,7 @@ public interface VehicleSchemaV2Names {
 	public static final String CAPACITY = "capacity";
 	public static final String SEATS = "seats";
 	public static final String PERSONS = "persons";
-	public static final String STANDINGROOM = "standingRoom";
+	public static final String STANDINGROOM = "standingRoomInPersons";
 	public static final String FREIGHTCAPACITY = "freightCapacity";
 	public static final String VOLUME = "volumeInCubicMeters";
 //	public static final String CUBICMETERS = "cubicMeters";
