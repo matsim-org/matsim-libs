@@ -86,8 +86,22 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 		return loadConfig( IOUtils.getUrlFromFileOrResource( args[0] ), typedArgs, customModules );
 	}
 
+	public static Config loadConfig( Config config, String [] args, ConfigGroup... customModules ) {
+		String[] typedArgs = Arrays.copyOfRange( args, 1, args.length );
+		return loadConfig( config, IOUtils.getUrlFromFileOrResource( args[0] ), typedArgs, customModules );
+	}
+
 	public static Config loadConfig( final URL url, String [] typedArgs, ConfigGroup... customModules ) {
 		Config config = loadConfig( url, customModules ) ;
+		return applyCommandline( config, typedArgs );
+	}
+
+	public static Config loadConfig( Config config, final URL url, String [] typedArgs, ConfigGroup... customModules ) {
+		loadConfig( config, url, customModules ) ;
+		return applyCommandline( config, typedArgs );
+	}
+
+	private static Config applyCommandline( Config config, String[] typedArgs ){
 		try{
 			CommandLine.Builder bld = new CommandLine.Builder( typedArgs ) ;
 			bld.allowAnyOption( true  );
@@ -152,9 +166,12 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 		}
 	}
 
-	public static void loadConfig(final Config config, final URL url) throws UncheckedIOException {
+	public static void loadConfig(final Config config, final URL url, ConfigGroup... customModules ) throws UncheckedIOException {
 		if (config.global() == null) {
 			config.addCoreModules();
+		}
+		for (ConfigGroup customModule : customModules) {
+			config.addModule(customModule);
 		}
 		new ConfigReader(config).parse(url);
 	}
