@@ -27,7 +27,8 @@ The reader uses the builder pattern. With a simple set up you can convert your n
 ```
 String file = "path/to/your/file.osm.pbf";
 String outputFile = "path/to/your/matsim-network.xml.gz";
-CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832"); // you may choose your own target coordinate system, but UTM32 is a good choice if you run a simulatio in Germany
+// you may choose your own target coordinate system, but UTM32 is a good choice if you run a simulatio in Germany
+CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832");
 Network network = NetworkUtils.createNetwork();
 
 SupersonicOsmNetworkReader.builder()
@@ -55,7 +56,8 @@ transport mode on all links to 'car' and 'bike'.
  ```
  String file = "path/to/your/file.osm.pbf";
  String outputFile = "path/to/your/matsim-network.xml.gz";
- CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832"); // you may choose your own target coordinate system, but UTM32 is a good choice if you run a simulatio in Germany
+ // you may choose your own target coordinate system, but UTM32 is a good choice if you run a simulatio in Germany
+ CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832");
  Network network = NetworkUtils.createNetwork();
  
  SupersonicOsmNetworkReader.builder()
