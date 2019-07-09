@@ -56,7 +56,11 @@ public class StageActivityTypesImpl implements StageActivityTypes {
 
 	@Override
 	public boolean isStageActivity(final String activityType) {
-		return types.contains( activityType );
+		if ( !activityType.isEmpty() && activityType.endsWith("interaction") ) {
+			return true;
+		} else {
+			return types.contains( activityType );
+		}
 	}
 
 
