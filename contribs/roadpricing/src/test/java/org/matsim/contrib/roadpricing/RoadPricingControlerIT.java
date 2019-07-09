@@ -63,7 +63,9 @@ public class RoadPricingControlerIT {
 		ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile( "distanceToll.xml" ) ;
 		config.controler().setOutputDirectory(utils.getOutputDirectory() + "/tollcase/");
 		Controler controler2 = new Controler(config);
-		controler2.setModules(new ControlerDefaultsWithRoadPricingModule());
+		/* FIXME Check if the following is correct, jwj '19. What's the difference? */
+//		controler2.setModules(new RoadPricingModuleDefaults());
+		controler2.addOverridingModule(RoadPricingUtils.createModule());
 		controler2.getConfig().controler().setCreateGraphs(false);
 		controler2.getConfig().controler().setDumpDataAtEnd(false);
 		controler2.getConfig().controler().setWriteEventsInterval(0);

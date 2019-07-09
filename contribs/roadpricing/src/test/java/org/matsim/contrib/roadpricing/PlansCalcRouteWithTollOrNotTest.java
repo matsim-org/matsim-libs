@@ -76,7 +76,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		log.warn( "access/egress?" + config.plansCalcRoute().isInsertingAccessEgressWalk() );
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.createDefaultScheme();
+		RoadPricingSchemeImpl toll = RoadPricingUtils.createMutableScheme();
 		toll.setType("area");
 		toll.addLink(Id.createLinkId("5"));
 		toll.addLink(Id.createLinkId("11"));
@@ -145,7 +145,9 @@ public class PlansCalcRouteWithTollOrNotTest {
 	private PlansCalcRouteWithTollOrNot testee(final Scenario scenario, final RoadPricingScheme toll) {
 		return Injector.createInjector(
 				scenario.getConfig(),
-				new ControlerDefaultsWithRoadPricingModule(toll),
+				new RoadPricingModuleDefaults(toll),
+				/* FIXME Check/understand why the following is INcorrect, jwj '19. What's the difference? */
+//				RoadPricingUtils.createModule(toll),
 				new ScenarioByInstanceModule(scenario),
 				new ControlerDefaultCoreListenersModule(),
 				new NewControlerModule())
@@ -162,7 +164,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		RoadPricingTestUtils.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.createDefaultScheme();
+		RoadPricingSchemeImpl toll = RoadPricingUtils.createMutableScheme();
 		toll.setType("area");
 		Id.createLinkId("7");
 		toll.createAndAddCost(6*3600, 10*3600, 0.06);
@@ -188,7 +190,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		RoadPricingTestUtils.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.createDefaultScheme();
+		RoadPricingSchemeImpl toll = RoadPricingUtils.createMutableScheme();
 		toll.setType("area");
 		toll.addLink(Id.createLinkId("3"));
 		toll.addLink(Id.createLinkId("5"));
@@ -210,15 +212,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		if ( !config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
 			return (Leg) (planElements.get(3));
 		} else {
-			StageActivityTypes adHocTypes = new StageActivityTypes(){
-				@Override public boolean isStageActivity(String activityType) {
-					if ( activityType.contains("interaction") ) {
-						return true ;
-					} else {
-						return false ;
-					}
-				}
-			} ;
+			StageActivityTypes adHocTypes = activityType -> activityType.contains("interaction");
 			List<Trip> trips = TripStructureUtils.getTrips(planElements, adHocTypes) ;
 			List<Leg> legs = trips.get(1).getLegsOnly() ;
 			if ( legs.size()==1 ) {
@@ -236,7 +230,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		RoadPricingTestUtils.createNetwork2(scenario);
 
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.createDefaultScheme();
+		RoadPricingSchemeImpl toll = RoadPricingUtils.createMutableScheme();
 		toll.setType("area");
 		toll.addLink(Id.createLinkId("5"));
 		toll.addLink(Id.createLinkId("11"));

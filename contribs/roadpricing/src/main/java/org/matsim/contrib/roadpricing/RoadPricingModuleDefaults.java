@@ -36,15 +36,11 @@ import javax.inject.Provider;
 import java.net.URL;
 import java.util.Collections;
 
-final class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
+final class RoadPricingModuleDefaults extends AbstractModule {
 
 	private final RoadPricingScheme roadPricingScheme;
 
-	ControlerDefaultsWithRoadPricingModule() {
-		this.roadPricingScheme = null;
-	}
-
-	ControlerDefaultsWithRoadPricingModule(RoadPricingScheme roadPricingScheme) {
+	RoadPricingModuleDefaults(RoadPricingScheme roadPricingScheme) {
 		this.roadPricingScheme = roadPricingScheme;
 	}
 
@@ -106,7 +102,7 @@ final class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
 							+ "construct a zero toll file and insert that. ");
 				}
 				URL tollLinksFile = ConfigGroup.getInputFileURL(this.config.getContext(), rpConfig.getTollLinksFile());
-				RoadPricingSchemeImpl rpsImpl = RoadPricingUtils.createDefaultScheme();
+				RoadPricingSchemeImpl rpsImpl = RoadPricingUtils.createMutableScheme();
 				new RoadPricingReaderXMLv1(rpsImpl).parse(tollLinksFile);
 				return rpsImpl;
 			}

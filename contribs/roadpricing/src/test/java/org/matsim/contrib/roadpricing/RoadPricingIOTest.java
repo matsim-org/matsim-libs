@@ -48,7 +48,7 @@ public class RoadPricingIOTest extends MatsimTestCase {
 		final Id<Link> id3 = Id.create(3, Link.class);
 
 		// first, read the scheme from file
-		RoadPricingSchemeImpl scheme1 = RoadPricingUtils.createDefaultScheme();
+		RoadPricingSchemeImpl scheme1 = RoadPricingUtils.createMutableScheme();
 		RoadPricingReaderXMLv1 reader1 = new RoadPricingReaderXMLv1(scheme1);
 		reader1.readFile(origFile);
 
@@ -91,7 +91,7 @@ public class RoadPricingIOTest extends MatsimTestCase {
 		 * than the written one. Thus, read this file again and write it again and
 		 * compare them.
 		 */
-		RoadPricingSchemeImpl scheme2 = RoadPricingUtils.createDefaultScheme();
+		RoadPricingSchemeImpl scheme2 = RoadPricingUtils.createMutableScheme();
 		RoadPricingReaderXMLv1 reader2 = new RoadPricingReaderXMLv1(scheme2);
 		reader2.readFile(tmpFile1);
 
