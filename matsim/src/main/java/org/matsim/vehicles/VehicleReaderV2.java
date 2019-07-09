@@ -17,6 +17,7 @@ class VehicleReaderV2 extends MatsimXmlParser{
 	private VehicleCapacity currentCapacity = null;
 	private FreightCapacity currentFreightCapacity = null;
 	private EngineInformation currentEngineInformation = null;
+	private CostInformation currentCostInformation = null;
 //	private EngineInformation.FuelType currentFuelType = null;
 //	private double fixedCostsPerDay = Double.NaN;
 //	private double costsPerMeter = Double.NaN;
@@ -50,6 +51,10 @@ class VehicleReaderV2 extends MatsimXmlParser{
 			case VehicleSchemaV2Names.CAPACITY:
 				this.currentVehType.setCapacity( this.currentCapacity );
 				this.currentCapacity = null;
+				break;
+			case VehicleSchemaV2Names.COSTINFORMATION:
+				this.currentVehType.setCostInformation( this.currentCostInformation );
+				this.currentCostInformation = null;
 				break;
 			case VehicleSchemaV2Names.VEHICLETYPE:
 				this.vehicles.addVehicleType( this.currentVehType );
@@ -97,7 +102,7 @@ class VehicleReaderV2 extends MatsimXmlParser{
 //				//TODO: throws null pointer exception -> why???
 //				this.currentCapacity.setWeightInTons( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.WEIGHT ) ) ) ;
 				this.currentCapacity.setVolumeInCubicMeters( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.VOLUME ) ) );
-//				this.currAttributes = this.currentCapacity.getAttributes() ;
+				this.currAttributes = this.currentCapacity.getAttributes() ;
 				break;
 //			case VehicleSchemaV2Names.SEATS:
 //				this.currentCapacity.setSeats( Integer.valueOf( atts.getValue( VehicleSchemaV2Names.PERSONS ) ) );
@@ -123,8 +128,9 @@ class VehicleReaderV2 extends MatsimXmlParser{
 				double fixedCostsPerDay = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.FIXEDCOSTSPERDAY ) );
 				double costsPerMeter = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERMETER ) );
 				double costsPerSecond = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERSECOND ) );
-				CostInformation currentCostInformation = this.builder.createCostInformation( fixedCostsPerDay, costsPerMeter, costsPerSecond );
+				this.currentCostInformation = this.builder.createCostInformation( fixedCostsPerDay, costsPerMeter, costsPerSecond );
 				this.currentVehType.setCostInformation( currentCostInformation );
+				this.currAttributes = this.currentCostInformation.getAttributes();
 				break;
 			case VehicleSchemaV2Names.VEHICLE:
 				Id<VehicleType> typeId = Id.create( atts.getValue( VehicleSchemaV2Names.TYPE ), VehicleType.class );
