@@ -182,12 +182,12 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 		this.writeStartTag(VehicleSchemaV2Names.FREIGHTCAPACITY, null);
 		if ( fc.getVolume() != FreightCapacity.UNDEFINED_VOLUME ) {
 			atts.clear();
-			atts.add(this.createTuple(VehicleSchemaV2Names.CUBICMETERS, Double.toString(fc.getVolume())));
+			atts.add(this.createTuple(VehicleSchemaV2Names.VOLUME, Double.toString(fc.getVolume())));
 			this.writeStartTag(VehicleSchemaV2Names.VOLUME, atts, true);
 		}
 		if (fc.getWeight() != FreightCapacity.UNDEFINED_WEIGHT ) {
 			atts.clear();
-			atts.add(this.createTuple(VehicleSchemaV2Names.TONS, Double.toString(fc.getWeight())));
+			atts.add(this.createTuple(VehicleSchemaV2Names.WEIGHT, Double.toString(fc.getWeight())));
 			this.writeStartTag(VehicleSchemaV2Names.WEIGHT, atts, true);
 		}
 		this.writeEndTag(VehicleSchemaV2Names.FREIGHTCAPACITY);

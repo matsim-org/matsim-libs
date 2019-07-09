@@ -26,16 +26,37 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
  * @author dgrether
  */
 public interface VehicleCapacity extends Attributable {
+
+	double UNDEFINED_VOLUME =  Double.POSITIVE_INFINITY ;
+	double UNDEFINED_WEIGHT = Double.POSITIVE_INFINITY ;
+	double UNDEFINED_UNITS = Integer.MAX_VALUE ;
 	
 	public Integer getSeats();
 	
 	public Integer getStandingRoom();
-	
+
+	/**
+	 * @deprecated FreightCapacity functionality is now part of VehicleCapacity, kmt Jul19
+	 * */
+	@Deprecated
 	public FreightCapacity getFreightCapacity();
 	
 	public void setSeats(Integer seats);
 	
 	public void setStandingRoom(Integer standingRoom);
 	
+	/**
+	* @deprecated FreightCapacity functionality is now part of VehicleCapacity, kmt Jul19
+	 * */
+	@Deprecated
 	public void setFreightCapacity(FreightCapacity freightCapacity);
+
+	public double getVolumeInCubicMeters();
+
+	public void setVolumeInCubicMeters(double volumeInCubicMeters);
+
+	public double getWeightInTons();
+
+	public void setWeightInTons(double weightInTons);
+
 }

@@ -111,7 +111,7 @@ class VehicleReaderV2 extends MatsimXmlParser{
 //				this.currentFreightCapacity.setVolume( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.CUBICMETERS ) ) );
 //				break;
 //			case VehicleSchemaV2Names.WEIGHT:
-//				this.currentFreightCapacity.setWeight( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.TONS ) ) );
+//				this.currentFreightCapacity.setWeightInTons( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.TONS ) ) );
 //				break;
 			case VehicleSchemaV2Names.COSTINFORMATION:
 				double fixedCostsPerDay = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.FIXEDCOSTSPERDAY ) );

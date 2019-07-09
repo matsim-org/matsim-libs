@@ -68,8 +68,8 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 		assertNotNull(vehTypeNormalCar.getCapacity());
 		assertEquals(Integer.valueOf(5), vehTypeNormalCar.getCapacity().getSeats());
 		assertEquals(Integer.valueOf(20), vehTypeNormalCar.getCapacity().getStandingRoom());
-		assertEquals(23.23, vehTypeNormalCar.getCapacity().getVolume(), EPSILON);
-		assertEquals(9.5, vehTypeNormalCar.getCapacity()getWeight(), EPSILON);
+		assertEquals(23.23, vehTypeNormalCar.getCapacity().getVolumeInCubicMeters(), EPSILON);
+		assertEquals(9.5, vehTypeNormalCar.getCapacity().getWeightInTons(), EPSILON);
 		assertEquals(200.0, VehicleUtils.getFreightCapacityUnits(vehTypeNormalCar.getCapacity()), EPSILON);
 
 		assertNotNull(vehTypeNormalCar.getCostInformation());

@@ -83,8 +83,8 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 		assertNotNull(vehTypeNormalCar.getCapacity());
 		assertEquals(Integer.valueOf(5), vehTypeNormalCar.getCapacity().getSeats());
 		assertEquals(Integer.valueOf(20), vehTypeNormalCar.getCapacity().getStandingRoom());
-		assertEquals(23.23, vehTypeNormalCar.getCapacity().getVolume(), EPSILON);
-		assertEquals(9.5, vehTypeNormalCar.getCapacity()getWeight(), EPSILON);
+		assertEquals(23.23, vehTypeNormalCar.getCapacity().getVolumeInCubicMeters(), EPSILON);
+		assertEquals(9.5, vehTypeNormalCar.getCapacity().getWeightInTons(), EPSILON);
 		assertEquals(200.0, VehicleUtils.getFreightCapacityUnits(vehTypeNormalCar.getCapacity()), EPSILON);
 
 		assertNotNull(vehTypeNormalCar.getCostInformation());
@@ -145,22 +145,22 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 
 	@Test
 	public void test_NumberOfVehiclesIsReadCorrectly() {
-		assertNotNull(vehicles2);
-		assertEquals(3, vehicles2.size());
+		assertNotNull(vehicles);
+		assertEquals(3, vehicles.size());
 	}
 
 	@Test
 	public void test_VehicleTypeToVehiclesAssignmentIsReadCorrectly(){
-		assertNotNull(vehicles2.get(id23));
-		assertEquals(id23, vehicles2.get(id23).getId());
-		assertEquals(Id.create("normal&Car", VehicleType.class), vehicles2.get(id23).getType().getId());
+		assertNotNull(vehicles.get(id23));
+		assertEquals(id23, vehicles.get(id23).getId());
+		assertEquals(Id.create("normal&Car", VehicleType.class), vehicles.get(id23).getType().getId());
 
-		assertNotNull(vehicles2.get(id42));
-		assertEquals(id42, vehicles2.get(id42).getId());
-		assertEquals(Id.create("defaultValue>Car", VehicleType.class), vehicles2.get(id42).getType().getId());
+		assertNotNull(vehicles.get(id42));
+		assertEquals(id42, vehicles.get(id42).getId());
+		assertEquals(Id.create("defaultValue>Car", VehicleType.class), vehicles.get(id42).getType().getId());
 
-		assertNotNull(vehicles2.get(id42_23));
-		assertEquals(id42_23, vehicles2.get(id42_23).getId());
+		assertNotNull(vehicles.get(id42_23));
+		assertEquals(id42_23, vehicles.get(id42_23).getId());
 	}
 
 }

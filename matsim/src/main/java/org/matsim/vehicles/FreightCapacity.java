@@ -21,18 +21,46 @@ package org.matsim.vehicles;
 
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
+/**
+ * @deprecated FreightCapacity functionality is now part of VehicleCapacity, kmt Jul19
+ * */
+@Deprecated
 public interface FreightCapacity extends Attributable {
-	
+
+	/**
+	 * @deprecated FreightCapacity functionality is now part of VehicleCapacity, kmt Jul19
+	 * */
+	@Deprecated
 	public double getVolume();
 
+	/**
+	 * @deprecated FreightCapacity functionality is now part of VehicleCapacity, kmt Jul19
+	 * */
+	@Deprecated
 	public void setVolume(double cubicMeters);
 
+	/**
+	 * @deprecated FreightCapacity functionality is now part of VehicleCapacity, kmt Jul19
+	 * */
+	@Deprecated
 	public double getWeight();
 
+	/**
+	 * @deprecated FreightCapacity functionality is now part of VehicleCapacity, kmt Jul19
+	 * */
+	@Deprecated
 	public void setWeight(double tons);
 
+	/**
+	 * @deprecated FreightCapacity functionality is now part of VehicleCapacity, kmt Jul19
+	 * */
+	@Deprecated
 	public int getUnits();
 
+	/**
+	 * @deprecated FreightCapacity functionality is now part of VehicleCapacity, kmt Jul19
+	 * */
+	@Deprecated
 	public void setUnits(int units);
 
 	double UNDEFINED_VOLUME =  Double.POSITIVE_INFINITY ;

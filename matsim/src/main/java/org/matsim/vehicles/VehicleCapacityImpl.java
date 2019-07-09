@@ -29,6 +29,8 @@ public class VehicleCapacityImpl implements VehicleCapacity {
 
 	private Integer seats = null;
 	private Integer standingRoom = null;
+	private Double volumeInCubicMeters = null;
+	private Double weightInTons = null;
 	private FreightCapacity freightCap = null;
 	private Attributes attributes = new Attributes() ;
 
@@ -49,6 +51,7 @@ public class VehicleCapacityImpl implements VehicleCapacity {
 		return standingRoom;
 	}
 
+
 	@Override
 	public void setFreightCapacity(FreightCapacity freightCapacity) {
 		this.freightCap = freightCapacity;
@@ -62,6 +65,26 @@ public class VehicleCapacityImpl implements VehicleCapacity {
 	@Override
 	public void setStandingRoom(Integer standingRoom) {
 		this.standingRoom = standingRoom;
+	}
+
+	@Override
+	public double getVolumeInCubicMeters() {
+		return volumeInCubicMeters;
+	}
+
+	@Override
+	public void setVolumeInCubicMeters(double volumeInCubicMeters) {
+		this.volumeInCubicMeters = volumeInCubicMeters;
+	}
+
+	@Override
+	public double getWeightInTons() {
+		return weightInTons;
+	}
+
+	@Override
+	public void setWeightInTons(double weightInTons) {
+		this.weightInTons = weightInTons;
 	}
 
 	@Override public Attributes getAttributes(){
