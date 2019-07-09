@@ -43,10 +43,10 @@ class VehicleReaderV2 extends MatsimXmlParser{
 				this.currentVehType.setEngineInformation( this.currentEngineInformation );
 				this.currentEngineInformation = null;
 				break;
-			case VehicleSchemaV2Names.FREIGHTCAPACITY:
-				this.currentCapacity.setFreightCapacity( this.currentFreightCapacity );
-				this.currentFreightCapacity = null;
-				break;
+//			case VehicleSchemaV2Names.FREIGHTCAPACITY:
+//				this.currentCapacity.setFreightCapacity( this.currentFreightCapacity );
+//				this.currentFreightCapacity = null;
+//				break;
 			case VehicleSchemaV2Names.CAPACITY:
 				this.currentVehType.setCapacity( this.currentCapacity );
 				this.currentCapacity = null;
@@ -92,10 +92,12 @@ class VehicleReaderV2 extends MatsimXmlParser{
 			case VehicleSchemaV2Names.CAPACITY:
 				this.currentCapacity = this.builder.createVehicleCapacity();
 				this.currentCapacity.setSeats( Integer.valueOf( atts.getValue( VehicleSchemaV2Names.SEATS ) ) );
-				this.currentCapacity.setStandingRoom( Integer.valueOf( atts.getValue( VehicleSchemaV2Names.STANDINGROOM ) ) );
-				this.currentCapacity.setWeightInTons( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.WEIGHT ) ) ) ;
+				//TODO: throws null pointer exception -> why???
+//				this.currentCapacity.setStandingRoom( Integer.valueOf( atts.getValue( VehicleSchemaV2Names.STANDINGROOM ) ) );
+//				//TODO: throws null pointer exception -> why???
+//				this.currentCapacity.setWeightInTons( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.WEIGHT ) ) ) ;
 				this.currentCapacity.setVolumeInCubicMeters( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.VOLUME ) ) );
-				this.currAttributes = this.currentCapacity.getAttributes() ;
+//				this.currAttributes = this.currentCapacity.getAttributes() ;
 				break;
 //			case VehicleSchemaV2Names.SEATS:
 //				this.currentCapacity.setSeats( Integer.valueOf( atts.getValue( VehicleSchemaV2Names.PERSONS ) ) );
