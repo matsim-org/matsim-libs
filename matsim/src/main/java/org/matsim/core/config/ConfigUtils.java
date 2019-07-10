@@ -101,7 +101,7 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 		return applyCommandline( config, typedArgs );
 	}
 
-	private static Config applyCommandline( Config config, String[] typedArgs ){
+	public static Config applyCommandline( Config config, String[] typedArgs ){
 		try{
 			CommandLine.Builder bld = new CommandLine.Builder( typedArgs ) ;
 			bld.allowAnyOption( true  );
