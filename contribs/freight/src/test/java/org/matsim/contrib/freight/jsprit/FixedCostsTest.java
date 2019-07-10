@@ -170,18 +170,18 @@ public class FixedCostsTest extends MatsimTestCase {
         }
     }
 
-//    @Test
-//    public final void test_carrier1CostsAreCorrectly() {
-//        //carrier1: only vehicles of Type A (no fixed costs, variable costs: 1 EUR/km)
-//           // nearby sercice1: 8km -> 8 EUR; service2: 36km -> 36 EUR  --> total 44EUR -> score = -44
-//        assertEquals(-44, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier1", Carrier.class)).getSelectedPlan().getScore(), EPSILON);
-//    }
+    @Test
+    public final void test_carrier1CostsAreCorrectly() {
+        //carrier1: only vehicles of Type A (no fixed costs, variable costs: 1 EUR/km)
+           // nearby sercice1: 8km -> 8 EUR; service2: 36km -> 36 EUR  --> total 44EUR -> score = -44
+        assertEquals(-44, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier1", Carrier.class)).getSelectedPlan().getScore(), EPSILON);
+    }
 
-//    @Test
-//    public final void test_carrier2CostsAreCorrectly() {
-//        //carrier2: only vehicles of Type B (fixed costs of 10 EUR/verhicle, no variable costs)
-//        assertEquals(-20.44, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier2", Carrier.class)).getSelectedPlan().getScore(), EPSILON);
-//    }
+    @Test
+    public final void test_carrier2CostsAreCorrectly() {
+        //carrier2: only vehicles of Type B (fixed costs of 10 EUR/verhicle, no variable costs)
+        assertEquals(-20.44, carriersPlannedAndRouted.getCarriers().get(Id.create("carrier2", Carrier.class)).getSelectedPlan().getScore(), EPSILON);
+    }
 
     @Test
     public final void test_carrier3CostsAreCorrectly() {
