@@ -825,17 +825,18 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		 * {@value TYPICAL_DURATION_CMT}
 		 */
 		@StringSetter(TYPICAL_DURATION)
-		private void setTypicalDuration(final String typicalDuration) {
+		private ActivityParams setTypicalDuration(final String typicalDuration) {
 			testForLocked();
-			setTypicalDuration(Time.parseTime(typicalDuration));
+			return setTypicalDuration(Time.parseTime(typicalDuration));
 		}
 
 		/**
 		 * {@value TYPICAL_DURATION_CMT}
 		 */
-		public void setTypicalDuration(final double typicalDuration) {
+		public ActivityParams setTypicalDuration(final double typicalDuration) {
 			testForLocked();
 			this.typicalDuration = typicalDuration;
+			return this ;
 		}
 
 		// --- activity type:
@@ -906,9 +907,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter(TYPICAL_DURATION_SCORE_COMPUTATION)
-		public void setTypicalDurationScoreComputation(TypicalDurationScoreComputation str) {
+		public ActivityParams setTypicalDurationScoreComputation(TypicalDurationScoreComputation str) {
 			testForLocked();
 			this.typicalDurationScoreComputation = str;
+			return this ;
 		}
 
 		@StringGetter("priority")
