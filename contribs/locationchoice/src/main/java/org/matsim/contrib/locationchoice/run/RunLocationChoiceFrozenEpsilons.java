@@ -20,22 +20,19 @@
  *  * ***********************************************************************
  */
 
-package org.matsim.contrib.locationchoice;
+package org.matsim.contrib.locationchoice.run;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.locationchoice.frozenepsilons.BestReplyLocationChoicePlanStrategy;
-import org.matsim.contrib.locationchoice.frozenepsilons.DCScoringFunctionFactory;
-import org.matsim.contrib.locationchoice.frozenepsilons.DestinationChoiceContext;
+import org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastes;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.Collection;
 
-public class RunLocationChoiceFrozenEpsilons {
+class RunLocationChoiceFrozenEpsilons {
 	private static final String MY_LOCATION_CHOICE = "MyLocationChoice";
 	
 	public static void main(String[] args) {
@@ -59,25 +56,13 @@ public class RunLocationChoiceFrozenEpsilons {
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		final DestinationChoiceContext lcContext = new DestinationChoiceContext(scenario) ;
-		scenario.addScenarioElement(DestinationChoiceContext.ELEMENT_NAME, lcContext);
-
 		// ---
 
 		Controler controler = new Controler(scenario);
 
 		// ---
 
-		DCScoringFunctionFactory scoringFunctionFactory = new DCScoringFunctionFactory(scenario, lcContext);
-		scoringFunctionFactory.setUsingConfigParamsForScoring(true) ;
-		controler.setScoringFunctionFactory(scoringFunctionFactory);
-
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				addPlanStrategyBinding(MY_LOCATION_CHOICE).to( BestReplyLocationChoicePlanStrategy.class );
-			}
-		});
+		FrozenTastes.configure( controler );
 
 		// ---
 

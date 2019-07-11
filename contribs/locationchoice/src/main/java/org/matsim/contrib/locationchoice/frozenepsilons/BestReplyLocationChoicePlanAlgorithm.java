@@ -24,17 +24,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.frozenepsilons.DestinationChoiceContext.ActivityFacilityWithIndex;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
-import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
+//import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ScaleEpsilon;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
@@ -51,11 +50,12 @@ import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
+	private static final Logger log = Logger.getLogger( BestReplyLocationChoicePlanAlgorithm.class ) ;
 	
 	private final ActivityFacilities facilities;
 	private final ObjectAttributes personsMaxDCScoreUnscaled;
 	private final ScaleEpsilon scaleEpsilon;
-	private final ActTypeConverter actTypeConverter;
+//	private final ActTypeConverter actTypeConverter;
 	private final DestinationSampler sampler;
 	private final DestinationChoiceContext lcContext;
 	private final MultiNodeDijkstra forwardMultiNodeDijkstra;
@@ -67,7 +67,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	private final Map<String, Double> beelineDistanceFactors;
 	private TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType;
 	private final TripRouter tripRouter;
-	private final DestinationChoiceConfigGroup dccg;
+	private final FrozenTastesConfigGroup dccg;
 	private final Scenario scenario;
 
 	public BestReplyLocationChoicePlanAlgorithm(
@@ -79,7 +79,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		this.facilities = lcContext.getScenario().getActivityFacilities();
 		this.personsMaxDCScoreUnscaled = personsMaxDCScoreUnscaled;
 		this.scaleEpsilon = lcContext.getScaleEpsilon();
-		this.actTypeConverter = lcContext.getConverter();
+//		this.actTypeConverter = lcContext.getConverter();
 		this.sampler = sampler;
 		this.lcContext = lcContext;
 		this.forwardMultiNodeDijkstra = forwardMultiNodeDijkstra;
@@ -96,7 +96,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		this.tripRouter = tripRouter;
 
 		scenario = this.lcContext.getScenario();
-		this.dccg = ConfigUtils.addOrGetModule( scenario.getConfig(), DestinationChoiceConfigGroup.class ) ;
+		this.dccg = ConfigUtils.addOrGetModule( scenario.getConfig(), FrozenTastesConfigGroup.class ) ;
 	}
 
 	@Override
@@ -126,14 +126,25 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 
 					List<? extends PlanElement> actslegs = plan.getPlanElements();
 					final Activity actToMove = (Activity) pe;
-					final Activity actPre = (Activity) actslegs.get(actlegIndex - 2);
+					final PlanElement prevAct = actslegs.get( actlegIndex - 2 );
+					if ( ! ( prevAct instanceof Activity ) ) {
+						log.warn("") ;
+						log.warn( "prevAct is not an activity; agentId=" + plan.getPerson().getId() ) ;
+						log.warn( "prevAct=" + prevAct ) ;
+						log.warn("") ;
+						for( PlanElement planElement : plan.getPlanElements() ){
+							log.warn( planElement ) ;
+						}
+						log.warn("") ;
+					}
+					final Activity actPre = (Activity) prevAct;
 
 					final Activity actPost = (Activity) actslegs.get(actlegIndex + 2);
 					final Coord coordPre = PopulationUtils.decideOnCoordForActivity( actPre, scenario ) ;
 					final Coord coordPost = PopulationUtils.decideOnCoordForActivity( actPost, scenario ) ;
 					double distanceDirect = CoordUtils.calcEuclideanDistance( coordPre, coordPost );
-					double maximumDistance = this.convertEpsilonIntoDistance(plan.getPerson(), 
-							this.actTypeConverter.convertType(actToMove.getType()));
+					double maximumDistance = this.convertEpsilonIntoDistance(plan.getPerson(),
+						  actToMove.getType() );
 
 					double maxRadius = (distanceDirect +  maximumDistance) / 2.0;
 
@@ -158,12 +169,12 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	}
 
 	private ChoiceSet createChoiceSetFromCircle(Plan plan, int personIndex,
-			final ApproximationLevel travelTimeApproximationLevel,
+			final FrozenTastesConfigGroup.ApproximationLevel travelTimeApproximationLevel,
 			final Activity actToMove, double maxRadius, Coord center) {
 
 		ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, scenario );
 
-		final String convertedType = this.actTypeConverter.convertType(actToMove.getType());
+		final String convertedType = actToMove.getType();
 		Gbl.assertNotNull(convertedType);
 		final QuadTree<ActivityFacilityWithIndex> quadTree = this.quadTreesOfType.get( convertedType );
 		Gbl.assertNotNull( quadTree );

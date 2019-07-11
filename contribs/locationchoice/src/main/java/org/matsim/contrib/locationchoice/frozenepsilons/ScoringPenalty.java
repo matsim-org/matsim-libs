@@ -17,42 +17,43 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice.utils;
+package org.matsim.contrib.locationchoice.frozenepsilons;
 
-import gnu.trove.map.TObjectDoubleMap;
-import gnu.trove.map.hash.TObjectDoubleHashMap;
 
-import java.util.Set;
+//import org.apache.log4j.Logger;
 
- public class ScaleEpsilon {
-	 // this functionality would probably better sit in the config
 
-	private TObjectDoubleMap<String> epsilonFactors = new TObjectDoubleHashMap<>();
-	private final boolean useSimpleTypes = false; // demand v1: e.g., s0.5, ... s24.0 = s
-	
-	public double getEpsilonFactor(String actType) {
-		if (this.useSimpleTypes) actType = actType.substring(0, 1);
-		return this.epsilonFactors.get(actType);
+class ScoringPenalty {
+
+	private double startTime = 0;
+	private double endTime = 0;
+	private FacilityPenalty facilityPenalty = null;
+	private double score = 0.0;
+
+	//private static final Logger log = Logger.getLogger(Penalty.class);
+
+	public ScoringPenalty(double startTime, double endTime, FacilityPenalty facilityPenalty, double score) {
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.facilityPenalty = facilityPenalty;
+		this.score = score;
 	}
-	
-	public void setEpsilonFactor(String actType, double factor) {
-		this.epsilonFactors.put(actType, factor);
+
+
+	public double getScore() {
+		return score;
 	}
-	
-//	public void setUseSimpleTypes(boolean useSimpleTypes) {
-//		this.useSimpleTypes = useSimpleTypes;
-//	}
-	
-	public boolean isFlexibleType(String actType) {
-		if (this.useSimpleTypes) actType = actType.substring(0, 1);
-		return this.epsilonFactors.containsKey(actType);
+	public void setScore(double score) {
+		this.score = score;
 	}
-	
-//	public int getNumberOfFlexibleTypes() {
-//		return this.epsilonFactors.size();
-//	}
-	
-	public Set<String> getFlexibleTypes() {
-		return this.epsilonFactors.keySet();
+
+	public double getPenalty() {
+		
+		double penaltyFactor = 0.0;
+		if (this.facilityPenalty != null) {
+			this.facilityPenalty.finish(); // is this still needed? we have a call in EventsToFacilityLoad
+			penaltyFactor = this.facilityPenalty.getCapacityPenaltyFactor(startTime, endTime);
+		}
+		return this.score * penaltyFactor;
 	}
 }

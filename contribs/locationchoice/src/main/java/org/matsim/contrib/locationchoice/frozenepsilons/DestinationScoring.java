@@ -27,8 +27,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.EpsilonDistributionTypes;
 import org.matsim.contrib.locationchoice.utils.ScaleEpsilon;
 import org.matsim.core.config.Config;
 import org.matsim.facilities.ActivityFacility;
@@ -40,7 +38,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 	//As the random number generator is re-seeded here anyway, we do not need a rng given from outside!
 	private Random rnd = new Random();
 	private Config config;
-	private DestinationChoiceConfigGroup dccg;
+	private FrozenTastesConfigGroup dccg;
 	private double[] facilitiesKValuesArray;
 	private double[] personsKValuesArray;
 	private ScaleEpsilon scaleEpsilon;
@@ -48,7 +46,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 		
 	public DestinationScoring(DestinationChoiceContext lcContext) {
 		this.config = lcContext.getScenario().getConfig();
-		this.dccg = (DestinationChoiceConfigGroup) this.config.getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+		this.dccg = (FrozenTastesConfigGroup) this.config.getModule( FrozenTastesConfigGroup.GROUP_NAME );
 		this.facilitiesKValuesArray = lcContext.getFacilitiesKValuesArray();
 		this.personsKValuesArray = lcContext.getPersonsKValuesArray();
 		this.scaleEpsilon = lcContext.getScaleEpsilon();
@@ -122,7 +120,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 		/*
 		 * generate the epsilons according to standard Gumbel or standard Gaussian distribution
 		 */
-		if (this.dccg.getEpsilonDistribution() == EpsilonDistributionTypes.gumbel) {
+		if (this.dccg.getEpsilonDistribution() == FrozenTastesConfigGroup.EpsilonDistributionTypes.gumbel) {
 			// take a few draws to come to the "chaotic region"
 			for (int i = 0; i < 5; i++) {
 				rnd.nextDouble();
