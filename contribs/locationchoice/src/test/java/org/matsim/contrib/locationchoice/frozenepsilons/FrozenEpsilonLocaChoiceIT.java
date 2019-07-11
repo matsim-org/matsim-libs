@@ -18,6 +18,7 @@ import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
@@ -53,6 +54,7 @@ import static org.junit.Assert.*;
 import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.Algotype.bestResponse;
 import static org.matsim.contrib.locationchoice.LocationChoiceIT.localCreatePopWOnePerson;
 import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.*;
+import static org.matsim.core.config.groups.StrategyConfigGroup.*;
 
 public class FrozenEpsilonLocaChoiceIT{
 	private static final Logger log = Logger.getLogger( FrozenEpsilonLocaChoiceIT.class ) ;
@@ -219,41 +221,21 @@ public class FrozenEpsilonLocaChoiceIT{
 				throw new RuntimeException( Gbl.NOT_IMPLEMENTED) ;
 		}
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );
-		{
-			PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams( "home" ) ;
-			params.setTypicalDuration( 12.*3600. );
-			config.planCalcScore().addActivityParams( params );
-		}
-		{
-			PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams( "shop" ) ;
-			params.setTypicalDuration( 2.*3600. );
-			config.planCalcScore().addActivityParams( params );
-		}
-		{
-			StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings( ) ;
-			stratSets.setStrategyName( "MyLocationChoice" );
-			stratSets.setWeight( 1.0 );
-			stratSets.setDisableAfter( 10 );
-			config.strategy().addStrategySettings( stratSets );
-		}
+
+		config.planCalcScore().addActivityParams( new ActivityParams( "home" ).setTypicalDuration( 12.*3600. ) );
+		config.planCalcScore().addActivityParams( new ActivityParams( "shop" ).setTypicalDuration( 2.*3600. ) );
+
+		config.strategy().addStrategySettings( new StrategySettings( ).setStrategyName( FrozenTastes.LOCATION_CHOICE_PLAN_STRATEGY ).setWeight( 1.0 ).setDisableAfter( 10 ) );
+
 		switch ( runType ){
 			case shortRun:
 				break;
 			case medRun:
-			case longRun:{
-				StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
-				stratSets.setStrategyName( "MyLocationChoice" );
-				stratSets.setWeight( 0.1 );
-				config.strategy().addStrategySettings( stratSets );
-			}
-			{
-				StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
-				stratSets.setStrategyName( DefaultSelector.ChangeExpBeta );
-				stratSets.setWeight( 1.0 );
-				config.strategy().addStrategySettings( stratSets );
-			}
-			config.strategy().setFractionOfIterationsToDisableInnovation( 0.8 );
-			config.planCalcScore().setFractionOfIterationsToStartScoreMSA( 0.8 );
+			case longRun:
+				config.strategy().addStrategySettings( new StrategySettings().setStrategyName( FrozenTastes.LOCATION_CHOICE_PLAN_STRATEGY ).setWeight( 0.1 ) );
+				config.strategy().addStrategySettings( new StrategySettings().setStrategyName( DefaultSelector.ChangeExpBeta ).setWeight( 1.0 ) );
+				config.strategy().setFractionOfIterationsToDisableInnovation( 0.8 );
+				config.planCalcScore().setFractionOfIterationsToStartScoreMSA( 0.8 );
 			break ;
 			default:
 				throw new RuntimeException( Gbl.NOT_IMPLEMENTED ) ;
@@ -280,9 +262,6 @@ public class FrozenEpsilonLocaChoiceIT{
 		// using LCPlans does not, or no longer, work (throws a null pointer exception).  kai, mar'19
 
 		// ---
-
-		//		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-		// (this will not load anything since there are no files defined)
 
 		Scenario scenario = ScenarioUtils.createScenario( config ) ;
 		// don't load anything
@@ -350,17 +329,9 @@ public class FrozenEpsilonLocaChoiceIT{
 			}
 		}
 
-//		final DestinationChoiceContext lcContext = new DestinationChoiceContext(scenario) ;
-//		scenario.addScenarioElement(DestinationChoiceContext.ELEMENT_NAME, lcContext);
-
 		// CONTROL(L)ER:
 		Controler controler = new Controler(scenario);
 		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
-
-		// set scoring function
-//		DCScoringFunctionFactory scoringFunctionFactory = new DCScoringFunctionFactory(controler.getScenario(), lcContext);
-//		scoringFunctionFactory.setUsingConfigParamsForScoring(true) ;
-//		controler.setScoringFunctionFactory(scoringFunctionFactory);
 
 		FrozenTastes.configure( controler );
 
@@ -368,7 +339,6 @@ public class FrozenEpsilonLocaChoiceIT{
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-//				addPlanStrategyBinding("MyLocationChoice").to( BestReplyLocationChoicePlanStrategy.class );
 				addControlerListenerBinding().to( KaiAnalysisListener.class ).in( Singleton.class ) ;
 			}
 		});
@@ -530,17 +500,17 @@ public class FrozenEpsilonLocaChoiceIT{
 		dccg.setAlgorithm( Algotype.random );
 		dccg.setFlexibleTypes("work" );
 
-		PlanCalcScoreConfigGroup.ActivityParams home = new PlanCalcScoreConfigGroup.ActivityParams("home");
+		ActivityParams home = new ActivityParams("home");
 		home.setTypicalDuration(12*60*60);
 		config.planCalcScore().addActivityParams(home);
-		PlanCalcScoreConfigGroup.ActivityParams work = new PlanCalcScoreConfigGroup.ActivityParams("work");
+		ActivityParams work = new ActivityParams("work");
 		work.setTypicalDuration(12*60*60);
 		config.planCalcScore().addActivityParams(work);
-		PlanCalcScoreConfigGroup.ActivityParams shop = new PlanCalcScoreConfigGroup.ActivityParams("shop");
+		ActivityParams shop = new ActivityParams("shop");
 		shop.setTypicalDuration(1.*60*60);
 		config.planCalcScore().addActivityParams(shop);
 
-		final StrategyConfigGroup.StrategySettings strategySettings = new StrategyConfigGroup.StrategySettings(Id.create("1", StrategyConfigGroup.StrategySettings.class ));
+		final StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class ));
 		strategySettings.setStrategyName("MyLocationChoice");
 		strategySettings.setWeight(1.0);
 		config.strategy().addStrategySettings(strategySettings);
