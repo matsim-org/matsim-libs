@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -49,6 +50,7 @@ import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
+	private static final Logger log = Logger.getLogger( BestReplyLocationChoicePlanAlgorithm.class ) ;
 	
 	private final ActivityFacilities facilities;
 	private final ObjectAttributes personsMaxDCScoreUnscaled;
@@ -124,7 +126,18 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 
 					List<? extends PlanElement> actslegs = plan.getPlanElements();
 					final Activity actToMove = (Activity) pe;
-					final Activity actPre = (Activity) actslegs.get(actlegIndex - 2);
+					final PlanElement prevAct = actslegs.get( actlegIndex - 2 );
+					if ( ! ( prevAct instanceof Activity ) ) {
+						log.warn("") ;
+						log.warn( "prevAct is not an activity; agentId=" + plan.getPerson().getId() ) ;
+						log.warn( "prevAct=" + prevAct ) ;
+						log.warn("") ;
+						for( PlanElement planElement : plan.getPlanElements() ){
+							log.warn( planElement ) ;
+						}
+						log.warn("") ;
+					}
+					final Activity actPre = (Activity) prevAct;
 
 					final Activity actPost = (Activity) actslegs.get(actlegIndex + 2);
 					final Coord coordPre = PopulationUtils.decideOnCoordForActivity( actPre, scenario ) ;
