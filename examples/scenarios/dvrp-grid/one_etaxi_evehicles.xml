@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<!DOCTYPE vehicles SYSTEM "http://matsim.org/files/dtd/electric_vehicles_v1.dtd">
+
+<vehicles>
+	<vehicle id="taxi_one" battery_capacity="20" initial_soc="16.0"/>
+</vehicles>

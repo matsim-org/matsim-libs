@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.etaxi.run;
 
+import java.net.URL;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
@@ -46,8 +48,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class RunETaxiScenario {
-	public static void run(String configFile, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configFile,
+	public static void run(URL configUrl, boolean otfvis) {
+		Config config = ConfigUtils.loadConfig(configUrl,
 				new TaxiConfigGroup(ETaxiOptimizerProvider::createParameterSet), new DvrpConfigGroup(),
 				new OTFVisConfigGroup(), new EvConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
@@ -90,12 +92,5 @@ public class RunETaxiScenario {
 		}
 
 		return controler;
-	}
-
-	public static void main(String[] args) {
-		// String configFile = "./src/main/resources/one_etaxi/one_etaxi_config.xml";
-		// String configFile =
-		// "../../shared-svn/projects/maciejewski/Mielec/2014_02_base_scenario/mielec_etaxi_config.xml";
-		RunETaxiScenario.run("mielec_2014_02/mielec_etaxi_config.xml", false);
 	}
 }

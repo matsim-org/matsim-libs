@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.taxi.optimizer.zonal;
 
+import java.net.URL;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.taxi.optimizer.rules.IdleTaxiZonalRegistry;
@@ -36,21 +38,21 @@ import org.matsim.core.router.util.TravelTime;
 public class ZonalTaxiOptimizer extends RuleBasedTaxiOptimizer {
 	public static ZonalTaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
 			TaxiScheduler scheduler, Network network, MobsimTimer timer, TravelTime travelTime,
-			TravelDisutility travelDisutility) {
+			TravelDisutility travelDisutility, URL context) {
 		double cellSize = ((ZonalTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()).getRuleBasedTaxiOptimizerParams()
 				.getCellSize();
 		return create(eventsManager, taxiCfg, fleet, scheduler, network, timer, travelTime, travelDisutility,
-				new SquareGridSystem(network, cellSize));
+				new SquareGridSystem(network, cellSize), context);
 	}
 
 	public static ZonalTaxiOptimizer create(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
 			TaxiScheduler scheduler, Network network, MobsimTimer timer, TravelTime travelTime,
-			TravelDisutility travelDisutility, ZonalSystem zonalSystem) {
+			TravelDisutility travelDisutility, ZonalSystem zonalSystem, URL context) {
 		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem, scheduler);
 		UnplannedRequestZonalRegistry unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zonalSystem);
 		ZonalRequestInserter requestInserter = new ZonalRequestInserter(fleet, scheduler, timer, network, travelTime,
 				travelDisutility, ((ZonalTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams()), idleTaxiRegistry,
-				unplannedRequestRegistry);
+				unplannedRequestRegistry, context);
 		return new ZonalTaxiOptimizer(eventsManager, taxiCfg, fleet, scheduler, idleTaxiRegistry,
 				unplannedRequestRegistry, requestInserter);
 	}

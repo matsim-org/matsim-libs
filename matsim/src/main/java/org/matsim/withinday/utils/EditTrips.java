@@ -1,4 +1,25 @@
-/**
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * EditTrips.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ /**
  * 
  */
 package org.matsim.withinday.utils;
@@ -32,7 +53,6 @@ import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
@@ -66,7 +86,10 @@ public final class EditTrips {
 	private EventsManager eventsManager;
 
 	public EditTrips( QSim qsim, TripRouter tripRouter, Scenario scenario ) {
-		log.setLevel( Level.DEBUG);
+//		For other log level, find log4j.xml and add something like
+//<logger name="org.matsim.withinday.utils.EditTrips">
+//	<level value="info"/>
+//</logger>
 		this.tripRouter = tripRouter;
 		this.scenario = scenario;
 		this.pf = scenario.getPopulation().getFactory() ;
@@ -164,7 +187,7 @@ public final class EditTrips {
 		List<? extends PlanElement> newTripElements = newTripToNewActivity(currentLocationFacility, newAct, mainMode, now, person );
 
 		// (2) there should be no access leg even with access/egress routing
-		Gbl.assertIf( ! ((Leg)newTripElements.get(1)).getMode().equals( TransportMode.access_walk ) );
+		Gbl.assertIf( ! ((Leg)newTripElements.get(1)).getMode().equals( TransportMode.non_network_walk ) );
 
 		// (3) modify current route within current leg:
 		replaceRemainderOfCurrentRoute(currentLeg, newTripElements, agent);
@@ -563,7 +586,7 @@ public final class EditTrips {
 			newPlanElementsAfterMerge.add(act);
 			// new currentLeg is otherwise not added (but replaced by the modified old
 			// currentLeg)
-			if (newCurrentLeg.getMode().equals(TransportMode.access_walk)) {
+			if (newCurrentLeg.getMode().equals(TransportMode.non_network_walk )) {
 				// The router did not know that we come from a pt leg, but walking to another
 				// TransitStopFacility should be a transit_walk and not an access_walk
 				newCurrentLeg.setMode(TransportMode.transit_walk);

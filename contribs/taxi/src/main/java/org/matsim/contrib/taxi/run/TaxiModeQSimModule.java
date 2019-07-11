@@ -28,7 +28,6 @@ import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.ModalProviders;
@@ -71,10 +70,6 @@ public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 
 		addModalComponent(TaxiOptimizer.class, new ModalProviders.AbstractProvider<TaxiOptimizer>(taxiCfg.getMode()) {
 			@Inject
-			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
-			private Network network;
-
-			@Inject
 			private MobsimTimer timer;
 
 			@Inject
@@ -87,21 +82,17 @@ public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 			@Override
 			public TaxiOptimizer get() {
 				Fleet fleet = getModalInstance(Fleet.class);
+				Network network = getModalInstance(Network.class);
 				TaxiScheduler taxiScheduler = getModalInstance(TaxiScheduler.class);
 				TravelDisutility travelDisutility = getModalInstance(
 						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
 				return new DefaultTaxiOptimizerProvider(events, taxiCfg, fleet, network, timer, travelTime,
-						travelDisutility,
-						taxiScheduler).get();
+						travelDisutility, taxiScheduler, getConfig().getContext()).get();
 			}
 		});
 
 		bindModal(TaxiScheduler.class).toProvider(
 				new ModalProviders.AbstractProvider<TaxiScheduler>(taxiCfg.getMode()) {
-					@Inject
-					@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
-					private Network network;
-
 					@Inject
 					private MobsimTimer timer;
 
@@ -112,6 +103,7 @@ public class TaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 					@Override
 					public TaxiScheduler get() {
 						Fleet fleet = getModalInstance(Fleet.class);
+						Network network = getModalInstance(Network.class);
 						TravelDisutility travelDisutility = getModalInstance(
 								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
 						return new TaxiScheduler(taxiCfg, fleet, network, timer, travelTime, travelDisutility);
