@@ -213,8 +213,12 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	private void setLocationOfActivityToFacilityId( Activity act2, Id<ActivityFacility> facilityId ) {
 		act2.setFacilityId( facilityId );
 		ActivityFacility facility = this.facilities.getFacilities().get(facilityId);
-		act2.setLinkId( FacilitiesUtils.decideOnLink( facility, scenario.getNetwork() ).getId() );
-		act2.setCoord( facility.getCoord() );
+		if ( facility != null ){
+			// (null can happen when the activity initially was located without a facility, and it did not find an alternative facility in the choice
+			// set. kai, jul'19)
+			act2.setLinkId( FacilitiesUtils.decideOnLink( facility, scenario.getNetwork() ).getId() );
+			act2.setCoord( facility.getCoord() );
+		}
 	}
 
 	/**
