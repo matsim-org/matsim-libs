@@ -86,6 +86,10 @@ public final class EditTrips {
 	private EventsManager eventsManager;
 
 	public EditTrips( QSim qsim, TripRouter tripRouter, Scenario scenario ) {
+//		For other log level, find log4j.xml and add something like
+//<logger name="org.matsim.withinday.utils.EditTrips">
+//	<level value="info"/>
+//</logger>
 		this.tripRouter = tripRouter;
 		this.scenario = scenario;
 		this.pf = scenario.getPopulation().getFactory() ;
