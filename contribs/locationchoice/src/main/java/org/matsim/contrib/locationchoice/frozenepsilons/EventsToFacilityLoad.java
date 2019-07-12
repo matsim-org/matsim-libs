@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice.facilityload;
+package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import java.util.Iterator;
 import java.util.TreeMap;
@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
@@ -38,15 +37,12 @@ import org.matsim.facilities.ActivityOption;
  * @author anhorni
  * Uses FacilityPenalty to manage the facililities' loads by taking care of activity start and end events.
  */
-public class EventsToFacilityLoad implements ActivityStartEventHandler, ActivityEndEventHandler {
+class EventsToFacilityLoad implements ActivityStartEventHandler, ActivityEndEventHandler {
 
 	private TreeMap<Id, FacilityPenalty> facilityPenalties;
 	private final static Logger log = Logger.getLogger(EventsToFacilityLoad.class);
 
-	public EventsToFacilityLoad(final ActivityFacilities facilities, double scaleNumberOfPersons,
-			TreeMap<Id, FacilityPenalty> facilityPenalties, DestinationChoiceConfigGroup config) {
-		super();
-
+	EventsToFacilityLoad( final ActivityFacilities facilities, TreeMap<Id, FacilityPenalty> facilityPenalties, FrozenTastesConfigGroup config ) {
 		this.facilityPenalties = facilityPenalties;
 
 		log.info("facilities size: " + facilities.getFacilities().values().size());
@@ -67,7 +63,7 @@ public class EventsToFacilityLoad implements ActivityStartEventHandler, Activity
 					capacity = act.getCapacity();
 				}
 			}
-			this.facilityPenalties.put(f.getId(), new FacilityPenalty(capacity, scaleNumberOfPersons, config));
+			this.facilityPenalties.put(f.getId(), new FacilityPenalty(capacity, config) );
 		}
 		log.info("finished init");
 	}

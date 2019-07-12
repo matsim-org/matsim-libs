@@ -18,10 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice.facilityload;
+package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -44,14 +44,14 @@ import java.util.TreeMap;
  *
  * @author anhorni
  */
-public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimListener, AfterMobsimListener, IterationEndsListener {
+class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimListener, AfterMobsimListener, IterationEndsListener {
 
 	private EventsToFacilityLoad eventsToFacilityLoad = null;
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
 
 	//--------------------------------------------------------------------------------------------------
 
-	public FacilitiesLoadCalculator(TreeMap<Id, FacilityPenalty> facilityPenalties) {
+	FacilitiesLoadCalculator( TreeMap<Id, FacilityPenalty> facilityPenalties ) {
 		this.facilityPenalties = facilityPenalties;
 	}
 
@@ -59,18 +59,8 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 	@Override
 	public void notifyStartup(final StartupEvent event) {
 		MatsimServices controler = event.getServices();
-		/*
-		 * Scales the load of the facilities (for e.g. 10 % runs), assuming that only integers
-		 * can be used to scale a  x% scenario ((100 MOD x == 0) runs e.g. x=10%)
-		 */
-		DestinationChoiceConfigGroup dccg = (DestinationChoiceConfigGroup) controler.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
-		double scaleNumberOfPersons = dccg.getScaleFactor();
-        this.eventsToFacilityLoad = new EventsToFacilityLoad(
-        		controler.getScenario().getActivityFacilities(), 
-        		scaleNumberOfPersons,
-				this.facilityPenalties, 
-				((DestinationChoiceConfigGroup)controler.getConfig().getModule("locationchoice"))
-				);
+		FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule(controler.getConfig(), FrozenTastesConfigGroup.class ) ;
+		this.eventsToFacilityLoad = new EventsToFacilityLoad( controler.getScenario().getActivityFacilities(), this.facilityPenalties, dccg );
 		event.getServices().getEvents().addHandler(this.eventsToFacilityLoad);
 	}
 

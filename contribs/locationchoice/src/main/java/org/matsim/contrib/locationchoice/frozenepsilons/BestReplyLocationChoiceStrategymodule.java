@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.frozenepsilons.DestinationChoiceContext.ActivityFacilityWithIndex;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstraFactory;
@@ -55,9 +54,9 @@ import javax.inject.Provider;
  * Idea of this should be as follows: all persons and all facilities have k values.  frozen epsilon will be generated on the fly from those two values.  together with frozen
  * epsilon, the location choice is indeed best reply.
  */
-final class BestReplyLocationChoiceStrategyModule extends AbstractMultithreadedModule {
+final class BestReplyLocationChoiceStrategymodule extends AbstractMultithreadedModule {
 
-	private static final Logger log = Logger.getLogger( BestReplyLocationChoiceStrategyModule.class );
+	private static final Logger log = Logger.getLogger( BestReplyLocationChoiceStrategymodule.class );
 	private final Provider<TripRouter> tripRouterProvider;
 
 	private ObjectAttributes personsMaxEpsUnscaled;
@@ -76,7 +75,7 @@ final class BestReplyLocationChoiceStrategyModule extends AbstractMultithreadedM
 	private Map<String, TravelTime> travelTimes;
 	private Map<String, TravelDisutilityFactory> travelDisutilities;
 
-	public BestReplyLocationChoiceStrategyModule( Provider<TripRouter> tripRouterProvider, DestinationChoiceContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled,
+	public BestReplyLocationChoiceStrategymodule( Provider<TripRouter> tripRouterProvider, DestinationChoiceContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled,
 								    ScoringFunctionFactory scoringFunctionFactory, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilities ) {
 		super(lcContext.getScenario().getConfig().global());
 		this.tripRouterProvider = tripRouterProvider;
@@ -84,8 +83,8 @@ final class BestReplyLocationChoiceStrategyModule extends AbstractMultithreadedM
 		this.travelTimes = travelTimes;
 		this.travelDisutilities = travelDisutilities;
 
-		DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule( lcContext.getScenario().getConfig(), DestinationChoiceConfigGroup.class );
-		if (!DestinationChoiceConfigGroup.Algotype.bestResponse.equals( dccg.getAlgorithm() )) {
+		FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule( lcContext.getScenario().getConfig(), FrozenTastesConfigGroup.class );
+		if (!FrozenTastesConfigGroup.Algotype.bestResponse.equals( dccg.getAlgorithm() )) {
 			throw new RuntimeException("wrong class for selected location choice algorithm type; aborting ...") ;
 		}
 		this.lcContext = lcContext;
