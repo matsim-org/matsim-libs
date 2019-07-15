@@ -27,9 +27,9 @@ import java.util.concurrent.ForkJoinPool;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.util.PartialSort;
 import org.matsim.contrib.util.distance.DistanceUtils;
@@ -105,24 +105,20 @@ class DetourLinksProvider {
 		// TODO use more sophisticated DetourTimeEstimator
 		double optimisticBeelineSpeed = OPTIMISTIC_BEELINE_SPEED_COEFF * drtCfg.getEstimatedDrtSpeed()
 				/ drtCfg.getEstimatedBeelineDistanceFactor();
-		insertionFilter = new SingleVehicleInsertionFilter(//
-				new DetourTimesProvider(
-						(from, to) -> DistanceUtils.calculateDistance(from, to) / optimisticBeelineSpeed,
-						drtCfg.getStopDuration()), //
-				new InsertionCostCalculator(drtCfg, timer, penaltyCalculator));
+		insertionFilter = new SingleVehicleInsertionFilter(new DetourTimesProvider(
+				(from, to) -> DistanceUtils.calculateDistance(from, to) / optimisticBeelineSpeed,
+				drtCfg.getStopDuration()), new InsertionCostCalculator(drtCfg, timer, penaltyCalculator));
 	}
 
 	void findInsertionsAndLinks(ForkJoinPool forkJoinPool, Collection<Entry> vEntries) {
-		forkJoinPool.submit(() -> vEntries.parallelStream()//
-				.forEach(this::addDetourLinks))//
-				.join();
+		forkJoinPool.submit(() -> vEntries.parallelStream().forEach(this::addDetourLinks)).join();
 		processNearestInsertionsAtEnd();
 		detourLinksSet = new DetourLinksSet(linksToPickup, linksFromPickup, linksToDropoff, linksFromDropoff);
 	}
 
 	/**
 	 * Designed to be called in parallel for each vEntry in VehicleData.entries
-	 * 
+	 *
 	 * @param vEntry
 	 */
 	private void addDetourLinks(Entry vEntry) {

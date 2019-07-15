@@ -1,0 +1,114 @@
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * AbstractQNode.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.core.mobsim.qsim.qnetsimengine;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.matsim.api.core.v01.network.Node;
+
+/**
+ * {@link QNodeI} is the interface; this is an abstract class that contains implementation
+ * of non-traffic related "infrastructure", primarily (de)activation.
+ *
+ */
+
+abstract class AbstractQNode implements QNodeI {
+
+	// necessary if Nodes are (de)activated
+	private NetElementActivationRegistry activator = null;
+
+	/*
+	 * This needs to be atomic since this allows us to ensure that an node which is
+	 * already active is not activated again. This could happen if multiple thread call
+	 * activateNode() concurrently.
+	 * cdobler, sep'14
+	 */
+	private final AtomicBoolean active = new AtomicBoolean(false);
+
+	// for Customizable
+	private final Map<String, Object> customAttributes = new HashMap<>();
+	
+	final Node node;
+
+	
+	
+	AbstractQNode(final Node n){
+		this.node = n;
+	}
+	
+	
+	@Override
+	public Node getNode() {
+		return this.node;
+	}
+	
+	/**
+	 * The ParallelQSim replaces the activator with the QSimEngineRunner 
+	 * that handles this node.
+	 */
+	/*package*/ void setNetElementActivationRegistry(NetElementActivationRegistry activator) {
+		// yyyy I cannot say if this needs to be in QNodeI or not.  The mechanics of this are tricky to implement, so it would 
+		// not be a stable/robust API.  kai, jul'17
+		
+		this.activator = activator;
+	}
+	
+	/**
+	 * This method is called from QueueWithBuffer.addToBuffer(...) which is triggered at 
+	 * some placed, but always initially by a QLink's doSomStep(...) method. I.e. QNodes
+	 * are only activated while moveNodes(...) is performed. However, multiple threads
+	 * could try to activate the same node at a time, therefore this has to be thread-safe.
+	 * cdobler, sep'14 
+	 */
+	/*package*/ final void activateNode() {
+		// yyyy I cannot say if this needs to be in QNodeI or not.  The mechanics of this are tricky to implement, so it would 
+		// not be a stable/robust API.  kai, jul'17
+		
+		/*
+		 * this.active.compareAndSet(boolean expected, boolean update)
+		 * We expect the value to be false, i.e. the node is de-activated. If this is
+		 * true, the value is changed to true and the activator is informed.
+		 */
+		if (this.active.compareAndSet(false, true)) {
+			this.activator.registerNodeAsActive(this);
+		}
+	}
+	
+	final boolean isActive() {
+		// yyyy I cannot say if this needs to be in QNodeI or not.  The mechanics of this are tricky to implement, so it would 
+		// not be a stable/robust API.  kai, jul'17
+		
+		return this.active.get();
+	}
+	
+	void setActive(boolean active) {
+		this.active.set(active);
+	}
+
+	
+	@Override
+	public final Map<String, Object> getCustomAttributes() {
+		return customAttributes;
+	}
+}

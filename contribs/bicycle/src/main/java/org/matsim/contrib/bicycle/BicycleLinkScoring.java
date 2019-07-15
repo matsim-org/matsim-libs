@@ -40,12 +40,12 @@ import org.matsim.vehicles.Vehicle;
  * This link-based scoring should be used when true times spent on an individual link are relevant
  * and for the scoring of the interaction with motorized traffic.
  */
-class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring {
-	private static final Logger LOG = Logger.getLogger(BicycleLinkScoring.class);
-	
+class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring {	
+
 	private final ScoringParameters params;
-	
-	private Scenario scenario;
+	private final Scenario scenario;
+	private final BicycleConfigGroup bicycleConfigGroup;
+
 	private Vehicle2DriverEventHandler vehicle2Driver = new Vehicle2DriverEventHandler();
 	private Id<Link> previousLink;
 	private double previousLinkRelativePosition;
@@ -53,19 +53,12 @@ class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring {
 	private double score;
 	private int carCountOnLink;
 	
-	private final double marginalUtilityOfInfrastructure_m;
-	private final double marginalUtilityOfComfort_m;
-	private final double marginalUtilityOfGradient_m_100m;
-	
 	private static int ccc=0 ;
-	
-	BicycleLinkScoring( final ScoringParameters params, Scenario scenario, BicycleConfigGroup bicycleConfigGroup ) {
+
+	BicycleLinkScoring(ScoringParameters params, Scenario scenario, BicycleConfigGroup bicycleConfigGroup) {
 		this.params = params;
 		this.scenario = scenario;
-		
-		this.marginalUtilityOfInfrastructure_m = bicycleConfigGroup.getMarginalUtilityOfInfrastructure_m();
-		this.marginalUtilityOfComfort_m = bicycleConfigGroup.getMarginalUtilityOfComfort_m();
-		this.marginalUtilityOfGradient_m_100m = bicycleConfigGroup.getMarginalUtilityOfGradient_m_100m();
+		this.bicycleConfigGroup = bicycleConfigGroup;
 	}
 
 	@Override public void finish() {}
@@ -135,7 +128,9 @@ class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring {
 			// LOG.warn("----- link = " + linkId + " -- car score offset = " + carScoreOffset);
 			
 			double scoreOnLink = BicycleUtilityUtils.computeLinkBasedScore(scenario.getNetwork().getLinks().get(linkId),
-					marginalUtilityOfComfort_m, marginalUtilityOfInfrastructure_m, marginalUtilityOfGradient_m_100m);
+					bicycleConfigGroup.getMarginalUtilityOfComfort_m(),
+					bicycleConfigGroup.getMarginalUtilityOfInfrastructure_m(),
+					bicycleConfigGroup.getMarginalUtilityOfGradient_m_100m());
 			// LOG.warn("----- link = " + linkId + " -- scoreOnLink = " + scoreOnLink);
 			this.score += scoreOnLink;
 			
@@ -153,9 +148,9 @@ class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring {
 	// Copied and adapted from CharyparNagelLegScoring
 	private double computeTimeDistanceBasedScoreComponent( double travelTime, double dist ) {
 		double tmpScore = 0.0;
-		ModeUtilityParameters modeParams = this.params.modeParams.get("bicycle");
+		ModeUtilityParameters modeParams = this.params.modeParams.get(bicycleConfigGroup.getBicycleMode());
 		if (modeParams == null) {
-			throw new RuntimeException("no scoring parameters are defined for bicycle") ;
+			throw new RuntimeException("no scoring parameters are defined for " + bicycleConfigGroup.getBicycleMode()) ;
 		}
 		tmpScore += travelTime * modeParams.marginalUtilityOfTraveling_s;
 		if (modeParams.marginalUtilityOfDistance_m != 0.0 || modeParams.monetaryDistanceCostRate != 0.0) {

@@ -32,7 +32,7 @@
 		<param name="storageCapacityFactor" value="1.0"/>
 		<param name="stuckTime" value="10"/>
 		<param name="removeStuckVehicles" value="yes"/>
-		
+		<param name="simStarttimeInterpretation" value="onlyUseStarttime"/>
 	</module>
 	<module name="strategy">
 			

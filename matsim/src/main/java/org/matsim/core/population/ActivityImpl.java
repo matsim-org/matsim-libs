@@ -136,7 +136,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	@Override
 	public final String toString() {
-		return "[type=" + this.getType() + "]" +
+		return "act [type=" + this.getType() + "]" +
 				"[coord=" + this.getCoord() + "]" +
 				"[linkId=" + this.linkId + "]" +
 				"[startTime=" + Time.writeTime(this.getStartTime()) + "]" +

@@ -638,7 +638,7 @@ public final class QLinkTest extends MatsimTestCase {
     private static void dummify(QNetwork network) {
         NetElementActivationRegistry netElementActivator = new NetElementActivationRegistry() {
             @Override
-            protected void registerNodeAsActive(QNodeImpl node) {
+            protected void registerNodeAsActive(QNodeI node) {
 
             }
 

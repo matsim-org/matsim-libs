@@ -21,13 +21,13 @@ package org.matsim.contrib.av.robotaxi.fares.drt;/*
  * created by jbischoff, 11.12.2018
  */
 
+import java.util.Collection;
+
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-import java.util.Collection;
-
-public class DrtFaresConfigGroup extends ReflectiveConfigGroup {
+public final class DrtFaresConfigGroup extends ReflectiveConfigGroup {
 
     public static final String GROUP_NAME = "drtfares";
 

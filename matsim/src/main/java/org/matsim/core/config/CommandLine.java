@@ -1,4 +1,25 @@
-package org.matsim.core.config;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * CommandLine.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.core.config;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -13,6 +34,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSet;
 
 /**
  * <p>
@@ -94,6 +116,7 @@ import org.apache.log4j.Logger;
  * <ul>
  * <li><code>--config:global.numberOfThreads 48</code></li>
  * <li><code>--config:strategy.strategysettings[strategyName=ReRoute].weight 0.0</code></li>
+ * <li><code>--config:planCalcScore.scoringParameters[subpopulation=null].modeParams[mode=car].constant -3.5</code></li>
  * </ul>
  * 
  * @author Sebastian Hörl <sebastian.hoerl@ivt.baug.ethz.ch>
@@ -389,8 +412,8 @@ public class CommandLine {
 		List<String> flatArguments = new LinkedList<>();
 
 		for (String argument : args) {
-			int index = argument.indexOf("=");
-			int bracketIndex = argument.indexOf("]");
+			int index = argument.lastIndexOf("=");
+			int bracketIndex = argument.lastIndexOf("]");
 
 			if (bracketIndex > index) {
 				index = argument.indexOf("=", bracketIndex);
@@ -574,6 +597,13 @@ public class CommandLine {
 										processParameter(option, newPath, parameterSet, newRemainder);
 										return;
 									}
+									
+									// allow for the case subpopulation = 'null' in the scoring parameters
+									if (parameterSetType.equals(ScoringParameterSet.SET_TYPE) && selectionParameter.equals("subpopulation") && selectionValue.equals("null")) {
+										processParameter(option, newPath, parameterSet, newRemainder);
+										return;
+									}
+									
 								}
 							}
 

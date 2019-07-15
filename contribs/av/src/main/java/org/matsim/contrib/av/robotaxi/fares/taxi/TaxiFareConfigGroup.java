@@ -22,17 +22,17 @@
  */
 package org.matsim.contrib.av.robotaxi.fares.taxi;
 
+import java.util.Map;
+
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
-
-import java.util.Map;
 
 /**
  * @author  jbischoff
  * Config Group to set taxi or drt fares.
  * 
  */
-public class TaxiFareConfigGroup extends ReflectiveConfigGroup {
+public final class TaxiFareConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "taxifare";
 

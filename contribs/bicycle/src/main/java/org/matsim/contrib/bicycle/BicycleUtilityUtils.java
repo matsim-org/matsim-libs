@@ -27,9 +27,9 @@ class BicycleUtilityUtils {
 	
 	static double computeLinkBasedScore( Link link, double marginalUtilityOfComfort_m,
 							 double marginalUtilityOfInfrastructure_m, double marginalUtilityOfGradient_m_100m ) {
-		String surface = (String) link.getAttributes().getAttribute(BicycleLabels.SURFACE);
+		String surface = (String) link.getAttributes().getAttribute(BicycleUtils.SURFACE);
 		String type = (String) link.getAttributes().getAttribute("type");
-		String cyclewaytype = (String) link.getAttributes().getAttribute(BicycleLabels.CYCLEWAY);
+		String cyclewaytype = (String) link.getAttributes().getAttribute(BicycleUtils.CYCLEWAY);
 
 		double distance = link.getLength();
 		
@@ -46,13 +46,17 @@ class BicycleUtilityUtils {
 	
 	static double getGradientFactor( Link link ) {
 		double gradient = 0.;
-		Double fromNodeZ = link.getFromNode().getCoord().getZ();
-		Double toNodeZ = link.getToNode().getCoord().getZ();
-		if ((fromNodeZ != null) && (toNodeZ != null)) {
-			if (toNodeZ > fromNodeZ) { // No positive utility for downhill, only negative for uphill
-				gradient = (toNodeZ - fromNodeZ) / link.getLength();
+		
+		if (link.getFromNode().getCoord().hasZ() && link.getToNode().getCoord().hasZ()) {
+			Double fromNodeZ = link.getFromNode().getCoord().getZ();
+			Double toNodeZ = link.getToNode().getCoord().getZ();
+			if ((fromNodeZ != null) && (toNodeZ != null)) {
+				if (toNodeZ > fromNodeZ) { // No positive utility for downhill, only negative for uphill
+					gradient = (toNodeZ - fromNodeZ) / link.getLength();
+				}
 			}
 		}
+		
 		return gradient;
 	}
 

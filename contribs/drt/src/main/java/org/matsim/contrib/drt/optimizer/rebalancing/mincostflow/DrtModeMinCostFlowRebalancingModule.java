@@ -27,7 +27,6 @@ import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -45,8 +44,9 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 
 	@Override
 	public void install() {
-		MinCostFlowRebalancingParams params = drtCfg.getMinCostFlowRebalancing();
-		bindModal(DrtZonalSystem.class).toProvider(new DrtZonalSystem.DrtZonalSystemProvider(params.getCellSize()));
+		MinCostFlowRebalancingParams params = drtCfg.getMinCostFlowRebalancing().get();
+		bindModal(DrtZonalSystem.class).toProvider(
+				modalProvider(getter -> new DrtZonalSystem(getter.getModal(Network.class), params.getCellSize())));
 
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
@@ -54,16 +54,15 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 				bindModal(RebalancingStrategy.class).toProvider(modalProvider(
 						getter -> new MinCostFlowRebalancingStrategy(getter.getModal(RebalancingTargetCalculator.class),
 								getter.getModal(DrtZonalSystem.class), getter.getModal(Fleet.class),
-								getter.getModal(MinCostRelocationCalculator.class), drtCfg))).asEagerSingleton();
+								getter.getModal(MinCostRelocationCalculator.class), params))).asEagerSingleton();
 
 				bindModal(RebalancingTargetCalculator.class).toProvider(modalProvider(
 						getter -> new LinearRebalancingTargetCalculator(getter.getModal(ZonalDemandAggregator.class),
-								drtCfg))).asEagerSingleton();
+								params))).asEagerSingleton();
 
 				bindModal(MinCostRelocationCalculator.class).toProvider(modalProvider(
 						getter -> new AggregatedMinCostRelocationCalculator(getter.getModal(DrtZonalSystem.class),
-								getter.getNamed(Network.class, DvrpRoutingNetworkProvider.DVRP_ROUTING))))
-						.asEagerSingleton();
+								getter.getModal(Network.class)))).asEagerSingleton();
 			}
 		});
 

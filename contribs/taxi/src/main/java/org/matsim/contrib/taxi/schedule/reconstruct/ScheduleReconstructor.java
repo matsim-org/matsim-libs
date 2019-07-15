@@ -26,17 +26,19 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.fleet.FleetImpl;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.vehicles.Vehicle;
 
+import com.google.common.collect.ImmutableMap;
+
 public class ScheduleReconstructor {
-	private final FleetImpl fleet = new FleetImpl();
+	private ImmutableMap<Id<DvrpVehicle>, DvrpVehicle> fleet;
 	final Map<Id<Request>, TaxiRequest> taxiRequests = new LinkedHashMap<>();
 	final Map<Id<Link>, ? extends Link> links;
 
@@ -75,7 +77,10 @@ public class ScheduleReconstructor {
 			throw new IllegalStateException();
 		}
 
-		scheduleBuilders.values().stream().map(ScheduleBuilder::getVehicle).forEach(fleet::addVehicle);
+		fleet = scheduleBuilders.values()
+				.stream()
+				.map(ScheduleBuilder::getVehicle)
+				.collect(ImmutableMap.toImmutableMap(DvrpVehicle::getId, v -> v));
 	}
 
 	public Fleet getFleet() {
@@ -83,7 +88,7 @@ public class ScheduleReconstructor {
 			validateSchedulesAndAddVehiclesToFleet();
 		}
 
-		return fleet;
+		return () -> fleet;
 	}
 
 	public static Fleet reconstructFromFile(Network network, String eventsFile, String mode) {

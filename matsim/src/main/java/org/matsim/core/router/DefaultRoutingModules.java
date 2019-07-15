@@ -21,7 +21,6 @@ package org.matsim.core.router;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
@@ -46,10 +45,10 @@ public final class DefaultRoutingModules {
 				params) ;
 	}
 
-	public static RoutingModule createTeleportationRouter( String mode, PopulationFactory popFac, ModeRoutingParams params ) {
+	public static RoutingModule createTeleportationRouter( String mode, Scenario scenario, ModeRoutingParams params ) {
 		return new TeleportationRoutingModule(
 				mode,
-				popFac,
+			  scenario,
 				params.getTeleportedModeSpeed(),
                 params.getBeelineDistanceFactor() );
 	}
@@ -65,15 +64,13 @@ public final class DefaultRoutingModules {
 				routeAlgo);
 	}
 	
-	static RoutingModule createAccessEgressNetworkRouter( String mode, PopulationFactory popFact, Network net,
-										final LeastCostPathCalculator routeAlgo, PlansCalcRouteConfigGroup calcRouteConfig,
-										Scenario scenario ) {
+	public static RoutingModule createAccessEgressNetworkRouter( String mode,
+											 final LeastCostPathCalculator routeAlgo, Scenario scenario,
+											 Network filteredNetwork ) {
 		return new NetworkRoutingInclAccessEgressModule(
 				mode,
-				popFact,
-				net,
-				routeAlgo,
-				calcRouteConfig, scenario);
+			  routeAlgo,
+			  scenario, filteredNetwork );
 	}
 
 }

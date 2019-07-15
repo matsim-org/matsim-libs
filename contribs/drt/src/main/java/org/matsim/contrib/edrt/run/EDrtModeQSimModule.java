@@ -45,7 +45,6 @@ import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.ModalProviders;
@@ -58,7 +57,7 @@ import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory;
 import org.matsim.contrib.edrt.optimizer.depot.NearestChargerAsDepot;
 import org.matsim.contrib.edrt.schedule.EDrtTaskFactoryImpl;
 import org.matsim.contrib.edrt.scheduler.EmptyVehicleChargingScheduler;
-import org.matsim.contrib.ev.data.ChargingInfrastructure;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -87,7 +86,7 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 		addModalComponent(DrtOptimizer.class, modalProvider(
 				getter -> new EDrtOptimizer(getter.getModal(DefaultDrtOptimizer.class),
-						getter.getModal(EmptyVehicleChargingScheduler.class), getter.get(MobsimTimer.class))));
+						getter.getModal(EmptyVehicleChargingScheduler.class))));
 
 		bindModal(DefaultDrtOptimizer.class).toProvider(modalProvider(
 				getter -> new DefaultDrtOptimizer(drtCfg, getter.getModal(Fleet.class), getter.get(MobsimTimer.class),
@@ -103,10 +102,6 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 		bindModal(EmptyVehicleChargingScheduler.class).toProvider(
 				new ModalProviders.AbstractProvider<EmptyVehicleChargingScheduler>(drtCfg.getMode()) {
 					@Inject
-					@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
-					private Network network;
-
-					@Inject
 					private MobsimTimer timer;
 
 					@Inject
@@ -114,6 +109,7 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 					@Override
 					public EmptyVehicleChargingScheduler get() {
+						Network network = getModalInstance(Network.class);
 						DrtTaskFactory taskFactory = getModalInstance(DrtTaskFactory.class);
 						return new EmptyVehicleChargingScheduler(network, timer, taskFactory, chargingInfrastructure);
 					}
@@ -140,10 +136,6 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 		bindModal(EmptyVehicleRelocator.class).toProvider(
 				new ModalProviders.AbstractProvider<EmptyVehicleRelocator>(drtCfg.getMode()) {
 					@Inject
-					@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
-					private Network network;
-
-					@Inject
 					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 					private TravelTime travelTime;
 
@@ -152,6 +144,7 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 					@Override
 					public EmptyVehicleRelocator get() {
+						Network network = getModalInstance(Network.class);
 						DrtTaskFactory taskFactory = getModalInstance(DrtTaskFactory.class);
 						TravelDisutility travelDisutility = getModalInstance(
 								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
@@ -181,15 +174,12 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 		addModalComponent(ParallelPathDataProvider.class,
 				new ModalProviders.AbstractProvider<ParallelPathDataProvider>(getMode()) {
 					@Inject
-					@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
-					private Network network;
-
-					@Inject
 					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 					private TravelTime travelTime;
 
 					@Override
 					public ParallelPathDataProvider get() {
+						Network network = getModalInstance(Network.class);
 						TravelDisutility travelDisutility = getModalInstance(
 								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
 						return new ParallelPathDataProvider(network, travelTime, travelDisutility, drtCfg);

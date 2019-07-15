@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.drt.optimizer.rebalancing.NoRebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.DrtModeMinCostFlowRebalancingModule;
-import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.routing.ClosestAccessEgressStopFinder;
 import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtRouteUpdater;
@@ -41,6 +40,7 @@ import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
+import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
@@ -69,11 +69,16 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 	@Override
 	public void install() {
+		DvrpModes.registerDvrpMode(binder(), getMode());
+
+		install(DvrpRoutingNetworkProvider.createDvrpModeRoutingNetworkModule(getMode(),
+				drtCfg.isUseModeFilteredSubnetwork()));
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
 
-		install(new FleetModule(getMode(), drtCfg.getVehiclesFile(), drtCfg.isChangeStartLinkToLastLinkInSchedule()));
+		install(new FleetModule(getMode(), drtCfg.getVehiclesFileUrl(getConfig().getContext()),
+				drtCfg.isChangeStartLinkToLastLinkInSchedule()));
 
-		if (MinCostFlowRebalancingParams.isRebalancingEnabled(drtCfg.getMinCostFlowRebalancing())) {
+		if (drtCfg.getMinCostFlowRebalancing().isPresent()) {
 			install(new DrtModeMinCostFlowRebalancingModule(drtCfg));
 		} else {
 			bindModal(RebalancingStrategy.class).to(NoRebalancingStrategy.class).asEagerSingleton();
@@ -107,10 +112,6 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 		bindModal(DrtRouteUpdater.class).toProvider(new ModalProviders.AbstractProvider<DrtRouteUpdater>(getMode()) {
 			@Inject
-			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
-			private Network network;
-
-			@Inject
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 			private TravelTime travelTime;
 
@@ -122,6 +123,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 			@Override
 			public DefaultDrtRouteUpdater get() {
+				Network network = getModalInstance(Network.class);
 				return new DefaultDrtRouteUpdater(drtCfg, network, travelTime,
 						getModalInstance(TravelDisutilityFactory.class), population, config);
 			}
@@ -134,15 +136,11 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		private final DrtConfigGroup drtCfg;
 
 		@Inject
-		@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
-		private Network network;
-
-		@Inject
 		@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 		private TravelTime travelTime;
 
 		@Inject
-		private PopulationFactory populationFactory;
+		private Scenario scenario ;
 
 		@Inject
 		@Named(TransportMode.walk)
@@ -155,8 +153,9 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 		@Override
 		public DrtRoutingModule get() {
+			Network network = getModalInstance(Network.class);
 			return new DrtRoutingModule(drtCfg, network, travelTime, getModalInstance(TravelDisutilityFactory.class),
-					populationFactory, walkRouter);
+				  walkRouter, scenario );
 		}
 	}
 

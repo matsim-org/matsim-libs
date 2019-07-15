@@ -35,9 +35,9 @@ public class FleetReader extends MatsimXmlParser {
 
 	private static final int DEFAULT_CAPACITY = 1;
 
-	private final FleetSpecificationImpl fleet;
+	private final FleetSpecification fleet;
 
-	public FleetReader(FleetSpecificationImpl fleet) {
+	public FleetReader(FleetSpecification fleet) {
 		this.fleet = fleet;
 	}
 

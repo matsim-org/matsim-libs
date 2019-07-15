@@ -24,12 +24,14 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.NetworkRoutingInclAccessEgressModule;
 
 /**
@@ -51,7 +53,6 @@ public class FacilitiesUtils {
 	}
 
 	/**
-	 * @param network
 	 * @return sorted map containing containing the facilities as values and their ids as keys.
 	 */
 	public static SortedMap<Id<ActivityFacility>, ActivityFacility> getSortedFacilities(final ActivityFacilities facilities) {
@@ -66,18 +67,18 @@ public class FacilitiesUtils {
 		}
 	}
 	
-	public static Link decideOnLink( final Facility fromFacility, final Network network ) {
+	public static Link decideOnLink( final Facility facility, final Network network ) {
 		Link accessActLink = null ;
 		
 		Id<Link> accessActLinkId = null ;
 		try {
-			accessActLinkId = fromFacility.getLinkId() ;
+			accessActLinkId = facility.getLinkId() ;
 		} catch ( Exception ee ) {
 			// there are implementations that throw an exception here although "null" is, in fact, an interpretable value. kai, oct'18
 		}
 		
 		if ( accessActLinkId!=null ) {
-			accessActLink = network.getLinks().get( fromFacility.getLinkId() );
+			accessActLink = network.getLinks().get( facility.getLinkId() );
 			// i.e. if street address is in mode-specific subnetwork, I just use that, and do not search for another (possibly closer)
 			// other link.
 			
@@ -87,11 +88,11 @@ public class FacilitiesUtils {
 			// this is the case where the postal address link is NOT in the subnetwork, i.e. does NOT serve the desired mode,
 			// OR the facility does not have a street address link in the first place.
 
-			if( fromFacility.getCoord()==null ) {
+			if( facility.getCoord()==null ) {
 				throw new RuntimeException("link for facility cannot be determined when neither facility link id nor facility coordinate given") ;
 			}
 			
-			accessActLink = NetworkUtils.getNearestLink(network, fromFacility.getCoord()) ;
+			accessActLink = NetworkUtils.getNearestLink(network, facility.getCoord()) ;
 			if ( accessActLink == null ) {
 				int ii = 0 ;
 				for ( Link link : network.getLinks().values() ) {
@@ -105,6 +106,10 @@ public class FacilitiesUtils {
 			Gbl.assertNotNull(accessActLink);
 		}
 		return accessActLink;
+
+		// I just found out that there are facilities that insist on links that may not be postal addresses since they cannot be reached by car.
+		// TransitStopFacility is an example.  kai, jun'19
+
 	}
 
 	public static Facility toFacility( final Activity toWrap, ActivityFacilities activityFacilities ){
@@ -124,4 +129,20 @@ public class FacilitiesUtils {
 	public static Facility wrapActivity ( final Activity toWrap ) {
 		return new ActivityWrapperFacility( toWrap ) ;
 	}
+
+	public static Facility wrapLink( final Link link ) {
+		return new LinkWrapperFacility( link ) ;
+	}
+
+	/**
+	 *  We have situations where the coordinate field in facility is not filled out.
+	 */
+	public static Coord decideOnCoord( final Facility facility, final Network network ) {
+		Coord coord = facility.getCoord() ;
+		if ( coord == null ) {
+			coord = network.getLinks().get( facility.getLinkId() ).getCoord() ;
+		}
+		return coord ;
+	}
+
 }

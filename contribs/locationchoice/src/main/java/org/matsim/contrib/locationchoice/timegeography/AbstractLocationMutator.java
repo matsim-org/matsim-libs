@@ -50,7 +50,7 @@ abstract class AbstractLocationMutator implements PlanAlgorithm {
 
 	// ----------------------------------------------------------
 
-	public AbstractLocationMutator( final Scenario scenario, Random random ) {
+	AbstractLocationMutator( final Scenario scenario, Random random ) {
 		this.dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
 		this.defineFlexibleActivities = new ActivitiesHandler(this.dccg);
 		this.quadTreesOfType = new TreeMap<>();
@@ -60,8 +60,8 @@ abstract class AbstractLocationMutator implements PlanAlgorithm {
 		this.initLocal();
 	}
 
-	public AbstractLocationMutator( Scenario scenario, TreeMap<String, ? extends QuadTree<ActivityFacility>> quad_trees,
-						  TreeMap<String, ActivityFacilityImpl []> facilities_of_type, Random random ) {
+	AbstractLocationMutator( Scenario scenario, TreeMap<String, ? extends QuadTree<ActivityFacility>> quad_trees,
+					 TreeMap<String, ActivityFacilityImpl[]> facilities_of_type, Random random ) {
 		this.dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
 		this.defineFlexibleActivities = new ActivitiesHandler(this.dccg);
 		this.quadTreesOfType = quad_trees;

@@ -140,8 +140,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 			bw.flush();
 			bw.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 

@@ -22,23 +22,29 @@ package org.matsim.contrib.drt.run;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
+import javax.annotation.Nullable;
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
+import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.utils.misc.Time;
 
-public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
+public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
+	private static final Logger log = Logger.getLogger(DrtConfigGroup.class);
 
 	public static final String GROUP_NAME = "drt";
 
@@ -50,6 +56,14 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	public static final String MODE = "mode";
 	static final String MODE_EXP = "Mode which will be handled by PassengerEngine and VrpOptimizer "
 			+ "(passengers'/customers' perspective)";
+
+	public static final String USE_MODE_FILTERED_SUBNETWORK = "useModeFilteredSubnetwork";
+	static final String USE_MODE_FILTERED_SUBNETWORK_EXP =
+			"Limit the operation of vehicles to links (of the 'dvrp_routing'"
+					+ " network) with 'allowedModes' containing this 'mode'."
+					+ " For backward compatibility, the value is set to false by default"
+					+ " -- this means that the vehicles are allowed to operate on all links of the 'dvrp_routing' network."
+					+ " The 'dvrp_routing' is defined by DvrpConfigGroup.networkModes)";
 
 	public static final String STOP_DURATION = "stopDuration";
 	static final String STOP_DURATION_EXP = "Bus stop duration. Must be positive.";
@@ -122,6 +136,8 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	@NotBlank
 	private String mode = TransportMode.drt; // travel mode (passengers'/customers' perspective)
 
+	private boolean useModeFilteredSubnetwork = false;
+
 	@Positive
 	private double stopDuration = Double.NaN;// seconds
 
@@ -132,7 +148,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	// maxTravelTimeAlpha * unshared_ride_travel_time(fromLink, toLink) + maxTravelTimeBeta,
 	// where unshared_ride_travel_time(fromLink, toLink) is calculated with FastAStarEuclidean
 	// (hence AStarEuclideanOverdoFactor needs to be specified)
-	@Min(1)
+	@DecimalMin("1.0")
 	private double maxTravelTimeAlpha = Double.NaN;// [-]
 
 	@PositiveOrZero
@@ -153,13 +169,13 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	@PositiveOrZero
 	private double estimatedDrtSpeed = 25. / 3.6;// [m/s]
 
-	@Min(1)
+	@DecimalMin("1.0")
 	private double estimatedBeelineDistanceFactor = 1.3;// [-]
 
 	@NotNull
 	private String vehiclesFile = null;
 
-	// used only for stopbased DRT scheme
+	@Nullable
 	private String transitStopFile = null; // only for stopbased DRT scheme
 
 	private boolean plotDetailedCustomerStats = true;
@@ -178,9 +194,56 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	}
 
 	@Override
+	protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
+
+		if (Time.isUndefinedTime(config.qsim().getEndTime())
+				&& config.qsim().getSimEndtimeInterpretation()
+				!= QSimConfigGroup.EndtimeInterpretation.onlyUseEndtime) {
+			// Not an issue if all request rejections are immediate (i.e. happen during request submission)
+			log.warn("qsim.endTime should be specified and qsim.simEndtimeInterpretation should be 'onlyUseEndtime'"
+					+ " if postponed request rejection is allowed. Otherwise, rejected passengers"
+					+ " (who are stuck endlessly waiting for a DRT vehicle) will prevent QSim from stopping."
+					+ " Keep also in mind that not setting an end time may result in agents "
+					+ "attempting to travel without vehicles being available.");
+		}
+		if (config.qsim().getNumberOfThreads() != 1) {
+			throw new RuntimeException("Only a single-threaded QSim allowed");
+		}
+		if (getMaxWaitTime() < getStopDuration()) {
+			throw new RuntimeException(
+					DrtConfigGroup.MAX_WAIT_TIME + " must not be smaller than " + DrtConfigGroup.STOP_DURATION);
+		}
+		if (getOperationalScheme() == OperationalScheme.stopbased && getTransitStopFile() == null) {
+			throw new RuntimeException(DrtConfigGroup.TRANSIT_STOP_FILE
+					+ " must not be null when "
+					+ DrtConfigGroup.OPERATIONAL_SCHEME
+					+ " is "
+					+ DrtConfigGroup.OperationalScheme.stopbased);
+		}
+		if (getNumberOfThreads() > Runtime.getRuntime().availableProcessors()) {
+			throw new RuntimeException(
+					DrtConfigGroup.NUMBER_OF_THREADS + " is higher than the number of logical cores available to JVM");
+		}
+		if (config.global().getNumberOfThreads() < getNumberOfThreads()) {
+			log.warn("Consider increasing global.numberOfThreads to at least the value of drt.numberOfThreads"
+					+ " in order to speed up the DRT route update during the replanning phase.");
+		}
+		if (getParameterSets(MinCostFlowRebalancingParams.SET_NAME).size() > 1) {
+			throw new RuntimeException("More then one rebalancing parameter sets is specified");
+		}
+
+		if (useModeFilteredSubnetwork) {
+			DvrpRoutingNetworkProvider.
+					checkUseModeFilteredSubnetworkAllowed(config, mode);
+		}
+	}
+
+	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> map = super.getComments();
 		map.put(MODE, MODE_EXP);
+		map.put(USE_MODE_FILTERED_SUBNETWORK, USE_MODE_FILTERED_SUBNETWORK_EXP);
 		map.put(STOP_DURATION, STOP_DURATION_EXP);
 		map.put(MAX_WAIT_TIME, MAX_WAIT_TIME_EXP);
 		map.put(MAX_TRAVEL_TIME_ALPHA, MAX_TRAV_ALPHA_EXP);
@@ -215,6 +278,22 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	@StringSetter(MODE)
 	public void setMode(String mode) {
 		this.mode = mode;
+	}
+
+	/**
+	 * @return {@value #USE_MODE_FILTERED_SUBNETWORK_EXP}
+	 */
+	@StringGetter(USE_MODE_FILTERED_SUBNETWORK)
+	public boolean isUseModeFilteredSubnetwork() {
+		return useModeFilteredSubnetwork;
+	}
+
+	/**
+	 * @param useModeFilteredSubnetwork {@value #USE_MODE_FILTERED_SUBNETWORK_EXP}
+	 */
+	@StringSetter(USE_MODE_FILTERED_SUBNETWORK)
+	public void setUseModeFilteredSubnetwork(boolean useModeFilteredSubnetwork) {
+		this.useModeFilteredSubnetwork = useModeFilteredSubnetwork;
 	}
 
 	/**
@@ -364,9 +443,8 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	 * @param operationalScheme -- {@value #OP_SCHEME_EXP}
 	 */
 	@StringSetter(OPERATIONAL_SCHEME)
-	public void setOperationalScheme(String operationalScheme) {
-
-		this.operationalScheme = OperationalScheme.valueOf(operationalScheme);
+	public void setOperationalScheme(OperationalScheme operationalScheme) {
+		this.operationalScheme = operationalScheme;
 	}
 
 	/**
@@ -420,7 +498,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	 * @param-- {@value #ESTIMATED_DRT_SPEED_EXP}
 	 */
 	@StringSetter(ESTIMATED_DRT_SPEED)
-	public void setEstimatedSpeed(double estimatedSpeed) {
+	public void setEstimatedDrtSpeed(double estimatedSpeed) {
 		this.estimatedDrtSpeed = estimatedSpeed;
 	}
 
@@ -492,15 +570,19 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	 * @return 'minCostFlowRebalancing' parameter set defined in the DRT config or null if the parameters were not
 	 * specified
 	 */
-	@Valid
-	public MinCostFlowRebalancingParams getMinCostFlowRebalancing() {
+	public Optional<MinCostFlowRebalancingParams> getMinCostFlowRebalancing() {
 		Collection<? extends ConfigGroup> parameterSets = getParameterSets(MinCostFlowRebalancingParams.SET_NAME);
-		return parameterSets.isEmpty() ? null : (MinCostFlowRebalancingParams)parameterSets.iterator().next();
+		if (parameterSets.size() > 1) {
+			throw new RuntimeException("More then one rebalancing parameter sets is specified");
+		}
+		return parameterSets.isEmpty() ?
+				Optional.empty() :
+				Optional.of((MinCostFlowRebalancingParams)parameterSets.iterator().next());
 	}
 
 	@Override
 	public ConfigGroup createParameterSet(String type) {
-		if (type.startsWith(MinCostFlowRebalancingParams.SET_NAME)) {
+		if (type.equals(MinCostFlowRebalancingParams.SET_NAME)) {
 			return new MinCostFlowRebalancingParams();
 		}
 		return super.createParameterSet(type);
