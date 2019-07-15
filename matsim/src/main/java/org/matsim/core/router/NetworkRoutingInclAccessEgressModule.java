@@ -26,12 +26,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
@@ -44,7 +39,6 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 import java.util.ArrayList;
@@ -59,15 +53,11 @@ import java.util.List;
  */
 public final class NetworkRoutingInclAccessEgressModule implements RoutingModule {
 	private static final Logger log = Logger.getLogger( NetworkRoutingInclAccessEgressModule.class );
-	private final Vehicle proxyVehicle;
+	//private final Vehicle proxyVehicle;
 
 	private final class AccessEgressStageActivityTypes implements StageActivityTypes {
 		@Override public boolean isStageActivity(String activityType) {
-			if ( NetworkRoutingInclAccessEgressModule.this.stageActivityType.equals( activityType ) ) {
-				return true ;
-			} else {
-				return false ;
-			}
+			return NetworkRoutingInclAccessEgressModule.this.stageActivityType.equals(activityType);
 		}
 		@Override public boolean equals( Object obj ) {
 			if ( !(obj instanceof AccessEgressStageActivityTypes) ) {
@@ -88,6 +78,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	private final Network filteredNetwork;
 	private final LeastCostPathCalculator routeAlgo;
 	private String stageActivityType;
+	private final Scenario scenario;
 
 	NetworkRoutingInclAccessEgressModule(
 		  final String mode,
@@ -97,6 +88,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		this.filteredNetwork = filteredNetwork ;
 		this.routeAlgo = routeAlgo;
 		this.mode = mode;
+		this.scenario = scenario;
 		this.populationFactory = scenario.getPopulation().getFactory() ;
 		this.stageActivityType = PlanCalcScoreConfigGroup.createStageActivityType( mode );
 		if ( !scenario.getConfig().plansCalcRoute().isInsertingAccessEgressWalk() ) {
@@ -105,7 +97,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		}
 
 		// yyyyyy the following is a quick fix until Janek hopefully comes along with using the "true" vehicles.  kai, jun'19
-		switch( scenario.getConfig().qsim().getVehiclesSource() ) {
+	/*	switch( scenario.getConfig().qsim().getVehiclesSource() ) {
 			// yyyyyy it is confusing that this comes out of a qsim config group!  The config option would better be in the "vehicles" config group.
 			//  kai, jun'19
 			case defaultVehicle: {
@@ -126,7 +118,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 				break;
 			default:
 				throw new IllegalStateException( "Unexpected value: " + scenario.getConfig().qsim().getVehiclesSource() );
-		}
+		}*/
 	}
 
 	@Override
@@ -206,11 +198,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			// facility does not have a coordinate; we cannot bushwhack
 			return true;
 		}
-		if ( toFacility instanceof LinkWrapperFacility ) {
-			// trip ends on link; no need to bushwhack (this is, in fact, not totally clear: might be link on network of other mode)
-			return true;
-		}
-		return false;
+		// trip ends on link; no need to bushwhack (this is, in fact, not totally clear: might be link on network of other mode)
+		return toFacility instanceof LinkWrapperFacility;
 	}
 
 	public static double addBushwhackingLegFromFacilityToLinkIfNecessary( final Facility fromFacility, final Person person,
@@ -299,7 +288,9 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 		if (toLink != fromLink) { // (a "true" route)
 
-			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, proxyVehicle);
+			Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(person, leg.getMode(), this.scenario.getConfig());
+			Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId);
+			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, vehicle);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
 
 			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());

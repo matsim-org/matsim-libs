@@ -14,9 +14,12 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.ReplanningEvent;
+import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleCapacity;
@@ -134,7 +137,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
         scenario.getConfig().qsim().setUsePersonIdForMissingVehicleId(true);
         scenario.getConfig().controler().setFirstIteration(0);
-        scenario.getConfig().controler().setLastIteration(0);
+        scenario.getConfig().controler().setLastIteration(1);
         scenario.getConfig().controler().setOutputDirectory(utils.getOutputDirectory());
         scenario.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
         scenario.getConfig().qsim().setMainModes(modes);
@@ -158,12 +161,24 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         workParams.setTypicalDuration(1);
         scenario.getConfig().planCalcScore().addActivityParams(workParams);
 
+        StrategyConfigGroup.StrategySettings replanning = new StrategyConfigGroup.StrategySettings();
+        replanning.setStrategyName("ReRoute");
+        replanning.setWeight(1.0);
+        scenario.getConfig().strategy().addStrategySettings(replanning);
+
         Controler controler = new Controler(scenario);
 
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
                 bind(MainModeIdentifier.class).to(SimpleMainModeIdentifier.class);
+            }
+        });
+
+        controler.addControlerListener(new ReplanningListener() {
+            @Override
+            public void notifyReplanning(ReplanningEvent event) {
+                System.out.println(event.toString());
             }
         });
         controler.run();
