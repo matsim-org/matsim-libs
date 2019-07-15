@@ -26,14 +26,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.controler.PrepareForSimImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -45,6 +39,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,24 +55,43 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	private static final Logger log = Logger.getLogger( NetworkRoutingInclAccessEgressModule.class );
 	private final Scenario scenario;
 
-	private final class AccessEgressStageActivityTypes implements StageActivityTypes {
-		@Override public boolean isStageActivity(String activityType) {
-			if ( NetworkRoutingInclAccessEgressModule.this.stageActivityType.equals( activityType ) ) {
-				return true ;
-			} else {
-				return false ;
-			}
+	/*package (Tests)*/ double routeLeg(Person person, Leg leg, Link fromLink, Link toLink, double depTime) {
+		double travTime;
+
+		Node startNode = fromLink.getToNode();    // start at the end of the "current" link
+		Node endNode = toLink.getFromNode(); // the target is the start of the link
+
+		if (toLink != fromLink) { // (a "true" route)
+
+			Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(person, this.mode, scenario.getConfig());
+			Vehicle vehicle = this.scenario.getVehicles().getVehicles().get(vehicleId);
+
+			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, vehicle);
+			if (path == null)
+				throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
+
+			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
+			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
+			route.setTravelTime((int) path.travelTime);
+			route.setTravelCost(path.travelCost);
+			route.setDistance(RouteUtils.calcDistance(route, 1.0, 1.0, this.network));
+			leg.setRoute(route);
+			travTime = (int) path.travelTime;
+
+		} else {
+			// create an empty route == staying on place if toLink == endLink
+			// note that we still do a route: someone may drive from one location to another on the link. kai, dec'15
+			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
+			route.setTravelTime(0);
+			route.setDistance(0.0);
+			leg.setRoute(route);
+			travTime = 0;
 		}
-		@Override public boolean equals( Object obj ) {
-			if ( !(obj instanceof AccessEgressStageActivityTypes) ) {
-				return false ;
-			}
-			AccessEgressStageActivityTypes other = (AccessEgressStageActivityTypes) obj ;
-			return other.isStageActivity(NetworkRoutingInclAccessEgressModule.this.stageActivityType) ;
-		}
-		@Override public int hashCode() {
-			return NetworkRoutingInclAccessEgressModule.this.stageActivityType.hashCode() ;
-		}
+
+		leg.setDepartureTime(depTime);
+		leg.setTravelTime(travTime);
+
+		return travTime;
 	}
 
 
@@ -245,48 +259,25 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		return "[NetworkRoutingModule: mode="+this.mode+"]";
 	}
 
-
-	/*package (Tests)*/ double routeLeg(Person person, Leg leg, Link fromLink, Link toLink, double depTime) {
-		double travTime = 0;
-
-		Node startNode = fromLink.getToNode();	// start at the end of the "current" link
-		Node endNode = toLink.getFromNode(); // the target is the start of the link
-
-		if (toLink != fromLink) { // (a "true" route)
-
-			Vehicle vehicle =
-//				  this.scenario.getVehicles().getVehicles().get( PrepareForSimImpl.obtainVehicleId( person, this.mode, scenario.getConfig() ) ) ;
-				  person.getVehicles().get(mode) ;
-
-			String key = mode + "_vehicle" ;
-			Vehicle vehicle = person.getAttributes().getAttribute( key ) ;
-
-
-			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);
-			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
-
-			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
-			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
-			route.setTravelTime((int) path.travelTime);
-			route.setTravelCost(path.travelCost);
-			route.setDistance(RouteUtils.calcDistance(route, 1.0,1.0,this.network));
-			leg.setRoute(route);
-			travTime = (int) path.travelTime;
-
-		} else {
-			// create an empty route == staying on place if toLink == endLink
-			// note that we still do a route: someone may drive from one location to another on the link. kai, dec'15
-			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
-			route.setTravelTime(0);
-			route.setDistance(0.0);
-			leg.setRoute(route);
-			travTime = 0;
+	private final class AccessEgressStageActivityTypes implements StageActivityTypes {
+		@Override
+		public boolean isStageActivity(String activityType) {
+			return NetworkRoutingInclAccessEgressModule.this.stageActivityType.equals(activityType);
 		}
 
-		leg.setDepartureTime(depTime);
-		leg.setTravelTime(travTime);
+		@Override
+		public boolean equals(Object obj) {
+			if (!(obj instanceof AccessEgressStageActivityTypes)) {
+				return false;
+			}
+			AccessEgressStageActivityTypes other = (AccessEgressStageActivityTypes) obj;
+			return other.isStageActivity(NetworkRoutingInclAccessEgressModule.this.stageActivityType);
+		}
 
-		return travTime;
+		@Override
+		public int hashCode() {
+			return NetworkRoutingInclAccessEgressModule.this.stageActivityType.hashCode();
+		}
 	}
 
 }

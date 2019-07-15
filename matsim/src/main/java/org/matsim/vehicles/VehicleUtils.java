@@ -21,6 +21,8 @@
 package org.matsim.vehicles;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.Config;
 
 
 /**
@@ -49,4 +51,17 @@ public class VehicleUtils {
 		return DEFAULT_VEHICLE_TYPE;
 	}
 
+    public static Id<Vehicle> getVehicleId(Person person, String mode, Config config) {
+
+        if (config.qsim().getUsePersonIdForMissingVehicleId()) {
+            switch (config.qsim().getVehiclesSource()) {
+                case defaultVehicle:
+                case fromVehiclesData:
+                    return Id.createVehicleId(person.getId());
+                case modeVehicleTypesFromVehiclesData:
+                    return Id.createVehicleId(person.getId().toString() + "_" + mode);
+            }
+        }
+        throw new RuntimeException("not implemented");
+    }
 }

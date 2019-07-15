@@ -8,14 +8,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.population.algorithms.PersonPrepareForSim;
 import org.matsim.core.router.PlanRouter;
@@ -26,8 +24,6 @@ import org.matsim.facilities.FacilitiesFromPopulation;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesFactory;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -126,12 +122,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		// At least xy2links is needed here, i.e. earlier than PrepareForMobsimImpl.  It could, however, presumably be separated out
 		// (i.e. we introduce a separate PersonPrepareForMobsim).  kai, jul'18
 		ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(),
-				new ParallelPersonAlgorithmUtils.PersonAlgorithmProvider() {
-					@Override
-					public AbstractPersonAlgorithm getPersonAlgorithm() {
-						return new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, carOnlyNetwork);
-					}
-				}
+                () -> new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, carOnlyNetwork)
 		);
 
 		// yyyy from a behavioral perspective, the vehicle must be somehow linked to
@@ -172,7 +163,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	private void createAndAddVehiclesForEveryNetworkMode(final Map<String, VehicleType> modeVehicleTypes) {
 		for ( Person person : scenario.getPopulation().getPersons().values()) {
 			for (String mode : scenario.getConfig().qsim().getMainModes()) {
-				Id<Vehicle> vehicleId = obtainVehicleId(person, mode, this.scenario.getConfig() );
+                Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(person, mode, this.scenario.getConfig());
 				createAndAddVehicleIfNotPresent(vehicleId, modeVehicleTypes.get(mode));
 			}
 		}
@@ -209,20 +200,15 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 
 	private void createAndAddVehicleIfNotPresent(Id<Vehicle> vehicleId, VehicleType vehicleType) {
 		// try to get vehicle from the vehicles container:
-		Vehicles vehicles = scenario.getVehicles();
-		Vehicle vehicle = vehicles.getVehicles().get(vehicleId);
-		VehiclesFactory factory = vehicles.getFactory();
+        Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId);
 
 		if ( vehicle==null ) {
 			// if it was not found, next step depends on config:
 			switch ( qSimConfigGroup.getVehiclesSource() ) {
 				case defaultVehicle:
-					vehicle = factory.createVehicle(vehicleId, vehicleType);
-					vehicles.addVehicle(vehicle);
-					break;
 				case modeVehicleTypesFromVehiclesData:
-					vehicle = factory.createVehicle(vehicleId, vehicleType);
-					vehicles.addVehicle(vehicle);
+                    vehicle = scenario.getVehicles().getFactory().createVehicle(vehicleId, vehicleType);
+                    scenario.getVehicles().addVehicle(vehicle);
 					break;
 				case fromVehiclesData:
 					// otherwise complain:
@@ -232,39 +218,5 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 					throw new RuntimeException("not implemented");
 			}
 		}
-	}
-
-	public static Id<Vehicle> obtainVehicleId( Person person, String mode, Config config2 ) {
-		// yyyy: move to PopulationUtils
-
-
-		QSimConfigGroup config = config2.qsim() ;
-
-		Id<Vehicle> vehicleId ;
-
-		if (config.getUsePersonIdForMissingVehicleId()) {
-
-			// yyyy my strong preference would be to do away with this "car_" exception and to just
-			// use <mode>_personId across the board.  kai, may'18
-			
-			switch (config.getVehiclesSource()) {
-				case defaultVehicle:
-				case fromVehiclesData:
-					vehicleId = Id.createVehicleId( person.getId() );
-					break;
-				case modeVehicleTypesFromVehiclesData:
-					if(! mode.equals(TransportMode.car)) {
-						vehicleId = Id.createVehicleId( person.getId().toString() + "_" + mode );
-					} else {
-						vehicleId = Id.createVehicleId( person.getId() );
-					}
-					break;
-				default:
-					throw new RuntimeException("not implemented") ;
-			}
-		} else {
-			throw new RuntimeException( "not implemented" ) ;
-		}
-		return vehicleId;
 	}
 }
