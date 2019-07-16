@@ -137,7 +137,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
         scenario.getConfig().qsim().setUsePersonIdForMissingVehicleId(true);
         scenario.getConfig().controler().setFirstIteration(0);
-        scenario.getConfig().controler().setLastIteration(1);
+        scenario.getConfig().controler().setLastIteration(0);
         scenario.getConfig().controler().setOutputDirectory(utils.getOutputDirectory());
         scenario.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
         scenario.getConfig().qsim().setMainModes(modes);
