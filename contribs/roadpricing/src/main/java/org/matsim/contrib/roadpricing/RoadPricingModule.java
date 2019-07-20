@@ -16,7 +16,7 @@ public final class RoadPricingModule extends AbstractModule {
 	
 	private RoadPricingScheme scheme;
 
-	RoadPricingModule() {	}
+	public RoadPricingModule() {	}
 	
 	RoadPricingModule( RoadPricingScheme scheme ) {
 		this.scheme = scheme;

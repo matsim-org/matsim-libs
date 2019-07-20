@@ -22,6 +22,8 @@ package org.matsim.contrib.roadpricing;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -48,7 +50,7 @@ public class RoadPricingIOTest extends MatsimTestCase {
 		final Id<Link> id3 = Id.create(3, Link.class);
 
 		// first, read the scheme from file
-		RoadPricingSchemeImpl scheme1 = RoadPricingUtils.createMutableScheme();
+		RoadPricingSchemeImpl scheme1 = RoadPricingUtils.createAndRegisterMutableScheme( ScenarioUtils.createScenario( ConfigUtils.createConfig() ) );
 		RoadPricingReaderXMLv1 reader1 = new RoadPricingReaderXMLv1(scheme1);
 		reader1.readFile(origFile);
 
@@ -91,7 +93,7 @@ public class RoadPricingIOTest extends MatsimTestCase {
 		 * than the written one. Thus, read this file again and write it again and
 		 * compare them.
 		 */
-		RoadPricingSchemeImpl scheme2 = RoadPricingUtils.createMutableScheme();
+		RoadPricingSchemeImpl scheme2 = RoadPricingUtils.createAndRegisterMutableScheme( ScenarioUtils.createScenario( ConfigUtils.createConfig() ) );
 		RoadPricingReaderXMLv1 reader2 = new RoadPricingReaderXMLv1(scheme2);
 		reader2.readFile(tmpFile1);
 

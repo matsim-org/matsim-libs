@@ -19,6 +19,7 @@
 package org.matsim.contrib.roadpricing.run;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.roadpricing.RoadPricingModule;
 import org.matsim.contrib.roadpricing.RoadPricingUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -73,7 +74,7 @@ public final class RunRoadPricingExample {
 		// use the road pricing module.
 		// (loads the road pricing scheme, uses custom travel disutility including tolls, etc.)
 		//        controler.setModules(new ControlerDefaultsWithRoadPricingModule());
-		controler.addOverridingModule(RoadPricingUtils.createModule());
+		controler.addOverridingModule( new RoadPricingModule() );
 
 		// run the controler:
 		controler.run();
