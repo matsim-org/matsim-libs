@@ -16,12 +16,16 @@ public class RunAbcExampleStaticTest{
 
 	@Test public void main(){
 
-		URL context = ExamplesUtils.getTestScenarioURL( "equil" );
-		URL config = IOUtils.newUrl( context, "config.xml" );
+//		URL context = ExamplesUtils.getTestScenarioURL( "equil" );
+//		URL config = IOUtils.newUrl( context, "config.xml" );
+//		final String configString = config.toString();
+//		System.out.println( "configfile=" + configString ) ;
+		// does not work, not exactly sure why.  kai, jul'19
 
-		System.out.println( "configfile=" + config.toString() ) ;
-
-		String [] args = { config.toString() } ;
+		String [] args = {"scenarios/equil/config.xml"
+			  ,"--config:controler.outputDirectory=" + utils.getOutputDirectory()
+			  ,"--config:controler.lastIteration=2"
+		} ;
 
 		RunAbcExampleStatic.main( args );
 

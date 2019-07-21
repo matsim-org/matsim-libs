@@ -91,23 +91,4 @@ public class ExampleTest {
 		controler.run() ;
 	}
 
-	@Test
-	public void testRunAbcExample() {
-		// using an appropriate config file, that is included in the repository.
-		// unfortunately, the test now depends on this file. if someone removes/changes it, problems might occur.
-		String[] args = {
-			  "scenarios/equil/example5-config.xml",
-			  "--config:controler.outputDirectory", utils.getOutputDirectory(),
-			  "--config:controler.lastIteration=1",
-			  "--config:controler.writeEventsInterval=1"
-		} ;
-
-		try{
-			RunAbcExample.main( args );
-		} catch ( Exception ee ) {
-			ee.printStackTrace();
-			Assert.fail();
-		}
-	}
-	
 }

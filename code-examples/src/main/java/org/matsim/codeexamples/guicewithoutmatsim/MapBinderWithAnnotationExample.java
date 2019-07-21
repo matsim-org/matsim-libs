@@ -20,7 +20,7 @@ public final class MapBinderWithAnnotationExample{
 	void run() {
 		List<com.google.inject.Module> modules = new ArrayList<>() ;
 		// (there is also a Module in java.lang, and maven gets confused about that.  kai, jul'19)
-		
+
 		modules.add(  new AbstractModule(){
 			@Override
 			protected void configure(){
