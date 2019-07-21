@@ -36,38 +36,20 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public final class RunFromConfigfileExample {
 
-	private final String[] args;
-	private Config config;
-
 	public static void main( final String[] args ) {
-		new RunFromConfigfileExample( args ).run() ;
-	}
 
-	public RunFromConfigfileExample( String [] args ) {
-		this.args = args ;
-	}
-
-	public void run( ){
-		if ( config==null ) {
-			prepareConfig() ;
+		Config config ;
+		if ( args!=null && args.length>=1 ) {
+			config = ConfigUtils.loadConfig( args ) ; // note that this may process command line options
+		} else {
+			config = ConfigUtils.loadConfig(  "scenarios/equil/config.xml" ) ;
 		}
 
 		Scenario scenario = ScenarioUtils.loadScenario(config );
 
 		Controler controler = new Controler(scenario);
+
 		controler.run();
-	}
-
-	public Config prepareConfig(){
-		String configFile ;
-		if ( args!=null && args.length>=1 ) {
-			configFile = args[0] ;
-		} else {
-			configFile = "scenarios/equil/config.xml";
-		}
-
-		config = ConfigUtils.loadConfig( configFile );
-		return config;
 	}
 
 }
