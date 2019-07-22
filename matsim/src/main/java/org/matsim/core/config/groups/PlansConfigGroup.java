@@ -107,13 +107,26 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 	public URL getInputFileURL(URL context) {
 		return ConfigGroup.getInputFileURL(context, this.inputFile);
 	}
-
+	// ---
+	private boolean insistingOnUsingDeprecatedPersonAttributeFile = false ;
+	private static final String INSISTING_ON_USING_DEPRECATED_PERSON_ATTRIBUTE_FILE = "insistingOnUsingDeprecatedPersonAttributeFile" ;
+	@StringSetter(INSISTING_ON_USING_DEPRECATED_PERSON_ATTRIBUTE_FILE)
+	public final void setInsistingOnUsingDeprecatedPersonAttributeFile( boolean val ) {
+		this.insistingOnUsingDeprecatedPersonAttributeFile = val ;
+	}
+	@StringGetter(INSISTING_ON_USING_DEPRECATED_PERSON_ATTRIBUTE_FILE)
+	public final boolean isInsistingOnUsingDeprecatedPersonAttributeFile() {
+		return insistingOnUsingDeprecatedPersonAttributeFile;
+	}
 	@StringGetter( INPUT_PERSON_ATTRIBUTES_FILE )
 	@Deprecated // I think that this should be phased out; use Attributes inside each facility.  kai, mar'19
 	public String getInputPersonAttributeFile() {
 		return this.inputPersonAttributeFile;
 	}
-
+	public static final String MESSAGE = "using the separate person attribute file is deprecated.  Add the information directly into each person, using " +
+						 "the Attributable feature.  If you insist on continuing to use the separate person attribute file, set " +
+						 "insistingOnUsingDeprecatedPersonAttributeFile to true.  The file will then be read, but the values " +
+						 "will be entered into each person using Attributable, and written as such to output_plans.  kai, may'19";
 	@StringSetter( INPUT_PERSON_ATTRIBUTES_FILE )
 	@Deprecated // I think that this should be phased out; use Attributes inside each facility.  kai, mar'19
 	public void setInputPersonAttributeFile(final String inputPersonAttributeFile) {
@@ -124,7 +137,7 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 	public URL getInputPersonAttributeFileURL(URL context) {
 		return ConfigGroup.getInputFileURL(context, this.inputPersonAttributeFile);
 	}
-
+	// ---
 	@StringGetter( NETWORK_ROUTE_TYPE )
 	public String getNetworkRouteType() {
 		return this.networkRouteType;

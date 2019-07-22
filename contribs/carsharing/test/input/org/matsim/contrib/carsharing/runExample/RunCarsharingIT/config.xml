@@ -104,7 +104,9 @@
 <!-- ====================================================================== -->
 
 	<module name="plans" >
-		<param name="inputPersonAttributesFile" value="1000desiresAttributes.xml" />
+<!--		<param name="inputPersonAttributesFile" value="1000desiresAttributes.xml" />-->
+<!--		(is working without. kai, jun'19)-->
+
 		<param name="inputPlansFile" value="10persons.xml" />
 	</module>
 

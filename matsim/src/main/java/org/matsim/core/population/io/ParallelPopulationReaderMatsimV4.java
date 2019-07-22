@@ -41,7 +41,7 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
 import org.matsim.lanes.Lanes;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.core.population.PersonAttributes;
 import org.matsim.vehicles.Vehicles;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
@@ -280,11 +280,6 @@ import org.xml.sax.helpers.AttributesImpl;
 			return population.getFactory();
 		}
 
-		@Override
-		public ObjectAttributes getPersonAttributes() {
-			return population.getPersonAttributes();
-		}
-		
 		@Override
 		public String getName() {
 			throw new RuntimeException("Calls to this method are not expected to happen...");
