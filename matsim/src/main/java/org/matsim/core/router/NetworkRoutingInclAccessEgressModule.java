@@ -186,9 +186,18 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		Gbl.assertNotNull( startCoord );
 
 		final Id<Link> startLinkId = egressActLink.getId();
-		final Activity interactionActivity = createInteractionActivity( startCoord, startLinkId, stageActivityType );
-		result.add( interactionActivity ) ;
-
+		
+		// check whether we already have an identical interaction activity directly before
+		PlanElement lastPlanElement = result.get( result.size() - 1 ); 
+		if ( lastPlanElement instanceof Leg ) {
+			final Activity interactionActivity = createInteractionActivity( startCoord, startLinkId, stageActivityType );
+			result.add( interactionActivity ) ;
+		} else {
+			// don't add another (interaction) activity
+			// TODO: assuming that this is an interaction activity, e.g. non_network_walk - drt interaction - non_network_walk
+			// Not clear what we should do if it is not an interaction activity (and how that could happen).
+		}
+		
 		Id<Link> endLinkId = toFacility.getLinkId();
 		if ( endLinkId==null ) {
 			endLinkId = startLinkId;
