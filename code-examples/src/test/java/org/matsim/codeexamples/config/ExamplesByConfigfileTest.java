@@ -19,9 +19,12 @@
 package org.matsim.codeexamples.config;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,13 +55,14 @@ public class ExamplesByConfigfileTest {
 		Collection<Object[]> filesToRun = new ArrayList<>();
 
 		filesToRun.add(new Object [] {"scenarios/equil/config.xml"});
+		filesToRun.add(new Object [] {"scenarios/equil/config-with-minimal-plans-file.xml"});
 		filesToRun.add(new Object [] {"scenarios/equil/config-with-mobsim.xml"});
 		filesToRun.add(new Object [] {"scenarios/equil/example2-config.xml"});
 		filesToRun.add(new Object [] {"scenarios/equil/example5-config.xml"});
  		filesToRun.add(new Object [] {"scenarios/equil/config-with-controlerListener.xml"});
 		filesToRun.add(new Object [] {"scenarios/equil/config-with-pluggablePlanStrategy.xml"});
 
-		filesToRun.add(new Object [] {"scenarios/equil-extended/config.xml"});
+		filesToRun.add(new Object [] {"scenarios/equil-extended/config-extended.xml"});
 		filesToRun.add(new Object [] {"scenarios/equil-extended/config-with-lanes.xml"});
 		filesToRun.add(new Object [] {"scenarios/equil-extended/config-with-network-change-events.xml"});
 
@@ -76,6 +80,8 @@ public class ExamplesByConfigfileTest {
 		// before running each test. kai, jul'16
 	}
 
+	private static String outputDir ;
+
 
 	/**
 	 * Test method for {@link RunFromConfigfileExample#main(java.lang.String[])}.
@@ -83,13 +89,31 @@ public class ExamplesByConfigfileTest {
 	@SuppressWarnings("static-method")
 	@Test
 	public final void testMain() {
-		RunFromConfigfileExample matsim = new RunFromConfigfileExample( new String [] { configFile } ) ;
+		if ( outputDir==null ) {
+			outputDir = utils.getOutputDirectory() ; // removes output dir every time this is run so run it only once
+		}
 
-		Config config = matsim.prepareConfig() ;
-		config.controler().setOutputDirectory( utils.getOutputDirectory() );
-		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		final Path fileName = Paths.get( configFile ).getFileName();
+		// yy would be nice to remove the file extension. kai, jul'19
 
-		matsim.run() ;
+		try{
+
+			if( configFile.contains( "config-with-mobsim" ) || configFile.contains( "example2-config" ) ){
+				final String[] args = {configFile
+					  , "--config:controler.outputDirectory=" + outputDir + "/" + fileName
+				};
+				RunFromConfigfileExample.main( args );
+			} else{
+				final String[] args = {configFile
+					  , "--config:controler.outputDirectory=" + outputDir + "/" + fileName
+					  , "--config:controler.lastIteration=2"
+				};
+				RunFromConfigfileExample.main( args );
+			}
+		} catch( Exception ee  ){
+			ee.printStackTrace();
+			Assert.fail();
+		}
 	}
 
 }

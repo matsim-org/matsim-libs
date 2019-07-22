@@ -27,30 +27,19 @@ import static org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.
 
 final class RunMultipleModesExample{
 
-
-
 	private static final Logger log = Logger.getLogger(RunMultipleModesExample.class) ;
 
-	private Config config;
-
 	public static void main( String [] args ) {
-		RunMultipleModesExample abc = new RunMultipleModesExample();
-		abc.run() ;
+		Config config = prepareConfig( args ) ;
+
+		Scenario scenario = prepareScenario( config );
+
+		Controler controler = prepareControler( scenario );
+
+		controler.run() ;
 	}
 
-	public final void run() {
-		if ( config==null ) {
-			prepareConfig() ;
-		}
-
-		Scenario scenario = ScenarioUtils.loadScenario( config );
-
-		// add the modes to each link:
-		for( Link link : scenario.getNetwork().getLinks().values() ){
-			Set<String> modes = new LinkedHashSet<>( Arrays.asList( TransportMode.car, TransportMode.bike ));
-			link.setAllowedModes( modes );
-		}
-
+	static Controler prepareControler( Scenario scenario ){
 		Controler controler = new Controler( scenario ) ;
 
 		controler.addOverridingModule( new AbstractModule(){
@@ -59,14 +48,24 @@ final class RunMultipleModesExample{
 				this.addTravelTimeBinding( TransportMode.bike ).to( BikeTravelTime.class ) ;
 			}
 		} ) ;
-
-		controler.run() ;
+		return controler;
 	}
 
-	final Config prepareConfig(){
+	static Scenario prepareScenario( Config config ){
+		Scenario scenario = ScenarioUtils.loadScenario( config );
+
+		// add the modes to each link:
+		for( Link link : scenario.getNetwork().getLinks().values() ){
+			Set<String> modes = new LinkedHashSet<>( Arrays.asList( TransportMode.car, TransportMode.bike ));
+			link.setAllowedModes( modes );
+		}
+		return scenario;
+	}
+
+	static final Config prepareConfig( String [] args ){
 		final URL url = IOUtils.newUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" );
 		log.warn("url=" + url.toString() ) ;
-		config = ConfigUtils.loadConfig( url ) ;
+		Config config = ConfigUtils.loadConfig( url );;
 
 		{ // add strategy that switches between car and bike:
 			StrategySettings stratSets = new StrategySettings(  ) ;
@@ -88,6 +87,7 @@ final class RunMultipleModesExample{
 
 			// say that the the travel times need to be analyzed also for the bike mode:
 //			config.travelTimeCalculator().setAnalyzedModes( new LinkedHashSet<>( Arrays.asList( TransportMode.bike, TransportMode.car ) ) ) ;
+			// no longer needed; by default all network modes are analyzed
 
 			// set up bike scoring:
 			ModeParams params = new ModeParams( TransportMode.bike ) ;
@@ -97,7 +97,7 @@ final class RunMultipleModesExample{
 			config.qsim().setMainModes( new HashSet<>( Arrays.asList( TransportMode.car, TransportMode.bike ) ) ) ;
 		}
 
-		config.travelTimeCalculator().setSeparateModes( true ); // otherwise, router will use speeds averaged over modes.  For 11.x, this is the default.
+//		config.travelTimeCalculator().setSeparateModes( true ); // otherwise, router will use speeds averaged over modes.  For 11.x, this is the default.
 //		config.travelTimeCalculator().setSeparateModes( false ); // this used to be the default
 
 //		config.plansCalcRoute().setInsertingAccessEgressWalk( true );
@@ -106,9 +106,9 @@ final class RunMultipleModesExample{
 	}
 
 
-	private class BikeTravelTime implements TravelTime{
+	private static class BikeTravelTime implements TravelTime{
 		@Override public double getLinkTravelTime( Link link, double time, Person person, Vehicle vehicle ){
-			throw new RuntimeException( "not implemented" );
+			return 1. ;
 		}
 	}
 }

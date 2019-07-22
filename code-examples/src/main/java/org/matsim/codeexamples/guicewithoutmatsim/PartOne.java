@@ -4,6 +4,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.multibindings.MapBinder;
+import com.google.inject.multibindings.MultibinderBinding;
 import org.apache.log4j.Logger;
 
 class PartOne{
@@ -14,6 +16,7 @@ class PartOne{
 			@Override protected void configure(){
 				bind(Simulation.class).to( MySimulation1.class ) ;
 				bind( Helper.class ).to( MyHelper1.class ) ;
+//				MapBinder<String,TravelTime>.newMapBinder( this, "car",   )
 			}
 		} );
 		Simulation sim = injector.getInstance(Simulation.class);

@@ -35,7 +35,7 @@ class RunAbcExampleStatic{
 	static Config prepareConfig( String[] args ){
 		Config config ;
 		if ( args!=null && args.length > 0 ){
-			config = ConfigUtils.loadConfig( args[0] );
+			config = ConfigUtils.loadConfig( args );
 		} else {
 			throw new RuntimeException("need a config file; aborting") ;
 		}
