@@ -228,18 +228,19 @@ class ScenarioLoaderImpl {
 
 			final String outputDirectory = this.config.controler().getOutputDirectory();
 			final File outDir = new File( outputDirectory );
-			if ( outDir.exists() && outDir.canWrite() ){
-				// since ScenarioLoader is supposed to only read material,  there are cases where the output directory does not exist at
-				// this stage. One could maybe write to the "config.getContext()" directory.  However, sometimes this is a URL, and thus also
-				// non-writeable, and it is even less systematic than writing into the output directory. kai, jun'19
-
-				String outFilename = outputDirectory + "/input_plans_with_person_attributes.xml.gz";
-				PopulationUtils.writePopulation( scenario.getPopulation(), outFilename );
-
-				log.warn(
-					  "a file with path=" + outFilename + " was just written in order to facilitate the transition to having person attributes inside " +
-						    "the persons. " );
-			}
+//			if ( outDir.exists() && outDir.canWrite() ){
+//				// since ScenarioLoader is supposed to only read material,  there are cases where the output directory does not exist at
+//				// this stage. One could maybe write to the "config.getContext()" directory.  However, sometimes this is a URL, and thus also
+//				// non-writeable, and it is even less systematic than writing into the output directory. kai, jun'19
+//
+//				String outFilename = outputDirectory + "/input_plans_with_person_attributes.xml.gz";
+//				PopulationUtils.writePopulation( scenario.getPopulation(), outFilename );
+//
+//				log.warn(
+//					  "a file with path=" + outFilename + " was just written in order to facilitate the transition to having person attributes inside " +
+//						    "the persons. " );
+//			}
+			// TD says to rather not have this kind of side effect.  kai, jul'19
 
 			if ( !this.config.plans().isInsistingOnUsingDeprecatedPersonAttributeFile() ) {
 				throw new RuntimeException( MESSAGE ) ;
