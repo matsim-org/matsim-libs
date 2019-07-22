@@ -339,9 +339,7 @@ public final class EditTrips {
 			((MobsimAgent) ptPassengerAgent).endLegAndComputeNextState( now );
 		}
 
-
-		this.scenario.getPopulation().getPersonAttributes().putAttribute( agent.getId().toString(), AgentSnapshotInfo.marker, true ) ;
-		this.scenario.getPopulation().getPersons().get( agent.getId() ).getAttributes().putAttribute( AgentSnapshotInfo.marker, true ) ;
+		PopulationUtils.putPersonAttribute( person, AgentSnapshotInfo.marker, true );
 	}
 
 	/**

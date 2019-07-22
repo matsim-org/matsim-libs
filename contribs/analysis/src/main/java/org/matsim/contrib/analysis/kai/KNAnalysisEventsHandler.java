@@ -67,7 +67,6 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 	public static final String SUBPOPULATION = "subpopulation" ; // subpopulationAttributeName
 
 	private Scenario scenario = null ;
-	private Population population = null;
 	private final TreeMap<Id<Person>, Double> agentDepartures = new TreeMap<>();
 	private final TreeMap<Id<Person>, Integer> agentLegs = new TreeMap<>();
 
@@ -80,6 +79,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 
 	//	private final MainModeIdentifier mainModeIdentifier = new TransportPlanningMainModeIdentifier() ;
 	private final MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl() ;
+	private ObjectAttributes attribs = new ObjectAttributes() ;
 
 	// using this one here since presumably a fair number of the transit_walk trips in the survey in fact were pt trips.  kai, sep'16
 
@@ -142,7 +142,6 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 	/* deliberately package */ KNAnalysisEventsHandler(final Scenario scenario) {
 		// this does not need to be injectable, since it is typically called from KaiAnalysisListener.  kai, may'18
 		this.scenario = scenario ;
-		this.population = scenario.getPopulation() ;
 
 		final String tollLinksFileName = ConfigUtils.addOrGetModule(this.scenario.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).getTollLinksFile();
 		if ( tollLinksFileName != null && !tollLinksFileName.equals("") ) {
@@ -227,7 +226,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 		if (cnt == null) {
 			this.agentLegs.put(event.getPersonId(), 1);
 		} else {
-			this.agentLegs.put(event.getPersonId(), Integer.valueOf(1 + cnt.intValue()));
+			this.agentLegs.put(event.getPersonId(), 1 + cnt.intValue() );
 		}
 	}
 
@@ -237,7 +236,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 	@Override
 	public void handleEvent(final PersonArrivalEvent event) {
 		Double depTime = this.agentDepartures.remove(event.getPersonId());
-		Person person = this.population.getPersons().get(event.getPersonId());
+		Person person = this.scenario.getPopulation().getPersons().get(event.getPersonId());
 		if (depTime != null && person != null) {
 			double travTime = event.getTime() - depTime;
 
@@ -366,28 +365,19 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 		}
 
 		for ( Person person : this.scenario.getPopulation().getPersons().values() ) {
-//			ObjectAttributes attribs = this.scenario.getPopulation().getPersonAttributes() ;
 
-//			attribs.putAttribute( person.getId().toString(), TRAV_TIME, 0. ) ;
-			PopulationUtils.putPersonAttribute( person, TRAV_TIME, 0. );
+			attribs.putAttribute( person.getId().toString(), TRAV_TIME, 0. ) ;
 
-//			if ( attribs.getAttribute( person.getId().toString(), CERTAIN_LINKS_CNT ) != null ) {
-//				attribs.putAttribute( person.getId().toString(), CERTAIN_LINKS_CNT, 0. ) ;
-//			}
-			if ( PopulationUtils.getPersonAttribute( person, CERTAIN_LINKS_CNT) != null ) {
-				PopulationUtils.putPersonAttribute( person, CERTAIN_LINKS_CNT, 0. );
+			if ( attribs.getAttribute( person.getId().toString(), CERTAIN_LINKS_CNT ) != null ) {
+				attribs.putAttribute( person.getId().toString(), CERTAIN_LINKS_CNT, 0. ) ;
 			}
-			// yy I must have written this myself, but I don't know where there is the null check first.  kai, may'19
+			// yy I must have written this myself, but I don't know why there is the null check first.  kai, may'19
 
-//			if ( attribs.getAttribute( person.getId().toString(), PAYMENTS) != null ) {
-//				attribs.putAttribute( person.getId().toString(), PAYMENTS, 0. ) ;
-//			}
-			if ( PopulationUtils.getPersonAttribute( person, PAYMENTS) != null ) {
-				PopulationUtils.putPersonAttribute( person, PAYMENTS, 0. );
+			if ( attribs.getAttribute( person.getId().toString(), PAYMENTS) != null ) {
+				attribs.putAttribute( person.getId().toString(), PAYMENTS, 0. ) ;
 			}
-			// yy I must have written this myself, but I don't know where there is the null check first.  kai, may'19
+			// yy I must have written this myself, but I don't know why there is the null check first.  kai, may'19
 		}
-		// (yy not sure if I like the above; might be better to just use a local data structure. kai, may'14)
 
 		controlStatisticsSum = 0. ;
 		controlStatisticsCnt = 0. ;
@@ -473,7 +463,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 		}
 
 		// write population attributes:
-		new ObjectAttributesXmlWriter(pop.getPersonAttributes()).writeFile(filenameTmp + "extendedPersonAttributes.xml.gz");
+		new ObjectAttributesXmlWriter( attribs ).writeFile(filenameTmp + "extendedPersonAttributes.xml.gz");
 
 		//write statistics:
 		for ( StatType type : StatType.values() ) {
@@ -644,7 +634,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 		}
 
 		if ( this.otherTolledLinkIds.contains( event.getLinkId() ) ) {
-			final Person person = this.population.getPersons().get( delegate.getDriverOfVehicle( event.getVehicleId() ) );
+			final Person person = this.scenario.getPopulation().getPersons().get( delegate.getDriverOfVehicle( event.getVehicleId() ) );
 			Gbl.assertNotNull( person );
 			add( person, 1., CERTAIN_LINKS_CNT );
 		}

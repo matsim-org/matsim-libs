@@ -131,10 +131,11 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 			final Scenario scenario,
 			final Person person,
 			final String type ) {
-		final Double typicalDuration =
-					(Double) PopulationUtils.getPersonAttribute(
-						  person, "typicalDuration_"+type, scenario.getPopulation()
-												 );
+//		final Double typicalDuration =
+//			  (Double) PopulationUtils.getPersonAttribute(
+//				    person, "typicalDuration_"+type, scenario.getPopulation()
+//										   );
+		final Double typicalDuration = (Double) PopulationUtils.getPersonAttribute( person, "typicalDuration_"+type );
 
 		if ( typicalDuration != null ) return typicalDuration;
 
