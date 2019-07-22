@@ -112,7 +112,6 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 	}
 
 	public boolean isEligibleForRequestInsertion(DvrpVehicle vehicle, double currentTime) {
-		return !(currentTime + lookAhead < vehicle.getServiceBeginTime()//
-				|| currentTime >= vehicle.getServiceEndTime());
+		return !(currentTime + lookAhead < vehicle.getServiceBeginTime() || currentTime >= vehicle.getServiceEndTime());
 	}
 }

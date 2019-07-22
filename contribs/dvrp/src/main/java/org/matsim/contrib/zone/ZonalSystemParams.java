@@ -20,11 +20,13 @@
 
 package org.matsim.contrib.zone;
 
+import java.net.URL;
 import java.util.Map;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PositiveOrZero;
 
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 public final class ZonalSystemParams extends ReflectiveConfigGroup {
@@ -67,6 +69,10 @@ public final class ZonalSystemParams extends ReflectiveConfigGroup {
 		return zonesXmlFile;
 	}
 
+	public URL getZonesXmlUrl(URL context) {
+		return ConfigGroup.getInputFileURL(context, this.zonesXmlFile);
+	}
+
 	/**
 	 * @param zonesXmlFile {@value #ZONES_XML_FILE_EXP}
 	 */
@@ -81,6 +87,10 @@ public final class ZonalSystemParams extends ReflectiveConfigGroup {
 	@StringGetter(ZONES_SHP_FILE)
 	public String getZonesShpFile() {
 		return zonesShpFile;
+	}
+
+	public URL getZonesShpUrl(URL context) {
+		return ConfigGroup.getInputFileURL(context, this.zonesShpFile);
 	}
 
 	/**

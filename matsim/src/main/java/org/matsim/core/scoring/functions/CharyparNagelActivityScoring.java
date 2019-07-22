@@ -60,7 +60,7 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 		this.firstActivityEndTime = INITIAL_FIRST_ACT_END_TIME;
 		this.score = INITIAL_SCORE;
 
-		firstLastActWarning = 0 ;
+//		firstLastActWarning = 0 ;
 		firstLastActOpeningTimesWarning = 0 ;
 		this.openingIntervalCalculator = openingIntervalCalculator;
 	}

@@ -27,7 +27,6 @@ import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -46,7 +45,8 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 	@Override
 	public void install() {
 		MinCostFlowRebalancingParams params = drtCfg.getMinCostFlowRebalancing().get();
-		bindModal(DrtZonalSystem.class).toProvider(new DrtZonalSystem.DrtZonalSystemProvider(params.getCellSize()));
+		bindModal(DrtZonalSystem.class).toProvider(
+				modalProvider(getter -> new DrtZonalSystem(getter.getModal(Network.class), params.getCellSize())));
 
 		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
@@ -62,8 +62,7 @@ public class DrtModeMinCostFlowRebalancingModule extends AbstractDvrpModeModule 
 
 				bindModal(MinCostRelocationCalculator.class).toProvider(modalProvider(
 						getter -> new AggregatedMinCostRelocationCalculator(getter.getModal(DrtZonalSystem.class),
-								getter.getNamed(Network.class, DvrpRoutingNetworkProvider.DVRP_ROUTING))))
-						.asEagerSingleton();
+								getter.getModal(Network.class)))).asEagerSingleton();
 			}
 		});
 

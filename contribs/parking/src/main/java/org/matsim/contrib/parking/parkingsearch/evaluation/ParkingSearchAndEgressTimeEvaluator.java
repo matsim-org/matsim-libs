@@ -156,7 +156,7 @@ public class ParkingSearchAndEgressTimeEvaluator implements PersonArrivalEventHa
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
 		if (this.searchTime.containsKey(event.getPersonId())){
-			if (event.getLegMode().equals(TransportMode.egress_walk)){
+			if (event.getLegMode().equals(TransportMode.non_network_walk )){
 			double parkingTime = event.getTime() - searchTime.remove(event.getPersonId());
 			int hour = (int) (event.getTime() / 3600);
 			if (hour<24){
