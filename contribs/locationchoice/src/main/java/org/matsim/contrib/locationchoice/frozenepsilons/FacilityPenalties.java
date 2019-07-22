@@ -1,10 +1,10 @@
-package org.matsim.contrib.locationchoice.facilityload;
+package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 
-public class FacilityPenalties {
+class FacilityPenalties {
 	/** name to use to add as a scenario element */
 	public static final String ELEMENT_NAME = "faciliyPenalties";
 	

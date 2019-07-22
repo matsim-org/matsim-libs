@@ -1,4 +1,4 @@
-package org.matsim.contrib.locationchoice;
+package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -15,14 +15,11 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel;
-import org.matsim.contrib.locationchoice.frozenepsilons.BestReplyLocationChoicePlanStrategy;
-import org.matsim.contrib.locationchoice.frozenepsilons.DCActivityWOFacilitiesScoringFunction;
-import org.matsim.contrib.locationchoice.frozenepsilons.DCScoringFunctionFactory;
-import org.matsim.contrib.locationchoice.frozenepsilons.DestinationChoiceContext;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -46,6 +43,7 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.*;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import java.util.HashSet;
 import java.util.List;
@@ -53,9 +51,10 @@ import java.util.Random;
 import java.util.Set;
 
 import static org.junit.Assert.*;
-import static org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype.bestResponse;
-import static org.matsim.contrib.locationchoice.LocationChoiceIT.localCreateConfig;
+import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.Algotype.bestResponse;
 import static org.matsim.contrib.locationchoice.LocationChoiceIT.localCreatePopWOnePerson;
+import static org.matsim.contrib.locationchoice.frozenepsilons.FrozenTastesConfigGroup.*;
+import static org.matsim.core.config.groups.StrategyConfigGroup.*;
 
 public class FrozenEpsilonLocaChoiceIT{
 	private static final Logger log = Logger.getLogger( FrozenEpsilonLocaChoiceIT.class ) ;
@@ -68,12 +67,12 @@ public class FrozenEpsilonLocaChoiceIT{
 	@Test
 	public void testLocationChoiceJan2013() {
 		//	CONFIG:
-		final Config config = localCreateConfig( this.utils.getPackageInputDirectory() + "config.xml");
+		final Config config = localCreateConfig( this.utils.getPackageInputDirectory() + "../config2.xml");
 
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 
-		DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule( config, DestinationChoiceConfigGroup.class );;
+		FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule( config, FrozenTastesConfigGroup.class );;
 
 		dccg.setAlgorithm( bestResponse );
 		// yy I don't think that this is honoured anywhere in the way this is plugged together here.  kai, mar'19
@@ -145,11 +144,11 @@ public class FrozenEpsilonLocaChoiceIT{
 	@Test
 	public void testLocationChoiceFeb2013NegativeScores() {
 		// config:
-		final Config config = localCreateConfig( utils.getPackageInputDirectory() + "config.xml");
+		final Config config = localCreateConfig( utils.getPackageInputDirectory() + "../config2.xml");
 
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );
 
-		final DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule(config, DestinationChoiceConfigGroup.class ) ;
+		final FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule(config, FrozenTastesConfigGroup.class ) ;
 
 		dccg.setAlgorithm( bestResponse );
 		// yy Don't think has an influence with setup here. kai, mar'19
@@ -222,47 +221,27 @@ public class FrozenEpsilonLocaChoiceIT{
 				throw new RuntimeException( Gbl.NOT_IMPLEMENTED) ;
 		}
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );
-		{
-			PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams( "home" ) ;
-			params.setTypicalDuration( 12.*3600. );
-			config.planCalcScore().addActivityParams( params );
-		}
-		{
-			PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams( "shop" ) ;
-			params.setTypicalDuration( 2.*3600. );
-			config.planCalcScore().addActivityParams( params );
-		}
-		{
-			StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings( ) ;
-			stratSets.setStrategyName( "MyLocationChoice" );
-			stratSets.setWeight( 1.0 );
-			stratSets.setDisableAfter( 10 );
-			config.strategy().addStrategySettings( stratSets );
-		}
+
+		config.planCalcScore().addActivityParams( new ActivityParams( "home" ).setTypicalDuration( 12.*3600. ) );
+		config.planCalcScore().addActivityParams( new ActivityParams( "shop" ).setTypicalDuration( 2.*3600. ) );
+
+		config.strategy().addStrategySettings( new StrategySettings( ).setStrategyName( FrozenTastes.LOCATION_CHOICE_PLAN_STRATEGY ).setWeight( 1.0 ).setDisableAfter( 10 ) );
+
 		switch ( runType ){
 			case shortRun:
 				break;
 			case medRun:
-			case longRun:{
-				StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
-				stratSets.setStrategyName( "MyLocationChoice" );
-				stratSets.setWeight( 0.1 );
-				config.strategy().addStrategySettings( stratSets );
-			}
-			{
-				StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings();
-				stratSets.setStrategyName( DefaultSelector.ChangeExpBeta );
-				stratSets.setWeight( 1.0 );
-				config.strategy().addStrategySettings( stratSets );
-			}
-			config.strategy().setFractionOfIterationsToDisableInnovation( 0.8 );
-			config.planCalcScore().setFractionOfIterationsToStartScoreMSA( 0.8 );
+			case longRun:
+				config.strategy().addStrategySettings( new StrategySettings().setStrategyName( FrozenTastes.LOCATION_CHOICE_PLAN_STRATEGY ).setWeight( 0.1 ) );
+				config.strategy().addStrategySettings( new StrategySettings().setStrategyName( DefaultSelector.ChangeExpBeta ).setWeight( 1.0 ) );
+				config.strategy().setFractionOfIterationsToDisableInnovation( 0.8 );
+				config.planCalcScore().setFractionOfIterationsToStartScoreMSA( 0.8 );
 			break ;
 			default:
 				throw new RuntimeException( Gbl.NOT_IMPLEMENTED ) ;
 		}
 
-		final DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule(config, DestinationChoiceConfigGroup.class ) ;
+		final FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule(config, FrozenTastesConfigGroup.class ) ;
 		switch( runType ) {
 			case shortRun:
 				dccg.setEpsilonScaleFactors("10.0" );
@@ -283,9 +262,6 @@ public class FrozenEpsilonLocaChoiceIT{
 		// using LCPlans does not, or no longer, work (throws a null pointer exception).  kai, mar'19
 
 		// ---
-
-		//		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-		// (this will not load anything since there are no files defined)
 
 		Scenario scenario = ScenarioUtils.createScenario( config ) ;
 		// don't load anything
@@ -353,23 +329,16 @@ public class FrozenEpsilonLocaChoiceIT{
 			}
 		}
 
-		final DestinationChoiceContext lcContext = new DestinationChoiceContext(scenario) ;
-		scenario.addScenarioElement(DestinationChoiceContext.ELEMENT_NAME, lcContext);
-
 		// CONTROL(L)ER:
 		Controler controler = new Controler(scenario);
 		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 
-		// set scoring function
-		DCScoringFunctionFactory scoringFunctionFactory = new DCScoringFunctionFactory(controler.getScenario(), lcContext);
-		scoringFunctionFactory.setUsingConfigParamsForScoring(true) ;
-		controler.setScoringFunctionFactory(scoringFunctionFactory);
+		FrozenTastes.configure( controler );
 
 		// bind locachoice strategy (selected in localCreateConfig):
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addPlanStrategyBinding("MyLocationChoice").to( BestReplyLocationChoicePlanStrategy.class );
 				addControlerListenerBinding().to( KaiAnalysisListener.class ).in( Singleton.class ) ;
 			}
 		});
@@ -515,6 +484,43 @@ public class FrozenEpsilonLocaChoiceIT{
 		facility1.addActivityOption(new ActivityOptionImpl("work"));
 		// (as soon as you set a scoring function that looks if activity types match opportunities at facilities, you can only use
 		// an activity type that indeed is at the facility)
+	}
+
+	static Config localCreateConfig( String configFileName ) {
+		// setup config
+		Config config = ConfigUtils.loadConfig(configFileName, new FrozenTastesConfigGroup() ) ;
+
+		config.global().setNumberOfThreads(0);
+		config.controler().setFirstIteration(0);
+		config.controler().setLastIteration(1);
+		config.controler().setMobsim("qsim");
+		config.qsim().setSnapshotStyle( QSimConfigGroup.SnapshotStyle.queue ) ;
+
+		final FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule(config, FrozenTastesConfigGroup.class ) ;
+		dccg.setAlgorithm( Algotype.random );
+		dccg.setFlexibleTypes("work" );
+
+		ActivityParams home = new ActivityParams("home");
+		home.setTypicalDuration(12*60*60);
+		config.planCalcScore().addActivityParams(home);
+		ActivityParams work = new ActivityParams("work");
+		work.setTypicalDuration(12*60*60);
+		config.planCalcScore().addActivityParams(work);
+		ActivityParams shop = new ActivityParams("shop");
+		shop.setTypicalDuration(1.*60*60);
+		config.planCalcScore().addActivityParams(shop);
+
+		final StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class ));
+		strategySettings.setStrategyName("MyLocationChoice");
+		strategySettings.setWeight(1.0);
+		config.strategy().addStrategySettings(strategySettings);
+
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class ).setEffectiveLaneWidth(1. ) ;
+		config.qsim().setLinkWidthForVis((float)1.) ;
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setShowTeleportedAgents(true) ;
+		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setDrawNonMovingItems(true) ;
+
+		return config;
 	}
 
 

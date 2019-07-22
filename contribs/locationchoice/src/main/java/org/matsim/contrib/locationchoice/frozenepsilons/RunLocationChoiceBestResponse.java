@@ -20,13 +20,9 @@
  *  * ***********************************************************************
  */
 
-package org.matsim.contrib.locationchoice.zzunused;
+package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.contrib.locationchoice.frozenepsilons.DestinationChoiceContext;
-import org.matsim.contrib.locationchoice.frozenepsilons.DCScoringFunctionFactory;
-import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -36,7 +32,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 class RunLocationChoiceBestResponse {
 
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig(args[0], new DestinationChoiceConfigGroup() );
+		Config config = ConfigUtils.loadConfig(args[0], new FrozenTastesConfigGroup() );
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		run(scenario);
 	}
@@ -48,7 +44,7 @@ class RunLocationChoiceBestResponse {
 		scenario.addScenarioElement(DestinationChoiceContext.ELEMENT_NAME , dcContext);
 
 		DCScoringFunctionFactory dcScoringFunctionFactory = new DCScoringFunctionFactory(scenario, dcContext);
-		DestinationChoiceConfigGroup dccg = ConfigUtils.addOrGetModule( dcContext.getScenario().getConfig(), DestinationChoiceConfigGroup.class);
+		FrozenTastesConfigGroup dccg = ConfigUtils.addOrGetModule( dcContext.getScenario().getConfig(), FrozenTastesConfigGroup.class );
 		if (dccg.getPrefsFile() == null && !scenario.getConfig().facilities().getInputFile().equals("null")) {
 			dcScoringFunctionFactory.setUsingConfigParamsForScoring(false);
 		} else {
@@ -56,7 +52,7 @@ class RunLocationChoiceBestResponse {
 		}
 
 		Controler controler = new Controler(scenario);
-		controler.addControlerListener(new DestinationChoiceInitializer(dcContext));
+		controler.addControlerListener(new DestinationChoiceInitializer(dcContext) );
 		if (dccg.getRestraintFcnExp() > 0.0 && dccg.getRestraintFcnFactor() > 0.0) {
 			controler.addControlerListener(new FacilitiesLoadCalculator(dcContext.getFacilityPenalties()));
 		}

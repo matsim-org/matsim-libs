@@ -30,8 +30,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.ApproximationLevel;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
@@ -46,8 +44,8 @@ class ChoiceSet {
 	private static final Logger log = Logger.getLogger( ChoiceSet.class ) ;
 
 	private final Network network;
-	private final DestinationChoiceConfigGroup dccg;
-	private ApproximationLevel approximationLevel;
+	private final FrozenTastesConfigGroup dccg;
+	private FrozenTastesConfigGroup.ApproximationLevel approximationLevel;
 	private List<Id<ActivityFacility>> destinations = new LinkedList<>();
 	private List<Id<ActivityFacility>> notYetVisited = new LinkedList<>();
 	private final ActivityFacilities facilities;
@@ -71,12 +69,12 @@ class ChoiceSet {
 		return stb.toString() ;
 	}
 
-	ChoiceSet( ApproximationLevel approximationLevel, Scenario scenario ) {
+	ChoiceSet( FrozenTastesConfigGroup.ApproximationLevel approximationLevel, Scenario scenario ) {
 		this.approximationLevel = approximationLevel;
 		this.facilities = scenario.getActivityFacilities();
 		this.scenario = scenario;
 
-		this.dccg = (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+		this.dccg = (FrozenTastesConfigGroup) this.scenario.getConfig().getModule( FrozenTastesConfigGroup.GROUP_NAME );
 
 		this.network = scenario.getNetwork() ;
 	}
@@ -137,7 +135,7 @@ class ChoiceSet {
 		Activity activityToRelocate = (Activity) planTmp.getPlanElements().get(actlegIndex);
 
 		// We need to calculate the multi node dijkstra stuff only in case localRouting is used.
-		if (this.approximationLevel == DestinationChoiceConfigGroup.ApproximationLevel.localRouting )
+		if (this.approximationLevel == FrozenTastesConfigGroup.ApproximationLevel.localRouting )
 		{
 			// we want to investigate multiple destinations for a given activity.  Thus, we need
 			// (1) the Dijkstra tree from the activity before to all these destinations

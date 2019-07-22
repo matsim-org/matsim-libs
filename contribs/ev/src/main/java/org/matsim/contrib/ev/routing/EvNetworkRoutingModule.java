@@ -18,6 +18,12 @@
  * *********************************************************************** */
 package org.matsim.contrib.ev.routing;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -26,6 +32,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.VehicleChargingHandler;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
@@ -49,8 +56,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 
-import java.util.*;
-
 /**
  * This network Routing module adds stages for re-charging into the Route.
  * This wraps a "computer science" {@link LeastCostPathCalculator}, which routes from a node to another node, into something that
@@ -73,6 +78,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 	private final AuxEnergyConsumption.Factory auxConsumptionFactory;
 	private final String stageActivityType;
 	private final String vehicleSuffix;
+	private final EvConfigGroup evConfigGroup;
 
 	private final class EvCharingStageActivityType implements StageActivityTypes {
 		@Override
@@ -105,8 +111,8 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 	public EvNetworkRoutingModule(final String mode, final Network network, RoutingModule delegate,
 			ElectricFleetSpecification electricFleet,
 			ChargingInfrastructureSpecification chargingInfrastructureSpecification, TravelTime travelTime,
-			DriveEnergyConsumption.Factory driveConsumptionFactory,
-			AuxEnergyConsumption.Factory auxConsumptionFactory) {
+			DriveEnergyConsumption.Factory driveConsumptionFactory, AuxEnergyConsumption.Factory auxConsumptionFactory,
+			EvConfigGroup evConfigGroup) {
 		this.travelTime = travelTime;
 		Gbl.assertNotNull(network);
 		this.delegate = delegate;
@@ -117,6 +123,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 		this.driveConsumptionFactory = driveConsumptionFactory;
 		this.auxConsumptionFactory = auxConsumptionFactory;
 		stageActivityType = mode + VehicleChargingHandler.CHARGING_IDENTIFIER;
+		this.evConfigGroup = evConfigGroup;
 		this.vehicleSuffix = mode.equals(TransportMode.car) ? "" : "_" + mode;
 	}
 
@@ -178,7 +185,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 							selectedChargerLink.getCoord(), selectedChargerLink.getId());
 					double maxPowerEstimate = Math.min(selectedCharger.getMaxPower(), ev.getBatteryCapacity() / 3.6);
 					double estimatedChargingTime = (ev.getBatteryCapacity() * 1.5) / maxPowerEstimate;
-					chargeAct.setMaximumDuration(Math.min(1200, estimatedChargingTime));
+					chargeAct.setMaximumDuration(Math.max(evConfigGroup.getMinimumChargeTime(), estimatedChargingTime));
 					lastArrivaltime += chargeAct.getMaximumDuration();
 					stagedRoute.add(chargeAct);
 					lastFrom = nexttoFacility;
@@ -208,11 +215,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 
 			double consumption = driveEnergyConsumption.calcEnergyConsumption(l, travelT, Time.getUndefinedTime())
 					+ auxEnergyConsumption.calcEnergyConsumption(basicLeg.getDepartureTime(), travelT, l.getId());
-			if (consumption > 0) {
-				pseudoVehicle.getBattery().discharge(consumption);
-			} else {
-				pseudoVehicle.getBattery().charge(-consumption);
-			}
+			pseudoVehicle.getBattery().changeSoc(-consumption);
 			double currentSoc = pseudoVehicle.getBattery().getSoc();
 			// to accomodate for ERS, where energy charge is directly implemented in the consumption model
 			double consumptionDiff = (lastSoc - currentSoc);

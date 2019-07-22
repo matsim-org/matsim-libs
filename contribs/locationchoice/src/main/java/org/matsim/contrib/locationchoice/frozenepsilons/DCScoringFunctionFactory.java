@@ -22,7 +22,6 @@ package org.matsim.contrib.locationchoice.frozenepsilons;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -32,7 +31,7 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 
-public class DCScoringFunctionFactory implements ScoringFunctionFactory {
+class DCScoringFunctionFactory implements ScoringFunctionFactory {
 	
 	private final static Logger log = Logger.getLogger(DCScoringFunctionFactory.class);
 	
@@ -49,7 +48,7 @@ public class DCScoringFunctionFactory implements ScoringFunctionFactory {
 		log.info("creating DCScoringFunctionFactory");
 		
 		// configure ScoringFunction according to config
-		DestinationChoiceConfigGroup dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+		FrozenTastesConfigGroup dccg = (FrozenTastesConfigGroup) scenario.getConfig().getModule( FrozenTastesConfigGroup.GROUP_NAME );
 		if (dccg != null) {
 			this.setUsingConfigParamsForScoring(dccg.getUseConfigParamsForScoring());
 			this.setUsingIndividualScoringParameters(dccg.getUseIndividualScoringParameters());
