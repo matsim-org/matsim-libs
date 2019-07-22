@@ -179,7 +179,7 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		// add a walk leg after parking
 		Leg currentPlannedLeg = (Leg) currentPlanElement;
 		Id<Link> walkDestination = currentPlannedLeg.getRoute().getEndLinkId();
-		Leg walkLeg = walkLegFactory.createWalkLeg(agent.getCurrentLinkId(), walkDestination, now, TransportMode.egress_walk);
+		Leg walkLeg = walkLegFactory.createWalkLeg(agent.getCurrentLinkId(), walkDestination, now, TransportMode.non_network_walk );
 		this.lastParkActionState = LastParkActionState.WALKFROMPARK;
 		this.stageInteractionType = null;
 		return new StaticPassengerDynLeg(walkLeg.getRoute(), walkLeg.getMode());
@@ -225,7 +225,7 @@ public class ParkingAgentLogic implements DynAgentLogic {
 			}
 
             Id<Link> teleportedParkLink = this.teleportationLogic.getVehicleLocation(agent.getCurrentLinkId(), vehicleId, parkLink, now, currentLeg.getMode());
-            Leg walkleg = walkLegFactory.createWalkLeg(agent.getCurrentLinkId(), teleportedParkLink, now, TransportMode.access_walk);
+            Leg walkleg = walkLegFactory.createWalkLeg(agent.getCurrentLinkId(), teleportedParkLink, now, TransportMode.non_network_walk );
 			this.lastParkActionState = LastParkActionState.WALKTOPARK;
 			this.currentlyAssignedVehicleId = vehicleId;
 			this.stageInteractionType = ParkingUtils.PARKACTIVITYTYPE;

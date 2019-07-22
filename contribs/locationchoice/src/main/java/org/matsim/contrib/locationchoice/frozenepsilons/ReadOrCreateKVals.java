@@ -23,8 +23,6 @@ package org.matsim.contrib.locationchoice.frozenepsilons;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.contrib.locationchoice.utils.RandomFromVarDistr;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacility;
@@ -57,7 +55,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 	 * This is important to know for reading (case 0) or computation of maxDCScore (case 1)
 	 */
 	public int run() {
-		DestinationChoiceConfigGroup dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+		FrozenTastesConfigGroup dccg = (FrozenTastesConfigGroup) scenario.getConfig().getModule( FrozenTastesConfigGroup.GROUP_NAME );
 		String pkValuesFileName = dccg.getpkValuesFile();
 		String fkValuesFileName = dccg.getfkValuesFile();
 		String maxEpsValuesFileName = dccg.getMaxEpsFile();
