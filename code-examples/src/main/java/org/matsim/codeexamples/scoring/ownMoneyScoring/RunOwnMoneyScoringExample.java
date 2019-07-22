@@ -1,4 +1,4 @@
-package tutorial.scoring.ownMoneyScoring;
+package org.matsim.codeexamples.scoring.ownMoneyScoring;
 
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;

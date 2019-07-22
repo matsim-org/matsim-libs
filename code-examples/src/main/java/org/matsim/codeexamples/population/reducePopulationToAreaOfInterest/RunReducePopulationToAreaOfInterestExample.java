@@ -18,6 +18,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.strategies.ChangeTripMode;
+import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -29,8 +30,9 @@ class RunReducePopulationToAreaOfInterestExample{
 	// what I want to do: go throw all persons, take their selected plan, and then:
 	// * route that selected plan entirely by car
 	// * find out of any of the routes go through my area of interest
-	// * remove the person it not
-	// yyyy However, I can't find an easy way of doing that. :-(  kai, jun'19
+	// * remove the person if not
+	// yyyy Someone should try this out.  kai, jul'19
+	// yyyy Someone should write a test case.  kai, jul'19
 
 
 	private static final Logger log = Logger.getLogger( RunReducePopulationToAreaOfInterestExample.class ) ;
@@ -64,13 +66,11 @@ class RunReducePopulationToAreaOfInterestExample{
 		@Inject TripRouter tripRouter ;
 		@Override public void notifyStartup( StartupEvent event ){
 
-			EditTrips editTrips = new EditTrips( tripRouter, scenario );;
+			PlanRouter planRouter = new PlanRouter( tripRouter, scenario.getActivityFacilities() );
 
 			for( Person person : scenario.getPopulation().getPersons().values() ){
 				Plan plan = person.getSelectedPlan() ;
-				for( TripStructureUtils.Trip trip : TripStructureUtils.getTrips( plan, tripRouter.getStageActivityTypes() ) ){
-					editTrips.replanFutureTrip( trip, plan, TransportMode.car ) ;
-				}
+				planRouter.run(plan) ;
 				for( Leg leg : TripStructureUtils.getLegs( plan ) ){
 					if ( leg.getRoute() instanceof NetworkRoute ) {
 						for( Id<Link> linkId : ((NetworkRoute) leg.getRoute()).getLinkIds() ) {
