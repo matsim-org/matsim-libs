@@ -11,7 +11,7 @@ public class RunAbcSimpleExampleTest{
 	@Test
 	public void main(){
 		try{
-			RunAbcExample.main( null );
+			RunAbcSimpleExample.main( null );
 		} catch ( Exception ee ) {
 			log.fatal(ee) ;
 			fail() ;
