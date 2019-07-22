@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -85,9 +86,11 @@ abstract class AbstractQLink implements QLinkI {
 	// joint implementation for Customizable
 	private final Map<String, Object> customAttributes = new HashMap<>();
 
-	private final Map<Id<Vehicle>, QVehicle> parkedVehicles = new LinkedHashMap<>(10);
+//	private final Map<Id<Vehicle>, QVehicle> parkedVehicles = new LinkedHashMap<>(10);
+	private final Map<Id<Vehicle>, QVehicle> parkedVehicles = new ConcurrentHashMap<>(10);
 
-	private final Map<Id<Person>, MobsimAgent> additionalAgentsOnLink = new LinkedHashMap<>();
+//	private final Map<Id<Person>, MobsimAgent> additionalAgentsOnLink = new LinkedHashMap<>();
+	private final Map<Id<Person>, MobsimAgent> additionalAgentsOnLink = new ConcurrentHashMap<>( ) ;
 
 	private final Map<Id<Vehicle>, Queue<MobsimDriverAgent>> driversWaitingForCars = new LinkedHashMap<>();
 
