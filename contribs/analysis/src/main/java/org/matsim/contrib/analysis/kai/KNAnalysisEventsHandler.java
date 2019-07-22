@@ -403,15 +403,12 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 	}
 
 	private void add( Person person, double val, final String attributeName ) {
-//		final ObjectAttributes pAttribs = this.scenario.getPopulation().getPersonAttributes();
-//		Double oldVal = (Double) pAttribs.getAttribute( person.toString(), attributeName ) ;
-		Double oldVal = (Double) PopulationUtils.getPersonAttribute( person, attributeName) ;
+		Double oldVal = (Double) attribs.getAttribute( person.toString(), attributeName ) ;
 		double newVal = val ;
 		if ( oldVal!=null ) {
 			newVal += oldVal ;
 		}
-//		pAttribs.putAttribute( person.toString(), attributeName, newVal ) ;
-		PopulationUtils.putPersonAttribute( person, attributeName, newVal );
+		attribs.putAttribute( person.toString(), attributeName, newVal ) ;
 	}
 
 	public void writeStats(final String filenameTmp) {
@@ -479,7 +476,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 		double maxPayment = Double.NEGATIVE_INFINITY ;
 		Set<String> subPopTypes = new HashSet<>() ;
 		for ( Person person : pop.getPersons().values() ) {
-			Double payment = (Double) PopulationUtils.getPersonAttribute( person, PAYMENTS) ;
+			Double payment = (Double) attribs.getAttribute( person.getId().toString(), PAYMENTS ) ;
 			if ( payment==null ) continue ;
 			if ( payment > maxPayment ) {
 				maxPayment = payment ;
@@ -500,7 +497,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 
 		for ( Person person : pop.getPersons().values() ) {
 			String subPopType = (String) PopulationUtils.getPersonAttribute( person, SUBPOPULATION) ;
-			Double payment = (Double) PopulationUtils.getPersonAttribute( person, PAYMENTS) ;
+			Double payment = (Double) attribs.getAttribute( person.getId().toString(), PAYMENTS ) ;
 			if (payment==null || subPopType == null) continue ;
 			int bin = (int) (payment/binSize) ;
 			sum.get(subPopType)[bin] += payment ;
