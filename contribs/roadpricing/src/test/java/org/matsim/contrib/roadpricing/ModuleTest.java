@@ -58,7 +58,7 @@ public class ModuleTest {
         Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(RoadPricingUtils.createModule());
+	    controler.addOverridingModule( new RoadPricingModule() );
 //        controler.setModules(new RoadPricingModuleDefaults());
         controler.run();
     }
@@ -72,11 +72,11 @@ public class ModuleTest {
 
         Controler controler1 = new Controler(scenario);
 //        controler1.setModules(new RoadPricingModuleDefaults());
-		controler1.addOverridingModule(RoadPricingUtils.createModule());
+	    controler1.addOverridingModule( new RoadPricingModule() );
         controler1.run();
         config.controler().setOutputDirectory(utils.getOutputDirectory()+"/2");
         Controler controler2 = new Controler(scenario);
-        controler2.addOverridingModule(RoadPricingUtils.createModule());
+	    controler2.addOverridingModule( new RoadPricingModule() );
 //        controler2.setModules(new RoadPricingModuleDefaults());
         controler2.run();
     }
