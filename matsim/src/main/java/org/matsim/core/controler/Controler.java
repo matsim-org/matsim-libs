@@ -440,21 +440,6 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 		});
 	}
 
-	/**
-	 * Allows you to set a factory for {@link org.matsim.core.router.TripRouter} instances.
-	 * Do this if your use-case requires custom routing logic, for instance if you
-	 * implement your own complex travel mode.
-	 * See {@link org.matsim.core.router.TripRouter} for more information and pointers to examples.
-	 */
-	@Deprecated // yyyy I don't think that it is plausible to have this as an official extension point. kai, mar'19
-	public final void setTripRouterFactory(final javax.inject.Provider<TripRouter> factory) {
-		this.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(TripRouter.class).toProvider(factory);
-			}
-		});
-	}
 	@Override
 	public final Controler addOverridingModule( AbstractModule abstractModule ) {
 		if (this.injectorCreated) {
