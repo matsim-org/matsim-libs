@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
+import org.matsim.core.config.ConfigUtils;
 
 /**
  * Utility to create different road pricing schemes.
@@ -36,16 +37,12 @@ public class RoadPricingUtils {
 		return new RoadPricingConfigGroup();
 	}
 
-	public static RoadPricingModule createModule() {
-		return new RoadPricingModule();
-	}
+	//	public static RoadPricingModule createModule(RoadPricingScheme scheme) {
+//		return new RoadPricingModule(scheme);
+//	}
 
-	public static RoadPricingModule createModule(RoadPricingScheme scheme) {
-		return new RoadPricingModule(scheme);
-	}
-
-	public static RoadPricingSchemeImpl createMutableScheme() {
-		return new RoadPricingSchemeImpl();
+	public static RoadPricingSchemeImpl createAndRegisterMutableScheme( Scenario scenario ) {
+		return (RoadPricingSchemeImpl) getScheme( scenario );
 	}
 
 	public static RoadPricingScheme getScheme(Scenario sc) {
@@ -78,5 +75,13 @@ public class RoadPricingUtils {
 
 	public static void addLinkSpecificCost(RoadPricingSchemeImpl scheme, Id<Link> linkId, double startTime, double endTime, double amount){
 		scheme.addLinkCost(linkId, startTime, endTime, amount);
+	}
+
+	public static RoadPricingSchemeImpl loadRoadPricingScheme( Scenario sc ){
+		RoadPricingSchemeImpl scheme = (RoadPricingSchemeImpl) getScheme( sc );
+		RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule( sc.getConfig(), RoadPricingConfigGroup.class );
+		;
+		new RoadPricingReaderXMLv1( scheme ).readFile( rpConfig.getTollLinksFile() );
+		return scheme;
 	}
 }

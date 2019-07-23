@@ -20,35 +20,20 @@
 
 package org.matsim.contrib.roadpricing;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
-import java.util.List;
-
-import javax.inject.Provider;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.AStarLandmarksFactory;
-import org.matsim.core.router.DijkstraFactory;
-import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -57,8 +42,13 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.testcases.MatsimTestUtils;
+
+import javax.inject.Provider;
+import java.util.List;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * Tests the correct working of {@link TravelDisutilityIncludingToll} by using it
@@ -78,7 +68,7 @@ public class TollTravelCostCalculatorTest {
 		RoadPricingTestUtils.createNetwork2((MutableScenario)scenario);
 		Network net = scenario.getNetwork() ;
 		
-		RoadPricingSchemeImpl scheme = RoadPricingUtils.createMutableScheme();
+		RoadPricingSchemeImpl scheme = RoadPricingUtils.createAndRegisterMutableScheme( ScenarioUtils.createScenario( ConfigUtils.createConfig() ) );
 		scheme.setType(RoadPricingScheme.TOLL_TYPE_DISTANCE);
 		final Id<Link> link5Id = Id.create("5", Link.class);
 		scheme.addLink(link5Id);
@@ -127,7 +117,7 @@ public class TollTravelCostCalculatorTest {
 		RoadPricingTestUtils.createNetwork2(scenario);
 		Network network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.createMutableScheme();
+		RoadPricingSchemeImpl toll = RoadPricingUtils.createAndRegisterMutableScheme(ScenarioUtils.createScenario( ConfigUtils.createConfig() ) );
 		toll.setType(RoadPricingScheme.TOLL_TYPE_DISTANCE);
 		toll.addLink(Id.create("5", Link.class));
 		toll.addLink(Id.create("11", Link.class));
@@ -212,7 +202,7 @@ public class TollTravelCostCalculatorTest {
 		RoadPricingTestUtils.createNetwork2(scenario);
 		Network network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.createMutableScheme();
+		RoadPricingSchemeImpl toll = RoadPricingUtils.createAndRegisterMutableScheme(ScenarioUtils.createScenario( ConfigUtils.createConfig() ) );
 		toll.setType(RoadPricingScheme.TOLL_TYPE_LINK);
 		toll.addLink(Id.create("5", Link.class));
 		toll.addLink(Id.create("11", Link.class));
@@ -307,7 +297,7 @@ public class TollTravelCostCalculatorTest {
 		RoadPricingTestUtils.createNetwork2(scenario);
 		Network network = scenario.getNetwork();
 		// a basic toll where only the morning hours are tolled
-		RoadPricingSchemeImpl toll = RoadPricingUtils.createMutableScheme();
+		RoadPricingSchemeImpl toll = RoadPricingUtils.createAndRegisterMutableScheme(ScenarioUtils.createScenario( ConfigUtils.createConfig() ) );
 		toll.setType(RoadPricingScheme.TOLL_TYPE_CORDON);
 		toll.addLink(Id.create("5", Link.class));
 		toll.addLink(Id.create("11", Link.class));

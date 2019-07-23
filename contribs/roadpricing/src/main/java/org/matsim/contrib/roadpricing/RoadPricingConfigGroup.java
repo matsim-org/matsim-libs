@@ -22,6 +22,7 @@ package org.matsim.contrib.roadpricing;
 
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 public final class RoadPricingConfigGroup extends ReflectiveConfigGroup {
@@ -37,18 +38,24 @@ public final class RoadPricingConfigGroup extends ReflectiveConfigGroup {
 	 * by themselves. kai, in consultation with michael z. and johan j, sep'14
 	 */
 
+	private static final Logger LOG = Logger.getLogger(RoadPricingConfigGroup.class);
+
 	public static final String GROUP_NAME = "roadpricing";
 
 	private static final String TOLL_LINKS_FILE = "tollLinksFile";
+	private static final String TOLL_ENFORCEMENT_PROBABILITY = "enforcementEfficiency";
+
 	private String tollLinksFile = null;
+	private double enforcementProbability = 1.0;
 
 	/**
 	 * Create using {@link RoadPricingUtils#createConfigGroup()}.
 	 */
 	public RoadPricingConfigGroup() {
 		super(GROUP_NAME);
-	}
 
+		getComments().put(GROUP_NAME, "The probability that the toll is actually paid by the vehicle/person. Must be in the range [0.0, 1.0], and defaults to 1.0");
+	}
 
     @Override
     public Map<String, String> getComments() {
@@ -64,4 +71,22 @@ public final class RoadPricingConfigGroup extends ReflectiveConfigGroup {
 	public void setTollLinksFile(final String tollLinksFile) {
 		this.tollLinksFile = tollLinksFile;
 	}
+
+	@StringGetter(TOLL_ENFORCEMENT_PROBABILITY)
+	public double getEnforcementProbability() {
+		return enforcementProbability;
+	}
+
+	@StringSetter(TOLL_ENFORCEMENT_PROBABILITY)
+	public void setEnforcementProbability(double enforcementProbability) {
+		if(enforcementProbability > 1.0){
+			throw new IllegalArgumentException("The enforcement efficiency must be in the range [0,1]");
+		}
+		if(enforcementProbability != 1.0){
+			LOG.warn("The probability of collecting toll is less than 1. Make sure this is what you want!");
+		}
+		this.enforcementProbability = enforcementProbability;
+	}
+
+
 }

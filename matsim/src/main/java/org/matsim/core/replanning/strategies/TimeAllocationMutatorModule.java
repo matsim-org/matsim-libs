@@ -59,7 +59,6 @@ class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 	private final double mutationRange;
 	private final boolean affectingDuration;
 	private final String subpopulationAttribute;
-	private final ObjectAttributes personAttributes;
 	private final Map<String, Double> subpopulationMutationRanges;
 	private final Map<String, Boolean> subpopulationAffectingDuration;
 	private final PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation;
@@ -75,7 +74,6 @@ class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 		this.affectingDuration = affectingDuration;
 		this.mutationRange = mutationRange;
 		this.activityDurationInterpretation = (config.plans().getActivityDurationInterpretation());
-		this.personAttributes = null;
 		this.subpopulationAttribute = null;
 		this.subpopulationMutationRanges = null;
 		this.subpopulationAffectingDuration = null;
@@ -99,8 +97,7 @@ class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 			this.subpopulationAttribute = plansConfigGroup.getSubpopulationAttributeName();
 			this.subpopulationMutationRanges = new HashMap<>();
 			this.subpopulationAffectingDuration = new HashMap<>();
-			this.personAttributes = population.getPersonAttributes();
-			
+
 			Collection<? extends ConfigGroup> settings = timeAllocationMutatorConfigGroup.getParameterSets(TimeAllocationMutatorSubpopulationSettings.SET_NAME);
 			for (ConfigGroup group : settings) {
 				TimeAllocationMutatorSubpopulationSettings subpopulationSettings = (TimeAllocationMutatorSubpopulationSettings) group;
@@ -110,7 +107,6 @@ class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 				log.info("Found individual time mutator settings for subpopulation: " + subpopulation);
 			}
 		} else {
-			this.personAttributes = null;
 			this.subpopulationAttribute = null;
 			this.subpopulationMutationRanges = null;
 			this.subpopulationAffectingDuration = null;
@@ -123,7 +119,7 @@ class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 		switch (this.activityDurationInterpretation) {
 		case minOfDurationAndEndTime:
 			pmta = new TripPlanMutateTimeAllocation(this.tripRouterProvider.get().getStageActivityTypes(), this.mutationRange, this.affectingDuration, MatsimRandom.getLocalInstance(),
-					this.subpopulationAttribute, this.personAttributes, this.subpopulationMutationRanges, this.subpopulationAffectingDuration);
+					this.subpopulationAttribute, this.subpopulationMutationRanges, this.subpopulationAffectingDuration);
 			break;
 		default:
 			pmta = new PlanMutateTimeAllocationSimplified(

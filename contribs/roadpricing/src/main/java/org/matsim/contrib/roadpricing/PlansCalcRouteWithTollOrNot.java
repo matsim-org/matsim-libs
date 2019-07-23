@@ -30,21 +30,18 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelTime;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import java.util.Map;
 
  class PlansCalcRouteWithTollOrNot implements PlanAlgorithm {
 
-	public static final String CAR_WITH_PAYED_AREA_TOLL = "car_with_payed_area_toll";
+	static final String CAR_WITH_PAYED_AREA_TOLL = "car_with_payed_area_toll";
 	private RoadPricingScheme roadPricingScheme;
 	private Provider<TripRouter> tripRouterFactory;
 
 	@Inject
-	PlansCalcRouteWithTollOrNot(RoadPricingScheme roadPricingScheme, Provider<TripRouter> tripRouterFactory, Map<String, TravelDisutilityFactory> travelDisutilityFactory, Map<String, TravelTime> travelTime) {
+	PlansCalcRouteWithTollOrNot(RoadPricingScheme roadPricingScheme, Provider<TripRouter> tripRouterFactory) {
 		this.roadPricingScheme = roadPricingScheme;
 		this.tripRouterFactory = tripRouterFactory;
 	}

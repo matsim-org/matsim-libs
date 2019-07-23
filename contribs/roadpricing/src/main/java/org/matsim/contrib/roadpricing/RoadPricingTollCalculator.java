@@ -56,7 +56,7 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 
 	static class AgentTollInfo {
 		public double toll = 0.0;
-		public boolean insideCordonArea = true;
+		boolean insideCordonArea = true;
 	}
 
 	final RoadPricingScheme scheme;
@@ -108,6 +108,7 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 			/* we do not handle wait2link-events for these tolls, because the agent
 			 * should not pay twice for this link, and he (likely) paid already when
 			 * arriving at this link.  */
+			//noinspection UnnecessaryReturnStatement
 			return;
 		} else {
 			// Just like a LinkEnterEvent

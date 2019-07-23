@@ -29,6 +29,9 @@ import java.util.Map;
  * @author thibautd
  */
 public class AttributesUtils {
+	public static final String ATTRIBUTES = "attributes";
+	public static final String ATTRIBUTE = "attribute";
+
 	/**
 	 * Adds the mappings from "from" to "to". Nothing is done to copy the Object themselves,
 	 * which should be fine for 99.9% of the usecases of Attributes (value objects)
