@@ -28,7 +28,7 @@ public class ExampleIndividualizedScoringParametersPerPerson implements ScoringP
 	public ScoringParameters getScoringParameters(Person person) {
 		if ( cache.containsKey( person.getId() ) ) return cache.get( person.getId() );
 
-		final ScoringParameters.Builder builder = new ScoringParameters.Builder(scenario, person.getId());
+		final ScoringParameters.Builder builder = new ScoringParameters.Builder(scenario, person);
 
 		// tune. Here hard-coded for lisibility, but should be computed/read from person attributes.
 		builder.getActivityParameters( "h" ).setTypicalDuration_s( 8 * 3600 );

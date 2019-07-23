@@ -15,6 +15,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.population.PersonUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -35,11 +37,9 @@ public class RunCustomScoringExample {
 
 	private static final class RainScoringFunctionFactory implements ScoringFunctionFactory {
 		private final  Scenario scenario;
-		private final ObjectAttributes personAttributes;
 
-		private RainScoringFunctionFactory(Scenario scenario, ObjectAttributes personAttributes) {
+		private RainScoringFunctionFactory( Scenario scenario ) {
 			this.scenario = scenario;
-			this.personAttributes = personAttributes;
 		}
 
 		@Override
@@ -48,13 +48,14 @@ public class RunCustomScoringExample {
 
 			// Score activities, legs, payments and being stuck
 			// with the default MATSim scoring based on utility parameters in the config file.
-			final ScoringParameters params = new ScoringParameters.Builder(scenario, person.getId()).build();
+			final ScoringParameters params = new ScoringParameters.Builder(scenario, person).build();
 			sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
 			sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
 			sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));
 			sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
-			if ((Boolean) personAttributes.getAttribute(person.getId().toString(), DISLIKES_LEAVING_EARLY_AND_COMING_HOME_LATE)) {
+//			if ((Boolean) personAttributes.getAttribute(person.getId().toString(), DISLIKES_LEAVING_EARLY_AND_COMING_HOME_LATE)) {
+			if ((Boolean) PopulationUtils.getPersonAttribute( person, DISLIKES_LEAVING_EARLY_AND_COMING_HOME_LATE ) ) {
 				sumScoringFunction.addScoringFunction(new ExtremeTimePenaltyScoring());
 			}
 
@@ -72,12 +73,14 @@ public class RunCustomScoringExample {
 		// ObjectAttributes can be written to and read from files, so in reality,
 		// this would come from a census, a pre-processing step, or from anywhere else, 
 		// but for this example I just make it up.
-		final ObjectAttributes personAttributes = scenario.getPopulation().getPersonAttributes();
+//		final ObjectAttributes personAttributes = scenario.getPopulation().getPersonAttributes();
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			if (Integer.parseInt(person.getId().toString()) % 2 == 0) {
-				personAttributes.putAttribute(person.getId().toString(), DISLIKES_LEAVING_EARLY_AND_COMING_HOME_LATE, true);
+//				personAttributes.putAttribute(person.getId().toString(), DISLIKES_LEAVING_EARLY_AND_COMING_HOME_LATE, true);
+				PopulationUtils.putPersonAttribute( person, DISLIKES_LEAVING_EARLY_AND_COMING_HOME_LATE, true );
 			} else {
-				personAttributes.putAttribute(person.getId().toString(), DISLIKES_LEAVING_EARLY_AND_COMING_HOME_LATE, false);
+//				personAttributes.putAttribute(person.getId().toString(), DISLIKES_LEAVING_EARLY_AND_COMING_HOME_LATE, false);
+				PopulationUtils.putPersonAttribute( person, DISLIKES_LEAVING_EARLY_AND_COMING_HOME_LATE, false );
 			}
 		}
 
@@ -94,7 +97,7 @@ public class RunCustomScoringExample {
 
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install() {
-				this.bindScoringFunctionFactory().toInstance(new RainScoringFunctionFactory(scenario, personAttributes) ) ;
+				this.bindScoringFunctionFactory().toInstance(new RainScoringFunctionFactory(scenario) ) ;
 				
 			}
 

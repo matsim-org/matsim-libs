@@ -78,7 +78,7 @@ public class RunScenarioWithCustomScoring {
 				// Score activities, legs, payments and being stuck
 				// with the default MATSim scoring based on utility parameters in the config file.
 				final ScoringParameters params =
-						new ScoringParameters.Builder(scenario, person.getId()).build();
+						new ScoringParameters.Builder(scenario, person).build();
 				sumScoringFunction.addScoringFunction(new KindergartenActivityScoring(person.getId(), kindergartenArrivalHandler));
 				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
 				sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));

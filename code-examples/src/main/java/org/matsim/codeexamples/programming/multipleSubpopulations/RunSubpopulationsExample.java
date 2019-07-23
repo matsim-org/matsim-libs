@@ -29,6 +29,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
@@ -144,7 +145,7 @@ public class RunSubpopulationsExample {
 			createPopulation(sc, SUBPOP1_NAME, 100);
 			createPopulation(sc, SUBPOP2_NAME, 100);
 			new PopulationWriter(sc.getPopulation(), sc.getNetwork()).write(PLANS);
-			new ObjectAttributesXmlWriter(sc.getPopulation().getPersonAttributes()).writeFile(OBJECT_ATTRIBUTES);
+//			new ObjectAttributesXmlWriter(sc.getPopulation().getPersonAttributes()).writeFile(OBJECT_ATTRIBUTES);
 		}
 	}
 
@@ -181,7 +182,8 @@ public class RunSubpopulationsExample {
 			scenario.getPopulation().addPerson(person);
 
 			/* Set the subpopulation attribute. */
-			scenario.getPopulation().getPersonAttributes().putAttribute(person.getId().toString(), SUBPOP_ATTRIB_NAME, prefix);
+//			scenario.getPopulation().getPersonAttributes().putAttribute(person.getId().toString(), SUBPOP_ATTRIB_NAME, prefix);
+			PopulationUtils.putPersonAttribute( person, SUBPOP_ATTRIB_NAME, prefix );
 		}
 	}
 
