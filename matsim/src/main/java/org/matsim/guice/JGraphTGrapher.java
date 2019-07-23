@@ -85,12 +85,6 @@ public class JGraphTGrapher extends AbstractInjectorGrapher {
 
 	@Override
 	protected void postProcess() throws IOException {
-		for (Node node : new HashSet<>(g.vertexSet())) {
-//			if ((node instanceof InterfaceNode) && node.getId().getKey().getTypeLiteral().getRawType().isAssignableFrom(Map.class) && !node.getId().getKey().toString().contains("AttributeConverter") /* regular MapBinder, not my construct */) {
-//				removeIntermediate(node, this.g);
-//			}
-			System.out.println(node.getId().getKey().toString());
-		}
 		DirectedGraph<Node, Edge> filtered = new DirectedMaskSubgraph<>(g, new MaskFunctor<Node, Edge>() {
 			@Override
 			public boolean isEdgeMasked(Edge edge) {
@@ -195,7 +189,12 @@ public class JGraphTGrapher extends AbstractInjectorGrapher {
 				return !ci.connectedSetOf(vertex).contains(node);
 			}
 		}));
-
+//		for (Node node : new HashSet<>(g.vertexSet())) {
+//			if ((node instanceof InterfaceNode) && node.getId().getKey().getTypeLiteral().getRawType().isAssignableFrom(Map.class) && !node.getId().getKey().toString().contains("AttributeConverter") /* regular MapBinder, not my construct */) {
+//				removeIntermediate(node, this.g);
+//			}
+//			System.out.println(node.getId().getKey().toString());
+//		}
 //		for (Node node : new HashSet<>(filtered.vertexSet())) {
 //			if (node.getId().getKey().toString().contains("PlansReplanningImpl") || node.getId().getKey().toString().contains("PlansScoringImpl")) {
 //				removeIntermediate(node, filtered);
@@ -210,10 +209,11 @@ public class JGraphTGrapher extends AbstractInjectorGrapher {
 	}
 
 	private void removeIntermediate(Node node, DirectedGraph<Node, Edge> g) {
-		if (g.incomingEdgesOf(node).size() != 1) {
+		Set<Edge> edges = g.incomingEdgesOf(node);
+		if (edges.size() != 1) {
 			throw new RuntimeException(node.toString());
 		}
-		Edge otherEdge = g.incomingEdgesOf(node).iterator().next();
+		Edge otherEdge = edges.iterator().next();
 		for (Edge edge : new ArrayList<>(g.outgoingEdgesOf(node))) {
 			Node target = g.getEdgeTarget(edge);
 			Node source = g.getEdgeSource(otherEdge);

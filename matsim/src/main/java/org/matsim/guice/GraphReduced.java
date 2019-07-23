@@ -41,6 +41,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -91,7 +92,8 @@ public class GraphReduced {
                                 allAliases.addAll(getMultibinderAliases(SnapshotWriter.class, bindings));
                                 allAliases.addAll(getMultibinderAliases(MobsimListener.class, bindings));
                                 allAliases.addAll(getMultibinderAliases(EventHandler.class, bindings));
-                                return allAliases;
+								allAliases.addAll(getMultibinderAliases(AbstractQSimModule.class, bindings));
+								return allAliases;
                             }
                     ), out);
             renderer.graph(matsimInjector.getInstance(com.google.inject.Injector.class));
@@ -106,6 +108,7 @@ public class GraphReduced {
 		ParameterizedType comGoogleInjectProvider = Types.newParameterizedType(Provider.class, aClass);
 		ParameterizedType javaxInjectProvider = Types.newParameterizedType(javax.inject.Provider.class, aClass);
 		aliases.add(new Alias(NodeId.newInstanceId(Key.get(Types.setOf(aClass))), toId));
+		aliases.add(new Alias(NodeId.newTypeId(Key.get(Types.newParameterizedType(Collection.class, aClass))), toId));
 		aliases.add(new Alias(NodeId.newTypeId(Key.get(Types.newParameterizedType(Collection.class, comGoogleInjectProvider))), toId));
 		aliases.add(new Alias(NodeId.newInstanceId(Key.get(Types.newParameterizedType(Collection.class, comGoogleInjectProvider))), toId));
 		aliases.add(new Alias(NodeId.newTypeId(Key.get(Types.newParameterizedType(Collection.class, javaxInjectProvider))), toId));
