@@ -50,6 +50,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim {
@@ -184,8 +185,16 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	private void createAndAddVehiclesForEveryNetworkMode(final Map<String, VehicleType> modeVehicleTypes) {
 		for ( Person person : scenario.getPopulation().getPersons().values()) {
 			for (String mode : scenario.getConfig().qsim().getMainModes()) {
-                Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(person, mode, this.scenario.getConfig());
+				Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(person, mode, this.scenario.getConfig());
 				createAndAddVehicleIfNotPresent(vehicleId, modeVehicleTypes.get(mode));
+
+				Map<String, Id<Vehicle>> map = (Map<String, Id<Vehicle>>) person.getAttributes().getAttribute( "vehicles" );
+				if ( map==null ) {
+					list = ... ;
+					map = ... ;
+				}
+				map.put(mode, ....) ;
+				person.getAttributes().putAttribute(  ) ;
 			}
 		}
 	}
@@ -221,15 +230,15 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 
 	private void createAndAddVehicleIfNotPresent(Id<Vehicle> vehicleId, VehicleType vehicleType) {
 		// try to get vehicle from the vehicles container:
-        Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId);
+		Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId);
 
 		if ( vehicle==null ) {
 			// if it was not found, next step depends on config:
 			switch ( qSimConfigGroup.getVehiclesSource() ) {
 				case defaultVehicle:
 				case modeVehicleTypesFromVehiclesData:
-                    vehicle = scenario.getVehicles().getFactory().createVehicle(vehicleId, vehicleType);
-                    scenario.getVehicles().addVehicle(vehicle);
+					vehicle = scenario.getVehicles().getFactory().createVehicle(vehicleId, vehicleType);
+					scenario.getVehicles().addVehicle(vehicle);
 					break;
 				case fromVehiclesData:
 					// otherwise complain:
