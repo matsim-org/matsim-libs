@@ -123,12 +123,14 @@ public class GraphReduced {
 		ParameterizedType comGoogleInjectProvider = Types.newParameterizedType(Provider.class, aClass);
 		ParameterizedType javaxInjectProvider = Types.newParameterizedType(javax.inject.Provider.class, aClass);
 		ParameterizedType stringToComGoogleInjectProviderMapEntry = Types.newParameterizedTypeWithOwner(Map.class, Map.Entry.class, keyType, comGoogleInjectProvider);
+		ParameterizedType stringToJavaxInjectProviderMapEntry = Types.newParameterizedTypeWithOwner(Map.class, Map.Entry.class, keyType, javaxInjectProvider);
 		aliases.add(new Alias(NodeId.newInstanceId(Key.get(Types.setOf(stringToComGoogleInjectProviderMapEntry))), toId));
 		aliases.add(new Alias(NodeId.newTypeId(Key.get(Types.mapOf(keyType, comGoogleInjectProvider))), toId));
 		aliases.add(new Alias(NodeId.newTypeId(Key.get(Types.mapOf(keyType, javaxInjectProvider))), toId));
 		aliases.add(new Alias(NodeId.newInstanceId(Key.get(Types.mapOf(keyType, comGoogleInjectProvider))), toId));
 		aliases.add(new Alias(NodeId.newInstanceId(Key.get(Types.mapOf(keyType, aClass))), toId));
 		aliases.add(new Alias(NodeId.newTypeId(Key.get(Types.setOf(stringToComGoogleInjectProviderMapEntry))), toId));
+		aliases.add(new Alias(NodeId.newTypeId(Key.get(Types.setOf(stringToJavaxInjectProviderMapEntry))), toId));
 		aliases.add(new Alias(NodeId.newTypeId(Key.get(Types.newParameterizedType(Collection.class, Types.newParameterizedType(javax.inject.Provider.class, stringToComGoogleInjectProviderMapEntry)))), toId));
 		aliases.add(new Alias(NodeId.newTypeId(Key.get(Types.newParameterizedType(Collection.class, Types.newParameterizedType(Provider.class, stringToComGoogleInjectProviderMapEntry)))), toId));
 		aliases.add(new Alias(NodeId.newInstanceId(Key.get(Types.newParameterizedType(Collection.class, Types.newParameterizedType(Provider.class, stringToComGoogleInjectProviderMapEntry)))), toId));

@@ -42,74 +42,9 @@ public class MyGrapher extends AbstractInjectorGrapher {
 	boolean fields = false;
 
 	MyGrapher() {
-		super(new GrapherParameters()
-				.setAliasCreator(bindings -> {
-							// Copied from ProviderAliasCreator
-							List<Alias> allAliases = Lists.newArrayList();
-							for (Binding<?> binding : bindings) {
-								if (binding instanceof ProviderBinding) {
-									allAliases.add(new Alias(NodeId.newTypeId(binding.getKey()),
-											NodeId.newTypeId(((ProviderBinding<?>) binding).getProvidedKey())));
-								}
-							}
-							allAliases.addAll(getMapBinderAliases(String.class, TravelTime.class, bindings));
-							allAliases.addAll(getMapBinderAliases(String.class, TravelDisutilityFactory.class, bindings));
-							allAliases.addAll(getMapBinderAliases(String.class, RoutingModule.class, bindings));
-							allAliases.addAll(getMapBinderAliases(StrategyConfigGroup.StrategySettings.class, PlanStrategy.class, bindings));
-							allAliases.addAll(getMultibinderAliases(ControlerListener.class, bindings));
-							allAliases.addAll(getMultibinderAliases(SnapshotWriter.class, bindings));
-							allAliases.addAll(getMultibinderAliases(MobsimListener.class, bindings));
-							allAliases.addAll(getMultibinderAliases(EventHandler.class, bindings));
-							return allAliases;
-						}
-				));
+		super();
 	}
-
-	static List<Alias> getMultibinderAliases(Type aClass, Iterable<Binding<?>> bindings) {
-		List<Alias> aliases = Lists.newArrayList();
-		NodeId toId = NodeId.newTypeId(Key.get(Types.setOf(aClass)));
-		ParameterizedType comGoogleInjectProvider = Types.newParameterizedType(com.google.inject.Provider.class, aClass);
-		ParameterizedType javaxInjectProvider = Types.newParameterizedType(Provider.class, aClass);
-		aliases.add(new Alias(NodeId.newInstanceId(Key.get(Types.setOf(aClass))), toId));
-		aliases.add(new Alias(NodeId.newTypeId(Key.get(Types.newParameterizedType(Collection.class, comGoogleInjectProvider))), toId));
-		aliases.add(new Alias(NodeId.newInstanceId(Key.get(Types.newParameterizedType(Collection.class, comGoogleInjectProvider))), toId));
-		aliases.add(new Alias(NodeId.newTypeId(Key.get(Types.newParameterizedType(Collection.class, javaxInjectProvider))), toId));
-		for (Binding<?> binding : bindings) {
-			if (binding.getKey().getTypeLiteral().getType().equals(aClass) && binding.getKey().getAnnotationType() != null && binding.getKey().getAnnotationType().getName().equals("com.google.inject.multibindings.Element")) {
-				aliases.add(new Alias(NodeId.newTypeId(binding.getKey()), toId));
-			}
-		}
-		return aliases;
-	}
-
-	static <K> List<Alias> getMapBinderAliases(Class<K> keyType, Type aClass, Iterable<Binding<?>> bindings) {
-		List<Alias> aliases = Lists.newArrayList();
-		NodeId toId = NodeId.newTypeId(Key.get(Types.mapOf(keyType, aClass)));
-		ParameterizedType comGoogleInjectProvider = Types.newParameterizedType(com.google.inject.Provider.class, aClass);
-		ParameterizedType javaxInjectProvider = Types.newParameterizedType(Provider.class, aClass);
-		ParameterizedType stringToComGoogleInjectProviderMapEntry = Types.newParameterizedTypeWithOwner(Map.class, Map.Entry.class, keyType, comGoogleInjectProvider);
-		aliases.add(new Alias(NodeId.newInstanceId(Key.get(Types.setOf(stringToComGoogleInjectProviderMapEntry))), toId));
-		aliases.add(new Alias(NodeId.newTypeId(Key.get(Types.mapOf(keyType, comGoogleInjectProvider))), toId));
-		aliases.add(new Alias(NodeId.newTypeId(Key.get(Types.mapOf(keyType, javaxInjectProvider))), toId));
-		aliases.add(new Alias(NodeId.newInstanceId(Key.get(Types.mapOf(keyType, comGoogleInjectProvider))), toId));
-		aliases.add(new Alias(NodeId.newInstanceId(Key.get(Types.mapOf(keyType, aClass))), toId));
-		aliases.add(new Alias(NodeId.newTypeId(Key.get(Types.setOf(stringToComGoogleInjectProviderMapEntry))), toId));
-		aliases.add(new Alias(NodeId.newTypeId(Key.get(Types.newParameterizedType(Collection.class, Types.newParameterizedType(Provider.class, stringToComGoogleInjectProviderMapEntry)))), toId));
-		aliases.add(new Alias(NodeId.newTypeId(Key.get(Types.newParameterizedType(Collection.class, Types.newParameterizedType(com.google.inject.Provider.class, stringToComGoogleInjectProviderMapEntry)))), toId));
-		aliases.add(new Alias(NodeId.newInstanceId(Key.get(Types.newParameterizedType(Collection.class, Types.newParameterizedType(com.google.inject.Provider.class, stringToComGoogleInjectProviderMapEntry)))), toId));
-		for (Binding<?> binding : bindings) {
-			if (binding.getKey().getTypeLiteral().getType().equals(aClass) && binding.getKey().getAnnotationType() != null && binding.getKey().getAnnotationType().getName().equals("com.google.inject.multibindings.Element")) {
-				aliases.add(new Alias(NodeId.newTypeId(binding.getKey()), toId));
-				aliases.add(new Alias(NodeId.newInstanceId(binding.getKey()), toId));
-			}
-			if (binding.getKey().getTypeLiteral().getType().equals(stringToComGoogleInjectProviderMapEntry) && binding.getKey().getAnnotationType() != null && binding.getKey().getAnnotationType().getName().equals("com.google.inject.multibindings.Element")) {
-				aliases.add(new Alias(NodeId.newTypeId(binding.getKey()), toId));
-				aliases.add(new Alias(NodeId.newInstanceId(binding.getKey()), toId));
-			}
-		}
-		return aliases;
-	}
-
+	
 	private final Map<NodeId, GraphvizNode> nodes = Maps.newHashMap();
 	private final List<GraphvizEdge> edges = Lists.newArrayList();
 	private final NameFactory nameFactory = new ShortNameFactory();

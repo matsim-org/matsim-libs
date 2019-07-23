@@ -196,12 +196,12 @@ public class JGraphTGrapher extends AbstractInjectorGrapher {
 			}
 		}));
 
-		for (Node node : new HashSet<>(filtered.vertexSet())) {
-			if (node.getId().getKey().toString().contains("PlansReplanningImpl") || node.getId().getKey().toString().contains("PlansScoringImpl")) {
-				removeIntermediate(node, filtered);
-			}
-			System.out.println(node.getId().getKey().toString());
-		}
+//		for (Node node : new HashSet<>(filtered.vertexSet())) {
+//			if (node.getId().getKey().toString().contains("PlansReplanningImpl") || node.getId().getKey().toString().contains("PlansScoringImpl")) {
+//				removeIntermediate(node, filtered);
+//			}
+//			System.out.println(node.getId().getKey().toString());
+//		}
 
 		MyGrapher myGrapher = new MyGrapher();
 		myGrapher.setRankdir("LR");
