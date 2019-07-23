@@ -1,13 +1,9 @@
 package org.matsim.contrib.emissions.analysis;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -22,15 +18,19 @@ import org.matsim.contrib.analysis.spatial.SpatialInterpolation;
 import org.matsim.contrib.analysis.spatial.SquareGrid;
 import org.matsim.contrib.analysis.time.TimeBinMap;
 import org.matsim.contrib.emissions.events.EmissionEventsReader;
-import org.matsim.contrib.emissions.types.Pollutant;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.matsim.core.utils.collections.Tuple;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.AbstractMap;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class may be used to collect emission events of some events file and assign those emissions to a grid structure.
@@ -51,7 +51,7 @@ public class EmissionGridAnalyzer {
     private final Network network;
     private final Geometry bounds;
     private TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> emissionsByPollutant;
-    private TimeBinMap<Grid<Map<Pollutant, Double>>> binHolder;
+    private TimeBinMap<Grid<Map<String, Double>>> binHolder;
     private Iterator<TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>>> timeBins;
 
     private double shortestDistanceWithWeightToZero = Double.MAX_VALUE;
@@ -79,16 +79,16 @@ public class EmissionGridAnalyzer {
      * @param eventsFile Path to the events file e.g. '/path/to/events.xml.gz
      * @return TimeBinMap containing a grid which maps pollutants to values.
      */
-    public TimeBinMap<Grid<Map<Pollutant, Double>>> process(String eventsFile) {
+    public TimeBinMap<Grid<Map<String, Double>>> process(String eventsFile) {
     	
         TimeBinMap<Map<Id<Link>, EmissionsByPollutant>> timeBinsWithEmissions = processEventsFile(eventsFile);
-        TimeBinMap<Grid<Map<Pollutant, Double>>> result = new TimeBinMap<>(binSize);
+        TimeBinMap<Grid<Map<String, Double>>> result = new TimeBinMap<>(binSize);
 
         logger.info("Starting grid computation...");
         
         timeBinsWithEmissions.getTimeBins().forEach(bin -> {
             logger.info("creating grid for time bin with start time: " + bin.getStartTime());
-            Grid<Map<Pollutant, Double>> grid = writeAllLinksToGrid(bin.getValue());
+            Grid<Map<String, Double>> grid = writeAllLinksToGrid(bin.getValue());
             result.getTimeBin(bin.getStartTime()).setValue(grid);
         });
 
@@ -139,7 +139,7 @@ public class EmissionGridAnalyzer {
         TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> nextBin = this.timeBins.next();
         logger.info("creating grid for time bin with start time: " + nextBin.getStartTime());
 
-        Grid<Map<Pollutant, Double>> grid = writeAllLinksToGrid(nextBin.getValue());
+        Grid<Map<String, Double>> grid = writeAllLinksToGrid(nextBin.getValue());
 
         ObjectMapper mapper = createObjectMapper();
         try {
@@ -159,7 +159,7 @@ public class EmissionGridAnalyzer {
     public String processToJsonString(String eventsFile) {
 
         ObjectMapper mapper = createObjectMapper();
-        TimeBinMap<Grid<Map<Pollutant, Double>>> result = process(eventsFile);
+        TimeBinMap<Grid<Map<String, Double>>> result = process(eventsFile);
         try {
             return mapper.writeValueAsString(result);
         } catch (JsonProcessingException e) {
@@ -176,7 +176,7 @@ public class EmissionGridAnalyzer {
     public void processToJsonFile(String eventsFile, String jsonFile) {
 
         ObjectMapper mapper = createObjectMapper();
-        TimeBinMap<Grid<Map<Pollutant, Double>>> result = process(eventsFile);
+        TimeBinMap<Grid<Map<String, Double>>> result = process(eventsFile);
 
         try {
             mapper.writeValue(new File(jsonFile), result);
@@ -195,9 +195,9 @@ public class EmissionGridAnalyzer {
         return handler.getTimeBins();
     }
 
-    private Grid<Map<Pollutant, Double>> writeAllLinksToGrid(Map<Id<Link>, EmissionsByPollutant> linksWithEmissions) {
+    private Grid<Map<String, Double>> writeAllLinksToGrid(Map<Id<Link>, EmissionsByPollutant> linksWithEmissions) {
 
-        Grid<Map<Pollutant, Double>> grid = createGrid();
+        Grid<Map<String, Double>> grid = createGrid();
         int counter = 0;
 
         for (Id<Link> id : linksWithEmissions.keySet()) {
@@ -214,7 +214,7 @@ public class EmissionGridAnalyzer {
         return grid;
     }
 
-    private void processLink(Link link, EmissionsByPollutant emissions, Grid<Map<Pollutant, Double>> grid) {
+    private void processLink(Link link, EmissionsByPollutant emissions, Grid<Map<String, Double>> grid) {
 
         // create a clipping area to speed up calculation time
         // use 5*smoothing radius as longer distances result in a weighting of effectively 0
@@ -229,23 +229,23 @@ public class EmissionGridAnalyzer {
         });
     }
 
-    private void processCell(Grid.Cell<Map<Pollutant, Double>> cell, EmissionsByPollutant emissions, double weight) {
+    private void processCell(Grid.Cell<Map<String, Double>> cell, EmissionsByPollutant emissions, double weight) {
 
         // merge both maps from cell and linkemissions and sum up values, while the link emissions are multiplied by
         // the cell weight
-        Map<Pollutant, Double> newValues = Stream.concat(cell.getValue().entrySet().stream(),
+        Map<String, Double> newValues = Stream.concat(cell.getValue().entrySet().stream(),
                 emissions.getEmissions().entrySet().stream()
                     .map(e -> new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue() * weight * countScaleFactor)))
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Double::sum));
 
-        Map<Pollutant, Double> valuesWithoutTinyResults = removeTinyValuesFromResults(newValues);
+        Map<String, Double> valuesWithoutTinyResults = removeTinyValuesFromResults(newValues);
         cell.setValue(valuesWithoutTinyResults);
     }
 
-    private Map<Pollutant, Double> removeTinyValuesFromResults(Map<Pollutant, Double> values) {
+    private Map<String, Double> removeTinyValuesFromResults(Map<String, Double> values) {
         return values.entrySet().stream()
                 .filter(entry -> entry.getValue() >= minimumThreshold)
-                .collect(Collectors.toMap(entry->entry.getKey(), entry->entry.getValue()));
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private boolean isWithinBounds(Link link) {
@@ -253,7 +253,7 @@ public class EmissionGridAnalyzer {
         return bounds.contains(linkCentroid);
     }
 
-    private Grid<Map<Pollutant, Double>> createGrid() {
+    private Grid<Map<String, Double>> createGrid() {
 
         if (gridType == GridType.Hexagonal)
             return new HexagonalGrid<>(gridSize, HashMap::new, bounds);
