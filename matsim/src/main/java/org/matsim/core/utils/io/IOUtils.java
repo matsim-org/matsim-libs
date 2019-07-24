@@ -84,7 +84,25 @@ import org.apache.log4j.Logger;
  * 
  * <h2>URL handling</h2>
  * 
- * To con
+ * To convert a file name to a URL, use {@link #getFileUrl(String)}. This is
+ * mostly useful to determine the URL for an output file. If you are working
+ * with input files, the best is to make use of
+ * {@link #resolveFileOrResource(String)}, which will first try to find a
+ * certain file in the file system and then in the class path (i.e. in the Java
+ * resources). This makes it easy to write versatile code that can work with
+ * local files and resources at the same time.
+ * 
+ * <h2>Compression</h2>
+ * 
+ * Compessed files are automatically assumed if ceraint file types are
+ * encountered. Currently, the following patterns match certain compression
+ * algorithms:
+ * 
+ * <ul>
+ * <li><code>*.gz</code>: GZIP compression</li>
+ * <li><code>*.lz4</code>: LZ4 compression</li>
+ * <li><code>*.bz2</code>: Bzip2 compression</li>
+ * </ul>
  */
 final public class IOUtils {
 	/**
