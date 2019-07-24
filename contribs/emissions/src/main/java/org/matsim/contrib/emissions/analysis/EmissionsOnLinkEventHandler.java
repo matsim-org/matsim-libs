@@ -7,11 +7,9 @@ import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
-import org.matsim.contrib.emissions.types.Pollutant;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Collects Warm- and Cold-Emission-Events by time bin and by link-id
@@ -55,14 +53,11 @@ class EmissionsOnLinkEventHandler implements WarmEmissionEventHandler, ColdEmiss
 
         TimeBinMap.TimeBin<Map<Id<Link>, EmissionsByPollutant>> currentBin = timeBins.getTimeBin(time);
 
-        Map<Pollutant, Double> typedEmissions = emissions.entrySet().stream()
-                .collect(Collectors.toMap(entry -> Pollutant.valueOf(entry.getKey()), Map.Entry::getValue));
-
         if (!currentBin.hasValue())
             currentBin.setValue(new HashMap<>());
         if (!currentBin.getValue().containsKey(linkId))
-            currentBin.getValue().put(linkId, new EmissionsByPollutant(typedEmissions));
+            currentBin.getValue().put(linkId, new EmissionsByPollutant(new HashMap<>(emissions)));
         else
-            currentBin.getValue().get(linkId).addEmissions(typedEmissions);
+            currentBin.getValue().get(linkId).addEmissions(emissions);
     }
 }

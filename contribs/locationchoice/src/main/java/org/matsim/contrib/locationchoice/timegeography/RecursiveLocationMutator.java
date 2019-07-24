@@ -194,7 +194,7 @@ class RecursiveLocationMutator extends AbstractLocationMutator{
 		for (int j = 0; j < actslegs.size(); j=j+2) {
 			final Activity act = (Activity)actslegs.get(j);
 
-			if ( super.getDefineFlexibleActivities().getFlexibleTypes().contains( this.getDefineFlexibleActivities().getConverter().convertType(act.getType() ) )) { // found secondary activity
+			if ( super.getDefineFlexibleActivities().getFlexibleTypes().contains( act.getType() )) { // found secondary activity
 				manager.secondaryActivityFound(act, (Leg)actslegs.get(j+1));
 			}
 			else {		// found primary activity
@@ -217,7 +217,7 @@ class RecursiveLocationMutator extends AbstractLocationMutator{
 			double radius, String type) {
 		double midPointX = (coordStart.getX()+coordEnd.getX())/2.0;
 		double midPointY = (coordStart.getY()+coordEnd.getY())/2.0;
-		return (ArrayList<ActivityFacility>) this.getQuadTreesOfType().get( this.getDefineFlexibleActivities().getConverter().convertType(type ) ).
+		return (ArrayList<ActivityFacility>) this.getQuadTreesOfType().get( type ).
 				getDisk(midPointX, midPointY, radius);
 	}
 

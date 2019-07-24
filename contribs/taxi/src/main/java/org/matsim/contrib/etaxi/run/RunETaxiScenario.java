@@ -33,6 +33,7 @@ import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.FixedSpeedCharging;
 import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
+import org.matsim.contrib.ev.dvrp.EvDvrpFleetQSimModule;
 import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
 import org.matsim.contrib.ev.dvrp.OperatingVehicleProvider;
 import org.matsim.contrib.ev.temperature.TemperatureService;
@@ -57,7 +58,7 @@ public class RunETaxiScenario {
 	}
 
 	public static Controler createControler(Config config, boolean otfvis) {
-		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
+		String mode = TaxiConfigGroup.get(config).getMode();
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -66,6 +67,7 @@ public class RunETaxiScenario {
 		controler.addOverridingModule(new DvrpModule());
 		controler.addOverridingModule(new EvModule());
 		controler.addOverridingModule(new EvDvrpIntegrationModule());
+		controler.addOverridingQSimModule(new EvDvrpFleetQSimModule(mode));
 
 		controler.addOverridingQSimModule(new AbstractQSimModule() {
 			@Override
@@ -74,7 +76,7 @@ public class RunETaxiScenario {
 			}
 		});
 
-		controler.configureQSimComponents(EvDvrpIntegrationModule.activateModes(taxiCfg.getMode()));
+		controler.configureQSimComponents(EvDvrpIntegrationModule.activateModes(mode));
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

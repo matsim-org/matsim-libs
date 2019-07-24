@@ -134,8 +134,9 @@ public final class StrategyConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter( "weight" )
-		public void setWeight(final double probability) {
+		public StrategySettings setWeight(final double probability) {
 			this.probability = probability;
+			return this ;
 		}
 
 		@StringGetter( "weight" )
@@ -144,8 +145,9 @@ public final class StrategyConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter( "strategyName" )
-		public void setStrategyName(final String name) {
+		public StrategySettings setStrategyName(final String name) {
 			this.strategyName = name;
+			return this ;
 		}
 
 		@StringGetter( "strategyName" )
@@ -154,8 +156,9 @@ public final class StrategyConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter( "disableAfterIteration" )
-		public void setDisableAfter(final int disableAfter) {
+		public StrategySettings setDisableAfter(final int disableAfter) {
 			this.disableAfter = disableAfter;
+			return this ;
 		}
 
 		@StringGetter( "disableAfterIteration" )
@@ -164,8 +167,9 @@ public final class StrategyConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter( "executionPath" )
-		public void setExePath(final String exePath) {
+		public StrategySettings setExePath(final String exePath) {
 			this.exePath = exePath;
+			return this ;
 		}
 
 		@StringGetter( "executionPath" )
@@ -179,8 +183,9 @@ public final class StrategyConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter( "subpopulation" )
-		public void setSubpopulation(final String subpopulation) {
+		public StrategySettings setSubpopulation(final String subpopulation) {
 			this.subpopulation = subpopulation;
+			return this ;
 		}
 
 		@StringGetter( "subpopulation" )

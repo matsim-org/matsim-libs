@@ -1,15 +1,5 @@
 package org.matsim.contrib.emissions.analysis;
 
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,13 +15,22 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.analysis.spatial.Grid;
 import org.matsim.contrib.analysis.time.TimeBinMap;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
-import org.matsim.contrib.emissions.types.Pollutant;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriter;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+import static org.junit.Assert.*;
 
 public class EmissionGridAnalyzerTest {
 
@@ -43,7 +42,7 @@ public class EmissionGridAnalyzerTest {
         return Math.random() * upperBounds;
     }
 
-    private void writeEventsToFile(Path eventsFile, Network network, Pollutant pollutant, double pollutionPerEvent, int fromTime, int toTime) {
+    private void writeEventsToFile(Path eventsFile, Network network, String pollutant, double pollutionPerEvent, int fromTime, int toTime) {
 
         EventsManager eventsManager = EventsUtils.createEventsManager();
         EventWriter writer = new EventWriterXML(eventsFile.toString());
@@ -83,10 +82,10 @@ public class EmissionGridAnalyzerTest {
         return factory.createNode(Id.createNodeId(UUID.randomUUID().toString()), coord);
     }
 
-    private WarmEmissionEvent createEmissionEvent(double time, Link link, Pollutant pollutant, double pollutionPerEvent) {
+    private WarmEmissionEvent createEmissionEvent(double time, Link link, String pollutant, double pollutionPerEvent) {
 
         Map<String, Double> emissions = new HashMap<>();
-        emissions.put(pollutant.getText(), pollutionPerEvent);
+        emissions.put(pollutant, pollutionPerEvent);
         return new WarmEmissionEvent(time, link.getId(), Id.createVehicleId(UUID.randomUUID().toString()), emissions);
     }
 
@@ -115,7 +114,7 @@ public class EmissionGridAnalyzerTest {
     @Test
     public void process() {
 
-        final Pollutant pollutant = Pollutant.HC;
+        final String pollutant = "HC";
         final double pollutionPerEvent = 1;
         Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString()+ ".xml");
         Network network = createRandomNetwork(100, 1000, 1000);
@@ -128,7 +127,7 @@ public class EmissionGridAnalyzerTest {
                 .withSmoothingRadius(200)
                 .build();
 
-        TimeBinMap<Grid<Map<Pollutant, Double>>> timeBins = analyzer.process(eventsFile.toString());
+        TimeBinMap<Grid<Map<String, Double>>> timeBins = analyzer.process(eventsFile.toString());
 
         assertEquals(10, timeBins.getTimeBins().size());
         timeBins.getTimeBins().forEach(bin -> {
@@ -140,7 +139,7 @@ public class EmissionGridAnalyzerTest {
     @Test
     public void process_singleLinkWithOneEvent() {
 
-        final Pollutant pollutant = Pollutant.CO;
+        final String pollutant = "CO";
         final double pollutionPerEvent = 1000;
         final int time = 1;
         final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
@@ -160,13 +159,13 @@ public class EmissionGridAnalyzerTest {
                 .withBounds(createRect(12, 12))
                 .build();
 
-        TimeBinMap<Grid<Map<Pollutant, Double>>> timeBinMap = analyzer.process(eventsFile.toString());
+        TimeBinMap<Grid<Map<String, Double>>> timeBinMap = analyzer.process(eventsFile.toString());
 
         assertEquals(1, timeBinMap.getTimeBins().size());
-        TimeBinMap.TimeBin<Grid<Map<Pollutant, Double>>> bin = timeBinMap.getTimeBin(time);
+        TimeBinMap.TimeBin<Grid<Map<String, Double>>> bin = timeBinMap.getTimeBin(time);
         assertTrue(bin.hasValue());
 
-        Grid.Cell<Map<Pollutant, Double>> fromCell = bin.getValue().getCell(new Coordinate(5, 5));
+        Grid.Cell<Map<String, Double>> fromCell = bin.getValue().getCell(new Coordinate(5, 5));
         double valueOfCellWithLink = fromCell.getValue().get(pollutant);
 
         // deterministic value assumed to be valid due to comparison with old implementation
@@ -179,7 +178,7 @@ public class EmissionGridAnalyzerTest {
     @Test
     public void process_singleLinkWithTwoEvents() {
 
-        final Pollutant pollutant = Pollutant.CO;
+        final String pollutant = "co";
         final double pollutionPerEvent = 1000;
         final int time = 1;
         final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
@@ -199,13 +198,13 @@ public class EmissionGridAnalyzerTest {
                 .withBounds(createRect(12, 12))
                 .build();
 
-        TimeBinMap<Grid<Map<Pollutant, Double>>> timeBinMap = analyzer.process(eventsFile.toString());
+        TimeBinMap<Grid<Map<String, Double>>> timeBinMap = analyzer.process(eventsFile.toString());
 
         assertEquals(1, timeBinMap.getTimeBins().size());
-        TimeBinMap.TimeBin<Grid<Map<Pollutant, Double>>> bin = timeBinMap.getTimeBin(time);
+        TimeBinMap.TimeBin<Grid<Map<String, Double>>> bin = timeBinMap.getTimeBin(time);
         assertTrue(bin.hasValue());
 
-        Grid.Cell<Map<Pollutant, Double>> fromCell = bin.getValue().getCell(new Coordinate(5, 5));
+        Grid.Cell<Map<String, Double>> fromCell = bin.getValue().getCell(new Coordinate(5, 5));
         double valueOfCellWithLink = fromCell.getValue().get(pollutant);
 
         // deterministic value assumed to be valid due to comparison with old implementation
@@ -218,7 +217,7 @@ public class EmissionGridAnalyzerTest {
     @Test
     public void process_twoLinksWithOneEventEach() {
 
-        final Pollutant pollutant = Pollutant.CO;
+        final String pollutant = "co";
         final double pollutionPerEvent = 1000;
         final int time = 1;
         final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
@@ -243,13 +242,13 @@ public class EmissionGridAnalyzerTest {
                 .withBounds(createRect(12, 12))
                 .build();
 
-        TimeBinMap<Grid<Map<Pollutant, Double>>> timeBinMap = analyzer.process(eventsFile.toString());
+        TimeBinMap<Grid<Map<String, Double>>> timeBinMap = analyzer.process(eventsFile.toString());
 
         assertEquals(1, timeBinMap.getTimeBins().size());
-        TimeBinMap.TimeBin<Grid<Map<Pollutant, Double>>> bin = timeBinMap.getTimeBin(time);
+        TimeBinMap.TimeBin<Grid<Map<String, Double>>> bin = timeBinMap.getTimeBin(time);
         assertTrue(bin.hasValue());
 
-        Grid.Cell<Map<Pollutant, Double>> fromCell = bin.getValue().getCell(new Coordinate(5, 5));
+        Grid.Cell<Map<String, Double>> fromCell = bin.getValue().getCell(new Coordinate(5, 5));
         double valueOfCellWithLink = fromCell.getValue().get(pollutant);
 
         assertEquals(275.3558600648614, valueOfCellWithLink, 0.0001);
@@ -260,7 +259,7 @@ public class EmissionGridAnalyzerTest {
     @Test
     public void process_twoLinksWithTwoEventsEach() {
 
-        final Pollutant pollutant = Pollutant.CO;
+        final String pollutant = "some-pollutant";
         final double pollutionPerEvent = 1000;
         final int time = 1;
         final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString() + ".xml");
@@ -285,13 +284,13 @@ public class EmissionGridAnalyzerTest {
                 .withBounds(createRect(12, 12))
                 .build();
 
-        TimeBinMap<Grid<Map<Pollutant, Double>>> timeBinMap = analyzer.process(eventsFile.toString());
+        TimeBinMap<Grid<Map<String, Double>>> timeBinMap = analyzer.process(eventsFile.toString());
 
         assertEquals(1, timeBinMap.getTimeBins().size());
-        TimeBinMap.TimeBin<Grid<Map<Pollutant, Double>>> bin = timeBinMap.getTimeBin(time);
+        TimeBinMap.TimeBin<Grid<Map<String, Double>>> bin = timeBinMap.getTimeBin(time);
         assertTrue(bin.hasValue());
 
-        Grid.Cell<Map<Pollutant, Double>> fromCell = bin.getValue().getCell(new Coordinate(5, 5));
+        Grid.Cell<Map<String, Double>> fromCell = bin.getValue().getCell(new Coordinate(5, 5));
         double valueOfCellWithLink = fromCell.getValue().get(pollutant);
 
         assertEquals(550.7117201297228, valueOfCellWithLink, 0.0001);
@@ -302,7 +301,7 @@ public class EmissionGridAnalyzerTest {
     @Test
     public void process_withBoundaries() {
 
-        final Pollutant pollutant = Pollutant.HC;
+        final String pollutant = "Nox";
         final double pollutionPerEvent = 1;
         Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString()+ ".xml");
         Network network = createRandomNetwork(100, 1000, 1000);
@@ -316,10 +315,10 @@ public class EmissionGridAnalyzerTest {
                 .withSmoothingRadius(100)
                 .build();
 
-        TimeBinMap<Grid<Map<Pollutant, Double>>> timeBinMap = analyzer.process(eventsFile.toString());
+        TimeBinMap<Grid<Map<String, Double>>> timeBinMap = analyzer.process(eventsFile.toString());
 
         assertEquals(1, timeBinMap.getTimeBins().size());
-        TimeBinMap.TimeBin<Grid<Map<Pollutant, Double>>> bin = timeBinMap.getTimeBin(2);
+        TimeBinMap.TimeBin<Grid<Map<String, Double>>> bin = timeBinMap.getTimeBin(2);
         assertTrue(bin.hasValue());
 
         assertEquals(25, bin.getValue().getCells().size());
@@ -328,7 +327,7 @@ public class EmissionGridAnalyzerTest {
     @Test
     public void processToJson() {
 
-        final Pollutant pollutant = Pollutant.NO2;
+        final String pollutant = "no2";
         final double pollutionPerEvent = 1;
         final int time = 1;
         final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString()+ ".xml");
@@ -350,7 +349,7 @@ public class EmissionGridAnalyzerTest {
     @Test
     public void processToJsonFile() throws IOException {
 
-        final Pollutant pollutant = Pollutant.NO2;
+        final String pollutant = "NO2";
         final double pollutionPerEvent = 1;
         final int time = 1;
         final Path eventsFile = Paths.get(testUtils.getOutputDirectory()).resolve(UUID.randomUUID().toString()+ ".xml");

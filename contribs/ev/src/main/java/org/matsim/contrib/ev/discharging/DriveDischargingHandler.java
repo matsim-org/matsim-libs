@@ -116,12 +116,7 @@ public class DriveDischargingHandler
 			double energy = ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt, eventTime - tt)
 					+ ev.getAuxEnergyConsumption().calcEnergyConsumption(eventTime - tt, tt, linkId);
 			//Energy consumption might be negative on links with negative slope
-			//XXX or maybe we should allow a negative energy in the discharge() method??
-			if (energy < 0) {
-				ev.getBattery().charge(Math.abs(energy));
-			} else {
-				ev.getBattery().discharge(energy);
-			}
+			ev.getBattery().changeSoc(-energy);
 
 			//FIXME emit a DriveOnLinkEnergyConsumptionEvent instead of calculating it here...
 			double linkConsumption = energy + energyConsumptionPerLink.getOrDefault(linkId, 0.0);

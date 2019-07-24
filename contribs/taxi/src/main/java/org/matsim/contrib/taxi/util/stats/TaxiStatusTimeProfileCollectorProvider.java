@@ -24,8 +24,8 @@ import java.awt.Paint;
 
 import org.jfree.data.xy.DefaultTableXYDataset;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
+import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.util.timeprofile.TimeProfileCharts;
 import org.matsim.contrib.util.timeprofile.TimeProfileCharts.ChartType;
@@ -54,7 +54,7 @@ public class TaxiStatusTimeProfileCollectorProvider implements Provider<MobsimLi
 	@Override
 	public MobsimListener get() {
 		ProfileCalculator calc = TimeProfiles.combineProfileCalculators(
-				TaxiTimeProfiles.createCurrentTaxiTaskTypeCounter(fleet), //
+				TaxiTimeProfiles.createCurrentTaxiTaskTypeCounter(fleet),
 				TaxiTimeProfiles.createRequestsWithStatusCounter(requestCollector.getRequests().values(),
 						TaxiRequestStatus.UNPLANNED));
 

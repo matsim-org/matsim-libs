@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.charging.VehicleChargingHandler;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
@@ -77,6 +78,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 	private final AuxEnergyConsumption.Factory auxConsumptionFactory;
 	private final String stageActivityType;
 	private final String vehicleSuffix;
+	private final EvConfigGroup evConfigGroup;
 
 	private final class EvCharingStageActivityType implements StageActivityTypes {
 		@Override
@@ -109,8 +111,8 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 	public EvNetworkRoutingModule(final String mode, final Network network, RoutingModule delegate,
 			ElectricFleetSpecification electricFleet,
 			ChargingInfrastructureSpecification chargingInfrastructureSpecification, TravelTime travelTime,
-			DriveEnergyConsumption.Factory driveConsumptionFactory,
-			AuxEnergyConsumption.Factory auxConsumptionFactory) {
+			DriveEnergyConsumption.Factory driveConsumptionFactory, AuxEnergyConsumption.Factory auxConsumptionFactory,
+			EvConfigGroup evConfigGroup) {
 		this.travelTime = travelTime;
 		Gbl.assertNotNull(network);
 		this.delegate = delegate;
@@ -121,6 +123,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 		this.driveConsumptionFactory = driveConsumptionFactory;
 		this.auxConsumptionFactory = auxConsumptionFactory;
 		stageActivityType = mode + VehicleChargingHandler.CHARGING_IDENTIFIER;
+		this.evConfigGroup = evConfigGroup;
 		this.vehicleSuffix = mode.equals(TransportMode.car) ? "" : "_" + mode;
 	}
 
@@ -180,8 +183,9 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 					stagedRoute.add(lastLeg);
 					Activity chargeAct = PopulationUtils.createActivityFromCoordAndLinkId(stageActivityType,
 							selectedChargerLink.getCoord(), selectedChargerLink.getId());
-					double estimatedChargingTime = (ev.getBatteryCapacity() * 1.25) / selectedCharger.getMaxPower();
-					chargeAct.setMaximumDuration(estimatedChargingTime);
+					double maxPowerEstimate = Math.min(selectedCharger.getMaxPower(), ev.getBatteryCapacity() / 3.6);
+					double estimatedChargingTime = (ev.getBatteryCapacity() * 1.5) / maxPowerEstimate;
+					chargeAct.setMaximumDuration(Math.max(evConfigGroup.getMinimumChargeTime(), estimatedChargingTime));
 					lastArrivaltime += chargeAct.getMaximumDuration();
 					stagedRoute.add(chargeAct);
 					lastFrom = nexttoFacility;
@@ -211,11 +215,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 
 			double consumption = driveEnergyConsumption.calcEnergyConsumption(l, travelT, Time.getUndefinedTime())
 					+ auxEnergyConsumption.calcEnergyConsumption(basicLeg.getDepartureTime(), travelT, l.getId());
-			if (consumption > 0) {
-				pseudoVehicle.getBattery().discharge(consumption);
-			} else {
-				pseudoVehicle.getBattery().charge(-consumption);
-			}
+			pseudoVehicle.getBattery().changeSoc(-consumption);
 			double currentSoc = pseudoVehicle.getBattery().getSoc();
 			// to accomodate for ERS, where energy charge is directly implemented in the consumption model
 			double consumptionDiff = (lastSoc - currentSoc);

@@ -20,6 +20,7 @@
 package org.matsim.contrib.taxi.optimizer.rules;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -45,7 +46,7 @@ public class UnplannedRequestZonalRegistry {
 
 		requestsInZones = new HashMap<>(zonalSystem.getZones().size());
 		for (Id<Zone> id : zonalSystem.getZones().keySet()) {
-			requestsInZones.put(id, new HashMap<>());
+			requestsInZones.put(id, new LinkedHashMap<>());//LinkedHashMap to preserve iteration order
 		}
 	}
 
@@ -72,8 +73,9 @@ public class UnplannedRequestZonalRegistry {
 	}
 
 	public Stream<TaxiRequest> findNearestRequests(Node node, int minCount) {
-		return zonesSortedByDistance.get(zonalSystem.getZone(node).getId()).stream()//
-				.flatMap(z -> requestsInZones.get(z.getId()).values().stream())//
+		return zonesSortedByDistance.get(zonalSystem.getZone(node).getId())
+				.stream()
+				.flatMap(z -> requestsInZones.get(z.getId()).values().stream())
 				.limit(minCount);
 	}
 

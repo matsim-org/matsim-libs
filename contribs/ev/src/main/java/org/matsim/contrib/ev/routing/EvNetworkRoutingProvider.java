@@ -1,16 +1,16 @@
 package org.matsim.contrib.ev.routing;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -22,8 +22,9 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class EvNetworkRoutingProvider implements Provider<RoutingModule> {
 	private static final Logger log = Logger.getLogger(EvNetworkRoutingProvider.class);
@@ -37,6 +38,9 @@ public class EvNetworkRoutingProvider implements Provider<RoutingModule> {
 
 	@Inject
 	private SingleModeNetworksCache singleModeNetworksCache;
+
+	@Inject
+	private Config config;
 
 	@Inject
 	private PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
@@ -81,8 +85,6 @@ public class EvNetworkRoutingProvider implements Provider<RoutingModule> {
 	 * @param routingMode
 	 */
 	public EvNetworkRoutingProvider(String mode, String routingMode) {
-		//		log.setLevel(Level.DEBUG);
-
 		this.mode = mode;
 		this.routingMode = routingMode;
 	}
@@ -130,8 +132,7 @@ public class EvNetworkRoutingProvider implements Provider<RoutingModule> {
 			return new EvNetworkRoutingModule(mode, filteredNetwork,
 					DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo),
 					electricFleetSpecification, chargingInfrastructureSpecification, travelTime,
-					driveConsumptionFactory,
-					auxConsumptionFactory);
+					driveConsumptionFactory, auxConsumptionFactory, EvConfigGroup.get(config));
 		}
 	}
 }

@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroupI;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -39,25 +39,23 @@ import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
 
 public class TreesBuilder {
+	// this functionality would better be directly provided by the facilities container (similar to how network does it)
 
 	private Network network = null;
 	private static final Logger log = Logger.getLogger(TreesBuilder.class);
 	private Set<String> flexibleTypes = new HashSet<String>();
-	private final DestinationChoiceConfigGroup config;
+	private final DestinationChoiceConfigGroupI config;
 	
 	protected TreeMap<String, QuadTree<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTree<ActivityFacility>>();
 	protected TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 	
-	private ActTypeConverter converter = new ActTypeConverter(true);
-
-
-	public TreesBuilder(Set<String> flexibleTypes, Network network, DestinationChoiceConfigGroup config) {
+	public TreesBuilder(Set<String> flexibleTypes, Network network, DestinationChoiceConfigGroupI config) {
 		this.flexibleTypes = flexibleTypes;
 		this.network = network;
 		this.config = config;
 	}
 
-	public TreesBuilder(Network network, DestinationChoiceConfigGroup config) {
+	public TreesBuilder(Network network, DestinationChoiceConfigGroupI config) {
 		this.network = network;
 		this.config = config;
 		this.initFlexibleTypes();
@@ -71,7 +69,7 @@ public class TreesBuilder {
 			String[] entries = types.split(",", -1);
 			for (int i = 0; i < entries.length; i++) {
 				if (!entries[i].trim().equals("null")) {
-					this.flexibleTypes.add(this.converter.convertType(entries[i].trim()));
+					this.flexibleTypes.add( entries[i].trim() );
 				}
 			}
 		}
@@ -115,11 +113,11 @@ public class TreesBuilder {
 
 				// if flexibleTypes is empty we add all types to trees as potentially all types can be relocated
 				// otherwise we add all types given by flexibleTypes
-				if (this.flexibleTypes.size() == 0 ||  this.flexibleTypes.contains(this.converter.convertType(actOpt.getType()))) {
-					if (!trees.containsKey(this.converter.convertType(actOpt.getType()))) {
-						trees.put(this.converter.convertType(actOpt.getType()), new TreeMap<Id<ActivityFacility>, ActivityFacility>());
+				if (this.flexibleTypes.size() == 0 ||  this.flexibleTypes.contains( actOpt.getType() )) {
+					if (!trees.containsKey( actOpt.getType() )) {
+						trees.put( actOpt.getType(), new TreeMap<Id<ActivityFacility>, ActivityFacility>() );
 					}
-					trees.get(this.converter.convertType(actOpt.getType())).put(f.getId(), f);
+					trees.get( actOpt.getType() ).put(f.getId(), f );
 				}
 			}
 		}
@@ -138,8 +136,8 @@ public class TreesBuilder {
 //			if (type.startsWith("h") || type.startsWith("tta")) continue;	// startsWith("h") also removed oder activity types such as "hotel". cdobler, nov'14
 			if (type.equals("h") || type.equals("home") || type.startsWith("tta")) continue;
 
-			this.quadTreesOfType.put(this.converter.convertType(type), this.buildFacQuadTree(this.converter.convertType(type), tree_of_type));
-			this.facilitiesOfType.put(this.converter.convertType(type), tree_of_type.values().toArray(new ActivityFacilityImpl[tree_of_type.size()]));
+			this.quadTreesOfType.put( type, this.buildFacQuadTree( type, tree_of_type ) );
+			this.facilitiesOfType.put( type, tree_of_type.values().toArray(new ActivityFacilityImpl[tree_of_type.size()] ) );
 		}
 	}
 
@@ -179,11 +177,11 @@ public class TreesBuilder {
 		return facilitiesOfType;
 	}
 
-	public ActTypeConverter getActTypeConverter() {
-		return converter;
-	}
-
-	public void setActTypeConverter(ActTypeConverter converter) {
-		this.converter = converter;
-	}
+//	public ActTypeConverter getActTypeConverter() {
+//		return converter;
+//	}
+//
+//	public void setActTypeConverter(ActTypeConverter converter) {
+//		this.converter = converter;
+//	}
 }

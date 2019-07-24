@@ -24,7 +24,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.validation.constraints.Min;
+import javax.annotation.Nullable;
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -34,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
+import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -54,6 +56,14 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	public static final String MODE = "mode";
 	static final String MODE_EXP = "Mode which will be handled by PassengerEngine and VrpOptimizer "
 			+ "(passengers'/customers' perspective)";
+
+	public static final String USE_MODE_FILTERED_SUBNETWORK = "useModeFilteredSubnetwork";
+	static final String USE_MODE_FILTERED_SUBNETWORK_EXP =
+			"Limit the operation of vehicles to links (of the 'dvrp_routing'"
+					+ " network) with 'allowedModes' containing this 'mode'."
+					+ " For backward compatibility, the value is set to false by default"
+					+ " -- this means that the vehicles are allowed to operate on all links of the 'dvrp_routing' network."
+					+ " The 'dvrp_routing' is defined by DvrpConfigGroup.networkModes)";
 
 	public static final String STOP_DURATION = "stopDuration";
 	static final String STOP_DURATION_EXP = "Bus stop duration. Must be positive.";
@@ -126,6 +136,8 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	@NotBlank
 	private String mode = TransportMode.drt; // travel mode (passengers'/customers' perspective)
 
+	private boolean useModeFilteredSubnetwork = false;
+
 	@Positive
 	private double stopDuration = Double.NaN;// seconds
 
@@ -136,7 +148,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	// maxTravelTimeAlpha * unshared_ride_travel_time(fromLink, toLink) + maxTravelTimeBeta,
 	// where unshared_ride_travel_time(fromLink, toLink) is calculated with FastAStarEuclidean
 	// (hence AStarEuclideanOverdoFactor needs to be specified)
-	@Min(1)
+	@DecimalMin("1.0")
 	private double maxTravelTimeAlpha = Double.NaN;// [-]
 
 	@PositiveOrZero
@@ -157,13 +169,13 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	@PositiveOrZero
 	private double estimatedDrtSpeed = 25. / 3.6;// [m/s]
 
-	@Min(1)
+	@DecimalMin("1.0")
 	private double estimatedBeelineDistanceFactor = 1.3;// [-]
 
 	@NotNull
 	private String vehiclesFile = null;
 
-	// used only for stopbased DRT scheme
+	@Nullable
 	private String transitStopFile = null; // only for stopbased DRT scheme
 
 	private boolean plotDetailedCustomerStats = true;
@@ -220,12 +232,18 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		if (getParameterSets(MinCostFlowRebalancingParams.SET_NAME).size() > 1) {
 			throw new RuntimeException("More then one rebalancing parameter sets is specified");
 		}
+
+		if (useModeFilteredSubnetwork) {
+			DvrpRoutingNetworkProvider.
+					checkUseModeFilteredSubnetworkAllowed(config, mode);
+		}
 	}
 
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> map = super.getComments();
 		map.put(MODE, MODE_EXP);
+		map.put(USE_MODE_FILTERED_SUBNETWORK, USE_MODE_FILTERED_SUBNETWORK_EXP);
 		map.put(STOP_DURATION, STOP_DURATION_EXP);
 		map.put(MAX_WAIT_TIME, MAX_WAIT_TIME_EXP);
 		map.put(MAX_TRAVEL_TIME_ALPHA, MAX_TRAV_ALPHA_EXP);
@@ -260,6 +278,22 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	@StringSetter(MODE)
 	public void setMode(String mode) {
 		this.mode = mode;
+	}
+
+	/**
+	 * @return {@value #USE_MODE_FILTERED_SUBNETWORK_EXP}
+	 */
+	@StringGetter(USE_MODE_FILTERED_SUBNETWORK)
+	public boolean isUseModeFilteredSubnetwork() {
+		return useModeFilteredSubnetwork;
+	}
+
+	/**
+	 * @param useModeFilteredSubnetwork {@value #USE_MODE_FILTERED_SUBNETWORK_EXP}
+	 */
+	@StringSetter(USE_MODE_FILTERED_SUBNETWORK)
+	public void setUseModeFilteredSubnetwork(boolean useModeFilteredSubnetwork) {
+		this.useModeFilteredSubnetwork = useModeFilteredSubnetwork;
 	}
 
 	/**
@@ -409,9 +443,8 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @param operationalScheme -- {@value #OP_SCHEME_EXP}
 	 */
 	@StringSetter(OPERATIONAL_SCHEME)
-	public void setOperationalScheme(String operationalScheme) {
-
-		this.operationalScheme = OperationalScheme.valueOf(operationalScheme);
+	public void setOperationalScheme(OperationalScheme operationalScheme) {
+		this.operationalScheme = operationalScheme;
 	}
 
 	/**
@@ -465,7 +498,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @param-- {@value #ESTIMATED_DRT_SPEED_EXP}
 	 */
 	@StringSetter(ESTIMATED_DRT_SPEED)
-	public void setEstimatedSpeed(double estimatedSpeed) {
+	public void setEstimatedDrtSpeed(double estimatedSpeed) {
 		this.estimatedDrtSpeed = estimatedSpeed;
 	}
 

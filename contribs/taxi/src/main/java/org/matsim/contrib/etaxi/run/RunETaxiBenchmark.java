@@ -37,6 +37,7 @@ import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.charging.FixedSpeedCharging;
 import org.matsim.contrib.ev.discharging.AuxDischargingHandler;
+import org.matsim.contrib.ev.dvrp.EvDvrpFleetQSimModule;
 import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
 import org.matsim.contrib.ev.dvrp.OperatingVehicleProvider;
 import org.matsim.contrib.ev.temperature.TemperatureService;
@@ -49,6 +50,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * For a fair and consistent benchmarking of taxi dispatching algorithms we assume that link travel times are
@@ -76,7 +79,7 @@ public class RunETaxiBenchmark {
 		config.controler().setWritePlansInterval(0);
 		config.controler().setCreateGraphs(false);
 
-		DvrpConfigGroup.get(config).setNetworkMode(null);// to switch off network filtering
+		DvrpConfigGroup.get(config).setNetworkModes(ImmutableSet.of());// to switch off network filtering
 		config.addConfigConsistencyChecker(new DvrpBenchmarkConfigConsistencyChecker());
 
 		String mode = TaxiConfigGroup.get(config).getMode();
@@ -90,6 +93,7 @@ public class RunETaxiBenchmark {
 		controler.addOverridingModule(new ETaxiModule());
 		controler.addOverridingModule(new EvModule());
 		controler.addOverridingModule(new EvDvrpIntegrationModule());
+		controler.addOverridingQSimModule(new EvDvrpFleetQSimModule(mode));
 
 		controler.addOverridingQSimModule(new AbstractQSimModule() {
 			@Override

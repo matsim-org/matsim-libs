@@ -34,8 +34,11 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.objectattributes.AttributeConverter;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 /**
@@ -47,9 +50,14 @@ public class ScenarioByConfigInjectionTest {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testAttributeConvertersAreInjected() {
+	public void testAttributeConvertersAreInjected_deprecated() {
 		log.info( "create test scenario" );
 		final Config config = createTestScenario();
+
+		config.plans().setInsistingOnUsingDeprecatedPersonAttributeFile( true );
+		// yy this enables reading the old attributes file.  The true test, however, would have to test (all) the attribute converters for Attributable.
+		// kai, jun'19
+
 		log.info( "create injector" );
 		com.google.inject.Injector injector =
 				Injector.createInjector(
@@ -66,7 +74,10 @@ public class ScenarioByConfigInjectionTest {
 		final Scenario scenario = injector.getInstance( Scenario.class );
 
 		log.info( "get object attribute" );
-		Object stupid = scenario.getPopulation().getPersonAttributes().getAttribute( "1" , "stupidAttribute" );
+		Population population = scenario.getPopulation();
+		Person person = population.getPersons().get( Id.createPersonId( "1" ) ) ;
+		Gbl.assertNotNull( person );
+		Object stupid = PopulationUtils.getPersonAttribute( person, "stupidAttribute");
 
 		// TODO test for ALL attribute containers...
 		Assert.assertEquals(
@@ -166,7 +177,8 @@ public class ScenarioByConfigInjectionTest {
 		final Scenario sc = ScenarioUtils.createScenario( config );
 		final Person person = sc.getPopulation().getFactory().createPerson(Id.createPersonId( 1 ));
 		sc.getPopulation().addPerson( person );
-		sc.getPopulation().getPersonAttributes().putAttribute( "1" , "stupidAttribute" , new StupidClass() );
+//		sc.getPopulation().getPersonAttributes().putAttribute( "1" , "stupidAttribute" , new StupidClass() );
+		PopulationUtils.putPersonAttribute( person, "stupidAttribute", new StupidClass() );
 
 		person.getAttributes().putAttribute( "otherAttribute" , new StupidClass() );
 
@@ -188,7 +200,7 @@ public class ScenarioByConfigInjectionTest {
 		final PopulationWriter popWriter = new PopulationWriter( sc.getPopulation() , sc.getNetwork() );
 		popWriter.putAttributeConverter( StupidClass.class , new StupidClassConverter() );
 		popWriter.writeV6( plansFile );
-		final ObjectAttributesXmlWriter writer = new ObjectAttributesXmlWriter(sc.getPopulation().getPersonAttributes());
+		final ObjectAttributesXmlWriter writer = new ObjectAttributesXmlWriter(new ObjectAttributes());
 		writer.putAttributeConverter( StupidClass.class , new StupidClassConverter() );
 		writer.writeFile( attributeFile );
 
