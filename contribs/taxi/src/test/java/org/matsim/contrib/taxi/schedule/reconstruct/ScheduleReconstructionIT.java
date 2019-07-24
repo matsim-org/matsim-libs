@@ -62,13 +62,13 @@ public class ScheduleReconstructionIT {
 
 	@Test
 	public void testOneTaxiReconstruction() {
-		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_taxi_benchmark_config.xml");
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_taxi_benchmark_config.xml");
 		runReconstruction(configUrl);
 	}
 
 	@Test
 	public void testMielecReconstruction() {
-		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_benchmark_config.xml");
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_benchmark_config.xml");
 		runReconstruction(configUrl);
 	}
 

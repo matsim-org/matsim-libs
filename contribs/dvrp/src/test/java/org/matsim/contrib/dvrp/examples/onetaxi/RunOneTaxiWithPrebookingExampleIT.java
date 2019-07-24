@@ -72,7 +72,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 	@Test
 	public void testRun() {
 		// load config
-		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"),
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"),
 				"generic_dvrp_one_taxi_config.xml");
 		Config config = ConfigUtils.loadConfig(configUrl, new DvrpConfigGroup(),
 				new OTFVisConfigGroup());

@@ -51,6 +51,40 @@ import org.apache.log4j.Logger;
 
 /**
  * This class provides helper methods for input/output in MATSim.
+ * 
+ * The whole I/O infrastructure is based on URLs, which allows more flexibility
+ * than String-based paths or URLs. The structure follows three levels: Stream
+ * level, writer/reader level, and convenience methods.
+ * 
+ * <h2>Stream level</h2>
+ * 
+ * The two main methods on the stream level are {@link #getInputStream(URL)} and
+ * {@link #getOutputStream(URL, boolean)}. Their use is rather obvious, the
+ * boolean argument of the output stream is whether it is an appending output
+ * stream. Depending on the extension of the reference file of the URL,
+ * compression will be detected automatically. See below for a list of active
+ * compression algorithms.
+ * 
+ * <h2>Reader/Writer level</h2>
+ * 
+ * Use {@link #getBufferedWriter(URL, Charset, boolean)} and its simplified
+ * versions to obtained a BufferedWriter object. Use
+ * {@link #getBufferedReader(URL)} to obtain a BufferedReader. These functions
+ * should be used preferredly, because they allow for future movements of files
+ * to servers etc.
+ * 
+ * <h2>Convenience methods</h2>
+ * 
+ * Two convenience methods exist: {@link #getBufferedReader(String)} and
+ * {@link #getBufferedReader(String)}, which take a String-based path as input.
+ * They intentionally do not allow for much flexibility (e.g. choosing the
+ * character set of the files). If this is needed, please use the reader/writer
+ * level methods and construct the URL via the helper functions that are
+ * documented below.
+ * 
+ * <h2>URL handling</h2>
+ * 
+ * To con
  */
 final public class IOUtils {
 	/**
@@ -64,7 +98,7 @@ final public class IOUtils {
 
 	static {
 		COMPRESSION_EXTENSIONS.put("gz", CompressorStreamFactory.GZIP);
-		COMPRESSION_EXTENSIONS.put("lz4", CompressorStreamFactory.LZ4_BLOCK);
+		COMPRESSION_EXTENSIONS.put("lz4", CompressorStreamFactory.LZ4_FRAMED);
 		COMPRESSION_EXTENSIONS.put("bz2", CompressorStreamFactory.BZIP2);
 	}
 
@@ -76,7 +110,7 @@ final public class IOUtils {
 	public static final String NATIVE_NEWLINE = System.getProperty("line.separator");
 
 	// Logger
-	private final static Logger log = Logger.getLogger(IOUtils.class);
+	private final static Logger logger = Logger.getLogger(IOUtils.class);
 
 	/**
 	 * This function takes a path and tries to find the file in the file system or
@@ -89,48 +123,55 @@ final public class IOUtils {
 	 * <li>Find path in class path with compression extension</li>
 	 * </ol>
 	 * 
-	 * @throws MalformedURLException 
-	 * @throws FileNotFoundException 
+	 * @throws UncheckedIOException
 	 */
-	public static URL resolveFileOrResource(String filename) throws MalformedURLException, FileNotFoundException {
-		// I) Replace home identifier
-		if (filename.startsWith("~" + File.separator)) {
-			filename = System.getProperty("user.home") + filename.substring(1);
-		}
+	public static URL resolveFileOrResource(String filename) throws UncheckedIOException {
+		try {
+			// I) Replace home identifier
+			if (filename.startsWith("~" + File.separator)) {
+				filename = System.getProperty("user.home") + filename.substring(1);
+			}
 
-		// II.1) First, try to find the file in the file system
-		File file = new File(filename);
-
-		if (file.exists()) {
-			return file.toURI().toURL();
-		}
-
-		// II.2) Try to find file with an additional postfix for compression
-		for (String postfix : COMPRESSION_EXTENSIONS.keySet()) {
-			file = new File(filename + "." + postfix);
+			// II.1) First, try to find the file in the file system
+			File file = new File(filename);
 
 			if (file.exists()) {
+				logger.info(String.format("Resolved %s to %s", filename, file));
 				return file.toURI().toURL();
 			}
-		}
 
-		// III.1) First, try to find the file in the class path
-		URL resource = IOUtils.class.getClassLoader().getResource(filename);
+			// II.2) Try to find file with an additional postfix for compression
+			for (String postfix : COMPRESSION_EXTENSIONS.keySet()) {
+				file = new File(filename + "." + postfix);
 
-		if (resource != null) {
-			return resource;
-		}
+				if (file.exists()) {
+					logger.info(String.format("Resolved %s to %s", filename, file));
+					return file.toURI().toURL();
+				}
+			}
 
-		// III.2) Second, try to find the resource with a compression extension
-		for (String postfix : COMPRESSION_EXTENSIONS.keySet()) {
-			resource = IOUtils.class.getClassLoader().getResource(filename);
+			// III.1) First, try to find the file in the class path
+			URL resource = IOUtils.class.getClassLoader().getResource(filename);
 
 			if (resource != null) {
+				logger.info(String.format("Resolved %s to %s", filename, resource));
 				return resource;
 			}
-		}
 
-		throw new FileNotFoundException(filename);
+			// III.2) Second, try to find the resource with a compression extension
+			for (String postfix : COMPRESSION_EXTENSIONS.keySet()) {
+				resource = IOUtils.class.getClassLoader().getResource(filename + "." + postfix);
+
+				if (resource != null) {
+					logger.info(String.format("Resolved %s to %s", filename, resource));
+					return resource;
+				}
+			}
+
+			throw new FileNotFoundException(filename);
+		} catch (FileNotFoundException | MalformedURLException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 	/**
@@ -148,19 +189,25 @@ final public class IOUtils {
 	 * extension, the method will try to open the compressed file using the proper
 	 * decompression algorithm.
 	 * 
-	 * @throws IOException 
-	 * @throws CompressorException 
+	 * @throws UncheckedIOException
 	 */
-	public static InputStream getInputStream(URL url) throws IOException, CompressorException {
-		InputStream inputStream = url.openStream();
+	public static InputStream getInputStream(URL url) throws UncheckedIOException {
+		try {
+			InputStream inputStream = url.openStream();
 
-		String compression = getCompression(url);
-		if (compression != null) {
-			CompressorStreamFactory compressorStreamFactory = new CompressorStreamFactory();
-			inputStream = compressorStreamFactory.createCompressorInputStream(inputStream);
+			String compression = getCompression(url);
+			if (compression != null) {
+				CompressorStreamFactory compressorStreamFactory = new CompressorStreamFactory();
+				inputStream = compressorStreamFactory.createCompressorInputStream(compression, inputStream);
+				logger.info(String.format("Using %s compression for %s", compression, url));
+			} else {
+				logger.info(String.format("Using no compression for %s", url));
+			}
+
+			return new UnicodeInputStream(new BufferedInputStream(inputStream));
+		} catch (IOException | CompressorException e) {
+			throw new UncheckedIOException(e);
 		}
-
-		return new UnicodeInputStream(new BufferedInputStream(inputStream));
 	}
 
 	/**
@@ -168,10 +215,9 @@ final public class IOUtils {
 	 * the method will try to open the compressed file using the proper
 	 * decompression algorithm. A given character set is used for the reader.
 	 * 
-	 * @throws CompressorException 
-	 * @throws IOException 
+	 * @throws UncheckedIOException
 	 */
-	public static BufferedReader getBufferedReader(URL url, Charset charset) throws IOException, CompressorException {
+	public static BufferedReader getBufferedReader(URL url, Charset charset) throws UncheckedIOException {
 		InputStream inputStream = getInputStream(url);
 		return new BufferedReader(new InputStreamReader(inputStream, charset));
 	}
@@ -180,27 +226,10 @@ final public class IOUtils {
 	 * See {@link #getBufferedReader(String, Charset)}. UTF-8 is assumed as the
 	 * character set.
 	 * 
-	 * @throws CompressorException 
-	 * @throws IOException 
+	 * @throws UncheckedIOException
 	 */
-	public static BufferedReader getBufferedReader(URL url) throws IOException, CompressorException {
+	public static BufferedReader getBufferedReader(URL url) throws UncheckedIOException {
 		return getBufferedReader(url, CHARSET_UTF8);
-	}
-
-	/**
-	 * Convenience wrapper which works like
-	 * {@link #getBufferedReader(String, Charset)}, but receives a String file name
-	 * that is resolved to a URL in the background according to
-	 * {@link #resolveFileOrResource(String)}. UTF-8 is assumed as the encoding. For
-	 * more flexibility, please combine the two aforementioned methods.
-	 * 
-	 * @throws CompressorException 
-	 * @throws IOException 
-	 * @throws FileNotFoundException 
-	 * @throws MalformedURLException 
-	 */
-	public static BufferedReader getBufferedReader(String filename) throws MalformedURLException, FileNotFoundException, IOException, CompressorException {
-		return getBufferedReader(resolveFileOrResource(filename));
 	}
 
 	/**
@@ -209,30 +238,36 @@ final public class IOUtils {
 	 * decompression algorithm. Note that compressed files cannot be appended and
 	 * that it is only possible to write to the file system (i.e. file:// protocol).
 	 * 
-	 * @throws IOException 
-	 * @throws CompressorException 
+	 * @throws UncheckedIOException
 	 */
 	@SuppressWarnings("resource")
-	public static OutputStream getOutputStream(URL url, boolean append) throws IOException, CompressorException {
-		if (!url.getProtocol().equals("file")) {
-			throw new IOException("Can only write to file:// protocol URLs");
+	public static OutputStream getOutputStream(URL url, boolean append) throws UncheckedIOException {
+		try {
+			if (!url.getProtocol().equals("file")) {
+				throw new UncheckedIOException("Can only write to file:// protocol URLs");
+			}
+
+			File file = new File(url.getPath());
+			String compression = getCompression(url);
+
+			if (compression != null && append && file.exists()) {
+				throw new UncheckedIOException("Cannot append to compressed files.");
+			}
+
+			OutputStream outputStream = new FileOutputStream(file, append);
+
+			if (compression != null) {
+				CompressorStreamFactory compressorStreamFactory = new CompressorStreamFactory();
+				outputStream = compressorStreamFactory.createCompressorOutputStream(compression, outputStream);
+				logger.info(String.format("Using %s compression for %s", compression, url));
+			} else {
+				logger.info(String.format("Using no compression for %s", url));
+			}
+
+			return new BufferedOutputStream(outputStream);
+		} catch (IOException | CompressorException e) {
+			throw new UncheckedIOException(e);
 		}
-
-		File file = new File(url.getPath());
-		String compression = getCompression(url);
-
-		if (compression != null && append && file.exists()) {
-			throw new IOException("Cannot append to compressed files.");
-		}
-
-		OutputStream outputStream = new FileOutputStream(file, append);
-
-		if (compression != null) {
-			CompressorStreamFactory compressorStreamFactory = new CompressorStreamFactory();
-			outputStream = compressorStreamFactory.createCompressorOutputStream(compression, outputStream);
-		}
-
-		return new BufferedOutputStream(outputStream);
 	}
 
 	/**
@@ -241,10 +276,10 @@ final public class IOUtils {
 	 * decompression algorithm. Note that compressed files cannot be appended and
 	 * that it is only possible to write to the file system (i.e. file:// protocol).
 	 * 
-	 * @throws CompressorException 
-	 * @throws IOException 
+	 * @throws UncheckedIOException
 	 */
-	public static BufferedWriter getBufferedWriter(URL url, Charset charset, boolean append) throws IOException, CompressorException {
+	public static BufferedWriter getBufferedWriter(URL url, Charset charset, boolean append)
+			throws UncheckedIOException {
 		OutputStream outputStream = getOutputStream(url, append);
 		return new BufferedWriter(new OutputStreamWriter(outputStream, charset));
 	}
@@ -253,38 +288,19 @@ final public class IOUtils {
 	 * See {@link #getBufferedWriter(String, Charset, bool)}. UTF-8 is assumed as
 	 * the character set and non-appending mode is used.
 	 * 
-	 * @throws CompressorException 
-	 * @throws IOException 
+	 * @throws UncheckedIOException
 	 */
-	public static BufferedWriter getBufferedWriter(URL url) throws IOException, CompressorException {
+	public static BufferedWriter getBufferedWriter(URL url) throws UncheckedIOException {
 		return getBufferedWriter(url, CHARSET_UTF8, false);
-	}
-
-	/**
-	 * Convenience wrapper which works like
-	 * {@link #getBufferedWriter(String, Charset, bool)}, but receives a String file
-	 * name that is resolved to a URL in the background according to
-	 * {@link #resolveFileOrResource(String)}. UTF-8 is assumed as the encoding and
-	 * non-appending mode is used. For more flexibility, please combine the two
-	 * aforementioned methods.
-	 * 
-	 * @throws CompressorException 
-	 * @throws IOException 
-	 * @throws FileNotFoundException 
-	 * @throws MalformedURLException 
-	 */
-	public static BufferedWriter getBufferedWriter(String filename) throws MalformedURLException, FileNotFoundException, IOException, CompressorException {
-		return getBufferedWriter(resolveFileOrResource(filename));
 	}
 
 	/**
 	 * Wrapper function for {@link #getBufferedWriter(URL)} that creates a
 	 * PrintStream.
 	 * 
-	 * @throws CompressorException 
-	 * @throws IOException 
+	 * @throws UncheckedIOException
 	 */
-	public static PrintStream getPrintStream(URL url) throws IOException, CompressorException {
+	public static PrintStream getPrintStream(URL url) throws UncheckedIOException {
 		return new PrintStream(getOutputStream(url, false));
 	}
 
@@ -293,14 +309,20 @@ final public class IOUtils {
 	 *
 	 * @param fromStream The stream containing the data to be copied
 	 * @param toStream   The stream the data should be written to
-	 * @throws IOException
+	 * 
+	 * @throws UncheckedIOException
 	 */
-	public static void copyStream(final InputStream fromStream, final OutputStream toStream) throws IOException {
-		byte[] buffer = new byte[4096];
-		int bytesRead;
+	public static void copyStream(final InputStream fromStream, final OutputStream toStream)
+			throws UncheckedIOException {
+		try {
+			byte[] buffer = new byte[4096];
+			int bytesRead;
 
-		while ((bytesRead = fromStream.read(buffer)) != -1) {
-			toStream.write(buffer, 0, bytesRead);
+			while ((bytesRead = fromStream.read(buffer)) != -1) {
+				toStream.write(buffer, 0, bytesRead);
+			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -309,6 +331,8 @@ final public class IOUtils {
 	 * should not be any accidents like following symbolic links.
 	 *
 	 * @param path The directory to be deleted
+	 * 
+	 * @throws UncheckedIOException
 	 */
 	public static void deleteDirectoryRecursively(Path path) throws UncheckedIOException {
 		try {
@@ -326,7 +350,7 @@ final public class IOUtils {
 				}
 			});
 		} catch (IOException e) {
-			throw new UncheckedIOException(e.getMessage(), e);
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -335,8 +359,10 @@ final public class IOUtils {
 	 * 
 	 * Source:
 	 * http://stackoverflow.com/questions/4245863/fast-way-to-compare-inputstreams
+	 * 
+	 * @throws UncheckedIOException
 	 */
-	public static boolean isEqual(InputStream first, InputStream second) throws IOException {
+	public static boolean isEqual(InputStream first, InputStream second) throws UncheckedIOException {
 		try {
 			while (true) {
 				int fr = first.read();
@@ -349,23 +375,71 @@ final public class IOUtils {
 					return true; // EOF on both sides
 				}
 			}
-		} finally {
-			if (first != null)
-				first.close();
-			if (second != null)
-				second.close();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
 	}
 
-	public static URL newUrl(URL context, String spec) {
+	/**
+	 * Returns a URL for a (not necessarily existing) file path.
+	 * 
+	 * @param filename File name.
+	 * 
+	 * @throws UncheckedIOException
+	 */
+	public static URL getFileUrl(String filename) throws UncheckedIOException {
 		try {
-			return new URL(context, spec);
+			return new File(filename).toURI().toURL();
 		} catch (MalformedURLException e) {
-			try {
-				return new File(spec).toURI().toURL();
-			} catch (MalformedURLException e1) {
-				throw new RuntimeException(e1);
-			}
+			throw new UncheckedIOException(e);
 		}
+	}
+
+	/**
+	 * Given a base URL, returns the extended URL.
+	 * 
+	 * @param context   Base URL, e.g. from the Config object.
+	 * @param extension Extended path specification.
+	 * 
+	 * @throws UncheckedIOException
+	 */
+	public static URL extendUrl(URL context, String extension) throws UncheckedIOException {
+		if (context == null) {
+			throw new IllegalArgumentException("Please use IOUtils.getFileUrl");
+		}
+
+		try {
+			return new URL(context, extension);
+		} catch (MalformedURLException e) {
+			// We cannot construct a URL for some reason (see respective unit test)
+			return getFileUrl(extension);
+		}
+	}
+
+	/**
+	 * Convenience wrapper, see {@link #getBufferedReader(URL, Charset)}.
+	 * 
+	 * Note, that in general you should rather use URLs and the respective
+	 * {@link #getBufferedReader(URL)} function. You can obtain URLs for your file
+	 * paths either using {@link #resolveFileOrResource(String)} for an existing
+	 * identifier for which it is not sure a priori whether it is a local file or a
+	 * URL.
+	 */
+	public static BufferedReader getBufferedReader(String filename) {
+		return getBufferedReader(resolveFileOrResource(filename));
+	}
+
+	/**
+	 * Convenience wrapper, see {@link #getBufferedWriter(URL, Charset, boolean)}.
+	 */
+	public static BufferedWriter getBufferedWriter(String filename) {
+		return getBufferedWriter(getFileUrl(filename));
+	}
+
+	/**
+	 * Convenience wrapper, see {@link #getBufferedWriter(URL, Charset, boolean)}.
+	 */
+	public static BufferedWriter getAppendingBufferedWriter(String filename) {
+		return getBufferedWriter(getFileUrl(filename), CHARSET_UTF8, true);
 	}
 }

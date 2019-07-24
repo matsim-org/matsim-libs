@@ -288,7 +288,7 @@ class ScenarioLoaderImpl {
 		}
 
 		if ( this.config.transit().getTransitLinesAttributesFile() != null ) {
-			URL transitLinesAttributesFileName = IOUtils.newUrl(this.config.getContext(), this.config.transit().getTransitLinesAttributesFile());
+			URL transitLinesAttributesFileName = IOUtils.extendUrl(this.config.getContext(), this.config.transit().getTransitLinesAttributesFile());
 			log.info("loading transit lines attributes from " + transitLinesAttributesFileName);
 			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitLinesAttributes());
 			reader.putAttributeConverters( attributeConverters );
@@ -296,7 +296,7 @@ class ScenarioLoaderImpl {
 		}
 
 		if ( this.config.transit().getTransitStopsAttributesFile() != null ) {
-			URL transitStopsAttributesURL = IOUtils.newUrl(this.config.getContext(), this.config.transit().getTransitStopsAttributesFile());
+			URL transitStopsAttributesURL = IOUtils.extendUrl(this.config.getContext(), this.config.transit().getTransitStopsAttributesFile());
 			log.info("loading transit stop facilities attributes from " + transitStopsAttributesURL);
 			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitStopsAttributes());
 			reader.putAttributeConverters( attributeConverters );
@@ -318,7 +318,7 @@ class ScenarioLoaderImpl {
 		final String vehiclesFile = this.config.vehicles().getVehiclesFile();
 		if ( vehiclesFile != null ) {
 			log.info("loading vehicles from " + vehiclesFile );
-			new VehicleReaderV1(this.scenario.getVehicles()).parse(IOUtils.newUrl(this.config.getContext(), vehiclesFile));
+			new VehicleReaderV1(this.scenario.getVehicles()).parse(IOUtils.extendUrl(this.config.getContext(), vehiclesFile));
 		} 
 		else {
 			log.info("no vehicles file set in config, not loading any vehicles");
