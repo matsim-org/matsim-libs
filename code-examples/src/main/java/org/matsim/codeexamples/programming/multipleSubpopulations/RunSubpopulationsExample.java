@@ -66,7 +66,7 @@ import java.net.URL;
 public class RunSubpopulationsExample {
 	final static String EQUIL_NETWORK = new File("scenarios/equil-extended/network.xml").getAbsolutePath();
 	final static String PLANS = new File("scenarios/equil-extended/plans-with-subpopulation.xml").getAbsolutePath();
-	final static String OBJECT_ATTRIBUTES = new File("scenarios/equil-extended/personAtrributes-with-subpopulation.xml").getAbsolutePath();
+//	final static String OBJECT_ATTRIBUTES = new File("scenarios/equil-extended/personAtrributes-with-subpopulation.xml").getAbsolutePath();
 	final static String CONFIG = "scenarios/equil-extended/config-with-subpopulation.xml";
 	final static String OUTPUT = "./output/example";
 
@@ -84,7 +84,7 @@ public class RunSubpopulationsExample {
 		Config config = ConfigUtils.createConfig(); 
 		ConfigUtils.loadConfig(config, CONFIG);
 		config.plans().setInputFile(PLANS);
-		config.plans().setInputPersonAttributeFile(OBJECT_ATTRIBUTES);
+//		config.plans().setInputPersonAttributeFile(OBJECT_ATTRIBUTES);
 		config.plans().setSubpopulationAttributeName(SUBPOP_ATTRIB_NAME); /* This is the default anyway. */
 		config.network().setInputFile(EQUIL_NETWORK);
 		config.controler().setOutputDirectory(OUTPUT);
