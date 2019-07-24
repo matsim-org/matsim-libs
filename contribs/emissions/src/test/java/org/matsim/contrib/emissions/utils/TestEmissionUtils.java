@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.emissions.EmissionUtils;
-import org.matsim.contrib.emissions.types.Pollutant;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
@@ -779,13 +778,13 @@ public class TestEmissionUtils {
 		
 	}
 
-	public static Map<Pollutant, Double> createEmissions() {
-		return Arrays.stream(Pollutant.values())
+	public static Map<String, Double> createEmissions() {
+		return Arrays.asList("co2", "CO", "NOx", "NO", "NO2", "HC").stream()
 				.collect(Collectors.toMap(p -> p, p -> Math.random()));
 	}
 
-	public static Map<Pollutant, Double> createEmissionsWithFixedValue(double value) {
-		return Arrays.stream(Pollutant.values())
+	public static Map<String, Double> createEmissionsWithFixedValue(double value) {
+		return Arrays.asList("co2", "CO", "NOx", "NO", "NO2", "HC").stream()
 				.collect(Collectors.toMap(p -> p, p -> value));
 	}
 
