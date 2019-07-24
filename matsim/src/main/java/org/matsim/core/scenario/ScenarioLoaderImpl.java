@@ -220,10 +220,12 @@ class ScenarioLoaderImpl {
 			if ( !personAttributes.toString().equals( "" ) ) {
 				String message = "personAttributes not empty after going through all persons, meaning that it contains material for personIDs that " +
 								 "are not in the population.  This is not necessarily a bug so we will continue, but note that such material " +
-								 "will no longer be contained in the output_* files.  The material that is still there will follow.  kai, " +
-								 "jun'19" ;
+								 "will no longer be contained in the output_* files.  (We have this happening in particular when the same personAttributes " +
+								     "file is used for the 10pct and the 1pct scenario. The material that is still there will follow.  kai, jun'19" ;
 				log.warn( message ) ;
-				log.warn( personAttributes.toString() ) ;
+				log.warn( "showing the first 1000 characters from the remaining personAttributes ...") ;
+				log.warn( personAttributes.toString().substring( 0,1000 ) ) ;
+				log.warn("");
 			}
 
 			final String outputDirectory = this.config.controler().getOutputDirectory();
