@@ -51,7 +51,10 @@ public final class EmissionUtils {
 		return indexFromKey ;
 	}
 
-	private static final String HBEFA_ROAD_TYPE = "hbefa_road_type";
+	/* This needs to be public to ensure consistent use of the attribute name when
+	creating networks from outside the contrib, jwjoubert Jul'19 */
+	public static final String HBEFA_ROAD_TYPE = "hbefa_road_type";
+
 	public static void setHbefaRoadType( Link link, String type ){
 		if (type!=null){
 			link.getAttributes().putAttribute(HBEFA_ROAD_TYPE, type);
