@@ -44,6 +44,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.AgentTracker;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -81,11 +82,12 @@ public final class EditTrips {
 
 	private final TripRouter tripRouter;
 	private final PopulationFactory pf;
+	private final InternalInterface internalInterface;
 	private Scenario scenario;
 	private TransitStopAgentTracker transitAgentTracker;
 	private EventsManager eventsManager;
 
-	public EditTrips( QSim qsim, TripRouter tripRouter, Scenario scenario ) {
+	public EditTrips( TripRouter tripRouter, Scenario scenario, InternalInterface internalInterface ) {
 //		For other log level, find log4j.xml and add something like
 //<logger name="org.matsim.withinday.utils.EditTrips">
 //	<level value="info"/>
@@ -93,9 +95,10 @@ public final class EditTrips {
 		this.tripRouter = tripRouter;
 		this.scenario = scenario;
 		this.pf = scenario.getPopulation().getFactory() ;
-		this.eventsManager = qsim.getEventsManager();
+		this.internalInterface = internalInterface;
+		this.eventsManager = internalInterface.getMobsim().getEventsManager();
 
-		for (AgentTracker tracker : (qsim.getAgentTrackers())) {
+		for (AgentTracker tracker : (internalInterface.getMobsim().getAgentTrackers())) {
 			if (tracker instanceof TransitStopAgentTracker) {
 				transitAgentTracker = (TransitStopAgentTracker) tracker;
 				break;
@@ -337,6 +340,7 @@ public final class EditTrips {
 
 			transitAgentTracker.removeAgentFromStop(ptPassengerAgent, currentOrNextStop.getId());
 			((MobsimAgent) ptPassengerAgent).endLegAndComputeNextState( now );
+			this.internalInterface.arrangeNextAgentState( (MobsimAgent) ptPassengerAgent );
 		}
 
 		PopulationUtils.putPersonAttribute( person, AgentSnapshotInfo.marker, true );

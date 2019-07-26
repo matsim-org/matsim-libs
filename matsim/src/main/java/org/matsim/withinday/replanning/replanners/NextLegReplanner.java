@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -70,7 +71,10 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 		
 		String mainMode = this.tripRouter.getMainModeIdentifier().identifyMainMode(trip.getTripElements());
 		double departureTime = TripStructureUtils.getDepartureTime(trip);
-		new EditTrips(qsim, this.tripRouter, scenario).replanFutureTrip(trip, executedPlan, mainMode, departureTime);
+//		new EditTrips( this.tripRouter, scenario, internalInterface ).replanFutureTrip(trip, executedPlan, mainMode, departureTime );
+		if ( true ) {
+			throw new RuntimeException( Gbl.NOT_IMPLEMENTED ) ;
+		}
 		
 		return true;
 	}
