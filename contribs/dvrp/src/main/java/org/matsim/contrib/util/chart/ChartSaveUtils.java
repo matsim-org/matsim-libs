@@ -10,7 +10,7 @@ import org.jfree.chart.*;
 public class ChartSaveUtils {
 	public static void saveAsPNG(JFreeChart chart, String filename, int width, int height) {
 		try {
-			ChartUtilities.writeChartAsPNG(new FileOutputStream(filename + ".png"), chart, width, height);
+			ChartUtils.writeChartAsPNG(new FileOutputStream(filename + ".png"), chart, width, height);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

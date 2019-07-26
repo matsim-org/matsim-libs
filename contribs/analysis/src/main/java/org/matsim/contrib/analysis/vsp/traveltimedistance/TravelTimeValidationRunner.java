@@ -23,7 +23,7 @@
 package org.matsim.contrib.analysis.vsp.traveltimedistance;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.annotations.XYAnnotation;
 import org.jfree.chart.annotations.XYLineAnnotation;
@@ -156,8 +156,8 @@ public class TravelTimeValidationRunner {
 			           yAxisd.getRange().getUpperBound());
 			((XYPlot) chart.getPlot()).addAnnotation(diagonald);
 			
-			ChartUtilities.writeChartAsPNG(new FileOutputStream(folder+"/validated_traveltimes" + ".png"), chart2, 1500, 1500);
-			ChartUtilities.writeChartAsPNG(new FileOutputStream(folder+"/validated_traveldistances.png"), chart, 1500, 1500);
+			ChartUtils.writeChartAsPNG(new FileOutputStream(folder+"/validated_traveltimes" + ".png"), chart2, 1500, 1500);
+			ChartUtils.writeChartAsPNG(new FileOutputStream(folder+"/validated_traveldistances.png"), chart, 1500, 1500);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
