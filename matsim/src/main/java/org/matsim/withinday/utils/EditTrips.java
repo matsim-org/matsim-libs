@@ -210,7 +210,7 @@ public final class EditTrips {
 	}
 
 	private void replanCurrentLegWithTransitRoute(Activity newAct, String routingMode, Leg currentLeg, double now, MobsimAgent agent) {
-		log.debug("entering replanCurrentLegWithTransitRoute for agent" + agent.getId()) ;
+		log.debug("entering replanCurrentLegWithTransitRoute for agentId=" + agent.getId()) ;
 
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
 		List<PlanElement> planElements = plan.getPlanElements() ;
@@ -268,16 +268,16 @@ public final class EditTrips {
 		List<? extends PlanElement> newTripElements = null;
 		// (1) get new trip from current position to new activity:
 		if (mobsimVehicle == null) {
-			log.debug( "agent with ID=" + agent.getId() + " agent is waiting for the next vehicle to arrive at the access stop" ) ;
 			currentOrNextStop = scenario.getTransitSchedule().getFacilities().get(oldPtRoute.getAccessStopId());
+			log.debug( "agent with ID=" + agent.getId() + " is waiting at a stop=" + currentOrNextStop ) ;
 			newTripElements = newTripToNewActivity(currentOrNextStop, newAct, routingMode, now, person );
-			if (newTripElements.get(0) instanceof Leg
-					&& ((Leg) newTripElements.get(0)).getRoute() instanceof ExperimentalTransitRoute
-					&& ((ExperimentalTransitRoute) ((Leg) newTripElements.get(0)).getRoute()).getAccessStopId()
-							.equals(currentOrNextStop.getId())) {
-				// The agent will use a transit line departing from the same stop facility,
+			Gbl.assertIf( newTripElements.get(0) instanceof Leg ); // that is what TripRouter should do.  kai, jul'19
+			if (	 ((Leg) newTripElements.get(0)).getRoute() instanceof ExperimentalTransitRoute
+					&& ((ExperimentalTransitRoute) ((Leg) newTripElements.get(0)).getRoute()).getAccessStopId().equals(currentOrNextStop.getId())) {
+				log.debug( "agent with ID=" + agent.getId() + " will wait for vehicle departing at the same stop facility." ) ;
 				// don't remove the agent from the stop tracker
 			} else {
+				log.debug("agent with ID=" + agent.getId() + " will leave the stop facility.") ;
 				// The agent will not board any bus at the transit stop and will walk away or
 				// do something else. We have to remove him from the list of waiting agents.
 				wantsToLeaveStop = true ;
@@ -288,8 +288,16 @@ public final class EditTrips {
 			// mobsim about changed plan in any particular way
 			TransitDriverAgent driver = (TransitDriverAgent) mobsimVehicle.getDriver();
 			currentOrNextStop = driver.getNextTransitStop();
-			newTripElements = newTripToNewActivity(currentOrNextStop, newAct, routingMode, now, person );
+			newTripElements = newTripToNewActivity(currentOrNextStop, newAct, routingMode, now+180, person );
+			// yyyy as discussed elswhere, would make more sense to compute this once arrived at that stop.
 		}
+
+		log.debug("") ;
+		log.debug("newTrip for agentId=" + agent.getId() );
+		for( PlanElement planElement : newTripElements ){
+			log.debug(planElement) ;
+		}
+		log.debug("") ;
 
 		//??????????
 		// (2) prune the new trip up to the current leg: -> for pt better as one step together with mergeOldAndNewCurrentPtLeg
@@ -297,6 +305,8 @@ public final class EditTrips {
 
 		// (2) prune the new trip up to the current leg and modify current route, return additional PlanElements if necessary for merging:
 		newTripElements = mergeOldAndNewCurrentPtLeg(currentLeg, newTripElements, agent, currentOrNextStop);
+		// yyyyyy I would do the different infill in the case differentiation above (and not try to autosense
+		// which case we have inside mergeOldAndNewCurrentPtLeg). See fix-edittrips branch.  kai, jul'19
 
 		// (3) remove remainder of old trip after current leg in plan:
 		int pos = WithinDayAgentUtils.getCurrentPlanElementIndex(agent) + 1 ;
@@ -326,9 +336,15 @@ public final class EditTrips {
 					stb.append( ((Activity) planElement).getType() );
 				}
 			}
+			log.debug("") ;
 			log.debug( "agent" + agent.getId() + " new plan: " + stb.toString() );
 		}
-		log.debug("agent" + agent.getId() + " new plan: " + planElements.toString());
+		log.debug("") ;
+		log.debug("agent" + agent.getId() + " new plan: " ) ;
+		for( PlanElement planElement : planElements ){
+			log.debug(planElement) ;
+		}
+		log.debug("") ;
 
 		WithinDayAgentUtils.resetCaches(agent);
 
@@ -515,11 +531,12 @@ public final class EditTrips {
 			indexNextPtRoute = 0;
 		} else if (newCurrentLeg.getRoute() instanceof GenericRouteImpl) {
 			log.debug("new trip PlanElement 0 is GenericRouteImpl (= walk/bike or similar) " + newTrip);
-		} else if (newTrip.size() > 1 && newTrip.get(1) instanceof Leg
+		}
+		// yyyyyy beyond here could only happen if route instanceof NetworkRoute.  Which currently is not possible, I think.  ??????  kai, jul'19
+		else if (newTrip.size() > 1 && newTrip.get(1) instanceof Leg
 				&& ((Leg) newTrip.get(1)).getRoute() instanceof ExperimentalTransitRoute) {
 			// not sure whether this can actually happen
-			log.debug("new trip PlanElement 1 is pt leg " + newTrip.get(0) + " --- " + newTrip.get(1) + " --- "
-					+ newTrip.get(2));
+			log.debug("new trip PlanElement 1 is pt leg " + newTrip.get(0) + " --- " + newTrip.get(1) + " --- " + newTrip.get(2));
 			nextPtRoute = (ExperimentalTransitRoute) ((Leg) newTrip.get(1)).getRoute();
 			indexNextPtRoute = 1;
 		} else if (newTrip.size() > 2 && newTrip.get(2) instanceof Leg
@@ -624,6 +641,8 @@ public final class EditTrips {
 	@Deprecated // prefer the non-static methods
 	public static List<? extends PlanElement> replanFutureTrip(Trip trip, Plan plan, String routingMode,
 			double departureTime, TripRouter tripRouter, Scenario scenario) {
+		log.debug( "entering replanFutureTrip for agentid=" + plan.getPerson().getId() ) ;
+
 		Person person = plan.getPerson();
 
 		Facility fromFacility = FacilitiesUtils.toFacility(trip.getOriginActivity(), scenario.getActivityFacilities());
