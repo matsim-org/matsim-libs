@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.locationtech.jts.geom.Geometry;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
@@ -27,6 +28,7 @@ public class DemandGenerator {
 	File[] files;
 	Map<String, Geometry> zoneMap;
 	Map<String, String> nameMap;
+	Map<String, List<String>> neighbourMap;
 	Map<String, String> areaMap;
 	Map<String, String> useMap;
 	Map<String, CommercialZone> commercialZoneMap;
@@ -40,6 +42,7 @@ public class DemandGenerator {
 		this.inputpath = inputpath;
 		this.files = new File(inputpath).listFiles();
 		this.zoneMap = new HashMap<String, Geometry>();
+		this.neighbourMap = new HashMap<String, List<String>>();
 		this.nameMap = new HashMap<String, String>();
 		this.areaMap = new HashMap<String, String>();
 		this.useMap = new HashMap<String, String>();
@@ -65,9 +68,9 @@ public class DemandGenerator {
 
 		String companyFolder = "D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\Unternehmen\\";
 		String zoneSHP = "D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\Zellen\\FNP_Merged\\baseShapeH.shp";
-		String outputCSV = "D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\zellen.csv";
+		String outputpath = "D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\";
 
-		DemandGenerator demand = new DemandGenerator(companyFolder, zoneSHP, outputCSV);
+		DemandGenerator demand = new DemandGenerator(companyFolder, zoneSHP, outputpath);
 		for (int i = 0; i < demand.files.length; i++) {
 			String dummyDemandFile = demand.getFile(i);
 
@@ -80,6 +83,9 @@ public class DemandGenerator {
 		}
 
 		demand.getCompanyClassesPerZone();
+		demand.findNeighbourZones();
+		demand.writeNeighbourZonesCSV();
+		demand.writeTravelTimes2ZonesCSV();
 
 	}
 
@@ -94,15 +100,39 @@ public class DemandGenerator {
 		for (SimpleFeature feature : features) {
 			String id = feature.getAttribute(featureKeyInShapeFile).toString();
 			String name = feature.getAttribute("Stadtteil").toString();
-			String area = feature.getAttribute("Flaeche").toString();
 			String use = feature.getAttribute("Nutzung").toString();
+			String area = null;
+			if (use.contains ("A") ) {
+				area = "0.000000";
+			} else {
+				area = feature.getAttribute("Flaeche").toString();
+			}
 			Geometry geometry = (Geometry) feature.getDefaultGeometry();
 			zones.add(id);
 			zoneMap.put(id, geometry);
 			nameMap.put(id, name);
 			areaMap.put(id, area);
 			useMap.put(id, use);
+			neighbourMap.put(id, null);
 		}
+	}
+
+	public void findNeighbourZones() {
+
+		for (String zone : zoneMap.keySet()) {
+			ArrayList<String> neighbourzones = new ArrayList<String>();
+			Geometry geometry = zoneMap.get(zone);
+			for (String neighbourzone : zoneMap.keySet()) {
+				Geometry neighbourgeometry = zoneMap.get(neighbourzone);
+				if (zone != neighbourzone && geometry.intersects(neighbourgeometry)) {
+					// System.out.println("Coordinate in "+ zone);
+					neighbourzones.add(neighbourzone);
+					// System.out.println("gefunden" + neighbourzone);
+				}
+			}
+			neighbourMap.put(zone, neighbourzones);
+		}
+		// System.out.println("halt Stop!");
 	}
 
 	public void initializeZone2CompanyClassCounterMap() {
@@ -158,6 +188,7 @@ public class DemandGenerator {
 		}
 		shape2CommercialZoneMap();
 		writeCompanies2ZoneCSV();
+
 	}
 
 	public void shape2CommercialZoneMap() {
@@ -172,9 +203,9 @@ public class DemandGenerator {
 	}
 
 	public void writeCompanies2ZoneCSV() {
-		String header = "Zelle;Stadtteil,Flaeche,Nutzung,Unternehmen;A;B;C;D;E;F;G;H;I;J;K;L;M;N;O;P;Q;R;S;T;U";
+		String header = "Zelle;Stadtteil;Flaeche;Nutzung;Unternehmen;A;B;C;D;E;F;G;H;I;J;K;L;M;N;O;P;Q;R;S;T;U";
 
-		BufferedWriter bw = IOUtils.getBufferedWriter(outputpath);
+		BufferedWriter bw = IOUtils.getBufferedWriter(outputpath + "Zellen.csv");
 		try {
 			bw.write(header);
 			for (Entry<String, Map<String, MutableInt>> entry : zone2CompanyClassCounterMap.entrySet()) {
@@ -195,11 +226,74 @@ public class DemandGenerator {
 			}
 			bw.flush();
 			bw.close();
-			System.out.println("Write CSV done!");
+			System.out.println("Write ZellenCSV done!");
 		} catch (IOException entry) {
 			// TODO Auto-generated catch block
 			entry.printStackTrace();
 		}
 	}
 
+	public void writeNeighbourZonesCSV() {
+		String header = "Zelle;Nachbarzelle";
+		BufferedWriter bw = IOUtils.getBufferedWriter(outputpath + "Nachbarzellen.csv");
+		try {
+			bw.write(header);
+			bw.newLine();
+			for (Entry<String, List<String>> entry : neighbourMap.entrySet()) {
+				String zone = entry.getKey();
+
+				if (neighbourMap.get(zone) != null) {
+					for (String neighbour : neighbourMap.get(zone)) {
+						bw.write(zone + ";" + neighbour);
+						bw.newLine();
+					}
+				}
+
+			}
+			bw.flush();
+			bw.close();
+			System.out.println("Write NeighbourCSV done!");
+		} catch (IOException entry) {
+			// TODO Auto-generated catch block
+			entry.printStackTrace();
+		}
+
+	}
+
+	public void writeTravelTimes2ZonesCSV() {
+		String header = "Von;Nach;Reisezeit";
+		BufferedWriter bw = IOUtils.getBufferedWriter(outputpath + "Reisezeiten.csv");
+		try {
+			bw.write(header);
+			bw.newLine();
+			for (Entry<String, Geometry> entry : zoneMap.entrySet()) {
+				String zone = entry.getKey();
+				for (Entry<String, Geometry> other : zoneMap.entrySet()) {
+					String otherZone = other.getKey();
+
+					if (zone != otherZone) {
+
+						double cDistance = zoneMap.get(zone).getCentroid()
+								.distance(zoneMap.get(otherZone).getCentroid());
+						double tt = (cDistance / (36 / 3.6)) / 60;
+
+						bw.write(zone + ";" + otherZone + ";" + tt);
+						bw.newLine();
+					} else {
+						int tt = 1;
+						bw.write(zone + ";" + otherZone + ";" + tt);
+						bw.newLine();
+					}
+				}
+
+			}
+			bw.flush();
+			bw.close();
+			System.out.println("Write TravelTimeCSV done!");
+		} catch (IOException entry) {
+			// TODO Auto-generated catch block
+			entry.printStackTrace();
+		}
+
+	}
 }
