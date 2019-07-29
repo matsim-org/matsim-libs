@@ -18,17 +18,25 @@
 
 package vwExamples.utils.delays;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.geotools.filter.expression.ThisPropertyAccessorFactory;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.locationtech.jts.geom.Geometry;
@@ -53,6 +61,7 @@ import org.matsim.core.population.io.StreamingPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
 import analysis.drtOccupancy.DynModeTripsAnalyser;
@@ -85,89 +94,103 @@ public class RunTravelDelayAnalysisBatch {
 
 			String[] StringList = scenarioDir.toString().split("\\\\");
 			String scenarioName = StringList[StringList.length - 1];
+			
+			Set<String> scenarioToBeAnalyzed = new HashSet<String>();
+			scenarioToBeAnalyzed.add("VW243_HomeOfficeInOut_10pct");
+//			scenarioToBeAnalyzed.add("VW243_LocalLinkFlow_1.28_10pct");
+//			scenarioToBeAnalyzed.add("VW243_CityCommuterDRT_10pct300_veh_idx0");
+//			scenarioToBeAnalyzed.add("VW243_CityCommuterDRTAmpel2.0_10pct300_veh_idx0");
+//			
+			
 
-			StreamingPopulationReader spr = new StreamingPopulationReader(
-					ScenarioUtils.createScenario(ConfigUtils.createConfig()));
-			spr.addAlgorithm(new PersonAlgorithm() {
-				@Override
-				public void run(Person person) {
-					// relevantAgents.add(person.getId());
+			if (scenarioToBeAnalyzed.contains(scenarioName)) {
+				System.out.println("Start Delay Analysis: "+ scenarioName);
 
-					// 01: Case for Commuter
-					// if (livesOutside(person.getSelectedPlan(), zoneMap)
-					// && worksInside(person.getSelectedPlan(), zoneMap)) {
-					// relevantAgents.add(person.getId());
-					// }
+				StreamingPopulationReader spr = new StreamingPopulationReader(
+						ScenarioUtils.createScenario(ConfigUtils.createConfig()));
+				spr.addAlgorithm(new PersonAlgorithm() {
+					@Override
+					public void run(Person person) {
+						// relevantAgents.add(person.getId());
 
-					// 02: HousholdSurvery (Inhabitants)
-					// if (livesInside(person.getSelectedPlan(), zoneMap)) {
-					// relevantAgents.add(person.getId());
-					// }
+						// 01: Case for Commuter
+						// if (livesOutside(person.getSelectedPlan(), zoneMap)
+						// && worksInside(person.getSelectedPlan(), zoneMap)) {
+						// relevantAgents.add(person.getId());
+						// }
 
+						// 02: HousholdSurvery (Inhabitants)
+						// if (livesInside(person.getSelectedPlan(), zoneMap)) {
+						// relevantAgents.add(person.getId());
+						// }
+
+					}
+
+				});
+				spr.readFile(scenarioDir + "\\" + scenarioName + ".output_plans.xml.gz");
+
+				Network network = NetworkUtils.createNetwork();
+				new MatsimNetworkReader(network).readFile(scenarioDir + "\\" + scenarioName + ".output_network.xml.gz");
+				TravelDelayCalculator tdc = new TravelDelayCalculator(network, boundary);
+
+				EventsManager events = EventsUtils.createEventsManager();
+				events.addHandler(tdc);
+				new MatsimEventsReader(events).readFile(scenarioDir + "\\" + scenarioName + ".output_events.xml.gz");
+				DynModeTripsAnalyser.collection2Text(tdc.getTrips(),
+						scenarioDir + "\\" + scenarioName + ".delay_city_hannover.csv",
+						"PersonId;ArrivalTime;FreespeedTravelTime;ActualTravelTime;Delay;Beeline;Flag;Mileage_m");
+
+				Map<Id<Link>, MutableDouble> linkFlows = tdc.getLinkFlowMap();
+				Map<Id<Link>, MutableDouble> linkDelays = tdc.getLinkDelayMap();
+
+				for (Entry<Id<Link>, ? extends Link> linkEntry : network.getLinks().entrySet()) {
+					Id<Link> linkId = linkEntry.getValue().getId();
+
+					if (linkFlows.containsKey(linkId)) {
+
+						Double flow = linkFlows.get(linkId).doubleValue();
+						Double delay = linkDelays.get(linkId).doubleValue();
+						Double delayPerVeh_min = delay / (flow * 60);
+						Double linkCongestionIdx = tdc.getMeanCongestionIdxPerLink(linkId);
+
+						// double accaptedDelay =
+						// NetworkUtils.getFreespeedTravelTime(linkEntry.getValue())*0.2*flow;
+						linkEntry.getValue().getAttributes().putAttribute("flow_veh", flow);
+						// linkEntry.getValue().getAttributes().putAttribute("congestion_idx",
+						// delay/accaptedDelay);
+						linkEntry.getValue().getAttributes().putAttribute("delay_h", delay / 3600.0);
+						linkEntry.getValue().getAttributes().putAttribute("delayv_min", delayPerVeh_min);
+						linkEntry.getValue().getAttributes().putAttribute("cong_idx", linkCongestionIdx);
+
+					} else {
+						linkEntry.getValue().getAttributes().putAttribute("flow_veh", -99.0);
+						// linkEntry.getValue().getAttributes().putAttribute("congestion_idx", -99.0);
+						linkEntry.getValue().getAttributes().putAttribute("delay_h", -99.0);
+						linkEntry.getValue().getAttributes().putAttribute("delayv_min", -99.0);
+						linkEntry.getValue().getAttributes().putAttribute("cong_idx", -99.0);
+
+					}
 				}
 
-			});
-			spr.readFile(scenarioDir + "\\" + scenarioName + ".output_plans.xml.gz");
+				NetworkUtils.writeNetwork(network,
+						scenarioDir + "\\" + scenarioName + ".output_network_flow_delay.xml.gz");
 
-			Network network = NetworkUtils.createNetwork();
-			new MatsimNetworkReader(network).readFile(scenarioDir + "\\" + scenarioName + ".output_network.xml.gz");
-			TravelDelayCalculator tdc = new TravelDelayCalculator(network, boundary);
+//				 String netfile = scenarioDir + "\\" + scenarioName +
+//				 ".output_network_flow_delay.xml.gz";
+//				 String outputFileLs = scenarioDir + "\\" + scenarioName +
+//				 ".output_network_flow_delay_l.shp";
+//				 String outputFileP = scenarioDir + "\\" + scenarioName +
+//				 ".output_network_flow_delay_p.shp";
+//				 String[] params = {netfile,outputFileLs,outputFileP};
+//				 Links2ESRIShape.main(params);
 
-			EventsManager events = EventsUtils.createEventsManager();
-			events.addHandler(tdc);
-			new MatsimEventsReader(events).readFile(scenarioDir + "\\" + scenarioName + ".output_events.xml.gz");
-			DynModeTripsAnalyser.collection2Text(tdc.getTrips(),
-					scenarioDir + "\\" + scenarioName + ".delay_city_hannover.csv",
-					"PersonId;ArrivalTime;FreespeedTravelTime;ActualTravelTime;Delay;Beeline;Flag;Mileage_m");
+				createLinkAttributesList(network);
+				DynModeTripsAnalyser.collection2Text(LinkAttributesList,
+						scenarioDir + "\\" + scenarioName + ".linkData_delay_flow_city_hannover.csv",
+						"linkid;delay_h;flow_veh");
 
-			Map<Id<Link>, MutableDouble> linkFlows = tdc.getLinkFlowMap();
-			Map<Id<Link>, MutableDouble> linkDelays = tdc.getLinkDelayMap();
-		
-
-			for (Entry<Id<Link>, ? extends Link> linkEntry : network.getLinks().entrySet()) {
-				Id<Link> linkId = linkEntry.getValue().getId();
-
-				if (linkFlows.containsKey(linkId)) {
-
-					Double flow = linkFlows.get(linkId).doubleValue();
-					Double delay = linkDelays.get(linkId).doubleValue();
-					Double delayPerVeh_min = delay / (flow*60);
-					Double linkCongestionIdx= tdc.getMeanCongestionIdxPerLink(linkId);
-
-//					double accaptedDelay = NetworkUtils.getFreespeedTravelTime(linkEntry.getValue())*0.2*flow;
-					linkEntry.getValue().getAttributes().putAttribute("flow_veh", flow);
-//					linkEntry.getValue().getAttributes().putAttribute("congestion_idx", delay/accaptedDelay);
-					linkEntry.getValue().getAttributes().putAttribute("delay_h", delay/3600.0);
-					linkEntry.getValue().getAttributes().putAttribute("delayv_min", delayPerVeh_min);
-					linkEntry.getValue().getAttributes().putAttribute("cong_idx", linkCongestionIdx);
-					
-					
-				} else {
-					linkEntry.getValue().getAttributes().putAttribute("flow_veh", -99.0);
-//					linkEntry.getValue().getAttributes().putAttribute("congestion_idx", -99.0);
-					linkEntry.getValue().getAttributes().putAttribute("delay_h", -99.0);
-					linkEntry.getValue().getAttributes().putAttribute("delayv_min", -99.0);
-					linkEntry.getValue().getAttributes().putAttribute("cong_idx", -99.0);
-
-				}
+//				writeTimeDependentFlow(scenarioDir + "\\" + scenarioName + ".LinkFlows.csv",tdc.getTimeDependentFlow());
 			}
-
-			NetworkUtils.writeNetwork(network, scenarioDir + "\\" + scenarioName + ".output_network_flow_delay.xml.gz");
-
-			// String netfile = scenarioDir + "\\" + scenarioName +
-			// ".output_network_flow_delay.xml.gz";
-			// String outputFileLs = scenarioDir + "\\" + scenarioName +
-			// ".output_network_flow_delay_l.shp";
-			// String outputFileP = scenarioDir + "\\" + scenarioName +
-			// ".output_network_flow_delay_p.shp";
-			// String[] params = {netfile,outputFileLs,outputFileP};
-			// Links2ESRIShape.main(params);
-
-			createLinkAttributesList(network);
-			DynModeTripsAnalyser.collection2Text(LinkAttributesList,
-					scenarioDir + "\\" + scenarioName + ".linkData_delay_flow_city_hannover.csv",
-					"linkid;delay_h;flow_veh");
-
 		}
 
 	}
@@ -196,6 +219,55 @@ public class RunTravelDelayAnalysisBatch {
 			LinkAttributesList.add(Entry);
 		}
 
+	}
+	
+	public static void writeTimeDependentFlow(String fileName, Map<Double, HashMap<Id<Link>,MutableInt>> timeDependentFlow) {
+		DecimalFormat format = new DecimalFormat();
+		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
+		format.setMinimumIntegerDigits(1);
+		format.setMaximumFractionDigits(2);
+		format.setGroupingUsed(false);
+
+		BufferedWriter bw = IOUtils.getBufferedWriter(fileName);
+
+		
+		SortedSet<Double> timeBins = new TreeSet<>(timeDependentFlow.keySet());
+				
+		
+		
+		try {
+
+			bw.write("hour;linkId;flowPerHour");
+			bw.newLine();
+			for (Double t : timeBins) {
+				
+				for (Entry<Id<Link>, MutableInt> linkEntry : timeDependentFlow.get(t).entrySet())
+				{
+					String row = t + ";" + linkEntry.getKey() + ";" + linkEntry.getValue();
+
+					bw.write(row);
+					bw.newLine();
+				}
+
+				
+
+			}
+
+			bw.flush();
+			bw.close();
+			// datasetrequ.addSeries(parkCount);
+			// // JFreeChart chart = chartProfile(splitParkings.size(), dataset, "Waiting
+			// // times", "Wait time (s)");
+			// JFreeChart chart2 = chartProfile(splitParkings.size(), datasetrequ, "Parked
+			// Vehicles over Time",
+			// "Total Parked Cars [-]");
+			// // ChartSaveUtils.saveAsPNG(chart, fileName, 1500, 1000);
+			// ChartSaveUtils.saveAsPNG(chart2, fileName + "_parkEvents", 1500, 1000);
+
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
 	}
 
 	public static void readShape(String shapeFile, String featureKeyInShapeFile) {

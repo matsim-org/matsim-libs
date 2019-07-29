@@ -43,8 +43,8 @@ public class SelectRandomPopSample {
         //Create a Scenario
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         //Fill this Scenario with a population.
-        new PopulationReader(scenario).readFile("C:\\Users\\VWBIDGN\\Desktop\\Joschka\\plans\\0.10_vw235_drt_plan_1x_selected.xml.gz");
-        String randomOrderedPop = "C:\\Users\\VWBIDGN\\Desktop\\Joschka\\plans\\0.01_vw235_drt_plan_1x_selected.xml.g";
+        new PopulationReader(scenario).readFile("D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\commuterdrt_out_in_withinAll_vw235_nocad.1.0_20pct.output_plans_selected.xml.gz");
+        String randomOrderedPop = "D:\\\\Matsim\\\\Axer\\\\Hannover\\\\ZIM\\\\input\\\\plans\\\\commuterdrt_out_in_withinAll_vw235_nocad.1.0_20pct.output_plans_selected_10pct.xml.gz";
         StreamingPopulationWriter filteredPop = new StreamingPopulationWriter();
         filteredPop.startStreaming(randomOrderedPop);
 

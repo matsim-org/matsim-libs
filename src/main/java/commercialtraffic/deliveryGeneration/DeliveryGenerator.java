@@ -27,6 +27,8 @@ import com.graphhopper.jsprit.core.algorithm.termination.VariationCoefficientTer
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
+import commercialtraffic.integration.CarrierMode;
+import commercialtraffic.integration.CommercialTrafficChecker;
 import commercialtraffic.integration.CommercialTrafficConfigGroup;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -64,11 +66,14 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
 
     public final double firsttourTraveltimeBuffer;
     private final int maxIterations;
+    private final CarrierMode carrierMode;
 
     private Scenario scenario;
     private Population population;
 
-    private Carriers carriers;
+    private Carriers hullcarriers;
+    private Carriers jspritcarriers;
+
     private final TravelTime carTT;
 
     private Set<Id<Person>> freightDrivers = new HashSet<>();
@@ -83,15 +88,18 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
     }
 
     @Inject
-    public DeliveryGenerator(Scenario scenario, Map<String, TravelTime> travelTimes, Carriers carriers) {
+    public DeliveryGenerator(Scenario scenario, Map<String, TravelTime> travelTimes, Carriers carriers, CarrierMode carrierMode) {
         CommercialTrafficConfigGroup ctcg = CommercialTrafficConfigGroup.get(scenario.getConfig());
-        this.carriers = carriers;
+        this.hullcarriers = carriers;
         firsttourTraveltimeBuffer = ctcg.getFirstLegTraveltimeBufferFactor();
-
+        this.carrierMode = carrierMode;
         this.scenario = scenario;
         this.population = scenario.getPopulation();
         maxIterations = ctcg.getJspritIterations();
         carTT = travelTimes.get(TransportMode.car);
+        if (CommercialTrafficChecker.hasMissingAttributes(population)) {
+            throw new RuntimeException("Not all agents expectingg deliveries contain all required attributes fo receival. Please check the log for DeliveryConsistencyChecker. Aborting.");
+        }
 
     }
 
@@ -100,32 +108,37 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
      */
     DeliveryGenerator(Scenario scenario, Carriers carriers) {
         this.population = scenario.getPopulation();
-        this.carriers = carriers;
+        this.hullcarriers = carriers;
         this.scenario = scenario;
         firsttourTraveltimeBuffer = 2;
         maxIterations = 100;
         carTT = new FreeSpeedTravelTime();
+        carrierMode = (m -> TransportMode.car);
     }
 
     private void generateIterationServices() {
-        carriers.getCarriers().values().forEach(carrier -> carrier.getServices().clear());
+        hullcarriers.getCarriers().values().forEach(carrier -> carrier.getServices().clear());
         Set<PlanElement> activitiesWithServcies = new HashSet<>();
         population.getPersons().values().forEach(p ->
         {
-            activitiesWithServcies.addAll(p.getSelectedPlan().getPlanElements().stream().filter(Activity.class::isInstance).filter(a -> a.getAttributes().getAsMap().containsKey(PersonDelivery.DELIEVERY_TYPE)).collect(Collectors.toSet()));
+            activitiesWithServcies.addAll(p.getSelectedPlan().getPlanElements().stream()
+                    .filter(Activity.class::isInstance)
+                    .filter(a -> a.getAttributes().getAsMap().containsKey(PersonDelivery.DELIEVERY_TYPE))
+                    .collect(Collectors.toSet()));
         });
         int i = 0;
         for (PlanElement pe : activitiesWithServcies) {
             Activity activity = (Activity) pe;
             CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(Id.create(i, CarrierService.class), activity.getLinkId());
-            serviceBuilder.setCapacityDemand((int) activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_SIZE));
-            serviceBuilder.setServiceDuration((int) activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_DURATION));
-            serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance((int) activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_TIME_START), (int) activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_TIME_END)));
+            serviceBuilder.setCapacityDemand(Integer.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_SIZE))));
+            serviceBuilder.setServiceDuration(Integer.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_DURATION))));
+            serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_TIME_START))), Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_TIME_END)))));
             i++;
             Id<Carrier> carrierId = PersonDelivery.getCarrierId(activity);
-            if (carriers.getCarriers().containsKey(carrierId)) {
-                Carrier carrier = carriers.getCarriers().get(carrierId);
+            if (hullcarriers.getCarriers().containsKey(carrierId)) {
+                Carrier carrier = hullcarriers.getCarriers().get(carrierId);
                 carrier.getServices().add(serviceBuilder.build());
+
 
             } else {
                 throw new RuntimeException("Carrier Id does not exist: " + carrierId.toString());
@@ -136,44 +149,41 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
     }
 
     private void buildTours() {
+
+
         Set<CarrierVehicleType> vehicleTypes = new HashSet<>();
-        carriers.getCarriers().values().forEach(carrier -> vehicleTypes.addAll(carrier.getCarrierCapabilities().getVehicleTypes()));
+        hullcarriers.getCarriers().values().forEach(carrier -> vehicleTypes.addAll(carrier.getCarrierCapabilities().getVehicleTypes()));
         NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), vehicleTypes);
         netBuilder.setTimeSliceWidth(900); // !!!! otherwise it will not do anything.
         netBuilder.setTravelTime(carTT);
         final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
+        hullcarriers.getCarriers().values().stream().forEach(carrier -> {
+                    //Build VRP
+                    VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork());
+                    //            vrpBuilder.setRoutingCost(netBasedCosts);
+                    // this is too expansive for the size of the problem
+                    VehicleRoutingProblem problem = vrpBuilder.build();
+                    // get the algorithm out-of-the-box, search solution and get the best one.
+                    VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
+                    algorithm.setMaxIterations(maxIterations);
+                    // variationCoefficient = stdDeviation/mean. so i set the threshold rather soft
+                    algorithm.addTerminationCriterion(new VariationCoefficientTermination(5, 0.1));
+                    Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
+                    VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
+                    //get the CarrierPlan
+                    CarrierPlan carrierPlan = MatsimJspritFactory.createPlan(carrier, bestSolution);
+                    NetworkRouter.routePlan(carrierPlan, netBasedCosts);
+                    carrier.setSelectedPlan(carrierPlan);
+                }
 
-        for (Carrier carrier : carriers.getCarriers().values()) {
-            //Build VRP
-            VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork());
-            vrpBuilder.setRoutingCost(netBasedCosts);
-            VehicleRoutingProblem problem = vrpBuilder.build();
+        );
 
-            // get the algorithm out-of-the-box, search solution and get the best one.
-            VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
-
-            algorithm.setMaxIterations(maxIterations);
-
-            // variationCoefficient = stdDeviation/mean. so i set the threshold rather soft
-            algorithm.addTerminationCriterion(new VariationCoefficientTermination(50, 0.01));
-
-
-            Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
-            VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
-
-            //get the CarrierPlan
-            CarrierPlan carrierPlan = MatsimJspritFactory.createPlan(carrier, bestSolution);
-            NetworkRouter.routePlan(carrierPlan, netBasedCosts);
-
-            carrier.setSelectedPlan(carrierPlan);
-
-        }
 
 
     }
 
     private void createFreightAgents() {
-        for (Carrier carrier : carriers.getCarriers().values()) {
+        for (Carrier carrier : hullcarriers.getCarriers().values()) {
             int nextId = 0;
             for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 
@@ -200,7 +210,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
                         if (route == null)
                             throw new IllegalStateException("missing route for carrier " + carrier.getId());
                         route.setTravelTime(tourLeg.getExpectedTransportTime());
-                        Leg leg = PopulationUtils.createLeg(TransportMode.car);
+                        Leg leg = PopulationUtils.createLeg(carrierMode.getCarrierMode(carrier.getId()));
                         leg.setRoute(route);
                         leg.setDepartureTime(tourLeg.getExpectedDepartureTime());
                         leg.setTravelTime(tourLeg.getExpectedTransportTime());
@@ -217,7 +227,8 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
 
                     } else if (tourElement instanceof Tour.TourActivity) {
                         Tour.TourActivity act = (Tour.TourActivity) tourElement;
-                        Activity tourElementActivity = PopulationUtils.createActivityFromLinkId(act.getActivityType(), act.getLocation());
+
+                        Activity tourElementActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.DELIVERY, act.getLocation());
                         plan.addActivity(tourElementActivity);
                         if (lastTourElementActivity == null) {
                             tourElementActivity.setMaximumDuration(act.getDuration());
@@ -239,7 +250,6 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
                 }
                 Id<Vehicle> vid = Id.createVehicleId(driverPerson.getId());
                 scenario.getVehicles().addVehicle(scenario.getVehicles().getFactory().createVehicle(vid, carrierVehicle.getVehicleType()));
-                ;
                 freightVehicles.add(vid);
                 freightDrivers.add(driverPerson.getId());
             }
@@ -263,8 +273,8 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
     private void removeFreightAgents() {
         freightDrivers.forEach(d -> scenario.getPopulation().removePerson(d));
         freightVehicles.forEach(vehicleId -> scenario.getVehicles().removeVehicle(vehicleId));
-        CarrierVehicleTypes.getVehicleTypes(carriers).getVehicleTypes().keySet().forEach(vehicleTypeId -> scenario.getVehicles().removeVehicleType(vehicleTypeId));
-        carriers.getCarriers().values().forEach(carrier -> {
+        CarrierVehicleTypes.getVehicleTypes(hullcarriers).getVehicleTypes().keySet().forEach(vehicleTypeId -> scenario.getVehicles().removeVehicleType(vehicleTypeId));
+        hullcarriers.getCarriers().values().forEach(carrier -> {
             carrier.getServices().clear();
             carrier.getShipments().clear();
             carrier.clearPlans();

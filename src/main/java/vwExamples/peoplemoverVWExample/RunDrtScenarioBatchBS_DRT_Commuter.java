@@ -87,7 +87,7 @@ public class RunDrtScenarioBatchBS_DRT_Commuter {
 
 		TemperatureChangeConfigGroup tcg = (TemperatureChangeConfigGroup) config.getModules()
 				.get(TemperatureChangeConfigGroup.GROUP_NAME);
-		tcg.setTempFile(inbase + "\\temp\\temperatures_7.csv");
+		tcg.setTemperatureChangeFile(inbase + "\\temp\\temperatures_7.csv");
 
 		// config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		// Overwrite existing configuration parameters
@@ -188,7 +188,7 @@ public class RunDrtScenarioBatchBS_DRT_Commuter {
 
 		drt.setVehiclesFile(inbase + "\\fleets\\fleet.xml.gz");
 		drt.setIdleVehiclesReturnToDepots(true);
-		drt.setOperationalScheme("stopbased");
+		drt.setOperationalScheme(DrtConfigGroup.OperationalScheme.stopbased);
 		drt.setPlotDetailedCustomerStats(true);
 
 		EvConfigGroup eDrt = (EvConfigGroup) config.getModules().get(EvConfigGroup.GROUP_NAME);

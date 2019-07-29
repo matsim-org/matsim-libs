@@ -25,20 +25,26 @@ package ft.cemdap4H.planspreprocessing;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.util.random.WeightedRandomSelection;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.StreamingPopulationReader;
 import org.matsim.core.population.io.StreamingPopulationWriter;
@@ -61,11 +67,12 @@ public class ReassignZonesByAttractiveness {
 	Map<String, Geometry> zoneMap = new HashMap<>();
 	Map<String, WVIZonalAttractiveness> attractiveness;
 	String[] refineActivities = {"leisure", "education", "shopping","other"};   
-	List<String> refineActivitiesList = Arrays.asList(refineActivities);  
+	List<String> refineActivitiesList = Arrays.asList(refineActivities);
+	
 	
 	
 	public static void main(String[] args) {
-		new ReassignZonesByAttractiveness().run("E:\\Thiel\\Programme\\MatSim\\00_HannoverModel_1.0\\Input\\Cemdap\\add_data\\shp\\Statistische_Bezirke_Hannover_Region.shp", "E:\\Thiel\\Programme\\MatSim\\00_HannoverModel_1.0\\Input\\Cemdap\\add_data\\Weights_All.txt", "E:\\Thiel\\Programme\\MatSim\\00_HannoverModel_1.0\\Input\\Cemdap\\cemdap_output\\Hannover_big_wchildren\\mergedPlans_filtered_Att_Stud.xml.gz", "E:\\Thiel\\Programme\\MatSim\\00_HannoverModel_1.0\\Input\\Cemdap\\cemdap_output\\Hannover_big_wchildren\\mergedPlans_filtered_Att_Stud_final.xml.gz");
+		new ReassignZonesByAttractiveness().run("D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\add_data\\shp\\Statistische_Bezirke_Hannover_Region.shp", "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\add_data\\Weights_All.txt", "D:\\Matsim\\Axer\\Hannover\\Base\\vw243_cadON_ptSpeedAdj.0.1\\vw243_cadON_ptSpeedAdj.0.1.output_plans.xml.gz", "D:\\Matsim\\Axer\\Hannover\\Base\\vw243_cadON_ptSpeedAdj.0.1\\vw243_cadON_ptSpeedAdj.0.1.output_plans_shiftStud.xml.gz");
 	}
 	
 	
@@ -75,33 +82,116 @@ public class ReassignZonesByAttractiveness {
 		StreamingPopulationReader spr = new StreamingPopulationReader(ScenarioUtils.createScenario(ConfigUtils.createConfig()));
 		StreamingPopulationWriter spw = new StreamingPopulationWriter();
 		spw.startStreaming(outputPlansFile);
+		Set<Id<Person>> personset = new HashSet<Id<Person>>();
 		spr.addAlgorithm(new PersonAlgorithm() {
+			
 			
 			@Override
 			public void run(Person person) {
-				for (Plan plan : person.getPlans()){
-				int counter = 0;
-				for (PlanElement pe : plan.getPlanElements()){
+				
+				PersonUtils.removeUnselectedPlans(person);
+				
+				person.getPlans().stream()
+				.flatMap(pl -> pl.getPlanElements().stream()).filter(Leg.class::isInstance)
+				.forEach(pe -> ((Leg) pe).setRoute(null));
+
+				
+				Coord homeCoord = getHomeCoord(person);
+				
+				if (isStudent(person))
+				{
+					for (Plan plan : person.getPlans()){
+						int counter = 0;
+						for (PlanElement pe : plan.getPlanElements()){
+							
+							if (pe instanceof Activity){
+								Activity act = (Activity) pe;
+								String activityShort = act.getType().split("_")[0];
+								Coord defaultCoord =act.getCoord();
+
+								if (refineActivitiesList.contains(activityShort)){
+									String zone = findZone(act.getCoord(),activityShort);
+									if (zone!=null){
+										Coord preceedingCoord = findPreviousActivity(plan,counter);
+										Coord proceedingCoord = findNextActivity(plan, counter);
+//										Map<String, WVIZonalAttractiveness> attractiveness = findAttractiveness(zone);
+										Coord newActivityCoord = findNewActivityCoord(preceedingCoord,proceedingCoord,attractiveness,activityShort);
+										act.setCoord(newActivityCoord);
+										act.setLinkId(null);
+										Coord modifiedCoord =newActivityCoord;
+										
+										
+										if (defaultCoord.getX() == newActivityCoord.getX() )
+										{
+											System.out.println(activityShort+" Coordinate not modified!" +modifiedCoord + " --> " +newActivityCoord );
+										}
+										else {
+											//System.out.println(activityShort+" Coordinate correct modified!" +modifiedCoord + " --> " +newActivityCoord );
+										}
+									}
+									else {
+										//Number of persons where location refinement is erroneous
+										
+										if (act.getCoord().getX()==homeCoord.getX())
+										{
+											System.out.println(act.getType());
+											personset.add(person.getId());
+
+										break;
+										}
+									}
+								}
+							}
+							//Counter of actual plan element
+							counter++;
+						}
+						}
+					//System.out.println(person.getId());
+				}
+				
+				
+				
+
+			}
+			
+			private boolean isStudent(Person person)
+			{
+				
+				
+				for (PlanElement pe : person.getSelectedPlan().getPlanElements()){
 					
 					if (pe instanceof Activity){
 						Activity act = (Activity) pe;
-						String activityShort = act.getType().split("_")[0];
-
-						if (refineActivitiesList.contains(activityShort)){
-							String zone = findZone(act.getCoord(),activityShort);
-							if (zone!=null){
-								Coord preceedingCoord = findPreviousActivity(plan,counter);
-								Coord proceedingCoord = findNextActivity(plan, counter);
-//								Map<String, WVIZonalAttractiveness> attractiveness = findAttractiveness(zone);
-								Coord newActivityCoord = findNewActivityCoord(preceedingCoord,proceedingCoord,attractiveness,activityShort);
-								act.setCoord(newActivityCoord);
-							}
+						if (act.getType().contains("education"))
+						{
+							return true;
 						}
 					}
-					//Counter of actual plan element
-					counter++;
+					
+					
 				}
+				return false;
+				
+			}
+			
+			private Coord getHomeCoord(Person person)
+			{
+				
+				
+				for (PlanElement pe : person.getSelectedPlan().getPlanElements()){
+					
+					if (pe instanceof Activity){
+						Activity act = (Activity) pe;
+						if (act.getType().contains("home"))
+						{
+							return act.getCoord();
+						}
+					}
+					
+					
 				}
+				return null;
+				
 			}
 
 			private Coord findNewActivityCoord(Coord preceedingCoord, Coord proceedingCoord,
@@ -109,6 +199,8 @@ public class ReassignZonesByAttractiveness {
 				WeightedRandomSelection<String> wrs = new WeightedRandomSelection<>();
 				for (WVIZonalAttractiveness a : attractiveness.values()){
 					double v;
+					
+//					System.out.println("Refine: "+activityType);
 					switch (activityType){
 						case "work":
 							v = a.getAttractivenessWork();
@@ -129,10 +221,24 @@ public class ReassignZonesByAttractiveness {
 							throw new RuntimeException("activitytype unknown: " + activityType);
 					}
 				double distance = CoordUtils.calcEuclideanDistance(preceedingCoord, a.getZoneCentroid())+CoordUtils.calcEuclideanDistance(proceedingCoord, a.getZoneCentroid());
+				
+//				//If distance == 0, because all acts are on the same place initialized assume a constant distance of 7500 m
+//				if (distance==0.0)
+//				{
+//					System.out.println("No distance given, Coords are equal!. Use constant distance for grav. model");
+//					distance = 7500;
+//					
+//				}
+//				
 				double avalue = v/(distance*distance);
+//				System.out.println(avalue);
+				
+				
 				wrs.add(a.getZoneId(), avalue);
 				}
 				String selectedZone = wrs.select();
+				
+				
 				Geometry geometry = zoneMap.get(selectedZone);
 				Envelope envelope = geometry.getEnvelopeInternal();
 				while (true) {
@@ -220,6 +326,7 @@ public class ReassignZonesByAttractiveness {
 		spr.addAlgorithm(spw);
 		spr.readFile(inputPlansFile);
 		spw.closeStreaming();
+		System.out.println(personset.size());
 		
 	}
 	

@@ -19,6 +19,7 @@
 package vwExamples.utils.delays;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.Triple;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.locationtech.jts.geom.Coordinate;
@@ -58,12 +59,37 @@ public class TravelDelayCalculator implements PersonDepartureEventHandler, Perso
 	private Map<Id<Link>, MutableDouble> LinkFlowMap = new HashMap<>();
 	private Map<Id<Link>, MutableDouble> LinkDelayMap = new HashMap<>();
 	private Map<Id<Link>, List<Double>> CongestionIdxMap = new HashMap<>();
-	// private Set<Id<Person>> relevantAgents = new HashSet<>();
-
+	private Map<Double, HashMap<Id<Link>,MutableInt>> timeDependentFlow = new HashMap<>();
+	
 	public TravelDelayCalculator(Network network, Geometry boundary) {
 		this.network = network;
 		// this.relevantAgents = relevantAgents;
 		this.boundary = boundary;
+		
+		
+		System.out.println("Initialze initalFlowMapPerBin");
+
+			for (int time = 0; time < 30 * 3600; time = time + 3600) {
+				
+				HashMap<Id<Link>,MutableInt> initalFlowMapPerBin = new HashMap<Id<Link>,MutableInt>();
+				
+				for (Entry<Id<Link>, ? extends Link> linkEntry : network.getLinks().entrySet())
+				{
+					//Only store car links
+					if(linkEntry.getValue().getAllowedModes().contains(TransportMode.car))
+					{
+					initalFlowMapPerBin.put(linkEntry.getKey(), new MutableInt(0));
+					}
+				}
+				
+				timeDependentFlow.put((double) time, initalFlowMapPerBin);
+				
+			}
+		}
+		
+	
+	public Map<Double, HashMap<Id<Link>,MutableInt>>getTimeDependentFlow() {
+		return timeDependentFlow;
 	}
 	
 	public Map<Id<Link>, MutableDouble> getLinkFlowMap() {
@@ -138,6 +164,9 @@ public class TravelDelayCalculator implements PersonDepartureEventHandler, Perso
 					CongestionIdxMap.get(l.getId()).add(congestionIdx);
 //					System.out.println(l.getId() + "||" +  LinkDelayMap.get(l.getId()).toString());
 
+					//Store vehicle that has left within this interval this link
+					double timeFlowBin = ((Math.floor(enterTime / 3600.0)) * 3600.0);
+					timeDependentFlow.get(timeFlowBin).get(event.getLinkId()).increment();
 				}
 				else {
 					LinkFlowMap.put((l.getId()), new MutableDouble());
@@ -147,12 +176,18 @@ public class TravelDelayCalculator implements PersonDepartureEventHandler, Perso
 					LinkFlowMap.get(l.getId()).add(1);
 					LinkDelayMap.get(l.getId()).add(travelTime-freeSpeedTravelTime);
 					CongestionIdxMap.get(l.getId()).add(congestionIdx);
+					
+					//Store vehicle that has left within this interval this link
+					double timeFlowBin = ((Math.floor(enterTime / 3600.0)) * 3600.0);
+					timeDependentFlow.get(timeFlowBin).get(event.getLinkId()).increment();
 				}
 			}
 
 		}
 
 	}
+	
+	
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
@@ -238,6 +273,9 @@ public class TravelDelayCalculator implements PersonDepartureEventHandler, Perso
 			this.FromTo.put(event.getPersonId(), new ArrayList<Coord>());
 			this.FromTo.get(event.getPersonId()).add(fromCoord);
 		}
+		
+		
+
 	}
 
 	@Override

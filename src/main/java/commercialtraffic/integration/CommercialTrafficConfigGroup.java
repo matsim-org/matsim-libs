@@ -54,6 +54,20 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     public static final String JSPRITITERS = "jspritIterations";
     public static final String JSPRITITERSDESC = "Number of jsprit Iterations. These take place at the beginning of each MATSim iteration";
 
+    @Positive
+    private double zeroUtilityDelay = 1800;
+    public static final String ZEROUTILDELAY = "zeroUtilityDelay";
+    public static final String ZEROUTILDELAYDESC = "Delay (in seconds) that marks the threshold for zero utility";
+
+    @Positive
+    private double maxDeliveryScore = 6;
+    public static final String MAXDELIVERYSCORE = "maxDeliveryScore";
+    public static final String MAXDELIVERYSCOREDESC = "Score for On time delivery.";
+
+    private double minDeliveryScore = -6;
+    public static final String MINDELIVERYSCORE = "minDeliveryScore";
+    public static final String MINDELIVERYSCOREDESC = "Minimum score for delayed deliveries.";
+
 
     public static final String GROUP_NAME = "commercialTraffic";
 
@@ -139,6 +153,54 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
         this.jspritIterations = jspritIterations;
     }
 
+    /**
+     * @return zeroUtilityDelay --{@value #ZEROUTILDELAYDESC}
+     */
+    @StringGetter(ZEROUTILDELAY)
+    public double getZeroUtilityDelay() {
+        return zeroUtilityDelay;
+    }
+
+    /**
+     * @param zeroUtilityDelay --{@value #ZEROUTILDELAYDESC}
+     */
+    @StringSetter(ZEROUTILDELAY)
+    public void setZeroUtilityDelay(double zeroUtilityDelay) {
+        this.zeroUtilityDelay = zeroUtilityDelay;
+    }
+
+    /**
+     * @return maxDeliveryScore --{@value #MAXDELIVERYSCOREDESC}
+     */
+    @StringGetter(MAXDELIVERYSCORE)
+    public double getMaxDeliveryScore() {
+        return maxDeliveryScore;
+    }
+
+    /**
+     * @param maxDeliveryScore --{@value #MAXDELIVERYSCOREDESC}
+     */
+    @StringSetter(MAXDELIVERYSCORE)
+    public void setMaxDeliveryScore(double maxDeliveryScore) {
+        this.maxDeliveryScore = maxDeliveryScore;
+    }
+
+    /**
+     * @return minDeliveryScore --{@value #MINDELIVERYSCOREDESC}
+     */
+    @StringGetter(MINDELIVERYSCORE)
+    public double getMinDeliveryScore() {
+        return minDeliveryScore;
+    }
+
+    /**
+     * @param minDeliveryScore --{@value #MINDELIVERYSCOREDESC}
+     */
+    @StringSetter(MINDELIVERYSCORE)
+    public void setMinDeliveryScore(double minDeliveryScore) {
+        this.minDeliveryScore = minDeliveryScore;
+    }
+
     @Override
     public Map<String, String> getComments() {
         Map<String, String> map = super.getComments();
@@ -146,6 +208,17 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
         map.put(CARRIERSVEHICLETYPED, CARRIERSVEHICLETYPEDESC);
         map.put(FIRSTLEGBUFFER, FIRSTLEGBUFFERDESC);
         map.put(JSPRITITERS, JSPRITITERSDESC);
+        map.put(MAXDELIVERYSCORE, MAXDELIVERYSCOREDESC);
+        map.put(MINDELIVERYSCORE, MINDELIVERYSCOREDESC);
+        map.put(ZEROUTILDELAY, ZEROUTILDELAYDESC);
         return map;
+    }
+
+    @Override
+    protected void checkConsistency(Config config) {
+        super.checkConsistency(config);
+        if (getMaxDeliveryScore() < getMinDeliveryScore()) {
+            throw new RuntimeException("Minimum Score for delivery is higher than maximum score");
+        }
     }
 }

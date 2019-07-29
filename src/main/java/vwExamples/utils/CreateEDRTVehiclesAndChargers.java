@@ -95,7 +95,7 @@ public class CreateEDRTVehiclesAndChargers {
 			Link startLink;
 			startLink = scenario.getNetwork().getLinks().get(e.getKey());
 			if (!startLink.getAllowedModes().contains(TransportMode.drt)) {
-				throw new RuntimeException("StartLink " + startLink.getId().toString() + " does not allow car mode.");
+				throw new RuntimeException("StartLink " + startLink.getId().toString() + " does not allow DRT mode.");
 			}
 			
 			

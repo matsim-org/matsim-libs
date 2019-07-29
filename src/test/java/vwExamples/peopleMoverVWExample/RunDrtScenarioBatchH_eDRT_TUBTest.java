@@ -1,6 +1,8 @@
-package vwExamples.peoplemoverVWExample;
+package vwExamples.peopleMoverVWExample;
 
 import org.junit.Test;
+
+import vwExamples.peoplemoverVWExample.RunDrtScenarioBatchH_eDRT_TUB;
 
 import java.io.IOException;
 

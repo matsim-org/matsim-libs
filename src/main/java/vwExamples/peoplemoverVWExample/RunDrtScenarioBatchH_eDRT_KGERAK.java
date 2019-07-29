@@ -110,7 +110,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 
 		TemperatureChangeConfigGroup tcg = (TemperatureChangeConfigGroup)config.getModules()
 				.get(TemperatureChangeConfigGroup.GROUP_NAME);
-		tcg.setTempFile(inbase + "\\input\\temp\\temperatures_0.csv");
+		tcg.setTemperatureChangeFile(inbase + "\\input\\temp\\temperatures_0.csv");
 		config.travelTimeCalculator().setTraveltimeBinSize(900);
 		Set<String> modes = new HashSet<String>();
 		modes.add("car");
@@ -186,7 +186,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 
 		drt.setVehiclesFile(inbase + "\\input\\fleets\\fleet.xml.gz");
 		drt.setIdleVehiclesReturnToDepots(true);
-		drt.setOperationalScheme("stopbased");
+		drt.setOperationalScheme(DrtConfigGroup.OperationalScheme.stopbased);
 		drt.setPlotDetailedCustomerStats(true);
 
 		EvConfigGroup eDrt = (EvConfigGroup)config.getModules().get(EvConfigGroup.GROUP_NAME);

@@ -1,6 +1,5 @@
 package vwExamples.Zim;
 
-
 /* *********************************************************************** *
  * project: org.matsim.*
  *                                                                         *
@@ -44,7 +43,6 @@ import java.util.Random;
 
 //import org.matsim.core.population.io.PopulationReader;
 
-
 /**
  * @author jbischoff
  * This is an example how to set different flow capacity consumptions for different vehicles.
@@ -59,46 +57,49 @@ import java.util.Random;
  */
 public class Sim01_LocalLinkFlowIncrease {
 
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
 
-        new Sim01_LocalLinkFlowIncrease().run(false);
+		new Sim01_LocalLinkFlowIncrease().run(false);
 
-    }
+	}
 
+	public void run(boolean otfvis) {
 
-    public void run(boolean otfvis) {
+		String runId = "VW243_LocalLinkFlow_1.28_10pct";
+		String base = "D:\\Matsim\\Axer\\Hannover\\Zim\\";
+		String input = base + "input\\";
+		String ouput = base + "output\\"+runId;
+		Config config = ConfigUtils.loadConfig(input + "Sim01_LocalLinkFlowIncrease.xml", new OTFVisConfigGroup());
+		config.plans().setInputFile(input + "plans\\vw243_cadON_ptSpeedAdj.0.1.output_plans.xml.gz");
 
-    	String base = "D:\\Matsim\\Axer\\Hannover\\Zim\\";
-    	String input = base+"input\\";
-    	String ouput = base+"output\\";
-        Config config = ConfigUtils.loadConfig(input+"Sim01_LocalLinkFlowIncrease.xml", new OTFVisConfigGroup());
-        config.plans().setInputFile(input+"plans\\vw235_nocad.1.0.output_plans.xml.gz");
-        
-//        StrategySettings strategySettings = new StrategySettings();
-//        strategySettings.addParam("KeepLastSelected", "KeepLastSelected");
-//        strategySettings.setStrategyName("KeepLastSelected");
-//        config.strategy().addStrategySettings(strategySettings);
-        
-        config.controler().setOutputDirectory(ouput);
-        config.network().setInputFile(input + "network\\network_intersectionLinks.xml.gz");
-        config.transit().setTransitScheduleFile(input+"transit\\transitschedule.xml");
-        config.transit().setVehiclesFile(input+"transit\\transitvehicles.xml");
+		// StrategySettings strategySettings = new StrategySettings();
+		// strategySettings.addParam("KeepLastSelected", "KeepLastSelected");
+		// strategySettings.setStrategyName("KeepLastSelected");
+		// config.strategy().addStrategySettings(strategySettings);
+
+		config.controler().setOutputDirectory(ouput);
+		config.network().setInputFile(input + "network\\network_intersectionLinks_1.28_.xml.gz");
+		config.transit().setTransitScheduleFile(input + "transit\\transitschedule.xml");
+		config.transit().setVehiclesFile(input + "transit\\transitvehicles.xml");
 		config.controler().setLastIteration(2); // Number of simulation iterations
 		config.controler().setWriteEventsInterval(2); // Write Events file every x-Iterations
 		config.controler().setWritePlansInterval(2); // Write Plan file every x-Iterations
 		config.qsim().setStartTime(0);
 		config.qsim().setNumberOfThreads(16);
-        Scenario scenario = ScenarioUtils.loadScenario(config);
+		config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
+		config.qsim().setFlowCapFactor(0.1);
+		config.qsim().setStorageCapFactor(0.11);
+		config.controler().setRunId(runId);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-
-        //Run Simulation
-        Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new SwissRailRaptorModule());
-        controler.run();
-    }
-
+		// Run Simulation
+		Controler controler = new Controler(scenario);
+		
+		controler.addOverridingModule(new SwissRailRaptorModule());
+		controler.run();
+	}
 
 }

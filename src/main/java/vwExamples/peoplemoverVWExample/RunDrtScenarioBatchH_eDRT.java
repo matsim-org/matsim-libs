@@ -93,7 +93,7 @@ public class RunDrtScenarioBatchH_eDRT {
 
 		TemperatureChangeConfigGroup tcg = (TemperatureChangeConfigGroup) config.getModules()
 				.get(TemperatureChangeConfigGroup.GROUP_NAME);
-		tcg.setTempFile(inbase + "\\temp\\temperatures.csv");
+		tcg.setTemperatureChangeFile(inbase + "\\temp\\temperatures.csv");
 
 		// config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		// Overwrite existing configuration parameters
@@ -185,7 +185,7 @@ public class RunDrtScenarioBatchH_eDRT {
 
 		drt.setVehiclesFile(inbase + "\\fleets\\fleet.xml.gz");
 		drt.setIdleVehiclesReturnToDepots(true);
-		drt.setOperationalScheme("stopbased");
+		drt.setOperationalScheme(DrtConfigGroup.OperationalScheme.stopbased);
 
 		EvConfigGroup eDrt = (EvConfigGroup) config.getModules().get(EvConfigGroup.GROUP_NAME);
 		eDrt.setChargersFile(inbase + "\\chargers\\chargers.xml.gz");

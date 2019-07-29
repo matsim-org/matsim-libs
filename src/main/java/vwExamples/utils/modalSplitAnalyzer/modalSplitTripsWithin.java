@@ -74,7 +74,7 @@ import parking.ParkingRouterNetworkRoutingModule;
  * @author axer
  */
 
-public class modalSplitCommuter {
+public class modalSplitTripsWithin {
 	private Map<String, PersonValidator> groups = new HashMap<>();
 
 	// Shape File to check home and work locations of the agents
@@ -90,8 +90,8 @@ public class modalSplitCommuter {
 	String shapeFeature2 = "NO";
 
 	StageActivityTypes stageActs;
-	static String inFileName = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\vw235_nocad.1.0.output_plans.xml.gz";
-	static String OutFileName = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\commuterdrt_vw235_nocad.1.0_20pct.output_plans_test.xml.gz";
+	static String inFileName = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\w243_inOutDRT.xml.gz";
+	static String OutFileName = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\w243_inOutWithDRT.xml.gz";
 
 	static List<String> primaryActivies = new ArrayList<>();
 	static List<String> primaryLegModes = new ArrayList<>();
@@ -102,12 +102,12 @@ public class modalSplitCommuter {
 	// reduce it by factor 0.58, the get the correct amount of DRT users
 	// Like Berlin
 	static {
-		desiredModalShiftRatesMap.put("car", 0.20);
+		desiredModalShiftRatesMap.put("car", 0.10);
 	}
 
 	public static void main(String[] args) {
 
-		modalSplitCommuter tde = new modalSplitCommuter();
+		modalSplitTripsWithin tde = new modalSplitTripsWithin();
 		tde.run(inFileName);
 
 	}
@@ -129,6 +129,25 @@ public class modalSplitCommuter {
 		}
 		return false;
 	}
+	
+	
+	public static boolean livesInside(Plan plan, Map<String, Geometry> zoneMap) {
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				if (((Activity) pe).getType().contains("home")) {
+
+					Activity activity = ((Activity) pe);
+					Coord coord = activity.getCoord();
+					// If home is not inside zoneMap return true
+					if (isWithinZone(coord, zoneMap)) {
+						return true;
+					}
+
+				}
+			}
+		}
+		return false;
+	}
 
 	public static boolean worksInside(Plan plan, Map<String, Geometry> zoneMap) {
 		for (PlanElement pe : plan.getPlanElements()) {
@@ -139,6 +158,26 @@ public class modalSplitCommuter {
 					Coord coord = activity.getCoord();
 					// If work is inside zoneMap return true
 					if (isWithinZone(coord, zoneMap)) {
+						return true;
+					}
+
+				}
+			}
+		}
+		return false;
+
+	}
+	
+	
+	public static boolean worksOutside(Plan plan, Map<String, Geometry> serviceAreazonesMap, Map<String, Geometry> zoneMap) {
+		for (PlanElement pe : plan.getPlanElements()) {
+			if (pe instanceof Activity) {
+				if (((Activity) pe).getType().contains("work")) {
+
+					Activity activity = ((Activity) pe);
+					Coord coord = activity.getCoord();
+					// Works in peripherie
+					if (isWithinZone(coord, serviceAreazonesMap) && !isWithinZone(coord, zoneMap)) {
 						return true;
 					}
 
@@ -322,7 +361,7 @@ public class modalSplitCommuter {
 
 	}
 
-	public static boolean containsWorkingActWithinArea(Subtour subTour) {
+	public static boolean containsWorkingActWithinCityArea(Subtour subTour) {
 
 		for (Trip trip : subTour.getTrips()) {
 			Activity act = trip.getDestinationActivity();
@@ -331,7 +370,29 @@ public class modalSplitCommuter {
 
 				Coord coord = act.getCoord();
 				// If work is inside zoneMap return true
-				if (isWithinZone(coord, zoneMap)) {
+				if (isWithinZone(coord, serviceAreazonesMap)) {
+					return true;
+				}
+
+			}
+
+		}
+
+		return false;
+
+	}
+	
+	
+	public static boolean containsWorkingActOutside(Subtour subTour) {
+
+		for (Trip trip : subTour.getTrips()) {
+			Activity act = trip.getDestinationActivity();
+
+			if (act.getType().contains("work")) {
+
+				Coord coord = act.getCoord();
+				// If work is inside zoneMap return true
+				if (!isWithinZone(coord, zoneMap)) {
 					return true;
 				}
 
@@ -464,7 +525,7 @@ public class modalSplitCommuter {
 	public void run(String populationFile) {
 		readShape(shapeFile, shapeFeature);
 		readServiceAreaShape(serviceArea, shapeFeature);
-		groups.put("isCommuter", new isCityCommuter());
+		groups.put("LivesCity", new LivesCity());
 
 		primaryActivies.add("home");
 		primaryActivies.add("work");
@@ -590,7 +651,7 @@ public class modalSplitCommuter {
 							if (isPrimaryLeg(leg)) {
 								primaryLegMode = leg.getMode();
 
-								if (leg.getMode().equals(TransportMode.pt)) {
+								if (leg.getMode().equals(TransportMode.pt) || leg.getMode().equals(TransportMode.drt)) {
 									legDistance = ((CoordUtils.calcEuclideanDistance(preAct.getCoord(),
 											nexAct.getCoord()) * 1.3) / 1000.0);
 								} else {
@@ -706,7 +767,7 @@ public class modalSplitCommuter {
 							// replaceTripIndices = getReplaceableTripIndices(subTour, plan);
 							// System.out.println(replaceTripIndices);
 							String SubtourMode = getSubtourMode(subTour, plan);
-							boolean isCommuterSubtour = containsWorkingActWithinArea(subTour);
+							//boolean isCommuterSubtour = containsWorkingActWithinCityArea(subTour);
 							boolean subTourInServiceArea = subTourIsWithinServiceArea(subTour);
 
 							// System.out.println(SubtourMode);
@@ -722,12 +783,12 @@ public class modalSplitCommuter {
 
 							// System.out.println(SubtourMode);
 
-							if (desiredModalShiftRatesMap.keySet().contains(SubtourMode) && isCommuterSubtour && subTourInServiceArea) {
+							if (desiredModalShiftRatesMap.keySet().contains(SubtourMode) && subTourInServiceArea) {
 
 								double limit = maxShiftNumbersPerMode(SubtourMode, desiredModalShiftRatesMap,
 										allTrafficModalShare.modeTripsMap, allTrafficModalShare.modeTripsMapRelative);
 
-								if (limit >= LogReplacedTripsMap.get(SubtourMode).intValue() && p.nextDouble() < 0.50) {
+								if (limit >= LogReplacedTripsMap.get(SubtourMode).intValue() && p.nextDouble() < 0.3) {
 
 									for (Trip trip : subTour.getTrips()) {
 										for (Leg l : trip.getLegsOnly()) {
@@ -741,9 +802,10 @@ public class modalSplitCommuter {
 										initalModeTripMap.get(SubtourMode).decrement();
 										initalModeTripMap.get(TransportMode.drt).increment();
 										LogReplacedTripsMap.get(SubtourMode).increment();
+										
 									}
 
-									// System.out.println(person.getId());
+//									System.out.println(person.getId());
 								}
 							}
 
@@ -919,6 +981,54 @@ public class modalSplitCommuter {
 			Boolean isvalid = false;
 
 			if (livesOutside(person.getSelectedPlan(), zoneMap) && worksInside(person.getSelectedPlan(), zoneMap)) {
+				isvalid = true;
+			}
+
+			return isvalid;
+
+		}
+
+	}
+	// zoneMap = City Hannover
+	class isWithinCityCommuter implements PersonValidator {
+
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see
+		 * analysis.traveldistances.PersonValidator#isValidPerson(org.matsim.api.core.
+		 * v01.population.Person)
+		 */
+		@Override
+		public boolean isValidPerson(Person person) {
+
+			Boolean isvalid = false;
+
+			if (livesInside(person.getSelectedPlan(), zoneMap) && worksInside(person.getSelectedPlan(), zoneMap)) {
+				isvalid = true;
+			}
+
+			return isvalid;
+
+		}
+
+	}
+	
+	class isPEripherieCommuter implements PersonValidator {
+
+		/*
+		 * (non-Javadoc)
+		 *
+		 * @see
+		 * analysis.traveldistances.PersonValidator#isValidPerson(org.matsim.api.core.
+		 * v01.population.Person)
+		 */
+		@Override
+		public boolean isValidPerson(Person person) {
+
+			Boolean isvalid = false;
+
+			if (livesInside(person.getSelectedPlan(), zoneMap) && worksOutside(person.getSelectedPlan(), serviceAreazonesMap,zoneMap)) {
 				isvalid = true;
 			}
 

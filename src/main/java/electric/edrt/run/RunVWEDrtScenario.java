@@ -65,12 +65,12 @@ public class RunVWEDrtScenario {
 
 		TemperatureChangeConfigGroup tcg = (TemperatureChangeConfigGroup)config.getModules()
 				.get(TemperatureChangeConfigGroup.GROUP_NAME);
-		tcg.setTempFile("temperatures.csv");
+		tcg.setTemperatureChangeFile("temperatures.csv");
 
 		DrtConfigGroup drt = (DrtConfigGroup)config.getModules().get(DrtConfigGroup.GROUP_NAME);
 
 		// Use custom stop duration
-		drt.setOperationalScheme("stopbased");
+		drt.setOperationalScheme(DrtConfigGroup.OperationalScheme.stopbased);
 		drt.setMaxTravelTimeBeta(500);
 		drt.setMaxTravelTimeAlpha(1.3);
 		drt.setMaxWaitTime(500);

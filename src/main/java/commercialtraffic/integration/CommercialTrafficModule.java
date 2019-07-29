@@ -21,8 +21,14 @@ package commercialtraffic.integration;/*
  * created by jbischoff, 03.05.2019
  */
 
+import commercialtraffic.analysis.CommercialTrafficAnalysisListener;
+import commercialtraffic.analysis.TourLengthAnalyzer;
 import commercialtraffic.deliveryGeneration.DeliveryGenerator;
 import commercialtraffic.replanning.ChangeDeliveryServiceOperator;
+import commercialtraffic.scoring.DefaultCommercialServiceScore;
+import commercialtraffic.scoring.DeliveryScoreCalculator;
+import commercialtraffic.scoring.ScoreCommercialServices;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
@@ -45,16 +51,25 @@ public class CommercialTrafficModule extends AbstractModule {
         CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
         new CarrierVehicleTypeReader(vehicleTypes).readFile(ctcg.getCarriersVehicleTypesFileUrl(getConfig().getContext()).getFile());
         new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
-
+        if (CommercialTrafficChecker.checkCarrierConsistency(carriers)) {
+            throw new RuntimeException("Carrier definition is invalid. Please check the log for details.");
+        }
+        ;
+        bind(DeliveryScoreCalculator.class).toInstance(new DefaultCommercialServiceScore(ctcg.getMaxDeliveryScore(), ctcg.getMinDeliveryScore(), ctcg.getZeroUtilityDelay()));
         bind(Carriers.class).toInstance(carriers);
+        bind(ScoreCommercialServices.class).asEagerSingleton();
+        bind(TourLengthAnalyzer.class).asEagerSingleton();
+        //TODO: Change this, once some carriers have different modes, such as DRT.
+        bind(CarrierMode.class).toInstance(carrierId -> TransportMode.car);
+
         addControlerListenerBinding().to(DeliveryGenerator.class);
+        addControlerListenerBinding().to(CommercialTrafficAnalysisListener.class);
 
         addPlanStrategyBinding(ChangeDeliveryServiceOperator.SELECTOR_NAME).toProvider(new Provider<PlanStrategy>() {
             @Inject
             Config config;
             @Inject
             Carriers carriers;
-
             @Override
             public PlanStrategy get() {
                 final PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
