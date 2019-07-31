@@ -25,8 +25,8 @@ import org.opengis.feature.simple.SimpleFeature;
 public class DemandGenerator {
 	String inputpath;
 	String outputpath;
-	File[] files;
-	Map<String, Geometry> zoneMap;
+	public File[] files;
+	public Map<String, Geometry> zoneMap;
 	Map<String, String> nameMap;
 	Map<String, List<String>> neighbourMap;
 	Map<String, String> areaMap;
@@ -34,10 +34,10 @@ public class DemandGenerator {
 	Map<String, CommercialZone> commercialZoneMap;
 	Set<String> zones;
 	String ShapeFile;
-	List<Demand4CompanyClass> demand4CompanyClass2List;
+	public Map<String,Demand4CompanyClass> demand4CompanyClass2List;
 	Map<String, Map<String, MutableInt>> zone2CompanyClassCounterMap;
 
-	DemandGenerator(String inputpath, String ShapeFile, String outputpath) {
+	public DemandGenerator(String inputpath, String ShapeFile, String outputpath) {
 		this.outputpath = outputpath;
 		this.inputpath = inputpath;
 		this.files = new File(inputpath).listFiles();
@@ -50,7 +50,7 @@ public class DemandGenerator {
 		this.commercialZoneMap = new HashMap<String, CommercialZone>();
 
 		this.ShapeFile = ShapeFile;
-		this.demand4CompanyClass2List = new ArrayList<Demand4CompanyClass>();
+		this.demand4CompanyClass2List = new HashMap<String,Demand4CompanyClass>();
 		// Zone --> CompanyClass --> Counter
 		this.zone2CompanyClassCounterMap = new HashMap<String, Map<String, MutableInt>>();
 
@@ -77,8 +77,9 @@ public class DemandGenerator {
 			Demand4CompanyClass d = new Demand4CompanyClass(dummyDemandFile, null, demand.zoneMap);
 
 			d.readDemandCSV();
+			
 
-			demand.demand4CompanyClass2List.add(d);
+			demand.demand4CompanyClass2List.put(d.getCompanyClass(),d);
 
 		}
 
@@ -164,7 +165,7 @@ public class DemandGenerator {
 	public void getCompanyClassesPerZone() {
 		initializeZone2CompanyClassCounterMap();
 
-		for (Demand4CompanyClass demandPerFile : demand4CompanyClass2List) {
+		for (Demand4CompanyClass demandPerFile : demand4CompanyClass2List.values()) {
 			String companyClass = demandPerFile.getCompanyClass();
 
 			// Loop over all companies

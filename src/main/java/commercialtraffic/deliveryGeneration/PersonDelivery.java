@@ -36,7 +36,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class PersonDelivery {
-
+//Zuordnung von Dienstleister zu Person (Kunde Akteur)
     public static final String DELIEVERY_SIZE = "deliveryAmount";
     public static final String DELIEVERY_TYPE = "deliveryType";
     public static final String DELIEVERY_DURATION = "deliveryDuration";

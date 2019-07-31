@@ -11,6 +11,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
@@ -31,21 +33,25 @@ public class Demand4CompanyClass {
 	String epsgForDemandFile;
 	Map<String, Geometry> zoneMap;
 	List<String[]> companyLocationsList;
-	Map<String, ArrayList<Company>> companyClass2CompanyMap;
+	public Map<String, ArrayList<Company>> companyClass2CompanyMap;
+	public Map<String, ArrayList<Company>> zone2CompanyMap;
 
-	Demand4CompanyClass(String csvDemandFile, String epsgForDemandFile, Map<String, Geometry> zoneMap) {
+	public Demand4CompanyClass(String csvDemandFile, String epsgForDemandFile, Map<String, Geometry> zoneMap) {
 		this.csvDemandFile = csvDemandFile;
 		this.epsgForDemandFile = epsgForDemandFile;
 		this.zoneMap = zoneMap;
 		this.companyLocationsList = new ArrayList<String[]>();
 		this.companyClass2CompanyMap = new HashMap<String, ArrayList<Company>>();
+		this.zone2CompanyMap = new HashMap<String, ArrayList<Company>>();
 	}
 
 	public String getZone(Coord coord, Map<String, Geometry> zoneMap) {
 		// Function assumes Shapes are in the same coordinate system like MATSim
 		// simulation
 
-		for (String zone : zoneMap.keySet()) {
+		SortedSet<String> keys = new TreeSet<String>(zoneMap.keySet());
+		
+		for (String zone : keys) {
 			Geometry geometry = zoneMap.get(zone);
 			if (geometry.intersects(MGC.coord2Point(coord))) {
 				// System.out.println("Coordinate in "+ zone);
@@ -67,6 +73,7 @@ public class Demand4CompanyClass {
 
 		return companyClass;
 	}
+
 
 	public void readDemandCSV() {
 		// List<String[]> lines = new ArrayList<String[]>();
@@ -99,6 +106,15 @@ public class Demand4CompanyClass {
 				} else {
 					companyClass2CompanyMap.get(companyClass).add(company);
 				}
+				
+				
+				if (!zone2CompanyMap.containsKey(zone)) {
+					zone2CompanyMap.put(zone, new ArrayList<Company>());
+					zone2CompanyMap.get(zone).add(company);
+				} else {
+					zone2CompanyMap.get(zone).add(company);
+				}
+
 
 			}
 		} catch (FileNotFoundException e) {
