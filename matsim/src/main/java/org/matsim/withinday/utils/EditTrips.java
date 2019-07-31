@@ -50,6 +50,7 @@ import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
+import org.matsim.core.mobsim.qsim.pt.TransitDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -288,7 +289,27 @@ public final class EditTrips {
 			// mobsim about changed plan in any particular way
 			TransitDriverAgent driver = (TransitDriverAgent) mobsimVehicle.getDriver();
 			currentOrNextStop = driver.getNextTransitStop();
-			newTripElements = newTripToNewActivity(currentOrNextStop, newAct, routingMode, now+180, person );
+			/*
+			 *  Look up scheduled arrival time at next transit stop and replan from that time.
+			 *  Use planned arrival time instead of some kind of real arrival including delay in order to allow the router
+			 *  to find the transit route the agent is currently staying on. Otherwise the router would assume that this bus has
+			 *  already departed and cannot be reached by the agent even though the agent is currently located on that very same
+			 *  bus (which the router does not know :-( )
+			 *  We have no router or schedule data in "real time", i.e. considering delays, so lets assume that all pt departures
+			 *  are punctual. If we would route from the current time (= "now") instead, it is unclear how long it will take to 
+			 *  arrive at the next stop and we risk that the agent misses the bus he is already riding on. - gl jul'19 
+			 */
+			double reRoutingTime;
+			if (driver instanceof TransitDriverAgentImpl) { // this is ugly, but there seems to be no other way to find out the scheduled arrival time. Maybe add to interface?
+				TransitDriverAgentImpl driverImpl = (TransitDriverAgentImpl) driver;
+				double departureFirstTransitRouteStop = driverImpl.getDeparture().getDepartureTime();
+				double arrivalOffsetNextTransitRouteStop = driverImpl.getTransitRoute().getStop(currentOrNextStop).getArrivalOffset();
+				reRoutingTime = departureFirstTransitRouteStop + arrivalOffsetNextTransitRouteStop;
+			} else {
+				throw new RuntimeException("transit driver is not a TransitDriverAgentImpl, not implemented!");
+			}
+			log.debug( "agent with ID=" + agent.getId() + " is re-routed from next stop " + currentOrNextStop.getId() + " scheduled arrival at " + reRoutingTime);
+			newTripElements = newTripToNewActivity(currentOrNextStop, newAct, routingMode, reRoutingTime, person );
 			// yyyy as discussed elswhere, would make more sense to compute this once arrived at that stop.
 		}
 
