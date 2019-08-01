@@ -1,7 +1,7 @@
 # super-sonic-osm-network-reader
 Converts Osm-Data into a MATSim network. It uses the osm4j Framework to parse OSM's pbf format. 
 After parsing the OSM file the conversion is parallized using Java's Stream-API.
-The parser is currently 4 times faster than the MATSim standard parser.
+The parser is currently 5 times faster than the MATSim standard parser.
 
 ## How to install
 The project is published via Jitpack. To include it into your project simply add the following to your pom.xml
