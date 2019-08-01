@@ -420,7 +420,16 @@ public final class EditTrips {
 			Trip trip = findCurrentTrip( agent ) ;
 			Facility fromFacility = FacilitiesUtils.toFacility(nextAct, scenario.getActivityFacilities());
 			Facility toFacility = FacilitiesUtils.toFacility(trip.getDestinationActivity(), scenario.getActivityFacilities());
-			double departureTime = PopulationUtils.decideOnActivityEndTime( nextAct, now, scenario.getConfig() );
+			/*
+			 * PopulationUtils.decideOnActivityEndTime() does not take into account that the agent might be on a PlanElement
+			 * before the activity and assumes instead that the agent starts the activity at the time passed as parameter and
+			 * calculates a suitable activity end time based on that start time. This is not useful here :-(
+			 * For now hope that the end time of the previous activity was updated when the agent departed for the leg and use 
+			 * that (leg departure time exists as variable but is -Infinity...). - gl jul'19 
+			 */
+			//			double departureTime = PopulationUtils.decideOnActivityEndTime( nextAct, now, scenario.getConfig() );
+			Activity previousActivity = (Activity) plan.getPlanElements().get(currPosPlanElements - 1);
+			double departureTime = previousActivity.getEndTime() + currentLeg.getTravelTime();
 			final List<? extends PlanElement> newTrip = tripRouter.calcRoute(routingMode, fromFacility, toFacility, departureTime, null );
 			// yy fix missing person
 			TripRouter.insertTrip(plan, nextAct, newTrip, trip.getDestinationActivity() ) ;
