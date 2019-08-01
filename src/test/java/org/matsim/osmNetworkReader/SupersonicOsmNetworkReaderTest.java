@@ -64,8 +64,8 @@ public class SupersonicOsmNetworkReaderTest {
     @Ignore
 	public void test() {
 
-		Path file = Paths.get("C:\\Users\\Janek\\Downloads\\bremen-latest.osm.pbf");
-		Path output = Paths.get("C:\\Users\\Janek\\Desktop\\bremen-latest.xml.gz");
+		Path file = Paths.get("C:\\Users\\Janek\\Downloads\\germany-latest.osm.pbf");
+		Path output = Paths.get("C:\\Users\\Janek\\Desktop\\germany-latest.xml.gz");
 		Network network = NetworkUtils.createNetwork();
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832");
 		var linkProperties = Map.of(
@@ -81,7 +81,8 @@ public class SupersonicOsmNetworkReaderTest {
 		new SupersonicOsmNetworkReader.Builder()
 				.network(network)
 				.coordinateTransformation(coordinateTransformation)
-				.overridingLinkProperties(linkProperties)
+				.linkFilter((coord, level) -> level < LinkProperties.LEVEL_TERTIARY)
+				//.overridingLinkProperties(linkProperties)
 				.build()
 				.read(file);
 
