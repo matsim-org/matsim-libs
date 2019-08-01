@@ -1,5 +1,6 @@
 package commercialtraffic.demandAssigment;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -7,8 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-
 import com.opencsv.CSVReader;
 
 public class CommercialTripsReader {
@@ -16,149 +15,210 @@ public class CommercialTripsReader {
 	String csvTripFile;
 	Map<String, List<CommercialTrip>> commercialTripMap;
 	Map<String, List<Double>> ServiceType2ServiceDurationsMap;
+	public File[] files;
+	String serviceTimeDistInputPath;
 
-	CommercialTripsReader(String csvTripFile) {
+	public CommercialTripsReader(String csvTripFile, String serviceTimeDistInputPath) {
 		this.csvTripFile = csvTripFile;
 		this.rawTripList = new ArrayList<String[]>();
 		this.commercialTripMap = new HashMap<String, List<CommercialTrip>>();
 		this.ServiceType2ServiceDurationsMap = new HashMap<String, List<Double>>();
+		this.files = new File(serviceTimeDistInputPath).listFiles();
+		this.serviceTimeDistInputPath =serviceTimeDistInputPath;
+	}
+
+	public static void main(String[] args) {
+
+		CommercialTripsReader tripReader = new CommercialTripsReader("D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\wege.csv","D:\\Thiel\\Programme\\WVModell\\ServiceDurCalc\\Distributions\\");
+		tripReader.run();
+	}
+
+	public void run() {
+		
+		readVehicleCSV();
+		readServiceTimeDistributionsCSV();
 
 	}
 
-	public static void main(String[] args)  {
+	public String getFile(int i) {
 
-		run();
-
-	}
-
-	public static void run()  {
-		CommercialTripsReader tripReader = new CommercialTripsReader(
-				"D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\wege.csv");
-		tripReader.readVehicleCSV();
-		tripReader.calcServiceDurationsPerServiceType();
+		return this.files[i].toString();
 
 	}
 
-	public void calcServiceDurationsPerServiceType()  {
-		double officeFactor = 0.0;
-		double workDayDuration = 8 * 3600.0;
+	// public void calcServiceDurationsPerServiceType() {
+	// double officeFactor = 0.0;
+	// double workDayDuration = 8 * 3600.0;
+	// //
+	// https://www.baua.de/DE/Angebote/Publikationen/Berichte/F2398.pdf?__blob=publicationFile
+	// // Worktimes per ServiceType
+	//
+	// for (Entry<String, List<CommercialTrip>> entry :
+	// this.commercialTripMap.entrySet()) {
+	//
+	// String serviceType = entry.getKey();
+	//
+	// switch (serviceType) {
+	// case "A":
+	// officeFactor = 0.15;
+	// workDayDuration = 8.22 * 3600.0;
+	// break;
+	//
+	// case "B":
+	// officeFactor = 0.15;
+	// workDayDuration = 8 * 3600.0;
+	// break;
+	//
+	// case "C":
+	// officeFactor = 0.15;
+	// workDayDuration = 8 * 3600.0;
+	// break;
+	//
+	// case "D":
+	// officeFactor = 0.15;
+	// workDayDuration = 8.34 * 3600.0;
+	// break;
+	//
+	// case "E":
+	// officeFactor = 0.15;
+	// workDayDuration = 8.36 * 3600.0;
+	// break;
+	//
+	// case "F":
+	// officeFactor = 0.15;
+	// workDayDuration = 8.32 * 3600.0;
+	// break;
+	//
+	// case "G":
+	// officeFactor = 0.15;
+	// workDayDuration = 7.12 * 3600.0;
+	// break;
+	//
+	// case "H":
+	// officeFactor = 0.15;
+	// workDayDuration = 8.26 * 3600.0;
+	// break;
+	//
+	// case "I":
+	// officeFactor = 0.15;
+	// workDayDuration = 8 * 3600.0;
+	// break;
+	//
+	// case "J":
+	// officeFactor = 0.15;
+	// workDayDuration = 8 * 3600.0;
+	// break;
+	//
+	// case "K":
+	// officeFactor = 0.6;
+	// workDayDuration = 8 * 3600.0;
+	// break;
+	//
+	// case "L":
+	// officeFactor = 0.6;
+	// workDayDuration = 8 * 3600.0;
+	// break;
+	//
+	// case "M":
+	// officeFactor = 0.15;
+	// workDayDuration = 8 * 3600.0;
+	// break;
+	//
+	// case "N":
+	// officeFactor = 0.15;
+	// workDayDuration = 8 * 3600.0;
+	// break;
+	//
+	// case "O":
+	// officeFactor = 0.15;
+	// workDayDuration = 8 * 3600.0;
+	// break;
+	//
+	// case "P":
+	// officeFactor = 0.15;
+	// workDayDuration = 8 * 3600.0;
+	// break;
+	//
+	// case "Q":
+	// officeFactor = 0.15;
+	// workDayDuration = 7.3 * 3600.0;
+	// break;
+	//
+	// case "R":
+	// officeFactor = 0.15;
+	// workDayDuration = 7.22 * 3600.0;
+	// break;
+	//
+	// case "S":
+	// officeFactor = 0.15;
+	// workDayDuration = 8 * 3600.0;
+	// break;
+	//
+	// case "T":
+	// officeFactor = 0.15;
+	// workDayDuration = 8 * 3600.0;
+	// break;
+	//
+	// case "U":
+	// officeFactor = 0.15;
+	// workDayDuration = 8 * 3600.0;
+	// break;
+	//
+	// case "V":
+	// officeFactor = 0.15;
+	// workDayDuration = 8 * 3600.0;
+	// break;
+	//
+	// }
+	//
+	// List<Double> serviceDurationsPerServiceType =
+	// calcServiceDurations(workDayDuration, officeFactor,
+	// entry.getValue());
+	// this.ServiceType2ServiceDurationsMap.put(entry.getKey(),
+	// serviceDurationsPerServiceType);
+	//
+	// Double average = serviceDurationsPerServiceType.stream().mapToDouble(val ->
+	// val).average().orElse(0.0);
+	// System.out.println(entry.getKey() + " = " + average / 60.0);
+	// }
+	// }
 
-		for (Entry<String, List<CommercialTrip>> entry : this.commercialTripMap.entrySet()) {
-			
-			String serviceType = entry.getKey();
-			
-			switch (serviceType) {
-			case "A":
-				officeFactor = 0.15;
-				workDayDuration = 8 * 3600.0;
-				break;
-				
-			case "B":
-				officeFactor = 0.15;
-				workDayDuration = 8 * 3600.0;
-				break;
-				
-			case "D":
-				officeFactor = 0.15;
-				workDayDuration = 8 * 3600.0;
-				break;
-				
-			case "E":
-				officeFactor = 0.15;
-				workDayDuration = 8 * 3600.0;
-				break;
-				
-			case "F":
-				officeFactor = 0.15;
-				workDayDuration = 8 * 3600.0;
-				break;
-				
-			case "G":
-				officeFactor = 0.15;
-				workDayDuration = 8 * 3600.0;
-				break;
-				
-			case "H":
-				officeFactor = 0.15;
-				workDayDuration = 8 * 3600.0;
-				break;
-				
-			case "J":
-				officeFactor = 0.15;
-				workDayDuration = 8 * 3600.0;
-				break;
-				
-			case "K":
-				officeFactor = 0.6;
-				workDayDuration = 8 * 3600.0;
-				break;
-			
-			case "M":
-				officeFactor = 0.15;
-				workDayDuration = 8 * 3600.0;
-				break;
-				
-			case "O":
-				officeFactor = 0.15;
-				workDayDuration = 8 * 3600.0;
-				break;
-				
-			case "P":
-				officeFactor = 0.15;
-				workDayDuration = 8 * 3600.0;
-				break;
-				
-			case "S":
-				officeFactor = 0.15;
-				workDayDuration = 8 * 3600.0;
-				break;
-				
-			}
-			
-			
-			
-			List<Double> serviceDurationsPerServiceType = calcServiceDurations(workDayDuration,officeFactor, entry.getValue());
-			this.ServiceType2ServiceDurationsMap.put(entry.getKey(), serviceDurationsPerServiceType);
-			
-			Double average = serviceDurationsPerServiceType.stream().mapToDouble(val -> val).average().orElse(0.0);
-			System.out.println(entry.getKey() + " = "+average/60.0);
-		}
-	}
-
-	public List<Double> calcServiceDurations(double dailyWorkDuration, double officeFactor,
-			List<CommercialTrip> tripList) {
-
-		List<Double> serviceTimeDurations = new ArrayList<Double>();
-
-		double defaultDailyWorkDur = dailyWorkDuration;
-		// Temporary values
-		double travelTime = 0.0;
-		int tripPerVeh = 0;
-
-		int tripCounter = 0;
-		int listSize = tripList.size();
-		for (CommercialTrip trip : tripList) {
-			tripCounter++;
-			tripPerVeh++;
-
-			travelTime = travelTime + trip.fahrzeit;
-
-			if (trip.fahrtID == 1 || tripCounter == listSize) {
-				while (travelTime > (dailyWorkDuration * (1.0 - officeFactor))) {
-					dailyWorkDuration = dailyWorkDuration + 3600.0;
-				}
-				double serviceTimeDuration = ((dailyWorkDuration * (1.0 - officeFactor)) - travelTime) / tripPerVeh;
-				serviceTimeDurations.add(serviceTimeDuration);
-				// Reset
-				travelTime = 0.0;
-				tripPerVeh = 0;
-				dailyWorkDuration = defaultDailyWorkDur;
-
-			}
-		}
-		return serviceTimeDurations;
-
-	}
+	// public List<Double> calcServiceDurations(double dailyWorkDuration, double
+	// officeFactor,
+	// List<CommercialTrip> tripList) {
+	//
+	// List<Double> serviceTimeDurations = new ArrayList<Double>();
+	//
+	// double defaultDailyWorkDur = dailyWorkDuration;
+	// // Temporary values
+	// double travelTime = 0.0;
+	// int tripPerVeh = 0;
+	//
+	// int tripCounter = 0;
+	// int listSize = tripList.size();
+	// for (CommercialTrip trip : tripList) {
+	// tripCounter++;
+	// tripPerVeh++;
+	//
+	// travelTime = travelTime + trip.fahrzeit;
+	//
+	// if (trip.fahrtID == 1 || tripCounter == listSize) {
+	// while (travelTime > (dailyWorkDuration * (1.0 - officeFactor))) {
+	// dailyWorkDuration = dailyWorkDuration + 3600.0;
+	// }
+	// double serviceTimeDuration = ((dailyWorkDuration * (1.0 - officeFactor)) -
+	// travelTime) / tripPerVeh;
+	// serviceTimeDurations.add(serviceTimeDuration);
+	// // Reset
+	// travelTime = 0.0;
+	// tripPerVeh = 0;
+	// dailyWorkDuration = defaultDailyWorkDur;
+	//
+	// }
+	// }
+	// return serviceTimeDurations;
+	//
+	// }
 
 	public void readVehicleCSV() {
 
@@ -213,5 +273,44 @@ public class CommercialTripsReader {
 			}
 		}
 
+	}
+
+	public void readServiceTimeDistributionsCSV() {
+		for (int i = 0; i < this.files.length; i++) {
+
+			String fileToServiceDistPerServiceType = getFile(i);
+			String serviceType = new File(fileToServiceDistPerServiceType).getName().split("\\.")[0];
+
+			CSVReader reader = null;
+			try {
+				reader = new CSVReader(new FileReader(fileToServiceDistPerServiceType));
+				rawTripList = reader.readAll();
+				for (int j = 1; j < rawTripList.size(); j++) {
+					String[] lineContents = rawTripList.get(j);
+					double value = Double.parseDouble(lineContents[0]);
+
+					if (ServiceType2ServiceDurationsMap.containsKey(serviceType)) {
+						ServiceType2ServiceDurationsMap.get(serviceType).add(value);
+					} else {
+						ServiceType2ServiceDurationsMap.put(serviceType, new ArrayList<Double>());
+						ServiceType2ServiceDurationsMap.get(serviceType).add(value);
+					}
+
+				}
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				if (reader != null) {
+					try {
+						reader.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+
+		}
 	}
 }

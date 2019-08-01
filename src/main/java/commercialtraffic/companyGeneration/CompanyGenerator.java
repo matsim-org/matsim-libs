@@ -24,6 +24,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import com.opencsv.CSVReader;
 
+import commercialtraffic.demandAssigment.CommercialTripsReader;
 import ft.utils.ctDemandPrep.Company;
 import ft.utils.ctDemandPrep.Demand4CompanyClass;
 import ft.utils.ctDemandPrep.DemandGenerator;
@@ -69,6 +70,9 @@ public class CompanyGenerator {
 				"D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\Zellen\\FNP_Merged\\baseShapeH.shp",
 				"D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\",
 				"D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\Carrier\\");
+		
+		CommercialTripsReader tripReader = new CommercialTripsReader("D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\wege.csv","D:\\Thiel\\Programme\\WVModell\\ServiceDurCalc\\Distributions\\");
+		tripReader.run();
 		
 		demand.loadCompanyLocations();
 		demand.readVehicleCSV();
