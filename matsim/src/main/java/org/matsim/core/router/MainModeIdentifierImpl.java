@@ -47,8 +47,8 @@ public final class MainModeIdentifierImpl implements MainModeIdentifier {
 			if ( pe instanceof Leg ) {
 				Leg leg = (Leg) pe ;
 				String mode2 = leg.getMode() ;
-				if ( !mode2.contains( TransportMode.access_walk ) && 
-						!mode2.contains( TransportMode.egress_walk) &&
+				if ( !mode2.contains( TransportMode.non_network_walk ) &&
+						!mode2.contains( TransportMode.non_network_walk ) &&
 						!mode2.contains( TransportMode.transit_walk ) ) {
 					return mode2 ;
 				}

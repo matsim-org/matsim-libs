@@ -18,15 +18,32 @@
 
 package org.matsim.contrib.etaxi.run;
 
+import java.net.URL;
+
 import org.junit.Test;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 
 /**
  * @author michalm
  */
 public class RunETaxiScenarioIT {
 	@Test
-	public void test() {
-		String configFile = "mielec_2014_02/mielec_etaxi_config.xml";
-		RunETaxiScenario.run(configFile, false);
+	public void testOneTaxi() {
+		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_etaxi_config.xml");
+		RunETaxiScenario.run(configUrl, false);
+	}
+
+	@Test
+	public void testRuleBased() {
+		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_etaxi_config.xml");
+		RunETaxiScenario.run(configUrl, false);
+	}
+
+	@Test
+	public void testAssignment() {
+		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("mielec"),
+				"mielec_etaxi_config_assignment.xml");
+		RunETaxiScenario.run(configUrl, false);
 	}
 }

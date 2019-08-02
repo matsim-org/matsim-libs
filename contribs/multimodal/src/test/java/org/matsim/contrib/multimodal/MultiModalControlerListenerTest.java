@@ -413,7 +413,7 @@ public class MultiModalControlerListenerTest {
 			// assume that the agent is allowed to travel on the link
 			Assert.assertEquals(true, link.getAllowedModes().contains(mode));
 
-			if ( mode.contains(TransportMode.access_walk) || mode.contains(TransportMode.egress_walk) ) {
+			if ( mode.contains(TransportMode.non_network_walk ) || mode.contains(TransportMode.non_network_walk ) ) {
 				return ;
 			}
 			this.linkLeftCount++;
@@ -428,7 +428,7 @@ public class MultiModalControlerListenerTest {
 			this.arrivalCount++;
 
 			double tripTravelTime = event.getTime() - this.departures.remove(event.getPersonId());
-			if ( mode.contains(TransportMode.access_walk) || mode.contains(TransportMode.egress_walk) ) {
+			if ( mode.contains(TransportMode.non_network_walk ) || mode.contains(TransportMode.non_network_walk ) ) {
 				return ;
 			}
 			Double modeTravelTime = this.travelTimesPerMode.get(mode);

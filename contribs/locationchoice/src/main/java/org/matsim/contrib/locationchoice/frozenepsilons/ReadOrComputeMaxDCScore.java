@@ -24,7 +24,6 @@ import java.util.HashSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.utils.ScaleEpsilon;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -40,7 +39,7 @@ class ReadOrComputeMaxDCScore {
 
 	private Config config;
 	private Scenario scenario;
-	private DestinationChoiceConfigGroup dccg;
+	private FrozenTastesConfigGroup dccg;
 	private DestinationChoiceContext lcContext;
 	private ObjectAttributes personsMaxDCScoreUnscaled = new ObjectAttributes();
 	private ScaleEpsilon scaleEpsilon;
@@ -49,7 +48,7 @@ class ReadOrComputeMaxDCScore {
 	public ReadOrComputeMaxDCScore(DestinationChoiceContext lcContext) {
 		this.scenario = lcContext.getScenario();
 		this.config = this.scenario.getConfig();
-		this.dccg = (DestinationChoiceConfigGroup) scenario.getConfig().getModule(DestinationChoiceConfigGroup.GROUP_NAME);
+		this.dccg = (FrozenTastesConfigGroup) scenario.getConfig().getModule( FrozenTastesConfigGroup.GROUP_NAME );
 		this.scaleEpsilon = lcContext.getScaleEpsilon();
 		this.flexibleTypes = lcContext.getFlexibleTypes();
 		this.lcContext = lcContext;

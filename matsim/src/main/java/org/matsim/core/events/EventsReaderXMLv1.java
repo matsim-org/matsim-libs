@@ -49,7 +49,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -170,7 +170,8 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 					atts.getValue(ActivityEndEvent.ATTRIBUTE_FACILITY) == null ? null : Id.create(atts.getValue(ActivityEndEvent.ATTRIBUTE_FACILITY), ActivityFacility.class), 
 					atts.getValue(ActivityEndEvent.ATTRIBUTE_ACTTYPE)));
 		} else if (ActivityStartEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new ActivityStartEvent(time, Id.create(atts.getValue(ActivityStartEvent.ATTRIBUTE_PERSON), Person.class), Id.create(atts.getValue(ActivityStartEvent.ATTRIBUTE_LINK), Link.class), atts.getValue(ActivityStartEvent.ATTRIBUTE_FACILITY) == null ? null : Id.create(atts.getValue(ActivityStartEvent.ATTRIBUTE_FACILITY), ActivityFacility.class), atts.getValue(ActivityStartEvent.ATTRIBUTE_ACTTYPE)));
+			this.events.processEvent(new ActivityStartEvent(time, Id.create(atts.getValue(
+				  HasPersonId.ATTRIBUTE_PERSON ), Person.class ), Id.create(atts.getValue(ActivityStartEvent.ATTRIBUTE_LINK ), Link.class ), atts.getValue(ActivityStartEvent.ATTRIBUTE_FACILITY ) == null ? null : Id.create(atts.getValue(ActivityStartEvent.ATTRIBUTE_FACILITY ), ActivityFacility.class ), atts.getValue(ActivityStartEvent.ATTRIBUTE_ACTTYPE )) );
 		} else if (PersonArrivalEvent.EVENT_TYPE.equals(eventType)) {
 			String legMode = atts.getValue(PersonArrivalEvent.ATTRIBUTE_LEGMODE);
 			String mode = legMode == null ? null : legMode.intern();

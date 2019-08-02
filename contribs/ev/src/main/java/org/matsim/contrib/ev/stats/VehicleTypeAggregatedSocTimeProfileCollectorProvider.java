@@ -19,58 +19,66 @@
 
 package org.matsim.contrib.ev.stats;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.matsim.contrib.ev.EvUnits;
-import org.matsim.contrib.ev.data.ElectricFleet;
+import org.matsim.contrib.ev.fleet.ElectricFleet;
 import org.matsim.contrib.util.timeprofile.TimeProfileCollector;
 import org.matsim.contrib.util.timeprofile.TimeProfileCollector.ProfileCalculator;
 import org.matsim.contrib.util.timeprofile.TimeProfiles;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class VehicleTypeAggregatedSocTimeProfileCollectorProvider implements Provider<MobsimListener> {
-    private final ElectricFleet evFleet;
-    private final MatsimServices matsimServices;
+	private final ElectricFleet evFleet;
+	private final MatsimServices matsimServices;
 
-    @Inject
-    public VehicleTypeAggregatedSocTimeProfileCollectorProvider(ElectricFleet evFleet, MatsimServices matsimServices) {
-        this.evFleet = evFleet;
-        this.matsimServices = matsimServices;
-    }
+	@Inject
+	public VehicleTypeAggregatedSocTimeProfileCollectorProvider(ElectricFleet evFleet, MatsimServices matsimServices) {
+		this.evFleet = evFleet;
+		this.matsimServices = matsimServices;
+	}
 
-    @Override
-    public MobsimListener get() {
-        ProfileCalculator calc = createIndividualSocCalculator(evFleet);
-        return new TimeProfileCollector(calc, 300, "average_soc_time_profiles", matsimServices);
-    }
+	@Override
+	public MobsimListener get() {
+		ProfileCalculator calc = createIndividualSocCalculator(evFleet);
+		return new TimeProfileCollector(calc, 300, "average_soc_time_profiles", matsimServices);
+	}
 
-    public static ProfileCalculator createIndividualSocCalculator(final ElectricFleet evFleet) {
+	public static ProfileCalculator createIndividualSocCalculator(final ElectricFleet evFleet) {
 
-        Set<String> vehicleTypes = evFleet.getElectricVehicles().values().stream().map(electricVehicle -> electricVehicle.getVehicleType()).collect(Collectors.toCollection(LinkedHashSet::new));
-        vehicleTypes.add("Fleet Average");
-        String[] header = vehicleTypes.stream().toArray(String[]::new);
-        return TimeProfiles.createProfileCalculator(header, () -> {
-                    Double[] result = new Double[header.length];
-                    for (int i = 0; i < header.length - 1; i++) {
-                        String type = header[i];
-						result[i] = evFleet.getElectricVehicles()
-								.values()
-								.stream()
-								.filter(electricVehicle -> electricVehicle.getVehicleType().equals(type))
-								.mapToDouble(ev -> EvUnits.J_to_kWh(ev.getBattery().getSoc()))
-								.average()
-								.orElse(Double.NaN);
-                    }
-                    result[header.length - 1] = evFleet.getElectricVehicles().values().stream()//
-							.mapToDouble(ev -> EvUnits.J_to_kWh(ev.getBattery().getSoc())).average().getAsDouble();
-                    return result;
-                }
-        );
-    }
+		Set<String> vehicleTypes = evFleet.getElectricVehicles()
+				.values()
+				.stream()
+				.map(electricVehicle -> electricVehicle.getVehicleType())
+				.collect(Collectors.toCollection(LinkedHashSet::new));
+		vehicleTypes.add("Fleet Average");
+		String[] header = vehicleTypes.stream().toArray(String[]::new);
+		return TimeProfiles.createProfileCalculator(header, () -> {
+			Double[] result = new Double[header.length];
+			for (int i = 0; i < header.length - 1; i++) {
+				String type = header[i];
+				result[i] = evFleet.getElectricVehicles()
+						.values()
+						.stream()
+						.filter(electricVehicle -> electricVehicle.getVehicleType().equals(type))
+						.mapToDouble(ev -> EvUnits.J_to_kWh(ev.getBattery().getSoc()))
+						.average()
+						.orElse(Double.NaN);
+			}
+			result[header.length - 1] = evFleet.getElectricVehicles()
+					.values()
+					.stream()
+					.mapToDouble(ev -> EvUnits.J_to_kWh(ev.getBattery().getSoc()))
+					.average()
+					.getAsDouble();
+			return result;
+		});
+	}
 
 }

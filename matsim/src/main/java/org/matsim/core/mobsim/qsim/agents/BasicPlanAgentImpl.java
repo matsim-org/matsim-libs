@@ -1,4 +1,25 @@
-package org.matsim.core.mobsim.qsim.agents;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * BasicPlanAgentImpl.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.core.mobsim.qsim.agents;
 
 import java.util.List;
 
@@ -168,6 +189,9 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 
 	@Override
 	public final void endActivityAndComputeNextState(final double now) {
+		if ( ! ( this.getCurrentPlanElement() instanceof Activity ) ){
+			log.warn( "trying to end an activity but current plan element is not an activity; agentId=" + this.getId() );
+		}
 		Activity act = (Activity) this.getCurrentPlanElement() ;
 		this.getEvents().processEvent( new ActivityEndEvent(now, this.getPerson().getId(), this.currentLinkId, act.getFacilityId(), act.getType()));
 	

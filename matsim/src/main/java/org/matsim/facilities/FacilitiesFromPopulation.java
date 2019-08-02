@@ -46,11 +46,11 @@ import org.matsim.core.network.NetworkUtils;
  * removing the old locations (coord and link) from the population.
  * If an activity already has an ActivityFacility assigned, the ActivityFacility is overwritten.
  * If an activity only has a coordinate, different behavior is possible, see
- * {@link #setAssignLinksToFacilitiesIfMissing(boolean, Network)}.
+ * {@link #setAssignLinksToFacilitiesIfMissing(Network)}.
  *
  * @author mrieser
  */
-public class FacilitiesFromPopulation {
+public final class FacilitiesFromPopulation {
 
 	private final static Logger log = Logger.getLogger(FacilitiesFromPopulation.class);
 
@@ -109,16 +109,11 @@ public class FacilitiesFromPopulation {
 	 * and the facility will not be assigned to a link, essentially breaking the contract of
 	 * {@link #setOneFacilityPerLink(boolean)}.
 	 *
-	 * @param doAssignment
 	 * @param network
 	 */
-	public void setAssignLinksToFacilitiesIfMissing(final boolean doAssignment, final Network network) {
-		// (yy not sure if the false setting makes sense at all. kai, jul'18)
-		
-		if (doAssignment && network == null) {
-			throw new IllegalArgumentException("Network cannot be null if assignment should be done.");
-		}
-		this.network = doAssignment ? network : null;
+	public void setAssignLinksToFacilitiesIfMissing( final Network network ) {
+		Gbl.assertNotNull( network );
+		this.network = network ;
 	}
 
 	/**
@@ -131,11 +126,9 @@ public class FacilitiesFromPopulation {
 		this.removeLinksAndCoordinates = doRemoval;
 	}
 
-	public void assignOpeningTimes(final boolean doAssignment, final PlanCalcScoreConfigGroup calcScoreConfigGroup) {
-		if (doAssignment && calcScoreConfigGroup == null) {
-			throw new IllegalArgumentException("Config must not be null if opening times should be assigned.");
-		}
-		this.planCalcScoreConfigGroup = doAssignment ? calcScoreConfigGroup : null;
+	public void assignOpeningTimes( final PlanCalcScoreConfigGroup calcScoreConfigGroup ) {
+		Gbl.assertNotNull( calcScoreConfigGroup );
+		this.planCalcScoreConfigGroup = calcScoreConfigGroup ;
 	}
 
 	public void run(final Population population) {

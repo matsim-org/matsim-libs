@@ -1,4 +1,25 @@
-package org.matsim.core.mobsim.qsim.changeeventsengine;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * NetworkChangeEventsEngineTest.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.core.mobsim.qsim.changeeventsengine;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -18,9 +39,12 @@ import org.matsim.core.mobsim.jdeqsim.MessageQueue;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
+import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.util.List;
 
 /**
  * @author mrieser / Simunto GmbH
@@ -158,6 +182,11 @@ public class NetworkChangeEventsEngineTest {
 		@Override
 		public MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId) {
 			return null;
+		}
+
+		@Override
+		public List<DepartureHandler> getDepartureHandlers(){
+			throw new RuntimeException( "not implemented" );
 		}
 
 	}

@@ -227,7 +227,7 @@ public final class MatsimTestUtils extends TestWatchman {
 	public String getClassInputDirectory() {
 		if (this.classInputDirectory == null) {
 			
-			Logger.getLogger(this.getClass()).warn( "user.dir = " + System.getProperty("user.dir") ) ;
+			Logger.getLogger(this.getClass()).info( "user.dir = " + System.getProperty("user.dir") ) ;
 			
 			this.classInputDirectory = "test/input/" +
 											   this.testClass.getCanonicalName().replace('.', '/') + "/";

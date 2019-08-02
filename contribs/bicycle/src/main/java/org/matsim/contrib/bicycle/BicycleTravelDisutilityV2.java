@@ -29,7 +29,9 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author smetzler, dziemke
  */
-public class BicycleTravelDisutilityV2 implements TravelDisutility {
+// Used version seesm to be BicycleTravelDisutility (without V2)
+@Deprecated
+class BicycleTravelDisutilityV2 implements TravelDisutility {
 	private static final Logger LOG = Logger.getLogger(BicycleTravelDisutilityV2.class);
 
 	private final double marginalCostOfInfrastructure_m;
@@ -44,9 +46,9 @@ public class BicycleTravelDisutilityV2 implements TravelDisutility {
 	BicycleTravelDisutilityV2(Network network, TravelDisutility timeDistanceDisutility, BicycleConfigGroup bicycleConfigGroup, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.timeDistanceDisutility = timeDistanceDisutility;
 		
-		final PlanCalcScoreConfigGroup.ModeParams bicycleParams = cnScoringGroup.getModes().get("bicycle");
+		final PlanCalcScoreConfigGroup.ModeParams bicycleParams = cnScoringGroup.getModes().get(bicycleConfigGroup.getBicycleMode());
 		if (bicycleParams == null) {
-			throw new NullPointerException("Bicycle is not part of the valid mode parameters " + cnScoringGroup.getModes().keySet());
+			throw new NullPointerException(bicycleConfigGroup.getBicycleMode() + " is not part of the valid mode parameters " + cnScoringGroup.getModes().keySet());
 		}
 
 		this.marginalCostOfInfrastructure_m = -(bicycleConfigGroup.getMarginalUtilityOfInfrastructure_m());
@@ -63,10 +65,10 @@ public class BicycleTravelDisutilityV2 implements TravelDisutility {
 	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
 		// TODO Needed as long as network mode filtering kicks out attributes; remove when possible, dz, sep'17
 		Link linkWithAttributes = network.getLinks().get(link.getId());
-		
-		String surface = (String) linkWithAttributes.getAttributes().getAttribute(BicycleLabels.SURFACE);
+
+		String surface = (String) linkWithAttributes.getAttributes().getAttribute(BicycleUtils.SURFACE);
 		String type = (String) linkWithAttributes.getAttributes().getAttribute("type");
-		String cyclewaytype = (String) linkWithAttributes.getAttributes().getAttribute(BicycleLabels.CYCLEWAY);
+		String cyclewaytype = (String) linkWithAttributes.getAttributes().getAttribute(BicycleUtils.CYCLEWAY);
 
 		double distance = linkWithAttributes.getLength();
 		

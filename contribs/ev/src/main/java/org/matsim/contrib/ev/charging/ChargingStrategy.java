@@ -18,18 +18,18 @@
 
 package org.matsim.contrib.ev.charging;
 
-import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
 
 /**
  * @author michalm
  */
 public interface ChargingStrategy {
-	double calcEnergyCharge(ElectricVehicle ev, double chargePeriod);
-
-	boolean isChargingCompleted(ElectricVehicle ev);
+	default boolean isChargingCompleted(ElectricVehicle ev) {
+		return calcRemainingEnergyToCharge(ev) <= 0;
+	}
 
 	double calcRemainingEnergyToCharge(ElectricVehicle ev);
 
-	// should include potentially longer charging if AUX remains turned on
+	//XXX should include potentially longer charging if AUX remains turned on
 	double calcRemainingTimeToCharge(ElectricVehicle ev);
 }

@@ -19,18 +19,16 @@
 
 package org.matsim.contrib.etaxi.optimizer;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.MapConfiguration;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.etaxi.ETaxiScheduler;
 import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentETaxiOptimizer;
 import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentETaxiOptimizerParams;
 import org.matsim.contrib.etaxi.optimizer.rules.RuleBasedETaxiOptimizer;
 import org.matsim.contrib.etaxi.optimizer.rules.RuleBasedETaxiOptimizerParams;
-import org.matsim.contrib.ev.data.ChargingInfrastructure;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -42,26 +40,20 @@ import com.google.inject.Provider;
 import com.google.inject.name.Named;
 
 public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
-	public static final String TYPE = "type";
-
-	public enum EOptimizerType {
-		E_RULE_BASED, E_ASSIGNMENT;
-	}
-
 	private final EventsManager eventsManager;
 	private final TaxiConfigGroup taxiCfg;
-	private final Network network;
 	private final Fleet fleet;
+	private final Network network;
 	private final MobsimTimer timer;
 	private final TravelTime travelTime;
 	private final TravelDisutility travelDisutility;
 	private final ETaxiScheduler eScheduler;
 	private final ChargingInfrastructure chargingInfrastructure;
 
-	public ETaxiOptimizerProvider(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
-			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, MobsimTimer timer,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, TravelDisutility travelDisutility,
-			ETaxiScheduler eScheduler, ChargingInfrastructure chargingInfrastructure) {
+	public ETaxiOptimizerProvider(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet, Network network,
+			MobsimTimer timer, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
+			TravelDisutility travelDisutility, ETaxiScheduler eScheduler,
+			ChargingInfrastructure chargingInfrastructure) {
 		this.eventsManager = eventsManager;
 		this.taxiCfg = taxiCfg;
 		this.fleet = fleet;
@@ -75,22 +67,25 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 
 	@Override
 	public TaxiOptimizer get() {
-		Configuration optimizerConfig = new MapConfiguration(taxiCfg.getOptimizerConfigGroup().getParams());
-		EOptimizerType type = EOptimizerType.valueOf(optimizerConfig.getString(TYPE));
-
-		switch (type) {
-			case E_RULE_BASED:
+		switch (taxiCfg.getTaxiOptimizerParams().getName()) {
+			case RuleBasedETaxiOptimizerParams.SET_NAME:
 				return RuleBasedETaxiOptimizer.create(eventsManager, taxiCfg, fleet, eScheduler, network, timer,
-						travelTime, travelDisutility, new RuleBasedETaxiOptimizerParams(optimizerConfig),
-						chargingInfrastructure);
-
-			case E_ASSIGNMENT:
+						travelTime, travelDisutility, chargingInfrastructure);
+			case AssignmentETaxiOptimizerParams.SET_NAME:
 				return AssignmentETaxiOptimizer.create(eventsManager, taxiCfg, fleet, network, timer, travelTime,
-						travelDisutility, eScheduler, chargingInfrastructure,
-						new AssignmentETaxiOptimizerParams(optimizerConfig));
+						travelDisutility, eScheduler, chargingInfrastructure);
+		}
+		throw new RuntimeException("Unsupported taxi optimizer type: " + taxiCfg.getTaxiOptimizerParams().getName());
+	}
 
+	public static AbstractTaxiOptimizerParams createParameterSet(String type) {
+		switch (type) {
+			case AssignmentETaxiOptimizerParams.SET_NAME:
+				return new AssignmentETaxiOptimizerParams();
+			case RuleBasedETaxiOptimizerParams.SET_NAME:
+				return new RuleBasedETaxiOptimizerParams();
 			default:
-				throw new RuntimeException();
+				return null;
 		}
 	}
 }

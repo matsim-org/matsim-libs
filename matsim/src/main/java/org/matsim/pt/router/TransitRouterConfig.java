@@ -27,7 +27,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.pt.config.TransitRouterConfigGroup;
+
+import java.util.Map;
 
 /**
  * Design decisions:<ul>
@@ -114,10 +117,17 @@ public class TransitRouterConfig implements MatsimParameters {
 		}
 		
 		// walk:
-		this.beelineDistanceFactor = pcrConfig.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
-
-		this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk)
-				/ beelineDistanceFactor ;
+		{
+			for( Map.Entry<String, PlansCalcRouteConfigGroup.ModeRoutingParams> entry : pcrConfig.getModeRoutingParams().entrySet() ){
+				Logger.getLogger( this.getClass() ).warn("mode=" + entry.getKey() + "; params=" + entry.getValue()) ;
+			}
+			final PlansCalcRouteConfigGroup.ModeRoutingParams params = pcrConfig.getModeRoutingParams().get( TransportMode.non_network_walk );
+			Gbl.assertNotNull( params );
+			this.beelineDistanceFactor = params.getBeelineDistanceFactor();
+			this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get( TransportMode.non_network_walk ) / beelineDistanceFactor;
+		}
+		// yyyyyy the two above need to be moved away from walk since otherwise one is not able to move walk routing to network routing!!!!!! Now trying access_walk ...  kai,
+		// apr'19
 		
 		this.marginalUtilityOfTravelTimeWalk_utl_s = pcsConfig.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() /3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ;
 		

@@ -1,6 +1,5 @@
 package org.matsim.contrib.emissions.analysis;
 
-import org.matsim.contrib.emissions.types.Pollutant;
 
 import java.util.Map;
 
@@ -10,26 +9,25 @@ import java.util.Map;
  */
 class EmissionsByPollutant {
 
-    private Map<Pollutant, Double> emissionByPollutant;
+    private Map<String, Double> emissionByPollutant;
 
-    EmissionsByPollutant(Map<Pollutant, Double> emissions) {
+    EmissionsByPollutant(Map<String, Double> emissions) {
         this.emissionByPollutant = emissions;
     }
 
-    void addEmissions(Map<Pollutant, Double> emissions) {
+    void addEmissions(Map<String, Double> emissions) {
         emissions.forEach(this::addEmission);
     }
 
-    double addEmission(Pollutant pollutant, double value) {
-
+    double addEmission(String pollutant, double value) {
         return emissionByPollutant.merge(pollutant, value, Double::sum);
     }
 
-    Map<Pollutant, Double> getEmissions() {
+    Map<String, Double> getEmissions() {
         return emissionByPollutant;
     }
 
-    double getEmission(Pollutant pollutant) {
+    double getEmission(String pollutant) {
         return emissionByPollutant.get(pollutant);
     }
 }

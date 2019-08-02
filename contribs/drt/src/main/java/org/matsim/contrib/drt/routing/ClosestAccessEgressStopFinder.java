@@ -62,8 +62,9 @@ public class ClosestAccessEgressStopFinder implements AccessEgressStopFinder {
 	private TransitStopFacility findClosestStop(Facility facility) {
 		Coord coord = StopBasedDrtRoutingModule.getFacilityCoord(facility, network);
 
-		TransitStopFacility closest = stops.values().stream()//
-				.min(Comparator.comparing(s -> DistanceUtils.calculateSquaredDistance(coord, s.getCoord())))//
+		TransitStopFacility closest = stops.values()
+				.stream()
+				.min(Comparator.comparing(s -> DistanceUtils.calculateSquaredDistance(coord, s.getCoord())))
 				.orElse(null);
 
 		return closest;
