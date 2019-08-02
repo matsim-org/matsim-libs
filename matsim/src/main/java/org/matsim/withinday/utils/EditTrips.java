@@ -430,8 +430,7 @@ public final class EditTrips {
 			//			double departureTime = PopulationUtils.decideOnActivityEndTime( nextAct, now, scenario.getConfig() );
 			Activity previousActivity = (Activity) plan.getPlanElements().get(currPosPlanElements - 1);
 			double departureTime = previousActivity.getEndTime() + currentLeg.getTravelTime();
-			final List<? extends PlanElement> newTrip = tripRouter.calcRoute(routingMode, fromFacility, toFacility, departureTime, null );
-			// yy fix missing person
+			final List<? extends PlanElement> newTrip = tripRouter.calcRoute(routingMode, fromFacility, toFacility, departureTime, plan.getPerson() );
 			TripRouter.insertTrip(plan, nextAct, newTrip, trip.getDestinationActivity() ) ;
 		} else {
 			/*
