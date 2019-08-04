@@ -89,85 +89,102 @@ public final class AccessibilityCalculator {
 		}
 
 		LOG.info("Iterating over all aggregated measuring points...");
-		int numberOfProcessors = Runtime.getRuntime().availableProcessors();
-		LOG.info("There are " + numberOfProcessors + " available processors.");
-		final int partitionSize = (int) ((double) aggregatedOrigins.size() / numberOfProcessors) + 1;
-		LOG.info("partitionSize " + partitionSize);
-		Iterable<List<Id<Node>>> partitions = Iterables.partition(aggregatedOriginNodes, partitionSize);
 
-		ProgressBar progressBar = new ProgressBar(aggregatedOrigins.size());
 
-		ConcurrentExecutor<Void> executor = ConcurrentExecutor.fixedPoolService(numberOfProcessors);
-		for (final List<Id<Node>> partition : partitions) {
-			executor.addTaskToQueue(() -> {
-				try {
-					Map<String, AccessibilityContributionCalculator> calculatorsForPartition = new LinkedHashMap<>();
-					for (String mode : new HashSet<>(calculators.keySet())) {
-						calculatorsForPartition.put(mode, calculators.get(mode).duplicate());
+		if (acg.isUseParallelization()) {
+			int numberOfProcessors = Runtime.getRuntime().availableProcessors();
+			LOG.info("There are " + numberOfProcessors + " available processors.");
+
+			final int partitionSize = (int) ((double) aggregatedOrigins.size() / numberOfProcessors) + 1;
+			LOG.info("partitionSize " + partitionSize);
+			Iterable<List<Id<Node>>> partitions = Iterables.partition(aggregatedOriginNodes, partitionSize);
+
+			ProgressBar progressBar = new ProgressBar(aggregatedOrigins.size());
+
+			ConcurrentExecutor<Void> executor = ConcurrentExecutor.fixedPoolService(numberOfProcessors);
+			for (final List<Id<Node>> partition : partitions) {
+				executor.addTaskToQueue(() -> {
+					try {
+						compute(departureTime, aggregatedOpportunities, aggregatedOrigins, partition, progressBar);
+					} catch (Exception e) {
+						throw new RuntimeException(e);
 					}
-
-					// Go through all nodes that have a measuring point assigned
-					for (Id<Node> nodeId : partition) {
-						progressBar.update();
-
-						Node fromNode = network.getNodes().get(nodeId);
-
-						for (AccessibilityContributionCalculator calculator : calculatorsForPartition.values()) {
-							Gbl.assertNotNull(calculator);
-							calculator.notifyNewOriginNode(fromNode, departureTime);
-						}
-
-						// Go through all measuring points assigned to current node
-						for (ActivityFacility origin : aggregatedOrigins.get(nodeId)) {
-							assert(origin.getCoord() != null);
-
-							Map<String,Double> expSums = new ConcurrentHashMap<>();
-							for (String mode : calculators.keySet()) {
-								expSums.put(mode, 0.);
-							}
-
-							// TODO Check what this really means
-							// Gbl.assertIf(aggregatedOpportunities.length > 0);
-							// yyyyyy a test fails when this line is made active; cannot say why an execution path where there are now opportunities can make sense for a test.  kai, mar'17
-
-							// Go through all aggregated opportunities (i.e. network nodes to which at least one opportunity is assigned)
-							for (final AggregationObject aggregatedOpportunity : aggregatedOpportunities.values()) {
-								// Go through all calculators
-								for (String mode : calculatorsForPartition.keySet()) {
-									final double expVhk = calculatorsForPartition.get(mode).computeContributionOfOpportunity(origin, aggregatedOpportunity, departureTime);
-									expSums.put(mode, expSums.get(mode) + expVhk);
-								}
-							}
-
-							Map<String, Double> accessibilities  = new ConcurrentHashMap<>();
-
-							for (String mode : calculatorsForPartition.keySet()) {
-								if (acg.getAccessibilityMeasureType() == AccessibilityMeasureType.logSum) {
-									accessibilities.put(mode, (1/this.cnScoringGroup.getBrainExpBeta()) * Math.log(expSums.get(mode)));
-								} else if (acg.getAccessibilityMeasureType() == AccessibilityMeasureType.rawSum) {
-									accessibilities.put(mode, expSums.get(mode));
-								} else if (acg.getAccessibilityMeasureType() == AccessibilityMeasureType.gravity) {
-									throw new IllegalArgumentException("This accessibility measure is not yet implemented.");
-								} else {
-									throw new IllegalArgumentException("No valid accessibility measure type chosen.");
-								}
-							}
-
-							for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
-								zoneDataExchangeInterface.setFacilityAccessibilities(origin, departureTime, accessibilities);
-							}
-						}
-					}
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-				return null;
-			});
+					return null;
+				});
+			}
+			executor.execute();
+		} else {
+			LOG.info("Performing the computation without parallelization.");
+			ProgressBar progressBar = new ProgressBar(aggregatedOrigins.size());
+			compute(departureTime, aggregatedOpportunities, aggregatedOrigins, aggregatedOriginNodes, progressBar);
 		}
-		executor.execute();
 
 		for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
 			zoneDataExchangeInterface.finish();
+		}
+	}
+
+
+	private void compute(Double departureTime, Map<Id<Node>, AggregationObject> aggregatedOpportunities, Map<Id<Node>,
+			ArrayList<ActivityFacility>> aggregatedOrigins, Collection<Id<Node>> aggregatedOriginNodes, ProgressBar progressBar) {
+
+		Map<String, AccessibilityContributionCalculator> calculatorsForPartition = new LinkedHashMap<>();
+		for (String mode : new HashSet<>(calculators.keySet())) {
+			calculatorsForPartition.put(mode, calculators.get(mode).duplicate());
+		}
+
+		// Go through all nodes that have a measuring point assigned
+		//for (Id<Node> nodeId : partition) {
+		for (Id<Node> nodeId : aggregatedOrigins.keySet()) {
+			progressBar.update();
+
+			Node fromNode = network.getNodes().get(nodeId);
+
+			for (AccessibilityContributionCalculator calculator : calculatorsForPartition.values()) {
+				Gbl.assertNotNull(calculator);
+				calculator.notifyNewOriginNode(fromNode, departureTime);
+			}
+
+			// Go through all measuring points assigned to current node
+			for (ActivityFacility origin : aggregatedOrigins.get(nodeId)) {
+				assert(origin.getCoord() != null);
+
+				Map<String,Double> expSums = new ConcurrentHashMap<>();
+				for (String mode : calculators.keySet()) {
+					expSums.put(mode, 0.);
+				}
+
+				// TODO Check what this really means
+				// Gbl.assertIf(aggregatedOpportunities.length > 0);
+				// yyyyyy a test fails when this line is made active; cannot say why an execution path where there are now opportunities can make sense for a test.  kai, mar'17
+
+				// Go through all aggregated opportunities (i.e. network nodes to which at least one opportunity is assigned)
+				for (final AggregationObject aggregatedOpportunity : aggregatedOpportunities.values()) {
+					// Go through all calculators
+					for (String mode : calculatorsForPartition.keySet()) {
+						final double expVhk = calculatorsForPartition.get(mode).computeContributionOfOpportunity(origin, aggregatedOpportunity, departureTime);
+						expSums.put(mode, expSums.get(mode) + expVhk);
+					}
+				}
+
+				Map<String, Double> accessibilities  = new ConcurrentHashMap<>();
+
+				for (String mode : calculatorsForPartition.keySet()) {
+					if (acg.getAccessibilityMeasureType() == AccessibilityMeasureType.logSum) {
+						accessibilities.put(mode, (1/this.cnScoringGroup.getBrainExpBeta()) * Math.log(expSums.get(mode)));
+					} else if (acg.getAccessibilityMeasureType() == AccessibilityMeasureType.rawSum) {
+						accessibilities.put(mode, expSums.get(mode));
+					} else if (acg.getAccessibilityMeasureType() == AccessibilityMeasureType.gravity) {
+						throw new IllegalArgumentException("This accessibility measure is not yet implemented.");
+					} else {
+						throw new IllegalArgumentException("No valid accessibility measure type chosen.");
+					}
+				}
+
+				for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
+					zoneDataExchangeInterface.setFacilityAccessibilities(origin, departureTime, accessibilities);
+				}
+			}
 		}
 	}
 
