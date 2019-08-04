@@ -556,7 +556,7 @@ public class AccessibilityIntegrationTest {
 
 		@Override
 		public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay, Map<String, Double> accessibilities){
-			accessibilitiesMap.put(new Tuple<ActivityFacility, Double>(measurePoint, timeOfDay), accessibilities);
+			accessibilitiesMap.put(new Tuple<>(measurePoint, timeOfDay), accessibilities);
 		}
 		
 		@Override
