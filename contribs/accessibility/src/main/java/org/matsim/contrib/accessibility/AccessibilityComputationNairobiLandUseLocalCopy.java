@@ -50,10 +50,10 @@ public class AccessibilityComputationNairobiLandUseLocalCopy {
 		Envelope envelope = new Envelope(246000, 271000, 9853000, 9863000); // Central part of Nairobi
 		String scenarioCRS = "EPSG:21037"; // EPSG:21037 = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		
-		config.network().setInputFile("/Users/dominik/Workspace/nairobi/data/nairobi/input/2015-10-15_network.xml");
-		config.facilities().setInputFile("/Users/dominik/Workspace/nairobi/data/land_use/Nairobi_LU_2010/facilities.xml");
+		config.network().setInputFile("../nairobi/data/nairobi/input/2015-10-15_network.xml");
+		config.facilities().setInputFile("../nairobi/data/land_use/Nairobi_LU_2010/facilities.xml");
 		String runId = "ke_nairobi_landuse_hexagons_" + tileSize_m;
-		config.controler().setOutputDirectory("/Users/dominik/Workspace/nairobi/data/nairobi/output/" + runId + "_3/");
+		config.controler().setOutputDirectory("../nairobi/data/nairobi/output/" + runId + "_lcpt_par4-13_car_500/");
 		config.controler().setRunId(runId);
 		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -64,8 +64,8 @@ public class AccessibilityComputationNairobiLandUseLocalCopy {
 		acg.setEnvelope(envelope);
 		acg.setTileSize_m(tileSize_m);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, false);
-//		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+//		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
 		acg.setOutputCrs(scenarioCRS);
 		
 		ConfigUtils.setVspDefaults(config);
