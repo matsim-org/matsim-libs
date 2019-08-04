@@ -44,6 +44,8 @@ public final class ConstantSpeedAccessibilityExpContributionCalculator implement
 	// to be realistic in South Africa, but less elsewhere)
 	private final LeastCostPathTree lcptTravelDistance = new LeastCostPathTree(new FreeSpeedTravelTime(), new LinkLengthTravelDisutility());
 
+	private final String mode;
+	private final Config config;
 	private final Network network;
 	
 	private double logitScaleParameter;
@@ -61,6 +63,8 @@ public final class ConstantSpeedAccessibilityExpContributionCalculator implement
 
 
 	public ConstantSpeedAccessibilityExpContributionCalculator(final String mode, Config config, Network network) {
+		this.mode = mode;
+		this.config = config;
 		this.network = network;
 		final PlanCalcScoreConfigGroup planCalcScoreConfigGroup = config.planCalcScore() ;
 
@@ -123,5 +127,14 @@ public final class ConstantSpeedAccessibilityExpContributionCalculator implement
 		
 		// exp(beta * a) * exp(beta * b) = exp(beta * (a+b))
 		return Math.exp(logitScaleParameter * (constMode + utilityMeasuringPoint2Road + utilityRoad2Node + utility)) * sumExpVjkWalk;
+	}
+
+
+	@Override
+	public ConstantSpeedAccessibilityExpContributionCalculator duplicate() {
+		LOG.info("Creating another ConstantSpeedAccessibilityExpContributionCalculator object.");
+		ConstantSpeedAccessibilityExpContributionCalculator constantSpeedAccessibilityExpContributionCalculator =
+				new ConstantSpeedAccessibilityExpContributionCalculator(this.mode, this.config, this.network);
+		return constantSpeedAccessibilityExpContributionCalculator;
 	}
 }

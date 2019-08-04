@@ -32,4 +32,12 @@ public final class LeastCostPathCalculatorAccessibilityContributionCalculator im
 		LeastCostPathCalculator.Path path = leastCostPathCalculator.calcLeastCostPath(fromNode, destination.getNearestNode(), departureTime, null, null);
 		return destination.getSum() * Math.exp(planCalcScoreConfigGroup.getBrainExpBeta() * path.travelCost);
 	}
+
+
+	@Override
+	public LeastCostPathCalculatorAccessibilityContributionCalculator duplicate() {
+		LeastCostPathCalculatorAccessibilityContributionCalculator leastCostPathCalculatorAccessibilityContributionCalculator =
+				new LeastCostPathCalculatorAccessibilityContributionCalculator(this.planCalcScoreConfigGroup, this.leastCostPathCalculator);
+		return leastCostPathCalculatorAccessibilityContributionCalculator;
+	}
 }

@@ -14,6 +14,7 @@ import org.matsim.contrib.dvrp.router.DijkstraTree;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -43,14 +44,20 @@ import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl;
 
 	private final Network network;
 	private final TravelTime travelTime;
+	//
+	private final TravelDisutilityFactory travelDisutilityFactory;
+	private final Scenario scenario;
+	//
 
 	private final double betaWalkTT;
 	private final double betaWalkTD;
 	private final double walkSpeed_m_s;
 
 	private Node fromNode = null;
-//	private final LeastCostPathTreeExtended lcpt;
-	private final DijkstraTree dijkstraTree;
+	private final LeastCostPathTreeExtended lcpt;
+	//private final DijkstraTree dijkstraTree;
+	//private final MultiNodePathCalculator multiNodePathCalculator;
+	//private ImaginaryNode aggregatedToNodes;
 
 	
 	public NetworkModeAccessibilityExpContributionCalculator(final TravelTime travelTime,
@@ -59,13 +66,19 @@ import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl;
 
 		final PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
 		this.scheme = (RoadPricingScheme) scenario.getScenarioElement( RoadPricingScheme.ELEMENT_NAME );
-		this.travelTime = travelTime;		
+		this.travelTime = travelTime;
+		//
+		this.travelDisutilityFactory = travelDisutilityFactory;
+		this.scenario = scenario;
+		//
 
 		Gbl.assertNotNull(travelDisutilityFactory);
 		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime);
 
-//		this.lcpt = new LeastCostPathTreeExtended(travelTime, travelDisutility, this.scheme);
-		this.dijkstraTree = new DijkstraTree(network, travelDisutility, travelTime);
+		this.lcpt = new LeastCostPathTreeExtended(travelTime, travelDisutility, this.scheme);
+		//this.dijkstraTree = new DijkstraTree(network, travelDisutility, travelTime);
+		//FastMultiNodeDijkstraFactory fastMultiNodeDijkstraFactory = new FastMultiNodeDijkstraFactory(true);
+		//this.multiNodePathCalculator = (MultiNodePathCalculator) fastMultiNodeDijkstraFactory.createPathCalculator(network, travelDisutility, travelTime);
 
 		if ( planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.car).getMarginalUtilityOfDistance() != 0. ) {
 			log.error( "marginal utility of distance for car different from zero but not used in accessibility computations");
@@ -89,16 +102,17 @@ import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl;
 	@Override
 	public void notifyNewOriginNode(Node fromNode, Double departureTime) {
 		this.fromNode = fromNode;
-//		this.lcpt.calculateExtended(network, fromNode, departureTime);
-		this.dijkstraTree.calcLeastCostPathTree(fromNode, departureTime);
+		this.lcpt.calculateExtended(network, fromNode, departureTime);
+		//this.dijkstraTree.calcLeastCostPathTree(fromNode, departureTime);
+		//multiNodePathCalculator.calcLeastCostPath(fromNode, aggregatedToNodes, departureTime, null, null);
 	}
 	
 	
 	@Override
 	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime) {
 
-		System.out.println("oring = " + origin.getCoord().getX() + "   " + origin.getCoord().getY());
-		System.out.println("destnode = " + destination.getNearestNode().getCoord().getX() + "   " + destination.getNearestNode().getCoord().getY());
+//		System.out.println("oring = " + origin.getCoord().getX() + "   " + origin.getCoord().getY());
+//		System.out.println("destnode = " + destination.getNearestNode().getCoord().getX() + "   " + destination.getNearestNode().getCoord().getY());
 		Link nearestLink = NetworkUtils.getNearestLinkExactly(network, origin.getCoord());
 
 		// === (1) ORIGIN to LINK to NODE (captures the distance (as walk time) between the origin via the link to the node):
@@ -132,8 +146,10 @@ import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl;
 
 		// === (2) REMAINING TRAVEL ON NETWORK:
 		// Note: This is a utility that becomes a disutility when it holds a negative value (as it does)
-//		double congestedCarUtility = - lcpt.getTree().get(destination.getNearestNode().getId()).getCost();
-		double congestedCarUtility = - dijkstraTree.getLeastCostPath(destination.getNearestNode()).travelCost;
+		double congestedCarUtility = - lcpt.getTree().get(destination.getNearestNode().getId()).getCost();
+		//double congestedCarUtility = - dijkstraTree.getLeastCostPath(destination.getNearestNode()).travelCost;
+		//double congestedCarUtility = - multiNodePathCalculator.constructPath(fromNode, destination.getNearestNode(), departureTime).travelCost;
+
 
 		// System.out.println("congestedCarDisutility = " + congestedCarDisutility);
 		// travel disutility congested car on road network (including toll)
@@ -169,5 +185,20 @@ import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl;
 			}
 		}
 		return result ;
+	}
+
+
+//	public void setToNodes(ImaginaryNode aggregatedToNodes) {
+//		log.warn("Setting toNodes.");
+//		this.aggregatedToNodes = aggregatedToNodes;
+//	}
+
+
+	@Override
+	public NetworkModeAccessibilityExpContributionCalculator duplicate() {
+		log.info("Creating another NetworkModeAccessibilityExpContributionCalculator object.");
+		NetworkModeAccessibilityExpContributionCalculator networkModeAccessibilityExpContributionCalculator =
+				new NetworkModeAccessibilityExpContributionCalculator(this.travelTime, this.travelDisutilityFactory, this.scenario,	this.network);
+		return networkModeAccessibilityExpContributionCalculator;
 	}
 }

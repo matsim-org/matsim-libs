@@ -42,7 +42,7 @@ public class TripRouterAccessibilityContributionCalculator implements Accessibil
 	private String mode;
 	private PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
 	
-	public TripRouterAccessibilityContributionCalculator( String mode, TripRouter tripRouter, PlanCalcScoreConfigGroup planCalcScoreConfigGroup) {
+	public TripRouterAccessibilityContributionCalculator(String mode, TripRouter tripRouter, PlanCalcScoreConfigGroup planCalcScoreConfigGroup) {
 		this.mode = mode ;
 		this.tripRouter = tripRouter;
 		this.planCalcScoreConfigGroup = planCalcScoreConfigGroup;
@@ -81,5 +81,13 @@ public class TripRouterAccessibilityContributionCalculator implements Accessibil
 		
 		// exp(beta * a) * exp(beta * b) = exp(beta * (a+b))
 		return Math.exp(this.planCalcScoreConfigGroup.getBrainExpBeta() * utility) * sumExpVjkWalk;
+	}
+
+
+	@Override
+	public TripRouterAccessibilityContributionCalculator duplicate() {
+		TripRouterAccessibilityContributionCalculator tripRouterAccessibilityContributionCalculator =
+				new TripRouterAccessibilityContributionCalculator(this.mode, this.tripRouter, this.planCalcScoreConfigGroup);
+		return tripRouterAccessibilityContributionCalculator;
 	}
 }

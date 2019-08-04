@@ -42,4 +42,9 @@ public interface AccessibilityContributionCalculator {
 	double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime);
 	// yyyy I am somewhat sceptic if we tryly need both "fromNode" (above) and origin.
 	// yyyy And I am quite confident that we do not need the departure time twice.
+
+	/*
+	Needed for perallelization
+	 */
+	AccessibilityContributionCalculator duplicate();
 }
