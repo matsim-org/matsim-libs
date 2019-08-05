@@ -103,13 +103,33 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
     private void handleFreightActivityStart(ActivityStartEvent event) {
         if (event.getActType().equals(FreightConstants.END)) {
             activeDeliveryAgents.remove(event.getPersonId());
-        } else if (event.getActType().equals(FreightConstants.DELIVERY)) {
+        } else if (event.getActType().contains(FreightConstants.DELIVERY)) {
             Id<Carrier> carrier = PersonDelivery.getCarrierIdFromDriver(event.getPersonId());
+            String customerAboutToBeServed = event.getActType().split("_")[1];
             if (currentExpectedDeliveriesPerLink.containsKey(event.getLinkId())) {
                 ExpectedDelivery deliveryCandidate = currentExpectedDeliveriesPerLink.get(event.getLinkId()).stream()
                         .filter(d -> d.getCarrier().equals(carrier))
-                        .min(Comparator.comparing(ExpectedDelivery::getStartTime))
+                        .min(Comparator.comparing(ExpectedDelivery::getStartTime)) // i think this is a problem:
+                        // we assume that the next served customer is the one, which is expected to be.
+                        // But it might be that the corresponding tour/driver is not the one who is performing the delivery activity here...
                         .orElseThrow(() -> new RuntimeException("No available deliveries expected for carrier " + carrier + "at link " + event.getLinkId()));
+
+                ExpectedDelivery deliveryCandidateV2 = currentExpectedDeliveriesPerLink.get(event.getLinkId()).stream()
+                        .filter(d -> d.getCarrier().equals(carrier))
+                        .filter(d -> d.getPersonId().toString().equals(customerAboutToBeServed)) // this should do the trick: also filter for the customer (whose id is now contained in the activityType)
+                        .min(Comparator.comparing(ExpectedDelivery::getStartTime))
+                        .orElseThrow(() -> new RuntimeException("No available deliveries expected for customer " + customerAboutToBeServed + " by carrier " + carrier + "at link " + event.getLinkId()));
+
+
+                if(! (deliveryCandidate.getPersonId().toString().equals(customerAboutToBeServed))){
+                    throw new RuntimeException("the carrier agent " + event.getPersonId() + " is starting to serve customer " + customerAboutToBeServed
+                            + " but we are about to score customer " + deliveryCandidate.getPersonId() + ".\n"
+                            + "if we would filter the customer about to be served the ExpectedDelivery would be = " + deliveryCandidateV2);
+                }
+
+
+
+//                deliveryCandidate.getPersonId()
                 currentExpectedDeliveriesPerLink.get(event.getLinkId()).remove(deliveryCandidate);
                 double timeDifference = calcDifference(deliveryCandidate, event.getTime());
                 double score = scoreCalculator.calcScore(timeDifference);
@@ -187,6 +207,11 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
 
         public double getEndTime() {
             return endTime;
+        }
+
+        @Override
+        public String toString(){
+            return "[person=" + personId +";" + "type=" + type +";" + "carrier=" + carrier + ";" + "start=" + startTime + ";" + "end=" + endTime + "]";
         }
     }
 

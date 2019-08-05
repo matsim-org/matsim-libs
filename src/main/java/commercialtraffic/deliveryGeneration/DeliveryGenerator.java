@@ -138,13 +138,9 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
             if (hullcarriers.getCarriers().containsKey(carrierId)) {
                 Carrier carrier = hullcarriers.getCarriers().get(carrierId);
                 carrier.getServices().add(serviceBuilder.build());
-
-
             } else {
                 throw new RuntimeException("Carrier Id does not exist: " + carrierId.toString());
             }
-
-
         }
     }
 
@@ -228,6 +224,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
                     } else if (tourElement instanceof Tour.TourActivity) {
                         Tour.TourActivity act = (Tour.TourActivity) tourElement;
 
+                        //here we would pass over the service Activity type containing the customer id...
                         Activity tourElementActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.DELIVERY, act.getLocation());
                         plan.addActivity(tourElementActivity);
                         if (lastTourElementActivity == null) {
