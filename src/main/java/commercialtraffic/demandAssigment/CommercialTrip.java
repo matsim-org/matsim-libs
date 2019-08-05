@@ -13,9 +13,10 @@ public class CommercialTrip {
 	String zielzelle;
 	int art_ziel;
 	double fahrzeit;
+	String customerRelation;
 
 	CommercialTrip(int id, int unternehmensID, int fahrtID, String unternehmenszelle, String wirtschaftszweig,
-			int fahrzeugtyp, int zweck, String quellzelle, String zielzelle, int art_ziel, double fahrzeit) {
+			int fahrzeugtyp, int zweck, String quellzelle, String zielzelle, int art_ziel, double fahrzeit,String customerRelation) {
 		this.id = id;
 		this.unternehmensID = unternehmensID;
 		this.fahrtID = fahrtID;
@@ -27,7 +28,7 @@ public class CommercialTrip {
 		this.zielzelle = zielzelle;
 		this.art_ziel = art_ziel;
 		this.fahrzeit = fahrzeit;
-
+		this.customerRelation = customerRelation;
 	}
 
 }

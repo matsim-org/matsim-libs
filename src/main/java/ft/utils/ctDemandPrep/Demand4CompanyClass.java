@@ -44,6 +44,11 @@ public class Demand4CompanyClass {
 		this.companyClass2CompanyMap = new HashMap<String, ArrayList<Company>>();
 		this.zone2CompanyMap = new HashMap<String, ArrayList<Company>>();
 	}
+	
+	public Demand4CompanyClass()
+	{
+		
+	}
 
 	public String getZone(Coord coord, Map<String, Geometry> zoneMap) {
 		// Function assumes Shapes are in the same coordinate system like MATSim

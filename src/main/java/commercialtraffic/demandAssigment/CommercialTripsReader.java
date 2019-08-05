@@ -246,10 +246,25 @@ public class CommercialTripsReader {
 				String quellzelle = (lineContents[24]);
 				String zielzelle = (lineContents[25]);
 				int art_ziel = Integer.parseInt(lineContents[22]);
+				String customerRelation = "";
+				if (art_ziel == 8)
+				{
+				
+					customerRelation = "b2c";
+				}
+				else if (art_ziel == 10) {
+					customerRelation ="private";
+				}
+				else {
+					customerRelation ="b2b";
+				}
+				
+						
+						
 				double fahrzeit = Double.parseDouble(lineContents[26]) * 60.0;
 
 				CommercialTrip commercialTrip = new CommercialTrip(id, unternehmensID, fahrtID, unternehmenszelle,
-						wirtschaftszweig, fahrzeugtyp, zweck, quellzelle, zielzelle, art_ziel, fahrzeit);
+						wirtschaftszweig, fahrzeugtyp, zweck, quellzelle, zielzelle, art_ziel, fahrzeit,customerRelation);
 
 				if (commercialTripMap.containsKey(wirtschaftszweig)) {
 					commercialTripMap.get(wirtschaftszweig).add(commercialTrip);
