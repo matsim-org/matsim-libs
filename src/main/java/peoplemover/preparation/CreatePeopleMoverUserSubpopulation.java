@@ -24,7 +24,9 @@ package peoplemover.preparation;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
@@ -47,10 +49,11 @@ public class CreatePeopleMoverUserSubpopulation {
 		new PopulationReader(scenario).readFile(inputPlansFile);
 		for (Person p : scenario.getPopulation().getPersons().values()){
 			if (p.getId().toString().startsWith(identifier)){
-				scenario.getPopulation().getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", subpopulation);
+				PopulationUtils.putPersonAttribute(p,"subpopulation",subpopulation);
 			}
 		}
-		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile(outputPersonAttributes);
+//		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile(outputPersonAttributes);
+		new PopulationWriter(scenario.getPopulation()).write(outputPersonAttributes); //not sure if this is what was originally intended here..
 	}
 	
 }
