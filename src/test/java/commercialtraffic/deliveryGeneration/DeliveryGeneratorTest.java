@@ -79,12 +79,12 @@ public class DeliveryGeneratorTest {
         work.setLinkId(Id.createLinkId(259));
         work.setEndTime(16 * 3600);
 
-        work.getAttributes().putAttribute(PersonDelivery.DELIEVERY_TYPE, "pizza");
-        work.getAttributes().putAttribute(PersonDelivery.DELIEVERY_DURATION, 180);
-        work.getAttributes().putAttribute(PersonDelivery.DELIEVERY_TIME_START, 12 * 3600);
-        work.getAttributes().putAttribute(PersonDelivery.DELIEVERY_TIME_END, 13 * 3600);
+        work.getAttributes().putAttribute(PersonDelivery.DELIVERY_TYPE, "pizza");
+        work.getAttributes().putAttribute(PersonDelivery.DELIVERY_DURATION, 180);
+        work.getAttributes().putAttribute(PersonDelivery.DELIVERY_TIME_START, 12 * 3600);
+        work.getAttributes().putAttribute(PersonDelivery.DELIVERY_TIME_END, 13 * 3600);
         work.getAttributes().putAttribute(PersonDelivery.SERVICE_OPERATOR, 1);
-        work.getAttributes().putAttribute(PersonDelivery.DELIEVERY_SIZE, 1);
+        work.getAttributes().putAttribute(PersonDelivery.DELIVERY_SIZE, 1);
 
         plan.addActivity(work);
 

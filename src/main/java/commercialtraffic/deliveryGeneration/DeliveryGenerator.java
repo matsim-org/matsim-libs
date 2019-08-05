@@ -123,16 +123,16 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
         {
             activitiesWithServcies.addAll(p.getSelectedPlan().getPlanElements().stream()
                     .filter(Activity.class::isInstance)
-                    .filter(a -> a.getAttributes().getAsMap().containsKey(PersonDelivery.DELIEVERY_TYPE))
+                    .filter(a -> a.getAttributes().getAsMap().containsKey(PersonDelivery.DELIVERY_TYPE))
                     .collect(Collectors.toSet()));
         });
         int i = 0;
         for (PlanElement pe : activitiesWithServcies) {
             Activity activity = (Activity) pe;
             CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(Id.create(i, CarrierService.class), activity.getLinkId());
-            serviceBuilder.setCapacityDemand(Integer.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_SIZE))));
-            serviceBuilder.setServiceDuration(Integer.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_DURATION))));
-            serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_TIME_START))), Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_TIME_END)))));
+            serviceBuilder.setCapacityDemand(Integer.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_SIZE))));
+            serviceBuilder.setServiceDuration(Integer.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_DURATION))));
+            serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_TIME_START))), Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_TIME_END)))));
             i++;
             Id<Carrier> carrierId = PersonDelivery.getCarrierId(activity);
             if (hullcarriers.getCarriers().containsKey(carrierId)) {
