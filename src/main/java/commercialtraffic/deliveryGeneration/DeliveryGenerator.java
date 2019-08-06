@@ -30,6 +30,7 @@ import com.graphhopper.jsprit.core.util.Solutions;
 import commercialtraffic.integration.CarrierMode;
 import commercialtraffic.integration.CommercialTrafficChecker;
 import commercialtraffic.integration.CommercialTrafficConfigGroup;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -51,10 +52,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
 import javax.inject.Inject;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -64,7 +62,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
 
 
 
-    public final double firsttourTraveltimeBuffer;
+    private final double firsttourTraveltimeBuffer;
     private final int maxIterations;
     private final CarrierMode carrierMode;
 
@@ -80,11 +78,19 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
     private Set<Id<Vehicle>> freightVehicles = new HashSet<>();
 
 
+    private final static Logger log = Logger.getLogger(DeliveryGenerator.class);
+
+
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
         generateIterationServices();
         buildTours();
         createFreightAgents();
+
+        String dir = event.getServices().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/";
+        log.info("writing carrier file of iteration " + event.getIteration() + " to " + dir);
+        CarrierPlanXmlWriterV2 planWriter = new CarrierPlanXmlWriterV2(hullcarriers);
+        planWriter.write(dir + "carriers_it" + event.getIteration() + ".xml");
     }
 
     @Inject
@@ -98,7 +104,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
         maxIterations = ctcg.getJspritIterations();
         carTT = travelTimes.get(TransportMode.car);
         if (CommercialTrafficChecker.hasMissingAttributes(population)) {
-            throw new RuntimeException("Not all agents expectingg deliveries contain all required attributes fo receival. Please check the log for DeliveryConsistencyChecker. Aborting.");
+            throw new RuntimeException("Not all agents expecting deliveries contain all required attributes fo receival. Please check the log for DeliveryConsistencyChecker. Aborting.");
         }
 
     }
@@ -118,35 +124,52 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
 
     private void generateIterationServices() {
         hullcarriers.getCarriers().values().forEach(carrier -> carrier.getServices().clear());
-        Set<PlanElement> activitiesWithServcies = new HashSet<>();
+
+        Map<Person,Set<PlanElement>> person2ActsWithServices = new HashMap();
+
         population.getPersons().values().forEach(p ->
         {
-            activitiesWithServcies.addAll(p.getSelectedPlan().getPlanElements().stream()
+            Set<PlanElement> activitiesWithServices = new HashSet<>(p.getSelectedPlan().getPlanElements().stream()
                     .filter(Activity.class::isInstance)
                     .filter(a -> a.getAttributes().getAsMap().containsKey(PersonDelivery.DELIVERY_TYPE))
                     .collect(Collectors.toSet()));
+            person2ActsWithServices.put(p,activitiesWithServices);
         });
-        int i = 0;
-        for (PlanElement pe : activitiesWithServcies) {
-            Activity activity = (Activity) pe;
-            CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(Id.create(i, CarrierService.class), activity.getLinkId());
-            serviceBuilder.setCapacityDemand(Integer.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_SIZE))));
-            serviceBuilder.setServiceDuration(Integer.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_DURATION))));
-            serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_TIME_START))), Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_TIME_END)))));
-            i++;
-            Id<Carrier> carrierId = PersonDelivery.getCarrierId(activity);
-            if (hullcarriers.getCarriers().containsKey(carrierId)) {
-                Carrier carrier = hullcarriers.getCarriers().get(carrierId);
-                carrier.getServices().add(serviceBuilder.build());
-            } else {
-                throw new RuntimeException("Carrier Id does not exist: " + carrierId.toString());
+        for(Person personWithDelivieries : person2ActsWithServices.keySet()){
+            int i = 0;
+            for (PlanElement pe : person2ActsWithServices.get(personWithDelivieries)) {
+                Activity activity = (Activity) pe;
+                CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(createCarrierServiceIdXForCustomer(personWithDelivieries,i), activity.getLinkId());
+                serviceBuilder.setCapacityDemand(Integer.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_SIZE))));
+                serviceBuilder.setServiceDuration(Integer.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_DURATION))));
+                serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_TIME_START))), Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_TIME_END)))));
+                i++;
+                Id<Carrier> carrierId = PersonDelivery.getCarrierId(activity);
+                if (hullcarriers.getCarriers().containsKey(carrierId)) {
+                    Carrier carrier = hullcarriers.getCarriers().get(carrierId);
+                    carrier.getServices().add(serviceBuilder.build());
+                } else {
+                    throw new RuntimeException("Carrier Id does not exist: " + carrierId.toString());
+                }
             }
         }
+
+    }
+
+    private static  Id<CarrierService> createCarrierServiceIdXForCustomer(Person customer, int x){
+        return Id.create(customer.getId().toString() + PersonDelivery.CARRIERSPLIT + x, CarrierService.class);
+    }
+
+    private static String createDeliveryActTypeFromServiceId(Id<CarrierService> id) {
+        String idStr = id.toString();
+        return FreightConstants.DELIVERY + PersonDelivery.CARRIERSPLIT + idStr.substring(0,idStr.lastIndexOf(PersonDelivery.CARRIERSPLIT));
+    }
+
+    public static Id<Person> getCustomerIdFromDeliveryActivityType(String actType){
+        return Id.createPersonId(actType.substring(actType.indexOf(PersonDelivery.CARRIERSPLIT)+1,actType.length()));
     }
 
     private void buildTours() {
-
-
         Set<CarrierVehicleType> vehicleTypes = new HashSet<>();
         hullcarriers.getCarriers().values().forEach(carrier -> vehicleTypes.addAll(carrier.getCarrierCapabilities().getVehicleTypes()));
         NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), vehicleTypes);
@@ -222,10 +245,14 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
                         lastTourLeg = leg;
 
                     } else if (tourElement instanceof Tour.TourActivity) {
-                        Tour.TourActivity act = (Tour.TourActivity) tourElement;
+                        if(! (tourElement instanceof  Tour.ServiceActivity)) throw new RuntimeException("currently only services (not shipments) are supported!");
+
+                        Tour.ServiceActivity act = (Tour.ServiceActivity) tourElement;
+
+                        String actType = createDeliveryActTypeFromServiceId(act.getService().getId());
 
                         //here we would pass over the service Activity type containing the customer id...
-                        Activity tourElementActivity = PopulationUtils.createActivityFromLinkId(FreightConstants.DELIVERY, act.getLocation());
+                        Activity tourElementActivity = PopulationUtils.createActivityFromLinkId(actType, act.getLocation());
                         plan.addActivity(tourElementActivity);
                         if (lastTourElementActivity == null) {
                             tourElementActivity.setMaximumDuration(act.getDuration());
