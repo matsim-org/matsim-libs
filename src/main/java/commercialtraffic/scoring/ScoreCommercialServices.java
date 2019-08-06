@@ -109,26 +109,10 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
             Id<Person> customerAboutToBeServed = DeliveryGenerator.getCustomerIdFromDeliveryActivityType(event.getActType());
             if (currentExpectedDeliveriesPerLink.containsKey(event.getLinkId())) {
                 ExpectedDelivery deliveryCandidate = currentExpectedDeliveriesPerLink.get(event.getLinkId()).stream()
-                        .filter(d -> d.getCarrier().equals(carrier))
-                        .min(Comparator.comparing(ExpectedDelivery::getStartTime)) // i think this is a problem:
-                        // we assume that the next served customer is the one, which is expected to be.
-                        // But it might be that the corresponding tour/driver is not the one who is performing the delivery activity here...
-                        .orElseThrow(() -> new RuntimeException("No available deliveries expected for carrier " + carrier + "at link " + event.getLinkId()));
-
-                ExpectedDelivery deliveryCandidateV2 = currentExpectedDeliveriesPerLink.get(event.getLinkId()).stream()
-                        .filter(d -> d.getCarrier().equals(carrier))
-                        .filter(d -> d.getPersonId().equals(customerAboutToBeServed)) // this should do the trick: also filter for the customer (whose id is now contained in the activityType)
+                        .filter(d -> d.getCarrier().equals(carrier)) //this probably is obsolete as customer can only order at one carrier anyways
+                        .filter(d -> d.getPersonId().equals(customerAboutToBeServed)) // filter for the customer (whose id is contained in the activityType)
                         .min(Comparator.comparing(ExpectedDelivery::getStartTime))
                         .orElseThrow(() -> new RuntimeException("No available deliveries expected for customer " + customerAboutToBeServed + " by carrier " + carrier + " at link " + event.getLinkId()));
-
-
-                if(! (deliveryCandidate.getPersonId().equals(customerAboutToBeServed))){
-                    throw new RuntimeException("the carrier agent " + event.getPersonId() + " is starting to serve customer " + customerAboutToBeServed
-                            + " but we are about to score customer " + deliveryCandidate.getPersonId() + ".\n"
-                            + "if we would filter the customer about to be served the ExpectedDelivery would be = " + deliveryCandidateV2);
-                } else if (!deliveryCandidate.equals(deliveryCandidateV2)){
-                    throw new RuntimeException("two different candidates were found. \n v1=" + deliveryCandidate + "\n v2=" + deliveryCandidateV2);
-                }
 
                 currentExpectedDeliveriesPerLink.get(event.getLinkId()).remove(deliveryCandidate);
                 double timeDifference = calcDifference(deliveryCandidate, event.getTime());
