@@ -28,6 +28,7 @@ import commercialtraffic.replanning.ChangeDeliveryServiceOperator;
 import commercialtraffic.scoring.DefaultCommercialServiceScore;
 import commercialtraffic.scoring.DeliveryScoreCalculator;
 import commercialtraffic.scoring.ScoreCommercialServices;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.config.Config;
@@ -38,8 +39,20 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CommercialTrafficModule extends AbstractModule {
+
+    Map<Id<Carrier>, String> carrierTransportModes = new HashMap<>();
+
+    public CommercialTrafficModule(){
+        super();
+    }
+
+    CommercialTrafficModule(Map<Id<Carrier>, String> carrier2TransportMode){
+        this.carrierTransportModes = carrier2TransportMode;
+    }
 
 
     @Override
@@ -59,8 +72,12 @@ public class CommercialTrafficModule extends AbstractModule {
         bind(Carriers.class).toInstance(carriers);
         bind(ScoreCommercialServices.class).asEagerSingleton();
         bind(TourLengthAnalyzer.class).asEagerSingleton();
-        //TODO: Change this, once some carriers have different modes, such as DRT.
-        bind(CarrierMode.class).toInstance(carrierId -> TransportMode.car);
+
+        if(this.carrierTransportModes.isEmpty()){
+            bind(CarrierMode.class).toInstance(carrierId -> TransportMode.car);
+        } else {
+            bind(CarrierMode.class).toInstance(carrierId -> carrierTransportModes.get(carrierId));
+        }
 
         addControlerListenerBinding().to(DeliveryGenerator.class);
         addControlerListenerBinding().to(CommercialTrafficAnalysisListener.class);
