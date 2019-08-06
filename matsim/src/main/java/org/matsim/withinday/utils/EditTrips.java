@@ -549,59 +549,10 @@ public final class EditTrips {
 		// prune remaining route from current route:
 		ExperimentalTransitRoute oldPtRoute = (ExperimentalTransitRoute) currentLeg.getRoute();
 
-		final Integer currentRouteLinkIdIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent);
-
-		ExperimentalTransitRoute nextPtRoute = null;
-		int indexNextPtRoute = Integer.MIN_VALUE;
 		if (newCurrentLeg.getRoute() instanceof ExperimentalTransitRoute) {
 			// not sure whether this can actually happen
-			log.debug("new trip PlanElement 0 is pt leg " + newTrip);
-			nextPtRoute = (ExperimentalTransitRoute) newCurrentLeg.getRoute();
-			indexNextPtRoute = 0;
-		} else if (newCurrentLeg.getRoute() instanceof GenericRouteImpl) {
-			log.debug("new trip PlanElement 0 is GenericRouteImpl (= walk/bike or similar) " + newTrip);
-		}
-		// yyyyyy beyond here could only happen if route instanceof NetworkRoute.  Which currently is not possible, I think.  ??????  kai, jul'19
-		else if (newTrip.size() > 1 && newTrip.get(1) instanceof Leg
-				&& ((Leg) newTrip.get(1)).getRoute() instanceof ExperimentalTransitRoute) {
-			// not sure whether this can actually happen
-			log.debug("new trip PlanElement 1 is pt leg " + newTrip.get(0) + " --- " + newTrip.get(1) + " --- " + newTrip.get(2));
-			nextPtRoute = (ExperimentalTransitRoute) ((Leg) newTrip.get(1)).getRoute();
-			indexNextPtRoute = 1;
-		} else if (newTrip.size() > 2 && newTrip.get(2) instanceof Leg
-				&& ((Leg) newTrip.get(2)).getRoute() instanceof ExperimentalTransitRoute) {
-			// transit_walk + pt act + pt leg
-			log.debug("agent" + agent.getId() + " currentLeg" + currentLeg + " ----- new trip PlanElement 2 is pt leg " + newTrip.get(0) + " --- " + newTrip.get(1) + " --- "
-					+ newTrip.get(2));
-			nextPtRoute = (ExperimentalTransitRoute) ((Leg) newTrip.get(2)).getRoute();
-			indexNextPtRoute = 2;
-		} else {
-			// other mode before maybe another pt leg might follow
-			log.debug("4" + newTrip);
-		}
-
-		if (nextPtRoute == null) {
-			// -> Agent shall disembark at the next stop, then use another mode
-			currentLeg.setRoute(new ExperimentalTransitRoute(
-					scenario.getTransitSchedule().getFacilities().get(oldPtRoute.getAccessStopId()), nextStop,
-					oldPtRoute.getLineId(), oldPtRoute.getRouteId()));
-			// add pt interaction activities. transfer walk?
-			Activity act = PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE,
-					nextStop.getCoord(), nextStop.getLinkId());
-			act.setMaximumDuration(0.0);
-			newPlanElementsAfterMerge.add(act);
-			// it is not clear which mode a walk leg should have here in between two modes
-
-			// TODO infill leg from pt stop to start of other mode necessary? Or automatically produced while routing new mode from pt stop facility?
-
-
-			for (int ijk = 0; ijk < newTrip.size(); ijk++) {
-				newPlanElementsAfterMerge.add(newPlanElementsAfterMerge.size(), newTrip.get(ijk));
-			}
-			WithinDayAgentUtils.resetCaches(agent);
-			return newPlanElementsAfterMerge;
-
-		} else {
+			log.debug("new trip PlanElement 0 is a pt leg " + newTrip);
+			ExperimentalTransitRoute nextPtRoute = (ExperimentalTransitRoute) newCurrentLeg.getRoute();
 			if (oldPtRoute.getLineId().equals(nextPtRoute.getLineId())) {
 				if (oldPtRoute.getRouteId().equals(nextPtRoute.getRouteId())
 						|| transitRouteLaterStopsAt(oldPtRoute.getLineId(), oldPtRoute.getRouteId(), nextStop.getId(),
@@ -615,7 +566,7 @@ public final class EditTrips {
 					// Is there an access_walk leg in the new trip (router assumes the trip begins
 					// here) ? If yes, we should remove the access_walk leg and the pt interaction
 					// (by not copying it into newPlanElementsAfterMerge).
-					for (int ijk = indexNextPtRoute; ijk < newTrip.size(); ijk++) {
+					for (int ijk = 0; ijk < newTrip.size(); ijk++) {
 						newPlanElementsAfterMerge.add(newPlanElementsAfterMerge.size(), newTrip.get(ijk));
 					}
 					WithinDayAgentUtils.resetCaches(agent);
@@ -639,6 +590,27 @@ public final class EditTrips {
 				// TransitStopFacility should be a transit_walk and not an access_walk
 				newCurrentLeg.setMode(TransportMode.transit_walk);
 			}
+			for (int ijk = 0; ijk < newTrip.size(); ijk++) {
+				newPlanElementsAfterMerge.add(newPlanElementsAfterMerge.size(), newTrip.get(ijk));
+			}
+			WithinDayAgentUtils.resetCaches(agent);
+			return newPlanElementsAfterMerge;
+		} else {
+			log.debug("new trip PlanElement 0 is not a pt leg (= walk/bike or similar) " + newTrip);
+			// -> Agent shall disembark at the next stop, then use another mode
+			currentLeg.setRoute(new ExperimentalTransitRoute(
+					scenario.getTransitSchedule().getFacilities().get(oldPtRoute.getAccessStopId()), nextStop,
+					oldPtRoute.getLineId(), oldPtRoute.getRouteId()));
+			// add pt interaction activities. transfer walk?
+			Activity act = PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE,
+					nextStop.getCoord(), nextStop.getLinkId());
+			act.setMaximumDuration(0.0);
+			newPlanElementsAfterMerge.add(act);
+			// it is not clear which mode a walk leg should have here in between two modes
+
+			// TODO infill leg from pt stop to start of other mode necessary? Or automatically produced while routing new mode from pt stop facility?
+
+
 			for (int ijk = 0; ijk < newTrip.size(); ijk++) {
 				newPlanElementsAfterMerge.add(newPlanElementsAfterMerge.size(), newTrip.get(ijk));
 			}
