@@ -70,7 +70,7 @@ public class CommercialTrafficChecker {
         Double timeWindowStart = Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_TIME_START)));
         Double timeWindowEnd = Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_TIME_END)));
         if (timeWindowEnd < timeWindowStart) {
-            log.error("Person" + pid + " has an error in timewindows in Activity " + activity.getType());
+            log.error("Person " + pid + " has an error in timewindows in Activity " + activity.getType() + ". start=" + timeWindowStart + " end=" +timeWindowEnd);
             fail = true;
         }
         return fail;
