@@ -427,7 +427,7 @@ public final class EditTrips {
 			 * The end time of the previous activity is not updated when the agent departs for the leg.
 			 * Leg departure time exists as variable but is -Infinity.... 
 			 * So we have no clear and reliable information when the agent will finish its teleport leg.
-			 * Do some estimation and hope for a better solution in the future :-(
+			 * Do some estimation and hope for a TODO better solution in the future :-(
 			 * - gl jul'19 
 			 */
 			//			double departureTime = PopulationUtils.decideOnActivityEndTime( nextAct, now, scenario.getConfig() );
@@ -435,8 +435,9 @@ public final class EditTrips {
 			// We don't know where the agent is located on its teleport leg and when it will arrive. Let's assume the agent is 
 			// located half way between origin and destination of the teleport leg.
 			double departureTime = now + 0.5 * currentLeg.getTravelTime();
-			// Check whether looking into previousActivity.getEndTime() gives better estimation results
-			if (Double.isFinite(previousActivity.getEndTime()) && previousActivity.getEndTime() > now) {
+			// Check whether looking into previousActivity.getEndTime() gives plausible estimation results (potentially more precise)
+			// Not clear whether this is more precise than using now. If agents end their activities on time it is, otherwise unclear.
+			if (Double.isFinite(previousActivity.getEndTime()) && previousActivity.getEndTime() < now) {
 				// the last activity has a planned end time defined, hope that the end time is close to the real end time:
 				double departureTimeAccordingToPlannedActivityEnd = previousActivity.getEndTime() + currentLeg.getTravelTime();
 				// plausibility check: The agent can only arrive after the current time
