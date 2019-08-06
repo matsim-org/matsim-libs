@@ -116,8 +116,9 @@ public class AttributesParcelExample {
 							else if (firstAct == false) {
 								Leg prevLeg = PopulationUtils.getPreviousLeg(plan, act);
 								Activity prevAct = PopulationUtils.getPreviousActivity(plan, prevLeg);
-								double prevActEndtime = prevAct.getEndTime();
-								if (prevAct.getEndTime() < deliveryBusinessEnd) {
+//								double prevActEndtime = prevAct.getEndTime(); // this also can be -Inf so it is better to use the expected arrival time out of the prevLeg. see comment below
+//								if (prevActEndtime < deliveryBusinessEnd) {
+                                if(prevLeg.getDepartureTime()+prevLeg.getTravelTime() < deliveryBusinessEnd){
 									act.getAttributes().putAttribute("deleteActivity", "None");
 									act.getAttributes().putAttribute("deliveryAmount", "1");
 									act.getAttributes().putAttribute("deliveryType", parcelSmall);
@@ -125,11 +126,16 @@ public class AttributesParcelExample {
 //											Math.max(deliveryBusinessStart, prevActEndtime)); //as activity end time most often is not set for prevAct, this almost always leads to deliveryTimeStart = deliveryBusinessStart
 																								// even if home activity is in the evening. But we can derive expected arrival time at home activity out of the leg.tschlenther 6.8.2019
 											Math.max(deliveryBusinessStart,prevLeg.getDepartureTime()+prevLeg.getTravelTime()) ); //one could think of inserting a buffer here..
-									
+
 									if (act.getEndTime() < 0) {
-										act.getAttributes().putAttribute("deliveryTimeEnd", deliveryBusinessEnd);
-										deliveryCounter++;
-										break;
+                                        if(PopulationUtils.getLastActivity(plan).equals(act)){
+                                            act.getAttributes().putAttribute("deliveryTimeEnd", deliveryBusinessEnd);
+                                        } else {
+                                            act.getAttributes().putAttribute("deliveryTimeEnd",
+                                                    Math.min(PopulationUtils.getNextLeg(plan,act).getDepartureTime(), deliveryBusinessEnd));
+                                        }
+                                        deliveryCounter++;
+                                        break;
 									} else {
 										act.getAttributes().putAttribute("deliveryTimeEnd",
 												Math.min(act.getEndTime(), deliveryBusinessEnd));
