@@ -110,7 +110,7 @@ public class ScheduleCharts {
 			setShadowVisible(false);
 			setDrawBarOutline(true);
 
-			setBaseToolTipGenerator(new XYToolTipGenerator() {
+			setDefaultToolTipGenerator(new XYToolTipGenerator() {
 				@Override
 				public String generateToolTip(XYDataset dataset, int series, int item) {
 					return getTask(series, item).getDescription();

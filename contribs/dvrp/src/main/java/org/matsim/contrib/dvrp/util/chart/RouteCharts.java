@@ -75,7 +75,7 @@ public class RouteCharts {
 		renderer.setSeriesLinesVisible(0, false);
 		renderer.setSeriesItemLabelsVisible(0, true);
 
-		renderer.setBaseItemLabelGenerator(new XYItemLabelGenerator() {
+		renderer.setDefaultItemLabelGenerator(new XYItemLabelGenerator() {
 			public String generateLabel(XYDataset dataset, int series, int item) {
 				return ((CoordDataset)dataset).getText(series, item);
 			}
@@ -117,7 +117,7 @@ public class RouteCharts {
 		renderer.setSeriesLinesVisible(0, false);
 		renderer.setSeriesItemLabelsVisible(0, true);
 
-		renderer.setBaseItemLabelGenerator(new LabelGenerator());
+		renderer.setDefaultItemLabelGenerator(new LabelGenerator());
 
 		Paint[] paints = DefaultDrawingSupplier.DEFAULT_PAINT_SEQUENCE;
 		Shape[] shapes = DefaultDrawingSupplier.DEFAULT_SHAPE_SEQUENCE;

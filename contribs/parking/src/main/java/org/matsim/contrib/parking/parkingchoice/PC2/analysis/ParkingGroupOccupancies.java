@@ -25,7 +25,7 @@ import java.util.HashMap;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
-import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
@@ -96,7 +96,7 @@ public abstract class ParkingGroupOccupancies implements BasicEventHandler {
 	public void savePlot(String fileName) {
 		final JFreeChart chart = LineChart.createChart(xySeriesCollection, "Parking Group Occupancies");
 		try {
-			ChartUtilities.saveChartAsPNG(new File(fileName), chart,  800, 600, null, true, 9);
+			ChartUtils.saveChartAsPNG(new File(fileName), chart,  800, 600, null, true, 9);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
