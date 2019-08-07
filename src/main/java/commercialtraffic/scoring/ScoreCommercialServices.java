@@ -81,13 +81,13 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
         for (Plan plan : plans) {
             plan.getPlanElements().stream().filter(Activity.class::isInstance).forEach(pe -> {
                 Activity activity = (Activity) pe;
-                if (activity.getAttributes().getAsMap().containsKey(PersonDelivery.DELIVERY_TYPE)) {
-                    ExpectedDelivery expectedDelivery = new ExpectedDelivery((String) activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_TYPE)
+                if (activity.getAttributes().getAsMap().containsKey(PersonDelivery.JOB_TYPE)) {
+                    ExpectedDelivery expectedDelivery = new ExpectedDelivery((String) activity.getAttributes().getAttribute(PersonDelivery.JOB_TYPE)
                             , PersonDelivery.getCarrierId(activity)
                             , plan.getPerson().getId()
-                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_DURATION)))
-                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_TIME_START)))
-                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_TIME_END))));
+                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.JOB_DURATION)))
+                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.JOB_EARLIEST_START)))
+                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.JOB_TIME_END))));
                     Set<ExpectedDelivery> set = currentExpectedDeliveriesPerLink.getOrDefault(activity.getLinkId(), new HashSet<>());
                     set.add(expectedDelivery);
                     currentExpectedDeliveriesPerLink.put(activity.getLinkId(), set);

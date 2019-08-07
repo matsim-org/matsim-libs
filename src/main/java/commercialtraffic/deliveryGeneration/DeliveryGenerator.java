@@ -131,7 +131,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
         {
             Set<PlanElement> activitiesWithServices = new HashSet<>(p.getSelectedPlan().getPlanElements().stream()
                     .filter(Activity.class::isInstance)
-                    .filter(a -> a.getAttributes().getAsMap().containsKey(PersonDelivery.DELIVERY_TYPE))
+                    .filter(a -> a.getAttributes().getAsMap().containsKey(PersonDelivery.JOB_TYPE))
                     .collect(Collectors.toSet()));
             person2ActsWithServices.put(p,activitiesWithServices);
         });
@@ -140,9 +140,9 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
             for (PlanElement pe : person2ActsWithServices.get(personWithDelivieries)) {
                 Activity activity = (Activity) pe;
                 CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(createCarrierServiceIdXForCustomer(personWithDelivieries,i), activity.getLinkId());
-                serviceBuilder.setCapacityDemand(Integer.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_SIZE))));
-                serviceBuilder.setServiceDuration(Integer.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_DURATION))));
-                serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_TIME_START))), Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_TIME_END)))));
+                serviceBuilder.setCapacityDemand(Integer.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.JOB_SIZE))));
+                serviceBuilder.setServiceDuration(Integer.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.JOB_DURATION))));
+                serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.JOB_EARLIEST_START))), Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.JOB_TIME_END)))));
                 i++;
                 Id<Carrier> carrierId = PersonDelivery.getCarrierId(activity);
                 if (hullcarriers.getCarriers().containsKey(carrierId)) {
@@ -176,7 +176,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
         netBuilder.setTimeSliceWidth(900); // !!!! otherwise it will not do anything.
         netBuilder.setTravelTime(carTT);
         final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
-        hullcarriers.getCarriers().values().stream().forEach(carrier -> {
+        hullcarriers.getCarriers().values().parallelStream().forEach(carrier -> {
                     //Build VRP
                     VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork());
                     //            vrpBuilder.setRoutingCost(netBasedCosts);

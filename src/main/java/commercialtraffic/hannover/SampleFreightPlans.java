@@ -51,15 +51,15 @@ public class SampleFreightPlans {
             if (PersonDelivery.planExpectsDeliveries(person.getSelectedPlan())) {
                 person.getSelectedPlan().getPlanElements().stream()
                         .filter(Activity.class::isInstance)
-                        .filter(planElement -> planElement.getAttributes().getAsMap().containsKey(PersonDelivery.DELIVERY_TYPE))
+                        .filter(planElement -> planElement.getAttributes().getAsMap().containsKey(PersonDelivery.JOB_TYPE))
                         .forEach(a -> {
-                            a.getAttributes().putAttribute(PersonDelivery.SERVICE_OPERATOR, operators.get(random.nextInt(operators.size())));
-                            a.getAttributes().putAttribute(PersonDelivery.DELIVERY_DURATION, "180");
-                            Double timeWindowStart = Double.valueOf(String.valueOf(a.getAttributes().getAttribute(PersonDelivery.DELIVERY_TIME_START)));
-                            Double timeWindowEnd = Double.valueOf(String.valueOf(a.getAttributes().getAttribute(PersonDelivery.DELIVERY_TIME_END)));
+                            a.getAttributes().putAttribute(PersonDelivery.JOB_OPERATOR, operators.get(random.nextInt(operators.size())));
+                            a.getAttributes().putAttribute(PersonDelivery.JOB_DURATION, "180");
+                            Double timeWindowStart = Double.valueOf(String.valueOf(a.getAttributes().getAttribute(PersonDelivery.JOB_EARLIEST_START)));
+                            Double timeWindowEnd = Double.valueOf(String.valueOf(a.getAttributes().getAttribute(PersonDelivery.JOB_TIME_END)));
                             if (timeWindowEnd <= timeWindowStart) {
                                 timeWindowEnd = timeWindowStart + 1800;
-                                a.getAttributes().putAttribute(PersonDelivery.DELIVERY_TIME_END, timeWindowEnd);
+                                a.getAttributes().putAttribute(PersonDelivery.JOB_TIME_END, timeWindowEnd);
                             }
                         });
 //                spw.run(person); //samples only agents with activities

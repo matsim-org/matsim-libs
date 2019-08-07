@@ -37,26 +37,27 @@ import java.util.stream.Collectors;
 
 public class PersonDelivery {
 
-    public static final String DELIVERY_SIZE = "deliveryAmount";
-    public static final String DELIVERY_TYPE = "deliveryType";
-    public static final String DELIVERY_DURATION = "deliveryDuration";
-    public static final String DELIVERY_TIME_START = "deliveryTimeStart";
-    public static final String SERVICE_OPERATOR = "operator";
-    public static final String DELIVERY_TIME_END = "deliveryTimeEnd";
+    public static final String JOB_SIZE = "jobAmount";
+    public static final String JOB_TYPE = "jobType";
+    public static final String JOB_DURATION = "jobDuration";
+    public static final String JOB_EARLIEST_START = "jobTimeStart";
+    public static final String JOB_OPERATOR = "operator";
+    public static final String JOB_TIME_END = "jobTimeEnd";
+    public static final String JOB_ID = "jobId";
 
     public static final String CARRIERSPLIT = "_";
 
 
     public static Id<Carrier> getCarrierId(Activity activity) {
-        return Id.create(activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_TYPE).toString() + CARRIERSPLIT + activity.getAttributes().getAttribute(PersonDelivery.SERVICE_OPERATOR).toString(), Carrier.class);
+        return Id.create(activity.getAttributes().getAttribute(PersonDelivery.JOB_TYPE).toString() + CARRIERSPLIT + activity.getAttributes().getAttribute(PersonDelivery.JOB_OPERATOR).toString(), Carrier.class);
     }
 
     public static String getServiceOperator(Activity activity) {
-        return activity.getAttributes().getAttribute(SERVICE_OPERATOR).toString();
+        return activity.getAttributes().getAttribute(JOB_OPERATOR).toString();
     }
 
     public static void setServiceOperator(Activity activity, String operator) {
-        activity.getAttributes().putAttribute(SERVICE_OPERATOR, operator);
+        activity.getAttributes().putAttribute(JOB_OPERATOR, operator);
     }
 
     public static void setServiceOperatorAndDeliveryType(Activity activity, Id<Carrier> carrierId) {
@@ -69,11 +70,11 @@ public class PersonDelivery {
 
 
     public static String getDeliveryType(Activity activity) {
-        return (String) activity.getAttributes().getAttribute(DELIVERY_TYPE);
+        return (String) activity.getAttributes().getAttribute(JOB_TYPE);
     }
 
     public static void setDeliveryType(Activity activity, String operator) {
-        activity.getAttributes().putAttribute(DELIVERY_TYPE, operator);
+        activity.getAttributes().putAttribute(JOB_TYPE, operator);
     }
 
     public static Set<Id<Carrier>> getOperatorsForDeliveryType(Carriers carriers, String deliveryType) {
@@ -91,7 +92,7 @@ public class PersonDelivery {
     public static boolean planExpectsDeliveries(Plan plan) {
         return plan.getPlanElements().stream()
                 .filter(Activity.class::isInstance)
-                .anyMatch(planElement -> planElement.getAttributes().getAsMap().containsKey(DELIVERY_TYPE));
+                .anyMatch(planElement -> planElement.getAttributes().getAsMap().containsKey(JOB_TYPE));
     }
 
     public static String getCarrierMarket(Id<Carrier> carrierId) {
