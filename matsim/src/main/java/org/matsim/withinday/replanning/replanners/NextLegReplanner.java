@@ -71,10 +71,8 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 		
 		String mainMode = this.tripRouter.getMainModeIdentifier().identifyMainMode(trip.getTripElements());
 		double departureTime = TripStructureUtils.getDepartureTime(trip);
-//		new EditTrips( this.tripRouter, scenario, internalInterface ).replanFutureTrip(trip, executedPlan, mainMode, departureTime );
-		if ( true ) {
-			throw new RuntimeException( Gbl.NOT_IMPLEMENTED ) ;
-		}
+		// To replan pt legs, we would need internalInterface of type InternalInterface.class
+		new EditTrips( this.tripRouter, scenario, null ).replanFutureTrip(trip, executedPlan, mainMode, departureTime );
 		
 		return true;
 	}

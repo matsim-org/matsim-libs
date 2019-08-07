@@ -93,18 +93,24 @@ public final class EditTrips {
 //<logger name="org.matsim.withinday.utils.EditTrips">
 //	<level value="info"/>
 //</logger>
+		//  We need InternalInterface to move waiting passengers from a transit stop to the next leg if replanning tells them not to board a bus there.
+		if (internalInterface == null) {
+			log.warn("InternalInterface is null. Replanning of pt/transit legs will not work properly and will likely fail.");
+		} else {
+			this.eventsManager = internalInterface.getMobsim().getEventsManager();
+			for (AgentTracker tracker : (internalInterface.getMobsim().getAgentTrackers())) {
+				if (tracker instanceof TransitStopAgentTracker) {
+					transitAgentTracker = (TransitStopAgentTracker) tracker;
+					break;
+				}
+			}
+		}
+		
 		this.tripRouter = tripRouter;
 		this.scenario = scenario;
 		this.pf = scenario.getPopulation().getFactory() ;
 		this.internalInterface = internalInterface;
-		this.eventsManager = internalInterface.getMobsim().getEventsManager();
 
-		for (AgentTracker tracker : (internalInterface.getMobsim().getAgentTrackers())) {
-			if (tracker instanceof TransitStopAgentTracker) {
-				transitAgentTracker = (TransitStopAgentTracker) tracker;
-				break;
-			}
-		}
 		if (transitAgentTracker == null) {
 			log.warn("no TransitStopAgentTracker found in qsim. Replanning of pt/transit legs will not work properly and will likely fail.");
 		}
