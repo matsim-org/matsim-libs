@@ -25,27 +25,43 @@ import commercialtraffic.integration.CommercialTrafficConfigGroup;
 import commercialtraffic.integration.CommercialTrafficModule;
 import commercialtraffic.replanning.ChangeDeliveryServiceOperator;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 
+import java.util.HashMap;
+
 import static org.matsim.core.config.ConfigUtils.createConfig;
 import static org.matsim.core.scenario.ScenarioUtils.loadScenario;
 
-public class RunCommercialTraffic {
+public class RunCommercialTrafficUsingDRT {
     public static void main(String[] args) {
 
         String inputDir = "input/commercialtrafficIt/";
 
-        Config config = createConfig();
+        DrtConfigGroup drtCfg = new DrtConfigGroup();
+        drtCfg.setMaxWaitTime(30*60);
+        drtCfg.setMaxTravelTimeAlpha(2);
+        drtCfg.setMaxTravelTimeBeta(15);
+        drtCfg.setStopDuration(60);
+        drtCfg.setVehiclesFile(inputDir + "drtVehicles.xml");
+
         CommercialTrafficConfigGroup commercialTrafficConfigGroup = new CommercialTrafficConfigGroup();
         commercialTrafficConfigGroup.setCarriersFile(inputDir + "test-carriers.xml");
         commercialTrafficConfigGroup.setCarriersVehicleTypesFile(inputDir + "carriertypes.xml");
         commercialTrafficConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
-        config.addModule(commercialTrafficConfigGroup);
+
+        Config config = createConfig(drtCfg, new DvrpConfigGroup(), commercialTrafficConfigGroup);
+
+        config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
+
         StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
         changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
         changeExpBeta.setWeight(0.5);
@@ -55,6 +71,9 @@ public class RunCommercialTraffic {
         changeServiceOperator.setStrategyName(ChangeDeliveryServiceOperator.SELECTOR_NAME);
         changeServiceOperator.setWeight(0.5);
         config.strategy().addStrategySettings(changeServiceOperator);
+
+
+
 
         config.strategy().setFractionOfIterationsToDisableInnovation(.8);
         PlanCalcScoreConfigGroup.ActivityParams home = new PlanCalcScoreConfigGroup.ActivityParams("home");
@@ -71,9 +90,9 @@ public class RunCommercialTraffic {
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         config.network().setInputFile(inputDir + "grid_network.xml");
         config.plans().setInputFile(inputDir + "testpop.xml");
-        Scenario scenario = loadScenario(config);
 
-        Controler controler = new Controler(scenario);
+        Controler controler = DrtControlerCreator.createControlerWithSingleModeDrt(config,false);
+
 
         controler.addOverridingModule(new CommercialTrafficModule());
 

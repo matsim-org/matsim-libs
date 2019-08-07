@@ -74,7 +74,9 @@ public class CommercialTrafficModule extends AbstractModule {
         bind(TourLengthAnalyzer.class).asEagerSingleton();
 
         if(this.carrierTransportModes.isEmpty()){
-            bind(CarrierMode.class).toInstance(carrierId -> TransportMode.car);
+//            bind(CarrierMode.class).toInstance(carrierId -> TransportMode.car);
+            bind(CarrierMode.class).toInstance(carrierId -> TransportMode.drt);
+
         } else {
             bind(CarrierMode.class).toInstance(carrierId -> carrierTransportModes.get(carrierId));
         }
@@ -96,4 +98,8 @@ public class CommercialTrafficModule extends AbstractModule {
         });
 
     }
+
+
+    private void installDRT(){}
+
 }
