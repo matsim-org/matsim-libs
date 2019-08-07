@@ -124,19 +124,19 @@ public class RunExperiencedTripsAnalysis {
 
         Set<Id<Link>> monitoredStartAndEndLinks = new HashSet<>();
 
-        DrtPtTripEventHandler eventHandler = new DrtPtTripEventHandler(scenario.getNetwork(), scenario.getTransitSchedule(),
-                monitoredModes, monitoredStartAndEndLinks);
-        events.addHandler(eventHandler);
-        new DrtEventsReader(events).readFile(runPrefix + "output_events.xml.gz");
-        System.out.println("Start writing trips of " + eventHandler.getPerson2ExperiencedTrips().size() + " agents.");
-        ExperiencedTripsWriter tripsWriter = new ExperiencedTripsWriter(runPrefix +
-                "experiencedTrips.csv",
-                eventHandler.getPerson2ExperiencedTrips(), monitoredModes, scenario.getNetwork(), relevantAgents, zoneMap);
-        tripsWriter.writeExperiencedTrips();
-        ExperiencedTripsWriter legsWriter = new ExperiencedTripsWriter(runPrefix +
-                "experiencedLegs.csv",
-                eventHandler.getPerson2ExperiencedTrips(), monitoredModes, scenario.getNetwork(), relevantAgents, zoneMap);
-        legsWriter.writeExperiencedLegs();
+//        DrtPtTripEventHandler eventHandler = new DrtPtTripEventHandler(scenario.getNetwork(), scenario.getTransitSchedule(),
+//                monitoredModes, monitoredStartAndEndLinks);
+//        events.addHandler(eventHandler);
+//        new DrtEventsReader(events).readFile(runPrefix + "output_events.xml.gz");
+//        System.out.println("Start writing trips of " + eventHandler.getPerson2ExperiencedTrips().size() + " agents.");
+//        ExperiencedTripsWriter tripsWriter = new ExperiencedTripsWriter(runPrefix +
+//                "experiencedTrips.csv",
+//                eventHandler.getPerson2ExperiencedTrips(), monitoredModes, scenario.getNetwork(), relevantAgents, zoneMap);
+//        tripsWriter.writeExperiencedTrips();
+//        ExperiencedTripsWriter legsWriter = new ExperiencedTripsWriter(runPrefix +
+//                "experiencedLegs.csv",
+//                eventHandler.getPerson2ExperiencedTrips(), monitoredModes, scenario.getNetwork(), relevantAgents, zoneMap);
+//        legsWriter.writeExperiencedLegs();
     }
 
     public static void readShape(String shapeFile, String featureKeyInShapeFile) {
