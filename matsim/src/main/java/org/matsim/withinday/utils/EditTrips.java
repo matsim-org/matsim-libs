@@ -424,12 +424,27 @@ public final class EditTrips {
 			 * PopulationUtils.decideOnActivityEndTime() does not take into account that the agent might be on a PlanElement
 			 * before the activity and assumes instead that the agent starts the activity at the time passed as parameter and
 			 * calculates a suitable activity end time based on that start time. This is not useful here :-(
-			 * For now hope that the end time of the previous activity was updated when the agent departed for the leg and use 
-			 * that (leg departure time exists as variable but is -Infinity...). - gl jul'19 
+			 * The end time of the previous activity is not updated when the agent departs for the leg.
+			 * Leg departure time exists as variable but is -Infinity.... 
+			 * So we have no clear and reliable information when the agent will finish its teleport leg.
+			 * Do some estimation and hope for a TODO better solution in the future :-(
+			 * - gl jul'19 
 			 */
 			//			double departureTime = PopulationUtils.decideOnActivityEndTime( nextAct, now, scenario.getConfig() );
 			Activity previousActivity = (Activity) plan.getPlanElements().get(currPosPlanElements - 1);
-			double departureTime = previousActivity.getEndTime() + currentLeg.getTravelTime();
+			// We don't know where the agent is located on its teleport leg and when it will arrive. Let's assume the agent is 
+			// located half way between origin and destination of the teleport leg.
+			double departureTime = now + 0.5 * currentLeg.getTravelTime();
+			// Check whether looking into previousActivity.getEndTime() gives plausible estimation results (potentially more precise)
+			// Not clear whether this is more precise than using now. If agents end their activities on time it is, otherwise unclear.
+			if (Double.isFinite(previousActivity.getEndTime()) && previousActivity.getEndTime() < now) {
+				// the last activity has a planned end time defined, hope that the end time is close to the real end time:
+				double departureTimeAccordingToPlannedActivityEnd = previousActivity.getEndTime() + currentLeg.getTravelTime();
+				// plausibility check: The agent can only arrive after the current time
+				if (departureTimeAccordingToPlannedActivityEnd > now) {
+					departureTime = departureTimeAccordingToPlannedActivityEnd;
+				}
+			}
 			final List<? extends PlanElement> newTrip = tripRouter.calcRoute(routingMode, fromFacility, toFacility, departureTime, plan.getPerson() );
 			TripRouter.insertTrip(plan, nextAct, newTrip, trip.getDestinationActivity() ) ;
 		} else {
