@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -45,7 +44,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.AgentTracker;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
@@ -70,8 +68,6 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.withinday.events.ReplanningEvent;
-
-import static org.matsim.core.population.PopulationUtils.createLeg;
 
 /**
  * The methods here should modify trips, i.e. material between two non-stage-activities.
@@ -279,16 +275,45 @@ public final class EditTrips {
 			log.debug( "agent with ID=" + agent.getId() + " is waiting at a stop=" + currentOrNextStop ) ;
 			newTripElements = newTripToNewActivity(currentOrNextStop, newAct, routingMode, now, person );
 			Gbl.assertIf( newTripElements.get(0) instanceof Leg ); // that is what TripRouter should do.  kai, jul'19
-			if (	 ((Leg) newTripElements.get(0)).getRoute() instanceof ExperimentalTransitRoute
-					&& ((ExperimentalTransitRoute) ((Leg) newTripElements.get(0)).getRoute()).getAccessStopId().equals(currentOrNextStop.getId())) {
-				log.debug( "agent with ID=" + agent.getId() + " will wait for vehicle departing at the same stop facility." ) ;
-				// don't remove the agent from the stop tracker
-			} else {
-				log.debug("agent with ID=" + agent.getId() + " will leave the stop facility.") ;
+			
+			wantsToLeaveStop = true ;
+			if (newTripElements.size() >= 2) {
+				// check if the agent has a useless teleport leg from a transit stop to the very same stop
+				Leg newPtLeg = (Leg) newTripElements.get(2);
+				if (newPtLeg.getRoute() instanceof ExperimentalTransitRoute) {
+					ExperimentalTransitRoute newPtRoute = (ExperimentalTransitRoute) newPtLeg.getRoute();
+					if (newPtRoute.getAccessStopId().equals(currentOrNextStop.getId())) {
+						// the agent will stay at the same stop where the agent is already waiting
+						log.debug( "agent with ID=" + agent.getId() + " will wait for vehicle departing at the same stop facility." ) ;
+						// don't remove the agent from the stop tracker
+						currentLeg.setRoute(new ExperimentalTransitRoute(
+								scenario.getTransitSchedule().getFacilities().get(oldPtRoute.getAccessStopId()),
+								scenario.getTransitSchedule().getFacilities().get(newPtRoute.getEgressStopId()),
+								newPtRoute.getLineId(), newPtRoute.getRouteId()));
+						// There is an access_walk leg in the new trip (router assumes the trip begins
+						// here) so we should remove the access_walk leg and the pt interaction
+						// element 0 is the useless walk from the stop to the same stop
+						// element 1 is a pt interaction between the walk and the first pt leg
+						// element 2 is the first pt leg, which we don't need because we updated the
+						// current pt leg
+						// so remove elements 0, 1 and 2, i.e. remove first element 3 times (index is moving)
+						newTripElements.remove(0);
+						newTripElements.remove(0);
+						newTripElements.remove(0);
+						wantsToLeaveStop = false;
+						WithinDayAgentUtils.resetCaches(agent);
+					}
+				}
+			}
+			
+			// in all other cases leave the stop
+			if (wantsToLeaveStop) {
 				// The agent will not board any bus at the transit stop and will walk away or
 				// do something else. We have to remove him from the list of waiting agents.
-				wantsToLeaveStop = true ;
+				log.debug("agent with ID=" + agent.getId() + " will leave the stop facility.") ;
+				newTripElements = defaultMergeOldAndNewCurrentPtLeg(currentLeg, newTripElements, agent, currentOrNextStop, oldPtRoute);
 			}
+
 		} else {
 			log.debug( "agent with ID=" + agent.getId() + " is on a vehicle" );
 			// agent is asked whether she intends to leave at each stop, so no need to tell
@@ -317,6 +342,46 @@ public final class EditTrips {
 			log.debug( "agent with ID=" + agent.getId() + " is re-routed from next stop " + currentOrNextStop.getId() + " scheduled arrival at " + reRoutingTime);
 			newTripElements = newTripToNewActivity(currentOrNextStop, newAct, routingMode, reRoutingTime, person );
 			// yyyy as discussed elswhere, would make more sense to compute this once arrived at that stop.
+			
+			boolean agentStaysOnSameVehicle = false;
+			if (newTripElements.size() >= 2) {
+				// check if the agent has a useless teleport leg from a transit stop to the very same stop
+				Leg firstPtLeg = (Leg) newTripElements.get(2);
+				if (firstPtLeg.getRoute() instanceof ExperimentalTransitRoute) {
+					ExperimentalTransitRoute newPtRoute = (ExperimentalTransitRoute) firstPtLeg.getRoute();
+					if (newPtRoute.getAccessStopId().equals(currentOrNextStop.getId())) {
+						// the agent will take a pt vehicle from the stop where the bus will arrive next
+						if (oldPtRoute.getLineId().equals(newPtRoute.getLineId())
+								&& (oldPtRoute.getRouteId().equals(newPtRoute.getRouteId())
+										|| transitRouteLaterStopsAt(oldPtRoute.getLineId(), oldPtRoute.getRouteId(),
+												currentOrNextStop.getId(), newPtRoute.getEgressStopId()))) {
+							// Same TransitRoute or other TransitRoute which also serves the new egress stop
+							// -> Agent can stay on the same vehicle
+							currentLeg.setRoute(new ExperimentalTransitRoute(
+									scenario.getTransitSchedule().getFacilities().get(oldPtRoute.getAccessStopId()),
+									scenario.getTransitSchedule().getFacilities().get(newPtRoute.getEgressStopId()),
+									oldPtRoute.getLineId(), oldPtRoute.getRouteId()));
+							// There is an access_walk leg in the new trip (router assumes the trip begins
+							// here) so we should remove the access_walk leg and the pt interaction
+							// element 0 is the useless walk from the stop to the same stop
+							// element 1 is a pt interaction between the walk and the first pt leg
+							// element 2 is the first pt leg, which we don't need because we updated the
+							// current pt leg
+							// so remove elements 0, 1 and 2, i.e. remove first element 3 times (index is moving)
+							newTripElements.remove(0);
+							newTripElements.remove(0);
+							newTripElements.remove(0);
+							WithinDayAgentUtils.resetCaches(agent);
+							agentStaysOnSameVehicle = true;
+						}
+					}
+				}
+			}
+			
+			// in all other cases disembark at next stop
+			if (!agentStaysOnSameVehicle) {
+				newTripElements = defaultMergeOldAndNewCurrentPtLeg(currentLeg, newTripElements, agent, currentOrNextStop, oldPtRoute);
+			}
 		}
 
 		log.debug("") ;
@@ -325,15 +390,6 @@ public final class EditTrips {
 			log.debug(planElement) ;
 		}
 		log.debug("") ;
-
-		//??????????
-		// (2) prune the new trip up to the current leg: -> for pt better as one step together with mergeOldAndNewCurrentPtLeg
-//		pruneUpToCurrentLeg(currentLeg, newTripElements);
-
-		// (2) prune the new trip up to the current leg and modify current route, return additional PlanElements if necessary for merging:
-		newTripElements = mergeOldAndNewCurrentPtLeg(currentLeg, newTripElements, agent, currentOrNextStop);
-		// yyyyyy I would do the different infill in the case differentiation above (and not try to autosense
-		// which case we have inside mergeOldAndNewCurrentPtLeg). See fix-edittrips branch.  kai, jul'19
 
 		// (3) remove remainder of old trip after current leg in plan:
 		int pos = WithinDayAgentUtils.getCurrentPlanElementIndex(agent) + 1 ;
@@ -560,84 +616,36 @@ public final class EditTrips {
 		WithinDayAgentUtils.resetCaches(agent);
 	}
 
-	private List<PlanElement> mergeOldAndNewCurrentPtLeg(Leg currentLeg, List<? extends PlanElement> newTrip,
-			MobsimAgent agent, TransitStopFacility nextStop) {
+	private List<PlanElement> defaultMergeOldAndNewCurrentPtLeg(Leg currentLeg, List<? extends PlanElement> newTrip,
+			MobsimAgent agent, TransitStopFacility nextStop, ExperimentalTransitRoute oldPtRoute) {
 		Leg newCurrentLeg = (Leg) newTrip.get(0);
-		Gbl.assertNotNull(newCurrentLeg);
 
 		List<PlanElement> newPlanElementsAfterMerge = new ArrayList<>();
 
-		// prune remaining route from current route:
-		ExperimentalTransitRoute oldPtRoute = (ExperimentalTransitRoute) currentLeg.getRoute();
-
+		// obviuosly pt routers always return first a walk leg to the transit stop, even if ask for a route from a transit stop
+		// to some place and the router wants to board a bus at that very same transit stop, the router will add a walk leg
+		// from that transit stop location to that very same transit stop.
 		if (newCurrentLeg.getRoute() instanceof ExperimentalTransitRoute) {
-			// not sure whether this can actually happen
-			log.debug("new trip PlanElement 0 is a pt leg " + newTrip);
-			ExperimentalTransitRoute nextPtRoute = (ExperimentalTransitRoute) newCurrentLeg.getRoute();
-			if (oldPtRoute.getLineId().equals(nextPtRoute.getLineId())) {
-				if (oldPtRoute.getRouteId().equals(nextPtRoute.getRouteId())
-						|| transitRouteLaterStopsAt(oldPtRoute.getLineId(), oldPtRoute.getRouteId(), nextStop.getId(),
-								nextPtRoute.getEgressStopId())) {
-					// Same TransitRoute or other TransitRoute which also serves the new egress stop
-					// -> case 1: Agent can stay on the same vehicle
-					currentLeg.setRoute(new ExperimentalTransitRoute(
-							scenario.getTransitSchedule().getFacilities().get(oldPtRoute.getAccessStopId()),
-							scenario.getTransitSchedule().getFacilities().get(nextPtRoute.getEgressStopId()),
-							oldPtRoute.getLineId(), oldPtRoute.getRouteId()));
-					// Is there an access_walk leg in the new trip (router assumes the trip begins
-					// here) ? If yes, we should remove the access_walk leg and the pt interaction
-					// (by not copying it into newPlanElementsAfterMerge).
-					for (int ijk = 0; ijk < newTrip.size(); ijk++) {
-						newPlanElementsAfterMerge.add(newPlanElementsAfterMerge.size(), newTrip.get(ijk));
-					}
-					WithinDayAgentUtils.resetCaches(agent);
-					return newPlanElementsAfterMerge;
-				}
-			}
-			// if different TransitRoute that does not serve desired egress stop
-			// -> case 2: Agent shall disembark at the next stop
-			currentLeg.setRoute(new ExperimentalTransitRoute(
-					scenario.getTransitSchedule().getFacilities().get(oldPtRoute.getAccessStopId()), nextStop,
-					oldPtRoute.getLineId(), oldPtRoute.getRouteId()));
-			// add pt interaction activities. transfer walk
-			Activity act = PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE,
-					nextStop.getCoord(), nextStop.getLinkId());
-			act.setMaximumDuration(0.0);
-			newPlanElementsAfterMerge.add(act);
-			// new currentLeg is otherwise not added (but replaced by the modified old
-			// currentLeg)
-			if (newCurrentLeg.getMode().equals(TransportMode.non_network_walk )) {
-				// The router did not know that we come from a pt leg, but walking to another
-				// TransitStopFacility should be a transit_walk and not an access_walk
-				newCurrentLeg.setMode(TransportMode.transit_walk);
-			}
-			for (int ijk = 0; ijk < newTrip.size(); ijk++) {
-				newPlanElementsAfterMerge.add(newPlanElementsAfterMerge.size(), newTrip.get(ijk));
-			}
-			WithinDayAgentUtils.resetCaches(agent);
-			return newPlanElementsAfterMerge;
-		} else {
-			log.debug("new trip PlanElement 0 is not a pt leg (= walk/bike or similar) " + newTrip);
-			// -> Agent shall disembark at the next stop, then use another mode
-			currentLeg.setRoute(new ExperimentalTransitRoute(
-					scenario.getTransitSchedule().getFacilities().get(oldPtRoute.getAccessStopId()), nextStop,
-					oldPtRoute.getLineId(), oldPtRoute.getRouteId()));
-			// add pt interaction activities. transfer walk?
-			Activity act = PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE,
-					nextStop.getCoord(), nextStop.getLinkId());
-			act.setMaximumDuration(0.0);
-			newPlanElementsAfterMerge.add(act);
-			// it is not clear which mode a walk leg should have here in between two modes
+			throw new RuntimeException(Gbl.NOT_IMPLEMENTED);
+		}		
 
-			// TODO infill leg from pt stop to start of other mode necessary? Or automatically produced while routing new mode from pt stop facility?
+		// prune remaining route from current route:
+		currentLeg.setRoute(new ExperimentalTransitRoute(
+				scenario.getTransitSchedule().getFacilities().get(oldPtRoute.getAccessStopId()), nextStop,
+				oldPtRoute.getLineId(), oldPtRoute.getRouteId()));
+		// add pt interaction activity
+		Activity act = PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE,
+				nextStop.getCoord(), nextStop.getLinkId());
+		act.setMaximumDuration(0.0);
+		newPlanElementsAfterMerge.add(act);
+		// an infill leg from pt stop to start of other mode necessary seems to be
+		// automatically produced while routing new mode from pt stop facility, so we don't have to add one
 
-
-			for (int ijk = 0; ijk < newTrip.size(); ijk++) {
-				newPlanElementsAfterMerge.add(newPlanElementsAfterMerge.size(), newTrip.get(ijk));
-			}
-			WithinDayAgentUtils.resetCaches(agent);
-			return newPlanElementsAfterMerge;
+		for (int ijk = 0; ijk < newTrip.size(); ijk++) {
+			newPlanElementsAfterMerge.add(newPlanElementsAfterMerge.size(), newTrip.get(ijk));
 		}
+		WithinDayAgentUtils.resetCaches(agent);
+		return newPlanElementsAfterMerge;
 	}
 
 	private boolean transitRouteLaterStopsAt(Id<TransitLine> lineId, Id<TransitRoute> routeId,
