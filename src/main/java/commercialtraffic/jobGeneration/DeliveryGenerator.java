@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package commercialtraffic.deliveryGeneration;/*
+package commercialtraffic.jobGeneration;/*
  * created by jbischoff, 11.04.2019
  */
 
@@ -131,7 +131,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
         {
             Set<PlanElement> activitiesWithServices = new HashSet<>(p.getSelectedPlan().getPlanElements().stream()
                     .filter(Activity.class::isInstance)
-                    .filter(a -> a.getAttributes().getAsMap().containsKey(PersonDelivery.JOB_TYPE))
+                    .filter(a -> a.getAttributes().getAsMap().containsKey(CommercialJobUtils.JOB_TYPE))
                     .collect(Collectors.toSet()));
             person2ActsWithServices.put(p,activitiesWithServices);
         });
@@ -140,11 +140,11 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
             for (PlanElement pe : person2ActsWithServices.get(personWithDelivieries)) {
                 Activity activity = (Activity) pe;
                 CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(createCarrierServiceIdXForCustomer(personWithDelivieries,i), activity.getLinkId());
-                serviceBuilder.setCapacityDemand(Integer.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.JOB_SIZE))));
-                serviceBuilder.setServiceDuration(Integer.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.JOB_DURATION))));
-                serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.JOB_EARLIEST_START))), Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.JOB_TIME_END)))));
+                serviceBuilder.setCapacityDemand(Integer.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_SIZE))));
+                serviceBuilder.setServiceDuration(Integer.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_DURATION))));
+                serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_EARLIEST_START))), Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_TIME_END)))));
                 i++;
-                Id<Carrier> carrierId = PersonDelivery.getCarrierId(activity);
+                Id<Carrier> carrierId = CommercialJobUtils.getCarrierId(activity);
                 if (hullcarriers.getCarriers().containsKey(carrierId)) {
                     Carrier carrier = hullcarriers.getCarriers().get(carrierId);
                     carrier.getServices().add(serviceBuilder.build());
@@ -157,16 +157,16 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
     }
 
     private static  Id<CarrierService> createCarrierServiceIdXForCustomer(Person customer, int x){
-        return Id.create(customer.getId().toString() + PersonDelivery.CARRIERSPLIT + x, CarrierService.class);
+        return Id.create(customer.getId().toString() + CommercialJobUtils.CARRIERSPLIT + x, CarrierService.class);
     }
 
     private static String createDeliveryActTypeFromServiceId(Id<CarrierService> id) {
         String idStr = id.toString();
-        return FreightConstants.DELIVERY + PersonDelivery.CARRIERSPLIT + idStr.substring(0,idStr.lastIndexOf(PersonDelivery.CARRIERSPLIT));
+        return FreightConstants.DELIVERY + CommercialJobUtils.CARRIERSPLIT + idStr.substring(0,idStr.lastIndexOf(CommercialJobUtils.CARRIERSPLIT));
     }
 
     public static Id<Person> getCustomerIdFromDeliveryActivityType(String actType){
-        return Id.createPersonId(actType.substring(actType.indexOf(PersonDelivery.CARRIERSPLIT)+1,actType.length()));
+        return Id.createPersonId(actType.substring(actType.indexOf(CommercialJobUtils.CARRIERSPLIT)+1,actType.length()));
     }
 
     private void buildTours() {

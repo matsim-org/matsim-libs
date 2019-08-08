@@ -23,7 +23,7 @@ package commercialtraffic.integration;/*
 
 import commercialtraffic.analysis.CommercialTrafficAnalysisListener;
 import commercialtraffic.analysis.TourLengthAnalyzer;
-import commercialtraffic.deliveryGeneration.DeliveryGenerator;
+import commercialtraffic.jobGeneration.DeliveryGenerator;
 import commercialtraffic.replanning.ChangeDeliveryServiceOperator;
 import commercialtraffic.scoring.DefaultCommercialServiceScore;
 import commercialtraffic.scoring.DeliveryScoreCalculator;

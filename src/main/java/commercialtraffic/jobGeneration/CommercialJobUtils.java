@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package commercialtraffic.deliveryGeneration;/*
+package commercialtraffic.jobGeneration;/*
  * created by jbischoff, 11.04.2019
  */
 
@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class PersonDelivery {
+public class CommercialJobUtils {
 
     public static final String JOB_SIZE = "jobAmount";
     public static final String JOB_TYPE = "jobType";
@@ -49,7 +49,7 @@ public class PersonDelivery {
 
 
     public static Id<Carrier> getCarrierId(Activity activity) {
-        return Id.create(activity.getAttributes().getAttribute(PersonDelivery.JOB_TYPE).toString() + CARRIERSPLIT + activity.getAttributes().getAttribute(PersonDelivery.JOB_OPERATOR).toString(), Carrier.class);
+        return Id.create(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_TYPE).toString() + CARRIERSPLIT + activity.getAttributes().getAttribute(CommercialJobUtils.JOB_OPERATOR).toString(), Carrier.class);
     }
 
     public static String getServiceOperator(Activity activity) {
@@ -92,7 +92,7 @@ public class PersonDelivery {
     public static boolean planExpectsDeliveries(Plan plan) {
         return plan.getPlanElements().stream()
                 .filter(Activity.class::isInstance)
-                .anyMatch(planElement -> planElement.getAttributes().getAsMap().containsKey(JOB_TYPE));
+                .anyMatch(planElement -> planElement.getAttributes().getAsMap().containsKey(JOB_ID));
     }
 
     public static String getCarrierMarket(Id<Carrier> carrierId) {

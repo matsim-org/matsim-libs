@@ -1,4 +1,4 @@
-package commercialtraffic.deliveryGeneration;
+package commercialtraffic.jobGeneration;
 
 import org.junit.Ignore;
 import org.matsim.api.core.v01.Coord;
@@ -79,12 +79,12 @@ public class DeliveryGeneratorTest {
         work.setLinkId(Id.createLinkId(259));
         work.setEndTime(16 * 3600);
 
-        work.getAttributes().putAttribute(PersonDelivery.JOB_TYPE, "pizza");
-        work.getAttributes().putAttribute(PersonDelivery.JOB_DURATION, 180);
-        work.getAttributes().putAttribute(PersonDelivery.JOB_EARLIEST_START, 12 * 3600);
-        work.getAttributes().putAttribute(PersonDelivery.JOB_TIME_END, 13 * 3600);
-        work.getAttributes().putAttribute(PersonDelivery.JOB_OPERATOR, 1);
-        work.getAttributes().putAttribute(PersonDelivery.JOB_SIZE, 1);
+        work.getAttributes().putAttribute(CommercialJobUtils.JOB_TYPE, "pizza");
+        work.getAttributes().putAttribute(CommercialJobUtils.JOB_DURATION, 180);
+        work.getAttributes().putAttribute(CommercialJobUtils.JOB_EARLIEST_START, 12 * 3600);
+        work.getAttributes().putAttribute(CommercialJobUtils.JOB_TIME_END, 13 * 3600);
+        work.getAttributes().putAttribute(CommercialJobUtils.JOB_OPERATOR, 1);
+        work.getAttributes().putAttribute(CommercialJobUtils.JOB_SIZE, 1);
 
         plan.addActivity(work);
 

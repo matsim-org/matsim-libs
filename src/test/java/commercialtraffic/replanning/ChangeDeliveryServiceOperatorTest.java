@@ -1,7 +1,7 @@
 package commercialtraffic.replanning;
 
-import commercialtraffic.deliveryGeneration.DeliveryGeneratorTest;
-import commercialtraffic.deliveryGeneration.PersonDelivery;
+import commercialtraffic.jobGeneration.DeliveryGeneratorTest;
+import commercialtraffic.jobGeneration.CommercialJobUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -25,12 +25,12 @@ public class ChangeDeliveryServiceOperatorTest {
         changeDeliveryServiceOperator.getPlanAlgoInstance().run(testPlan);
 
         Activity work = (Activity) testPlan.getPlanElements().get(2);
-        String op = PersonDelivery.getServiceOperator(work);
+        String op = CommercialJobUtils.getServiceOperator(work);
         Assert.assertEquals(op, "2");
 
         changeDeliveryServiceOperator.getPlanAlgoInstance().run(testPlan);
 
-        op = PersonDelivery.getServiceOperator(work);
+        op = CommercialJobUtils.getServiceOperator(work);
         Assert.assertEquals(op, "1");
 
     }
@@ -51,12 +51,12 @@ public class ChangeDeliveryServiceOperatorTest {
         work.setLinkId(Id.createLinkId(259));
         work.setEndTime(16 * 3600);
 
-        work.getAttributes().putAttribute(PersonDelivery.JOB_TYPE, "pizza");
-        work.getAttributes().putAttribute(PersonDelivery.JOB_DURATION, 180);
-        work.getAttributes().putAttribute(PersonDelivery.JOB_EARLIEST_START, 12 * 3600);
-        work.getAttributes().putAttribute(PersonDelivery.JOB_TIME_END, 13 * 3600);
-        work.getAttributes().putAttribute(PersonDelivery.JOB_OPERATOR, 1);
-        work.getAttributes().putAttribute(PersonDelivery.JOB_SIZE, 1);
+        work.getAttributes().putAttribute(CommercialJobUtils.JOB_TYPE, "pizza");
+        work.getAttributes().putAttribute(CommercialJobUtils.JOB_DURATION, 180);
+        work.getAttributes().putAttribute(CommercialJobUtils.JOB_EARLIEST_START, 12 * 3600);
+        work.getAttributes().putAttribute(CommercialJobUtils.JOB_TIME_END, 13 * 3600);
+        work.getAttributes().putAttribute(CommercialJobUtils.JOB_OPERATOR, 1);
+        work.getAttributes().putAttribute(CommercialJobUtils.JOB_SIZE, 1);
 
         plan.addActivity(work);
 

@@ -21,7 +21,7 @@ package commercialtraffic.hannover;/*
  * created by jbischoff, 20.06.2019
  */
 
-import commercialtraffic.deliveryGeneration.PersonDelivery;
+import commercialtraffic.jobGeneration.CommercialJobUtils;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -48,18 +48,18 @@ public class SampleFreightPlans {
         spw.startStreaming(outputFile);
         spr.addAlgorithm(person -> {
             PersonUtils.removeUnselectedPlans(person);
-            if (PersonDelivery.planExpectsDeliveries(person.getSelectedPlan())) {
+            if (CommercialJobUtils.planExpectsDeliveries(person.getSelectedPlan())) {
                 person.getSelectedPlan().getPlanElements().stream()
                         .filter(Activity.class::isInstance)
-                        .filter(planElement -> planElement.getAttributes().getAsMap().containsKey(PersonDelivery.JOB_TYPE))
+                        .filter(planElement -> planElement.getAttributes().getAsMap().containsKey(CommercialJobUtils.JOB_TYPE))
                         .forEach(a -> {
-                            a.getAttributes().putAttribute(PersonDelivery.JOB_OPERATOR, operators.get(random.nextInt(operators.size())));
-                            a.getAttributes().putAttribute(PersonDelivery.JOB_DURATION, "180");
-                            Double timeWindowStart = Double.valueOf(String.valueOf(a.getAttributes().getAttribute(PersonDelivery.JOB_EARLIEST_START)));
-                            Double timeWindowEnd = Double.valueOf(String.valueOf(a.getAttributes().getAttribute(PersonDelivery.JOB_TIME_END)));
+                            a.getAttributes().putAttribute(CommercialJobUtils.JOB_OPERATOR, operators.get(random.nextInt(operators.size())));
+                            a.getAttributes().putAttribute(CommercialJobUtils.JOB_DURATION, "180");
+                            Double timeWindowStart = Double.valueOf(String.valueOf(a.getAttributes().getAttribute(CommercialJobUtils.JOB_EARLIEST_START)));
+                            Double timeWindowEnd = Double.valueOf(String.valueOf(a.getAttributes().getAttribute(CommercialJobUtils.JOB_TIME_END)));
                             if (timeWindowEnd <= timeWindowStart) {
                                 timeWindowEnd = timeWindowStart + 1800;
-                                a.getAttributes().putAttribute(PersonDelivery.JOB_TIME_END, timeWindowEnd);
+                                a.getAttributes().putAttribute(CommercialJobUtils.JOB_TIME_END, timeWindowEnd);
                             }
                         });
 //                spw.run(person); //samples only agents with activities
