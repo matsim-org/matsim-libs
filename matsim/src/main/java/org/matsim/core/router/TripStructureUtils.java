@@ -108,13 +108,11 @@ public class TripStructureUtils {
 			final Plan plan,
 			final StageActivityTypes stageActivities) {
 		return getTrips(
-				plan.getPlanElements(),
-				stageActivities);
+				plan.getPlanElements());
 	}
 
 	public static List<Trip> getTrips(
-			final List<? extends PlanElement> planElements,
-			final StageActivityTypes stageActivities) {
+			final List<? extends PlanElement> planElements) {
 		final List<Trip> trips = new ArrayList<>();
 
 		int originActivityIndex = -1;
@@ -125,7 +123,7 @@ public class TripStructureUtils {
 			if ( !(pe instanceof Activity) ) continue;
 			final Activity act = (Activity) pe;
 
-			if (stageActivities.isStageActivity( act.getType() )) continue;
+			if (StageActivityTypeIdentifier.isStageActivity( act.getType() )) continue;
 			if ( currentIndex - originActivityIndex > 1 ) {
 				// which means, if I am understanding this right, that two activities without a leg in between will not be considered
 				// a trip.  
@@ -194,7 +192,7 @@ public class TripStructureUtils {
 
 		Id<?> destinationId = null;
 		final List<Id<?>> originIds = new ArrayList<>();
-		final List<Trip> trips = getTrips( planElements , stageActivityTypes );
+		final List<Trip> trips = getTrips( planElements );
 		final List<Trip> nonAllocatedTrips = new ArrayList<>( trips );
 		for (Trip trip : trips) {
             final Id<?> originId;
@@ -479,7 +477,7 @@ public class TripStructureUtils {
 		if ( currentPlanElement instanceof Activity ) {
 			Gbl.assertIf( stageActivities.isStageActivity( ((Activity)currentPlanElement).getType() ) ) ;
 		}
-		List<Trip> trips = getTrips(plan.getPlanElements(), stageActivities ) ;
+		List<Trip> trips = getTrips(plan.getPlanElements()) ;
 		for ( Trip trip : trips ) {
 			int index = trip.getTripElements().indexOf( currentPlanElement ) ;
 			if ( index != -1 ) {
@@ -490,7 +488,7 @@ public class TripStructureUtils {
 	}
 	public static Trip findTripEndingAtActivity(Activity activity, Plan plan, StageActivityTypes stageActivities ) {
 		Gbl.assertIf( ! stageActivities.isStageActivity( activity.getType()) ) ;
-		List<Trip> trips = getTrips(plan.getPlanElements(), stageActivities ) ;
+		List<Trip> trips = getTrips(plan.getPlanElements()) ;
 		for ( Trip trip : trips ) {
 			if ( activity.equals( trip.getDestinationActivity() ) ) {
 				return trip;
