@@ -59,14 +59,13 @@ public final class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme
 	 * @param tollFactor the implementation instance of toll factors.
 	 * @param scenario
 	 */
-	private RoadPricingSchemeUsingTollFactor( String pricingSchemeFileName, TollFactor tollFactor, Scenario scenario ) {
+	private RoadPricingSchemeUsingTollFactor(URL pricingSchemeFileName, TollFactor tollFactor, Scenario scenario ) {
 
 		// read the road pricing scheme from file
 		RoadPricingSchemeImpl scheme = RoadPricingUtils.createAndRegisterMutableScheme(scenario );
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
-		System.out.println(new File(pricingSchemeFileName).getAbsolutePath());
 		try {
-			rpReader.readFile(pricingSchemeFileName);
+			rpReader.readURL(pricingSchemeFileName);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -75,8 +74,8 @@ public final class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme
 
 	}
 
-	public static void createAndRegisterRoadPricingSchemeUsingTollFactor( String pricingSchemeFileName, TollFactor tollFactor,
-																	  Scenario scenario ){
+	public static void createAndRegisterRoadPricingSchemeUsingTollFactor(URL pricingSchemeFileName, TollFactor tollFactor,
+																																			 Scenario scenario ){
 		new RoadPricingSchemeUsingTollFactor( pricingSchemeFileName, tollFactor, scenario );
 		// yy todo: inline constructor. kai, jul'19
 	}
