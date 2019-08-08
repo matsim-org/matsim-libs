@@ -50,7 +50,7 @@ public class TourModeUnifierAlgorithmTest {
 		final Id<Link> anchorLink2 = Id.create( "anchor2" , Link.class );
 		final Random random = new Random( 234 );
 
-		final String stageType = "stage";
+		final String stageType = "stage interaction";
 		final String mode = "the_mode";
 
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", anchorLink1) );
@@ -109,7 +109,7 @@ public class TourModeUnifierAlgorithmTest {
 		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", anchorLink1) );
 
-		final StageActivityTypes types = new StageActivityTypesImpl( stageType );
+		final StageActivityTypes types = new StageActivityTypesImpl();
 		final int nActs = TripStructureUtils.getActivities( plan , types ).size();
 
 		final PlanAlgorithm testee =
@@ -145,7 +145,7 @@ public class TourModeUnifierAlgorithmTest {
 		final Id<Link> anchorLink2 = Id.create( "anchor2" , Link.class );
 		final Random random = new Random( 234 );
 
-		final String stageType = "stage";
+		final String stageType = "stage interaction";
 		final String mode1 = "first_mode";
 		final String mode2 = "second_mode";
 		final String modeOfOpenTour = "space_shuttle";
@@ -183,7 +183,7 @@ public class TourModeUnifierAlgorithmTest {
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("s", exitLink) );
 
 
-		final StageActivityTypes types = new StageActivityTypesImpl( stageType );
+		final StageActivityTypes types = new StageActivityTypesImpl();
 
 		final PlanAlgorithm testee =
 			new TourModeUnifierAlgorithm( 
@@ -242,7 +242,7 @@ public class TourModeUnifierAlgorithmTest {
 		final Id<Link> anchorLink = Id.create( "anchor" , Link.class );
 		final Random random = new Random( 234 );
 
-		final String stageType = "stage";
+		final String stageType = "stage interaction";
 		final String mode1 = "first_mode";
 		final String mode2 = "second_mode";
 
@@ -266,7 +266,7 @@ public class TourModeUnifierAlgorithmTest {
 		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", anchorLink) );
 
-		final StageActivityTypes types = new StageActivityTypesImpl( stageType );
+		final StageActivityTypes types = new StageActivityTypesImpl();
 		final int nActs = TripStructureUtils.getActivities( plan , types ).size();
 
 		final PlanAlgorithm testee =

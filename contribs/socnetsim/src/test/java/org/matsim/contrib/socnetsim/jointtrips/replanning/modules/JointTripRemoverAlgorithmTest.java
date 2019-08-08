@@ -485,7 +485,7 @@ public class JointTripRemoverAlgorithmTest {
 	private Fixture createMultiDriverStageFixture() {
 		final Person driver = PopulationUtils.getFactory().createPerson(Id.createPersonId("Schumacher"));
 		final Person passenger = PopulationUtils.getFactory().createPerson(Id.createPersonId("Asterix"));
-		final String stageType = "drinkACoffee";
+		final String stageType = "drinkACoffee interaction";
 
 		final Id<Link> link1 = Id.create( 1 , Link.class );
 		final Id<Link> link2 = Id.create( 2 , Link.class );
@@ -550,13 +550,13 @@ public class JointTripRemoverAlgorithmTest {
 					Arrays.asList( jointDriverLeg ),
 					passenger.getId(),
 					jointPassengerLeg),
-				new StageActivityTypesImpl( stageType ));
+				new StageActivityTypesImpl());
 	}
 
 	private Fixture createMultiPassengerStageFixture() {
 		final Person driver = PopulationUtils.getFactory().createPerson(Id.createPersonId("Schumacher"));
 		final Person passenger = PopulationUtils.getFactory().createPerson(Id.createPersonId("Asterix"));
-		final String stageType = "drinkACoffee";
+		final String stageType = "drinkACoffee interaction";
 
 		final Id<Link> link1 = Id.create( 1 , Link.class );
 		final Id<Link> link2 = Id.create( 2 , Link.class );
@@ -621,7 +621,7 @@ public class JointTripRemoverAlgorithmTest {
 					Arrays.asList( jointDriverLeg ),
 					passenger.getId(),
 					jointPassengerLeg),
-				new StageActivityTypesImpl( stageType ));
+				new StageActivityTypesImpl());
 	}
 
 	private Fixture createTwoPassengersInDifferentTripsRemoveFirstFixture() {

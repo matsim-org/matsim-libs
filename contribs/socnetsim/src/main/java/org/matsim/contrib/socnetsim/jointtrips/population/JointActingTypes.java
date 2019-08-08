@@ -32,7 +32,7 @@ import org.matsim.core.router.StageActivityTypesImpl;
 public interface JointActingTypes {
 	public static final String INTERACTION = "joint_interaction";
 	public static final StageActivityTypes JOINT_STAGE_ACTS =
-		new StageActivityTypesImpl( INTERACTION );
+		new StageActivityTypesImpl();
 
 	public static final String PASSENGER = "car_passenger";
 	public static final String DRIVER = "car_driver";

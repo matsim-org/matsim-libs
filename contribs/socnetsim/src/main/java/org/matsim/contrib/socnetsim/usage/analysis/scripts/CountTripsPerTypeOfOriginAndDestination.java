@@ -66,10 +66,7 @@ public class CountTripsPerTypeOfOriginAndDestination {
 			}
 		};
 	private static final StageActivityTypes STAGES =
-		new StageActivityTypesImpl(
-				Arrays.asList(
-					PtConstants.TRANSIT_ACTIVITY_TYPE,
-					JointActingTypes.INTERACTION ) );
+		new StageActivityTypesImpl();
 
 
 	public static void main(final String[] args) throws IOException {

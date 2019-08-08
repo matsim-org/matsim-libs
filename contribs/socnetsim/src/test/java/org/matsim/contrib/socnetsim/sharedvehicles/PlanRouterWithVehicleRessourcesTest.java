@@ -100,7 +100,7 @@ public class PlanRouterWithVehicleRessourcesTest {
 
 	private static TripRouter createTripRouter(final PopulationFactory factory, Config config) {
 		// create some stages to check the behavior with that
-		final String stage = "realize that actually, you did't forget to close the window, and go again";
+		final String stage = "realize that actually, you did't forget to close the window, and go again interaction";
 		final TripRouter.Builder builder = new TripRouter.Builder(config) ;
 		builder.setRoutingModule(
 				TransportMode.car,
@@ -130,7 +130,7 @@ public class PlanRouterWithVehicleRessourcesTest {
 
 					@Override
 					public StageActivityTypes getStageActivityTypes() {
-						return new StageActivityTypesImpl( stage );
+						return new StageActivityTypesImpl();
 					}
 				});
 		return builder.build() ;

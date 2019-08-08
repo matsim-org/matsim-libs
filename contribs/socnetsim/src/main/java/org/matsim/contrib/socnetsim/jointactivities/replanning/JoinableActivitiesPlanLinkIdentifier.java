@@ -51,7 +51,7 @@ public class JoinableActivitiesPlanLinkIdentifier implements PlanLinkIdentifier 
 	private final StageActivityTypes stages =
 			new CompositeStageActivityTypes(
 					JointActingTypes.JOINT_STAGE_ACTS,
-					new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ) );
+					new StageActivityTypesImpl() );
 	private final String type;
 
 	public JoinableActivitiesPlanLinkIdentifier(
