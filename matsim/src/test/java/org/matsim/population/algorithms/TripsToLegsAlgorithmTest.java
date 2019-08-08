@@ -61,8 +61,8 @@ public class TripsToLegsAlgorithmTest {
 		}
 	}
 
-	private static final String DUMMY_1 = "dummy_1";
-	private static final String DUMMY_2 = "dummy_2";
+	private static final String DUMMY_1 = "dummy_1 interaction";
+	private static final String DUMMY_2 = "dummy_2 interaction";
 
 	@Test
 	public void testMonoLegPlan() throws Exception {
@@ -238,10 +238,7 @@ public class TripsToLegsAlgorithmTest {
 
 	private static void performTest(final Fixture fixture) {
 		final StageActivityTypes types =
-			new StageActivityTypesImpl(
-					Arrays.asList(
-						DUMMY_1,
-						DUMMY_2 ));
+			new StageActivityTypesImpl();
 
 		final TripsToLegsAlgorithm algorithm = new TripsToLegsAlgorithm( types , new MainModeIdentifierImpl() );
 		algorithm.run( fixture.plan );

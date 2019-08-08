@@ -44,7 +44,7 @@ import java.util.List;
  */
 public class TransitRouterWrapper implements RoutingModule {
 	private static final StageActivityTypes CHECKER =
-			new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE);
+			new StageActivityTypesImpl();
 	private final TransitRouter router;
 	private final RoutingModule walkRouter;
 	private final TransitSchedule transitSchedule;

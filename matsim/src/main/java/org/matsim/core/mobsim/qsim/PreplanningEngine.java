@@ -78,8 +78,7 @@ public final class PreplanningEngine implements MobsimEngine {
 
 	private static final Logger log = Logger.getLogger( PreplanningEngine.class );
 
-	public static final StageActivityTypes drtStageActivities = new StageActivityTypesImpl(
-		  createStageActivityType(TransportMode.drt), createStageActivityType(TransportMode.walk));
+	public static final StageActivityTypes drtStageActivities = new StageActivityTypesImpl();
 
 	private final ActivityFacilities facilities;
 

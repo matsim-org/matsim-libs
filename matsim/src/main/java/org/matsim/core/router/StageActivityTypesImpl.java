@@ -19,58 +19,17 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 /**
- * Default implementation of a {@link StageActivityTypes}, based on a list of types.
+ * Default implementation of a {@link StageActivityTypes}.
  *
  * @author thibautd
  */
 public class StageActivityTypesImpl implements StageActivityTypes {
-	// use a sorted set, so that two checkers returning the same result
-	// have equal internal collections.
-	private final SortedSet<String> types = new TreeSet<String>();
-
-	/**
-	 * Initializes an instance with a single type
-	 */
-	public StageActivityTypesImpl(final String type) {
-		this( Collections.singleton( type ) );
-	}
-
-	/**
-	 * Initialises an instance with a given list of types
-	 * @param types a Collection containing the types to consider as stage types.
-	 */
-	public StageActivityTypesImpl(final Collection<String> types) {
-		this.types.addAll( types );
-	}
-
-	public StageActivityTypesImpl( final String... types ) {
-		this( Arrays.asList( types ) );
-	}
 
 	@Override
 	public boolean isStageActivity(final String activityType) {
-		return activityType.endsWith("interaction") || types.contains( activityType );
+		return activityType.endsWith("interaction");
 	}
 
-
-	@Override
-	public boolean equals(final Object other) {
-		if (other != null && other.getClass().equals( this.getClass() )) {
-			return types.equals( ((StageActivityTypesImpl) other).types );
-		}
-		return false;
-	}
-
-	@Override
-	public int hashCode() {
-		return types.hashCode();
-	}
 }
 

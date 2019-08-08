@@ -48,9 +48,9 @@ public class TripStructureUtilsTest {
 	private static final PopulationFactory populationFactory =
             ScenarioUtils.createScenario(
 	        ConfigUtils.createConfig()).getPopulation().getFactory();
-    private static final String dummyType = "dummy";
+    private static final String dummyType = "dummy interaction";
 	private static final StageActivityTypes stageActivities =
-		new StageActivityTypesImpl( dummyType );
+		new StageActivityTypesImpl();
 
 	private final List<Fixture> fixtures = new ArrayList<Fixture>();
 	private static class Fixture {

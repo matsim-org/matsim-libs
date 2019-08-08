@@ -62,7 +62,7 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 	private static final String[] CHAIN_BASED_MODES = new String[]{TransportMode.car};
 
 	private static final String STAGE = PtConstants.TRANSIT_ACTIVITY_TYPE;
-	private final StageActivityTypes stagesActivities = new StageActivityTypesImpl( STAGE );
+	private final StageActivityTypes stagesActivities = new StageActivityTypesImpl();
 	private final double probaForRandomSingleTripMode;
 	
 	// /////////////////////////////////////////////////////////////////////////

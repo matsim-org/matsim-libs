@@ -117,7 +117,7 @@ public class Grid {
 	}
 
 	private void setActivityCoords () {
-		StageActivityTypes stages = new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE);
+		StageActivityTypes stages = new StageActivityTypesImpl();
 		for (Person person: scenario.getPopulation().getPersons().values()) {
 
 			for(Activity activity: TripStructureUtils.getActivities(person.getSelectedPlan(), stages)){
