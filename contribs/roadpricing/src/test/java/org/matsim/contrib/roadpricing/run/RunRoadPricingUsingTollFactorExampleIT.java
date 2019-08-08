@@ -12,6 +12,7 @@ public class RunRoadPricingUsingTollFactorExampleIT {
 		try {
 			RunRoadPricingUsingTollFactorExample.main(args);
 		} catch (Exception e) {
+			e.printStackTrace();
 			Assert.fail("Example should run without exceptions.");
 		}
 	}
