@@ -30,6 +30,7 @@ import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
@@ -47,11 +48,6 @@ public class JoinableActivitiesPlanLinkIdentifier implements PlanLinkIdentifier 
 	private static final Logger log =
 		Logger.getLogger(JoinableActivitiesPlanLinkIdentifier.class);
 
-	// XXX should be passed from outside, but not available at construction
-	private final StageActivityTypes stages =
-			new CompositeStageActivityTypes(
-					JointActingTypes.JOINT_STAGE_ACTS,
-					new StageActivityTypesImpl() );
 	private final String type;
 
 	public JoinableActivitiesPlanLinkIdentifier(
@@ -106,7 +102,7 @@ public class JoinableActivitiesPlanLinkIdentifier implements PlanLinkIdentifier 
 		final Id personId = plan.getPerson().getId();
 		double lastEnd = 0;
 		int ind = 0;
-		for ( Activity act : TripStructureUtils.getActivities( plan , stages ) ) {
+		for ( Activity act : TripStructureUtils.getActivities( plan , StageActivityHandling.ExcludeStageActivities ) ) {
 			final Id loc = act.getFacilityId();
 
 			final LocationEvent event =

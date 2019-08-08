@@ -35,6 +35,7 @@ import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.router.TripStructureUtils.Trip;
 
 /**
@@ -110,7 +111,7 @@ public class TourModeUnifierAlgorithmTest {
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", anchorLink1) );
 
 		final StageActivityTypes types = new StageActivityTypesImpl();
-		final int nActs = TripStructureUtils.getActivities( plan , types ).size();
+		final int nActs = TripStructureUtils.getActivities( plan , StageActivityHandling.ExcludeStageActivities ).size();
 
 		final PlanAlgorithm testee =
 			new TourModeUnifierAlgorithm(
@@ -267,7 +268,7 @@ public class TourModeUnifierAlgorithmTest {
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", anchorLink) );
 
 		final StageActivityTypes types = new StageActivityTypesImpl();
-		final int nActs = TripStructureUtils.getActivities( plan , types ).size();
+		final int nActs = TripStructureUtils.getActivities( plan , StageActivityHandling.ExcludeStageActivities ).size();
 
 		final PlanAlgorithm testee =
 			new TourModeUnifierAlgorithm( 

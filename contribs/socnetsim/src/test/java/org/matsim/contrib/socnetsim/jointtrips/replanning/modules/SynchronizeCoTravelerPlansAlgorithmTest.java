@@ -41,6 +41,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -326,7 +327,7 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 			testee.run( fixture.jointPlan );
 
 			for ( Plan p : fixture.jointPlan.getIndividualPlans().values() ) {
-				for ( Activity activity : TripStructureUtils.getActivities( p , EmptyStageActivityTypes.INSTANCE ) ) {
+				for ( Activity activity : TripStructureUtils.getActivities( p , StageActivityHandling.IncludeStageActivities ) ) {
 					final Double endTime = fixture.expectedEndTimes.remove( activity );
 					if ( endTime == null ) continue;
 

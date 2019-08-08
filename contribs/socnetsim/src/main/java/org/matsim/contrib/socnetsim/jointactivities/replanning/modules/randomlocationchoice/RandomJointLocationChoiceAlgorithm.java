@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -74,13 +75,16 @@ public class RandomJointLocationChoiceAlgorithm implements GenericPlanAlgorithm<
 	private final ActivityFacilities facilities;
 	private final SocialNetwork socialNetwork;
 	private final RandomJointLocationChoiceConfigGroup config;
-	private final StageActivityTypes activityFilter =
-		new StageActivityTypes() {
-			@Override
-			public boolean isStageActivity(final String activityType) {
-				return !config.getTypes().contains( activityType );
-			}
-		};
+	// TODO: This looks awkward. Not clear whether we can really assume that this in practice really identified only activity 
+	// types which end on "interaction" or whether we now miss some. In socnetsim all stage activity types are renamed to end
+	// on "interaction"
+//	private final StageActivityTypes activityFilter =
+//		new StageActivityTypes() {
+//			@Override
+//			public boolean isStageActivity(final String activityType) {
+//				return !config.getTypes().contains( activityType );
+//			}
+//		};
 	final Random random;
 
 	public RandomJointLocationChoiceAlgorithm(
@@ -177,7 +181,7 @@ public class RandomJointLocationChoiceAlgorithm implements GenericPlanAlgorithm<
 			final Collection<Plan> plans) {
 		final AgentAndTypeActivityMap actsPerType = new AgentAndTypeActivityMap();
 		for ( Plan p : plans ) {
-			for ( Activity act : TripStructureUtils.getActivities( p , activityFilter ) ) {
+			for ( Activity act : TripStructureUtils.getActivities( p , StageActivityHandling.ExcludeStageActivities ) ) {
 				actsPerType.addActivity( p.getPerson().getId() , act );
 			}
 		}

@@ -32,6 +32,7 @@ import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.pt.PtConstants;
 
 import javax.inject.Inject;
@@ -236,8 +237,10 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 	/* package-private, for testing */ double similarity( Plan plan1, Plan plan2 ) {
 		double simil = 0. ;
 		{
-			List<Activity> activities1 = TripStructureUtils.getActivities(plan1, stageActivities) ;
-			List<Activity> activities2 = TripStructureUtils.getActivities(plan2, stageActivities) ;
+			// TODO: Is StageActivityHandling.ExcludeStageActivities always right here or should we allow to pass 
+			// the StageActivityHandling setting via get() / constructor?
+			List<Activity> activities1 = TripStructureUtils.getActivities(plan1, StageActivityHandling.ExcludeStageActivities) ;
+			List<Activity> activities2 = TripStructureUtils.getActivities(plan2, StageActivityHandling.ExcludeStageActivities) ;
 			simil += PopulationUtils.calculateSimilarity(activities1, activities2, actTypeWeight, locationWeight, actTimeWeight ) ;
 			if ( Double.isNaN(simil) ) {
 				log.warn("simil is NaN; id: " + plan1.getPerson().getId() ) ;

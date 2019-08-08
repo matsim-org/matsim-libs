@@ -35,6 +35,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 
@@ -189,7 +190,7 @@ public class RunUtils {
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
-				for (Activity act : TripStructureUtils.getActivities( plan , EmptyStageActivityTypes.INSTANCE )) {
+				for (Activity act : TripStructureUtils.getActivities( plan , StageActivityHandling.IncludeStageActivities )) {
 					if (act.getCoord() != null) continue;
 					if (act.getLinkId() == null) throw new NullPointerException();
 					act.setCoord(

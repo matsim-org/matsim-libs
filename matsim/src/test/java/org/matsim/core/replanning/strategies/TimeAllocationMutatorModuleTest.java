@@ -43,6 +43,7 @@ import org.matsim.core.population.algorithms.PlanMutateTimeAllocationSimplified;
 import org.matsim.core.population.algorithms.TripPlanMutateTimeAllocation;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
@@ -73,8 +74,8 @@ public class TimeAllocationMutatorModuleTest extends MatsimTestCase {
 	public void testSimplifiedMutation() {
 		boolean affectingDuration = true ;
 
-		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified(new StageActivityTypesImpl(), 750, affectingDuration, MatsimRandom.getLocalInstance()), 750);
-		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified(new StageActivityTypesImpl(), 7200, affectingDuration, MatsimRandom.getLocalInstance()), 7200);
+		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified(StageActivityHandling.ExcludeStageActivities, 750, affectingDuration, MatsimRandom.getLocalInstance()), 750);
+		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified(StageActivityHandling.ExcludeStageActivities, 7200, affectingDuration, MatsimRandom.getLocalInstance()), 7200);
 	}
 
 	public void testSubpopulations() {

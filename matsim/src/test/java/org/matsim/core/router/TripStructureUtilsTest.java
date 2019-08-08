@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -333,7 +334,7 @@ public class TripStructureUtilsTest {
 			final List<Activity> acts =
 				TripStructureUtils.getActivities(
 						fixture.plan, 
-						stageActivities);
+						StageActivityHandling.ExcludeStageActivities);
 
 			assertEquals(
 					"unexpected number of activities in "+acts+" for fixture "+fixture.name,

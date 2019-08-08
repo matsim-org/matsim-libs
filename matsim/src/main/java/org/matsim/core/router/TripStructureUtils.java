@@ -47,6 +47,8 @@ import org.matsim.core.gbl.Gbl;
  * @author thibautd
  */
 public class TripStructureUtils {
+	
+	public enum StageActivityHandling { IncludeStageActivities, ExcludeStageActivities };
 
 	private TripStructureUtils() {}
 
@@ -69,23 +71,32 @@ public class TripStructureUtils {
 
 	public static List<Activity> getActivities(
 			final Plan plan,
-			final StageActivityTypes stageActivities) {
+			final StageActivityHandling stageActivityHandling) {
 		return getActivities(
 				plan.getPlanElements(),
-				stageActivities);
+				stageActivityHandling);
 	}
 
 	public static List<Activity> getActivities(
 			final List<? extends PlanElement> planElements,
-			final StageActivityTypes stageActivities) {
+			final StageActivityHandling stageActivityHandling) {
 		final List<Activity> activities = new ArrayList<>();
 
 		for (PlanElement pe : planElements) {
 			if ( !(pe instanceof Activity) ) continue;
 			final Activity act = (Activity) pe;
 
-			if ( stageActivities == null || !stageActivities.isStageActivity( act.getType() ) ) {
-				activities.add( act );
+			switch (stageActivityHandling) {
+			case IncludeStageActivities:
+				activities.add(act);
+				break;
+			case ExcludeStageActivities:
+				if (!(new StageActivityTypesImpl().isStageActivity(act.getType()))) {
+					activities.add(act);
+				}
+				break;
+			default:
+				throw new RuntimeException(Gbl.NOT_IMPLEMENTED);
 			}
 		}
 

@@ -50,6 +50,7 @@ import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -487,8 +488,8 @@ public final class PopulationUtils {
 	 * A pointer to material in TripStructureUtils
 	 *
 	 */
-	public static List<Activity> getActivities( Plan plan, StageActivityTypes stageActivities ) {
-		return TripStructureUtils.getActivities(plan, stageActivities ) ;
+	public static List<Activity> getActivities( Plan plan, StageActivityHandling stageActivityHandling ) {
+		return TripStructureUtils.getActivities(plan, stageActivityHandling ) ;
 	}
 
 	/**

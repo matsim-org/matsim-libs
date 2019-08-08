@@ -75,9 +75,6 @@ public class GroupTimeAllocationMutatorFactory extends AbstractConfigurableSelec
 					new AbstractMultithreadedModule( config.global().getNumberOfThreads() ) {
 						@Override
 						public PlanAlgorithm getPlanAlgoInstance() {
-							final CompositeStageActivityTypes blackList = new CompositeStageActivityTypes();
-							blackList.addActivityTypes( tripRouterFactory.get().getStageActivityTypes() );
-							blackList.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
 
 							final int iteration = getReplanningContext().getIteration();
 							final int firstIteration = config.controler().getFirstIteration();
@@ -89,7 +86,6 @@ public class GroupTimeAllocationMutatorFactory extends AbstractConfigurableSelec
 							log.debug( "temperature in iteration "+iteration+": "+temp );
 							final BlackListedTimeAllocationMutator algo =
 									new BlackListedTimeAllocationMutator(
-										blackList,
 										config.timeAllocationMutator().getMutationRange() * temp,
 										MatsimRandom.getLocalInstance() );
 							return algo;

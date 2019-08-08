@@ -41,6 +41,7 @@ import org.matsim.core.population.algorithms.PlanMutateTimeAllocationSimplified;
 import org.matsim.core.population.algorithms.TripPlanMutateTimeAllocation;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
@@ -123,7 +124,8 @@ class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 			break;
 		default:
 			pmta = new PlanMutateTimeAllocationSimplified(
-					this.tripRouterProvider.get().getStageActivityTypes(), this.mutationRange, this.affectingDuration, MatsimRandom.getLocalInstance());
+					// TODO: is StageActivityHandling.ExcludeStageActivities right here?
+					StageActivityHandling.ExcludeStageActivities, this.mutationRange, this.affectingDuration, MatsimRandom.getLocalInstance());
 		}
 		return pmta;
 	}

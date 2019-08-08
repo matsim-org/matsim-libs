@@ -24,9 +24,8 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.router.EmptyStageActivityTypes;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -40,7 +39,7 @@ import org.matsim.core.utils.misc.Time;
  */
 public final class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
 
-	private final StageActivityTypes blackList;
+	private final StageActivityHandling stageActivityHandling;
 	private final double mutationRange;
 	private final Random random;
 	private final boolean affectingDuration;
@@ -52,7 +51,7 @@ public final class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
 	 * @param random
 	 */
 	public PlanMutateTimeAllocationSimplified(final double mutationRange, boolean affectingDuration, final Random random) {
-		this( EmptyStageActivityTypes.INSTANCE , mutationRange , affectingDuration, random );
+		this( StageActivityHandling.IncludeStageActivities , mutationRange , affectingDuration, random );
 	}
 	/**
 	 * Initializes an instance mutating all non-stage activities in a plan
@@ -60,8 +59,8 @@ public final class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
 	 * @param affectingDuration
 	 * @param random
 	 */
-	public PlanMutateTimeAllocationSimplified(final StageActivityTypes blackList, final double mutationRange, boolean affectingDuration, final Random random) {
-		this.blackList = blackList;
+	public PlanMutateTimeAllocationSimplified(final StageActivityHandling stageActivityHandling, final double mutationRange, boolean affectingDuration, final Random random) {
+		this.stageActivityHandling = stageActivityHandling;
 		this.mutationRange = mutationRange;
 		this.affectingDuration = affectingDuration;
 		this.random = random;
@@ -69,7 +68,7 @@ public final class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
 
 	@Override
 	public void run(final Plan plan) {
-		for ( Activity act : TripStructureUtils.getActivities( plan , blackList ) ) {
+		for ( Activity act : TripStructureUtils.getActivities( plan , stageActivityHandling ) ) {
 			// this is deliberately simplistic.  Cleanup up of the time information should be done somewhere else.
 			if ( !Time.isUndefinedTime( act.getEndTime() ) ) {
 				act.setEndTime(mutateTime(act.getEndTime()));
