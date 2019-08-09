@@ -38,12 +38,12 @@ import static org.matsim.core.scenario.ScenarioUtils.loadScenario;
 public class RunCommercialTraffic {
     public static void main(String[] args) {
 
+        String inputDir = "input/commercialtrafficIt/";
 
         Config config = createConfig();
-
         CommercialTrafficConfigGroup commercialTrafficConfigGroup = new CommercialTrafficConfigGroup();
-        commercialTrafficConfigGroup.setCarriersFile("test-carriers.xml");
-        commercialTrafficConfigGroup.setCarriersVehicleTypesFile("carriertypes.xml");
+        commercialTrafficConfigGroup.setCarriersFile(inputDir + "test-carriers.xml");
+        commercialTrafficConfigGroup.setCarriersVehicleTypesFile(inputDir + "carriertypes.xml");
         commercialTrafficConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
         config.addModule(commercialTrafficConfigGroup);
         StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
@@ -72,8 +72,8 @@ public class RunCommercialTraffic {
         config.controler().setWriteEventsInterval(1);
         config.controler().setOutputDirectory("output/commercialtraffictestrun");
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-        config.network().setInputFile("grid_network.xml");
-        config.plans().setInputFile("testpop.xml");
+        config.network().setInputFile(inputDir + "grid_network.xml");
+        config.plans().setInputFile(inputDir + "testpop.xml");
         Scenario scenario = loadScenario(config);
 
         Controler controler = new Controler(scenario);

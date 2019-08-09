@@ -3,7 +3,9 @@ package cemdap4wob.planspreprocessing;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.StreamingPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -24,17 +26,19 @@ public class CreateSubpopulations {
 			@Override
 			public void run(Person person) {
 				if (isBs(person.getId())) {
-					scenario.getPopulation().getPersonAttributes().putAttribute(person.getId().toString(), "subpopulation", "livesBs");
+					PopulationUtils.putPersonAttribute(person, "subpopulation", "livesBs");
 				}
 				else if (isWob(person.getId())) {
-					scenario.getPopulation().getPersonAttributes().putAttribute(person.getId().toString(), "subpopulation", "livesWob");
+					PopulationUtils.putPersonAttribute(person, "subpopulation", "livesWob");
 
-				} else 	scenario.getPopulation().getPersonAttributes().putAttribute(person.getId().toString(), "subpopulation", "default");
+				} else 	PopulationUtils.putPersonAttribute(person, "subpopulation", "default");
 
 			}
 		});
 		spr.readFile(populationFile);	
-		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile(subpopulationFile);
+//		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile(subpopulationFile);
+		new PopulationWriter(scenario.getPopulation()).write(subpopulationFile); //not sure if this is what was originally intended here..
+
 	}
 	
 	private boolean isBs(Id<Person> id) {

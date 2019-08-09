@@ -22,6 +22,7 @@ package commercialtraffic.scoring;/*
  */
 
 import com.google.inject.Inject;
+import commercialtraffic.deliveryGeneration.DeliveryGenerator;
 import commercialtraffic.deliveryGeneration.PersonDelivery;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -80,13 +81,13 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
         for (Plan plan : plans) {
             plan.getPlanElements().stream().filter(Activity.class::isInstance).forEach(pe -> {
                 Activity activity = (Activity) pe;
-                if (activity.getAttributes().getAsMap().containsKey(PersonDelivery.DELIEVERY_TYPE)) {
-                    ExpectedDelivery expectedDelivery = new ExpectedDelivery((String) activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_TYPE)
+                if (activity.getAttributes().getAsMap().containsKey(PersonDelivery.JOB_TYPE)) {
+                    ExpectedDelivery expectedDelivery = new ExpectedDelivery((String) activity.getAttributes().getAttribute(PersonDelivery.JOB_TYPE)
                             , PersonDelivery.getCarrierId(activity)
                             , plan.getPerson().getId()
-                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_DURATION)))
-                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_TIME_START)))
-                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIEVERY_TIME_END))));
+                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.JOB_DURATION)))
+                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.JOB_EARLIEST_START)))
+                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.JOB_TIME_END))));
                     Set<ExpectedDelivery> set = currentExpectedDeliveriesPerLink.getOrDefault(activity.getLinkId(), new HashSet<>());
                     set.add(expectedDelivery);
                     currentExpectedDeliveriesPerLink.put(activity.getLinkId(), set);
@@ -103,13 +104,16 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
     private void handleFreightActivityStart(ActivityStartEvent event) {
         if (event.getActType().equals(FreightConstants.END)) {
             activeDeliveryAgents.remove(event.getPersonId());
-        } else if (event.getActType().equals(FreightConstants.DELIVERY)) {
+        } else if (event.getActType().contains(FreightConstants.DELIVERY)) {
             Id<Carrier> carrier = PersonDelivery.getCarrierIdFromDriver(event.getPersonId());
+            Id<Person> customerAboutToBeServed = DeliveryGenerator.getCustomerIdFromDeliveryActivityType(event.getActType());
             if (currentExpectedDeliveriesPerLink.containsKey(event.getLinkId())) {
                 ExpectedDelivery deliveryCandidate = currentExpectedDeliveriesPerLink.get(event.getLinkId()).stream()
-                        .filter(d -> d.getCarrier().equals(carrier))
+                        .filter(d -> d.getCarrier().equals(carrier)) //this probably is obsolete as customer can only order at one carrier anyways
+                        .filter(d -> d.getPersonId().equals(customerAboutToBeServed)) // filter for the customer (whose id is contained in the activityType)
                         .min(Comparator.comparing(ExpectedDelivery::getStartTime))
-                        .orElseThrow(() -> new RuntimeException("No available deliveries expected for carrier " + carrier + "at link " + event.getLinkId()));
+                        .orElseThrow(() -> new RuntimeException("No available deliveries expected for customer " + customerAboutToBeServed + " by carrier " + carrier + " at link " + event.getLinkId()));
+
                 currentExpectedDeliveriesPerLink.get(event.getLinkId()).remove(deliveryCandidate);
                 double timeDifference = calcDifference(deliveryCandidate, event.getTime());
                 double score = scoreCalculator.calcScore(timeDifference);
@@ -156,7 +160,7 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
         private final double startTime;
         private final double endTime;
 
-        public ExpectedDelivery(String type, Id<Carrier> carrier, Id<Person> personId, double deliveryDuration, double startTime, double endTime) {
+        ExpectedDelivery(String type, Id<Carrier> carrier, Id<Person> personId, double deliveryDuration, double startTime, double endTime) {
             this.type = type;
             this.carrier = carrier;
             this.personId = personId;
@@ -187,6 +191,11 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
 
         public double getEndTime() {
             return endTime;
+        }
+
+        @Override
+        public String toString(){
+            return "[person=" + personId +";" + "type=" + type +";" + "carrier=" + carrier + ";" + "start=" + startTime + ";" + "end=" + endTime + "]";
         }
     }
 
