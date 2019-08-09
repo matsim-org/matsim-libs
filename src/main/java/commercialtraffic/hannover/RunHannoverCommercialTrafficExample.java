@@ -61,7 +61,6 @@ public class RunHannoverCommercialTrafficExample {
 
         Controler controler = new Controler(scenario);
 
-
         // tell the system to use the congested car router for the ride mode:
         controler.addOverridingModule(new AbstractModule() {
             @Override
@@ -76,7 +75,6 @@ public class RunHannoverCommercialTrafficExample {
 
 
         controler.run();
-
 
     }
 

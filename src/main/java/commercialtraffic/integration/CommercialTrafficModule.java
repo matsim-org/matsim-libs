@@ -23,6 +23,7 @@ package commercialtraffic.integration;/*
 
 import commercialtraffic.analysis.CommercialTrafficAnalysisListener;
 import commercialtraffic.analysis.TourLengthAnalyzer;
+import commercialtraffic.jobGeneration.CommercialJobManager;
 import commercialtraffic.jobGeneration.DeliveryGenerator;
 import commercialtraffic.replanning.ChangeDeliveryServiceOperator;
 import commercialtraffic.scoring.DefaultCommercialServiceScore;
@@ -69,11 +70,11 @@ public class CommercialTrafficModule extends AbstractModule {
             @Inject
             Config config;
             @Inject
-            Carriers carriers;
+            CommercialJobManager manager;
             @Override
             public PlanStrategy get() {
                 final PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
-                builder.addStrategyModule(new ChangeDeliveryServiceOperator(config.global(), carriers));
+                builder.addStrategyModule(new ChangeDeliveryServiceOperator(config.global(),manager));
                 return builder.build();
             }
         });
