@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+
+import org.matsim.core.gbl.MatsimRandom;
+
 import com.opencsv.CSVReader;
 
 public class CommercialTripsReader {
@@ -17,6 +21,8 @@ public class CommercialTripsReader {
 	Map<String, List<Double>> ServiceType2ServiceDurationsMap;
 	public File[] files;
 	String serviceTimeDistInputPath;
+	Random r = MatsimRandom.getRandom();
+	long nr = 1896;
 
 	public CommercialTripsReader(String csvTripFile, String serviceTimeDistInputPath) {
 		this.csvTripFile = csvTripFile;
@@ -24,17 +30,21 @@ public class CommercialTripsReader {
 		this.commercialTripMap = new HashMap<String, List<CommercialTrip>>();
 		this.ServiceType2ServiceDurationsMap = new HashMap<String, List<Double>>();
 		this.files = new File(serviceTimeDistInputPath).listFiles();
-		this.serviceTimeDistInputPath =serviceTimeDistInputPath;
+		this.serviceTimeDistInputPath = serviceTimeDistInputPath;
+
+		r.setSeed(nr);
 	}
 
 	public static void main(String[] args) {
 
-		CommercialTripsReader tripReader = new CommercialTripsReader("D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\wege.csv","D:\\Thiel\\Programme\\WVModell\\ServiceDurCalc\\Distributions\\");
+		CommercialTripsReader tripReader = new CommercialTripsReader(
+				"D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\wege.csv",
+				"D:\\Thiel\\Programme\\WVModell\\ServiceDurCalc\\Distributions\\");
 		tripReader.run();
 	}
 
 	public void run() {
-		
+
 		readVehicleCSV();
 		readServiceTimeDistributionsCSV();
 
@@ -44,6 +54,16 @@ public class CommercialTripsReader {
 
 		return this.files[i].toString();
 
+	}
+
+	public double getRandomServiceDurationPerType(String serviceType) {
+
+		int randromIdx = r.nextInt(ServiceType2ServiceDurationsMap.get(serviceType).size());
+		
+		List<Double> valueList = ServiceType2ServiceDurationsMap.get(serviceType); 
+		java.util.Collections.sort(valueList);
+		
+		return valueList.get(randromIdx);
 	}
 
 	// public void calcServiceDurationsPerServiceType() {
@@ -247,24 +267,20 @@ public class CommercialTripsReader {
 				String zielzelle = (lineContents[25]);
 				int art_ziel = Integer.parseInt(lineContents[22]);
 				String customerRelation = "";
-				if (art_ziel == 8)
-				{
-				
-					customerRelation = "b2c";
+				if (art_ziel == 8) {
+
+					customerRelation = "B2C";
+				} else if (art_ziel == 10) {
+					customerRelation = "private";
+				} else {
+					customerRelation = "B2B";
 				}
-				else if (art_ziel == 10) {
-					customerRelation ="private";
-				}
-				else {
-					customerRelation ="b2b";
-				}
-				
-						
-						
+
 				double fahrzeit = Double.parseDouble(lineContents[26]) * 60.0;
 
 				CommercialTrip commercialTrip = new CommercialTrip(id, unternehmensID, fahrtID, unternehmenszelle,
-						wirtschaftszweig, fahrzeugtyp, zweck, quellzelle, zielzelle, art_ziel, fahrzeit,customerRelation);
+						wirtschaftszweig, fahrzeugtyp, zweck, quellzelle, zielzelle, art_ziel, fahrzeit,
+						customerRelation);
 
 				if (commercialTripMap.containsKey(wirtschaftszweig)) {
 					commercialTripMap.get(wirtschaftszweig).add(commercialTrip);
@@ -302,7 +318,7 @@ public class CommercialTripsReader {
 				rawTripList = reader.readAll();
 				for (int j = 1; j < rawTripList.size(); j++) {
 					String[] lineContents = rawTripList.get(j);
-					double value = Double.parseDouble(lineContents[0]);
+					double value = Double.parseDouble(lineContents[0])*60;
 
 					if (ServiceType2ServiceDurationsMap.containsKey(serviceType)) {
 						ServiceType2ServiceDurationsMap.get(serviceType).add(value);

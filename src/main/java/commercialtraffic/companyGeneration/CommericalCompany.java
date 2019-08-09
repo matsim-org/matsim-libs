@@ -8,9 +8,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities;
 import org.matsim.contrib.freight.carrier.CarrierImpl;
+import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.CarrierVehicleType;
 import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
@@ -32,8 +34,8 @@ public class CommericalCompany {
 			String serviceType, Id<Link> companyLinkId) {
 		// A company is also the carrier
 		this.companyId = companyId;
-		this.carrierId = companyId;
-		this.carrier = CarrierImpl.newInstance(Id.create(companyId, Carrier.class));
+		this.carrierId = serviceType+"_"+companyId;
+		this.carrier = CarrierImpl.newInstance(Id.create(carrierId, Carrier.class));
 		this.openingTime = openingTime;
 		this.closingTime = closingTime;
 		this.serviceType = serviceType;
@@ -47,6 +49,18 @@ public class CommericalCompany {
 		this.carrier.getCarrierCapabilities().getCarrierVehicles().add(getVehicle(Id.createVehicleId(carrierId + "_" + fleetIterator + "_vehTyp_" + vehicleType), linkId, companyId, vehicleType));
 		this.carrier.getCarrierCapabilities().getVehicleTypes().add(createType(vehicleType));
 		fleetIterator++;
+	}
+	
+	public void addService(int serviceId, Id<Link> linkId,double startTime, double endTime, double serviceDuration)
+	{
+		double trueEndTime = endTime-serviceDuration;
+		CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(Id.create(serviceId, CarrierService.class ), linkId);
+		//TODO: Please change to non fixed number
+		serviceBuilder.setCapacityDemand( 1 );
+		serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(startTime, trueEndTime) );
+		serviceBuilder.setServiceDuration( serviceDuration);
+		CarrierService service = serviceBuilder.build();
+		carrier.getServices().add(service);
 	}
 
 	public static CarrierVehicle getVehicle(Id<?> id, Id<Link> homeId, String depot, int vehicleType) {

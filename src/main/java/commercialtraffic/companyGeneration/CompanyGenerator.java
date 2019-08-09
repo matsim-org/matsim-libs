@@ -39,44 +39,52 @@ public class CompanyGenerator {
 	String outputpath;
 	String carrierOutputPath;
 	Network network;
-	Map<String, CommericalCompany> commercialCompanyMap = new HashMap<String, CommericalCompany>();
-
+	// This map contains our companies and their carriers. In this case each company
+	// is its own carrier. String Key = companyId
+	public Map<String, CommericalCompany> commercialCompanyMap = new HashMap<String, CommericalCompany>();
 	List<String[]> vehicleList;
-
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	CommercialTripsReader tripReader;
+	String ctTripsFile;
+	String serviceTimeDistributions;
 
-	CompanyGenerator(String csvVehiclefile, String networkFile, String companyFolder, String zoneSHP,
-			String outputpath, String carrierOutputPath) {
+	public CompanyGenerator(String csvVehiclefile, String ctTripsFile, String serviceTimeDistributions,
+			String networkFile, String companyFolder, String zoneSHP, String outputpath, String carrierOutputPath) {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
 		this.csvVehiclefile = csvVehiclefile;
+		this.ctTripsFile = ctTripsFile;
 		this.networkFile = networkFile;
+		this.serviceTimeDistributions = serviceTimeDistributions;
 		this.companyFolder = companyFolder;
 		this.zoneSHP = zoneSHP;
 		this.outputpath = outputpath;
 		this.network = scenario.getNetwork();
 		this.carrierOutputPath = carrierOutputPath;
+		// TODO: Obviously not needed?!
+		// CommercialTripsReader tripReader = new CommercialTripsReader(ctTripsFile,
+		// serviceTimeDistributions);
+		// tripReader.run();
 
 	}
-	
+
 	public static void main(String[] args) {
-	
-		run();
+
 	}
 
-	public static void run() {
-		CompanyGenerator demand = new CompanyGenerator("D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\fahrzeuge.csv",
-				"D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Network\\00_Final_Network\\network_editedPt.xml.gz",
-				"D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\Unternehmen\\",
-				"D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\Zellen\\FNP_Merged\\baseShapeH.shp",
-				"D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\",
-				"D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\Carrier\\");
-		
-		CommercialTripsReader tripReader = new CommercialTripsReader("D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\wege.csv","D:\\Thiel\\Programme\\WVModell\\ServiceDurCalc\\Distributions\\");
-		tripReader.run();
-		
-		demand.loadCompanyLocations();
-		demand.readVehicleCSV();
-		demand.writeCarriers();
+	public void initalize() {
+		// CompanyGenerator demand = new
+		// CompanyGenerator("D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\fahrzeuge.csv",
+		// "D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\wege.csv",
+		// "D:\\Thiel\\Programme\\WVModell\\ServiceDurCalc\\Distributions\\",
+		// "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Network\\00_Final_Network\\network_editedPt.xml.gz",
+		// "D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\Unternehmen\\",
+		// "D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\Zellen\\FNP_Merged\\baseShapeH.shp",
+		// "D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\",
+		// "D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\Carrier\\");
+
+		this.loadCompanyLocations();
+		this.readVehicleCSV();
+		// this.writeCarriers();
 
 	}
 
@@ -104,14 +112,13 @@ public class CompanyGenerator {
 
 	public Id<Link> infereCompanyLink(String companyClass, String zone) {
 		Demand4CompanyClass comClass = companyLocations.demand4CompanyClass2List.get(companyClass);
-		if (comClass.zone2CompanyMap.get(zone)==null)
-		{
-			System.out.println("Zone not found:"+ zone);
-			
+		if (comClass.zone2CompanyMap.get(zone) == null) {
+			System.out.println("Zone not found:" + zone);
+
 		}
 
 		ArrayList<Company> companyPerCompanyClassAndZone = comClass.zone2CompanyMap.get(zone);
-		
+
 		Company company = companyPerCompanyClassAndZone.remove(0);
 
 		return NetworkUtils.getNearestLink(network, company.coord).getId();
@@ -156,9 +163,9 @@ public class CompanyGenerator {
 					Id<Link> companyLinkId = infereCompanyLink(companyClass, zone);
 
 					// TODO
-					CommericalCompany commericalCompany = new CommericalCompany(companyId, 8 * 3600.0, 18 * 3600.0,
+					CommericalCompany commericalCompany = new CommericalCompany(companyId, 7 * 3600.0, 18 * 3600.0,
 							300.0, companyClass, companyLinkId);
-					commericalCompany.addVehicle(companyLinkId, vehicleType, 8 * 3600.0, 18 * 3600.0);
+					commericalCompany.addVehicle(companyLinkId, vehicleType, 7 * 3600.0, 18 * 3600.0);
 					commercialCompanyMap.put(companyId, commericalCompany);
 
 				}
@@ -179,23 +186,20 @@ public class CompanyGenerator {
 		}
 
 	}
-	
-	
-	public void writeCarriers()
-	{
-		 Carriers carriers = new Carriers();
-		
-		 
-		for (Entry<String, CommericalCompany> commercialCompanyEntry : commercialCompanyMap.entrySet()) 
-			
+
+	public void writeCarriers() {
+		Carriers carriers = new Carriers();
+
+		for (Entry<String, CommericalCompany> commercialCompanyEntry : commercialCompanyMap.entrySet())
+
 		{
 			carriers.addCarrier(commercialCompanyEntry.getValue().carrier);
-			
-			
+
 		}
-        new CarrierPlanXmlWriterV2(carriers).write(carrierOutputPath + "carrier_definition.xml");
-        new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers)).write(carrierOutputPath + "carrier_vehicletypes.xml");
-		
+		new CarrierPlanXmlWriterV2(carriers).write(carrierOutputPath + "carrier_definition.xml");
+		new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers))
+				.write(carrierOutputPath + "carrier_vehicletypes.xml");
+
 	}
 
 }

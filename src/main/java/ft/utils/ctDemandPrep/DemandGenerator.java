@@ -14,9 +14,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.locationtech.jts.geom.Geometry;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -28,14 +31,15 @@ public class DemandGenerator {
 	public File[] files;
 	public Map<String, Geometry> zoneMap;
 	Map<String, String> nameMap;
-	Map<String, List<String>> neighbourMap;
+	public Map<String, List<String>> neighbourMap;
 	Map<String, String> areaMap;
 	Map<String, String> useMap;
 	Map<String, CommercialZone> commercialZoneMap;
 	Set<String> zones;
 	String ShapeFile;
-	public Map<String,Demand4CompanyClass> demand4CompanyClass2List;
+	public Map<String, Demand4CompanyClass> demand4CompanyClass2List;
 	Map<String, Map<String, MutableInt>> zone2CompanyClassCounterMap;
+	TreeSet<String> zoneKeys;
 
 	public DemandGenerator(String inputpath, String ShapeFile, String outputpath) {
 		this.outputpath = outputpath;
@@ -50,7 +54,7 @@ public class DemandGenerator {
 		this.commercialZoneMap = new HashMap<String, CommercialZone>();
 
 		this.ShapeFile = ShapeFile;
-		this.demand4CompanyClass2List = new HashMap<String,Demand4CompanyClass>();
+		this.demand4CompanyClass2List = new HashMap<String, Demand4CompanyClass>();
 		// Zone --> CompanyClass --> Counter
 		this.zone2CompanyClassCounterMap = new HashMap<String, Map<String, MutableInt>>();
 
@@ -77,9 +81,8 @@ public class DemandGenerator {
 			Demand4CompanyClass d = new Demand4CompanyClass(dummyDemandFile, null, demand.zoneMap);
 
 			d.readDemandCSV();
-			
 
-			demand.demand4CompanyClass2List.put(d.getCompanyClass(),d);
+			demand.demand4CompanyClass2List.put(d.getCompanyClass(), d);
 
 		}
 
@@ -103,7 +106,7 @@ public class DemandGenerator {
 			String name = feature.getAttribute("Stadtteil").toString();
 			String use = feature.getAttribute("Nutzung").toString();
 			String area = null;
-			if (use.contains ("A") ) {
+			if (use.contains("A")) {
 				area = "0.000000";
 			} else {
 				area = feature.getAttribute("Flaeche").toString();
@@ -116,9 +119,11 @@ public class DemandGenerator {
 			useMap.put(id, use);
 			neighbourMap.put(id, null);
 		}
+		
+		zoneKeys = new TreeSet<String>(zoneMap.keySet());
 	}
 
-	public void findNeighbourZones() {
+	public void findNeighbourZonesOld() {
 
 		for (String zone : zoneMap.keySet()) {
 			ArrayList<String> neighbourzones = new ArrayList<String>();
@@ -134,6 +139,72 @@ public class DemandGenerator {
 			neighbourMap.put(zone, neighbourzones);
 		}
 		// System.out.println("halt Stop!");
+	}
+
+	public void findNeighbourZones() {
+		int maxBuffer = 100;
+		int bufferInc = 10;
+
+		
+		
+		for (String zone : zoneKeys) {
+			int buffer = 0;
+			ArrayList<String> neighbourzones = new ArrayList<String>();
+
+			while (neighbourzones.isEmpty() && (buffer < maxBuffer)) {
+				Geometry geometry = zoneMap.get(zone).buffer(buffer);
+				for (String neighbourzone : zoneKeys) {
+
+					Geometry neighbourgeometry = zoneMap.get(neighbourzone);
+					if (zone != neighbourzone && geometry.intersects(neighbourgeometry)) {
+						// System.out.println("Coordinate in "+ zone);
+						neighbourzones.add(neighbourzone);
+						// System.out.println("gefunden" + neighbourzone);
+					}
+				}
+				buffer = buffer + bufferInc;
+			}
+			neighbourMap.put(zone, neighbourzones);
+		}
+		// System.out.println("halt Stop!");
+	}
+
+	public String getZoneFancy(Coord coord, Map<String, Geometry> zoneMap) {
+		// Function assumes Shapes are in the same coordinate system like MATSim
+		// simulation
+
+		SortedSet<String> keys = new TreeSet<String>(zoneMap.keySet());
+		double maxRadius = 50.0;
+		double radius = 0.0;
+
+		while (radius <= maxRadius) {
+			// System.out.println("Working with radius: "+ radius );
+			for (String zone : keys) {
+				Geometry geometry = zoneMap.get(zone);
+
+				if (radius == 0) {
+					if (geometry.intersects(MGC.coord2Point(coord))) {
+						// System.out.println("Coordinate in "+ zone +" with radius "+ radius);
+
+						return zone;
+					}
+
+				} else {
+					if (geometry.intersects(MGC.coord2Point(coord).buffer(radius))) {
+						// System.out.println("Coordinate in "+ zone +" with radius "+ radius);
+
+						return zone;
+					}
+
+				}
+
+			}
+
+			radius = radius + 25.0;
+
+		}
+
+		return null;
 	}
 
 	public void initializeZone2CompanyClassCounterMap() {

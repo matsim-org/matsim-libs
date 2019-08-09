@@ -66,6 +66,47 @@ public class Demand4CompanyClass {
 
 		return null;
 	}
+	
+	public String getZoneFancy(Coord coord, Map<String, Geometry> zoneMap) {
+		// Function assumes Shapes are in the same coordinate system like MATSim
+		// simulation
+
+		SortedSet<String> keys = new TreeSet<String>(zoneMap.keySet());
+		double maxRadius = 50.0;
+		double radius = 0.0;
+
+		while (radius <= maxRadius) {
+//			System.out.println("Working with radius: "+ radius );
+			for (String zone : keys) {
+				Geometry geometry = zoneMap.get(zone);
+				
+				if (radius==0)
+				{
+					if (geometry.intersects(MGC.coord2Point(coord))) {
+//						System.out.println("Coordinate in "+ zone +" with radius "+ radius);
+						
+						return zone;
+					}
+					
+				}
+				else {
+					if (geometry.intersects(MGC.coord2Point(coord).buffer(radius))) {
+//						System.out.println("Coordinate in "+ zone +" with radius "+ radius);
+						
+						return zone;
+					}
+					
+				}
+				
+
+			}
+
+			radius = radius + 25.0;
+
+		}
+
+		return null;
+	}
 
 	public String getCompanyClass() {
 		File f = new File(csvDemandFile);
