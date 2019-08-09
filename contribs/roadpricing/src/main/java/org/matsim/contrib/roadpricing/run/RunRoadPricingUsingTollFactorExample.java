@@ -70,7 +70,7 @@ public class RunRoadPricingUsingTollFactorExample {
 
 		// instantiate the road pricing scheme, with the toll factor inserted:
 		URL roadpricingUrl = IOUtils.newUrl(config.getContext(), rpConfig.getTollLinksFile());
-		RoadPricingSchemeUsingTollFactor.createAndRegisterRoadPricingSchemeUsingTollFactor(roadpricingUrl.getFile(), tollFactor, scenario );
+		RoadPricingSchemeUsingTollFactor.createAndRegisterRoadPricingSchemeUsingTollFactor(roadpricingUrl, tollFactor, scenario );
 
 
 		// instantiate the control(l)er:

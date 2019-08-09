@@ -20,11 +20,6 @@
 
 package org.matsim.contrib.roadpricing;
 
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -32,6 +27,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.vehicles.Vehicle;
+
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author nagel
@@ -59,14 +59,13 @@ public final class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme
 	 * @param tollFactor the implementation instance of toll factors.
 	 * @param scenario
 	 */
-	private RoadPricingSchemeUsingTollFactor( String pricingSchemeFileName, TollFactor tollFactor, Scenario scenario ) {
+	private RoadPricingSchemeUsingTollFactor(URL pricingSchemeFileName, TollFactor tollFactor, Scenario scenario ) {
 
 		// read the road pricing scheme from file
 		RoadPricingSchemeImpl scheme = RoadPricingUtils.createAndRegisterMutableScheme(scenario );
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
-		System.out.println(new File(pricingSchemeFileName).getAbsolutePath());
 		try {
-			rpReader.readFile(pricingSchemeFileName);
+			rpReader.readURL(pricingSchemeFileName);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -75,8 +74,8 @@ public final class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme
 
 	}
 
-	public static void createAndRegisterRoadPricingSchemeUsingTollFactor( String pricingSchemeFileName, TollFactor tollFactor,
-																	  Scenario scenario ){
+	public static void createAndRegisterRoadPricingSchemeUsingTollFactor(URL pricingSchemeFileName, TollFactor tollFactor,
+																																			 Scenario scenario ){
 		new RoadPricingSchemeUsingTollFactor( pricingSchemeFileName, tollFactor, scenario );
 		// yy todo: inline constructor. kai, jul'19
 	}
