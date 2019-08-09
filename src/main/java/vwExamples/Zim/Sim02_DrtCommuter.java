@@ -246,7 +246,7 @@ public class Sim02_DrtCommuter {
 
 		drt.setVehiclesFile(inbase + "\\input\\fleets\\fleet.xml.gz");
 		drt.setIdleVehiclesReturnToDepots(false);
-		drt.setOperationalScheme("stopbased");
+		drt.setOperationalScheme(DrtConfigGroup.OperationalScheme.stopbased);
 		drt.setPlotDetailedCustomerStats(true);
 
 //		 EvConfigGroup eDrt = (EvConfigGroup)

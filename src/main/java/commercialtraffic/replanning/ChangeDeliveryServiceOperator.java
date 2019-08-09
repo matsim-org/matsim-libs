@@ -56,7 +56,7 @@ public class ChangeDeliveryServiceOperator extends AbstractMultithreadedModule {
     public PlanAlgorithm getPlanAlgoInstance() {
         return plan -> {
             List<Activity> activitiesWithServices = new ArrayList<>();
-            plan.getPlanElements().stream().filter(Activity.class::isInstance).filter(a -> a.getAttributes().getAsMap().containsKey(PersonDelivery.DELIEVERY_TYPE)).forEach(planElement -> activitiesWithServices.add((Activity) planElement));
+            plan.getPlanElements().stream().filter(Activity.class::isInstance).filter(a -> a.getAttributes().getAsMap().containsKey(PersonDelivery.JOB_TYPE)).forEach(planElement -> activitiesWithServices.add((Activity) planElement));
             if (activitiesWithServices.isEmpty()) {
                 return;
             }

@@ -179,7 +179,7 @@ public class RunDrtScenarioBatchBS_eDRT_withParking {
 
 		drt.setVehiclesFile(inbase + "\\fleets\\fleet.xml.gz");
 		drt.setIdleVehiclesReturnToDepots(true);
-		drt.setOperationalScheme("stopbased");
+		drt.setOperationalScheme(DrtConfigGroup.OperationalScheme.stopbased);
 		drt.setPlotDetailedCustomerStats(true);
 
 		EvConfigGroup eDrt = (EvConfigGroup) config.getModules().get(EvConfigGroup.GROUP_NAME);

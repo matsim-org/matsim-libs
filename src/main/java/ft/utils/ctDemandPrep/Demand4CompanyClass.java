@@ -1,0 +1,120 @@
+package ft.utils.ctDemandPrep;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.locationtech.jts.geom.Geometry;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
+
+import com.opencsv.CSVReader;
+
+import vwExamples.utils.DemandFromCSV.Trip;
+
+public class Demand4CompanyClass {
+	String csvDemandFile;
+	String epsgForDemandFile;
+	Map<String, Geometry> zoneMap;
+	List<String[]> companyLocationsList;
+	Map<String, ArrayList<Company>> companyClass2CompanyMap;
+
+	Demand4CompanyClass(String csvDemandFile, String epsgForDemandFile, Map<String, Geometry> zoneMap) {
+		this.csvDemandFile = csvDemandFile;
+		this.epsgForDemandFile = epsgForDemandFile;
+		this.zoneMap = zoneMap;
+		this.companyLocationsList = new ArrayList<String[]>();
+		this.companyClass2CompanyMap = new HashMap<String, ArrayList<Company>>();
+	}
+
+	public String getZone(Coord coord, Map<String, Geometry> zoneMap) {
+		// Function assumes Shapes are in the same coordinate system like MATSim
+		// simulation
+
+		for (String zone : zoneMap.keySet()) {
+			Geometry geometry = zoneMap.get(zone);
+			if (geometry.intersects(MGC.coord2Point(coord))) {
+				// System.out.println("Coordinate in "+ zone);
+				return zone;
+			}
+		}
+
+		return null;
+	}
+
+	public String getCompanyClass() {
+		File f = new File(csvDemandFile);
+		String[] splitted = f.getName().split("-");
+		String companyClass = null;
+
+		if (splitted.length > 0) {
+			companyClass = splitted[0];
+		}
+
+		return companyClass;
+	}
+
+	public void readDemandCSV() {
+		// List<String[]> lines = new ArrayList<String[]>();
+		// request_time,origin_lon,origin_lat,destination_lon,destination_lat,adult_passengers,earliest_departure_time
+		// 3.83,9.748710662806856,52.37641117305442,9.724524282164197,52.387478853652404,1,3.83
+
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
+				"EPSG:25832");
+
+		CSVReader reader = null;
+		try {
+			reader = new CSVReader(new FileReader(this.csvDemandFile));
+			companyLocationsList = reader.readAll();
+			for (int i = 1; i < companyLocationsList.size(); i++) {
+				String[] lineContents = companyLocationsList.get(i);
+				double lon = Double.parseDouble(lineContents[3]); // origin_lon,
+				double lat = Double.parseDouble(lineContents[2]); // origin_lat,
+
+				Coord coord = ct.transform(new Coord(lon, lat));
+
+				String companyClass = getCompanyClass();
+
+				String zone = getZone(coord, zoneMap);
+
+				Company company = new Company(coord, zone, companyClass);
+
+				if (!companyClass2CompanyMap.containsKey(companyClass)) {
+					companyClass2CompanyMap.put(companyClass, new ArrayList<Company>());
+					companyClass2CompanyMap.get(companyClass).add(company);
+				} else {
+					companyClass2CompanyMap.get(companyClass).add(company);
+				}
+
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
+	}
+
+}

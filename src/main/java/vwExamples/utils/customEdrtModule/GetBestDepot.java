@@ -324,7 +324,10 @@ public class GetBestDepot implements DepotFinder {
 			return bestHub;
 
 		} else {
-			throw new RuntimeException("Overall hub capacity != Fleet size");
+			throw new RuntimeException("Overall hub capacity != Fleet size...."
+					+ " A comment (michal): this method is called during a QSim step, and not between steps."
+					+ " This may lead to some non-deterministic behaviour - depending on the order of processing "
+					+ " within a QSim step. Therefore RunDrtScenarioBatchH_eDRT_TUBTest sometimes fails sometimes passes.");
 		}
 
 	}

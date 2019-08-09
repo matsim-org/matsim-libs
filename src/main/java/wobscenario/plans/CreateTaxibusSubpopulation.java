@@ -20,11 +20,9 @@
 package wobscenario.plans;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
@@ -55,13 +53,13 @@ public class CreateTaxibusSubpopulation {
 			}
 			}
 		if (rep){
-			scenario.getPopulation().getPersonAttributes().putAttribute(p.getId().toString(), "subpopulation", "taxibusCustomer");
+			PopulationUtils.putPersonAttribute(p, "subpopulation", "taxibusCustomer");
 		}
-		
 		}
-		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/bswb_pesonAttributes.xml");
-	}
-	
+//		new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/bswb_pesonAttributes.xml");
+        new PopulationWriter(scenario.getPopulation()).write("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/input/bswb_pesonAttributes.xml"); //not sure if this is what was originally intended here..
+    }
+
 	public static void main(String[] args) {
 		CreateTaxibusSubpopulation s = new CreateTaxibusSubpopulation();
 		s.run();

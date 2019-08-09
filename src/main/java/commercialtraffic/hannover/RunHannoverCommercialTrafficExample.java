@@ -47,10 +47,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class RunHannoverCommercialTrafficExample {
     public static void main(String[] args) {
-        String runId = "haj-delivery";
+        String runId = "haj-delivery_ap1.1_v2";
 
         Config config = ConfigUtils.loadConfig(args[0], new CommercialTrafficConfigGroup());
-        config.controler().setOutputDirectory("output/" + runId);
+        String outputDir = args[1];
+        config.controler().setOutputDirectory(outputDir + runId);
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         config.controler().setRunId(runId);
 

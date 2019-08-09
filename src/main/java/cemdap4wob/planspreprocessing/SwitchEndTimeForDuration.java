@@ -36,8 +36,8 @@ import org.matsim.core.utils.misc.Time;
 
 public class SwitchEndTimeForDuration {
     public static void main(String[] args) {
-        String inputFile = "D:/runs-svn/vw_rufbus/2018/vw219/ITERS/it.0/vw219.0.plans.xml.gz";
-        String outputFile = "C://Users//Joschka//Documents//shared-svn//projects//vw_rufbus//projekt2//cemdap-vw//vw219-input/initial_plans1.0.xml.gz";
+        String inputFile = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\input\\finishedPlans.xml.gz";
+        String outputFile = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\input\\finishedPlans_1.0_timeFIX.xml.gz";
         final int[] i = {0, 0};
         TripsToLegsAlgorithm tripsToLegsAlgorithm = new TripsToLegsAlgorithm(activityType -> activityType.endsWith("interaction"), new MainModeIdentifierImpl());
 

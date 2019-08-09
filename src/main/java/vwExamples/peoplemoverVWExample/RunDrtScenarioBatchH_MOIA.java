@@ -139,7 +139,7 @@ public class RunDrtScenarioBatchH_MOIA {
 		
 		drt.setVehiclesFile(inbase + "\\input\\fleets\\fleet.xml.gz");
 		drt.setIdleVehiclesReturnToDepots(false);
-		drt.setOperationalScheme("stopbased");
+		drt.setOperationalScheme(DrtConfigGroup.OperationalScheme.stopbased);
 		drt.setPlotDetailedCustomerStats(true);
 
 

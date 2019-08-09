@@ -32,7 +32,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-
+import com.google.common.collect.ImmutableSet;
 
 public class RunDrtWithStops {
 
@@ -45,24 +45,24 @@ public class RunDrtWithStops {
 		Config config = ConfigUtils.loadConfig(configFile, new DvrpConfigGroup(), new TaxiConfigGroup(),
 				new OTFVisConfigGroup(), new DrtConfigGroup());
 		//	for debugging:
-//		config.plans().setInputFile("singleDrtAgent.xml");
-		DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
-		
+		//		config.plans().setInputFile("singleDrtAgent.xml");
+		DrtConfigGroup drt = (DrtConfigGroup)config.getModules().get(DrtConfigGroup.GROUP_NAME);
+
 		drt.setEstimatedBeelineDistanceFactor(1.3);
-		drt.setEstimatedSpeed(30/3.6);
+		drt.setEstimatedDrtSpeed(30 / 3.6);
 		drt.setMaxWalkDistance(500);
 		drt.setMaxTravelTimeAlpha(1.5);
 		drt.setMaxTravelTimeBeta(300);
 		drt.setTransitStopFile("network/stopsWRS_300m.xml");
-		drt.setOperationalScheme(OperationalScheme.stopbased.toString());
+		drt.setOperationalScheme(OperationalScheme.stopbased);
 		int threads = Runtime.getRuntime().availableProcessors() - 1;
 		System.out.println(threads + " threads used for drt.");
 		drt.setNumberOfThreads(threads);
-		
-		DvrpConfigGroup.get(config).setNetworkMode("av");
-		
+
+		DvrpConfigGroup.get(config).setNetworkModes(ImmutableSet.of("av"));
+
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		
+
 		config.qsim().setStartTime(0);
 		config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);
 		config.controler().setWriteEventsInterval(1);
@@ -72,7 +72,6 @@ public class RunDrtWithStops {
 	public static Controler createControler(Config config, boolean otfvis) {
 
 		Controler controler = DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis);
-	
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
