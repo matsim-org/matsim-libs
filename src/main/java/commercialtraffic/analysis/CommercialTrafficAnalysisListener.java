@@ -85,10 +85,10 @@ public class CommercialTrafficAnalysisListener implements IterationEndsListener,
     private void analyzeCarrierMarketShares(int iteration) {
 
 
-        Map<String, Set<Id<Carrier>>> splitCarriersByMarket = CommercialJobUtils.splitCarriersByMarket(carriers);
+        Map<String, Set<Id<Carrier>>> carriersSplitByMarket = CommercialJobUtils.splitCarriersByMarket(carriers);
 
 
-        for (Map.Entry<String, Set<Id<Carrier>>> entry : splitCarriersByMarket.entrySet()) {
+        for (Map.Entry<String, Set<Id<Carrier>>> entry : carriersSplitByMarket.entrySet()) {
             Map<Id<Carrier>, Map<Integer, Double>> marketShareHistory = carrierShareHistories.getOrDefault(entry.getKey(), new HashMap<>());
             carrierShareHistories.put(entry.getKey(), marketShareHistory);
 
@@ -191,6 +191,5 @@ public class CommercialTrafficAnalysisListener implements IterationEndsListener,
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
         scoreCommercialServices.prepareTourArrivalsForDay();
-
     }
 }
