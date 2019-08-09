@@ -85,8 +85,8 @@ public class RunEvExamplewithLTHConsumptionModel {
 
 		VehicleTypeSpecificDriveEnergyConsumptionFactory driveEnergyConsumptionFactory = new VehicleTypeSpecificDriveEnergyConsumptionFactory();
 		driveEnergyConsumptionFactory.addEnergyConsumptionModelFactory("defaultVehicleType",
-				new LTHConsumptionModelReader(Id.create("defaultVehicleType", VehicleType.class)).readFile(
-						ConfigGroup.getInputFileURL(config.getContext(), "MidCarMap.csv").getFile()));
+				new LTHConsumptionModelReader(Id.create("defaultVehicleType", VehicleType.class)).readURL(
+						ConfigGroup.getInputFileURL(config.getContext(), "MidCarMap.csv")));
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new EvModule());
