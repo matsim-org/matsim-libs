@@ -18,7 +18,7 @@
  * *********************************************************************** *
  */
 
-package vwExamples.utils.DrtTrajectoryAnalyzer;
+package vwExamples.utils.drtTrajectoryAnalyzer;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;

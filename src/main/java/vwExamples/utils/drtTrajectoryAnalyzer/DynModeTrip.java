@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package vwExamples.utils.DrtTrajectoryAnalyzer;
+package vwExamples.utils.drtTrajectoryAnalyzer;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;

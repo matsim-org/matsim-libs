@@ -1,4 +1,4 @@
-package vwExamples.utils.CreateShiftingScenario;
+package vwExamples.utils.createShiftingScenario;
 
 
 import org.matsim.core.router.TripStructureUtils.Subtour;
