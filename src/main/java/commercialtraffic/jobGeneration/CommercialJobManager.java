@@ -21,6 +21,7 @@
 package commercialtraffic.jobGeneration;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.Carriers;
@@ -80,9 +81,10 @@ public class CommercialJobManager {
                 .collect(Collectors.toSet());
     }
 
-    private Set<CarrierService> getCarrierServices(){
-        return Collections.unmodifiableSet(this.serviceRegistry);
+    Map<Id<CarrierService>,CarrierService> getCarrierServicesMap(){
+        return Collections.unmodifiableMap(serviceRegistry.stream().collect(Collectors.toMap(CarrierService::getId, s -> s, (a, b) -> b)) );
     }
+
 
     public Id<Carrier> getCurrentCarrierOfService(Id<CarrierService> service) {
         return this.service2Operator.get(service);

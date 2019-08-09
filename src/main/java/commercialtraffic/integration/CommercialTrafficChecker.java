@@ -21,6 +21,7 @@ package commercialtraffic.integration;/*
  * created by jbischoff, 20.06.2019
  */
 
+import commercialtraffic.jobGeneration.CommercialJobManager;
 import commercialtraffic.jobGeneration.CommercialJobUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.log4j.Logger;
@@ -30,6 +31,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.Carriers;
 
 import java.util.Arrays;
@@ -38,43 +40,39 @@ import java.util.Map;
 
 public class CommercialTrafficChecker {
     private static final Logger log = Logger.getLogger(CommercialTrafficChecker.class);
-    private static final List<String> attributesToCheck = Arrays.asList(CommercialJobUtils.JOB_OPERATOR, CommercialJobUtils.JOB_DURATION, CommercialJobUtils.JOB_TIME_END, CommercialJobUtils.JOB_EARLIEST_START, CommercialJobUtils.JOB_SIZE);
 
     /**
-     * @param population to check
-     * @return true if errors exist, false if all attributes are set
+     * checks whether the services referenced in the population have the corresponding link id's
+     *
+     * @param population containing references to services
+     * @param services
      */
-    public static boolean hasMissingAttributes(Population population) {
+    public static void checkLinkIdsOfReferencedServicesInPopulation(Population population, Map<Id<CarrierService>, CarrierService> services) {
         final MutableBoolean fail = new MutableBoolean(false);
         for (Person p : population.getPersons().values()) {
-            for (Plan plan : p.getPlans()) {
-                plan.getPlanElements().stream().filter(Activity.class::isInstance).filter(planElement -> planElement.getAttributes().getAsMap().containsKey(CommercialJobUtils.JOB_TYPE)).forEach(planElement -> {
-                    if (checkActivityConsistency((Activity) planElement, p.getId()) == true) {
-                        fail.setTrue();
-                    }
-                });
-            }
+            p.getPlans().parallelStream()
+                    .forEach(plan -> {
+                        plan.getPlanElements().stream()
+                                .filter(Activity.class::isInstance)
+                                .filter(planElement -> planElement.getAttributes()
+                                .getAsMap().containsKey(CommercialJobUtils.JOB_ID)).forEach(planElement ->
+                                    checkActivityConsistency((Activity) planElement, p.getId(), services));
+                    });
         }
-        return fail.booleanValue();
     }
 
-    private static boolean checkActivityConsistency(Activity activity, Id<Person> pid) {
-        boolean fail = false;
-        Map<String, Object> attributes = activity.getAttributes().getAsMap();
-        for (String attribute : attributesToCheck) {
-            if (!attributes.containsKey(attribute)) {
-                log.error("Person" + pid + " lacks " + attribute + " in Activity " + activity.getType());
-                fail = true;
-            }
+
+    private static void checkActivityConsistency(Activity activity, Id<Person> pid, Map<Id<CarrierService>, CarrierService> services) {
+        String[] jobIds = CommercialJobUtils.getServiceIdStringArrayFromActivity(activity);
+        for (String jobId : jobIds) {
+            Id<CarrierService> serviceId = Id.create(jobId, CarrierService.class);
+            if (services.containsKey(serviceId))
+                throw new IllegalStateException("Activity " + activity + " of person " + pid + " references a service which does not exist in input carriers file. serviceId=" + serviceId);
+            if (!services.get(serviceId).getLocationLinkId().equals(activity.getLinkId()))
+                throw new IllegalStateException("linkId's of service " + serviceId + " and activity " + activity + " of person " + pid + " do not match!");
         }
-        Double timeWindowStart = Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_EARLIEST_START)));
-        Double timeWindowEnd = Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_TIME_END)));
-        if (timeWindowEnd < timeWindowStart) {
-            log.error("Person " + pid + " has an error in timewindows in Activity " + activity.getType() + ". start=" + timeWindowStart + " end=" +timeWindowEnd);
-            fail = true;
-        }
-        return fail;
     }
+
 
     /**
      * @param carriers to check

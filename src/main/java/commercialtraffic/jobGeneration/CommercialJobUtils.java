@@ -46,12 +46,6 @@ public class CommercialJobUtils {
     public static final String JOB_ID_REGEX = ";";
     public static final String CARRIERSPLIT = "_";
 
-    public static Id<CarrierService> getRandomServiceFromActivity (Activity activity, Random random){
-        if(! activityExpectsServices(activity)) throw new IllegalArgumentException("can not retrieve service from activity " + activity);
-        String[] jobIds = String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_ID)).split(CommercialJobUtils.JOB_ID_REGEX);
-        return Id.create(jobIds[random.nextInt(jobIds.length)],CarrierService.class);
-    }
-
     public static Id<Carrier> getCarrierIdFromDriver(Id<Person> personId) {
         return Id.create(personId.toString().split(CARRIERSPLIT)[1] + CARRIERSPLIT + personId.toString().split(CARRIERSPLIT)[2], Carrier.class);
     }
@@ -80,6 +74,17 @@ public class CommercialJobUtils {
             carriersSplitByMarket.put(market, carriersForMarket);
         }
         return carriersSplitByMarket;
+    }
+
+    public static Id<CarrierService> getRandomServiceFromActivity(Activity activity, Random random){
+        if(! CommercialJobUtils.activityExpectsServices(activity)) throw new IllegalArgumentException("can not retrieve service from activity " + activity);
+        String[] jobIds = getServiceIdStringArrayFromActivity(activity);
+        return Id.create(jobIds[random.nextInt(jobIds.length)],CarrierService.class);
+    }
+
+    public static String[] getServiceIdStringArrayFromActivity(Activity activity){
+        if(! CommercialJobUtils.activityExpectsServices(activity)) throw new IllegalArgumentException("can not retrieve service id's from activity " + activity);
+        return String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_ID)).split(CommercialJobUtils.JOB_ID_REGEX);
     }
 
 }

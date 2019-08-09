@@ -96,10 +96,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
         this.jobManager = jobManager;
         maxIterations = ctcg.getJspritIterations();
         carTT = travelTimes.get(TransportMode.car);
-        if (CommercialTrafficChecker.hasMissingAttributes(population)) {
-            throw new RuntimeException("Not all agents expecting deliveries contain all required attributes fo receival. Please check the log for DeliveryConsistencyChecker. Aborting.");
-        }
-
+        CommercialTrafficChecker.checkLinkIdsOfReferencedServicesInPopulation(population, jobManager.getCarrierServicesMap());
     }
 
     /**

@@ -77,6 +77,30 @@
         </plan>
 
     </person>
+	
+	 <person id="4">
+        <plan selected="yes">
+            <activity type="home" link="255" x="-200.0" y="800.0" end_time="08:00:00">
+            </activity>
+            <leg mode="car">
+            </leg>
+            <activity type="home" link="112" x="0.0" y="0.0" end_time="16:00:00">
+                <attributes>
+                    <attribute name="deliveryAmount" class="java.lang.Integer">1</attribute>
+                    <attribute name="deliveryDuration" class="java.lang.Integer">180</attribute>
+                    <attribute name="deliveryTimeEnd" class="java.lang.Integer">51000</attribute>
+                    <attribute name="deliveryTimeStart" class="java.lang.Integer">50000</attribute>
+                    <attribute name="deliveryType" class="java.lang.String">pizza</attribute>
+                    <attribute name="operator" class="java.lang.Integer">1</attribute>
+                </attributes>
+            </activity>
+            <leg mode="car">
+            </leg>
+            <activity type="home" link="116" x="-200.0" y="800.0">
+            </activity>
+        </plan>
+
+    </person>
 
 
 </population>
