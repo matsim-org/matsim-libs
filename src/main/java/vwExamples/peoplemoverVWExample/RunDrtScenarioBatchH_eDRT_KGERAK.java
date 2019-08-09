@@ -62,9 +62,9 @@ import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
 import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 import vwExamples.utils.CreateEDRTVehiclesAndChargers;
-import vwExamples.utils.DrtTrajectoryAnalyzer.MyDrtTrajectoryAnalysisModule;
 import vwExamples.utils.customEV.BatteryReplacementCharging;
 import vwExamples.utils.customEdrtModule.CustomEDrtControlerCreator;
+import vwExamples.utils.drtTrajectoryAnalyzer.MyDrtTrajectoryAnalysisModule;
 
 /**
  * @author axer

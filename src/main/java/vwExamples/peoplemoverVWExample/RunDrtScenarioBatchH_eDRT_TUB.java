@@ -57,9 +57,9 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
 import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
-import vwExamples.utils.DrtTrajectoryAnalyzer.MyDrtTrajectoryAnalysisModule;
 import vwExamples.utils.customEV.BatteryReplacementCharging;
 import vwExamples.utils.customEdrtModule.CustomEDrtControlerCreator;
+import vwExamples.utils.drtTrajectoryAnalyzer.MyDrtTrajectoryAnalysisModule;
 
 /**
  * @author axer

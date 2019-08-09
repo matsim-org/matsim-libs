@@ -52,7 +52,7 @@ import electric.edrt.run.RunVWEDrtScenario;
 import parking.ParkingRouterConfigGroup;
 import parking.ParkingRouterModule;
 import vwExamples.utils.CreateEDRTVehiclesAndChargers;
-import vwExamples.utils.DrtTrajectoryAnalyzer.MyDrtTrajectoryAnalysisModule;
+import vwExamples.utils.drtTrajectoryAnalyzer.MyDrtTrajectoryAnalysisModule;
 import vwExamples.utils.parking.createParkingNetwork.CreateParkingNetwork;
 
 /**
