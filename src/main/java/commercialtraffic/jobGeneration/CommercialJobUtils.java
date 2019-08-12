@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
+import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.core.gbl.MatsimRandom;
 
@@ -48,6 +49,10 @@ public class CommercialJobUtils {
 
     public static Id<Carrier> getCarrierIdFromDriver(Id<Person> personId) {
         return Id.create(personId.toString().split(CARRIERSPLIT)[1] + CARRIERSPLIT + personId.toString().split(CARRIERSPLIT)[2], Carrier.class);
+    }
+
+    static Id<Person> createDriverId(Carrier carrier, int nextId, CarrierVehicle carrierVehicle) {
+        return Id.createPersonId("freight" + CARRIERSPLIT +  carrier.getId() + CARRIERSPLIT + "veh" + CARRIERSPLIT + carrierVehicle.getVehicleId() + CARRIERSPLIT + nextId);
     }
 
     public static boolean planExpectsDeliveries(Plan plan) {

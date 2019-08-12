@@ -149,8 +149,8 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
         return FreightConstants.DELIVERY + CommercialJobUtils.CARRIERSPLIT + id;
     }
 
-    public static Id<Person> getCustomerIdFromDeliveryActivityType(String actType){
-        return Id.createPersonId(actType.substring(actType.indexOf(CommercialJobUtils.CARRIERSPLIT)+1,actType.length()));
+    public static Id<CarrierService> getServiceIdFromActivityType(String actType){
+        return Id.create(actType.substring(actType.indexOf(CommercialJobUtils.CARRIERSPLIT)+1),CarrierService.class);
     }
 
     private void runTourPlanning() {
@@ -191,7 +191,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
 
                 CarrierVehicle carrierVehicle = scheduledTour.getVehicle();
 
-                Id<Person> driverId = Id.createPersonId("freight_" + carrier.getId() + "_veh_" + carrierVehicle.getVehicleId() + "_" + nextId);
+                Id<Person> driverId = CommercialJobUtils.createDriverId(carrier, nextId, carrierVehicle);
                 nextId++;
 
                 Person driverPerson = createDriverPerson(driverId);
@@ -260,6 +260,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
             }
         }
     }
+
 
     private Person createDriverPerson(Id<Person> driverId) {
         final Id<Person> id = driverId;

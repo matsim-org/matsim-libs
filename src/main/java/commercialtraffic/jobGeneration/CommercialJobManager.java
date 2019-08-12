@@ -26,6 +26,7 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.Carriers;
 
+import javax.inject.Inject;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,6 +37,7 @@ public class CommercialJobManager {
     private Map<Id<CarrierService>,Id<Carrier>> service2Operator = new HashMap<>();
 //    private final Map<Id<CarrierService>,String> serviceType = new HashMap<>();
 
+    @Inject
     CommercialJobManager(Carriers carriers){
         carriers.getCarriers().values().forEach(carrier -> {
             carrier.getServices().forEach(carrierService -> {
@@ -81,10 +83,9 @@ public class CommercialJobManager {
                 .collect(Collectors.toSet());
     }
 
-    Map<Id<CarrierService>,CarrierService> getCarrierServicesMap(){
+    public Map<Id<CarrierService>,CarrierService> getCarrierServicesMap(){
         return Collections.unmodifiableMap(serviceRegistry.stream().collect(Collectors.toMap(CarrierService::getId, s -> s, (a, b) -> b)) );
     }
-
 
     public Id<Carrier> getCurrentCarrierOfService(Id<CarrierService> service) {
         return this.service2Operator.get(service);
