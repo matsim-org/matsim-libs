@@ -16,7 +16,7 @@
         <!-- Default:1800.0; Defines how many seconds a time mutation can maximally shift a time. -->
         <param name="mutationRange" value="1800.0"/>
         <!-- false; Use individual settings for each subpopulation. If enabled but no settings are found, regular settings are uses as fallback. -->
-        <param name="useIndividualSettingsForSubpopulations" value="false"/>
+        <!--<param name="useIndividualSettingsForSubpopulations" value="false"/> -->
     </module>
     <module name="changeMode">
         <!-- Defines whether car availability is considered be considered or not. An agent has no car only if it has no license, or never access to a car. Default: true -->
