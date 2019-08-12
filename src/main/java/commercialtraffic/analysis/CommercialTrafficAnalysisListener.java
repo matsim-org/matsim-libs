@@ -46,7 +46,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.*;
 
 
-public class CommercialTrafficAnalysisListener implements IterationEndsListener, BeforeMobsimListener {
+public class CommercialTrafficAnalysisListener implements IterationEndsListener {
 
     @Inject
     MatsimServices services;
@@ -186,10 +186,5 @@ public class CommercialTrafficAnalysisListener implements IterationEndsListener,
             }
 
         }
-    }
-
-    @Override
-    public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-        scoreCommercialServices.prepareTourArrivalsForDay();
     }
 }

@@ -21,64 +21,57 @@ package commercialtraffic.integration;/*
  * created by jbischoff, 20.06.2019
  */
 
-import commercialtraffic.jobGeneration.CommercialJobManager;
 import commercialtraffic.jobGeneration.CommercialJobUtils;
-import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.Carriers;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class CommercialTrafficChecker {
     private static final Logger log = Logger.getLogger(CommercialTrafficChecker.class);
+    private final Integer MAXWARNCOUNT = 10;
+    private int warnCount = 1;
 
-    /**
-     * checks whether the services referenced in the population have the corresponding link id's
-     *
-     * @param population containing references to services
-     * @param services
-     */
-    public static void checkLinkIdsOfReferencedServicesInPopulation(Population population, Map<Id<CarrierService>, CarrierService> services) {
-        final MutableBoolean fail = new MutableBoolean(false);
-        for (Person p : population.getPersons().values()) {
-            p.getPlans().parallelStream()
-                    .forEach(plan -> {
-                        plan.getPlanElements().stream()
-                                .filter(Activity.class::isInstance)
-                                .filter(planElement -> planElement.getAttributes()
-                                .getAsMap().containsKey(CommercialJobUtils.JOB_ID)).forEach(planElement ->
-                                    checkActivityConsistency((Activity) planElement, p.getId(), services));
-                    });
+    private Set<Id<CarrierService>> allServiceIdsReferencedInPopulation = new HashSet<>();
+
+    public void checkActivityServiceLocationConsistency(Activity activity, Id<Person> pid, Map<Id<CarrierService>, CarrierService> services) {
+        if(! CommercialJobUtils.activityExpectsServices(activity)) throw new RuntimeException();
+
+        boolean actHasLinkId = activity.getLinkId() != null;
+        if (!actHasLinkId && warnCount <= MAXWARNCOUNT) {
+            log.warn("activity " + activity + " of agent " + pid + " references at least one service and has no link id set. " +
+                    "please check if the service's link ids correspond to the activity location." +
+                    "Otherwise, results will be wrong and should not be interpreted!" +
+                    "This message is only given " + MAXWARNCOUNT + " times");
+            warnCount++;
+        }
+
+        Set<Id<CarrierService>> jobIds = CommercialJobUtils.getServiceIdsFromActivity(activity);
+        for (Id<CarrierService> serviceId : jobIds) {
+            if(!this.allServiceIdsReferencedInPopulation.add(serviceId))
+                throw new IllegalArgumentException("service id=" + serviceId + " is contained at least twice in population file");
+            if (!services.containsKey(serviceId))
+                throw new IllegalArgumentException("Activity " + activity + " of person " + pid + " references a service which does not exist in input carriers file. serviceId=" + serviceId);
+            if(actHasLinkId){
+                if (!services.get(serviceId).getLocationLinkId().equals(activity.getLinkId()))
+                    throw new IllegalStateException("linkId's of service " + serviceId + " and activity " + activity + " of person " + pid + " do not match!");
+            }
+
         }
     }
-
-
-    private static void checkActivityConsistency(Activity activity, Id<Person> pid, Map<Id<CarrierService>, CarrierService> services) {
-        String[] jobIds = CommercialJobUtils.getServiceIdStringArrayFromActivity(activity);
-        for (String jobId : jobIds) {
-            Id<CarrierService> serviceId = Id.create(jobId, CarrierService.class);
-            if (services.containsKey(serviceId))
-                throw new IllegalStateException("Activity " + activity + " of person " + pid + " references a service which does not exist in input carriers file. serviceId=" + serviceId);
-            if (!services.get(serviceId).getLocationLinkId().equals(activity.getLinkId()))
-                throw new IllegalStateException("linkId's of service " + serviceId + " and activity " + activity + " of person " + pid + " do not match!");
-        }
-    }
-
 
     /**
      * @param carriers to check
      * @return true if errors exist, false if carriers are set properly
      */
-    public static boolean checkCarrierConsistency(Carriers carriers) {
+    boolean checkCarrierConsistency(Carriers carriers) {
         boolean fail = false;
         for (Carrier carrier : carriers.getCarriers().values()) {
             if (carrier.getId().toString().split(CommercialJobUtils.CARRIERSPLIT).length != 2) {

@@ -20,25 +20,49 @@
 
 package commercialtraffic.jobGeneration;
 
+import commercialtraffic.integration.CommercialTrafficChecker;
+import commercialtraffic.integration.CommercialTrafficConfigGroup;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.router.util.TravelTime;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class CommercialJobManager {
+public class CommercialJobManager implements BeforeMobsimListener, AfterMobsimListener {
 
+    private final CommercialTrafficChecker consistencyChecker;
+    private final FreightAgentInserter agentInserter;
+    private final Scenario scenario;
+    private final CommercialTrafficConfigGroup ctConfigGroup;
     private Carriers carriers;
     private Set<CarrierService> serviceRegistry = new HashSet<>();
     private Map<Id<CarrierService>,Id<Carrier>> service2Operator = new HashMap<>();
-//    private final Map<Id<CarrierService>,String> serviceType = new HashMap<>();
+    private Map<Id<CarrierService>,Id<Person>> service2Customer = new HashMap<>();
+    private TravelTime carTravelTime;
 
     @Inject
-    CommercialJobManager(Carriers carriers){
+    public CommercialJobManager(Carriers carriers, Scenario scenario, FreightAgentInserter agentInserter, CommercialTrafficChecker consistencyChecker, Map<String, TravelTime> travelTimes){
+        this.agentInserter = agentInserter;
+        this.consistencyChecker = consistencyChecker;
+        this.scenario = scenario;
+        this.carTravelTime = travelTimes.get(TransportMode.car);
+        this.ctConfigGroup = CommercialTrafficConfigGroup.get(scenario.getConfig());
         carriers.getCarriers().values().forEach(carrier -> {
             carrier.getServices().forEach(carrierService -> {
                 this.serviceRegistry.add(carrierService);
@@ -48,7 +72,34 @@ public class CommercialJobManager {
             carrier.getServices().clear(); //initialize
         });
         this.carriers = carriers;
+        mapServicesToCustomerAndCheckLocationConsistency(scenario.getPopulation());
     }
+
+
+    private void mapServicesToCustomerAndCheckLocationConsistency(Population population){
+        final MutableBoolean fail = new MutableBoolean(false);
+        for (Person p : population.getPersons().values()) {
+            p.getPlans().stream()
+                .forEach(plan -> {
+                    plan.getPlanElements().stream()
+                        .filter(Activity.class::isInstance)
+                        .filter(planElement -> CommercialJobUtils.activityExpectsServices((Activity) planElement))
+                            .forEach(planElement -> {
+                                consistencyChecker.checkActivityServiceLocationConsistency((Activity) planElement, p.getId(), getCarrierServicesMap());
+                            mapServiceToCustomer(p.getId(),(Activity) planElement);
+                        });
+                });
+        }
+    }
+
+    private void mapServiceToCustomer(Id<Person> personId, Activity activity) {
+        Set<Id<CarrierService>> jobIDs = CommercialJobUtils.getServiceIdsFromActivity(activity);
+        for(Id<CarrierService> carrierServiceId : jobIDs){
+            if(this.service2Customer.containsKey(carrierServiceId)) throw new IllegalArgumentException("service id " + carrierServiceId + " is referenced twice in input population");
+            this.service2Customer.put(carrierServiceId,personId);
+        }
+    }
+
 
     public void setOperatorForService(Id<CarrierService> serviceId, Id<Carrier> carrierId){
         if(! this.service2Operator.containsKey(serviceId)) throw new IllegalArgumentException("there is no registration of service " + serviceId);
@@ -56,20 +107,15 @@ public class CommercialJobManager {
         this.service2Operator.put(serviceId,carrierId);
     }
 
-    Carriers getCarriersWithServicesForIteration(){
-        Carriers carriersForIteration = new Carriers();
-        carriers.getCarriers().values().forEach(carriersForIteration::addCarrier);
-        serviceRegistry.forEach(service -> carriersForIteration.getCarriers().get(service2Operator.get(service.getId())).getServices().add(service));
-        return carriersForIteration;
-        //TODO test whether this.carriers now also contain services => if so, write initialize method or create copies of carrier and their capabilities
-    }
-
-
     private String getServiceTypeOfCarrier(Id<Carrier> carrierId){
         String[] idString =  carrierId.toString().split(CommercialJobUtils.CARRIERSPLIT);
         if(idString.length != 2) throw new IllegalArgumentException("illegal carrier id. please make sure that carrier id's are set to the pattern serviceType" + CommercialJobUtils.CARRIERSPLIT + "operator!"
                 + "\n this is not the case for " + carrierId);
         return idString[0];
+    }
+
+    public Id<Person> getCustomer(@NotNull Id<CarrierService> serviceId){
+        return this.service2Customer.get(serviceId);
     }
 
     public String getServiceType(Id<CarrierService> serviceId){
@@ -89,5 +135,40 @@ public class CommercialJobManager {
 
     public Id<Carrier> getCurrentCarrierOfService(Id<CarrierService> service) {
         return this.service2Operator.get(service);
+    }
+
+    /**
+     * Notifies all observers of the Controler that the mobility simulation will start next.
+     *
+     * @param event
+     */
+    @Override
+    public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+        serviceRegistry.forEach(service -> carriers.getCarriers().get(service2Operator.get(service.getId())).getServices().add(service));
+        TourPlanning.runTourPlanningForCarriers(carriers,scenario,ctConfigGroup.getJspritIterations(), carTravelTime);
+        agentInserter.createFreightAgents(carriers,ctConfigGroup.getFirstLegTraveltimeBufferFactor());
+    }
+
+    /**
+     * Notifies all observers of the Controler that the mobility simulation just finished.
+     *
+     * @param event
+     */
+    @Override
+    public void notifyAfterMobsim(AfterMobsimEvent event) {
+        writeCarriersFileForIteration(event);
+        this.agentInserter.removeFreightAgents(carriers);
+        carriers.getCarriers().values().forEach(carrier -> {
+            carrier.getServices().clear();
+            carrier.getShipments().clear();
+            carrier.clearPlans();
+        });
+    }
+
+    private void writeCarriersFileForIteration(AfterMobsimEvent event) {
+        String dir = event.getServices().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/";
+//        log.info("writing carrier file of iteration " + event.getIteration() + " to " + dir);
+        CarrierPlanXmlWriterV2 planWriter = new CarrierPlanXmlWriterV2(carriers);
+        planWriter.write(dir + "carriers_it" + event.getIteration() + ".xml");
     }
 }

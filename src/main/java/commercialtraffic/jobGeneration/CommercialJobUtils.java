@@ -30,10 +30,8 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.core.gbl.MatsimRandom;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class CommercialJobUtils {
 
@@ -83,13 +81,18 @@ public class CommercialJobUtils {
 
     public static Id<CarrierService> getRandomServiceFromActivity(Activity activity, Random random){
         if(! CommercialJobUtils.activityExpectsServices(activity)) throw new IllegalArgumentException("can not retrieve service from activity " + activity);
-        String[] jobIds = getServiceIdStringArrayFromActivity(activity);
-        return Id.create(jobIds[random.nextInt(jobIds.length)],CarrierService.class);
+        Set<Id<CarrierService>> jobIds = getServiceIdsFromActivity(activity);
+        return new ArrayList<>(jobIds).get(random.nextInt(jobIds.size()));
     }
 
-    public static String[] getServiceIdStringArrayFromActivity(Activity activity){
+    public static Set<Id<CarrierService>> getServiceIdsFromActivity (Activity activity){
         if(! CommercialJobUtils.activityExpectsServices(activity)) throw new IllegalArgumentException("can not retrieve service id's from activity " + activity);
-        return String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_ID)).split(CommercialJobUtils.JOB_ID_REGEX);
+        String[] jobIds = String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_ID)).split(CommercialJobUtils.JOB_ID_REGEX);
+        Set<Id<CarrierService>> serviceIds = new HashSet<>();
+        for(String jobId : jobIds){
+            if(!serviceIds.add(Id.create(jobId, CarrierService.class))) throw new IllegalArgumentException(" activity " + activity + " references serviceId=" + jobId + " twice");
+        }
+        return serviceIds;
     }
 
 }

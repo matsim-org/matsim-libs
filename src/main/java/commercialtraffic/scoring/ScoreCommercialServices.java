@@ -23,8 +23,7 @@ package commercialtraffic.scoring;/*
 
 import com.google.inject.Inject;
 import commercialtraffic.jobGeneration.CommercialJobManager;
-import commercialtraffic.jobGeneration.CommercialJobUtils;
-import commercialtraffic.jobGeneration.DeliveryGenerator;
+import commercialtraffic.jobGeneration.FreightAgentInserter;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -33,20 +32,15 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class ScoreCommercialServices implements ActivityStartEventHandler, ActivityEndEventHandler {
-
-
 
     private final DeliveryScoreCalculator scoreCalculator;
     private final EventsManager eventsManager;
@@ -74,40 +68,11 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
 
     }
 
-
-//    public void prepareTourArrivalsForDay() {
-//        currentExpectedDeliveriesPerLink.clear();
-//        Set<Plan> plans = population.getPersons().values().stream()
-//                .map(p -> p.getSelectedPlan())
-//                .filter(plan -> CommercialJobUtils.planExpectsDeliveries(plan)).collect(Collectors.toSet());
-//        for (Plan plan : plans) {
-//            plan.getPlanElements().stream().filter(Activity.class::isInstance).forEach(pe -> {
-//                Activity activity = (Activity) pe;
-//                if (CommercialJobUtils.activityExpectsServices(activity)) {
-//                    ExpectedDelivery expectedDelivery = new ExpectedDelivery((String) activity.getAttributes().getAttribute(CommercialJobUtils.JOB_TYPE)
-//                            , CommercialJobUtils.getCarrierId(activity)
-//                            , plan.getPerson().getId()
-//                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_DURATION)))
-//                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_EARLIEST_START)))
-//                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_TIME_END))));
-//                    Set<ExpectedDelivery> set = currentExpectedDeliveriesPerLink.getOrDefault(activity.getLinkId(), new HashSet<>());
-//                    set.add(expectedDelivery);
-//                    currentExpectedDeliveriesPerLink.put(activity.getLinkId(), set);
-//
-//                }
-//
-//            });
-//        }
-//        Logger.getLogger(getClass()).info(currentExpectedDeliveriesPerLink.size() + " links expect deliveries");
-//
-//    }
-
-
     private void handleFreightActivityStart(ActivityStartEvent event) {
         if (event.getActType().equals(FreightConstants.END)) {
             activeDeliveryAgents.remove(event.getPersonId());
         } else if (event.getActType().contains(FreightConstants.DELIVERY)) {
-            Id<CarrierService> serviceId = DeliveryGenerator.getServiceIdFromActivityType(event.getActType());
+            Id<CarrierService> serviceId = FreightAgentInserter.getServiceIdFromActivityType(event.getActType());
             CarrierService service = this.carrierServicesForThisIteration.remove(serviceId);
             if(service == null) throw new IllegalStateException("no service with id " + serviceId + " expected. already started???");
             Id<Carrier> carrier = jobManager.getCurrentCarrierOfService(serviceId);
@@ -115,18 +80,9 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
                 double timeDifference = calcDifference(service, event.getTime());
                 double score = scoreCalculator.calcScore(timeDifference);
 
-                // Ich muss die KundenId zum service mappen! Das sollte im JobManager passieren!
-
-                //Job Manager und deliveryGenerator sollten mehr zusammengefasst werden (entweder TourPlanningskript + manager oder nur manager)
-
-
-
-                eventsManager.processEvent(new PersonMoneyEvent(event.getTime(), deliveryCandidate.getPersonId(), score));
-
-
-
-                logEntries.add(new DeliveryLogEntry(deliveryCandidate.getPersonId(), deliveryCandidate.getCarrier(), event.getTime(), score, event.getLinkId(), timeDifference, event.getPersonId()));
-
+                Id<Person> customer = jobManager.getCustomer(serviceId);
+                eventsManager.processEvent(new PersonMoneyEvent(event.getTime(), customer, score));
+                logEntries.add(new DeliveryLogEntry(customer, carrier, event.getTime(), score, event.getLinkId(), timeDifference, event.getPersonId()));
             } else {
                 Logger.getLogger(getClass()).warn("No available deliveries expected at link " + event.getLinkId());
             }
@@ -143,7 +99,6 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
         this.carrierServicesForThisIteration = new HashMap<>(this.jobManager.getCarrierServicesMap());
         activeDeliveryAgents.clear();
         logEntries.clear();
-
     }
 
 
@@ -157,6 +112,8 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
     public List<DeliveryLogEntry> getLogEntries() {
         return logEntries;
     }
+
+    //------------------------------------------------------------------------------------------------------
 
     static class ExpectedDelivery {
         private final String type;
