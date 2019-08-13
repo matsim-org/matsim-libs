@@ -46,7 +46,6 @@ public class AccidentsConfigGroup extends ReflectiveConfigGroup {
 	}
 	
 	private boolean enableAccidentsModule = true;
-	private boolean internalizeAccidentCosts = false;	
 	
 	// e.g. 1 for 100%; 10 for 10%; 100 for 1%
 	private double sampleSize = 10.;
@@ -79,16 +78,6 @@ public class AccidentsConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( "enableAccidentsModule" )
 	public void setEnableAccidentsModule(boolean enableAccidentsModule) {
 		this.enableAccidentsModule = enableAccidentsModule;
-	}
-
-	@StringGetter( "internalizeAccidentCosts" )
-	public boolean isInternalizeAccidentCosts() {
-		return internalizeAccidentCosts;
-	}
-
-	@StringSetter( "internalizeAccidentCosts" )
-	public void setInternalizeAccidentCosts(boolean internalizeAccidentCosts) {
-		this.internalizeAccidentCosts = internalizeAccidentCosts;
 	}
 
 	@StringGetter( "sampleSize" )

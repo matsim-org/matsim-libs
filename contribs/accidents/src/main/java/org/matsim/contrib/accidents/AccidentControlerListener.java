@@ -24,21 +24,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
-
 import org.apache.log4j.Logger;
 import org.geotools.data.DataStore;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.accidents.computation.AccidentCost30vs50;
 import org.matsim.contrib.accidents.computation.AccidentCostBVWPtoFrequencyConverter;
 import org.matsim.contrib.accidents.computation.AccidentCostComputationBVWP;
@@ -51,8 +47,6 @@ import org.matsim.contrib.accidents.data.ParkingType;
 import org.matsim.contrib.accidents.data.Planequal_Planfree_Tunnel;
 import org.matsim.contrib.accidents.data.TimeBinInfo;
 import org.matsim.contrib.accidents.handlers.AnalysisEventHandler;
-import org.matsim.contrib.noise.personLinkMoneyEvents.PersonLinkMoneyEvent;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -83,9 +77,6 @@ public class AccidentControlerListener implements StartupListener, IterationEnds
 	
 	@Inject
 	private AccidentsContext accidentsContext;
-	
-	@Inject
-	private EventsManager events;
 	
 	private int warnCounter = 0;
 	
@@ -169,51 +160,7 @@ public class AccidentControlerListener implements StartupListener, IterationEnds
 		}
 		log.info("Computing accident probabilities per link and time bin... Done.");
 		
-		log.info("+++ Total accident costs per day [EUR] (upscaled to full population size): " + totalAccidentCostsPerDay);
-		
-		AccidentsConfigGroup accidentSettings = (AccidentsConfigGroup) scenario.getConfig().getModules().get(AccidentsConfigGroup.GROUP_NAME);
-		if (accidentSettings.isInternalizeAccidentCosts()) {
-			log.info("Internalizing accident costs...");
-			
-			double totalInternalizedCosts = 0.;
-			
-			for (Id<Link> linkId : analzyer.getLinkId2time2personIds().keySet()) {
-				for (Integer timeInterval : analzyer.getLinkId2time2personIds().get(linkId).keySet()) {
-					
-					double costs = 0.;
-					if (accidentsContext.getLinkId2info().get(linkId) != null && accidentsContext.getLinkId2info().get(linkId).getTimeSpecificInfo().get(timeInterval) != null) {
-						costs = accidentsContext.getLinkId2info().get(linkId).getTimeSpecificInfo().get(timeInterval).getAccidentCosts();
-					}
-										
-					if (costs != 0) {
-						for (Id<Person> personId : analzyer.getLinkId2time2personIds().get(linkId).get(timeInterval)) {
-							
-							if (personId == null) {
-								throw new RuntimeException("Person Id is null. Aborting...");
-							}
-							
-							final double time = ((timeInterval + 1) * timeBinSize) - (timeBinSize/2);
-							
-							final double amount = (( -1 * costs / accidentSettings.getSampleSize() ) / analzyer.getLinkId2time2personIds().get(linkId).get(timeInterval).size() ) * accidentSettings.getTollFactor() ;
-							
-							if (amount > 0) {
-								throw new RuntimeException("A positive amount is considered as a gain in the scoring.");
-							}
-							
-							PersonMoneyEvent moneyEvent = new PersonMoneyEvent(this.scenario.getConfig().qsim().getEndTime(), personId, amount);
-							this.events.processEvent(moneyEvent);
-							
-							PersonLinkMoneyEvent linkMoneyEvent = new PersonLinkMoneyEvent(30 * 3600., personId, linkId, amount, time, "accidents");
-							this.events.processEvent(linkMoneyEvent);
-							
-							totalInternalizedCosts += amount;
-						}
-					}
-				}
-			}
-			log.info("Internalizing accident costs... Done.");
-			log.info("+++ Total internalized accident costs per day [EUR] (sample size): " + totalInternalizedCosts);
-		}
+		log.info("+++ Total accident costs per day [EUR] (upscaled to full population size): " + totalAccidentCostsPerDay);		
 	}
 
 	@Override

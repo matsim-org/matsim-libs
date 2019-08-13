@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.time.LocalTime;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -39,9 +38,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 * @author ikaddoura
 */
 
-public class AccidentWriter {
-	private static final Logger log = Logger.getLogger(AccidentWriter.class);
-	
+public class AccidentWriter {	
 	private static String convertSecondToHHMMSSString(int nSecondTime) {
 	    return LocalTime.MIN.plusSeconds(nSecondTime).toString();
 	}

@@ -47,9 +47,7 @@ public class RunAccidents {
 	
 	private static String landUseFile;
 	private static String popDensityFile;
-	
-	private static boolean internalize;
-	
+		
 	public static void main(String[] args) throws IOException {
 		log.info("Starting simulation run with the following arguments:");
 		
@@ -69,9 +67,6 @@ public class RunAccidents {
 			
 			popDensityFile = args[4];
 			log.info("popDensityFile: " + popDensityFile);
-
-			internalize = Boolean.parseBoolean(args[5]);
-			log.info("internalize: " + internalize);
 			
 		} else {
 			configFile = "./data/input/be_251/config.xml";
@@ -79,7 +74,6 @@ public class RunAccidents {
 			runId = "run_onlyBVWP_adjustedCosts30vs50";
 			landUseFile = "./data/input/osmBerlinBrandenburg/gis.osm_landuse_a_free_1_GK4.shp";
 			popDensityFile = "./data/input/osmBerlin/gis.osm_places_a_free_1_GK4.shp";
-			internalize = false;
 			
 //			configFile = "./data/input/internalization_test/internalization_config.xml";
 //			outputDirectory = "./data/output/internalization_test/run_1/";
@@ -114,7 +108,6 @@ public class RunAccidents {
 		accidentsSettings.setPlanFreeLinksArray(PlanfreeLinkIDs.getPlanfreeLinkIDs());
 		accidentsSettings.setLanduseOSMInputShapeFile(landUseFile);
 		accidentsSettings.setPlacesOSMInputFile(popDensityFile);
-		accidentsSettings.setInternalizeAccidentCosts(internalize);
 		accidentsSettings.setOsmInputFileCRS("EPSG:31468");
 		
 		

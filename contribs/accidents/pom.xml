@@ -16,12 +16,6 @@
   		  <artifactId>gt-jdbc-postgis</artifactId>
 			<version>20.2</version>
  		 </dependency>
-        
-        <dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>noise</artifactId>
-			<version>12.0-SNAPSHOT</version>
-		</dependency>
 		
 	</dependencies>
   

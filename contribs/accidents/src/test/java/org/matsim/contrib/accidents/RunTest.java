@@ -42,7 +42,6 @@ public class RunTest {
 		
 		AccidentsConfigGroup accidentsSettings = ConfigUtils.addOrGetModule(config, AccidentsConfigGroup.class);
 		accidentsSettings.setEnableAccidentsModule(true);
-		accidentsSettings.setInternalizeAccidentCosts(true);
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
