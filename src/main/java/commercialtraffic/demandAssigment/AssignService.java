@@ -106,7 +106,7 @@ public class AssignService {
 	public static void main(String[] args) {
 
 		AssignService assignData = new AssignService(
-				"D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw251.1.0\\vw251.1.0.output_plans.xml.gz",
+				"D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw243_cadON_ptSpeedAdj.0.1\\vw243_cadON_ptSpeedAdj.0.1.output_plans.xml.gz",
 				"D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\wege.csv",
 				"D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\fahrzeuge.csv",
 				"D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Network\\00_Final_Network\\network_editedPt.xml.gz",
@@ -143,6 +143,9 @@ public class AssignService {
 				String zone = commercialTrip.zielzelle;
 				String carrierId = serviceType + "_" + commercialTrip.unternehmensID;
 				String companyId = String.valueOf(commercialTrip.unternehmensID);
+				if (customerRelation=="private") {
+					continue;
+				}
 
 				double serviceDuration = this.commercialTripReader.getRandomServiceDurationPerType(serviceType);
 
