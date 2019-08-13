@@ -19,6 +19,7 @@
 
 package commercialtraffic.integration;/*
  * created by jbischoff, 20.06.2019
+ * modified by tschlenther august 2019
  */
 
 import commercialtraffic.jobGeneration.CommercialJobUtils;
@@ -91,5 +92,7 @@ public class CommercialTrafficChecker {
     }
 
     public void checkCarrierHasATourPlan(Carrier carrier) {
+                if(carrier.getPlans().isEmpty()) throw new RuntimeException("carrier " + carrier + " does not have a plan");
+                if(carrier.getPlans().get(0).getScheduledTours().isEmpty()) throw new RuntimeException("the plan of carrier " + carrier + " does not have tour");
     }
 }
