@@ -51,7 +51,7 @@ public class CommericalCompany {
 		fleetIterator++;
 	}
 	
-	public void addService(int serviceId, Id<Link> linkId,double startTime, double endTime, double serviceDuration)
+	public void addService(String serviceId, Id<Link> linkId,double startTime, double endTime, double serviceDuration)
 	{
 		double trueEndTime = endTime-serviceDuration;
 		CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(Id.create(serviceId, CarrierService.class ), linkId);

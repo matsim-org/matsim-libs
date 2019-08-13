@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 
 public class Job {
-	int jobId;
+	String jobId;
 	Id<Person> personid;
 	String serviceType;
 	String customerRelation;
@@ -18,7 +18,7 @@ public class Job {
 	Double endTime;
 	
 	
-	public Job(int jobId,String carrierId, Id<Person> personid, String serviceType, String customerRelation, String zone,
+	public Job(String jobId,String carrierId, Id<Person> personid, String serviceType, String customerRelation, String zone,
 			Double serviceDuration, int planIdx, Activity regularAgentActivity, Double startTime, Double endTime) {
 		this.jobId = jobId;
 		this.carrierId = carrierId;

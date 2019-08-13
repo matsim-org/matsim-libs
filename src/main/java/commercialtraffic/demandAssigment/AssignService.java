@@ -246,7 +246,7 @@ public class AssignService {
 
 									// return finalActivityDestination;
 
-									return new Job(jobIdCounter.toInteger(), carrierId, candidatePerson, serviceType,
+									return new Job(jobIdCounter.toString(), carrierId, candidatePerson, serviceType,
 											customerRelation, zone, serviceDuration, matchedPeIdx,
 											finalActivityDestination, startTime, endTime);
 

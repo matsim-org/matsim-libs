@@ -41,6 +41,7 @@ public class CompanyGenerator {
 	String outputpath;
 	String carrierOutputPath;
 	Network network;
+	Network carNetwork;
 	// This map contains our companies and their carriers. In this case each company
 	// is its own carrier. String Key = companyId
 	public Map<String, CommericalCompany> commercialCompanyMap = new HashMap<String, CommericalCompany>();
@@ -62,6 +63,10 @@ public class CompanyGenerator {
 		this.outputpath = outputpath;
 		this.network = scenario.getNetwork();
 		this.carrierOutputPath = carrierOutputPath;
+		//Filter Network to get only Car-links
+		NetworkFilterManager networkFilter = new NetworkFilterManager(network);
+		networkFilter.addLinkFilter(l -> l.getAllowedModes().contains(TransportMode.car));
+		carNetwork = networkFilter.applyFilters();
 		// TODO: Obviously not needed?!
 		// CommercialTripsReader tripReader = new CommercialTripsReader(ctTripsFile,
 		// serviceTimeDistributions);
@@ -123,9 +128,7 @@ public class CompanyGenerator {
 
 		Company company = companyPerCompanyClassAndZone.remove(0);
 
-		NetworkFilterManager networkFilter = new NetworkFilterManager(network);
-		networkFilter.addLinkFilter(l -> l.getAllowedModes().contains(TransportMode.car));
-		Network carNetwork = networkFilter.applyFilters();
+
 
 		return NetworkUtils.getNearestLink(carNetwork, company.coord).getId();
 	}
@@ -141,6 +144,7 @@ public class CompanyGenerator {
 		// "EPSG:25832");
 
 		CSVReader reader = null;
+
 		try {
 			reader = new CSVReader(new FileReader(this.csvVehiclefile));
 			vehicleList = reader.readAll();
