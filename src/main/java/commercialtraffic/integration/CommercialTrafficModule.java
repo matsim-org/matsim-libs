@@ -23,7 +23,8 @@ package commercialtraffic.integration;/*
 
 import commercialtraffic.analysis.CommercialTrafficAnalysisListener;
 import commercialtraffic.analysis.TourLengthAnalyzer;
-import commercialtraffic.deliveryGeneration.DeliveryGenerator;
+import commercialtraffic.jobGeneration.CommercialJobManager;
+import commercialtraffic.jobGeneration.FreightAgentInserter;
 import commercialtraffic.replanning.ChangeDeliveryServiceOperator;
 import commercialtraffic.scoring.DefaultCommercialServiceScore;
 import commercialtraffic.scoring.DeliveryScoreCalculator;
@@ -51,29 +52,32 @@ public class CommercialTrafficModule extends AbstractModule {
         CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
         new CarrierVehicleTypeReader(vehicleTypes).readFile(ctcg.getCarriersVehicleTypesFileUrl(getConfig().getContext()).getFile());
         new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
-        if (CommercialTrafficChecker.checkCarrierConsistency(carriers)) {
+        CommercialTrafficChecker consistencyChecker = new CommercialTrafficChecker();
+        if (consistencyChecker.checkCarrierConsistency(carriers)) {
             throw new RuntimeException("Carrier definition is invalid. Please check the log for details.");
         }
-        ;
+        bind(CommercialTrafficChecker.class).toInstance(consistencyChecker);
         bind(DeliveryScoreCalculator.class).toInstance(new DefaultCommercialServiceScore(ctcg.getMaxDeliveryScore(), ctcg.getMinDeliveryScore(), ctcg.getZeroUtilityDelay()));
         bind(Carriers.class).toInstance(carriers);
+        bind(CommercialJobManager.class).asEagerSingleton();
         bind(ScoreCommercialServices.class).asEagerSingleton();
         bind(TourLengthAnalyzer.class).asEagerSingleton();
         //TODO: Change this, once some carriers have different modes, such as DRT.
         bind(CarrierMode.class).toInstance(carrierId -> TransportMode.car);
 
-        addControlerListenerBinding().to(DeliveryGenerator.class);
+        bind(FreightAgentInserter.class).asEagerSingleton();
+        addControlerListenerBinding().to(CommercialJobManager.class);
         addControlerListenerBinding().to(CommercialTrafficAnalysisListener.class);
 
         addPlanStrategyBinding(ChangeDeliveryServiceOperator.SELECTOR_NAME).toProvider(new Provider<PlanStrategy>() {
             @Inject
             Config config;
             @Inject
-            Carriers carriers;
+            CommercialJobManager manager;
             @Override
             public PlanStrategy get() {
                 final PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
-                builder.addStrategyModule(new ChangeDeliveryServiceOperator(config.global(), carriers));
+                builder.addStrategyModule(new ChangeDeliveryServiceOperator(config.global(),manager));
                 return builder.build();
             }
         });
