@@ -1,4 +1,4 @@
-package org.matsim.contrib.accidents.data.berlin;
+package org.matsim.contrib.accidents.runExample;
 
 import org.apache.log4j.Logger;
 

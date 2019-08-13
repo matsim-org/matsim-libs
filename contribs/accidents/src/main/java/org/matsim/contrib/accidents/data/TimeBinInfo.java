@@ -26,7 +26,6 @@ package org.matsim.contrib.accidents.data;
 public class TimeBinInfo {
 	
 	private final int intervalNr;
-	private double accidentFrequency;
 	private double accidentCosts;
 		
 	public int getIntervalNr() {
@@ -35,14 +34,6 @@ public class TimeBinInfo {
 
 	public TimeBinInfo(int intervalNr) {
 		this.intervalNr = intervalNr;
-	}
-
-	public double getAccidentFrequency() {
-		return accidentFrequency;
-	}
-
-	public void setAccidentFrequency(double accidentProbability) {
-		this.accidentFrequency = accidentProbability;
 	}
 
 	public double getAccidentCosts() {

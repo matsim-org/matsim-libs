@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.accidents.computation.AccidentsComputationMethod;
 
 /**
 * @author ikaddoura, mmayobre
@@ -35,15 +36,7 @@ public class AccidentLinkInfo {
 	private final Id<Link> linkId;
 	
 	private ArrayList<Integer> roadTypeBVWP;	
-	private LinkAccidentsComputationMethod computationMethod;
-	private double speedLimit;
-	private double roadWidth;
-	private int numberSideRoads; //number of side Roads per km
-	private ParkingType parkingType; 
-	private double numberOfLanes; 
-	private AccidentAreaType areaType;
-	private Planequal_Planfree_Tunnel planequal_planfree_tunnel;
-	private String landUseType;
+	private AccidentsComputationMethod computationMethod;
 
 	private final Map<Integer, TimeBinInfo> timeSpecificInfo = new HashMap<>();
 	
@@ -63,79 +56,15 @@ public class AccidentLinkInfo {
 		this.roadTypeBVWP = roadType;
 	}
 
-	public double getNumberOfLanes() {
-		return numberOfLanes;
-	}
-
-	public void setNumberOfLanes(double numberOfLanes) {
-		this.numberOfLanes = numberOfLanes;
-	}
-
-	public AccidentAreaType getAreaType() {
-		return areaType;
-	}
-
-	public void setAreaType(AccidentAreaType areaType) {
-		this.areaType = areaType;
-	}
-
-	public Planequal_Planfree_Tunnel getPlanequal_planfree_tunnel() {
-		return planequal_planfree_tunnel;
-	}
-
-	public void setPlanequal_planfree_tunnel(Planequal_Planfree_Tunnel planequal_planfree_tunnel) {
-		this.planequal_planfree_tunnel = planequal_planfree_tunnel;
-	}
-
-	public String getLandUseType() {
-		return landUseType;
-	}
-
-	public void setLandUseType(String landUseType) {
-		this.landUseType = landUseType;
-	}
-
 	public Map<Integer, TimeBinInfo> getTimeSpecificInfo() {
 		return timeSpecificInfo;
 	}
 
-	public double getSpeedLimit() {
-		return speedLimit;
-	}
-
-	public void setSpeedLimit(double speedLimit) {
-		this.speedLimit = speedLimit;
-	}
-
-	public double getRoadWidth() {
-		return roadWidth;
-	}
-
-	public void setRoadWidth(double roadWidth) {
-		this.roadWidth = roadWidth;
-	}
-
-	public int getNumberSideRoads() {
-		return numberSideRoads;
-	}
-
-	public void setNumberSideRoads(int numberSideRoads) {
-		this.numberSideRoads = numberSideRoads;
-	}
-
-	public ParkingType getParkingType() {
-		return parkingType;
-	}
-
-	public void setParkingType(ParkingType parkingType) {
-		this.parkingType = parkingType;
-	}
-
-	public LinkAccidentsComputationMethod getComputationMethod() {
+	public AccidentsComputationMethod getComputationMethod() {
 		return computationMethod;
 	}
 
-	public void setComputationMethod(LinkAccidentsComputationMethod computationMethod) {
+	public void setComputationMethod(AccidentsComputationMethod computationMethod) {
 		this.computationMethod = computationMethod;
 	}
 

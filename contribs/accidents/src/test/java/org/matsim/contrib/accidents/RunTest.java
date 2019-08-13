@@ -66,13 +66,13 @@ public class RunTest {
 				String[] columns = line.split(";");
 				for (int column = 0; column < columns.length; column++) {
 					
-					if (lineCounter == 0 && column == 49) {
+					if (lineCounter == 0 && column == 25) {
 						double accidentCosts = Double.valueOf(columns[column]);
 						Assert.assertEquals("wrong accident costs", 10.37988, accidentCosts , 0.01);	
 						//Manuel nachgerechnet: STIMMT!
 					}
 					
-					if (lineCounter == 1 && column == 49) {
+					if (lineCounter == 1 && column == 25) {
 						double accidentCosts = Double.valueOf(columns[column]);
 						Assert.assertEquals("wrong accident costs", 16.68195, accidentCosts , 0.01);
 						//Manuel nachgerechnet: STIMMT!

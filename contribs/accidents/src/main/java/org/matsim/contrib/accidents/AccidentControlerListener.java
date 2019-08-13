@@ -35,16 +35,9 @@ import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.accidents.computation.AccidentCost30vs50;
-import org.matsim.contrib.accidents.computation.AccidentCostBVWPtoFrequencyConverter;
 import org.matsim.contrib.accidents.computation.AccidentCostComputationBVWP;
-import org.matsim.contrib.accidents.computation.AccidentFrequencyComputation;
-import org.matsim.contrib.accidents.data.AccidentAreaType;
-import org.matsim.contrib.accidents.data.AccidentComputationApproach;
+import org.matsim.contrib.accidents.computation.AccidentsComputationMethod;
 import org.matsim.contrib.accidents.data.AccidentLinkInfo;
-import org.matsim.contrib.accidents.data.LinkAccidentsComputationMethod;
-import org.matsim.contrib.accidents.data.ParkingType;
-import org.matsim.contrib.accidents.data.Planequal_Planfree_Tunnel;
 import org.matsim.contrib.accidents.data.TimeBinInfo;
 import org.matsim.contrib.accidents.handlers.AnalysisEventHandler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -53,7 +46,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -77,9 +69,7 @@ public class AccidentControlerListener implements StartupListener, IterationEnds
 	
 	@Inject
 	private AccidentsContext accidentsContext;
-	
-	private int warnCounter = 0;
-	
+		
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {		
 		AccidentWriter accidentWriter = new AccidentWriter();
@@ -95,9 +85,7 @@ public class AccidentControlerListener implements StartupListener, IterationEnds
 		
 		double totalAccidentCostsPerDay = 0.;
 		
-		final TravelTime travelTime = event.getServices().getLinkTravelTimes();
 		final double timeBinSize = this.scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize();	
-		final double numberOfTimeBinsPerDay = (24 * 3600) / timeBinSize;
 		
 		for (AccidentLinkInfo linkInfo : this.accidentsContext.getLinkId2info().values()) {
 					
@@ -108,49 +96,19 @@ public class AccidentControlerListener implements StartupListener, IterationEnds
 				final double time = (endTime - timeBinSize/2.);
 				final int timeBinNr = (int) (time / timeBinSize);
 				
-				final double actualTravelTime = travelTime.getLinkTravelTime(link, time, null, null);
-				final double actualSpeed = link.getLength() / actualTravelTime;
 				final AccidentsConfigGroup accidentSettings = (AccidentsConfigGroup) scenario.getConfig().getModules().get(AccidentsConfigGroup.GROUP_NAME);
 				final double demand = accidentSettings.getSampleSize() * analzyer.getDemand(linkInfo.getLinkId(), timeBinNr);
-				final double estimatedAADT = demand * numberOfTimeBinsPerDay; 
 				
-				double frequency = 0.;
 				double accidentCosts = 0.;
 								
-				if (linkInfo.getComputationMethod().toString().equals(LinkAccidentsComputationMethod.BVWP.toString())) {
-				
-					// BVWP
-					
+				if (linkInfo.getComputationMethod().toString().equals(AccidentsComputationMethod.BVWP.toString())) {
 					accidentCosts = AccidentCostComputationBVWP.computeAccidentCosts(demand, link.getLength(), linkInfo.getRoadTypeBVWP());
-					frequency = AccidentCostBVWPtoFrequencyConverter.convertAccidentFrequencyDependingOnActualSpeed(accidentCosts, actualSpeed);
-				
-				} else if (linkInfo.getComputationMethod().toString().equals(LinkAccidentsComputationMethod.DenmarkModel.toString())) {
-
-					// DenmarkModel
-
-					if (accidentSettings.getAccidentsComputationApproach().toString().equals(AccidentComputationApproach.BVWPforAllRoads.toString())) {
-						throw new RuntimeException("Ther should be no link where the computation method is set to + '" + LinkAccidentsComputationMethod.DenmarkModel.toString() +"'. Aborting...");
-					}
-					
-//					log.info("Link" + linkInfo.getLinkId() + "info: ({ demand: " + demand + ", speedLimit: " + linkInfo.getSpeedLimit() + ", roadWidth: " + linkInfo.getRoadWidth() + ", numberSideRoads: " + linkInfo.getNumberSideRoads() + ", parkingType: " + linkInfo.getParkingType() + " & areaType: " + linkInfo.getAreaType() +" .})") ;
-					
-					frequency = (AccidentFrequencyComputation.computeAccidentFrequency(
-							estimatedAADT, 
-							linkInfo.getSpeedLimit(), 
-							linkInfo.getRoadWidth() , 
-							linkInfo.getNumberSideRoads() , 
-							linkInfo.getParkingType(), 
-							linkInfo.getAreaType()
-							)
-								) * (link.getLength() / 1000.) / (365. * 24. * 3600.) * timeBinSize; // frequency per km per year --> frequency per link per timeBin
-					accidentCosts = frequency * AccidentCost30vs50.giveAccidentCostDependingOnActualSpeed(actualSpeed);
 				
 				} else {
 					throw new RuntimeException("Unknown accident computation approach or value not set. Aborting...");
 				}
 								
 				TimeBinInfo timeBinInfo = new TimeBinInfo(timeBinNr);
-				timeBinInfo.setAccidentFrequency(frequency);
 				timeBinInfo.setAccidentCosts(accidentCosts);
 				
 				linkInfo.getTimeSpecificInfo().put(timeBinNr, timeBinInfo);
@@ -165,6 +123,9 @@ public class AccidentControlerListener implements StartupListener, IterationEnds
 
 	@Override
 	public void notifyStartup(StartupEvent arg0) {
+		
+		// TODO: move this stuff to some pre-processing + writing into link attributes; e.g. AccidentsUtils.getBVWPRoadTypes(); required attribute name should be a lookup in accidents config group
+		
 		// Initialize all link-specific information
 				
 		Map<String, SimpleFeature> landUseFeaturesBB = new HashMap<>();
@@ -230,29 +191,21 @@ public class AccidentControlerListener implements StartupListener, IterationEnds
 			}
 			linkCounter++;			
 			
-			boolean bvwpForAllRoads = false;
-			if (accidentSettings.getAccidentsComputationApproach().toString().equals(AccidentComputationApproach.BVWPforAllRoads.toString())) {
-				bvwpForAllRoads = true;
-			}
-			
-			if (bvwpForAllRoads || link.getFreespeed() > 14.) {
-				// probably a motorway
+			if (accidentSettings.getAccidentsComputationMethod().toString().equals(AccidentsComputationMethod.BVWP.toString())) {
 				
-				info.setComputationMethod(LinkAccidentsComputationMethod.BVWP);
+				info.setComputationMethod(AccidentsComputationMethod.BVWP);
 				// BVWP	
 				
 				ArrayList<Integer> list = new ArrayList<>();
 				
 				//Plan equal, Plan free or Tunnel?
 				list.add(0, 1); // Default: Plan equal
-				info.setPlanequal_planfree_tunnel(Planequal_Planfree_Tunnel.Planequal);
 				
 				String[] planfreeLinkIDs = accidentSettings.getPlanFreeLinksArray();
 				for(int j=0; j < planfreeLinkIDs.length; j++){
 				    if(planfreeLinkIDs[j].equals(String.valueOf(link.getId()))){
 				    	list.set(0, 0); // Change to Plan free
 				    	log.info(link.getId() + " Changed to Plan free!");
-				    	info.setPlanequal_planfree_tunnel(Planequal_Planfree_Tunnel.Planfree);
 				    	break;
 				    }
 				}
@@ -263,7 +216,6 @@ public class AccidentControlerListener implements StartupListener, IterationEnds
 					if(tunnelLinkIDs[i].equals(String.valueOf(link.getId()))){
 						list.set(0, 2); // Change to Tunnel
 						log.info(link.getId() + " Changed to Tunnel!");
-						info.setPlanequal_planfree_tunnel(Planequal_Planfree_Tunnel.Tunnel);
 						break;
 					}
 				}
@@ -284,7 +236,6 @@ public class AccidentControlerListener implements StartupListener, IterationEnds
 				
 				} else {
 					String landUseTypeBB = landUseDataBB.get(osmLandUseFeatureBBId);
-					info.setLandUseType(landUseTypeBB);
 					//log.info("ERSTE PROBE, landUseTypeBB = " + landUseDataBB.get(osmLandUseFeatureBBId));
 					//String landUseTypeBB = osmLandUseFeatureId;
 					if (landUseTypeBB.matches("commercial|industrial|recreation_ground|residential|retail")) { //built-up area
@@ -305,74 +256,9 @@ public class AccidentControlerListener implements StartupListener, IterationEnds
 					numberOfLanesBVWP = 4;
 				} else numberOfLanesBVWP = (int) link.getNumberOfLanes();
 				list.add(2, numberOfLanesBVWP);
-				info.setRoadTypeBVWP(list); 
-				
-				info.setNumberOfLanes(link.getNumberOfLanes()); // for linkinfo-CSV
-				info.setSpeedLimit(link.getFreespeed()); // for linkinfo-CSV
-				info.setNumberSideRoads(0); // default --> for linkinfo-CSV
-				info.setRoadWidth(link.getNumberOfLanes() * 3.75); // from network --> for linkinfo-CSV
-					
-			} else {
-				// freespeed below 14 m/s --> probably not a motorway				
-				
-				info.setComputationMethod(LinkAccidentsComputationMethod.DenmarkModel);
-				
-				info.setNumberSideRoads(0); // default
-				info.setParkingType(ParkingType.BaysAtKerb); // Default
-				info.setRoadWidth(link.getNumberOfLanes() * 3.75); // from network
-				info.setSpeedLimit(link.getFreespeed()); // from network
-				
-				// Accident Area Type:
-				
-				CoordinateTransformation ctScenarioCRS2osmCRS = TransformationFactory.getCoordinateTransformation(this.scenario.getConfig().global().getCoordinateSystem(), accidentSettings.getOsmInputFileCRS());
-				Coord linkCoordinateTransformedToOSMCRS = ctScenarioCRS2osmCRS.transform(link.getCoord());
-				Point p = MGC.xy2Point(linkCoordinateTransformedToOSMCRS.getX(), linkCoordinateTransformedToOSMCRS.getY()); 
-				
-				String osmLandUseFeatureBBId = getOSMLandUseFeatureBBId(link, landUseFeaturesBB);
-				
-				if (osmLandUseFeatureBBId == null) {
-					log.warn("No area type found for link " + link.getId() + ". Using default value: industrial/residential neighbourhood.");
-					info.setAreaType(AccidentAreaType.IndustrialResidentialNeighbourhood);
-					
-				} else {
-					String landUseType = landUseDataBB.get(osmLandUseFeatureBBId);
-					
-					if (landUseType.equals("retail")) {
-						info.setAreaType(AccidentAreaType.Shops);
-					} else if (landUseType.matches("commercial|industrial|military|park|recreation_ground")) {
-						info.setAreaType(AccidentAreaType.IndustrialResidentialNeighbourhood);
-					} else if (landUseType.matches("allotments|cemetery|farm|forest|grass|heath|meadow|nature_reserve|orchard|quarry|scrub|vineyard")){
-						info.setAreaType(AccidentAreaType.ScatteredHousing);
-					} else if (landUseType.equals("residential")) {
-						String osmPopulationDensityFeatureId = "";
-						for (SimpleFeature feature : popDensityFeatures.values()) {
-							if (((Geometry) feature.getDefaultGeometry()).contains(p)) {
-								osmPopulationDensityFeatureId = feature.getAttribute("osm_id").toString();
-								break;
-							}
-						}
-						double populationDensity = 0. ;
-						if (osmPopulationDensityFeatureId == "") {
-							
-							if (warnCounter <= 5) {
-								log.warn("No attribute 'pop_dens' found for link " + link.getId() + ". This link is located in Brandenburg and not in Berlin, setting 'AccidentAreaType' as 'ScatteredHousing'.");
-								warnCounter++;
-								if (warnCounter == 5) {
-									log.warn("Furhter warnings of this type will not be printed out.");
-								}
-							}
-							info.setAreaType(AccidentAreaType.ScatteredHousing);
-						} else { 
-							populationDensity = popDensityData.get(osmPopulationDensityFeatureId);
-							if (populationDensity <= 2000. ){
-								info.setAreaType(AccidentAreaType.ScatteredHousing);
-							} else {
-								info.setAreaType(AccidentAreaType.IndustrialResidentialNeighbourhood);
-							}
-						}
-					} 
-				} 
-			}		
+				info.setRoadTypeBVWP(list); 	
+			}
+			
 			this.accidentsContext.getLinkId2info().put(link.getId(), info);
 		}
 		log.info("Initializing all link-specific information... Done.");

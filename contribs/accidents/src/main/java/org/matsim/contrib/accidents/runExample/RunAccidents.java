@@ -17,21 +17,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.accidents;
+package org.matsim.contrib.accidents.runExample;
 
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.accidents.AccidentsConfigGroup;
+import org.matsim.contrib.accidents.AccidentsModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import org.matsim.contrib.accidents.data.berlin.PlanfreeLinkIDs;
-import org.matsim.contrib.accidents.data.berlin.TunnelLinkIDs;
 
 /**
 * @author ikaddoura, mmayobre

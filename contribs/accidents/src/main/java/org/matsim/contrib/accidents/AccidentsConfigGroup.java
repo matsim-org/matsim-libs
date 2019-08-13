@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.accidents.data.AccidentComputationApproach;
+import org.matsim.contrib.accidents.computation.AccidentsComputationMethod;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -50,7 +50,7 @@ public class AccidentsConfigGroup extends ReflectiveConfigGroup {
 	// e.g. 1 for 100%; 10 for 10%; 100 for 1%
 	private double sampleSize = 10.;
 	
-	// LAND-USE based on OSM (Berlin and Brandenburg) for AccidentAreaType in the Denmark Method & for built-up/nonbuilt-up area in the BVWP Method
+	// LAND-USE based on OSM (Berlin and Brandenburg) for built-up/nonbuilt-up area in the BVWP Method
 	private String landuseOSMInputShapeFile = null;
 	
 	// POPULATION DENSITY based on OSM (Berlin) + statistics
@@ -64,12 +64,8 @@ public class AccidentsConfigGroup extends ReflectiveConfigGroup {
 	private String[] planFreeLinks = {""};	
 	private String planFreeLinkCSVInputFile = null;
 		
-	private AccidentComputationApproach accidentsComputationApproach = AccidentComputationApproach.BVWPforAllRoads;
-	
-	private double tollFactor = 1.;
-	
-	// add parameters if you need them
-	
+	private AccidentsComputationMethod accidentsComputationMethod = AccidentsComputationMethod.BVWP;
+			
 	@StringGetter( "enableAccidentsModule" )
 	public boolean isEnableAccidentsModule() {
 		return enableAccidentsModule;
@@ -230,24 +226,14 @@ public class AccidentsConfigGroup extends ReflectiveConfigGroup {
 		this.osmInputFileCRS = osmInputFileCRS;
 	}
 
-	@StringGetter( "accidentsComputationApproach" )
-	public AccidentComputationApproach getAccidentsComputationApproach() {
-		return accidentsComputationApproach;
+	@StringGetter( "accidentsComputationMethod" )
+	public AccidentsComputationMethod getAccidentsComputationMethod() {
+		return accidentsComputationMethod;
 	}
 
-	@StringSetter( "accidentsComputationApproach" )
-	public void setAccidentsComputationApproach(AccidentComputationApproach accidentsComputationApproach) {
-		this.accidentsComputationApproach = accidentsComputationApproach;
-	}
-
-	@StringGetter( "tollFactor" )
-	public double getTollFactor() {
-		return tollFactor;
-	}
-
-	@StringSetter( "tollFactor" )
-	public void setTollFactor(double tollFactor) {
-		this.tollFactor = tollFactor;
+	@StringSetter( "accidentsComputationMethod" )
+	public void AccidentsComputationMethod(AccidentsComputationMethod accidentsComputationMethod) {
+		this.accidentsComputationMethod = accidentsComputationMethod;
 	}
 			
 }
