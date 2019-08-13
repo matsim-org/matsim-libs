@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
@@ -19,6 +20,7 @@ import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -121,7 +123,11 @@ public class CompanyGenerator {
 
 		Company company = companyPerCompanyClassAndZone.remove(0);
 
-		return NetworkUtils.getNearestLink(network, company.coord).getId();
+		NetworkFilterManager networkFilter = new NetworkFilterManager(network);
+		networkFilter.addLinkFilter(l -> l.getAllowedModes().contains(TransportMode.car));
+		Network carNetwork = networkFilter.applyFilters();
+
+		return NetworkUtils.getNearestLink(carNetwork, company.coord).getId();
 	}
 
 	public void readVehicleCSV() {
