@@ -11,6 +11,10 @@ public class AccidentCostComputationBVWP {
 
 	public static double computeAccidentCosts(double demand, double length, ArrayList<Integer> roadType){
 		//costRateTable in €/T.vehicle-km
+		
+		// TODO: Check if this is 100% equal to Abb. 13 BVWP Methodenhandbuch 2030
+		// TODO: runtime exception instead of 0
+		
 		double costRateTable[][][] = {
 			/*	2. Ziffer
 			 * 		1.Spalte: Außerhalb von bebauten Gebiet, Kfz-Straße
