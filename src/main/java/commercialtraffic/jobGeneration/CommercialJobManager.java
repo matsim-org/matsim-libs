@@ -64,12 +64,18 @@ public class CommercialJobManager implements BeforeMobsimListener, AfterMobsimLi
         this.carTravelTime = travelTimes.get(TransportMode.car);
         this.ctConfigGroup = CommercialTrafficConfigGroup.get(scenario.getConfig());
         carriers.getCarriers().values().forEach(carrier -> {
+
             carrier.getServices().forEach(carrierService -> {
                 this.serviceRegistry.add(carrierService);
                 if(this.service2Operator.containsKey(carrierService.getId())) throw new IllegalArgumentException("duplicate service id: " + carrierService.getId());
                 service2Operator.put(carrierService.getId(),carrier.getId());
             });
-            carrier.getServices().clear(); //initialize
+            if(!ctConfigGroup.getRunTourPlanning()){
+                consistencyChecker.checkCarrierHasATourPlan(carrier);
+            } else {
+                carrier.getServices().clear(); //initialize
+            }
+
         });
         this.carriers = carriers;
         mapServicesToCustomerAndCheckLocationConsistency(scenario.getPopulation());
@@ -144,9 +150,11 @@ public class CommercialJobManager implements BeforeMobsimListener, AfterMobsimLi
      */
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-        serviceRegistry.forEach(service -> carriers.getCarriers().get(service2Operator.get(service.getId())).getServices().add(service));
-        TourPlanning.runTourPlanningForCarriers(carriers,scenario,ctConfigGroup.getJspritIterations(), carTravelTime);
-        agentInserter.createFreightAgents(carriers,ctConfigGroup.getFirstLegTraveltimeBufferFactor());
+        if(ctConfigGroup.getRunTourPlanning()){
+            serviceRegistry.forEach(service -> carriers.getCarriers().get(service2Operator.get(service.getId())).getServices().add(service));
+            TourPlanning.runTourPlanningForCarriers(carriers,scenario,ctConfigGroup.getJspritIterations(), carTravelTime);
+            agentInserter.createFreightAgents(carriers,ctConfigGroup.getFirstLegTraveltimeBufferFactor());
+        }
     }
 
     /**
@@ -156,13 +164,15 @@ public class CommercialJobManager implements BeforeMobsimListener, AfterMobsimLi
      */
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event) {
-        writeCarriersFileForIteration(event);
-        this.agentInserter.removeFreightAgents(carriers);
-        carriers.getCarriers().values().forEach(carrier -> {
-            carrier.getServices().clear();
-            carrier.getShipments().clear();
-            carrier.clearPlans();
-        });
+        if(ctConfigGroup.getRunTourPlanning()){
+            writeCarriersFileForIteration(event);
+            this.agentInserter.removeFreightAgents(carriers);
+            carriers.getCarriers().values().forEach(carrier -> {
+                carrier.getServices().clear();
+                carrier.getShipments().clear();
+                carrier.clearPlans();
+            });
+        }
     }
 
     private void writeCarriersFileForIteration(AfterMobsimEvent event) {

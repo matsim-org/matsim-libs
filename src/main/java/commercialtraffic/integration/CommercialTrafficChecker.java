@@ -90,4 +90,6 @@ public class CommercialTrafficChecker {
         return fail;
     }
 
+    public void checkCarrierHasATourPlan(Carrier carrier) {
+    }
 }

@@ -21,6 +21,7 @@ package commercialtraffic.integration;/*
  * created by jbischoff, 08.05.2019
  */
 
+import commercialtraffic.replanning.ChangeDeliveryServiceOperator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -53,6 +54,11 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     private int jspritIterations = 100;
     public static final String JSPRITITERS = "jspritIterations";
     public static final String JSPRITITERSDESC = "Number of jsprit Iterations. These take place at the beginning of each MATSim iteration";
+
+    private boolean runTourPlanning = true;
+    public  static final String RUNJSPRIT = "runTourPlanning";
+    public static final String RUNJSPRITDESC = "Defines whether JSprit is run. " +
+            "If this is set to true, ChangeDeliveryOperator strategy must not be switched on and all carriers need to have at least one plan containing at least one tour.";
 
     @Positive
     private double zeroUtilityDelay = 1800;
@@ -153,6 +159,12 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
         this.jspritIterations = jspritIterations;
     }
 
+    @StringSetter(RUNJSPRIT)
+    public void setRunTourPlanning(boolean runTourPlanning){ this.runTourPlanning = runTourPlanning; }
+
+    @StringGetter(RUNJSPRIT)
+    public boolean getRunTourPlanning(){ return runTourPlanning; }
+
     /**
      * @return zeroUtilityDelay --{@value #ZEROUTILDELAYDESC}
      */
@@ -208,6 +220,7 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
         map.put(CARRIERSVEHICLETYPED, CARRIERSVEHICLETYPEDESC);
         map.put(FIRSTLEGBUFFER, FIRSTLEGBUFFERDESC);
         map.put(JSPRITITERS, JSPRITITERSDESC);
+        map.put(RUNJSPRIT,RUNJSPRITDESC);
         map.put(MAXDELIVERYSCORE, MAXDELIVERYSCOREDESC);
         map.put(MINDELIVERYSCORE, MINDELIVERYSCOREDESC);
         map.put(ZEROUTILDELAY, ZEROUTILDELAYDESC);
@@ -219,6 +232,12 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
         super.checkConsistency(config);
         if (getMaxDeliveryScore() < getMinDeliveryScore()) {
             throw new RuntimeException("Minimum Score for delivery is higher than maximum score");
+        } //TODO test
+        if(!getRunTourPlanning() && config.strategy().getStrategySettings().stream()
+                .anyMatch(strategySettings -> strategySettings.getStrategyName().equals(ChangeDeliveryServiceOperator.SELECTOR_NAME))){
+            throw new RuntimeException("if tour planning is switched off, the replanning  strategy " + ChangeDeliveryServiceOperator.SELECTOR_NAME
+                                        + " is forbidden. Either let the carriers do tour planning before eacht iteration by setting " + RUNJSPRIT + "=true "
+                                         + "or exclude the replanning strategy " + ChangeDeliveryServiceOperator.SELECTOR_NAME);
         }
     }
 }
