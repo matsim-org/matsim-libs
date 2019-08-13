@@ -274,6 +274,7 @@ public class PtAlongALine2Test{
 
 	@Test
 	public void intermodalAccessEgressPicksWrongVariant() {
+		// outdated comment:
 		// this test fails because it picks a
 		//    drt-nonNetworkWalk-nonNetworkWalk-drt
 		//  trip over a faster
@@ -287,6 +288,8 @@ public class PtAlongALine2Test{
 		//            handleTransfers(true, parameters);
 		//        }
 		// makes it pass.  I have no idea why, or if this would be a good direction to go for a fix.  kai, jul'19
+		
+		// does now work with these lines of code in SwissRailRaptorCore (which solve problems in other tests) gleich, aug'19
 
 		Config config = PtAlongALineTest.createConfig( utils.getOutputDirectory() );
 
