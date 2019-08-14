@@ -15,8 +15,11 @@
         <param name="mutationAffectsDuration" value="true"/>
         <!-- Default:1800.0; Defines how many seconds a time mutation can maximally shift a time. -->
         <param name="mutationRange" value="7200.0"/>
+		
+		<!-- this was disabled in matsim 0.12. but still is in here for documentary reasons-->
         <!-- false; Use individual settings for each subpopulation. If enabled but no settings are found, regular settings are uses as fallback. -->
-        <param name="useIndividualSettingsForSubpopulations" value="false"/>
+        <!--<param name="useIndividualSettingsForSubpopulations" value="false"/>-->
+		
     </module>
 
     <module name="changeMode">
