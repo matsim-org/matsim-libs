@@ -62,12 +62,14 @@ public class CommercialTrafficModule extends AbstractModule {
         bind(CommercialJobManager.class).asEagerSingleton();
         bind(ScoreCommercialServices.class).asEagerSingleton();
         bind(TourLengthAnalyzer.class).asEagerSingleton();
+        bind(FreightAgentInserter.class).asEagerSingleton();
+
         //TODO: Change this, once some carriers have different modes, such as DRT.
         bind(CarrierMode.class).toInstance(carrierId -> TransportMode.car);
 
-        bind(FreightAgentInserter.class).asEagerSingleton();
         addControlerListenerBinding().to(CommercialJobManager.class);
         addControlerListenerBinding().to(CommercialTrafficAnalysisListener.class);
+        addMobsimListenerBinding().to(ScoreCommercialServices.class);
 
         addPlanStrategyBinding(ChangeDeliveryServiceOperator.SELECTOR_NAME).toProvider(new Provider<PlanStrategy>() {
             @Inject

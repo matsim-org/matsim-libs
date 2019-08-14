@@ -37,10 +37,12 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 
 import java.util.*;
 
-public class ScoreCommercialServices implements ActivityStartEventHandler, ActivityEndEventHandler {
+public class ScoreCommercialServices implements ActivityStartEventHandler, ActivityEndEventHandler, MobsimBeforeCleanupListener {
 
     private final DeliveryScoreCalculator scoreCalculator;
     private final EventsManager eventsManager;
@@ -109,6 +111,17 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
 
     public List<DeliveryLogEntry> getLogEntries() {
         return logEntries;
+    }
+
+    @Override
+    public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent mobsimBeforeCleanupEvent) {
+        if(!this.carrierServicesForThisIteration.isEmpty()){
+            StringBuilder msg = new StringBuilder("Not all services that were expected by agents have been served. This is a list of the unexecuted services:\n");
+            for(Id<CarrierService> serviceId : this.carrierServicesForThisIteration.keySet()){
+                    msg.append(serviceId).append("\n");
+            }
+            throw new IllegalStateException(msg.toString());
+        }
     }
 
     //------------------------------------------------------------------------------------------------------
