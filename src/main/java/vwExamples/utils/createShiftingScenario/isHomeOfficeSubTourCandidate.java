@@ -1,8 +1,12 @@
-package vwExamples.utils.CreateShiftingScenario;
+package vwExamples.utils.createShiftingScenario;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringJoiner;
 
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -13,33 +17,42 @@ import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
-public class assignHomeOfficeSubTour implements SubTourValidator {
+public class isHomeOfficeSubTourCandidate implements SubTourValidator {
 	Network network;
 	Map<String, Geometry> cityZonesMap;
 	Map<String, Geometry> serviceAreazonesMap;
 
-	assignHomeOfficeSubTour(Network network, Map<String, Geometry> cityZonesMap,
+	isHomeOfficeSubTourCandidate(Network network, Map<String, Geometry> cityZonesMap,
 			Map<String, Geometry> serviceAreazonesMap) {
 		this.network = network;
 		this.cityZonesMap = cityZonesMap;
 		this.serviceAreazonesMap = serviceAreazonesMap;
+
 
 	}
 
 	@Override
 	public boolean isValidSubTour(Subtour subTour) {
 //		boolean subTourInServiceArea = subTourIsWithinServiceArea(subTour);
-		String chain = getSubtourActivityChain(subTour);
-		String requiredChain = "home-work-home";
-				
-		if ((isInboundCommuterTour(subTour) || isOutboundCommuterTour(subTour))
-		&& chain.equals(requiredChain)) {
+//		String chain = getSubtourActivityChain(subTour);
+//		String requiredChain = "home-work-home"; //Umlegungslogik bedingt triviale Wegekette
+		
+//		String requiredChain = "work"; //Muss ein Arbeiter sein, Dämpfungsfaktor, weil davon nicht alle 6 %
+
+//		if ((isInboundCommuterTour(subTour) || isOutboundCommuterTour(subTour) || isWithinCommuterTour(subTour))
+//				&& subTourInServiceArea && chain.equals(requiredChain)) {
+//			return true;
+//		}
+		
+		if ((isInboundCommuterTour(subTour) || isOutboundCommuterTour(subTour) || isWithinCommuterTour(subTour))) {
+	
 			return true;
 		}
 				
 
 		else return false;
 	}
+	
 
 	public String getSubtourActivityChain(Subtour subtour) {
 		StringJoiner joiner = new StringJoiner("-");

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package vwExamples.utils.DrtTrajectoryAnalyzer;
+package vwExamples.utils.drtTrajectoryAnalyzer;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;

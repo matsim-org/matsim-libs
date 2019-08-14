@@ -70,12 +70,12 @@ public class Sim03_HomeOffice {
 
 	public void run(boolean otfvis) {
 
-		String runId = "VW243_HomeOfficeInOut_10pct";
+		String runId = "VW243_HomeOfficeInOut1x_10pct";
 		String base = "D:\\Matsim\\Axer\\Hannover\\Zim\\";
 		String input = base + "input\\";
 		String ouput = base + "output\\"+runId;
 		Config config = ConfigUtils.loadConfig(input + "Sim03_HomeOffice.xml", new OTFVisConfigGroup());
-		config.plans().setInputFile(input + "plans\\vw243_cadON_ptSpeedAdj.0.1_homeOffice_InOut.output_plans.xml.gz");
+		config.plans().setInputFile(input + "plans\\vw243_cadON_ptSpeedAdj.0.1_homeOffice_InOutWithin1x.output_plans.xml.gz");
 		
 
 		// StrategySettings strategySettings = new StrategySettings();

@@ -22,8 +22,8 @@ package commercialtraffic.scoring;/*
  */
 
 import com.google.inject.Inject;
-import commercialtraffic.deliveryGeneration.DeliveryGenerator;
-import commercialtraffic.deliveryGeneration.PersonDelivery;
+import commercialtraffic.jobGeneration.CommercialJobManager;
+import commercialtraffic.jobGeneration.FreightAgentInserter;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -32,33 +32,30 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
-public class ScoreCommercialServices implements ActivityStartEventHandler, ActivityEndEventHandler {
-
-
-    private final Population population;
-
+public class ScoreCommercialServices implements ActivityStartEventHandler, ActivityEndEventHandler, MobsimBeforeCleanupListener {
 
     private final DeliveryScoreCalculator scoreCalculator;
     private final EventsManager eventsManager;
+    private final CommercialJobManager jobManager;
 
     private final Set<Id<Person>> activeDeliveryAgents = new HashSet<>();
-    private final Map<Id<Link>, Set<ExpectedDelivery>> currentExpectedDeliveriesPerLink = new HashMap<>();
     private final List<DeliveryLogEntry> logEntries = new ArrayList<>();
 
+    private Map<Id<CarrierService>, CarrierService> carrierServicesForThisIteration;
+
     @Inject
-    public ScoreCommercialServices(Population population, DeliveryScoreCalculator scoreCalculator, EventsManager eventsManager) {
-        this.population = population;
+    public ScoreCommercialServices(CommercialJobManager manager, DeliveryScoreCalculator scoreCalculator, EventsManager eventsManager) {
+        this.jobManager = manager;
         this.scoreCalculator = scoreCalculator;
         this.eventsManager = eventsManager;
         this.eventsManager.addHandler(this);
@@ -69,74 +66,39 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
         if (activeDeliveryAgents.contains(event.getPersonId())) {
             handleFreightActivityStart(event);
         }
-
     }
-
-
-    public void prepareTourArrivalsForDay() {
-        currentExpectedDeliveriesPerLink.clear();
-        Set<Plan> plans = population.getPersons().values().stream()
-                .map(p -> p.getSelectedPlan())
-                .filter(plan -> PersonDelivery.planExpectsDeliveries(plan)).collect(Collectors.toSet());
-        for (Plan plan : plans) {
-            plan.getPlanElements().stream().filter(Activity.class::isInstance).forEach(pe -> {
-                Activity activity = (Activity) pe;
-                if (activity.getAttributes().getAsMap().containsKey(PersonDelivery.DELIVERY_TYPE)) {
-                    ExpectedDelivery expectedDelivery = new ExpectedDelivery((String) activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_TYPE)
-                            , PersonDelivery.getCarrierId(activity)
-                            , plan.getPerson().getId()
-                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_DURATION)))
-                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_TIME_START)))
-                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(PersonDelivery.DELIVERY_TIME_END))));
-                    Set<ExpectedDelivery> set = currentExpectedDeliveriesPerLink.getOrDefault(activity.getLinkId(), new HashSet<>());
-                    set.add(expectedDelivery);
-                    currentExpectedDeliveriesPerLink.put(activity.getLinkId(), set);
-
-                }
-
-            });
-        }
-        Logger.getLogger(getClass()).info(currentExpectedDeliveriesPerLink.size() + " links expect deliveries");
-
-    }
-
 
     private void handleFreightActivityStart(ActivityStartEvent event) {
         if (event.getActType().equals(FreightConstants.END)) {
             activeDeliveryAgents.remove(event.getPersonId());
         } else if (event.getActType().contains(FreightConstants.DELIVERY)) {
-            Id<Carrier> carrier = PersonDelivery.getCarrierIdFromDriver(event.getPersonId());
-            Id<Person> customerAboutToBeServed = DeliveryGenerator.getCustomerIdFromDeliveryActivityType(event.getActType());
-            if (currentExpectedDeliveriesPerLink.containsKey(event.getLinkId())) {
-                ExpectedDelivery deliveryCandidate = currentExpectedDeliveriesPerLink.get(event.getLinkId()).stream()
-                        .filter(d -> d.getCarrier().equals(carrier)) //this probably is obsolete as customer can only order at one carrier anyways
-                        .filter(d -> d.getPersonId().equals(customerAboutToBeServed)) // filter for the customer (whose id is contained in the activityType)
-                        .min(Comparator.comparing(ExpectedDelivery::getStartTime))
-                        .orElseThrow(() -> new RuntimeException("No available deliveries expected for customer " + customerAboutToBeServed + " by carrier " + carrier + " at link " + event.getLinkId()));
+            Id<CarrierService> serviceId = FreightAgentInserter.getServiceIdFromActivityType(event.getActType());
+            CarrierService service = this.carrierServicesForThisIteration.remove(serviceId);
+            if(service == null) throw new IllegalStateException("no service with id " + serviceId + " expected. already started???");
+            Id<Carrier> carrier = jobManager.getCurrentCarrierOfService(serviceId);
 
-                currentExpectedDeliveriesPerLink.get(event.getLinkId()).remove(deliveryCandidate);
-                double timeDifference = calcDifference(deliveryCandidate, event.getTime());
+                double timeDifference = calcDifference(service, event.getTime());
                 double score = scoreCalculator.calcScore(timeDifference);
-                eventsManager.processEvent(new PersonMoneyEvent(event.getTime(), deliveryCandidate.getPersonId(), score));
-                logEntries.add(new DeliveryLogEntry(deliveryCandidate.getPersonId(), deliveryCandidate.getCarrier(), event.getTime(), score, event.getLinkId(), timeDifference, event.getPersonId()));
 
+                Id<Person> customer = jobManager.getCustomer(serviceId);
+                eventsManager.processEvent(new PersonMoneyEvent(event.getTime(), customer, score));
+                logEntries.add(new DeliveryLogEntry(customer, serviceId, carrier, event.getTime(), score, event.getLinkId(), timeDifference, event.getPersonId()));
             } else {
                 Logger.getLogger(getClass()).warn("No available deliveries expected at link " + event.getLinkId());
             }
-        }
     }
 
-    private double calcDifference(ExpectedDelivery deliveryCandidate, double time) {
-        if (time < deliveryCandidate.getStartTime()) return (deliveryCandidate.getStartTime() - time);
-        else if (time >= deliveryCandidate.getStartTime() && time <= deliveryCandidate.getEndTime()) return 0;
-        else return (time - deliveryCandidate.getEndTime());
+    private double calcDifference(CarrierService service, double time) {
+        if (time < service.getServiceStartTimeWindow().getStart()) return (service.getServiceStartTimeWindow().getStart() - time);
+        else if (time >= service.getServiceStartTimeWindow().getStart() && time <= service.getServiceStartTimeWindow().getEnd()) return 0;
+        else return (time - service.getServiceStartTimeWindow().getEnd());
     }
 
     @Override
     public void reset(int iteration) {
+        this.carrierServicesForThisIteration = new HashMap<>(this.jobManager.getCarrierServicesMap());
         activeDeliveryAgents.clear();
         logEntries.clear();
-
     }
 
 
@@ -151,54 +113,18 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
         return logEntries;
     }
 
-    static class ExpectedDelivery {
-        private final String type;
-        private final Id<Carrier> carrier;
-
-        private final Id<Person> personId;
-        private final double deliveryDuration;
-        private final double startTime;
-        private final double endTime;
-
-        ExpectedDelivery(String type, Id<Carrier> carrier, Id<Person> personId, double deliveryDuration, double startTime, double endTime) {
-            this.type = type;
-            this.carrier = carrier;
-            this.personId = personId;
-            this.deliveryDuration = deliveryDuration;
-            this.startTime = startTime;
-            this.endTime = endTime;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public Id<Carrier> getCarrier() {
-            return carrier;
-        }
-
-        public Id<Person> getPersonId() {
-            return personId;
-        }
-
-        public double getDeliveryDuration() {
-            return deliveryDuration;
-        }
-
-        public Double getStartTime() {
-            return startTime;
-        }
-
-        public double getEndTime() {
-            return endTime;
-        }
-
-        @Override
-        public String toString(){
-            return "[person=" + personId +";" + "type=" + type +";" + "carrier=" + carrier + ";" + "start=" + startTime + ";" + "end=" + endTime + "]";
+    @Override
+    public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent mobsimBeforeCleanupEvent) {
+        if(!this.carrierServicesForThisIteration.isEmpty()){
+            StringBuilder msg = new StringBuilder("Not all services that were expected by agents have been served. This is a list of the unexecuted services:\n");
+            for(Id<CarrierService> serviceId : this.carrierServicesForThisIteration.keySet()){
+                    msg.append(serviceId).append("\n");
+            }
+            throw new IllegalStateException(msg.toString());
         }
     }
 
+    //------------------------------------------------------------------------------------------------------
 
     public static class DeliveryLogEntry {
         private final Id<Person> personId;
@@ -208,9 +134,11 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
         private final Id<Link> linkId;
         private final double timeDifference;
         private final Id<Person> driverId;
+        private Id<CarrierService> serviceId;
 
-        public DeliveryLogEntry(Id<Person> personId, Id<Carrier> carrierId, double time, double score, Id<Link> linkId, double timeDifference, Id<Person> driverId) {
+        DeliveryLogEntry(Id<Person> personId, Id<CarrierService> serviceId, Id<Carrier> carrierId, double time, double score, Id<Link> linkId, double timeDifference, Id<Person> driverId) {
             this.personId = personId;
+            this.serviceId = serviceId;
             this.carrierId = carrierId;
             this.time = time;
             this.score = score;
@@ -245,6 +173,10 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
 
         public Id<Person> getDriverId() {
             return driverId;
+        }
+
+        public Id<CarrierService> getServiceId() {
+            return serviceId;
         }
     }
 }

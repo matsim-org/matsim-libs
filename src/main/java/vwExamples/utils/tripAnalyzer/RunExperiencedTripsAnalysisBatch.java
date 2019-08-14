@@ -74,7 +74,8 @@ public class RunExperiencedTripsAnalysisBatch {
 //			scenarioToBeAnalyzed.add("VW243_LocalLinkFlow_1.28_10pct");
 //			scenarioToBeAnalyzed.add("VW243_CityCommuterDRTAmpel2.0_10pct300_veh_idx0");
 //			scenarioToBeAnalyzed.add("VW243_CityCommuterDRTAmpel2.0_10pct300_veh_idx0");
-			scenarioToBeAnalyzed.add("VW243_HomeOfficeInOut_10pct");
+			scenarioToBeAnalyzed.add("VW243_HomeOfficeInOut1x_10pct");
+			scenarioToBeAnalyzed.add("VW243_HomeOfficeInOut2x_10pct");
 //			scenarioToBeAnalyzed.add("vw243_cadON_ptSpeedAdj.0.1");
 			
 			

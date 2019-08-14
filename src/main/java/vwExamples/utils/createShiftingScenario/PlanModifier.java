@@ -17,29 +17,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package vwExamples.utils.CreateShiftingScenario;
+package vwExamples.utils.createShiftingScenario;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
-import java.util.StringJoiner;
-
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.locationtech.jts.geom.Geometry;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -51,7 +47,6 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypes;
@@ -61,12 +56,10 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.PtConstants;
 import org.opengis.feature.simple.SimpleFeature;
-
-import vwExamples.utils.tripAnalyzer.ExperiencedTrip;
 
 /**
  * @author saxer
@@ -86,7 +79,7 @@ public class PlanModifier {
 	String plansFile;
 	String networkFile;
 	String modPlansFile;
-//	StreamingPopulationWriter modifiedPopulationWriter;
+	// StreamingPopulationWriter modifiedPopulationWriter;
 	Scenario scenario;
 
 	Collection<String> stages;
@@ -97,16 +90,19 @@ public class PlanModifier {
 										// be shifted
 	SubTourValidator assignTourValidator; // Defines the rule assign trips and agents that might be shifted
 
-	ShiftingScenario shitingScenario;
+	ShiftingScenario shiftingScenario;
+	String sep = ";";
 
 	PlanModifier(String cityZonesFile, String serviceAreaZonesFile, String plansFile, String modPlansFile,
 			String networkFile) {
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//		this.modifiedPopulationWriter = new StreamingPopulationWriter();
+		// this.modifiedPopulationWriter = new StreamingPopulationWriter();
 		this.modPlansFile = modPlansFile;
 		this.cityZonesFile = cityZonesFile;
 		this.serviceAreaZonesFile = serviceAreaZonesFile;
 
+		this.plansFile = plansFile;
+		this.networkFile = networkFile;
 		new PopulationReader(this.scenario).readFile(plansFile);
 		new MatsimNetworkReader(this.scenario.getNetwork()).readFile(networkFile);
 
@@ -121,7 +117,7 @@ public class PlanModifier {
 		readCityShape(this.cityZonesFile, "NO");
 		readServiceAreaShape(this.serviceAreaZonesFile, "NO");
 
-//		modifiedPopulationWriter = new StreamingPopulationWriter();
+		// modifiedPopulationWriter = new StreamingPopulationWriter();
 
 		// Add staging acts for pt and drt
 		stages = new ArrayList<String>();
@@ -132,7 +128,7 @@ public class PlanModifier {
 
 		subTourValidator = new isHomeOfficeSubTourCandidate(network, cityZonesMap, serviceAreazonesMap);
 		assignTourValidator = new assignHomeOfficeSubTour(network, cityZonesMap, serviceAreazonesMap);
-		shitingScenario = new ShiftingScenario(0.06);
+		shiftingScenario = new ShiftingScenario(0.06);
 
 	}
 
@@ -142,10 +138,60 @@ public class PlanModifier {
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Hannover_Stadtteile.shp",
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Real_Region_Hannover.shp",
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\vw243_cadON_ptSpeedAdj.0.1.output_plans.xml.gz",
-				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\vw243_cadON_ptSpeedAdj.0.1_homeOffice_InOut.output_plans.xml.gz",
+				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\vw243_cadON_ptSpeedAdj.0.1_homeOffice_InOutWithin1x.output_plans.xml.gz",
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\network\\network.xml.gz");
 		planmodifier.count();
 		planmodifier.assign();
+		planmodifier.writeScenarioInformation();
+
+	}
+
+	public void writeScenarioInformation() {
+
+		String outputFolder = new File(this.plansFile).getParent();
+
+		try {
+
+			BufferedWriter bw = IOUtils.getBufferedWriter(outputFolder + "\\scenarioStats.csv");
+
+			String header1 = "RequiredTours" + sep + "AssigendTours";
+			bw.write(header1);
+			bw.newLine();
+			bw.write(shiftingScenario.toursToBeAssigned + sep + shiftingScenario.assignedSubTours);
+			bw.newLine();
+			bw.write("TripModalSplit");
+			bw.newLine();
+
+			for (Entry<String, MutableInt> entry : shiftingScenario.mode2TripCounter.entrySet()) {
+				String mode = entry.getKey();
+				int tripCount = entry.getValue().getValue();
+
+				String row = mode + sep + tripCount;
+				bw.write(row);
+				bw.newLine();
+			}
+
+			bw.write("ShiftedTripsFromMode");
+			bw.newLine();
+
+			for (Entry<String, MutableInt> entry : shiftingScenario.mode2ShiftedTripCounter.entrySet()) {
+				String mode = entry.getKey();
+				int tripCount = entry.getValue().getValue();
+
+				String row = mode + sep + tripCount;
+				bw.write(row);
+				bw.newLine();
+			}
+
+			bw.newLine();
+
+			bw.flush();
+			bw.close();
+
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			throw new RuntimeException("Could not write scenario statistics");
+		}
 
 	}
 
@@ -162,8 +208,8 @@ public class PlanModifier {
 				String subtourMode = getSubtourMode(subTour, plan);
 
 				if (subTourValidator.isValidSubTour(subTour)) {
-					shitingScenario.agentSet.add(person.getId());
-					shitingScenario.totalSubtourCounter.increment();
+					shiftingScenario.agentSet.add(person.getId());
+					shiftingScenario.totalSubtourCounter.increment();
 
 					// System.out.println(person.getId());
 
@@ -177,11 +223,11 @@ public class PlanModifier {
 						// Collections.singletonList(PopulationUtils.createLeg(TransportMode.drt)),
 						// trip.getDestinationActivity());
 						// }
-						if (shitingScenario.mode2TripCounter.containsKey(subtourMode)) {
-							shitingScenario.mode2TripCounter.get(subtourMode).increment();
+						if (shiftingScenario.mode2TripCounter.containsKey(subtourMode)) {
+							shiftingScenario.mode2TripCounter.get(subtourMode).increment();
 
 						} else {
-							shitingScenario.mode2TripCounter.put(subtourMode, new MutableInt(1));
+							shiftingScenario.mode2TripCounter.put(subtourMode, new MutableInt(1));
 
 						}
 
@@ -194,29 +240,28 @@ public class PlanModifier {
 			}
 		}
 
-		System.out.println(shitingScenario.mode2TripCounter);
+		System.out.println(shiftingScenario.mode2TripCounter);
 
 		// modifiedPopulationWriter.closeStreaming();
 	}
 
 	public void assign() {
-		String shiftingType = shitingScenario.type;
-		int assignedSubTours = 0;
-		int toursToBeAssigned = 0;
+		String shit2Mode = "stayHome";
+		String shiftingType = shiftingScenario.type;
 
 		// Part for subtourConversion
 		if (shiftingType.equals("subtourConversion")) {
 
-			toursToBeAssigned = (int) (shitingScenario.subTourConversionRate
-					* shitingScenario.totalSubtourCounter.doubleValue());
+			shiftingScenario.toursToBeAssigned = (int) (shiftingScenario.subTourConversionRate
+					* shiftingScenario.totalSubtourCounter.doubleValue());
 
 			// Convert set to list in order to select random elements
-			ArrayList<Id<Person>> agentCandidateList = new ArrayList<Id<Person>>(shitingScenario.agentSet);
+			ArrayList<Id<Person>> agentCandidateList = new ArrayList<Id<Person>>(shiftingScenario.agentSet);
 
 			while (true) {
-				System.out.println(assignedSubTours + " out of " + toursToBeAssigned);
+				System.out.println(shiftingScenario.assignedSubTours + " out of " + shiftingScenario.toursToBeAssigned);
 
-				if (assignedSubTours >= toursToBeAssigned) {
+				if (shiftingScenario.assignedSubTours >= shiftingScenario.toursToBeAssigned) {
 					break;
 				}
 
@@ -229,7 +274,10 @@ public class PlanModifier {
 				boolean foundTour = false;
 				for (Subtour subTour : TripStructureUtils.getSubtours(plan, blackList)) {
 
-					if (assignTourValidator.isValidSubTour(subTour)) {
+					String subtourMode = getSubtourMode(subTour, plan);
+
+					// It is not allowed to shift an already shifted tour
+					if (assignTourValidator.isValidSubTour(subTour) && (subtourMode != shit2Mode)) {
 
 						for (Trip trip : subTour.getTrips()) {
 							for (Leg l : trip.getLegsOnly()) {
@@ -237,15 +285,25 @@ public class PlanModifier {
 								l.setTravelTime(0.0);
 
 								TripRouter.insertTrip(plan, trip.getOriginActivity(),
-										Collections.singletonList(PopulationUtils.createLeg("stayHome")),
+										Collections.singletonList(PopulationUtils.createLeg(shit2Mode)),
 										trip.getDestinationActivity());
+							}
+
+							if (shiftingScenario.mode2ShiftedTripCounter.containsKey(subtourMode)) {
+								shiftingScenario.mode2ShiftedTripCounter.get(subtourMode).increment();
+
+							} else {
+								shiftingScenario.mode2ShiftedTripCounter.put(subtourMode, new MutableInt(1));
+
 							}
 
 						}
 						foundTour = true;
 
 					}
-					assignedSubTours++;
+					if (foundTour == true) {
+						shiftingScenario.assignedSubTours++;
+					}
 
 					if (foundTour == false) {
 						agentCandidateList.remove(randomAgentCandidateIdx);
@@ -258,14 +316,14 @@ public class PlanModifier {
 
 		}
 
-		//Write population
-//		for (Person person : scenario.getPopulation().getPersons().values()) {
-//			modifiedPopulationWriter.writePerson(person);
-//		}
+		// Write population
+		// for (Person person : scenario.getPopulation().getPersons().values()) {
+		// modifiedPopulationWriter.writePerson(person);
+		// }
 
 		new PopulationWriter(scenario.getPopulation(), null).write(modPlansFile);
-//		modifiedPopulationWriter.startStreaming(modPlansFile);
-//		modifiedPopulationWriter.closeStreaming();
+		// modifiedPopulationWriter.startStreaming(modPlansFile);
+		// modifiedPopulationWriter.closeStreaming();
 
 	}
 

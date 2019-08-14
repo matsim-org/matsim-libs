@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package vwExamples.utils.DrtTrajectoryAnalyzer;
+package vwExamples.utils.drtTrajectoryAnalyzer;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.matsim.api.core.v01.Coord;
