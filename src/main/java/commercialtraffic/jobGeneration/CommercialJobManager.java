@@ -70,32 +70,31 @@ public class CommercialJobManager implements BeforeMobsimListener, AfterMobsimLi
                 if(this.service2Operator.containsKey(carrierService.getId())) throw new IllegalArgumentException("duplicate service id: " + carrierService.getId());
                 service2Operator.put(carrierService.getId(),carrier.getId());
             });
-            if(!ctConfigGroup.getRunTourPlanning()){
-                consistencyChecker.checkCarrierHasATourPlan(carrier);
-            } else {
-                carrier.getServices().clear(); //initialize
-            }
-
+            if(ctConfigGroup.getRunTourPlanning()) carrier.getServices().clear(); //initialize
         });
         this.carriers = carriers;
-        mapServicesToCustomerAndCheckLocationConsistency(scenario.getPopulation());
+        if(mapServicesToCustomerAndCheckLocationConsistency(scenario.getPopulation()))
+            throw new RuntimeException("there is a problem with consistency of location in services and activities." +
+                "please check the log for details.");
     }
 
 
-    private void mapServicesToCustomerAndCheckLocationConsistency(Population population){
+    private boolean mapServicesToCustomerAndCheckLocationConsistency(Population population){
         final MutableBoolean fail = new MutableBoolean(false);
         for (Person p : population.getPersons().values()) {
-            p.getPlans().stream()
+            p.getPlans()
                 .forEach(plan -> {
                     plan.getPlanElements().stream()
                         .filter(Activity.class::isInstance)
                         .filter(planElement -> CommercialJobUtils.activityExpectsServices((Activity) planElement))
                             .forEach(planElement -> {
-                                consistencyChecker.checkActivityServiceLocationConsistency((Activity) planElement, p.getId(), getCarrierServicesMap());
+                                if(consistencyChecker.checkActivityServiceLocationConsistency((Activity) planElement, p.getId(), getCarrierServicesMap()))
+                                    fail.setTrue();
                             mapServiceToCustomer(p.getId(),(Activity) planElement);
                         });
                 });
         }
+        return fail.getValue();
     }
 
     private void mapServiceToCustomer(Id<Person> personId, Activity activity) {

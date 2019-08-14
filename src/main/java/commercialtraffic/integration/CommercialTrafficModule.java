@@ -53,7 +53,7 @@ public class CommercialTrafficModule extends AbstractModule {
         new CarrierVehicleTypeReader(vehicleTypes).readFile(ctcg.getCarriersVehicleTypesFileUrl(getConfig().getContext()).getFile());
         new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
         CommercialTrafficChecker consistencyChecker = new CommercialTrafficChecker();
-        if (consistencyChecker.checkCarrierConsistency(carriers)) {
+        if (consistencyChecker.checkCarrierConsistency(carriers, ctcg)) {
             throw new RuntimeException("Carrier definition is invalid. Please check the log for details.");
         }
         bind(CommercialTrafficChecker.class).toInstance(consistencyChecker);

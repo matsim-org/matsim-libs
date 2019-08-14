@@ -42,9 +42,9 @@ public class CommercialTrafficChecker {
 
     private Set<Id<CarrierService>> allServiceIdsReferencedInPopulation = new HashSet<>();
 
-    public void checkActivityServiceLocationConsistency(Activity activity, Id<Person> pid, Map<Id<CarrierService>, CarrierService> services) {
+    public boolean checkActivityServiceLocationConsistency(Activity activity, Id<Person> pid, Map<Id<CarrierService>, CarrierService> services) {
         if(! CommercialJobUtils.activityExpectsServices(activity)) throw new RuntimeException();
-
+        boolean fail = false;
         boolean actHasLinkId = activity.getLinkId() != null;
         if (!actHasLinkId && warnCount <= MAXWARNCOUNT) {
             log.warn("activity " + activity + " of agent " + pid + " references at least one service and has no link id set.\n" +
@@ -56,23 +56,29 @@ public class CommercialTrafficChecker {
 
         Set<Id<CarrierService>> jobIds = CommercialJobUtils.getServiceIdsFromActivity(activity);
         for (Id<CarrierService> serviceId : jobIds) {
-            if(!this.allServiceIdsReferencedInPopulation.add(serviceId))
-                throw new IllegalArgumentException("service id=" + serviceId + " is contained at least twice in population file");
-            if (!services.containsKey(serviceId))
-                throw new IllegalArgumentException("Activity " + activity + " of person " + pid + " references a service which does not exist in input carriers file. serviceId=" + serviceId);
-            if(actHasLinkId){
-                if (!services.get(serviceId).getLocationLinkId().equals(activity.getLinkId()))
-                    throw new IllegalStateException("linkId's of service " + serviceId + " and activity " + activity + " of person " + pid + " do not match!");
+            if(!this.allServiceIdsReferencedInPopulation.add(serviceId)){
+                log.error("service id=" + serviceId + " is contained at least twice in population file");
+                fail = true;
             }
-
+            if (!services.containsKey(serviceId)){
+                log.error("Activity " + activity + " of person " + pid + " references a service which does not exist in input carriers file. serviceId=" + serviceId);
+                fail = true;
+            }
+            if(actHasLinkId){
+                if (!services.get(serviceId).getLocationLinkId().equals(activity.getLinkId())){
+                    log.error("linkId's of service " + serviceId + " and activity " + activity + " of person " + pid + " do not match!");
+                    fail = true;
+                }
+            }
         }
+        return fail;
     }
 
     /**
      * @param carriers to check
      * @return true if errors exist, false if carriers are set properly
      */
-    boolean checkCarrierConsistency(Carriers carriers) {
+    boolean checkCarrierConsistency(Carriers carriers, CommercialTrafficConfigGroup commercialTrafficConfigGroup) {
         boolean fail = false;
         for (Carrier carrier : carriers.getCarriers().values()) {
             if (carrier.getId().toString().split(CommercialJobUtils.CARRIERSPLIT).length != 2) {
@@ -87,12 +93,17 @@ public class CommercialTrafficChecker {
                 log.error("Carrier " + carrier.getId() + " needs to have at least one vehicle defined.");
                 fail = true;
             }
+            if(!commercialTrafficConfigGroup.getRunTourPlanning()){
+                if(carrier.getPlans().isEmpty()) {
+                    log.error("carrier " + carrier.getId() + " does not have a plan but tour planning is switched off in CommercialTrafficConfigGroup");
+                    fail = true;
+                } else if(carrier.getPlans().get(0).getScheduledTours().isEmpty()){
+                    log.error("the plan of carrier " + carrier.getId() + " does not have tour but tour planning is switched off in CommercialTrafficConfigGroup");
+                    fail = true;
+                }
+            }
         }
         return fail;
     }
 
-    public void checkCarrierHasATourPlan(Carrier carrier) {
-                if(carrier.getPlans().isEmpty()) throw new RuntimeException("carrier " + carrier.getId() + " does not have a plan but tour planning is switched off in CommercialTrafficConfigGroup");
-                if(carrier.getPlans().get(0).getScheduledTours().isEmpty()) throw new RuntimeException("the plan of carrier " + carrier.getId() + " does not have tour but tour planning is switched off in CommercialTrafficConfigGroup");
-    }
 }
