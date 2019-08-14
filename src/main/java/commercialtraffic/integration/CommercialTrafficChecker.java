@@ -47,9 +47,9 @@ public class CommercialTrafficChecker {
 
         boolean actHasLinkId = activity.getLinkId() != null;
         if (!actHasLinkId && warnCount <= MAXWARNCOUNT) {
-            log.warn("activity " + activity + " of agent " + pid + " references at least one service and has no link id set. " +
-                    "please check if the service's link ids correspond to the activity location." +
-                    "Otherwise, results will be wrong and should not be interpreted!" +
+            log.warn("activity " + activity + " of agent " + pid + " references at least one service and has no link id set.\n" +
+                    "please check if the service's link ids correspond to the activity location.\n" +
+                    "Otherwise, results will be wrong and should not be interpreted!\n" +
                     "This message is only given " + MAXWARNCOUNT + " times");
             warnCount++;
         }
@@ -92,7 +92,7 @@ public class CommercialTrafficChecker {
     }
 
     public void checkCarrierHasATourPlan(Carrier carrier) {
-                if(carrier.getPlans().isEmpty()) throw new RuntimeException("carrier " + carrier + " does not have a plan");
-                if(carrier.getPlans().get(0).getScheduledTours().isEmpty()) throw new RuntimeException("the plan of carrier " + carrier + " does not have tour");
+                if(carrier.getPlans().isEmpty()) throw new RuntimeException("carrier " + carrier.getId() + " does not have a plan but tour planning is switched off in CommercialTrafficConfigGroup");
+                if(carrier.getPlans().get(0).getScheduledTours().isEmpty()) throw new RuntimeException("the plan of carrier " + carrier.getId() + " does not have tour but tour planning is switched off in CommercialTrafficConfigGroup");
     }
 }

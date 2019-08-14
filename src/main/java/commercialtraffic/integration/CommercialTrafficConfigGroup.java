@@ -236,7 +236,7 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
         if(!getRunTourPlanning() && config.strategy().getStrategySettings().stream()
                 .anyMatch(strategySettings -> strategySettings.getStrategyName().equals(ChangeDeliveryServiceOperator.SELECTOR_NAME))){
             throw new RuntimeException("if tour planning is switched off, the replanning  strategy " + ChangeDeliveryServiceOperator.SELECTOR_NAME
-                                        + " is forbidden. Either let the carriers do tour planning before eacht iteration by setting " + RUNJSPRIT + "=true "
+                                        + " is forbidden. Either let the carriers do tour planning before each  iteration by setting " + RUNJSPRIT + "=true "
                                          + "or exclude the replanning strategy " + ChangeDeliveryServiceOperator.SELECTOR_NAME);
         }
     }
