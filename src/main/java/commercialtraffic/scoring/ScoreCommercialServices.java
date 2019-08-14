@@ -47,7 +47,6 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
     private final CommercialJobManager jobManager;
 
     private final Set<Id<Person>> activeDeliveryAgents = new HashSet<>();
-    private final Map<Id<Link>, Set<ExpectedDelivery>> currentExpectedDeliveriesPerLink = new HashMap<>();
     private final List<DeliveryLogEntry> logEntries = new ArrayList<>();
 
     private Map<Id<CarrierService>, CarrierService> carrierServicesForThisIteration;
@@ -65,7 +64,6 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
         if (activeDeliveryAgents.contains(event.getPersonId())) {
             handleFreightActivityStart(event);
         }
-
     }
 
     private void handleFreightActivityStart(ActivityStartEvent event) {
@@ -114,55 +112,6 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
     }
 
     //------------------------------------------------------------------------------------------------------
-
-    static class ExpectedDelivery {
-        private final String type;
-        private final Id<Carrier> carrier;
-
-        private final Id<Person> personId;
-        private final double deliveryDuration;
-        private final double startTime;
-        private final double endTime;
-
-        ExpectedDelivery(String type, Id<Carrier> carrier, Id<Person> personId, double deliveryDuration, double startTime, double endTime) {
-            this.type = type;
-            this.carrier = carrier;
-            this.personId = personId;
-            this.deliveryDuration = deliveryDuration;
-            this.startTime = startTime;
-            this.endTime = endTime;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-        public Id<Carrier> getCarrier() {
-            return carrier;
-        }
-
-        public Id<Person> getPersonId() {
-            return personId;
-        }
-
-        public double getDeliveryDuration() {
-            return deliveryDuration;
-        }
-
-        public Double getStartTime() {
-            return startTime;
-        }
-
-        public double getEndTime() {
-            return endTime;
-        }
-
-        @Override
-        public String toString(){
-            return "[person=" + personId +";" + "type=" + type +";" + "carrier=" + carrier + ";" + "start=" + startTime + ";" + "end=" + endTime + "]";
-        }
-    }
-
 
     public static class DeliveryLogEntry {
         private final Id<Person> personId;
