@@ -135,9 +135,10 @@ public class CommercialTrafficAnalysisListener implements IterationEndsListener 
     private void writeDeliveryStats(String filename) {
         Collections.sort(scoreCommercialServices.getLogEntries(), Comparator.comparing(ScoreCommercialServices.DeliveryLogEntry::getTime));
         try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(filename)), CSVFormat.DEFAULT.withDelimiter(sep.charAt(0)).withHeader("CarrierId"
-                , "PersonId", "Time", "Score", "LinkId", "TimeDerivation", "DriverId"))) {
+                ,"serviceId", "PersonId", "Time", "Score", "LinkId", "TimeDerivation", "DriverId"))) {
             for (ScoreCommercialServices.DeliveryLogEntry entry : scoreCommercialServices.getLogEntries()) {
                 csvPrinter.print(entry.getCarrierId());
+                csvPrinter.print(entry.getServiceId());
                 csvPrinter.print(entry.getPersonId());
                 csvPrinter.print(Time.writeTime(entry.getTime()));
                 csvPrinter.print(entry.getScore());

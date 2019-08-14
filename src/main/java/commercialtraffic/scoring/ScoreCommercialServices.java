@@ -80,7 +80,7 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
 
                 Id<Person> customer = jobManager.getCustomer(serviceId);
                 eventsManager.processEvent(new PersonMoneyEvent(event.getTime(), customer, score));
-                logEntries.add(new DeliveryLogEntry(customer, carrier, event.getTime(), score, event.getLinkId(), timeDifference, event.getPersonId()));
+                logEntries.add(new DeliveryLogEntry(customer, serviceId, carrier, event.getTime(), score, event.getLinkId(), timeDifference, event.getPersonId()));
             } else {
                 Logger.getLogger(getClass()).warn("No available deliveries expected at link " + event.getLinkId());
             }
@@ -121,9 +121,11 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
         private final Id<Link> linkId;
         private final double timeDifference;
         private final Id<Person> driverId;
+        private Id<CarrierService> serviceId;
 
-        public DeliveryLogEntry(Id<Person> personId, Id<Carrier> carrierId, double time, double score, Id<Link> linkId, double timeDifference, Id<Person> driverId) {
+        DeliveryLogEntry(Id<Person> personId, Id<CarrierService> serviceId, Id<Carrier> carrierId, double time, double score, Id<Link> linkId, double timeDifference, Id<Person> driverId) {
             this.personId = personId;
+            this.serviceId = serviceId;
             this.carrierId = carrierId;
             this.time = time;
             this.score = score;
@@ -158,6 +160,10 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
 
         public Id<Person> getDriverId() {
             return driverId;
+        }
+
+        public Id<CarrierService> getServiceId() {
+            return serviceId;
         }
     }
 }
