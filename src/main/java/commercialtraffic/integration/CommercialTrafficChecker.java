@@ -23,13 +23,16 @@ package commercialtraffic.integration;/*
  */
 
 import commercialtraffic.jobGeneration.CommercialJobUtils;
+import commercialtraffic.replanning.ChangeDeliveryServiceOperator;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierCapabilities;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.core.config.Config;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -78,7 +81,8 @@ public class CommercialTrafficChecker {
      * @param carriers to check
      * @return true if errors exist, false if carriers are set properly
      */
-    boolean checkCarrierConsistency(Carriers carriers, CommercialTrafficConfigGroup commercialTrafficConfigGroup) {
+    boolean checkCarrierConsistency(Carriers carriers, Config config) {
+
         boolean fail = false;
         for (Carrier carrier : carriers.getCarriers().values()) {
             if (carrier.getId().toString().split(CommercialJobUtils.CARRIERSPLIT).length != 2) {
@@ -93,12 +97,20 @@ public class CommercialTrafficChecker {
                 log.error("Carrier " + carrier.getId() + " needs to have at least one vehicle defined.");
                 fail = true;
             }
-            if(!commercialTrafficConfigGroup.getRunTourPlanning()){
+            if(!CommercialTrafficConfigGroup.get(config).getRunTourPlanning()){
+
                 if(carrier.getPlans().isEmpty()) {
                     log.error("carrier " + carrier.getId() + " does not have a plan but tour planning is switched off in CommercialTrafficConfigGroup");
                     fail = true;
                 } else if(carrier.getPlans().get(0).getScheduledTours().isEmpty()){
                     log.error("the plan of carrier " + carrier.getId() + " does not have tour but tour planning is switched off in CommercialTrafficConfigGroup");
+                    fail = true;
+                }
+            } else if(config.strategy().getStrategySettings().stream()
+                        .anyMatch(strategySettings -> strategySettings.getStrategyName().equals(ChangeDeliveryServiceOperator.SELECTOR_NAME))){
+                if(!carrier.getCarrierCapabilities().getFleetSize().equals(CarrierCapabilities.FleetSize.INFINITE)){
+                    log.error("at the moment, only infinite fleet size is allowed when using the " + ChangeDeliveryServiceOperator.SELECTOR_NAME
+                    + " strategy. this way it is avoided, that agents that expect a service do not get served. fleetsize is not infinite for carrier " + carrier.getId());
                     fail = true;
                 }
             }
