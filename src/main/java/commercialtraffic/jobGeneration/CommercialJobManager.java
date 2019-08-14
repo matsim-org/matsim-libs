@@ -46,7 +46,6 @@ import java.util.stream.Collectors;
 
 public class CommercialJobManager implements BeforeMobsimListener, AfterMobsimListener {
 
-    private final CommercialTrafficChecker consistencyChecker;
     private final FreightAgentInserter agentInserter;
     private final Scenario scenario;
     private final CommercialTrafficConfigGroup ctConfigGroup;
@@ -59,7 +58,6 @@ public class CommercialJobManager implements BeforeMobsimListener, AfterMobsimLi
     @Inject
     public CommercialJobManager(Carriers carriers, Scenario scenario, FreightAgentInserter agentInserter, CommercialTrafficChecker consistencyChecker, Map<String, TravelTime> travelTimes){
         this.agentInserter = agentInserter;
-        this.consistencyChecker = consistencyChecker;
         this.scenario = scenario;
         this.carTravelTime = travelTimes.get(TransportMode.car);
         this.ctConfigGroup = CommercialTrafficConfigGroup.get(scenario.getConfig());
@@ -73,13 +71,13 @@ public class CommercialJobManager implements BeforeMobsimListener, AfterMobsimLi
             if(ctConfigGroup.getRunTourPlanning()) carrier.getServices().clear(); //initialize
         });
         this.carriers = carriers;
-        if(mapServicesToCustomerAndCheckLocationConsistency(scenario.getPopulation()))
+        if(mapServicesToCustomerAndCheckLocationConsistency(scenario.getPopulation(), consistencyChecker))
             throw new RuntimeException("there is a problem with consistency of location in services and activities." +
                 "please check the log for details.");
     }
 
 
-    private boolean mapServicesToCustomerAndCheckLocationConsistency(Population population){
+    private boolean mapServicesToCustomerAndCheckLocationConsistency(Population population, CommercialTrafficChecker consistencyChecker){
         final MutableBoolean fail = new MutableBoolean(false);
         for (Person p : population.getPersons().values()) {
             p.getPlans()
