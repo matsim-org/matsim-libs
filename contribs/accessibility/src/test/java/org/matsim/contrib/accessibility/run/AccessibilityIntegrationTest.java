@@ -385,6 +385,7 @@ public class AccessibilityIntegrationTest {
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.matrixBasedPt, true);
+		acg.setUseParallelization(false);
 		
 		// modify config according to needs
 		Network network = createTestNetwork(); // this is a little odd. kai, dec'16
