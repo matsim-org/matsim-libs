@@ -41,7 +41,7 @@ import java.util.Set;
 
 public class TourPlanning  {
 
-    static Carriers runTourPlanningForCarriers(Carriers carriers, Scenario scenario, int maxIterations, TravelTime travelTime) {
+    static void runTourPlanningForCarriers(Carriers carriers, Scenario scenario, int maxIterations, TravelTime travelTime) {
         Set<CarrierVehicleType> vehicleTypes = new HashSet<>();
         carriers.getCarriers().values().forEach(carrier -> vehicleTypes.addAll(carrier.getCarrierCapabilities().getVehicleTypes()));
         NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), vehicleTypes);
@@ -67,6 +67,5 @@ public class TourPlanning  {
                     carrier.setSelectedPlan(carrierPlan);
                 }
         );
-        return carriers;
     }
 }
