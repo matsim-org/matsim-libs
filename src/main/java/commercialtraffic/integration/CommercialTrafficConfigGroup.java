@@ -58,7 +58,7 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     private boolean runTourPlanning = true;
     public  static final String RUNJSPRIT = "runTourPlanning";
     public static final String RUNJSPRITDESC = "Defines whether JSprit is run. " +
-            "If this is set to true, ChangeDeliveryOperator strategy must not be switched on and all carriers need to have at least one plan containing at least one tour.";
+            "If this is set to false, ChangeDeliveryOperator strategy must not be switched on and all carriers need to have at least one plan containing at least one tour.";
 
     @Positive
     private double zeroUtilityDelay = 1800;
