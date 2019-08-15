@@ -28,8 +28,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AccessibilityMeasureType;
 import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
+import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.ProgressBar;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
@@ -50,10 +52,10 @@ public final class AccessibilityCalculator {
 	private final Map<String, AccessibilityContributionCalculator> calculators = new LinkedHashMap<>();
 	// (test may depend on that this is a "Linked" Hash Map. kai, dec'16)
 
+    private final Config config;
 	private final PlanCalcScoreConfigGroup cnScoringGroup;
 	private final AccessibilityConfigGroup acg;
 	private final Network network;
-	private final double walkSpeed_m_h;
 
 	private final ArrayList<FacilityDataExchangeInterface> zoneDataExchangeListeners = new ArrayList<>();
 
@@ -61,6 +63,7 @@ public final class AccessibilityCalculator {
 	public AccessibilityCalculator(Scenario scenario, ActivityFacilities measuringPoints, Network network) {
 		this.network = network;
 		this.measuringPoints = measuringPoints;
+		this.config = scenario.getConfig();
 		this.acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 		this.cnScoringGroup = scenario.getConfig().planCalcScore();
 
@@ -76,13 +79,11 @@ public final class AccessibilityCalculator {
 		if (cnScoringGroup.getOrCreateModeParams(TransportMode.walk).getMonetaryDistanceRate() != 0.) {
 			LOG.error("Monetary distance cost rate for walk different from zero, but not used in accessibility computations");
 		}
-
-		this.walkSpeed_m_h = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
 	}
 
 	public final void computeAccessibilities(Double departureTime, ActivityFacilities opportunities) {
-		Map<Id<Node>, AggregationObject> aggregatedOpportunities = aggregateOpportunitiesWithSameNearestNode(opportunities, network);
-		Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedOrigins = aggregateMeasurePointsWithSameNearestNode();
+		Map<Id<Node>, AggregationObject> aggregatedOpportunities = AccessibilityUtils.aggregateOpportunitiesWithSameNearestNode(opportunities, network, config);
+		Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedOrigins = AccessibilityUtils.aggregateMeasurePointsWithSameNearestNode(measuringPoints, network);
 		Collection<Id<Node>> aggregatedOriginNodes = new LinkedList<>();
 		for (Id<Node> nodeId : aggregatedOrigins.keySet()) {
 			aggregatedOriginNodes.add(nodeId);
@@ -186,88 +187,6 @@ public final class AccessibilityCalculator {
 				}
 			}
 		}
-	}
-
-
-	/**
-	 * Aggregates disutilities Vjk to get from node j to all k that are attached to j and assign sum(Vjk) is to node j.
-	 *
-	 *     j---k1
-	 *     |\
-	 *     | \
-	 *     k2 k3
-	 */
-	private final Map<Id<Node>, AggregationObject> aggregateOpportunitiesWithSameNearestNode(final ActivityFacilities opportunities, Network network) {
-		// yyyy this method ignores the "capacities" of the facilities. kai, mar'14
-		// for now, we decided not to add "capacities" as it is not needed for current projects. dz, feb'16
-
-		LOG.info("Aggregating " + opportunities.getFacilities().size() + " opportunities with same nearest node...");
-		Map<Id<Node>, AggregationObject> opportunityClusterMap = new ConcurrentHashMap<>();
-		ProgressBar progressBar = new ProgressBar(opportunities.getFacilities().size());
-
-		for (ActivityFacility opportunity : opportunities.getFacilities().values()) {
-			progressBar.update();
-
-			Node nearestNode = NetworkUtils.getNearestNode(network, opportunity.getCoord());
-			double distance_m = NetworkUtils.getEuclideanDistance(opportunity.getCoord(), nearestNode.getCoord());
-
-			// in MATSim this is [utils/h]: cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
-			double walkBetaTT_utils_h = this.cnScoringGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling()
-					- this.cnScoringGroup.getPerforming_utils_hr(); // default values: -12 = (-6.) - (6.)
-			double VjkWalkTravelTime = walkBetaTT_utils_h * (distance_m / this.walkSpeed_m_h);
-			// System.out.println("VjkWalkTravelTime = " + VjkWalkTravelTime);
-
-			// in MATSim this is 0 !!! since getMonetaryDistanceCostRateWalk doesn't exist:
-			double walkBetaTD_utils_m = cnScoringGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance(); // default value: 0.
-			double VjkWalkDistance = walkBetaTD_utils_m * distance_m;
-			// System.out.println("VjkWalkDistance = " + VjkWalkDistance);
-
-			double expVjk = Math.exp(this.cnScoringGroup.getBrainExpBeta() * (VjkWalkTravelTime + VjkWalkDistance));
-
-			// add Vjk to sum
-			AggregationObject jco = opportunityClusterMap.get(nearestNode.getId()); // Why "jco"?
-			if (jco == null) {
-				jco = new AggregationObject(opportunity.getId(), null, null, nearestNode, 0.); // Important: Initialize with zero!
-				// This is a bit counter-intuitive. The first opportunity is added twice to the aggregation object, but the first time with zero
-				// "impact". Leave it as is for the time being as urbanSim code uses this, dz, july'17
-				opportunityClusterMap.put(nearestNode.getId(), jco);
-			}
-			if (acg.isUseOpportunityWeights()) {
-				if (opportunity.getAttributes().getAttribute(AccessibilityAttributes.WEIGHT) == null) {
-					throw new RuntimeException("If option \"useOpportunityWeights\" is used, the facilities must have an attribute with key " + AccessibilityAttributes.WEIGHT + ".");
-				} else {
-					double weight = Double.parseDouble(opportunity.getAttributes().getAttribute(AccessibilityAttributes.WEIGHT).toString());
-					jco.addObject(opportunity.getId(), expVjk * Math.pow(weight, acg.getWeightExponent()));
-				}
-			} else {
-				jco.addObject(opportunity.getId(), expVjk);
-			}
-//			LOG.info("--- numberOfObjects = " + jco.getNumberOfObjects() + " --- objectIds = " + jco.getObjectIds());
-		}
-		LOG.info("Quite convoluted aggregation here...");
-		LOG.info("Aggregated " + opportunities.getFacilities().size() + " opportunities to " + opportunityClusterMap.size() + " nodes.");
-		return opportunityClusterMap;
-	}
-
-
-	private Map<Id<Node>, ArrayList<ActivityFacility>> aggregateMeasurePointsWithSameNearestNode() {
-		Map<Id<Node>,ArrayList<ActivityFacility>> aggregatedOrigins = new ConcurrentHashMap<>();
-
-		Gbl.assertNotNull(measuringPoints);
-		Gbl.assertNotNull(measuringPoints.getFacilities()) ;
-		for (ActivityFacility measuringPoint : measuringPoints.getFacilities().values()) {
-
-			Node nearestNode = NetworkUtils.getCloserNodeOnLink(measuringPoint.getCoord(),	NetworkUtils.getNearestLinkExactly(network, measuringPoint.getCoord()));
-			Id<Node> nearestNodeId = nearestNode.getId();
-
-			if(!aggregatedOrigins.containsKey(nearestNodeId)) {
-				aggregatedOrigins.put(nearestNodeId, new ArrayList<>());
-			}
-			aggregatedOrigins.get(nearestNodeId).add(measuringPoint);
-		}
-		LOG.info("Number of measuring points: " + measuringPoints.getFacilities().values().size());
-		LOG.info("Number of aggregated measuring points: " + aggregatedOrigins.size());
-		return aggregatedOrigins;
 	}
 
 
