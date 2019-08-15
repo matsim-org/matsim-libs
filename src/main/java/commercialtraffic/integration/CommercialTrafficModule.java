@@ -77,9 +77,6 @@ public class CommercialTrafficModule extends AbstractModule {
         bind(TourLengthAnalyzer.class).asEagerSingleton();
         bind(FreightAgentInserter.class).asEagerSingleton();
 
-        //TODO: Change this, once some carriers have different modes, such as DRT.
-        bind(CarrierMode.class).toInstance(carrierId -> TransportMode.car);
-
         if(this.carrierTransportModes.isEmpty()){
 //            bind(CarrierMode.class).toInstance(carrierId -> TransportMode.car);
             bind(CarrierMode.class).toInstance(carrierId -> TransportMode.drt);

@@ -72,9 +72,6 @@ public class RunCommercialTrafficUsingDRT {
         changeServiceOperator.setWeight(0.5);
         config.strategy().addStrategySettings(changeServiceOperator);
 
-
-
-
         config.strategy().setFractionOfIterationsToDisableInnovation(.8);
         PlanCalcScoreConfigGroup.ActivityParams home = new PlanCalcScoreConfigGroup.ActivityParams("home");
         home.setTypicalDuration(14 * 3600);
@@ -91,8 +88,10 @@ public class RunCommercialTrafficUsingDRT {
         config.network().setInputFile(inputDir + "grid_network.xml");
         config.plans().setInputFile(inputDir + "testpop.xml");
 
-        Controler controler = DrtControlerCreator.createControlerWithSingleModeDrt(config,false);
 
+        //so far, we want to have only one drt mode.
+        // TODO: Eventually, we might want to distinguish at least 2 drt modes, one for passenger transport and one for freight.
+        Controler controler = DrtControlerCreator.createControlerWithSingleModeDrt(config,false);
 
         controler.addOverridingModule(new CommercialTrafficModule());
 
