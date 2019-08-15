@@ -126,7 +126,7 @@ public final class AccessibilityCalculator {
 
 
 	private void compute(Double departureTime, Map<Id<Node>, AggregationObject> aggregatedOpportunities, Map<Id<Node>,
-			ArrayList<ActivityFacility>> aggregatedOrigins, Collection<Id<Node>> aggregatedOriginNodes, ProgressBar progressBar) {
+			ArrayList<ActivityFacility>> aggregatedOrigins, Collection<Id<Node>> subsetOfNodes, ProgressBar progressBar) {
 
 		Map<String, AccessibilityContributionCalculator> calculatorsForPartition = new LinkedHashMap<>();
 		for (String mode : new HashSet<>(calculators.keySet())) {
@@ -135,7 +135,7 @@ public final class AccessibilityCalculator {
 
 		// Go through all nodes that have a measuring point assigned
 		//for (Id<Node> nodeId : partition) {
-		for (Id<Node> nodeId : aggregatedOrigins.keySet()) {
+		for (Id<Node> nodeId : subsetOfNodes) {
 			progressBar.update();
 
 			Node fromNode = network.getNodes().get(nodeId);
@@ -257,15 +257,12 @@ public final class AccessibilityCalculator {
 		Gbl.assertNotNull(measuringPoints.getFacilities()) ;
 		for (ActivityFacility measuringPoint : measuringPoints.getFacilities().values()) {
 
-			// Determine nearest network node (from- or toNode) based on the link
 			Node nearestNode = NetworkUtils.getCloserNodeOnLink(measuringPoint.getCoord(),	NetworkUtils.getNearestLinkExactly(network, measuringPoint.getCoord()));
 			Id<Node> nearestNodeId = nearestNode.getId();
 
-			// Create new entry if key does not exist!
 			if(!aggregatedOrigins.containsKey(nearestNodeId)) {
-				aggregatedOrigins.put(nearestNodeId, new ArrayList<ActivityFacility>());
+				aggregatedOrigins.put(nearestNodeId, new ArrayList<>());
 			}
-			// Assign measure point (origin) to it's nearest node
 			aggregatedOrigins.get(nearestNodeId).add(measuringPoint);
 		}
 		LOG.info("Number of measuring points: " + measuringPoints.getFacilities().values().size());
