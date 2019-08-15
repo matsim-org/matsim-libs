@@ -63,7 +63,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 	private final class AccessEgressStageActivityTypes implements StageActivityTypes {
 		@Override public boolean isStageActivity(String activityType) {
-			if ( NetworkRoutingInclAccessEgressModule.this.stageActivityType.equals( activityType ) ) {
+			if ( activityType.endsWith("interaction") || 
+					NetworkRoutingInclAccessEgressModule.this.stageActivityType.equals( activityType ) ) {
 				return true ;
 			} else {
 				return false ;
@@ -74,10 +75,14 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 				return false ;
 			}
 			AccessEgressStageActivityTypes other = (AccessEgressStageActivityTypes) obj ;
-			return other.isStageActivity(NetworkRoutingInclAccessEgressModule.this.stageActivityType) ;
+			return stageActivityType.equals(other.getStageActivityTypeString());
 		}
 		@Override public int hashCode() {
 			return NetworkRoutingInclAccessEgressModule.this.stageActivityType.hashCode() ;
+		}
+		
+		private String getStageActivityTypeString() {
+			return stageActivityType;
 		}
 	}
 
@@ -87,7 +92,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 	private final Network filteredNetwork;
 	private final LeastCostPathCalculator routeAlgo;
-	private String stageActivityType;
+	private final String stageActivityType;
 
 	NetworkRoutingInclAccessEgressModule(
 		  final String mode,
