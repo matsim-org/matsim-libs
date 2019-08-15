@@ -163,7 +163,9 @@ public final class AccessibilityModule extends AbstractModule {
 				}
 				LOG.warn("sub-network for mode " + modeSet.toString() + " now has " + subNetwork.getNodes().size() + " nodes.");
 
-				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints, subNetwork);
+				String outputDirectory = scenario.getConfig().controler().getOutputDirectory() + "/" + activityType;
+				AccessibilityShutdownListenerV4 accessibilityShutdownListener = new AccessibilityShutdownListenerV4(scenario, measuringPoints, network,
+						opportunities, outputDirectory, acg);
 
 				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
 					AccessibilityContributionCalculator calculator;
@@ -197,23 +199,19 @@ public final class AccessibilityModule extends AbstractModule {
 //						TravelDisutility travelDisutility = this.travelDisutilityFactories.get(mode.toString()).createTravelDisutility(timeCalculator) ;
 						calculator = new TripRouterAccessibilityContributionCalculator(mode.toString(), tripRouter, config.planCalcScore());
 					}
-					accessibilityCalculator.putAccessibilityContributionCalculator(mode.name(), calculator);
+					accessibilityShutdownListener.putAccessibilityContributionCalculator(mode.name(), calculator);
+
 				}
-				
-				String outputDirectory = scenario.getConfig().controler().getOutputDirectory() + "/" + activityType;
-				
+
 				if (pushing2Geoserver || createQGisOutput) {
 					if (measurePointGeometryMap == null) {
 						throw new IllegalArgumentException("measure-point-to-geometry map must not be null if push to Geoserver is intended.");
 					}
 					Set <String> additionalFacInfo = additionalFacs.keySet();
-					accessibilityCalculator.addFacilityDataExchangeListener(new GeoserverUpdater(acg.getOutputCrs(),
+					accessibilityShutdownListener.addFacilityDataExchangeListener(new GeoserverUpdater(acg.getOutputCrs(),
 							config.controler().getRunId() + "_" + activityType, measurePointGeometryMap, additionalFacInfo,
 							outputDirectory, pushing2Geoserver, createQGisOutput));
-				}				
-
-				AccessibilityShutdownListenerV4 accessibilityShutdownListener = new AccessibilityShutdownListenerV4(accessibilityCalculator,
-						opportunities, outputDirectory, acg);
+				}
 				
 				for (ActivityFacilities fac : additionalFacs.values()) {
 					accessibilityShutdownListener.addAdditionalFacilityData(fac);
