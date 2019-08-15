@@ -93,16 +93,11 @@ public final class AccessibilityModule extends AbstractModule {
 			@Override
 			public ControlerListener get() {
 				AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.class);
-				//crs = acg.getOutputCrs();
-				
 				ActivityFacilities opportunities = AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(scenario, activityType);
-
 				final BoundingBox boundingBox;
 				
 				int tileSize_m = acg.getTileSize();
-				if (tileSize_m <= 0) {
-					LOG.error("Tile Size needs to be assigned a value greater than zero.");
-				}
+				if (tileSize_m <= 0) { LOG.error("Tile Size must be assigned a value greater than zero."); }
 				
 				if (acg.getAreaOfAccessibilityComputation() == AreaOfAccesssibilityComputation.fromShapeFile) {
 					Geometry boundary = GridUtils.getBoundary(acg.getShapeFileCellBasedAccessibility());
@@ -154,18 +149,22 @@ public final class AccessibilityModule extends AbstractModule {
 				AccessibilityUtils.assignAdditionalFacilitiesDataToMeasurePoint(measuringPoints, measurePointGeometryMap, additionalFacs);
 				
 				// TODO Need to find a stable way for multi-modal networks
-				// AV stuff -------------------------------------------------------------
-				TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
 				LOG.warn("Full network has " + network.getNodes().size() + " nodes.");
-				Network carNetwork = NetworkUtils.createNetwork();
+				Network subNetwork = NetworkUtils.createNetwork();
 				Set<String> modeSet = new HashSet<>();
-				modeSet.add("car");
-				filter.filter(carNetwork, modeSet);
-				LOG.warn("Pure car network now has " + carNetwork.getNodes().size() + " nodes.");
-				// End AV stuff -------------------------------------------------------------
-				
-				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints, network);
-//				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints, carNetwork);
+				if (acg.getIsComputingMode().contains(Modes4Accessibility.car)) {
+					TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
+					modeSet.add(TransportMode.car);
+					filter.filter(subNetwork, modeSet);
+				} else if (acg.getIsComputingMode().contains(Modes4Accessibility.bike)) {
+					TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
+					modeSet.add(TransportMode.car);
+					filter.filter(subNetwork, modeSet);
+				}
+				LOG.warn("sub-network for mode " + modeSet.toString() + " now has " + subNetwork.getNodes().size() + " nodes.");
+
+				AccessibilityCalculator accessibilityCalculator = new AccessibilityCalculator(scenario, measuringPoints, subNetwork);
+
 				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
 					AccessibilityContributionCalculator calculator;
 					switch(mode) {
@@ -213,7 +212,7 @@ public final class AccessibilityModule extends AbstractModule {
 							outputDirectory, pushing2Geoserver, createQGisOutput));
 				}				
 
-				AccessibilityShutdownListenerV4 accessibilityShutdownListener = new AccessibilityShutdownListenerV4(accessibilityCalculator, 
+				AccessibilityShutdownListenerV4 accessibilityShutdownListener = new AccessibilityShutdownListenerV4(accessibilityCalculator,
 						opportunities, outputDirectory, acg);
 				
 				for (ActivityFacilities fac : additionalFacs.values()) {
