@@ -22,6 +22,7 @@ package commercialtraffic.scoring;/*
  */
 
 import com.google.inject.Inject;
+import commercialtraffic.integration.CommercialTrafficConfigGroup;
 import commercialtraffic.jobGeneration.CommercialJobManager;
 import commercialtraffic.jobGeneration.FreightAgentInserter;
 import org.apache.log4j.Logger;
@@ -44,20 +45,26 @@ import java.util.*;
 
 public class ScoreCommercialServices implements ActivityStartEventHandler, ActivityEndEventHandler, MobsimBeforeCleanupListener {
 
+    private static final Logger log = Logger.getLogger(ScoreCommercialServices.class);
+
     private final DeliveryScoreCalculator scoreCalculator;
     private final EventsManager eventsManager;
     private final CommercialJobManager jobManager;
 
     private final Set<Id<Person>> activeDeliveryAgents = new HashSet<>();
     private final List<DeliveryLogEntry> logEntries = new ArrayList<>();
+    private final boolean breakSimulationIfNotAllServicesExecuted;
 
     private Map<Id<CarrierService>, CarrierService> carrierServicesForThisIteration;
 
+
+
     @Inject
-    public ScoreCommercialServices(CommercialJobManager manager, DeliveryScoreCalculator scoreCalculator, EventsManager eventsManager) {
+    public ScoreCommercialServices(CommercialJobManager manager, DeliveryScoreCalculator scoreCalculator, EventsManager eventsManager, CommercialTrafficConfigGroup cfGroup) {
         this.jobManager = manager;
         this.scoreCalculator = scoreCalculator;
         this.eventsManager = eventsManager;
+        this.breakSimulationIfNotAllServicesExecuted = cfGroup.isBreakSimulationIfNotAllServicesServed();
         this.eventsManager.addHandler(this);
     }
 
@@ -120,7 +127,8 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
             for(Id<CarrierService> serviceId : this.carrierServicesForThisIteration.keySet()){
                     msg.append(serviceId).append("\n");
             }
-            throw new IllegalStateException(msg.toString());
+            if(this.breakSimulationIfNotAllServicesExecuted)            throw new IllegalStateException(msg.toString());
+            else log.warn(msg);
         }
     }
 

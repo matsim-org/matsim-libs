@@ -74,6 +74,12 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     public static final String MINDELIVERYSCORE = "minDeliveryScore";
     public static final String MINDELIVERYSCOREDESC = "Minimum score for delayed deliveries.";
 
+    private boolean breakSimulationIfNotAllServicesServed = true;
+    public static final String BREAK_IF_NOT_ALL_SERVICES_SERVED = "breakIfNotAllRequestsServed";
+    static final String BREAK_IF_NOT_ALL_SERVICES_SERVED_EXP =
+            "Specifies whether the simulation should interrupt if not all services were executed when"
+                    + " an interation ends. Otherwise, a warning is given. True by default.";
+
 
     public static final String GROUP_NAME = "commercialTraffic";
 
@@ -213,6 +219,22 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
         this.minDeliveryScore = minDeliveryScore;
     }
 
+    /**
+     * @return {@value #BREAK_IF_NOT_ALL_SERVICES_SERVED_EXP}
+     */
+    @StringGetter(BREAK_IF_NOT_ALL_SERVICES_SERVED)
+    public boolean isBreakSimulationIfNotAllServicesServed() {
+        return breakSimulationIfNotAllServicesServed;
+    }
+
+    /**
+     * @param breakSimulationIfNotAllServicesServed {@value #BREAK_IF_NOT_ALL_SERVICES_SERVED_EXP}
+     */
+    @StringSetter(BREAK_IF_NOT_ALL_SERVICES_SERVED)
+    public void setBreakSimulationIfNotAllServicesServed(boolean breakSimulationIfNotAllServicesServed) {
+        this.breakSimulationIfNotAllServicesServed = breakSimulationIfNotAllServicesServed;
+    }
+
     @Override
     public Map<String, String> getComments() {
         Map<String, String> map = super.getComments();
@@ -224,6 +246,7 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
         map.put(MAXDELIVERYSCORE, MAXDELIVERYSCOREDESC);
         map.put(MINDELIVERYSCORE, MINDELIVERYSCOREDESC);
         map.put(ZEROUTILDELAY, ZEROUTILDELAYDESC);
+        map.put(BREAK_IF_NOT_ALL_SERVICES_SERVED, BREAK_IF_NOT_ALL_SERVICES_SERVED_EXP);
         return map;
     }
 
