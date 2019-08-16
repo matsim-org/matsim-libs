@@ -21,9 +21,14 @@
 package commercialtraffic.jobGeneration;
 
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
 import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
+import com.graphhopper.jsprit.core.algorithm.state.StateManager;
 import com.graphhopper.jsprit.core.algorithm.termination.VariationCoefficientTermination;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
+import com.graphhopper.jsprit.core.problem.constraint.ServiceDeliveriesFirstConstraint;
+import com.graphhopper.jsprit.core.problem.constraint.VehicleDependentTimeWindowConstraints;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
 import org.matsim.api.core.v01.Scenario;
@@ -54,6 +59,15 @@ public class TourPlanning  {
                     //            vrpBuilder.setRoutingCost(netBasedCosts);
                     // this is too expansive for the size of the problem
                     VehicleRoutingProblem problem = vrpBuilder.build();
+
+                    //use this in order to set a 'hard' constraint on time windows
+//                    StateManager stateManager = new StateManager(problem);
+//                    ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
+//                    constraintManager.addConstraint(new ServiceDeliveriesFirstConstraint(), ConstraintManager.Priority.CRITICAL);
+//                    constraintManager.addConstraint(new VehicleDependentTimeWindowConstraints(stateManager, problem.getTransportCosts(), problem.getActivityCosts()), ConstraintManager.Priority.HIGH);
+//                    VehicleRoutingAlgorithm algorithm = Jsprit.Builder.newInstance(problem).setStateAndConstraintManager(stateManager,constraintManager).buildAlgorithm();
+
+
                     // get the algorithm out-of-the-box, search solution and get the best one.
                     VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
                     algorithm.setMaxIterations(maxIterations);
