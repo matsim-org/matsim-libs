@@ -128,17 +128,6 @@
 			<version>1.1.1</version>
 		</dependency>
 		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>freight</artifactId>
-			<version>${matsim.version}</version>
-		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>com.graphhopper</groupId>-->
-<!--			<artifactId>jsprit-core</artifactId>-->
-<!--			<version>1.7-RC1</version>-->
-<!--		</dependency>-->
-
-		<dependency>
 			<!-- groupId>com.github.simunto</groupId>
 			<artifactId>matsim-sbb-extensions</artifactId>
 			<version>0.11.0-2018w44</version	-->
