@@ -84,6 +84,7 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 		this.writeStartTag(VehicleSchemaV2Names.VEHICLEDEFINITIONS, atts);
 		this.writeVehicleTypes(this.vehicleTypes);
 		this.writeVehicles(this.vehicles);
+		this.writeContent("\n", true);
 		this.writeEndTag(VehicleSchemaV2Names.VEHICLEDEFINITIONS);
 	}
 
@@ -97,55 +98,56 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 	}
 
 	private void writeVehicleTypes(Map<Id<VehicleType>, VehicleType> vts) throws UncheckedIOException, IOException {
+		this.writer.write("\n");
 		for (VehicleType vt : vts.values()) {
 			atts.clear();
 			atts.add(this.createTuple(VehicleSchemaV2Names.ID, vt.getId().toString()));
 			this.writeStartTag(VehicleSchemaV2Names.VEHICLETYPE, atts);
 
-			this.writer.write("\n");
-			attributesWriter.writeAttributes( "\t\t" , this.writer , vt.getAttributes() );
-
-			if (vt.getDescription() != null) {
-				this.writeStartTag(VehicleSchemaV2Names.DESCRIPTION, null);
-				this.writeContent(vt.getDescription(), true);
-				this.writeEndTag(VehicleSchemaV2Names.DESCRIPTION);
-			}
-			if (vt.getCapacity() != null) {
-				this.writeCapacity(vt.getCapacity());
-			}
-			if (!Double.isNaN(vt.getLength())){
-				atts.clear();
-				atts.add(this.createTuple(VehicleSchemaV2Names.METER, Double.toString(vt.getLength())));
-				this.writeStartTag(VehicleSchemaV2Names.LENGTH, atts, true);
-			}
-			if (!Double.isNaN(vt.getWidth())){
-				atts.clear();
-				atts.add(this.createTuple(VehicleSchemaV2Names.METER, Double.toString(vt.getWidth())));
-				this.writeStartTag(VehicleSchemaV2Names.WIDTH, atts, true);
-			}
-			if (!Double.isNaN(vt.getMaximumVelocity()) && !Double.isInfinite(vt.getMaximumVelocity())){
-				atts.clear();
-				atts.add(this.createTuple(VehicleSchemaV2Names.METERPERSECOND, Double.toString(vt.getMaximumVelocity())));
-				this.writeStartTag(VehicleSchemaV2Names.MAXIMUMVELOCITY, atts, true);
-			}
-			if (vt.getEngineInformation() != null) {
-				this.writeEngineInformation(vt.getEngineInformation());
-			}
-			atts.clear();
-			atts.add(this.createTuple(VehicleSchemaV2Names.PCE, vt.getPcuEquivalents()));
-			this.writeStartTag(VehicleSchemaV2Names.PASSENGERCAREQUIVALENTS, atts, true);
-			if (vt.getNetworkMode() != null) {
-				atts.clear();
-				atts.add(this.createTuple(VehicleSchemaV2Names.NETWORKMODE, vt.getNetworkMode()));
-				this.writeStartTag(VehicleSchemaV2Names.NETWORKMODE, atts, true);
-			}
-
-
-			if (!Double.isNaN(vt.getFlowEfficiencyFactor())) {
-                atts.clear();
-                atts.add(this.createTuple(VehicleSchemaV2Names.FACTOR, vt.getFlowEfficiencyFactor()));
-                this.writeStartTag(VehicleSchemaV2Names.FLOWEFFICIENCYFACTOR, atts, true);
-            }
+////			this.writer.write("\n");
+//			attributesWriter.writeAttributes( "\t\t" , this.writer , vt.getAttributes() );
+//
+//			if (vt.getDescription() != null) {
+//				this.writeStartTag(VehicleSchemaV2Names.DESCRIPTION, null);
+//				this.writeContent(vt.getDescription(), true);
+//				this.writeEndTag(VehicleSchemaV2Names.DESCRIPTION);
+//			}
+//			if (vt.getCapacity() != null) {
+//				this.writeCapacity(vt.getCapacity());
+//			}
+//			if (!Double.isNaN(vt.getLength())){
+//				atts.clear();
+//				atts.add(this.createTuple(VehicleSchemaV2Names.METER, Double.toString(vt.getLength())));
+//				this.writeStartTag(VehicleSchemaV2Names.LENGTH, atts, true);
+//			}
+//			if (!Double.isNaN(vt.getWidth())){
+//				atts.clear();
+//				atts.add(this.createTuple(VehicleSchemaV2Names.METER, Double.toString(vt.getWidth())));
+//				this.writeStartTag(VehicleSchemaV2Names.WIDTH, atts, true);
+//			}
+//			if (!Double.isNaN(vt.getMaximumVelocity()) && !Double.isInfinite(vt.getMaximumVelocity())){
+//				atts.clear();
+//				atts.add(this.createTuple(VehicleSchemaV2Names.METERPERSECOND, Double.toString(vt.getMaximumVelocity())));
+//				this.writeStartTag(VehicleSchemaV2Names.MAXIMUMVELOCITY, atts, true);
+//			}
+//			if (vt.getEngineInformation() != null) {
+//				this.writeEngineInformation(vt.getEngineInformation());
+//			}
+//			atts.clear();
+//			atts.add(this.createTuple(VehicleSchemaV2Names.PCE, vt.getPcuEquivalents()));
+//			this.writeStartTag(VehicleSchemaV2Names.PASSENGERCAREQUIVALENTS, atts, true);
+//			if (vt.getNetworkMode() != null) {
+//				atts.clear();
+//				atts.add(this.createTuple(VehicleSchemaV2Names.NETWORKMODE, vt.getNetworkMode()));
+//				this.writeStartTag(VehicleSchemaV2Names.NETWORKMODE, atts, true);
+//			}
+//
+//
+//			if (!Double.isNaN(vt.getFlowEfficiencyFactor())) {
+//                atts.clear();
+//                atts.add(this.createTuple(VehicleSchemaV2Names.FACTOR, vt.getFlowEfficiencyFactor()));
+//                this.writeStartTag(VehicleSchemaV2Names.FLOWEFFICIENCYFACTOR, atts, true);
+//            }
 			this.writeEndTag(VehicleSchemaV2Names.VEHICLETYPE);
 			this.writer.write("\n");
 		}

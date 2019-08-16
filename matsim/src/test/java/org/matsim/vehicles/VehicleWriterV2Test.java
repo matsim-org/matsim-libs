@@ -46,7 +46,7 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 	@BeforeClass
 	public void setUp() throws Exception {
 		super.setUp();
-		String outfileName = this.getOutputDirectory() + "testOutputVehicles.xml";
+		String outfileName = this.getOutputDirectory() + "../testOutputVehicles.xml";
 
 		//read it
 		Vehicles vehicles1 = VehicleUtils.createVehiclesContainer();
@@ -60,7 +60,7 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 		//read it again
 		Vehicles vehicles2 = VehicleUtils.createVehiclesContainer();
 		reader = new MatsimVehicleReader(vehicles2);
-		reader.readFile(this.getOutputDirectory() + "testOutputVehicles.xml");
+		reader.readFile(this.getOutputDirectory() + "../testOutputVehicles.xml");
 
 		vehicleTypes = vehicles2.getVehicleTypes();
 		vehicles = vehicles2.getVehicles();
