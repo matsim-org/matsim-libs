@@ -104,32 +104,42 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 			atts.add(this.createTuple(VehicleSchemaV2Names.ID, vt.getId().toString()));
 			this.writeStartTag(VehicleSchemaV2Names.VEHICLETYPE, atts);
 
+			//Write general vehicleType attributes
 			this.writer.write("\n");
 			attributesWriter.writeAttributes( "\t\t" , this.writer , vt.getAttributes() );
 
-//			if (vt.getDescription() != null) {
-//				this.writeStartTag(VehicleSchemaV2Names.DESCRIPTION, null);
-//				this.writeContent(vt.getDescription(), true);
-//				this.writeEndTag(VehicleSchemaV2Names.DESCRIPTION);
-//			}
+			//Write vehicleType description, if present TODO: remove line breaks.
+			if (vt.getDescription() != null) {
+				this.writeElement(VehicleSchemaV2Names.DESCRIPTION, vt.getDescription());
+			}
+
+			//TODO Write capacity, if present
 //			if (vt.getCapacity() != null) {
 //				this.writeCapacity(vt.getCapacity());
 //			}
-//			if (!Double.isNaN(vt.getLength())){
-//				atts.clear();
-//				atts.add(this.createTuple(VehicleSchemaV2Names.METER, Double.toString(vt.getLength())));
-//				this.writeStartTag(VehicleSchemaV2Names.LENGTH, atts, true);
-//			}
-//			if (!Double.isNaN(vt.getWidth())){
-//				atts.clear();
-//				atts.add(this.createTuple(VehicleSchemaV2Names.METER, Double.toString(vt.getWidth())));
-//				this.writeStartTag(VehicleSchemaV2Names.WIDTH, atts, true);
-//			}
-//			if (!Double.isNaN(vt.getMaximumVelocity()) && !Double.isInfinite(vt.getMaximumVelocity())){
-//				atts.clear();
-//				atts.add(this.createTuple(VehicleSchemaV2Names.METERPERSECOND, Double.toString(vt.getMaximumVelocity())));
-//				this.writeStartTag(VehicleSchemaV2Names.MAXIMUMVELOCITY, atts, true);
-//			}
+
+			//Write length, if present
+			if (!Double.isNaN(vt.getLength())){
+				atts.clear();
+				atts.add(this.createTuple(VehicleSchemaV2Names.METER, Double.toString(vt.getLength())));
+				this.writeStartTag(VehicleSchemaV2Names.LENGTH, atts, true);
+			}
+
+			//Write width, if present
+			if (!Double.isNaN(vt.getWidth())){
+				atts.clear();
+				atts.add(this.createTuple(VehicleSchemaV2Names.METER, Double.toString(vt.getWidth())));
+				this.writeStartTag(VehicleSchemaV2Names.WIDTH, atts, true);
+			}
+
+			//Write maximumVelocity, if present
+			if (!Double.isNaN(vt.getMaximumVelocity()) && !Double.isInfinite(vt.getMaximumVelocity())){
+				atts.clear();
+				atts.add(this.createTuple(VehicleSchemaV2Names.METERPERSECOND, Double.toString(vt.getMaximumVelocity())));
+				this.writeStartTag(VehicleSchemaV2Names.MAXIMUMVELOCITY, atts, true);
+			}
+
+			//TODO Write vehicleType engineInformation, if present
 //			if (vt.getEngineInformation() != null) {
 //				this.writeEngineInformation(vt.getEngineInformation());
 //			}
@@ -141,13 +151,30 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 //				atts.add(this.createTuple(VehicleSchemaV2Names.NETWORKMODE, vt.getNetworkMode()));
 //				this.writeStartTag(VehicleSchemaV2Names.NETWORKMODE, atts, true);
 //			}
-//
-//
-//			if (!Double.isNaN(vt.getFlowEfficiencyFactor())) {
-//                atts.clear();
-//                atts.add(this.createTuple(VehicleSchemaV2Names.FACTOR, vt.getFlowEfficiencyFactor()));
-//                this.writeStartTag(VehicleSchemaV2Names.FLOWEFFICIENCYFACTOR, atts, true);
-//            }
+
+			//TODO Write vehicleType costInformation, if present
+
+			//TODO Write passengerCarEquivalents, if present
+			if (!Double.isNaN(vt.getPcuEquivalents())) {
+				atts.clear();
+				atts.add(this.createTuple(VehicleSchemaV2Names.PCE, vt.getPcuEquivalents()));
+				this.writeStartTag(VehicleSchemaV2Names.PASSENGERCAREQUIVALENTS, atts, true);
+			}
+
+			//Write networkMode, if present
+			if (vt.getNetworkMode() != null) {
+				atts.clear();
+				atts.add(this.createTuple(VehicleSchemaV2Names.NETWORKMODE, vt.getNetworkMode()));
+				this.writeStartTag(VehicleSchemaV2Names.NETWORKMODE, atts, true);
+			}
+
+			//Write flowEfficiencyFactor, if present
+			if (!Double.isNaN(vt.getFlowEfficiencyFactor())) {
+                atts.clear();
+                atts.add(this.createTuple(VehicleSchemaV2Names.FACTOR, vt.getFlowEfficiencyFactor()));
+                this.writeStartTag(VehicleSchemaV2Names.FLOWEFFICIENCYFACTOR, atts, true);
+            }
+
 			this.writeEndTag(VehicleSchemaV2Names.VEHICLETYPE);
 			this.writer.write("\n");
 		}

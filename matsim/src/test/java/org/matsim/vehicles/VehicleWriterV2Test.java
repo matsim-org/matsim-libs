@@ -57,7 +57,7 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 		VehicleWriterV2 writer = new VehicleWriterV2(vehicles1);
 		writer.writeFile(outfileName);
 		assertTrue(new File(outfileName).exists()); 
-		//read it again
+//		//read it again
 		Vehicles vehicles2 = VehicleUtils.createVehiclesContainer();
 		reader = new MatsimVehicleReader(vehicles2);
 		reader.readFile(this.getOutputDirectory() + "../testOutputVehicles.xml");
