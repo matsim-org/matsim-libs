@@ -255,8 +255,8 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 			try {
 				cleanupSim();
 			} catch(Exception e) {
-				log.warn("exception in finally block - this may be a follow-up exception of an exception thrown in the try block.");
-				e.printStackTrace();
+				log.warn( "exception in finally block - " +
+						  "this may be a follow-up exception of an exception thrown in the try block.", e);
 			}
 		}
 	}
