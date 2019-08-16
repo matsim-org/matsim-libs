@@ -53,7 +53,6 @@ public class MatsimVehicleWriterTest extends MatsimTestCase {
 			reader.readFile( this.getPackageInputDirectory() + TESTXML );
 
 			VehicleType vehType = vehicles.getVehicleTypes().get(Id.create("normal&Car", VehicleType.class));
-			log.warn( "doorOperation=" + VehicleUtils.getDoorOperationMode( vehType ) ) ;
 
 			// write, which will be the newest fmt:
 			MatsimVehicleWriter writer = new MatsimVehicleWriter( vehicles );
@@ -67,7 +66,6 @@ public class MatsimVehicleWriterTest extends MatsimTestCase {
 			reader.readFile( this.getOutputDirectory() + "testOutputVehicles.xml" );
 
 			VehicleType vehType = vehicles.getVehicleTypes().get(Id.create("normal&Car", VehicleType.class));
-			log.warn( "doorOperation=" + VehicleUtils.getDoorOperationMode( vehType ) ) ;
 
 			//check it, check it, check it now!
 			this.checkContent( vehicles );
