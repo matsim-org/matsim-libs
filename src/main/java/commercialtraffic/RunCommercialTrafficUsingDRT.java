@@ -25,9 +25,13 @@ import commercialtraffic.integration.CommercialTrafficConfigGroup;
 import commercialtraffic.integration.CommercialTrafficModule;
 import commercialtraffic.replanning.ChangeDeliveryServiceOperator;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -35,6 +39,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.HashMap;
 
@@ -46,6 +51,8 @@ public class RunCommercialTrafficUsingDRT {
 
         String inputDir = "input/commercialtrafficIt/";
 
+
+
         DrtConfigGroup drtCfg = new DrtConfigGroup();
         drtCfg.setMaxWaitTime(30*60);
         drtCfg.setMaxTravelTimeAlpha(2);
@@ -53,12 +60,18 @@ public class RunCommercialTrafficUsingDRT {
         drtCfg.setStopDuration(60);
         drtCfg.setVehiclesFile(inputDir + "drtVehicles.xml");
 
+        MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
+        multiModeDrtConfigGroup.addParameterSet(drtCfg);
+
         CommercialTrafficConfigGroup commercialTrafficConfigGroup = new CommercialTrafficConfigGroup();
         commercialTrafficConfigGroup.setCarriersFile(inputDir + "test-carriers.xml");
         commercialTrafficConfigGroup.setCarriersVehicleTypesFile(inputDir + "carriertypes.xml");
         commercialTrafficConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
 
-        Config config = createConfig(drtCfg, new DvrpConfigGroup(), commercialTrafficConfigGroup);
+        commercialTrafficConfigGroup.setBreakSimulationIfNotAllServicesServed(false); //TODO: for preliminary studies only
+
+
+        Config config = createConfig(drtCfg, new DvrpConfigGroup(), commercialTrafficConfigGroup, multiModeDrtConfigGroup);
 
         config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
 
@@ -89,13 +102,24 @@ public class RunCommercialTrafficUsingDRT {
         config.plans().setInputFile(inputDir + "testpop.xml");
 
 
-        //so far, we want to have only one drt mode.
-        // TODO: Eventually, we might want to distinguish at least 2 drt modes, one for passenger transport and one for freight.
-        Controler controler = DrtControlerCreator.createControlerWithSingleModeDrt(config,false);
 
-        controler.addOverridingModule(new CommercialTrafficModule());
 
+        config.qsim().setEndTime(26*3600);
+        config.qsim().setSimEndtimeInterpretation(QSimConfigGroup.EndtimeInterpretation.onlyUseEndtime);
+
+
+
+        DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.planCalcScore());
+
+        Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
+        ScenarioUtils.loadScenario(scenario);
+        Controler controler = new Controler(scenario);
+
+        controler.addOverridingModule(new CommercialTrafficModule( (carrierId -> TransportMode.drt), config));
+
+        controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(MultiModeDrtConfigGroup.get(config)));
         controler.run();
+
 
 
     }

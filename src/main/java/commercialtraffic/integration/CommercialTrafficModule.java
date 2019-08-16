@@ -31,6 +31,10 @@ import commercialtraffic.scoring.DeliveryScoreCalculator;
 import commercialtraffic.scoring.ScoreCommercialServices;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtModule;
+import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
@@ -45,19 +49,28 @@ import java.util.Map;
 
 public class CommercialTrafficModule extends AbstractModule {
 
-    Map<Id<Carrier>, String> carrierTransportModes = new HashMap<>();
+    private final Config config;
+    private final MultiModeDrtConfigGroup multiModeDrtCfgGroup = null;
+    private CarrierMode carrierMode;
 
-    public CommercialTrafficModule(){
+    public CommercialTrafficModule(Config config){
         super();
+        this.config = config;
     }
 
-    CommercialTrafficModule(Map<Id<Carrier>, String> carrier2TransportMode){
-        this.carrierTransportModes = carrier2TransportMode;
+    public CommercialTrafficModule(CarrierMode carrierMode, Config config){
+        super();
+        this.carrierMode = carrierMode;
+        this.config = config;
     }
 
 
     @Override
     public void install() {
+
+        if(MultiModeDrtConfigGroup.get(config) != null){
+            installDRT();
+        }
 
         CommercialTrafficConfigGroup ctcg = CommercialTrafficConfigGroup.get(getConfig());
         Carriers carriers = new Carriers();
@@ -77,12 +90,11 @@ public class CommercialTrafficModule extends AbstractModule {
         bind(TourLengthAnalyzer.class).asEagerSingleton();
         bind(FreightAgentInserter.class).asEagerSingleton();
 
-        if(this.carrierTransportModes.isEmpty()){
-//            bind(CarrierMode.class).toInstance(carrierId -> TransportMode.car);
-            bind(CarrierMode.class).toInstance(carrierId -> TransportMode.drt);
-
+        if(this.carrierMode == null){
+            bind(CarrierMode.class).toInstance(carrierId -> TransportMode.car);
+//            bind(CarrierMode.class).toInstance(carrierId -> TransportMode.drt);
         } else {
-            bind(CarrierMode.class).toInstance(carrierId -> carrierTransportModes.get(carrierId));
+            bind(CarrierMode.class).toInstance(carrierMode);
         }
 
         addControlerListenerBinding().to(CommercialJobManager.class);
@@ -105,6 +117,9 @@ public class CommercialTrafficModule extends AbstractModule {
     }
 
 
-    private void installDRT(){}
+    private void installDRT(){
+        install(new MultiModeDrtModule());
+        install(new DvrpModule());
+    }
 
 }

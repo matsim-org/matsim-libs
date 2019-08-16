@@ -75,7 +75,7 @@ public class RunCommercialTraffic {
 
         Controler controler = new Controler(scenario);
 
-        controler.addOverridingModule(new CommercialTrafficModule());
+        controler.addOverridingModule(new CommercialTrafficModule(config));
 
         controler.run();
 

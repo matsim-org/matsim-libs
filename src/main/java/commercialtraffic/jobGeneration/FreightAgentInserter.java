@@ -25,9 +25,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.drt.run.DrtModeQSimModule;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
+import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteFactories;
+import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
@@ -43,15 +48,25 @@ public class FreightAgentInserter {
 
     private Set<Id<Person>> freightDrivers = new HashSet<>();
 
+    private Set<String> drtModes = new HashSet<>();
+
     @Inject
-    public FreightAgentInserter(Scenario scenario, CarrierMode carrierMode) {
+    public FreightAgentInserter(Scenario scenario, CarrierMode carrierMode, Config config) {
         this.scenario = scenario;
         this.carrierMode = carrierMode;
+        getDrtModes(config);
     }
 
     public FreightAgentInserter(Scenario scenario) {
         this.carrierMode = carrierId -> TransportMode.car;
         this.scenario = scenario;
+    }
+
+    private void getDrtModes(Config config){
+        MultiModeDrtConfigGroup drtCfgGroup = MultiModeDrtConfigGroup.get(config);
+        if (drtCfgGroup != null){
+            drtCfgGroup.getModalElements().forEach(cfg -> drtModes.add(cfg.getMode()));
+        }
     }
 
     private static String createServiceActTypeFromServiceId(Id<CarrierService> id) {
@@ -67,6 +82,7 @@ public class FreightAgentInserter {
 
     void createFreightAgents(Carriers carriersWithTours, double firsttourTraveltimeBuffer) {
         for (Carrier carrier : carriersWithTours.getCarriers().values()) {
+            String modeForCarrier = carrierMode.getCarrierMode(carrier.getId());
             int nextId = 0;
             for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 
@@ -82,19 +98,21 @@ public class FreightAgentInserter {
                 Activity lastTourElementActivity = null;
                 Leg lastTourLeg = null;
 
-
                 for (Tour.TourElement tourElement : scheduledTour.getTour().getTourElements()) {
                     if (tourElement instanceof org.matsim.contrib.freight.carrier.Tour.Leg) {
 
-
                         org.matsim.contrib.freight.carrier.Tour.Leg tourLeg = (org.matsim.contrib.freight.carrier.Tour.Leg) tourElement;
                         Route route = tourLeg.getRoute();
-                        route.setDistance(RouteUtils.calcDistance((NetworkRoute) route, 1.0, 1.0, scenario.getNetwork()));
-                        if (route == null)
-                            throw new IllegalStateException("missing route for carrier " + carrier.getId());
-                        route.setTravelTime(tourLeg.getExpectedTransportTime());
+                        if(route == null) throw new IllegalStateException("missing route for carrier " + carrier.getId());
                         Leg leg = PopulationUtils.createLeg(carrierMode.getCarrierMode(carrier.getId()));
-                        leg.setRoute(route);
+                        if(drtModes.contains(modeForCarrier)){
+                            leg.setRoute(null); //let the DrtRoute be calculated later
+                        } else{
+                            double routeDistance = RouteUtils.calcDistance((NetworkRoute) route, 1.0, 1.0, scenario.getNetwork());
+                            route.setDistance(routeDistance);
+                            route.setTravelTime(tourLeg.getExpectedTransportTime());
+                        }
+
                         leg.setDepartureTime(tourLeg.getExpectedDepartureTime());
                         leg.setTravelTime(tourLeg.getExpectedTransportTime());
                         leg.setTravelTime(tourLeg.getExpectedDepartureTime() + tourLeg.getExpectedTransportTime() - leg.getDepartureTime());
