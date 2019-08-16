@@ -50,38 +50,46 @@ import org.matsim.facilities.ActivityFacility;
 public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 	private static final Logger LOG = Logger.getLogger(AccessibilityShutdownListenerV4.class);
 
+    private final ActivityFacilities measuringPoints;
+    private ActivityFacilities opportunities;
+    private Scenario scenario;
+
 	private String outputDirectory;
 	private AccessibilityConfigGroup acg;
 	
 	private AccessibilityAggregator accessibilityAggregator;
-	private ActivityFacilities opportunities;
+
 
 
 	//
-	private final ActivityFacilities measuringPoints;
+
+
 	private final Map<String, AccessibilityContributionCalculator> calculators = new LinkedHashMap<>();
 	// (test may depend on that this is a "Linked" Hash Map. kai, dec'16)
 
-	private final Config config;
+	//private final Config config;
 	private final PlanCalcScoreConfigGroup cnScoringGroup;
 	private final Network network;
 
 	private final ArrayList<FacilityDataExchangeInterface> zoneDataExchangeListeners = new ArrayList<>();
+
+    Map<String, Double> accessibilities  = new ConcurrentHashMap<>();
 	//
 
 	
-	public AccessibilityShutdownListenerV4(Scenario scenario, ActivityFacilities measuringPoints, Network network, ActivityFacilities opportunities,
-										   String outputDirectory, AccessibilityConfigGroup acg) {
-		this.opportunities = opportunities;
-		//this.accessibilityCalculator = accessibilityCalculator;
+	public AccessibilityShutdownListenerV4(Scenario scenario, ActivityFacilities measuringPoints, ActivityFacilities opportunities,
+										   String outputDirectory) {
+        this.scenario = scenario;
+	    this.measuringPoints = measuringPoints;
+	    this.opportunities = opportunities;
+
 		this.outputDirectory = outputDirectory;
-		this.acg = acg;
+
 
 
 		//
-		this.network = network;
-		this.measuringPoints = measuringPoints;
-		this.config = scenario.getConfig();
+		this.network = scenario.getNetwork();
+
 		this.acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 		this.cnScoringGroup = scenario.getConfig().planCalcScore();
 
@@ -118,7 +126,6 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 		}
 
 		LOG.info("Start computing accessibilities.");
-		//accessibilityCalculator.computeAccessibilities(acg.getTimeOfDay(), opportunities);
 		computeAccessibilities(acg.getTimeOfDay(), opportunities);
 		LOG.info("Finished computing accessibilities.");
 
@@ -128,18 +135,16 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 
 	public final void computeAccessibilities(Double departureTime, ActivityFacilities opportunities) {
 		for (String mode : calculators.keySet()) {
-			Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedOrigins;
-			Map<Id<Node>, AggregationObject> aggregatedOpportunities;
-			if (mode.equals(TransportMode.car)) {
-				NetworkModeAccessibilityExpContributionCalculator networkModeAccessibilityExpContributionCalculator = (NetworkModeAccessibilityExpContributionCalculator) calculators.get(mode);
-				aggregatedOrigins = networkModeAccessibilityExpContributionCalculator.getAggregatedOrigins();
-				aggregatedOpportunities = networkModeAccessibilityExpContributionCalculator.getAggregatedOpportunities();
-			} else {
-				aggregatedOrigins = AccessibilityUtils.aggregateMeasurePointsWithSameNearestNode(measuringPoints, network);
-				aggregatedOpportunities = AccessibilityUtils.aggregateOpportunitiesWithSameNearestNode(opportunities, network, config);
-			}
 
-			Collection<Id<Node>> aggregatedOriginNodes = new LinkedList<>();
+			AccessibilityContributionCalculator calculator = calculators.get(mode);
+			calculator.initialize(measuringPoints, opportunities);
+
+
+
+            Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedOrigins = calculator.getAggregatedMeasurePoints();
+            Map<Id<Node>, AggregationObject> aggregatedOpportunities = calculator.getAgregatedOpportunities();
+
+            Collection<Id<Node>> aggregatedOriginNodes = new LinkedList<>();
 			for (Id<Node> nodeId : aggregatedOrigins.keySet()) {
 				aggregatedOriginNodes.add(nodeId);
 			}
@@ -183,64 +188,43 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 
 	private void compute(String mode, Double departureTime, Map<Id<Node>, AggregationObject> aggregatedOpportunities, Map<Id<Node>,
 			ArrayList<ActivityFacility>> aggregatedOrigins, Collection<Id<Node>> subsetOfNodes, ProgressBar progressBar) {
-
-//		Map<String, AccessibilityContributionCalculator> calculatorsForPartition = new LinkedHashMap<>();
-//		for (String mode : new HashSet<>(calculators.keySet())) {
-//			calculatorsForPartition.put(mode, calculators.get(mode).duplicate());
-//		}
 		AccessibilityContributionCalculator calculator = calculators.get(mode).duplicate();
 
 		// Go through all nodes that have a measuring point assigned
-		//for (Id<Node> nodeId : partition) {
 		for (Id<Node> nodeId : subsetOfNodes) {
 			progressBar.update();
 
 			Node fromNode = network.getNodes().get(nodeId);
 
-			//for (AccessibilityContributionCalculator calculator : calculatorsForPartition.values()) {
-				Gbl.assertNotNull(calculator);
-				calculator.notifyNewOriginNode(fromNode, departureTime);
-			//}
+			Gbl.assertNotNull(calculator);
+			calculator.notifyNewOriginNode(fromNode, departureTime);
 
 			// Go through all measuring points assigned to current node
 			for (ActivityFacility origin : aggregatedOrigins.get(nodeId)) {
 				assert(origin.getCoord() != null);
 
 				Map<String,Double> expSums = new ConcurrentHashMap<>();
-				//for (String mode : calculators.keySet()) {
-					expSums.put(mode, 0.);
-				//}
-
-				// TODO Check what this really means
-				// Gbl.assertIf(aggregatedOpportunities.length > 0);
-				// yyyyyy a test fails when this line is made active; cannot say why an execution path where there are now opportunities can make sense for a test.  kai, mar'17
+				expSums.put(mode, 0.);
 
 				// Go through all aggregated opportunities (i.e. network nodes to which at least one opportunity is assigned)
 				for (final AggregationObject aggregatedOpportunity : aggregatedOpportunities.values()) {
-					// Go through all calculators
-					//for (String mode : calculatorsForPartition.keySet()) {
-						//final double expVhk = calculatorsForPartition.get(mode).computeContributionOfOpportunity(origin, aggregatedOpportunity, departureTime);
-						final double expVhk = calculator.computeContributionOfOpportunity(origin, aggregatedOpportunity, departureTime);
-						expSums.put(mode, expSums.get(mode) + expVhk);
-					//}
+				    final double expVhk = calculator.computeContributionOfOpportunity(origin, aggregatedOpportunity, departureTime);
+				    expSums.put(mode, expSums.get(mode) + expVhk);
 				}
 
-				Map<String, Double> accessibilities  = new ConcurrentHashMap<>();
-
-				//for (String mode : calculatorsForPartition.keySet()) {
-					if (acg.getAccessibilityMeasureType() == AccessibilityConfigGroup.AccessibilityMeasureType.logSum) {
-						accessibilities.put(mode, (1/this.cnScoringGroup.getBrainExpBeta()) * Math.log(expSums.get(mode)));
-					} else if (acg.getAccessibilityMeasureType() == AccessibilityConfigGroup.AccessibilityMeasureType.rawSum) {
-						accessibilities.put(mode, expSums.get(mode));
-					} else if (acg.getAccessibilityMeasureType() == AccessibilityConfigGroup.AccessibilityMeasureType.gravity) {
-						throw new IllegalArgumentException("This accessibility measure is not yet implemented.");
-					} else {
-						throw new IllegalArgumentException("No valid accessibility measure type chosen.");
-					}
-				//}
+				double accessibility;
+                if (acg.getAccessibilityMeasureType() == AccessibilityConfigGroup.AccessibilityMeasureType.logSum) {
+                    accessibility = (1/this.cnScoringGroup.getBrainExpBeta()) * Math.log(expSums.get(mode));
+                } else if (acg.getAccessibilityMeasureType() == AccessibilityConfigGroup.AccessibilityMeasureType.rawSum) {
+                    accessibility = expSums.get(mode);
+                } else if (acg.getAccessibilityMeasureType() == AccessibilityConfigGroup.AccessibilityMeasureType.gravity) {
+                    throw new IllegalArgumentException("This accessibility measure is not yet implemented.");
+                } else {
+                    throw new IllegalArgumentException("No valid accessibility measure type chosen.");
+                }
 
 				for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
-					zoneDataExchangeInterface.setFacilityAccessibilities(origin, departureTime, accessibilities);
+					zoneDataExchangeInterface.setFacilityAccessibilities(origin, departureTime, mode, accessibility);
 				}
 			}
 		}

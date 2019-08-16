@@ -5,7 +5,7 @@ import org.matsim.facilities.ActivityFacility;
 
 public interface FacilityDataExchangeInterface {
 	
-	void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay, Map<String, Double> accessibilities);
+	void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay, String mode, double accessibility);
 
 	void finish();
 }

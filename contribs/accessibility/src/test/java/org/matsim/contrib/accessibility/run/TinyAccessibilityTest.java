@@ -54,15 +54,15 @@ import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * A small test that enables to easily compare results with hand-computed results.
- * 
+ *
  * @author dziemke
  */
 public class TinyAccessibilityTest {
 
 	private static final Logger LOG = Logger.getLogger(TinyAccessibilityTest.class);
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();	
-	
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+
 	@Test
 	public void testWithBoundingBox() {
 		final Config config = createTestConfig();
@@ -76,9 +76,9 @@ public class TinyAccessibilityTest {
 		acg.setBoundingBoxTop(max);
 		acg.setBoundingBoxLeft(min);
 		acg.setBoundingBoxRight(max);
-		
+
 		final Scenario sc = createTestScenario(config);
-		
+
 		Controler controler = new Controler(sc);
 
 		final AccessibilityModule module = new AccessibilityModule();
@@ -88,8 +88,8 @@ public class TinyAccessibilityTest {
 
 		controler.run();
 	}
-	
-	
+
+
 	private Config createTestConfig() {
 		final Config config = ConfigUtils.createConfig();
 
@@ -104,7 +104,7 @@ public class TinyAccessibilityTest {
 		return config;
 	}
 
-	
+
 	private static Scenario createTestScenario(final Config config) {
 //		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
@@ -120,14 +120,14 @@ public class TinyAccessibilityTest {
 		scenario.getConfig().facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.setInScenario);
 		return scenario;
 	}
-	
-	
+
+
 	/**
 	 * This method creates a test network. It is used for example in PtMatrixTest.java to test the pt simulation in MATSim.
 	 * The network has 9 nodes and 8 links (see the sketch below).
-	 * 
+	 *
 	 * @return the created test network
-	 * 
+	 *
 	 * @author thomas
 	 * @author tthunig
 	 */
@@ -159,59 +159,59 @@ public class TinyAccessibilityTest {
 		Node node7 = NetworkUtils.createAndAddNode(network, Id.create(7, Node.class), new Coord((double) 190, (double) 100));
 		Node node8 = NetworkUtils.createAndAddNode(network, Id.create(8, Node.class), new Coord((double) 190, (double) 200));
 		Node node9 = NetworkUtils.createAndAddNode(network, Id.create(9, Node.class), new Coord((double) 190, (double) 0));
-		
+
 		Set<String> modes = new HashSet<>();
 		modes.add("car");
 
 		// Links (bi-directional)
 		NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), node1, node2, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(1, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(2, Link.class), node2, node1, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(2, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(3, Link.class), node1, node3, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(3, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(4, Link.class), node3, node1, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(4, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(5, Link.class), node1, node4, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(5, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(6, Link.class), node4, node1, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(6, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(7, Link.class), node4, node5, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(7, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(8, Link.class), node5, node4, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(8, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(9, Link.class), node4, node6, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(9, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(10, Link.class), node6, node4, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(10, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(11, Link.class), node4, node7, (double) 80, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(11, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(12, Link.class), node7, node4, (double) 80, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(12, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(13, Link.class), node5, node8, (double) 80, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(13, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(14, Link.class), node8, node5, (double) 80, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(14, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(15, Link.class), node6, node9, (double) 80, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(15, Link.class)).setAllowedModes(modes);
 
 		NetworkUtils.createAndAddLink(network,Id.create(16, Link.class), node9, node6, (double) 80, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(16, Link.class)).setAllowedModes(modes);
-		
+
 		return network;
 	}
 
@@ -220,8 +220,13 @@ public class TinyAccessibilityTest {
 		private Map<Tuple<ActivityFacility, Double>, Map<String,Double>> accessibilitiesMap = new HashMap<>() ;
 
 		@Override
-		public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay, Map<String, Double> accessibilities){
-			accessibilitiesMap.put(new Tuple<ActivityFacility, Double>(measurePoint, timeOfDay), accessibilities);
+		public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay, String mode, double accessibility) {
+			Tuple<ActivityFacility, Double> key = new Tuple<>(measurePoint, timeOfDay);
+			if (!accessibilitiesMap.containsKey(key)) {
+				Map<String,Double> accessibilitiesByMode = new HashMap<>();
+				accessibilitiesMap.put(key, accessibilitiesByMode);
+			}
+			accessibilitiesMap.get(key).put(mode, accessibility);
 		}
 
 		@Override
