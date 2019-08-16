@@ -149,7 +149,7 @@ public final class AccessibilityModule extends AbstractModule {
 				AccessibilityUtils.assignAdditionalFacilitiesDataToMeasurePoint(measuringPoints, measurePointGeometryMap, additionalFacs);
 				
 				String outputDirectory = scenario.getConfig().controler().getOutputDirectory() + "/" + activityType;
-				AccessibilityShutdownListenerV4 accessibilityShutdownListener = new AccessibilityShutdownListenerV4(scenario, measuringPoints, opportunities, outputDirectory);
+				AccessibilityComputationShutdownListener accessibilityShutdownListener = new AccessibilityComputationShutdownListener(scenario, measuringPoints, opportunities, outputDirectory);
 
 				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
 					AccessibilityContributionCalculator calculator;

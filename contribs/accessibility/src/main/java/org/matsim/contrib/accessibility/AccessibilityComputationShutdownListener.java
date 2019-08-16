@@ -47,8 +47,8 @@ import org.matsim.facilities.ActivityFacility;
 /**
  * @author dziemke
  */
-public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
-	private static final Logger LOG = Logger.getLogger(AccessibilityShutdownListenerV4.class);
+public final class AccessibilityComputationShutdownListener implements ShutdownListener {
+	private static final Logger LOG = Logger.getLogger(AccessibilityComputationShutdownListener.class);
 
     private final ActivityFacilities measuringPoints;
     private ActivityFacilities opportunities;
@@ -77,7 +77,7 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 	//
 
 	
-	public AccessibilityShutdownListenerV4(Scenario scenario, ActivityFacilities measuringPoints, ActivityFacilities opportunities,
+	public AccessibilityComputationShutdownListener(Scenario scenario, ActivityFacilities measuringPoints, ActivityFacilities opportunities,
 										   String outputDirectory) {
         this.scenario = scenario;
 	    this.measuringPoints = measuringPoints;
