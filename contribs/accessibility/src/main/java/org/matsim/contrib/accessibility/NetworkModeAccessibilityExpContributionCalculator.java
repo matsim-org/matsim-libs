@@ -12,6 +12,7 @@ import org.matsim.contrib.dvrp.router.DijkstraTree;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -22,7 +23,9 @@ import org.matsim.contrib.roadpricing.RoadPricingScheme;
 import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author thibautd
@@ -44,8 +47,10 @@ import java.util.Map;
 
 	private double constCar;
 
+	private String mode;
 	private Scenario scenario;
 	private Network network;
+	private Network subNetwork;
 	private final TravelTime travelTime;
 	private final TravelDisutilityFactory travelDisutilityFactory;
 
@@ -63,13 +68,14 @@ import java.util.Map;
     Map<Id<Node>, AggregationObject> aggregatedOpportunities;
 
 
-	public NetworkModeAccessibilityExpContributionCalculator(final TravelTime travelTime, final TravelDisutilityFactory travelDisutilityFactory, Scenario scenario) {
+	public NetworkModeAccessibilityExpContributionCalculator(String mode, final TravelTime travelTime, final TravelDisutilityFactory travelDisutilityFactory, Scenario scenario) {
 		this.travelTime = travelTime;
 		this.travelDisutilityFactory = travelDisutilityFactory;
 
+		this.mode = mode;
+
 		this.scenario = scenario;
 		this.network = scenario.getNetwork();
-		log.warn("network = " + network);
 
 		final PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
 		this.scheme = (RoadPricingScheme) scenario.getScenarioElement( RoadPricingScheme.ELEMENT_NAME );
@@ -103,17 +109,29 @@ import java.util.Map;
 
 	@Override
 	public void initialize(ActivityFacilities measuringPoints, ActivityFacilities opportunities) {
-		log.warn("Initializing caluclator...");
+		log.warn("Initializing calculator for mode " + mode + "...");
+        log.warn("Full network has " + network.getNodes().size() + " nodes.");
+        subNetwork = NetworkUtils.createNetwork();
+        Set<String> modeSet = new HashSet<>();
+        TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
+        if (mode.equals(Modes4Accessibility.freespeed.name())) {
+        	modeSet.add(TransportMode.car);
+		} else {
+        	modeSet.add(mode);
+		}
+        filter.filter(subNetwork, modeSet);
+        if (subNetwork.getNodes().size() == 0) {throw new RuntimeException("Network has 0 nodes for mode " + mode + ". Something is wrong.");}
+        log.warn("sub-network for mode " + modeSet.toString() + " now has " + subNetwork.getNodes().size() + " nodes.");
 
-        this.aggregatedMeasurePoints = AccessibilityUtils.aggregateMeasurePointsWithSameNearestNode(measuringPoints, network);
-		this.aggregatedOpportunities = AccessibilityUtils.aggregateOpportunitiesWithSameNearestNode(opportunities, network, scenario.getConfig());
+        this.aggregatedMeasurePoints = AccessibilityUtils.aggregateMeasurePointsWithSameNearestNode(measuringPoints, subNetwork);
+		this.aggregatedOpportunities = AccessibilityUtils.aggregateOpportunitiesWithSameNearestNode(opportunities, subNetwork, scenario.getConfig());
 	}
 
 
 	@Override
 	public void notifyNewOriginNode(Node fromNode, Double departureTime) {
 		this.fromNode = fromNode;
-		this.lcpt.calculateExtended(network, fromNode, departureTime);
+		this.lcpt.calculateExtended(subNetwork, fromNode, departureTime);
 		//this.dijkstraTree.calcLeastCostPathTree(fromNode, departureTime);
 		//multiNodePathCalculator.calcLeastCostPath(fromNode, aggregatedToNodes, departureTime, null, null);
 	}
@@ -124,7 +142,7 @@ import java.util.Map;
 
 //		System.out.println("oring = " + origin.getCoord().getX() + "   " + origin.getCoord().getY());
 //		System.out.println("destnode = " + destination.getNearestNode().getCoord().getX() + "   " + destination.getNearestNode().getCoord().getY());
-		Link nearestLink = NetworkUtils.getNearestLinkExactly(network, origin.getCoord());
+		Link nearestLink = NetworkUtils.getNearestLinkExactly(subNetwork, origin.getCoord());
 
 		// === (1) ORIGIN to LINK to NODE (captures the distance (as walk time) between the origin via the link to the node):
 		Distances distance = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLink, fromNode);
@@ -210,7 +228,8 @@ import java.util.Map;
 	public NetworkModeAccessibilityExpContributionCalculator duplicate() {
 		log.info("Creating another NetworkModeAccessibilityExpContributionCalculator object.");
 		NetworkModeAccessibilityExpContributionCalculator networkModeAccessibilityExpContributionCalculator =
-				new NetworkModeAccessibilityExpContributionCalculator(this.travelTime, this.travelDisutilityFactory, this.scenario);
+				new NetworkModeAccessibilityExpContributionCalculator(this.mode, this.travelTime, this.travelDisutilityFactory, this.scenario);
+		networkModeAccessibilityExpContributionCalculator.subNetwork = this.subNetwork;
 		networkModeAccessibilityExpContributionCalculator.aggregatedMeasurePoints = this.aggregatedMeasurePoints;
 		networkModeAccessibilityExpContributionCalculator.aggregatedOpportunities = this.aggregatedOpportunities;
 		return networkModeAccessibilityExpContributionCalculator;
