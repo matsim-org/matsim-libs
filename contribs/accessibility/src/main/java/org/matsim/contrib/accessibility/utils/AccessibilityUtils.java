@@ -86,11 +86,8 @@ public class AccessibilityUtils {
 
 		LOG.info("Aggregating " + opportunities.getFacilities().size() + " opportunities with same nearest node...");
 		Map<Id<Node>, AggregationObject> opportunityClusterMap = new ConcurrentHashMap<>();
-		ProgressBar progressBar = new ProgressBar(opportunities.getFacilities().size());
 
 		for (ActivityFacility opportunity : opportunities.getFacilities().values()) {
-			progressBar.update();
-
 			Node nearestNode = NetworkUtils.getNearestNode(network, opportunity.getCoord());
 			double distance_m = NetworkUtils.getEuclideanDistance(opportunity.getCoord(), nearestNode.getCoord());
 

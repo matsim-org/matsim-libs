@@ -9,7 +9,7 @@ import org.matsim.facilities.ActivityFacility;
  * origin destination, for a given mode.
  * This includes travel time estimation and utility formulation.
  *
- * @author thibautd
+ * @author thibautd, dziemke
  */
 // It might make sense to split this further, into travel time estimation
 // and utility estimation. Ideally, one would actually not need any additional

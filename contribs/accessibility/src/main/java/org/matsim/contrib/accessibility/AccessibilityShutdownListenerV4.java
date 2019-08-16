@@ -127,57 +127,68 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 
 
 	public final void computeAccessibilities(Double departureTime, ActivityFacilities opportunities) {
-		Map<Id<Node>, AggregationObject> aggregatedOpportunities = AccessibilityUtils.aggregateOpportunitiesWithSameNearestNode(opportunities, network, config);
-		Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedOrigins = AccessibilityUtils.aggregateMeasurePointsWithSameNearestNode(measuringPoints, network);
-		Collection<Id<Node>> aggregatedOriginNodes = new LinkedList<>();
-		for (Id<Node> nodeId : aggregatedOrigins.keySet()) {
-			aggregatedOriginNodes.add(nodeId);
-		}
-
-		LOG.info("Iterating over all aggregated measuring points...");
-
-
-		if (acg.isUseParallelization()) {
-			int numberOfProcessors = Runtime.getRuntime().availableProcessors();
-			LOG.info("There are " + numberOfProcessors + " available processors.");
-
-			final int partitionSize = (int) ((double) aggregatedOrigins.size() / numberOfProcessors) + 1;
-			LOG.info("partitionSize " + partitionSize);
-			Iterable<List<Id<Node>>> partitions = Iterables.partition(aggregatedOriginNodes, partitionSize);
-
-			ProgressBar progressBar = new ProgressBar(aggregatedOrigins.size());
-
-			ConcurrentExecutor<Void> executor = ConcurrentExecutor.fixedPoolService(numberOfProcessors);
-			for (final List<Id<Node>> partition : partitions) {
-				executor.addTaskToQueue(() -> {
-					try {
-						compute(departureTime, aggregatedOpportunities, aggregatedOrigins, partition, progressBar);
-					} catch (Exception e) {
-						throw new RuntimeException(e);
-					}
-					return null;
-				});
+		for (String mode : calculators.keySet()) {
+			Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedOrigins;
+			Map<Id<Node>, AggregationObject> aggregatedOpportunities;
+			if (mode.equals(TransportMode.car)) {
+				NetworkModeAccessibilityExpContributionCalculator networkModeAccessibilityExpContributionCalculator = (NetworkModeAccessibilityExpContributionCalculator) calculators.get(mode);
+				aggregatedOrigins = networkModeAccessibilityExpContributionCalculator.getAggregatedOrigins();
+				aggregatedOpportunities = networkModeAccessibilityExpContributionCalculator.getAggregatedOpportunities();
+			} else {
+				aggregatedOrigins = AccessibilityUtils.aggregateMeasurePointsWithSameNearestNode(measuringPoints, network);
+				aggregatedOpportunities = AccessibilityUtils.aggregateOpportunitiesWithSameNearestNode(opportunities, network, config);
 			}
-			executor.execute();
-		} else {
-			LOG.info("Performing the computation without parallelization.");
-			ProgressBar progressBar = new ProgressBar(aggregatedOrigins.size());
-			compute(departureTime, aggregatedOpportunities, aggregatedOrigins, aggregatedOriginNodes, progressBar);
-		}
 
-		for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
-			zoneDataExchangeInterface.finish();
+			Collection<Id<Node>> aggregatedOriginNodes = new LinkedList<>();
+			for (Id<Node> nodeId : aggregatedOrigins.keySet()) {
+				aggregatedOriginNodes.add(nodeId);
+			}
+
+			LOG.info("Iterating over all aggregated measuring points...");
+
+			if (acg.isUseParallelization()) {
+				int numberOfProcessors = Runtime.getRuntime().availableProcessors();
+				LOG.info("There are " + numberOfProcessors + " available processors.");
+
+				final int partitionSize = (int) ((double) aggregatedOrigins.size() / numberOfProcessors) + 1;
+				LOG.info("partitionSize " + partitionSize);
+				Iterable<List<Id<Node>>> partitions = Iterables.partition(aggregatedOriginNodes, partitionSize);
+
+				ProgressBar progressBar = new ProgressBar(aggregatedOrigins.size());
+
+				ConcurrentExecutor<Void> executor = ConcurrentExecutor.fixedPoolService(numberOfProcessors);
+				for (final List<Id<Node>> partition : partitions) {
+					executor.addTaskToQueue(() -> {
+						try {
+							compute(mode, departureTime, aggregatedOpportunities, aggregatedOrigins, partition, progressBar);
+						} catch (Exception e) {
+							throw new RuntimeException(e);
+						}
+						return null;
+					});
+				}
+				executor.execute();
+			} else {
+				LOG.info("Performing the computation without parallelization.");
+				ProgressBar progressBar = new ProgressBar(aggregatedOrigins.size());
+				compute(mode, departureTime, aggregatedOpportunities, aggregatedOrigins, aggregatedOriginNodes, progressBar);
+			}
+
+			for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
+				zoneDataExchangeInterface.finish();
+			}
 		}
 	}
 
 
-	private void compute(Double departureTime, Map<Id<Node>, AggregationObject> aggregatedOpportunities, Map<Id<Node>,
+	private void compute(String mode, Double departureTime, Map<Id<Node>, AggregationObject> aggregatedOpportunities, Map<Id<Node>,
 			ArrayList<ActivityFacility>> aggregatedOrigins, Collection<Id<Node>> subsetOfNodes, ProgressBar progressBar) {
 
-		Map<String, AccessibilityContributionCalculator> calculatorsForPartition = new LinkedHashMap<>();
-		for (String mode : new HashSet<>(calculators.keySet())) {
-			calculatorsForPartition.put(mode, calculators.get(mode).duplicate());
-		}
+//		Map<String, AccessibilityContributionCalculator> calculatorsForPartition = new LinkedHashMap<>();
+//		for (String mode : new HashSet<>(calculators.keySet())) {
+//			calculatorsForPartition.put(mode, calculators.get(mode).duplicate());
+//		}
+		AccessibilityContributionCalculator calculator = calculators.get(mode).duplicate();
 
 		// Go through all nodes that have a measuring point assigned
 		//for (Id<Node> nodeId : partition) {
@@ -186,19 +197,19 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 
 			Node fromNode = network.getNodes().get(nodeId);
 
-			for (AccessibilityContributionCalculator calculator : calculatorsForPartition.values()) {
+			//for (AccessibilityContributionCalculator calculator : calculatorsForPartition.values()) {
 				Gbl.assertNotNull(calculator);
 				calculator.notifyNewOriginNode(fromNode, departureTime);
-			}
+			//}
 
 			// Go through all measuring points assigned to current node
 			for (ActivityFacility origin : aggregatedOrigins.get(nodeId)) {
 				assert(origin.getCoord() != null);
 
 				Map<String,Double> expSums = new ConcurrentHashMap<>();
-				for (String mode : calculators.keySet()) {
+				//for (String mode : calculators.keySet()) {
 					expSums.put(mode, 0.);
-				}
+				//}
 
 				// TODO Check what this really means
 				// Gbl.assertIf(aggregatedOpportunities.length > 0);
@@ -207,15 +218,16 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 				// Go through all aggregated opportunities (i.e. network nodes to which at least one opportunity is assigned)
 				for (final AggregationObject aggregatedOpportunity : aggregatedOpportunities.values()) {
 					// Go through all calculators
-					for (String mode : calculatorsForPartition.keySet()) {
-						final double expVhk = calculatorsForPartition.get(mode).computeContributionOfOpportunity(origin, aggregatedOpportunity, departureTime);
+					//for (String mode : calculatorsForPartition.keySet()) {
+						//final double expVhk = calculatorsForPartition.get(mode).computeContributionOfOpportunity(origin, aggregatedOpportunity, departureTime);
+						final double expVhk = calculator.computeContributionOfOpportunity(origin, aggregatedOpportunity, departureTime);
 						expSums.put(mode, expSums.get(mode) + expVhk);
-					}
+					//}
 				}
 
 				Map<String, Double> accessibilities  = new ConcurrentHashMap<>();
 
-				for (String mode : calculatorsForPartition.keySet()) {
+				//for (String mode : calculatorsForPartition.keySet()) {
 					if (acg.getAccessibilityMeasureType() == AccessibilityConfigGroup.AccessibilityMeasureType.logSum) {
 						accessibilities.put(mode, (1/this.cnScoringGroup.getBrainExpBeta()) * Math.log(expSums.get(mode)));
 					} else if (acg.getAccessibilityMeasureType() == AccessibilityConfigGroup.AccessibilityMeasureType.rawSum) {
@@ -225,7 +237,7 @@ public final class AccessibilityShutdownListenerV4 implements ShutdownListener {
 					} else {
 						throw new IllegalArgumentException("No valid accessibility measure type chosen.");
 					}
-				}
+				//}
 
 				for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
 					zoneDataExchangeInterface.setFacilityAccessibilities(origin, departureTime, accessibilities);

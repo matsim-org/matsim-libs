@@ -1,15 +1,13 @@
 package org.matsim.contrib.accessibility;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.accessibility.utils.AggregationObject;
-import org.matsim.contrib.accessibility.utils.Distances;
-import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
-import org.matsim.contrib.accessibility.utils.NetworkUtil;
+import org.matsim.contrib.accessibility.utils.*;
 import org.matsim.contrib.dvrp.router.DijkstraTree;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
@@ -18,9 +16,13 @@ import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.contrib.roadpricing.RoadPricingScheme;
 import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * @author thibautd
@@ -59,9 +61,20 @@ import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl;
 	//private final MultiNodePathCalculator multiNodePathCalculator;
 	//private ImaginaryNode aggregatedToNodes;
 
-	
+	//
+	private ActivityFacilities opportunities;
+	private final ActivityFacilities measuringPoints;
+	//
+
+	//
+	Map<Id<Node>, AggregationObject> aggregatedOpportunities;
+	Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedOrigins;
+	//
+
+
 	public NetworkModeAccessibilityExpContributionCalculator(final TravelTime travelTime,
-			final TravelDisutilityFactory travelDisutilityFactory, final Scenario scenario,	final Network network) {		
+			final TravelDisutilityFactory travelDisutilityFactory, final Scenario scenario,	final Network network,
+			ActivityFacilities measuringPoints, ActivityFacilities opportunities) {
 		this.network = network;
 
 		final PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
@@ -70,6 +83,11 @@ import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl;
 		//
 		this.travelDisutilityFactory = travelDisutilityFactory;
 		this.scenario = scenario;
+		//
+
+		//
+		this.opportunities = opportunities;
+		this.measuringPoints = measuringPoints;
 		//
 
 		Gbl.assertNotNull(travelDisutilityFactory);
@@ -96,6 +114,11 @@ import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl;
 		betaWalkTD		= planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
 
 		this.walkSpeed_m_s = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);
+
+		//
+		this.aggregatedOpportunities = AccessibilityUtils.aggregateOpportunitiesWithSameNearestNode(opportunities, network, scenario.getConfig());
+		this.aggregatedOrigins = AccessibilityUtils.aggregateMeasurePointsWithSameNearestNode(measuringPoints, network);
+		//
 	}
 
 
@@ -198,7 +221,18 @@ import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl;
 	public NetworkModeAccessibilityExpContributionCalculator duplicate() {
 		log.info("Creating another NetworkModeAccessibilityExpContributionCalculator object.");
 		NetworkModeAccessibilityExpContributionCalculator networkModeAccessibilityExpContributionCalculator =
-				new NetworkModeAccessibilityExpContributionCalculator(this.travelTime, this.travelDisutilityFactory, this.scenario,	this.network);
+				new NetworkModeAccessibilityExpContributionCalculator(this.travelTime, this.travelDisutilityFactory, this.scenario,
+						this.network, this.measuringPoints, this.opportunities);
 		return networkModeAccessibilityExpContributionCalculator;
+	}
+
+
+	public Map<Id<Node>, AggregationObject> getAggregatedOpportunities() {
+		return aggregatedOpportunities;
+	}
+
+
+	public Map<Id<Node>, ArrayList<ActivityFacility>> getAggregatedOrigins() {
+		return aggregatedOrigins;
 	}
 }

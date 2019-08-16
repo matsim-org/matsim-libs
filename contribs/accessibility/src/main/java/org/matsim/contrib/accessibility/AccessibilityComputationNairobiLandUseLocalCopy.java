@@ -53,7 +53,7 @@ public class AccessibilityComputationNairobiLandUseLocalCopy {
 		config.network().setInputFile("../nairobi/data/nairobi/input/2015-10-15_network.xml");
 		config.facilities().setInputFile("../nairobi/data/land_use/Nairobi_LU_2010/facilities.xml");
 		String runId = "ke_nairobi_landuse_hexagons_" + tileSize_m;
-		config.controler().setOutputDirectory("../nairobi/data/nairobi/output/" + runId + "_lcpt_par4_car_tr-2_100/");
+		config.controler().setOutputDirectory("../nairobi/data/nairobi/output/" + runId + "_lcpt_par4_car_tr-4_100/");
 		config.controler().setRunId(runId);
 		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
