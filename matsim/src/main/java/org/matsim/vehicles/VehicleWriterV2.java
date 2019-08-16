@@ -114,9 +114,9 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 			}
 
 			//TODO Write capacity, if present
-//			if (vt.getCapacity() != null) {
-//				this.writeCapacity(vt.getCapacity());
-//			}
+			if (vt.getCapacity() != null) {
+				this.writeCapacity(vt.getCapacity());
+			}
 
 			//Write length, if present
 			if (!Double.isNaN(vt.getLength())){
@@ -189,21 +189,24 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 		this.writeEndTag(VehicleSchemaV2Names.ENGINEINFORMATION);
 	}
 
-	private void writeCapacity(VehicleCapacity cap) throws UncheckedIOException {
-		this.writeStartTag(VehicleSchemaV2Names.CAPACITY, null);
-		if (cap.getSeats() != null) {
-			atts.clear();
-			atts.add(this.createTuple(VehicleSchemaV2Names.PERSONS, cap.getSeats()));
-			this.writeStartTag(VehicleSchemaV2Names.SEATS, atts, true);
+	private void writeCapacity(VehicleCapacity vehicleCapacity) throws UncheckedIOException {
+		atts.clear();
+		if (vehicleCapacity.getSeats() != null) {
+			atts.add(this.createTuple(VehicleSchemaV2Names.SEATS, vehicleCapacity.getSeats()));
 		}
-		if (cap.getStandingRoom() != null) {
-			atts.clear();
-			atts.add(this.createTuple(VehicleSchemaV2Names.PERSONS, cap.getStandingRoom()));
-			this.writeStartTag(VehicleSchemaV2Names.STANDINGROOM, atts, true);
+		if (vehicleCapacity.getStandingRoom() != null) {
+			atts.add(this.createTuple(VehicleSchemaV2Names.STANDINGROOM, vehicleCapacity.getStandingRoom()));
 		}
-		if (cap.getFreightCapacity() != null) {
-			this.writeFreightCapacity(cap.getFreightCapacity());
+		//TODO if value is not set it runs into NullPointerException
+		if (!Double.isNaN(vehicleCapacity.getVolumeInCubicMeters())) {
+			atts.add(this.createTuple(VehicleSchemaV2Names.VOLUME, vehicleCapacity.getVolumeInCubicMeters()));
 		}
+		//TODO if value is not set it runs into NullPointerException
+//		if (!Double.isNaN(vehicleCapacity.getWeightInTons())) {
+//			atts.add(this.createTuple(VehicleSchemaV2Names.WEIGHT, vehicleCapacity.getWeightInTons()));
+//		}
+		this.writeStartTag(VehicleSchemaV2Names.CAPACITY, atts);
+		//TODO attributes for capacity
 		this.writeEndTag(VehicleSchemaV2Names.CAPACITY);
 	}
 
