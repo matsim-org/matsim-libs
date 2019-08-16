@@ -22,6 +22,7 @@ package org.matsim.core.router;
 import java.util.List;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 
@@ -52,6 +53,33 @@ public final class MainModeIdentifierImpl implements MainModeIdentifier {
 						!mode2.contains( TransportMode.transit_walk ) ) {
 					return mode2 ;
 				}
+			}
+		}
+		
+		/*
+		 * For network modes, pt and drt we can encounter the following situation:
+		 * If the closest transit stop / link to the origin is also the closest transit stop / link to the destination,
+		 * there is no useful route between them, because we would board and get off at the same place.
+		 * Previously we had so called direct walks in that case, i.e. a single leg of mode "transit_walk", "drt_walk"
+		 * or similar. We want to get rid of these direct walks (see MATSIM-943).
+		 * We would then instead obtain non_network_walk --> pt interaction --> non_network_walk.
+		 * There is no leg of the main mode, so we try to find out the main mode using the interaction activity. 
+		 * In MATSIM-945 we decided to have all stage activities end with "interaction". Assuming an convention such as
+		 * stage activities should be called "mode interaction" (currently most or all stage activities follow that 
+		 * form) we try to identify the mode  
+		 * Something like a router mode would be better for the future. - gleich aug'19
+		 */
+		if (tripElements.size() == 3 && tripElements.get(0) instanceof Leg && tripElements.get(1) instanceof Activity
+				&& tripElements.get(2) instanceof Leg) {
+			Leg leg0 = (Leg) tripElements.get(0);
+			Activity act = (Activity) tripElements.get(1);
+			Leg leg1 = (Leg) tripElements.get(2);
+
+			if (leg0.getMode().equals(TransportMode.non_network_walk) && act.getType().contains("interaction")
+					&& leg1.getMode().equals(TransportMode.non_network_walk)) {
+				String firstPart = act.getType().split("interaction")[0];
+				String mainMode = firstPart.trim();
+				return mainMode;
 			}
 		}
 
