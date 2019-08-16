@@ -15,13 +15,8 @@ class VehicleReaderV2 extends MatsimXmlParser{
 	private final VehiclesFactory builder;
 	private VehicleType currentVehType = null;
 	private VehicleCapacity currentCapacity = null;
-	private FreightCapacity currentFreightCapacity = null;
 	private EngineInformation currentEngineInformation = null;
 	private CostInformation currentCostInformation = null;
-//	private EngineInformation.FuelType currentFuelType = null;
-//	private double fixedCostsPerDay = Double.NaN;
-//	private double costsPerMeter = Double.NaN;
-//	private double costsPerSecond = Double.NaN;
 
 	private final AttributesXmlReaderDelegate attributesDelegate = new AttributesXmlReaderDelegate();
 	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes = null ;
@@ -44,10 +39,7 @@ class VehicleReaderV2 extends MatsimXmlParser{
 				this.currentVehType.setEngineInformation( this.currentEngineInformation );
 				this.currentEngineInformation = null;
 				break;
-//			case VehicleSchemaV2Names.FREIGHTCAPACITY:
-//				this.currentCapacity.setFreightCapacity( this.currentFreightCapacity );
-//				this.currentFreightCapacity = null;
-//				break;
+
 			case VehicleSchemaV2Names.CAPACITY:
 				this.currentVehType.setCapacity( this.currentCapacity );
 				this.currentCapacity = null;
