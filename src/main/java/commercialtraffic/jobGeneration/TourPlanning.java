@@ -50,14 +50,14 @@ public class TourPlanning  {
         Set<CarrierVehicleType> vehicleTypes = new HashSet<>();
         carriers.getCarriers().values().forEach(carrier -> vehicleTypes.addAll(carrier.getCarrierCapabilities().getVehicleTypes()));
         NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), vehicleTypes);
-        netBuilder.setTimeSliceWidth(900); // !!!! otherwise it will not do anything.
+        netBuilder.setTimeSliceWidth(1800); // !!!! otherwise it will not do anything.
         netBuilder.setTravelTime(travelTime);
         final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
         carriers.getCarriers().values().parallelStream().forEach(carrier -> {
                     //Build VRP
                     VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork());
-                    //            vrpBuilder.setRoutingCost(netBasedCosts);
-                    // this is too expansive for the size of the problem
+                    vrpBuilder.setRoutingCost(netBasedCosts);// this may be too expensive for the size of the problem
+
                     VehicleRoutingProblem problem = vrpBuilder.build();
 
                     //use this in order to set a 'hard' constraint on time windows
@@ -66,7 +66,6 @@ public class TourPlanning  {
 //                    constraintManager.addConstraint(new ServiceDeliveriesFirstConstraint(), ConstraintManager.Priority.CRITICAL);
 //                    constraintManager.addConstraint(new VehicleDependentTimeWindowConstraints(stateManager, problem.getTransportCosts(), problem.getActivityCosts()), ConstraintManager.Priority.HIGH);
 //                    VehicleRoutingAlgorithm algorithm = Jsprit.Builder.newInstance(problem).setStateAndConstraintManager(stateManager,constraintManager).buildAlgorithm();
-
 
                     // get the algorithm out-of-the-box, search solution and get the best one.
                     VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
