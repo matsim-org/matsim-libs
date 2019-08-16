@@ -69,7 +69,7 @@ public class TripRouterAccessibilityContributionCalculator implements Accessibil
 
 
 	@Override
-	public void notifyNewOriginNode(Node fromNode, Double departureTime) {
+	public void notifyNewOriginNode(Id<Node> fromNodeId, Double departureTime) {
 		// at this point, do nothing (inefficient)
 	}
 

@@ -52,43 +52,23 @@ public final class AccessibilityComputationShutdownListener implements ShutdownL
 
     private final ActivityFacilities measuringPoints;
     private ActivityFacilities opportunities;
-    private Scenario scenario;
 
 	private String outputDirectory;
-	private AccessibilityConfigGroup acg;
-	
-	private AccessibilityAggregator accessibilityAggregator;
-
-
-
-	//
-
 
 	private final Map<String, AccessibilityContributionCalculator> calculators = new LinkedHashMap<>();
-	// (test may depend on that this is a "Linked" Hash Map. kai, dec'16)
-
-	//private final Config config;
-	private final PlanCalcScoreConfigGroup cnScoringGroup;
-	private final Network network;
-
+	private AccessibilityAggregator accessibilityAggregator;
 	private final ArrayList<FacilityDataExchangeInterface> zoneDataExchangeListeners = new ArrayList<>();
 
-    Map<String, Double> accessibilities  = new ConcurrentHashMap<>();
-	//
+	private AccessibilityConfigGroup acg;
+	private final PlanCalcScoreConfigGroup cnScoringGroup;
 
 	
 	public AccessibilityComputationShutdownListener(Scenario scenario, ActivityFacilities measuringPoints, ActivityFacilities opportunities,
 										   String outputDirectory) {
-        this.scenario = scenario;
 	    this.measuringPoints = measuringPoints;
 	    this.opportunities = opportunities;
 
 		this.outputDirectory = outputDirectory;
-
-
-
-		//
-		this.network = scenario.getNetwork();
 
 		this.acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 		this.cnScoringGroup = scenario.getConfig().planCalcScore();
@@ -105,7 +85,6 @@ public final class AccessibilityComputationShutdownListener implements ShutdownL
 		if (cnScoringGroup.getOrCreateModeParams(TransportMode.walk).getMonetaryDistanceRate() != 0.) {
 			LOG.error("Monetary distance cost rate for walk different from zero, but not used in accessibility computations");
 		}
-		//
 	}
 
 	private List<ActivityFacilities> additionalFacilityData = new ArrayList<>() ;
@@ -135,11 +114,8 @@ public final class AccessibilityComputationShutdownListener implements ShutdownL
 
 	public final void computeAccessibilities(Double departureTime, ActivityFacilities opportunities) {
 		for (String mode : calculators.keySet()) {
-
 			AccessibilityContributionCalculator calculator = calculators.get(mode);
 			calculator.initialize(measuringPoints, opportunities);
-
-
 
             Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedOrigins = calculator.getAggregatedMeasurePoints();
             Map<Id<Node>, AggregationObject> aggregatedOpportunities = calculator.getAgregatedOpportunities();
@@ -156,7 +132,7 @@ public final class AccessibilityComputationShutdownListener implements ShutdownL
 				LOG.info("There are " + numberOfProcessors + " available processors.");
 
 				final int partitionSize = (int) ((double) aggregatedOrigins.size() / numberOfProcessors) + 1;
-				LOG.info("partitionSize " + partitionSize);
+				LOG.info("Size of partitions = " + partitionSize);
 				Iterable<List<Id<Node>>> partitions = Iterables.partition(aggregatedOriginNodes, partitionSize);
 
 				ProgressBar progressBar = new ProgressBar(aggregatedOrigins.size());
@@ -188,19 +164,18 @@ public final class AccessibilityComputationShutdownListener implements ShutdownL
 
 	private void compute(String mode, Double departureTime, Map<Id<Node>, AggregationObject> aggregatedOpportunities, Map<Id<Node>,
 			ArrayList<ActivityFacility>> aggregatedOrigins, Collection<Id<Node>> subsetOfNodes, ProgressBar progressBar) {
+
 		AccessibilityContributionCalculator calculator = calculators.get(mode).duplicate();
 
 		// Go through all nodes that have a measuring point assigned
-		for (Id<Node> nodeId : subsetOfNodes) {
+		for (Id<Node> fromNodeId : subsetOfNodes) {
 			progressBar.update();
 
-			Node fromNode = network.getNodes().get(nodeId);
-
 			Gbl.assertNotNull(calculator);
-			calculator.notifyNewOriginNode(fromNode, departureTime);
+			calculator.notifyNewOriginNode(fromNodeId, departureTime);
 
 			// Go through all measuring points assigned to current node
-			for (ActivityFacility origin : aggregatedOrigins.get(nodeId)) {
+			for (ActivityFacility origin : aggregatedOrigins.get(fromNodeId)) {
 				assert(origin.getCoord() != null);
 
 				Map<String,Double> expSums = new ConcurrentHashMap<>();

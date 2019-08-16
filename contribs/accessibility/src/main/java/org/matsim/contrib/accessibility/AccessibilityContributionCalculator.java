@@ -31,11 +31,11 @@ public interface AccessibilityContributionCalculator {
 	 * allowing to perform some preprocessing (for instance pre-computing
 	 * a least-cost path tree).
 	 *
-	 * @param fromNode the Node on the network to which will be associated the next
+	 * @param fromNodeId the Id of the node on the network to which will be associated the next
 	 *                 examined opportunities.
 	 * @param departureTime TODO
 	 */
-	void notifyNewOriginNode( Node fromNode, Double departureTime );
+	void notifyNewOriginNode(Id<Node> fromNodeId, Double departureTime );
 
 	/**
 	 * estimates the contribution of a given opportunity to the accessibility metric,

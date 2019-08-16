@@ -42,8 +42,8 @@ public final class LeastCostPathCalculatorAccessibilityContributionCalculator im
 
 
 	@Override
-	public void notifyNewOriginNode(Node fromNode, Double departureTime) {
-		this.fromNode = fromNode;
+	public void notifyNewOriginNode(Id<Node> fromNodeId, Double departureTime) {
+		this.fromNode = scenario.getNetwork().getNodes().get(fromNodeId);
 		this.departureTime = departureTime;
 	}
 

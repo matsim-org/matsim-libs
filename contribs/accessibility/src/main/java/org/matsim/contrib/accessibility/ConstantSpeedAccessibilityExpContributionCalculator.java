@@ -33,13 +33,16 @@ import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author thibautd, dziemke
@@ -112,8 +115,8 @@ public final class ConstantSpeedAccessibilityExpContributionCalculator implement
 
 	
 	@Override
-	public void notifyNewOriginNode(Node fromNode, Double departureTime) {
-		this.fromNode = fromNode;
+	public void notifyNewOriginNode(Id<Node> fromNodeId, Double departureTime) {
+		this.fromNode = network.getNodes().get(fromNodeId);
 		this.lcptTravelDistance.calculate(network, fromNode, departureTime);
 	}
 

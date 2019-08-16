@@ -129,8 +129,8 @@ import java.util.Set;
 
 
 	@Override
-	public void notifyNewOriginNode(Node fromNode, Double departureTime) {
-		this.fromNode = fromNode;
+	public void notifyNewOriginNode(Id<Node> fromNodeId, Double departureTime) {
+		this.fromNode = subNetwork.getNodes().get(fromNodeId);
 		this.lcpt.calculateExtended(subNetwork, fromNode, departureTime);
 		//this.dijkstraTree.calcLeastCostPathTree(fromNode, departureTime);
 		//multiNodePathCalculator.calcLeastCostPath(fromNode, aggregatedToNodes, departureTime, null, null);
