@@ -96,34 +96,20 @@ class VehicleReaderV2 extends MatsimXmlParser{
 				break;
 			case VehicleSchemaV2Names.CAPACITY:
 				this.currentCapacity = this.builder.createVehicleCapacity();
-				this.currentCapacity.setSeats( Integer.valueOf( atts.getValue( VehicleSchemaV2Names.SEATS ) ) );
-				//TODO: throws null pointer exception -> why???
-//				this.currentCapacity.setStandingRoom( Integer.valueOf( atts.getValue( VehicleSchemaV2Names.STANDINGROOM ) ) );
-//				//TODO: throws null pointer exception -> why???
-//				this.currentCapacity.setWeightInTons( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.WEIGHT ) ) ) ;
-				this.currentCapacity.setVolumeInCubicMeters( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.VOLUME ) ) );
+				if (atts.getValue( VehicleSchemaV2Names.SEATS ) != null) {
+					this.currentCapacity.setSeats( Integer.valueOf( atts.getValue( VehicleSchemaV2Names.SEATS ) ) );
+				}
+				if (atts.getValue( VehicleSchemaV2Names.STANDINGROOM) != null) {
+				this.currentCapacity.setStandingRoom( Integer.valueOf( atts.getValue( VehicleSchemaV2Names.STANDINGROOM ) ) );
+				}
+				if (atts.getValue( VehicleSchemaV2Names.WEIGHT) != null) {
+					this.currentCapacity.setWeightInTons(Double.parseDouble(atts.getValue(VehicleSchemaV2Names.WEIGHT)));
+				}
+				if (atts.getValue( VehicleSchemaV2Names.VOLUME) != null) {
+					this.currentCapacity.setVolumeInCubicMeters(Double.parseDouble(atts.getValue(VehicleSchemaV2Names.VOLUME)));
+				}
 				this.currAttributes = this.currentCapacity.getAttributes() ;
 				break;
-//			case VehicleSchemaV2Names.SEATS:
-//				this.currentCapacity.setSeats( Integer.valueOf( atts.getValue( VehicleSchemaV2Names.PERSONS ) ) );
-//				break;
-//			case VehicleSchemaV2Names.STANDINGROOM:
-//				this.currentCapacity.setStandingRoom( Integer.valueOf( atts.getValue( VehicleSchemaV2Names.PERSONS ) ) );
-//				break;
-//			case VehicleSchemaV2Names.FREIGHTCAPACITY:
-//				double weightInTons = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.WEIGHT ) ) ;
-//				double volumeInCubicMeters = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.VOLUME ) ) ;
-//				this.currentFreightCapacity = this.builder.createFreigthCapacity();
-//				this.currentFreightCapacity.setVolume( volumeInCubicMeters );
-//				this.currentFreightCapacity.setWeight( weightInTons );
-//				this.currAttributes = this.currentFreightCapacity.getAttributes() ;
-//				break;
-//			case VehicleSchemaV2Names.VOLUME:
-//				this.currentFreightCapacity.setVolume( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.CUBICMETERS ) ) );
-//				break;
-//			case VehicleSchemaV2Names.WEIGHT:
-//				this.currentFreightCapacity.setWeightInTons( Double.parseDouble( atts.getValue( VehicleSchemaV2Names.TONS ) ) );
-//				break;
 			case VehicleSchemaV2Names.COSTINFORMATION:
 				double fixedCostsPerDay = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.FIXEDCOSTSPERDAY ) );
 				double costsPerMeter = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERMETER ) );
