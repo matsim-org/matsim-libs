@@ -1,8 +1,14 @@
 package org.matsim.contrib.accessibility;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
+import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Interface to provide a means to compute the utility of a given
@@ -15,6 +21,9 @@ import org.matsim.facilities.ActivityFacility;
 // and utility estimation. Ideally, one would actually not need any additional
 // interface compared to what MATSim provides. Not there yet [td, june 15]
 public interface AccessibilityContributionCalculator {
+
+	void initialize(ActivityFacilities measuringPoints, ActivityFacilities opportunities);
+
 	/**
 	 * Provided for performance purpose.
 	 * The accessibility listener(s) aggregate first all "measuring points"
@@ -42,6 +51,10 @@ public interface AccessibilityContributionCalculator {
 	double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime);
 	// yyyy I am somewhat sceptic if we tryly need both "fromNode" (above) and origin.
 	// yyyy And I am quite confident that we do not need the departure time twice.
+
+    Map<Id<Node>, ArrayList<ActivityFacility>> getAggregatedMeasurePoints();
+
+    Map<Id<Node>, AggregationObject> getAgregatedOpportunities();
 
 	/*
 	Needed for perallelization

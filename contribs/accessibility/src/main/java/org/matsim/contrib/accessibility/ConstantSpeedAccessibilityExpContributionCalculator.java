@@ -20,10 +20,13 @@
 package org.matsim.contrib.accessibility;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.Distances;
 import org.matsim.contrib.accessibility.utils.NetworkUtil;
@@ -31,8 +34,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * @author thibautd, dziemke
@@ -45,8 +52,9 @@ public final class ConstantSpeedAccessibilityExpContributionCalculator implement
 	private final LeastCostPathTree lcptTravelDistance = new LeastCostPathTree(new FreeSpeedTravelTime(), new LinkLengthTravelDisutility());
 
 	private final String mode;
-	private final Config config;
-	private final Network network;
+	private Config config;
+	private Network network;
+	private Scenario scenario;
 	
 	private double logitScaleParameter;
 	
@@ -55,17 +63,22 @@ public final class ConstantSpeedAccessibilityExpContributionCalculator implement
 	private double constMode;
 	private double modeSpeed_m_h = -1;
 	
-	private final double betaWalkTT;
-	private final double betaWalkTD;
-	private final double walkSpeed_m_h;
+	private double betaWalkTT;
+	private double betaWalkTD;
+	private double walkSpeed_m_h;
 
 	private Node fromNode = null;
 
+	Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedMeasurePoints;
+	Map<Id<Node>, AggregationObject> aggregatedOpportunities;
 
-	public ConstantSpeedAccessibilityExpContributionCalculator(final String mode, Config config, Network network) {
+
+	public ConstantSpeedAccessibilityExpContributionCalculator(final String mode, final Scenario scenario) {
 		this.mode = mode;
-		this.config = config;
-		this.network = network;
+		this.scenario = scenario;
+
+		this.config = scenario.getConfig();
+		this.network = scenario.getNetwork();
 		final PlanCalcScoreConfigGroup planCalcScoreConfigGroup = config.planCalcScore() ;
 
 		if (planCalcScoreConfigGroup.getOrCreateModeParams(mode).getMonetaryDistanceRate() != 0.) {
@@ -73,12 +86,12 @@ public final class ConstantSpeedAccessibilityExpContributionCalculator implement
 		}
 
 		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta();
-		
+
 		if (config.plansCalcRoute().getTeleportedModeSpeeds().get(mode) == null) {
 			LOG.error("No teleported mode speed for mode " + mode + " set.");
 		}
 		this.modeSpeed_m_h = config.plansCalcRoute().getTeleportedModeSpeeds().get(mode) * 3600.;
-		
+
 		final PlanCalcScoreConfigGroup.ModeParams modeParams = planCalcScoreConfigGroup.getOrCreateModeParams(mode);
 		betaModeTT = modeParams.getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
 		betaModeTD = modeParams.getMarginalUtilityOfDistance();
@@ -88,6 +101,14 @@ public final class ConstantSpeedAccessibilityExpContributionCalculator implement
 		betaWalkTD = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
 		this.walkSpeed_m_h = config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600;
 	}
+
+
+	@Override
+	public void initialize(ActivityFacilities measuringPoints, ActivityFacilities opportunities) {
+		this.aggregatedMeasurePoints = AccessibilityUtils.aggregateMeasurePointsWithSameNearestNode(measuringPoints, network);
+		this.aggregatedOpportunities = AccessibilityUtils.aggregateOpportunitiesWithSameNearestNode(opportunities, network, scenario.getConfig());
+	}
+
 
 	
 	@Override
@@ -134,7 +155,21 @@ public final class ConstantSpeedAccessibilityExpContributionCalculator implement
 	public ConstantSpeedAccessibilityExpContributionCalculator duplicate() {
 		LOG.info("Creating another ConstantSpeedAccessibilityExpContributionCalculator object.");
 		ConstantSpeedAccessibilityExpContributionCalculator constantSpeedAccessibilityExpContributionCalculator =
-				new ConstantSpeedAccessibilityExpContributionCalculator(this.mode, this.config, this.network);
+				new ConstantSpeedAccessibilityExpContributionCalculator(this.mode, this.scenario);
+		constantSpeedAccessibilityExpContributionCalculator.aggregatedMeasurePoints = this.aggregatedMeasurePoints;
+		constantSpeedAccessibilityExpContributionCalculator.aggregatedOpportunities = this.aggregatedOpportunities;
 		return constantSpeedAccessibilityExpContributionCalculator;
+	}
+
+
+	@Override
+	public Map<Id<Node>, ArrayList<ActivityFacility>> getAggregatedMeasurePoints() {
+		return aggregatedMeasurePoints;
+	}
+
+
+	@Override
+	public Map<Id<Node>, AggregationObject> getAgregatedOpportunities() {
+		return aggregatedOpportunities;
 	}
 }

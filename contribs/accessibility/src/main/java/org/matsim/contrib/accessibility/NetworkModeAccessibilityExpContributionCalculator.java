@@ -31,64 +31,48 @@ import java.util.Map;
 	private static final Logger log = Logger.getLogger( NetworkModeAccessibilityExpContributionCalculator.class );
 
 	@Deprecated // yyyy should be possible to get this from car travel disutility
-	private final RoadPricingScheme scheme ;
+	private RoadPricingScheme scheme ;
 
-	private final double logitScaleParameter;
+	private double logitScaleParameter;
 
 	@Deprecated // yyyy should be possible to get this from car travel disutility
-	private final double betaCarTT;		// in MATSim this is [utils/h]: cnScoringGroup.getTraveling_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
+	private double betaCarTT;		// in MATSim this is [utils/h]: cnScoringGroup.getTraveling_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
 	@Deprecated // yyyy should be possible to get this from car travel disutility
-	private final double betaCarTD;		// in MATSim this is [utils/money * money/meter] = [utils/meter]: cnScoringGroup.getMarginalUtilityOfMoney() * cnScoringGroup.getMonetaryDistanceCostRateCar()
+	private double betaCarTD;		// in MATSim this is [utils/money * money/meter] = [utils/meter]: cnScoringGroup.getMarginalUtilityOfMoney() * cnScoringGroup.getMonetaryDistanceCostRateCar()
 	@Deprecated // yyyy should be possible to get this from car travel disutility
-	private final double betaCarTMC;	// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
+	private double betaCarTMC;	// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
 
-	private final double constCar;
+	private double constCar;
 
-	private final Network network;
+	private Scenario scenario;
+	private Network network;
 	private final TravelTime travelTime;
-	//
 	private final TravelDisutilityFactory travelDisutilityFactory;
-	private final Scenario scenario;
-	//
 
-	private final double betaWalkTT;
-	private final double betaWalkTD;
-	private final double walkSpeed_m_s;
+	private double betaWalkTT;
+	private double betaWalkTD;
+	private double walkSpeed_m_s;
 
 	private Node fromNode = null;
-	private final LeastCostPathTreeExtended lcpt;
+	private LeastCostPathTreeExtended lcpt;
 	//private final DijkstraTree dijkstraTree;
 	//private final MultiNodePathCalculator multiNodePathCalculator;
 	//private ImaginaryNode aggregatedToNodes;
 
-	//
-	private ActivityFacilities opportunities;
-	private final ActivityFacilities measuringPoints;
-	//
-
-	//
-	Map<Id<Node>, AggregationObject> aggregatedOpportunities;
-	Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedOrigins;
-	//
+	Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedMeasurePoints;
+    Map<Id<Node>, AggregationObject> aggregatedOpportunities;
 
 
-	public NetworkModeAccessibilityExpContributionCalculator(final TravelTime travelTime,
-			final TravelDisutilityFactory travelDisutilityFactory, final Scenario scenario,	final Network network,
-			ActivityFacilities measuringPoints, ActivityFacilities opportunities) {
-		this.network = network;
+	public NetworkModeAccessibilityExpContributionCalculator(final TravelTime travelTime, final TravelDisutilityFactory travelDisutilityFactory, Scenario scenario) {
+		this.travelTime = travelTime;
+		this.travelDisutilityFactory = travelDisutilityFactory;
+
+		this.scenario = scenario;
+		this.network = scenario.getNetwork();
+		log.warn("network = " + network);
 
 		final PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
 		this.scheme = (RoadPricingScheme) scenario.getScenarioElement( RoadPricingScheme.ELEMENT_NAME );
-		this.travelTime = travelTime;
-		//
-		this.travelDisutilityFactory = travelDisutilityFactory;
-		this.scenario = scenario;
-		//
-
-		//
-		this.opportunities = opportunities;
-		this.measuringPoints = measuringPoints;
-		//
 
 		Gbl.assertNotNull(travelDisutilityFactory);
 		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime);
@@ -114,11 +98,15 @@ import java.util.Map;
 		betaWalkTD		= planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
 
 		this.walkSpeed_m_s = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);
+	}
 
-		//
+
+	@Override
+	public void initialize(ActivityFacilities measuringPoints, ActivityFacilities opportunities) {
+		log.warn("Initializing caluclator...");
+
+        this.aggregatedMeasurePoints = AccessibilityUtils.aggregateMeasurePointsWithSameNearestNode(measuringPoints, network);
 		this.aggregatedOpportunities = AccessibilityUtils.aggregateOpportunitiesWithSameNearestNode(opportunities, network, scenario.getConfig());
-		this.aggregatedOrigins = AccessibilityUtils.aggregateMeasurePointsWithSameNearestNode(measuringPoints, network);
-		//
 	}
 
 
@@ -129,8 +117,8 @@ import java.util.Map;
 		//this.dijkstraTree.calcLeastCostPathTree(fromNode, departureTime);
 		//multiNodePathCalculator.calcLeastCostPath(fromNode, aggregatedToNodes, departureTime, null, null);
 	}
-	
-	
+
+
 	@Override
 	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime) {
 
@@ -140,12 +128,12 @@ import java.util.Map;
 
 		// === (1) ORIGIN to LINK to NODE (captures the distance (as walk time) between the origin via the link to the node):
 		Distances distance = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLink, fromNode);
-		
+
 		// TODO: extract this walk part?
 		// In the state found before modularization (june 15), this was anyway not consistent accross modes
 		// (different for PtMatrix), pointing to the fact that making this mode-specific might make sense. (comment by thibaut?)
-		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Intersection() / (this.walkSpeed_m_s * 3600);	
-		
+		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Intersection() / (this.walkSpeed_m_s * 3600);
+
 		// (a) disutilities to get on or off the network
 		// NEW AV MODE
 //		double waitingTime_h = (Double) origin.getAttributes().getAttribute("waitingTime_s") / 3600.;
@@ -153,16 +141,16 @@ import java.util.Map;
 //					+ (distance.getDistancePoint2Intersection() * betaWalkTD);
 		// END NEW AV MODE
 		double walkUtilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT)
-					+ (distance.getDistancePoint2Intersection() * betaWalkTD);		
-		
+					+ (distance.getDistancePoint2Intersection() * betaWalkTD);
+
 		// (b) TRAVEL ON NETWORK to FIRST NODE:
 		double toll_money = getTollMoney(departureTime, nearestLink, distance);
 		double carSpeedOnNearestLink_m_s = nearestLink.getLength() / travelTime.getLinkTravelTime(nearestLink, departureTime, null, null);
 		double road2NodeCongestedCarTime_h = distance.getDistanceIntersection2Node() / (carSpeedOnNearestLink_m_s * 3600.);
 //		System.out.println("road2NodeCongestedCarTime_h = " + road2NodeCongestedCarTime_h);
-		
+
 		// Note: This is a utility that becomes a disutility when it holds a negative value (as it does)
-		double congestedCarUtilityRoad2Node = (road2NodeCongestedCarTime_h * betaCarTT) 
+		double congestedCarUtilityRoad2Node = (road2NodeCongestedCarTime_h * betaCarTT)
 				+ (distance.getDistanceIntersection2Node() * betaCarTD) + (toll_money * betaCarTMC);
 //		System.out.println("congestedCarDisutilityRoad2Node = " + congestedCarDisutilityRoad2Node);
 //		// yyyyyy dzdzdz: replace the above by link disutility multiplied by fraction of link that is used according to the entry point.  (toll should be in there automatically??)
@@ -176,12 +164,12 @@ import java.util.Map;
 
 		// System.out.println("congestedCarDisutility = " + congestedCarDisutility);
 		// travel disutility congested car on road network (including toll)
-		
+
 		// === (3) Pre-computed effect of all opportunities reachable from destination network node:
 		double sumExpVjkWalk = destination.getSum();
 //		System.out.println("destination.getSum() = " + destination.getSum());
 		// works because something like exp(A+c1) + exp(A+c2) + ... = exp(A) * [ exp(c1) + exp(c2) + ...]  =: exp(A) * sumExpVjkWalk
-		
+
 		// === (4) Everything together:
 		// note that exp(a+b) = exp(a) * exp(b), so for b the exponentiation has already been done.
 		return Math.exp(this.logitScaleParameter * (walkUtilityMeasuringPoint2Road + constCar + congestedCarUtilityRoad2Node
@@ -192,7 +180,7 @@ import java.util.Map;
 	@Deprecated // yyyy should be possible to get this from car travel disutility
 	private double getTollMoney(Double departureTime, Link nearestLink, Distances distance) {
 		// yy there should be a way of doing this that is closer to the mobsim (and thus more general/automatic).  kai, jun'16
-		
+
 		double result = 0. ;
 		if(scheme != null){
 			RoadPricingSchemeImpl.Cost cost = scheme.getLinkCostInfo(nearestLink.getId(), departureTime, null, null);
@@ -211,6 +199,7 @@ import java.util.Map;
 	}
 
 
+	// Needed if MultiNodePathCalculator is used as router -- experimental
 //	public void setToNodes(ImaginaryNode aggregatedToNodes) {
 //		log.warn("Setting toNodes.");
 //		this.aggregatedToNodes = aggregatedToNodes;
@@ -221,18 +210,21 @@ import java.util.Map;
 	public NetworkModeAccessibilityExpContributionCalculator duplicate() {
 		log.info("Creating another NetworkModeAccessibilityExpContributionCalculator object.");
 		NetworkModeAccessibilityExpContributionCalculator networkModeAccessibilityExpContributionCalculator =
-				new NetworkModeAccessibilityExpContributionCalculator(this.travelTime, this.travelDisutilityFactory, this.scenario,
-						this.network, this.measuringPoints, this.opportunities);
+				new NetworkModeAccessibilityExpContributionCalculator(this.travelTime, this.travelDisutilityFactory, this.scenario);
+		networkModeAccessibilityExpContributionCalculator.aggregatedMeasurePoints = this.aggregatedMeasurePoints;
+		networkModeAccessibilityExpContributionCalculator.aggregatedOpportunities = this.aggregatedOpportunities;
 		return networkModeAccessibilityExpContributionCalculator;
 	}
 
 
-	public Map<Id<Node>, AggregationObject> getAggregatedOpportunities() {
+	@Override
+    public Map<Id<Node>, ArrayList<ActivityFacility>> getAggregatedMeasurePoints() {
+        return aggregatedMeasurePoints;
+    }
+
+
+	@Override
+	public Map<Id<Node>, AggregationObject> getAgregatedOpportunities() {
 		return aggregatedOpportunities;
-	}
-
-
-	public Map<Id<Node>, ArrayList<ActivityFacility>> getAggregatedOrigins() {
-		return aggregatedOrigins;
 	}
 }

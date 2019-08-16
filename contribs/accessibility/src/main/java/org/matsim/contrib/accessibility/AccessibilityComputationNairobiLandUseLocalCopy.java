@@ -41,7 +41,7 @@ public class AccessibilityComputationNairobiLandUseLocalCopy {
 	public static final Logger LOG = Logger.getLogger(AccessibilityComputationNairobiLandUseLocalCopy.class);
 	
 	public static void main(String[] args) {
-		int tileSize_m = 100;
+		int tileSize_m = 500;
 		boolean push2Geoserver = false; // Set true for run on server
 		boolean createQGisOutput = true; // Set false for run on server
 		
@@ -53,7 +53,7 @@ public class AccessibilityComputationNairobiLandUseLocalCopy {
 		config.network().setInputFile("../nairobi/data/nairobi/input/2015-10-15_network.xml");
 		config.facilities().setInputFile("../nairobi/data/land_use/Nairobi_LU_2010/facilities.xml");
 		String runId = "ke_nairobi_landuse_hexagons_" + tileSize_m;
-		config.controler().setOutputDirectory("../nairobi/data/nairobi/output/" + runId + "_lcpt_par4_car_tr-4_100/");
+		config.controler().setOutputDirectory("../nairobi/data/nairobi/output/" + runId + "_lcpt_par4_car_tr-7_500/");
 		config.controler().setRunId(runId);
 		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -65,8 +65,10 @@ public class AccessibilityComputationNairobiLandUseLocalCopy {
 		acg.setTileSize_m(tileSize_m);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, false);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
-//		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+		//acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
 		acg.setOutputCrs(scenarioCRS);
+
+		//acg.setUseParallelization(false);
 		
 		ConfigUtils.setVspDefaults(config);
 		

@@ -148,58 +148,45 @@ public final class AccessibilityModule extends AbstractModule {
 				}
 				AccessibilityUtils.assignAdditionalFacilitiesDataToMeasurePoint(measuringPoints, measurePointGeometryMap, additionalFacs);
 				
-				// TODO Need to find a stable way for multi-modal networks
-				LOG.warn("Full network has " + network.getNodes().size() + " nodes.");
-				Network subNetwork = NetworkUtils.createNetwork();
-				Set<String> modeSet = new HashSet<>();
-				if (acg.getIsComputingMode().contains(Modes4Accessibility.car)) {
-					TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
-					modeSet.add(TransportMode.car);
-					filter.filter(subNetwork, modeSet);
-				} else if (acg.getIsComputingMode().contains(Modes4Accessibility.bike)) {
-					TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
-					modeSet.add(TransportMode.car);
-					filter.filter(subNetwork, modeSet);
-				}
-				LOG.warn("sub-network for mode " + modeSet.toString() + " now has " + subNetwork.getNodes().size() + " nodes.");
-
 				String outputDirectory = scenario.getConfig().controler().getOutputDirectory() + "/" + activityType;
-				AccessibilityShutdownListenerV4 accessibilityShutdownListener = new AccessibilityShutdownListenerV4(scenario, measuringPoints, network,
-						opportunities, outputDirectory, acg);
+				AccessibilityShutdownListenerV4 accessibilityShutdownListener = new AccessibilityShutdownListenerV4(scenario, measuringPoints, opportunities, outputDirectory);
 
 				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
 					AccessibilityContributionCalculator calculator;
 					switch(mode) {
 					case bike:
-						calculator = new ConstantSpeedAccessibilityExpContributionCalculator(mode.name(), config, network);
+						calculator = new ConstantSpeedAccessibilityExpContributionCalculator(mode.name(), scenario);
+//                        final TravelTime bikeTravelTime = travelTimes.get(mode.name());
+//                        Gbl.assertNotNull(bikeTravelTime);
+//                        final TravelDisutilityFactory bikeTravelDisutilityFactory = travelDisutilityFactories.get(mode.name());
+//                        calculator = new NetworkModeAccessibilityExpContributionCalculator(bikeTravelTime, bikeTravelDisutilityFactory, scenario, measuringPoints, opportunities);
 						break;
 					case car: {
 						final TravelTime travelTime = travelTimes.get(mode.name());
 						Gbl.assertNotNull(travelTime);
 						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(mode.name());
-						calculator = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario, network, measuringPoints, opportunities);
-//						calculator = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario, carNetwork);
+						calculator = new NetworkModeAccessibilityExpContributionCalculator(travelTime, travelDisutilityFactory, scenario);
 						break; }
 					case freespeed: {
 						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(TransportMode.car);
 						Gbl.assertNotNull(travelDisutilityFactory);
-						calculator = new NetworkModeAccessibilityExpContributionCalculator(new FreeSpeedTravelTime(), travelDisutilityFactory, scenario, network, measuringPoints, opportunities);
-//						calculator = new NetworkModeAccessibilityExpContributionCalculator(new FreeSpeedTravelTime(), travelDisutilityFactory, scenario, carNetwork);
+						calculator = new NetworkModeAccessibilityExpContributionCalculator(new FreeSpeedTravelTime(), travelDisutilityFactory, scenario);
 						break; }
 					case walk:
-						calculator = new ConstantSpeedAccessibilityExpContributionCalculator(mode.name(), config, network);
+						calculator = new ConstantSpeedAccessibilityExpContributionCalculator(mode.name(), scenario);
 						break;
 					case matrixBasedPt:
 						calculator = new LeastCostPathCalculatorAccessibilityContributionCalculator(
-								config.planCalcScore(),	ptMatrix.asPathCalculator(config.planCalcScore()));
+								config.planCalcScore(),	ptMatrix.asPathCalculator(config.planCalcScore()), scenario);
 						break;
 						//$CASES-OMITTED$
 					default:
 //						TravelTime timeCalculator = this.travelTimes.get( mode.toString() ) ;
 //						TravelDisutility travelDisutility = this.travelDisutilityFactories.get(mode.toString()).createTravelDisutility(timeCalculator) ;
-						calculator = new TripRouterAccessibilityContributionCalculator(mode.toString(), tripRouter, config.planCalcScore());
+						calculator = new TripRouterAccessibilityContributionCalculator(mode.toString(), tripRouter, config.planCalcScore(), scenario);
 					}
 					accessibilityShutdownListener.putAccessibilityContributionCalculator(mode.name(), calculator);
+
 
 				}
 
