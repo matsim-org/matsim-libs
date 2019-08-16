@@ -32,7 +32,7 @@ public class AttributesXmlWriterDelegate {
 				if (converted != null) {
 					writer.write(indentation + "\t");
 					writer.write("<attribute name=\"" + XmlUtils.encodeAttributeValue(objAttribute.getKey()) + "\" ");
-					writer.write("class=\"" + clazz.getName() + "\" >");
+					writer.write("class=\"" + clazz.getName() + "\">");
 					writer.write(XmlUtils.encodeContent(converted));
 					writer.write("</attribute>");
 					writer.newLine();
