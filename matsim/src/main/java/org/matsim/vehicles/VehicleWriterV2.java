@@ -52,20 +52,6 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 	public VehicleWriterV2(Vehicles vehicles) {
 		this.vehicleTypes = vehicles.getVehicleTypes();
 		this.vehicles = vehicles.getVehicles();
-//		Map<Class<?>, AttributeConverter<?>> converters = new HashMap<>() ;
-//		AttributeConverter<VehicleType.DoorOperationMode> converter = new AttributeConverter<VehicleType.DoorOperationMode>(){
-//			@Override
-//			public VehicleType.DoorOperationMode convert( String value ){
-//				return VehicleType.DoorOperationMode.valueOf( value ) ;
-//			}
-//
-//			@Override
-//			public String convertToString( Object o ){
-//				return ((VehicleType.DoorOperationMode)o).name() ;
-//			}
-//		} ;
-//		converters.put( VehicleType.DoorOperationMode.class, converter ) ;
-//		this.attributesWriter.putAttributeConverters( converters );
 	}
 
 	public void writeFile(String filename) throws UncheckedIOException, IOException {
@@ -108,12 +94,12 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 			this.writer.write("\n");
 			attributesWriter.writeAttributes( "\t\t" , this.writer , vt.getAttributes() , false);
 
-			//Write vehicleType description, if present TODO: remove line breaks.
+			//Write vehicleType description, if present
 			if (vt.getDescription() != null) {
 				this.writeElement(VehicleSchemaV2Names.DESCRIPTION, vt.getDescription());
 			}
 
-			//TODO Write capacity, if present
+			//Write capacity, if present
 			if (vt.getCapacity() != null) {
 				this.writeCapacity(vt.getCapacity());
 			}
@@ -147,18 +133,10 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 				attributesWriter.writeAttributes( "\t\t\t" , this.writer , vt.getEngineInformation().getAttributes(), false);
 				this.writeEndTag(VehicleSchemaV2Names.ENGINEINFORMATION);
 			}
-//			atts.clear();
-//			atts.add(this.createTuple(VehicleSchemaV2Names.PCE, vt.getPcuEquivalents()));
-//			this.writeStartTag(VehicleSchemaV2Names.PASSENGERCAREQUIVALENTS, atts, true);
-//			if (vt.getNetworkMode() != null) {
-//				atts.clear();
-//				atts.add(this.createTuple(VehicleSchemaV2Names.NETWORKMODE, vt.getNetworkMode()));
-//				this.writeStartTag(VehicleSchemaV2Names.NETWORKMODE, atts, true);
-//			}
 
 			//TODO Write vehicleType costInformation, if present
 
-			//TODO Write passengerCarEquivalents, if present
+			//Write passengerCarEquivalents, if present
 			if (!Double.isNaN(vt.getPcuEquivalents())) {
 				atts.clear();
 				atts.add(this.createTuple(VehicleSchemaV2Names.PCE, vt.getPcuEquivalents()));
