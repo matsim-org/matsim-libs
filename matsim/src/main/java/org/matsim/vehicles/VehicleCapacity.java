@@ -51,11 +51,11 @@ public interface VehicleCapacity extends Attributable {
 	@Deprecated
 	public void setFreightCapacity(FreightCapacity freightCapacity);
 
-	public double getVolumeInCubicMeters();
+	public Double getVolumeInCubicMeters();
 
 	public void setVolumeInCubicMeters(double volumeInCubicMeters);
 
-	public double getWeightInTons();
+	public Double getWeightInTons();
 
 	public void setWeightInTons(double weightInTons);
 

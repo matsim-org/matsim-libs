@@ -68,7 +68,7 @@ public class VehicleCapacityImpl implements VehicleCapacity {
 	}
 
 	@Override
-	public double getVolumeInCubicMeters() {
+	public Double getVolumeInCubicMeters() {
 		return volumeInCubicMeters;
 	}
 
@@ -78,7 +78,7 @@ public class VehicleCapacityImpl implements VehicleCapacity {
 	}
 
 	@Override
-	public double getWeightInTons() {
+	public Double getWeightInTons() {
 		return weightInTons;
 	}
 
