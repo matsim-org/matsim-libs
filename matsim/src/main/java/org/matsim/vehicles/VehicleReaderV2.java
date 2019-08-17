@@ -103,9 +103,9 @@ class VehicleReaderV2 extends MatsimXmlParser{
 				this.currAttributes = this.currentCapacity.getAttributes() ;
 				break;
 			case VehicleSchemaV2Names.COSTINFORMATION:
-				double fixedCostsPerDay = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.FIXEDCOSTSPERDAY ) );
-				double costsPerMeter = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERMETER ) );
-				double costsPerSecond = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERSECOND ) );
+				Double fixedCostsPerDay = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.FIXEDCOSTSPERDAY ) );
+				Double costsPerMeter = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERMETER ) );
+				Double costsPerSecond = Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERSECOND ) );
 				this.currentCostInformation = this.builder.createCostInformation( fixedCostsPerDay, costsPerMeter, costsPerSecond );
 				this.currentVehType.setCostInformation( currentCostInformation );
 				this.currAttributes = this.currentCostInformation.getAttributes();

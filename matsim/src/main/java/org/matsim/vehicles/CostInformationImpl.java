@@ -21,29 +21,29 @@ package org.matsim.vehicles;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public class CostInformationImpl implements CostInformation {
-    private final double fixed ;
-    private final double perMeter;
-    private final double perSecond;
+    private final Double fixed;
+    private final Double perMeter;
+    private final Double perSecond;
     private Attributes attributes = new Attributes() ;
 
-    public CostInformationImpl(double fixed, double perMeter, double perTimeUnit) {
+    public CostInformationImpl(Double fixed, Double perMeter, Double perTimeUnit) {
         this.fixed = fixed;
         this.perMeter = perMeter;
         this.perSecond = perTimeUnit;
     }
 
     @Override
-    public double getFixedCosts() {
+    public Double getFixedCosts() {
         return fixed;
     }
 
     @Override
-    public double getCostsPerMeter() {
+    public Double getCostsPerMeter() {
         return perMeter;
     }
 
     @Override
-    public double getCostsPerSecond() {
+    public Double getCostsPerSecond() {
         return perSecond;
     }
 

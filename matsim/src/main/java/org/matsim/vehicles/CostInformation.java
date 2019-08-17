@@ -23,7 +23,7 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
 
 public interface CostInformation extends Attributable {
 
-    public double getFixedCosts();
-    public double getCostsPerMeter();
-    public double getCostsPerSecond();
+    public Double getFixedCosts();
+    public Double getCostsPerMeter();
+    public Double getCostsPerSecond();
 }
