@@ -135,6 +135,9 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 			}
 
 			//TODO Write vehicleType costInformation, if present
+			if (vt.getCostInformation() != null) {
+				this.writeCostInformation(vt.getCostInformation());
+			}
 
 			//Write passengerCarEquivalents, if present
 			if (!Double.isNaN(vt.getPcuEquivalents())) {
@@ -183,19 +186,22 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 		this.writeEndTag(VehicleSchemaV2Names.CAPACITY);
 	}
 
-	private void writeFreightCapacity(FreightCapacity fc) throws UncheckedIOException {
-		this.writeStartTag(VehicleSchemaV2Names.FREIGHTCAPACITY, null);
-		if ( fc.getVolume() != FreightCapacity.UNDEFINED_VOLUME ) {
-			atts.clear();
-			atts.add(this.createTuple(VehicleSchemaV2Names.VOLUME, Double.toString(fc.getVolume())));
-			this.writeStartTag(VehicleSchemaV2Names.VOLUME, atts, true);
+	private void writeCostInformation(CostInformation costInformation) throws UncheckedIOException, IOException {
+		atts.clear();
+		if (costInformation.getFixedCosts() != null && !Double.isNaN(costInformation.getFixedCosts())) {
+			atts.add(this.createTuple(VehicleSchemaV2Names.FIXEDCOSTSPERDAY, costInformation.getFixedCosts()));
 		}
-		if (fc.getWeight() != FreightCapacity.UNDEFINED_WEIGHT ) {
-			atts.clear();
-			atts.add(this.createTuple(VehicleSchemaV2Names.WEIGHT, Double.toString(fc.getWeight())));
-			this.writeStartTag(VehicleSchemaV2Names.WEIGHT, atts, true);
+		if (costInformation.getCostsPerMeter() != null && !Double.isNaN(costInformation.getCostsPerMeter())) {
+			atts.add(this.createTuple(VehicleSchemaV2Names.COSTSPERMETER, costInformation.getCostsPerMeter()));
 		}
-		this.writeEndTag(VehicleSchemaV2Names.FREIGHTCAPACITY);
+		if (costInformation.getCostsPerSecond() != null && !Double.isNaN(costInformation.getCostsPerSecond())) {
+			atts.add(this.createTuple(VehicleSchemaV2Names.COSTSPERSECOND, costInformation.getCostsPerSecond()));
+		}
+		this.writeStartTag(VehicleSchemaV2Names.COSTINFORMATION, atts);
+		//attributes for capacity
+		this.writer.newLine();
+		attributesWriter.writeAttributes( "\t\t\t" , this.writer , costInformation.getAttributes(), false );
+		this.writeEndTag(VehicleSchemaV2Names.COSTINFORMATION);
 	}
 
 	public void putAttributeConverters(Map<Class<?>, AttributeConverter<?>> converters) {
