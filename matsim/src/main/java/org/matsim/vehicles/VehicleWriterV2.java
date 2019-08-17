@@ -189,7 +189,7 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 		this.writeEndTag(VehicleSchemaV2Names.ENGINEINFORMATION);
 	}
 
-	private void writeCapacity(VehicleCapacity vehicleCapacity) throws UncheckedIOException {
+	private void writeCapacity(VehicleCapacity vehicleCapacity) throws UncheckedIOException, IOException {
 		atts.clear();
 		if (vehicleCapacity.getSeats() != null) {
 			atts.add(this.createTuple(VehicleSchemaV2Names.SEATS, vehicleCapacity.getSeats()));
@@ -206,7 +206,10 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 //			atts.add(this.createTuple(VehicleSchemaV2Names.WEIGHT, vehicleCapacity.getWeightInTons()));
 //		}
 		this.writeStartTag(VehicleSchemaV2Names.CAPACITY, atts);
-		//TODO attributes for capacity
+		//attributes for capacity
+		this.writer.newLine();
+		attributesWriter.writeAttributes( "\t\t" , this.writer , vehicleCapacity.getAttributes() );
+
 		this.writeEndTag(VehicleSchemaV2Names.CAPACITY);
 	}
 
