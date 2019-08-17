@@ -106,7 +106,7 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 
 			//Write general vehicleType attributes
 			this.writer.write("\n");
-			attributesWriter.writeAttributes( "\t\t" , this.writer , vt.getAttributes() );
+			attributesWriter.writeAttributes( "\t\t" , this.writer , vt.getAttributes() , false);
 
 			//Write vehicleType description, if present TODO: remove line breaks.
 			if (vt.getDescription() != null) {
@@ -139,10 +139,14 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 				this.writeStartTag(VehicleSchemaV2Names.MAXIMUMVELOCITY, atts, true);
 			}
 
-			//TODO Write vehicleType engineInformation, if present
-//			if (vt.getEngineInformation() != null) {
-//				this.writeEngineInformation(vt.getEngineInformation());
-//			}
+			//Write vehicleType engineInformation, if present
+			if (vt.getEngineInformation() != null) {
+				atts.clear();
+				this.writeStartTag(VehicleSchemaV2Names.ENGINEINFORMATION, atts);
+				this.writer.newLine();
+				attributesWriter.writeAttributes( "\t\t\t" , this.writer , vt.getEngineInformation().getAttributes(), false);
+				this.writeEndTag(VehicleSchemaV2Names.ENGINEINFORMATION);
+			}
 //			atts.clear();
 //			atts.add(this.createTuple(VehicleSchemaV2Names.PCE, vt.getPcuEquivalents()));
 //			this.writeStartTag(VehicleSchemaV2Names.PASSENGERCAREQUIVALENTS, atts, true);
@@ -180,15 +184,6 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 		}
 	}
 
-	private void writeEngineInformation(EngineInformation ei) throws UncheckedIOException {
-		this.writeStartTag(VehicleSchemaV2Names.ENGINEINFORMATION, null);
-		this.writeStartTag(VehicleSchemaV2Names.FUELTYPE, null);
-		this.writeContent(ei.getFuelType().toString(), false);
-		this.writeEndTag(VehicleSchemaV2Names.FUELTYPE);
-		atts.clear();
-		this.writeEndTag(VehicleSchemaV2Names.ENGINEINFORMATION);
-	}
-
 	private void writeCapacity(VehicleCapacity vehicleCapacity) throws UncheckedIOException, IOException {
 		atts.clear();
 		if (vehicleCapacity.getSeats() != null) {
@@ -206,8 +201,7 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 		this.writeStartTag(VehicleSchemaV2Names.CAPACITY, atts);
 		//attributes for capacity
 		this.writer.newLine();
-		attributesWriter.writeAttributes( "\t\t\t" , this.writer , vehicleCapacity.getAttributes() );
-
+		attributesWriter.writeAttributes( "\t\t\t" , this.writer , vehicleCapacity.getAttributes(), false );
 		this.writeEndTag(VehicleSchemaV2Names.CAPACITY);
 	}
 
