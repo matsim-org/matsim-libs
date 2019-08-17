@@ -49,7 +49,7 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 	private Map<Id<Vehicle>, Vehicle> vehicles;
 
 
-	public VehicleWriterV2(Vehicles vehicles) {
+	VehicleWriterV2(Vehicles vehicles) {
 		this.vehicleTypes = vehicles.getVehicleTypes();
 		this.vehicles = vehicles.getVehicles();
 	}
@@ -101,7 +101,25 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 
 			//Write capacity, if present
 			if (vt.getCapacity() != null) {
-				this.writeCapacity(vt.getCapacity());
+				VehicleCapacity vehicleCapacity = vt.getCapacity();
+				atts.clear();
+				if (vehicleCapacity.getSeats() != null) {
+					atts.add(this.createTuple(VehicleSchemaV2Names.SEATS, vehicleCapacity.getSeats()));
+				}
+				if (vehicleCapacity.getStandingRoom() != null) {
+					atts.add(this.createTuple(VehicleSchemaV2Names.STANDINGROOM, vehicleCapacity.getStandingRoom()));
+				}
+				if (vehicleCapacity.getVolumeInCubicMeters() != null && !Double.isNaN(vehicleCapacity.getVolumeInCubicMeters())) {
+					atts.add(this.createTuple(VehicleSchemaV2Names.VOLUME, vehicleCapacity.getVolumeInCubicMeters()));
+				}
+				if (vehicleCapacity.getWeightInTons() != null && !Double.isNaN(vehicleCapacity.getWeightInTons())) {
+					atts.add(this.createTuple(VehicleSchemaV2Names.WEIGHT, vehicleCapacity.getWeightInTons()));
+				}
+				this.writeStartTag(VehicleSchemaV2Names.CAPACITY, atts);
+				//attributes for capacity
+				this.writer.newLine();
+				attributesWriter.writeAttributes( "\t\t\t" , this.writer , vehicleCapacity.getAttributes(), false );
+				this.writeEndTag(VehicleSchemaV2Names.CAPACITY);
 			}
 
 			//Write length, if present
@@ -134,9 +152,24 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 				this.writeEndTag(VehicleSchemaV2Names.ENGINEINFORMATION);
 			}
 
-			//TODO Write vehicleType costInformation, if present
+			//Write vehicleType costInformation, if present
 			if (vt.getCostInformation() != null) {
-				this.writeCostInformation(vt.getCostInformation());
+				CostInformation costInformation = vt.getCostInformation();
+				atts.clear();
+				if (costInformation.getFixedCosts() != null && !Double.isNaN(costInformation.getFixedCosts())) {
+					atts.add(this.createTuple(VehicleSchemaV2Names.FIXEDCOSTSPERDAY, costInformation.getFixedCosts()));
+				}
+				if (costInformation.getCostsPerMeter() != null && !Double.isNaN(costInformation.getCostsPerMeter())) {
+					atts.add(this.createTuple(VehicleSchemaV2Names.COSTSPERMETER, costInformation.getCostsPerMeter()));
+				}
+				if (costInformation.getCostsPerSecond() != null && !Double.isNaN(costInformation.getCostsPerSecond())) {
+					atts.add(this.createTuple(VehicleSchemaV2Names.COSTSPERSECOND, costInformation.getCostsPerSecond()));
+				}
+				this.writeStartTag(VehicleSchemaV2Names.COSTINFORMATION, atts);
+				//attributes for capacity
+				this.writer.newLine();
+				attributesWriter.writeAttributes( "\t\t\t" , this.writer , costInformation.getAttributes(), false );
+				this.writeEndTag(VehicleSchemaV2Names.COSTINFORMATION);
 			}
 
 			//Write passengerCarEquivalents, if present
@@ -163,45 +196,6 @@ public class VehicleWriterV2 extends MatsimXmlWriter {
 			this.writeEndTag(VehicleSchemaV2Names.VEHICLETYPE);
 			this.writer.write("\n");
 		}
-	}
-
-	private void writeCapacity(VehicleCapacity vehicleCapacity) throws UncheckedIOException, IOException {
-		atts.clear();
-		if (vehicleCapacity.getSeats() != null) {
-			atts.add(this.createTuple(VehicleSchemaV2Names.SEATS, vehicleCapacity.getSeats()));
-		}
-		if (vehicleCapacity.getStandingRoom() != null) {
-			atts.add(this.createTuple(VehicleSchemaV2Names.STANDINGROOM, vehicleCapacity.getStandingRoom()));
-		}
-		if (vehicleCapacity.getVolumeInCubicMeters() != null && !Double.isNaN(vehicleCapacity.getVolumeInCubicMeters())) {
-			atts.add(this.createTuple(VehicleSchemaV2Names.VOLUME, vehicleCapacity.getVolumeInCubicMeters()));
-		}
-		if (vehicleCapacity.getWeightInTons() != null && !Double.isNaN(vehicleCapacity.getWeightInTons())) {
-			atts.add(this.createTuple(VehicleSchemaV2Names.WEIGHT, vehicleCapacity.getWeightInTons()));
-		}
-		this.writeStartTag(VehicleSchemaV2Names.CAPACITY, atts);
-		//attributes for capacity
-		this.writer.newLine();
-		attributesWriter.writeAttributes( "\t\t\t" , this.writer , vehicleCapacity.getAttributes(), false );
-		this.writeEndTag(VehicleSchemaV2Names.CAPACITY);
-	}
-
-	private void writeCostInformation(CostInformation costInformation) throws UncheckedIOException, IOException {
-		atts.clear();
-		if (costInformation.getFixedCosts() != null && !Double.isNaN(costInformation.getFixedCosts())) {
-			atts.add(this.createTuple(VehicleSchemaV2Names.FIXEDCOSTSPERDAY, costInformation.getFixedCosts()));
-		}
-		if (costInformation.getCostsPerMeter() != null && !Double.isNaN(costInformation.getCostsPerMeter())) {
-			atts.add(this.createTuple(VehicleSchemaV2Names.COSTSPERMETER, costInformation.getCostsPerMeter()));
-		}
-		if (costInformation.getCostsPerSecond() != null && !Double.isNaN(costInformation.getCostsPerSecond())) {
-			atts.add(this.createTuple(VehicleSchemaV2Names.COSTSPERSECOND, costInformation.getCostsPerSecond()));
-		}
-		this.writeStartTag(VehicleSchemaV2Names.COSTINFORMATION, atts);
-		//attributes for capacity
-		this.writer.newLine();
-		attributesWriter.writeAttributes( "\t\t\t" , this.writer , costInformation.getAttributes(), false );
-		this.writeEndTag(VehicleSchemaV2Names.COSTINFORMATION);
 	}
 
 	public void putAttributeConverters(Map<Class<?>, AttributeConverter<?>> converters) {
