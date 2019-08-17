@@ -166,7 +166,7 @@ public class DrtRoutingModule implements RoutingModule {
 
 	@Override
 	public StageActivityTypes getStageActivityTypes() {
-		return EmptyStageActivityTypes.INSTANCE;
+		return drtStageActivityType;
 	}
 
 	/**
