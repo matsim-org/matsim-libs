@@ -39,7 +39,7 @@ public class TripRouterModule extends AbstractModule {
 	    // yy The code below will install _one_ LeastCostPathCalculator, which will be Dijkstra or Landmarks or something.  It will be the
 	    // same Landmarks instance for all modes ... although one could do better by doing the preprocessing separately for the different modes.
 	    // kai/mm, jan'17
-	    
+
         bind(TripRouter.class); // not thread-safe, not a singleton
         bind(MainModeIdentifier.class).to(MainModeIdentifierImpl.class);
         install(new LeastCostPathCalculatorModule());
@@ -72,5 +72,6 @@ public class TripRouterModule extends AbstractModule {
             }
             addRoutingModuleBinding(TransportMode.transit_walk).to(Key.get(RoutingModule.class, Names.named(TransportMode.walk)));
         }
+        addRoutingModuleBinding( "fallback" ).to( FallbackRoutingModule.class) ;
     }
 }

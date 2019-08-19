@@ -263,7 +263,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	}
 
 
-	private static double routeBushwhackingLeg(Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime,
+	static double routeBushwhackingLeg(Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime,
 			Id<Link> dpLinkId, Id<Link> arLinkId, PopulationFactory pf) {
 		// I don't think that it makes sense to use a RoutingModule for this, since that again makes assumptions about how to
 		// map facilities, and if you follow through to the teleportation routers one even finds activity wrappers, which is yet another
