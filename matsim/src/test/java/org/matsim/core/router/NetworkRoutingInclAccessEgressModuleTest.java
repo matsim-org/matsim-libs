@@ -18,8 +18,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.ReplanningEvent;
-import org.matsim.core.controler.listener.ReplanningListener;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleCapacity;
@@ -28,6 +27,9 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehiclesFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.junit.Assert.assertEquals;
 
 public class NetworkRoutingInclAccessEgressModuleTest {
 
@@ -37,6 +39,10 @@ public class NetworkRoutingInclAccessEgressModuleTest {
     private static final Coord WORK = new Coord(11100, 0);
     private static final String FAST_MODE = "fast-mode";
     private static final String SLOW_MODE = "slow-mode";
+    private static final String START_LINK = "start-link";
+    private static final String END_LINK = "end-link";
+    private static final String SLOW_BUT_DIRECT_LINK = "slow-but-direct-link";
+    private static final String FAST_BUT_LONGER_LINK = "fast-but-longer-link";
 
     @Rule
     public MatsimTestUtils utils = new MatsimTestUtils();
@@ -49,52 +55,59 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         NetworkFactory factory = network.getFactory();
         Node n1 = factory.createNode(Id.create("1", Node.class), HOME);
         Node n2 = factory.createNode(Id.create("2", Node.class), new Coord(HOME.getX() + 50, HOME.getY()));
-        Node n3 = factory.createNode(Id.create("3", Node.class), new Coord(WORK.getX() - 50, WORK.getY()));
-        Node n4 = factory.createNode(Id.create("4", Node.class), WORK);
+        Node n3 = factory.createNode(Id.create("3", Node.class), new Coord((WORK.getX() - HOME.getX()) / 2, HOME.getY() - 1000));
+        Node n4 = factory.createNode(Id.create("4", Node.class), new Coord(WORK.getX() - 50, WORK.getY()));
+        Node n5 = factory.createNode(Id.create("5", Node.class), WORK);
         network.addNode(n1);
         network.addNode(n2);
         network.addNode(n3);
         network.addNode(n4);
-        Link startLink = factory.createLink(Id.createLinkId("start"), n1, n2);
-        Link directButSlow = factory.createLink(Id.create("slow-link", Link.class), n2, n3);
-        Link longButFast = factory.createLink(Id.create("fast-link", Link.class), n2, n3);
-        Link endLInk = factory.createLink(Id.createLinkId("end"), n3, n4);
-        startLink.setAllowedModes(modes);
-        directButSlow.setAllowedModes(modes);
-        longButFast.setAllowedModes(modes);
-        endLInk.setAllowedModes(modes);
-        startLink.setFreespeed(FAST_SPEED);
-        directButSlow.setFreespeed(SLOW_SPEED);
-        longButFast.setFreespeed(FAST_SPEED);
-        endLInk.setFreespeed(FAST_SPEED);
+        network.addNode(n5);
 
-        startLink.setLength(50);
-        directButSlow.setLength(11000);
-        longButFast.setLength(100000.0);
-        endLInk.setLength(50);
+        Link startLink = createLink(START_LINK, n1, n2, 50, FAST_SPEED, modes, factory);
         network.addLink(startLink);
+
+        Link directButSlow = createLink(SLOW_BUT_DIRECT_LINK, n2, n4, 11000, SLOW_SPEED, modes, factory);
         network.addLink(directButSlow);
-        network.addLink(longButFast);
+
+        // split the fast link into two pieces to form a triangle. Thus, one could visually examine the separate links
+        Link longButFast1 = createLink(FAST_BUT_LONGER_LINK + "-1", n2, n3, 6000, FAST_SPEED, modes, factory);
+        network.addLink(longButFast1);
+        Link longButFast2 = createLink(FAST_BUT_LONGER_LINK + "-2", n3, n4, 6000, FAST_SPEED, modes, factory);
+        network.addLink(longButFast2);
+
+        Link endLInk = createLink(END_LINK, n4, n5, 50, FAST_SPEED, modes, factory);
         network.addLink(endLInk);
+
         return scenario;
     }
 
-    private static Person createPerson(String id, Coord homeCoord, Coord workCoord, String mode, PopulationFactory factory) {
+    private static Link createLink(String id, Node from, Node to, double length, double freespeed, Set<String> modes, NetworkFactory factory) {
+
+        Link link = factory.createLink(Id.createLinkId(id), from, to);
+        link.setLength(length);
+        link.setFreespeed(freespeed);
+        link.setAllowedModes(modes);
+        link.setCapacity(100000); // get capacity constraints out of the way
+        return link;
+    }
+
+    private static Person createPerson(String id, String mode, PopulationFactory factory) {
 
         Person person = factory.createPerson(Id.createPersonId(id));
 
         Plan plan = factory.createPlan();
-        Activity home1 = factory.createActivityFromCoord("home", homeCoord);
+        Activity home1 = factory.createActivityFromCoord("home", HOME);
         home1.setEndTime(0);
-        home1.setLinkId(Id.createLinkId("start"));
+        home1.setLinkId(Id.createLinkId(START_LINK));
         plan.addActivity(home1);
 
         Leg toWork = factory.createLeg(mode);
         plan.addLeg(toWork);
 
-        Activity work = factory.createActivityFromCoord("work", workCoord);
+        Activity work = factory.createActivityFromCoord("work", WORK);
         work.setEndTime(300);
-        work.setLinkId(Id.createLinkId("end"));
+        work.setLinkId(Id.createLinkId(END_LINK));
         plan.addActivity(work);
 
         person.addPlan(plan);
@@ -102,33 +115,41 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         return person;
     }
 
-    private static VehicleType createVehicleType(String name, double maxVelocity, int capacity, VehiclesFactory factory) {
+    private static VehicleType createVehicleType(String name, double maxVelocity, VehiclesFactory factory) {
 
         VehicleType result = factory.createVehicleType(Id.create(name, VehicleType.class));
         VehicleCapacity vehicleCapacity = new VehicleCapacityImpl();
-        vehicleCapacity.setSeats(capacity);
+        vehicleCapacity.setSeats(1);
         result.setCapacity(vehicleCapacity);
         result.setMaximumVelocity(maxVelocity);
         return result;
     }
 
+    private static List<Id<Link>> getNetworkRoute(List<PlanElement> elements) {
+        return elements.stream()
+                .filter(element -> element instanceof Leg)
+                .map(element -> (Leg) element)
+                .filter(leg -> !leg.getMode().equals(TransportMode.non_network_walk))
+                .flatMap(leg -> ((NetworkRoute) leg.getRoute()).getLinkIds().stream())
+                .collect(Collectors.toList());
+    }
+
     @Test
-    public void calcRoute() {
+    public void calcRoute_speedOfIndividualVehicle() {
 
         Scenario scenario = createScenario();
 
         // add vehicle types
-        VehicleType slowType = createVehicleType(SLOW_MODE, SLOW_SPEED, 1, scenario.getVehicles().getFactory());
-        VehicleType fastType = createVehicleType(FAST_MODE, FAST_SPEED, 1, scenario.getVehicles().getFactory());
+        VehicleType slowType = createVehicleType(SLOW_MODE, SLOW_SPEED, scenario.getVehicles().getFactory());
+        VehicleType fastType = createVehicleType(FAST_MODE, FAST_SPEED, scenario.getVehicles().getFactory());
 
         scenario.getVehicles().addVehicleType(slowType);
         scenario.getVehicles().addVehicleType(fastType);
 
         // add persons
-        Person slowPerson = createPerson("slow-person", HOME, WORK, slowType.getId().toString(), scenario.getPopulation().getFactory());
-        Person fastPerson = createPerson("fast-person", HOME, WORK, fastType.getId().toString(), scenario.getPopulation().getFactory());
-
+        Person slowPerson = createPerson("slow-person", slowType.getId().toString(), scenario.getPopulation().getFactory());
         scenario.getPopulation().addPerson(slowPerson);
+        Person fastPerson = createPerson("fast-person", fastType.getId().toString(), scenario.getPopulation().getFactory());
         scenario.getPopulation().addPerson(fastPerson);
 
         // set up a config
@@ -166,28 +187,31 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         replanning.setWeight(1.0);
         scenario.getConfig().strategy().addStrategySettings(replanning);
 
+        // set up a controler with individual main mode identifier at the point of this writing the default one seems broken
         Controler controler = new Controler(scenario);
-
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
                 bind(MainModeIdentifier.class).to(SimpleMainModeIdentifier.class);
             }
         });
-
-        controler.addControlerListener(new ReplanningListener() {
-            @Override
-            public void notifyReplanning(ReplanningEvent event) {
-                System.out.println(event.toString());
-            }
-        });
         controler.run();
 
-        // get the output here and assert, that the two persons have taken the right path
+        // Assert that the slow agent takes the direct route
+        List<Id<Link>> slowLinkIds = getNetworkRoute(slowPerson.getSelectedPlan().getPlanElements());
+        assertEquals(1, slowLinkIds.size());
+        assertEquals(Id.createLinkId(SLOW_BUT_DIRECT_LINK), slowLinkIds.get(0));
 
-
+        // assert that the fast agent takes the longer route with higher speed
+        List<Id<Link>> fastLinkIds = getNetworkRoute(fastPerson.getSelectedPlan().getPlanElements());
+        assertEquals(2, fastLinkIds.size());
+        assertEquals(Id.createLinkId(FAST_BUT_LONGER_LINK + "-1"), fastLinkIds.get(0));
+        assertEquals(Id.createLinkId(FAST_BUT_LONGER_LINK + "-2"), fastLinkIds.get(1));
     }
 
+    /**
+     * returns the mode of the first leg in a plan, which is not a non_network_mode
+     */
     private static class SimpleMainModeIdentifier implements MainModeIdentifier {
 
         @Override
@@ -195,6 +219,7 @@ public class NetworkRoutingInclAccessEgressModuleTest {
             return tripElements.stream()
                     .filter(element -> element instanceof Leg)
                     .map(element -> (Leg) element)
+                    .filter(leg -> !leg.getMode().equals(TransportMode.non_network_walk))
                     .map(Leg::getMode)
                     .findFirst()
                     .orElseThrow(() -> new RuntimeException("could not find main mode"));

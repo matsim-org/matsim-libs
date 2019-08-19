@@ -95,30 +95,6 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			throw new RuntimeException("trying to use access/egress but not switched on in config.  "
 					+ "currently not supported; there are too many other problems") ;
 		}
-
-		// yyyyyy the following is a quick fix until Janek hopefully comes along with using the "true" vehicles.  kai, jun'19
-	/*	switch( scenario.getConfig().qsim().getVehiclesSource() ) {
-			// yyyyyy it is confusing that this comes out of a qsim config group!  The config option would better be in the "vehicles" config group.
-			//  kai, jun'19
-			case defaultVehicle: {
-				VehicleType proxyVehicleType = VehicleUtils.getDefaultVehicleType();
-				proxyVehicle = scenario.getVehicles().getFactory().createVehicle( Id.createVehicleId( "proxyVehicle" ), proxyVehicleType );
-				break; }
-			case modeVehicleTypesFromVehiclesData: {
-				VehicleType proxyVehicleType = scenario.getVehicles().getVehicleTypes().get( Id.create( mode, VehicleType.class ) );
-				if ( proxyVehicleType==null ) {
-					throw new RuntimeException( "there is no mode vehicle type for mode=" + mode + " although vehiclesSource is set to " +
-											"modeVehicleTypesFromVehiclesData" ) ;
-				}
-				proxyVehicle = scenario.getVehicles().getFactory().createVehicle( Id.createVehicleId( "proxyVehicle" ), proxyVehicleType );
-				// (note: the network router is by mode, so we only need one mode vehicle here.  kai, jun'19)
-				break; }
-			case fromVehiclesData:
-				proxyVehicle = null ;
-				break;
-			default:
-				throw new IllegalStateException( "Unexpected value: " + scenario.getConfig().qsim().getVehiclesSource() );
-		}*/
 	}
 
 	@Override
@@ -280,7 +256,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 
 	/*package (Tests)*/ double routeLeg(Person person, Leg leg, Link fromLink, Link toLink, double depTime) {
-		double travTime = 0;
+		double travTime;
 
 		Node startNode = fromLink.getToNode();	// start at the end of the "current" link
 		Node endNode = toLink.getFromNode(); // the target is the start of the link
@@ -288,7 +264,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 		if (toLink != fromLink) { // (a "true" route)
 
-			Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(person, leg.getMode(), this.scenario.getConfig());
+			Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(person, leg.getMode());
 			Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId);
 			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, vehicle);
 			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
@@ -316,5 +292,4 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 		return travTime;
 	}
-
 }

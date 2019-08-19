@@ -50,7 +50,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 
 public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim {
@@ -140,15 +139,11 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		// using car only network to get the links for facilities. Amit July'18
 		XY2LinksForFacilities.run(carOnlyNetwork, this.activityFacilities);
 
-		// make sure all routes are calculated.
-		// At least xy2links is needed here, i.e. earlier than PrepareForMobsimImpl.  It could, however, presumably be separated out
-		// (i.e. we introduce a separate PersonPrepareForMobsim).  kai, jul'18
-		ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(),
-                () -> new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, carOnlyNetwork)
-		);
+
 
 		// yyyy from a behavioral perspective, the vehicle must be somehow linked to
 		// the person (maybe via the household).    kai, feb'18
+		// each agent receives a vehicle for each main mode now. janek, aug'19
 		
 		switch( qSimConfigGroup.getVehiclesSource() ) {
 			case defaultVehicle:
@@ -161,6 +156,14 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 			default:
 				throw new RuntimeException( Gbl.NOT_IMPLEMENTED ) ;
 		}
+
+		// make sure all routes are calculated.
+		// the above creation of vehicles per agent has to be run before executing the initial routing here. janek, aug'19
+		// At least xy2links is needed here, i.e. earlier than PrepareForMobsimImpl.  It could, however, presumably be separated out
+		// (i.e. we introduce a separate PersonPrepareForMobsim).  kai, jul'18
+		ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(),
+				() -> new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, carOnlyNetwork)
+		);
 		
 		if (scenario instanceof Lockable) {
 			((Lockable)scenario).setLocked();
@@ -185,16 +188,9 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	private void createAndAddVehiclesForEveryNetworkMode(final Map<String, VehicleType> modeVehicleTypes) {
 		for ( Person person : scenario.getPopulation().getPersons().values()) {
 			for (String mode : scenario.getConfig().qsim().getMainModes()) {
-				Id<Vehicle> vehicleId = VehicleUtils.getVehicleId(person, mode, this.scenario.getConfig());
+				Id<Vehicle> vehicleId = VehicleUtils.createVehicleId(person, mode, this.scenario.getConfig());
 				createAndAddVehicleIfNotPresent(vehicleId, modeVehicleTypes.get(mode));
-
-				Map<String, Id<Vehicle>> map = (Map<String, Id<Vehicle>>) person.getAttributes().getAttribute( "vehicles" );
-				if ( map==null ) {
-					list = ... ;
-					map = ... ;
-				}
-				map.put(mode, ....) ;
-				person.getAttributes().putAttribute(  ) ;
+				VehicleUtils.insertVehicleIdIntoAttributes(person, mode, vehicleId);
 			}
 		}
 	}
