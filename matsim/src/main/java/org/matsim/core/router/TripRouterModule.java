@@ -74,6 +74,6 @@ public class TripRouterModule extends AbstractModule {
         }
 //        addRoutingModuleBinding( FallbackRoutingModule._fallback ).to( FallbackRoutingModule.class ) ;
 
-        this.bind( FallbackRoutingModuleDefaultImpl.class ).to( FallbackRoutingModuleDefaultImpl.class ) ;
+        this.bind( FallbackRoutingModule.class ).to( FallbackRoutingModuleDefaultImpl.class ) ;
     }
 }
