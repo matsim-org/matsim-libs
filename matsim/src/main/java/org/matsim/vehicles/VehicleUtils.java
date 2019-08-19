@@ -144,6 +144,7 @@ public class VehicleUtils {
 	//TODO: Remove here, because we now let in engineInformation as seperate field?
 	public static void setEngineInformation(VehicleType vehicleType, EngineInformation.FuelType fuelType, double literPerMeter){
 		vehicleType.setEngineInformation(new EngineInformationImpl(fuelType));
+		setHbefaTechnology(vehicleType.getEngineInformation(), fuelType.toString());
 		setFuelConsumption(vehicleType, literPerMeter);
 	}
 
