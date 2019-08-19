@@ -19,10 +19,7 @@
 package org.matsim.contrib.roadpricing.run;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.roadpricing.RoadPricingConfigGroup;
-import org.matsim.contrib.roadpricing.RoadPricingSchemeUsingTollFactor;
-import org.matsim.contrib.roadpricing.RoadPricingUtils;
-import org.matsim.contrib.roadpricing.TollFactor;
+import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -73,13 +70,14 @@ public class RunRoadPricingUsingTollFactorExample {
 
 		// instantiate the road pricing scheme, with the toll factor inserted:
 		URL roadpricingUrl = IOUtils.newUrl(config.getContext(), rpConfig.getTollLinksFile());
-		RoadPricingSchemeUsingTollFactor scheme = new RoadPricingSchemeUsingTollFactor(roadpricingUrl.getFile(), tollFactor);
+		RoadPricingSchemeUsingTollFactor.createAndRegisterRoadPricingSchemeUsingTollFactor(roadpricingUrl, tollFactor, scenario );
+
 
 		// instantiate the control(l)er:
 		Controler controler = new Controler(scenario);
 
 		// add the road pricing module, with our scheme from above inserted:
-		controler.addOverridingModule(RoadPricingUtils.createModule(scheme));
+		controler.addOverridingModule( new RoadPricingModule() );
 
 		// run everything:
 		controler.run();

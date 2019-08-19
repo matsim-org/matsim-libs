@@ -24,14 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -40,14 +33,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -71,6 +57,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
@@ -1093,4 +1080,25 @@ public final class PopulationUtils {
 		boolean result = PopulationUtils.equalPopulation( population1, population2 );
 		return result ;
 	}
+
+	// ---
+
+	public static Object getPersonAttribute(HasPlansAndId person, String key) {
+		if ( person instanceof Attributable ){
+			return ((Attributable) person).getAttributes().getAttribute( key );
+		}
+		return null;
+	}
+	public static void putPersonAttribute( Person person, String key, Object value ) {
+		person.getAttributes().putAttribute( key, value ) ;
+	}
+	public static Object removePersonAttribute( Person person, String key ) {
+		return person.getAttributes().removeAttribute( key );
+	}
+	@Deprecated  // this command is a bit dangerous, since it might clear someone else's attributes.  Maybe best don't use.  kai, may'19
+	public static void removePersonAttributes( Person person, Population population ) {
+		//population.getPersonAttributes().removeAllAttributesDirectly( person.getId().toString() );
+		person.getAttributes().clear();
+	}
+
 }

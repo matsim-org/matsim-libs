@@ -19,10 +19,7 @@ package org.matsim.contrib.roadpricing.run;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.roadpricing.RoadPricingConfigGroup;
-import org.matsim.contrib.roadpricing.RoadPricingScheme;
-import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl;
-import org.matsim.contrib.roadpricing.RoadPricingUtils;
+import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -49,20 +46,51 @@ public class RunRoadPricingFromCode {
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setLastIteration(10);
 
+		// prepare scenario:
+
 		Scenario sc = ScenarioUtils.loadScenario(config);
+
+		createCustomRoadPricingScheme(sc);
+
+		// prepare controler:
 
 		Controler controler = new Controler(sc);
 
-		RoadPricingScheme scheme = createCustomRoadPricingScheme();
+		controler.addOverridingModule( new RoadPricingModule() );
 
-		controler.addOverridingModule(RoadPricingUtils.createModule(scheme));
+		// run controler:
+
+		controler.run();
+	}
+
+	private static void runFromFile(String[] args){
+		// yyyyyy this method is now totally in the wrong class!  kai, jul'19
+
+		if(args.length==0){ args = new String[]{TEST_CONFIG}; }
+
+		/* Start with a known config file (with population, network, and scoring
+		parameteres specified) and just remove the road pricing file. */
+		Config config = ConfigUtils.loadConfig(args[0], RoadPricingUtils.createConfigGroup());
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setLastIteration(10);
+
+		// prepare scenario:
+
+		Scenario sc = ScenarioUtils.loadScenario(config);
+		RoadPricingUtils.loadRoadPricingScheme( sc );
+
+		// prepare scenario:
+
+		Controler controler = new Controler(sc);
+
+		controler.addOverridingModule( new RoadPricingModule() );
 
 		controler.run();
 	}
 
 
-	private static RoadPricingScheme createCustomRoadPricingScheme(){
-		RoadPricingSchemeImpl scheme = RoadPricingUtils.createMutableScheme();
+	private static void createCustomRoadPricingScheme( Scenario scenario){
+		RoadPricingSchemeImpl scheme = RoadPricingUtils.createAndRegisterMutableScheme(scenario );
 
 		/* Configure roadpricing scheme. */
 		RoadPricingUtils.setName(scheme, "custom");
@@ -84,6 +112,5 @@ public class RunRoadPricingFromCode {
 				Time.parseTime("10:00:00"),
 				10.0);
 
-		return scheme;
 	}
 }

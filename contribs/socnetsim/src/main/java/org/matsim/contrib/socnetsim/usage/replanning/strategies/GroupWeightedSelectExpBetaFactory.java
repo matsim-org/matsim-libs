@@ -62,7 +62,7 @@ public class GroupWeightedSelectExpBetaFactory extends NonInnovativeStrategyFact
 							MatsimRandom.getLocalInstance(),
 							sc.getConfig().planCalcScore().getBrainExpBeta()),
 						 configGroup.getWeightAttributeName(),
-						 sc.getPopulation().getPersonAttributes() ) );
+						 sc.getPopulation() ) );
 
 	}
 

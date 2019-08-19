@@ -129,6 +129,11 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 					}
 				} else if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
+					// access_walk and egress_walk were replaced by non_network_walk
+					if (leg.getMode().equals("access_walk") || leg.getMode().equals("egress_walk")) {
+						leg.setMode(TransportMode.non_network_walk);
+					}
+					
 					if (leg.getRoute() == null) {
 						needsReRoute = true;
 					} else if (Double.isNaN(leg.getRoute().getDistance())){

@@ -65,7 +65,7 @@ public class RoadPricingControlerIT {
 		Controler controler2 = new Controler(config);
 		/* FIXME Check if the following is correct, jwj '19. What's the difference? */
 //		controler2.setModules(new RoadPricingModuleDefaults());
-		controler2.addOverridingModule(RoadPricingUtils.createModule());
+		controler2.addOverridingModule( new RoadPricingModule() );
 		controler2.getConfig().controler().setCreateGraphs(false);
 		controler2.getConfig().controler().setDumpDataAtEnd(false);
 		controler2.getConfig().controler().setWriteEventsInterval(0);

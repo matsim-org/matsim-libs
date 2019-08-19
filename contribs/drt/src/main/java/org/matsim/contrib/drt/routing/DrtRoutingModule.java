@@ -19,8 +19,13 @@
 
 package org.matsim.contrib.drt.routing;
 
-import com.google.inject.name.Named;
-import org.apache.log4j.Level;
+import static org.matsim.core.router.NetworkRoutingInclAccessEgressModule.addBushwhackingLegFromFacilityToLinkIfNecessary;
+import static org.matsim.core.router.NetworkRoutingInclAccessEgressModule.addBushwhackingLegFromLinkToFacilityIfNecessary;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -34,21 +39,19 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.router.*;
+import org.matsim.core.router.EmptyStageActivityTypes;
+import org.matsim.core.router.FastAStarEuclideanFactory;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import static org.matsim.core.router.NetworkRoutingInclAccessEgressModule.*;
+import com.google.inject.name.Named;
 
 /**
  * @author jbischoff
@@ -163,7 +166,7 @@ public class DrtRoutingModule implements RoutingModule {
 
 	@Override
 	public StageActivityTypes getStageActivityTypes() {
-		return EmptyStageActivityTypes.INSTANCE;
+		return drtStageActivityType;
 	}
 
 	/**

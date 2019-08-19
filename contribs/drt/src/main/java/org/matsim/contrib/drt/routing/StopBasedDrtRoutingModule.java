@@ -51,7 +51,7 @@ import com.google.inject.name.Named;
  * @author michalm (Michal Maciejewski)
  */
 public class StopBasedDrtRoutingModule implements RoutingModule {
-	private static final Logger LOGGER = Logger.getLogger(StopBasedDrtRoutingModule.class);
+	private static final Logger logger = Logger.getLogger(StopBasedDrtRoutingModule.class);
 
 	public interface AccessEgressStopFinder {
 		Pair<TransitStopFacility, TransitStopFacility> findStops(Facility fromFacility, Facility toFacility);
@@ -142,7 +142,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 
 	private void printWarning(Supplier<String> supplier) {
 		if (drtCfg.isPrintDetailedWarnings()) {
-			Logger.getLogger(getClass()).warn(supplier.get());
+			logger.warn(supplier.get());
 		}
 	}
 

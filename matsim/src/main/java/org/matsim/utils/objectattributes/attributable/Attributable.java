@@ -25,5 +25,6 @@
  * @author thibautd
  */
 public interface Attributable {
+
 	Attributes getAttributes();
 }

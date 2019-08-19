@@ -47,16 +47,16 @@ import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
  *
  * @author mrieser
  */
-public final class CalcAverageTolledTripLength implements LinkEnterEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+final class CalcAverageTolledTripLength implements LinkEnterEventHandler, PersonArrivalEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(CalcAverageTolledTripLength.class);
 
 	private double sumLength = 0.0;
 	private int cntTrips = 0;
-	private RoadPricingScheme scheme = null;
-	private Network network = null;
-	private TreeMap<Id<Person>, Double> agentDistance = null;
+	private RoadPricingScheme scheme;
+	private Network network;
+	private TreeMap<Id<Person>, Double> agentDistance;
 
 	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 	

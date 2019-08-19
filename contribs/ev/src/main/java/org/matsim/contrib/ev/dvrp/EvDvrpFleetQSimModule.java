@@ -23,54 +23,37 @@ package org.matsim.contrib.ev.dvrp;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleImpl;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.fleet.FleetReader;
 import org.matsim.contrib.dvrp.fleet.FleetSpecification;
-import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
 import org.matsim.contrib.dvrp.fleet.Fleets;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.ev.fleet.ElectricFleet;
-import org.matsim.core.config.ConfigGroup;
 
 import com.google.inject.Inject;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class EvDvrpFleetModule extends AbstractDvrpModeModule {
-	private final String file;
-
-	public EvDvrpFleetModule(String mode, String file) {
+public class EvDvrpFleetQSimModule extends AbstractDvrpModeQSimModule {
+	public EvDvrpFleetQSimModule(String mode) {
 		super(mode);
-		this.file = file;
 	}
 
 	@Override
-	public void install() {
-		bindModal(FleetSpecification.class).toProvider(() -> {
-			FleetSpecificationImpl fleetSpecification = new FleetSpecificationImpl();
-			new FleetReader(fleetSpecification).parse(ConfigGroup.getInputFileURL(getConfig().getContext(), file));
-			return fleetSpecification;
-		}).asEagerSingleton();
+	public void configureQSim() {
+		bindModal(Fleet.class).toProvider(new ModalProviders.AbstractProvider<Fleet>(getMode()) {
+			@Inject
+			private ElectricFleet evFleet;
 
-		installQSimModule(new AbstractDvrpModeQSimModule(getMode()) {
 			@Override
-			protected void configureQSim() {
-				bindModal(Fleet.class).toProvider(new ModalProviders.AbstractProvider<Fleet>(getMode()) {
-					@Inject
-					private ElectricFleet evFleet;
+			public Fleet get() {
+				FleetSpecification fleetSpecification = getModalInstance(FleetSpecification.class);
+				Network network = getModalInstance(Network.class);
+				return Fleets.createCustomFleet(fleetSpecification,
+						s -> EvDvrpVehicle.create(new DvrpVehicleImpl(s, network.getLinks().get(s.getStartLinkId())),
+								evFleet));
 
-					@Override
-					public Fleet get() {
-						FleetSpecification fleetSpecification = getModalInstance(FleetSpecification.class);
-						Network network = getModalInstance(Network.class);
-						return Fleets.createCustomFleet(fleetSpecification, s -> EvDvrpVehicle.create(
-								new DvrpVehicleImpl(s, network.getLinks().get(s.getStartLinkId())), evFleet));
-
-					}
-				}).asEagerSingleton();
 			}
-		});
+		}).asEagerSingleton();
 	}
 }

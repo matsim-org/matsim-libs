@@ -32,7 +32,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.NumberAxis;
@@ -595,7 +595,7 @@ public class CreateAutomatedFDTest {
 		JFreeChart chart = new JFreeChart("Fundamental diagrams", JFreeChart.DEFAULT_TITLE_FONT, plot, true);
 
 		try {
-			ChartUtilities.saveChartAsPNG(new File(outFile), chart, 800, 600);
+			ChartUtils.saveChartAsPNG(new File(outFile), chart, 800, 600);
 		} catch (IOException e) {
 			throw new RuntimeException("Data is not plotted. Reason "+e);
 		}

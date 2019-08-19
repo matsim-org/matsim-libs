@@ -84,7 +84,7 @@ class DCScoringFunctionFactory implements ScoringFunctionFactory {
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
 		
 		if (this.usingIndividualScoringParameters) {
-			ScoringParameters scoringParameters = new ScoringParameters.Builder(this.scenario, person.getId()).build();
+			ScoringParameters scoringParameters = new ScoringParameters.Builder(this.scenario, person ).build();
 			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(scoringParameters, this.scenario.getNetwork(), this.scenario.getConfig().transit().getTransitModes()));
 			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(scoringParameters));
 		} else {

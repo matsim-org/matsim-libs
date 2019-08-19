@@ -23,7 +23,6 @@ package org.matsim.core.scoring.functions;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.MatsimParameters;
@@ -31,6 +30,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
+import org.matsim.core.population.PopulationUtils;
 
 public class ScoringParameters implements MatsimParameters {
 
@@ -97,14 +97,14 @@ public class ScoringParameters implements MatsimParameters {
 
 		public Builder(
 				final Scenario scenario,
-				final Id<Person> person ) {
+				final Person person ) {
 			this(
 					scenario.getConfig().planCalcScore(),
 					scenario.getConfig().planCalcScore().getScoringParameters(
 							(String)
-									scenario.getPopulation().getPersonAttributes().getAttribute(
-											person.toString(),
-											scenario.getConfig().plans().getSubpopulationAttributeName() ) ),
+									PopulationUtils.getPersonAttribute(
+										  person, scenario.getConfig().plans().getSubpopulationAttributeName()
+														    ) ),
 					scenario.getConfig().scenario() );
 		}
 
