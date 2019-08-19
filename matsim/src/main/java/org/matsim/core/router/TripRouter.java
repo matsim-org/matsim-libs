@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -64,6 +63,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 	private final Map<String, RoutingModule> routingModules = new HashMap<>();
 	
 	private final CompositeStageActivityTypes checker = new CompositeStageActivityTypes();
+	private final FallbackRoutingModule fallbackRoutingModule;
 
 	private MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
 
@@ -74,6 +74,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 	public static final class Builder {
 		private final Config config;
 		private MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
+		private FallbackRoutingModule fallbackRoutingModule = new FallbackRoutingModuleDefaultImpl() ;
 		private Map<String, Provider<RoutingModule>> routingModuleProviders = new LinkedHashMap<>() ;
 		public Builder( Config config ) {
 			this.config = config ;
@@ -93,7 +94,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 			return this ;
 		}
 		public TripRouter build() {
-			return new TripRouter( routingModuleProviders, mainModeIdentifier, config ) ;
+			return new TripRouter( routingModuleProviders, mainModeIdentifier, config, fallbackRoutingModule ) ;
 		}
 	}
 
@@ -106,7 +107,9 @@ public final class TripRouter implements MatsimExtensionPoint {
 //	// kai, sep'16
 
 	@Inject
-	TripRouter( Map<String, Provider<RoutingModule>> routingModuleProviders, MainModeIdentifier mainModeIdentifier, Config config ) {
+	TripRouter( Map<String, Provider<RoutingModule>> routingModuleProviders, MainModeIdentifier mainModeIdentifier, Config config,
+			FallbackRoutingModule fallbackRoutingModule ) {
+		this.fallbackRoutingModule = fallbackRoutingModule;
 
 		for (Map.Entry<String, Provider<RoutingModule>> entry : routingModuleProviders.entrySet()) {
 			setRoutingModule(entry.getKey(), entry.getValue().get());
@@ -228,13 +231,9 @@ public final class TripRouter implements MatsimExtensionPoint {
 
 			if ( trip == null ) {
 				//				throw new NullPointerException( "Routing module "+module+" returned a null Trip for main mode "+mainMode );
-				module = routingModules.get( FallbackRoutingModule._fallback) ;
-				if ( module==null ) {
-					throw new NullPointerException( "Routing module "+module+" returned a null Trip for main mode "+mainMode );
-				}
-				trip = module.calcRoute( fromFacility, toFacility, departureTime, person ) ;
+				trip = fallbackRoutingModule.calcRoute( fromFacility, toFacility, departureTime, person ) ;
 				for( Leg leg : TripStructureUtils.getLegs( trip ) ){
-					leg.setMode( mainMode + FallbackRoutingModule._fallback );
+					leg.setMode( mainMode + FallbackRoutingModuleDefaultImpl._fallback );
 				}
 			}
 			return trip;
