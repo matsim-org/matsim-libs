@@ -35,7 +35,7 @@ public class EngineInformationImpl implements EngineInformation {
 	 * @deprecated litersPerMeter were not longer set here.
 	 * Please use EngineInformationImpl(FuelType fueltype) instead if you want to set the FuelType only (recommended)
 	 * Please use VehicleUtils.setEngineInformation(...) instead if you also want to set FuelType and FuelConsumption (no longer recommended,
-	 * because we want to have the FuelConsumption comming from the emissions contrib). This FuelConsumption here is only a very rough estimation
+	 * because we want to have the FuelConsumption coming from the emissions contrib). This FuelConsumption here is only a very rough estimation
 	 * without traffic condition.
 	 */
 	@Deprecated

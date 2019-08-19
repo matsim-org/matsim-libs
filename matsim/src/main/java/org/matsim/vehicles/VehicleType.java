@@ -141,6 +141,10 @@ public class VehicleType implements Attributable {
 		this.engineInformation = engineInformation;
 	}
 
+	/**
+	 * @deprecated please use {@see VehicleUtils} -> setHBEFATechology instead.
+	 */
+	@Deprecated
 	public void setFreightCapacity(FreightCapacity freightCapacity) {
 		this.capacity.setFreightCapacity( freightCapacity );
 	}
@@ -181,6 +185,10 @@ public class VehicleType implements Attributable {
 		return costInformation;
 	}
 
+	/**
+	 * @deprecated please use {@see VehicleUtils} -> getHBEFATechology instead.
+	 */
+	@Deprecated
 	public FreightCapacity getFreightCapacity() {
 		return this.capacity.getFreightCapacity();
 	}
