@@ -62,6 +62,7 @@ public class TourPlanning  {
         netBuilder.setTravelTime(travelTime);
         final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
         carriers.getCarriers().values().parallelStream().forEach(carrier -> {
+                    log.info("start tour planning for " + carrier.getId());
                     //Build VRP
                     VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork());
                     vrpBuilder.setRoutingCost(netBasedCosts);// this may be too expensive for the size of the problem
@@ -69,24 +70,29 @@ public class TourPlanning  {
                     VehicleRoutingProblem problem = vrpBuilder.build();
 
                     //use this in order to set a 'hard' constraint on time windows
-//                    StateManager stateManager = new StateManager(problem);
-//                    ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
-//                    constraintManager.addConstraint(new ServiceDeliveriesFirstConstraint(), ConstraintManager.Priority.CRITICAL);
-//                    constraintManager.addConstraint(new VehicleDependentTimeWindowConstraints(stateManager, problem.getTransportCosts(), problem.getActivityCosts()), ConstraintManager.Priority.HIGH);
-//                    VehicleRoutingAlgorithm algorithm = Jsprit.Builder.newInstance(problem).setStateAndConstraintManager(stateManager,constraintManager).buildAlgorithm();
+                    StateManager stateManager = new StateManager(problem);
+                    ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
+                    constraintManager.addConstraint(new ServiceDeliveriesFirstConstraint(), ConstraintManager.Priority.CRITICAL);
+                    constraintManager.addConstraint(new VehicleDependentTimeWindowConstraints(stateManager, problem.getTransportCosts(), problem.getActivityCosts()), ConstraintManager.Priority.HIGH);
+                    VehicleRoutingAlgorithm algorithm = Jsprit.Builder.newInstance(problem)
+                                                        .setStateAndConstraintManager(stateManager,constraintManager)
+                                                        .buildAlgorithm();
 
                     // get the algorithm out-of-the-box, search solution and get the best one.
-                    VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
+//                    VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
+
                     algorithm.setMaxIterations(maxIterations);
+
                     // variationCoefficient = stdDeviation/mean. so i set the threshold rather soft
-                    algorithm.addTerminationCriterion(new VariationCoefficientTermination(5, 0.1));
+//                    algorithm.addTerminationCriterion(new VariationCoefficientTermination(5, 0.1));
+
                     Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
                     VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
                     //get the CarrierPlan
                     CarrierPlan carrierPlan = MatsimJspritFactory.createPlan(carrier, bestSolution);
 
                     log.info("routing plan for carrier " + carrier.getId());
-                    NetworkRouter.routePlan(carrierPlan, netBasedCosts);
+                    NetworkRouter.routePlan(carrierPlan, netBasedCosts);    //we need to route the plans in order to create reasonable freight-agent plans
                     log.info("routing for carrier " + carrier.getId() + " finished");
                     carrier.setSelectedPlan(carrierPlan);
                 }
