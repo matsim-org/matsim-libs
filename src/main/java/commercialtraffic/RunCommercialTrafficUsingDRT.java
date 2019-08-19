@@ -54,9 +54,9 @@ public class RunCommercialTrafficUsingDRT {
 
 
         DrtConfigGroup drtCfg = new DrtConfigGroup();
-        drtCfg.setMaxWaitTime(30*60);
-        drtCfg.setMaxTravelTimeAlpha(2);
-        drtCfg.setMaxTravelTimeBeta(15);
+        drtCfg.setMaxWaitTime(2*3600);
+        drtCfg.setMaxTravelTimeAlpha(5);
+        drtCfg.setMaxTravelTimeBeta(15*60);
         drtCfg.setStopDuration(60);
         drtCfg.setVehiclesFile(inputDir + "drtVehicles.xml");
 
