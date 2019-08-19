@@ -39,7 +39,6 @@ public class CommercialJobManagerTest {
         travelTimes.put(TransportMode.car, new FreeSpeedTravelTime());
         CommercialJobManager manager = new CommercialJobManager(carriers,scenario,
                                                                     new FreightAgentInserter(scenario),
-                                                                    new CommercialTrafficChecker(),
                                                                     travelTimes);
 
         new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers)).write("carriertypes.xml");

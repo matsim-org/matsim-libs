@@ -32,7 +32,6 @@ public class ChangeDeliveryServiceOperatorTest {
         travelTimes.put(TransportMode.car, new FreeSpeedTravelTime());
         CommercialJobManager manager = new CommercialJobManager(carriers,scenario,
                 new FreightAgentInserter(scenario),
-                new CommercialTrafficChecker(),
                 travelTimes);
         ChangeDeliveryServiceOperator changeDeliveryServiceOperator = new ChangeDeliveryServiceOperator(scenario.getConfig().global(), manager);
 

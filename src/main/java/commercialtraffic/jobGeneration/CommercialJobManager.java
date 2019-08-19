@@ -56,7 +56,7 @@ public class CommercialJobManager implements BeforeMobsimListener, AfterMobsimLi
     private TravelTime carTravelTime;
 
     @Inject
-    public CommercialJobManager(Carriers carriers, Scenario scenario, FreightAgentInserter agentInserter, CommercialTrafficChecker consistencyChecker, Map<String, TravelTime> travelTimes){
+    public CommercialJobManager(Carriers carriers, Scenario scenario, FreightAgentInserter agentInserter, Map<String, TravelTime> travelTimes){
         this.agentInserter = agentInserter;
         this.scenario = scenario;
         this.carTravelTime = travelTimes.get(TransportMode.car);
@@ -71,13 +71,13 @@ public class CommercialJobManager implements BeforeMobsimListener, AfterMobsimLi
             if(ctConfigGroup.getRunTourPlanning()) carrier.getServices().clear(); //initialize
         });
         this.carriers = carriers;
-        if(mapServicesToCustomerAndCheckLocationConsistency(scenario.getPopulation(), consistencyChecker))
+        if(mapServicesToCustomer(scenario.getPopulation()))
             throw new RuntimeException("there is a problem with consistency of location in services and activities." +
                 "please check the log for details.");
     }
 
 
-    private boolean mapServicesToCustomerAndCheckLocationConsistency(Population population, CommercialTrafficChecker consistencyChecker){
+    private boolean mapServicesToCustomer(Population population){
         final MutableBoolean fail = new MutableBoolean(false);
         for (Person p : population.getPersons().values()) {
             p.getPlans()
@@ -86,16 +86,14 @@ public class CommercialJobManager implements BeforeMobsimListener, AfterMobsimLi
                         .filter(Activity.class::isInstance)
                         .filter(planElement -> CommercialJobUtils.activityExpectsServices((Activity) planElement))
                             .forEach(planElement -> {
-                                if(consistencyChecker.checkActivityServiceLocationConsistency((Activity) planElement, p.getId(), getCarrierServicesMap()))
-                                    fail.setTrue();
-                            mapServiceToCustomer(p.getId(),(Activity) planElement);
+                            retrieveServicesIdsAndDoMapping(p.getId(),(Activity) planElement);
                         });
                 });
         }
         return fail.getValue();
     }
 
-    private void mapServiceToCustomer(Id<Person> personId, Activity activity) {
+    private void retrieveServicesIdsAndDoMapping(Id<Person> personId, Activity activity) {
         Set<Id<CarrierService>> jobIDs = CommercialJobUtils.getServiceIdsFromActivity(activity);
         for(Id<CarrierService> carrierServiceId : jobIDs){
             if(this.service2Customer.containsKey(carrierServiceId)) throw new IllegalArgumentException("service id " + carrierServiceId + " is referenced twice in input population");
@@ -119,6 +117,11 @@ public class CommercialJobManager implements BeforeMobsimListener, AfterMobsimLi
 
     public Id<Person> getCustomer(@NotNull Id<CarrierService> serviceId){
         return this.service2Customer.get(serviceId);
+    }
+
+    public Set<Id<Person>> getAllCustomers(){
+        Set<Id<Person>> allCustomers = new HashSet<>(this.service2Customer.values());
+        return Collections.unmodifiableSet( allCustomers );
     }
 
     public String getServiceType(Id<CarrierService> serviceId){
@@ -178,4 +181,5 @@ public class CommercialJobManager implements BeforeMobsimListener, AfterMobsimLi
         CarrierPlanXmlWriterV2 planWriter = new CarrierPlanXmlWriterV2(carriers);
         planWriter.write(dir + "carriers_it" + event.getIteration() + ".xml");
     }
+
 }

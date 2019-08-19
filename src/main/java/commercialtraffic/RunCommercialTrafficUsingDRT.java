@@ -70,7 +70,6 @@ public class RunCommercialTrafficUsingDRT {
 
         commercialTrafficConfigGroup.setBreakSimulationIfNotAllServicesServed(false); //TODO: for preliminary studies only
 
-
         Config config = createConfig(new DvrpConfigGroup(), commercialTrafficConfigGroup, multiModeDrtConfigGroup);
 
         config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
