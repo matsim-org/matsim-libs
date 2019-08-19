@@ -22,7 +22,7 @@ package commercialtraffic.analysis;/*
  */
 
 import com.google.inject.Inject;
-import commercialtraffic.jobGeneration.CommercialJobUtils;
+import commercialtraffic.commercialJob.CommercialJobUtils;
 import commercialtraffic.scoring.ScoreCommercialServices;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -30,9 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.misc.Time;

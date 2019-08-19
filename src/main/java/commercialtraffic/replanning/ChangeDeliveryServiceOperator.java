@@ -21,13 +21,12 @@ package commercialtraffic.replanning;/*
  * created by jbischoff, 22.05.2019
  */
 
-import commercialtraffic.jobGeneration.CommercialJobManager;
-import commercialtraffic.jobGeneration.CommercialJobUtils;
+import commercialtraffic.commercialJob.CommercialJobManager;
+import commercialtraffic.commercialJob.CommercialJobUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.algorithms.PlanAlgorithm;

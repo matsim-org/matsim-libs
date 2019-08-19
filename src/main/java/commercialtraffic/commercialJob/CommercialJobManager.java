@@ -18,9 +18,8 @@
  *                                                                         *
  * *********************************************************************** */
 
-package commercialtraffic.jobGeneration;
+package commercialtraffic.commercialJob;
 
-import commercialtraffic.integration.CommercialTrafficChecker;
 import commercialtraffic.integration.CommercialTrafficConfigGroup;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.matsim.api.core.v01.Id;

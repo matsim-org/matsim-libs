@@ -23,18 +23,16 @@ package commercialtraffic.integration;/*
 
 import commercialtraffic.analysis.CommercialTrafficAnalysisListener;
 import commercialtraffic.analysis.TourLengthAnalyzer;
-import commercialtraffic.jobGeneration.CommercialJobManager;
-import commercialtraffic.jobGeneration.FreightAgentInserter;
+import commercialtraffic.commercialJob.CommercialJobManager;
+import commercialtraffic.commercialJob.FreightAgentInserter;
 import commercialtraffic.replanning.ChangeDeliveryServiceOperator;
 import commercialtraffic.scoring.DefaultCommercialServiceScore;
 import commercialtraffic.scoring.DeliveryScoreCalculator;
 import commercialtraffic.scoring.ScoreCommercialServices;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
@@ -44,8 +42,6 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import java.util.HashMap;
-import java.util.Map;
 
 public class CommercialTrafficModule extends AbstractModule {
 

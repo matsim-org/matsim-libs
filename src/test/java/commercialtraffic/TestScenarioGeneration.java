@@ -21,7 +21,7 @@
 package commercialtraffic;
 
 import commercialtraffic.integration.CommercialTrafficConfigGroup;
-import commercialtraffic.jobGeneration.CommercialJobUtils;
+import commercialtraffic.commercialJob.CommercialJobUtils;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;

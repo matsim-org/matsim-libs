@@ -1,10 +1,9 @@
 package commercialtraffic.replanning;
 
 import commercialtraffic.TestScenarioGeneration;
-import commercialtraffic.integration.CommercialTrafficChecker;
-import commercialtraffic.jobGeneration.CommercialJobManager;
-import commercialtraffic.jobGeneration.CommercialJobUtils;
-import commercialtraffic.jobGeneration.FreightAgentInserter;
+import commercialtraffic.commercialJob.CommercialJobManager;
+import commercialtraffic.commercialJob.CommercialJobUtils;
+import commercialtraffic.commercialJob.FreightAgentInserter;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;

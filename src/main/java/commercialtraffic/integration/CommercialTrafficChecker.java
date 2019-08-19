@@ -23,8 +23,8 @@ package commercialtraffic.integration;/*
  */
 
 import com.google.inject.Inject;
-import commercialtraffic.jobGeneration.CommercialJobManager;
-import commercialtraffic.jobGeneration.CommercialJobUtils;
+import commercialtraffic.commercialJob.CommercialJobManager;
+import commercialtraffic.commercialJob.CommercialJobUtils;
 import commercialtraffic.replanning.ChangeDeliveryServiceOperator;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.log4j.Logger;

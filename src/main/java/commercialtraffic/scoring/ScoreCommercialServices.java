@@ -23,8 +23,8 @@ package commercialtraffic.scoring;/*
 
 import com.google.inject.Inject;
 import commercialtraffic.integration.CommercialTrafficConfigGroup;
-import commercialtraffic.jobGeneration.CommercialJobManager;
-import commercialtraffic.jobGeneration.FreightAgentInserter;
+import commercialtraffic.commercialJob.CommercialJobManager;
+import commercialtraffic.commercialJob.FreightAgentInserter;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;

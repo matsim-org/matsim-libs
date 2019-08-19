@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package commercialtraffic.jobGeneration;/*
+package commercialtraffic.commercialJob;/*
  * created by jbischoff, 11.04.2019
  */
 
