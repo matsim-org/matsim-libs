@@ -245,4 +245,42 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 		}
 	}
 
+	/**
+	 * Writes an element including start and end tag on the writer
+	 * @param tagname
+	 * @param content
+	 * @throws UncheckedIOException
+	 */
+	protected final void writeElement(String tagname, String content) throws UncheckedIOException{
+		//start tag
+		try {
+			if (doPrettyPrint) {
+				this.writer.write(NL);
+				indent();
+				this.indentationLevel++;
+			}
+			this.writer.write("<" + tagname + ">");
+				if (doPrettyPrint) {
+					this.indentationLevel--;
+				}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+
+		//content
+		try {
+			writer.write(encodeContent(content));
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+
+		//end tag
+		try {
+			this.writer.write("</" + tagname + ">");
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+
 }
