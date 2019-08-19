@@ -68,7 +68,7 @@ public class RunCommercialTrafficUsingDRT {
         commercialTrafficConfigGroup.setCarriersVehicleTypesFile(inputDir + "carriertypes.xml");
         commercialTrafficConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
 
-        commercialTrafficConfigGroup.setBreakSimulationIfNotAllServicesServed(false); //TODO: for preliminary studies only
+//        commercialTrafficConfigGroup.setBreakSimulationIfNotAllServicesServed(false); //TODO: for preliminary studies only
 
         Config config = createConfig(new DvrpConfigGroup(), commercialTrafficConfigGroup, multiModeDrtConfigGroup);
 
