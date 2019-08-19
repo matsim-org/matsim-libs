@@ -60,29 +60,13 @@ public final class MatsimVehicleReader implements MatsimReader{
 	private static final class VehicleReader extends MatsimXmlParser {
 		private final Vehicles vehicles;
 
-		//		private final static String NETWORK_V1 = "network_v1.dtd";
-//		private final static String NETWORK_V2 = "network_v2.dtd";
-
 		private MatsimXmlParser delegate = null;
-//		private final String inputCRS;
-//		private final String targetCRS;
-
 
 		private Map<Class<?>, AttributeConverter<?>> converters = new HashMap<>();
 
-		public VehicleReader(Vehicles vehicles) {
+		VehicleReader(Vehicles vehicles) {
 			this.vehicles = vehicles ;
 		}
-
-//		public VehicleReader(String targetCRS, Network network) {
-//			this(null, targetCRS, network);
-//		}
-//
-//		public VehicleReader(String inputCRS, String targetCRS, Network network) {
-//			this.inputCRS = inputCRS;
-//			this.targetCRS = targetCRS;
-//			this.network = network;
-//		}
 
 		@Override
 		public void startTag(final String name, final Attributes atts, final Stack<String> context) {
@@ -113,36 +97,7 @@ public final class MatsimVehicleReader implements MatsimReader{
 			} catch ( SAXException e) {
 				throw new RuntimeException(e);
 			}
-//			if (targetCRS != null) {
-//				ProjectionUtils.putCRS(network, targetCRS );
-//			}
 		}
-
-//		@Override
-//		protected void setDoctype(final String doctype) {
-//			super.setDoctype(doctype);
-//
-//			switch ( doctype ) {
-////				case NETWORK_V1:
-////					this.delegate =
-////						  new NetworkReaderMatsimV1(
-////							    inputCRS != null ?
-////									TransformationFactory.getCoordinateTransformation(inputCRS, targetCRS ) :
-////									new IdentityTransformation(),
-////							    this.network);
-////					log.info("using network_v1-reader.");
-////					break;
-////				case NETWORK_V2:
-////					this.delegate = new NetworkReaderMatsimV2(inputCRS, targetCRS, this.network);
-////					((NetworkReaderMatsimV2) delegate).putAttributeConverters( converters );
-////					log.info("using network_v2-reader.");
-////					break;
-//				default:
-//					this.delegate = new VehicleReaderV1( vehicles ) ;
-////					this.delegate.setValidating( false );
-//					log.info( "using vehicle_v1 reader (xsd)" ) ;
-//			}
-//		}
 
 		public void putAttributeConverter(Class<?> clazz, AttributeConverter<?> converter) {
 			this.converters.put( clazz, converter );
