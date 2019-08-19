@@ -14,7 +14,7 @@ class VehicleReaderV1 extends MatsimXmlParser{
 	private final VehiclesFactory builder;
 	private VehicleType currentVehType = null;
 	private VehicleCapacity currentCapacity = null;
-//	private FreightCapacity currentFreightCap = null;
+	private FreightCapacity currentFreightCap = null;
 	private EngineInformation.FuelType currentFuelType = null;
 
 	public VehicleReaderV1( final Vehicles vehicles ){
@@ -32,9 +32,9 @@ class VehicleReaderV1 extends MatsimXmlParser{
 			this.currentFuelType = null;
 		} else if( VehicleSchemaV1Names.FUELTYPE.equalsIgnoreCase( name ) ){
 			this.currentFuelType = this.parseFuelType( content.trim() );
-//		} else if( VehicleSchemaV1Names.FREIGHTCAPACITY.equalsIgnoreCase( name ) ){
-//			this.currentCapacity.setFreightCapacity( this.currentFreightCap );
-//			this.currentFreightCap = null;
+		} else if( VehicleSchemaV1Names.FREIGHTCAPACITY.equalsIgnoreCase( name ) ){
+			this.currentCapacity.setFreightCapacity( this.currentFreightCap );
+			this.currentFreightCap = null;
 		} else if( VehicleSchemaV1Names.CAPACITY.equalsIgnoreCase( name ) ){
 			this.currentVehType.setCapacity( this.currentCapacity );
 			this.currentCapacity = null;
@@ -89,9 +89,10 @@ class VehicleReaderV1 extends MatsimXmlParser{
 			this.currentCapacity.setSeats( Integer.valueOf( atts.getValue( VehicleSchemaV1Names.PERSONS ) ) );
 		} else if( VehicleSchemaV1Names.STANDINGROOM.equalsIgnoreCase( name ) ){
 			this.currentCapacity.setStandingRoom( Integer.valueOf( atts.getValue( VehicleSchemaV1Names.PERSONS ) ) );
-//		} else if( VehicleSchemaV1Names.FREIGHTCAPACITY.equalsIgnoreCase( name ) ){
-//			this.currentFreightCap = this.builder.createFreigthCapacity();
+		} else if( VehicleSchemaV1Names.FREIGHTCAPACITY.equalsIgnoreCase( name ) ){
+			this.currentFreightCap = this.builder.createFreigthCapacity();
 		} else if( VehicleSchemaV1Names.VOLUME.equalsIgnoreCase( name ) ){
+			this.currentFreightCap.setVolume(Double.parseDouble( atts.getValue( VehicleSchemaV1Names.CUBICMETERS ) ));
 			this.currentCapacity.setVolumeInCubicMeters( Double.parseDouble( atts.getValue( VehicleSchemaV1Names.CUBICMETERS ) ) );
 		} else if( VehicleSchemaV1Names.GASCONSUMPTION.equalsIgnoreCase( name ) ){
 			VehicleUtils.setFuelConsumption(this.currentVehType, Double.parseDouble( atts.getValue( VehicleSchemaV1Names.LITERPERMETER )) );
