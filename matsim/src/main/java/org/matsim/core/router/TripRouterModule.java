@@ -72,6 +72,6 @@ public class TripRouterModule extends AbstractModule {
             }
             addRoutingModuleBinding(TransportMode.transit_walk).to(Key.get(RoutingModule.class, Names.named(TransportMode.walk)));
         }
-        addRoutingModuleBinding( "fallback" ).to( FallbackRoutingModule.class) ;
+        addRoutingModuleBinding( FallbackRoutingModule._fallback ).to( FallbackRoutingModule.class ) ;
     }
 }

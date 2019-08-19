@@ -17,6 +17,9 @@ import java.util.List;
 
 class FallbackRoutingModule implements  RoutingModule {
 
+	public static final String _fallback = "_fallback";
+
+
 	@Inject private Population population ;
 	@Inject private Network network ;
 
