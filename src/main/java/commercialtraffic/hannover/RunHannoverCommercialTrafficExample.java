@@ -71,7 +71,7 @@ public class RunHannoverCommercialTrafficExample {
         });
 
         controler.addOverridingModule(new SwissRailRaptorModule());
-        controler.addOverridingModule(new CommercialTrafficModule());
+        controler.addOverridingModule(new CommercialTrafficModule(config));
 
 
         controler.run();

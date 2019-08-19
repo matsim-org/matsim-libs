@@ -31,6 +31,8 @@ import com.graphhopper.jsprit.core.problem.constraint.ServiceDeliveriesFirstCons
 import com.graphhopper.jsprit.core.problem.constraint.VehicleDependentTimeWindowConstraints;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
+import commercialtraffic.integration.CarrierMode;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierVehicleType;
@@ -40,11 +42,17 @@ import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.core.router.util.TravelTime;
 
+import javax.inject.Inject;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 public class TourPlanning  {
+
+    static Logger log = Logger.getLogger(TourPlanning.class);
+
+    @Inject
+    CarrierMode carrierMode;
 
     static void runTourPlanningForCarriers(Carriers carriers, Scenario scenario, int maxIterations, TravelTime travelTime) {
         Set<CarrierVehicleType> vehicleTypes = new HashSet<>();
@@ -76,7 +84,10 @@ public class TourPlanning  {
                     VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
                     //get the CarrierPlan
                     CarrierPlan carrierPlan = MatsimJspritFactory.createPlan(carrier, bestSolution);
+
+                    log.info("routing plan for carrier " + carrier.getId());
                     NetworkRouter.routePlan(carrierPlan, netBasedCosts);
+                    log.info("routing for carrier " + carrier.getId() + " finished");
                     carrier.setSelectedPlan(carrierPlan);
                 }
         );
