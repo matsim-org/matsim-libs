@@ -43,7 +43,7 @@ public final class MainModeIdentifierImpl implements MainModeIdentifier {
 			// for direct walk (and presumably in between pt legs, if necessary).  kai/gregor, sep'18
 		}
 		if ( mode.endsWith( "_fallback" ) )  {
-			return mode.split( "_fallback" )[0] ;
+			return mode.substring(0, mode.length() - 9) ;
 		}
 		
 		for ( PlanElement pe : tripElements ) {
