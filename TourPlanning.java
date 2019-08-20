@@ -22,7 +22,6 @@ package commercialtraffic.commercialJob;
 
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
-import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
 import com.graphhopper.jsprit.core.algorithm.state.StateManager;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
@@ -30,7 +29,7 @@ import com.graphhopper.jsprit.core.problem.constraint.ServiceDeliveriesFirstCons
 import com.graphhopper.jsprit.core.problem.constraint.VehicleDependentTimeWindowConstraints;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
-import commercialtraffic.integration.CarrierMode;
+import commercialtraffic.integration.CarrierJSpritIterations;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
@@ -50,10 +49,8 @@ public class TourPlanning  {
 
     static Logger log = Logger.getLogger(TourPlanning.class);
 
-    @Inject
-    CarrierMode carrierMode;
 
-    static void runTourPlanningForCarriers(Carriers carriers, Scenario scenario, int maxIterations, int jSpritTimeSliceWidth, TravelTime travelTime) {
+    static void runTourPlanningForCarriers(Carriers carriers, Scenario scenario, CarrierJSpritIterations iterations, int jSpritTimeSliceWidth, TravelTime travelTime) {
         Set<CarrierVehicleType> vehicleTypes = new HashSet<>();
         carriers.getCarriers().values().forEach(carrier -> vehicleTypes.addAll(carrier.getCarrierCapabilities().getVehicleTypes()));
         NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), vehicleTypes);
@@ -103,7 +100,7 @@ public class TourPlanning  {
                         log.info("setting maxIterations=1 as carrier has no services");
                         algorithm.setMaxIterations(1);
                     } else{
-                        algorithm.setMaxIterations(maxIterations);
+                        algorithm.setMaxIterations(iterations.getNrOfJSpritIterationsForCarrier(carrier.getId()));
                     }
 
                     // variationCoefficient = stdDeviation/mean. so i set the threshold rather soft
