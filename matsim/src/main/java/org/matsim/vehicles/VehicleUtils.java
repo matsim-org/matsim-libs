@@ -22,7 +22,6 @@ package org.matsim.vehicles;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.Config;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -68,18 +67,10 @@ public class VehicleUtils {
 	 * @param mode   The mode this vehicle is for
 	 * @return a VehicleId
 	 */
-	public static Id<Vehicle> createVehicleId(Person person, String mode, Config config) {
+	public static Id<Vehicle> createVehicleId(Person person, String mode) {
 
-		if (config.qsim().getUsePersonIdForMissingVehicleId()) {
-			switch (config.qsim().getVehiclesSource()) {
-				case defaultVehicle:
-				case fromVehiclesData:
-					return Id.createVehicleId(person.getId());
-				case modeVehicleTypesFromVehiclesData:
-					return Id.createVehicleId(person.getId().toString() + "_" + mode);
-			}
-		}
-		throw new RuntimeException("not implemented");
+		return Id.createVehicleId(person.getId().toString() + "_" + mode);
+
 	}
 
 	/**
@@ -91,7 +82,9 @@ public class VehicleUtils {
 	public static Id<Vehicle> getVehicleId(Person person, String mode) {
 		Map<String, Id<Vehicle>> vehicleIds = (Map<String, Id<Vehicle>>) person.getAttributes().getAttribute(VehicleUtils.VEHICLE_ATTRIBUTE_KEY);
 		if (vehicleIds == null || !vehicleIds.containsKey(mode)) {
-			throw new RuntimeException("Could not retrieve vehicle id from person: " + person.getId().toString() + " for mode: " + mode);
+			throw new RuntimeException("Could not retrieve vehicle id from person: " + person.getId().toString() + " for mode: " + mode +
+					". If you are not using config.qsim().getVehicleSource() with 'defaultVehicle' or 'modeVehicleTypesFromVehiclesData' you have to provide " +
+					"a vehicle for each mode for each person with an id like: 'personId_mode' and attach it as a person attribute with key 'vehicles'.");
 		}
 		return vehicleIds.get(mode);
 	}

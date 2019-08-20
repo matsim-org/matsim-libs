@@ -139,23 +139,10 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		// using car only network to get the links for facilities. Amit July'18
 		XY2LinksForFacilities.run(carOnlyNetwork, this.activityFacilities);
 
-
-
 		// yyyy from a behavioral perspective, the vehicle must be somehow linked to
 		// the person (maybe via the household).    kai, feb'18
 		// each agent receives a vehicle for each main mode now. janek, aug'19
-		
-		switch( qSimConfigGroup.getVehiclesSource() ) {
-			case defaultVehicle:
-			case modeVehicleTypesFromVehiclesData:
-				createAndAddVehiclesForEveryNetworkMode( getMode2VehicleType() );
-				break;
-			case fromVehiclesData:
-				// don't do anything
-				break;
-			default:
-				throw new RuntimeException( Gbl.NOT_IMPLEMENTED ) ;
-		}
+		createAndAddVehiclesForEveryNetworkMode();
 
 		// make sure all routes are calculated.
 		// the above creation of vehicles per agent has to be run before executing the initial routing here. janek, aug'19
@@ -185,63 +172,56 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		// (yyyy means that if someone replaces prepareForSim and does not add the above lines, the containers are not locked.  kai, nov'16)
 	}
 
-	private void createAndAddVehiclesForEveryNetworkMode(final Map<String, VehicleType> modeVehicleTypes) {
-		for ( Person person : scenario.getPopulation().getPersons().values()) {
-			for (String mode : scenario.getConfig().qsim().getMainModes()) {
-				Id<Vehicle> vehicleId = VehicleUtils.createVehicleId(person, mode, this.scenario.getConfig());
-				createAndAddVehicleIfNotPresent(vehicleId, modeVehicleTypes.get(mode));
-				VehicleUtils.insertVehicleIdIntoAttributes(person, mode, vehicleId);
+	private void createAndAddVehiclesForEveryNetworkMode() {
+
+		final Map<String, VehicleType> modeVehicleTypes = getVehicleTypesForAllMainModes();
+
+		for (Map.Entry<String, VehicleType> modeType : modeVehicleTypes.entrySet()) {
+			for (Person person : scenario.getPopulation().getPersons().values()) {
+
+				Id<Vehicle> vehicleId = VehicleUtils.createVehicleId(person, modeType.getKey());
+				createAndAddVehicleIfNecessary(vehicleId, modeType.getValue());
+				VehicleUtils.insertVehicleIdIntoAttributes(person, modeType.getKey(), vehicleId);
 			}
 		}
 	}
 
-	private  Map<String, VehicleType> getMode2VehicleType(){
+	private Map<String, VehicleType> getVehicleTypesForAllMainModes() {
+
 		Map<String, VehicleType> modeVehicleTypes = new HashMap<>();
-		switch ( this.qSimConfigGroup.getVehiclesSource() ) {
-			case defaultVehicle:
-				for (String mode : this.qSimConfigGroup.getMainModes()) {
-					// initialize each mode with default vehicle type:
-					VehicleType defaultVehicleType = VehicleUtils.getDefaultVehicleType();
-					modeVehicleTypes.put(mode, defaultVehicleType);
-					if( scenario.getVehicles().getVehicleTypes().get(defaultVehicleType.getId())==null) {
-						scenario.getVehicles().addVehicleType(defaultVehicleType); // adding default vehicle type to vehicles container
-					}
-				}
-				break;
-			case modeVehicleTypesFromVehiclesData:
-				for (String mode : qSimConfigGroup.getMainModes()) {
-					VehicleType vehicleType = scenario.getVehicles().getVehicleTypes().get( Id.create(mode, VehicleType.class) ) ;
-					Gbl.assertNotNull(vehicleType);
-					modeVehicleTypes.put(mode, vehicleType );
-				}
-				break;
-			case fromVehiclesData:
-				// don't do anything
-				break;
-			default:
-				throw new RuntimeException("not implemented yet.");
+		for (String mode : qSimConfigGroup.getMainModes()) {
+			VehicleType type = null;
+			switch (qSimConfigGroup.getVehiclesSource()) {
+				case defaultVehicle:
+					type = VehicleUtils.getDefaultVehicleType();
+					if (!scenario.getVehicles().getVehicleTypes().containsKey(type.getId()))
+						scenario.getVehicles().addVehicleType(type);
+					break;
+				case modeVehicleTypesFromVehiclesData:
+					type = scenario.getVehicles().getVehicleTypes().get(Id.create(mode, VehicleType.class));
+					break;
+				case fromVehiclesData:
+				default:
+					break;
+			}
+			Gbl.assertNotNull(type);
+			modeVehicleTypes.put(mode, type);
 		}
 		return modeVehicleTypes;
 	}
 
-	private void createAndAddVehicleIfNotPresent(Id<Vehicle> vehicleId, VehicleType vehicleType) {
-		// try to get vehicle from the vehicles container:
-		Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId);
+	private void createAndAddVehicleIfNecessary(Id<Vehicle> vehicleId, VehicleType vehicleType) {
 
-		if ( vehicle==null ) {
-			// if it was not found, next step depends on config:
-			switch ( qSimConfigGroup.getVehiclesSource() ) {
+		if (!scenario.getVehicles().getVehicles().containsKey(vehicleId)) {
+
+			switch (qSimConfigGroup.getVehiclesSource()) {
 				case defaultVehicle:
 				case modeVehicleTypesFromVehiclesData:
-					vehicle = scenario.getVehicles().getFactory().createVehicle(vehicleId, vehicleType);
+					Vehicle vehicle = scenario.getVehicles().getFactory().createVehicle(vehicleId, vehicleType);
 					scenario.getVehicles().addVehicle(vehicle);
 					break;
 				case fromVehiclesData:
-					// otherwise complain:
-					throw new IllegalStateException("Expecting a vehicle id which is missing in the vehicles database: " + vehicleId);
-				default:
-					// also complain when someone added another config option here:
-					throw new RuntimeException("not implemented");
+					throw new RuntimeException("Expecting a vehicle id which is missing in the vehicles database: " + vehicleId);
 			}
 		}
 	}

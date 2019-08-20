@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -21,15 +22,12 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleCapacityImpl;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehiclesFactory;
+import org.matsim.vehicles.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class NetworkRoutingInclAccessEgressModuleTest {
 
@@ -47,10 +45,10 @@ public class NetworkRoutingInclAccessEgressModuleTest {
     @Rule
     public MatsimTestUtils utils = new MatsimTestUtils();
 
-    private static Scenario createScenario() {
+    private static Scenario createScenario(Config config) {
 
         final Set<String> modes = new HashSet<>(Arrays.asList(TransportMode.car, FAST_MODE, SLOW_MODE));
-        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        Scenario scenario = ScenarioUtils.createScenario(config);
         Network network = scenario.getNetwork();
         NetworkFactory factory = network.getFactory();
         Node n1 = factory.createNode(Id.create("1", Node.class), HOME);
@@ -80,6 +78,44 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         network.addLink(endLInk);
 
         return scenario;
+    }
+
+    private static Controler createControler(Scenario scenario) {
+
+        Controler controler = new Controler(scenario);
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bind(MainModeIdentifier.class).to(SimpleMainModeIdentifier.class);
+            }
+        });
+        return controler;
+    }
+
+    private Config createConfig() {
+
+        Config config = ConfigUtils.createConfig();
+        config.qsim().setUsePersonIdForMissingVehicleId(true);
+        config.controler().setFirstIteration(0);
+        config.controler().setLastIteration(0);
+        config.controler().setOutputDirectory(utils.getOutputDirectory());
+        config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+        config.plansCalcRoute().setInsertingAccessEgressWalk(true);
+
+        final PlanCalcScoreConfigGroup.ActivityParams homeParams = new PlanCalcScoreConfigGroup.ActivityParams("home");
+        homeParams.setTypicalDuration(1);
+        config.planCalcScore().addActivityParams(homeParams);
+
+        final PlanCalcScoreConfigGroup.ActivityParams workParams = new PlanCalcScoreConfigGroup.ActivityParams("work");
+        workParams.setTypicalDuration(1);
+        config.planCalcScore().addActivityParams(workParams);
+
+        StrategyConfigGroup.StrategySettings replanning = new StrategyConfigGroup.StrategySettings();
+        replanning.setStrategyName("ReRoute");
+        replanning.setWeight(1.0);
+        config.strategy().addStrategySettings(replanning);
+
+        return config;
     }
 
     private static Link createLink(String id, Node from, Node to, double length, double freespeed, Set<String> modes, NetworkFactory factory) {
@@ -135,11 +171,29 @@ public class NetworkRoutingInclAccessEgressModuleTest {
     }
 
     @Test
-    public void calcRoute_speedOfIndividualVehicle() {
+    public void calcRoute_modeVehiclesFromVehiclesData_differentTypesTakeDifferentRoutes() {
 
-        Scenario scenario = createScenario();
+        Config config = createConfig();
 
-        // add vehicle types
+        // set test specific things
+        Collection<String> modes = Arrays.asList(SLOW_MODE, FAST_MODE);
+
+        config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
+        config.qsim().setMainModes(modes);
+        config.plansCalcRoute().setNetworkModes(modes);
+        PlanCalcScoreConfigGroup scoring = config.planCalcScore();
+
+        PlanCalcScoreConfigGroup.ModeParams slowParams = new PlanCalcScoreConfigGroup.ModeParams(SLOW_MODE);
+        slowParams.setMarginalUtilityOfTraveling(-1);
+        scoring.addModeParams(slowParams);
+
+        PlanCalcScoreConfigGroup.ModeParams fastParams = new PlanCalcScoreConfigGroup.ModeParams(FAST_MODE);
+        fastParams.setMarginalUtilityOfTraveling(-1);
+        scoring.addModeParams(fastParams);
+
+        Scenario scenario = createScenario(config);
+
+        // create
         VehicleType slowType = createVehicleType(SLOW_MODE, SLOW_SPEED, scenario.getVehicles().getFactory());
         VehicleType fastType = createVehicleType(FAST_MODE, FAST_SPEED, scenario.getVehicles().getFactory());
 
@@ -152,49 +206,8 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         Person fastPerson = createPerson("fast-person", fastType.getId().toString(), scenario.getPopulation().getFactory());
         scenario.getPopulation().addPerson(fastPerson);
 
-        // set up a config
-        Collection<String> modes = Arrays.asList(slowType.getId().toString(), fastType.getId().toString());
-
-        scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
-        scenario.getConfig().qsim().setUsePersonIdForMissingVehicleId(true);
-        scenario.getConfig().controler().setFirstIteration(0);
-        scenario.getConfig().controler().setLastIteration(0);
-        scenario.getConfig().controler().setOutputDirectory(utils.getOutputDirectory());
-        scenario.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-        scenario.getConfig().qsim().setMainModes(modes);
-        scenario.getConfig().plansCalcRoute().setNetworkModes(modes);
-        scenario.getConfig().plansCalcRoute().setInsertingAccessEgressWalk(true);
-
-        PlanCalcScoreConfigGroup scoring = scenario.getConfig().planCalcScore();
-        PlanCalcScoreConfigGroup.ModeParams slowParams = new PlanCalcScoreConfigGroup.ModeParams(slowType.getId().toString());
-        slowParams.setMarginalUtilityOfTraveling(-1);
-        scoring.addModeParams(slowParams);
-
-        PlanCalcScoreConfigGroup.ModeParams fastParams = new PlanCalcScoreConfigGroup.ModeParams(fastType.getId().toString());
-        fastParams.setMarginalUtilityOfTraveling(-1);
-        scoring.addModeParams(fastParams);
-
-        final PlanCalcScoreConfigGroup.ActivityParams homeParams = new PlanCalcScoreConfigGroup.ActivityParams("home");
-        homeParams.setTypicalDuration(1);
-        scenario.getConfig().planCalcScore().addActivityParams(homeParams);
-
-        final PlanCalcScoreConfigGroup.ActivityParams workParams = new PlanCalcScoreConfigGroup.ActivityParams("work");
-        workParams.setTypicalDuration(1);
-        scenario.getConfig().planCalcScore().addActivityParams(workParams);
-
-        StrategyConfigGroup.StrategySettings replanning = new StrategyConfigGroup.StrategySettings();
-        replanning.setStrategyName("ReRoute");
-        replanning.setWeight(1.0);
-        scenario.getConfig().strategy().addStrategySettings(replanning);
-
         // set up a controler with individual main mode identifier at the point of this writing the default one seems broken
-        Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                bind(MainModeIdentifier.class).to(SimpleMainModeIdentifier.class);
-            }
-        });
+        Controler controler = createControler(scenario);
         controler.run();
 
         // Assert that the slow agent takes the direct route
@@ -207,6 +220,34 @@ public class NetworkRoutingInclAccessEgressModuleTest {
         assertEquals(2, fastLinkIds.size());
         assertEquals(Id.createLinkId(FAST_BUT_LONGER_LINK + "-1"), fastLinkIds.get(0));
         assertEquals(Id.createLinkId(FAST_BUT_LONGER_LINK + "-2"), fastLinkIds.get(1));
+    }
+
+    @Test
+    public void calcRoute_defaultVehicle_defaultVehicleIsAssigned() {
+
+        Config config = createConfig();
+        config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.defaultVehicle);
+
+        Scenario scenario = createScenario(config);
+
+        // add persons
+        Person person = createPerson("slow-person", "car", scenario.getPopulation().getFactory());
+        scenario.getPopulation().addPerson(person);
+
+        // set up a controler with individual main mode identifier at the point of this writing the default one seems broken
+        Controler controler = createControler(scenario);
+        controler.run();
+
+        Object map = person.getAttributes().getAttribute("vehicles");
+
+        assertNotNull(map);
+        Map<String, Id<Vehicle>> modeId = (Map<String, Id<Vehicle>>) map;
+
+        // should be only one, but however
+        for (Id<Vehicle> vehicleId : modeId.values()) {
+            assertTrue(scenario.getVehicles().getVehicles().containsKey(vehicleId));
+            assertEquals(VehicleUtils.getDefaultVehicleType(), scenario.getVehicles().getVehicles().get(vehicleId).getType());
+        }
     }
 
     /**
