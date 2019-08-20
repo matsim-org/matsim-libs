@@ -103,6 +103,8 @@ public class RunCommercialTrafficUsingDRTExample {
         config.qsim().setEndTime(26*3600);
         config.qsim().setSimEndtimeInterpretation(QSimConfigGroup.EndtimeInterpretation.onlyUseEndtime);
 
+        config.controler().setLastIteration(5);
+
         DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.planCalcScore());
 
         Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);

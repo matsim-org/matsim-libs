@@ -71,6 +71,9 @@ public class RunCommercialTrafficExample {
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         config.network().setInputFile(inputDir + "grid_network.xml");
         config.plans().setInputFile(inputDir + "testpop.xml");
+
+        config.controler().setLastIteration(5);
+
         Scenario scenario = loadScenario(config);
 
         Controler controler = new Controler(scenario);
