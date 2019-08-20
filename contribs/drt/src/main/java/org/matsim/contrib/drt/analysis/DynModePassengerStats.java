@@ -104,7 +104,7 @@ public class DynModePassengerStats
 	public void handleEvent(ActivityEndEvent event) {
 		if (event.getActType().equals(VrpAgentLogic.BEFORE_SCHEDULE_ACTIVITY_TYPE)) {
 			Id<Vehicle> vid = Id.createVehicleId(event.getPersonId().toString());
-			this.inVehicleDistance.put(vid, new HashMap<Id<Person>, MutableDouble>());
+			this.inVehicleDistance.put(vid, new HashMap<>());
 			this.vehicleDistances.put(vid, new double[3 + maxcap]);
 		}
 	}

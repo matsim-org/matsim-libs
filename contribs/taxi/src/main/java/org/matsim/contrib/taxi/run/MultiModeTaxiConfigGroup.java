@@ -33,7 +33,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implements MultiModal<TaxiConfigGroup> {
+public final class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implements MultiModal<TaxiConfigGroup> {
 	public static final String GROUP_NAME = "multiModeTaxi";
 
 	@SuppressWarnings("deprecation")
@@ -54,9 +54,7 @@ public class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implements M
 					"In the multi-mode taxi setup, TaxiConfigGroup must not be defined at the config top level");
 		}
 
-		if (!MultiModals.isAllModesUnique(this)) {
-			throw new RuntimeException("Taxi modes in MultiModeTaxiConfigGroup are not unique");
-		}
+		MultiModals.requireAllModesUnique(this);
 	}
 
 	@Override

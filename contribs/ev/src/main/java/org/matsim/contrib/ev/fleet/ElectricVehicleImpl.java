@@ -20,26 +20,35 @@
 
 package org.matsim.contrib.ev.fleet;
 
+import java.util.Objects;
+
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.ev.charging.ChargingPower;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 
 import com.google.common.collect.ImmutableList;
 
 public class ElectricVehicleImpl implements ElectricVehicle {
-	public static final String DEFAULT_VEHICLE_TYPE = "defaultVehicleType";
+	public static ElectricVehicle create(ElectricVehicleSpecification vehicleSpecification,
+			DriveEnergyConsumption.Factory driveFactory, AuxEnergyConsumption.Factory auxFactory,
+			ChargingPower.Factory chargingFactory) {
+		ElectricVehicleImpl ev = new ElectricVehicleImpl(vehicleSpecification);
+		ev.driveEnergyConsumption = Objects.requireNonNull(driveFactory.create(ev));
+		ev.auxEnergyConsumption = Objects.requireNonNull(auxFactory.create(ev));
+		ev.chargingPower = Objects.requireNonNull(chargingFactory.create(ev));
+		return ev;
+	}
 
 	private final ElectricVehicleSpecification vehicleSpecification;
 	private final Battery battery;
 
-	private final DriveEnergyConsumption driveEnergyConsumption;
-	private final AuxEnergyConsumption auxEnergyConsumption;
+	private DriveEnergyConsumption driveEnergyConsumption;
+	private AuxEnergyConsumption auxEnergyConsumption;
+	private ChargingPower chargingPower;
 
-	public ElectricVehicleImpl(ElectricVehicleSpecification vehicleSpecification,
-			DriveEnergyConsumption driveEnergyConsumption, AuxEnergyConsumption auxEnergyConsumption) {
+	private ElectricVehicleImpl(ElectricVehicleSpecification vehicleSpecification) {
 		this.vehicleSpecification = vehicleSpecification;
-		this.driveEnergyConsumption = driveEnergyConsumption;
-		this.auxEnergyConsumption = auxEnergyConsumption;
 		battery = new BatteryImpl(vehicleSpecification.getBatteryCapacity(), vehicleSpecification.getInitialSoc());
 	}
 
@@ -71,5 +80,10 @@ public class ElectricVehicleImpl implements ElectricVehicle {
 	@Override
 	public AuxEnergyConsumption getAuxEnergyConsumption() {
 		return auxEnergyConsumption;
+	}
+
+	@Override
+	public ChargingPower getChargingPower() {
+		return chargingPower;
 	}
 }

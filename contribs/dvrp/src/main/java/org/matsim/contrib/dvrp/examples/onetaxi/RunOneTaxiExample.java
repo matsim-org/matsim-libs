@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
+import java.net.URL;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -26,6 +28,7 @@ import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -35,12 +38,9 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  * @author michalm
  */
 public final class RunOneTaxiExample {
-	private static final String CONFIG_FILE = "./src/main/resources/one_taxi/one_taxi_config.xml";
-	private static final String TAXIS_FILE = "one_taxi_vehicles.xml";
-
-	public static void run(boolean otfvis, int lastIteration) {
+	public static void run(URL configUrl, String taxisFile, boolean otfvis, int lastIteration) {
 		// load config
-		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new DvrpConfigGroup(), new OTFVisConfigGroup());
+		Config config = ConfigUtils.loadConfig(configUrl, new DvrpConfigGroup(), new OTFVisConfigGroup());
 		config.controler().setLastIteration(lastIteration);
 
 		// load scenario
@@ -49,7 +49,7 @@ public final class RunOneTaxiExample {
 		// setup controler
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new DvrpModule());
-		controler.addOverridingModule(new OneTaxiModule(TAXIS_FILE));
+		controler.addOverridingModule(new OneTaxiModule(ConfigGroup.getInputFileURL(config.getContext(), taxisFile)));
 		controler.configureQSimComponents(DvrpQSimComponents.activateModes(TransportMode.taxi));
 
 		if (otfvis) {
@@ -58,9 +58,5 @@ public final class RunOneTaxiExample {
 
 		// run simulation
 		controler.run();
-	}
-
-	public static void main(String... args) {
-		run(true, 0); // switch to 'false' to turn off visualisation
 	}
 }

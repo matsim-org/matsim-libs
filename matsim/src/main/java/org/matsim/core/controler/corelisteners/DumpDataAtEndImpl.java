@@ -277,14 +277,6 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		final PopulationWriter writer = new PopulationWriter(population, network);
 		writer.putAttributeConverters( attributeConverters );
 		writer.write(controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_POPULATION));
-
-		final ObjectAttributes personAttributes = population.getPersonAttributes();
-		if ( personAttributes!=null ) {
-			ObjectAttributesXmlWriter attributesXmlWriter = new ObjectAttributesXmlWriter(personAttributes) ;
-			attributesXmlWriter.setPrettyPrint(true);
-			attributesXmlWriter.putAttributeConverters( attributeConverters );
-			attributesXmlWriter.writeFile( controlerIO.getOutputFilename(Controler.OUTPUT_PREFIX + Controler.FILENAME_PERSON_ATTRIBUTES ) );
-		}
 	}
 
 }

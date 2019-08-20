@@ -38,6 +38,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleImpl;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleTypeImpl;
 
 /**
  * @author mrieser / senozon
@@ -143,8 +145,10 @@ public class PersonalizableDisutilityIntegrationTest {
 			new MatsimNetworkReader(this.scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
 			
 			this.person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
-			
-			this.vehicle = new VehicleImpl(null, null);
+
+			Id<Vehicle> dummyId = Id.createVehicleId( "dummy" ) ;
+			VehicleType dummyType = new VehicleTypeImpl( Id.create( "dummyVehicleType", VehicleType.class ) ) ;
+			this.vehicle = new VehicleImpl(dummyId, dummyType);
 			
 			this.costFunction = new PersonEnforcingTravelDisutility();
 			this.costFunction.setExpectations(this.person, this.vehicle);

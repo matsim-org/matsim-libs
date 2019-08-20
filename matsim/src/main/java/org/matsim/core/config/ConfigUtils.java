@@ -72,13 +72,36 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 		return loadConfig(IOUtils.getUrlFromFileOrResource(filename), customModules);
 	}
 
+	/**
+	 *  This variant is meant such that one can have a command line call to MATSim that first provides a config file, and then
+	 *  overrides some of it.  Should be particularly useful for integration tests for main methods, since, if those main methods are using
+	 *  this method here, it should be possible to test them via
+	 *  <pre>
+	 *        ...main( <config.xml> --config:controler.outputDir=... )
+	 *  </pre>
+	 *  i.e. the current necessity to break runnable scripts into pieces to change things like output directory or lastIteration should be gone with this.
+	 */
 	public static Config loadConfig( String [] args, ConfigGroup... customModules ) {
 		String[] typedArgs = Arrays.copyOfRange( args, 1, args.length );
 		return loadConfig( IOUtils.getUrlFromFileOrResource( args[0] ), typedArgs, customModules );
 	}
 
+	public static Config loadConfig( Config config, String [] args, ConfigGroup... customModules ) {
+		String[] typedArgs = Arrays.copyOfRange( args, 1, args.length );
+		return loadConfig( config, IOUtils.getUrlFromFileOrResource( args[0] ), typedArgs, customModules );
+	}
+
 	public static Config loadConfig( final URL url, String [] typedArgs, ConfigGroup... customModules ) {
 		Config config = loadConfig( url, customModules ) ;
+		return applyCommandline( config, typedArgs );
+	}
+
+	public static Config loadConfig( Config config, final URL url, String [] typedArgs, ConfigGroup... customModules ) {
+		loadConfig( config, url, customModules ) ;
+		return applyCommandline( config, typedArgs );
+	}
+
+	public static Config applyCommandline( Config config, String[] typedArgs ){
 		try{
 			CommandLine.Builder bld = new CommandLine.Builder( typedArgs ) ;
 			bld.allowAnyOption( true  );
@@ -143,9 +166,12 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 		}
 	}
 
-	public static void loadConfig(final Config config, final URL url) throws UncheckedIOException {
+	public static void loadConfig(final Config config, final URL url, ConfigGroup... customModules ) throws UncheckedIOException {
 		if (config.global() == null) {
 			config.addCoreModules();
+		}
+		for (ConfigGroup customModule : customModules) {
+			config.addModule(customModule);
 		}
 		new ConfigReader(config).parse(url);
 	}

@@ -64,7 +64,7 @@ class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Activity) {
 				activityIndex++ ;
-				if (this.lcContext.getConverter().convertType(((Activity) pe).getType()).equals(type)) {
+				if ( ((Activity) pe).getType().equals(type )) {
 			
 					for (ActivityFacilityWithIndex f : this.typedFacilities) {
 						//check if facility is sampled

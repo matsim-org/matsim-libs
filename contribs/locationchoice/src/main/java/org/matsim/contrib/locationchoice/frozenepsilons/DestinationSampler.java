@@ -19,7 +19,6 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 
 /**
  * Chooses a stable sample of facilities for every person 
@@ -41,7 +40,7 @@ class DestinationSampler {
 	private double[] personsKValues;
 	double samplePercent = 100.0;
 	
-	public DestinationSampler(double[] personsKValues, double[] facilitiesKValues, DestinationChoiceConfigGroup module) {
+	public DestinationSampler(double[] personsKValues, double[] facilitiesKValues, FrozenTastesConfigGroup module ) {
 		this.facilitiesKValues = facilitiesKValues;
 		this.personsKValues = personsKValues;
 		this.samplePercent = module.getDestinationSamplePercent();

@@ -188,7 +188,7 @@ public class StrategyManager implements MatsimManager {
 	 */
 	public final void run(final Population population, final ReplanningContext replanningContext) {
 		beforePopulationRunHook(population, replanningContext);
-		delegate.run(population.getPersons().values(), population.getPersonAttributes(), replanningContext);
+		delegate.run(population.getPersons().values(), population, replanningContext);
 		afterRunHook(population);
 	}
 

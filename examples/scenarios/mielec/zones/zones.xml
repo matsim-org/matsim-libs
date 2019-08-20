@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<!DOCTYPE zones SYSTEM "http://matsim.org/files/dtd/zones_v1.dtd">
+
+<zones>
+	<zone id="1" type="internal"/>
+	<zone id="2" type="internal"/>
+	<zone id="3" type="internal"/>
+	<zone id="4" type="internal"/>
+	<zone id="5" type="internal"/>
+	<zone id="6" type="internal"/>
+	<zone id="7" type="internal"/>
+	<zone id="8" type="internal"/>
+	<zone id="9" type="internal"/>
+	<zone id="10" type="external"/>
+	<zone id="11" type="external"/>
+	<zone id="12" type="external"/>
+	<zone id="13" type="external"/>
+	<zone id="100" type="external"/>
+	<zone id="110" type="external"/>
+	<zone id="120" type="external"/>
+	<zone id="130" type="external"/>
+</zones>

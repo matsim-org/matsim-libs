@@ -29,12 +29,12 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 /**
  * @author michalm
  */
-public class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
+public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	public static final String SET_NAME = "minCostFlowRebalancing";
 
 	public static final String INTERVAL = "interval";
 	static final String INTERVAL_EXP = "Specifies how often empty vehicle rebalancing is executed."
-			+ " Must be positive. Default is 1800 s.";
+			+ " Must be positive. Default is 1800 s. Expects an Integer Value";
 
 	public static final String MIN_SERVICE_TIME = "minServiceTime";
 	static final String MIN_SERVICE_TIME_EXP = //
@@ -48,11 +48,11 @@ public class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 
 	public static final String TARGET_ALPHA = "targetAlpha";
 	static final String TARGET_ALPHA_EXP = "alpha coefficient in linear target calculation."
-			+ " In general, should be lower then 1.0 to prevent over-reacting and high empty milleage.";
+			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty milleage.";
 
 	public static final String TARGET_BETA = "targetBeta";
 	static final String TARGET_BETA_EXP = "beta constant in linear target calculation."
-			+ " In general, should be lower then 1.0 to prevent over-reacting and high empty milleage.";
+			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty milleage.";
 
 	public static final String CELL_SIZE = "cellSize";
 	static final String CELL_SIZE_EXP = "size of square cells used for demand aggregation."
@@ -62,19 +62,19 @@ public class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 	private int interval = 1800;// [s]
 
 	@Positive
-	public double minServiceTime = 2 * interval;// [s]
+	private double minServiceTime = 2 * interval;// [s]
 
 	@PositiveOrZero
-	public double maxTimeBeforeIdle = 0.5 * interval;// [s], if 0 then soon-idle vehicle will not be considered
+	private double maxTimeBeforeIdle = 0.5 * interval;// [s], if 0 then soon-idle vehicle will not be considered
 
 	@PositiveOrZero
-	public double targetAlpha = Double.NaN;
+	private double targetAlpha = Double.NaN;
 
 	@PositiveOrZero
-	public double targetBeta = Double.NaN;
+	private double targetBeta = Double.NaN;
 
 	@Positive
-	public double cellSize = Double.NaN;// [m]
+	private double cellSize = Double.NaN;// [m]
 
 	public MinCostFlowRebalancingParams() {
 		super(SET_NAME);

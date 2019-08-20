@@ -22,10 +22,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.ev.data.Charger;
-import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
-import org.matsim.contrib.ev.dvrp.TaskEnergyConsumptions;
+import org.matsim.contrib.ev.dvrp.VrpPathEnergyConsumptions;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
 
 /**
  * @author michalm
@@ -34,14 +34,15 @@ public class EDrtTaskFactoryImpl implements DrtTaskFactory {
 	@Override
 	public EDrtDriveTask createDriveTask(DvrpVehicle vehicle, VrpPathWithTravelData path) {
 		ElectricVehicle ev = ((EvDvrpVehicle)vehicle).getElectricVehicle();
-		double totalEnergy = TaskEnergyConsumptions.calcTotalEnergyConsumption(ev, path);
+		double totalEnergy = VrpPathEnergyConsumptions.calcTotalEnergy(ev, path, path.getDepartureTime());
 		return new EDrtDriveTask(path, totalEnergy);
 	}
 
 	@Override
 	public EDrtStopTask createStopTask(DvrpVehicle vehicle, double beginTime, double endTime, Link link) {
 		ElectricVehicle ev = ((EvDvrpVehicle)vehicle).getElectricVehicle();
-		double auxEnergy = TaskEnergyConsumptions.calcAuxEnergy(ev, beginTime, endTime);
+		double auxEnergy = ev.getAuxEnergyConsumption()
+				.calcEnergyConsumption(beginTime, endTime - beginTime, link.getId());
 		return new EDrtStopTask(beginTime, endTime, link, auxEnergy);
 	}
 

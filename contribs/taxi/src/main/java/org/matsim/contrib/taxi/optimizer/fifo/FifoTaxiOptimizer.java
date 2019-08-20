@@ -35,9 +35,8 @@ import org.matsim.core.router.util.TravelTime;
 public class FifoTaxiOptimizer extends DefaultTaxiOptimizer {
 
 	public FifoTaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet, Network network,
-			MobsimTimer timer, TravelTime travelTime, TravelDisutility travelDisutility, TaxiScheduler scheduler,
-			FifoTaxiOptimizerParams params) {
-		super(eventsManager, taxiCfg, fleet, scheduler, params,
+			MobsimTimer timer, TravelTime travelTime, TravelDisutility travelDisutility, TaxiScheduler scheduler) {
+		super(eventsManager, taxiCfg, fleet, scheduler,
 				new FifoRequestInserter(network, fleet, timer, travelTime, travelDisutility, scheduler));
 	}
 }

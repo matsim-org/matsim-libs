@@ -37,6 +37,8 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
@@ -116,6 +118,7 @@ public final class ExampleWithinDayController implements StartupListener {
 	@Inject private LeastCostPathCalculatorFactory pathCalculatorFactory;
 	@Inject private Map<String,TravelDisutilityFactory> travelDisutilityFactories ;
 	@Inject private Map<String,TravelTime> travelTimes ;
+	@Inject private Mobsim mobsim ;
 
 
 	/*
@@ -162,10 +165,10 @@ public final class ExampleWithinDayController implements StartupListener {
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		this.initReplanners();
+		this.initReplanners(  );
 	}
 	
-	private void initReplanners() {
+	private void initReplanners( ) {
 		RouteFactories routeFactory = ((PopulationFactory) this.scenario.getPopulation().getFactory()).getRouteFactories() ;
 		Network network = this.scenario.getNetwork() ;
 		
@@ -188,7 +191,7 @@ public final class ExampleWithinDayController implements StartupListener {
 		this.duringActivityProbabilityFilterFactory = new ProbabilityFilterFactory(this.pDuringActivityReplanning);
 		this.duringActivityIdentifierFactory.addAgentFilterFactory(this.duringActivityProbabilityFilterFactory);
 		this.duringActivityIdentifier = duringActivityIdentifierFactory.createIdentifier();
-		this.duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenario, this.withinDayEngine, this.tripRouterProvider);
+		this.duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenario, this.withinDayEngine, this.tripRouterProvider,(QSim)mobsim);
 		this.duringActivityReplannerFactory.addIdentifier(this.duringActivityIdentifier);
 		this.withinDayEngine.addDuringActivityReplannerFactory(this.duringActivityReplannerFactory);
 

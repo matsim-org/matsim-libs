@@ -1,16 +1,16 @@
 package org.matsim.contrib.ev.routing;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.ev.data.ChargingInfrastructure;
+import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
 import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.fleet.ElectricFleetSpecification;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructureSpecification;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -22,11 +22,12 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
-public class EVNetworkRoutingProvider implements Provider<RoutingModule> {
-	private static final Logger log = Logger.getLogger(EVNetworkRoutingProvider.class);
+public class EvNetworkRoutingProvider implements Provider<RoutingModule> {
+	private static final Logger log = Logger.getLogger(EvNetworkRoutingProvider.class);
 
 	private final String routingMode;
 	@Inject
@@ -37,6 +38,9 @@ public class EVNetworkRoutingProvider implements Provider<RoutingModule> {
 
 	@Inject
 	private SingleModeNetworksCache singleModeNetworksCache;
+
+	@Inject
+	private Config config;
 
 	@Inject
 	private PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
@@ -54,12 +58,12 @@ public class EVNetworkRoutingProvider implements Provider<RoutingModule> {
 	private ElectricFleetSpecification electricFleetSpecification;
 
 	@Inject
-	private ChargingInfrastructure chargingInfrastructure;
+	private ChargingInfrastructureSpecification chargingInfrastructureSpecification;
 
 	@Inject
 	private DriveEnergyConsumption.Factory driveConsumptionFactory;
 
-	@Inject(optional = true)
+	@Inject
 	private AuxEnergyConsumption.Factory auxConsumptionFactory;
 
 	/**
@@ -68,7 +72,7 @@ public class EVNetworkRoutingProvider implements Provider<RoutingModule> {
 	 *
 	 * @param mode
 	 */
-	public EVNetworkRoutingProvider(String mode) {
+	public EvNetworkRoutingProvider(String mode) {
 		this(mode, mode);
 	}
 
@@ -80,9 +84,7 @@ public class EVNetworkRoutingProvider implements Provider<RoutingModule> {
 	 * @param mode
 	 * @param routingMode
 	 */
-	public EVNetworkRoutingProvider(String mode, String routingMode) {
-		//		log.setLevel(Level.DEBUG);
-
+	public EvNetworkRoutingProvider(String mode, String routingMode) {
 		this.mode = mode;
 		this.routingMode = routingMode;
 	}
@@ -125,12 +127,12 @@ public class EVNetworkRoutingProvider implements Provider<RoutingModule> {
 
 		// the following again refers to the (transport)mode, since it will determine the mode of the leg on the network:
 		if (plansCalcRouteConfigGroup.isInsertingAccessEgressWalk()) {
-			throw new IllegalArgumentException("Bushwacking is not currently supported by the EV Routing module");
+			throw new IllegalArgumentException("Bushwacking is not currently supported by the EV routing module");
 		} else {
-			return new EVNetworkRoutingModule(mode, filteredNetwork,
+			return new EvNetworkRoutingModule(mode, filteredNetwork,
 					DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo),
-					electricFleetSpecification, chargingInfrastructure, travelTime, driveConsumptionFactory,
-					auxConsumptionFactory);
+					electricFleetSpecification, chargingInfrastructureSpecification, travelTime,
+					driveConsumptionFactory, auxConsumptionFactory, EvConfigGroup.get(config));
 		}
 	}
 }

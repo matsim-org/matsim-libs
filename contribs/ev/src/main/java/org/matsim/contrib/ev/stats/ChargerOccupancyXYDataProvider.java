@@ -19,17 +19,18 @@
 
 package org.matsim.contrib.ev.stats;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 import org.matsim.contrib.ev.charging.ChargingLogic;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
-import org.matsim.contrib.ev.data.Charger;
-import org.matsim.contrib.ev.data.ChargingInfrastructure;
+import org.matsim.contrib.ev.infrastructure.Charger;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.util.XYDataCollector;
 import org.matsim.contrib.util.XYDataCollector.XYDataCalculator;
 import org.matsim.contrib.util.XYDataCollectors;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class ChargerOccupancyXYDataProvider implements Provider<MobsimListener> {
 	private final ChargingInfrastructure chargingInfrastructure;
@@ -51,19 +52,19 @@ public class ChargerOccupancyXYDataProvider implements Provider<MobsimListener> 
 
 	public static XYDataCalculator<Charger> createChargerOccupancyCalculator(
 			final ChargingInfrastructure chargingInfrastructure, boolean relative) {
-		String[] header = relative ? //
-				new String[] { "plugs", "plugged_rel", "queued_rel", "assigned_rel" } //
-				: new String[] { "plugs", "plugged", "queued", "assigned" };
+		String[] header = relative ?
+				new String[] { "plugs", "plugged_rel", "queued_rel", "assigned_rel" } :
+				new String[] { "plugs", "plugged", "queued", "assigned" };
 
 		return XYDataCollectors.createCalculator(header, charger -> {
 			ChargingLogic logic = charger.getLogic();
 			int plugs = charger.getPlugs();
-			int assignedCount = logic instanceof ChargingWithQueueingAndAssignmentLogic //
-					? ((ChargingWithQueueingAndAssignmentLogic)logic).getAssignedVehicles().size()//
-					: 0;
+			int assignedCount = logic instanceof ChargingWithQueueingAndAssignmentLogic ?
+					((ChargingWithQueueingAndAssignmentLogic)logic).getAssignedVehicles().size() :
+					0;
 			return new String[] { charger.getPlugs() + "", //
-					getValue(logic.getPluggedVehicles().size(), plugs, relative), //
-					getValue(logic.getQueuedVehicles().size(), plugs, relative), //
+					getValue(logic.getPluggedVehicles().size(), plugs, relative),
+					getValue(logic.getQueuedVehicles().size(), plugs, relative),
 					getValue(assignedCount, plugs, relative) };
 		});
 	}

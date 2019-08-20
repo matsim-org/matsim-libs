@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.taxi.benchmark;
 
+import java.net.URL;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkConfigConsistencyChecker;
@@ -38,6 +40,8 @@ import org.matsim.core.network.FixedIntervalTimeVariantLinkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 
+import com.google.common.collect.ImmutableSet;
+
 /**
  * For a fair and consistent benchmarking of taxi dispatching algorithms we assume that link travel times are
  * deterministic. To simulate this property, we remove (1) all other traffic, and (2) link capacity constraints (e.g. by
@@ -49,8 +53,8 @@ import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
  * each link over time. The default approach is to specify free-flow speeds in each time interval (usually 15 minutes).
  */
 public class RunTaxiBenchmark {
-	public static void run(String configFile, int runs) {
-		Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new DvrpConfigGroup());
+	public static void run(URL configUrl, int runs) {
+		Config config = ConfigUtils.loadConfig(configUrl, new TaxiConfigGroup(), new DvrpConfigGroup());
 		createControler(config, runs).run();
 	}
 
@@ -61,9 +65,8 @@ public class RunTaxiBenchmark {
 		config.controler().setWritePlansInterval(0);
 		config.controler().setCreateGraphs(false);
 
-		DvrpConfigGroup.get(config).setNetworkMode(null);// to switch off network filtering
+		DvrpConfigGroup.get(config).setNetworkModes(ImmutableSet.of());// to switch off network filtering
 		config.addConfigConsistencyChecker(new DvrpBenchmarkConfigConsistencyChecker());
-		config.checkConsistency();
 
 		String mode = TaxiConfigGroup.get(config).getMode();
 		Scenario scenario = loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
@@ -94,9 +97,5 @@ public class RunTaxiBenchmark {
 
 		ScenarioUtils.loadScenario(scenario);
 		return scenario;
-	}
-
-	public static void main(String[] args) {
-		run("./src/main/resources/one_taxi_benchmark/one_taxi_benchmark_config.xml", 20);
 	}
 }

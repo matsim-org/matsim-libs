@@ -84,6 +84,12 @@
 		    <groupId>com.graphhopper</groupId>
 		    <artifactId>jsprit-analysis</artifactId>
 	    	<version>1.7.2</version>
+	    	<exclusions>
+				<exclusion>
+					<groupId>org.jfree</groupId>
+					<artifactId>jfreechart</artifactId>
+				</exclusion>
+	    	</exclusions>
 		</dependency>
 	
 		<dependency>

@@ -35,39 +35,53 @@ import java.util.Set;
 /**
  * @author dziemke
  */
-public class BicycleLegScoring extends CharyparNagelLegScoring {
-	// private static final Logger LOG = Logger.getLogger(BicycleLegScoring.class);
+class BicycleLegScoring extends CharyparNagelLegScoring {
 
 	private final double marginalUtilityOfInfrastructure_m;
 	private final double marginalUtilityOfComfort_m;
 	private final double marginalUtilityOfGradient_m_100m;
+	private final String bicycleMode;
 
-	public BicycleLegScoring(final ScoringParameters params, Network network, Set<String> ptModes, BicycleConfigGroup bicycleConfigGroup) {
+	BicycleLegScoring( final ScoringParameters params, Network network, Set<String> ptModes, BicycleConfigGroup bicycleConfigGroup ) {
 		super(params, network, ptModes);
 
 		this.marginalUtilityOfInfrastructure_m = bicycleConfigGroup.getMarginalUtilityOfInfrastructure_m();
 		this.marginalUtilityOfComfort_m = bicycleConfigGroup.getMarginalUtilityOfComfort_m();
 		this.marginalUtilityOfGradient_m_100m = bicycleConfigGroup.getMarginalUtilityOfGradient_m_100m();
+		this.bicycleMode = bicycleConfigGroup.getBicycleMode();
 	}
 	
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
 		// Get leg score from regular CharyparNagelLegScoring
 		double legScore = super.calcLegScore(departureTime, arrivalTime, leg);
-		// LOG.warn("----- legScore = " + legScore);
-		
-		NetworkRoute networkRoute = (NetworkRoute) leg.getRoute();
-		
-		List<Id<Link>> linkIds = new ArrayList<>();
-		linkIds.addAll(networkRoute.getLinkIds());
-		linkIds.add(networkRoute.getEndLinkId());
-		
-		// Iterate over all links of the route
-		for (Id<Link> linkId : linkIds) {
-			double scoreOnLink = BicycleUtilityUtils.computeLinkBasedScore(network.getLinks().get(linkId),
-					marginalUtilityOfComfort_m, marginalUtilityOfInfrastructure_m, marginalUtilityOfGradient_m_100m);
-			// LOG.warn("----- link = " + linkId + " -- scoreOnLink = " + scoreOnLink);
-			legScore += scoreOnLink;
+
+		if (isBicycleMode(leg.getMode())) {
+
+			if (!isSameStartAndEnd(leg)) {
+
+				NetworkRoute networkRoute = (NetworkRoute) leg.getRoute();
+
+				List<Id<Link>> linkIds = new ArrayList<>(networkRoute.getLinkIds());
+				linkIds.add(networkRoute.getEndLinkId());
+				
+				// Iterate over all links of the route
+				for (Id<Link> linkId : linkIds) {
+					double scoreOnLink = BicycleUtilityUtils.computeLinkBasedScore(network.getLinks().get(linkId),
+							marginalUtilityOfComfort_m, marginalUtilityOfInfrastructure_m, marginalUtilityOfGradient_m_100m);
+					// LOG.warn("----- link = " + linkId + " -- scoreOnLink = " + scoreOnLink);
+					legScore += scoreOnLink;
+				}
+			}
 		}
+		
 		return legScore;
+	}
+
+	private boolean isBicycleMode(String mode) {
+		return mode.equals(bicycleMode);
+	}
+
+	private boolean isSameStartAndEnd(Leg leg) {
+		return leg.getRoute().getStartLinkId().toString().equals(leg.getRoute().getEndLinkId().toString());
 	}
 }

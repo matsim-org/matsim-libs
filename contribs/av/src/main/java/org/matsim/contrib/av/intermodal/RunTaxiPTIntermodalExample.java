@@ -22,6 +22,8 @@
  */
 package org.matsim.contrib.av.intermodal;
 
+import java.net.URL;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.av.intermodal.router.VariableAccessTransitRouterModule;
 import org.matsim.contrib.av.intermodal.router.config.VariableAccessConfigGroup;
@@ -42,17 +44,9 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 /**
  * @author jbischoff
  */
-
-/**
- *
- */
 public class RunTaxiPTIntermodalExample {
-	public static void main(String[] args) {
-		new RunTaxiPTIntermodalExample().run(false);
-	}
-
-	public void run(boolean OTFVis) {
-		Config config = ConfigUtils.loadConfig("intermodal/config.xml", new TaxiConfigGroup(), new DvrpConfigGroup());
+	public void run(URL configUrl, boolean OTFVis) {
+		Config config = ConfigUtils.loadConfig(configUrl, new TaxiConfigGroup(), new DvrpConfigGroup());
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 

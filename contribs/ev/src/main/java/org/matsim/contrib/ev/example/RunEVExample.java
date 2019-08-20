@@ -21,21 +21,17 @@ package org.matsim.contrib.ev.example;/*
  * created by jbischoff, 19.03.2019
  */
 
+import java.io.File;
 import java.io.IOException;
-import java.util.function.Function;
+import java.net.URL;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
-import org.matsim.contrib.ev.charging.ChargingLogic;
-import org.matsim.contrib.ev.charging.ChargingStrategy;
-import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
-import org.matsim.contrib.ev.charging.FastThenSlowCharging;
 import org.matsim.contrib.ev.charging.VehicleChargingHandler;
-import org.matsim.contrib.ev.data.Charger;
-import org.matsim.contrib.ev.routing.EVNetworkRoutingProvider;
+import org.matsim.contrib.ev.routing.EvNetworkRoutingProvider;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -44,43 +40,41 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class RunEVExample {
-	private static final Logger log = Logger.getLogger(RunEVExample.class);
+public class RunEvExample {
+	static final String DEFAULT_CONFIG_FILE = "test/input/org/matsim/contrib/ev/example/RunEvExample/config.xml";
+	private static final Logger log = Logger.getLogger(RunEvExample.class);
 
 	public static void main(String[] args) throws IOException {
-
-		String configFile;
+		final URL configUrl;
 		if (args.length > 0) {
 			log.info("Starting simulation run with the following arguments:");
-			configFile = args[0];
-			log.info("config file: " + configFile);
-
+			configUrl = new URL(args[0]);
+			log.info("config URL: " + configUrl);
 		} else {
-			log.info("Starting simulation run with example config file from resource path");
-
-			//load config file from resource path (see src/main/resources folder for the example)
-			configFile = "config.xml";
+			File localConfigFile = new File(DEFAULT_CONFIG_FILE);
+			if (localConfigFile.exists()) {
+				log.info("Starting simulation run with the local example config file");
+				configUrl = localConfigFile.toURI().toURL();
+			} else {
+				log.info("Starting simulation run with the example config file from GitHub repository");
+				configUrl = new URL("https://raw.githubusercontent.com/matsim-org/matsim/master/contribs/ev/"
+						+ DEFAULT_CONFIG_FILE);
+			}
 		}
-		new RunEVExample().run(configFile);
+		new RunEvExample().run(configUrl);
 	}
 
-	public void run(String configFile) {
-		Config config = ConfigUtils.loadConfig(configFile, new EvConfigGroup());
+	public void run(URL configUrl) {
+		Config config = ConfigUtils.loadConfig(configUrl, new EvConfigGroup());
 		config.controler()
 				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Function<Charger, ChargingStrategy> chargingStrategyFactory = charger -> new FastThenSlowCharging(
-				charger.getPower());
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new EvModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addRoutingModuleBinding(TransportMode.car).toProvider(new EVNetworkRoutingProvider(TransportMode.car));
-				bind(ChargingLogic.Factory.class).toInstance(
-						charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-								chargingStrategyFactory.apply(charger)));
-
+				addRoutingModuleBinding(TransportMode.car).toProvider(new EvNetworkRoutingProvider(TransportMode.car));
 				installQSimModule(new AbstractQSimModule() {
 					@Override
 					protected void configureQSim() {

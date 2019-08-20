@@ -22,79 +22,106 @@ package org.matsim.contrib.ev.charging;
 
 import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
+
+import com.google.common.base.MoreObjects;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class VariableSpeedCharging implements ChargingStrategy {
+public class VariableSpeedCharging implements ChargingPower {//TODO upgrade to BatteryCharging
+
 	public static class Point {
 		private final double relativeSoc;
 		private final double relativePower;
 
-		public Point(double relativeSoc, double relativePower) {
+		public Point(double relativeSoc, double relativeSpeed) {
+			if (relativeSoc < 0 || relativeSoc > 1) {
+				throw new IllegalArgumentException("Relative SOC must be in [0,1]");
+			}
+			if (relativeSpeed <= 0) {//XXX To avoid infinite charging simulation (e.g. at SOC==0 or close to 1.0)
+				throw new IllegalArgumentException("Relative speed must be positive");
+			}
 			this.relativeSoc = relativeSoc;
-			this.relativePower = relativePower;
+			this.relativePower = relativeSpeed;
+		}
+
+		@Override
+		public String toString() {
+			return MoreObjects.toStringHelper(this)
+					.add("relativeSoc", relativeSoc)
+					.add("relativePower", relativePower)
+					.toString();
 		}
 	}
 
-	public static VariableSpeedCharging createStrategyForTesla(double chargingPower, double maxRelativeSoc) {
-		Point pointA = new Point(0, 0.75);// 0% => 0.75 c
-		Point pointB = new Point(0.15, 1.5);// 15% => 1.5 c
-		Point pointC = new Point(0.5, 1.5);// 50% => 1.5 c
-		Point pointD = new Point(1.0, 0.05);// 100% => 0.05 c
-		return new VariableSpeedCharging(chargingPower, maxRelativeSoc, pointA, pointB, pointC, pointD);
+	public static VariableSpeedCharging createForTesla(ElectricVehicle electricVehicle) {
+		Point pointA = new Point(0, 0.75);// 0% => 0.75 C
+		Point pointB = new Point(0.15, 1.5);// 15% => 1.5 C
+		Point pointC = new Point(0.5, 1.5);// 50% => 1.5 C
+		Point pointD = new Point(1.0, 0.05);// 100% => 0.05 C
+		return new VariableSpeedCharging(electricVehicle, pointA, pointB, pointC, pointD);
 	}
 
-	public static VariableSpeedCharging createStrategyForNissanLeaf(double chargingPower, double maxRelativeSoc) {
-		Point pointA = new Point(0, 0.75);// 0% => 0.75 c
-		Point pointB = new Point(0.1, 1.75);// 15% => 1.5 c
-		Point pointC = new Point(0.6, 1.75);// 50% => 1.5 c
-		Point pointD = new Point(1.0, 0.05);// 100% => 0.05 c
-		return new VariableSpeedCharging(chargingPower, maxRelativeSoc, pointA, pointB, pointC, pointD);
+	public static VariableSpeedCharging createForNissanLeaf(ElectricVehicle electricVehicle) {
+		Point pointA = new Point(0, 0.75);// 0% => 0.75 C
+		Point pointB = new Point(0.1, 1.75);// 10% => 1.75 C
+		Point pointC = new Point(0.6, 1.75);// 60% => 1.75 C
+		Point pointD = new Point(1.0, 0.05);// 100% => 0.05 C
+		return new VariableSpeedCharging(electricVehicle, pointA, pointB, pointC, pointD);
 	}
 
-	private final double chargingPower;
-	private final double maxRelativeSoc;
+	private final ElectricVehicle electricVehicle;
+	private final Point pointA;
+	private final Point pointB;
+	private final Point pointC;
+	private final Point pointD;
 
-	private final Point pointA = new Point(0, 0.75);// 0% => 0.75 c
-	private final Point pointB = new Point(0.15, 1.5);// 15% => 1.5 c
-	private final Point pointC = new Point(0.5, 1.5);// 50% => 1.5 c
-	private final Point pointD = new Point(1.0, 0.05);// 100% => 0.05 c
-
-	//XXX To avoid infinite charging simulation at 0 or close to 1.0 ensure:
-	// 1. pointD.relativePower > 0.0
-	// 2. pointA.relativePower > 0.0
-	public VariableSpeedCharging(double chargingPower, double maxRelativeSoc, Point pointA, Point pointB, Point pointC,
+	public VariableSpeedCharging(ElectricVehicle electricVehicle, Point pointA, Point pointB, Point pointC,
 			Point pointD) {
-		if (chargingPower <= 0) {
-			throw new IllegalArgumentException("chargingPower must be positive");
+		//checks whether the A-B-C-D profile
+		if (pointA.relativeSoc != 0) {
+			throw new IllegalArgumentException("PointA.relativeSoc must be 0");
 		}
-		if (maxRelativeSoc <= 0 || maxRelativeSoc > 1) {
-			throw new IllegalArgumentException("maxRelativeSoc must be in (0,1]");
+		if (pointD.relativeSoc != 1) {
+			throw new IllegalArgumentException("PointB.relativeSoc must be 1");
+		}
+		if (pointB.relativeSoc == 0) {
+			throw new IllegalArgumentException("PointB.relativeSoc must be greater than 0");
+		}
+		if (pointC.relativeSoc == 1) {
+			throw new IllegalArgumentException("PointB.relativeSoc must be less than 1");
+		}
+		if (pointB.relativeSoc >= pointC.relativeSoc) {
+			throw new IllegalArgumentException("PointB.relativeSoc must be less than PointC.relativeSoc");
+		}
+		if (pointA.relativePower > pointB.relativePower) {
+			throw new IllegalArgumentException("PointA.relativePower must not be greater than PointB.relativePower");
+		}
+		if (pointD.relativePower > pointC.relativePower) {
+			throw new IllegalArgumentException("PointD.relativePower must not be greater than PointC.relativePower");
 		}
 
-		this.chargingPower = chargingPower;
-		this.maxRelativeSoc = maxRelativeSoc;
+		this.electricVehicle = electricVehicle;
+		this.pointA = pointA;
+		this.pointB = pointB;
+		this.pointC = pointC;
+		this.pointD = pointD;
 	}
 
-	//TODO calcCurrentPower
-	public double calcEnergyCharge(ElectricVehicle ev, double chargePeriod) {
-		Battery b = ev.getBattery();
+	@Override
+	public double calcChargingPower(Charger charger) {
+		Battery b = electricVehicle.getBattery();
 		double relativeSoc = b.getSoc() / b.getCapacity();
 		double c = b.getCapacity() / 3600.;
-		double currentPower;
 
-		Point adjustedPointB = adjustPointIfSlowerCharging(c, pointA, pointB);
-		Point adjustedPointC = adjustPointIfSlowerCharging(c, pointD, pointC);
-
-		if (relativeSoc <= adjustedPointB.relativeSoc) {
-			currentPower = c * approxRelativePower(relativeSoc, pointA, adjustedPointB);
-		} else if (relativeSoc <= adjustedPointC.relativeSoc) {
-			currentPower = c * approxRelativePower(relativeSoc, adjustedPointB, adjustedPointC);
+		if (relativeSoc <= pointB.relativeSoc) {
+			return Math.min(charger.getPower(), c * approxRelativePower(relativeSoc, pointA, pointB));
+		} else if (relativeSoc <= pointC.relativeSoc) {
+			return Math.min(charger.getPower(), c * approxRelativePower(relativeSoc, pointB, pointC));
 		} else {
-			currentPower = c * approxRelativePower(relativeSoc, adjustedPointC, pointD);
+			return Math.min(charger.getPower(), c * approxRelativePower(relativeSoc, pointC, pointD));
 		}
-		return currentPower * chargePeriod;
 	}
 
 	private double approxRelativePower(double relativeSoc, Point point0, Point point1) {
@@ -102,48 +129,54 @@ public class VariableSpeedCharging implements ChargingStrategy {
 		return point0.relativePower + a * (point1.relativePower - point0.relativePower);
 	}
 
-	@Override
-	public boolean isChargingCompleted(ElectricVehicle ev) {
-		return calcRemainingEnergyToCharge(ev) <= 0;
-	}
-
-	@Override
-	public double calcRemainingEnergyToCharge(ElectricVehicle ev) {
-		Battery b = ev.getBattery();
-		return maxRelativeSoc * b.getCapacity() - b.getSoc();
-	}
-
-	@Override
-	public double calcRemainingTimeToCharge(ElectricVehicle ev) {
-		Battery b = ev.getBattery();
+	//TODO convert to: calcChargingTime(Charger charger, double energy)
+	public double calcRemainingTimeToCharge(Charger charger) {
+		Battery b = electricVehicle.getBattery();
 		double relativeSoc = b.getSoc() / b.getCapacity();
 		double c = b.getCapacity() / 3600.;
+		double relativeChargerPower = charger.getPower() / c;
 
-		Point adjustedPointB = adjustPointIfSlowerCharging(c, pointA, pointB);
-		Point adjustedPointC = adjustPointIfSlowerCharging(c, pointD, pointC);
+		final Point adjustedPointA;
+		final Point adjustedPointB;
+		if (pointA.relativePower >= relativeChargerPower) {
+			adjustedPointA = new Point(0, relativeChargerPower);
+			adjustedPointB = new Point(pointB.relativeSoc, relativeChargerPower);
+		} else {
+			adjustedPointA = pointA;
+			adjustedPointB = adjustPointIfSlowerCharging(relativeChargerPower, pointA, pointB);
+		}
+
+		final Point adjustedPointD;
+		final Point adjustedPointC;
+		if (pointD.relativePower >= relativeChargerPower) {//rather unlikely
+			adjustedPointD = new Point(1, relativeChargerPower);
+			adjustedPointC = new Point(pointC.relativeSoc, relativeChargerPower);
+		} else {
+			adjustedPointD = pointD;
+			adjustedPointC = adjustPointIfSlowerCharging(relativeChargerPower, pointD, pointC);
+		}
 
 		if (relativeSoc <= adjustedPointB.relativeSoc) {
-			return approximateRemainingChargeTime(relativeSoc, pointA, adjustedPointB)//
+			return approximateRemainingChargeTime(relativeSoc, adjustedPointA, adjustedPointB)//
 					+ approxChargeTime(adjustedPointB, adjustedPointC)//
-					+ approxChargeTime(adjustedPointC, pointD);
+					+ approxChargeTime(adjustedPointC, adjustedPointD);
 		} else if (relativeSoc <= adjustedPointC.relativeSoc) {
 			return approximateRemainingChargeTime(relativeSoc, adjustedPointB, adjustedPointC)//
-					+ approxChargeTime(adjustedPointC, pointD);
+					+ approxChargeTime(adjustedPointC, adjustedPointD);
 		} else {
-			return approximateRemainingChargeTime(relativeSoc, adjustedPointC, pointD);
+			return approximateRemainingChargeTime(relativeSoc, adjustedPointC, adjustedPointD);
 		}
 	}
 
-	private Point adjustPointIfSlowerCharging(double c, Point lowerPoint, Point higherPoint) {
-		if (chargingPower >= c * higherPoint.relativePower) {
+	private Point adjustPointIfSlowerCharging(double relativeChargerPower, Point lowerPoint, Point higherPoint) {
+		if (relativeChargerPower >= higherPoint.relativePower) {
 			return higherPoint;
 		}
 
-		double relativeChargingPower = chargingPower / c;
-		double a = (relativeChargingPower - lowerPoint.relativePower) / (higherPoint.relativePower
+		double a = (relativeChargerPower - lowerPoint.relativePower) / (higherPoint.relativePower
 				- lowerPoint.relativePower);
 		double relativeSoc = lowerPoint.relativeSoc + a * (higherPoint.relativeSoc - lowerPoint.relativeSoc);
-		return new Point(relativeSoc, relativeChargingPower);
+		return new Point(relativeSoc, relativeChargerPower);
 	}
 
 	private double approximateRemainingChargeTime(double relativeSoc, Point point0, Point point1) {
