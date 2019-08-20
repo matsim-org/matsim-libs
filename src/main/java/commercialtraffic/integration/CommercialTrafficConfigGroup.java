@@ -50,11 +50,6 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     public static final String FIRSTLEGBUFFER = "firstLegBufferFactor";
     public static final String FIRSTLEGBUFFERDESC = "Buffer travel time factor for the first leg of a freight tour.";
 
-    @Positive
-    private int jspritIterations = 100;
-    public static final String JSPRITITERS = "jspritIterations";
-    public static final String JSPRITITERSDESC = "Number of jsprit Iterations. These take place at the beginning of each MATSim iteration";
-
     private boolean runTourPlanning = true;
     public  static final String RUNJSPRIT = "runTourPlanning";
     public static final String RUNJSPRITDESC = "Defines whether JSprit is run. " +
@@ -155,22 +150,6 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     @StringSetter(FIRSTLEGBUFFER)
     public void setFirstLegTraveltimeBufferFactor(double firstLegTraveltimeBufferFactor) {
         this.firstLegTraveltimeBufferFactor = firstLegTraveltimeBufferFactor;
-    }
-
-    /**
-     * @return jspritIterations --{@value #JSPRITITERSDESC}
-     */
-    @StringGetter(JSPRITITERS)
-    public int getJspritIterations() {
-        return jspritIterations;
-    }
-
-    /**
-     * @param jspritIterations --{@value #JSPRITITERSDESC}
-     */
-    @StringSetter(JSPRITITERS)
-    public void setJspritIterations(int jspritIterations) {
-        this.jspritIterations = jspritIterations;
     }
 
     @StringSetter(RUNJSPRIT)
