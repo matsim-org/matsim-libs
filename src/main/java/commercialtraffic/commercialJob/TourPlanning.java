@@ -22,6 +22,7 @@ package commercialtraffic.commercialJob;
 
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
+import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
 import com.graphhopper.jsprit.core.algorithm.state.StateManager;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
@@ -60,12 +61,25 @@ public class TourPlanning  {
         netBuilder.setTravelTime(travelTime);
         final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
         carriers.getCarriers().values().parallelStream().forEach(carrier -> {
-                    log.info("start tour planning for " + carrier.getId());
+                    double start = System.currentTimeMillis();
+                    int serviceCount =  carrier.getServices().size();
+                    log.info("start tour planning for " + carrier.getId() + " which has " + serviceCount + " services");
+
                     //Build VRP
                     VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork());
                     vrpBuilder.setRoutingCost(netBasedCosts);// this may be too expensive for the size of the problem
 
                     VehicleRoutingProblem problem = vrpBuilder.build();
+
+                    double radialShare =  0.3;  //standard radial share is 0.3
+                    double randomShare = 0.5;   //standard random share is 0.5
+                    if(serviceCount > 1000){ //if problem is huge, take only half the share for replanning
+                        radialShare = 0.15;
+                        randomShare = 0.25;
+                    }
+
+                    int radialServicesReplanned = Math.max( 1, (int) (serviceCount * radialShare));
+                    int randomServicesReplanned = Math.max( 1, (int) (serviceCount * randomShare));
 
                     //use this in order to set a 'hard' constraint on time windows
                     StateManager stateManager = new StateManager(problem);
@@ -73,25 +87,36 @@ public class TourPlanning  {
                     constraintManager.addConstraint(new ServiceDeliveriesFirstConstraint(), ConstraintManager.Priority.CRITICAL);
                     constraintManager.addConstraint(new VehicleDependentTimeWindowConstraints(stateManager, problem.getTransportCosts(), problem.getActivityCosts()), ConstraintManager.Priority.HIGH);
                     VehicleRoutingAlgorithm algorithm = Jsprit.Builder.newInstance(problem)
-                                                        .setStateAndConstraintManager(stateManager,constraintManager)
-                                                        .buildAlgorithm();
+                            .setStateAndConstraintManager(stateManager,constraintManager)
+                            .setProperty(Jsprit.Parameter.RADIAL_MIN_SHARE, String.valueOf(radialServicesReplanned))
+                            .setProperty(Jsprit.Parameter.RADIAL_MAX_SHARE, String.valueOf(radialServicesReplanned))
+                            .setProperty(Jsprit.Parameter.RANDOM_BEST_MIN_SHARE, String.valueOf(randomServicesReplanned))
+                            .setProperty(Jsprit.Parameter.RANDOM_BEST_MAX_SHARE, String.valueOf(randomServicesReplanned))
+                            .buildAlgorithm();
+
 
                     // get the algorithm out-of-the-box, search solution and get the best one.
 //                    VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
 
-                    algorithm.setMaxIterations(maxIterations);
+                    if(serviceCount == 0){
+                        log.info("setting maxIterations=1 as carrier has no services");
+                        algorithm.setMaxIterations(1);
+                    } else{
+                        algorithm.setMaxIterations(maxIterations);
+                    }
 
                     // variationCoefficient = stdDeviation/mean. so i set the threshold rather soft
-//                    algorithm.addTerminationCriterion(new VariationCoefficientTermination(5, 0.1));
+//                    algorithm.addTerminationCriterion(new VariationCoefficientTermination(5, 0.1)); //this does not seem to work, tschlenther august 2019
 
                     Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
                     VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
+                    log.info("tour planning for carrier " + carrier.getId() + " took " + (System.currentTimeMillis() - start)/1000 + " seconds.");
                     //get the CarrierPlan
                     CarrierPlan carrierPlan = MatsimJspritFactory.createPlan(carrier, bestSolution);
 
                     log.info("routing plan for carrier " + carrier.getId());
                     NetworkRouter.routePlan(carrierPlan, netBasedCosts);    //we need to route the plans in order to create reasonable freight-agent plans
-                    log.info("routing for carrier " + carrier.getId() + " finished");
+                    log.info("routing for carrier " + carrier.getId() + " finished. Tour planning plus routing took " + (System.currentTimeMillis() - start)/1000 + " seconds." );
                     carrier.setSelectedPlan(carrierPlan);
                 }
         );
