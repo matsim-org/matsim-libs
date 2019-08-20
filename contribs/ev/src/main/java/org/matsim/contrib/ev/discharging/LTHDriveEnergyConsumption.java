@@ -31,8 +31,6 @@ import org.matsim.core.gbl.Gbl;
 
 import com.google.common.primitives.Doubles;
 
-import com.google.common.primitives.Doubles;
-
 public class LTHDriveEnergyConsumption implements DriveEnergyConsumption {
 
 	private PiecewiseBicubicSplineInterpolator splineInterpolater = new PiecewiseBicubicSplineInterpolator();
