@@ -111,7 +111,7 @@ public class RunCommercialTrafficUsingDRTExample {
         ScenarioUtils.loadScenario(scenario);
         Controler controler = new Controler(scenario);
 
-        controler.addOverridingModule(new CommercialTrafficModule( (carrierId -> TransportMode.drt), config));
+        controler.addOverridingModule(new CommercialTrafficModule( config, (carrierId -> 20), (carrierId -> TransportMode.drt)));
 
         controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(MultiModeDrtConfigGroup.get(config)));
         controler.run();

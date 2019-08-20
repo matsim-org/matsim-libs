@@ -48,17 +48,20 @@ public class CommercialTrafficModule extends AbstractModule {
 
     private final Config config;
     private final MultiModeDrtConfigGroup multiModeDrtCfgGroup = null;
+    private final CarrierJSpritIterations iterationsForCarrier;
     private CarrierMode carrierMode;
 
-    public CommercialTrafficModule(Config config){
+    public CommercialTrafficModule(Config config, CarrierJSpritIterations iterationsForCarrier){
         super();
         this.config = config;
+        this.iterationsForCarrier = iterationsForCarrier;
     }
 
-    public CommercialTrafficModule(CarrierMode carrierMode, Config config){
+    public CommercialTrafficModule(Config config, CarrierJSpritIterations iterationsForCarrier, CarrierMode carrierMode){
         super();
         this.carrierMode = carrierMode;
         this.config = config;
+        this.iterationsForCarrier = iterationsForCarrier;
     }
 
 
@@ -86,6 +89,8 @@ public class CommercialTrafficModule extends AbstractModule {
         bind(ScoreCommercialServices.class).in(Singleton.class);
         bind(TourLengthAnalyzer.class).in(Singleton.class);
         bind(FreightAgentInserter.class).in(Singleton.class);
+
+        bind(CarrierJSpritIterations.class).toInstance(iterationsForCarrier);
 
         if(this.carrierMode == null){
             bind(CarrierMode.class).toInstance(carrierId -> TransportMode.car);

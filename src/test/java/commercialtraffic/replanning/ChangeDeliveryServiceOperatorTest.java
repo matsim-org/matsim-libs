@@ -29,7 +29,7 @@ public class ChangeDeliveryServiceOperatorTest {
         Scenario scenario = TestScenarioGeneration.generateScenario();
         Map<String, TravelTime> travelTimes = new HashMap<>();
         travelTimes.put(TransportMode.car, new FreeSpeedTravelTime());
-        CommercialJobManager manager = new CommercialJobManager(carriers,scenario,
+        CommercialJobManager manager = new CommercialJobManager(carriers, (carrierId -> 20), scenario,
                 new FreightAgentInserter(scenario),
                 travelTimes);
         ChangeDeliveryServiceOperator changeDeliveryServiceOperator = new ChangeDeliveryServiceOperator(scenario.getConfig().global(), manager);
