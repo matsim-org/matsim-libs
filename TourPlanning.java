@@ -53,11 +53,12 @@ public class TourPlanning  {
     @Inject
     CarrierMode carrierMode;
 
-    static void runTourPlanningForCarriers(Carriers carriers, Scenario scenario, int maxIterations, TravelTime travelTime) {
+    static void runTourPlanningForCarriers(Carriers carriers, Scenario scenario, int maxIterations, int jSpritTimeSliceWidth, TravelTime travelTime) {
         Set<CarrierVehicleType> vehicleTypes = new HashSet<>();
         carriers.getCarriers().values().forEach(carrier -> vehicleTypes.addAll(carrier.getCarrierCapabilities().getVehicleTypes()));
         NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), vehicleTypes);
-        netBuilder.setTimeSliceWidth(1800); // !!!! otherwise it will not do anything.
+        log.info("SETTING TIME SLICE TO " + jSpritTimeSliceWidth);
+        netBuilder.setTimeSliceWidth(jSpritTimeSliceWidth); // !!!! otherwise it will not do anything.
         netBuilder.setTravelTime(travelTime);
         final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
         carriers.getCarriers().values().parallelStream().forEach(carrier -> {

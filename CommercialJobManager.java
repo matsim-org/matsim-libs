@@ -151,7 +151,7 @@ public class CommercialJobManager implements BeforeMobsimListener, AfterMobsimLi
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
         if(ctConfigGroup.getRunTourPlanning()){
             serviceRegistry.forEach(service -> carriers.getCarriers().get(service2Operator.get(service.getId())).getServices().add(service));
-            TourPlanning.runTourPlanningForCarriers(carriers,scenario,ctConfigGroup.getJspritIterations(), carTravelTime);
+            TourPlanning.runTourPlanningForCarriers(carriers,scenario,ctConfigGroup.getJspritIterations(), ctConfigGroup.getJspritTimeSliceWidth(), carTravelTime);
             agentInserter.createFreightAgents(carriers,ctConfigGroup.getFirstLegTraveltimeBufferFactor());
         }
     }
