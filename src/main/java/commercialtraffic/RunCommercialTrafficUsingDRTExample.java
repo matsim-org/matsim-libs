@@ -95,7 +95,7 @@ public class RunCommercialTrafficUsingDRTExample {
         config.planCalcScore().addActivityParams(work);
         config.controler().setLastIteration(10);
         config.controler().setWriteEventsInterval(1);
-        config.controler().setOutputDirectory("output/commercialtraffictestrun");
+        config.controler().setOutputDirectory("output/commercialtraffictestrunWithDRT");
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         config.network().setInputFile(inputDir + "grid_network.xml");
         config.plans().setInputFile(inputDir + "testpop.xml");
