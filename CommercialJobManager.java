@@ -20,6 +20,7 @@
 
 package commercialtraffic.commercialJob;
 
+import commercialtraffic.integration.CarrierJSpritIterations;
 import commercialtraffic.integration.CommercialTrafficConfigGroup;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.matsim.api.core.v01.Id;
@@ -54,8 +55,12 @@ public class CommercialJobManager implements BeforeMobsimListener, AfterMobsimLi
     private Map<Id<CarrierService>,Id<Person>> service2Customer = new HashMap<>();
     private TravelTime carTravelTime;
 
+    private CarrierJSpritIterations carrierJSpritIterations;
+
+    //needs to be public to be accessible in tests
     @Inject
-    private CommercialJobManager(Carriers carriers, Scenario scenario, FreightAgentInserter agentInserter, Map<String, TravelTime> travelTimes){
+    public CommercialJobManager(Carriers carriers, CarrierJSpritIterations carrierJSpritIterations, Scenario scenario, FreightAgentInserter agentInserter, Map<String, TravelTime> travelTimes){
+        this.carrierJSpritIterations = carrierJSpritIterations;
         this.agentInserter = agentInserter;
         this.scenario = scenario;
         this.carTravelTime = travelTimes.get(TransportMode.car);
@@ -151,7 +156,7 @@ public class CommercialJobManager implements BeforeMobsimListener, AfterMobsimLi
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
         if(ctConfigGroup.getRunTourPlanning()){
             serviceRegistry.forEach(service -> carriers.getCarriers().get(service2Operator.get(service.getId())).getServices().add(service));
-            TourPlanning.runTourPlanningForCarriers(carriers,scenario,ctConfigGroup.getJspritIterations(), ctConfigGroup.getJspritTimeSliceWidth(), carTravelTime);
+            TourPlanning.runTourPlanningForCarriers(carriers,scenario, carrierJSpritIterations, ctConfigGroup.getJspritTimeSliceWidth(), carTravelTime);
             agentInserter.createFreightAgents(carriers,ctConfigGroup.getFirstLegTraveltimeBufferFactor());
         }
     }
