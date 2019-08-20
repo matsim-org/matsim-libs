@@ -39,6 +39,7 @@ import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.utils.misc.Time;
@@ -50,8 +51,39 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 
 	@SuppressWarnings("deprecation")
 	public static DrtConfigGroup get(Config config) {
-		return (DrtConfigGroup)config.getModule(GROUP_NAME);
+//		return (DrtConfigGroup)config.getModule(GROUP_NAME);
+		return ConfigUtils.addOrGetModule( config, DrtConfigGroup.class ) ;
+		// yyyy I think that this method should be inlined and then removed to become consistent with how it is done elsewhere.  kai, aug'19
+		// yy I have to say that I am not sure if the method should exist at all.  It seems to me that DrtConfigGroup can exist both at the base level
+		// _and_ as one of many such config groups inside MultiModeDrtConfigGroups.  Our experience with such dual use approaches is not so good.  kai,
+		// aug'19
 	}
+
+	// ---
+	private static final String DRT_SERVICE_AREA_FILENAME="drtServiceAreaShapeFile" ;
+	private String drtServiceAreaShapeFile = null ;
+
+	/**
+	 * @return {@link #DRT_SERVICE_AREA_FILE_EXP}
+	 */
+//	@StringGetter( DRT_SERVICE_AREA_FILENAME )
+// yyyy could presumably be commented in (= allow in xml). kai, aug'19
+	public String getDrtServiceAreaShapeFile(){
+		return drtServiceAreaShapeFile;
+	}
+
+	/**
+	 * @param getDrtServiceAreaShapeFile -- {@link #DRT_SERVICE_AREA_FILE_EXP}
+	 */
+//	@StringSetter( DRT_SERVICE_AREA_FILENAME )
+// yyyy could presumably be commented in (= allow in xml). kai, aug'19
+	public void setDrtServiceAreaShapeFile( String getDrtServiceAreaShapeFile ){
+		this.drtServiceAreaShapeFile = getDrtServiceAreaShapeFile;
+	}
+	private static final String DRT_SERVICE_AREA_FILE_EXP ="allows to configure a service area per drt mode.  For the time being, the default code is " +
+												"not doing anything with that info; this may follow in the future." ;
+
+	// ---
 
 	public static final String MODE = "mode";
 	static final String MODE_EXP = "Mode which will be handled by PassengerEngine and VrpOptimizer "
@@ -260,6 +292,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		map.put(NUMBER_OF_THREADS, NUMBER_OF_THREADS_EXP);
 		map.put(PRINT_WARNINGS, PRINT_WARNINGS_EXP);
 		map.put(REQUEST_REJECTION, REQUEST_REJECTION_EXP);
+		map.put(DRT_SERVICE_AREA_FILENAME, DRT_SERVICE_AREA_FILE_EXP ) ;
 		return map;
 	}
 
