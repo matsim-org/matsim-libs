@@ -21,6 +21,7 @@ package commercialtraffic.integration;/*
  * created by jbischoff, 03.05.2019
  */
 
+import com.google.inject.Singleton;
 import commercialtraffic.analysis.CommercialTrafficAnalysisListener;
 import commercialtraffic.analysis.TourLengthAnalyzer;
 import commercialtraffic.commercialJob.CommercialJobManager;
@@ -81,10 +82,10 @@ public class CommercialTrafficModule extends AbstractModule {
         bind(CommercialTrafficChecker.class).toInstance(consistencyChecker);
         bind(DeliveryScoreCalculator.class).toInstance(new DefaultCommercialServiceScore(ctcg.getMaxDeliveryScore(), ctcg.getMinDeliveryScore(), ctcg.getZeroUtilityDelay()));
         bind(Carriers.class).toInstance(carriers);
-        bind(CommercialJobManager.class).asEagerSingleton();
-        bind(ScoreCommercialServices.class).asEagerSingleton();
-        bind(TourLengthAnalyzer.class).asEagerSingleton();
-        bind(FreightAgentInserter.class).asEagerSingleton();
+        bind(CommercialJobManager.class).in(Singleton.class);
+        bind(ScoreCommercialServices.class).in(Singleton.class);
+        bind(TourLengthAnalyzer.class).in(Singleton.class);
+        bind(FreightAgentInserter.class).in(Singleton.class);
 
         if(this.carrierMode == null){
             bind(CarrierMode.class).toInstance(carrierId -> TransportMode.car);

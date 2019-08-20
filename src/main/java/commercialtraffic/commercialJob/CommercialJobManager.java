@@ -55,7 +55,7 @@ public class CommercialJobManager implements BeforeMobsimListener, AfterMobsimLi
     private TravelTime carTravelTime;
 
     @Inject
-    public CommercialJobManager(Carriers carriers, Scenario scenario, FreightAgentInserter agentInserter, Map<String, TravelTime> travelTimes){
+    private CommercialJobManager(Carriers carriers, Scenario scenario, FreightAgentInserter agentInserter, Map<String, TravelTime> travelTimes){
         this.agentInserter = agentInserter;
         this.scenario = scenario;
         this.carTravelTime = travelTimes.get(TransportMode.car);

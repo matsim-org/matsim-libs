@@ -60,7 +60,7 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
 
 
     @Inject
-    public ScoreCommercialServices(CommercialJobManager manager, DeliveryScoreCalculator scoreCalculator, EventsManager eventsManager, CommercialTrafficConfigGroup cfGroup) {
+    private ScoreCommercialServices(CommercialJobManager manager, DeliveryScoreCalculator scoreCalculator, EventsManager eventsManager, CommercialTrafficConfigGroup cfGroup) {
         this.jobManager = manager;
         this.scoreCalculator = scoreCalculator;
         this.eventsManager = eventsManager;

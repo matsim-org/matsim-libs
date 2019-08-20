@@ -48,7 +48,7 @@ public class FreightAgentInserter {
     private Set<String> drtModes = new HashSet<>();
 
     @Inject
-    public FreightAgentInserter(Scenario scenario, CarrierMode carrierMode, Config config) {
+    private FreightAgentInserter(Scenario scenario, CarrierMode carrierMode, Config config) {
         this.scenario = scenario;
         this.carrierMode = carrierMode;
         getDrtModes(config);

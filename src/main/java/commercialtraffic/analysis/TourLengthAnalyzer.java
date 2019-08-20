@@ -51,7 +51,7 @@ public class TourLengthAnalyzer implements ActivityEndEventHandler, LinkEnterEve
     private final Network network;
 
     @Inject
-    public TourLengthAnalyzer(Network network, EventsManager eventsManager) {
+    private TourLengthAnalyzer(Network network, EventsManager eventsManager) {
         this.network = network;
         eventsManager.addHandler(this);
     }
