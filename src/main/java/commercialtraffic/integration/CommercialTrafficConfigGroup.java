@@ -61,6 +61,14 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
             "If this is set to false, ChangeDeliveryOperator strategy must not be switched on and all carriers need to have at least one plan containing at least one tour.";
 
     @Positive
+    private int jSpritTimeSliceWidth = 1800;
+    public static final String JSPRITTIMESLICEWIDTH = "jSpritTimeSliceWidth";
+    public static final String JSPRITTIMESLICEWIDTHDESC = "time slice width used in JSprit in seconds." +
+            " The smaller the value, the more precise the calculation of routing costs but the longer the computation time." +
+            " Default value is 1800 seconds.";
+
+
+    @Positive
     private double zeroUtilityDelay = 1800;
     public static final String ZEROUTILDELAY = "zeroUtilityDelay";
     public static final String ZEROUTILDELAYDESC = "Delay (in seconds) that marks the threshold for zero utility";
@@ -172,6 +180,22 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     public boolean getRunTourPlanning(){ return runTourPlanning; }
 
     /**
+     * @return jspritTimeSliceWidth --{@value #JSPRITTIMESLICEWIDTHDESC}
+     */
+    @StringGetter(JSPRITTIMESLICEWIDTH)
+    public int getJspritTimeSliceWidth() {
+        return jSpritTimeSliceWidth;
+    }
+
+    /**
+     * @param jspritTimeSliceWidth --{@value #JSPRITTIMESLICEWIDTHDESC}
+     */
+    @StringSetter(JSPRITTIMESLICEWIDTH)
+    public void setjSpritTimeSliceWidth(int jspritTimeSliceWidth) {
+        this.jSpritTimeSliceWidth = jspritTimeSliceWidth;
+    }
+
+    /**
      * @return zeroUtilityDelay --{@value #ZEROUTILDELAYDESC}
      */
     @StringGetter(ZEROUTILDELAY)
@@ -242,6 +266,7 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
         map.put(CARRIERSVEHICLETYPED, CARRIERSVEHICLETYPEDESC);
         map.put(FIRSTLEGBUFFER, FIRSTLEGBUFFERDESC);
         map.put(JSPRITITERS, JSPRITITERSDESC);
+        map.put(JSPRITTIMESLICEWIDTH,JSPRITTIMESLICEWIDTHDESC);
         map.put(RUNJSPRIT,RUNJSPRITDESC);
         map.put(MAXDELIVERYSCORE, MAXDELIVERYSCOREDESC);
         map.put(MINDELIVERYSCORE, MINDELIVERYSCOREDESC);
