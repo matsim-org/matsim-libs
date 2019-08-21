@@ -226,7 +226,6 @@ import java.util.Set;
 
 	@Override
 	public NetworkModeAccessibilityExpContributionCalculator duplicate() {
-		log.info("Creating another NetworkModeAccessibilityExpContributionCalculator object.");
 		NetworkModeAccessibilityExpContributionCalculator networkModeAccessibilityExpContributionCalculator =
 				new NetworkModeAccessibilityExpContributionCalculator(this.mode, this.travelTime, this.travelDisutilityFactory, this.scenario);
 		networkModeAccessibilityExpContributionCalculator.subNetwork = this.subNetwork;
