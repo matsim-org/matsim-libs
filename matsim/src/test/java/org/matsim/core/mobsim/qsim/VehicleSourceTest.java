@@ -34,11 +34,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -54,6 +50,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
 import java.util.Arrays;
@@ -71,29 +68,29 @@ import java.util.Map;
 public class VehicleSourceTest {
 
 	private final VehiclesSource vehicleSource;
-	private final boolean isUsingPersonIdForMissionVehicleId;
+	private final boolean isUsingPersonIdForMissingVehicleId;
 
-	public VehicleSourceTest(VehiclesSource vehicleSource, boolean isUsingPersonIdForMissionVehicleId) {
+	public VehicleSourceTest(VehiclesSource vehicleSource, boolean isUsingPersonIdForMissingVehicleId) {
 		this.vehicleSource = vehicleSource;
-		this.isUsingPersonIdForMissionVehicleId = isUsingPersonIdForMissionVehicleId;
+		this.isUsingPersonIdForMissingVehicleId = isUsingPersonIdForMissingVehicleId;
 	}
 
-	@Parameters(name = "{index}: vehicleSource == {0}; isUsingPersonIdForMissionVehicleId == {1}")
+	@Parameters(name = "{index}: vehicleSource == {0}; isUsingPersonIdForMissingVehicleId == {1}")
 	public static Collection<Object[]> parameterObjects () {
-		int nrow = VehiclesSource.values().length;
-		Object [][] vehicleSources = new Object [nrow][2];
-		int index = 0;
-		for (VehiclesSource vs : VehiclesSource.values()) {
-			vehicleSources[index] = new Object [] {vs, true};
-//			vehicleSources[index] = new Object [] {vs, false}; // TODO : fix false cases
-			index++;
-		}
-		return Arrays.asList(vehicleSources);
+
+		// create the combinations manually, since 'fromVehiclesData' in combination with 'isUsingPersonIdForMissingVehicleId' doesn't make sense
+		return Arrays.asList(
+				new Object[]{VehiclesSource.defaultVehicle, true},
+				new Object[]{VehiclesSource.defaultVehicle, false},
+				new Object[]{VehiclesSource.modeVehicleTypesFromVehiclesData, true},
+				new Object[]{VehiclesSource.modeVehicleTypesFromVehiclesData, false},
+				new Object[]{VehiclesSource.fromVehiclesData, false}
+		);
 	}
 
 	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
 	private Scenario scenario ;
-	private final String transportModes [] = new String [] {"bike","car"};
+	private final String[] transportModes = new String[]{"bike", "car"};
 	private Link link1;
 	private Link link2;
 	private Link link3;
@@ -105,13 +102,6 @@ public class VehicleSourceTest {
 		createNetwork();
 		createPlans();
 
-		if(vehicleSource==VehiclesSource.modeVehicleTypesFromVehiclesData &&
-				!isUsingPersonIdForMissionVehicleId &&
-				scenario.getVehicles().getVehicles().size()==0) {
-			throw new RuntimeException("Use of person id for mission vehicle id is not allowed and vehicle source is "+vehicleSource+
-			". In such situation vehicles in the scenario must be present.");
-		}
-
 		Config config = scenario.getConfig();
 		config.qsim().setFlowCapFactor(1.0);
 		config.qsim().setStorageCapFactor(1.0);
@@ -120,7 +110,7 @@ public class VehicleSourceTest {
 		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
 
 		config.qsim().setVehiclesSource(this.vehicleSource);
-		config.qsim().setUsePersonIdForMissingVehicleId(this.isUsingPersonIdForMissionVehicleId);
+		config.qsim().setUsePersonIdForMissingVehicleId(this.isUsingPersonIdForMissingVehicleId);
 
 		config.controler().setOutputDirectory(helper.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -150,20 +140,17 @@ public class VehicleSourceTest {
 		});
 		cont.run();
 
-		Map<Id<Link>, Double> travelTime1= null ;
-		switch( this.vehicleSource ) {
-		case defaultVehicle:
-		case fromVehiclesData:
-			travelTime1 = vehicleLinkTravelTimes.get(Id.create("0", Vehicle.class));
-			break;
-		case modeVehicleTypesFromVehiclesData:
-			travelTime1 = vehicleLinkTravelTimes.get(Id.create("0_bike", Vehicle.class));
-			break;
-		default:
-			throw new RuntimeException("not implemented yet.");
+		// usually all vehicles will have an id of the form personId_mode. If person id for missing vehicle id is used
+		// the vehicle for mode car will have an id equal to the driver's id. All other modes will receive the normal ids
+		Id<Vehicle> carId;
+		if (isUsingPersonIdForMissingVehicleId) {
+			carId = Id.createVehicleId("1");
+		} else {
+			carId = Id.createVehicleId("1_car");
 		}
-		
-		Map<Id<Link>, Double> travelTime2 = vehicleLinkTravelTimes.get(Id.create("1", Vehicle.class));
+
+		Map<Id<Link>, Double> travelTime1 = vehicleLinkTravelTimes.get(Id.create("0_bike", Vehicle.class));
+		Map<Id<Link>, Double> travelTime2 = vehicleLinkTravelTimes.get(carId);
 
 		int bikeTravelTime = travelTime1.get(Id.create("2", Link.class)).intValue(); 
 		int carTravelTime = travelTime2.get(Id.create("2", Link.class)).intValue();
@@ -192,9 +179,9 @@ public class VehicleSourceTest {
 		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord(0.0, 1000.0));
 		Node node4 = NetworkUtils.createAndAddNode(network, Id.create("4", Node.class), new Coord(0.0, 1100.0));
 
-        link1 = NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), node1, node2, (double) 100, (double) 25, (double) 600, (double) 1, null, "22");
-        link2 = NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), node2, node3, (double) 1000, (double) 25, (double) 600, (double) 1, null, "22");
-        link3 = NetworkUtils.createAndAddLink(network,Id.create("3", Link.class), node3, node4, (double) 100, (double) 25, (double) 600, (double) 1, null, "22");
+		link1 = NetworkUtils.createAndAddLink(network, Id.create("1", Link.class), node1, node2, 100, 25, 600, 1, null, "22");
+		link2 = NetworkUtils.createAndAddLink(network, Id.create("2", Link.class), node2, node3, 1000, 25, 600, 1, null, "22");
+		link3 = NetworkUtils.createAndAddLink(network, Id.create("3", Link.class), node3, node4, 100, 25, 600, 1, null, "22");
 	}
 
 	private void createPlans(){
@@ -249,9 +236,10 @@ public class VehicleSourceTest {
 						scenario.getVehicles().addVehicleType(vehTypes[i]);
 					}
 
-					Id<Vehicle> vId = Id.create(p.getId(),Vehicle.class);
+					Id<Vehicle> vId = VehicleUtils.createVehicleId(p, transportModes[i]);
 					Vehicle v = vehiclesFactory.createVehicle(vId, vehTypes[i]);
 					scenario.getVehicles().addVehicle(v);
+					VehicleUtils.insertVehicleIdIntoAttributes(p, transportModes[i], vId);
 
 					break;
 					default:
