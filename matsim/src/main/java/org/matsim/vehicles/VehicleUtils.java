@@ -65,7 +65,6 @@ public class VehicleUtils {
 	 * @return a VehicleId
 	 */
 	public static Id<Vehicle> createVehicleId(Person person, String mode) {
-
 		return Id.createVehicleId(person.getId().toString() + "_" + mode);
 	}
 
@@ -79,17 +78,21 @@ public class VehicleUtils {
 		Map<String, Id<Vehicle>> vehicleIds = (Map<String, Id<Vehicle>>) person.getAttributes().getAttribute(VehicleUtils.VEHICLE_ATTRIBUTE_KEY);
 		if (vehicleIds == null || !vehicleIds.containsKey(mode)) {
 			throw new RuntimeException("Could not retrieve vehicle id from person: " + person.getId().toString() + " for mode: " + mode +
-					". If you are not using config.qsim().getVehicleSource() with 'defaultVehicle' or 'modeVehicleTypesFromVehiclesData' you have to provide " +
-					"a vehicle for each mode for each person with an id like: 'personId_mode' and attach it as a person attribute with key 'vehicles'.");
+                    ". \nIf you are not using config.qsim().getVehicleSource() with 'defaultVehicle' or 'modeVehicleTypesFromVehiclesData' you have to provide " +
+                    "a vehicle for each mode for each person. Attach a map of mode:String -> id:Id<Vehicle> with key 'vehicles' as person attribute to each person." +
+                    "\n VehicleUtils.insertVehicleIdIntoAttributes does this for you."
+            );
 		}
 		return vehicleIds.get(mode);
 	}
 
-	public static void insertVehicleIdIntoAttributes(Person person, String mode, Id<Vehicle> vehicleId) {
-		Object attr = person.getAttributes().getAttribute("vehicles");
-		Map<String, Id<Vehicle>> map = attr == null ? new HashMap<>() : ((Map<String, Id<Vehicle>>) attr);
-
-		map.put(mode, vehicleId);
-		person.getAttributes().putAttribute("vehicles", map);
-	}
+    /**
+     * Attaches a vehicle id to a person, so that the router knows which vehicle to use for which mode and person
+     */
+    public static void insertVehicleIdIntoAttributes(Person person, String mode, Id<Vehicle> vehicleId) {
+        Object attr = person.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_KEY);
+        Map<String, Id<Vehicle>> map = attr == null ? new HashMap<>() : ((Map<String, Id<Vehicle>>) attr);
+        map.put(mode, vehicleId);
+        person.getAttributes().putAttribute(VEHICLE_ATTRIBUTE_KEY, map);
+    }
 }

@@ -172,7 +172,9 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		// (yyyy means that if someone replaces prepareForSim and does not add the above lines, the containers are not locked.  kai, nov'16)
 	}
 
-	private static int cnt = 0;
+	// only warn once that legacy vehicle id is used
+	private static boolean hasWarned = false;
+
 	private void createAndAddVehiclesForEveryNetworkMode() {
 
 		final Map<String, VehicleType> modeVehicleTypes = getVehicleTypesForAllMainModes();
@@ -182,10 +184,13 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 
 				Id<Vehicle> vehicleId = VehicleUtils.createVehicleId(person, modeType.getKey());
 
-				if (cnt == 0 && qSimConfigGroup.getUsePersonIdForMissingVehicleId() && TransportMode.car.equals(modeType.getKey())) {
-					log.warn("'usePersonIdForMissingVehicleId' is deprecated. It will be removed soon.");
+				if (qSimConfigGroup.getUsePersonIdForMissingVehicleId() && TransportMode.car.equals(modeType.getKey())) {
+					if (!hasWarned) {
+						log.warn("'usePersonIdForMissingVehicleId' is deprecated. It will be removed soon.");
+						hasWarned = true;
+					}
+
 					vehicleId = Id.createVehicleId(person.getId());
-					cnt++;
 				}
 				createAndAddVehicleIfNecessary(vehicleId, modeType.getValue());
 				VehicleUtils.insertVehicleIdIntoAttributes(person, modeType.getKey(), vehicleId);
@@ -196,6 +201,11 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	private Map<String, VehicleType> getVehicleTypesForAllMainModes() {
 
 		Map<String, VehicleType> modeVehicleTypes = new HashMap<>();
+
+		if (qSimConfigGroup.getVehiclesSource().equals(QSimConfigGroup.VehiclesSource.fromVehiclesData)) {
+			// in this case the user has to do everything on their own and we can short circuit here.
+			return modeVehicleTypes;
+		}
 		for (String mode : qSimConfigGroup.getMainModes()) {
 			VehicleType type = null;
 			switch (qSimConfigGroup.getVehiclesSource()) {
@@ -207,9 +217,8 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 				case modeVehicleTypesFromVehiclesData:
 					type = scenario.getVehicles().getVehicleTypes().get(Id.create(mode, VehicleType.class));
 					break;
-				case fromVehiclesData:
 				default:
-					break;
+					throw new RuntimeException(qSimConfigGroup.getVehiclesSource().toString() + " is not implemented yet.");
 			}
 			Gbl.assertNotNull(type);
 			modeVehicleTypes.put(mode, type);
@@ -227,7 +236,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 					Vehicle vehicle = scenario.getVehicles().getFactory().createVehicle(vehicleId, vehicleType);
 					scenario.getVehicles().addVehicle(vehicle);
 					break;
-				case fromVehiclesData:
+				default:
 					throw new RuntimeException("Expecting a vehicle id which is missing in the vehicles database: " + vehicleId);
 			}
 		}
