@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.matsim.vehicles.FreightCapacity;
 
-public class CarrierFreightCapacity implements FreightCapacity{
+public abstract class CarrierFreightCapacity implements FreightCapacity{
 
 	public final static String LOADING_AID = "loadingAid"; 
 	

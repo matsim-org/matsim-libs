@@ -175,20 +175,6 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	}
 
 	@Override
-	protected void checkConsistency(Config config) {
-		super.checkConsistency(config);
-
-		if (config.qsim().getNumberOfThreads() != 1) {
-			throw new RuntimeException("Only a single-threaded QSim allowed");
-		}
-
-		if (isVehicleDiversion() && !isOnlineVehicleTracker()) {
-			throw new RuntimeException(
-					TaxiConfigGroup.VEHICLE_DIVERSION + " requires " + TaxiConfigGroup.ONLINE_VEHICLE_TRACKER);
-		}
-	}
-
-	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> map = super.getComments();
 		map.put(MODE, MODE_EXP);

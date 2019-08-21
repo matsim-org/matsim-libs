@@ -74,8 +74,6 @@ public class AttributesXmlWriterDelegate {
 		}
 	}
 
-
-
 	public void putAttributeConverters(Map<Class<?>, AttributeConverter<?>> converters) {
 		this.converter.putAttributeConverters(converters);
 	}
