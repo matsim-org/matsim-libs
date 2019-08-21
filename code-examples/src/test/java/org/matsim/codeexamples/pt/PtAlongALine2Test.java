@@ -68,6 +68,7 @@ public class PtAlongALine2Test{
 	enum DrtMode { none, teleportBeeline, teleportBasedOnNetworkRoute, full }
 	private DrtMode drtMode = DrtMode.full ;
 	private boolean drt2 = true ;
+	private boolean drt3 = true ;
 
 	@Test
 	public void testPtAlongALineWithRaptorAndDrtServiceArea() {
@@ -95,12 +96,18 @@ public class PtAlongALine2Test{
 			if( drt2 ){
 				config.plansCalcRoute().addModeRoutingParams( new ModeRoutingParams().setMode( "drt2" ).setTeleportedModeSpeed( 100. / 3.6 ) );
 			}
+			if( drt3 ){
+				config.plansCalcRoute().addModeRoutingParams( new ModeRoutingParams().setMode( "drt3" ).setTeleportedModeSpeed( 100. / 3.6 ) );
+			}
 			// teleportation router for walk or bike is automatically defined.
 		} else if( drtMode == DrtMode.teleportBasedOnNetworkRoute ){// (route as network route)
 			Set<String> networkModes = new HashSet<>( );
 			networkModes.add( TransportMode.drt );
 			if( drt2 ){
 				networkModes.add( "drt2" );
+			}
+			if( drt3 ){
+				networkModes.add( "drt3" );
 			}
 			config.plansCalcRoute().setNetworkModes( networkModes );
 		}
@@ -139,6 +146,14 @@ public class PtAlongALine2Test{
 					//				paramSetDrt2.setStopFilterAttribute( null );
 					configRaptor.addIntermodalAccessEgress( paramSetDrt2 );
 				}
+				if ( drt3 ){
+					IntermodalAccessEgressParameterSet paramSetDrt2 = new IntermodalAccessEgressParameterSet();
+					paramSetDrt2.setMode( "drt3" );
+					paramSetDrt2.setRadius( 1000000 );
+					//				paramSetDrt2.setPersonFilterAttribute( null );
+					//				paramSetDrt2.setStopFilterAttribute( null );
+					configRaptor.addIntermodalAccessEgress( paramSetDrt2 );
+				}
 			}
 
 		}
@@ -151,6 +166,9 @@ public class PtAlongALine2Test{
 			config.planCalcScore().addModeParams( new ModeParams(TransportMode.drt).setMarginalUtilityOfTraveling( margUtlTravPt ) );
 			if ( drt2 ) {
 				config.planCalcScore().addModeParams( new ModeParams("drt2").setMarginalUtilityOfTraveling( margUtlTravPt ) );
+			}
+			if ( drt3 ) {
+				config.planCalcScore().addModeParams( new ModeParams("drt3").setMarginalUtilityOfTraveling( margUtlTravPt ) );
 			}
 		}
 		config.planCalcScore().addModeParams( new ModeParams("walk2").setMarginalUtilityOfTraveling( margUtlTravPt ) );
@@ -167,9 +185,10 @@ public class PtAlongALine2Test{
 
 			String drtVehiclesFile = "drt_vehicles.xml";
 			String drt2VehiclesFile = "drt2_vehicles.xml";
+			String drt3VehiclesFile = "drt3_vehicles.xml";
 
 			DvrpConfigGroup dvrpConfig = ConfigUtils.addOrGetModule( config, DvrpConfigGroup.class );
-			dvrpConfig.setNetworkModes( ImmutableSet.copyOf( Arrays.asList( TransportMode.drt, "drt2" ) ) ) ;
+			dvrpConfig.setNetworkModes( ImmutableSet.copyOf( Arrays.asList( TransportMode.drt, "drt2", "drt3" ) ) ) ;
 
 			MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule( config, MultiModeDrtConfigGroup.class );
 			{
@@ -196,6 +215,18 @@ public class PtAlongALine2Test{
 				drtConfig.setUseModeFilteredSubnetwork( true );
 				mm.addParameterSet( drtConfig );
 			}
+			if ( drt2 ) {
+				DrtConfigGroup drtConfig = new DrtConfigGroup();
+				drtConfig.setMaxTravelTimeAlpha( 1.3 );
+				drtConfig.setVehiclesFile( drt3VehiclesFile );
+				drtConfig.setMaxTravelTimeBeta( 5. * 60. );
+				drtConfig.setStopDuration( 60. );
+				drtConfig.setMaxWaitTime( Double.MAX_VALUE );
+				drtConfig.setRequestRejection( false );
+				drtConfig.setMode( "drt3" );
+				drtConfig.setUseModeFilteredSubnetwork( true );
+				mm.addParameterSet( drtConfig );
+			}
 
 			for( DrtConfigGroup drtConfigGroup : mm.getModalElements() ){
 				DrtConfigs.adjustDrtConfig( drtConfigGroup, config.planCalcScore() );
@@ -205,7 +236,10 @@ public class PtAlongALine2Test{
 			// to configure DRT and load the vehicles otherwise
 			PtAlongALineTest.createDrtVehiclesFile(drtVehiclesFile, "DRT-", 10, Id.createLinkId("0-1" ) );
 			if ( drt2 ){
-				PtAlongALineTest.createDrtVehiclesFile( drt2VehiclesFile, "DRT2-", 10, Id.createLinkId( "1000-999" ) );
+				PtAlongALineTest.createDrtVehiclesFile( drt2VehiclesFile, "DRT2-", 10, Id.createLinkId( "999-1000" ) );
+			}
+			if ( drt3 ){
+				PtAlongALineTest.createDrtVehiclesFile( drt3VehiclesFile, "DRT3-", 10, Id.createLinkId( "500-501" ) );
 			}
 
 		}
@@ -225,7 +259,10 @@ public class PtAlongALine2Test{
 		// add drt modes to the car links' allowed modes in their respective service area
 		PtAlongALineTest.addModeToAllLinksBtwnGivenNodes(scenario.getNetwork(), 0, 400, TransportMode.drt );
 		if ( drt2 ){
-			PtAlongALineTest.addModeToAllLinksBtwnGivenNodes( scenario.getNetwork(), 800, 1000, "drt2" );
+			PtAlongALineTest.addModeToAllLinksBtwnGivenNodes( scenario.getNetwork(), 700, 1000, "drt2" );
+		}
+		if ( drt3 ){
+			PtAlongALineTest.addModeToAllLinksBtwnGivenNodes( scenario.getNetwork(), 500, 600, "drt3" );
 		}
 		// TODO: reference somehow network creation, to ensure that these link ids exist
 
@@ -234,6 +271,10 @@ public class PtAlongALine2Test{
 		VehiclesFactory vf = scenario.getVehicles().getFactory();
 		if ( drt2 ) {
 			VehicleType vehType = vf.createVehicleType( Id.create( "drt2", VehicleType.class ) );
+			vehType.setMaximumVelocity( 25./3.6 );
+			scenario.getVehicles().addVehicleType( vehType );
+		} if ( drt3 ) {
+			VehicleType vehType = vf.createVehicleType( Id.create( "drt3", VehicleType.class ) );
 			vehType.setMaximumVelocity( 25./3.6 );
 			scenario.getVehicles().addVehicleType( vehType );
 		}{
@@ -259,9 +300,13 @@ public class PtAlongALine2Test{
 		if ( drtMode==DrtMode.full ){
 			controler.addOverridingModule( new DvrpModule() );
 			controler.addOverridingModule( new MultiModeDrtModule() );
-			if ( drt2 ){
+			if ( drt2 && drt3 ){
+				controler.configureQSimComponents( DvrpQSimComponents.activateModes( TransportMode.drt, "drt2", "drt3" ) );
+			} else if (drt2) {
 				controler.configureQSimComponents( DvrpQSimComponents.activateModes( TransportMode.drt, "drt2" ) );
-			} else{
+			} else if (drt3) {
+				controler.configureQSimComponents( DvrpQSimComponents.activateModes( TransportMode.drt, "drt3" ) );
+			} else {
 				controler.configureQSimComponents( DvrpQSimComponents.activateModes( TransportMode.drt ) );
 			}
 		}
@@ -270,6 +315,24 @@ public class PtAlongALine2Test{
 //		controler.addOverridingModule( new OTFVisLiveModule() );
 
 		controler.run();
+		
+		/*
+		 * TODO: Asserts:
+		 * All agents go from some randomly chosen link to the transit stop at the far right.
+		 * 
+		 * Nobody should use DRT2, because it only connects to that transit stop at the right.
+		 * 
+		 * People on the left should use DRT to go to the left stop or towards the middle stop (and walk the distance
+		 * between the end of the DRT service area and the middle stop).
+		 * 
+		 * People between the middle stop and the right stop should use DRT3 or even walk into the DRT3 service area
+		 * (=walk in the wrong direction to access the fast drt mode to access a fast pt trip instead of slowly walking
+		 * the whole distance to the destination). At some point walking towards the DRT3 area becomes less attractive
+		 * thanh walking directly to the right transit stop, so agents start to walk directly (as the pt router found no
+		 * route at all including a pt leg, it returned instead a direct walk).
+		 * 
+		 */
+		
 	}
 
 	@Test
