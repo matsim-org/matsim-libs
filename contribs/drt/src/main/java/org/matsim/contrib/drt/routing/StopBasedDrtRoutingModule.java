@@ -100,10 +100,12 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		}
 
 		if (accessFacility.getLinkId() == egressFacility.getLinkId()) {
-			printWarning(() -> "Start and end stop are the same, agent will walk, using mode "
-					+ drtStageActivityType.drtWalk
-					+ ". Agent Id:\t"
-					+ person.getId());
+			if( drtCfg.isPrintDetailedWarnings() ){
+				printWarning(() -> "Start and end stop are the same, agent will walk, using mode "
+						+ drtStageActivityType.drtWalk
+						+ ". Agent Id:\t"
+						+ person.getId());
+			}
 			return Collections.singletonList(createDrtWalkLeg(fromFacility, toFacility, departureTime, person));
 		}
 
