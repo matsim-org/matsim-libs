@@ -220,8 +220,6 @@ public class TinyMultimodalAccessibilityTest {
 
 		NetworkUtils.createAndAddLink(network,Id.create(16, Link.class), node9, node6, (double) 80, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(16, Link.class)).setAllowedModes(modes);
-		Link link16 = network.getLinks().get(Id.create(16, Link.class));
-		LOG.error("Link " + link16.getId() + " has following allowed modes: " + link16.getAllowedModes());
 
 		Set<String> ptModes = new HashSet<>();
 		ptModes.add("pt");
