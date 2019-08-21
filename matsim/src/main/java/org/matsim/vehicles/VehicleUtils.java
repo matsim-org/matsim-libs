@@ -57,9 +57,6 @@ public class VehicleUtils {
 	/**
 	 * Creates a vehicle id based on the person and the mode
 	 * <p>
-	 * If config.qsim().getVehicleSource() is "defaultVehicle" or "fromVehiclesData" the function returns a VehicleId which
-	 * has the same value as the person's id
-	 * <p>
 	 * If config.qsim().getVehicleSource() is "modeVehicleTypesFromVehiclesData", the returned id is a combination of
 	 * the person's id and the supplied mode. E.g. "person1_car
 	 *
@@ -70,7 +67,6 @@ public class VehicleUtils {
 	public static Id<Vehicle> createVehicleId(Person person, String mode) {
 
 		return Id.createVehicleId(person.getId().toString() + "_" + mode);
-
 	}
 
 	/**

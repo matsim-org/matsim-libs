@@ -172,6 +172,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		// (yyyy means that if someone replaces prepareForSim and does not add the above lines, the containers are not locked.  kai, nov'16)
 	}
 
+	private static int cnt = 0;
 	private void createAndAddVehiclesForEveryNetworkMode() {
 
 		final Map<String, VehicleType> modeVehicleTypes = getVehicleTypesForAllMainModes();
@@ -180,6 +181,12 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 			for (Person person : scenario.getPopulation().getPersons().values()) {
 
 				Id<Vehicle> vehicleId = VehicleUtils.createVehicleId(person, modeType.getKey());
+
+				if (cnt == 0 && qSimConfigGroup.getUsePersonIdForMissingVehicleId() && TransportMode.car.equals(modeType.getKey())) {
+					log.warn("'usePersonIdForMissingVehicleId' is deprecated. It will be removed soon.");
+					vehicleId = Id.createVehicleId(person.getId());
+					cnt++;
+				}
 				createAndAddVehicleIfNecessary(vehicleId, modeType.getValue());
 				VehicleUtils.insertVehicleIdIntoAttributes(person, modeType.getKey(), vehicleId);
 			}
