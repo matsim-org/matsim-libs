@@ -100,10 +100,10 @@ public class AccidentControlerListener implements StartupListener, IterationEnds
 				final double demand = accidentSettings.getSampleSize() * analzyer.getDemand(linkInfo.getLinkId(), timeBinNr);
 				
 				double accidentCosts = 0.;
+				double costRate = 0.;
 								
 				if (linkInfo.getComputationMethod().toString().equals(AccidentsComputationMethod.BVWP.toString())) {
-					accidentCosts = AccidentCostComputationBVWP.computeAccidentCosts(demand, link.getLength(), linkInfo.getRoadTypeBVWP());
-				
+					accidentCosts = AccidentCostComputationBVWP.computeAccidentCosts(demand, link, linkInfo.getRoadTypeBVWP());
 				} else {
 					throw new RuntimeException("Unknown accident computation approach or value not set. Aborting...");
 				}

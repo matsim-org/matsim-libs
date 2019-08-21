@@ -2,6 +2,9 @@ package org.matsim.contrib.accidents.computation;
 
 import java.util.ArrayList;
 
+import org.jfree.util.Log;
+import org.matsim.api.core.v01.network.Link;
+
 /**
 * @author mmayobre
 */
@@ -9,11 +12,14 @@ import java.util.ArrayList;
 public class AccidentCostComputationBVWP {
 //Computes the expected Accident Costs depending on the expected vehicle-km an the Cost Rate of each Road Type
 
-	public static double computeAccidentCosts(double demand, double length, ArrayList<Integer> roadType){
+	public static double computeAccidentCosts(double demand, Link link, ArrayList<Integer> roadType){
 		//costRateTable in €/T.vehicle-km
 		
 		// TODO: Check if this is 100% equal to Abb. 13 BVWP Methodenhandbuch 2030
+		// it is equal but simplified (Hugo)
 		// TODO: runtime exception instead of 0
+		// Since in this class the link ID can not be getted I would rather throw the exeption or warning in the class AccidentControlerListener notifying the ID of the link where the value would be 0 (Hugo)
+		// TO THINK ABOUT: doing an alternative Method in case all the data is available (Hugo)
 		
 		double costRateTable[][][] = {
 			/*	2. Ziffer
@@ -49,8 +55,11 @@ public class AccidentCostComputationBVWP {
 		
 		//Parameter costRate
 		double costRate = costRateTable[roadType.get(0)][roadType.get(2)-1][roadType.get(1)]; 
+		if (costRate == 0) {
+			Log.error("Accident cost rate not specified link " + link.getId().toString() + " , roadtype: "+ roadType.toString() );
+		}
 		
-		double vehicleKm = demand * (length / 1000.); // length is converted from METER to KILOMETER
+		double vehicleKm = demand * (link.getLength() / 1000.); // length is converted from METER to KILOMETER
 		
 		double accidentCosts = costRate * (vehicleKm / 1000.); // vehicleKM --> T.vehicleKM
 		
