@@ -19,26 +19,28 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
-import java.util.*;
-import javax.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.controler.PrepareForSimImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleFactory;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleUtils;
+
+import javax.inject.Inject;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public final class PopulationAgentSource implements AgentSource {
 	private static final Logger log = Logger.getLogger( PopulationAgentSource.class );
@@ -89,7 +91,7 @@ public final class PopulationAgentSource implements AgentSource {
 				vehicleId = route.getVehicleId();
 			}
 			if (vehicleId == null) {
-				vehicleId = PrepareForSimImpl.obtainAutomaticVehicleId(person.getId(), leg.getMode(), qsim.getScenario().getConfig().qsim() );
+				vehicleId = VehicleUtils.getVehicleId(person, leg.getMode());
 				if(route!=null) {
 					route.setVehicleId( vehicleId );
 				}
