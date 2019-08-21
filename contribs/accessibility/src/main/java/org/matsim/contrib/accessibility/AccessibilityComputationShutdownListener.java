@@ -21,7 +21,7 @@ package org.matsim.contrib.accessibility;
 
 import java.io.File;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 import com.google.common.collect.Iterables;
 import org.apache.log4j.Logger;
@@ -137,9 +137,11 @@ public final class AccessibilityComputationShutdownListener implements ShutdownL
 
 				ProgressBar progressBar = new ProgressBar(aggregatedOrigins.size());
 
-				ConcurrentExecutor<Void> executor = ConcurrentExecutor.fixedPoolService(numberOfProcessors);
+				ExecutorService service = Executors.newFixedThreadPool(numberOfProcessors);
+				List<Callable<Void>> tasks = new ArrayList<>();
+
 				for (final List<Id<Node>> partition : partitions) {
-					executor.addTaskToQueue(() -> {
+					tasks.add(() -> {
 						try {
 							compute(mode, departureTime, aggregatedOpportunities, aggregatedOrigins, partition, progressBar);
 						} catch (Exception e) {
@@ -148,7 +150,18 @@ public final class AccessibilityComputationShutdownListener implements ShutdownL
 						return null;
 					});
 				}
-				executor.execute();
+
+				try {
+					List<Future<Void>> futures = service.invokeAll(tasks);
+					for (Future<Void> future : futures) {
+						future.get();
+					}
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e);
+				} catch (ExecutionException e) {
+					throw new RuntimeException(e);
+				}
+				service.shutdown();
 			} else {
 				LOG.info("Performing the computation without parallelization.");
 				ProgressBar progressBar = new ProgressBar(aggregatedOrigins.size());

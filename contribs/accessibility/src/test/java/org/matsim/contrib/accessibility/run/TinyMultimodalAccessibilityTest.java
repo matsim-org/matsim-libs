@@ -99,7 +99,7 @@ public class TinyMultimodalAccessibilityTest {
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 		//acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
-		acg.setUseParallelization(false); // TODO Needed as long as threads don't reliably forward errors
+		//acg.setUseParallelization(false); // TODO Needed as long as exceptions from threads are not reliably caught
 
 		config.controler().setLastIteration(0);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
@@ -226,8 +226,6 @@ public class TinyMultimodalAccessibilityTest {
 
 		NetworkUtils.createAndAddLink(network,Id.create(17, Link.class), node10, node11, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(17, Link.class)).setAllowedModes(ptModes);
-		Link link = network.getLinks().get(Id.create(17, Link.class));
-		LOG.error("Link " + link.getId() + " has following allowed modes: " + link.getAllowedModes());
 
 		NetworkUtils.createAndAddLink(network,Id.create(18, Link.class), node11, node10, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(18, Link.class)).setAllowedModes(ptModes);
