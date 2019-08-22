@@ -178,7 +178,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 
 	private void createAndAddVehiclesForEveryNetworkMode() {
 
-		final Map<String, VehicleType> modeVehicleTypes = getVehicleTypesForAllNetworAndMainkModes();
+		final Map<String, VehicleType> modeVehicleTypes = getVehicleTypesForAllNetworkAndMainModes();
 
 		for (Map.Entry<String, VehicleType> modeType : modeVehicleTypes.entrySet()) {
 			for (Person person : scenario.getPopulation().getPersons().values()) {
@@ -199,7 +199,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		}
 	}
 
-	private Map<String, VehicleType> getVehicleTypesForAllNetworAndMainkModes() {
+	private Map<String, VehicleType> getVehicleTypesForAllNetworkAndMainModes() {
 
 		Map<String, VehicleType> modeVehicleTypes = new HashMap<>();
 
