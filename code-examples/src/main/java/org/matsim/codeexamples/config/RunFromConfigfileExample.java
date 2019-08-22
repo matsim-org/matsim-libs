@@ -20,17 +20,16 @@
 
 package org.matsim.codeexamples.config;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.IOUtils;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleUtils;
 
 
 /**
@@ -54,6 +53,14 @@ public final class RunFromConfigfileExample {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config );
 
+		// if vehicles are not auto generated but explicitly loaded from a vehicles file, vehicles have to be attached to
+		// agents.
+		if (config.qsim().getVehiclesSource().equals(QSimConfigGroup.VehiclesSource.fromVehiclesData)) {
+			for (Person person : scenario.getPopulation().getPersons().values()) {
+				Vehicle vehicle = scenario.getVehicles().getVehicles().get(Id.createVehicleId(person.getId()));
+				VehicleUtils.insertVehicleIdIntoAttributes(person, vehicle.getType().getId().toString(), vehicle.getId());
+			}
+		}
 
 		Controler controler = new Controler(scenario);
 //		controler.addOverridingModule( new AbstractModule(){
