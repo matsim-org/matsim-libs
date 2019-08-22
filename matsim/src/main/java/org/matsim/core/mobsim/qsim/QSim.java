@@ -252,7 +252,12 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 			// We really want to perform that. For instance, with QNetsimEngine, threads are cleaned up in this method.
 			// Without this finally, in case of a crash, threads are not closed, which lead to process hanging forever
 			// at least on the eth euler cluster (but not on our local machines at ivt!?) td oct 15
-			cleanupSim();
+			try {
+				cleanupSim();
+			} catch(Exception e) {
+				log.warn( "exception in finally block - " +
+						  "this may be a follow-up exception of an exception thrown in the try block.", e);
+			}
 		}
 	}
 
