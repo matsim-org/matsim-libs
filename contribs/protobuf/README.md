@@ -10,6 +10,11 @@ TODO
 
 Building this contribution with IntelliJ or maven in the command line works out of the box. 
 
+### IntelliJ
+If `ProtobufEvents.java` is denoted as missing, right-click on the protobuffolder in IntelliJ and go to "Maven" -> "Generate Sources and Update Folders". Maybe do a Maven -> "Reimport" before to update the dependencies.
+
+After that, `ProtobufEvents.java` should show up in `target/generated-sources` 
+
 ### Eclipse
 
 Eclipse users, however, need to invoke 
