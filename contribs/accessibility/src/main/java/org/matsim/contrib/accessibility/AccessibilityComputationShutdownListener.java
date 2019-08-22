@@ -139,7 +139,6 @@ public final class AccessibilityComputationShutdownListener implements ShutdownL
 
 				ExecutorService service = Executors.newFixedThreadPool(numberOfProcessors);
 				List<Callable<Void>> tasks = new ArrayList<>();
-
 				for (final List<Id<Node>> partition : partitions) {
 					tasks.add(() -> {
 						try {
@@ -150,7 +149,6 @@ public final class AccessibilityComputationShutdownListener implements ShutdownL
 						return null;
 					});
 				}
-
 				try {
 					List<Future<Void>> futures = service.invokeAll(tasks);
 					for (Future<Void> future : futures) {
@@ -167,10 +165,9 @@ public final class AccessibilityComputationShutdownListener implements ShutdownL
 				ProgressBar progressBar = new ProgressBar(aggregatedOrigins.size());
 				compute(mode, departureTime, aggregatedOpportunities, aggregatedOrigins, aggregatedOriginNodes, progressBar);
 			}
-
-			for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
-				zoneDataExchangeInterface.finish();
-			}
+		}
+		for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
+			zoneDataExchangeInterface.finish();
 		}
 	}
 
