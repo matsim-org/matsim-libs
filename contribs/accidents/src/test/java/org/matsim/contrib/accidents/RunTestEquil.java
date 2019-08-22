@@ -3,7 +3,9 @@ package org.matsim.contrib.accidents;
 import java.io.BufferedReader;
 import java.io.IOException;
 
+import org.junit.Assert;
 import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -21,6 +23,7 @@ public class RunTestEquil {
     
     @Rule public MatsimTestUtils utils = new MatsimTestUtils();
     
+    @Test 
     public void test1() 
     {
     configFile = utils.getPackageInputDirectory() + "/equil_scenario/config_test.xml";
@@ -40,6 +43,10 @@ public class RunTestEquil {
     Controler controler = new Controler (scenario);
     
     controler.addOverridingModule(new AccidentsModule(scenario));
+    
+    //TODO: changing through programming the free speed of some links so they would not be allways categorized as planfrei
+    //wich implications has the type of the config file?
+    //TODO: changing manually the config file so it runs with the test
     
     controler.run();
 
@@ -62,6 +69,5 @@ public class RunTestEquil {
 //    	}
 //    	}
 //    }
-    
 }
 }
