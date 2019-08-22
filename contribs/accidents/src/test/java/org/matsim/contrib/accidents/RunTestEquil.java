@@ -26,7 +26,7 @@ public class RunTestEquil {
     @Test 
     public void test1() 
     {
-    configFile = utils.getPackageInputDirectory() + "/equil_scenario/config_test.xml";
+    configFile = utils.getPackageInputDirectory() + "/equil_scenario/config.xml";
     outputDirectory = utils.getOutputDirectory();
     runId = "run1";
     
@@ -35,18 +35,19 @@ public class RunTestEquil {
     
     config.controler().setOutputDirectory(outputDirectory);
     config.controler().setRunId(runId);
+    //Is better to take the initial config where just one of the routes is selected or better take the plans of the tenth iteration?
+    config.controler().setLastIteration(0);
+    
     
     AccidentsConfigGroup accidentsSettings = ConfigUtils.addOrGetModule(config,  AccidentsConfigGroup.class);
     accidentsSettings.setEnableAccidentsModule(true);
     
     final Scenario scenario = ScenarioUtils.loadScenario(config);
     Controler controler = new Controler (scenario);
-    
     controler.addOverridingModule(new AccidentsModule(scenario));
     
-    //TODO: changing through programming the free speed of some links so they would not be allways categorized as planfrei
+    //TODO: changing through programming the free speed and number o lanes of some links so they would not be allways categorized with tehe same roadtype.
     //wich implications has the type of the config file?
-    //TODO: changing manually the config file so it runs with the test
     
     controler.run();
 
