@@ -99,7 +99,7 @@ public class TinyMultimodalAccessibilityTest {
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 		//acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
-		//acg.setUseParallelization(false); // TODO Needed as long as exceptions from threads are not reliably caught
+		acg.setUseParallelization(false);
 
 		config.controler().setLastIteration(0);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
@@ -256,10 +256,12 @@ public class TinyMultimodalAccessibilityTest {
 		@Override
 		public void finish() {
 			for (Tuple<ActivityFacility, Double> tuple : accessibilitiesMap.keySet()) {
-				LOG.error("CHECK X = " + tuple.getFirst().getCoord().getX() + " -- Y = " + tuple.getFirst().getCoord().getY() + " -- value = " + accessibilitiesMap.get(tuple).get(TransportMode.car));
+				LOG.warn("CHECK X = " + tuple.getFirst().getCoord().getX() + " -- Y = " + tuple.getFirst().getCoord().getY() + " -- freespeed value = " + accessibilitiesMap.get(tuple).get("freespeed"));
+				LOG.warn("CHECK X = " + tuple.getFirst().getCoord().getX() + " -- Y = " + tuple.getFirst().getCoord().getY() + " -- car value = " + accessibilitiesMap.get(tuple).get(TransportMode.car));
 				if (tuple.getFirst().getCoord().getX() == 50.) {
 					if (tuple.getFirst().getCoord().getY() == 50. || tuple.getFirst().getCoord().getY() == 150.) {
 						Assert.assertEquals(0.08573977315253786, accessibilitiesMap.get(tuple).get("freespeed"), MatsimTestUtils.EPSILON);
+						LOG.error("here");
 					}
 				}
 				if (tuple.getFirst().getCoord().getX() == 150.) {

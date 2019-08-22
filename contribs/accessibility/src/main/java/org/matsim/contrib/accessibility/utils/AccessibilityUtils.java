@@ -95,21 +95,16 @@ public class AccessibilityUtils {
 			double walkBetaTT_utils_h = config.planCalcScore().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling()
 					- config.planCalcScore().getPerforming_utils_hr(); // default values: -12 = (-6.) - (6.)
 			double VjkWalkTravelTime = walkBetaTT_utils_h * (distance_m / walkSpeed_m_h);
-			// System.out.println("VjkWalkTravelTime = " + VjkWalkTravelTime);
+			System.out.println("VjkWalkTravelTime = " + VjkWalkTravelTime);
+			System.out.println("config.planCalcScore().getBrainExpBeta() = " + config.planCalcScore().getBrainExpBeta());
 
-			// in MATSim this is 0 !!! since getMonetaryDistanceCostRateWalk doesn't exist:
-			double walkBetaTD_utils_m = config.planCalcScore().getModes().get(TransportMode.walk).getMarginalUtilityOfDistance(); // default value: 0.
-			double VjkWalkDistance = walkBetaTD_utils_m * distance_m;
-			// System.out.println("VjkWalkDistance = " + VjkWalkDistance);
-
-			double expVjk = Math.exp(config.planCalcScore().getBrainExpBeta() * (VjkWalkTravelTime + VjkWalkDistance));
+			double expVjk = Math.exp(config.planCalcScore().getBrainExpBeta() * VjkWalkTravelTime);
+			System.out.println("expVjk = " + expVjk);
 
 			// add Vjk to sum
 			AggregationObject jco = opportunityClusterMap.get(nearestNode.getId()); // Why "jco"?
 			if (jco == null) {
-				jco = new AggregationObject(opportunity.getId(), null, null, nearestNode, 0.); // Important: Initialize with zero!
-				// This is a bit counter-intuitive. The first opportunity is added twice to the aggregation object, but the first time with zero
-				// "impact". Leave it as is for the time being as urbanSim code uses this, dz, july'17
+				jco = new AggregationObject(opportunity.getId(), null, null, nearestNode, 0.);
 				opportunityClusterMap.put(nearestNode.getId(), jco);
 			}
 			if (acg.isUseOpportunityWeights()) {
@@ -122,9 +117,7 @@ public class AccessibilityUtils {
 			} else {
 				jco.addObject(opportunity.getId(), expVjk);
 			}
-//			LOG.info("--- numberOfObjects = " + jco.getNumberOfObjects() + " --- objectIds = " + jco.getObjectIds());
 		}
-		LOG.info("Quite convoluted aggregation here...");
 		LOG.info("Aggregated " + opportunities.getFacilities().size() + " opportunities to " + opportunityClusterMap.size() + " nodes.");
 		return opportunityClusterMap;
 	}
