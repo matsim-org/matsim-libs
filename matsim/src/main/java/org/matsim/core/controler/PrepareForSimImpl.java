@@ -177,7 +177,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 
 	private void createAndAddVehiclesForEveryNetworkMode() {
 
-		final Map<String, VehicleType> modeVehicleTypes = getVehicleTypesForAllMainModes();
+		final Map<String, VehicleType> modeVehicleTypes = getVehicleTypesForAllNetworkModes();
 
 		for (Map.Entry<String, VehicleType> modeType : modeVehicleTypes.entrySet()) {
 			for (Person person : scenario.getPopulation().getPersons().values()) {
@@ -198,7 +198,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		}
 	}
 
-	private Map<String, VehicleType> getVehicleTypesForAllMainModes() {
+	private Map<String, VehicleType> getVehicleTypesForAllNetworkModes() {
 
 		Map<String, VehicleType> modeVehicleTypes = new HashMap<>();
 
@@ -206,7 +206,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 			// in this case the user has to do everything on their own and we can short circuit here.
 			return modeVehicleTypes;
 		}
-		for (String mode : qSimConfigGroup.getMainModes()) {
+		for (String mode : scenario.getConfig().plansCalcRoute().getNetworkModes()) {
 			VehicleType type = null;
 			switch (qSimConfigGroup.getVehiclesSource()) {
 				case defaultVehicle:
