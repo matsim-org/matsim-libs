@@ -23,7 +23,6 @@ import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -59,9 +58,9 @@ public class TestMatsimTransformer {
 		assertNotNull(matsimType);
 		assertEquals("myType",matsimType.getId().toString());
 		assertEquals(50, matsimType.getCarrierVehicleCapacity());
-		assertEquals(10.0, matsimType.getVehicleCostInformation().getPerDistanceUnit(), 0.01);
-		assertEquals(5.0, matsimType.getVehicleCostInformation().getPerTimeUnit(), 0.01);
-		assertEquals(100.0, matsimType.getVehicleCostInformation().getFix(), 0.01);
+		assertEquals(10.0, matsimType.getCostInformation().getCostsPerMeter(), 0.01);
+		assertEquals(5.0, matsimType.getCostInformation().getCostsPerSecond(), 0.01);
+		assertEquals(100.0, matsimType.getCostInformation().getFixedCosts(), 0.01);
 	}
 	
 	@Test

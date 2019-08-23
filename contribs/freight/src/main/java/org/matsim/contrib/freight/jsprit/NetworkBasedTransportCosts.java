@@ -215,8 +215,8 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 	/**
 	 * Calculates vehicle-type-dependent travelDisutility per link.
 	 * 
-	 * <p>Note that it uses <code>vehicleType.getVehicleCostInformation().perDistanceUnit</code> and
-	 * <code>vehicleType.getVehicleCostInformation().perTimeUnit</code> to calculate time and distance related transport costs.
+	 * <p>Note that it uses <code>vehicleType.getCostInformation().perDistanceUnit</code> and
+	 * <code>vehicleType.getCostInformation().perTimeUnit</code> to calculate time and distance related transport costs.
 	 * 
 	 * @author stefan
 	 *
@@ -375,7 +375,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 
 		private void retrieveTypeSpecificCosts(Collection<CarrierVehicleType> vehicleTypes) {
 			for(CarrierVehicleType type : vehicleTypes){
-				typeSpecificCosts.put(type.getId().toString(), new VehicleTypeVarCosts(type.getVehicleCostInformation().getPerDistanceUnit(), type.getVehicleCostInformation().getPerTimeUnit()));
+				typeSpecificCosts.put(type.getId().toString(), new VehicleTypeVarCosts(type.getCostInformation().getCostsPerMeter(), type.getCostInformation().getCostsPerSecond()));
 			}
 			typeSpecificCosts.put(defaultTypeId,new VehicleTypeVarCosts(1.,0.));
 		}

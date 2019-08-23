@@ -2,8 +2,9 @@ package org.matsim.contrib.freight.carrier;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType.VehicleCostInformation;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.vehicles.CostInformation;
+import org.matsim.vehicles.CostInformationImpl;
 import org.matsim.vehicles.EngineInformation.FuelType;
 import org.matsim.vehicles.EngineInformationImpl;
 import org.matsim.vehicles.VehicleType;
@@ -18,7 +19,7 @@ public class CarrierVehicleTypeTest extends MatsimTestCase{
 		CarrierVehicleType mediumType = CarrierVehicleType.Builder.newInstance(Id.create("medium", VehicleType.class ))
 				.setDescription("Medium Vehicle")
 				.setCapacity(30)
-				.setVehicleCostInformation(new VehicleCostInformation(50, 1.0, 0.5))
+				.setVehicleCostInformation(new CostInformationImpl(50., 1.0, 0.5))
 				.setEngineInformation(new EngineInformationImpl(FuelType.diesel, 0.02))
 				.setMaxVelocity(13.89)
 				.build();
@@ -33,7 +34,7 @@ public class CarrierVehicleTypeTest extends MatsimTestCase{
 		CarrierVehicleType smallType = CarrierVehicleType.Builder.newInstance(Id.create("small", VehicleType.class), mediumType)
 				.setDescription("Small Vehicle")
 				.setCapacity(16)
-				.setVehicleCostInformation(new VehicleCostInformation(25, 0.75, 0.25))
+				.setVehicleCostInformation(new CostInformationImpl(25., 0.75, 0.25))
 				.setEngineInformation(new EngineInformationImpl(FuelType.gasoline, 0.015))
 				.setMaxVelocity(10.0)
 				.build();
@@ -55,9 +56,9 @@ public class CarrierVehicleTypeTest extends MatsimTestCase{
 	@Test
 	public void test_whenCreatingTypeMedium_itCreatesCostInfoCorrectly(){
 		CarrierVehicleType medium = types.getVehicleTypes().get(Id.create("medium", VehicleType.class));
-		assertEquals(50.0, medium.getVehicleCostInformation().getFix(),0.01);
-		assertEquals(1.0, medium.getVehicleCostInformation().getPerDistanceUnit(),0.01);
-		assertEquals(0.5, medium.getVehicleCostInformation().getPerTimeUnit(),0.01);
+		assertEquals(50.0, medium.getCostInformation().getFixedCosts(),0.01);
+		assertEquals(1.0, medium.getCostInformation().getCostsPerMeter(),0.01);
+		assertEquals(0.5, medium.getCostInformation().getCostsPerSecond(),0.01);
 	}
 
 	@Test
@@ -89,9 +90,9 @@ public class CarrierVehicleTypeTest extends MatsimTestCase{
 	@Test
 	public void test_whenCopyingTypeMedium_itCopiesCostInfoCorrectly(){
 		CarrierVehicleType medium2 = types.getVehicleTypes().get(Id.create("medium2", VehicleType.class));
-		assertEquals(50.0, medium2.getVehicleCostInformation().getFix(),0.01);
-		assertEquals(1.0, medium2.getVehicleCostInformation().getPerDistanceUnit(),0.01);
-		assertEquals(0.5, medium2.getVehicleCostInformation().getPerTimeUnit(),0.01);
+		assertEquals(50.0, medium2.getCostInformation().getFixedCosts(),0.01);
+		assertEquals(1.0, medium2.getCostInformation().getCostsPerMeter(),0.01);
+		assertEquals(0.5, medium2.getCostInformation().getCostsPerSecond(),0.01);
 	}
 
 	@Test
@@ -123,9 +124,9 @@ public class CarrierVehicleTypeTest extends MatsimTestCase{
 	@Test
 	public void test_whenModifyingTypesmall_itModifiesCostInfoCorrectly(){
 		CarrierVehicleType small = types.getVehicleTypes().get(Id.create("small", VehicleType.class));
-		assertEquals(25.0, small.getVehicleCostInformation().getFix(),0.01);
-		assertEquals(0.75, small.getVehicleCostInformation().getPerDistanceUnit(),0.01);
-		assertEquals(0.25, small.getVehicleCostInformation().getPerTimeUnit(),0.01);
+		assertEquals(25.0, small.getCostInformation().getFixedCosts(),0.01);
+		assertEquals(0.75, small.getCostInformation().getCostsPerMeter(),0.01);
+		assertEquals(0.25, small.getCostInformation().getCostsPerSecond(),0.01);
 	}
 
 	@Test

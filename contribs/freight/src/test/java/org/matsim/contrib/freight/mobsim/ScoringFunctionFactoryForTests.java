@@ -97,7 +97,7 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 			}
 			
 			private double getDistanceParameter(CarrierVehicle vehicle, Person driver) {
-				return vehicle.getVehicleType().getVehicleCostInformation().getPerDistanceUnit();
+				return vehicle.getVehicleType().getCostInformation().getCostsPerMeter();
 			}
 
 			private CarrierVehicle getVehicle(Id<Vehicle> vehicleId) {

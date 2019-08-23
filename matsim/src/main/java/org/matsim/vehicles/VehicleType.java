@@ -48,15 +48,15 @@ public class VehicleType implements Attributable {
 		this.id = typeId;
 	}
 
-	public String getDescription() {
+	public final String getDescription() {
 		return description;
 	}
 
-	public VehicleCapacity getCapacity() {
+	public final VehicleCapacity getCapacity() {
 		return capacity;
 	}
 
-	public Id<VehicleType> getId() {
+	public final Id<VehicleType> getId() {
 		return id;
 	}
 
@@ -64,7 +64,7 @@ public class VehicleType implements Attributable {
 	 * @deprecated please use {@see VehicleUtils} instead.
 	 */
 	@Deprecated
-	public double getAccessTime() {
+	public final double getAccessTime() {
 		return VehicleUtils.getAccessTime(this);
 	}
 
@@ -72,7 +72,7 @@ public class VehicleType implements Attributable {
 	 * @deprecated please use {@see VehicleUtils} instead.
 	 */
 	@Deprecated
-	public double getEgressTime() {
+	public final double getEgressTime() {
 		return VehicleUtils.getEgressTime(this);
 	}
 
@@ -80,7 +80,7 @@ public class VehicleType implements Attributable {
 	 * @deprecated please use {@see VehicleUtils} instead.
 	 */
 	@Deprecated
-	public void setAccessTime(double seconds) {
+	public final void setAccessTime(double seconds) {
 		VehicleUtils.setAccessTime(this, seconds);
 	}
 
@@ -88,7 +88,7 @@ public class VehicleType implements Attributable {
 	 * @deprecated please use {@see VehicleUtils} instead.
 	 */
 	@Deprecated
-	public void setEgressTime(double seconds) {
+	public final void setEgressTime(double seconds) {
 		VehicleUtils.setEgressTime(this, seconds);
 	}
 
@@ -96,7 +96,7 @@ public class VehicleType implements Attributable {
 	 * @deprecated please use {@see VehicleUtils} instead.
 	 */
 	@Deprecated
-	public DoorOperationMode getDoorOperationMode() {
+	public final  DoorOperationMode getDoorOperationMode() {
 		return VehicleUtils.getDoorOperationMode( this ) ;
 	}
 
@@ -104,40 +104,40 @@ public class VehicleType implements Attributable {
 	 * @deprecated please use {@see VehicleUtils} instead.
 	 */
 	@Deprecated
-	public void setDoorOperationMode(DoorOperationMode mode) {
+	public final void setDoorOperationMode(DoorOperationMode mode) {
 		VehicleUtils.setDoorOperationMode( this, mode ) ;
 	}
 
-	public double getPcuEquivalents() {
+	public final double getPcuEquivalents() {
 		return pcuEquivalents;
 	}
 
-	public void setPcuEquivalents(double pcuEquivalents) {
+	public final void setPcuEquivalents(double pcuEquivalents) {
 		this.pcuEquivalents = pcuEquivalents;
 	}
 
-	public double getFlowEfficiencyFactor() {
+	public final double getFlowEfficiencyFactor() {
 		return flowEfficiencyFactor;
 	}
 
-	public void setFlowEfficiencyFactor(double flowEfficiencyFactor) {
+	public final void setFlowEfficiencyFactor(double flowEfficiencyFactor) {
 		this.flowEfficiencyFactor = flowEfficiencyFactor;
 	}
 
 	@Override
-	public  Attributes getAttributes() {
+	public final  Attributes getAttributes() {
 		return attributes ;
 	}
 
-	public void setCapacity(VehicleCapacity capacity) {
+	public final void setCapacity(VehicleCapacity capacity) {
 		this.capacity = capacity;
 	}
 
-	public void setDescription(String desc) {
+	public final void setDescription(String desc) {
 		this.description = desc;
 	}
 
-	public void setEngineInformation(EngineInformation engineInformation) {
+	public final void setEngineInformation(EngineInformation engineInformation) {
 		this.engineInformation = engineInformation;
 	}
 
@@ -145,43 +145,43 @@ public class VehicleType implements Attributable {
 	 * @deprecated please use {@see VehicleUtils} -> setHBEFATechology instead.
 	 */
 	@Deprecated
-	public void setFreightCapacity(FreightCapacity freightCapacity) {
+	public final void setFreightCapacity(FreightCapacity freightCapacity) {
 		this.capacity.setFreightCapacity( freightCapacity );
 	}
 
-	public void setCostInformation(CostInformation costInformation) {
+	public final void setCostInformation(CostInformation costInformation) {
 		this.costInformation = costInformation;
 	}
 
-	public void setLength(double length) {
+	public final void setLength(double length) {
 		this.length = length;
 	}
 
-	public void setMaximumVelocity(double meterPerSecond) {
+	public final void setMaximumVelocity(double meterPerSecond) {
 		this.maxVelocity = meterPerSecond;
 	}
 
-	public void setWidth(double width) {
+	public final void setWidth(double width) {
 		this.width = width;
 	}
 
-	public double getWidth() {
+	public final double getWidth() {
 		return width;
 	}
 
-	public double getMaximumVelocity() {
+	public final double getMaximumVelocity() {
 		return maxVelocity;
 	}
 
-	public double getLength() {
+	public final double getLength() {
 		return length;
 	}
 
-	public EngineInformation getEngineInformation() {
+	public final EngineInformation getEngineInformation() {
 		return engineInformation;
 	}
 
-	public CostInformation getCostInformation() {
+	public final CostInformation getCostInformation() {
 		return costInformation;
 	}
 
@@ -189,15 +189,15 @@ public class VehicleType implements Attributable {
 	 * @deprecated please use {@see VehicleUtils} -> getHBEFATechology instead.
 	 */
 	@Deprecated
-	public FreightCapacity getFreightCapacity() {
+	public final FreightCapacity getFreightCapacity() {
 		return this.capacity.getFreightCapacity();
 	}
 
-    public String getNetworkMode() {
+    public final String getNetworkMode() {
         return networkMode;
     }
 
-    public void setNetworkMode(String networkMode) {
+    public final void setNetworkMode(String networkMode) {
         this.networkMode = networkMode;
     }
 }

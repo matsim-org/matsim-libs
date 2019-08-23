@@ -1,6 +1,8 @@
 package org.matsim.contrib.freight.carrier;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.vehicles.CostInformation;
+import org.matsim.vehicles.CostInformationImpl;
 import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.VehicleType;
 
@@ -13,7 +15,7 @@ import org.matsim.vehicles.VehicleType;
  * @author sschroeder
  *
  */
-public class CarrierVehicleType extends ForwardingVehicleType {
+public class CarrierVehicleType extends VehicleType {
 
 	/**
 	 * A builder building the type.
@@ -31,7 +33,7 @@ public class CarrierVehicleType extends ForwardingVehicleType {
 		 * @param typeId
 		 * @return a type builder
 		 */
-		public static Builder newInstance(Id<VehicleType> typeId){
+		public static Builder newInstance(Id<org.matsim.vehicles.VehicleType> typeId){
 			return new Builder(typeId);
 		}
 		
@@ -45,16 +47,16 @@ public class CarrierVehicleType extends ForwardingVehicleType {
 		 * @param typeId
 		 * @return a type builder
 		 */
-		public static Builder newInstance(Id<VehicleType> typeId, CarrierVehicleType carrierVehicleType){
+		public static Builder newInstance(Id<org.matsim.vehicles.VehicleType> typeId, CarrierVehicleType carrierVehicleType){
 			return new Builder(typeId)
 					.setDescription(carrierVehicleType.getDescription())
 					.setEngineInformation(carrierVehicleType.getEngineInformation())
 					.setCapacity(carrierVehicleType.getCarrierVehicleCapacity())
 					.setMaxVelocity(carrierVehicleType.getMaximumVelocity())
-					.setVehicleCostInformation(carrierVehicleType.getVehicleCostInformation());		
+					.setVehicleCostInformation(carrierVehicleType.getCostInformation());
 		}
 		
-		private Id<VehicleType> typeId;
+		private Id<org.matsim.vehicles.VehicleType> typeId;
 		private double fix = 0.0;
 		private double perDistanceUnit = 1.0;
 		private double perTimeUnit = 0.0;
@@ -64,7 +66,7 @@ public class CarrierVehicleType extends ForwardingVehicleType {
 		private double maxVeloInMeterPerSeconds = Double.MAX_VALUE;
 		
 		
-		private Builder(Id<VehicleType> typeId){
+		private Builder(Id<org.matsim.vehicles.VehicleType> typeId){
 			this.typeId = typeId;
 		}
 		
@@ -140,17 +142,17 @@ public class CarrierVehicleType extends ForwardingVehicleType {
 		}
 
 		/**
-		 * Sets {@link VehicleCostInformation}
+		 * Sets {@link CostInformation}
 		 * 
 		 * <p>The defaults are [fix=0.0][perDistanceUnit=1.0][perTimeUnit=0.0].
 		 * 
 		 * @param info
 		 * @return this builder
 		 */
-		public Builder setVehicleCostInformation(VehicleCostInformation info) {
-			fix = info.fix;
-			perDistanceUnit = info.perDistanceUnit;
-			perTimeUnit = info.perTimeUnit;
+		public Builder setVehicleCostInformation(CostInformation info) {
+			fix = info.getFixedCosts();
+			perDistanceUnit = info.getCostsPerMeter();
+			perTimeUnit = info.getCostsPerSecond();
 			return this;
 		}
 
@@ -170,56 +172,16 @@ public class CarrierVehicleType extends ForwardingVehicleType {
 			return this;
 		}
 	}
-	
-	public static class VehicleCostInformation {
-
-		private double fix;
-		private double perDistanceUnit;
-		private double perTimeUnit;
-
-		public VehicleCostInformation(double fix, double perDistanceUnit, double perTimeUnit) {
-			super();
-			this.fix = fix;
-			this.perDistanceUnit = perDistanceUnit;
-			this.perTimeUnit = perTimeUnit;
-		}
-		
-		public double getFix() {
-			return fix;
-		}
-
-		public double getPerDistanceUnit() {
-			return perDistanceUnit;
-		}
-
-		public double getPerTimeUnit() {
-			return perTimeUnit;
-		}
-
-	}
-
-	private VehicleCostInformation vehicleCostInformation;
 
 	private int capacity;
 	
 	private CarrierVehicleType(Builder builder){
-		super(new VehicleType(builder.typeId) );
-		this.vehicleCostInformation = new VehicleCostInformation(builder.fix, builder.perDistanceUnit, builder.perTimeUnit);
+		super(builder.typeId);
+		super.setCostInformation(new CostInformationImpl(builder.fix, builder.perDistanceUnit, builder.perTimeUnit));
 		if(builder.engineInfo != null) super.setEngineInformation(builder.engineInfo);
 		if(builder.description != null) super.setDescription(builder.description);
 		capacity = builder.capacity;
 		super.setMaximumVelocity(builder.maxVeloInMeterPerSeconds);
-	}
-
-	/**
-	 * Returns the cost values for this vehicleType.
-	 * 
-	 * If cost values are not explicitly set, the defaults are [fix=0.0][perDistanceUnit=1.0][perTimeUnit=0.0].
-	 * 
-	 * @return vehicleCostInformation
-	 */
-	public VehicleCostInformation getVehicleCostInformation() {
-		return vehicleCostInformation;
 	}
 	
 

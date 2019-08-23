@@ -34,14 +34,11 @@ import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 
-import com.graphhopper.jsprit.core.problem.AbstractJob;
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem.FleetSize;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingActivityCosts;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
-import com.graphhopper.jsprit.core.problem.job.Delivery;
-import com.graphhopper.jsprit.core.problem.job.Pickup;
 import com.graphhopper.jsprit.core.problem.job.Service;
 import com.graphhopper.jsprit.core.problem.job.Service.Builder;
 import com.graphhopper.jsprit.core.problem.job.Shipment;
@@ -253,9 +250,9 @@ public class MatsimJspritFactory {
 		if(carrierVehicleType == null) throw new IllegalStateException("carrierVehicleType is null");
 		VehicleTypeImpl.Builder typeBuilder = VehicleTypeImpl.Builder.newInstance(carrierVehicleType.getId().toString());
 		typeBuilder.addCapacityDimension(0, carrierVehicleType.getCarrierVehicleCapacity());
-		typeBuilder.setCostPerDistance(carrierVehicleType.getVehicleCostInformation().getPerDistanceUnit());
-		typeBuilder.setCostPerTransportTime(carrierVehicleType.getVehicleCostInformation().getPerTimeUnit());
-		typeBuilder.setFixedCost(carrierVehicleType.getVehicleCostInformation().getFix());
+		typeBuilder.setCostPerDistance(carrierVehicleType.getCostInformation().getCostsPerMeter());
+		typeBuilder.setCostPerTransportTime(carrierVehicleType.getCostInformation().getCostsPerSecond());
+		typeBuilder.setFixedCost(carrierVehicleType.getCostInformation().getFixedCosts());
 		typeBuilder.setMaxVelocity(carrierVehicleType.getMaximumVelocity());
 		return typeBuilder.build();
 	}

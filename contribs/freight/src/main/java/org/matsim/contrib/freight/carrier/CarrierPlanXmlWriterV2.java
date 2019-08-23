@@ -92,8 +92,8 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 //			writer.write("\t\t\t\t\t\t<description>" + type.getDescription() + "</description>\n");
 //			writer.write("\t\t\t\t\t\t<engineInformation fuelType=\"" + type.getEngineInformation().getFuelType().toString() + "\" gasConsumption=\"" + type.getEngineInformation().getFuelConsumption() + "\"/>\n");
 //			writer.write("\t\t\t\t\t\t<capacity>" + type.getCarrierVehicleCapacity() + "</capacity>\n");
-//			writer.write("\t\t\t\t\t\t<costInformation fix=\"" + type.getVehicleCostInformation().fix + "\" perMeter=\"" + type.getVehicleCostInformation().perDistanceUnit + 
-//					"\" perSecond=\"" + type.getVehicleCostInformation().perTimeUnit + "\"/>\n");
+//			writer.write("\t\t\t\t\t\t<costInformation fix=\"" + type.getCostInformation().fix + "\" perMeter=\"" + type.getCostInformation().perDistanceUnit +
+//					"\" perSecond=\"" + type.getCostInformation().perTimeUnit + "\"/>\n");
 //			writer.write("\t\t\t\t\t</vehicleType>\n");
 //		}
 //		writer.write("\t\t\t\t</vehicleTypes>\n\n");
