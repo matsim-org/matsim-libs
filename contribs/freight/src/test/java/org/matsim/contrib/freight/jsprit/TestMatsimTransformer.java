@@ -358,7 +358,7 @@ public class TestMatsimTransformer {
 
 	private CarrierVehicleType getMatsimVehicleType() {
 		CarrierVehicleType matsimType = CarrierVehicleType.Builder.newInstance(Id.create("matsimType", org.matsim.vehicles.VehicleType.class))
-				.setCapacity(50)
+				.setCapacityWeightInTons(50 )
 				.setCostPerDistanceUnit(10.0)
 				.setCostPerTimeUnit(5.0)
 				.setFixCost(100.0)

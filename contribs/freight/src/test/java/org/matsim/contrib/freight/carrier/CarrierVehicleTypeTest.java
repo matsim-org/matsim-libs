@@ -3,7 +3,6 @@ package org.matsim.contrib.freight.carrier;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.vehicles.CostInformation;
 import org.matsim.vehicles.CostInformationImpl;
 import org.matsim.vehicles.EngineInformation.FuelType;
 import org.matsim.vehicles.EngineInformationImpl;
@@ -18,7 +17,7 @@ public class CarrierVehicleTypeTest extends MatsimTestCase{
 		super.setUp();
 		CarrierVehicleType mediumType = CarrierVehicleType.Builder.newInstance(Id.create("medium", VehicleType.class ))
 				.setDescription("Medium Vehicle")
-				.setCapacity(30)
+				.setCapacityWeightInTons(30 )
 				.setVehicleCostInformation(new CostInformationImpl(50., 1.0, 0.5))
 				.setEngineInformation(new EngineInformationImpl(FuelType.diesel, 0.02))
 				.setMaxVelocity(13.89)
@@ -33,7 +32,7 @@ public class CarrierVehicleTypeTest extends MatsimTestCase{
 		//Setting up a smaller one based of the one above and changing all values.
 		CarrierVehicleType smallType = CarrierVehicleType.Builder.newInstance(Id.create("small", VehicleType.class), mediumType)
 				.setDescription("Small Vehicle")
-				.setCapacity(16)
+				.setCapacityWeightInTons(16 )
 				.setVehicleCostInformation(new CostInformationImpl(25., 0.75, 0.25))
 				.setEngineInformation(new EngineInformationImpl(FuelType.gasoline, 0.015))
 				.setMaxVelocity(10.0)

@@ -123,7 +123,7 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 //			if(currentCap != null) vehType.setFreightCapacity(currentCap);
 			if(currentVehicleCosts != null) typeBuilder.setVehicleCostInformation(currentVehicleCosts);
 			if(currentEngineInfo != null) typeBuilder.setEngineInformation(currentEngineInfo);
-			if(currentCapacity != null) typeBuilder.setCapacity(Integer.parseInt(currentCapacity));
+			if(currentCapacity != null) typeBuilder.setCapacityWeightInTons(Integer.parseInt(currentCapacity ) );
 			if(maxVelo != null) typeBuilder.setMaxVelocity(Double.parseDouble(maxVelo));
 			CarrierVehicleType vehType = typeBuilder.build();
 			carrierVehicleTypes.getVehicleTypes().put(vehType.getId(), vehType);

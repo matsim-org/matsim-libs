@@ -15,7 +15,6 @@ import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.CarrierVehicleType;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.core.config.Config;
@@ -174,7 +173,7 @@ final class FreightScenarioCreator {
 
     private static CarrierVehicleType createLightType() {
         CarrierVehicleType.Builder typeBuilder = CarrierVehicleType.Builder.newInstance(Id.create("small",VehicleType.class));
-        typeBuilder.setCapacity(6);
+        typeBuilder.setCapacityWeightInTons(6 );
         typeBuilder.setFixCost(80.0);
         typeBuilder.setCostPerDistanceUnit(0.00047);
         typeBuilder.setCostPerTimeUnit(0.008);
@@ -191,7 +190,7 @@ final class FreightScenarioCreator {
 
     private static CarrierVehicleType createHeavyType() {
         CarrierVehicleType.Builder typeBuilder = CarrierVehicleType.Builder.newInstance(Id.create("heavy", VehicleType.class));
-        typeBuilder.setCapacity(25);
+        typeBuilder.setCapacityWeightInTons(25 );
         typeBuilder.setFixCost(130.0);
         typeBuilder.setCostPerDistanceUnit(0.00077);
         typeBuilder.setCostPerTimeUnit(0.008);

@@ -312,7 +312,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 		}
 		else if(name.equals("capacity")){
 			if(content == null) throw new IllegalStateException("vehicle-capacity is missing.");
-			vehicleTypeBuilder.setCapacity(Integer.parseInt(content));
+			vehicleTypeBuilder.setCapacityWeightInTons(Integer.parseInt(content ) );
 		}
 		else if(name.equals("vehicleType")){
 			CarrierVehicleType type = vehicleTypeBuilder.build();

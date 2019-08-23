@@ -24,7 +24,6 @@ import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -83,7 +82,7 @@ public class FixedCostsTest extends MatsimTestCase {
 
         //only variable costs (per distance), no fixed costs
         CarrierVehicleType carrierVehType_A = CarrierVehicleType.Builder.newInstance(Id.create("gridType_A", VehicleType.class))
-                .setCapacity(1)
+                .setCapacityWeightInTons(1 )
                 .setMaxVelocity(10)
                 .setCostPerDistanceUnit(0.001)      //1 EUR per km
                 .setCostPerTimeUnit(0.0)
@@ -95,7 +94,7 @@ public class FixedCostsTest extends MatsimTestCase {
 
         //only fixed costs, no variable costs
         CarrierVehicleType carrierVehType_B = CarrierVehicleType.Builder.newInstance(Id.create("gridType_B", VehicleType.class))
-                .setCapacity(1)
+                .setCapacityWeightInTons(1 )
                 .setMaxVelocity(10)
                 .setCostPerDistanceUnit(0.00001)
                 .setCostPerTimeUnit(0.0)

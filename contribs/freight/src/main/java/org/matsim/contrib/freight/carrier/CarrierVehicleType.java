@@ -1,10 +1,7 @@
 package org.matsim.contrib.freight.carrier;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.vehicles.CostInformation;
-import org.matsim.vehicles.CostInformationImpl;
-import org.matsim.vehicles.EngineInformation;
-import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.*;
 
 /**
  * The carrier vehicle type.
@@ -51,7 +48,7 @@ public class CarrierVehicleType extends VehicleType {
 			return new Builder(typeId)
 					.setDescription(carrierVehicleType.getDescription())
 					.setEngineInformation(carrierVehicleType.getEngineInformation())
-					.setCapacity(carrierVehicleType.getCarrierVehicleCapacity())
+					.setCapacityWeightInTons(carrierVehicleType.getCarrierVehicleCapacity() )
 					.setMaxVelocity(carrierVehicleType.getMaximumVelocity())
 					.setVehicleCostInformation(carrierVehicleType.getCostInformation());
 		}
@@ -62,7 +59,7 @@ public class CarrierVehicleType extends VehicleType {
 		private double perTimeUnit = 0.0;
 		private String description;
 		private EngineInformation engineInfo;
-		private int capacity = 0;
+		private int weightInTons = 0;
 		private double maxVeloInMeterPerSeconds = Double.MAX_VALUE;
 		
 		
@@ -127,8 +124,8 @@ public class CarrierVehicleType extends VehicleType {
 		 * @param capacity
 		 * @return this builder
 		 */
-		public Builder setCapacity(int capacity){
-			this.capacity = capacity;
+		public Builder setCapacityWeightInTons( int capacity ){
+			this.weightInTons = capacity;
 			return this;
 		}
 		
@@ -173,14 +170,19 @@ public class CarrierVehicleType extends VehicleType {
 		}
 	}
 
-	private int capacity;
+	private int weightInTons;
 	
 	private CarrierVehicleType(Builder builder){
 		super(builder.typeId);
 		super.setCostInformation(new CostInformationImpl(builder.fix, builder.perDistanceUnit, builder.perTimeUnit));
 		if(builder.engineInfo != null) super.setEngineInformation(builder.engineInfo);
 		if(builder.description != null) super.setDescription(builder.description);
-		capacity = builder.capacity;
+//		capacity = builder.capacity;
+
+		VehicleCapacity aCapacity = new VehicleCapacityImpl() ;
+		aCapacity.setWeightInTons( weightInTons );
+		super.setCapacity( aCapacity );
+
 		super.setMaximumVelocity(builder.maxVeloInMeterPerSeconds);
 	}
 	
@@ -193,7 +195,7 @@ public class CarrierVehicleType extends VehicleType {
 	 * @return integer
 	 */
 	public int getCarrierVehicleCapacity(){
-		return capacity;
+		return weightInTons;
 	}
 	
 }

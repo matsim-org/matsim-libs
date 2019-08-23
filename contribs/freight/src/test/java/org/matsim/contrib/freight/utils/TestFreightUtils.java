@@ -93,7 +93,7 @@ public class TestFreightUtils {
 
 		//Create vehicle for Carriers
 		CarrierVehicleType carrierVehType = CarrierVehicleType.Builder.newInstance(Id.create("gridType", VehicleType.class))
-				.setCapacity(3)
+				.setCapacityWeightInTons(3 )
 				.setMaxVelocity(10)
 				.setCostPerDistanceUnit(0.0001)
 				.setCostPerTimeUnit(0.001)

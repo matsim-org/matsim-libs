@@ -235,7 +235,7 @@ public class MatsimJspritFactory {
 	 */
 	static CarrierVehicleType createCarrierVehicleType(VehicleType type){
 		CarrierVehicleType.Builder typeBuilder = CarrierVehicleType.Builder.newInstance(Id.create(type.getTypeId(), org.matsim.vehicles.VehicleType.class));
-		typeBuilder.setCapacity(type.getCapacityDimensions().get(0));
+		typeBuilder.setCapacityWeightInTons(type.getCapacityDimensions().get(0 ) );
 		typeBuilder.setCostPerDistanceUnit(type.getVehicleCostParams().perDistanceUnit).setCostPerTimeUnit(type.getVehicleCostParams().perTransportTimeUnit)
 		.setFixCost(type.getVehicleCostParams().fix);
 		typeBuilder.setMaxVelocity(type.getMaxVelocity());
