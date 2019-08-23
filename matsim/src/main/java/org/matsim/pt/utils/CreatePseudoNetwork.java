@@ -160,7 +160,7 @@ public class CreatePseudoNetwork {
 		} else {
 			link.setLength(CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()));
 		}
-		link.setFreespeed(30.0 / 3.6);
+		link.setFreespeed(100.0 / 3.6);
 		link.setCapacity(500);
 		link.setNumberOfLanes(1);
 		this.network.addLink(link);
