@@ -51,6 +51,7 @@ import javax.inject.Provider;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim {
 	// I think it is ok to have this public final.  Since one may want to use it as a delegate.  kai, may'18
@@ -177,7 +178,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 
 	private void createAndAddVehiclesForEveryNetworkMode() {
 
-		final Map<String, VehicleType> modeVehicleTypes = getVehicleTypesForAllMainModes();
+		final Map<String, VehicleType> modeVehicleTypes = getVehicleTypesForAllNetworkAndMainModes();
 
 		for (Map.Entry<String, VehicleType> modeType : modeVehicleTypes.entrySet()) {
 			for (Person person : scenario.getPopulation().getPersons().values()) {
@@ -198,7 +199,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		}
 	}
 
-	private Map<String, VehicleType> getVehicleTypesForAllMainModes() {
+	private Map<String, VehicleType> getVehicleTypesForAllNetworkAndMainModes() {
 
 		Map<String, VehicleType> modeVehicleTypes = new HashMap<>();
 
@@ -206,7 +207,11 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 			// in this case the user has to do everything on their own and we can short circuit here.
 			return modeVehicleTypes;
 		}
-		for (String mode : qSimConfigGroup.getMainModes()) {
+
+		Set<String> modes = new HashSet<>(qSimConfigGroup.getMainModes());
+		modes.addAll(scenario.getConfig().plansCalcRoute().getNetworkModes());
+
+		for (String mode : modes) {
 			VehicleType type = null;
 			switch (qSimConfigGroup.getVehiclesSource()) {
 				case defaultVehicle:
