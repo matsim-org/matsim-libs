@@ -209,7 +209,7 @@ public class TestFreightUtils {
 		Assert.assertEquals(FleetSize.INFINITE, carrierWShipmentsOnlyFromCarrierWServices.getCarrierCapabilities().getFleetSize());
 		Assert.assertEquals(1, carrierWShipmentsOnlyFromCarrierWServices.getCarrierCapabilities().getVehicleTypes().size());
 		for (CarrierVehicleType carrierVehicleType : carrierWShipmentsOnlyFromCarrierWServices.getCarrierCapabilities().getVehicleTypes()){
-			Assert.assertEquals(3,carrierVehicleType.getCarrierVehicleCapacity());
+			Assert.assertEquals(3., (double) carrierVehicleType.getCapacity().getWeightInTons(), Double.MIN_VALUE );
 			Assert.assertEquals(130, carrierVehicleType.getCostInformation().getFixedCosts(), 0.0);
 			Assert.assertEquals(0.0001, carrierVehicleType.getCostInformation().getCostsPerMeter(), 0.0);
 			Assert.assertEquals(0.001, carrierVehicleType.getCostInformation().getCostsPerSecond(), 0.0);
@@ -221,7 +221,7 @@ public class TestFreightUtils {
 		Assert.assertEquals(FleetSize.INFINITE, carrierWShipmentsOnlyFromCarrierWShipments.getCarrierCapabilities().getFleetSize());
 		Assert.assertEquals(1, carrierWShipmentsOnlyFromCarrierWShipments.getCarrierCapabilities().getVehicleTypes().size());
 		for (CarrierVehicleType carrierVehicleType : carrierWShipmentsOnlyFromCarrierWShipments.getCarrierCapabilities().getVehicleTypes()){
-			Assert.assertEquals(3,carrierVehicleType.getCarrierVehicleCapacity());
+			Assert.assertEquals(3.,(double) carrierVehicleType.getCapacity().getWeightInTons(), Double.MIN_VALUE );
 			Assert.assertEquals(130, carrierVehicleType.getCostInformation().getFixedCosts(), 0.0);
 			Assert.assertEquals(0.0001, carrierVehicleType.getCostInformation().getCostsPerMeter(), 0.0);
 			Assert.assertEquals(0.001, carrierVehicleType.getCostInformation().getCostsPerSecond(), 0.0);

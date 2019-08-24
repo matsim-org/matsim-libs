@@ -27,14 +27,17 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  */
 public class VehicleCapacityImpl implements VehicleCapacity {
 
-	private Integer seats = null;
-	private Integer standingRoom = null;
-	private Double volumeInCubicMeters = null;
-	private Double weightInTons = null;
+	private Integer seats = 1; // one seat for the driver
+	private Integer standingRoom = 0 ;
+	private Double volumeInCubicMeters = Double.POSITIVE_INFINITY ; // not an active constraint
+	private Double weightInTons = Double.POSITIVE_INFINITY ; // not an active constraint
 	private FreightCapacity freightCap = null;
 	private Attributes attributes = new Attributes() ;
 
-	public VehicleCapacityImpl(){}
+	@Deprecated // I am rather unsure if it makes sense to both have an interface, and to instantiate the implementation directly.  kai, aug'19
+	public VehicleCapacityImpl(){
+
+	}
 	
 	@Override
 	public FreightCapacity getFreightCapacity() {

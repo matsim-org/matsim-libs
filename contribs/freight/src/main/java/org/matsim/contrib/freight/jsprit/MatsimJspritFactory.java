@@ -249,7 +249,13 @@ public class MatsimJspritFactory {
 	static VehicleType createVehicleType(CarrierVehicleType carrierVehicleType){
 		if(carrierVehicleType == null) throw new IllegalStateException("carrierVehicleType is null");
 		VehicleTypeImpl.Builder typeBuilder = VehicleTypeImpl.Builder.newInstance(carrierVehicleType.getId().toString());
-		typeBuilder.addCapacityDimension(0, carrierVehicleType.getCarrierVehicleCapacity());
+		final double vehicleCapacity = carrierVehicleType.getCapacity().getWeightInTons();
+		final int vehicleCapacityInt = (int) vehicleCapacity ;
+		if ( vehicleCapacity - vehicleCapacityInt > 0 ) {
+			log.warn( "vehicle capacity truncated to int: before=" + vehicleCapacity + "; after=" + vehicleCapacityInt ) ;
+			// yyyyyy this implies that we would have fewer problems if we set vehicle capacity in kg instead of in tons in our data model.  kai, aug'19
+		}
+		typeBuilder.addCapacityDimension(0, vehicleCapacityInt );
 		typeBuilder.setCostPerDistance(carrierVehicleType.getCostInformation().getCostsPerMeter());
 		typeBuilder.setCostPerTransportTime(carrierVehicleType.getCostInformation().getCostsPerSecond());
 		typeBuilder.setFixedCost(carrierVehicleType.getCostInformation().getFixedCosts());

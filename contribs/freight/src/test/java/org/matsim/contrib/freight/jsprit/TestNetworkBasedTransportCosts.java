@@ -95,20 +95,29 @@ public class TestNetworkBasedTransportCosts extends MatsimTestCase{
 		String NETWORK_FILENAME = getClassInputDirectory() + "network.xml";
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILENAME);
 		
-		CarrierVehicleType vtype1 = mock(CarrierVehicleType.class);
+//		CarrierVehicleType vtype1 = mock(CarrierVehicleType.class);
 		CostInformation param1 = new CostInformationImpl(0.0, 2.0, 0.0);
-		when(vtype1.getCostInformation()).thenReturn(param1);
-		when(vtype1.getId()).thenReturn(Id.create("type1", org.matsim.vehicles.VehicleType.class));
+//		when(vtype1.getCostInformation()).thenReturn(param1);
+//		when(vtype1.getId()).thenReturn(Id.create("type1", org.matsim.vehicles.VehicleType.class));
+		// one cannot mock final methods!!
+
+		CarrierVehicleType vtype1 =
+			  CarrierVehicleType.Builder.newInstance( Id.create( "type1", org.matsim.vehicles.VehicleType.class ) ).setVehicleCostInformation( param1 ).build() ;
+
 		
-		CarrierVehicleType vtype2 = mock(CarrierVehicleType.class);
+//		CarrierVehicleType vtype2 = mock(CarrierVehicleType.class);
 		CostInformation param2 = new CostInformationImpl(0.0, 4.0, 0.0);
-		when(vtype2.getCostInformation()).thenReturn(param2);
-		when(vtype2.getId()).thenReturn(Id.create("type2", org.matsim.vehicles.VehicleType.class));
-		
+//		when(vtype2.getCostInformation()).thenReturn(param2);
+//		when(vtype2.getId()).thenReturn(Id.create("type2", org.matsim.vehicles.VehicleType.class));
+		// one cannot mock final methods!!
+
+		CarrierVehicleType vtype2 =
+			  CarrierVehicleType.Builder.newInstance( Id.create( "type2", org.matsim.vehicles.VehicleType.class ) ).setVehicleCostInformation( param2 ).build() ;
+
 		Network network = scenario.getNetwork();
 		NetworkBasedTransportCosts.Builder builder = 
 				NetworkBasedTransportCosts.Builder.newInstance(network,Arrays.asList(vtype1,vtype2));
-		NetworkBasedTransportCosts c = builder.build();
+		NetworkBasedTransportCosts networkBasedTransportCosts = builder.build();
 		
 		Vehicle vehicle1 = mock(Vehicle.class);
 		VehicleType type1 = mock(VehicleType.class);
@@ -124,8 +133,8 @@ public class TestNetworkBasedTransportCosts extends MatsimTestCase{
 		when(vehicle2.getType()).thenReturn(type2);
 		when(vehicle2.getId()).thenReturn("vehicle2");
 		
-		assertEquals(20000.0, c.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle1), 0.01);
-		assertEquals(40000.0, c.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle2), 0.01);
+		assertEquals(20000.0, networkBasedTransportCosts.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle1), 0.01);
+		assertEquals(40000.0, networkBasedTransportCosts.getTransportCost(Location.newInstance("20"), Location.newInstance("21"), 0.0, mock(Driver.class), vehicle2), 0.01);
 
 	}
 

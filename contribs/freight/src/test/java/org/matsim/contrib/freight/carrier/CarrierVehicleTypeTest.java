@@ -49,7 +49,7 @@ public class CarrierVehicleTypeTest extends MatsimTestCase{
 	@Test
 	public void test_whenCreatingTypeMedium_itCreatesCapacityCorrectly(){
 		CarrierVehicleType medium = types.getVehicleTypes().get(Id.create("medium", VehicleType.class));
-		assertEquals(30, medium.getCarrierVehicleCapacity());
+		assertEquals(30., medium.getCapacity().getWeightInTons() );
 	}
 
 	@Test
@@ -83,7 +83,7 @@ public class CarrierVehicleTypeTest extends MatsimTestCase{
 	@Test
 	public void test_whenCopyingTypeMedium_itCopiesCapacityCorrectly(){
 		CarrierVehicleType medium2 = types.getVehicleTypes().get(Id.create("medium2", VehicleType.class));
-		assertEquals(30, medium2.getCarrierVehicleCapacity());
+		assertEquals(30., medium2.getCapacity().getWeightInTons() );
 	}
 
 	@Test
@@ -117,7 +117,7 @@ public class CarrierVehicleTypeTest extends MatsimTestCase{
 	@Test
 	public void test_whenModifyingTypesmall_itModifiesCapacityCorrectly(){
 		CarrierVehicleType small = types.getVehicleTypes().get(Id.create("small", VehicleType.class));
-		assertEquals(16, small.getCarrierVehicleCapacity());
+		assertEquals(16., small.getCapacity().getWeightInTons() );
 	}
 
 	@Test

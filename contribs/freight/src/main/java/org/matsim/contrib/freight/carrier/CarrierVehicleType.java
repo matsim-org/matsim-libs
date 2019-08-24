@@ -48,7 +48,7 @@ public class CarrierVehicleType extends VehicleType {
 			return new Builder(typeId)
 					.setDescription(carrierVehicleType.getDescription())
 					.setEngineInformation(carrierVehicleType.getEngineInformation())
-					.setCapacityWeightInTons(carrierVehicleType.getCarrierVehicleCapacity() )
+					.setCapacityWeightInTons( carrierVehicleType.getCapacity().getWeightInTons() )
 					.setMaxVelocity(carrierVehicleType.getMaximumVelocity())
 					.setVehicleCostInformation(carrierVehicleType.getCostInformation());
 		}
@@ -59,7 +59,7 @@ public class CarrierVehicleType extends VehicleType {
 		private double perTimeUnit = 0.0;
 		private String description;
 		private EngineInformation engineInfo;
-		private int weightInTons = 0;
+		private double weightInTons = 0;
 		private double maxVeloInMeterPerSeconds = Double.MAX_VALUE;
 		
 		
@@ -124,7 +124,7 @@ public class CarrierVehicleType extends VehicleType {
 		 * @param capacity
 		 * @return this builder
 		 */
-		public Builder setCapacityWeightInTons( int capacity ){
+		public Builder setCapacityWeightInTons( double capacity ){
 			this.weightInTons = capacity;
 			return this;
 		}
@@ -170,17 +170,15 @@ public class CarrierVehicleType extends VehicleType {
 		}
 	}
 
-	private int weightInTons;
-	
 	private CarrierVehicleType(Builder builder){
 		super(builder.typeId);
 		super.setCostInformation(new CostInformationImpl(builder.fix, builder.perDistanceUnit, builder.perTimeUnit));
 		if(builder.engineInfo != null) super.setEngineInformation(builder.engineInfo);
 		if(builder.description != null) super.setDescription(builder.description);
-//		capacity = builder.capacity;
 
+//		capacity = builder.capacity;
 		VehicleCapacity aCapacity = new VehicleCapacityImpl() ;
-		aCapacity.setWeightInTons( weightInTons );
+		aCapacity.setWeightInTons( builder.weightInTons );
 		super.setCapacity( aCapacity );
 
 		super.setMaximumVelocity(builder.maxVeloInMeterPerSeconds);
@@ -194,8 +192,9 @@ public class CarrierVehicleType extends VehicleType {
 	 * 
 	 * @return integer
 	 */
-	public int getCarrierVehicleCapacity(){
-		return weightInTons;
+	@Deprecated // use "inline method" in your code. kai, aug'19
+	public Double getCarrierVehicleCapacity(){
+		return this.getCapacity().getWeightInTons() ;
 	}
 	
 }
