@@ -70,15 +70,16 @@ public class VehicleReaderV1Test extends MatsimTestCase {
 		assertNotNull(vehType.getCapacity());
 		assertEquals(Integer.valueOf(5), vehType.getCapacity().getSeats());
 		assertEquals(Integer.valueOf(20), vehType.getCapacity().getStandingRoom());
-		assertNotNull(vehType.getCapacity().getFreightCapacity());
-		assertEquals(23.23, vehType.getCapacity().getFreightCapacity().getVolume(), EPSILON);
+//		assertNotNull(vehType.getCapacity().getFreightCapacity());
+//		assertEquals(23.23, vehType.getCapacity().getFreightCapacity().getVolume(), EPSILON);
+		assertEquals( 23.23, vehType.getCapacity().getVolumeInCubicMeters(), EPSILON );
 		assertNotNull(vehType.getEngineInformation());
-		assertEquals(EngineInformation.FuelType.diesel, VehicleUtils.getEngineInformation(vehType).getFuelType());
+		assertEquals( EngineInformation.FuelType.diesel, VehicleUtils.getEngineInformation(vehType ).getFuelType() );
 		assertEquals(0.23, VehicleUtils.getEngineInformation(vehType).getFuelConsumption(), EPSILON);
 		assertEquals(0.23, VehicleUtils.getFuelConsumption(vehType), EPSILON);
 		assertEquals(23.23, VehicleUtils.getAccessTime(vehType), EPSILON);
 		assertEquals(42.42, VehicleUtils.getEgressTime(vehType), EPSILON);
-		assertEquals(DoorOperationMode.parallel, VehicleUtils.getDoorOperationMode(vehType));
+		assertEquals( VehicleUtils.DoorOperationMode.parallel, VehicleUtils.getDoorOperationMode(vehType ) );
 		assertEquals(2.0, vehType.getPcuEquivalents());
     }
 

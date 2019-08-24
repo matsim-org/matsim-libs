@@ -96,7 +96,7 @@ public class VehicleType implements Attributable {
 	 * @deprecated please use {@see VehicleUtils} instead.
 	 */
 	@Deprecated
-	public final  DoorOperationMode getDoorOperationMode() {
+	public final VehicleUtils.DoorOperationMode getDoorOperationMode() {
 		return VehicleUtils.getDoorOperationMode( this ) ;
 	}
 
@@ -104,7 +104,7 @@ public class VehicleType implements Attributable {
 	 * @deprecated please use {@see VehicleUtils} instead.
 	 */
 	@Deprecated
-	public final void setDoorOperationMode(DoorOperationMode mode) {
+	public final void setDoorOperationMode( VehicleUtils.DoorOperationMode mode ) {
 		VehicleUtils.setDoorOperationMode( this, mode ) ;
 	}
 
@@ -137,17 +137,17 @@ public class VehicleType implements Attributable {
 		this.description = desc;
 	}
 
-	public final void setEngineInformation(EngineInformation engineInformation) {
+	public final void setEngineInformation( EngineInformation engineInformation ) {
 		this.engineInformation = engineInformation;
 	}
 
-	/**
-	 * @deprecated please use {@see VehicleUtils} -> setHBEFATechology instead.
-	 */
-	@Deprecated
-	public final void setFreightCapacity(FreightCapacity freightCapacity) {
-		this.capacity.setFreightCapacity( freightCapacity );
-	}
+//	/**
+//	 * @deprecated please use {@see VehicleUtils} -> setHBEFATechology instead.
+//	 */
+//	@Deprecated
+//	public final void setFreightCapacity(FreightCapacity freightCapacity) {
+//		this.capacity.setFreightCapacity( freightCapacity );
+//	}
 
 	public final void setCostInformation(CostInformation costInformation) {
 		this.costInformation = costInformation;
@@ -185,13 +185,13 @@ public class VehicleType implements Attributable {
 		return costInformation;
 	}
 
-	/**
-	 * @deprecated please use {@see VehicleUtils} -> getHBEFATechology instead.
-	 */
-	@Deprecated
-	public final FreightCapacity getFreightCapacity() {
-		return this.capacity.getFreightCapacity();
-	}
+//	/**
+//	 * @deprecated please use {@see VehicleUtils} -> getHBEFATechology instead.
+//	 */
+//	@Deprecated
+//	public final FreightCapacity getFreightCapacity() {
+//		return this.capacity.getFreightCapacity();
+//	}
 
     public final String getNetworkMode() {
         return networkMode;

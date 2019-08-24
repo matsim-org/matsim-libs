@@ -127,7 +127,7 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 		}
 	}
 
-	private void writeEngineInformation(EngineInformation ei) throws UncheckedIOException {
+	private void writeEngineInformation( EngineInformation ei ) throws UncheckedIOException {
 		this.writeStartTag(VehicleSchemaV1Names.ENGINEINFORMATION, null);
 		this.writeStartTag(VehicleSchemaV1Names.FUELTYPE, null);
 		this.writeContent(ei.getFuelType().toString(), false);
@@ -150,18 +150,23 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 			atts.add(this.createTuple(VehicleSchemaV1Names.PERSONS, cap.getStandingRoom()));
 			this.writeStartTag(VehicleSchemaV1Names.STANDINGROOM, atts, true);
 		}
-		if (cap.getFreightCapacity() != null) {
-			this.writeFreightCapacity(cap.getFreightCapacity());
+//		if (cap.getFreightCapacity() != null) {
+//			this.writeFreightCapacity(cap.getFreightCapacity());
+//		}
+		if ( cap.getVolumeInCubicMeters() != null ) {
+			atts.clear() ;
+			atts.add(createTuple( VehicleSchemaV1Names.FREIGHTCAPACITY, cap.getVolumeInCubicMeters() )) ;
+			this.writeStartTag( VehicleSchemaV1Names.CUBICMETERS, atts, true );
 		}
 		this.writeEndTag(VehicleSchemaV1Names.CAPACITY);
 	}
 
-	private void writeFreightCapacity(FreightCapacity fc) throws UncheckedIOException {
-		this.writeStartTag(VehicleSchemaV1Names.FREIGHTCAPACITY, null);
-		atts.clear();
-		atts.add(this.createTuple(VehicleSchemaV1Names.CUBICMETERS, Double.toString(fc.getVolume())));
-		this.writeStartTag(VehicleSchemaV1Names.VOLUME, atts, true);
-		this.writeEndTag(VehicleSchemaV1Names.FREIGHTCAPACITY);
-	}
+//	private void writeFreightCapacity(FreightCapacity fc) throws UncheckedIOException {
+//		this.writeStartTag(VehicleSchemaV1Names.FREIGHTCAPACITY, null);
+//		atts.clear();
+//		atts.add(this.createTuple(VehicleSchemaV1Names.CUBICMETERS, Double.toString(fc.getVolume())));
+//		this.writeStartTag(VehicleSchemaV1Names.VOLUME, atts, true);
+//		this.writeEndTag(VehicleSchemaV1Names.FREIGHTCAPACITY);
+//	}
 	
 }

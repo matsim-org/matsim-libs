@@ -44,7 +44,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.EngineInformation.FuelType;
-import org.matsim.vehicles.EngineInformationImpl;
+import org.matsim.vehicles.EngineInformation;
 
 public class TestMatsimTransformer {
 	
@@ -362,7 +362,7 @@ public class TestMatsimTransformer {
 				.setCostPerDistanceUnit(10.0)
 				.setCostPerTimeUnit(5.0)
 				.setFixCost(100.0)
-				.setEngineInformation(new EngineInformationImpl(FuelType.diesel, 15))
+				.setEngineInformation(new EngineInformation(FuelType.diesel, 15) )
 				.setMaxVelocity(13.8)
 				.build();
 		return matsimType;

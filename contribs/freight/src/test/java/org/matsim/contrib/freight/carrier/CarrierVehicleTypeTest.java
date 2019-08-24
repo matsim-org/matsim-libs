@@ -3,9 +3,9 @@ package org.matsim.contrib.freight.carrier;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.vehicles.CostInformationImpl;
+import org.matsim.vehicles.CostInformation;
 import org.matsim.vehicles.EngineInformation.FuelType;
-import org.matsim.vehicles.EngineInformationImpl;
+import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.VehicleType;
 
 public class CarrierVehicleTypeTest extends MatsimTestCase{
@@ -18,8 +18,8 @@ public class CarrierVehicleTypeTest extends MatsimTestCase{
 		CarrierVehicleType mediumType = CarrierVehicleType.Builder.newInstance(Id.create("medium", VehicleType.class ))
 				.setDescription("Medium Vehicle")
 				.setCapacityWeightInTons(30 )
-				.setVehicleCostInformation(new CostInformationImpl(50., 1.0, 0.5))
-				.setEngineInformation(new EngineInformationImpl(FuelType.diesel, 0.02))
+				.setVehicleCostInformation(new CostInformation(50., 1.0, 0.5) )
+				.setEngineInformation(new EngineInformation(FuelType.diesel, 0.02) )
 				.setMaxVelocity(13.89)
 				.build();
 		types = new CarrierVehicleTypes();
@@ -33,8 +33,8 @@ public class CarrierVehicleTypeTest extends MatsimTestCase{
 		CarrierVehicleType smallType = CarrierVehicleType.Builder.newInstance(Id.create("small", VehicleType.class), mediumType)
 				.setDescription("Small Vehicle")
 				.setCapacityWeightInTons(16 )
-				.setVehicleCostInformation(new CostInformationImpl(25., 0.75, 0.25))
-				.setEngineInformation(new EngineInformationImpl(FuelType.gasoline, 0.015))
+				.setVehicleCostInformation(new CostInformation(25., 0.75, 0.25) )
+				.setEngineInformation(new EngineInformation(FuelType.gasoline, 0.015) )
 				.setMaxVelocity(10.0)
 				.build();
 		types.getVehicleTypes().put(smallType.getId(), smallType);

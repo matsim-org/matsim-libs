@@ -83,7 +83,7 @@ class VehicleReaderV2 extends MatsimXmlParser{
 				this.currentVehType.setMaximumVelocity( val );
 				break;
 			case VehicleSchemaV2Names.ENGINEINFORMATION:
-				this.currentEngineInformation = new EngineInformationImpl();
+				this.currentEngineInformation = new EngineInformation();
 				this.currAttributes = this.currentEngineInformation.getAttributes() ;
 				break;
 			case VehicleSchemaV2Names.CAPACITY:

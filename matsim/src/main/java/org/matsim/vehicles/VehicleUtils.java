@@ -53,7 +53,7 @@ public class VehicleUtils {
 	private static final String COST_PER_SECOND_INSERVICE = "costsPerSecondInService";
 
 	static {
-		VehicleCapacityImpl capacity = new VehicleCapacityImpl();
+		VehicleCapacity capacity = new VehicleCapacity();
 		capacity.setSeats(4);
 		DEFAULT_VEHICLE_TYPE.setCapacity(capacity);
 	}
@@ -178,7 +178,7 @@ public class VehicleUtils {
 	}
 
 	//TODO: Remove here, because we now let in engineInformation as seperate field?
-	public static EngineInformation getEngineInformation(VehicleType vehicleType){
+	public static EngineInformation getEngineInformation( VehicleType vehicleType ){
 		EngineInformation engineInformation = vehicleType.getEngineInformation();
 		//if not stored in the "old" format, organize values from the attributes. This will be probably changed in the future, kmt mar'19
 		if (Double.isNaN(engineInformation.getFuelConsumption())){
@@ -188,15 +188,15 @@ public class VehicleUtils {
 	}
 
 	//TODO: Remove here, because we now let in engineInformation as seperate field?
-	public static void setEngineInformation(VehicleType vehicleType, EngineInformation.FuelType fuelType, double literPerMeter){
-		vehicleType.setEngineInformation(new EngineInformationImpl(fuelType));
+	public static void setEngineInformation( VehicleType vehicleType, EngineInformation.FuelType fuelType, double literPerMeter ){
+		vehicleType.setEngineInformation(new EngineInformation(fuelType) );
 		setHbefaTechnology(vehicleType.getEngineInformation(), fuelType.toString());
 		setFuelConsumption(vehicleType, literPerMeter);
 	}
 
 	//TODO: Remove here, because we now let in engineInformation as seperate field?
 	public static void setEngineInformation(VehicleType vehicleType, Attributes currAttributes) {
-		vehicleType.setEngineInformation(new EngineInformationImpl());
+		vehicleType.setEngineInformation(new EngineInformation() );
 		if (currAttributes == null || currAttributes.isEmpty()){
 //			log.warn("No Attributes were set for EngineInformation of vehicle type " + vehicleType);
 			throw new RuntimeException("No Attributes were set for EngineInformation of vehicle type " + vehicleType);
@@ -251,7 +251,7 @@ public class VehicleUtils {
 //		return getHbefaSizeClass(vehicleType.getEngineInformation());
 //	}
 
-	public static String getHbefaSizeClass(EngineInformation ei) {
+	public static String getHbefaSizeClass( EngineInformation ei ) {
 		return (String) ei.getAttributes().getAttribute(HBEFA_SIZE_CLASS);
 	}
 	public static void setHbefaSizeClass( EngineInformation engineInformation, String hbefaSizeClass ) {
@@ -262,7 +262,7 @@ public class VehicleUtils {
 //		return getHbefaEmissionsConcept(vehicleType.getEngineInformation());
 //	}
 
-	public static String getHbefaEmissionsConcept(EngineInformation ei) {
+	public static String getHbefaEmissionsConcept( EngineInformation ei ) {
 		return (String) ei.getAttributes().getAttribute(HBEFA_EMISSIONS_CONCEPT);
 	}
 	public static void setHbefaEmissionsConcept( EngineInformation engineInformation, String emissionsConcept ) {
@@ -286,4 +286,5 @@ public class VehicleUtils {
 		costInformation.getAttributes().putAttribute(COST_PER_SECOND_INSERVICE, costsPerSecond);
 	}
 
+	public enum DoorOperationMode{ serial, parallel }
 }

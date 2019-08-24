@@ -159,7 +159,7 @@ public class CarrierVehicleType extends VehicleType {
 		 * @param engineInfo
 		 * @return this builder
 		 */
-		public Builder setEngineInformation(EngineInformation engineInfo) {
+		public Builder setEngineInformation( EngineInformation engineInfo ) {
 			this.engineInfo = engineInfo;
 			return this;
 		}
@@ -172,29 +172,16 @@ public class CarrierVehicleType extends VehicleType {
 
 	private CarrierVehicleType(Builder builder){
 		super(builder.typeId);
-		super.setCostInformation(new CostInformationImpl(builder.fix, builder.perDistanceUnit, builder.perTimeUnit));
+		super.setCostInformation(new CostInformation(builder.fix, builder.perDistanceUnit, builder.perTimeUnit) );
 		if(builder.engineInfo != null) super.setEngineInformation(builder.engineInfo);
 		if(builder.description != null) super.setDescription(builder.description);
 
 //		capacity = builder.capacity;
-		VehicleCapacity aCapacity = new VehicleCapacityImpl() ;
+		VehicleCapacity aCapacity = new VehicleCapacity() ;
 		aCapacity.setWeightInTons( builder.weightInTons );
 		super.setCapacity( aCapacity );
 
 		super.setMaximumVelocity(builder.maxVeloInMeterPerSeconds);
-	}
-	
-
-	/**
-	 * Returns the capacity of carrierVehicleType.
-	 * 
-	 * <p>This might be replaced in future by a more complex concept of capacity (considering volume and different units).
-	 * 
-	 * @return integer
-	 */
-	@Deprecated // use "inline method" in your code. kai, aug'19
-	public Double getCarrierVehicleCapacity(){
-		return this.getCapacity().getWeightInTons() ;
 	}
 	
 }

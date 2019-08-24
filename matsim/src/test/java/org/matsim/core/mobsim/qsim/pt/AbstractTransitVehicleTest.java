@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.pt.fakes.FakePassengerAgent;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 
@@ -45,7 +44,7 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 
 	public void testInitialization_SeatAndStandCapacity() {
 		VehicleType vehType = new VehicleType(Id.create("busType", VehicleType.class ));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
+		VehicleCapacity capacity = new VehicleCapacity();
 		capacity.setSeats(Integer.valueOf(5));
 		capacity.setStandingRoom(Integer.valueOf(2));
 		vehType.setCapacity(capacity);
@@ -57,7 +56,7 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 
 	public void testInitialization_SeatOnlyCapacity() {
 		VehicleType vehType = new VehicleType(Id.create("busType", VehicleType.class ));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
+		VehicleCapacity capacity = new VehicleCapacity();
 		capacity.setSeats(Integer.valueOf(4));
 		vehType.setCapacity(capacity);
 		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
@@ -80,7 +79,7 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 
 	public void testAddPassenger() {
 		VehicleType vehType = new VehicleType(Id.create("busType", VehicleType.class ));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
+		VehicleCapacity capacity = new VehicleCapacity();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
 		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
@@ -102,7 +101,7 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 
 	public void testRemovePassenger() {
 		VehicleType vehType = new VehicleType(Id.create("busType", VehicleType.class ));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
+		VehicleCapacity capacity = new VehicleCapacity();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
 		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);

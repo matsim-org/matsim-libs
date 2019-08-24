@@ -20,43 +20,62 @@
 package org.matsim.vehicles;
 
 
-import org.matsim.utils.objectattributes.attributable.Attributable;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author dgrether
  */
-public interface VehicleCapacity extends Attributable {
+public class VehicleCapacity{
 
-	double UNDEFINED_VOLUME =  Double.POSITIVE_INFINITY ;
-	double UNDEFINED_WEIGHT = Double.POSITIVE_INFINITY ;
-	double UNDEFINED_UNITS = Integer.MAX_VALUE ;
-	
-	public Integer getSeats();
-	
-	public Integer getStandingRoom();
+	private Integer seats = 1; // one seat for the driver
+	private Integer standingRoom = 0 ;
+	private Double volumeInCubicMeters = Double.POSITIVE_INFINITY ; // not an active constraint
+	private Double weightInTons = Double.POSITIVE_INFINITY ; // not an active constraint
+//	private FreightCapacity freightCap = null;
+	private Attributes attributes = new Attributes() ;
 
-	/**
-	 * @deprecated FreightCapacity functionality is now part of VehicleCapacity, kmt Jul19
-	 * */
-	@Deprecated
-	public FreightCapacity getFreightCapacity();
-	
-	public void setSeats(Integer seats);
-	
-	public void setStandingRoom(Integer standingRoom);
-	
-	/**
-	* @deprecated FreightCapacity functionality is now part of VehicleCapacity, kmt Jul19
-	 * */
-	@Deprecated
-	public void setFreightCapacity(FreightCapacity freightCapacity);
+	public Integer getSeats() {
+		return seats;
+	}
 
-	public Double getVolumeInCubicMeters();
+	public Integer getStandingRoom() {
+		return standingRoom;
+	}
 
-	public void setVolumeInCubicMeters(double volumeInCubicMeters);
+	public void setSeats(Integer seats) {
+		this.seats = seats;
+	}
 
-	public Double getWeightInTons();
+	public void setStandingRoom(Integer standingRoom) {
+		this.standingRoom = standingRoom;
+	}
 
-	public void setWeightInTons(double weightInTons);
+	public Double getVolumeInCubicMeters() {
+		return volumeInCubicMeters;
+	}
+
+	public void setVolumeInCubicMeters(double volumeInCubicMeters) {
+		this.volumeInCubicMeters = volumeInCubicMeters;
+	}
+
+	public Double getWeightInTons() {
+		return weightInTons;
+	}
+
+	public void setWeightInTons(double weightInTons) {
+		this.weightInTons = weightInTons;
+	}
+
+	public Attributes getAttributes(){
+		return this.attributes ;
+	}
+
+//	public void setFreightCapacity(FreightCapacity freightCapacity) {
+//		this.freightCap = freightCapacity;
+//	}
+//	public FreightCapacity getFreightCapacity() {
+//		return freightCap;
+//	}
+	// (these are no longer there; use capacity.get/setVolume/Weight directly, or use getAttributes. kai/kai, aug'19)
 
 }

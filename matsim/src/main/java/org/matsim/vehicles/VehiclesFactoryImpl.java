@@ -28,6 +28,13 @@ import org.matsim.vehicles.EngineInformation.FuelType;
  * @author dgrether
  */
 class VehiclesFactoryImpl implements VehiclesFactory {
+	// The design is roughly as follows:
+	// * VehicleType and its sub-types VehicleCapacity and CostInformation are no longer behind interfaces.  They are so "small" that we will assume that
+	// we will never optimize them.  Which means that they can also be instantiated directly; the methods here are there for historical reasons and for
+	// convenience.
+	// * Hierarchical sub-types are gone.  E.g. there is no FreighCapacity within VehicleCapacity any more.
+	// * EngineInformation is deprecated and should go away soon.  In practice, the hbefa entries are used, and they are used via Attributable.
+	// kai/kai, aug'19
 
 
 	/**
@@ -38,37 +45,35 @@ class VehiclesFactoryImpl implements VehiclesFactory {
 
 	@Override
 	public Vehicle createVehicle(Id<Vehicle> id, VehicleType type) {
-		Vehicle veh = new VehicleImpl(id, type);
-		return veh;
+		return new VehicleImpl(id, type);
 	}
 	
 	@Override
 	public VehicleType createVehicleType(Id<VehicleType> typeId) {
-			VehicleType veh = new VehicleType(typeId);
-			return veh;
+		return new VehicleType(typeId);
 	}
 
 
 	@Override
 	public VehicleCapacity createVehicleCapacity() {
-		return new VehicleCapacityImpl();
+		return new VehicleCapacity();
 	}
 
 
-	@Override
-	public FreightCapacity createFreigthCapacity() {
-		return new FreightCapacityImpl();
-	}
+//	@Override
+//	public FreightCapacity createFreigthCapacity() {
+//		return new FreightCapacityImpl();
+//	}
 
 
-	@Override
-	public EngineInformation createEngineInformation(FuelType fuelType,
-			double gasConsumption) {
-			return new EngineInformationImpl(fuelType, gasConsumption);
-	}
+//	@Override
+//	public EngineInformation createEngineInformation( FuelType fuelType,
+//									  double gasConsumption ) {
+//			return new EngineInformation(fuelType, gasConsumption);
+//	}
 
 	@Override
 	public CostInformation createCostInformation(double fixedCosts, double costsPerMeter, double costsPerSecond) {
-		return new CostInformationImpl(fixedCosts, costsPerMeter, costsPerSecond);
+		return new CostInformation(fixedCosts, costsPerMeter, costsPerSecond);
 	}
 }

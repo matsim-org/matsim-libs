@@ -19,7 +19,6 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.EngineInformation.FuelType;
-import org.matsim.vehicles.EngineInformationImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.xml.sax.Attributes;
@@ -201,7 +200,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 		else if(name.equals("engineInformation")){
 			String fuelType = atts.getValue("fuelType");
 			String gasConsumption = atts.getValue("gasConsumption");
-			EngineInformation engineInfo = new EngineInformationImpl(parseFuelType(fuelType), Double.parseDouble(gasConsumption));
+			EngineInformation engineInfo = new EngineInformation(parseFuelType(fuelType ), Double.parseDouble(gasConsumption ));
 			this.vehicleTypeBuilder.setEngineInformation(engineInfo);
 		}
 		else if(name.equals("costInformation")){

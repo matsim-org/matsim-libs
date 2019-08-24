@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 
@@ -42,7 +41,7 @@ public class TransitQueueVehicleTest extends AbstractTransitVehicleTest {
 		VehicleType carType = new VehicleType(Id.create("carType", VehicleType.class ));
 		VehicleType busType = new VehicleType(Id.create("busType", VehicleType.class ));
 		busType.setPcuEquivalents(2.5);
-		VehicleCapacity capacity = new VehicleCapacityImpl();
+		VehicleCapacity capacity = new VehicleCapacity();
 		capacity.setSeats(Integer.valueOf(5));
 		carType.setCapacity(capacity);
 		busType.setCapacity(capacity);

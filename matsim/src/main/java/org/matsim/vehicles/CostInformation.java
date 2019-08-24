@@ -16,14 +16,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-
 package org.matsim.vehicles;
 
-import org.matsim.utils.objectattributes.attributable.Attributable;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
-public interface CostInformation extends Attributable {
+public class CostInformation{
+    private final Double fixed;
+    private final Double perMeter;
+    private final Double perSecond;
+    private Attributes attributes = new Attributes() ;
 
-    public Double getFixedCosts();
-    public Double getCostsPerMeter();
-    public Double getCostsPerSecond();
+    public CostInformation( Double fixed, Double perMeter, Double perTimeUnit ) {
+        this.fixed = fixed;
+        this.perMeter = perMeter;
+        this.perSecond = perTimeUnit;
+    }
+
+    public Double getFixedCosts() {
+        return fixed;
+    }
+
+    public Double getCostsPerMeter() {
+        return perMeter;
+    }
+
+    public Double getCostsPerSecond() {
+        return perSecond;
+    }
+
+    public Attributes getAttributes() {
+        return attributes;
+    }
 }

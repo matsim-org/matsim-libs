@@ -25,18 +25,18 @@ import org.matsim.vehicles.EngineInformation.FuelType;
 
 public interface VehiclesFactory extends MatsimFactory {
 
-	public VehicleType createVehicleType(Id<VehicleType> type);
+	VehicleType createVehicleType( Id<VehicleType> type );
 
-	public VehicleCapacity createVehicleCapacity();
+	VehicleCapacity createVehicleCapacity();
 
-	@Deprecated //FreightCapacity is deprecated.
-	public FreightCapacity createFreigthCapacity();
+//	@Deprecated //FreightCapacity is deprecated.
+//	public FreightCapacity createFreigthCapacity();
+//
+//	public EngineInformation createEngineInformation( FuelType fuelType,
+//									  double gasConsumption );
 
-	public EngineInformation createEngineInformation(FuelType fuelType,
-			double gasConsumption);
+	CostInformation createCostInformation( double fixedCosts, double costsPerMeter, double costsPerSecond );
 
-	public CostInformation createCostInformation(double fixedCosts, double costsPerMeter, double costsPerSecond);
-
-	public Vehicle createVehicle(Id<Vehicle> id, VehicleType type);
+	Vehicle createVehicle( Id<Vehicle> id, VehicleType type );
 
 }

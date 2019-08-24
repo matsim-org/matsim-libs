@@ -37,7 +37,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.EngineInformation;
-import org.matsim.vehicles.EngineInformationImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
@@ -87,7 +86,7 @@ public class FixedCostsTest extends MatsimTestCase {
                 .setCostPerDistanceUnit(0.001)      //1 EUR per km
                 .setCostPerTimeUnit(0.0)
                 .setFixCost(0)
-                .setEngineInformation(new EngineInformationImpl(EngineInformation.FuelType.diesel, 0.015))
+                .setEngineInformation(new EngineInformation( EngineInformation.FuelType.diesel, 0.015) )
                 .build();
         vehicleTypes.getVehicleTypes().put(carrierVehType_A.getId(), carrierVehType_A);
         CarrierVehicle carrierVehicle_A = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle_A", Vehicle.class), Id.createLinkId("i(1,0)")).setEarliestStart(0.0).setLatestEnd(36000.0).setTypeId(carrierVehType_A.getId()).build();
@@ -99,7 +98,7 @@ public class FixedCostsTest extends MatsimTestCase {
                 .setCostPerDistanceUnit(0.00001)
                 .setCostPerTimeUnit(0.0)
                 .setFixCost(10)
-                .setEngineInformation(new EngineInformationImpl(EngineInformation.FuelType.diesel, 0.015))
+                .setEngineInformation(new EngineInformation( EngineInformation.FuelType.diesel, 0.015) )
                 .build();
         vehicleTypes.getVehicleTypes().put(carrierVehType_B.getId(), carrierVehType_B);
         CarrierVehicle carrierVehicle_B = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle_B", Vehicle.class), Id.createLinkId("i(1,0)")).setEarliestStart(0.0).setLatestEnd(36000.0).setTypeId(carrierVehType_B.getId()).build();

@@ -83,7 +83,6 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
@@ -561,7 +560,7 @@ public class TransitQueueSimulationTest {
                     		transitEngine.getAgentTracker(), transitEngine);
 
                     VehicleType vehicleType = new VehicleType(Id.create("transitVehicleType", VehicleType.class ));
-                    VehicleCapacity capacity = new VehicleCapacityImpl();
+                    VehicleCapacity capacity = new VehicleCapacity();
                     capacity.setSeats(101);
                     capacity.setStandingRoom(0);
                     vehicleType.setCapacity(capacity);

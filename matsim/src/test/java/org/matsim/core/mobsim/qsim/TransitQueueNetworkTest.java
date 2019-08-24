@@ -69,7 +69,6 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 
@@ -1091,7 +1090,7 @@ public class TransitQueueNetworkTest extends TestCase {
 
             // setup: vehicles
             VehicleType vehicleType = new VehicleType(Id.create("testVehicleType", VehicleType.class ));
-            VehicleCapacity capacity = new VehicleCapacityImpl();
+            VehicleCapacity capacity = new VehicleCapacity();
             capacity.setSeats(Integer.valueOf(101));
             capacity.setStandingRoom(Integer.valueOf(0));
             vehicleType.setCapacity(capacity);
