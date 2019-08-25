@@ -1,27 +1,20 @@
 package org.matsim.contrib.freight.usecases.chessboard;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.contrib.freight.carrier.CarrierImpl;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType;
-import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Creates chessboard freight scenario.
@@ -171,8 +164,8 @@ final class FreightScenarioCreator {
         return vBuilder.build();
     }
 
-    private static CarrierVehicleType createLightType() {
-        CarrierVehicleType.Builder typeBuilder = CarrierVehicleType.Builder.newInstance(Id.create("small",VehicleType.class));
+    private static VehicleType createLightType() {
+        CarrierUtils.Builder typeBuilder = CarrierUtils.Builder.newInstance(Id.create("small", org.matsim.vehicles.VehicleType.class ) );
         typeBuilder.setCapacityWeightInTons(6 );
         typeBuilder.setFixCost(80.0);
         typeBuilder.setCostPerDistanceUnit(0.00047);
@@ -188,8 +181,8 @@ final class FreightScenarioCreator {
         return vBuilder.build();
     }
 
-    private static CarrierVehicleType createHeavyType() {
-        CarrierVehicleType.Builder typeBuilder = CarrierVehicleType.Builder.newInstance(Id.create("heavy", VehicleType.class));
+    private static VehicleType createHeavyType() {
+        CarrierUtils.Builder typeBuilder = CarrierUtils.Builder.newInstance(Id.create("heavy", org.matsim.vehicles.VehicleType.class ) );
         typeBuilder.setCapacityWeightInTons(25 );
         typeBuilder.setFixCost(130.0);
         typeBuilder.setCostPerDistanceUnit(0.00077);

@@ -20,17 +20,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities;
-import org.matsim.contrib.freight.carrier.CarrierImpl;
-import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.CarrierShipment;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.TimeWindow;
-import org.matsim.contrib.freight.carrier.Tour;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 
@@ -53,9 +43,9 @@ import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity.JobActivity;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
-import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
 import com.graphhopper.jsprit.core.util.Coordinate;
+import org.matsim.vehicles.VehicleType;
 
 
 /**
@@ -188,7 +178,7 @@ public class MatsimJspritFactory {
 			vehicleLocationBuilder.setCoordinate(Coordinate.newInstance(locationCoord.getX(), locationCoord.getY()));
 		}
 		Location vehicleLocation = vehicleLocationBuilder.build();
-		VehicleType vehicleType = createVehicleType(carrierVehicle.getVehicleType());
+		com.graphhopper.jsprit.core.problem.vehicle.VehicleType vehicleType = createVehicleType(carrierVehicle.getVehicleType() );
 		VehicleImpl.Builder vehicleBuilder = VehicleImpl.Builder.newInstance(carrierVehicle.getVehicleId().toString());
 		vehicleBuilder.setEarliestStart(carrierVehicle.getEarliestStartTime())
 		.setLatestArrival(carrierVehicle.getLatestEndTime())
@@ -213,7 +203,7 @@ public class MatsimJspritFactory {
 		String vehicleId = vehicle.getId();
 		CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(Id.create(vehicleId, org.matsim.vehicles.Vehicle.class),
 				Id.create(vehicle.getStartLocation().getId(), Link.class));
-		CarrierVehicleType carrierVehicleType = createCarrierVehicleType(vehicle.getType());
+		VehicleType carrierVehicleType = createCarrierVehicleType(vehicle.getType() );
 		vehicleBuilder.setType(carrierVehicleType);
 		vehicleBuilder.setEarliestStart(vehicle.getEarliestDeparture());
 		vehicleBuilder.setLatestEnd(vehicle.getLatestArrival());
@@ -225,7 +215,7 @@ public class MatsimJspritFactory {
 	}
 	
 	/**
-	 * Creates {@link CarrierVehicleType} from {@link VehicleType}.
+	 * Creates {@link VehicleType} from {@link com.graphhopper.jsprit.core.problem.vehicle.VehicleType}.
 	 * 
 	 * <p>No description and engineInformation can be set here. Do it by calling setEngineInforation(engineInfo) from the returned 
 	 * object. 
@@ -233,8 +223,8 @@ public class MatsimJspritFactory {
 	 * @param type to be transformed
 	 * @return CarrierVehicleType
 	 */
-	static CarrierVehicleType createCarrierVehicleType(VehicleType type){
-		CarrierVehicleType.Builder typeBuilder = CarrierVehicleType.Builder.newInstance(Id.create(type.getTypeId(), org.matsim.vehicles.VehicleType.class));
+	static VehicleType createCarrierVehicleType( com.graphhopper.jsprit.core.problem.vehicle.VehicleType type ){
+		CarrierUtils.Builder typeBuilder = CarrierUtils.Builder.newInstance(Id.create(type.getTypeId(), org.matsim.vehicles.VehicleType.class ) );
 		typeBuilder.setCapacityWeightInTons(type.getCapacityDimensions().get(0 ) );
 		typeBuilder.setCostPerDistanceUnit(type.getVehicleCostParams().perDistanceUnit).setCostPerTimeUnit(type.getVehicleCostParams().perTransportTimeUnit)
 		.setFixCost(type.getVehicleCostParams().fix);
@@ -243,10 +233,10 @@ public class MatsimJspritFactory {
 	}
 	
 	/**
-	 * Creates {@link VehicleType} from {@link CarrierVehicleType}.
+	 * Creates {@link com.graphhopper.jsprit.core.problem.vehicle.VehicleType} from {@link VehicleType}.
 
 	 */
-	static VehicleType createVehicleType(CarrierVehicleType carrierVehicleType){
+	static com.graphhopper.jsprit.core.problem.vehicle.VehicleType createVehicleType( VehicleType carrierVehicleType ){
 		if(carrierVehicleType == null) throw new IllegalStateException("carrierVehicleType is null");
 		VehicleTypeImpl.Builder typeBuilder = VehicleTypeImpl.Builder.newInstance(carrierVehicleType.getId().toString());
 		final double vehicleCapacity = carrierVehicleType.getCapacity().getWeightInTons();
@@ -558,7 +548,7 @@ public class MatsimJspritFactory {
 			capabilityBuilder.setFleetSize(org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize.FINITE);
 		}
 		else capabilityBuilder.setFleetSize(org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize.INFINITE);
-		for(VehicleType type : vrp.getTypes()){
+		for( com.graphhopper.jsprit.core.problem.vehicle.VehicleType type : vrp.getTypes()){
 			capabilityBuilder.addType(createCarrierVehicleType(type));
 		}
 		for(Vehicle vehicle : vrp.getVehicles()){

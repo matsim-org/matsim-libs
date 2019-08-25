@@ -30,11 +30,11 @@ public class CarrierCapabilities {
 		
 		public static Builder newInstance(){ return new Builder(); }
 		
-		private Collection<CarrierVehicleType> vehicleTypes = new ArrayList<CarrierVehicleType>();
+		private Collection<VehicleType> vehicleTypes = new ArrayList<VehicleType>();
 		
 		private Collection<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>();
 		
-		private Set<Id<VehicleType>> typeIds = new HashSet<>();
+		private Set<Id<org.matsim.vehicles.VehicleType>> typeIds = new HashSet<>();
 		
 		private FleetSize fleetSize = FleetSize.FINITE;
 		
@@ -43,7 +43,7 @@ public class CarrierCapabilities {
 			return this;
 		}
 		
-		public Builder addType(CarrierVehicleType type){
+		public Builder addType( VehicleType type ){
 			if(!typeIds.contains(type.getId())){
 				vehicleTypes.add(type);
 				typeIds.add(type.getId());
@@ -85,7 +85,7 @@ public class CarrierCapabilities {
 	
 	private Collection<CarrierVehicle> carrierVehicles = new ArrayList<CarrierVehicle>();
 	
-	private Collection<CarrierVehicleType> vehicleTypes = new ArrayList<CarrierVehicleType>();
+	private Collection<VehicleType> vehicleTypes = new ArrayList<VehicleType>();
 	
 	
 	/**
@@ -130,9 +130,9 @@ public class CarrierCapabilities {
 	 * Returns a collection of CarrierVehicleTypes.
 	 * 
 	 * @return a collection of vehicleTypes
-	 * @see CarrierVehicleType
+	 * @see VehicleType
 	 */
-	public Collection<CarrierVehicleType> getVehicleTypes() {
+	public Collection<VehicleType> getVehicleTypes() {
 		return vehicleTypes;
 	}
 

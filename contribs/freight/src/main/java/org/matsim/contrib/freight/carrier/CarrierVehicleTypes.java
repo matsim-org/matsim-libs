@@ -18,7 +18,7 @@ public class CarrierVehicleTypes {
 		CarrierVehicleTypes types = new CarrierVehicleTypes();
 		for(Carrier c : carriers.getCarriers().values()){
 			for(CarrierVehicle v : c.getCarrierCapabilities().getCarrierVehicles()){
-				CarrierVehicleType vehicleType = v.getVehicleType();
+				VehicleType vehicleType = v.getVehicleType();
 				if(vehicleType != null){
 					types.getVehicleTypes().put(vehicleType.getId(), vehicleType);
 				}
@@ -27,14 +27,14 @@ public class CarrierVehicleTypes {
 		return types;
 	}
 	
-	private Map<Id<VehicleType>,CarrierVehicleType> vehicleTypes;
+	private Map<Id<org.matsim.vehicles.VehicleType>, VehicleType> vehicleTypes;
 
 	public CarrierVehicleTypes() {
 		super();
 		this.vehicleTypes = new HashMap<>();
 	}
 
-	public Map<Id<VehicleType>, CarrierVehicleType> getVehicleTypes() {
+	public Map<Id<org.matsim.vehicles.VehicleType>, VehicleType> getVehicleTypes() {
 		return vehicleTypes;
 	}
 }

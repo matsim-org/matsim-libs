@@ -151,22 +151,24 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 			this.writeStartTag(VehicleSchemaV1Names.STANDINGROOM, atts, true);
 		}
 //		if (cap.getFreightCapacity() != null) {
+		if( cap.getVolumeInCubicMeters() != null ) {
 //			this.writeFreightCapacity(cap.getFreightCapacity());
-//		}
-		if ( cap.getVolumeInCubicMeters() != null ) {
-			atts.clear() ;
-			atts.add(createTuple( VehicleSchemaV1Names.FREIGHTCAPACITY, cap.getVolumeInCubicMeters() )) ;
-			this.writeStartTag( VehicleSchemaV1Names.CUBICMETERS, atts, true );
+			this.writeFreightCapacity( cap.getVolumeInCubicMeters() );
 		}
+//		if ( cap.getVolumeInCubicMeters() != null ) {
+//			atts.clear() ;
+//			atts.add(createTuple( VehicleSchemaV1Names.FREIGHTCAPACITY, cap.getVolumeInCubicMeters() )) ;
+//			this.writeStartTag( VehicleSchemaV1Names.CUBICMETERS, atts, true );
+//		}
 		this.writeEndTag(VehicleSchemaV1Names.CAPACITY);
 	}
 
-//	private void writeFreightCapacity(FreightCapacity fc) throws UncheckedIOException {
-//		this.writeStartTag(VehicleSchemaV1Names.FREIGHTCAPACITY, null);
-//		atts.clear();
-//		atts.add(this.createTuple(VehicleSchemaV1Names.CUBICMETERS, Double.toString(fc.getVolume())));
-//		this.writeStartTag(VehicleSchemaV1Names.VOLUME, atts, true);
-//		this.writeEndTag(VehicleSchemaV1Names.FREIGHTCAPACITY);
-//	}
+	private void writeFreightCapacity(double fc) throws UncheckedIOException {
+		this.writeStartTag(VehicleSchemaV1Names.FREIGHTCAPACITY, null);
+		atts.clear();
+		atts.add(this.createTuple(VehicleSchemaV1Names.CUBICMETERS, Double.toString(fc)));
+		this.writeStartTag(VehicleSchemaV1Names.VOLUME, atts, true);
+		this.writeEndTag(VehicleSchemaV1Names.FREIGHTCAPACITY);
+	}
 	
 }

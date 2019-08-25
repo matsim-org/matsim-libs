@@ -23,26 +23,26 @@ public class CarrierVehicleTypeReaderTest extends MatsimTestCase{
 	
 	@Test
 	public void test_whenReadingTypes_itReadyExactlyTheTypesFromFile(){
-		assertTrue(types.getVehicleTypes().containsKey(Id.create("medium", VehicleType.class)));
-		assertTrue(types.getVehicleTypes().containsKey(Id.create("light", VehicleType.class)));
+		assertTrue(types.getVehicleTypes().containsKey(Id.create("medium", org.matsim.vehicles.VehicleType.class ) ) );
+		assertTrue(types.getVehicleTypes().containsKey(Id.create("light", org.matsim.vehicles.VehicleType.class ) ) );
 		assertEquals(2, types.getVehicleTypes().size());
 	}
 	
 	@Test
 	public void test_whenReadingTypeMedium_itReadsDescriptionCorrectly(){
-		CarrierVehicleType medium = types.getVehicleTypes().get(Id.create("medium", VehicleType.class));
+		VehicleType medium = types.getVehicleTypes().get(Id.create("medium", org.matsim.vehicles.VehicleType.class ) );
 		assertEquals("Medium Vehicle", medium.getDescription());
 	}
 
 	@Test
 	public void test_whenReadingTypeMedium_itReadsCapacityCorrectly(){
-		CarrierVehicleType medium = types.getVehicleTypes().get(Id.create("medium", VehicleType.class));
+		VehicleType medium = types.getVehicleTypes().get(Id.create("medium", org.matsim.vehicles.VehicleType.class ) );
 		assertEquals(30., medium.getCapacity().getWeightInTons() );
 	}
 	
 	@Test
 	public void test_whenReadingTypeMedium_itReadsCostInfoCorrectly(){
-		CarrierVehicleType medium = types.getVehicleTypes().get(Id.create("medium", VehicleType.class));
+		VehicleType medium = types.getVehicleTypes().get(Id.create("medium", org.matsim.vehicles.VehicleType.class ) );
 		assertEquals(50.0, medium.getCostInformation().getFixedCosts(),0.01);
 		assertEquals(0.4, medium.getCostInformation().getCostsPerMeter(),0.01);
 		assertEquals(30.0, medium.getCostInformation().getCostsPerSecond(),0.01);
@@ -50,7 +50,7 @@ public class CarrierVehicleTypeReaderTest extends MatsimTestCase{
 	
 	@Test
 	public void test_whenReadingTypeMedium_itReadsEngineInfoCorrectly(){
-		CarrierVehicleType medium = types.getVehicleTypes().get(Id.create("medium", VehicleType.class));
+		VehicleType medium = types.getVehicleTypes().get(Id.create("medium", org.matsim.vehicles.VehicleType.class ) );
 		assertEquals(0.02, medium.getEngineInformation().getFuelConsumption(),0.01);
 		assertEquals("gasoline", medium.getEngineInformation().getFuelType().toString());
 	}

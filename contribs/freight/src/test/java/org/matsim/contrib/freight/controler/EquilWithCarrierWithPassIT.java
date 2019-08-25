@@ -93,9 +93,9 @@ public class EquilWithCarrierWithPassIT {
 
 	static void addDummyVehicleType( Carriers carriers, String idString ){
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes() ;
-		Id<VehicleType> id = Id.create( idString, VehicleType.class ) ;
-		CarrierVehicleType.Builder builder = CarrierVehicleType.Builder.newInstance( id );
-		CarrierVehicleType result = builder.build();
+		Id<org.matsim.vehicles.VehicleType> id = Id.create( idString, org.matsim.vehicles.VehicleType.class ) ;
+		CarrierUtils.Builder builder = CarrierUtils.Builder.newInstance( id );
+		VehicleType result = builder.build();
 		carrierVehicleTypes.getVehicleTypes().put( result.getId(), result ) ;
 		new CarrierVehicleTypeLoader( carriers ).loadVehicleTypes( carrierVehicleTypes );
 	}

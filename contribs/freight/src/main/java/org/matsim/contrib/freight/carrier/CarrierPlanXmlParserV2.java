@@ -92,9 +92,9 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 	
 	private Builder capabilityBuilder;
 
-	private org.matsim.contrib.freight.carrier.CarrierVehicleType.Builder vehicleTypeBuilder;
+	private CarrierUtils.Builder vehicleTypeBuilder;
 
-	private Map<Id<VehicleType>, CarrierVehicleType> vehicleTypeMap = new HashMap<>();
+	private Map<Id<org.matsim.vehicles.VehicleType>, VehicleType> vehicleTypeMap = new HashMap<>();
 
 	private double currentStartTime;
 	
@@ -195,7 +195,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 		else if(name.equals("vehicleType")){
 			String typeId = atts.getValue("id");
 			if(typeId == null) throw new IllegalStateException("vehicleTypeId is missing.");
-			this.vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(Id.create(typeId, VehicleType.class)); 
+			this.vehicleTypeBuilder = CarrierUtils.Builder.newInstance(Id.create(typeId, org.matsim.vehicles.VehicleType.class ) );
 		}
 		else if(name.equals("engineInformation")){
 			String fuelType = atts.getValue("fuelType");
@@ -224,8 +224,8 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 			CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(Id.create(vId, Vehicle.class), Id.create(depotLinkId, Link.class));
 			String typeId = atts.getValue("typeId");
 			if(typeId == null) throw new IllegalStateException("vehicleTypeId is missing.");
-			CarrierVehicleType vehicleType = vehicleTypeMap.get(Id.create(typeId, VehicleType.class));
-			vehicleBuilder.setTypeId(Id.create(typeId, VehicleType.class));
+			VehicleType vehicleType = vehicleTypeMap.get(Id.create(typeId, org.matsim.vehicles.VehicleType.class ) );
+			vehicleBuilder.setTypeId(Id.create(typeId, org.matsim.vehicles.VehicleType.class ) );
 			if(vehicleType != null) vehicleBuilder.setType(vehicleType);
 			String startTime = atts.getValue(VEHICLESTART);
 			if(startTime != null) vehicleBuilder.setEarliestStart(parseTimeToDouble(startTime));
@@ -314,7 +314,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 			vehicleTypeBuilder.setCapacityWeightInTons(Integer.parseInt(content ) );
 		}
 		else if(name.equals("vehicleType")){
-			CarrierVehicleType type = vehicleTypeBuilder.build();
+			VehicleType type = vehicleTypeBuilder.build();
 			vehicleTypeMap.put(type.getId(),type);
 			capabilityBuilder.addType(type);
 		}

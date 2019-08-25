@@ -50,8 +50,8 @@ public class CarrierVehicle {
 		
 		private Id<Link> locationId;
 		private Id<Vehicle> vehicleId;
-		private CarrierVehicleType type;
-		private Id<VehicleType> typeId;
+		private VehicleType type;
+		private Id<org.matsim.vehicles.VehicleType> typeId;
 		private double earliestStart = 0.0;
 		private double latestEnd = Integer.MAX_VALUE;
 		
@@ -61,13 +61,13 @@ public class CarrierVehicle {
 			this.vehicleId = vehicleId;
 		}
 		
-		public Builder setType(CarrierVehicleType type){
+		public Builder setType( VehicleType type ){
 			this.type=type;
 			return this;
 		}
 		
 		
-		public Builder setTypeId(Id<VehicleType> typeId){
+		public Builder setTypeId(Id<org.matsim.vehicles.VehicleType> typeId ){
 			this.typeId = typeId;
 			return this;
 		}
@@ -92,9 +92,9 @@ public class CarrierVehicle {
 
 	private final Id<Vehicle> vehicleId;
 	
-	private Id<VehicleType> typeId;
+	private Id<org.matsim.vehicles.VehicleType> typeId;
 
-	private CarrierVehicleType vehicleType;
+	private VehicleType vehicleType;
 
 	private double earliestStartTime;
 
@@ -129,11 +129,11 @@ public class CarrierVehicle {
 		return vehicleId + " stationed at " + locationId;
 	}
 
-	public CarrierVehicleType getVehicleType() {
+	public VehicleType getVehicleType() {
 		return vehicleType;
 	}
 
-	public void setVehicleType(CarrierVehicleType vehicleType) {
+	public void setVehicleType( VehicleType vehicleType ) {
 		this.vehicleType = vehicleType;
 	}
 
@@ -161,7 +161,7 @@ public class CarrierVehicle {
 	}
 
 	
-	public Id<VehicleType> getVehicleTypeId() {
+	public Id<org.matsim.vehicles.VehicleType> getVehicleTypeId() {
 		return typeId;
 	}
 

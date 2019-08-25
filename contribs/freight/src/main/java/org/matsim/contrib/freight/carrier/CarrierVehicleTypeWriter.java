@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.vehicles.CostInformation;
 import org.matsim.vehicles.EngineInformation;
+import org.matsim.vehicles.VehicleType;
 
 /**
  * A writer that writes carriers and their plans in an xml-file.
@@ -44,7 +45,7 @@ public class CarrierVehicleTypeWriter extends MatsimXmlWriter {
 
 	private void writeTypes(BufferedWriter writer)throws IOException {
 		writer.write("\t<vehicleTypes>\n");
-		for(CarrierVehicleType type : vehicleTypes.getVehicleTypes().values()){
+		for( VehicleType type : vehicleTypes.getVehicleTypes().values()){
 			writer.write("\t\t<vehicleType id=\"" + type.getId() + "\">\n");
 			writer.write("\t\t\t<description>" + type.getDescription() + "</description>\n");
 			EngineInformation engineInformation = type.getEngineInformation();

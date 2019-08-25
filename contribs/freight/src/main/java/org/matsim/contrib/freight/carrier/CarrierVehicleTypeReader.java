@@ -21,7 +21,7 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 	
 	private CarrierVehicleTypes carrierVehicleTypes;
 
-	private Id<VehicleType> currentTypeId;
+	private Id<org.matsim.vehicles.VehicleType> currentTypeId;
 
 	private String currentDescription;
 
@@ -65,7 +65,7 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if(name.equals("vehicleType")){
-			this.currentTypeId = Id.create(atts.getValue("id"), VehicleType.class);
+			this.currentTypeId = Id.create(atts.getValue("id"), org.matsim.vehicles.VehicleType.class );
 		}
 		if(name.equals("allowableWeight")){
 			String weight = atts.getValue("weight");
@@ -117,7 +117,7 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 			this.maxVelo = content;
 		}
 		if(name.equals("vehicleType")){
-			CarrierVehicleType.Builder typeBuilder = CarrierVehicleType.Builder.newInstance(currentTypeId);
+			CarrierUtils.Builder typeBuilder = CarrierUtils.Builder.newInstance(currentTypeId );
 			if(currentDescription != null) typeBuilder.setDescription(currentDescription);
 //			if(currentWeight != null) vehType.setAllowableTotalWeight(currentWeight);
 //			if(currentCap != null) vehType.setFreightCapacity(currentCap);
@@ -125,7 +125,7 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 			if(currentEngineInfo != null) typeBuilder.setEngineInformation(currentEngineInfo);
 			if(currentCapacity != null) typeBuilder.setCapacityWeightInTons(Double.parseDouble(currentCapacity ) );
 			if(maxVelo != null) typeBuilder.setMaxVelocity(Double.parseDouble(maxVelo));
-			CarrierVehicleType vehType = typeBuilder.build();
+			VehicleType vehType = typeBuilder.build();
 			carrierVehicleTypes.getVehicleTypes().put(vehType.getId(), vehType);
 			reset();
 		}

@@ -20,7 +20,6 @@ import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolutio
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
-import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
 
 import org.junit.Rule;
@@ -28,23 +27,14 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.contrib.freight.carrier.CarrierImpl;
-import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.CarrierShipment;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.TimeWindow;
-import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.EngineInformation.FuelType;
 import org.matsim.vehicles.EngineInformation;
+import org.matsim.vehicles.VehicleType;
 
 public class TestMatsimTransformer {
 	
@@ -53,8 +43,8 @@ public class TestMatsimTransformer {
 	
 	@Test
 	public void whenTransforming_jSpritType2matsimType_itIsMadeCorrectly(){
-		VehicleType jspritType = VehicleTypeImpl.Builder.newInstance("myType").addCapacityDimension(0, 50).setCostPerDistance(10.0).setCostPerTransportTime(5.0).setFixedCost(100.0).build();
-		CarrierVehicleType matsimType = MatsimJspritFactory.createCarrierVehicleType(jspritType);
+		com.graphhopper.jsprit.core.problem.vehicle.VehicleType jspritType = VehicleTypeImpl.Builder.newInstance("myType" ).addCapacityDimension(0, 50 ).setCostPerDistance(10.0 ).setCostPerTransportTime(5.0 ).setFixedCost(100.0 ).build();
+		VehicleType matsimType = MatsimJspritFactory.createCarrierVehicleType(jspritType );
 		assertNotNull(matsimType);
 		assertEquals("myType",matsimType.getId().toString());
 		assertEquals(50., (double) matsimType.getCapacity().getWeightInTons(), Double.MIN_VALUE );
@@ -65,16 +55,16 @@ public class TestMatsimTransformer {
 	
 	@Test
 	public void whenTransforming_jSpritType2matsimType_withCaching_itIsNotCached(){
-		VehicleType jspritType = VehicleTypeImpl.Builder.newInstance("myType").addCapacityDimension(0, 50).setCostPerDistance(10.0).setCostPerTransportTime(5.0).setFixedCost(100.0).build();
-		CarrierVehicleType matsimType = MatsimJspritFactory.createCarrierVehicleType(jspritType);
+		com.graphhopper.jsprit.core.problem.vehicle.VehicleType jspritType = VehicleTypeImpl.Builder.newInstance("myType" ).addCapacityDimension(0, 50 ).setCostPerDistance(10.0 ).setCostPerTransportTime(5.0 ).setFixedCost(100.0 ).build();
+		VehicleType matsimType = MatsimJspritFactory.createCarrierVehicleType(jspritType );
 		assertThat(matsimType, is(not(MatsimJspritFactory.createCarrierVehicleType(jspritType))));
 	}
 	
 	
 	@Test
 	public void whenTransforming_matsimType2jSpritType_itIsMadeCorrectly(){
-		CarrierVehicleType matsimType = getMatsimVehicleType();
-		VehicleType jspritType = MatsimJspritFactory.createVehicleType(matsimType);
+		VehicleType matsimType = getMatsimVehicleType();
+		com.graphhopper.jsprit.core.problem.vehicle.VehicleType jspritType = MatsimJspritFactory.createVehicleType(matsimType );
 		assertNotNull(jspritType);
 		assertEquals(50,jspritType.getCapacityDimensions().get(0));
 		assertEquals(10.0, jspritType.getVehicleCostParams().perDistanceUnit,0.01);
@@ -84,7 +74,7 @@ public class TestMatsimTransformer {
 	
 	@Test
 	public void whenTransforming_jspritVehicle2matsimVehicle_itIsMadeCorrectly(){
-		VehicleType jspritType = VehicleTypeImpl.Builder.newInstance("myType").addCapacityDimension(0, 50).setCostPerDistance(10.0).setCostPerTransportTime(5.0).setFixedCost(100.0).build();
+		com.graphhopper.jsprit.core.problem.vehicle.VehicleType jspritType = VehicleTypeImpl.Builder.newInstance("myType" ).addCapacityDimension(0, 50 ).setCostPerDistance(10.0 ).setCostPerTransportTime(5.0 ).setFixedCost(100.0 ).build();
 		Vehicle jspritVehicle = VehicleImpl.Builder.newInstance("myVehicle").setEarliestStart(10.0).setLatestArrival(20.0).setStartLocation(Location.newInstance("loc")).setType(jspritType).build();
 		CarrierVehicle matsimVehicle = MatsimJspritFactory.createCarrierVehicle(jspritVehicle);
 		assertNotNull(matsimVehicle);
@@ -97,7 +87,7 @@ public class TestMatsimTransformer {
 	
 	@Test
 	public void whenTransforming_matsimVehicle2jspritVehicle_itIsMadeCorrectly(){
-		CarrierVehicleType matsimType = getMatsimVehicleType();
+		VehicleType matsimType = getMatsimVehicleType();
 		CarrierVehicle matsimVehicle = getMatsimVehicle("matsimVehicle", "loc", matsimType);
 		Vehicle jspritVehicle = MatsimJspritFactory.createVehicle(matsimVehicle, null);
 		assertNotNull(jspritVehicle);
@@ -352,19 +342,19 @@ public class TestMatsimTransformer {
 		return ScheduledTour.newInstance(sTourBuilder.build(),matsimVehicle,startTime);
 	}
 
-	private CarrierVehicle getMatsimVehicle(String VehicleId, String locationId, CarrierVehicleType matsimType) {
+	private CarrierVehicle getMatsimVehicle(String VehicleId, String locationId, VehicleType matsimType ) {
 		return CarrierVehicle.Builder.newInstance(Id.create(VehicleId, org.matsim.vehicles.Vehicle.class), Id.create(locationId, Link.class)).setEarliestStart(10.0).setLatestEnd(20.0).setType(matsimType).build();
 	}
 
-	private CarrierVehicleType getMatsimVehicleType() {
-		CarrierVehicleType matsimType = CarrierVehicleType.Builder.newInstance(Id.create("matsimType", org.matsim.vehicles.VehicleType.class))
-				.setCapacityWeightInTons(50 )
-				.setCostPerDistanceUnit(10.0)
-				.setCostPerTimeUnit(5.0)
-				.setFixCost(100.0)
-				.setEngineInformation(new EngineInformation(FuelType.diesel, 15) )
-				.setMaxVelocity(13.8)
-				.build();
+	private VehicleType getMatsimVehicleType() {
+		VehicleType matsimType = CarrierUtils.Builder.newInstance(Id.create("matsimType", org.matsim.vehicles.VehicleType.class ) )
+									   .setCapacityWeightInTons(50 )
+									   .setCostPerDistanceUnit(10.0)
+									   .setCostPerTimeUnit(5.0)
+									   .setFixCost(100.0)
+									   .setEngineInformation(new EngineInformation(FuelType.diesel, 15) )
+									   .setMaxVelocity(13.8)
+									   .build();
 		return matsimType;
 	}
 
@@ -490,7 +480,7 @@ public class TestMatsimTransformer {
 
 	private Carrier createCarrierWithServices() {
 		Carrier carrier = CarrierImpl.newInstance(Id.create("TestCarrier", Carrier.class));
-		CarrierVehicleType matsimType = getMatsimVehicleType();
+		VehicleType matsimType = getMatsimVehicleType();
 		CarrierCapabilities.Builder ccBuilder = CarrierCapabilities.Builder.newInstance() 
 				.addVehicle(getMatsimVehicle("matsimVehicle", "i(6,0)", matsimType))
 				.setFleetSize(FleetSize.INFINITE);				
@@ -502,7 +492,7 @@ public class TestMatsimTransformer {
 	
 	private Carrier createCarrierWithShipments() {
 		Carrier carrier = CarrierImpl.newInstance(Id.create("TestCarrier", Carrier.class));
-		CarrierVehicleType matsimType = getMatsimVehicleType();
+		VehicleType matsimType = getMatsimVehicleType();
 		CarrierCapabilities.Builder ccBuilder = CarrierCapabilities.Builder.newInstance() 
 				.addVehicle(getMatsimVehicle("matsimVehicle", "i(6,0)", matsimType))
 				.setFleetSize(FleetSize.INFINITE);				

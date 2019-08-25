@@ -8,18 +8,18 @@ import java.util.Arrays;
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.driver.Driver;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
-import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType;
+import org.matsim.contrib.freight.carrier.CarrierUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.CostInformation;
+import org.matsim.vehicles.VehicleType;
 
 
 public class TestNetworkBasedTransportCosts extends MatsimTestCase{
@@ -40,14 +40,14 @@ public class TestNetworkBasedTransportCosts extends MatsimTestCase{
 		NetworkBasedTransportCosts c = builder.build();
 		
 		Vehicle vehicle1 = mock(Vehicle.class);
-		VehicleType type1 = mock(VehicleType.class);
+		com.graphhopper.jsprit.core.problem.vehicle.VehicleType type1 = mock( com.graphhopper.jsprit.core.problem.vehicle.VehicleType.class );
 		when(type1.getMaxVelocity()).thenReturn(5.0);
 		when(type1.getTypeId()).thenReturn("type1");
 		when(vehicle1.getType()).thenReturn(type1);
 		when(vehicle1.getId()).thenReturn("vehicle1");
 		
 		Vehicle vehicle2 = mock(Vehicle.class);
-		VehicleType type2 = mock(VehicleType.class);
+		com.graphhopper.jsprit.core.problem.vehicle.VehicleType type2 = mock( com.graphhopper.jsprit.core.problem.vehicle.VehicleType.class );
 		when(type2.getMaxVelocity()).thenReturn(5.0);
 		when(type2.getTypeId()).thenReturn("type2");
 		when(vehicle2.getType()).thenReturn(type2);
@@ -73,7 +73,7 @@ public class TestNetworkBasedTransportCosts extends MatsimTestCase{
 		NetworkBasedTransportCosts c = builder.build();
 		
 		Vehicle vehicle2 = mock(Vehicle.class);
-		VehicleType type2 = mock(VehicleType.class);
+		com.graphhopper.jsprit.core.problem.vehicle.VehicleType type2 = mock( com.graphhopper.jsprit.core.problem.vehicle.VehicleType.class );
 		when(type2.getMaxVelocity()).thenReturn(5.0);
 		when(type2.getTypeId()).thenReturn("typeNotKnown");
 		when(vehicle2.getType()).thenReturn(type2);
@@ -100,8 +100,8 @@ public class TestNetworkBasedTransportCosts extends MatsimTestCase{
 //		when(vtype1.getId()).thenReturn(Id.create("type1", org.matsim.vehicles.VehicleType.class));
 		// one cannot mock final methods!!
 
-		CarrierVehicleType vtype1 =
-			  CarrierVehicleType.Builder.newInstance( Id.create( "type1", org.matsim.vehicles.VehicleType.class ) ).setVehicleCostInformation( param1 ).build() ;
+		VehicleType vtype1 =
+			  CarrierUtils.Builder.newInstance( Id.create( "type1", org.matsim.vehicles.VehicleType.class ) ).setVehicleCostInformation( param1 ).build() ;
 
 		
 //		CarrierVehicleType vtype2 = mock(CarrierVehicleType.class);
@@ -110,8 +110,8 @@ public class TestNetworkBasedTransportCosts extends MatsimTestCase{
 //		when(vtype2.getId()).thenReturn(Id.create("type2", org.matsim.vehicles.VehicleType.class));
 		// one cannot mock final methods!!
 
-		CarrierVehicleType vtype2 =
-			  CarrierVehicleType.Builder.newInstance( Id.create( "type2", org.matsim.vehicles.VehicleType.class ) ).setVehicleCostInformation( param2 ).build() ;
+		VehicleType vtype2 =
+			  CarrierUtils.Builder.newInstance( Id.create( "type2", org.matsim.vehicles.VehicleType.class ) ).setVehicleCostInformation( param2 ).build() ;
 
 		Network network = scenario.getNetwork();
 		NetworkBasedTransportCosts.Builder builder = 
@@ -119,14 +119,14 @@ public class TestNetworkBasedTransportCosts extends MatsimTestCase{
 		NetworkBasedTransportCosts networkBasedTransportCosts = builder.build();
 		
 		Vehicle vehicle1 = mock(Vehicle.class);
-		VehicleType type1 = mock(VehicleType.class);
+		com.graphhopper.jsprit.core.problem.vehicle.VehicleType type1 = mock( com.graphhopper.jsprit.core.problem.vehicle.VehicleType.class );
 		when(type1.getMaxVelocity()).thenReturn(5.0);
 		when(type1.getTypeId()).thenReturn("type1");
 		when(vehicle1.getType()).thenReturn(type1);
 		when(vehicle1.getId()).thenReturn("vehicle1");
 		
 		Vehicle vehicle2 = mock(Vehicle.class);
-		VehicleType type2 = mock(VehicleType.class);
+		com.graphhopper.jsprit.core.problem.vehicle.VehicleType type2 = mock( com.graphhopper.jsprit.core.problem.vehicle.VehicleType.class );
 		when(type2.getMaxVelocity()).thenReturn(5.0);
 		when(type2.getTypeId()).thenReturn("type2");
 		when(vehicle2.getType()).thenReturn(type2);

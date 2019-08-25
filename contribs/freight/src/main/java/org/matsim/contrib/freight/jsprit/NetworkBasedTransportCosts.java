@@ -12,22 +12,17 @@
  ******************************************************************************/
 package org.matsim.contrib.freight.jsprit;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
 import com.graphhopper.jsprit.core.problem.driver.Driver;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType;
 import org.matsim.core.router.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -36,6 +31,9 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.vehicles.VehicleType;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This calculates transport-times and transport-costs to cover the distance from one location to another. 
@@ -79,7 +77,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 
 		private Id<org.matsim.vehicles.Vehicle> id;
 		
-		private VehicleType type;
+		private org.matsim.vehicles.VehicleType type;
 
 		public MatsimVehicleWrapper(com.graphhopper.jsprit.core.problem.vehicle.Vehicle vehicle) {
 			this.id = Id.create(vehicle.getId(), org.matsim.vehicles.Vehicle.class);
@@ -91,8 +89,8 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 			this.type = vehicle.getVehicleType();
 		}
 
-		private VehicleType makeType(String typeId, double maxVelocity) {
-			VehicleType vehicleTypeImpl = new VehicleType(Id.create(typeId, org.matsim.vehicles.VehicleType.class ));
+		private org.matsim.vehicles.VehicleType makeType( String typeId, double maxVelocity ) {
+			org.matsim.vehicles.VehicleType vehicleTypeImpl = new org.matsim.vehicles.VehicleType(Id.create(typeId, org.matsim.vehicles.VehicleType.class ));
 			vehicleTypeImpl.setMaximumVelocity(maxVelocity);
 			return vehicleTypeImpl;
 		}
@@ -103,7 +101,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		}
 
 		@Override
-		public VehicleType getType() {
+		public org.matsim.vehicles.VehicleType getType() {
 			return type;
 		}
 	}
@@ -307,14 +305,14 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 
 	public static class Builder {
 
-		public static Builder newInstance(Network network, Collection<CarrierVehicleType> vehicleTypes){ 
+		public static Builder newInstance(Network network, Collection<VehicleType> vehicleTypes ){
 			return new Builder(network, vehicleTypes); 
 		}
 
 		
 		
 		public static Builder newInstance(Network network) {
-			return new Builder(network, Collections.<CarrierVehicleType> emptyList());
+			return new Builder(network, Collections.<VehicleType> emptyList());
 		}
 
 
@@ -363,18 +361,18 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		private String defaultTypeId = UUID.randomUUID().toString();
 		
 		/**
-		 * Creates the builder requiring {@link Network} and a collection of {@link CarrierVehicleType}.
+		 * Creates the builder requiring {@link Network} and a collection of {@link VehicleType}.
 		 * 
 		 * @param network
 		 * @param vehicleTypes must be all vehicleTypes and their assigned costInformation in the system.
 		 */
-		private Builder(Network network, Collection<CarrierVehicleType> vehicleTypes){
+		private Builder(Network network, Collection<VehicleType> vehicleTypes ){
 			this.network = network;
 			retrieveTypeSpecificCosts(vehicleTypes);
 		}
 
-		private void retrieveTypeSpecificCosts(Collection<CarrierVehicleType> vehicleTypes) {
-			for(CarrierVehicleType type : vehicleTypes){
+		private void retrieveTypeSpecificCosts(Collection<VehicleType> vehicleTypes ) {
+			for( VehicleType type : vehicleTypes){
 				typeSpecificCosts.put(type.getId().toString(), new VehicleTypeVarCosts(type.getCostInformation().getCostsPerMeter(), type.getCostInformation().getCostsPerSecond()));
 			}
 			typeSpecificCosts.put(defaultTypeId,new VehicleTypeVarCosts(1.,0.));
