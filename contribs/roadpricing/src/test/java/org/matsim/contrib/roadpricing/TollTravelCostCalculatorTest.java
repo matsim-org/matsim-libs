@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.ControlerDefaults;
@@ -157,7 +156,7 @@ public class TollTravelCostCalculatorTest {
 				costCalc );
 		RoadPricingTestUtils.compareRoutes("2 5 6", (NetworkRoute) ((Leg) (person1.getPlans().get(0).getPlanElements().get(carLegIndex))).getRoute());
 
-		Cost morningCost = toll.createAndAddCost(6*3600, 10*3600, 0.0006); // 0.0006 * link_length(100m) = 0.06, which is slightly below the threshold of 0.0666
+		RoadPricingCost morningCost = toll.createAndAddCost(6*3600, 10*3600, 0.0006 ); // 0.0006 * link_length(100m) = 0.06, which is slightly below the threshold of 0.0666
 		// 2nd case: with a low toll, agent still chooses shortest path
 		clearRoutes(population);
 		routePopulation(
@@ -250,7 +249,7 @@ public class TollTravelCostCalculatorTest {
 		}
 		RoadPricingTestUtils.compareRoutes("2 5 6", (NetworkRoute) ((Leg) (planElements2.get(carLegIndex))).getRoute());
 
-		Cost morningCost = toll.createAndAddCost(6*3600, 10*3600, 0.06); // 0.06, which is slightly below the threshold of 0.0666
+		RoadPricingCost morningCost = toll.createAndAddCost(6*3600, 10*3600, 0.06 ); // 0.06, which is slightly below the threshold of 0.0666
 		// 2nd case: with a low toll, agent still chooses shortest path
 		clearRoutes(population);
 		routePopulation(
@@ -331,7 +330,7 @@ public class TollTravelCostCalculatorTest {
 		RoadPricingTestUtils.compareRoutes("2 5 6", (NetworkRoute) ((Leg) (person1.getPlans().get(0).getPlanElements().get(carLegIndex))).getRoute());
 
 		// 2nd case: with a low toll, agent still chooses shortest path and pay the toll
-		Cost morningCost = toll.createAndAddCost(6*3600, 10*3600, 0.06);
+		RoadPricingCost morningCost = toll.createAndAddCost(6*3600, 10*3600, 0.06 );
 		clearRoutes(population);
 		routePopulation(
 				scenario,

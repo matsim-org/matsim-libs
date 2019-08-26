@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -110,7 +109,7 @@ class TravelDisutilityIncludingToll implements TravelDisutility {
 	/*package*/ class DistanceTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTypicalTollCost(final Link link, final double time) {
-			Cost cost_per_m = scheme.getTypicalLinkCostInfo(link.getId(), time );
+			RoadPricingCost cost_per_m = scheme.getTypicalLinkCostInfo(link.getId(), time );
 			if (cost_per_m == null) {
 				return 0.0;
 			}
@@ -123,7 +122,7 @@ class TravelDisutilityIncludingToll implements TravelDisutility {
 	/*package*/ class AreaTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTypicalTollCost(final Link link, final double time) {
-			Cost cost = scheme.getTypicalLinkCostInfo(link.getId(), time );
+			RoadPricingCost cost = scheme.getTypicalLinkCostInfo(link.getId(), time );
 			if (cost == null) {
 				return 0.0;
 			}
@@ -141,7 +140,7 @@ class TravelDisutilityIncludingToll implements TravelDisutility {
 	/*package*/ class CordonTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTypicalTollCost(final Link link, final double time) {
-			Cost cost = scheme.getTypicalLinkCostInfo(link.getId(), time );
+			RoadPricingCost cost = scheme.getTypicalLinkCostInfo(link.getId(), time );
 			if (cost == null) {
 				return 0.0;
 			}
@@ -152,7 +151,7 @@ class TravelDisutilityIncludingToll implements TravelDisutility {
 	/* package */ class LinkTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTypicalTollCost(final Link link, final double time) {
-			Cost cost = scheme.getTypicalLinkCostInfo(link.getId(), time );
+			RoadPricingCost cost = scheme.getTypicalLinkCostInfo(link.getId(), time );
 			if (cost == null) {
 				return 0.0;
 			}

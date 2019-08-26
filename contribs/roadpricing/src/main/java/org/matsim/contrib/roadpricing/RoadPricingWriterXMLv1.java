@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 
 /**
  * Writes a {@link RoadPricingSchemeImpl} to a file according to <code>roadpricing_v1.dtd</code>.
@@ -63,13 +62,13 @@ public final class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 			// links
 			this.writer.write("\t<links>\n");
 			for (Id<Link> linkId : this.scheme.getTypicalCostsForLink().keySet()) {
-				List<Cost> cs = this.scheme.getTypicalCostsForLink().get(linkId);
+				List<RoadPricingCost> cs = this.scheme.getTypicalCostsForLink().get(linkId );
 				this.writer.write("\t\t<link id=\"" + linkId.toString() + "\"");
 				if (cs == null) {
 					this.writer.write("/>\n");
 				} else {
 					this.writer.write(">\n");
-					for (Cost c : cs) {
+					for ( RoadPricingCost c : cs) {
 						this.writeCost(c, false);
 					}
 					this.writer.write("\t\t</link>\n");
@@ -86,7 +85,7 @@ public final class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 				this.writer.write("\t<!-- [monetary unit] / [travelling across a tolled link] -->\n");
 			}
 
-			for (RoadPricingSchemeImpl.Cost cost : this.scheme.getTypicalCosts()) {
+			for ( RoadPricingCost cost : this.scheme.getTypicalCosts()) {
 				this.writeCost(cost, true);
 			}
 
@@ -98,7 +97,7 @@ public final class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 	}
 
 
-	private void writeCost(Cost cost, boolean typical) throws IOException {
+	private void writeCost( RoadPricingCost cost, boolean typical ) throws IOException {
 		if (typical) {
 			this.writer.write("\t<cost ");
 		} else {

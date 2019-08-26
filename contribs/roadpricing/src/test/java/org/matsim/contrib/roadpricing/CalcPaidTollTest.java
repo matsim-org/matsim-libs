@@ -217,7 +217,7 @@ public class CalcPaidTollTest {
 	private void runTollSimulation(final Scenario scenario, final RoadPricingScheme toll) {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		@SuppressWarnings("unused")
-		RoadPricingTollCalculator paidToll = new RoadPricingTollCalculator(scenario.getNetwork(), toll, eventsManager);
+		RoadPricingTollCalculator paidToll = new RoadPricingTollCalculator(scenario.getNetwork(), scenario, eventsManager);
 		EventsToScore scoring = EventsToScore.createWithScoreUpdating(scenario, new CharyparNagelScoringFunctionFactory(scenario), eventsManager);
 		scoring.beginIteration(0);
 

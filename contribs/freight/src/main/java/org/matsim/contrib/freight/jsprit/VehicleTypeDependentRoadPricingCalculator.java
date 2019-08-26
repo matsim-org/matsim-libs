@@ -22,8 +22,8 @@ import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.roadpricing.RoadPricingCost;
 import org.matsim.contrib.roadpricing.RoadPricingScheme;
-import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 
 
 /**
@@ -35,14 +35,14 @@ import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 public class VehicleTypeDependentRoadPricingCalculator {
 	
 	interface TollCalculator {
-		double getTollAmount(Cost cost, Link link);
+		double getTollAmount( RoadPricingCost cost, Link link );
 	}
 	
 	static class CordonCalc implements TollCalculator {
 
 		
 		@Override
-		public double getTollAmount(Cost cost, Link link) {
+		public double getTollAmount( RoadPricingCost cost, Link link ) {
 			if(cost == null) return 0.0;
 			return cost.amount;
 		}
@@ -52,7 +52,7 @@ public class VehicleTypeDependentRoadPricingCalculator {
 	static class DistanceCalc implements TollCalculator{
 
 		@Override
-		public double getTollAmount(Cost cost, Link link) {
+		public double getTollAmount( RoadPricingCost cost, Link link ) {
 			if(cost == null) return 0.0;
 			return cost.amount*link.getLength();
 		}
@@ -90,7 +90,7 @@ public class VehicleTypeDependentRoadPricingCalculator {
 		if(pricingSchemes == null) return 0.0; 
 		double toll = 0.0;
 		for(RoadPricingScheme rps : pricingSchemes){
-			Cost linkCostInfo = rps.getLinkCostInfo(link.getId(), time, null, null);
+			RoadPricingCost linkCostInfo = rps.getLinkCostInfo(link.getId(), time, null, null );
 			toll += calculators.get(rps.getType()).getTollAmount(linkCostInfo,link);
 		}
 		return toll; 

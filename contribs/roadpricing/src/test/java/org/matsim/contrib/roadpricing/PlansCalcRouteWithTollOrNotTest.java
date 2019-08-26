@@ -47,7 +47,6 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -80,7 +79,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		toll.setType("area");
 		toll.addLink(Id.createLinkId("5"));
 		toll.addLink(Id.createLinkId("11"));
-		Cost morningCost = toll.createAndAddCost(6 * 3600, 10 * 3600, 0.12);
+		RoadPricingCost morningCost = toll.createAndAddCost(6 * 3600, 10 * 3600, 0.12 );
 		/* Start with a rather low toll. The toll is also so low, because we only
 		 * have small network with short links: the cost to travel across one link
 		 * is: 20s * (-6 EUR / h) = 20 * (-6) / 3600 = 0.03333
@@ -99,7 +98,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		RoadPricingTestUtils.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
 
 		// case 2: now add a toll in the afternoon too, so it is cheaper to pay the toll
-		Cost afternoonCost = toll.createAndAddCost(14*3600, 18*3600, 0.12);
+		RoadPricingCost afternoonCost = toll.createAndAddCost(14*3600, 18*3600, 0.12 );
 		log.warn( "access/egress? " + config.plansCalcRoute().isInsertingAccessEgressWalk() );
 		runOnAll(testee(scenario, toll), population);
 		log.warn( "access/egress? " + config.plansCalcRoute().isInsertingAccessEgressWalk() );

@@ -32,7 +32,7 @@ import org.matsim.core.router.util.TravelTime;
 
 import javax.inject.Inject;
 
-public final class RoadPricingTravelDisutilityFactory implements TravelDisutilityFactory {
+final class RoadPricingTravelDisutilityFactory implements TravelDisutilityFactory {
 	private final RoadPricingScheme scheme;
 	private final double marginalUtilityOfMoney ;
 	private TravelDisutilityFactory previousTravelDisutilityFactory;
@@ -43,13 +43,13 @@ public final class RoadPricingTravelDisutilityFactory implements TravelDisutilit
 		this(ControlerDefaults.createDefaultTravelDisutilityFactory(scenario), roadPricingScheme, scenario.getConfig());
 	}
 
-	public RoadPricingTravelDisutilityFactory(TravelDisutilityFactory previousTravelDisutilityFactory, RoadPricingScheme scheme, double marginalUtilityOfMoney) {
+	RoadPricingTravelDisutilityFactory(TravelDisutilityFactory previousTravelDisutilityFactory, RoadPricingScheme scheme, double marginalUtilityOfMoney) {
 		this.scheme = scheme ;
 		this.marginalUtilityOfMoney = marginalUtilityOfMoney ;
 		this.previousTravelDisutilityFactory = previousTravelDisutilityFactory ;
 	}
 
-	public RoadPricingTravelDisutilityFactory(TravelDisutilityFactory previousTravelDisutilityFactory, RoadPricingScheme scheme, Config config) {
+	RoadPricingTravelDisutilityFactory(TravelDisutilityFactory previousTravelDisutilityFactory, RoadPricingScheme scheme, Config config) {
 		this( previousTravelDisutilityFactory, scheme, config.planCalcScore().getMarginalUtilityOfMoney() ) ;
 	}
 

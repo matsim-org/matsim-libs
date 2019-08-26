@@ -26,6 +26,7 @@ import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
@@ -39,7 +40,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
-import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
+import org.matsim.core.gbl.Gbl;
 
 /**
  * Calculates the distance of a trip which occurred on tolled links.
@@ -62,9 +63,10 @@ final class CalcAverageTolledTripLength implements LinkEnterEventHandler, Person
 	
 	private static Double zero = 0.0;
 
-    @Inject
-	public CalcAverageTolledTripLength(final Network network, final RoadPricingScheme scheme, EventsManager events) {
-		this.scheme = scheme;
+	CalcAverageTolledTripLength( final Network network , final Scenario scenario , EventsManager events ) {
+		this.scheme = (RoadPricingScheme) scenario.getScenarioElement( RoadPricingScheme.ELEMENT_NAME );
+	    Gbl.assertNotNull( this.scheme );
+
 		this.network = network;
 		this.agentDistance = new TreeMap<>();
 		events.addHandler(this);
@@ -76,7 +78,7 @@ final class CalcAverageTolledTripLength implements LinkEnterEventHandler, Person
 		Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
 		
 		// getting the (monetary? generalized?) cost of the link
-		Cost cost = this.scheme.getLinkCostInfo(event.getLinkId(), event.getTime(), driverId, event.getVehicleId() );
+		RoadPricingCost cost = this.scheme.getLinkCostInfo(event.getLinkId(), event.getTime(), driverId, event.getVehicleId() );
 		
 		if (cost != null) {
 			// i.e. if there is a toll on the link

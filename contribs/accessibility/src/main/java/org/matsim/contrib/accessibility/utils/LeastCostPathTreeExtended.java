@@ -44,7 +44,7 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.contrib.roadpricing.RoadPricingScheme;
 import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl;
-import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
+import org.matsim.contrib.roadpricing.RoadPricingCost;
 import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 
 /**
@@ -108,7 +108,7 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 		// query toll
 		double toll = 0.;
 		if(this.scheme != null){
-			Cost cost = scheme.getLinkCostInfo(link.getId(), currTime, null, null);
+			RoadPricingCost cost = scheme.getLinkCostInfo(link.getId(), currTime, null, null );
 			if(cost != null)
 				toll = cost.amount;
 		}

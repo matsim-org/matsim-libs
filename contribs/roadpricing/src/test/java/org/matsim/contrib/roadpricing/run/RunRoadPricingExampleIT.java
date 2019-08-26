@@ -15,4 +15,5 @@ public class RunRoadPricingExampleIT {
 			Assert.fail("Example should run without exceptions.");
 		}
 	}
+
 }

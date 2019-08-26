@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.vehicles.Vehicle;
 
 import java.net.URL;
@@ -86,17 +85,17 @@ public final class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme
 	}
 
 	@Override
-	public Cost getLinkCostInfo(Id<Link> linkId, double time, Id<Person> personId, Id<Vehicle> vehicleId) {
-		Cost baseToll = delegate.getLinkCostInfo(linkId, time, personId, vehicleId);
+	public RoadPricingCost getLinkCostInfo( Id<Link> linkId, double time, Id<Person> personId, Id<Vehicle> vehicleId ) {
+		RoadPricingCost baseToll = delegate.getLinkCostInfo(linkId, time, personId, vehicleId );
 		if (baseToll == null) {
 			return null;
 		}
 		final double tollFactorVal = tollFactor.getTollFactor(personId, vehicleId, linkId, time);
-		return new Cost(baseToll.startTime, baseToll.endTime, baseToll.amount * tollFactorVal);
+		return new RoadPricingCost(baseToll.startTime, baseToll.endTime, baseToll.amount * tollFactorVal);
 	}
 
 	@Override
-	public Cost getTypicalLinkCostInfo(Id<Link> linkId, double time) {
+	public RoadPricingCost getTypicalLinkCostInfo( Id<Link> linkId, double time ) {
 		return delegate.getTypicalLinkCostInfo(linkId, time);
 	}
 
@@ -116,12 +115,12 @@ public final class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme
 	}
 
 	@Override
-	public Iterable<Cost> getTypicalCosts() {
+	public Iterable<RoadPricingCost> getTypicalCosts() {
 		return delegate.getTypicalCosts();
 	}
 
 	@Override
-	public Map<Id<Link>, List<Cost>> getTypicalCostsForLink() {
+	public Map<Id<Link>, List<RoadPricingCost>> getTypicalCostsForLink() {
 		return delegate.getTypicalCostsForLink();
 	}
 

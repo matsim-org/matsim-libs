@@ -20,9 +20,11 @@
 
 package org.matsim.contrib.roadpricing;
 
-import javax.inject.Inject;
-
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -56,16 +58,24 @@ class RoadPricingControlerListener implements StartupListener, IterationEndsList
 
 	final static private Logger log = Logger.getLogger(RoadPricingControlerListener.class);
 
-	private final RoadPricingScheme scheme;
+	private RoadPricingScheme scheme;
 	private final RoadPricingTollCalculator calcPaidToll;
 	private final CalcAverageTolledTripLength cattl;
 	private OutputDirectoryHierarchy controlerIO;
 
 	@Inject
-	RoadPricingControlerListener(RoadPricingScheme scheme, RoadPricingTollCalculator calcPaidToll, CalcAverageTolledTripLength cattl, OutputDirectoryHierarchy controlerIO) {
-		this.scheme = scheme;
-		this.calcPaidToll = calcPaidToll;
-		this.cattl = cattl;
+	RoadPricingControlerListener( Scenario scenario, OutputDirectoryHierarchy controlerIO, EventsManager events ) {
+		scheme = (RoadPricingScheme) scenario.getScenarioElement( RoadPricingScheme.ELEMENT_NAME );
+		if ( scheme==null ) {
+			RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule( scenario.getConfig() , RoadPricingConfigGroup.class );
+			if ( rpConfig.getTollLinksFile()==null || rpConfig.getTollLinksFile()=="" ) {
+				throw new RuntimeException( "neither road pricing scheme nor toll links file is provided; aborting ..." ) ;
+			}
+			scheme = RoadPricingUtils.createAndRegisterMutableScheme( scenario ) ;
+			new RoadPricingReaderXMLv1( (RoadPricingSchemeImpl) scheme ).readFile(rpConfig.getTollLinksFile());
+		}
+		this.calcPaidToll = new RoadPricingTollCalculator( scenario.getNetwork(), scenario, events ) ;
+		this.cattl = new CalcAverageTolledTripLength( scenario.getNetwork(), scenario, events ) ;
 		this.controlerIO = controlerIO;
 		Gbl.printBuildInfo("RoadPricing", "/org.matsim.contrib/roadpricing/revision.txt");
 	}

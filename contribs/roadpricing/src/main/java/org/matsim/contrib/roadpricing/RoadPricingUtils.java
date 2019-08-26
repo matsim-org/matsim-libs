@@ -23,7 +23,6 @@ package org.matsim.contrib.roadpricing;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.core.config.ConfigUtils;
 
 /**
@@ -65,7 +64,7 @@ public class RoadPricingUtils {
 		scheme.setDescription(description);
 	}
 
-	public static Cost createAndAddGeneralCost(RoadPricingSchemeImpl scheme, final double startTime, final double endTime, final double amount){
+	public static RoadPricingCost createAndAddGeneralCost( RoadPricingSchemeImpl scheme, final double startTime, final double endTime, final double amount ){
 		return scheme.createAndAddCost(startTime, endTime, amount);
 	}
 

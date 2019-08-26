@@ -50,26 +50,27 @@ final class RoadPricingModuleDefaults extends AbstractModule {
 		// But I am not quite sure yet how to best handle custom scenario elements. mz
 
 		// use ControlerDefaults configuration, replacing the TravelDisutility with a toll-dependent one
-		install(AbstractModule.override(Collections.<AbstractModule>singletonList(new ControlerDefaultsModule()), new RoadPricingModule(roadPricingScheme)));
+//		install(AbstractModule.override(Collections.<AbstractModule>singletonList(new ControlerDefaultsModule()), new RoadPricingModule(roadPricingScheme)));
+		throw new RuntimeException("we just broke this") ;
 	}
 
 
-	/**
-	 * This class binding ensure that there is a SINGLE, consistent RoadPricingScheme in the Scenario.
-	 */
-	static class RoadPricingInitializer {
-		@Inject
-		RoadPricingInitializer(RoadPricingScheme roadPricingScheme, Scenario scenario) {
-			RoadPricingScheme scenarioRoadPricingScheme = (RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
-			if (scenarioRoadPricingScheme == null) {
-				scenario.addScenarioElement(RoadPricingScheme.ELEMENT_NAME, roadPricingScheme);
-			} else {
-				if (roadPricingScheme != scenarioRoadPricingScheme) {
-					throw new RuntimeException("Trying to bind multiple, different RoadPricingSchemes (must be singleton)");
-				}
-			}
-		}
-	}
+//	/**
+//	 * This class binding ensure that there is a SINGLE, consistent RoadPricingScheme in the Scenario.
+//	 */
+//	static class RoadPricingInitializer {
+//		@Inject
+//		RoadPricingInitializer(RoadPricingScheme roadPricingScheme, Scenario scenario) {
+//			RoadPricingScheme scenarioRoadPricingScheme = (RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
+//			if (scenarioRoadPricingScheme == null) {
+//				scenario.addScenarioElement(RoadPricingScheme.ELEMENT_NAME, roadPricingScheme);
+//			} else {
+//				if (roadPricingScheme != scenarioRoadPricingScheme) {
+//					throw new RuntimeException("Trying to bind multiple, different RoadPricingSchemes (must be singleton)");
+//				}
+//			}
+//		}
+//	}
 
 
 	/**
@@ -116,9 +117,9 @@ final class RoadPricingModuleDefaults extends AbstractModule {
 		private final RoadPricingScheme scheme;
 
 		@Inject
-		TravelDisutilityIncludingTollFactoryProvider(Scenario scenario, RoadPricingScheme scheme) {
+		TravelDisutilityIncludingTollFactoryProvider(Scenario scenario) {
 			this.scenario = scenario;
-			this.scheme = scheme;
+			this.scheme = RoadPricingUtils.getScheme( scenario ) ;
 		}
 
 		@Override
