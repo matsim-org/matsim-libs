@@ -76,8 +76,8 @@ public class AccessibilityUtils {
 	 *     | \
 	 *     k2 k3
 	 */
-	public static final Map<Id<Node>, AggregationObject> aggregateOpportunitiesWithSameNearestNode(final ActivityFacilities opportunities, Network network,
-																								   Config config) {
+	public static final Map<Id<Node>, AggregationObject> aggregateOpportunitiesWithSameNearestNode(
+			final ActivityFacilities opportunities, Network network, Config config) {
 		// yyyy this method ignores the "capacities" of the facilities. kai, mar'14
 		// for now, we decided not to add "capacities" as it is not needed for current projects. dz, feb'16
 
@@ -95,11 +95,8 @@ public class AccessibilityUtils {
 			double walkBetaTT_utils_h = config.planCalcScore().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling()
 					- config.planCalcScore().getPerforming_utils_hr(); // default values: -12 = (-6.) - (6.)
 			double VjkWalkTravelTime = walkBetaTT_utils_h * (distance_m / walkSpeed_m_h);
-			System.out.println("VjkWalkTravelTime = " + VjkWalkTravelTime);
-			System.out.println("config.planCalcScore().getBrainExpBeta() = " + config.planCalcScore().getBrainExpBeta());
 
 			double expVjk = Math.exp(config.planCalcScore().getBrainExpBeta() * VjkWalkTravelTime);
-			System.out.println("expVjk = " + expVjk);
 
 			// add Vjk to sum
 			AggregationObject jco = opportunityClusterMap.get(nearestNode.getId()); // Why "jco"?
