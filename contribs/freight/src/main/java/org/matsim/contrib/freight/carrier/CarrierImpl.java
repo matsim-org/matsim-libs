@@ -36,7 +36,7 @@ public class CarrierImpl implements Carrier {
 
 	private CarrierImpl(final Id<Carrier> id) {
 		super();
-		this.carrierCapabilities = CarrierCapabilities.newInstance();
+		this.carrierCapabilities = CarrierCapabilities.Builder.newInstance().build();
 		this.id = id;
 		services = new ArrayList<CarrierService>();
 		shipments = new ArrayList<CarrierShipment>();
