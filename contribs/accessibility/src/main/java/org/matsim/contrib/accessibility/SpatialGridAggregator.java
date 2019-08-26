@@ -1,7 +1,6 @@
 package org.matsim.contrib.accessibility;
 
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
-import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.facilities.ActivityFacility;
 
 import java.util.HashMap;

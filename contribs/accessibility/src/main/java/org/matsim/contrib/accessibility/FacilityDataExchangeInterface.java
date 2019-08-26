@@ -1,4 +1,4 @@
-package org.matsim.contrib.accessibility.interfaces;
+package org.matsim.contrib.accessibility;
 
 import java.util.Map;
 import org.matsim.facilities.ActivityFacility;
