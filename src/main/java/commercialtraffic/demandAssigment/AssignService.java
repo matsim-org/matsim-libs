@@ -42,6 +42,9 @@ public class AssignService {
 	// !!!!! Important !!!!!
 	int maxServicesPerAct = 3;
 	
+	// !!!!! Filter CT Trips !!!!!
+	Double filterFactor=0.1;
+	
 	
 	CommercialTripsReader commercialTripReader;
 	String plansFile;
@@ -81,14 +84,14 @@ public class AssignService {
 		this.matsimInput = matsimInput;
 		new PopulationReader(scenario).readFile(plansFile);
 		r.setSeed(nr);
-		commercialTripReader = new CommercialTripsReader(commercialTripsFile, serviceDurationDistPath);
+		commercialTripReader = new CommercialTripsReader(commercialTripsFile, serviceDurationDistPath,filterFactor);
 		commercialTripReader.run();
 		demand = new DemandGenerator(companyFolder, zoneSHP, outputpath);
 		demand.findNeighbourZones();
 
 		// companyGenerator is required in order to construct carriers with services
 		this.companyGenerator = new CompanyGenerator(comercialVehicleCSV, commercialTripsFile, serviceDurationDistPath,
-				networkFile, companyFolder, zoneSHP, outputpath, matsimInput + "Carrier\\");
+				networkFile, companyFolder, zoneSHP, outputpath, matsimInput + "Carrier_"+filterFactor+"\\");
 		this.companyGenerator.initalize();
 
 		// CompanyGenerator demand = new
@@ -188,7 +191,7 @@ public class AssignService {
 	}
 
 	public void writePopulation() {
-		String filename = this.matsimInput + "Population//populationWithCTdemand.xml.gz";
+		String filename = this.matsimInput + "Population_"+filterFactor+"//populationWithCTdemand.xml.gz";
 		PopulationWriter writer = new PopulationWriter(this.scenario.getPopulation());
 		writer.write(filename);
 	}

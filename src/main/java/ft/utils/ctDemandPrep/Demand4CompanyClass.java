@@ -29,14 +29,14 @@ import com.opencsv.CSVReader;
 import vwExamples.utils.DemandFromCSV.Trip;
 
 public class Demand4CompanyClass {
-	String csvDemandFile;
+	List<String> csvDemandFile;
 	String epsgForDemandFile;
 	Map<String, Geometry> zoneMap;
 	List<String[]> companyLocationsList;
 	public Map<String, ArrayList<Company>> companyClass2CompanyMap;
 	public Map<String, ArrayList<Company>> zone2CompanyMap;
 
-	public Demand4CompanyClass(String csvDemandFile, String epsgForDemandFile, Map<String, Geometry> zoneMap) {
+	public Demand4CompanyClass(List<String> csvDemandFile, String epsgForDemandFile, Map<String, Geometry> zoneMap) {
 		this.csvDemandFile = csvDemandFile;
 		this.epsgForDemandFile = epsgForDemandFile;
 		this.zoneMap = zoneMap;
@@ -44,10 +44,9 @@ public class Demand4CompanyClass {
 		this.companyClass2CompanyMap = new HashMap<String, ArrayList<Company>>();
 		this.zone2CompanyMap = new HashMap<String, ArrayList<Company>>();
 	}
-	
-	public Demand4CompanyClass()
-	{
-		
+
+	public Demand4CompanyClass() {
+
 	}
 
 	public String getZone(Coord coord, Map<String, Geometry> zoneMap) {
@@ -55,7 +54,7 @@ public class Demand4CompanyClass {
 		// simulation
 
 		SortedSet<String> keys = new TreeSet<String>(zoneMap.keySet());
-		
+
 		for (String zone : keys) {
 			Geometry geometry = zoneMap.get(zone);
 			if (geometry.intersects(MGC.coord2Point(coord))) {
@@ -66,7 +65,7 @@ public class Demand4CompanyClass {
 
 		return null;
 	}
-	
+
 	public String getZoneFancy(Coord coord, Map<String, Geometry> zoneMap) {
 		// Function assumes Shapes are in the same coordinate system like MATSim
 		// simulation
@@ -76,28 +75,25 @@ public class Demand4CompanyClass {
 		double radius = 0.0;
 
 		while (radius <= maxRadius) {
-//			System.out.println("Working with radius: "+ radius );
+			// System.out.println("Working with radius: "+ radius );
 			for (String zone : keys) {
 				Geometry geometry = zoneMap.get(zone);
-				
-				if (radius==0)
-				{
+
+				if (radius == 0) {
 					if (geometry.intersects(MGC.coord2Point(coord))) {
-//						System.out.println("Coordinate in "+ zone +" with radius "+ radius);
-						
+						// System.out.println("Coordinate in "+ zone +" with radius "+ radius);
+
 						return zone;
 					}
-					
-				}
-				else {
+
+				} else {
 					if (geometry.intersects(MGC.coord2Point(coord).buffer(radius))) {
-//						System.out.println("Coordinate in "+ zone +" with radius "+ radius);
-						
+						// System.out.println("Coordinate in "+ zone +" with radius "+ radius);
+
 						return zone;
 					}
-					
+
 				}
-				
 
 			}
 
@@ -109,7 +105,7 @@ public class Demand4CompanyClass {
 	}
 
 	public String getCompanyClass() {
-		File f = new File(csvDemandFile);
+		File f = new File(csvDemandFile.get(0));
 		String[] splitted = f.getName().split("-");
 		String companyClass = null;
 
@@ -119,7 +115,6 @@ public class Demand4CompanyClass {
 
 		return companyClass;
 	}
-
 
 	public void readDemandCSV() {
 		// List<String[]> lines = new ArrayList<String[]>();
@@ -131,36 +126,37 @@ public class Demand4CompanyClass {
 
 		CSVReader reader = null;
 		try {
-			reader = new CSVReader(new FileReader(this.csvDemandFile));
-			companyLocationsList = reader.readAll();
-			for (int i = 1; i < companyLocationsList.size(); i++) {
-				String[] lineContents = companyLocationsList.get(i);
-				double lon = Double.parseDouble(lineContents[3]); // origin_lon,
-				double lat = Double.parseDouble(lineContents[2]); // origin_lat,
+			for (String demandFile : csvDemandFile) {
 
-				Coord coord = ct.transform(new Coord(lon, lat));
+				reader = new CSVReader(new FileReader(demandFile));
+				companyLocationsList = reader.readAll();
+				for (int i = 1; i < companyLocationsList.size(); i++) {
+					String[] lineContents = companyLocationsList.get(i);
+					double lon = Double.parseDouble(lineContents[3]); // origin_lon,
+					double lat = Double.parseDouble(lineContents[2]); // origin_lat,
 
-				String companyClass = getCompanyClass();
+					Coord coord = ct.transform(new Coord(lon, lat));
 
-				String zone = getZone(coord, zoneMap);
+					String companyClass = getCompanyClass();
 
-				Company company = new Company(coord, zone, companyClass);
+					String zone = getZone(coord, zoneMap);
 
-				if (!companyClass2CompanyMap.containsKey(companyClass)) {
-					companyClass2CompanyMap.put(companyClass, new ArrayList<Company>());
-					companyClass2CompanyMap.get(companyClass).add(company);
-				} else {
-					companyClass2CompanyMap.get(companyClass).add(company);
+					Company company = new Company(coord, zone, companyClass);
+
+					if (!companyClass2CompanyMap.containsKey(companyClass)) {
+						companyClass2CompanyMap.put(companyClass, new ArrayList<Company>());
+						companyClass2CompanyMap.get(companyClass).add(company);
+					} else {
+						companyClass2CompanyMap.get(companyClass).add(company);
+					}
+
+					if (!zone2CompanyMap.containsKey(zone)) {
+						zone2CompanyMap.put(zone, new ArrayList<Company>());
+						zone2CompanyMap.get(zone).add(company);
+					} else {
+						zone2CompanyMap.get(zone).add(company);
+					}
 				}
-				
-				
-				if (!zone2CompanyMap.containsKey(zone)) {
-					zone2CompanyMap.put(zone, new ArrayList<Company>());
-					zone2CompanyMap.get(zone).add(company);
-				} else {
-					zone2CompanyMap.get(zone).add(company);
-				}
-
 
 			}
 		} catch (FileNotFoundException e) {

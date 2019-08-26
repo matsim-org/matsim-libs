@@ -30,5 +30,9 @@ public class CommercialTrip {
 		this.fahrzeit = fahrzeit;
 		this.customerRelation = customerRelation;
 	}
+	public int getvehId() {
+		return id;
+		
+	}
 
 }

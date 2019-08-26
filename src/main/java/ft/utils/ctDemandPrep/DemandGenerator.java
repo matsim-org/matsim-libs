@@ -29,6 +29,7 @@ public class DemandGenerator {
 	String inputpath;
 	String outputpath;
 	public File[] files;
+	public Map<String, List<String>> filesPerCompanyClass;
 	public Map<String, Geometry> zoneMap;
 	Map<String, String> nameMap;
 	public Map<String, List<String>> neighbourMap;
@@ -45,6 +46,7 @@ public class DemandGenerator {
 		this.outputpath = outputpath;
 		this.inputpath = inputpath;
 		this.files = new File(inputpath).listFiles();
+		this.filesPerCompanyClass = new HashMap<String, List<String>>();
 		this.zoneMap = new HashMap<String, Geometry>();
 		this.neighbourMap = new HashMap<String, List<String>>();
 		this.nameMap = new HashMap<String, String>();
@@ -75,10 +77,11 @@ public class DemandGenerator {
 		String outputpath = "D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\";
 
 		DemandGenerator demand = new DemandGenerator(companyFolder, zoneSHP, outputpath);
-		for (int i = 0; i < demand.files.length; i++) {
-			String dummyDemandFile = demand.getFile(i);
+		demand.getFilesperCompanyClass();
+		for (String keys:demand.filesPerCompanyClass.keySet()) {
+			//String dummyDemandFile = demand.getFile(i);
 
-			Demand4CompanyClass d = new Demand4CompanyClass(dummyDemandFile, null, demand.zoneMap);
+			Demand4CompanyClass d = new Demand4CompanyClass(demand.filesPerCompanyClass.get(keys), null, demand.zoneMap);
 
 			d.readDemandCSV();
 
@@ -91,6 +94,25 @@ public class DemandGenerator {
 		demand.writeNeighbourZonesCSV();
 		demand.writeTravelTimes2ZonesCSV();
 
+	}
+
+	public void getFilesperCompanyClass() {
+		for (int i = 0; i < this.files.length; i++) {
+			File f = new File(files[i].toString());
+			String[] splitted = f.getName().split("-");
+			String companyClass = null;
+			if (splitted.length > 0) {
+				companyClass = splitted[0];
+			}
+
+			if (!filesPerCompanyClass.containsKey(companyClass)) {
+				filesPerCompanyClass.put(companyClass, new ArrayList<String>());
+				filesPerCompanyClass.get(companyClass).add(f.getAbsolutePath().toString());
+			} else {
+				filesPerCompanyClass.get(companyClass).add(f.getAbsolutePath().toString());
+			}
+
+		}
 	}
 
 	public String getFile(int i) {
@@ -119,7 +141,7 @@ public class DemandGenerator {
 			useMap.put(id, use);
 			neighbourMap.put(id, null);
 		}
-		
+
 		zoneKeys = new TreeSet<String>(zoneMap.keySet());
 	}
 
@@ -145,8 +167,6 @@ public class DemandGenerator {
 		int maxBuffer = 100;
 		int bufferInc = 10;
 
-		
-		
 		for (String zone : zoneKeys) {
 			int buffer = 0;
 			ArrayList<String> neighbourzones = new ArrayList<String>();

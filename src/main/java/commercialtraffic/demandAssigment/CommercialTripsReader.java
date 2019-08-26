@@ -6,9 +6,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import org.matsim.core.gbl.MatsimRandom;
 
@@ -17,20 +19,24 @@ import com.opencsv.CSVReader;
 public class CommercialTripsReader {
 	List<String[]> rawTripList;
 	String csvTripFile;
-	Map<String, List<CommercialTrip>> commercialTripMap;
+	public Map<String, List<CommercialTrip>> commercialTripMap;
 	Map<String, List<Double>> ServiceType2ServiceDurationsMap;
 	public File[] files;
 	String serviceTimeDistInputPath;
 	Random r = MatsimRandom.getRandom();
 	long nr = 1896;
+	Double filterFactor = null;
+	Map<String, Set<Integer>> vehBlackListIds;
 
-	public CommercialTripsReader(String csvTripFile, String serviceTimeDistInputPath) {
+	public CommercialTripsReader(String csvTripFile, String serviceTimeDistInputPath, double filterFactor) {
 		this.csvTripFile = csvTripFile;
 		this.rawTripList = new ArrayList<String[]>();
 		this.commercialTripMap = new HashMap<String, List<CommercialTrip>>();
 		this.ServiceType2ServiceDurationsMap = new HashMap<String, List<Double>>();
 		this.files = new File(serviceTimeDistInputPath).listFiles();
 		this.serviceTimeDistInputPath = serviceTimeDistInputPath;
+		this.filterFactor = filterFactor;
+		this.vehBlackListIds = new HashMap<String, Set<Integer>>();
 
 		r.setSeed(nr);
 	}
@@ -39,13 +45,16 @@ public class CommercialTripsReader {
 
 		CommercialTripsReader tripReader = new CommercialTripsReader(
 				"D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\wege.csv",
-				"D:\\Thiel\\Programme\\WVModell\\ServiceDurCalc\\Distributions\\");
+				"D:\\Thiel\\Programme\\WVModell\\ServiceDurCalc\\Distributions\\", 0.1);
 		tripReader.run();
 	}
 
 	public void run() {
 
 		readVehicleCSV();
+		if (filterFactor < 1) {
+			filterTrips(filterFactor);
+		}
 		readServiceTimeDistributionsCSV();
 
 	}
@@ -56,13 +65,44 @@ public class CommercialTripsReader {
 
 	}
 
+	public void filterTrips(double filterFactor) {
+
+		for (String key : commercialTripMap.keySet()) {
+
+			Set<Integer> vehBlackList = new HashSet<Integer>();
+			Set<Integer> vehCheckedList = new HashSet<Integer>();
+			for (CommercialTrip trip : commercialTripMap.get(key)) {
+				if ((!vehCheckedList.contains(trip.getvehId()) && (r.nextDouble() > filterFactor))) {
+					vehBlackList.add(trip.getvehId());
+				}
+				vehCheckedList.add(trip.getvehId());
+			}
+			vehBlackListIds.put(key, vehBlackList);
+
+		}
+		// System.out.println(tripMap.get("F").size());
+
+		for (String key : commercialTripMap.keySet()) {
+
+			for (int i = commercialTripMap.get(key).size() - 1; i >= 0; i--) {
+
+				if (vehBlackListIds.get(key).contains(commercialTripMap.get(key).get(i).getvehId())) {
+					commercialTripMap.get(key).remove(i);
+				}
+
+			}
+
+		}
+		// System.out.println(tripMap.get("F").size());
+	}
+
 	public double getRandomServiceDurationPerType(String serviceType) {
 
 		int randromIdx = r.nextInt(ServiceType2ServiceDurationsMap.get(serviceType).size());
-		
-		List<Double> valueList = ServiceType2ServiceDurationsMap.get(serviceType); 
+
+		List<Double> valueList = ServiceType2ServiceDurationsMap.get(serviceType);
 		java.util.Collections.sort(valueList);
-		
+
 		return valueList.get(randromIdx);
 	}
 
@@ -318,7 +358,7 @@ public class CommercialTripsReader {
 				rawTripList = reader.readAll();
 				for (int j = 1; j < rawTripList.size(); j++) {
 					String[] lineContents = rawTripList.get(j);
-					double value = Double.parseDouble(lineContents[0])*60;
+					double value = Double.parseDouble(lineContents[0]) * 60;
 
 					if (ServiceType2ServiceDurationsMap.containsKey(serviceType)) {
 						ServiceType2ServiceDurationsMap.get(serviceType).add(value);

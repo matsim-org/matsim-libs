@@ -104,10 +104,11 @@ public class CompanyGenerator {
 		// outputpath = "D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\";
 
 		companyLocations = new DemandGenerator(companyFolder, zoneSHP, outputpath);
-		for (int i = 0; i < companyLocations.files.length; i++) {
-			String dummyDemandFile = companyLocations.getFile(i);
+		companyLocations.getFilesperCompanyClass();
+		for (String keys:companyLocations.filesPerCompanyClass.keySet()) {
+			//String dummyDemandFile = demand.getFile(i);
 
-			Demand4CompanyClass d = new Demand4CompanyClass(dummyDemandFile, null, companyLocations.zoneMap);
+			Demand4CompanyClass d = new Demand4CompanyClass(companyLocations.filesPerCompanyClass.get(keys), null, companyLocations.zoneMap);
 
 			d.readDemandCSV();
 
