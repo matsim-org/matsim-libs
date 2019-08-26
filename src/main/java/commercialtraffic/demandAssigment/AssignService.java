@@ -91,7 +91,7 @@ public class AssignService {
 
 		// companyGenerator is required in order to construct carriers with services
 		this.companyGenerator = new CompanyGenerator(comercialVehicleCSV, commercialTripsFile, serviceDurationDistPath,
-				networkFile, companyFolder, zoneSHP, outputpath, matsimInput + "Carrier_"+filterFactor+"\\");
+				networkFile, companyFolder, zoneSHP, outputpath, matsimInput + "Carrier\\");
 		this.companyGenerator.initalize();
 
 		// CompanyGenerator demand = new
@@ -191,7 +191,7 @@ public class AssignService {
 	}
 
 	public void writePopulation() {
-		String filename = this.matsimInput + "Population_"+filterFactor+"//populationWithCTdemand.xml.gz";
+		String filename = this.matsimInput + "Population//populationWithCTdemand.xml.gz";
 		PopulationWriter writer = new PopulationWriter(this.scenario.getPopulation());
 		writer.write(filename);
 	}
