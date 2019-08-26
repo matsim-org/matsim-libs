@@ -43,6 +43,7 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
@@ -212,8 +213,7 @@ public class PlansCalcRouteWithTollOrNotTest {
 		if ( !config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
 			return (Leg) (planElements.get(3));
 		} else {
-			StageActivityTypes adHocTypes = activityType -> activityType.contains("interaction");
-			List<Trip> trips = TripStructureUtils.getTrips(planElements, adHocTypes) ;
+			List<Trip> trips = TripStructureUtils.getTrips(planElements) ;
 			List<Leg> legs = trips.get(1).getLegsOnly() ;
 			if ( legs.size()==1 ) {
 				return legs.get(0) ;
