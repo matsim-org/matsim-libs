@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -61,7 +62,8 @@ public class PersonActivityTracker implements ActivityEndEventHandler , Activity
 	
 	private final Set<String> consideredActivityTypes = new HashSet<String>();
 	private Map<Id<Person>, Integer> personId2currentActNr = new HashMap<Id<Person>, Integer>();
-		
+
+	@Inject
 	public PersonActivityTracker(NoiseContext noiseContext) {
 		this.noiseContext = noiseContext;
 		

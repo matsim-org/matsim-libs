@@ -36,17 +36,13 @@ import org.matsim.core.controler.AbstractModule;
 final class NoiseComputationModule extends AbstractModule {
 	private static final Logger log = Logger.getLogger(NoiseComputationModule.class);
 
-	@Inject
-	private Scenario scenario;
 
 	@Override
 	public void install() {
-		
+
 		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(this.getConfig(), NoiseConfigGroup.class);
 
-		NoiseContext noiseContext = new NoiseContext(this.scenario);
-		
-		this.bind(NoiseContext.class).toInstance(noiseContext);
+		this.bind(NoiseContext.class);
 		
 		this.bind(NoiseTimeTracker.class).asEagerSingleton();
 		this.addEventHandlerBinding().to(NoiseTimeTracker.class);
@@ -57,7 +53,7 @@ final class NoiseComputationModule extends AbstractModule {
 		}
 		
 		if (noiseParameters.isComputePopulationUnits()) {
-			this.addEventHandlerBinding().toInstance(new PersonActivityTracker(noiseContext));
+			this.addEventHandlerBinding().to(PersonActivityTracker.class);
 		}
 				
 		if (noiseParameters.isInternalizeNoiseDamages()) {

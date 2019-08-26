@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.locationtech.jts.algorithm.Angle;
 import org.matsim.api.core.v01.Coord;
@@ -90,8 +91,9 @@ public class NoiseContext {
 	private final Map<Id<ReceiverPoint>, NoiseReceiverPoint> noiseReceiverPoints;
 	
 	// ############################################
-	
-	public NoiseContext(Scenario scenario) {
+
+	@Inject
+	NoiseContext(Scenario scenario) {
 		this.scenario = scenario;
 
 //		if ((NoiseConfigGroup) this.scenario.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME) == null) {

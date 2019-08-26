@@ -272,7 +272,7 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 			}
 		}
 		
-		if  (!"".equals(this.tunnelLinkIdFile)) {
+		if  (this.tunnelLinkIdFile != null && !"".equals(this.tunnelLinkIdFile)) {
 			
 			if (this.tunnelLinkIDs.size() > 0) {
 				log.warn("Loading the tunnel link IDs from a file. Deleting the existing tunnel link IDs that are added manually.");
