@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -53,8 +54,8 @@ public class NoiseWriter {
 	public static void writeReceiverPoints(NoiseContext noiseContext, String outputPath, boolean useCompression) {
 
 		// csv file
-		HashMap<Id<ReceiverPoint>,Double> id2xCoord = new HashMap<>();
-		HashMap<Id<ReceiverPoint>,Double> id2yCoord = new HashMap<>();
+		Map<Id<ReceiverPoint>,Double> id2xCoord = new HashMap<>();
+		Map<Id<ReceiverPoint>,Double> id2yCoord = new HashMap<>();
 		int c = 0;
 		for(Id<ReceiverPoint> id : noiseContext.getReceiverPoints().keySet()) {
 			c++;
@@ -64,12 +65,12 @@ public class NoiseWriter {
 			id2xCoord.put(id, noiseContext.getReceiverPoints().get(id).getCoord().getX());
 			id2yCoord.put(id, noiseContext.getReceiverPoints().get(id).getCoord().getY());
 		}
-		List<String> headers = new ArrayList<String>();
+		List<String> headers = new ArrayList<>();
 		headers.add("receiverPointId");
 		headers.add("xCoord");
 		headers.add("yCoord");
 		
-		List<HashMap<Id<ReceiverPoint>,Double>> values = new ArrayList<>();
+		List<Map<Id<ReceiverPoint>,Double>> values = new ArrayList<>();
 		values.add(id2xCoord);
 		values.add(id2yCoord);
 		
@@ -99,7 +100,7 @@ public class NoiseWriter {
 //		log.info("Writing receiver points to shapefile... Done. ");
 	}
 	
-	public static void write (String fileName , int columns , List<String> headers , List<HashMap<Id<ReceiverPoint>,Double>> values, boolean useCompression) {
+	public static void write (String fileName , int columns , List<String> headers , List<Map<Id<ReceiverPoint>,Double>> values, boolean useCompression) {
 		
 		File file = new File(fileName);
 		file.mkdirs();

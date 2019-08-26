@@ -50,7 +50,7 @@ public class NoiseOnlineControlerExample {
 	
 	private static final String configFile = "./contribs/noise/test/input/org/matsim/contrib/noise/config.xml";
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) {
 				
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -68,5 +68,4 @@ public class NoiseOnlineControlerExample {
 		ProcessNoiseImmissions processNoiseImmissions = new ProcessNoiseImmissions(workingDirectory, receiverPointsFile, noiseParameters.getReceiverPointGap());
 		processNoiseImmissions.run();	
 	}
-	
 }
