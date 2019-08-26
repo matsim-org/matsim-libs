@@ -24,7 +24,7 @@ import org.matsim.core.controler.AbstractModule;
 /**
 * @author ikaddoura
 */
-public class NoiseModule extends AbstractModule {
+public final class NoiseModule extends AbstractModule {
 
 	@Override
 	public void install() {

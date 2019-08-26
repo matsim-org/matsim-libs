@@ -33,7 +33,7 @@ import org.matsim.core.controler.AbstractModule;
 /**
 * @author ikaddoura
 */
-public class NoiseComputationModule extends AbstractModule {
+final class NoiseComputationModule extends AbstractModule {
 	private static final Logger log = Logger.getLogger(NoiseComputationModule.class);
 
 	@Inject

@@ -202,16 +202,11 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 			
 	private void checkGridParametersForConsistency() {
 		
-		List<String> consideredActivitiesForReceiverPointGridList = new ArrayList<String>();
-		List<String> consideredActivitiesForDamagesList = new ArrayList<String>();
+		List<String> consideredActivitiesForReceiverPointGridList = new ArrayList<>();
+		List<String> consideredActivitiesForDamagesList = new ArrayList<>();
 
-		for (int i = 0; i < consideredActivitiesForDamageCalculation.length; i++) {
-			consideredActivitiesForDamagesList.add(consideredActivitiesForDamageCalculation[i]);
-		}
-
-		for (int i = 0; i < this.consideredActivitiesForReceiverPointGrid.length; i++) {
-			consideredActivitiesForReceiverPointGridList.add(consideredActivitiesForReceiverPointGrid[i]);
-		}
+		Collections.addAll(consideredActivitiesForDamagesList, consideredActivitiesForDamageCalculation);
+		consideredActivitiesForReceiverPointGridList.addAll(Arrays.asList(consideredActivitiesForReceiverPointGrid));
 		
 		if (this.receiverPointGap == 0.) {
 			throw new RuntimeException("The receiver point gap is 0. Aborting...");
@@ -277,7 +272,7 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 			}
 		}
 		
-		if (this.tunnelLinkIdFile != null && this.tunnelLinkIdFile != "") {
+		if  (!"".equals(this.tunnelLinkIdFile)) {
 			
 			if (this.tunnelLinkIDs.size() > 0) {
 				log.warn("Loading the tunnel link IDs from a file. Deleting the existing tunnel link IDs that are added manually.");
