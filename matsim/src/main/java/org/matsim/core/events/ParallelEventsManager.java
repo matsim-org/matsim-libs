@@ -70,6 +70,8 @@ public final class ParallelEventsManager implements EventsManager {
 	
 	private boolean locked = false;
 
+	private int iteration = 0;
+
 	/*
 	 * Processed events are collected in an ArrayBlockingQueue. The distributor retrieves them and collects
 	 * them in arrays. If an array is full or the time step ends (in case syncOnTimeSteps is true) or
@@ -230,6 +232,7 @@ public final class ParallelEventsManager implements EventsManager {
 		 * events are created afterwards, e.g. money events by the road pricing contrib.
 		 */
 		this.parallelMode = true;
+		resetHandlers(iteration);
 	}
 		
 	/*
@@ -268,6 +271,7 @@ public final class ParallelEventsManager implements EventsManager {
 		}
 		
 		this.locked = false;
+		iteration += 1;
 	}
 
 	@Override

@@ -268,9 +268,8 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	 * Prepare the simulation and get all the settings from the configuration.
 	 */
 	/*package*/ void prepareSim() {
-		events.initProcessing();
-
 		createAgents();
+		events.initProcessing();
 		this.initSimTimer();
 		this.infoTime = Math.floor(this.simTimer.getSimStartTime()
 				/ INFO_PERIOD)

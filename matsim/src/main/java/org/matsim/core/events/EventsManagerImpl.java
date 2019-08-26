@@ -116,6 +116,7 @@ public final class EventsManagerImpl implements EventsManager {
 
 	private long counter = 0;
 	private long nextCounterMsg = 1;
+	private int iteration = 0;
 
 	private HandlerData findHandler(final Class<?> evklass) {
 		for (HandlerData handler : this.handlerData) {
@@ -184,7 +185,7 @@ public final class EventsManagerImpl implements EventsManager {
 
 	@Override
 	public void initProcessing() {
-		// nothing to do in this implementation
+		resetHandlers(iteration);
 	}
 
 	@Override
@@ -194,7 +195,7 @@ public final class EventsManagerImpl implements EventsManager {
 
 	@Override
 	public void finishProcessing() {
-		// nothing to do in this implementation
+		iteration += 1;
 	}
 
 	private void addHandlerInterfaces(final EventHandler handler, final Class<?> handlerClass) {

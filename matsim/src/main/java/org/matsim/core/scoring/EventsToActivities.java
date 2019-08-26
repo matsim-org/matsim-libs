@@ -57,7 +57,7 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
 	    void handleActivity(PersonExperiencedActivity activity);
 	}
 
-    private Map<Id<Person>, Activity> activities = new HashMap<>();
+    private Activity[] activities;
     private List<ActivityHandler> activityHandlers = new ArrayList<>();
 
     public EventsToActivities() {
@@ -76,7 +76,8 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
 
     @Override
     public void handleEvent(ActivityEndEvent event) {
-        Activity activity = activities.remove(event.getPersonId());
+        Activity activity = activities[event.getPersonId().hashCode()];
+        activities[event.getPersonId().hashCode()] = null;
         if (activity == null) {
             Activity firstActivity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
             firstActivity.setFacilityId(event.getFacilityId());
@@ -93,12 +94,12 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
         Activity activity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
         activity.setFacilityId(event.getFacilityId());
         activity.setStartTime(event.getTime());
-        activities.put(event.getPersonId(), activity);
+        activities[event.getPersonId().hashCode()] = activity;
     }
 
     @Override
     public void reset(int iteration) {
-        activities.clear();
+        activities = new Activity[Id.getNumberOfIds(Person.class)];
     }
 
     public void addActivityHandler(ActivityHandler activityHandler) {
@@ -106,9 +107,11 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
     }
 
     public void finish() {
-        for (Map.Entry<Id<Person>, Activity> entry : activities.entrySet()) {
-            for (ActivityHandler activityHandler : activityHandlers) {
-                activityHandler.handleActivity(new PersonExperiencedActivity(entry.getKey(), entry.getValue()));
+        for (int i = 0; i < activities.length; i++) {
+            if (activities[i] != null) {
+                for (ActivityHandler activityHandler : activityHandlers) {
+                    activityHandler.handleActivity(new PersonExperiencedActivity(Id.get(i, Person.class), activities[i]));
+                }
             }
         }
     }

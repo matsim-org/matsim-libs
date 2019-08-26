@@ -69,6 +69,7 @@ public final class ParallelEventsManagerImpl implements EventsManager {
 	private int numberOfAddedEventsHandler = 0;
 	private final AtomicBoolean hadException = new AtomicBoolean(false);
 	private final ExceptionHandler uncaughtExceptionHandler = new ExceptionHandler(hadException);
+	private int iteration;
 
 	private final static Logger log = Logger.getLogger(ParallelEventsManagerImpl.class);
 
@@ -204,6 +205,7 @@ public final class ParallelEventsManagerImpl implements EventsManager {
 		if (this.hadException.get()) {
 			throw new RuntimeException("Exception while processing events. Cannot guarantee that all events have been fully processed.");
 		}
+		iteration += 1;
 	}
 
 	// create event handler threads
@@ -220,6 +222,7 @@ public final class ParallelEventsManagerImpl implements EventsManager {
 		
 		// (re-)activate parallel mode while the mobsim is running
 		this.parallelMode = true;
+		resetHandlers(iteration);
 	}
 
 	/**

@@ -110,6 +110,7 @@ public final class SingleHandlerEventsManager implements EventsManager {
 	
 	private long counter = 0;
 	private long nextCounterMsg = 1;
+	private int iteration = 0;
 
 	private boolean isActive = true;
 	
@@ -236,7 +237,7 @@ public final class SingleHandlerEventsManager implements EventsManager {
 
 	@Override
 	public void initProcessing() {
-		// nothing to do in this implementation
+		resetHandlers(iteration);
 	}
 
 	@Override
@@ -246,7 +247,7 @@ public final class SingleHandlerEventsManager implements EventsManager {
 
 	@Override
 	public void finishProcessing() {
-		// nothing to do in this implementation
+		iteration += 1;
 	}
 
 	public EventHandler getEventHandler() {
