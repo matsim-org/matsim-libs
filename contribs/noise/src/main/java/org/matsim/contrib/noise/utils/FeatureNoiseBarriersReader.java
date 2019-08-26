@@ -69,7 +69,6 @@ public class FeatureNoiseBarriersReader {
 
             final Object geometry = feature.getAttribute("geometry");
             if(!(geometry instanceof  Polygon)) {
-                System.out.println("test1");
                 continue;
             }
             Polygon polygon = (Polygon) geometry;
@@ -82,7 +81,6 @@ public class FeatureNoiseBarriersReader {
             }
             transformedPolygon.apply(FILTER);
             if(!polygon.isValid()) {
-                System.out.println("test");
                 continue;
             }
             Id<NoiseBarrier> id = Id.create((String) feature.getAttribute("id"), NoiseBarrier.class);
@@ -113,6 +111,9 @@ public class FeatureNoiseBarriersReader {
         return height;
     }
 
+    /**
+     * GeoJson uses x and y the other way around
+     */
     private static class InvertCoordinateFilter implements CoordinateFilter {
         @Override
         public void filter(Coordinate coord) {
