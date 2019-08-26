@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.noise;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.noise.data.NoiseContext;
@@ -32,18 +33,11 @@ import org.matsim.core.controler.AbstractModule;
 /**
 * @author ikaddoura
 */
-
 public class NoiseComputationModule extends AbstractModule {
 	private static final Logger log = Logger.getLogger(NoiseComputationModule.class);
 
-	private final Scenario scenario;
-
-	public NoiseComputationModule(Scenario scenario) {
-		// yy passing "scenario" is maybe not such a problem, but in general one idea of the guice approach is to try to get
-		// away without passing arguments (and, in consequence, not use constructors).  kai, feb'18
-
-		this.scenario = scenario;
-	}
+	@Inject
+	private Scenario scenario;
 
 	@Override
 	public void install() {

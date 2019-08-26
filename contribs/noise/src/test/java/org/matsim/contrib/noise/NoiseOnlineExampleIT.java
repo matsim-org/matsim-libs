@@ -55,7 +55,7 @@ public class NoiseOnlineExampleIT {
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new NoiseModule(scenario));
+		controler.addOverridingModule(new NoiseModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
 		controler.run();

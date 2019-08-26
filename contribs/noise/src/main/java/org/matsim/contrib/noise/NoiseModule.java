@@ -19,25 +19,16 @@
 
 package org.matsim.contrib.noise;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.AbstractModule;
 
 /**
 * @author ikaddoura
 */
-
 public class NoiseModule extends AbstractModule {
-
-	private final Scenario scenario;
-
-	public NoiseModule(Scenario scenario) {
-		this.scenario = scenario;
-	}
 
 	@Override
 	public void install() {
-		
-		install(new NoiseComputationModule(scenario));
+		install(new NoiseComputationModule());
 		install(new NoiseDefaultCarTravelDisutilityModule());
 	}
 
