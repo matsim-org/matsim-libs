@@ -30,7 +30,7 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 * @author ikaddoura
 */
 
-public class NoiseDefaultCarTravelDisutilityModule extends AbstractModule {
+final class NoiseDefaultCarTravelDisutilityModule extends AbstractModule {
 	private static final Logger log = Logger.getLogger(NoiseDefaultCarTravelDisutilityModule.class);
 
 	@Override
@@ -42,7 +42,7 @@ public class NoiseDefaultCarTravelDisutilityModule extends AbstractModule {
 			
 			log.info("Replacing the default travel disutility for the transport mode 'car' by a travel distuility which accounts for noise tolls.");
 			
-			if (noiseParameters.isComputeAvgNoiseCostPerLinkAndTime() == false) {
+			if (!noiseParameters.isComputeAvgNoiseCostPerLinkAndTime()) {
 				log.warn("The travel disutility which accounts for noise tolls requires the computation of average noise cost per link and time bin."
 						+ "Setting the value 'computeAvgNoiseCostPerLinkAndTime' to 'true'...");
 				noiseParameters.setComputeAvgNoiseCostPerLinkAndTime(true);
