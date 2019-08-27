@@ -56,46 +56,43 @@ public class RoadPricingControlerIT {
 
 		// first run basecase
 		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil-extended"), "config.xml"));
-		config.controler().setLastIteration(0);
+
 		config.plans().setInputFile("plans1.xml");
+
+		config.controler().setLastIteration(0);
 		config.controler().setOutputDirectory(utils.getOutputDirectory() + "/basecase/");
 		config.controler().setWritePlansInterval(0);
-		final String tollLinksFile = IOUtils.newUrl( config.getContext() , "distanceToll.xml" ).getPath();
-
-		ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class ).setTollLinksFile(
-			  tollLinksFile );
+		config.controler().setCreateGraphs( false );
+		config.controler().setDumpDataAtEnd( false );
+		config.controler().setWriteEventsInterval( 0 );
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 
-//		RoadPricingUtils.loadRoadPricingScheme( scenario ) ;
+		double scoreBasecase;
+		{
+			Controler controler1 = new Controler( scenario );
+			controler1.run();
+			scoreBasecase = controler1.getScenario().getPopulation().getPersons().get( Id.create( "1" , Person.class ) ).getPlans().get( 0 ).getScore();
+		}
 
-		double scoreBasecase = 0. ;
-//		{
-//			Controler controler1 = new Controler( scenario );
-//			controler1.getConfig().controler().setCreateGraphs( false );
-//			controler1.getConfig().controler().setDumpDataAtEnd( false );
-//			controler1.getConfig().controler().setWriteEventsInterval( 0 );
-//			controler1.run();
-//			scoreBasecase = controler1.getScenario().getPopulation().getPersons().get( Id.create( "1" , Person.class ) ).getPlans().get(
-//				  0 ).getScore();
-//		}
-
-		double scoreTollcase = 0. ;
+		double scoreTollcase;
 		{
 			// now run toll case
 			config.controler().setOutputDirectory( utils.getOutputDirectory() + "/tollcase/" );
-			//        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
-			ConfigUtils.addOrGetModule( config , RoadPricingConfigGroup.GROUP_NAME , RoadPricingConfigGroup.class ).setTollLinksFile( tollLinksFile );
+			final RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule( config , RoadPricingConfigGroup.class );
+			rpConfig.setTollLinksFile( IOUtils.newUrl( config.getContext() , "distanceToll.xml" ).getPath() );
+			// ---
+			RoadPricingUtils.loadRoadPricingScheme( scenario ) ;
+			// ---
 			Controler controler2 = new Controler( scenario );
+
 			/* FIXME Check if the following is correct, jwj '19. What's the difference? */
 //		controler2.setModules(new RoadPricingModuleDefaults(RoadPricingUtils.getScheme(scenario)));
+			// "setModules" first removes all the MATSim default modules.  Which is not what we need here. kai, aug'19
+
 			controler2.addOverridingModule( new RoadPricingModule() );
-			controler2.getConfig().controler().setCreateGraphs( false );
-			controler2.getConfig().controler().setDumpDataAtEnd( false );
-			controler2.getConfig().controler().setWriteEventsInterval( 0 );
 			controler2.run();
-			scoreTollcase = controler2.getScenario().getPopulation().getPersons().get( Id.create( "1" , Person.class ) ).getPlans().get(
-				  0 ).getScore();
+			scoreTollcase = controler2.getScenario().getPopulation().getPersons().get( Id.create( "1" , Person.class ) ).getPlans().get( 0 ).getScore();
 		}
 		// there should be a score difference
 		Assert.assertEquals(3.0, scoreBasecase - scoreTollcase, MatsimTestUtils.EPSILON); // toll amount: 10000*0.00020 + 5000*0.00020
