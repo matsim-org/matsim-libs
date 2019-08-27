@@ -41,10 +41,8 @@ import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
@@ -155,11 +153,6 @@ public class DrtRoutingModule implements RoutingModule {
 		}
 
 		return result ;
-	}
-
-	// TODO: check whether necessary
-	public StageActivityTypes getStageActivityTypes() {
-		return drtStageActivityType;
 	}
 
 	/**
