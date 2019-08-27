@@ -56,11 +56,15 @@ import org.matsim.contrib.noise.handler.NoiseEquations;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -93,8 +97,17 @@ public class NoiseIT {
 		
 		String[] consideredActivities = {"home", "work"};
 		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivities);
-		
-		NoiseContext noiseContext = new NoiseContext(scenario);
+
+		com.google.inject.Injector injector = Injector.createInjector( scenario.getConfig() , new AbstractModule(){
+			@Override public void install(){
+				install( new NoiseModule() ) ;
+				install( new ScenarioByInstanceModule( scenario ) ) ;
+				install( new EventsManagerModule() ) ;
+			}
+		} );;
+
+//		NoiseContext noiseContext = new NoiseContext(scenario);
+		NoiseContext noiseContext = injector.getInstance( NoiseContext.class ) ;
 		
 		// test the grid of receiver points
 		Assert.assertEquals("wrong number of receiver points", 16, noiseContext.getReceiverPoints().size(), MatsimTestUtils.EPSILON);
@@ -187,7 +200,7 @@ public class NoiseIT {
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, runDirectory);
+		NoiseOfflineCalculationWithInjection noiseCalculation = new NoiseOfflineCalculationWithInjection(scenario, runDirectory);
 		noiseCalculation.run();	
 		
 		EventsManager events = EventsUtils.createEventsManager();
@@ -970,7 +983,7 @@ public class NoiseIT {
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(true);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, runDirectory);
+		NoiseOfflineCalculationWithInjection noiseCalculation = new NoiseOfflineCalculationWithInjection(scenario, runDirectory);
 		noiseCalculation.run();	
 							
 		// ############################################
@@ -1058,7 +1071,7 @@ public class NoiseIT {
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(true);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, runDirectory);
+		NoiseOfflineCalculationWithInjection noiseCalculation = new NoiseOfflineCalculationWithInjection(scenario, runDirectory);
 		noiseCalculation.run();		
 		
 		EventsManager events = EventsUtils.createEventsManager();
