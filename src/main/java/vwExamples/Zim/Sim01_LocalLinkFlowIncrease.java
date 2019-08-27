@@ -22,6 +22,8 @@ package vwExamples.Zim;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -68,7 +70,7 @@ public class Sim01_LocalLinkFlowIncrease {
 
 	public void run(boolean otfvis) {
 
-		String runId = "VW243_LocalLinkFlow_1.28_10pct";
+		String runId = "VW243_LocalLinkFlow_1.15_10pct";
 		String base = "D:\\Matsim\\Axer\\Hannover\\Zim\\";
 		String input = base + "input\\";
 		String ouput = base + "output\\"+runId;
@@ -81,7 +83,7 @@ public class Sim01_LocalLinkFlowIncrease {
 		// config.strategy().addStrategySettings(strategySettings);
 
 		config.controler().setOutputDirectory(ouput);
-		config.network().setInputFile(input + "network\\network_intersectionLinks_1.28_.xml.gz");
+		config.network().setInputFile(input + "network\\network_intersectionLinks_1.15_.xml.gz");
 		config.transit().setTransitScheduleFile(input + "transit\\transitschedule.xml");
 		config.transit().setVehiclesFile(input + "transit\\transitvehicles.xml");
 		config.controler().setLastIteration(2); // Number of simulation iterations
@@ -94,12 +96,29 @@ public class Sim01_LocalLinkFlowIncrease {
 		config.qsim().setStorageCapFactor(0.11);
 		config.controler().setRunId(runId);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+//		adjustPtNetworkCapacity(scenario.getNetwork(),config.qsim().getFlowCapFactor());
 
 		// Run Simulation
 		Controler controler = new Controler(scenario);
 		
 		controler.addOverridingModule(new SwissRailRaptorModule());
+		
+		adjustPtNetworkCapacity(controler.getScenario().getNetwork(), config.qsim().getFlowCapFactor());
+
+		
 		controler.run();
 	}
-
+	
+	private static void adjustPtNetworkCapacity(Network network, double flowCapacityFactor){
+		if (flowCapacityFactor<1.0){
+			for (Link l : network.getLinks().values()){
+				if (l.getAllowedModes().contains(TransportMode.pt)){
+					l.setCapacity(l.getCapacity()/flowCapacityFactor);
+				}
+			}
+		}
+	}
 }
+
+
+

@@ -33,7 +33,7 @@ public class assignHomeOfficeSubTour implements SubTourValidator {
 		String requiredChain = "home-work-home";
 				
 		if ((isInboundCommuterTour(subTour) || isOutboundCommuterTour(subTour) || isWithinCommuterTour(subTour) )
-		&& chain.equals(requiredChain)) {
+		&& (chain.equals(requiredChain))) {
 			return true;
 		}
 				

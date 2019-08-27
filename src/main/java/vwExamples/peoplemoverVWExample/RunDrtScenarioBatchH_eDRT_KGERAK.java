@@ -77,7 +77,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 	public static final double CHARGING_SPEED_FACTOR = 1.0;
 	public static final double BATTERYREPLACETIME = 180.0;
 
-	static boolean BatteryReplace = false;
+	static boolean BatteryReplace = true;
 
 	static int[] fleetRange = { 100 };
 	//	static int[] fleetRange = {100};
@@ -99,7 +99,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 	public static void run(int vehiclePerDepot, int iterationIdx) throws IOException {
 
 		// Enable or Disable rebalancing
-		String runId = "H5charger_1xRate_batteryRecharge_" + vehiclePerDepot + "_veh_idx" + iterationIdx;
+		String runId = "H3_1xRate_batteryReplace_0C_60kWh_" + vehiclePerDepot + "_veh_idx" + iterationIdx;
 		boolean rebalancing = true;
 
 		String inbase = "D:\\Matsim\\Axer\\Hannover\\K-GERAK\\";
@@ -177,11 +177,11 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 		vehiclesAndChargers.E_VEHICLE_FILE = inbase + "\\input\\fleets\\eFleet.xml.gz";
 		vehiclesAndChargers.drtTag = drtTag;
 		vehiclesAndChargers.SEATS = 6;
-		vehiclesAndChargers.MAX_START_CAPACITY_KWH = 78;
-		vehiclesAndChargers.MIN_START_CAPACITY_KWH = 78;
-		vehiclesAndChargers.BATTERY_CAPACITY_KWH = 78;
+		vehiclesAndChargers.MAX_START_CAPACITY_KWH = 60;
+		vehiclesAndChargers.MIN_START_CAPACITY_KWH = 60;
+		vehiclesAndChargers.BATTERY_CAPACITY_KWH = 60;
 		vehiclesAndChargers.CHARGINGPOWER_KW = (int)(100);
-		vehiclesAndChargers.CHAGERSPERDEPOT = 5;
+		vehiclesAndChargers.CHAGERSPERDEPOT = 3;
 		vehiclesAndChargers.run(depotsAndVehicles);
 
 		drt.setVehiclesFile(inbase + "\\input\\fleets\\fleet.xml.gz");

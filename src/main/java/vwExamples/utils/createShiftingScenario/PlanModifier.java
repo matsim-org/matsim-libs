@@ -159,7 +159,7 @@ public class PlanModifier {
 			bw.newLine();
 			bw.write(shiftingScenario.toursToBeAssigned + sep + shiftingScenario.assignedSubTours);
 			bw.newLine();
-			bw.write("TripModalSplit");
+			bw.write("Available trips (counted)");
 			bw.newLine();
 
 			for (Entry<String, MutableInt> entry : shiftingScenario.mode2TripCounter.entrySet()) {
@@ -171,7 +171,7 @@ public class PlanModifier {
 				bw.newLine();
 			}
 
-			bw.write("ShiftedTripsFromMode");
+			bw.write("Shifted trips (counted)");
 			bw.newLine();
 
 			for (Entry<String, MutableInt> entry : shiftingScenario.mode2ShiftedTripCounter.entrySet()) {
@@ -248,6 +248,7 @@ public class PlanModifier {
 	public void assign() {
 		String shit2Mode = "stayHome";
 		String shiftingType = shiftingScenario.type;
+		int tripCounter = 0;
 
 		// Part for subtourConversion
 		if (shiftingType.equals("subtourConversion")) {
@@ -271,13 +272,20 @@ public class PlanModifier {
 				// Select a random person from agentSet
 				Plan plan = scenario.getPopulation().getPersons().get(personId).getSelectedPlan();
 
-				boolean foundTour = false;
+				
+				// Loop over all subtours of this agent
+
 				for (Subtour subTour : TripStructureUtils.getSubtours(plan, blackList)) {
 
+					// Get subtour mode
 					String subtourMode = getSubtourMode(subTour, plan);
 
+					// Check if this subtour can be shifted to an other mode
 					// It is not allowed to shift an already shifted tour
 					if (assignTourValidator.isValidSubTour(subTour) && (subtourMode != shit2Mode)) {
+
+					
+						// System.out.println("Trip Size:" + subTour.getTrips().size());
 
 						for (Trip trip : subTour.getTrips()) {
 							for (Leg l : trip.getLegsOnly()) {
@@ -297,20 +305,21 @@ public class PlanModifier {
 
 							}
 
+							tripCounter++;
 						}
-						foundTour = true;
-
-					}
-					if (foundTour == true) {
+						
 						shiftingScenario.assignedSubTours++;
+						
 					}
-
-					if (foundTour == false) {
-						agentCandidateList.remove(randomAgentCandidateIdx);
-
-					}
+	
 
 				}
+				// If no tour for this agent can be found, this agent could be deleted from
+				// agentCandidateList
+//				if (foundTour == false) {
+//					agentCandidateList.remove(randomAgentCandidateIdx);
+//
+//				}
 
 			}
 
@@ -324,6 +333,7 @@ public class PlanModifier {
 		new PopulationWriter(scenario.getPopulation(), null).write(modPlansFile);
 		// modifiedPopulationWriter.startStreaming(modPlansFile);
 		// modifiedPopulationWriter.closeStreaming();
+//		System.out.println(tripCounter);
 
 	}
 
@@ -333,7 +343,7 @@ public class PlanModifier {
 		String subtourMode = null;
 		List<Trip> trips = subTour.getTrips();
 
-		MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
+		MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImplFallback();
 
 		for (TripStructureUtils.Trip trip : trips) {
 			final List<PlanElement> fullTrip = plan.getPlanElements().subList(

@@ -22,6 +22,8 @@ package vwExamples.Zim;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -111,12 +113,23 @@ public class Sim03_HomeOffice {
 		config.qsim().setStorageCapFactor(0.11);
 		config.controler().setRunId(runId);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+		adjustPtNetworkCapacity(scenario.getNetwork(),config.qsim().getFlowCapFactor());
 
 		// Run Simulation
 		Controler controler = new Controler(scenario);
 		
 		controler.addOverridingModule(new SwissRailRaptorModule());
 		controler.run();
+	}
+	
+	private static void adjustPtNetworkCapacity(Network network, double flowCapacityFactor){
+		if (flowCapacityFactor<1.0){
+			for (Link l : network.getLinks().values()){
+				if (l.getAllowedModes().contains(TransportMode.pt)){
+					l.setCapacity(l.getCapacity()/flowCapacityFactor);
+				}
+			}
+		}
 	}
 
 }

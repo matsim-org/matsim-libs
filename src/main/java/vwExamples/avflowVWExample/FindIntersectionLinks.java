@@ -48,9 +48,9 @@ public class FindIntersectionLinks {
 		new MatsimNetworkReader(network).readFile(networkFile);
 		new MatsimNetworkReader(networkIntersectionLinks).readFile(networkFile);
 		getTrafficLightLinksFast(network, Coords);
-		adjustLinkCapacity(1.28);
+		adjustLinkCapacity(1.15);
 		new NetworkWriter(networkIntersectionLinks)
-				.write("C:\\Users\\VWBIDGN\\Desktop\\network_intersectionLinks_1.28_.xml.gz");
+				.write("D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\network\\network_intersectionLinks_1.15_.xml.gz");
 	}
 
 	static void adjustLinkCapacity(double flowIncreaseFactor) {

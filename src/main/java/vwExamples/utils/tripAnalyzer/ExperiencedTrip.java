@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import java.util.*;
@@ -58,6 +59,7 @@ public class ExperiencedTrip {
 	private Double startOfParking = null;
 	private Double endOfParking = null;
 	private String beeline;
+	private Double totalInVehMilage;
 	// Coords unavailable in events
 
 	/**
@@ -94,6 +96,16 @@ public class ExperiencedTrip {
 		this.tripClass = null;
 
 		this.beeline = null;
+	}
+
+	void setTotalInVehicleMilage(Double milage) {
+		this.totalInVehMilage = milage;
+
+	}
+	
+	double getTotalInVehicleMilage() {
+		return this.totalInVehMilage;
+
 	}
 
 	private void findTransitStopsVisited() {
@@ -252,58 +264,56 @@ public class ExperiencedTrip {
 	}
 
 	String getMainMode() {
-		Set<String> acceptedMainModes = new HashSet<>(Arrays.asList("car", "pt", "drt", "walk", "ride", "bike","stayHome"));
+		Set<String> acceptedMainModes = new HashSet<>(
+				Arrays.asList("car", "pt", "drt", "walk", "ride", "bike", "stayHome"));
 
 		Set<String> seenModesForLegs = new HashSet<String>();
 		for (ExperiencedLeg leg : this.legs) {
 			String legMode = leg.getMode();
 
-//			if (acceptedMainModes.contains(legMode)) {
-//				return legMode;
-//			}
-//			else if  (legMode.equals("transit_walk")) {
-//				return "walk";
-//			}
-			
+			// if (acceptedMainModes.contains(legMode)) {
+			// return legMode;
+			// }
+			// else if (legMode.equals("transit_walk")) {
+			// return "walk";
+			// }
+
 			seenModesForLegs.add(legMode);
 
 		}
-		
-		//There is only one used mode
-		if (seenModesForLegs.size()==1)
-		{
+
+		// There is only one used mode
+		if (seenModesForLegs.size() == 1) {
 			String mode = seenModesForLegs.iterator().next();
 			return mode;
-			
+
 		}
-		
-		if (seenModesForLegs.size()>1)
-		{
-			Set<String> filteredPersons = acceptedMainModes.stream().flatMap(n -> seenModesForLegs.stream().filter(p -> n.equals(p))).collect(Collectors.toCollection(LinkedHashSet::new));
+
+		if (seenModesForLegs.size() > 1) {
+			Set<String> filteredPersons = acceptedMainModes.stream()
+					.flatMap(n -> seenModesForLegs.stream().filter(p -> n.equals(p)))
+					.collect(Collectors.toCollection(LinkedHashSet::new));
 			String mode = filteredPersons.iterator().next();
-			
-			if(acceptedMainModes.contains(mode))
-			{
+
+			if (acceptedMainModes.contains(mode)) {
 				return mode;
 			}
-			
+
 			else {
 				return "unknown";
 			}
-			
+
 		}
-		
 
 		return "unknown";
 
 	}
-	public void setBeeline(Geometry beeline)
-	{
-		this.beeline=beeline.toString();
+
+	public void setBeeline(Geometry beeline) {
+		this.beeline = beeline.toString();
 	}
-	
-	public String getBeeline()
-	{
+
+	public String getBeeline() {
 		return this.beeline;
 	}
 }
