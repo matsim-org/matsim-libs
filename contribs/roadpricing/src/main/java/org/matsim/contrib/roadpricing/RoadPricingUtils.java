@@ -83,4 +83,13 @@ public class RoadPricingUtils {
 		new RoadPricingReaderXMLv1( scheme ).readFile( rpConfig.getTollLinksFile() );
 		return scheme;
 	}
+
+	static void checkIfRoadPricingSchemeExists( Scenario sc ) {
+		String msg = "RoadPricingScheme is null or empty.  You need to register it as ScenarioElement before you instantiate Controler.  Look at the " +
+					   "examples ...\n";
+		RoadPricingSchemeImpl scheme = (RoadPricingSchemeImpl) getScheme( sc );
+		if ( scheme==null || scheme.getType()==null ) {
+			throw new RuntimeException( msg ) ;
+		}
+	}
 }

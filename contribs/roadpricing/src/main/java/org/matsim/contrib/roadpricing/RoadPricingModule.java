@@ -28,7 +28,7 @@ public final class RoadPricingModule extends AbstractModule {
 //		} else {
 //			throw new RuntimeException("no road pricing scheme loaded when controler is started; aborting") ;
 //		bind(RoadPricingScheme.class).toProvider( RoadPricingModuleDefaults.RoadPricingSchemeProvider.class ).in( Singleton.class ) ;
-		bind(RoadPricingScheme.class).toProvider( RoadPricingModuleDefaults.RoadPricingSchemeProvider.class ).in( Singleton.class );
+//		bind(RoadPricingScheme.class).toProvider( RoadPricingModuleDefaults.RoadPricingSchemeProvider.class ).in( Singleton.class );
 //		}
 		// also add RoadPricingScheme as ScenarioElement.  yyyy TODO might try to get rid of this; binding it is safer
 //		bind(RoadPricingInitializer.class).asEagerSingleton();
@@ -42,10 +42,10 @@ public final class RoadPricingModule extends AbstractModule {
 
 		// specific re-routing strategy for area toll:
 		// yyyy TODO could probably combine them somewhat
-//		bind(PlansCalcRouteWithTollOrNot.class);
-//		addPlanStrategyBinding("ReRouteAreaToll").toProvider(ReRouteAreaToll.class);
-//		addTravelDisutilityFactoryBinding("car_with_payed_area_toll").toInstance(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, getConfig().planCalcScore()));
-//		addRoutingModuleBinding("car_with_payed_area_toll").toProvider(new RoadPricingNetworkRouting());
+		bind(PlansCalcRouteWithTollOrNot.class);
+		addPlanStrategyBinding("ReRouteAreaToll").toProvider(ReRouteAreaToll.class);
+		addTravelDisutilityFactoryBinding("car_with_payed_area_toll").toInstance(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, getConfig().planCalcScore()));
+		addRoutingModuleBinding("car_with_payed_area_toll").toProvider(new RoadPricingNetworkRouting());
 
 		// yyyy TODO It might be possible that the area stuff is adequately resolved by the randomizing approach.  Would need to try
 		// that out.  kai, sep'16

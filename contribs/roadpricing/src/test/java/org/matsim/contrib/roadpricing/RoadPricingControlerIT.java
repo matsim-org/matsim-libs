@@ -82,7 +82,7 @@ public class RoadPricingControlerIT {
 			final RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule( config , RoadPricingConfigGroup.class );
 			rpConfig.setTollLinksFile( IOUtils.newUrl( config.getContext() , "distanceToll.xml" ).getPath() );
 			// ---
-//			RoadPricingUtils.loadRoadPricingScheme( scenario ) ;
+			RoadPricingUtils.loadRoadPricingScheme( scenario ) ;
 			// ---
 			Controler controler2 = new Controler( scenario );
 

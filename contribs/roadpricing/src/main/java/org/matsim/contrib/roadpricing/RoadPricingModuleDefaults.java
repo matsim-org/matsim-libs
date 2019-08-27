@@ -118,13 +118,12 @@ final class RoadPricingModuleDefaults extends AbstractModule {
 
 	static class TravelDisutilityIncludingTollFactoryProvider implements Provider<TravelDisutilityFactory> {
 
-		private final RoadPricingScheme scheme;
 		private final Config config;
 		private final Scenario scenario;
 
 		@Inject
-		TravelDisutilityIncludingTollFactoryProvider( RoadPricingScheme scheme, Config config, Scenario scenario ) {
-			this.scheme = scheme;
+		TravelDisutilityIncludingTollFactoryProvider( Config config, Scenario scenario ) {
+			RoadPricingUtils.checkIfRoadPricingSchemeExists( scenario );
 			this.config = config;
 			this.scenario = scenario;
 		}
@@ -132,6 +131,7 @@ final class RoadPricingModuleDefaults extends AbstractModule {
 		@Override
 		public TravelDisutilityFactory get() {
 			final TravelDisutilityFactory originalTravelDisutilityFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
+			RoadPricingScheme scheme = RoadPricingUtils.getScheme( scenario );
 			Gbl.assertNotNull(scheme);
 			RoadPricingTravelDisutilityFactory travelDisutilityFactory = new RoadPricingTravelDisutilityFactory(
 				  originalTravelDisutilityFactory, scheme, config.planCalcScore().getMarginalUtilityOfMoney()

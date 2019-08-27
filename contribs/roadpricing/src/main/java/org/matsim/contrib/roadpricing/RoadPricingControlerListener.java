@@ -58,14 +58,18 @@ class RoadPricingControlerListener implements StartupListener, IterationEndsList
 
 	final static private Logger log = Logger.getLogger(RoadPricingControlerListener.class);
 
-	private RoadPricingScheme scheme;
+//	private RoadPricingScheme scheme;
 	private final RoadPricingTollCalculator calcPaidToll;
 	private final CalcAverageTolledTripLength cattl;
+	private final Scenario scenario;
 	private OutputDirectoryHierarchy controlerIO;
 
 	@Inject
-	RoadPricingControlerListener(Scenario scenario, OutputDirectoryHierarchy controlerIO, EventsManager events, RoadPricingScheme scheme ) {
-		this.scheme = scheme;
+	RoadPricingControlerListener(Scenario scenario, OutputDirectoryHierarchy controlerIO, EventsManager events ) {
+		this.scenario = scenario;
+		RoadPricingUtils.checkIfRoadPricingSchemeExists( scenario );
+
+		//		this.scheme = scheme;
 //		scheme = (RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
 //		if (scheme == null || scheme.getType() == null) {
 //			RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), RoadPricingConfigGroup.class);
@@ -96,7 +100,8 @@ class RoadPricingControlerListener implements StartupListener, IterationEndsList
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		String filename = this.controlerIO.getOutputFilename("output_toll.xml.gz");
-		new RoadPricingWriterXMLv1(this.scheme).writeFile(filename);
+		RoadPricingScheme scheme = RoadPricingUtils.getScheme( scenario );;
+		new RoadPricingWriterXMLv1(scheme).writeFile(filename);
 	}
 
 }
