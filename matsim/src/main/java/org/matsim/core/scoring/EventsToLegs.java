@@ -170,7 +170,10 @@ public final class EventsToLegs implements PersonDepartureEventHandler, PersonAr
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
         vehicle2passengers.get(event.getVehicleId())
-                .forEach(p -> experiencedRoutes.get(p).add(event.getLinkId()));
+				.forEach(p -> experiencedRoutes.computeIfPresent(p, (personId, ids) -> {
+					ids.add(event.getLinkId());
+					return ids;
+				}));
 
     }
 
