@@ -120,6 +120,8 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 
 	private List<AbstractQSimModule> overridingQSimModules = new LinkedList<>();
 
+	private List<AbstractModule> modulesToAdd = new LinkedList<>() ;
+
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
@@ -231,9 +233,20 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 					  // should not be necessary: created in the controler
 					  //install(new ScenarioByInstanceModule(scenario));
 				  }
-			  }
-												  );
-		this.injector = Injector.createInjector( config, AbstractModule.override( standardModules, overrides ) );
+			  }) ;
+
+		AbstractModule modulesThatShouldNotOverrideEachOther = new AbstractModule(){
+			@Override public void install(){
+				for( AbstractModule module : modulesToAdd ){
+					install( module );
+				}
+			}
+		};;
+
+		Set<AbstractModule> combinedStandardModule = Collections.singleton(
+			  AbstractModule.override( standardModules , modulesThatShouldNotOverrideEachOther ) );;
+
+		this.injector = Injector.createInjector( config, AbstractModule.override( combinedStandardModule, overrides ) );
 		ControlerI controler = injector.getInstance(ControlerI.class);
 		controler.run();
 	}
@@ -461,6 +474,11 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 			throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
 		}
 		this.overrides = AbstractModule.override(Collections.singletonList(this.overrides), abstractModule);
+		return this ;
+	}
+
+	public final Controler addModule( AbstractModule abstractModule ) {
+		this.modulesToAdd.add( abstractModule ) ;
 		return this ;
 	}
 
