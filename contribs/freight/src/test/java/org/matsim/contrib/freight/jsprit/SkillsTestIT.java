@@ -44,26 +44,29 @@ public class SkillsTestIT {
 	private final Id<Link> carrierLocation = Id.createLinkId("i(1,0)");
 
 	@Test
-	public void testJsprit() {
+	public void testJspritWithDifferentSkillsRequired() {
 		/* First test with different skills. */
-		Scenario scenarioWithDifferentSkillsRequired = setupTestScenario();
-		addShipmentsRequiringDifferentSkills(scenarioWithDifferentSkillsRequired);
+		Scenario scenario = setupTestScenario();
+		addShipmentsRequiringDifferentSkills(scenario);
 		VehicleRoutingProblemSolution solutionWithDifferentSkills = null;
 		try {
-			solutionWithDifferentSkills = generateCarrierPlans(scenarioWithDifferentSkillsRequired);
+			solutionWithDifferentSkills = generateCarrierPlans(scenario);
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail("Should run integration test without exception.");
 		}
 		Assert.assertEquals("Wrong number of vehicles.", 2L, solutionWithDifferentSkills.getRoutes().size());
 		Assert.assertEquals("Wrong carrier score.", 2085.7971014492755, solutionWithDifferentSkills.getCost(), MatsimTestUtils.EPSILON);
+	}
 
+	@Test
+	public void testJspritWithSameSkillsRequired(){
 		/* Test with same skills. */
-		Scenario scenarioWithSameSkillsRequired = setupTestScenario();
-		addShipmentsRequiringSameSkills(scenarioWithSameSkillsRequired);
+		Scenario scenario = setupTestScenario();
+		addShipmentsRequiringSameSkills(scenario);
 		VehicleRoutingProblemSolution solutionWithSameSkills = null;
 		try {
-			solutionWithSameSkills = generateCarrierPlans(scenarioWithSameSkillsRequired);
+			solutionWithSameSkills = generateCarrierPlans(scenario);
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail("Should run integration test without exception.");
@@ -91,6 +94,7 @@ public class SkillsTestIT {
 		carrier.setSelectedPlan(newPlan);
 		SolutionPrinter.print(problem, solution, SolutionPrinter.Print.VERBOSE);
 
+		new CarrierPlanXmlWriterV3(FreightUtils.getCarriers(scenario)).write(utils.getOutputDirectory() + "carriers.xml");
 		return solution;
 	}
 
