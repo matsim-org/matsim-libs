@@ -69,28 +69,34 @@ public class RoadPricingControlerIT {
 
 //		RoadPricingUtils.loadRoadPricingScheme( scenario ) ;
 
-		Controler controler1 = new Controler(scenario);
-		controler1.getConfig().controler().setCreateGraphs(false);
-		controler1.getConfig().controler().setDumpDataAtEnd(false);
-		controler1.getConfig().controler().setWriteEventsInterval(0);
-		controler1.run();
-		double scoreBasecase = controler1.getScenario().getPopulation().getPersons().get(Id.create("1", Person.class)).getPlans().get(0).getScore();
+		double scoreBasecase = 0. ;
+//		{
+//			Controler controler1 = new Controler( scenario );
+//			controler1.getConfig().controler().setCreateGraphs( false );
+//			controler1.getConfig().controler().setDumpDataAtEnd( false );
+//			controler1.getConfig().controler().setWriteEventsInterval( 0 );
+//			controler1.run();
+//			scoreBasecase = controler1.getScenario().getPopulation().getPersons().get( Id.create( "1" , Person.class ) ).getPlans().get(
+//				  0 ).getScore();
+//		}
 
-
-		// now run toll case
-		config.controler().setOutputDirectory(utils.getOutputDirectory() + "/tollcase/");
-		//        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
-		ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(tollLinksFile);
-		Controler controler2 = new Controler(scenario);
-		/* FIXME Check if the following is correct, jwj '19. What's the difference? */
+		double scoreTollcase = 0. ;
+		{
+			// now run toll case
+			config.controler().setOutputDirectory( utils.getOutputDirectory() + "/tollcase/" );
+			//        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
+			ConfigUtils.addOrGetModule( config , RoadPricingConfigGroup.GROUP_NAME , RoadPricingConfigGroup.class ).setTollLinksFile( tollLinksFile );
+			Controler controler2 = new Controler( scenario );
+			/* FIXME Check if the following is correct, jwj '19. What's the difference? */
 //		controler2.setModules(new RoadPricingModuleDefaults(RoadPricingUtils.getScheme(scenario)));
-		controler2.addOverridingModule( new RoadPricingModule() );
-		controler2.getConfig().controler().setCreateGraphs(false);
-		controler2.getConfig().controler().setDumpDataAtEnd(false);
-		controler2.getConfig().controler().setWriteEventsInterval(0);
-		controler2.run();
-		double scoreTollcase = controler2.getScenario().getPopulation().getPersons().get(Id.create("1", Person.class)).getPlans().get(0).getScore();
-		
+			controler2.addOverridingModule( new RoadPricingModule() );
+			controler2.getConfig().controler().setCreateGraphs( false );
+			controler2.getConfig().controler().setDumpDataAtEnd( false );
+			controler2.getConfig().controler().setWriteEventsInterval( 0 );
+			controler2.run();
+			scoreTollcase = controler2.getScenario().getPopulation().getPersons().get( Id.create( "1" , Person.class ) ).getPlans().get(
+				  0 ).getScore();
+		}
 		// there should be a score difference
 		Assert.assertEquals(3.0, scoreBasecase - scoreTollcase, MatsimTestUtils.EPSILON); // toll amount: 10000*0.00020 + 5000*0.00020
 	}

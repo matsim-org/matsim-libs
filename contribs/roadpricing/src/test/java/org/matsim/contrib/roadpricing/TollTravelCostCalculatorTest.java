@@ -82,7 +82,7 @@ public class TollTravelCostCalculatorTest {
         final TravelDisutilityFactory defaultDisutilityFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
         
 		RoadPricingTravelDisutilityFactory travelDisutilityFactory = new RoadPricingTravelDisutilityFactory(
-				defaultDisutilityFactory, margUtlOfMoney );
+				defaultDisutilityFactory, scheme, margUtlOfMoney );
 //        travelDisutilityFactory.setSigma( 0. ) ;
 		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(timeCalculator ) ;
 		
@@ -126,7 +126,8 @@ public class TollTravelCostCalculatorTest {
 		// yy note: this returns a combined TravelTime and TravelDisutility object.  The TravelDisutility object is used in the next three lines to be wrapped, 
 		// and then never again.  Would be nice to be able to get them separately ...  kai, oct'13
 		
-		TravelDisutility costCalc = new TravelDisutilityIncludingToll((TravelDisutility)timeCalc, config); // we use freespeedTravelCosts as base costs
+		TravelDisutility costCalc = new TravelDisutilityIncludingToll((TravelDisutility)timeCalc, toll, config); // we use freespeedTravelCosts as base
+		// costs
 
 		AStarLandmarksFactory aStarLandmarksFactory = new AStarLandmarksFactory();
 
@@ -208,7 +209,7 @@ public class TollTravelCostCalculatorTest {
 		RoadPricingTestUtils.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
 		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
-		TravelDisutility costCalc = new TravelDisutilityIncludingToll(timeCostCalc, config); // we use freespeedTravelCosts as base costs
+		TravelDisutility costCalc = new TravelDisutilityIncludingToll(timeCostCalc, toll, config); // we use freespeedTravelCosts as base costs
 
 		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory();
 
@@ -303,7 +304,7 @@ public class TollTravelCostCalculatorTest {
 		RoadPricingTestUtils.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
 		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
-		TravelDisutility costCalc = new TravelDisutilityIncludingToll(timeCostCalc, config); // we use freespeedTravelCosts as base costs
+		TravelDisutility costCalc = new TravelDisutilityIncludingToll(timeCostCalc, toll, config); // we use freespeedTravelCosts as base costs
 
 		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory();
 

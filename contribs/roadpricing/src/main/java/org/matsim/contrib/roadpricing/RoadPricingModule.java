@@ -27,7 +27,8 @@ public final class RoadPricingModule extends AbstractModule {
 //			bind(RoadPricingScheme.class).toInstance(scheme);
 //		} else {
 //			throw new RuntimeException("no road pricing scheme loaded when controler is started; aborting") ;
-			bind(RoadPricingScheme.class).toProvider( RoadPricingModuleDefaults.RoadPricingSchemeProvider.class ).in( Singleton.class ) ;
+//		bind(RoadPricingScheme.class).toProvider( RoadPricingModuleDefaults.RoadPricingSchemeProvider.class ).in( Singleton.class ) ;
+		bind(RoadPricingScheme.class).toProvider( RoadPricingModuleDefaults.RoadPricingSchemeProvider.class ).asEagerSingleton();
 //		}
 		// also add RoadPricingScheme as ScenarioElement.  yyyy TODO might try to get rid of this; binding it is safer
 //		bind(RoadPricingInitializer.class).asEagerSingleton();

@@ -25,6 +25,7 @@ package org.matsim.contrib.roadpricing;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.ControlerDefaults;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -33,27 +34,27 @@ import org.matsim.core.router.util.TravelTime;
 import javax.inject.Inject;
 
 final class RoadPricingTravelDisutilityFactory implements TravelDisutilityFactory {
-//	private final RoadPricingScheme scheme;
+	private final RoadPricingScheme scheme;
 	private final double marginalUtilityOfMoney ;
 	private TravelDisutilityFactory previousTravelDisutilityFactory;
 	private double sigma = 3. ;
 
-	@Inject
-	RoadPricingTravelDisutilityFactory(Scenario scenario) {
-//	RoadPricingTravelDisutilityFactory(Scenario scenario, RoadPricingScheme roadPricingScheme) {
-		this(ControlerDefaults.createDefaultTravelDisutilityFactory(scenario), scenario.getConfig());
-	}
+//	RoadPricingTravelDisutilityFactory(Scenario scenario) {
+////	RoadPricingTravelDisutilityFactory(Scenario scenario, RoadPricingScheme roadPricingScheme) {
+//		this(ControlerDefaults.createDefaultTravelDisutilityFactory(scenario), scenario.getConfig());
+//	}
 
-//	RoadPricingTravelDisutilityFactory(TravelDisutilityFactory previousTravelDisutilityFactory, RoadPricingScheme scheme, double marginalUtilityOfMoney) {
-	RoadPricingTravelDisutilityFactory(TravelDisutilityFactory previousTravelDisutilityFactory, double marginalUtilityOfMoney) {
-//		this.scheme = scheme ;
+	RoadPricingTravelDisutilityFactory(TravelDisutilityFactory previousTravelDisutilityFactory, RoadPricingScheme scheme, double marginalUtilityOfMoney) {
+//	RoadPricingTravelDisutilityFactory(TravelDisutilityFactory previousTravelDisutilityFactory, double marginalUtilityOfMoney) {
+		this.scheme = scheme ;
+		Gbl.assertNotNull( this.scheme );
 		this.marginalUtilityOfMoney = marginalUtilityOfMoney ;
 		this.previousTravelDisutilityFactory = previousTravelDisutilityFactory ;
 	}
 
-//	RoadPricingTravelDisutilityFactory(TravelDisutilityFactory previousTravelDisutilityFactory, RoadPricingScheme scheme, Config config) {
-	RoadPricingTravelDisutilityFactory(TravelDisutilityFactory previousTravelDisutilityFactory, Config config) {
-		this( previousTravelDisutilityFactory, config.planCalcScore().getMarginalUtilityOfMoney() ) ;
+	RoadPricingTravelDisutilityFactory(TravelDisutilityFactory previousTravelDisutilityFactory, RoadPricingScheme scheme, Config config) {
+//	RoadPricingTravelDisutilityFactory(TravelDisutilityFactory previousTravelDisutilityFactory, Config config) {
+		this( previousTravelDisutilityFactory, scheme, config.planCalcScore().getMarginalUtilityOfMoney() ) ;
 	}
 
 	@Override
@@ -67,7 +68,7 @@ final class RoadPricingTravelDisutilityFactory implements TravelDisutilityFactor
 		}
 		return new TravelDisutilityIncludingToll(
 				previousTravelDisutilityFactory.createTravelDisutility(timeCalculator),
-//				this.scheme,
+				this.scheme,
 				this.marginalUtilityOfMoney,
 				this.sigma
 		);

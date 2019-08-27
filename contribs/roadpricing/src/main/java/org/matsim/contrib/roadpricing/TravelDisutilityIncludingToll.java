@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.vehicles.Vehicle;
 
@@ -51,19 +52,22 @@ class TravelDisutilityIncludingToll implements TravelDisutility {
 
 	private static int utlOfMoneyWrnCnt = 0 ;
 
-//	TravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, final RoadPricingScheme scheme, Config config)
-	TravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, Config config)
+	TravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, final RoadPricingScheme scheme, Config config)
+////	TravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, Config config)
 	{
-		this( normalTravelDisutility, config.planCalcScore().getMarginalUtilityOfMoney(), 0. ) ;
+		this( normalTravelDisutility, scheme, config.planCalcScore().getMarginalUtilityOfMoney(), 0. ) ;
 		// this is using sigma=0 for backwards compatibility (not sure how often this is needed)
 	}
 
-	TravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, //final RoadPricingScheme scheme,
+	TravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, final RoadPricingScheme scheme,
 			double marginalUtilityOfMoney, double sigma ) {
 
 //		this.scheme = RoadPricingUtils.getScheme(scenario);
 
-//		this.scheme = scheme;
+		this.scheme = scheme;
+
+		Gbl.assertNotNull(this.scheme);
+
 		this.normalTravelDisutility = normalTravelDisutility;
 		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType())) {
 			this.tollCostHandler = new DistanceTollCostBehaviour();

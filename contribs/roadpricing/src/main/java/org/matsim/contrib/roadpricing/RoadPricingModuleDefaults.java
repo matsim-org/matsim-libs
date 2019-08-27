@@ -29,6 +29,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.controler.ControlerDefaultsModule;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
 import javax.inject.Inject;
@@ -114,20 +115,22 @@ final class RoadPricingModuleDefaults extends AbstractModule {
 	static class TravelDisutilityIncludingTollFactoryProvider implements Provider<TravelDisutilityFactory> {
 
 		private final Scenario scenario;
-		private final RoadPricingScheme scheme;
+//		private final RoadPricingScheme scheme;
 
 		@Inject
 		TravelDisutilityIncludingTollFactoryProvider(Scenario scenario) {
 			this.scenario = scenario;
-			this.scheme = RoadPricingUtils.getScheme( scenario ) ;
+//			this.scheme = RoadPricingUtils.getScheme( scenario ) ;
 		}
 
 		@Override
 		public TravelDisutilityFactory get() {
 			final Config config = scenario.getConfig();
 			final TravelDisutilityFactory originalTravelDisutilityFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
+			RoadPricingScheme scheme = (RoadPricingScheme) scenario.getScenarioElement( RoadPricingScheme.ELEMENT_NAME );
+			Gbl.assertNotNull(scheme);
 			RoadPricingTravelDisutilityFactory travelDisutilityFactory = new RoadPricingTravelDisutilityFactory(
-					originalTravelDisutilityFactory, config.planCalcScore().getMarginalUtilityOfMoney()
+					originalTravelDisutilityFactory, scheme, config.planCalcScore().getMarginalUtilityOfMoney()
 			);
 			travelDisutilityFactory.setSigma(config.plansCalcRoute().getRoutingRandomness());
 			return travelDisutilityFactory;
