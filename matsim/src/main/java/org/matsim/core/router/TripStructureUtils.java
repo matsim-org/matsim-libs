@@ -93,7 +93,7 @@ public class TripStructureUtils {
 				activities.add(act);
 				break;
 			case ExcludeStageActivities:
-				if (!(new StageActivityTypesImpl().isStageActivity(act.getType()))) {
+				if (!(StageActivityTypeIdentifier.isStageActivity(act.getType()))) {
 					activities.add(act);
 				}
 				break;
@@ -606,10 +606,14 @@ public class TripStructureUtils {
 			return "Subtour: "+trips.toString();
 		}
 	}
+	public static Trip findTripAtPlanElement( PlanElement currentPlanElement, Plan plan) {
+		return findTripAtPlanElement(currentPlanElement, plan, EmptyStageActivityTypes.INSTANCE);
+	}
 	@Deprecated // use findTripAtPlanElement(...) instead.
 	public static Trip findCurrentTrip( PlanElement pe, Plan plan, StageActivityTypes sat ) {
 		return findTripAtPlanElement( pe, plan, sat ) ;
 	}
+	@Deprecated
 	public static Trip findTripAtPlanElement( PlanElement currentPlanElement, Plan plan, StageActivityTypes stageActivities ) {
 		if ( currentPlanElement instanceof Activity ) {
 			Gbl.assertIf( stageActivities.isStageActivity( ((Activity)currentPlanElement).getType() ) ) ;
@@ -623,8 +627,9 @@ public class TripStructureUtils {
 		}
 		return null ;
 	}
-	public static Trip findTripEndingAtActivity(Activity activity, Plan plan, StageActivityTypes stageActivities ) {
-		Gbl.assertIf( ! stageActivities.isStageActivity( activity.getType()) ) ;
+	
+	public static Trip findTripEndingAtActivity(Activity activity, Plan plan) {
+		Gbl.assertIf( ! StageActivityTypeIdentifier.isStageActivity( activity.getType()) ) ;
 		List<Trip> trips = getTrips(plan.getPlanElements()) ;
 		for ( Trip trip : trips ) {
 			if ( activity.equals( trip.getDestinationActivity() ) ) {
@@ -634,9 +639,8 @@ public class TripStructureUtils {
 		return null ;
 	}
 	
-	// TODO: check
-	public static Trip findTripStartingAtActivity( final Activity activity, final Plan plan, StageActivityTypes stageActivities ) {
-		Gbl.assertIf( ! stageActivities.isStageActivity( activity.getType()) ) ;
+	public static Trip findTripStartingAtActivity( final Activity activity, final Plan plan ) {
+		Gbl.assertIf( ! StageActivityTypeIdentifier.isStageActivity( activity.getType()) ) ;
 		List<Trip> trips = getTrips( plan ) ;
 		for ( Trip trip : trips ) {
 			if ( trip.getOriginActivity().equals( activity ) ) {

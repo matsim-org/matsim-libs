@@ -64,7 +64,7 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 
 		// Get the activity currently performed by the agent as well as the subsequent trip.
 		Activity currentActivity = (Activity) WithinDayAgentUtils.getCurrentPlanElement(withinDayAgent);
-		Trip trip = TripStructureUtils.findTripStartingAtActivity(currentActivity, executedPlan, this.tripRouter.getStageActivityTypes() );
+		Trip trip = TripStructureUtils.findTripStartingAtActivity( currentActivity, executedPlan );
 
 		// If there is no trip after the activity.
 		if (trip == null) return false;
