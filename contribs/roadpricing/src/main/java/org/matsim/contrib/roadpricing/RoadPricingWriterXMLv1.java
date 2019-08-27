@@ -62,13 +62,13 @@ public final class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 			// links
 			this.writer.write("\t<links>\n");
 			for (Id<Link> linkId : this.scheme.getTypicalCostsForLink().keySet()) {
-				List<RoadPricingCost> cs = this.scheme.getTypicalCostsForLink().get(linkId );
+				List<CostInfo> cs = this.scheme.getTypicalCostsForLink().get(linkId );
 				this.writer.write("\t\t<link id=\"" + linkId.toString() + "\"");
 				if (cs == null) {
 					this.writer.write("/>\n");
 				} else {
 					this.writer.write(">\n");
-					for ( RoadPricingCost c : cs) {
+					for ( CostInfo c : cs) {
 						this.writeCost(c, false);
 					}
 					this.writer.write("\t\t</link>\n");
@@ -85,7 +85,7 @@ public final class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 				this.writer.write("\t<!-- [monetary unit] / [travelling across a tolled link] -->\n");
 			}
 
-			for ( RoadPricingCost cost : this.scheme.getTypicalCosts()) {
+			for ( CostInfo cost : this.scheme.getTypicalCosts()) {
 				this.writeCost(cost, true);
 			}
 
@@ -97,7 +97,7 @@ public final class RoadPricingWriterXMLv1 extends MatsimXmlWriter {
 	}
 
 
-	private void writeCost( RoadPricingCost cost, boolean typical ) throws IOException {
+	private void writeCost( CostInfo cost, boolean typical ) throws IOException {
 		if (typical) {
 			this.writer.write("\t<cost ");
 		} else {

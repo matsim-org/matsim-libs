@@ -10,7 +10,7 @@ import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.Distances;
 import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.accessibility.utils.NetworkUtil;
-import org.matsim.contrib.roadpricing.RoadPricingCost;
+import org.matsim.contrib.roadpricing.CostInfo;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
@@ -150,7 +150,7 @@ import org.matsim.contrib.roadpricing.RoadPricingScheme;
 		
 		double result = 0. ;
 		if(scheme != null){
-			RoadPricingCost cost = scheme.getLinkCostInfo(nearestLink.getId(), departureTime, null, null );
+			CostInfo cost = scheme.getLinkCostInfo(nearestLink.getId(), departureTime, null, null );
 			if(cost != null) {
 				result = cost.amount;
 			}

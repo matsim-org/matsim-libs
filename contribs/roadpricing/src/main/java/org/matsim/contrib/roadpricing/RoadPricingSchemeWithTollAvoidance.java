@@ -66,7 +66,7 @@ public class RoadPricingSchemeWithTollAvoidance implements RoadPricingScheme {
 	}
 
 	@Override
-	public RoadPricingCost getLinkCostInfo( Id<Link> linkId, double time, Id<Person> personId, Id<Vehicle> vehicleId ) {
+	public CostInfo getLinkCostInfo( Id<Link> linkId, double time, Id<Person> personId, Id<Vehicle> vehicleId ) {
 		Person person = this.scenario.getPopulation().getPersons().get(personId);
 		Object attr = person.getAttributes().getAttribute(ATTR_AVOIDANCE);
 		if (attr == null) {
@@ -74,7 +74,7 @@ public class RoadPricingSchemeWithTollAvoidance implements RoadPricingScheme {
 		} else {
 			boolean tollEvader = (boolean) attr;
 			if (tollEvader) {
-				return new RoadPricingCost(0.0, Time.getUndefinedTime(), 0.0);
+				return new CostInfo(0.0, Time.getUndefinedTime(), 0.0);
 			} else {
 				return delegate.getLinkCostInfo(linkId, time, personId, vehicleId);
 			}
@@ -82,17 +82,17 @@ public class RoadPricingSchemeWithTollAvoidance implements RoadPricingScheme {
 	}
 
 	@Override
-	public RoadPricingCost getTypicalLinkCostInfo( Id<Link> linkId, double time ) {
+	public CostInfo getTypicalLinkCostInfo( Id<Link> linkId, double time ) {
 		return delegate.getTypicalLinkCostInfo(linkId, time);
 	}
 
 	@Override
-	public Iterable<RoadPricingCost> getTypicalCosts() {
+	public Iterable<CostInfo> getTypicalCosts() {
 		return delegate.getTypicalCosts();
 	}
 
 	@Override
-	public Map<Id<Link>, List<RoadPricingCost>> getTypicalCostsForLink() {
+	public Map<Id<Link>, List<CostInfo>> getTypicalCostsForLink() {
 		return delegate.getTypicalCostsForLink();
 	}
 

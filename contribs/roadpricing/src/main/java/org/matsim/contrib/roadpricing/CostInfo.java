@@ -5,12 +5,12 @@ package org.matsim.contrib.roadpricing;
  *
  * @author mrieser
  */
-public final class RoadPricingCost implements Comparable<RoadPricingCost> {
+public final class CostInfo implements Comparable<CostInfo> {
 	public final double startTime;
 	public final double endTime;
 	public final double amount;
 
-	public RoadPricingCost( final double startTime, final double endTime, final double amount ) {
+	public CostInfo( final double startTime, final double endTime, final double amount ) {
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.amount = amount;
@@ -22,16 +22,16 @@ public final class RoadPricingCost implements Comparable<RoadPricingCost> {
 	}
 
 	@Override
-	public int compareTo( RoadPricingCost o ) {
+	public int compareTo( CostInfo o ) {
 		return Double.compare(this.startTime, o.startTime);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if(!(obj instanceof RoadPricingCost)){
+		if(!(obj instanceof CostInfo)){
 			throw new IllegalArgumentException("Can only compare two Cost elements");
 		}
-		RoadPricingCost otherCost = (RoadPricingCost) obj;
+		CostInfo otherCost = (CostInfo) obj;
 		return this.startTime == otherCost.startTime &&
 				this.endTime == otherCost.endTime &&
 				this.amount == otherCost.amount;

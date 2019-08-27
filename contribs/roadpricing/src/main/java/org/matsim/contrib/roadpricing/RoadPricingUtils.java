@@ -64,7 +64,7 @@ public class RoadPricingUtils {
 		scheme.setDescription(description);
 	}
 
-	public static RoadPricingCost createAndAddGeneralCost( RoadPricingSchemeImpl scheme, final double startTime, final double endTime, final double amount ){
+	public static CostInfo createAndAddGeneralCost( RoadPricingSchemeImpl scheme, final double startTime, final double endTime, final double amount ){
 		return scheme.createAndAddCost(startTime, endTime, amount);
 	}
 

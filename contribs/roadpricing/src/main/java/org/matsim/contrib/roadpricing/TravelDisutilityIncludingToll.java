@@ -122,7 +122,7 @@ class TravelDisutilityIncludingToll implements TravelDisutility {
 	/*package*/ class DistanceTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTypicalTollCost(final Link link, final double time) {
-			RoadPricingCost cost_per_m = scheme.getTypicalLinkCostInfo(link.getId(), time );
+			CostInfo cost_per_m = scheme.getTypicalLinkCostInfo(link.getId(), time );
 			if (cost_per_m == null) {
 				return 0.0;
 			}
@@ -135,7 +135,7 @@ class TravelDisutilityIncludingToll implements TravelDisutility {
 	/*package*/ class AreaTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTypicalTollCost(final Link link, final double time) {
-			RoadPricingCost cost = scheme.getTypicalLinkCostInfo(link.getId(), time );
+			CostInfo cost = scheme.getTypicalLinkCostInfo(link.getId(), time );
 			if (cost == null) {
 				return 0.0;
 			}
@@ -153,7 +153,7 @@ class TravelDisutilityIncludingToll implements TravelDisutility {
 	/*package*/ class CordonTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTypicalTollCost(final Link link, final double time) {
-			RoadPricingCost cost = scheme.getTypicalLinkCostInfo(link.getId(), time );
+			CostInfo cost = scheme.getTypicalLinkCostInfo(link.getId(), time );
 			if (cost == null) {
 				return 0.0;
 			}
@@ -164,7 +164,7 @@ class TravelDisutilityIncludingToll implements TravelDisutility {
 	/* package */ class LinkTollCostBehaviour implements TollRouterBehaviour {
 		@Override
 		public double getTypicalTollCost(final Link link, final double time) {
-			RoadPricingCost cost = scheme.getTypicalLinkCostInfo(link.getId(), time );
+			CostInfo cost = scheme.getTypicalLinkCostInfo(link.getId(), time );
 			if (cost == null) {
 				return 0.0;
 			}

@@ -40,15 +40,15 @@ public final class RoadPricingSchemeImpl implements RoadPricingScheme {
 
 	private static Logger log = Logger.getLogger(RoadPricingSchemeImpl.class);
 
-	private Map<Id<Link>, List<RoadPricingCost>> linkIds;
+	private Map<Id<Link>, List<CostInfo>> linkIds;
 
 	private String name = null;
 	private String type = null;
 	private String description = null;
-	private final ArrayList<RoadPricingCost> costs;
+	private final ArrayList<CostInfo> costs;
 
 	private boolean cacheIsInvalid = true;
-	private RoadPricingCost[] costCache = null;
+	private CostInfo[] costCache = null;
 
 	RoadPricingSchemeImpl() {
 		this.linkIds = new HashMap<>();
@@ -91,9 +91,9 @@ public final class RoadPricingSchemeImpl implements RoadPricingScheme {
 	/**
 	 * This is (if I am right) adding a possible toll for <i>all</i> links.  kai, oct'14
 	 */
-	RoadPricingCost createAndAddCost( final double startTime, final double endTime, final double amount ) {
+	CostInfo createAndAddCost( final double startTime, final double endTime, final double amount ) {
 		warnAboutNoToll(startTime, endTime);
-		RoadPricingCost cost = new RoadPricingCost(startTime, endTime, amount);
+		CostInfo cost = new CostInfo(startTime, endTime, amount);
 		this.costs.add(cost);
 		this.cacheIsInvalid = true;
 		return cost;
@@ -101,8 +101,8 @@ public final class RoadPricingSchemeImpl implements RoadPricingScheme {
 
 	void addLinkCost(Id<Link> linkId, double startTime, double endTime, double amount) {
 		warnAboutNoToll(startTime, endTime);
-		RoadPricingCost cost = new RoadPricingCost(startTime, endTime, amount);
-		List<RoadPricingCost> cs = this.linkIds.computeIfAbsent(linkId, k -> new ArrayList<>() );
+		CostInfo cost = new CostInfo(startTime, endTime, amount);
+		List<CostInfo> cs = this.linkIds.computeIfAbsent(linkId, k -> new ArrayList<>() );
 		cs.add(cost);
 		Collections.sort(cs);
 	}
@@ -119,15 +119,15 @@ public final class RoadPricingSchemeImpl implements RoadPricingScheme {
 		}
 	}
 
-	void removeCost(final RoadPricingCost cost ) {
+	void removeCost(final CostInfo cost ) {
 		this.cacheIsInvalid = true; // added this without testing it.  kai, nov'13
 		this.costs.remove(cost);
 	}
 
 	@SuppressWarnings("SimplifiableConditionalExpression")
 	@Deprecated
-	boolean removeLinkCost(final Id<Link> linkId, final RoadPricingCost cost ) {
-		List<RoadPricingCost> c = this.linkIds.get(linkId );
+	boolean removeLinkCost(final Id<Link> linkId, final CostInfo cost ) {
+		List<CostInfo> c = this.linkIds.get(linkId );
 		return (c != null) ? c.remove(cost) : false;
 	}
 
@@ -137,25 +137,25 @@ public final class RoadPricingSchemeImpl implements RoadPricingScheme {
 	}
 
 	@Override
-	public final Map<Id<Link>, List<RoadPricingCost>> getTypicalCostsForLink() {
+	public final Map<Id<Link>, List<CostInfo>> getTypicalCostsForLink() {
 		return this.linkIds;
 	}
 
 	@Override
-	public final Iterable<RoadPricingCost> getTypicalCosts() {
+	public final Iterable<CostInfo> getTypicalCosts() {
 		return this.costs;
 	}
 
 	/**
 	 * @return all Cost objects as an array for faster iteration.
 	 */
-	RoadPricingCost[] getCostArray() {
+	CostInfo[] getCostArray() {
 		if (this.cacheIsInvalid) buildCache();
 		return this.costCache.clone();
 	}
 
 	@Override
-	public RoadPricingCost getLinkCostInfo( final Id<Link> linkId, final double time, Id<Person> personId, Id<Vehicle> vehicleId ) {
+	public CostInfo getLinkCostInfo( final Id<Link> linkId, final double time, Id<Person> personId, Id<Vehicle> vehicleId ) {
 		// this is the default road pricing scheme, which ignores the person.  kai, mar'12
 		// Now also added vehicleId as an argument, which is also ignored at the default level. kai, apr'14
 
@@ -164,17 +164,17 @@ public final class RoadPricingSchemeImpl implements RoadPricingScheme {
 		if (this.linkIds.containsKey(linkId)) {
 			// (linkId is contained in list of tolled links)
 
-			List<RoadPricingCost> linkSpecificCosts = this.linkIds.get(linkId );
+			List<CostInfo> linkSpecificCosts = this.linkIds.get(linkId );
 			if (linkSpecificCosts == null) {
 				// (It is expected to have links in the map with null as "value")
 				// no link specific info found, apply "general" cost (which is in costCache after (*)):
-				for ( RoadPricingCost cost : this.costCache) {
+				for ( CostInfo cost : this.costCache) {
 					if ((time >= cost.startTime) && (time < cost.endTime)) {
 						return cost;
 					}
 				}
 			} else {
-				for ( RoadPricingCost cost : linkSpecificCosts) {
+				for ( CostInfo cost : linkSpecificCosts) {
 					if ((time >= cost.startTime) && (time < cost.endTime)) {
 						return cost;
 					}
@@ -185,12 +185,12 @@ public final class RoadPricingSchemeImpl implements RoadPricingScheme {
 	}
 
 	@Override
-	public RoadPricingCost getTypicalLinkCostInfo( Id<Link> linkId, double time ) {
+	public CostInfo getTypicalLinkCostInfo( Id<Link> linkId, double time ) {
 		return this.getLinkCostInfo(linkId, time, null, null);
 	}
 
 	private void buildCache() {
-		this.costCache = new RoadPricingCost[this.costs.size()];
+		this.costCache = new CostInfo[this.costs.size()];
 		this.costCache = this.costs.toArray(this.costCache);
 		this.cacheIsInvalid = false;
 	}

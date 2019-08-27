@@ -22,8 +22,6 @@ package org.matsim.contrib.roadpricing;
 
 import java.util.TreeMap;
 
-import javax.inject.Inject;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -78,7 +76,7 @@ final class CalcAverageTolledTripLength implements LinkEnterEventHandler, Person
 		Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
 		
 		// getting the (monetary? generalized?) cost of the link
-		RoadPricingCost cost = this.scheme.getLinkCostInfo(event.getLinkId(), event.getTime(), driverId, event.getVehicleId() );
+		CostInfo cost = this.scheme.getLinkCostInfo(event.getLinkId(), event.getTime(), driverId, event.getVehicleId() );
 		
 		if (cost != null) {
 			// i.e. if there is a toll on the link

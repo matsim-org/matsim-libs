@@ -85,17 +85,17 @@ public final class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme
 	}
 
 	@Override
-	public RoadPricingCost getLinkCostInfo( Id<Link> linkId, double time, Id<Person> personId, Id<Vehicle> vehicleId ) {
-		RoadPricingCost baseToll = delegate.getLinkCostInfo(linkId, time, personId, vehicleId );
+	public CostInfo getLinkCostInfo( Id<Link> linkId, double time, Id<Person> personId, Id<Vehicle> vehicleId ) {
+		CostInfo baseToll = delegate.getLinkCostInfo(linkId, time, personId, vehicleId );
 		if (baseToll == null) {
 			return null;
 		}
 		final double tollFactorVal = tollFactor.getTollFactor(personId, vehicleId, linkId, time);
-		return new RoadPricingCost(baseToll.startTime, baseToll.endTime, baseToll.amount * tollFactorVal);
+		return new CostInfo(baseToll.startTime, baseToll.endTime, baseToll.amount * tollFactorVal);
 	}
 
 	@Override
-	public RoadPricingCost getTypicalLinkCostInfo( Id<Link> linkId, double time ) {
+	public CostInfo getTypicalLinkCostInfo( Id<Link> linkId, double time ) {
 		return delegate.getTypicalLinkCostInfo(linkId, time);
 	}
 
@@ -115,12 +115,12 @@ public final class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme
 	}
 
 	@Override
-	public Iterable<RoadPricingCost> getTypicalCosts() {
+	public Iterable<CostInfo> getTypicalCosts() {
 		return delegate.getTypicalCosts();
 	}
 
 	@Override
-	public Map<Id<Link>, List<RoadPricingCost>> getTypicalCostsForLink() {
+	public Map<Id<Link>, List<CostInfo>> getTypicalCostsForLink() {
 		return delegate.getTypicalCostsForLink();
 	}
 

@@ -22,8 +22,6 @@ package org.matsim.contrib.roadpricing;
 
 import java.util.TreeMap;
 
-import javax.inject.Inject;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -210,7 +208,7 @@ final class RoadPricingTollCalculator implements LinkEnterEventHandler, VehicleE
 		@Override
 		public void handleEvent(final LinkEnterEvent event, final Link link) {
 			Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
-			RoadPricingCost cost = RoadPricingTollCalculator.this.scheme.getLinkCostInfo(link.getId(),
+			CostInfo cost = RoadPricingTollCalculator.this.scheme.getLinkCostInfo(link.getId(),
 					event.getTime(), driverId, event.getVehicleId() );
 			if (cost != null) {
 				double newToll = link.getLength() * cost.amount;
@@ -247,7 +245,7 @@ final class RoadPricingTollCalculator implements LinkEnterEventHandler, VehicleE
 
 			Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
 			
-			RoadPricingCost cost = RoadPricingTollCalculator.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), driverId, event.getVehicleId() );
+			CostInfo cost = RoadPricingTollCalculator.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), driverId, event.getVehicleId() );
 			if (cost != null) {
 
 				AgentTollInfo info = RoadPricingTollCalculator.this.agents.get(driverId);
@@ -288,7 +286,7 @@ final class RoadPricingTollCalculator implements LinkEnterEventHandler, VehicleE
 		@Override
 		public void handleEvent(final LinkEnterEvent event, final Link link) {
 			Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
-			RoadPricingCost cost = RoadPricingTollCalculator.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), driverId, event.getVehicleId() );
+			CostInfo cost = RoadPricingTollCalculator.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), driverId, event.getVehicleId() );
 			if (cost != null) {
 				AgentTollInfo info = RoadPricingTollCalculator.this.agents.get(driverId);
 				if (info == null) {
@@ -325,7 +323,7 @@ final class RoadPricingTollCalculator implements LinkEnterEventHandler, VehicleE
 		@Override
 		public void handleEvent(final LinkEnterEvent event, final Link link) {
 			Id<Person> driverId = delegate.getDriverOfVehicle(event.getVehicleId());
-			RoadPricingCost cost = RoadPricingTollCalculator.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), driverId, event.getVehicleId() );
+			CostInfo cost = RoadPricingTollCalculator.this.scheme.getLinkCostInfo(link.getId(), event.getTime(), driverId, event.getVehicleId() );
 			if (cost != null) {
 				// this is a link inside the toll area.
 				// [[I guess this assumes that all links inside the cordon are listed in the toll scheme, similar to an area

@@ -62,8 +62,8 @@ public class RoadPricingIOTest extends MatsimTestCase {
 		assertTrue(scheme1.getTolledLinkIds().contains(id2));
 		assertTrue(scheme1.getTolledLinkIds().contains(id3));
 		assertEquals(3, scheme1.getCostArray().length);
-		Iterator<RoadPricingCost> costIter = scheme1.getTypicalCosts().iterator();
-		RoadPricingCost cost = costIter.next();
+		Iterator<CostInfo> costIter = scheme1.getTypicalCosts().iterator();
+		CostInfo cost = costIter.next();
 		assertEquals(6*3600.0, cost.startTime, EPSILON);
 		assertEquals(10*3600.0, cost.endTime, EPSILON);
 		assertEquals(0.00020, cost.amount, EPSILON);

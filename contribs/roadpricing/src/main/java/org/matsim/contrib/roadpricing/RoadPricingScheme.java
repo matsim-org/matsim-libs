@@ -104,18 +104,18 @@ public interface RoadPricingScheme {
 	 * <code>null</code> if the link is either not part of the tolling scheme
 	 * or there is no toll at the specified time for the link.
 	 */
-	RoadPricingCost getLinkCostInfo( final Id<Link> linkId, final double time, Id<Person> personId, Id<Vehicle> vehicleId );
+	CostInfo getLinkCostInfo( final Id<Link> linkId, final double time, Id<Person> personId, Id<Vehicle> vehicleId );
 	
 	/**
 	 * This is essentially to enforce that getLinkCostInfo( linkId, time, null, null ) 
 	 * is there ... to allow mental modules to work on "approximate" numbers.
 	 */
-	RoadPricingCost getTypicalLinkCostInfo( final Id<Link> linkId, final double time ) ;
+	CostInfo getTypicalLinkCostInfo( final Id<Link> linkId, final double time ) ;
 
-	Iterable<RoadPricingCost> getTypicalCosts();
+	Iterable<CostInfo> getTypicalCosts();
 	// yy seems to me that this is not needed; getting Map<Id, List<Cost>> should be enough.  Has something to do with cache and
 	// access speeds.
 
-	Map<Id<Link>, List<RoadPricingCost>> getTypicalCostsForLink();
+	Map<Id<Link>, List<CostInfo>> getTypicalCostsForLink();
 
 }
