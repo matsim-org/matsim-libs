@@ -199,11 +199,9 @@ public class TripStructureUtils {
 	}
 
 	public static Collection<Subtour> getSubtours(
-            final Plan plan,
-            final StageActivityTypes stageActivityTypes) {
+            final Plan plan) {
 		return getSubtours(
-				plan.getPlanElements(),
-				stageActivityTypes
+				plan.getPlanElements()
         );
 	}
 
@@ -236,8 +234,7 @@ public class TripStructureUtils {
 	 * sequence
 	 */
 	public static Collection<Subtour> getSubtours(
-            final List<? extends PlanElement> planElements,
-            final StageActivityTypes stageActivityTypes) {
+            final List<? extends PlanElement> planElements) {
 		final List<Subtour> subtours = new ArrayList<>();
 
 		Id<?> destinationId = null;

@@ -422,7 +422,7 @@ public class TripStructureUtilsTest {
 					"type",
 						new Coord((double) 0, (double) 0)) );
 
-		TripStructureUtils.getSubtours( plan , EmptyStageActivityTypes.INSTANCE );
+		TripStructureUtils.getSubtours( plan );
 	}
 }
 

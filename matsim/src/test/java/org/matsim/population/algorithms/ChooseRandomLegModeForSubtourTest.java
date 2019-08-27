@@ -430,15 +430,9 @@ public class ChooseRandomLegModeForSubtourTest {
 			final String expectedMode,
 			final boolean useFacilities) {
 		final Collection<Subtour> originalSubtours =
-			TripStructureUtils.getSubtours(
-						originalPlan,
-						EmptyStageActivityTypes.INSTANCE
-			);
+			TripStructureUtils.getSubtours( originalPlan );
 		final Collection<Subtour> mutatedSubtours =
-			TripStructureUtils.getSubtours(
-						plan,
-						EmptyStageActivityTypes.INSTANCE
-			);
+			TripStructureUtils.getSubtours(	plan );
 
 		assertEquals(
 				"number of subtour changed",
