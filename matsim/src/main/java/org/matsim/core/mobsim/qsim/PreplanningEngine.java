@@ -57,8 +57,6 @@ import org.matsim.core.mobsim.qsim.interfaces.TripInfoRequest;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfoWithRequiredBooking;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -77,8 +75,6 @@ public final class PreplanningEngine implements MobsimEngine {
 	// layer of infrastructure?  Am currently leaning towards the second argument.  kai, mar'19
 
 	private static final Logger log = Logger.getLogger( PreplanningEngine.class );
-
-	public static final StageActivityTypes drtStageActivities = new StageActivityTypesImpl();
 
 	private final ActivityFacilities facilities;
 
