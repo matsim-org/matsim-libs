@@ -64,16 +64,17 @@ class RoadPricingControlerListener implements StartupListener, IterationEndsList
 	private OutputDirectoryHierarchy controlerIO;
 
 	@Inject
-	RoadPricingControlerListener(Scenario scenario, OutputDirectoryHierarchy controlerIO, EventsManager events) {
-		scheme = (RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
-		if (scheme == null || scheme.getType() == null) {
-			RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), RoadPricingConfigGroup.class);
-			if (rpConfig.getTollLinksFile() == null && rpConfig.getTollLinksFile() == "") {
-				throw new RuntimeException("neither road pricing scheme nor toll links file is provided; aborting ...");
-			}
-			scheme = RoadPricingUtils.createAndRegisterMutableScheme(scenario);
-			new RoadPricingReaderXMLv1((RoadPricingSchemeImpl) scheme).readFile(rpConfig.getTollLinksFile());
-		}
+	RoadPricingControlerListener(Scenario scenario, OutputDirectoryHierarchy controlerIO, EventsManager events, RoadPricingScheme scheme ) {
+		this.scheme = scheme;
+//		scheme = (RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
+//		if (scheme == null || scheme.getType() == null) {
+//			RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), RoadPricingConfigGroup.class);
+//			if (rpConfig.getTollLinksFile() == null && rpConfig.getTollLinksFile() == "") {
+//				throw new RuntimeException("neither road pricing scheme nor toll links file is provided; aborting ...");
+//			}
+//			scheme = RoadPricingUtils.createAndRegisterMutableScheme(scenario);
+//			new RoadPricingReaderXMLv1((RoadPricingSchemeImpl) scheme).readFile(rpConfig.getTollLinksFile());
+//		}
 		this.calcPaidToll = new RoadPricingTollCalculator(scenario.getNetwork(), scenario, events);
 		this.cattl = new CalcAverageTolledTripLength(scenario.getNetwork(), scenario, events);
 		this.controlerIO = controlerIO;

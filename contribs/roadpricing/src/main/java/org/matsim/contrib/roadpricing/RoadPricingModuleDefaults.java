@@ -81,56 +81,60 @@ final class RoadPricingModuleDefaults extends AbstractModule {
 	static class RoadPricingSchemeProvider implements Provider<RoadPricingScheme> {
 
 		private final Config config;
+		private final RoadPricingScheme rpsImpl;
 		private Scenario scenario;
 
 		@Inject
-		RoadPricingSchemeProvider(Config config, Scenario scenario) {
+		RoadPricingSchemeProvider(Config config, Scenario scenario){
 			/* TODO Check if we can get the Config from the Scenario */
 			this.config = config;
 			this.scenario = scenario;
+			RoadPricingScheme scenarioRoadPricingScheme = (RoadPricingScheme) scenario.getScenarioElement( RoadPricingScheme.ELEMENT_NAME );
+			RoadPricingScheme tmp;
+			if( scenarioRoadPricingScheme != null ){
+				tmp = scenarioRoadPricingScheme;
+			} else{
+				RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule( config , RoadPricingConfigGroup.GROUP_NAME ,
+					  RoadPricingConfigGroup.class );
+
+				if( rpConfig.getTollLinksFile() == null ){
+					throw new RuntimeException( "Road pricing inserted but neither toll links file nor RoadPricingScheme given.  "
+											+ "Such an execution path is not allowed.  If you want a base case without toll, "
+											+ "construct a zero toll file and insert that. " );
+				}
+				URL tollLinksFile = ConfigGroup.getInputFileURL( this.config.getContext() , rpConfig.getTollLinksFile() );
+				tmp = RoadPricingUtils.createAndRegisterMutableScheme( scenario );
+				new RoadPricingReaderXMLv1( (RoadPricingSchemeImpl) tmp ).parse( tollLinksFile );
+			}
+			rpsImpl = tmp;
 		}
 
 		@Override
 		public RoadPricingScheme get() {
-			RoadPricingScheme scenarioRoadPricingScheme = (RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
-			if (scenarioRoadPricingScheme != null) {
-				return scenarioRoadPricingScheme;
-			} else {
-				RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
-
-				if (rpConfig.getTollLinksFile() == null) {
-					throw new RuntimeException("Road pricing inserted but neither toll links file nor RoadPricingScheme given.  "
-							+ "Such an execution path is not allowed.  If you want a base case without toll, "
-							+ "construct a zero toll file and insert that. ");
-				}
-				URL tollLinksFile = ConfigGroup.getInputFileURL(this.config.getContext(), rpConfig.getTollLinksFile());
-				RoadPricingSchemeImpl rpsImpl = RoadPricingUtils.createAndRegisterMutableScheme(scenario );
-				new RoadPricingReaderXMLv1(rpsImpl).parse(tollLinksFile);
-				return rpsImpl;
-			}
+			return rpsImpl;
 		}
 	}
 
 
 	static class TravelDisutilityIncludingTollFactoryProvider implements Provider<TravelDisutilityFactory> {
 
+		private final RoadPricingScheme scheme;
+		private final Config config;
 		private final Scenario scenario;
-//		private final RoadPricingScheme scheme;
 
 		@Inject
-		TravelDisutilityIncludingTollFactoryProvider(Scenario scenario) {
+		TravelDisutilityIncludingTollFactoryProvider( RoadPricingScheme scheme, Config config, Scenario scenario ) {
+			this.scheme = scheme;
+			this.config = config;
 			this.scenario = scenario;
-//			this.scheme = RoadPricingUtils.getScheme( scenario ) ;
 		}
 
 		@Override
 		public TravelDisutilityFactory get() {
-			final Config config = scenario.getConfig();
 			final TravelDisutilityFactory originalTravelDisutilityFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
-			RoadPricingScheme scheme = (RoadPricingScheme) scenario.getScenarioElement( RoadPricingScheme.ELEMENT_NAME );
 			Gbl.assertNotNull(scheme);
 			RoadPricingTravelDisutilityFactory travelDisutilityFactory = new RoadPricingTravelDisutilityFactory(
-					originalTravelDisutilityFactory, scheme, config.planCalcScore().getMarginalUtilityOfMoney()
+				  originalTravelDisutilityFactory, scheme, config.planCalcScore().getMarginalUtilityOfMoney()
 			);
 			travelDisutilityFactory.setSigma(config.plansCalcRoute().getRoutingRandomness());
 			return travelDisutilityFactory;

@@ -74,7 +74,7 @@ public class RoadPricingSchemeWithTollAvoidance implements RoadPricingScheme {
 		} else {
 			boolean tollEvader = (boolean) attr;
 			if (tollEvader) {
-				return new CostInfo(0.0, Time.getUndefinedTime(), 0.0);
+				return new CostInfo(0.0, Double.POSITIVE_INFINITY, 0.0);
 			} else {
 				return delegate.getLinkCostInfo(linkId, time, personId, vehicleId);
 			}
