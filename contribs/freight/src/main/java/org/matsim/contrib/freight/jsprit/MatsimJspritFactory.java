@@ -237,10 +237,18 @@ public class MatsimJspritFactory {
 				.addSkills(vehicle.getSkills().values());
 		CarrierVehicle carrierVehicle = vehicleBuilder.build();
 
-		/* Add the skills to the vehicle type. */
-		CarrierVehicleType typeWithSkills = CarrierVehicleType.Builder.newInstance(carrierVehicleType.getId());
-		carrierVehicle.makeCopy();
-
+		/* Add the skills (from the vehicle) to the vehicle type. */
+		CarrierVehicleType.Builder newCarrierVehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(carrierVehicleType.getId());
+		newCarrierVehicleTypeBuilder
+				/* Take everything from the current vehicle type */
+				.setCapacity(carrierVehicleType.getCarrierVehicleCapacity())
+				.setEngineInformation(carrierVehicleType.getEngineInformation())
+				.setVehicleCostInformation(carrierVehicleType.getVehicleCostInformation())
+				.setDescription(carrierVehicleType.getDescription())
+				.setMaxVelocity(carrierVehicleType.getMaximumVelocity())
+				/* But take the skills from the vehicle. */
+				.addSkills(vehicle.getSkills().values());
+		carrierVehicle.setVehicleType(newCarrierVehicleTypeBuilder.build());
 
 		assert vehicle.getEarliestDeparture() == carrierVehicle.getEarliestStartTime() : "vehicles must have the same earliestStartTime";
 		assert vehicle.getLatestArrival() == carrierVehicle.getLatestEndTime() : "vehicles must have the same latestEndTime";
