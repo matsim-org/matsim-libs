@@ -236,7 +236,7 @@ class ChoiceSet {
 				default:
 					throw new RuntimeException( Gbl.NOT_IMPLEMENTED ) ;
 			}
-			PlanTimesAdapter adapter = new PlanTimesAdapter( router.getStageActivityTypes(), this.scenario );
+			PlanTimesAdapter adapter = new PlanTimesAdapter( this.scenario );
 			final double score = adapter.scorePlan( planTmp, scoringFunction, planTmp.getPerson() );
 
 			if (score > largestValue) {

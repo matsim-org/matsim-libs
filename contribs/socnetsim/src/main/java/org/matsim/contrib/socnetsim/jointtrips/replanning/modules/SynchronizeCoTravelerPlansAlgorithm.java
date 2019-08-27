@@ -27,9 +27,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.StageActivityTypeIdentifier;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.utils.misc.Time;
 
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
@@ -53,8 +51,7 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 
 	private final Set<String> stageTypes;
 
-	public SynchronizeCoTravelerPlansAlgorithm(
-			final StageActivityTypes externalTypes) {
+	public SynchronizeCoTravelerPlansAlgorithm() {
 		this.stageTypes = JointActingTypes.JOINT_STAGE_ACTS;
 	}
 

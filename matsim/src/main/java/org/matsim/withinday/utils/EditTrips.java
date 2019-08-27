@@ -54,6 +54,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -477,7 +478,7 @@ public final class EditTrips {
 		int currPosPlanElements = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
 		Activity nextAct = (Activity) plan.getPlanElements().get(currPosPlanElements + 1);
 
-		if ( tripRouter.getStageActivityTypes().isStageActivity(nextAct.getType()) ) {
+		if ( StageActivityTypeIdentifier.isStageActivity(nextAct.getType()) ) {
 			Trip trip = findCurrentTrip( agent ) ;
 			Facility fromFacility = FacilitiesUtils.toFacility(nextAct, scenario.getActivityFacilities());
 			Facility toFacility = FacilitiesUtils.toFacility(trip.getDestinationActivity(), scenario.getActivityFacilities());

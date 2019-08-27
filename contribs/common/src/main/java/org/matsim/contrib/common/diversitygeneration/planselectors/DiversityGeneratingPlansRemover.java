@@ -25,15 +25,12 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.selectors.AbstractPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
-import org.matsim.pt.PtConstants;
 
 import javax.inject.Inject;
 import java.util.HashMap;
@@ -77,7 +74,6 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 		private double sameRoutePenalty = 0.3;
 		private double sameModePenalty = 0.3;
 
-		private StageActivityTypes stageActivities ;
 		private Network network;
 
 		@Inject final void setNetwork(Network network) {
@@ -106,7 +102,6 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 		}
 		@Inject final void setTripRouter( TripRouter val ) {
 			// (not user settable)
-			stageActivities = val.getStageActivityTypes() ;
 		}
 		@Override
 		public final DiversityGeneratingPlansRemover get() {
@@ -116,22 +111,20 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 					this.locationWeight,
 					this.actTimeParameter,
 					this.sameRoutePenalty,
-					this.sameModePenalty,
-					this.stageActivities);
+					this.sameModePenalty);
 		}
 	}
 
 	private DiversityGeneratingPlansRemover(Network network,
 			double actTypeWeight, double locationWeight,
 			double actTimeParameter, double sameRoutePenalty,
-			double sameModePenalty, StageActivityTypes stageActivities) {
+			double sameModePenalty) {
 		this.network = network;
 		this.actTypeWeight = actTypeWeight;
 		this.locationWeight = locationWeight;
 		this.actTimeWeight = actTimeParameter;
 		this.sameRoutePenalty = sameRoutePenalty;
 		this.sameModePenalty = sameModePenalty;
-		this.stageActivities = stageActivities;
 	}
 
 	static private final Logger log = Logger.getLogger(DiversityGeneratingPlansRemover.class);
@@ -144,7 +137,6 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 
 	private final double sameRoutePenalty;
 	private final double sameModePenalty;
-	private final StageActivityTypes stageActivities;
 
 	@Override
 	protected final Map<Plan, Double> calcWeights(List<? extends Plan> plans) {

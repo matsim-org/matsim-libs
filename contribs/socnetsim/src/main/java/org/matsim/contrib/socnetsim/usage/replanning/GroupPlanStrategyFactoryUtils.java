@@ -68,8 +68,7 @@ public class GroupPlanStrategyFactoryUtils {
 			final Provider<TripRouter> tripRouterFactory) {
 		return new JointPlanBasedGroupStrategyModule(
 				new SynchronizeCoTravelerPlansModule(
-					config.global().getNumberOfThreads(),
-					tripRouterFactory.get().getStageActivityTypes() ) );
+					config.global().getNumberOfThreads() ) );
 	}
 
 	public static GenericStrategyModule<GroupPlans> createReRouteModule(

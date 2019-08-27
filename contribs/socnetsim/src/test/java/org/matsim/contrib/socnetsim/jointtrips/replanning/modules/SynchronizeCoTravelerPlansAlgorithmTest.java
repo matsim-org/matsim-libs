@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -322,7 +321,7 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 	// /////////////////////////////////////////////////////////////////////////
 	@Test
 	public void testDepartureTimes() throws Exception {
-		final SynchronizeCoTravelerPlansAlgorithm testee = new SynchronizeCoTravelerPlansAlgorithm( EmptyStageActivityTypes.INSTANCE );
+		final SynchronizeCoTravelerPlansAlgorithm testee = new SynchronizeCoTravelerPlansAlgorithm();
 		for ( Fixture fixture : fixtures ) {
 			testee.run( fixture.jointPlan );
 
