@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.noise.data;
+package org.matsim.contrib.noise;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,7 +40,7 @@ import org.matsim.api.core.v01.population.Person;
  * @author ikaddoura
  *
  */
-public class NoiseReceiverPoint extends ReceiverPoint {
+class NoiseReceiverPoint extends ReceiverPoint {
 
 	public NoiseReceiverPoint(Id<ReceiverPoint> id, Coord coord) {
 		super(id, coord);

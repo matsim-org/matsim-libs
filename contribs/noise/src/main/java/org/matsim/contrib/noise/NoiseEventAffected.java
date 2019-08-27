@@ -20,14 +20,13 @@
 /**
  * 
  */
-package org.matsim.contrib.noise.events;
-
-import java.util.Map;
+package org.matsim.contrib.noise;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.noise.data.ReceiverPoint;
+
+import java.util.Map;
 
 /**
  * @author lkroeger, ikaddoura

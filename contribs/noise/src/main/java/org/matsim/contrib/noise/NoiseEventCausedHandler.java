@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,37 +20,15 @@
 /**
  * 
  */
-package org.matsim.contrib.noise.data;
+package org.matsim.contrib.noise;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
+import org.matsim.core.events.handler.EventHandler;
 
 /**
- * 
- * Contains the relevant information for a single receiver point.
- * 
- * @author ikaddoura
+ * @author lkroeger
  *
  */
-public class ReceiverPoint implements Identifiable<ReceiverPoint>{
-	
-	// initialization
-	private final Id<ReceiverPoint> id;
-	private Coord coord;
-	
-	public ReceiverPoint(Id<ReceiverPoint> id, Coord coord) {
-		this.id = id;
-		this.coord = coord;
-	}
-	
-	@Override
-	public Id<ReceiverPoint> getId() {
-		return this.id;
-	}
 
-	public Coord getCoord() {
-		return coord;
-	}
-	
+public interface NoiseEventCausedHandler extends EventHandler{
+	public void handleEvent (NoiseEventCaused event);
 }

@@ -20,7 +20,7 @@
 /**
  *
  */
-package org.matsim.contrib.noise.handler;
+package org.matsim.contrib.noise;
 
 import java.util.Collection;
 
@@ -32,7 +32,7 @@ import java.util.Collection;
  * @author lkroeger, ikaddoura
  *
  */
-public final class NoiseEquations {
+final class NoiseEquations {
 
 	private NoiseEquations() {};
 

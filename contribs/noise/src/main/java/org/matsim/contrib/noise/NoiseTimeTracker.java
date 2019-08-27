@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.noise.handler;
+package org.matsim.contrib.noise;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,15 +41,6 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.noise.NoiseConfigGroup;
-import org.matsim.contrib.noise.NoiseWriter;
-import org.matsim.contrib.noise.data.NoiseAllocationApproach;
-import org.matsim.contrib.noise.data.NoiseContext;
-import org.matsim.contrib.noise.data.NoiseLink;
-import org.matsim.contrib.noise.data.NoiseReceiverPoint;
-import org.matsim.contrib.noise.data.PersonActivityInfo;
-import org.matsim.contrib.noise.events.NoiseEventAffected;
-import org.matsim.contrib.noise.events.NoiseEventCaused;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
@@ -65,7 +56,7 @@ import com.google.inject.Inject;
  *
  */
 
-public class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEntersVehicleEventHandler, LinkEnterEventHandler, TransitDriverStartsEventHandler {
+class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEntersVehicleEventHandler, LinkEnterEventHandler, TransitDriverStartsEventHandler {
 
 	private static final Logger log = Logger.getLogger(NoiseTimeTracker.class);
 	private static final boolean printLog = false;

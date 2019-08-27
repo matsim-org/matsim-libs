@@ -20,9 +20,8 @@
 /**
  * 
  */
-package org.matsim.contrib.noise.handler;
+package org.matsim.contrib.noise;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -39,10 +38,6 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.noise.data.NoiseContext;
-import org.matsim.contrib.noise.data.NoiseReceiverPoint;
-import org.matsim.contrib.noise.data.PersonActivityInfo;
-import org.matsim.contrib.noise.data.ReceiverPoint;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -54,7 +49,7 @@ import org.matsim.pt.PtConstants;
  *
  */
 
-public class PersonActivityTracker implements ActivityEndEventHandler , ActivityStartEventHandler {
+final class PersonActivityTracker implements ActivityEndEventHandler , ActivityStartEventHandler {
 
 	private static final Logger log = Logger.getLogger(PersonActivityTracker.class);
 	

@@ -1,4 +1,4 @@
-package org.matsim.contrib.noise.data;
+package org.matsim.contrib.noise;
 
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Id;
@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.Id;
 /**
  * @author nkuehnel
  */
-public final class FeatureNoiseBarrierImpl implements NoiseBarrier {
+ final class FeatureNoiseBarrierImpl implements NoiseBarrier {
 
     private final Id<NoiseBarrier> id;
 

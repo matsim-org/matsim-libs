@@ -20,11 +20,9 @@
 /**
  * 
  */
-package org.matsim.contrib.noise.handler;
+package org.matsim.contrib.noise;
 
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
-import org.matsim.contrib.noise.data.NoiseContext;
-import org.matsim.contrib.noise.events.NoiseEventCaused;
 import org.matsim.contrib.noise.personLinkMoneyEvents.PersonLinkMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 
@@ -37,7 +35,7 @@ import com.google.inject.Inject;
  * @author ikaddoura
  *
  */
-public class NoisePricingHandler implements NoiseEventCausedHandler {
+class NoisePricingHandler implements NoiseEventCausedHandler {
 
 	@Inject
 	private EventsManager events;

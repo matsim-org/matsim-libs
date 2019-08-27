@@ -20,17 +20,13 @@
 /**
  * 
  */
-package org.matsim.contrib.noise.utils;
+package org.matsim.contrib.noise;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.noise.events.NoiseEventAffected;
-import org.matsim.contrib.noise.events.NoiseEventCaused;
-import org.matsim.contrib.noise.handler.NoiseEventAffectedHandler;
-import org.matsim.contrib.noise.handler.NoiseEventCausedHandler;
 
 /**
  * Analyzes an event file with noise events.
@@ -38,7 +34,7 @@ import org.matsim.contrib.noise.handler.NoiseEventCausedHandler;
  * @author ikaddoura
  *
  */
-public class NoiseEventAnalysisHandler implements NoiseEventCausedHandler, NoiseEventAffectedHandler {
+class NoiseEventAnalysisHandler implements NoiseEventCausedHandler, NoiseEventAffectedHandler {
 
 	private SortedMap<Id<Person>, Double> id2causedNoiseCost = new TreeMap<Id<Person>, Double>();
 	private SortedMap<Id<Person>, Double> id2affectedNoiseCost = new TreeMap<Id<Person>, Double>();

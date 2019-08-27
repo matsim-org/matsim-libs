@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.noise.data;
+package org.matsim.contrib.noise;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,9 +41,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.noise.NoiseConfigGroup;
-import org.matsim.contrib.noise.handler.NoiseEquations;
-import org.matsim.contrib.noise.utils.FeatureNoiseBarriersReader;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -57,7 +54,7 @@ import org.matsim.vehicles.Vehicle;
  * @author lkroeger, ikaddoura
  *
  */
-public final class NoiseContext {
+final class NoiseContext {
 	
 	private static final Logger log = Logger.getLogger(NoiseContext.class);
 			

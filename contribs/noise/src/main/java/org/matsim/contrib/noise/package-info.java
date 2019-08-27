@@ -13,7 +13,7 @@
  * There are two possible use cases:
  * <ul>
  * <li> Run an offline noise computation for analysis purposes, see {@link org.matsim.contrib.noise.examples.NoiseOfflineCalculationExample}. 
- * <li> Run an online noise computation, see {@link org.matsim.contrib.noise.examples.NoiseOnlineControlerExample}. Noise damages may be internalized applying different allocation approaches, see {@link org.matsim.contrib.noise.data.NoiseAllocationApproach}.
+ * <li> Run an online noise computation, see {@link org.matsim.contrib.noise.examples.NoiseOnlineControlerExample}. Noise damages may be internalized applying different allocation approaches, see {@link org.matsim.contrib.noise.NoiseAllocationApproach}.
  * </ul>
  * 
  * The computation of noise levels is based on the German RLS 90 approach (Richtlinien fuer den Laermschutz and Strassen, Forschungsgesellschaft fuer Strassen- und Verkehrswesen), but applies some simplifications and minor modifications.

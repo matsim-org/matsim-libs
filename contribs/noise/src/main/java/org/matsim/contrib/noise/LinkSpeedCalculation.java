@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.noise.handler;
+package org.matsim.contrib.noise;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,8 +32,8 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.contrib.noise.data.NoiseContext;
-import org.matsim.contrib.noise.data.NoiseLink;
+import org.matsim.contrib.noise.NoiseContext;
+import org.matsim.contrib.noise.NoiseLink;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
@@ -42,7 +42,7 @@ import com.google.inject.Inject;
  * @author ikaddoura
  *
  */
-public class LinkSpeedCalculation implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler{
+final class LinkSpeedCalculation implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler{
 
 	@Inject
 	private NoiseContext noiseContext;

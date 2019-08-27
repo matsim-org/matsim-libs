@@ -20,11 +20,6 @@
 package org.matsim.contrib.noise;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.noise.data.NoiseContext;
-import org.matsim.contrib.noise.handler.LinkSpeedCalculation;
-import org.matsim.contrib.noise.handler.NoisePricingHandler;
-import org.matsim.contrib.noise.handler.NoiseTimeTracker;
-import org.matsim.contrib.noise.handler.PersonActivityTracker;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 

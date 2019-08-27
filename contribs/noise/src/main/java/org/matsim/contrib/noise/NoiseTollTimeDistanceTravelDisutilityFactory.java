@@ -17,9 +17,8 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.noise.routing;
+package org.matsim.contrib.noise;
 
-import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -33,7 +32,7 @@ import com.google.inject.Inject;
  * @author ikaddoura
  *
  */
-public final class NoiseTollTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
+final class NoiseTollTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
 
 	private double sigma = 0. ;
 	private RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory;

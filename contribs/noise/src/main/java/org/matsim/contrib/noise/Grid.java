@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.noise.data;
+package org.matsim.contrib.noise;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
@@ -52,7 +51,7 @@ import org.matsim.pt.PtConstants;
  * @author lkroeger, ikaddoura
  *
  */
-public class Grid {
+final class Grid {
 	
 	private static final Logger log = Logger.getLogger(Grid.class);
 			

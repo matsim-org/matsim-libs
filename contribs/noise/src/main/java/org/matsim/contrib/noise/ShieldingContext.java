@@ -1,4 +1,4 @@
-package org.matsim.contrib.noise.data;
+package org.matsim.contrib.noise;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,7 +15,6 @@ import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.index.quadtree.Quadtree;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.noise.handler.NoiseEquations;
 import org.matsim.core.utils.geometry.GeometryUtils;
 
 /**
@@ -23,7 +22,7 @@ import org.matsim.core.utils.geometry.GeometryUtils;
  *
  * @author nkuehnel
  */
-public class ShieldingContext {
+final class ShieldingContext {
 
     private final static Logger logger = Logger.getLogger(ShieldingContext.class);
 

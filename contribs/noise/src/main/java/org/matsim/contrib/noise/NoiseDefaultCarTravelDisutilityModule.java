@@ -21,7 +21,6 @@ package org.matsim.contrib.noise;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.noise.routing.NoiseTollTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
