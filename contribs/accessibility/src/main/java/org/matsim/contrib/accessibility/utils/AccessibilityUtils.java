@@ -154,6 +154,17 @@ public class AccessibilityUtils {
 		LOG.warn("sub-network for mode " + modeSet.toString() + " now has " + subNetwork.getNodes().size() + " nodes.");
 		return subNetwork;
 	}
+
+
+	public static double getModeSpecificConstantForAccessibilities(String mode, PlanCalcScoreConfigGroup planCalcScoreConfigGroup) {
+		double modeSpecificConstant;
+		if (mode.equals(Modes4Accessibility.freespeed.name())) {
+			modeSpecificConstant = planCalcScoreConfigGroup.getModes().get(TransportMode.car).getConstant();
+		} else {
+			modeSpecificConstant = planCalcScoreConfigGroup.getModes().get(mode).getConstant();
+		}
+		return modeSpecificConstant;
+	}
 	
 	/**
 	 * Collects all facilities of a given type that have been loaded to the sceanrio.

@@ -179,7 +179,8 @@ public final class AccessibilityModule extends AbstractModule {
 					default:
 //						TravelTime timeCalculator = this.travelTimes.get( mode.toString() ) ;
 //						TravelDisutility travelDisutility = this.travelDisutilityFactories.get(mode.toString()).createTravelDisutility(timeCalculator) ;
-						calculator = new TripRouterAccessibilityContributionCalculator(mode.toString(), tripRouter, config.planCalcScore(), scenario);
+						calculator = new TripRouterAccessibilityContributionCalculator(mode.name(), tripRouter, config.planCalcScore(), scenario,
+								travelTimes.get(TransportMode.car), travelDisutilityFactories.get(TransportMode.car));
 					}
 					accessibilityShutdownListener.putAccessibilityContributionCalculator(mode.name(), calculator);
 

@@ -134,12 +134,7 @@ import java.util.Set;
 		double sumExpVjkWalk = destination.getSum();
 
 		// Combine all utility components (using the identity: exp(a+b) = exp(a) * exp(b))
-		double modeSpecificConstant;
-		if (mode.equals(Modes4Accessibility.freespeed.name())) {
-			modeSpecificConstant = planCalcScoreConfigGroup.getModes().get(TransportMode.car).getConstant();
-		} else {
-			modeSpecificConstant = planCalcScoreConfigGroup.getModes().get(mode).getConstant();
-		}
+		double modeSpecificConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(mode, planCalcScoreConfigGroup);
 		return Math.exp(this.planCalcScoreConfigGroup.getBrainExpBeta() * (walkUtilityMeasuringPoint2Road + modeSpecificConstant
 				+ congestedCarUtilityRoad2Node + congestedCarUtility) ) * sumExpVjkWalk;
 	}
