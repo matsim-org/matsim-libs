@@ -20,6 +20,14 @@
 
 package org.matsim.core.utils.io;
 
+import com.github.luben.zstd.ZstdInputStream;
+import com.github.luben.zstd.ZstdOutputStream;
+import net.jpountz.lz4.LZ4BlockInputStream;
+import net.jpountz.lz4.LZ4BlockOutputStream;
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
+import org.apache.log4j.Logger;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -42,12 +50,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
-
-import org.apache.commons.compress.compressors.CompressorException;
-import org.apache.commons.compress.compressors.CompressorStreamFactory;
-import org.apache.log4j.Logger;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * This class provides helper methods for input/output in MATSim.
@@ -102,6 +109,7 @@ import org.apache.log4j.Logger;
  * <li><code>*.gz</code>: GZIP compression</li>
  * <li><code>*.lz4</code>: LZ4 compression</li>
  * <li><code>*.bz2</code>: Bzip2 compression</li>
+ * <li><code>*.zst</code>: ZStandard compression</li>
  * </ul>
  */
 final public class IOUtils {
@@ -111,13 +119,16 @@ final public class IOUtils {
 	private IOUtils() {
 	}
 
+	private enum CompressionType { GZIP, LZ4, BZIP2, ZSTD }
+
 	// Define compressions that can be used.
-	private static final Map<String, String> COMPRESSION_EXTENSIONS = new TreeMap<>();
+	private static final Map<String, CompressionType> COMPRESSION_EXTENSIONS = new TreeMap<>();
 
 	static {
-		COMPRESSION_EXTENSIONS.put("gz", CompressorStreamFactory.GZIP);
-		COMPRESSION_EXTENSIONS.put("lz4", CompressorStreamFactory.LZ4_FRAMED);
-		COMPRESSION_EXTENSIONS.put("bz2", CompressorStreamFactory.BZIP2);
+		COMPRESSION_EXTENSIONS.put("gz", CompressionType.GZIP);
+		COMPRESSION_EXTENSIONS.put("lz4", CompressionType.LZ4);
+		COMPRESSION_EXTENSIONS.put("bz2", CompressionType.BZIP2);
+		COMPRESSION_EXTENSIONS.put("zstd", CompressionType.ZSTD);
 	}
 
 	// Define a number of charsets that are / have been used.
@@ -196,10 +207,10 @@ final public class IOUtils {
 	 * Gets the compression of a certain URL by file extension. May return null if
 	 * not compression is assumed.
 	 */
-	private static String getCompression(URL url) {
+	private static CompressionType getCompression(URL url) {
 		String[] segments = url.getPath().split("\\.");
 		String lastExtension = segments[segments.length - 1];
-		return COMPRESSION_EXTENSIONS.get(lastExtension);
+		return COMPRESSION_EXTENSIONS.get(lastExtension.toLowerCase(Locale.ROOT));
 	}
 
 	/**
@@ -213,13 +224,22 @@ final public class IOUtils {
 		try {
 			InputStream inputStream = url.openStream();
 
-			String compression = getCompression(url);
+			CompressionType compression = getCompression(url);
 			if (compression != null) {
-				CompressorStreamFactory compressorStreamFactory = new CompressorStreamFactory();
-				inputStream = compressorStreamFactory.createCompressorInputStream(compression, inputStream);
-				logger.info(String.format("Using %s compression for %s", compression, url));
-			} else {
-				logger.info(String.format("Using no compression for %s", url));
+				switch (compression) {
+					case GZIP:
+						inputStream = new GZIPInputStream(inputStream);
+						break;
+					case LZ4:
+						inputStream = new LZ4BlockInputStream(inputStream);
+						break;
+					case BZIP2:
+						inputStream = new CompressorStreamFactory().createCompressorInputStream(CompressorStreamFactory.BZIP2, inputStream);
+						break;
+					case ZSTD:
+						inputStream = new ZstdInputStream(inputStream);
+						break;
+				}
 			}
 
 			return new UnicodeInputStream(new BufferedInputStream(inputStream));
@@ -241,7 +261,7 @@ final public class IOUtils {
 	}
 
 	/**
-	 * See {@link #getBufferedReader(String, Charset)}. UTF-8 is assumed as the
+	 * See {@link #getBufferedReader(URL, Charset)}. UTF-8 is assumed as the
 	 * character set.
 	 * 
 	 * @throws UncheckedIOException
@@ -266,7 +286,7 @@ final public class IOUtils {
 			}
 
 			File file = new File(url.getPath());
-			String compression = getCompression(url);
+			CompressionType compression = getCompression(url);
 
 			if (compression != null && append && file.exists()) {
 				throw new UncheckedIOException("Cannot append to compressed files.");
@@ -275,11 +295,20 @@ final public class IOUtils {
 			OutputStream outputStream = new FileOutputStream(file, append);
 
 			if (compression != null) {
-				CompressorStreamFactory compressorStreamFactory = new CompressorStreamFactory();
-				outputStream = compressorStreamFactory.createCompressorOutputStream(compression, outputStream);
-				logger.info(String.format("Using %s compression for %s", compression, url));
-			} else {
-				logger.info(String.format("Using no compression for %s", url));
+				switch (compression) {
+					case GZIP:
+						outputStream = new GZIPOutputStream(outputStream);
+						break;
+					case LZ4:
+						outputStream = new LZ4BlockOutputStream(outputStream);
+						break;
+					case BZIP2:
+						outputStream = new CompressorStreamFactory().createCompressorOutputStream(CompressorStreamFactory.BZIP2, outputStream);
+						break;
+					case ZSTD:
+						outputStream = new ZstdOutputStream(outputStream, 6);
+						break;
+				}
 			}
 
 			return new BufferedOutputStream(outputStream);
@@ -303,7 +332,7 @@ final public class IOUtils {
 	}
 
 	/**
-	 * See {@link #getBufferedWriter(String, Charset, bool)}. UTF-8 is assumed as
+	 * See {@link #getBufferedWriter(URL, Charset, boolean)}. UTF-8 is assumed as
 	 * the character set and non-appending mode is used.
 	 * 
 	 * @throws UncheckedIOException
