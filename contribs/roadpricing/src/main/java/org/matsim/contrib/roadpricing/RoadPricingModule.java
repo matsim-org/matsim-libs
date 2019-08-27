@@ -13,20 +13,12 @@ import com.google.inject.Singleton;
 public final class RoadPricingModule extends AbstractModule {
 	final private static Logger LOG = Logger.getLogger(RoadPricingModule.class);
 	
-//	private RoadPricingScheme scheme;
-
-//	public RoadPricingModule() {	}
-	
-//	RoadPricingModule( RoadPricingScheme scheme ) {
-//		this.scheme = scheme;
-//	}
-	
 	@Override
 	public void install() {
-
+//		Thread.dumpStack();
 		LOG.warn(" !!! Creating RoadPricingConfigGroup !!!");
 //		ConfigUtils.addOrGetModule(getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
-		
+
 
 		// TODO sort out different ways to set toll schemes; reduce automagic
 		// TODO JWJ: is this still too "automagic"?
@@ -35,11 +27,15 @@ public final class RoadPricingModule extends AbstractModule {
 //			bind(RoadPricingScheme.class).toInstance(scheme);
 //		} else {
 //			throw new RuntimeException("no road pricing scheme loaded when controler is started; aborting") ;
-////			bind(RoadPricingScheme.class).toProvider( RoadPricingModuleDefaults.RoadPricingSchemeProvider.class ).in( Singleton.class ) ;
+			bind(RoadPricingScheme.class).toProvider( RoadPricingModuleDefaults.RoadPricingSchemeProvider.class ).in( Singleton.class ) ;
 //		}
 		// also add RoadPricingScheme as ScenarioElement.  yyyy TODO might try to get rid of this; binding it is safer
 //		bind(RoadPricingInitializer.class).asEagerSingleton();
-		
+
+		// this is what makes the mobsim compute tolls and generate money events
+		// TODO yyyy could probably combine the following two:
+		addControlerListenerBinding().to(RoadPricingControlerListener.class).in( Singleton.class ) ;
+
 		// add the toll to the routing disutility.  also includes "randomizing":
 		addTravelDisutilityFactoryBinding(TransportMode.car).toProvider(TravelDisutilityIncludingTollFactoryProvider.class).in( Singleton.class ) ;
 
@@ -49,13 +45,10 @@ public final class RoadPricingModule extends AbstractModule {
 //		addPlanStrategyBinding("ReRouteAreaToll").toProvider(ReRouteAreaToll.class);
 //		addTravelDisutilityFactoryBinding("car_with_payed_area_toll").toInstance(new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, getConfig().planCalcScore()));
 //		addRoutingModuleBinding("car_with_payed_area_toll").toProvider(new RoadPricingNetworkRouting());
-		
+
 		// yyyy TODO It might be possible that the area stuff is adequately resolved by the randomizing approach.  Would need to try
 		// that out.  kai, sep'16
 
-		// this is what makes the mobsim compute tolls and generate money events
-		// TODO yyyy could probably combine the following two:
-		addControlerListenerBinding().to(RoadPricingControlerListener.class).in( Singleton.class ) ;
 
 
 

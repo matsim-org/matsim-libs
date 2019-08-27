@@ -20,7 +20,9 @@
 
 package org.matsim.contrib.roadpricing;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
@@ -38,7 +40,10 @@ class TravelDisutilityIncludingToll implements TravelDisutility {
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger( TravelDisutilityIncludingToll.class ) ;
 
-	private final RoadPricingScheme scheme;
+	@Inject
+	Scenario scenario;
+	@Inject
+	RoadPricingScheme scheme;
 	private final TollRouterBehaviour tollCostHandler;
 	private final TravelDisutility normalTravelDisutility;
 	private final double marginalUtilityOfMoney;
@@ -46,28 +51,32 @@ class TravelDisutilityIncludingToll implements TravelDisutility {
 
 	private static int utlOfMoneyWrnCnt = 0 ;
 
-	TravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, final RoadPricingScheme scheme, Config config)
+//	TravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, final RoadPricingScheme scheme, Config config)
+	TravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, Config config)
 	{
-		this( normalTravelDisutility, scheme, config.planCalcScore().getMarginalUtilityOfMoney(), 0. ) ;
+		this( normalTravelDisutility, config.planCalcScore().getMarginalUtilityOfMoney(), 0. ) ;
 		// this is using sigma=0 for backwards compatibility (not sure how often this is needed)
 	}
 
-	TravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, final RoadPricingScheme scheme,
+	TravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, //final RoadPricingScheme scheme,
 			double marginalUtilityOfMoney, double sigma ) {
-		this.scheme = scheme;
+
+//		this.scheme = RoadPricingUtils.getScheme(scenario);
+
+//		this.scheme = scheme;
 		this.normalTravelDisutility = normalTravelDisutility;
-		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(scheme.getType())) {
+		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType())) {
 			this.tollCostHandler = new DistanceTollCostBehaviour();
-		} else if (scheme.getType() == RoadPricingScheme.TOLL_TYPE_AREA) {
+		} else if (this.scheme.getType() == RoadPricingScheme.TOLL_TYPE_AREA) {
 			this.tollCostHandler = new AreaTollCostBehaviour();
 			Logger.getLogger(this.getClass()).warn("area pricing is more brittle than the other toll schemes; " +
 					"make sure you know what you are doing.  kai, apr'13 & sep'14") ;
-		} else if (scheme.getType() == RoadPricingScheme.TOLL_TYPE_CORDON) {
+		} else if (this.scheme.getType() == RoadPricingScheme.TOLL_TYPE_CORDON) {
 			this.tollCostHandler = new CordonTollCostBehaviour();
-		} else if (scheme.getType() == RoadPricingScheme.TOLL_TYPE_LINK) {
+		} else if (this.scheme.getType() == RoadPricingScheme.TOLL_TYPE_LINK) {
 			this.tollCostHandler = new LinkTollCostBehaviour();
 		} else {
-			throw new IllegalArgumentException("RoadPricingScheme of type \"" + scheme.getType() + "\" is not supported.");
+			throw new IllegalArgumentException("RoadPricingScheme of type \"" + this.scheme.getType() + "\" is not supported.");
 		}
 		this.marginalUtilityOfMoney = marginalUtilityOfMoney ;
 		if ( utlOfMoneyWrnCnt < 1 && this.marginalUtilityOfMoney != 1. ) {

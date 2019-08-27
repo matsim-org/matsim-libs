@@ -19,24 +19,16 @@ package org.matsim.contrib.roadpricing.run;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.roadpricing.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.vehicles.Vehicle;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
- * Basic 'script' to run roadpricing. This example ahows how to, programatically,
+ * Basic 'script' to run road pricing. This example shows how to, programmatically,
  * configure the roadpricing scheme instead of reading it from an XML file.
  */
 public class RunRoadPricingFromCode {
@@ -71,31 +63,6 @@ public class RunRoadPricingFromCode {
 		controler.run();
 	}
 
-	private static void runFromFile(String[] args){
-		// yyyyyy this method is now totally in the wrong class!  kai, jul'19
-
-		if(args.length==0){ args = new String[]{TEST_CONFIG}; }
-
-		/* Start with a known config file (with population, network, and scoring
-		parameteres specified) and just remove the road pricing file. */
-		Config config = ConfigUtils.loadConfig(args[0], RoadPricingUtils.createConfigGroup());
-		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(10);
-
-		// prepare scenario:
-
-		Scenario sc = ScenarioUtils.loadScenario(config);
-		RoadPricingUtils.loadRoadPricingScheme( sc );
-
-		// prepare scenario:
-
-		Controler controler = new Controler(sc);
-
-		controler.addOverridingModule( new RoadPricingModule() );
-
-		controler.run();
-	}
-
 
 	private static void createCustomRoadPricingScheme( Scenario scenario){
 		RoadPricingSchemeImpl scheme1 = RoadPricingUtils.createAndRegisterMutableScheme(scenario );
@@ -119,51 +86,5 @@ public class RunRoadPricingFromCode {
 				Time.parseTime("06:00:00"),
 				Time.parseTime("10:00:00"),
 				10.0);
-
-		RoadPricingScheme scheme2 = new RoadPricingScheme(){
-			@Override public String getName(){
-				return scheme1.getName() ;
-			}
-
-			@Override public String getType(){
-				return scheme1.getType() ;
-			}
-
-			@Override public String getDescription(){
-				return scheme1.getDescription() ;
-			}
-
-			@Override public Set<Id<Link>> getTolledLinkIds(){
-				return scheme1.getTolledLinkIds() ;
-			}
-
-			@Override
-			public RoadPricingCost getLinkCostInfo( Id<Link> linkId , double time , Id<Person> personId , Id<Vehicle> vehicleId ){
-				RoadPricingCost baseCost = scheme1.getLinkCostInfo( linkId , time , personId , vehicleId );
-
-				Vehicle vehicle = scenario.getVehicles().getVehicles().get( vehicleId ) ;
-				Gbl.assertNotNull(vehicle);
-				if ( true ) {
-					return baseCost ;
-				} else {
-					// i.e. has an eTag
-					return new RoadPricingCost(baseCost.startTime, baseCost.endTime, baseCost.amount * 0.8 ) ;
-				}
-			}
-
-			@Override public RoadPricingCost getTypicalLinkCostInfo( Id<Link> linkId , double time ){
-				return scheme1.getTypicalLinkCostInfo( linkId, time ) ;
-			}
-
-			@Override public Iterable<RoadPricingCost> getTypicalCosts(){
-				return scheme1.getTypicalCosts() ;
-			}
-
-			@Override public Map<Id<Link>, List<RoadPricingCost>> getTypicalCostsForLink(){
-				return scheme1.getTypicalCostsForLink() ;
-			}
-		} ;
-
-
 	}
 }

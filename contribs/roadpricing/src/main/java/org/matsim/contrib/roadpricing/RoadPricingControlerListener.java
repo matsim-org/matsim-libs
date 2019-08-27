@@ -36,14 +36,14 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.TravelDisutility;
 
 /**
- * Integrates the RoadPricing functionality into the MATSim Controler.  Does the 
+ * Integrates the RoadPricing functionality into the MATSim Controler.  Does the
  * following:
  * <p></p>
  * <strike>Initialization:
  * <ul>
  * 		<li> Adds the {@link RoadPricingTollCalculator} events listener (to calculate the
  * 			 toll per agent).
- * 		<li> Adds the toll to the {@link TravelDisutility} for the router (by 
+ * 		<li> Adds the toll to the {@link TravelDisutility} for the router (by
  * 			 wrapping the pre-existing {@link TravelDisutility} object).
  * </ul></strike>
  * After mobsim:
@@ -64,25 +64,25 @@ class RoadPricingControlerListener implements StartupListener, IterationEndsList
 	private OutputDirectoryHierarchy controlerIO;
 
 	@Inject
-	RoadPricingControlerListener( Scenario scenario, OutputDirectoryHierarchy controlerIO, EventsManager events ) {
-		scheme = (RoadPricingScheme) scenario.getScenarioElement( RoadPricingScheme.ELEMENT_NAME );
-		if ( scheme==null ) {
-			RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule( scenario.getConfig() , RoadPricingConfigGroup.class );
-			if ( rpConfig.getTollLinksFile()==null || rpConfig.getTollLinksFile()=="" ) {
-				throw new RuntimeException( "neither road pricing scheme nor toll links file is provided; aborting ..." ) ;
+	RoadPricingControlerListener(Scenario scenario, OutputDirectoryHierarchy controlerIO, EventsManager events) {
+		scheme = (RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
+		if (scheme == null || scheme.getType() == null) {
+			RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), RoadPricingConfigGroup.class);
+			if (rpConfig.getTollLinksFile() == null && rpConfig.getTollLinksFile() == "") {
+				throw new RuntimeException("neither road pricing scheme nor toll links file is provided; aborting ...");
 			}
-			scheme = RoadPricingUtils.createAndRegisterMutableScheme( scenario ) ;
-			new RoadPricingReaderXMLv1( (RoadPricingSchemeImpl) scheme ).readFile(rpConfig.getTollLinksFile());
+			scheme = RoadPricingUtils.createAndRegisterMutableScheme(scenario);
+			new RoadPricingReaderXMLv1((RoadPricingSchemeImpl) scheme).readFile(rpConfig.getTollLinksFile());
 		}
-		this.calcPaidToll = new RoadPricingTollCalculator( scenario.getNetwork(), scenario, events ) ;
-		this.cattl = new CalcAverageTolledTripLength( scenario.getNetwork(), scenario, events ) ;
+		this.calcPaidToll = new RoadPricingTollCalculator(scenario.getNetwork(), scenario, events);
+		this.cattl = new CalcAverageTolledTripLength(scenario.getNetwork(), scenario, events);
 		this.controlerIO = controlerIO;
 		Gbl.printBuildInfo("RoadPricing", "/org.matsim.contrib/roadpricing/revision.txt");
 	}
 
 	@Override
-	public void notifyStartup(final StartupEvent event) {}
-
+	public void notifyStartup(final StartupEvent event) {
+	}
 
 
 	@Override
@@ -94,7 +94,7 @@ class RoadPricingControlerListener implements StartupListener, IterationEndsList
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		String filename = this.controlerIO.getOutputFilename("output_toll.xml.gz") ;
+		String filename = this.controlerIO.getOutputFilename("output_toll.xml.gz");
 		new RoadPricingWriterXMLv1(this.scheme).writeFile(filename);
 	}
 
