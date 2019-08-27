@@ -18,11 +18,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.accessibility.utils;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
@@ -44,6 +40,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.accessibility.AccessibilityAttributes;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
@@ -51,6 +48,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.facilities.ActivityFacilities;
@@ -140,6 +138,22 @@ public class AccessibilityUtils {
 		return aggregatedOrigins;
 	}
 
+
+	public static Network createModeSpecificSubNetwork(Network network, String mode) {
+		LOG.warn("Full network has " + network.getNodes().size() + " nodes.");
+		Network subNetwork = NetworkUtils.createNetwork();
+		Set<String> modeSet = new HashSet<>();
+		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
+		if (mode.equals(Modes4Accessibility.freespeed.name())) {
+			modeSet.add(TransportMode.car);
+		} else {
+			modeSet.add(mode);
+		}
+		filter.filter(subNetwork, modeSet);
+		if (subNetwork.getNodes().size() == 0) {throw new RuntimeException("Network has 0 nodes for mode " + mode + ". Something is wrong.");}
+		LOG.warn("sub-network for mode " + modeSet.toString() + " now has " + subNetwork.getNodes().size() + " nodes.");
+		return subNetwork;
+	}
 	
 	/**
 	 * Collects all facilities of a given type that have been loaded to the sceanrio.
