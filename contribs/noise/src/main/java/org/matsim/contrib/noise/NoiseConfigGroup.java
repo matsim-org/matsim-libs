@@ -85,6 +85,7 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	private static final String WRITE_OUTPUT_ITERATION_CMT = "Specifies how often the noise-specific output is written out.";
 	private static final String CONSIDER_NOISE_BARRIERS = "considerNoiseBarriers";
 	private static final String NOISE_BARRIERS_GEOJSON_FILE = "noiseBarriersGeojsonPath";
+	private static final String NOISE_BARRIERS_SOURCE_CRS = "source coordinate reference system of noise barriers geojson file";
 	private static final String NETWORK_MODES_TO_IGNORE = "networkModesToIgnore";
 
     public NoiseConfigGroup() {
@@ -134,6 +135,7 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 
 	private boolean considerNoiseBarriers = false;
     private String noiseBarriersFilePath = null;
+    private String noiseBarriersSourceCrs = null;
     
     // ########################################################################################################
 	
@@ -186,6 +188,7 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 
 		comments.put(CONSIDER_NOISE_BARRIERS, "Set to 'true' if noise barriers / building shielding should be considered. Otherwise set to 'false'.");
         comments.put(NOISE_BARRIERS_GEOJSON_FILE, "Path to the geojson file for noise barriers.");
+        comments.put(NOISE_BARRIERS_SOURCE_CRS, "Source coordinate reference system of noise barriers geojson file.");
 
         comments.put(NETWORK_MODES_TO_IGNORE, "Specifies the network modes to be excluded from the noise computation, e.g. 'bike'.");
 
@@ -775,8 +778,17 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
     }
 
     @StringSetter(NOISE_BARRIERS_GEOJSON_FILE)
-    public void setConsiderNoiseBarriers(String noiseBarriersFilePath) {
+    public void setNoiseBarriersFilePath(String noiseBarriersFilePath) {
         this.noiseBarriersFilePath = noiseBarriersFilePath;
     }
-    
+
+    @StringGetter(NOISE_BARRIERS_SOURCE_CRS)
+    public String getNoiseBarriersSourceCRS() {
+        return this.noiseBarriersSourceCrs;
+    }
+
+    @StringSetter(NOISE_BARRIERS_SOURCE_CRS)
+    public void setNoiseBarriersSourceCRS(String noiseBarriersSourceCrs) {
+        this.noiseBarriersSourceCrs = noiseBarriersSourceCrs;
+    }
 }

@@ -61,7 +61,7 @@ public final class ProcessNoiseImmissions {
 	private final String outputPath;
 	
 	private BufferedWriter bw;
-	private Map<Double, Map<Id<ReceiverPoint>, Double>> time2rp2value = new HashMap<Double, Map<Id<ReceiverPoint>, Double>>();
+	private Map<Double, Map<Id<ReceiverPoint>, Double>> time2rp2value = new HashMap<>();
 	
 	public ProcessNoiseImmissions(String workingDirectory, String receiverPointsFile, double receiverPointGap) {
 		this.workingDirectory = workingDirectory;
@@ -94,7 +94,7 @@ public final class ProcessNoiseImmissions {
 				String line = null;
 				line = br.readLine();
 
-				Map<Id<ReceiverPoint>, Double> rp2value = new HashMap<Id<ReceiverPoint>, Double>();
+				Map<Id<ReceiverPoint>, Double> rp2value = new HashMap<>();
 				int lineCounter = 0;
 				log.info("Reading lines ");
 				while ((line = br.readLine()) != null) {

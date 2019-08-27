@@ -57,7 +57,7 @@ import org.matsim.vehicles.Vehicle;
  * @author lkroeger, ikaddoura
  *
  */
-public class NoiseContext {
+public final class NoiseContext {
 	
 	private static final Logger log = Logger.getLogger(NoiseContext.class);
 			
@@ -66,7 +66,7 @@ public class NoiseContext {
 	private final Grid grid;
 	private final ShieldingContext shielding;
 
-	private final Map<Tuple<Integer,Integer>, List<Id<Link>>> zoneTuple2listOfLinkIds = new HashMap<Tuple<Integer, Integer>, List<Id<Link>>>();
+	private final Map<Tuple<Integer,Integer>, List<Id<Link>>> zoneTuple2listOfLinkIds = new HashMap<>();
 	private double xCoordMinLinkNode = Double.MAX_VALUE;
 //	private double xCoordMaxLinkNode = Double.MIN_VALUE;
 //	private double yCoordMinLinkNode = Double.MAX_VALUE;
@@ -118,7 +118,7 @@ public class NoiseContext {
 
         if(noiseParams.isConsiderNoiseBarriers()) {
             final Collection<FeatureNoiseBarrierImpl> barriers
-                    = FeatureNoiseBarriersReader.read(noiseParams.getNoiseBarriersFilePath(), "EPSG:4326", "EPSG:31468");
+                    = FeatureNoiseBarriersReader.read(noiseParams.getNoiseBarriersFilePath(), noiseParams.getNoiseBarriersSourceCRS(), scenario.getConfig().global().getCoordinateSystem());
             shielding = new ShieldingContext(barriers);
         } else {
             shielding = null;
