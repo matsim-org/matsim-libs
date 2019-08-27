@@ -29,10 +29,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.contrib.socnetsim.framework.cliques.config.JointTripInsertorConfigGroup;
@@ -44,7 +42,6 @@ import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
 import org.matsim.contrib.socnetsim.usage.JointScenarioUtils;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
 

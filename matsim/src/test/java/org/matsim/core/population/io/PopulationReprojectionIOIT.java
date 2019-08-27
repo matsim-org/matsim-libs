@@ -42,8 +42,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
-import org.matsim.core.router.EmptyStageActivityTypes;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.ProjectionUtils;

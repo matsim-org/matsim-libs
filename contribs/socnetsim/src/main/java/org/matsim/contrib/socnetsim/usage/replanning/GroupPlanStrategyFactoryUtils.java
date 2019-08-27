@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.TourModeUnifierModule;

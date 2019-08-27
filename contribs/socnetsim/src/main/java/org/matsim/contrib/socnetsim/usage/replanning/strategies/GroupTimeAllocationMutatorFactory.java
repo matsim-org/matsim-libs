@@ -27,14 +27,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.TripRouter;
 
 import com.google.inject.Inject;
 
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.BlackListedTimeAllocationMutator;
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.GroupPlanStrategy;
 import org.matsim.contrib.socnetsim.usage.replanning.GroupPlanStrategyFactoryUtils;

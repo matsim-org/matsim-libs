@@ -20,7 +20,6 @@
 package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.TripRouter;
 
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;

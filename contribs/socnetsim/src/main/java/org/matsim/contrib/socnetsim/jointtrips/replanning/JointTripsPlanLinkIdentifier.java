@@ -22,7 +22,6 @@ package org.matsim.contrib.socnetsim.jointtrips.replanning;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 

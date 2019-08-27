@@ -22,7 +22,6 @@ package org.matsim.contrib.socnetsim.jointtrips.replanning.modules;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -31,7 +30,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
