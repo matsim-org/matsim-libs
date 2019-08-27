@@ -126,6 +126,7 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 		// all other objects have to be different by definition, as long as the cache is correctly implemented
 	}
 
+	public abstract int index();
 
 	/**
 	 * The default implementation to be used for Ids.
@@ -144,6 +145,11 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 		/*package*/ IdImpl(final String id, final int index) {
 			this.id = id;
 			this.index = index;
+		}
+
+		@Override
+		public int index() {
+			return this.index;
 		}
 
 		@Override
