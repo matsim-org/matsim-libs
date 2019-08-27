@@ -304,8 +304,10 @@ public final class PreplanningEngine implements MobsimEngine {
 
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 
-		// search for drt trip corresponding to drt leg.  Trick is using our own stage activities.
-		TripStructureUtils.Trip drtTrip = TripStructureUtils.findTripAtPlanElement(leg, plan, drtStageActivities );
+		// search for drt trip corresponding to drt leg.  Trick is using our own stage activities (drtStageActivities).
+		// TODO: existing tests pass, but probably it is currently wrong after removing stage activity types
+		// and thereby losing the ability to only consider drtStageActivities as stage activities and nothing else
+		TripStructureUtils.Trip drtTrip = TripStructureUtils.findTripAtPlanElement(leg, plan );
 		Gbl.assertNotNull(drtTrip );
 
 		final TripInfoRequest request = new TripInfoRequest.Builder(scenario).setFromActivity(drtTrip.getOriginActivity() )

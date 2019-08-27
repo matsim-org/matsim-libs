@@ -42,9 +42,9 @@ import org.matsim.core.gbl.Gbl;
  * Two versions of the methods are provided, working on {@link Plan}s
  * or lists of {@link PlanElement}s.
  * <br>
- * The methods require an instance of {@link StageActivityTypes} as a parameter,
- * which is used to identify the dummy activities pertaining to trips.
- * In almost all use-cases, it should come from {@link TripRouter#getStageActivityTypes()}.
+ * The methods require {@link StageActivityHandling} as a parameter,
+ * which is used to decide whether dummy activities such as pt interaction should be
+ * handled like normal activities or ignored.
  *
  * @author thibautd
  */
@@ -606,17 +606,15 @@ public class TripStructureUtils {
 			return "Subtour: "+trips.toString();
 		}
 	}
-	public static Trip findTripAtPlanElement( PlanElement currentPlanElement, Plan plan) {
-		return findTripAtPlanElement(currentPlanElement, plan, EmptyStageActivityTypes.INSTANCE);
-	}
+
 	@Deprecated // use findTripAtPlanElement(...) instead.
-	public static Trip findCurrentTrip( PlanElement pe, Plan plan, StageActivityTypes sat ) {
-		return findTripAtPlanElement( pe, plan, sat ) ;
+	public static Trip findCurrentTrip( PlanElement pe, Plan plan ) {
+		return findTripAtPlanElement( pe, plan ) ;
 	}
-	@Deprecated
-	public static Trip findTripAtPlanElement( PlanElement currentPlanElement, Plan plan, StageActivityTypes stageActivities ) {
+
+	public static Trip findTripAtPlanElement( PlanElement currentPlanElement, Plan plan ) {
 		if ( currentPlanElement instanceof Activity ) {
-			Gbl.assertIf( stageActivities.isStageActivity( ((Activity)currentPlanElement).getType() ) ) ;
+			Gbl.assertIf( StageActivityTypeIdentifier.isStageActivity( ((Activity)currentPlanElement).getType() ) ) ;
 		}
 		List<Trip> trips = getTrips(plan.getPlanElements()) ;
 		for ( Trip trip : trips ) {
