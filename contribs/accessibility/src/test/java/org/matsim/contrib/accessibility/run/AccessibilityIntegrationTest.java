@@ -130,8 +130,8 @@ public class AccessibilityIntegrationTest {
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.matrixBasedPt, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.matrixBasedPt, false);
 
 		ModeParams ptParams = new ModeParams(TransportMode.transit_walk);
 		config.planCalcScore().addModeParams(ptParams);
@@ -383,8 +383,8 @@ public class AccessibilityIntegrationTest {
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.matrixBasedPt, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.matrixBasedPt, false);
 		acg.setUseParallelization(false);
 
 		// modify config according to needs
