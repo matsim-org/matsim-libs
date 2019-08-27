@@ -2,7 +2,7 @@
  * A package which provides some tools to compute...
  * <ul>
  * <li> noise (emission) levels on network links (based on traffic volume, share of heavy goods vehicles, speed level)
- * <li> noise (immission) levels at receiver points (based on the surrounding links' emissions and distances)
+ * <li> noise (immission) levels at receiver points (based on the surrounding links' emissions, distances and shielding [optional])
  * <li> population units (= population densities) at receiver points (mapping agents to the nearest receiver point) 
  * <li> noise damages (= noise exposure costs) at receiver points (based on population units and noise levels)
  * </ul>
@@ -26,6 +26,8 @@
  * Preprint available from <a href="https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2015/15-12/"> </a>
  * <li> I. Kaddoura and K. Nagel. Activity-based computation of marginal noise exposure costs: Implications for traffic management. Transportation Research Record 2597, 2016. DOI: 10.3141/2597-15.
  * Preprint available from <a href="https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2015/15-13/"> </a>
+ * <li> N. Kuehnel, I. Kaddoura and R. Moeckel. Noise Shielding in an Agent-Based Transport Model Using Volunteered Geographic Data. Procedia Computer Science Volume 151, 2019. Pages 808-813 DOI: 10.1016/j.procs.2019.04.110.
+ * Available from <a href="https://www.sciencedirect.com/science/article/pii/S1877050919305745"> </a>
  * </ul>
  * 
  * 

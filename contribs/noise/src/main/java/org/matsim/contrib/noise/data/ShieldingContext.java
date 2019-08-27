@@ -42,6 +42,9 @@ public class ShieldingContext {
         }
     }
 
+    /**
+     * determines the shielding correction for a receiver point for a given link emission source
+     */
     double determineShieldingCorrection(ReceiverPoint receiverPoint, Link link, Coord projectedCoord) {
         double correctionTermShielding = 0;
         final Point rpPoint = GeometryUtils.createGeotoolsPoint(receiverPoint.getCoord());
@@ -122,6 +125,9 @@ public class ShieldingContext {
         return correctionTermShielding;
     }
 
+    /**
+     * Returns an ordered map of distances and coords to all obstruction edges
+     */
     private ConcurrentSkipListMap<Double, Coordinate> getObstructionEdges(Point receiver, Point source, Geometry directLineOfSight,
                                                                           Geometry fromLineOfSight, Geometry toLineOfSight) {
         final Collection<NoiseBarrier> candidates =
@@ -140,6 +146,14 @@ public class ShieldingContext {
         return edgeCandidates;
     }
 
+    /**
+     * Checks whether a barrier is obstructing the receiver point-emission source relation.
+     * The following has to be met:
+     * 1) the barrier must not contain the receiver point
+     * 2) the direct projected line of sight must intersect the barrier
+     * 3) the line of sight from receiver to the from-Node of the link intersects the barrier
+     * 4) the line of sight from receiver to the to-Node of the link intersects the barrier
+     */
     private boolean isObstructing(Geometry receiver, Geometry source, Geometry lineOfSight,
                                   Geometry fromLineOfSight, Geometry toLineOfSight, Geometry barrier) {
         return !barrier.contains(receiver)
