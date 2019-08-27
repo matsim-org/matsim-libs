@@ -22,13 +22,9 @@
  */
 package org.matsim.contrib.noise;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
+import com.sun.istack.internal.Nullable;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -61,11 +57,11 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 	private static final Logger log = Logger.getLogger(NoiseTimeTracker.class);
 	private static final boolean printLog = false;
 	
-	@Inject
-	private NoiseContext noiseContext;
+	@Inject private NoiseContext noiseContext;
 		
-	@Inject
-	private EventsManager events;
+	@Inject private EventsManager events;
+
+	@Inject(optional = true) Set<NoiseModule.NoiseListener> listeners ;
 
 	private String outputDirectory;
 	private int iteration;
@@ -226,11 +222,22 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 					calculateMarginalDamageCost(rp, immisions);
 				}
 			}
+			if ( listeners!=null ) {
+				NoiseModule.NoiseRecord record = new NoiseModule.NoiseRecord() ;
+				record.coord = rp.getCoord() ;
+				record.immissions = rp.getFinalImmission() ;
+				for( NoiseModule.NoiseListener listener : listeners ){
+					listener.putNoiseRecord( record );
+				}
+			} else {
+				log.warn("listeners=null") ;
+			}
 		}
 		calculateCostsPerVehiclePerLinkPerTimeInterval();
 		
 		finishNoiseDamageCosts();
-		
+
+
 		if (writeOutput()) {
 			NoiseWriter.writeNoiseImmissionStatsPerHour(noiseContext, outputDirectory);
 			if (this.noiseContext.getNoiseParams().isComputePopulationUnits()) {

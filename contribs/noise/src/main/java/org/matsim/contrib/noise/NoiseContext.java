@@ -91,6 +91,8 @@ final class NoiseContext {
 
 	@Inject
 	NoiseContext(Scenario scenario) {
+		log.warn("instantiating NoiseContext") ;
+
 		this.scenario = scenario;
 
 //		if ((NoiseConfigGroup) this.scenario.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME) == null) {

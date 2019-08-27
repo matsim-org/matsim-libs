@@ -257,7 +257,7 @@ final class NoiseWriter {
 		
 	}
 	
-	public static void writePersonActivityInfoPerHour(NoiseContext noiseContext, String outputPath) {
+	static void writePersonActivityInfoPerHour( NoiseContext noiseContext , String outputPath ) {
 		double timeInterval = noiseContext.getCurrentTimeBinEndTime();
 		
 		String outputPathActivityInfo = outputPath + "consideredAgentUnits/";
@@ -265,6 +265,8 @@ final class NoiseWriter {
 		dir.mkdirs();
 		
 		String fileName = outputPathActivityInfo + "consideredAgentUnits_" + timeInterval + ".csv";
+
+		log.warn("writing consideredAgentUnits for timeInterval=" + timeInterval ) ;
 		
 		File file = new File(fileName);
 		
