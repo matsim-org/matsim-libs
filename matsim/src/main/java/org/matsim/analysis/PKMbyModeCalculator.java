@@ -1,10 +1,31 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * PKMbyModeCalculator.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package org.matsim.analysis;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.jfree.chart.util.ArrayUtils;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.charts.StackedBarChart;
@@ -14,11 +35,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 /**
- *
+ * analyses passenger kilometer traveled based on experienced plans.
+ * @author jbischoff
  */
 public class PKMbyModeCalculator {
 
@@ -32,8 +57,8 @@ public class PKMbyModeCalculator {
 
     @Inject
     PKMbyModeCalculator(ControlerConfigGroup controlerConfigGroup, OutputDirectoryHierarchy controlerIO) {
-    writePng = controlerConfigGroup.isCreateGraphs();
-    this.controlerIO = controlerIO;
+        writePng = controlerConfigGroup.isCreateGraphs();
+        this.controlerIO = controlerIO;
     }
 
     public void addIteration(int iteration, Map<Id<Person>, Plan> map) {
@@ -52,32 +77,29 @@ public class PKMbyModeCalculator {
     }
 
 
-
     public void writeOutput() {
-         writeVKTText();
-        
+        writeVKTText();
+
     }
 
     private void writeVKTText() {
         TreeSet<String> allModes = new TreeSet<>();
         allModes.addAll(this.pmtPerIteration.values()
-                                .stream()
-                                .flatMap(i->i.keySet().stream())
-                                .collect(Collectors.toSet()));
+                .stream()
+                .flatMap(i->i.keySet().stream())
+                .collect(Collectors.toSet()));
 
-        try(CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(controlerIO.getOutputFilename(filename + ".txt"))), CSVFormat.DEFAULT.withDelimiter(DEL)))
-
-        {
+        try(CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(controlerIO.getOutputFilename(filename + ".txt"))), CSVFormat.DEFAULT.withDelimiter(DEL))) {
             csvPrinter.print("Iteration");
             csvPrinter.printRecord(allModes);
 
             for (Map.Entry<Integer,Map<String,Double>> e : pmtPerIteration.entrySet()){
                 csvPrinter.print(e.getKey());
-            for (String mode : allModes){
-                csvPrinter.print(df.format(e.getValue().getOrDefault(mode,0.0)/1000.0));
-            }
+                for (String mode : allModes){
+                    csvPrinter.print(df.format(e.getValue().getOrDefault(mode,0.0)/1000.0));
+                }
                 csvPrinter.println();
-        }
+            }
 
 
         } catch (IOException e) {
@@ -88,7 +110,7 @@ public class PKMbyModeCalculator {
             int i = 0;
             for (Integer it : pmtPerIteration.keySet()){
                 categories[i++] = it.toString();
-                }
+            }
 
             StackedBarChart chart = new StackedBarChart("Passenger kilometers traveled per Mode","Iteration","pkm",categories);
             for (String mode : allModes){
