@@ -68,7 +68,6 @@ public class TripPlanMutateTimeAllocationTest {
 
 		TripPlanMutateTimeAllocation mutator =
 				new TripPlanMutateTimeAllocation(
-						new StageActivityTypesImpl(),
 						3600.,
 						affectingDuration, new Random(2011));
 		mutator.run(plan);
