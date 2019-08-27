@@ -21,7 +21,6 @@ package org.matsim.contrib.socnetsim.usage.analysis.scripts;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -37,15 +36,11 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.pt.PtConstants;
 
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.contrib.socnetsim.jointtrips.JointMainModeIdentifier;
 
 /**
@@ -65,9 +60,6 @@ public class CountTripsPerTypeOfOriginAndDestination {
 				return delegate.identifyMainMode( tripElements );
 			}
 		};
-	private static final StageActivityTypes STAGES =
-		new StageActivityTypesImpl();
-
 
 	public static void main(final String[] args) throws IOException {
 		final String inPlansFile = args[ 0 ];

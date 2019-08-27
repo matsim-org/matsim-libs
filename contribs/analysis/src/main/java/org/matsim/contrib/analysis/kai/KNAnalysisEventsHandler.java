@@ -37,7 +37,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -69,13 +68,6 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 	private Scenario scenario = null ;
 	private final TreeMap<Id<Person>, Double> agentDepartures = new TreeMap<>();
 	private final TreeMap<Id<Person>, Integer> agentLegs = new TreeMap<>();
-
-	private final StageActivityTypes stageActivities = new StageActivityTypes(){
-		@Override public boolean isStageActivity(String activityType) {
-			return activityType.contains("interaction") ;
-			// yyyy Hopefully nobody defines a standard activity type with name "people_interaction" or similar ...  kai, sep'16
-		}
-	} ;
 
 	//	private final MainModeIdentifier mainModeIdentifier = new TransportPlanningMainModeIdentifier() ;
 	private final MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl() ;

@@ -43,7 +43,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.charts.BarChart;
@@ -64,15 +63,13 @@ public class DistanceDistribution implements IterationEndsListener {
 	private final Network network;
 	private final Population population;
 	private final MainModeIdentifier mainModeIdentifier;
-	private final StageActivityTypes stageActivityTypes;
 	private final List<DistributionClass> classes;
 	
 	public DistanceDistribution(final Network network, final Population population,
-			final MainModeIdentifier mainModeIdentifier, final StageActivityTypes stageActivityTypes) {
+			final MainModeIdentifier mainModeIdentifier) {
 		this.network = network;
 		this.population = population;
 		this.mainModeIdentifier = mainModeIdentifier;
-		this.stageActivityTypes = stageActivityTypes;
 		
 		this.classes = new ArrayList<DistributionClass>();
 	}

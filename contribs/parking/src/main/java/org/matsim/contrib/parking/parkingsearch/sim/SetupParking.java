@@ -28,7 +28,6 @@ import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
-import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.contrib.parking.parkingsearch.evaluation.ParkingListener;
 import org.matsim.contrib.parking.parkingsearch.manager.FacilityBasedParkingManager;
 import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
@@ -43,7 +42,6 @@ import org.matsim.core.controler.PrepareForSim;
 import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
-import org.matsim.core.router.StageActivityTypes;
 
 import com.google.inject.name.Names;
 
@@ -63,14 +61,7 @@ public class SetupParking {
 		controler.getConfig().addModule(new DvrpConfigGroup());
 		}
 		final DynRoutingModule routingModuleCar = new DynRoutingModule(TransportMode.car);
-		StageActivityTypes stageActivityTypesCar = new StageActivityTypes() {
-			@Override
-			public boolean isStageActivity(String activityType) {
 
-				return (activityType.equals(ParkingUtils.PARKACTIVITYTYPE));
-			}
-		};
-		routingModuleCar.setStageActivityTypes(stageActivityTypesCar);
 		controler.addOverridingModule(new DvrpTravelTimeModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
