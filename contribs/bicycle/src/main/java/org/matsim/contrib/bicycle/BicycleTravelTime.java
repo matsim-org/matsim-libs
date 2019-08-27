@@ -49,7 +49,7 @@ public class BicycleTravelTime implements TravelTime {
 		String surface = (String) link.getAttributes().getAttribute(BicycleLabels.SURFACE);
 		double surfaceSpeed = vehicleLinkSpeed;
 		if (surface != null) {
-			surfaceSpeed = computeSurfaceSpeed(vehicleLinkSpeed, surface, type);
+//			surfaceSpeed = computeSurfaceSpeed(vehicleLinkSpeed, surface, type);
 		}
 		
 		double effectiveSpeed = Math.min(gradientSpeed, surfaceSpeed);

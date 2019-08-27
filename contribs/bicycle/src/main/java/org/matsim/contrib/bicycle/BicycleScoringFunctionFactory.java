@@ -55,7 +55,7 @@ public class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
 		BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) scenario.getConfig().getModule("bicycle");
 		BicycleScoringType bicycleScoringType = bicycleConfigGroup.getBicycleScoringType();
 		if (bicycleScoringType == BicycleScoringType.legBased) {
-			sumScoringFunction.addScoringFunction(new BicycleLegScoring(params, scenario.getNetwork(), scenario.getConfig().transit().getTransitModes(), bicycleConfigGroup));
+			sumScoringFunction.addScoringFunction(new BicycleLegScoring(params, scenario.getNetwork(), scenario.getConfig().transit().getTransitModes(), bicycleConfigGroup, person));
 		} else if (bicycleScoringType == BicycleScoringType.linkBased) {
 			BicycleLinkScoring bicycleLinkScoring = new BicycleLinkScoring(params, scenario, bicycleConfigGroup);
 			sumScoringFunction.addScoringFunction(bicycleLinkScoring);

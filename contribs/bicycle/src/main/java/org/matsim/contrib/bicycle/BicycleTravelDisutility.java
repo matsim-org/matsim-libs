@@ -21,6 +21,7 @@ package org.matsim.contrib.bicycle;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -42,6 +43,7 @@ public class BicycleTravelDisutility implements TravelDisutility {
 	private final double marginalCostOfInfrastructure_m;
 	private final double marginalCostOfComfort_m;
 	private final double marginalCostOfGradient_m_100m;
+	private final BicycleConfigGroup bicycleConfigGroup;
 	
 	private final double normalization;
 	private final double sigma;
@@ -73,6 +75,7 @@ public class BicycleTravelDisutility implements TravelDisutility {
 		this.marginalCostOfInfrastructure_m = -(bicycleConfigGroup.getMarginalUtilityOfInfrastructure_m());
 		this.marginalCostOfComfort_m = -(bicycleConfigGroup.getMarginalUtilityOfComfort_m());
 		this.marginalCostOfGradient_m_100m = -(bicycleConfigGroup.getMarginalUtilityOfGradient_m_100m());
+		this.bicycleConfigGroup = bicycleConfigGroup;
 
 		this.timeCalculator = timeCalculator;
 		
@@ -83,17 +86,28 @@ public class BicycleTravelDisutility implements TravelDisutility {
 
 	@Override
 	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
+		//debug
+		if(link.getId().equals(Id.createLinkId("6"))) {
+			Logger.getLogger(BicycleTravelDisutility.class).warn("Found it!!");			
+		}
 		double travelTime = timeCalculator.getLinkTravelTime(link, time, person, vehicle);
 		
 		String surface = (String) link.getAttributes().getAttribute(BicycleLabels.SURFACE);
 		String type = (String) link.getAttributes().getAttribute("type");
 		String cyclewaytype = (String) link.getAttributes().getAttribute(BicycleLabels.CYCLEWAY);
 
+
+		
+		
+		
 		double distance = link.getLength();
 		
 		double travelTimeDisutility = marginalCostOfTime_s * travelTime;
 		double distanceDisutility = marginalCostOfDistance_m * distance;
-		
+		//TODO perhaps it would make sense to somehow integrate my utility functions, even though they are ROUTE based and thus need a leg 
+		//in order to find the utility of an individual link? clivings April 2019
+		//For now, though, I'll leave this disutility calculation alone, since its main purpose is to find more
+		//"creative" routes. 
 		double comfortFactor = BicycleUtilityUtils.getComfortFactor(surface, type);
 		double comfortDisutility = marginalCostOfComfort_m * (1. - comfortFactor) * distance;
 		

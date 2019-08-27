@@ -35,6 +35,7 @@ public class BicycleTravelDisutilityV2 implements TravelDisutility {
 	private final double marginalCostOfInfrastructure_m;
 	private final double marginalCostOfComfort_m;
 	private final double marginalCostOfGradient_m_100m;
+	private final BicycleConfigGroup bicycleConfigGroup;
 	
 	private final Network network;
 
@@ -52,6 +53,7 @@ public class BicycleTravelDisutilityV2 implements TravelDisutility {
 		this.marginalCostOfInfrastructure_m = -(bicycleConfigGroup.getMarginalUtilityOfInfrastructure_m());
 		this.marginalCostOfComfort_m = -(bicycleConfigGroup.getMarginalUtilityOfComfort_m());
 		this.marginalCostOfGradient_m_100m = -(bicycleConfigGroup.getMarginalUtilityOfGradient_m_100m());
+		this.bicycleConfigGroup = bicycleConfigGroup;
 		
 		// TODO Needed as long as network mode filtering kicks out attributes; remove when possible, dz, sep'17
 		// Also see comments in BicycleTravelDisutilityFactory

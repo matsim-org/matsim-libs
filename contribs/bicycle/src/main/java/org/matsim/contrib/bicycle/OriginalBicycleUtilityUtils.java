@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.network.Link;
 /**
  * @author dziemke
  */
-public class BicycleUtilityUtils {
+public class OriginalBicycleUtilityUtils {
 	
 	public static double computeLinkBasedScore(Link link, double marginalUtilityOfComfort_m,
 			double marginalUtilityOfInfrastructure_m, double marginalUtilityOfGradient_m_100m) {
