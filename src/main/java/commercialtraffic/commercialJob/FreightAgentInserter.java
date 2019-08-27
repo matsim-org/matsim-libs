@@ -33,6 +33,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleUtils;
 
 import javax.inject.Inject;
 import java.util.HashSet;
@@ -150,6 +151,7 @@ public class FreightAgentInserter {
                 } catch (IllegalArgumentException e) {
                 }
                 Id<Vehicle> vid = Id.createVehicleId(driverPerson.getId());
+                VehicleUtils.insertVehicleIdIntoAttributes(driverPerson,carrierMode.getCarrierMode(carrier.getId()),vid);
                 scenario.getVehicles().addVehicle(scenario.getVehicles().getFactory().createVehicle(vid, carrierVehicle.getVehicleType()));
                 freightVehicles.add(vid);
                 freightDrivers.add(driverPerson.getId());
