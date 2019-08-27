@@ -34,11 +34,8 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.NetworkRoutingInclAccessEgressModule;
 import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
@@ -54,12 +51,10 @@ public class DynRoutingModule implements RoutingModule {
 	private PlansCalcRouteConfigGroup calcRouteConfig;
 
 	private final String mode;
-	private StageActivityTypes stageActivityTypes;
 
 	public DynRoutingModule(String mode) {
 		this.mode = mode;
 		this.stageActivityType = mode + " interaction";
-		this.stageActivityTypes = new StageActivityTypesImpl();
 	}
 
 	@Override
@@ -102,15 +97,4 @@ public class DynRoutingModule implements RoutingModule {
 		return result;
 	}
 
-	/**
-	 * @param stageActivityTypes the stageActivityTypes to set
-	 */
-	public void setStageActivityTypes(StageActivityTypes stageActivityTypes) {
-		this.stageActivityTypes = stageActivityTypes;
-	}
-
-	// TODO: check whether necessary
-	public StageActivityTypes getStageActivityTypes() {
-		return this.stageActivityTypes != null ? this.stageActivityTypes : EmptyStageActivityTypes.INSTANCE;
-	}
 }
