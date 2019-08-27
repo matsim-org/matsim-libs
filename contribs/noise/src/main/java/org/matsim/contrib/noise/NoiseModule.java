@@ -31,6 +31,5 @@ public final class NoiseModule extends AbstractModule {
 		install(new NoiseComputationModule());
 		install(new NoiseDefaultCarTravelDisutilityModule());
 	}
-
 }
 

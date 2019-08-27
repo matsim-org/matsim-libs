@@ -29,7 +29,6 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 /**
 * @author ikaddoura
 */
-
 final class NoiseDefaultCarTravelDisutilityModule extends AbstractModule {
 	private static final Logger log = Logger.getLogger(NoiseDefaultCarTravelDisutilityModule.class);
 
@@ -55,6 +54,5 @@ final class NoiseDefaultCarTravelDisutilityModule extends AbstractModule {
 			bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
 		}		
 	}
-
 }
 

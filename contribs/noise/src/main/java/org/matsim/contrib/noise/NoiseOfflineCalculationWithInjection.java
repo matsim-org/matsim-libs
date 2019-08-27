@@ -150,7 +150,7 @@ public class NoiseOfflineCalculationWithInjection{
 
 	}
 
-	public NoiseTimeTracker getTimeTracker() {
+	NoiseTimeTracker getTimeTracker() {
 		return timeTracker;
 	}
 
