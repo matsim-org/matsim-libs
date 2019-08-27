@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Injector;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 
 /**
@@ -45,7 +46,7 @@ final class NoiseDefaultCarTravelDisutilityModule extends AbstractModule {
 						+ "Setting the value 'computeAvgNoiseCostPerLinkAndTime' to 'true'...");
 				noiseParameters.setComputeAvgNoiseCostPerLinkAndTime(true);
 			}
-			
+
 			final NoiseTollTimeDistanceTravelDisutilityFactory tollDisutilityCalculatorFactory = new NoiseTollTimeDistanceTravelDisutilityFactory(
 					new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, this.getConfig().planCalcScore()),
 					this.getConfig().planCalcScore()

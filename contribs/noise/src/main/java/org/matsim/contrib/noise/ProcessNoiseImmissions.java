@@ -46,20 +46,12 @@ public final class ProcessNoiseImmissions {
 	
 	private static final Logger log = Logger.getLogger(ProcessNoiseImmissions.class);
 
-	private final double startTime = 3600.;
-	private final double timeBinSize = 3600.;
-	private final double endTime = 24. * 3600.;
-	
 	private final double receiverPointGap;
 	private final String workingDirectory;
 	private String receiverPointsFile;
-		
-	private final String separator = ";";
-	private final String label = "immission";
-	
+
 	private final String outputPath;
-	
-	private BufferedWriter bw;
+
 	private Map<Double, Map<Id<ReceiverPoint>, Double>> time2rp2value = new HashMap<>();
 	
 	public ProcessNoiseImmissions(String workingDirectory, String receiverPointsFile, double receiverPointGap) {
@@ -78,12 +70,17 @@ public final class ProcessNoiseImmissions {
 	}
 	
 	public void run() {
-		
+
+		String label = "immission";
 		String outputFile = outputPath + label + "_processed.csv";
 		
 		try {
-			
-			for (double time = startTime; time <= endTime; time = time + timeBinSize) {
+
+			double startTime = 3600.;
+			double timeBinSize = 3600.;
+			double endTime = 24. * 3600.;
+			String separator = ";";
+			for ( double time = startTime ; time <= endTime ; time = time + timeBinSize ) {
 				
 				log.info("Reading time bin: " + time);
 
@@ -102,7 +99,7 @@ public final class ProcessNoiseImmissions {
 						log.info("# " + lineCounter);
 					}
 					
-					String[] columns = line.split(separator);
+					String[] columns = line.split( separator );
 					Id<ReceiverPoint> rp = null;
 					Double value = null;
 					for (int column = 0; column < columns.length; column++) {
@@ -135,7 +132,7 @@ public final class ProcessNoiseImmissions {
 					log.info("# " + lineCounter);
 				}
 				
-				String[] columns = line.split(this.separator);
+				String[] columns = line.split( separator );
 				Id<ReceiverPoint> rpId = null;
 				double x = 0;
 				double y = 0;
@@ -160,39 +157,39 @@ public final class ProcessNoiseImmissions {
 				rp2Coord.put(rpId, new Coord(x, y));
 				
 			}
-			
-			bw = new BufferedWriter(new FileWriter(outputFile));
+
+			BufferedWriter bw = new BufferedWriter( new FileWriter( outputFile ) );
 			
 			// write headers
-			bw.write("Receiver Point Id;x;y");
+			bw.write("Receiver Point Id;x;y" );
 			
-			for (double time = startTime; time <= endTime; time = time + timeBinSize) {
-				bw.write(";" + label + "_" + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS));
+			for ( double time = startTime ; time <= endTime ; time = time + timeBinSize ) {
+				bw.write(";" + label + "_" + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS ) );
 			}
 			
-			bw.write(";Lden;L_6-9;L_16-19");
+			bw.write(";Lden;L_6-9;L_16-19" );
 
 			bw.newLine();
 
 			// fill table
-			for (Id<ReceiverPoint> rp : time2rp2value.get(endTime).keySet()) {
-				bw.write(rp.toString() + ";" + rp2Coord.get(rp).getX() + ";" + rp2Coord.get(rp).getY());
+			for (Id<ReceiverPoint> rp : time2rp2value.get( endTime ).keySet()) {
+				bw.write(rp.toString() + ";" + rp2Coord.get(rp ).getX() + ";" + rp2Coord.get(rp ).getY() );
 				
-				for (double time = startTime; time <= endTime; time = time + timeBinSize) {
-					bw.write(";" + time2rp2value.get(time).get(rp));
+				for ( double time = startTime ; time <= endTime ; time = time + timeBinSize ) {
+					bw.write(";" + time2rp2value.get(time ).get(rp ) );
 				}
 				
 				// aggregate time intervals
 	
 				double termDay = 0.;
 				// day: 7-19
-				for (double time = 8 * 3600.; time <= 19 * 3600.; time = time + timeBinSize) {
+				for (double time = 8 * 3600.; time <= 19 * 3600.; time = time + timeBinSize ) {
 					termDay = termDay + Math.pow(10, time2rp2value.get(time).get(rp) / 10);
 				}
 				
 				double termEvening = 0.;
 				// evening: 19-23
-				for (double time = 20 * 3600.; time <= 23 * 3600.; time = time + timeBinSize) {
+				for (double time = 20 * 3600.; time <= 23 * 3600.; time = time + timeBinSize ) {
 					termEvening = termEvening + Math.pow(10, (time2rp2value.get(time).get(rp) + 5) / 10);
 				}
 
@@ -200,30 +197,30 @@ public final class ProcessNoiseImmissions {
 				// night: 23-7
 				
 				// nightA: 23-24
-				for (double time = 24 * 3600.; time <= 24 * 3600.; time = time + timeBinSize) {
+				for (double time = 24 * 3600.; time <= 24 * 3600.; time = time + timeBinSize ) {
 					termNight = termNight + Math.pow(10, (time2rp2value.get(time).get(rp) + 10) / 10);
 				}
 				// nightB: 0-7
-				for (double time = 1 * 3600.; time <= 7 * 3600.; time = time + timeBinSize) {
+				for (double time = 1 * 3600.; time <= 7 * 3600.; time = time + timeBinSize ) {
 					termNight = termNight + Math.pow(10, (time2rp2value.get(time).get(rp) + 10) / 10);
 				}
 			
 				double Lden = 10 * Math.log10(1./24. * (termDay + termEvening + termNight));
-				bw.write(";" + Lden);
+				bw.write(";" + Lden );
 				
 				double term69 = 0.;
-				for (double time = 7 * 3600.; time <= 9 * 3600.; time = time + timeBinSize) {
+				for (double time = 7 * 3600.; time <= 9 * 3600.; time = time + timeBinSize ) {
 					term69 = term69 + Math.pow(10, (time2rp2value.get(time).get(rp)) / 10);
 				}
 				double L_69 = 10 * Math.log10(1./3. * term69);
-				bw.write(";" + L_69);
+				bw.write(";" + L_69 );
 				
 				double term1619 = 0.;
-				for (double time = 17 * 3600.; time <= 19 * 3600.; time = time + timeBinSize) {
+				for (double time = 17 * 3600.; time <= 19 * 3600.; time = time + timeBinSize ) {
 					term1619 = term1619 + Math.pow(10, (time2rp2value.get(time).get(rp)) / 10);
 				}
 				double L_1619 = 10 * Math.log10(1./3. * term1619);
-				bw.write(";" + L_1619);
+				bw.write(";" + L_1619 );
 				
 				bw.newLine();
 			}				
