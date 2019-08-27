@@ -23,7 +23,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -39,8 +38,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.TripsToLegsAlgorithm;
 import org.matsim.core.router.MainModeIdentifierImpl;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
 
 /**
  * @author thibautd
@@ -237,10 +234,8 @@ public class TripsToLegsAlgorithmTest {
 	}
 
 	private static void performTest(final Fixture fixture) {
-		final StageActivityTypes types =
-			new StageActivityTypesImpl();
 
-		final TripsToLegsAlgorithm algorithm = new TripsToLegsAlgorithm( types , new MainModeIdentifierImpl() );
+		final TripsToLegsAlgorithm algorithm = new TripsToLegsAlgorithm( new MainModeIdentifierImpl() );
 		algorithm.run( fixture.plan );
 
 		assertEquals(

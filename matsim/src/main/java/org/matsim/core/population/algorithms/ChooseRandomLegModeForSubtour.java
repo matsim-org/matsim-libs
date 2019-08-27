@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
@@ -71,7 +70,6 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 	private final SubtourModeChoice.Behavior behavior;
 	private Collection<String> singleTripSubtourModes;
 
-	private final StageActivityTypes stageActivityTypes;
 	private final MainModeIdentifier mainModeIdentifier;
 
 	private final Random rng;
@@ -83,13 +81,11 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 	private ChooseRandomSingleLegMode changeSingleLegMode = null ;
 	
 	public ChooseRandomLegModeForSubtour(
-			final StageActivityTypes stageActivityTypes,
 			final MainModeIdentifier mainModeIdentifier,
 			final PermissibleModesCalculator permissibleModesCalculator,
 			final String[] modes,
 			final String[] chainBasedModes,
 			final Random rng, SubtourModeChoice.Behavior behavior, double probaForChooseRandomSingleTripMode) {
-		this.stageActivityTypes = stageActivityTypes;
 		this.mainModeIdentifier = mainModeIdentifier;
 		this.permissibleModesCalculator = permissibleModesCalculator;
 		this.modes = Arrays.asList(modes);
@@ -111,7 +107,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 				// nothing to choose if there is only one mode!  I also don't think that we can base this on size, since
 				// mode strings might be registered multiple times (these are not sets).  kai, may'18
 
-				this.tripsToLegs = new TripsToLegsAlgorithm(this.stageActivityTypes, this.mainModeIdentifier);
+				this.tripsToLegs = new TripsToLegsAlgorithm(this.mainModeIdentifier);
 				this.changeSingleLegMode = new ChooseRandomSingleLegMode(possibleModes, rng, true);
 			}
 		}

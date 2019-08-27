@@ -47,7 +47,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -79,7 +78,6 @@ ShutdownListener {
 	Map<String,Map<Integer,Double>> modeHistories = new HashMap<>() ;
 	private int minIteration = 0;
 	private final Provider<TripRouter> tripRouterFactory;
-	private StageActivityTypes stageActivities;
 	private MainModeIdentifier mainModeIdentifier;
 	private Map<String,Double> modeCnt = new TreeMap<>() ;
 	
@@ -113,7 +111,6 @@ ShutdownListener {
 	public void notifyStartup(final StartupEvent event) {
 		this.minIteration = controlerConfigGroup.getFirstIteration();
 		TripRouter tripRouter = tripRouterFactory.get();
-		this.stageActivities = tripRouter.getStageActivityTypes() ;
 		this.mainModeIdentifier = tripRouter.getMainModeIdentifier() ;
 	}
 

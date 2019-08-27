@@ -40,13 +40,10 @@ import org.matsim.core.population.algorithms.ChooseRandomLegModeForSubtour;
 import org.matsim.core.population.algorithms.PermissibleModesCalculatorImpl;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.router.MainModeIdentifierImpl;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.PtConstants;
 
 /**
  * Tests specific to the 'probability-for-random-single-trip-mode' parameter.
@@ -58,8 +55,6 @@ public class ChooseRandomLegModeForSubtourDiffModesTest {
 	
 	private static final String[] MODES = new String[]{TransportMode.pt, TransportMode.car, TransportMode.walk};
 	private static final String[] CHAIN_BASED_MODES = new String[]{TransportMode.car};
-
-	private final StageActivityTypes stagesActivities = new StageActivityTypesImpl();
 	
 	private final double probaForRandomSingleTripMode;
 	
@@ -119,7 +114,6 @@ public class ChooseRandomLegModeForSubtourDiffModesTest {
 	public void testMutatedTrips() {
 		final ChooseRandomLegModeForSubtour testee =
 			new ChooseRandomLegModeForSubtour(
-					stagesActivities,
 					new MainModeIdentifierImpl(),
 					new PermissibleModesCalculatorImpl( MODES , false ),
 					MODES,

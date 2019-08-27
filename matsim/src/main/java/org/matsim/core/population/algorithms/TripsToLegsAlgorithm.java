@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -38,20 +37,15 @@ import org.matsim.core.router.TripStructureUtils.Trip;
  * @author thibautd
  */
 public final class TripsToLegsAlgorithm implements PlanAlgorithm {
-	private final StageActivityTypes blackList;
 	private final MainModeIdentifier mainModeIdentifier;
 
 	public TripsToLegsAlgorithm(final TripRouter router) {
-		this(
-				router.getStageActivityTypes(),
-				router.getMainModeIdentifier() );
+		this( router.getMainModeIdentifier() );
 	}
 
 
 	public TripsToLegsAlgorithm(
-			final StageActivityTypes blackList,
 			final MainModeIdentifier mainModeIdentifier) {
-		this.blackList = blackList;
 		this.mainModeIdentifier = mainModeIdentifier;
 	}
 
