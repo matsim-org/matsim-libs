@@ -54,7 +54,6 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -699,10 +698,6 @@ public final class EditTrips {
 	public static List<? extends PlanElement> relocateFutureTrip(Trip trip, Plan plan, String mainMode,
 			double departureTime, TripRouter tripRouter, Scenario scenario) {
 		return replanFutureTrip(trip, plan, mainMode, departureTime, tripRouter, scenario );
-	}
-
-	public StageActivityTypes getStageActivities() {
-		return tripRouter.getStageActivityTypes();
 	}
 
 	public Trip findTripAfterActivity(Plan plan, Activity activity) {
