@@ -69,7 +69,7 @@ public class TinyMultimodalAccessibilityTest {
 		final Config config = createTestConfig();
 
 		double min = 0.; // Values for bounding box usually come from a config file
-		double max = 400.;
+		double max = 300.;
 
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
 		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
@@ -157,14 +157,14 @@ public class TinyMultimodalAccessibilityTest {
 
 		// Nodes
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 10, (double) 100));
-		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 10, (double) 200));
-		Node node3 = NetworkUtils.createAndAddNode(network, Id.create(3, Node.class), new Coord((double) 10, (double) 0));
-		Node node4 = NetworkUtils.createAndAddNode(network, Id.create(4, Node.class), new Coord((double) 110, (double) 100));
-		Node node5 = NetworkUtils.createAndAddNode(network, Id.create(5, Node.class), new Coord((double) 110, (double) 200));
-		Node node6 = NetworkUtils.createAndAddNode(network, Id.create(6, Node.class), new Coord((double) 110, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create(2, Node.class), new Coord((double) 10, (double) 190));
+		Node node3 = NetworkUtils.createAndAddNode(network, Id.create(3, Node.class), new Coord((double) 10, (double) 10));
+		Node node4 = NetworkUtils.createAndAddNode(network, Id.create(4, Node.class), new Coord((double) 120, (double) 100));
+		Node node5 = NetworkUtils.createAndAddNode(network, Id.create(5, Node.class), new Coord((double) 120, (double) 190));
+		Node node6 = NetworkUtils.createAndAddNode(network, Id.create(6, Node.class), new Coord((double) 120, (double) 10));
 		Node node7 = NetworkUtils.createAndAddNode(network, Id.create(7, Node.class), new Coord((double) 190, (double) 100));
-		Node node8 = NetworkUtils.createAndAddNode(network, Id.create(8, Node.class), new Coord((double) 190, (double) 200));
-		Node node9 = NetworkUtils.createAndAddNode(network, Id.create(9, Node.class), new Coord((double) 190, (double) 0));
+		Node node8 = NetworkUtils.createAndAddNode(network, Id.create(8, Node.class), new Coord((double) 190, (double) 190));
+		Node node9 = NetworkUtils.createAndAddNode(network, Id.create(9, Node.class), new Coord((double) 190, (double) 10));
 		Node node10 = NetworkUtils.createAndAddNode(network, Id.create(10, Node.class), new Coord((double) 40, (double) 40));
 		Node node11 = NetworkUtils.createAndAddNode(network, Id.create(11, Node.class), new Coord((double) 140, (double) 40));
 		Node node12 = NetworkUtils.createAndAddNode(network, Id.create(12, Node.class), new Coord((double) 270, (double) 40));
@@ -173,52 +173,52 @@ public class TinyMultimodalAccessibilityTest {
 		modes.add("car");
 
 		// Links (bi-directional)
-		NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), node1, node2, (double) 100, freespeed, capacity, numLanes);
+		NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), node1, node2, (double) 90, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(1, Link.class)).setAllowedModes(modes);
 
-		NetworkUtils.createAndAddLink(network,Id.create(2, Link.class), node2, node1, (double) 100, freespeed, capacity, numLanes);
+		NetworkUtils.createAndAddLink(network,Id.create(2, Link.class), node2, node1, (double) 90, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(2, Link.class)).setAllowedModes(modes);
 
-		NetworkUtils.createAndAddLink(network,Id.create(3, Link.class), node1, node3, (double) 100, freespeed, capacity, numLanes);
+		NetworkUtils.createAndAddLink(network,Id.create(3, Link.class), node1, node3, (double) 90, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(3, Link.class)).setAllowedModes(modes);
 
-		NetworkUtils.createAndAddLink(network,Id.create(4, Link.class), node3, node1, (double) 100, freespeed, capacity, numLanes);
+		NetworkUtils.createAndAddLink(network,Id.create(4, Link.class), node3, node1, (double) 90, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(4, Link.class)).setAllowedModes(modes);
 
-		NetworkUtils.createAndAddLink(network,Id.create(5, Link.class), node1, node4, (double) 100, freespeed, capacity, numLanes);
+		NetworkUtils.createAndAddLink(network,Id.create(5, Link.class), node1, node4, (double) 110, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(5, Link.class)).setAllowedModes(modes);
 
-		NetworkUtils.createAndAddLink(network,Id.create(6, Link.class), node4, node1, (double) 100, freespeed, capacity, numLanes);
+		NetworkUtils.createAndAddLink(network,Id.create(6, Link.class), node4, node1, (double) 110, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(6, Link.class)).setAllowedModes(modes);
 
-		NetworkUtils.createAndAddLink(network,Id.create(7, Link.class), node4, node5, (double) 100, freespeed, capacity, numLanes);
+		NetworkUtils.createAndAddLink(network,Id.create(7, Link.class), node4, node5, (double) 90, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(7, Link.class)).setAllowedModes(modes);
 
-		NetworkUtils.createAndAddLink(network,Id.create(8, Link.class), node5, node4, (double) 100, freespeed, capacity, numLanes);
+		NetworkUtils.createAndAddLink(network,Id.create(8, Link.class), node5, node4, (double) 90, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(8, Link.class)).setAllowedModes(modes);
 
-		NetworkUtils.createAndAddLink(network,Id.create(9, Link.class), node4, node6, (double) 100, freespeed, capacity, numLanes);
+		NetworkUtils.createAndAddLink(network,Id.create(9, Link.class), node4, node6, (double) 90, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(9, Link.class)).setAllowedModes(modes);
 
-		NetworkUtils.createAndAddLink(network,Id.create(10, Link.class), node6, node4, (double) 100, freespeed, capacity, numLanes);
+		NetworkUtils.createAndAddLink(network,Id.create(10, Link.class), node6, node4, (double) 90, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(10, Link.class)).setAllowedModes(modes);
 
-		NetworkUtils.createAndAddLink(network,Id.create(11, Link.class), node4, node7, (double) 80, freespeed, capacity, numLanes);
+		NetworkUtils.createAndAddLink(network,Id.create(11, Link.class), node4, node7, (double) 70, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(11, Link.class)).setAllowedModes(modes);
 
-		NetworkUtils.createAndAddLink(network,Id.create(12, Link.class), node7, node4, (double) 80, freespeed, capacity, numLanes);
+		NetworkUtils.createAndAddLink(network,Id.create(12, Link.class), node7, node4, (double) 70, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(12, Link.class)).setAllowedModes(modes);
 
-		NetworkUtils.createAndAddLink(network,Id.create(13, Link.class), node5, node8, (double) 80, freespeed, capacity, numLanes);
+		NetworkUtils.createAndAddLink(network,Id.create(13, Link.class), node5, node8, (double) 70, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(13, Link.class)).setAllowedModes(modes);
 
-		NetworkUtils.createAndAddLink(network,Id.create(14, Link.class), node8, node5, (double) 80, freespeed, capacity, numLanes);
+		NetworkUtils.createAndAddLink(network,Id.create(14, Link.class), node8, node5, (double) 70, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(14, Link.class)).setAllowedModes(modes);
 
-		NetworkUtils.createAndAddLink(network,Id.create(15, Link.class), node6, node9, (double) 80, freespeed, capacity, numLanes);
+		NetworkUtils.createAndAddLink(network,Id.create(15, Link.class), node6, node9, (double) 70, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(15, Link.class)).setAllowedModes(modes);
 
-		NetworkUtils.createAndAddLink(network,Id.create(16, Link.class), node9, node6, (double) 80, freespeed, capacity, numLanes);
+		NetworkUtils.createAndAddLink(network,Id.create(16, Link.class), node9, node6, (double) 70, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(16, Link.class)).setAllowedModes(modes);
 
 		Set<String> ptModes = new HashSet<>();
@@ -259,14 +259,21 @@ public class TinyMultimodalAccessibilityTest {
 				LOG.warn("CHECK X = " + tuple.getFirst().getCoord().getX() + " -- Y = " + tuple.getFirst().getCoord().getY() + " -- freespeed value = " + accessibilitiesMap.get(tuple).get("freespeed"));
 				LOG.warn("CHECK X = " + tuple.getFirst().getCoord().getX() + " -- Y = " + tuple.getFirst().getCoord().getY() + " -- car value = " + accessibilitiesMap.get(tuple).get(TransportMode.car));
 				if (tuple.getFirst().getCoord().getX() == 50.) {
-					if (tuple.getFirst().getCoord().getY() == 50. || tuple.getFirst().getCoord().getY() == 150.) {
-						Assert.assertEquals(0.08573977315253786, accessibilitiesMap.get(tuple).get("freespeed"), MatsimTestUtils.EPSILON);
-						LOG.error("here");
+					if (tuple.getFirst().getCoord().getY() == 50.) {
+						Assert.assertEquals(-0.017248522428805767, accessibilitiesMap.get(tuple).get("freespeed"), MatsimTestUtils.EPSILON);
+						Assert.assertEquals(-0.017248522428805767, accessibilitiesMap.get(tuple).get(TransportMode.car), MatsimTestUtils.EPSILON);
+					} else if (tuple.getFirst().getCoord().getY() == 150.) {
+						Assert.assertEquals(-0.017248522428805767, accessibilitiesMap.get(tuple).get("freespeed"), MatsimTestUtils.EPSILON);
+						Assert.assertEquals(-0.017248522428805767, accessibilitiesMap.get(tuple).get(TransportMode.car), MatsimTestUtils.EPSILON);
 					}
 				}
 				if (tuple.getFirst().getCoord().getX() == 150.) {
-					if (tuple.getFirst().getCoord().getY() == 50. || tuple.getFirst().getCoord().getY() == 150.) {
-						Assert.assertEquals(0.2091965632759945, accessibilitiesMap.get(tuple).get("freespeed"), MatsimTestUtils.EPSILON);
+					if (tuple.getFirst().getCoord().getY() == 50.) {
+						Assert.assertEquals(0.2758252376673665, accessibilitiesMap.get(tuple).get("freespeed"), MatsimTestUtils.EPSILON);
+						Assert.assertEquals(0.2758252376673665, accessibilitiesMap.get(tuple).get(TransportMode.car), MatsimTestUtils.EPSILON);
+					} else if (tuple.getFirst().getCoord().getY() == 150.) {
+						Assert.assertEquals(0.2758252376673665, accessibilitiesMap.get(tuple).get("freespeed"), MatsimTestUtils.EPSILON);
+						Assert.assertEquals(0.2758252376673665, accessibilitiesMap.get(tuple).get(TransportMode.car), MatsimTestUtils.EPSILON);
 					}
 				}
 			}
