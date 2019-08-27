@@ -45,8 +45,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
@@ -80,8 +79,6 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 	private final Population population;
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	
-	private StageActivityTypes stageActivityTypes;
-
 	/*
 	 * Replaced TreeMaps with (Linked)HashMaps since they should perform much better. For 'partialScores'
 	 * a LinkedHashMap is used to ensure that agents are written in a deterministic order to the output files.
@@ -104,8 +101,6 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 //	private boolean passLinkEventsToPerson = false;
 	
 	private Vehicle2DriverEventHandler vehicles2Drivers = new Vehicle2DriverEventHandler();
-	@Inject(optional = true)
-	private TripRouter tripRouter;
 
 	@Inject
 	ScoringFunctionsForPopulation( ControlerListenerManager controlerListenerManager, EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
@@ -134,27 +129,6 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 			this.tripRecords.put(person.getId(), PopulationUtils.createPlan());
 		}
 	}
-
-	private StageActivityTypes getStageActivities() {
-		if (this.stageActivityTypes == null) {
-			if (this.tripRouter !=null ) {
-				this.stageActivityTypes = this.tripRouter.getStageActivityTypes() ;
-			} else {
-				this.stageActivityTypes = new StageActivityTypes() {
-					@Override public boolean isStageActivity( final String activityType ) {
-						if ( activityType.contains( "_interaction" ) ) {
-							return true;
-						} else {
-							return false;
-						}
-					}
-				};
-				// yyyyyy this is really terrible, needs to come from global data structure instead.
-			}
-		}
-		return this.stageActivityTypes;
-	}
-	
 
 	@Override
 	synchronized public void handleEvent(Event o) {
@@ -238,7 +212,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 		if ( plan!= null ) {
 			if ( !plan.getPlanElements().isEmpty() ) {
 				// plan != null, meaning we already have pre-existing material
-				if (getStageActivities().isStageActivity( activity.getType() ) ) {
+				if (StageActivityTypeIdentifier.isStageActivity( activity.getType() ) ) {
 					// we are at a stage activity.  Don't do anything ; activity will be added later
 				} else {
 					// we are at a real activity, which is not the first one we see for this agent.  output the trip ...
