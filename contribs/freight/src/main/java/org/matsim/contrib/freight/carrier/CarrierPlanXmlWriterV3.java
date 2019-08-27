@@ -84,17 +84,7 @@ public class CarrierPlanXmlWriterV3 extends MatsimXmlWriter {
 
 	private void writeVehiclesAndTheirTypes(Carrier carrier, BufferedWriter writer) throws IOException {
 		writer.write("\t\t\t<capabilities fleetSize=\"" + carrier.getCarrierCapabilities().getFleetSize().toString() + "\">\n");
-//		writer.write("\t\t\t\t<vehicleTypes>\n");
-//		for(CarrierVehicleType type : carrier.getCarrierCapabilities().getVehicleTypes()){
-//			writer.write("\t\t\t\t\t<vehicleType id=\"" + type.getId() + "\">\n");
-//			writer.write("\t\t\t\t\t\t<description>" + type.getDescription() + "</description>\n");
-//			writer.write("\t\t\t\t\t\t<engineInformation fuelType=\"" + type.getEngineInformation().getFuelType().toString() + "\" gasConsumption=\"" + type.getEngineInformation().getGasConsumption() + "\"/>\n");
-//			writer.write("\t\t\t\t\t\t<capacity>" + type.getCarrierVehicleCapacity() + "</capacity>\n");
-//			writer.write("\t\t\t\t\t\t<costInformation fix=\"" + type.getVehicleCostInformation().fix + "\" perMeter=\"" + type.getVehicleCostInformation().perDistanceUnit + 
-//					"\" perSecond=\"" + type.getVehicleCostInformation().perTimeUnit + "\"/>\n");
-//			writer.write("\t\t\t\t\t</vehicleType>\n");
-//		}
-//		writer.write("\t\t\t\t</vehicleTypes>\n\n");
+
 		//vehicles
 		writer.write("\t\t\t\t<vehicles>\n");
 		for (CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles()) {
@@ -180,7 +170,22 @@ public class CarrierPlanXmlWriterV3 extends MatsimXmlWriter {
 			writer.write("capacityDemand=\"" + s.getCapacityDemand() + "\" ");
 			writer.write("earliestStart=\"" + getTime(s.getServiceStartTimeWindow().getStart()) + "\" ");
 			writer.write("latestEnd=\"" + getTime(s.getServiceStartTimeWindow().getEnd()) + "\" ");
-			writer.write("serviceDuration=\"" + getTime(s.getServiceDuration()) + "\"/>\n");
+			writer.write("serviceDuration=\"" + getTime(s.getServiceDuration()) + "\"");
+			if(s.getskills().values().isEmpty()){
+				writer.write("/>\n");
+			} else{
+				writer.write(">\n");
+				writer.write("\t\t\t\t\t<skills>");
+				Iterator<String> skillsIterator = s.getskills().values().iterator();
+				writer.write(skillsIterator.next());
+				while(skillsIterator.hasNext()){
+					writer.write(",");
+					writer.write(skillsIterator.next());
+				}
+				writer.write("</skills>\n");
+				writer.write("\t\t\t\t</service>\n");
+
+			}
 		}
 		writer.write("\t\t\t</services>\n\n");
 
@@ -276,6 +281,5 @@ public class CarrierPlanXmlWriterV3 extends MatsimXmlWriter {
 
 	private void endCarriers(BufferedWriter writer) throws IOException {
 		writer.write("\t</carriers>\n");
-
 	}
 }

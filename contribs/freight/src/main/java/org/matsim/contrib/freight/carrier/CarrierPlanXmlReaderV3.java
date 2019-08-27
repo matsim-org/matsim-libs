@@ -15,7 +15,7 @@ public class CarrierPlanXmlReaderV3 implements MatsimReader {
 
 	private static Logger logger = Logger.getLogger(CarrierPlanXmlReaderV3.class);
 
-	private CarrierPlanXmlParserV2 delegate;
+	private CarrierPlanXmlParserV3 delegate;
 
 	/**
 	 * Constructs a reader with an empty carriers-container for the carriers to be constructed.
@@ -23,7 +23,7 @@ public class CarrierPlanXmlReaderV3 implements MatsimReader {
 	 * @param carriers which is a map that stores carriers
 	 */
 	public CarrierPlanXmlReaderV3(Carriers carriers) {
-		this.delegate = new CarrierPlanXmlParserV2(carriers);
+		this.delegate = new CarrierPlanXmlParserV3(carriers);
 	}
 	
 	/**

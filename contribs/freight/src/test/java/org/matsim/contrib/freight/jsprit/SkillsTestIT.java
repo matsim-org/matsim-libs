@@ -95,6 +95,8 @@ public class SkillsTestIT {
 		SolutionPrinter.print(problem, solution, SolutionPrinter.Print.VERBOSE);
 
 		new CarrierPlanXmlWriterV3(FreightUtils.getCarriers(scenario)).write(utils.getOutputDirectory() + "carriers.xml");
+		Scenario scNew = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new CarrierPlanXmlReaderV3(FreightUtils.getCarriers(scNew)).readFile(utils.getOutputDirectory() + "carriers.xml");
 		return solution;
 	}
 

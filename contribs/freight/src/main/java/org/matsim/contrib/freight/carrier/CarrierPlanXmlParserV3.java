@@ -30,8 +30,14 @@ class CarrierPlanXmlParserV3 extends MatsimXmlParser {
 	public static String LINKID = "linkId";
 
 	public static String SHIPMENTS = "shipments";
-
 	public static String SHIPMENT = "shipment";
+	public static String SHIPMENT_ID_IN_SHIPMENTS = "id";
+	public static String SHIPMENT_ID_IN_PLAN = "shipmentId";
+
+	private static String SERVICES = "services";
+	private static String SERVICE = "service";
+	private static String SERVICE_ID_IN_SERVICES = "id";
+	private static String SERVICE_ID_IN_PLANS = "serviceId";
 
 	public static String ID = "id";
 
@@ -47,7 +53,6 @@ class CarrierPlanXmlParserV3 extends MatsimXmlParser {
 
 	public static String TYPE = "type";
 
-	public static String SHIPMENTID = "shipmentId";
 
 	public static String START = "start";
 
@@ -69,9 +74,8 @@ class CarrierPlanXmlParserV3 extends MatsimXmlParser {
 
 	private String previousRouteContent;
 
-	public Map<String, CarrierShipment> currentShipments = null;
 
-	public Map<String, CarrierVehicle> vehicles = null;
+	public Map<Id<Vehicle>, CarrierVehicle> vehicles = null;
 
 	public Collection<ScheduledTour> scheduledTours = null;
 
@@ -90,12 +94,21 @@ class CarrierPlanXmlParserV3 extends MatsimXmlParser {
 
 	private Builder capabilityBuilder;
 
+	private CarrierVehicle.Builder currentVehicleBuilder;
+	private CarrierShipment.Builder currentShipmentBuilder;
+	private CarrierService.Builder currentServiceBuilder;
+
 	private CarrierVehicleType.Builder vehicleTypeBuilder;
 
 	private Map<Id<VehicleType>, CarrierVehicleType> vehicleTypeMap = new HashMap<>();
 
+	private List<String> listOfVehicleSkills = new ArrayList<>();
+	private List<String> listOfShipmentSkills = new ArrayList<>();
+	private List<String> listOfServiceSkills = new ArrayList<>();
+
 	private double currentStartTime;
 
+	public Map<Id<CarrierShipment>, CarrierShipment> shipmentMap = null;
 	private Map<Id<CarrierService>, CarrierService> serviceMap;
 
 	/**
@@ -116,38 +129,35 @@ class CarrierPlanXmlParserV3 extends MatsimXmlParser {
 			currentCarrier = CarrierImpl.newInstance(Id.create(id, Carrier.class));
 		}
 		//services
-		else if (name.equals("services")) {
+		else if (name.equals(SERVICES)) {
 			serviceMap = new HashMap<>();
 		}
-		else if (name.equals("service")) {
-			String idString = atts.getValue("id");
+		else if (name.equals(SERVICE)) {
+			String idString = atts.getValue(SERVICE_ID_IN_SERVICES);
 			if(idString == null) throw new IllegalStateException("service.id is missing.");
 			Id<CarrierService> id = Id.create(idString, CarrierService.class);
 			String toLocation = atts.getValue("to");
 			if(toLocation == null) throw new IllegalStateException("service.to is missing. ");
 			Id<Link> to = Id.create(toLocation, Link.class);
-			CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(id, to);
+			currentServiceBuilder = CarrierService.Builder.newInstance(id, to);
 			String capDemandString = atts.getValue("capacityDemand");
-			if(capDemandString != null) serviceBuilder.setCapacityDemand(getInt(capDemandString));
+			if(capDemandString != null) currentServiceBuilder.setCapacityDemand(getInt(capDemandString));
 			String startString = atts.getValue("earliestStart");
 			double start = parseTimeToDouble(startString);
 			double end = Double.MAX_VALUE;
 			String endString = atts.getValue("latestEnd");
 			end = parseTimeToDouble(endString);
-			serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(start, end));
+			currentServiceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(start, end));
 			String serviceTimeString = atts.getValue("serviceDuration");
-			if(serviceTimeString != null) serviceBuilder.setServiceDuration(parseTimeToDouble(serviceTimeString));
-			CarrierService service = serviceBuilder.build();
-			serviceMap.put(service.getId(), service);
-			currentCarrier.getServices().add(service);
+			if(serviceTimeString != null) currentServiceBuilder.setServiceDuration(parseTimeToDouble(serviceTimeString));
 		}
 
 		//shipments
 		else if (name.equals(SHIPMENTS)) {
-			currentShipments = new HashMap<String, CarrierShipment>();
+			shipmentMap = new HashMap<Id<CarrierShipment>, CarrierShipment>();
 		}
 		else if (name.equals(SHIPMENT)) {
-			String idString = atts.getValue("id");
+			String idString = atts.getValue(SHIPMENT_ID_IN_SHIPMENTS);
 			if(idString == null) throw new IllegalStateException("shipment.id is missing.");
 			Id<CarrierShipment> id = Id.create(idString, CarrierShipment.class);
 			String from = atts.getValue(FROM);
@@ -157,7 +167,7 @@ class CarrierPlanXmlParserV3 extends MatsimXmlParser {
 			String sizeString = atts.getValue(SIZE);
 			if(sizeString == null) throw new IllegalStateException("shipment.size is missing.");
 			int size = getInt(sizeString);
-			CarrierShipment.Builder shipmentBuilder = CarrierShipment.Builder.newInstance(id, Id.create(from, Link.class), Id.create(to, Link.class), size);
+			currentShipmentBuilder = CarrierShipment.Builder.newInstance(id, Id.create(from, Link.class), Id.create(to, Link.class), size);
 
 			String startPickup = atts.getValue("startPickup");
 			String endPickup = atts.getValue("endPickup");
@@ -166,14 +176,10 @@ class CarrierPlanXmlParserV3 extends MatsimXmlParser {
 			String pickupServiceTime = atts.getValue("pickupServiceTime");
 			String deliveryServiceTime = atts.getValue("deliveryServiceTime");
 
-			if (startPickup != null && endPickup != null) shipmentBuilder.setPickupTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startPickup), parseTimeToDouble(endPickup)));
-			if(startDelivery != null && endDelivery != null) shipmentBuilder.setDeliveryTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startDelivery), parseTimeToDouble(endDelivery)));
-			if (pickupServiceTime != null) shipmentBuilder.setPickupServiceTime(parseTimeToDouble(pickupServiceTime));
-			if (deliveryServiceTime != null) shipmentBuilder.setDeliveryServiceTime(parseTimeToDouble(deliveryServiceTime));
-
-			CarrierShipment shipment = shipmentBuilder.build();
-			currentShipments.put(atts.getValue(ID), shipment);
-			currentCarrier.getShipments().add(shipment);
+			if (startPickup != null && endPickup != null) currentShipmentBuilder.setPickupTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startPickup), parseTimeToDouble(endPickup)));
+			if(startDelivery != null && endDelivery != null) currentShipmentBuilder.setDeliveryTimeWindow(TimeWindow.newInstance(parseTimeToDouble(startDelivery), parseTimeToDouble(endDelivery)));
+			if (pickupServiceTime != null) currentShipmentBuilder.setPickupServiceTime(parseTimeToDouble(pickupServiceTime));
+			if (deliveryServiceTime != null) currentShipmentBuilder.setDeliveryServiceTime(parseTimeToDouble(deliveryServiceTime));
 		}
 
 		//capabilities
@@ -212,27 +218,23 @@ class CarrierPlanXmlParserV3 extends MatsimXmlParser {
 		
 		//vehicle
 		else if (name.equals(VEHICLES)) {
-			vehicles = new HashMap<String, CarrierVehicle>();
+			vehicles = new HashMap<>();
 		}
 		else if (name.equals(VEHICLE)) {
 			String vId = atts.getValue(ID);
 			if(vId == null) throw new IllegalStateException("vehicleId is missing.");
 			String depotLinkId = atts.getValue("depotLinkId");
 			if(depotLinkId == null) throw new IllegalStateException("depotLinkId of vehicle is missing.");
-			CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(Id.create(vId, Vehicle.class), Id.create(depotLinkId, Link.class));
+			currentVehicleBuilder = CarrierVehicle.Builder.newInstance(Id.create(vId, Vehicle.class), Id.create(depotLinkId, Link.class));
 			String typeId = atts.getValue("typeId");
 			if(typeId == null) throw new IllegalStateException("vehicleTypeId is missing.");
 			CarrierVehicleType vehicleType = vehicleTypeMap.get(Id.create(typeId, VehicleType.class));
-			vehicleBuilder.setTypeId(Id.create(typeId, VehicleType.class));
-			if(vehicleType != null) vehicleBuilder.setType(vehicleType);
+			currentVehicleBuilder.setTypeId(Id.create(typeId, VehicleType.class));
+			if(vehicleType != null) currentVehicleBuilder.setType(vehicleType);
 			String startTime = atts.getValue(VEHICLESTART);
-			if(startTime != null) vehicleBuilder.setEarliestStart(parseTimeToDouble(startTime));
+			if(startTime != null) currentVehicleBuilder.setEarliestStart(parseTimeToDouble(startTime));
 			String endTime = atts.getValue(VEHICLEEND);
-			if(endTime != null) vehicleBuilder.setLatestEnd(parseTimeToDouble(endTime));
-			
-			CarrierVehicle vehicle = vehicleBuilder.build();
-			capabilityBuilder.addVehicle(vehicle);
-			vehicles.put(vId, vehicle);
+			if(endTime != null) currentVehicleBuilder.setLatestEnd(parseTimeToDouble(endTime));
 		}
 		
 		//plans
@@ -248,7 +250,7 @@ class CarrierPlanXmlParserV3 extends MatsimXmlParser {
 		else if (name.equals("tour")) {
 			String vehicleId = atts.getValue("vehicleId");
 			if(vehicleId == null) throw new IllegalStateException("vehicleId is missing in tour.");
-			currentVehicle = vehicles.get(vehicleId);
+			currentVehicle = vehicles.get(Id.createVehicleId(vehicleId));
 			if(currentVehicle == null) throw new IllegalStateException("vehicle to vehicleId " + vehicleId + " is missing.");
 			currentTourBuilder = Tour.Builder.newInstance();
 		}
@@ -273,21 +275,21 @@ class CarrierPlanXmlParserV3 extends MatsimXmlParser {
 				currentTourBuilder.scheduleStart(currentVehicle.getLocation(),TimeWindow.newInstance(currentVehicle.getEarliestStartTime(), currentVehicle.getLatestEndTime()));
 				
 			} else if (type.equals("pickup")) {
-				String id = atts.getValue(SHIPMENTID);
+				String id = atts.getValue(SHIPMENT_ID_IN_PLAN);
 				if(id == null) throw new IllegalStateException("pickup.shipmentId is missing.");
-				CarrierShipment s = currentShipments.get(id);
+				CarrierShipment s = shipmentMap.get(Id.create(id, CarrierShipment.class));
 				finishLeg(s.getFrom());
 				currentTourBuilder.schedulePickup(s);
 				previousActLoc = s.getFrom();
 			} else if (type.equals("delivery")) {
-				String id = atts.getValue(SHIPMENTID);
+				String id = atts.getValue(SHIPMENT_ID_IN_PLAN);
 				if(id == null) throw new IllegalStateException("delivery.shipmentId is missing.");
-				CarrierShipment s = currentShipments.get(id);
+				CarrierShipment s = shipmentMap.get(Id.create(id, CarrierShipment.class));
 				finishLeg(s.getTo());
 				currentTourBuilder.scheduleDelivery(s);
 				previousActLoc = s.getTo();
-			} else if (type.equals("service")){
-				String id = atts.getValue("serviceId");
+			} else if (type.equals(SERVICE)){
+				String id = atts.getValue(SERVICE_ID_IN_PLANS);
 				if(id == null) throw new IllegalStateException("act.serviceId is missing.");
 				CarrierService s = serviceMap.get(Id.create(id, CarrierService.class));
 				if(s == null) throw new IllegalStateException("serviceId is not known.");
@@ -298,7 +300,6 @@ class CarrierPlanXmlParserV3 extends MatsimXmlParser {
 				finishLeg(currentVehicle.getLocation());
 				currentTourBuilder.scheduleEnd(currentVehicle.getLocation(), TimeWindow.newInstance(currentVehicle.getEarliestStartTime(),currentVehicle.getLatestEndTime()));
 			}
-			
 		}
 	}
 	
@@ -337,6 +338,37 @@ class CarrierPlanXmlParserV3 extends MatsimXmlParser {
 		}
 		else if(name.equals("description")){
 			vehicleTypeBuilder.setDescription(content);
+		}
+		else if(name.equals(SKILLS)){
+			String[] skills = content.trim().split(",");
+			List<String> listOfSkills = Arrays.asList(skills);
+			String thisContext =context.lastElement();
+			switch(thisContext){
+				case "vehicle":
+					currentVehicleBuilder.addSkills(listOfSkills);
+					break;
+				case "shipment":
+					currentShipmentBuilder.addSkills(listOfSkills);
+					break;
+				case "service":
+					currentServiceBuilder.addSkills(listOfSkills);
+					break;
+				default:
+					throw new IllegalArgumentException("Don't know what to do with 'skills' for '" + thisContext + "'");
+			}
+		} else if(name.equals(SHIPMENT)){
+			CarrierShipment shipment = currentShipmentBuilder.build();
+			shipmentMap.put(shipment.getId(), shipment);
+			currentCarrier.getShipments().add(shipment);
+		} else if(name.equals(SERVICE)){
+			CarrierService service = currentServiceBuilder.build();
+			serviceMap.put(service.getId(), service);
+			currentCarrier.getServices().add(service);
+		} else if(name.equals(VEHICLE)){
+			CarrierVehicle vehicle = currentVehicleBuilder.build();
+			capabilityBuilder.addVehicle(vehicle);
+			vehicles.put(vehicle.getVehicleId(), vehicle);
+
 		}
 	}
 
