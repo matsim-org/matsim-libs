@@ -1,15 +1,21 @@
 package org.matsim.contrib.freight.carrier;
 
+import com.graphhopper.jsprit.core.problem.Skills;
 import org.matsim.api.core.v01.Id;
 import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 /**
  * The carrier vehicle type.
  * 
- * I decided to put vehicle cost information into the type (which is indeed not a physical attribute of the type). Thus physical and
- * non physical attributes are used. This is likely to be changed in future.
+ * I decided to put vehicle cost information into the type (which is indeed not
+ * a physical attribute of the type). Thus physical and non physical attributes
+ * are used. This is likely to be changed in future.
  * 
  * @author sschroeder
  *
@@ -63,6 +69,7 @@ public class CarrierVehicleType extends ForwardingVehicleType {
 		private EngineInformation engineInfo;
 		private int capacity = 0;
 		private double maxVeloInMeterPerSeconds = Double.MAX_VALUE;
+		private List<String> listOfSkills = new ArrayList<>();
 		
 		
 		private Builder(Id<VehicleType> typeId){
@@ -170,6 +177,16 @@ public class CarrierVehicleType extends ForwardingVehicleType {
 			this.maxVeloInMeterPerSeconds  = veloInMeterPerSeconds;
 			return this;
 		}
+
+		public Builder addSkill(String skill){
+			this.listOfSkills.add(skill);
+			return this;
+		}
+
+		public Builder addSkills(Collection<String> skills){
+			this.listOfSkills.addAll(skills);
+			return this;
+		}
 	}
 	
 	public static class VehicleCostInformation {
@@ -202,6 +219,8 @@ public class CarrierVehicleType extends ForwardingVehicleType {
 	private VehicleCostInformation vehicleCostInformation;
 
 	private int capacity;
+
+	private Skills skills;
 	
 	private CarrierVehicleType(Builder builder){
 		super(new VehicleTypeImpl(builder.typeId));
@@ -210,6 +229,7 @@ public class CarrierVehicleType extends ForwardingVehicleType {
 		if(builder.description != null) super.setDescription(builder.description);
 		capacity = builder.capacity;
 		super.setMaximumVelocity(builder.maxVeloInMeterPerSeconds);
+		skills = Skills.Builder.newInstance().addAllSkills(builder.listOfSkills).build();
 	}
 
 	/**
@@ -233,6 +253,10 @@ public class CarrierVehicleType extends ForwardingVehicleType {
 	 */
 	public int getCarrierVehicleCapacity(){
 		return capacity;
+	}
+
+	public Skills getSkills(){
+		return skills;
 	}
 	
 }

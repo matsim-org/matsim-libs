@@ -1,7 +1,12 @@
 package org.matsim.contrib.freight.carrier;
 
+import com.graphhopper.jsprit.core.problem.Skills;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 
 public class CarrierService  {
@@ -19,6 +24,7 @@ public class CarrierService  {
 		private double serviceTime = 0.0;
 		private TimeWindow timeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
 		private int capacityDemand = 0;
+		private List<String> listOfSkills = new ArrayList<>();
 		
 		private Builder(Id<CarrierService> id, Id<Link> locationLinkId) {
 			super();
@@ -55,7 +61,17 @@ public class CarrierService  {
 			this.timeWindow = startTimeWindow;
 			return this;
 		}
-		
+
+		public Builder addSkill(String skill){
+			this.listOfSkills.add(skill);
+			return this;
+		}
+
+		public Builder addSkills(Collection<String> skills){
+			this.listOfSkills.addAll(skills);
+			return this;
+		}
+
 		public CarrierService build(){
 			return new CarrierService(this);
 		}
@@ -80,6 +96,8 @@ public class CarrierService  {
 
 	private final int demand;
 
+	private final Skills skills;
+
 	private CarrierService(Builder builder){
 		id = builder.id;
 		locationId = builder.locationLinkId;
@@ -87,6 +105,7 @@ public class CarrierService  {
 		timeWindow = builder.timeWindow;
 		demand = builder.capacityDemand;
 		name = builder.name;
+		skills = Skills.Builder.newInstance().addAllSkills(builder.listOfSkills).build();
 	}
 
 	public Id<CarrierService> getId() {
@@ -108,6 +127,8 @@ public class CarrierService  {
 	public int getCapacityDemand() {
 		return demand;
 	}
+
+	public Skills getskills(){ return skills; }
 	
 	/**
 	 * @return the name

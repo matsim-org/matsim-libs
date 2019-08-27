@@ -1,9 +1,14 @@
 package org.matsim.contrib.freight.carrier;
 
+import com.graphhopper.jsprit.core.problem.Skills;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 
@@ -54,6 +59,7 @@ public class CarrierVehicle {
 		private Id<VehicleType> typeId;
 		private double earliestStart = 0.0;
 		private double latestEnd = Integer.MAX_VALUE;
+		private List<String> listOfSkills = new ArrayList<>();
 		
 		
 		public Builder(Id<Vehicle> vehicleId, Id<Link> locationId){
@@ -82,6 +88,16 @@ public class CarrierVehicle {
 			this.latestEnd = latestEnd;
 			return this;
 		}
+
+		public Builder addSkill(String skill){
+			this.listOfSkills.add(skill);
+			return this;
+		}
+
+		public Builder addSkills(Collection<String> skills){
+			this.listOfSkills.addAll(skills);
+			return this;
+		}
 		
 		public CarrierVehicle build(){
 			return new CarrierVehicle(this);
@@ -100,11 +116,14 @@ public class CarrierVehicle {
 
 	private double latestEndTime;
 
+	private Skills skills;
+
 	private CarrierVehicle(final Id<Vehicle> vehicleId, final Id<Link> location) {
 		this.vehicleId = vehicleId;
 		this.locationId = location;
 		earliestStartTime = 0.0;
 		latestEndTime = Integer.MAX_VALUE;
+		skills = Skills.Builder.newInstance().build();
 	}
 	
 	private CarrierVehicle(Builder builder){
@@ -114,6 +133,7 @@ public class CarrierVehicle {
 		earliestStartTime = builder.earliestStart;
 		latestEndTime = builder.latestEnd;
 		typeId = builder.typeId;
+		skills = Skills.Builder.newInstance().addAllSkills(builder.listOfSkills).build();
 	}
 
 	public Id<Link> getLocation() {
@@ -159,6 +179,8 @@ public class CarrierVehicle {
 	public double getLatestEndTime() {
 		return latestEndTime;
 	}
+
+	public Skills getSkills(){ return skills; }
 
 	
 	public Id<VehicleType> getVehicleTypeId() {

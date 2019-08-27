@@ -1,7 +1,12 @@
 package org.matsim.contrib.freight.carrier;
 
+import com.graphhopper.jsprit.core.problem.Skills;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * A shipment from one location to another, with certain size and other constraints such as time-windows and service-times.
@@ -64,7 +69,7 @@ public final class CarrierShipment {
 		TimeWindow delTW = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
 		double pickServiceTime = 0.0;
 		double delServiceTime = 0.0;
-		
+		List<String> listOfSkills = new ArrayList<>();
 		/**
 		 * @Deprecated Please use Builder (Id<CarrierShipment> id, Id<Link> from, Id<Link> to, int size) instead.
 		 */
@@ -103,6 +108,16 @@ public final class CarrierShipment {
 			this.delServiceTime = deliveryServiceTime;
 			return this;
 		}
+
+		public Builder addSkill(String skill){
+			this.listOfSkills.add(skill);
+			return this;
+		}
+
+		public Builder addSkills(Collection<String> skills){
+			this.listOfSkills.addAll(skills);
+			return this;
+		}
 		
 		public CarrierShipment build(){
 			return new CarrierShipment(this);
@@ -125,6 +140,8 @@ public final class CarrierShipment {
 
 	private double deliveryServiceTime;
 
+	private Skills skills;
+
 //	public CarrierShipment(final Id from, final Id to, final int size, final TimeWindow pickupTimeWindow, final TimeWindow deliveryTimeWindow) {
 //		super();
 //		this.from = from;
@@ -143,6 +160,7 @@ public final class CarrierShipment {
 		deliveryServiceTime = builder.delServiceTime;
 		pickupTimeWindow = builder.pickTW;
 		deliveryTimeWindow = builder.delTW;
+		skills = Skills.Builder.newInstance().addAllSkills(builder.listOfSkills).build();
 	}
 
 	public double getPickupServiceTime() {
@@ -183,6 +201,8 @@ public final class CarrierShipment {
 	public TimeWindow getDeliveryTimeWindow() {
 		return deliveryTimeWindow;
 	}
+
+	public Skills getSkills(){ return skills; }
 
 	@Override
 	public String toString() {

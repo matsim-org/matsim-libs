@@ -1,13 +1,10 @@
 package org.matsim.contrib.freight.carrier;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
 import com.graphhopper.jsprit.core.problem.Skills;
 import org.matsim.api.core.v01.Id;
 import org.matsim.vehicles.VehicleType;
+
+import java.util.*;
 
 /**
  * This contains the capabilities/resources a carrier has/can deploy.
@@ -32,11 +29,9 @@ public class CarrierCapabilities {
 			return new Builder();
 		}
 
-		private Collection<CarrierVehicleType> vehicleTypes = new ArrayList<CarrierVehicleType>();
+		private Collection<CarrierVehicleType> vehicleTypes = new ArrayList<>();
 
-		private Collection<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>();
-
-		private Collection<Skills> skills = new ArrayList<>();
+		private Collection<CarrierVehicle> vehicles = new ArrayList<>();
 
 		private Set<Id<VehicleType>> typeIds = new HashSet<>();
 
@@ -58,11 +53,6 @@ public class CarrierCapabilities {
 		public Builder addVehicle(CarrierVehicle carrierVehicle) {
 			vehicles.add(carrierVehicle);
 			if (carrierVehicle.getVehicleType() != null) addType(carrierVehicle.getVehicleType());
-			return this;
-		}
-
-		public Builder addSkill(String skill) {
-			this.skills.add(Skills.Builder.newInstance().addSkill(skill).build());
 			return this;
 		}
 
@@ -96,14 +86,11 @@ public class CarrierCapabilities {
 		this.carrierVehicles = builder.vehicles;
 		this.vehicleTypes = builder.vehicleTypes;
 		this.fleetSize = builder.fleetSize;
-		this.skills = builder.skills;
 	}
 
-	private Collection<CarrierVehicle> carrierVehicles = new ArrayList<CarrierVehicle>();
+	private Collection<CarrierVehicle> carrierVehicles = new ArrayList<>();
 
-	private Collection<CarrierVehicleType> vehicleTypes = new ArrayList<CarrierVehicleType>();
-
-	private Collection<Skills> skills = new ArrayList<>();
+	private Collection<CarrierVehicleType> vehicleTypes = new ArrayList<>();
 
 
 	/**
@@ -150,11 +137,4 @@ public class CarrierCapabilities {
 	public Collection<CarrierVehicleType> getVehicleTypes() {
 		return vehicleTypes;
 	}
-
-	/**
-	 * Returns a collection of {@link Skills}.
-	 *
-	 * @return
-	 */
-	public Collection<Skills> getSkills() { return skills; }
 }
