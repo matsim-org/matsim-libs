@@ -43,7 +43,7 @@ import org.matsim.core.utils.misc.Time;
  * @author ikaddoura
  *
  */
-public class ProcessNoiseImmissions {
+public final class ProcessNoiseImmissions {
 	
 	private static final Logger log = Logger.getLogger(ProcessNoiseImmissions.class);
 
@@ -88,7 +88,7 @@ public class ProcessNoiseImmissions {
 				
 				log.info("Reading time bin: " + time);
 
-				String fileName = workingDirectory + label + "_" + Double.toString(time) + ".csv";
+				String fileName = workingDirectory + label + "_" + time + ".csv";
 				BufferedReader br = IOUtils.getBufferedReader(fileName);
 				
 				String line = null;
