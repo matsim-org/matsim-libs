@@ -22,6 +22,7 @@ package org.matsim.contrib.socnetsim.jointtrips.replanning.modules;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -65,7 +66,6 @@ public class JointTripInsertorAndRemoverAlgorithm implements GenericPlanAlgorith
 				tripRouter);
 		this.remover = new JointTripRemoverAlgorithm(
 				random,
-				tripRouter.getStageActivityTypes(),
 				tripRouter.getMainModeIdentifier());
 		this.iterative = iterative;
 	}
@@ -95,17 +95,13 @@ public class JointTripInsertorAndRemoverAlgorithm implements GenericPlanAlgorith
 		int countPassengers = 0;
 		int countEgoists = 0;
 
-		final CompositeStageActivityTypes stageTypes = new CompositeStageActivityTypes();
-		stageTypes.addActivityTypes( tripRouter.getStageActivityTypes() );
-		stageTypes.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
-
 		for (Plan indivPlan : plan.getIndividualPlans().values()) {
 			if ( agentsToIgnore.contains( indivPlan.getPerson().getId() ) ) continue;
 
 			// parse trips, and count "egoists" (non-driver non-passenger) and
 			// passengers. Some care is needed: joint trips are not identified as
 			// trips by the router!
-			for ( Trip trip : TripStructureUtils.getTrips( indivPlan , stageTypes ) ) {
+			for ( Trip trip : TripStructureUtils.getTrips( indivPlan , JointActingTypes.JOINT_STAGE_ACTS ) ) {
 				if ( tripContainsOneOfThoseModes( trip , Collections.singleton( JointActingTypes.PASSENGER ) ) ) countPassengers++;
 				if ( !tripContainsOneOfThoseModes( trip , JointActingTypes.JOINT_MODES ) ) countEgoists++;
 			}

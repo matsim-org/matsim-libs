@@ -117,15 +117,11 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 			// identify the joint trips as one single trips.
 			// Otherwise, the process will insert joint trips to access pick-ups
 			// or go from drop offs...
-			final CompositeStageActivityTypes types = new CompositeStageActivityTypes();
-			types.addActivityTypes( router.getStageActivityTypes() );
-			types.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
-
 			final MainModeIdentifier mainModeIdentifier =
 				new JointMainModeIdentifier(
 						router.getMainModeIdentifier() );
 
-			for ( TripStructureUtils.Trip trip : TripStructureUtils.getTrips( plan , types ) ) {
+			for ( TripStructureUtils.Trip trip : TripStructureUtils.getTrips( plan , JointActingTypes.JOINT_STAGE_ACTS ) ) {
 				final String mode = mainModeIdentifier.identifyMainMode( trip.getTripElements() );
 
 				if ( mode.equals( TransportMode.car ) ) {

@@ -54,7 +54,7 @@ import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
  * @author thibautd
  */
 public class OptimizeVehicleAllocationAtTourLevelTest {
-	private static StageActivityTypes stages = EmptyStageActivityTypes.INSTANCE;
+	private static Set<String> stages = new HashSet<>();// formerly EmptyStageActivityTypes.INSTANCE;
 	private static String MODE = "the_vehicular_mode";
 
 	private final PopulationFactory popFact = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory();

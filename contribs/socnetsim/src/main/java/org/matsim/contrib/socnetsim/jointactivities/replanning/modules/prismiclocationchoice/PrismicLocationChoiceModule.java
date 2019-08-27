@@ -52,9 +52,7 @@ public class PrismicLocationChoiceModule  extends AbstractMultithreadedGenericSt
 				(PrismicLocationChoiceConfigGroup) scenario.getConfig().getModule( PrismicLocationChoiceConfigGroup.GROUP_NAME ),
 				scenario.getActivityFacilities(),
 				(SocialNetwork) scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME ),
-				new CompositeStageActivityTypes(
-						tripRouterProvider.get().getStageActivityTypes(),
-						JointActingTypes.JOINT_STAGE_ACTS ) );
+				JointActingTypes.JOINT_STAGE_ACTS );
 	}
 }
 

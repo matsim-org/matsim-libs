@@ -19,8 +19,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.replanning.modules;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -110,7 +112,7 @@ public class TourModeUnifierAlgorithmTest {
 		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", anchorLink1) );
 
-		final StageActivityTypes types = new StageActivityTypesImpl();
+		final Set<String> types = new HashSet<>(); // formerly new StageActivityTypesImpl();
 		final int nActs = TripStructureUtils.getActivities( plan , StageActivityHandling.ExcludeStageActivities ).size();
 
 		final PlanAlgorithm testee =
@@ -184,7 +186,7 @@ public class TourModeUnifierAlgorithmTest {
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("s", exitLink) );
 
 
-		final StageActivityTypes types = new StageActivityTypesImpl();
+		final Set<String> types = new HashSet<>();// formerly new StageActivityTypesImpl();
 
 		final PlanAlgorithm testee =
 			new TourModeUnifierAlgorithm( 
@@ -267,7 +269,7 @@ public class TourModeUnifierAlgorithmTest {
 		plan.addLeg( PopulationUtils.createLeg("mode-"+random.nextLong()) );
 		plan.addActivity( PopulationUtils.createActivityFromLinkId("h", anchorLink) );
 
-		final StageActivityTypes types = new StageActivityTypesImpl();
+		final Set<String> types = new HashSet<>();// formerly new StageActivityTypesImpl();
 		final int nActs = TripStructureUtils.getActivities( plan , StageActivityHandling.ExcludeStageActivities ).size();
 
 		final PlanAlgorithm testee =

@@ -19,7 +19,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointtrips.scoring;
 
+import java.util.Set;
+
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.scoring.SumScoringFunction;
 
@@ -29,10 +32,10 @@ import org.matsim.core.scoring.SumScoringFunction;
 public class BlackListedActivityScoringFunction implements SumScoringFunction.ActivityScoring {
 	private final SumScoringFunction.ActivityScoring delegate;
 
-	private final StageActivityTypes blackList;
+	private final Set<String> blackList; // formerly StageActivityTypes
 
 	public BlackListedActivityScoringFunction(
-			final StageActivityTypes blackList,
+			final Set<String> blackList,
 			final SumScoringFunction.ActivityScoring delegate) {
 		this.blackList = blackList;
 		this.delegate = delegate;
@@ -40,19 +43,19 @@ public class BlackListedActivityScoringFunction implements SumScoringFunction.Ac
 
 	@Override
 	public void handleFirstActivity(Activity act) {
-		if ( blackList.isStageActivity( act.getType() ) ) return;
+		if ( blackList.contains( act.getType() ) || StageActivityTypeIdentifier.isStageActivity(act.getType()) ) return;
 		delegate.handleFirstActivity( act);
 	}
 
 	@Override
 	public void handleActivity(Activity act) {
-		if ( blackList.isStageActivity( act.getType() ) ) return;
+		if ( blackList.contains( act.getType() ) || StageActivityTypeIdentifier.isStageActivity(act.getType()) ) return;
 		delegate.handleActivity( act);
 	}
 
 	@Override
 	public void handleLastActivity(Activity act) {
-		if ( blackList.isStageActivity( act.getType() ) ) return;
+		if ( blackList.contains( act.getType() ) || StageActivityTypeIdentifier.isStageActivity(act.getType()) ) return;
 		delegate.handleLastActivity( act);
 	}
 

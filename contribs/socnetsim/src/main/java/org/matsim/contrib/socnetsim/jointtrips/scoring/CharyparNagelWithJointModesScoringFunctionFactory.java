@@ -21,6 +21,7 @@ package org.matsim.contrib.socnetsim.jointtrips.scoring;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -47,7 +48,7 @@ public class CharyparNagelWithJointModesScoringFunctionFactory implements Scorin
 		Logger.getLogger(CharyparNagelWithJointModesScoringFunctionFactory.class);
 
 
-	private final StageActivityTypes blackList;
+	private final Set<String> blackList; // formerly StageActivityTypes
 	private final ScoringParameters params;
 	private final Map<String, LegScoringParameters> parametersPerMode = new HashMap<String, LegScoringParameters>();
     private final Scenario scenario;
@@ -62,7 +63,7 @@ public class CharyparNagelWithJointModesScoringFunctionFactory implements Scorin
     }
 
     public CharyparNagelWithJointModesScoringFunctionFactory(
-			final StageActivityTypes typesNotToScore,
+			final Set<String> typesNotToScore,
 			final Scenario scenario) {
 		log.warn( "initializing the \"CharyparNagel\" scoring function: this has no special parameters for joint modes!" );
 		this.params = new ScoringParameters.Builder(scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters(null), scenario.getConfig().scenario()).build();

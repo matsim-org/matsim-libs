@@ -20,6 +20,7 @@
 package org.matsim.contrib.socnetsim.jointtrips.replanning.modules;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
@@ -27,6 +28,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.router.CompositeStageActivityTypes;
+import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.utils.misc.Time;
 
@@ -49,14 +51,11 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 	private static final Logger log =
 		Logger.getLogger(SynchronizeCoTravelerPlansAlgorithm.class);
 
-	private final StageActivityTypes stageTypes;
+	private final Set<String> stageTypes;
 
 	public SynchronizeCoTravelerPlansAlgorithm(
 			final StageActivityTypes externalTypes) {
-		final CompositeStageActivityTypes composite = new CompositeStageActivityTypes();
-		composite.addActivityTypes( externalTypes );
-		composite.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
-		this.stageTypes = composite;
+		this.stageTypes = JointActingTypes.JOINT_STAGE_ACTS;
 	}
 
 	@Override
@@ -88,8 +87,9 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 			final PlanElement pe = passengerElements.get( --ind );
 
 			// assume stage activities have 0 duration
-			if ( pe instanceof Activity &&
-					!stageTypes.isStageActivity( ((Activity) pe).getType() ) ) {
+			if ( pe instanceof Activity && 
+					!(StageActivityTypeIdentifier.isStageActivity( ((Activity) pe).getType() )  ||
+					stageTypes.contains(((Activity) pe).getType())) ){
 				((Activity) pe).setMaximumDuration( Time.UNDEFINED_TIME );
 				((Activity) pe).setEndTime( now > 0 ? now : 0 );
 				return;
@@ -130,7 +130,8 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 
 			// assume stage activities have 0 duration
 			if ( pe instanceof Activity &&
-					!stageTypes.isStageActivity( ((Activity) pe).getType() ) ) {
+					!(StageActivityTypeIdentifier.isStageActivity( ((Activity) pe).getType() )  ||
+					stageTypes.contains(((Activity) pe).getType())) ){
 				final double endTime = ((Activity) pe).getEndTime();
 				if ( endTime == Time.UNDEFINED_TIME ) throw new RuntimeException( "undefined end time" );
 				return endTime + tt;

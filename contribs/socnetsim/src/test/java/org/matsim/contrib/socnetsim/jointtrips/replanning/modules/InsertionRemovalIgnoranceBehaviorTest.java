@@ -44,6 +44,7 @@ import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
 import org.matsim.contrib.socnetsim.usage.JointScenarioUtils;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
 
@@ -72,7 +73,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 
 	@Test
 	public void testRemoverIgnorance() throws Exception {
-		final JointTripRemoverAlgorithm algo = new JointTripRemoverAlgorithm( random , EmptyStageActivityTypes.INSTANCE , new MainModeIdentifierImpl() );
+		final JointTripRemoverAlgorithm algo = new JointTripRemoverAlgorithm( random , new MainModeIdentifierImpl() );
 		
 		JointPlan jointPlan = createPlanWithJointTrips();
 

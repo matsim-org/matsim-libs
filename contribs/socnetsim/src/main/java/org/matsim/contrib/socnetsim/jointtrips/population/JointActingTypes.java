@@ -20,19 +20,17 @@
 package org.matsim.contrib.socnetsim.jointtrips.population;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
+import java.util.Set;
 
 /**
  * Defines different naming constants related to joint actings.
  * @author thibautd
  */
 public interface JointActingTypes {
-	public static final String INTERACTION = "joint_interaction";
-	public static final StageActivityTypes JOINT_STAGE_ACTS =
-		new StageActivityTypesImpl();
+	public static final String INTERACTION = "joint";
+	public static final Set<String> JOINT_STAGE_ACTS = new HashSet<>(Arrays.asList( INTERACTION ));
 
 	public static final String PASSENGER = "car_passenger";
 	public static final String DRIVER = "car_driver";

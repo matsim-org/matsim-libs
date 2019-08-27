@@ -27,9 +27,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.junit.Before;
@@ -42,12 +44,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifierImpl;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
 
 import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
@@ -153,8 +151,8 @@ public class JointTripRemoverAlgorithmTest {
 					driver.getId(),
 					Arrays.asList( jointDriverLeg ),
 					passenger.getId(),
-					jointPassengerLeg),
-				EmptyStageActivityTypes.INSTANCE);
+					jointPassengerLeg)
+				);
 	}
 
 	private Fixture createTwoPassengersFixture() {
@@ -250,8 +248,8 @@ public class JointTripRemoverAlgorithmTest {
 					driver.getId(),
 					Arrays.asList( jointDriverLeg ),
 					passenger1.getId(),
-					jointPassengerLeg1),
-				EmptyStageActivityTypes.INSTANCE);
+					jointPassengerLeg1)
+				);
 	}
 
 	private Fixture createTwoPassengersFixtureWithInternOverlap() {
@@ -364,8 +362,8 @@ public class JointTripRemoverAlgorithmTest {
 					driver.getId(),
 					Arrays.asList( jointDriverLeg2 ),
 					passenger1.getId(),
-					jointPassengerLeg1),
-				EmptyStageActivityTypes.INSTANCE);
+					jointPassengerLeg1)
+				);
 	}
 
 	private Fixture createTwoPassengersFixtureWithExternOverlap() {
@@ -478,8 +476,8 @@ public class JointTripRemoverAlgorithmTest {
 					driver.getId(),
 					Arrays.asList( jointDriverLeg1 , jointDriverLeg2 , jointDriverLeg3 ),
 					passenger1.getId(),
-					jointPassengerLeg1),
-				EmptyStageActivityTypes.INSTANCE);
+					jointPassengerLeg1)
+				);
 	}
 
 	private Fixture createMultiDriverStageFixture() {
@@ -540,7 +538,7 @@ public class JointTripRemoverAlgorithmTest {
 		expectedAfterRemoval.put(
 				passenger.getId(),
 				Arrays.asList( pAct1 , PopulationUtils.createLeg(TransportMode.pt) , pAct2 ));
-
+		
 		return new Fixture(
 				"complex access trip driver",
 				new JointPlanFactory().createJointPlan( plans ),
@@ -549,8 +547,8 @@ public class JointTripRemoverAlgorithmTest {
 					driver.getId(),
 					Arrays.asList( jointDriverLeg ),
 					passenger.getId(),
-					jointPassengerLeg),
-				new StageActivityTypesImpl());
+					jointPassengerLeg)
+				);
 	}
 
 	private Fixture createMultiPassengerStageFixture() {
@@ -611,6 +609,9 @@ public class JointTripRemoverAlgorithmTest {
 		expectedAfterRemoval.put(
 				passenger.getId(),
 				Arrays.asList( pAct1 , PopulationUtils.createLeg(TransportMode.pt) , pAct2 ));
+		
+		Set<String> stageActivityTypes = new HashSet<>();
+		stageActivityTypes.add(stageType);
 
 		return new Fixture(
 				"complex access trip passenger",
@@ -620,8 +621,8 @@ public class JointTripRemoverAlgorithmTest {
 					driver.getId(),
 					Arrays.asList( jointDriverLeg ),
 					passenger.getId(),
-					jointPassengerLeg),
-				new StageActivityTypesImpl());
+					jointPassengerLeg)
+				);
 	}
 
 	private Fixture createTwoPassengersInDifferentTripsRemoveFirstFixture() {
@@ -709,8 +710,8 @@ public class JointTripRemoverAlgorithmTest {
 					driver.getId(),
 					Arrays.asList( jointDriverLeg ),
 					passenger1.getId(),
-					jointPassengerLeg1),
-				EmptyStageActivityTypes.INSTANCE);
+					jointPassengerLeg1)
+				);
 	}
 
 	private Fixture createTwoPassengersInDifferentTripsRemoveSecondFixture() {
@@ -799,8 +800,8 @@ public class JointTripRemoverAlgorithmTest {
 					driver.getId(),
 					Arrays.asList( jointDriverLeg2 ),
 					passenger2.getId(),
-					jointPassengerLeg2),
-				EmptyStageActivityTypes.INSTANCE);
+					jointPassengerLeg2)
+				);
 	}
 
 	private Fixture createTwoDriversFixture(final boolean removeFirst) {
@@ -897,8 +898,8 @@ public class JointTripRemoverAlgorithmTest {
 						driver1.getId(),
 						Arrays.asList( jointDriverLeg1 ),
 						passenger.getId(),
-						jointPassengerLeg1),
-					EmptyStageActivityTypes.INSTANCE);
+						jointPassengerLeg1)
+					);
 		}
 
 		assert !removeFirst;
@@ -924,8 +925,8 @@ public class JointTripRemoverAlgorithmTest {
 					driver2.getId(),
 					Arrays.asList( jointDriverLeg2 ),
 					passenger.getId(),
-					jointPassengerLeg2),
-				EmptyStageActivityTypes.INSTANCE);
+					jointPassengerLeg2)
+				);
 
 	}
 
@@ -937,7 +938,7 @@ public class JointTripRemoverAlgorithmTest {
 		// TODO: test driver and passenger removal separately
 		for ( Fixture f : fixtures ) {
 			log.info( "testing removal on fixture "+f.name );
-			final JointTripRemoverAlgorithm algo = new JointTripRemoverAlgorithm( null ,  f.stageActivities , new MainModeIdentifierImpl() );
+			final JointTripRemoverAlgorithm algo = new JointTripRemoverAlgorithm( null , new MainModeIdentifierImpl() );
 			algo.removePassengerTrip( f.toRemove , f.jointPlan );
 			algo.removeDriverTrip( f.toRemove , f.jointPlan );
 
@@ -1040,14 +1041,12 @@ public class JointTripRemoverAlgorithmTest {
 		public final JointPlan jointPlan;
 		public final Map<Id<Person>, List<PlanElement>> expectedPlanAfterRemoval;
 		public final JointTrip toRemove;
-		public final StageActivityTypes stageActivities;
 
 		public Fixture(
 				final String name,
 				final JointPlan jointPlan,
 				final Map<Id<Person>, List<PlanElement>> expectedPlanAfterRemoval,
-				final JointTrip toRemove,
-				final StageActivityTypes stageActivities) {
+				final JointTrip toRemove) {
 			if ( expectedPlanAfterRemoval.size() != jointPlan.getIndividualPlans().size() ) {
 				throw new IllegalArgumentException( expectedPlanAfterRemoval.size()+" != "+jointPlan.getIndividualPlans().size() );
 			}
@@ -1055,7 +1054,6 @@ public class JointTripRemoverAlgorithmTest {
 			this.jointPlan = jointPlan;
 			this.expectedPlanAfterRemoval = expectedPlanAfterRemoval;
 			this.toRemove = toRemove;
-			this.stageActivities = stageActivities;
 		}
 	}
 }

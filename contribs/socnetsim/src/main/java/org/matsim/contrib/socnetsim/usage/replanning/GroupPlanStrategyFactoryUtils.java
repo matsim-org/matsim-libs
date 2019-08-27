@@ -89,14 +89,11 @@ public class GroupPlanStrategyFactoryUtils {
 			final Config config,
 			final Provider<TripRouter> tripRouterFactory) {
 		final TripRouter router = tripRouterFactory.get();
-		final CompositeStageActivityTypes stageTypes = new CompositeStageActivityTypes();
-		stageTypes.addActivityTypes( router.getStageActivityTypes() );
-		stageTypes.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
 
 		return new IndividualBasedGroupStrategyModule(
 				new TourModeUnifierModule(
 					config.global().getNumberOfThreads(),
-					stageTypes,
+					JointActingTypes.JOINT_STAGE_ACTS,
 					new MainModeIdentifier() {
 						@Override
 						public String identifyMainMode(
