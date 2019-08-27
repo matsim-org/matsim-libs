@@ -49,7 +49,7 @@ public final class JointTripsPlanLinkIdentifier implements PlanLinkIdentifier {
 	private static boolean containsCoTraveler(
 			final Plan plan,
 			final Id cotraveler) {
-		for ( Trip t : TripStructureUtils.getTrips( plan , EmptyStageActivityTypes.INSTANCE ) ) {
+		for ( Trip t : TripStructureUtils.getTrips( plan ) ) {
 			for ( Leg l : t.getLegsOnly() ) {
 				if ( l.getRoute() instanceof DriverRoute ) {
 					if ( ((DriverRoute) l.getRoute()).getPassengersIds().contains( cotraveler ) ) {

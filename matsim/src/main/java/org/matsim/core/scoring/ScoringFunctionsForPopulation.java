@@ -243,7 +243,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 				} else {
 					// we are at a real activity, which is not the first one we see for this agent.  output the trip ...
 					plan.addActivity( activity );
-					final List<Trip> trips = TripStructureUtils.getTrips( plan, getStageActivities());
+					final List<Trip> trips = TripStructureUtils.getTrips( plan );
 					// yyyyyy should in principle only return one trip.  There are, however, situations where
 					// it returns two trips, in particular in conjunction with the minibus raptor.  Possibly
 					// something that has to do with not alternativing between acts and legs.

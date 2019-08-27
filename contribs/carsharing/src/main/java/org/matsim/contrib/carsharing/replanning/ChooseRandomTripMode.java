@@ -41,7 +41,7 @@ public final class ChooseRandomTripMode implements PlanAlgorithm {
 	@Override
 	public void run(Plan plan) {
 		Id<Person> personId = plan.getPerson().getId();
-		List<Trip> trips = TripStructureUtils.getTrips(plan, stageActivityTypes);
+		List<Trip> trips = TripStructureUtils.getTrips( plan );
 		boolean ffcard = false;
 		boolean owcard = false;
 		int cnt = trips.size();

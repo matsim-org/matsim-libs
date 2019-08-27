@@ -432,7 +432,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 				}
 			}
 			{
-				for ( Trip trip : TripStructureUtils.getTrips(selectedPlan, stageActivities ) ) {
+				for ( Trip trip : TripStructureUtils.getTrips(selectedPlan) ) {
 					String mainMode = mainModeIdentifier.identifyMainMode( trip.getTripElements() ) ;
 					double item = calcBeelineDistance(trip.getOriginActivity(), trip.getDestinationActivity() ) ;
 

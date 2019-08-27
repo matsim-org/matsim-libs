@@ -58,7 +58,7 @@ public final class TripsToLegsAlgorithm implements PlanAlgorithm {
 	@Override
 	public void run(final Plan plan) {
 		final List<PlanElement> planElements = plan.getPlanElements();
-		final List<Trip> trips = TripStructureUtils.getTrips( plan , blackList );
+		final List<Trip> trips = TripStructureUtils.getTrips( plan );
 
 		for ( Trip trip : trips ) {
 			final List<PlanElement> fullTrip =

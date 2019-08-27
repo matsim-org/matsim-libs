@@ -125,7 +125,7 @@ ShutdownListener {
 	private void collectModeShareInfo(final IterationEndsEvent event) {
 		for (Person person : this.population.getPersons().values()) {
 			Plan plan = person.getSelectedPlan() ;
-			List<Trip> trips = TripStructureUtils.getTrips(plan, stageActivities) ;
+			List<Trip> trips = TripStructureUtils.getTrips(plan) ;
 			for ( Trip trip : trips ) {
 				String mode = this.mainModeIdentifier.identifyMainMode( trip.getTripElements() ) ;
 				// yy as stated elsewhere, the "computer science" mode identification may not be the same as the "transport planning" 

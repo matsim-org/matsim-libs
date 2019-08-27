@@ -327,7 +327,8 @@ public final class PreplanningEngine implements MobsimEngine {
 		TripStructureUtils.Trip inputTrip = null;
 		Coord pickupCoord = FacilitiesUtils.decideOnCoord( tripInfo.getPickupLocation(), network ) ;
 		Coord dropoffCoord = FacilitiesUtils.decideOnCoord( tripInfo.getDropoffLocation(), network ) ;
-		for (TripStructureUtils.Trip drtTrip : TripStructureUtils.getTrips(plan, PreplanningEngine.drtStageActivities )) {
+		// TODO: check: was PreplanningEngine.drtStageActivities, so drt* interaction only?
+		for (TripStructureUtils.Trip drtTrip : TripStructureUtils.getTrips( plan )) {
 			// recall that we have set the activity end time of the current activity to infinity, so we cannot use that any more.  :-( ?!
 			// could instead use some kind of ID.  Not sure if that would really be better.
 			// So here we are looking for a trip where origin and destination are close to pickup and dropoff:

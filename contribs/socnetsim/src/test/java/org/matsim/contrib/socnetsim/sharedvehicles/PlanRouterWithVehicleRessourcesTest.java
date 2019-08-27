@@ -88,7 +88,7 @@ public class PlanRouterWithVehicleRessourcesTest {
 
 		router.run( plan );
 
-		for ( Trip trip : TripStructureUtils.getTrips( plan , tripRouter.getStageActivityTypes() ) ) {
+		for ( Trip trip : TripStructureUtils.getTrips( plan ) ) {
 			for (Leg l : trip.getLegsOnly()) {
 				assertEquals(
 					"unexpected vehicle id",

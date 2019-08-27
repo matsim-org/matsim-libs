@@ -835,7 +835,7 @@ public class TripStructureUtilsSubtoursTest {
 	@Test
 	public void testGetTripsWithoutSubSubtours() throws Exception {
 		for (Fixture f : allFixtures( useFacilitiesAsAnchorPoint )) {
-			final int nTrips = TripStructureUtils.getTrips( f.plan , CHECKER ).size();
+			final int nTrips = TripStructureUtils.getTrips( f.plan ).size();
 			final Collection<Subtour> subtours =
 				TripStructureUtils.getSubtours(
 						f.plan,

@@ -477,11 +477,11 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 		for ( Fixture f : createFixtures() ) {
 			for (int i = 0; i < 5; i++) {
 				final Plan plan = f.createNewPlanInstance();
-				final int initNTrips = TripStructureUtils.getTrips( plan , stagesActivities ).size();
+				final int initNTrips = TripStructureUtils.getTrips( plan ).size();
 				final Collection<Subtour> initSubtours = TripStructureUtils.getSubtours( plan , stagesActivities );
 				testee.run( plan );
 
-				final List<Trip> newTrips = TripStructureUtils.getTrips( plan , stagesActivities );
+				final List<Trip> newTrips = TripStructureUtils.getTrips( plan );
 				
 				Assert.assertEquals(
 						"number of trips changed with mode mutation!?",

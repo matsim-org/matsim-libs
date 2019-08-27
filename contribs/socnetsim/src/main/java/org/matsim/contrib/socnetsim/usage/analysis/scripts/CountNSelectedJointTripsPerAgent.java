@@ -55,9 +55,7 @@ public class CountNSelectedJointTripsPerAgent {
 
 			for (Person p : sc.getPopulation().getPersons().values()) {
 				final List<Trip> trips =
-					TripStructureUtils.getTrips(
-							p.getSelectedPlan(),
-							EmptyStageActivityTypes.INSTANCE );
+					TripStructureUtils.getTrips(p.getSelectedPlan());
 
 				int countPassenger = 0;
 				int countDriver = 0;

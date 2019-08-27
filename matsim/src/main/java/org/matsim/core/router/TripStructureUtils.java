@@ -112,15 +112,6 @@ public class TripStructureUtils {
 				plan.getPlanElements());
 	}
 
-	// TODO: delete
-	@Deprecated
-	public static List<Trip> getTrips(
-			final Plan plan,
-			final StageActivityTypes stageActivityTypes) {
-		return getTrips(
-				plan.getPlanElements());
-	}
-	
 	@Deprecated
 	public static List<Trip> getTrips(
 			final Plan plan,
@@ -645,9 +636,11 @@ public class TripStructureUtils {
 		}
 		return null ;
 	}
+	
+	// TODO: check
 	public static Trip findTripStartingAtActivity( final Activity activity, final Plan plan, StageActivityTypes stageActivities ) {
 		Gbl.assertIf( ! stageActivities.isStageActivity( activity.getType()) ) ;
-		List<Trip> trips = getTrips( plan, stageActivities ) ;
+		List<Trip> trips = getTrips( plan ) ;
 		for ( Trip trip : trips ) {
 			if ( trip.getOriginActivity().equals( activity ) ) {
 				return trip ;

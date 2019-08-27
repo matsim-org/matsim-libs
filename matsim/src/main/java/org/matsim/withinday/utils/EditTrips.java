@@ -118,7 +118,7 @@ public final class EditTrips {
 	}
 	public Trip findTripAtPlanElement(MobsimAgent agent, PlanElement pe) {
 //		log.debug("plan element to be found=" + pe ) ;
-		List<Trip> trips = TripStructureUtils.getTrips( WithinDayAgentUtils.getModifiablePlan(agent), tripRouter.getStageActivityTypes() ) ;
+		List<Trip> trips = TripStructureUtils.getTrips( WithinDayAgentUtils.getModifiablePlan(agent) ) ;
 		for ( Trip trip : trips ) {
 			for ( PlanElement te : trip.getTripElements() ) {
 //				log.debug("trip element to be compared with=" + te ) ;

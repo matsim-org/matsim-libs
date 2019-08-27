@@ -372,7 +372,7 @@ public class FrozenEpsilonLocaChoiceIT{
 						}
 						double[] cnt = new double[1000] ;
 						for( Person person : population.getPersons().values() ){
-							List<Trip> trips = TripStructureUtils.getTrips( person.getSelectedPlan(), tripRouter.getStageActivityTypes() );
+							List<Trip> trips = TripStructureUtils.getTrips( person.getSelectedPlan() );
 							for( Trip trip : trips ){
 								Facility facFrom = FacilitiesUtils.toFacility( trip.getOriginActivity(), facilities );
 								Facility facTo = FacilitiesUtils.toFacility( trip.getDestinationActivity(), facilities );

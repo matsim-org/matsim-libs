@@ -92,7 +92,7 @@ class PlanTimesAdapter {
 		lastAct.setStartTime( now );
 		scoringFunction.handleActivity( lastAct );
 		// the following is hedging against the newer tripscoring; not clear if this will work out-of-sequence.
-		for( Trip trip : getTrips( planTmp, stageActivityTypes ) ){
+		for( Trip trip : getTrips( planTmp ) ){
 			scoringFunction.handleTrip( trip );
 		}
 

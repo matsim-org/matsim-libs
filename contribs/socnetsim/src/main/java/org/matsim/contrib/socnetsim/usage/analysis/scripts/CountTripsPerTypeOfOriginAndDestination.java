@@ -97,7 +97,7 @@ public class CountTripsPerTypeOfOriginAndDestination {
 		final QueryableSet records = new QueryableSet();
 		for ( Person person : population.getPersons().values() ) {
 			final Plan plan = person.getSelectedPlan();
-			for ( Trip trip : TripStructureUtils.getTrips( plan , STAGES ) ) {
+			for ( Trip trip : TripStructureUtils.getTrips( plan ) ) {
 				final Record r = records.getOrAddIfNotThere(
 						new Record(
 							trip.getOriginActivity().getType(),

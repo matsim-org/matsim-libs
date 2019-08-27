@@ -85,7 +85,7 @@ public class DistanceDistribution implements IterationEndsListener {
 	}
 	
 	private void analyzePlan(Plan plan) {
-		List<Trip> trips = TripStructureUtils.getTrips(plan , stageActivityTypes);
+		List<Trip> trips = TripStructureUtils.getTrips(plan);
 		
 		for (Trip trip : trips) {
 			String originActivityType = trip.getOriginActivity().getType();

@@ -155,7 +155,7 @@ public final class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		List<Candidate> choiceSet =
 					determineChoiceSet(
 							homeLocation,
-							TripStructureUtils.getTrips(plan, stageActivityTypes),
+							TripStructureUtils.getTrips(plan),
 							TripStructureUtils.getSubtours(
 									plan,
 									stageActivityTypes
