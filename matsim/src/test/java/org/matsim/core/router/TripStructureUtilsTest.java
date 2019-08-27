@@ -50,8 +50,6 @@ public class TripStructureUtilsTest {
             ScenarioUtils.createScenario(
 	        ConfigUtils.createConfig()).getPopulation().getFactory();
     private static final String dummyType = "dummy interaction";
-	private static final StageActivityTypes stageActivities =
-		new StageActivityTypesImpl();
 
 	private final List<Fixture> fixtures = new ArrayList<Fixture>();
 	private static class Fixture {
@@ -344,7 +342,7 @@ public class TripStructureUtilsTest {
 			for (Activity act : acts) {
 				assertFalse(
 						"found a dummy act in "+acts+" for fixture "+fixture.name,
-						stageActivities.isStageActivity( act.getType() ));
+						StageActivityTypeIdentifier.isStageActivity( act.getType() ));
 			}
 		}
 	}
@@ -365,7 +363,7 @@ public class TripStructureUtilsTest {
 					if (pe instanceof Leg) continue;
 					assertTrue(
 							"found a non-dummy act in "+trip.getTripElements()+" for fixture "+fixture.name,
-							stageActivities.isStageActivity( ((Activity) pe).getType() ));
+							StageActivityTypeIdentifier.isStageActivity( ((Activity) pe).getType() ));
 				}
 
 				final int indexOfStart =

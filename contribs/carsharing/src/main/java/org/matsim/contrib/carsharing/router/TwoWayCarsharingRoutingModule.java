@@ -7,9 +7,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.facilities.Facility;
 
 public class TwoWayCarsharingRoutingModule implements RoutingModule {
@@ -26,9 +24,5 @@ public class TwoWayCarsharingRoutingModule implements RoutingModule {
 		trip.add(leg1);		
 		return trip;
 	}
-		
-	@Override
-	public StageActivityTypes getStageActivityTypes() {
-		return EmptyStageActivityTypes.INSTANCE;
-	}
+
 }

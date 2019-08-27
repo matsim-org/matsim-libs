@@ -54,32 +54,6 @@ import java.util.List;
 public final class NetworkRoutingInclAccessEgressModule implements RoutingModule {
 	private static final Logger log = Logger.getLogger( NetworkRoutingInclAccessEgressModule.class );
 
-	private final class AccessEgressStageActivityTypes implements StageActivityTypes {
-		@Override public boolean isStageActivity(String activityType) {
-			if ( activityType.endsWith("interaction") ||
-					NetworkRoutingInclAccessEgressModule.this.stageActivityType.equals( activityType ) ) {
-				return true ;
-			} else {
-				return false ;
-			}
-		}
-		@Override public boolean equals( Object obj ) {
-			if ( !(obj instanceof AccessEgressStageActivityTypes) ) {
-				return false ;
-			}
-			AccessEgressStageActivityTypes other = (AccessEgressStageActivityTypes) obj ;
-			return stageActivityType.equals(other.getStageActivityTypeString());
-		}
-		@Override public int hashCode() {
-			return NetworkRoutingInclAccessEgressModule.this.stageActivityType.hashCode() ;
-		}
-
-		private String getStageActivityTypeString() {
-			return stageActivityType;
-		}
-	}
-
-
 	private final String mode;
 	private final PopulationFactory populationFactory;
 
@@ -258,12 +232,6 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		leg.setDepartureTime(depTime);
 		leg.setTravelTime(travTime);
 		return travTime;
-	}
-
-
-	@Override
-	public StageActivityTypes getStageActivityTypes() {
-		return new AccessEgressStageActivityTypes() ;
 	}
 
 	@Override

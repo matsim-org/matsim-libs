@@ -28,9 +28,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.facilities.Facility;
 
 import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
@@ -81,9 +79,5 @@ public class DriverRoutingModule implements RoutingModule {
 		return Collections.singletonList( leg );
 	}
 
-	@Override
-	public StageActivityTypes getStageActivityTypes() {
-		return EmptyStageActivityTypes.INSTANCE;
-	}
 }
 

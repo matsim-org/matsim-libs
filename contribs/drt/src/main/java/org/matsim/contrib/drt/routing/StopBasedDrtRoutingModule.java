@@ -148,7 +148,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		}
 	}
 
-	@Override
+	// TODO: check whether still necessary
 	public StageActivityTypes getStageActivityTypes() {
 		return drtStageActivityType;
 	}

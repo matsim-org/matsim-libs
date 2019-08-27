@@ -109,7 +109,7 @@ public class DynRoutingModule implements RoutingModule {
 		this.stageActivityTypes = stageActivityTypes;
 	}
 
-	@Override
+	// TODO: check whether necessary
 	public StageActivityTypes getStageActivityTypes() {
 		return this.stageActivityTypes != null ? this.stageActivityTypes : EmptyStageActivityTypes.INSTANCE;
 	}

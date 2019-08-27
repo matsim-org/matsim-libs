@@ -190,10 +190,4 @@ class LinkToLinkRoutingModule implements RoutingModule
         }
     }
 
-
-    @Override
-    public StageActivityTypes getStageActivityTypes()
-    {
-		return EmptyStageActivityTypes.INSTANCE;
-    }
 }

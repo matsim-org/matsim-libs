@@ -36,10 +36,8 @@ import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
@@ -119,11 +117,6 @@ class DrtRoutingModuleOld implements RoutingModule {
 	private Link getLink(Facility facility) {
 		Link link = network.getLinks().get(facility.getLinkId());
 		return link != null ? link : NetworkUtils.getNearestLink(network, facility.getCoord());
-	}
-
-	@Override
-	public StageActivityTypes getStageActivityTypes() {
-		return EmptyStageActivityTypes.INSTANCE;
 	}
 
 	/**

@@ -52,7 +52,6 @@ import org.matsim.facilities.ActivityFacility;
 @RunWith( Parameterized.class )
 public class TripStructureUtilsSubtoursTest {
 	private static final String STAGE = "stage_activity interaction";
-	private static final StageActivityTypes CHECKER = new StageActivityTypesImpl();
 	private final boolean useFacilitiesAsAnchorPoint;
 
 	@Parameters

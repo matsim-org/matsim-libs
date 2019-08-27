@@ -187,10 +187,6 @@ public class JointPlanRouterTest {
 							return Arrays.asList( PopulationUtils.createLeg(TransportMode.car) );
 						}
 
-						@Override
-						public StageActivityTypes getStageActivityTypes() {
-							return EmptyStageActivityTypes.INSTANCE;
-						}
 					}));
 		
 		builder.setRoutingModule(

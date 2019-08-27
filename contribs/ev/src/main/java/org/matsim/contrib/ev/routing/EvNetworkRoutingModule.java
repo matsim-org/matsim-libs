@@ -225,7 +225,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 		return consumptions;
 	}
 
-	@Override
+	// TODO: check whether still necessary
 	public StageActivityTypes getStageActivityTypes() {
 		return new EvCharingStageActivityType();
 	}

@@ -36,8 +36,6 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.facilities.Facility;
@@ -52,8 +50,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * @author thibautd, jbischoff
  */
 public class VariableAccessTransitRouterWrapper implements RoutingModule {
-    private static final StageActivityTypes CHECKER =
-            new StageActivityTypesImpl();
     private final TransitRouter router;
     private final RoutingModule walkRouter;
     private final TransitSchedule transitSchedule;
@@ -182,8 +178,4 @@ public class VariableAccessTransitRouterWrapper implements RoutingModule {
 	    return trip;
     }
 
-    @Override
-    public StageActivityTypes getStageActivityTypes() {
-        return CHECKER;
-    }
 } 

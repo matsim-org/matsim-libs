@@ -43,8 +43,6 @@ import java.util.List;
  * @author thibautd
  */
 public class TransitRouterWrapper implements RoutingModule {
-	private static final StageActivityTypes CHECKER =
-			new StageActivityTypesImpl();
 	private final TransitRouter router;
 	private final RoutingModule walkRouter;
 	private final TransitSchedule transitSchedule;
@@ -165,8 +163,4 @@ public class TransitRouterWrapper implements RoutingModule {
 		return route;
 	}
 
-	@Override
-	public StageActivityTypes getStageActivityTypes() {
-		return CHECKER;
-	}
 } 

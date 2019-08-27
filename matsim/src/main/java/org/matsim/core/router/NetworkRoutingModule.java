@@ -117,11 +117,6 @@ public final class NetworkRoutingModule implements RoutingModule {
 	}
 
 	@Override
-	public StageActivityTypes getStageActivityTypes() {
-		return EmptyStageActivityTypes.INSTANCE;
-	}
-
-	@Override
 	public String toString() {
 		return "[NetworkRoutingModule: mode="+this.mode+"]";
 	}

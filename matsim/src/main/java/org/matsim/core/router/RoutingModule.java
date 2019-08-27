@@ -38,8 +38,8 @@ public interface RoutingModule {
 	/**
 	 * Computes a route, as a sequence of plan elements. The plan elements can
 	 * be only legs, or a sequence of legs and "dummy" activities. All activity
-	 * types inserted as dummy activities must be notified by the
-	 * {@link #getStageActivityTypes()} method.
+	 * types inserted as dummy activities must have a type which ends on
+	 * "interaction".
 	 * <br>
 	 * <b>important:</b> if route computation relies on a shortest path algorithm
 	 * using {@link TravelTime} and/or {@link TravelDisutility}
@@ -59,13 +59,5 @@ public interface RoutingModule {
 			Person person);
 	// NOTE: It makes some sense to _not_ have the vehicle as an argument here ... since that only makes sense for vehicular modes. kai, feb'19
 
-	/**
-	 * Gives access to the activity types to consider as stages.
-	 * </ul>
-	 * @return a non-null {@link StageActivityTypes}. This should always return
-	 * the same instance, or at least return instances which are equal for equals().
-	 * Otherwise, replacement of modules in the {@link TripRouter} will not work.
-	 */
-	public StageActivityTypes getStageActivityTypes();
 }
 

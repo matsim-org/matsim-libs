@@ -128,10 +128,6 @@ public class PlanRouterWithVehicleRessourcesTest {
 						return legs ;
 					}
 
-					@Override
-					public StageActivityTypes getStageActivityTypes() {
-						return new StageActivityTypesImpl();
-					}
 				});
 		return builder.build() ;
 	}
