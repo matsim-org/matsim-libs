@@ -18,9 +18,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.analysis.kai;
 
-import java.util.Arrays;
-
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.roadpricing.RoadPricingConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -28,7 +27,8 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.contrib.roadpricing.RoadPricingConfigGroup;
+
+import java.util.Arrays;
 
 /**
  * @author nagel
@@ -84,7 +84,7 @@ public class RunKNEventsAnalyzer {
 		
 		// ===
 		
-		EventsManager events = new EventsManagerImpl() ;
+		EventsManager events = new EventsManagerImpl(null) ;
 		
 		Vehicle2DriverEventHandler vehicle2Driver = new Vehicle2DriverEventHandler();
 		events.addHandler(vehicle2Driver);

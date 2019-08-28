@@ -36,7 +36,7 @@ public class SimStepParallelEventsManagerImplTest {
 
 	@Test
 	public void testEventHandlerCanProduceAdditionalEventLateInSimStep() {
-		final SimStepParallelEventsManagerImpl events = new SimStepParallelEventsManagerImpl(8);
+		final SimStepParallelEventsManagerImpl events = new SimStepParallelEventsManagerImpl(8, null);
 		events.addHandler(new LinkEnterEventHandler() {
 			@Override
 			public void handleEvent(LinkEnterEvent event) {

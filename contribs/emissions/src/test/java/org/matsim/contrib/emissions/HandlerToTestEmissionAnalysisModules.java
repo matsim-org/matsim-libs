@@ -63,7 +63,7 @@ class HandlerToTestEmissionAnalysisModules implements EventsManager {
 	}
 
 	@Override
-	public void resetHandlers(int iteration) {
+	public void resetHandlers() {
 	}
 
 	@Override

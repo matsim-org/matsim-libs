@@ -24,12 +24,18 @@
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.IterationCounter;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 public class EventsUtils {
 
     public static EventsManager createEventsManager() {
-		final EventsManagerImpl events = new EventsManagerImpl();
+		final EventsManagerImpl events = new EventsManagerImpl(new IterationCounter() {
+			@Override
+			public Integer getIterationNumber() {
+				return null;
+			}
+		});
 //		events.initProcessing();
 		return events;
     }

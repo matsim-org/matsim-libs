@@ -20,6 +20,16 @@
 
 package org.matsim.core.events;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.IterationCounter;
+import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.misc.Time;
+
+import javax.inject.Inject;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,16 +39,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.misc.Time;
-
-import javax.inject.Inject;
 
 /**
  * @author cdobler
@@ -70,8 +70,6 @@ public final class ParallelEventsManager implements EventsManager {
 	
 	private boolean locked = false;
 
-	private int iteration = 0;
-
 	/*
 	 * Processed events are collected in an ArrayBlockingQueue. The distributor retrieves them and collects
 	 * them in arrays. If an array is full or the time step ends (in case syncOnTimeSteps is true) or
@@ -91,24 +89,26 @@ public final class ParallelEventsManager implements EventsManager {
 //	private final int eventsArraySize = 32768;	// syncOnTimeSteps = false
 //	private final int eventsArraySize = 512;	// syncOnTimeSteps = true
 	private final int eventsArraySize;
+	private final IterationCounter iterationCounter;
 
 	@Inject
-	ParallelEventsManager(Config config) {
-		this(config.parallelEventHandling().getSynchronizeOnSimSteps() != null ? config.parallelEventHandling().getSynchronizeOnSimSteps() : true);
+	ParallelEventsManager(Config config, IterationCounter iterationCounter) {
+		this(config.parallelEventHandling().getSynchronizeOnSimSteps() != null ? config.parallelEventHandling().getSynchronizeOnSimSteps() : true, iterationCounter);
 	}
 
-	public ParallelEventsManager(final boolean syncOnTimeSteps) {
-		this(syncOnTimeSteps, true, -1);
+	public ParallelEventsManager(boolean syncOnTimeSteps, IterationCounter iterationCounter) {
+		this(syncOnTimeSteps, true, -1, iterationCounter);
 	}
 	
-	public ParallelEventsManager(final boolean syncOnTimeSteps, final int numOfThreads) {
-		this(syncOnTimeSteps, false, numOfThreads);
+	public ParallelEventsManager(boolean syncOnTimeSteps, int numOfThreads, IterationCounter iterationCounter) {
+		this(syncOnTimeSteps, false, numOfThreads, iterationCounter);
 	}
 	
-	/*package*/ ParallelEventsManager(final boolean syncOnTimeSteps, final boolean oneThreadPerHandler, final int numOfThreads) {
+	/*package*/ ParallelEventsManager(boolean syncOnTimeSteps, boolean oneThreadPerHandler, int numOfThreads, IterationCounter iterationCounter) {
 		this.syncOnTimeSteps = syncOnTimeSteps;
 		this.oneThreadPerHandler = oneThreadPerHandler;
 		this.numOfThreads = numOfThreads;
+		this.iterationCounter = iterationCounter;
 		
 		this.hadException = new AtomicBoolean(false);
 		
@@ -116,7 +116,7 @@ public final class ParallelEventsManager implements EventsManager {
 		this.iterationEndBarrier = new Phaser(1);
 		
 		this.eventsHandlers = new ArrayList<EventHandler>();
-		this.singleThreadEventsHandler = new EventsManagerImpl();
+		this.singleThreadEventsHandler = new EventsManagerImpl(this.iterationCounter);
 		
 		if (syncOnTimeSteps) this.eventsArraySize = 512;
 		else this.eventsArraySize = 32768;
@@ -157,8 +157,8 @@ public final class ParallelEventsManager implements EventsManager {
 	}
 	
 	@Override
-	public void resetHandlers(int iteration) {
-		this.singleThreadEventsHandler.resetHandlers(iteration);
+	public void resetHandlers() {
+		this.singleThreadEventsHandler.resetHandlers();
 	}
 
 	@Override
@@ -172,9 +172,9 @@ public final class ParallelEventsManager implements EventsManager {
 		
 		this.eventsManagers = new EventsManager[numHandlers];
 		if (this.oneThreadPerHandler) {
-			for (int i = 0; i < this.eventsHandlers.size(); i++) this.eventsManagers[i] = new SingleHandlerEventsManager(this.eventsHandlers.get(i));
+			for (int i = 0; i < this.eventsHandlers.size(); i++) this.eventsManagers[i] = new SingleHandlerEventsManager(this.eventsHandlers.get(i), this.iterationCounter);
 		} else {
-			for (int i = 0; i < this.numOfThreads; i++) this.eventsManagers[i] = new EventsManagerImpl();
+			for (int i = 0; i < this.numOfThreads; i++) this.eventsManagers[i] = new EventsManagerImpl(this.iterationCounter);
 			for (int i = 0; i < this.eventsHandlers.size(); i++) this.eventsManagers[this.eventsHandlers.size() % numOfThreads].addHandler(this.eventsHandlers.get(i));
 		}
 		
@@ -232,7 +232,7 @@ public final class ParallelEventsManager implements EventsManager {
 		 * events are created afterwards, e.g. money events by the road pricing contrib.
 		 */
 		this.parallelMode = true;
-		resetHandlers(iteration);
+		resetHandlers();
 	}
 		
 	/*
@@ -271,7 +271,6 @@ public final class ParallelEventsManager implements EventsManager {
 		}
 		
 		this.locked = false;
-		iteration += 1;
 	}
 
 	@Override

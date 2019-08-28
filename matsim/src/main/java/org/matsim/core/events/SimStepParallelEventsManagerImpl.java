@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.ParallelEventHandlingConfigGroup;
+import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
 
@@ -35,7 +36,6 @@ import java.util.Queue;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -65,19 +65,20 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 	private AtomicLong counter;
 	private AtomicReference<Throwable> hadException = new AtomicReference<>();
 
-	private int iteration = 0;
+	private IterationCounter iterationCounter;
 
 	@Inject
-	SimStepParallelEventsManagerImpl(ParallelEventHandlingConfigGroup config) {
-		this(config.getNumberOfThreads() != null ? config.getNumberOfThreads() : 1);
+	SimStepParallelEventsManagerImpl(ParallelEventHandlingConfigGroup config, IterationCounter iterationCounter) {
+		this(config.getNumberOfThreads() != null ? config.getNumberOfThreads() : 1, iterationCounter);
 	}
 
-    public SimStepParallelEventsManagerImpl() {
-		this(1);
-	}
+//	public SimStepParallelEventsManagerImpl() {
+//		this(1);
+//	}
 	
-	public SimStepParallelEventsManagerImpl(int numOfThreads) {
+	public SimStepParallelEventsManagerImpl(int numOfThreads, IterationCounter iterationCounter) {
 		this.numOfThreads = numOfThreads;
+		this.iterationCounter = iterationCounter;
 		log.info("number of threads=" + numOfThreads );
 		init();
 	}
@@ -88,10 +89,10 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 		this.simStepEndBarrier = new CyclicBarrier(this.numOfThreads + 1);
 		this.iterationEndBarrier = new CyclicBarrier(this.numOfThreads + 1);
 		
-		this.delegate = new EventsManagerImpl();
+		this.delegate = new EventsManagerImpl(this.iterationCounter);
 
 		this.eventsManagers = new EventsManagerImpl[this.numOfThreads];
-		for (int i = 0; i < numOfThreads; i++) this.eventsManagers[i] = new EventsManagerImpl();
+		for (int i = 0; i < numOfThreads; i++) this.eventsManagers[i] = new EventsManagerImpl(this.iterationCounter);
 	}
 
 	@Override
@@ -119,8 +120,8 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 	}
 	
 	@Override
-	public void resetHandlers(int iteration) {
-		delegate.resetHandlers(iteration);
+	public void resetHandlers() {
+		delegate.resetHandlers();
 		counter.set(0);
 	}
 
@@ -174,7 +175,7 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 		 * the EventsProcessingThreads.
 		 */
 		this.parallelMode = true;
-		resetHandlers(iteration);
+		resetHandlers();
 	}
 		
 	/*
@@ -214,8 +215,6 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 		if (throwable != null) {
 			throw new RuntimeException("Exception while processing events. Cannot guarantee that all events have been fully processed.", throwable);
 		}
-
-		iteration += 1;
 	}
 
 	@Override

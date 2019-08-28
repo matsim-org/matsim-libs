@@ -94,7 +94,7 @@ public abstract class AbstractJDEQSimTest {
 	}
 
 	public void runJDEQSim(Scenario scenario) {
-		EventsManagerImpl events = new EventsManagerImpl();
+		EventsManagerImpl events = new EventsManagerImpl(null);
 		events.addHandler(new PersonEventCollector());
 		events.initProcessing();
 		new JDEQSimulation(ConfigUtils.addOrGetModule(scenario.getConfig(), JDEQSimConfigGroup.NAME, JDEQSimConfigGroup.class), scenario, events).run();

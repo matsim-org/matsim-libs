@@ -153,7 +153,7 @@ public class FastThenSlowChargingTest {
 				.plugCount(1)
 				.build();
 		return ChargerImpl.create(chargerSpecification, new FakeLink(Id.createLinkId("link_id")),
-				ch -> new ChargingWithQueueingLogic(ch, new ChargeUpToMaxSocStrategy(ch, 1), new EventsManagerImpl()));
+				ch -> new ChargingWithQueueingLogic(ch, new ChargeUpToMaxSocStrategy(ch, 1), new EventsManagerImpl(null)));
 	}
 
 	private ElectricVehicle createElectricVehicle(double capacity_kWh, double soc_kWh) {

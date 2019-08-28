@@ -65,7 +65,7 @@ public class Example implements BasicEventHandler{
 
 //			Example e = new Example();
 				long start = System.currentTimeMillis();
-				EventsManager em = new EventsManagerImpl();
+				EventsManager em = new EventsManagerImpl(null);
 				FileOutputStream fos = new FileOutputStream(output1);
 				ProtoEventsWriter pew = new ProtoEventsWriter(fos);
 				em.addHandler(pew);
@@ -79,7 +79,7 @@ public class Example implements BasicEventHandler{
 			{
 				log.info("Reading pbf writing pbf");
 				long start = System.currentTimeMillis();
-				EventsManager em = new EventsManagerImpl();
+				EventsManager em = new EventsManagerImpl(null);
 				FileOutputStream fos = new FileOutputStream(output2);
 				ProtoEventsWriter pew = new ProtoEventsWriter(fos);
 				em.addHandler(pew);
@@ -92,7 +92,7 @@ public class Example implements BasicEventHandler{
 			{
 				log.info("Reading XML");
 				long start = System.currentTimeMillis();
-				EventsManager em = new EventsManagerImpl();
+				EventsManager em = new EventsManagerImpl(null);
 				Example e = new Example();
 				em.addHandler(e);
 				MatsimEventsReader r = new MatsimEventsReader(em);
@@ -105,7 +105,7 @@ public class Example implements BasicEventHandler{
 			{
 				log.info("Reading pbf");
 				long start = System.currentTimeMillis();
-				EventsManager em = new EventsManagerImpl();
+				EventsManager em = new EventsManagerImpl(null);
 				Example e = new Example();
 				em.addHandler(e);
 				new ProtoEventsParser(em).parse(output1);

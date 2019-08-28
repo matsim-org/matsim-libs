@@ -70,7 +70,7 @@ public ChoiceGenerationControler(String[] args) {
 //                    controler.getScenario()));
     travelTimeCalculator = TravelTimeCalculator.create(scenario.getNetwork(), config.travelTimeCalculator());
 
-    EventsManagerImpl eventsManager = new EventsManagerImpl();
+    EventsManagerImpl eventsManager = new EventsManagerImpl(controler);
     EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);
     eventsManager.addHandler(waitTimeCalculator);
     eventsManager.addHandler(stopStopTimeCalculator);

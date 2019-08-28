@@ -20,15 +20,6 @@
 
 package org.matsim.core.events;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -62,8 +53,19 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.AgentWaitingForPtEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
+import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
+
+import javax.inject.Inject;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * EventHandling
@@ -89,6 +91,7 @@ public final class EventsManagerImpl implements EventsManager {
 		protected Class<?> eventklass;
 		protected ArrayList<EventHandler> handlerList = new ArrayList<EventHandler>(5);
 		protected Method method;
+
 		protected HandlerData(final Class<?> eventklass, final Method method) {
 			this.eventklass = eventklass;
 			this.method = method;
@@ -116,7 +119,13 @@ public final class EventsManagerImpl implements EventsManager {
 
 	private long counter = 0;
 	private long nextCounterMsg = 1;
-	private int iteration = 0;
+
+	protected IterationCounter iterationCounter;
+
+	@Inject
+	public EventsManagerImpl(IterationCounter iterationCounter) {
+		this.iterationCounter = iterationCounter;
+	}
 
 	private HandlerData findHandler(final Class<?> evklass) {
 		for (HandlerData handler : this.handlerData) {
@@ -167,7 +176,7 @@ public final class EventsManagerImpl implements EventsManager {
 	}
 
 	@Override
-	public void resetHandlers(final int iteration) {
+	public void resetHandlers() {
 		log.info("resetting Event-Handlers");
 		this.counter = 0;
 		this.nextCounterMsg = 1;
@@ -176,7 +185,7 @@ public final class EventsManagerImpl implements EventsManager {
 			for (EventHandler handler : handlerdata.handlerList) {
 				if (!resetHandlers.contains(handler)) {
 					log.info("  " + handler.getClass().getName());
-					handler.reset(iteration);
+					handler.reset(this.iterationCounter.getIterationNumber());
 					resetHandlers.add(handler);
 				}
 			}
@@ -185,7 +194,7 @@ public final class EventsManagerImpl implements EventsManager {
 
 	@Override
 	public void initProcessing() {
-		resetHandlers(iteration);
+		resetHandlers();
 	}
 
 	@Override
@@ -195,7 +204,6 @@ public final class EventsManagerImpl implements EventsManager {
 
 	@Override
 	public void finishProcessing() {
-		iteration += 1;
 	}
 
 	private void addHandlerInterfaces(final EventHandler handler, final Class<?> handlerClass) {

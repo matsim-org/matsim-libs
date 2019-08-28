@@ -61,8 +61,8 @@ class SynchronizedEventsManagerImpl implements EventsManager {
 	}
 
 	@Override
-	public void resetHandlers(int iteration) {
-		delegate.resetHandlers(iteration);
+	public void resetHandlers() {
+		delegate.resetHandlers();
 	}
 
 	@Override

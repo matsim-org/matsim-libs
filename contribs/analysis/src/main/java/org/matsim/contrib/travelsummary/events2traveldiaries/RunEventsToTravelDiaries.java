@@ -106,7 +106,7 @@ public class RunEventsToTravelDiaries {
         EventsToTravelDiaries handler =
                 new EventsToTravelDiaries(scenario);
 
-        EventsManager events = new EventsManagerImpl();
+        EventsManager events = new EventsManagerImpl(null);
 
         events.addHandler(handler);
 

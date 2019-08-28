@@ -20,13 +20,6 @@
 
 package org.matsim.core.events;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -66,8 +59,16 @@ import org.matsim.core.api.experimental.events.handler.AgentWaitingForPtEventHan
 import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
+import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Implementation of an EventsManager that serves exactly one EventHandler.
@@ -110,12 +111,13 @@ public final class SingleHandlerEventsManager implements EventsManager {
 	
 	private long counter = 0;
 	private long nextCounterMsg = 1;
-	private int iteration = 0;
 
 	private boolean isActive = true;
+	private final IterationCounter iterationCounter;
 	
-	public SingleHandlerEventsManager(EventHandler eventHandler) {
+	public SingleHandlerEventsManager(EventHandler eventHandler, IterationCounter iterationCounter) {
 		this.eventHandler = eventHandler;
+		this.iterationCounter = iterationCounter;
 		
 		if (this.eventHandler instanceof LinkLeaveEventHandler) this.isLeaveLinkHandler = true;
 		else this.isLeaveLinkHandler = false;
@@ -228,16 +230,16 @@ public final class SingleHandlerEventsManager implements EventsManager {
 	}
 
 	@Override
-	public void resetHandlers(final int iteration) {
+	public void resetHandlers() {
 		log.info("resetting Event-Handler");
 		this.counter = 0;
 		this.nextCounterMsg = 1;
-		this.eventHandler.reset(iteration);
+		this.eventHandler.reset(this.iterationCounter.getIterationNumber());
 	}
 
 	@Override
 	public void initProcessing() {
-		resetHandlers(iteration);
+		resetHandlers();
 	}
 
 	@Override
@@ -247,7 +249,6 @@ public final class SingleHandlerEventsManager implements EventsManager {
 
 	@Override
 	public void finishProcessing() {
-		iteration += 1;
 	}
 
 	public EventHandler getEventHandler() {

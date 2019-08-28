@@ -99,7 +99,7 @@ public class VariableSpeedChargingTest {
 				.plugCount(1)
 				.build();
 		Charger charger = ChargerImpl.create(chargerSpecification, new FakeLink(Id.createLinkId("link_id")),
-				ch -> new ChargingWithQueueingLogic(ch, new ChargeUpToMaxSocStrategy(ch, 1), new EventsManagerImpl()));
+				ch -> new ChargingWithQueueingLogic(ch, new ChargeUpToMaxSocStrategy(ch, 1), new EventsManagerImpl(null)));
 
 		ElectricVehicle electricVehicle = ElectricVehicleImpl.create(specification,
 				ev -> (link, travelTime, linkEnterTime) -> {

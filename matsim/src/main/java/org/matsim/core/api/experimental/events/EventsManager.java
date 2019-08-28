@@ -35,7 +35,7 @@ public interface EventsManager {
 	
 	public void removeHandler(final EventHandler handler);
 
-	public void resetHandlers(int iteration);
+	public void resetHandlers();
 	
 	/**
 	 * Called before the first event is sent for processing. Allows to initialize internal
