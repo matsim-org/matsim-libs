@@ -31,8 +31,10 @@ import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.EngineInformation.FuelType;
 
@@ -44,6 +46,7 @@ import com.graphhopper.jsprit.core.util.Solutions;
 
 import org.junit.Assert;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehiclesFactory;
 
 public class TestFreightUtils {
 	
@@ -341,6 +344,53 @@ public class TestFreightUtils {
 		String packageInputDirectory = classInputDirectory.substring(0, classInputDirectory.lastIndexOf('/'));
 		packageInputDirectory = packageInputDirectory.substring(0, packageInputDirectory.lastIndexOf('/') + 1);
 		return packageInputDirectory;
+	}
+
+	@Test
+	public void testAddVehicleTypeSkill(){
+		VehiclesFactory factory = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getVehicles().getFactory();
+		VehicleType type = factory.createVehicleType(Id.create("test", VehicleType.class));
+		Assert.assertFalse("Should not have skill.", FreightUtils.hasSkill(type, "testSkill"));
+
+		FreightUtils.addSkill(type, "testSkillOne");
+		Assert.assertTrue("Should have skill 'testSkillOne'.", FreightUtils.hasSkill(type, "testSkillOne"));
+
+
+		FreightUtils.addSkill(type, "testSkillTwo");
+		Assert.assertTrue("Should have skill 'testSkillOne'.", FreightUtils.hasSkill(type, "testSkillOne"));
+		Assert.assertTrue("Should have skill 'testSkillTwo'.", FreightUtils.hasSkill(type, "testSkillTwo"));
+	}
+
+	@Test
+	public void testAddShipmentSkill(){
+		CarrierShipment shipment = CarrierShipment.Builder.newInstance(
+				Id.create("testShipment", CarrierShipment.class), Id.createLinkId("1"), Id.createLinkId("2"), 1)
+				.build();
+		Assert.assertFalse("Should not have skill.", FreightUtils.hasSkill(shipment, "testSkill"));
+
+		FreightUtils.addSkill(shipment, "testSkillOne");
+		Assert.assertTrue("Should have skill 'testSkillOne'.", FreightUtils.hasSkill(shipment, "testSkillOne"));
+
+
+		FreightUtils.addSkill(shipment, "testSkillTwo");
+		Assert.assertTrue("Should have skill 'testSkillOne'.", FreightUtils.hasSkill(shipment, "testSkillOne"));
+		Assert.assertTrue("Should have skill 'testSkillTwo'.", FreightUtils.hasSkill(shipment, "testSkillTwo"));
+	}
+
+	@Test
+	public void testAddServiceSkill(){
+		CarrierService service = CarrierService.Builder.newInstance(
+				Id.create("testShipment", CarrierService.class), Id.createLinkId("2"))
+				.build();
+		Assert.assertFalse("Should not have skill.", FreightUtils.hasSkill(service, "testSkill"));
+
+		FreightUtils.addSkill(service, "testSkillOne");
+		Assert.assertTrue("Should have skill 'testSkillOne'.", FreightUtils.hasSkill(service, "testSkillOne"));
+
+
+		FreightUtils.addSkill(service, "testSkillTwo");
+		Assert.assertTrue("Should have skill 'testSkillOne'.", FreightUtils.hasSkill(service, "testSkillOne"));
+		Assert.assertTrue("Should have skill 'testSkillTwo'.", FreightUtils.hasSkill(service, "testSkillTwo"));
 	}
 
 }

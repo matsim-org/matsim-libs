@@ -2,9 +2,11 @@ package org.matsim.contrib.freight.carrier;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.utils.objectattributes.attributable.Attributable;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 
-public class CarrierService  {
+public final class CarrierService implements Attributable {
 
 	public static class Builder {
 		
@@ -80,6 +82,8 @@ public class CarrierService  {
 
 	private final int demand;
 
+	private Attributes attributes = new Attributes();
+
 	private CarrierService(Builder builder){
 		id = builder.id;
 		locationId = builder.locationLinkId;
@@ -108,7 +112,12 @@ public class CarrierService  {
 	public int getCapacityDemand() {
 		return demand;
 	}
-	
+
+	@Override
+	public Attributes getAttributes() {
+		return attributes;
+	}
+
 	/**
 	 * @return the name
 	 */

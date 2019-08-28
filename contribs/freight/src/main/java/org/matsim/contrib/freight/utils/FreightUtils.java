@@ -18,21 +18,17 @@
 
 package org.matsim.contrib.freight.utils;
 
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierImpl;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.CarrierShipment;
-import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
+import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.vehicles.VehicleType;
+
+import java.util.*;
 
 /**
  * Utils for the work with the freight contrib
@@ -43,12 +39,14 @@ import org.matsim.contrib.freight.carrier.Tour.TourElement;
 public class FreightUtils {
 
 	/**
-	 * From the outside, rather use {@link FreightUtils#getCarriers(Scenario)} .  This string constant will eventually become private.
+	 * From the outside, rather use {@link FreightUtils#getCarriers(Scenario)} .
+	 * This string constant will eventually become private.
 	 */
 	@Deprecated
 	public static final String CARRIERS = "carriers" ;
 	private static final Logger log = Logger.getLogger(FreightUtils.class );
 
+	private static final String ATTR_SKILLS = "skills";
 	/**
 	 * Creates a new {@link Carriers} container only with {@link CarrierShipment}s for creating a new VRP.
 	 * As consequence of the transformation of {@link CarrierService}s to {@link CarrierShipment}s the solution of the VRP can have tours with
@@ -132,12 +130,13 @@ public class FreightUtils {
 		} catch (Exception e) {
 			throw new RuntimeException("Carrier " + carrier.getId() + " has NO selectedPlan. --> CanNOT create a new carrier from solution");
 		}
+		Collection<ScheduledTour> tours;
 		try {
-			carrier.getSelectedPlan().getScheduledTours();
+			tours = carrier.getSelectedPlan().getScheduledTours();
 		} catch (Exception e) {
 			throw new RuntimeException("Carrier " + carrier.getId() + " has NO ScheduledTours. --> CanNOT create a new carrier from solution");
 		}
-		for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours()) {
+		for (ScheduledTour tour : tours) {
 			Id<Link> depotForTour = tour.getVehicle().getLocation();
 			for (TourElement te : tour.getTour().getTourElements()) {
 				if (te instanceof ServiceActivity){
@@ -161,4 +160,115 @@ public class FreightUtils {
 		}
 	}
 
+	/**
+	 * Adds a skill to the vehicle's {@link org.matsim.vehicles.VehicleType}.
+	 * @param vehicleType the vehicle type to change;
+	 * @param skill the skill.
+	 */
+	public static void addSkill(VehicleType vehicleType, String skill){
+		addSkill(vehicleType.getAttributes(), skill);
+	}
+
+	/**
+	 * Checks if a given skill is available in the given attributes.
+	 * @param type the {@link VehicleType};
+	 * @param skill the free-form type skill.
+	 * @return <code>true</code> if the skill is in the skill set; or
+	 * <code>false</code> if the skill is not in the skill set, or there is no
+	 * skill set available/set.
+	 */
+	public static boolean hasSkill(VehicleType type, String skill) {
+		return hasSkill(type.getAttributes(), skill);
+	}
+
+	/**
+	 * Adds a skill to the {@link com.graphhopper.jsprit.core.problem.job.Shipment}.
+	 * @param shipment the vehicle type to change;
+	 * @param skill the skill.
+	 */
+	public static void addSkill(CarrierShipment shipment, String skill){
+		addSkill(shipment.getAttributes(), skill);
+	}
+
+	/**
+	 * Checks if a given skill is available in the given attributes.
+	 * @param shipment the {@link CarrierShipment};
+	 * @param skill the free-form type skill.
+	 * @return <code>true</code> if the skill is in the skill set; or
+	 * <code>false</code> if the skill is not in the skill set, or there is no
+	 * skill set available/set.
+	 */
+	public static boolean hasSkill(CarrierShipment shipment, String skill) {
+		return hasSkill(shipment.getAttributes(), skill);
+	}
+
+
+	/**
+	 * Adds a skill to the {@link CarrierService}.
+	 * @param service the vehicle type to change;
+	 * @param skill the skill.
+	 */
+	public static void addSkill(CarrierService service, String skill){
+		addSkill(service.getAttributes(), skill);
+	}
+
+	/**
+	 * Checks if a given skill is available in the given attributes.
+	 * @param service the {@link CarrierService};
+	 * @param skill the free-form type skill.
+	 * @return <code>true</code> if the skill is in the skill set; or
+	 * <code>false</code> if the skill is not in the skill set, or there is no
+	 * skill set available/set.
+	 */
+	public static boolean hasSkill(CarrierService service, String skill) {
+		return hasSkill(service.getAttributes(), skill);
+	}
+
+	/**
+	 * A general method to add a skill to any {@link Attributes} object.
+	 * @param attributes where skill is added, if it doesn't already exist;
+	 * @param skill to be added.
+	 */
+	private static void addSkill(Attributes attributes, String skill){
+		List<String> skills = convertSkillsAttributeToList(attributes);
+		if(!skills.contains(skill)){
+			String skillString;
+			if(skills.size() == 0){
+				skillString = skill;
+			} else{
+				skillString = attributes.getAttribute(ATTR_SKILLS) + "," + skill;
+			}
+			attributes.putAttribute(ATTR_SKILLS, skillString);
+		}
+	}
+
+	/**
+	 * Checks if a given skill is available in the given attributes.
+	 * @param attributes the {@link Attributes} container to check for the skill;
+	 * @param skill the free-form type skill.
+	 * @return <code>true</code> if the skill is in the skill set; or
+	 * <code>false</code> if the skill is not in the skill set, or there is no
+	 * skill set available/set.
+	 */
+	private static boolean hasSkill(Attributes attributes, String skill) {
+		if(attributes.getAttribute(ATTR_SKILLS) == null){
+			return false;
+		}
+		List<String> skills = convertSkillsAttributeToList(attributes);
+		return skills.contains(skill);
+	}
+
+	/**
+	 * Converts the 'skills' attribute to a list of strings.
+	 * @param attributes the {@link Attributes} container that is checked for the
+	 *                   skill(s) to be converted.
+	 * @return the {@link List} of skills, possibly empty, as parsed from the attribute.
+	 */
+	private static List<String> convertSkillsAttributeToList(Attributes attributes){
+		if(attributes.getAttribute(ATTR_SKILLS) == null){
+			return new ArrayList<>();
+		} else{
+			return Arrays.asList(Objects.requireNonNull(attributes.getAttribute(ATTR_SKILLS)).toString().split(","));
+		}
+	}
 }
