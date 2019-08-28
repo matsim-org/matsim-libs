@@ -20,10 +20,10 @@ public class CarrierPlanXmlWriterV2Test extends MatsimTestCase{
 		super.setUp();
 		Carriers carriers = new Carriers();
 		String classInputDirectory = getClassInputDirectory();
-		new CarrierPlanXmlReaderV2(carriers).readFile(classInputDirectory + "carrierPlansEquils.xml");
+		new CarrierPlanXmlReader(carriers).readFile(classInputDirectory + "carrierPlansEquils.xml");
 		new CarrierPlanXmlWriterV2(carriers).write(getClassInputDirectory() + "carrierPlansEquilsWritten.xml");
 		carriers.getCarriers().clear();
-		new CarrierPlanXmlReaderV2(carriers).readFile(getClassInputDirectory() + "carrierPlansEquilsWritten.xml");
+		new CarrierPlanXmlReader(carriers).readFile(getClassInputDirectory() + "carrierPlansEquilsWritten.xml");
 		testCarrier = carriers.getCarriers().get(Id.create("testCarrier", Carrier.class));
 	}
 	

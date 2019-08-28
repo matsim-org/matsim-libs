@@ -65,7 +65,7 @@ public final class RunChessboard {
         final URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
 
         final Carriers carriers = FreightUtils.getCarriers( scenario ) ;
-        new CarrierPlanXmlReaderV2(carriers).readURL( IOUtils.newUrl(url, "carrierPlans.xml" ) );
+        new CarrierPlanXmlReader(carriers).readURL( IOUtils.newUrl(url, "carrierPlans.xml" ) );
 
         final CarrierVehicleTypes types = new CarrierVehicleTypes();
         new CarrierVehicleTypeReader(types).readURL( IOUtils.newUrl(url, "vehicleTypes.xml" ) );

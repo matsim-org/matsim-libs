@@ -80,7 +80,7 @@ public class EquilWithCarrierWithPassIT {
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 		{
 			Carriers carriers = new Carriers();
-			new CarrierPlanXmlReaderV2( carriers ).readFile( testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
+			new CarrierPlanXmlReader( carriers ).readFile( testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
 			scenario.addScenarioElement( FreightUtils.CARRIERS, carriers );
 
 			final String idString = "foo";

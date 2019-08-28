@@ -16,7 +16,7 @@ public class CarrierVehicleTypeLoaderTest extends MatsimTestCase{
 		types = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader(types).readFile(getClassInputDirectory() + "vehicleTypes.xml");
 		carriers = new Carriers();
-		new CarrierPlanXmlReaderV2(carriers).readFile(getClassInputDirectory() + "carrierPlansEquils.xml");
+		new CarrierPlanXmlReader(carriers).readFile(getClassInputDirectory() + "carrierPlansEquils.xml");
 	}
 
 	@Test
