@@ -20,12 +20,13 @@
 package org.matsim.vehicles;
 
 
+import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author dgrether
  */
-public class VehicleCapacity{
+public class VehicleCapacity implements Attributable {
 
 	private Integer seats = 1; // one seat for the driver
 	private Integer standingRoom = 0 ;

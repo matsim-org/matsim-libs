@@ -78,8 +78,8 @@ public class TestMatsimTransformer {
 		Vehicle jspritVehicle = VehicleImpl.Builder.newInstance("myVehicle").setEarliestStart(10.0).setLatestArrival(20.0).setStartLocation(Location.newInstance("loc")).setType(jspritType).build();
 		CarrierVehicle matsimVehicle = MatsimJspritFactory.createCarrierVehicle(jspritVehicle);
 		assertNotNull(matsimVehicle);
-		assertEquals("myType", matsimVehicle.getVehicleType().getId().toString());
-		assertEquals("myVehicle",matsimVehicle.getVehicleId().toString());
+		assertEquals("myType", matsimVehicle.getType().getId().toString() );
+		assertEquals("myVehicle",matsimVehicle.getId().toString() );
 		assertEquals(10.0,matsimVehicle.getEarliestStartTime(),0.01);
 		assertEquals(20.0,matsimVehicle.getLatestEndTime(),0.01);
 		assertEquals("loc",matsimVehicle.getLocation().toString());
@@ -219,7 +219,7 @@ public class TestMatsimTransformer {
     }
 
     private VehicleImpl createJspritVehicle(CarrierVehicle vehicle) {
-        return VehicleImpl.Builder.newInstance(vehicle.getVehicleId().toString())
+        return VehicleImpl.Builder.newInstance(vehicle.getId().toString() )
                 .setEarliestStart(vehicle.getEarliestStartTime())
                 .setLatestArrival(vehicle.getLatestEndTime())
                 .setStartLocation(Location.newInstance(vehicle.getLocation().toString())).build();

@@ -85,8 +85,8 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		}
 		
 		public MatsimVehicleWrapper(CarrierVehicle vehicle) {
-			this.id = vehicle.getVehicleId();
-			this.type = vehicle.getVehicleType();
+			this.id = vehicle.getId();
+			this.type = vehicle.getType();
 		}
 
 		private org.matsim.vehicles.VehicleType makeType( String typeId, double maxVelocity ) {

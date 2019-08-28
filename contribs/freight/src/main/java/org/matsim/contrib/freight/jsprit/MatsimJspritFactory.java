@@ -178,8 +178,8 @@ public class MatsimJspritFactory {
 			vehicleLocationBuilder.setCoordinate(Coordinate.newInstance(locationCoord.getX(), locationCoord.getY()));
 		}
 		Location vehicleLocation = vehicleLocationBuilder.build();
-		com.graphhopper.jsprit.core.problem.vehicle.VehicleType vehicleType = createVehicleType(carrierVehicle.getVehicleType() );
-		VehicleImpl.Builder vehicleBuilder = VehicleImpl.Builder.newInstance(carrierVehicle.getVehicleId().toString());
+		com.graphhopper.jsprit.core.problem.vehicle.VehicleType vehicleType = createVehicleType(carrierVehicle.getType() );
+		VehicleImpl.Builder vehicleBuilder = VehicleImpl.Builder.newInstance(carrierVehicle.getId().toString() );
 		vehicleBuilder.setEarliestStart(carrierVehicle.getEarliestStartTime())
 		.setLatestArrival(carrierVehicle.getLatestEndTime())
 		.setStartLocation(vehicleLocation)
@@ -315,7 +315,7 @@ public class MatsimJspritFactory {
 		CarrierVehicle carrierVehicle = scheduledTour.getVehicle();
 		double depTime = scheduledTour.getDeparture();
 		Tour tour = scheduledTour.getTour();
-        Id<org.matsim.vehicles.Vehicle> vehicleId = carrierVehicle.getVehicleId();
+        Id<org.matsim.vehicles.Vehicle> vehicleId = carrierVehicle.getId();
         Vehicle jspritVehicle = getVehicle(vehicleId.toString(),vehicleRoutingProblem);
 		if(jspritVehicle == null) throw new IllegalStateException("jsprit-vehicle to id=" + vehicleId.toString() + " is missing");
 
@@ -379,9 +379,9 @@ public class MatsimJspritFactory {
 			Coord coordinate = null;
 			if(network != null) {
 				Link link = network.getLinks().get(v.getLocation());
-				if(link == null) throw new IllegalStateException("vehicle.locationId cannot be found in network [vehicleId=" + v.getVehicleId() + "][locationId=" + v.getLocation() + "]");
+				if(link == null) throw new IllegalStateException("vehicle.locationId cannot be found in network [vehicleId=" + v.getId() + "][locationId=" + v.getLocation() + "]");
 				coordinate = link.getCoord();
-			} else log.warn("cannot find linkId " + v.getVehicleId());
+			} else log.warn("cannot find linkId " + v.getId() );
 			Vehicle veh = createVehicle(v, coordinate);
 			assert veh.getEarliestDeparture() == v.getEarliestStartTime() : "earliestDeparture of both vehicles must be equal";
 			assert veh.getLatestArrival() == v.getLatestEndTime() : "latestArrTime of both vehicles must be equal";
@@ -463,9 +463,9 @@ public class MatsimJspritFactory {
 			Coord coordinate = null;
 			if(network != null) {
 				Link link = network.getLinks().get(v.getLocation());
-				if(link == null) throw new IllegalStateException("vehicle.locationId cannot be found in network [vehicleId=" + v.getVehicleId() + "][locationId=" + v.getLocation() + "]");
+				if(link == null) throw new IllegalStateException("vehicle.locationId cannot be found in network [vehicleId=" + v.getId() + "][locationId=" + v.getLocation() + "]");
 				coordinate = link.getCoord();
-			} else log.warn("cannot find linkId " + v.getVehicleId());
+			} else log.warn("cannot find linkId " + v.getId() );
 			vrpBuilder.addVehicle(createVehicle(v, coordinate));
 		}
 		

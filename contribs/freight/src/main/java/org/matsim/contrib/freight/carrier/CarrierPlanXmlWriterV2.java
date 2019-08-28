@@ -6,8 +6,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.graphhopper.jsprit.core.problem.job.Shipment;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -101,9 +99,9 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 		writer.write("\t\t\t\t<vehicles>\n");
 		for (CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles()) {
 			Id<VehicleType> vehicleTypeId = v.getVehicleTypeId();
-			if(vehicleTypeId == null) vehicleTypeId = v.getVehicleType().getId();
+			if(vehicleTypeId == null) vehicleTypeId = v.getType().getId();
 			if(vehicleTypeId == null) throw new IllegalStateException("vehicleTypeId is missing.");
-			writer.write("\t\t\t\t\t<vehicle id=\"" + v.getVehicleId()
+			writer.write("\t\t\t\t\t<vehicle id=\"" + v.getId()
 					+ "\" depotLinkId=\"" + v.getLocation()  
 					+ "\" typeId=\"" + vehicleTypeId.toString()
 					+ "\" earliestStart=\"" + getTime(v.getEarliestStartTime())
@@ -190,7 +188,7 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 					
 			for (ScheduledTour tour : plan.getScheduledTours()) {
 				writer.write("\t\t\t\t<tour ");
-				writer.write("vehicleId=\"" + tour.getVehicle().getVehicleId()
+				writer.write("vehicleId=\"" + tour.getVehicle().getId()
 						+ "\">\n");
 				writer.write("\t\t\t\t\t<act type=\"" + FreightConstants.START
 						+ "\" end_time=\"" + Time.writeTime(tour.getDeparture())

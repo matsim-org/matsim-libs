@@ -11,7 +11,7 @@ import org.matsim.vehicles.VehicleType;
  * @author sschroeder
  *
  */
-public class CarrierVehicle {
+public class CarrierVehicle implements Vehicle {
 
 	/**
 	 * Returns a new instance of carrierVehicle.
@@ -120,7 +120,7 @@ public class CarrierVehicle {
 		return locationId;
 	}
 
-	public Id<Vehicle> getVehicleId() {
+	public Id<Vehicle> getId() {
 		return vehicleId;
 	}
 	
@@ -129,14 +129,13 @@ public class CarrierVehicle {
 		return vehicleId + " stationed at " + locationId;
 	}
 
-	public VehicleType getVehicleType() {
+	public VehicleType getType() {
 		return vehicleType;
 	}
 
-	public void setVehicleType( VehicleType vehicleType ) {
+	public void setType( VehicleType vehicleType ) {
 		this.vehicleType = vehicleType;
 	}
-
 
 	/**
 	 * Returns the earliest time a vehicle can be deployed (and thus can departure from its origin).

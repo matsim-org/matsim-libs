@@ -19,12 +19,13 @@
 
 package org.matsim.vehicles;
 
+import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author dgrether
  */
-public class EngineInformation{
+public class EngineInformation implements Attributable {
 
 	private FuelType fuelType;
 	private double gasConsumption;

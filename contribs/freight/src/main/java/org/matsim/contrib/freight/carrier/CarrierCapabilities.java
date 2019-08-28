@@ -53,7 +53,7 @@ public class CarrierCapabilities {
 		
 		public Builder addVehicle(CarrierVehicle carrierVehicle){
 			vehicles.add(carrierVehicle);
-			if(carrierVehicle.getVehicleType() != null) addType(carrierVehicle.getVehicleType());
+			if(carrierVehicle.getType() != null) addType(carrierVehicle.getType() );
 			return this;
 		}
 		

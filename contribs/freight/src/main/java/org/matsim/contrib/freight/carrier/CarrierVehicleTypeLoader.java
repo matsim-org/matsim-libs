@@ -40,7 +40,7 @@ public class CarrierVehicleTypeLoader {
 				if(typeId != null){
 					if(types.getVehicleTypes().containsKey(typeId)){
 						VehicleType vehicleType = types.getVehicleTypes().get(typeId );
-						v.setVehicleType(vehicleType);
+						v.setType(vehicleType );
 						Collection<VehicleType> vTypes = c.getCarrierCapabilities().getVehicleTypes();
 						if(!vTypes.contains(vehicleType)){
 							vTypes.add(vehicleType);

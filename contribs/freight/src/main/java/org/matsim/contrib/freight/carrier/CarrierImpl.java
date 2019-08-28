@@ -32,7 +32,7 @@ public class CarrierImpl implements Carrier {
 	
 	private CarrierPlan selectedPlan;
 
-//	private final Attributes attributes = new Attributes();
+	private final Attributes attributes = new Attributes();
 
 	private CarrierImpl(final Id<Carrier> id) {
 		super();
@@ -131,10 +131,10 @@ public class CarrierImpl implements Carrier {
 	@Override
 	public void clearPlans() { this.plans.clear(); }
 
-//	@Override
-//	public Attributes getAttributes() {
-//		return attributes;
-//	}
+	@Override
+	public Attributes getAttributes() {
+		return attributes;
+	}
 
 
 

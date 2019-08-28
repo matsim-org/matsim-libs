@@ -109,13 +109,13 @@ public class CarrierPlanXmlWriterV2Test extends MatsimTestCase{
 	
 	private boolean exactlyTheseVehiclesAreInVehicleCollection(List<Id<Vehicle>> asList, Collection<CarrierVehicle> carrierVehicles) {
 		List<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>(carrierVehicles);
-		for(CarrierVehicle type : carrierVehicles) if(asList.contains(type.getVehicleId())) vehicles.remove(type);
+		for(CarrierVehicle type : carrierVehicles) if(asList.contains(type.getId() )) vehicles.remove(type );
 		return vehicles.isEmpty();
 	}
 
 	private CarrierVehicle getVehicle(String vehicleName) {
 		for(CarrierVehicle v : testCarrier.getCarrierCapabilities().getCarrierVehicles()){
-			if(v.getVehicleId().toString().equals(vehicleName)){
+			if(v.getId().toString().equals(vehicleName )){
 				return v;
 			}
 		}
