@@ -133,7 +133,7 @@ public class CreateEDRTVehiclesAndChargers {
 
 			ChargerSpecification charger = ImmutableChargerSpecification.newBuilder()
 					.id(Id.create("charger_" + startLink.getId(), Charger.class))
-					.maxPower(CHARGINGPOWER_KW * EvUnits.W_PER_kW)
+					.plugPower(CHARGINGPOWER_KW * EvUnits.W_PER_kW)
 					.plugCount(chargersPerDepot)
 					.linkId(startLink.getId()).chargerType(ChargerSpecification.DEFAULT_CHARGER_TYPE)
 					.build();
