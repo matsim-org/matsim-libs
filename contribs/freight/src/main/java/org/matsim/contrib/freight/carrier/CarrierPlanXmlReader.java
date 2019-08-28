@@ -59,6 +59,7 @@ public class CarrierPlanXmlReader implements MatsimReader {
 
 		@Override
 		public void startTag(final String name, final Attributes atts, final Stack<String> context) {
+//			log.debug("Reading start tag. name: " + name + " , attributes: " + atts.toString() + " , context: " + context);
 			if ( CARRIERS.equalsIgnoreCase( name ) ) {
 				String str = atts.getValue( "xsi:schemaLocation" );
 				log.info("Found following schemeLocation in carriers definition file: " + str);
@@ -66,9 +67,11 @@ public class CarrierPlanXmlReader implements MatsimReader {
 					log.warn("No validation information found. Using ReaderV2 instead.");
 					delegate = new CarrierPlanXmlParserV2( carriers ) ;
 				} else if ( str.contains( "carriersDefinitons_v1.0.xsd" ) ){
+					log.info("Found carriersDefinitons_v1.0.xsd. Using CarrierPlanReaderV1.");
 					delegate = new CarrierPlanReaderV1(carriers);
 				} else if ( str.contains( "carriersDefinitons_v2.0.xsd" ) ) { //This is the current one - but no validation file existing, kmt aug19
-					delegate = new CarrierPlanXmlParserV2( carriers ) ;
+					log.warn("Found carriersDefinitons_v2.0.xsd. Using CarrierPlanReaderV2.");
+					delegate = new CarrierPlanXmlParserV2( carriers );
 //				} else if ( str.contains( "carriersDefinitons_v3.0.xsd" ) ) { //Not available yet
 //					delegate = new CarrierPlanXmlParserV3( carriers ) ;
 				} else {
