@@ -25,9 +25,9 @@ import org.xml.sax.Attributes;
  * @author sschroeder
  *
  */
-public class CarrierPlanReader extends MatsimXmlParser {
+public class CarrierPlanReaderV1 extends MatsimXmlParser {
 
-	private static final Logger logger = Logger.getLogger(CarrierPlanReader.class);
+	private static final Logger logger = Logger.getLogger(CarrierPlanReaderV1.class);
 
 	private static final String CARRIERS = "carriers";
 
@@ -96,7 +96,7 @@ public class CarrierPlanReader extends MatsimXmlParser {
 	 *
 	 * @param carriers which is a map that stores carriers
 	 */
-	public CarrierPlanReader(Carriers carriers) {
+	public CarrierPlanReaderV1(Carriers carriers) {
 		super();
 		this.carriers = carriers;
 		this.setValidating(false);
