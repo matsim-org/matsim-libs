@@ -182,6 +182,28 @@ public class FreightUtils {
 	}
 
 	/**
+	 * Sets the given skills as an attribute. If prior skills were set, they
+	 * will be overwritten.
+	 * @param type for which skills are set;
+	 * @param skills that are converted to an attribute.
+	 */
+	public static void setSkills(VehicleType type, Set<String> skills){
+		setSkills(type.getAttributes(), skills);
+	}
+
+	/**
+	 * Get all the skills in the argument's {@link Attributes}. You should not
+	 * try and modify the returned list. If you want to add a skill, use the
+	 * method {@link #addSkill(VehicleType, String)}.
+	 *
+	 * @param type for which skills are sought;
+	 * @return an unmodifiable {@link List} of the skills.
+	 */
+	public static List<String> getSkills(VehicleType type){
+		return Collections.unmodifiableList(convertSkillsAttributeToList(type.getAttributes()));
+	}
+
+	/**
 	 * Adds a skill to the {@link com.graphhopper.jsprit.core.problem.job.Shipment}.
 	 * @param shipment the vehicle type to change;
 	 * @param skill the skill.
@@ -200,6 +222,28 @@ public class FreightUtils {
 	 */
 	public static boolean hasSkill(CarrierShipment shipment, String skill) {
 		return hasSkill(shipment.getAttributes(), skill);
+	}
+
+	/**
+	 * Sets the given skills as an attribute. If prior skills were set, they
+	 * will be overwritten.
+	 * @param shipment for which skills are set;
+	 * @param skills that are converted to an attribute.
+	 */
+	public static void setSkills(CarrierShipment shipment, Set<String> skills){
+		setSkills(shipment.getAttributes(), skills);
+	}
+
+	/**
+	 * Get all the skills in the argument's {@link Attributes}. You should not
+	 * try and modify the returned list. If you want to add a skill, use the
+	 * method {@link #addSkill(CarrierShipment, String)}.
+	 *
+	 * @param shipment for which skills are sought;
+	 * @return an unmodifiable {@link List} of the skills.
+	 */
+	public static List<String> getSkills(CarrierShipment shipment){
+		return Collections.unmodifiableList(convertSkillsAttributeToList(shipment.getAttributes()));
 	}
 
 
@@ -223,6 +267,30 @@ public class FreightUtils {
 	public static boolean hasSkill(CarrierService service, String skill) {
 		return hasSkill(service.getAttributes(), skill);
 	}
+
+	/**
+	 * Sets the given skills as an attribute. If prior skills were set, they
+	 * will be overwritten.
+	 * @param service for which skills are set;
+	 * @param skills that are converted to an attribute.
+	 */
+	public static void setSkills(CarrierService service, Set<String> skills){
+		setSkills(service.getAttributes(), skills);
+	}
+
+	/**
+	 * Get all the skills in the argument's {@link Attributes}. You should not
+	 * try and modify the returned list. If you want to add a skill, use the
+	 * method {@link #addSkill(CarrierService, String)}.
+	 *
+	 * @param service for which skills are sought;
+	 * @return an unmodifiable {@link List} of the skills.
+	 */
+	public static List<String> getSkills(CarrierService service){
+		return Collections.unmodifiableList(convertSkillsAttributeToList(service.getAttributes()));
+	}
+
+
 
 	/**
 	 * A general method to add a skill to any {@link Attributes} object.
@@ -269,6 +337,18 @@ public class FreightUtils {
 			return new ArrayList<>();
 		} else{
 			return Arrays.asList(Objects.requireNonNull(attributes.getAttribute(ATTR_SKILLS)).toString().split(","));
+		}
+	}
+
+	private static void setSkills(Attributes attributes, Set<String> skills){
+		if (skills.size() != 0) {
+			Iterator<String> skillIterator = skills.iterator();
+			String skillString = skillIterator.next();
+			while(skillIterator.hasNext()){
+				skillString += ",";
+				skillString += skillIterator.next();
+			}
+			attributes.putAttribute(ATTR_SKILLS, skillString);
 		}
 	}
 }
