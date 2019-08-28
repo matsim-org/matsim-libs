@@ -73,24 +73,34 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 	// not sufficient, people should use AbstractController.  kai, jan'13
 
 	public static final String DIRECTORY_ITERS = "ITERS";
-	public static final String FILENAME_CONFIG = "config.xml";
-	public static final String FILENAME_CONFIG_REDUCED = "config_reduced.xml";
-	public static final String FILENAME_NETWORK = "network.xml.gz";
-	public static final String FILENAME_LANES = "lanes.xml.gz";
-	public static final String FILENAME_CHANGE_EVENTS_XML = "change_events.xml.gz";
-	public static final String FILENAME_COUNTS = "counts.xml.gz" ;
-	public static final String FILENAME_POPULATION = "plans.xml.gz";
-	public static final String FILENAME_EXPERIENCED_PLANS = "experienced_plans.xml.gz";
-	public static final String FILENAME_PERSON_ATTRIBUTES = "personAttributes.xml.gz" ;
-	public static final String FILENAME_HOUSEHOLDS = "households.xml.gz";
-	public static final String FILENAME_FACILITIES = "facilities.xml.gz";
-	public static final String FILENAME_EVENTS_XML = "events.xml.gz";
-	public static final String FILENAME_TRANSIT_SCHEDULE = "transitSchedule.xml.gz";
-	public static final String FILENAME_TRANSIT_VEHICLES = "transitVehicles.xml.gz";
-	public static final String FILENAME_VEHICLES = "vehicles.xml.gz";
-	public static final String FILENAME_LINKSTATS = "linkstats.txt.gz";
-	public static final String FILENAME_TRAVELDISTANCESTATS = "traveldistancestats";
-	public static final String OUTPUT_PREFIX = "output_";
+
+	public enum DefaultFiles {
+		config("config.xml"),
+		configReduced("config_reduced.xml"),
+		network("network.xml"),
+		lanes("lanes.xml"),
+		changeEvents("change_events.xml"),
+		counts("counts.xml"),
+		population("plans.xml"),
+		experiencedPlans("experienced_plans.xml"),
+		households("households.xml"),
+		facilities("facilities.xml"),
+		events("events.xml"),
+		transitSchedule("transitSchedule.xml"),
+		transitVehicles("transitVehicles.xml"),
+		vehicles("vehicles.xml"),
+		linkstats("linkstats.txt"),
+		traveldistancestats("traveldistancestats")
+		;
+
+		final String filename;
+
+		DefaultFiles(String filename) {
+			this.filename = filename;
+		}
+	}
+
+	static final String OUTPUT_PREFIX = "output_";
 
 	public static final String DIVIDER = "###################################################";
 

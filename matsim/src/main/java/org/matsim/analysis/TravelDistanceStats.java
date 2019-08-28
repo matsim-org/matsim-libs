@@ -78,7 +78,7 @@ public class TravelDistanceStats {
 
 	@Inject
 	TravelDistanceStats(ControlerConfigGroup controlerConfigGroup, GlobalConfigGroup globalConfigGroup, OutputDirectoryHierarchy controlerIO) {
-		this(controlerConfigGroup, globalConfigGroup, controlerIO.getOutputFilename(Controler.FILENAME_TRAVELDISTANCESTATS), controlerConfigGroup.isCreateGraphs());
+		this(controlerConfigGroup, globalConfigGroup, controlerIO.getOutputFilename(Controler.DefaultFiles.traveldistancestats, ControlerConfigGroup.CompressionType.none), controlerConfigGroup.isCreateGraphs());
 	}
 
 	/**
