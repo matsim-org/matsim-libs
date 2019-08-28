@@ -130,10 +130,10 @@ public class FastThenSlowChargingTest {
 	public void calcChargingTime_exceptions() {
 		Assertions.assertThatThrownBy(() -> assertCalcChargingTime(100, 0, -1, 200, 2 * 360))
 				.isExactlyInstanceOf(IllegalArgumentException.class)
-				.hasMessage("Energy must be positive");
+				.hasMessageStartingWith("Energy is negative: ");
 		Assertions.assertThatThrownBy(() -> assertCalcChargingTime(100, 90, 11, 200, 2 * 360))
 				.isExactlyInstanceOf(IllegalArgumentException.class)
-				.hasMessage("End SOC must not be greater than 100%");
+				.hasMessageStartingWith("End SOC greater than battery capacity: ");
 	}
 
 	private void assertCalcChargingTime(double capacity_kWh, double soc_kWh, double energy_kWh, double chargerPower_kW,
