@@ -41,14 +41,14 @@ final class FreightScenarioCreator {
 
         for(int i=1;i<10;i++){
             Id<Link> homeId = Id.createLinkId("i("+i+",9)R");
-            Carrier carrier = CarrierImpl.newInstance(Id.create(agentCounter,Carrier.class));
+            Carrier carrier = CarrierUtils.createCarrier(Id.create(agentCounter,Carrier.class ) );
             createFleet(homeId, carrier);
             createCustomers(carrier,scenario.getNetwork());
             agentCounter++;
             carriers.addCarrier(carrier);
 
             Id<Link> homeIdR = Id.createLinkId("i("+i+",0)");
-            Carrier carrier_ = CarrierImpl.newInstance(Id.create(agentCounter,Carrier.class));
+            Carrier carrier_ = CarrierUtils.createCarrier(Id.create(agentCounter,Carrier.class ) );
             createFleet(homeIdR, carrier_);
             createCustomers(carrier_,scenario.getNetwork());
             agentCounter++;
@@ -57,14 +57,14 @@ final class FreightScenarioCreator {
 
         for(int i=1;i<10;i++){
             Id<Link> homeId = Id.createLinkId("j(0,"+i+")R");
-            Carrier carrier = CarrierImpl.newInstance(Id.create(agentCounter,Carrier.class));
+            Carrier carrier = CarrierUtils.createCarrier(Id.create(agentCounter,Carrier.class ) );
             createFleet(homeId, carrier);
             createCustomers(carrier,scenario.getNetwork());
             agentCounter++;
             carriers.addCarrier(carrier);
 
             Id<Link> homeIdR = Id.createLinkId("j(9,"+i+")");
-            Carrier carrier_ = CarrierImpl.newInstance(Id.create(agentCounter,Carrier.class));
+            Carrier carrier_ = CarrierUtils.createCarrier(Id.create(agentCounter,Carrier.class ) );
             createFleet(homeIdR, carrier_);
             createCustomers(carrier_,scenario.getNetwork());
             agentCounter++;
@@ -165,7 +165,7 @@ final class FreightScenarioCreator {
     }
 
     private static VehicleType createLightType() {
-        CarrierUtils.Builder typeBuilder = CarrierUtils.Builder.newInstance(Id.create("small", org.matsim.vehicles.VehicleType.class ) );
+        CarrierUtils.CarrierVehicleTypeBuilder typeBuilder = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("small", org.matsim.vehicles.VehicleType.class ) );
         typeBuilder.setCapacityWeightInTons(6 );
         typeBuilder.setFixCost(80.0);
         typeBuilder.setCostPerDistanceUnit(0.00047);
@@ -182,7 +182,7 @@ final class FreightScenarioCreator {
     }
 
     private static VehicleType createHeavyType() {
-        CarrierUtils.Builder typeBuilder = CarrierUtils.Builder.newInstance(Id.create("heavy", org.matsim.vehicles.VehicleType.class ) );
+        CarrierUtils.CarrierVehicleTypeBuilder typeBuilder = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("heavy", org.matsim.vehicles.VehicleType.class ) );
         typeBuilder.setCapacityWeightInTons(25 );
         typeBuilder.setFixCost(130.0);
         typeBuilder.setCostPerDistanceUnit(0.00077);

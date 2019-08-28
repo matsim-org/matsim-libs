@@ -62,7 +62,7 @@ public class FreightUtils {
 	public static Carriers createShipmentVRPCarrierFromServiceVRPSolution(Carriers carriers) {
 		Carriers carriersWithShipments = new Carriers();
 		for (Carrier carrier : carriers.getCarriers().values()){
-			Carrier carrierWS = CarrierImpl.newInstance(carrier.getId());
+			Carrier carrierWS = CarrierUtils.createCarrier(carrier.getId() );
 			if (carrier.getShipments().size() > 0) {
 				copyShipments(carrierWS, carrier);
 			}

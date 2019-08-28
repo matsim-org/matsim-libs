@@ -92,7 +92,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 	
 	private Builder capabilityBuilder;
 
-	private CarrierUtils.Builder vehicleTypeBuilder;
+	private CarrierUtils.CarrierVehicleTypeBuilder vehicleTypeBuilder;
 
 	private Map<Id<org.matsim.vehicles.VehicleType>, VehicleType> vehicleTypeMap = new HashMap<>();
 
@@ -115,7 +115,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 		if (name.equals(CARRIER)) {
 			String id = atts.getValue(ID);
 			if(id == null) throw new IllegalStateException("carrierId is missing.");
-			currentCarrier = CarrierImpl.newInstance(Id.create(id, Carrier.class));
+			currentCarrier = CarrierUtils.createCarrier(Id.create(id, Carrier.class ) );
 		}
 		//services
 		else if (name.equals("services")) {
@@ -195,7 +195,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 		else if(name.equals("vehicleType")){
 			String typeId = atts.getValue("id");
 			if(typeId == null) throw new IllegalStateException("vehicleTypeId is missing.");
-			this.vehicleTypeBuilder = CarrierUtils.Builder.newInstance(Id.create(typeId, org.matsim.vehicles.VehicleType.class ) );
+			this.vehicleTypeBuilder = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create(typeId, org.matsim.vehicles.VehicleType.class ) );
 		}
 		else if(name.equals("engineInformation")){
 			String fuelType = atts.getValue("fuelType");

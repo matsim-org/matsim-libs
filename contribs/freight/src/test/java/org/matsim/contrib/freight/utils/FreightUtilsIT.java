@@ -76,24 +76,24 @@ public class FreightUtilsIT {
 		
 		//Create carrier with services and shipments
 		carriersWithServicesAndShpiments = new Carriers() ;
-		carrierWServices = CarrierImpl.newInstance(CARRIER_SERVICES_ID );
+		carrierWServices = CarrierUtils.createCarrier(CARRIER_SERVICES_ID );
 		carrierWServices.getServices().add(createMatsimService("Service1", "i(3,9)", 2));
 		carrierWServices.getServices().add(createMatsimService("Service2", "i(4,9)", 2));
 		
 		//Create carrier with shipments
-		carrierWShipments = CarrierImpl.newInstance(CARRIER_SHIPMENTS_ID);
+		carrierWShipments = CarrierUtils.createCarrier(CARRIER_SHIPMENTS_ID );
 		carrierWShipments.getShipments().add(createMatsimShipment("shipment1", "i(1,0)", "i(7,6)R", 1)); 
 		carrierWShipments.getShipments().add(createMatsimShipment("shipment2", "i(3,0)", "i(3,7)", 2));
 
 		//Create vehicle for Carriers
-		VehicleType carrierVehType = CarrierUtils.Builder.newInstance(Id.create("gridType", org.matsim.vehicles.VehicleType.class ) )
-										 .setCapacityWeightInTons(3 )
-										 .setMaxVelocity(10)
-										 .setCostPerDistanceUnit(0.0001)
-										 .setCostPerTimeUnit(0.001)
-										 .setFixCost(130)
-										 .setEngineInformation(new EngineInformation(FuelType.diesel, 0.015) )
-										 .build();
+		VehicleType carrierVehType = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("gridType", org.matsim.vehicles.VehicleType.class ) )
+													 .setCapacityWeightInTons(3 )
+													 .setMaxVelocity(10)
+													 .setCostPerDistanceUnit(0.0001)
+													 .setCostPerTimeUnit(0.001)
+													 .setFixCost(130)
+													 .setEngineInformation(new EngineInformation(FuelType.diesel, 0.015) )
+													 .build();
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
 		vehicleTypes.getVehicleTypes().put(carrierVehType.getId(), carrierVehType);
 		

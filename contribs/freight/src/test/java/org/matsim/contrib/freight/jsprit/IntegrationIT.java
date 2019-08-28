@@ -13,18 +13,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.contrib.freight.carrier.CarrierImpl;
-import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
-import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -96,7 +86,7 @@ public class IntegrationIT {
 	private static Carriers createCarriers(String carrierFilename, CarrierVehicleTypes vehicleTypes) {
 		Carriers carriers = new Carriers() ;
 		{
-			Carrier carrier = CarrierImpl.newInstance( Id.create("TestCarrier", Carrier.class)); 
+			Carrier carrier = CarrierUtils.createCarrier( Id.create("TestCarrier", Carrier.class ) );
 			{
 				org.matsim.contrib.freight.carrier.CarrierCapabilities.Builder capabilityBuilder = CarrierCapabilities.Builder.newInstance();
 				capabilityBuilder.setFleetSize(FleetSize.FINITE);

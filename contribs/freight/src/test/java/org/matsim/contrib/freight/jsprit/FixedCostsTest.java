@@ -63,15 +63,15 @@ public class FixedCostsTest extends MatsimTestCase {
     public void setUp() throws Exception {
         super.setUp();
 //        Create carrier with services; service1 nearby the depot, service2 at the opposite side of the network
-        Carrier carrier1 = CarrierImpl.newInstance(Id.create("carrier1", Carrier.class));
+        Carrier carrier1 = CarrierUtils.createCarrier(Id.create("carrier1", Carrier.class ) );
         carrier1.getServices().add(createMatsimService("Service1", "i(3,0)", 1));
         carrier1.getServices().add(createMatsimService("Service2", "i(9,9)R", 1));
 
-        Carrier carrier2 = CarrierImpl.newInstance(Id.create("carrier2", Carrier.class));
+        Carrier carrier2 = CarrierUtils.createCarrier(Id.create("carrier2", Carrier.class ) );
         carrier2.getServices().add(createMatsimService("Service1", "i(3,0)", 1));
         carrier2.getServices().add(createMatsimService("Service2", "i(9,9)R", 1));
 
-        Carrier carrier3 = CarrierImpl.newInstance(Id.create("carrier3", Carrier.class));
+        Carrier carrier3 = CarrierUtils.createCarrier(Id.create("carrier3", Carrier.class ) );
         carrier3.getServices().add(createMatsimService("Service1", "i(3,0)", 1));
         carrier3.getServices().add(createMatsimService("Service2", "i(9,9)R", 1));
 
@@ -80,26 +80,26 @@ public class FixedCostsTest extends MatsimTestCase {
         CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
 
         //only variable costs (per distance), no fixed costs
-        VehicleType carrierVehType_A = CarrierUtils.Builder.newInstance(Id.create("gridType_A", org.matsim.vehicles.VehicleType.class ) )
-									     .setCapacityWeightInTons(1 )
-									     .setMaxVelocity(10)
-									     .setCostPerDistanceUnit(0.001)      //1 EUR per km
-									     .setCostPerTimeUnit(0.0)
-									     .setFixCost(0)
-									     .setEngineInformation(new EngineInformation( EngineInformation.FuelType.diesel, 0.015) )
-									     .build();
+        VehicleType carrierVehType_A = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("gridType_A", org.matsim.vehicles.VehicleType.class ) )
+												     .setCapacityWeightInTons(1 )
+												     .setMaxVelocity(10)
+												     .setCostPerDistanceUnit(0.001)      //1 EUR per km
+												     .setCostPerTimeUnit(0.0)
+												     .setFixCost(0)
+												     .setEngineInformation(new EngineInformation( EngineInformation.FuelType.diesel, 0.015) )
+												     .build();
         vehicleTypes.getVehicleTypes().put(carrierVehType_A.getId(), carrierVehType_A);
         CarrierVehicle carrierVehicle_A = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle_A", Vehicle.class), Id.createLinkId("i(1,0)")).setEarliestStart(0.0).setLatestEnd(36000.0).setTypeId(carrierVehType_A.getId()).build();
 
         //only fixed costs, no variable costs
-        VehicleType carrierVehType_B = CarrierUtils.Builder.newInstance(Id.create("gridType_B", org.matsim.vehicles.VehicleType.class ) )
-									     .setCapacityWeightInTons(1 )
-									     .setMaxVelocity(10)
-									     .setCostPerDistanceUnit(0.00001)
-									     .setCostPerTimeUnit(0.0)
-									     .setFixCost(10)
-									     .setEngineInformation(new EngineInformation( EngineInformation.FuelType.diesel, 0.015) )
-									     .build();
+        VehicleType carrierVehType_B = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("gridType_B", org.matsim.vehicles.VehicleType.class ) )
+												     .setCapacityWeightInTons(1 )
+												     .setMaxVelocity(10)
+												     .setCostPerDistanceUnit(0.00001)
+												     .setCostPerTimeUnit(0.0)
+												     .setFixCost(10)
+												     .setEngineInformation(new EngineInformation( EngineInformation.FuelType.diesel, 0.015) )
+												     .build();
         vehicleTypes.getVehicleTypes().put(carrierVehType_B.getId(), carrierVehType_B);
         CarrierVehicle carrierVehicle_B = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle_B", Vehicle.class), Id.createLinkId("i(1,0)")).setEarliestStart(0.0).setLatestEnd(36000.0).setTypeId(carrierVehType_B.getId()).build();
 

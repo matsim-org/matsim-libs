@@ -122,7 +122,7 @@ public class CarrierPlanReaderV1 extends MatsimXmlParser {
 		switch( name ){
 			case CARRIER:{
 				String id = atts.getValue( ID );
-				currentCarrier = CarrierImpl.newInstance( Id.create( id, Carrier.class ) );
+				currentCarrier = CarrierUtils.createCarrier( Id.create( id, Carrier.class ) );
 				break;
 			}
 			case SHIPMENTS:{
@@ -179,7 +179,7 @@ public class CarrierPlanReaderV1 extends MatsimXmlParser {
 				CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance( Id.create( vId, Vehicle.class ),
 					  Id.create( linkId, Link.class ) );
 				vehicleBuilder.setTypeId( Id.create( typeId, VehicleType.class ) );
-				vehicleBuilder.setType( CarrierUtils.Builder.newInstance( Id.create( typeId, VehicleType.class ) ).build() );
+				vehicleBuilder.setType( CarrierUtils.CarrierVehicleTypeBuilder.newInstance( Id.create( typeId, VehicleType.class ) ).build() );
 				if( startTime != null ) vehicleBuilder.setEarliestStart( getDouble( startTime ) );
 				if( endTime != null ) vehicleBuilder.setLatestEnd( getDouble( endTime ) );
 				CarrierVehicle vehicle = vehicleBuilder.build();

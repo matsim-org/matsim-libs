@@ -15,28 +15,28 @@ public class CarrierVehicleTypeTest extends MatsimTestCase{
 	@Override
 	public void setUp() throws Exception{
 		super.setUp();
-		VehicleType mediumType = CarrierUtils.Builder.newInstance(Id.create("medium", org.matsim.vehicles.VehicleType.class ) )
-									   .setDescription("Medium Vehicle")
-									   .setCapacityWeightInTons(30 )
-									   .setVehicleCostInformation(new CostInformation(50., 1.0, 0.5) )
-									   .setEngineInformation(new EngineInformation(FuelType.diesel, 0.02) )
-									   .setMaxVelocity(13.89)
-									   .build();
+		VehicleType mediumType = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("medium", org.matsim.vehicles.VehicleType.class ) )
+												   .setDescription("Medium Vehicle")
+												   .setCapacityWeightInTons(30 )
+												   .setVehicleCostInformation(new CostInformation(50., 1.0, 0.5) )
+												   .setEngineInformation(new EngineInformation(FuelType.diesel, 0.02) )
+												   .setMaxVelocity(13.89)
+												   .build();
 		types = new CarrierVehicleTypes();
 		types.getVehicleTypes().put(mediumType.getId(), mediumType);
 
 		//Setting up a copy of the one above
-		VehicleType mediumType2 = CarrierUtils.Builder.newInstance(Id.create("medium2", org.matsim.vehicles.VehicleType.class ), mediumType ).build();
+		VehicleType mediumType2 = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("medium2", org.matsim.vehicles.VehicleType.class ), mediumType ).build();
 		types.getVehicleTypes().put(mediumType2.getId(), mediumType2);
 
 		//Setting up a smaller one based of the one above and changing all values.
-		VehicleType smallType = CarrierUtils.Builder.newInstance(Id.create("small", org.matsim.vehicles.VehicleType.class ), mediumType )
-									  .setDescription("Small Vehicle")
-									  .setCapacityWeightInTons(16 )
-									  .setVehicleCostInformation(new CostInformation(25., 0.75, 0.25) )
-									  .setEngineInformation(new EngineInformation(FuelType.gasoline, 0.015) )
-									  .setMaxVelocity(10.0)
-									  .build();
+		VehicleType smallType = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("small", org.matsim.vehicles.VehicleType.class ), mediumType )
+												  .setDescription("Small Vehicle")
+												  .setCapacityWeightInTons(16 )
+												  .setVehicleCostInformation(new CostInformation(25., 0.75, 0.25) )
+												  .setEngineInformation(new EngineInformation(FuelType.gasoline, 0.015) )
+												  .setMaxVelocity(10.0)
+												  .build();
 		types.getVehicleTypes().put(smallType.getId(), smallType);
 	}
 

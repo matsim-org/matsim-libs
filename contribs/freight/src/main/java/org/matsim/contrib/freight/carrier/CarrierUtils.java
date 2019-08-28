@@ -6,14 +6,36 @@ import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CarrierUtils{
+	public static Carrier createCarrier( Id<Carrier> id ){
+		return new CarrierImpl(id);
+	}
+
+	public static CarrierPlan copyPlan( CarrierPlan plan2copy ) {
+		List<ScheduledTour> tours = new ArrayList<ScheduledTour>();
+		for (ScheduledTour sTour : plan2copy.getScheduledTours()) {
+			double depTime = sTour.getDeparture();
+			CarrierVehicle vehicle = sTour.getVehicle();
+			Tour tour = sTour.getTour().duplicate();
+			tours.add(ScheduledTour.newInstance(tour, vehicle, depTime));
+		}
+		CarrierPlan copiedPlan = new CarrierPlan(plan2copy.getCarrier(), tours);
+		double initialScoreOfCopiedPlan = plan2copy.getScore();
+		copiedPlan.setScore(initialScoreOfCopiedPlan);
+		return copiedPlan;
+
+	}
+
 	/**
 	 * A builder building the type.
 	 *
 	 * @author sschroeder
 	 *
 	 */
-	public static class Builder {
+	public static class CarrierVehicleTypeBuilder{
 
 		/**
 		 * Returns a new instance of builder initialized with the typeId.
@@ -23,8 +45,8 @@ public class CarrierUtils{
 		 * @param typeId
 		 * @return a type builder
 		 */
-		public static Builder newInstance( Id<org.matsim.vehicles.VehicleType> typeId ){
-			return new Builder(typeId);
+		public static CarrierVehicleTypeBuilder newInstance( Id<VehicleType> typeId ){
+			return new CarrierVehicleTypeBuilder(typeId);
 		}
 
 		/**
@@ -37,8 +59,8 @@ public class CarrierUtils{
 		 * @param typeId
 		 * @return a type builder
 		 */
-		public static Builder newInstance( Id<org.matsim.vehicles.VehicleType> typeId, VehicleType carrierVehicleType ){
-			return new Builder(typeId)
+		public static CarrierVehicleTypeBuilder newInstance( Id<VehicleType> typeId, VehicleType carrierVehicleType ){
+			return new CarrierVehicleTypeBuilder(typeId)
 					.setDescription(carrierVehicleType.getDescription())
 					.setEngineInformation(carrierVehicleType.getEngineInformation())
 					.setCapacityWeightInTons( carrierVehicleType.getCapacity().getWeightInTons() )
@@ -46,7 +68,7 @@ public class CarrierUtils{
 					.setVehicleCostInformation(carrierVehicleType.getCostInformation());
 		}
 
-		Id<org.matsim.vehicles.VehicleType> typeId;
+		Id<VehicleType> typeId;
 		double fix = 0.0;
 		double perDistanceUnit = 1.0;
 		double perTimeUnit = 0.0;
@@ -56,7 +78,7 @@ public class CarrierUtils{
 		double maxVeloInMeterPerSeconds = Double.MAX_VALUE;
 
 
-		private Builder(Id<org.matsim.vehicles.VehicleType> typeId ){
+		private CarrierVehicleTypeBuilder( Id<VehicleType> typeId ){
 			this.typeId = typeId;
 		}
 
@@ -67,7 +89,7 @@ public class CarrierUtils{
 		 * @param fix
 		 * @return
 		 */
-		public Builder setFixCost(double fix){
+		public CarrierVehicleTypeBuilder setFixCost( double fix ){
 			this.fix = fix;
 			return this;
 		}
@@ -80,7 +102,7 @@ public class CarrierUtils{
 		 * @param perDistanceUnit
 		 * @return
 		 */
-		public Builder setCostPerDistanceUnit(double perDistanceUnit){
+		public CarrierVehicleTypeBuilder setCostPerDistanceUnit( double perDistanceUnit ){
 			this.perDistanceUnit = perDistanceUnit;
 			return this;
 		}
@@ -93,7 +115,7 @@ public class CarrierUtils{
 		 * @param perTimeUnit
 		 * @return
 		 */
-		public Builder setCostPerTimeUnit(double perTimeUnit){
+		public CarrierVehicleTypeBuilder setCostPerTimeUnit( double perTimeUnit ){
 			this.perTimeUnit = perTimeUnit;
 			return this;
 		}
@@ -104,7 +126,7 @@ public class CarrierUtils{
 		 * @param description
 		 * @return this builder
 		 */
-		public Builder setDescription(String description){
+		public CarrierVehicleTypeBuilder setDescription( String description ){
 			this.description = description;
 			return this;
 		}
@@ -117,7 +139,7 @@ public class CarrierUtils{
 		 * @param capacity
 		 * @return this builder
 		 */
-		public Builder setCapacityWeightInTons( double capacity ){
+		public CarrierVehicleTypeBuilder setCapacityWeightInTons( double capacity ){
 			this.weightInTons = capacity;
 			return this;
 		}
@@ -150,7 +172,7 @@ public class CarrierUtils{
 		 * @param info
 		 * @return this builder
 		 */
-		public Builder setVehicleCostInformation(CostInformation info) {
+		public CarrierVehicleTypeBuilder setVehicleCostInformation( CostInformation info ) {
 			fix = info.getFixedCosts();
 			perDistanceUnit = info.getCostsPerMeter();
 			perTimeUnit = info.getCostsPerSecond();
@@ -163,12 +185,12 @@ public class CarrierUtils{
 		 * @param engineInfo
 		 * @return this builder
 		 */
-		public Builder setEngineInformation( EngineInformation engineInfo ) {
+		public CarrierVehicleTypeBuilder setEngineInformation( EngineInformation engineInfo ) {
 			this.engineInfo = engineInfo;
 			return this;
 		}
 
-		public Builder setMaxVelocity(double veloInMeterPerSeconds) {
+		public CarrierVehicleTypeBuilder setMaxVelocity( double veloInMeterPerSeconds ) {
 			this.maxVeloInMeterPerSeconds  = veloInMeterPerSeconds;
 			return this;
 		}

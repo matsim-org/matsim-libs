@@ -80,6 +80,7 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 		
 		if(name.equals("costInformation")){
 			String fix = atts.getValue("fix");
+			// yyyyyy shouldn't this be "perDay"??? kai, aug'19
 			String perMeter = atts.getValue("perMeter");
 			String perSecond = atts.getValue("perSecond");
 			if(fix == null || perMeter == null || perSecond == null) throw new IllegalStateException("cannot read costInformation correctly. probably the paramName was written wrongly");
@@ -117,7 +118,7 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 			this.maxVelo = content;
 		}
 		if(name.equals("vehicleType")){
-			CarrierUtils.Builder typeBuilder = CarrierUtils.Builder.newInstance(currentTypeId );
+			CarrierUtils.CarrierVehicleTypeBuilder typeBuilder = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(currentTypeId );
 			if(currentDescription != null) typeBuilder.setDescription(currentDescription);
 //			if(currentWeight != null) vehType.setAllowableTotalWeight(currentWeight);
 //			if(currentCap != null) vehType.setFreightCapacity(currentCap);

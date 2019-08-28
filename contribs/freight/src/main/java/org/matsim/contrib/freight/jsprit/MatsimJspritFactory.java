@@ -235,7 +235,7 @@ public class MatsimJspritFactory {
 		for(String skill : vehicle.getSkills().values()){
 			FreightUtils.addSkill(carrierVehicle.getType(), skill);
 		}
-		
+
 		assert vehicle.getEarliestDeparture() == carrierVehicle.getEarliestStartTime() : "vehicles must have the same earliestStartTime";
 		assert vehicle.getLatestArrival() == carrierVehicle.getLatestEndTime() : "vehicles must have the same latestEndTime";
 		assert vehicle.getStartLocation().getId() == carrierVehicle.getLocation().toString() : "locs must be the same";
@@ -251,9 +251,9 @@ public class MatsimJspritFactory {
 	 * @param type to be transformed
 	 * @return CarrierVehicleType
 	 */
-	static VehicleType createCarrierVehicleType(com.graphhopper.jsprit.core.problem.vehicle.VehicleType type) {
-		CarrierUtils.Builder typeBuilder = CarrierUtils.Builder.newInstance(Id.create(type.getTypeId(), org.matsim.vehicles.VehicleType.class));
-		typeBuilder.setCapacityWeightInTons(type.getCapacityDimensions().get(0));
+	static VehicleType createCarrierVehicleType( com.graphhopper.jsprit.core.problem.vehicle.VehicleType type ){
+		CarrierUtils.CarrierVehicleTypeBuilder typeBuilder = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create(type.getTypeId(), org.matsim.vehicles.VehicleType.class ) );
+		typeBuilder.setCapacityWeightInTons(type.getCapacityDimensions().get(0 ) );
 		typeBuilder.setCostPerDistanceUnit(type.getVehicleCostParams().perDistanceUnit).setCostPerTimeUnit(type.getVehicleCostParams().perTransportTimeUnit)
 				.setFixCost(type.getVehicleCostParams().fix);
 		typeBuilder.setMaxVelocity(type.getMaxVelocity());
@@ -561,7 +561,7 @@ public class MatsimJspritFactory {
 	 */
 	public static Carrier createCarrier(String carrierId, VehicleRoutingProblem vrp) {
 		Id<Carrier> id = Id.create(carrierId, Carrier.class);
-		Carrier carrier = CarrierImpl.newInstance(id);
+		Carrier carrier = CarrierUtils.createCarrier(id );
 		CarrierCapabilities.Builder capabilityBuilder = CarrierCapabilities.Builder.newInstance();
 
 		//fleet and vehicles

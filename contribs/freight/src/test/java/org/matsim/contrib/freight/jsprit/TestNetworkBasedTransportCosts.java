@@ -101,7 +101,7 @@ public class TestNetworkBasedTransportCosts extends MatsimTestCase{
 		// one cannot mock final methods!!
 
 		VehicleType vtype1 =
-			  CarrierUtils.Builder.newInstance( Id.create( "type1", org.matsim.vehicles.VehicleType.class ) ).setVehicleCostInformation( param1 ).build() ;
+			  CarrierUtils.CarrierVehicleTypeBuilder.newInstance( Id.create( "type1", org.matsim.vehicles.VehicleType.class ) ).setVehicleCostInformation( param1 ).build() ;
 
 		
 //		CarrierVehicleType vtype2 = mock(CarrierVehicleType.class);
@@ -111,7 +111,7 @@ public class TestNetworkBasedTransportCosts extends MatsimTestCase{
 		// one cannot mock final methods!!
 
 		VehicleType vtype2 =
-			  CarrierUtils.Builder.newInstance( Id.create( "type2", org.matsim.vehicles.VehicleType.class ) ).setVehicleCostInformation( param2 ).build() ;
+			  CarrierUtils.CarrierVehicleTypeBuilder.newInstance( Id.create( "type2", org.matsim.vehicles.VehicleType.class ) ).setVehicleCostInformation( param2 ).build() ;
 
 		Network network = scenario.getNetwork();
 		NetworkBasedTransportCosts.Builder builder = 

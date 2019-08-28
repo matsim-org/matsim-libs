@@ -298,7 +298,7 @@ public class TestMatsimTransformer {
 
         VehicleRoutingProblem vehicleRoutingProblem = VehicleRoutingProblem.Builder.newInstance().addAllJobs(services1).addAllJobs(services2).addVehicle(v1).addVehicle(v2).build();
 
-		CarrierPlan plan = new CarrierPlan(CarrierImpl.newInstance(Id.create("myCarrier", Carrier.class)), sTours);
+		CarrierPlan plan = new CarrierPlan( CarrierUtils.createCarrier(Id.create("myCarrier", Carrier.class ) ), sTours);
 		plan.setScore(-100.0);
 		VehicleRoutingProblemSolution solution = MatsimJspritFactory.createSolution(plan, vehicleRoutingProblem);
 		assertNotNull(solution);
@@ -347,14 +347,14 @@ public class TestMatsimTransformer {
 	}
 
 	private VehicleType getMatsimVehicleType() {
-		VehicleType matsimType = CarrierUtils.Builder.newInstance(Id.create("matsimType", org.matsim.vehicles.VehicleType.class ) )
-									   .setCapacityWeightInTons(50 )
-									   .setCostPerDistanceUnit(10.0)
-									   .setCostPerTimeUnit(5.0)
-									   .setFixCost(100.0)
-									   .setEngineInformation(new EngineInformation(FuelType.diesel, 15) )
-									   .setMaxVelocity(13.8)
-									   .build();
+		VehicleType matsimType = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("matsimType", org.matsim.vehicles.VehicleType.class ) )
+												   .setCapacityWeightInTons(50 )
+												   .setCostPerDistanceUnit(10.0)
+												   .setCostPerTimeUnit(5.0)
+												   .setFixCost(100.0)
+												   .setEngineInformation(new EngineInformation(FuelType.diesel, 15) )
+												   .setMaxVelocity(13.8)
+												   .build();
 		return matsimType;
 	}
 
@@ -479,7 +479,7 @@ public class TestMatsimTransformer {
 	}
 
 	private Carrier createCarrierWithServices() {
-		Carrier carrier = CarrierImpl.newInstance(Id.create("TestCarrier", Carrier.class));
+		Carrier carrier = CarrierUtils.createCarrier(Id.create("TestCarrier", Carrier.class ) );
 		VehicleType matsimType = getMatsimVehicleType();
 		CarrierCapabilities.Builder ccBuilder = CarrierCapabilities.Builder.newInstance() 
 				.addVehicle(getMatsimVehicle("matsimVehicle", "i(6,0)", matsimType))
@@ -491,7 +491,7 @@ public class TestMatsimTransformer {
 	}
 	
 	private Carrier createCarrierWithShipments() {
-		Carrier carrier = CarrierImpl.newInstance(Id.create("TestCarrier", Carrier.class));
+		Carrier carrier = CarrierUtils.createCarrier(Id.create("TestCarrier", Carrier.class ) );
 		VehicleType matsimType = getMatsimVehicleType();
 		CarrierCapabilities.Builder ccBuilder = CarrierCapabilities.Builder.newInstance() 
 				.addVehicle(getMatsimVehicle("matsimVehicle", "i(6,0)", matsimType))

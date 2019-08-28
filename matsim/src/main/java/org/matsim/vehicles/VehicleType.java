@@ -20,6 +20,7 @@
 package org.matsim.vehicles;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
@@ -27,6 +28,8 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * @author dgrether
  */
 public class VehicleType implements Attributable {
+	// yy should maybe the whole type be immutable? I guess that the question is how people use this.  If they have a vehicle, get the type, and then keep
+	// a reference to the type, then replacing the type means that it will have another reference, and these users will not notice.  ???????
 
 	private double width = 1.0;
 	private double maxVelocity = Double.POSITIVE_INFINITY; // default: constrained only by the link speed
@@ -38,7 +41,7 @@ public class VehicleType implements Attributable {
 //	private FreightCapacity freightCapacity;
 	private String description;
 	private VehicleCapacity capacity;
-	private String networkMode = "car";
+	private String networkMode = TransportMode.car ;
 
 	private Id<VehicleType> id;
 
