@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Preconditions;
 
 /**
  * Immutable implementation of ChargerSpecification
@@ -46,12 +47,8 @@ public class ImmutableChargerSpecification implements ChargerSpecification {
 		plugPower = Objects.requireNonNull(builder.plugPower);
 		plugCount = Objects.requireNonNull(builder.plugCount);
 
-		if (plugPower < 0) {
-			throw new IllegalArgumentException("Negative plugPower of charger: " + id);
-		}
-		if (plugCount < 0) {
-			throw new IllegalArgumentException("Negative plugCount of charger: " + id);
-		}
+		Preconditions.checkArgument(plugPower >= 0, "Negative plugPower of charger: %s", id);
+		Preconditions.checkArgument(plugCount >= 0, "Negative plugCount of charger: %s", id);
 	}
 
 	public static Builder newBuilder() {

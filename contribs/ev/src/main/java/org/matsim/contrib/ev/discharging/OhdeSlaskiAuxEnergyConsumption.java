@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.temperature.TemperatureService;
 
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 
 public class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
@@ -38,9 +39,8 @@ public class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
 	// temp - air temp [oC]
 	// power - avg power [W]
 	private static double calcPower(double temp) {
-		if (temp < MIN_TEMP || temp > MAX_TEMP) {
-			throw new IllegalArgumentException();
-		}
+		Preconditions.checkArgument(temp >= MIN_TEMP && temp <= MAX_TEMP, "temperature outside allowed range: %f",
+				temp);
 		return (a * temp + b) * temp + c;
 	}
 

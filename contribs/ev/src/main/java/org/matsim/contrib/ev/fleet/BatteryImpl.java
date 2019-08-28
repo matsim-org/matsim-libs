@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.ev.fleet;
 
+import com.google.common.base.Preconditions;
+
 public class BatteryImpl implements Battery {
 	private final double capacity;
 	private double soc;
@@ -41,9 +43,7 @@ public class BatteryImpl implements Battery {
 
 	@Override
 	public void setSoc(double soc) {
-		if (soc < 0 || soc > capacity) {
-			throw new IllegalArgumentException("SoC=" + soc);
-		}
+		Preconditions.checkArgument(soc >= 0 && soc <= capacity, "SoC outside allowed range: %f", soc);
 		this.soc = soc;
 	}
 }

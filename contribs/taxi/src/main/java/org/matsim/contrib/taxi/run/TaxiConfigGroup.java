@@ -37,6 +37,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
+import com.google.common.base.Verify;
+
 public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
 	public static final String GROUP_NAME = "taxi";
 
@@ -159,14 +161,10 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
 
-		if (config.qsim().getNumberOfThreads() != 1) {
-			throw new RuntimeException("Only a single-threaded QSim allowed");
-		}
+		Verify.verify(config.qsim().getNumberOfThreads() == 1, "Only a single-threaded QSim allowed");
 
-		if (isVehicleDiversion() && !isOnlineVehicleTracker()) {
-			throw new RuntimeException(
-					TaxiConfigGroup.VEHICLE_DIVERSION + " requires " + TaxiConfigGroup.ONLINE_VEHICLE_TRACKER);
-		}
+		Verify.verify(!isVehicleDiversion() || isOnlineVehicleTracker(),
+				TaxiConfigGroup.VEHICLE_DIVERSION + " requires " + TaxiConfigGroup.ONLINE_VEHICLE_TRACKER);
 
 		if (useModeFilteredSubnetwork) {
 			DvrpRoutingNetworkProvider.
