@@ -34,7 +34,7 @@ public final class NoiseModule extends AbstractModule {
 	}
 
 	interface NoiseListener{
-		void putRecord( XYTRecord record ) ;
+		void newRecord( XYTRecord record ) ;
 	}
 
 }

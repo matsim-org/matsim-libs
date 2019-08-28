@@ -86,7 +86,7 @@ public class NoiseOnlineExampleIT {
 			@Override public void install(){
 				Multibinder<NoiseModule.NoiseListener> binder = Multibinder.newSetBinder( this.binder(), NoiseModule.NoiseListener.class ) ;
 				binder.addBinding().toInstance( new NoiseModule.NoiseListener(){
-					@Override public void putRecord( XYTRecord record ){
+					@Override public void newRecord( XYTRecord record ){
 						log.warn( record ) ;
 					}
 				} );

@@ -231,7 +231,7 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 										   .put( "immissions", rp.getFinalImmission() )
 										   .build() ;
 				for( NoiseModule.NoiseListener listener : listeners ){
-					listener.putRecord( record );
+					listener.newRecord( record );
 				}
 			} else {
 				log.warn("listeners=null") ;
