@@ -446,6 +446,11 @@
 		    <artifactId>commons-compress</artifactId>
 		    <version>1.18</version>
 		</dependency>
+	  <dependency>
+		  <groupId>org.apache.commons</groupId>
+		  <artifactId>commons-csv</artifactId>
+		  <version>1.5</version>
+	  </dependency>
 
 		<!--According to https://stackoverflow.com/questions/43574426/how-to-resolve-java-lang-noclassdeffounderror-javax-xml-bind-jaxbexception-in-j/43574427#43574427,-->
 		<!--the following is needed to include jaxb into java9 and later. kai based on thibaut, feb'18-->
