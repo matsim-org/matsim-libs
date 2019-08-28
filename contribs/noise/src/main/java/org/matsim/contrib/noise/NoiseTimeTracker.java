@@ -24,8 +24,8 @@ package org.matsim.contrib.noise;
 
 import java.util.*;
 
-import com.sun.istack.internal.Nullable;
 import org.apache.log4j.Logger;
+import org.matsim.analysis.XYTRecord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -223,11 +223,15 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 				}
 			}
 			if ( listeners!=null ) {
-				NoiseModule.NoiseRecord record = new NoiseModule.NoiseRecord() ;
-				record.coord = rp.getCoord() ;
-				record.immissions = rp.getFinalImmission() ;
+				XYTRecord record = new XYTRecord.Builder()
+										   .setStartTime( 0. )
+										   .setEndTime( 0. )
+										   .setCoord( rp.getCoord() )
+										   .setFacilityId( null )
+										   .put( "immissions", rp.getFinalImmission() )
+										   .build() ;
 				for( NoiseModule.NoiseListener listener : listeners ){
-					listener.putNoiseRecord( record );
+					listener.putRecord( record );
 				}
 			} else {
 				log.warn("listeners=null") ;

@@ -26,6 +26,7 @@ import com.google.inject.multibindings.Multibinder;
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.analysis.XYTRecord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -85,7 +86,7 @@ public class NoiseOnlineExampleIT {
 			@Override public void install(){
 				Multibinder<NoiseModule.NoiseListener> binder = Multibinder.newSetBinder( this.binder(), NoiseModule.NoiseListener.class ) ;
 				binder.addBinding().toInstance( new NoiseModule.NoiseListener(){
-					@Override public void putNoiseRecord( NoiseModule.NoiseRecord record ){
+					@Override public void putRecord( XYTRecord record ){
 						log.warn( record ) ;
 					}
 				} );

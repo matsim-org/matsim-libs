@@ -19,10 +19,8 @@
 
 package org.matsim.contrib.noise;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
+import org.matsim.analysis.XYTRecord;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.facilities.ActivityFacility;
 
 /**
 * @author ikaddoura
@@ -36,20 +34,8 @@ public final class NoiseModule extends AbstractModule {
 	}
 
 	interface NoiseListener{
-		void putNoiseRecord( NoiseRecord record ) ;
+		void putRecord( XYTRecord record ) ;
 	}
 
-	static class NoiseRecord {
-		double startTime ;
-		double endTime ;
-		Id<ActivityFacility> facilityId ;
-		Coord coord ;
-		double immissions ;
-		@Override
-		public String toString() {
-			return "NoiseRecord=[ startTime=" + startTime + " | endTime=" + endTime + " | facilityId=" + facilityId
-				  + " | coord=" + coord + " | immissions=" + immissions + " ]";
-		}
-	}
 }
 
