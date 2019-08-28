@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.charts.StackedBarChart;
 
@@ -53,7 +54,6 @@ public class PKMbyModeCalculator {
     private final OutputDirectoryHierarchy controlerIO;
     private final static char DEL = '\t';
     private final DecimalFormat df = new DecimalFormat();
-    final static String FILENAME = "pkm_ModeStats";
 
 
     @Inject
@@ -90,7 +90,7 @@ public class PKMbyModeCalculator {
                 .flatMap(i->i.keySet().stream())
                 .collect(Collectors.toSet()));
 
-        try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(controlerIO.getOutputFilename(FILENAME + ".txt"))), CSVFormat.DEFAULT.withDelimiter(DEL))) {
+        try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(controlerIO.getOutputFilename(Controler.FILENAME_PKMMODESTATS + ".txt"))), CSVFormat.DEFAULT.withDelimiter(DEL))) {
             csvPrinter.print("Iteration");
             csvPrinter.printRecord(allModes);
 
@@ -124,7 +124,7 @@ public class PKMbyModeCalculator {
                 chart.addSeries(mode, value);
             }
             chart.addMatsimLogo();
-            chart.saveAsPng(controlerIO.getOutputFilename(FILENAME + ".png"), 1024, 768);
+            chart.saveAsPng(controlerIO.getOutputFilename(Controler.FILENAME_PKMMODESTATS + ".png"), 1024, 768);
 
         }
 

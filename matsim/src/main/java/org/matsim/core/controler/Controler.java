@@ -90,6 +90,8 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 	public static final String FILENAME_VEHICLES = "vehicles.xml.gz";
 	public static final String FILENAME_LINKSTATS = "linkstats.txt.gz";
 	public static final String FILENAME_TRAVELDISTANCESTATS = "traveldistancestats";
+	public final static String FILENAME_PKMMODESTATS = "pkm_ModeStats";
+
 	public static final String OUTPUT_PREFIX = "output_";
 
 	public static final String DIVIDER = "###################################################";
