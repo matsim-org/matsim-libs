@@ -109,9 +109,8 @@ public class CustomEDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 					
 					@Override
 					public EmptyVehicleChargingScheduler get() {
-						Network network = getModalInstance(Network.class);
 						DrtTaskFactory taskFactory = getModalInstance(DrtTaskFactory.class);
-						return new EmptyVehicleChargingScheduler(network, timer, taskFactory, chargingInfrastructure);
+						return new EmptyVehicleChargingScheduler(timer, taskFactory, chargingInfrastructure);
 					}
 				}).asEagerSingleton();
 
