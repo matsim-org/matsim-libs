@@ -39,7 +39,7 @@ public class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
 	// temp - air temp [oC]
 	// power - avg power [W]
 	private static double calcPower(double temp) {
-		Preconditions.checkArgument(temp >= MIN_TEMP && temp <= MAX_TEMP, "temperature outside allowed range: %f",
+		Preconditions.checkArgument(temp >= MIN_TEMP && temp <= MAX_TEMP, "temperature outside allowed range: %s",
 				temp);
 		return (a * temp + b) * temp + c;
 	}

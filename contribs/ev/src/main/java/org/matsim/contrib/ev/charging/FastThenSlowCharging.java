@@ -56,12 +56,12 @@ public class FastThenSlowCharging implements BatteryCharging {
 
 	@Override
 	public double calcChargingTime(Charger charger, double energy) {
-		Preconditions.checkArgument(energy >= 0, "Energy is negative: %f", energy);
+		Preconditions.checkArgument(energy >= 0, "Energy is negative: %s", energy);
 
 		Battery b = electricVehicle.getBattery();
 		double startSoc = b.getSoc();
 		double endSoc = startSoc + energy;
-		Preconditions.checkArgument(endSoc <= b.getCapacity(), "End SOC greater than battery capacity: %f", endSoc);
+		Preconditions.checkArgument(endSoc <= b.getCapacity(), "End SOC greater than battery capacity: %s", endSoc);
 
 		double threshold1 = 0.5 * b.getCapacity();
 		double threshold2 = 0.75 * b.getCapacity();

@@ -43,7 +43,7 @@ public class BatteryImpl implements Battery {
 
 	@Override
 	public void setSoc(double soc) {
-		Preconditions.checkArgument(soc >= 0 && soc <= capacity, "SoC outside allowed range: %f", soc);
+		Preconditions.checkArgument(soc >= 0 && soc <= capacity, "SoC outside allowed range: %s", soc);
 		this.soc = soc;
 	}
 }
