@@ -133,11 +133,17 @@ public class TripRouterAccessibilityContributionCalculator implements Accessibil
 			Route route = leg.getRoute();
 			Link endLink = subNetwork.getLinks().get(route.getEndLinkId());
 			double endLinkLength = endLink.getLength();
-			double endLinkTT = endLinkLength / endLink.getFreespeed(); // This is an assumption as it is only the freespeed
+			double estimatedEndLinkTT = endLinkLength / endLink.getFreespeed(); // This is an assumption as it is only the freespeed
 
+			// Note: The following computation where the end link length is added is only correct once the end link is removed from the route
+			// in the NetworkRoutingModule (route.setDistance(RouteUtils.calcDistance(route, 1.0, 0.0, this.network));)
+			if (this.planCalcScoreConfigGroup.getModes().get(leg.getMode()).getMarginalUtilityOfDistance() != 0.) {
+				LOG.warn("A computation including a marginal utility of distance will only be correct if the route time/distance" +
+						"inconsistency in the NetworkRoutingModule is solved.");
+			}
 			utility += (leg.getRoute().getDistance() + endLinkLength) * this.planCalcScoreConfigGroup.getModes().get(leg.getMode()).getMarginalUtilityOfDistance();
-			utility += (leg.getRoute().getTravelTime() + endLinkTT) * this.planCalcScoreConfigGroup.getModes().get(leg.getMode()).getMarginalUtilityOfTraveling() / 3600.;
-			utility += -(leg.getRoute().getTravelTime() + endLinkTT) * this.planCalcScoreConfigGroup.getPerforming_utils_hr() / 3600.;
+			utility += (leg.getRoute().getTravelTime() + estimatedEndLinkTT) * this.planCalcScoreConfigGroup.getModes().get(leg.getMode()).getMarginalUtilityOfTraveling() / 3600.;
+			utility += -(leg.getRoute().getTravelTime() + estimatedEndLinkTT) * this.planCalcScoreConfigGroup.getPerforming_utils_hr() / 3600.;
 		}
 
 		// Utility based on opportunities that are attached to destination node
@@ -147,8 +153,6 @@ public class TripRouterAccessibilityContributionCalculator implements Accessibil
 		double modeSpecificConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(mode, planCalcScoreConfigGroup);
 		return Math.exp(this.planCalcScoreConfigGroup.getBrainExpBeta() * (utility + modeSpecificConstant + walkUtilityMeasuringPoint2Road + congestedCarUtilityRoad2Node)) * sumExpVjkWalk;
 	}
-
-
 
 
 	@Override
