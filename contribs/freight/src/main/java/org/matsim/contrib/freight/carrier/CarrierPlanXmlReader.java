@@ -54,7 +54,7 @@ public class CarrierPlanXmlReader implements MatsimReader {
 
 		CarriersPlanReader(Carriers carriers) {
 			this.carriers = carriers ;
-//			this.setValidating(false);
+			this.setValidating(false);          //remove later, when having an idea, how to handle "Missing DOCTYPE" Error.
 		}
 
 		@Override
