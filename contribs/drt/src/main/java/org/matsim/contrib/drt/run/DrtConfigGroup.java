@@ -92,7 +92,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	static final String IDLE_VEHICLES_RETURN_TO_DEPOTS_EXP = "Idle vehicles return to the nearest of all start links. See: DvrpVehicle.getStartLink()";
 
 	public static final String OPERATIONAL_SCHEME = "operationalScheme";
-	static final String OP_SCHEME_EXP = "Operational Scheme, either door2door or stopbased. door2door by default";
+	static final String OP_SCHEME_EXP = "Operational Scheme, either of door2door, stopbased or serviceAreaBased. door2door by default";
 
 	public static final String MAX_WALK_DISTANCE = "maxWalkDistance";
 	static final String MAX_WALK_EXP = "Maximum desired walk distance (in meters) to next stop location in stopbased system. If no suitable stop is found in that range, the search radius will be extended in steps of maxWalkDistance until a stop is found.";
