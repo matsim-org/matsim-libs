@@ -260,8 +260,8 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	private void dumpConfig() {
 		// dump config
-		new ConfigWriter(this.config).write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.config));
-		new ConfigWriter(this.config, ConfigWriter.Verbosity.minimal).write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.configReduced));
+		new ConfigWriter(this.config).write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.config, ControlerConfigGroup.CompressionType.none));
+		new ConfigWriter(this.config, ConfigWriter.Verbosity.minimal).write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.configReduced, ControlerConfigGroup.CompressionType.none));
 	}
 
 	private void dumpNetwork() {
