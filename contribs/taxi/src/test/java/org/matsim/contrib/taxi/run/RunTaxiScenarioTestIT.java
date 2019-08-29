@@ -54,6 +54,6 @@ public class RunTaxiScenarioTestIT {
 		taxiCfg.setTaxisFile(taxisFile);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setDumpDataAtEnd(false);
-		TaxiControlerCreator.createControlerWithSingleModeDrt(config, false).run();
+		TaxiControlerCreator.createControlerWithSingleModeTaxi(config, false).run();
 	}
 }
