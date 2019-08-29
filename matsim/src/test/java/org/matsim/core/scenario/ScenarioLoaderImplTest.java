@@ -33,6 +33,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -112,7 +114,12 @@ public class ScenarioLoaderImplTest {
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(this.util.classInputResourcePath(), "facilityAttributesConfig.xml"));
 		config.facilities().addParam("inputFacilityAttributesFile", "facilityAttributes.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Assert.assertEquals("world", scenario.getActivityFacilities().getFacilityAttributes().getAttribute("1", "hello"));
+		Assert.assertEquals(
+				"unexpected attribute value",
+				"world",
+				FacilitiesUtils.getFacilityAttribute(
+						scenario.getActivityFacilities().getFacilities().get(Id.create(1, ActivityFacility.class)),
+						"hello"));
 	}
 
 	@Test

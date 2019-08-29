@@ -20,6 +20,13 @@ public class FailingObjectAttributes extends ObjectAttributes{
 		);
 	}
 
+	public static FailingObjectAttributes createFacilitiesAttributes() {
+		return new FailingObjectAttributes(
+				str -> "facilities.getPersonAttributes()." + str + " will be deprecated; use FacilitiesUtils" +
+						".get/put/...FacilityAttribute... instead.  td, aug'19"
+		);
+	}
+
 	@Override public Object getAttribute( String personId, String key) {
 		throw new RuntimeException( msgFunction.apply("getAttribute"));
 	}
