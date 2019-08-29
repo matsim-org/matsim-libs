@@ -77,11 +77,10 @@
 			<artifactId>gt-jdbc-postgis</artifactId>
 			<version>20.2</version>
 		</dependency>
-		<!-- for now: use a forked version which is compatible with the latest MATSim version -->
 		<dependency>
-			<groupId>com.github.ikaddoura</groupId>
+			<groupId>com.github.SchweizerischeBundesbahnen</groupId>
 			<artifactId>matsim-sbb-extensions</artifactId>
-			<version>fixPersonAttributesLookup-80edb69292-1</version>
+			<version>11.2</version>
 		</dependency>
 	</dependencies>
 </project>
