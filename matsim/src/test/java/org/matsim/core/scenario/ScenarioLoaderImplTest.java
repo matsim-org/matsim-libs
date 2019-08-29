@@ -112,6 +112,7 @@ public class ScenarioLoaderImplTest {
 	@Test
 	public void testLoadScenario_loadFacilitiesAttributes() {
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(this.util.classInputResourcePath(), "facilityAttributesConfig.xml"));
+		config.facilities().setInsistingOnUsingDeprecatedFacilitiesAttributeFile(true);
 		config.facilities().addParam("inputFacilityAttributesFile", "facilityAttributes.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Assert.assertEquals(

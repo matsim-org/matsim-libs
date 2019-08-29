@@ -24,9 +24,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -35,7 +35,6 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.lanes.LanesReader;
@@ -51,7 +50,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.*;
 
-import static org.matsim.core.config.groups.PlansConfigGroup.MESSAGE;
+import static org.matsim.core.config.groups.PlansConfigGroup.PERSON_ATTRIBUTES_DEPRECATION_MESSAGE;
 
 /**
  * Loads elements of Scenario from file. Non standardized elements
@@ -170,6 +169,9 @@ class ScenarioLoaderImpl {
 			log.info("no facilities file set in config, therefore not loading any facilities.  This is not a problem except if you are using facilities");
 		}
 		if ((this.config.facilities() != null) && (this.config.facilities().getInputFacilitiesAttributesFile() != null)) {
+			if ( !this.config.facilities().isInsistingOnUsingDeprecatedFacilitiesAttributeFile() ) {
+				throw new RuntimeException(FacilitiesConfigGroup.FACILITIES_ATTRIBUTES_DEPRECATION_MESSAGE) ;
+			}
 			URL facilitiesAttributesURL = ConfigGroup.getInputFileURL(this.config.getContext(), this.config.facilities().getInputFacilitiesAttributesFile());
 			log.info("loading facility attributes from " + facilitiesAttributesURL);
 			parseObjectAttributesToAttributable(
@@ -232,7 +234,7 @@ class ScenarioLoaderImpl {
 			// TD says to rather not have this kind of side effect.  kai, jul'19
 
 			if ( !this.config.plans().isInsistingOnUsingDeprecatedPersonAttributeFile() ) {
-				throw new RuntimeException( MESSAGE ) ;
+				throw new RuntimeException(PERSON_ATTRIBUTES_DEPRECATION_MESSAGE) ;
 			}
 		}
 		else {
