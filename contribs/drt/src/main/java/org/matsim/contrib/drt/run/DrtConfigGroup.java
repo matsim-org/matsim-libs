@@ -126,7 +126,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 					+ " using up to 4 threads. Default value is 'min(4, no. of cores available to JVM)'";
 	private static final String DRT_SERVICE_AREA_FILE_EXP = "allows to configure a service area per drt mode.  For the time being, the default code is " +
 			"not doing anything with that info; this may follow in the future.";
-	private static final String DRT_SERVICE_INTEPRETATION = "drtServiceAreaInterpretation";
+	private static final String DRT_SERVICE_AREA_INTERPRETATION = "drtServiceAreaInterpretation";
 	private static final String DRT_SERVICE_INTEPRETATION_EXP = "Intepretation of DRT Service Area. Possible values: " + ServiceAreaInterpretation.values() +
 			" Default value: " + ServiceAreaInterpretation.ignore;
 	private String drtServiceAreaShapeFile = null;
@@ -195,11 +195,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		stopbased, door2door
 	}
 
-	@StringGetter(DRT_SERVICE_INTEPRETATION)
-	public static String getDrtServiceIntepretation() {
-		return DRT_SERVICE_INTEPRETATION;
-	}
-
 	public DrtConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -243,6 +238,10 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		if (getParameterSets(MinCostFlowRebalancingParams.SET_NAME).size() > 1) {
 			throw new RuntimeException("More then one rebalancing parameter sets is specified");
 		}
+		if (getDrtServiceAreaShapeFile() != null && getServiceAreaInterpretation() == ServiceAreaInterpretation.ignore) {
+			log.warn("A Shape file for the Service Area is set, but " + DRT_SERVICE_AREA_INTERPRETATION + " is set to ignore. " +
+					"This is most likely not desired.");
+		}
 
 		if (useModeFilteredSubnetwork) {
 			DvrpRoutingNetworkProvider.
@@ -272,7 +271,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		map.put(PRINT_WARNINGS, PRINT_WARNINGS_EXP);
 		map.put(REQUEST_REJECTION, REQUEST_REJECTION_EXP);
 		map.put(DRT_SERVICE_AREA_FILENAME, DRT_SERVICE_AREA_FILE_EXP ) ;
-		map.put(DRT_SERVICE_INTEPRETATION, DRT_SERVICE_INTEPRETATION_EXP);
+		map.put(DRT_SERVICE_AREA_INTERPRETATION, DRT_SERVICE_INTEPRETATION_EXP);
 		return map;
 	}
 
@@ -596,7 +595,12 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		this.printDetailedWarnings = printDetailedWarnings;
 	}
 
-	@StringSetter(DRT_SERVICE_INTEPRETATION)
+	@StringGetter(DRT_SERVICE_AREA_INTERPRETATION)
+	public ServiceAreaInterpretation getServiceAreaInterpretation() {
+		return serviceAreaInterpretation;
+	}
+
+	@StringSetter(DRT_SERVICE_AREA_INTERPRETATION)
 	public void setServiceAreaInterpretation(ServiceAreaInterpretation serviceAreaInterpretation) {
 		this.serviceAreaInterpretation = serviceAreaInterpretation;
 	}
