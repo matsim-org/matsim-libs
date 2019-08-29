@@ -33,8 +33,6 @@
         <param name="carriersVehicleTypeFile" value="carriertypes.xml"/>
         <!-- Buffer travel time factor for the first leg of a freight tour. -->
         <param name="firstLegBufferFactor" value="1.5"/>
-        <!-- Number of jsprit Iterations. These take place at the beginning of each MATSim iteration -->
-        <param name="jspritIterations" value="20"/>
         <!-- Score for On time delivery. -->
         <param name="maxDeliveryScore" value="6.0"/>
         <!-- Minimum score for delayed deliveries. -->
