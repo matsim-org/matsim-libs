@@ -124,11 +124,10 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 			"Number of threads used for parallel evaluation of request insertion into existing schedules."
 					+ " Scales well up to 4, due to path data provision, the most computationally intensive part,"
 					+ " using up to 4 threads. Default value is 'min(4, no. of cores available to JVM)'";
-	private static final String DRT_SERVICE_AREA_FILE_EXP = "allows to configure a service area per drt mode.  For the time being, the default code is " +
-			"not doing anything with that info; this may follow in the future.";
-	private static final String DRT_SERVICE_AREA_INTERPRETATION = "drtServiceAreaInterpretation";
-	private static final String DRT_SERVICE_INTEPRETATION_EXP = "Intepretation of DRT Service Area. Possible values: " + ServiceAreaInterpretation.values() +
-			" Default value: " + ServiceAreaInterpretation.ignore;
+
+	private static final String DRT_SERVICE_AREA_FILE_EXP = "allows to configure a service area per drt mode." +
+			"Used with serviceArea Operational Scheme";
+
 	private String drtServiceAreaShapeFile = null;
 
 
@@ -136,8 +135,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	private String mode = TransportMode.drt; // travel mode (passengers'/customers' perspective)
 
 	private boolean useModeFilteredSubnetwork = false;
-	@NotNull
-	private ServiceAreaInterpretation serviceAreaInterpretation = ServiceAreaInterpretation.ignore;
 
 	@Positive
 	private double stopDuration = Double.NaN;// seconds
@@ -191,14 +188,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	private int numberOfThreads = Math.min(Runtime.getRuntime().availableProcessors(),
 			ParallelPathDataProvider.MAX_THREADS);
 
-	public enum OperationalScheme {
-		stopbased, door2door
-	}
-
-	public DrtConfigGroup() {
-		super(GROUP_NAME);
-	}
-
 	@Override
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
@@ -227,6 +216,14 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 					+ " is "
 					+ DrtConfigGroup.OperationalScheme.stopbased);
 		}
+		if (getOperationalScheme() == OperationalScheme.serviceAreaBased && getDrtServiceAreaShapeFile() == null) {
+			throw new RuntimeException(DrtConfigGroup.DRT_SERVICE_AREA_FILENAME
+					+ " must not be null when "
+					+ DrtConfigGroup.OPERATIONAL_SCHEME
+					+ " is "
+					+ OperationalScheme.serviceAreaBased);
+		}
+
 		if (getNumberOfThreads() > Runtime.getRuntime().availableProcessors()) {
 			throw new RuntimeException(
 					DrtConfigGroup.NUMBER_OF_THREADS + " is higher than the number of logical cores available to JVM");
@@ -238,15 +235,20 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		if (getParameterSets(MinCostFlowRebalancingParams.SET_NAME).size() > 1) {
 			throw new RuntimeException("More then one rebalancing parameter sets is specified");
 		}
-		if (getDrtServiceAreaShapeFile() != null && getServiceAreaInterpretation() == ServiceAreaInterpretation.ignore) {
-			log.warn("A Shape file for the Service Area is set, but " + DRT_SERVICE_AREA_INTERPRETATION + " is set to ignore. " +
-					"This is most likely not desired.");
-		}
+
 
 		if (useModeFilteredSubnetwork) {
 			DvrpRoutingNetworkProvider.
 					checkUseModeFilteredSubnetworkAllowed(config, mode);
 		}
+	}
+
+	public DrtConfigGroup() {
+		super(GROUP_NAME);
+	}
+
+	public enum OperationalScheme {
+		stopbased, door2door, serviceAreaBased
 	}
 
 	@Override
@@ -271,7 +273,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		map.put(PRINT_WARNINGS, PRINT_WARNINGS_EXP);
 		map.put(REQUEST_REJECTION, REQUEST_REJECTION_EXP);
 		map.put(DRT_SERVICE_AREA_FILENAME, DRT_SERVICE_AREA_FILE_EXP ) ;
-		map.put(DRT_SERVICE_AREA_INTERPRETATION, DRT_SERVICE_INTEPRETATION_EXP);
 		return map;
 	}
 
@@ -600,19 +601,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		this.printDetailedWarnings = printDetailedWarnings;
 	}
 
-	@StringGetter(DRT_SERVICE_AREA_INTERPRETATION)
-	public ServiceAreaInterpretation getServiceAreaInterpretation() {
-		return serviceAreaInterpretation;
-	}
 
-	@StringSetter(DRT_SERVICE_AREA_INTERPRETATION)
-	public void setServiceAreaInterpretation(ServiceAreaInterpretation serviceAreaInterpretation) {
-		this.serviceAreaInterpretation = serviceAreaInterpretation;
-	}
-
-	public enum ServiceAreaInterpretation {
-		ignore, reject, walkToFromServiceArea
-	}
 
 	/**
 	 * @return 'minCostFlowRebalancing' parameter set defined in the DRT config or null if the parameters were not
