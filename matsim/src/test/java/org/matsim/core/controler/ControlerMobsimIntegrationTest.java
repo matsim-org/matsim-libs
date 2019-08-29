@@ -43,7 +43,7 @@ public class ControlerMobsimIntegrationTest {
 
 	@Test
 	public void testRunMobsim_customMobsim() {
-		Config cfg = this.utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
+		Config cfg = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		cfg.controler().setLastIteration(0);
 		cfg.controler().setMobsim("counting");
 		cfg.controler().setWritePlansInterval(0);

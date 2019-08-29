@@ -24,13 +24,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -71,9 +65,7 @@ public class EventsToLegsTest {
 		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, agentId, Id.createLinkId("l1"), "car"));
 		eventsToLegs.handleEvent(new PersonEntersVehicleEvent(10.0, agentId, vehId));
 		eventsToLegs.handleEvent(new VehicleEntersTrafficEvent(10.0, agentId, Id.createLinkId("l1"), vehId, "car", 1.0));
-		eventsToLegs.handleEvent(new LinkLeaveEvent(10.0, vehId, Id.createLinkId("l1")));
 		eventsToLegs.handleEvent(new LinkEnterEvent(11.0, vehId, Id.createLinkId("l2")));
-		eventsToLegs.handleEvent(new LinkLeaveEvent(15.0, vehId, Id.createLinkId("l2")));
 		eventsToLegs.handleEvent(new LinkEnterEvent(16.0, vehId, Id.createLinkId("l3")));
 		eventsToLegs.handleEvent(new VehicleLeavesTrafficEvent(30.0, agentId, Id.createLinkId("l3"), vehId, "car", 1.0));
 		eventsToLegs.handleEvent(new PersonArrivalEvent(30.0, agentId, Id.createLinkId("l3"), "car"));
@@ -87,7 +79,7 @@ public class EventsToLegsTest {
 	private static Scenario createTriangularNetwork() {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		Network network = (Network) scenario.getNetwork();
+        Network network = scenario.getNetwork();
 		
 		// add nodes
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("n1", Node.class), new Coord((double) 0, (double) 0));

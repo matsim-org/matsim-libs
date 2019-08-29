@@ -35,7 +35,7 @@ public class RunPSimTest {
 
 	Logger logger = Logger.getLogger(RunPSimTest.class);
 
-	final Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"),"0.config.xml"));
+	final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"),"0.config.xml"));
 
 	static double psimscore, qsimscore = Double.NEGATIVE_INFINITY;
 

@@ -46,7 +46,7 @@ public class RunTaxiScenarioTestIT {
 	}
 
 	private void runMielec(String plansFile, String taxisFile) {
-		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_config.xml");
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_config.xml");
 		TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
 		Config config = ConfigUtils.loadConfig(configUrl, taxiCfg, new DvrpConfigGroup(), new OTFVisConfigGroup());
 		config.plans().setInputFile(plansFile);
