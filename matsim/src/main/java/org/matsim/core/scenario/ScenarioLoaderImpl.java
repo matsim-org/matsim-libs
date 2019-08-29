@@ -21,6 +21,7 @@ package org.matsim.core.scenario;
 
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -34,6 +35,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.lanes.LanesReader;
@@ -42,6 +44,7 @@ import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.vehicles.VehicleReaderV1;
 
 import java.io.File;
@@ -169,14 +172,18 @@ class ScenarioLoaderImpl {
 		if ((this.config.facilities() != null) && (this.config.facilities().getInputFacilitiesAttributesFile() != null)) {
 			URL facilitiesAttributesURL = ConfigGroup.getInputFileURL(this.config.getContext(), this.config.facilities().getInputFacilitiesAttributesFile());
 			log.info("loading facility attributes from " + facilitiesAttributesURL);
-			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getActivityFacilities().getFacilityAttributes());
-			reader.putAttributeConverters( attributeConverters );
-			reader.parse(facilitiesAttributesURL);
+			parseObjectAttributesToAttributable(
+					facilitiesAttributesURL,
+					scenario.getActivityFacilities().getFacilities().values(),
+					"facilityAttributes not empty after going through all facilities, meaning that it contains material for facilityIDs that " +
+							"are not in the container.  This is not necessarily a bug so we will continue, but note that such material " +
+							"will no longer be contained in the output_* files.");
 		}
 		else {
 			log.info("no facility-attributes file set in config, not loading any facility attributes");
 		}
 	}
+
 
 	private void loadPopulation() {
 		if ((this.config.plans() != null) && (this.config.plans().getInputFile() != null)) {
@@ -199,33 +206,14 @@ class ScenarioLoaderImpl {
 		if ((this.config.plans() != null) && (this.config.plans().getInputPersonAttributeFile() != null)) {
 			URL personAttributesURL = this.config.plans().getInputPersonAttributeFileURL(this.config.getContext());
 			log.info("loading person attributes from " + personAttributesURL);
-//			final PersonAttributes personAttributes = this.scenario.getPopulation().getPersonAttributes();
-			final ObjectAttributes personAttributes = new ObjectAttributes() ;
-			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader( personAttributes );
-			reader.putAttributeConverters( attributeConverters );
-			reader.parse(personAttributesURL);
-
-			for( Person person : this.scenario.getPopulation().getPersons().values() ){
-				Collection<String> keys = ObjectAttributesUtils.getAllAttributeNames( personAttributes, person.getId().toString() );
-				for( String key : keys ){
-					Object value = personAttributes.getAttribute( person.getId().toString(), key );
-					person.getAttributes().putAttribute( key, value ) ;
-				}
-				personAttributes.removeAllAttributes( person.getId().toString() );
-			}
-			// (some of the above could also become a static helper method in ObjectAttributesUtils, but this here seems the only
-			// place within matsim core where the personAttributes are automatically read so maybe there is no need for this. kai, jun'19)
-
-			if ( !personAttributes.toString().equals( "" ) ) {
-				String message = "personAttributes not empty after going through all persons, meaning that it contains material for personIDs that " +
-								 "are not in the population.  This is not necessarily a bug so we will continue, but note that such material " +
-								 "will no longer be contained in the output_* files.  (We have this happening in particular when the same personAttributes " +
-								     "file is used for the 10pct and the 1pct scenario. The material that is still there will follow.  kai, jun'19" ;
-				log.warn( message ) ;
-				log.warn( "showing the first 1000 characters from the remaining personAttributes ...") ;
-				log.warn( personAttributes.toString().substring( 0,1000 ) ) ;
-				log.warn("");
-			}
+			parseObjectAttributesToAttributable(
+					personAttributesURL,
+					scenario.getPopulation().getPersons().values(),
+					"personAttributes not empty after going through all persons, meaning that it contains material for personIDs that " +
+							"are not in the population.  This is not necessarily a bug so we will continue, but note that such material " +
+							"will no longer be contained in the output_* files.  (We have this happening in particular when the same personAttributes " +
+							"file is used for the 10pct and the 1pct scenario. The material that is still there will follow.  kai, jun'19"
+			);
 
 			final String outputDirectory = this.config.controler().getOutputDirectory();
 			final File outDir = new File( outputDirectory );
@@ -334,6 +322,34 @@ class ScenarioLoaderImpl {
 		}
 		else {
 			log.info("no lanes file set in config, not loading any lanes");
+		}
+	}
+
+	private <T extends Identifiable<?> & Attributable> void parseObjectAttributesToAttributable(
+			URL url,
+			Iterable<T> attributables,
+			String message) {
+		final ObjectAttributes attributes = new ObjectAttributes();
+		ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(attributes);
+		reader.putAttributeConverters( attributeConverters );
+		reader.parse(url);
+
+		for( T facility : attributables ) {
+			Collection<String> keys = ObjectAttributesUtils.getAllAttributeNames( attributes, facility.getId().toString() );
+			for( String key : keys ){
+				Object value = attributes.getAttribute( facility.getId().toString(), key );
+				facility.getAttributes().putAttribute( key, value ) ;
+			}
+			attributes.removeAllAttributes( facility.getId().toString() );
+		}
+		// (some of the above could also become a static helper method in ObjectAttributesUtils, but this here seems the only
+		// place within matsim core where the personAttributes are automatically read so maybe there is no need for this. kai, jun'19)
+
+		if ( !attributes.toString().equals( "" ) ) {
+			log.warn( message ) ;
+			log.warn( "showing the first 1000 characters from the remaining personAttributes ...") ;
+			log.warn( attributes.toString().substring( 0,1000 ) ) ;
+			log.warn("");
 		}
 	}
 
