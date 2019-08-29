@@ -30,7 +30,7 @@ import org.matsim.examples.ExamplesUtils;
 public class RunEDrtScenarioIT {
 	@Test
 	public void test() {
-		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_edrt_config.xml");
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_edrt_config.xml");
 		RunEDrtScenario.run(configUrl, false);
 	}
 }
