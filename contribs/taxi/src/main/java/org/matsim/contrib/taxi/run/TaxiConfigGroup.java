@@ -47,7 +47,8 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	@SuppressWarnings("deprecation")
 	public static TaxiConfigGroup get(Config config) {
 		Collection<TaxiConfigGroup> taxiConfigGroups = MultiModeTaxiConfigGroup.get(config).getModalElements();
-		Preconditions.checkArgument(taxiConfigGroups.size() == 1, "Method allowed if only 1 taxi mode in the config");
+		Preconditions.checkArgument(taxiConfigGroups.size() == 1,
+				"Supported for only 1 taxi mode in the config. Number of taxi modes: %s", taxiConfigGroups.size());
 		return taxiConfigGroups.iterator().next();
 	}
 
