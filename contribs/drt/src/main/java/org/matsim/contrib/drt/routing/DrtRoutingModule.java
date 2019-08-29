@@ -106,24 +106,17 @@ public class DrtRoutingModule implements RoutingModule {
 		double now = departureTime ;
 
 		if (accessActLink == egressActLink){
-			if ( plansCalcRouteConfig.isInsertingAccessEgressWalk() ) {
-				List<PlanElement> result = new ArrayList<>() ;
-				now = addBushwhackingLegFromFacilityToLinkIfNecessary( fromFacility, person, accessActLink, now, result, populationFactory, drtStageActivityType.drtStageActivity ) ;
-				addBushwhackingLegFromLinkToFacilityIfNecessary( toFacility, person, egressActLink, now, result, populationFactory, drtStageActivityType.drtStageActivity) ;
-				return result ;
-			} else{
-				if( drtCfg.isPrintDetailedWarnings() ){
-					LOGGER.error( "Start and end stop are the same, agent will walk using mode "
-								    + drtStageActivityType.drtWalk
-								    + ". Agent Id:\t"
-								    + person.getId() );
-				}
-				Leg leg = (Leg) walkRouter.calcRoute( fromFacility, toFacility, departureTime, person ).get( 0 );
-				leg.setDepartureTime( now );
-				leg.setMode( drtStageActivityType.drtWalk );
-				LOGGER.debug( "travel time on walk leg=" + leg.getTravelTime() );
-				return Collections.singletonList( leg );
+			if( drtCfg.isPrintDetailedWarnings() ){
+				LOGGER.error( "Start and end stop are the same, agent will walk using mode "
+							    + drtStageActivityType.drtWalk
+							    + ". Agent Id:\t"
+							    + person.getId() );
 			}
+			Leg leg = (Leg) walkRouter.calcRoute( fromFacility, toFacility, departureTime, person ).get( 0 );
+			leg.setDepartureTime( now );
+			leg.setMode( drtStageActivityType.drtWalk );
+			LOGGER.debug( "travel time on walk leg=" + leg.getTravelTime() );
+			return Collections.singletonList( leg );
 		}
 		// yyyy I think that our life will become easier if we don't do direct walk.  kai, jul'19
 

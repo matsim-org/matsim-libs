@@ -32,7 +32,7 @@ import org.matsim.examples.ExamplesUtils;
 public class RunRobotaxiExampleIT {
 	@Test
 	public void testRun() {
-		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_config.xml");
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_config.xml");
 		RunRobotaxiExample.run(configUrl, false);
 	}
 }

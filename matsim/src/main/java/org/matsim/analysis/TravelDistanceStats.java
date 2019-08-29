@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
@@ -78,7 +77,7 @@ public class TravelDistanceStats {
 
 	@Inject
 	TravelDistanceStats(ControlerConfigGroup controlerConfigGroup, GlobalConfigGroup globalConfigGroup, OutputDirectoryHierarchy controlerIO) {
-		this(controlerConfigGroup, globalConfigGroup, controlerIO.getOutputFilename(Controler.FILENAME_TRAVELDISTANCESTATS), controlerConfigGroup.isCreateGraphs());
+		this(controlerConfigGroup, globalConfigGroup, controlerIO.getOutputFilename("traveldistancestats"), controlerConfigGroup.isCreateGraphs());
 	}
 
 	/**
