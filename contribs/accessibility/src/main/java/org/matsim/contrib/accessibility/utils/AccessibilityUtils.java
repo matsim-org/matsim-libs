@@ -26,10 +26,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -74,7 +71,7 @@ public class AccessibilityUtils {
 	 *     | \
 	 *     k2 k3
 	 */
-	public static final Map<Id<Node>, AggregationObject> aggregateOpportunitiesWithSameNearestNode(
+	public static final Map<Id<? extends BasicLocation>, AggregationObject> aggregateOpportunitiesWithSameNearestNode(
 			final ActivityFacilities opportunities, Network network, Config config) {
 		// yyyy this method ignores the "capacities" of the facilities. kai, mar'14
 		// for now, we decided not to add "capacities" as it is not needed for current projects. dz, feb'16
@@ -83,7 +80,7 @@ public class AccessibilityUtils {
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 
 		LOG.info("Aggregating " + opportunities.getFacilities().size() + " opportunities with same nearest node...");
-		Map<Id<Node>, AggregationObject> opportunityClusterMap = new ConcurrentHashMap<>();
+		Map<Id<? extends BasicLocation>, AggregationObject> opportunityClusterMap = new ConcurrentHashMap<>();
 
 		for (ActivityFacility opportunity : opportunities.getFacilities().values()) {
 			Node nearestNode = NetworkUtils.getNearestNode(network, opportunity.getCoord());
@@ -118,8 +115,8 @@ public class AccessibilityUtils {
 	}
 
 
-	public static Map<Id<Node>, ArrayList<ActivityFacility>> aggregateMeasurePointsWithSameNearestNode(ActivityFacilities measuringPoints, Network network) {
-		Map<Id<Node>,ArrayList<ActivityFacility>> aggregatedOrigins = new ConcurrentHashMap<>();
+	public static Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregateMeasurePointsWithSameNearestNode(ActivityFacilities measuringPoints, Network network) {
+		Map<Id<? extends BasicLocation>,ArrayList<ActivityFacility>> aggregatedOrigins = new ConcurrentHashMap<>();
 
 		Gbl.assertNotNull(measuringPoints);
 		Gbl.assertNotNull(measuringPoints.getFacilities()) ;

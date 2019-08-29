@@ -1,5 +1,6 @@
 package org.matsim.contrib.accessibility;
 
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
@@ -35,7 +36,7 @@ public interface AccessibilityContributionCalculator {
 	 *                 examined opportunities.
 	 * @param departureTime TODO
 	 */
-	void notifyNewOriginNode(Id<Node> fromNodeId, Double departureTime );
+	void notifyNewOriginNode(Id<? extends BasicLocation> fromNodeId, Double departureTime );
 
 	/**
 	 * estimates the contribution of a given opportunity to the accessibility metric,
@@ -44,17 +45,17 @@ public interface AccessibilityContributionCalculator {
 	 * the exponential of the utility, scaled by the logit scale parameter.
 	 *
 	 * @param origin the origin point
-	 * @param destination the opportunities at the destination
+	 * //@param destination the opportunities at the destination
 	 * @param departureTime TODO
 	 * @return the utility of the OD pair, to be included in the logsum
 	 */
-	double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime);
+	double computeContributionOfOpportunity(ActivityFacility origin, Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities, Double departureTime);
 	// yyyy I am somewhat sceptic if we tryly need both "fromNode" (above) and origin.
 	// yyyy And I am quite confident that we do not need the departure time twice.
 
-    Map<Id<Node>, ArrayList<ActivityFacility>> getAggregatedMeasurePoints();
+    Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> getAggregatedMeasurePoints();
 
-    Map<Id<Node>, AggregationObject> getAgregatedOpportunities();
+    Map<Id<? extends BasicLocation>, AggregationObject> getAgregatedOpportunities();
 
 	/*
 	Needed for perallelization

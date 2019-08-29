@@ -25,6 +25,7 @@ import java.util.concurrent.*;
 
 import com.google.common.collect.Iterables;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -113,11 +114,12 @@ public final class AccessibilityComputationShutdownListener implements ShutdownL
 			AccessibilityContributionCalculator calculator = calculators.get(mode);
 			calculator.initialize(measuringPoints, opportunities);
 
-            Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedOrigins = calculator.getAggregatedMeasurePoints();
-            Map<Id<Node>, AggregationObject> aggregatedOpportunities = calculator.getAgregatedOpportunities();
+			// TODO
+            Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregatedOrigins = calculator.getAggregatedMeasurePoints();
+            Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities = calculator.getAgregatedOpportunities();
 
-            Collection<Id<Node>> aggregatedOriginNodes = new LinkedList<>();
-			for (Id<Node> nodeId : aggregatedOrigins.keySet()) {
+            Collection<Id<? extends BasicLocation>> aggregatedOriginNodes = new LinkedList<>();
+			for (Id<? extends BasicLocation> nodeId : aggregatedOrigins.keySet()) {
 				aggregatedOriginNodes.add(nodeId);
 			}
 
@@ -129,13 +131,13 @@ public final class AccessibilityComputationShutdownListener implements ShutdownL
 
 				final int partitionSize = (int) ((double) aggregatedOrigins.size() / numberOfProcessors) + 1;
 				LOG.info("Size of partitions = " + partitionSize);
-				Iterable<List<Id<Node>>> partitions = Iterables.partition(aggregatedOriginNodes, partitionSize);
+				Iterable<List<Id<? extends BasicLocation>>> partitions = Iterables.partition(aggregatedOriginNodes, partitionSize);
 
 				ProgressBar progressBar = new ProgressBar(aggregatedOrigins.size());
 
 				ExecutorService service = Executors.newFixedThreadPool(numberOfProcessors);
 				List<Callable<Void>> tasks = new ArrayList<>();
-				for (final List<Id<Node>> partition : partitions) {
+				for (final List<Id<? extends BasicLocation>> partition : partitions) {
 					tasks.add(() -> {
 						try {
 							compute(mode, departureTime, aggregatedOpportunities, aggregatedOrigins, partition, progressBar);
@@ -168,13 +170,14 @@ public final class AccessibilityComputationShutdownListener implements ShutdownL
 	}
 
 
-	private void compute(String mode, Double departureTime, Map<Id<Node>, AggregationObject> aggregatedOpportunities, Map<Id<Node>,
-			ArrayList<ActivityFacility>> aggregatedOrigins, Collection<Id<Node>> subsetOfNodes, ProgressBar progressBar) {
+	private void compute(String mode, Double departureTime, Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities,
+						 Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregatedOrigins,
+						 Collection<Id<? extends BasicLocation>> subsetOfNodes, ProgressBar progressBar) {
 
 		AccessibilityContributionCalculator calculator = calculators.get(mode).duplicate();
 
 		// Go through all nodes that have a measuring point assigned
-		for (Id<Node> fromNodeId : subsetOfNodes) {
+		for (Id<? extends BasicLocation> fromNodeId : subsetOfNodes) {
 			progressBar.update();
 
 			Gbl.assertNotNull(calculator);
@@ -183,13 +186,8 @@ public final class AccessibilityComputationShutdownListener implements ShutdownL
 			// Go through all measuring points assigned to current node
 			for (ActivityFacility origin : aggregatedOrigins.get(fromNodeId)) {
 				assert(origin.getCoord() != null);
-				double expSum = 0.;
 
-				// Go through all aggregated opportunities (i.e. network nodes to which at least one opportunity is assigned)
-				for (final AggregationObject aggregatedOpportunity : aggregatedOpportunities.values()) {
-				    final double expVhk = calculator.computeContributionOfOpportunity(origin, aggregatedOpportunity, departureTime);
-				    expSum += expVhk;
-				}
+                double expSum = calculator.computeContributionOfOpportunity(origin, aggregatedOpportunities, departureTime);
 
 				double accessibility;
                 if (acg.getAccessibilityMeasureType() == AccessibilityConfigGroup.AccessibilityMeasureType.logSum) {

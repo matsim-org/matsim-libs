@@ -1,6 +1,7 @@
 package org.matsim.contrib.accessibility;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -49,8 +50,8 @@ import java.util.Set;
 	//private final MultiNodePathCalculator multiNodePathCalculator;
 	//private ImaginaryNode aggregatedToNodes;
 
-	Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedMeasurePoints;
-    Map<Id<Node>, AggregationObject> aggregatedOpportunities;
+	Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregatedMeasurePoints;
+    Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities;
 
 
 	public NetworkModeAccessibilityExpContributionCalculator(String mode, final TravelTime travelTime, final TravelDisutilityFactory travelDisutilityFactory, Scenario scenario) {
@@ -98,7 +99,7 @@ import java.util.Set;
 
 
 	@Override
-	public void notifyNewOriginNode(Id<Node> fromNodeId, Double departureTime) {
+	public void notifyNewOriginNode(Id<? extends BasicLocation> fromNodeId, Double departureTime) {
 		this.fromNode = subNetwork.getNodes().get(fromNodeId);
 		this.lcpt.calculateExtended(subNetwork, fromNode, departureTime);
 		//this.dijkstraTree.calcLeastCostPathTree(fromNode, departureTime);
@@ -107,36 +108,41 @@ import java.util.Set;
 
 
 	@Override
-	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime) {
-		Link nearestLink = NetworkUtils.getNearestLinkExactly(subNetwork, origin.getCoord());
+	public double computeContributionOfOpportunity(ActivityFacility origin, Map<Id<?extends BasicLocation>, AggregationObject> aggregatedOpportunities, Double departureTime) {
+		double expSum = 0.;
 
-		// Orthogonal walk to nearest link
-		Distances distance = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLink, fromNode);
-		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Intersection() / (this.walkSpeed_m_s * 3600);
-		double walkUtilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT);
+		for (final AggregationObject destination : aggregatedOpportunities.values()) {
+			Link nearestLink = NetworkUtils.getNearestLinkExactly(subNetwork, origin.getCoord());
 
-		// NEW AV MODE
-//		double waitingTime_h = (Double) origin.getAttributes().getAttribute("waitingTime_s") / 3600.;
-//		double walkUtilityMeasuringPoint2Road = ((walkTravelTimeMeasuringPoint2Road_h + waitingTime_h) * betaWalkTT)
-//					+ (distance.getDistancePoint2Intersection() * betaWalkTD);
-		// END NEW AV MODE
+			// Orthogonal walk to nearest link
+			Distances distance = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLink, fromNode);
+			double walkTravelTimeMeasuringPoint2Road_h = distance.getDistancePoint2Intersection() / (this.walkSpeed_m_s * 3600);
+			double walkUtilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT);
 
-		// Travel on section of first link to first node
-		double distanceFraction = distance.getDistanceIntersection2Node() / nearestLink.getLength();
-		double congestedCarUtilityRoad2Node = -travelDisutility.getLinkTravelDisutility(nearestLink, departureTime, null, null) * distanceFraction;
+			// NEW AV MODE
+			//		double waitingTime_h = (Double) origin.getAttributes().getAttribute("waitingTime_s") / 3600.;
+			//		double walkUtilityMeasuringPoint2Road = ((walkTravelTimeMeasuringPoint2Road_h + waitingTime_h) * betaWalkTT)
+			//					+ (distance.getDistancePoint2Intersection() * betaWalkTD);
+			// END NEW AV MODE
 
-		// Remaining travel on network
-		double congestedCarUtility = - lcpt.getTree().get(destination.getNearestNode().getId()).getCost();
-		//double congestedCarUtility = - dijkstraTree.getLeastCostPath(destination.getNearestNode()).travelCost;
-		//double congestedCarUtility = - multiNodePathCalculator.constructPath(fromNode, destination.getNearestNode(), departureTime).travelCost;
+			// Travel on section of first link to first node
+			double distanceFraction = distance.getDistanceIntersection2Node() / nearestLink.getLength();
+			double congestedCarUtilityRoad2Node = -travelDisutility.getLinkTravelDisutility(nearestLink, departureTime, null, null) * distanceFraction;
 
-		// Pre-computed effect of all opportunities reachable from destination network node
-		double sumExpVjkWalk = destination.getSum();
+			// Remaining travel on network
+			double congestedCarUtility = -lcpt.getTree().get(destination.getNearestNode().getId()).getCost();
+			//double congestedCarUtility = - dijkstraTree.getLeastCostPath(destination.getNearestNode()).travelCost;
+			//double congestedCarUtility = - multiNodePathCalculator.constructPath(fromNode, destination.getNearestNode(), departureTime).travelCost;
 
-		// Combine all utility components (using the identity: exp(a+b) = exp(a) * exp(b))
-		double modeSpecificConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(mode, planCalcScoreConfigGroup);
-		return Math.exp(this.planCalcScoreConfigGroup.getBrainExpBeta() * (walkUtilityMeasuringPoint2Road + modeSpecificConstant
-				+ congestedCarUtilityRoad2Node + congestedCarUtility) ) * sumExpVjkWalk;
+			// Pre-computed effect of all opportunities reachable from destination network node
+			double sumExpVjkWalk = destination.getSum();
+
+			// Combine all utility components (using the identity: exp(a+b) = exp(a) * exp(b))
+			double modeSpecificConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(mode, planCalcScoreConfigGroup);
+			expSum += Math.exp(this.planCalcScoreConfigGroup.getBrainExpBeta() * (walkUtilityMeasuringPoint2Road + modeSpecificConstant
+					+ congestedCarUtilityRoad2Node + congestedCarUtility)) * sumExpVjkWalk;
+		}
+		return expSum;
 	}
 
 
@@ -159,13 +165,13 @@ import java.util.Set;
 
 
 	@Override
-    public Map<Id<Node>, ArrayList<ActivityFacility>> getAggregatedMeasurePoints() {
+    public Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> getAggregatedMeasurePoints() {
         return aggregatedMeasurePoints;
     }
 
 
 	@Override
-	public Map<Id<Node>, AggregationObject> getAgregatedOpportunities() {
+	public Map<Id<? extends BasicLocation>, AggregationObject> getAgregatedOpportunities() {
 		return aggregatedOpportunities;
 	}
 }
