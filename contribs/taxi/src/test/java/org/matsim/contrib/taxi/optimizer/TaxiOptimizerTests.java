@@ -91,8 +91,8 @@ public class TaxiOptimizerTests {
 			URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
 					"mielec_taxi_benchmark_config.xml");
 
-			TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
-			config = ConfigUtils.loadConfig(configUrl, MultiModeTaxiConfigGroup.of(taxiCfg), new DvrpConfigGroup());
+			config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup());
+			TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
 
 			config.plans().setInputFile("plans_only_taxi_mini_benchmark_" + plansSuffix + ".xml.gz");
 			taxiCfg.setTaxisFile("taxis_mini_benchmark-" + taxisSuffix + ".xml");

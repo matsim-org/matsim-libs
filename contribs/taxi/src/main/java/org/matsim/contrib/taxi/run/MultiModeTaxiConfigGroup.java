@@ -36,6 +36,10 @@ import com.google.common.base.Verify;
  * @author Michal Maciejewski (michalm)
  */
 public final class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implements MultiModal<TaxiConfigGroup> {
+
+	/**
+	 * use only when creating the taxi config from scratch (no taxi config in the config file)
+	 */
 	public static MultiModeTaxiConfigGroup of(TaxiConfigGroup taxiConfigGroup) {
 		MultiModeTaxiConfigGroup multiTaxiCfg = new MultiModeTaxiConfigGroup();
 		multiTaxiCfg.addParameterSet(taxiConfigGroup);

@@ -47,11 +47,10 @@ public class RunTaxiScenarioTestIT {
 
 	private void runMielec(String plansFile, String taxisFile) {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_config.xml");
-		TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
-		Config config = ConfigUtils.loadConfig(configUrl, MultiModeTaxiConfigGroup.of(taxiCfg), new DvrpConfigGroup(),
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 		config.plans().setInputFile(plansFile);
-		taxiCfg.setTaxisFile(taxisFile);
+		TaxiConfigGroup.get(config).setTaxisFile(taxisFile);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setDumpDataAtEnd(false);
 		TaxiControlerCreator.createControlerWithSingleModeTaxi(config, false).run();
