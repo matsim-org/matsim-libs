@@ -35,7 +35,7 @@ public class Shp2NetworkModification {
 
 	public static void addModeToLinksStartingOrEndingInShp(Scenario scenario, String modeToAdd, String shpFile) {
 		
-		LOGGER.info("Adding drt mode to network...");
+		LOGGER.info("Adding mode to network...");
 		
 		List<Geometry> serviceAreaGeometries = ShpGeometryUtils.loadShapeFile(shpFile);
 
