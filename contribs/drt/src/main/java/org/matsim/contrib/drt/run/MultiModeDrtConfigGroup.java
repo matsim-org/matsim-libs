@@ -28,6 +28,7 @@ import org.matsim.contrib.dvrp.run.MultiModal;
 import org.matsim.contrib.dvrp.run.MultiModals;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
@@ -38,7 +39,9 @@ public final class MultiModeDrtConfigGroup extends ReflectiveConfigGroup impleme
 
 	@SuppressWarnings("deprecation")
 	public static MultiModeDrtConfigGroup get(Config config) {
-		return (MultiModeDrtConfigGroup)config.getModule(GROUP_NAME);
+//		return (MultiModeDrtConfigGroup)config.getModule(GROUP_NAME);
+		return ConfigUtils.addOrGetModule( config, MultiModeDrtConfigGroup.class ) ;
+		// yyyy I think that this method should be inlined and then removed to become consistent with how it is done elsewhere.  kai, aug'19
 	}
 
 	public MultiModeDrtConfigGroup() {

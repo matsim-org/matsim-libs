@@ -19,18 +19,6 @@
 
 package org.matsim.contrib.drt.run;
 
-import java.net.URL;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-
-import javax.annotation.Nullable;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
@@ -43,15 +31,19 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.utils.misc.Time;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.*;
+import java.net.URL;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+
 public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	private static final Logger log = Logger.getLogger(DrtConfigGroup.class);
 
 	public static final String GROUP_NAME = "drt";
 
-	@SuppressWarnings("deprecation")
-	public static DrtConfigGroup get(Config config) {
-		return (DrtConfigGroup)config.getModule(GROUP_NAME);
-	}
+	private static final String DRT_SERVICE_AREA_FILENAME="drtServiceAreaShapeFile" ;
 
 	public static final String MODE = "mode";
 	static final String MODE_EXP = "Mode which will be handled by PassengerEngine and VrpOptimizer "
@@ -100,7 +92,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	static final String IDLE_VEHICLES_RETURN_TO_DEPOTS_EXP = "Idle vehicles return to the nearest of all start links. See: DvrpVehicle.getStartLink()";
 
 	public static final String OPERATIONAL_SCHEME = "operationalScheme";
-	static final String OP_SCHEME_EXP = "Operational Scheme, either door2door or stopbased. door2door by default";
+	static final String OP_SCHEME_EXP = "Operational Scheme, either of door2door, stopbased or serviceAreaBased. door2door by default";
 
 	public static final String MAX_WALK_DISTANCE = "maxWalkDistance";
 	static final String MAX_WALK_EXP = "Maximum desired walk distance (in meters) to next stop location in stopbased system. If no suitable stop is found in that range, the search radius will be extended in steps of maxWalkDistance until a stop is found.";
@@ -133,6 +125,12 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 					+ " Scales well up to 4, due to path data provision, the most computationally intensive part,"
 					+ " using up to 4 threads. Default value is 'min(4, no. of cores available to JVM)'";
 
+	private static final String DRT_SERVICE_AREA_FILE_EXP = "allows to configure a service area per drt mode." +
+			"Used with serviceArea Operational Scheme";
+
+	private String drtServiceAreaShapeFile = null;
+
+
 	@NotBlank
 	private String mode = TransportMode.drt; // travel mode (passengers'/customers' perspective)
 
@@ -163,6 +161,11 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	@NotNull
 	private OperationalScheme operationalScheme = OperationalScheme.door2door;
 
+	@SuppressWarnings("deprecation")
+	public static DrtConfigGroup get(Config config) {
+		return (DrtConfigGroup) config.getModule(GROUP_NAME);
+	}
+
 	@PositiveOrZero // used only for stopbased DRT scheme
 	private double maxWalkDistance = 0;// [m];
 
@@ -184,14 +187,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	@Positive
 	private int numberOfThreads = Math.min(Runtime.getRuntime().availableProcessors(),
 			ParallelPathDataProvider.MAX_THREADS);
-
-	public enum OperationalScheme {
-		stopbased, door2door
-	}
-
-	public DrtConfigGroup() {
-		super(GROUP_NAME);
-	}
 
 	@Override
 	protected void checkConsistency(Config config) {
@@ -221,6 +216,14 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 					+ " is "
 					+ DrtConfigGroup.OperationalScheme.stopbased);
 		}
+		if (getOperationalScheme() == OperationalScheme.serviceAreaBased && getDrtServiceAreaShapeFile() == null) {
+			throw new RuntimeException(DrtConfigGroup.DRT_SERVICE_AREA_FILENAME
+					+ " must not be null when "
+					+ DrtConfigGroup.OPERATIONAL_SCHEME
+					+ " is "
+					+ OperationalScheme.serviceAreaBased);
+		}
+
 		if (getNumberOfThreads() > Runtime.getRuntime().availableProcessors()) {
 			throw new RuntimeException(
 					DrtConfigGroup.NUMBER_OF_THREADS + " is higher than the number of logical cores available to JVM");
@@ -233,10 +236,19 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 			throw new RuntimeException("More then one rebalancing parameter sets is specified");
 		}
 
+
 		if (useModeFilteredSubnetwork) {
 			DvrpRoutingNetworkProvider.
 					checkUseModeFilteredSubnetworkAllowed(config, mode);
 		}
+	}
+
+	public DrtConfigGroup() {
+		super(GROUP_NAME);
+	}
+
+	public enum OperationalScheme {
+		stopbased, door2door, serviceAreaBased
 	}
 
 	@Override
@@ -260,6 +272,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		map.put(NUMBER_OF_THREADS, NUMBER_OF_THREADS_EXP);
 		map.put(PRINT_WARNINGS, PRINT_WARNINGS_EXP);
 		map.put(REQUEST_REJECTION, REQUEST_REJECTION_EXP);
+		map.put(DRT_SERVICE_AREA_FILENAME, DRT_SERVICE_AREA_FILE_EXP ) ;
 		return map;
 	}
 
@@ -326,6 +339,27 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	@StringSetter(MAX_WAIT_TIME)
 	public void setMaxWaitTime(double maxWaitTime) {
 		this.maxWaitTime = maxWaitTime;
+	}
+
+	/**
+	 * @return {@link #DRT_SERVICE_AREA_FILE_EXP}
+	 */
+	@StringGetter(DRT_SERVICE_AREA_FILENAME)
+	public String getDrtServiceAreaShapeFile() {
+		return drtServiceAreaShapeFile;
+	}
+
+	public URL getDrtServiceAreaShapeFileURL(URL context) {
+		return ConfigGroup.getInputFileURL(context, drtServiceAreaShapeFile);
+	}
+
+
+	/**
+	 * @param getDrtServiceAreaShapeFile -- {@link #DRT_SERVICE_AREA_FILE_EXP}
+	 */
+	@StringSetter(DRT_SERVICE_AREA_FILENAME)
+	public void setDrtServiceAreaShapeFile(String getDrtServiceAreaShapeFile) {
+		this.drtServiceAreaShapeFile = getDrtServiceAreaShapeFile;
 	}
 
 	/**
@@ -447,6 +481,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		this.operationalScheme = operationalScheme;
 	}
 
+
 	/**
 	 * @return -- {@value #TRANSIT_STOP_FILE_EXP}
 	 */
@@ -565,6 +600,8 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	public void setPrintDetailedWarnings(boolean printDetailedWarnings) {
 		this.printDetailedWarnings = printDetailedWarnings;
 	}
+
+
 
 	/**
 	 * @return 'minCostFlowRebalancing' parameter set defined in the DRT config or null if the parameters were not
