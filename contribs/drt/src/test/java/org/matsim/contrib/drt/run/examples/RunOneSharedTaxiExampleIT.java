@@ -30,7 +30,7 @@ import org.matsim.examples.ExamplesUtils;
 public class RunOneSharedTaxiExampleIT {
 	@Test
 	public void testRun() {
-		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_shared_taxi_config.xml");
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_shared_taxi_config.xml");
 		RunOneSharedTaxiExample.run(configUrl, false, 1);
 	}
 }

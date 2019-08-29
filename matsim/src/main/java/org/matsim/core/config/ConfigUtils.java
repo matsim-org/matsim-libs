@@ -44,7 +44,7 @@ import java.util.Iterator;
 public abstract class ConfigUtils implements MatsimExtensionPoint {
 
 	public static Config createConfig(final String context) {
-		URL url = IOUtils.getUrlFromFileOrResource(context) ;
+		URL url = IOUtils.resolveFileOrResource(context) ;
 		return createConfig( url ) ;
 	}
 
@@ -69,7 +69,7 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 	}
 
 	public static Config loadConfig(final String filename, ConfigGroup... customModules) throws UncheckedIOException {
-		return loadConfig(IOUtils.getUrlFromFileOrResource(filename), customModules);
+		return loadConfig(IOUtils.resolveFileOrResource(filename), customModules);
 	}
 
 	/**
@@ -83,12 +83,12 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 	 */
 	public static Config loadConfig( String [] args, ConfigGroup... customModules ) {
 		String[] typedArgs = Arrays.copyOfRange( args, 1, args.length );
-		return loadConfig( IOUtils.getUrlFromFileOrResource( args[0] ), typedArgs, customModules );
+		return loadConfig( IOUtils.resolveFileOrResource( args[0] ), typedArgs, customModules );
 	}
 
 	public static Config loadConfig( Config config, String [] args, ConfigGroup... customModules ) {
 		String[] typedArgs = Arrays.copyOfRange( args, 1, args.length );
-		return loadConfig( config, IOUtils.getUrlFromFileOrResource( args[0] ), typedArgs, customModules );
+		return loadConfig( config, IOUtils.resolveFileOrResource( args[0] ), typedArgs, customModules );
 	}
 
 	public static Config loadConfig( final URL url, String [] typedArgs, ConfigGroup... customModules ) {

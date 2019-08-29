@@ -94,7 +94,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 			"Limit the operation of vehicles to links (of the 'dvrp_routing'"
 					+ " network) with 'allowedModes' containing this 'mode'."
 					+ " For backward compatibility, the value is set to false by default"
-					+ " -- this means that the vehicles are allowed to operate on all links of the 'dvrp_routing' network."
+					+ " - this means that the vehicles are allowed to operate on all links of the 'dvrp_routing' network."
 					+ " The 'dvrp_routing' is defined by DvrpConfigGroup.networkModes)";
 
 	public static final String STOP_DURATION = "stopDuration";

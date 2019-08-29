@@ -507,6 +507,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 				}
 				double linkTTimeFromObservation = TravelTimeCalculator.this.getLinkTravelTime(link, time);
 				return Math.max( linkTtimeFromVehicle, linkTTimeFromObservation) ;
+				// yyyyyy should this not be min?  kai/janek, may'19
 			}
 
 		};

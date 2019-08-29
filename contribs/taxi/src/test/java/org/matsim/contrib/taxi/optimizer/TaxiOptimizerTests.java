@@ -87,7 +87,7 @@ public class TaxiOptimizerTests {
 		private final Controler controler;
 
 		public PreloadedBenchmark(String plansSuffix, String taxisSuffix) {
-			URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("mielec"),
+			URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
 					"mielec_taxi_benchmark_config.xml");
 
 			TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
