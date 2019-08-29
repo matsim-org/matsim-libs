@@ -72,15 +72,15 @@ public class FastThenSlowCharging implements BatteryCharging {
 		double c = b.getCapacity() / 3600;
 
 		double energyA = startSoc >= threshold1 ? 0 : Math.min(threshold1, endSoc) - startSoc;
-		double timeA = energyA / Math.min(charger.getPower(), 1.75 * c);
+		double timeA = energyA / Math.min(charger.getPlugPower(), 1.75 * c);
 
 		double energyB = startSoc >= threshold2 || endSoc <= threshold1 ?
 				0 :
 				Math.min(threshold2, endSoc) - Math.max(threshold1, startSoc);
-		double timeB = energyB / Math.min(charger.getPower(), 1.25 * c);
+		double timeB = energyB / Math.min(charger.getPlugPower(), 1.25 * c);
 
 		double energyC = endSoc <= threshold2 ? 0 : endSoc - Math.max(threshold2, startSoc);
-		double timeC = energyC / Math.min(charger.getPower(), 0.5 * c);
+		double timeC = energyC / Math.min(charger.getPlugPower(), 0.5 * c);
 
 		return timeA + timeB + timeC;
 	}
@@ -88,6 +88,6 @@ public class FastThenSlowCharging implements BatteryCharging {
 
 	@Override
 	public double calcChargingPower(Charger charger) {
-		return calcChargingPower(charger.getPower());
+		return calcChargingPower(charger.getPlugPower());
 	}
 }

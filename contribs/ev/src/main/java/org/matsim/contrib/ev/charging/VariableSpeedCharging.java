@@ -116,11 +116,11 @@ public class VariableSpeedCharging implements ChargingPower {//TODO upgrade to B
 		double c = b.getCapacity() / 3600.;
 
 		if (relativeSoc <= pointB.relativeSoc) {
-			return Math.min(charger.getPower(), c * approxRelativePower(relativeSoc, pointA, pointB));
+			return Math.min(charger.getPlugPower(), c * approxRelativePower(relativeSoc, pointA, pointB));
 		} else if (relativeSoc <= pointC.relativeSoc) {
-			return Math.min(charger.getPower(), c * approxRelativePower(relativeSoc, pointB, pointC));
+			return Math.min(charger.getPlugPower(), c * approxRelativePower(relativeSoc, pointB, pointC));
 		} else {
-			return Math.min(charger.getPower(), c * approxRelativePower(relativeSoc, pointC, pointD));
+			return Math.min(charger.getPlugPower(), c * approxRelativePower(relativeSoc, pointC, pointD));
 		}
 	}
 
@@ -134,7 +134,7 @@ public class VariableSpeedCharging implements ChargingPower {//TODO upgrade to B
 		Battery b = electricVehicle.getBattery();
 		double relativeSoc = b.getSoc() / b.getCapacity();
 		double c = b.getCapacity() / 3600.;
-		double relativeChargerPower = charger.getPower() / c;
+		double relativeChargerPower = charger.getPlugPower() / c;
 
 		final Point adjustedPointA;
 		final Point adjustedPointB;
