@@ -26,6 +26,7 @@ import java.util.Optional;
 
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
+import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -91,7 +92,7 @@ public class TaxiOptimizerTests {
 					"mielec_taxi_benchmark_config.xml");
 
 			TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
-			config = ConfigUtils.loadConfig(configUrl, taxiCfg, new DvrpConfigGroup());
+			config = ConfigUtils.loadConfig(configUrl, MultiModeTaxiConfigGroup.of(taxiCfg), new DvrpConfigGroup());
 
 			config.plans().setInputFile("plans_only_taxi_mini_benchmark_" + plansSuffix + ".xml.gz");
 			taxiCfg.setTaxisFile("taxis_mini_benchmark-" + taxisSuffix + ".xml");

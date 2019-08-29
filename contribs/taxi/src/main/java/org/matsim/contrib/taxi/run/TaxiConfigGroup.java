@@ -20,6 +20,7 @@
 package org.matsim.contrib.taxi.run;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -37,6 +38,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
 
 public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
@@ -44,7 +46,9 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 
 	@SuppressWarnings("deprecation")
 	public static TaxiConfigGroup get(Config config) {
-		return (TaxiConfigGroup)config.getModule(GROUP_NAME);
+		Collection<TaxiConfigGroup> taxiConfigGroups = MultiModeTaxiConfigGroup.get(config).getModalElements();
+		Preconditions.checkArgument(taxiConfigGroups.size() == 1, "Method allowed if only 1 taxi mode in the config");
+		return taxiConfigGroups.iterator().next();
 	}
 
 	public static final String MODE = "mode";

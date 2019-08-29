@@ -44,7 +44,7 @@ public class TaxiControlerCreator {
 		Controler controler = new Controler(scenario);
 
 		controler.addOverridingModule(new DvrpModule());
-		controler.addOverridingModule(new TaxiModule());
+		controler.addOverridingModule(new MultiModeTaxiModule());
 		controler.configureQSimComponents(
 				DvrpQSimComponents.activateModes(TaxiConfigGroup.get(controler.getConfig()).getMode()));
 

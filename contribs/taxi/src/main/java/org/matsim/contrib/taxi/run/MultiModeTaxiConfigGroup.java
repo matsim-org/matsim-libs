@@ -36,6 +36,12 @@ import com.google.common.base.Verify;
  * @author Michal Maciejewski (michalm)
  */
 public final class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implements MultiModal<TaxiConfigGroup> {
+	public static MultiModeTaxiConfigGroup of(TaxiConfigGroup taxiConfigGroup) {
+		MultiModeTaxiConfigGroup multiTaxiCfg = new MultiModeTaxiConfigGroup();
+		multiTaxiCfg.addParameterSet(taxiConfigGroup);
+		return multiTaxiCfg;
+	}
+
 	public static final String GROUP_NAME = "multiModeTaxi";
 
 	@SuppressWarnings("deprecation")
@@ -50,7 +56,7 @@ public final class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implem
 	@Override
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
-		Verify.verify(TaxiConfigGroup.get(config) == null,
+		Verify.verify(config.getModule(TaxiConfigGroup.GROUP_NAME) == null,
 				"In the multi-mode taxi setup, TaxiConfigGroup must not be defined at the config top level");
 		MultiModals.requireAllModesUnique(this);
 	}
