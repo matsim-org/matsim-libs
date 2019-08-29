@@ -348,6 +348,11 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		return drtServiceAreaShapeFile;
 	}
 
+	public URL getDrtServiceAreaShapeFileURL(URL context) {
+		return ConfigGroup.getInputFileURL(context, drtServiceAreaShapeFile);
+	}
+
+
 	/**
 	 * @param getDrtServiceAreaShapeFile -- {@link #DRT_SERVICE_AREA_FILE_EXP}
 	 */
