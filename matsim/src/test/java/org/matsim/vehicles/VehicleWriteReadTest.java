@@ -29,6 +29,10 @@ public class VehicleWriteReadTest{
 
 	@Before
 	public void setUp() throws IOException {
+	}
+
+	@Test
+	public void v1_isWrittenCorrect () throws FileNotFoundException, IOException {
 		//----- V1 --------
 		//read it
 		Vehicles vehicles1 = VehicleUtils.createVehiclesContainer();
@@ -37,25 +41,13 @@ public class VehicleWriteReadTest{
 
 		//write it
 		VehicleWriterV1 writerV1 = new VehicleWriterV1(vehicles1);
-		writerV1.writeFile(utils.getOutputDirectory() + OUTXML_v1);
+		final String outputDirectory = utils.getOutputDirectory();
+		writerV1.writeFile( outputDirectory + OUTXML_v1 );
 
-		//----- V2 --------
-		//read it
-		Vehicles vehicles2 = VehicleUtils.createVehiclesContainer();
-		MatsimVehicleReader reader2 = new MatsimVehicleReader(vehicles2);
-		reader2.readFile(utils.getPackageInputDirectory() + TESTXML_v2);
-
-		//write it
-		VehicleWriterV2 writerV2 = new VehicleWriterV2(vehicles2);
-		writerV2.writeFile(utils.getOutputDirectory() + OUTXML_v2);
-	}
-
-	@Test
-	public void v1_isWrittenCorrect () throws FileNotFoundException, IOException {
-		assertTrue(new File(utils.getOutputDirectory() + OUTXML_v1).exists());
+		assertTrue(new File( outputDirectory + OUTXML_v1).exists() );
 
 		BufferedReader readerV1Input = IOUtils.getBufferedReader(utils.getPackageInputDirectory() + TESTXML_v1);
-		BufferedReader readerV1Output = IOUtils.getBufferedReader(utils.getOutputDirectory() + OUTXML_v1);
+		BufferedReader readerV1Output = IOUtils.getBufferedReader( outputDirectory + OUTXML_v1 );
 
 		String lineInput;
 		String lineOutput;
@@ -70,16 +62,30 @@ public class VehicleWriteReadTest{
 
 	@Test
 	public void v2_isWrittenCorrect () throws FileNotFoundException, IOException {
-		assertTrue(new File(utils.getOutputDirectory() + OUTXML_v1).exists());
+		//----- V2 --------
+		//read it
+		Vehicles vehicles2 = VehicleUtils.createVehiclesContainer();
+		MatsimVehicleReader reader2 = new MatsimVehicleReader(vehicles2);
+		reader2.readFile(utils.getPackageInputDirectory() + TESTXML_v2);
+
+		//write it
+		VehicleWriterV2 writerV2 = new VehicleWriterV2(vehicles2);
+		final String outputDirectory = utils.getOutputDirectory();
+		writerV2.writeFile( outputDirectory + OUTXML_v2 );
+		assertTrue(new File( outputDirectory + OUTXML_v2).exists() );
 
 		BufferedReader readerV2Input = IOUtils.getBufferedReader(utils.getPackageInputDirectory() + TESTXML_v2);
-		BufferedReader readerV2Output = IOUtils.getBufferedReader(utils.getOutputDirectory() + OUTXML_v2);
+		BufferedReader readerV2Output = IOUtils.getBufferedReader( outputDirectory + OUTXML_v2 );
 
 		String lineInput;
 		String lineOutput;
 
 		while (((lineInput = readerV2Input.readLine()) != null) && ((lineOutput = readerV2Output.readLine()) != null)) {
-			log.info("Reading line... value in input file: " + lineInput + " , value in output File: "  + lineOutput);
+
+			log.info("in/out:");
+			log.info(lineInput);
+			log.info(lineOutput);
+			log.info("") ;
 			assertEquals("Lines have different content: ", lineInput, lineOutput);
 		}
 		readerV2Input.close();

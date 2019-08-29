@@ -51,6 +51,7 @@ public final class VehicleUtils {
 	private static final String HBEFA_EMISSIONS_CONCEPT = "HbefaEmissionsConcept";
 	private static final String COST_PER_SECOND_WAITING = "costsPerSecondWaiting";
 	private static final String COST_PER_SECOND_INSERVICE = "costsPerSecondInService";
+	private static final String FUEL_TYPE = "fuelType";
 
 	static {
 		VehicleCapacity capacity = new VehicleCapacity();
@@ -177,42 +178,46 @@ public final class VehicleUtils {
 		vehicleType.getAttributes().putAttribute(FUELCONSUMPTION, literPerMeter);
 	}
 
-	//TODO: Remove here, because we now let in engineInformation as seperate field?
-	public static EngineInformation getEngineInformation( VehicleType vehicleType ){
-		EngineInformation engineInformation = vehicleType.getEngineInformation();
-		//if not stored in the "old" format, organize values from the attributes. This will be probably changed in the future, kmt mar'19
-		if (Double.isNaN(engineInformation.getFuelConsumption())){
-			engineInformation.setFuelConsumption(getFuelConsumption(vehicleType));
-		}
-		return engineInformation;
-	}
-
-	//TODO: Remove here, because we now let in engineInformation as seperate field?
-	public static void setEngineInformation( VehicleType vehicleType, EngineInformation.FuelType fuelType, double literPerMeter ){
-		vehicleType.setEngineInformation(new EngineInformation(fuelType) );
-		setHbefaTechnology(vehicleType.getEngineInformation(), fuelType.toString());
-		setFuelConsumption(vehicleType, literPerMeter);
-	}
-
-	//TODO: Remove here, because we now let in engineInformation as seperate field?
-	public static void setEngineInformation(VehicleType vehicleType, Attributes currAttributes) {
-		vehicleType.setEngineInformation(new EngineInformation() );
-		if (currAttributes == null || currAttributes.isEmpty()){
-//			log.warn("No Attributes were set for EngineInformation of vehicle type " + vehicleType);
-			throw new RuntimeException("No Attributes were set for EngineInformation of vehicle type " + vehicleType);
-		} else {
-			for (String attribute : currAttributes.getAsMap().keySet()) {
-				vehicleType.getAttributes().putAttribute(attribute, currAttributes.getAttribute(attribute));
-			}
-		}
-	}
+//	//TODO: Remove here, because we now let in engineInformation as seperate field?
+//	public static EngineInformation getEngineInformation( VehicleType vehicleType ){
+//		EngineInformation engineInformation = vehicleType.getEngineInformation();
+//		//if not stored in the "old" format, organize values from the attributes. This will be probably changed in the future, kmt mar'19
+//		if (Double.isNaN(engineInformation.getFuelConsumption())){
+//			engineInformation.setFuelConsumption(getFuelConsumption(vehicleType));
+//		}
+//		return engineInformation;
+//	}
+//
+//	//TODO: Remove here, because we now let in engineInformation as seperate field?
+//	public static void setEngineInformation( VehicleType vehicleType, EngineInformation.FuelType fuelType, double literPerMeter ){
+//		vehicleType.setEngineInformation(new EngineInformation(fuelType) );
+//		setHbefaTechnology(vehicleType.getEngineInformation(), fuelType.toString());
+//		setFuelConsumption(vehicleType, literPerMeter);
+//	}
+//
+//	//TODO: Remove here, because we now let in engineInformation as seperate field?
+//	public static void setEngineInformation(VehicleType vehicleType, Attributes currAttributes) {
+//		vehicleType.setEngineInformation(new EngineInformation() );
+//		if (currAttributes == null || currAttributes.isEmpty()){
+////			log.warn("No Attributes were set for EngineInformation of vehicle type " + vehicleType);
+//			throw new RuntimeException("No Attributes were set for EngineInformation of vehicle type " + vehicleType);
+//		} else {
+//			for (String attribute : currAttributes.getAsMap().keySet()) {
+//				vehicleType.getAttributes().putAttribute(attribute, currAttributes.getAttribute(attribute));
+//			}
+//		}
+//	}
 
 	//******** EngineInformation attributes ************
 
+
+	@Deprecated
 	public static double getFreightCapacityUnits (VehicleCapacity vehicleCapacity) {
 		return (int) vehicleCapacity.getAttributes().getAttribute(FREIGHT_CAPACITY_UNITS);
 	}
 
+
+	@Deprecated
 	public static void setFreightCapacityUnits(VehicleCapacity vehicleCapacity, double units) {
 		vehicleCapacity.getAttributes().putAttribute(FREIGHT_CAPACITY_UNITS, units);
 	}
@@ -270,18 +275,26 @@ public final class VehicleUtils {
 	}
 
 	//******** CostInformation attributes ************
+
+	@Deprecated
 	public static double getCostsPerSecondWaiting(CostInformation costInformation) {
 		return (double) costInformation.getAttributes().getAttribute(COST_PER_SECOND_WAITING);
 	}
 
+
+	@Deprecated
 	public static void setCostsPerSecondWaiting(CostInformation costInformation, double costsPerSecond) {
 		costInformation.getAttributes().putAttribute(COST_PER_SECOND_WAITING, costsPerSecond);
 	}
 
+
+	@Deprecated
 	public static double getCostsPerSecondInService(CostInformation costInformation) {
 		return (double) costInformation.getAttributes().getAttribute(COST_PER_SECOND_INSERVICE);
 	}
 
+
+	@Deprecated
 	public static void setCostsPerSecondInService(CostInformation costInformation, double costsPerSecond) {
 		costInformation.getAttributes().putAttribute(COST_PER_SECOND_INSERVICE, costsPerSecond);
 	}
@@ -290,5 +303,10 @@ public final class VehicleUtils {
 		return new VehicleImpl( id , type );
 	}
 
+	@Deprecated
+	public static EngineInformation.FuelType getFuelType( EngineInformation engineInformation ){
+		return (EngineInformation.FuelType) engineInformation.getAttributes().getAttribute( FUEL_TYPE );
+	}
+	@Deprecated
 	public enum DoorOperationMode{ serial, parallel }
 }

@@ -22,7 +22,7 @@ package org.matsim.vehicles;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 
-public final class VehicleImpl implements Vehicle {
+final class VehicleImpl implements Vehicle {
 
 	private VehicleType type;
 	private Id<Vehicle> id;

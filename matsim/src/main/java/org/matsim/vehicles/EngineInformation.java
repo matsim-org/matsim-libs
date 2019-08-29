@@ -45,27 +45,30 @@ public final class EngineInformation implements Attributable {
 		this.setFuelType(fueltype);
 		this.setFuelConsumption(literPerMeter);
 	}
-
+	@Deprecated
 	public EngineInformation( FuelType fueltype ) {
 		this.setFuelType(fueltype);
 		this.setFuelConsumption(Double.NaN);
 	}
 
-    public EngineInformation() {
-    }
-
-	public FuelType getFuelType() {
-		return this.fuelType;
+	public EngineInformation() {
 	}
 
+	@Deprecated
+	public FuelType getFuelType() {
+		return VehicleUtils.getFuelType( this ) ;
+	}
+
+	@Deprecated
 	public double getFuelConsumption() {
 		return this.gasConsumption;
 	}
 
+	@Deprecated
 	public void setFuelType(FuelType fueltype) {
 		this.fuelType = fueltype;
 	}
-
+	@Deprecated
 	public void setFuelConsumption(double literPerMeter) {
 		this.gasConsumption = literPerMeter ;
 	}
@@ -74,5 +77,6 @@ public final class EngineInformation implements Attributable {
 		return attributes ;
 	}
 
-	public static enum FuelType {diesel, gasoline, electricity, biodiesel}
+	@Deprecated
+	public enum FuelType {diesel, gasoline, electricity, biodiesel}
 }
