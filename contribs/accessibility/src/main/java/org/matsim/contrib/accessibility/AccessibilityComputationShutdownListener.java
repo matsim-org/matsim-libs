@@ -183,21 +183,19 @@ public final class AccessibilityComputationShutdownListener implements ShutdownL
 			// Go through all measuring points assigned to current node
 			for (ActivityFacility origin : aggregatedOrigins.get(fromNodeId)) {
 				assert(origin.getCoord() != null);
-
-				Map<String,Double> expSums = new ConcurrentHashMap<>();
-				expSums.put(mode, 0.);
+				double expSum = 0.;
 
 				// Go through all aggregated opportunities (i.e. network nodes to which at least one opportunity is assigned)
 				for (final AggregationObject aggregatedOpportunity : aggregatedOpportunities.values()) {
 				    final double expVhk = calculator.computeContributionOfOpportunity(origin, aggregatedOpportunity, departureTime);
-				    expSums.put(mode, expSums.get(mode) + expVhk);
+				    expSum += expVhk;
 				}
 
 				double accessibility;
                 if (acg.getAccessibilityMeasureType() == AccessibilityConfigGroup.AccessibilityMeasureType.logSum) {
-                    accessibility = (1/this.cnScoringGroup.getBrainExpBeta()) * Math.log(expSums.get(mode));
+					accessibility = (1/this.cnScoringGroup.getBrainExpBeta()) * Math.log(expSum);
                 } else if (acg.getAccessibilityMeasureType() == AccessibilityConfigGroup.AccessibilityMeasureType.rawSum) {
-                    accessibility = expSums.get(mode);
+					accessibility = expSum;
                 } else if (acg.getAccessibilityMeasureType() == AccessibilityConfigGroup.AccessibilityMeasureType.gravity) {
                     throw new IllegalArgumentException("This accessibility measure is not yet implemented.");
                 } else {
