@@ -1,5 +1,6 @@
 package org.matsim.contrib.accessibility;
 
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
@@ -23,8 +24,8 @@ public final class LeastCostPathCalculatorAccessibilityContributionCalculator im
 	private Double departureTime;
 	private Scenario scenario;
 
-    Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedMeasurePoints;
-    Map<Id<Node>, AggregationObject> aggregatedOpportunities;
+    Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregatedMeasurePoints;
+    Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities;
 
 
 	public LeastCostPathCalculatorAccessibilityContributionCalculator(PlanCalcScoreConfigGroup planCalcScoreConfigGroup, LeastCostPathCalculator leastCostPathCalculator, Scenario scenario) {
@@ -42,16 +43,22 @@ public final class LeastCostPathCalculatorAccessibilityContributionCalculator im
 
 
 	@Override
-	public void notifyNewOriginNode(Id<Node> fromNodeId, Double departureTime) {
+	public void notifyNewOriginNode(Id<? extends BasicLocation> fromNodeId, Double departureTime) {
 		this.fromNode = scenario.getNetwork().getNodes().get(fromNodeId);
 		this.departureTime = departureTime;
 	}
 
 
 	@Override
-	public double computeContributionOfOpportunity(ActivityFacility origin, AggregationObject destination, Double departureTime) {
-		LeastCostPathCalculator.Path path = leastCostPathCalculator.calcLeastCostPath(fromNode, destination.getNearestNode(), departureTime, null, null);
-		return destination.getSum() * Math.exp(planCalcScoreConfigGroup.getBrainExpBeta() * path.travelCost);
+	public double computeContributionOfOpportunity(ActivityFacility origin,
+			Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities, Double departureTime) {
+		double expSum = 0.;
+
+		for (final AggregationObject destination : aggregatedOpportunities.values()) {
+			LeastCostPathCalculator.Path path = leastCostPathCalculator.calcLeastCostPath(fromNode, destination.getNearestNode(), departureTime, null, null);
+			expSum += destination.getSum() * Math.exp(planCalcScoreConfigGroup.getBrainExpBeta() * path.travelCost);
+		}
+		return expSum;
 	}
 
 
@@ -64,13 +71,13 @@ public final class LeastCostPathCalculatorAccessibilityContributionCalculator im
 
 
     @Override
-    public Map<Id<Node>, ArrayList<ActivityFacility>> getAggregatedMeasurePoints() {
+    public Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> getAggregatedMeasurePoints() {
         return aggregatedMeasurePoints;
     }
 
 
     @Override
-    public Map<Id<Node>, AggregationObject> getAgregatedOpportunities() {
+    public Map<Id<? extends BasicLocation>, AggregationObject> getAgregatedOpportunities() {
         return aggregatedOpportunities;
     }
 }

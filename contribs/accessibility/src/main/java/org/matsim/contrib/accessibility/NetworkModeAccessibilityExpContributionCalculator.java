@@ -108,7 +108,8 @@ import java.util.Set;
 
 
 	@Override
-	public double computeContributionOfOpportunity(ActivityFacility origin, Map<Id<?extends BasicLocation>, AggregationObject> aggregatedOpportunities, Double departureTime) {
+	public double computeContributionOfOpportunity(ActivityFacility origin,
+			Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities, Double departureTime) {
 		double expSum = 0.;
 
 		for (final AggregationObject destination : aggregatedOpportunities.values()) {

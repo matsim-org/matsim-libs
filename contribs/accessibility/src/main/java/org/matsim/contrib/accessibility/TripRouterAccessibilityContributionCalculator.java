@@ -19,6 +19,7 @@
 package org.matsim.contrib.accessibility;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -56,8 +57,8 @@ public class TripRouterAccessibilityContributionCalculator implements Accessibil
 	private PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
 	private Scenario scenario;
 
-    Map<Id<Node>, ArrayList<ActivityFacility>> aggregatedMeasurePoints;
-    Map<Id<Node>, AggregationObject> aggregatedOpportunities;
+    Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregatedMeasurePoints;
+    Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities;
 
 	private Network subNetwork;
 
@@ -99,59 +100,67 @@ public class TripRouterAccessibilityContributionCalculator implements Accessibil
 
 
 	@Override
-	public void notifyNewOriginNode(Id<Node> fromNodeId, Double departureTime) {
+	public void notifyNewOriginNode(Id<? extends BasicLocation> fromNodeId, Double departureTime) {
 		this.fromNode = subNetwork.getNodes().get(fromNodeId);
 	}
 
 
 	@Override
-	public double computeContributionOfOpportunity(ActivityFacility origin, final AggregationObject destination, Double departureTime) {
-		Link nearestLink = getNearestLinkInCorrectDirection(origin, subNetwork, fromNode);
-		((ActivityFacilityImpl) origin).setLinkId(nearestLink.getId()); // Set nearest link to origin so that router really starts fomr here
+	public double computeContributionOfOpportunity(ActivityFacility origin,
+			Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities, Double departureTime) {
+		double expSum = 0.;
 
-		// Orthogonal walk to nearest link
-		Distances distance = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLink, fromNode);
-		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Intersection() / (this.walkSpeed_m_s * 3600);
-		double walkUtilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT);
+		for (final AggregationObject destination : aggregatedOpportunities.values()) {
 
-		// Travel on section of first link to first node
-		double distanceFraction = distance.getDistanceIntersection2Node() / nearestLink.getLength();
-		double congestedCarUtilityRoad2Node = -travelDisutility.getLinkTravelDisutility(nearestLink, departureTime, null, null) * distanceFraction;
+			Link nearestLink = getNearestLinkInCorrectDirection(origin, subNetwork, fromNode);
+			((ActivityFacilityImpl) origin).setLinkId(nearestLink.getId()); // Set nearest link to origin so that router really starts fomr here
 
-		ActivityFacilitiesFactory activityFacilitiesFactory = new ActivityFacilitiesFactoryImpl();
-		ActivityFacility destinationFacility = activityFacilitiesFactory.createActivityFacility(null, destination.getNearestNode().getCoord());
+			// Orthogonal walk to nearest link
+			Distances distance = NetworkUtil.getDistances2NodeViaGivenLink(origin.getCoord(), nearestLink, fromNode);
+			double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Intersection() / (this.walkSpeed_m_s * 3600);
+			double walkUtilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT);
 
-		Gbl.assertNotNull(tripRouter);
-		List<? extends PlanElement> plan = tripRouter.calcRoute(mode, origin, destinationFacility, departureTime, null);
+			// Travel on section of first link to first node
+			double distanceFraction = distance.getDistanceIntersection2Node() / nearestLink.getLength();
+			double congestedCarUtilityRoad2Node = -travelDisutility.getLinkTravelDisutility(nearestLink, departureTime, null, null) * distanceFraction;
 
-		double utility = 0.;
-		List<Leg> legs = TripStructureUtils.getLegs(plan);
-		// TODO Doing it like this, the pt interaction (e.g. waiting) times will be omitted!
-		Gbl.assertIf(!legs.isEmpty());
+			ActivityFacilitiesFactory activityFacilitiesFactory = new ActivityFacilitiesFactoryImpl();
+			ActivityFacility destinationFacility = activityFacilitiesFactory.createActivityFacility(null, destination.getNearestNode().getCoord());
 
-		for (Leg leg : legs) {
-			Route route = leg.getRoute();
-			Link endLink = subNetwork.getLinks().get(route.getEndLinkId());
-			double endLinkLength = endLink.getLength();
-			double estimatedEndLinkTT = endLinkLength / endLink.getFreespeed(); // This is an assumption as it is only the freespeed
+			Gbl.assertNotNull(tripRouter);
+			List<? extends PlanElement> plan = tripRouter.calcRoute(mode, origin, destinationFacility, departureTime, null);
 
-			// Note: The following computation where the end link length is added is only correct once the end link is removed from the route
-			// in the NetworkRoutingModule (route.setDistance(RouteUtils.calcDistance(route, 1.0, 0.0, this.network));)
-			if (this.planCalcScoreConfigGroup.getModes().get(leg.getMode()).getMarginalUtilityOfDistance() != 0.) {
-				LOG.warn("A computation including a marginal utility of distance will only be correct if the route time/distance" +
-						"inconsistency in the NetworkRoutingModule is solved.");
+			double utility = 0.;
+			List<Leg> legs = TripStructureUtils.getLegs(plan);
+			// TODO Doing it like this, the pt interaction (e.g. waiting) times will be omitted!
+			Gbl.assertIf(!legs.isEmpty());
+
+			for (Leg leg : legs) {
+				Route route = leg.getRoute();
+				Link endLink = subNetwork.getLinks().get(route.getEndLinkId());
+				double endLinkLength = endLink.getLength();
+				double estimatedEndLinkTT = endLinkLength / endLink.getFreespeed(); // This is an assumption as it is only the freespeed
+
+				// Note: The following computation where the end link length is added is only correct once the end link is removed from the route
+				// in the NetworkRoutingModule (route.setDistance(RouteUtils.calcDistance(route, 1.0, 0.0, this.network));)
+				if (this.planCalcScoreConfigGroup.getModes().get(leg.getMode()).getMarginalUtilityOfDistance() != 0.) {
+					LOG.warn("A computation including a marginal utility of distance will only be correct if the route time/distance" +
+							"inconsistency in the NetworkRoutingModule is solved.");
+				}
+				utility += (leg.getRoute().getDistance() + endLinkLength) * this.planCalcScoreConfigGroup.getModes().get(leg.getMode()).getMarginalUtilityOfDistance();
+				utility += (leg.getRoute().getTravelTime() + estimatedEndLinkTT) * this.planCalcScoreConfigGroup.getModes().get(leg.getMode()).getMarginalUtilityOfTraveling() / 3600.;
+				utility += -(leg.getRoute().getTravelTime() + estimatedEndLinkTT) * this.planCalcScoreConfigGroup.getPerforming_utils_hr() / 3600.;
 			}
-			utility += (leg.getRoute().getDistance() + endLinkLength) * this.planCalcScoreConfigGroup.getModes().get(leg.getMode()).getMarginalUtilityOfDistance();
-			utility += (leg.getRoute().getTravelTime() + estimatedEndLinkTT) * this.planCalcScoreConfigGroup.getModes().get(leg.getMode()).getMarginalUtilityOfTraveling() / 3600.;
-			utility += -(leg.getRoute().getTravelTime() + estimatedEndLinkTT) * this.planCalcScoreConfigGroup.getPerforming_utils_hr() / 3600.;
+
+			// Utility based on opportunities that are attached to destination node
+			double sumExpVjkWalk = destination.getSum();
+
+			// exp(beta * a) * exp(beta * b) = exp(beta * (a+b))
+			double modeSpecificConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(mode, planCalcScoreConfigGroup);
+			expSum += Math.exp(this.planCalcScoreConfigGroup.getBrainExpBeta() * (utility + modeSpecificConstant + walkUtilityMeasuringPoint2Road + congestedCarUtilityRoad2Node)) * sumExpVjkWalk;
+
 		}
-
-		// Utility based on opportunities that are attached to destination node
-		double sumExpVjkWalk = destination.getSum();
-
-		// exp(beta * a) * exp(beta * b) = exp(beta * (a+b))
-		double modeSpecificConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(mode, planCalcScoreConfigGroup);
-		return Math.exp(this.planCalcScoreConfigGroup.getBrainExpBeta() * (utility + modeSpecificConstant + walkUtilityMeasuringPoint2Road + congestedCarUtilityRoad2Node)) * sumExpVjkWalk;
+		return expSum;
 	}
 
 
@@ -168,13 +177,13 @@ public class TripRouterAccessibilityContributionCalculator implements Accessibil
 
 
     @Override
-    public Map<Id<Node>, ArrayList<ActivityFacility>> getAggregatedMeasurePoints() {
+    public Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> getAggregatedMeasurePoints() {
         return aggregatedMeasurePoints;
     }
 
 
     @Override
-    public Map<Id<Node>, AggregationObject> getAgregatedOpportunities() {
+    public Map<Id<? extends BasicLocation>, AggregationObject> getAgregatedOpportunities() {
         return aggregatedOpportunities;
     }
 
