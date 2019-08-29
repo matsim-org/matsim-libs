@@ -339,6 +339,11 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 				}
 
 				@Override
+				public void setIteration(int iteration) {
+					throw new UnsupportedOperationException();
+				}
+
+				@Override
 				public void resetHandlers(int iteration) {
 					throw new UnsupportedOperationException();
 				}
