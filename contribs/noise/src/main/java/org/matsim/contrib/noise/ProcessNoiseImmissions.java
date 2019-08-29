@@ -26,14 +26,15 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Envelope;
+import org.matsim.analysis.XYTRecord;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.analysis.vsp.qgis.*;
+import org.matsim.core.router.priorityqueue.BinaryMinHeap;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -53,7 +54,8 @@ public final class ProcessNoiseImmissions {
 	private final String outputPath;
 
 	private Map<Double, Map<Id<ReceiverPoint>, Double>> time2rp2value = new HashMap<>();
-	
+	private List<NoiseModule.NoiseListener> listeners = new ArrayList<>() ;
+
 	public ProcessNoiseImmissions(String workingDirectory, String receiverPointsFile, double receiverPointGap) {
 		this.workingDirectory = workingDirectory;
 		this.receiverPointsFile = receiverPointsFile;
@@ -223,6 +225,15 @@ public final class ProcessNoiseImmissions {
 				bw.write(";" + L_1619 );
 				
 				bw.newLine();
+
+				for( NoiseModule.NoiseListener listener : listeners ){
+					XYTRecord.Builder builder = new XYTRecord.Builder().setCoord( ... );
+					builder.put( "Lden", Lden  ) ;
+					builder.put( "Lden", Lden  ) ;
+					XYTRecord record = builder.build();;
+					listener.newRecord( record );
+				}
+
 			}				
 			
 			bw.close();
@@ -257,4 +268,7 @@ public final class ProcessNoiseImmissions {
 		
 	}
 
+	public void addListener( NoiseModule.NoiseListener noiseListener ){
+		listeners.add( noiseListener ) ;
+	}
 }
