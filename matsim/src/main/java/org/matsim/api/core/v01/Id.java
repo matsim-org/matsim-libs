@@ -41,8 +41,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class Id<T> implements Comparable<Id<T>> {
 
-	private final static Map<Class<?>, Map<String, Id<?>>> cacheId = new ConcurrentHashMap<Class<?>, Map<String, Id<?>>>();
-	private final static Map<Class<?>, Map<Integer, Id<?>>> cacheIndex = new ConcurrentHashMap<Class<?>, Map<Integer, Id<?>>>();
+	private final static Map<Class<?>, Map<String, Id<?>>> cacheId = new ConcurrentHashMap<>();
+	private final static Map<Class<?>, Map<Integer, Id<?>>> cacheIndex = new ConcurrentHashMap<>();
 
 	public static <T> Id<T> create(final long key, final Class<T> type) {
 		return create(Long.toString(key), type);
@@ -59,17 +59,10 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 	 * This method supports a cache where ids are stored and re-used per type.   
 	 */
 	public static <T> Id<T> create(final String key, final Class<T> type) {
-		Map<String, Id<?>> mapId = cacheId.get(type);
-		Map<Integer, Id<?>> mapIndex = cacheIndex.get(type);
-
-		if (mapId == null) {
-			mapId = new ConcurrentHashMap<>();
-			mapIndex = new ConcurrentHashMap<>();
-			cacheId.put(type, mapId);
-			cacheIndex.put(type, mapIndex);
-		}
-
 		Gbl.assertNotNull(key);
+
+		Map<String, Id<?>> mapId = cacheId.computeIfAbsent(type, k -> new ConcurrentHashMap<>(1000));
+		Map<Integer, Id<?>> mapIndex = cacheIndex.computeIfAbsent(type, k -> new ConcurrentHashMap<>(1000));
 
 		Id<?> id = mapId.get(key);
 
@@ -116,7 +109,8 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 	 */
 	@Override
 	public int compareTo(Id<T> o) throws IllegalArgumentException {
-		return Integer.compare(this.index(), o.index());
+		return this.toString().compareTo(o.toString());
+//		return Integer.compare(this.index(), o.index()); // this would be more efficient, but changes some test results due to different ordering
 	}
 	
 	@Override
@@ -156,7 +150,8 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 
 		@Override
 		public int hashCode() {
-			return this.index;
+			return this.id.hashCode();
+			// this.index  would be an alternative implementation for the hashCode
 		}
 		
 		@Override
