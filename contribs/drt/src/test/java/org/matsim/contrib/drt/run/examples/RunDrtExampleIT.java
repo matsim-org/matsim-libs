@@ -22,6 +22,7 @@
  */
 package org.matsim.contrib.drt.run.examples;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -66,7 +67,9 @@ public class RunDrtExampleIT {
 		RunDrtExample.run(config, false);
 	}
 
+
 	@Test
+	@Ignore
 	public void testRunServiceAreabasedExample() {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_serviceArea_based_drt_config.xml");
 		Config config = ConfigUtils.loadConfig(configUrl, new DrtConfigGroup(), new DvrpConfigGroup(),
