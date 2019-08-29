@@ -35,6 +35,8 @@ import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.households.Household;
+import org.matsim.households.HouseholdUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -127,7 +129,14 @@ public class ScenarioLoaderImplTest {
 	public void testLoadScenario_loadHouseholdAttributes() {
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(this.util.classInputResourcePath(), "householdAttributesConfig.xml"));
 		config.households().addParam("inputHouseholdAttributesFile", "householdAttributes.xml");
+		config.households().setInsistingOnUsingDeprecatedHouseholdsAttributeFile(true);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Assert.assertEquals("world", scenario.getHouseholds().getHouseholdAttributes().getAttribute("1", "hello"));
+		Assert.assertEquals(
+				"unexpected attribute value",
+				"world",
+				HouseholdUtils.getHouseholdAttribute(
+						scenario.getHouseholds().getHouseholds().get(Id.create(1, Household.class)),
+						"hello"));
+
 	}
 }

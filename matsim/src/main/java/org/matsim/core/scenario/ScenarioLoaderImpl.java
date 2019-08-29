@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
+import org.matsim.core.config.groups.HouseholdsConfigGroup;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -254,11 +255,18 @@ class ScenarioLoaderImpl {
 		}
 		final String fn = this.config.households().getInputHouseholdAttributesFile();
 		if ((this.config.households() != null) && ( fn != null)) {
+			if (!this.config.households().isInsistingOnUsingDeprecatedHouseholdsAttributeFile()) {
+				throw new RuntimeException(HouseholdsConfigGroup.HOUSEHOLD_ATTRIBUTES_DEPRECATION_MESSAGE);
+			}
+
 			URL householdAttributesFileName = ConfigGroup.getInputFileURL(this.config.getContext(), fn ) ;
 			log.info("loading household attributes from " + householdAttributesFileName);
-			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getHouseholds().getHouseholdAttributes());
-			reader.putAttributeConverters( attributeConverters );
-			reader.parse(householdAttributesFileName);
+			parseObjectAttributesToAttributable(
+					householdAttributesFileName,
+					this.scenario.getHouseholds().getHouseholds().values(),
+					"householdAttributes not empty after going through all households, meaning that it contains material for householdIDs that " +
+							"are not in the container.  This is not necessarily a bug so we will continue, but note that such material " +
+							"will no longer be contained in the output_* files.");
 		}
 		else {
 			log.info("no household-attributes file set in config, not loading any household attributes");
@@ -350,7 +358,7 @@ class ScenarioLoaderImpl {
 		if ( !attributes.toString().equals( "" ) ) {
 			log.warn( message ) ;
 			log.warn( "showing the first 1000 characters from the remaining personAttributes ...") ;
-			log.warn( attributes.toString().substring( 0,1000 ) ) ;
+			log.warn( attributes.toString().substring( 0, Math.min(attributes.toString().length(), 1000 ) ) );
 			log.warn("");
 		}
 	}

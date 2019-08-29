@@ -27,6 +27,13 @@ public class FailingObjectAttributes extends ObjectAttributes{
 		);
 	}
 
+	public static FailingObjectAttributes createHouseholdsAttributes() {
+		return new FailingObjectAttributes(
+				str -> "households.getHouseholdAttributes()." + str + " will be deprecated; use HouseholdUtils" +
+						".get/put/...HouseholdAttribute... instead.  td, aug'19"
+		);
+	}
+
 	@Override public Object getAttribute( String personId, String key) {
 		throw new RuntimeException( msgFunction.apply("getAttribute"));
 	}

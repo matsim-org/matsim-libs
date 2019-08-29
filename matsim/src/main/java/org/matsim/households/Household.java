@@ -22,6 +22,7 @@ package org.matsim.households;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.vehicles.Vehicle;
@@ -29,10 +30,8 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author dgrether
  */
-public interface Household extends Attributable {
+public interface Household extends Identifiable<Household>, Attributable {
 
-	public Id<Household> getId();
-	
 	public List<Id<Person>> getMemberIds();
 	
 	/**
