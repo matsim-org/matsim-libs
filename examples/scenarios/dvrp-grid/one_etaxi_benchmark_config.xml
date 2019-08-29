@@ -14,7 +14,7 @@
 			<param name="timeProfiles" value="false"/>
 			<param name="detailedStats" value="false"/>
 
-			<parameterset type="RuleBasedETaxiOptimizer">
+			<parameterset type="org.matsim.contrib.etaxi.optimizer.rules.RuleBasedETaxiOptimizerParams">
 				<parameterset type="RuleBasedTaxiOptimizer"/>
 
 				<param name="minRelativeSoc" value="0.7"/>

@@ -15,7 +15,7 @@
 			<param name="timeProfiles" value="true"/>
 			<param name="detailedStats" value="true"/>
 
-			<parameterset type="AssignmentETaxiOptimizer">
+			<parameterset type="org.matsim.contrib.etaxi.optimizer.assignment.AssignmentETaxiOptimizerParams">
 				<parameterset type="AssignmentTaxiOptimizer">
 					<param name="reoptimizationTimeStep" value="10"/>
 					<param name="mode" value="DSE"/>
