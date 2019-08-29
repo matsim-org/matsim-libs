@@ -20,9 +20,8 @@
 package org.matsim.contrib.taxi.run;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.Map;
-import java.util.Objects;
-import java.util.function.Function;
 
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
@@ -32,17 +31,26 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
+import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.fifo.FifoTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.zonal.ZonalTaxiOptimizerParams;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
+
+import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
 
 public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
 	public static final String GROUP_NAME = "taxi";
 
 	@SuppressWarnings("deprecation")
 	public static TaxiConfigGroup get(Config config) {
-		return (TaxiConfigGroup)config.getModule(GROUP_NAME);
+		Collection<TaxiConfigGroup> taxiConfigGroups = MultiModeTaxiConfigGroup.get(config).getModalElements();
+		Preconditions.checkArgument(taxiConfigGroups.size() == 1,
+				"Supported for only 1 taxi mode in the config. Number of taxi modes: %s", taxiConfigGroups.size());
+		return taxiConfigGroups.iterator().next();
 	}
 
 	public static final String MODE = "mode";
@@ -143,30 +151,20 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 
 	private boolean printDetailedWarnings = true;
 
-	private final Function<String, AbstractTaxiOptimizerParams> taxiOptimizerParamsCreator;
 	private AbstractTaxiOptimizerParams taxiOptimizerParams;
 
 	public TaxiConfigGroup() {
-		this(DefaultTaxiOptimizerProvider::createParameterSet);
-	}
-
-	public TaxiConfigGroup(Function<String, AbstractTaxiOptimizerParams> taxiOptimizerParamsCreator) {
 		super(GROUP_NAME);
-		this.taxiOptimizerParamsCreator = taxiOptimizerParamsCreator;
 	}
 
 	@Override
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
 
-		if (config.qsim().getNumberOfThreads() != 1) {
-			throw new RuntimeException("Only a single-threaded QSim allowed");
-		}
+		Verify.verify(config.qsim().getNumberOfThreads() == 1, "Only a single-threaded QSim allowed");
 
-		if (isVehicleDiversion() && !isOnlineVehicleTracker()) {
-			throw new RuntimeException(
-					TaxiConfigGroup.VEHICLE_DIVERSION + " requires " + TaxiConfigGroup.ONLINE_VEHICLE_TRACKER);
-		}
+		Verify.verify(!isVehicleDiversion() || isOnlineVehicleTracker(),
+				TaxiConfigGroup.VEHICLE_DIVERSION + " requires " + TaxiConfigGroup.ONLINE_VEHICLE_TRACKER);
 
 		if (useModeFilteredSubnetwork) {
 			DvrpRoutingNetworkProvider.
@@ -410,8 +408,22 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 
 	@Override
 	public ConfigGroup createParameterSet(String type) {
-		return Objects.requireNonNull(taxiOptimizerParamsCreator.apply(type),
-				"Unable to create a parameter set of type: " + type);
+		switch (type) {
+			case AssignmentTaxiOptimizerParams.SET_NAME:
+				return new AssignmentTaxiOptimizerParams();
+			case FifoTaxiOptimizerParams.SET_NAME:
+				return new FifoTaxiOptimizerParams();
+			case RuleBasedTaxiOptimizerParams.SET_NAME:
+				return new RuleBasedTaxiOptimizerParams();
+			case ZonalTaxiOptimizerParams.SET_NAME:
+				return new ZonalTaxiOptimizerParams();
+			default:
+				try {
+					return (AbstractTaxiOptimizerParams)Class.forName(type).getDeclaredConstructor().newInstance();
+				} catch (ReflectiveOperationException e) {
+					throw new RuntimeException("Cannot instantiate taxi optimizer parameter set of type: " + type, e);
+				}
+		}
 	}
 
 	@Override

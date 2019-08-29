@@ -30,8 +30,9 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
+import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
+import org.matsim.contrib.taxi.run.MultiModeTaxiModule;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -44,7 +45,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  */
 public class RunDrtAndTaxiExample {
 	public static void run(URL configUrl, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configUrl, new DrtConfigGroup(), new TaxiConfigGroup(),
+		Config config = ConfigUtils.loadConfig(configUrl, new DrtConfigGroup(), new MultiModeTaxiConfigGroup(),
 				new DvrpConfigGroup(), new OTFVisConfigGroup());
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
 		ScenarioUtils.loadScenario(scenario);
@@ -52,7 +53,7 @@ public class RunDrtAndTaxiExample {
 				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new DrtModule());
-		controler.addOverridingModule(new TaxiModule());
+		controler.addOverridingModule(new MultiModeTaxiModule());
 
 		String taxiMode = TaxiConfigGroup.get(controler.getConfig()).getMode();
 		String drtMode = DrtConfigGroup.get(controler.getConfig()).getMode();

@@ -24,6 +24,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
+import com.google.common.base.Preconditions;
+
 /**
  * @author michalm
  */
@@ -35,9 +37,8 @@ public class RunDrtScenario {
 	}
 
 	public static void main(String[] args) {
-		if (args.length != 1) {
-			throw new IllegalArgumentException("RunDrtScenario needs one argument: path to the configuration file");
-		}
+		Preconditions.checkArgument(args.length == 1,
+				"RunDrtScenario needs one argument: path to the configuration file");
 		RunDrtScenario.run(args[0], false);
 	}
 }
