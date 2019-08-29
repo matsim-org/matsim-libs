@@ -19,18 +19,6 @@
 
 package org.matsim.contrib.drt.run;
 
-import java.net.URL;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-
-import javax.annotation.Nullable;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
@@ -39,51 +27,23 @@ import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.utils.misc.Time;
+
+import javax.annotation.Nullable;
+import javax.validation.constraints.*;
+import java.net.URL;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
 
 public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	private static final Logger log = Logger.getLogger(DrtConfigGroup.class);
 
 	public static final String GROUP_NAME = "drt";
 
-	@SuppressWarnings("deprecation")
-	public static DrtConfigGroup get(Config config) {
-//		return (DrtConfigGroup)config.getModule(GROUP_NAME);
-		return ConfigUtils.addOrGetModule( config, DrtConfigGroup.class ) ;
-		// yyyy I think that this method should be inlined and then removed to become consistent with how it is done elsewhere.  kai, aug'19
-		// yy I have to say that I am not sure if the method should exist at all.  It seems to me that DrtConfigGroup can exist both at the base level
-		// _and_ as one of many such config groups inside MultiModeDrtConfigGroups.  Our experience with such dual use approaches is not so good.  kai,
-		// aug'19
-	}
-
-	// ---
 	private static final String DRT_SERVICE_AREA_FILENAME="drtServiceAreaShapeFile" ;
-	private String drtServiceAreaShapeFile = null ;
-
-	/**
-	 * @return {@link #DRT_SERVICE_AREA_FILE_EXP}
-	 */
-//	@StringGetter( DRT_SERVICE_AREA_FILENAME )
-// yyyy could presumably be commented in (= allow in xml). kai, aug'19
-	public String getDrtServiceAreaShapeFile(){
-		return drtServiceAreaShapeFile;
-	}
-
-	/**
-	 * @param getDrtServiceAreaShapeFile -- {@link #DRT_SERVICE_AREA_FILE_EXP}
-	 */
-//	@StringSetter( DRT_SERVICE_AREA_FILENAME )
-// yyyy could presumably be commented in (= allow in xml). kai, aug'19
-	public void setDrtServiceAreaShapeFile( String getDrtServiceAreaShapeFile ){
-		this.drtServiceAreaShapeFile = getDrtServiceAreaShapeFile;
-	}
-	private static final String DRT_SERVICE_AREA_FILE_EXP ="allows to configure a service area per drt mode.  For the time being, the default code is " +
-												"not doing anything with that info; this may follow in the future." ;
-
-	// ---
 
 	public static final String MODE = "mode";
 	static final String MODE_EXP = "Mode which will be handled by PassengerEngine and VrpOptimizer "
@@ -164,11 +124,20 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 			"Number of threads used for parallel evaluation of request insertion into existing schedules."
 					+ " Scales well up to 4, due to path data provision, the most computationally intensive part,"
 					+ " using up to 4 threads. Default value is 'min(4, no. of cores available to JVM)'";
+	private static final String DRT_SERVICE_AREA_FILE_EXP = "allows to configure a service area per drt mode.  For the time being, the default code is " +
+			"not doing anything with that info; this may follow in the future.";
+	private static final String DRT_SERVICE_INTEPRETATION = "drtServiceAreaInterpretation";
+	private static final String DRT_SERVICE_INTEPRETATION_EXP = "Intepretation of DRT Service Area. Possible values: " + ServiceAreaInterpretation.values() +
+			" Default value: " + ServiceAreaInterpretation.ignore;
+	private String drtServiceAreaShapeFile = null;
+
 
 	@NotBlank
 	private String mode = TransportMode.drt; // travel mode (passengers'/customers' perspective)
 
 	private boolean useModeFilteredSubnetwork = false;
+	@NotNull
+	private ServiceAreaInterpretation serviceAreaInterpretation = ServiceAreaInterpretation.ignore;
 
 	@Positive
 	private double stopDuration = Double.NaN;// seconds
@@ -195,6 +164,11 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	@NotNull
 	private OperationalScheme operationalScheme = OperationalScheme.door2door;
 
+	@SuppressWarnings("deprecation")
+	public static DrtConfigGroup get(Config config) {
+		return (DrtConfigGroup) config.getModule(GROUP_NAME);
+	}
+
 	@PositiveOrZero // used only for stopbased DRT scheme
 	private double maxWalkDistance = 0;// [m];
 
@@ -219,6 +193,11 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 
 	public enum OperationalScheme {
 		stopbased, door2door
+	}
+
+	@StringGetter(DRT_SERVICE_INTEPRETATION)
+	public static String getDrtServiceIntepretation() {
+		return DRT_SERVICE_INTEPRETATION;
 	}
 
 	public DrtConfigGroup() {
@@ -293,6 +272,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		map.put(PRINT_WARNINGS, PRINT_WARNINGS_EXP);
 		map.put(REQUEST_REJECTION, REQUEST_REJECTION_EXP);
 		map.put(DRT_SERVICE_AREA_FILENAME, DRT_SERVICE_AREA_FILE_EXP ) ;
+		map.put(DRT_SERVICE_INTEPRETATION, DRT_SERVICE_INTEPRETATION_EXP);
 		return map;
 	}
 
@@ -359,6 +339,22 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	@StringSetter(MAX_WAIT_TIME)
 	public void setMaxWaitTime(double maxWaitTime) {
 		this.maxWaitTime = maxWaitTime;
+	}
+
+	/**
+	 * @return {@link #DRT_SERVICE_AREA_FILE_EXP}
+	 */
+	@StringGetter(DRT_SERVICE_AREA_FILENAME)
+	public String getDrtServiceAreaShapeFile() {
+		return drtServiceAreaShapeFile;
+	}
+
+	/**
+	 * @param getDrtServiceAreaShapeFile -- {@link #DRT_SERVICE_AREA_FILE_EXP}
+	 */
+	@StringSetter(DRT_SERVICE_AREA_FILENAME)
+	public void setDrtServiceAreaShapeFile(String getDrtServiceAreaShapeFile) {
+		this.drtServiceAreaShapeFile = getDrtServiceAreaShapeFile;
 	}
 
 	/**
@@ -480,6 +476,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		this.operationalScheme = operationalScheme;
 	}
 
+
 	/**
 	 * @return -- {@value #TRANSIT_STOP_FILE_EXP}
 	 */
@@ -597,6 +594,15 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	@StringSetter(PRINT_WARNINGS)
 	public void setPrintDetailedWarnings(boolean printDetailedWarnings) {
 		this.printDetailedWarnings = printDetailedWarnings;
+	}
+
+	@StringSetter(DRT_SERVICE_INTEPRETATION)
+	public void setServiceAreaInterpretation(ServiceAreaInterpretation serviceAreaInterpretation) {
+		this.serviceAreaInterpretation = serviceAreaInterpretation;
+	}
+
+	public enum ServiceAreaInterpretation {
+		ignore, reject, walkToFromServiceArea
 	}
 
 	/**
