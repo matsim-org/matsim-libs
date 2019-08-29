@@ -22,8 +22,6 @@ package org.matsim.contrib.taxi.run;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Objects;
-import java.util.function.Function;
 
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
@@ -33,7 +31,10 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
-import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
+import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.fifo.FifoTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.zonal.ZonalTaxiOptimizerParams;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -150,16 +151,10 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 
 	private boolean printDetailedWarnings = true;
 
-	private final Function<String, AbstractTaxiOptimizerParams> taxiOptimizerParamsCreator;
 	private AbstractTaxiOptimizerParams taxiOptimizerParams;
 
 	public TaxiConfigGroup() {
-		this(DefaultTaxiOptimizerProvider::createParameterSet);
-	}
-
-	public TaxiConfigGroup(Function<String, AbstractTaxiOptimizerParams> taxiOptimizerParamsCreator) {
 		super(GROUP_NAME);
-		this.taxiOptimizerParamsCreator = taxiOptimizerParamsCreator;
 	}
 
 	@Override
@@ -413,8 +408,22 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 
 	@Override
 	public ConfigGroup createParameterSet(String type) {
-		return Objects.requireNonNull(taxiOptimizerParamsCreator.apply(type),
-				"Unable to create a parameter set of type: " + type);
+		switch (type) {
+			case AssignmentTaxiOptimizerParams.SET_NAME:
+				return new AssignmentTaxiOptimizerParams();
+			case FifoTaxiOptimizerParams.SET_NAME:
+				return new FifoTaxiOptimizerParams();
+			case RuleBasedTaxiOptimizerParams.SET_NAME:
+				return new RuleBasedTaxiOptimizerParams();
+			case ZonalTaxiOptimizerParams.SET_NAME:
+				return new ZonalTaxiOptimizerParams();
+			default:
+				try {
+					return (AbstractTaxiOptimizerParams)Class.forName(type).getDeclaredConstructor().newInstance();
+				} catch (ReflectiveOperationException e) {
+					throw new RuntimeException("Cannot instantiate taxi optimizer parameter set of type: " + type, e);
+				}
+		}
 	}
 
 	@Override
