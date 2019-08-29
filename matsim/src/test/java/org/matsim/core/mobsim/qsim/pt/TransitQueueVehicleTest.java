@@ -22,10 +22,7 @@ package org.matsim.core.mobsim.qsim.pt;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleImpl;
-import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.*;
 
 /**
  * @author mrieser
@@ -45,8 +42,8 @@ public class TransitQueueVehicleTest extends AbstractTransitVehicleTest {
 		capacity.setSeats(Integer.valueOf(5));
 		carType.setCapacity(capacity);
 		busType.setCapacity(capacity);
-		Vehicle car = new VehicleImpl(Id.create(1976, Vehicle.class), carType);
-		Vehicle bus = new VehicleImpl(Id.create(1976, Vehicle.class), busType);
+		Vehicle car = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), carType );
+		Vehicle bus = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), busType );
 		TransitQVehicle veh = new TransitQVehicle(car);
 		assertEquals(1.0, veh.getSizeInEquivalents(), MatsimTestCase.EPSILON);
 		veh = new TransitQVehicle(bus);

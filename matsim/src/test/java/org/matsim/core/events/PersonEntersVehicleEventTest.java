@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
  * @author mrieser
@@ -37,7 +37,7 @@ public class PersonEntersVehicleEventTest extends MatsimTestCase {
 	public void testReadWriteXml() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		VehicleType vehicleType = new VehicleType(Id.create("testVehType", VehicleType.class ));
-		Vehicle vehicle = new VehicleImpl(Id.create(80, Vehicle.class), vehicleType);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(80, Vehicle.class ), vehicleType );
 		PersonEntersVehicleEvent event = new PersonEntersVehicleEvent(5.0 * 3600 + 11.0 * 60, person.getId(), vehicle.getId());
 		PersonEntersVehicleEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event);
 		assertEquals("wrong time of event.", 5.0 * 3600 + 11.0 * 60, event2.getTime(), EPSILON);

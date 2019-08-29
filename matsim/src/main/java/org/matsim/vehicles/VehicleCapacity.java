@@ -26,7 +26,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 /**
  * @author dgrether
  */
-public class VehicleCapacity implements Attributable {
+public final class VehicleCapacity implements Attributable {
 	// yyyy maybe at least these subtypes should be immutable?
 
 	private Integer seats = 1; // one seat for the driver

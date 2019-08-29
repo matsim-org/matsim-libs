@@ -27,10 +27,7 @@ import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.fakes.FakePassengerAgent;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleImpl;
-import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.*;
 
 
 /**
@@ -48,7 +45,7 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 		capacity.setSeats(Integer.valueOf(5));
 		capacity.setStandingRoom(Integer.valueOf(2));
 		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 		TransitVehicle veh = createTransitVehicle(vehicle);
 		assertEquals(vehicle, veh.getVehicle());
 		assertEquals(7, veh.getPassengerCapacity());
@@ -59,7 +56,7 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 		VehicleCapacity capacity = new VehicleCapacity();
 		capacity.setSeats(Integer.valueOf(4));
 		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 		TransitVehicle veh = createTransitVehicle(vehicle);
 		assertEquals(vehicle, veh.getVehicle());
 		assertEquals(4, veh.getPassengerCapacity());
@@ -67,7 +64,7 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 
 	public void testInitialization_NoCapacity() {
 		VehicleType vehType = new VehicleType(Id.create("busType", VehicleType.class ));
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 		try {
 			createTransitVehicle(vehicle);
 			fail("missing exception.");
@@ -82,7 +79,7 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 		VehicleCapacity capacity = new VehicleCapacity();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 		TransitVehicle veh = createTransitVehicle(vehicle);
 		ArrayList<PTPassengerAgent> passengers = new ArrayList<PTPassengerAgent>(veh.getPassengerCapacity());
 		for (int i = 0; i < veh.getPassengerCapacity(); i++) {
@@ -104,7 +101,7 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 		VehicleCapacity capacity = new VehicleCapacity();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 		TransitVehicle veh = createTransitVehicle(vehicle);
 
 		PTPassengerAgent passenger1 = new FakePassengerAgent(null);

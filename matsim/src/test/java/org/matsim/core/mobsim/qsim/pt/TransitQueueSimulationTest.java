@@ -81,12 +81,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleImpl;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesFactory;
+import org.matsim.vehicles.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -565,7 +560,8 @@ public class TransitQueueSimulationTest {
                     capacity.setStandingRoom(0);
                     vehicleType.setCapacity(capacity);
 
-                    TransitQVehicle veh = new TransitQVehicle(new VehicleImpl(Id.create(TestHandleStopSimulation.this.driver.getId(), Vehicle.class), vehicleType));
+                    TransitQVehicle veh = new TransitQVehicle(
+				    VehicleUtils.createVehicle(Id.create(TestHandleStopSimulation.this.driver.getId(), Vehicle.class ), vehicleType ) );
                     veh.setDriver(TestHandleStopSimulation.this.driver);
                     veh.setStopHandler(new SimpleTransitStopHandler());
                     TestHandleStopSimulation.this.driver.setVehicle(veh);

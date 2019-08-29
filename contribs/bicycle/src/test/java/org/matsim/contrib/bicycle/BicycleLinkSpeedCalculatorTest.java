@@ -10,8 +10,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 import java.util.UUID;
 
@@ -36,7 +36,7 @@ public class BicycleLinkSpeedCalculatorTest {
         Link link = createLinkWithNoGradientAndNoSpecialSurface();
         VehicleType type = new VehicleType(Id.create("no-bike", VehicleType.class));
         type.setMaximumVelocity(link.getFreespeed() / 2); // less than the link's freespeed
-        QVehicle vehicle = new QVehicleImpl(new VehicleImpl(Id.createVehicleId(1), type));
+        QVehicle vehicle = new QVehicleImpl( VehicleUtils.createVehicle(Id.createVehicleId(1 ), type ) );
         BicycleLinkSpeedCalculator calculator = new BicycleLinkSpeedCalculator(configGroup);
 
         double speed = calculator.getMaximumVelocity(vehicle, link, 1);
@@ -49,7 +49,7 @@ public class BicycleLinkSpeedCalculatorTest {
         Link link = createLinkWithNoGradientAndNoSpecialSurface();
         VehicleType type = new VehicleType(Id.create("no-bike", VehicleType.class));
         type.setMaximumVelocity(link.getFreespeed() * 10); // more than the link's freespeed
-        QVehicle vehicle = new QVehicleImpl(new VehicleImpl(Id.createVehicleId(1), type));
+        QVehicle vehicle = new QVehicleImpl( VehicleUtils.createVehicle(Id.createVehicleId(1 ), type ) );
         BicycleLinkSpeedCalculator calculator = new BicycleLinkSpeedCalculator(configGroup);
 
         double speed = calculator.getMaximumVelocity(vehicle, link, 1);
@@ -63,7 +63,7 @@ public class BicycleLinkSpeedCalculatorTest {
         Link link = createLinkWithNoGradientAndNoSpecialSurface();
         VehicleType type = new VehicleType(Id.create("bike", VehicleType.class));
         type.setMaximumVelocity(1000); // more than in the config group
-        QVehicle vehicle = new QVehicleImpl(new VehicleImpl(Id.createVehicleId(1), type));
+        QVehicle vehicle = new QVehicleImpl( VehicleUtils.createVehicle(Id.createVehicleId(1 ), type ) );
         BicycleLinkSpeedCalculator calculator = new BicycleLinkSpeedCalculator(configGroup);
 
         double speed = calculator.getMaximumVelocity(vehicle, link, 1);
@@ -78,7 +78,7 @@ public class BicycleLinkSpeedCalculatorTest {
         link.setFreespeed(configGroup.getMaxBicycleSpeedForRouting() * 0.5); // the freespeed should be less than the assumed bike speed
         VehicleType type = new VehicleType(Id.create("bike", VehicleType.class));
         type.setMaximumVelocity(link.getFreespeed() * 2);
-        QVehicle vehicle = new QVehicleImpl(new VehicleImpl(Id.createVehicleId(1), type));
+        QVehicle vehicle = new QVehicleImpl( VehicleUtils.createVehicle(Id.createVehicleId(1 ), type ) );
         BicycleLinkSpeedCalculator calculator = new BicycleLinkSpeedCalculator(configGroup);
 
         double speed = calculator.getMaximumVelocity(vehicle, link, 1);

@@ -129,6 +129,7 @@ public class CarrierVehicle implements Vehicle {
 		return vehicleId + " stationed at " + locationId;
 	}
 
+	@Override
 	public VehicleType getType() {
 		return vehicleType;
 	}

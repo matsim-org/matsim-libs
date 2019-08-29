@@ -20,14 +20,13 @@
 package org.matsim.vehicles;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.vehicles.EngineInformation.FuelType;
 
 /**
  * deliberately non-public since there is an interface.  kai, nov'11
  * 
  * @author dgrether
  */
-class VehiclesFactoryImpl implements VehiclesFactory {
+final class VehiclesFactoryImpl implements VehiclesFactory {
 	// The design is roughly as follows:
 	// * VehicleType and its sub-types VehicleCapacity and CostInformation are no longer behind interfaces.  They are so "small" that we will assume that
 	// we will never optimize them.  Which means that they can also be instantiated directly; the methods here are there for historical reasons and for
@@ -45,7 +44,7 @@ class VehiclesFactoryImpl implements VehiclesFactory {
 
 	@Override
 	public Vehicle createVehicle(Id<Vehicle> id, VehicleType type) {
-		return new VehicleImpl(id, type);
+		return VehicleUtils.createVehicle(id, type );
 	}
 	
 	@Override

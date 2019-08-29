@@ -36,7 +36,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
  * It can easy pointed to the current version of VehicleReader (which is now V2)
  * @author kturner
  */
-public class MatsimVehicleWriter extends MatsimXmlWriter {
+public final class MatsimVehicleWriter extends MatsimXmlWriter {
   
 	private static final Logger log = Logger.getLogger(MatsimVehicleWriter.class);
 

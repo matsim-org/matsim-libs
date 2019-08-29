@@ -32,7 +32,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  * @author dgrether
  * @author jwjoubert
  */
-class VehiclesImpl implements Vehicles {
+final class VehiclesImpl implements Vehicles {
 	private final Map<Id<VehicleType>, VehicleType> vehicleTypes;
 	private final LinkedHashMap<Id<Vehicle>, Vehicle> vehicles;
 	private final VehiclesFactoryImpl builder;

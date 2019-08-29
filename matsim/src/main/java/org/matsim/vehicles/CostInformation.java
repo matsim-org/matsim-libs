@@ -20,7 +20,7 @@ package org.matsim.vehicles;
 
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
-public class CostInformation{
+public final class CostInformation{
 	// yyyy maybe at least these subtypes should be immutable?  kai, aug'19
 
     private final Double fixed;

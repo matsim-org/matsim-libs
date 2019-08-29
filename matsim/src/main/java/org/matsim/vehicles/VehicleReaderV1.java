@@ -7,7 +7,7 @@ import org.xml.sax.Attributes;
 
 import java.util.Stack;
 
-class VehicleReaderV1 extends MatsimXmlParser{
+final class VehicleReaderV1 extends MatsimXmlParser{
 	private static final Logger log = Logger.getLogger(VehicleReaderV1.class) ;
 
 	private final Vehicles vehicles;

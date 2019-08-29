@@ -33,7 +33,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * @author nagel
  *
  */
-public class VehicleUtils {
+public final class VehicleUtils {
 	private static final Logger log = Logger.getLogger( VehicleUtils.class ) ;
 
 	private static final VehicleType DEFAULT_VEHICLE_TYPE = VehicleUtils.getFactory().createVehicleType(Id.create("defaultVehicleType", VehicleType.class));
@@ -284,6 +284,10 @@ public class VehicleUtils {
 
 	public static void setCostsPerSecondInService(CostInformation costInformation, double costsPerSecond) {
 		costInformation.getAttributes().putAttribute(COST_PER_SECOND_INSERVICE, costsPerSecond);
+	}
+
+	public static VehicleImpl createVehicle( Id<Vehicle> id , VehicleType type ){
+		return new VehicleImpl( id , type );
 	}
 
 	public enum DoorOperationMode{ serial, parallel }

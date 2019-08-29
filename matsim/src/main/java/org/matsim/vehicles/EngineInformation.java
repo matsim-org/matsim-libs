@@ -25,7 +25,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 /**
  * @author dgrether
  */
-public class EngineInformation implements Attributable {
+public final class EngineInformation implements Attributable {
 	// yyyy maybe these subtypes should be immutable?
 
 	private FuelType fuelType;

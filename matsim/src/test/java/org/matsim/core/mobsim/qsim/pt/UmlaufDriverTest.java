@@ -55,10 +55,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleImpl;
-import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -128,7 +125,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		VehicleCapacity capacity = new VehicleCapacity();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		driver.setVehicle(queueVehicle);
 		driver.endActivityAndComputeNextState(0);
@@ -226,7 +223,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		VehicleCapacity capacity = new VehicleCapacity();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
@@ -269,7 +266,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		VehicleCapacity capacity = new VehicleCapacity();
 		capacity.setSeats(Integer.valueOf(4));
 		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
@@ -347,7 +344,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		VehicleCapacity capacity = new VehicleCapacity();
 		capacity.setSeats(5);
 		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
@@ -411,7 +408,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		VehicleCapacity capacity = new VehicleCapacity();
 		capacity.setSeats(5);
 		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
@@ -454,7 +451,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		VehicleCapacity capacity = new VehicleCapacity();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
@@ -508,7 +505,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		VehicleCapacity capacity = new VehicleCapacity();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
@@ -561,7 +558,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		VehicleCapacity capacity = new VehicleCapacity();
 		capacity.setSeats(5);
 		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
+		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);

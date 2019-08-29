@@ -67,10 +67,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleImpl;
-import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.*;
 
 import junit.framework.TestCase;
 
@@ -1096,7 +1093,7 @@ public class TransitQueueNetworkTest extends TestCase {
             vehicleType.setCapacity(capacity);
 
             FakeTransitDriver tDriver = new FakeTransitDriver(tLine, tRoute, dep, tracker, transitEngine );
-            this.transitVehicle = new TransitQVehicle(new VehicleImpl(Id.create(tDriver.getId(), Vehicle.class), vehicleType));
+            this.transitVehicle = new TransitQVehicle( VehicleUtils.createVehicle(Id.create(tDriver.getId(), Vehicle.class ), vehicleType ) );
 
 //            this.qlink1.addParkedVehicle(this.transitVehicle);
             ((QNetsimEngine)this.simEngine).addParkedVehicle(this.transitVehicle, this.qlink1.getLink().getId()) ;
@@ -1110,7 +1107,7 @@ public class TransitQueueNetworkTest extends TestCase {
             this.qsim.internalInterface.arrangeNextAgentState(tDriver) ;
             // (not great, but is a test. kai, dec'11)
 
-            this.normalVehicle = new QVehicleImpl(new VehicleImpl(Id.create("2", Vehicle.class), vehicleType));
+            this.normalVehicle = new QVehicleImpl( VehicleUtils.createVehicle(Id.create("2", Vehicle.class ), vehicleType ) );
 //            this.qlink1.addParkedVehicle(this.normalVehicle);
             ((QNetsimEngine)this.simEngine).addParkedVehicle(this.normalVehicle, this.qlink1.getLink().getId()) ;
 
@@ -1124,7 +1121,7 @@ public class TransitQueueNetworkTest extends TestCase {
             if (stop2 != null) {
                 /* we're testing two stops. Add another normal vehicle with 20 seconds delay,
                      * that *could* overtake a transit vehicle at its second stop. */
-                this.normalVehicle2 = new QVehicleImpl(new VehicleImpl(Id.create("3", Vehicle.class), vehicleType));
+                this.normalVehicle2 = new QVehicleImpl( VehicleUtils.createVehicle(Id.create("3", Vehicle.class ), vehicleType ) );
 //                this.qlink1.addParkedVehicle(this.normalVehicle2);
                 ((QNetsimEngine)this.simEngine).addParkedVehicle(this.normalVehicle2, this.qlink1.getLink().getId()) ;
 
