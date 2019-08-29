@@ -36,7 +36,7 @@ final class NoiseComputationModule extends AbstractModule {
 
 		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(this.getConfig(), NoiseConfigGroup.class);
 
-//		this.bind(NoiseContext.class).in( Singleton.class ); // makes the test fail
+//		this.bind(NoiseContext.class).in( Singleton.class ); // makes some tests fail
 		this.bind(NoiseContext.class) ;
 
 
@@ -44,18 +44,18 @@ final class NoiseComputationModule extends AbstractModule {
 		this.addEventHandlerBinding().to(NoiseTimeTracker.class);
 		
 		if (noiseParameters.isUseActualSpeedLevel()) {
-//			this.bind(LinkSpeedCalculation.class).asEagerSingleton(); // not needed
+			this.bind(LinkSpeedCalculation.class).in( Singleton.class ) ;
 			this.addEventHandlerBinding().to(LinkSpeedCalculation.class);
 		}
 		
 		if (noiseParameters.isComputePopulationUnits()) {
-//			this.bind(PersonActivityTracker.class).in( Singleton.class ) ; // not needed
+			this.bind(PersonActivityTracker.class).in( Singleton.class ) ;
 			this.addEventHandlerBinding().to(PersonActivityTracker.class);
 		}
 				
 		if (noiseParameters.isInternalizeNoiseDamages()) {
 
-//			this.bind(NoisePricingHandler.class).asEagerSingleton(); // not needed
+			this.bind(NoisePricingHandler.class).in( Singleton.class ) ;
 			this.addEventHandlerBinding().to(NoisePricingHandler.class);
 
 			log.info("Internalizing noise damages. This requires that the default travel disutility is replaced by a travel distuility which accounts for noise tolls.");
