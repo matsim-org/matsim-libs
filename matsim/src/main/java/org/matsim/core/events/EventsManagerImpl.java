@@ -20,15 +20,6 @@
 
 package org.matsim.core.events;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -65,6 +56,15 @@ import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityE
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * EventHandling
  * <ol>
@@ -87,9 +87,9 @@ public final class EventsManagerImpl implements EventsManager {
 	static private class HandlerData {
 
 		protected Class<?> eventklass;
-		protected ArrayList<EventHandler> handlerList = new ArrayList<EventHandler>(5);
+		protected ArrayList<EventHandler> handlerList = new ArrayList<>(5);
 		protected Method method;
-		protected HandlerData(final Class<?> eventklass, final Method method) {
+		HandlerData(final Class<?> eventklass, final Method method) {
 			this.eventklass = eventklass;
 			this.method = method;
 		}
@@ -99,20 +99,20 @@ public final class EventsManagerImpl implements EventsManager {
 	}
 
 	static private class HandlerInfo {
-		protected final Class<?> eventClass;
-		protected final EventHandler eventHandler;
+		final Class<?> eventClass;
+		final EventHandler eventHandler;
 		protected final Method method;
 
-		protected HandlerInfo(final Class<?> eventClass, final EventHandler eventHandler, final Method method) {
+		HandlerInfo(final Class<?> eventClass, final EventHandler eventHandler, final Method method) {
 			this.eventClass = eventClass;
 			this.eventHandler = eventHandler;
 			this.method = method;
 		}
 	}
 
-	private final List<HandlerData> handlerData = new ArrayList<HandlerData>();
+	private final List<HandlerData> handlerData = new ArrayList<>();
 
-	private final Map<Class<?>, HandlerInfo[]> cacheHandlers = new ConcurrentHashMap<Class<?>, HandlerInfo[]>(15);
+	private final Map<Class<?>, HandlerInfo[]> cacheHandlers = new ConcurrentHashMap<>(15);
 
 	private long counter = 0;
 	private long nextCounterMsg = 1;
@@ -140,7 +140,7 @@ public final class EventsManagerImpl implements EventsManager {
 
 	@Override
 	public void addHandler (final EventHandler handler) {
-		Set<Class<?>> addedHandlers = new HashSet<Class<?>>();
+		Set<Class<?>> addedHandlers = new HashSet<>();
 		Class<?> test = handler.getClass();
 		log.info("adding Event-Handler: " + test.getName());
 		while (test != Object.class) {
@@ -167,11 +167,16 @@ public final class EventsManagerImpl implements EventsManager {
 	}
 
 	@Override
+	public void setIteration(int iteration) {
+		this.iteration = iteration;
+	}
+
+	@Override
 	public void resetHandlers(final int iteration) {
 		log.info("resetting Event-Handlers");
 		this.counter = 0;
 		this.nextCounterMsg = 1;
-		Set<EventHandler> resetHandlers = new HashSet<EventHandler>();
+		Set<EventHandler> resetHandlers = new HashSet<>();
 		for (HandlerData handlerdata : this.handlerData) {
 			for (EventHandler handler : handlerdata.handlerList) {
 				if (!resetHandlers.contains(handler)) {
@@ -195,7 +200,6 @@ public final class EventsManagerImpl implements EventsManager {
 
 	@Override
 	public void finishProcessing() {
-		iteration += 1;
 	}
 
 	private void addHandlerInterfaces(final EventHandler handler, final Class<?> handlerClass) {
@@ -241,7 +245,7 @@ public final class EventsManagerImpl implements EventsManager {
 			return cache;
 		}
 
-		ArrayList<HandlerInfo> info = new ArrayList<HandlerInfo>();
+		ArrayList<HandlerInfo> info = new ArrayList<>();
 		// first search in class-hierarchy
 		while (klass != Object.class) {
 			HandlerData dat = findHandler(klass);
@@ -268,7 +272,7 @@ public final class EventsManagerImpl implements EventsManager {
 	}
 
 	private Set<Class<?>> getAllInterfaces(final Class<?> klass) {
-		Set<Class<?>> intfs = new HashSet<Class<?>>();
+		Set<Class<?>> intfs = new HashSet<>();
 		for (Class<?> intf : klass.getInterfaces()) {
 			intfs.add(intf);
 			intfs.addAll(getAllInterfaces(intf));

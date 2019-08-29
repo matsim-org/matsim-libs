@@ -61,23 +61,28 @@ class SynchronizedEventsManagerImpl implements EventsManager {
 	}
 
 	@Override
+	public void setIteration(int iteration) {
+		this.delegate.setIteration(iteration);
+	}
+
+	@Override
 	public void resetHandlers(int iteration) {
-		delegate.resetHandlers(iteration);
+		this.delegate.resetHandlers(iteration);
 	}
 
 	@Override
 	public void initProcessing() {
-		delegate.initProcessing();
+		this.delegate.initProcessing();
 	}
 
 	@Override
 	public void afterSimStep(double time) {
-		delegate.afterSimStep(time);
+		this.delegate.afterSimStep(time);
 	}
 
 	@Override
 	public void finishProcessing() {
-		delegate.finishProcessing();
+		this.delegate.finishProcessing();
 	}
 
 }

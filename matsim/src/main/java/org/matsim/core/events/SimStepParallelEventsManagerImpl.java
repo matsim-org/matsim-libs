@@ -35,7 +35,6 @@ import java.util.Queue;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -117,7 +116,12 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 		
 		for (EventsManager eventsManager : eventsManagers) eventsManager.removeHandler(handler);
 	}
-	
+
+	@Override
+	public void setIteration(int iteration) {
+		this.iteration = iteration;
+	}
+
 	@Override
 	public void resetHandlers(int iteration) {
 		delegate.resetHandlers(iteration);
@@ -151,11 +155,10 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 		/*
 		 *  Create a Barrier that the threads use to synchronize.
 		 */
-        CyclicBarrier waitForEmptyQueuesBarrier = new CyclicBarrier(this.numOfThreads, processedEventsChecker);
+		CyclicBarrier waitForEmptyQueuesBarrier = new CyclicBarrier(this.numOfThreads, processedEventsChecker);
 		
 		hadException = new AtomicReference<>();
-        ExceptionHandler uncaughtExceptionHandler = new ExceptionHandler(hadException, waitForEmptyQueuesBarrier,
-                simStepEndBarrier, iterationEndBarrier);
+		ExceptionHandler uncaughtExceptionHandler = new ExceptionHandler(hadException, waitForEmptyQueuesBarrier, simStepEndBarrier, iterationEndBarrier);
 		
 		runnables = new ProcessEventsRunnable[numOfThreads];
 		for (int i = 0; i < numOfThreads; i++) {
@@ -174,7 +177,7 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 		 * the EventsProcessingThreads.
 		 */
 		this.parallelMode = true;
-		resetHandlers(iteration);
+		resetHandlers(this.iteration);
 	}
 		
 	/*
@@ -200,7 +203,7 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 			} catch (InterruptedException | BrokenBarrierException e) {
 				this.hadException.set(e);
 			}
-        }
+		}
 		
 		delegate.finishProcessing();
 		for (EventsManager eventsManager : this.eventsManagers) eventsManager.finishProcessing();
@@ -214,8 +217,6 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 		if (throwable != null) {
 			throw new RuntimeException("Exception while processing events. Cannot guarantee that all events have been fully processed.", throwable);
 		}
-
-		iteration += 1;
 	}
 
 	@Override

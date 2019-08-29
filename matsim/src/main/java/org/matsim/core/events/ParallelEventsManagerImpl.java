@@ -20,9 +20,6 @@
 
 package org.matsim.core.events;
 
-import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -30,6 +27,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.handler.EventHandler;
 
 import javax.inject.Inject;
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  *
@@ -90,26 +89,6 @@ public final class ParallelEventsManagerImpl implements EventsManager {
 		init(config.parallelEventHandling().getNumberOfThreads());
 	}
 
-	/**
-	 * @param numberOfThreads
-	 *            - specify the number of threads used for the events handler
-	 */
-	public ParallelEventsManagerImpl(int numberOfThreads) {
-		init(numberOfThreads);
-	}
-
-	/**
-	 *
-	 * @param numberOfThreads
-	 * @param estimatedNumberOfEvents
-	 *            Only use this constructor for larger simulations (20M+
-	 *            events).
-	 */
-	public ParallelEventsManagerImpl(int numberOfThreads, long estimatedNumberOfEvents) {
-		preInputBufferMaxLength = (int) (estimatedNumberOfEvents / 10 );
-		init(numberOfThreads);
-	}
-
 	@Override
 	public void processEvent(final Event event) {
 		if (parallelMode) {
@@ -130,6 +109,11 @@ public final class ParallelEventsManagerImpl implements EventsManager {
 			events[numberOfAddedEventsHandler].addHandler(handler);
 			numberOfAddedEventsHandler = (numberOfAddedEventsHandler + 1) % numberOfThreads;
 		}
+	}
+
+	@Override
+	public void setIteration(int iteration) {
+		this.iteration = iteration;
 	}
 
 	@Override
@@ -205,7 +189,6 @@ public final class ParallelEventsManagerImpl implements EventsManager {
 		if (this.hadException.get()) {
 			throw new RuntimeException("Exception while processing events. Cannot guarantee that all events have been fully processed.");
 		}
-		iteration += 1;
 	}
 
 	// create event handler threads
@@ -232,7 +215,7 @@ public final class ParallelEventsManagerImpl implements EventsManager {
 
 		private final AtomicBoolean hadException;
 
-		public ExceptionHandler(final AtomicBoolean hadException) {
+		ExceptionHandler(final AtomicBoolean hadException) {
 			this.hadException = hadException;
 		}
 

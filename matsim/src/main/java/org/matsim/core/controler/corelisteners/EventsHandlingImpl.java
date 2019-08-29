@@ -20,10 +20,8 @@
 
 package org.matsim.core.controler.corelisteners;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.ControlerConfigGroup;
@@ -39,8 +37,9 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.events.algorithms.EventWriter;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 @Singleton
 final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
@@ -75,6 +74,7 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		eventsManager.setIteration(event.getIteration());
 		final boolean writingEventsAtAll = this.writeEventsInterval > 0;
 		final boolean regularWriteEvents = writingEventsAtAll && ( event.getIteration()>0 && event.getIteration() % writeEventsInterval == 0 ) ;
 		// (w/o the "writingEventsAtAll && ..." this is a division by zero when writeEventsInterval=0. kai, apr'18)

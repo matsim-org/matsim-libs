@@ -29,25 +29,25 @@ import org.matsim.core.mobsim.framework.Steppable;
  */
 public interface EventsManager {
 
-	public void processEvent(final Event event);
+	void processEvent(final Event event);
 
-	public void addHandler(final EventHandler handler);
+	void addHandler(final EventHandler handler);
 	
-	public void removeHandler(final EventHandler handler);
+	void removeHandler(final EventHandler handler);
 
-	public void resetHandlers(int iteration);
+	void resetHandlers(int iteration);
 	
 	/**
 	 * Called before the first event is sent for processing. Allows to initialize internal
 	 * data structures used to process events.
 	 */
-	public void initProcessing();
+	void initProcessing();
 
 	/**
-	 * Called by a {@link Steppable} Mobsim after each {@link doSimStep} call. Parallel implementations
+	 * Called by a {@link Steppable} Mobsim after each {@link Steppable#doSimStep(double)} call. Parallel implementations
 	 * of an EventsManager can then ensure that all events of the sim step have been processed.
 	 */
-	public void afterSimStep(double time);
+	void afterSimStep(double time);
 	
 	/**
 	 * Called after the last event is sent for processing. The method must only return when all
@@ -55,6 +55,7 @@ public interface EventsManager {
 	 * {@link #processEvent(Event)}). Can be used to clean up internal data structures used
 	 * to process events.
 	 */
-	public void finishProcessing();
+	void finishProcessing();
 
+	void setIteration(int iteration);
 }

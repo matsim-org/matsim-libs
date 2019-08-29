@@ -59,7 +59,10 @@ class HandlerToTestEmissionAnalysisModules implements EventsManager {
 
 	@Override
 	public void removeHandler(EventHandler handler) {
+	}
 
+	@Override
+	public void setIteration(int iteration) {
 	}
 
 	@Override

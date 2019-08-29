@@ -20,13 +20,6 @@
 
 package org.matsim.core.events;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -69,6 +62,13 @@ import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityE
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Implementation of an EventsManager that serves exactly one EventHandler.
  * Events that are not handled by that handler are ignored.
@@ -84,7 +84,7 @@ public final class SingleHandlerEventsManager implements EventsManager {
 	 * a) Class is handled the first time, therefore we have to check whether the Handler can handle it (no HandlerInfo object)
 	 * b) Class cannot be handled (HandlerInfo with empty Method field)
 	 */
-	private final Map<Class<?>, HandlerInfo> methodToHandle = new HashMap<Class<?>, HandlerInfo>();
+	private final Map<Class<?>, HandlerInfo> methodToHandle = new HashMap<>();
 
 	private final EventHandler eventHandler;
 	
@@ -114,68 +114,31 @@ public final class SingleHandlerEventsManager implements EventsManager {
 
 	private boolean isActive = true;
 	
-	public SingleHandlerEventsManager(EventHandler eventHandler) {
+	SingleHandlerEventsManager(EventHandler eventHandler) {
 		this.eventHandler = eventHandler;
-		
-		if (this.eventHandler instanceof LinkLeaveEventHandler) this.isLeaveLinkHandler = true;
-		else this.isLeaveLinkHandler = false;
-		
-		if (this.eventHandler instanceof LinkEnterEventHandler) this.isLinkEnterHandler = true;
-		else this.isLinkEnterHandler = false;
 
-		if (this.eventHandler instanceof VehicleEntersTrafficEventHandler) this.isWait2LinkHandler = true;
-		else this.isWait2LinkHandler = false;
-
-		if (this.eventHandler instanceof PersonArrivalEventHandler) this.isPersonArrivalHandler = true;
-		else this.isPersonArrivalHandler = false;
-
-		if (this.eventHandler instanceof PersonDepartureEventHandler) this.isPersonDepatureHandler = true;
-		else this.isPersonDepatureHandler = false;
-
-		if (this.eventHandler instanceof ActivityEndEventHandler) this.isActivityEndHandler = true;
-		else this.isActivityEndHandler = false;
-
-		if (this.eventHandler instanceof ActivityStartEventHandler) this.isActivityStartHandler = true;
-		else this.isActivityStartHandler = false;
-
-		if (this.eventHandler instanceof TeleportationArrivalEventHandler) this.isTeleportationArrivalHandler = true;
-		else this.isTeleportationArrivalHandler = false;
-		
-		if (this.eventHandler instanceof TransitDriverStartsEventHandler) this.isTransitDriverStartsHandler = true;
-		else this.isTransitDriverStartsHandler = false;
-
-		if (this.eventHandler instanceof PersonStuckEventHandler) this.isPersonStuckHandler = true;
-		else this.isPersonStuckHandler = false;
-
-		if (this.eventHandler instanceof PersonMoneyEventHandler) this.isPersonMoneyHandler = true;
-		else this.isPersonMoneyHandler = false;
-
-		if (this.eventHandler instanceof AgentWaitingForPtEventHandler) this.isAgentWaitingForPtHandler = true;
-		else this.isAgentWaitingForPtHandler = false;
-
-		if (this.eventHandler instanceof PersonEntersVehicleEventHandler) this.isPersonEntersVehicleHandler = true;
-		else this.isPersonEntersVehicleHandler = false;
-
-		if (this.eventHandler instanceof PersonLeavesVehicleEventHandler) this.isPersonLeavesVehicleHandler = true;
-		else this.isPersonLeavesVehicleHandler = false;
-
-		if (this.eventHandler instanceof VehicleDepartsAtFacilityEventHandler) this.isVehicleDepartsAtFacilityHandler = true;
-		else this.isVehicleDepartsAtFacilityHandler = false;
-
-		if (this.eventHandler instanceof VehicleArrivesAtFacilityEventHandler) this.isVehicleArrivesAtFacilityHandler = true;
-		else this.isVehicleArrivesAtFacilityHandler = false;
-		
-		if (this.eventHandler instanceof VehicleLeavesTrafficEventHandler) this.isVehicleLeavesTrafficHandler = true;
-		else this.isVehicleLeavesTrafficHandler = false;
-
-		if (this.eventHandler instanceof VehicleAbortsEventHandler) this.isVehicleAbortsHandler = true;
-		else this.isVehicleAbortsHandler = false;
-		
-		if (this.eventHandler instanceof BasicEventHandler) this.isBasicEventHandler = true;
-		else this.isBasicEventHandler = false;
+		this.isLeaveLinkHandler = this.eventHandler instanceof LinkLeaveEventHandler;
+		this.isLinkEnterHandler = this.eventHandler instanceof LinkEnterEventHandler;
+		this.isWait2LinkHandler = this.eventHandler instanceof VehicleEntersTrafficEventHandler;
+		this.isPersonArrivalHandler = this.eventHandler instanceof PersonArrivalEventHandler;
+		this.isPersonDepatureHandler = this.eventHandler instanceof PersonDepartureEventHandler;
+		this.isActivityEndHandler = this.eventHandler instanceof ActivityEndEventHandler;
+		this.isActivityStartHandler = this.eventHandler instanceof ActivityStartEventHandler;
+		this.isTeleportationArrivalHandler = this.eventHandler instanceof TeleportationArrivalEventHandler;
+		this.isTransitDriverStartsHandler = this.eventHandler instanceof TransitDriverStartsEventHandler;
+		this.isPersonStuckHandler = this.eventHandler instanceof PersonStuckEventHandler;
+		this.isPersonMoneyHandler = this.eventHandler instanceof PersonMoneyEventHandler;
+		this.isAgentWaitingForPtHandler = this.eventHandler instanceof AgentWaitingForPtEventHandler;
+		this.isPersonEntersVehicleHandler = this.eventHandler instanceof PersonEntersVehicleEventHandler;
+		this.isPersonLeavesVehicleHandler = this.eventHandler instanceof PersonLeavesVehicleEventHandler;
+		this.isVehicleDepartsAtFacilityHandler = this.eventHandler instanceof VehicleDepartsAtFacilityEventHandler;
+		this.isVehicleArrivesAtFacilityHandler = this.eventHandler instanceof VehicleArrivesAtFacilityEventHandler;
+		this.isVehicleLeavesTrafficHandler = this.eventHandler instanceof VehicleLeavesTrafficEventHandler;
+		this.isVehicleAbortsHandler = this.eventHandler instanceof VehicleAbortsEventHandler;
+		this.isBasicEventHandler = this.eventHandler instanceof BasicEventHandler;
 
 		// identify the implemented Handler Interfaces
-		Set<Class<?>> addedHandlers = new HashSet<Class<?>>();
+		Set<Class<?>> addedHandlers = new HashSet<>();
 		Class<?> test = eventHandler.getClass();
 		log.info("adding Event-Handler: " + test.getName());
 		while (test != Object.class) {
@@ -193,7 +156,7 @@ public final class SingleHandlerEventsManager implements EventsManager {
 	
 	static private class HandlerInfo {
 		protected final Method method;
-		protected HandlerInfo(final Method method) {
+		HandlerInfo(final Method method) {
 			this.method = method;
 		}
 	}
@@ -228,6 +191,11 @@ public final class SingleHandlerEventsManager implements EventsManager {
 	}
 
 	@Override
+	public void setIteration(int iteration) {
+		this.iteration = iteration;
+	}
+
+	@Override
 	public void resetHandlers(final int iteration) {
 		log.info("resetting Event-Handler");
 		this.counter = 0;
@@ -247,7 +215,6 @@ public final class SingleHandlerEventsManager implements EventsManager {
 
 	@Override
 	public void finishProcessing() {
-		iteration += 1;
 	}
 
 	public EventHandler getEventHandler() {
@@ -263,11 +230,7 @@ public final class SingleHandlerEventsManager implements EventsManager {
 		try {
 			Method method = this.getHandlersForClass(event.getClass());
 			if (method != null) method.invoke(this.eventHandler, event);
-		} catch (IllegalArgumentException e) {
-			throw new RuntimeException("problem invoking EventHandler " + this.eventHandler.getClass().getCanonicalName() + " for event-class " + event.getClass().getCanonicalName(), e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException("problem invoking EventHandler " + this.eventHandler.getClass().getCanonicalName() + " for event-class " + event.getClass().getCanonicalName(), e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException("problem invoking EventHandler " + this.eventHandler.getClass().getCanonicalName() + " for event-class " + event.getClass().getCanonicalName(), e);
 		}
 	}
@@ -325,7 +288,7 @@ public final class SingleHandlerEventsManager implements EventsManager {
 	}
 
 	private Set<Class<?>> getAllInterfaces(final Class<?> klass) {
-		Set<Class<?>> intfs = new HashSet<Class<?>>();
+		Set<Class<?>> intfs = new HashSet<>();
 		for (Class<?> intf : klass.getInterfaces()) {
 			intfs.add(intf);
 			intfs.addAll(getAllInterfaces(intf));

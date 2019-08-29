@@ -20,16 +20,6 @@
 
 package org.matsim.core.events;
 
-import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.Phaser;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -39,6 +29,15 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 
 import javax.inject.Inject;
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Phaser;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author cdobler
@@ -155,7 +154,12 @@ public final class ParallelEventsManager implements EventsManager {
 			}
 		}
 	}
-	
+
+	@Override
+	public void setIteration(int iteration) {
+		this.iteration = iteration;
+	}
+
 	@Override
 	public void resetHandlers(int iteration) {
 		this.singleThreadEventsHandler.resetHandlers(iteration);
@@ -232,7 +236,7 @@ public final class ParallelEventsManager implements EventsManager {
 		 * events are created afterwards, e.g. money events by the road pricing contrib.
 		 */
 		this.parallelMode = true;
-		resetHandlers(iteration);
+		resetHandlers(this.iteration);
 	}
 		
 	/*
@@ -271,7 +275,6 @@ public final class ParallelEventsManager implements EventsManager {
 		}
 		
 		this.locked = false;
-		iteration += 1;
 	}
 
 	@Override
@@ -295,7 +298,7 @@ public final class ParallelEventsManager implements EventsManager {
 		private final ProcessEventsRunnable[] runnables;
 		private final BlockingQueue<Event> inputQueue;
 		
-		public Distributor(ProcessEventsRunnable[] runnables) {
+		Distributor(ProcessEventsRunnable[] runnables) {
 			this.runnables = runnables;
 			this.inputQueue = new ArrayBlockingQueue<>(eventsQueueSize);
 		}
@@ -348,8 +351,8 @@ public final class ParallelEventsManager implements EventsManager {
 		private final BlockingQueue<Event[]> eventsQueue;
 		private double lastEventTime = Time.getUndefinedTime();
 
-		public ProcessEventsRunnable(EventsManager eventsManager, ProcessedEventsChecker processedEventsChecker, 
-				Phaser waitForEmptyQueuesBarrier, Phaser simStepEndBarrier, Phaser iterationEndBarrier) {
+		ProcessEventsRunnable(EventsManager eventsManager, ProcessedEventsChecker processedEventsChecker,
+													Phaser waitForEmptyQueuesBarrier, Phaser simStepEndBarrier, Phaser iterationEndBarrier) {
 			this.eventsManager = eventsManager;
 			this.processedEventsChecker = processedEventsChecker;
 			this.waitForEmptyQueuesBarrier = waitForEmptyQueuesBarrier;
@@ -429,7 +432,7 @@ public final class ParallelEventsManager implements EventsManager {
 		private boolean allEventsProcessed;
 		private double time;
 		
-		public ProcessedEventsChecker(EventsManager eventsManager, Queue<Event> eventsQueue) {
+		ProcessedEventsChecker(EventsManager eventsManager, Queue<Event> eventsQueue) {
 			this.eventsManager = eventsManager;
 			this.eventsQueue = eventsQueue;
 			
@@ -440,7 +443,7 @@ public final class ParallelEventsManager implements EventsManager {
 			this.time = time;
 		}
 		
-		public boolean allEventsProcessed() {
+		boolean allEventsProcessed() {
 			return this.allEventsProcessed;
 		}
 		
