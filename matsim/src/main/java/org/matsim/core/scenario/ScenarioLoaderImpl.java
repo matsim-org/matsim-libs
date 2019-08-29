@@ -39,6 +39,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.lanes.LanesReader;
+import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -287,19 +288,33 @@ class ScenarioLoaderImpl {
 		}
 
 		if ( this.config.transit().getTransitLinesAttributesFile() != null ) {
+			if (!this.config.transit().isInsistingOnUsingDeprecatedAttributeFiles()) {
+				throw new RuntimeException(TransitConfigGroup.TRANSIT_ATTRIBUTES_DEPRECATION_MESSAGE);
+			}
+
 			URL transitLinesAttributesFileName = IOUtils.extendUrl(this.config.getContext(), this.config.transit().getTransitLinesAttributesFile());
 			log.info("loading transit lines attributes from " + transitLinesAttributesFileName);
-			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitLinesAttributes());
-			reader.putAttributeConverters( attributeConverters );
-			reader.parse(transitLinesAttributesFileName);
+			parseObjectAttributesToAttributable(
+					transitLinesAttributesFileName,
+					this.scenario.getTransitSchedule().getTransitLines().values(),
+					"transit lines attributes not empty after going through all lines, meaning that it contains material for line IDs that " +
+							"are not in the container.  This is not necessarily a bug so we will continue, but note that such material " +
+							"will no longer be contained in the output_* files.");
 		}
 
 		if ( this.config.transit().getTransitStopsAttributesFile() != null ) {
+			if (!this.config.transit().isInsistingOnUsingDeprecatedAttributeFiles()) {
+				throw new RuntimeException(TransitConfigGroup.TRANSIT_ATTRIBUTES_DEPRECATION_MESSAGE);
+			}
+
 			URL transitStopsAttributesURL = IOUtils.extendUrl(this.config.getContext(), this.config.transit().getTransitStopsAttributesFile());
 			log.info("loading transit stop facilities attributes from " + transitStopsAttributesURL);
-			ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitStopsAttributes());
-			reader.putAttributeConverters( attributeConverters );
-			reader.parse(transitStopsAttributesURL);
+			parseObjectAttributesToAttributable(
+					transitStopsAttributesURL,
+					this.scenario.getTransitSchedule().getFacilities().values(),
+					"transit stops attributes not empty after going through all stops, meaning that it contains material for stop IDs that " +
+							"are not in the container.  This is not necessarily a bug so we will continue, but note that such material " +
+							"will no longer be contained in the output_* files.");
 		}
 	}
 

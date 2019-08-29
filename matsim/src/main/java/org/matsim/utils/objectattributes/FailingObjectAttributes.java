@@ -34,6 +34,20 @@ public class FailingObjectAttributes extends ObjectAttributes{
 		);
 	}
 
+	public static FailingObjectAttributes createTransitStopsAttributes() {
+		return new FailingObjectAttributes(
+				str -> "schedule.getTransitStopsAttributes()." + str + " will be deprecated; use TransitScheduleUtils" +
+						".get/put/...Attribute... instead.  td, aug'19"
+		);
+	}
+
+	public static FailingObjectAttributes createTransitLinesAttributes() {
+		return new FailingObjectAttributes(
+				str -> "schedule.getTransitLinesAttributes()." + str + " will be deprecated; use TransitScheduleUtils" +
+						".get/put/...Attribute... instead.  td, aug'19"
+		);
+	}
+
 	@Override public Object getAttribute( String personId, String key) {
 		throw new RuntimeException( msgFunction.apply("getAttribute"));
 	}

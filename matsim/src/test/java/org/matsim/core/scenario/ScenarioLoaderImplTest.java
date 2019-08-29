@@ -37,6 +37,9 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.households.Household;
 import org.matsim.households.HouseholdUtils;
+import org.matsim.pt.transitSchedule.TransitScheduleUtils;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -99,16 +102,28 @@ public class ScenarioLoaderImplTest {
 	public void testLoadScenario_loadTransitLinesAttributes() {
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(this.util.classInputResourcePath(), "transitConfig.xml"));
 		config.transit().setTransitLinesAttributesFile("transitLinesAttributes.xml");
+		config.transit().setInsistingOnUsingDeprecatedAttributeFiles(true);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Assert.assertEquals("world", scenario.getTransitSchedule().getTransitLinesAttributes().getAttribute("Blue Line", "hello"));
+		Assert.assertEquals(
+				"unexpected attribute value",
+				"world",
+				TransitScheduleUtils.getLineAttribute(
+						scenario.getTransitSchedule().getTransitLines().get(Id.create("Blue Line", TransitLine.class)),
+						"hello"));
 	}
 
 	@Test
 	public void testLoadScenario_loadTransitStopsAttributes() {
 		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(this.util.classInputResourcePath(), "transitConfig.xml"));
 		config.transit().setTransitStopsAttributesFile("transitStopsAttributes.xml");
+		config.transit().setInsistingOnUsingDeprecatedAttributeFiles(true);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Assert.assertEquals(Boolean.TRUE, scenario.getTransitSchedule().getTransitStopsAttributes().getAttribute("1", "hasP+R"));
+		Assert.assertEquals(
+				"unexpected attribute value",
+				Boolean.TRUE,
+				TransitScheduleUtils.getStopFacilityAttribute(
+						scenario.getTransitSchedule().getFacilities().get(Id.create(1, TransitStopFacility.class)),
+						"hasP+R"));
 	}
 
 	@Test
