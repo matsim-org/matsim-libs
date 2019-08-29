@@ -24,7 +24,7 @@
 					<xs:element name="attributes" minOccurs="0">
 						<xs:complexType>
 							<xs:sequence>
-                                <xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"/>
+								<xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"/>
 							</xs:sequence>
 						</xs:complexType>
 					</xs:element>
@@ -67,21 +67,21 @@
 		</xs:complexContent>
 	</xs:complexType>
 
-  <xs:complexType name="capacityType">
-    <xs:sequence>
-      <xs:element name="attributes" minOccurs="0">
-        <xs:complexType>
-          <xs:sequence>
-			  <xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"/>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
-    </xs:sequence>
-    <xs:attribute name="seats" type="xs:nonNegativeInteger"/>
-    <xs:attribute name="standingRoomInPersons" type="xs:nonNegativeInteger"/>
-	  <xs:attribute name="volumeInCubicMeters" type="xs:double"/>
-	  <xs:attribute name="weightInTons" type="xs:double"/>
-  </xs:complexType>
+	<xs:complexType name="capacityType">
+		<xs:sequence>
+			<xs:element name="attributes" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="seats" type="xs:nonNegativeInteger"/>
+		<xs:attribute name="standingRoomInPersons" type="xs:nonNegativeInteger"/>
+		<xs:attribute name="volumeInCubicMeters" type="xs:double"/>
+		<xs:attribute name="weightInTons" type="xs:double"/>
+	</xs:complexType>
 
 	<xs:complexType name="engineInformationType">
 		<xs:sequence>
@@ -96,15 +96,15 @@
 	</xs:complexType>
 
 	<xs:complexType name="costInformationType">
-      <xs:sequence>
-        <xs:element name="attributes" minOccurs="0">
-          <xs:complexType>
-            <xs:sequence>
-				<xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-          </xs:complexType>
-        </xs:element>
-      </xs:sequence>
+		<xs:sequence>
+			<xs:element name="attributes" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
 		<xs:attribute name="fixedCostsPerDay" type="xs:decimal"/>
 		<xs:attribute name="costsPerMeter" type="xs:decimal"/>
 		<xs:attribute name="costsPerSecond" type="xs:decimal"/>

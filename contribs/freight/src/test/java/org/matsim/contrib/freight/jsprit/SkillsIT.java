@@ -108,7 +108,7 @@ public class SkillsIT {
 
 		Carriers carriers = FreightUtils.getCarriers(scenario);
 		{
-			Carrier carrier = CarrierImpl.newInstance(Id.create("TestCarrier", Carrier.class));
+			Carrier carrier = CarrierUtils.createCarrier( Id.create("TestCarrier", Carrier.class));
 			{
 				CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 				capabilitiesBuilder.setFleetSize(CarrierCapabilities.FleetSize.FINITE);

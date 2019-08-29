@@ -13,15 +13,19 @@
 			<attribute name="egressTimeInSecondsPerPerson" class="java.lang.Double">42.42</attribute>
 			<attribute name="doorOperationMode" class="java.lang.String">parallel</attribute>
 		</attributes>
+
 		<description>abc</description>
+
 		<capacity seats="5" standingRoomInPersons="20" volumeInCubicMeters="23.23" weightInTons="9.5">
 			<attributes>
 				<attribute name="freightCapacityInUnits" class="java.lang.Integer">200</attribute>
 			</attributes>
 		</capacity>
+
 		<length meter="9.5" />
 		<width meter="3" />
 		<maximumVelocity meterPerSecond="42" />
+
 		<engineInformation>
 			<attributes>
 				<attribute name="HbefaVehicleCategory" class="java.lang.String">pass. car</attribute>
@@ -30,11 +34,13 @@
 				<attribute name="HbefaEmissionsConcept" class="java.lang.String">EURO-5</attribute>
 			</attributes>
 		</engineInformation>
+
 		<costInformation fixedCostsPerDay="100.00" costsPerMeter="0.15" costsPerSecond="0.08">
 			<attributes>
 				<attribute name="costsPerSecondWaiting" class="java.lang.Double">0.06</attribute>
 			</attributes>
 		</costInformation>
+
 		<passengerCarEquivalents pce="2.0" />
 		<networkMode networkMode = "pt" />
 		<flowEfficiencyFactor factor="1.5" />
