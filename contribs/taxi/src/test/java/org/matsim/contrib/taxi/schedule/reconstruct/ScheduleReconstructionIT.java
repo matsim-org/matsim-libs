@@ -42,6 +42,7 @@ import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
+import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -74,7 +75,7 @@ public class ScheduleReconstructionIT {
 
 	@SuppressWarnings("unchecked")
 	private void runReconstruction(URL configUrl) {
-		Config config = ConfigUtils.loadConfig(configUrl, new TaxiConfigGroup(), new DvrpConfigGroup(),
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setDumpDataAtEnd(false);

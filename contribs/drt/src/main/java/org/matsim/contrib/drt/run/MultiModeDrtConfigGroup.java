@@ -31,6 +31,8 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
+import com.google.common.base.Verify;
+
 /**
  * @author Michal Maciejewski (michalm)
  */
@@ -51,12 +53,8 @@ public final class MultiModeDrtConfigGroup extends ReflectiveConfigGroup impleme
 	@Override
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
-
-		if (DrtConfigGroup.get(config) != null) {
-			throw new RuntimeException(
-					"In the multi-mode DRT setup, DrtConfigGroup must not be defined at the config top level");
-		}
-
+		Verify.verify(DrtConfigGroup.get(config) == null,
+				"In the multi-mode DRT setup, DrtConfigGroup must not be defined at the config top level");
 		MultiModals.requireAllModesUnique(this);
 	}
 

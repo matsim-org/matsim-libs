@@ -39,12 +39,12 @@ public class TaxiControlerCreator {
 	 * @param otfvis
 	 * @return
 	 */
-	public static Controler createControlerWithSingleModeDrt(Config config, boolean otfvis) {
+	public static Controler createControlerWithSingleModeTaxi(Config config, boolean otfvis) {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 
 		controler.addOverridingModule(new DvrpModule());
-		controler.addOverridingModule(new TaxiModule());
+		controler.addOverridingModule(new MultiModeTaxiModule());
 		controler.configureQSimComponents(
 				DvrpQSimComponents.activateModes(TaxiConfigGroup.get(controler.getConfig()).getMode()));
 
