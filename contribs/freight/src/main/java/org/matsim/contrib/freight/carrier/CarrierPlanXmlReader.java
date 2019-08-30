@@ -33,16 +33,46 @@ public class CarrierPlanXmlReader implements MatsimReader {
 
 	@Override
 	public void readFile( String filename ){
-		reader.readFile( filename );
+		try {
+			reader.readFile( filename );
+		} catch (Exception e) {
+			log.warn("### Exception found while trying to read CarrierPlan: Message: " + e.getMessage() + " ; cause: " + e.getCause() + " ; class " + e.getClass());
+			if (e.getCause().getMessage().contains("cvc-elt.1.a")) { // "Cannot find the declaration of element" -> exception comes most probably, because no validation information was found
+					log.warn("read with validation = true failed. Try it again without validation... filename: " + filename);
+					reader.setValidating(false);
+					reader.readFile(filename);
+			} else { //other problem: e.g. validation does not work, because of missing validation file.
+			throw  e;}
+		}
 	}
 
 	@Override
 	public void readURL( URL url ){
-		reader.readURL( url );
+		try {
+			reader.readURL(url);
+		}  catch (Exception e) {
+			log.warn("### Exception found while trying to read CarrierPlan: Message: " + e.getMessage() + " ; cause: " + e.getCause() + " ; class " + e.getClass());
+			if (e.getCause().getMessage().contains("cvc-elt.1.a")) { // "Cannot find the declaration of element" -> exception comes most probably, because no validation information was found
+				log.warn("read with validation = true failed. Try it again without validation... url: " + url.toString());
+			reader.setValidating(false);
+			reader.readURL(url);
+			} else { //other problem: e.g. validation does not work, because of missing validation file.
+				throw  e;}
+		}
 	}
 
 	public void readStream( InputStream inputStream ){
-		reader.parse( inputStream ) ;
+		try {
+			reader.parse( inputStream ) ;
+		} catch (Exception e)
+		{log.warn("### Exception found while trying to read CarrierPlan: Message: " + e.getMessage() + " ; cause: " + e.getCause() + " ; class " + e.getClass());
+			if (e.getCause().getMessage().contains("cvc-elt.1.a")) { // "Cannot find the declaration of element" -> exception comes most probably, because no validation information was found
+				log.warn("read with validation = true failed. Try it again without validation... ");
+			reader.setValidating(false);
+			reader.parse(inputStream);
+			} else { //other problem: e.g. validation does not work, because of missing validation file.
+				throw  e;}
+		}
 	}
 
 	private static final class CarriersPlanReader extends MatsimXmlParser {
@@ -54,7 +84,7 @@ public class CarrierPlanXmlReader implements MatsimReader {
 
 		CarriersPlanReader(Carriers carriers) {
 			this.carriers = carriers ;
-			this.setValidating(false);          //remove later, when having an idea, how to handle "Missing DOCTYPE" Error.
+//			this.setValidating(false);          //remove later, when having an idea, how to handle "Missing DOCTYPE" Error.
 		}
 
 		@Override
