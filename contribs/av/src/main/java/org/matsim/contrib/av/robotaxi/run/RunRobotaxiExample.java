@@ -28,8 +28,9 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
+import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
+import org.matsim.contrib.taxi.run.MultiModeTaxiModule;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -40,7 +41,7 @@ public class RunRobotaxiExample {
 
 	public static void run(URL configUrl, boolean otfvis) {
 		Config config = ConfigUtils.loadConfig(configUrl, new DvrpConfigGroup(), new TaxiFaresConfigGroup(),
-				new OTFVisConfigGroup(), new TaxiConfigGroup());
+				new OTFVisConfigGroup(), new MultiModeTaxiConfigGroup());
 		createControler(config, otfvis).run();
 	}
 
@@ -52,7 +53,7 @@ public class RunRobotaxiExample {
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new TaxiFareModule());
 		controler.addOverridingModule(new DvrpModule());
-		controler.addOverridingModule(new TaxiModule());
+		controler.addOverridingModule(new MultiModeTaxiModule());
 		controler.configureQSimComponents(DvrpQSimComponents.activateModes(mode));
 
 		if (otfvis) {

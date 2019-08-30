@@ -18,7 +18,7 @@
  * *********************************************************************** */
 
 /**
- * 
+ *
  */
 package org.matsim.contrib.av.robotaxi.fares.taxi;
 
@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -65,44 +66,44 @@ public class TaxiFareHandlerTest {
 		tccg.setDistanceFare_m(1.0/1000.0);
 		tccg.setTimeFare_h(36);
 		TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
-		config.addModule(taxiCfg);
+		config.addModule(MultiModeTaxiConfigGroup.of(taxiCfg));
 		final MutableDouble fare = new MutableDouble(0);
 		EventsManager events = EventsUtils.createEventsManager();
         TaxiFareHandler tfh = new TaxiFareHandler(tccg, network, events);
 		events.addHandler(tfh);
 		events.addHandler(new PersonMoneyEventHandler() {
-						
+
 			@Override
 			public void handleEvent(PersonMoneyEvent event) {
 				fare.add(event.getAmount());
-				
+
 			}
 
 			@Override
 			public void reset(int iteration) {}
 		});
 		Id<Person> p1 = Id.createPersonId("p1");
-		Id<Vehicle> t1= Id.createVehicleId("v1"); 
+		Id<Vehicle> t1 = Id.createVehicleId("v1");
 		events.processEvent(new PersonDepartureEvent(0.0, p1 , Id.createLinkId("12"), taxiCfg.getMode()));
 		events.processEvent(new PersonEntersVehicleEvent(60.0, p1 , t1));
 		events.processEvent(new LinkEnterEvent(61,t1,Id.createLinkId("23")));
 		events.processEvent(new PersonArrivalEvent(120.0, p1, Id.createLinkId("23"), taxiCfg.getMode()));
-		
+
 		events.processEvent(new PersonDepartureEvent(180.0, p1 , Id.createLinkId("12"), taxiCfg.getMode()));
 		events.processEvent(new PersonEntersVehicleEvent(240.0, p1 , t1));
 		events.processEvent(new LinkEnterEvent(241,t1,Id.createLinkId("23")));
 		events.processEvent(new PersonArrivalEvent(300.0, p1, Id.createLinkId("23"), taxiCfg.getMode()));
-		
-		//fare: 1 (daily fee) +2*1(basefare)+ 2*1 (distance) + (36/60)*2 = -(1+2+2+0,12) = -6.2 
+
+		//fare: 1 (daily fee) +2*1(basefare)+ 2*1 (distance) + (36/60)*2 = -(1+2+2+0,12) = -6.2
 		Assert.assertEquals(-6.2, fare.getValue(), 0);
-		
-        // test minFarePerTrip
+
+		// test minFarePerTrip
 		events.processEvent(new PersonDepartureEvent(360.0, p1 , Id.createLinkId("23"), taxiCfg.getMode()));
 		events.processEvent(new PersonEntersVehicleEvent(400.0, p1 , t1));
 		events.processEvent(new LinkEnterEvent(401,t1,Id.createLinkId("34")));
 		events.processEvent(new PersonArrivalEvent(410.0, p1, Id.createLinkId("34"), taxiCfg.getMode()));
-		
-        /* 
+
+		/*
          * fare new trip: 0 (daily fee already paid) + 0.1 (distance)+ 1 basefare + 0.1 (time) = 1.2 < minFarePerTrip = 1.5
          * --> new total fare: 6.2 (previous trip) + 1.5 (minFarePerTrip for new trip) = 7.7
          */
@@ -123,7 +124,7 @@ public class TaxiFareHandlerTest {
 		NetworkUtils.createAndAddLink(network, Id.createLinkId(23), n2, n3, 1000.0, 100 , 100 , 1 , "1", "");
 		NetworkUtils.createAndAddLink(network, Id.createLinkId(34), n3, n4, 100.0, 100 , 100 , 1 , "1", "");
 		return network;
-			
+
 	}
-	
+
 }

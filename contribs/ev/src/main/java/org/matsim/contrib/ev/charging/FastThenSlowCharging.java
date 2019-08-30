@@ -32,13 +32,14 @@ import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 
+import com.google.common.base.Preconditions;
+
 public class FastThenSlowCharging implements BatteryCharging {
 	private final ElectricVehicle electricVehicle;
 
 	public FastThenSlowCharging(ElectricVehicle electricVehicle) {
 		this.electricVehicle = electricVehicle;
 	}
-
 
 	public double calcChargingPower(double maxPower) {
 		Battery b = electricVehicle.getBattery();
@@ -53,19 +54,14 @@ public class FastThenSlowCharging implements BatteryCharging {
 		}
 	}
 
-
 	@Override
 	public double calcChargingTime(Charger charger, double energy) {
-		if (energy < 0) {
-			throw new IllegalArgumentException("Energy must be positive");
-		}
+		Preconditions.checkArgument(energy >= 0, "Energy is negative: %s", energy);
 
 		Battery b = electricVehicle.getBattery();
 		double startSoc = b.getSoc();
 		double endSoc = startSoc + energy;
-		if (endSoc > b.getCapacity()) {
-			throw new IllegalArgumentException("End SOC must not be greater than 100%");
-		}
+		Preconditions.checkArgument(endSoc <= b.getCapacity(), "End SOC greater than battery capacity: %s", endSoc);
 
 		double threshold1 = 0.5 * b.getCapacity();
 		double threshold2 = 0.75 * b.getCapacity();
@@ -84,7 +80,6 @@ public class FastThenSlowCharging implements BatteryCharging {
 
 		return timeA + timeB + timeC;
 	}
-
 
 	@Override
 	public double calcChargingPower(Charger charger) {

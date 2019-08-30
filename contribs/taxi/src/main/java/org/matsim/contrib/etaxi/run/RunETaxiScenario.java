@@ -24,7 +24,6 @@ import java.net.URL;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.etaxi.optimizer.ETaxiOptimizerProvider;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.EvModule;
 import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
@@ -38,6 +37,7 @@ import org.matsim.contrib.ev.dvrp.EvDvrpIntegrationModule;
 import org.matsim.contrib.ev.dvrp.OperatingVehicleProvider;
 import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
+import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -50,8 +50,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class RunETaxiScenario {
 	public static void run(URL configUrl, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configUrl,
-				new TaxiConfigGroup(ETaxiOptimizerProvider::createParameterSet), new DvrpConfigGroup(),
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup(), new EvConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		createControler(config, otfvis).run();
@@ -63,7 +62,7 @@ public class RunETaxiScenario {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new ETaxiModule());
+		controler.addOverridingModule(new MultiModeETaxiModule());
 		controler.addOverridingModule(new DvrpModule());
 		controler.addOverridingModule(new EvModule());
 		controler.addOverridingModule(new EvDvrpIntegrationModule());

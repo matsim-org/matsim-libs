@@ -30,8 +30,9 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.dvrp.run.QSimScopeObjectListenerModule;
+import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
+import org.matsim.contrib.taxi.run.MultiModeTaxiModule;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -54,7 +55,7 @@ import com.google.common.collect.ImmutableSet;
  */
 public class RunTaxiBenchmark {
 	public static void run(URL configUrl, int runs) {
-		Config config = ConfigUtils.loadConfig(configUrl, new TaxiConfigGroup(), new DvrpConfigGroup());
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup());
 		createControler(config, runs).run();
 	}
 
@@ -76,7 +77,7 @@ public class RunTaxiBenchmark {
 		controler.addOverridingModule(new DvrpBenchmarkModule());
 		controler.configureQSimComponents(DvrpQSimComponents.activateModes(mode));
 
-		controler.addOverridingModule(new TaxiModule());
+		controler.addOverridingModule(new MultiModeTaxiModule());
 
 		controler.addOverridingModule(QSimScopeObjectListenerModule.builder(TaxiBenchmarkStats.class)
 				.mode(mode)

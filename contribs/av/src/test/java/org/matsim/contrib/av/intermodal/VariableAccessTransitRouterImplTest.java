@@ -16,7 +16,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.av.intermodal.router.FixedDistanceBasedVariableAccessModule;
 import org.matsim.contrib.av.intermodal.router.VariableAccessTransitRouterImpl;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -58,7 +58,7 @@ public class VariableAccessTransitRouterImplTest {
 	@Test
 	public void testCalcRoute() throws MalformedURLException {
 		URL configUrl = new File(utils.getPackageInputDirectory() + "config.xml").toURI().toURL();
-		Config config = ConfigUtils.loadConfig(configUrl, new TaxiConfigGroup());
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup());
 
 		config.plansCalcRoute().setBeelineDistanceFactor(1.3);
 		for (@SuppressWarnings("unused") Double speed : config.plansCalcRoute().getBeelineDistanceFactors().values()) {
@@ -82,7 +82,7 @@ public class VariableAccessTransitRouterImplTest {
 		trConfig.setBeelineWalkSpeed(
 				0.641025641025641); // default value, equals result of default beeline distance factor 1.3 and default walk speed 3.0 km/h
 		// The directWalkFactor can only be set in the TransitRouterConfigGroup, not in the TransitRouterConfig. Assuming the default remains 1.0 .
-		// Check with trConfig.getDirectWalkFactor(); 
+		// Check with trConfig.getDirectWalkFactor();
 
 		PreparedTransitSchedule preparedTransitSchedule = new PreparedTransitSchedule(scenario.getTransitSchedule());
 		TransitRouterNetwork ptRouterNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(),
