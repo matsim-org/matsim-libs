@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.router.StageActivityTypeIdentifier;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.scoring.SumScoringFunction;
 
 /**
