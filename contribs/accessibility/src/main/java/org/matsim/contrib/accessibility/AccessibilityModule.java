@@ -175,12 +175,13 @@ public final class AccessibilityModule extends AbstractModule {
 						calculator = new LeastCostPathCalculatorAccessibilityContributionCalculator(
 								config.planCalcScore(),	ptMatrix.asPathCalculator(config.planCalcScore()), scenario);
 						break;
-						//$CASES-OMITTED$
+					case pt:
+						calculator = new SwissRailRaptorAccessibilityContributionCalculator(mode.name(), config.planCalcScore(), scenario);
+						break;
 					default:
-//						TravelTime timeCalculator = this.travelTimes.get( mode.toString() ) ;
-//						TravelDisutility travelDisutility = this.travelDisutilityFactories.get(mode.toString()).createTravelDisutility(timeCalculator) ;
 						calculator = new TripRouterAccessibilityContributionCalculator(mode.name(), tripRouter, config.planCalcScore(), scenario,
 								travelTimes.get(TransportMode.car), travelDisutilityFactories.get(TransportMode.car));
+
 					}
 					accessibilityShutdownListener.putAccessibilityContributionCalculator(mode.name(), calculator);
 

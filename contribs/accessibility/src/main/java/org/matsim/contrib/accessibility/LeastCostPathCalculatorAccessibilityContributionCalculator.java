@@ -55,7 +55,7 @@ public final class LeastCostPathCalculatorAccessibilityContributionCalculator im
 		double expSum = 0.;
 
 		for (final AggregationObject destination : aggregatedOpportunities.values()) {
-			LeastCostPathCalculator.Path path = leastCostPathCalculator.calcLeastCostPath(fromNode, destination.getNearestNode(), departureTime, null, null);
+			LeastCostPathCalculator.Path path = leastCostPathCalculator.calcLeastCostPath(fromNode, (Node) destination.getNearestNode(), departureTime, null, null);
 			expSum += destination.getSum() * Math.exp(planCalcScoreConfigGroup.getBrainExpBeta() * path.travelCost);
 		}
 		return expSum;

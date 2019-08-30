@@ -74,7 +74,8 @@ public class TripRouterAccessibilityContributionCalculator implements Accessibil
 
 	public TripRouterAccessibilityContributionCalculator(String mode, TripRouter tripRouter, PlanCalcScoreConfigGroup planCalcScoreConfigGroup, Scenario scenario,
 														 TravelTime travelTime, TravelDisutilityFactory travelDisutilityFactory) {
-		this.mode = mode;
+		LOG.warn("This is currently heavliy oriented on the need of car-based computatations. Revise beofre using for other modes!");
+	    this.mode = mode;
 		this.tripRouter = tripRouter;
 		this.planCalcScoreConfigGroup = planCalcScoreConfigGroup;
 		this.scenario = scenario;
