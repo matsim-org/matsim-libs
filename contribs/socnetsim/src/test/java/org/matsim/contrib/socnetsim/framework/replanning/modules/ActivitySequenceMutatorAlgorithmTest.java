@@ -51,7 +51,7 @@ public class ActivitySequenceMutatorAlgorithmTest {
 		final PlanAlgorithm testee =
 			new ActivitySequenceMutatorAlgorithm(
 					new Random( 890 ),
-					StageActivityHandling.IncludeStageActivities );
+					StageActivityHandling.StagesAsNormalActivities );
 		testee.run( plan );
 
 		Assert.assertEquals(
@@ -81,7 +81,7 @@ public class ActivitySequenceMutatorAlgorithmTest {
 		final PlanAlgorithm testee =
 			new ActivitySequenceMutatorAlgorithm(
 					new Random( 890 ),
-					StageActivityHandling.IncludeStageActivities );
+					StageActivityHandling.StagesAsNormalActivities );
 		testee.run( plan );
 
 		Assert.assertEquals(
@@ -105,7 +105,7 @@ public class ActivitySequenceMutatorAlgorithmTest {
 		final PlanAlgorithm testee =
 			new ActivitySequenceMutatorAlgorithm(
 					new Random( 890 ),
-					StageActivityHandling.IncludeStageActivities );
+					StageActivityHandling.StagesAsNormalActivities );
 		testee.run( plan );
 
 		Assert.assertEquals(

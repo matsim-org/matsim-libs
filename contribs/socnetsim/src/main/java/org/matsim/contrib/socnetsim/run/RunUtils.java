@@ -186,7 +186,7 @@ public class RunUtils {
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
-				for (Activity act : TripStructureUtils.getActivities( plan , StageActivityHandling.IncludeStageActivities )) {
+				for (Activity act : TripStructureUtils.getActivities( plan , StageActivityHandling.StagesAsNormalActivities )) {
 					if (act.getCoord() != null) continue;
 					if (act.getLinkId() == null) throw new NullPointerException();
 					act.setCoord(

@@ -50,7 +50,7 @@ import org.matsim.core.gbl.Gbl;
  */
 public class TripStructureUtils {
 	
-	public enum StageActivityHandling { IncludeStageActivities, ExcludeStageActivities };
+	public enum StageActivityHandling { StagesAsNormalActivities, ExcludeStageActivities };
 
 	private TripStructureUtils() {}
 
@@ -89,7 +89,7 @@ public class TripStructureUtils {
 			final Activity act = (Activity) pe;
 
 			switch (stageActivityHandling) {
-			case IncludeStageActivities:
+			case StagesAsNormalActivities:
 				activities.add(act);
 				break;
 			case ExcludeStageActivities:

@@ -51,7 +51,7 @@ public final class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
 	 * @param random
 	 */
 	public PlanMutateTimeAllocationSimplified(final double mutationRange, boolean affectingDuration, final Random random) {
-		this( StageActivityHandling.IncludeStageActivities , mutationRange , affectingDuration, random );
+		this( StageActivityHandling.StagesAsNormalActivities , mutationRange , affectingDuration, random );
 	}
 	/**
 	 * Initializes an instance mutating all non-stage activities in a plan

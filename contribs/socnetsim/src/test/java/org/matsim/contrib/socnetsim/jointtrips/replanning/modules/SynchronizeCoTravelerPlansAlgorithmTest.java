@@ -326,7 +326,7 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 			testee.run( fixture.jointPlan );
 
 			for ( Plan p : fixture.jointPlan.getIndividualPlans().values() ) {
-				for ( Activity activity : TripStructureUtils.getActivities( p , StageActivityHandling.IncludeStageActivities ) ) {
+				for ( Activity activity : TripStructureUtils.getActivities( p , StageActivityHandling.StagesAsNormalActivities ) ) {
 					final Double endTime = fixture.expectedEndTimes.remove( activity );
 					if ( endTime == null ) continue;
 
