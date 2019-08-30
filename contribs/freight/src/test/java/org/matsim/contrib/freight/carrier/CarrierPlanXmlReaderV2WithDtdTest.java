@@ -1,5 +1,6 @@
 package org.matsim.contrib.freight.carrier;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
@@ -24,7 +25,7 @@ public class CarrierPlanXmlReaderV2WithDtdTest extends MatsimTestCase {
 		testCarrier = carriers.getCarriers().get(Id.create("testCarrier", Carrier.class));
 	}
 	
-	@Test
+	@Test @Ignore
 	public void test_whenReadingServices_nuOfServicesIsCorrect(){
 		assertEquals(3,testCarrier.getServices().size());
 	}
@@ -42,7 +43,7 @@ public class CarrierPlanXmlReaderV2WithDtdTest extends MatsimTestCase {
 		assertEquals("heavy",heavy.getVehicleTypeId().toString());
 	}
 	
-	@Test
+	@Test @Ignore
 	public void test_whenReadingCarrier_itReadsVehiclesCorrectly(){
 		Collection<CarrierVehicle> carrierVehicles = testCarrier.getCarrierCapabilities().getCarrierVehicles();
 		assertEquals(3,carrierVehicles.size());
@@ -50,22 +51,22 @@ public class CarrierPlanXmlReaderV2WithDtdTest extends MatsimTestCase {
 				Id.create("mediumVehicle", Vehicle.class),Id.create("heavyVehicle", Vehicle.class)),carrierVehicles));
 	}
 	
-	@Test
+	@Test @Ignore
 	public void test_whenReadingCarrier_itReadsFleetSizeCorrectly(){
 		assertEquals(FleetSize.INFINITE, testCarrier.getCarrierCapabilities().getFleetSize());
 	}
 	
-	@Test
+	@Test @Ignore
 	public void test_whenReadingCarrier_itReadsShipmentsCorrectly(){
 		assertEquals(2, testCarrier.getShipments().size());
 	}
 	
-	@Test
+	@Test @Ignore
 	public void test_whenReadingCarrier_itReadsPlansCorrectly(){
 		assertEquals(3, testCarrier.getPlans().size());
 	}
 	
-	@Test
+	@Test @Ignore
 	public void test_whenReadingCarrier_itSelectsPlansCorrectly(){
 		assertNotNull(testCarrier.getSelectedPlan());
 	}
@@ -78,7 +79,7 @@ public class CarrierPlanXmlReaderV2WithDtdTest extends MatsimTestCase {
 		assertEquals(FleetSize.FINITE, carriers.getCarriers().get(Id.create("testCarrier", Carrier.class)).getCarrierCapabilities().getFleetSize());
 	}
 	
-	@Test
+	@Test @Ignore
 	public void test_whenReadingPlans_nuOfToursIsCorrect(){
 		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
 		assertEquals(1, plans.get(0).getScheduledTours().size());
@@ -86,7 +87,7 @@ public class CarrierPlanXmlReaderV2WithDtdTest extends MatsimTestCase {
 		assertEquals(1, plans.get(2).getScheduledTours().size());
 	}
 	
-	@Test
+	@Test @Ignore
 	public void test_whenReadingToursOfPlan1_nuOfActivitiesIsCorrect(){
 		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
 		CarrierPlan plan1 = plans.get(0);
@@ -102,7 +103,7 @@ public class CarrierPlanXmlReaderV2WithDtdTest extends MatsimTestCase {
 		assertEquals(9,tour1.getTour().getTourElements().size());
 	}
 	
-	@Test
+	@Test @Ignore
 	public void test_whenReadingToursOfPlan3_nuOfActivitiesIsCorrect(){
 		List<CarrierPlan> plans = new ArrayList<CarrierPlan>(testCarrier.getPlans());
 		CarrierPlan plan3 = plans.get(2);
