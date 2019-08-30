@@ -112,6 +112,7 @@ public class TripStructureUtils {
 				plan.getPlanElements());
 	}
 
+	// for contrib socnetsim only
 	@Deprecated
 	public static List<Trip> getTrips(
 			final Plan plan,
@@ -121,43 +122,14 @@ public class TripStructureUtils {
 				stageActivityTypes);
 	}
 
+	@SuppressWarnings("unchecked") // we pass an empty set, it does not matter what type could theoretically be in that empty set
 	public static List<Trip> getTrips(
 			final List<? extends PlanElement> planElements) {
-		final List<Trip> trips = new ArrayList<>();
-
-		int originActivityIndex = -1;
-		int currentIndex = -1;
-		for (PlanElement pe : planElements) {
-			currentIndex++;
-
-			if ( !(pe instanceof Activity) ) continue;
-			final Activity act = (Activity) pe;
-
-			if (StageActivityTypeIdentifier.isStageActivity( act.getType() )) continue;
-			if ( currentIndex - originActivityIndex > 1 ) {
-				// which means, if I am understanding this right, that two activities without a leg in between will not be considered
-				// a trip.  
-
-				trips.add( new Trip(
-						(Activity) planElements.get( originActivityIndex ),
-						// do not back the list by the list in the plan:
-						// according to the documentation, this would result
-						// in an undefined behavior if the full sequence was modified
-						// (for instance by modifying another trip)
-						Collections.unmodifiableList(
-								new ArrayList<>(
-										planElements.subList(
-												originActivityIndex + 1,
-												currentIndex))),
-						act ) );
-			}
-
-			originActivityIndex = currentIndex;
-		}
-
-		return Collections.unmodifiableList( trips );
+		
+		return getTrips(planElements, Collections.EMPTY_SET);
 	}
-	
+
+	// for contrib socnetsim only
 	@Deprecated
 	public static List<Trip> getTrips(
 			final List<? extends PlanElement> planElements,
@@ -233,84 +205,14 @@ public class TripStructureUtils {
 	 * @throws RuntimeException if the Trip sequence has inconsistent location
 	 * sequence
 	 */
+	@SuppressWarnings("unchecked") // we pass an empty set, it does not matter what type could theoretically be in that empty set
 	public static Collection<Subtour> getSubtours(
             final List<? extends PlanElement> planElements) {
-		final List<Subtour> subtours = new ArrayList<>();
 
-		Id<?> destinationId = null;
-		final List<Id<?>> originIds = new ArrayList<>();
-		final List<Trip> trips = getTrips( planElements );
-		final List<Trip> nonAllocatedTrips = new ArrayList<>( trips );
-		for (Trip trip : trips) {
-            final Id<?> originId;
-            //use facilities if available
-		    if (trip.getOriginActivity().getFacilityId()!=null ) {
-		        originId = trip.getOriginActivity().getFacilityId();
-            } else {
-		        originId = trip.getOriginActivity().getLinkId();
-            }
-
-					if ( originId == null ) {
-						throw new NullPointerException( "Both facility id and link id for origin activity "+trip.getOriginActivity()+
-								" are null!" );
-					}
-
-					if (destinationId != null && !originId.equals( destinationId )) {
-						throw new RuntimeException( "unconsistent trip location sequence: "+destinationId+" != "+originId );
-					}
-
-            if (trip.getDestinationActivity().getFacilityId()!=null ) {
-                destinationId = trip.getDestinationActivity().getFacilityId();
-            } else {
-                destinationId = trip.getDestinationActivity().getLinkId();
-            }
-
-							if ( destinationId == null ) {
-								throw new NullPointerException( "Both facility id and link id for destination activity "+trip.getDestinationActivity()+
-										" are null!" );
-							}
-
-							originIds.add( originId );
-
-							if (originIds.contains( destinationId )) {
-								// end of a subtour
-								final int subtourStartIndex = originIds.lastIndexOf( destinationId );
-								final int subtourEndIndex = originIds.size();
-
-								final List<Trip> subtour = new ArrayList<>( trips.subList( subtourStartIndex , subtourEndIndex ) );
-								nonAllocatedTrips.removeAll( subtour );
-
-								// do not consider the locations visited in finished subtours
-								// as possible anchor points
-								for (int i=subtourStartIndex; i < subtourEndIndex; i++) {
-									originIds.set( i , null );
-								}
-
-								addSubtourAndUpdateParents(
-										subtours,
-										new Subtour(
-												subtourStartIndex,
-												subtourEndIndex,
-												subtour,
-												true) );
-							}
-		}
-
-		if (nonAllocatedTrips.size() != 0) {
-			// "open" plan: the root is the sequence of all trips,
-			// even if it is not closed
-			addSubtourAndUpdateParents(
-					subtours,
-					new Subtour(
-							0,
-							trips.size(),
-							new ArrayList<>( trips ),
-							false));
-		}
-
-		return Collections.unmodifiableList( subtours );
+		return getSubtours(planElements, Collections.EMPTY_SET);
 	}
 
+	// for contrib socnetsim only
 	@Deprecated
 	public static Collection<Subtour> getSubtours(
             final Plan plan,
@@ -321,6 +223,7 @@ public class TripStructureUtils {
         );
 	}
 	
+	// for contrib socnetsim only
 	@Deprecated
 	public static Collection<Subtour> getSubtours(
             final List<? extends PlanElement> planElements,
