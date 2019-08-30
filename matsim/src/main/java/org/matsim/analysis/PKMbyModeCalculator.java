@@ -22,11 +22,13 @@ package org.matsim.analysis;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.jfree.chart.axis.CategoryLabelPositions;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.charts.StackedBarChart;
 
@@ -51,8 +53,8 @@ public class PKMbyModeCalculator {
     private final boolean writePng;
     private final OutputDirectoryHierarchy controlerIO;
     private final static char DEL = '\t';
+    private final static String FILENAME = "pkm_modestats";
     private final DecimalFormat df = new DecimalFormat();
-    final String filename = "pkm_ModeStats";
 
 
     @Inject
@@ -61,7 +63,7 @@ public class PKMbyModeCalculator {
         this.controlerIO = controlerIO;
     }
 
-    public void addIteration(int iteration, Map<Id<Person>, Plan> map) {
+    void addIteration(int iteration, Map<Id<Person>, Plan> map) {
         Map<String,Double> pmtbyMode = map.values()
                 .parallelStream()
                 .flatMap(plan -> plan.getPlanElements().stream())
@@ -77,7 +79,7 @@ public class PKMbyModeCalculator {
     }
 
 
-    public void writeOutput() {
+    void writeOutput() {
         writeVKTText();
 
     }
@@ -89,7 +91,7 @@ public class PKMbyModeCalculator {
                 .flatMap(i->i.keySet().stream())
                 .collect(Collectors.toSet()));
 
-        try(CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(controlerIO.getOutputFilename(filename + ".txt"))), CSVFormat.DEFAULT.withDelimiter(DEL))) {
+        try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(controlerIO.getOutputFilename( FILENAME+ ".txt"))), CSVFormat.DEFAULT.withDelimiter(DEL))) {
             csvPrinter.print("Iteration");
             csvPrinter.printRecord(allModes);
 
@@ -113,6 +115,9 @@ public class PKMbyModeCalculator {
             }
 
             StackedBarChart chart = new StackedBarChart("Passenger kilometers traveled per Mode","Iteration","pkm",categories);
+            //rotate x-axis by 90degrees
+            chart.getChart().getCategoryPlot().getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.UP_90);
+
             for (String mode : allModes){
                 double[] value =  pmtPerIteration.values().stream()
                         .mapToDouble(k->k.getOrDefault(mode,0.0)/1000.0)
@@ -120,7 +125,7 @@ public class PKMbyModeCalculator {
                 chart.addSeries(mode, value);
             }
             chart.addMatsimLogo();
-            chart.saveAsPng(controlerIO.getOutputFilename(filename+".png"),1024,768);
+            chart.saveAsPng(controlerIO.getOutputFilename(FILENAME+ ".png"), 1024, 768);
 
         }
 
