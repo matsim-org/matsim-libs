@@ -53,6 +53,7 @@ public class PKMbyModeCalculator {
     private final boolean writePng;
     private final OutputDirectoryHierarchy controlerIO;
     private final static char DEL = '\t';
+    private final static String FILENAME = "pkm_modestats";
     private final DecimalFormat df = new DecimalFormat();
 
 
@@ -90,7 +91,7 @@ public class PKMbyModeCalculator {
                 .flatMap(i->i.keySet().stream())
                 .collect(Collectors.toSet()));
 
-        try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(controlerIO.getOutputFilename(Controler.FILENAME_PKMMODESTATS + ".txt"))), CSVFormat.DEFAULT.withDelimiter(DEL))) {
+        try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(controlerIO.getOutputFilename( FILENAME+ ".txt"))), CSVFormat.DEFAULT.withDelimiter(DEL))) {
             csvPrinter.print("Iteration");
             csvPrinter.printRecord(allModes);
 
@@ -124,7 +125,7 @@ public class PKMbyModeCalculator {
                 chart.addSeries(mode, value);
             }
             chart.addMatsimLogo();
-            chart.saveAsPng(controlerIO.getOutputFilename(Controler.FILENAME_PKMMODESTATS + ".png"), 1024, 768);
+            chart.saveAsPng(controlerIO.getOutputFilename(FILENAME+ ".png"), 1024, 768);
 
         }
 
