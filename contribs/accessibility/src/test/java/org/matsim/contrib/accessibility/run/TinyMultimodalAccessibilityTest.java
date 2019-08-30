@@ -144,7 +144,7 @@ public class TinyMultimodalAccessibilityTest {
 		 * 	|		 |
 		 * (1)------(4)------(7)
 		 * 	|		 |
-		 * 	| (10)---|--(11)---------(12)
+		 * 	| (10)---|--(11)-----(12)
 		 * (3)		(6)------(9)
 		 */
 		double freespeed = 2.7;
@@ -167,7 +167,7 @@ public class TinyMultimodalAccessibilityTest {
 		Node node9 = NetworkUtils.createAndAddNode(network, Id.create(9, Node.class), new Coord((double) 190, (double) 10));
 		Node node10 = NetworkUtils.createAndAddNode(network, Id.create(10, Node.class), new Coord((double) 40, (double) 40));
 		Node node11 = NetworkUtils.createAndAddNode(network, Id.create(11, Node.class), new Coord((double) 140, (double) 40));
-		Node node12 = NetworkUtils.createAndAddNode(network, Id.create(12, Node.class), new Coord((double) 270, (double) 40));
+		Node node12 = NetworkUtils.createAndAddNode(network, Id.create(12, Node.class), new Coord((double) 240, (double) 40));
 
 		Set<String> modes = new HashSet<>();
 		modes.add("car");
