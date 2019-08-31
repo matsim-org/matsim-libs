@@ -66,7 +66,9 @@ public class TaxiFareHandlerTest {
 		tccg.setDistanceFare_m(1.0/1000.0);
 		tccg.setTimeFare_h(36);
 		TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
-		config.addModule(MultiModeTaxiConfigGroup.of(taxiCfg));
+		MultiModeTaxiConfigGroup multiTaxiCfg = new MultiModeTaxiConfigGroup();
+		multiTaxiCfg.addParameterSet(taxiCfg);
+		config.addModule(multiTaxiCfg);
 		final MutableDouble fare = new MutableDouble(0);
 		EventsManager events = EventsUtils.createEventsManager();
         TaxiFareHandler tfh = new TaxiFareHandler(tccg, network, events);
