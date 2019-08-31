@@ -126,7 +126,7 @@ public class RunDrtScenarioBatchH_eDRT_TUB {
 		});
 
 		// controler.addOverridingModule(new ParkingRouterModule());
-		controler.addOverridingModule(new MyDrtTrajectoryAnalysisModule(DrtConfigGroup.get(config)));
+		controler.addOverridingModule(new MyDrtTrajectoryAnalysisModule(DrtConfigGroup.getSingleModeDrtConfig(config)));
 
 		// We finally run the controller to start MATSim
 

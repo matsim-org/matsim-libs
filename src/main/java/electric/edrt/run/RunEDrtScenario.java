@@ -107,7 +107,7 @@ public class RunEDrtScenario {
 	}
 
 	public static Controler createControler(Config config) {
-		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
+		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(config);
 		Controler controler = EDrtControlerCreator.createControler(config, false);
 		controler.addOverridingModule(new TemperatureChangeModule());
 
