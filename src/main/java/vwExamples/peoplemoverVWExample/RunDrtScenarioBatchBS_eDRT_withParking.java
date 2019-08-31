@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.temperature.TemperatureChangeConfigGroup;
@@ -84,7 +85,8 @@ public class RunDrtScenarioBatchBS_eDRT_withParking {
 
         String inbase = "d:\\input\\";
 
-		final Config config = ConfigUtils.loadConfig(inbase + "conf_BS_DRT_10pct_eDRT.xml", new DrtConfigGroup(),
+		final Config config = ConfigUtils.loadConfig(inbase + "conf_BS_DRT_10pct_eDRT.xml",
+				new MultiModeDrtConfigGroup(),
 				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(),
 				new TemperatureChangeConfigGroup());
 

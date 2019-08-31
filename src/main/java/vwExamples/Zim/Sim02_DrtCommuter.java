@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
@@ -102,13 +103,13 @@ public class Sim02_DrtCommuter {
 		String inbase = "D:\\Matsim\\Axer\\Hannover\\ZIM\\";
 
 		// With EV
-//		final Config config = ConfigUtils.loadConfig(inbase + "\\input\\Sim02_CommuterDRT.xml", new DrtConfigGroup(),
+		//		final Config config = ConfigUtils.loadConfig(inbase + "\\input\\Sim02_CommuterDRT.xml", new MultiModeDrtConfigGroup(),
 //				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(),
 //				new TemperatureChangeConfigGroup());
 		//
 		// Without EV
-		 final Config config = ConfigUtils.loadConfig(inbase +
-		 "\\input\\Sim02_CommuterDRT.xml", new DrtConfigGroup(),
+		 final Config config = ConfigUtils.loadConfig(inbase + "\\input\\Sim02_CommuterDRT.xml",
+				 new MultiModeDrtConfigGroup(),
 		 new DvrpConfigGroup(), new OTFVisConfigGroup());
 
 		// With EV

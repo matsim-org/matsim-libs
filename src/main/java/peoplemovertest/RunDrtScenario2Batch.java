@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -51,7 +52,8 @@ public class RunDrtScenario2Batch {
 		for (String Element : strings){
 			//Define the path to the config file and enable / disable otfvis
 			//Basis configuration
-			final Config config = ConfigUtils.loadConfig("D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/config.xml",new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
+			final Config config = ConfigUtils.loadConfig("D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/config.xml",
+					new MultiModeDrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
 			boolean otfvis = false;
 			
 	

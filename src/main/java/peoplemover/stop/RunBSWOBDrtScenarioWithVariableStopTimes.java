@@ -21,6 +21,7 @@ package peoplemover.stop;
 
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -33,8 +34,8 @@ public class RunBSWOBDrtScenarioWithVariableStopTimes {
     private static String inputPath = "D:\\BS_DRT\\input\\";
 
     public static void main(String[] args) {
-        Config config = ConfigUtils.loadConfig(inputPath + "stoptimes-config.xml",
-                new DvrpConfigGroup(), new OTFVisConfigGroup(), new DrtConfigGroup());
+        Config config = ConfigUtils.loadConfig(inputPath + "stoptimes-config.xml", new DvrpConfigGroup(),
+                new OTFVisConfigGroup(), new MultiModeDrtConfigGroup());
         config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
         config.plans().setInputFile("population/vw219_it_1_sampleRate0.1replaceRate_bs_drt.xml.gz");
         config.controler().setLastIteration(1); // Number of simulation iterations

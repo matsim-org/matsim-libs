@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.ev.EvConfigGroup;
@@ -104,7 +105,8 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 
 		String inbase = "D:\\Matsim\\Axer\\Hannover\\K-GERAK\\";
 
-		final Config config = ConfigUtils.loadConfig(inbase + "\\input\\hannover_edrt.xml", new DrtConfigGroup(),
+		final Config config = ConfigUtils.loadConfig(inbase + "\\input\\hannover_edrt.xml",
+				new MultiModeDrtConfigGroup(),
 				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(),
 				new TemperatureChangeConfigGroup());
 

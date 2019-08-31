@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.temperature.TemperatureChangeConfigGroup;
@@ -53,7 +54,8 @@ public class RunDrtScenarioBatchBS_eDRT {
 
         String inbase = "D:\\Matsim\\Axer\\BSWOB2.0_Scenarios\\";
 
-        final Config config = ConfigUtils.loadConfig(inbase + "conf_BS_DRT_100pct_eDRT.xml", new DrtConfigGroup(),
+		final Config config = ConfigUtils.loadConfig(inbase + "conf_BS_DRT_100pct_eDRT.xml",
+				new MultiModeDrtConfigGroup(),
                 new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(), new TemperatureChangeConfigGroup());
 
         TemperatureChangeConfigGroup tcg = (TemperatureChangeConfigGroup) config.getModules().get(TemperatureChangeConfigGroup.GROUP_NAME);

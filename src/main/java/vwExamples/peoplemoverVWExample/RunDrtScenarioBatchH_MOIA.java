@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -78,7 +79,8 @@ public class RunDrtScenarioBatchH_MOIA {
 
 		String inbase = "D:\\Matsim\\Axer\\Hannover\\MOIA\\";
 
-		final Config config = ConfigUtils.loadConfig(inbase + "\\input\\hannover_edrt.xml", new DrtConfigGroup(),
+		final Config config = ConfigUtils.loadConfig(inbase + "\\input\\hannover_edrt.xml",
+				new MultiModeDrtConfigGroup(),
 				new DvrpConfigGroup(), new OTFVisConfigGroup());
 		
 	

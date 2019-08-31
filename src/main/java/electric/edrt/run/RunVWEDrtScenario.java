@@ -22,6 +22,7 @@ package electric.edrt.run;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.av.maxspeed.DvrpTravelTimeWithMaxSpeedLimitModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.edrt.run.EDrtControlerCreator;
@@ -53,7 +54,7 @@ public class RunVWEDrtScenario {
 	private static String inputPath = "D:\\BS_DRT\\input\\";
 
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig(inputPath + "edrt-config.xml", new DrtConfigGroup(),
+		Config config = ConfigUtils.loadConfig(inputPath + "edrt-config.xml", new MultiModeDrtConfigGroup(),
 				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(),
 				new TemperatureChangeConfigGroup());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);

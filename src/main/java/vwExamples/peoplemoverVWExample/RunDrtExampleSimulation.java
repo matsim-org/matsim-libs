@@ -22,6 +22,7 @@ package vwExamples.peoplemoverVWExample;
 
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -38,7 +39,8 @@ public class RunDrtExampleSimulation {
     public static void main(String[] args) {
 
         //Define the path to the config file and enable / disable otfvis
-        final Config config = ConfigUtils.loadConfig("D:/Axer/MatsimDataStore/DAI-Package/config.xml", new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
+		final Config config = ConfigUtils.loadConfig("D:/Axer/MatsimDataStore/DAI-Package/config.xml",
+				new MultiModeDrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
 
         //Disable otfvis visulization interface
         boolean otfvis = false;
