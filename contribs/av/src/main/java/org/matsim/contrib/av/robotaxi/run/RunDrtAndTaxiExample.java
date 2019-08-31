@@ -25,8 +25,8 @@ import java.net.URL;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
-import org.matsim.contrib.drt.run.DrtModule;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
@@ -53,7 +53,7 @@ public class RunDrtAndTaxiExample {
 		config.controler()
 				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DrtModule());
+		controler.addOverridingModule(new MultiModeDrtModule());
 		controler.addOverridingModule(new MultiModeTaxiModule());
 
 		String taxiMode = TaxiConfigGroup.getSingleModeTaxiConfig(controler.getConfig()).getMode();

@@ -68,7 +68,7 @@ public final class DrtControlerCreator {
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new DvrpModule());
-		controler.addOverridingModule(new DrtModule());
+		controler.addOverridingModule(new MultiModeDrtModule());
 		controler.configureQSimComponents(DvrpQSimComponents.activateModes(drtCfg.getMode()));
 
 		if (otfvis) {
