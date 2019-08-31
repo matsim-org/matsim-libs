@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.DrtModule;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
@@ -45,7 +46,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  */
 public class RunDrtAndTaxiExample {
 	public static void run(URL configUrl, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configUrl, new DrtConfigGroup(), new MultiModeTaxiConfigGroup(),
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new MultiModeTaxiConfigGroup(),
 				new DvrpConfigGroup(), new OTFVisConfigGroup());
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
 		ScenarioUtils.loadScenario(scenario);

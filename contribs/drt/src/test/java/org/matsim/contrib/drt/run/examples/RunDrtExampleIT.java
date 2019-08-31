@@ -22,10 +22,12 @@
  */
 package org.matsim.contrib.drt.run.examples;
 
+import java.net.URL;
+
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -34,8 +36,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-
-import java.net.URL;
 
 /**
  * @author jbischoff
@@ -48,7 +48,7 @@ public class RunDrtExampleIT {
 	@Test
 	public void testRunDrtExample() {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_drt_config.xml");
-		Config config = ConfigUtils.loadConfig(configUrl, new DrtConfigGroup(), new DvrpConfigGroup(),
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -59,7 +59,7 @@ public class RunDrtExampleIT {
 	@Test
 	public void testRunDrtStopbasedExample() {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_stop_based_drt_config.xml");
-		Config config = ConfigUtils.loadConfig(configUrl, new DrtConfigGroup(), new DvrpConfigGroup(),
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -72,7 +72,7 @@ public class RunDrtExampleIT {
 	@Ignore
 	public void testRunServiceAreabasedExample() {
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_serviceArea_based_drt_config.xml");
-		Config config = ConfigUtils.loadConfig(configUrl, new DrtConfigGroup(), new DvrpConfigGroup(),
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);

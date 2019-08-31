@@ -31,7 +31,7 @@ import com.google.common.base.Preconditions;
  */
 public class RunDrtScenario {
 	public static void run(String configFile, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configFile, new DrtConfigGroup(), new DvrpConfigGroup(),
+		Config config = ConfigUtils.loadConfig(configFile, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 		DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis).run();
 	}

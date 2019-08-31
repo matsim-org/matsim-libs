@@ -61,7 +61,7 @@ public final class MultiModeDrtConfigGroup extends ReflectiveConfigGroup impleme
 	@Override
 	public ConfigGroup createParameterSet(String type) {
 		if (type.equals(DrtConfigGroup.GROUP_NAME)) {
-			return new DrtConfigGroup();
+			return new MultiModeDrtConfigGroup();
 		}
 		throw new IllegalArgumentException(type);
 	}
