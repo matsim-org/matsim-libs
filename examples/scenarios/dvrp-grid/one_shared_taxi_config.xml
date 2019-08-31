@@ -1,14 +1,16 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
-	<module name="drt">
-		<param name="stopDuration" value="60"/>
-		<param name="maxWaitTime" value="900"/>
-		<param name="maxTravelTimeAlpha" value="1.3"/>
-		<param name="maxTravelTimeBeta" value="600"/>
-		<param name="requestRejection" value="false"/>
-		<param name="vehiclesFile" value="one_shared_taxi_vehicles.xml"/>
-		<param name="changeStartLinkToLastLinkInSchedule" value="true"/>
+	<module name="multiModeDrt">
+		<parameterset type="drt">
+			<param name="stopDuration" value="60"/>
+			<param name="maxWaitTime" value="900"/>
+			<param name="maxTravelTimeAlpha" value="1.3"/>
+			<param name="maxTravelTimeBeta" value="600"/>
+			<param name="requestRejection" value="false"/>
+			<param name="vehiclesFile" value="one_shared_taxi_vehicles.xml"/>
+			<param name="changeStartLinkToLastLinkInSchedule" value="true"/>
+		</parameterset>
 	</module>
 
 	<module name="network">
