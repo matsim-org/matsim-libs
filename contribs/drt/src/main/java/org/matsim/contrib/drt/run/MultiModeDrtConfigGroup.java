@@ -28,7 +28,6 @@ import org.matsim.contrib.dvrp.run.MultiModal;
 import org.matsim.contrib.dvrp.run.MultiModals;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 import com.google.common.base.Verify;
@@ -39,11 +38,12 @@ import com.google.common.base.Verify;
 public final class MultiModeDrtConfigGroup extends ReflectiveConfigGroup implements MultiModal<DrtConfigGroup> {
 	public static final String GROUP_NAME = "multiModeDrt";
 
-	@SuppressWarnings("deprecation")
+	/**
+	 * @param config
+	 * @return MultiModeDrtConfigGroup if exists. Otherwise fails
+	 */
 	public static MultiModeDrtConfigGroup get(Config config) {
-//		return (MultiModeDrtConfigGroup)config.getModule(GROUP_NAME);
-		return ConfigUtils.addOrGetModule( config, MultiModeDrtConfigGroup.class ) ;
-		// yyyy I think that this method should be inlined and then removed to become consistent with how it is done elsewhere.  kai, aug'19
+		return (MultiModeDrtConfigGroup)config.getModule(GROUP_NAME);
 	}
 
 	public MultiModeDrtConfigGroup() {
@@ -53,7 +53,7 @@ public final class MultiModeDrtConfigGroup extends ReflectiveConfigGroup impleme
 	@Override
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
-		Verify.verify(DrtConfigGroup.getSingleModeDrtConfig(config) == null,
+		Verify.verify(config.getModule(DrtConfigGroup.GROUP_NAME) == null,
 				"In the multi-mode DRT setup, DrtConfigGroup must not be defined at the config top level");
 		MultiModals.requireAllModesUnique(this);
 	}
@@ -61,7 +61,7 @@ public final class MultiModeDrtConfigGroup extends ReflectiveConfigGroup impleme
 	@Override
 	public ConfigGroup createParameterSet(String type) {
 		if (type.equals(DrtConfigGroup.GROUP_NAME)) {
-			return new MultiModeDrtConfigGroup();
+			return new DrtConfigGroup();
 		}
 		throw new IllegalArgumentException(type);
 	}

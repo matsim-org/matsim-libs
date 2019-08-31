@@ -39,7 +39,10 @@ public final class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implem
 
 	public static final String GROUP_NAME = "multiModeTaxi";
 
-	@SuppressWarnings("deprecation")
+	/**
+	 * @param config
+	 * @return MultiModeTaxiConfigGroup if exists. Otherwise fails
+	 */
 	public static MultiModeTaxiConfigGroup get(Config config) {
 		return (MultiModeTaxiConfigGroup)config.getModule(GROUP_NAME);
 	}
