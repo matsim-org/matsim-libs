@@ -21,9 +21,10 @@
 package org.matsim.contrib.edrt.run;
 
 import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
-import org.matsim.contrib.drt.routing.DrtMainModeIdentifier;
+import org.matsim.contrib.drt.routing.MultiModeDrtMainModeIdentifier;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtModeModule;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.MainModeIdentifier;
 
@@ -32,17 +33,19 @@ import com.google.inject.Inject;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class EDrtModule extends AbstractModule {
+public class MultiModeEDrtModule extends AbstractModule {
 
 	@Inject
-	private DrtConfigGroup drtCfg;
+	private MultiModeDrtConfigGroup multiModeDrtCfg;
 
 	@Override
 	public void install() {
-		install(new DrtModeModule(drtCfg));
-		installQSimModule(new EDrtModeQSimModule(drtCfg));
-		install(new DrtModeAnalysisModule(drtCfg));
+		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
+			install(new DrtModeModule(drtCfg));
+			installQSimModule(new EDrtModeQSimModule(drtCfg));
+			install(new DrtModeAnalysisModule(drtCfg));
+		}
 
-		bind(MainModeIdentifier.class).to(DrtMainModeIdentifier.class).asEagerSingleton();
+		bind(MainModeIdentifier.class).toInstance(new MultiModeDrtMainModeIdentifier(multiModeDrtCfg));
 	}
 }
