@@ -46,7 +46,7 @@ public class RunRobotaxiExample {
 	}
 
 	public static Controler createControler(Config config, boolean otfvis) {
-		String mode = TaxiConfigGroup.get(config).getMode();
+		String mode = TaxiConfigGroup.getSingleModeTaxiConfig(config).getMode();
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 

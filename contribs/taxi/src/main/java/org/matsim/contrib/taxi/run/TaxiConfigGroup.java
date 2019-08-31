@@ -45,8 +45,12 @@ import com.google.common.base.Verify;
 public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
 	public static final String GROUP_NAME = "taxi";
 
-	@SuppressWarnings("deprecation")
-	public static TaxiConfigGroup get(Config config) {
+	/**
+	 * @param config
+	 * @return single-mode taxi config (only if there is exactly 1 taxi config group in {@link MultiModeTaxiConfigGroup}.
+	 * Otherwise will fail.
+	 */
+	public static TaxiConfigGroup getSingleModeTaxiConfig(Config config) {
 		Collection<TaxiConfigGroup> taxiConfigGroups = MultiModeTaxiConfigGroup.get(config).getModalElements();
 		Preconditions.checkArgument(taxiConfigGroups.size() == 1,
 				"Supported for only 1 taxi mode in the config. Number of taxi modes: %s", taxiConfigGroups.size());

@@ -46,7 +46,7 @@ public class TaxiControlerCreator {
 		controler.addOverridingModule(new DvrpModule());
 		controler.addOverridingModule(new MultiModeTaxiModule());
 		controler.configureQSimComponents(
-				DvrpQSimComponents.activateModes(TaxiConfigGroup.get(controler.getConfig()).getMode()));
+				DvrpQSimComponents.activateModes(TaxiConfigGroup.getSingleModeTaxiConfig(controler.getConfig()).getMode()));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
