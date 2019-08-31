@@ -53,7 +53,7 @@ public class RunEDrtScenario {
 	}
 
 	public static Controler createControler(Config config, boolean otfvis) {
-		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
+		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(config);
 		Controler controler = EDrtControlerCreator.createControler(config, otfvis);
 
 		controler.addOverridingModule(new AbstractModule() {

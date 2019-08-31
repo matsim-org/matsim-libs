@@ -53,7 +53,7 @@ public final class MultiModeDrtConfigGroup extends ReflectiveConfigGroup impleme
 	@Override
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
-		Verify.verify(DrtConfigGroup.get(config) == null,
+		Verify.verify(DrtConfigGroup.getSingleModeDrtConfig(config) == null,
 				"In the multi-mode DRT setup, DrtConfigGroup must not be defined at the config top level");
 		MultiModals.requireAllModesUnique(this);
 	}

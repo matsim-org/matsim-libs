@@ -40,7 +40,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class EDrtControlerCreator {
 
 	public static Controler createControler(Config config, boolean otfvis) {
-		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
+		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(config);
 		DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore());
 
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);

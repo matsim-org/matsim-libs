@@ -57,7 +57,7 @@ public class RunDrtAndTaxiExample {
 		controler.addOverridingModule(new MultiModeTaxiModule());
 
 		String taxiMode = TaxiConfigGroup.getSingleModeTaxiConfig(controler.getConfig()).getMode();
-		String drtMode = DrtConfigGroup.get(controler.getConfig()).getMode();
+		String drtMode = DrtConfigGroup.getSingleModeDrtConfig(controler.getConfig()).getMode();
 		controler.addOverridingModule(new DvrpModule());
 		controler.configureQSimComponents(DvrpQSimComponents.activateModes(taxiMode, drtMode));
 
