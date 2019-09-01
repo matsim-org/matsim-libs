@@ -20,8 +20,11 @@
 
 package org.matsim.contrib.drt.run;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import java.net.URL;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -33,7 +36,11 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.drt.optimizer.rebalancing.NoRebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.DrtModeMinCostFlowRebalancingModule;
-import org.matsim.contrib.drt.routing.*;
+import org.matsim.contrib.drt.routing.ClosestAccessEgressStopFinder;
+import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
+import org.matsim.contrib.drt.routing.DrtRouteUpdater;
+import org.matsim.contrib.drt.routing.DrtRoutingModule;
+import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
@@ -54,10 +61,8 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 
-import java.net.URL;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 /**
  * @author michalm (Michal Maciejewski)
@@ -147,7 +152,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		private TravelTime travelTime;
 
 		@Inject
-		private Scenario scenario ;
+		private Scenario scenario;
 
 		@Inject
 		@Named(TransportMode.walk)
@@ -163,7 +168,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 			Network network = getModalInstance(Network.class);
 
 			return new DrtRoutingModule(drtCfg, network, travelTime, getModalInstance(TravelDisutilityFactory.class),
-				  walkRouter, scenario );
+					walkRouter, scenario);
 		}
 	}
 
@@ -180,24 +185,21 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 		@Override
 		public TransitSchedule get() {
-			final List<Geometry> geometries = ShpGeometryUtils.loadShapeFile(drtCfg.getDrtServiceAreaShapeFileURL(context).getFile());
+			final List<Geometry> geometries = ShpGeometryUtils.loadGemetries(
+					drtCfg.getDrtServiceAreaShapeFileURL(context));
 			Network network = getModalInstance(Network.class);
-			Set<Link> relevantLinks = network.getLinks().values()
-					.parallelStream()
+			Set<Link> relevantLinks = network.getLinks().values().stream()
 					.filter(link -> ShpGeometryUtils.isCoordInGeometries(link.getToNode().getCoord(), geometries))
 					.collect(Collectors.toSet());
-			final TransitSchedule schedule = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getTransitSchedule();
-			relevantLinks.stream().forEach(
-					link -> {
-						TransitStopFacility f =
-								schedule.getFactory()
-										.createTransitStopFacility(Id.create(link.getId(), TransitStopFacility.class),
-												link.getToNode().getCoord(), false);
-						f.setLinkId(link.getId());
-						schedule.addStopFacility(f);
-
-					}
-			);
+			final TransitSchedule schedule = ScenarioUtils.createScenario(ConfigUtils.createConfig())
+					.getTransitSchedule();
+			relevantLinks.stream().forEach(link -> {
+				TransitStopFacility f = schedule.getFactory()
+						.createTransitStopFacility(Id.create(link.getId(), TransitStopFacility.class),
+								link.getToNode().getCoord(), false);
+				f.setLinkId(link.getId());
+				schedule.addStopFacility(f);
+			});
 			return schedule;
 		}
 	}
