@@ -127,7 +127,8 @@ public class CustomEDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 		bindModal(VehicleData.EntryFactory.class).toProvider(
 				EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider.class).asEagerSingleton();
 
-		bindModal(InsertionCostCalculator.PenaltyCalculator.class).to(drtCfg.isRequestRejection() ?
+		bindModal(InsertionCostCalculator.PenaltyCalculator.class).to(
+				drtCfg.isRejectRequestIfMaxWaitOrTravelTimeViolated() ?
 				InsertionCostCalculator.RejectSoftConstraintViolations.class :
 				InsertionCostCalculator.DiscourageSoftConstraintViolations.class).asEagerSingleton();
 

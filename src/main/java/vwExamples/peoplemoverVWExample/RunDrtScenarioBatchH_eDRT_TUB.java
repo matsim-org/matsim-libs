@@ -180,7 +180,7 @@ public class RunDrtScenarioBatchH_eDRT_TUB {
 		drt.setMaxTravelTimeAlpha(1.3);
 		drt.setMaxWaitTime(500.0);
 		drt.setStopDuration(30.0);
-		drt.setRequestRejection(true);
+		drt.setRejectRequestIfMaxWaitOrTravelTimeViolated(true);
 
         drt.setTransitStopFile("network/virtualStops.xml");
 		drt.setMaxWalkDistance(800.0);

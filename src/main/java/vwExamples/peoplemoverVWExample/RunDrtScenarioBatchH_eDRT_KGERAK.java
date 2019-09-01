@@ -147,7 +147,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 		drt.setMaxTravelTimeAlpha(1.3);
 		drt.setMaxWaitTime(500.0);
 		drt.setStopDuration(30.0);
-		drt.setRequestRejection(true);
+		drt.setRejectRequestIfMaxWaitOrTravelTimeViolated(true);
 
 		// Create the virtual stops for the drt service
 		// VirtualStops are dynamically generated
