@@ -85,7 +85,7 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 		install(new PassengerEngineQSimModule(getMode()));
 
 		addModalComponent(DrtOptimizer.class, modalProvider(
-				getter -> new EDrtOptimizer(getter.getModal(DefaultDrtOptimizer.class),
+				getter -> new EDrtOptimizer(drtCfg, getter.getModal(DefaultDrtOptimizer.class),
 						getter.getModal(EmptyVehicleChargingScheduler.class))));
 
 		bindModal(DefaultDrtOptimizer.class).toProvider(modalProvider(
@@ -95,6 +95,8 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 						getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class))))
 				.asEagerSingleton();
 
+		// XXX if overridden to something else, make sure that the depots are equipped with chargers
+		//  otherwise vehicles will not re-charge
 		bindModal(DepotFinder.class).to(NearestChargerAsDepot.class);
 
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
