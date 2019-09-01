@@ -123,7 +123,7 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 	public String getInputPersonAttributeFile() {
 		return this.inputPersonAttributeFile;
 	}
-	public static final String MESSAGE = "using the separate person attribute file is deprecated.  Add the information directly into each person, using " +
+	public static final String PERSON_ATTRIBUTES_DEPRECATION_MESSAGE = "using the separate person attribute file is deprecated.  Add the information directly into each person, using " +
 						 "the Attributable feature.  If you insist on continuing to use the separate person attribute file, set " +
 						 "insistingOnUsingDeprecatedPersonAttributeFile to true.  The file will then be read, but the values " +
 						 "will be entered into each person using Attributable, and written as such to output_plans.  kai, may'19";

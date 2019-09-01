@@ -30,6 +30,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.utils.objectattributes.FailingObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
@@ -115,13 +116,13 @@ public class TransitScheduleImpl implements TransitSchedule {
 	}
 
 	@Override
-	public ObjectAttributes getTransitLinesAttributes() {
-		return this.transitLinesAttributes;
+	public FailingObjectAttributes getTransitLinesAttributes() {
+		return FailingObjectAttributes.createTransitLinesAttributes();
 	}
 	
 	@Override
-	public ObjectAttributes getTransitStopsAttributes() {
-		return this.transitStopsAttributes;
+	public FailingObjectAttributes getTransitStopsAttributes() {
+		return FailingObjectAttributes.createTransitStopsAttributes();
 	}
 
 	@Override

@@ -21,8 +21,8 @@ package org.matsim.contrib.drt.run.examples;
 
 import java.net.URL;
 
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -33,7 +33,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  */
 public class RunOneSharedTaxiExample {
 	public static void run(URL configUrl, boolean otfvis, int lastIteration) {
-		Config config = ConfigUtils.loadConfig(configUrl, new DrtConfigGroup(), new DvrpConfigGroup(),
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 		config.controler().setLastIteration(lastIteration);
 		config.controler().setWriteEventsInterval(lastIteration);

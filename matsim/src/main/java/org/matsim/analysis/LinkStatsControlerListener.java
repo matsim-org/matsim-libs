@@ -31,7 +31,6 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.router.util.TravelTime;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import java.util.Map;
 
 /**
@@ -58,7 +57,7 @@ final class LinkStatsControlerListener implements IterationEndsListener, Iterati
 		}
 
 		if (createLinkStatsInIteration(iteration)) {
-			linkStats.writeFile(this.controlerIO.getIterationFilename(iteration, Controler.FILENAME_LINKSTATS));
+			linkStats.writeFile(this.controlerIO.getIterationFilename(iteration, Controler.DefaultFiles.linkstats));
 			this.doReset = true;
 		}
 	}

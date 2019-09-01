@@ -23,7 +23,7 @@
 package org.matsim.analysis;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.NumberAxis;
@@ -92,7 +92,7 @@ public class LegHistogramChart {
 	 */
 	public static void writeGraphic(LegHistogram legHistogram, final String filename) {
 		try {
-            ChartUtilities.saveChartAsPNG(new File(filename), getGraphic(legHistogram.getAllModesData(), "all", legHistogram.getIteration()), 1024, 768);
+            ChartUtils.saveChartAsPNG(new File(filename), getGraphic(legHistogram.getAllModesData(), "all", legHistogram.getIteration()), 1024, 768);
 		} catch (IOException e) {
             throw new UncheckedIOException(e);
 		}
@@ -110,7 +110,7 @@ public class LegHistogramChart {
 	 */
 	public static void writeGraphic(LegHistogram legHistogram, final String filename, final String legMode) {
 		try {
-            ChartUtilities.saveChartAsPNG(new File(filename), getGraphic(legHistogram.getDataForMode(legMode), legMode, legHistogram.getIteration()), 1024, 768);
+			ChartUtils.saveChartAsPNG(new File(filename), getGraphic(legHistogram.getDataForMode(legMode), legMode, legHistogram.getIteration()), 1024, 768);
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

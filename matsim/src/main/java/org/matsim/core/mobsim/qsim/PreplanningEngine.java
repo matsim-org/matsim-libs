@@ -129,7 +129,7 @@ public final class PreplanningEngine implements MobsimEngine {
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
-		this.editTrips = new EditTrips(internalInterface.getMobsim(), tripRouter, scenario);
+		this.editTrips = new EditTrips( tripRouter, scenario, internalInterface );
 		this.editPlans = new EditPlans(internalInterface.getMobsim(), tripRouter, editTrips);
 		this.internalInterface = internalInterface ;
 	}

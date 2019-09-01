@@ -21,6 +21,10 @@
 package org.matsim.vehicles;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -30,6 +34,7 @@ import org.matsim.api.core.v01.Id;
 public class VehicleUtils {
 
 	private static final VehicleType DEFAULT_VEHICLE_TYPE = VehicleUtils.getFactory().createVehicleType(Id.create("defaultVehicleType", VehicleType.class));
+	private static final String VEHICLE_ATTRIBUTE_KEY = "vehicles";
 
 	static {
 		VehicleCapacityImpl capacity = new VehicleCapacityImpl();
@@ -49,4 +54,45 @@ public class VehicleUtils {
 		return DEFAULT_VEHICLE_TYPE;
 	}
 
+	/**
+	 * Creates a vehicle id based on the person and the mode
+	 * <p>
+	 * If config.qsim().getVehicleSource() is "modeVehicleTypesFromVehiclesData", the returned id is a combination of
+	 * the person's id and the supplied mode. E.g. "person1_car
+	 *
+	 * @param person The person which owns the vehicle
+	 * @param mode   The mode this vehicle is for
+	 * @return a VehicleId
+	 */
+	public static Id<Vehicle> createVehicleId(Person person, String mode) {
+		return Id.createVehicleId(person.getId().toString() + "_" + mode);
+	}
+
+	/**
+	 * Retrieves a vehicleId from the person's attributes.
+	 *
+	 * @return the vehicleId of the person's vehicle for the specified mode
+	 * @throws RuntimeException In case no vehicleIds were set or in case no vehicleId was set for the specified mode
+	 */
+	public static Id<Vehicle> getVehicleId(Person person, String mode) {
+		Map<String, Id<Vehicle>> vehicleIds = (Map<String, Id<Vehicle>>) person.getAttributes().getAttribute(VehicleUtils.VEHICLE_ATTRIBUTE_KEY);
+		if (vehicleIds == null || !vehicleIds.containsKey(mode)) {
+			throw new RuntimeException("Could not retrieve vehicle id from person: " + person.getId().toString() + " for mode: " + mode +
+                    ". \nIf you are not using config.qsim().getVehicleSource() with 'defaultVehicle' or 'modeVehicleTypesFromVehiclesData' you have to provide " +
+                    "a vehicle for each mode for each person. Attach a map of mode:String -> id:Id<Vehicle> with key 'vehicles' as person attribute to each person." +
+                    "\n VehicleUtils.insertVehicleIdIntoAttributes does this for you."
+            );
+		}
+		return vehicleIds.get(mode);
+	}
+
+    /**
+     * Attaches a vehicle id to a person, so that the router knows which vehicle to use for which mode and person
+     */
+    public static void insertVehicleIdIntoAttributes(Person person, String mode, Id<Vehicle> vehicleId) {
+        Object attr = person.getAttributes().getAttribute(VEHICLE_ATTRIBUTE_KEY);
+        Map<String, Id<Vehicle>> map = attr == null ? new HashMap<>() : ((Map<String, Id<Vehicle>>) attr);
+        map.put(mode, vehicleId);
+        person.getAttributes().putAttribute(VEHICLE_ATTRIBUTE_KEY, map);
+    }
 }

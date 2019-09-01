@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeries;
 import org.matsim.api.core.v01.Coord;
@@ -173,7 +173,7 @@ public class DrtRequestAnalyzer implements PassengerRequestRejectedEventHandler,
 						"Initially planned wait time [s]", times, Pair.of(0., drtCfg.getMaxWaitTime()));
 				//			xAxis.setLowerBound(0);
 				//			yAxis.setLowerBound(0);
-				ChartUtilities.writeChartAsPNG(new FileOutputStream(plotFileName), chart2, 1500, 1500);
+				ChartUtils.writeChartAsPNG(new FileOutputStream(plotFileName), chart2, 1500, 1500);
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);

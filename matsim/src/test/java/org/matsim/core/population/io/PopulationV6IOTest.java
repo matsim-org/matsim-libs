@@ -27,11 +27,21 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 /**
  * @author thibautd
@@ -228,5 +238,87 @@ public class PopulationV6IOTest {
 		Assert.assertEquals( "Unexpected String attribute in " + readScenario.getPopulation().getAttributes(),
 				population.getAttributes().getAttribute( "type" ) ,
 				readScenario.getPopulation().getAttributes().getAttribute( "type" ) );
+	}
+
+	// see MATSIM-927, https://matsim.atlassian.net/browse/MATSIM-927
+	@Test
+	public void testRouteIO() {
+		Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+		PopulationFactory pf = population.getFactory();
+
+		Person person1 = pf.createPerson(Id.create("1", Person.class));
+		Plan plan = pf.createPlan();
+		Activity act1 = pf.createActivityFromCoord("home", new Coord(0, 0));
+		act1.setEndTime(8*3600);
+		Leg leg = pf.createLeg("special");
+		GenericRouteImpl route = new GenericRouteImpl(Id.create("a", Link.class), Id.create("b", Link.class));
+		route.setRouteDescription("can contain & some \" special > characters < .");
+		leg.setRoute(route);
+		Activity act2 = pf.createActivityFromCoord("work", new Coord(1000, 1000));
+
+		plan.addActivity(act1);
+		plan.addLeg(leg);
+		plan.addActivity(act2);
+		person1.addPlan(plan);
+		population.addPerson(person1);
+
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		new PopulationWriter(population).write(out);
+
+		// ----
+
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+		ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
+		new PopulationReader(scenario).parse(in);
+
+		Assert.assertEquals(route.getRouteDescription(), ((Leg) scenario.getPopulation().getPersons().get(person1.getId()).getSelectedPlan().getPlanElements().get(1)).getRoute().getRouteDescription());
+	}
+
+	// inspired from MATSIM-927, https://matsim.atlassian.net/browse/MATSIM-927
+	@Test
+	public void testSpecialCharactersIO() {
+		Population population = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+		PopulationFactory pf = population.getFactory();
+
+		population.setName("I\"m &<special>");
+
+		Person person1 = pf.createPerson(Id.create("<oh>&\"😀", Person.class));
+		Plan plan = pf.createPlan();
+		Activity act1 = pf.createActivityFromLinkId("><&\"", Id.create(">><<\"&\"", Link.class));
+		act1.setEndTime(8*3600);
+		Leg leg = pf.createLeg("ho\"me>wo&rk");
+		GenericRouteImpl route = new GenericRouteImpl(Id.create("a", Link.class), Id.create("b", Link.class));
+		route.setRouteDescription("can contain & some \" special > characters < .");
+		leg.setRoute(route);
+		Activity act2 = pf.createActivityFromCoord("wo\'\"'\\\"rk", new Coord(1000, 1000));
+
+		plan.addActivity(act1);
+		plan.addLeg(leg);
+		plan.addActivity(act2);
+		person1.addPlan(plan);
+		population.addPerson(person1);
+
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		new PopulationWriter(population).write(out);
+
+		// ----
+
+//		String xml = new String(out.toByteArray());
+//		System.out.println(xml);
+
+		// ----
+
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+		ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
+		new PopulationReader(scenario).parse(in);
+
+		Person p1 = scenario.getPopulation().getPersons().get(person1.getId()); // this already checks the id
+		Plan pl1 = p1.getSelectedPlan();
+		Assert.assertEquals(act1.getType(), ((Activity) pl1.getPlanElements().get(0)).getType());
+		Assert.assertEquals(act1.getLinkId(), ((Activity) pl1.getPlanElements().get(0)).getLinkId());
+
+		Assert.assertEquals(route.getRouteDescription(), ((Leg) scenario.getPopulation().getPersons().get(person1.getId()).getSelectedPlan().getPlanElements().get(1)).getRoute().getRouteDescription());
 	}
 }

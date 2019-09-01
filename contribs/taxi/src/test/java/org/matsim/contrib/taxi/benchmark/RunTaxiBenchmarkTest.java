@@ -28,7 +28,7 @@ import org.matsim.examples.ExamplesUtils;
 public class RunTaxiBenchmarkTest {
 	@Test
 	public void testRunOneTaxi() {
-		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_taxi_benchmark_config.xml");
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_taxi_benchmark_config.xml");
 		RunTaxiBenchmark.run(configUrl, 3);
 	}
 }
