@@ -8,7 +8,7 @@
 			<param name="maxTravelTimeAlpha" value="1.3"/>
 			<param name="maxTravelTimeBeta" value="400"/>
 
-
+			<param name="idleVehiclesReturnToDepots" value="true"/>
 			<param name="vehiclesFile" value="vehicles-10-cap-4.xml"/>
 			<!-- param name="vehiclesFile" value="vehicles-20-cap-2.xml" / -->
 
