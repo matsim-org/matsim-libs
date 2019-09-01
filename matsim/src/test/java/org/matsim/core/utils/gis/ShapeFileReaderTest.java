@@ -1,8 +1,7 @@
 
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- * ShapeFileReaderTest.java
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
  * copyright       : (C) 2019 by the members listed in the COPYING,        *
@@ -17,9 +16,10 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
- package org.matsim.utils.gis;
+package org.matsim.core.utils.gis;
 
 import java.io.IOException;
 
@@ -27,7 +27,6 @@ import org.geotools.data.FeatureSource;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
