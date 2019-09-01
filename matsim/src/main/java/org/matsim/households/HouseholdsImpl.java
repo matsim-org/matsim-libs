@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.utils.objectattributes.FailingObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
@@ -79,7 +80,7 @@ public class HouseholdsImpl implements Households {
 
 	@Override
 	public ObjectAttributes getHouseholdAttributes() {
-		return this.householdAttributes;
+		return FailingObjectAttributes.createHouseholdsAttributes();
 	}
 
 }

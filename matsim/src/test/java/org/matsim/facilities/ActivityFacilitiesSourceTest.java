@@ -139,7 +139,7 @@ public class ActivityFacilitiesSourceTest {
 	
 	// create basic scenario
 	private Scenario prepareScenario() {
-		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.plans().setInputFile(null);
 		config.controler().setLastIteration(0);
 		
