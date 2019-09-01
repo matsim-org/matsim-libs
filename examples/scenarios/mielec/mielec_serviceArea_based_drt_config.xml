@@ -9,7 +9,7 @@
 			<param name="maxTravelTimeBeta" value="400"/>
 
 			<param name="operationalScheme" value="serviceAreaBased"/>
-			<param name="drtServiceAreaShapeFile" value="mielec.shp"/>
+			<param name="drtServiceAreaShapeFile" value="mielec/mielec.shp"/>
 
 			<param name="vehiclesFile" value="vehicles-10-cap-4.xml"/>
 			<!-- param name="vehiclesFile" value="vehicles-20-cap-2.xml" / -->
