@@ -173,7 +173,7 @@ public class RunDrtScenarioBatchH_eDRT_TUB {
 
         config.network().setInputFile("network/drtServiceAreaNetwork.xml.gz");
 
-		DrtConfigGroup drt = (DrtConfigGroup)config.getModules().get(DrtConfigGroup.GROUP_NAME);
+		DrtConfigGroup drt = DrtConfigGroup.getSingleModeDrtConfig(config);
 
 		drt.setPrintDetailedWarnings(false);
 		drt.setMaxTravelTimeBeta(500.0);

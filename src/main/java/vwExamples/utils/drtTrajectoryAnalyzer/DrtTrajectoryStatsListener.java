@@ -19,16 +19,6 @@
 
 package vwExamples.utils.drtTrajectoryAnalyzer;
 
-import com.google.inject.Inject;
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.IterationCounter;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
-import org.matsim.vehicles.Vehicle;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -38,6 +28,17 @@ import java.text.DecimalFormatSymbols;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map.Entry;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.IterationCounter;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
+import org.matsim.vehicles.Vehicle;
+
+import com.google.inject.Inject;
 
 /**
  * @author saxer
@@ -68,7 +69,7 @@ public class DrtTrajectoryStatsListener implements MobsimBeforeCleanupListener {
 	@Inject
 	public DrtTrajectoryStatsListener(Config config, DrtConfigGroup drtCfg,
 									  MyDynModeTrajectoryStats myDynModeTrajectoryStats) {
-		drtgroup = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+		drtgroup = DrtConfigGroup.getSingleModeDrtConfig(config);
 		runId = config.controler().getRunId();
 
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));

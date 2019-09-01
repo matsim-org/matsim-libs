@@ -78,7 +78,7 @@ public class RunDrtScenarioBatchBS_eDRT {
         config.network().setInputFile(inbase + "\\network\\drtServiceAreaNetwork.xml.gz");
 
         // This part allows to change dynamically DRT config parameters
-        DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+        DrtConfigGroup drt = DrtConfigGroup.getSingleModeDrtConfig(config);
 
         drt.setPrintDetailedWarnings(true);
         //Parameters to setup the DRT service

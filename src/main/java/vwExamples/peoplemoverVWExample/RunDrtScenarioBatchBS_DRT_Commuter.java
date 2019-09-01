@@ -125,7 +125,7 @@ public class RunDrtScenarioBatchBS_DRT_Commuter {
 		config.controler().setRoutingAlgorithmType(ControlerConfigGroup.RoutingAlgorithmType.Dijkstra);
 
 		// This part allows to change dynamically DRT config parameters
-		DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+		DrtConfigGroup drt = DrtConfigGroup.getSingleModeDrtConfig(config);
 		
 //		DvrpConfigGroup dvrp = (DvrpConfigGroup) config.getModules().get(DvrpConfigGroup.GROUP_NAME);
 //		dvrp.setTravelTimeEstimationAlpha(.15);

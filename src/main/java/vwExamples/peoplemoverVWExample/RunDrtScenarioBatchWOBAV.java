@@ -97,7 +97,7 @@ public class RunDrtScenarioBatchWOBAV {
 
 
             //This part allows to change dynamically DRT config parameters
-            DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+            DrtConfigGroup drt = DrtConfigGroup.getSingleModeDrtConfig(config);
             //DRT optimizer searches only the x-most closed vehicles.
             //Handling more vehicles cost more time and will induce more empty trip mileage, because faraway vehicles are also considered to service the customer request
             //drt.setkNearestVehicles(90);

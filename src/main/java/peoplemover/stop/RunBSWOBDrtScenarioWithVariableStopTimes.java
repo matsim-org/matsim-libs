@@ -43,7 +43,7 @@ public class RunBSWOBDrtScenarioWithVariableStopTimes {
         config.controler().setWritePlansInterval(1); // Write Plan file every x-Iterations
         config.network().setInputFile("network/modifiedNetwork.xml.gz");
 
-        DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+        DrtConfigGroup drt = DrtConfigGroup.getSingleModeDrtConfig(config);
 
         // Use custom stop duration
         drt.setOperationalScheme(DrtConfigGroup.OperationalScheme.stopbased);

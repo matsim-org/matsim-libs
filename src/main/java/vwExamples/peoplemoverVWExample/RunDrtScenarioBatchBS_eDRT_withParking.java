@@ -126,7 +126,7 @@ public class RunDrtScenarioBatchBS_eDRT_withParking {
 		config.network().setInputFile(inbase + "\\network\\drtServiceAreaNetwork_withPark.xml.gz");
 
 		// This part allows to change dynamically DRT config parameters
-		DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+		DrtConfigGroup drt = DrtConfigGroup.getSingleModeDrtConfig(config);
 
 		drt.setPrintDetailedWarnings(false);
 		// Parameters to setup the DRT service

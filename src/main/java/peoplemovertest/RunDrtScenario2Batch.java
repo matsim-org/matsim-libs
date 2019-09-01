@@ -63,7 +63,7 @@ public class RunDrtScenario2Batch {
 			config.controler().setWritePlansInterval(1);
 			config.controler().setOutputDirectory("D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/drt_"+Element.toString()+"_nextStation_default/output/");
 			config.plans().setInputFile("D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/population/run124.100.output_plans_DRT"+Element.toString()+".xml.gz");
-			DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+			DrtConfigGroup drt = DrtConfigGroup.getSingleModeDrtConfig(config);
 			//Initialize the controller
 			Controler controler = createControler(config, otfvis);
 			

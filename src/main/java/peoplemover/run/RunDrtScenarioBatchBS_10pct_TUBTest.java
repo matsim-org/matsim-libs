@@ -62,7 +62,7 @@ public class RunDrtScenarioBatchBS_10pct_TUBTest {
 		config.network().setInputFile("network/modifiedNetwork.xml.gz");
 
 		// This part allows to change dynamically DRT config parameters
-		DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+		DrtConfigGroup drt = DrtConfigGroup.getSingleModeDrtConfig(config);
 
 		// Use custom stop duration
 		drt.setOperationalScheme(DrtConfigGroup.OperationalScheme.stopbased);

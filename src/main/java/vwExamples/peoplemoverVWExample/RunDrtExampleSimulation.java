@@ -63,7 +63,7 @@ public class RunDrtExampleSimulation {
         config.plans().setInputFile("D:/Axer/MatsimDataStore/DAI-Package/inputplans/run124.100.output_plans_DRT0.1.xml.gz");
 
         //Add config parameter to DrtConfigGroup
-        DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+		DrtConfigGroup drt = DrtConfigGroup.getSingleModeDrtConfig(config);
         //Take only the kNearestVehicles within the DRT dispatching
 
 
