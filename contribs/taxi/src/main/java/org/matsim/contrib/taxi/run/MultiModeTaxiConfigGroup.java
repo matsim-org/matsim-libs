@@ -37,18 +37,12 @@ import com.google.common.base.Verify;
  */
 public final class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implements MultiModal<TaxiConfigGroup> {
 
-	/**
-	 * use only when creating the taxi config from scratch (no taxi config in the config file)
-	 */
-	public static MultiModeTaxiConfigGroup of(TaxiConfigGroup taxiConfigGroup) {
-		MultiModeTaxiConfigGroup multiTaxiCfg = new MultiModeTaxiConfigGroup();
-		multiTaxiCfg.addParameterSet(taxiConfigGroup);
-		return multiTaxiCfg;
-	}
-
 	public static final String GROUP_NAME = "multiModeTaxi";
 
-	@SuppressWarnings("deprecation")
+	/**
+	 * @param config
+	 * @return MultiModeTaxiConfigGroup if exists. Otherwise fails
+	 */
 	public static MultiModeTaxiConfigGroup get(Config config) {
 		return (MultiModeTaxiConfigGroup)config.getModule(GROUP_NAME);
 	}

@@ -43,6 +43,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.utils.misc.Time;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
 
 public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
@@ -50,9 +51,11 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 
 	public static final String GROUP_NAME = "drt";
 
-	@SuppressWarnings("deprecation")
-	public static DrtConfigGroup get(Config config) {
-		return (DrtConfigGroup)config.getModule(GROUP_NAME);
+	public static DrtConfigGroup getSingleModeDrtConfig(Config config) {
+		Collection<DrtConfigGroup> drtConfigGroups = MultiModeDrtConfigGroup.get(config).getModalElements();
+		Preconditions.checkArgument(drtConfigGroups.size() == 1,
+				"Supported for only 1 DRT mode in the config. Number of DRT modes: %s", drtConfigGroups.size());
+		return drtConfigGroups.iterator().next();
 	}
 
 	public static final String MODE = "mode";

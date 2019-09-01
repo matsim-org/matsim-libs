@@ -80,7 +80,7 @@ public class ScheduleReconstructionIT {
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setDumpDataAtEnd(false);
 
-		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
+		TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(config);
 		Controler controler = RunTaxiBenchmark.createControler(config, 1);
 		controler.addOverridingModule(new AbstractDvrpModeModule(taxiCfg.getMode()) {
 			@Override

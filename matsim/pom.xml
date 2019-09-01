@@ -502,6 +502,6 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<geotools.version>20.2</geotools.version>
+		<geotools.version>21.1</geotools.version>
     </properties>
 </project>

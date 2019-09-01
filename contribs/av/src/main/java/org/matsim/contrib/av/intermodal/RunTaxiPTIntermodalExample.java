@@ -77,7 +77,7 @@ public class RunTaxiPTIntermodalExample {
 		otfvis.setDrawNonMovingItems(true);
 		config.addModule(otfvis);
 
-		String mode = TaxiConfigGroup.get(config).getMode();
+		String mode = TaxiConfigGroup.getSingleModeTaxiConfig(config).getMode();
 
 		// ---
 		Scenario scenario = ScenarioUtils.loadScenario(config);

@@ -1,20 +1,22 @@
 <?xml version="1.0" ?>
 <!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
-	<module name="drt">
-		<param name="stopDuration" value="60"/>
-		<param name="maxWaitTime" value="600"/>
-		<param name="maxTravelTimeAlpha" value="1.3"/>
-		<param name="maxTravelTimeBeta" value="400"/>
+	<module name="multiModeDrt">
+		<parameterset type="drt">
+			<param name="stopDuration" value="60"/>
+			<param name="maxWaitTime" value="600"/>
+			<param name="maxTravelTimeAlpha" value="1.3"/>
+			<param name="maxTravelTimeBeta" value="400"/>
 
 
-		<param name="vehiclesFile" value="vehicles-10-cap-4.xml"/>
-		<!-- param name="vehiclesFile" value="vehicles-20-cap-2.xml" / -->
+			<param name="vehiclesFile" value="vehicles-10-cap-4.xml"/>
+			<!-- param name="vehiclesFile" value="vehicles-20-cap-2.xml" / -->
 
-		<parameterset type="minCostFlowRebalancing">
-			<param name="targetAlpha" value="0.5"/>
-			<param name="targetBeta" value="0.5"/>
-			<param name="cellSize" value="500"/>
+			<parameterset type="minCostFlowRebalancing">
+				<param name="targetAlpha" value="0.5"/>
+				<param name="targetBeta" value="0.5"/>
+				<param name="cellSize" value="500"/>
+			</parameterset>
 		</parameterset>
 	</module>
 

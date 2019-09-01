@@ -81,7 +81,7 @@ public class RunETaxiBenchmark {
 		DvrpConfigGroup.get(config).setNetworkModes(ImmutableSet.of());// to switch off network filtering
 		config.addConfigConsistencyChecker(new DvrpBenchmarkConfigConsistencyChecker());
 
-		String mode = TaxiConfigGroup.get(config).getMode();
+		String mode = TaxiConfigGroup.getSingleModeTaxiConfig(config).getMode();
 		Scenario scenario = RunTaxiBenchmark.loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
 
 		Controler controler = new Controler(scenario);

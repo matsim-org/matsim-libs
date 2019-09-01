@@ -92,7 +92,7 @@ public class TaxiOptimizerTests {
 					"mielec_taxi_benchmark_config.xml");
 
 			config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup());
-			TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
+			TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(config);
 
 			config.plans().setInputFile("plans_only_taxi_mini_benchmark_" + plansSuffix + ".xml.gz");
 			taxiCfg.setTaxisFile("taxis_mini_benchmark-" + taxisSuffix + ".xml");
@@ -103,7 +103,7 @@ public class TaxiOptimizerTests {
 
 	public static void runBenchmark(List<TaxiConfigVariant> variants, AbstractTaxiOptimizerParams taxiOptimizerParams,
 			PreloadedBenchmark benchmark, String outputDir) {
-		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(benchmark.config);
+		TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(benchmark.config);
 		Optional.ofNullable(taxiCfg.getTaxiOptimizerParams()).ifPresent(taxiCfg::removeParameterSet);
 		taxiCfg.addParameterSet(taxiOptimizerParams);
 
