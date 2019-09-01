@@ -31,17 +31,17 @@ import org.matsim.core.scoring.ExperiencedPlansService;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.facilities.ActivityFacilities;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class JGraphTGrapher extends AbstractInjectorGrapher {
 
 	private ListenableDirectedGraph<Node, Edge> g;
 	private final Map<NodeId, Node> nodes = new HashMap<>();
 	private Writer writer;
-	private final NameFactory nameFactory = new ShortNameFactory();
 
 	public JGraphTGrapher(GrapherParameters options, Writer writer) {
 		super(options);
@@ -50,41 +50,41 @@ public class JGraphTGrapher extends AbstractInjectorGrapher {
 	}
 
 	@Override
-	protected void reset() throws IOException {
+	protected void reset() {
 		g = new ListenableDirectedGraph<>(Edge.class);
 		nodes.clear();
 	}
 
 	@Override
-	protected void newInterfaceNode(InterfaceNode node) throws IOException {
+	protected void newInterfaceNode(InterfaceNode node) {
 		g.addVertex(node);
 		nodes.put(node.getId(), node);
 	}
 
 	@Override
-	protected void newImplementationNode(ImplementationNode node) throws IOException {
+	protected void newImplementationNode(ImplementationNode node) {
 		g.addVertex(node);
 		nodes.put(node.getId(), node);
 	}
 
 	@Override
-	protected void newInstanceNode(InstanceNode node) throws IOException {
+	protected void newInstanceNode(InstanceNode node) {
 		g.addVertex(node);
 		nodes.put(node.getId(), node);
 	}
 
 	@Override
-	protected void newDependencyEdge(DependencyEdge edge) throws IOException {
+	protected void newDependencyEdge(DependencyEdge edge) {
 		g.addEdge(nodes.get(edge.getFromId()), nodes.get(edge.getToId()), edge);
 	}
 
 	@Override
-	protected void newBindingEdge(BindingEdge edge) throws IOException {
+	protected void newBindingEdge(BindingEdge edge) {
 		g.addEdge(nodes.get(edge.getFromId()), nodes.get(edge.getToId()), edge);
 	}
 
 	@Override
-	protected void postProcess() throws IOException {
+	protected void postProcess() {
 		DirectedGraph<Node, Edge> filtered = new DirectedMaskSubgraph<>(g, new MaskFunctor<Node, Edge>() {
 			@Override
 			public boolean isEdgeMasked(Edge edge) {
@@ -189,43 +189,10 @@ public class JGraphTGrapher extends AbstractInjectorGrapher {
 				return !ci.connectedSetOf(vertex).contains(node);
 			}
 		}));
-//		for (Node node : new HashSet<>(g.vertexSet())) {
-//			if ((node instanceof InterfaceNode) && node.getId().getKey().getTypeLiteral().getRawType().isAssignableFrom(Map.class) && !node.getId().getKey().toString().contains("AttributeConverter") /* regular MapBinder, not my construct */) {
-//				removeIntermediate(node, this.g);
-//			}
-//			System.out.println(node.getId().getKey().toString());
-//		}
-//		for (Node node : new HashSet<>(filtered.vertexSet())) {
-//			if (node.getId().getKey().toString().contains("PlansReplanningImpl") || node.getId().getKey().toString().contains("PlansScoringImpl")) {
-//				removeIntermediate(node, filtered);
-//			}
-//			System.out.println(node.getId().getKey().toString());
-//		}
 
 		MyGrapher myGrapher = new MyGrapher();
 		myGrapher.setRankdir("LR");
 		myGrapher.setOut((PrintWriter) writer);
 		myGrapher.graph(filtered);
 	}
-
-	private void removeIntermediate(Node node, DirectedGraph<Node, Edge> g) {
-		Set<Edge> edges = g.incomingEdgesOf(node);
-		if (edges.size() != 1) {
-			throw new RuntimeException(node.toString());
-		}
-		Edge otherEdge = edges.iterator().next();
-		for (Edge edge : new ArrayList<>(g.outgoingEdgesOf(node))) {
-			Node target = g.getEdgeTarget(edge);
-			Node source = g.getEdgeSource(otherEdge);
-			g.removeEdge(edge);
-			Edge newEdge = otherEdge.copy(source.getId(), target.getId());
-			g.addEdge(source, target, newEdge);
-		}
-		g.removeVertex(node);
-	}
-
-/**
- * {rank=min; x5;}
-
- */
 }
