@@ -151,6 +151,7 @@ class BicycleTravelDisutility implements TravelDisutility {
 //				+ " / rndDist = " + logNormalRndDist + " / rndInf = "	+ logNormalRndInf + " / rndComf = " + logNormalRndComf + " / rndGrad = " + logNormalRndGrad);
 		double disutility = (1 + normalRndLink) * travelTimeDisutility + logNormalRndDist * distanceDisutility + logNormalRndInf * infrastructureDisutility
 				+ logNormalRndComf * comfortDisutility + logNormalRndGrad * gradientDisutility;
+		// note that "normalRndLink" follows a Gaussian distribution, not a lognormal one as the others do!
 //		double disutility = travelTimeDisutility + logNormalRndDist * distanceDisutility + (1 + normalRndLink) * logNormalRndInf * infrastructureDisutility
 //				+ (1 + normalRndLink) * logNormalRndComf * comfortDisutility + (1 + normalRndLink) * logNormalRndGrad * gradientDisutility;
 //		LOG.warn("Disutility = " + disutility);

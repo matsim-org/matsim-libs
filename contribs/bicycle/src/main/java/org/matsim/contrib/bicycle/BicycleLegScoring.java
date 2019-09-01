@@ -20,11 +20,14 @@
 
 package org.matsim.contrib.bicycle;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 
@@ -35,30 +38,33 @@ import java.util.Set;
 /**
  * @author dziemke
  */
-class BicycleLegScoring extends CharyparNagelLegScoring {
-	// yyyy replace inheritance by delegation.  kai, sep'19
+class BicycleLegScoring implements SumScoringFunction.LegScoring, SumScoringFunction.ArbitraryEventScoring{
+	private static final Logger log = Logger.getLogger( BicycleLegScoring.class ) ;
+
+	private final CharyparNagelLegScoring delegate ;
 
 	private final double marginalUtilityOfInfrastructure_m;
 	private final double marginalUtilityOfComfort_m;
 	private final double marginalUtilityOfGradient_m_100m;
 	private final String bicycleMode;
+	private final Network network;
 
 	private double additionalScore = 0. ;
 
 	BicycleLegScoring( final ScoringParameters params, Network network, Set<String> ptModes, BicycleConfigGroup bicycleConfigGroup ) {
-		super(params, network, ptModes);
+		delegate = new CharyparNagelLegScoring( params, network, ptModes ) ;
 
 		this.marginalUtilityOfInfrastructure_m = bicycleConfigGroup.getMarginalUtilityOfInfrastructure_m();
 		this.marginalUtilityOfComfort_m = bicycleConfigGroup.getMarginalUtilityOfComfort_m();
 		this.marginalUtilityOfGradient_m_100m = bicycleConfigGroup.getMarginalUtilityOfGradient_m_100m();
 		this.bicycleMode = bicycleConfigGroup.getBicycleMode();
+
+		this.network = network ;
 	}
 
-	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
-		// Get leg score from regular CharyparNagelLegScoring
-		double legScore = super.calcLegScore(departureTime, arrivalTime, leg);
+	private void calcLegScore( final Leg leg ) {
 
-		if (isBicycleMode(leg.getMode())) {
+		if ( bicycleMode.equals( leg.getMode() ) ) {
 
 			if (!isSameStartAndEnd(leg)) {
 
@@ -77,19 +83,27 @@ class BicycleLegScoring extends CharyparNagelLegScoring {
 			}
 		}
 
-		return legScore;
 	}
 
-	private boolean isBicycleMode(String mode) {
-		return mode.equals(bicycleMode);
-	}
-
-	private boolean isSameStartAndEnd(Leg leg) {
+	private static boolean isSameStartAndEnd(Leg leg) {
 		return leg.getRoute().getStartLinkId().toString().equals(leg.getRoute().getEndLinkId().toString());
 	}
 
-	@Override
-	public double getScore() {
-		return super.getScore() + additionalScore ;
+	@Override public void finish(){
+		delegate.finish();
 	}
+
+	@Override public double getScore(){
+		return delegate.getScore() + this.additionalScore ;
+	}
+
+	@Override public void handleLeg( Leg leg ){
+		delegate.handleLeg( leg );
+		calcLegScore( leg );
+	}
+
+	@Override public void handleEvent( Event event ){
+		delegate.handleEvent( event );
+	}
+
 }
