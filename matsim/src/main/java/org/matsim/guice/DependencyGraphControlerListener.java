@@ -24,6 +24,7 @@ package org.matsim.guice;
 
 import com.google.common.collect.Lists;
 import com.google.inject.Binding;
+import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.grapher.AbstractInjectorGrapher;
@@ -31,14 +32,11 @@ import com.google.inject.grapher.Alias;
 import com.google.inject.grapher.NodeId;
 import com.google.inject.spi.ProviderBinding;
 import com.google.inject.util.Types;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.ControlerI;
-import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
@@ -48,6 +46,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -57,50 +56,46 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class GraphReduced {
+class DependencyGraphControlerListener implements StartupListener {
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException, IllegalAccessException, InstantiationException {
-        String configFileToGraph = args[0];
-        String moduleToGraph = args[1];
-        String outputDirectory = args[2];
+	private final OutputDirectoryHierarchy controlerIO;
+	private final Injector injector;
 
-        Config configToGraph = ConfigUtils.loadConfig(configFileToGraph);
-        configToGraph.controler().setOutputDirectory(outputDirectory);
-        configToGraph.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+	@Inject
+	DependencyGraphControlerListener(Injector injector, OutputDirectoryHierarchy controlerIO) {
+		this.injector = injector;
+		this.controlerIO = controlerIO;
+	}
 
-        Class<?> moduleClass = Class.forName(moduleToGraph);
-        Object module = moduleClass.newInstance();
-
-        com.google.inject.Injector matsimInjector = Injector.createInjector(configToGraph, (AbstractModule) module);
-        matsimInjector.getInstance(ControlerI.class);
-        try (PrintWriter out = new PrintWriter(new File(outputDirectory +"/guice.dot"))) {
-            JGraphTGrapher grapher = new JGraphTGrapher(new AbstractInjectorGrapher.GrapherParameters()
+	@Override
+	public void notifyStartup(StartupEvent event) {
+		try (PrintWriter out = new PrintWriter(new File(controlerIO.getOutputFilename("modules.dot")))) {
+			MatsimGrapher grapher = new MatsimGrapher(new AbstractInjectorGrapher.GrapherParameters()
 					.setAliasCreator(bindings -> {
-                                // Copied from ProviderAliasCreator
-                                List<Alias> allAliases = Lists.newArrayList();
-                                for (Binding<?> binding : bindings) {
-                                    if (binding instanceof ProviderBinding) {
-                                        allAliases.add(new Alias(NodeId.newTypeId(binding.getKey()),
-                                                NodeId.newTypeId(((ProviderBinding<?>) binding).getProvidedKey())));
-                                    }
-                                }
-                                allAliases.addAll(getMapBinderAliases(String.class, TravelTime.class, bindings));
-                                allAliases.addAll(getMapBinderAliases(String.class, TravelDisutilityFactory.class, bindings));
-                                allAliases.addAll(getMapBinderAliases(String.class, RoutingModule.class, bindings));
-                                allAliases.addAll(getMapBinderAliases(StrategyConfigGroup.StrategySettings.class, PlanStrategy.class, bindings));
-                                allAliases.addAll(getMultibinderAliases(ControlerListener.class, bindings));
-                                allAliases.addAll(getMultibinderAliases(SnapshotWriter.class, bindings));
-                                allAliases.addAll(getMultibinderAliases(MobsimListener.class, bindings));
-                                allAliases.addAll(getMultibinderAliases(EventHandler.class, bindings));
+								List<Alias> allAliases = Lists.newArrayList();
+								for (Binding<?> binding : bindings) {
+									if (binding instanceof ProviderBinding) {
+										allAliases.add(new Alias(NodeId.newTypeId(binding.getKey()),
+												NodeId.newTypeId(((ProviderBinding<?>) binding).getProvidedKey())));
+									}
+								}
+								allAliases.addAll(getMapBinderAliases(String.class, TravelTime.class, bindings));
+								allAliases.addAll(getMapBinderAliases(String.class, TravelDisutilityFactory.class, bindings));
+								allAliases.addAll(getMapBinderAliases(String.class, RoutingModule.class, bindings));
+								allAliases.addAll(getMapBinderAliases(StrategyConfigGroup.StrategySettings.class, PlanStrategy.class, bindings));
+								allAliases.addAll(getMultibinderAliases(ControlerListener.class, bindings));
+								allAliases.addAll(getMultibinderAliases(SnapshotWriter.class, bindings));
+								allAliases.addAll(getMultibinderAliases(MobsimListener.class, bindings));
+								allAliases.addAll(getMultibinderAliases(EventHandler.class, bindings));
 								allAliases.addAll(getMultibinderAliases(AbstractQSimModule.class, bindings));
 								return allAliases;
-                            }
-                    ), out);
-            grapher.graph(matsimInjector);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+							}
+					), out);
+			grapher.graph(injector);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
     private static List<Alias> getMultibinderAliases(Type aClass, Iterable<Binding<?>> bindings) {
 		List<Alias> aliases = Lists.newArrayList();
@@ -149,4 +144,5 @@ public class GraphReduced {
 		}
 		return aliases;
 	}
+
 }
