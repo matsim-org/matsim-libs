@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
@@ -84,7 +85,7 @@ class BicycleTravelDisutility implements TravelDisutility {
 		double travelTime = timeCalculator.getLinkTravelTime(link, time, person, vehicle);
 
 		String surface = (String) link.getAttributes().getAttribute(BicycleUtils.SURFACE);
-		String type = (String) link.getAttributes().getAttribute("type");
+		String type = NetworkUtils.getType( link ) ;
 		String cyclewaytype = (String) link.getAttributes().getAttribute(BicycleUtils.CYCLEWAY);
 
 		double distance = link.getLength();

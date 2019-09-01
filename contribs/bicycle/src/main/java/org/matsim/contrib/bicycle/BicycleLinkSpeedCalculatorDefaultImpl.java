@@ -76,13 +76,13 @@ public class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkSpeedCa
 	// TODO combine this with comfort
 	private double computeSurfaceFactor(Link link) {
 		if (hasNotAttribute(link, BicycleUtils.WAY_TYPE)
-				|| link.getAttributes().getAttribute(BicycleUtils.WAY_TYPE).equals(BicycleUtils.CYCLEWAY)
+				|| BicycleUtils.CYCLEWAY.equals( link.getAttributes().getAttribute( BicycleUtils.WAY_TYPE ) )
 				|| hasNotAttribute(link, BicycleUtils.SURFACE)
 		) {
 			return 1.0;
 		}
 		//so, the link is NOT a cycleway, and has a surface attribute
-		String surface = link.getAttributes().getAttribute(BicycleUtils.SURFACE).toString();
+		String surface = (String) link.getAttributes().getAttribute(BicycleUtils.SURFACE );
 		switch (surface) {
 			case "paved":
 			case "asphalt":

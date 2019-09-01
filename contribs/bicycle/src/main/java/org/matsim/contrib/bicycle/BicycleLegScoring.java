@@ -36,6 +36,7 @@ import java.util.Set;
  * @author dziemke
  */
 class BicycleLegScoring extends CharyparNagelLegScoring {
+	// yyyy replace inheritance by delegation.  kai, sep'19
 
 	private final double marginalUtilityOfInfrastructure_m;
 	private final double marginalUtilityOfComfort_m;
@@ -50,7 +51,7 @@ class BicycleLegScoring extends CharyparNagelLegScoring {
 		this.marginalUtilityOfGradient_m_100m = bicycleConfigGroup.getMarginalUtilityOfGradient_m_100m();
 		this.bicycleMode = bicycleConfigGroup.getBicycleMode();
 	}
-	
+
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
 		// Get leg score from regular CharyparNagelLegScoring
 		double legScore = super.calcLegScore(departureTime, arrivalTime, leg);
@@ -63,7 +64,7 @@ class BicycleLegScoring extends CharyparNagelLegScoring {
 
 				List<Id<Link>> linkIds = new ArrayList<>(networkRoute.getLinkIds());
 				linkIds.add(networkRoute.getEndLinkId());
-				
+
 				// Iterate over all links of the route
 				for (Id<Link> linkId : linkIds) {
 					double scoreOnLink = BicycleUtilityUtils.computeLinkBasedScore(network.getLinks().get(linkId),
@@ -73,7 +74,7 @@ class BicycleLegScoring extends CharyparNagelLegScoring {
 				}
 			}
 		}
-		
+
 		return legScore;
 	}
 

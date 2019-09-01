@@ -9,7 +9,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 
 public class BicycleQSimModule extends AbstractQSimModule {
-	// needs to be public since otherwise nobody can overwrite parts of Bicycles.addAsOverridingModules(...).  kai, sep'19
+	// needs to be public since otherwise one cannot overwrite only parts of Bicycles.addAsOverridingModules(...).  kai, sep'19
 
     @Override
     protected void configureQSim() {
@@ -27,7 +27,7 @@ public class BicycleQSimModule extends AbstractQSimModule {
         private EventsManager events;
 
         @Inject
-        private BicycleLinkSpeedCalculatorDefaultImpl calculator;
+        private BicycleLinkSpeedCalculator calculator;
 
         @Override
         public QNetworkFactory get() {
