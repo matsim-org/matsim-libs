@@ -84,7 +84,7 @@ public class CustomEDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 		install(new PassengerEngineQSimModule(getMode()));
 
 		addModalComponent(DrtOptimizer.class, modalProvider(
-				getter -> new CustomEDrtOptimizer(getter.getModal(DefaultDrtOptimizer.class),
+				getter -> new CustomEDrtOptimizer(drtCfg, getter.getModal(DefaultDrtOptimizer.class),
 						getter.getModal(EmptyVehicleChargingScheduler.class), getter.get(MobsimTimer.class))));
 
 		bindModal(DefaultDrtOptimizer.class).toProvider(modalProvider(
@@ -94,8 +94,9 @@ public class CustomEDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 						getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class))))
 				.asEagerSingleton();
 
-
-        bindModal(DepotFinder.class).toProvider(modalProvider(getter -> new GetBestDepot(getter.get(ChargingInfrastructure.class), getter.get(ElectricFleet.class), getter.getModal(Fleet.class)))).asEagerSingleton();
+		bindModal(DepotFinder.class).toProvider(modalProvider(
+				getter -> new GetBestDepot(getter.get(ChargingInfrastructure.class), getter.get(ElectricFleet.class),
+						getter.getModal(Fleet.class)))).asEagerSingleton();
 
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
 
@@ -106,7 +107,7 @@ public class CustomEDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 					@Inject
 					private ChargingInfrastructure chargingInfrastructure;
-					
+
 					@Override
 					public EmptyVehicleChargingScheduler get() {
 						DrtTaskFactory taskFactory = getModalInstance(DrtTaskFactory.class);
