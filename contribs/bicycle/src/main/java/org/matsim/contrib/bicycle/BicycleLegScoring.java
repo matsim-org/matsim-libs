@@ -43,6 +43,8 @@ class BicycleLegScoring extends CharyparNagelLegScoring {
 	private final double marginalUtilityOfGradient_m_100m;
 	private final String bicycleMode;
 
+	private double additionalScore = 0. ;
+
 	BicycleLegScoring( final ScoringParameters params, Network network, Set<String> ptModes, BicycleConfigGroup bicycleConfigGroup ) {
 		super(params, network, ptModes);
 
@@ -70,7 +72,7 @@ class BicycleLegScoring extends CharyparNagelLegScoring {
 					double scoreOnLink = BicycleUtilityUtils.computeLinkBasedScore(network.getLinks().get(linkId),
 							marginalUtilityOfComfort_m, marginalUtilityOfInfrastructure_m, marginalUtilityOfGradient_m_100m);
 					// LOG.warn("----- link = " + linkId + " -- scoreOnLink = " + scoreOnLink);
-					legScore += scoreOnLink;
+					additionalScore += scoreOnLink;
 				}
 			}
 		}
@@ -84,5 +86,10 @@ class BicycleLegScoring extends CharyparNagelLegScoring {
 
 	private boolean isSameStartAndEnd(Leg leg) {
 		return leg.getRoute().getStartLinkId().toString().equals(leg.getRoute().getEndLinkId().toString());
+	}
+
+	@Override
+	public double getScore() {
+		return super.getScore() + additionalScore ;
 	}
 }
