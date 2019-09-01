@@ -85,7 +85,7 @@ public class JGraphTGrapher extends AbstractInjectorGrapher {
 
 	@Override
 	protected void postProcess() {
-		DirectedGraph<Node, Edge> filtered = new DirectedMaskSubgraph<>(g, new MaskFunctor<Node, Edge>() {
+		DirectedGraph<Node, Edge> filteredGraph = new DirectedMaskSubgraph<>(g, new MaskFunctor<Node, Edge>() {
 			@Override
 			public boolean isEdgeMasked(Edge edge) {
 				return false;
@@ -176,9 +176,9 @@ public class JGraphTGrapher extends AbstractInjectorGrapher {
 				return false;
 			}
 		});
-		ConnectivityInspector<Node, Edge> ci = new ConnectivityInspector<>(filtered);
-		filtered = new ListenableDirectedGraph<>(Edge.class);
-		Graphs.addGraph(filtered, new DirectedMaskSubgraph<>(g, new MaskFunctor<Node, Edge>() {
+		ConnectivityInspector<Node, Edge> ci = new ConnectivityInspector<>(filteredGraph);
+		filteredGraph = new ListenableDirectedGraph<>(Edge.class);
+		Graphs.addGraph(filteredGraph, new DirectedMaskSubgraph<>(g, new MaskFunctor<Node, Edge>() {
 			@Override
 			public boolean isEdgeMasked(Edge edge) {
 				return false;
@@ -190,9 +190,9 @@ public class JGraphTGrapher extends AbstractInjectorGrapher {
 			}
 		}));
 
-		MyGrapher myGrapher = new MyGrapher();
-		myGrapher.setRankdir("LR");
-		myGrapher.setOut((PrintWriter) writer);
-		myGrapher.graph(filtered);
+		GraphvizRenderer graphvizRenderer = new GraphvizRenderer();
+		graphvizRenderer.setRankdir("LR");
+		graphvizRenderer.setOut((PrintWriter) writer);
+		graphvizRenderer.render(filteredGraph);
 	}
 }

@@ -4,47 +4,30 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.inject.Binding;
 import com.google.inject.Key;
 import com.google.inject.grapher.*;
 import com.google.inject.grapher.graphviz.*;
 import com.google.inject.name.Names;
 import com.google.inject.spi.InjectionPoint;
-import com.google.inject.spi.ProviderBinding;
-import com.google.inject.util.Types;
 import org.jgrapht.DirectedGraph;
-import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.PrepareForSim;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.controler.corelisteners.PlansScoring;
-import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
-import javax.inject.Provider;
 import java.io.PrintWriter;
 import java.lang.reflect.Member;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class MyGrapher extends AbstractInjectorGrapher {
+public class GraphvizRenderer {
 
-	boolean fields = false;
+	private boolean fields = false;
 
-	MyGrapher() {
-		super();
-	}
-	
 	private final Map<NodeId, GraphvizNode> nodes = Maps.newHashMap();
 	private final List<GraphvizEdge> edges = Lists.newArrayList();
 	private final NameFactory nameFactory = new ShortNameFactory();
@@ -53,23 +36,28 @@ public class MyGrapher extends AbstractInjectorGrapher {
 	private PrintWriter out;
 	private String rankdir = "TB";
 
-	@Override
-	protected void reset() {
-		nodes.clear();
-		edges.clear();
-	}
+	public void render(DirectedGraph<Node, Edge> graph) {
+		for (Node node : graph.vertexSet()) {
+			if (node instanceof InstanceNode) {
+				newInstanceNode(((InstanceNode) node));
+			} else if (node instanceof ImplementationNode) {
+				newImplementationNode(((ImplementationNode) node));
+			} else if (node instanceof InterfaceNode) {
+				newInterfaceNode(((InterfaceNode) node));
+			}
+		}
+		for (Edge edge : graph.edgeSet()) {
+			if (edge instanceof BindingEdge) {
+				newBindingEdge(((BindingEdge) edge));
+			} else if (edge instanceof DependencyEdge) {
+				newDependencyEdge(((DependencyEdge) edge));
+			}
+		}
+		out.println("digraph injector {");
 
-	public void setOut(PrintWriter out) {
-		this.out = out;
-	}
-
-	public void setRankdir(String rankdir) {
-		this.rankdir = rankdir;
-	}
-
-	@Override
-	protected void postProcess() {
-		start();
+		Map<String, String> attrs = Maps.newHashMap();
+		attrs.put("rankdir", rankdir);
+		out.println("graph " + getAttrString(attrs) + ";");
 
 		for (GraphvizNode node : nodes.values()) {
 			renderNode(node);
@@ -100,29 +88,30 @@ public class MyGrapher extends AbstractInjectorGrapher {
 		out.flush();
 	}
 
-	protected Map<String, String> getGraphAttributes() {
-		Map<String, String> attrs = Maps.newHashMap();
-		attrs.put("rankdir", rankdir);
-		return attrs;
+
+	protected void reset() {
+		nodes.clear();
+		edges.clear();
 	}
 
-	protected void start() {
-		out.println("digraph injector {");
+	public void setOut(PrintWriter out) {
+		this.out = out;
+	}
 
-		Map<String, String> attrs = getGraphAttributes();
-		out.println("graph " + getAttrString(attrs) + ";");
+	void setRankdir(String rankdir) {
+		this.rankdir = rankdir;
 	}
 
 	protected void finish() {
 		out.println("}");
 	}
 
-	protected void renderNode(GraphvizNode node) {
+	private void renderNode(GraphvizNode node) {
 		Map<String, String> attrs = getNodeAttributes(node);
 		out.println(node.getIdentifier() + " " + getAttrString(attrs));
 	}
 
-	protected Map<String, String> getNodeAttributes(GraphvizNode node) {
+	private Map<String, String> getNodeAttributes(GraphvizNode node) {
 		Map<String, String> attrs = Maps.newHashMap();
 
 		attrs.put("label", getNodeLabel(node));
@@ -139,7 +128,7 @@ public class MyGrapher extends AbstractInjectorGrapher {
 	 * table with a heading at the top and (in the case of
 	 * {@link ImplementationNode}s) rows for each of the member fields.
 	 */
-	protected String getNodeLabel(GraphvizNode node) {
+	private String getNodeLabel(GraphvizNode node) {
 		String cellborder = node.getStyle() == NodeStyle.INVISIBLE ? "1" : "0";
 
 		StringBuilder html = new StringBuilder();
@@ -173,7 +162,7 @@ public class MyGrapher extends AbstractInjectorGrapher {
 		return html.toString();
 	}
 
-	protected void renderEdge(GraphvizEdge edge) {
+	private void renderEdge(GraphvizEdge edge) {
 		Map<String, String> attrs = getEdgeAttributes(edge);
 
 		String tailId = getEdgeEndPoint(nodes.get(edge.getTailNodeId()).getIdentifier(),
@@ -185,17 +174,13 @@ public class MyGrapher extends AbstractInjectorGrapher {
 		out.println(tailId + " -> " + headId + " " + getAttrString(attrs));
 	}
 
-	protected Map<String, String> getEdgeAttributes(GraphvizEdge edge) {
+	private Map<String, String> getEdgeAttributes(GraphvizEdge edge) {
 		Map<String, String> attrs = Maps.newHashMap();
 
 		attrs.put("arrowhead", getArrowString(edge.getArrowHead()));
 		attrs.put("arrowtail", getArrowString(edge.getArrowTail()));
 		attrs.put("style", edge.getStyle().toString());
-//		if (edge.getHeadNodeId().getKey().getAnnotation() instanceof com.google.inject.name.Named) {
-////			System.out.printf("%s --- %s\n", edge.getHeadNodeId().getKey().getAnnotation(), edge.getTailNodeId().getKey().getAnnotation());
-//			String value = ((com.google.inject.name.Named) edge.getHeadNodeId().getKey().getAnnotation()).value();
-//			attrs.put("label", value);
-//		}
+
 		return attrs;
 	}
 
@@ -218,11 +203,11 @@ public class MyGrapher extends AbstractInjectorGrapher {
 	 * represents combining them. With Graphviz, that just means concatenating
 	 * them.
 	 */
-	protected String getArrowString(List<ArrowType> arrows) {
+	private String getArrowString(List<ArrowType> arrows) {
 		return Joiner.on("").join(arrows);
 	}
 
-	protected String getEdgeEndPoint(String nodeId, String portId, CompassPoint compassPoint) {
+	private String getEdgeEndPoint(String nodeId, String portId, CompassPoint compassPoint) {
 		List<String> portStrings = Lists.newArrayList(nodeId);
 
 		if (portId != null) {
@@ -236,25 +221,11 @@ public class MyGrapher extends AbstractInjectorGrapher {
 		return Joiner.on(":").join(portStrings);
 	}
 
-	protected String htmlEscape(String str) {
+	private String htmlEscape(String str) {
 		return str.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
 	}
 
-	protected List<String> htmlEscape(List<String> elements) {
-		List<String> escaped = Lists.newArrayList();
-		for (String element : elements) {
-			escaped.add(htmlEscape(element));
-		}
-		return escaped;
-	}
-
-	@Override
-	protected void newInterfaceNode(InterfaceNode node) {
-		System.out.println(node.getSource());
-
-		// TODO(phopkins): Show the Module on the graph, which comes from the
-		// class name when source is a StackTraceElement.
-
+	private void newInterfaceNode(InterfaceNode node) {
 		NodeId nodeId = node.getId();
 		GraphvizNode gnode = new GraphvizNode(nodeId);
 		gnode.setStyle(NodeStyle.DASHED);
@@ -264,10 +235,7 @@ public class MyGrapher extends AbstractInjectorGrapher {
 		addNode(gnode);
 	}
 
-	@Override
-	protected void newImplementationNode(ImplementationNode node) {
-		System.out.println(node.getSource());
-
+	private void newImplementationNode(ImplementationNode node) {
 		NodeId nodeId = node.getId();
 		GraphvizNode gnode = new GraphvizNode(nodeId);
 		gnode.setStyle(NodeStyle.SOLID);
@@ -285,9 +253,7 @@ public class MyGrapher extends AbstractInjectorGrapher {
 		addNode(gnode);
 	}
 
-	@Override
-	protected void newInstanceNode(InstanceNode node) {
-		System.out.println(node.getSource());
+	private void newInstanceNode(InstanceNode node) {
 		NodeId nodeId = node.getId();
 		GraphvizNode gnode = new GraphvizNode(nodeId);
 		gnode.setStyle(NodeStyle.SOLID);
@@ -310,8 +276,7 @@ public class MyGrapher extends AbstractInjectorGrapher {
 		addNode(gnode);
 	}
 
-	@Override
-	protected void newDependencyEdge(DependencyEdge edge) {
+	private void newDependencyEdge(DependencyEdge edge) {
 		GraphvizEdge gedge = new GraphvizEdge(edge.getFromId(), edge.getToId());
 		InjectionPoint fromPoint = edge.getInjectionPoint();
 		if (fromPoint == null) {
@@ -325,8 +290,7 @@ public class MyGrapher extends AbstractInjectorGrapher {
 		edges.add(gedge);
 	}
 
-	@Override
-	protected void newBindingEdge(BindingEdge edge) {
+	private void newBindingEdge(BindingEdge edge) {
 		GraphvizEdge gedge = new GraphvizEdge(edge.getFromId(), edge.getToId());
 		gedge.setStyle(EdgeStyle.DASHED);
 		switch (edge.getType()) {
@@ -350,23 +314,4 @@ public class MyGrapher extends AbstractInjectorGrapher {
 		nodes.put(node.getNodeId(), node);
 	}
 
-	public void graph(DirectedGraph<Node, Edge> graph) {
-		for (Node node : graph.vertexSet()) {
-			if (node instanceof InstanceNode) {
-				newInstanceNode(((InstanceNode) node));
-			} else if (node instanceof ImplementationNode) {
-				newImplementationNode(((ImplementationNode) node));
-			} else if (node instanceof InterfaceNode) {
-				newInterfaceNode(((InterfaceNode) node));
-			}
-		}
-		for (Edge edge : graph.edgeSet()) {
-			if (edge instanceof BindingEdge) {
-				newBindingEdge(((BindingEdge) edge));
-			} else if (edge instanceof DependencyEdge) {
-				newDependencyEdge(((DependencyEdge) edge));
-			}
-		}
-		postProcess();
-	}
 }

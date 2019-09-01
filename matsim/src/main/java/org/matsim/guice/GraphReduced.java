@@ -74,7 +74,7 @@ public class GraphReduced {
         com.google.inject.Injector matsimInjector = Injector.createInjector(configToGraph, (AbstractModule) module);
         matsimInjector.getInstance(ControlerI.class);
         try (PrintWriter out = new PrintWriter(new File(outputDirectory +"/guice.dot"))) {
-            JGraphTGrapher renderer = new JGraphTGrapher(new AbstractInjectorGrapher.GrapherParameters()
+            JGraphTGrapher grapher = new JGraphTGrapher(new AbstractInjectorGrapher.GrapherParameters()
 					.setAliasCreator(bindings -> {
                                 // Copied from ProviderAliasCreator
                                 List<Alias> allAliases = Lists.newArrayList();
@@ -96,13 +96,13 @@ public class GraphReduced {
 								return allAliases;
                             }
                     ), out);
-            renderer.graph(matsimInjector.getInstance(com.google.inject.Injector.class));
+            grapher.graph(matsimInjector);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    static List<Alias> getMultibinderAliases(Type aClass, Iterable<Binding<?>> bindings) {
+    private static List<Alias> getMultibinderAliases(Type aClass, Iterable<Binding<?>> bindings) {
 		List<Alias> aliases = Lists.newArrayList();
 		NodeId toId = NodeId.newTypeId(Key.get(Types.setOf(aClass)));
 		ParameterizedType comGoogleInjectProvider = Types.newParameterizedType(Provider.class, aClass);
@@ -120,7 +120,7 @@ public class GraphReduced {
 		return aliases;
 	}
 
-    static <K> List<Alias> getMapBinderAliases(Class<K> keyType, Type aClass, Iterable<Binding<?>> bindings) {
+    private static <K> List<Alias> getMapBinderAliases(Class<K> keyType, Type aClass, Iterable<Binding<?>> bindings) {
 		List<Alias> aliases = Lists.newArrayList();
 		NodeId toId = NodeId.newTypeId(Key.get(Types.mapOf(keyType, aClass)));
 		ParameterizedType comGoogleInjectProvider = Types.newParameterizedType(Provider.class, aClass);
