@@ -48,7 +48,9 @@ final class BicycleModule extends AbstractModule {
 		addTravelTimeBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelTime.class).in(Singleton.class);
 		addTravelDisutilityFactoryBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelDisutilityFactory.class).in(Singleton.class);
 		bindScoringFunctionFactory().to(BicycleScoringFunctionFactory.class).in(Singleton.class);
+
 		bind(BicycleLinkSpeedCalculator.class);
+		// yyyy not sure if this is helpful since if it is not bound against an interface, one cannot replace it anyways.  kai, sep'19
 
         if (bicycleConfigGroup.isMotorizedInteraction()) {
 			addMobsimListenerBinding().to(MotorizedInteractionEngine.class);

@@ -37,7 +37,7 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	private static final String BICYCLE_MODE = "bicycleMode";
 	private static final String MOTORIZED_INTERACTION = "motorizedInteraction";
 	
-	public static enum BicycleScoringType {legBased, linkBased};
+	public enum BicycleScoringType {legBased, linkBased};
 
 	private double marginalUtilityOfComfort;
 	private double marginalUtilityOfInfrastructure;
@@ -98,11 +98,11 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	public double getMaxBicycleSpeedForRouting() {
 		return this.maxBicycleSpeedForRouting;
 	}
-	@StringSetter( BICYCLE_MODE )
+	@StringGetter( BICYCLE_MODE )
 	public String getBicycleMode() {
 		return this.bicycleMode;
 	}
-	@StringGetter( BICYCLE_MODE )
+	@StringSetter( BICYCLE_MODE )
 	public void setBicycleMode(String bicycleMode) {
 		this.bicycleMode = bicycleMode;
 	}
