@@ -3,8 +3,8 @@
  targetNamespace="http://www.matsim.org/files/dtd" xmlns="http://www.matsim.org/files/dtd" 
  elementFormDefault="qualified" 
  xml:lang="en">
-<!-- Editor: Dominik Grether, VSP, Berlin Institute of Technology -->
-<!-- This xml schema contains xml definitions for household information in the MATSim framework  -->
+<!-- Editor: Kai Martins-Turner, VSP, Berlin Institute of Technology -->
+<!-- This xml schema contains xml definitions for freight carriers information in the MATSim framework (freight contrib)  -->
 
 <xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
 
