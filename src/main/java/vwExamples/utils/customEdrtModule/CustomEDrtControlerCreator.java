@@ -46,7 +46,7 @@ public class CustomEDrtControlerCreator {
 		ScenarioUtils.loadScenario(scenario);
 
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new CustomEDrtModule());
+		controler.addOverridingModule(new CustomMultiModeEDrtModule());
 		controler.addOverridingModule(new DvrpModule());
 		controler.addOverridingModule(new EvModule());
 		controler.addOverridingModule(new EvDvrpIntegrationModule());
