@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.accidents.computation.AccidentsComputationMethod;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -36,7 +35,9 @@ import org.matsim.core.utils.io.IOUtils;
  * @author ikaddoura
  */
 
-public class AccidentsConfigGroup extends ReflectiveConfigGroup {
+public final class AccidentsConfigGroup extends ReflectiveConfigGroup {
+	// needs to be public because of reflection-based annotations
+
 	private static final Logger log = Logger.getLogger(AccidentsConfigGroup.class);
 
 	public static final String GROUP_NAME = "accidents" ;
@@ -235,6 +236,11 @@ public class AccidentsConfigGroup extends ReflectiveConfigGroup {
 	public void AccidentsComputationMethod(AccidentsComputationMethod accidentsComputationMethod) {
 		this.accidentsComputationMethod = accidentsComputationMethod;
 	}
-			
+
+	/**
+	* @author mmayobre
+	*/
+
+	public enum AccidentsComputationMethod {BVWP}
 }
 
