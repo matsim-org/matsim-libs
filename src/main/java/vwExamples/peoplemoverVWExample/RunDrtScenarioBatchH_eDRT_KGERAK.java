@@ -138,6 +138,8 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 
 		config.network().setInputFile(inbase + "\\input\\network\\drtServiceAreaNetwork.xml.gz");
 
+		//create an empty DRT config group if not present in the config file
+		MultiModeDrtConfigGroup.get(config).addParameterSet(new DrtConfigGroup());
 		// This part allows to change dynamically DRT config parameters
 		DrtConfigGroup drt = (DrtConfigGroup)config.getModules().get(DrtConfigGroup.GROUP_NAME);
 

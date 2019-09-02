@@ -76,7 +76,7 @@ public class RunDrtScenarioBatchH_eDRT_TUB {
 
 	public static void main(String[] args) throws IOException {
 
-        run(100, 0, "D:/testInput");
+		run(100, 0, "D:/testInput");
 
 	}
 
@@ -90,7 +90,7 @@ public class RunDrtScenarioBatchH_eDRT_TUB {
 				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(),
 				new TemperatureChangeConfigGroup());
 		config.controler().setRunId(runId);
-        config.controler().setOutputDirectory(inbase + "/output/" + runId); // Define dynamically the output dir
+		config.controler().setOutputDirectory(inbase + "/output/" + runId); // Define dynamically the output dir
 
 		adjustConfig(config, rebalancing);
 
@@ -161,7 +161,7 @@ public class RunDrtScenarioBatchH_eDRT_TUB {
 
 		// config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		// Overwrite existing configuration parameters
-        config.plans().setInputFile("plans/testdrtplans.xml.gz");
+		config.plans().setInputFile("plans/testdrtplans.xml.gz");
 		config.controler().setLastIteration(0); // Number of simulation iterations
 		config.controler().setWriteEventsInterval(0); // Write Events file every x-Iterations
 		config.controler().setWritePlansInterval(0); // Write Plan file every x-Iterations
@@ -171,7 +171,10 @@ public class RunDrtScenarioBatchH_eDRT_TUB {
 		String drtTag = "drt"; // drtTag is assigned to roads that should be used by the drt service
 		// Adding drtTag to the network in order to define a service area
 
-        config.network().setInputFile("network/drtServiceAreaNetwork.xml.gz");
+		config.network().setInputFile("network/drtServiceAreaNetwork.xml.gz");
+
+		//create an empty DRT config group if not present in the config file
+		MultiModeDrtConfigGroup.get(config).addParameterSet(new DrtConfigGroup());
 
 		DrtConfigGroup drt = DrtConfigGroup.getSingleModeDrtConfig(config);
 
@@ -182,17 +185,17 @@ public class RunDrtScenarioBatchH_eDRT_TUB {
 		drt.setStopDuration(30.0);
 		drt.setRejectRequestIfMaxWaitOrTravelTimeViolated(true);
 
-        drt.setTransitStopFile("network/virtualStops.xml");
+		drt.setTransitStopFile("network/virtualStops.xml");
 		drt.setMaxWalkDistance(800.0);
 
-        drt.setVehiclesFile("fleets/fleet.xml.gz");
+		drt.setVehiclesFile("fleets/fleet.xml.gz");
 		drt.setIdleVehiclesReturnToDepots(true);
 		drt.setOperationalScheme(DrtConfigGroup.OperationalScheme.stopbased);
 		drt.setPlotDetailedCustomerStats(true);
 
 		EvConfigGroup eDrt = (EvConfigGroup)config.getModules().get(EvConfigGroup.GROUP_NAME);
-        eDrt.setChargersFile("chargers/chargers.xml.gz");
-        eDrt.setVehiclesFile("fleets/eFleet.xml.gz");
+		eDrt.setChargersFile("chargers/chargers.xml.gz");
+		eDrt.setVehiclesFile("fleets/eFleet.xml.gz");
 		eDrt.setAuxDischargeTimeStep(10);
 		eDrt.setTimeProfiles(true);
 
