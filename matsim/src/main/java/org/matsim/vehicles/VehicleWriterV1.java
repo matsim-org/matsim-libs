@@ -109,7 +109,7 @@ public final class VehicleWriterV1 extends MatsimXmlWriter {
 				this.writeStartTag(VehicleSchemaV1Names.MAXIMUMVELOCITY, atts, true);
 			}
 			if (vt.getEngineInformation() != null) {
-				this.writeEngineInformation(VehicleUtils.getEngineInformation(vt));
+				this.writeEngineInformation(vt.getEngineInformation());
 			}
 			atts.clear();
 			atts.add(this.createTuple(VehicleSchemaV1Names.SECONDSPERPERSON, VehicleUtils.getAccessTime(vt)));
