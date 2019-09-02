@@ -116,6 +116,7 @@ class BicycleTravelDisutility implements TravelDisutility {
 						+ "sigma to zero.") ;
 			}
 			normalRndLink = 0.05 * random.nextGaussian();
+			// yyyyyy are we sure that this is a good approach?  In high resolution networks, this leads to quirky detours ...  kai, sep'19
 			if (person != prevPerson) {
 				prevPerson = person;
 
