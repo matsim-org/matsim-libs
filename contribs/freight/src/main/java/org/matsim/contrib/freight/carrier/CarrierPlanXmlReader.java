@@ -28,6 +28,7 @@ public class CarrierPlanXmlReader implements MatsimReader {
 	private final CarriersPlanReader reader;
 
 	public CarrierPlanXmlReader( final Carriers carriers ) {
+        System.setProperty("matsim.preferLocalDtds", "true");       //can be removed later, once the carriersDefiniton_v2.0.xsd is online
 		this.reader = new CarriersPlanReader( carriers ) ;
 	}
 
