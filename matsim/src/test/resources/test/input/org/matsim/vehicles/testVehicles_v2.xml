@@ -9,7 +9,6 @@
 			<attribute name="accessTimeInSecondsPerPerson" class="java.lang.Double">23.23</attribute>
 			<attribute name="doorOperationMode" class="java.lang.String">parallel</attribute>
 			<attribute name="egressTimeInSecondsPerPerson" class="java.lang.Double">42.42</attribute>
-			<attribute name="fuelConsumptionLitersPerMeter" class="java.lang.Double">0.23</attribute>
 		</attributes>
 		<description>abc</description>
 		<capacity seats="5" standingRoomInPersons="20" volumeInCubicMeters="23.23" weightInTons="9.5">
@@ -22,6 +21,7 @@
 		<maximumVelocity meterPerSecond="42.0"/>
 		<engineInformation>
 			<attributes>
+				<attribute name="fuelConsumptionLitersPerMeter" class="java.lang.Double">0.23</attribute>
 				<attribute name="HbefaEmissionsConcept" class="java.lang.String">EURO-5</attribute>
 				<attribute name="HbefaSizeClass" class="java.lang.String">&lt; 1,4L</attribute>
 				<attribute name="HbefaTechnology" class="java.lang.String">petrol</attribute>
