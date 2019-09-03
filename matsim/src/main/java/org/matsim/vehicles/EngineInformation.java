@@ -40,16 +40,16 @@ public final class EngineInformation implements Attributable {
 	 * because we want to have the FuelConsumption coming from the emissions contrib). This FuelConsumption here is only a very rough estimation
 	 * without traffic condition.
 	 */
-	@Deprecated
-	public EngineInformation( FuelType fueltype, double literPerMeter ) {
-		this.setFuelType(fueltype);
-		this.setFuelConsumption(literPerMeter);
-	}
-	@Deprecated
-	public EngineInformation( FuelType fueltype ) {
-		this.setFuelType(fueltype);
-		this.setFuelConsumption(Double.NaN);
-	}
+//	@Deprecated
+//	public EngineInformation( FuelType fueltype, double literPerMeter ) {
+//		this.setFuelType(fueltype);
+//		this.setFuelConsumption(literPerMeter);
+//	}
+//	@Deprecated
+//	public EngineInformation( FuelType fueltype ) {
+//		this.setFuelType(fueltype);
+//		this.setFuelConsumption(Double.NaN);
+//	}
 
 	public EngineInformation() {
 	}
