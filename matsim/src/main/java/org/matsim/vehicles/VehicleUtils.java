@@ -208,7 +208,7 @@ public final class VehicleUtils {
 //		}
 //	}
 
-	//******** EngineInformation attributes ************
+	//******** Capacity attributes ************
 
 
 	@Deprecated
