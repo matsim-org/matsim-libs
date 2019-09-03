@@ -175,7 +175,8 @@ public final class VehicleUtils {
 	}
 
 	public static void setFuelConsumption(VehicleType vehicleType, double literPerMeter) {
-		vehicleType.getAttributes().putAttribute(FUELCONSUMPTION, literPerMeter);
+    	setFuelConsumption(vehicleType.getEngineInformation(), literPerMeter);
+//		vehicleType.getAttributes().putAttribute(FUELCONSUMPTION, literPerMeter);
 	}
 
 //	//TODO: Remove here, because we now let in engineInformation as seperate field?
