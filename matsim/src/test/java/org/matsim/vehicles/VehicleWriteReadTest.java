@@ -7,6 +7,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.*;
+import java.util.Objects;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -76,14 +77,15 @@ public class VehicleWriteReadTest{
 
 		String lineInput;
 		String lineOutput;
-
+		long lineCnt = 0 ;
 		while (((lineInput = readerV2Input.readLine()) != null) && ((lineOutput = readerV2Output.readLine()) != null)) {
-
-			log.info("in/out:");
-			log.info(lineInput);
-			log.info(lineOutput);
-			log.info("") ;
-			assertEquals("Lines have different content: ", lineInput, lineOutput);
+			lineCnt++ ;
+			if ( !Objects.equals( lineInput.trim(), lineOutput.trim() ) ) {
+				log.error("in/out:");
+				log.error("line=" + lineCnt + ": " + lineInput);
+				log.error("line=" + lineCnt + ": " + lineOutput);
+			}
+			assertEquals("Lines have different content: ", lineInput.trim(), lineOutput.trim());
 		}
 		readerV2Input.close();
 		readerV2Output.close();
