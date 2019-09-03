@@ -31,7 +31,7 @@ final class VehicleReaderV1 extends MatsimXmlParser{
 //			VehicleUtils.setEngineInformation(this.currentVehType, this.currentFuelType, VehicleUtils.getFuelConsumption(this.currentVehType));
 //			this.currentFuelType = null;
 		} else if( VehicleSchemaV1Names.FUELTYPE.equalsIgnoreCase( name ) ){
-			VehicleUtils.setFuelType(this.currentVehType.getEngineInformation(), content.trim());
+			VehicleUtils.setFuelType(this.currentVehType.getEngineInformation(), EngineInformation.FuelType.valueOf(content.trim()));
 		} else if( VehicleSchemaV1Names.FREIGHTCAPACITY.equalsIgnoreCase( name ) ){
 //			this.currentCapacity.setFreightCapacity( this.currentFreightCap );
 //			this.currentFreightCap = null;
@@ -42,32 +42,6 @@ final class VehicleReaderV1 extends MatsimXmlParser{
 			this.vehicles.addVehicleType( this.currentVehType );
 			this.currentVehType = null;
 		}
-	}
-
-	private EngineInformation.FuelType parseFuelType( final String content ){
-		return EngineInformation.FuelType.valueOf(content) ;
-//		if( EngineInformation.FuelType.gasoline.toString().equalsIgnoreCase( content ) ){
-//			return EngineInformation.FuelType.gasoline;
-//		} else if( EngineInformation.FuelType.diesel.toString().equalsIgnoreCase( content ) ){
-//			return EngineInformation.FuelType.diesel;
-//		} else if( EngineInformation.FuelType.electricity.toString().equalsIgnoreCase( content ) ){
-//			return EngineInformation.FuelType.electricity;
-//		} else if( EngineInformation.FuelType.biodiesel.toString().equalsIgnoreCase( content ) ){
-//			return EngineInformation.FuelType.biodiesel;
-//		} else{
-//			throw new IllegalArgumentException( "Fuel type: " + content + " is not supported!" );
-//		}
-	}
-
-	private VehicleUtils.DoorOperationMode parseDoorOperationMode( final String modeString ){
-		return VehicleUtils.DoorOperationMode.valueOf(modeString) ;
-//		if( VehicleUtils.DoorOperationMode.serial.toString().equalsIgnoreCase( modeString ) ){
-//			return VehicleUtils.DoorOperationMode.serial;
-//		} else if( VehicleUtils.DoorOperationMode.parallel.toString().equalsIgnoreCase( modeString ) ){
-//			return VehicleUtils.DoorOperationMode.parallel;
-//		} else{
-//			throw new IllegalArgumentException( "Door operation mode " + modeString + " is not supported" );
-//		}
 	}
 
 	@Override
@@ -115,7 +89,7 @@ final class VehicleReaderV1 extends MatsimXmlParser{
 		} else if( VehicleSchemaV1Names.EGRESSTIME.equalsIgnoreCase( name ) ){
 		    VehicleUtils.setEgressTime(this.currentVehType, Double.parseDouble( atts.getValue( VehicleSchemaV1Names.SECONDSPERPERSON ) ));
 		} else if( VehicleSchemaV1Names.DOOROPERATION.equalsIgnoreCase( name ) ){
-		    VehicleUtils.setDoorOperationMode(this.currentVehType, this.parseDoorOperationMode((atts.getValue(VehicleSchemaV1Names.MODE))));
+			VehicleUtils.setDoorOperationMode(this.currentVehType, VehicleUtils.DoorOperationMode.valueOf((atts.getValue(VehicleSchemaV1Names.MODE))));
 		} else if( VehicleSchemaV1Names.PASSENGERCAREQUIVALENTS.equalsIgnoreCase( name ) ){
 			this.currentVehType.setPcuEquivalents( Double.parseDouble( atts.getValue( VehicleSchemaV1Names.PCE ) ) );
 		}

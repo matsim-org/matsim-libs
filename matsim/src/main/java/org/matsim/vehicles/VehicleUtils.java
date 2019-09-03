@@ -165,12 +165,13 @@ public final class VehicleUtils {
 	}
 
 	public static double getFuelConsumption(VehicleType vehicleType) {
-		final Object attribute = vehicleType.getAttributes().getAttribute(FUELCONSUMPTION);
-		if ( attribute==null ) {
-			return Double.NaN ; // this was the default value in V1; could also return Double-null instead.
-		} else {
-			return (double) attribute;
-		}
+//		final Object attribute = vehicleType.getAttributes().getAttribute(FUELCONSUMPTION);
+//		if ( attribute==null ) {
+//			return Double.NaN ; // this was the default value in V1; could also return Double-null instead.
+//		} else {
+//			return (double) attribute;
+//		}
+		return getFuelConsumption(vehicleType.getEngineInformation());
 	}
 
 	public static void setFuelConsumption(VehicleType vehicleType, double literPerMeter) {
@@ -276,25 +277,25 @@ public final class VehicleUtils {
 	//******** CostInformation attributes ************
 
 	@Deprecated
-	public static double getCostsPerSecondWaiting(CostInformation costInformation) {
+	/*package*/ static double getCostsPerSecondWaiting(CostInformation costInformation) {
 		return (double) costInformation.getAttributes().getAttribute(COST_PER_SECOND_WAITING);
 	}
 
 
 	@Deprecated
-	public static void setCostsPerSecondWaiting(CostInformation costInformation, double costsPerSecond) {
+	/*package*/ static void setCostsPerSecondWaiting(CostInformation costInformation, double costsPerSecond) {
 		costInformation.getAttributes().putAttribute(COST_PER_SECOND_WAITING, costsPerSecond);
 	}
 
 
 	@Deprecated
-	public static double getCostsPerSecondInService(CostInformation costInformation) {
+	/*package*/ static double getCostsPerSecondInService(CostInformation costInformation) {
 		return (double) costInformation.getAttributes().getAttribute(COST_PER_SECOND_INSERVICE);
 	}
 
 
 	@Deprecated
-	public static void setCostsPerSecondInService(CostInformation costInformation, double costsPerSecond) {
+	/*package*/ static void setCostsPerSecondInService(CostInformation costInformation, double costsPerSecond) {
 		costInformation.getAttributes().putAttribute(COST_PER_SECOND_INSERVICE, costsPerSecond);
 	}
 
@@ -303,13 +304,23 @@ public final class VehicleUtils {
 	}
 
 	@Deprecated
-	public static String getFuelType(EngineInformation engineInformation ){
-		return engineInformation.getAttributes().getAttribute( FUEL_TYPE ).toString();
+	static EngineInformation.FuelType getFuelType(EngineInformation engineInformation ){
+		return (EngineInformation.FuelType) engineInformation.getAttributes().getAttribute( FUEL_TYPE );
 	}
 
 	@Deprecated
-	public static void setFuelType(EngineInformation engineInformation, String fuelType ){
+	static void setFuelType(EngineInformation engineInformation, EngineInformation.FuelType fuelType ){
 		engineInformation.getAttributes().putAttribute( FUEL_TYPE,  fuelType);
+	}
+
+	@Deprecated
+	static double getFuelConsumption(EngineInformation engineInformation ){
+		return (double) engineInformation.getAttributes().getAttribute( FUELCONSUMPTION );
+	}
+
+	@Deprecated
+	static void setFuelConsumption(EngineInformation engineInformation, double fuelConsumption ){
+		engineInformation.getAttributes().putAttribute( FUELCONSUMPTION,  fuelConsumption);
 	}
 
 	@Deprecated

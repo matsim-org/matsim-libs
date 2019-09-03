@@ -28,8 +28,8 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 public final class EngineInformation implements Attributable {
 	// yyyy maybe these subtypes should be immutable?
 
-	private String fuelType;
-	private double fuelConsumption;
+//	private String fuelType;
+//	private double fuelConsumption;
 	private Attributes attributes = new Attributes() ;
 
 	/**
@@ -55,22 +55,22 @@ public final class EngineInformation implements Attributable {
 	}
 
 	@Deprecated
-	public String getFuelType() {
+	public FuelType getFuelType() {
 		return VehicleUtils.getFuelType( this ) ;
 	}
 
 	@Deprecated
 	public double getFuelConsumption() {
-		return this.fuelConsumption;
+		return VehicleUtils.getFuelConsumption(this);
 	}
 
 	@Deprecated
 	public void setFuelType(FuelType fueltype) {
-		this.fuelType = fueltype.toString();
+		VehicleUtils.setFuelType(this, fueltype);
 	}
 	@Deprecated
 	public void setFuelConsumption(double literPerMeter) {
-		this.fuelConsumption = literPerMeter ;
+		VehicleUtils.setFuelConsumption(this, literPerMeter);
 	}
 
 	public Attributes getAttributes(){
