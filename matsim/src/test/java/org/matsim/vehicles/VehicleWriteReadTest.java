@@ -17,10 +17,10 @@ public class VehicleWriteReadTest{
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 
-	private static final String TESTXML_v1 = "testVehicles_v1.xml";
+	private static final String TESTXML_v1 = "testVehicles_v1_withDefaultValues.xml";
 	private static final String OUTXML_v1 = "testOutputVehicles_v1.xml";
 
-	private static final String TESTXML_v2 = "testVehicles_v2.xml";
+	private static final String TESTXML_v2 = "testVehicles_v2_withDefaultValues.xml";
 	private static final String OUTXML_v2 = "testOutputVehicles_v2.xml";
 
 
@@ -28,13 +28,13 @@ public class VehicleWriteReadTest{
 	public void setUp() throws IOException {
 	}
 
-	@Test @Ignore
+	@Test
 	public void v1_isWrittenCorrect () throws FileNotFoundException, IOException {
 		//----- V1 --------
 		//read it
 		Vehicles vehicles1 = VehicleUtils.createVehiclesContainer();
 		MatsimVehicleReader reader1 = new MatsimVehicleReader(vehicles1);
-		reader1.readFile(utils.getPackageInputDirectory() + TESTXML_v1);
+		reader1.readFile(utils.getClassInputDirectory() + TESTXML_v1);
 
 		//write it
 		VehicleWriterV1 writerV1 = new VehicleWriterV1(vehicles1);
@@ -43,7 +43,7 @@ public class VehicleWriteReadTest{
 
 		assertTrue(new File( outputDirectory + OUTXML_v1).exists() );
 
-		BufferedReader readerV1Input = IOUtils.getBufferedReader(utils.getPackageInputDirectory() + TESTXML_v1);
+		BufferedReader readerV1Input = IOUtils.getBufferedReader(utils.getClassInputDirectory() + TESTXML_v1);
 		BufferedReader readerV1Output = IOUtils.getBufferedReader( outputDirectory + OUTXML_v1 );
 
 		String lineInput;
@@ -57,13 +57,13 @@ public class VehicleWriteReadTest{
 		readerV1Output.close();
 	}
 
-	@Test @Ignore
+	@Test
 	public void v2_isWrittenCorrect () throws FileNotFoundException, IOException {
 		//----- V2 --------
 		//read it
 		Vehicles vehicles2 = VehicleUtils.createVehiclesContainer();
 		MatsimVehicleReader reader2 = new MatsimVehicleReader(vehicles2);
-		reader2.readFile(utils.getPackageInputDirectory() + TESTXML_v2);
+		reader2.readFile(utils.getClassInputDirectory() + TESTXML_v2);
 
 		//write it
 		VehicleWriterV2 writerV2 = new VehicleWriterV2(vehicles2);
@@ -71,7 +71,7 @@ public class VehicleWriteReadTest{
 		writerV2.writeFile( outputDirectory + OUTXML_v2 );
 		assertTrue(new File( outputDirectory + OUTXML_v2).exists() );
 
-		BufferedReader readerV2Input = IOUtils.getBufferedReader(utils.getPackageInputDirectory() + TESTXML_v2);
+		BufferedReader readerV2Input = IOUtils.getBufferedReader(utils.getClassInputDirectory() + TESTXML_v2);
 		BufferedReader readerV2Output = IOUtils.getBufferedReader( outputDirectory + OUTXML_v2 );
 
 		String lineInput;
