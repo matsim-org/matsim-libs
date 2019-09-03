@@ -15,7 +15,7 @@ final class VehicleReaderV2 extends MatsimXmlParser{
 	private final VehiclesFactory builder;
 	private VehicleType currentVehType = null;
 	private VehicleCapacity currentCapacity = null;
-	private EngineInformation currentEngineInformation = null;
+//	private EngineInformation currentEngineInformation = null;
 	private CostInformation currentCostInformation = null;
 
 	private final AttributesXmlReaderDelegate attributesDelegate = new AttributesXmlReaderDelegate();
@@ -36,8 +36,8 @@ final class VehicleReaderV2 extends MatsimXmlParser{
 				}
 				break;
 			case VehicleSchemaV2Names.ENGINEINFORMATION:
-				this.currentVehType.setEngineInformation( this.currentEngineInformation );
-				this.currentEngineInformation = null;
+//				this.currentVehType.setEngineInformation( this.currentEngineInformation );
+//				this.currentEngineInformation = null;
 				break;
 
 			case VehicleSchemaV2Names.CAPACITY:
@@ -83,8 +83,9 @@ final class VehicleReaderV2 extends MatsimXmlParser{
 				this.currentVehType.setMaximumVelocity( val );
 				break;
 			case VehicleSchemaV2Names.ENGINEINFORMATION:
-				this.currentEngineInformation = new EngineInformation();
-				this.currAttributes = this.currentEngineInformation.getAttributes() ;
+//				this.currentEngineInformation = new EngineInformation();
+//				this.currentEngineInformation = this.currentVehType.getEngineInformation() ;
+				this.currAttributes = this.currentVehType.getEngineInformation().getAttributes() ;
 				break;
 			case VehicleSchemaV2Names.CAPACITY:
 				this.currentCapacity = this.builder.createVehicleCapacity();

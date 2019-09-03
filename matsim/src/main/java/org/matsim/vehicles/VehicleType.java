@@ -36,11 +36,11 @@ public final class VehicleType implements Attributable {
 	private double length = 7.5;
 	private double pcuEquivalents = 1.0;
 	private double flowEfficiencyFactor = 1.0;
-	private EngineInformation engineInformation;
-	private CostInformation costInformation;
+	private EngineInformation engineInformation = new EngineInformation() ;
+	private CostInformation costInformation = new CostInformation() ;
 //	private FreightCapacity freightCapacity;
 	private String description;
-	private VehicleCapacity capacity;
+	private VehicleCapacity capacity = new VehicleCapacity();
 	private String networkMode = TransportMode.car ;
 
 	private Id<VehicleType> id;

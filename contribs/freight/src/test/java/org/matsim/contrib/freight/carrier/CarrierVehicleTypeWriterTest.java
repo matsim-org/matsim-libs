@@ -11,7 +11,7 @@ public class CarrierVehicleTypeWriterTest {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils() ;
 	
-	@Test @Ignore
+	@Test
 	public void testTypeWriter(){
 		CarrierVehicleTypes types = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader(types).readFile(utils.getClassInputDirectory()+ "vehicleTypes.xml");

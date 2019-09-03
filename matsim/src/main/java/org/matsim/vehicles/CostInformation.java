@@ -23,30 +23,46 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 public final class CostInformation{
 	// yyyy maybe at least these subtypes should be immutable?  kai, aug'19
 
-    private final Double fixed;
-    private final Double perMeter;
-    private final Double perSecond;
-    private Attributes attributes = new Attributes() ;
+	private Double fixed;
+	private Double perMeter;
+	private Double perSecond;
+	private Attributes attributes = new Attributes() ;
 
-    public CostInformation( Double fixed, Double perMeter, Double perTimeUnit ) {
-        this.fixed = fixed;
-        this.perMeter = perMeter;
-        this.perSecond = perTimeUnit;
-    }
+	public CostInformation() {}
 
-    public Double getFixedCosts() {
-        return fixed;
-    }
+	@Deprecated
+	public CostInformation( Double fixed, Double perMeter, Double perTimeUnit ) {
+		this.fixed = fixed;
+		this.perMeter = perMeter;
+		this.perSecond = perTimeUnit;
+	}
 
-    public Double getCostsPerMeter() {
-        return perMeter;
-    }
+	public Double getFixedCosts() {
+		return fixed;
+	}
 
-    public Double getCostsPerSecond() {
-        return perSecond;
-    }
+	public Double getCostsPerMeter() {
+		return perMeter;
+	}
 
-    public Attributes getAttributes() {
-        return attributes;
-    }
+	public Double getCostsPerSecond() {
+		return perSecond;
+	}
+
+	public Attributes getAttributes() {
+		return attributes;
+	}
+
+	public void setFixed( Double fixed ){
+		this.fixed = fixed;
+	}
+
+	public void setPerMeter( Double perMeter ){
+		this.perMeter = perMeter;
+	}
+
+	public void setPerSecond( Double perSecond ){
+		this.perSecond = perSecond;
+	}
+
 }
