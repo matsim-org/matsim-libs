@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.population.Person;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.matsim.utils.objectattributes.attributable.Attributes;
 
 
 /**
@@ -304,9 +303,15 @@ public final class VehicleUtils {
 	}
 
 	@Deprecated
-	public static EngineInformation.FuelType getFuelType( EngineInformation engineInformation ){
-		return (EngineInformation.FuelType) engineInformation.getAttributes().getAttribute( FUEL_TYPE );
+	public static String getFuelType(EngineInformation engineInformation ){
+		return engineInformation.getAttributes().getAttribute( FUEL_TYPE ).toString();
 	}
+
+	@Deprecated
+	public static void setFuelType(EngineInformation engineInformation, String fuelType ){
+		engineInformation.getAttributes().putAttribute( FUEL_TYPE,  fuelType);
+	}
+
 	@Deprecated
 	public enum DoorOperationMode{ serial, parallel }
 }
