@@ -88,7 +88,7 @@ public class MatsimVehicleWriterTest extends MatsimTestCase {
 		assertEquals(Integer.valueOf(20), vehType.getCapacity().getStandingRoom());
 		assertEquals(23.23, vehType.getCapacity().getVolumeInCubicMeters(), EPSILON);
 		assertNotNull(vehType.getEngineInformation());
-		assertEquals( EngineInformation.FuelType.diesel.toString(), VehicleUtils.getHbefaTechnology(vehType.getEngineInformation() ) );
+		assertEquals( EngineInformation.FuelType.diesel.toString(), VehicleUtils.getFuelType(vehType.getEngineInformation() ) );
 		assertEquals(0.23, VehicleUtils.getFuelConsumption(vehType), EPSILON);
 		assertEquals(23.23, VehicleUtils.getAccessTime(vehType), EPSILON);
 		assertEquals(42.42, VehicleUtils.getEgressTime(vehType), EPSILON);

@@ -29,7 +29,7 @@ public final class EngineInformation implements Attributable {
 	// yyyy maybe these subtypes should be immutable?
 
 	private String fuelType;
-	private double gasConsumption;
+	private double fuelConsumption;
 	private Attributes attributes = new Attributes() ;
 
 	/**
@@ -61,7 +61,7 @@ public final class EngineInformation implements Attributable {
 
 	@Deprecated
 	public double getFuelConsumption() {
-		return this.gasConsumption;
+		return this.fuelConsumption;
 	}
 
 	@Deprecated
@@ -70,7 +70,7 @@ public final class EngineInformation implements Attributable {
 	}
 	@Deprecated
 	public void setFuelConsumption(double literPerMeter) {
-		this.gasConsumption = literPerMeter ;
+		this.fuelConsumption = literPerMeter ;
 	}
 
 	public Attributes getAttributes(){

@@ -76,7 +76,6 @@ public class VehicleReaderV1Test extends MatsimTestCase {
 		assertNotNull(vehType.getEngineInformation());
 		assertEquals( EngineInformation.FuelType.diesel.toString(), vehType.getEngineInformation().getFuelType());
 		assertEquals(0.23, VehicleUtils.getFuelConsumption(vehType), EPSILON);
-		assertEquals(0.23, VehicleUtils.getFuelConsumption(vehType), EPSILON);
 		assertEquals(23.23, VehicleUtils.getAccessTime(vehType), EPSILON);
 		assertEquals(42.42, VehicleUtils.getEgressTime(vehType), EPSILON);
 		assertEquals( VehicleUtils.DoorOperationMode.parallel, VehicleUtils.getDoorOperationMode(vehType ) );
