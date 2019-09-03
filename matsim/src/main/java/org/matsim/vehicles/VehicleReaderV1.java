@@ -30,6 +30,7 @@ final class VehicleReaderV1 extends MatsimXmlParser{
 		} else if( VehicleSchemaV1Names.ENGINEINFORMATION.equalsIgnoreCase( name ) ){
 //			VehicleUtils.setEngineInformation(this.currentVehType, this.currentFuelType, VehicleUtils.getFuelConsumption(this.currentVehType));
 //			this.currentFuelType = null;
+			this.currentVehType.setEngineInformation(null);
 		} else if( VehicleSchemaV1Names.FUELTYPE.equalsIgnoreCase( name ) ){
 			VehicleUtils.setFuelType(this.currentVehType.getEngineInformation(), EngineInformation.FuelType.valueOf(content.trim()));
 		} else if( VehicleSchemaV1Names.FREIGHTCAPACITY.equalsIgnoreCase( name ) ){

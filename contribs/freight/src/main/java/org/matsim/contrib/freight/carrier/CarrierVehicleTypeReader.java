@@ -72,9 +72,9 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 			parseDouble(weight);
 		}
 		if(name.equals("engineInformation")){
-			String fuelType = atts.getValue("fuelType");
-			String gasConsumption = atts.getValue("gasConsumption");
-			EngineInformation engineInfo = new EngineInformation(parseFuelType(fuelType ), parseDouble(gasConsumption ));
+			EngineInformation engineInfo = new EngineInformation();
+			engineInfo.setFuelConsumption(parseDouble(atts.getValue("gasConsumption")));
+			engineInfo.setFuelType(parseFuelType(atts.getValue("fuelType")));
 			this.currentEngineInfo = engineInfo;
 		}
 		
@@ -84,7 +84,10 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 			String perMeter = atts.getValue("perMeter");
 			String perSecond = atts.getValue("perSecond");
 			if(fix == null || perMeter == null || perSecond == null) throw new IllegalStateException("cannot read costInformation correctly. probably the paramName was written wrongly");
-			CostInformation vehicleCosts = new CostInformation(parseDouble(fix ), parseDouble(perMeter ), parseDouble(perSecond ));
+			CostInformation vehicleCosts = new CostInformation();
+			vehicleCosts.setFixedCosts(parseDouble(fix ));
+			vehicleCosts.setCostsPerMeter(parseDouble(perMeter) );
+			vehicleCosts.setCostsPerSecond(parseDouble(perSecond ));
 			this.currentVehicleCosts = vehicleCosts;
 		}
 	}
@@ -102,7 +105,7 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 		throw new IllegalStateException("fuelType " + fuelType + " is not supported");
 	}
 
-	private double parseDouble(String weight) {
+	private Double parseDouble(String weight) {
 		return Double.parseDouble(weight);
 	}
 

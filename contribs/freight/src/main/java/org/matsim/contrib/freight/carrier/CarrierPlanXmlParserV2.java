@@ -198,9 +198,9 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 			this.vehicleTypeBuilder = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create(typeId, org.matsim.vehicles.VehicleType.class ) );
 		}
 		else if(name.equals("engineInformation")){
-			String fuelType = atts.getValue("fuelType");
-			String gasConsumption = atts.getValue("gasConsumption");
-			EngineInformation engineInfo = new EngineInformation(parseFuelType(fuelType ), Double.parseDouble(gasConsumption ));
+			EngineInformation engineInfo = new EngineInformation();
+			engineInfo.setFuelType(parseFuelType(atts.getValue("fuelType")));
+			engineInfo.setFuelConsumption(Double.parseDouble(atts.getValue("gasConsumption")));
 			this.vehicleTypeBuilder.setEngineInformation(engineInfo);
 		}
 		else if(name.equals("costInformation")){

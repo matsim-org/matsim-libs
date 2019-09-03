@@ -35,7 +35,7 @@ public interface VehiclesFactory extends MatsimFactory {
 //	public EngineInformation createEngineInformation( FuelType fuelType,
 //									  double gasConsumption );
 
-	CostInformation createCostInformation( double fixedCosts, double costsPerMeter, double costsPerSecond );
+//	CostInformation createCostInformation( double fixedCosts, double costsPerMeter, double costsPerSecond );
 
 	Vehicle createVehicle( Id<Vehicle> id, VehicleType type );
 

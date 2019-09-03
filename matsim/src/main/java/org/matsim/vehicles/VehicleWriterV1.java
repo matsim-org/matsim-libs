@@ -130,7 +130,8 @@ public final class VehicleWriterV1 extends MatsimXmlWriter {
 	private void writeEngineInformation( EngineInformation ei ) throws UncheckedIOException {
 		this.writeStartTag(VehicleSchemaV1Names.ENGINEINFORMATION, null);
 		this.writeStartTag(VehicleSchemaV1Names.FUELTYPE, null);
-		this.writeContent(ei.getFuelType().toString(), false);
+//		this.writeContent(ei.getFuelType().toString(), false);
+		this.writeContent(VehicleUtils.getFuelType(ei).toString(), false);
 		this.writeEndTag(VehicleSchemaV1Names.FUELTYPE);
 		atts.clear();
 		atts.add(this.createTuple(VehicleSchemaV1Names.LITERPERMETER, Double.toString(ei.getFuelConsumption())));

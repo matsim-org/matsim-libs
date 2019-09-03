@@ -104,7 +104,7 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 		assertEquals(7.5, vehTypeDefaultCar.getLength(), EPSILON);
 		assertEquals(1.0, vehTypeDefaultCar.getWidth(), EPSILON);
 		assertTrue(Double.isInfinite(vehTypeDefaultCar.getMaximumVelocity()));
-		assertNull(vehTypeDefaultCar.getCapacity());
+		assertNotNull(vehTypeDefaultCar.getCapacity());
 		assertEquals( VehicleUtils.DoorOperationMode.serial, VehicleUtils.getDoorOperationMode(vehTypeDefaultCar ) );
 		assertEquals(1.0, vehTypeDefaultCar.getPcuEquivalents());
 		assertEquals(1.0, vehTypeDefaultCar.getFlowEfficiencyFactor());

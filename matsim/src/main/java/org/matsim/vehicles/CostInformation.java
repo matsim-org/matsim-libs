@@ -30,12 +30,12 @@ public final class CostInformation{
 
 	public CostInformation() {}
 
-	@Deprecated
-	public CostInformation( Double fixed, Double perMeter, Double perTimeUnit ) {
-		this.fixed = fixed;
-		this.perMeter = perMeter;
-		this.perSecond = perTimeUnit;
-	}
+//	@Deprecated
+//	public CostInformation( Double fixed, Double perMeter, Double perTimeUnit ) {
+//		this.fixed = fixed;
+//		this.perMeter = perMeter;
+//		this.perSecond = perTimeUnit;
+//	}
 
 	public Double getFixedCosts() {
 		return fixed;
@@ -53,15 +53,15 @@ public final class CostInformation{
 		return attributes;
 	}
 
-	public void setFixed( Double fixed ){
+	public void setFixedCosts(Double fixed ){
 		this.fixed = fixed;
 	}
 
-	public void setPerMeter( Double perMeter ){
+	public void setCostsPerMeter(Double perMeter ){
 		this.perMeter = perMeter;
 	}
 
-	public void setPerSecond( Double perSecond ){
+	public void setCostsPerSecond(Double perSecond ){
 		this.perSecond = perSecond;
 	}
 
