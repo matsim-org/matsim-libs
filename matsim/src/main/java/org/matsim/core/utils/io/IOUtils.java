@@ -42,6 +42,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -285,7 +286,7 @@ final public class IOUtils {
 				throw new UncheckedIOException("Can only write to file:// protocol URLs");
 			}
 
-			File file = new File(url.getPath());
+			File file = new File(url.toURI());
 			CompressionType compression = getCompression(url);
 
 			if (compression != null && append && file.exists()) {
@@ -312,7 +313,7 @@ final public class IOUtils {
 			}
 
 			return new BufferedOutputStream(outputStream);
-		} catch (IOException | CompressorException e) {
+		} catch (IOException | CompressorException | URISyntaxException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
