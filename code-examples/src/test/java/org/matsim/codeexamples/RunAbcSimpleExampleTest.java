@@ -42,4 +42,18 @@ public class RunAbcSimpleExampleTest{
 			fail() ;
 		}
 	}
+
+	@Test
+	@Ignore
+	public void main3(){
+		try{
+			RunAbcSimpleExample.main( new String []{ "jar:file:/Users/kainagel/.m2/repository/org/matsim/matsim-examples/12.0-SNAPSHOT/matsim-examples-12.0-SNAPSHOT.jar!/test/scenarios/equil/config.xml"
+				  , "--config:controler.outputDirectory=" + utils.getOutputDirectory()
+				  , "--config:controler.lastIteration=2"
+			} );
+		} catch ( Exception ee ) {
+			log.fatal(ee) ;
+			fail() ;
+		}
+	}
 }
