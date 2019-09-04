@@ -131,7 +131,7 @@ import java.util.Set;
 			double congestedCarUtilityRoad2Node = -travelDisutility.getLinkTravelDisutility(nearestLink, departureTime, null, null) * distanceFraction;
 
 			// Remaining travel on network
-			double congestedCarUtility = -lcpt.getTree().get(((Node) destination.getNearestNode()).getId()).getCost();
+			double congestedCarUtility = -lcpt.getTree().get(((Node) destination.getNearestBasicLocation()).getId()).getCost();
 			//double congestedCarUtility = - dijkstraTree.getLeastCostPath(destination.getNearestNode()).travelCost;
 			//double congestedCarUtility = - multiNodePathCalculator.constructPath(fromNode, destination.getNearestNode(), departureTime).travelCost;
 

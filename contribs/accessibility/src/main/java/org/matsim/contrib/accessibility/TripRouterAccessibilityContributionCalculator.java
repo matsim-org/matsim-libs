@@ -126,7 +126,7 @@ public class TripRouterAccessibilityContributionCalculator implements Accessibil
 			double congestedCarUtilityRoad2Node = -travelDisutility.getLinkTravelDisutility(nearestLink, departureTime, null, null) * distanceFraction;
 
 			ActivityFacilitiesFactory activityFacilitiesFactory = new ActivityFacilitiesFactoryImpl();
-			ActivityFacility destinationFacility = activityFacilitiesFactory.createActivityFacility(null, destination.getNearestNode().getCoord());
+			ActivityFacility destinationFacility = activityFacilitiesFactory.createActivityFacility(null, destination.getNearestBasicLocation().getCoord());
 
 			Gbl.assertNotNull(tripRouter);
 			List<? extends PlanElement> plan = tripRouter.calcRoute(mode, origin, destinationFacility, departureTime, null);

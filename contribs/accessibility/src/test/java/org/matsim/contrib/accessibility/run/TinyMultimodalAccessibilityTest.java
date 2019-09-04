@@ -41,17 +41,18 @@ import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A small test that enables to easily compare results with hand-computed results.
@@ -98,7 +99,7 @@ public class TinyMultimodalAccessibilityTest {
 		acg.setTileSize_m(100);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
-		//acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
 		acg.setUseParallelization(false);
 
 		config.controler().setLastIteration(0);
@@ -112,8 +113,12 @@ public class TinyMultimodalAccessibilityTest {
 	private static Scenario createTestScenario(final Config config) {
 //		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
-		Network network = createLessSymmetricMultimodalTestNetwork();
+		Network network = createLessSymmetricMultimodalTestNetwork(scenario);
 		scenario.setNetwork(network);
+
+		//
+		TransitSchedule transitSchedule = createTransitSchedule(scenario);
+		//
 
 		// Creating test opportunities (facilities); one on each link with same ID as link and coord on center of link
 		final ActivityFacilities opportunities = scenario.getActivityFacilities();
@@ -128,6 +133,46 @@ public class TinyMultimodalAccessibilityTest {
 	}
 
 
+	public static TransitSchedule createTransitSchedule (Scenario scenario) {
+		Network network = scenario.getNetwork();
+
+		TransitSchedule schedule = scenario.getTransitSchedule();
+		TransitScheduleFactory builder = schedule.getFactory();
+
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("stop1", TransitStopFacility.class), new Coord((double) 40, (double) 40), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("stop2", TransitStopFacility.class), new Coord((double) 140, (double) 40), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("stop3", TransitStopFacility.class), new Coord((double) 240, (double) 40), false);
+		ArrayList<TransitRouteStop> stops = new ArrayList<>();
+		stops.add(builder.createTransitRouteStop(stop1, 0, 0));
+		stops.add(builder.createTransitRouteStop(stop2, 20, 30));
+		stops.add(builder.createTransitRouteStop(stop3, 50, 60));
+		schedule.addStopFacility(stop1);
+		schedule.addStopFacility(stop2);
+		schedule.addStopFacility(stop3);
+
+		Link link17 = network.getLinks().get(Id.createLinkId("17"));
+		Link link19 = network.getLinks().get(Id.createLinkId("19"));
+
+		stop1.setLinkId(link17.getId());
+		stop2.setLinkId(Id.createLinkId("18"));
+		stop3.setLinkId(link19.getId());
+
+		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(link17.getId(), link19.getId());
+		ArrayList<Id<Link>> links = new ArrayList<>(0);
+		route.setLinkIds(link17.getId(), links, link19.getId());
+
+		TransitLine line = builder.createTransitLine(Id.create("1", TransitLine.class));
+		TransitRoute tRoute = builder.createTransitRoute(Id.create(">", TransitRoute.class), route, stops, TransportMode.pt);
+		Departure dep = builder.createDeparture(Id.create("dep1", Departure.class), 8. * 3600 + 1. * 60.);
+		dep.setVehicleId(Id.create("veh1", Vehicle.class));
+		tRoute.addDeparture(dep);
+		line.addRoute(tRoute);
+		schedule.addTransitLine(line);
+
+		return schedule;
+	}
+
+
 	/**
 	 * This method creates a test network. It is used for example in PtMatrixTest.java to test the pt simulation in MATSim.
 	 * The network has 9 nodes and 8 links (see the sketch below).
@@ -137,7 +182,7 @@ public class TinyMultimodalAccessibilityTest {
 	 * @author thomas
 	 * @author tthunig
 	 */
-	public static Network createLessSymmetricMultimodalTestNetwork() {
+	public static Network createLessSymmetricMultimodalTestNetwork(Scenario scenario) {
 		/*
 		 * (2)		(5)------(8)
 		 * 	|		 |
@@ -151,9 +196,7 @@ public class TinyMultimodalAccessibilityTest {
 		double capacity = 500.;
 		double numLanes = 1.;
 
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-
-		Network network = (Network) scenario.getNetwork();
+		Network network = scenario.getNetwork();
 
 		// Nodes
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create(1, Node.class), new Coord((double) 10, (double) 100));
@@ -224,17 +267,20 @@ public class TinyMultimodalAccessibilityTest {
 		Set<String> ptModes = new HashSet<>();
 		ptModes.add("pt");
 
-		NetworkUtils.createAndAddLink(network,Id.create(17, Link.class), node10, node11, (double) 100, freespeed, capacity, numLanes);
+		NetworkUtils.createAndAddLink(network,Id.create(17, Link.class), node10, node10, (double) 10, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(17, Link.class)).setAllowedModes(ptModes);
 
-		NetworkUtils.createAndAddLink(network,Id.create(18, Link.class), node11, node10, (double) 100, freespeed, capacity, numLanes);
+		NetworkUtils.createAndAddLink(network,Id.create(18, Link.class), node10, node11, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(18, Link.class)).setAllowedModes(ptModes);
 
-		NetworkUtils.createAndAddLink(network,Id.create(19, Link.class), node11, node12, (double) 130, freespeed, capacity, numLanes);
+		NetworkUtils.createAndAddLink(network,Id.create(19, Link.class), node11, node10, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(19, Link.class)).setAllowedModes(ptModes);
 
-		NetworkUtils.createAndAddLink(network,Id.create(20, Link.class), node12, node11, (double) 130, freespeed, capacity, numLanes);
+		NetworkUtils.createAndAddLink(network,Id.create(20, Link.class), node11, node12, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(20, Link.class)).setAllowedModes(ptModes);
+
+		NetworkUtils.createAndAddLink(network,Id.create(21, Link.class), node12, node12, (double) 10, freespeed, capacity, numLanes);
+		network.getLinks().get(Id.create(21, Link.class)).setAllowedModes(ptModes);
 
 		return network;
 	}
@@ -262,18 +308,22 @@ public class TinyMultimodalAccessibilityTest {
 					if (tuple.getFirst().getCoord().getY() == 50.) {
 						Assert.assertEquals(-0.017248522428805767, accessibilitiesMap.get(tuple).get("freespeed"), MatsimTestUtils.EPSILON);
 						Assert.assertEquals(-0.017248522428805767, accessibilitiesMap.get(tuple).get(TransportMode.car), MatsimTestUtils.EPSILON);
+                        Assert.assertEquals(0.0020510618020555325, accessibilitiesMap.get(tuple).get(TransportMode.pt), MatsimTestUtils.EPSILON);
 					} else if (tuple.getFirst().getCoord().getY() == 150.) {
 						Assert.assertEquals(-0.017248522428805767, accessibilitiesMap.get(tuple).get("freespeed"), MatsimTestUtils.EPSILON);
 						Assert.assertEquals(-0.017248522428805767, accessibilitiesMap.get(tuple).get(TransportMode.car), MatsimTestUtils.EPSILON);
+						Assert.assertEquals(-0.04152005026781742, accessibilitiesMap.get(tuple).get(TransportMode.pt), MatsimTestUtils.EPSILON);
 					}
 				}
 				if (tuple.getFirst().getCoord().getX() == 150.) {
 					if (tuple.getFirst().getCoord().getY() == 50.) {
 						Assert.assertEquals(0.2758252376673665, accessibilitiesMap.get(tuple).get("freespeed"), MatsimTestUtils.EPSILON);
 						Assert.assertEquals(0.2758252376673665, accessibilitiesMap.get(tuple).get(TransportMode.car), MatsimTestUtils.EPSILON);
+						Assert.assertEquals(0.25069951470887114, accessibilitiesMap.get(tuple).get(TransportMode.pt), MatsimTestUtils.EPSILON);
 					} else if (tuple.getFirst().getCoord().getY() == 150.) {
 						Assert.assertEquals(0.2758252376673665, accessibilitiesMap.get(tuple).get("freespeed"), MatsimTestUtils.EPSILON);
 						Assert.assertEquals(0.2758252376673665, accessibilitiesMap.get(tuple).get(TransportMode.car), MatsimTestUtils.EPSILON);
+						Assert.assertEquals(0.25069951470887114, accessibilitiesMap.get(tuple).get(TransportMode.pt), MatsimTestUtils.EPSILON);
 					}
 				}
 			}

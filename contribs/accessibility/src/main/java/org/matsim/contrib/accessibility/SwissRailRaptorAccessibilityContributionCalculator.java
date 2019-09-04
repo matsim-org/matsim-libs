@@ -22,15 +22,14 @@ import ch.sbb.matsim.routing.pt.raptor.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.*;
+import org.matsim.pt.transitSchedule.TransitStopFacilityImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -51,18 +50,18 @@ public class SwissRailRaptorAccessibilityContributionCalculator implements Acces
     Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities;
 
 	private double betaWalkTT;
-	private double walkSpeed_m_s;
+	private double walkSpeed_m_h;
 
     SwissRailRaptorData raptorData;
 
-    Map<ActivityFacility, Collection<TransitStopFacility>> stopsPerZone = new LinkedHashMap<>();
+    Map<Id<ActivityFacility>, Collection<TransitStopFacility>> stopsPerAggregatedOpportunity = new LinkedHashMap<>();
 
 
     public SwissRailRaptorAccessibilityContributionCalculator(String mode, PlanCalcScoreConfigGroup planCalcScoreConfigGroup, Scenario scenario) {
 		this.mode = mode;
 
-		TransitSchedule schedule = null;
-		Network ptNetwork = null;
+		TransitSchedule schedule = scenario.getTransitSchedule();
+		Network ptNetwork = scenario.getNetwork();
 
 		RaptorStaticConfig raptorConfig = RaptorUtils.createStaticConfig(scenario.getConfig());
 		raptorConfig.setOptimization(RaptorStaticConfig.RaptorOptimization.OneToAllRouting);
@@ -78,7 +77,7 @@ public class SwissRailRaptorAccessibilityContributionCalculator implements Acces
 
 		betaWalkTT = planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
 
-		this.walkSpeed_m_s = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);
+		this.walkSpeed_m_h = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
 	}
 
 
@@ -104,6 +103,16 @@ public class SwissRailRaptorAccessibilityContributionCalculator implements Acces
         aggregatedOpportunities = new ConcurrentHashMap<>();
         AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
         for (ActivityFacility opportunity : opportunities.getFacilities().values()) {
+
+            // Find stops close to opportunity
+            final Coord coord = opportunity.getCoord();
+            Collection<TransitStopFacility> stops = raptorData.findNearbyStops(coord.getX(), coord.getY(), scenario.getConfig().transitRouter().getSearchRadius());
+            if (stops.isEmpty()) {
+                TransitStopFacilityImpl nearest = (TransitStopFacilityImpl) raptorData.findNearestStop(coord.getX(), coord.getY());
+                double nearestStopDistance = CoordUtils.calcEuclideanDistance(coord, nearest.getCoord());
+                stops = raptorData.findNearbyStops(coord.getX(), coord.getY(), nearestStopDistance + scenario.getConfig().transitRouter().getExtensionRadius());
+            }
+
             AggregationObject jco = aggregatedOpportunities.get(opportunity.getId());
             if (jco == null) {
                 jco = new AggregationObject(opportunity.getId(), null, null, opportunity, 0.);
@@ -119,22 +128,8 @@ public class SwissRailRaptorAccessibilityContributionCalculator implements Acces
             } else {
                 jco.addObject(opportunity.getId(), 1.);
             }
-        }
-        LOG.info("Aggregated " + opportunities.getFacilities().size() + " opportunities to " + aggregatedOpportunities.size() + " nodes.");
 
-
-        // Compute closest egress stops per zone
-        for (ActivityFacility facility : opportunities.getFacilities().values()) {
-            final Coord coord = facility.getCoord();
-            // Collection<TransitStopFacility> stops = raptorData.findNearbyStops(coord.getX(), coord.getY(), parameters.getSearchRadius());
-            Collection<TransitStopFacility> stops = raptorData.findNearbyStops(coord.getX(), coord.getY(), 1000.);
-            if (stops.isEmpty()) {
-                TransitStopFacility nearest = raptorData.findNearestStop(coord.getX(), coord.getY());
-                double nearestStopDistance = CoordUtils.calcEuclideanDistance(coord, nearest.getCoord());
-                // stops = raptorData.findNearbyStops(coord.getX(), coord.getY(), nearestStopDistance + parameters.getExtensionRadius());
-                stops = raptorData.findNearbyStops(coord.getX(), coord.getY(), nearestStopDistance + 200.);
-            }
-            stopsPerZone.put(facility, stops);
+            stopsPerAggregatedOpportunity.put(opportunity.getId(), stops);
         }
     }
 
@@ -153,19 +148,21 @@ public class SwissRailRaptorAccessibilityContributionCalculator implements Acces
 
         for (final AggregationObject destination : aggregatedOpportunities.values()) {
             //compute direct walk costs
-            final Coord toCoord = destination.getNearestNode().getCoord();
-            double directDistance = CoordUtils.calcEuclideanDistance(origin.getCoord(), toCoord);
-            double directWalkCost = directDistance / walkSpeed_m_s * betaWalkTT;
+            final Coord toCoord = destination.getNearestBasicLocation().getCoord();
+            double directDistance_m = CoordUtils.calcEuclideanDistance(origin.getCoord(), toCoord);
+            double directWalkCost = -directDistance_m / walkSpeed_m_h * betaWalkTT;
 
             double travelCost = Double.MAX_VALUE;
-            for (TransitStopFacility stop : stopsPerZone.get(destination)) {
+            ActivityFacility nearestStop = ((ActivityFacility) destination.getNearestBasicLocation());
+            Collection<TransitStopFacility> stops = stopsPerAggregatedOpportunity.get(nearestStop.getId());
+
+            for (TransitStopFacility stop : stops) {
                 final SwissRailRaptorCore.TravelInfo travelInfo = idTravelInfoMap.get(stop.getId());
                 if (travelInfo != null) {
                     double distance = CoordUtils.calcEuclideanDistance(stop.getCoord(), toCoord);
-                    double egressWalkCost = distance / walkSpeed_m_s  * betaWalkTT;
-                    //total travel time includes travel, access, egress and waiting costs
+                    double egressWalkCost = - distance / walkSpeed_m_h  * betaWalkTT;
+                    //total travel cost include travel, access, egress and waiting costs
                     double cost = travelInfo.accessCost + travelInfo.travelCost + travelInfo.waitingCost + egressWalkCost;
-                    //take the most optimistic time up until now
                     travelCost = Math.min(travelCost, cost);
                 }
             }
@@ -174,7 +171,7 @@ public class SwissRailRaptorAccessibilityContributionCalculator implements Acces
             travelCost = Math.min(travelCost, directWalkCost);
 
             double modeSpecificConstant = AccessibilityUtils.getModeSpecificConstantForAccessibilities(mode, planCalcScoreConfigGroup);
-            expSum += Math.exp(this.planCalcScoreConfigGroup.getBrainExpBeta() * (travelCost + modeSpecificConstant));
+            expSum += Math.exp(this.planCalcScoreConfigGroup.getBrainExpBeta() * (-travelCost + modeSpecificConstant));
         }
         return expSum;
 	}
@@ -186,6 +183,7 @@ public class SwissRailRaptorAccessibilityContributionCalculator implements Acces
 				new SwissRailRaptorAccessibilityContributionCalculator(this.mode, this.planCalcScoreConfigGroup, this.scenario);
         swissRailRaptorAccessibilityContributionCalculator.aggregatedMeasurePoints = this.aggregatedMeasurePoints;
         swissRailRaptorAccessibilityContributionCalculator.aggregatedOpportunities = this.aggregatedOpportunities;
+        swissRailRaptorAccessibilityContributionCalculator.stopsPerAggregatedOpportunity = this.stopsPerAggregatedOpportunity;
 		return swissRailRaptorAccessibilityContributionCalculator;
 	}
 

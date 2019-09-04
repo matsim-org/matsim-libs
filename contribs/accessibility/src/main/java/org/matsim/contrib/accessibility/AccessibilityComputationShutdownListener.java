@@ -118,9 +118,9 @@ public final class AccessibilityComputationShutdownListener implements ShutdownL
             Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregatedOrigins = calculator.getAggregatedMeasurePoints();
             Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities = calculator.getAgregatedOpportunities();
 
-            Collection<Id<? extends BasicLocation>> aggregatedOriginNodes = new LinkedList<>();
+            Collection<Id<? extends BasicLocation>> aggregatedOriginIds = new LinkedList<>();
 			for (Id<? extends BasicLocation> nodeId : aggregatedOrigins.keySet()) {
-				aggregatedOriginNodes.add(nodeId);
+				aggregatedOriginIds.add(nodeId);
 			}
 
 			LOG.info("Iterating over all aggregated measuring points...");
@@ -131,7 +131,7 @@ public final class AccessibilityComputationShutdownListener implements ShutdownL
 
 				final int partitionSize = (int) ((double) aggregatedOrigins.size() / numberOfProcessors) + 1;
 				LOG.info("Size of partitions = " + partitionSize);
-				Iterable<List<Id<? extends BasicLocation>>> partitions = Iterables.partition(aggregatedOriginNodes, partitionSize);
+				Iterable<List<Id<? extends BasicLocation>>> partitions = Iterables.partition(aggregatedOriginIds, partitionSize);
 
 				ProgressBar progressBar = new ProgressBar(aggregatedOrigins.size());
 
@@ -161,7 +161,7 @@ public final class AccessibilityComputationShutdownListener implements ShutdownL
 			} else {
 				LOG.info("Performing the computation without parallelization.");
 				ProgressBar progressBar = new ProgressBar(aggregatedOrigins.size());
-				compute(mode, departureTime, aggregatedOpportunities, aggregatedOrigins, aggregatedOriginNodes, progressBar);
+				compute(mode, departureTime, aggregatedOpportunities, aggregatedOrigins, aggregatedOriginIds, progressBar);
 			}
 		}
 		for (FacilityDataExchangeInterface zoneDataExchangeInterface : this.zoneDataExchangeListeners) {
