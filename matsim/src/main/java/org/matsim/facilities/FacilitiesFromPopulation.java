@@ -146,6 +146,8 @@ public final class FacilitiesFromPopulation {
 		Map<Id<Link>, ActivityFacility> facilitiesPerLinkId = new HashMap<>();
 		Map<Coord, ActivityFacility> facilitiesPerCoordinate = new HashMap<>();
 
+		Gbl.assertNotNull( network ) ;
+
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {
@@ -156,20 +158,31 @@ public final class FacilitiesFromPopulation {
 						Id<Link> linkId = activity.getLinkId();
 						ActivityFacility facility = null;
 
-						Gbl.assertNotNull( network ) ;
-
-						if (linkId == null && this.network != null) {
+						if ( linkId == null ) {
 							linkId = NetworkUtils.getNearestLinkExactly(this.network, coord).getId();
 							// yyyy we have been using the non-exact version in other parts of the project. kai, mar'19
 						}
 
 						Gbl.assertNotNull( linkId );
 
-						if (this.oneFacilityPerLink && linkId != null) {
+						if ( this.oneFacilityPerLink ) {
 							facility = facilitiesPerLinkId.get(linkId);
 							if (facility == null) {
 								final Id<ActivityFacility> facilityId = Id.create( this.idPrefix + linkId.toString() , ActivityFacility.class );
-								facility = addFacilityExceptIfAlreadyThere( factory , facilitiesPerLinkId , coord , linkId , facilityId );
+								final ActivityFacility preExistingFacilityIfAny = this.facilities.getFacilities().get( facilityId );
+								if ( preExistingFacilityIfAny == null ){
+									facility = factory.createActivityFacility( facilityId , coord , linkId );
+									facilitiesPerLinkId.put( linkId , facility );
+									this.facilities.addActivityFacility( facility );
+								} else {
+									if ( Objects.equals( preExistingFacilityIfAny.getLinkId() ,
+										  linkId ) && Objects.equals( preExistingFacilityIfAny.getCoord() , coord ) ) {
+										// do nothing; presumably, same auto-generation has been run before
+										facility = preExistingFacilityIfAny;
+									} else {
+										throw new RuntimeException( "Facility with id=" + facilityId + " but different in coordinates and/or linkId already exists." ) ;
+									}
+								}
 							}
 						} else {
 							if (coord == null)  {
@@ -181,7 +194,19 @@ public final class FacilitiesFromPopulation {
 							facility = facilitiesPerCoordinate.get(coord);
 							if (facility == null) {
 								final Id<ActivityFacility> facilityId = Id.create( this.idPrefix + idxCounter++ , ActivityFacility.class );
-								facility = addFacilityExceptIfAlreadyThere( factory, facilitiesPerLinkId, coord, linkId, facilityId ) ;
+								final ActivityFacility preExistingFacilityIfAny = this.facilities.getFacilities().get( facilityId );
+								if ( preExistingFacilityIfAny == null ){
+									facility = factory.createActivityFacility( facilityId , coord , linkId );
+									facilitiesPerCoordinate.put( coord , facility );
+									this.facilities.addActivityFacility( facility );
+								} else {
+									if ( Objects.equals( preExistingFacilityIfAny.getLinkId() , linkId ) && Objects.equals( preExistingFacilityIfAny.getCoord() , coord ) ) {
+										// do nothing; presumably, same auto-generation has been run before
+										facility = preExistingFacilityIfAny;
+									} else {
+										throw new RuntimeException( "Facility with id=" + facilityId + " but different in coordinates and/or linkId already exists." ) ;
+									}
+								}
 							}
 						}
 
@@ -201,25 +226,6 @@ public final class FacilitiesFromPopulation {
 						}
 					}
 				}
-			}
-		}
-	}
-
-	private ActivityFacility addFacilityExceptIfAlreadyThere( ActivityFacilitiesFactory factory , Map<Id<Link>, ActivityFacility> facilitiesPerLinkId ,
-										    Coord coord , Id<Link> linkId , Id<ActivityFacility> facilityId ){
-		final ActivityFacility preExistingFacilityIfAny = this.facilities.getFacilities().get( facilityId );
-		ActivityFacility facility = null ;
-		if ( preExistingFacilityIfAny == null ){
-			facility = factory.createActivityFacility( facilityId , coord, linkId );
-			facilitiesPerLinkId.put(linkId, facility);
-			this.facilities.addActivityFacility( facility );
-			return facility ;
-		} else {
-			if ( Objects.equals( preExistingFacilityIfAny.getLinkId() , linkId ) && Objects.equals( preExistingFacilityIfAny.getCoord() , coord ) ) {
-				// do nothing; presumably, same auto-generation has been run before
-				return preExistingFacilityIfAny ;
-			} else {
-				throw new RuntimeException( "Facility with id=" + facilityId + " but different in coordinates and/or linkId already exists." ) ;
 			}
 		}
 	}
