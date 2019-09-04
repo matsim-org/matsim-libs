@@ -32,8 +32,9 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
+import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
+import org.matsim.contrib.taxi.run.MultiModeTaxiModule;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -46,7 +47,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  */
 public class RunTaxiPTIntermodalExample {
 	public void run(URL configUrl, boolean OTFVis) {
-		Config config = ConfigUtils.loadConfig(configUrl, new TaxiConfigGroup(), new DvrpConfigGroup());
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup());
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
@@ -76,7 +77,7 @@ public class RunTaxiPTIntermodalExample {
 		otfvis.setDrawNonMovingItems(true);
 		config.addModule(otfvis);
 
-		String mode = TaxiConfigGroup.get(config).getMode();
+		String mode = TaxiConfigGroup.getSingleModeTaxiConfig(config).getMode();
 
 		// ---
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -86,7 +87,7 @@ public class RunTaxiPTIntermodalExample {
 		controler.addOverridingModule(new DvrpModule());
 		controler.configureQSimComponents(DvrpQSimComponents.activateModes(mode));
 
-		controler.addOverridingModule(new TaxiModule());
+		controler.addOverridingModule(new MultiModeTaxiModule());
 
 		controler.addOverridingModule(new VariableAccessTransitRouterModule());
 		if (OTFVis) {
