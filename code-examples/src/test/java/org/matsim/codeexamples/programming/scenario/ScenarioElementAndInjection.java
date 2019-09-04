@@ -23,8 +23,12 @@ public class ScenarioElementAndInjection{
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
+	/**
+	 * This is testing at what phase a scenario element would be available.
+	 */
 	@Test
 	public void test1() {
+		// not really a test in its current form!
 
 		Config config = ConfigUtils.createConfig() ;
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );

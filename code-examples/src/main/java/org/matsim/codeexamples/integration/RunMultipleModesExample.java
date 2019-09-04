@@ -63,7 +63,7 @@ final class RunMultipleModesExample{
 	}
 
 	static final Config prepareConfig( String [] args ){
-		final URL url = IOUtils.newUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" );
+		final URL url = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" );
 		log.warn("url=" + url.toString() ) ;
 		Config config = ConfigUtils.loadConfig( url );;
 

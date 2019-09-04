@@ -140,7 +140,7 @@ public class PtAlongALineTest{
 			drtConfig.setMaxWaitTime(900.);
 			drtConfig.setMaxTravelTimeAlpha(1.3);
 			drtConfig.setMaxTravelTimeBeta(10. * 60.);
-			drtConfig.setRequestRejection(false);
+			drtConfig.setRejectRequestIfMaxWaitOrTravelTimeViolated( false );
 			drtConfig.setVehiclesFile(taxisA.toString());
 			drtConfig.setChangeStartLinkToLastLinkInSchedule(true);
 			multiModeDrtCfg.addParameterSet(drtConfig);
@@ -275,7 +275,7 @@ public class PtAlongALineTest{
 			drtConfig.setMaxTravelTimeBeta( 5. * 60. );
 			drtConfig.setStopDuration( 60. );
 			drtConfig.setMaxWaitTime( Double.MAX_VALUE );
-			drtConfig.setRequestRejection( false );
+			drtConfig.setRejectRequestIfMaxWaitOrTravelTimeViolated( false );
 			drtConfig.setMode( TransportMode.drt );
 			mm.addParameterSet( drtConfig );
 		}

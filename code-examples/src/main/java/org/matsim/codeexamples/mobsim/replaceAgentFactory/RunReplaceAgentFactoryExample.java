@@ -61,8 +61,8 @@ class RunReplaceAgentFactoryExample {
 	}
 	
 	Config prepareConfig() {
-//		config = ConfigUtils.loadConfig( IOUtils.newUrl( ExamplesUtils.getTestScenarioURL( "siouxfalls-2014" ), "config_default.xml") ) ;
-		config = ConfigUtils.loadConfig( IOUtils.newUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml") ) ;
+//		config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "siouxfalls-2014" ), "config_default.xml") ) ;
+		config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml") ) ;
 		return config;
 	}
 	

@@ -66,7 +66,7 @@ public class RunWithinDayReplanningAgentExample {
 
 		// set some config stuff:
 		URL context = ExamplesUtils.getTestScenarioURL("siouxfalls");
-		URL networkUrl = IOUtils.newUrl(context, "network-wo-dummy-node.xml");
+		URL networkUrl = IOUtils.extendUrl(context, "network-wo-dummy-node.xml");
 //		config.network().setInputFile("scenarios/siouxfalls/network-wo-dummy-node.xml") ;
 		config.network().setInputFile(networkUrl.toString());
 		config.controler().setLastIteration(0) ;

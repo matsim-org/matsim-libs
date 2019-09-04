@@ -45,7 +45,7 @@ public class RunTimeDependentNetworkExample {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		URL configurl = IOUtils.newUrl( ExamplesUtils.getTestScenarioURL("equil") , "config.xml" ) ;
+		URL configurl = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL("equil") , "config.xml" ) ;
 		
 		Config config = ConfigUtils.loadConfig( configurl ) ;
 		

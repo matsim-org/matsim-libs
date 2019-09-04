@@ -51,7 +51,7 @@ public class MultipleJvmBlackBox {
 	
 	public static void run(String[] args) {
 		final URL url = ExamplesUtils.getTestScenarioURL( "equil" );
-		final URL configUrl = IOUtils.newUrl( url, "config.xml" );;
+		final URL configUrl = IOUtils.extendUrl( url, "config.xml" );;
 		Config config = ConfigUtils.loadConfig( configUrl ) ;
 		config.controler().setOutputDirectory( "./output/" );
 		

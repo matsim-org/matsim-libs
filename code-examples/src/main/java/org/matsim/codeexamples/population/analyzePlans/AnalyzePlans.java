@@ -19,7 +19,7 @@ class AnalysePlans{
 
     public static void main ( String [] args ) {
 
-        URL configUrl = IOUtils.newUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" );;
+        URL configUrl = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" );;
         Config config = ConfigUtils.loadConfig( configUrl ) ;
 
 

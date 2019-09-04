@@ -137,7 +137,7 @@ public class RunSubpopulationsExample {
 
 	private static void prepareExampleScenario() {
 		{
-			URL url = IOUtils.newUrl( ExamplesUtils.getTestScenarioURL("equil-extended") , "config.xml" ) ;
+			URL url = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL("equil-extended") , "config.xml" ) ;
 			
 			Scenario sc = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(url));
 

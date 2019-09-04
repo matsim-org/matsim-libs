@@ -39,7 +39,7 @@ public class RunPluggablePlanStrategyInCodeExample {
 		
 		Config config;
 		if ( args.length==0 ) {
-			config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml")) ;
+			config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml")) ;
 		} else {
 			config = ConfigUtils.loadConfig(args[0]);
 		}

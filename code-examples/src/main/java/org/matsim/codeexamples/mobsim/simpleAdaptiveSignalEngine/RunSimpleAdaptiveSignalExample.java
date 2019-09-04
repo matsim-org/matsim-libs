@@ -50,7 +50,7 @@ public class RunSimpleAdaptiveSignalExample {
 			outputDir = args[0];
 		}
 		// load the daganzo example
-		final Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("daganzo"), "config.xml"));
+		final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("daganzo"), "config.xml"));
 		config.controler().setOutputDirectory(outputDir);
 		config.controler().setWriteEventsInterval(config.controler().getLastIteration());
 		config.vspExperimental().setWritingOutputEvents(true);

@@ -11,7 +11,7 @@ import org.matsim.examples.ExamplesUtils;
  */
 public class RunExampleIndividualizedScoring {
 	public static void main(String... args) {
-		final Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+		final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.controler().setOutputDirectory( "output/exampleIndividualScores/");
 
 		final Controler controler = new Controler( config );

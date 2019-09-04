@@ -35,7 +35,7 @@ public final class RunBicycleExample{
 		if ( args != null && args.length>=1 ) {
 			config = ConfigUtils.loadConfig( args ) ;
 		} else {
-			config = ConfigUtils.loadConfig( IOUtils.newUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) ) ;
+			config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) ) ;
 		}
 
 		config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );

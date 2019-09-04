@@ -56,7 +56,7 @@ public class RunTeleportationMobsimWithCustomRoutingExample {
 		// make sure we get all the log messages in the logfile
 		OutputDirectoryLogging.catchLogEntries();
 		
-		final URL url = IOUtils.newUrl( ExamplesUtils.getTestScenarioURL( "pt-tutorial" ), "0.config.xml" );;
+		final URL url = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "pt-tutorial" ), "0.config.xml" );;
 		
 		// load the config ...
 		final Config config = ConfigUtils.loadConfig( url );

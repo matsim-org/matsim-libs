@@ -198,7 +198,7 @@ public class PtAlongALine2Test{
 				drtConfig.setMaxTravelTimeBeta( 5. * 60. );
 				drtConfig.setStopDuration( 60. );
 				drtConfig.setMaxWaitTime( Double.MAX_VALUE );
-				drtConfig.setRequestRejection( false );
+				drtConfig.setRejectRequestIfMaxWaitOrTravelTimeViolated( false );
 				drtConfig.setMode( TransportMode.drt );
 				drtConfig.setUseModeFilteredSubnetwork( true );
 				mm.addParameterSet( drtConfig );
@@ -210,7 +210,7 @@ public class PtAlongALine2Test{
 				drtConfig.setMaxTravelTimeBeta( 5. * 60. );
 				drtConfig.setStopDuration( 60. );
 				drtConfig.setMaxWaitTime( Double.MAX_VALUE );
-				drtConfig.setRequestRejection( false );
+				drtConfig.setRejectRequestIfMaxWaitOrTravelTimeViolated( false );
 				drtConfig.setMode( "drt2" );
 				drtConfig.setUseModeFilteredSubnetwork( true );
 				mm.addParameterSet( drtConfig );
@@ -222,7 +222,7 @@ public class PtAlongALine2Test{
 				drtConfig.setMaxTravelTimeBeta( 5. * 60. );
 				drtConfig.setStopDuration( 60. );
 				drtConfig.setMaxWaitTime( Double.MAX_VALUE );
-				drtConfig.setRequestRejection( false );
+				drtConfig.setRejectRequestIfMaxWaitOrTravelTimeViolated( false );
 				drtConfig.setMode( "drt3" );
 				drtConfig.setUseModeFilteredSubnetwork( true );
 				mm.addParameterSet( drtConfig );

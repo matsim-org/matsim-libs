@@ -69,7 +69,7 @@ public class ExampleTest {
 		final URL url = ExamplesUtils.getTestScenarioURL( "equil" );
 		// (works when matsim-examples is specified as dependency in pom.xml)
 
-		final URL configUrl = IOUtils.newUrl( url, "config.xml" );;
+		final URL configUrl = IOUtils.extendUrl( url, "config.xml" );;
 		Config config = ConfigUtils.loadConfig( configUrl ) ;
 
 		// !! redefine the output directory: !!

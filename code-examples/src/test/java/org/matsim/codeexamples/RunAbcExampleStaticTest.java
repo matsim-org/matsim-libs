@@ -17,7 +17,7 @@ public class RunAbcExampleStaticTest{
 	@Test public void main(){
 
 //		URL context = ExamplesUtils.getTestScenarioURL( "equil" );
-//		URL config = IOUtils.newUrl( context, "config.xml" );
+//		URL config = IOUtils.extendUrl( context, "config.xml" );
 //		final String configString = config.toString();
 //		System.out.println( "configfile=" + configString ) ;
 		// does not work, not exactly sure why.  kai, jul'19

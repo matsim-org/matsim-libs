@@ -28,7 +28,7 @@ class RunOwnMoneyScoringExample {
 	static final String NET_INCOME_PER_MONTH="netIncomePerMonth" ;
 
 	public static void main(String... args) {
-		final Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+		final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.controler().setOutputDirectory( "output/ownMoneyScoring/");
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 

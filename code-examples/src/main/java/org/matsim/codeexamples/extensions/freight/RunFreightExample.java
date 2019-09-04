@@ -37,6 +37,7 @@ import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -81,11 +82,13 @@ public class RunFreightExample {
 	}
 
 	private static Config createConfig() {
-		Config config = ConfigUtils.loadConfig( IOUtils.newUrl(scenarioUrl, "config.xml" ) );
+
+		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl(scenarioUrl, "config.xml" ) );
 
 		config.controler().setOutputDirectory("./output/freight");
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
-		new OutputDirectoryHierarchy( config.controler().getOutputDirectory(), config.controler().getRunId(), config.controler().getOverwriteFileSetting() ) ;
+		new OutputDirectoryHierarchy( config.controler().getOutputDirectory(), config.controler().getRunId(),
+			  config.controler().getOverwriteFileSetting(), true, ControlerConfigGroup.CompressionType.gzip ) ;
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles );
 		// (the directory structure is needed for jsprit output, which is before the controler starts.  Maybe there is a better alternative ...)
 
@@ -101,11 +104,11 @@ public class RunFreightExample {
 
 		//create or load carrier vehicle types
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
-		new CarrierVehicleTypeReader( vehicleTypes ).readURL( IOUtils.newUrl(scenarioUrl, "vehicleTypes.xml" ) ) ;
+		new CarrierVehicleTypeReader( vehicleTypes ).readURL( IOUtils.extendUrl(scenarioUrl, "vehicleTypes.xml" ) ) ;
 
 		//create or laod the carrier(s) including assignment of vehicle types to the carrier(s)
 		Carriers carriers = new Carriers() ;
-		new CarrierPlanXmlReaderV2( carriers ).readURL( IOUtils.newUrl(scenarioUrl, "singleCarrierFiveActivitiesWithoutRoutes.xml" ) ) ;
+		new CarrierPlanXmlReaderV2( carriers ).readURL( IOUtils.extendUrl(scenarioUrl, "singleCarrierFiveActivitiesWithoutRoutes.xml" ) ) ;
 
 		// assign vehicle types to the carriers
 		new CarrierVehicleTypeLoader( carriers ).loadVehicleTypes( vehicleTypes ) ;
@@ -148,7 +151,7 @@ public class RunFreightExample {
 			VehicleRoutingAlgorithm vra = algoBuilder.buildAlgorithm();
 
 			//			// or read it from file
-//			final URL algorithmURL = IOUtils.newUrl(scenarioUrl, "algorithm_v2.xml");
+//			final URL algorithmURL = IOUtils.extendUrl(scenarioUrl, "algorithm_v2.xml");
 //			VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, algorithmURL);
 //			//TODO initial soultion needed
 			

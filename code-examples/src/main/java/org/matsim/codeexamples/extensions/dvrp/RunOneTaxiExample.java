@@ -23,7 +23,7 @@ import java.net.URL;
 public class RunOneTaxiExample {
 
 	public static void main(String[] args) {
-		URL configUrl = IOUtils.newUrl( ExamplesUtils.getTestScenarioURL("dvrp-grid" ),
+		URL configUrl = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL("dvrp-grid" ),
 			  "generic_dvrp_one_taxi_config.xml" );
 		org.matsim.contrib.dvrp.examples.onetaxi.RunOneTaxiExample.run(configUrl, "one_taxi_vehicles.xml", false, 0 );
 	}

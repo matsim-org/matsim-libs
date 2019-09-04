@@ -18,7 +18,7 @@ public class RunRobotaxiExample {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		URL configUrl = IOUtils.newUrl( ExamplesUtils.getTestScenarioURL("mielec" ), "mielec_taxi_config.xml" );
+		URL configUrl = IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL("mielec" ), "mielec_taxi_config.xml" );
 		org.matsim.contrib.av.robotaxi.run.RunRobotaxiExample.run(configUrl, false );
 	}
 

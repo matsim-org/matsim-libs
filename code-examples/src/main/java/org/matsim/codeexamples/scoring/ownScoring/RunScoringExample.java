@@ -37,7 +37,7 @@ class RunScoringExample {
 	public static void main( String [] args ) {
 		
 		final URL url = ExamplesUtils.getTestScenarioURL("pt-simple");
-		Config config = ConfigUtils.loadConfig( IOUtils.newUrl( url, "config.xml" ) );
+		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl( url, "config.xml" ) );
 		
 		config.controler().setOverwriteFileSetting( deleteDirectoryIfExists );
 		
