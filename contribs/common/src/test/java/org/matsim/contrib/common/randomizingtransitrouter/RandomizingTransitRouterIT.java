@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.contrib.common.randomizedtransitrouter.RandomizingTransitRouterModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -62,12 +63,7 @@ public class RandomizingTransitRouterIT {
 		}
 
 		@Override public void handleEvent(PersonEntersVehicleEvent event) {
-			final Double oldVal = cnts.get( event.getVehicleId() );
-			if ( oldVal!= null ) {
-				cnts.put( event.getVehicleId(), oldVal + 1. ) ;
-			} else {
-				cnts.put( event.getVehicleId(), 1. ) ;
-			}
+			cnts.merge( event.getVehicleId() , 1. , Double::sum );
 		}
 		
 		void printCounts() {
@@ -102,29 +98,12 @@ public class RandomizingTransitRouterIT {
 		
 		config.global().setNumberOfThreads(1);
 		
-		{
-			ActivityParams params = new ActivityParams("home") ;
-			params.setTypicalDuration( 6*3600. );
-			config.planCalcScore().addActivityParams(params);
-		}
-		{
-			ActivityParams params = new ActivityParams("education_100") ;
-			params.setTypicalDuration( 6*3600. );
-			config.planCalcScore().addActivityParams(params);
-		}
-		{
-			StrategySettings stratSets = new StrategySettings(ConfigUtils.createAvailableStrategyId(config)) ;
-			stratSets.setStrategyName(DefaultStrategy.ReRoute);
-			stratSets.setWeight(0.1);
-			config.strategy().addStrategySettings(stratSets);
-		}
-		{
-			StrategySettings stratSets = new StrategySettings(ConfigUtils.createAvailableStrategyId(config)) ;
-			stratSets.setStrategyName(DefaultSelector.ChangeExpBeta);
-			stratSets.setWeight(0.9);
-			config.strategy().addStrategySettings(stratSets);
-		}
-		
+		config.planCalcScore().addActivityParams( new ActivityParams("home").setTypicalDuration( 6*3600. ) );
+		config.planCalcScore().addActivityParams( new ActivityParams("education_100").setTypicalDuration( 6*3600. ) );
+
+		config.strategy().addStrategySettings( new StrategySettings().setStrategyName(DefaultStrategy.ReRoute ).setWeight(0.1 ) );
+		config.strategy().addStrategySettings( new StrategySettings().setStrategyName(DefaultSelector.ChangeExpBeta ).setWeight(0.9 ) );
+
 		config.qsim().setEndTime(18.*3600.);
 		
 		config.timeAllocationMutator().setMutationRange(7200);
@@ -132,6 +111,8 @@ public class RandomizingTransitRouterIT {
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		config.qsim().setTrafficDynamics( TrafficDynamics.withHoles );
 		config.qsim().setUsingFastCapacityUpdate(true);
+
+		config.facilities().setFacilitiesSource( FacilitiesConfigGroup.FacilitiesSource.none );
 		
 		config.vspExperimental().setWritingOutputEvents(true);
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.warn );
@@ -143,8 +124,7 @@ public class RandomizingTransitRouterIT {
 		// ---
 		
 		Controler controler = new Controler( scenario ) ;
-//		controler.setDirtyShutdown(true);
-		
+
 		controler.addOverridingModule( new RandomizingTransitRouterModule() );
 
 		final MyObserver observer = new MyObserver();
