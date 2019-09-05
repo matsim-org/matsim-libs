@@ -21,8 +21,6 @@ package org.matsim.core.router.util;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 
-import java.util.Collection;
-
 /**
  * @author thibautd
  */

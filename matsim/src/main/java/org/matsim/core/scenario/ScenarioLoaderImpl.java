@@ -48,7 +48,6 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.vehicles.VehicleReaderV1;
 
-import java.io.File;
 import java.net.URL;
 import java.util.*;
 
@@ -220,7 +219,7 @@ class ScenarioLoaderImpl {
 			);
 
 			final String outputDirectory = this.config.controler().getOutputDirectory();
-			final File outDir = new File( outputDirectory );
+//			final File outDir = new File( outputDirectory );
 //			if ( outDir.exists() && outDir.canWrite() ){
 //				// since ScenarioLoader is supposed to only read material,  there are cases where the output directory does not exist at
 //				// this stage. One could maybe write to the "config.getContext()" directory.  However, sometimes this is a URL, and thus also
