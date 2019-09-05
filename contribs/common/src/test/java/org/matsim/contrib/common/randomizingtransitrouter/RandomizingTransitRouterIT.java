@@ -112,7 +112,11 @@ public class RandomizingTransitRouterIT {
 		config.qsim().setTrafficDynamics( TrafficDynamics.withHoles );
 		config.qsim().setUsingFastCapacityUpdate(true);
 
-		config.facilities().setFacilitiesSource( FacilitiesConfigGroup.FacilitiesSource.none );
+//		config.facilities().setFacilitiesSource( FacilitiesConfigGroup.FacilitiesSource.none );
+		// yyyy changing this setting changes result.  Possible reasons:
+		// * The implicit activity coordinates may be elsewhere.
+		// * The "fudged" walk distances may be different.
+		// * It uses getNearestLinkEXACTLY, and thus activities may be attached to other links.
 		
 		config.vspExperimental().setWritingOutputEvents(true);
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.warn );
@@ -136,7 +140,7 @@ public class RandomizingTransitRouterIT {
 		
 		observer.printCounts(); 
 		
-		// the following is just a regression test, making sure that results remain stable.  In general, the randomized transit router 
+		// yyyy the following is just a regression test, making sure that results remain stable.  In general, the randomized transit router
 		// could be improved, for example along the lines of the randomized regular router, which uses a (hopefully unbiased) lognormal
 		// distribution rather than a biased uniform distribution as is used here.  kai, jul'15
 		
