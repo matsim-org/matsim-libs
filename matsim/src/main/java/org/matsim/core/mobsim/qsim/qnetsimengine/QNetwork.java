@@ -51,6 +51,8 @@ public class QNetwork implements NetsimNetwork {
 
 	private final QNetworkFactory queueNetworkFactory;
 
+	QNetsimEngine simEngine; // only for tests...
+
 	QNetwork(final Network network, final QNetworkFactory netsimNetworkFactory ) {
 		this.network = network;
 		this.queueNetworkFactory = netsimNetworkFactory;
@@ -59,6 +61,7 @@ public class QNetwork implements NetsimNetwork {
 	}
 
 	public void initialize(QNetsimEngine simEngine, AgentCounter agentCounter, MobsimTimer simTimer) {
+		this.simEngine = simEngine;
 		this.queueNetworkFactory.initializeFactory( agentCounter, simTimer, simEngine.ii);
 		for (Node n : network.getNodes().values()) {
 			this.nodes.put(n.getId(), this.queueNetworkFactory.createNetsimNode(n));
