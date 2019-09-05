@@ -39,14 +39,14 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class CustomEDrtControlerCreator {
 
 	public static Controler createControler(Config config, boolean otfvis) {
-		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
+		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(config);
 		DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore());
 
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
 		ScenarioUtils.loadScenario(scenario);
 
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new CustomEDrtModule());
+		controler.addOverridingModule(new CustomMultiModeEDrtModule());
 		controler.addOverridingModule(new DvrpModule());
 		controler.addOverridingModule(new EvModule());
 		controler.addOverridingModule(new EvDvrpIntegrationModule());

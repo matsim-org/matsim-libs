@@ -25,6 +25,7 @@ import java.util.List;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -52,7 +53,7 @@ public class RunDrtScenario2Batch {
 			// Define the path to the config file and enable / disable otfvis
 			// Basis configuration
 			final Config config = ConfigUtils.loadConfig("D:/Axer/MatsimDataStore/WOB_DRTtoPM/config.xml",
-					new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
+					new MultiModeDrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
 			boolean otfvis = false;
 
 			// Overwrite existing configuration parameters

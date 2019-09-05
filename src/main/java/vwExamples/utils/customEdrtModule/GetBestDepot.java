@@ -231,6 +231,8 @@ public class GetBestDepot implements DepotFinder {
 
 	}
 
+	//This is relevant for scenarios with specified hubs where the number of vehicles is initalized equals 1
+	//We assume that there is at least a stay capacity for 100 vehicles and not only a stay capacity of 1
 	public void setMinlHubCapacity() {
 		int minHubCapacity = 100;
 		// Get an update of the actual hub situation
@@ -253,14 +255,14 @@ public class GetBestDepot implements DepotFinder {
 
 		currentHubCapacity();
 
-		//		int i=0;
-		//		System.out.println("-----------------------------------------------------");
-		//		for (Entry<Link, MutableInt> hubEntry : CurrentHubCapacityMap.entrySet()) {
-		//			i++;
-		//			System.out.println(i+": "+ hubEntry.getKey().getId() + ": " + hubEntry.getValue());
-		//
-		//		}
-		//		System.out.println("-----------------------------------------------------");
+//				int i=0;
+//				System.out.println("-----------------------------------------------------");
+//				for (Entry<Link, MutableInt> hubEntry : CurrentHubCapacityMap.entrySet()) {
+//					i++;
+//					System.out.println(i+": "+ hubEntry.getKey().getId() + ": " + hubEntry.getValue());
+//		
+//				}
+//				System.out.println("-----------------------------------------------------");
 
 		Map<Link, Double> HubDistanceMap = new HashMap<>();
 		Link bestHub = null;
@@ -288,7 +290,7 @@ public class GetBestDepot implements DepotFinder {
 
 			int currentHubCapa = currentHubEntry.getValue().intValue();
 
-			//			System.out.println(currentHubEntry.getKey().getId()+" Capacity: "+currentHubCapa + " ||" +" Assigned: "+assignedVehicle + " ||" +" Remain: "+(currentHubCapa-assignedVehicle));
+//			System.out.println(currentHubEntry.getKey().getId()+" Capacity: "+currentHubCapa + " ||" +" Assigned: "+assignedVehicle + " ||" +" Remain: "+(currentHubCapa-assignedVehicle));
 
 			//			HubsWithRemaingCapacity.put(currentHubEntry.getKey(), new MutableInt(currentHubEntry.getValue()) );
 			HubsWithRemaingCapacity.put(currentHubEntry.getKey(), new MutableInt(currentHubCapa - assignedVehicle));
@@ -324,11 +326,23 @@ public class GetBestDepot implements DepotFinder {
 			return bestHub;
 
 		} else {
-			throw new RuntimeException("Overall hub capacity != Fleet size...."
-					+ " A comment (michal): this method is called during a QSim step, and not between steps."
-					+ " This may lead to some non-deterministic behaviour - depending on the order of processing "
-					+ " within a QSim step. Therefore RunDrtScenarioBatchH_eDRT_TUBTest sometimes fails sometimes passes.");
+//			throw new RuntimeException("Overall hub capacity != Fleet size...."
+//					+ " A comment (michal): this method is called during a QSim step, and not between steps."
+//					+ " This may lead to some non-deterministic behaviour - depending on the order of processing "
+//					+ " within a QSim step. Therefore RunDrtScenarioBatchH_eDRT_TUBTest sometimes fails sometimes passes.");
+			// In this case, we take simply the closest hub
+			double distance = Double.MAX_VALUE;
+			for (Link hub : HubDistanceMap.keySet()) {
+
+				double distanceToHub = HubDistanceMap.get(hub);
+				if (distanceToHub < distance) {
+					bestHub = hub;
+					distance = distanceToHub;
+				}
+
+			}
 		}
+		return bestHub;
 
 	}
 

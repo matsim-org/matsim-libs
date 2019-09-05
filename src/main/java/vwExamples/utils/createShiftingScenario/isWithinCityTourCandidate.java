@@ -5,21 +5,19 @@ import java.util.StringJoiner;
 
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
-public class assignHomeOfficeSubTour implements SubTourValidator {
+public class isWithinCityTourCandidate implements SubTourValidator {
 	Network network;
 	Map<String, Geometry> cityZonesMap;
 	Map<String, Geometry> serviceAreazonesMap;
 
-	assignHomeOfficeSubTour(Network network, Map<String, Geometry> cityZonesMap,
-			Map<String, Geometry> serviceAreazonesMap) {
+	isWithinCityTourCandidate(Network network, Map<String, Geometry> cityZonesMap, Map<String, Geometry> serviceAreazonesMap) {
 		this.network = network;
 		this.cityZonesMap = cityZonesMap;
 		this.serviceAreazonesMap = serviceAreazonesMap;
@@ -28,17 +26,40 @@ public class assignHomeOfficeSubTour implements SubTourValidator {
 
 	@Override
 	public boolean isValidSubTour(Subtour subTour) {
-//		boolean subTourInServiceArea = subTourIsWithinServiceArea(subTour);
-		String chain = getSubtourActivityChain(subTour);
-		String requiredChain = "home-work-home";
-				
-		if ((isInboundCommuterTour(subTour) || isOutboundCommuterTour(subTour) || isWithinCommuterTour(subTour) )
-		&& (chain.equals(requiredChain))) {
+
+		if ((isWithinCityTourCheck(subTour))) {
+
 			return true;
 		}
-				
 
-		else return false;
+		else
+			return false;
+	}
+
+	public double getBeelineTourLength(Subtour subTour) {
+		double distance = 0;
+		for (Trip trip : subTour.getTrips()) {
+
+			Coord fromCoord = trip.getOriginActivity().getCoord();
+			Coord toCoord = trip.getDestinationActivity().getCoord();
+
+			distance = distance + DistanceUtils.calculateDistance(fromCoord, toCoord);
+
+		}
+		return distance;
+	}
+
+	public boolean isWithinCityTourCheck(Subtour subtour) {
+		for (Trip trip : subtour.getTrips()) {
+			Coord fromCoord = trip.getOriginActivity().getCoord();
+			Coord toCoord = trip.getDestinationActivity().getCoord();
+
+			if (!isWithinZone(fromCoord) && !isWithinZone(toCoord)) {
+				return false;
+			}
+
+		}
+		return true;
 	}
 
 	public String getSubtourActivityChain(Subtour subtour) {

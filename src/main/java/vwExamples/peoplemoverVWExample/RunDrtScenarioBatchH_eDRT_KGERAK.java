@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.ev.EvConfigGroup;
@@ -77,7 +78,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 	public static final double CHARGING_SPEED_FACTOR = 1.0;
 	public static final double BATTERYREPLACETIME = 180.0;
 
-	static boolean BatteryReplace = false;
+	static boolean BatteryReplace = true;
 
 	static int[] fleetRange = { 100 };
 	//	static int[] fleetRange = {100};
@@ -99,12 +100,13 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 	public static void run(int vehiclePerDepot, int iterationIdx) throws IOException {
 
 		// Enable or Disable rebalancing
-		String runId = "H5charger_1xRate_batteryRecharge_" + vehiclePerDepot + "_veh_idx" + iterationIdx;
+		String runId = "H3_1xRate_batteryReplace_0C_30kWh_" + vehiclePerDepot + "_veh_idx" + iterationIdx;
 		boolean rebalancing = true;
 
 		String inbase = "D:\\Matsim\\Axer\\Hannover\\K-GERAK\\";
 
-		final Config config = ConfigUtils.loadConfig(inbase + "\\input\\hannover_edrt.xml", new DrtConfigGroup(),
+		final Config config = ConfigUtils.loadConfig(inbase + "\\input\\hannover_edrt.xml",
+				new MultiModeDrtConfigGroup(),
 				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(),
 				new TemperatureChangeConfigGroup());
 
@@ -136,6 +138,8 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 
 		config.network().setInputFile(inbase + "\\input\\network\\drtServiceAreaNetwork.xml.gz");
 
+		//create an empty DRT config group if not present in the config file
+		MultiModeDrtConfigGroup.get(config).addParameterSet(new DrtConfigGroup());
 		// This part allows to change dynamically DRT config parameters
 		DrtConfigGroup drt = (DrtConfigGroup)config.getModules().get(DrtConfigGroup.GROUP_NAME);
 
@@ -145,7 +149,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 		drt.setMaxTravelTimeAlpha(1.3);
 		drt.setMaxWaitTime(500.0);
 		drt.setStopDuration(30.0);
-		drt.setRequestRejection(true);
+		drt.setRejectRequestIfMaxWaitOrTravelTimeViolated(true);
 
 		// Create the virtual stops for the drt service
 		// VirtualStops are dynamically generated
@@ -177,11 +181,11 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 		vehiclesAndChargers.E_VEHICLE_FILE = inbase + "\\input\\fleets\\eFleet.xml.gz";
 		vehiclesAndChargers.drtTag = drtTag;
 		vehiclesAndChargers.SEATS = 6;
-		vehiclesAndChargers.MAX_START_CAPACITY_KWH = 78;
-		vehiclesAndChargers.MIN_START_CAPACITY_KWH = 78;
-		vehiclesAndChargers.BATTERY_CAPACITY_KWH = 78;
+		vehiclesAndChargers.MAX_START_CAPACITY_KWH = 30;
+		vehiclesAndChargers.MIN_START_CAPACITY_KWH = 30;
+		vehiclesAndChargers.BATTERY_CAPACITY_KWH = 30;
 		vehiclesAndChargers.CHARGINGPOWER_KW = (int)(100);
-		vehiclesAndChargers.CHAGERSPERDEPOT = 5;
+		vehiclesAndChargers.CHAGERSPERDEPOT = 3;
 		vehiclesAndChargers.run(depotsAndVehicles);
 
 		drt.setVehiclesFile(inbase + "\\input\\fleets\\fleet.xml.gz");

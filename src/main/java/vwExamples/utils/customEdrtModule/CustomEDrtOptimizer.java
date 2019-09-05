@@ -20,17 +20,19 @@ package vwExamples.utils.customEdrtModule;
 
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
-import org.matsim.contrib.dvrp.optimizer.Request;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
-import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.edrt.scheduler.EmptyVehicleChargingScheduler;
+import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
 import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
-import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+
+import com.google.common.base.Verify;
 
 /**
  * @author axer
@@ -40,8 +42,11 @@ public class CustomEDrtOptimizer implements DrtOptimizer {
 	private final EmptyVehicleChargingScheduler chargingScheduler;
 	private final MobsimTimer timer;
 
-	public CustomEDrtOptimizer(DefaultDrtOptimizer optimizer, EmptyVehicleChargingScheduler chargingScheduler,
-			MobsimTimer timer) {
+	public CustomEDrtOptimizer(DrtConfigGroup drtConfigGroup, DefaultDrtOptimizer optimizer,
+			EmptyVehicleChargingScheduler chargingScheduler, MobsimTimer timer) {
+		Verify.verify(drtConfigGroup.getIdleVehiclesReturnToDepots(),
+				"DrtConfigGroup(mode=%s).idleVehiclesReturnToDepots is false."
+						+ " Recharging is possible only if idle vehicles return to depots", drtConfigGroup.getMode());
 		this.optimizer = optimizer;
 		this.chargingScheduler = chargingScheduler;
 		this.timer = timer;
@@ -57,16 +62,15 @@ public class CustomEDrtOptimizer implements DrtOptimizer {
 				&& schedule.getCurrentTask().getTaskIdx() == schedule.getTaskCount() - 1) {
 			//No time constraint for charging
 			//But minSOC for charging should be considered
-			
+
 			ElectricVehicle ev = ((EvDvrpVehicle)vehicle).getElectricVehicle();
 			Battery b = ev.getBattery();
 			double relativeSoc = b.getSoc() / b.getCapacity();
-			if(relativeSoc<0.5)
-			{
+			if (relativeSoc < 0.5) {
 				//System.out.println("Found vehicle with low SOC");
 				chargingScheduler.chargeVehicle(vehicle);
 			}
-			
+
 		}
 	}
 

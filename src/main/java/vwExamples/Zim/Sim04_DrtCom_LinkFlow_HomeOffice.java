@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
-import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
@@ -49,6 +48,8 @@ import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.temperature.TemperatureChangeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
@@ -69,7 +70,7 @@ import vwExamples.utils.customEdrtModule.CustomEDrtControlerCreator;
  * @author axer
  */
 
-public class Sim02_DrtCommuter {
+public class Sim04_DrtCom_LinkFlow_HomeOffice {
 
 	public static final double MAX_RELATIVE_SOC = 0.8;// charge up to 80% SOC
 	public static final double MIN_RELATIVE_SOC = 0.1;// send to chargers vehicles below 20% SOC
@@ -77,9 +78,8 @@ public class Sim02_DrtCommuter {
 	public static final double BATTERYREPLACETIME = 180.0;
 
 	static boolean BatteryReplace = false;
-	static int[] fleetRange = { 350 }; //Pendler DRT
-//	static int[] fleetRange = { 300 }; //Pendler DRT
-//	static int[] fleetRange = { 2800 };
+
+	static int[] fleetRange = { 300 };
 	// static int[] fleetRange = {50,60,70};
 
 	public static void main(String[] args) throws IOException {
@@ -98,19 +98,19 @@ public class Sim02_DrtCommuter {
 	public static void run(int fleet, int iterationIdx) throws IOException {
 
 		// Enable or Disable rebalancing
-		String runId = "vw243_CityDRT_10pct_0.1" + fleet + "_veh_idx" + iterationIdx;
+		String runId = "VW243_Drt_HomeOffice_LinkFlow1.15" + fleet + "_veh_idx" + iterationIdx;
 		boolean rebalancing = true;
 
 		String inbase = "D:\\Matsim\\Axer\\Hannover\\ZIM\\";
 
 		// With EV
-		//		final Config config = ConfigUtils.loadConfig(inbase + "\\input\\Sim02_CommuterDRT.xml", new MultiModeDrtConfigGroup(),
+//		final Config config = ConfigUtils.loadConfig(inbase + "\\input\\Sim02_CommuterDRT.xml", new DrtConfigGroup(),
 //				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(),
 //				new TemperatureChangeConfigGroup());
 		//
 		// Without EV
-		 final Config config = ConfigUtils.loadConfig(inbase + "\\input\\Sim02_CommuterDRT.xml",
-				 new MultiModeDrtConfigGroup(),
+		 final Config config = ConfigUtils.loadConfig(inbase +
+		 "\\input\\Sim02_CommuterDRT.xml", new DrtConfigGroup(),
 		 new DvrpConfigGroup(), new OTFVisConfigGroup());
 
 		// With EV
@@ -123,11 +123,24 @@ public class Sim02_DrtCommuter {
 		modes.add("car");
 		modes.add("drt");
 		config.travelTimeCalculator().setAnalyzedModes(modes);
+		
+		PlanCalcScoreConfigGroup.ModeParams scoreParams =  new PlanCalcScoreConfigGroup.ModeParams("stayHome");
+		config.planCalcScore().addModeParams(scoreParams);
+		
+		PlansCalcRouteConfigGroup.ModeRoutingParams params = new PlansCalcRouteConfigGroup.ModeRoutingParams();
+		params.setMode("stayHome");
+		params.setTeleportedModeFreespeedLimit(100000d);
+		params.setTeleportedModeSpeed(100000d);
+		params.setBeelineDistanceFactor(1.3);
+		config.plansCalcRoute().addModeRoutingParams(params);
+
+		config.planCalcScore().addModeParams(scoreParams);
+
+
 
 		// config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		// Overwrite existing configuration parameters
-//		config.plans().setInputFile(inbase + "\\input\\plans\\w243_inOutWithDRT_selected.xml.gz");
-		config.plans().setInputFile(inbase + "\\input\\plans\\vw243_cadON_ptSpeedAdj.0.1_DRT_0.1.output_plans.xml.gz");
+		config.plans().setInputFile(inbase + "\\input\\plans\\vw243_drt_stayHome.xml.gz");
 		config.controler().setLastIteration(6); // Number of simulation iterations
 		config.controler().setWriteEventsInterval(2); // Write Events file every x-Iterations
 		config.controler().setWritePlansInterval(2); // Write Plan file every x-Iterations
@@ -136,7 +149,7 @@ public class Sim02_DrtCommuter {
 		config.qsim().setFlowCapFactor(0.1);
 		config.qsim().setStorageCapFactor(0.11);
 
-		String networkFilePath = inbase + "\\input\\network\\network.xml.gz";
+		String networkFilePath = inbase + "\\input\\network\\network_intersectionLinks_1.15_.xml.gz";
 		String shapeFilePath = inbase + "\\input\\shp\\Real_Region_Hannover.shp";
 		String shapeFeature = "NO"; // shapeFeature is used to read the shapeFilePath. All zones in shapeFile are
 									// used to generate a drt service area
@@ -147,7 +160,7 @@ public class Sim02_DrtCommuter {
 		config.network().setInputFile(inbase + "\\input\\network\\drtServiceAreaNetwork.xml.gz");
 
 		// This part allows to change dynamically DRT config parameters
-		DrtConfigGroup drt = DrtConfigGroup.getSingleModeDrtConfig(config);
+		DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
 
 		drt.setPrintDetailedWarnings(false);
 		// Parameters to setup the DRT service

@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -51,7 +52,8 @@ public class RunDrtScenario2Batch {
 		for (String Element : strings){
 			//Define the path to the config file and enable / disable otfvis
 			//Basis configuration
-			final Config config = ConfigUtils.loadConfig("D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/config.xml",new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
+			final Config config = ConfigUtils.loadConfig("D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/config.xml",
+					new MultiModeDrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
 			boolean otfvis = false;
 			
 	
@@ -61,7 +63,7 @@ public class RunDrtScenario2Batch {
 			config.controler().setWritePlansInterval(1);
 			config.controler().setOutputDirectory("D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/drt_"+Element.toString()+"_nextStation_default/output/");
 			config.plans().setInputFile("D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/population/run124.100.output_plans_DRT"+Element.toString()+".xml.gz");
-			DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+			DrtConfigGroup drt = DrtConfigGroup.getSingleModeDrtConfig(config);
 			//Initialize the controller
 			Controler controler = createControler(config, otfvis);
 			

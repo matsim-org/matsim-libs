@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.temperature.TemperatureChangeConfigGroup;
@@ -81,7 +82,8 @@ public class RunDrtScenarioBatchBS_DRT_Commuter {
 
 		String inbase = "D:\\Matsim\\Axer\\BSWOB2.0_Scenarios\\";
 
-		final Config config = ConfigUtils.loadConfig(inbase + "conf_BS_DRT_100pct_eDRT.xml", new DrtConfigGroup(),
+		final Config config = ConfigUtils.loadConfig(inbase + "conf_BS_DRT_100pct_eDRT.xml",
+				new MultiModeDrtConfigGroup(),
 				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(),
 				new TemperatureChangeConfigGroup());
 
@@ -123,7 +125,7 @@ public class RunDrtScenarioBatchBS_DRT_Commuter {
 		config.controler().setRoutingAlgorithmType(ControlerConfigGroup.RoutingAlgorithmType.Dijkstra);
 
 		// This part allows to change dynamically DRT config parameters
-		DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+		DrtConfigGroup drt = DrtConfigGroup.getSingleModeDrtConfig(config);
 		
 //		DvrpConfigGroup dvrp = (DvrpConfigGroup) config.getModules().get(DvrpConfigGroup.GROUP_NAME);
 //		dvrp.setTravelTimeEstimationAlpha(.15);

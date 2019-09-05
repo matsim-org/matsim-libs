@@ -19,8 +19,8 @@
 
 package peoplemover.run;
 
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -32,7 +32,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  */
 public class RunDrtScenario {
 	public static void run(String configFile, boolean otfvis) {
-	    final Config config = ConfigUtils.loadConfig(configFile, new DrtConfigGroup(), new DvrpConfigGroup(),
+		final Config config = ConfigUtils.loadConfig(configFile, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 		Controler controler = createControler(config, otfvis);
 		controler.run();

@@ -49,8 +49,6 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.inject.Inject;
-
 /**
  * @author jbischoff
  *
@@ -77,10 +75,6 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 	 * @see org.matsim.core.events.handler.EventHandler#reset(int)
 	 */
 
-	/**
-	 * 
-	 */
-	@Inject
 	public DynModePassengerStats(Network network, EventsManager events, DrtConfigGroup drtConfigGroup,
 			FleetSpecification fleet) {
 		this.mode = drtConfigGroup.getMode();

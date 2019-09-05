@@ -22,6 +22,7 @@ package vwExamples.peoplemoverVWExample;
 
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -38,7 +39,8 @@ public class RunDrtExampleSimulation {
     public static void main(String[] args) {
 
         //Define the path to the config file and enable / disable otfvis
-        final Config config = ConfigUtils.loadConfig("D:/Axer/MatsimDataStore/DAI-Package/config.xml", new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
+		final Config config = ConfigUtils.loadConfig("D:/Axer/MatsimDataStore/DAI-Package/config.xml",
+				new MultiModeDrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
 
         //Disable otfvis visulization interface
         boolean otfvis = false;
@@ -61,7 +63,7 @@ public class RunDrtExampleSimulation {
         config.plans().setInputFile("D:/Axer/MatsimDataStore/DAI-Package/inputplans/run124.100.output_plans_DRT0.1.xml.gz");
 
         //Add config parameter to DrtConfigGroup
-        DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+		DrtConfigGroup drt = DrtConfigGroup.getSingleModeDrtConfig(config);
         //Take only the kNearestVehicles within the DRT dispatching
 
 

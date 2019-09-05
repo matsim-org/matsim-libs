@@ -25,6 +25,7 @@ package robotaxi.run;
 import org.matsim.contrib.av.robotaxi.fares.taxi.TaxiFareConfigGroup;
 import org.matsim.contrib.av.robotaxi.run.RunRobotaxiExample;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -44,7 +45,8 @@ public class RunTaxiBatchScenario {
 		
 		for (int i = 1000; i< 10000; i+=5000){
 			//laedt eine "Basisconfig" inkl. der Nicht-Standard-Config-Gruppen für Taxis etc.
-			Config config = ConfigUtils.loadConfig("config.xml", new TaxiConfigGroup(), new TaxiFareConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
+			Config config = ConfigUtils.loadConfig("config.xml", new MultiModeTaxiConfigGroup(),
+					new TaxiFareConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
 			
 			
 			//ueberschreibt den Wert für die Flottendatei

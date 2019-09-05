@@ -90,8 +90,8 @@ public class modalSplitCommuterOut {
 	String shapeFeature2 = "NO";
 
 	StageActivityTypes stageActs;
-	static String inFileName = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\w243_inDRT.xml.gz";
-	static String OutFileName = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\w243_inOutDRT.xml.gz";
+	static String inFileName = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\w251_inDRT.xml.gz";
+	static String OutFileName = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\w251_inOutDRT.xml.gz";
 
 	static List<String> primaryActivies = new ArrayList<>();
 	static List<String> primaryLegModes = new ArrayList<>();
