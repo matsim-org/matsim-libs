@@ -54,9 +54,8 @@ import java.util.Collection;
 public class ActivityFacilitiesSourceTest {
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
-	
-	private final String mode = TransportMode.car;
-//    private static final String outDir = "test/output/"+ActivityFacilitiesSourceTest.class.getCanonicalName().replace('.','/')+"/";
+
+	//    private static final String outDir = "test/output/"+ActivityFacilitiesSourceTest.class.getCanonicalName().replace('.','/')+"/";
 
 	private final FacilitiesConfigGroup.FacilitiesSource facilitiesSource;
 	private final boolean facilitiesWithCoordOnly ;
@@ -83,13 +82,14 @@ public class ActivityFacilitiesSourceTest {
 	@Test
 	public void test(){
 		String outDir = utils.getOutputDirectory() ;
-		String testOutDir = outDir + "/" + facilitiesSource.toString() + "_facilitiesWithCoordOnly_" + String
-				.valueOf(facilitiesWithCoordOnly) + "/";
+		String testOutDir = outDir + "/" + facilitiesSource.toString() + "_facilitiesWithCoordOnly_" + String.valueOf(facilitiesWithCoordOnly) + "/";
 		new File(testOutDir).mkdirs();
 
 		Scenario scenario = prepareScenario();
 		scenario.getConfig().controler().setOutputDirectory(testOutDir);
 		scenario.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		// (overwriteExistingFiles is needed here for the parameterized test since otherwise all output directories except for
+		// the last test will be deleted and thus not available for debugging. kai, sep'19)
 		new Controler(scenario).run();
 
 		// checks
@@ -184,7 +184,8 @@ public class ActivityFacilitiesSourceTest {
 		}
 		
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
-		
+
+		String mode = TransportMode.car;
 		{ //  activities from coords only
 			Person person = populationFactory.createPerson(Id.createPersonId("0"));
 			Plan plan = populationFactory.createPlan();
@@ -194,14 +195,14 @@ public class ActivityFacilitiesSourceTest {
 				home.setFacilityId(Id.create("1", ActivityFacility.class));
 			}
 			plan.addActivity(home);
-			plan.addLeg(populationFactory.createLeg(mode));
+			plan.addLeg(populationFactory.createLeg( mode ) );
 			Activity work = populationFactory.createActivityFromCoord("w", new Coord(10000.0, 0.0));
 			work.setEndTime(16 * 3600.0);
 			if (assignFacilityIdToActivity(facilitiesSource)) {
 				work.setFacilityId(Id.create("2", ActivityFacility.class));
 			}
 			plan.addActivity(work);
-			plan.addLeg(populationFactory.createLeg(mode));
+			plan.addLeg(populationFactory.createLeg( mode ) );
 			Activity lastAct = populationFactory.createActivityFromCoord("h", new Coord(-25000.0, 0.0));
 			if (assignFacilityIdToActivity(facilitiesSource)) {
 				lastAct.setFacilityId(Id.create("1", ActivityFacility.class));
@@ -221,14 +222,14 @@ public class ActivityFacilitiesSourceTest {
 				home.setFacilityId(Id.create("1", ActivityFacility.class));
 			}
 			plan.addActivity(home);
-			plan.addLeg(populationFactory.createLeg(mode));
+			plan.addLeg(populationFactory.createLeg( mode ) );
 			Activity work = populationFactory.createActivityFromLinkId("w", Id.createLinkId("20"));
 			if (assignFacilityIdToActivity(facilitiesSource)) {
 				work.setFacilityId(Id.create("2", ActivityFacility.class));
 			}
 			work.setEndTime(17.5 * 3600.0);
 			plan.addActivity(work);
-			plan.addLeg(populationFactory.createLeg(mode));
+			plan.addLeg(populationFactory.createLeg( mode ) );
 			Activity lastAct = populationFactory.createActivityFromLinkId("h", Id.createLinkId("1"));
 			if (assignFacilityIdToActivity(facilitiesSource)) {
 				lastAct.setFacilityId(Id.create("1", ActivityFacility.class));
@@ -246,7 +247,7 @@ public class ActivityFacilitiesSourceTest {
 			}
 			home.setEndTime(7.8 * 3600.0);
 			plan.addActivity(home);
-			plan.addLeg(populationFactory.createLeg(mode));
+			plan.addLeg(populationFactory.createLeg( mode ) );
 			Activity work = populationFactory.createActivityFromLinkId("w", Id.createLinkId("20"));
 
 			if ( this.facilitiesSource.equals(FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile)){
@@ -258,7 +259,7 @@ public class ActivityFacilitiesSourceTest {
 			}
 			work.setEndTime(18 * 3600.0);
 			plan.addActivity(work);
-			plan.addLeg(populationFactory.createLeg(mode));
+			plan.addLeg(populationFactory.createLeg( mode ) );
 			Activity lastAct = populationFactory.createActivityFromCoord("h", new Coord(-25000.0, 0.0));
 			if (assignFacilityIdToActivity(facilitiesSource)) {
 				lastAct.setFacilityId(Id.create("1", ActivityFacility.class));
@@ -277,7 +278,7 @@ public class ActivityFacilitiesSourceTest {
 			home.setEndTime(9 * 3600.0);
 			home.setLinkId(Id.createLinkId("1"));
 			plan.addActivity(home);
-			plan.addLeg(populationFactory.createLeg(mode));
+			plan.addLeg(populationFactory.createLeg( mode ) );
 			Activity work = populationFactory.createActivityFromCoord("w", new Coord(10000.0, 0.0));
 			if (assignFacilityIdToActivity(facilitiesSource)) {
 				work.setFacilityId(Id.create("2", ActivityFacility.class));
@@ -285,7 +286,7 @@ public class ActivityFacilitiesSourceTest {
 			work.setEndTime(18.5 * 3600.0);
 			work.setLinkId(Id.createLinkId("20"));
 			plan.addActivity(work);
-			plan.addLeg(populationFactory.createLeg(mode));
+			plan.addLeg(populationFactory.createLeg( mode ) );
 			Activity lastAct = populationFactory.createActivityFromCoord("h", new Coord(-25000.0, 0.0));
 			if (assignFacilityIdToActivity(facilitiesSource)) {
 				lastAct.setFacilityId(Id.create("1", ActivityFacility.class));
