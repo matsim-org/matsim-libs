@@ -168,7 +168,7 @@ public class Sim04_DrtCom_LinkFlow_HomeOffice {
 		drt.setMaxTravelTimeAlpha(1.4);
 		drt.setMaxWaitTime(900.0);
 		drt.setStopDuration(105);
-		drt.setRequestRejection(true);
+		drt.setRejectRequestIfMaxWaitOrTravelTimeViolated(true);
 
 		// Create the virtual stops for the drt service
 		// VirtualStops are dynamically generated
