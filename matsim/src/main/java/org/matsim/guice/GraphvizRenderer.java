@@ -67,21 +67,21 @@ public class GraphvizRenderer {
 			renderEdge(edge);
 		}
 
-		out.println("{");
-		out.println("rank=same;");
-		out.println(nodes.get(NodeId.newTypeId(Key.get(Mobsim.class))).getIdentifier()+";");
-		out.println(nodes.get(NodeId.newTypeId(Key.get(TripRouter.class))).getIdentifier()+";");
-		out.println(nodes.get(NodeId.newTypeId(Key.get(PlansScoring.class))).getIdentifier()+";");
-		out.println(nodes.get(NodeId.newTypeId(Key.get(PrepareForSim.class))).getIdentifier()+";");
-		out.println(nodes.get(NodeId.newTypeId(Key.get(PlansReplanning.class))).getIdentifier()+";");
-		out.println("}");
-
-		out.println("{");
-		out.println("rank=same;");
-		out.println(nodes.get(NodeId.newTypeId(Key.get(RoutingModule.class, Names.named("car")))).getIdentifier()+";");
-		out.println(nodes.get(NodeId.newTypeId(Key.get(TravelTime.class, Names.named("car")))).getIdentifier()+";");
-		out.println(nodes.get(NodeId.newTypeId(Key.get(TravelDisutilityFactory.class, Names.named("car")))).getIdentifier()+";");
-		out.println("}");
+//		out.println("{");
+//		out.println("rank=same;");
+//		out.println(nodes.get(NodeId.newTypeId(Key.get(Mobsim.class))).getIdentifier()+";");
+//		out.println(nodes.get(NodeId.newTypeId(Key.get(TripRouter.class))).getIdentifier()+";");
+//		out.println(nodes.get(NodeId.newTypeId(Key.get(PlansScoring.class))).getIdentifier()+";");
+//		out.println(nodes.get(NodeId.newTypeId(Key.get(PrepareForSim.class))).getIdentifier()+";");
+//		out.println(nodes.get(NodeId.newTypeId(Key.get(PlansReplanning.class))).getIdentifier()+";");
+//		out.println("}");
+//
+//		out.println("{");
+//		out.println("rank=same;");
+//		out.println(nodes.get(NodeId.newTypeId(Key.get(RoutingModule.class, Names.named("car")))).getIdentifier()+";");
+//		out.println(nodes.get(NodeId.newTypeId(Key.get(TravelTime.class, Names.named("car")))).getIdentifier()+";");
+//		out.println(nodes.get(NodeId.newTypeId(Key.get(TravelDisutilityFactory.class, Names.named("car")))).getIdentifier()+";");
+//		out.println("}");
 
 		finish();
 
