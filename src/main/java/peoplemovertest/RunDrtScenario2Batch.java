@@ -17,35 +17,66 @@
  *                                                                         *
  * *********************************************************************** */
 
-package peoplemover.run;
+package peoplemovertest;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-/**
- * @author michalm
- */
-public class RunDrtScenario {
-	public static void run(String configFile, boolean otfvis) {
-		final Config config = ConfigUtils.loadConfig(configFile, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
-				new OTFVisConfigGroup());
-		Controler controler = createControler(config, otfvis);
-		controler.run();
-	}
+//import org.matsim.contrib.av.robotaxi.run.RunRobotaxiExample;
 
+/**
+ * @author axer
+ */
+public class RunDrtScenario2Batch {
+	//Class to create the controller
 	public static Controler createControler(Config config, boolean otfvis) {
 		return DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis);
 	}
 
 	public static void main(String[] args) {
-		if (args.length != 1) {
-			throw new IllegalArgumentException("RunDrtScenario needs one argument: path to the configuration file");
-		}
-		RunDrtScenario.run(args[0], false);
+		//Define Iteration list
+		List<String> strings = Arrays.asList("0.5");
+//		List<String> strings = Arrays.asList("0.1", "0.3","0.5");
+
+
+		for (String Element : strings){
+			//Define the path to the config file and enable / disable otfvis
+			//Basis configuration
+			final Config config = ConfigUtils.loadConfig("D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/config.xml",
+					new MultiModeDrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
+			boolean otfvis = false;
+			
+	
+			//Overwrite existing configuration parameters
+			config.controler().setLastIteration(4);
+			config.controler().setWriteEventsInterval(1);
+			config.controler().setWritePlansInterval(1);
+			config.controler().setOutputDirectory("D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/drt_"+Element.toString()+"_nextStation_default/output/");
+			config.plans().setInputFile("D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/population/run124.100.output_plans_DRT"+Element.toString()+".xml.gz");
+			DrtConfigGroup drt = DrtConfigGroup.getSingleModeDrtConfig(config);
+			//Initialize the controller
+			Controler controler = createControler(config, otfvis);
+			
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.3);
+					
+				}
+			});
+	
+			controler.run();
+
+	}
 	}
 }

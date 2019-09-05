@@ -22,9 +22,10 @@ package wobscenario.peoplemover;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigGroup.OperationalScheme;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
@@ -42,8 +43,8 @@ public class RunDrtWithStops {
 	}
 
 	public static void run(String configFile, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configFile, new DvrpConfigGroup(), new TaxiConfigGroup(),
-				new OTFVisConfigGroup(), new DrtConfigGroup());
+		Config config = ConfigUtils.loadConfig(configFile, new DvrpConfigGroup(), new MultiModeTaxiConfigGroup(),
+				new OTFVisConfigGroup(), new MultiModeDrtConfigGroup());
 		//	for debugging:
 		//		config.plans().setInputFile("singleDrtAgent.xml");
 		DrtConfigGroup drt = (DrtConfigGroup)config.getModules().get(DrtConfigGroup.GROUP_NAME);

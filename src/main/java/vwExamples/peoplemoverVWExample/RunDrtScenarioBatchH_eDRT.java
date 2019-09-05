@@ -40,6 +40,7 @@ import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.ev.EvConfigGroup;
 import org.matsim.contrib.ev.temperature.TemperatureChangeConfigGroup;
@@ -87,7 +88,8 @@ public class RunDrtScenarioBatchH_eDRT {
 		String inbase = "D:\\Thiel\\Programme\\MatSim\\03_HannoverDRT\\input\\";
 		String outbase = "D:\\Thiel\\Programme\\MatSim\\03_HannoverDRT\\output\\";
 
-		final Config config = ConfigUtils.loadConfig(inbase + "config_H_DRT_1.0_0.25DRT.xml", new DrtConfigGroup(),
+		final Config config = ConfigUtils.loadConfig(inbase + "config_H_DRT_1.0_0.25DRT.xml",
+				new MultiModeDrtConfigGroup(),
 				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(), new TemperatureChangeConfigGroup(),
 				new CadytsConfigGroup());
 
@@ -127,7 +129,7 @@ public class RunDrtScenarioBatchH_eDRT {
 		config.network().setInputFile(inbase + "\\network\\drtServiceAreaNetwork.xml.gz");
 		
 		// This part allows to change dynamically DRT config parameters
-		DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+		DrtConfigGroup drt = DrtConfigGroup.getSingleModeDrtConfig(config);
 
 		drt.setPrintDetailedWarnings(false);
 		// Parameters to setup the DRT service

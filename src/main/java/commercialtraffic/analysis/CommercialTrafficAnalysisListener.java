@@ -22,7 +22,7 @@ package commercialtraffic.analysis;/*
  */
 
 import com.google.inject.Inject;
-import commercialtraffic.deliveryGeneration.PersonDelivery;
+import commercialtraffic.commercialJob.CommercialJobUtils;
 import commercialtraffic.scoring.ScoreCommercialServices;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -30,9 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.misc.Time;
@@ -46,7 +44,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.*;
 
 
-public class CommercialTrafficAnalysisListener implements IterationEndsListener, BeforeMobsimListener {
+public class CommercialTrafficAnalysisListener implements IterationEndsListener {
 
     @Inject
     MatsimServices services;
@@ -85,10 +83,10 @@ public class CommercialTrafficAnalysisListener implements IterationEndsListener,
     private void analyzeCarrierMarketShares(int iteration) {
 
 
-        Map<String, Set<Id<Carrier>>> splitCarriersByMarket = PersonDelivery.splitCarriersByMarket(carriers);
+        Map<String, Set<Id<Carrier>>> carriersSplitByMarket = CommercialJobUtils.splitCarriersByMarket(carriers);
 
 
-        for (Map.Entry<String, Set<Id<Carrier>>> entry : splitCarriersByMarket.entrySet()) {
+        for (Map.Entry<String, Set<Id<Carrier>>> entry : carriersSplitByMarket.entrySet()) {
             Map<Id<Carrier>, Map<Integer, Double>> marketShareHistory = carrierShareHistories.getOrDefault(entry.getKey(), new HashMap<>());
             carrierShareHistories.put(entry.getKey(), marketShareHistory);
 
@@ -135,9 +133,10 @@ public class CommercialTrafficAnalysisListener implements IterationEndsListener,
     private void writeDeliveryStats(String filename) {
         Collections.sort(scoreCommercialServices.getLogEntries(), Comparator.comparing(ScoreCommercialServices.DeliveryLogEntry::getTime));
         try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(filename)), CSVFormat.DEFAULT.withDelimiter(sep.charAt(0)).withHeader("CarrierId"
-                , "PersonId", "Time", "Score", "LinkId", "TimeDerivation", "DriverId"))) {
+                ,"serviceId", "PersonId", "Time", "Score", "LinkId", "TimeDerivation", "DriverId"))) {
             for (ScoreCommercialServices.DeliveryLogEntry entry : scoreCommercialServices.getLogEntries()) {
                 csvPrinter.print(entry.getCarrierId());
+                csvPrinter.print(entry.getServiceId());
                 csvPrinter.print(entry.getPersonId());
                 csvPrinter.print(Time.writeTime(entry.getTime()));
                 csvPrinter.print(entry.getScore());
@@ -155,7 +154,7 @@ public class CommercialTrafficAnalysisListener implements IterationEndsListener,
     private void writeIterationCarrierStats(IterationEndsEvent event) {
         for (Carrier carrier : carriers.getCarriers().values()) {
             DoubleSummaryStatistics distances = tourLengthAnalyzer.getDeliveryAgentDistances().entrySet().stream()
-                    .filter(entry -> PersonDelivery.getCarrierIdFromDriver(entry.getKey()).equals(carrier.getId()))
+                    .filter(entry -> CommercialJobUtils.getCarrierIdFromDriver(entry.getKey()).equals(carrier.getId()))
                     .mapToDouble(e -> e.getValue())
                     .summaryStatistics();
             DoubleSummaryStatistics scores = scoreCommercialServices.getLogEntries().stream()
@@ -186,11 +185,5 @@ public class CommercialTrafficAnalysisListener implements IterationEndsListener,
             }
 
         }
-    }
-
-    @Override
-    public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-        scoreCommercialServices.prepareTourArrivalsForDay();
-
     }
 }

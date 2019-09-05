@@ -17,7 +17,7 @@ public class CommercialTrafficIntegrationTest {
         Config config = ConfigUtils.loadConfig("input/commercialtrafficIT/config.xml", new CommercialTrafficConfigGroup());
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new CommercialTrafficModule());
+        controler.addOverridingModule(new CommercialTrafficModule(config, (carrierId -> 20)));
         controler.run();
     }
 

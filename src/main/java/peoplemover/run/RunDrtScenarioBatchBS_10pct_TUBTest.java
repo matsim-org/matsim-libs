@@ -23,6 +23,7 @@ package peoplemover.run;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -44,7 +45,7 @@ public class RunDrtScenarioBatchBS_10pct_TUBTest {
 		// Other config parameters will be generated or modified dynamically within this
 		// loop
 		// Define the path to the config file and enable / disable otfvis
-		final Config config = ConfigUtils.loadConfig(inputPath+"config.xml", new DrtConfigGroup(),
+		final Config config = ConfigUtils.loadConfig(inputPath + "config.xml", new MultiModeDrtConfigGroup(),
 				new DvrpConfigGroup(), new OTFVisConfigGroup());
 
 		// OTFVis is an open source, OpenGL-based visualizer for looking at MATSim
@@ -61,7 +62,7 @@ public class RunDrtScenarioBatchBS_10pct_TUBTest {
 		config.network().setInputFile("network/modifiedNetwork.xml.gz");
 
 		// This part allows to change dynamically DRT config parameters
-		DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+		DrtConfigGroup drt = DrtConfigGroup.getSingleModeDrtConfig(config);
 
 		// Use custom stop duration
 		drt.setOperationalScheme(DrtConfigGroup.OperationalScheme.stopbased);

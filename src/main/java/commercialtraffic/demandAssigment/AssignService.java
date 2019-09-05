@@ -4,8 +4,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -14,11 +12,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.Triple;
-import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -35,15 +30,25 @@ import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-
 import commercialtraffic.companyGeneration.CommericalCompany;
 import commercialtraffic.companyGeneration.CompanyGenerator;
 import ft.utils.ctDemandPrep.Demand4CompanyClass;
 import ft.utils.ctDemandPrep.DemandGenerator;
 
 public class AssignService {
+	
+	// !!!!! Important !!!!!
+	// SET MAX SERVICES PER ACTIVITY
+	// !!!!! Important !!!!!
+	int maxServicesPerAct = 3;
+	
+	// !!!!! Filter CT Trips !!!!!
+	Double filterFactor=0.1;
+	
+	
 	CommercialTripsReader commercialTripReader;
 	String plansFile;
+
 	Set<String> acceptedMainModes = new HashSet<>(
 			Arrays.asList("car", "pt", "drt", "walk", "ride", "bike", "stayHome"));
 	Set<String> acceptedActivities = new HashSet<>(
@@ -79,7 +84,7 @@ public class AssignService {
 		this.matsimInput = matsimInput;
 		new PopulationReader(scenario).readFile(plansFile);
 		r.setSeed(nr);
-		commercialTripReader = new CommercialTripsReader(commercialTripsFile, serviceDurationDistPath);
+		commercialTripReader = new CommercialTripsReader(commercialTripsFile, serviceDurationDistPath,filterFactor);
 		commercialTripReader.run();
 		demand = new DemandGenerator(companyFolder, zoneSHP, outputpath);
 		demand.findNeighbourZones();
@@ -141,6 +146,9 @@ public class AssignService {
 				String zone = commercialTrip.zielzelle;
 				String carrierId = serviceType + "_" + commercialTrip.unternehmensID;
 				String companyId = String.valueOf(commercialTrip.unternehmensID);
+				if (customerRelation=="private") {
+					continue;
+				}
 
 				double serviceDuration = this.commercialTripReader.getRandomServiceDurationPerType(serviceType);
 
@@ -153,10 +161,23 @@ public class AssignService {
 					companyMap.get(companyId).addService(finalJob.jobId, finalJob.regularAgentActivity.getLinkId(),
 							finalJob.startTime, finalJob.endTime, serviceDuration);
 
-					// Set attributes
-					this.scenario.getPopulation().getPersons().get(finalJob.personid).getSelectedPlan()
-							.getPlanElements().get(finalJob.planIdx).getAttributes()
-							.putAttribute("jobId", finalJob.jobId);
+					// Check for Attributes
+					Object actAttr = this.scenario.getPopulation().getPersons().get(finalJob.personid).getSelectedPlan()
+							.getPlanElements().get(finalJob.planIdx).getAttributes().getAttribute("jobId");
+
+					if (actAttr == null) {
+						this.scenario.getPopulation().getPersons().get(finalJob.personid).getSelectedPlan()
+								.getPlanElements().get(finalJob.planIdx).getAttributes()
+								.putAttribute("jobId", finalJob.jobId);
+					} else {
+						String prevJobId = actAttr.toString();
+						this.scenario.getPopulation().getPersons().get(finalJob.personid).getSelectedPlan()
+								.getPlanElements().get(finalJob.planIdx).getAttributes()
+								.putAttribute("jobId", prevJobId + ";" + finalJob.jobId);
+						
+						//System.out.println(prevJobId + ";" + finalJob.jobId);
+
+					}
 
 					this.jobIdCounter.increment();
 					foundCounter.increment();
@@ -217,10 +238,8 @@ public class AssignService {
 								Triple<Integer, Double, Double> result = getTimeConstrainedActivity(candidatePerson,
 										peIndexList, serviceDuration);
 
-								
-
 								if (result != null) {
-									
+
 									Integer matchedPeIdx = result.getLeft();
 									Double startTime = result.getMiddle();
 									Double endTime = result.getRight();
@@ -230,7 +249,7 @@ public class AssignService {
 
 									// return finalActivityDestination;
 
-									return new Job(jobIdCounter.toInteger(), carrierId, candidatePerson, serviceType,
+									return new Job(jobIdCounter.toString(), carrierId, candidatePerson, serviceType,
 											customerRelation, zone, serviceDuration, matchedPeIdx,
 											finalActivityDestination, startTime, endTime);
 
@@ -266,6 +285,19 @@ public class AssignService {
 			Double actEndTime = Double.NaN;
 
 			Activity activity = (Activity) plan.getPlanElements().get(peIdx);
+
+			Object actAttr = activity.getAttributes().getAttribute("jobId");
+
+			if (actAttr != null) {
+
+				int servicesPerAct = Arrays.asList(activity.getAttributes().getAttribute("jobId").toString().split(";"))
+						.size();
+
+				if (servicesPerAct >= maxServicesPerAct) {
+					continue;
+				}
+
+			}
 
 			if (peIdx > 1) {
 

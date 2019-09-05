@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
@@ -19,6 +20,7 @@ import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -39,6 +41,7 @@ public class CompanyGenerator {
 	String outputpath;
 	String carrierOutputPath;
 	Network network;
+	Network carNetwork;
 	// This map contains our companies and their carriers. In this case each company
 	// is its own carrier. String Key = companyId
 	public Map<String, CommericalCompany> commercialCompanyMap = new HashMap<String, CommericalCompany>();
@@ -60,6 +63,10 @@ public class CompanyGenerator {
 		this.outputpath = outputpath;
 		this.network = scenario.getNetwork();
 		this.carrierOutputPath = carrierOutputPath;
+		//Filter Network to get only Car-links
+		NetworkFilterManager networkFilter = new NetworkFilterManager(network);
+		networkFilter.addLinkFilter(l -> l.getAllowedModes().contains(TransportMode.car));
+		carNetwork = networkFilter.applyFilters();
 		// TODO: Obviously not needed?!
 		// CommercialTripsReader tripReader = new CommercialTripsReader(ctTripsFile,
 		// serviceTimeDistributions);
@@ -97,10 +104,11 @@ public class CompanyGenerator {
 		// outputpath = "D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\";
 
 		companyLocations = new DemandGenerator(companyFolder, zoneSHP, outputpath);
-		for (int i = 0; i < companyLocations.files.length; i++) {
-			String dummyDemandFile = companyLocations.getFile(i);
+		companyLocations.getFilesperCompanyClass();
+		for (String keys:companyLocations.filesPerCompanyClass.keySet()) {
+			//String dummyDemandFile = demand.getFile(i);
 
-			Demand4CompanyClass d = new Demand4CompanyClass(dummyDemandFile, null, companyLocations.zoneMap);
+			Demand4CompanyClass d = new Demand4CompanyClass(companyLocations.filesPerCompanyClass.get(keys), null, companyLocations.zoneMap);
 
 			d.readDemandCSV();
 
@@ -121,7 +129,9 @@ public class CompanyGenerator {
 
 		Company company = companyPerCompanyClassAndZone.remove(0);
 
-		return NetworkUtils.getNearestLink(network, company.coord).getId();
+
+
+		return NetworkUtils.getNearestLink(carNetwork, company.coord).getId();
 	}
 
 	public void readVehicleCSV() {
@@ -135,6 +145,7 @@ public class CompanyGenerator {
 		// "EPSG:25832");
 
 		CSVReader reader = null;
+
 		try {
 			reader = new CSVReader(new FileReader(this.csvVehiclefile));
 			vehicleList = reader.readAll();

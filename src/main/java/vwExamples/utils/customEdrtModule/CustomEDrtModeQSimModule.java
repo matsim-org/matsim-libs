@@ -84,7 +84,7 @@ public class CustomEDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 		install(new PassengerEngineQSimModule(getMode()));
 
 		addModalComponent(DrtOptimizer.class, modalProvider(
-				getter -> new CustomEDrtOptimizer(getter.getModal(DefaultDrtOptimizer.class),
+				getter -> new CustomEDrtOptimizer(drtCfg, getter.getModal(DefaultDrtOptimizer.class),
 						getter.getModal(EmptyVehicleChargingScheduler.class), getter.get(MobsimTimer.class))));
 
 		bindModal(DefaultDrtOptimizer.class).toProvider(modalProvider(
@@ -94,8 +94,9 @@ public class CustomEDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 						getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class))))
 				.asEagerSingleton();
 
-
-        bindModal(DepotFinder.class).toProvider(modalProvider(getter -> new GetBestDepot(getter.get(ChargingInfrastructure.class), getter.get(ElectricFleet.class), getter.getModal(Fleet.class)))).asEagerSingleton();
+		bindModal(DepotFinder.class).toProvider(modalProvider(
+				getter -> new GetBestDepot(getter.get(ChargingInfrastructure.class), getter.get(ElectricFleet.class),
+						getter.getModal(Fleet.class)))).asEagerSingleton();
 
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
 
@@ -106,12 +107,11 @@ public class CustomEDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 					@Inject
 					private ChargingInfrastructure chargingInfrastructure;
-					
+
 					@Override
 					public EmptyVehicleChargingScheduler get() {
-						Network network = getModalInstance(Network.class);
 						DrtTaskFactory taskFactory = getModalInstance(DrtTaskFactory.class);
-						return new EmptyVehicleChargingScheduler(network, timer, taskFactory, chargingInfrastructure);
+						return new EmptyVehicleChargingScheduler(timer, taskFactory, chargingInfrastructure);
 					}
 				}).asEagerSingleton();
 
@@ -127,7 +127,8 @@ public class CustomEDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 		bindModal(VehicleData.EntryFactory.class).toProvider(
 				EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider.class).asEagerSingleton();
 
-		bindModal(InsertionCostCalculator.PenaltyCalculator.class).to(drtCfg.isRequestRejection() ?
+		bindModal(InsertionCostCalculator.PenaltyCalculator.class).to(
+				drtCfg.isRejectRequestIfMaxWaitOrTravelTimeViolated() ?
 				InsertionCostCalculator.RejectSoftConstraintViolations.class :
 				InsertionCostCalculator.DiscourageSoftConstraintViolations.class).asEagerSingleton();
 

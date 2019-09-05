@@ -17,7 +17,6 @@ package commercialtraffic.examples;/* ******************************************
 				*                                                                         *
 				* *********************************************************************** */
 
-import commercialtraffic.deliveryGeneration.PersonDelivery;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -27,18 +26,15 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
 import static org.matsim.core.config.ConfigUtils.createConfig;
 import static org.matsim.core.scenario.ScenarioUtils.createScenario;
 
-import java.io.StringWriter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.locationtech.jts.geom.Geometry;

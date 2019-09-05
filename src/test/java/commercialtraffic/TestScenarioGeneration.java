@@ -1,6 +1,27 @@
-package commercialtraffic.deliveryGeneration;
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * Controler.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 
-import org.junit.Ignore;
+package commercialtraffic;
+
+import commercialtraffic.integration.CommercialTrafficConfigGroup;
+import commercialtraffic.commercialJob.CommercialJobUtils;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -11,7 +32,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.vehicles.Vehicle;
@@ -20,22 +40,17 @@ import org.matsim.vehicles.VehicleType;
 import static org.matsim.core.config.ConfigUtils.createConfig;
 import static org.matsim.core.scenario.ScenarioUtils.createScenario;
 
-public class DeliveryGeneratorTest {
+public class TestScenarioGeneration {
 
 
-    @Ignore
-    @org.junit.Test
-    public void notifyBeforeMobsim() {
-        Carriers carriers = generateCarriers();
-        Config config = createConfig();
+    public static Scenario generateScenario(){
+        Config config = createConfig(new CommercialTrafficConfigGroup());
         Scenario scenario = createScenario(config);
-        new MatsimNetworkReader(scenario.getNetwork()).readFile("grid_network.xml");
+        new MatsimNetworkReader(scenario.getNetwork()).readFile("input/commercialtrafficIT/grid_network.xml");
         addPopulation(scenario);
-        DeliveryGenerator generator = new DeliveryGenerator(scenario, carriers);
-
-        new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers)).write("carriertypes.xml");
-        generator.notifyBeforeMobsim(new BeforeMobsimEvent(null, 0));
+        return scenario;
     }
+
 
     public static Carriers generateCarriers() {
         Carriers carriers = new Carriers();
@@ -48,6 +63,12 @@ public class DeliveryGeneratorTest {
         pizza_1.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
         pizza_1.getCarrierCapabilities().getCarrierVehicles().add(getLightVehicle(Id.createVehicleId(1), Id.createLinkId(111), "one"));
         pizza_1.getCarrierCapabilities().getVehicleTypes().add(createLightType());
+        pizza_1.getServices().add(CarrierService
+                .Builder.newInstance(Id.create("salamipizza", CarrierService.class),Id.createLinkId("259"))
+                .setCapacityDemand(1)
+                .setServiceDuration(180)
+                .setServiceStartTimeWindow(TimeWindow.newInstance(12*3600,13*3600))
+                .build());
 
         pizza_2.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
         pizza_2.getCarrierCapabilities().getCarrierVehicles().add(getLightVehicle(Id.createVehicleId(1), Id.createLinkId(111), "one"));
@@ -63,7 +84,7 @@ public class DeliveryGeneratorTest {
     }
 
 
-    private void addPopulation(Scenario scenario) {
+    private static void addPopulation(Scenario scenario) {
         Person p = scenario.getPopulation().getFactory().createPerson(Id.createPersonId(1));
         Plan plan = scenario.getPopulation().getFactory().createPlan();
         p.addPlan(plan);
@@ -79,12 +100,7 @@ public class DeliveryGeneratorTest {
         work.setLinkId(Id.createLinkId(259));
         work.setEndTime(16 * 3600);
 
-        work.getAttributes().putAttribute(PersonDelivery.JOB_TYPE, "pizza");
-        work.getAttributes().putAttribute(PersonDelivery.JOB_DURATION, 180);
-        work.getAttributes().putAttribute(PersonDelivery.JOB_EARLIEST_START, 12 * 3600);
-        work.getAttributes().putAttribute(PersonDelivery.JOB_TIME_END, 13 * 3600);
-        work.getAttributes().putAttribute(PersonDelivery.JOB_OPERATOR, 1);
-        work.getAttributes().putAttribute(PersonDelivery.JOB_SIZE, 1);
+        work.getAttributes().putAttribute(CommercialJobUtils.JOB_ID, "salamipizza");
 
         plan.addActivity(work);
 
@@ -100,7 +116,7 @@ public class DeliveryGeneratorTest {
     }
 
 
-    public static CarrierVehicle getLightVehicle(Id<?> id, Id<Link> homeId, String depot) {
+    private static CarrierVehicle getLightVehicle(Id<?> id, Id<Link> homeId, String depot) {
         CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(Id.create(("carrier_" + id.toString() + "_lightVehicle_" + depot), Vehicle.class), homeId);
         vBuilder.setEarliestStart(6 * 60 * 60);
         vBuilder.setLatestEnd(16 * 60 * 60);
@@ -108,7 +124,7 @@ public class DeliveryGeneratorTest {
         return vBuilder.build();
     }
 
-    public static CarrierVehicleType createLightType() {
+    private static CarrierVehicleType createLightType() {
         CarrierVehicleType.Builder typeBuilder = CarrierVehicleType.Builder.newInstance(Id.create("small", VehicleType.class));
         typeBuilder.setCapacity(6);
         typeBuilder.setFixCost(80.0);
@@ -116,4 +132,6 @@ public class DeliveryGeneratorTest {
         typeBuilder.setCostPerTimeUnit(0.008);
         return typeBuilder.build();
     }
+
+
 }

@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -70,7 +71,9 @@ public class RunDrtScenarioBatchWOBAV {
             //Some config parameters will be taken from the provided config file
             //Other config parameters will be generated or modified dynamically within this loop
             //Define the path to the config file and enable / disable otfvis
-            final Config config = ConfigUtils.loadConfig("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\WOB\\input\\config.xml", new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
+            final Config config = ConfigUtils.loadConfig(
+                    "D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\WOB\\input\\config.xml", new MultiModeDrtConfigGroup(),
+                    new DvrpConfigGroup(), new OTFVisConfigGroup());
 
             //Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -94,7 +97,7 @@ public class RunDrtScenarioBatchWOBAV {
 
 
             //This part allows to change dynamically DRT config parameters
-            DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+            DrtConfigGroup drt = DrtConfigGroup.getSingleModeDrtConfig(config);
             //DRT optimizer searches only the x-most closed vehicles.
             //Handling more vehicles cost more time and will induce more empty trip mileage, because faraway vehicles are also considered to service the customer request
             //drt.setkNearestVehicles(90);

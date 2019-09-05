@@ -16,7 +16,7 @@
         <!-- Default:1800.0; Defines how many seconds a time mutation can maximally shift a time. -->
         <param name="mutationRange" value="1800.0"/>
         <!-- false; Use individual settings for each subpopulation. If enabled but no settings are found, regular settings are uses as fallback. -->
-        <param name="useIndividualSettingsForSubpopulations" value="false"/>
+        <!--<param name="useIndividualSettingsForSubpopulations" value="false"/> -->
     </module>
     <module name="changeMode">
         <!-- Defines whether car availability is considered be considered or not. An agent has no car only if it has no license, or never access to a car. Default: true -->
@@ -33,12 +33,12 @@
         <param name="carriersVehicleTypeFile" value="carriertypes.xml"/>
         <!-- Buffer travel time factor for the first leg of a freight tour. -->
         <param name="firstLegBufferFactor" value="1.5"/>
-        <!-- Number of jsprit Iterations. These take place at the beginning of each MATSim iteration -->
-        <param name="jspritIterations" value="100"/>
         <!-- Score for On time delivery. -->
         <param name="maxDeliveryScore" value="6.0"/>
         <!-- Minimum score for delayed deliveries. -->
         <param name="minDeliveryScore" value="-6.0"/>
+		<!-- Defines whether JSprit is run. If this is set to true, ChangeDeliveryOperator strategy must not be switched on and all carriers need to have at least one plan containing at least one tour. -->
+		<param name="runTourPlanning" value="true" />
         <!-- Delay (in seconds) that marks the threshold for zero utility -->
         <param name="zeroUtilityDelay" value="1800.0"/>
     </module>

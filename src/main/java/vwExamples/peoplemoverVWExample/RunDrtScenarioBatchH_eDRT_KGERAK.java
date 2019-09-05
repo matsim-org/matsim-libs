@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
 import org.matsim.contrib.ev.EvConfigGroup;
@@ -104,7 +105,8 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 
 		String inbase = "D:\\Matsim\\Axer\\Hannover\\K-GERAK\\";
 
-		final Config config = ConfigUtils.loadConfig(inbase + "\\input\\hannover_edrt.xml", new DrtConfigGroup(),
+		final Config config = ConfigUtils.loadConfig(inbase + "\\input\\hannover_edrt.xml",
+				new MultiModeDrtConfigGroup(),
 				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(),
 				new TemperatureChangeConfigGroup());
 
@@ -136,6 +138,8 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 
 		config.network().setInputFile(inbase + "\\input\\network\\drtServiceAreaNetwork.xml.gz");
 
+		//create an empty DRT config group if not present in the config file
+		MultiModeDrtConfigGroup.get(config).addParameterSet(new DrtConfigGroup());
 		// This part allows to change dynamically DRT config parameters
 		DrtConfigGroup drt = (DrtConfigGroup)config.getModules().get(DrtConfigGroup.GROUP_NAME);
 
@@ -145,7 +149,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 		drt.setMaxTravelTimeAlpha(1.3);
 		drt.setMaxWaitTime(500.0);
 		drt.setStopDuration(30.0);
-		drt.setRequestRejection(true);
+		drt.setRejectRequestIfMaxWaitOrTravelTimeViolated(true);
 
 		// Create the virtual stops for the drt service
 		// VirtualStops are dynamically generated

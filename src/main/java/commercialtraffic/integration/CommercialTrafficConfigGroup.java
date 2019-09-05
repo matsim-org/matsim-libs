@@ -21,6 +21,7 @@ package commercialtraffic.integration;/*
  * created by jbischoff, 08.05.2019
  */
 
+import commercialtraffic.replanning.ChangeDeliveryServiceOperator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -49,10 +50,18 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     public static final String FIRSTLEGBUFFER = "firstLegBufferFactor";
     public static final String FIRSTLEGBUFFERDESC = "Buffer travel time factor for the first leg of a freight tour.";
 
+    private boolean runTourPlanning = true;
+    public  static final String RUNJSPRIT = "runTourPlanning";
+    public static final String RUNJSPRITDESC = "Defines whether JSprit is run. " +
+            "If this is set to false, ChangeDeliveryOperator strategy must not be switched on and all carriers need to have at least one plan containing at least one tour.";
+
     @Positive
-    private int jspritIterations = 100;
-    public static final String JSPRITITERS = "jspritIterations";
-    public static final String JSPRITITERSDESC = "Number of jsprit Iterations. These take place at the beginning of each MATSim iteration";
+    private int jSpritTimeSliceWidth = 1800;
+    public static final String JSPRITTIMESLICEWIDTH = "jSpritTimeSliceWidth";
+    public static final String JSPRITTIMESLICEWIDTHDESC = "time slice width used in JSprit in seconds." +
+            " The smaller the value, the more precise the calculation of routing costs but the longer the computation time." +
+            " Default value is 1800 seconds.";
+
 
     @Positive
     private double zeroUtilityDelay = 1800;
@@ -67,6 +76,12 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     private double minDeliveryScore = -6;
     public static final String MINDELIVERYSCORE = "minDeliveryScore";
     public static final String MINDELIVERYSCOREDESC = "Minimum score for delayed deliveries.";
+
+    private boolean breakSimulationIfNotAllServicesServed = true;
+    public static final String BREAK_IF_NOT_ALL_SERVICES_SERVED = "breakIfNotAllRequestsServed";
+    static final String BREAK_IF_NOT_ALL_SERVICES_SERVED_EXP =
+            "Specifies whether the simulation should interrupt if not all services were executed when"
+                    + " an interation ends. Otherwise, a warning is given. True by default.";
 
 
     public static final String GROUP_NAME = "commercialTraffic";
@@ -137,20 +152,26 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
         this.firstLegTraveltimeBufferFactor = firstLegTraveltimeBufferFactor;
     }
 
+    @StringSetter(RUNJSPRIT)
+    public void setRunTourPlanning(boolean runTourPlanning){ this.runTourPlanning = runTourPlanning; }
+
+    @StringGetter(RUNJSPRIT)
+    public boolean getRunTourPlanning(){ return runTourPlanning; }
+
     /**
-     * @return jspritIterations --{@value #JSPRITITERSDESC}
+     * @return jspritTimeSliceWidth --{@value #JSPRITTIMESLICEWIDTHDESC}
      */
-    @StringGetter(JSPRITITERS)
-    public int getJspritIterations() {
-        return jspritIterations;
+    @StringGetter(JSPRITTIMESLICEWIDTH)
+    public int getJspritTimeSliceWidth() {
+        return jSpritTimeSliceWidth;
     }
 
     /**
-     * @param jspritIterations --{@value #JSPRITITERSDESC}
+     * @param jspritTimeSliceWidth --{@value #JSPRITTIMESLICEWIDTHDESC}
      */
-    @StringSetter(JSPRITITERS)
-    public void setJspritIterations(int jspritIterations) {
-        this.jspritIterations = jspritIterations;
+    @StringSetter(JSPRITTIMESLICEWIDTH)
+    public void setjSpritTimeSliceWidth(int jspritTimeSliceWidth) {
+        this.jSpritTimeSliceWidth = jspritTimeSliceWidth;
     }
 
     /**
@@ -201,16 +222,34 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
         this.minDeliveryScore = minDeliveryScore;
     }
 
+    /**
+     * @return {@value #BREAK_IF_NOT_ALL_SERVICES_SERVED_EXP}
+     */
+    @StringGetter(BREAK_IF_NOT_ALL_SERVICES_SERVED)
+    public boolean isBreakSimulationIfNotAllServicesServed() {
+        return breakSimulationIfNotAllServicesServed;
+    }
+
+    /**
+     * @param breakSimulationIfNotAllServicesServed {@value #BREAK_IF_NOT_ALL_SERVICES_SERVED_EXP}
+     */
+    @StringSetter(BREAK_IF_NOT_ALL_SERVICES_SERVED)
+    public void setBreakSimulationIfNotAllServicesServed(boolean breakSimulationIfNotAllServicesServed) {
+        this.breakSimulationIfNotAllServicesServed = breakSimulationIfNotAllServicesServed;
+    }
+
     @Override
     public Map<String, String> getComments() {
         Map<String, String> map = super.getComments();
         map.put(CARRIERSFILEDE, CARRIERSFILEDESC);
         map.put(CARRIERSVEHICLETYPED, CARRIERSVEHICLETYPEDESC);
         map.put(FIRSTLEGBUFFER, FIRSTLEGBUFFERDESC);
-        map.put(JSPRITITERS, JSPRITITERSDESC);
+        map.put(JSPRITTIMESLICEWIDTH,JSPRITTIMESLICEWIDTHDESC);
+        map.put(RUNJSPRIT,RUNJSPRITDESC);
         map.put(MAXDELIVERYSCORE, MAXDELIVERYSCOREDESC);
         map.put(MINDELIVERYSCORE, MINDELIVERYSCOREDESC);
         map.put(ZEROUTILDELAY, ZEROUTILDELAYDESC);
+        map.put(BREAK_IF_NOT_ALL_SERVICES_SERVED, BREAK_IF_NOT_ALL_SERVICES_SERVED_EXP);
         return map;
     }
 
@@ -219,6 +258,12 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
         super.checkConsistency(config);
         if (getMaxDeliveryScore() < getMinDeliveryScore()) {
             throw new RuntimeException("Minimum Score for delivery is higher than maximum score");
+        } //TODO test
+        if(!getRunTourPlanning() && config.strategy().getStrategySettings().stream()
+                .anyMatch(strategySettings -> strategySettings.getStrategyName().equals(ChangeDeliveryServiceOperator.SELECTOR_NAME))){
+            throw new RuntimeException("if tour planning is switched off, the replanning  strategy " + ChangeDeliveryServiceOperator.SELECTOR_NAME
+                                        + " is forbidden. Either let the carriers do tour planning before each  iteration by setting " + RUNJSPRIT + "=true "
+                                         + "or exclude the replanning strategy " + ChangeDeliveryServiceOperator.SELECTOR_NAME);
         }
     }
 }
