@@ -235,12 +235,12 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 		String absolutePath = prefix + path;
 		return absolutePath;
 	}
-
+	@Deprecated // using this vs not using this can change results, presumably because strategies may be used in a different sequence from the registry.
+	// (Had the problem in RandomizingTransitRotuerIT.) kai, dec'19
 	public static Id<StrategySettings> createAvailableStrategyId(Config config) {
 		long maxStrategyId = 0;
-		Iterator<StrategySettings> iterator = config.strategy().getStrategySettings().iterator();
-		while(iterator.hasNext()){
-			maxStrategyId = Math.max(maxStrategyId, Long.parseLong(iterator.next().getId().toString()));
+		for( StrategySettings strategySettings : config.strategy().getStrategySettings() ){
+			maxStrategyId = Math.max( maxStrategyId , Long.parseLong( strategySettings.getId().toString() ) );
 		}
 		return Id.create(maxStrategyId + 1, StrategySettings.class);
 	}

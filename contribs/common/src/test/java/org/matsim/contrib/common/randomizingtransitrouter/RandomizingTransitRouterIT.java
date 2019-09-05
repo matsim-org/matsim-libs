@@ -101,8 +101,11 @@ public class RandomizingTransitRouterIT {
 		config.planCalcScore().addActivityParams( new ActivityParams("home").setTypicalDuration( 6*3600. ) );
 		config.planCalcScore().addActivityParams( new ActivityParams("education_100").setTypicalDuration( 6*3600. ) );
 
+//		config.strategy().addStrategySettings( new StrategySettings( ConfigUtils.createAvailableStrategyId(config)).setStrategyName(DefaultStrategy.ReRoute ).setWeight(0.1 ) );
+//		config.strategy().addStrategySettings( new StrategySettings( ConfigUtils.createAvailableStrategyId(config)).setStrategyName(DefaultSelector.ChangeExpBeta ).setWeight(0.9 ) );
 		config.strategy().addStrategySettings( new StrategySettings().setStrategyName(DefaultStrategy.ReRoute ).setWeight(0.1 ) );
 		config.strategy().addStrategySettings( new StrategySettings().setStrategyName(DefaultSelector.ChangeExpBeta ).setWeight(0.9 ) );
+		// yy changing the above (= no longer using createAvailableStrategyId) changes the results.  :-( :-( :-(
 
 		config.qsim().setEndTime(18.*3600.);
 		
@@ -145,8 +148,8 @@ public class RandomizingTransitRouterIT {
 		// distribution rather than a biased uniform distribution as is used here.  kai, jul'15
 		
 		Assert.assertEquals(36., observer.getCounts().get( Id.create("1009", Vehicle.class) ), 0.1 );
-		Assert.assertEquals( 6., observer.getCounts().get( Id.create("1012", Vehicle.class) ) , 0.1 );
-		Assert.assertEquals(21., observer.getCounts().get( Id.create("2009", Vehicle.class) ) , 0.1 );
+		Assert.assertEquals( 8. /*6.*/ , observer.getCounts().get( Id.create("1012", Vehicle.class) ) , 0.1 );
+		Assert.assertEquals(22. /*21.*/, observer.getCounts().get( Id.create("2009", Vehicle.class) ) , 0.1 );
 		Assert.assertEquals(36., observer.getCounts().get( Id.create("3009", Vehicle.class) ) , 0.1 );
 		
 		
