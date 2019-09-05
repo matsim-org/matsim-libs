@@ -58,6 +58,8 @@ public class RunExperiencedTripsAnalysisBatch {
 	public static void main(String[] args) {
 
 		run("D:\\Matsim\\Axer\\Hannover\\ZIM\\output\\");
+		run("D:\\Matsim\\Axer\\Hannover\\Base\\");
+		run("D:\\Matsim\\Axer\\Hannover\\WV\\");
 	}
 
 	public static void run(String runDir) {
@@ -70,13 +72,20 @@ public class RunExperiencedTripsAnalysisBatch {
 			String scenarioName = StringList[StringList.length - 1];
 
 			Set<String> scenarioToBeAnalyzed = new HashSet<String>();
-//			scenarioToBeAnalyzed.add("VW243_LocalLinkFlow_1.15_10pct"); //InOut
+//			scenarioToBeAnalyzed.add("VW243_LocalLinkFlow_1.15_10pct");
 //			scenarioToBeAnalyzed.add("VW243_LocalLinkFlow_1.28_10pct");
+//			scenarioToBeAnalyzed.add("VW243_CityCommuterDRT_10pct300_veh_idx0");
 //			scenarioToBeAnalyzed.add("VW243_CityCommuterDRTAmpel2.0_10pct300_veh_idx0");
-//			scenarioToBeAnalyzed.add("VW243_CityCommuterDRTAmpel2.0_10pct300_veh_idx0");
-			scenarioToBeAnalyzed.add("VW243_HomeOfficeInOut1x_10pct");
-			scenarioToBeAnalyzed.add("VW243_HomeOfficeInOut2x_10pct");
+//			scenarioToBeAnalyzed.add("VW243_HomeOfficeInOut1x_10pct");
+//			scenarioToBeAnalyzed.add("VW243_HomeOfficeInOut2x_10pct");
 //			scenarioToBeAnalyzed.add("vw243_cadON_ptSpeedAdj.0.1");
+//			scenarioToBeAnalyzed.add("VW243_Drt_HomeOffice_LinkFlow1.15300_veh_idx0");
+//			scenarioToBeAnalyzed.add("VW251_CityCommuterDRT_100pct2800_veh_idx0");
+			scenarioToBeAnalyzed.add("vw251.1.0");
+//			scenarioToBeAnalyzed.add("CT_243.0.1");
+//			scenarioToBeAnalyzed.add("CT_243_noJsprit.0.1");
+			
+			
 			
 			
 			
@@ -106,6 +115,7 @@ public class RunExperiencedTripsAnalysisBatch {
 		monitoredModes.add("drt_walk");
 		monitoredModes.add("access_walk");
 		monitoredModes.add("egress_walk");
+		monitoredModes.add("non_network_walk");
 		monitoredModes.add("car");
 		monitoredModes.add("walk");
 		monitoredModes.add("bike");
@@ -169,6 +179,7 @@ public class RunExperiencedTripsAnalysisBatch {
 				eventHandler.getPerson2ExperiencedTrips(), eventHandler.getZone2BinActiveVehicleMap(), eventHandler.getModeMileageMap(), monitoredModes,
 				scenario.getNetwork(), zoneMap);
 		tripsWriter.writeExperiencedTrips();
+//		System.out.print("Counted Stuck Events "+ eventHandler.getStuckEvents());
 		// ExperiencedTripsWriter legsWriter = new ExperiencedTripsWriter(runPrefix +
 		// "experiencedLegs.csv",
 		// eventHandler.getPerson2ExperiencedTrips(), monitoredModes,

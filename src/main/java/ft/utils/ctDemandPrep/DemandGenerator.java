@@ -164,7 +164,7 @@ public class DemandGenerator {
 	}
 
 	public void findNeighbourZones() {
-		int maxBuffer = 100;
+		int maxBuffer = 150;
 		int bufferInc = 10;
 
 		for (String zone : zoneKeys) {

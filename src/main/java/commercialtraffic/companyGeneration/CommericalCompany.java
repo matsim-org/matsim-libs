@@ -46,14 +46,15 @@ public class CommericalCompany {
 
 	void addVehicle(Id<Link> linkId, int vehicleType, Double openingTime, Double closingTime) {
 
-		this.carrier.getCarrierCapabilities().getCarrierVehicles().add(getVehicle(Id.createVehicleId(carrierId + "_" + fleetIterator + "_vehTyp_" + vehicleType), linkId, companyId, vehicleType));
+		this.carrier.getCarrierCapabilities().getCarrierVehicles().add(getVehicle(Id.createVehicleId(carrierId + "_" + fleetIterator + "_vehTyp_" + vehicleType), linkId, companyId, vehicleType,openingTime,closingTime));
 		this.carrier.getCarrierCapabilities().getVehicleTypes().add(createType(vehicleType));
 		fleetIterator++;
 	}
 	
 	public void addService(String serviceId, Id<Link> linkId,double startTime, double endTime, double serviceDuration)
 	{
-		double trueEndTime = endTime-serviceDuration;
+		//FAIL! double trueEndTime = endTime-serviceDuration;
+		double trueEndTime = endTime;
 		CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(Id.create(serviceId, CarrierService.class ), linkId);
 		//TODO: Please change to non fixed number
 		serviceBuilder.setCapacityDemand( 1 );
@@ -63,12 +64,12 @@ public class CommericalCompany {
 		carrier.getServices().add(service);
 	}
 
-	public static CarrierVehicle getVehicle(Id<?> id, Id<Link> homeId, String depot, int vehicleType) {
+	public static CarrierVehicle getVehicle(Id<?> id, Id<Link> homeId, String depot, int vehicleType, double openingTime, double closingTime) {
 				
 		CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder
 				.newInstance(Id.create((id.toString()), Vehicle.class), homeId);
-		vBuilder.setEarliestStart(6 * 60 * 60);
-		vBuilder.setLatestEnd(16 * 60 * 60);
+		vBuilder.setEarliestStart(openingTime);
+		vBuilder.setLatestEnd(closingTime);
 		vBuilder.setType(createType(vehicleType));
 		//TODO: We could add vehicle length for each vehicleType according to KID at this stage
 		return vBuilder.build();
@@ -98,7 +99,7 @@ public class CommericalCompany {
 			return typeBuilder.build();
 		case 3:
 
-			typeBuilder.setCapacity(100);
+			typeBuilder.setCapacity(150);
 			typeBuilder.setFixCost(80.0);
 			typeBuilder.setCostPerDistanceUnit(0.00047);
 			typeBuilder.setCostPerTimeUnit(0.008);

@@ -43,11 +43,12 @@ public class AssignService {
 	int maxServicesPerAct = 3;
 	
 	// !!!!! Filter CT Trips !!!!!
-	Double filterFactor=0.1;
+	Double filterFactor=1.0;
 	
 	
 	CommercialTripsReader commercialTripReader;
 	String plansFile;
+	String addCompanyFolder;
 
 	Set<String> acceptedMainModes = new HashSet<>(
 			Arrays.asList("car", "pt", "drt", "walk", "ride", "bike", "stayHome"));
@@ -75,10 +76,11 @@ public class AssignService {
 	long nr = 1896;
 	Random r = MatsimRandom.getRandom();
 
-	AssignService(String plansFile, String commercialTripsFile, String comercialVehicleCSV, String networkFile,
+	AssignService(String plansFile,String addCompanyFolder, String commercialTripsFile, String comercialVehicleCSV, String networkFile,
 			String serviceDurationDistPath, String companyFolder, String zoneSHP, String matsimInput,
 			String outputpath) {
 		this.outputpath = outputpath;
+		this.addCompanyFolder=addCompanyFolder;
 		this.comercialVehicleCSV = comercialVehicleCSV;
 		this.networkFile = networkFile;
 		this.matsimInput = matsimInput;
@@ -86,12 +88,15 @@ public class AssignService {
 		r.setSeed(nr);
 		commercialTripReader = new CommercialTripsReader(commercialTripsFile, serviceDurationDistPath,filterFactor);
 		commercialTripReader.run();
+		
+		
+		
 		demand = new DemandGenerator(companyFolder, zoneSHP, outputpath);
 		demand.findNeighbourZones();
 
 		// companyGenerator is required in order to construct carriers with services
-		this.companyGenerator = new CompanyGenerator(comercialVehicleCSV, commercialTripsFile, serviceDurationDistPath,
-				networkFile, companyFolder, zoneSHP, outputpath, matsimInput + "Carrier\\");
+		this.companyGenerator = new CompanyGenerator(comercialVehicleCSV,addCompanyFolder, commercialTripsFile, serviceDurationDistPath,
+				networkFile, companyFolder, zoneSHP, outputpath, matsimInput + "Carrier\\",commercialTripReader.vehBlackListIds);
 		this.companyGenerator.initalize();
 
 		// CompanyGenerator demand = new
@@ -110,6 +115,7 @@ public class AssignService {
 
 		AssignService assignData = new AssignService(
 				"D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw243_cadON_ptSpeedAdj.0.1\\vw243_cadON_ptSpeedAdj.0.1.output_plans.xml.gz",
+				"D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\EGrocery",
 				"D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\wege.csv",
 				"D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\fahrzeuge.csv",
 				"D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Network\\00_Final_Network\\network_editedPt.xml.gz",
@@ -199,7 +205,7 @@ public class AssignService {
 	public Job getActivityCandiate(String serviceType, String customerRelation, String zone, double serviceDuration,
 			String carrierId) {
 
-		int maxCheckedZones = 3;
+		int maxCheckedZones = 4;
 		int checkedZonesCounter = 0;
 
 		List<String> neighbourZoneList = demand.neighbourMap.get(zone);
@@ -248,10 +254,14 @@ public class AssignService {
 											.get(matchedPeIdx);
 
 									// return finalActivityDestination;
-
+//									if (jobIdCounter.intValue()==2324) {
+//										int test=1;
+//										System.out.println(test);
+//									}
 									return new Job(jobIdCounter.toString(), carrierId, candidatePerson, serviceType,
 											customerRelation, zone, serviceDuration, matchedPeIdx,
 											finalActivityDestination, startTime, endTime);
+									
 
 								}
 							}
@@ -276,6 +286,9 @@ public class AssignService {
 
 		// List<Integer> matchedActsList = new ArrayList<Integer>();
 		// Left = peIdx, Middle = ActStartTime, Right = ActEndTime
+		//TODO Add Opening and Closing time to check time constraint
+		
+		
 		List<Triple<Integer, Double, Double>> matchedActsList2 = new ArrayList<>();
 
 		Plan plan = this.scenario.getPopulation().getPersons().get(candidatePerson).getSelectedPlan();
@@ -287,6 +300,7 @@ public class AssignService {
 			Activity activity = (Activity) plan.getPlanElements().get(peIdx);
 
 			Object actAttr = activity.getAttributes().getAttribute("jobId");
+			
 
 			if (actAttr != null) {
 
@@ -310,13 +324,13 @@ public class AssignService {
 
 				actStartTime = prevLeg.getDepartureTime() + prevLeg.getTravelTime();
 			} else {
-				actStartTime = 0.0;
+				actStartTime = 6.0* 3600.0;
 			}
 
 			actEndTime = activity.getEndTime();
 
 			if (actEndTime == Double.NEGATIVE_INFINITY) {
-				actEndTime = 30 * 3600.0;
+				actEndTime = 17.5 * 3600.0;
 			}
 
 			if (actStartTime != Double.NaN && actEndTime != Double.NaN) {

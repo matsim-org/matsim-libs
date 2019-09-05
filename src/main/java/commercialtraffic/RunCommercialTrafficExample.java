@@ -38,12 +38,12 @@ import static org.matsim.core.scenario.ScenarioUtils.loadScenario;
 public class RunCommercialTrafficExample {
     public static void main(String[] args) {
 
-        String inputDir = "input/commercialtrafficIt/";
+        String inputDir = "D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\Test\\";
 
         Config config = createConfig();
         CommercialTrafficConfigGroup commercialTrafficConfigGroup = new CommercialTrafficConfigGroup();
-        commercialTrafficConfigGroup.setCarriersFile(inputDir + "test-carriers.xml");
-        commercialTrafficConfigGroup.setCarriersVehicleTypesFile(inputDir + "carriertypes.xml");
+        commercialTrafficConfigGroup.setCarriersFile(inputDir + "carrier_definition.xml");
+        commercialTrafficConfigGroup.setCarriersVehicleTypesFile(inputDir + "carrier_vehicletypes.xml");
         commercialTrafficConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
         config.addModule(commercialTrafficConfigGroup);
         StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
@@ -51,26 +51,26 @@ public class RunCommercialTrafficExample {
         changeExpBeta.setWeight(0.5);
         config.strategy().addStrategySettings(changeExpBeta);
 
-        StrategyConfigGroup.StrategySettings changeServiceOperator = new StrategyConfigGroup.StrategySettings();
-        changeServiceOperator.setStrategyName(ChangeDeliveryServiceOperator.SELECTOR_NAME);
-        changeServiceOperator.setWeight(0.5);
-        config.strategy().addStrategySettings(changeServiceOperator);
+//        StrategyConfigGroup.StrategySettings changeServiceOperator = new StrategyConfigGroup.StrategySettings();
+//        changeServiceOperator.setStrategyName(ChangeDeliveryServiceOperator.SELECTOR_NAME);
+//        changeServiceOperator.setWeight(0.5);
+//        config.strategy().addStrategySettings(changeServiceOperator);
 
         config.strategy().setFractionOfIterationsToDisableInnovation(.8);
-        PlanCalcScoreConfigGroup.ActivityParams home = new PlanCalcScoreConfigGroup.ActivityParams("home");
-        home.setTypicalDuration(14 * 3600);
-        config.planCalcScore().addActivityParams(home);
-        PlanCalcScoreConfigGroup.ActivityParams work = new PlanCalcScoreConfigGroup.ActivityParams("work");
-        work.setTypicalDuration(14 * 3600);
-        work.setOpeningTime(8 * 3600);
-        work.setClosingTime(8 * 3600);
-        config.planCalcScore().addActivityParams(work);
+//        PlanCalcScoreConfigGroup.ActivityParams home = new PlanCalcScoreConfigGroup.ActivityParams("home");
+//        home.setTypicalDuration(14 * 3600);
+//        config.planCalcScore().addActivityParams(home);
+//        PlanCalcScoreConfigGroup.ActivityParams work = new PlanCalcScoreConfigGroup.ActivityParams("work");
+//        work.setTypicalDuration(14 * 3600);
+//        work.setOpeningTime(8 * 3600);
+//        work.setClosingTime(8 * 3600);
+//        config.planCalcScore().addActivityParams(work);
         config.controler().setLastIteration(10);
         config.controler().setWriteEventsInterval(1);
-        config.controler().setOutputDirectory("output/commercialtraffictestrun");
+        config.controler().setOutputDirectory("D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\Test\\output\\commercialtraffictestrun");
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-        config.network().setInputFile(inputDir + "grid_network.xml");
-        config.plans().setInputFile(inputDir + "testpop.xml");
+        config.network().setInputFile(inputDir + "network_editedPt.xml.gz");
+        config.plans().setInputFile(inputDir + "populationWithCTdemand.xml.gz");
 
         config.controler().setLastIteration(5);
 

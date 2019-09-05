@@ -26,7 +26,7 @@ public class CommercialTripsReader {
 	Random r = MatsimRandom.getRandom();
 	long nr = 1896;
 	Double filterFactor = null;
-	Map<String, Set<Integer>> vehBlackListIds;
+	public Map<String, Set<Integer>> vehBlackListIds;
 
 	public CommercialTripsReader(String csvTripFile, String serviceTimeDistInputPath, double filterFactor) {
 		this.csvTripFile = csvTripFile;

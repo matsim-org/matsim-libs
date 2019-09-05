@@ -64,7 +64,7 @@ import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 
 public class RunCemdapBasecase {
 public static void main(String[] args) {
-	String runId = "vw251";
+	String runId = "vw252_flow115_stor110";
 	String pct = ".1.0";
 	
 	String configPath = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\config_1.0.xml"; 
@@ -72,8 +72,9 @@ public static void main(String[] args) {
 	Config config = ConfigUtils.loadConfig(configPath, new CadytsConfigGroup());
 	
 	
-	config.plans().setInputFile("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw250.1.0\\vw250.1.0.output_plans.xml.gz");
+	config.plans().setInputFile("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw251.1.0\\vw251.1.0.output_plans.xml.gz");
 	config.network().setInputFile("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\input\\network_editedPt.xml.gz");
+	
 	
 	Scenario scenario = ScenarioUtils.loadScenario(config);
 	adjustPtNetworkCapacity(scenario.getNetwork(),config.qsim().getFlowCapFactor());
@@ -97,7 +98,7 @@ public static void main(String[] args) {
 	config.controler().setWriteEventsInterval(25);
 	config.controler().setLastIteration(50); //Number of simulation iterations
 	
-	config.strategy().setFractionOfIterationsToDisableInnovation(0.70); //Fraction to disable Innovation
+	config.strategy().setFractionOfIterationsToDisableInnovation(0.75); //Fraction to disable Innovation
 	
 	// tell the system to use the congested car router for the ride mode:
 	controler.addOverridingModule(new AbstractModule(){

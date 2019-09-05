@@ -19,6 +19,9 @@
 
 package vwExamples.utils.tripAnalyzer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -44,6 +47,7 @@ public class ExperiencedLeg {
     private final double grossWaitTime;
     private final double inVehicleTime;
     private final double distance;
+    private final List<Id<Link>> routeList;
     private final Id<TransitStopFacility> ptFromStop;
     private final Id<TransitStopFacility> ptToStop;
 
@@ -54,7 +58,7 @@ public class ExperiencedLeg {
                    Id<Link> fromLink, Id<Link> toLink, double startTime,
                    double endTime, String mode, double waitTime, double grossWaitTime, double inVehicleTime,
                    double distance, Id<TransitRoute> transitRouteId,
-                   Id<TransitStopFacility> ptFromStop, Id<TransitStopFacility> ptToStop) {
+                   Id<TransitStopFacility> ptFromStop, Id<TransitStopFacility> ptToStop, List<Id<Link>>  routeList) {
         this.agent = agent;
 //		this.from = from;
 //		this.to = to;
@@ -70,6 +74,10 @@ public class ExperiencedLeg {
         this.transitRouteId = transitRouteId;
         this.ptFromStop = ptFromStop;
         this.ptToStop = ptToStop;
+        this.routeList=routeList;
+    }
+    List<Id<Link>> getRouteListe() {
+        return routeList;
     }
 
     double getDistance() {
