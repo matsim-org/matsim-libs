@@ -99,7 +99,7 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 	public static void run(int vehiclePerDepot, int iterationIdx) throws IOException {
 
 		// Enable or Disable rebalancing
-		String runId = "H3_1xRate_batteryReplace_0C_60kWh_" + vehiclePerDepot + "_veh_idx" + iterationIdx;
+		String runId = "H3_1xRate_batteryReplace_0C_30kWh_" + vehiclePerDepot + "_veh_idx" + iterationIdx;
 		boolean rebalancing = true;
 
 		String inbase = "D:\\Matsim\\Axer\\Hannover\\K-GERAK\\";
@@ -177,9 +177,9 @@ public class RunDrtScenarioBatchH_eDRT_KGERAK {
 		vehiclesAndChargers.E_VEHICLE_FILE = inbase + "\\input\\fleets\\eFleet.xml.gz";
 		vehiclesAndChargers.drtTag = drtTag;
 		vehiclesAndChargers.SEATS = 6;
-		vehiclesAndChargers.MAX_START_CAPACITY_KWH = 60;
-		vehiclesAndChargers.MIN_START_CAPACITY_KWH = 60;
-		vehiclesAndChargers.BATTERY_CAPACITY_KWH = 60;
+		vehiclesAndChargers.MAX_START_CAPACITY_KWH = 30;
+		vehiclesAndChargers.MIN_START_CAPACITY_KWH = 30;
+		vehiclesAndChargers.BATTERY_CAPACITY_KWH = 30;
 		vehiclesAndChargers.CHARGINGPOWER_KW = (int)(100);
 		vehiclesAndChargers.CHAGERSPERDEPOT = 3;
 		vehiclesAndChargers.run(depotsAndVehicles);

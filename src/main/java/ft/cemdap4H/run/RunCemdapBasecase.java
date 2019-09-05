@@ -64,16 +64,19 @@ import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 
 public class RunCemdapBasecase {
 public static void main(String[] args) {
-	String runId = "vw251";
+	String runId = "vw255_fcp_1.2";
 	String pct = ".1.0";
 	
-	String configPath = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\config_1.0.xml"; 
+	String configPath = "D:\\Matsim\\Axer\\Hannover\\Base\\vw251.1.0\\vw251.1.0.output_config.xml"; 
 		
 	Config config = ConfigUtils.loadConfig(configPath, new CadytsConfigGroup());
 	
 	
-	config.plans().setInputFile("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw250.1.0\\vw250.1.0.output_plans.xml.gz");
-	config.network().setInputFile("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\input\\network_editedPt.xml.gz");
+	config.plans().setInputFile("D:\\Matsim\\Axer\\Hannover\\Base\\vw251.1.0\\vw251.1.0.output_plans.xml.gz");
+	config.network().setInputFile("D:\\Matsim\\Axer\\Hannover\\Base\\vw251.1.0\\vw251.1.0.output_network.xml.gz");
+	config.transit().setTransitScheduleFile("D:\\Matsim\\Axer\\Hannover\\Base\\vw251.1.0\\vw251.1.0.output_transitSchedule.xml.gz");
+	config.transit().setVehiclesFile("D:\\Matsim\\Axer\\Hannover\\Base\\vw251.1.0\\vw251.1.0.output_transitVehicles.xml.gz");
+	config.qsim().setFlowCapFactor(1.20);
 	
 	Scenario scenario = ScenarioUtils.loadScenario(config);
 	adjustPtNetworkCapacity(scenario.getNetwork(),config.qsim().getFlowCapFactor());
@@ -88,16 +91,16 @@ public static void main(String[] args) {
 	
 	//Override Counts params
 	CountsConfigGroup countsccg = (CountsConfigGroup) config.getModules().get(CountsConfigGroup.GROUP_NAME);
-	countsccg.setInputFile("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\input\\Counts\\counts_H_LSA.xml");
+	countsccg.setInputFile("D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\network\\counts_H_LSA.xml");
 	
 	
-	config.controler().setOutputDirectory("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\"+runId+pct);
+	config.controler().setOutputDirectory("D:\\Matsim\\Axer\\Hannover\\Base\\"+runId+pct);
 	config.controler().setRunId(runId+pct);
-	config.controler().setWritePlansInterval(25);
-	config.controler().setWriteEventsInterval(25);
-	config.controler().setLastIteration(50); //Number of simulation iterations
+	config.controler().setWritePlansInterval(10);
+	config.controler().setWriteEventsInterval(10);
+	config.controler().setLastIteration(0); //Number of simulation iterations
 	
-	config.strategy().setFractionOfIterationsToDisableInnovation(0.70); //Fraction to disable Innovation
+	config.strategy().setFractionOfIterationsToDisableInnovation(0.0); //Fraction to disable Innovation
 	
 	// tell the system to use the congested car router for the ride mode:
 	controler.addOverridingModule(new AbstractModule(){

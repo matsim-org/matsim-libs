@@ -124,6 +124,7 @@ public class DrtPtTripEventHandler implements ActivityStartEventHandler, Activit
 	private int timeSpanReachedCounter;
 	private int interval;
 	private Set<String> activeVehicle;
+	private int stuckPersonCounter;
 
 	/**
 	 * @param network
@@ -150,6 +151,8 @@ public class DrtPtTripEventHandler implements ActivityStartEventHandler, Activit
 		this.activeVehicle = new HashSet<String>();
 		this.activeVehicle.add(TransportMode.car);
 		this.activeVehicle.add(TransportMode.drt);
+		this.activeVehicle.add("commercial");
+		this.stuckPersonCounter=0;
 
 		this.ModeMileageMap = new HashMap<String, MutableDouble>();
 
@@ -170,6 +173,7 @@ public class DrtPtTripEventHandler implements ActivityStartEventHandler, Activit
 		ModeMileageMap.put("rail", new MutableDouble(0));
 		ModeMileageMap.put(TransportMode.drt, new MutableDouble(0));
 		ModeMileageMap.put(TransportMode.car, new MutableDouble(0));
+		ModeMileageMap.put("commercial", new MutableDouble(0));
 
 	}
 
@@ -202,6 +206,12 @@ public class DrtPtTripEventHandler implements ActivityStartEventHandler, Activit
 			} else {
 				// If vehicle is not detected as drt nor pt, it needs to be a car
 				transportMode = TransportMode.car;
+				
+				//Freight agents are counted as commercial
+				if(vehicleId.toString().contains("freight"))
+				{
+					transportMode="commercial";
+				}
 
 			}
 
@@ -240,6 +250,8 @@ public class DrtPtTripEventHandler implements ActivityStartEventHandler, Activit
 	// in-vehicle distances
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
+		
+		
 		if (monitoredVeh2toMonitoredDistance.containsKey(event.getVehicleId())) {
 			monitoredVeh2toMonitoredDistance.put(event.getVehicleId(),
 					monitoredVeh2toMonitoredDistance.get(event.getVehicleId())
@@ -448,6 +460,8 @@ public class DrtPtTripEventHandler implements ActivityStartEventHandler, Activit
 			List<Id<Link>> routeList = new ArrayList<Id<Link>>();
 
 			if (agent2CurrentLegMode.get(event.getPersonId()).equals(event.getLegMode())) {
+							
+				
 				double waitTime;
 				double grossWaitTime;
 				double inVehicleTime;
@@ -495,6 +509,7 @@ public class DrtPtTripEventHandler implements ActivityStartEventHandler, Activit
 				} else {
 					ptRoute = Id.create("no pt", TransitRoute.class);
 				}
+
 
 				// Save ExperiencedLeg and remove temporary data
 				agent2CurrentTripExperiencedLegs.get(event.getPersonId())
@@ -569,6 +584,10 @@ public class DrtPtTripEventHandler implements ActivityStartEventHandler, Activit
 	public Map<String, Map<Double, Set<Id<Vehicle>>>> getZone2BinActiveVehicleMap() {
 		return zone2BinActiveVehicleMap;
 	}
+	
+	public int getStuckEvents() {
+		return this.stuckPersonCounter;
+	}
 
 	public Map<String, MutableDouble> getModeMileageMap() {
 		return ModeMileageMap;
@@ -632,6 +651,12 @@ public class DrtPtTripEventHandler implements ActivityStartEventHandler, Activit
 			} else {
 				// If vehicle is not detected as drt nor pt, it needs to be a car
 				transportMode = TransportMode.car;
+				
+				//Freight agents are counted as commercial
+				if(vehicleId.toString().contains("freight"))
+				{
+					transportMode="commercial";
+				}
 
 			}
 
@@ -667,6 +692,15 @@ public class DrtPtTripEventHandler implements ActivityStartEventHandler, Activit
 		}
 
 	}
+
+//	@Override
+//	public void handleEvent(PersonStuckEvent event) {
+//		if(event.getLegMode().equals(TransportMode.car)){
+//			stuckPersonCounter++;
+//		}
+//		
+//		
+//	}
 
 	// @Override
 	// public void handleEvent(PersonStuckEvent event) {

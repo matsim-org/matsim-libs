@@ -102,7 +102,14 @@ public class RunTravelDelayAnalysisBatch {
 //			scenarioToBeAnalyzed.add("VW243_CityCommuterDRT_10pct300_veh_idx0");
 //			scenarioToBeAnalyzed.add("VW243_LocalLinkFlow_1.15_10pct");
 //			scenarioToBeAnalyzed.add("VW243_CityCommuterDRTAmpel2.0_10pct300_veh_idx0");
-			scenarioToBeAnalyzed.add("VW243_Drt_HomeOffice_LinkFlow1.15300_veh_idx0");
+//			scenarioToBeAnalyzed.add("VW243_Drt_HomeOffice_LinkFlow1.15300_veh_idx0");
+//			scenarioToBeAnalyzed.add("VW251_CityCommuterDRT_100pct2800_veh_idx0");
+//			scenarioToBeAnalyzed.add("vw251.1.0");
+//			scenarioToBeAnalyzed.add("vw243_CityDRT_10pct_0.1300_veh_idx0");
+//			scenarioToBeAnalyzed.add("vw243_CityDRT_10pct_0.05300_veh_idx0");
+			scenarioToBeAnalyzed.add("vw243_CityDRT_10pct_0.1350_veh_idx0");
+			
+			
 //			
 			
 

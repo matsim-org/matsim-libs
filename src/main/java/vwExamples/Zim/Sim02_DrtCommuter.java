@@ -76,8 +76,9 @@ public class Sim02_DrtCommuter {
 	public static final double BATTERYREPLACETIME = 180.0;
 
 	static boolean BatteryReplace = false;
-
-	static int[] fleetRange = { 300 };
+	static int[] fleetRange = { 350 }; //Pendler DRT
+//	static int[] fleetRange = { 300 }; //Pendler DRT
+//	static int[] fleetRange = { 2800 };
 	// static int[] fleetRange = {50,60,70};
 
 	public static void main(String[] args) throws IOException {
@@ -96,7 +97,7 @@ public class Sim02_DrtCommuter {
 	public static void run(int fleet, int iterationIdx) throws IOException {
 
 		// Enable or Disable rebalancing
-		String runId = "VW243_CityCommuterDRT_10pct" + fleet + "_veh_idx" + iterationIdx;
+		String runId = "vw243_CityDRT_10pct_0.1" + fleet + "_veh_idx" + iterationIdx;
 		boolean rebalancing = true;
 
 		String inbase = "D:\\Matsim\\Axer\\Hannover\\ZIM\\";
@@ -124,7 +125,8 @@ public class Sim02_DrtCommuter {
 
 		// config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		// Overwrite existing configuration parameters
-		config.plans().setInputFile(inbase + "\\input\\plans\\w243_inOutWithDRT_selected.xml.gz");
+//		config.plans().setInputFile(inbase + "\\input\\plans\\w243_inOutWithDRT_selected.xml.gz");
+		config.plans().setInputFile(inbase + "\\input\\plans\\vw243_cadON_ptSpeedAdj.0.1_DRT_0.1.output_plans.xml.gz");
 		config.controler().setLastIteration(6); // Number of simulation iterations
 		config.controler().setWriteEventsInterval(2); // Write Events file every x-Iterations
 		config.controler().setWritePlansInterval(2); // Write Plan file every x-Iterations

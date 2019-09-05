@@ -204,6 +204,8 @@ public class ExperiencedTripsWriter {
 				// network.getLinks().get(trip.getToLinkId()).getCoord());
 				double totalDrivenTripDist = 0.0;
 
+				
+				
 				for (ExperiencedLeg leg : trip.getLegs()) {
 
 					List<Id<Link>> routeList = leg.getRouteListe();
@@ -211,6 +213,7 @@ public class ExperiencedTripsWriter {
 					totalDrivenTripDist = totalDrivenTripDist + getRouteDistance(routeList);
 
 				}
+				
 
 				// In case of beeline modes there will be no in vehicle mileage
 				// Extract part pf the beeline that is within the research boundary
@@ -415,6 +418,12 @@ public class ExperiencedTripsWriter {
 			{
 
 				for (ExperiencedTrip trip : triplist) {
+					
+//					if(trip.getAgent().toString().contains("freight"))
+//					{
+//						System.out.println(trip.getAgent());
+//					}
+					
 					if (tripWithinCity(trip)) {
 						String mainMode = trip.getMainMode();
 						String storeMode = null;
@@ -834,6 +843,10 @@ public class ExperiencedTripsWriter {
 	private void tourIdentifier() {
 		System.out.println("Working Tour Identification");
 		String tourMatchKey = "home";
+		HashSet<String> commercialTrafficActs = new  HashSet<String>();
+		commercialTrafficActs.add("start");
+		commercialTrafficActs.add("end");
+				
 		// int checkedToursCounter = 0;
 
 		int realNumberTripStored = 0;
@@ -841,7 +854,8 @@ public class ExperiencedTripsWriter {
 
 		for (Entry<Id<Person>, List<ExperiencedTrip>> tripsPerPersonEntry : agent2trips.entrySet()) {
 
-			// Id<Person> PersonId = tripsPerPersonEntry.getKey();
+			Id<Person> PersonId = tripsPerPersonEntry.getKey();
+						
 			List<ExperiencedTrip> tripList = tripsPerPersonEntry.getValue();
 
 			totalNumberTripToBeStored = totalNumberTripToBeStored + tripList.size();
@@ -851,6 +865,14 @@ public class ExperiencedTripsWriter {
 			for (ExperiencedTrip trip : tripList) {
 
 				String actAfter = trip.getActivityAfter();
+				
+				if (commercialTrafficActs.contains(actAfter))
+				{
+					Logger.getLogger(ExperiencedTripsWriter.class).warn("REWRITE FREIGHT ACTS");
+					actAfter = tourMatchKey;
+				}
+						
+				
 				// trip.setSubTourNr(subtourIdent);
 				tripsWithinTour.add(trip);
 
@@ -1023,7 +1045,11 @@ public class ExperiencedTripsWriter {
 									.add(new ParkingEvent(startOfParking, endOfParking, personId, coord, parkingZone));
 						}
 
+					}else if (activityDuration < 0)
+					{
+						Logger.getLogger(ExperiencedTripsWriter.class).warn("Person "+ personId + " Act Start < Act End:" +" duration "+ activityDuration);
 					}
+					
 				}
 
 				i++;
