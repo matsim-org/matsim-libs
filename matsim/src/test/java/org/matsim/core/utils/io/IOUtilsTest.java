@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Paths;
@@ -541,6 +542,38 @@ public class IOUtilsTest {
 		System.out.println(context.toString());
 		URL url = IOUtils.extendUrl(context, "C:\\windows\\directory\\filename.txt");
 		System.out.println(url.toString());
+	}
+
+	@Test
+	public void testResolveFileOrResource() throws URISyntaxException, IOException {
+
+		File jarFile = new File("test/input/org/matsim/core/utils/io/IOUtils/testfile.jar");
+		String jarUrlString = "file:" + jarFile.getAbsolutePath(); // URLs require absolute paths
+		String fileUrlString = "jar:" + jarUrlString + "!/the_file.txt";
+
+		URL url = IOUtils.resolveFileOrResource(fileUrlString);
+		try (InputStream is = url.openStream()) {
+			byte[] data = new byte[4096];
+			int size = is.read(data);
+			Assert.assertEquals(9, size);
+			Assert.assertEquals("Success!\n", new String(data, 0, size));
+		}
+	}
+
+	@Test
+	public void testResolveFileOrResource_withWhitespace() throws URISyntaxException, IOException {
+
+		File jarFile = new File("test/input/org/matsim/core/utils/io/IOUtils/test directory/testfile.jar");
+		String fileUrlString = "jar:" + jarFile.toURI().toString() + "!/the_file.txt";
+		Assert.assertTrue(fileUrlString.contains("test%20directory")); // just make sure the space is correctly URL-encoded
+
+		URL url = IOUtils.resolveFileOrResource(fileUrlString);
+		try (InputStream is = url.openStream()) {
+			byte[] data = new byte[4096];
+			int size = is.read(data);
+			Assert.assertEquals(9, size);
+			Assert.assertEquals("Success!\n", new String(data, 0, size));
+		}
 	}
 
 }
