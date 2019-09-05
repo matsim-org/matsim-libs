@@ -88,13 +88,14 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 					+ "maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. "
 					+ "Beta should not be smaller than 0.";
 
-	public static final String REQUEST_REJECTION = "requestRejection";
-	static final String REQUEST_REJECTION_EXP = "If true, the max travel and wait times of a submitted request"
-			+ " are considered hard constraints (the request gets rejected if one of the constraints is violated)."
-			+ " If false, the max travel and wait times are considered soft constraints (insertion of a request that"
-			+ " violates one of the constraints is allowed, but its cost is increased by additional penalty to make"
-			+ " it relatively less attractive). Penalisation of insertions can be customised by injecting a customised"
-			+ " InsertionCostCalculator.PenaltyCalculator";
+	public static final String REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED = "rejectRequestIfMaxWaitOrTravelTimeViolated";
+	static final String REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP =
+			"If true, the max travel and wait times of a submitted request"
+					+ " are considered hard constraints (the request gets rejected if one of the constraints is violated)."
+					+ " If false, the max travel and wait times are considered soft constraints (insertion of a request that"
+					+ " violates one of the constraints is allowed, but its cost is increased by additional penalty to make"
+					+ " it relatively less attractive). Penalisation of insertions can be customised by injecting a customised"
+					+ " InsertionCostCalculator.PenaltyCalculator";
 
 	public static final String CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE = "changeStartLinkToLastLinkInSchedule";
 	static final String CHANGE_START_EXP =
@@ -163,7 +164,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	@PositiveOrZero
 	private double maxTravelTimeBeta = Double.NaN;// [s]
 
-	private boolean requestRejection = true;
+	private boolean rejectRequestIfMaxWaitOrTravelTimeViolated = true;//
 
 	private boolean changeStartLinkToLastLinkInSchedule = false;
 
@@ -277,7 +278,8 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		map.put(ESTIMATED_BEELINE_DISTANCE_FACTOR, ESTIMATED_BEELINE_DISTANCE_FACTOR_EXP);
 		map.put(NUMBER_OF_THREADS, NUMBER_OF_THREADS_EXP);
 		map.put(PRINT_WARNINGS, PRINT_WARNINGS_EXP);
-		map.put(REQUEST_REJECTION, REQUEST_REJECTION_EXP);
+		map.put(REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED,
+				REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP);
 		map.put(DRT_SERVICE_AREA_FILENAME, DRT_SERVICE_AREA_FILE_EXP);
 		return map;
 	}
@@ -400,19 +402,19 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	}
 
 	/**
-	 * @return -- {@value #REQUEST_REJECTION_EXP}
+	 * @return -- {@value #REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP}
 	 */
-	@StringGetter(REQUEST_REJECTION)
-	public boolean isRequestRejection() {
-		return requestRejection;
+	@StringGetter(REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED)
+	public boolean isRejectRequestIfMaxWaitOrTravelTimeViolated() {
+		return rejectRequestIfMaxWaitOrTravelTimeViolated;
 	}
 
 	/**
-	 * @param requestRejection -- {@value #REQUEST_REJECTION_EXP}
+	 * @param rejectRequestIfMaxWaitOrTravelTimeViolated -- {@value #REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP}
 	 */
-	@StringSetter(REQUEST_REJECTION)
-	public void setRequestRejection(boolean requestRejection) {
-		this.requestRejection = requestRejection;
+	@StringSetter(REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED)
+	public void setRejectRequestIfMaxWaitOrTravelTimeViolated(boolean rejectRequestIfMaxWaitOrTravelTimeViolated) {
+		this.rejectRequestIfMaxWaitOrTravelTimeViolated = rejectRequestIfMaxWaitOrTravelTimeViolated;
 	}
 
 	/**

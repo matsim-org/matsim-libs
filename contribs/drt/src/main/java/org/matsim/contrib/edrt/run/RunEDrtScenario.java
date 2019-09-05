@@ -21,7 +21,6 @@ package org.matsim.contrib.edrt.run;
 
 import java.net.URL;
 
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
@@ -53,7 +52,6 @@ public class RunEDrtScenario {
 	}
 
 	public static Controler createControler(Config config, boolean otfvis) {
-		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(config);
 		Controler controler = EDrtControlerCreator.createControler(config, otfvis);
 
 		controler.addOverridingModule(new AbstractModule() {
