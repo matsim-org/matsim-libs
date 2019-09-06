@@ -19,10 +19,7 @@
 
 package org.matsim.contrib.accessibility.run;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -35,11 +32,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.*;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
-import org.matsim.contrib.accessibility.AccessibilityModule;
-import org.matsim.contrib.accessibility.Modes4Accessibility;
-import org.matsim.contrib.accessibility.FacilityDataExchangeInterface;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
@@ -63,6 +57,31 @@ public class TinyAccessibilityTest {
 	private static final Logger LOG = Logger.getLogger(TinyAccessibilityTest.class);
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+
+	@Test
+	public void runFromEvents() {
+		final Config config = createTestConfig();
+
+		double min = 0.; // Values for bounding box usually come from a config file
+		double max = 200.;
+
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
+		acg.setBoundingBoxBottom(min);
+		acg.setBoundingBoxTop(max);
+		acg.setBoundingBoxLeft(min);
+		acg.setBoundingBoxRight(max);
+
+		final Scenario scenario = createTestScenario(config);
+
+		final String eventsFile = utils.getClassInputDirectory() + "output_events.xml.gz";
+
+
+		AccessibilityFromEvents.Builder builder = new AccessibilityFromEvents.Builder( scenario , eventsFile );
+		builder.addDataListener( new ResultsComparator() );
+		builder.build().run() ;
+
+	}
 
 	@Test
 	public void testWithBoundingBox() {
