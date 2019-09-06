@@ -128,10 +128,10 @@ public class TransitQueueSimulationTest {
         Vehicles vehicles = scenario.getTransitVehicles();
         VehiclesFactory vb = vehicles.getFactory();
         VehicleType vehicleType = vb.createVehicleType(Id.create("transitVehicleType", VehicleType.class));
-        VehicleCapacity capacity = vb.createVehicleCapacity();
-        capacity.setSeats(Integer.valueOf(101));
-        capacity.setStandingRoom(Integer.valueOf(0));
-        vehicleType.setCapacity(capacity);
+//        VehicleCapacity capacity = vb.createVehicleCapacity();
+        vehicleType.getCapacity().setSeats(Integer.valueOf(101));
+        vehicleType.getCapacity().setStandingRoom(Integer.valueOf(0));
+//        vehicleType.setCapacity(capacity);
         
         vehicles.addVehicleType(vehicleType);
         
@@ -555,10 +555,10 @@ public class TransitQueueSimulationTest {
                     		transitEngine.getAgentTracker(), transitEngine);
 
                     VehicleType vehicleType = new VehicleType(Id.create("transitVehicleType", VehicleType.class ));
-                    VehicleCapacity capacity = new VehicleCapacity();
-                    capacity.setSeats(101);
-                    capacity.setStandingRoom(0);
-                    vehicleType.setCapacity(capacity);
+//                    VehicleCapacity capacity = new VehicleCapacity();
+                    vehicleType.getCapacity().setSeats(101);
+                    vehicleType.getCapacity().setStandingRoom(0);
+//                    vehicleType.setCapacity(capacity);
 
                     TransitQVehicle veh = new TransitQVehicle(
 				    VehicleUtils.createVehicle(Id.create(TestHandleStopSimulation.this.driver.getId(), Vehicle.class ), vehicleType ) );

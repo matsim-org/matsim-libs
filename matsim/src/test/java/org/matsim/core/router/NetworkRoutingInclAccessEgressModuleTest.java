@@ -154,9 +154,9 @@ public class NetworkRoutingInclAccessEgressModuleTest {
     private static VehicleType createVehicleType(String name, double maxVelocity, VehiclesFactory factory) {
 
         VehicleType result = factory.createVehicleType(Id.create(name, VehicleType.class));
-        VehicleCapacity vehicleCapacity = new VehicleCapacity();
-        vehicleCapacity.setSeats(1);
-        result.setCapacity(vehicleCapacity);
+//        VehicleCapacity vehicleCapacity = new VehicleCapacity();
+        result.getCapacity().setSeats(1);
+//        result.setCapacity(vehicleCapacity);
         result.setMaximumVelocity(maxVelocity);
         return result;
     }

@@ -83,13 +83,16 @@ public class TestFreightUtils {
 		carrierWShipments.getShipments().add(createMatsimShipment("shipment2", "i(3,0)", "i(3,7)", 2));
 
 		//Create vehicle for Carriers
+		final EngineInformation engineInfo = new EngineInformation( );
+		engineInfo.setFuelType( FuelType.diesel );
+		engineInfo.setFuelConsumption( 0.015 );
 		VehicleType carrierVehType = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("gridType", org.matsim.vehicles.VehicleType.class ) )
 													 .setCapacityWeightInTons(3 )
 													 .setMaxVelocity(10)
 													 .setCostPerDistanceUnit(0.0001)
 													 .setCostPerTimeUnit(0.001)
 													 .setFixCost(130)
-													 .setEngineInformation(new EngineInformation(FuelType.diesel, 0.015) )
+													 .setEngineInformation( engineInfo )
 													 .build();
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
 		vehicleTypes.getVehicleTypes().put(carrierVehType.getId(), carrierVehType);

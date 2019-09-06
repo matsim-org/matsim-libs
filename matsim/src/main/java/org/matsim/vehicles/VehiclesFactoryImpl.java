@@ -53,10 +53,10 @@ final class VehiclesFactoryImpl implements VehiclesFactory {
 	}
 
 
-	@Override
-	public VehicleCapacity createVehicleCapacity() {
-		return new VehicleCapacity();
-	}
+//	@Override
+//	public VehicleCapacity createVehicleCapacity() {
+//		return new VehicleCapacity();
+//	}
 
 
 //	@Override

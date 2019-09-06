@@ -8,6 +8,7 @@ import org.matsim.vehicles.VehicleType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class CarrierUtils{
 	public static Carrier createCarrier( Id<Carrier> id ){
@@ -151,14 +152,22 @@ public class CarrierUtils{
 		 */
 		public VehicleType build(){
 			VehicleType vehicleType = new VehicleType( this.typeId );
-			vehicleType.setCostInformation(new CostInformation(this.fix, this.perDistanceUnit, this.perTimeUnit) );
-			if(this.engineInfo != null) vehicleType.setEngineInformation(this.engineInfo);
+//			vehicleType.setCostInformation(new CostInformation(this.fix, this.perDistanceUnit, this.perTimeUnit) );
+			vehicleType.getCostInformation().setFixedCosts( this.fix );
+			vehicleType.getCostInformation().setCostsPerMeter( this.perDistanceUnit );
+			vehicleType.getCostInformation().setCostsPerSecond( this.perTimeUnit );
+//			if(this.engineInfo != null) vehicleType.setEngineInformation(this.engineInfo);
+			if ( this.engineInfo != null ) {
+				for( Map.Entry<String, Object> entry : this.engineInfo.getAttributes().getAsMap().entrySet() ){
+					vehicleType.getEngineInformation().getAttributes().putAttribute( entry.getKey(), entry.getValue() ) ;
+				}
+			}
 			if(this.description != null) vehicleType.setDescription(this.description);
 
 //		capacity = builder.capacity;
-			VehicleCapacity aCapacity = new VehicleCapacity() ;
-			aCapacity.setWeightInTons( this.weightInTons );
-			vehicleType.setCapacity( aCapacity );
+//			VehicleCapacity aCapacity = new VehicleCapacity() ;
+			vehicleType.getCapacity().setWeightInTons( this.weightInTons );
+//			vehicleType.setCapacity( aCapacity );
 
 			vehicleType.setMaximumVelocity(this.maxVeloInMeterPerSeconds);
 			return vehicleType ;

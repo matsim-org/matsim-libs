@@ -27,7 +27,10 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * @author dgrether
  */
 public final class VehicleCapacity implements Attributable {
-	// yyyy maybe at least these subtypes should be immutable?
+	// maybe at least these subtypes should be immutable?
+	// --> no, we make them fully settable, "data base in memory".  This has been the matsim design from the beginning, and all attempts to deviate from it
+	// always seem to lead to awkward code.  If parallel computing pieces need immutable data structures, they first need to copy them from the in-memory
+	// data base.  kai, sep'19
 
 	private Integer seats = 1; // one seat for the driver
 	private Integer standingRoom = 0 ;
@@ -35,6 +38,10 @@ public final class VehicleCapacity implements Attributable {
 	private Double weightInTons = Double.MAX_VALUE ; // not an active constraint; infty not possible by xsd
 //	private FreightCapacity freightCap = null;
 	private Attributes attributes = new Attributes() ;
+
+	public VehicleCapacity(){
+		// yyyy leaving this public for the time being because otherwise the carrier vehicle type reading logic needs to change completely.  kai, sep'19
+	}
 
 	public Integer getSeats() {
 		return seats;

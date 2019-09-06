@@ -53,9 +53,10 @@ public final class VehicleUtils {
 	private static final String FUEL_TYPE = "fuelType";
 
 	static {
-		VehicleCapacity capacity = new VehicleCapacity();
-		capacity.setSeats(4);
-		DEFAULT_VEHICLE_TYPE.setCapacity(capacity);
+//		VehicleCapacity capacity = new VehicleCapacity();
+//		capacity.setSeats(4);
+//		DEFAULT_VEHICLE_TYPE.setCapacity(capacity);
+		DEFAULT_VEHICLE_TYPE.getCapacity().setSeats( 4 );
 	}
 
 	public static VehiclesFactory getFactory() {

@@ -41,10 +41,10 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 
 	public void testInitialization_SeatAndStandCapacity() {
 		VehicleType vehType = new VehicleType(Id.create("busType", VehicleType.class ));
-		VehicleCapacity capacity = new VehicleCapacity();
-		capacity.setSeats(Integer.valueOf(5));
-		capacity.setStandingRoom(Integer.valueOf(2));
-		vehType.setCapacity(capacity);
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehType.getCapacity().setSeats(Integer.valueOf(5));
+		vehType.getCapacity().setStandingRoom(Integer.valueOf(2));
+//		vehType.getCapacity(capacity);
 		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 		TransitVehicle veh = createTransitVehicle(vehicle);
 		assertEquals(vehicle, veh.getVehicle());
@@ -53,9 +53,9 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 
 	public void testInitialization_SeatOnlyCapacity() {
 		VehicleType vehType = new VehicleType(Id.create("busType", VehicleType.class ));
-		VehicleCapacity capacity = new VehicleCapacity();
-		capacity.setSeats(Integer.valueOf(4));
-		vehType.setCapacity(capacity);
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehType.getCapacity().setSeats(Integer.valueOf(4));
+//		vehType.setCapacity(capacity);
 		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 		TransitVehicle veh = createTransitVehicle(vehicle);
 		assertEquals(vehicle, veh.getVehicle());
@@ -76,9 +76,9 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 
 	public void testAddPassenger() {
 		VehicleType vehType = new VehicleType(Id.create("busType", VehicleType.class ));
-		VehicleCapacity capacity = new VehicleCapacity();
-		capacity.setSeats(Integer.valueOf(5));
-		vehType.setCapacity(capacity);
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehType.getCapacity().setSeats(Integer.valueOf(5));
+//		vehType.setCapacity(capacity);
 		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 		TransitVehicle veh = createTransitVehicle(vehicle);
 		ArrayList<PTPassengerAgent> passengers = new ArrayList<PTPassengerAgent>(veh.getPassengerCapacity());
@@ -98,9 +98,9 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 
 	public void testRemovePassenger() {
 		VehicleType vehType = new VehicleType(Id.create("busType", VehicleType.class ));
-		VehicleCapacity capacity = new VehicleCapacity();
-		capacity.setSeats(Integer.valueOf(5));
-		vehType.setCapacity(capacity);
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehType.getCapacity().setSeats(Integer.valueOf(5));
+//		vehType.setCapacity(capacity);
 		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 		TransitVehicle veh = createTransitVehicle(vehicle);
 

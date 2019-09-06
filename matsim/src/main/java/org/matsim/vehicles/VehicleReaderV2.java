@@ -14,9 +14,9 @@ final class VehicleReaderV2 extends MatsimXmlParser{
 	private final Vehicles vehicles;
 	private final VehiclesFactory builder;
 	private VehicleType currentVehType = null;
-	private VehicleCapacity currentCapacity = null;
+//	private VehicleCapacity currentCapacity = null;
 //	private EngineInformation currentEngineInformation = null;
-	private CostInformation currentCostInformation = null;
+//	private CostInformation currentCostInformation = null;
 
 	private final AttributesXmlReaderDelegate attributesDelegate = new AttributesXmlReaderDelegate();
 	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes = null ;
@@ -35,19 +35,18 @@ final class VehicleReaderV2 extends MatsimXmlParser{
 					this.currentVehType.setDescription( content.trim() );
 				}
 				break;
-			case VehicleSchemaV2Names.ENGINEINFORMATION:
+//			case VehicleSchemaV2Names.ENGINEINFORMATION:
 //				this.currentVehType.setEngineInformation( this.currentEngineInformation );
 //				this.currentEngineInformation = null;
-				break;
-
-			case VehicleSchemaV2Names.CAPACITY:
-				this.currentVehType.setCapacity( this.currentCapacity );
-				this.currentCapacity = null;
-				break;
-			case VehicleSchemaV2Names.COSTINFORMATION:
-				this.currentVehType.setCostInformation( this.currentCostInformation );
-				this.currentCostInformation = null;
-				break;
+//				break;
+//			case VehicleSchemaV2Names.CAPACITY:
+//				this.currentVehType.setCapacity( this.currentCapacity );
+//				this.currentCapacity = null;
+//				break;
+//			case VehicleSchemaV2Names.COSTINFORMATION:
+//				this.currentVehType.setCostInformation( this.currentCostInformation );
+//				this.currentCostInformation = null;
+//				break;
 			case VehicleSchemaV2Names.VEHICLETYPE:
 				this.vehicles.addVehicleType( this.currentVehType );
 				this.currentVehType = null;
@@ -88,28 +87,28 @@ final class VehicleReaderV2 extends MatsimXmlParser{
 				this.currAttributes = this.currentVehType.getEngineInformation().getAttributes() ;
 				break;
 			case VehicleSchemaV2Names.CAPACITY:
-				this.currentCapacity = this.builder.createVehicleCapacity();
+//				this.currentCapacity = this.builder.createVehicleCapacity();
 				if (atts.getValue( VehicleSchemaV2Names.SEATS ) != null) {
-					this.currentCapacity.setSeats( Integer.valueOf( atts.getValue( VehicleSchemaV2Names.SEATS ) ) );
+					this.currentVehType.getCapacity().setSeats( Integer.valueOf( atts.getValue( VehicleSchemaV2Names.SEATS ) ) );
 				}
 				if (atts.getValue( VehicleSchemaV2Names.STANDINGROOM) != null) {
-				this.currentCapacity.setStandingRoom( Integer.valueOf( atts.getValue( VehicleSchemaV2Names.STANDINGROOM ) ) );
+				this.currentVehType.getCapacity().setStandingRoom( Integer.valueOf( atts.getValue( VehicleSchemaV2Names.STANDINGROOM ) ) );
 				}
 				if (atts.getValue( VehicleSchemaV2Names.WEIGHT) != null) {
-					this.currentCapacity.setWeightInTons(Double.parseDouble(atts.getValue(VehicleSchemaV2Names.WEIGHT)));
+					this.currentVehType.getCapacity().setWeightInTons(Double.parseDouble(atts.getValue(VehicleSchemaV2Names.WEIGHT)));
 				}
 				if (atts.getValue( VehicleSchemaV2Names.VOLUME) != null) {
-					this.currentCapacity.setVolumeInCubicMeters(Double.parseDouble(atts.getValue(VehicleSchemaV2Names.VOLUME)));
+					this.currentVehType.getCapacity().setVolumeInCubicMeters(Double.parseDouble(atts.getValue(VehicleSchemaV2Names.VOLUME)));
 				}
-				this.currAttributes = this.currentCapacity.getAttributes() ;
+				this.currAttributes = this.currentVehType.getCapacity().getAttributes() ;
 				break;
 			case VehicleSchemaV2Names.COSTINFORMATION:
-				this.currentCostInformation = new CostInformation();
-				this.currentCostInformation.setFixedCosts(Double.parseDouble( atts.getValue( VehicleSchemaV2Names.FIXEDCOSTSPERDAY ) ));
-				this.currentCostInformation.setCostsPerMeter(Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERMETER ) ));
-				this.currentCostInformation.setCostsPerSecond(Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERSECOND ) ));
-				this.currentVehType.setCostInformation( currentCostInformation );
-				this.currAttributes = this.currentCostInformation.getAttributes();
+//				this.currentCostInformation = new CostInformation();
+				this.currentVehType.getCostInformation().setFixedCosts(Double.parseDouble( atts.getValue( VehicleSchemaV2Names.FIXEDCOSTSPERDAY ) ));
+				this.currentVehType.getCostInformation().setCostsPerMeter(Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERMETER ) ));
+				this.currentVehType.getCostInformation().setCostsPerSecond(Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERSECOND ) ));
+//				this.currentVehType.setCostInformation( currentCostInformation );
+				this.currAttributes = this.currentVehType.getCostInformation().getAttributes();
 				break;
 			case VehicleSchemaV2Names.VEHICLE:
 				Id<VehicleType> typeId = Id.create( atts.getValue( VehicleSchemaV2Names.TYPE ), VehicleType.class );

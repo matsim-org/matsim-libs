@@ -54,10 +54,10 @@ class PVehiclesFactory {
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();		
 		VehiclesFactory vehFactory = vehicles.getFactory();
 		VehicleType vehType = vehFactory.createVehicleType(Id.create(this.pConfig.getPIdentifier(), VehicleType.class));
-		VehicleCapacity capacity = new VehicleCapacity();
-		capacity.setSeats(this.pConfig.getPaxPerVehicle()); // 2018-11 the driver no longer takes one seat
-		capacity.setStandingRoom(0);
-		vehType.setCapacity(capacity);
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehType.getCapacity().setSeats(this.pConfig.getPaxPerVehicle()); // 2018-11 the driver no longer takes one seat
+		vehType.getCapacity().setStandingRoom(0);
+//		vehType.setCapacity(capacity);
 		vehType.setPcuEquivalents(this.pConfig.getPassengerCarEquivalents());
 		vehType.setMaximumVelocity(this.pConfig.getVehicleMaximumVelocity());
         VehicleUtils.setAccessTime(vehType, this.pConfig.getDelayPerBoardingPassenger());

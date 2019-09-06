@@ -27,7 +27,7 @@ public interface VehiclesFactory extends MatsimFactory {
 
 	VehicleType createVehicleType( Id<VehicleType> type );
 
-	VehicleCapacity createVehicleCapacity();
+//	VehicleCapacity createVehicleCapacity();
 
 //	@Deprecated //FreightCapacity is deprecated.
 //	public FreightCapacity createFreigthCapacity();

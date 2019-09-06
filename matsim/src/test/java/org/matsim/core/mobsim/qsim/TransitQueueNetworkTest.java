@@ -1087,10 +1087,10 @@ public class TransitQueueNetworkTest extends TestCase {
 
             // setup: vehicles
             VehicleType vehicleType = new VehicleType(Id.create("testVehicleType", VehicleType.class ));
-            VehicleCapacity capacity = new VehicleCapacity();
-            capacity.setSeats(Integer.valueOf(101));
-            capacity.setStandingRoom(Integer.valueOf(0));
-            vehicleType.setCapacity(capacity);
+//            VehicleCapacity capacity = new VehicleCapacity();
+            vehicleType.getCapacity().setSeats(Integer.valueOf(101));
+		  vehicleType.getCapacity().setStandingRoom(Integer.valueOf(0));
+//            vehicleType.setCapacity(capacity);
 
             FakeTransitDriver tDriver = new FakeTransitDriver(tLine, tRoute, dep, tracker, transitEngine );
             this.transitVehicle = new TransitQVehicle( VehicleUtils.createVehicle(Id.create(tDriver.getId(), Vehicle.class ), vehicleType ) );

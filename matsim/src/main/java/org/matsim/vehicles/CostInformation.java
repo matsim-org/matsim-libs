@@ -28,14 +28,16 @@ public final class CostInformation{
 	private Double perSecond;
 	private Attributes attributes = new Attributes() ;
 
-	public CostInformation() {}
+	public CostInformation() {
+		// yyyy leaving this public for the time being because otherwise the carrier vehicle type reading logic needs to change completely.  kai, sep'19
+	}
 
-//	@Deprecated
-//	public CostInformation( Double fixed, Double perMeter, Double perTimeUnit ) {
-//		this.fixed = fixed;
-//		this.perMeter = perMeter;
-//		this.perSecond = perTimeUnit;
-//	}
+	@Deprecated
+	public CostInformation( Double fixed, Double perMeter, Double perTimeUnit ) {
+		this.fixed = fixed;
+		this.perMeter = perMeter;
+		this.perSecond = perTimeUnit;
+	}
 
 	public Double getFixedCosts() {
 		return fixed;

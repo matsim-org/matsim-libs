@@ -50,10 +50,10 @@ public class CreateVehiclesForSchedule {
 	public void run() {
 		VehiclesFactory vb = this.vehicles.getFactory();
 		VehicleType vehicleType = vb.createVehicleType(Id.create("defaultTransitVehicleType", VehicleType.class));
-		VehicleCapacity capacity = new VehicleCapacity();
-		capacity.setSeats(Integer.valueOf(101));
-		capacity.setStandingRoom(Integer.valueOf(0));
-		vehicleType.setCapacity(capacity);
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehicleType.getCapacity().setSeats( 101 );
+		vehicleType.getCapacity().setStandingRoom( 0 );
+//		vehicleType.setCapacity(capacity);
 		this.vehicles.addVehicleType(vehicleType);
 
 		long vehId = 0;

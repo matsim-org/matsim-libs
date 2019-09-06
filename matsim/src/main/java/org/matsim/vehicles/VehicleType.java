@@ -36,7 +36,7 @@ public final class VehicleType implements Attributable {
 	private double length = 7.5;
 	private double pcuEquivalents = 1.0;
 	private double flowEfficiencyFactor = 1.0;
-	private EngineInformation engineInformation = new EngineInformation() ;
+	private final EngineInformation engineInformation = new EngineInformation() ;
 	private CostInformation costInformation = new CostInformation() ;
 //	private FreightCapacity freightCapacity;
 	private String description;
@@ -140,9 +140,9 @@ public final class VehicleType implements Attributable {
 		this.description = desc;
 	}
 
-	public final void setEngineInformation( EngineInformation engineInformation ) {
-		this.engineInformation = engineInformation;
-	}
+//	public final void setEngineInformation( EngineInformation engineInformation ) {
+//		this.engineInformation = engineInformation;
+//	}
 
 //	/**
 //	 * @deprecated please use {@see VehicleUtils} -> setHBEFATechology instead.

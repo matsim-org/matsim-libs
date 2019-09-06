@@ -38,10 +38,11 @@ public class TransitQueueVehicleTest extends AbstractTransitVehicleTest {
 		VehicleType carType = new VehicleType(Id.create("carType", VehicleType.class ));
 		VehicleType busType = new VehicleType(Id.create("busType", VehicleType.class ));
 		busType.setPcuEquivalents(2.5);
-		VehicleCapacity capacity = new VehicleCapacity();
-		capacity.setSeats(Integer.valueOf(5));
-		carType.setCapacity(capacity);
-		busType.setCapacity(capacity);
+//		VehicleCapacity capacity = new VehicleCapacity();
+		carType.getCapacity().setSeats(Integer.valueOf(5));
+		busType.getCapacity().setSeats( 5 );
+//		carType.setCapacity(capacity);
+//		busType.setCapacity(capacity);
 		Vehicle car = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), carType );
 		Vehicle bus = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), busType );
 		TransitQVehicle veh = new TransitQVehicle(car);
