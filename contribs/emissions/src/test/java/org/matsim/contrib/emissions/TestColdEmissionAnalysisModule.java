@@ -301,6 +301,12 @@ public class TestColdEmissionAnalysisModule {
 			
 			putIntoHbefaColdTable( detailedHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( fakeFactor ), HEAVY_GOODS_VEHICLE );
 		}
+		{
+			// add urban bus entry "diesel;none;none":
+			HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( diesel_technology, none_sizeClass, none_emConcept );
+
+			putIntoHbefaColdTable( detailedHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( fakeFactor ), URBAN_BUS );
+		}
 //		{
 //			// add passenger car entry "petrol;none;nullCase":
 //			// (pre-existing comment: "PASSENGER_CAR;PC petrol;petrol;nullCase" --???)
@@ -342,6 +348,12 @@ public class TestColdEmissionAnalysisModule {
 			final HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( petrol_technology, none_sizeClass, none_emConcept );
 			
 			putIntoHbefaColdTable( avgHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( fakeFactor ), HEAVY_GOODS_VEHICLE );
+		}
+		{
+			// add Urban Bus entry "diesel;none;none".
+			final HbefaVehicleAttributes vehAtt = ColdEmissionAnalysisModule.createHbefaVehicleAttributes( diesel_technology, none_sizeClass, none_emConcept );
+
+			putIntoHbefaColdTable( avgHbefaColdTable, vehAtt, new HbefaColdEmissionFactor( fakeFactor ), URBAN_BUS );
 		}
 	}
 	

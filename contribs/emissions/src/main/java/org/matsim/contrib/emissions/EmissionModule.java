@@ -394,6 +394,7 @@ public final class EmissionModule {
 		if(string.contains("pass. car")) hbefaVehicleCategory = HbefaVehicleCategory.PASSENGER_CAR;
 		else if(string.contains("HGV")) hbefaVehicleCategory = HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
 		else if(string.contains("motorcycle")) hbefaVehicleCategory = HbefaVehicleCategory.MOTORCYCLE;
+		else if(string.contains("urban bus")) hbefaVehicleCategory = HbefaVehicleCategory.URBAN_BUS;
 		else{
 			logger.warn("Could not map String " + string + " to any HbefaVehicleCategory; please check syntax in file " + averageFleetWarmEmissionFactorsFile);
 			throw new RuntimeException();

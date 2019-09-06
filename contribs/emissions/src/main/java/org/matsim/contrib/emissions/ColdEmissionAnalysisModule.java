@@ -75,7 +75,8 @@ final class ColdEmissionAnalysisModule {
 	private final Double emissionEfficiencyFactor;
 	private final EmissionsConfigGroup ecg;
 	
-	private int vehInfoWarnHDVCnt = 0;
+	private int vehInfoWarnHGVCnt = 0;
+	private int vehInfoWarnUrbanBusCnt = 0;
 	private int vehAttributesNotSpecifiedCnt = 0;
 	private static final int maxWarnCnt = 3;
 	private int vehInfoWarnMotorCylceCnt = 0;
@@ -112,7 +113,7 @@ final class ColdEmissionAnalysisModule {
 
 	public void reset() {
 		logger.info("resetting counters...");
-		vehInfoWarnHDVCnt = 0;
+		vehInfoWarnHGVCnt = 0;
 		vehAttributesNotSpecifiedCnt = 0;
 	}
 
@@ -197,17 +198,25 @@ final class ColdEmissionAnalysisModule {
 
         HbefaColdEmissionFactorKey key = new HbefaColdEmissionFactorKey();
 
-        if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE)){
-            key.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
-            key.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
-            if(vehInfoWarnHDVCnt < maxWarnCnt) {
-                vehInfoWarnHDVCnt++;
-                logger.warn("HBEFA 3.1 does not provide cold start emission factors for " +
-                        HbefaVehicleCategory.HEAVY_GOODS_VEHICLE +
-                        ". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
-                if(vehInfoWarnHDVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
-            }
-        } else if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.ZERO_EMISSION_VEHICLE)) {
+        if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE)) {
+					key.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+					if (vehInfoWarnHGVCnt < maxWarnCnt) {
+						vehInfoWarnHGVCnt++;
+						logger.warn("HBEFA 3.1 does not provide cold start emission factors for " +
+								HbefaVehicleCategory.HEAVY_GOODS_VEHICLE +
+								". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
+						if (vehInfoWarnHGVCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+					}
+				} else if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.URBAN_BUS)){
+					key.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+					if(vehInfoWarnUrbanBusCnt < maxWarnCnt) {
+						vehInfoWarnUrbanBusCnt++;
+						logger.warn("HBEFA 3.1 does not provide cold start emission factors for " +
+								HbefaVehicleCategory.URBAN_BUS +
+								". Setting vehicle category to " + HbefaVehicleCategory.PASSENGER_CAR + "...");
+						if(vehInfoWarnUrbanBusCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+					}
+				} else if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.ZERO_EMISSION_VEHICLE)) {
 			for (String cp : coldPollutants){
 				coldEmissionsOfEvent.put( cp, 0.0 );
 			}

@@ -221,8 +221,10 @@ public final class WarmEmissionAnalysisModule {
 
 		HbefaWarmEmissionFactorKey efkey = new HbefaWarmEmissionFactorKey();
 
-		if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE)){
+		if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE)) {
 			efkey.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
+		} else if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.URBAN_BUS)) {
+			efkey.setHbefaVehicleCategory(HbefaVehicleCategory.URBAN_BUS);
 		} else if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.MOTORCYCLE)) {
 			efkey.setHbefaVehicleCategory(HbefaVehicleCategory.MOTORCYCLE);
 		} else if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.ZERO_EMISSION_VEHICLE)) {
