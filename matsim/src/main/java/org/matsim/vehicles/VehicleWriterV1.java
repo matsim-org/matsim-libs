@@ -158,7 +158,7 @@ public final class VehicleWriterV1 extends MatsimXmlWriter {
 			this.writeStartTag(VehicleSchemaV1Names.STANDINGROOM, atts, true);
 		}
 //		if (cap.getFreightCapacity() != null) {
-		if( cap.getVolumeInCubicMeters() != null ) {
+		if( cap.getVolumeInCubicMeters() != null && !Double.isInfinite(cap.getVolumeInCubicMeters())) {
 //			this.writeFreightCapacity(cap.getFreightCapacity());
 			this.writeFreightCapacity( cap.getVolumeInCubicMeters() );
 		}

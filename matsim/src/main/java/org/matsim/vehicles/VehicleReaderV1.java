@@ -70,7 +70,11 @@ final class VehicleReaderV1 extends MatsimXmlParser{
 //			this.currentFreightCap = this.builder.createFreigthCapacity();
 		} else if( VehicleSchemaV1Names.VOLUME.equalsIgnoreCase( name ) ) {
 //			this.currentFreightCap.setVolume(Double.parseDouble( atts.getValue( VehicleSchemaV1Names.CUBICMETERS ) ));
-			this.currentVehType.getCapacity().setVolumeInCubicMeters(Double.parseDouble(atts.getValue(VehicleSchemaV1Names.CUBICMETERS)));
+			if(atts.getValue(VehicleSchemaV1Names.CUBICMETERS).contentEquals("INF")){
+				this.currentVehType.getCapacity().setVolumeInCubicMeters(Double.POSITIVE_INFINITY);
+			} else {
+				this.currentVehType.getCapacity().setVolumeInCubicMeters(Double.parseDouble(atts.getValue(VehicleSchemaV1Names.CUBICMETERS)));
+			}
 //		} else if( VehicleSchemaV1Names.ENGINEINFORMATION.equalsIgnoreCase( name ) ){
 //			this.currentVehType.setEngineInformation(new EngineInformation());
 		} else if( VehicleSchemaV1Names.GASCONSUMPTION.equalsIgnoreCase( name ) ){

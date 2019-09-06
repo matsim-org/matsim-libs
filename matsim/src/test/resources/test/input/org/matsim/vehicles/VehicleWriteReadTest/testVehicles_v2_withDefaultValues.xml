@@ -43,7 +43,7 @@
 			<attribute name="Attribute1" class="java.lang.String">def</attribute>
 			<attribute name="Attribute2" class="java.lang.Integer">2</attribute>
 		</attributes>
-		<capacity seats="1" standingRoomInPersons="0" volumeInCubicMeters="1.7976931348623157E308" weightInTons="1.7976931348623157E308">
+		<capacity seats="1" standingRoomInPersons="0">
 
 		</capacity>
 		<length meter="7.5"/>
@@ -59,7 +59,7 @@
 	<vehicleType id="smallTruck">
 
 		<description>This is a small truck</description>
-		<capacity seats="2" standingRoomInPersons="0" volumeInCubicMeters="15.0" weightInTons="1.7976931348623157E308">
+		<capacity seats="2" standingRoomInPersons="0">
 
 		</capacity>
 		<length meter="7.5"/>

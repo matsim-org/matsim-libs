@@ -34,8 +34,8 @@ public final class VehicleCapacity implements Attributable {
 
 	private Integer seats = 1; // one seat for the driver
 	private Integer standingRoom = 0 ;
-	private Double volumeInCubicMeters = Double.MAX_VALUE ; // not an active constraint; infty not possible by xsd
-	private Double weightInTons = Double.MAX_VALUE ; // not an active constraint; infty not possible by xsd
+	private Double volumeInCubicMeters = Double.POSITIVE_INFINITY ;
+	private Double weightInTons = Double.POSITIVE_INFINITY ;
 //	private FreightCapacity freightCap = null;
 	private Attributes attributes = new Attributes() ;
 

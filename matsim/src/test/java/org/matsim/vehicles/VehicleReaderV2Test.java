@@ -103,6 +103,8 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 		assertNotNull(vehTypeDefaultCar);
 		assertEquals(7.5, vehTypeDefaultCar.getLength(), EPSILON);
 		assertEquals(1.0, vehTypeDefaultCar.getWidth(), EPSILON);
+		assertTrue(Double.isInfinite(vehTypeDefaultCar.getCapacity().getVolumeInCubicMeters()));	//Default values
+		assertTrue(Double.isInfinite(vehTypeDefaultCar.getCapacity().getWeightInTons()));			//Default values
 		assertTrue(Double.isInfinite(vehTypeDefaultCar.getMaximumVelocity()));
 		assertNotNull(vehTypeDefaultCar.getCapacity());
 		assertEquals( VehicleUtils.DoorOperationMode.serial, VehicleUtils.getDoorOperationMode(vehTypeDefaultCar ) );
@@ -117,6 +119,13 @@ public class VehicleReaderV2Test extends MatsimTestCase {
 		VehicleType vehTypeSmallTruck = vehicleTypes.get(Id.create("smallTruck", VehicleType.class));
 		assertNotNull(vehTypeSmallTruck);
 		assertEquals("This is a small truck", vehTypeSmallTruck.getDescription());
+
+		assertNotNull(vehTypeSmallTruck.getCapacity());
+		assertEquals(Integer.valueOf(2), vehTypeSmallTruck.getCapacity().getSeats());
+		assertEquals(Integer.valueOf(0), vehTypeSmallTruck.getCapacity().getStandingRoom());
+		assertTrue(Double.isInfinite(vehTypeSmallTruck.getCapacity().getVolumeInCubicMeters()));
+		assertTrue(Double.isInfinite(vehTypeSmallTruck.getCapacity().getWeightInTons()));
+
 		assertEquals(7.5, vehTypeSmallTruck.getLength(), EPSILON);
 		assertEquals(1.0, vehTypeSmallTruck.getWidth(), EPSILON);
 		assertEquals("diesel", VehicleUtils.getHbefaTechnology(vehTypeSmallTruck.getEngineInformation()));

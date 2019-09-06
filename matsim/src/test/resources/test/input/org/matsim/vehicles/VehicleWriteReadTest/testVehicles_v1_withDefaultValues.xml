@@ -25,9 +25,6 @@
 		<capacity>
 			<seats persons="1"/>
 			<standingRoom persons="0"/>
-			<freightCapacity>
-				<volume cubicMeters="1.7976931348623157E308"/>
-			</freightCapacity>
 		</capacity>
 		<length meter="7.5"/>
 		<width meter="1.0"/>

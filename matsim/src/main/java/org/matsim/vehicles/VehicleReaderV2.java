@@ -95,10 +95,19 @@ final class VehicleReaderV2 extends MatsimXmlParser{
 				this.currentVehType.getCapacity().setStandingRoom( Integer.valueOf( atts.getValue( VehicleSchemaV2Names.STANDINGROOM ) ) );
 				}
 				if (atts.getValue( VehicleSchemaV2Names.WEIGHT) != null) {
-					this.currentVehType.getCapacity().setWeightInTons(Double.parseDouble(atts.getValue(VehicleSchemaV2Names.WEIGHT)));
+					if(atts.getValue(VehicleSchemaV2Names.WEIGHT).contentEquals("INF")){
+						this.currentVehType.getCapacity().setWeightInTons(Double.POSITIVE_INFINITY);
+					} else {
+						this.currentVehType.getCapacity().setWeightInTons(Double.parseDouble(atts.getValue(VehicleSchemaV2Names.WEIGHT)));
+					}
 				}
 				if (atts.getValue( VehicleSchemaV2Names.VOLUME) != null) {
-					this.currentVehType.getCapacity().setVolumeInCubicMeters(Double.parseDouble(atts.getValue(VehicleSchemaV2Names.VOLUME)));
+					if(atts.getValue(VehicleSchemaV2Names.VOLUME).contentEquals("INF")){
+						this.currentVehType.getCapacity().setVolumeInCubicMeters(Double.POSITIVE_INFINITY);
+					} else {
+					log.warn(atts.getValue(VehicleSchemaV2Names.VOLUME));
+						this.currentVehType.getCapacity().setVolumeInCubicMeters(Double.parseDouble(atts.getValue(VehicleSchemaV2Names.VOLUME)));
+					}
 				}
 				this.currAttributes = this.currentVehType.getCapacity().getAttributes() ;
 				break;

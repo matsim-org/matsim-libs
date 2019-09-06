@@ -53,7 +53,7 @@
 	<vehicleType id="smallTruck">
 
 		<description>This is a small truck</description>
-		<capacity seats="2" standingRoomInPersons="0" volumeInCubicMeters="15.0" weightInTons="1.7976931348623157E308">
+		<capacity seats="2" standingRoomInPersons="0" volumeInCubicMeters="INF" weightInTons="INF">
 
 		</capacity>
 		<length meter="7.5"/>
