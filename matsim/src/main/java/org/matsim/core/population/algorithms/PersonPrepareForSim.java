@@ -35,7 +35,11 @@ import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.facilities.ActivityFacilities;
+import org.matsim.pt.PtConstants;
 
 /**
  * Performs several checks that persons are ready for a mobility simulation.
@@ -112,6 +116,19 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 		for (Plan plan : person.getPlans()) {
 			boolean needsXY2Links = false;
 			boolean needsReRoute = false;
+			
+			// for backward compatibility: replace all non-direct transit_walk legs (trips with more than one leg) by non_network_walk
+			for (Trip trip : TripStructureUtils.getTrips(plan.getPlanElements(), new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE))) {
+				if (trip.getLegsOnly().size() > 1) {
+					
+					for (Leg leg : trip.getLegsOnly()) {
+						if (leg.getMode().equals("transit_walk")) {
+							leg.setMode(TransportMode.non_network_walk);
+						}
+					}					
+				}					
+			}
+			
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					Activity act = (Activity) pe;
