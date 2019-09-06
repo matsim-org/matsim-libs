@@ -19,11 +19,6 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,6 +61,11 @@ import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 
 /**
@@ -134,7 +134,7 @@ public final class QLinkTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Tests that vehicles driving on a link are found with {@link NetsimLink#getVehicle(Id)}
+	 * Tests that vehicles driving on a link are found with {@link NetsimLink#getAllVehicles()}
 	 * and {@link NetsimLink#getAllVehicles()}.
 	 *
 	 * @author mrieser
@@ -199,7 +199,7 @@ public final class QLinkTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Tests that vehicles parked on a link are found with {@link NetsimLink#getVehicle(Id)}
+	 * Tests that vehicles parked on a link are found with {@link NetsimLink#getAllVehicles()}
 	 * and {@link NetsimLink#getAllVehicles()}.
 	 *
 	 * @author mrieser
@@ -234,7 +234,7 @@ public final class QLinkTest extends MatsimTestCase {
 	}
 
 	/**
-	 * Tests that vehicles departing on a link are found with {@link NetsimLink#getVehicle(Id)}
+	 * Tests that vehicles departing on a link are found with {@link NetsimLink#getAllVehicles()}
 	 * and {@link NetsimLink#getAllVehicles()}.
 	 *
 	 * @author mrieser
@@ -269,8 +269,8 @@ public final class QLinkTest extends MatsimTestCase {
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.getAcceptingQLane()).getAllVehicles().size());
 		assertEquals(1, f.qlink1.getAllVehicles().size());
 
-		driver.endActivityAndComputeNextState(0); 
-		f.queueNetwork.simEngine.ii.arrangeNextAgentState(driver) ; // i.e. driver departs, should now be in wait queue 
+		driver.endActivityAndComputeNextState(0);
+		f.queueNetwork.simEngine.ii.arrangeNextAgentState(driver) ; // i.e. driver departs, should now be in wait queue
 		assertTrue(f.qlink1.isNotOfferingVehicle()); // veh not in buffer
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.getAcceptingQLane()).getAllVehicles().size()); // veh not on lane
 		assertEquals("vehicle not found in waiting list.", veh, f.qlink1.getVehicle(id1)); // veh _should_ be on link (in waiting list)

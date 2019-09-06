@@ -20,7 +20,7 @@ public abstract class AbstractSignalsReader implements MatsimReader{
     @Override
     public final void readFile( String filename ){
         log.info("starting unmarshalling " + filename);
-        try ( InputStream stream = IOUtils.getInputStream(filename )){
+        try ( InputStream stream = IOUtils.getInputStream(IOUtils.resolveFileOrResource(filename) )){
             readStream(stream);
         } catch ( IOException e) {
             throw new UncheckedIOException(e);

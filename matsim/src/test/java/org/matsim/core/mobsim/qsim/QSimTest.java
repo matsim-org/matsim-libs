@@ -1323,10 +1323,13 @@ public class QSimTest {
 
 	@Test
 	public void testStartAndEndTime() {
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Config config = scenario.getConfig();
 
+		final Config config = ConfigUtils.createConfig();
 		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
+
+		// ---
+
+		MutableScenario scenario = ScenarioUtils.createMutableScenario( config );
 
 		// build simple network with 1 link
 		Network network = scenario.getNetwork();

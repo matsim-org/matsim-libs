@@ -8,7 +8,7 @@
 			<param name="maxWaitTime" value="900"/>
 			<param name="maxTravelTimeAlpha" value="1.3"/>
 			<param name="maxTravelTimeBeta" value="600"/>
-			<param name="requestRejection" value="false"/>
+			<param name="rejectRequestIfMaxWaitOrTravelTimeViolated" value="false"/>
 			<param name="vehiclesFile" value="one_shared_taxi_vehicles_A.xml"/>
 			<param name="changeStartLinkToLastLinkInSchedule" value="true"/>
 		</parameterset>
@@ -19,7 +19,7 @@
 			<param name="maxWaitTime" value="900"/>
 			<param name="maxTravelTimeAlpha" value="1.3"/>
 			<param name="maxTravelTimeBeta" value="600"/>
-			<param name="requestRejection" value="false"/>
+			<param name="rejectRequestIfMaxWaitOrTravelTimeViolated" value="false"/>
 			<param name="vehiclesFile" value="one_shared_taxi_vehicles_B.xml"/>
 			<param name="changeStartLinkToLastLinkInSchedule" value="true"/>
 		</parameterset>
@@ -30,7 +30,7 @@
 			<param name="maxWaitTime" value="900"/>
 			<param name="maxTravelTimeAlpha" value="1.3"/>
 			<param name="maxTravelTimeBeta" value="600"/>
-			<param name="requestRejection" value="false"/>
+			<param name="rejectRequestIfMaxWaitOrTravelTimeViolated" value="false"/>
 			<param name="vehiclesFile" value="one_shared_taxi_vehicles_C.xml"/>
 			<param name="changeStartLinkToLastLinkInSchedule" value="true"/>
 		</parameterset>

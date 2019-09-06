@@ -32,7 +32,7 @@ import org.matsim.core.router.util.TravelTime;
 /**
  * @author smetzler, dziemke
  */
-final class BicycleTravelDisutilityFactory implements TravelDisutilityFactory {
+public final class BicycleTravelDisutilityFactory implements TravelDisutilityFactory {
 	// public-final is ok since ctor is package-private: can only be used through injection
 
 	private static final Logger LOG = Logger.getLogger(BicycleTravelDisutilityFactory.class);

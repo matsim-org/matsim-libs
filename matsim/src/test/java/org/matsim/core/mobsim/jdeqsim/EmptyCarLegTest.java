@@ -43,7 +43,7 @@ public class EmptyCarLegTest extends AbstractJDEQSimTest {
 	@Test
 	public void test_EmptyCarRoute() {
 		
-		Config config = utils.loadConfig(IOUtils.newUrl(utils.packageInputResourcePath(), "config1.xml"));
+		Config config = utils.loadConfig(IOUtils.extendUrl(utils.packageInputResourcePath(), "config1.xml"));
 		MatsimRandom.reset(config.global().getRandomSeed());
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		ScenarioUtils.loadScenario(scenario);

@@ -28,7 +28,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.facilities.algorithms.FacilityAlgorithm;
 
 /**
- * A Facility is a (Basic)Location ("getCoord") with an Id ("getId") that is connected to a Link ("getLinkId").
+ * A Facility is a (Basic)Location ("getCoord") that is connected to a Link ("getLinkId").  Since about 2018, it no longer implements Identifiable, since
+ * that caused headaches with the generification of Id.
  *
  * @author (of javadoc) nagel
  */

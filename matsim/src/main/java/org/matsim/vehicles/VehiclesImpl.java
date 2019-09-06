@@ -36,7 +36,6 @@ final class VehiclesImpl implements Vehicles {
 	private final Map<Id<VehicleType>, VehicleType> vehicleTypes;
 	private final LinkedHashMap<Id<Vehicle>, Vehicle> vehicles;
 	private final VehiclesFactoryImpl builder;
-	private final ObjectAttributes vehicleAttributes = new ObjectAttributes();
 
 	private final Counter counter = new Counter("[VehiclesImpl] added vehicle # " );
 
@@ -130,10 +129,4 @@ final class VehiclesImpl implements Vehicles {
 		}
 		this.vehicleTypes.remove(vehicleTypeId);
 	}
-
-	@Override
-	public ObjectAttributes getVehicleAttributes() {
-		return this.vehicleAttributes;
-	}
-
 }

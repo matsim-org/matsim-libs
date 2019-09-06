@@ -20,14 +20,15 @@
 
 package org.matsim.api.core.v01;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -40,13 +41,13 @@ import org.matsim.vehicles.Vehicle;
  */
 public abstract class Id<T> implements Comparable<Id<T>> {
 
-	private final static Map<Class<?>, Map<String, Id<?>>> cache = new ConcurrentHashMap<Class<?>, Map<String, Id<?>>>();
-	
-	
+	private final static Map<Class<?>, Map<String, Id<?>>> cacheId = new ConcurrentHashMap<>();
+	private final static Map<Class<?>, Map<Integer, Id<?>>> cacheIndex = new ConcurrentHashMap<>();
+
 	public static <T> Id<T> create(final long key, final Class<T> type) {
 		return create(Long.toString(key), type);
 	}
-	
+
 	public static <T> Id<T> create(final Id<?> id, final Class<T> type) {
 		if (id == null) {
 			return null;
@@ -58,19 +59,47 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 	 * This method supports a cache where ids are stored and re-used per type.   
 	 */
 	public static <T> Id<T> create(final String key, final Class<T> type) {
-		Map<String, Id<?>> map = cache.get(type);
-		if (map == null) {
-			map = new ConcurrentHashMap<String, Id<?>>();
-			cache.put(type, map);
-		}
 		Gbl.assertNotNull(key);
-		Id<?> id = map.get(key);
+
+		Map<String, Id<?>> mapId = cacheId.computeIfAbsent(type, k -> new ConcurrentHashMap<>(1000));
+		Map<Integer, Id<?>> mapIndex = cacheIndex.computeIfAbsent(type, k -> new ConcurrentHashMap<>(1000));
+
+		Id<?> id = mapId.get(key);
+
 		if (id == null) {
-			id = new IdImpl<T>(key);
-			map.put(key, id);
+			int index = mapIndex.size(); // TODO - this is not thread safe
+			id = new IdImpl<T>(key, index);
+			mapId.put(key, id);
+			mapIndex.put(index, id);
 		}
-		
+
 		return (Id<T>) id;
+	}
+
+	public abstract int index();
+
+	public static <T> Id<T> get(int index, final Class<T> type) {
+		Map<Integer, Id<?>> mapIndex = cacheIndex.get(type);
+
+		if (mapIndex == null) {
+			return null;
+		}
+
+		return (Id<T>)mapIndex.get(index);
+	}
+
+	public static <T> Id<T> get(String id, final Class<T> type) {
+		Map<String, Id<?>> mapId = cacheId.get(type);
+
+		if (mapId == null) {
+			return null;
+		}
+
+		return (Id<T>)mapId.get(id);
+	}
+
+	public static <T> int getNumberOfIds(final Class<T> type) {
+		return cacheIndex.getOrDefault(type, Collections.emptyMap()).size();
 	}
 	
 	/**
@@ -80,14 +109,8 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 	 */
 	@Override
 	public int compareTo(Id<T> o) throws IllegalArgumentException {
-		int res = this.toString().compareTo(o.toString());
-//		if (res == 0) {   // FIXME temporary relax the check until the Id migration has taken place
-//			if (equals(o)) {
-//				return 0;
-//			}
-//			throw new IllegalArgumentException("The ids are equal but of different types.");
-//		}
-		return res;
+		return this.toString().compareTo(o.toString());
+//		return Integer.compare(this.index(), o.index()); // this would be more efficient, but changes some test results due to different ordering
 	}
 	
 	@Override
@@ -100,7 +123,7 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 		// all other objects have to be different by definition, as long as the cache is correctly implemented
 	}
 
-	
+
 	/**
 	 * The default implementation to be used for Ids.
 	 * Have this as a separate class instead of integrated into the Id class
@@ -113,14 +136,22 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 	private static class IdImpl<T> extends Id<T> {
 
 		private final String id; 
+		private final int index;
 		
-		/*package*/ IdImpl(final String id) {
+		/*package*/ IdImpl(final String id, final int index) {
 			this.id = id;
+			this.index = index;
+		}
+
+		@Override
+		public int index() {
+			return this.index;
 		}
 
 		@Override
 		public int hashCode() {
 			return this.id.hashCode();
+			// this.index  would be an alternative implementation for the hashCode
 		}
 		
 		@Override

@@ -32,7 +32,7 @@ import org.matsim.examples.ExamplesUtils;
 public class RunETaxiBenchmarkTest {
 	@Test
 	public void testRuleBased() {
-		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_etaxi_benchmark_config.xml");
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_etaxi_benchmark_config.xml");
 		RunETaxiBenchmark.run(configUrl, 2);
 	}
 

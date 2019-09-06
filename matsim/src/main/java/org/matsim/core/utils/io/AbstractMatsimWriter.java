@@ -69,7 +69,7 @@ public abstract class AbstractMatsimWriter {
 		if (this.useCompression == null) {
 			this.writer = IOUtils.getBufferedWriter(filename);
 		} else {
-			this.writer = IOUtils.getBufferedWriter(filename, this.useCompression);
+			this.writer = IOUtils.getBufferedWriter(filename + ".gz");
 		}
 	}
 

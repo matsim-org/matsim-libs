@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.utils.objectattributes.FailingObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
@@ -32,16 +33,12 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  */
 public class HouseholdsImpl implements Households {
 	
-//	private final static Logger log = Logger.getLogger(HouseholdImpl.class);
-
 	private HouseholdsFactory factory;
 
 	private Map<Id<Household>, Household> households;
 	
-	private final ObjectAttributes householdAttributes = new ObjectAttributes();
-	
 	public HouseholdsImpl(){
-		this.households = new LinkedHashMap<Id<Household>, Household>();
+		this.households = new LinkedHashMap<>();
 		this.factory = new HouseholdsFactoryImpl();
 	}
 	
@@ -79,7 +76,7 @@ public class HouseholdsImpl implements Households {
 
 	@Override
 	public ObjectAttributes getHouseholdAttributes() {
-		return this.householdAttributes;
+		return FailingObjectAttributes.createHouseholdsAttributes();
 	}
 
 }

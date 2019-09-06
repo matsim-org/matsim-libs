@@ -1,6 +1,6 @@
-/*
- * *********************************************************************** *
+/* *********************************************************************** *
  * project: org.matsim.*
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
  * copyright       : (C) 2019 by the members listed in the COPYING,        *
@@ -15,34 +15,28 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** *
- */
+ * *********************************************************************** */
 
-package org.matsim.contrib.edrt.run;
+package org.matsim.utils.gis.shp2matsim;
 
-import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
-import org.matsim.contrib.drt.routing.DrtMainModeIdentifier;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.run.DrtModeModule;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.router.MainModeIdentifier;
+import java.net.URL;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import com.google.inject.Inject;
+import org.locationtech.jts.geom.Geometry;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.ShapeFileReader;
 
-/**
- * @author Michal Maciejewski (michalm)
- */
-public class EDrtModule extends AbstractModule {
+public class ShpGeometryUtils {
+	public static List<Geometry> loadGemetries(URL url) {
+		return ShapeFileReader.getAllFeatures(url)
+				.stream()
+				.map(sf -> (Geometry)sf.getDefaultGeometry())
+				.collect(Collectors.toList());
+	}
 
-	@Inject
-	private DrtConfigGroup drtCfg;
-
-	@Override
-	public void install() {
-		install(new DrtModeModule(drtCfg));
-		installQSimModule(new EDrtModeQSimModule(drtCfg));
-		install(new DrtModeAnalysisModule(drtCfg));
-
-		bind(MainModeIdentifier.class).to(DrtMainModeIdentifier.class).asEagerSingleton();
+	public static boolean isCoordInGeometries(Coord coord, List<Geometry> geometries) {
+		return geometries.stream().anyMatch(MGC.coord2Point(coord)::within);
 	}
 }

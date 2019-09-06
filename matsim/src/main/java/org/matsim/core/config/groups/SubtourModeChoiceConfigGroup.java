@@ -101,11 +101,12 @@ public final class SubtourModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		comments.put(CHAINBASEDMODES, "Defines the chain-based modes, seperated by commas" );
 		comments.put(CARAVAIL, "Defines whether car availability must be considered or not. A agent has no car only if it has no license, or never access to a car" );
 		{
-			String msg = "Only for backwards compatibility.  Defines if only trips from modes list should change mode, or all trips.  Options: " ;
+			StringBuilder msg = new StringBuilder("Only for backwards compatibility.  Defines if only trips from modes list should change mode, or all trips.  Options: ");
 			for ( SubtourModeChoice.Behavior behavior : SubtourModeChoice.Behavior.values() ) {
-				msg += behavior.name() + " " ;
+				msg.append(behavior.name());
+				msg.append(' ');
 			}
-			comments.put(BEHAVIOR, msg);
+			comments.put(BEHAVIOR, msg.toString());
 		}
 		return comments;
 	}

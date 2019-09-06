@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.utils.objectattributes.FailingObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
@@ -54,8 +55,6 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, SearchableAct
 	private final Map<Id<ActivityFacility>, ActivityFacility> facilities = new LinkedHashMap<>();
 
 	private String name;
-
-	private final ObjectAttributes facilityAttributes = new ObjectAttributes();
 
 	private QuadTree<ActivityFacility> facilitiesQuadTree;
 
@@ -143,8 +142,8 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, SearchableAct
 	}
 
 	@Override
-	public ObjectAttributes getFacilityAttributes() {
-		return this.facilityAttributes;
+	public FailingObjectAttributes getFacilityAttributes() {
+		return FailingObjectAttributes.createFacilitiesAttributes();
 	}
 	
 	@Override

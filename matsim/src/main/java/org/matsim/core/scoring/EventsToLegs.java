@@ -23,22 +23,8 @@ import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -48,7 +34,6 @@ import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
-import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -60,11 +45,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import java.util.*;
 
 
 /**
@@ -80,22 +61,11 @@ import java.util.Map;
  * @author michaz
  *
  */
-public final class EventsToLegs implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler, 
-TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+public final class EventsToLegs implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkEnterEventHandler,
+        TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
-	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
-	private static class PendingTransitTravel {
-
-		final Id<Vehicle> vehicleId;
-		final Id<TransitStopFacility> accessStop;
-
-		public PendingTransitTravel(Id<Vehicle> vehicleId, Id<TransitStopFacility> accessStop) {
-			this.vehicleId = vehicleId;
-			this.accessStop = accessStop;
-		}
-
-	}
+    private Map<Id<Vehicle>, Set<Id<Person>>> vehicle2passengers = new HashMap<>();
 
 	private static class LineAndRoute {
 
@@ -141,20 +111,31 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	private Map<Id<Vehicle>, LineAndRoute> transitVehicle2currentRoute = new HashMap<>();
 	private List<LegHandler> legHandlers = new ArrayList<>();
 
-
-	@Inject
-	EventsToLegs(Network network) {
-		this.network = network;
-	}
-
-
-
-	public EventsToLegs(Scenario scenario) {
+    EventsToLegs(Scenario scenario) {
 		this.network = scenario.getNetwork();
 		if (scenario.getConfig().transit().isUseTransit()) {
 			this.transitSchedule = scenario.getTransitSchedule();
 		}
 	}
+
+
+    @Inject
+    EventsToLegs(Network network) {
+        this.network = network;
+    }
+
+    @Override
+    public void handleEvent(PersonEntersVehicleEvent event) {
+        LineAndRoute lineAndRoute = transitVehicle2currentRoute.get(event.getVehicleId());
+        if (lineAndRoute != null
+                && !event.getPersonId().equals(lineAndRoute.driverId)) { // transit drivers are not considered to travel by transit
+            transitTravels.put(event.getPersonId(), new PendingTransitTravel(event.getVehicleId(), lineAndRoute.lastFacilityId));
+        } else {
+            Set<Id<Person>> passengersInVehicle = vehicle2passengers.getOrDefault(event.getVehicleId(), new HashSet<>());
+            passengersInVehicle.add(event.getPersonId());
+            vehicle2passengers.put(event.getVehicleId(), passengersInVehicle);
+        }
+    }
 
 	@Override
 	public void reset(int iteration) {
@@ -164,7 +145,6 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 		routelessTravels.clear();
 		transitVehicle2currentRoute.clear();
 
-		delegate.reset(iteration);
 	}
 
 
@@ -181,25 +161,32 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	}
 
 	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		LineAndRoute lineAndRoute = transitVehicle2currentRoute.get(event.getVehicleId());
-		if (lineAndRoute != null
-				&& !event.getPersonId().equals(lineAndRoute.driverId)) { // transit drivers are not considered to travel by transit
-			transitTravels.put(event.getPersonId(), new PendingTransitTravel(event.getVehicleId(), lineAndRoute.lastFacilityId));
-		}
-	}
-
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
-
+    public void handleEvent(PersonLeavesVehicleEvent event) {
+        if (vehicle2passengers.containsKey(event.getVehicleId())) {
+            vehicle2passengers.get(event.getVehicleId()).remove(event.getPersonId());
+        }
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id<Person> driverOfVehicle = delegate.getDriverOfVehicle(event.getVehicleId());
-		List<Id<Link>> route = experiencedRoutes.get(driverOfVehicle);
-		route.add(event.getLinkId());
-	}
+        vehicle2passengers.get(event.getVehicleId())
+				.forEach(p -> experiencedRoutes.computeIfPresent(p, (personId, ids) -> {
+					ids.add(event.getLinkId());
+					return ids;
+				}));
+
+    }
+
+    @Override
+    public void handleEvent(VehicleEntersTrafficEvent event) {
+
+        // remember the relative position on the link
+        if (vehicle2passengers.containsKey(event.getVehicleId())) {
+            vehicle2passengers.get(event.getVehicleId())
+                    .forEach(personId -> relPosOnDepartureLinkPerPerson.put(personId, event.getRelativePositionOnLink()));
+        }
+
+    }
 
 	@Override
 	public void handleEvent(TeleportationArrivalEvent travelEvent) {
@@ -299,19 +286,25 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 	}
 
 	@Override
-	public void handleEvent(VehicleEntersTrafficEvent event) {
-		delegate.handleEvent(event);
-
-		// remember the relative position on the link
-		relPosOnDepartureLinkPerPerson.put(event.getPersonId(), event.getRelativePositionOnLink());
-	}
-
-	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		delegate.handleEvent(event);
 
 		// remember the relative position on the link
-		relPosOnArrivalLinkPerPerson.put(event.getPersonId(), event.getRelativePositionOnLink());
-	}
+        if (vehicle2passengers.containsKey(event.getVehicleId())) {
+            vehicle2passengers.get(event.getVehicleId())
+                    .forEach(personId -> relPosOnArrivalLinkPerPerson.put(personId, event.getRelativePositionOnLink()));
+        }
+    }
+
+    private static class PendingTransitTravel {
+
+        final Id<Vehicle> vehicleId;
+        final Id<TransitStopFacility> accessStop;
+
+        PendingTransitTravel(Id<Vehicle> vehicleId, Id<TransitStopFacility> accessStop) {
+            this.vehicleId = vehicleId;
+            this.accessStop = accessStop;
+        }
+
+    }
 
 }
