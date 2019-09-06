@@ -119,7 +119,11 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 		assertEquals(7.5, vehTypeDefaultCar.getLength(), EPSILON);
 		assertEquals(1.0, vehTypeDefaultCar.getWidth(), EPSILON);
 		assertTrue(Double.isInfinite(vehTypeDefaultCar.getMaximumVelocity()));
-		assertNull(vehTypeDefaultCar.getCapacity());
+		assertNotNull(vehTypeDefaultCar.getCapacity());
+		assertNotNull(vehTypeDefaultCar.getCostInformation());
+		assertNull(vehTypeDefaultCar.getCostInformation().getFixedCosts());
+		assertNull(vehTypeDefaultCar.getCostInformation().getCostsPerMeter());
+		assertNull(vehTypeDefaultCar.getCostInformation().getCostsPerSecond());
 		assertEquals( VehicleUtils.DoorOperationMode.serial, VehicleUtils.getDoorOperationMode(vehTypeDefaultCar ) );
 		assertEquals(1.0, vehTypeDefaultCar.getPcuEquivalents());
 		assertEquals(1.0, vehTypeDefaultCar.getFlowEfficiencyFactor());

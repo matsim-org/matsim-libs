@@ -94,7 +94,7 @@ public class VehicleWriterV1Test extends MatsimTestCase {
 		assertEquals(7.5, vehType.getLength(), EPSILON);
 		assertEquals(1.0, vehType.getWidth(), EPSILON);
 		assertTrue(Double.isInfinite(vehType.getMaximumVelocity()));
-		assertNull(vehType.getCapacity());
+		assertNotNull(vehType.getCapacity());
 		assertEquals( VehicleUtils.DoorOperationMode.serial, VehicleUtils.getDoorOperationMode(vehType ) );
 		assertEquals(1.0, vehType.getPcuEquivalents());
 

@@ -165,7 +165,7 @@ public final class VehicleUtils {
 		vehicleType.getAttributes().putAttribute(ACCESSTIME, accessTime);
 	}
 
-	public static double getFuelConsumption(VehicleType vehicleType) {
+	public static Double getFuelConsumption(VehicleType vehicleType) {
 //		final Object attribute = vehicleType.getAttributes().getAttribute(FUELCONSUMPTION);
 //		if ( attribute==null ) {
 //			return Double.NaN ; // this was the default value in V1; could also return Double-null instead.
@@ -316,8 +316,8 @@ public final class VehicleUtils {
 	}
 
 	@Deprecated
-	static double getFuelConsumption(EngineInformation engineInformation ){
-		return (double) engineInformation.getAttributes().getAttribute( FUELCONSUMPTION );
+	static Double getFuelConsumption(EngineInformation engineInformation ){
+		return (Double) engineInformation.getAttributes().getAttribute( FUELCONSUMPTION );
 	}
 
 	@Deprecated

@@ -144,7 +144,7 @@ public final class VehicleWriterV2 extends MatsimXmlWriter {
 			}
 
 			//Write vehicleType engineInformation, if present
-			if (vt.getEngineInformation() != null) {
+			if (vt.getEngineInformation() != null & !vt.getEngineInformation().getAttributes().isEmpty()) {
 				atts.clear();
 				this.writeStartTag(VehicleSchemaV2Names.ENGINEINFORMATION, atts);
 				this.writer.newLine();

@@ -43,8 +43,14 @@
 			<attribute name="Attribute1" class="java.lang.String">def</attribute>
 			<attribute name="Attribute2" class="java.lang.Integer">2</attribute>
 		</attributes>
+		<capacity seats="1" standingRoomInPersons="0" volumeInCubicMeters="1.7976931348623157E308" weightInTons="1.7976931348623157E308">
+
+		</capacity>
 		<length meter="7.5"/>
 		<width meter="1.0"/>
+		<costInformation>
+
+		</costInformation>
 		<passengerCarEquivalents pce="1.0"/>
 		<networkMode networkMode="car"/>
 		<flowEfficiencyFactor factor="1.0"/>

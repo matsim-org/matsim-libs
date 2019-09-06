@@ -108,7 +108,8 @@ public final class VehicleWriterV1 extends MatsimXmlWriter {
 				atts.add(this.createTuple(VehicleSchemaV1Names.METERPERSECOND, Double.toString(vt.getMaximumVelocity())));
 				this.writeStartTag(VehicleSchemaV1Names.MAXIMUMVELOCITY, atts, true);
 			}
-			if (vt.getEngineInformation() != null) {
+			if (vt.getEngineInformation() != null && !vt.getEngineInformation().getAttributes().isEmpty()) {
+				log.info("try to write EngineInformation for vehType" + vt.getId());
 				this.writeEngineInformation(vt.getEngineInformation());
 			}
 			atts.clear();
@@ -131,11 +132,16 @@ public final class VehicleWriterV1 extends MatsimXmlWriter {
 		this.writeStartTag(VehicleSchemaV1Names.ENGINEINFORMATION, null);
 		this.writeStartTag(VehicleSchemaV1Names.FUELTYPE, null);
 //		this.writeContent(ei.getFuelType().toString(), false);
-		this.writeContent(VehicleUtils.getFuelType(ei).toString(), false);
+		if (VehicleUtils.getFuelType(ei) != null) {
+			this.writeContent(VehicleUtils.getFuelType(ei).toString(), false);
+		}
 		this.writeEndTag(VehicleSchemaV1Names.FUELTYPE);
 		atts.clear();
-		atts.add(this.createTuple(VehicleSchemaV1Names.LITERPERMETER, Double.toString(ei.getFuelConsumption())));
-		this.writeStartTag(VehicleSchemaV1Names.GASCONSUMPTION, atts, true);
+//		log.warn("EngineInformation: " + ei + " fc: " + ei.getFuelConsumption());
+		if((VehicleUtils.getFuelConsumption(ei) != null)) {
+			atts.add(this.createTuple(VehicleSchemaV1Names.LITERPERMETER, VehicleUtils.getFuelConsumption(ei)));
+			this.writeStartTag(VehicleSchemaV1Names.GASCONSUMPTION, atts, true);
+		}
 		this.writeEndTag(VehicleSchemaV1Names.ENGINEINFORMATION);
 	}
 
