@@ -7,6 +7,8 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -45,30 +47,49 @@ public class RunTestEquil {
     final Scenario scenario = ScenarioUtils.loadScenario(config);
     Controler controler = new Controler (scenario);
     controler.addOverridingModule(new AccidentsModule(scenario));
-    
-    //TODO: changing through programming the free speed and number o lanes of some links so they would not be allways categorized with tehe same roadtype.
-    //wich implications has the type of the config file?
-    
+    //how can be changed the parameters of the accidents Module
+    //TODO: changing through programming the free speed and number o lanes of some links so they would not be allways categorized with the same roadtype.
+    //wich implications has the type of the config file? the test does not work with the output configs
+ 
     controler.run();
 
-    //First looking if the program run and then comparing the results
+    //the programm runs there is problems with the calculation of the total costs from the link 1
+    //Link 1 three vehicles are not taken into account for the calculation
     
-//    BufferedReader br = IOUtils.getBufferedReader(outputDirectory + "");
-//    
-//    String line = null;
-//    try {
-//    	line = br.readLine();  	
-//    } catch (IOException e) {
-//    e.printStackTrace();
-//    }
-//    
-//    try  {
-//    	int lineCounter=0;
-//    	while ((line = br.readLine()) != null) {
-//    		String [] columns = line.split(";");
-//    		
-//    	}
-//    	}
-//    }
+    BufferedReader br = IOUtils.getBufferedReader(outputDirectory + "ITERS/it.0/run1.0.accidentCosts_BVWP.csv");
+	
+	String line = null;
+	try {
+		line = br.readLine();
+	} catch (IOException e) {
+		e.printStackTrace();
+	} // headers
+
+	try {
+		int lineCounter = 0;
+		while ((line = br.readLine()) != null) {
+			
+			String[] columns = line.split(";");
+			for (int column = 0; column < columns.length; column++) {
+				
+				if (lineCounter == 1 && column == 121) {
+					double accidentCosts = Double.valueOf(columns[column]);
+					Assert.assertEquals("wrong accident costs", 2162.475, accidentCosts , 0.01);	
+					//Manuel nachgerechnet: STIMMT!
+				}
+				
+				if (lineCounter == 12 && column == 121) {
+					double accidentCosts = Double.valueOf(columns[column]);
+					Assert.assertEquals("wrong accident costs", 617.85, accidentCosts , 0.01);
+					//Manuel nachgerechnet: STIMMT!
+				}
+									
+			}
+			
+			lineCounter++;
+		}
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
 }
 }
