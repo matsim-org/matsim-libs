@@ -8,40 +8,44 @@
 	<groupId>org.matsim.contrib</groupId>
 	<artifactId>freight</artifactId>
 	<name>freight</name>
-	
+
+	<properties>
+		<matsim.version>12.0-SNAPSHOT</matsim.version>
+	</properties>
+
 	<build>
-    <plugins>
-        <!--<plugin>-->
-            <!--<groupId>org.apache.maven.plugins</groupId>-->
-            <!--<artifactId>maven-javadoc-plugin</artifactId>-->
-            <!--<version>2.7</version>-->
-            <!--<executions>-->
-                <!--<execution>-->
-                    <!--<id>attach-javadoc</id>-->
-                    <!--<goals>-->
-                        <!--<goal>jar</goal>-->
-                    <!--</goals>-->
-                <!--</execution>-->
-            <!--</executions>-->
-        <!--</plugin>-->
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <version>2.4</version>
-            <executions>
-                <execution>
-                    <id>attach-sources</id>
-                    <goals>
-                        <goal>jar-no-fork</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
-		<plugin>
-			<artifactId>maven-assembly-plugin</artifactId>
-		</plugin>
-	</plugins>
-</build>
+		<plugins>
+			<!--<plugin>-->
+			<!--<groupId>org.apache.maven.plugins</groupId>-->
+			<!--<artifactId>maven-javadoc-plugin</artifactId>-->
+			<!--<version>2.7</version>-->
+			<!--<executions>-->
+			<!--<execution>-->
+			<!--<id>attach-javadoc</id>-->
+			<!--<goals>-->
+			<!--<goal>jar</goal>-->
+			<!--</goals>-->
+			<!--</execution>-->
+			<!--</executions>-->
+			<!--</plugin>-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.4</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 
 
 	<dependencyManagement>
@@ -67,43 +71,43 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
-	 
+
 		<dependency>
-		    <groupId>com.graphhopper</groupId>
-		    <artifactId>jsprit-core</artifactId>
-		    <version>1.7.2</version>
-		 </dependency>
-		 
-		 <dependency>
-		    <groupId>com.graphhopper</groupId>
-		    <artifactId>jsprit-io</artifactId>
-		    <version>1.7.2</version>
-		 </dependency>
-				 
+			<groupId>com.graphhopper</groupId>
+			<artifactId>jsprit-core</artifactId>
+			<version>1.7.2</version>
+		</dependency>
+
 		<dependency>
-		    <groupId>com.graphhopper</groupId>
-		    <artifactId>jsprit-analysis</artifactId>
-	    	<version>1.7.2</version>
-	    	<exclusions>
+			<groupId>com.graphhopper</groupId>
+			<artifactId>jsprit-io</artifactId>
+			<version>1.7.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.graphhopper</groupId>
+			<artifactId>jsprit-analysis</artifactId>
+			<version>1.7.2</version>
+			<exclusions>
 				<exclusion>
 					<groupId>org.jfree</groupId>
 					<artifactId>jfreechart</artifactId>
 				</exclusion>
-	    	</exclusions>
+			</exclusions>
 		</dependency>
-	
+
 		<dependency>
-	  		<groupId>org.matsim.contrib</groupId>
+			<groupId>org.matsim.contrib</groupId>
 			<artifactId>roadpricing</artifactId>
-			<version>12.0-SNAPSHOT</version>
+			<version>${matsim.version}</version>
 		</dependency>
-		
+
 		<dependency>
-	  		<groupId>org.matsim.contrib</groupId>
+			<groupId>org.matsim.contrib</groupId>
 			<artifactId>otfvis</artifactId>
-			<version>12.0-SNAPSHOT</version>
+			<version>${matsim.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
@@ -120,24 +124,23 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.7.21</version>
-		</dependency> 
-		
+		</dependency>
+
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
-			<version>12.0-SNAPSHOT</version>
-		
+			<version>${matsim.version}</version>
 		</dependency>
-		
+
 	</dependencies>
-	 	
-  <repositories>
-   	<repository>
-    		<id>jsprit-releases</id>
-    		<url>https://github.com/jsprit/mvn-rep/raw/master/releases</url>
- 	</repository>
- </repositories>
-	
-	
-	
+
+	<repositories>
+		<repository>
+			<id>jsprit-releases</id>
+			<url>https://github.com/jsprit/mvn-rep/raw/master/releases</url>
+		</repository>
+	</repositories>
+
+
+
 </project>

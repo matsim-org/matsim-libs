@@ -113,13 +113,16 @@ public class SkillsIT {
 				CarrierCapabilities.Builder capabilitiesBuilder = CarrierCapabilities.Builder.newInstance();
 				capabilitiesBuilder.setFleetSize(CarrierCapabilities.FleetSize.FINITE);
 
-				CostInformation costInformation = new CostInformation(1000.0, 0.001, 0.001);
+				CostInformation costInformation1 = new CostInformation() ;
+				costInformation1.setFixedCosts( 1000.0 );
+				costInformation1.setCostsPerMeter( 0.001 );
+				costInformation1.setCostsPerSecond( 0.001 );
 				VehicleCapacity vehicleCapacity = new VehicleCapacity();
 				vehicleCapacity.setWeightInTons(2.0);
 
 				/* Vehicle type 1. */
 				VehicleType typeOne = scenario.getVehicles().getFactory().createVehicleType(Id.create("Type 1", VehicleType.class));
-				typeOne.setCostInformation(costInformation);
+				typeOne.setCostInformation(costInformation1);
 				typeOne.setCapacity(vehicleCapacity);
 				FreightUtils.addSkill(typeOne, "skill 1");
 				capabilitiesBuilder.addType(typeOne);
@@ -132,7 +135,7 @@ public class SkillsIT {
 
 				/* Vehicle type 2. */
 				VehicleType typeTwo = scenario.getVehicles().getFactory().createVehicleType(Id.create("Type 1", VehicleType.class));
-				typeTwo.setCostInformation(costInformation);
+				typeTwo.setCostInformation(costInformation1);
 				typeTwo.setCapacity(vehicleCapacity);
 				FreightUtils.addSkill(typeTwo, "skill 2");
 				capabilitiesBuilder.addType(typeTwo);

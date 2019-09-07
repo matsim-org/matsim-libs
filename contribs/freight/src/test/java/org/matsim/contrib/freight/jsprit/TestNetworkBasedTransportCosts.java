@@ -95,7 +95,11 @@ public class TestNetworkBasedTransportCosts extends MatsimTestCase{
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILENAME);
 		
 //		CarrierVehicleType vtype1 = mock(CarrierVehicleType.class);
-		CostInformation param1 = new CostInformation(0.0, 2.0, 0.0);
+		CostInformation costInformation1 = new CostInformation() ;
+		costInformation1.setFixedCosts( 0.0 );
+		costInformation1.setCostsPerMeter( 2.0 );
+		costInformation1.setCostsPerSecond( 0.0 );
+		CostInformation param1 = costInformation1;
 //		when(vtype1.getCostInformation()).thenReturn(param1);
 //		when(vtype1.getId()).thenReturn(Id.create("type1", org.matsim.vehicles.VehicleType.class));
 		// one cannot mock final methods!!
@@ -105,7 +109,11 @@ public class TestNetworkBasedTransportCosts extends MatsimTestCase{
 
 		
 //		CarrierVehicleType vtype2 = mock(CarrierVehicleType.class);
-		CostInformation param2 = new CostInformation(0.0, 4.0, 0.0);
+		CostInformation costInformation = new CostInformation() ;
+		costInformation.setFixedCosts( 0.0 );
+		costInformation.setCostsPerMeter( 4.0 );
+		costInformation.setCostsPerSecond( 0.0 );
+		CostInformation param2 = costInformation;
 //		when(vtype2.getCostInformation()).thenReturn(param2);
 //		when(vtype2.getId()).thenReturn(Id.create("type2", org.matsim.vehicles.VehicleType.class));
 		// one cannot mock final methods!!

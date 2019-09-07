@@ -15,11 +15,19 @@ public class CarrierVehicleTypeTest extends MatsimTestCase{
 	@Override
 	public void setUp() throws Exception{
 		super.setUp();
+		CostInformation costInformation1 = new CostInformation() ;
+		costInformation1.setFixedCosts( 50. );
+		costInformation1.setCostsPerMeter( 1.0 );
+		costInformation1.setCostsPerSecond( 0.5 );
+		EngineInformation engineInformation1 = new EngineInformation();
+		engineInformation1.setFuelType( FuelType.diesel );
+		engineInformation1.setFuelConsumption( 0.02 );
 		VehicleType mediumType = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("medium", org.matsim.vehicles.VehicleType.class ) )
 												   .setDescription("Medium Vehicle")
 												   .setCapacityWeightInTons(30 )
-												   .setVehicleCostInformation(new CostInformation(50., 1.0, 0.5) )
-												   .setEngineInformation(new EngineInformation(FuelType.diesel, 0.02) )
+												   .setVehicleCostInformation( costInformation1 )
+												   .setEngineInformation(
+													     engineInformation1 )
 												   .setMaxVelocity(13.89)
 												   .build();
 		types = new CarrierVehicleTypes();
@@ -30,11 +38,19 @@ public class CarrierVehicleTypeTest extends MatsimTestCase{
 		types.getVehicleTypes().put(mediumType2.getId(), mediumType2);
 
 		//Setting up a smaller one based of the one above and changing all values.
+		CostInformation costInformation = new CostInformation() ;
+		costInformation.setFixedCosts( 25. );
+		costInformation.setCostsPerMeter( 0.75 );
+		costInformation.setCostsPerSecond( 0.25 );
+		EngineInformation engineInformation = new EngineInformation();
+		engineInformation.setFuelType( FuelType.gasoline );
+		engineInformation.setFuelConsumption( 0.015 );
 		VehicleType smallType = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("small", org.matsim.vehicles.VehicleType.class ), mediumType )
 												  .setDescription("Small Vehicle")
 												  .setCapacityWeightInTons(16 )
-												  .setVehicleCostInformation(new CostInformation(25., 0.75, 0.25) )
-												  .setEngineInformation(new EngineInformation(FuelType.gasoline, 0.015) )
+												  .setVehicleCostInformation( costInformation )
+												  .setEngineInformation(
+													    engineInformation )
 												  .setMaxVelocity(10.0)
 												  .build();
 		types.getVehicleTypes().put(smallType.getId(), smallType);
