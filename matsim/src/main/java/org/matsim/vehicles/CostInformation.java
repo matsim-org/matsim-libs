@@ -18,9 +18,10 @@
 
 package org.matsim.vehicles;
 
+import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
-public final class CostInformation{
+public final class CostInformation implements Attributable{
 	// maybe at least these subtypes should be immutable?  kai, aug'19
 	// No, the decision is to rather have the typical matsim data model where this is an object-oriented database in memory, and everything is settable.
 	// kai, sep'19
@@ -30,45 +31,30 @@ public final class CostInformation{
 	private Double perSecond;
 	private Attributes attributes = new Attributes() ;
 
-	public CostInformation() {
-		// yyyy leaving this public for the time being because otherwise the carrier vehicle type reading logic needs to change completely.  kai, sep'19
+	/* package-private */ CostInformation() {
 	}
-
-//	@Deprecated private CostInformation( Double fixed , Double perMeter , Double perTimeUnit ) {
-//		this.fixed = fixed;
-//		this.perMeter = perMeter;
-//		this.perSecond = perTimeUnit;
-//	}
-
 	public Double getFixedCosts() {
 		return fixed;
 	}
-
 	public Double getCostsPerMeter() {
 		return perMeter;
 	}
-
 	public Double getCostsPerSecond() {
 		return perSecond;
 	}
-
 	public Attributes getAttributes() {
 		return attributes;
 	}
-
-	public CostInformation setFixedCosts( Double fixed ){
+	public CostInformation setFixedCost( Double fixed ){
 		this.fixed = fixed;
 		return this ;
 	}
-
 	public CostInformation setCostsPerMeter( Double perMeter ){
 		this.perMeter = perMeter;
 		return this ;
 	}
-
 	public CostInformation setCostsPerSecond( Double perSecond ){
 		this.perSecond = perSecond;
 		return this ;
 	}
-
 }

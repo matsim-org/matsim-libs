@@ -20,6 +20,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.CostInformation;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 
 public class TestNetworkBasedTransportCosts extends MatsimTestCase{
@@ -95,31 +96,35 @@ public class TestNetworkBasedTransportCosts extends MatsimTestCase{
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(NETWORK_FILENAME);
 		
 //		CarrierVehicleType vtype1 = mock(CarrierVehicleType.class);
-		CostInformation costInformation1 = new CostInformation() ;
-		costInformation1.setFixedCosts( 0.0 );
+		final Id<VehicleType> type11 = Id.create( "type1", VehicleType.class );
+		VehicleType vtype1 = VehicleUtils.getFactory().createVehicleType( type11 );;
+
+		CostInformation costInformation1 = vtype1.getCostInformation() ;
+		costInformation1.setFixedCost( 0.0 );
 		costInformation1.setCostsPerMeter( 2.0 );
 		costInformation1.setCostsPerSecond( 0.0 );
-		CostInformation param1 = costInformation1;
 //		when(vtype1.getCostInformation()).thenReturn(param1);
 //		when(vtype1.getId()).thenReturn(Id.create("type1", org.matsim.vehicles.VehicleType.class));
 		// one cannot mock final methods!!
 
-		VehicleType vtype1 =
-			  CarrierUtils.CarrierVehicleTypeBuilder.newInstance( Id.create( "type1", org.matsim.vehicles.VehicleType.class ) ).setVehicleCostInformation( param1 ).build() ;
+//		VehicleType vtype1 =
+//			  CarrierUtils.CarrierVehicleTypeBuilder.newInstance( type11 ).setVehicleCostInformation( param1 ).build() ;
 
 		
 //		CarrierVehicleType vtype2 = mock(CarrierVehicleType.class);
-		CostInformation costInformation = new CostInformation() ;
-		costInformation.setFixedCosts( 0.0 );
+		final Id<VehicleType> type21 = Id.create( "type2", VehicleType.class );
+		VehicleType vtype2 = VehicleUtils.getFactory().createVehicleType( type21 );;
+
+		CostInformation costInformation = vtype2.getCostInformation() ;
+		costInformation.setFixedCost( 0.0 );
 		costInformation.setCostsPerMeter( 4.0 );
 		costInformation.setCostsPerSecond( 0.0 );
-		CostInformation param2 = costInformation;
 //		when(vtype2.getCostInformation()).thenReturn(param2);
 //		when(vtype2.getId()).thenReturn(Id.create("type2", org.matsim.vehicles.VehicleType.class));
 		// one cannot mock final methods!!
 
-		VehicleType vtype2 =
-			  CarrierUtils.CarrierVehicleTypeBuilder.newInstance( Id.create( "type2", org.matsim.vehicles.VehicleType.class ) ).setVehicleCostInformation( param2 ).build() ;
+//		VehicleType vtype2 =
+//			  CarrierUtils.CarrierVehicleTypeBuilder.newInstance( type21 ).setVehicleCostInformation( param2 ).build() ;
 
 		Network network = scenario.getNetwork();
 		NetworkBasedTransportCosts.Builder builder = 

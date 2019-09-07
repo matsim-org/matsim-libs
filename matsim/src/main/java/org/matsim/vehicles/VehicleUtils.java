@@ -23,6 +23,7 @@ package org.matsim.vehicles;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -83,6 +84,29 @@ public final class VehicleUtils {
 	 */
 	public static Id<Vehicle> createVehicleId(Person person, String mode) {
 		return Id.createVehicleId(person.getId().toString() + "_" + mode);
+	}
+
+	public static void copyFromTo( VehicleType in, VehicleType out ) {
+		out.setMaximumVelocity( in.getMaximumVelocity() ) ;
+		out.setDescription( in.getDescription() ) ;
+		out.setPcuEquivalents( in.getPcuEquivalents() ) ;
+		out.setLength( in.getLength() ) ;
+		out.setWidth( in.getLength() ) ;
+		out.setFlowEfficiencyFactor( in.getFlowEfficiencyFactor() ) ;
+		out.setNetworkMode( in.getNetworkMode() ) ;
+		// (all the deprecated setters are copied via the attributes!)
+		AttributesUtils.copyAttributesFromTo( in, out );
+
+		CostInformation cost = in.getCostInformation();;
+		out.getCostInformation().setCostsPerSecond( cost.getCostsPerSecond() ).setCostsPerMeter( cost.getCostsPerMeter() ).setFixedCost( cost.getFixedCosts() ) ;
+		AttributesUtils.copyAttributesFromTo( cost, out.getCostInformation() );
+
+		VehicleCapacity cap = in.getCapacity() ;
+		out.getCapacity().setWeightInTons( cap.getWeightInTons() ).setSeats( cap.getSeats() ).setSeats( cap.getStandingRoom() ).setVolumeInCubicMeters( cap.getVolumeInCubicMeters() ) ;
+		AttributesUtils.copyAttributesFromTo( cap, out.getCapacity() );
+
+		AttributesUtils.copyAttributesFromTo( in.getEngineInformation(), out.getEngineInformation() );
+
 	}
 
 	/**

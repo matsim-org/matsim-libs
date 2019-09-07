@@ -165,12 +165,12 @@ final class FreightScenarioCreator {
     }
 
     private static VehicleType createLightType() {
-        CarrierUtils.CarrierVehicleTypeBuilder typeBuilder = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("small", org.matsim.vehicles.VehicleType.class ) );
-        typeBuilder.setCapacityWeightInTons(6 );
-        typeBuilder.setFixCost(80.0);
-        typeBuilder.setCostPerDistanceUnit(0.00047);
-        typeBuilder.setCostPerTimeUnit(0.008);
-        return typeBuilder.build();
+        VehicleType typeBuilder = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("small", VehicleType.class ) );
+        typeBuilder.getCapacity().setWeightInTons( 6. ) ;
+        typeBuilder.getCostInformation().setFixedCost(80.0);
+        typeBuilder.getCostInformation().setCostsPerMeter( 0.00047);
+        typeBuilder.getCostInformation().setCostsPerSecond( 0.008);
+        return typeBuilder ;
     }
 
     private static CarrierVehicle getHeavyVehicle(Id<?> id, Id<Link> homeId, String depot) {
@@ -182,7 +182,7 @@ final class FreightScenarioCreator {
     }
 
     private static VehicleType createHeavyType() {
-        CarrierUtils.CarrierVehicleTypeBuilder typeBuilder = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("heavy", org.matsim.vehicles.VehicleType.class ) );
+        VehicleType typeBuilder = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("heavy", VehicleType.class ) );
         typeBuilder.setCapacityWeightInTons(25 );
         typeBuilder.setFixCost(130.0);
         typeBuilder.setCostPerDistanceUnit(0.00077);

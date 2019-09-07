@@ -33,8 +33,8 @@ import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.vehicles.*;
 import org.matsim.vehicles.EngineInformation.FuelType;
-import org.matsim.vehicles.EngineInformation;
 
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
@@ -43,7 +43,6 @@ import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolutio
 import com.graphhopper.jsprit.core.util.Solutions;
 
 import org.junit.Assert;
-import org.matsim.vehicles.VehicleType;
 
 
 //TODO: length of routes (legs) AND end time of route are missing.
@@ -86,18 +85,20 @@ public class FreightUtilsIT {
 		carrierWShipments.getShipments().add(createMatsimShipment("shipment2", "i(3,0)", "i(3,7)", 2));
 
 		//Create vehicle for Carriers
-		EngineInformation engineInformation = new EngineInformation();
+		final Id<VehicleType> vehTypeId = Id.create( "gridType", VehicleType.class );
+		VehicleType carrierVehType = VehicleUtils.getFactory().createVehicleType( vehTypeId );;
+		EngineInformation engineInformation = carrierVehType.getEngineInformation() ;
 		engineInformation.setFuelType( FuelType.diesel );
 		engineInformation.setFuelConsumption( 0.015 );
-		VehicleType carrierVehType = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("gridType", org.matsim.vehicles.VehicleType.class ) )
-													 .setCapacityWeightInTons(3 )
-													 .setMaxVelocity(10)
-													 .setCostPerDistanceUnit(0.0001)
-													 .setCostPerTimeUnit(0.001)
-													 .setFixCost(130)
-													 .setEngineInformation(
-														   engineInformation )
-													 .build();
+		VehicleCapacity capacity = carrierVehType.getCapacity() ;
+		capacity.setWeightInTons( 3. ) ;
+		CostInformation costInfo = carrierVehType.getCostInformation();
+		costInfo.setCostsPerSecond( 0.001 ) ;
+		costInfo.setCostsPerMeter( 0.0001 ) ;
+		costInfo.setFixedCost( 130. ) ;
+//		VehicleType carrierVehType = CarrierUtils.CarrierVehicleTypeBuilder.newInstance( vehTypeId )
+		carrierVehType.setMaximumVelocity(10);
+
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
 		vehicleTypes.getVehicleTypes().put(carrierVehType.getId(), carrierVehType);
 		

@@ -36,8 +36,6 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.vehicles.CostInformation;
-import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 
 public class SkillsIT {
@@ -123,7 +121,7 @@ public class SkillsIT {
 				/* Vehicle type 1. */
 				VehicleType typeOne = scenario.getVehicles().getFactory().createVehicleType(Id.create("Type 1", VehicleType.class));
 //				typeOne.setCostInformation(costInformation1);
-				typeOne.getCostInformation().setFixedCosts( 1000.0 ).setCostsPerMeter( 0.001 ).setCostsPerSecond( 0.001 ) ;
+				typeOne.getCostInformation().setFixedCost( 1000.0 ).setCostsPerMeter( 0.001 ).setCostsPerSecond( 0.001 ) ;
 //				typeOne.setCapacity(vehicleCapacity);
 				typeOne.getCapacity().setWeightInTons( 2.0 );
 				FreightUtils.addSkill(typeOne, "skill 1");
@@ -138,7 +136,7 @@ public class SkillsIT {
 				/* Vehicle type 2. */
 				VehicleType typeTwo = scenario.getVehicles().getFactory().createVehicleType(Id.create("Type 1", VehicleType.class));
 //				typeTwo.setCostInformation(costInformation1);
-				typeTwo.getCostInformation().setFixedCosts( 1000.0 ).setCostsPerMeter( 0.001 ).setCostsPerSecond( 0.001 ) ;
+				typeTwo.getCostInformation().setFixedCost( 1000.0 ).setCostsPerMeter( 0.001 ).setCostsPerSecond( 0.001 ) ;
 //				typeTwo.setCapacity(vehicleCapacity);
 				typeTwo.getCapacity().setWeightInTons( 2.0 );
 				FreightUtils.addSkill(typeTwo, "skill 2");

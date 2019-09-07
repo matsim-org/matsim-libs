@@ -42,27 +42,21 @@ public final class VehicleType implements Attributable {
 	private String description;
 	private final VehicleCapacity capacity = new VehicleCapacity();
 	private String networkMode = TransportMode.car ;
-
 	private Id<VehicleType> id;
-
 	private final Attributes attributes = new Attributes();
 
 	public VehicleType( Id<VehicleType> typeId ) {
 		this.id = typeId;
 	}
-
 	public final String getDescription() {
 		return description;
 	}
-
 	public final VehicleCapacity getCapacity() {
 		return capacity;
 	}
-
 	public final Id<VehicleType> getId() {
 		return id;
 	}
-
 	/**
 	 * @deprecated please use {@see VehicleUtils} instead.
 	 */
@@ -70,7 +64,6 @@ public final class VehicleType implements Attributable {
 	public final double getAccessTime() {
 		return VehicleUtils.getAccessTime(this);
 	}
-
 	/**
 	 * @deprecated please use {@see VehicleUtils} instead.
 	 */
@@ -78,7 +71,6 @@ public final class VehicleType implements Attributable {
 	public final double getEgressTime() {
 		return VehicleUtils.getEgressTime(this);
 	}
-
 	/**
 	 * @deprecated please use {@see VehicleUtils} instead.
 	 */
@@ -86,7 +78,6 @@ public final class VehicleType implements Attributable {
 	public final void setAccessTime(double seconds) {
 		VehicleUtils.setAccessTime(this, seconds);
 	}
-
 	/**
 	 * @deprecated please use {@see VehicleUtils} instead.
 	 */
@@ -94,7 +85,6 @@ public final class VehicleType implements Attributable {
 	public final void setEgressTime(double seconds) {
 		VehicleUtils.setEgressTime(this, seconds);
 	}
-
 	/**
 	 * @deprecated please use {@see VehicleUtils} instead.
 	 */
@@ -102,7 +92,6 @@ public final class VehicleType implements Attributable {
 	public final VehicleUtils.DoorOperationMode getDoorOperationMode() {
 		return VehicleUtils.getDoorOperationMode( this ) ;
 	}
-
 	/**
 	 * @deprecated please use {@see VehicleUtils} instead.
 	 */
@@ -110,97 +99,83 @@ public final class VehicleType implements Attributable {
 	public final void setDoorOperationMode( VehicleUtils.DoorOperationMode mode ) {
 		VehicleUtils.setDoorOperationMode( this, mode ) ;
 	}
-
 	public final double getPcuEquivalents() {
 		return pcuEquivalents;
 	}
-
-	public final void setPcuEquivalents(double pcuEquivalents) {
+	public final VehicleType setPcuEquivalents( double pcuEquivalents ) {
 		this.pcuEquivalents = pcuEquivalents;
+		return this;
 	}
-
 	public final double getFlowEfficiencyFactor() {
 		return flowEfficiencyFactor;
 	}
-
-	public final void setFlowEfficiencyFactor(double flowEfficiencyFactor) {
+	public final VehicleType setFlowEfficiencyFactor( double flowEfficiencyFactor ) {
 		this.flowEfficiencyFactor = flowEfficiencyFactor;
+		return this;
 	}
-
 	@Override
 	public final  Attributes getAttributes() {
 		return attributes ;
 	}
-
-//	public final void setCapacity(VehicleCapacity capacity) {
-//		this.capacity = capacity;
-//	}
-
-	public final void setDescription(String desc) {
+	public final VehicleType setDescription( String desc ) {
 		this.description = desc;
+		return this;
 	}
-
-//	public final void setEngineInformation( EngineInformation engineInformation ) {
-//		this.engineInformation = engineInformation;
-//	}
-
-//	/**
-//	 * @deprecated please use {@see VehicleUtils} -> setHBEFATechology instead.
-//	 */
-//	@Deprecated
-//	public final void setFreightCapacity(FreightCapacity freightCapacity) {
-//		this.capacity.setFreightCapacity( freightCapacity );
-//	}
-
-//	public final void setCostInformation(CostInformation costInformation) {
-//		this.costInformation = costInformation;
-//	}
-
-	public final void setLength(double length) {
+	public final VehicleType setLength( double length ) {
 		this.length = length;
+		return this;
 	}
-
-	public final void setMaximumVelocity(double meterPerSecond) {
+	public final VehicleType setMaximumVelocity( double meterPerSecond ) {
 		this.maxVelocity = meterPerSecond;
+		return this;
 	}
-
-	public final void setWidth(double width) {
+	public final VehicleType setWidth( double width ) {
 		this.width = width;
+		return this;
 	}
-
 	public final double getWidth() {
 		return width;
 	}
-
 	public final double getMaximumVelocity() {
 		return maxVelocity;
 	}
-
 	public final double getLength() {
 		return length;
 	}
-
 	public final EngineInformation getEngineInformation() {
 		return engineInformation;
 	}
-
 	public final CostInformation getCostInformation() {
 		return costInformation;
 	}
-
-//	/**
-//	 * @deprecated please use {@see VehicleUtils} -> getHBEFATechology instead.
-//	 */
-//	@Deprecated
-//	public final FreightCapacity getFreightCapacity() {
-//		return this.capacity.getFreightCapacity();
-//	}
-
     public final String getNetworkMode() {
         return networkMode;
     }
-
     public final void setNetworkMode(String networkMode) {
         this.networkMode = networkMode;
     }
+	@Deprecated // refactoring device, please inline
+	public VehicleType setCapacityWeightInTons( int i ){
+		this.getCapacity().setWeightInTons( i ) ;
+		return this ;
+	}
+	@Deprecated // refactoring device, please inline
+	public VehicleType setFixCost( double perDay ){
+		this.getCostInformation().setFixedCost( perDay ) ;
+		return this ;
+	}
+	@Deprecated // refactoring device, please inline
+	public VehicleType setCostPerDistanceUnit( double perMeter ){
+		this.getCostInformation().setCostsPerMeter( perMeter ) ;
+		return this ;
+	}
+	@Deprecated // refactoring device, please inline
+	public VehicleType setCostPerTimeUnit( double perSecond ){
+		this.getCostInformation().setCostsPerSecond( perSecond ) ;
+		return this ;
+	}
+	@Deprecated // refactoring device, please delete
+	public VehicleType build(){
+		return this;
+	}
 }

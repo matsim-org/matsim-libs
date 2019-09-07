@@ -1,10 +1,9 @@
 package org.matsim.contrib.freight.carrier;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.vehicles.CostInformation;
 import org.matsim.vehicles.EngineInformation;
-import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,8 +45,8 @@ public class CarrierUtils{
 		 * @param typeId
 		 * @return a type builder
 		 */
-		public static CarrierVehicleTypeBuilder newInstance( Id<VehicleType> typeId ){
-			return new CarrierVehicleTypeBuilder(typeId);
+		public static VehicleType newInstance( Id<VehicleType> typeId ){
+			return VehicleUtils.getFactory().createVehicleType( typeId ) ;
 		}
 
 		/**
@@ -56,17 +55,14 @@ public class CarrierUtils{
 		 * Can be used for create a new, modified CarrierVehicleType basing on an existing one.
 		 * Values can be changed within the builder afterwards.
 		 *
-		 * @param carrierVehicleType
 		 * @param typeId
+		 * @param carrierVehicleType
 		 * @return a type builder
 		 */
-		public static CarrierVehicleTypeBuilder newInstance( Id<VehicleType> typeId, VehicleType carrierVehicleType ){
-			return new CarrierVehicleTypeBuilder(typeId)
-					.setDescription(carrierVehicleType.getDescription())
-					.setEngineInformation(carrierVehicleType.getEngineInformation())
-					.setCapacityWeightInTons( carrierVehicleType.getCapacity().getWeightInTons() )
-					.setMaxVelocity(carrierVehicleType.getMaximumVelocity())
-					.setVehicleCostInformation(carrierVehicleType.getCostInformation());
+		public static VehicleType newInstance( Id<VehicleType> typeId, VehicleType carrierVehicleType ){
+			VehicleType newVehicleType = VehicleUtils.getFactory().createVehicleType( typeId );
+			VehicleUtils.copyFromTo( carrierVehicleType, newVehicleType );
+			return newVehicleType ;
 		}
 
 		Id<VehicleType> typeId;
@@ -153,7 +149,7 @@ public class CarrierUtils{
 		public VehicleType build(){
 			VehicleType vehicleType = new VehicleType( this.typeId );
 //			vehicleType.setCostInformation(new CostInformation(this.fix, this.perDistanceUnit, this.perTimeUnit) );
-			vehicleType.getCostInformation().setFixedCosts( this.fix );
+			vehicleType.getCostInformation().setFixedCost( this.fix );
 			vehicleType.getCostInformation().setCostsPerMeter( this.perDistanceUnit );
 			vehicleType.getCostInformation().setCostsPerSecond( this.perTimeUnit );
 //			if(this.engineInfo != null) vehicleType.setEngineInformation(this.engineInfo);
@@ -173,33 +169,33 @@ public class CarrierUtils{
 			return vehicleType ;
 		}
 
-		/**
-		 * Sets {@link CostInformation}
-		 *
-		 * <p>The defaults are [fix=0.0][perDistanceUnit=1.0][perTimeUnit=0.0].
-		 *
-		 * @param info
-		 * @return this builder
-		 */
-		public CarrierVehicleTypeBuilder setVehicleCostInformation( CostInformation info ) {
-			fix = info.getFixedCosts();
-			perDistanceUnit = info.getCostsPerMeter();
-			perTimeUnit = info.getCostsPerSecond();
-			return this;
-		}
+//		/**
+//		 * Sets {@link CostInformation}
+//		 *
+//		 * <p>The defaults are [fix=0.0][perDistanceUnit=1.0][perTimeUnit=0.0].
+//		 *
+//		 * @param info
+//		 * @return this builder
+//		 */
+//		public CarrierVehicleTypeBuilder setVehicleCostInformation( CostInformation info ) {
+//			fix = info.getFixedCosts();
+//			perDistanceUnit = info.getCostsPerMeter();
+//			perTimeUnit = info.getCostsPerSecond();
+//			return this;
+//		}
 
-		/**
-		 * Sets {@link EngineInformation}
-		 *
-		 * @param engineInfo
-		 * @return this builder
-		 */
-		public CarrierVehicleTypeBuilder setEngineInformation( EngineInformation engineInfo ) {
-			this.engineInfo = engineInfo;
-			return this;
-		}
+//		/**
+//		 * Sets {@link EngineInformation}
+//		 *
+//		 * @param engineInfo
+//		 * @return this builder
+//		 */
+//		public CarrierVehicleTypeBuilder setEngineInformation( EngineInformation engineInfo ) {
+//			this.engineInfo = engineInfo;
+//			return this;
+//		}
 
-		public CarrierVehicleTypeBuilder setMaxVelocity( double veloInMeterPerSeconds ) {
+		public CarrierVehicleTypeBuilder setMaximumVelocity( double veloInMeterPerSeconds ) {
 			this.maxVeloInMeterPerSeconds  = veloInMeterPerSeconds;
 			return this;
 		}

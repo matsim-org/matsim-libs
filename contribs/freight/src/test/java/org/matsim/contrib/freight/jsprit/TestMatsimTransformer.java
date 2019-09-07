@@ -32,9 +32,8 @@ import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.*;
 import org.matsim.vehicles.EngineInformation.FuelType;
-import org.matsim.vehicles.EngineInformation;
-import org.matsim.vehicles.VehicleType;
 
 public class TestMatsimTransformer {
 	
@@ -347,19 +346,16 @@ public class TestMatsimTransformer {
 	}
 
 	private VehicleType getMatsimVehicleType() {
-		EngineInformation engineInformation = new EngineInformation();
-		engineInformation.setFuelType( FuelType.diesel );
-		engineInformation.setFuelConsumption( (double) 15 );
-		VehicleType matsimType = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("matsimType", org.matsim.vehicles.VehicleType.class ) )
-												   .setCapacityWeightInTons(50 )
-												   .setCostPerDistanceUnit(10.0)
-												   .setCostPerTimeUnit(5.0)
-												   .setFixCost(100.0)
-												   .setEngineInformation(
-													     engineInformation )
-												   .setMaxVelocity(13.8)
-												   .build();
-		return matsimType;
+//		EngineInformation engineInformation = new EngineInformation();
+//		engineInformation.setFuelType( FuelType.diesel );
+//		engineInformation.setFuelConsumption( (double) 15 );
+//		CarrierUtils.CarrierVehicleTypeBuilder builder = CarrierUtils.CarrierVehicleTypeBuilder.newInstance( Id.create( "matsimType", VehicleType.class ) )
+		VehicleType vehicleType = VehicleUtils.getFactory().createVehicleType( Id.create( "matsimType", VehicleType.class ) ).setMaximumVelocity( 13.8 ) ;
+		vehicleType.getCapacity().setWeightInTons( 50 );
+		vehicleType.getCostInformation().setCostsPerMeter( 10.0 ).setCostsPerSecond( 5.0 ).setFixedCost( 100. );
+		vehicleType.getEngineInformation().setFuelType( FuelType.diesel ) ;
+		vehicleType.getEngineInformation().setFuelConsumption( 15. );
+		return vehicleType;
 	}
 
 	private CarrierShipment getMatsimShipment(String id, String from, String to, int size) {

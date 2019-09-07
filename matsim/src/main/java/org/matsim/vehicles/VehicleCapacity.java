@@ -36,58 +36,39 @@ public final class VehicleCapacity implements Attributable {
 	private Integer standingRoom = 0 ;
 	private Double volumeInCubicMeters = Double.POSITIVE_INFINITY ;
 	private Double weightInTons = Double.POSITIVE_INFINITY ;
-//	private FreightCapacity freightCap = null;
 	private Attributes attributes = new Attributes() ;
 
 	/* package-private */ VehicleCapacity(){
 	}
-
 	public Integer getSeats() {
 		return seats;
 	}
-
 	public Integer getStandingRoom() {
 		return standingRoom;
 	}
-
 	public VehicleCapacity setSeats( Integer seats ) {
 		this.seats = seats;
 		return this ;
 	}
-
 	public VehicleCapacity setStandingRoom( Integer standingRoom ) {
 		this.standingRoom = standingRoom;
 		return this ;
 	}
-
 	public Double getVolumeInCubicMeters() {
 		return volumeInCubicMeters;
 	}
-
 	public VehicleCapacity setVolumeInCubicMeters( double volumeInCubicMeters ) {
 		this.volumeInCubicMeters = volumeInCubicMeters;
 		return this ;
 	}
-
 	public Double getWeightInTons() {
 		return weightInTons;
 	}
-
 	public VehicleCapacity setWeightInTons( double weightInTons ) {
 		this.weightInTons = weightInTons;
 		return this ;
 	}
-
 	public Attributes getAttributes(){
 		return this.attributes ;
 	}
-
-//	public void setFreightCapacity(FreightCapacity freightCapacity) {
-//		this.freightCap = freightCapacity;
-//	}
-//	public FreightCapacity getFreightCapacity() {
-//		return freightCap;
-//	}
-	// (these are no longer there; use capacity.get/setVolume/Weight directly, or use getAttributes. kai/kai, aug'19)
-
 }

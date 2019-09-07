@@ -36,13 +36,11 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.vehicles.EngineInformation;
-import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.*;
 
 import java.net.URL;
 import java.util.Collection;
 import org.apache.log4j.Logger;
-import org.matsim.vehicles.VehicleType;
 
 
 /**
@@ -80,33 +78,31 @@ public class FixedCostsTest extends MatsimTestCase {
 		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
 
 		//only variable costs (per distance), no fixed costs
-		EngineInformation engineInformation1 = new EngineInformation();
-		engineInformation1.setFuelType( EngineInformation.FuelType.diesel );
-		engineInformation1.setFuelConsumption( 0.015 );
-		VehicleType carrierVehType_A = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("gridType_A", org.matsim.vehicles.VehicleType.class ) )
-													   .setCapacityWeightInTons(1 )
-													   .setMaxVelocity(10)
-													   .setCostPerDistanceUnit(0.001)      //1 EUR per km
-													   .setCostPerTimeUnit(0.0)
-													   .setFixCost(0)
-													   .setEngineInformation( engineInformation1 )
-													   .build();
-		vehicleTypes.getVehicleTypes().put(carrierVehType_A.getId(), carrierVehType_A);
+		final Id<VehicleType> vehicleTypeId = Id.create( "gridType_A", VehicleType.class );
+		VehicleType carrierVehType_A = VehicleUtils.getFactory().createVehicleType( vehicleTypeId );;
+		{
+			EngineInformation engineInformation1 = carrierVehType_A.getEngineInformation();
+			engineInformation1.setFuelType( EngineInformation.FuelType.diesel );
+			engineInformation1.setFuelConsumption( 0.015 );
+			carrierVehType_A.getCapacity().setWeightInTons( 1. );
+			carrierVehType_A.getCostInformation().setFixedCost( 0. ).setCostsPerMeter( 0.001 ).setCostsPerSecond( 0.0 );
+			carrierVehType_A.setMaximumVelocity( 10 );
+			vehicleTypes.getVehicleTypes().put( carrierVehType_A.getId(), carrierVehType_A );
+		}
 		CarrierVehicle carrierVehicle_A = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle_A", Vehicle.class), Id.createLinkId("i(1,0)")).setEarliestStart(0.0).setLatestEnd(36000.0).setTypeId(carrierVehType_A.getId()).build();
 
 		//only fixed costs, no variable costs
-		EngineInformation engineInformation = new EngineInformation();
-		engineInformation.setFuelType( EngineInformation.FuelType.diesel );
-		engineInformation.setFuelConsumption( 0.015 );
-		VehicleType carrierVehType_B = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("gridType_B", org.matsim.vehicles.VehicleType.class ) )
-													   .setCapacityWeightInTons(1 )
-													   .setMaxVelocity(10)
-													   .setCostPerDistanceUnit(0.00001)
-													   .setCostPerTimeUnit(0.0)
-													   .setFixCost(10)
-													   .setEngineInformation( engineInformation )
-													   .build();
-		vehicleTypes.getVehicleTypes().put(carrierVehType_B.getId(), carrierVehType_B);
+		final Id<VehicleType> vehicleTypeId1 = Id.create( "gridType_B", VehicleType.class );
+		VehicleType carrierVehType_B = VehicleUtils.getFactory().createVehicleType( vehicleTypeId1 );
+		{
+			EngineInformation engineInformation = carrierVehType_B.getEngineInformation();
+			engineInformation.setFuelType( EngineInformation.FuelType.diesel );
+			engineInformation.setFuelConsumption( 0.015 );
+			carrierVehType_B.getCapacity().setWeightInTons( 1. );
+			carrierVehType_B.getCostInformation().setFixedCost( 10. ).setCostsPerMeter( 0.00001 ).setCostsPerSecond( 0. ) ;
+			carrierVehType_B.setMaximumVelocity( 10. );
+			vehicleTypes.getVehicleTypes().put( carrierVehType_B.getId(), carrierVehType_B );
+		}
 		CarrierVehicle carrierVehicle_B = CarrierVehicle.Builder.newInstance(Id.create("gridVehicle_B", Vehicle.class), Id.createLinkId("i(1,0)")).setEarliestStart(0.0).setLatestEnd(36000.0).setTypeId(carrierVehType_B.getId()).build();
 
 		//carrier1: only vehicles of Type A (no fixed costs, variable costs: 1 EUR/km)

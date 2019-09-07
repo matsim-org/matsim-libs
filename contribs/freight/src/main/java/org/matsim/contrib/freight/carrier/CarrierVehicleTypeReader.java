@@ -5,6 +5,7 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.vehicles.*;
 import org.matsim.vehicles.EngineInformation.FuelType;
 import org.xml.sax.Attributes;
@@ -20,22 +21,8 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 	private static Logger logger = Logger.getLogger(CarrierVehicleTypeReader.class);
 	
 	private CarrierVehicleTypes carrierVehicleTypes;
-
-	private Id<org.matsim.vehicles.VehicleType> currentTypeId;
-
-	private String currentDescription;
-
-	
-
-//	private Integer currentCap;
-
-	private CostInformation currentVehicleCosts;
-
-	private EngineInformation currentEngineInfo;
-
-	private String currentCapacity;
-	
-	private String maxVelo;
+	private Attributable currentAttributable ;
+	private VehicleType currentType;
 
 	public CarrierVehicleTypeReader(CarrierVehicleTypes carrierVehicleTypes) {
 		super();
@@ -65,17 +52,20 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if(name.equals("vehicleType")){
-			this.currentTypeId = Id.create(atts.getValue("id"), org.matsim.vehicles.VehicleType.class );
+			Id<VehicleType> currentTypeId = Id.create( atts.getValue( "id" ), VehicleType.class );
+			this.currentType = VehicleUtils.getFactory().createVehicleType( currentTypeId ) ;
 		}
 		if(name.equals("allowableWeight")){
 			String weight = atts.getValue("weight");
-			parseDouble(weight);
+			Double.parseDouble( weight );
+			// yyyyyy what is this?  kai, sep'19
 		}
 		if(name.equals("engineInformation")){
-			EngineInformation engineInfo = new EngineInformation();
-			engineInfo.setFuelConsumption(parseDouble(atts.getValue("gasConsumption")));
-			engineInfo.setFuelType(parseFuelType(atts.getValue("fuelType")));
-			this.currentEngineInfo = engineInfo;
+//			EngineInformation engineInfo = new EngineInformation();
+			EngineInformation engineInfo = this.currentType.getEngineInformation() ;
+			engineInfo.setFuelConsumption( Double.parseDouble( atts.getValue( "gasConsumption" ) ) );
+			engineInfo.setFuelType( FuelType.valueOf( atts.getValue( "fuelType" ) ) );
+//			this.currentEngineInfo = engineInfo;
 		}
 		
 		if(name.equals("costInformation")){
@@ -84,63 +74,52 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 			String perMeter = atts.getValue("perMeter");
 			String perSecond = atts.getValue("perSecond");
 			if(fix == null || perMeter == null || perSecond == null) throw new IllegalStateException("cannot read costInformation correctly. probably the paramName was written wrongly");
-			CostInformation vehicleCosts = new CostInformation();
-			vehicleCosts.setFixedCosts(parseDouble(fix ));
-			vehicleCosts.setCostsPerMeter(parseDouble(perMeter) );
-			vehicleCosts.setCostsPerSecond(parseDouble(perSecond ));
-			this.currentVehicleCosts = vehicleCosts;
+//			CostInformation vehicleCosts = new CostInformation();
+			CostInformation vehicleCosts = this.currentType.getCostInformation();;
+			vehicleCosts.setFixedCost( Double.parseDouble( fix ) );
+			vehicleCosts.setCostsPerMeter( Double.parseDouble( perMeter ) );
+			vehicleCosts.setCostsPerSecond( Double.parseDouble( perSecond ) );
+//			this.currentVehicleCosts = vehicleCosts;
 		}
-	}
-
-	private FuelType parseFuelType(String fuelType) {
-		if(fuelType.equals(FuelType.diesel.toString())){
-			return FuelType.diesel;
-		}
-		else if(fuelType.equals(FuelType.electricity.toString())){
-			return FuelType.electricity;
-		}
-		else if(fuelType.equals(FuelType.gasoline.toString())){
-			return FuelType.gasoline;
-		}
-		throw new IllegalStateException("fuelType " + fuelType + " is not supported");
-	}
-
-	private Double parseDouble(String weight) {
-		return Double.parseDouble(weight);
 	}
 
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
 		if(name.equals("description")){
-			this.currentDescription = content;
+//			this.currentDescription = content;
+			this.currentType.setDescription( content );
 		}
 		if(name.equals("capacity")){
-			this.currentCapacity = content;
+//			this.currentCapacity = content;
+			this.currentType.getCapacity().setWeightInTons( Double.parseDouble( content ) ) ;
+			// yyyyyy note that this is interpretation!!
 		}
 		if(name.equals("maxVelocity")){
-			this.maxVelo = content;
+//			this.maxVelo = content;
+			this.currentType.setMaximumVelocity( Double.parseDouble( content ) );
 		}
 		if(name.equals("vehicleType")){
-			CarrierUtils.CarrierVehicleTypeBuilder typeBuilder = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(currentTypeId );
-			if(currentDescription != null) typeBuilder.setDescription(currentDescription);
+//			CarrierUtils.CarrierVehicleTypeBuilder typeBuilder = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(currentTypeId );
+//			if(currentDescription != null) typeBuilder.setDescription(currentDescription);
 //			if(currentWeight != null) vehType.setAllowableTotalWeight(currentWeight);
 //			if(currentCap != null) vehType.setFreightCapacity(currentCap);
-			if(currentVehicleCosts != null) typeBuilder.setVehicleCostInformation(currentVehicleCosts);
-			if(currentEngineInfo != null) typeBuilder.setEngineInformation(currentEngineInfo);
-			if(currentCapacity != null) typeBuilder.setCapacityWeightInTons(Double.parseDouble(currentCapacity ) );
-			if(maxVelo != null) typeBuilder.setMaxVelocity(Double.parseDouble(maxVelo));
-			VehicleType vehType = typeBuilder.build();
-			carrierVehicleTypes.getVehicleTypes().put(vehType.getId(), vehType);
+//			if(currentVehicleCosts != null) typeBuilder.setVehicleCostInformation(currentVehicleCosts);
+//			if(currentEngineInfo != null) typeBuilder.setEngineInformation(currentEngineInfo);
+//			if(currentCapacity != null) typeBuilder.setCapacityWeightInTons(Double.parseDouble(currentCapacity ) );
+//			if(maxVelo != null) typeBuilder.setMaxVelocity(Double.parseDouble(maxVelo));
+//			VehicleType vehType = typeBuilder.build();
+			carrierVehicleTypes.getVehicleTypes().put(this.currentType.getId(), currentType );
 			reset();
 		}
 		
 	}
 
 	private void reset() {
-		currentTypeId = null;
-		currentDescription = null;
-		currentVehicleCosts = null;
-		currentEngineInfo = null;
+//		currentTypeId = null;
+//		currentDescription = null;
+//		currentVehicleCosts = null;
+//		currentEngineInfo = null;
+		currentType = null ;
 	}
 
 }

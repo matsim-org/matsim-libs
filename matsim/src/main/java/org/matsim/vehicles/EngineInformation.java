@@ -28,32 +28,11 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 public final class EngineInformation implements Attributable {
 	// yyyy maybe these subtypes should be immutable?
 
-//	private String fuelType;
-//	private double fuelConsumption;
 	private Attributes attributes = new Attributes() ;
 
-//	/**
-//	 *
-//	 * @deprecated litersPerMeter were not longer set here.
-//	 * Please use EngineInformationImpl(FuelType fueltype) instead if you want to set the FuelType only (recommended)
-//	 * Please use VehicleUtils.setEngineInformation(...) instead if you also want to set FuelType and FuelConsumption (no longer recommended,
-//	 * because we want to have the FuelConsumption coming from the emissions contrib). This FuelConsumption here is only a very rough estimation
-//	 * without traffic condition.
-//	 */
-//	@Deprecated private EngineInformation( FuelType fueltype , double literPerMeter ) {
-//		this.setFuelType(fueltype);
-//		this.setFuelConsumption(literPerMeter);
-//	}
-//	@Deprecated
-//	public EngineInformation( FuelType fueltype ) {
-//		this.setFuelType(fueltype);
-//		this.setFuelConsumption(Double.NaN);
-//	}
-
-	public EngineInformation() {
+	/* package-private */ EngineInformation() {
 		// yyyy leaving this public for the time being because otherwise the carrier vehicle type reading logic needs to change completely.  kai, sep'19
 	}
-
 	@Deprecated
 	public FuelType getFuelType() {
 		return VehicleUtils.getFuelType( this ) ;
@@ -63,11 +42,11 @@ public final class EngineInformation implements Attributable {
 		return VehicleUtils.getFuelConsumption(this);
 	}
 	@Deprecated
-	public void setFuelType(FuelType fueltype) {
+	public void setFuelType( FuelType fueltype ) {
 		VehicleUtils.setFuelType(this, fueltype);
 	}
 	@Deprecated
-	public void setFuelConsumption(double literPerMeter) {
+	public void setFuelConsumption( double literPerMeter ) {
 		VehicleUtils.setFuelConsumption(this, literPerMeter);
 	}
 	public Attributes getAttributes(){

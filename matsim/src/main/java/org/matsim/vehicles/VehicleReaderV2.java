@@ -114,7 +114,7 @@ final class VehicleReaderV2 extends MatsimXmlParser{
 			case VehicleSchemaV2Names.COSTINFORMATION:
 //				this.currentCostInformation = new CostInformation();
 				if (atts.getValue( VehicleSchemaV2Names.FIXEDCOSTSPERDAY ) != null) {
-					this.currentVehType.getCostInformation().setFixedCosts(Double.parseDouble(atts.getValue(VehicleSchemaV2Names.FIXEDCOSTSPERDAY)));
+					this.currentVehType.getCostInformation().setFixedCost(Double.parseDouble(atts.getValue(VehicleSchemaV2Names.FIXEDCOSTSPERDAY ) ) );
 				}
 				if (atts.getValue( VehicleSchemaV2Names.COSTSPERMETER) != null) {
 				this.currentVehType.getCostInformation().setCostsPerMeter(Double.parseDouble( atts.getValue( VehicleSchemaV2Names.COSTSPERMETER ) ));
