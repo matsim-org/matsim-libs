@@ -48,6 +48,7 @@ import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
 import com.graphhopper.jsprit.core.util.Coordinate;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 
 /**
@@ -251,7 +252,7 @@ public class MatsimJspritFactory {
 	 * @return CarrierVehicleType
 	 */
 	static VehicleType createCarrierVehicleType( com.graphhopper.jsprit.core.problem.vehicle.VehicleType type ){
-		VehicleType typeBuilder = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create(type.getTypeId(), VehicleType.class ) );
+		VehicleType typeBuilder = VehicleUtils.getFactory().createVehicleType( Id.create( type.getTypeId(), VehicleType.class ) );
 		typeBuilder.setCapacityWeightInTons(type.getCapacityDimensions().get(0 ) );
 		typeBuilder.setCostPerDistanceUnit(type.getVehicleCostParams().perDistanceUnit).setCostPerTimeUnit(type.getVehicleCostParams().perTransportTimeUnit)
 				.setFixCost(type.getVehicleCostParams().fix);

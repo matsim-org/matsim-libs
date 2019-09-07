@@ -11,6 +11,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -165,7 +166,7 @@ final class FreightScenarioCreator {
     }
 
     private static VehicleType createLightType() {
-        VehicleType typeBuilder = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("small", VehicleType.class ) );
+	    VehicleType typeBuilder = VehicleUtils.getFactory().createVehicleType( Id.create( "small", VehicleType.class ) );
         typeBuilder.getCapacity().setWeightInTons( 6. ) ;
         typeBuilder.getCostInformation().setFixedCost(80.0);
         typeBuilder.getCostInformation().setCostsPerMeter( 0.00047);
@@ -182,7 +183,7 @@ final class FreightScenarioCreator {
     }
 
     private static VehicleType createHeavyType() {
-        VehicleType typeBuilder = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("heavy", VehicleType.class ) );
+	    VehicleType typeBuilder = VehicleUtils.getFactory().createVehicleType( Id.create( "heavy", VehicleType.class ) );
         typeBuilder.setCapacityWeightInTons(25 );
         typeBuilder.setFixCost(130.0);
         typeBuilder.setCostPerDistanceUnit(0.00077);

@@ -17,6 +17,7 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 import org.xml.sax.Attributes;
 
 /**
@@ -179,7 +180,7 @@ public class CarrierPlanReaderV1 extends MatsimXmlParser {
 				CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance( Id.create( vId, Vehicle.class ),
 					  Id.create( linkId, Link.class ) );
 				vehicleBuilder.setTypeId( Id.create( typeId, VehicleType.class ) );
-				vehicleBuilder.setType( CarrierUtils.CarrierVehicleTypeBuilder.newInstance( Id.create( typeId, VehicleType.class ) ).build() );
+				vehicleBuilder.setType( VehicleUtils.getFactory().createVehicleType( Id.create( typeId, VehicleType.class ) ).build() );
 				if( startTime != null ) vehicleBuilder.setEarliestStart( getDouble( startTime ) );
 				if( endTime != null ) vehicleBuilder.setLatestEnd( getDouble( endTime ) );
 				CarrierVehicle vehicle = vehicleBuilder.build();
