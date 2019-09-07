@@ -39,8 +39,7 @@ public final class VehicleCapacity implements Attributable {
 //	private FreightCapacity freightCap = null;
 	private Attributes attributes = new Attributes() ;
 
-	public VehicleCapacity(){
-		// yyyy leaving this public for the time being because otherwise the carrier vehicle type reading logic needs to change completely.  kai, sep'19
+	/* package-private */ VehicleCapacity(){
 	}
 
 	public Integer getSeats() {

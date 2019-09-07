@@ -40,7 +40,7 @@ public final class VehicleType implements Attributable {
 	private CostInformation costInformation = new CostInformation() ;
 //	private FreightCapacity freightCapacity;
 	private String description;
-	private VehicleCapacity capacity = new VehicleCapacity();
+	private final VehicleCapacity capacity = new VehicleCapacity();
 	private String networkMode = TransportMode.car ;
 
 	private Id<VehicleType> id;
@@ -132,9 +132,9 @@ public final class VehicleType implements Attributable {
 		return attributes ;
 	}
 
-	public final void setCapacity(VehicleCapacity capacity) {
-		this.capacity = capacity;
-	}
+//	public final void setCapacity(VehicleCapacity capacity) {
+//		this.capacity = capacity;
+//	}
 
 	public final void setDescription(String desc) {
 		this.description = desc;

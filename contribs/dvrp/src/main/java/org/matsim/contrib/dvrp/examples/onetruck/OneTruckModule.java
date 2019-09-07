@@ -73,9 +73,10 @@ public class OneTruckModule extends AbstractDvrpModeModule {
 	private static VehicleType createTruckType() {
 		VehicleType truckType = VehicleUtils.getFactory().createVehicleType(Id.create("truckType", VehicleType.class));
 		truckType.setLength(15.);
-		VehicleCapacity vehicleCapacity = new VehicleCapacity();
-		vehicleCapacity.setSeats(1);
-		truckType.setCapacity(vehicleCapacity);
+//		VehicleCapacity vehicleCapacity = new VehicleCapacity();
+//		vehicleCapacity.setSeats(1);
+//		truckType.setCapacity(vehicleCapacity);
+		truckType.getCapacity().setSeats( 1 );
 		return truckType;
 	}
 
