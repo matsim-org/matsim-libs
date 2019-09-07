@@ -85,7 +85,7 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
-		if(name.equals("description")){
+		if(name.equals("description")){//Ca
 //			this.currentDescription = content;
 			this.currentType.setDescription( content );
 		}

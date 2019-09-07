@@ -28,7 +28,7 @@ public class CarrierPlanXmlReader implements MatsimReader {
 	private final CarriersPlanReader reader;
 
 	public CarrierPlanXmlReader( final Carriers carriers ) {
-        System.setProperty("matsim.preferLocalDtds", "true");       //can be removed later, once the carriersDefiniton_v2.0.xsd is online
+		System.setProperty("matsim.preferLocalDtds", "true");       //can be removed later, once the carriersDefiniton_v2.0.xsd is online
 		this.reader = new CarriersPlanReader( carriers ) ;
 	}
 
@@ -38,7 +38,7 @@ public class CarrierPlanXmlReader implements MatsimReader {
 			reader.readFile( filename );
 		} catch (Exception e) {
 			log.warn("### Exception found while trying to read CarrierPlan: Message: " + e.getMessage() + " ; cause: " + e.getCause() + " ; class " + e.getClass());
-			if (e.getCause().getMessage().contains("cvc-elt.1.a")) { // "Cannot find the declaration of element" -> exception comes most probably, because no validation information was found
+			if (e.getCause().getMessage().contains("cvc-elt.1.a")) { // "Cannot find the declaration of element" -> exception comes most probably because no validation information was found
 					log.warn("read with validation = true failed. Try it again without validation... filename: " + filename);
 					reader.setValidating(false);
 					reader.readFile(filename);
@@ -53,12 +53,13 @@ public class CarrierPlanXmlReader implements MatsimReader {
 			reader.readURL(url);
 		}  catch (Exception e) {
 			log.warn("### Exception found while trying to read CarrierPlan: Message: " + e.getMessage() + " ; cause: " + e.getCause() + " ; class " + e.getClass());
-			if (e.getCause().getMessage().contains("cvc-elt.1.a")) { // "Cannot find the declaration of element" -> exception comes most probably, because no validation information was found
+			if (e.getCause().getMessage().contains("cvc-elt.1.a")) { // "Cannot find the declaration of element" -> exception comes most probably because no validation information was found
 				log.warn("read with validation = true failed. Try it again without validation... url: " + url.toString());
 			reader.setValidating(false);
 			reader.readURL(url);
 			} else { //other problem: e.g. validation does not work, because of missing validation file.
-				throw  e;}
+				throw  e;
+			}
 		}
 	}
 
@@ -67,7 +68,7 @@ public class CarrierPlanXmlReader implements MatsimReader {
 			reader.parse( inputStream ) ;
 		} catch (Exception e)
 		{log.warn("### Exception found while trying to read CarrierPlan: Message: " + e.getMessage() + " ; cause: " + e.getCause() + " ; class " + e.getClass());
-			if (e.getCause().getMessage().contains("cvc-elt.1.a")) { // "Cannot find the declaration of element" -> exception comes most probably, because no validation information was found
+			if (e.getCause().getMessage().contains("cvc-elt.1.a")) { // "Cannot find the declaration of element" -> exception comes most probably because no validation information was found
 				log.warn("read with validation = true failed. Try it again without validation... ");
 			reader.setValidating(false);
 			reader.parse(inputStream);
@@ -80,8 +81,6 @@ public class CarrierPlanXmlReader implements MatsimReader {
 		private final Carriers carriers;
 
 		private MatsimXmlParser delegate = null;
-
-		private Map<Class<?>, AttributeConverter<?>> converters = new HashMap<>();
 
 		CarriersPlanReader(Carriers carriers) {
 			this.carriers = carriers ;
@@ -103,8 +102,6 @@ public class CarrierPlanXmlReader implements MatsimReader {
 				} else if ( str.contains( "carriersDefinitions_v2.0.xsd" ) ) { //This is the current one - but no validation file existing, kmt aug19
 					log.warn("Found carriersDefinitions_v2.0.xsd. Using CarrierPlanReaderV2.");
 					delegate = new CarrierPlanXmlParserV2( carriers );
-//				} else if ( str.contains( "carriersDefinitons_v3.0.xsd" ) ) { //Not available yet
-//					delegate = new CarrierPlanXmlParserV3( carriers ) ;
 				} else {
 					throw new RuntimeException("no reader found for " + str ) ;
 				}
