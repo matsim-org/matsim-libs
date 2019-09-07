@@ -92,9 +92,9 @@ public class FreightUtilsIT {
 		VehicleType carrierVehType = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("gridType", org.matsim.vehicles.VehicleType.class ) )
 													 .setCapacityWeightInTons(3 )
 													 .setMaxVelocity(10)
-													 .setCostPerDistanceUnit(0.0001)
-													 .setCostPerTimeUnit(0.001)
-													 .setFixCost(130)
+													 .setCostPerMeter(0.0001 )
+													 .setCostPerSecond(0.001 )
+													 .setFixedCost(130 )
 													 .setEngineInformation(
 														   engineInformation )
 													 .build();

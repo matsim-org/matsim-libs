@@ -207,9 +207,9 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 			String fix = atts.getValue("fix");
 			String perMeter = atts.getValue("perMeter");
 			String perSecond = atts.getValue("perSecond");
-			if(fix != null) this.vehicleTypeBuilder.setFixCost(Double.parseDouble(fix));
-			if(perMeter != null) this.vehicleTypeBuilder.setCostPerDistanceUnit(Double.parseDouble(perMeter));
-			if(perSecond != null) this.vehicleTypeBuilder.setCostPerTimeUnit(Double.parseDouble(perSecond));
+			if(fix != null) this.vehicleTypeBuilder.setFixedCost(Double.parseDouble(fix ) );
+			if(perMeter != null) this.vehicleTypeBuilder.setCostPerMeter(Double.parseDouble(perMeter ) );
+			if(perSecond != null) this.vehicleTypeBuilder.setCostPerSecond(Double.parseDouble(perSecond ) );
 		}
 		
 		//vehicle

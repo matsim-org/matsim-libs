@@ -1,10 +1,7 @@
 package org.matsim.contrib.freight.carrier;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.vehicles.CostInformation;
-import org.matsim.vehicles.EngineInformation;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,48 +47,41 @@ public class CarrierUtils{
 			return new CarrierVehicleTypeBuilder(typeId);
 		}
 
-		/**
-		 * Returns a new instance of builder initialized with the typeId and the values the given from existing CarrierVehicleType.
-		 *
-		 * Can be used for create a new, modified CarrierVehicleType basing on an existing one.
-		 * Values can be changed within the builder afterwards.
-		 *
-		 * @param carrierVehicleType
-		 * @param typeId
-		 * @return a type builder
-		 */
-		public static CarrierVehicleTypeBuilder newInstance( Id<VehicleType> typeId, VehicleType carrierVehicleType ){
-			return new CarrierVehicleTypeBuilder(typeId)
-					.setDescription(carrierVehicleType.getDescription())
-					.setEngineInformation(carrierVehicleType.getEngineInformation())
-					.setCapacityWeightInTons( carrierVehicleType.getCapacity().getWeightInTons() )
-					.setMaxVelocity(carrierVehicleType.getMaximumVelocity())
-					.setVehicleCostInformation(carrierVehicleType.getCostInformation());
-		}
+//		/**
+//		 * Returns a new instance of builder initialized with the typeId and the values the given from existing CarrierVehicleType.
+//		 *
+//		 * Can be used for create a new, modified CarrierVehicleType basing on an existing one.
+//		 * Values can be changed within the builder afterwards.
+//		 *
+//		 * @param carrierVehicleType
+//		 * @param typeId
+//		 * @return a type builder
+//		 */
+//		public static CarrierVehicleTypeBuilder newInstance( Id<VehicleType> typeId, VehicleType carrierVehicleType ){
+//			return new CarrierVehicleTypeBuilder(typeId)
+//					.setDescription(carrierVehicleType.getDescription())
+//					.setEngineInformation(carrierVehicleType.getEngineInformation())
+//					.setCapacityWeightInTons( carrierVehicleType.getCapacity().getWeightInTons() )
+//					.setMaxVelocity(carrierVehicleType.getMaximumVelocity())
+//					.setVehicleCostInformation(carrierVehicleType.getCostInformation());
+//		}
 
-		Id<VehicleType> typeId;
-		double fix = 0.0;
-		double perDistanceUnit = 1.0;
-		double perTimeUnit = 0.0;
-		String description;
-		EngineInformation engineInfo;
-		double weightInTons = 0;
-		double maxVeloInMeterPerSeconds = Double.MAX_VALUE;
-
+		private final VehicleType vehicleType;
+		// since the implementation is no longer immutable, we can as well have the final object directly. kai, sep'19
 
 		private CarrierVehicleTypeBuilder( Id<VehicleType> typeId ){
-			this.typeId = typeId;
+			vehicleType = VehicleUtils.getFactory().createVehicleType( typeId ) ;
 		}
 
 		/**
 		 * Sets fixed costs of vehicle.
 		 *
 		 * <p>By default it is 0.
-		 * @param fix
+		 * @param perDay
 		 * @return
 		 */
-		public CarrierVehicleTypeBuilder setFixCost( double fix ){
-			this.fix = fix;
+		public CarrierVehicleTypeBuilder setFixedCost( double perDay ){
+			this.vehicleType.getCostInformation().setFixedCosts( perDay ) ;
 			return this;
 		}
 
@@ -100,11 +90,11 @@ public class CarrierUtils{
 		 *
 		 * <p>By default it is 1.
 		 *
-		 * @param perDistanceUnit
+		 * @param perMeter
 		 * @return
 		 */
-		public CarrierVehicleTypeBuilder setCostPerDistanceUnit( double perDistanceUnit ){
-			this.perDistanceUnit = perDistanceUnit;
+		public CarrierVehicleTypeBuilder setCostPerMeter( double perMeter ){
+			this.vehicleType.getCostInformation().setCostsPerMeter( perMeter ) ;
 			return this;
 		}
 
@@ -113,11 +103,11 @@ public class CarrierUtils{
 		 *
 		 * <p>By default it is 0.
 		 *
-		 * @param perTimeUnit
+		 * @param perSecond
 		 * @return
 		 */
-		public CarrierVehicleTypeBuilder setCostPerTimeUnit( double perTimeUnit ){
-			this.perTimeUnit = perTimeUnit;
+		public CarrierVehicleTypeBuilder setCostPerSecond( double perSecond ){
+			this.vehicleType.getCostInformation().setCostsPerSecond( perSecond ) ;
 			return this;
 		}
 
@@ -128,7 +118,7 @@ public class CarrierUtils{
 		 * @return this builder
 		 */
 		public CarrierVehicleTypeBuilder setDescription( String description ){
-			this.description = description;
+			this.vehicleType.setDescription( description );
 			return this;
 		}
 
@@ -141,7 +131,7 @@ public class CarrierUtils{
 		 * @return this builder
 		 */
 		public CarrierVehicleTypeBuilder setCapacityWeightInTons( double capacity ){
-			this.weightInTons = capacity;
+			this.vehicleType.getCapacity().setWeightInTons( capacity ) ;
 			return this;
 		}
 
@@ -151,56 +141,60 @@ public class CarrierUtils{
 		 * @return {@link VehicleType}
 		 */
 		public VehicleType build(){
-			VehicleType vehicleType = new VehicleType( this.typeId );
-//			vehicleType.setCostInformation(new CostInformation(this.fix, this.perDistanceUnit, this.perTimeUnit) );
-			vehicleType.getCostInformation().setFixedCosts( this.fix );
-			vehicleType.getCostInformation().setCostsPerMeter( this.perDistanceUnit );
-			vehicleType.getCostInformation().setCostsPerSecond( this.perTimeUnit );
-//			if(this.engineInfo != null) vehicleType.setEngineInformation(this.engineInfo);
-			if ( this.engineInfo != null ) {
-				for( Map.Entry<String, Object> entry : this.engineInfo.getAttributes().getAsMap().entrySet() ){
-					vehicleType.getEngineInformation().getAttributes().putAttribute( entry.getKey(), entry.getValue() ) ;
-				}
-			}
-			if(this.description != null) vehicleType.setDescription(this.description);
-
-//		capacity = builder.capacity;
-//			VehicleCapacity aCapacity = new VehicleCapacity() ;
-			vehicleType.getCapacity().setWeightInTons( this.weightInTons );
-//			vehicleType.setCapacity( aCapacity );
-
-			vehicleType.setMaximumVelocity(this.maxVeloInMeterPerSeconds);
-			return vehicleType ;
+//			VehicleType vehicleType = new VehicleType( this.typeId );
+////			vehicleType.setCostInformation(new CostInformation(this.fix, this.perDistanceUnit, this.perTimeUnit) );
+//			vehicleType.getCostInformation().setFixedCosts( this.fix );
+//			vehicleType.getCostInformation().setCostsPerMeter( this.perDistanceUnit );
+//			vehicleType.getCostInformation().setCostsPerSecond( this.perTimeUnit );
+////			if(this.engineInfo != null) vehicleType.setEngineInformation(this.engineInfo);
+//			if ( this.engineInfo != null ) {
+//				for( Map.Entry<String, Object> entry : this.engineInfo.getAttributes().getAsMap().entrySet() ){
+//					vehicleType.getEngineInformation().getAttributes().putAttribute( entry.getKey(), entry.getValue() ) ;
+//				}
+//			}
+//			if(this.description != null) vehicleType.setDescription(this.description);
+//
+////		capacity = builder.capacity;
+////			VehicleCapacity aCapacity = new VehicleCapacity() ;
+//			vehicleType.getCapacity().setWeightInTons( this.weightInTons );
+////			vehicleType.setCapacity( aCapacity );
+//
+//			vehicleType.setMaximumVelocity(this.maxVeloInMeterPerSeconds);
+//			return vehicleType ;
+			return this.vehicleType ;
 		}
 
-		/**
-		 * Sets {@link CostInformation}
-		 *
-		 * <p>The defaults are [fix=0.0][perDistanceUnit=1.0][perTimeUnit=0.0].
-		 *
-		 * @param info
-		 * @return this builder
-		 */
-		public CarrierVehicleTypeBuilder setVehicleCostInformation( CostInformation info ) {
-			fix = info.getFixedCosts();
-			perDistanceUnit = info.getCostsPerMeter();
-			perTimeUnit = info.getCostsPerSecond();
-			return this;
-		}
+//		/**
+//		 * Sets {@link CostInformation}
+//		 *
+//		 * <p>The defaults are [fix=0.0][perDistanceUnit=1.0][perTimeUnit=0.0].
+//		 *
+//		 * @param info
+//		 * @return this builder
+//		 */
+//		public CarrierVehicleTypeBuilder setVehicleCostInformation( CostInformation info ) {
+//			fix = info.getFixedCosts();
+//			perDistanceUnit = info.getCostsPerMeter();
+//			perTimeUnit = info.getCostsPerSecond();
+//			return this;
+//		}
 
-		/**
-		 * Sets {@link EngineInformation}
-		 *
-		 * @param engineInfo
-		 * @return this builder
-		 */
-		public CarrierVehicleTypeBuilder setEngineInformation( EngineInformation engineInfo ) {
-			this.engineInfo = engineInfo;
-			return this;
+//		/**
+//		 * Sets {@link EngineInformation}
+//		 *
+//		 * @param engineInfo
+//		 * @return this builder
+//		 */
+//		public CarrierVehicleTypeBuilder setEngineInformation( EngineInformation engineInfo ) {
+//			this.engineInfo = engineInfo;
+//			return this;
+//		}
+		public EngineInformation getEngineInformation() {
+			return this.vehicleType.getEngineInformation() ;
 		}
 
 		public CarrierVehicleTypeBuilder setMaxVelocity( double veloInMeterPerSeconds ) {
-			this.maxVeloInMeterPerSeconds  = veloInMeterPerSeconds;
+			this.vehicleType.setMaximumVelocity( veloInMeterPerSeconds );
 			return this;
 		}
 	}

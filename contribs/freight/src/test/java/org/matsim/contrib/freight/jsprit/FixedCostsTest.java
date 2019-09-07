@@ -86,9 +86,9 @@ public class FixedCostsTest extends MatsimTestCase {
 		VehicleType carrierVehType_A = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("gridType_A", org.matsim.vehicles.VehicleType.class ) )
 													   .setCapacityWeightInTons(1 )
 													   .setMaxVelocity(10)
-													   .setCostPerDistanceUnit(0.001)      //1 EUR per km
-													   .setCostPerTimeUnit(0.0)
-													   .setFixCost(0)
+													   .setCostPerMeter(0.001 )      //1 EUR per km
+													   .setCostPerSecond(0.0 )
+													   .setFixedCost(0 )
 													   .setEngineInformation( engineInformation1 )
 													   .build();
 		vehicleTypes.getVehicleTypes().put(carrierVehType_A.getId(), carrierVehType_A);
@@ -101,9 +101,9 @@ public class FixedCostsTest extends MatsimTestCase {
 		VehicleType carrierVehType_B = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("gridType_B", org.matsim.vehicles.VehicleType.class ) )
 													   .setCapacityWeightInTons(1 )
 													   .setMaxVelocity(10)
-													   .setCostPerDistanceUnit(0.00001)
-													   .setCostPerTimeUnit(0.0)
-													   .setFixCost(10)
+													   .setCostPerMeter(0.00001 )
+													   .setCostPerSecond(0.0 )
+													   .setFixedCost(10 )
 													   .setEngineInformation( engineInformation )
 													   .build();
 		vehicleTypes.getVehicleTypes().put(carrierVehType_B.getId(), carrierVehType_B);

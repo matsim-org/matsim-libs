@@ -21,7 +21,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.Freight;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
@@ -254,8 +253,8 @@ public class MatsimJspritFactory {
 	static VehicleType createCarrierVehicleType( com.graphhopper.jsprit.core.problem.vehicle.VehicleType type ){
 		CarrierUtils.CarrierVehicleTypeBuilder typeBuilder = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create(type.getTypeId(), org.matsim.vehicles.VehicleType.class ) );
 		typeBuilder.setCapacityWeightInTons(type.getCapacityDimensions().get(0 ) );
-		typeBuilder.setCostPerDistanceUnit(type.getVehicleCostParams().perDistanceUnit).setCostPerTimeUnit(type.getVehicleCostParams().perTransportTimeUnit)
-				.setFixCost(type.getVehicleCostParams().fix);
+		typeBuilder.setCostPerMeter(type.getVehicleCostParams().perDistanceUnit ).setCostPerSecond(type.getVehicleCostParams().perTransportTimeUnit )
+			     .setFixedCost(type.getVehicleCostParams().fix );
 		typeBuilder.setMaxVelocity(type.getMaxVelocity());
 		return typeBuilder.build();
 	}

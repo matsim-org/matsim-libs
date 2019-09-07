@@ -352,9 +352,9 @@ public class TestMatsimTransformer {
 		engineInformation.setFuelConsumption( (double) 15 );
 		VehicleType matsimType = CarrierUtils.CarrierVehicleTypeBuilder.newInstance(Id.create("matsimType", org.matsim.vehicles.VehicleType.class ) )
 												   .setCapacityWeightInTons(50 )
-												   .setCostPerDistanceUnit(10.0)
-												   .setCostPerTimeUnit(5.0)
-												   .setFixCost(100.0)
+												   .setCostPerMeter(10.0 )
+												   .setCostPerSecond(5.0 )
+												   .setFixedCost(100.0 )
 												   .setEngineInformation(
 													     engineInformation )
 												   .setMaxVelocity(13.8)
