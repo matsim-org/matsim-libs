@@ -190,36 +190,39 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 
 		//vehicle-type
 		else if(name.equals("vehicleType")){
-			String typeIdAsString = atts.getValue("id");
-			if(typeIdAsString == null) throw new IllegalStateException("vehicleTypeId is missing.");
-			final Id<VehicleType> typeId = Id.create( typeIdAsString, VehicleType.class );
-//			this.vehicleTypeBuilder = CarrierUtils.CarrierVehicleTypeBuilder.newInstance( typeId );
-			this.vehicleType = VehicleUtils.getFactory().createVehicleType( typeId ) ;
+			throw new RuntimeException("I am confused now if, for carriers, vehicleType is in the plans file, or in a separate file.") ;
+//			String typeIdAsString = atts.getValue("id");
+//			if(typeIdAsString == null) throw new IllegalStateException("vehicleTypeId is missing.");
+//			final Id<VehicleType> typeId = Id.create( typeIdAsString, VehicleType.class );
+////			this.vehicleTypeBuilder = CarrierUtils.CarrierVehicleTypeBuilder.newInstance( typeId );
+//			this.vehicleType = VehicleUtils.getFactory().createVehicleType( typeId ) ;
 		}
 		else if(name.equals("engineInformation")){
-//			EngineInformation engineInfo = new EngineInformation();
-			EngineInformation engineInfo = this.vehicleType.getEngineInformation();;
-			engineInfo.setFuelType(parseFuelType(atts.getValue("fuelType")));
-			engineInfo.setFuelConsumption(Double.parseDouble(atts.getValue("gasConsumption")));
-//			this.vehicleTypeBuilder.setEngineInformation(engineInfo);
+			throw new RuntimeException("I am confused now if, for carriers, vehicleType is in the plans file, or in a separate file.") ;
+////			EngineInformation engineInfo = new EngineInformation();
+//			EngineInformation engineInfo = this.vehicleType.getEngineInformation();;
+//			engineInfo.setFuelType(parseFuelType(atts.getValue("fuelType")));
+//			engineInfo.setFuelConsumption(Double.parseDouble(atts.getValue("gasConsumption")));
+////			this.vehicleTypeBuilder.setEngineInformation(engineInfo);
 		}
 		else if(name.equals("costInformation")){
-			String fix = atts.getValue("fix");
-			String perMeter = atts.getValue("perMeter");
-			String perSecond = atts.getValue("perSecond");
-			CostInformation costInformation = this.vehicleType.getCostInformation() ;
-			if(fix != null){
-//				this.vehicleTypeBuilder.setFixCost(Double.parseDouble(fix));
-				costInformation.setFixedCost( Double.parseDouble( fix ) ) ;
-			}
-			if(perMeter != null){
-//				this.vehicleTypeBuilder.setCostPerDistanceUnit(Double.parseDouble(perMeter));
-				costInformation.setCostsPerMeter( Double.parseDouble( perMeter ) ) ;
-			}
-			if(perSecond != null){
-//				this.vehicleTypeBuilder.setCostPerTimeUnit(Double.parseDouble(perSecond));
-				costInformation.setCostsPerSecond( Double.parseDouble( perSecond ) ) ;
-			}
+			throw new RuntimeException("I am confused now if, for carriers, vehicleType is in the plans file, or in a separate file.") ;
+//			String fix = atts.getValue("fix");
+//			String perMeter = atts.getValue("perMeter");
+//			String perSecond = atts.getValue("perSecond");
+//			CostInformation costInformation = this.vehicleType.getCostInformation() ;
+//			if(fix != null){
+////				this.vehicleTypeBuilder.setFixCost(Double.parseDouble(fix));
+//				costInformation.setFixedCost( Double.parseDouble( fix ) ) ;
+//			}
+//			if(perMeter != null){
+////				this.vehicleTypeBuilder.setCostPerDistanceUnit(Double.parseDouble(perMeter));
+//				costInformation.setCostsPerMeter( Double.parseDouble( perMeter ) ) ;
+//			}
+//			if(perSecond != null){
+////				this.vehicleTypeBuilder.setCostPerTimeUnit(Double.parseDouble(perSecond));
+//				costInformation.setCostsPerSecond( Double.parseDouble( perSecond ) ) ;
+//			}
 		}
 
 		//vehicle
@@ -324,9 +327,10 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 //			vehicleTypeBuilder.setCapacityWeightInTons(Integer.parseInt(content ) );
 //		}
 		else if(name.equals("vehicleType")){
-//			VehicleType type = vehicleType.build();
-			vehicleTypeMap.put(vehicleType.getId(),vehicleType);
-			capabilityBuilder.addType(vehicleType);
+////			VehicleType type = vehicleType.build();
+//			vehicleTypeMap.put(vehicleType.getId(),vehicleType);
+//			capabilityBuilder.addType(vehicleType);
+			throw new RuntimeException("I am confused now if, for carriers, vehicleType is in the plans file, or in a separate file.") ;
 		}
 		else if (name.equals("route")) {
 			this.previousRouteContent = content;
