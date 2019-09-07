@@ -42,6 +42,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -151,17 +152,26 @@ final public class IOUtils {
 	 * <li>Find path in class path as resource</li>
 	 * <li>Find path in class path with compression extension</li>
 	 * </ol>
+	 *
+	 * In case the filename is a URL (i.e. starting with "file:" or "jar:file:"),
+	 * then no resolution is done but the provided filename returned as URL.
 	 * 
 	 * @throws UncheckedIOException
 	 */
 	public static URL resolveFileOrResource(String filename) throws UncheckedIOException {
 		try {
-			// I) Replace home identifier
+			// I) do not handle URLs
+			if (filename.startsWith("jar:file:") || filename.startsWith("file:")) {
+				// looks like an URI
+				return new URL(filename);
+			}
+
+			// II) Replace home identifier
 			if (filename.startsWith("~" + File.separator)) {
 				filename = System.getProperty("user.home") + filename.substring(1);
 			}
 
-			// II.1) First, try to find the file in the file system
+			// III.1) First, try to find the file in the file system
 			File file = new File(filename);
 
 			if (file.exists()) {
@@ -169,7 +179,7 @@ final public class IOUtils {
 				return file.toURI().toURL();
 			}
 
-			// II.2) Try to find file with an additional postfix for compression
+			// III.2) Try to find file with an additional postfix for compression
 			for (String postfix : COMPRESSION_EXTENSIONS.keySet()) {
 				file = new File(filename + "." + postfix);
 
@@ -179,7 +189,7 @@ final public class IOUtils {
 				}
 			}
 
-			// III.1) First, try to find the file in the class path
+			// IV.1) First, try to find the file in the class path
 			URL resource = IOUtils.class.getClassLoader().getResource(filename);
 
 			if (resource != null) {
@@ -187,7 +197,7 @@ final public class IOUtils {
 				return resource;
 			}
 
-			// III.2) Second, try to find the resource with a compression extension
+			// IV.2) Second, try to find the resource with a compression extension
 			for (String postfix : COMPRESSION_EXTENSIONS.keySet()) {
 				resource = IOUtils.class.getClassLoader().getResource(filename + "." + postfix);
 
@@ -285,7 +295,7 @@ final public class IOUtils {
 				throw new UncheckedIOException("Can only write to file:// protocol URLs");
 			}
 
-			File file = new File(url.getPath());
+			File file = new File(url.toURI());
 			CompressionType compression = getCompression(url);
 
 			if (compression != null && append && file.exists()) {
@@ -312,7 +322,7 @@ final public class IOUtils {
 			}
 
 			return new BufferedOutputStream(outputStream);
-		} catch (IOException | CompressorException e) {
+		} catch (IOException | CompressorException | URISyntaxException e) {
 			throw new UncheckedIOException(e);
 		}
 	}

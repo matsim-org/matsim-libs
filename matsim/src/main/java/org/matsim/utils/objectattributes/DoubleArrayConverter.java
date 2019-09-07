@@ -25,8 +25,7 @@ import org.apache.log4j.Logger;
 
 public class DoubleArrayConverter implements AttributeConverter<double[]> {
 
-    private static String DELIMITER = ",";
-
+    private static final String DELIMITER = ",";
 
     @Override
     public double[] convert(String value) {
@@ -45,13 +44,13 @@ public class DoubleArrayConverter implements AttributeConverter<double[]> {
             return null;
         }
         double[] s = (double[]) o;
-        String result = "";
+        StringBuilder result = new StringBuilder();
         for (int i = 0; i < s.length; i++) {
-            result = result + Double.toString(s[i]);
-            if (i < s.length - 1) {
-                result = result + DELIMITER;
+            if (i > 0) {
+                result.append(DELIMITER);
             }
+            result.append(s[i]);
         }
-        return result;
+        return result.toString();
     }
 }
