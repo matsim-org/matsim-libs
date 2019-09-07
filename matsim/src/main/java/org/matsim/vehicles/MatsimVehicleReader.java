@@ -57,14 +57,14 @@ public final class MatsimVehicleReader implements MatsimReader{
 		reader.parse( inputStream ) ;
 	}
 
-	private static final class VehicleReader extends MatsimXmlParser {
+	public static final class VehicleReader extends MatsimXmlParser {
 		private final Vehicles vehicles;
 
 		private MatsimXmlParser delegate = null;
 
 		private Map<Class<?>, AttributeConverter<?>> converters = new HashMap<>();
 
-		VehicleReader(Vehicles vehicles) {
+		public VehicleReader( Vehicles vehicles ) {
 			this.vehicles = vehicles ;
 		}
 

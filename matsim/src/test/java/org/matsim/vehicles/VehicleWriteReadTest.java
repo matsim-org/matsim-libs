@@ -2,7 +2,6 @@ package org.matsim.vehicles;
 
 import org.apache.log4j.Logger;
 import org.junit.*;
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -35,27 +34,16 @@ public class VehicleWriteReadTest{
 		//read it
 		Vehicles vehicles1 = VehicleUtils.createVehiclesContainer();
 		MatsimVehicleReader reader1 = new MatsimVehicleReader(vehicles1);
-		reader1.readFile(utils.getClassInputDirectory() + TESTXML_v1);
+		final String inputFilename = utils.getClassInputDirectory() + TESTXML_v1;
+		reader1.readFile( inputFilename );
 
 		//write it
 		VehicleWriterV1 writerV1 = new VehicleWriterV1(vehicles1);
 		final String outputDirectory = utils.getOutputDirectory();
-		writerV1.writeFile( outputDirectory + OUTXML_v1 );
+		final String outputFilename = outputDirectory + OUTXML_v1;
+		writerV1.writeFile( outputFilename );
 
-		assertTrue(new File( outputDirectory + OUTXML_v1).exists() );
-
-		BufferedReader readerV1Input = IOUtils.getBufferedReader(utils.getClassInputDirectory() + TESTXML_v1);
-		BufferedReader readerV1Output = IOUtils.getBufferedReader( outputDirectory + OUTXML_v1 );
-
-		String lineInput;
-		String lineOutput;
-
-		while (((lineInput = readerV1Input.readLine()) != null) && ((lineOutput = readerV1Output.readLine()) != null)) {
-			log.info("Reading line... value in input file: " + lineInput + " , value in output File: "  + lineOutput);
-			assertEquals("Lines have different content: ", lineInput, lineOutput);
-		}
-		readerV1Input.close();
-		readerV1Output.close();
+		MatsimTestUtils.compareFilesLineByLine( inputFilename, outputFilename );
 	}
 
 	@Test
@@ -64,30 +52,16 @@ public class VehicleWriteReadTest{
 		//read it
 		Vehicles vehicles2 = VehicleUtils.createVehiclesContainer();
 		MatsimVehicleReader reader2 = new MatsimVehicleReader(vehicles2);
-		reader2.readFile(utils.getClassInputDirectory() + TESTXML_v2);
+		final String inFile = utils.getClassInputDirectory() + TESTXML_v2;
+		reader2.readFile( inFile );
 
 		//write it
 		VehicleWriterV2 writerV2 = new VehicleWriterV2(vehicles2);
 		final String outputDirectory = utils.getOutputDirectory();
-		writerV2.writeFile( outputDirectory + OUTXML_v2 );
-		assertTrue(new File( outputDirectory + OUTXML_v2).exists() );
+		final String outFile = outputDirectory + OUTXML_v2;
+		writerV2.writeFile( outFile );
 
-		BufferedReader readerV2Input = IOUtils.getBufferedReader(utils.getClassInputDirectory() + TESTXML_v2);
-		BufferedReader readerV2Output = IOUtils.getBufferedReader( outputDirectory + OUTXML_v2 );
+		MatsimTestUtils.compareFilesLineByLine( inFile, outFile );
 
-		String lineInput;
-		String lineOutput;
-		long lineCnt = 0 ;
-		while (((lineInput = readerV2Input.readLine()) != null) && ((lineOutput = readerV2Output.readLine()) != null)) {
-			lineCnt++ ;
-			if ( !Objects.equals( lineInput.trim(), lineOutput.trim() ) ) {
-				log.error("in/out:");
-				log.error("line=" + lineCnt + ": " + lineInput);
-				log.error("line=" + lineCnt + ": " + lineOutput);
-			}
-			assertEquals("Lines have different content: ", lineInput.trim(), lineOutput.trim());
-		}
-		readerV2Input.close();
-		readerV2Output.close();
 	}
 }

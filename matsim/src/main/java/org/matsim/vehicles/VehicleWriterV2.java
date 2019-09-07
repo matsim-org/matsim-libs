@@ -39,7 +39,7 @@ import java.util.Map;
  * @author kturner
  */
 
-public final class VehicleWriterV2 extends MatsimXmlWriter {
+final class VehicleWriterV2 extends MatsimXmlWriter {
 
 	private static final Logger log = Logger.getLogger(VehicleWriterV2.class);
 	private AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
@@ -49,7 +49,7 @@ public final class VehicleWriterV2 extends MatsimXmlWriter {
 	private Map<Id<Vehicle>, Vehicle> vehicles;
 
 
-	VehicleWriterV2(Vehicles vehicles) {
+	public VehicleWriterV2( Vehicles vehicles ) {
 		this.vehicleTypes = vehicles.getVehicleTypes();
 		this.vehicles = vehicles.getVehicles();
 	}

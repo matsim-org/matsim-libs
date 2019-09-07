@@ -26,7 +26,7 @@ import org.xml.sax.Attributes;
  * @author sschroeder
  *
  */
-public class CarrierPlanReaderV1 extends MatsimXmlParser {
+class CarrierPlanReaderV1 extends MatsimXmlParser {
 
 	private static final Logger logger = Logger.getLogger(CarrierPlanReaderV1.class);
 

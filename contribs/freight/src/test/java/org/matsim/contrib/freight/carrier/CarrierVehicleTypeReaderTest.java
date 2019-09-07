@@ -1,19 +1,31 @@
 package org.matsim.contrib.freight.carrier;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
-public class CarrierVehicleTypeReaderTest extends MatsimTestCase{
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class CarrierVehicleTypeReaderTest {
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 	
-	CarrierVehicleTypes types;
-	
-	@Override
-	public void setUp() throws Exception{
-		super.setUp();
+	private CarrierVehicleTypes types;
+	private String inFilename;
+
+	@Before
+	public void setUp() {
 		types = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader(types).readFile(getClassInputDirectory() + "vehicleTypes.xml");
+		inFilename = utils.getClassInputDirectory() + "vehicleTypes.xml";
+		new CarrierVehicleTypeReader(types).readFile( inFilename );
 	}
 	
 	@Test
@@ -37,7 +49,7 @@ public class CarrierVehicleTypeReaderTest extends MatsimTestCase{
 	@Test
 	public void test_whenReadingTypeMedium_itReadsCapacityCorrectly(){
 		VehicleType medium = types.getVehicleTypes().get(Id.create("medium", org.matsim.vehicles.VehicleType.class ) );
-		assertEquals(30., medium.getCapacity().getWeightInTons() );
+		assertEquals(30., (double) medium.getCapacity().getWeightInTons() );
 	}
 	
 	@Test
@@ -53,5 +65,26 @@ public class CarrierVehicleTypeReaderTest extends MatsimTestCase{
 		VehicleType medium = types.getVehicleTypes().get(Id.create("medium", org.matsim.vehicles.VehicleType.class ) );
 		assertEquals(0.02, medium.getEngineInformation().getFuelConsumption(),0.01);
 		assertEquals("gasoline", medium.getEngineInformation().getFuelType().toString());
+	}
+
+	@Test
+	public void readV1andWriteV2(){
+		final String outFilename = utils.getOutputDirectory() + "/vehicleTypes_v2.xml";
+		new CarrierVehicleTypeWriter( types ).write( outFilename ) ;
+		final String referenceFilename = utils.getClassInputDirectory() + "/vehicleTypes_v2.xml" ;
+		MatsimTestUtils.compareFilesLineByLine( referenceFilename, outFilename );
+	}
+
+	@Test
+	public void readV2andWriteV2() {
+		// yyyyyy because of "setUp" this will be doing an irrelevant read first.
+		String inFilename1 = utils.getClassInputDirectory() + "vehicleTypes_v2.xml";;
+		CarrierVehicleTypes types1 = new CarrierVehicleTypes();
+		new CarrierVehicleTypeReader( types1 ).readFile( inFilename1 );
+
+		final String outFilename = utils.getOutputDirectory() + "/vehicleTypes_v2.xml";
+		new CarrierVehicleTypeWriter( types1 ).write( outFilename ) ;
+
+		MatsimTestUtils.compareFilesLineByLine( inFilename1, outFilename );
 	}
 }
