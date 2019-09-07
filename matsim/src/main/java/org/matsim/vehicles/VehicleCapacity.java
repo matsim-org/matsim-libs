@@ -50,28 +50,32 @@ public final class VehicleCapacity implements Attributable {
 		return standingRoom;
 	}
 
-	public void setSeats(Integer seats) {
+	public VehicleCapacity setSeats( Integer seats ) {
 		this.seats = seats;
+		return this ;
 	}
 
-	public void setStandingRoom(Integer standingRoom) {
+	public VehicleCapacity setStandingRoom( Integer standingRoom ) {
 		this.standingRoom = standingRoom;
+		return this ;
 	}
 
 	public Double getVolumeInCubicMeters() {
 		return volumeInCubicMeters;
 	}
 
-	public void setVolumeInCubicMeters(double volumeInCubicMeters) {
+	public VehicleCapacity setVolumeInCubicMeters( double volumeInCubicMeters ) {
 		this.volumeInCubicMeters = volumeInCubicMeters;
+		return this ;
 	}
 
 	public Double getWeightInTons() {
 		return weightInTons;
 	}
 
-	public void setWeightInTons(double weightInTons) {
+	public VehicleCapacity setWeightInTons( double weightInTons ) {
 		this.weightInTons = weightInTons;
+		return this ;
 	}
 
 	public Attributes getAttributes(){

@@ -56,16 +56,19 @@ public final class CostInformation{
 		return attributes;
 	}
 
-	public void setFixedCosts(Double fixed ){
+	public CostInformation setFixedCosts( Double fixed ){
 		this.fixed = fixed;
+		return this ;
 	}
 
-	public void setCostsPerMeter(Double perMeter ){
+	public CostInformation setCostsPerMeter( Double perMeter ){
 		this.perMeter = perMeter;
+		return this ;
 	}
 
-	public void setCostsPerSecond(Double perSecond ){
+	public CostInformation setCostsPerSecond( Double perSecond ){
 		this.perSecond = perSecond;
+		return this ;
 	}
 
 }

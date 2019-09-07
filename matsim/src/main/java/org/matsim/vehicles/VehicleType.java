@@ -37,7 +37,7 @@ public final class VehicleType implements Attributable {
 	private double pcuEquivalents = 1.0;
 	private double flowEfficiencyFactor = 1.0;
 	private final EngineInformation engineInformation = new EngineInformation() ;
-	private CostInformation costInformation = new CostInformation() ;
+	private final CostInformation costInformation = new CostInformation() ;
 //	private FreightCapacity freightCapacity;
 	private String description;
 	private final VehicleCapacity capacity = new VehicleCapacity();
@@ -152,9 +152,9 @@ public final class VehicleType implements Attributable {
 //		this.capacity.setFreightCapacity( freightCapacity );
 //	}
 
-	public final void setCostInformation(CostInformation costInformation) {
-		this.costInformation = costInformation;
-	}
+//	public final void setCostInformation(CostInformation costInformation) {
+//		this.costInformation = costInformation;
+//	}
 
 	public final void setLength(double length) {
 		this.length = length;
