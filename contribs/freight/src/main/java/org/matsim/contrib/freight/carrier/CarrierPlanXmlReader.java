@@ -20,8 +20,8 @@ import java.util.Stack;
  *
  */
 public class CarrierPlanXmlReader implements MatsimReader {
-
-	private static Logger log = Logger.getLogger(CarrierPlanXmlReader.class);
+	private static final Logger log = Logger.getLogger(CarrierPlanXmlReader.class);
+	private static final String MSG="With early carrier plans file formats, there will be an expected exception in the following." ;
 
 	private static final String CARRIERS = "carriers";
 
@@ -34,6 +34,7 @@ public class CarrierPlanXmlReader implements MatsimReader {
 
 	@Override
 	public void readFile( String filename ){
+		log.info(MSG) ;
 		try {
 			reader.readFile( filename );
 		} catch (Exception e) {
@@ -49,6 +50,7 @@ public class CarrierPlanXmlReader implements MatsimReader {
 
 	@Override
 	public void readURL( URL url ){
+		log.info(MSG) ;
 		try {
 			reader.readURL(url);
 		}  catch (Exception e) {
@@ -64,6 +66,7 @@ public class CarrierPlanXmlReader implements MatsimReader {
 	}
 
 	public void readStream( InputStream inputStream ){
+		log.info(MSG) ;
 		try {
 			reader.parse( inputStream ) ;
 		} catch (Exception e)

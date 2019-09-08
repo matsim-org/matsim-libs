@@ -1,5 +1,6 @@
 package org.matsim.contrib.freight.carrier;
 
+import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -17,7 +18,9 @@ import static org.junit.Assert.assertTrue;
 
 public class CarrierVehicleTypeReaderTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
-	
+
+	private static final Logger log = Logger.getLogger(CarrierVehicleTypeReaderTest.class) ;
+
 	private CarrierVehicleTypes types;
 	private String inFilename;
 
@@ -49,7 +52,7 @@ public class CarrierVehicleTypeReaderTest {
 	@Test
 	public void test_whenReadingTypeMedium_itReadsCapacityCorrectly(){
 		VehicleType medium = types.getVehicleTypes().get(Id.create("medium", org.matsim.vehicles.VehicleType.class ) );
-		assertEquals(30., (double) medium.getCapacity().getWeightInTons() );
+		assertEquals(30., (double) medium.getCapacity().getWeightInTons(), Double.MIN_VALUE );
 	}
 	
 	@Test
@@ -77,7 +80,13 @@ public class CarrierVehicleTypeReaderTest {
 
 	@Test
 	public void readV2andWriteV2() {
-		// yyyyyy because of "setUp" this will be doing an irrelevant read first.
+		// yyyyyy FIXME because of "setUp" this will be doing an irrelevant read first.
+		log.info("") ;
+		log.info("") ;
+		log.info("") ;
+		log.info("") ;
+		log.info("now starting for real") ;
+		log.info("") ;
 		String inFilename1 = utils.getClassInputDirectory() + "vehicleTypes_v2.xml";;
 		CarrierVehicleTypes types1 = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader( types1 ).readFile( inFilename1 );
