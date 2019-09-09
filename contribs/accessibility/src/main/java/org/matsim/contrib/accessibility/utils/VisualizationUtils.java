@@ -192,7 +192,7 @@ public class VisualizationUtils {
 			// if OS is Macintosh
 			// example (dominik) // os.arch=x86_64 // os.name=Mac OS X // os.version=10.10.2
 		} else if ( osName.contains("Mac") || osName.contains("mac") ) {
-			String cmd = "/Applications/QGIS.app/Contents/MacOS/QGIS " + workingDirectory + "QGisProjectFile_" + mode + ".qgs" +
+			String cmd = "/Applications/QGIS3.app/Contents/MacOS/QGIS " + workingDirectory + "QGisProjectFile_" + mode + ".qgs" +
 					" --snapshot " + workingDirectory + "snapshot_" + mode + ".png";
 
 			String stdoutFileName = workingDirectory + "snapshot_" + mode + ".log";

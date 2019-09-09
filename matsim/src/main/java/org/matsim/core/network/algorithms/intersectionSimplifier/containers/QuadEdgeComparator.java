@@ -53,13 +53,9 @@ public class QuadEdgeComparator implements Comparator<QuadEdge> {
 	 */
 	@Override
 	public int compare(QuadEdge qeA, QuadEdge qeB) {
-		if (this.map.get(qeA) < this.map.get(qeB)) {
-			return 1;
-		} else if (this.map.get(qeA) == this.map.get(qeB)) {
-			return 0;
-		} else {
-			return -1;
-		}
+		Double valA = this.map.get(qeA);
+		Double valB = this.map.get(qeB);
+		return valB.compareTo(valA);
 	}
 
 }

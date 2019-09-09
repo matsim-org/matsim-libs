@@ -44,7 +44,7 @@ public class FixedGroupsIdentifierFileParser {
 	private static XMLStreamReader getStreamReader(final String fileName) {
 		final XMLInputFactory xmlif = XMLInputFactory.newInstance();
 		try {
-			final InputStream stream = IOUtils.getInputStream(fileName);
+			final InputStream stream = IOUtils.getInputStream(IOUtils.resolveFileOrResource(fileName));
 			return xmlif.createXMLStreamReader( stream );
 		}
 		catch (Exception e) {

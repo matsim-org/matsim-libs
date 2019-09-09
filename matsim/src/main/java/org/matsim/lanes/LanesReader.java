@@ -70,7 +70,7 @@ public final class LanesReader implements MatsimReader {
 	public void readFile(final String filename) {
 		try {
 			log.info("reading file " + filename);
-			InputStream inputStream = IOUtils.getInputStream(filename);
+			InputStream inputStream = IOUtils.getInputStream(IOUtils.resolveFileOrResource(filename));
 			parse(inputStream);
 		} catch (JAXBException | SAXException e) {
 			throw new RuntimeException(e);

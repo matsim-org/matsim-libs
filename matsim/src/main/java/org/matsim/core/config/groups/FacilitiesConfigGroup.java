@@ -36,13 +36,15 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 	private static final String INPUT_FILE= "inputFacilitiesFile";
 	private static final String INPUT_FACILITY_ATTRIBUTES_FILE = "inputFacilityAttributesFile";
 	private static final String INPUT_CRS = "inputCRS";
+	private static final String INSISTING_ON_USING_DEPRECATED_ATTRIBUTE_FILE = "insistingOnUsingDeprecatedFacilitiesAttributeFile" ;
 
 	private String inputFile = null;
 	private String inputFacilitiesAttributesFile = null;
 	private String inputCRS = null;
+	private boolean insistingOnUsingDeprecatedPersonAttributeFile = false ;
 
 	// following params are required only if activitiesFacilities are generated internally (e.g., FacilitiesSource.onePerActivityLocationInPlansFile). Amit Jan'18
-	private String idPrefix = "autogen_";
+	private String idPrefix = "f_auto_";
 //	private boolean removingLinksAndCoordinates = true;
 //	private boolean assigningOpeningTime = false;
 //	private boolean assigningLinksToFacilitiesIfMissing = true;
@@ -57,6 +59,11 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 //	private static final String REMOVING_LINKS_AND_COORDINATES = "removingLinksAndCoordinates";
 //	private static final String ASSIGNING_OPENING_TIME = "assigningOpeningTime";
 //	private static final String ASSIGNING_LINKS_TO_FACILITIES_IF_MISSING="assigningLinksToFacilitiesIfMissing";
+
+	public static final String FACILITIES_ATTRIBUTES_DEPRECATION_MESSAGE = "using the separate facilities attribute file is deprecated.  Add the information directly into each facility, using " +
+			"the Attributable feature.  If you insist on continuing to use the separate facility attribute file, set " +
+			"insistingOnUsingDeprecatedFacilityAttributeFile to true.  The file will then be read, but the values " +
+			"will be entered into each facility using Attributable, and written as such to output_facilities.";
 
 	public FacilitiesConfigGroup() {
 		super(GROUP_NAME);
@@ -192,6 +199,15 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(FACILITIES_SOURCE)
 	public void setFacilitiesSource(FacilitiesSource facilitiesSource) {
 		this.facilitiesSource = facilitiesSource;
+	}
+
+	@StringSetter(INSISTING_ON_USING_DEPRECATED_ATTRIBUTE_FILE)
+	public final void setInsistingOnUsingDeprecatedFacilitiesAttributeFile( boolean val ) {
+		this.insistingOnUsingDeprecatedPersonAttributeFile = val ;
+	}
+	@StringGetter(INSISTING_ON_USING_DEPRECATED_ATTRIBUTE_FILE)
+	public final boolean isInsistingOnUsingDeprecatedFacilitiesAttributeFile() {
+		return insistingOnUsingDeprecatedPersonAttributeFile;
 	}
 
 ////	@StringGetter(ADD_EMPTY_ACTIVITY_OPTIONS)

@@ -55,7 +55,7 @@ public class GeometryUtilsTest {
 	@Test
 	public final void testIntersectingLinks() {
 		
-		Config config = ConfigUtils.loadConfig( IOUtils.newUrl( ExamplesUtils.getTestScenarioURL("equil"), "config.xml" ) ) ;
+		Config config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL("equil"), "config.xml" ) ) ;
 		
 		final Network network = ScenarioUtils.loadScenario(config).getNetwork();
 

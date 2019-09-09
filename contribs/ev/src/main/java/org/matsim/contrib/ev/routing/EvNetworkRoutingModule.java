@@ -154,7 +154,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 					stagedRoute.add(lastLeg);
 					Activity chargeAct = PopulationUtils.createActivityFromCoordAndLinkId(stageActivityType,
 							selectedChargerLink.getCoord(), selectedChargerLink.getId());
-					double maxPowerEstimate = Math.min(selectedCharger.getMaxPower(), ev.getBatteryCapacity() / 3.6);
+					double maxPowerEstimate = Math.min(selectedCharger.getPlugPower(), ev.getBatteryCapacity() / 3.6);
 					double estimatedChargingTime = (ev.getBatteryCapacity() * 1.5) / maxPowerEstimate;
 					chargeAct.setMaximumDuration(Math.max(evConfigGroup.getMinimumChargeTime(), estimatedChargingTime));
 					lastArrivaltime += chargeAct.getMaximumDuration();

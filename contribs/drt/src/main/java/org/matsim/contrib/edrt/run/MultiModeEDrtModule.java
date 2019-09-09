@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,25 +15,37 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.taxi.run;
+package org.matsim.contrib.edrt.run;
 
+import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
+import org.matsim.contrib.drt.routing.MultiModeDrtMainModeIdentifier;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.DrtModeModule;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.router.MainModeIdentifier;
 
 import com.google.inject.Inject;
 
 /**
- * @author michalm
+ * @author Michal Maciejewski (michalm)
  */
-public final class TaxiModule extends AbstractModule {
+public class MultiModeEDrtModule extends AbstractModule {
 
 	@Inject
-	private TaxiConfigGroup taxiCfg;
+	private MultiModeDrtConfigGroup multiModeDrtCfg;
 
 	@Override
 	public void install() {
-		install(new TaxiModeModule(taxiCfg));
-		installQSimModule(new TaxiModeQSimModule(taxiCfg));
+		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
+			install(new DrtModeModule(drtCfg));
+			installQSimModule(new EDrtModeQSimModule(drtCfg));
+			install(new DrtModeAnalysisModule(drtCfg));
+		}
+
+		bind(MainModeIdentifier.class).toInstance(new MultiModeDrtMainModeIdentifier(multiModeDrtCfg));
 	}
 }

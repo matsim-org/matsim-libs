@@ -32,7 +32,7 @@ import org.matsim.vehicles.VehicleType;
  * @author smetzler, dziemke
  */
 final class BicycleModule extends AbstractModule {
-	// necessary to have this public
+	// needs to be public since otherwise nobody can overwrite parts of Bicycles.addAsOverridingModules(...).  kai, sep'19
 	
 	private static final Logger LOG = Logger.getLogger(BicycleModule.class);
 
@@ -48,7 +48,8 @@ final class BicycleModule extends AbstractModule {
 		addTravelTimeBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelTime.class).in(Singleton.class);
 		addTravelDisutilityFactoryBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelDisutilityFactory.class).in(Singleton.class);
 		bindScoringFunctionFactory().to(BicycleScoringFunctionFactory.class).in(Singleton.class);
-		bind(BicycleLinkSpeedCalculator.class);
+
+		bind( BicycleLinkSpeedCalculator.class ).to( BicycleLinkSpeedCalculatorDefaultImpl.class ) ;
 
         if (bicycleConfigGroup.isMotorizedInteraction()) {
 			addMobsimListenerBinding().to(MotorizedInteractionEngine.class);

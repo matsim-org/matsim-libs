@@ -3,6 +3,7 @@ package org.matsim.contrib.accessibility.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 
@@ -11,7 +12,7 @@ public final class AggregationObject {
 	private List<Id> objectIdList = null; // either job or person id
 	private Id zoneID;
 	private Id parcelID;
-	private Node nearestNode;
+	private BasicLocation nearestBasicLocation;
 	
 	private double sum = 0. ;
 	private double cnt = 0. ;
@@ -21,19 +22,19 @@ public final class AggregationObject {
 //		this(objectID, parcelId, zoneId, null, value);
 //	}
 	
-	public AggregationObject(Id objectID, Id parcelId, Id zoneId, Node nearestNode, double value){
+	public AggregationObject(Id objectID, Id parcelId, Id zoneId, BasicLocation nearestBasicLocation, double value){
 		if(this.objectIdList == null)
 			this.objectIdList = new ArrayList<Id>();
 		this.objectIdList.add( objectID );
 		this.parcelID = parcelId;
 		this.zoneID = zoneId;
-		this.nearestNode = nearestNode;
+		this.nearestBasicLocation = nearestBasicLocation;
 		
 		this.sum = value;
 	}
 	
-	public void setNearestNode(Node nearestNode){
-		this.nearestNode = nearestNode;
+	public void setNearestBasicLocation(Node nearestBasicLocation){
+		this.nearestBasicLocation = nearestBasicLocation;
 	}
 	
 	public void addObject(Id objectID, double value){
@@ -42,8 +43,8 @@ public final class AggregationObject {
 		this.cnt ++ ; // could be generalized into a weight.  kai, mar'14
 	}
 	
-	public Node getNearestNode(){
-		return this.nearestNode;
+	public BasicLocation getNearestBasicLocation(){
+		return this.nearestBasicLocation;
 	}
 	
 	public int getNumberOfObjects(){

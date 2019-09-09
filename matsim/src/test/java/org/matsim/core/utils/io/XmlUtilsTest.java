@@ -25,11 +25,10 @@ import org.junit.Test;
 /**
  * @author mrieser
  */
-public class MatsimXmlWriterTest {
+public class XmlUtilsTest {
 
 	@Test
 	public void testEncodeAttributeValue() {
-		MatsimXmlWriter writer = new MatsimXmlWriter() { };
 		Assert.assertEquals("hello world!", XmlUtils.encodeAttributeValue("hello world!"));
 		Assert.assertEquals("you &amp; me", XmlUtils.encodeAttributeValue("you & me"));
 		Assert.assertEquals("you &amp; me &amp; her", XmlUtils.encodeAttributeValue("you & me & her"));
@@ -41,7 +40,6 @@ public class MatsimXmlWriterTest {
 
 	@Test
 	public void testEncodedContent() {
-		MatsimXmlWriter writer = new MatsimXmlWriter() { };
 		Assert.assertEquals("hello world!", XmlUtils.encodeContent("hello world!"));
 		Assert.assertEquals("you &amp; me", XmlUtils.encodeContent("you & me"));
 		Assert.assertEquals("you &amp; me &amp; her", XmlUtils.encodeContent("you & me & her"));
