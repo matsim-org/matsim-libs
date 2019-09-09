@@ -120,6 +120,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 				Gbl.assertIf(! this.activityFacilities.getFacilities().isEmpty() );
 				break;
 			case onePerActivityLinkInPlansFile:
+				/* fall-through */ // switch is inside "FacilitiesFromPopulation" method!
 			case onePerActivityLocationInPlansFile:
 //				FacilitiesFromPopulation facilitiesFromPopulation = new FacilitiesFromPopulation(activityFacilities, facilitiesConfigGroup);
 				FacilitiesFromPopulation facilitiesFromPopulation = new FacilitiesFromPopulation(scenario);
