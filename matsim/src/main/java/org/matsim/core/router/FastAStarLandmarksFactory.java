@@ -27,7 +27,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.router.util.ArrayRoutingNetworkFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -44,7 +43,7 @@ import org.matsim.core.router.util.TravelTime;
  */
 @Singleton
 public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory {
-	
+
 	private final RoutingNetworkFactory routingNetworkFactory;
 	private final Map<Network, RoutingNetwork> routingNetworks = new HashMap<>();
 	private final Map<Network, PreProcessLandmarks> preProcessData = new HashMap<>();
@@ -70,42 +69,43 @@ public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory
 	// hide this constructor, as only one router type is allowed anyway...
 	private FastAStarLandmarksFactory(final FastRouterType fastRouterType, int numberOfThreads) {
 		switch (fastRouterType) {
-		case ARRAY:
-			this.routingNetworkFactory = new ArrayRoutingNetworkFactory();
-			break;
-		case POINTER:
-			throw new RuntimeException("PointerRoutingNetworks are no longer supported. Use ArrayRoutingNetworks instead. Aborting!");
-		default:
-			throw new RuntimeException("Undefined FastRouterType: " + fastRouterType);
+			case ARRAY:
+				this.routingNetworkFactory = new ArrayRoutingNetworkFactory();
+				break;
+			case POINTER:
+				throw new RuntimeException(
+						"PointerRoutingNetworks are no longer supported. Use ArrayRoutingNetworks instead. Aborting!");
+			default:
+				throw new RuntimeException("Undefined FastRouterType: " + fastRouterType);
 		}
 
 		this.nThreads = numberOfThreads;
 	}
 
 	@Override
-	public synchronized LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
+	public synchronized LeastCostPathCalculator createPathCalculator(final Network network,
+			final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		RoutingNetwork routingNetwork = this.routingNetworks.get(network);
 		PreProcessLandmarks preProcessLandmarks = this.preProcessData.get(network);
-		
+
 		if (routingNetwork == null) {
 			routingNetwork = this.routingNetworkFactory.createRoutingNetwork(network);
-			
-			if (preProcessLandmarks == null) {
-				preProcessLandmarks = new PreProcessLandmarks(travelCosts);
-				preProcessLandmarks.setNumberOfThreads(nThreads);
-				preProcessLandmarks.run(network);
-				this.preProcessData.put(network, preProcessLandmarks);
-				
-				for (RoutingNetworkNode node : routingNetwork.getNodes().values()) {
-					node.setDeadEndData(preProcessLandmarks.getNodeData(node.getNode()));
-				}
-			}				
-			
+
+			preProcessLandmarks = new PreProcessLandmarks(travelCosts);
+			preProcessLandmarks.setNumberOfThreads(nThreads);
+			preProcessLandmarks.run(network);
+			this.preProcessData.put(network, preProcessLandmarks);
+
+			for (RoutingNetworkNode node : routingNetwork.getNodes().values()) {
+				node.setDeadEndData(preProcessLandmarks.getNodeData(node.getNode()));
+			}
+
 			this.routingNetworks.put(network, routingNetwork);
 		}
 		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
-		
+
 		final double overdoFactor = 1.0;
-		return new FastAStarLandmarks(routingNetwork, preProcessLandmarks, travelCosts, travelTimes, overdoFactor, fastRouterFactory);
+		return new FastAStarLandmarks(routingNetwork, preProcessLandmarks, travelCosts, travelTimes, overdoFactor,
+				fastRouterFactory);
 	}
 }
