@@ -37,6 +37,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.name.Named;
@@ -62,9 +63,10 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 
 		// Euclidean with overdoFactor > 1.0 could lead to 'experiencedTT < unsharedRideTT',
 		// while the benefit would be a marginal reduction of computation time ==> so stick to 1.0
-		// XXX uses the global.numberOfThreads, not drt.numberOfThreads as this is executed in the replanning phase
+		LeastCostPathCalculatorFactory factory = new FastAStarEuclideanFactory();
+		// XXX uses the global.numberOfThreads, not drt.numberOfThreads, as this is executed in the replanning phase
 		executorService = new ExecutorServiceWithResource<>(IntStream.range(0, config.global().getNumberOfThreads())
-				.mapToObj(i -> new FastAStarEuclideanFactory().createPathCalculator(network,
+				.mapToObj(i -> factory.createPathCalculator(network,
 						travelDisutilityFactory.createTravelDisutility(travelTime), travelTime))
 				.collect(Collectors.toList()));
 	}
