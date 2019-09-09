@@ -225,14 +225,14 @@ public final class ProcessNoiseImmissions {
 				bw.write(";" + L_1619 );
 				
 				bw.newLine();
-
-				for( NoiseModule.NoiseListener listener : listeners ){
-					XYTRecord.Builder builder = new XYTRecord.Builder().setCoord( ... );
-					builder.put( "Lden", Lden  ) ;
-					builder.put( "Lden", Lden  ) ;
-					XYTRecord record = builder.build();;
-					listener.newRecord( record );
-				}
+// TODO
+//				for( NoiseModule.NoiseListener listener : listeners ){
+//					XYTRecord.Builder builder = new XYTRecord.Builder().setCoord( ... );
+//					builder.put( "Lden", Lden  ) ;
+//					builder.put( "Lden", Lden  ) ;
+//					XYTRecord record = builder.build();;
+//					listener.newRecord( record );
+//				}
 
 			}				
 			

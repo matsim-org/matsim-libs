@@ -82,7 +82,7 @@ public class NoiseIT {
 
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile, new NoiseConfigGroup()));
 				
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) scenario.getConfig().getModule("noise");
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) scenario.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
 		
 		noiseParameters.setReceiverPointGap(250.);	
 		noiseParameters.setScaleFactor(1.);
@@ -171,7 +171,8 @@ public class NoiseIT {
 		
 		// run the noise analysis for the final iteration (offline)
 		
-		String runDirectory = controler.getConfig().controler().getOutputDirectory() + "/";
+		String runDirectory = controler.getConfig().controler().getOutputDirectory();
+		if (!runDirectory.endsWith("/")) runDirectory = runDirectory + "/";
 		
 		Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
 		config.network().setInputFile(runDirectory + "output_network.xml.gz");
@@ -179,7 +180,7 @@ public class NoiseIT {
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(controler.getConfig().controler().getLastIteration());
 		
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModules().get(NoiseConfigGroup.GROUP_NAME);
 		
 		noiseParameters.setReceiverPointGap(250.);	
 		
@@ -289,15 +290,12 @@ public class NoiseIT {
 			}
 			
 		}
-		
-		Map<Id<ReceiverPoint>, Double> affectedPersonsPerReceiverPoint = new HashMap<Id<ReceiverPoint>, Double>();
-		
+
 		int index = 0;
 		
 		for(double currentTimeSlot : timeSlots){
-			
-			Map<Id<ReceiverPoint>, Double> affectedPersonsPerReceiverPointTest = new HashMap<Id<ReceiverPoint>, Double>();
-			
+			final Map<Id<ReceiverPoint>, Double> affectedPersonsPerReceiverPointTest = new HashMap<Id<ReceiverPoint>, Double>();
+						
 			double affectedPersons = 0.;
 			
 			for(Id<Person> personId : scenario.getPopulation().getPersons().keySet()){
@@ -413,15 +411,12 @@ public class NoiseIT {
 							Gbl.assertNotNull( rpId );
 						}
 						
-						if(!affectedPersonsPerReceiverPointTest.containsKey(rpId)){
-							
+						if(!affectedPersonsPerReceiverPointTest.containsKey(rpId)){			
 							affectedPersonsPerReceiverPointTest.put(rpId, affectedPersons);
 							
-						} else{
-							
+						} else{					
 							double n = affectedPersonsPerReceiverPointTest.get(rpId);
-							affectedPersonsPerReceiverPointTest.put(rpId, n + affectedPersons);
-							
+							affectedPersonsPerReceiverPointTest.put(rpId, n + affectedPersons);			
 						}
 						
 					}
@@ -431,9 +426,6 @@ public class NoiseIT {
 			}
 			
 			if(currentTimeSlot == endTime){
-				
-				affectedPersonsPerReceiverPoint = affectedPersonsPerReceiverPointTest;
-				// ??? kai, feb'16
 				
 				if ( runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {
 					Assert.assertEquals("Wrong number of affected persons at receiver point 16", 1.991388888888, 
@@ -940,30 +932,35 @@ public class NoiseIT {
 	@Test
 	public final void test2b(){
 		
-		// start a simple MATSim run with a single iteration
-		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
-		Config runConfig = ConfigUtils.loadConfig( configFile ) ;
-		runConfig.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		String runDirectory = null;
+		int lastIteration = -1;
+		{
+			// start a simple MATSim run with a single iteration
+			String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
+			Config runConfig = ConfigUtils.loadConfig( configFile ) ;
+			runConfig.controler().setOutputDirectory(testUtils.getOutputDirectory());
 
-		runConfig.plansCalcRoute().setInsertingAccessEgressWalk(false);
-		// I made test2a test both versions, but I don't really want to do that work again myself. kai, feb'16 
-		
-		Controler controler = new Controler(runConfig);
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
-		controler.run();
+			runConfig.plansCalcRoute().setInsertingAccessEgressWalk(false);
+			// I made test2a test both versions, but I don't really want to do that work again myself. kai, feb'16 
+			
+			Controler controler = new Controler(runConfig);
+			controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+			controler.run();	
+			
+			runDirectory = controler.getConfig().controler().getOutputDirectory() + "/";
+			lastIteration = controler.getConfig().controler().getLastIteration();
+		}
 		
 		// run the noise analysis for the final iteration (offline)
 		
-		String runDirectory = controler.getConfig().controler().getOutputDirectory() + "/";
-
-		Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
+		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(runDirectory + "output_network.xml.gz");
 		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
 		config.controler().setOutputDirectory(runDirectory);
-		config.controler().setLastIteration(controler.getConfig().controler().getLastIteration());
+		config.controler().setLastIteration(lastIteration);
 						
 		// adjust the default noise parameters
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
+		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
 		noiseParameters.setReceiverPointGap(250.);	
 		
 		String[] consideredActivities = {"home", "work"};
@@ -1052,7 +1049,7 @@ public class NoiseIT {
 		config.controler().setLastIteration(controler.getConfig().controler().getLastIteration());
 						
 		// adjust the default noise parameters
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModules().get(NoiseConfigGroup.GROUP_NAME);
 		noiseParameters.setReceiverPointGap(250.);	
 		
 		String[] consideredActivities = {"home", "work"};

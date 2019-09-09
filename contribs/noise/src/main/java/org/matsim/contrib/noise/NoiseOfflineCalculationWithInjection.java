@@ -94,7 +94,7 @@ public class NoiseOfflineCalculationWithInjection{
 		EventsManager events = injector.getInstance( EventsManager.class ) ;
 
 		timeTracker = new NoiseTimeTracker();
-//		NoiseTimeTracker timeTracker = injector.getInstance( NoiseTimeTracker.class ) ;
+//		timeTracker = injector.getInstance( NoiseTimeTracker.class ) ;
 		// (does not work)
 
 		timeTracker.setNoiseContext(noiseContext);
