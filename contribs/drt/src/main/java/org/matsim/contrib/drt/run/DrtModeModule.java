@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -187,11 +187,14 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 		@Override
 		public TransitSchedule get() {
-			final List<Geometry> geometries = ShpGeometryUtils.loadGemetries(
+			final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils.loadPreparedGeometries(
 					drtCfg.getDrtServiceAreaShapeFileURL(context));
 			Network network = getModalInstance(Network.class);
-			Set<Link> relevantLinks = network.getLinks().values().stream()
-					.filter(link -> ShpGeometryUtils.isCoordInGeometries(link.getToNode().getCoord(), geometries))
+			Set<Link> relevantLinks = network.getLinks()
+					.values()
+					.stream()
+					.filter(link -> ShpGeometryUtils.isCoordInPreparedGeometries(link.getToNode().getCoord(),
+							preparedGeometries))
 					.collect(Collectors.toSet());
 			final TransitSchedule schedule = ScenarioUtils.createScenario(ConfigUtils.createConfig())
 					.getTransitSchedule();
