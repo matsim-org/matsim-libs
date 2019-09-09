@@ -55,13 +55,6 @@ public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory
 		this(FastRouterType.ARRAY, globalConfigGroup.getNumberOfThreads());
 	}
 
-	public FastAStarLandmarksFactory() {
-		// the value of 8 threads was the default that I found here when making this configurable without injection.
-		// This was in the create method, with a comment from kai, nov 17.
-		// Not sure why this is a good default. td, nov 18
-		this(8);
-	}
-
 	public FastAStarLandmarksFactory(int nThreads) {
 		this(FastRouterType.ARRAY, nThreads);
 	}
