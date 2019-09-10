@@ -80,7 +80,10 @@ public class NoiseIT {
 		
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config1.xml";
 
-		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile, new NoiseConfigGroup()));
+		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
+		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 				
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) scenario.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
 		

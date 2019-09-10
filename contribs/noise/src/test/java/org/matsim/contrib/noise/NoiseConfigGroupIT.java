@@ -48,6 +48,7 @@ public class NoiseConfigGroupIT {
 		
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseConfigGroupTest/config0.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
+		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 				
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 
@@ -75,7 +76,8 @@ public class NoiseConfigGroupIT {
 		
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseConfigGroupTest/config1.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
-				
+		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		
 		// see if the custom config group is written into the output config file
