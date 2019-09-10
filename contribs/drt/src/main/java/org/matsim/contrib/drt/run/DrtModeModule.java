@@ -52,8 +52,10 @@ import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -145,6 +147,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 	}
 
 	private static class DrtRoutingModuleProvider extends ModalProviders.AbstractProvider<DrtRoutingModule> {
+		private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = new FastAStarEuclideanFactory();
 		private final DrtConfigGroup drtCfg;
 
 		@Inject
@@ -166,9 +169,8 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		@Override
 		public DrtRoutingModule get() {
 			Network network = getModalInstance(Network.class);
-
-			return new DrtRoutingModule(drtCfg, network, travelTime, getModalInstance(TravelDisutilityFactory.class),
-					walkRouter, scenario);
+			return new DrtRoutingModule(drtCfg, network, leastCostPathCalculatorFactory, travelTime,
+					getModalInstance(TravelDisutilityFactory.class), walkRouter, scenario);
 		}
 	}
 

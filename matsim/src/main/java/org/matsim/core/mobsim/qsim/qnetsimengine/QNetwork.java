@@ -50,7 +50,8 @@ public class QNetwork implements NetsimNetwork {
 	private final Network network;
 
 	private final QNetworkFactory queueNetworkFactory;
-	QNetsimEngine simEngine;
+
+	QNetsimEngine simEngine; // only for tests...
 
 	QNetwork(final Network network, final QNetworkFactory netsimNetworkFactory ) {
 		this.network = network;
@@ -59,9 +60,9 @@ public class QNetwork implements NetsimNetwork {
 		this.nodes = new LinkedHashMap<>((int)(network.getLinks().size()*1.1), 0.95f);
 	}
 
-	public void initialize(QNetsimEngine simEngine1, AgentCounter agentCounter, MobsimTimer simTimer) {
-		this.simEngine = simEngine1;
-		this.queueNetworkFactory.initializeFactory( agentCounter, simTimer, simEngine1.ii );
+	public void initialize(QNetsimEngine simEngine, AgentCounter agentCounter, MobsimTimer simTimer) {
+		this.simEngine = simEngine;
+		this.queueNetworkFactory.initializeFactory( agentCounter, simTimer, simEngine.ii);
 		for (Node n : network.getNodes().values()) {
 			this.nodes.put(n.getId(), this.queueNetworkFactory.createNetsimNode(n));
 		}

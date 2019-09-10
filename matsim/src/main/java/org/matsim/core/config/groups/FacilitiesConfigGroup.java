@@ -44,7 +44,7 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 	private boolean insistingOnUsingDeprecatedPersonAttributeFile = false ;
 
 	// following params are required only if activitiesFacilities are generated internally (e.g., FacilitiesSource.onePerActivityLocationInPlansFile). Amit Jan'18
-	private String idPrefix = "autogen_";
+	private String idPrefix = "f_auto_";
 //	private boolean removingLinksAndCoordinates = true;
 //	private boolean assigningOpeningTime = false;
 //	private boolean assigningLinksToFacilitiesIfMissing = true;
