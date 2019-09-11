@@ -57,7 +57,7 @@ public class RunTestEquil {
     controler.run();
 
     //the total costs of link 1 differ to the one which I manually calculate
-    //Link 1 three vehicles are not taken into account for the calculation, the ones before 06.00
+    //Link 1 three vehicles are not taken into account for the calculation, the ones before 06.00, it takes the ones at this time at the next day (29:35 for example)
     
     BufferedReader br = IOUtils.getBufferedReader(outputDirectory + "ITERS/it.0/run1.0.accidentCosts_BVWP.csv");
 	
