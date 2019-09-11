@@ -17,6 +17,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -32,26 +33,28 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import commercialtraffic.companyGeneration.CommericalCompany;
 import commercialtraffic.companyGeneration.CompanyGenerator;
+import ft.utils.ctDemandPrep.Company;
 import ft.utils.ctDemandPrep.Demand4CompanyClass;
 import ft.utils.ctDemandPrep.DemandGenerator;
 
 public class AssignService {
-	
+
 	// !!!!! Important !!!!!
 	// SET MAX SERVICES PER ACTIVITY
 	// !!!!! Important !!!!!
 	int maxServicesPerAct = 3;
-	
+
 	// !!!!! Filter CT Trips !!!!!
-	Double filterFactor=1.0;
-	
-	
+	Double filterFactor = 0.1;
+
 	CommercialTripsReader commercialTripReader;
 	String plansFile;
 	String addCompanyFolder;
 
 	Set<String> acceptedMainModes = new HashSet<>(
-			Arrays.asList("car", "pt", "drt", "walk", "ride", "bike", "stayHome"));
+			Arrays.asList("car", "pt", "drt", "walk", "ride", "bike", "stayHome", "preventedShoppingTrip"));
+	Set<String> additionalLegModes = new HashSet<>(Arrays.asList("stayHome", "preventedShoppingTrip"));
+
 	Set<String> acceptedActivities = new HashSet<>(
 			Arrays.asList("home", "work", "shopping", "leisure", "other", "education"));
 
@@ -71,32 +74,32 @@ public class AssignService {
 	MutableInt foundCounter = new MutableInt(0);
 	List<Job> jobList = new ArrayList<Job>();
 	MutableInt jobIdCounter = new MutableInt(0);
+	MutableInt eGroceryJobIdCounter = new MutableInt(0);
 	CompanyGenerator companyGenerator;
 	String comercialVehicleCSV;
 	long nr = 1896;
 	Random r = MatsimRandom.getRandom();
 
-	AssignService(String plansFile,String addCompanyFolder, String commercialTripsFile, String comercialVehicleCSV, String networkFile,
-			String serviceDurationDistPath, String companyFolder, String zoneSHP, String matsimInput,
-			String outputpath) {
+	AssignService(String plansFile, String addCompanyFolder, String commercialTripsFile, String comercialVehicleCSV,
+			String networkFile, String serviceDurationDistPath, String companyFolder, String zoneSHP,
+			String matsimInput, String outputpath) {
 		this.outputpath = outputpath;
-		this.addCompanyFolder=addCompanyFolder;
+		this.addCompanyFolder = addCompanyFolder;
 		this.comercialVehicleCSV = comercialVehicleCSV;
 		this.networkFile = networkFile;
 		this.matsimInput = matsimInput;
 		new PopulationReader(scenario).readFile(plansFile);
 		r.setSeed(nr);
-		commercialTripReader = new CommercialTripsReader(commercialTripsFile, serviceDurationDistPath,filterFactor);
+		commercialTripReader = new CommercialTripsReader(commercialTripsFile, serviceDurationDistPath, filterFactor);
 		commercialTripReader.run();
-		
-		
-		
+
 		demand = new DemandGenerator(companyFolder, zoneSHP, outputpath);
 		demand.findNeighbourZones();
 
 		// companyGenerator is required in order to construct carriers with services
-		this.companyGenerator = new CompanyGenerator(comercialVehicleCSV,addCompanyFolder, commercialTripsFile, serviceDurationDistPath,
-				networkFile, companyFolder, zoneSHP, outputpath, matsimInput + "Carrier\\",commercialTripReader.vehBlackListIds);
+		this.companyGenerator = new CompanyGenerator(comercialVehicleCSV, addCompanyFolder, commercialTripsFile,
+				serviceDurationDistPath, networkFile, companyFolder, zoneSHP, outputpath, matsimInput + "Carrier\\",
+				commercialTripReader.vehBlackListIds);
 		this.companyGenerator.initalize();
 
 		// CompanyGenerator demand = new
@@ -114,7 +117,7 @@ public class AssignService {
 	public static void main(String[] args) {
 
 		AssignService assignData = new AssignService(
-				"D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw243_cadON_ptSpeedAdj.0.1\\vw243_cadON_ptSpeedAdj.0.1.output_plans.xml.gz",
+				"D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\vw243_0.1_EGrocery0.1\\vw243_0.1_EGrocery0.1_input.xml.gz",
 				"D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\EGrocery",
 				"D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\wege.csv",
 				"D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\fahrzeuge.csv",
@@ -128,7 +131,8 @@ public class AssignService {
 		assignData.initializeActCandidateMap();
 
 		assignData.findCandidates();
-		assignData.manipulatePopulationAndCreateServices();
+		assignData.addCustomServices();
+		// assignData.manipulatePopulationAndCreateServices();
 		assignData.writeCustomerDemand();
 		assignData.writePopulation();
 		assignData.companyGenerator.writeCarriers();
@@ -137,22 +141,79 @@ public class AssignService {
 
 	}
 
+	// Add custom Services
+	public void addCustomServices() {
+		int maxServicePerPerson = 1;
+		List<String> grocCompkeys = new ArrayList<String>();
+		for (Entry<String, CommericalCompany> entry : companyGenerator.commercialCompanyMap.entrySet()) {
+			if (entry.getKey().contains("e-grocery")) {
+				grocCompkeys.add(entry.getKey());
+			}
+		}
+		java.util.Collections.sort(grocCompkeys);
+		// Loop over Persons to find E-Grocery demand
+		for (Person p : scenario.getPopulation().getPersons().values()) {
+			int serviceCounter = 0;
+
+			Plan plan = p.getSelectedPlan();
+			int peIdx = 0;
+			double eGrocServDur = 300.0;
+			List<Integer> peList = new ArrayList<Integer>();
+			for (PlanElement pe : plan.getPlanElements()) {
+
+				if (pe instanceof Activity) {
+					if (!(pe.getAttributes().isEmpty())) {
+						Object actAttr = pe.getAttributes().getAttribute("jobId");
+						if (actAttr.equals("-99")) {
+
+							peList.add(peIdx);
+							// Create Service for Carrier H1_e-grocery1
+							String serviceId = "H1_" + eGroceryJobIdCounter + "e-Grocery";
+
+							Id<Link> linkId = ((Activity) pe).getLinkId();
+							Triple<Integer, Double, Double> result = getTimeConstrainedActivity(p.getId(), peList,
+									eGrocServDur);
+							if (result != null && !(serviceCounter > maxServicePerPerson)) {
+								double endTime = result.getRight();
+								double startTime = result.getMiddle();
+								int capacity = Math.max(1, (r.nextInt(16)));
+								int rdmIdx = r.nextInt(grocCompkeys.size());
+								companyGenerator.commercialCompanyMap.get(grocCompkeys.get(rdmIdx))
+										.addGroceryService(serviceId, linkId, startTime, endTime, capacity);
+								pe.getAttributes().putAttribute("jobId", serviceId);
+								serviceCounter++;
+
+							} else {
+								pe.getAttributes().removeAttribute("jobId");
+							}
+
+							eGroceryJobIdCounter.increment();
+						}
+
+					}
+				}
+				peIdx++;
+			}
+
+		}
+
+	}
+
 	// Add services to customers and add service objects to carriers
 	public void manipulatePopulationAndCreateServices() {
 
 		// companyCarrierMap String Key = companyId
 		Map<String, CommericalCompany> companyMap = companyGenerator.commercialCompanyMap;
-		for (Entry<String, List<CommercialTrip>> tripsPerServiceType : commercialTripReader.commercialTripMap
-				.entrySet())
 
-		{
+		for (Entry<String, List<CommercialTrip>> tripsPerServiceType : commercialTripReader.commercialTripMap
+				.entrySet()) {
 			for (CommercialTrip commercialTrip : tripsPerServiceType.getValue()) {
 				String customerRelation = commercialTrip.customerRelation;
 				String serviceType = commercialTrip.wirtschaftszweig;
 				String zone = commercialTrip.zielzelle;
 				String carrierId = serviceType + "_" + commercialTrip.unternehmensID;
 				String companyId = String.valueOf(commercialTrip.unternehmensID);
-				if (customerRelation=="private") {
+				if (customerRelation == "private") {
 					continue;
 				}
 
@@ -170,6 +231,7 @@ public class AssignService {
 					// Check for Attributes
 					Object actAttr = this.scenario.getPopulation().getPersons().get(finalJob.personid).getSelectedPlan()
 							.getPlanElements().get(finalJob.planIdx).getAttributes().getAttribute("jobId");
+					// E-Grocery Service is attributed with -99
 
 					if (actAttr == null) {
 						this.scenario.getPopulation().getPersons().get(finalJob.personid).getSelectedPlan()
@@ -180,8 +242,8 @@ public class AssignService {
 						this.scenario.getPopulation().getPersons().get(finalJob.personid).getSelectedPlan()
 								.getPlanElements().get(finalJob.planIdx).getAttributes()
 								.putAttribute("jobId", prevJobId + ";" + finalJob.jobId);
-						
-						//System.out.println(prevJobId + ";" + finalJob.jobId);
+
+						// System.out.println(prevJobId + ";" + finalJob.jobId);
 
 					}
 
@@ -254,14 +316,13 @@ public class AssignService {
 											.get(matchedPeIdx);
 
 									// return finalActivityDestination;
-//									if (jobIdCounter.intValue()==2324) {
-//										int test=1;
-//										System.out.println(test);
-//									}
+									// if (jobIdCounter.intValue()==2324) {
+									// int test=1;
+									// System.out.println(test);
+									// }
 									return new Job(jobIdCounter.toString(), carrierId, candidatePerson, serviceType,
 											customerRelation, zone, serviceDuration, matchedPeIdx,
 											finalActivityDestination, startTime, endTime);
-									
 
 								}
 							}
@@ -286,9 +347,8 @@ public class AssignService {
 
 		// List<Integer> matchedActsList = new ArrayList<Integer>();
 		// Left = peIdx, Middle = ActStartTime, Right = ActEndTime
-		//TODO Add Opening and Closing time to check time constraint
-		
-		
+		// TODO Add Opening and Closing time to check time constraint
+
 		List<Triple<Integer, Double, Double>> matchedActsList2 = new ArrayList<>();
 
 		Plan plan = this.scenario.getPopulation().getPersons().get(candidatePerson).getSelectedPlan();
@@ -300,7 +360,6 @@ public class AssignService {
 			Activity activity = (Activity) plan.getPlanElements().get(peIdx);
 
 			Object actAttr = activity.getAttributes().getAttribute("jobId");
-			
 
 			if (actAttr != null) {
 
@@ -316,21 +375,29 @@ public class AssignService {
 			if (peIdx > 1) {
 
 				Leg prevLeg = (Leg) plan.getPlanElements().get(peIdx - 1);
+				// if (additionalLegModes.contains(prevLeg.getMode().toString())) {
+				// //peIdx++;
+				// continue;
+				//
+				if (!(additionalLegModes.contains(prevLeg.getMode().toString()))
+						&& prevLeg.getTravelTime() == Double.NEGATIVE_INFINITY) {
 
-				if (prevLeg.getTravelTime() == Double.NEGATIVE_INFINITY) {
 					throw new IllegalArgumentException(
-							"Found leg with no travle time! Please provide iterated output plans");
+							"Found leg with no travel time! Please provide iterated output plans1");
 				}
-
-				actStartTime = prevLeg.getDepartureTime() + prevLeg.getTravelTime();
+				if (additionalLegModes.contains(prevLeg.getMode().toString())) {
+					actStartTime = 6.0 * 3600.0;
+				} else {
+					actStartTime = prevLeg.getDepartureTime() + prevLeg.getTravelTime();
+				}
 			} else {
-				actStartTime = 6.0* 3600.0;
+				actStartTime = 6.0 * 3600.0;
 			}
 
 			actEndTime = activity.getEndTime();
 
 			if (actEndTime == Double.NEGATIVE_INFINITY) {
-				actEndTime = 17.5 * 3600.0;
+				actEndTime = 20 * 3600.0;
 			}
 
 			if (actStartTime != Double.NaN && actEndTime != Double.NaN) {
@@ -581,7 +648,7 @@ public class AssignService {
 
 			Person person = population.getPersons().get(personId);
 
-			PersonUtils.removeUnselectedPlans(person);
+			// PersonUtils.removeUnselectedPlans(person);
 
 			// Person person = myPerson.next();
 
@@ -608,10 +675,14 @@ public class AssignService {
 						if (peIdx > 1) {
 
 							Leg prevLeg = (Leg) person.getSelectedPlan().getPlanElements().get(peIdx - 1);
-
+							if (additionalLegModes.contains(prevLeg.getMode().toString())) {
+								peIdx++;
+								continue;
+							}
 							if (prevLeg.getTravelTime() == Double.NEGATIVE_INFINITY) {
+
 								throw new IllegalArgumentException(
-										"Found leg with no travle time! Please provide iterated output plans");
+										"Found leg with no travel time! Please provide iterated output plans2");
 							}
 
 							actStartTime = prevLeg.getDepartureTime() + prevLeg.getTravelTime();
@@ -987,9 +1058,11 @@ public class AssignService {
 				if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
 
-					if (leg.getTravelTime() == Double.NEGATIVE_INFINITY) {
+					if (!(additionalLegModes.contains(leg.getMode().toString()))
+							&& (leg.getTravelTime() == Double.NEGATIVE_INFINITY)) {
+
 						throw new IllegalArgumentException(
-								"Found leg with no travle time! Please provide iterated output plans");
+								"Found leg with no travel time! Please provide iterated output plans3");
 					}
 
 					if (acceptedMainModes.contains(leg.getMode())) {

@@ -29,6 +29,8 @@ import com.graphhopper.jsprit.core.problem.constraint.ServiceDeliveriesFirstCons
 import com.graphhopper.jsprit.core.problem.constraint.VehicleDependentTimeWindowConstraints;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
+import commercialtraffic.NetworkBasedTransportCosts;
+import commercialtraffic.NetworkRouter;
 import commercialtraffic.integration.CarrierJSpritIterations;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -36,14 +38,16 @@ import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierVehicleType;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
-import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
-import org.matsim.contrib.freight.jsprit.NetworkRouter;
+//import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
+//import org.matsim.contrib.freight.jsprit.NetworkRouter;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ForkJoinPool;
 
 public class TourPlanning  {
 
@@ -55,18 +59,27 @@ public class TourPlanning  {
         carriers.getCarriers().values().forEach(carrier -> vehicleTypes.addAll(carrier.getCarrierCapabilities().getVehicleTypes()));
         NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), vehicleTypes);
         log.info("SETTING TIME SLICE TO " + jSpritTimeSliceWidth);
+        
+        
         netBuilder.setTimeSliceWidth(jSpritTimeSliceWidth); // !!!! otherwise it will not do anything.
         netBuilder.setTravelTime(travelTime);
-        final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
-        carriers.getCarriers().values().parallelStream().forEach(carrier -> {
+
+        
+
+        
+        final NetworkBasedTransportCosts netBasedCosts1 = netBuilder.build();
+        
+carriers.getCarriers().values().parallelStream().forEach(carrier -> {
                     double start = System.currentTimeMillis();
                     int serviceCount =  carrier.getServices().size();
                     log.info("start tour planning for " + carrier.getId() + " which has " + serviceCount + " services");
 
                     //Build VRP
+                    
                     VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork());
-                    vrpBuilder.setRoutingCost(netBasedCosts);// this may be too expensive for the size of the problem
-
+                    
+                    vrpBuilder.setRoutingCost(netBasedCosts1);// this may be too expensive for the size of the problem
+                    
                     VehicleRoutingProblem problem = vrpBuilder.build();
 
                     double radialShare =  0.3;  //standard radial share is 0.3
@@ -84,8 +97,10 @@ public class TourPlanning  {
                     ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
                     constraintManager.addConstraint(new ServiceDeliveriesFirstConstraint(), ConstraintManager.Priority.CRITICAL);
                     constraintManager.addConstraint(new VehicleDependentTimeWindowConstraints(stateManager, problem.getTransportCosts(), problem.getActivityCosts()), ConstraintManager.Priority.HIGH);
+                    //add Multiple Threads
                     VehicleRoutingAlgorithm algorithm = Jsprit.Builder.newInstance(problem)
                             .setStateAndConstraintManager(stateManager,constraintManager)
+                            .setProperty(Jsprit.Parameter.THREADS,String.valueOf(32))
                             .setProperty(Jsprit.Parameter.RADIAL_MIN_SHARE, String.valueOf(radialServicesReplanned))
                             .setProperty(Jsprit.Parameter.RADIAL_MAX_SHARE, String.valueOf(radialServicesReplanned))
                             .setProperty(Jsprit.Parameter.RANDOM_BEST_MIN_SHARE, String.valueOf(randomServicesReplanned))
@@ -113,7 +128,7 @@ public class TourPlanning  {
                     CarrierPlan carrierPlan = MatsimJspritFactory.createPlan(carrier, bestSolution);
 
                     log.info("routing plan for carrier " + carrier.getId());
-                    NetworkRouter.routePlan(carrierPlan, netBasedCosts);    //we need to route the plans in order to create reasonable freight-agent plans
+                    NetworkRouter.routePlan(carrierPlan, netBasedCosts1);    //we need to route the plans in order to create reasonable freight-agent plans
                     log.info("routing for carrier " + carrier.getId() + " finished. Tour planning plus routing took " + (System.currentTimeMillis() - start)/1000 + " seconds." );
                     carrier.setSelectedPlan(carrierPlan);
                 }

@@ -63,6 +63,25 @@ public class CommericalCompany {
 		CarrierService service = serviceBuilder.build();
 		carrier.getServices().add(service);
 	}
+	public void addGroceryService(String serviceId, Id<Link> linkId,double startTime, double endTime, int Capacity)
+	{
+		//FAIL! double trueEndTime = endTime-serviceDuration;
+		double trueEndTime = endTime;
+		CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(Id.create(serviceId, CarrierService.class ), linkId);
+		//TODO: Please change to non fixed number
+		serviceBuilder.setCapacityDemand( Capacity );
+		serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(startTime, trueEndTime) );
+		serviceBuilder.setServiceDuration( 300);
+		CarrierService service = serviceBuilder.build();
+		carrier.getServices().add(service);
+	}
+	
+	public double getClosingTime(String companyId) {
+		
+		
+		return closingTime;
+		
+	}
 
 	public static CarrierVehicle getVehicle(Id<?> id, Id<Link> homeId, String depot, int vehicleType, double openingTime, double closingTime) {
 				

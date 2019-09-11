@@ -32,6 +32,7 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
@@ -46,12 +47,12 @@ import static org.matsim.core.scenario.ScenarioUtils.loadScenario;
 
 public class RunCommercialTraffic_H {
 	public static void main(String[] args) {
-		String runId = "CT_251_noJsprit";
-		String pct = ".1.0";
+		String runId = "vw243_0.1_EGrocery0.1";
+		String pct = ".0.1";
 
-		String inputDir = "D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\vw251_1.0\\";
+		String inputDir = "D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\vw243_0.1_EGrocery0.1\\";
 
-		Config config = ConfigUtils.loadConfig(inputDir + "config_1.0.xml", new CommercialTrafficConfigGroup());
+		Config config = ConfigUtils.loadConfig(inputDir + "config_0.1.xml", new CommercialTrafficConfigGroup());
 
 		StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
 		changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
@@ -69,9 +70,24 @@ public class RunCommercialTraffic_H {
 		CommercialTrafficConfigGroup ctcg = (CommercialTrafficConfigGroup) config.getModules().get(CommercialTrafficConfigGroup.GROUP_NAME);
 		ctcg.setCarriersFile(inputDir+"Carrier\\carrier_definition.xml");
 		ctcg.setCarriersVehicleTypesFile(inputDir+"Carrier\\carrier_vehicletypes.xml");
+		ctcg.setjSpritTimeSliceWidth(3600);
 		
 		
-		config.controler().setLastIteration(3);
+		//Config for StayHome Act
+		PlanCalcScoreConfigGroup.ModeParams scoreParams =  new PlanCalcScoreConfigGroup.ModeParams("preventedShoppingTrip");
+		config.planCalcScore().addModeParams(scoreParams);
+		
+		PlansCalcRouteConfigGroup.ModeRoutingParams params = new PlansCalcRouteConfigGroup.ModeRoutingParams();
+		params.setMode("preventedShoppingTrip");
+		params.setTeleportedModeFreespeedLimit(100000d);
+		params.setTeleportedModeSpeed(100000d);
+		params.setBeelineDistanceFactor(1.3);
+		config.plansCalcRoute().addModeRoutingParams(params);
+
+		config.planCalcScore().addModeParams(scoreParams);
+		
+		
+		config.controler().setLastIteration(1);
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.00); // Fraction to disable Innovation
 		Scenario scenario = loadScenario(config);
 		adjustPtNetworkCapacity(scenario.getNetwork(), config.qsim().getFlowCapFactor());
@@ -88,7 +104,10 @@ public class RunCommercialTraffic_H {
 
 		controler.addOverridingModule(new SwissRailRaptorModule());
 
-		controler.addOverridingModule(new CommercialTrafficModule(config, (carrierId -> 0)));
+		controler.addOverridingModule(new CommercialTrafficModule(config, carrierId -> {
+            if(carrierId.toString().startsWith("H1")) return 100;
+            return 1;
+        }));
 
 		controler.run();
 

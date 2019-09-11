@@ -180,12 +180,11 @@ public class CompanyGenerator {
 						// TODO Fix opening and closing times
 						if (commercialCompanyMap.containsKey(companyId)) {
 							// Add only not filtered and active new vehicle
-							if ((vehBlackListIds.isEmpty() && active)
-									|| (!vehBlackListIds.get(companyClass).contains(vehicleId) && active)) {
-								commercialCompanyMap.get(companyId).addVehicle(
-										commercialCompanyMap.get(companyId).companyLinkId, vehicleType, vehOpening,
-										vehClosing);
-							}
+
+							commercialCompanyMap.get(companyId).addVehicle(
+									commercialCompanyMap.get(companyId).companyLinkId, vehicleType, vehOpening,
+									vehClosing);
+
 						} else {
 							// Create company
 							Id<Link> companyLinkId = NetworkUtils.getNearestLink(carNetwork, companyCoord).getId();
@@ -194,10 +193,9 @@ public class CompanyGenerator {
 							CommericalCompany commericalCompany = new CommericalCompany(companyId, compOpening,
 									compClosing, servDur, companyClass, companyLinkId);
 							// Add only not filtered and active new vehicle
-							if ((vehBlackListIds.isEmpty() && active)
-									|| (!vehBlackListIds.get(companyClass).contains(vehicleId) && active)) {
-								commericalCompany.addVehicle(companyLinkId, vehicleType, vehOpening, vehClosing);
-							}
+
+							commericalCompany.addVehicle(companyLinkId, vehicleType, vehOpening, vehClosing);
+
 							commercialCompanyMap.put(companyId, commericalCompany);
 
 						}
@@ -306,8 +304,8 @@ public class CompanyGenerator {
 				// Delete Companies without vehicles
 				continue;
 			}
-
-			carriers.addCarrier(commercialCompanyEntry.getValue().carrier);
+if (commercialCompanyEntry.getValue().carrier.getId().toString().contains("grocery")) {
+			carriers.addCarrier(commercialCompanyEntry.getValue().carrier);}
 
 		}
 		new CarrierPlanXmlWriterV2(carriers).write(carrierOutputPath + "carrier_definition.xml");
