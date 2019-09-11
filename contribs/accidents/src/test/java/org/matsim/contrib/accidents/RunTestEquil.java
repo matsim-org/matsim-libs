@@ -53,7 +53,7 @@ public class RunTestEquil {
     //how can the parameters of the accidents Module be changed? 
     //TODO: changing through programming the free speed and number o lanes, is there an elegant way to do this we normally changed the input with other programs in Matsim.
     //wich implications has the type of the config file? the test does not work with the output configs
-    Network network = scenario.getNetwork(); 
+    //Network network = scenario.getNetwork(); 
     controler.run();
 
     //the total costs of link 1 differ to the one which I manually calculate
