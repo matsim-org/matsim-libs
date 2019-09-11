@@ -50,14 +50,14 @@ public class RunTestEquil {
     final Scenario scenario = ScenarioUtils.loadScenario(config);
     Controler controler = new Controler (scenario);
     controler.addOverridingModule(new AccidentsModule(scenario));
-    //how can the parameters of the accidents Module be changed? 
+    //how can the parameters of the accidents Module be changed? normally I would write config.modulename().set....
     //TODO: changing through programming the free speed and number o lanes, is there an elegant way to do this we normally changed the input with other programs in Matsim.
     //wich implications has the type of the config file? the test does not work with the output configs
     //Network network = scenario.getNetwork(); 
     controler.run();
 
     //the total costs of link 1 differ to the one which I manually calculate
-    //Link 1 three vehicles are not taken into account for the calculation, the ones before 06.00, it takes the ones at this time at the next day (29:35 for example)
+    //Link 1 three vehicles are not taken into account for the calculation, the ones before 06.00, it takes the ones at this time at the next day (29:45 for example) instead
     
     BufferedReader br = IOUtils.getBufferedReader(outputDirectory + "ITERS/it.0/run1.0.accidentCosts_BVWP.csv");
 	
