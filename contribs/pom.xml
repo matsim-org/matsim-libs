@@ -153,6 +153,7 @@
 
 	<modules>
 		<module>accessibility</module>
+		<module>accidents</module>
 		<module>analysis</module>
 		<module>av</module>
 		<module>bicycle</module>
