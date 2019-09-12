@@ -173,13 +173,15 @@ public final class EmissionUtils {
 	}
 
 
-	public static void setHbefaVehicleDescription( final VehicleType vt, final String hbefaVehicleDescription ) {
+	public static void setHbefaVehicleDescription( final VehicleType vehicleType, final String hbefaVehicleDescription ) {
 		// yyyy maybe this should use the vehicle information tuple (see below)?
 		// yyyy replace this by using Attributes.  kai, oct'18
-		vt.setDescription((vt.getDescription() == null ? "" : vt.getDescription() + " ") +
-				EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() +
-				hbefaVehicleDescription +
-				EmissionSpecificationMarker.END_EMISSIONS.toString());
+//		vt.setDescription((vt.getDescription() == null ? "" : vt.getDescription() + " ") +
+//				EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() +
+//				hbefaVehicleDescription +
+//				EmissionSpecificationMarker.END_EMISSIONS.toString());
+
+		vehicleType.getAttributes().putAttribute( HBEFA_VEHICLE_DESCRIPTION, hbefaVehicleDescription ) ;
 	}
 	
 	static Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleDescription2VehicleInformationTuple( String hbefaVehicleTypeDescription ) {
