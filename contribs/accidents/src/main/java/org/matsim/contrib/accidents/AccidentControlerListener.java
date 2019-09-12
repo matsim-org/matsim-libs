@@ -97,7 +97,6 @@ import com.google.inject.Inject;
 				final double demand = accidentSettings.getSampleSize() * analzyer.getDemand(linkInfo.getLinkId(), timeBinNr);
 				
 				double accidentCosts = 0.;
-				double costRate = 0.;
 								
 				if (linkInfo.getComputationMethod().toString().equals( AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString() )) {
 					accidentCosts = AccidentCostComputationBVWP.computeAccidentCosts(demand, link, linkInfo.getRoadTypeBVWP());

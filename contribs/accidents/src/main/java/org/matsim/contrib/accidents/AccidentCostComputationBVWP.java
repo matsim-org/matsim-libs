@@ -2,25 +2,30 @@ package org.matsim.contrib.accidents;
 
 import java.util.ArrayList;
 
-import org.jfree.util.Log;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 
 /**
+ * 
+ * Computes the accident costs depending on the vehicle-km and the cost rate given for each road type
+ * 
 * @author mmayobre
 */
-
 class AccidentCostComputationBVWP {
-//Computes the expected Accident Costs depending on the expected vehicle-km an the Cost Rate of each Road Type
+	private static final Logger log = Logger.getLogger(AccidentCostComputationBVWP.class);
 
+	/**
+	 * 
+	 * Provides the accident costs in EUR based on a simplified version of Fig. 13 in the German BVWP 'Methodenhandbuch' 2030
+	 * 
+	 * @param demand
+	 * @param link
+	 * @param roadType
+	 * @return accident costs in EUR
+	 */
 	public static double computeAccidentCosts(double demand, Link link, ArrayList<Integer> roadType){
-		//costRateTable in €/T.vehicle-km
-		
-		// TODO: Check if this is 100% equal to Abb. 13 BVWP Methodenhandbuch 2030
-		// it is equal but simplified (Hugo)
-		// TODO: runtime exception instead of 0
-		// Since in this class the link ID can not be getted I would rather throw the exeption or warning in the class AccidentControlerListener notifying the ID of the link where the value would be 0 (Hugo)
-		// TO THINK ABOUT: doing an alternative Method in case all the data is available (Hugo)
-		
+
+		//costRateTable in EUR/T.vehicle-km
 		double costRateTable[][][] = {
 			/*	2. Ziffer
 			 * 		1.Spalte: Außerhalb von bebauten Gebiet, Kfz-Straße
@@ -53,19 +58,16 @@ class AccidentCostComputationBVWP {
 			}		
 		};
 		
-		//Parameter costRate
 		double costRate = costRateTable[roadType.get(0)][roadType.get(2)-1][roadType.get(1)]; 
 		if (costRate == 0) {
-			Log.error("Accident cost rate not specified link " + link.getId().toString() + " , roadtype: "+ roadType.toString() );
+			log.warn("Accident cost rate is not specified link " + link.getId().toString() + " , roadtype: " + roadType.toString() );
 		}
 		
 		double vehicleKm = demand * (link.getLength() / 1000.); // length is converted from METER to KILOMETER
 		
 		double accidentCosts = costRate * (vehicleKm / 1000.); // vehicleKM --> T.vehicleKM
 		
-		return accidentCosts; // in €
-		//return costRate;
-		
+		return accidentCosts;		
 	}
 	
 }
