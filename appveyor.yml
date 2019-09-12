@@ -14,7 +14,7 @@ install:
   - cmd: java -version
 
 build_script:
-  - mvn package --batch-mode -DskipTests -Dmaven.javadoc.skip -Dmatsim.preferLocalDtds=true --fail-at-end -Dsource.skip -Dassembly.skipAssembly=true
+  - mvn package --batch-mode -DskipTests -Dmaven.javadoc.skip -Dmatsim.preferLocalDtds=true --fail-at-end
 # test_script:
 #   - mvn test
 cache:
