@@ -91,7 +91,7 @@ public class FreightUtilsIT {
 		engineInformation.setFuelType( FuelType.diesel );
 		engineInformation.setFuelConsumption( 0.015 );
 		VehicleCapacity capacity = carrierVehType.getCapacity() ;
-		capacity.setWeightInTons( 3. ) ;
+		capacity.setOther( 3. ) ;
 		CostInformation costInfo = carrierVehType.getCostInformation();
 		costInfo.setCostsPerSecond( 0.001 ) ;
 		costInfo.setCostsPerMeter( 0.0001 ) ;
