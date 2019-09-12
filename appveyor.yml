@@ -9,6 +9,7 @@ os: Windows Server 2012
 install:
   - cmd: SET MAVEN_OPTS=-Xmx1g
   - cmd: SET JAVA_OPTS=-Xmx1g
+  - cmd: SET PATH=%JAVA_HOME%\bin;%PATH%
   - cmd: mvn --version
   - cmd: java -version
 
