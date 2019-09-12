@@ -2,16 +2,11 @@ package org.matsim.contrib.accidents;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -44,6 +39,10 @@ public class RunTestEquil {
     Controler controler = new Controler (scenario);
     controler.addOverridingModule(new AccidentsModule() );
     
+    scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setFreespeed(10); 
+    scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setNumberOfLanes(3);
+    scenario.getNetwork().getLinks().get(Id.createLinkId("15")).setFreespeed(10); 
+    scenario.getNetwork().getLinks().get(Id.createLinkId("15")).setNumberOfLanes(2);
     controler.run();
 
     //the total costs of link 1 differ to the one which I manually calculate
@@ -65,12 +64,14 @@ public class RunTestEquil {
 			String[] columns = line.split(";");
 			for (int column = 0; column < columns.length; column++) {
 				
+                //	link 22
 				if (lineCounter == 1 && column == 121) {
 					double accidentCosts = Double.valueOf(columns[column]);
-					Assert.assertEquals("wrong accident costs", 2162.475, accidentCosts , 0.01);	
-					//nachgerechnet: STIMMT!
+					int agents = 100;
+					int lengthKM = 35;
+					double accidentCostsManualCalculation = (agents  * lengthKM  * 61.785) / 1000. * 10;
+					Assert.assertEquals("wrong accident costs", accidentCostsManualCalculation, accidentCosts , 0.01);
 				}
-				
 				// link 1
 				if (lineCounter == 11 && column == 121) {
 					double accidentCosts = Double.valueOf(columns[column]);
@@ -78,10 +79,25 @@ public class RunTestEquil {
 					int lengthKM = 10;
 					double accidentCostsManualCalculation = (agents  * lengthKM  * 61.785) / 1000. * 10;
 					Assert.assertEquals("wrong accident costs", accidentCostsManualCalculation, accidentCosts , 0.01);
-//					Assert.assertEquals("wrong accident costs", 617.85, accidentCosts , 0.01);
-					//nachgerechnet: STIMMT NICHT!
 				}
-									
+				
+				//  link 6
+				if (lineCounter == 16 && column == 121) {
+					double accidentCosts = Double.valueOf(columns[column]);
+					int agents = 100;
+					int lengthKM = 10;
+					double accidentCostsManualCalculation = (agents  * lengthKM  * 34.735) / 1000. * 10;
+					Assert.assertEquals("wrong accident costs", accidentCostsManualCalculation, accidentCosts , 0.01);
+				}	
+				
+				//  link 15
+				if (lineCounter == 6 && column == 121) {
+					double accidentCosts = Double.valueOf(columns[column]);
+					int agents = 100;
+					int lengthKM = 5;
+					double accidentCostsManualCalculation = (agents  * lengthKM  * 31.63) / 1000. * 10;
+					Assert.assertEquals("wrong accident costs", accidentCostsManualCalculation, accidentCosts , 0.01);
+				}
 			}
 			
 			lineCounter++;
