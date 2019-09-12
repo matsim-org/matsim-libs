@@ -54,15 +54,15 @@ class PVehiclesFactory {
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();		
 		VehiclesFactory vehFactory = vehicles.getFactory();
 		VehicleType vehType = vehFactory.createVehicleType(Id.create(this.pConfig.getPIdentifier(), VehicleType.class));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(this.pConfig.getPaxPerVehicle()); // 2018-11 the driver no longer takes one seat
-		capacity.setStandingRoom(0);
-		vehType.setCapacity(capacity);
+//		VehicleCapacity capacity = new VehicleCapacity();
+		vehType.getCapacity().setSeats(this.pConfig.getPaxPerVehicle()); // 2018-11 the driver no longer takes one seat
+		vehType.getCapacity().setStandingRoom(0);
+//		vehType.setCapacity(capacity);
 		vehType.setPcuEquivalents(this.pConfig.getPassengerCarEquivalents());
 		vehType.setMaximumVelocity(this.pConfig.getVehicleMaximumVelocity());
-		vehType.setAccessTime(this.pConfig.getDelayPerBoardingPassenger());
-		vehType.setEgressTime(this.pConfig.getDelayPerAlightingPassenger());
-		vehType.setDoorOperationMode(this.pConfig.getDoorOperationMode());
+        VehicleUtils.setAccessTime(vehType, this.pConfig.getDelayPerBoardingPassenger());
+		VehicleUtils.setEgressTime(vehType, this.pConfig.getDelayPerAlightingPassenger());
+		VehicleUtils.setDoorOperationMode(vehType, this.pConfig.getDoorOperationMode()) ;
 		vehicles.addVehicleType( vehType);
 	
 		for (TransitLine line : pTransitSchedule.getTransitLines().values()) {

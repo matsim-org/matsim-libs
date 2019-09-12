@@ -1,4 +1,25 @@
-package org.matsim.facilities;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * FacilitiesReprojectionIOTest.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.facilities;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -37,8 +58,8 @@ public class FacilitiesReprojectionIOTest {
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Scenario reprojectedScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		new MatsimFacilitiesReader( originalScenario ).parse(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "facilities.xml"));
-		new MatsimFacilitiesReader( INITIAL_CRS, TARGET_CRS, reprojectedScenario.getActivityFacilities() ).parse(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "facilities.xml"));
+		new MatsimFacilitiesReader( originalScenario ).parse(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "facilities.xml"));
+		new MatsimFacilitiesReader( INITIAL_CRS, TARGET_CRS, reprojectedScenario.getActivityFacilities() ).parse(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "facilities.xml"));
 
 		assertScenarioReprojectedCorrectly(originalScenario, reprojectedScenario);
 	}
@@ -46,7 +67,7 @@ public class FacilitiesReprojectionIOTest {
 	@Test
 	public void testReprojectionAtExport() {
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimFacilitiesReader( originalScenario ).parse(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "facilities.xml"));
+		new MatsimFacilitiesReader( originalScenario ).parse(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "facilities.xml"));
 
 		final String outFile = utils.getOutputDirectory()+"/facilities.xml.gz";
 
@@ -66,7 +87,7 @@ public class FacilitiesReprojectionIOTest {
 		final double epsilon = 0.01;
 
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimFacilitiesReader( originalScenario ).parse(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "facilities.xml"));
+		new MatsimFacilitiesReader( originalScenario ).parse(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "facilities.xml"));
 
 		ProjectionUtils.putCRS(originalScenario.getActivityFacilities(), INITIAL_CRS);
 		new FacilitiesWriter(originalScenario.getActivityFacilities()).write(utils.getOutputDirectory()+"/facilities.xml");
@@ -128,10 +149,10 @@ public class FacilitiesReprojectionIOTest {
 		final double epsilon = 0.01;
 
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimFacilitiesReader( originalScenario ).parse(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "facilities.xml"));
+		new MatsimFacilitiesReader( originalScenario ).parse(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "facilities.xml"));
 
 		final Config config = ConfigUtils.createConfig();
-		config.facilities().setInputFile( IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "facilities.xml").toString() );
+		config.facilities().setInputFile( IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "facilities.xml").toString() );
 		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);
 
 		config.facilities().setInputCRS(TransformationFactory.CH1903_LV03_GT );

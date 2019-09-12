@@ -20,29 +20,54 @@
 package org.matsim.contrib.taxi.run;
 
 import java.net.URL;
+import java.util.Collection;
 import java.util.Map;
 
-import javax.validation.constraints.Min;
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.Modal;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.fifo.FifoTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.zonal.ZonalTaxiOptimizerParams;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-public class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
+import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
+
+public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
 	public static final String GROUP_NAME = "taxi";
 
-	@SuppressWarnings("deprecation")
-	public static TaxiConfigGroup get(Config config) {
-		return (TaxiConfigGroup)config.getModule(GROUP_NAME);
+	/**
+	 * @param config
+	 * @return single-mode taxi config (only if there is exactly 1 taxi config group in {@link MultiModeTaxiConfigGroup}.
+	 * Otherwise will fail.
+	 */
+	public static TaxiConfigGroup getSingleModeTaxiConfig(Config config) {
+		Collection<TaxiConfigGroup> taxiConfigGroups = MultiModeTaxiConfigGroup.get(config).getModalElements();
+		Preconditions.checkArgument(taxiConfigGroups.size() == 1,
+				"Supported for only 1 taxi mode in the config. Number of taxi modes: %s", taxiConfigGroups.size());
+		return taxiConfigGroups.iterator().next();
 	}
 
 	public static final String MODE = "mode";
 	static final String MODE_EXP = "Mode which will be handled by PassengerEngine and VrpOptimizer "
 			+ "(passengers'/customers' perspective)";
+
+	public static final String USE_MODE_FILTERED_SUBNETWORK = "useModeFilteredSubnetwork";
+	static final String USE_MODE_FILTERED_SUBNETWORK_EXP =
+			"Limit the operation of vehicles to links (of the 'dvrp_routing'"
+					+ " network) with 'allowedModes' containing this 'mode'."
+					+ " For backward compatibility, the value is set to false by default"
+					+ " -- this means that the vehicles are allowed to operate on all links of the 'dvrp_routing' network."
+					+ " The 'dvrp_routing' is defined by DvrpConfigGroup.networkModes)";
 
 	public static final String DESTINATION_KNOWN = "destinationKnown";
 	static final String DESTINATION_KNOWN_EXP =
@@ -100,13 +125,10 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
 			"Specifies whether the simulation should interrupt if not all requests were performed when"
 					+ " an interation ends. Otherwise, a warning is given. True by default.";
 
-	public static final String OPTIMIZER_PARAMETER_SET = "optimizer";
-	static final String OPTIMIZER_PARAMETER_SET_EXP =
-			"Specifies the type and parameters of the TaxiOptimizer. See: TaxiOptimizerParams and classes"
-					+ " implementing it, e.g. AbstractTaxiOptimizerParams.";
-
 	@NotBlank
 	private String mode = TransportMode.taxi; // travel mode (passengers'/customers' perspective)
+
+	private boolean useModeFilteredSubnetwork = false;
 
 	private boolean destinationKnown = false;
 	private boolean vehicleDiversion = false;
@@ -117,8 +139,8 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
 	@Positive
 	private double dropoffDuration = Double.NaN;// seconds
 
-	@Min(1)
-	private double AStarEuclideanOverdoFactor = 1.;
+	@DecimalMin("1.0")
+	private double AStarEuclideanOverdoFactor = 2.;
 
 	private boolean onlineVehicleTracker = false;
 	private boolean changeStartLinkToLastLinkInSchedule = false;
@@ -133,14 +155,32 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
 
 	private boolean printDetailedWarnings = true;
 
+	private AbstractTaxiOptimizerParams taxiOptimizerParams;
+
 	public TaxiConfigGroup() {
 		super(GROUP_NAME);
+	}
+
+	@Override
+	protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
+
+		Verify.verify(config.qsim().getNumberOfThreads() == 1, "Only a single-threaded QSim allowed");
+
+		Verify.verify(!isVehicleDiversion() || isOnlineVehicleTracker(),
+				TaxiConfigGroup.VEHICLE_DIVERSION + " requires " + TaxiConfigGroup.ONLINE_VEHICLE_TRACKER);
+
+		if (useModeFilteredSubnetwork) {
+			DvrpRoutingNetworkProvider.
+					checkUseModeFilteredSubnetworkAllowed(config, mode);
+		}
 	}
 
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> map = super.getComments();
 		map.put(MODE, MODE_EXP);
+		map.put(USE_MODE_FILTERED_SUBNETWORK, USE_MODE_FILTERED_SUBNETWORK_EXP);
 		map.put(DESTINATION_KNOWN, DESTINATION_KNOWN_EXP);
 		map.put(VEHICLE_DIVERSION, VEHICLE_DIVERSION_EXP);
 		map.put(PICKUP_DURATION, PICKUP_DURATION_EXP);
@@ -152,7 +192,6 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
 		map.put(TIME_PROFILES, TIME_PROFILES_EXP);
 		map.put(DETAILED_STATS, DETAILED_STATS_EXP);
 		map.put(BREAK_IF_NOT_ALL_REQUESTS_SERVED, BREAK_IF_NOT_ALL_REQUESTS_SERVED_EXP);
-		map.put(OPTIMIZER_PARAMETER_SET, OPTIMIZER_PARAMETER_SET_EXP);
 		map.put(PRINT_WARNINGS, PRINT_WARNINGS_EXP);
 		return map;
 	}
@@ -173,6 +212,22 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
 	@StringSetter(MODE)
 	public void setMode(String mode) {
 		this.mode = mode;
+	}
+
+	/**
+	 * @return {@value #USE_MODE_FILTERED_SUBNETWORK_EXP}
+	 */
+	@StringGetter(USE_MODE_FILTERED_SUBNETWORK)
+	public boolean isUseModeFilteredSubnetwork() {
+		return useModeFilteredSubnetwork;
+	}
+
+	/**
+	 * @param useModeFilteredSubnetwork {@value #USE_MODE_FILTERED_SUBNETWORK_EXP}
+	 */
+	@StringSetter(USE_MODE_FILTERED_SUBNETWORK)
+	public void setUseModeFilteredSubnetwork(boolean useModeFilteredSubnetwork) {
+		this.useModeFilteredSubnetwork = useModeFilteredSubnetwork;
 	}
 
 	/**
@@ -351,13 +406,53 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
 		this.breakSimulationIfNotAllRequestsServed = breakSimulationIfNotAllRequestsServed;
 	}
 
-	public ConfigGroup getOptimizerConfigGroup() {
-		return getParameterSets(OPTIMIZER_PARAMETER_SET).iterator().next();
+	public AbstractTaxiOptimizerParams getTaxiOptimizerParams() {
+		return taxiOptimizerParams;
 	}
 
-	public void setOptimizerConfigGroup(ConfigGroup optimizerCfg) {
-		clearParameterSetsForType(OPTIMIZER_PARAMETER_SET);
-		addParameterSet(optimizerCfg);
+	@Override
+	public ConfigGroup createParameterSet(String type) {
+		switch (type) {
+			case AssignmentTaxiOptimizerParams.SET_NAME:
+				return new AssignmentTaxiOptimizerParams();
+			case FifoTaxiOptimizerParams.SET_NAME:
+				return new FifoTaxiOptimizerParams();
+			case RuleBasedTaxiOptimizerParams.SET_NAME:
+				return new RuleBasedTaxiOptimizerParams();
+			case ZonalTaxiOptimizerParams.SET_NAME:
+				return new ZonalTaxiOptimizerParams();
+			default:
+				try {
+					return (AbstractTaxiOptimizerParams)Class.forName(type).getDeclaredConstructor().newInstance();
+				} catch (ReflectiveOperationException e) {
+					throw new RuntimeException("Cannot instantiate taxi optimizer parameter set of type: " + type, e);
+				}
+		}
+	}
+
+	@Override
+	public void addParameterSet(ConfigGroup set) {
+		if (set instanceof AbstractTaxiOptimizerParams) {
+			if (taxiOptimizerParams != null) {
+				throw new IllegalStateException(
+						"Remove the existing taxi optimizer parameter set before adding a new one");
+			}
+			taxiOptimizerParams = (AbstractTaxiOptimizerParams)set;
+		}
+
+		super.addParameterSet(set);
+	}
+
+	@Override
+	public boolean removeParameterSet(ConfigGroup set) {
+		if (set instanceof AbstractTaxiOptimizerParams) {
+			if (taxiOptimizerParams == null) {
+				throw new IllegalStateException("The existing taxi optimizer param set is null. Cannot remove it.");
+			}
+			taxiOptimizerParams = null;
+		}
+
+		return super.removeParameterSet(set);
 	}
 
 	public URL getTaxisFileUrl(URL context) {

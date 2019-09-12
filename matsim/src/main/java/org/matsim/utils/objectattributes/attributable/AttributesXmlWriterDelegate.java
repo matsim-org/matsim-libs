@@ -1,4 +1,25 @@
-package org.matsim.utils.objectattributes.attributable;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * AttributesXmlWriterDelegate.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.utils.objectattributes.attributable;
 
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.io.XmlUtils;
@@ -16,6 +37,10 @@ public class AttributesXmlWriterDelegate {
 	private final ObjectAttributesConverter converter = new ObjectAttributesConverter();
 
 	public final void writeAttributes(final String indentation, final BufferedWriter writer, final Attributes attributes) {
+		writeAttributes(indentation, writer, attributes, true);
+	}
+
+	public final void writeAttributes(final String indentation, final BufferedWriter writer, final Attributes attributes, boolean emptyLineAfter) {
 		if (attributes.size() == 0) {
 			return;
 		}
@@ -32,7 +57,7 @@ public class AttributesXmlWriterDelegate {
 				if (converted != null) {
 					writer.write(indentation + "\t");
 					writer.write("<attribute name=\"" + XmlUtils.encodeAttributeValue(objAttribute.getKey()) + "\" ");
-					writer.write("class=\"" + clazz.getCanonicalName() + "\" >");
+					writer.write("class=\"" + clazz.getName() + "\">");
 					writer.write(XmlUtils.encodeContent(converted));
 					writer.write("</attribute>");
 					writer.newLine();
@@ -41,7 +66,9 @@ public class AttributesXmlWriterDelegate {
 
 			writer.write(indentation);
 			writer.write("</attributes>");
-			writer.newLine();
+			if (emptyLineAfter) {
+				writer.newLine();
+			}
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

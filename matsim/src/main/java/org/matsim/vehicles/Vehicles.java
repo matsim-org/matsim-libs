@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
+import org.matsim.utils.objectattributes.FailingObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 
@@ -47,7 +48,4 @@ public interface Vehicles extends MatsimToplevelContainer {
 	public void addVehicleType(final VehicleType type);
 
 	public void removeVehicleType(final Id<VehicleType> vehicleTypeId);
-
-	public ObjectAttributes getVehicleAttributes();
-
 }

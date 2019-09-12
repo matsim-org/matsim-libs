@@ -32,17 +32,21 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author Michal Maciejewski (michalm)
  */
 public class TaxiControlerCreator {
-	public static Controler createControler(Config config, boolean otfvis) {
-		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
-		config.checkConsistency();
-
+	/**
+	 * Creates a controller in one step. Assumes a single taxi service.
+	 *
+	 * @param config
+	 * @param otfvis
+	 * @return
+	 */
+	public static Controler createControlerWithSingleModeTaxi(Config config, boolean otfvis) {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 
 		controler.addOverridingModule(new DvrpModule());
-		controler.addOverridingModule(new TaxiModule());
+		controler.addOverridingModule(new MultiModeTaxiModule());
 		controler.configureQSimComponents(
-				DvrpQSimComponents.activateModes(TaxiConfigGroup.get(controler.getConfig()).getMode()));
+				DvrpQSimComponents.activateModes(TaxiConfigGroup.getSingleModeTaxiConfig(controler.getConfig()).getMode()));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());

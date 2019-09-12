@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
+import org.locationtech.jts.geom.Coordinate;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -36,8 +37,6 @@ import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.vividsolutions.jts.geom.Coordinate;
-
 public class Schedules2GIS {
 	private final Iterable<? extends DvrpVehicle> vehicles;
 	private final PolylineFeatureFactory factory;
@@ -45,13 +44,13 @@ public class Schedules2GIS {
 	public Schedules2GIS(Iterable<? extends DvrpVehicle> vehicles, String coordSystem) {
 		this.vehicles = vehicles;
 
-		factory = new PolylineFeatureFactory.Builder().//
-				setCrs(MGC.getCRS(coordSystem)).//
-				setName("vrp_route").//
-				addAttribute("VEH_ID", Integer.class).//
-				addAttribute("VEH_NAME", String.class).//
-				addAttribute("ROUTE_ID", Integer.class).//
-				addAttribute("ARC_IDX", Integer.class).//
+		factory = new PolylineFeatureFactory.Builder().
+				setCrs(MGC.getCRS(coordSystem)).
+				setName("vrp_route").
+				addAttribute("VEH_ID", Integer.class).
+				addAttribute("VEH_NAME", String.class).
+				addAttribute("ROUTE_ID", Integer.class).
+				addAttribute("ARC_IDX", Integer.class).
 				create();
 	}
 

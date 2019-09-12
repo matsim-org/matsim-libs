@@ -22,7 +22,7 @@ package org.matsim.contrib.taxi.util.stats;
 import java.util.List;
 
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.fleet.FleetStatsCalculator;
+import org.matsim.contrib.dvrp.run.QSimScopeObjectListener;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.util.CSVLineBuilder;
 import org.matsim.contrib.util.CompactCSVWriter;
@@ -30,9 +30,11 @@ import org.matsim.core.controler.IterationCounter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.utils.io.IOUtils;
 
-public class TaxiStatsDumper implements ShutdownListener, FleetStatsCalculator {
+public class TaxiStatsDumper implements ShutdownListener, MobsimBeforeCleanupListener, QSimScopeObjectListener<Fleet> {
 	private static final String[] HEADER = { "iter", null, //
 			"PassWaitTime_avg", "PassWaitTime_sd", "PassWaitTime_95%ile", "PassWaitTime_max", null, //
 			"EmptyDriveRatio_fleetAvg", "EmptyDriveRatio_avg", "EmptyDriveRatio_sd", null, //
@@ -43,6 +45,8 @@ public class TaxiStatsDumper implements ShutdownListener, FleetStatsCalculator {
 	private final OutputDirectoryHierarchy controlerIO;
 	private final IterationCounter iterationCounter;
 	private final CompactCSVWriter multiDayWriter;
+
+	private Fleet fleet;
 
 	public TaxiStatsDumper(TaxiConfigGroup taxiCfg, OutputDirectoryHierarchy controlerIO,
 			IterationCounter iterationCounter) {
@@ -56,7 +60,12 @@ public class TaxiStatsDumper implements ShutdownListener, FleetStatsCalculator {
 	}
 
 	@Override
-	public void updateStats(Fleet fleet) {
+	public void objectCreated(Fleet fleet) {
+		this.fleet = fleet;
+	}
+
+	@Override
+	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
 		TaxiStatsCalculator calculator = new TaxiStatsCalculator(fleet.getVehicles().values());
 
 		appendToMultiDayStats(calculator.getDailyStats(), iterationCounter.getIterationNumber());
@@ -66,20 +75,21 @@ public class TaxiStatsDumper implements ShutdownListener, FleetStatsCalculator {
 	}
 
 	private void appendToMultiDayStats(TaxiStats s, int iteration) {
-		multiDayWriter.writeNext(new CSVLineBuilder().add(iteration + "") //
-				.addEmpty() //
-				.addf("%.1f", s.passengerWaitTime.getMean()).addf("%.1f", s.passengerWaitTime.getStandardDeviation()) //
-				.addf("%.0f", s.passengerWaitTime.getPercentile(95)) //
-				.addf("%.0f", s.passengerWaitTime.getMax()) //
-				.addEmpty() //
-				.addf("%.4f", s.getFleetEmptyDriveRatio()) //
-				.addf("%.4f", s.vehicleEmptyDriveRatio.getMean()) //
-				.addf("%.4f", s.vehicleEmptyDriveRatio.getStandardDeviation()) //
-				.addEmpty() //
-				.addf("%.4f", s.getFleetStayRatio()) //
-				.addf("%.4f", s.vehicleStayRatio.getMean()) //
-				.addf("%.4f", s.vehicleStayRatio.getStandardDeviation()) //
-				.addEmpty() //
+		multiDayWriter.writeNext(new CSVLineBuilder().add(iteration + "")
+				.addEmpty()
+				.addf("%.1f", s.passengerWaitTime.getMean())
+				.addf("%.1f", s.passengerWaitTime.getStandardDeviation())
+				.addf("%.0f", s.passengerWaitTime.getPercentile(95))
+				.addf("%.0f", s.passengerWaitTime.getMax())
+				.addEmpty()
+				.addf("%.4f", s.getFleetEmptyDriveRatio())
+				.addf("%.4f", s.vehicleEmptyDriveRatio.getMean())
+				.addf("%.4f", s.vehicleEmptyDriveRatio.getStandardDeviation())
+				.addEmpty()
+				.addf("%.4f", s.getFleetStayRatio())
+				.addf("%.4f", s.vehicleStayRatio.getMean())
+				.addf("%.4f", s.vehicleStayRatio.getStandardDeviation())
+				.addEmpty()
 				.addf("%.4f", s.getOccupiedDriveRatio()));
 		multiDayWriter.flush();
 	}

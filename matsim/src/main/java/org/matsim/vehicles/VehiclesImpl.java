@@ -32,11 +32,10 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  * @author dgrether
  * @author jwjoubert
  */
-class VehiclesImpl implements Vehicles {
+final class VehiclesImpl implements Vehicles {
 	private final Map<Id<VehicleType>, VehicleType> vehicleTypes;
 	private final LinkedHashMap<Id<Vehicle>, Vehicle> vehicles;
 	private final VehiclesFactoryImpl builder;
-	private final ObjectAttributes vehicleAttributes = new ObjectAttributes();
 
 	private final Counter counter = new Counter("[VehiclesImpl] added vehicle # " );
 
@@ -82,7 +81,7 @@ class VehiclesImpl implements Vehicles {
 
 		/* Check if the VehicleType associated with the vehicle already exist.
 		 * Here only an error message is given. A RuntimeException is thrown
-		 * when the VehicleWriterV1 is called (JWJ, '14). */
+		 * when the MatsimVehicleWriter is called (JWJ, '14). */
 		if(!this.vehicleTypes.containsKey(v.getType().getId())){
 			throw new IllegalArgumentException("Cannot add Vehicle with type = " + v.getType().getId().toString() +
 					" if the VehicleType has not been added to the Vehicles container.");
@@ -130,10 +129,4 @@ class VehiclesImpl implements Vehicles {
 		}
 		this.vehicleTypes.remove(vehicleTypeId);
 	}
-
-	@Override
-	public ObjectAttributes getVehicleAttributes() {
-		return this.vehicleAttributes;
-	}
-
 }

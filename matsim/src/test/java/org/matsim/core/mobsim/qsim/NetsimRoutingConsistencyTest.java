@@ -1,13 +1,32 @@
-package org.matsim.core.mobsim.qsim;
 
-import java.util.Arrays;
-import java.util.Collections;
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * NetsimRoutingConsistencyTest.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.core.mobsim.qsim;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
@@ -15,11 +34,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -39,6 +54,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 public class NetsimRoutingConsistencyTest {
 		@Test
@@ -124,14 +142,9 @@ public class NetsimRoutingConsistencyTest {
 			network.addLink(link34);
 			network.addLink(link45);
 
-			Arrays.asList(link12, link23, link34, link45).forEach(l -> l.setAllowedModes(Collections.singleton("car")));
+			Arrays.asList(link12, link23, link34, link45).forEach(l -> l.setAllowedModes(Collections.singleton(TransportMode.car)));
 			Arrays.asList(link12, link23, link34, link45).forEach(l -> l.setLength(1000.0));
 			Arrays.asList(link12, link23, link34, link45).forEach(l -> l.setFreespeed(10.0));
-
-			Vehicle vehicle = scenario.getVehicles().getFactory().createVehicle(Id.createVehicleId("P"),
-					VehicleUtils.getDefaultVehicleType());
-			scenario.getVehicles().addVehicleType(VehicleUtils.getDefaultVehicleType());
-			scenario.getVehicles().addVehicle(vehicle);
 
 			Population population = scenario.getPopulation();
 
@@ -145,12 +158,18 @@ public class NetsimRoutingConsistencyTest {
 			Plan plan = population.getFactory().createPlan();
 			person.addPlan(plan);
 
+			Vehicle vehicle = scenario.getVehicles().getFactory().createVehicle(VehicleUtils.createVehicleId(person, TransportMode.car),
+					VehicleUtils.getDefaultVehicleType());
+			VehicleUtils.insertVehicleIdIntoAttributes(person, TransportMode.car, vehicle.getId());
+			scenario.getVehicles().addVehicleType(VehicleUtils.getDefaultVehicleType());
+			scenario.getVehicles().addVehicle(vehicle);
+
 			TravelTime travelTime = new FreeSpeedTravelTime();
 			TravelDisutility travelDisutility = new OnlyTimeDependentTravelDisutility(travelTime);
 
 			LeastCostPathCalculator router = new DijkstraFactory().createPathCalculator(network, travelDisutility,
 					travelTime);
-			NetworkRoutingModule routingModule = new NetworkRoutingModule("car", population.getFactory(), network,
+			NetworkRoutingModule routingModule = new NetworkRoutingModule(TransportMode.car, population.getFactory(), network,
 					router);
 
 			Leg leg = (Leg) routingModule
@@ -221,7 +240,7 @@ public class NetsimRoutingConsistencyTest {
 			network.addLink(link34);
 			network.addLink(link45);
 
-			Arrays.asList(link12, link23, link34, link45).forEach(l -> l.setAllowedModes(Collections.singleton("car")));
+			Arrays.asList(link12, link23, link34, link45).forEach(l -> l.setAllowedModes(Collections.singleton(TransportMode.car)));
 			Arrays.asList(link12, link23, link34, link45).forEach(l -> l.setLength(1000.0));
 			Arrays.asList(link12, link23, link34, link45).forEach(l -> l.setFreespeed(10.0));
 
@@ -243,7 +262,7 @@ public class NetsimRoutingConsistencyTest {
 			person.addPlan(plan);
 			
 			plan.addActivity(startActivity);
-			plan.addLeg(population.getFactory().createLeg("car"));
+			plan.addLeg(population.getFactory().createLeg(TransportMode.car));
 			plan.addActivity(endActivity);
 			
 			DepartureArrivalListener listener = new DepartureArrivalListener();

@@ -39,12 +39,12 @@ public class TimeAndSpaceTourRouter {
 
 		@Override
 		public Id<Vehicle> getId() {
-			return carrierVehicle.getVehicleId();
+			return carrierVehicle.getId();
 		}
 
 		@Override
 		public VehicleType getType() {
-			return carrierVehicle.getVehicleType();
+			return carrierVehicle.getType();
 		}
 
 		public CarrierVehicle getCarrierVehicle() {

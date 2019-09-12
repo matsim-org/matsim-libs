@@ -151,10 +151,10 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 
 		Vehicles vehicles = scenario.getTransitVehicles();
 		VehicleType vehicleType = vehicles.getFactory().createVehicleType(Id.create("VT1", VehicleType.class));
-		VehicleCapacity vehicleCapacity = vehicles.getFactory().createVehicleCapacity();
-		vehicleCapacity.setSeats(30);
-		vehicleCapacity.setStandingRoom(70);
-		vehicleType.setCapacity(vehicleCapacity);
+//		VehicleCapacity vehicleCapacity = vehicles.getFactory().createVehicleCapacity();
+		vehicleType.getCapacity().setSeats(30);
+		vehicleType.getCapacity().setStandingRoom(70);
+//		vehicleType.setCapacity(vehicleCapacity);
 		vehicles.addVehicleType(vehicleType);
 		
 		Vehicle vehicle = vehicles.getFactory().createVehicle(Id.create("V1", Vehicle.class), vehicleType);

@@ -25,12 +25,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
@@ -131,12 +131,13 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 			final Scenario scenario,
 			final Person person,
 			final String type ) {
-		final Double typicalDuration =
-					(Double) scenario.getPopulation().getPersonAttributes().getAttribute(
-						person.getId().toString(),
-						"typicalDuration_"+type );
+//		final Double typicalDuration =
+//			  (Double) PopulationUtils.getPersonAttribute(
+//				    person, "typicalDuration_"+type, scenario.getPopulation()
+//										   );
+		final Double typicalDuration = (Double) PopulationUtils.getPersonAttribute( person, "typicalDuration_"+type );
 
-		if ( typicalDuration != null ) return typicalDuration.doubleValue();
+		if ( typicalDuration != null ) return typicalDuration;
 
 		final ActivityParams params = scenario.getConfig().planCalcScore().getActivityParams( type );
 		

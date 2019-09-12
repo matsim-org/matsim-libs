@@ -19,10 +19,15 @@
 
 package org.matsim.contrib.drt.routing;
 
+import static org.matsim.core.router.NetworkRoutingInclAccessEgressModule.addBushwhackingLegFromFacilityToLinkIfNecessary;
+import static org.matsim.core.router.NetworkRoutingInclAccessEgressModule.addBushwhackingLegFromLinkToFacilityIfNecessary;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -33,16 +38,16 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.router.EmptyStageActivityTypes;
-import org.matsim.core.router.FastAStarEuclideanFactory;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
 import com.google.inject.name.Named;
@@ -50,6 +55,7 @@ import com.google.inject.name.Named;
 /**
  * @author jbischoff
  * @author michalm (Michal Maciejewski)
+ * @author Kai Nagel
  */
 public class DrtRoutingModule implements RoutingModule {
 	private static final Logger LOGGER = Logger.getLogger(DrtRoutingModule.class);
@@ -61,30 +67,46 @@ public class DrtRoutingModule implements RoutingModule {
 	private final PopulationFactory populationFactory;
 	private final RoutingModule walkRouter;
 	private final DrtStageActivityType drtStageActivityType;
+	private final PlansCalcRouteConfigGroup plansCalcRouteConfig;
 
-	public DrtRoutingModule(DrtConfigGroup drtCfg, @Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
+	public DrtRoutingModule(DrtConfigGroup drtCfg, Network network,
+			LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			TravelDisutilityFactory travelDisutilityFactory, PopulationFactory populationFactory,
-			@Named(TransportMode.walk) RoutingModule walkRouter) {
+			TravelDisutilityFactory travelDisutilityFactory, @Named(TransportMode.walk) RoutingModule walkRouter,
+			Scenario scenario) {
+		// constructor was public when I found it, and cannot be made package private.  Thus now passing scenario as argument so we have a bit more
+		// flexibility for changes without having to change the argument list every time.  kai, jul'19
+
 		this.drtCfg = drtCfg;
 		this.network = network;
 		this.travelTime = travelTime;
-		this.populationFactory = populationFactory;
+		this.populationFactory = scenario.getPopulation().getFactory();
 		this.walkRouter = walkRouter;
 		this.drtStageActivityType = new DrtStageActivityType(drtCfg.getMode());
+		this.plansCalcRouteConfig = scenario.getConfig().plansCalcRoute();
 
 		// Euclidean with overdoFactor > 1.0 could lead to 'experiencedTT < unsharedRideTT',
 		// while the benefit would be a marginal reduction of computation time ==> so stick to 1.0
-		router = new FastAStarEuclideanFactory().createPathCalculator(network,
+		router = leastCostPathCalculatorFactory.createPathCalculator(network,
 				travelDisutilityFactory.createTravelDisutility(travelTime), travelTime);
 	}
 
 	@Override
 	public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime,
 			Person person) {
-		Link fromLink = getLink(fromFacility);
-		Link toLink = getLink(toFacility);
-		if (toLink == fromLink) {
+		LOGGER.debug("entering calcRoute ...");
+		LOGGER.debug("fromFacility=" + fromFacility.toString());
+		LOGGER.debug("toFacility=" + toFacility.toString());
+
+		Gbl.assertNotNull(fromFacility);
+		Gbl.assertNotNull(toFacility);
+
+		Link accessActLink = FacilitiesUtils.decideOnLink(fromFacility, network);
+		Link egressActLink = FacilitiesUtils.decideOnLink(toFacility, network);
+
+		double now = departureTime;
+
+		if (accessActLink == egressActLink) {
 			if (drtCfg.isPrintDetailedWarnings()) {
 				LOGGER.error("Start and end stop are the same, agent will walk using mode "
 						+ drtStageActivityType.drtWalk
@@ -92,38 +114,57 @@ public class DrtRoutingModule implements RoutingModule {
 						+ person.getId());
 			}
 			Leg leg = (Leg)walkRouter.calcRoute(fromFacility, toFacility, departureTime, person).get(0);
+			leg.setDepartureTime(now);
 			leg.setMode(drtStageActivityType.drtWalk);
-			return (Collections.singletonList(leg));
+			LOGGER.debug("travel time on walk leg=" + leg.getTravelTime());
+			return Collections.singletonList(leg);
+		}
+		// yyyy I think that our life will become easier if we don't do direct walk.  kai, jul'19
+
+		List<PlanElement> result = new ArrayList<>();
+
+		// === access:
+		if (plansCalcRouteConfig.isInsertingAccessEgressWalk()) {
+			now = addBushwhackingLegFromFacilityToLinkIfNecessary(fromFacility, person, accessActLink, now, result,
+					populationFactory, drtStageActivityType.drtStageActivity);
 		}
 
-		VrpPathWithTravelData unsharedPath = VrpPaths.calcAndCreatePath(fromLink, toLink, departureTime, router,
-				travelTime);
-		double unsharedRideTime = unsharedPath.getTravelTime();//includes first & last link
-		double maxTravelTime = getMaxTravelTime(drtCfg, unsharedRideTime);
-		double unsharedDistance = VrpPaths.calcDistance(unsharedPath);//includes last link
+		// === drt proper:
+		{
+			VrpPathWithTravelData unsharedPath = VrpPaths.calcAndCreatePath(accessActLink, egressActLink, departureTime,
+					router, travelTime);
+			double unsharedRideTime = unsharedPath.getTravelTime();//includes first & last link
+			double maxTravelTime = getMaxTravelTime(drtCfg, unsharedRideTime);
+			double unsharedDistance = VrpPaths.calcDistance(unsharedPath);//includes last link
 
-		DrtRoute route = populationFactory.getRouteFactories()
-				.createRoute(DrtRoute.class, fromLink.getId(), toLink.getId());
-		route.setDistance(unsharedDistance);
-		route.setTravelTime(maxTravelTime);
-		route.setUnsharedRideTime(unsharedRideTime);
-		route.setMaxWaitTime(drtCfg.getMaxWaitTime());
+			DrtRoute route = populationFactory.getRouteFactories()
+					.createRoute(DrtRoute.class, accessActLink.getId(), egressActLink.getId());
+			route.setDistance(unsharedDistance);
+			route.setTravelTime(maxTravelTime);
+			route.setUnsharedRideTime(unsharedRideTime);
+			route.setMaxWaitTime(drtCfg.getMaxWaitTime());
 
-		Leg drtLeg = populationFactory.createLeg(drtCfg.getMode());
-		drtLeg.setDepartureTime(departureTime);
-		drtLeg.setTravelTime(maxTravelTime);
-		drtLeg.setRoute(route);
-		return Collections.singletonList(drtLeg);
-	}
+			Leg leg = populationFactory.createLeg(drtCfg.getMode());
+			leg.setDepartureTime(departureTime);
+			leg.setTravelTime(maxTravelTime);
+			leg.setRoute(route);
 
-	private Link getLink(Facility facility) {
-		Link link = network.getLinks().get(facility.getLinkId());
-		return link != null ? link : NetworkUtils.getNearestLink(network, facility.getCoord());
+			result.add(leg);
+			now += maxTravelTime;
+		}
+
+		// === egress:
+		if (plansCalcRouteConfig.isInsertingAccessEgressWalk()) {
+			addBushwhackingLegFromLinkToFacilityIfNecessary(toFacility, person, egressActLink, now, result,
+					populationFactory, drtStageActivityType.drtStageActivity);
+		}
+
+		return result;
 	}
 
 	@Override
 	public StageActivityTypes getStageActivityTypes() {
-		return EmptyStageActivityTypes.INSTANCE;
+		return drtStageActivityType;
 	}
 
 	/**

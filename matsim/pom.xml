@@ -5,10 +5,13 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>matsim</artifactId>
 	<name>MATSim</name>
-	<version>0.11.0-SNAPSHOT</version>
+	<version>12.0-SNAPSHOT</version>
 	<description>Multi-Agent Transport Simulation</description>
 	<url>http://ci.matsim.org:8080/job/MATSim_M2/ws/matsim/target/site</url>
 	<inceptionYear>2005</inceptionYear>
+	<!--<properties>-->
+	<!--	<skip.surefire.tests>${skipTests}</skip.surefire.tests>-->
+	<!--</properties>-->
 	<licenses>
 		<license>
 			<name>GNU General Public License</name>
@@ -101,8 +104,10 @@
 					</excludes>
 					<forkMode>once</forkMode>
 					<!-- avoid out of memory errors: -->
-					<argLine>-Xmx700m -Djava.awt.headless=true
-						-Dmatsim.preferLocalDtds=true</argLine>
+					<argLine>-Xmx700m -Djava.awt.headless=true -Dmatsim.preferLocalDtds=true</argLine>
+					<!-- skips surefire tests without skipping failsafe tests.
+					     Property value seems to magically default to false -->
+					<!--<skipTests>${skip.surefire.tests}</skipTests>-->
 				</configuration>
 			</plugin>
 			<plugin>
@@ -152,6 +157,7 @@
 					</execution>
 				</executions>
 				<configuration>
+					<source>8</source><!--can be skipped from maven-javadoc-plugin 3.1.0-->
 					<quiet>true</quiet>
 					<header>MATSim API</header>
 					<excludePackageNames>org.matsim.jaxb:org.matsim.jaxb.*</excludePackageNames>
@@ -348,7 +354,7 @@
 		<dependency>
 			<groupId>org.jfree</groupId>
 			<artifactId>jfreechart</artifactId>
-			<version>1.0.19</version>
+			<version>1.5.0</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -371,13 +377,13 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
-			<version>0.11.0-SNAPSHOT</version>
+			<version>12.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jfree</groupId>
 			<artifactId>jcommon</artifactId>
-			<version>1.0.23</version>
+			<version>1.0.24</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>
@@ -390,6 +396,16 @@
 			<version>4.1.0</version>
 		</dependency>
 		<dependency>
+			<groupId>com.google.inject.extensions</groupId>
+			<artifactId>guice-grapher</artifactId>
+			<version>4.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jgrapht</groupId>
+			<artifactId>jgrapht-core</artifactId>
+			<version>0.9.1</version>
+		</dependency>
+		<dependency>
 			<groupId>net.sf.trove4j</groupId>
 			<artifactId>trove4j</artifactId>
 			<version>3.0.3</version>
@@ -400,10 +416,52 @@
 			<version>2.2.0</version>
 		</dependency>
 		<dependency>
-			<groupId>net.jpountz.lz4</groupId>
-			<artifactId>lz4</artifactId>
-			<version>1.3.0</version>
+			<groupId>org.lz4</groupId>
+			<artifactId>lz4-java</artifactId>
+			<version>1.6.0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.github.luben</groupId>
+			<artifactId>zstd-jni</artifactId>
+			<version>1.4.3-1</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>2.0.1.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>6.0.9.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator-annotation-processor</artifactId>
+			<version>6.0.9.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>org.glassfish</groupId>
+			<artifactId>javax.el</artifactId>
+			<version>3.0.1-b10</version>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>3.12.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-compress</artifactId>
+		    <version>1.18</version>
+		</dependency>
+	  <dependency>
+		  <groupId>org.apache.commons</groupId>
+		  <artifactId>commons-csv</artifactId>
+		  <version>1.5</version>
+	  </dependency>
+
 		<!--According to https://stackoverflow.com/questions/43574426/how-to-resolve-java-lang-noclassdeffounderror-javax-xml-bind-jaxbexception-in-j/43574427#43574427,-->
 		<!--the following is needed to include jaxb into java9 and later. kai based on thibaut, feb'18-->
 		<!-- Java 6 = JAX-B Version 2.0   -->
@@ -454,6 +512,6 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<geotools.version>14.0</geotools.version>
+		<geotools.version>21.1</geotools.version>
     </properties>
 </project>

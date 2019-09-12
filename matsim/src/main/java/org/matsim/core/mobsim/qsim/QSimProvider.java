@@ -51,12 +51,10 @@ public class QSimProvider implements Provider<QSim> {
 	private Collection<AbstractQSimModule> modules;
 	private List<AbstractQSimModule> overridingModules;
 	private QSimComponentsConfig components;
-	@Inject(optional = true)
-	private IterationCounter iterationCounter;
 
 	@Inject
 	QSimProvider(Injector injector, Config config, Collection<AbstractQSimModule> modules,
-			QSimComponentsConfig components, @Named("overrides") List<AbstractQSimModule> overridingModules) {
+			 QSimComponentsConfig components, @Named("overrides") List<AbstractQSimModule> overridingModules) {
 		this.injector = injector;
 		this.modules = modules;
 		// (these are the implementations)
@@ -72,7 +70,7 @@ public class QSimProvider implements Provider<QSim> {
 		modules.forEach(m -> m.setConfig(config));
 		overridingModules.forEach(m -> m.setConfig(config));
 
-        AbstractQSimModule qsimModule = AbstractQSimModule.overrideQSimModules(modules, overridingModules);
+		AbstractQSimModule qsimModule = AbstractQSimModule.overrideQSimModules(modules, overridingModules);
 
 		AbstractModule module = new AbstractModule() {
 			@Override
@@ -85,16 +83,9 @@ public class QSimProvider implements Provider<QSim> {
 
 		Injector qsimInjector = injector.createChildInjector(module);
 
-//		if (iterationCounter == null
-//				|| config.controler().getFirstIteration() == iterationCounter.getIterationNumber()) {
-//			// trying to somewhat reduce logfile verbosity. kai, aug'18
-		// (does not work since iterationNumber is not defined here. kai, jan'19)
-//			org.matsim.core.controler.Injector.printInjector(qsimInjector, log);
-//		}
-
 		QSim qSim = qsimInjector.getInstance(QSim.class);
 
-        for (Object activeComponent : components.getActiveComponents()) {
+		for (Object activeComponent : components.getActiveComponents()) {
 			Key<Collection<Provider<QSimComponent>>> activeComponentKey;
 			if (activeComponent instanceof Annotation) {
 				activeComponentKey = Key.get(new TypeLiteral<Collection<Provider<QSimComponent>>>(){}, (Annotation) activeComponent);
@@ -103,42 +94,42 @@ public class QSimProvider implements Provider<QSim> {
 			}
 
 			Collection<Provider<QSimComponent>> providers = qsimInjector.getInstance(activeComponentKey);
-            for (Provider<QSimComponent> provider : providers) {
-                QSimComponent qSimComponent = provider.get();
-                if (qSimComponent instanceof MobsimEngine) {
-                    MobsimEngine instance = (MobsimEngine) qSimComponent;
-                    qSim.addMobsimEngine(instance);
-                    log.info("Added MobsimEngine " + instance.getClass());
-                }
+			for (Provider<QSimComponent> provider : providers) {
+				QSimComponent qSimComponent = provider.get();
+				if (qSimComponent instanceof MobsimEngine) {
+					MobsimEngine instance = (MobsimEngine) qSimComponent;
+					qSim.addMobsimEngine(instance);
+					log.info("Added MobsimEngine " + instance.getClass());
+				}
 
-                if (qSimComponent instanceof ActivityHandler) {
-                    ActivityHandler instance = (ActivityHandler) qSimComponent;
-                    qSim.addActivityHandler(instance);
-                    log.info("Added Activityhandler " + instance.getClass());
-                }
+				if (qSimComponent instanceof ActivityHandler) {
+					ActivityHandler instance = (ActivityHandler) qSimComponent;
+					qSim.addActivityHandler(instance);
+					log.info("Added Activityhandler " + instance.getClass());
+				}
 
-                if (qSimComponent instanceof DepartureHandler) {
-                    DepartureHandler instance = (DepartureHandler) qSimComponent;
-                    qSim.addDepartureHandler(instance);
-                    log.info("Added DepartureHandler " + instance.getClass());
-                }
+				if (qSimComponent instanceof DepartureHandler) {
+					DepartureHandler instance = (DepartureHandler) qSimComponent;
+					qSim.addDepartureHandler(instance);
+					log.info("Added DepartureHandler " + instance.getClass());
+				}
 
-                if (qSimComponent instanceof AgentSource) {
-                    AgentSource instance = (AgentSource) qSimComponent;
-                    qSim.addAgentSource(instance);
-                    log.info("Added AgentSource " + instance.getClass());
-                }
+				if (qSimComponent instanceof AgentSource) {
+					AgentSource instance = (AgentSource) qSimComponent;
+					qSim.addAgentSource(instance);
+					log.info("Added AgentSource " + instance.getClass());
+				}
 
-                if (qSimComponent instanceof MobsimListener) {
-                    MobsimListener instance = (MobsimListener) qSimComponent;
-                    qSim.addQueueSimulationListeners(instance);
-                    log.info("Added MobsimListener " + instance.getClass());
-                }
+				if (qSimComponent instanceof MobsimListener) {
+					MobsimListener instance = (MobsimListener) qSimComponent;
+					qSim.addQueueSimulationListeners(instance);
+					log.info("Added MobsimListener " + instance.getClass());
+				}
 
-            }
-        }
+			}
+		}
 
-        return qSim;
+		return qSim;
 	}
 
 	/**

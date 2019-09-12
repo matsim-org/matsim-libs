@@ -174,7 +174,7 @@ public class DeterministicMultithreadedReplanningIT {
 
 		config.controler().setLastIteration(lastIteration);
 		config.global().setNumberOfThreads(4); // just use any number > 1
-		config.plans().setInputFile(IOUtils.newUrl(testUtils.classInputResourcePath(), "plans1.xml").toString());
+		config.plans().setInputFile(IOUtils.extendUrl(testUtils.classInputResourcePath(), "plans1.xml").toString());
 		{
 			// setup run1
 			PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());

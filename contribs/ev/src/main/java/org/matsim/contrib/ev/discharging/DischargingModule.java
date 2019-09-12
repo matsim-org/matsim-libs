@@ -20,50 +20,31 @@
 
 package org.matsim.contrib.ev.discharging;
 
-import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.EvModule;
+import org.matsim.contrib.ev.temperature.TemperatureService;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class DischargingModule extends AbstractModule {
-	private final EvConfigGroup evCfg;
-
-	private static DriveEnergyConsumption.Factory DEFAULT_DRIVE_CONSUMPTION_FACTORY //
-			= ev -> new OhdeSlaskiDriveEnergyConsumption();
-
-	// TODO fixed temperature 15 oC
-	// FIXME reintroduce TemperatureProvider
-	private static AuxEnergyConsumption.Factory DEFAULT_AUX_CONSUMPTION_FACTORY //
-			= ev -> new OhdeSlaskiAuxEnergyConsumption(ev, () -> 15, (v, t) -> true);
-
-	private final DriveEnergyConsumption.Factory driveConsumptionFactory;
-	private final AuxEnergyConsumption.Factory auxConsumptionFactory;
-
-	public DischargingModule(EvConfigGroup evCfg) {
-		this(evCfg, DEFAULT_DRIVE_CONSUMPTION_FACTORY, DEFAULT_AUX_CONSUMPTION_FACTORY);
-	}
-
-	public DischargingModule(EvConfigGroup evCfg, DriveEnergyConsumption.Factory driveConsumptionFactory,
-			AuxEnergyConsumption.Factory auxConsumptionFactory) {
-		this.evCfg = evCfg;
-		this.driveConsumptionFactory = driveConsumptionFactory;
-		this.auxConsumptionFactory = auxConsumptionFactory;
-	}
-
 	@Override
 	public void install() {
-		bind(DriveEnergyConsumption.Factory.class).toInstance(driveConsumptionFactory);
+		bind(DriveEnergyConsumption.Factory.class).toInstance(ev -> new OhdeSlaskiDriveEnergyConsumption());
+		bind(TemperatureService.class).toInstance(linkId -> 15);// XXX fixed temperature 15 oC
+		bind(AuxEnergyConsumption.Factory.class).to(OhdeSlaskiAuxEnergyConsumption.Factory.class).asEagerSingleton();
 
-		bind(DriveDischargingHandler.class).asEagerSingleton();
-		addEventHandlerBinding().to(DriveDischargingHandler.class);
+		installQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				this.bind(DriveDischargingHandler.class).asEagerSingleton();
+				this.bind(AuxDischargingHandler.class).asEagerSingleton();
+				this.addQSimComponentBinding(EvModule.EV_COMPONENT).to(AuxDischargingHandler.class);
 
-		if (evCfg.getAuxDischargingSimulation()
-				== EvConfigGroup.AuxDischargingSimulation.seperateAuxDischargingHandler) {
-			// "isTurnedOn" returns true ==> should not be used when for "seperateAuxDischargingHandler"
-			bind(AuxEnergyConsumption.Factory.class).toInstance(auxConsumptionFactory);
-			bind(AuxDischargingHandler.class).asEagerSingleton();
-			addMobsimListenerBinding().to(AuxDischargingHandler.class);
-		}
+				//by default, no vehicle will be AUX-discharged when not moving
+				this.bind(AuxDischargingHandler.VehicleProvider.class).toInstance(event -> null);
+			}
+		});
 	}
 }

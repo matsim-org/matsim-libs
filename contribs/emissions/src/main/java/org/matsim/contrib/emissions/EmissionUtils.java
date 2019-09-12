@@ -37,30 +37,30 @@ import java.util.stream.Stream;
 
 /**
  * @author ikaddoura, benjamin
- *
  */
 public final class EmissionUtils {
 	private static final Logger logger = Logger.getLogger(EmissionUtils.class);
 	private static final String HBEFA_VEHICLE_DESCRIPTION = "hbefaVehicleTypeDescription";
 
-	static Map<String, Integer> createIndexFromKey( String strLine ) {
-		String[] keys = strLine.split(";") ;
+	static Map<String, Integer> createIndexFromKey(String strLine) {
+		String[] keys = strLine.split(";");
 
-		Map<String, Integer> indexFromKey = new HashMap<>() ;
-		for ( int ii = 0; ii < keys.length; ii++ ) {
-			indexFromKey.put(keys[ii], ii ) ;
+		Map<String, Integer> indexFromKey = new HashMap<>();
+		for (int ii = 0; ii < keys.length; ii++) {
+			indexFromKey.put(keys[ii], ii);
 		}
-		return indexFromKey ;
+		return indexFromKey;
 	}
 
 	private static final String HBEFA_ROAD_TYPE = "hbefa_road_type";
-	static void setHbefaRoadType( Link link, String type ){
-		if (type!=null){
+
+	public static void setHbefaRoadType(Link link, String type) {
+		if (type != null) {
 			link.getAttributes().putAttribute(HBEFA_ROAD_TYPE, type);
 		}
 	}
 
-	static String getHbefaRoadType( Link link ) {
+	public static String getHbefaRoadType(Link link) {
 		return (String) link.getAttributes().getAttribute(HBEFA_ROAD_TYPE);
 	}
 
@@ -68,16 +68,16 @@ public final class EmissionUtils {
 
 		Map<String, Double> pollutant2sumOfEmissions =
 				Stream.concat(warmEmissions.entrySet().stream(), coldEmissions.entrySet().stream())
-					.collect(Collectors.toMap(
-							Entry::getKey, // The key
-							Entry::getValue, // The value
-							Double::sum
-							)
-					);
+						.collect(Collectors.toMap(
+								Entry::getKey, // The key
+								Entry::getValue, // The value
+								Double::sum
+								)
+						);
 
 		return pollutant2sumOfEmissions;
 	}
-	
+
 	public static <T> Map<Id<T>, Map<String, Double>> sumUpEmissionsPerId(
 			Map<Id<T>, Map<String, Double>> warmEmissions,
 			Map<Id<T>, Map<String, Double>> coldEmissions) {
@@ -101,17 +101,17 @@ public final class EmissionUtils {
 
 	public static Map<Id<Person>, SortedMap<String, Double>> setNonCalculatedEmissionsForPopulation(Population population, Map<Id<Person>, SortedMap<String, Double>> totalEmissions, Set<String> pollutants) {
 		Map<Id<Person>, SortedMap<String, Double>> personId2Emissions = new HashMap<>();
-		for(Person person : population.getPersons().values()){
+		for (Person person : population.getPersons().values()) {
 			Id<Person> personId = person.getId();
 			SortedMap<String, Double> emissionType2Value;
-			if(totalEmissions.get(personId) == null){ // person not in map (e.g. pt user)
+			if (totalEmissions.get(personId) == null) { // person not in map (e.g. pt user)
 				emissionType2Value = new TreeMap<>();
-				for(String pollutant :  pollutants){
+				for (String pollutant : pollutants) {
 					emissionType2Value.put(pollutant, 0.0);
 				}
 			} else { // person in map, but some emissions are not set; setting these to 0.0 
 				emissionType2Value = totalEmissions.get(personId);
-				for(String pollutant :  emissionType2Value.keySet()){
+				for (String pollutant : emissionType2Value.keySet()) {
 					// else do nothing
 					emissionType2Value.putIfAbsent(pollutant, 0.0);
 				}
@@ -129,19 +129,19 @@ public final class EmissionUtils {
 	public static Map<Id<Link>, SortedMap<String, Double>> setNonCalculatedEmissionsForNetwork(Network network, Map<Id<Link>, SortedMap<String, Double>> totalEmissions, Set<String> pollutants) {
 		Map<Id<Link>, SortedMap<String, Double>> linkId2Emissions = new HashMap<>();
 
-		for(Link link: network.getLinks().values()){
+		for (Link link : network.getLinks().values()) {
 			Id<Link> linkId = link.getId();
 			SortedMap<String, Double> emissionType2Value;
-			
-			if(totalEmissions.get(linkId) == null){
+
+			if (totalEmissions.get(linkId) == null) {
 				emissionType2Value = new TreeMap<>();
-				for(String pollutant : pollutants){
+				for (String pollutant : pollutants) {
 					emissionType2Value.put(pollutant, 0.0);
 				}
 			} else {
 				emissionType2Value = totalEmissions.get(linkId);
-				for(String pollutant :  pollutants){
-					if(emissionType2Value.get(pollutant) == null){
+				for (String pollutant : pollutants) {
+					if (emissionType2Value.get(pollutant) == null) {
 						emissionType2Value.put(pollutant, 0.0);
 					} else {
 						//TODO: is this redundant?
@@ -157,11 +157,11 @@ public final class EmissionUtils {
 	public static <T> SortedMap<String, Double> getTotalEmissions(Map<Id<T>, SortedMap<String, Double>> person2TotalEmissions) {
 		SortedMap<String, Double> totalEmissions = new TreeMap<>();
 
-		for(Id<T> personId : person2TotalEmissions.keySet()){
-			Map<String, Double> individualEmissions = person2TotalEmissions.get(personId);
+		for (Id<T> personId : person2TotalEmissions.keySet()) {
+			SortedMap<String, Double> individualEmissions = person2TotalEmissions.get(personId);
 			double sumOfPollutant;
-			for(String pollutant : individualEmissions.keySet()){
-				if(totalEmissions.containsKey(pollutant)){
+			for (String pollutant : individualEmissions.keySet()) {
+				if (totalEmissions.containsKey(pollutant)) {
 					sumOfPollutant = totalEmissions.get(pollutant) + individualEmissions.get(pollutant);
 				} else {
 					sumOfPollutant = individualEmissions.get(pollutant);
@@ -173,20 +173,20 @@ public final class EmissionUtils {
 	}
 
 
-
 	public static void setHbefaVehicleDescription( final VehicleType vt, final String hbefaVehicleDescription ) {
 		// yyyy maybe this should use the vehicle information tuple (see below)?
-
-		vt.getAttributes().putAttribute( HBEFA_VEHICLE_DESCRIPTION, hbefaVehicleDescription ) ;
+		// yyyy replace this by using Attributes.  kai, oct'18
+		vt.setDescription((vt.getDescription() == null ? "" : vt.getDescription() + " ") +
+				EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() +
+				hbefaVehicleDescription +
+				EmissionSpecificationMarker.END_EMISSIONS.toString());
 	}
 	
 	static Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleDescription2VehicleInformationTuple( String hbefaVehicleTypeDescription ) {
 		// yyyy what is the advantage of having this as a tuple over just using a class with four entries?  kai, oct'18
-		
+
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple;
 		HbefaVehicleCategory hbefaVehicleCategory = null;
-
-
 		
 		// yyyy replace this by using Attributes.  kai, oct'18
 //		int startIndex = vehicleType.indexOf(EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() ) + EmissionSpecificationMarker.BEGIN_EMISSIONS.toString().length();
@@ -196,14 +196,14 @@ public final class EmissionUtils {
 
 		String[] vehicleInformationArray = hbefaVehicleTypeDescription.split(";" ) ;
 
-		for(HbefaVehicleCategory vehCat : HbefaVehicleCategory.values()){
-			if(vehCat.toString().equals(vehicleInformationArray[0])){
+		for (HbefaVehicleCategory vehCat : HbefaVehicleCategory.values()) {
+			if (vehCat.toString().equals(vehicleInformationArray[0])) {
 				hbefaVehicleCategory = vehCat;
 			}
 		}
-		
+
 		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
-		if(vehicleInformationArray.length == 4){
+		if (vehicleInformationArray.length == 4) {
 			hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationArray[1]);
 			hbefaVehicleAttributes.setHbefaSizeClass(vehicleInformationArray[2]);
 			hbefaVehicleAttributes.setHbefaEmConcept(vehicleInformationArray[3]);
@@ -215,7 +215,7 @@ public final class EmissionUtils {
 
 
 	static Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>>
-			createHBEFASpeedsTable( Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable ) {
+	createHBEFASpeedsTable(Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable) {
 
 		Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> table = new HashMap<>();
 

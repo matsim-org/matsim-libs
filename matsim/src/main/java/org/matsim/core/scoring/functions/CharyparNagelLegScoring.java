@@ -33,7 +33,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -46,6 +45,8 @@ import java.util.Set;
  */
 public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScoringFunction.LegScoring, org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring {
 	// yyyy URL in above javadoc is broken.  kai, feb'17
+
+	private static final Logger log = Logger.getLogger( CharyparNagelLegScoring.class ) ;
 
 	protected double score;
 
@@ -91,8 +92,8 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 		double travelTime = arrivalTime - departureTime; // travel time in seconds	
 		ModeUtilityParameters modeParams = this.params.modeParams.get(leg.getMode());
 		if (modeParams == null) {
-			if (leg.getMode().equals(TransportMode.transit_walk) || leg.getMode().equals(TransportMode.access_walk) 
-					|| leg.getMode().equals(TransportMode.egress_walk) ) {
+			if (leg.getMode().equals(TransportMode.transit_walk) || leg.getMode().equals(TransportMode.non_network_walk )
+					|| leg.getMode().equals(TransportMode.non_network_walk ) ) {
 				modeParams = this.params.modeParams.get(TransportMode.walk);
 			} else {
 //				modeParams = this.params.modeParams.get(TransportMode.other);
@@ -171,7 +172,14 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 
 	@Override
 	public void handleLeg(Leg leg) {
+		Gbl.assertIf( !Time.isUndefinedTime( leg.getDepartureTime() ) ) ;
+		Gbl.assertIf( !Time.isUndefinedTime( leg.getTravelTime() ) );
+
 		double legScore = calcLegScore(leg.getDepartureTime(), leg.getDepartureTime() + leg.getTravelTime(), leg);
+		if ( Double.isNaN( legScore )) {
+			log.error( "dpTime=" + leg.getDepartureTime() + "; ttime=" + leg.getTravelTime() + "; leg=" + leg ) ;
+			throw new RuntimeException("score is NaN") ;
+		}
 		this.score += legScore;
 	}
 }

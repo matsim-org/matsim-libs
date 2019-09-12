@@ -36,12 +36,12 @@ public class CarrierVehicleTypeLoader {
 	public void loadVehicleTypes(CarrierVehicleTypes types){
 		for(Carrier c : carriers.getCarriers().values()){
 			for(CarrierVehicle v : c.getCarrierCapabilities().getCarrierVehicles()){
-				Id<VehicleType> typeId = v.getVehicleTypeId();
+				Id<org.matsim.vehicles.VehicleType> typeId = v.getVehicleTypeId();
 				if(typeId != null){
 					if(types.getVehicleTypes().containsKey(typeId)){
-						CarrierVehicleType vehicleType = types.getVehicleTypes().get(typeId);
-						v.setVehicleType(vehicleType);
-						Collection<CarrierVehicleType> vTypes = c.getCarrierCapabilities().getVehicleTypes();
+						VehicleType vehicleType = types.getVehicleTypes().get(typeId );
+						v.setType(vehicleType );
+						Collection<VehicleType> vTypes = c.getCarrierCapabilities().getVehicleTypes();
 						if(!vTypes.contains(vehicleType)){
 							vTypes.add(vehicleType);
 						}

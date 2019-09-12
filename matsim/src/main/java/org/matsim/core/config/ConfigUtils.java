@@ -31,6 +31,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Iterator;
 
 /**
@@ -43,7 +44,7 @@ import java.util.Iterator;
 public abstract class ConfigUtils implements MatsimExtensionPoint {
 
 	public static Config createConfig(final String context) {
-		URL url = IOUtils.getUrlFromFileOrResource(context) ;
+		URL url = IOUtils.resolveFileOrResource(context) ;
 		return createConfig( url ) ;
 	}
 
@@ -68,7 +69,50 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 	}
 
 	public static Config loadConfig(final String filename, ConfigGroup... customModules) throws UncheckedIOException {
-		return loadConfig(IOUtils.getUrlFromFileOrResource(filename), customModules);
+		return loadConfig(IOUtils.resolveFileOrResource(filename), customModules);
+	}
+
+	/**
+	 *  This variant is meant such that one can have a command line call to MATSim that first provides a config file, and then
+	 *  overrides some of it.  Should be particularly useful for integration tests for main methods, since, if those main methods are using
+	 *  this method here, it should be possible to test them via
+	 *  <pre>
+	 *        ...main( <config.xml> --config:controler.outputDir=... )
+	 *  </pre>
+	 *  i.e. the current necessity to break runnable scripts into pieces to change things like output directory or lastIteration should be gone with this.
+	 */
+	public static Config loadConfig( String [] args, ConfigGroup... customModules ) {
+		String[] typedArgs = Arrays.copyOfRange( args, 1, args.length );
+		return loadConfig( IOUtils.resolveFileOrResource( args[0] ), typedArgs, customModules );
+	}
+
+	public static Config loadConfig( Config config, String [] args, ConfigGroup... customModules ) {
+		String[] typedArgs = Arrays.copyOfRange( args, 1, args.length );
+		return loadConfig( config, IOUtils.resolveFileOrResource( args[0] ), typedArgs, customModules );
+	}
+
+	public static Config loadConfig( final URL url, String [] typedArgs, ConfigGroup... customModules ) {
+		Config config = loadConfig( url, customModules ) ;
+		return applyCommandline( config, typedArgs );
+	}
+
+	public static Config loadConfig( Config config, final URL url, String [] typedArgs, ConfigGroup... customModules ) {
+		loadConfig( config, url, customModules ) ;
+		return applyCommandline( config, typedArgs );
+	}
+
+	public static Config applyCommandline( Config config, String[] typedArgs ){
+		try{
+			CommandLine.Builder bld = new CommandLine.Builder( typedArgs ) ;
+			bld.allowAnyOption( true  );
+			bld.allowPositionalArguments( false ) ;
+			CommandLine cmd = bld.build();
+			cmd.applyConfiguration( config );
+		} catch( CommandLine.ConfigurationException e ){
+			e.printStackTrace();
+			throw new RuntimeException( e ) ;
+		}
+		return config ;
 	}
 
 	public static Config loadConfig(final URL url, ConfigGroup... customModules) throws UncheckedIOException {
@@ -122,9 +166,12 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 		}
 	}
 
-	public static void loadConfig(final Config config, final URL url) throws UncheckedIOException {
+	public static void loadConfig(final Config config, final URL url, ConfigGroup... customModules ) throws UncheckedIOException {
 		if (config.global() == null) {
 			config.addCoreModules();
+		}
+		for (ConfigGroup customModule : customModules) {
+			config.addModule(customModule);
 		}
 		new ConfigReader(config).parse(url);
 	}
@@ -188,12 +235,12 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 		String absolutePath = prefix + path;
 		return absolutePath;
 	}
-
+	@Deprecated // using this vs not using this can change results, presumably because strategies may be used in a different sequence from the registry.
+	// (Had the problem in RandomizingTransitRotuerIT.) kai, dec'19
 	public static Id<StrategySettings> createAvailableStrategyId(Config config) {
 		long maxStrategyId = 0;
-		Iterator<StrategySettings> iterator = config.strategy().getStrategySettings().iterator();
-		while(iterator.hasNext()){
-			maxStrategyId = Math.max(maxStrategyId, Long.parseLong(iterator.next().getId().toString()));
+		for( StrategySettings strategySettings : config.strategy().getStrategySettings() ){
+			maxStrategyId = Math.max( maxStrategyId , Long.parseLong( strategySettings.getId().toString() ) );
 		}
 		return Id.create(maxStrategyId + 1, StrategySettings.class);
 	}

@@ -22,9 +22,19 @@
  */
 package org.matsim.contrib.noise.data;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-import com.vividsolutions.jts.algorithm.Angle;
 import org.apache.log4j.Logger;
+import org.locationtech.jts.algorithm.Angle;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -39,10 +49,6 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Contains the grid and further noise-specific information.
@@ -67,6 +73,8 @@ public class NoiseContext {
 	
 	private final Set<Id<Vehicle>> asBusConsideredTransitVehicleIDs = new HashSet<>();
 	private final Set<Id<Vehicle>> notConsideredTransitVehicleIDs = new HashSet<>();
+	private final Set<Id<Vehicle>> ignoredNetworkModeVehicleIDs = new HashSet<>();
+
 	private final Map<Id<Link>, Map<Id<Vehicle>, Double>> linkId2vehicleId2lastEnterTime = new HashMap<>();
 	private final Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>();
 	
@@ -403,5 +411,9 @@ public class NoiseContext {
 
 	public Map<Id<Vehicle>, Id<Person>> getVehicleId2PersonId() {
 		return vehicleId2personId;
+	}
+
+	public Set<Id<Vehicle>> getIgnoredNetworkModeVehicleIDs() {
+		return ignoredNetworkModeVehicleIDs;
 	}
 }

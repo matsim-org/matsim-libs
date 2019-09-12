@@ -27,7 +27,6 @@ import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.ModalProviders;
@@ -37,7 +36,7 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.contrib.etaxi.ETaxiActionCreator;
 import org.matsim.contrib.etaxi.ETaxiScheduler;
 import org.matsim.contrib.etaxi.optimizer.ETaxiOptimizerProvider;
-import org.matsim.contrib.ev.data.ChargingInfrastructure;
+import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
@@ -71,10 +70,6 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 
 		addModalComponent(TaxiOptimizer.class, new ModalProviders.AbstractProvider<TaxiOptimizer>(taxiCfg.getMode()) {
 			@Inject
-			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
-			private Network network;
-
-			@Inject
 			private MobsimTimer timer;
 
 			@Inject
@@ -90,20 +85,17 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 			@Override
 			public TaxiOptimizer get() {
 				Fleet fleet = getModalInstance(Fleet.class);
+				Network network = getModalInstance(Network.class);
 				ETaxiScheduler eTaxiScheduler = getModalInstance(ETaxiScheduler.class);
 				TravelDisutility travelDisutility = getModalInstance(
 						TravelDisutilityFactory.class).createTravelDisutility(travelTime);
-				return new ETaxiOptimizerProvider(taxiCfg, fleet, network, timer, travelTime, travelDisutility,
+				return new ETaxiOptimizerProvider(events, taxiCfg, fleet, network, timer, travelTime, travelDisutility,
 						eTaxiScheduler, chargingInfrastructure).get();
 			}
 		});
 
 		bindModal(ETaxiScheduler.class).toProvider(
 				new ModalProviders.AbstractProvider<ETaxiScheduler>(taxiCfg.getMode()) {
-					@Inject
-					@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
-					private Network network;
-
 					@Inject
 					private MobsimTimer timer;
 
@@ -114,6 +106,7 @@ public class ETaxiModeQSimModule extends AbstractDvrpModeQSimModule {
 					@Override
 					public ETaxiScheduler get() {
 						Fleet fleet = getModalInstance(Fleet.class);
+						Network network = getModalInstance(Network.class);
 						TravelDisutility travelDisutility = getModalInstance(
 								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
 						return new ETaxiScheduler(taxiCfg, fleet, network, timer, travelTime, travelDisutility);

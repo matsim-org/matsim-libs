@@ -65,10 +65,10 @@ public final class RunChessboard {
         final URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
 
         final Carriers carriers = FreightUtils.getCarriers( scenario ) ;
-        new CarrierPlanXmlReaderV2(carriers).readURL( IOUtils.newUrl(url, "carrierPlans.xml" ) );
+        new CarrierPlanXmlReader(carriers).readURL( IOUtils.extendUrl(url, "carrierPlans.xml" ) );
 
         final CarrierVehicleTypes types = new CarrierVehicleTypes();
-        new CarrierVehicleTypeReader(types).readURL( IOUtils.newUrl(url, "vehicleTypes.xml" ) );
+        new CarrierVehicleTypeReader(types).readURL( IOUtils.extendUrl(url, "vehicleTypes.xml" ) );
         new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
         // ... to here should really be done in prepareScenario.  kai, feb'19
 
@@ -149,7 +149,7 @@ public final class RunChessboard {
 
     public final Config prepareConfig(){
         final URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
-        final URL configURL = IOUtils.newUrl(url, "config.xml");
+        final URL configURL = IOUtils.extendUrl(url, "config.xml");
         config = ConfigUtils.loadConfig(configURL  );
         config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
         config.global().setRandomSeed(4177);

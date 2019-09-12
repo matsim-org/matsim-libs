@@ -24,9 +24,7 @@ import org.matsim.api.core.v01.Identifiable;
 
 /**
  * Represents a general request in DVRP.
- * 
- * For request rejection - adapt isRejected()
- * 
+ *
  * @author michalm
  */
 public interface Request extends Identifiable<Request> {
@@ -36,15 +34,7 @@ public interface Request extends Identifiable<Request> {
 	 */
 	double getSubmissionTime();
 
-	/**
-	 * @return indicates whether the request has been rejected by the service provider (optimizer/dispatcher)
-	 */
-	default boolean isRejected() {
-		return false;
-	}
-
 	static String toString(Request request) {
-		return "[id=" + request.getId() + "][submissionTime=" + request.getSubmissionTime() + "][rejected="
-				+ request.isRejected() + "]";
+		return "[id=" + request.getId() + "][submissionTime=" + request.getSubmissionTime() + "]";
 	}
 }

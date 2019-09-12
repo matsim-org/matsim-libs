@@ -20,7 +20,6 @@
 package org.matsim.contrib.dvrp.benchmark;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
@@ -30,8 +29,6 @@ public class DvrpBenchmarkConfigConsistencyChecker implements ConfigConsistencyC
 
 	@Override
 	public void checkConsistency(Config config) {
-		new DvrpConfigConsistencyChecker().checkConsistency(config);
-
 		if (config.network().isTimeVariantNetwork() && config.network().getChangeEventsInputFile() == null) {
 			log.warn("No change events provided for the time variant network");
 		}
@@ -48,7 +45,7 @@ public class DvrpBenchmarkConfigConsistencyChecker implements ConfigConsistencyC
 			log.warn("StorageCapFactor should be large enough (e.g. 100) to obtain deterministic (fixed) travel times");
 		}
 
-		if (config.network().isTimeVariantNetwork() && DvrpConfigGroup.get(config).getNetworkMode() != null) {
+		if (config.network().isTimeVariantNetwork() && !DvrpConfigGroup.get(config).getNetworkModes().isEmpty()) {
 			throw new RuntimeException("The current version of RunTaxiBenchmark does not support this case: "
 					+ "@Named(DvrpModule.DVRP_ROUTING) Network would consist of links having "
 					+ "VariableIntervalTimeVariantAttributes instead of FixedIntervalTimeVariantAttributes.");

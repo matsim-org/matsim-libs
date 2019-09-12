@@ -26,7 +26,7 @@ import java.util.Vector;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 
-public class ManageSubchains {
+ class ManageSubchains {
 
 	private List<SubChain> subChains = new Vector<SubChain>();
 	private int subChainIndex = -1;

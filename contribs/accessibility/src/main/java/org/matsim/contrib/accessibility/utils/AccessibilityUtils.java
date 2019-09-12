@@ -18,25 +18,34 @@
  * *********************************************************************** */
 package org.matsim.contrib.accessibility.utils;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.accessibility.AccessibilityAttributes;
+import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.facilities.ActivityFacilities;
@@ -48,16 +57,111 @@ import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.facilities.FacilitiesUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-
 /**
  * @author dziemke
  */
 public class AccessibilityUtils {
 	public static final Logger LOG = Logger.getLogger(AccessibilityUtils.class);
+
+	/**
+	 * Aggregates disutilities Vjk to get from node j to all k that are attached to j and assign sum(Vjk) is to node j.
+	 *
+	 *     j---k1
+	 *     |\
+	 *     | \
+	 *     k2 k3
+	 */
+	public static final Map<Id<? extends BasicLocation>, AggregationObject> aggregateOpportunitiesWithSameNearestNode(
+			final ActivityFacilities opportunities, Network network, Config config) {
+		// yyyy this method ignores the "capacities" of the facilities. kai, mar'14
+		// for now, we decided not to add "capacities" as it is not needed for current projects. dz, feb'16
+
+		double walkSpeed_m_h = config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
+
+		LOG.info("Aggregating " + opportunities.getFacilities().size() + " opportunities with same nearest node...");
+		Map<Id<? extends BasicLocation>, AggregationObject> opportunityClusterMap = new ConcurrentHashMap<>();
+
+		for (ActivityFacility opportunity : opportunities.getFacilities().values()) {
+			Node nearestNode = NetworkUtils.getNearestNode(network, opportunity.getCoord());
+			double distance_m = NetworkUtils.getEuclideanDistance(opportunity.getCoord(), nearestNode.getCoord());
+
+			// in MATSim this is [utils/h]: cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
+			double walkBetaTT_utils_h = config.planCalcScore().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling()
+					- config.planCalcScore().getPerforming_utils_hr(); // default values: -12 = (-6.) - (6.)
+			double VjkWalkTravelTime = walkBetaTT_utils_h * (distance_m / walkSpeed_m_h);
+
+			double expVjk = Math.exp(config.planCalcScore().getBrainExpBeta() * VjkWalkTravelTime);
+
+			// add Vjk to sum
+			AggregationObject jco = opportunityClusterMap.get(nearestNode.getId()); // Why "jco"?
+			if (jco == null) {
+				jco = new AggregationObject(opportunity.getId(), null, null, nearestNode, 0.);
+				opportunityClusterMap.put(nearestNode.getId(), jco);
+			}
+			if (acg.isUseOpportunityWeights()) {
+				if (opportunity.getAttributes().getAttribute(AccessibilityAttributes.WEIGHT) == null) {
+					throw new RuntimeException("If option \"useOpportunityWeights\" is used, the facilities must have an attribute with key " + AccessibilityAttributes.WEIGHT + ".");
+				} else {
+					double weight = Double.parseDouble(opportunity.getAttributes().getAttribute(AccessibilityAttributes.WEIGHT).toString());
+					jco.addObject(opportunity.getId(), expVjk * Math.pow(weight, acg.getWeightExponent()));
+				}
+			} else {
+				jco.addObject(opportunity.getId(), expVjk);
+			}
+		}
+		LOG.info("Aggregated " + opportunities.getFacilities().size() + " opportunities to " + opportunityClusterMap.size() + " nodes.");
+		return opportunityClusterMap;
+	}
+
+
+	public static Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregateMeasurePointsWithSameNearestNode(ActivityFacilities measuringPoints, Network network) {
+		Map<Id<? extends BasicLocation>,ArrayList<ActivityFacility>> aggregatedOrigins = new ConcurrentHashMap<>();
+
+		Gbl.assertNotNull(measuringPoints);
+		Gbl.assertNotNull(measuringPoints.getFacilities()) ;
+		for (ActivityFacility measuringPoint : measuringPoints.getFacilities().values()) {
+
+			Node nearestNode = NetworkUtils.getCloserNodeOnLink(measuringPoint.getCoord(),	NetworkUtils.getNearestLinkExactly(network, measuringPoint.getCoord()));
+			Id<Node> nearestNodeId = nearestNode.getId();
+
+			if(!aggregatedOrigins.containsKey(nearestNodeId)) {
+				aggregatedOrigins.put(nearestNodeId, new ArrayList<>());
+			}
+			aggregatedOrigins.get(nearestNodeId).add(measuringPoint);
+		}
+		LOG.info("Number of measuring points: " + measuringPoints.getFacilities().values().size());
+		LOG.info("Number of aggregated measuring points: " + aggregatedOrigins.size());
+		return aggregatedOrigins;
+	}
+
+
+	public static Network createModeSpecificSubNetwork(Network network, String mode) {
+		LOG.warn("Full network has " + network.getNodes().size() + " nodes.");
+		Network subNetwork = NetworkUtils.createNetwork();
+		Set<String> modeSet = new HashSet<>();
+		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
+		if (mode.equals(Modes4Accessibility.freespeed.name())) {
+			modeSet.add(TransportMode.car);
+		} else {
+			modeSet.add(mode);
+		}
+		filter.filter(subNetwork, modeSet);
+		if (subNetwork.getNodes().size() == 0) {throw new RuntimeException("Network has 0 nodes for mode " + mode + ". Something is wrong.");}
+		LOG.warn("sub-network for mode " + modeSet.toString() + " now has " + subNetwork.getNodes().size() + " nodes.");
+		return subNetwork;
+	}
+
+
+	public static double getModeSpecificConstantForAccessibilities(String mode, PlanCalcScoreConfigGroup planCalcScoreConfigGroup) {
+		double modeSpecificConstant;
+		if (mode.equals(Modes4Accessibility.freespeed.name())) {
+			modeSpecificConstant = planCalcScoreConfigGroup.getModes().get(TransportMode.car).getConstant();
+		} else {
+			modeSpecificConstant = planCalcScoreConfigGroup.getModes().get(mode).getConstant();
+		}
+		return modeSpecificConstant;
+	}
 	
 	/**
 	 * Collects all facilities of a given type that have been loaded to the sceanrio.
@@ -78,6 +182,7 @@ public class AccessibilityUtils {
 		return activityFacilities;
 	}
 
+
 	/**
 	 * Collects the types of all facilities that have been loaded to the scenario.
 	 */
@@ -94,7 +199,8 @@ public class AccessibilityUtils {
 		LOG.warn("The following activity option types where found within the activity facilities: " + activityOptionTypes);
 		return activityOptionTypes;
 	}
-	
+
+
 	public static void combineDifferentActivityOptionTypes(final Scenario scenario, String combinedType, final List<String> activityOptionsToBeIncluded) {
 		ActivityOption markerOption = new ActivityOptionImpl(combinedType); 
 		
@@ -116,7 +222,8 @@ public class AccessibilityUtils {
 			facility.addActivityOption(markerOption);
 		}
 	}
-	
+
+
 	public static final ActivityFacilities createFacilityForEachLink(String facilityContainerName, Network network) {
 		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities(facilityContainerName);
 		ActivityFacilitiesFactory aff = facilities.getFactory();
@@ -126,7 +233,8 @@ public class AccessibilityUtils {
 		}
 		return facilities ;
 	}
-	
+
+
 	public static final ActivityFacilities createFacilityFromBuildingShapefile(String shapeFileName, String identifierCaption, String numberOfHouseholdsCaption) {
 		ShapeFileReader shapeFileReader = new ShapeFileReader();
 		Collection<SimpleFeature> features = shapeFileReader.readFileAndInitialize(shapeFileName);
@@ -148,6 +256,7 @@ public class AccessibilityUtils {
 		return facilities ;
 	}
 
+
 	/**
 	 * Creates measuring points based on the scenario's network and a specified cell size.
 	 */
@@ -161,7 +270,8 @@ public class AccessibilityUtils {
 		ActivityFacilities measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(xMin, yMin, xMax, yMax, cellSize);
 		return measuringPoints;
 	}
-	
+
+
 	/**
 	 * Calculates the sum of the values of a given list.
 	 * 
@@ -175,7 +285,8 @@ public class AccessibilityUtils {
 		}
 		return sum;
 	}
-	
+
+
 	/**
 	 * Calculates Gini coefficient of the values of a given values. The Gini Coefficient is equals to the half of
 	 * the relative mean absolute difference (RMD).
@@ -200,7 +311,8 @@ public class AccessibilityUtils {
 		double giniCoefficient = sumOfAbsoluteDifferences / (2 * Math.pow(numberOfValues, 2) * arithmeticMean);
 		return giniCoefficient;
 	}
-	
+
+
 	/**
 	 * Creates facilities from plans. Note that a new additional facility is created for each activity.
 	 * @param population
@@ -245,6 +357,7 @@ public class AccessibilityUtils {
 		return facilities;
 	}
 
+
 	public static String getDate() {
 		Calendar cal = Calendar.getInstance ();
 		int month = cal.get(Calendar.MONTH) + 1;
@@ -255,7 +368,8 @@ public class AccessibilityUtils {
 				+ monthStr + "-" + cal.get(Calendar.DAY_OF_MONTH);
 		return date;
 	}
-	
+
+
 	public static void assignAdditionalFacilitiesDataToMeasurePoint(ActivityFacilities measurePoints, Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap,
 			Map<String, ActivityFacilities> additionalFacilityData) {
 		LOG.info("Start assigning additional facilities data to measure point.");
@@ -278,7 +392,7 @@ public class AccessibilityUtils {
 					}
 				}
 			}
-			LOG.warn(additionalDataFacilitiesToAssign + " have not been assigned to a measure point geometry.");
+			LOG.warn(additionalDataFacilitiesToAssign + " additional data facilies have not been assigned to a measure point geometry.");
 		}
 		LOG.info("Finished assigning additional facilities data to measure point.");
 	}

@@ -31,9 +31,7 @@ import org.matsim.facilities.Facility;
  * Defines classes responsible for routing for a given
  * (main)-mode.
  * It does not modify the plan.  
- * <p></p>
- * See {@link tutorial.programming.example12PluggableTripRouter.RunPluggableTripRouterExample} for an example how to use this interface.
- * 
+ *
  * @author thibautd
  */
 public interface RoutingModule {
@@ -59,6 +57,7 @@ public interface RoutingModule {
 			Facility toFacility,
 			double departureTime,
 			Person person);
+	// NOTE: It makes some sense to _not_ have the vehicle as an argument here ... since that only makes sense for vehicular modes. kai, feb'19
 
 	/**
 	 * Gives access to the activity types to consider as stages.

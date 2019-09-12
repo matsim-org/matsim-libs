@@ -1,0 +1,18 @@
+language: java
+jdk: oraclejdk8
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer  # https://github.com/travis-ci/travis-ci/issues/3259
+script:
+  # Test for presence of license headers
+  - for f in `find ./ -name '*.java'`; do echo $f `grep 'it under the terms of the GNU General Public License as published by' -c $f`; done | awk '$2 == 0 {print $1 " has no license header"; fail=1} END {if (fail) exit 1}'
+  - mvn package -B -Dmatsim.preferLocalDtds=true -Dmaven.test.redirectTestOutputToFile
+# --fail-at-end
+env:
+  global:
+    - MAVEN_OPTS="-Xmx2g"
+cache:
+  directories:
+  - $HOME/.m2
+

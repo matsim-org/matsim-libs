@@ -20,11 +20,6 @@
 
 package org.matsim.core.population.io;
 
-import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,10 +31,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.scenario.MutableScenario;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Map;
 
 public final class StreamingPopulationReader implements MatsimReader {
 	private static final Logger log = Logger.getLogger(StreamingPopulationReader.class);
@@ -174,9 +171,6 @@ public final class StreamingPopulationReader implements MatsimReader {
 		}
 		@Override public Person removePerson(Id<Person> personId) {
 			return delegate.removePerson(personId);
-		}
-		@Override public ObjectAttributes getPersonAttributes() {
-			return delegate.getPersonAttributes();
 		}
 
 		@Override

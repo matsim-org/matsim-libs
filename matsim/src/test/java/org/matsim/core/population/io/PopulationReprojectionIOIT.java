@@ -1,4 +1,25 @@
-package org.matsim.core.population.io;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * PopulationReprojectionIOIT.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.core.population.io;
 
 import java.io.File;
 import java.net.MalformedURLException;
@@ -56,8 +77,8 @@ public class PopulationReprojectionIOIT {
 		Config config = ConfigUtils.createConfig(ExamplesUtils.getTestScenarioURL("berlin"));
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 
-		new MatsimNetworkReader(scenario.getNetwork()).parse(IOUtils.newUrl(config.getContext(), NET_FILE));
-		new PopulationReader(scenario).parse(IOUtils.newUrl(config.getContext(), BASE_FILE));
+		new MatsimNetworkReader(scenario.getNetwork()).parse(IOUtils.extendUrl(config.getContext(), NET_FILE));
+		new PopulationReader(scenario).parse(IOUtils.extendUrl(config.getContext(), BASE_FILE));
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV4(testFile);
 
 		testConversionAtInput(testFile);
@@ -71,8 +92,8 @@ public class PopulationReprojectionIOIT {
 		Config config = ConfigUtils.createConfig(ExamplesUtils.getTestScenarioURL("berlin"));
 		final Scenario scenario = ScenarioUtils.createScenario(config);
 		// necessary for v4...
-		new MatsimNetworkReader(scenario.getNetwork()).parse(IOUtils.newUrl(config.getContext(), NET_FILE));
-		new PopulationReader(scenario).parse(IOUtils.newUrl(config.getContext(), BASE_FILE));
+		new MatsimNetworkReader(scenario.getNetwork()).parse(IOUtils.extendUrl(config.getContext(), NET_FILE));
+		new PopulationReader(scenario).parse(IOUtils.extendUrl(config.getContext(), BASE_FILE));
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeV5(testFile);
 
 		testConversionAtInput(testFile);
@@ -86,8 +107,8 @@ public class PopulationReprojectionIOIT {
 		Config config = ConfigUtils.createConfig(ExamplesUtils.getTestScenarioURL("berlin"));
 		final Scenario originalScenario = ScenarioUtils.createScenario(config);
 		// necessary for v4...
-		new MatsimNetworkReader(originalScenario.getNetwork()).parse(IOUtils.newUrl(config.getContext(), NET_FILE));
-		new PopulationReader(originalScenario).parse(IOUtils.newUrl(config.getContext(), BASE_FILE));
+		new MatsimNetworkReader(originalScenario.getNetwork()).parse(IOUtils.extendUrl(config.getContext(), NET_FILE));
+		new PopulationReader(originalScenario).parse(IOUtils.extendUrl(config.getContext(), BASE_FILE));
 
 		// write test population with conversion
 		new PopulationWriter(
@@ -98,7 +119,7 @@ public class PopulationReprojectionIOIT {
 		// read converted population
 		final Scenario reprojectedScenario = ScenarioUtils.createScenario(config);
 		// necessary for v4...
-		new MatsimNetworkReader(reprojectedScenario.getNetwork()).parse(IOUtils.newUrl(config.getContext(), NET_FILE));
+		new MatsimNetworkReader(reprojectedScenario.getNetwork()).parse(IOUtils.extendUrl(config.getContext(), NET_FILE));
 		new PopulationReader(reprojectedScenario).readFile(testFile);
 
 		assertPopulationCorrectlyTransformed( originalScenario.getPopulation() , reprojectedScenario.getPopulation() );
@@ -112,8 +133,8 @@ public class PopulationReprojectionIOIT {
 		Config config = ConfigUtils.createConfig(ExamplesUtils.getTestScenarioURL("berlin"));
 		final Scenario originalScenario = ScenarioUtils.createScenario(config);
 		// necessary for v4...
-		new MatsimNetworkReader(originalScenario.getNetwork()).parse(IOUtils.newUrl(config.getContext(), NET_FILE));
-		new PopulationReader(originalScenario).parse(IOUtils.newUrl(config.getContext(), BASE_FILE));
+		new MatsimNetworkReader(originalScenario.getNetwork()).parse(IOUtils.extendUrl(config.getContext(), NET_FILE));
+		new PopulationReader(originalScenario).parse(IOUtils.extendUrl(config.getContext(), BASE_FILE));
 
 		// write test population with conversion
 		new PopulationWriter(
@@ -145,8 +166,8 @@ public class PopulationReprojectionIOIT {
 								getOutputURL()
 						));
 
-		new MatsimNetworkReader(originalScenario.getNetwork()).parse(IOUtils.newUrl(berlin, NET_FILE));
-		new PopulationReader(originalScenario).parse(IOUtils.newUrl(berlin, BASE_FILE));
+		new MatsimNetworkReader(originalScenario.getNetwork()).parse(IOUtils.extendUrl(berlin, NET_FILE));
+		new PopulationReader(originalScenario).parse(IOUtils.extendUrl(berlin, BASE_FILE));
 		final Config config = ConfigUtils.createConfig(berlin);
 
 		ProjectionUtils.putCRS(originalScenario.getNetwork(), INITIAL_CRS);
@@ -256,8 +277,8 @@ public class PopulationReprojectionIOIT {
 		URL berlin = ExamplesUtils.getTestScenarioURL("berlin");
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig(berlin));
 		// necessary for v4...
-		new MatsimNetworkReader(originalScenario.getNetwork()).parse(IOUtils.newUrl(berlin, NET_FILE));
-		new PopulationReader(originalScenario).parse(IOUtils.newUrl(berlin, BASE_FILE));
+		new MatsimNetworkReader(originalScenario.getNetwork()).parse(IOUtils.extendUrl(berlin, NET_FILE));
+		new PopulationReader(originalScenario).parse(IOUtils.extendUrl(berlin, BASE_FILE));
 		final Config config = ConfigUtils.createConfig(berlin);
 
 		// specify config
@@ -345,7 +366,7 @@ public class PopulationReprojectionIOIT {
 		final Scenario reprojectedScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		// necessary for v4...
-		URL network = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("berlin"), NET_FILE);
+		URL network = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), NET_FILE);
 		new MatsimNetworkReader(originalScenario.getNetwork()).parse(network);
 		new MatsimNetworkReader(reprojectedScenario.getNetwork()).parse(network);
 

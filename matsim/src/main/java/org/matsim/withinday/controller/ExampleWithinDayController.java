@@ -29,14 +29,13 @@ import javax.inject.Singleton;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -113,8 +112,8 @@ public final class ExampleWithinDayController implements StartupListener {
 	@Inject private ActivityReplanningMap activityReplanningMap;
 	@Inject private LinkReplanningMap linkReplanningMap;
 	@Inject private LeastCostPathCalculatorFactory pathCalculatorFactory;
-	@Inject private Map<String,TravelDisutilityFactory> travelDisutilityFactories ;
-	@Inject private Map<String,TravelTime> travelTimes ;
+	@Inject private Map<String,TravelDisutilityFactory> travelDisutilityFactories;
+	@Inject private Map<String,TravelTime> travelTimes;
 
 
 	/*
@@ -133,7 +132,8 @@ public final class ExampleWithinDayController implements StartupListener {
 		} 
 		
 		Config config = ConfigUtils.loadConfig( args[0] , new WithinDayConfigGroup() ) ;
-		
+		config.controler().setRoutingAlgorithmType( ControlerConfigGroup.RoutingAlgorithmType.Dijkstra );
+
 		Scenario scenario = ScenarioUtils.loadScenario( config) ;
 		
 		final Controler controler = new Controler(scenario);
@@ -160,11 +160,10 @@ public final class ExampleWithinDayController implements StartupListener {
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		this.initReplanners();
+		this.initReplanners(  );
 	}
 	
-	private void initReplanners() {
-		RouteFactories routeFactory = ((PopulationFactory) this.scenario.getPopulation().getFactory()).getRouteFactories() ;
+	private void initReplanners( ) {
 		Network network = this.scenario.getNetwork() ;
 		
 		TravelTime travelTime = travelTimes.get( TransportMode.car ) ;
@@ -194,7 +193,7 @@ public final class ExampleWithinDayController implements StartupListener {
 		this.duringLegProbabilityFilterFactory = new ProbabilityFilterFactory(this.pDuringLegReplanning);
 		this.duringLegIdentifierFactory.addAgentFilterFactory(this.duringLegProbabilityFilterFactory);
 		this.duringLegIdentifier = this.duringLegIdentifierFactory.createIdentifier();
-		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenario, this.withinDayEngine, pathCalculator, routeFactory );
+		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenario, this.withinDayEngine, pathCalculator);
 		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
 		this.withinDayEngine.addDuringLegReplannerFactory(this.duringLegReplannerFactory);
 	}

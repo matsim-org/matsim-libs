@@ -18,10 +18,17 @@
  * *********************************************************************** */
 package org.matsim.contrib.accessibility.utils;
 
-import com.vividsolutions.jts.geom.Envelope;
 import org.apache.log4j.Logger;
+import org.locationtech.jts.geom.Envelope;
 import org.matsim.contrib.accessibility.Labels;
-import org.matsim.contrib.analysis.vsp.qgis.*;
+import org.matsim.contrib.analysis.vsp.qgis.GraduatedSymbolRenderer;
+import org.matsim.contrib.analysis.vsp.qgis.PolygonLayerRenderer;
+import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
+import org.matsim.contrib.analysis.vsp.qgis.QGisMapnikFileCreator;
+import org.matsim.contrib.analysis.vsp.qgis.QGisWriter;
+import org.matsim.contrib.analysis.vsp.qgis.RasterLayer;
+import org.matsim.contrib.analysis.vsp.qgis.RendererFactory;
+import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityXmlRenderer;
 import org.matsim.contrib.analysis.vsp.qgis.utils.ColorRangeUtils;
 import org.matsim.core.utils.misc.ExeRunner;
@@ -185,7 +192,7 @@ public class VisualizationUtils {
 			// if OS is Macintosh
 			// example (dominik) // os.arch=x86_64 // os.name=Mac OS X // os.version=10.10.2
 		} else if ( osName.contains("Mac") || osName.contains("mac") ) {
-			String cmd = "/Applications/QGIS.app/Contents/MacOS/QGIS " + workingDirectory + "QGisProjectFile_" + mode + ".qgs" +
+			String cmd = "/Applications/QGIS3.app/Contents/MacOS/QGIS " + workingDirectory + "QGisProjectFile_" + mode + ".qgs" +
 					" --snapshot " + workingDirectory + "snapshot_" + mode + ".png";
 
 			String stdoutFileName = workingDirectory + "snapshot_" + mode + ".log";

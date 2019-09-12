@@ -26,7 +26,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlReader;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.mobsim.DistanceScoringFunctionFactoryForTests;
 import org.matsim.contrib.freight.mobsim.StrategyManagerFactoryForTests;
@@ -39,6 +39,8 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.testcases.MatsimTestUtils;
+
+import static org.matsim.contrib.freight.controler.EquilWithCarrierWithPassIT.addDummyVehicleType;
 
 public class EquilWithCarrierWithoutPassIT {
 	
@@ -77,7 +79,8 @@ public class EquilWithCarrierWithoutPassIT {
 	@Test
 	public void testMobsimWithCarrierRunsWithoutException() {
 		Carriers carriers = new Carriers();
-		new CarrierPlanXmlReaderV2(carriers).readFile(planFile);
+		new CarrierPlanXmlReader(carriers).readFile(planFile);
+		addDummyVehicleType( carriers, "default") ;
 		controler.addOverridingModule(new CarrierModule(carriers));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -93,7 +96,8 @@ public class EquilWithCarrierWithoutPassIT {
 	@Test
 	public void testScoringInMeters(){
 		Carriers carriers = new Carriers();
-		new CarrierPlanXmlReaderV2(carriers).readFile(planFile);
+		new CarrierPlanXmlReader(carriers).readFile(planFile);
+		addDummyVehicleType( carriers, "default") ;
 		controler.addOverridingModule(new CarrierModule(carriers));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -115,7 +119,8 @@ public class EquilWithCarrierWithoutPassIT {
 	@Test
 	public void testScoringInSecondsWoTimeWindowEnforcement(){
 		Carriers carriers = new Carriers();
-		new CarrierPlanXmlReaderV2(carriers).readFile(planFile);
+		new CarrierPlanXmlReader(carriers).readFile(planFile);
+		addDummyVehicleType( carriers, "default") ;
 		final CarrierModule carrierModule = new CarrierModule( carriers );
 		carrierModule.setPhysicallyEnforceTimeWindowBeginnings( false );
 		controler.addOverridingModule( carrierModule );
@@ -140,7 +145,8 @@ public class EquilWithCarrierWithoutPassIT {
 	@Test
 	public void testScoringInSecondsWTimeWindowEnforcement(){
 		Carriers carriers = new Carriers();
-		new CarrierPlanXmlReaderV2(carriers).readFile(planFile);
+		new CarrierPlanXmlReader(carriers).readFile(planFile);
+		addDummyVehicleType( carriers, "default") ;
 		final CarrierModule carrierModule = new CarrierModule( carriers );
 		carrierModule.setPhysicallyEnforceTimeWindowBeginnings( true );
 		controler.addOverridingModule( carrierModule );
@@ -165,7 +171,8 @@ public class EquilWithCarrierWithoutPassIT {
 	@Test
 	public void testScoringInSecondsWithWithinDayRescheduling(){
 		Carriers carriers = new Carriers();
-		new CarrierPlanXmlReaderV2(carriers).readFile(planFile);
+		new CarrierPlanXmlReader(carriers).readFile(planFile);
+		addDummyVehicleType( carriers, "default") ;
 		CarrierModule carrierControler = new CarrierModule(carriers);
 		carrierControler.setPhysicallyEnforceTimeWindowBeginnings(true);
 		controler.addOverridingModule(carrierControler);

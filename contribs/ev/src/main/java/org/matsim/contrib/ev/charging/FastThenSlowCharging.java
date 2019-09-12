@@ -17,59 +17,72 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.ev.charging;/*
+package org.matsim.contrib.ev.charging;
+/*
  * created by jbischoff, 16.11.2018
  *
- * This charging strategy mimics the typical behavior at fast-chargers:
+ * This charging model mimics the typical behavior at fast-chargers:
  * Up to 50%, full power (or up to 1.75* C) is applied, up to
- * 75% SOC, a maximum of 1.25 * C is applied. Untill full, maximum power is 0.5*C.
+ * 75% SOC, a maximum of 1.25 * C is applied. Until full, maximum power is 0.5*C.
  * C == battery capacity.
  * This charging behavior is based on research conducted at LTH / University of Lund
  */
 
-import org.matsim.contrib.ev.data.Battery;
-import org.matsim.contrib.ev.data.ElectricVehicle;
+import org.matsim.contrib.ev.fleet.Battery;
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
 
-public class FastThenSlowCharging implements ChargingStrategy {
+import com.google.common.base.Preconditions;
 
-	private final double chargingPower;
+public class FastThenSlowCharging implements BatteryCharging {
+	private final ElectricVehicle electricVehicle;
 
-	public FastThenSlowCharging(double chargingPower) {
-		if (chargingPower <= 0) {
-			throw new IllegalArgumentException("chargingPower must be positive");
-		}
-		this.chargingPower = chargingPower;
+	public FastThenSlowCharging(ElectricVehicle electricVehicle) {
+		this.electricVehicle = electricVehicle;
 	}
 
-	@Override
-	public double calcEnergyCharge(ElectricVehicle ev, double chargePeriod) {
-		Battery b = ev.getBattery();
+	public double calcChargingPower(double maxPower) {
+		Battery b = electricVehicle.getBattery();
 		double relativeSoc = b.getSoc() / b.getCapacity();
 		double c = b.getCapacity() / 3600;
-		double currentPower;
 		if (relativeSoc <= 0.5) {
-			currentPower = Math.min(chargingPower, 1.75 * c);
+			return Math.min(maxPower, 1.75 * c);
 		} else if (relativeSoc <= 0.75) {
-			currentPower = Math.min(chargingPower, 1.25 * c);
+			return Math.min(maxPower, 1.25 * c);
 		} else {
-			currentPower = Math.min(chargingPower, 0.5 * c);
+			return Math.min(maxPower, 0.5 * c);
 		}
-		return currentPower * chargePeriod;
 	}
 
 	@Override
-	public boolean isChargingCompleted(ElectricVehicle ev) {
-		return calcRemainingEnergyToCharge(ev) <= 0;
+	public double calcChargingTime(Charger charger, double energy) {
+		Preconditions.checkArgument(energy >= 0, "Energy is negative: %s", energy);
+
+		Battery b = electricVehicle.getBattery();
+		double startSoc = b.getSoc();
+		double endSoc = startSoc + energy;
+		Preconditions.checkArgument(endSoc <= b.getCapacity(), "End SOC greater than battery capacity: %s", endSoc);
+
+		double threshold1 = 0.5 * b.getCapacity();
+		double threshold2 = 0.75 * b.getCapacity();
+		double c = b.getCapacity() / 3600;
+
+		double energyA = startSoc >= threshold1 ? 0 : Math.min(threshold1, endSoc) - startSoc;
+		double timeA = energyA / Math.min(charger.getPlugPower(), 1.75 * c);
+
+		double energyB = startSoc >= threshold2 || endSoc <= threshold1 ?
+				0 :
+				Math.min(threshold2, endSoc) - Math.max(threshold1, startSoc);
+		double timeB = energyB / Math.min(charger.getPlugPower(), 1.25 * c);
+
+		double energyC = endSoc <= threshold2 ? 0 : endSoc - Math.max(threshold2, startSoc);
+		double timeC = energyC / Math.min(charger.getPlugPower(), 0.5 * c);
+
+		return timeA + timeB + timeC;
 	}
 
 	@Override
-	public double calcRemainingEnergyToCharge(ElectricVehicle ev) {
-		Battery b = ev.getBattery();
-		return b.getCapacity() - b.getSoc();
-	}
-
-	@Override
-	public double calcRemainingTimeToCharge(ElectricVehicle ev) {
-		return calcRemainingEnergyToCharge(ev) / chargingPower;//TODO should consider variable charging speed
+	public double calcChargingPower(Charger charger) {
+		return calcChargingPower(charger.getPlugPower());
 	}
 }

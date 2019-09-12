@@ -48,7 +48,6 @@ import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.PassengerEngineQSimModule;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestValidator;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeQSimModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.ModalProviders;
@@ -104,17 +103,15 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 		bindModal(VehicleData.EntryFactory.class).toInstance(new VehicleDataEntryFactoryImpl(drtCfg));
 
-		bindModal(InsertionCostCalculator.PenaltyCalculator.class).to(drtCfg.isRequestRejection() ?
-				InsertionCostCalculator.RejectSoftConstraintViolations.class :
-				InsertionCostCalculator.DiscourageSoftConstraintViolations.class).asEagerSingleton();
+		bindModal(InsertionCostCalculator.PenaltyCalculator.class).to(
+				drtCfg.isRejectRequestIfMaxWaitOrTravelTimeViolated() ?
+						InsertionCostCalculator.RejectSoftConstraintViolations.class :
+						InsertionCostCalculator.DiscourageSoftConstraintViolations.class).asEagerSingleton();
 
 		bindModal(DrtTaskFactory.class).toInstance(new DrtTaskFactoryImpl());
 
 		bindModal(EmptyVehicleRelocator.class).toProvider(
 				new ModalProviders.AbstractProvider<EmptyVehicleRelocator>(drtCfg.getMode()) {
-					@Inject
-					@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
-					private Network network;
 
 					@Inject
 					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
@@ -125,6 +122,7 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 					@Override
 					public EmptyVehicleRelocator get() {
+						Network network = getModalInstance(Network.class);
 						DrtTaskFactory taskFactory = getModalInstance(DrtTaskFactory.class);
 						TravelDisutility travelDisutility = getModalInstance(
 								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
@@ -154,15 +152,12 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 		addModalComponent(ParallelPathDataProvider.class,
 				new ModalProviders.AbstractProvider<ParallelPathDataProvider>(getMode()) {
 					@Inject
-					@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
-					private Network network;
-
-					@Inject
 					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 					private TravelTime travelTime;
 
 					@Override
 					public ParallelPathDataProvider get() {
+						Network network = getModalInstance(Network.class);
 						TravelDisutility travelDisutility = getModalInstance(
 								TravelDisutilityFactory.class).createTravelDisutility(travelTime);
 						return new ParallelPathDataProvider(network, travelTime, travelDisutility, drtCfg);

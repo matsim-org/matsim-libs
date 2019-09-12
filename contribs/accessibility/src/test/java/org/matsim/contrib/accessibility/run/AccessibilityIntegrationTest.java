@@ -30,6 +30,7 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.locationtech.jts.geom.Envelope;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -43,7 +44,7 @@ import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.AccessibilityModule;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
-import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
+import org.matsim.contrib.accessibility.FacilityDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
@@ -67,30 +68,28 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.testcases.MatsimTestUtils;
 
-import com.vividsolutions.jts.geom.Envelope;
-
 /**
  * I can't say how similar or different to {@link AccessibilityIntegrationTest} this one here is.  kai, feb'17
- * 
+ *
  * @author nagel, dziemke
  */
 public class AccessibilityIntegrationTest {
 
 	private static final Logger LOG = Logger.getLogger(AccessibilityIntegrationTest.class);
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();	
-	
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+
 	@Ignore
 	@Test
 	public void testRunAccessibilityExample() {
 		Config config = ConfigUtils.loadConfig("./examples/RunAccessibilityExample/config.xml");
-		
+
 		AccessibilityConfigGroup accConfig = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
 		accConfig.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, true);
-		
+
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		org.matsim.contrib.accessibility.run.RunAccessibilityExample.run(scenario);
-		
+
 		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
 		tabFileParserConfig.setFileName("./output/work/accessibilities.csv");
 		tabFileParserConfig.setDelimiterRegex(",");
@@ -102,13 +101,13 @@ public class AccessibilityIntegrationTest {
 	            	x = Double.parseDouble(row[0]);
 	            	x = Double.parseDouble(row[1]);
 	            	value = Double.parseDouble(row[2]);
-	            	
+
 	            	if (x == 50) {
 	            		if (y == 50) {
 	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", 2.1486094237531126, value, utils.EPSILON);
 	            		} else if (y == 150){
 	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", 2.1766435716006005, value, utils.EPSILON);
-	            		} 
+	            		}
 	            	} else if (x == 150) {
 	            		if (y == 50) {
 	            			Assert.assertEquals("Wrong work accessibility value at x=" + x + ", y=" + y + ":", 2.1486094237531126, value, utils.EPSILON);
@@ -120,8 +119,8 @@ public class AccessibilityIntegrationTest {
             }
         });
 	}
-	
-	
+
+
 	@Test
 	public void testWithBoundingBoxConfigFile() {
 		Config config = ConfigUtils.loadConfig(utils.getInputDirectory() + "config.xml");
@@ -131,25 +130,25 @@ public class AccessibilityIntegrationTest {
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.matrixBasedPt, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.matrixBasedPt, false);
 
 		ModeParams ptParams = new ModeParams(TransportMode.transit_walk);
 		config.planCalcScore().addModeParams(ptParams);
-		
+
 		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class) ;
-		
+
 		final Scenario sc = ScenarioUtils.loadScenario(config);
 		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
 		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
-		
+
 		Controler controler = new Controler(sc);
 
 		final AccessibilityModule module = new AccessibilityModule();
 		final ResultsComparator resultsComparator = new ResultsComparator(false);
 		module.addFacilityDataExchangeListener(resultsComparator);
 		controler.addOverridingModule(module);
-		controler.addOverridingModule(new AbstractModule() {			
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(PtMatrix.class).toInstance(ptMatrix);
@@ -157,7 +156,7 @@ public class AccessibilityIntegrationTest {
 		});
 		controler.run();
 	}
-	
+
 
 	@Test
 	public void testWithBoundingBox() {
@@ -172,20 +171,20 @@ public class AccessibilityIntegrationTest {
 		acg.setBoundingBoxTop(max);
 		acg.setBoundingBoxLeft(min);
 		acg.setBoundingBoxRight(max);
-		
+
 		final Scenario sc = createTestScenario(config);
-			
+
 		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class ) ;
 		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
 		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
-		
+
 		Controler controler = new Controler(sc);
 
 		final AccessibilityModule module = new AccessibilityModule();
 		final ResultsComparator resultsComparator = new ResultsComparator(false);
 		module.addFacilityDataExchangeListener(resultsComparator);
 		controler.addOverridingModule(module);
-		controler.addOverridingModule(new AbstractModule() {			
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(PtMatrix.class).toInstance(ptMatrix);
@@ -193,8 +192,8 @@ public class AccessibilityIntegrationTest {
 		});
 		controler.run();
 	}
-	
-	
+
+
 	@Test
 	public void testWithBoundingBoxUsingOpportunityWeights() {
 		final Config config = createTestConfig();
@@ -208,22 +207,22 @@ public class AccessibilityIntegrationTest {
 		acg.setBoundingBoxTop(max);
 		acg.setBoundingBoxLeft(min);
 		acg.setBoundingBoxRight(max);
-		
+
 		acg.setUseOpportunityWeights(true);
 		acg.setWeightExponent(2.);
-		
+
 		final Scenario sc = createTestScenarioUsingOpportunityWeights(config) ;
 		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class ) ;
 		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
 		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
-		
+
 		Controler controler = new Controler(sc);
 
 		final AccessibilityModule module = new AccessibilityModule();
 		final ResultsComparator resultsComparator = new ResultsComparator(true);
 		module.addFacilityDataExchangeListener(resultsComparator);
 		controler.addOverridingModule(module);
-		controler.addOverridingModule(new AbstractModule() {			
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(PtMatrix.class).toInstance(ptMatrix);
@@ -236,7 +235,7 @@ public class AccessibilityIntegrationTest {
 	@Test
 	public void testWithExtentDeterminedByNetwork() {
 		final Config config = createTestConfig() ;
-		
+
 		final Scenario sc = createTestScenario(config) ;
 		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class ) ;
 		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
@@ -248,7 +247,7 @@ public class AccessibilityIntegrationTest {
 		final ResultsComparator resultsComparator = new ResultsComparator(false);
 		module.addFacilityDataExchangeListener(resultsComparator);
 		controler.addOverridingModule(module);
-		controler.addOverridingModule(new AbstractModule() {			
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(PtMatrix.class).toInstance(ptMatrix);
@@ -286,7 +285,7 @@ public class AccessibilityIntegrationTest {
 		final ResultsComparator resultsComparator = new ResultsComparator(false);
 		module.addFacilityDataExchangeListener(resultsComparator);
 		controler.addOverridingModule(module);
-		controler.addOverridingModule(new AbstractModule() {			
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(PtMatrix.class).toInstance(ptMatrix);
@@ -294,8 +293,8 @@ public class AccessibilityIntegrationTest {
 		});
 		controler.run();
 	}
-	
-	
+
+
 	@Test
 	public void testWithPredefinedMeasuringPoints() {
 		Config config = createTestConfig() ;
@@ -306,17 +305,17 @@ public class AccessibilityIntegrationTest {
 			LOG.error("Facilities file with measuring points not found! testWithMeasuringPointsInFacilitiesFile could not be performed...");
 			Assert.assertTrue(f.exists());
 		}
-		
+
 		Scenario measuringPointsSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimFacilitiesReader(measuringPointsSc).readFile(f.getAbsolutePath());
 		ActivityFacilities measuringPoints = (ActivityFacilities) AccessibilityUtils.collectActivityFacilitiesWithOptionOfType(measuringPointsSc, null);
 
 		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
-		
+
 		acg.setTileSize_m(100);
-		
+
 		acg.setEnvelope(new Envelope(0, 200, 0, 200));
-		
+
 		acg.setMeasuringPointsFacilities(measuringPoints);
 		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromFacilitiesObject);
 
@@ -331,7 +330,7 @@ public class AccessibilityIntegrationTest {
 		final ResultsComparator resultsComparator = new ResultsComparator(false);
 		module.addFacilityDataExchangeListener(resultsComparator);
 		controler.addOverridingModule(module);
-		controler.addOverridingModule(new AbstractModule() {			
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(PtMatrix.class).toInstance(ptMatrix);
@@ -340,41 +339,41 @@ public class AccessibilityIntegrationTest {
 		controler.run();
 	}
 
-	
+
 	@Ignore
 	@Test
 	public void testWithFile(){
 		/*TODO Complete - JWJ, Dec'16 */
 		Config config = createTestConfig();
-		
+
 		File f = new File(this.utils.getInputDirectory() + "pointFile.csv");
 		if(!f.exists()){
 			LOG.error("Point file not found! testWithFile could not be tested...");
 			Assert.assertTrue(f.exists());
 		}
-		
+
 		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
 		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromFacilitiesFile);
 		acg.setMeasuringPointsFile(f.getAbsolutePath());
-		
+
 		final Scenario sc = createTestScenario(config);
-		
+
 		Controler controler = new Controler(sc);
-		
+
 		final AccessibilityModule module = new AccessibilityModule();
 //		module.addSpatialGridDataExchangeListener( new EvaluateTestResults(true,true,true,true,true) ) ;
 		controler.addOverridingModule(module);
-		
+
 		controler.run();
-		
-		/* FIXME This currently does NOTHING... it completely ignores the 
+
+		/* FIXME This currently does NOTHING... it completely ignores the
 		 * file-based instruction.  (presumably JWJ, dec'16)
-		 * 
+		 *
 		 * This is now in principle working; I fixed at least one bug.  But pointFile.csv is empty. --> disabling the test.  kai, feb'17
 		 */
 	}
-	
-	
+
+
 	private Config createTestConfig() {
 		final Config config = ConfigUtils.createConfig();
 
@@ -384,9 +383,10 @@ public class AccessibilityIntegrationTest {
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.matrixBasedPt, true);
-		
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.matrixBasedPt, false);
+		acg.setUseParallelization(false);
+
 		// modify config according to needs
 		Network network = createTestNetwork(); // this is a little odd. kai, dec'16
 		String networkFile = utils.getOutputDirectory() + "network.xml";
@@ -416,7 +416,7 @@ public class AccessibilityIntegrationTest {
 		return config;
 	}
 
-	
+
 	private static Scenario createTestScenario(final Config config) {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 //		MutableScenario scenario = (MutableScenario) ScenarioUtils.loadScenario(config);
@@ -434,8 +434,8 @@ public class AccessibilityIntegrationTest {
 		scenario.getConfig().facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.setInScenario);
 		return scenario;
 	}
-	
-	
+
+
 	private static Scenario createTestScenarioUsingOpportunityWeights(final Config config) {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -449,14 +449,14 @@ public class AccessibilityIntegrationTest {
 		scenario.getConfig().facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.setInScenario);
 		return scenario;
 	}
-	
-	
+
+
 	/**
 	 * This method creates a test network. It is used for example in PtMatrixTest.java to test the pt simulation in MATSim.
 	 * The network has 9 nodes and 8 links (see the sketch below).
-	 * 
+	 *
 	 * @return the created test network
-	 * 
+	 *
 	 * @author thomas
 	 * @author tthunig
 	 */
@@ -489,66 +489,66 @@ public class AccessibilityIntegrationTest {
 		Node node7 = NetworkUtils.createAndAddNode(network, Id.create(7, Node.class), new Coord((double) 200, (double) 100));
 		Node node8 = NetworkUtils.createAndAddNode(network, Id.create(8, Node.class), new Coord((double) 200, (double) 200));
 		Node node9 = NetworkUtils.createAndAddNode(network, Id.create(9, Node.class), new Coord((double) 200, (double) 0));
-		
+
 		Set<String> modes = new HashSet<>();
 		modes.add("car");
 
 		// Links (bi-directional)
 		NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), node1, node2, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(1, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(2, Link.class), node2, node1, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(2, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(3, Link.class), node1, node3, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(3, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(4, Link.class), node3, node1, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(4, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(5, Link.class), node1, node4, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(5, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(6, Link.class), node4, node1, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(6, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(7, Link.class), node4, node5, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(7, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(8, Link.class), node5, node4, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(8, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(9, Link.class), node4, node6, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(9, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(10, Link.class), node6, node4, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(10, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(11, Link.class), node4, node7, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(11, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(12, Link.class), node7, node4, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(12, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(13, Link.class), node5, node8, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(13, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(14, Link.class), node8, node5, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(14, Link.class)).setAllowedModes(modes);
-		
+
 		NetworkUtils.createAndAddLink(network,Id.create(15, Link.class), node6, node9, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(15, Link.class)).setAllowedModes(modes);
 
 		NetworkUtils.createAndAddLink(network,Id.create(16, Link.class), node9, node6, (double) 100, freespeed, capacity, numLanes);
 		network.getLinks().get(Id.create(16, Link.class)).setAllowedModes(modes);
-		
+
 		return network;
 	}
 
 
 	static class ResultsComparator implements FacilityDataExchangeInterface{
 		private Map<Tuple<ActivityFacility, Double>, Map<String,Double>> accessibilitiesMap = new HashMap<>();
-		
+
 		private boolean useOpportunityWeights = false;
 
 		public ResultsComparator(boolean useOpportunityWeights){
@@ -556,10 +556,15 @@ public class AccessibilityIntegrationTest {
 		}
 
 		@Override
-		public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay, Map<String, Double> accessibilities){
-			accessibilitiesMap.put(new Tuple<ActivityFacility, Double>(measurePoint, timeOfDay), accessibilities);
-		}
-		
+        public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay, String mode, double accessibility) {
+            Tuple<ActivityFacility, Double> key = new Tuple<>(measurePoint, timeOfDay);
+            if (!accessibilitiesMap.containsKey(key)) {
+                Map<String,Double> accessibilitiesByMode = new HashMap<>();
+                accessibilitiesMap.put(key, accessibilitiesByMode);
+            }
+            accessibilitiesMap.get(key).put(mode, accessibility);
+        }
+
 		@Override
 		public void finish() {
 			for (Tuple<ActivityFacility, Double> tuple : accessibilitiesMap.keySet()) {

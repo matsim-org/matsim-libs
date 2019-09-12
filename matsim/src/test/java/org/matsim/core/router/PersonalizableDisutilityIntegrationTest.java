@@ -37,7 +37,8 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleImpl;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
  * @author mrieser / senozon
@@ -120,7 +121,7 @@ public class PersonalizableDisutilityIntegrationTest {
 	@Test
 	public void testPersonAvailableForDisutility_FastAStarLandmarks() {
 		Fixture f = new Fixture();
-		LeastCostPathCalculatorFactory routerFactory = new FastAStarLandmarksFactory();
+		LeastCostPathCalculatorFactory routerFactory = new FastAStarLandmarksFactory(2);
 		LeastCostPathCalculator router = routerFactory.createPathCalculator(f.network, f.costFunction, new FreeSpeedTravelTime());
 		router.calcLeastCostPath(
 				f.network.getNodes().get(Id.create("2", Node.class)), 
@@ -143,8 +144,10 @@ public class PersonalizableDisutilityIntegrationTest {
 			new MatsimNetworkReader(this.scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
 			
 			this.person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
-			
-			this.vehicle = new VehicleImpl(null, null);
+
+			Id<Vehicle> dummyId = Id.createVehicleId( "dummy" ) ;
+			VehicleType dummyType = new VehicleType( Id.create( "dummyVehicleType", VehicleType.class ) ) ;
+			this.vehicle = VehicleUtils.createVehicle(dummyId, dummyType );
 			
 			this.costFunction = new PersonEnforcingTravelDisutility();
 			this.costFunction.setExpectations(this.person, this.vehicle);

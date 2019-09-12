@@ -3,6 +3,7 @@ package org.matsim.vis.otfvis;
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -38,4 +39,5 @@ public interface SimulationViewForQueries {
 
 	double getTime();
 
+	Scenario getScenario();
 }

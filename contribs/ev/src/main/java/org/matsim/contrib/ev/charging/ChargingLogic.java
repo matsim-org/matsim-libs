@@ -19,14 +19,13 @@
 
 package org.matsim.contrib.ev.charging;
 
-import org.matsim.contrib.ev.data.Charger;
-import org.matsim.contrib.ev.data.ElectricVehicle;
-import org.matsim.core.api.experimental.events.EventsManager;
-
 import java.util.Collection;
 
+import org.matsim.contrib.ev.fleet.ElectricVehicle;
+import org.matsim.contrib.ev.infrastructure.Charger;
+
 public interface ChargingLogic {
-	static interface Factory {
+	interface Factory {
 		ChargingLogic create(Charger charger);
 	}
 
@@ -37,8 +36,6 @@ public interface ChargingLogic {
 	void removeVehicle(ElectricVehicle ev, double now);
 
 	void chargeVehicles(double chargePeriod, double now);
-
-	void initEventsHandling(EventsManager eventsManager);
 
 	Collection<ElectricVehicle> getPluggedVehicles();
 

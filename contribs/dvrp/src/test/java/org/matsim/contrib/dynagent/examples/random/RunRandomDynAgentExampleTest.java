@@ -19,11 +19,16 @@
 
 package org.matsim.contrib.dynagent.examples.random;
 
+import java.net.URL;
+
 import org.junit.Test;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 
 public class RunRandomDynAgentExampleTest {
 	@Test
 	public void testRun() {
-		RunRandomDynAgentExample.run(false);
+		URL networkUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "config.xml");
+		RunRandomDynAgentExample.run(networkUrl, "grid_network.xml", false);
 	}
 }

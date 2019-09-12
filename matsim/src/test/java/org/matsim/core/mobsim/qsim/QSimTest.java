@@ -87,9 +87,8 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.testcases.utils.LogCounter;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
+import org.matsim.vehicles.VehicleUtils;
 
 @RunWith(Parameterized.class)
 public class QSimTest {
@@ -413,10 +412,14 @@ public class QSimTest {
 		Assert.assertEquals("wrong time in 3rd event.", 6.0*3600 + 0, allEvents.get(2).getTime(), MatsimTestCase.EPSILON);
 		Assert.assertEquals("wrong time in 4th event.", 6.0*3600 + 0, allEvents.get(3).getTime(), MatsimTestCase.EPSILON);
 
-		Assert.assertEquals("wrong time in 5th event.", 6.0*3600 + 1, allEvents.get(4).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in 6th event.", 6.0*3600 + 1, allEvents.get(5).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in 7th event.", 6.0*3600 + 1, allEvents.get(6).getTime(), MatsimTestCase.EPSILON);
-		Assert.assertEquals("wrong time in 8th event.", 6.0*3600 + 1, allEvents.get(7).getTime(), MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in 5th event.", 6.0 * 3600 + 0, allEvents.get(4).getTime(),
+				MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in 6th event.", 6.0 * 3600 + 0, allEvents.get(5).getTime(),
+				MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in 7th event.", 6.0 * 3600 + 0, allEvents.get(6).getTime(),
+				MatsimTestCase.EPSILON);
+		Assert.assertEquals("wrong time in 8th event.", 6.0 * 3600 + 0, allEvents.get(7).getTime(),
+				MatsimTestCase.EPSILON);
 
 
 		Assert.assertEquals("wrong link in 1st event.", f.link1.getId(), ((ActivityEndEvent) allEvents.get(0)).getLinkId() );
@@ -1039,9 +1042,9 @@ public class QSimTest {
 		NetsimLink qlink2 = qnet.getNetsimLink(Id.create(2, Link.class));
 		NetsimLink qlink3 = qnet.getNetsimLink(Id.create(3, Link.class));
 
-		VehicleType defaultVehicleType = new VehicleTypeImpl(Id.create("defaultVehicleType", VehicleType.class));
-		QVehicle vehicle1 = new QVehicleImpl(new VehicleImpl(Id.create(1, Vehicle.class), defaultVehicleType));
-		QVehicle vehicle2 = new QVehicleImpl(new VehicleImpl(Id.create(2, Vehicle.class), defaultVehicleType));
+		VehicleType defaultVehicleType = new VehicleType(Id.create("defaultVehicleType", VehicleType.class ));
+		QVehicle vehicle1 = new QVehicleImpl( VehicleUtils.createVehicle(Id.create(1, Vehicle.class ), defaultVehicleType ) );
+		QVehicle vehicle2 = new QVehicleImpl( VehicleUtils.createVehicle(Id.create(2, Vehicle.class ), defaultVehicleType ) );
 		sim.addParkedVehicle(vehicle1, Id.create(2, Link.class));
 		sim.addParkedVehicle(vehicle2, Id.create(2, Link.class));
 
@@ -1320,10 +1323,13 @@ public class QSimTest {
 
 	@Test
 	public void testStartAndEndTime() {
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Config config = scenario.getConfig();
 
+		final Config config = ConfigUtils.createConfig();
 		config.qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
+
+		// ---
+
+		MutableScenario scenario = ScenarioUtils.createMutableScenario( config );
 
 		// build simple network with 1 link
 		Network network = scenario.getNetwork();

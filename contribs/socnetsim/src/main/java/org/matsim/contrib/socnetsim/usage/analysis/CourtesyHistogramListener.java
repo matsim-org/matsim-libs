@@ -21,7 +21,7 @@ package org.matsim.contrib.socnetsim.usage.analysis;
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.NumberAxis;
@@ -127,7 +127,7 @@ public class CourtesyHistogramListener  implements IterationEndsListener, Iterat
 
 	public static void writeGraphic(CourtesyHistogram courtesyHistogram, final String actType, final String filename) {
 		try {
-            ChartUtilities.saveChartAsPNG(
+            ChartUtils.saveChartAsPNG(
 					new File(filename),
 					getGraphic(
 							courtesyHistogram.getDataFrames().get( actType ),

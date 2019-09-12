@@ -22,24 +22,41 @@ package org.matsim.contrib.taxi.run;
 
 import java.util.Collection;
 
+import javax.validation.Valid;
+
 import org.matsim.contrib.dvrp.run.MultiModal;
+import org.matsim.contrib.dvrp.run.MultiModals;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
+import com.google.common.base.Verify;
+
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implements MultiModal<TaxiConfigGroup> {
+public final class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implements MultiModal<TaxiConfigGroup> {
+
 	public static final String GROUP_NAME = "multiModeTaxi";
 
-	@SuppressWarnings("deprecation")
+	/**
+	 * @param config
+	 * @return MultiModeTaxiConfigGroup if exists. Otherwise fails
+	 */
 	public static MultiModeTaxiConfigGroup get(Config config) {
 		return (MultiModeTaxiConfigGroup)config.getModule(GROUP_NAME);
 	}
 
 	public MultiModeTaxiConfigGroup() {
 		super(GROUP_NAME);
+	}
+
+	@Override
+	protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
+		Verify.verify(config.getModule(TaxiConfigGroup.GROUP_NAME) == null,
+				"In the multi-mode taxi setup, TaxiConfigGroup must not be defined at the config top level");
+		MultiModals.requireAllModesUnique(this);
 	}
 
 	@Override
@@ -52,7 +69,7 @@ public class MultiModeTaxiConfigGroup extends ReflectiveConfigGroup implements M
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Collection<TaxiConfigGroup> getModalElements() {
+	public Collection<@Valid TaxiConfigGroup> getModalElements() {
 		return (Collection<TaxiConfigGroup>)getParameterSets(TaxiConfigGroup.GROUP_NAME);
 	}
 }

@@ -22,31 +22,36 @@
  */
 package org.matsim.contrib.drt.routing;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Supplier;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Supplier;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 /**
  * @author jbischoff
  * @author michalm (Michal Maciejewski)
  */
 public class StopBasedDrtRoutingModule implements RoutingModule {
-	private static final Logger LOGGER = Logger.getLogger(StopBasedDrtRoutingModule.class);
+	private static final Logger logger = Logger.getLogger(StopBasedDrtRoutingModule.class);
 
 	public interface AccessEgressStopFinder {
 		Pair<TransitStopFacility, TransitStopFacility> findStops(Facility fromFacility, Facility toFacility);
@@ -72,28 +77,36 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 	}
 
 	@Override
-	public List<? extends PlanElement> calcRoute( Facility fromFacility, Facility toFacility, double departureTime,
-								    Person person) {
+	public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime,
+			Person person) {
 		Pair<TransitStopFacility, TransitStopFacility> stops = stopFinder.findStops(fromFacility, toFacility);
 
 		TransitStopFacility accessFacility = stops.getLeft();
 		if (accessFacility == null) {
-			printError(() -> "No access stop found, agent will walk, using mode " + drtStageActivityType.drtWalk
-					+ ". Agent Id:\t" + person.getId());
-            return Collections.singletonList(createDrtWalkLeg(fromFacility, toFacility, departureTime, person));
+			printWarning(() -> "No access stop found, agent will walk, using mode "
+					+ drtStageActivityType.drtWalk
+					+ ". Agent Id:\t"
+					+ person.getId());
+			return Collections.singletonList(createDrtWalkLeg(fromFacility, toFacility, departureTime, person));
 		}
 
 		TransitStopFacility egressFacility = stops.getRight();
 		if (egressFacility == null) {
-			printError(() -> "No egress stop found, agent will walk, using mode " + drtStageActivityType.drtWalk
-					+ ". Agent Id:\t" + person.getId());
-            return Collections.singletonList(createDrtWalkLeg(fromFacility, toFacility, departureTime, person));
+			printWarning(() -> "No egress stop found, agent will walk, using mode "
+					+ drtStageActivityType.drtWalk
+					+ ". Agent Id:\t"
+					+ person.getId());
+			return Collections.singletonList(createDrtWalkLeg(fromFacility, toFacility, departureTime, person));
 		}
 
 		if (accessFacility.getLinkId() == egressFacility.getLinkId()) {
-			printError(() -> "Start and end stop are the same, agent will walk, using mode " + drtStageActivityType.drtWalk
-					+ ". Agent Id:\t" + person.getId());
-            return Collections.singletonList(createDrtWalkLeg(fromFacility, toFacility, departureTime, person));
+			if( drtCfg.isPrintDetailedWarnings() ){
+				printWarning(() -> "Start and end stop are the same, agent will walk, using mode "
+						+ drtStageActivityType.drtWalk
+						+ ". Agent Id:\t"
+						+ person.getId());
+			}
+			return Collections.singletonList(createDrtWalkLeg(fromFacility, toFacility, departureTime, person));
 		}
 
 		List<PlanElement> trip = new ArrayList<>();
@@ -115,24 +128,23 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		return trip;
 	}
 
-	private Leg createDrtWalkLeg( Facility fromFacility, Facility toFacility, double departureTime,
-						Person person) {
+	private Leg createDrtWalkLeg(Facility fromFacility, Facility toFacility, double departureTime, Person person) {
 		Leg leg = (Leg)walkRouter.calcRoute(fromFacility, toFacility, departureTime, person).get(0);
 		leg.setMode(drtStageActivityType.drtWalk);
 		return leg;
 	}
 
 	private Activity createDrtStageActivity(Facility stopFacility) {
-		Activity activity = populationFactory
-				.createActivityFromCoord(drtStageActivityType.drtStageActivity, stopFacility.getCoord());
+		Activity activity = populationFactory.createActivityFromCoord(drtStageActivityType.drtStageActivity,
+				stopFacility.getCoord());
 		activity.setMaximumDuration(1);
 		activity.setLinkId(stopFacility.getLinkId());
 		return activity;
 	}
 
-	private void printError(Supplier<String> supplier) {
+	private void printWarning(Supplier<String> supplier) {
 		if (drtCfg.isPrintDetailedWarnings()) {
-			Logger.getLogger(getClass()).error(supplier.get());
+			logger.warn(supplier.get());
 		}
 	}
 

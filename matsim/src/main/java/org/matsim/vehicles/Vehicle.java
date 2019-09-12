@@ -26,6 +26,6 @@ import org.matsim.api.core.v01.Identifiable;
  */
 public interface Vehicle extends Identifiable<Vehicle> {
 
-	public VehicleType getType();
+	VehicleType getType();
 	
 }

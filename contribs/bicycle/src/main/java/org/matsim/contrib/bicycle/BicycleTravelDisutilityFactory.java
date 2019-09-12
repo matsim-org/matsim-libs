@@ -18,21 +18,23 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
-//import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-//import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.inject.Inject;
+//import org.matsim.api.core.v01.Scenario;
+//import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 
 /**
  * @author smetzler, dziemke
  */
-public class BicycleTravelDisutilityFactory implements TravelDisutilityFactory {
+public final class BicycleTravelDisutilityFactory implements TravelDisutilityFactory {
+	// public-final is ok since ctor is package-private: can only be used through injection
+
 	private static final Logger LOG = Logger.getLogger(BicycleTravelDisutilityFactory.class);
 
 	@Inject	BicycleConfigGroup bicycleConfigGroup;
@@ -40,6 +42,8 @@ public class BicycleTravelDisutilityFactory implements TravelDisutilityFactory {
 	@Inject	PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
 	
 	private static int normalisationWrnCnt = 0;
+
+	/* package-private */ BicycleTravelDisutilityFactory(){}
 	
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {

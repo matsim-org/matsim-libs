@@ -33,10 +33,14 @@ import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Polygon;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
-import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
+import org.matsim.contrib.accessibility.FacilityDataExchangeInterface;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -46,11 +50,6 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.facilities.ActivityFacility;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Polygon;
 
 public class GeoserverUpdater implements FacilityDataExchangeInterface {
 
@@ -78,8 +77,15 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 	private Map<Tuple<ActivityFacility, Double>, Map<String,Double>> accessibilitiesMap = new HashMap<>() ;
 
 	@Override
-	public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay,	Map<String, Double> accessibilities) {
-		accessibilitiesMap.put(new Tuple<>(measurePoint, timeOfDay), accessibilities);
+	public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay, String mode, double accessibility) {
+	//public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay, Map<String, Double> accessibilities) {
+		//accessibilitiesMap.put(new Tuple<>(measurePoint, timeOfDay), accessibilities);
+		Tuple<ActivityFacility, Double> key = new Tuple<>(measurePoint, timeOfDay);
+		if (!accessibilitiesMap.containsKey(key)) {
+			Map<String,Double> accessibilitiesByMode = new HashMap<>();
+			accessibilitiesMap.put(key, accessibilitiesByMode);
+		}
+		accessibilitiesMap.get(key).put(mode, accessibility);
 	}
 
 	@Override

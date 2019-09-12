@@ -20,7 +20,7 @@
 
  package org.matsim.core.scoring;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
@@ -34,9 +34,7 @@ import org.matsim.core.population.PopulationUtils;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 
@@ -57,7 +55,7 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
 	    void handleActivity(PersonExperiencedActivity activity);
 	}
 
-    private Map<Id<Person>, Activity> activities = new HashMap<>();
+    private IdMap<Person, Activity> activities = new IdMap<>(Person.class, Activity.class);
     private List<ActivityHandler> activityHandlers = new ArrayList<>();
 
     public EventsToActivities() {
@@ -76,14 +74,14 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
 
     @Override
     public void handleEvent(ActivityEndEvent event) {
-        Activity activity = activities.remove(event.getPersonId());
+        Activity activity = this.activities.remove(event.getPersonId());
         if (activity == null) {
             Activity firstActivity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
             firstActivity.setFacilityId(event.getFacilityId());
             activity = firstActivity;
         }
         activity.setEndTime(event.getTime());
-        for (ActivityHandler activityHandler : activityHandlers) {
+        for (ActivityHandler activityHandler : this.activityHandlers) {
             activityHandler.handleActivity(new PersonExperiencedActivity(event.getPersonId(), activity));
         }
     }
@@ -93,12 +91,12 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
         Activity activity = PopulationUtils.createActivityFromLinkId(event.getActType(), event.getLinkId());
         activity.setFacilityId(event.getFacilityId());
         activity.setStartTime(event.getTime());
-        activities.put(event.getPersonId(), activity);
+        this.activities.put(event.getPersonId(), activity);
     }
 
     @Override
     public void reset(int iteration) {
-        activities.clear();
+        this.activities.clear();
     }
 
     public void addActivityHandler(ActivityHandler activityHandler) {
@@ -106,11 +104,11 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
     }
 
     public void finish() {
-        for (Map.Entry<Id<Person>, Activity> entry : activities.entrySet()) {
-            for (ActivityHandler activityHandler : activityHandlers) {
-                activityHandler.handleActivity(new PersonExperiencedActivity(entry.getKey(), entry.getValue()));
+        this.activities.forEach((id, activity) -> {
+            for (ActivityHandler activityHandler : this.activityHandlers) {
+                activityHandler.handleActivity(new PersonExperiencedActivity(id, activity));
             }
-        }
+        });
     }
 
 }

@@ -1,12 +1,30 @@
-package org.matsim.core.mobsim.qsim.agents;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * BasicPlanAgentImpl.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.core.mobsim.qsim.agents;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -17,7 +35,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.gbl.Gbl;
@@ -30,10 +47,8 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityOption;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
@@ -174,6 +189,9 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 
 	@Override
 	public final void endActivityAndComputeNextState(final double now) {
+		if ( ! ( this.getCurrentPlanElement() instanceof Activity ) ){
+			log.warn( "trying to end an activity but current plan element is not an activity; agentId=" + this.getId() );
+		}
 		Activity act = (Activity) this.getCurrentPlanElement() ;
 		this.getEvents().processEvent( new ActivityEndEvent(now, this.getPerson().getId(), this.currentLinkId, act.getFacilityId(), act.getType()));
 	
@@ -385,7 +403,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		} else {
 			throw new RuntimeException("unexpected type of PlanElement") ;
 		}
-		return getFacility(activity, scenario);
+		return FacilitiesUtils.toFacility( activity, scenario.getActivityFacilities() ) ;
 	}
 
 	@Override
@@ -393,8 +411,8 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		PlanElement pe = this.getCurrentPlanElement() ;
 		if ( pe instanceof Leg ) {
 			Activity activity = this.getNextActivity() ;
-			ActivityFacility fac = this.scenario.getActivityFacilities().getFacilities().get( activity.getFacilityId() ) ;
-			return getFacility(activity, scenario);
+			return FacilitiesUtils.toFacility( activity, scenario.getActivityFacilities() ) ;
+
 			// the above assumes alternating acts/legs.  I start having the suspicion that we should revoke our decision to give that up.
 			// If not, one will have to use TripUtils to find the preceeding activity ... but things get more difficult.  Preferably, the
 			// factility should then sit in the leg (since there it is used for routing).  kai, dec'15
@@ -404,8 +422,4 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		throw new RuntimeException("unexpected type of PlanElement") ;
 	}
 
-	private static Facility getFacility(Activity activity, Scenario scenario) {
-		ActivityFacility fac = scenario.getActivityFacilities().getFacilities().get( activity.getFacilityId() ) ;
-		return ( fac != null) ? fac : new ActivityWrapperFacility( activity );
-	}
 }

@@ -2,7 +2,7 @@ package org.matsim.contrib.taxi.benchmark;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.dvrp.fleet.FleetStatsCalculator;
+import org.matsim.contrib.dvrp.run.QSimScopeObjectListener;
 import org.matsim.contrib.taxi.util.stats.TaxiStats;
 import org.matsim.contrib.taxi.util.stats.TaxiStatsCalculator;
 import org.matsim.contrib.util.CSVLineBuilder;
@@ -10,9 +10,12 @@ import org.matsim.contrib.util.CompactCSVWriter;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.utils.io.IOUtils;
 
-public class TaxiBenchmarkStats implements ShutdownListener, FleetStatsCalculator {
+public class TaxiBenchmarkStats
+		implements ShutdownListener, MobsimBeforeCleanupListener, QSimScopeObjectListener<Fleet> {
 	public static final String[] HEADER = { "n", "m", //
 			"PassWaitTime_avg", //
 			"PassWaitTime_95%ile", //
@@ -29,12 +32,19 @@ public class TaxiBenchmarkStats implements ShutdownListener, FleetStatsCalculato
 	private final SummaryStatistics emptyDriveRatio = new SummaryStatistics();
 	private final SummaryStatistics stayRatio = new SummaryStatistics();
 
+	private Fleet fleet;
+
 	public TaxiBenchmarkStats(OutputDirectoryHierarchy controlerIO) {
 		this.controlerIO = controlerIO;
 	}
 
 	@Override
-	public void updateStats(Fleet fleet) {
+	public void objectCreated(Fleet fleet) {
+		this.fleet = fleet;
+	}
+
+	@Override
+	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
 		TaxiStats singleRunStats = new TaxiStatsCalculator(fleet.getVehicles().values()).getDailyStats();
 
 		passengerWaitTime.addValue(singleRunStats.passengerWaitTime.getMean());
@@ -60,10 +70,10 @@ public class TaxiBenchmarkStats implements ShutdownListener, FleetStatsCalculato
 
 	protected CSVLineBuilder createAndInitLineBuilder() {
 		return new CSVLineBuilder()//
-				.addf("%.1f", passengerWaitTime.getMean())//
-				.addf("%.0f", pc95PassengerWaitTime.getMean())//
-				.addf("%.0f", maxPassengerWaitTime.getMean())//
-				.addf("%.3f", emptyDriveRatio.getMean())//
+				.addf("%.1f", passengerWaitTime.getMean())
+				.addf("%.0f", pc95PassengerWaitTime.getMean())
+				.addf("%.0f", maxPassengerWaitTime.getMean())
+				.addf("%.3f", emptyDriveRatio.getMean())
 				.addf("%.3f", stayRatio.getMean());
 	}
 }

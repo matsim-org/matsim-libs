@@ -19,22 +19,17 @@
 
 package org.matsim.contrib.taxi.run;
 
+import java.net.URL;
+
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class RunTaxiScenario {
-	public static void run(String configFile, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new DvrpConfigGroup(),
+	public static void run(URL configUrl, boolean otfvis) {
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
-		TaxiControlerCreator.createControler(config, otfvis).run();
-	}
-
-	public static void main(String[] args) {
-		if (args.length != 1) {
-			throw new IllegalArgumentException("RunTaxiScenario needs one argument: path to the configuration file");
-		}
-		RunTaxiScenario.run(args[0], false);
+		TaxiControlerCreator.createControlerWithSingleModeTaxi(config, otfvis).run();
 	}
 }

@@ -98,34 +98,39 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		// yyyyyy find better solution for this. kai, dec'15
 		{
-			ActivityParams params = new ActivityParams("car interaction");
+			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.car ) ) ;
 			params.setScoringThisActivityAtAll(false);
 			this.addActivityParams(params);
 		}
 		{
-			ActivityParams params = new ActivityParams("pt interaction"); // need
-																			// this
-																			// for
-																			// self-programmed
-																			// pseudo
-																			// pt.
-																			// kai,
-																			// nov'16
+			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.pt ));
+			// need this for self-programmed pseudo pt. kai, nov'16
+
 			params.setScoringThisActivityAtAll(false);
 			this.addActivityParams(params);
 		}
 		{
-			ActivityParams params = new ActivityParams("bike interaction");
+			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.bike ) ) ;
 			params.setScoringThisActivityAtAll(false);
 			this.addActivityParams(params);
 		}
 		{
-			ActivityParams params = new ActivityParams("other interaction");
+			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.drt ) ) ;
 			params.setScoringThisActivityAtAll(false);
 			this.addActivityParams(params);
 		}
 		{
-			ActivityParams params = new ActivityParams("walk interaction");
+			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.taxi ) ) ;
+			params.setScoringThisActivityAtAll(false);
+			this.addActivityParams(params);
+		}
+		{
+			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.other ) ) ;
+			params.setScoringThisActivityAtAll(false);
+			this.addActivityParams(params);
+		}
+		{
+			ActivityParams params = new ActivityParams( createStageActivityType( TransportMode.walk ) );
 			params.setScoringThisActivityAtAll(false);
 			this.addActivityParams(params);
 			// bushwhacking_walk---network_walk---bushwhacking_walk
@@ -150,6 +155,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 	// ---
 	private static final String FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA = "fractionOfIterationsToStartScoreMSA";
+
+	public static String createStageActivityType( String mode ){
+		return mode + " interaction";
+	}
 
 	// ---
 
@@ -527,7 +536,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 	}
 
-	public void addScoringParameters(final ScoringParameterSet params) {
+	private void addScoringParameters( final ScoringParameterSet params ) {
 		final ScoringParameterSet previous = this.getScoringParameters(params.getSubpopulation());
 
 		if (previous != null) {
@@ -816,17 +825,18 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		 * {@value TYPICAL_DURATION_CMT}
 		 */
 		@StringSetter(TYPICAL_DURATION)
-		private void setTypicalDuration(final String typicalDuration) {
+		private ActivityParams setTypicalDuration(final String typicalDuration) {
 			testForLocked();
-			setTypicalDuration(Time.parseTime(typicalDuration));
+			return setTypicalDuration(Time.parseTime(typicalDuration));
 		}
 
 		/**
 		 * {@value TYPICAL_DURATION_CMT}
 		 */
-		public void setTypicalDuration(final double typicalDuration) {
+		public ActivityParams setTypicalDuration(final double typicalDuration) {
 			testForLocked();
 			this.typicalDuration = typicalDuration;
+			return this ;
 		}
 
 		// --- activity type:
@@ -897,9 +907,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter(TYPICAL_DURATION_SCORE_COMPUTATION)
-		public void setTypicalDurationScoreComputation(TypicalDurationScoreComputation str) {
+		public ActivityParams setTypicalDurationScoreComputation(TypicalDurationScoreComputation str) {
 			testForLocked();
 			this.typicalDurationScoreComputation = str;
+			return this ;
 		}
 
 		@StringGetter("priority")
@@ -908,9 +919,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter("priority")
-		public void setPriority(final double priority) {
+		public ActivityParams setPriority(final double priority) {
 			testForLocked();
 			this.priority = priority;
+			return this ;
 		}
 
 		@StringGetter("minimalDuration")
@@ -923,14 +935,14 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter("minimalDuration")
-		private void setMinimalDuration(final String minimalDuration) {
+		private ActivityParams setMinimalDuration(final String minimalDuration) {
 			testForLocked();
-			setMinimalDuration(Time.parseTime(minimalDuration));
+			return setMinimalDuration(Time.parseTime(minimalDuration));
 		}
 
 		private static int minDurCnt = 0;
 
-		public void setMinimalDuration(final double minimalDuration) {
+		public ActivityParams setMinimalDuration(final double minimalDuration) {
 			testForLocked();
 			if ((!Time.isUndefinedTime(minimalDuration)) && (minDurCnt < 1)) {
 				minDurCnt++;
@@ -940,6 +952,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 								+ Gbl.ONLYONCE);
 			}
 			this.minimalDuration = minimalDuration;
+			return this ;
 		}
 
 		@StringGetter("openingTime")
@@ -952,14 +965,16 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter("openingTime")
-		private void setOpeningTime(final String openingTime) {
+		private ActivityParams setOpeningTime(final String openingTime) {
 			testForLocked();
 			setOpeningTime(Time.parseTime(openingTime));
+			return this ;
 		}
 
-		public void setOpeningTime(final double openingTime) {
+		public ActivityParams setOpeningTime(final double openingTime) {
 			testForLocked();
 			this.openingTime = openingTime;
+			return this ;
 		}
 
 		@StringGetter("latestStartTime")
@@ -972,14 +987,16 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter("latestStartTime")
-		private void setLatestStartTime(final String latestStartTime) {
+		private ActivityParams setLatestStartTime(final String latestStartTime) {
 			testForLocked();
 			setLatestStartTime(Time.parseTime(latestStartTime));
+			return this ;
 		}
 
-		public void setLatestStartTime(final double latestStartTime) {
+		public ActivityParams setLatestStartTime(final double latestStartTime) {
 			testForLocked();
 			this.latestStartTime = latestStartTime;
+			return this ;
 		}
 
 		@StringGetter("earliestEndTime")
@@ -992,14 +1009,16 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter("earliestEndTime")
-		private void setEarliestEndTime(final String earliestEndTime) {
+		private ActivityParams setEarliestEndTime(final String earliestEndTime) {
 			testForLocked();
 			setEarliestEndTime(Time.parseTime(earliestEndTime));
+			return this ;
 		}
 
-		public void setEarliestEndTime(final double earliestEndTime) {
+		public ActivityParams setEarliestEndTime(final double earliestEndTime) {
 			testForLocked();
 			this.earliestEndTime = earliestEndTime;
+			return this ;
 		}
 
 		@StringGetter("closingTime")
@@ -1012,19 +1031,21 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter("closingTime")
-		private void setClosingTime(final String closingTime) {
+		private ActivityParams setClosingTime(final String closingTime) {
 			testForLocked();
 			setClosingTime(Time.parseTime(closingTime));
+			return this ;
 		}
 
-		public void setClosingTime(final double closingTime) {
+		public ActivityParams setClosingTime(final double closingTime) {
 			testForLocked();
 			this.closingTime = closingTime;
+			return this ;
 		}
 
 		// ---
 		
-		public static final String SCORING_THIS_ACTIVITY_AT_ALL = "scoringThisActivityAtAll";
+		static final String SCORING_THIS_ACTIVITY_AT_ALL = "scoringThisActivityAtAll";
 
 		private boolean scoringThisActivityAtAll = true;
 
@@ -1034,15 +1055,16 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter(SCORING_THIS_ACTIVITY_AT_ALL)
-		public void setScoringThisActivityAtAll(boolean scoringThisActivityAtAll) {
+		public ActivityParams setScoringThisActivityAtAll(boolean scoringThisActivityAtAll) {
 			testForLocked();
 			this.scoringThisActivityAtAll = scoringThisActivityAtAll;
+			return this ;
 		}
 	}
 
 	public static class ModeParams extends ReflectiveConfigGroup implements MatsimParameters {
 
-		public final static String SET_TYPE = "modeParams";
+		final static String SET_TYPE = "modeParams";
 		
 		private static final String MONETARY_DISTANCE_RATE = "monetaryDistanceRate";
 		private static final String MONETARY_DISTANCE_RATE_CMT = "[unit_of_money/m] conversion of distance into money. Normally negative.";
@@ -1054,8 +1076,8 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		public static final String MODE = "mode";
 		
-		public static final String DAILY_MONETARY_CONSTANT = "dailyMonetaryConstant";
-		public static final String DAILY_UTILITY_CONSTANT = "dailyUtilityConstant";
+		static final String DAILY_MONETARY_CONSTANT = "dailyMonetaryConstant";
+		static final String DAILY_UTILITY_CONSTANT = "dailyUtilityConstant";
 		
 		private String mode = null;
 		private double traveling = -6.0;
@@ -1102,9 +1124,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter(MODE)
-		public void setMode(final String mode) {
+		public ModeParams setMode(final String mode) {
 			testForLocked();
 			this.mode = mode;
+			return this ;
 		}
 		@StringGetter(MODE)
 		public String getMode() {
@@ -1112,9 +1135,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 		// ---
 		@StringSetter(MARGINAL_UTILITY_OF_TRAVELING)
-		public void setMarginalUtilityOfTraveling(double traveling) {
+		public ModeParams setMarginalUtilityOfTraveling(double traveling) {
 			testForLocked();
 			this.traveling = traveling;
+			return this ;
 		}
 		@StringGetter(MARGINAL_UTILITY_OF_TRAVELING)
 		public double getMarginalUtilityOfTraveling() {
@@ -1126,9 +1150,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			return distance;
 		}
 		@StringSetter("marginalUtilityOfDistance_util_m")
-		public void setMarginalUtilityOfDistance(double distance) {
+		public ModeParams setMarginalUtilityOfDistance(double distance) {
 			testForLocked();
 			this.distance = distance;
+			return this ;
 		}
 
 		/**
@@ -1143,9 +1168,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		 * @param constant -- {@value #CONSTANT_CMT}
 		 */
 		@StringSetter(CONSTANT)
-		public void setConstant(double constant) {
+		public ModeParams setConstant(double constant) {
 			testForLocked();
 			this.constant = constant;
+			return this ;
 		}
 		// ---
 		/**
@@ -1160,9 +1186,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		 * @param monetaryDistanceRate -- {@value #MONETARY_DISTANCE_RATE_CMT}
 		 */
 		@StringSetter(MONETARY_DISTANCE_RATE)
-		public void setMonetaryDistanceRate(double monetaryDistanceRate) {
+		public ModeParams setMonetaryDistanceRate(double monetaryDistanceRate) {
 			testForLocked();
 			this.monetaryDistanceRate = monetaryDistanceRate;
+			return this ;
 		}
 		@StringGetter(DAILY_MONETARY_CONSTANT)
 		public double getDailyMonetaryConstant() {
@@ -1170,8 +1197,9 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter(DAILY_MONETARY_CONSTANT)
-		public void setDailyMonetaryConstant(double dailyMonetaryConstant) {
+		public ModeParams setDailyMonetaryConstant(double dailyMonetaryConstant) {
 			this.dailyMonetaryConstant = dailyMonetaryConstant;
+			return this ;
 		}
 
 		@StringGetter(DAILY_UTILITY_CONSTANT)
@@ -1180,8 +1208,9 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 
 		@StringSetter(DAILY_UTILITY_CONSTANT)
-		public void setDailyUtilityConstant(double dailyUtilityConstant) {
+		public ModeParams setDailyUtilityConstant(double dailyUtilityConstant) {
 			this.dailyUtilityConstant = dailyUtilityConstant;
+			return this ;
 		}
 
 
@@ -1267,8 +1296,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			testForLocked();
 			this.utilityOfLineSwitch = utilityOfLineSwitch;
 		}
-
-		private static int setWaitingCnt = 0;
 
 		@StringGetter(WAITING)
 		public double getMarginalUtlOfWaiting_utils_hr() {

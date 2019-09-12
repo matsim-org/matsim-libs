@@ -92,6 +92,17 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			log.log( lvl, "did not find xml as one of the events file formats. vsp default is using xml events.");
 		}
 
+		switch ( config.controler().getRoutingAlgorithmType() ) {
+			case Dijkstra:
+			case AStarLandmarks:
+			case FastDijkstra:
+				log.log( lvl, "you are not using FastAStarLandmarks as routing algorithm.  vsp default is to use FastAStarLandmarks.") ;
+				System.out.flush();
+				break;
+			case FastAStarLandmarks:
+				break;
+		}
+
 		// === location choice:
 		
 		boolean usingLocationChoice = false ;
@@ -253,14 +264,14 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 //			log.log( lvl,  " found 'qsim.usingFastCapacityUpdate==false'; vsp should try out `true' and report. ") ;
 //		}
 		switch( config.qsim().getTrafficDynamics() ) {
-		case withHoles:
-		case kinematicWaves:
-			break;
-		case queue:
-		default:
-			log.log( lvl,  " found 'qsim.trafficDynamics==" + config.qsim().getTrafficDynamics() + "'; vsp standard is`" 
-					+ TrafficDynamics.kinematicWaves + "'." ) ;
-			break;
+			case kinematicWaves:
+				break;
+			case withHoles:
+			case queue:
+			default:
+				log.log( lvl,  " found 'qsim.trafficDynamics==" + config.qsim().getTrafficDynamics() + "'; vsp standard is`"
+							     + TrafficDynamics.kinematicWaves + "'." ) ;
+				break;
 		}
 		
 		if ( config.qsim()!=null && config.qsim().isRemoveStuckVehicles() ) {

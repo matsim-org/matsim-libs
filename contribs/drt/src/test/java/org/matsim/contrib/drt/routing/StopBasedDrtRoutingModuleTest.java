@@ -22,54 +22,67 @@
  */
 package org.matsim.contrib.drt.routing;
 
+import java.util.List;
+
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.router.ActivityWrapperFacility;
+import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.TeleportationRoutingModule;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-
-import java.util.List;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author jbischoff
  */
 public class StopBasedDrtRoutingModuleTest {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void test() {
+	public void testCottbus() {
 		Scenario scenario = createTestScenario();
+		ActivityFacilities facilities = scenario.getActivityFacilities();
 		final Double networkTravelSpeed = 0.83333;
 		final Double beelineFactor = 1.3;
-		TeleportationRoutingModule walkRouter = new TeleportationRoutingModule(TransportMode.walk,
-				scenario.getPopulation().getFactory(), networkTravelSpeed, beelineFactor);
-		DrtConfigGroup drtCfg = DrtConfigGroup.get(scenario.getConfig());
+		TeleportationRoutingModule walkRouter = new TeleportationRoutingModule(TransportMode.walk, scenario,
+				networkTravelSpeed, beelineFactor);
+		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(scenario.getConfig());
 		AccessEgressStopFinder stopFinder = new DefaultAccessEgressStopFinder(scenario.getTransitSchedule(), drtCfg,
 				scenario.getConfig().plansCalcRoute(), scenario.getNetwork());
 		DrtRoutingModule drtRoutingModule = new DrtRoutingModule(drtCfg, scenario.getNetwork(),
-				new FreeSpeedTravelTime(), TimeAsTravelDisutility::new, scenario.getPopulation().getFactory(),
-				walkRouter);
+				new FastAStarEuclideanFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new, walkRouter,
+				scenario);
 		StopBasedDrtRoutingModule stopBasedDRTRoutingModule = new StopBasedDrtRoutingModule(
 				scenario.getPopulation().getFactory(), drtRoutingModule, walkRouter, stopFinder, drtCfg);
 
 		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId(1));
 		Activity h = (Activity)p1.getSelectedPlan().getPlanElements().get(0);
-		ActivityWrapperFacility hf = new ActivityWrapperFacility(h);
+		Facility hf = FacilitiesUtils.toFacility(h, facilities);
 
 		Activity w = (Activity)p1.getSelectedPlan().getPlanElements().get(2);
-		ActivityWrapperFacility wf = new ActivityWrapperFacility(w);
+		Facility wf = FacilitiesUtils.toFacility(w, facilities);
 
 		List<? extends PlanElement> routedList = stopBasedDRTRoutingModule.calcRoute(hf, wf, 8 * 3600, p1);
 
@@ -77,22 +90,21 @@ public class StopBasedDrtRoutingModuleTest {
 
 		Person p2 = scenario.getPopulation().getPersons().get(Id.createPersonId(2));
 		Activity h2 = (Activity)p2.getSelectedPlan().getPlanElements().get(0);
-		ActivityWrapperFacility hf2 = new ActivityWrapperFacility(h2);
+		Facility hf2 = FacilitiesUtils.toFacility(h2, facilities);
 
 		Activity w2 = (Activity)p2.getSelectedPlan().getPlanElements().get(2);
-		ActivityWrapperFacility wf2 = new ActivityWrapperFacility(w2);
+		Facility wf2 = FacilitiesUtils.toFacility(w2, facilities);
 
 		List<? extends PlanElement> routedList2 = stopBasedDRTRoutingModule.calcRoute(hf2, wf2, 8 * 3600, p2);
 
 		Person p3 = scenario.getPopulation().getPersons().get(Id.createPersonId(3));
-		Activity h3 = (Activity) p3.getSelectedPlan().getPlanElements().get(0);
-		ActivityWrapperFacility hf3 = new ActivityWrapperFacility(h3);
+		Activity h3 = (Activity)p3.getSelectedPlan().getPlanElements().get(0);
+		Facility hf3 = FacilitiesUtils.toFacility(h3, facilities);
 
-		Activity w3 = (Activity) p3.getSelectedPlan().getPlanElements().get(2);
-		ActivityWrapperFacility wf3 = new ActivityWrapperFacility(w3);
+		Activity w3 = (Activity)p3.getSelectedPlan().getPlanElements().get(2);
+		Facility wf3 = FacilitiesUtils.toFacility(w3, facilities);
 
 		List<? extends PlanElement> routedList3 = stopBasedDRTRoutingModule.calcRoute(hf3, wf3, 8 * 3600, p3);
-
 
 		Assert.assertEquals(5, routedList.size());
 		Assert.assertEquals(5, routedList2.size());
@@ -109,11 +121,14 @@ public class StopBasedDrtRoutingModuleTest {
 		Config config = ConfigUtils.createConfig();
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 		drtConfigGroup.setMaxWalkDistance(200);
-		drtConfigGroup.setTransitStopFile("./src/test/resources/cottbus/drtstops.xml.gz");
+		drtConfigGroup.setTransitStopFile(utils.getInputDirectory() + "drtstops.xml.gz");
+		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
+		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
+		config.addModule(multiModeDrtConfigGroup);
 		config.addModule(drtConfigGroup);
 
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
-		new MatsimNetworkReader(scenario.getNetwork()).readFile("./src/test/resources/cottbus/network.xml.gz");
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(utils.getInputDirectory() + "network.xml.gz");
 		new TransitScheduleReader(scenario).readFile(drtConfigGroup.getTransitStopFile());
 		createSomeAgents(scenario);
 		return scenario;
@@ -150,7 +165,6 @@ public class StopBasedDrtRoutingModuleTest {
 		work2.setLinkId(Id.createLinkId(7717));
 		plan2.addActivity(work2);
 		scenario.getPopulation().addPerson(p2);
-
 
 		Person p3 = pf.createPerson(Id.createPersonId(3));
 		Plan plan3 = pf.createPlan();

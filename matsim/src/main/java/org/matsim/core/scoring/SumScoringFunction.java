@@ -1,4 +1,25 @@
-package org.matsim.core.scoring;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * SumScoringFunction.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.core.scoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
@@ -80,7 +101,8 @@ public final class SumScoringFunction implements ScoringFunction {
 				activityScoringFunction.handleLastActivity(activity);
 			}
 		} else {
-			throw new RuntimeException("Trying to score an activity without start or end time. Should not happen."); 	
+			throw new RuntimeException("Trying to score an activity without start or end time. Should not happen. Activity="
+			+ activity );
 		}
 	}
 

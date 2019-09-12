@@ -36,27 +36,34 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 	private static final String INPUT_FILE= "inputFacilitiesFile";
 	private static final String INPUT_FACILITY_ATTRIBUTES_FILE = "inputFacilityAttributesFile";
 	private static final String INPUT_CRS = "inputCRS";
+	private static final String INSISTING_ON_USING_DEPRECATED_ATTRIBUTE_FILE = "insistingOnUsingDeprecatedFacilitiesAttributeFile" ;
 
 	private String inputFile = null;
 	private String inputFacilitiesAttributesFile = null;
 	private String inputCRS = null;
+	private boolean insistingOnUsingDeprecatedPersonAttributeFile = false ;
 
 	// following params are required only if activitiesFacilities are generated internally (e.g., FacilitiesSource.onePerActivityLocationInPlansFile). Amit Jan'18
-	private String idPrefix = "";
-	private boolean removingLinksAndCoordinates = true;
-	private boolean assigningOpeningTime = false;
+	private String idPrefix = "f_auto_";
+//	private boolean removingLinksAndCoordinates = true;
+//	private boolean assigningOpeningTime = false;
 //	private boolean assigningLinksToFacilitiesIfMissing = true;
 
 	private static final String FACILITIES_SOURCE = "facilitiesSource";
 	public enum FacilitiesSource {none, fromFile, setInScenario, onePerActivityLinkInPlansFile, onePerActivityLocationInPlansFile};
 	private FacilitiesSource facilitiesSource = FacilitiesSource.none;
-	private boolean addEmptyActivityOption = false;
+//	private boolean addEmptyActivityOption = false;
 
 //	private static final String ADD_EMPTY_ACTIVITY_OPTIONS = "addEmptyActivityOption";
 	private static final String ID_PREFIX="idPrefix";
 //	private static final String REMOVING_LINKS_AND_COORDINATES = "removingLinksAndCoordinates";
 //	private static final String ASSIGNING_OPENING_TIME = "assigningOpeningTime";
 //	private static final String ASSIGNING_LINKS_TO_FACILITIES_IF_MISSING="assigningLinksToFacilitiesIfMissing";
+
+	public static final String FACILITIES_ATTRIBUTES_DEPRECATION_MESSAGE = "using the separate facilities attribute file is deprecated.  Add the information directly into each facility, using " +
+			"the Attributable feature.  If you insist on continuing to use the separate facility attribute file, set " +
+			"insistingOnUsingDeprecatedFacilityAttributeFile to true.  The file will then be read, but the values " +
+			"will be entered into each facility using Attributable, and written as such to output_facilities.";
 
 	public FacilitiesConfigGroup() {
 		super(GROUP_NAME);
@@ -79,7 +86,7 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 			comments.put(FACILITIES_SOURCE, "This defines how facilities should be created. Possible values: "+options.toString());
 		}
 
-		comments.put( ID_PREFIX, "A prefix to be used in activityFacility id.");
+		comments.put( ID_PREFIX, "A prefix to be used for auto-generated IDs.");
 
 //		comments.put(ONE_FACILITY_PER_LINK, "Sets whether all activities on a link should be collected within one ActivityFacility." +
 //				" Default is 'true'. If set to 'false', for each coordinate found in the population's activities a separate ActivityFacility will be created.");
@@ -113,11 +120,13 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringGetter( INPUT_FACILITY_ATTRIBUTES_FILE )
+	@Deprecated // I think that this should be phased out; use Attributes inside each facility.  kai, mar'19
 	public String getInputFacilitiesAttributesFile() {
 		return this.inputFacilitiesAttributesFile;
 	}
 
 	@StringSetter( INPUT_FACILITY_ATTRIBUTES_FILE )
+	@Deprecated // I think that this should be phased out; use Attributes inside each facility.  kai, mar'19
 	public void setInputFacilitiesAttributesFile(String inputFacilitiesAttributesFile) {
 		this.inputFacilitiesAttributesFile = inputFacilitiesAttributesFile;
 	}
@@ -153,24 +162,24 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 //	}
 
 //	@StringGetter(REMOVING_LINKS_AND_COORDINATES)
-	public boolean isRemovingLinksAndCoordinates() {
-		return removingLinksAndCoordinates;
-	}
+//	public boolean isRemovingLinksAndCoordinates() {
+//		return removingLinksAndCoordinates;
+//	}
 
 //	@StringSetter(REMOVING_LINKS_AND_COORDINATES)
-	public void setRemovingLinksAndCoordinates(boolean removingLinksAndCoordinates) {
-		this.removingLinksAndCoordinates = removingLinksAndCoordinates;
-	}
-
-//	@StringGetter(ASSIGNING_OPENING_TIME)
-	public boolean isAssigningOpeningTime() {
-		return assigningOpeningTime;
-	}
-
-//	@StringSetter(ASSIGNING_OPENING_TIME)
-	public void setAssigningOpeningTime(boolean assigningOpeningTime) {
-		this.assigningOpeningTime = assigningOpeningTime;
-	}
+//	public void setRemovingLinksAndCoordinates(boolean removingLinksAndCoordinates) {
+//		this.removingLinksAndCoordinates = removingLinksAndCoordinates;
+//	}
+//
+////	@StringGetter(ASSIGNING_OPENING_TIME)
+//	public boolean isAssigningOpeningTime() {
+//		return assigningOpeningTime;
+//	}
+//
+////	@StringSetter(ASSIGNING_OPENING_TIME)
+//	public void setAssigningOpeningTime(boolean assigningOpeningTime) {
+//		this.assigningOpeningTime = assigningOpeningTime;
+//	}
 
 //	@StringGetter(ASSIGNING_LINKS_TO_FACILITIES_IF_MISSING)
 //	public boolean isAssigningLinksToFacilitiesIfMissing() {
@@ -192,13 +201,22 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 		this.facilitiesSource = facilitiesSource;
 	}
 
-//	@StringGetter(ADD_EMPTY_ACTIVITY_OPTIONS)
-	public boolean isAddEmptyActivityOption() {
-		return addEmptyActivityOption;
+	@StringSetter(INSISTING_ON_USING_DEPRECATED_ATTRIBUTE_FILE)
+	public final void setInsistingOnUsingDeprecatedFacilitiesAttributeFile( boolean val ) {
+		this.insistingOnUsingDeprecatedPersonAttributeFile = val ;
+	}
+	@StringGetter(INSISTING_ON_USING_DEPRECATED_ATTRIBUTE_FILE)
+	public final boolean isInsistingOnUsingDeprecatedFacilitiesAttributeFile() {
+		return insistingOnUsingDeprecatedPersonAttributeFile;
 	}
 
-//	@StringSetter(ADD_EMPTY_ACTIVITY_OPTIONS)
-	public void setAddEmptyActivityOption(boolean addEmptyActivityOption) {
-		this.addEmptyActivityOption = addEmptyActivityOption;
-	}
+////	@StringGetter(ADD_EMPTY_ACTIVITY_OPTIONS)
+//	public boolean isAddEmptyActivityOption() {
+//		return addEmptyActivityOption;
+//	}
+//
+////	@StringSetter(ADD_EMPTY_ACTIVITY_OPTIONS)
+//	public void setAddEmptyActivityOption(boolean addEmptyActivityOption) {
+//		this.addEmptyActivityOption = addEmptyActivityOption;
+//	}
 }

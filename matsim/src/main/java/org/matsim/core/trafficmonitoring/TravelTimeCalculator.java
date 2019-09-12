@@ -102,7 +102,6 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		return calculator;
 	}
 
-	@Deprecated // user builder instead.  kai, feb'19
 	private static TravelTimeCalculator configure(TravelTimeCalculator calculator, TravelTimeCalculatorConfigGroup config, Network network) {
 		// This should be replaced by a builder if we need the functionality.  kai/mads, feb'19
 
@@ -217,9 +216,6 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 
 	}
 
-
-
-	@Deprecated // user builder instead.  kai, feb'19
 	private TravelTimeCalculator(final Network network, final int timeslice, final int maxTime,
 				   boolean calculateLinkTravelTimes, boolean calculateLinkToLinkTravelTimes, boolean filterModes, Set<String> analyzedModes) {
 		this.calculateLinkTravelTimes = calculateLinkTravelTimes;
@@ -363,7 +359,6 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 	 * increases the router performance by 20-30%!
 	 * cdobler, aug'17
 	 */
-	@Deprecated // should become non-public; use getLinkTravelTimes().... instead ...
 	private double getLinkTravelTime(final Link link, final double time) {
 		if (this.calculateLinkTravelTimes) {
 
@@ -405,7 +400,6 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 								    "if calculation is switched off by config option!");
 	}
 
-	@Deprecated // should become non-public; use getLinkToLinkTravelTimes()... instead.
 	private double getLinkToLinkTravelTime(final Id<Link> fromLinkId, final Id<Link> toLinkId, double time) {
 		if (!this.calculateLinkToLinkTravelTimes) {
 			throw new IllegalStateException("No link to link travel time is available " +
@@ -488,27 +482,6 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		}
 	}
 
-//	public int getNumSlots() {
-//		return this.numSlots;
-//	}
-
-//	/**
-//	 * @return the size of a time bin in seconds.
-//	 */
-//	public int getTimeSlice() {
-//		return this.timeSlice;
-//	}
-
-//	/*package*/ static class DataContainer {
-//		/*package*/ private final TravelTimeData ttData;
-//		/*package*/ private volatile boolean needsConsolidation = false;
-//
-//		/*package*/ DataContainer(final TravelTimeData data) {
-//			this.ttData = data;
-//		}
-//
-//	}
-
 	private static int cnt = 0 ;
 
 	public TravelTime getLinkTravelTimes() {
@@ -534,6 +507,7 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 				}
 				double linkTTimeFromObservation = TravelTimeCalculator.this.getLinkTravelTime(link, time);
 				return Math.max( linkTtimeFromVehicle, linkTTimeFromObservation) ;
+				// yyyyyy should this not be min?  kai/janek, may'19
 			}
 
 		};

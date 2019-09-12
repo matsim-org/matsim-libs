@@ -22,10 +22,7 @@
  */
 package org.matsim.contrib.drt.run;
 
-import java.util.function.Function;
-
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.dvrp.run.DvrpModule;
@@ -33,7 +30,6 @@ import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -41,62 +37,38 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author michalm (Michal Maciejewski)
  */
 public final class DrtControlerCreator {
-
 	/**
-	 * Creates a standard scenario and adds a DRT route factory to the default route factories.
+	 * Creates a standard scenario and adds a DRT route factory to the route factories.
 	 *
 	 * @param config
 	 * @return
 	 */
 	public static Scenario createScenarioWithDrtRouteFactory(Config config) {
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		addDrtRouteFactory(scenario);
+		scenario.getPopulation()
+				.getFactory()
+				.getRouteFactories()
+				.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
 		return scenario;
 	}
 
-	public static void addDrtRouteFactory(Scenario scenario) {
-		RouteFactories routeFactories = scenario.getPopulation().getFactory().getRouteFactories();
-		if (routeFactories.getRouteClassForType(DrtRoute.ROUTE_TYPE).equals(Route.class)) {
-			routeFactories.setRouteFactory(DrtRoute.class, new DrtRouteFactory());
-		}
-	}
-
 	/**
-	 * Creates a controller in one step.
+	 * Creates a controller in one step. Assumes a single DRT service.
 	 *
 	 * @param config
 	 * @param otfvis
 	 * @return
 	 */
 	public static Controler createControlerWithSingleModeDrt(Config config, boolean otfvis) {
-		return createControlerWithSingleModeDrt(config, otfvis, cfg -> {
-			Scenario scenario = createScenarioWithDrtRouteFactory(cfg);
-			ScenarioUtils.loadScenario(scenario);
-			return scenario;
-		});
-	}
-
-	/**
-	 * Creates a controller in one step. Allows for customised scenario creation.
-	 *
-	 * @param config
-	 * @param otfvis
-	 * @param scenarioLoader
-	 * @return
-	 */
-	public static Controler createControlerWithSingleModeDrt(Config config, boolean otfvis,
-			Function<Config, Scenario> scenarioLoader) {
-		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
+		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(config);
 		DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore());
 
-		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-		config.checkConsistency();
-
-		Scenario scenario = scenarioLoader.apply(config);
+		Scenario scenario = createScenarioWithDrtRouteFactory(config);
+		ScenarioUtils.loadScenario(scenario);
 
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DrtModule());
 		controler.addOverridingModule(new DvrpModule());
+		controler.addOverridingModule(new MultiModeDrtModule());
 		controler.configureQSimComponents(DvrpQSimComponents.activateModes(drtCfg.getMode()));
 
 		if (otfvis) {

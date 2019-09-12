@@ -97,6 +97,7 @@ final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 				startLinks(atts);
 				break;
 			case ATTRIBUTES:
+				/* fall-through */
 			case ATTRIBUTE:
 				attributesDelegate.startTag( name , atts , context , currentAttributes );
 				break;
@@ -118,6 +119,7 @@ final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 						ProjectionUtils.putCRS(network, targetCRS);
 					}
 				}
+				/* fall-through */
 			case ATTRIBUTE:
 				attributesDelegate.endTag(name, content, context);
 				break;

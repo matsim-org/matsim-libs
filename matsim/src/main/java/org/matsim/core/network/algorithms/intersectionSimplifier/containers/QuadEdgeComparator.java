@@ -22,7 +22,7 @@ package org.matsim.core.network.algorithms.intersectionSimplifier.containers;
 import java.util.Comparator;
 import java.util.Map;
 
-import com.vividsolutions.jts.triangulate.quadedge.QuadEdge;
+import org.locationtech.jts.triangulate.quadedge.QuadEdge;
 
 public class QuadEdgeComparator implements Comparator<QuadEdge> {
 	
@@ -53,13 +53,9 @@ public class QuadEdgeComparator implements Comparator<QuadEdge> {
 	 */
 	@Override
 	public int compare(QuadEdge qeA, QuadEdge qeB) {
-		if (this.map.get(qeA) < this.map.get(qeB)) {
-			return 1;
-		} else if (this.map.get(qeA) == this.map.get(qeB)) {
-			return 0;
-		} else {
-			return -1;
-		}
+		Double valA = this.map.get(qeA);
+		Double valB = this.map.get(qeB);
+		return valB.compareTo(valA);
 	}
 
 }

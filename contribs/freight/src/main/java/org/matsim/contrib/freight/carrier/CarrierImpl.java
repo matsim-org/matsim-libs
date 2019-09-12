@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * This is a carrier that has capabilities and resources, jobs and plans to fulfill its obligations.
@@ -13,12 +14,8 @@ import org.matsim.api.core.v01.Id;
  * @author sschroeder, mzilske
  *
  */
-public class CarrierImpl implements Carrier {
+final class CarrierImpl implements Carrier {
 
-	public static Carrier newInstance(Id<Carrier> id){
-		return new CarrierImpl(id);
-	}
-	
 	private final Id<Carrier> id;
 
 	private final List<CarrierPlan> plans;
@@ -30,8 +27,10 @@ public class CarrierImpl implements Carrier {
 	private CarrierCapabilities carrierCapabilities;
 	
 	private CarrierPlan selectedPlan;
-	
-	private CarrierImpl(final Id<Carrier> id) {
+
+	private final Attributes attributes = new Attributes();
+
+	CarrierImpl( final Id<Carrier> id ) {
 		super();
 		this.carrierCapabilities = CarrierCapabilities.newInstance();
 		this.id = id;
@@ -100,24 +99,9 @@ public class CarrierImpl implements Carrier {
 
 	@Override
 	public CarrierPlan createCopyOfSelectedPlanAndMakeSelected() {
-		CarrierPlan newPlan = CarrierImpl.copyPlan(this.selectedPlan) ;
+		CarrierPlan newPlan = CarrierUtils.copyPlan(this.selectedPlan ) ;
 		this.setSelectedPlan( newPlan ) ;
 		return newPlan ;
-	}
-
-	public static CarrierPlan copyPlan(CarrierPlan plan2copy) {
-		List<ScheduledTour> tours = new ArrayList<ScheduledTour>();
-		for (ScheduledTour sTour : plan2copy.getScheduledTours()) {
-			double depTime = sTour.getDeparture();
-			CarrierVehicle vehicle = sTour.getVehicle();
-			Tour tour = sTour.getTour().duplicate();
-			tours.add(ScheduledTour.newInstance(tour, vehicle, depTime));
-		}
-		CarrierPlan copiedPlan = new CarrierPlan(plan2copy.getCarrier(), tours);
-		double initialScoreOfCopiedPlan = plan2copy.getScore();
-		copiedPlan.setScore(initialScoreOfCopiedPlan);
-		return copiedPlan;
-	
 	}
 
 	@Override
@@ -127,5 +111,12 @@ public class CarrierImpl implements Carrier {
 
 	@Override
 	public void clearPlans() { this.plans.clear(); }
+
+	@Override
+	public Attributes getAttributes() {
+		return attributes;
+	}
+
+
 
 }

@@ -41,7 +41,7 @@ import java.util.StringTokenizer;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
@@ -503,7 +503,7 @@ public class GeneralLib {
 		int width = 500;
 		int height = 300;
 		try {
-			ChartUtilities.saveChartAsPNG(new File(fileName), chart, width,
+			ChartUtils.saveChartAsPNG(new File(fileName), chart, width,
 					height);
 		} catch (IOException e) {
 
@@ -548,7 +548,7 @@ public class GeneralLib {
 		int height = 300;
 
 		try {
-			ChartUtilities.saveChartAsPNG(new File(fileName), chart, width,
+			ChartUtils.saveChartAsPNG(new File(fileName), chart, width,
 					height);
 		} catch (IOException e) {
 

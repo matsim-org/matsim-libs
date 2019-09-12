@@ -22,34 +22,53 @@ package org.matsim.contrib.drt.run;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
+import javax.annotation.Nullable;
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
+import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.utils.misc.Time;
 
-public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
+import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
+
+public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
+	private static final Logger log = Logger.getLogger(DrtConfigGroup.class);
 
 	public static final String GROUP_NAME = "drt";
 
-	@SuppressWarnings("deprecation")
-	public static DrtConfigGroup get(Config config) {
-		return (DrtConfigGroup)config.getModule(GROUP_NAME);
+	public static DrtConfigGroup getSingleModeDrtConfig(Config config) {
+		Collection<DrtConfigGroup> drtConfigGroups = MultiModeDrtConfigGroup.get(config).getModalElements();
+		Preconditions.checkArgument(drtConfigGroups.size() == 1,
+				"Supported for only 1 DRT mode in the config. Number of DRT modes: %s", drtConfigGroups.size());
+		return drtConfigGroups.iterator().next();
 	}
 
 	public static final String MODE = "mode";
 	static final String MODE_EXP = "Mode which will be handled by PassengerEngine and VrpOptimizer "
 			+ "(passengers'/customers' perspective)";
+
+	public static final String USE_MODE_FILTERED_SUBNETWORK = "useModeFilteredSubnetwork";
+	static final String USE_MODE_FILTERED_SUBNETWORK_EXP =
+			"Limit the operation of vehicles to links (of the 'dvrp_routing'"
+					+ " network) with 'allowedModes' containing this 'mode'."
+					+ " For backward compatibility, the value is set to false by default"
+					+ " - this means that the vehicles are allowed to operate on all links of the 'dvrp_routing' network."
+					+ " The 'dvrp_routing' is defined by DvrpConfigGroup.networkModes)";
 
 	public static final String STOP_DURATION = "stopDuration";
 	static final String STOP_DURATION_EXP = "Bus stop duration. Must be positive.";
@@ -69,13 +88,14 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 					+ "maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. "
 					+ "Beta should not be smaller than 0.";
 
-	public static final String REQUEST_REJECTION = "requestRejection";
-	static final String REQUEST_REJECTION_EXP = "If true, the max travel and wait times of a submitted request"
-			+ " are considered hard constraints (the request gets rejected if one of the constraints is violated)."
-			+ " If false, the max travel and wait times are considered soft constraints (insertion of a request that"
-			+ " violates one of the constraints is allowed, but its cost is increased by additional penalty to make"
-			+ " it relatively less attractive). Penalisation of insertions can be customised by injecting a customised"
-			+ " InsertionCostCalculator.PenaltyCalculator";
+	public static final String REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED = "rejectRequestIfMaxWaitOrTravelTimeViolated";
+	static final String REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP =
+			"If true, the max travel and wait times of a submitted request"
+					+ " are considered hard constraints (the request gets rejected if one of the constraints is violated)."
+					+ " If false, the max travel and wait times are considered soft constraints (insertion of a request that"
+					+ " violates one of the constraints is allowed, but its cost is increased by additional penalty to make"
+					+ " it relatively less attractive). Penalisation of insertions can be customised by injecting a customised"
+					+ " InsertionCostCalculator.PenaltyCalculator";
 
 	public static final String CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE = "changeStartLinkToLastLinkInSchedule";
 	static final String CHANGE_START_EXP =
@@ -86,7 +106,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	static final String IDLE_VEHICLES_RETURN_TO_DEPOTS_EXP = "Idle vehicles return to the nearest of all start links. See: DvrpVehicle.getStartLink()";
 
 	public static final String OPERATIONAL_SCHEME = "operationalScheme";
-	static final String OP_SCHEME_EXP = "Operational Scheme, either door2door or stopbased. door2door by default";
+	static final String OP_SCHEME_EXP = "Operational Scheme, either of door2door, stopbased or serviceAreaBased. door2door by default";
 
 	public static final String MAX_WALK_DISTANCE = "maxWalkDistance";
 	static final String MAX_WALK_EXP = "Maximum desired walk distance (in meters) to next stop location in stopbased system. If no suitable stop is found in that range, the search radius will be extended in steps of maxWalkDistance until a stop is found.";
@@ -107,6 +127,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 			"Stop locations file (transit schedule format, but without lines) for DRT stops. "
 					+ "Used only for the stopbased mode";
 
+	private static final String DRT_SERVICE_AREA_FILENAME = "drtServiceAreaShapeFile";
+	private static final String DRT_SERVICE_AREA_FILE_EXP = "allows to configure a service area per drt mode."
+			+ "Used with serviceArea Operational Scheme";
+
 	public static final String PLOT_CUST_STATS = "writeDetailedCustomerStats";
 	static final String PLOT_CUST_STATS_EXP = "Writes out detailed DRT customer stats in each iteration. True by default.";
 
@@ -122,6 +146,8 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	@NotBlank
 	private String mode = TransportMode.drt; // travel mode (passengers'/customers' perspective)
 
+	private boolean useModeFilteredSubnetwork = false;
+
 	@Positive
 	private double stopDuration = Double.NaN;// seconds
 
@@ -132,13 +158,13 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	// maxTravelTimeAlpha * unshared_ride_travel_time(fromLink, toLink) + maxTravelTimeBeta,
 	// where unshared_ride_travel_time(fromLink, toLink) is calculated with FastAStarEuclidean
 	// (hence AStarEuclideanOverdoFactor needs to be specified)
-	@Min(1)
+	@DecimalMin("1.0")
 	private double maxTravelTimeAlpha = Double.NaN;// [-]
 
 	@PositiveOrZero
 	private double maxTravelTimeBeta = Double.NaN;// [s]
 
-	private boolean requestRejection = true;
+	private boolean rejectRequestIfMaxWaitOrTravelTimeViolated = true;//
 
 	private boolean changeStartLinkToLastLinkInSchedule = false;
 
@@ -153,14 +179,17 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	@PositiveOrZero
 	private double estimatedDrtSpeed = 25. / 3.6;// [m/s]
 
-	@Min(1)
+	@DecimalMin("1.0")
 	private double estimatedBeelineDistanceFactor = 1.3;// [-]
 
 	@NotNull
 	private String vehiclesFile = null;
 
-	// used only for stopbased DRT scheme
+	@Nullable
 	private String transitStopFile = null; // only for stopbased DRT scheme
+
+	@Nullable
+	private String drtServiceAreaShapeFile = null; // only for serviceAreaBased DRT scheme
 
 	private boolean plotDetailedCustomerStats = true;
 	private boolean printDetailedWarnings = true;
@@ -170,7 +199,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 			ParallelPathDataProvider.MAX_THREADS);
 
 	public enum OperationalScheme {
-		stopbased, door2door
+		stopbased, door2door, serviceAreaBased
 	}
 
 	public DrtConfigGroup() {
@@ -178,9 +207,62 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	}
 
 	@Override
+	protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
+
+		if (Time.isUndefinedTime(config.qsim().getEndTime())
+				&& config.qsim().getSimEndtimeInterpretation()
+				!= QSimConfigGroup.EndtimeInterpretation.onlyUseEndtime) {
+			// Not an issue if all request rejections are immediate (i.e. happen during request submission)
+			log.warn("qsim.endTime should be specified and qsim.simEndtimeInterpretation should be 'onlyUseEndtime'"
+					+ " if postponed request rejection is allowed. Otherwise, rejected passengers"
+					+ " (who are stuck endlessly waiting for a DRT vehicle) will prevent QSim from stopping."
+					+ " Keep also in mind that not setting an end time may result in agents "
+					+ "attempting to travel without vehicles being available.");
+		}
+
+		Verify.verify(config.qsim().getNumberOfThreads() == 1, "Only a single-threaded QSim allowed");
+
+		Verify.verify(getMaxWaitTime() >= getStopDuration(),
+				DrtConfigGroup.MAX_WAIT_TIME + " must not be smaller than " + DrtConfigGroup.STOP_DURATION);
+
+		Verify.verify(getOperationalScheme() != OperationalScheme.stopbased || getTransitStopFile() != null,
+				DrtConfigGroup.TRANSIT_STOP_FILE
+						+ " must not be null when "
+						+ DrtConfigGroup.OPERATIONAL_SCHEME
+						+ " is "
+						+ DrtConfigGroup.OperationalScheme.stopbased);
+
+		Verify.verify(
+				getOperationalScheme() != OperationalScheme.serviceAreaBased || getDrtServiceAreaShapeFile() != null,
+				DrtConfigGroup.DRT_SERVICE_AREA_FILENAME
+						+ " must not be null when "
+						+ DrtConfigGroup.OPERATIONAL_SCHEME
+						+ " is "
+						+ DrtConfigGroup.OperationalScheme.serviceAreaBased);
+
+		Verify.verify(getNumberOfThreads() <= Runtime.getRuntime().availableProcessors(),
+				DrtConfigGroup.NUMBER_OF_THREADS + " is higher than the number of logical cores available to JVM");
+
+		if (config.global().getNumberOfThreads() < getNumberOfThreads()) {
+			log.warn("Consider increasing global.numberOfThreads to at least the value of drt.numberOfThreads"
+					+ " in order to speed up the DRT route update during the replanning phase.");
+		}
+
+		Verify.verify(getParameterSets(MinCostFlowRebalancingParams.SET_NAME).size() <= 1,
+				"More then one rebalancing parameter sets is specified");
+
+		if (useModeFilteredSubnetwork) {
+			DvrpRoutingNetworkProvider.
+					checkUseModeFilteredSubnetworkAllowed(config, mode);
+		}
+	}
+
+	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> map = super.getComments();
 		map.put(MODE, MODE_EXP);
+		map.put(USE_MODE_FILTERED_SUBNETWORK, USE_MODE_FILTERED_SUBNETWORK_EXP);
 		map.put(STOP_DURATION, STOP_DURATION_EXP);
 		map.put(MAX_WAIT_TIME, MAX_WAIT_TIME_EXP);
 		map.put(MAX_TRAVEL_TIME_ALPHA, MAX_TRAV_ALPHA_EXP);
@@ -196,7 +278,9 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 		map.put(ESTIMATED_BEELINE_DISTANCE_FACTOR, ESTIMATED_BEELINE_DISTANCE_FACTOR_EXP);
 		map.put(NUMBER_OF_THREADS, NUMBER_OF_THREADS_EXP);
 		map.put(PRINT_WARNINGS, PRINT_WARNINGS_EXP);
-		map.put(REQUEST_REJECTION, REQUEST_REJECTION_EXP);
+		map.put(REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED,
+				REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP);
+		map.put(DRT_SERVICE_AREA_FILENAME, DRT_SERVICE_AREA_FILE_EXP);
 		return map;
 	}
 
@@ -215,6 +299,22 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	@StringSetter(MODE)
 	public void setMode(String mode) {
 		this.mode = mode;
+	}
+
+	/**
+	 * @return {@value #USE_MODE_FILTERED_SUBNETWORK_EXP}
+	 */
+	@StringGetter(USE_MODE_FILTERED_SUBNETWORK)
+	public boolean isUseModeFilteredSubnetwork() {
+		return useModeFilteredSubnetwork;
+	}
+
+	/**
+	 * @param useModeFilteredSubnetwork {@value #USE_MODE_FILTERED_SUBNETWORK_EXP}
+	 */
+	@StringSetter(USE_MODE_FILTERED_SUBNETWORK)
+	public void setUseModeFilteredSubnetwork(boolean useModeFilteredSubnetwork) {
+		this.useModeFilteredSubnetwork = useModeFilteredSubnetwork;
 	}
 
 	/**
@@ -250,6 +350,26 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	}
 
 	/**
+	 * @return {@link #DRT_SERVICE_AREA_FILE_EXP}
+	 */
+	@StringGetter(DRT_SERVICE_AREA_FILENAME)
+	public String getDrtServiceAreaShapeFile() {
+		return drtServiceAreaShapeFile;
+	}
+
+	public URL getDrtServiceAreaShapeFileURL(URL context) {
+		return ConfigGroup.getInputFileURL(context, drtServiceAreaShapeFile);
+	}
+
+	/**
+	 * @param getDrtServiceAreaShapeFile -- {@link #DRT_SERVICE_AREA_FILE_EXP}
+	 */
+	@StringSetter(DRT_SERVICE_AREA_FILENAME)
+	public void setDrtServiceAreaShapeFile(String getDrtServiceAreaShapeFile) {
+		this.drtServiceAreaShapeFile = getDrtServiceAreaShapeFile;
+	}
+
+	/**
 	 * @return -- {@value #MAX_TRAV_ALPHA_EXP}
 	 */
 	@StringGetter(MAX_TRAVEL_TIME_ALPHA)
@@ -282,19 +402,19 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	}
 
 	/**
-	 * @return -- {@value #REQUEST_REJECTION_EXP}
+	 * @return -- {@value #REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP}
 	 */
-	@StringGetter(REQUEST_REJECTION)
-	public boolean isRequestRejection() {
-		return requestRejection;
+	@StringGetter(REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED)
+	public boolean isRejectRequestIfMaxWaitOrTravelTimeViolated() {
+		return rejectRequestIfMaxWaitOrTravelTimeViolated;
 	}
 
 	/**
-	 * @param requestRejection -- {@value #REQUEST_REJECTION_EXP}
+	 * @param rejectRequestIfMaxWaitOrTravelTimeViolated -- {@value #REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP}
 	 */
-	@StringSetter(REQUEST_REJECTION)
-	public void setRequestRejection(boolean requestRejection) {
-		this.requestRejection = requestRejection;
+	@StringSetter(REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED)
+	public void setRejectRequestIfMaxWaitOrTravelTimeViolated(boolean rejectRequestIfMaxWaitOrTravelTimeViolated) {
+		this.rejectRequestIfMaxWaitOrTravelTimeViolated = rejectRequestIfMaxWaitOrTravelTimeViolated;
 	}
 
 	/**
@@ -364,9 +484,8 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	 * @param operationalScheme -- {@value #OP_SCHEME_EXP}
 	 */
 	@StringSetter(OPERATIONAL_SCHEME)
-	public void setOperationalScheme(String operationalScheme) {
-
-		this.operationalScheme = OperationalScheme.valueOf(operationalScheme);
+	public void setOperationalScheme(OperationalScheme operationalScheme) {
+		this.operationalScheme = operationalScheme;
 	}
 
 	/**
@@ -420,7 +539,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	 * @param-- {@value #ESTIMATED_DRT_SPEED_EXP}
 	 */
 	@StringSetter(ESTIMATED_DRT_SPEED)
-	public void setEstimatedSpeed(double estimatedSpeed) {
+	public void setEstimatedDrtSpeed(double estimatedSpeed) {
 		this.estimatedDrtSpeed = estimatedSpeed;
 	}
 
@@ -492,15 +611,19 @@ public class DrtConfigGroup extends ReflectiveConfigGroup implements Modal {
 	 * @return 'minCostFlowRebalancing' parameter set defined in the DRT config or null if the parameters were not
 	 * specified
 	 */
-	@Valid
-	public MinCostFlowRebalancingParams getMinCostFlowRebalancing() {
+	public Optional<MinCostFlowRebalancingParams> getMinCostFlowRebalancing() {
 		Collection<? extends ConfigGroup> parameterSets = getParameterSets(MinCostFlowRebalancingParams.SET_NAME);
-		return parameterSets.isEmpty() ? null : (MinCostFlowRebalancingParams)parameterSets.iterator().next();
+		if (parameterSets.size() > 1) {
+			throw new RuntimeException("More then one rebalancing parameter sets is specified");
+		}
+		return parameterSets.isEmpty() ?
+				Optional.empty() :
+				Optional.of((MinCostFlowRebalancingParams)parameterSets.iterator().next());
 	}
 
 	@Override
 	public ConfigGroup createParameterSet(String type) {
-		if (type.startsWith(MinCostFlowRebalancingParams.SET_NAME)) {
+		if (type.equals(MinCostFlowRebalancingParams.SET_NAME)) {
 			return new MinCostFlowRebalancingParams();
 		}
 		return super.createParameterSet(type);

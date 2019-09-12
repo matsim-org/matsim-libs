@@ -26,7 +26,7 @@ import java.util.Vector;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
 
-public class SubChain {
+class SubChain {
 
 	private Activity firstPrimAct = null;
 	private Activity lastPrimAct = null;
