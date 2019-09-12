@@ -15,8 +15,8 @@ install:
 
 build_script:
   - mvn package --batch-mode -DskipTests -Dmaven.javadoc.skip -Dmatsim.preferLocalDtds=true --fail-at-end
-# test_script:
-#   - mvn test
+test_script:
+  - mvn test
 cache:
   - C:\Users\appveyor\.m2
 #  - C:\Users\appveyor\.m2 -> pom.xml # uncomment if the cache should be invalidated if pom.xml changes
