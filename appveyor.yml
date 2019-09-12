@@ -11,8 +11,9 @@ install:
   - cmd: SET JAVA_OPTS=-Xmx1g
   - cmd: mvn --version
   - cmd: java -version
+
 build_script:
-  - mvn package --batch-mode -DskipTests -Dmaven.javadoc.skip -Dmatsim.preferLocalDtds=true --fail-at-end -Dsource.skip -Dassembly.skipAssembly=true
+  - mvn package --batch-mode --also-make --projects matsim -DskipTests -Dmaven.javadoc.skip -Dmatsim.preferLocalDtds=true --fail-at-end -Dsource.skip -Dassembly.skipAssembly=true
 # test_script:
 #   - mvn test
 cache:
