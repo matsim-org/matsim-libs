@@ -41,6 +41,8 @@ class AccidentWriter {
 	}
 	
 	public void write(Scenario scenario, IterationEndsEvent event, Map<Id<Link>, AccidentLinkInfo> linkId2info, AnalysisEventHandler analzyer) {
+		AccidentsConfigGroup accidentsCfg = (AccidentsConfigGroup) scenario.getConfig().getModules().get(AccidentsConfigGroup.GROUP_NAME);
+		
 		double timeBinSize = scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize();
 				
 		//File with Linkinfo for Tests
@@ -62,7 +64,7 @@ class AccidentWriter {
 				double demandPerDay = 0.0;
 				linkInformation.write(info.getLinkId().toString());
 				linkInformation.write(";");
-				linkInformation.write(String.valueOf(info.getRoadTypeBVWP()));
+				linkInformation.write(String.valueOf(scenario.getNetwork().getLinks().get(info.getLinkId()).getAttributes().getAttribute(accidentsCfg.getBvwpRoadTypeAttributeName())));
 				linkInformation.write(";");
 				for (double endTime = timeBinSize ; endTime <= scenario.getConfig().travelTimeCalculator().getMaxTime(); endTime = endTime + timeBinSize ) {
 					double time = (endTime - timeBinSize/2.);

@@ -19,7 +19,6 @@
 
 package org.matsim.contrib.accidents;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,7 +33,6 @@ class AccidentLinkInfo {
 	
 	private final Id<Link> linkId;
 	
-	private ArrayList<Integer> roadTypeBVWP;	
 	private AccidentsConfigGroup.AccidentsComputationMethod computationMethod;
 
 	private final Map<Integer, TimeBinInfo> timeSpecificInfo = new HashMap<>();
@@ -45,14 +43,6 @@ class AccidentLinkInfo {
 	
 	public Id<Link> getLinkId() {
 		return linkId;
-	}
-
-	public ArrayList<Integer> getRoadTypeBVWP() {
-		return roadTypeBVWP;
-	}
-
-	public void setRoadTypeBVWP(ArrayList<Integer> roadType) {
-		this.roadTypeBVWP = roadType;
 	}
 
 	public Map<Integer, TimeBinInfo> getTimeSpecificInfo() {

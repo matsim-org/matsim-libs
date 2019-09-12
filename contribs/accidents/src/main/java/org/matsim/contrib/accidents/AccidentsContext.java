@@ -34,7 +34,7 @@ public final class AccidentsContext {
 	// class is public so it can be bound from outside package
 
 	@Inject AccidentsContext(){}
-	// injected constructor is package-private so that nobody can instationate this class directly
+	// injected constructor is package-private so that nobody can instantiate this class directly
 	
 	private Map<Id<Link>, AccidentLinkInfo> linkId2info = new HashMap<>();
 
