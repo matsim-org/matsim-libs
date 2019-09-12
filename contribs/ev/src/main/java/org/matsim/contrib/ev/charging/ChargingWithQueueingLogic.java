@@ -64,7 +64,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 			}
 		}
 
-		int queuedToPluggedCount = Math.min(queuedVehicles.size(), charger.getPlugs() - pluggedVehicles.size());
+		int queuedToPluggedCount = Math.min(queuedVehicles.size(), charger.getPlugCount() - pluggedVehicles.size());
 		for (int i = 0; i < queuedToPluggedCount; i++) {
 			plugVehicle(queuedVehicles.poll(), now);
 		}
@@ -78,7 +78,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 	@Override
 	public void addVehicle(ElectricVehicle ev, ChargingListener chargingListener, double now) {
 		listeners.put(ev.getId(), chargingListener);
-		if (pluggedVehicles.size() < charger.getPlugs()) {
+		if (pluggedVehicles.size() < charger.getPlugCount()) {
 			plugVehicle(ev, now);
 		} else {
 			queueVehicle(ev, now);

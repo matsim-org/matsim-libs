@@ -57,7 +57,7 @@ public class ResumableRunsIT {
 	 */
 	@Test
 	public void testResumableRuns() throws MalformedURLException {
-		Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+		Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.controler().setLastIteration(11);
 		config.controler().setWriteEventsInterval(1);
 		config.global().setNumberOfThreads(1); // only use one thread to rule out other disturbances for the test

@@ -57,23 +57,23 @@ public class RunBicycleExample {
 			config = ConfigUtils.createConfig("bicycle_example/");
 			config.addModule(new BicycleConfigGroup());
 			fillConfigWithBicycleStandardValues(config);
-			
+
 			config.network().setInputFile("network_lane.xml"); // Modify this
 			config.plans().setInputFile("population_1200.xml");
 		} else {
 			throw new RuntimeException("More than one argument was provided. There is no procedure for this situation. Thus aborting!"
-					+ " Provide either (1) only a suitable config file or (2) no argument at all to run example with given example of resources folder.");
+								     + " Provide either (1) only a suitable config file or (2) no argument at all to run example with given example of resources folder.");
 		}
 		config.controler().setLastIteration(100); // Modify if motorized interaction is used
 		boolean considerMotorizedInteraction = false;
-		
+
 		new RunBicycleExample().run(config, considerMotorizedInteraction);
 	}
 
-    static void fillConfigWithBicycleStandardValues(Config config) {
+	static void fillConfigWithBicycleStandardValues(Config config) {
 		config.controler().setWriteEventsInterval(1);
 
-        BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) config.getModules().get(BicycleConfigGroup.GROUP_NAME);
+		BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) config.getModules().get(BicycleConfigGroup.GROUP_NAME);
 		bicycleConfigGroup.setMarginalUtilityOfInfrastructure_m(-0.0002);
 		bicycleConfigGroup.setMarginalUtilityOfComfort_m(-0.0002);
 		bicycleConfigGroup.setMarginalUtilityOfGradient_m_100m(-0.02);
@@ -82,65 +82,47 @@ public class RunBicycleExample {
 		List<String> mainModeList = new ArrayList<>();
 		mainModeList.add("bicycle");
 		mainModeList.add(TransportMode.car);
+
 		config.qsim().setMainModes(mainModeList);
 
-        config.strategy().setMaxAgentPlanMemorySize(5);
-		{
-			StrategySettings strategySettings = new StrategySettings();
-			strategySettings.setStrategyName("ChangeExpBeta");
-			strategySettings.setWeight(0.8);
-			config.strategy().addStrategySettings(strategySettings);
-		}{
-			StrategySettings strategySettings = new StrategySettings();
-			strategySettings.setStrategyName("ReRoute");
-			strategySettings.setWeight(0.2);
-			config.strategy().addStrategySettings(strategySettings);
-		}
+		config.strategy().setMaxAgentPlanMemorySize(5);
+		config.strategy().addStrategySettings( new StrategySettings().setStrategyName("ChangeExpBeta" ).setWeight(0.8 ) );
+		config.strategy().addStrategySettings( new StrategySettings().setStrategyName("ReRoute" ).setWeight(0.2 ) );
 
-        ActivityParams homeActivity = new ActivityParams("home");
-		homeActivity.setTypicalDuration(12*60*60);
-		config.planCalcScore().addActivityParams(homeActivity);
+		config.planCalcScore().addActivityParams( new ActivityParams("home").setTypicalDuration(12*60*60 ) );
+		config.planCalcScore().addActivityParams( new ActivityParams("work").setTypicalDuration(8*60*60 ) );
 
-        ActivityParams workActivity = new ActivityParams("work");
-		workActivity.setTypicalDuration(8*60*60);
-		config.planCalcScore().addActivityParams(workActivity);
+		config.planCalcScore().addModeParams( new ModeParams("bicycle").setConstant(0. ).setMarginalUtilityOfDistance(-0.0004 ).setMarginalUtilityOfTraveling(-6.0 ).setMonetaryDistanceRate(0. ) );
 
-        ModeParams bicycle = new ModeParams("bicycle");
-		bicycle.setConstant(0.);
-		bicycle.setMarginalUtilityOfDistance(-0.0004); // util/m
-		bicycle.setMarginalUtilityOfTraveling(-6.0); // util/h
-		bicycle.setMonetaryDistanceRate(0.);
-		config.planCalcScore().addModeParams(bicycle);
-
-        config.plansCalcRoute().setNetworkModes(mainModeList);
+		config.plansCalcRoute().setNetworkModes(mainModeList);
 	}
 
-    public void run(Config config, boolean considerMotorizedInteraction) {
-        config.global().setNumberOfThreads(1);
-        config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+	public void run(Config config, boolean considerMotorizedInteraction) {
+		config.global().setNumberOfThreads(1);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-        config.plansCalcRoute().setRoutingRandomness(3.);
+		config.plansCalcRoute().setRoutingRandomness(3.);
 
-        if (considerMotorizedInteraction) {
-            BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) config.getModules().get(BicycleConfigGroup.GROUP_NAME);
-            bicycleConfigGroup.setMotorizedInteraction(considerMotorizedInteraction);
-        }
+		if (considerMotorizedInteraction) {
+			BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) config.getModules().get(BicycleConfigGroup.GROUP_NAME);
+			bicycleConfigGroup.setMotorizedInteraction(considerMotorizedInteraction);
+		}
 
-        Scenario scenario = ScenarioUtils.loadScenario(config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-        VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create(TransportMode.car, VehicleType.class));
-        scenario.getVehicles().addVehicleType(car);
+		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create(TransportMode.car, VehicleType.class));
+		scenario.getVehicles().addVehicleType(car);
 
-        VehicleType bicycle = VehicleUtils.getFactory().createVehicleType(Id.create("bicycle", VehicleType.class));
-        bicycle.setMaximumVelocity(20.0 / 3.6);
-        bicycle.setPcuEquivalents(0.25);
-        scenario.getVehicles().addVehicleType(bicycle);
+		VehicleType bicycle = VehicleUtils.getFactory().createVehicleType(Id.create("bicycle", VehicleType.class));
+		bicycle.setMaximumVelocity(20.0 / 3.6);
+		bicycle.setPcuEquivalents(0.25);
+		scenario.getVehicles().addVehicleType(bicycle);
 
-        scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
+		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
-        Controler controler = new Controler(scenario);
-        Bicycles.addAsOverridingModule(controler);
+		Controler controler = new Controler(scenario);
+		Bicycles.addAsOverridingModule(controler);
 
-        controler.run();
-    }
+		controler.run();
+	}
 }

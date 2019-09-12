@@ -89,7 +89,7 @@ public class BestDispatchFinder {
 					vehNode = departure.link.getToNode();
 
 					// simplified, but works for taxis, since pickup trips are short (about 5 mins)
-					delay += 1 + toLink.getFreespeed(departure.time);
+					delay += 1 + toLink.getLength() / toLink.getFreespeed(departure.time);
 				}
 
 				InitialNode existingInitialNode = initialNodes.get(vehNode.getId());
@@ -144,7 +144,7 @@ public class BestDispatchFinder {
 
 			if (!initialNodes.containsKey(locNodeId)) {
 				// simplified, but works for taxis, since pickup trips are short (about 5 mins)
-				double delayAtLastLink = link.getFreespeed(departure.time);
+				double delayAtLastLink = link.getLength() / link.getFreespeed(departure.time);
 
 				// works most fair (FIFO) if unplannedRequests (=destinations) are sorted by T0 (ascending)
 				InitialNode newInitialNode = new InitialNode(link.getFromNode(), delayAtLastLink, delayAtLastLink);

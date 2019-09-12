@@ -154,7 +154,7 @@ public class VisumNetworkReader {
 	}
 
 	public void read(final String filename) throws UncheckedIOException {
-		BufferedReader reader = IOUtils.getBufferedReader(filename, Charset.forName("ISO-8859-1"));
+		BufferedReader reader = IOUtils.getBufferedReader(IOUtils.getFileUrl(filename), Charset.forName("ISO-8859-1"));
 
 		try {
 			String line = reader.readLine();

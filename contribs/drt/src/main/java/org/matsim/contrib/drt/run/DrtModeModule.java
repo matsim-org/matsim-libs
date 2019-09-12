@@ -21,9 +21,15 @@
 package org.matsim.contrib.drt.run;
 
 import java.net.URL;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.locationtech.jts.geom.prep.PreparedGeometry;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -46,12 +52,16 @@ import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -70,7 +80,6 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 	@Override
 	public void install() {
 		DvrpModes.registerDvrpMode(binder(), getMode());
-
 		install(DvrpRoutingNetworkProvider.createDvrpModeRoutingNetworkModule(getMode(),
 				drtCfg.isUseModeFilteredSubnetwork()));
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
@@ -89,9 +98,13 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 				addRoutingModuleBinding(getMode()).toProvider(new DrtRoutingModuleProvider(drtCfg));//not singleton
 				break;
 
+			case serviceAreaBased:
 			case stopbased:
-				bindModal(TransitSchedule.class).toInstance(readTransitSchedule());
-
+				if (drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.serviceAreaBased) {
+					bindModal(TransitSchedule.class).toProvider(new ShapeFileStopProvider(getConfig(), drtCfg));
+				} else {
+					bindModal(TransitSchedule.class).toInstance(readTransitSchedule());
+				}
 				bindModal(DrtRoutingModule.class).toProvider(new DrtRoutingModuleProvider(drtCfg));//not singleton
 
 				addRoutingModuleBinding(getMode()).toProvider(modalProvider(
@@ -104,6 +117,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 						getter -> new ClosestAccessEgressStopFinder(getter.getModal(TransitSchedule.class), drtCfg,
 								getter.get(PlansCalcRouteConfigGroup.class), getter.get(Network.class))))
 						.asEagerSingleton();
+
 				break;
 
 			default:
@@ -133,6 +147,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 	}
 
 	private static class DrtRoutingModuleProvider extends ModalProviders.AbstractProvider<DrtRoutingModule> {
+		private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = new FastAStarEuclideanFactory();
 		private final DrtConfigGroup drtCfg;
 
 		@Inject
@@ -140,7 +155,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		private TravelTime travelTime;
 
 		@Inject
-		private Scenario scenario ;
+		private Scenario scenario;
 
 		@Inject
 		@Named(TransportMode.walk)
@@ -154,8 +169,43 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		@Override
 		public DrtRoutingModule get() {
 			Network network = getModalInstance(Network.class);
-			return new DrtRoutingModule(drtCfg, network, travelTime, getModalInstance(TravelDisutilityFactory.class),
-				  walkRouter, scenario );
+			return new DrtRoutingModule(drtCfg, network, leastCostPathCalculatorFactory, travelTime,
+					getModalInstance(TravelDisutilityFactory.class), walkRouter, scenario);
+		}
+	}
+
+	private static class ShapeFileStopProvider extends ModalProviders.AbstractProvider<TransitSchedule> {
+
+		private final DrtConfigGroup drtCfg;
+		private final URL context;
+
+		protected ShapeFileStopProvider(Config config, DrtConfigGroup drtCfg) {
+			super(drtCfg.getMode());
+			this.drtCfg = drtCfg;
+			this.context = config.getContext();
+		}
+
+		@Override
+		public TransitSchedule get() {
+			final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils.loadPreparedGeometries(
+					drtCfg.getDrtServiceAreaShapeFileURL(context));
+			Network network = getModalInstance(Network.class);
+			Set<Link> relevantLinks = network.getLinks()
+					.values()
+					.stream()
+					.filter(link -> ShpGeometryUtils.isCoordInPreparedGeometries(link.getToNode().getCoord(),
+							preparedGeometries))
+					.collect(Collectors.toSet());
+			final TransitSchedule schedule = ScenarioUtils.createScenario(ConfigUtils.createConfig())
+					.getTransitSchedule();
+			relevantLinks.stream().forEach(link -> {
+				TransitStopFacility f = schedule.getFactory()
+						.createTransitStopFacility(Id.create(link.getId(), TransitStopFacility.class),
+								link.getToNode().getCoord(), false);
+				f.setLinkId(link.getId());
+				schedule.addStopFacility(f);
+			});
+			return schedule;
 		}
 	}
 

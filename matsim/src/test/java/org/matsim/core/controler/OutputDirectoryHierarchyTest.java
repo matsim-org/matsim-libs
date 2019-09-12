@@ -21,6 +21,7 @@ package org.matsim.core.controler;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.testcases.MatsimTestUtils;
@@ -44,7 +45,8 @@ public class OutputDirectoryHierarchyTest {
 		// directory creation is a side effect of instanciation...
 		new OutputDirectoryHierarchy(
 				outputDirectory,
-				OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+				OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists,
+				ControlerConfigGroup.CompressionType.none);
 
 		Assert.assertTrue(
 				"Directory was not created",
@@ -62,7 +64,8 @@ public class OutputDirectoryHierarchyTest {
 			// directory creation is a side effect of instanciation...
 			new OutputDirectoryHierarchy(
 					outputDirectory,
-					OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
+					OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists,
+					ControlerConfigGroup.CompressionType.none);
 		}
 		catch ( RuntimeException e ) {
 			return;
@@ -78,7 +81,8 @@ public class OutputDirectoryHierarchyTest {
 		// directory creation is a side effect of instanciation...
 		new OutputDirectoryHierarchy(
 				outputDirectory,
-				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
+				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles,
+				ControlerConfigGroup.CompressionType.none);
 
 		Assert.assertTrue(
 				"Directory was not created",
@@ -95,7 +99,8 @@ public class OutputDirectoryHierarchyTest {
 		// directory creation is a side effect of instanciation...
 		new OutputDirectoryHierarchy(
 				outputDirectory,
-				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles,
+				ControlerConfigGroup.CompressionType.none);
 
 		Assert.assertTrue(
 				"Directory was cleared",
@@ -111,7 +116,8 @@ public class OutputDirectoryHierarchyTest {
 		// directory creation is a side effect of instanciation...
 		new OutputDirectoryHierarchy(
 				outputDirectory,
-				OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+				OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists,
+				ControlerConfigGroup.CompressionType.none);
 
 		Assert.assertTrue(
 				"Directory was not created",
@@ -128,7 +134,8 @@ public class OutputDirectoryHierarchyTest {
 		// directory creation is a side effect of instanciation...
 		new OutputDirectoryHierarchy(
 				outputDirectory,
-				OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+				OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists,
+				ControlerConfigGroup.CompressionType.none);
 
 		Assert.assertTrue(
 				"Directory was deleted but not re-created!",

@@ -65,7 +65,7 @@ public class TransitScheduleReprojectionIOTest {
 
 	@Test
 	public void testInput() {
-		URL transitSchedule = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "transitschedule.xml");
+		URL transitSchedule = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "transitschedule.xml");
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new TransitScheduleReader( originalScenario ).readURL(transitSchedule );
 
@@ -77,7 +77,7 @@ public class TransitScheduleReprojectionIOTest {
 
 	@Test
 	public void testOutput() {
-		URL transitSchedule = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "transitschedule.xml");
+		URL transitSchedule = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "transitschedule.xml");
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new TransitScheduleReader(originalScenario).readURL(transitSchedule );
 

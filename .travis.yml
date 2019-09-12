@@ -77,6 +77,7 @@ env:
   matrix:
     - MODULE=matsim                        
     # sorted from longest to shortest (to minimise the overall test stage duration)
+    - MODULE=contribs/vsp
     - MODULE=contribs/common
     - MODULE=contribs/taxi
     - MODULE=contribs/minibus
@@ -106,3 +107,4 @@ env:
     - MODULE=contribs/eventsBasedPTRouter
     - MODULE=contribs/hybridsim
     - MODULE=contribs/otfvis
+
