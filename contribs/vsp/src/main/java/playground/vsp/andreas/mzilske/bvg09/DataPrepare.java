@@ -225,8 +225,8 @@ public class DataPrepare {
 		VehiclesFactory vb = this.scenario.getTransitVehicles().getFactory();
 		VehicleType vehicleType = vb.createVehicleType(Id.create(
 				"defaultTransitVehicleType", VehicleType.class));
-		
-//		VehicleCapacity capacity = new VehicleCapacity();
+
+//		VehicleCapacity capacity = veh.getCapacity();
 //		capacity.setSeats(Integer.valueOf(101));
 //		capacity.setStandingRoom(Integer.valueOf(0));
 //		vehicleType.setCapacity(capacity);
