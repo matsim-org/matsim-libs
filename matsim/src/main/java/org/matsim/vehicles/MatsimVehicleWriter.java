@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * VehicleDefinitionsWriterV1
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -16,27 +17,42 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package org.matsim.vehicles;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
- * @author dgrether
+ * This is the new default Writer for the vehicles file.
+ * It can easy pointed to the current version of VehicleReader (which is now V2)
+ * @author kturner
  */
-public class FreightCapacityImpl implements FreightCapacity {
+public final class MatsimVehicleWriter extends MatsimXmlWriter {
+  
+	private static final Logger log = Logger.getLogger(MatsimVehicleWriter.class);
 
-	private double volume;
-	
-	public FreightCapacityImpl(){}
-	
-	@Override
-	public void setVolume(double cubicMeters) {
-		this.volume = cubicMeters;
+	private VehicleWriterV2 delegate;
+
+	public MatsimVehicleWriter(Vehicles vehicles) {
+		delegate = new VehicleWriterV2(vehicles);
 	}
-	
-	@Override
-	public double getVolume() {
-		return this.volume;
+
+	/**
+	 * Writes the vehicles in the current default format
+	 * (currently vehicleDefinitions_v2.0.dtd).
+	 */
+	public void writeFile(String filename) throws UncheckedIOException, IOException {
+		log.info( Gbl.aboutToWrite( "vehicles", filename) ) ;
+		delegate.writeFile(filename);
 	}
-	
+
 }

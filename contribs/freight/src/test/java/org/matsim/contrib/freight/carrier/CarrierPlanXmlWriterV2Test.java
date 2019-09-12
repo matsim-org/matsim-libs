@@ -20,10 +20,10 @@ public class CarrierPlanXmlWriterV2Test extends MatsimTestCase{
 		super.setUp();
 		Carriers carriers = new Carriers();
 		String classInputDirectory = getClassInputDirectory();
-		new CarrierPlanXmlReaderV2(carriers).readFile(classInputDirectory + "carrierPlansEquils.xml");
+		new CarrierPlanXmlReader(carriers).readFile(classInputDirectory + "carrierPlansEquils.xml");
 		new CarrierPlanXmlWriterV2(carriers).write(getClassInputDirectory() + "carrierPlansEquilsWritten.xml");
 		carriers.getCarriers().clear();
-		new CarrierPlanXmlReaderV2(carriers).readFile(getClassInputDirectory() + "carrierPlansEquilsWritten.xml");
+		new CarrierPlanXmlReader(carriers).readFile(getClassInputDirectory() + "carrierPlansEquilsWritten.xml");
 		testCarrier = carriers.getCarriers().get(Id.create("testCarrier", Carrier.class));
 	}
 	
@@ -109,13 +109,13 @@ public class CarrierPlanXmlWriterV2Test extends MatsimTestCase{
 	
 	private boolean exactlyTheseVehiclesAreInVehicleCollection(List<Id<Vehicle>> asList, Collection<CarrierVehicle> carrierVehicles) {
 		List<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>(carrierVehicles);
-		for(CarrierVehicle type : carrierVehicles) if(asList.contains(type.getVehicleId())) vehicles.remove(type);
+		for(CarrierVehicle type : carrierVehicles) if(asList.contains(type.getId() )) vehicles.remove(type );
 		return vehicles.isEmpty();
 	}
 
 	private CarrierVehicle getVehicle(String vehicleName) {
 		for(CarrierVehicle v : testCarrier.getCarrierCapabilities().getCarrierVehicles()){
-			if(v.getVehicleId().toString().equals(vehicleName)){
+			if(v.getId().toString().equals(vehicleName )){
 				return v;
 			}
 		}

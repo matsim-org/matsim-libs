@@ -6,8 +6,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.graphhopper.jsprit.core.problem.job.Shipment;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -90,10 +88,10 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 //		for(CarrierVehicleType type : carrier.getCarrierCapabilities().getVehicleTypes()){
 //			writer.write("\t\t\t\t\t<vehicleType id=\"" + type.getId() + "\">\n");
 //			writer.write("\t\t\t\t\t\t<description>" + type.getDescription() + "</description>\n");
-//			writer.write("\t\t\t\t\t\t<engineInformation fuelType=\"" + type.getEngineInformation().getFuelType().toString() + "\" gasConsumption=\"" + type.getEngineInformation().getGasConsumption() + "\"/>\n");
+//			writer.write("\t\t\t\t\t\t<engineInformation fuelType=\"" + type.getEngineInformation().getFuelType().toString() + "\" gasConsumption=\"" + type.getEngineInformation().getFuelConsumption() + "\"/>\n");
 //			writer.write("\t\t\t\t\t\t<capacity>" + type.getCarrierVehicleCapacity() + "</capacity>\n");
-//			writer.write("\t\t\t\t\t\t<costInformation fix=\"" + type.getVehicleCostInformation().fix + "\" perMeter=\"" + type.getVehicleCostInformation().perDistanceUnit + 
-//					"\" perSecond=\"" + type.getVehicleCostInformation().perTimeUnit + "\"/>\n");
+//			writer.write("\t\t\t\t\t\t<costInformation fix=\"" + type.getCostInformation().fix + "\" perMeter=\"" + type.getCostInformation().perDistanceUnit +
+//					"\" perSecond=\"" + type.getCostInformation().perTimeUnit + "\"/>\n");
 //			writer.write("\t\t\t\t\t</vehicleType>\n");
 //		}
 //		writer.write("\t\t\t\t</vehicleTypes>\n\n");
@@ -101,9 +99,9 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 		writer.write("\t\t\t\t<vehicles>\n");
 		for (CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles()) {
 			Id<VehicleType> vehicleTypeId = v.getVehicleTypeId();
-			if(vehicleTypeId == null) vehicleTypeId = v.getVehicleType().getId();
+			if(vehicleTypeId == null) vehicleTypeId = v.getType().getId();
 			if(vehicleTypeId == null) throw new IllegalStateException("vehicleTypeId is missing.");
-			writer.write("\t\t\t\t\t<vehicle id=\"" + v.getVehicleId()
+			writer.write("\t\t\t\t\t<vehicle id=\"" + v.getId()
 					+ "\" depotLinkId=\"" + v.getLocation()  
 					+ "\" typeId=\"" + vehicleTypeId.toString()
 					+ "\" earliestStart=\"" + getTime(v.getEarliestStartTime())
@@ -190,7 +188,7 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 					
 			for (ScheduledTour tour : plan.getScheduledTours()) {
 				writer.write("\t\t\t\t<tour ");
-				writer.write("vehicleId=\"" + tour.getVehicle().getVehicleId()
+				writer.write("vehicleId=\"" + tour.getVehicle().getId()
 						+ "\">\n");
 				writer.write("\t\t\t\t\t<act type=\"" + FreightConstants.START
 						+ "\" end_time=\"" + Time.writeTime(tour.getDeparture())

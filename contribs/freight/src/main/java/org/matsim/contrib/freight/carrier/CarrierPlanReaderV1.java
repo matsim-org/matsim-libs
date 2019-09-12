@@ -17,6 +17,7 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 import org.xml.sax.Attributes;
 
 /**
@@ -25,9 +26,9 @@ import org.xml.sax.Attributes;
  * @author sschroeder
  *
  */
-public class CarrierPlanReader extends MatsimXmlParser {
+class CarrierPlanReaderV1 extends MatsimXmlParser {
 
-	private static final Logger logger = Logger.getLogger(CarrierPlanReader.class);
+	private static final Logger logger = Logger.getLogger(CarrierPlanReaderV1.class);
 
 	private static final String CARRIERS = "carriers";
 
@@ -96,7 +97,7 @@ public class CarrierPlanReader extends MatsimXmlParser {
 	 *
 	 * @param carriers which is a map that stores carriers
 	 */
-	public CarrierPlanReader(Carriers carriers) {
+	public CarrierPlanReaderV1(Carriers carriers) {
 		super();
 		this.carriers = carriers;
 		this.setValidating(false);
@@ -122,7 +123,7 @@ public class CarrierPlanReader extends MatsimXmlParser {
 		switch( name ){
 			case CARRIER:{
 				String id = atts.getValue( ID );
-				currentCarrier = CarrierImpl.newInstance( Id.create( id, Carrier.class ) );
+				currentCarrier = CarrierUtils.createCarrier( Id.create( id, Carrier.class ) );
 				break;
 			}
 			case SHIPMENTS:{
@@ -179,7 +180,7 @@ public class CarrierPlanReader extends MatsimXmlParser {
 				CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance( Id.create( vId, Vehicle.class ),
 					  Id.create( linkId, Link.class ) );
 				vehicleBuilder.setTypeId( Id.create( typeId, VehicleType.class ) );
-				vehicleBuilder.setType( CarrierVehicleType.Builder.newInstance( Id.create( typeId, VehicleType.class ) ).build() );
+				vehicleBuilder.setType( VehicleUtils.getFactory().createVehicleType( Id.create( typeId, VehicleType.class ) ).build() );
 				if( startTime != null ) vehicleBuilder.setEarliestStart( getDouble( startTime ) );
 				if( endTime != null ) vehicleBuilder.setLatestEnd( getDouble( endTime ) );
 				CarrierVehicle vehicle = vehicleBuilder.build();

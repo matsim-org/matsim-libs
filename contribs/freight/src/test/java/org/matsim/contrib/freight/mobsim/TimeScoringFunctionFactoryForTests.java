@@ -123,7 +123,7 @@ public class TimeScoringFunctionFactoryForTests implements CarrierScoringFunctio
 
 			private CarrierVehicle getVehicle(Id<Vehicle> vehicleId) {
 				for(CarrierVehicle cv : carrier.getCarrierCapabilities().getCarrierVehicles()){
-					if(cv.getVehicleId().equals(vehicleId)){
+					if(cv.getId().equals(vehicleId )){
 						return cv;
 					}
 				}

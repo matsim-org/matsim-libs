@@ -124,7 +124,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
             if(selectedPlan == null) return 0.;
             for(ScheduledTour tour : selectedPlan.getScheduledTours()){
                 if(!tour.getTour().getTourElements().isEmpty()){
-                    score += (-1)*tour.getVehicle().getVehicleType().getVehicleCostInformation().getFix();
+                    score += (-1)*tour.getVehicle().getType().getCostInformation().getFixedCosts();
                 }
             }
             return score;
@@ -168,18 +168,18 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
         }
 
         private double getTimeParameter(CarrierVehicle vehicle) {
-            return vehicle.getVehicleType().getVehicleCostInformation().getPerTimeUnit();
+            return vehicle.getType().getCostInformation().getCostsPerSecond();
         }
 
 
         private double getDistanceParameter(CarrierVehicle vehicle) {
-            return vehicle.getVehicleType().getVehicleCostInformation().getPerDistanceUnit();
+            return vehicle.getType().getCostInformation().getCostsPerMeter();
         }
 
 
         private CarrierVehicle getVehicle(Id vehicleId) {
             for(CarrierVehicle cv : carrier.getCarrierCapabilities().getCarrierVehicles()){
-                if(cv.getVehicleId().equals(vehicleId)){
+                if(cv.getId().equals(vehicleId )){
                     return cv;
                 }
             }
@@ -243,15 +243,15 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
             if(event instanceof LinkEnterEvent){
                 CarrierVehicle carrierVehicle = getVehicle(((LinkEnterEvent) event).getVehicleId());
                 if(carrierVehicle == null) throw new IllegalStateException("carrier vehicle missing");
-                double toll = roadPricing.getTollAmount(carrierVehicle.getVehicleType().getId(),network.getLinks().get(((LinkEnterEvent) event).getLinkId()),event.getTime());
-                if(toll > 0.) System.out.println("bing: vehicle " + carrierVehicle.getVehicleId() + " paid toll " + toll + "");
+                double toll = roadPricing.getTollAmount(carrierVehicle.getType().getId(),network.getLinks().get(((LinkEnterEvent) event).getLinkId() ),event.getTime() );
+                if(toll > 0.) System.out.println("bing: vehicle " + carrierVehicle.getId() + " paid toll " + toll + "" );
                 score += (-1) * toll;
             }
         }
 
         private CarrierVehicle getVehicle(Id<Vehicle> vehicleId) {
             for(CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles()){
-                if(v.getVehicleId().equals(vehicleId)){
+                if(v.getId().equals(vehicleId )){
                     return v;
                 }
             }
