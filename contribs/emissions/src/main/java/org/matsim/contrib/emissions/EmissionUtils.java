@@ -27,7 +27,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -181,7 +183,15 @@ public final class EmissionUtils {
 //				hbefaVehicleDescription +
 //				EmissionSpecificationMarker.END_EMISSIONS.toString());
 
-		vehicleType.getAttributes().putAttribute( HBEFA_VEHICLE_DESCRIPTION, hbefaVehicleDescription ) ;
+//		vehicleType.getAttributes().putAttribute( HBEFA_VEHICLE_DESCRIPTION, hbefaVehicleDescription ) ;
+
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> result = convertVehicleDescription2VehicleInformationTuple( hbefaVehicleDescription );;
+
+		EngineInformation engineInformation = vehicleType.getEngineInformation();;
+		VehicleUtils.setHbefaEmissionsConcept( engineInformation, result.getSecond().getHbefaEmConcept() );
+		VehicleUtils.setHbefaSizeClass( engineInformation, result.getSecond().getHbefaSizeClass() );
+		VehicleUtils.setHbefaTechnology( engineInformation, result.getSecond().getHbefaTechnology() );
+		VehicleUtils.setHbefaVehicleCategory( engineInformation, result.getFirst().name() );
 	}
 	
 	static Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleDescription2VehicleInformationTuple( String hbefaVehicleTypeDescription ) {
