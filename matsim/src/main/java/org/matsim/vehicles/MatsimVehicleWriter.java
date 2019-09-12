@@ -55,14 +55,4 @@ public final class MatsimVehicleWriter extends MatsimXmlWriter {
 		delegate.writeFile(filename);
 	}
 
-
-//	public void putAttributeConverters(Map<Class<?>, AttributeConverter<?>> converters) {
-//		this.converters.putAll(converters);
-//	}
-//
-//	public final void writeV1(final String filename) {
-//		new FacilitiesWriterV1(coordinateTransformation, facilities).write(filename);
-//	}
-
-
 }

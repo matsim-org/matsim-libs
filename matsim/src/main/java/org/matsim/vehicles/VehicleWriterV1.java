@@ -157,16 +157,9 @@ public final class VehicleWriterV1 extends MatsimXmlWriter {
 			atts.add(this.createTuple(VehicleSchemaV1Names.PERSONS, cap.getStandingRoom()));
 			this.writeStartTag(VehicleSchemaV1Names.STANDINGROOM, atts, true);
 		}
-//		if (cap.getFreightCapacity() != null) {
 		if( cap.getVolumeInCubicMeters() != null && !Double.isInfinite(cap.getVolumeInCubicMeters())) {
-//			this.writeFreightCapacity(cap.getFreightCapacity());
 			this.writeFreightCapacity( cap.getVolumeInCubicMeters() );
 		}
-//		if ( cap.getVolumeInCubicMeters() != null ) {
-//			atts.clear() ;
-//			atts.add(createTuple( VehicleSchemaV1Names.FREIGHTCAPACITY, cap.getVolumeInCubicMeters() )) ;
-//			this.writeStartTag( VehicleSchemaV1Names.CUBICMETERS, atts, true );
-//		}
 		this.writeEndTag(VehicleSchemaV1Names.CAPACITY);
 	}
 

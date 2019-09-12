@@ -14,9 +14,6 @@ final class VehicleReaderV2 extends MatsimXmlParser{
 	private final Vehicles vehicles;
 	private final VehiclesFactory builder;
 	private VehicleType currentVehType = null;
-//	private VehicleCapacity currentCapacity = null;
-//	private EngineInformation currentEngineInformation = null;
-//	private CostInformation currentCostInformation = null;
 
 	private final AttributesXmlReaderDelegate attributesDelegate = new AttributesXmlReaderDelegate();
 	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes = null ;
@@ -35,18 +32,6 @@ final class VehicleReaderV2 extends MatsimXmlParser{
 					this.currentVehType.setDescription( content.trim() );
 				}
 				break;
-//			case VehicleSchemaV2Names.ENGINEINFORMATION:
-//				this.currentVehType.setEngineInformation( this.currentEngineInformation );
-//				this.currentEngineInformation = null;
-//				break;
-//			case VehicleSchemaV2Names.CAPACITY:
-//				this.currentVehType.setCapacity( this.currentCapacity );
-//				this.currentCapacity = null;
-//				break;
-//			case VehicleSchemaV2Names.COSTINFORMATION:
-//				this.currentVehType.setCostInformation( this.currentCostInformation );
-//				this.currentCostInformation = null;
-//				break;
 			case VehicleSchemaV2Names.VEHICLETYPE:
 				this.vehicles.addVehicleType( this.currentVehType );
 				this.currentVehType = null;
@@ -60,7 +45,6 @@ final class VehicleReaderV2 extends MatsimXmlParser{
 				// do nothing
 		}
 	}
-
 
 	@Override
 	public void startTag( final String name, final Attributes atts, final Stack<String> context ){
@@ -82,12 +66,9 @@ final class VehicleReaderV2 extends MatsimXmlParser{
 				this.currentVehType.setMaximumVelocity( val );
 				break;
 			case VehicleSchemaV2Names.ENGINEINFORMATION:
-//				this.currentEngineInformation = new EngineInformation();
-//				this.currentEngineInformation = this.currentVehType.getEngineInformation() ;
 				this.currAttributes = this.currentVehType.getEngineInformation().getAttributes() ;
 				break;
 			case VehicleSchemaV2Names.CAPACITY:
-//				this.currentCapacity = this.builder.createVehicleCapacity();
 				if (atts.getValue( VehicleSchemaV2Names.SEATS ) != null) {
 					this.currentVehType.getCapacity().setSeats( Integer.valueOf( atts.getValue( VehicleSchemaV2Names.SEATS ) ) );
 				}
@@ -115,7 +96,6 @@ final class VehicleReaderV2 extends MatsimXmlParser{
 				this.currAttributes = this.currentVehType.getCapacity().getAttributes() ;
 				break;
 			case VehicleSchemaV2Names.COSTINFORMATION:
-//				this.currentCostInformation = new CostInformation();
 				if (atts.getValue( VehicleSchemaV2Names.FIXEDCOSTSPERDAY ) != null) {
 					this.currentVehType.getCostInformation().setFixedCost(Double.parseDouble(atts.getValue(VehicleSchemaV2Names.FIXEDCOSTSPERDAY ) ) );
 				}
@@ -125,7 +105,6 @@ final class VehicleReaderV2 extends MatsimXmlParser{
 				if (atts.getValue( VehicleSchemaV2Names.COSTSPERSECOND) != null) {
 					this.currentVehType.getCostInformation().setCostsPerSecond(Double.parseDouble(atts.getValue(VehicleSchemaV2Names.COSTSPERSECOND)));
 				}
-//				this.currentVehType.setCostInformation( currentCostInformation );
 				this.currAttributes = this.currentVehType.getCostInformation().getAttributes();
 				break;
 			case VehicleSchemaV2Names.VEHICLE:

@@ -44,7 +44,6 @@ public final class VehicleUtils {
 	private static final String EGRESSTIME = "egressTimeInSecondsPerPerson";
 	private static final String ACCESSTIME = "accessTimeInSecondsPerPerson";
 	private static final String FUELCONSUMPTION = "fuelConsumptionLitersPerMeter";
-//	private static final String FREIGHT_CAPACITY_UNITS = "freightCapacityInUnits";
 	private static final String HBEFA_VEHICLE_CATEGORY_= "HbefaVehicleCategory";
 	private static final String HBEFA_TECHNOLOGY = "HbefaTechnology";
 	private static final String HBEFA_SIZE_CLASS = "HbefaSizeClass";
@@ -54,9 +53,6 @@ public final class VehicleUtils {
 	private static final String FUEL_TYPE = "fuelType";
 
 	static {
-//		VehicleCapacity capacity = new VehicleCapacity();
-//		capacity.setSeats(4);
-//		DEFAULT_VEHICLE_TYPE.setCapacity(capacity);
 		DEFAULT_VEHICLE_TYPE.getCapacity().setSeats( 4 );
 	}
 
@@ -190,69 +186,12 @@ public final class VehicleUtils {
 	}
 
 	public static Double getFuelConsumption(VehicleType vehicleType) {
-//		final Object attribute = vehicleType.getAttributes().getAttribute(FUELCONSUMPTION);
-//		if ( attribute==null ) {
-//			return Double.NaN ; // this was the default value in V1; could also return Double-null instead.
-//		} else {
-//			return (double) attribute;
-//		}
 		return getFuelConsumption(vehicleType.getEngineInformation());
 	}
 
 	public static void setFuelConsumption(VehicleType vehicleType, double literPerMeter) {
     	setFuelConsumption(vehicleType.getEngineInformation(), literPerMeter);
-//		vehicleType.getAttributes().putAttribute(FUELCONSUMPTION, literPerMeter);
 	}
-
-//	//TODO: Remove here, because we now let in engineInformation as seperate field?
-//	public static EngineInformation getEngineInformation( VehicleType vehicleType ){
-//		EngineInformation engineInformation = vehicleType.getEngineInformation();
-//		//if not stored in the "old" format, organize values from the attributes. This will be probably changed in the future, kmt mar'19
-//		if (Double.isNaN(engineInformation.getFuelConsumption())){
-//			engineInformation.setFuelConsumption(getFuelConsumption(vehicleType));
-//		}
-//		return engineInformation;
-//	}
-//
-//	//TODO: Remove here, because we now let in engineInformation as seperate field?
-//	public static void setEngineInformation( VehicleType vehicleType, EngineInformation.FuelType fuelType, double literPerMeter ){
-//		vehicleType.setEngineInformation(new EngineInformation(fuelType) );
-//		setHbefaTechnology(vehicleType.getEngineInformation(), fuelType.toString());
-//		setFuelConsumption(vehicleType, literPerMeter);
-//	}
-//
-//	//TODO: Remove here, because we now let in engineInformation as seperate field?
-//	public static void setEngineInformation(VehicleType vehicleType, Attributes currAttributes) {
-//		vehicleType.setEngineInformation(new EngineInformation() );
-//		if (currAttributes == null || currAttributes.isEmpty()){
-////			log.warn("No Attributes were set for EngineInformation of vehicle type " + vehicleType);
-//			throw new RuntimeException("No Attributes were set for EngineInformation of vehicle type " + vehicleType);
-//		} else {
-//			for (String attribute : currAttributes.getAsMap().keySet()) {
-//				vehicleType.getAttributes().putAttribute(attribute, currAttributes.getAttribute(attribute));
-//			}
-//		}
-//	}
-
-	//******** Capacity attributes ************
-
-
-//	@Deprecated
-//	public static double getFreightCapacityUnits (VehicleCapacity vehicleCapacity) {
-//		return (int) vehicleCapacity.getAttributes().getAttribute(FREIGHT_CAPACITY_UNITS);
-//	}
-
-
-//	@Deprecated
-//	public static void setFreightCapacityUnits(VehicleCapacity vehicleCapacity, double units) {
-//		vehicleCapacity.getAttributes().putAttribute(FREIGHT_CAPACITY_UNITS, units);
-//	}
-
-//	public static String getHbefaTechnology(VehicleType vehicleType){
-////		final Object attribute = vehicleType.getAttributes().getAttribute(HBEFA_TECHNOLOGY);
-////		return (String) attribute;
-//		return getHbefaTechnology( vehicleType.getEngineInformation() ) ;
-//	}
 
 	//******** EngineInformation attributes ************
 
@@ -263,14 +202,6 @@ public final class VehicleUtils {
 		engineInformation.getAttributes().putAttribute( HBEFA_TECHNOLOGY, hbefaTechnology ) ;
 	}
 
-//	public static void setHbefaTechnology(VehicleType vehicleType, String hbefaTechnology){
-//		vehicleType.getAttributes().putAttribute(HBEFA_TECHNOLOGY, hbefaTechnology);
-//	}
-
-//	public static String getHbefaVehicleCategory(VehicleType vehicleType) {
-//		return getHbefaVehicleCategory(vehicleType.getEngineInformation()) ;
-//	}
-
 	public static String getHbefaVehicleCategory( EngineInformation ei ){
 		return (String) ei.getAttributes().getAttribute( HBEFA_VEHICLE_CATEGORY_ ) ;
 	}
@@ -278,20 +209,12 @@ public final class VehicleUtils {
 		engineInformation.getAttributes().putAttribute( HBEFA_VEHICLE_CATEGORY_, hbefaVehicleCategory ) ;
 	}
 
-//	public static String getHbefaSizeClass(VehicleType vehicleType) {
-//		return getHbefaSizeClass(vehicleType.getEngineInformation());
-//	}
-
 	public static String getHbefaSizeClass( EngineInformation ei ) {
 		return (String) ei.getAttributes().getAttribute(HBEFA_SIZE_CLASS);
 	}
 	public static void setHbefaSizeClass( EngineInformation engineInformation, String hbefaSizeClass ) {
 		engineInformation.getAttributes().putAttribute( HBEFA_SIZE_CLASS, hbefaSizeClass ) ;
 	}
-
-//	public static String getHbefaEmissionsConcept(VehicleType vehicleType) {
-//		return getHbefaEmissionsConcept(vehicleType.getEngineInformation());
-//	}
 
 	public static String getHbefaEmissionsConcept( EngineInformation ei ) {
 		return (String) ei.getAttributes().getAttribute(HBEFA_EMISSIONS_CONCEPT);

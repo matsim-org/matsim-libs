@@ -53,26 +53,4 @@ final class VehiclesFactoryImpl implements VehiclesFactory {
 	}
 
 
-//	@Override
-//	public VehicleCapacity createVehicleCapacity() {
-//		return new VehicleCapacity();
-//	}
-
-
-//	@Override
-//	public FreightCapacity createFreigthCapacity() {
-//		return new FreightCapacityImpl();
-//	}
-
-
-//	@Override
-//	public EngineInformation createEngineInformation( FuelType fuelType,
-//									  double gasConsumption ) {
-//			return new EngineInformation(fuelType, gasConsumption);
-//	}
-
-//	@Override
-//	public CostInformation createCostInformation(double fixedCosts, double costsPerMeter, double costsPerSecond) {
-//		return new CostInformation(fixedCosts, costsPerMeter, costsPerSecond);
-//	}
 }

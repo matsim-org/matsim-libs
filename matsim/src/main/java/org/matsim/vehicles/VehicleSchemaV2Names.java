@@ -29,37 +29,23 @@ interface VehicleSchemaV2Names {
 	public static final String DESCRIPTION = "description";
 	public static final String CAPACITY = "capacity";
 	public static final String SEATS = "seats";
-//	public static final String PERSONS = "persons";
 	public static final String STANDINGROOM = "standingRoomInPersons";
-//	public static final String FREIGHTCAPACITY = "freightCapacity";
 	public static final String VOLUME = "volumeInCubicMeters";
-//	public static final String CUBICMETERS = "cubicMeters";
 	public static final String WEIGHT = "weightInTons";
 	public static final String OTHER = "other";
-//	public static final String TONS = "tons";
-//	public static final String UNIT = "unit";
-//	public static final String UNITS = "units";
 	public static final String LENGTH = "length";
 	public static final String METER = "meter";
 	public static final String WIDTH = "width";
 	public static final String COSTINFORMATION = "costInformation";
-//	public static final String COSTSINFORMATION = "costsInformation";
 	public static final String FIXEDCOSTSPERDAY = "fixedCostsPerDay";
 	public static final String COSTSPERMETER = "costsPerMeter";
 	public static final String COSTSPERSECOND = "costsPerSecond";
 	public static final String MAXIMUMVELOCITY = "maximumVelocity";
 	public static final String METERPERSECOND = "meterPerSecond";
 	public static final String ENGINEINFORMATION = "engineInformation";
-//	public static final String FUELTYPE = "fuelType";
-//	public static final String GASCONSUMPTION = "gasConsumption";
-//	public static final String LITERPERMETER = "literPerMeter";
 	public static final String VEHICLE = "vehicle";
 	public static final String ID = "id";
 	public static final String TYPE = "type";
-//	public static final String ACCESSTIME = "accessTime";
-//	public static final String SECONDSPERPERSON = "secondsPerPerson";
-//	public static final String EGRESSTIME = "egressTime";
-//	public static final String DOOROPERATION = "doorOperation";
 	public static final String MODE = "mode";
 	public static final String PASSENGERCAREQUIVALENTS = "passengerCarEquivalents";
 	public static final String PCE = "pce";
@@ -68,7 +54,5 @@ interface VehicleSchemaV2Names {
 	public static final String FACTOR = "factor";
 	public final static String ATTRIBUTES = "attributes";
 	public final static String ATTRIBUTE = "attribute";
-//	public final static String EIATTRIBUTES = "eiAttributes";
-//	public final static String EIATTRIBUTE = "eiAttribute";
 	
 }
