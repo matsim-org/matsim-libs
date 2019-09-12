@@ -75,10 +75,8 @@ import com.google.inject.Inject;
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-
-		// Compute accident probability per link and time bin
 		
-		log.info("Computing accident probabilites and costs per link and time bin...");
+		log.info("Computing accident costs per link and time bin...");
 		
 		double totalAccidentCostsPerDay = 0.;
 		
@@ -112,7 +110,7 @@ import com.google.inject.Inject;
 				totalAccidentCostsPerDay += accidentCosts;
 			}
 		}
-		log.info("Computing accident probabilities per link and time bin... Done.");
+		log.info("Computing accident costs per link and time bin... Done.");
 		
 		log.info("+++ Total accident costs per day [EUR] (upscaled to full population size): " + totalAccidentCostsPerDay);		
 	}

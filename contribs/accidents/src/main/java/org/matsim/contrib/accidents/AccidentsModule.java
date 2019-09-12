@@ -19,10 +19,10 @@
 
 package org.matsim.contrib.accidents;
 
-import com.google.inject.Singleton;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
+
+import com.google.inject.Singleton;
 
 /**
 * @author ikaddoura
