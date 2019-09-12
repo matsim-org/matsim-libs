@@ -42,11 +42,7 @@ class AccidentWriter {
 	
 	public void write(Scenario scenario, IterationEndsEvent event, Map<Id<Link>, AccidentLinkInfo> linkId2info, AnalysisEventHandler analzyer) {
 		double timeBinSize = scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize();
-		double numberOfTimeBinsPerDay = (24 * 3600) / timeBinSize;
-		double actualNumberOfTimeBins = scenario.getConfig().travelTimeCalculator().getMaxTime() / timeBinSize;
-		
-		double differenceOfTimeBins = actualNumberOfTimeBins - numberOfTimeBinsPerDay;
-		
+				
 		//File with Linkinfo for Tests
 		File linkInfoFile = new File(scenario.getConfig().controler().getOutputDirectory() + "ITERS/it." + event.getIteration() + "/" + scenario.getConfig().controler().getRunId() + "." + event.getIteration() + ".linkInfo.csv");
 		BufferedWriter linkInformation = null;
@@ -68,17 +64,16 @@ class AccidentWriter {
 				linkInformation.write(";");
 				linkInformation.write(String.valueOf(info.getRoadTypeBVWP()));
 				linkInformation.write(";");
-					for (double endTime = timeBinSize ; endTime <= scenario.getConfig().travelTimeCalculator().getMaxTime(); endTime = endTime + timeBinSize ) {
+				for (double endTime = timeBinSize ; endTime <= scenario.getConfig().travelTimeCalculator().getMaxTime(); endTime = endTime + timeBinSize ) {
 					double time = (endTime - timeBinSize/2.);
 					int timeBinNr = (int) (time / timeBinSize);
 					AccidentsConfigGroup accidentSettings = (AccidentsConfigGroup) scenario.getConfig().getModules().get(AccidentsConfigGroup.GROUP_NAME);
 					double demand = accidentSettings.getSampleSize() * analzyer.getDemand(info.getLinkId(), timeBinNr);
-					if (timeBinNr >= (int) differenceOfTimeBins){
-						demandPerDay += demand;
-					}
+					demandPerDay += demand;
+
 					linkInformation.write(Double.toString(demand));
 					linkInformation.write(";");
-					}
+				}
 				linkInformation.write(Double.toString(demandPerDay));	
 				linkInformation.newLine();
 			}
@@ -126,9 +121,7 @@ class AccidentWriter {
 				int timeBinNr = (int) (time / timeBinSize);
 				
 				if (info.getComputationMethod().toString().equals( AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString() )){
-					if (timeBinNr >= (int) differenceOfTimeBins){ // We need daily numbers and not 30h intervals for easily transformation to Year
-						accidentCostsPerDay_BVWP += info.getTimeSpecificInfo().get(timeBinNr).getAccidentCosts();
-					}
+					accidentCostsPerDay_BVWP += info.getTimeSpecificInfo().get(timeBinNr).getAccidentCosts();
 					try {
 						accidentCostsBVWP.write(Double.toString(info.getTimeSpecificInfo().get(timeBinNr).getAccidentCosts()));
 						accidentCostsBVWP.write(";");

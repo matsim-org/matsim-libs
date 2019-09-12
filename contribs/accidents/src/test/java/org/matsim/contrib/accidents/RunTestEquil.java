@@ -25,20 +25,17 @@ public class RunTestEquil {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
     
     @Test 
-    public void test1() 
-    {
-	    String configFile = utils.getPackageInputDirectory() + "/equil_scenario/config.xml";
-	    String outputDirectory = utils.getOutputDirectory();
-	    String runId = "run1";
+    public void test1() {
+	String configFile = utils.getPackageInputDirectory() + "/equil_scenario/config.xml";
+	String outputDirectory = utils.getOutputDirectory();
+	String runId = "run1";
     
     Config config = ConfigUtils.loadConfig( configFile );
     config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
     
     config.controler().setOutputDirectory( outputDirectory );
     config.controler().setRunId( runId );
-    //Is better to take the initial config where just one of the routes is selected or better take the plans of the tenth iteration?
     config.controler().setLastIteration(0);
-    
     
     AccidentsConfigGroup accidentsSettings = ConfigUtils.addOrGetModule(config,  AccidentsConfigGroup.class);
     accidentsSettings.setEnableAccidentsModule(true);
@@ -46,9 +43,6 @@ public class RunTestEquil {
     final Scenario scenario = ScenarioUtils.loadScenario(config);
     Controler controler = new Controler (scenario);
     controler.addOverridingModule(new AccidentsModule() );
-    
-    //TODO: changing through programming the free speed and number o lanes of some links so they would not be allways categorized with tehe same roadtype.
-    //wich implications has the type of the config file?
     
     controler.run();
 
@@ -77,9 +71,14 @@ public class RunTestEquil {
 					//nachgerechnet: STIMMT!
 				}
 				
-				if (lineCounter == 12 && column == 121) {
+				// link 1
+				if (lineCounter == 11 && column == 121) {
 					double accidentCosts = Double.valueOf(columns[column]);
-					Assert.assertEquals("wrong accident costs", 617.85, accidentCosts , 0.01);
+					int agents = 100;
+					int lengthKM = 10;
+					double accidentCostsManualCalculation = (agents  * lengthKM  * 61.785) / 1000. * 10;
+					Assert.assertEquals("wrong accident costs", accidentCostsManualCalculation, accidentCosts , 0.01);
+//					Assert.assertEquals("wrong accident costs", 617.85, accidentCosts , 0.01);
 					//nachgerechnet: STIMMT NICHT!
 				}
 									
