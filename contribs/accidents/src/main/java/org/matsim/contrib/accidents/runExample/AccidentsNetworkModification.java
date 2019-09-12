@@ -121,8 +121,8 @@ public class AccidentsNetworkModification {
 							
 			ArrayList<Integer> bvwpRoadType = new ArrayList<>();
 			
-			//Plan equal, Plan free or Tunnel?
-			bvwpRoadType.add(0, 1); // Default: Plan equal
+			// 'plangleich', 'planfrei' or tunnel?
+			bvwpRoadType.add(0, 1);
 			
 			for(int j=0; j < planfreeLinkIDs.length; j++){
 			    if(planfreeLinkIDs[j].equals(String.valueOf(link.getId()))){
