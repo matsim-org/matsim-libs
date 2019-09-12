@@ -46,7 +46,8 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.attributable.Attributable;
-import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.vehicles.MatsimVehicleReader;
+
 
 import java.net.URL;
 import java.util.*;
@@ -321,7 +322,7 @@ class ScenarioLoaderImpl {
 		final String vehiclesFile = this.config.transit().getVehiclesFile();
 		if ( vehiclesFile != null ) {
 			log.info("loading transit vehicles from " + vehiclesFile);
-			new VehicleReaderV1(this.scenario.getTransitVehicles()).parse(this.config.transit().getVehiclesFileURL(this.config.getContext()));
+			new MatsimVehicleReader(this.scenario.getTransitVehicles()).readURL(this.config.transit().getVehiclesFileURL(this.config.getContext() ) );
 		}
 		else {
 			log.info("no transit vehicles file set in config, not loading any transit vehicles");
@@ -331,7 +332,7 @@ class ScenarioLoaderImpl {
 		final String vehiclesFile = this.config.vehicles().getVehiclesFile();
 		if ( vehiclesFile != null ) {
 			log.info("loading vehicles from " + vehiclesFile );
-			new VehicleReaderV1(this.scenario.getVehicles()).parse(IOUtils.extendUrl(this.config.getContext(), vehiclesFile));
+			new MatsimVehicleReader(this.scenario.getVehicles()).readURL(IOUtils.extendUrl(this.config.getContext(), vehiclesFile ) );
 		} 
 		else {
 			log.info("no vehicles file set in config, not loading any vehicles");

@@ -144,10 +144,10 @@ public class AccessEgressDemo {
 		VehicleType vehicleType = vb.createVehicleType(Id.create("transitVehicleType", VehicleType.class));
 		vehicles.addVehicleType(vehicleType);
 		
-		VehicleCapacity capacity = vb.createVehicleCapacity();
-		capacity.setSeats(101);
-		capacity.setStandingRoom(0);
-		vehicleType.setCapacity(capacity);
+//		VehicleCapacity capacity = vb.createVehicleCapacity();
+		vehicleType.getCapacity().setSeats(101);
+		vehicleType.getCapacity().setStandingRoom(0);
+//		vehicleType.setCapacity(capacity);
 		for (int i = 0; i < nOfBuses; i++) {
 			vehicles.addVehicle( vb.createVehicle(Id.create(i, Vehicle.class), vehicleType));
 		}

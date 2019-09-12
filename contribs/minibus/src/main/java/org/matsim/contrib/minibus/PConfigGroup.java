@@ -32,7 +32,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.misc.StringUtils;
-import org.matsim.vehicles.VehicleType.DoorOperationMode;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
  * Config group to configure p
@@ -133,7 +133,7 @@ public final class PConfigGroup extends ConfigGroup{
 	private double vehicleMaximumVelocity = Double.POSITIVE_INFINITY;
 	private double delayPerBoardingPassenger = 2.0;
 	private double delayPerAlightingPassenger = 1.0;
-	private DoorOperationMode doorOperationMode = DoorOperationMode.serial;
+	private VehicleUtils.DoorOperationMode doorOperationMode = VehicleUtils.DoorOperationMode.serial;
 	private int numberOfIterationsForProspecting = 0;
 	private double initialBudget = 0.0;
 	private double costPerVehicleAndDay = 0.0;
@@ -221,10 +221,10 @@ public final class PConfigGroup extends ConfigGroup{
 		} else if (DELAY_PER_ALIGHTING_PASSENGER.equals(key)) {
 			this.delayPerAlightingPassenger = Double.parseDouble(value);
 		} else if (DOOR_OPERATION_MODE.equals(key)) { 
-			if (DoorOperationMode.serial.toString().equalsIgnoreCase(value)){
-				this.doorOperationMode = DoorOperationMode.serial;
-			} else if (DoorOperationMode.parallel.toString().equalsIgnoreCase(value)){
-				this.doorOperationMode = DoorOperationMode.parallel;
+			if ( VehicleUtils.DoorOperationMode.serial.toString().equalsIgnoreCase(value )){
+				this.doorOperationMode = VehicleUtils.DoorOperationMode.serial;
+			} else if ( VehicleUtils.DoorOperationMode.parallel.toString().equalsIgnoreCase(value )){
+				this.doorOperationMode = VehicleUtils.DoorOperationMode.parallel;
 			} 
 		} else if (COST_PER_VEHICLE_AND_DAY.equals(key)){
 			this.costPerVehicleAndDay = Double.parseDouble(value);
@@ -511,7 +511,7 @@ public final class PConfigGroup extends ConfigGroup{
 		return this.delayPerAlightingPassenger;
 	}
 	
-	public DoorOperationMode getDoorOperationMode() {
+	public VehicleUtils.DoorOperationMode getDoorOperationMode() {
 		return this.doorOperationMode;
 	}
 	

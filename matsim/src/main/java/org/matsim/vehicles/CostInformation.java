@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,46 +18,43 @@
 
 package org.matsim.vehicles;
 
+import org.matsim.utils.objectattributes.attributable.Attributable;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
-/**
- * @author dgrether
- */
-public class VehicleCapacityImpl implements VehicleCapacity {
+public final class CostInformation implements Attributable{
+	// maybe at least these subtypes should be immutable?  kai, aug'19
+	// No, the decision is to rather have the typical matsim data model where this is an object-oriented database in memory, and everything is settable.
+	// kai, sep'19
 
-	private Integer seats = null;
-	private Integer standingRoom = null;
-	private FreightCapacity freightCap = null;
-	
-	public VehicleCapacityImpl(){}
-	
-	@Override
-	public FreightCapacity getFreightCapacity() {
-		return freightCap;
+	private Double fixed;
+	private Double perMeter;
+	private Double perSecond;
+	private Attributes attributes = new Attributes() ;
+
+	/* package-private */ CostInformation() {
 	}
-
-	@Override
-	public Integer getSeats() {
-		return seats;
+	public Double getFixedCosts() {
+		return fixed;
 	}
-
-	@Override
-	public Integer getStandingRoom() {
-		return standingRoom;
+	public Double getCostsPerMeter() {
+		return perMeter;
 	}
-
-	@Override
-	public void setFreightCapacity(FreightCapacity freightCap) {
-		this.freightCap = freightCap;
+	public Double getCostsPerSecond() {
+		return perSecond;
 	}
-
-	@Override
-	public void setSeats(Integer seats) {
-		this.seats = seats;
+	public Attributes getAttributes() {
+		return attributes;
 	}
-
-	@Override
-	public void setStandingRoom(Integer standingRoom) {
-		this.standingRoom = standingRoom;
+	public CostInformation setFixedCost( Double fixed ){
+		this.fixed = fixed;
+		return this ;
 	}
-	
+	public CostInformation setCostsPerMeter( Double perMeter ){
+		this.perMeter = perMeter;
+		return this ;
+	}
+	public CostInformation setCostsPerSecond( Double perSecond ){
+		this.perSecond = perSecond;
+		return this ;
+	}
 }

@@ -4,9 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.vehicles.VehicleCapacityImpl;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
+import org.matsim.vehicles.VehicleType;
 
 public class DefaultVehTypes {
 	
@@ -40,14 +41,15 @@ public class DefaultVehTypes {
 	}
 	
 	private static VehicleType getBusBerlin(String id){
-		VehicleType veh = new VehicleTypeImpl(Id.create(id, VehicleType.class));
+		VehicleType veh = new VehicleType(Id.create(id, VehicleType.class));
 
 		veh.setDescription("Standard 3 doors");
-		
-		VehicleCapacityImpl cap = new VehicleCapacityImpl();
+
+//		VehicleCapacity cap = veh.getCapacity();
+		VehicleCapacity cap = veh.getCapacity() ;
 		cap.setSeats(new Integer(30));
 		cap.setStandingRoom(new Integer(60));
-		veh.setCapacity(cap);
+//		veh.setCapacity(cap);
 		
 		veh.setLength(12.0);
 		veh.setWidth(2.55);
@@ -60,14 +62,14 @@ public class DefaultVehTypes {
 	}
 	
 	private static VehicleType getBusUmland(String id){
-		VehicleType veh = new VehicleTypeImpl(Id.create(id, VehicleType.class));
+		VehicleType veh = new VehicleType(Id.create(id, VehicleType.class));
 
 		veh.setDescription("Standard 2 doors");
 		
-		VehicleCapacityImpl cap = new VehicleCapacityImpl();
+		VehicleCapacity cap = veh.getCapacity();
 		cap.setSeats(new Integer(30));
 		cap.setStandingRoom(new Integer(70));
-		veh.setCapacity(cap);
+//		veh.setCapacity(cap);
 		
 		veh.setLength(12.0);
 		veh.setWidth(2.55);
@@ -80,14 +82,14 @@ public class DefaultVehTypes {
 	}
 	
 	private static VehicleType getTramBerlin(String id){
-		VehicleType veh = new VehicleTypeImpl(Id.create(id, VehicleType.class));
+		VehicleType veh = new VehicleType(Id.create(id, VehicleType.class));
 		
 		veh.setDescription("GT6, one wagon");
 		
-		VehicleCapacityImpl cap = new VehicleCapacityImpl();
+		VehicleCapacity cap = veh.getCapacity();
 		cap.setSeats(new Integer(45));
 		cap.setStandingRoom(new Integer(103));
-		veh.setCapacity(cap);
+//		veh.setCapacity(cap);
 		
 		veh.setLength(28.27);
 		veh.setWidth(2.30);
@@ -100,14 +102,14 @@ public class DefaultVehTypes {
 	}
 	
 	private static VehicleType getTramUmland(String id){
-		VehicleType veh = new VehicleTypeImpl(Id.create(id, VehicleType.class));
+		VehicleType veh = new VehicleType(Id.create(id, VehicleType.class));
 		
 		veh.setDescription("Tatra long KT4D mod, one wagon");
 		
-		VehicleCapacityImpl cap = new VehicleCapacityImpl();
+		VehicleCapacity cap = veh.getCapacity();
 		cap.setSeats(new Integer(33));
 		cap.setStandingRoom(new Integer(66));
-		veh.setCapacity(cap);
+//		veh.setCapacity(cap);
 		
 		veh.setLength(19.05);
 		veh.setWidth(2.30);
@@ -120,14 +122,14 @@ public class DefaultVehTypes {
 	}
 	
 	private static VehicleType getUBahn(String id){
-		VehicleType veh = new VehicleTypeImpl(Id.create(id, VehicleType.class));
+		VehicleType veh = new VehicleType(Id.create(id, VehicleType.class));
 		
 		veh.setDescription("Baureihe F gross, 6 wagon unit");
 		
-		VehicleCapacityImpl cap = new VehicleCapacityImpl();
+		VehicleCapacity cap = veh.getCapacity();
 		cap.setSeats(new Integer(228));
 		cap.setStandingRoom(new Integer(477));
-		veh.setCapacity(cap);
+//		veh.setCapacity(cap);
 		
 		veh.setLength(96.3);
 		veh.setWidth(2.65);
@@ -140,14 +142,14 @@ public class DefaultVehTypes {
 	}
 	
 	private static VehicleType getSBahn(String id){
-		VehicleType veh = new VehicleTypeImpl(Id.create(id, VehicleType.class));
+		VehicleType veh = new VehicleType(Id.create(id, VehicleType.class));
 		
 		veh.setDescription("Baureihe 481, 8 wagon unit");
 		
-		VehicleCapacityImpl cap = new VehicleCapacityImpl();
+		VehicleCapacity cap = veh.getCapacity();
 		cap.setSeats(new Integer(376));
 		cap.setStandingRoom(new Integer(800));
-		veh.setCapacity(cap);
+//		veh.setCapacity(cap);
 		
 		veh.setLength(147.2);
 		veh.setWidth(3.00);
@@ -160,14 +162,14 @@ public class DefaultVehTypes {
 	}
 	
 	private static VehicleType getRegionalBahn(String id){
-		VehicleType veh = new VehicleTypeImpl(Id.create(id, VehicleType.class));
+		VehicleType veh = new VehicleType(Id.create(id, VehicleType.class));
 		
 		veh.setDescription("Baureihe DBpza 752 RE160, 5 wagon unit");
 		
-		VehicleCapacityImpl cap = new VehicleCapacityImpl();
+		VehicleCapacity cap = veh.getCapacity();
 		cap.setSeats(new Integer(578)); // 4*121 + 1*94
 		cap.setStandingRoom(new Integer(250)); // maybe 50p per wagon
-		veh.setCapacity(cap);
+//		veh.setCapacity(cap);
 		
 		veh.setLength(150.0); // 5*26,8 + Engine
 		veh.setWidth(3.00);

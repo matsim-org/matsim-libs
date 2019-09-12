@@ -20,14 +20,20 @@
 package org.matsim.vehicles;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.vehicles.EngineInformation.FuelType;
 
 /**
  * deliberately non-public since there is an interface.  kai, nov'11
  * 
  * @author dgrether
  */
-class VehiclesFactoryImpl implements VehiclesFactory {
+final class VehiclesFactoryImpl implements VehiclesFactory {
+	// The design is roughly as follows:
+	// * VehicleType and its sub-types VehicleCapacity and CostInformation are no longer behind interfaces.  They are so "small" that we will assume that
+	// we will never optimize them.  Which means that they can also be instantiated directly; the methods here are there for historical reasons and for
+	// convenience.
+	// * Hierarchical sub-types are gone.  E.g. there is no FreighCapacity within VehicleCapacity any more.
+	// * EngineInformation is deprecated and should go away soon.  In practice, the hbefa entries are used, and they are used via Attributable.
+	// kai/kai, aug'19
 
 
 	/**
@@ -38,32 +44,13 @@ class VehiclesFactoryImpl implements VehiclesFactory {
 
 	@Override
 	public Vehicle createVehicle(Id<Vehicle> id, VehicleType type) {
-		Vehicle veh = new VehicleImpl(id, type);
-		return veh;
+		return VehicleUtils.createVehicle(id, type );
 	}
 	
 	@Override
 	public VehicleType createVehicleType(Id<VehicleType> typeId) {
-			VehicleType veh = new VehicleTypeImpl(typeId);
-			return veh;
+		return new VehicleType(typeId);
 	}
 
 
-	@Override
-	public VehicleCapacity createVehicleCapacity() {
-		return new VehicleCapacityImpl();
-	}
-
-
-	@Override
-	public FreightCapacity createFreigthCapacity() {
-		return new FreightCapacityImpl();
-	}
-
-
-	@Override
-	public EngineInformation createEngineInformation(FuelType fuelType,
-			double gasConsumption) {
-			return new EngineInformationImpl(fuelType, gasConsumption);
-	}
 }

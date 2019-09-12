@@ -81,14 +81,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleCapacityImpl;
-import org.matsim.vehicles.VehicleImpl;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
-import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesFactory;
+import org.matsim.vehicles.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -135,10 +128,10 @@ public class TransitQueueSimulationTest {
         Vehicles vehicles = scenario.getTransitVehicles();
         VehiclesFactory vb = vehicles.getFactory();
         VehicleType vehicleType = vb.createVehicleType(Id.create("transitVehicleType", VehicleType.class));
-        VehicleCapacity capacity = vb.createVehicleCapacity();
-        capacity.setSeats(Integer.valueOf(101));
-        capacity.setStandingRoom(Integer.valueOf(0));
-        vehicleType.setCapacity(capacity);
+//        VehicleCapacity capacity = vb.createVehicleCapacity();
+        vehicleType.getCapacity().setSeats(Integer.valueOf(101));
+        vehicleType.getCapacity().setStandingRoom(Integer.valueOf(0));
+//        vehicleType.setCapacity(capacity);
         
         vehicles.addVehicleType(vehicleType);
         
@@ -561,13 +554,14 @@ public class TransitQueueSimulationTest {
                     		TestHandleStopSimulation.this.route, TestHandleStopSimulation.this.departure, 
                     		transitEngine.getAgentTracker(), transitEngine);
 
-                    VehicleType vehicleType = new VehicleTypeImpl(Id.create("transitVehicleType", VehicleType.class));
-                    VehicleCapacity capacity = new VehicleCapacityImpl();
-                    capacity.setSeats(101);
-                    capacity.setStandingRoom(0);
-                    vehicleType.setCapacity(capacity);
+                    VehicleType vehicleType = new VehicleType(Id.create("transitVehicleType", VehicleType.class ));
+//                    VehicleCapacity capacity = new VehicleCapacity();
+                    vehicleType.getCapacity().setSeats(101);
+                    vehicleType.getCapacity().setStandingRoom(0);
+//                    vehicleType.setCapacity(capacity);
 
-                    TransitQVehicle veh = new TransitQVehicle(new VehicleImpl(Id.create(TestHandleStopSimulation.this.driver.getId(), Vehicle.class), vehicleType));
+                    TransitQVehicle veh = new TransitQVehicle(
+				    VehicleUtils.createVehicle(Id.create(TestHandleStopSimulation.this.driver.getId(), Vehicle.class ), vehicleType ) );
                     veh.setDriver(TestHandleStopSimulation.this.driver);
                     veh.setStopHandler(new SimpleTransitStopHandler());
                     TestHandleStopSimulation.this.driver.setVehicle(veh);

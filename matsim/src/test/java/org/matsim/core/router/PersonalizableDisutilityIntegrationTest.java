@@ -37,9 +37,8 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
  * @author mrieser / senozon
@@ -147,8 +146,8 @@ public class PersonalizableDisutilityIntegrationTest {
 			this.person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 
 			Id<Vehicle> dummyId = Id.createVehicleId( "dummy" ) ;
-			VehicleType dummyType = new VehicleTypeImpl( Id.create( "dummyVehicleType", VehicleType.class ) ) ;
-			this.vehicle = new VehicleImpl(dummyId, dummyType);
+			VehicleType dummyType = new VehicleType( Id.create( "dummyVehicleType", VehicleType.class ) ) ;
+			this.vehicle = VehicleUtils.createVehicle(dummyId, dummyType );
 			
 			this.costFunction = new PersonEnforcingTravelDisutility();
 			this.costFunction.setExpectations(this.person, this.vehicle);
