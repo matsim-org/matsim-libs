@@ -117,8 +117,8 @@ public class AssignService {
 	public static void main(String[] args) {
 
 		AssignService assignData = new AssignService(
-				"D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\vw243_0.1_EGrocery0.1\\vw243_0.1_EGrocery0.1_input.xml.gz",
-				"D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\EGrocery",
+				"D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\vw243_0.1_EGrocery0.1_shops\\vw243_0.1_EGrocery0.1_input.xml.gz",
+				"D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\EGrocery\\Shops",
 				"D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\wege.csv",
 				"D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\fahrzeuge.csv",
 				"D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Network\\00_Final_Network\\network_editedPt.xml.gz",

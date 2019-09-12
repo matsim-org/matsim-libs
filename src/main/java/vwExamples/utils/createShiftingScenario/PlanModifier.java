@@ -207,7 +207,7 @@ public class PlanModifier {
 			for (Subtour subTour : TripStructureUtils.getSubtours(plan, blackList)) {
 
 				String subtourMode = getSubtourMode(subTour, plan);
-
+				//&&subtourmode equals transportmode car
 				if (subTourValidator.isValidSubTour(subTour)) {
 					shiftingScenario.agentSet.add(person.getId());
 					shiftingScenario.totalSubtourCounter.increment();
@@ -283,6 +283,7 @@ public class PlanModifier {
 
 					// Check if this subtour can be shifted to an other mode
 					// It is not allowed to shift an already shifted tour
+					//&&subtourmode equals transportmode car
 					if (assignTourValidator.isValidSubTour(subTour) && (subtourMode != shit2Mode)) {
 
 					

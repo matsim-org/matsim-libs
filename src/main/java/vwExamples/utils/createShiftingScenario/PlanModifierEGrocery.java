@@ -36,6 +36,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -130,7 +131,7 @@ public class PlanModifierEGrocery {
 
 		subTourValidator = new isShoppingSubTourCandidate(network, cityZonesMap, serviceAreazonesMap);
 		assignTourValidator = new assignShoppingCandidate(network, cityZonesMap, serviceAreazonesMap);
-		shiftingScenario = new ShiftingScenario(0.1);
+		shiftingScenario = new ShiftingScenario(0.3);
 
 	}
 
@@ -140,7 +141,7 @@ public class PlanModifierEGrocery {
 				"D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\Zellen\\Stadtteile\\Hannover_Stadtteile_25832.shp",
 				"D:\\\\Thiel\\\\Programme\\\\WVModell\\\\00_Eingangsdaten\\\\Zellen\\\\Stadtteile\\\\Hannover_Stadtteile_25832.shp",
 				"D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw243_cadON_ptSpeedAdj.0.1\\vw243_cadON_ptSpeedAdj.0.1.output_plans.xml.gz",
-				"D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\vw243_0.1_EGrocery0.1\\vw243_0.1_EGrocery0.1_input.xml.gz",
+				"D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\vw243_0.1_EGrocery0.1\\vw243_0.1_EGrocery0.1_input_carOnly.xml.gz",
 				"D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\vw243_0.1\\network\\network_editedPt.xml.gz");
 		planmodifier.count();
 		planmodifier.assign();
@@ -209,7 +210,7 @@ public class PlanModifierEGrocery {
 
 				String subtourMode = getSubtourMode(subTour, plan);
 
-				if (subTourValidator.isValidSubTour(subTour)) {
+				if (subTourValidator.isValidSubTour(subTour)&&(subtourMode.equals(TransportMode.car))) {
 					shiftingScenario.agentSet.add(person.getId());
 					shiftingScenario.totalSubtourCounter.increment();
 
@@ -295,8 +296,8 @@ public class PlanModifierEGrocery {
 
 					// Check if this subtour can be shifted to an other mode
 					// It is not allowed to shift an already shifted tour
-					if (assignTourValidator.isValidSubTour(subTour) && (subtourMode != shift2mode)
-							&& estimatedTourDistance > minTourDistance) {
+					if (assignTourValidator.isValidSubTour(subTour) &&(subtourMode.equals(TransportMode.car))&& (subtourMode != shift2mode)
+							&& estimatedTourDistance > minTourDistance ) {
 						leaveWhileLoopCounter = 0;
 
 						// System.out.println("Trip Size:" + subTour.getTrips().size());

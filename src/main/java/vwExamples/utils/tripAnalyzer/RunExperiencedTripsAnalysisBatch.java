@@ -52,14 +52,14 @@ public class RunExperiencedTripsAnalysisBatch {
 
 	static Map<String, Geometry> zoneMap = new HashMap<>();
 	static Set<String> zones = new HashSet<>();
-	static String shapeFile = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Hannover_Stadtteile.shp";
+	static String shapeFile = "D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\Zellen\\Stadtteile\\Hannover_Stadtteile_25832.shp";
 	static String shapeFeature = "NO";
 
 	public static void main(String[] args) {
 
-		run("D:\\Matsim\\Axer\\Hannover\\ZIM\\output\\");
-		run("D:\\Matsim\\Axer\\Hannover\\Base\\");
-		run("D:\\Matsim\\Axer\\Hannover\\WV\\");
+//		run("D:\\Matsim\\Axer\\Hannover\\ZIM\\output\\");
+		run("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\");
+//		run("D:\\Thiel\\Programme\\WVModell\\02_MatSimOutput\\");
 	}
 
 	public static void run(String runDir) {
@@ -78,12 +78,14 @@ public class RunExperiencedTripsAnalysisBatch {
 //			scenarioToBeAnalyzed.add("VW243_CityCommuterDRTAmpel2.0_10pct300_veh_idx0");
 //			scenarioToBeAnalyzed.add("VW243_HomeOfficeInOut1x_10pct");
 //			scenarioToBeAnalyzed.add("VW243_HomeOfficeInOut2x_10pct");
-//			scenarioToBeAnalyzed.add("vw243_cadON_ptSpeedAdj.0.1");
+			scenarioToBeAnalyzed.add("vw243_cadON_ptSpeedAdj.0.1");
 //			scenarioToBeAnalyzed.add("VW243_Drt_HomeOffice_LinkFlow1.15300_veh_idx0");
 //			scenarioToBeAnalyzed.add("VW251_CityCommuterDRT_100pct2800_veh_idx0");
-			scenarioToBeAnalyzed.add("vw251.1.0");
+//			scenarioToBeAnalyzed.add("vw251.1.0");
 //			scenarioToBeAnalyzed.add("CT_243.0.1");
 //			scenarioToBeAnalyzed.add("CT_243_noJsprit.0.1");
+//			scenarioToBeAnalyzed.add("vw243_0.1_EGrocery0.1.0.1");
+//			scenarioToBeAnalyzed.add("vw243_0.1_EGrocery0.1_shops.0.1");
 			
 			
 			
@@ -121,6 +123,8 @@ public class RunExperiencedTripsAnalysisBatch {
 		monitoredModes.add("bike");
 		monitoredModes.add("ride");
 		monitoredModes.add("stayHome");
+		monitoredModes.add("preventedShoppingTrip");
+		
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(runPrefix + "output_network.xml.gz");

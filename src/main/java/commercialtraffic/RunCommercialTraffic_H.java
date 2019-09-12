@@ -47,10 +47,10 @@ import static org.matsim.core.scenario.ScenarioUtils.loadScenario;
 
 public class RunCommercialTraffic_H {
 	public static void main(String[] args) {
-		String runId = "vw243_0.1_EGrocery0.1";
+		String runId = "vw243_0.1_EGrocery0.1_shops_changeCar";
 		String pct = ".0.1";
 
-		String inputDir = "D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\vw243_0.1_EGrocery0.1\\";
+		String inputDir = "D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\vw243_0.1_EGrocery0.1_shops_changeCar\\";
 
 		Config config = ConfigUtils.loadConfig(inputDir + "config_0.1.xml", new CommercialTrafficConfigGroup());
 
@@ -58,7 +58,7 @@ public class RunCommercialTraffic_H {
 		changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
 		changeExpBeta.setWeight(0.5);
 		config.strategy().addStrategySettings(changeExpBeta);
-		config.controler().setWriteEventsInterval(1);
+		config.controler().setWriteEventsInterval(5);
 		config.controler().setOutputDirectory("D:\\Thiel\\Programme\\WVModell\\02_MatSimOutput\\" + runId + pct);
 		config.controler()
 				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
@@ -71,6 +71,11 @@ public class RunCommercialTraffic_H {
 		ctcg.setCarriersFile(inputDir+"Carrier\\carrier_definition.xml");
 		ctcg.setCarriersVehicleTypesFile(inputDir+"Carrier\\carrier_vehicletypes.xml");
 		ctcg.setjSpritTimeSliceWidth(3600);
+		
+        StrategyConfigGroup.StrategySettings changeServiceOperator = new StrategyConfigGroup.StrategySettings();
+        changeServiceOperator.setStrategyName(ChangeDeliveryServiceOperator.SELECTOR_NAME);
+        changeServiceOperator.setWeight(0.5);
+        config.strategy().addStrategySettings(changeServiceOperator);
 		
 		
 		//Config for StayHome Act
@@ -87,8 +92,8 @@ public class RunCommercialTraffic_H {
 		config.planCalcScore().addModeParams(scoreParams);
 		
 		
-		config.controler().setLastIteration(1);
-		config.strategy().setFractionOfIterationsToDisableInnovation(0.00); // Fraction to disable Innovation
+		config.controler().setLastIteration(50);
+		config.strategy().setFractionOfIterationsToDisableInnovation(0.80); // Fraction to disable Innovation
 		Scenario scenario = loadScenario(config);
 		adjustPtNetworkCapacity(scenario.getNetwork(), config.qsim().getFlowCapFactor());
 
@@ -105,7 +110,7 @@ public class RunCommercialTraffic_H {
 		controler.addOverridingModule(new SwissRailRaptorModule());
 
 		controler.addOverridingModule(new CommercialTrafficModule(config, carrierId -> {
-            if(carrierId.toString().startsWith("H1")) return 100;
+            if(carrierId.toString().startsWith("H1")) return 15;
             return 1;
         }));
 

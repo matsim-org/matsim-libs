@@ -26,6 +26,8 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import com.opencsv.CSVReader;
 
@@ -158,8 +160,9 @@ public class CompanyGenerator {
 						String companyId = (lineContents[1]);
 						double companyX = Double.parseDouble(lineContents[2]);
 						double companyY = Double.parseDouble(lineContents[3]);
+						CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("EPSG:4326", "EPSG:25832");
 						Coord companyCoord = new Coord(companyX, companyY);
-
+						companyCoord=transformation.transform(companyCoord);
 						// String zone = (lineContents[4]);
 						String companyClass = lineContents[5];
 						int vehicleType = Integer.parseInt(lineContents[6]);
