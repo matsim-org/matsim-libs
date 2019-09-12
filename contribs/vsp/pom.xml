@@ -151,7 +151,7 @@
 
 		<!-- for accessibility contrib -->
 		<dependency>
-			<groupId>com.github.SchweizerischeBundesbahnen</groupId>
+			<groupId>ch.sbb</groupId>
 			<artifactId>matsim-sbb-extensions</artifactId>
 			<version>11.5</version>
 		</dependency>

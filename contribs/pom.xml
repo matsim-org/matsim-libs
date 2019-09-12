@@ -200,6 +200,10 @@
 			<id>matsim</id>
 			<url>http://dl.bintray.com/matsim/matsim</url>
 		</repository>
+		<repository>
+			<id>ch.sbb</id>
+			<url>https://schweizerischebundesbahnen.bintray.com/simba.mvn</url>
+		</repository>
 	</repositories>
 
 	<dependencies>
