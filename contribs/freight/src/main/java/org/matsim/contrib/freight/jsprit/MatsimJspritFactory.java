@@ -266,7 +266,15 @@ public class MatsimJspritFactory {
 	static com.graphhopper.jsprit.core.problem.vehicle.VehicleType createVehicleType(VehicleType carrierVehicleType) {
 		if (carrierVehicleType == null) throw new IllegalStateException("carrierVehicleType is null");
 		VehicleTypeImpl.Builder typeBuilder = VehicleTypeImpl.Builder.newInstance(carrierVehicleType.getId().toString());
-		final double vehicleCapacity = carrierVehicleType.getCapacity().getWeightInTons();
+		if ( carrierVehicleType.getCapacity().getVolumeInCubicMeters() < Double.MAX_VALUE ) {
+			throw new RuntimeException("restrictions can currently only be set for \"other\".  not a big problem, but needs to be implemented.  " +
+								     "kai/kai, sep'19") ;
+		}
+		if ( carrierVehicleType.getCapacity().getWeightInTons() < Double.MAX_VALUE ) {
+			throw new RuntimeException("restrictions can currently only be set for \"other\".  not a big problem, but needs to be implemented.  " +
+								     "kai/kai, sep'19") ;
+		}
+		final double vehicleCapacity = carrierVehicleType.getCapacity().getOther();
 		final int vehicleCapacityInt = (int) vehicleCapacity;
 		if (vehicleCapacity - vehicleCapacityInt > 0) {
 			log.warn("vehicle capacity truncated to int: before=" + vehicleCapacity + "; after=" + vehicleCapacityInt);

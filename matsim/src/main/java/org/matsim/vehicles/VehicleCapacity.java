@@ -37,6 +37,7 @@ public final class VehicleCapacity implements Attributable {
 	private Double volumeInCubicMeters = Double.POSITIVE_INFINITY ;
 	private Double weightInTons = Double.POSITIVE_INFINITY ;
 	private Attributes attributes = new Attributes() ;
+	private Double other = Double.POSITIVE_INFINITY ;
 
 	/* package-private */ VehicleCapacity(){
 	}
@@ -70,5 +71,11 @@ public final class VehicleCapacity implements Attributable {
 	}
 	public Attributes getAttributes(){
 		return this.attributes ;
+	}
+	public void setOther( double other ){
+		this.other = other ;
+	}
+	public Double getOther() {
+		return this.other;
 	}
 }

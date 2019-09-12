@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
@@ -40,14 +41,15 @@ public class DefaultVehTypes {
 	}
 	
 	private static VehicleType getBusBerlin(String id){
-		VehicleType veh = new VehicleTypeImpl(Id.create(id, VehicleType.class));
+		VehicleType veh = new VehicleType(Id.create(id, VehicleType.class));
 
 		veh.setDescription("Standard 3 doors");
-		
-		VehicleCapacityImpl cap = new VehicleCapacityImpl();
+
+//		VehicleCapacityImpl cap = new VehicleCapacityImpl();
+		VehicleCapacity cap = veh.getCapacity() ;
 		cap.setSeats(new Integer(30));
 		cap.setStandingRoom(new Integer(60));
-		veh.setCapacity(cap);
+//		veh.setCapacity(cap);
 		
 		veh.setLength(12.0);
 		veh.setWidth(2.55);

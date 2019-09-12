@@ -19,10 +19,6 @@
 
 package playground.vsp.andreas.mzilske.bvg09;
 
-import java.util.Collection;
-
-import javax.inject.Provider;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -60,18 +56,15 @@ import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.utils.CreatePseudoNetwork;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleCapacityImpl;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleWriterV1;
-import org.matsim.vehicles.VehiclesFactory;
+import org.matsim.vehicles.*;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetworkReader;
-
 import playground.vsp.andreas.mzilske.pt.queuesim.GreedyUmlaufBuilderImpl;
+
+import javax.inject.Provider;
+import java.util.Collection;
 
 public class DataPrepare {
 
@@ -232,10 +225,11 @@ public class DataPrepare {
 		VehiclesFactory vb = this.scenario.getTransitVehicles().getFactory();
 		VehicleType vehicleType = vb.createVehicleType(Id.create(
 				"defaultTransitVehicleType", VehicleType.class));
-		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(101));
-		capacity.setStandingRoom(Integer.valueOf(0));
-		vehicleType.setCapacity(capacity);
+		
+//		VehicleCapacity capacity = new VehicleCapacity();
+//		capacity.setSeats(Integer.valueOf(101));
+//		capacity.setStandingRoom(Integer.valueOf(0));
+//		vehicleType.setCapacity(capacity);
 		this.scenario.getTransitVehicles().addVehicleType(
 				vehicleType);
 

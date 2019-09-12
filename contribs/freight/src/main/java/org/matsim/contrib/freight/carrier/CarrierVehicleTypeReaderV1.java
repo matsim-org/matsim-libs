@@ -1,6 +1,8 @@
 package org.matsim.contrib.freight.carrier;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.vehicles.CostInformation;
 import org.matsim.vehicles.EngineInformation;
@@ -11,6 +13,9 @@ import org.xml.sax.Attributes;
 import java.util.Stack;
 
 class CarrierVehicleTypeReaderV1 extends MatsimXmlParser {
+	private static final Logger log = Logger.getLogger(CarrierVehicleTypeReaderV1.class) ;
+
+	private static int wrnCnt=10 ;
 
 	private final CarrierVehicleTypes carrierVehicleTypes;
 	private VehicleType currentType;
@@ -47,9 +52,16 @@ class CarrierVehicleTypeReaderV1 extends MatsimXmlParser {
 			this.currentType = VehicleUtils.getFactory().createVehicleType( currentTypeId ) ;
 		}
 		if(name.equals("allowableWeight")){
-			String weight = atts.getValue("weight");
-			Double.parseDouble( weight );
+//			String weight = atts.getValue("weight");
+//			Double.parseDouble( weight );
 			// yyyyyy what is this?  kai, sep'19
+			if ( wrnCnt>0 ){
+				log.warn( "allowableWeight is ignored (and has always been)." );
+				wrnCnt--;
+				if( wrnCnt == 0 ){
+					log.warn( Gbl.FUTURE_SUPPRESSED );
+				}
+			}
 		}
 		if(name.equals("engineInformation")){
 //			EngineInformation engineInfo = new EngineInformation();
@@ -82,8 +94,10 @@ class CarrierVehicleTypeReaderV1 extends MatsimXmlParser {
 		}
 		if(name.equals("capacity")){
 //			this.currentCapacity = content;
-			this.currentType.getCapacity().setWeightInTons( Double.parseDouble( content ) ) ;
+//			this.currentType.getCapacity().setWeightInTons( Double.parseDouble( content ) ) ;
 			// yyyyyy note that this is interpretation!!
+//			VehicleUtils.setFreightCapacityUnits(  );
+			this.currentType.getCapacity().setOther( Double.parseDouble( content ) ) ;
 		}
 		if(name.equals("maxVelocity")){
 //			this.maxVelo = content;

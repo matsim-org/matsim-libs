@@ -40,7 +40,7 @@ import org.matsim.counts.Volume;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.vehicles.MatsimVehicleReader;
 import org.matsim.vehicles.Vehicles;
 
 import playground.vsp.analysis.VspAnalyzer;
@@ -172,7 +172,7 @@ public class PtRoutes2PaxAnalysis extends AbstractAnalysisModule {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(sc).readFile(dir + "ITERS\\it.299\\testReRoute3Old.299.transitSchedule.xml.gz");
-		new VehicleReaderV1(((MutableScenario) sc).getTransitVehicles()).readFile(dir + "ITERS\\it.299\\testReRoute3Old.299.vehicles.xml.gz");
+		new MatsimVehicleReader(((MutableScenario) sc).getTransitVehicles()).readFile(dir + "ITERS\\it.299\\testReRoute3Old.299.vehicles.xml.gz" );
 		PtRoutes2PaxAnalysis ptRoutesPax = new PtRoutes2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((MutableScenario) sc).getTransitVehicles(), 3600, 24);
 		analyzer.addAnalysisModule(ptRoutesPax);
 		analyzer.run();
