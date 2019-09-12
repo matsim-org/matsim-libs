@@ -81,6 +81,7 @@
 		<xs:attribute name="standingRoomInPersons" type="xs:nonNegativeInteger"/>
 		<xs:attribute name="volumeInCubicMeters" type="xs:double"/>
 		<xs:attribute name="weightInTons" type="xs:double"/>
+		<xs:attribute name="other" type="xs:double"/>
 	</xs:complexType>
 
 	<xs:complexType name="engineInformationType">

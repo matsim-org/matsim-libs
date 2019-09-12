@@ -11,10 +11,7 @@
 			<attribute name="egressTimeInSecondsPerPerson" class="java.lang.Double">42.42</attribute>
 		</attributes>
 		<description>abc</description>
-		<capacity seats="5" standingRoomInPersons="20" volumeInCubicMeters="23.23" weightInTons="9.5">
-			<attributes>
-				<attribute name="freightCapacityInUnits" class="java.lang.Integer">200</attribute>
-			</attributes>
+		<capacity seats="5" standingRoomInPersons="20" volumeInCubicMeters="23.23" weightInTons="9.5" other="200">
 		</capacity>
 		<length meter="9.5"/>
 		<width meter="3.0"/>
