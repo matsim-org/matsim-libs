@@ -33,8 +33,6 @@ class AccidentLinkInfo {
 	
 	private final Id<Link> linkId;
 	
-	private AccidentsConfigGroup.AccidentsComputationMethod computationMethod;
-
 	private final Map<Integer, TimeBinInfo> timeSpecificInfo = new HashMap<>();
 	
 	public AccidentLinkInfo(Id<Link> linkId) {
@@ -47,14 +45,6 @@ class AccidentLinkInfo {
 
 	public Map<Integer, TimeBinInfo> getTimeSpecificInfo() {
 		return timeSpecificInfo;
-	}
-
-	public AccidentsConfigGroup.AccidentsComputationMethod getComputationMethod() {
-		return computationMethod;
-	}
-
-	public void setComputationMethod( AccidentsConfigGroup.AccidentsComputationMethod computationMethod ) {
-		this.computationMethod = computationMethod;
 	}
 
 }

@@ -50,7 +50,7 @@ class AccidentWriter {
 		BufferedWriter linkInformation = null;
 		try {
 			linkInformation = new BufferedWriter (new FileWriter(linkInfoFile));
-			linkInformation.write("Link_ID ;" + "roadTypeBVWP ;");
+			linkInformation.write("Link_ID ;");
 			for (double endTime = timeBinSize ; endTime <= scenario.getConfig().travelTimeCalculator().getMaxTime(); endTime = endTime + timeBinSize ) {
 				linkInformation.write(convertSecondToHHMMSSString((int)(endTime-timeBinSize)));
 				linkInformation.write(" - ");
@@ -60,17 +60,16 @@ class AccidentWriter {
 				}
 			linkInformation.write("demandPerDay ;");
 			linkInformation.newLine();
+			
 			for (AccidentLinkInfo info : linkId2info.values()) {
 				double demandPerDay = 0.0;
 				linkInformation.write(info.getLinkId().toString());
-				linkInformation.write(";");
-				linkInformation.write(String.valueOf(scenario.getNetwork().getLinks().get(info.getLinkId()).getAttributes().getAttribute(accidentsCfg.getBvwpRoadTypeAttributeName())));
 				linkInformation.write(";");
 				for (double endTime = timeBinSize ; endTime <= scenario.getConfig().travelTimeCalculator().getMaxTime(); endTime = endTime + timeBinSize ) {
 					double time = (endTime - timeBinSize/2.);
 					int timeBinNr = (int) (time / timeBinSize);
 					AccidentsConfigGroup accidentSettings = (AccidentsConfigGroup) scenario.getConfig().getModules().get(AccidentsConfigGroup.GROUP_NAME);
-					double demand = accidentSettings.getSampleSize() * analzyer.getDemand(info.getLinkId(), timeBinNr);
+					double demand = accidentSettings.getScaleFactor() * analzyer.getDemand(info.getLinkId(), timeBinNr);
 					demandPerDay += demand;
 
 					linkInformation.write(Double.toString(demand));
@@ -107,9 +106,11 @@ class AccidentWriter {
 		for (AccidentLinkInfo info : linkId2info.values()) {			
 			double accidentCostsPerDay_BVWP = 0.0;
 			double accidentCostsPerYear_BVWP = 0.0;
-			
+
+			String linkComputationMethod = (String) scenario.getNetwork().getLinks().get(info.getLinkId()).getAttributes().getAttribute(accidentsCfg.getAccidentsComputationMethodAttributeName());
+
 			try {
-				if (info.getComputationMethod().toString().equals( AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString() )){
+				if (linkComputationMethod.equals( AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString() )){
 					accidentCostsBVWP.write(info.getLinkId().toString());
 					accidentCostsBVWP.write(";");
 				}
@@ -122,7 +123,7 @@ class AccidentWriter {
 				double time = (endTime - timeBinSize/2.);
 				int timeBinNr = (int) (time / timeBinSize);
 				
-				if (info.getComputationMethod().toString().equals( AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString() )){
+				if (linkComputationMethod.toString().equals( AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString() )){
 					accidentCostsPerDay_BVWP += info.getTimeSpecificInfo().get(timeBinNr).getAccidentCosts();
 					try {
 						accidentCostsBVWP.write(Double.toString(info.getTimeSpecificInfo().get(timeBinNr).getAccidentCosts()));
@@ -132,9 +133,9 @@ class AccidentWriter {
 					}
 				}
 			}
-			accidentCostsPerYear_BVWP = accidentCostsPerDay_BVWP*365;
+			accidentCostsPerYear_BVWP = accidentCostsPerDay_BVWP * 365;
 			try {
-				if (info.getComputationMethod().toString().equals( AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString() )){
+				if (linkComputationMethod.toString().equals( AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString() )){
 					accidentCostsBVWP.write(Double.toString(accidentCostsPerDay_BVWP));
 					accidentCostsBVWP.write(";");
 					accidentCostsBVWP.write(Double.toString(accidentCostsPerYear_BVWP));

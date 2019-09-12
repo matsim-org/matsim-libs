@@ -7,6 +7,8 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.accidents.AccidentsConfigGroup.AccidentsComputationMethod;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -44,6 +46,25 @@ public class RunTest {
 		accidentsSettings.setEnableAccidentsModule(true);
 		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
+		
+		// pre-process network
+		for (Link link : scenario.getNetwork().getLinks().values()) {
+			link.getAttributes().putAttribute(accidentsSettings.getAccidentsComputationMethodAttributeName(), AccidentsComputationMethod.BVWP.toString());
+			
+			int numberOfLanesBVWP;
+			if (link.getNumberOfLanes() > 4){
+				numberOfLanesBVWP = 4;
+			} else {
+				numberOfLanesBVWP = (int) link.getNumberOfLanes();
+			}
+			
+			if (link.getFreespeed() > 16.) {
+				link.getAttributes().putAttribute(accidentsSettings.getBvwpRoadTypeAttributeName(), "1,0," + numberOfLanesBVWP);
+			} else {
+				link.getAttributes().putAttribute(accidentsSettings.getBvwpRoadTypeAttributeName(), "1,2," + numberOfLanesBVWP);
+			}		
+		}
+		
 		Controler controler = new Controler(scenario);
 		
 		controler.addOverridingModule(new AccidentsModule() );
@@ -57,7 +78,7 @@ public class RunTest {
 			line = br.readLine();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} // headers
+		}
 
 		try {
 			int lineCounter = 0;
@@ -68,14 +89,12 @@ public class RunTest {
 					
 					if (lineCounter == 0 && column == 25) {
 						double accidentCosts = Double.valueOf(columns[column]);
-						Assert.assertEquals("wrong accident costs", 10.37988, accidentCosts , 0.01);	
-						//Manuel nachgerechnet: STIMMT!
+						Assert.assertEquals("wrong accident costs", 10.37988, accidentCosts , MatsimTestUtils.EPSILON);	
 					}
 					
 					if (lineCounter == 1 && column == 25) {
 						double accidentCosts = Double.valueOf(columns[column]);
-						Assert.assertEquals("wrong accident costs", 16.68195, accidentCosts , 0.01);
-						//Manuel nachgerechnet: STIMMT!
+						Assert.assertEquals("wrong accident costs", 16.68195, accidentCosts , MatsimTestUtils.EPSILON);
 					}
 										
 				}

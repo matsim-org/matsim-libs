@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.accidents.AccidentsConfigGroup.AccidentsComputationMethod;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -77,17 +78,31 @@ import com.google.inject.Inject;
 				final int timeBinNr = (int) (time / timeBinSize);
 				
 				final AccidentsConfigGroup accidentSettings = (AccidentsConfigGroup) scenario.getConfig().getModules().get(AccidentsConfigGroup.GROUP_NAME);
-				final double demand = accidentSettings.getSampleSize() * analzyer.getDemand(linkInfo.getLinkId(), timeBinNr);
+				final double demand = accidentSettings.getScaleFactor() * analzyer.getDemand(linkInfo.getLinkId(), timeBinNr);
 				
 				double accidentCosts = 0.;
 								
-				if (linkInfo.getComputationMethod().toString().equals( AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString() )) {
+				String linkAccidentsComputationMethod = (String) this.scenario.getNetwork().getLinks().get(linkInfo.getLinkId()).getAttributes().getAttribute(accidentsCfg.getAccidentsComputationMethodAttributeName());
+				
+				if (linkAccidentsComputationMethod == null) {
+					throw new RuntimeException("Required link attribute " + accidentsCfg.getAccidentsComputationMethodAttributeName() + " is null."
+							+ " Please pre-process your network and specify the link attributes that are required to compute accident costs. Aborting...");
+				}
+				
+				if (linkAccidentsComputationMethod.equals( AccidentsComputationMethod.BVWP.toString() )) {
 					String bvwpRoadTypeString = (String) link.getAttributes().getAttribute(accidentsCfg.getBvwpRoadTypeAttributeName());
+
+					if (bvwpRoadTypeString == null) {
+						throw new RuntimeException("Required link attribute " + accidentsCfg.getBvwpRoadTypeAttributeName() + " is null."
+								+ " Please pre-process your network and specify the link attributes that are required to compute accident costs. Aborting...");
+					}
+					
 					ArrayList<Integer> bvwpRoadType = new ArrayList<>();
 					bvwpRoadType.add(0, Integer.valueOf(bvwpRoadTypeString.split(",")[0]));
 					bvwpRoadType.add(1, Integer.valueOf(bvwpRoadTypeString.split(",")[1]));
 					bvwpRoadType.add(2, Integer.valueOf(bvwpRoadTypeString.split(",")[2]));
 					accidentCosts = AccidentCostComputationBVWP.computeAccidentCosts(demand, link, bvwpRoadType);
+				
 				} else {
 					throw new RuntimeException("Unknown accident computation approach or value not set. Aborting...");
 				}

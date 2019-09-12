@@ -146,29 +146,34 @@ public class AccidentsNetworkModification {
 			if (osmLandUseFeatureBBId == null) {				
 				log.warn("No area type found for link " + link.getId() + ". Using default value: not built-up area.");
 				if (link.getFreespeed() > 16.) {
-					//probably an express-highway
 					bvwpRoadType.add(1, 0);
-				} else bvwpRoadType.add(1, 2); // probably not an express-highway
+				} else {
+					bvwpRoadType.add(1, 2);
+				}
 			
 			} else {
 				String landUseTypeBB = landUseDataBB.get(osmLandUseFeatureBBId);
 				if (landUseTypeBB.matches("commercial|industrial|recreation_ground|residential|retail")) { //built-up area
 					if (link.getFreespeed() > 16.) {
-						//probably an express-highway
 						bvwpRoadType.add(1, 1);
-					} else bvwpRoadType.add(1, 3); // probably not an express-highway
-				} else { //probably not built-up area
+					} else {
+						bvwpRoadType.add(1, 3); 
+					}
+				} else {
 					if (link.getFreespeed() > 16.) {
-						//probably an express-highway
 						bvwpRoadType.add(1, 0);
-					} else bvwpRoadType.add(1, 2); // probably not an express-highway
+					} else {
+						bvwpRoadType.add(1, 2);
+					}
 				}
 			}
 
 			int numberOfLanesBVWP;
 			if (link.getNumberOfLanes() > 4){
 				numberOfLanesBVWP = 4;
-			} else numberOfLanesBVWP = (int) link.getNumberOfLanes();
+			} else {
+				numberOfLanesBVWP = (int) link.getNumberOfLanes();
+			}
 			bvwpRoadType.add(2, numberOfLanesBVWP);
 			
 			link.getAttributes().putAttribute(accidentsCfg.getBvwpRoadTypeAttributeName(), bvwpRoadType.get(0) + "," + bvwpRoadType.get(1) + "," + bvwpRoadType.get(2));

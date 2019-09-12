@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -44,7 +43,6 @@ import com.google.inject.Inject;
 
 public final class AnalysisEventHandler implements EventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler {
 
-	private static final Logger log = Logger.getLogger(AnalysisEventHandler.class);	
 	private final Map<Id<Link>, Map<Integer, Integer>> linkId2time2leavingAgents = new HashMap<>();
 	private final Map<Id<Link>, Map<Integer, List<Id<Person>>>> linkId2time2personIds = new HashMap<>();
 	private final Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>();
@@ -68,12 +66,6 @@ public final class AnalysisEventHandler implements EventHandler, LinkLeaveEventH
 		double timeBinSize = this.scenario.getConfig().travelTimeCalculator().getTraveltimeBinSize(); 
 		int timeBinNr = (int) (event.getTime() / timeBinSize);
 		
-		// TODO: Remove once this is tested.
-//		log.info("-----------");
-//		log.info("time: " + event.getTime());
-//		log.info("time bin nr: " + timeBinNr);
-//		log.info("-----------");
-
 		Id<Link> linkId = event.getLinkId();
 		
 		if (linkId2time2leavingAgents.get(linkId) != null) {
@@ -110,12 +102,6 @@ public final class AnalysisEventHandler implements EventHandler, LinkLeaveEventH
 			time2leavingAgents.put(timeBinNr, personIds);
 			linkId2time2personIds.put(linkId, time2leavingAgents);
 		}
-		
-		// TODO: Remove once this is tested.
-//		log.info("-----------");
-//		log.info(event.toString());
-//		log.info(linkId2time2leavingAgents.toString());
-//		log.info("-----------");
 	}
 
 	private Id<Person> getDriverId(Id<Vehicle> vehicleId) {

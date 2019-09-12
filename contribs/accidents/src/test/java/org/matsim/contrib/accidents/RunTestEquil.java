@@ -7,6 +7,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.accidents.AccidentsConfigGroup.AccidentsComputationMethod;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -43,10 +45,26 @@ public class RunTestEquil {
     scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setNumberOfLanes(3);
     scenario.getNetwork().getLinks().get(Id.createLinkId("15")).setFreespeed(10); 
     scenario.getNetwork().getLinks().get(Id.createLinkId("15")).setNumberOfLanes(2);
+    
+    // pre-process network
+    for (Link link : scenario.getNetwork().getLinks().values()) {
+			link.getAttributes().putAttribute(accidentsSettings.getAccidentsComputationMethodAttributeName(), AccidentsComputationMethod.BVWP.toString());
+			
+			int numberOfLanesBVWP;
+			if (link.getNumberOfLanes() > 4){
+				numberOfLanesBVWP = 4;
+			} else {
+				numberOfLanesBVWP = (int) link.getNumberOfLanes();
+			}
+			
+			if (link.getFreespeed() > 16.) {
+				link.getAttributes().putAttribute(accidentsSettings.getBvwpRoadTypeAttributeName(), "1,0," + numberOfLanesBVWP);
+			} else {
+				link.getAttributes().putAttribute(accidentsSettings.getBvwpRoadTypeAttributeName(), "1,2," + numberOfLanesBVWP);
+			}		
+		}
+    
     controler.run();
-
-    //the total costs of link 1 differ to the one which I manually calculate
-    //Link 1 three vehicles are not taken into account for the calculation, the ones before 06.00, it takes the ones at this time at the next day (29:45 for example) instead
     
     BufferedReader br = IOUtils.getBufferedReader(outputDirectory + "ITERS/it.0/run1.0.accidentCosts_BVWP.csv");
 	

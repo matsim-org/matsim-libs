@@ -39,8 +39,7 @@ public final class AccidentsConfigGroup extends ReflectiveConfigGroup {
 	private final String bvwpRoadTypeAttributeName = "bvwpRoadType";
 	private final String accidentsComputationMethodAttributeName = "accidentsComputationMethod";
 	
-	// e.g. 1 for 100%; 10 for 10%; 100 for 1%
-	private double sampleSize = 10.; // TODO: rename to scale factor
+	private double scaleFactor = 10.;
 		
 	private AccidentsComputationMethod accidentsComputationMethod = AccidentsComputationMethod.BVWP;
 				
@@ -54,14 +53,14 @@ public final class AccidentsConfigGroup extends ReflectiveConfigGroup {
 		this.enableAccidentsModule = enableAccidentsModule;
 	}
 
-	@StringGetter( "sampleSize" )
-	public double getSampleSize() {
-		return sampleSize;
+	@StringGetter( "scaleFactor" )
+	public double getScaleFactor() {
+		return scaleFactor;
 	}
 
-	@StringSetter( "sampleSize" )
-	public void setSampleSize(double sampleSize) {
-		this.sampleSize = sampleSize;
+	@StringSetter( "scaleFactor" )
+	public void setScaleFactor(double scaleFactor) {
+		this.scaleFactor = scaleFactor;
 	}
 
 	@StringGetter( "accidentsComputationMethod" )

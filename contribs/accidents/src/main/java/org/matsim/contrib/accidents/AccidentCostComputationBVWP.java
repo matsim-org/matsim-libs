@@ -16,7 +16,7 @@ class AccidentCostComputationBVWP {
 
 	/**
 	 * 
-	 * Provides the accident costs in EUR based on a simplified version of Fig. 13 in the German BVWP 'Methodenhandbuch' 2030
+	 * Provides the accident costs in EUR based on a simplified version of Fig. 13 in the German 'BVWP Methodenhandbuch 2030'
 	 * 
 	 * @param demand
 	 * @param link
@@ -25,47 +25,49 @@ class AccidentCostComputationBVWP {
 	 */
 	public static double computeAccidentCosts(double demand, Link link, ArrayList<Integer> roadType){
 
-		//costRateTable in EUR/T.vehicle-km
+		// in EUR per 1000 vehicle-km
 		double costRateTable[][][] = {
-			/*	2. Ziffer
-			 * 		1.Spalte: Außerhalb von bebauten Gebiet, Kfz-Straße
-			 * 		2.Spalte: Innerhalb von bebauten Gebiet, Kfz-Straße
-			 * 		3.Spalte: Außerhalb von bebauten Gebiet
-			 * 		4.Spalte: Innerhalb von bebauten Gebiet
+				
+			/*	position 1
+			 * 		column 0: 'Außerhalb von bebauten Gebiet, Kfz-Straße'
+			 * 		column 1: 'Innerhalb von bebauten Gebiet, Kfz-Straße'
+			 * 		column 2: 'Außerhalb von bebauten Gebiet'
+			 * 		column 3: 'Innerhalb von bebauten Gebiet'
 			 * 
-			 * 	3. Ziffer: Anzahl an Fahrstreifen
+			 * 	position 2: number of lanes
 			 */
-			//Planfrei: 1.Ziffer --> 0
+			
+			// 'planfrei': positon 0 --> 0
 			{
-				{ 0      , 0      , 0      , 0      }, // 1 Fahrstreifen pro Richtung
-				{ 23.165 , 23.165 , 0      , 0      }, // 2 Fahrstreifen pro Richtung
-				{ 23.79  , 23.79  , 0      , 0      }, // 3 Fahrstreifen pro Richtung
-				{ 23.79  , 23.79  , 0      , 0      }  // 4 Fahrstreifen pro Richtung
+				{ 0      , 0      , 0      , 0      }, // 1 lane
+				{ 23.165 , 23.165 , 0      , 0      }, // 2 lane
+				{ 23.79  , 23.79  , 0      , 0      }, // 3 lane
+				{ 23.79  , 23.79  , 0      , 0      }  // 4 lane
 			},
-			//Plangleich: 1.Ziffer --> 1
+			// 'plangleich': positon 0 --> 1
 			{
-				{ 61.785 , 101.2  , 61.785 , 101.2  }, // 1 Fahrstreifen pro Richtung
-				{ 31.63  , 101.53 , 31.63  , 101.53 }, // 2 Fahrstreifen pro Richtung
-				{ 37.84  , 82.62  , 34.735 , 101.53 }, // 3 Fahrstreifen pro Richtung
-				{ 0      , 0      , 0      , 101.53 }  // 4 Fahrstreifen pro Richtung
+				{ 61.785 , 101.2  , 61.785 , 101.2  }, // 1 lane
+				{ 31.63  , 101.53 , 31.63  , 101.53 }, // 2 lane
+				{ 37.84  , 82.62  , 34.735 , 101.53 }, // 3 lane
+				{ 0      , 0      , 0      , 101.53 }  // 4 lane
 			},
-			//Tunnelstrecke: 1.Ziffer --> 2
+			// tunnel: positon 0 --> 2
 			{
-				{ 9.56   , 15.09    , 9.56  , 15.09 }, // 1 Fahrstreifen pro Richtung
-				{ 11.735 , 14.67425 , 0     , 17.57 }, // 2 Fahrstreifen pro Richtung
-				{ 11.735 , 11.735   , 0     , 17.57 }, // 3 Fahrstreifen pro Richtung
-				{ 9.11   , 9.11     , 0     , 17.57 }  // 4 Fahrstreifen pro Richtung
+				{ 9.56   , 15.09    , 9.56  , 15.09 }, // 1 lane
+				{ 11.735 , 14.67425 , 0     , 17.57 }, // 2 lane
+				{ 11.735 , 11.735   , 0     , 17.57 }, // 3 lane
+				{ 9.11   , 9.11     , 0     , 17.57 }  // 4 lane
 			}		
 		};
 		
 		double costRate = costRateTable[roadType.get(0)][roadType.get(2)-1][roadType.get(1)]; 
 		if (costRate == 0) {
-			log.warn("Accident cost rate is not specified link " + link.getId().toString() + " , roadtype: " + roadType.toString() );
+			log.warn("Accident cost rate for link " + link.getId().toString() + " is 0. (roadtype: " + roadType.toString() + ")" );
 		}
 		
-		double vehicleKm = demand * (link.getLength() / 1000.); // length is converted from METER to KILOMETER
+		double vehicleKm = demand * (link.getLength() / 1000.);
 		
-		double accidentCosts = costRate * (vehicleKm / 1000.); // vehicleKM --> T.vehicleKM
+		double accidentCosts = costRate * (vehicleKm / 1000.);
 		
 		return accidentCosts;		
 	}
