@@ -3,25 +3,20 @@ skip_tags: true
 clone_depth: 1
 environment:
   matrix:
-    - JAVA_HOME: C:\Program Files\Java\jdk1.8.0
-      fast_finish: true
+    - JAVA_HOME: C:\Program Files\Java\jdk11
+  fast_finish: true
 os: Windows Server 2012
 install:
-  - ps: |
-      Add-Type -AssemblyName System.IO.Compression.FileSystem
-      if (!(Test-Path -Path "C:\maven" )) {
-        (new-object System.Net.WebClient).DownloadFile('http://www.us.apache.org/dist/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.zip', 'C:\maven-bin.zip')
-        [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\maven-bin.zip", "C:\maven")
-      }
-  - cmd: SET PATH=C:\maven\apache-maven-3.3.9\bin;%JAVA_HOME%\bin;%PATH%
   - cmd: SET MAVEN_OPTS=-Xmx1g
   - cmd: SET JAVA_OPTS=-Xmx1g
+  - cmd: SET PATH=%JAVA_HOME%\bin;%PATH%
   - cmd: mvn --version
   - cmd: java -version
+
 build_script:
-  - mvn package -DskipTests
-# test_script:
-#   - mvn test
+  - mvn package --batch-mode --fail-at-end -Dmaven.javadoc.skip -DskipTests
+test_script:
+  - mvn test --batch-mode --fail-at-end -Dmaven.javadoc.skip -Dmatsim.preferLocalDtds=true -Dmaven.test.redirectTestOutputToFile
 cache:
-  - C:\maven\
   - C:\Users\appveyor\.m2
+#  - C:\Users\appveyor\.m2 -> pom.xml # uncomment if the cache should be invalidated if pom.xml changes
