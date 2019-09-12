@@ -1,4 +1,4 @@
-package org.matsim.contrib.accidents.computation;
+package org.matsim.contrib.accidents;
 
 import java.util.ArrayList;
 
@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.network.Link;
 * @author mmayobre
 */
 
-public class AccidentCostComputationBVWP {
+class AccidentCostComputationBVWP {
 //Computes the expected Accident Costs depending on the expected vehicle-km an the Cost Rate of each Road Type
 
 	public static double computeAccidentCosts(double demand, Link link, ArrayList<Integer> roadType){

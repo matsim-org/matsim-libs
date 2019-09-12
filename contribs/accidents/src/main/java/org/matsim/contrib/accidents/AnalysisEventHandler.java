@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.accidents.handlers;
+package org.matsim.contrib.accidents;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,12 +42,14 @@ import com.google.inject.Inject;
 * @author ikaddoura
 */
 
-public class AnalysisEventHandler implements EventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler {
+public final class AnalysisEventHandler implements EventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler {
 
 	private static final Logger log = Logger.getLogger(AnalysisEventHandler.class);	
 	private final Map<Id<Link>, Map<Integer, Integer>> linkId2time2leavingAgents = new HashMap<>();
 	private final Map<Id<Link>, Map<Integer, List<Id<Person>>>> linkId2time2personIds = new HashMap<>();
 	private final Map<Id<Vehicle>, Id<Person>> vehicleId2personId = new HashMap<>();
+
+	@Inject AnalysisEventHandler(){}
 	
 	@Inject
 	private Scenario scenario;

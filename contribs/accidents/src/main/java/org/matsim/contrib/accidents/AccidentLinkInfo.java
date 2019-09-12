@@ -17,31 +17,54 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.accidents.data;
+package org.matsim.contrib.accidents;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 /**
-* @author ikaddoura
+* @author ikaddoura, mmayobre
 */
 
-public class TimeBinInfo {
+class AccidentLinkInfo {
 	
-	private final int intervalNr;
-	private double accidentCosts;
-		
-	public int getIntervalNr() {
-		return intervalNr;
+	private final Id<Link> linkId;
+	
+	private ArrayList<Integer> roadTypeBVWP;	
+	private AccidentsConfigGroup.AccidentsComputationMethod computationMethod;
+
+	private final Map<Integer, TimeBinInfo> timeSpecificInfo = new HashMap<>();
+	
+	public AccidentLinkInfo(Id<Link> linkId) {
+		this.linkId = linkId;
+	}
+	
+	public Id<Link> getLinkId() {
+		return linkId;
 	}
 
-	public TimeBinInfo(int intervalNr) {
-		this.intervalNr = intervalNr;
+	public ArrayList<Integer> getRoadTypeBVWP() {
+		return roadTypeBVWP;
 	}
 
-	public double getAccidentCosts() {
-		return accidentCosts;
+	public void setRoadTypeBVWP(ArrayList<Integer> roadType) {
+		this.roadTypeBVWP = roadType;
 	}
 
-	public void setAccidentCosts(double accidentCosts) {
-		this.accidentCosts = accidentCosts;
+	public Map<Integer, TimeBinInfo> getTimeSpecificInfo() {
+		return timeSpecificInfo;
+	}
+
+	public AccidentsConfigGroup.AccidentsComputationMethod getComputationMethod() {
+		return computationMethod;
+	}
+
+	public void setComputationMethod( AccidentsConfigGroup.AccidentsComputationMethod computationMethod ) {
+		this.computationMethod = computationMethod;
 	}
 
 }

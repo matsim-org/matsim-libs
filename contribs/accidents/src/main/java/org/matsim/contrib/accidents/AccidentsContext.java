@@ -22,19 +22,23 @@ package org.matsim.contrib.accidents;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.accidents.data.AccidentLinkInfo;
 
 /**
 * @author ikaddoura
 */
 
-public class AccidentsContext {
+public final class AccidentsContext {
+	// class is public so it can be bound from outside package
+
+	@Inject AccidentsContext(){}
+	// injected constructor is package-private so that nobody can instationate this class directly
 	
 	private Map<Id<Link>, AccidentLinkInfo> linkId2info = new HashMap<>();
 
-	public Map<Id<Link>, AccidentLinkInfo> getLinkId2info() {
+	Map<Id<Link>, AccidentLinkInfo> getLinkId2info() {
 		return linkId2info;
 	}
 

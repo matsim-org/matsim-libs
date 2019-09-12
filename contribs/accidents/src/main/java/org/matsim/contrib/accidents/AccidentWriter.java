@@ -29,16 +29,13 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.accidents.computation.AccidentsComputationMethod;
-import org.matsim.contrib.accidents.data.AccidentLinkInfo;
-import org.matsim.contrib.accidents.handlers.AnalysisEventHandler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 
 /**
 * @author ikaddoura
 */
 
-public class AccidentWriter {	
+class AccidentWriter {
 	private static String convertSecondToHHMMSSString(int nSecondTime) {
 	    return LocalTime.MIN.plusSeconds(nSecondTime).toString();
 	}
@@ -115,7 +112,7 @@ public class AccidentWriter {
 			double accidentCostsPerYear_BVWP = 0.0;
 			
 			try {
-				if (info.getComputationMethod().toString().equals(AccidentsComputationMethod.BVWP.toString())){
+				if (info.getComputationMethod().toString().equals( AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString() )){
 					accidentCostsBVWP.write(info.getLinkId().toString());
 					accidentCostsBVWP.write(";");
 				}
@@ -128,7 +125,7 @@ public class AccidentWriter {
 				double time = (endTime - timeBinSize/2.);
 				int timeBinNr = (int) (time / timeBinSize);
 				
-				if (info.getComputationMethod().toString().equals(AccidentsComputationMethod.BVWP.toString())){
+				if (info.getComputationMethod().toString().equals( AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString() )){
 					if (timeBinNr >= (int) differenceOfTimeBins){ // We need daily numbers and not 30h intervals for easily transformation to Year
 						accidentCostsPerDay_BVWP += info.getTimeSpecificInfo().get(timeBinNr).getAccidentCosts();
 					}
@@ -142,7 +139,7 @@ public class AccidentWriter {
 			}
 			accidentCostsPerYear_BVWP = accidentCostsPerDay_BVWP*365;
 			try {
-				if (info.getComputationMethod().toString().equals(AccidentsComputationMethod.BVWP.toString())){	
+				if (info.getComputationMethod().toString().equals( AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString() )){
 					accidentCostsBVWP.write(Double.toString(accidentCostsPerDay_BVWP));
 					accidentCostsBVWP.write(";");
 					accidentCostsBVWP.write(Double.toString(accidentCostsPerYear_BVWP));

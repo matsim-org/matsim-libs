@@ -19,8 +19,8 @@
 
 package org.matsim.contrib.accidents;
 
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.accidents.handlers.AnalysisEventHandler;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 
@@ -28,26 +28,18 @@ import org.matsim.core.controler.AbstractModule;
 * @author ikaddoura
 */
 
-public class AccidentsModule extends AbstractModule {
-
-	private final AccidentsConfigGroup accidentsConfigGroup;
-	
-	public AccidentsModule(Scenario scenario) {
-				
-		ConfigUtils.addOrGetModule(scenario.getConfig(), AccidentsConfigGroup.class);
-		this.accidentsConfigGroup = (AccidentsConfigGroup) scenario.getConfig().getModules().get(AccidentsConfigGroup.GROUP_NAME);
-	}
+public final class AccidentsModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		
-		if (accidentsConfigGroup.isEnableAccidentsModule()) {
+		AccidentsConfigGroup accidentsConfigGroup = ConfigUtils.addOrGetModule( getConfig() , AccidentsConfigGroup.class );
+
+		if ( accidentsConfigGroup.isEnableAccidentsModule()) {
 			
-			AccidentsContext accidentsContext = new AccidentsContext();
-			this.bind(AccidentsContext.class).toInstance(accidentsContext);
+			this.bind(AccidentsContext.class).in( Singleton.class ) ;
 			
-			this.bind(AnalysisEventHandler.class).asEagerSingleton();						
-			this.addEventHandlerBinding().to(AnalysisEventHandler.class);
+			this.bind(AnalysisEventHandler.class).in( Singleton.class ) ;
+			this.addEventHandlerBinding().to(AnalysisEventHandler.class) ;
 			
 			this.addControlerListenerBinding().to(AccidentControlerListener.class);
 		}

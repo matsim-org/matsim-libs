@@ -19,10 +19,9 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import org.matsim.contrib.accidents.computation.AccidentCostComputationBVWP;
 import org.matsim.contrib.accidents.runExample.PlanfreeLinkIDs;
 import org.matsim.contrib.accidents.runExample.TunnelLinkIDs;
-import org.matsim.contrib.accidents.data.AccidentLinkInfo;;
+;
 
 /**
  * @author ikaddoura, mmayobre
@@ -64,9 +63,9 @@ public class ComputationTest {
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new AccidentsModule(scenario));
+		controler.addOverridingModule(new AccidentsModule() );
 		
-		AccidentsConfigGroup accidentSettings = (AccidentsConfigGroup) scenario.getConfig().getModules().get(AccidentsConfigGroup.GROUP_NAME);
+		AccidentsConfigGroup accidentSettings = ConfigUtils.addOrGetModule( scenario.getConfig(), AccidentsConfigGroup.class ) ;
 		accidentSettings.setTunnelLinksArray(TunnelLinkIDs.getTunnelLinkIDs());
 		String tunnelLinkProbe = "267428802_21508808";
 		boolean linkIsTunnel;

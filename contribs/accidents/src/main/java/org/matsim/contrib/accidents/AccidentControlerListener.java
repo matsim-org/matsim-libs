@@ -35,11 +35,6 @@ import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.accidents.computation.AccidentCostComputationBVWP;
-import org.matsim.contrib.accidents.computation.AccidentsComputationMethod;
-import org.matsim.contrib.accidents.data.AccidentLinkInfo;
-import org.matsim.contrib.accidents.data.TimeBinInfo;
-import org.matsim.contrib.accidents.handlers.AnalysisEventHandler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -58,7 +53,7 @@ import com.google.inject.Inject;
 * @author ikaddoura, mmayobre
 */
 
-public class AccidentControlerListener implements StartupListener, IterationEndsListener, AfterMobsimListener {
+ class AccidentControlerListener implements StartupListener, IterationEndsListener, AfterMobsimListener {
 	private static final Logger log = Logger.getLogger(AccidentControlerListener.class);
 
 	@Inject
@@ -69,6 +64,8 @@ public class AccidentControlerListener implements StartupListener, IterationEnds
 	
 	@Inject
 	private AccidentsContext accidentsContext;
+
+	@Inject AccidentControlerListener(){}
 		
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {		
@@ -102,7 +99,7 @@ public class AccidentControlerListener implements StartupListener, IterationEnds
 				double accidentCosts = 0.;
 				double costRate = 0.;
 								
-				if (linkInfo.getComputationMethod().toString().equals(AccidentsComputationMethod.BVWP.toString())) {
+				if (linkInfo.getComputationMethod().toString().equals( AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString() )) {
 					accidentCosts = AccidentCostComputationBVWP.computeAccidentCosts(demand, link, linkInfo.getRoadTypeBVWP());
 				} else {
 					throw new RuntimeException("Unknown accident computation approach or value not set. Aborting...");
@@ -191,9 +188,9 @@ public class AccidentControlerListener implements StartupListener, IterationEnds
 			}
 			linkCounter++;			
 			
-			if (accidentSettings.getAccidentsComputationMethod().toString().equals(AccidentsComputationMethod.BVWP.toString())) {
+			if (accidentSettings.getAccidentsComputationMethod().toString().equals( AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString() )) {
 				
-				info.setComputationMethod(AccidentsComputationMethod.BVWP);
+				info.setComputationMethod( AccidentsConfigGroup.AccidentsComputationMethod.BVWP );
 				// BVWP	
 				
 				ArrayList<Integer> list = new ArrayList<>();

@@ -21,25 +21,21 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class RunTestEquil {
-	
-	private static String configFile;
-	private static String outputDirectory;
-    private static String runId;
-    
-    @Rule public MatsimTestUtils utils = new MatsimTestUtils();
+
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
     
     @Test 
     public void test1() 
     {
-    configFile = utils.getPackageInputDirectory() + "/equil_scenario/config.xml";
-    outputDirectory = utils.getOutputDirectory();
-    runId = "run1";
+	    String configFile = utils.getPackageInputDirectory() + "/equil_scenario/config.xml";
+	    String outputDirectory = utils.getOutputDirectory();
+	    String runId = "run1";
     
-    Config config = ConfigUtils.loadConfig(configFile);
+    Config config = ConfigUtils.loadConfig( configFile );
     config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
     
-    config.controler().setOutputDirectory(outputDirectory);
-    config.controler().setRunId(runId);
+    config.controler().setOutputDirectory( outputDirectory );
+    config.controler().setRunId( runId );
     //Is better to take the initial config where just one of the routes is selected or better take the plans of the tenth iteration?
     config.controler().setLastIteration(0);
     
@@ -49,11 +45,11 @@ public class RunTestEquil {
     
     final Scenario scenario = ScenarioUtils.loadScenario(config);
     Controler controler = new Controler (scenario);
-    controler.addOverridingModule(new AccidentsModule(scenario));
-    //how can the parameters of the accidents Module be changed? normally I would write config.modulename().set....
-    //TODO: changing through programming the free speed and number o lanes, is there an elegant way to do this we normally changed the input with other programs in Matsim.
-    //wich implications has the type of the config file? the test does not work with the output configs
-    //Network network = scenario.getNetwork(); 
+    controler.addOverridingModule(new AccidentsModule() );
+    
+    //TODO: changing through programming the free speed and number o lanes of some links so they would not be allways categorized with tehe same roadtype.
+    //wich implications has the type of the config file?
+    
     controler.run();
 
     //the total costs of link 1 differ to the one which I manually calculate

@@ -113,7 +113,7 @@ public class RunAccidents {
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		
-		controler.addOverridingModule(new AccidentsModule(scenario));
+		controler.addOverridingModule(new AccidentsModule() );
 		
 		log.info("Loading scenario... Done.");
 		

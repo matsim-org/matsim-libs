@@ -1,12 +1,5 @@
 package org.matsim.contrib.accidents.runExample;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.geotools.data.DataStore;
 import org.geotools.data.simple.SimpleFeatureIterator;
@@ -16,7 +9,6 @@ import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.accidents.AccidentControlerListener;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -26,13 +18,20 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
 * @author mmayobre
 */
 
 public class BerlinLinkIDs_method {
-	private static final Logger log = Logger.getLogger(AccidentControlerListener.class);
+	private static final Logger log = Logger.getLogger(BerlinLinkIDs_method.class);
 	
 	String configFile = "./data/input/be_251/config.xml";
 	Config config = ConfigUtils.loadConfig(configFile);
