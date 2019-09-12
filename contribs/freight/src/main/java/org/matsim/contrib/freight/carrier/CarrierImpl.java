@@ -14,7 +14,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * @author sschroeder, mzilske
  *
  */
-final class CarrierImpl implements Carrier {
+public final class CarrierImpl implements Carrier {
 
 	private final Id<Carrier> id;
 

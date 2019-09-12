@@ -373,7 +373,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 
 		private void retrieveTypeSpecificCosts(Collection<VehicleType> vehicleTypes ) {
 			for( VehicleType type : vehicleTypes){
-				typeSpecificCosts.put(type.getId().toString(), new VehicleTypeVarCosts(type.getCostInformation().getCostsPerMeter(), type.getCostInformation().getCostsPerSecond()));
+				typeSpecificCosts.put(type.getId().toString(), new VehicleTypeVarCosts(type.getCostInformation().getCostsPerMeter(), type.getCostInformation().getCostsPerSecond()) );
 			}
 			typeSpecificCosts.put(defaultTypeId,new VehicleTypeVarCosts(1.,0.));
 		}

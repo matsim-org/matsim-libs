@@ -3,14 +3,11 @@ package org.matsim.contrib.freight.carrier;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.utils.objectattributes.AttributeConverter;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -20,7 +17,7 @@ import java.util.Stack;
  *
  */
 public class CarrierPlanXmlReader implements MatsimReader {
-	private static final Logger log = Logger.getLogger(CarrierPlanXmlReader.class);
+	private static final Logger log = Logger.getLogger( CarrierPlanXmlReader.class );
 	private static final String MSG="With early carrier plans file formats, there will be an expected exception in the following." ;
 
 	private static final String CARRIERS = "carriers";

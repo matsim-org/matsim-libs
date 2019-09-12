@@ -92,7 +92,7 @@ public class MatsimVehicleWriterTest extends MatsimTestCase {
 		assertEquals(0.23, VehicleUtils.getFuelConsumption(vehTypeDefaultCar), EPSILON);
 		assertEquals(23.23, VehicleUtils.getAccessTime(vehTypeDefaultCar), EPSILON);
 		assertEquals(42.42, VehicleUtils.getEgressTime(vehTypeDefaultCar), EPSILON);
-		assertEquals( VehicleUtils.DoorOperationMode.parallel, VehicleUtils.getDoorOperationMode(vehTypeDefaultCar ) );
+		assertEquals( VehicleType.DoorOperationMode.parallel, VehicleUtils.getDoorOperationMode(vehTypeDefaultCar ) );
 		assertEquals(2.0, vehTypeDefaultCar.getPcuEquivalents());
 
 		vehTypeDefaultCar = vehicleTypes.get(Id.create("defaultValue>Car", VehicleType.class));
@@ -101,11 +101,11 @@ public class MatsimVehicleWriterTest extends MatsimTestCase {
 		assertEquals(1.0, vehTypeDefaultCar.getWidth(), EPSILON);
 		assertTrue(Double.isInfinite(vehTypeDefaultCar.getMaximumVelocity()));
 		assertNotNull(vehTypeDefaultCar.getCapacity());
-		assertNotNull(vehTypeDefaultCar.getCostInformation());
-		assertNull(vehTypeDefaultCar.getCostInformation().getFixedCosts());
-		assertNull(vehTypeDefaultCar.getCostInformation().getCostsPerMeter());
-		assertNull(vehTypeDefaultCar.getCostInformation().getCostsPerSecond());
-		assertEquals( VehicleUtils.DoorOperationMode.serial, VehicleUtils.getDoorOperationMode(vehTypeDefaultCar ) );
+		assertNotNull(vehTypeDefaultCar.getCostInformation() );
+		assertNull(vehTypeDefaultCar.getCostInformation().getFixedCosts() );
+		assertNull(vehTypeDefaultCar.getCostInformation().getCostsPerMeter() );
+		assertNull(vehTypeDefaultCar.getCostInformation().getCostsPerSecond() );
+		assertEquals( VehicleType.DoorOperationMode.serial, VehicleUtils.getDoorOperationMode(vehTypeDefaultCar ) );
 		assertEquals(1.0, vehTypeDefaultCar.getPcuEquivalents());
 
 		assertNotNull(vehicles);
