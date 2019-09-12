@@ -17,4 +17,5 @@ build_script:
 # test_script:
 #   - mvn test
 cache:
-  - C:\Users\appveyor\.m2 -> pom.xml
+  - C:\Users\appveyor\.m2
+#  - C:\Users\appveyor\.m2 -> pom.xml # uncomment if the cache should be invalidated if pom.xml changes
