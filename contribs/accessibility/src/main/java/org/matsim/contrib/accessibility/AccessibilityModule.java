@@ -80,7 +80,10 @@ public final class AccessibilityModule extends AbstractModule {
 			@Inject private Network network ;
 			@Inject private Scenario scenario;
 
-			@Inject (optional = true) PtMatrix ptMatrix = null; // Downstream code knows how to handle a null PtMatrix
+//			@Inject (optional = true) PtMatrix ptMatrix = null; // Downstream code knows how to handle a null PtMatrix
+			// not consistent with guice-grapher, but also a result of garbled design: There should rather be a routing-mode that uses PtMatrix.
+			// Commenting it out for the time being.  kai, sep'19
+
 			@Inject private Map<String,TravelDisutilityFactory> travelDisutilityFactories ;
 			@Inject private Map<String,TravelTime> travelTimes ;
 			
@@ -172,9 +175,11 @@ public final class AccessibilityModule extends AbstractModule {
 						calculator = new ConstantSpeedAccessibilityExpContributionCalculator(mode.name(), scenario);
 						break;
 					case matrixBasedPt:
-						calculator = new LeastCostPathCalculatorAccessibilityContributionCalculator(
-								config.planCalcScore(),	ptMatrix.asPathCalculator(config.planCalcScore()), scenario);
-						break;
+						throw new RuntimeException("currently not supported because implementation not consistent with guice grapher.  kai, " +
+											     "sep'19") ;
+//						calculator = new LeastCostPathCalculatorAccessibilityContributionCalculator(
+//								config.planCalcScore(),	ptMatrix.asPathCalculator(config.planCalcScore()), scenario);
+//						break;
 					case pt:
 						calculator = new SwissRailRaptorAccessibilityContributionCalculator(mode.name(), config.planCalcScore(), scenario);
 						break;

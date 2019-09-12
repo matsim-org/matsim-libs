@@ -121,7 +121,7 @@ public class PersonalizableDisutilityIntegrationTest {
 	@Test
 	public void testPersonAvailableForDisutility_FastAStarLandmarks() {
 		Fixture f = new Fixture();
-		LeastCostPathCalculatorFactory routerFactory = new FastAStarLandmarksFactory();
+		LeastCostPathCalculatorFactory routerFactory = new FastAStarLandmarksFactory(2);
 		LeastCostPathCalculator router = routerFactory.createPathCalculator(f.network, f.costFunction, new FreeSpeedTravelTime());
 		router.calcLeastCostPath(
 				f.network.getNodes().get(Id.create("2", Node.class)), 
