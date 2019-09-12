@@ -52,7 +52,7 @@ public class CarrierVehicleTypeReaderTest {
 	@Test
 	public void test_whenReadingTypeMedium_itReadsCapacityCorrectly(){
 		VehicleType medium = types.getVehicleTypes().get(Id.create("medium", org.matsim.vehicles.VehicleType.class ) );
-		assertEquals(30., (double) medium.getCapacity().getWeightInTons(), Double.MIN_VALUE );
+		assertEquals(30., (double) medium.getCapacity().getOther(), Double.MIN_VALUE );
 	}
 	
 	@Test

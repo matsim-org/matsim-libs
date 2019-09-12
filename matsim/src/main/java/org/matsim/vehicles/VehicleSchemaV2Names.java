@@ -35,6 +35,7 @@ interface VehicleSchemaV2Names {
 	public static final String VOLUME = "volumeInCubicMeters";
 //	public static final String CUBICMETERS = "cubicMeters";
 	public static final String WEIGHT = "weightInTons";
+	public static final String OTHER = "other";
 //	public static final String TONS = "tons";
 //	public static final String UNIT = "unit";
 //	public static final String UNITS = "units";

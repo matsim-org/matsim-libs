@@ -115,6 +115,9 @@ final class VehicleWriterV2 extends MatsimXmlWriter {
 				if (vehicleCapacity.getWeightInTons() != null && !Double.isNaN(vehicleCapacity.getWeightInTons()) && !Double.isInfinite(vehicleCapacity.getWeightInTons())) {
 					atts.add(this.createTuple(VehicleSchemaV2Names.WEIGHT, vehicleCapacity.getWeightInTons()));
 				}
+				if (vehicleCapacity.getOther() != null && !Double.isNaN(vehicleCapacity.getOther()) && !Double.isInfinite(vehicleCapacity.getOther())) {
+					atts.add(this.createTuple(VehicleSchemaV2Names.OTHER, vehicleCapacity.getOther()));
+				}
 				this.writeStartTag(VehicleSchemaV2Names.CAPACITY, atts);
 				//attributes for capacity
 				this.writer.newLine();

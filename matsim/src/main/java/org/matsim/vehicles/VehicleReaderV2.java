@@ -109,6 +109,9 @@ final class VehicleReaderV2 extends MatsimXmlParser{
 						this.currentVehType.getCapacity().setVolumeInCubicMeters(Double.parseDouble(atts.getValue(VehicleSchemaV2Names.VOLUME)));
 					}
 				}
+				if (atts.getValue( VehicleSchemaV2Names.OTHER ) != null) {
+					this.currentVehType.getCapacity().setOther( Double.valueOf( atts.getValue( VehicleSchemaV2Names.OTHER ) ) );
+				}
 				this.currAttributes = this.currentVehType.getCapacity().getAttributes() ;
 				break;
 			case VehicleSchemaV2Names.COSTINFORMATION:

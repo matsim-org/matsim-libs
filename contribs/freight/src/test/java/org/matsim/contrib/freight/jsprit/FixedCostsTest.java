@@ -84,7 +84,7 @@ public class FixedCostsTest extends MatsimTestCase {
 			EngineInformation engineInformation1 = carrierVehType_A.getEngineInformation();
 			engineInformation1.setFuelType( EngineInformation.FuelType.diesel );
 			engineInformation1.setFuelConsumption( 0.015 );
-			carrierVehType_A.getCapacity().setWeightInTons( 1. );
+			carrierVehType_A.getCapacity().setOther( 1. );
 			carrierVehType_A.getCostInformation().setFixedCost( 0. ).setCostsPerMeter( 0.001 ).setCostsPerSecond( 0.0 );
 			carrierVehType_A.setMaximumVelocity( 10 );
 			vehicleTypes.getVehicleTypes().put( carrierVehType_A.getId(), carrierVehType_A );
@@ -98,7 +98,7 @@ public class FixedCostsTest extends MatsimTestCase {
 			EngineInformation engineInformation = carrierVehType_B.getEngineInformation();
 			engineInformation.setFuelType( EngineInformation.FuelType.diesel );
 			engineInformation.setFuelConsumption( 0.015 );
-			carrierVehType_B.getCapacity().setWeightInTons( 1. );
+			carrierVehType_B.getCapacity().setOther( 1. );
 			carrierVehType_B.getCostInformation().setFixedCost( 10. ).setCostsPerMeter( 0.00001 ).setCostsPerSecond( 0. ) ;
 			carrierVehType_B.setMaximumVelocity( 10. );
 			vehicleTypes.getVehicleTypes().put( carrierVehType_B.getId(), carrierVehType_B );

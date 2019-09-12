@@ -5,7 +5,7 @@
 	<vehicleType id="light">
 
 		<description>Light Vehicle</description>
-		<capacity seats="1" standingRoomInPersons="0" weightInTons="15.0">
+		<capacity seats="1" standingRoomInPersons="0" other="15.0">
 
 		</capacity>
 		<length meter="7.5"/>
@@ -27,7 +27,7 @@
 	<vehicleType id="medium">
 
 		<description>Medium Vehicle</description>
-		<capacity seats="1" standingRoomInPersons="0" weightInTons="30.0">
+		<capacity seats="1" standingRoomInPersons="0" other="30.0">
 
 		</capacity>
 		<length meter="7.5"/>
