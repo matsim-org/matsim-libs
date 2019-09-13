@@ -35,7 +35,7 @@ import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityE
 public class VehDelayAtStopHistogramEventHandler implements VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler{
 	
 	private final Logger log = Logger.getLogger(VehDelayAtStopHistogramEventHandler.class);
-	private final Level logLevel = Level.DEBUG;
+//	private final Level logLevel = Level.DEBUG;
 	
 	private int[] arrivalDelay;
 	private int[] departureDelay;
@@ -46,7 +46,7 @@ public class VehDelayAtStopHistogramEventHandler implements VehicleArrivesAtFaci
 	 * Delays <= 0s are counted in the first slot, delays >= <code>numberOfDetailedSlots</code> in the last slot.
 	 */
 	public VehDelayAtStopHistogramEventHandler(int numberOfDetailedSlots){
-		this.log.setLevel(this.logLevel);
+//		this.log.setLevel(this.logLevel);
 		this.arrivalDelay = new int[numberOfDetailedSlots + 2];
 		this.departureDelay = new int[numberOfDetailedSlots + 2];
 	}

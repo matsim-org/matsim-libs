@@ -39,7 +39,7 @@ import org.matsim.core.utils.collections.Tuple;
 public class AgentId2PtTripTravelTimeMapData {
 	
 	private final Logger log = Logger.getLogger(AgentId2PtTripTravelTimeMapData.class);
-	private final Level logLevel = Level.DEBUG;
+//	private final Level logLevel = Level.DEBUG;
 
 	private ActivityEndEvent startAct;
 	private ActivityStartEvent endAct;
@@ -47,7 +47,7 @@ public class AgentId2PtTripTravelTimeMapData {
 	LinkedList<Tuple<String, Double>> type2TravelTimeMap = new LinkedList<Tuple<String,Double>>();
 	
 	public AgentId2PtTripTravelTimeMapData(ActivityEndEvent startAct){
-		this.log.setLevel(this.logLevel);
+//		this.log.setLevel(this.logLevel);
 		this.startAct = startAct;
 	}
 

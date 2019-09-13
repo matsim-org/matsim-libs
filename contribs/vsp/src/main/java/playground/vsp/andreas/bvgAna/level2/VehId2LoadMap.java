@@ -42,13 +42,13 @@ import playground.vsp.andreas.bvgAna.level1.VehId2OccupancyHandler;
 public class VehId2LoadMap implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 
 	private final Logger log = Logger.getLogger(VehId2LoadMap.class);
-	private final Level logLevel = Level.DEBUG;
+//	private final Level logLevel = Level.DEBUG;
 	
 	private VehId2OccupancyHandler vehId2OccupancyHandler;
 	private Map<Id<Vehicle>, Vehicle> vehiclesMap;
 	
 	public VehId2LoadMap(Vehicles vehicles){
-		this.log.setLevel(this.logLevel);
+//		this.log.setLevel(this.logLevel);
 		this.vehId2OccupancyHandler = new VehId2OccupancyHandler();
 		this.vehiclesMap = vehicles.getVehicles();
 	}
