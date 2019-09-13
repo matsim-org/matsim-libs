@@ -28,7 +28,7 @@ final class PlotPlans {
 
         final Carriers carriers = new Carriers();
 //		new CarrierPlanXmlReader(carriers).read("input/usecases/chessboard/freight/singleCarrierTwentyActivities.xml");
-        new CarrierPlanXmlReader(carriers).readFile("output/ITERS/it.140/140.carrierPlans.xml");
+        new CarrierPlanXmlReader(carriers).readFile("output/ITERS/it.140/140.carrierPlans.xml" );
 
         CarrierVehicleTypes types = new CarrierVehicleTypes();
         new CarrierVehicleTypeReader(types).readFile("input/usecases/chessboard/freight/vehicleTypes.xml");

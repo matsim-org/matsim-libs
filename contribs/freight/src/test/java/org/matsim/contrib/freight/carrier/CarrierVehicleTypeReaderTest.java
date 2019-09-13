@@ -5,13 +5,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.CRCChecksum;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
-
-import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -58,9 +53,9 @@ public class CarrierVehicleTypeReaderTest {
 	@Test
 	public void test_whenReadingTypeMedium_itReadsCostInfoCorrectly(){
 		VehicleType medium = types.getVehicleTypes().get(Id.create("medium", org.matsim.vehicles.VehicleType.class ) );
-		assertEquals(50.0, medium.getCostInformation().getFixedCosts(),0.01);
-		assertEquals(0.4, medium.getCostInformation().getCostsPerMeter(),0.01);
-		assertEquals(30.0, medium.getCostInformation().getCostsPerSecond(),0.01);
+		assertEquals(50.0, medium.getCostInformation().getFixedCosts(),0.01 );
+		assertEquals(0.4, medium.getCostInformation().getCostsPerMeter(),0.01 );
+		assertEquals(30.0, medium.getCostInformation().getCostsPerSecond(),0.01 );
 	}
 	
 	@Test

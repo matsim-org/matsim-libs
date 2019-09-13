@@ -145,7 +145,7 @@ final class InitialCarrierPlanCreator {
         new MatsimNetworkReader(scenario.getNetwork()).readFile("input/usecases/chessboard/network/grid9x9_cap20.xml");
 
         Carriers carriers = new Carriers();
-        new CarrierPlanXmlReader(carriers).readFile("input/usecases/chessboard/freight/carrierPlansWithoutRoutes_10minTW.xml");
+        new CarrierPlanXmlReader(carriers).readFile("input/usecases/chessboard/freight/carrierPlansWithoutRoutes_10minTW.xml" );
 
         CarrierVehicleTypes types = new CarrierVehicleTypes();
         new CarrierVehicleTypeReader(types).readFile("input/usecases/chessboard/freight/vehicleTypes.xml");
