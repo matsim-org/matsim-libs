@@ -47,7 +47,7 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
 public class AgentId2PlannedDepartureTimeMap {
 
 	private static final Logger log = Logger.getLogger(AgentId2PlannedDepartureTimeMap.class);
-	private static final Level logLevel = Level.DEBUG;
+//	private static final Level logLevel = Level.DEBUG;
 
 	/**
 	 * Returns the planned departure time for each pt leg of a given set of agents
@@ -58,7 +58,7 @@ public class AgentId2PlannedDepartureTimeMap {
 	 */
 	public static Map<Id,List<Tuple<Id,AgentId2PlannedDepartureTimeMapData>>> getAgentId2PlannedPTDepartureTimeMap(Population pop, Set<Id<Person>> agentIds){
 
-		AgentId2PlannedDepartureTimeMap.log.setLevel(AgentId2PlannedDepartureTimeMap.logLevel);
+//		AgentId2PlannedDepartureTimeMap.log.setLevel(AgentId2PlannedDepartureTimeMap.logLevel);
 		Map<Id, List<Tuple<Id, AgentId2PlannedDepartureTimeMapData>>> agentId2PlannedDepartureMap = new TreeMap<Id, List<Tuple<Id, AgentId2PlannedDepartureTimeMapData>>>();
 
 		for (Person person : pop.getPersons().values()) {

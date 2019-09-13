@@ -41,13 +41,13 @@ import org.matsim.api.core.v01.population.Person;
 public class AgentId2DepartureDelayAtStopMap implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler{
 
 	private final Logger log = Logger.getLogger(AgentId2DepartureDelayAtStopMap.class);
-	private final Level logLevel = Level.OFF;
+//	private final Level logLevel = Level.OFF;
 
 	private final Set<Id<Person>> agentIds;
 	private TreeMap<Id<Person>, AgentId2DepartureDelayAtStopMapData> stopId2DelayAtStopMap = new TreeMap<>();
 
 	public AgentId2DepartureDelayAtStopMap(Set<Id<Person>> agentIds){
-		this.log.setLevel(this.logLevel);
+//		this.log.setLevel(this.logLevel);
 		this.agentIds = agentIds;
 	}
 

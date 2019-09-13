@@ -48,14 +48,14 @@ import org.matsim.pt.PtConstants;
 public class AgentId2PtTripTravelTimeMap implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler{
 	
 	private final Logger log = Logger.getLogger(AgentId2PtTripTravelTimeMap.class);
-	private final Level logLevel = Level.DEBUG;
+//	private final Level logLevel = Level.DEBUG;
 	
 	private Set<Id<Person>> agentIds;
 	private TreeMap<Id, ArrayList<AgentId2PtTripTravelTimeMapData>> agentId2PtTripTravelTimeMap = new TreeMap<Id, ArrayList<AgentId2PtTripTravelTimeMapData>>();
 	private TreeMap<Id, AgentId2PtTripTravelTimeMapData> tempList = new TreeMap<Id, AgentId2PtTripTravelTimeMapData>();
 	
 	public AgentId2PtTripTravelTimeMap(Set<Id<Person>> agentIds){
-		this.log.setLevel(this.logLevel);
+//		this.log.setLevel(this.logLevel);
 		this.agentIds = agentIds;
 	}
 	

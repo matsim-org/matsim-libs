@@ -50,7 +50,7 @@ import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
 public class EnterLeaveVehicle2ActivityHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, ActivityStartEventHandler, ActivityEndEventHandler{
 
 	private final Logger log = Logger.getLogger(EnterLeaveVehicle2ActivityHandler.class);
-	private final Level logLevel = Level.DEBUG;
+//	private final Level logLevel = Level.DEBUG;
 	private PtDriverIdAnalyzer ptDriverIdAnalyzer;
 	private TreeMap<Id, ActivityEndEvent> agentId2ActEndEvent = new TreeMap<Id, ActivityEndEvent>();
 	private TreeMap<Id, List<PersonLeavesVehicleEvent>> agentId2LeaveVehEvent = new TreeMap<Id, List<PersonLeavesVehicleEvent>>();
@@ -59,7 +59,7 @@ public class EnterLeaveVehicle2ActivityHandler implements PersonEntersVehicleEve
 	private HashMap<PersonLeavesVehicleEvent, ActivityStartEvent> personLeavesVehicleEvent2ActivityStartEvent = new HashMap<PersonLeavesVehicleEvent, ActivityStartEvent>();
 
 	public EnterLeaveVehicle2ActivityHandler(PtDriverIdAnalyzer ptDriverPrefixAnalyzer){
-		this.log.setLevel(this.logLevel);
+//		this.log.setLevel(this.logLevel);
 		this.ptDriverIdAnalyzer = ptDriverPrefixAnalyzer;
 	}
 
