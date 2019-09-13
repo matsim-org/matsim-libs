@@ -178,20 +178,16 @@ public final class EmissionUtils {
 	public static void setHbefaVehicleDescription( final VehicleType vehicleType, final String hbefaVehicleDescription ) {
 		// yyyy maybe this should use the vehicle information tuple (see below)?
 		// yyyy replace this by using Attributes.  kai, oct'18
-//		vt.setDescription((vt.getDescription() == null ? "" : vt.getDescription() + " ") +
-//				EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() +
-//				hbefaVehicleDescription +
-//				EmissionSpecificationMarker.END_EMISSIONS.toString());
 
-//		vehicleType.getAttributes().putAttribute( HBEFA_VEHICLE_DESCRIPTION, hbefaVehicleDescription ) ;
+		vehicleType.getAttributes().putAttribute( HBEFA_VEHICLE_DESCRIPTION, hbefaVehicleDescription ) ;
 
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> result = convertVehicleDescription2VehicleInformationTuple( hbefaVehicleDescription );;
-
-		EngineInformation engineInformation = vehicleType.getEngineInformation();;
-		VehicleUtils.setHbefaEmissionsConcept( engineInformation, result.getSecond().getHbefaEmConcept() );
-		VehicleUtils.setHbefaSizeClass( engineInformation, result.getSecond().getHbefaSizeClass() );
-		VehicleUtils.setHbefaTechnology( engineInformation, result.getSecond().getHbefaTechnology() );
-		VehicleUtils.setHbefaVehicleCategory( engineInformation, result.getFirst().name() );
+//		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> result = convertVehicleDescription2VehicleInformationTuple( hbefaVehicleDescription );;
+//
+//		EngineInformation engineInformation = vehicleType.getEngineInformation();;
+//		VehicleUtils.setHbefaEmissionsConcept( engineInformation, result.getSecond().getHbefaEmConcept() );
+//		VehicleUtils.setHbefaSizeClass( engineInformation, result.getSecond().getHbefaSizeClass() );
+//		VehicleUtils.setHbefaTechnology( engineInformation, result.getSecond().getHbefaTechnology() );
+//		VehicleUtils.setHbefaVehicleCategory( engineInformation, result.getFirst().name() );
 	}
 	
 	static Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleDescription2VehicleInformationTuple( String hbefaVehicleTypeDescription ) {
