@@ -90,18 +90,10 @@ public class NoiseOfflineCalculationWithInjection{
 		noiseContext = injector.getInstance( NoiseContext.class ) ;
 		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/", false);
 
-//		EventsManager events = EventsUtils.createEventsManager();
 		EventsManager events = injector.getInstance( EventsManager.class ) ;
 
-		timeTracker = new NoiseTimeTracker();
-//		timeTracker = injector.getInstance( NoiseTimeTracker.class ) ;
-		// (does not work)
-
-		timeTracker.setNoiseContext(noiseContext);
-		timeTracker.setEvents(events);
+		timeTracker = injector.getInstance( NoiseTimeTracker.class ) ;
 		timeTracker.setOutputFilePath(outputFilePath);
-
-		events.addHandler(timeTracker);
 
 		if (noiseContext.getNoiseParams().isUseActualSpeedLevel()) {
 			LinkSpeedCalculation linkSpeedCalculator = new LinkSpeedCalculation();
@@ -121,10 +113,6 @@ public class NoiseOfflineCalculationWithInjection{
 			events.addHandler(eventWriter);
 		}
 
-		if (noiseContext.getNoiseParams().isComputePopulationUnits()) {
-			PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
-			events.addHandler(actTracker);
-		}
 
 		log.info("Reading events file...");
 		MatsimEventsReader reader = new MatsimEventsReader(events);

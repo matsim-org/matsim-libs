@@ -256,7 +256,7 @@ public class NoiseIT {
 		double[] timeSlots = {sevenOclock, endTime, ttOclock};
 		String pathToConsideredAgentUnitsFile;
 		Map<Id<ReceiverPoint>, List<Double>> consideredAgentsPerReceiverPoint = new HashMap<Id<ReceiverPoint>, List<Double>>();
-		Map<String, Integer> idxFromKey = new ConcurrentHashMap<String, Integer>();
+		Map<String, Integer> idxFromKey = new ConcurrentHashMap<>();
 		BufferedReader br;
 		
 		for(double currentTimeSlot : timeSlots){
