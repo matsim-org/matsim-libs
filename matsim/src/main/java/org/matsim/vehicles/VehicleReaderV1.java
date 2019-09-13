@@ -74,7 +74,7 @@ final class VehicleReaderV1 extends MatsimXmlParser{
 		} else if( VehicleSchemaV1Names.EGRESSTIME.equalsIgnoreCase( name ) ){
 		    VehicleUtils.setEgressTime(this.currentVehType, Double.parseDouble( atts.getValue( VehicleSchemaV1Names.SECONDSPERPERSON ) ));
 		} else if( VehicleSchemaV1Names.DOOROPERATION.equalsIgnoreCase( name ) ){
-			VehicleUtils.setDoorOperationMode(this.currentVehType, VehicleUtils.DoorOperationMode.valueOf((atts.getValue(VehicleSchemaV1Names.MODE))));
+			VehicleUtils.setDoorOperationMode(this.currentVehType, VehicleType.DoorOperationMode.valueOf((atts.getValue(VehicleSchemaV1Names.MODE )) ) );
 		} else if( VehicleSchemaV1Names.PASSENGERCAREQUIVALENTS.equalsIgnoreCase( name ) ){
 			this.currentVehType.setPcuEquivalents( Double.parseDouble( atts.getValue( VehicleSchemaV1Names.PCE ) ) );
 		}

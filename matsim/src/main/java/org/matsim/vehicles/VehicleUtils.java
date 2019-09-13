@@ -134,18 +134,18 @@ public final class VehicleUtils {
     }
 	//******** general VehicleType attributes ************
 
-	public static DoorOperationMode getDoorOperationMode( VehicleType vehicleType ){
+	public static VehicleType.DoorOperationMode getDoorOperationMode( VehicleType vehicleType ){
 		final Object attribute = vehicleType.getAttributes().getAttribute( DOOR_OPERATION_MODE );
 		if ( attribute==null ) {
-			return DoorOperationMode.serial; // this was the default value in V1; could also return null instead.
-		} else if (attribute instanceof DoorOperationMode ){
-			return (DoorOperationMode) attribute;
+			return VehicleType.DoorOperationMode.serial; // this was the default value in V1; could also return null instead.
+		} else if (attribute instanceof VehicleType.DoorOperationMode ){
+			return (VehicleType.DoorOperationMode) attribute;
 		} else if (attribute instanceof String) {
 			String modeString = (String) attribute;
-			if ( DoorOperationMode.serial.toString().equalsIgnoreCase(modeString )) {
-				return DoorOperationMode.serial;
-			} else if ( DoorOperationMode.parallel.toString().equalsIgnoreCase(modeString )) {
-				return DoorOperationMode.parallel;
+			if ( VehicleType.DoorOperationMode.serial.toString().equalsIgnoreCase(modeString )) {
+				return VehicleType.DoorOperationMode.serial;
+			} else if ( VehicleType.DoorOperationMode.parallel.toString().equalsIgnoreCase(modeString )) {
+				return VehicleType.DoorOperationMode.parallel;
 			} else {
 				throw new IllegalArgumentException("VehicleType " + vehicleType.getId().toString() + " : Door operation mode " + modeString + "is not supported");
 			}
@@ -155,7 +155,7 @@ public final class VehicleUtils {
 		}
 	}
 
-	public static void setDoorOperationMode( VehicleType vehicleType, DoorOperationMode mode ){
+	public static void setDoorOperationMode( VehicleType vehicleType, VehicleType.DoorOperationMode mode ){
 		vehicleType.getAttributes().putAttribute( DOOR_OPERATION_MODE, mode ) ;
 	}
 
@@ -272,6 +272,4 @@ public final class VehicleUtils {
 		engineInformation.getAttributes().putAttribute( FUELCONSUMPTION,  fuelConsumption);
 	}
 
-	@Deprecated
-	public enum DoorOperationMode{ serial, parallel }
 }

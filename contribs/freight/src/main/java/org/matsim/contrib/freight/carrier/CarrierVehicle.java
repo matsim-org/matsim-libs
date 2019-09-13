@@ -119,7 +119,7 @@ public class CarrierVehicle implements Vehicle {
 	public Id<Link> getLocation() {
 		return locationId;
 	}
-
+	@Override
 	public Id<Vehicle> getId() {
 		return vehicleId;
 	}
@@ -128,7 +128,6 @@ public class CarrierVehicle implements Vehicle {
 	public String toString() {
 		return vehicleId + " stationed at " + locationId;
 	}
-
 	@Override
 	public VehicleType getType() {
 		return vehicleType;

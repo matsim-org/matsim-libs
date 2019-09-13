@@ -168,9 +168,9 @@ final class FreightScenarioCreator {
     private static VehicleType createLightType() {
 	    VehicleType typeBuilder = VehicleUtils.getFactory().createVehicleType( Id.create( "small", VehicleType.class ) );
         typeBuilder.getCapacity().setWeightInTons( 6. ) ;
-        typeBuilder.getCostInformation().setFixedCost(80.0);
-        typeBuilder.getCostInformation().setCostsPerMeter( 0.00047);
-        typeBuilder.getCostInformation().setCostsPerSecond( 0.008);
+        typeBuilder.getCostInformation().setFixedCost(80.0 );
+        typeBuilder.getCostInformation().setCostsPerMeter( 0.00047 );
+        typeBuilder.getCostInformation().setCostsPerSecond( 0.008 );
         return typeBuilder ;
     }
 

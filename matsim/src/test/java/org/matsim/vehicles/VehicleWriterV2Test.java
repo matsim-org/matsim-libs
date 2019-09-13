@@ -87,11 +87,11 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 		assertEquals(9.5, vehTypeNormalCar.getCapacity().getWeightInTons(), EPSILON);
 		assertEquals(200.0, vehTypeNormalCar.getCapacity().getOther(), EPSILON);
 
-		assertNotNull(vehTypeNormalCar.getCostInformation());
-		assertEquals(100, vehTypeNormalCar.getCostInformation().getFixedCosts(), EPSILON);
-		assertEquals(0.15, vehTypeNormalCar.getCostInformation().getCostsPerMeter(), EPSILON);
-		assertEquals(0.08, vehTypeNormalCar.getCostInformation().getCostsPerSecond(), EPSILON);
-		assertEquals(0.06, VehicleUtils.getCostsPerSecondWaiting(vehTypeNormalCar.getCostInformation()), EPSILON);
+		assertNotNull(vehTypeNormalCar.getCostInformation() );
+		assertEquals(100, vehTypeNormalCar.getCostInformation().getFixedCosts(), EPSILON );
+		assertEquals(0.15, vehTypeNormalCar.getCostInformation().getCostsPerMeter(), EPSILON );
+		assertEquals(0.08, vehTypeNormalCar.getCostInformation().getCostsPerSecond(), EPSILON );
+		assertEquals(0.06, VehicleUtils.getCostsPerSecondWaiting(vehTypeNormalCar.getCostInformation() ), EPSILON );
 
 		assertNotNull(vehTypeNormalCar.getEngineInformation());
 		EngineInformation engineInformation = vehTypeNormalCar.getEngineInformation();;
@@ -109,7 +109,7 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 		assertEquals(0.23, VehicleUtils.getFuelConsumption(vehTypeNormalCar), EPSILON);
 		assertEquals(23.23, VehicleUtils.getAccessTime(vehTypeNormalCar), EPSILON);
 		assertEquals(42.42, VehicleUtils.getEgressTime(vehTypeNormalCar), EPSILON);
-		assertEquals( VehicleUtils.DoorOperationMode.parallel, VehicleUtils.getDoorOperationMode(vehTypeNormalCar ) );
+		assertEquals( VehicleType.DoorOperationMode.parallel, VehicleUtils.getDoorOperationMode(vehTypeNormalCar ) );
 	}
 
 	@Test
@@ -120,11 +120,11 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 		assertEquals(1.0, vehTypeDefaultCar.getWidth(), EPSILON);
 		assertTrue(Double.isInfinite(vehTypeDefaultCar.getMaximumVelocity()));
 		assertNotNull(vehTypeDefaultCar.getCapacity());
-		assertNotNull(vehTypeDefaultCar.getCostInformation());
-		assertNull(vehTypeDefaultCar.getCostInformation().getFixedCosts());
-		assertNull(vehTypeDefaultCar.getCostInformation().getCostsPerMeter());
-		assertNull(vehTypeDefaultCar.getCostInformation().getCostsPerSecond());
-		assertEquals( VehicleUtils.DoorOperationMode.serial, VehicleUtils.getDoorOperationMode(vehTypeDefaultCar ) );
+		assertNotNull(vehTypeDefaultCar.getCostInformation() );
+		assertNull(vehTypeDefaultCar.getCostInformation().getFixedCosts() );
+		assertNull(vehTypeDefaultCar.getCostInformation().getCostsPerMeter() );
+		assertNull(vehTypeDefaultCar.getCostInformation().getCostsPerSecond() );
+		assertEquals( VehicleType.DoorOperationMode.serial, VehicleUtils.getDoorOperationMode(vehTypeDefaultCar ) );
 		assertEquals(1.0, vehTypeDefaultCar.getPcuEquivalents());
 		assertEquals(1.0, vehTypeDefaultCar.getFlowEfficiencyFactor());
 		assertEquals("def", vehTypeDefaultCar.getAttributes().getAttribute("Attribute1"));
@@ -140,11 +140,11 @@ public class VehicleWriterV2Test extends MatsimTestCase {
 		assertEquals(1.0, vehTypeSmallTruck.getWidth(), EPSILON);
 		assertEquals("diesel", VehicleUtils.getHbefaTechnology(vehTypeSmallTruck.getEngineInformation()));
 		assertEquals("EURO-6", VehicleUtils.getHbefaEmissionsConcept(vehTypeSmallTruck.getEngineInformation()));
-		assertEquals(100.0, vehTypeSmallTruck.getCostInformation().getFixedCosts(), EPSILON);
-		assertEquals(0.2,vehTypeSmallTruck.getCostInformation().getCostsPerMeter(), EPSILON);
-		assertEquals(0.10, vehTypeSmallTruck.getCostInformation().getCostsPerSecond(),EPSILON);
-		assertEquals(0.05, VehicleUtils.getCostsPerSecondWaiting(vehTypeSmallTruck.getCostInformation()), EPSILON);
-		assertEquals(0.15, VehicleUtils.getCostsPerSecondInService(vehTypeSmallTruck.getCostInformation()), EPSILON);
+		assertEquals(100.0, vehTypeSmallTruck.getCostInformation().getFixedCosts(), EPSILON );
+		assertEquals(0.2,vehTypeSmallTruck.getCostInformation().getCostsPerMeter(), EPSILON );
+		assertEquals(0.10, vehTypeSmallTruck.getCostInformation().getCostsPerSecond(),EPSILON );
+		assertEquals(0.05, VehicleUtils.getCostsPerSecondWaiting(vehTypeSmallTruck.getCostInformation() ), EPSILON );
+		assertEquals(0.15, VehicleUtils.getCostsPerSecondInService(vehTypeSmallTruck.getCostInformation() ), EPSILON );
 	}
 
 	@Test

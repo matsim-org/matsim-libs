@@ -21,7 +21,7 @@ public class CarrierPlanXmlReaderV2WithDtdTest extends MatsimTestCase {
 		super.setUp();
 		Carriers carriers = new Carriers();
 		String classInputDirectory = getClassInputDirectory();
-		new CarrierPlanXmlReader(carriers).readFile(classInputDirectory + "carrierPlansEquilsWithDtd.xml");
+		new CarrierPlanXmlReader(carriers).readFile(classInputDirectory + "carrierPlansEquilsWithDtd.xml" );
 		testCarrier = carriers.getCarriers().get(Id.create("testCarrier", Carrier.class));
 	}
 	
@@ -75,7 +75,7 @@ public class CarrierPlanXmlReaderV2WithDtdTest extends MatsimTestCase {
 	public void test_whenReadingCarrierWithFiniteFleet_itSetsFleetSizeCorrectly(){
 		Carriers carriers = new Carriers();
 		String classInputDirectory = getClassInputDirectory();
-		new CarrierPlanXmlReader(carriers).readFile(classInputDirectory + "carrierPlansEquilsFiniteFleetWithDtd.xml");
+		new CarrierPlanXmlReader(carriers).readFile(classInputDirectory + "carrierPlansEquilsFiniteFleetWithDtd.xml" );
 		assertEquals(FleetSize.FINITE, carriers.getCarriers().get(Id.create("testCarrier", Carrier.class)).getCarrierCapabilities().getFleetSize());
 	}
 	

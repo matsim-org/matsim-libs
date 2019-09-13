@@ -38,7 +38,7 @@ public final class VehicleType implements Attributable {
 	private double flowEfficiencyFactor = 1.0;
 	private final EngineInformation engineInformation = new EngineInformation() ;
 	private final CostInformation costInformation = new CostInformation() ;
-//	private FreightCapacity freightCapacity;
+	//	private FreightCapacity freightCapacity;
 	private String description;
 	private final VehicleCapacity capacity = new VehicleCapacity();
 	private String networkMode = TransportMode.car ;
@@ -89,14 +89,14 @@ public final class VehicleType implements Attributable {
 	 * @deprecated please use {@see VehicleUtils} instead.
 	 */
 	@Deprecated
-	public final VehicleUtils.DoorOperationMode getDoorOperationMode() {
+	public final DoorOperationMode getDoorOperationMode() {
 		return VehicleUtils.getDoorOperationMode( this ) ;
 	}
 	/**
 	 * @deprecated please use {@see VehicleUtils} instead.
 	 */
 	@Deprecated
-	public final void setDoorOperationMode( VehicleUtils.DoorOperationMode mode ) {
+	public final void setDoorOperationMode( DoorOperationMode mode ) {
 		VehicleUtils.setDoorOperationMode( this, mode ) ;
 	}
 	public final double getPcuEquivalents() {
@@ -148,12 +148,12 @@ public final class VehicleType implements Attributable {
 	public final CostInformation getCostInformation() {
 		return costInformation;
 	}
-    public final String getNetworkMode() {
-        return networkMode;
-    }
-    public final void setNetworkMode(String networkMode) {
-        this.networkMode = networkMode;
-    }
+	public final String getNetworkMode() {
+		return networkMode;
+	}
+	public final void setNetworkMode(String networkMode) {
+		this.networkMode = networkMode;
+	}
 	@Deprecated // refactoring device, please inline
 	public VehicleType setCapacityWeightInTons( int i ){
 		this.getCapacity().setWeightInTons( i ) ;
@@ -178,4 +178,7 @@ public final class VehicleType implements Attributable {
 	public VehicleType build(){
 		return this;
 	}
+
+	@Deprecated
+	public enum DoorOperationMode{ serial, parallel }
 }
