@@ -36,7 +36,7 @@ final class NoiseComputationModule extends AbstractModule {
 
 		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(this.getConfig(), NoiseConfigGroup.class);
 
-		this.bind(NoiseContext.class).in( Singleton.class ); // makes some tests fail
+		this.bind(NoiseContext.class).in( Singleton.class );
 
 		this.bind(NoiseTimeTracker.class).in(Singleton.class); // needed!
 		this.addEventHandlerBinding().to(NoiseTimeTracker.class);

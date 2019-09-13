@@ -57,8 +57,9 @@ import org.matsim.vehicles.Vehicle;
 final class NoiseContext {
 	
 	private static final Logger log = Logger.getLogger(NoiseContext.class);
-			
-	private final Scenario scenario;
+
+	@Inject
+	private Scenario scenario;
 	private final NoiseConfigGroup noiseParams;
 	private final Grid grid;
 	private final ShieldingContext shielding;
@@ -90,7 +91,7 @@ final class NoiseContext {
 	// ############################################
 
 	@Inject
-	NoiseContext(Scenario scenario) {
+	private NoiseContext(Scenario scenario) {
 		log.warn("instantiating NoiseContext") ;
 
 		this.scenario = scenario;
