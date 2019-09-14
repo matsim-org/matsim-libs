@@ -21,7 +21,7 @@ package org.matsim.contrib.noise.examples;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.noise.NoiseConfigGroup;
-import org.matsim.contrib.noise.NoiseOfflineCalculationWithInjection;
+import org.matsim.contrib.noise.NoiseOfflineCalculation;
 import org.matsim.contrib.noise.MergeNoiseCSVFile;
 import org.matsim.contrib.noise.ProcessNoiseImmissions;
 import org.matsim.core.config.Config;
@@ -56,7 +56,7 @@ public class NoiseOfflineCalculationExample {
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		NoiseOfflineCalculationWithInjection noiseCalculation = new NoiseOfflineCalculationWithInjection(scenario, outputDirectory);
+		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, outputDirectory);
 		noiseCalculation.run();
 		
 		// some processing of the output data

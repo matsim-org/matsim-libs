@@ -92,20 +92,14 @@ final class NoiseContext {
 
 	@Inject
 	private NoiseContext(Scenario scenario) {
-		log.warn("instantiating NoiseContext") ;
-
 		this.scenario = scenario;
 
-//		if ((NoiseConfigGroup) this.scenario.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME) == null) {
 		noiseParams = ConfigUtils.addOrGetModule(this.scenario.getConfig(), NoiseConfigGroup.class);
 		if (noiseParams == null) {
 			throw new RuntimeException("Could not find a noise config group. "
 					+ "Check if the custom module is loaded, e.g. 'ConfigUtils.loadConfig(configFile, new NoiseConfigGroup())'"
 					+ " Aborting...");
 		}
-		
-//		this.noiseParams = (NoiseConfigGroup) this.scenario.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
-//		this.noiseParams.checkNoiseParametersForConsistency();
 		
 		this.grid = new Grid(scenario);
 				

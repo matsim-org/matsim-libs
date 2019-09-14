@@ -41,8 +41,8 @@ import java.io.IOException;
  * @author ikaddoura
  *
  */
-public class NoiseOfflineCalculationWithInjection{
-	private static final Logger log = Logger.getLogger( NoiseOfflineCalculationWithInjection.class );
+public class NoiseOfflineCalculation{
+	private static final Logger log = Logger.getLogger( NoiseOfflineCalculation.class );
 
 	private String outputDirectory;
 	private Scenario scenario;
@@ -50,7 +50,7 @@ public class NoiseOfflineCalculationWithInjection{
 	private NoiseContext noiseContext = null;
 	private NoiseTimeTracker timeTracker = null;
 
-	public NoiseOfflineCalculationWithInjection( Scenario scenario, String analysisOutputDirectory ) {
+	public NoiseOfflineCalculation( Scenario scenario, String analysisOutputDirectory ) {
 		this.scenario = scenario;
 		this.outputDirectory = analysisOutputDirectory;
 

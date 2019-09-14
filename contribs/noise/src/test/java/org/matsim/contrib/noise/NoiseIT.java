@@ -196,7 +196,7 @@ public class NoiseIT {
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		NoiseOfflineCalculationWithInjection noiseCalculation = new NoiseOfflineCalculationWithInjection(scenario, runDirectory);
+		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, runDirectory);
 		noiseCalculation.run();	
 		
 		EventsManager events = EventsUtils.createEventsManager();
@@ -975,7 +975,7 @@ public class NoiseIT {
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(true);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		NoiseOfflineCalculationWithInjection noiseCalculation = new NoiseOfflineCalculationWithInjection(scenario, runDirectory);
+		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, runDirectory);
 		noiseCalculation.run();	
 							
 		// ############################################
@@ -1063,7 +1063,7 @@ public class NoiseIT {
 		noiseParameters.setAllowForSpeedsOutsideTheValidRange(true);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		NoiseOfflineCalculationWithInjection noiseCalculation = new NoiseOfflineCalculationWithInjection(scenario, runDirectory);
+		NoiseOfflineCalculation noiseCalculation = new NoiseOfflineCalculation(scenario, runDirectory);
 		noiseCalculation.run();		
 		
 		EventsManager events = EventsUtils.createEventsManager();
