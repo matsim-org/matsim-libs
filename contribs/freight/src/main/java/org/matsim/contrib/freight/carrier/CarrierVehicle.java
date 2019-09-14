@@ -11,7 +11,7 @@ import org.matsim.vehicles.VehicleType;
  * @author sschroeder
  *
  */
-public class CarrierVehicle {
+public class CarrierVehicle implements Vehicle {
 
 	/**
 	 * Returns a new instance of carrierVehicle.
@@ -50,8 +50,8 @@ public class CarrierVehicle {
 		
 		private Id<Link> locationId;
 		private Id<Vehicle> vehicleId;
-		private CarrierVehicleType type;
-		private Id<VehicleType> typeId;
+		private VehicleType type;
+		private Id<org.matsim.vehicles.VehicleType> typeId;
 		private double earliestStart = 0.0;
 		private double latestEnd = Integer.MAX_VALUE;
 		
@@ -61,13 +61,13 @@ public class CarrierVehicle {
 			this.vehicleId = vehicleId;
 		}
 		
-		public Builder setType(CarrierVehicleType type){
+		public Builder setType( VehicleType type ){
 			this.type=type;
 			return this;
 		}
 		
 		
-		public Builder setTypeId(Id<VehicleType> typeId){
+		public Builder setTypeId(Id<org.matsim.vehicles.VehicleType> typeId ){
 			this.typeId = typeId;
 			return this;
 		}
@@ -92,9 +92,9 @@ public class CarrierVehicle {
 
 	private final Id<Vehicle> vehicleId;
 	
-	private Id<VehicleType> typeId;
+	private Id<org.matsim.vehicles.VehicleType> typeId;
 
-	private CarrierVehicleType vehicleType;
+	private VehicleType vehicleType;
 
 	private double earliestStartTime;
 
@@ -119,8 +119,8 @@ public class CarrierVehicle {
 	public Id<Link> getLocation() {
 		return locationId;
 	}
-
-	public Id<Vehicle> getVehicleId() {
+	@Override
+	public Id<Vehicle> getId() {
 		return vehicleId;
 	}
 	
@@ -128,15 +128,14 @@ public class CarrierVehicle {
 	public String toString() {
 		return vehicleId + " stationed at " + locationId;
 	}
-
-	public CarrierVehicleType getVehicleType() {
+	@Override
+	public VehicleType getType() {
 		return vehicleType;
 	}
 
-	public void setVehicleType(CarrierVehicleType vehicleType) {
+	public void setType( VehicleType vehicleType ) {
 		this.vehicleType = vehicleType;
 	}
-
 
 	/**
 	 * Returns the earliest time a vehicle can be deployed (and thus can departure from its origin).
@@ -161,7 +160,7 @@ public class CarrierVehicle {
 	}
 
 	
-	public Id<VehicleType> getVehicleTypeId() {
+	public Id<org.matsim.vehicles.VehicleType> getVehicleTypeId() {
 		return typeId;
 	}
 

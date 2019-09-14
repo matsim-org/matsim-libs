@@ -33,7 +33,7 @@ final class RunPassengerAlongWithCarriers {
 
         Controler controler = new Controler(config);
         final Carriers carriers = new Carriers();
-        new CarrierPlanXmlReaderV2(carriers).readFile("input/usecases/chessboard/freight/carrierPlans.xml");
+        new CarrierPlanXmlReader(carriers).readFile("input/usecases/chessboard/freight/carrierPlans.xml" );
 
         CarrierVehicleTypes types = new CarrierVehicleTypes();
         new CarrierVehicleTypeReader(types).readFile("input/usecases/chessboard/freight/vehicleTypes.xml");

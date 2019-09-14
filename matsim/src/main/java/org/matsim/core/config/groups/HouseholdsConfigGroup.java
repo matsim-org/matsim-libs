@@ -35,9 +35,16 @@ public final class HouseholdsConfigGroup extends ReflectiveConfigGroup {
 
 	private static final String INPUT_FILE= "inputFile";
 	private static final String INPUT_HOUSEHOLD_ATTRIBUTES_FILE = "inputHouseholdAttributesFile";
+	private static final String INSISTING_ON_USING_DEPRECATED_ATTRIBUTE_FILE = "insistingOnUsingDeprecatedHouseholdsAttributeFile" ;
+
+	public static final String HOUSEHOLD_ATTRIBUTES_DEPRECATION_MESSAGE = "using the separate households attribute file is deprecated.  Add the information directly into each household, using " +
+			"the Attributable feature.  If you insist on continuing to use the separate household attribute file, set " +
+			"insistingOnUsingDeprecatedFacilityAttributeFile to true.  The file will then be read, but the values " +
+			"will be entered into each facility using Attributable, and written as such to output_facilities.";
 
 	private String inputFile = null;
 	private String inputHouseholdAttributesFile = null;
+	private boolean insistingOnUsingDeprecatedAttributeFile = false;
 
 	public HouseholdsConfigGroup() {
 		super(GROUP_NAME);
@@ -66,5 +73,14 @@ public final class HouseholdsConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( INPUT_HOUSEHOLD_ATTRIBUTES_FILE )
 	public void setInputHouseholdAttributesFile(String inputHouseholdAttributesFile) {
 		this.inputHouseholdAttributesFile = inputHouseholdAttributesFile;
+	}
+
+	@StringSetter(INSISTING_ON_USING_DEPRECATED_ATTRIBUTE_FILE)
+	public final void setInsistingOnUsingDeprecatedHouseholdsAttributeFile( boolean val ) {
+		this.insistingOnUsingDeprecatedAttributeFile = val ;
+	}
+	@StringGetter(INSISTING_ON_USING_DEPRECATED_ATTRIBUTE_FILE)
+	public final boolean isInsistingOnUsingDeprecatedHouseholdsAttributeFile() {
+		return insistingOnUsingDeprecatedAttributeFile;
 	}
 }

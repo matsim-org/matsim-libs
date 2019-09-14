@@ -29,7 +29,7 @@ import org.matsim.examples.ExamplesUtils;
 public class RunMultiModeTaxiExampleTestIT {
 	@Test
 	public void testRun() {
-		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "multi_mode_one_taxi_config.xml");
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "multi_mode_one_taxi_config.xml");
 		RunMultiModeTaxiExample.run(configUrl, false, 1);
 	}
 }

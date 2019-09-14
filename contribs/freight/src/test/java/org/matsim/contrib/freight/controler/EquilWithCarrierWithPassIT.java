@@ -43,6 +43,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 public class EquilWithCarrierWithPassIT {
 
@@ -80,7 +81,7 @@ public class EquilWithCarrierWithPassIT {
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 		{
 			Carriers carriers = new Carriers();
-			new CarrierPlanXmlReaderV2( carriers ).readFile( testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
+			new CarrierPlanXmlReader( carriers ).readFile( testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
 			scenario.addScenarioElement( FreightUtils.CARRIERS, carriers );
 
 			final String idString = "foo";
@@ -93,9 +94,9 @@ public class EquilWithCarrierWithPassIT {
 
 	static void addDummyVehicleType( Carriers carriers, String idString ){
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes() ;
-		Id<VehicleType> id = Id.create( idString, VehicleType.class ) ;
-		CarrierVehicleType.Builder builder = CarrierVehicleType.Builder.newInstance( id );
-		CarrierVehicleType result = builder.build();
+		Id<org.matsim.vehicles.VehicleType> id = Id.create( idString, org.matsim.vehicles.VehicleType.class ) ;
+		VehicleType builder = VehicleUtils.getFactory().createVehicleType( id );
+		VehicleType result = builder.build();
 		carrierVehicleTypes.getVehicleTypes().put( result.getId(), result ) ;
 		new CarrierVehicleTypeLoader( carriers ).loadVehicleTypes( carrierVehicleTypes );
 	}

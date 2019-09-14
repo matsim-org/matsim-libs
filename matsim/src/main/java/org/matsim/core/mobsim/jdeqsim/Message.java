@@ -28,7 +28,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
  */
 public abstract class Message implements Comparable<Message> {
 
-	protected static EventsManager eventsManager;
+	static EventsManager eventsManager;
 	// yyyy we have bad experiences with static non-final stuff. kai, feb'19
 
 	public static void setEventsManager(EventsManager eventsManager) {

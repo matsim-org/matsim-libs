@@ -7,7 +7,7 @@ import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolutio
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlReader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
@@ -27,8 +27,8 @@ final class PlotPlans {
 
 
         final Carriers carriers = new Carriers();
-//		new CarrierPlanXmlReaderV2(carriers).read("input/usecases/chessboard/freight/singleCarrierTwentyActivities.xml");
-        new CarrierPlanXmlReaderV2(carriers).readFile("output/ITERS/it.140/140.carrierPlans.xml");
+//		new CarrierPlanXmlReader(carriers).read("input/usecases/chessboard/freight/singleCarrierTwentyActivities.xml");
+        new CarrierPlanXmlReader(carriers).readFile("output/ITERS/it.140/140.carrierPlans.xml" );
 
         CarrierVehicleTypes types = new CarrierVehicleTypes();
         new CarrierVehicleTypeReader(types).readFile("input/usecases/chessboard/freight/vehicleTypes.xml");

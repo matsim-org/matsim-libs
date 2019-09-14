@@ -1,15 +1,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <parent>
-    <groupId>org.matsim</groupId>
-    <artifactId>contrib</artifactId>
-    <version>12.0-SNAPSHOT</version>
-  </parent>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.matsim.contrib</groupId>
-  <artifactId>accessibility</artifactId>
-  <name>accessibility</name>
-  <build>
-  		<resources>
+	<parent>
+		<groupId>org.matsim</groupId>
+		<artifactId>contrib</artifactId>
+		<version>12.0-SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.matsim.contrib</groupId>
+	<artifactId>accessibility</artifactId>
+	<name>accessibility</name>
+	<build>
+		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
 				<excludes>
@@ -24,28 +24,28 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
-	  <plugins>
-		  <plugin>
-			  <artifactId>maven-assembly-plugin</artifactId>
-		  </plugin>
-	  </plugins>
-  </build>
-  <dependencies>
-  	<dependency>
-  		<groupId>org.matsim.contrib</groupId>
-  		<artifactId>matrixbasedptrouter</artifactId>
-  		<version>12.0-SNAPSHOT</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.matsim.contrib</groupId>
-  		<artifactId>roadpricing</artifactId>
-  		<version>12.0-SNAPSHOT</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>net.sf.trove4j</groupId>
-  		<artifactId>trove4j</artifactId>
-  		<version>3.0.3</version>
-  	</dependency>
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>matrixbasedptrouter</artifactId>
+			<version>12.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>roadpricing</artifactId>
+			<version>12.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.trove4j</groupId>
+			<artifactId>trove4j</artifactId>
+			<version>3.0.3</version>
+		</dependency>
 		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-core</artifactId>
@@ -61,6 +61,11 @@
 			<artifactId>analysis</artifactId>
 			<version>12.0-SNAPSHOT</version>
 		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.matsim.contrib</groupId>-->
+<!--			<artifactId>dvrp</artifactId>-->
+<!--			<version>12.0-SNAPSHOT</version>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math</artifactId>
@@ -68,9 +73,14 @@
 		</dependency>
 		<!-- This dependency is required to be able to push to the GeoServer -->
 		<dependency>
-  		  <groupId>org.geotools.jdbc</groupId>
-  		  <artifactId>gt-jdbc-postgis</artifactId>
-			<version>20.2</version>
- 		 </dependency>
-  </dependencies>
+			<groupId>org.geotools.jdbc</groupId>
+			<artifactId>gt-jdbc-postgis</artifactId>
+			<version>21.2</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.sbb</groupId>
+			<artifactId>matsim-sbb-extensions</artifactId>
+			<version>11.5</version>
+		</dependency>
+	</dependencies>
 </project>

@@ -20,94 +20,165 @@
 package org.matsim.vehicles;
 
 import org.matsim.api.core.v01.Id;
-
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.utils.objectattributes.attributable.Attributable;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author dgrether
  */
-public interface VehicleType {
-	
-	public enum DoorOperationMode {serial, parallel}
+public final class VehicleType implements Attributable {
+	// yy should maybe the whole type be immutable? I guess that the question is how people use this.  If they have a vehicle, get the type, and then keep
+	// a reference to the type, then replacing the type means that it will have another reference, and these users will not notice.  ???????
 
-	public void setDescription(String desc);
+	private double width = 1.0;
+	private double maxVelocity = Double.POSITIVE_INFINITY; // default: constrained only by the link speed
+	private double length = 7.5;
+	private double pcuEquivalents = 1.0;
+	private double flowEfficiencyFactor = 1.0;
+	private final EngineInformation engineInformation = new EngineInformation() ;
+	private final CostInformation costInformation = new CostInformation() ;
+	//	private FreightCapacity freightCapacity;
+	private String description;
+	private final VehicleCapacity capacity = new VehicleCapacity();
+	private String networkMode = TransportMode.car ;
+	private Id<VehicleType> id;
+	private final Attributes attributes = new Attributes();
 
-	public void setLength(double length);
-
-	public void setWidth(double width);
-
-	public void setMaximumVelocity(double meterPerSecond);
-
-	public void setEngineInformation(EngineInformation currentEngineInfo);
-
-	public void setCapacity(VehicleCapacity capacity);
-
-	public double getWidth();
-
-	public double getMaximumVelocity();
-	
-	public double getLength();
-	
-	public EngineInformation getEngineInformation();
-	
-	public String getDescription();
-	
+	public VehicleType( Id<VehicleType> typeId ) {
+		this.id = typeId;
+	}
+	public final String getDescription() {
+		return description;
+	}
+	public final VehicleCapacity getCapacity() {
+		return capacity;
+	}
+	public final Id<VehicleType> getId() {
+		return id;
+	}
 	/**
-	 * Comments:<ul>
-	 * <li> What happens with multi-vehicle trains?  I assume they need to be defined as a single vehicle?  kai, jul'11
-	 * </ul>
-	 */
-	public VehicleCapacity getCapacity();
-	
-	public Id<VehicleType> getId();
-	
-	/**
-	 * Comments:<ul>
-	 * <li> In my understanding, ``access'' time is the time to reach the public transit system (e.g. by walking).  
-	 * See, e.g., http://en.wikipedia.org/wiki/Public_Transport_Accessibility_Level .  It is thus not the same as
-	 * the time for one person to enter the vehicle.  Or is there an alternative definition somewhere? kai, jul'11
-	 * <li> Even if this is understood as the time per person to enter the vehicle, it needs to be clear that this is, at
-	 * best, the emtpy vehicle entering time, and there may be additional functions computing longer vehicle entering times 
-	 * when the vehicle is full. kai, jul'11
-	 * <li> Finally, the time needs to be understood as capacitated.  I.e. when there are enough doors so that 9 passengers
-	 * can enter the vehicle per second, then this time should be 1/9=0.111. kai, jul'11
-	 * </ul>
+	 * @deprecated please use {@see VehicleUtils} instead.
 	 */
 	@Deprecated
-	public double getAccessTime();
-	
+	public final double getAccessTime() {
+		return VehicleUtils.getAccessTime(this);
+	}
 	/**
-	 * See comments under getter.
+	 * @deprecated please use {@see VehicleUtils} instead.
 	 */
 	@Deprecated
-	public void setAccessTime(double seconds);
-	
+	public final double getEgressTime() {
+		return VehicleUtils.getEgressTime(this);
+	}
 	/**
-	 * Comments:<ul>
-	 * <li> In my understanding, ``egress'' time is either the time from the vehicle to the final destination
-	 * (e.g. http://www.worldtransitresearch.info/research/1507/ ), or 
-	 * the time that is necessary to evacuate the vehicle.  Both definitions are decidedly not the same as the 
-	 * time for one person to leave the vehicle.  kai, jul'11  
-	 * <li> Also see remarks under getAccessTime() .
-	 * </ul>
+	 * @deprecated please use {@see VehicleUtils} instead.
 	 */
 	@Deprecated
-	public double getEgressTime();
-	
+	public final void setAccessTime(double seconds) {
+		VehicleUtils.setAccessTime(this, seconds);
+	}
 	/**
-	 * See comments under getter.
+	 * @deprecated please use {@see VehicleUtils} instead.
 	 */
 	@Deprecated
-	public void setEgressTime(double seconds);
-	
-	public DoorOperationMode getDoorOperationMode();
-	
-	public void setDoorOperationMode(DoorOperationMode mode);
-	
-	public double getPcuEquivalents();
+	public final void setEgressTime(double seconds) {
+		VehicleUtils.setEgressTime(this, seconds);
+	}
+	/**
+	 * @deprecated please use {@see VehicleUtils} instead.
+	 */
+	@Deprecated
+	public final DoorOperationMode getDoorOperationMode() {
+		return VehicleUtils.getDoorOperationMode( this ) ;
+	}
+	/**
+	 * @deprecated please use {@see VehicleUtils} instead.
+	 */
+	@Deprecated
+	public final void setDoorOperationMode( DoorOperationMode mode ) {
+		VehicleUtils.setDoorOperationMode( this, mode ) ;
+	}
+	public final double getPcuEquivalents() {
+		return pcuEquivalents;
+	}
+	public final VehicleType setPcuEquivalents( double pcuEquivalents ) {
+		this.pcuEquivalents = pcuEquivalents;
+		return this;
+	}
+	public final double getFlowEfficiencyFactor() {
+		return flowEfficiencyFactor;
+	}
+	public final VehicleType setFlowEfficiencyFactor( double flowEfficiencyFactor ) {
+		this.flowEfficiencyFactor = flowEfficiencyFactor;
+		return this;
+	}
+	@Override
+	public final  Attributes getAttributes() {
+		return attributes ;
+	}
+	public final VehicleType setDescription( String desc ) {
+		this.description = desc;
+		return this;
+	}
+	public final VehicleType setLength( double length ) {
+		this.length = length;
+		return this;
+	}
+	public final VehicleType setMaximumVelocity( double meterPerSecond ) {
+		this.maxVelocity = meterPerSecond;
+		return this;
+	}
+	public final VehicleType setWidth( double width ) {
+		this.width = width;
+		return this;
+	}
+	public final double getWidth() {
+		return width;
+	}
+	public final double getMaximumVelocity() {
+		return maxVelocity;
+	}
+	public final double getLength() {
+		return length;
+	}
+	public final EngineInformation getEngineInformation() {
+		return engineInformation;
+	}
+	public final CostInformation getCostInformation() {
+		return costInformation;
+	}
+	public final String getNetworkMode() {
+		return networkMode;
+	}
+	public final void setNetworkMode(String networkMode) {
+		this.networkMode = networkMode;
+	}
+	@Deprecated // refactoring device, please inline
+	public VehicleType setCapacityWeightInTons( int i ){
+		this.getCapacity().setWeightInTons( i ) ;
+		return this ;
+	}
+	@Deprecated // refactoring device, please inline
+	public VehicleType setFixCost( double perDay ){
+		this.getCostInformation().setFixedCost( perDay ) ;
+		return this ;
+	}
+	@Deprecated // refactoring device, please inline
+	public VehicleType setCostPerDistanceUnit( double perMeter ){
+		this.getCostInformation().setCostsPerMeter( perMeter ) ;
+		return this ;
+	}
+	@Deprecated // refactoring device, please inline
+	public VehicleType setCostPerTimeUnit( double perSecond ){
+		this.getCostInformation().setCostsPerSecond( perSecond ) ;
+		return this ;
+	}
+	@Deprecated // refactoring device, please delete
+	public VehicleType build(){
+		return this;
+	}
 
-	public void setPcuEquivalents(double pcuEquivalents);
-
-    public double getFlowEfficiencyFactor();
-
-	public void setFlowEfficiencyFactor(double flowEfficiencyFactor);
+	@Deprecated
+	public enum DoorOperationMode{ serial, parallel }
 }
