@@ -82,7 +82,7 @@ public class ModalDistanceAndCountsCadytsIT {
 	 * is set to have an equal share of car and bike users. The accepted error in the test is 5%, due to stochastic fuzziness
 	 */
 	@Test
-	@Ignore
+//	@Ignore
 	public void test() {
 
 		Config config = createConfig();
