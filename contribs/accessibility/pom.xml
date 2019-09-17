@@ -30,6 +30,14 @@
 			</plugin>
 		</plugins>
 	</build>
+	
+	<repositories>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+		
 	<dependencies>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
@@ -78,9 +86,9 @@
 			<version>21.2</version>
 		</dependency>
 		<dependency>
-			<groupId>ch.sbb</groupId>
+			<groupId>com.github.vsp-gleich</groupId>
 			<artifactId>matsim-sbb-extensions</artifactId>
-			<version>11.5</version>
+			<version>11.6-vsp-2019-08-26</version>
 		</dependency>
 	</dependencies>
 </project>
