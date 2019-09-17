@@ -154,17 +154,16 @@ public final class AccessibilityModule extends AbstractModule {
 					AccessibilityContributionCalculator calculator;
 					switch(mode) {
 					case bike:
-						calculator = new ConstantSpeedAccessibilityExpContributionCalculator(mode.name(), scenario);
-//                        final TravelTime bikeTravelTime = travelTimes.get(mode.name());
-//                        Gbl.assertNotNull(bikeTravelTime);
-//                        final TravelDisutilityFactory bikeTravelDisutilityFactory = travelDisutilityFactories.get(mode.name());
-//                        calculator = new NetworkModeAccessibilityExpContributionCalculator(bikeTravelTime, bikeTravelDisutilityFactory, scenario, measuringPoints, opportunities);
+                        final TravelTime bikeTravelTime = travelTimes.get(mode.name());
+                        Gbl.assertNotNull(bikeTravelTime);
+                        final TravelDisutilityFactory bikeTravelDisutilityFactory = travelDisutilityFactories.get(mode.name());
+                        calculator = new NetworkModeAccessibilityExpContributionCalculator(mode.name(), bikeTravelTime, bikeTravelDisutilityFactory, scenario);
 						break;
 					case car: {
-						final TravelTime travelTime = travelTimes.get(mode.name());
-						Gbl.assertNotNull(travelTime);
-						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(mode.name());
-						calculator = new NetworkModeAccessibilityExpContributionCalculator(mode.name(), travelTime, travelDisutilityFactory, scenario);
+						final TravelTime carTravelTime = travelTimes.get(mode.name());
+						Gbl.assertNotNull(carTravelTime);
+						final TravelDisutilityFactory carTravelDisutilityFactory = travelDisutilityFactories.get(mode.name());
+						calculator = new NetworkModeAccessibilityExpContributionCalculator(mode.name(), carTravelTime, carTravelDisutilityFactory, scenario);
 						break; }
 					case freespeed: {
 						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(TransportMode.car);
