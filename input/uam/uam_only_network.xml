@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">
+<network>
+
+	<!-- ====================================================================== -->
+
+	<nodes>
+		<node id="HUB_LANDING_0" x="568686.2549580961" y="5812546.609416321">
+		</node>
+		<node id="HUB_LANDING_1" x="564414.5311688676" y="5780667.55214392">
+		</node>
+		<node id="HUB_LANDING_2" x="525504.240424061" y="5799269.937021481">
+		</node>
+		<node id="HUB_LANDING_3" x="528582.1846217033" y="5808749.889772218">
+		</node>
+		<node id="HUB_LANDING_4" x="542452.5402004212" y="5836851.520141924">
+		</node>
+		<node id="HUB_LANDING_5" x="550409.3124197081" y="5803301.803610637">
+		</node>
+		<node id="HUB_TAKEOFF0" x="568693.7549580961" y="5812546.609416321">
+		</node>
+		<node id="HUB_TAKEOFF1" x="564422.0311688676" y="5780667.55214392">
+		</node>
+		<node id="HUB_TAKEOFF2" x="525511.740424061" y="5799269.937021481">
+		</node>
+		<node id="HUB_TAKEOFF3" x="528589.6846217033" y="5808749.889772218">
+		</node>
+		<node id="HUB_TAKEOFF4" x="542460.0402004212" y="5836851.520141924">
+		</node>
+		<node id="HUB_TAKEOFF5" x="550416.8124197081" y="5803301.803610637">
+		</node>
+		<node id="UAM_SKY_0" x="568690.0049580961" y="5812692.859416321">
+		</node>
+		<node id="UAM_SKY_1" x="564418.2811688676" y="5780813.80214392">
+		</node>
+		<node id="UAM_SKY_2" x="525507.990424061" y="5799416.187021481">
+		</node>
+		<node id="UAM_SKY_3" x="528585.9346217033" y="5808896.139772218">
+		</node>
+		<node id="UAM_SKY_4" x="542456.2902004212" y="5836997.770141924">
+		</node>
+		<node id="UAM_SKY_5" x="550413.0624197081" y="5803448.053610637">
+		</node>
+	</nodes>
+
+	<!-- ====================================================================== -->
+
+	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75">
+		<link id="GREEN_0_1" from="UAM_SKY_0" to="UAM_SKY_1" length="32163.984776586138" freespeed="30.0"
+			  capacity="60.0" permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_0_2" from="UAM_SKY_0" to="UAM_SKY_2" length="45176.9455485597" freespeed="30.0" capacity="60.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_0_3" from="UAM_SKY_0" to="UAM_SKY_3" length="40283.3903439402" freespeed="30.0" capacity="60.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_0_4" from="UAM_SKY_0" to="UAM_SKY_4" length="35762.22134273223" freespeed="30.0" capacity="60.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_0_5" from="UAM_SKY_0" to="UAM_SKY_5" length="20482.01803866858" freespeed="30.0" capacity="60.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_1_0" from="UAM_SKY_1" to="UAM_SKY_0" length="32163.984776586138" freespeed="30.0"
+			  capacity="60.0" permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_1_2" from="UAM_SKY_1" to="UAM_SKY_2" length="43128.40652027713" freespeed="30.0" capacity="60.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_1_3" from="UAM_SKY_1" to="UAM_SKY_3" length="45525.53948879429" freespeed="30.0" capacity="60.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_1_4" from="UAM_SKY_1" to="UAM_SKY_4" length="60323.853551466775" freespeed="30.0"
+			  capacity="60.0" permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_1_5" from="UAM_SKY_1" to="UAM_SKY_5" length="26616.827227721424" freespeed="30.0"
+			  capacity="60.0" permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_2_0" from="UAM_SKY_2" to="UAM_SKY_0" length="45176.9455485597" freespeed="30.0" capacity="60.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_2_1" from="UAM_SKY_2" to="UAM_SKY_1" length="43128.40652027713" freespeed="30.0" capacity="60.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_2_3" from="UAM_SKY_2" to="UAM_SKY_3" length="9967.10813827178" freespeed="30.0" capacity="60.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_2_4" from="UAM_SKY_2" to="UAM_SKY_4" length="41226.45091622773" freespeed="30.0" capacity="60.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_2_5" from="UAM_SKY_2" to="UAM_SKY_5" length="25229.319437930157" freespeed="30.0"
+			  capacity="60.0" permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_3_0" from="UAM_SKY_3" to="UAM_SKY_0" length="40283.3903439402" freespeed="30.0" capacity="60.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_3_1" from="UAM_SKY_3" to="UAM_SKY_1" length="45525.53948879429" freespeed="30.0" capacity="60.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_3_2" from="UAM_SKY_3" to="UAM_SKY_2" length="9967.10813827178" freespeed="30.0" capacity="60.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_3_4" from="UAM_SKY_3" to="UAM_SKY_4" length="31338.289572273367" freespeed="30.0"
+			  capacity="60.0" permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_3_5" from="UAM_SKY_3" to="UAM_SKY_5" length="22496.780897151522" freespeed="30.0"
+			  capacity="60.0" permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_4_0" from="UAM_SKY_4" to="UAM_SKY_0" length="35762.22134273223" freespeed="30.0" capacity="60.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_4_1" from="UAM_SKY_4" to="UAM_SKY_1" length="60323.853551466775" freespeed="30.0"
+			  capacity="60.0" permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_4_2" from="UAM_SKY_4" to="UAM_SKY_2" length="41226.45091622773" freespeed="30.0" capacity="60.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_4_3" from="UAM_SKY_4" to="UAM_SKY_3" length="31338.289572273367" freespeed="30.0"
+			  capacity="60.0" permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_4_5" from="UAM_SKY_4" to="UAM_SKY_5" length="34480.337925828455" freespeed="30.0"
+			  capacity="60.0" permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_5_0" from="UAM_SKY_5" to="UAM_SKY_0" length="20482.01803866858" freespeed="30.0" capacity="60.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_5_1" from="UAM_SKY_5" to="UAM_SKY_1" length="26616.827227721424" freespeed="30.0"
+			  capacity="60.0" permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_5_2" from="UAM_SKY_5" to="UAM_SKY_2" length="25229.319437930157" freespeed="30.0"
+			  capacity="60.0" permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_5_3" from="UAM_SKY_5" to="UAM_SKY_3" length="22496.780897151522" freespeed="30.0"
+			  capacity="60.0" permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="GREEN_5_4" from="UAM_SKY_5" to="UAM_SKY_4" length="34480.337925828455" freespeed="30.0"
+			  capacity="60.0" permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="HUB_0" from="HUB_LANDING_0" to="HUB_TAKEOFF0" length="7.5" freespeed="0.025" capacity="60.0"
+			  permlanes="5.0" oneway="1" modes="uam">
+		</link>
+		<link id="HUB_1" from="HUB_LANDING_1" to="HUB_TAKEOFF1" length="7.5" freespeed="0.025" capacity="60.0"
+			  permlanes="5.0" oneway="1" modes="uam">
+		</link>
+		<link id="HUB_2" from="HUB_LANDING_2" to="HUB_TAKEOFF2" length="7.5" freespeed="0.025" capacity="60.0"
+			  permlanes="5.0" oneway="1" modes="uam">
+		</link>
+		<link id="HUB_3" from="HUB_LANDING_3" to="HUB_TAKEOFF3" length="7.5" freespeed="0.025" capacity="60.0"
+			  permlanes="5.0" oneway="1" modes="uam">
+		</link>
+		<link id="HUB_4" from="HUB_LANDING_4" to="HUB_TAKEOFF4" length="7.5" freespeed="0.025" capacity="60.0"
+			  permlanes="5.0" oneway="1" modes="uam">
+		</link>
+		<link id="HUB_5" from="HUB_LANDING_5" to="HUB_TAKEOFF5" length="7.5" freespeed="0.025" capacity="60.0"
+			  permlanes="5.0" oneway="1" modes="uam">
+		</link>
+		<link id="RED_LANDING_0" from="UAM_SKY_0" to="HUB_TAKEOFF0" length="150.0" freespeed="5.0" capacity="120.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="RED_LANDING_1" from="UAM_SKY_1" to="HUB_TAKEOFF1" length="150.0" freespeed="5.0" capacity="120.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="RED_LANDING_2" from="UAM_SKY_2" to="HUB_TAKEOFF2" length="150.0" freespeed="5.0" capacity="120.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="RED_LANDING_3" from="UAM_SKY_3" to="HUB_TAKEOFF3" length="150.0" freespeed="5.0" capacity="120.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="RED_LANDING_4" from="UAM_SKY_4" to="HUB_TAKEOFF4" length="150.0" freespeed="5.0" capacity="120.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="RED_LANDING_5" from="UAM_SKY_5" to="HUB_TAKEOFF5" length="150.0" freespeed="5.0" capacity="120.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="RED_TAKEOFF_0" from="HUB_LANDING_0" to="UAM_SKY_0" length="150.0" freespeed="5.0" capacity="120.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="RED_TAKEOFF_1" from="HUB_LANDING_1" to="UAM_SKY_1" length="150.0" freespeed="5.0" capacity="120.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="RED_TAKEOFF_2" from="HUB_LANDING_2" to="UAM_SKY_2" length="150.0" freespeed="5.0" capacity="120.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="RED_TAKEOFF_3" from="HUB_LANDING_3" to="UAM_SKY_3" length="150.0" freespeed="5.0" capacity="120.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="RED_TAKEOFF_4" from="HUB_LANDING_4" to="UAM_SKY_4" length="150.0" freespeed="5.0" capacity="120.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+		<link id="RED_TAKEOFF_5" from="HUB_LANDING_5" to="UAM_SKY_5" length="150.0" freespeed="5.0" capacity="120.0"
+			  permlanes="1.0" oneway="1" modes="uam">
+		</link>
+	</links>
+
+	<!-- ====================================================================== -->
+
+</network>
