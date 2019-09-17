@@ -153,23 +153,20 @@ public final class AccessibilityModule extends AbstractModule {
 				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
 					AccessibilityContributionCalculator calculator;
 					switch(mode) {
-					case bike:
-                        final TravelTime bikeTravelTime = travelTimes.get(mode.name());
-                        Gbl.assertNotNull(bikeTravelTime);
-                        final TravelDisutilityFactory bikeTravelDisutilityFactory = travelDisutilityFactories.get(mode.name());
-                        calculator = new NetworkModeAccessibilityExpContributionCalculator(mode.name(), bikeTravelTime, bikeTravelDisutilityFactory, scenario);
-						break;
+					case freespeed: {
+						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(TransportMode.car);
+						Gbl.assertNotNull(travelDisutilityFactory);
+						calculator = new NetworkModeAccessibilityExpContributionCalculator(mode.name(), new FreeSpeedTravelTime(), travelDisutilityFactory, scenario);
+						break; }
 					case car: {
 						final TravelTime carTravelTime = travelTimes.get(mode.name());
 						Gbl.assertNotNull(carTravelTime);
 						final TravelDisutilityFactory carTravelDisutilityFactory = travelDisutilityFactories.get(mode.name());
 						calculator = new NetworkModeAccessibilityExpContributionCalculator(mode.name(), carTravelTime, carTravelDisutilityFactory, scenario);
 						break; }
-					case freespeed: {
-						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(TransportMode.car);
-						Gbl.assertNotNull(travelDisutilityFactory);
-						calculator = new NetworkModeAccessibilityExpContributionCalculator(mode.name(), new FreeSpeedTravelTime(), travelDisutilityFactory, scenario);
-						break; }
+					case bike:
+                        calculator = new ConstantSpeedAccessibilityExpContributionCalculator(mode.name(), scenario);
+                        break;
 					case walk:
 						calculator = new ConstantSpeedAccessibilityExpContributionCalculator(mode.name(), scenario);
 						break;
