@@ -475,9 +475,8 @@ public class PtAlongALineTest{
 		VehiclesFactory tvf = scenario.getTransitVehicles().getFactory();
 		VehicleType busType = tvf.createVehicleType( busTypeID );
 		{
-			VehicleCapacity capacity = tvf.createVehicleCapacity();
+			VehicleCapacity capacity = busType.getCapacity() ;
 			capacity.setSeats( 100 );
-			busType.setCapacity( capacity );
 		}
 		{
 			busType.setMaximumVelocity( 100. / 3.6 );

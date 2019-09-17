@@ -108,7 +108,7 @@ public class RunFreightExample {
 
 		//create or laod the carrier(s) including assignment of vehicle types to the carrier(s)
 		Carriers carriers = new Carriers() ;
-		new CarrierPlanXmlReaderV2( carriers ).readURL( IOUtils.extendUrl(scenarioUrl, "singleCarrierFiveActivitiesWithoutRoutes.xml" ) ) ;
+		new CarrierPlanXmlReader( carriers ).readURL( IOUtils.extendUrl(scenarioUrl, "singleCarrierFiveActivitiesWithoutRoutes.xml" ) ) ;
 
 		// assign vehicle types to the carriers
 		new CarrierVehicleTypeLoader( carriers ).loadVehicleTypes( vehicleTypes ) ;

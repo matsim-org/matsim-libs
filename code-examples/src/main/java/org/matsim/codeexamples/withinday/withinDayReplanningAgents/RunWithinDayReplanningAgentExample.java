@@ -43,15 +43,13 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
 
 import javax.inject.Inject;
@@ -91,12 +89,12 @@ public class RunWithinDayReplanningAgentExample {
 
 						// add my own agent(s):
 						qsim.addAgentSource(new AgentSource() {
-							VehicleType basicVehicleType = new VehicleTypeImpl(Id.create("basicVehicleType", VehicleType.class));
+							VehicleType basicVehicleType = new VehicleType(Id.create("basicVehicleType", VehicleType.class));
 
 							@Override
 							public void insertAgentsIntoMobsim() {
 								final Id<Link> startLinkId = (Id<Link>) (sc.getNetwork().getLinks().keySet().toArray())[0];
-								final MobsimVehicle veh = new QVehicleImpl(new VehicleImpl(Id.create("testVehicle", Vehicle.class ), basicVehicleType));
+								final MobsimVehicle veh = new QVehicleImpl( VehicleUtils.createVehicle(Id.create("testVehicle", Vehicle.class ), basicVehicleType ));
 //								final MobsimVehicle veh = new QVehicle(new VehicleImpl(Id.create("testVehicle", Vehicle.class ), basicVehicleType));
 								qsim.addParkedVehicle(veh, startLinkId);
 								qsim.insertAgentIntoMobsim(new MyAgent(sc, ev, qsim, startLinkId, veh));
