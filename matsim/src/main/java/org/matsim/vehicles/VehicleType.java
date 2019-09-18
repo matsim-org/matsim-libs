@@ -30,7 +30,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 public final class VehicleType implements Attributable{
 	// deliberately final, please do not change.
 	// If something like inheritance is needed, please change this class to VehicleTypeImpl, and extract interface under previous name VehicleType.
-	// And then use delegation.
+	// And then use delegation. kai, sep'19
 
 	// yy should maybe the whole type be immutable? I guess that the question is how people use this.  If they have a vehicle, get the type, and then keep
 	// a reference to the type, then replacing the type means that it will have another reference, and these users will not notice.  ???????
@@ -115,7 +115,7 @@ public final class VehicleType implements Attributable{
 		this.networkMode = networkMode;
 	}
 
-	// the following are attributes that did not seem universal enough and thus were relegated to from-form Attributes for the time being.  kai/kai, sep'19
+	// the following are attributes that did not seem universal enough and thus were relegated to free-form Attributes for the time being.  kai/kai, sep'19
 	/**
 	 * @deprecated please use {@see VehicleUtils} instead.
 	 */
@@ -157,35 +157,6 @@ public final class VehicleType implements Attributable{
 	@Deprecated
 	public final void setDoorOperationMode( DoorOperationMode mode ) {
 		VehicleUtils.setDoorOperationMode( this, mode ) ;
-	}
-
-	@Deprecated // refactoring device, please inline
-	public VehicleType setCapacityWeightInTons( int i ){
-		this.getCapacity().setWeightInTons( i ) ;
-		return this ;
-	}
-	@Deprecated // refactoring device, please inline
-	public VehicleType setFixCost( double perDay ){
-		this.getCostInformation().setFixedCost( perDay ) ;
-		return this ;
-	}
-	@Deprecated // refactoring device, please inline
-	public VehicleType setCostPerDistanceUnit( double perMeter ){
-		this.getCostInformation().setCostsPerMeter( perMeter ) ;
-		return this ;
-	}
-	@Deprecated // refactoring device, please inline
-	public VehicleType setCostPerTimeUnit( double perSecond ){
-		this.getCostInformation().setCostsPerSecond( perSecond ) ;
-		return this ;
-	}
-	@Deprecated // refactoring device, please inline
-	public CostInformation getVehicleCostInformation() {
-		return this.getCostInformation() ;
-	}
-	@Deprecated // refactoring device, please inline
-	public int getCarrierVehicleCapacity() {
-		return this.getCapacity().getOther().intValue() ;
 	}
 
 	public enum DoorOperationMode { serial, parallel }
