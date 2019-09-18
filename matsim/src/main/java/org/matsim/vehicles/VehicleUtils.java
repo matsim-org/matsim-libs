@@ -51,6 +51,9 @@ public final class VehicleUtils {
 	private static final String COST_PER_SECOND_WAITING = "costsPerSecondWaiting";
 	private static final String COST_PER_SECOND_INSERVICE = "costsPerSecondInService";
 	private static final String FUEL_TYPE = "fuelType";
+	public static VehicleType createVehicleType( Id<VehicleType> typeId ){
+		return new VehicleTypeImpl( typeId );
+	}
 
 	static {
 		DEFAULT_VEHICLE_TYPE.getCapacity().setSeats( 4 );
