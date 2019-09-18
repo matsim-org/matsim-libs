@@ -15,6 +15,13 @@ import org.matsim.vehicles.*;
  *
  */
 public class CarrierVehicleType {
+	// this is now really only a name space for the builder method.  There are two options where this could go:
+	// (1) into CarrierUtils; then it could keep its freight specific syntax
+	// (2) into VehicleUtils; then it would need to lose its freight specific syntax
+	// However, note that when moving it, the class here still needs to be available since otherwise a lot of outside code will break.
+	// kai, sep'19
+
+	private CarrierVehicleType(){} // do not instantiate
 
 	/**
 	 * A builder building the type.

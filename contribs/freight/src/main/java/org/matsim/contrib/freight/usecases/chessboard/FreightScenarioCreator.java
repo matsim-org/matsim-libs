@@ -184,11 +184,11 @@ final class FreightScenarioCreator {
 
     private static VehicleType createHeavyType() {
 	    VehicleType typeBuilder = VehicleUtils.getFactory().createVehicleType( Id.create( "heavy", VehicleType.class ) );
-        typeBuilder.setCapacityWeightInTons(25 );
-        typeBuilder.setFixCost(130.0);
-        typeBuilder.setCostPerDistanceUnit(0.00077);
-        typeBuilder.setCostPerTimeUnit(0.008);
-        return typeBuilder ;
+	    typeBuilder.getCapacity().setWeightInTons( 25 ) ;
+	    typeBuilder.getCostInformation().setFixedCost( 130.0 ) ;
+	    typeBuilder.getCostInformation().setCostsPerMeter( 0.00077 ) ;
+	    typeBuilder.getCostInformation().setCostsPerSecond( 0.008 ) ;
+	    return typeBuilder ;
     }
 
 
