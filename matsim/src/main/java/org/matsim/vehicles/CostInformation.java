@@ -21,8 +21,7 @@ package org.matsim.vehicles;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
-public class CostInformation implements Attributable{
-	// yyyyyy make final again
+public final class CostInformation implements Attributable{
 
 	// maybe at least these subtypes should be immutable?  kai, aug'19
 	// No, the decision is to rather have the typical matsim data model where this is an object-oriented database in memory, and everything is settable.
