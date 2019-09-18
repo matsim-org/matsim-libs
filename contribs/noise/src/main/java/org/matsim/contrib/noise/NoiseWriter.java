@@ -229,7 +229,7 @@ final class NoiseWriter {
 			
 			for (NoiseReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
 				
-				bw.write(rp.getId() + ";" + rp.getFinalImmission() + ";" + rp.getCoord().getX() + ";" + rp.getCoord().getY() + ";" + timeInterval );
+				bw.write(rp.getId() + ";" + rp.getCurrentImmission() + ";" + rp.getCoord().getX() + ";" + rp.getCoord().getY() + ";" + timeInterval );
 				bw.newLine();
 			}
 			

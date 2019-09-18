@@ -55,10 +55,20 @@ class NoiseReceiverPoint extends ReceiverPoint {
 	private Map<Id<Link>, Double> linkId2ShieldingCorrection = null;
 
 	// time-specific information
-	private double finalImmission = 0.;
+	private double currentImmission = 0.;
 	private double affectedAgentUnits = 0.;
 	private double damageCosts;
 	private double damageCostsPerAffectedAgentUnit;
+
+	//aggregated daily values
+	private double aggregatedImmissionTermLden = 0.;
+	private double aggregatedImmissionTerm69 = 0;
+	private double aggregatedImmissionTerm1619 = 0;
+
+	private double lden = Double.NaN;
+	private double l69 = Double.NaN;
+	private double l1619 = Double.NaN;
+
 
 	public Map<Id<Person>, List<PersonActivityInfo>> getPersonId2actInfos() {
 		if(personId2actInfos == null) {
@@ -121,12 +131,32 @@ class NoiseReceiverPoint extends ReceiverPoint {
 		return Collections.unmodifiableMap(linkId2ShieldingCorrection);
 	}
 
-	public double getFinalImmission() {
-		return finalImmission;
+	public double getCurrentImmission() {
+		return currentImmission;
 	}
 
-	public void setFinalImmission(double finalImmission) {
-		this.finalImmission = finalImmission;
+	public void setCurrentImmission(double currentImmission, double time) {
+		this.currentImmission = currentImmission;
+
+		if(time <= 24 * 3600.) {
+
+			double adjustedImmision = currentImmission;
+
+			if (time > 19 * 3600. && time <= 23 * 3600.) {
+				adjustedImmision = currentImmission + 5;
+			} else if ((time > 23 * 3600. && time <= 24 * 3600.)
+					|| (time > 0 * 3600. && time <= 7 * 3600.)) {
+				adjustedImmision = currentImmission + 10;
+			}
+
+			aggregatedImmissionTermLden += Math.pow(10, adjustedImmision / 10.);
+
+			if (time > 6 * 3600. && time <= 9 * 3600.) {
+				aggregatedImmissionTerm69 += Math.pow(10, currentImmission / 10.);
+			} else if (time > 16 * 3600. && time <= 19 * 3600.) {
+				aggregatedImmissionTerm1619 += Math.pow(10, currentImmission / 10.);
+			}
+		}
 	}
 
 	public double getDamageCosts() {
@@ -162,22 +192,40 @@ class NoiseReceiverPoint extends ReceiverPoint {
 //				+ ", linkId2IsolatedImmission=" + linkId2IsolatedImmission
 //				+ ", linkId2IsolatedImmissionPlusOneCar=" + linkId2IsolatedImmissionPlusOneCar
 //				+ ", linkId2IsolatedImmissionPlusOneHGV=" + linkId2IsolatedImmissionPlusOneHGV 
-				+ ", finalImmission=" + finalImmission 
+				+ ", finalImmission=" + currentImmission
 				+ ", affectedAgentUnits=" + affectedAgentUnits
 				+ ", damageCosts=" + damageCosts 
 				+ ", damageCostsPerAffectedAgentUnit=" + damageCostsPerAffectedAgentUnit + "]";
 	}
 
-	public void reset() {
+	void reset() {
 		resetTimeInterval();
 		this.personId2actInfos = null;
 	}
 	
-	public void resetTimeInterval() {
+	void resetTimeInterval() {
 //		linkId2IsolatedImmission.clear();
 		this.setFinalImmission(0.);
 		this.setAffectedAgentUnits(0.);
 		this.setDamageCosts(0.);
 		this.setDamageCostsPerAffectedAgentUnit(0.);
+	}
+
+	void processImmission() {
+		lden = 10 * Math.log10(1./24. * aggregatedImmissionTermLden);
+		l69 =  10 * Math.log10(1./3. * aggregatedImmissionTerm69);
+		l1619 =  10 * Math.log10(1./3. * aggregatedImmissionTerm1619);
+	}
+
+	double getLden() {
+		return lden;
+	}
+
+	double getL69() {
+		return l69;
+	}
+
+	double getL1619() {
+		return l1619;
 	}
 }
