@@ -33,6 +33,7 @@ import org.matsim.contrib.util.random.RandomUtils;
 import org.matsim.contrib.util.random.UniformRandom;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.RouteUtils;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -75,10 +76,8 @@ public class UamDemandCreator {
 
 		// leg
 		Leg leg = populationFactory.createLeg(UamNetworkCreator.UAM_MODE);
-		//		if (addEmptyRoute) {
-		//			leg.setRoute(RouteUtils.createGenericRouteImpl(startAct.getLinkId(), endAct.getLinkId()));
-		//		}
-		//		leg.setDepartureTime(startAct.getEndTime());
+		leg.setRoute(RouteUtils.createGenericRouteImpl(startAct.getLinkId(), endAct.getLinkId()));
+		leg.setDepartureTime(startAct.getEndTime());
 
 		Plan plan = populationFactory.createPlan();
 		plan.addActivity(startAct);

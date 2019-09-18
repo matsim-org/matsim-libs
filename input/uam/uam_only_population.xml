@@ -10,7 +10,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_0" end_time="00:59:59">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:59:59">
+				<route type="generic" start_link="HUB_0" end_link="HUB_1" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_1">
 			</activity>
@@ -24,7 +25,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_0" end_time="00:16:57">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:16:57">
+				<route type="generic" start_link="HUB_0" end_link="HUB_2" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_2">
 			</activity>
@@ -38,7 +40,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_0" end_time="00:13:53">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:13:53">
+				<route type="generic" start_link="HUB_0" end_link="HUB_3" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_3">
 			</activity>
@@ -52,7 +55,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_0" end_time="00:57:26">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:57:26">
+				<route type="generic" start_link="HUB_0" end_link="HUB_4" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_4">
 			</activity>
@@ -66,7 +70,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_0" end_time="00:32:24">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:32:24">
+				<route type="generic" start_link="HUB_0" end_link="HUB_5" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_5">
 			</activity>
@@ -80,7 +85,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_1" end_time="00:45:35">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:45:35">
+				<route type="generic" start_link="HUB_1" end_link="HUB_0" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_0">
 			</activity>
@@ -94,7 +100,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_1" end_time="00:18:56">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:18:56">
+				<route type="generic" start_link="HUB_1" end_link="HUB_2" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_2">
 			</activity>
@@ -108,7 +115,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_1" end_time="00:31:10">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:31:10">
+				<route type="generic" start_link="HUB_1" end_link="HUB_3" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_3">
 			</activity>
@@ -122,7 +130,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_1" end_time="00:28:31">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:28:31">
+				<route type="generic" start_link="HUB_1" end_link="HUB_4" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_4">
 			</activity>
@@ -136,7 +145,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_1" end_time="00:13:18">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:13:18">
+				<route type="generic" start_link="HUB_1" end_link="HUB_5" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_5">
 			</activity>
@@ -150,7 +160,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_2" end_time="00:01:49">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:01:49">
+				<route type="generic" start_link="HUB_2" end_link="HUB_0" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_0">
 			</activity>
@@ -164,7 +175,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_2" end_time="00:11:38">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:11:38">
+				<route type="generic" start_link="HUB_2" end_link="HUB_1" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_1">
 			</activity>
@@ -178,7 +190,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_2" end_time="00:34:47">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:34:47">
+				<route type="generic" start_link="HUB_2" end_link="HUB_3" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_3">
 			</activity>
@@ -192,7 +205,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_2" end_time="00:39:56">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:39:56">
+				<route type="generic" start_link="HUB_2" end_link="HUB_4" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_4">
 			</activity>
@@ -206,7 +220,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_2" end_time="00:33:38">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:33:38">
+				<route type="generic" start_link="HUB_2" end_link="HUB_5" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_5">
 			</activity>
@@ -220,7 +235,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_3" end_time="00:17:47">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:17:47">
+				<route type="generic" start_link="HUB_3" end_link="HUB_0" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_0">
 			</activity>
@@ -234,7 +250,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_3" end_time="00:03:46">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:03:46">
+				<route type="generic" start_link="HUB_3" end_link="HUB_1" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_1">
 			</activity>
@@ -248,7 +265,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_3" end_time="00:43:31">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:43:31">
+				<route type="generic" start_link="HUB_3" end_link="HUB_2" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_2">
 			</activity>
@@ -262,7 +280,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_3" end_time="00:42:49">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:42:49">
+				<route type="generic" start_link="HUB_3" end_link="HUB_4" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_4">
 			</activity>
@@ -276,7 +295,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_3" end_time="00:41:57">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:41:57">
+				<route type="generic" start_link="HUB_3" end_link="HUB_5" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_5">
 			</activity>
@@ -290,7 +310,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_4" end_time="00:07:45">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:07:45">
+				<route type="generic" start_link="HUB_4" end_link="HUB_0" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_0">
 			</activity>
@@ -304,7 +325,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_4" end_time="00:12:28">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:12:28">
+				<route type="generic" start_link="HUB_4" end_link="HUB_1" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_1">
 			</activity>
@@ -318,7 +340,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_4" end_time="00:04:59">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:04:59">
+				<route type="generic" start_link="HUB_4" end_link="HUB_2" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_2">
 			</activity>
@@ -332,7 +355,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_4" end_time="00:32:50">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:32:50">
+				<route type="generic" start_link="HUB_4" end_link="HUB_3" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_3">
 			</activity>
@@ -346,7 +370,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_4" end_time="00:17:31">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:17:31">
+				<route type="generic" start_link="HUB_4" end_link="HUB_5" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_5">
 			</activity>
@@ -360,7 +385,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_5" end_time="00:13:37">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:13:37">
+				<route type="generic" start_link="HUB_5" end_link="HUB_0" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_0">
 			</activity>
@@ -374,7 +400,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_5" end_time="00:08:26">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:08:26">
+				<route type="generic" start_link="HUB_5" end_link="HUB_1" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_1">
 			</activity>
@@ -388,7 +415,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_5" end_time="00:41:13">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:41:13">
+				<route type="generic" start_link="HUB_5" end_link="HUB_2" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_2">
 			</activity>
@@ -402,7 +430,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_5" end_time="00:26:26">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:26:26">
+				<route type="generic" start_link="HUB_5" end_link="HUB_3" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_3">
 			</activity>
@@ -416,7 +445,8 @@
 		<plan selected="yes">
 			<activity type="start" link="HUB_5" end_time="00:18:40">
 			</activity>
-			<leg mode="uam">
+			<leg mode="uam" dep_time="00:18:40">
+				<route type="generic" start_link="HUB_5" end_link="HUB_4" trav_time="undefined" distance="NaN"></route>
 			</leg>
 			<activity type="end" link="HUB_4">
 			</activity>
