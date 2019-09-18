@@ -37,7 +37,7 @@ public class DistributionAdapterTest {
 		
 		private Network network;
 		private DistributionCarrierScheduler scheduler;
-		private CarrierVehicleType distributionType;
+		private org.matsim.vehicles.VehicleType distributionType;
 		private CarrierVehicle distributionCarrierVehicle;
 		private CarrierCapabilities capabilities;
 		private Carrier distributionCarrier;

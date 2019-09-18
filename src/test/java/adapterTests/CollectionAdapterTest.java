@@ -36,7 +36,7 @@ public class CollectionAdapterTest {
 	
 	private Network network;
 	private CollectionCarrierScheduler scheduler;
-	private CarrierVehicleType collectionType;
+	private org.matsim.vehicles.VehicleType collectionType;
 	private CarrierVehicle collectionCarrierVehicle;
 	private Carrier collectionCarrier;
 	private CollectionCarrierAdapter collectionAdapter;

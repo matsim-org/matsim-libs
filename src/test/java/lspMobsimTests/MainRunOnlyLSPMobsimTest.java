@@ -81,7 +81,7 @@ public class MainRunOnlyLSPMobsimTest {
 		mainRunVehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		mainRunVehicleTypeBuilder.setFixCost(120);
 		mainRunVehicleTypeBuilder.setMaxVelocity(50/3.6);
-		CarrierVehicleType mainRunType = mainRunVehicleTypeBuilder.build();
+		org.matsim.vehicles.VehicleType mainRunType = mainRunVehicleTypeBuilder.build();
 				
 		
 		Id<Link> fromLinkId = Id.createLinkId("(4 2) (4 3)");

@@ -30,7 +30,7 @@ public class CollectionElementTest {
 
 	private Network network;
 	private CollectionCarrierScheduler scheduler;
-	private CarrierVehicleType collectionType;
+	private org.matsim.vehicles.VehicleType collectionType;
 	private CarrierCapabilities capabilities;
 	private Carrier carrier; 
 	private LogisticsSolutionElement collectionElement;

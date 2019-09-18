@@ -86,7 +86,7 @@ public class MultipleIterationsSecondReloadLSPMobsimTest {
 		collectionVehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		collectionVehicleTypeBuilder.setFixCost(49);
 		collectionVehicleTypeBuilder.setMaxVelocity(50/3.6);
-		CarrierVehicleType collectionType = collectionVehicleTypeBuilder.build();
+		org.matsim.vehicles.VehicleType collectionType = collectionVehicleTypeBuilder.build();
 		
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> collectionVehicleId = Id.createVehicleId("CollectionVehicle");
@@ -139,7 +139,7 @@ public class MultipleIterationsSecondReloadLSPMobsimTest {
 		mainRunVehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		mainRunVehicleTypeBuilder.setFixCost(120);
 		mainRunVehicleTypeBuilder.setMaxVelocity(50/3.6);
-		CarrierVehicleType mainRunType = mainRunVehicleTypeBuilder.build();
+		org.matsim.vehicles.VehicleType mainRunType = mainRunVehicleTypeBuilder.build();
 				
 		
 		Id<Link> fromLinkId = Id.createLinkId("(4 2) (4 3)");

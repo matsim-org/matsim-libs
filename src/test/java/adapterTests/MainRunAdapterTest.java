@@ -34,7 +34,7 @@ public class MainRunAdapterTest {
 	private Network network;
 	private Id<Carrier> carrierId;
 	private Id<VehicleType> vehicleTypeId;
-	private CarrierVehicleType mainRunType;
+	private org.matsim.vehicles.VehicleType mainRunType;
 	private Id<Link> fromLinkId;
 	private Id<Link> toLinkId;
 	private CarrierVehicle carrierVehicle;

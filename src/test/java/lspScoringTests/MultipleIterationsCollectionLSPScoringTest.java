@@ -86,7 +86,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		vehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		vehicleTypeBuilder.setFixCost(49);
 		vehicleTypeBuilder.setMaxVelocity(50 / 3.6);
-		CarrierVehicleType collectionType = vehicleTypeBuilder.build();
+		org.matsim.vehicles.VehicleType collectionType = vehicleTypeBuilder.build();
 
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Link collectionLink = network.getLinks().get(collectionLinkId);

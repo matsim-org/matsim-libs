@@ -30,7 +30,7 @@ public class DistributionElementTest {
 
 	private Network network;
 	private DistributionCarrierScheduler scheduler;
-	private CarrierVehicleType distributionType;
+	private org.matsim.vehicles.VehicleType distributionType;
 	private CarrierVehicle carrierVehicle;
 	private CarrierCapabilities capabilities;
 	private Carrier carrier;

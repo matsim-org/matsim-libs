@@ -50,7 +50,7 @@ public class MainRunElementTest {
 		vehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		vehicleTypeBuilder.setFixCost(120);
 		vehicleTypeBuilder.setMaxVelocity(50/3.6);
-		CarrierVehicleType mainRunType = vehicleTypeBuilder.build();
+		org.matsim.vehicles.VehicleType mainRunType = vehicleTypeBuilder.build();
 				
 		
 		Id<Link> fromLinkId = Id.createLinkId("(4 2) (4 3)");

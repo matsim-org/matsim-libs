@@ -76,7 +76,7 @@ public class CompleteLSPShipmentAssignerTest {
 		collectionVehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		collectionVehicleTypeBuilder.setFixCost(49);
 		collectionVehicleTypeBuilder.setMaxVelocity(50/3.6);
-		CarrierVehicleType collectionType = collectionVehicleTypeBuilder.build();
+		org.matsim.vehicles.VehicleType collectionType = collectionVehicleTypeBuilder.build();
 		
 		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> collectionVehicleId = Id.createVehicleId("CollectionVehicle");
@@ -129,7 +129,7 @@ public class CompleteLSPShipmentAssignerTest {
 		mainRunVehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		mainRunVehicleTypeBuilder.setFixCost(120);
 		mainRunVehicleTypeBuilder.setMaxVelocity(50/3.6);
-		CarrierVehicleType mainRunType = collectionVehicleTypeBuilder.build();
+		org.matsim.vehicles.VehicleType mainRunType = collectionVehicleTypeBuilder.build();
 				
 		
 		Id<Link> fromLinkId = Id.createLinkId("(4 2) (4 3)");
@@ -188,7 +188,7 @@ public class CompleteLSPShipmentAssignerTest {
 		dsitributionVehicleTypeBuilder.setCostPerTimeUnit(0.38);
 		dsitributionVehicleTypeBuilder.setFixCost(49);
 		dsitributionVehicleTypeBuilder.setMaxVelocity(50/3.6);
-		CarrierVehicleType distributionType = dsitributionVehicleTypeBuilder.build();
+		org.matsim.vehicles.VehicleType distributionType = dsitributionVehicleTypeBuilder.build();
 		
 		Id<Link> distributionLinkId = Id.createLinkId("(4 2) (4 3)");
 		Id<Vehicle> distributionVehicleId = Id.createVehicleId("CollectionVehicle");
