@@ -257,7 +257,7 @@ public class MatsimJspritFactory {
 		typeBuilder.setCostPerDistanceUnit(type.getVehicleCostParams().perDistanceUnit).setCostPerTimeUnit(type.getVehicleCostParams().perTransportTimeUnit)
 				.setFixCost(type.getVehicleCostParams().fix);
 		typeBuilder.setMaximumVelocity(type.getMaxVelocity() );
-		return typeBuilder.build();
+		return typeBuilder;
 	}
 
 	/**

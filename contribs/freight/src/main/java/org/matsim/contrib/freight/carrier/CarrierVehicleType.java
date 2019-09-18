@@ -1,9 +1,9 @@
 package org.matsim.contrib.freight.carrier;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.vehicles.EngineInformation;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.vehicles.*;
 
 /**
  * The carrier vehicle type.
@@ -14,7 +14,8 @@ import org.matsim.vehicles.VehicleUtils;
  * @author sschroeder
  *
  */
-public class CarrierVehicleType {
+public class CarrierVehicleType implements VehicleType {
+	private VehicleType delegate ;
 
 	/**
 	 * A builder building the type.
@@ -23,6 +24,7 @@ public class CarrierVehicleType {
 	 *
 	 */
 	public static class Builder {
+		VehicleType delegate ;
 		
 		/**
 		 * Returns a new instance of builder initialized with the typeId.
@@ -36,29 +38,28 @@ public class CarrierVehicleType {
 			return new Builder(typeId);
 		}
 		
-//		/**
-//		 * Returns a new instance of builder initialized with the typeId and the values the given from existing CarrierVehicleType.
-//		 *
-//		 * Can be used for create a new, modified CarrierVehicleType basing on an existing one.
-//		 * Values can be changed within the builder afterwards.
-//		 *
-//		 * @param carrierVehicleType
-//		 * @param typeId
-//		 * @return a type builder
-//		 */
-//		public static Builder newInstance(Id<VehicleType> typeId, CarrierVehicleType carrierVehicleType){
+		/**
+		 * Returns a new instance of builder initialized with the typeId and the values the given from existing CarrierVehicleType.
+		 * 
+		 * Can be used for create a new, modified CarrierVehicleType basing on an existing one. 
+		 * Values can be changed within the builder afterwards.
+		 * 
+		 * @param carrierVehicleType
+		 * @param typeId
+		 * @return a type builder
+		 */
+		public static Builder newInstance(Id<VehicleType> typeId, CarrierVehicleType carrierVehicleType){
 //			return new Builder(typeId)
 //					.setDescription(carrierVehicleType.getDescription())
 //					.setEngineInformation(carrierVehicleType.getEngineInformation())
 //					.setCapacity(carrierVehicleType.getCarrierVehicleCapacity())
 //					.setMaxVelocity(carrierVehicleType.getMaximumVelocity())
 //					.setVehicleCostInformation(carrierVehicleType.getVehicleCostInformation());
-//		}
+			throw new RuntimeException("not implemented") ;
+		}
 		
-		private VehicleType vehicleType;
-
 		private Builder(Id<VehicleType> typeId){
-			this.vehicleType = VehicleUtils.getFactory().createVehicleType( typeId ) ;
+			this.delegate = VehicleUtils.getFactory().createVehicleType( typeId ) ;
 		}
 		
 		/**
@@ -69,7 +70,7 @@ public class CarrierVehicleType {
 		 * @return
 		 */
 		public Builder setFixCost(double fix){
-			this.vehicleType.getCostInformation().setFixedCost( fix ) ;
+			this.delegate.getCostInformation().setFixedCost( fix ) ;
 			return this;
 		}
 		
@@ -82,7 +83,7 @@ public class CarrierVehicleType {
 		 * @return
 		 */
 		public Builder setCostPerDistanceUnit(double perDistanceUnit){
-			this.vehicleType.getCostInformation().setCostsPerMeter( perDistanceUnit ) ;
+			this.delegate.getCostInformation().setCostsPerMeter( perDistanceUnit ) ;
 			return this;
 		}
 		
@@ -95,7 +96,7 @@ public class CarrierVehicleType {
 		 * @return
 		 */
 		public Builder setCostPerTimeUnit(double perTimeUnit){
-			this.vehicleType.getCostInformation().setCostsPerSecond( perTimeUnit ) ;
+			this.delegate.getCostInformation().setCostsPerSecond( perTimeUnit ) ;
 			return this;
 		}
 		
@@ -106,7 +107,7 @@ public class CarrierVehicleType {
 		 * @return this builder
 		 */
 		public Builder setDescription(String description){
-			this.vehicleType.setDescription( description ) ;
+			this.delegate.setDescription( description ) ;
 			return this;
 		}
 		
@@ -119,7 +120,7 @@ public class CarrierVehicleType {
 		 * @return this builder
 		 */
 		public Builder setCapacity(int capacity){
-			this.vehicleType.getCapacity().setOther( capacity );
+			this.delegate.getCapacity().setOther( capacity );
 			return this;
 		}
 		
@@ -128,9 +129,8 @@ public class CarrierVehicleType {
 		 * 
 		 * @return {@link CarrierVehicleType}
 		 */
-		public VehicleType build(){
-//			return new CarrierVehicleType(this);
-			return this.vehicleType ;
+		public CarrierVehicleType build(){
+			return new CarrierVehicleType( delegate );
 		}
 
 		/**
@@ -142,9 +142,10 @@ public class CarrierVehicleType {
 		 * @return this builder
 		 */
 		public Builder setVehicleCostInformation(VehicleCostInformation info) {
-			this.vehicleType.getCostInformation().setCostsPerSecond( info.getPerTimeUnit() ) ;
-			this.vehicleType.getCostInformation().setCostsPerMeter( info.getPerDistanceUnit() ) ;
-			this.vehicleType.getCostInformation().setFixedCost( info.getFix() ) ;
+			Gbl.assertIf( info.getAttributes().isEmpty() );
+			delegate.getCostInformation().setFixedCost( info.getFixedCosts() ) ;
+			delegate.getCostInformation().setCostsPerSecond( info.getCostsPerSecond() ) ;
+			delegate.getCostInformation().setCostsPerSecond( info.getCostsPerSecond() ) ;
 			return this;
 		}
 
@@ -155,78 +156,114 @@ public class CarrierVehicleType {
 		 * @return this builder
 		 */
 		public Builder setEngineInformation(EngineInformation engineInfo) {
-			this.vehicleType.getEngineInformation().setFuelConsumption( engineInfo.getFuelConsumption() );
-			this.vehicleType.getEngineInformation().setFuelType( engineInfo.getFuelType() );
+			Gbl.assertIf( engineInfo.getAttributes().isEmpty() );
+			this.delegate.getEngineInformation().setFuelConsumption( engineInfo.getFuelConsumption() );
+			this.delegate.getEngineInformation().setFuelType( engineInfo.getFuelType() );
 			return this;
 		}
 
 		public Builder setMaxVelocity(double veloInMeterPerSeconds) {
-			this.vehicleType.setMaximumVelocity( veloInMeterPerSeconds ) ;
+			this.delegate.setMaximumVelocity( veloInMeterPerSeconds ) ;
 			return this;
 		}
 	}
-	
-	public static class VehicleCostInformation {
 
-		private double fix;
-		private double perDistanceUnit;
-		private double perTimeUnit;
-
-		public VehicleCostInformation(double fix, double perDistanceUnit, double perTimeUnit) {
-			super();
-			this.fix = fix;
-			this.perDistanceUnit = perDistanceUnit;
-			this.perTimeUnit = perTimeUnit;
-		}
-		
-		public double getFix() {
-			return fix;
-		}
-
-		public double getPerDistanceUnit() {
-			return perDistanceUnit;
-		}
-
-		public double getPerTimeUnit() {
-			return perTimeUnit;
-		}
+	@Deprecated // refactoring device; please inline to CostInformation
+	public static class VehicleCostInformation extends CostInformation {
 
 	}
 
-	private VehicleCostInformation vehicleCostInformation;
-
-	private int capacity;
-	
-//	private CarrierVehicleType(Builder builder){
-//		super(new VehicleTypeImpl(builder.typeId));
-//		this.vehicleCostInformation = new VehicleCostInformation(builder.fix, builder.perDistanceUnit, builder.perTimeUnit);
-//		if(builder.engineInfo != null) super.setEngineInformation(builder.engineInfo);
-//		if(builder.description != null) super.setDescription(builder.description);
-//		capacity = builder.capacity;
-//		super.setMaximumVelocity(builder.maxVeloInMeterPerSeconds);
-//	}
-
-	/**
-	 * Returns the cost values for this vehicleType.
-	 * 
-	 * If cost values are not explicitly set, the defaults are [fix=0.0][perDistanceUnit=1.0][perTimeUnit=0.0].
-	 * 
-	 * @return vehicleCostInformation
-	 */
-	public VehicleCostInformation getVehicleCostInformation() {
-		return vehicleCostInformation;
+	private CarrierVehicleType( VehicleType delegate ){
+		this.delegate = delegate ;
 	}
-	
 
-	/**
-	 * Returns the capacity of carrierVehicleType.
-	 * 
-	 * <p>This might be replaced in future by a more complex concept of capacity (considering volume and different units).
-	 * 
-	 * @return integer
-	 */
-	public int getCarrierVehicleCapacity(){
-		return capacity;
+
+	@Override public String getDescription(){
+		return delegate.getDescription();
 	}
-	
+	@Override public VehicleCapacity getCapacity(){
+		return delegate.getCapacity();
+	}
+	@Override public Id<VehicleType> getId(){
+		return delegate.getId();
+	}
+	@Override @Deprecated public double getAccessTime(){
+		return delegate.getAccessTime();
+	}
+	@Override @Deprecated public double getEgressTime(){
+		return delegate.getEgressTime();
+	}
+	@Override @Deprecated public void setAccessTime( double seconds ){
+		delegate.setAccessTime( seconds );
+	}
+	@Override @Deprecated public void setEgressTime( double seconds ){
+		delegate.setEgressTime( seconds );
+	}
+	@Override @Deprecated public DoorOperationMode getDoorOperationMode(){
+		return delegate.getDoorOperationMode();
+	}
+	@Override @Deprecated public void setDoorOperationMode( DoorOperationMode mode ){
+		delegate.setDoorOperationMode( mode );
+	}
+	@Override public double getPcuEquivalents(){
+		return delegate.getPcuEquivalents();
+	}
+	@Override public VehicleType setPcuEquivalents( double pcuEquivalents ){
+		return delegate.setPcuEquivalents( pcuEquivalents );
+	}
+	@Override public double getFlowEfficiencyFactor(){
+		return delegate.getFlowEfficiencyFactor();
+	}
+	@Override public VehicleType setFlowEfficiencyFactor( double flowEfficiencyFactor ){
+		return delegate.setFlowEfficiencyFactor( flowEfficiencyFactor );
+	}
+	@Override public Attributes getAttributes(){
+		return delegate.getAttributes();
+	}
+	@Override public VehicleType setDescription( String desc ){
+		return delegate.setDescription( desc );
+	}
+	@Override public VehicleType setLength( double length ){
+		return delegate.setLength( length );
+	}
+	@Override public VehicleType setMaximumVelocity( double meterPerSecond ){
+		return delegate.setMaximumVelocity( meterPerSecond );
+	}
+	@Override public VehicleType setWidth( double width ){
+		return delegate.setWidth( width );
+	}
+	@Override public double getWidth(){
+		return delegate.getWidth();
+	}
+	@Override public double getMaximumVelocity(){
+		return delegate.getMaximumVelocity();
+	}
+	@Override public double getLength(){
+		return delegate.getLength();
+	}
+	@Override public EngineInformation getEngineInformation(){
+		return delegate.getEngineInformation();
+	}
+	@Override public CostInformation getCostInformation(){
+		return delegate.getCostInformation();
+	}
+	@Override public String getNetworkMode(){
+		return delegate.getNetworkMode();
+	}
+	@Override public void setNetworkMode( String networkMode ){
+		delegate.setNetworkMode( networkMode );
+	}
+	@Override @Deprecated public VehicleType setCapacityWeightInTons( int i ){
+		return delegate.setCapacityWeightInTons( i );
+	}
+	@Override @Deprecated public VehicleType setFixCost( double perDay ){
+		return delegate.setFixCost( perDay );
+	}
+	@Override @Deprecated public VehicleType setCostPerDistanceUnit( double perMeter ){
+		return delegate.setCostPerDistanceUnit( perMeter );
+	}
+	@Override @Deprecated public VehicleType setCostPerTimeUnit( double perSecond ){
+		return delegate.setCostPerTimeUnit( perSecond );
+	}
+
 }

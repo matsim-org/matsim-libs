@@ -37,7 +37,6 @@ final class VehicleTypeImpl implements VehicleType{
 	private double flowEfficiencyFactor = 1.0;
 	private final EngineInformation engineInformation = new EngineInformation() ;
 	private final CostInformation costInformation = new CostInformation() ;
-	//	private FreightCapacity freightCapacity;
 	private String description;
 	private final VehicleCapacity capacity = new VehicleCapacity();
 	private String networkMode = TransportMode.car ;
@@ -56,6 +55,61 @@ final class VehicleTypeImpl implements VehicleType{
 	@Override public final Id<VehicleType> getId() {
 		return id;
 	}
+	@Override public final double getPcuEquivalents() {
+		return pcuEquivalents;
+	}
+	@Override public final VehicleTypeImpl setPcuEquivalents( double pcuEquivalents ) {
+		this.pcuEquivalents = pcuEquivalents;
+		return this;
+	}
+	@Override public final double getFlowEfficiencyFactor() {
+		return flowEfficiencyFactor;
+	}
+	@Override public final VehicleTypeImpl setFlowEfficiencyFactor( double flowEfficiencyFactor ) {
+		this.flowEfficiencyFactor = flowEfficiencyFactor;
+		return this;
+	}
+	@Override public final  Attributes getAttributes() {
+		return attributes ;
+	}
+	@Override public final VehicleTypeImpl setDescription( String desc ) {
+		this.description = desc;
+		return this;
+	}
+	@Override public final VehicleTypeImpl setLength( double length ) {
+		this.length = length;
+		return this;
+	}
+	@Override public final VehicleTypeImpl setMaximumVelocity( double meterPerSecond ) {
+		this.maxVelocity = meterPerSecond;
+		return this;
+	}
+	@Override public final VehicleTypeImpl setWidth( double width ) {
+		this.width = width;
+		return this;
+	}
+	@Override public final double getWidth() {
+		return width;
+	}
+	@Override public final double getMaximumVelocity() {
+		return maxVelocity;
+	}
+	@Override public final double getLength() {
+		return length;
+	}
+	@Override public final EngineInformation getEngineInformation() {
+		return engineInformation;
+	}
+	@Override public final CostInformation getCostInformation() {
+		return costInformation;
+	}
+	@Override public final String getNetworkMode() {
+		return networkMode;
+	}
+	@Override public final void setNetworkMode( String networkMode ) {
+		this.networkMode = networkMode;
+	}
+
 	/**
 	 * @deprecated please use {@see VehicleUtils} instead.
 	 */
@@ -98,61 +152,7 @@ final class VehicleTypeImpl implements VehicleType{
 	public final void setDoorOperationMode( DoorOperationMode mode ) {
 		VehicleUtils.setDoorOperationMode( this, mode ) ;
 	}
-	@Override public final double getPcuEquivalents() {
-		return pcuEquivalents;
-	}
-	@Override public final VehicleTypeImpl setPcuEquivalents( double pcuEquivalents ) {
-		this.pcuEquivalents = pcuEquivalents;
-		return this;
-	}
-	@Override public final double getFlowEfficiencyFactor() {
-		return flowEfficiencyFactor;
-	}
-	@Override public final VehicleTypeImpl setFlowEfficiencyFactor( double flowEfficiencyFactor ) {
-		this.flowEfficiencyFactor = flowEfficiencyFactor;
-		return this;
-	}
-	@Override
-	public final  Attributes getAttributes() {
-		return attributes ;
-	}
-	@Override public final VehicleTypeImpl setDescription( String desc ) {
-		this.description = desc;
-		return this;
-	}
-	@Override public final VehicleTypeImpl setLength( double length ) {
-		this.length = length;
-		return this;
-	}
-	@Override public final VehicleTypeImpl setMaximumVelocity( double meterPerSecond ) {
-		this.maxVelocity = meterPerSecond;
-		return this;
-	}
-	@Override public final VehicleTypeImpl setWidth( double width ) {
-		this.width = width;
-		return this;
-	}
-	@Override public final double getWidth() {
-		return width;
-	}
-	@Override public final double getMaximumVelocity() {
-		return maxVelocity;
-	}
-	@Override public final double getLength() {
-		return length;
-	}
-	@Override public final EngineInformation getEngineInformation() {
-		return engineInformation;
-	}
-	@Override public final CostInformation getCostInformation() {
-		return costInformation;
-	}
-	@Override public final String getNetworkMode() {
-		return networkMode;
-	}
-	@Override public final void setNetworkMode( String networkMode ) {
-		this.networkMode = networkMode;
-	}
+
 	@Override @Deprecated // refactoring device, please inline
 	public VehicleTypeImpl setCapacityWeightInTons( int i ){
 		this.getCapacity().setWeightInTons( i ) ;
@@ -172,10 +172,6 @@ final class VehicleTypeImpl implements VehicleType{
 	public VehicleTypeImpl setCostPerTimeUnit( double perSecond ){
 		this.getCostInformation().setCostsPerSecond( perSecond ) ;
 		return this ;
-	}
-	@Override @Deprecated // refactoring device, please delete
-	public VehicleTypeImpl build(){
-		return this;
 	}
 
 }

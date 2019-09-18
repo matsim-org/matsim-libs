@@ -32,14 +32,14 @@ public class CarrierVehicleTypeTest extends MatsimTestCase{
 		//Setting up a copy of the one above
 		VehicleType newVehicleType1 = VehicleUtils.getFactory().createVehicleType( Id.create("medium2", VehicleType.class ) );
 		VehicleUtils.copyFromTo( mediumType, newVehicleType1 );
-		VehicleType mediumType2 = newVehicleType1.build();
+		VehicleType mediumType2 = newVehicleType1;
 		types.getVehicleTypes().put(mediumType2.getId(), mediumType2);
 
 		//Setting up a smaller one based of the one above and changing all values.
 		final Id<VehicleType> smallTypeId = Id.create( "small", VehicleType.class );
 		VehicleType newVehicleType = VehicleUtils.getFactory().createVehicleType( smallTypeId );
 		VehicleUtils.copyFromTo( mediumType, newVehicleType );
-		VehicleType smallType = newVehicleType.build() ;
+		VehicleType smallType = newVehicleType ;
 		{
 			CostInformation costInformation = smallType.getCostInformation() ;
 			costInformation.setFixedCost( 25. );
