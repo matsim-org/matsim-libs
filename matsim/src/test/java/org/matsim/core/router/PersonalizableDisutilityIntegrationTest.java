@@ -146,7 +146,7 @@ public class PersonalizableDisutilityIntegrationTest {
 			this.person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 
 			Id<Vehicle> dummyId = Id.createVehicleId( "dummy" ) ;
-			VehicleType dummyType = new VehicleType( Id.create( "dummyVehicleType", VehicleType.class ) ) ;
+			VehicleType dummyType = VehicleUtils.createVehicleType( Id.create( "dummyVehicleType", VehicleType.class ) );
 			this.vehicle = VehicleUtils.createVehicle(dummyId, dummyType );
 			
 			this.costFunction = new PersonEnforcingTravelDisutility();
