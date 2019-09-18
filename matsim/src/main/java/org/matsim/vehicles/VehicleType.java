@@ -158,6 +158,10 @@ public final class VehicleType implements Attributable{
 	public final void setDoorOperationMode( DoorOperationMode mode ) {
 		VehicleUtils.setDoorOperationMode( this, mode ) ;
 	}
+	@Deprecated // refactoring device, please inline
+	public final CostInformation getVehicleCostInformation() {
+		return this.getCostInformation() ;
+	}
 
 	public enum DoorOperationMode { serial, parallel }
 
