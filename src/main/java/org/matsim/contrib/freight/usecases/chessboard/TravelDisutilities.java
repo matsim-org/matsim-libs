@@ -20,7 +20,7 @@ public final class TravelDisutilities{
 
 			@Override
 			public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
-				CarrierVehicleType type = vehicleTypes.getVehicleTypes().get(vehicle.getType().getId());
+				VehicleType type = vehicleTypes.getVehicleTypes().get(vehicle.getType().getId());
 				if(type == null) throw new IllegalStateException("vehicle "+vehicle.getId()+" has no type");
 				double tt = travelTime.getLinkTravelTime(link, time, person, vehicle);
 				return type.getVehicleCostInformation().getPerDistanceUnit()*link.getLength() + type.getVehicleCostInformation().getPerTimeUnit()*tt;
@@ -30,7 +30,7 @@ public final class TravelDisutilities{
 			public double getLinkMinimumTravelDisutility(Link link) {
 				double minDisutility = Double.MAX_VALUE;
 				double free_tt = link.getLength()/link.getFreespeed();
-				for(CarrierVehicleType type : vehicleTypes.getVehicleTypes().values()){
+				for(VehicleType type : vehicleTypes.getVehicleTypes().values()){
 					double disu = type.getVehicleCostInformation().getPerDistanceUnit()*link.getLength() + type.getVehicleCostInformation().getPerTimeUnit()*free_tt;
 					if(disu < minDisutility) minDisutility=disu;
 				}

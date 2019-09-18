@@ -29,6 +29,7 @@ import lsp.shipment.ScheduledShipmentTransport;
 import lsp.shipment.ScheduledShipmentUnload;
 import lsp.shipment.ShipmentComparator;
 import lsp.shipment.ScheduledShipmentLoad.Builder;
+import org.matsim.vehicles.VehicleType;
 
 
 public class MainRunCarrierScheduler extends ResourceScheduler {
@@ -73,7 +74,7 @@ public class MainRunCarrierScheduler extends ResourceScheduler {
 		ArrayList<ScheduledTour> scheduledTours = new ArrayList<ScheduledTour>();
 
 		for(ShipmentTuple tuple : copyOfAssignedShipments){
-			CarrierVehicleType vehicleType = carrier.getCarrierCapabilities().getVehicleTypes().iterator().next();
+			VehicleType vehicleType = carrier.getCarrierCapabilities().getVehicleTypes().iterator().next();
 			if((load + tuple.getShipment().getCapacityDemand()) <= vehicleType.getCarrierVehicleCapacity()){
 				shipmentsInCurrentTour.add(tuple);
 				load = load + tuple.getShipment().getCapacityDemand();

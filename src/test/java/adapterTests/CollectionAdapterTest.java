@@ -111,7 +111,7 @@ public class CollectionAdapterTest {
 			if(collectionCarrier.getCarrierCapabilities() == capabilities) {
 				assertTrue(capabilities.getFleetSize() == FleetSize.INFINITE);
 				assertFalse(capabilities.getVehicleTypes().isEmpty());
-				ArrayList<CarrierVehicleType> types = new ArrayList<CarrierVehicleType>(capabilities.getVehicleTypes());
+				ArrayList<VehicleType> types = new ArrayList<VehicleType>(capabilities.getVehicleTypes());
 				if(types.size() ==1) {
 					assertTrue(types.get(0) == collectionType);
 					assertTrue(collectionType.getCarrierVehicleCapacity() == 10);

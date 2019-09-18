@@ -12,7 +12,8 @@
 
 	<properties>
 		<!--<matsim.version>0.11.0-2018w49</matsim.version>-->
-		<matsim.version>0.11.0-SNAPSHOT</matsim.version>
+<!--		<matsim.version>0.11.0-SNAPSHOT</matsim.version>-->
+		<matsim.version>12.0-SNAPSHOT</matsim.version>
 	</properties>
 
 	<repositories>
@@ -62,7 +63,7 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
-			<version>0.11.0-SNAPSHOT</version>
+			<version>${matsim.version}</version>
 			<!--(not in weekly release!)-->
 		</dependency>
 		

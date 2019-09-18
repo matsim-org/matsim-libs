@@ -112,7 +112,7 @@ public class DistributionAdapterTest {
 				if(distributionCarrier.getCarrierCapabilities() == capabilities) {
 					assertTrue(capabilities.getFleetSize() == FleetSize.INFINITE);
 					assertFalse(capabilities.getVehicleTypes().isEmpty());
-					ArrayList<CarrierVehicleType> types = new ArrayList<CarrierVehicleType>(capabilities.getVehicleTypes());
+					ArrayList<VehicleType> types = new ArrayList<>( capabilities.getVehicleTypes() );
 					if(types.size() ==1) {
 						assertTrue(types.get(0) == distributionType);
 						assertTrue(distributionType.getCarrierVehicleCapacity() == 10);

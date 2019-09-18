@@ -114,7 +114,7 @@ public class MainRunAdapterTest {
 			if(carrier.getCarrierCapabilities() == capabilities) {
 				assertTrue(capabilities.getFleetSize() == FleetSize.INFINITE);
 				assertFalse(capabilities.getVehicleTypes().isEmpty());
-				ArrayList<CarrierVehicleType> types = new ArrayList<CarrierVehicleType>(capabilities.getVehicleTypes());
+				ArrayList<VehicleType> types = new ArrayList<VehicleType>(capabilities.getVehicleTypes());
 				if(types.size() ==1) {
 					assertTrue(types.get(0) == mainRunType);
 					assertTrue(mainRunType.getCarrierVehicleCapacity() == 30);
