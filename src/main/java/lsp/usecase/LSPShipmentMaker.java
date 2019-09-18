@@ -1,10 +1,7 @@
 package lsp.usecase;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-
+import lsp.shipment.LSPShipment;
+import lsp.shipment.LSPShipmentImpl;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -12,9 +9,10 @@ import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 
-import lsp.LSPImpl;
-import lsp.shipment.LSPShipment;
-import lsp.shipment.LSPShipmentImpl;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 public class LSPShipmentMaker {
 

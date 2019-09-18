@@ -2,6 +2,7 @@ package lspPlanTests;
 
 import static org.junit.Assert.*;
 
+import lsp.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -29,19 +30,13 @@ import lsp.usecase.MainRunCarrierAdapter;
 import lsp.usecase.MainRunCarrierScheduler;
 import lsp.usecase.ReloadingPoint;
 import lsp.usecase.ReloadingPointScheduler;
-import lsp.LSPPlanImpl;
-import lsp.LogisticsSolution;
-import lsp.LogisticsSolutionElement;
-import lsp.LogisticsSolutionElementImpl;
-import lsp.LogisticsSolutionImpl;
-import lsp.ShipmentAssigner;
 import lsp.resources.Resource;
 
 public class CompleteLSPPlanTest {
 	
 	private Network network;
 	private ShipmentAssigner assigner;
-	private LSPPlanImpl completePlan;
+	private LSPPlan completePlan;
 	private LogisticsSolution completeSolution;
  
 	@Before
@@ -221,7 +216,7 @@ public class CompleteLSPPlanTest {
 		completeSolution = completeSolutionBuilder.build();
 		
 		assigner = new DeterministicShipmentAssigner();
-		completePlan = new LSPPlanImpl();
+		completePlan = LSPUtils.createLSPPlan();
 		completePlan.setAssigner(assigner);
 		completePlan.addSolution(completeSolution);
 	}

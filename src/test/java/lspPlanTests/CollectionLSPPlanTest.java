@@ -2,6 +2,7 @@ package lspPlanTests;
 
 import static org.junit.Assert.*;
 
+import lsp.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -23,12 +24,6 @@ import org.matsim.vehicles.VehicleType;
 import lsp.usecase.CollectionCarrierAdapter;
 import lsp.usecase.CollectionCarrierScheduler;
 import lsp.usecase.DeterministicShipmentAssigner;
-import lsp.LSPPlanImpl;
-import lsp.LogisticsSolution;
-import lsp.LogisticsSolutionElement;
-import lsp.LogisticsSolutionElementImpl;
-import lsp.LogisticsSolutionImpl;
-import lsp.ShipmentAssigner;
 import lsp.resources.Resource;
 
 public class CollectionLSPPlanTest {
@@ -36,7 +31,7 @@ public class CollectionLSPPlanTest {
 	private Network network;
 	private LogisticsSolution collectionSolution;
 	private ShipmentAssigner assigner;
-	private LSPPlanImpl collectionPlan;
+	private LSPPlan collectionPlan;
 	
 	@Before
 	public void initialize() {
@@ -90,7 +85,7 @@ public class CollectionLSPPlanTest {
 		collectionSolution = collectionSolutionBuilder.build();
 		
 		assigner = new DeterministicShipmentAssigner();
-		collectionPlan = new LSPPlanImpl();
+		collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addSolution(collectionSolution);
 	}

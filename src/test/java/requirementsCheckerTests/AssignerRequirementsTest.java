@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+import lsp.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -25,22 +26,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.functions.Info;
-import lsp.LSP;
-import lsp.LSPImpl;
-import lsp.LSPPlanImpl;
-import lsp.LogisticsSolution;
-import lsp.LogisticsSolutionElement;
-import lsp.LogisticsSolutionElementImpl;
-import lsp.LogisticsSolutionImpl;
-import lsp.ShipmentAssigner;
-import lsp.SolutionScheduler;
 import lsp.resources.Resource;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.LSPShipmentImpl;
 import lsp.usecase.CollectionCarrierAdapter;
 import lsp.usecase.CollectionCarrierScheduler;
-import lsp.usecase.DeterministicShipmentAssigner;
 import lsp.usecase.SimpleForwardSolutionScheduler;
 
 public class AssignerRequirementsTest {
@@ -49,7 +39,7 @@ public class AssignerRequirementsTest {
 	private LogisticsSolution blueSolution;
 	private LogisticsSolution redSolution;
 	private ShipmentAssigner assigner;
-	private LSPPlanImpl collectionPlan;
+	private LSPPlan collectionPlan;
 	private LSP collectionLSP;	
 	
 	@Before
@@ -104,7 +94,7 @@ public class AssignerRequirementsTest {
 		redSolution.getInfos().add(new RedInfo());
 		
 		assigner = new RequirementsAssigner();
-		collectionPlan = new LSPPlanImpl();
+		collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addSolution(redSolution);
 	
@@ -141,7 +131,7 @@ public class AssignerRequirementsTest {
 		blueSolution.getInfos().add(new BlueInfo());
 		collectionPlan.addSolution(blueSolution);
 		
-		LSPImpl.Builder collectionLSPBuilder = LSPImpl.Builder.getInstance();
+		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance();
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
 		Id<LSP> collectionLSPId = Id.create("CollectionLSP", LSP.class);
 		collectionLSPBuilder.setId(collectionLSPId);

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+import lsp.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -33,17 +34,6 @@ import lsp.usecase.DeterministicShipmentAssigner;
 import lsp.usecase.SimpleForwardSolutionScheduler;
 import lsp.controler.LSPModule;
 import lsp.events.EventUtils;
-import lsp.LSP;
-import lsp.LSPImpl;
-import lsp.LSPPlanImpl;
-import lsp.LSPs;
-import lsp.LogisticsSolution;
-import lsp.LogisticsSolutionElement;
-import lsp.LogisticsSolutionElementImpl;
-import lsp.LogisticsSolutionImpl;
-import lsp.ShipmentAssigner;
-import lsp.SolutionScheduler;
-import lsp.resources.CarrierResource;
 import lsp.resources.Resource;
 import lsp.replanning.LSPReplanningModuleImpl;
 import lsp.scoring.LSPScoringModuleImpl;
@@ -113,11 +103,11 @@ public class MultipleShipmentsCollectionLSPMobsimTest {
 		LogisticsSolution collectionSolution = collectionSolutionBuilder.build();
 		
 		ShipmentAssigner assigner = new DeterministicShipmentAssigner();
-		LSPPlanImpl collectionPlan = new LSPPlanImpl();
+		LSPPlan collectionPlan = LSPUtils.createLSPPlan();
 		collectionPlan.setAssigner(assigner);
 		collectionPlan.addSolution(collectionSolution);
 	
-		LSPImpl.Builder collectionLSPBuilder = LSPImpl.Builder.getInstance();
+		LSPUtils.LSPBuilder collectionLSPBuilder = LSPUtils.LSPBuilder.getInstance();
 		collectionLSPBuilder.setInitialPlan(collectionPlan);
 		Id<LSP> collectionLSPId = Id.create("CollectionLSP", LSP.class);
 		collectionLSPBuilder.setId(collectionLSPId);

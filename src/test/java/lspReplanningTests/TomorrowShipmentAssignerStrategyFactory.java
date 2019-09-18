@@ -10,7 +10,7 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 
 import lsp.LSP;
 import lsp.LSPPlan;
-import lsp.LSPPlanImpl;
+import lsp.LSPPlan;
 import lsp.ShipmentAssigner;
 import lsp.shipment.LSPShipment;
 

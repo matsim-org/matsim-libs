@@ -4,6 +4,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+
+import lsp.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -22,16 +24,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.LSP;
-import lsp.LSPImpl;
-import lsp.LSPPlan;
-import lsp.LSPPlanImpl;
-import lsp.LogisticsSolution;
-import lsp.LogisticsSolutionElement;
-import lsp.LogisticsSolutionElementImpl;
-import lsp.LogisticsSolutionImpl;
-import lsp.ShipmentAssigner;
-import lsp.SolutionScheduler;
 import lsp.resources.Resource;
 import lsp.usecase.CollectionCarrierAdapter;
 import lsp.usecase.CollectionCarrierScheduler;
@@ -228,12 +220,12 @@ public class CompleteLSPCreationTest {
 		completeSolutionBuilder.addSolutionElement(distributionElement);
 		
 		assigner = new DeterministicShipmentAssigner();
-		LSPPlan completePlan = new LSPPlanImpl();
+		LSPPlan completePlan = LSPUtils.createLSPPlan();
 		completePlan.setAssigner(assigner);
 		completeSolution  = completeSolutionBuilder.build();
 		completePlan.addSolution(completeSolution);
 		
-		LSPImpl.Builder completeLSPBuilder = LSPImpl.Builder.getInstance();
+		LSPUtils.LSPBuilder completeLSPBuilder = LSPUtils.LSPBuilder.getInstance();
 		completeLSPBuilder.setInitialPlan(completePlan);
 		Id<LSP> collectionLSPId = Id.create("CollectionLSP", LSP.class);
 		completeLSPBuilder.setId(collectionLSPId);

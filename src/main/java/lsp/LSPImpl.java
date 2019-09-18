@@ -6,14 +6,13 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.ReplanningEvent;
-import org.matsim.core.replanning.GenericStrategyManager;
 
 import lsp.resources.Resource;
 import lsp.replanning.LSPReplanner;
 import lsp.scoring.LSPScorer;
 import lsp.shipment.LSPShipment;
 
-public class LSPImpl implements LSP {
+/* package-private */ class LSPImpl implements LSP {
 
 	private Id<LSP> id;
 	private Collection<LSPShipment> shipments;
@@ -23,67 +22,9 @@ public class LSPImpl implements LSP {
 	private Collection<Resource> resources;
 	private LSPScorer scorer;
 	private LSPReplanner replanner;
-	
-	public static class Builder{
-		private Id<LSP> id;
-		private SolutionScheduler solutionScheduler;
-		private LSPPlan initialPlan;
-		private Collection<Resource> resources;
-		private LSPScorer scorer;
-		private LSPReplanner replanner;
-		
 
-		
-		public static Builder getInstance(){
-		return new Builder();
-	}
-		
-	private Builder(){
-		this.resources = new ArrayList<Resource>();
 
-	}
-	
-	public Builder setSolutionScheduler(SolutionScheduler solutionScheduler){
-		this.solutionScheduler = solutionScheduler;
-		return this;
-	}
-	
-	public Builder setSolutionScorer(LSPScorer scorer){
-		this.scorer = scorer;
-		return this;
-	}
-	
-	public Builder setReplanner(LSPReplanner replanner){
-		this.replanner= replanner;
-		return this;
-	}
-	
-	
-	public Builder setInitialPlan(LSPPlan plan){
-		this.initialPlan = plan;
-		for(LogisticsSolution solution : plan.getSolutions()) {
-			for(LogisticsSolutionElement element : solution.getSolutionElements()) {
-				if(!resources.contains(element.getResource())) {
-					resources.add(element.getResource());
-				}
-			}
-		}
-		return this;
-	}
-	
-	public Builder setId(Id<LSP> id){
-		this.id = id;
-		return this;
-	}
-	
-	public LSPImpl build(){
-		return new LSPImpl(this);
-	}
-	
-	}
-	
-	
-	private LSPImpl(LSPImpl.Builder builder){
+	LSPImpl( LSPUtils.LSPBuilder builder ){
 		this.shipments = new ArrayList<LSPShipment>();
 		this.plans= new ArrayList<LSPPlan>();
 		this.id = builder.id;
@@ -182,7 +123,7 @@ public class LSPImpl implements LSP {
 				copiedSolution.getSolutionElements().addAll(solution.getSolutionElements());		
 				copiedSolutions.add(copiedSolution);
 		}
-		LSPPlan copiedPlan = new LSPPlanImpl();
+		LSPPlan copiedPlan = LSPUtils.createLSPPlan();
 		copiedPlan.setAssigner(plan2copy.getAssigner());
 		copiedPlan.setLSP(plan2copy.getLsp());
 		double initialScoreOfCopiedPlan = plan2copy.getScore();

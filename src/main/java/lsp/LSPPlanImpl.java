@@ -6,15 +6,15 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.population.BasicPlan;
 
-public class LSPPlanImpl implements LSPPlan{
+/* package-private */ class LSPPlanImpl implements LSPPlan{
 
 	private LSP lsp;
 	private double score;
 	private Collection<LogisticsSolution> solutions;
 	private ShipmentAssigner assigner;
 	
-	public LSPPlanImpl() {	
-		this.solutions = new ArrayList<LogisticsSolution>();
+	LSPPlanImpl() {
+		this.solutions = new ArrayList<>();
 	}
 	
 	public void addSolution (LogisticsSolution solution) {
