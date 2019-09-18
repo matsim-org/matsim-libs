@@ -201,11 +201,17 @@ class NoiseReceiverPoint extends ReceiverPoint {
 	void reset() {
 		resetTimeInterval();
 		this.personId2actInfos = null;
+		lden = Double.NaN;
+		l69 = Double.NaN;
+		l1619 = Double.NaN;
+		aggregatedImmissionTermLden = 0;
+		aggregatedImmissionTerm69 = 0;
+		aggregatedImmissionTerm1619 = 0;
 	}
 	
 	void resetTimeInterval() {
 //		linkId2IsolatedImmission.clear();
-		this.setFinalImmission(0.);
+		currentImmission = 0;
 		this.setAffectedAgentUnits(0.);
 		this.setDamageCosts(0.);
 		this.setDamageCostsPerAffectedAgentUnit(0.);

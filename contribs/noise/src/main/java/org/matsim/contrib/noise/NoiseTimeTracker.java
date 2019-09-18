@@ -608,7 +608,7 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 						} else {
 							if (cWarn4 == 0) {
 								log.warn("The marginal damage cost per HGV on link " + thisLink.toString() + " for receiver point " + rp.getId().toString() + " is " + marginalDamageCostHGVThisLink + ".");
-								log.warn("final immission: " + rp.getFinalImmission() + " - immission plus one car " + noiseImmissionPlusOneCarThisLink + " - marginal damage cost car: " + marginalDamageCostHGVThisLink);
+								log.warn("final immission: " + rp.getCurrentImmission() + " - immission plus one car " + noiseImmissionPlusOneCarThisLink + " - marginal damage cost car: " + marginalDamageCostHGVThisLink);
 								log.warn("Setting the marginal damage cost per HGV to 0.");
 								log.warn("This message is only given once.");
 								cWarn4++;
@@ -925,18 +925,17 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 		return vCarVHdv;
 	}
 
-	public void computeFinalTimeIntervals() {
-
+	void computeFinalTimeIntervals() {
 		while (this.noiseContext.getCurrentTimeBinEndTime() <= Math.max(24. * 3600., this.noiseContext.getScenario().getConfig().qsim().getEndTime())) {
 			processTimeBin();			
 		}
 	}
 	
-	public List<NoiseEventCaused> getNoiseEventsCaused() {
+	List<NoiseEventCaused> getNoiseEventsCaused() {
 		return noiseEventsCaused;
 	}
 
-	public List<NoiseEventAffected> getNoiseEventsAffected() {
+	List<NoiseEventAffected> getNoiseEventsAffected() {
 		return noiseEventsAffected;
 	}
 
