@@ -14,8 +14,8 @@ import org.matsim.vehicles.*;
  * @author sschroeder
  *
  */
-public class CarrierVehicleType implements VehicleType {
-	private VehicleType delegate ;
+public class CarrierVehicleType {
+//	private VehicleType delegate ;
 
 	/**
 	 * A builder building the type.
@@ -86,7 +86,7 @@ public class CarrierVehicleType implements VehicleType {
 			this.delegate.getCostInformation().setCostsPerMeter( perDistanceUnit ) ;
 			return this;
 		}
-		
+
 		/**
 		 * Sets costs per time-unit.
 		 * 
@@ -129,8 +129,9 @@ public class CarrierVehicleType implements VehicleType {
 		 * 
 		 * @return {@link CarrierVehicleType}
 		 */
-		public CarrierVehicleType build(){
-			return new CarrierVehicleType( delegate );
+		public VehicleType build(){
+//			return new CarrierVehicleType( delegate );
+			return delegate ;
 		}
 
 		/**
@@ -173,97 +174,97 @@ public class CarrierVehicleType implements VehicleType {
 
 	}
 
-	private CarrierVehicleType( VehicleType delegate ){
-		this.delegate = delegate ;
-	}
-
-
-	@Override public String getDescription(){
-		return delegate.getDescription();
-	}
-	@Override public VehicleCapacity getCapacity(){
-		return delegate.getCapacity();
-	}
-	@Override public Id<VehicleType> getId(){
-		return delegate.getId();
-	}
-	@Override @Deprecated public double getAccessTime(){
-		return delegate.getAccessTime();
-	}
-	@Override @Deprecated public double getEgressTime(){
-		return delegate.getEgressTime();
-	}
-	@Override @Deprecated public void setAccessTime( double seconds ){
-		delegate.setAccessTime( seconds );
-	}
-	@Override @Deprecated public void setEgressTime( double seconds ){
-		delegate.setEgressTime( seconds );
-	}
-	@Override @Deprecated public DoorOperationMode getDoorOperationMode(){
-		return delegate.getDoorOperationMode();
-	}
-	@Override @Deprecated public void setDoorOperationMode( DoorOperationMode mode ){
-		delegate.setDoorOperationMode( mode );
-	}
-	@Override public double getPcuEquivalents(){
-		return delegate.getPcuEquivalents();
-	}
-	@Override public VehicleType setPcuEquivalents( double pcuEquivalents ){
-		return delegate.setPcuEquivalents( pcuEquivalents );
-	}
-	@Override public double getFlowEfficiencyFactor(){
-		return delegate.getFlowEfficiencyFactor();
-	}
-	@Override public VehicleType setFlowEfficiencyFactor( double flowEfficiencyFactor ){
-		return delegate.setFlowEfficiencyFactor( flowEfficiencyFactor );
-	}
-	@Override public Attributes getAttributes(){
-		return delegate.getAttributes();
-	}
-	@Override public VehicleType setDescription( String desc ){
-		return delegate.setDescription( desc );
-	}
-	@Override public VehicleType setLength( double length ){
-		return delegate.setLength( length );
-	}
-	@Override public VehicleType setMaximumVelocity( double meterPerSecond ){
-		return delegate.setMaximumVelocity( meterPerSecond );
-	}
-	@Override public VehicleType setWidth( double width ){
-		return delegate.setWidth( width );
-	}
-	@Override public double getWidth(){
-		return delegate.getWidth();
-	}
-	@Override public double getMaximumVelocity(){
-		return delegate.getMaximumVelocity();
-	}
-	@Override public double getLength(){
-		return delegate.getLength();
-	}
-	@Override public EngineInformation getEngineInformation(){
-		return delegate.getEngineInformation();
-	}
-	@Override public CostInformation getCostInformation(){
-		return delegate.getCostInformation();
-	}
-	@Override public String getNetworkMode(){
-		return delegate.getNetworkMode();
-	}
-	@Override public void setNetworkMode( String networkMode ){
-		delegate.setNetworkMode( networkMode );
-	}
-	@Override @Deprecated public VehicleType setCapacityWeightInTons( int i ){
-		return delegate.setCapacityWeightInTons( i );
-	}
-	@Override @Deprecated public VehicleType setFixCost( double perDay ){
-		return delegate.setFixCost( perDay );
-	}
-	@Override @Deprecated public VehicleType setCostPerDistanceUnit( double perMeter ){
-		return delegate.setCostPerDistanceUnit( perMeter );
-	}
-	@Override @Deprecated public VehicleType setCostPerTimeUnit( double perSecond ){
-		return delegate.setCostPerTimeUnit( perSecond );
-	}
+//	private CarrierVehicleType( VehicleType delegate ){
+//		this.delegate = delegate ;
+//	}
+//
+//
+//	@Override public String getDescription(){
+//		return delegate.getDescription();
+//	}
+//	@Override public VehicleCapacity getCapacity(){
+//		return delegate.getCapacity();
+//	}
+//	@Override public Id<VehicleType> getId(){
+//		return delegate.getId();`
+//	}
+//	@Override @Deprecated public double getAccessTime(){
+//		return delegate.getAccessTime();
+//	}
+//	@Override @Deprecated public double getEgressTime(){
+//		return delegate.getEgressTime();
+//	}
+//	@Override @Deprecated public void setAccessTime( double seconds ){
+//		delegate.setAccessTime( seconds );
+//	}
+//	@Override @Deprecated public void setEgressTime( double seconds ){
+//		delegate.setEgressTime( seconds );
+//	}
+//	@Override @Deprecated public DoorOperationMode getDoorOperationMode(){
+//		return delegate.getDoorOperationMode();
+//	}
+//	@Override @Deprecated public void setDoorOperationMode( DoorOperationMode mode ){
+//		delegate.setDoorOperationMode( mode );
+//	}
+//	@Override public double getPcuEquivalents(){
+//		return delegate.getPcuEquivalents();
+//	}
+//	@Override public VehicleType setPcuEquivalents( double pcuEquivalents ){
+//		return delegate.setPcuEquivalents( pcuEquivalents );
+//	}
+//	@Override public double getFlowEfficiencyFactor(){
+//		return delegate.getFlowEfficiencyFactor();
+//	}
+//	@Override public VehicleType setFlowEfficiencyFactor( double flowEfficiencyFactor ){
+//		return delegate.setFlowEfficiencyFactor( flowEfficiencyFactor );
+//	}
+//	@Override public Attributes getAttributes(){
+//		return delegate.getAttributes();
+//	}
+//	@Override public VehicleType setDescription( String desc ){
+//		return delegate.setDescription( desc );
+//	}
+//	@Override public VehicleType setLength( double length ){
+//		return delegate.setLength( length );
+//	}
+//	@Override public VehicleType setMaximumVelocity( double meterPerSecond ){
+//		return delegate.setMaximumVelocity( meterPerSecond );
+//	}
+//	@Override public VehicleType setWidth( double width ){
+//		return delegate.setWidth( width );
+//	}
+//	@Override public double getWidth(){
+//		return delegate.getWidth();
+//	}
+//	@Override public double getMaximumVelocity(){
+//		return delegate.getMaximumVelocity();
+//	}
+//	@Override public double getLength(){
+//		return delegate.getLength();
+//	}
+//	@Override public EngineInformation getEngineInformation(){
+//		return delegate.getEngineInformation();
+//	}
+//	@Override public CostInformation getCostInformation(){
+//		return delegate.getCostInformation();
+//	}
+//	@Override public String getNetworkMode(){
+//		return delegate.getNetworkMode();
+//	}
+//	@Override public void setNetworkMode( String networkMode ){
+//		delegate.setNetworkMode( networkMode );
+//	}
+//	@Override @Deprecated public VehicleType setCapacityWeightInTons( int i ){
+//		return delegate.setCapacityWeightInTons( i );
+//	}
+//	@Override @Deprecated public VehicleType setFixCost( double perDay ){
+//		return delegate.setFixCost( perDay );
+//	}
+//	@Override @Deprecated public VehicleType setCostPerDistanceUnit( double perMeter ){
+//		return delegate.setCostPerDistanceUnit( perMeter );
+//	}
+//	@Override @Deprecated public VehicleType setCostPerTimeUnit( double perSecond ){
+//		return delegate.setCostPerTimeUnit( perSecond );
+//	}
 
 }

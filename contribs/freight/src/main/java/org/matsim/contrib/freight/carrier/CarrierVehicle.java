@@ -31,7 +31,7 @@ public class CarrierVehicle implements Vehicle {
 		return getId() ;
 	}
 	@Deprecated // refactoring device, please inline
-	public void setVehicleType( CarrierVehicleType collectionType ){
+	public void setVehicleType( VehicleType collectionType ){
 		setType( collectionType );
 	}
 
