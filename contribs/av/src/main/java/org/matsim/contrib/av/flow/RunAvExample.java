@@ -37,6 +37,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
@@ -53,7 +54,7 @@ public class RunAvExample {
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configUrl, new OTFVisConfigGroup()));
 		addPopulation(scenario);
 
-		VehicleType avType = new VehicleType(Id.create("autonomousVehicleType", VehicleType.class));
+		VehicleType avType = VehicleUtils.createVehicleType(Id.create("autonomousVehicleType", VehicleType.class ) );
 		avType.setFlowEfficiencyFactor(2.0);
 		scenario.getVehicles().addVehicleType(avType);
 
