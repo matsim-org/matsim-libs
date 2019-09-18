@@ -117,10 +117,10 @@ public class MainRunAdapterTest {
 				ArrayList<VehicleType> types = new ArrayList<VehicleType>(capabilities.getVehicleTypes());
 				if(types.size() ==1) {
 					assertTrue(types.get(0) == mainRunType);
-					assertTrue(mainRunType.getCarrierVehicleCapacity() == 30);
-					assertTrue(mainRunType.getVehicleCostInformation().getPerDistanceUnit() == 0.0008);
-					assertTrue(mainRunType.getVehicleCostInformation().getPerTimeUnit() == 0.38);
-					assertTrue(mainRunType.getVehicleCostInformation().getFix() == 120);
+					assertTrue( mainRunType.getCapacity().getOther().intValue() == 30 );
+					assertTrue( mainRunType.getCostInformation().getPerDistanceUnit() == 0.0008 );
+					assertTrue( mainRunType.getCostInformation().getPerTimeUnit() == 0.38 );
+					assertTrue( mainRunType.getCostInformation().getFix() == 120 );
 					assertTrue(mainRunType.getMaximumVelocity() == (50/3.6));					
 				}
 				ArrayList<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>(capabilities.getCarrierVehicles());

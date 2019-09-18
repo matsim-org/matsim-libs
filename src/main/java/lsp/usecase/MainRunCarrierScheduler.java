@@ -10,7 +10,6 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
@@ -28,7 +27,6 @@ import lsp.shipment.ScheduledShipmentLoad;
 import lsp.shipment.ScheduledShipmentTransport;
 import lsp.shipment.ScheduledShipmentUnload;
 import lsp.shipment.ShipmentComparator;
-import lsp.shipment.ScheduledShipmentLoad.Builder;
 import org.matsim.vehicles.VehicleType;
 
 
@@ -75,7 +73,7 @@ public class MainRunCarrierScheduler extends ResourceScheduler {
 
 		for(ShipmentTuple tuple : copyOfAssignedShipments){
 			VehicleType vehicleType = carrier.getCarrierCapabilities().getVehicleTypes().iterator().next();
-			if((load + tuple.getShipment().getCapacityDemand()) <= vehicleType.getCarrierVehicleCapacity()){
+			if((load + tuple.getShipment().getCapacityDemand()) <= vehicleType.getCapacity().getOther().intValue() ){
 				shipmentsInCurrentTour.add(tuple);
 				load = load + tuple.getShipment().getCapacityDemand();
 			}

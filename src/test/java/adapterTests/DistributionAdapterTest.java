@@ -115,10 +115,10 @@ public class DistributionAdapterTest {
 					ArrayList<VehicleType> types = new ArrayList<>( capabilities.getVehicleTypes() );
 					if(types.size() ==1) {
 						assertTrue(types.get(0) == distributionType);
-						assertTrue(distributionType.getCarrierVehicleCapacity() == 10);
-						assertTrue(distributionType.getVehicleCostInformation().getPerDistanceUnit() == 0.0004);
-						assertTrue(distributionType.getVehicleCostInformation().getPerTimeUnit() == 0.38);
-						assertTrue(distributionType.getVehicleCostInformation().getFix() == 49);
+						assertTrue( distributionType.getCapacity().getOther().intValue() == 10 );
+						assertTrue( distributionType.getCostInformation().getPerDistanceUnit() == 0.0004 );
+						assertTrue( distributionType.getCostInformation().getPerTimeUnit() == 0.38 );
+						assertTrue( distributionType.getCostInformation().getFix() == 49 );
 						assertTrue(distributionType.getMaximumVelocity() == (50/3.6));
 						
 					}

@@ -114,10 +114,10 @@ public class CollectionAdapterTest {
 				ArrayList<VehicleType> types = new ArrayList<VehicleType>(capabilities.getVehicleTypes());
 				if(types.size() ==1) {
 					assertTrue(types.get(0) == collectionType);
-					assertTrue(collectionType.getCarrierVehicleCapacity() == 10);
-					assertTrue(collectionType.getVehicleCostInformation().getPerDistanceUnit() == 0.0004);
-					assertTrue(collectionType.getVehicleCostInformation().getPerTimeUnit() == 0.38);
-					assertTrue(collectionType.getVehicleCostInformation().getFix() == 49);
+					assertTrue( collectionType.getCapacity().getOther().intValue() == 10 );
+					assertTrue( collectionType.getCostInformation().getPerDistanceUnit() == 0.0004 );
+					assertTrue( collectionType.getCostInformation().getPerTimeUnit() == 0.38 );
+					assertTrue( collectionType.getCostInformation().getFix() == 49 );
 					assertTrue(collectionType.getMaximumVelocity() == (50/3.6));
 					
 				}

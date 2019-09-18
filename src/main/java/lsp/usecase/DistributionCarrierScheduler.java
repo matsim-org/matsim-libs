@@ -10,7 +10,6 @@ import org.matsim.contrib.freight.carrier.CarrierImpl;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
@@ -84,7 +83,7 @@ public class DistributionCarrierScheduler extends ResourceScheduler {
 		
 		for(ShipmentTuple tuple : copyOfAssignedShipments){
 			VehicleType vehicleType = carrier.getCarrierCapabilities().getVehicleTypes().iterator().next();
-			if((load + tuple.getShipment().getCapacityDemand()) <= vehicleType.getCarrierVehicleCapacity()){
+			if((load + tuple.getShipment().getCapacityDemand()) <= vehicleType.getCapacity().getOther().intValue() ){
 				shipmentsInCurrentTour.add(tuple);
 				load = load + tuple.getShipment().getCapacityDemand();
 				cumulatedLoadingTime = cumulatedLoadingTime + tuple.getShipment().getServiceTime();

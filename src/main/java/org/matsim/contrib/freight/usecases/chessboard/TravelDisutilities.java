@@ -3,7 +3,6 @@ package org.matsim.contrib.freight.usecases.chessboard;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.jsprit.VehicleTypeDependentRoadPricingCalculator;
 import org.matsim.core.router.util.TravelDisutility;
@@ -23,7 +22,7 @@ public final class TravelDisutilities{
 				VehicleType type = vehicleTypes.getVehicleTypes().get(vehicle.getType().getId());
 				if(type == null) throw new IllegalStateException("vehicle "+vehicle.getId()+" has no type");
 				double tt = travelTime.getLinkTravelTime(link, time, person, vehicle);
-				return type.getVehicleCostInformation().getPerDistanceUnit()*link.getLength() + type.getVehicleCostInformation().getPerTimeUnit()*tt;
+				return type.getCostInformation().getPerDistanceUnit()*link.getLength() + type.getCostInformation().getPerTimeUnit()*tt;
 			}
 
 			@Override
@@ -31,7 +30,7 @@ public final class TravelDisutilities{
 				double minDisutility = Double.MAX_VALUE;
 				double free_tt = link.getLength()/link.getFreespeed();
 				for(VehicleType type : vehicleTypes.getVehicleTypes().values()){
-					double disu = type.getVehicleCostInformation().getPerDistanceUnit()*link.getLength() + type.getVehicleCostInformation().getPerTimeUnit()*free_tt;
+					double disu = type.getCostInformation().getPerDistanceUnit()*link.getLength() + type.getCostInformation().getPerTimeUnit()*free_tt;
 					if(disu < minDisutility) minDisutility=disu;
 				}
 				return minDisutility;
