@@ -26,7 +26,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 /**
  * @author dgrether
  */
-public final class VehicleTypeImpl implements VehicleType{
+final class VehicleTypeImpl implements VehicleType{
 	// yy should maybe the whole type be immutable? I guess that the question is how people use this.  If they have a vehicle, get the type, and then keep
 	// a reference to the type, then replacing the type means that it will have another reference, and these users will not notice.  ???????
 
