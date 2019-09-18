@@ -1,0 +1,75 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+	<module name="dvrp">
+		<param name="networkModes" value="uam"/>
+	</module>
+
+	<module name="multiModeTaxi">
+		<parameterset type="taxi">
+			<param name="mode" value="uam"/>
+			<param name="useModeFilteredSubnetwork" value="true"/>
+
+			<param name="destinationKnown" value="true"/>
+			<param name="vehicleDiversion" value="false"/>
+			<param name="pickupDuration" value="150"/>
+			<param name="dropoffDuration" value="150"/>
+			<param name="onlineVehicleTracker" value="true"/>
+
+			<param name="taxisFile" value="uam_fleet.xml"/>
+			<!-- param name="taxisFile" value="taxis-50.xml" / -->
+
+			<param name="timeProfiles" value="true"/>
+			<param name="detailedStats" value="true"/>
+
+			<parameterset type="RuleBasedTaxiOptimizer"/>
+		</parameterset>
+	</module>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="uam_only_network.xml"/>
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="uam_only_population.xml"/>
+	</module>
+
+	<module name="qsim">
+		<param name="simStarttimeInterpretation" value="onlyUseStarttime"/>
+		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true"/>
+		<param name="snapshotStyle" value="queue"/>
+	</module>
+
+	<module name="otfvis">
+		<param name="coloringScheme" value="taxicab"/>
+		<param name="drawNonMovingItems" value="true"/>
+	</module>
+
+	<module name="controler">
+		<param name="outputDirectory" value="output/uam/uam_only_scenario"/>
+		<param name="overwriteFiles" value="deleteDirectoryIfExists"/>
+		<param name="firstIteration" value="0"/>
+		<param name="lastIteration" value="0"/>
+	</module>
+
+	<module name="planCalcScore">
+		<param name="activityType_0" value="start"/>
+		<param name="activityTypicalDuration_0" value="12:00:00"/>
+
+		<param name="activityType_1" value="end"/>
+		<param name="activityTypicalDuration_1" value="12:00:00"/>
+
+		<param name="traveling_uam" value="-6"/>
+	</module>
+
+	<module name="planscalcroute">
+		<param name="networkModes" value="car,uam"/>
+	</module>
+
+	<module name="strategy">
+		<!-- We focus only on DynAgents. "Standard" agents do not change their behaviour -->
+		<param name="maxAgentPlanMemorySize" value="1"/>
+		<param name="ModuleProbability_1" value="1.0"/>
+		<param name="Module_1" value="KeepLastSelected"/>
+	</module>
+</config>
