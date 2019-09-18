@@ -52,7 +52,7 @@ public final class VehicleUtils {
 	private static final String COST_PER_SECOND_INSERVICE = "costsPerSecondInService";
 	private static final String FUEL_TYPE = "fuelType";
 	public static VehicleType createVehicleType( Id<VehicleType> typeId ){
-		return new VehicleTypeImpl( typeId );
+		return new VehicleType( typeId );
 	}
 
 	static {
