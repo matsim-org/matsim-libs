@@ -8,17 +8,10 @@ public interface VehicleType extends Attributable{
 	String getDescription();
 	VehicleCapacity getCapacity();
 	Id<VehicleType> getId();
-	@Deprecated double getAccessTime();
-	@Deprecated double getEgressTime();
-	@Deprecated void setAccessTime( double seconds );
-	@Deprecated void setEgressTime( double seconds );
-	@Deprecated DoorOperationMode getDoorOperationMode();
-	@Deprecated void setDoorOperationMode( DoorOperationMode mode );
 	double getPcuEquivalents();
 	VehicleType setPcuEquivalents( double pcuEquivalents );
 	double getFlowEfficiencyFactor();
 	VehicleType setFlowEfficiencyFactor( double flowEfficiencyFactor );
-	@Override Attributes getAttributes();
 	VehicleType setDescription( String desc );
 	VehicleType setLength( double length );
 	VehicleType setMaximumVelocity( double meterPerSecond );
@@ -30,16 +23,39 @@ public interface VehicleType extends Attributable{
 	CostInformation getCostInformation();
 	String getNetworkMode();
 	void setNetworkMode( String networkMode );
+
+	@Deprecated double getAccessTime();
+	@Deprecated double getEgressTime();
+	@Deprecated void setAccessTime( double seconds );
+	@Deprecated void setEgressTime( double seconds );
+	@Deprecated DoorOperationMode getDoorOperationMode();
+	@Deprecated void setDoorOperationMode( DoorOperationMode mode );
+
 	@Deprecated // refactoring device, please inline
-	VehicleType setCapacityWeightInTons( int i );
+	default VehicleType setCapacityWeightInTons( int i ) {
+		this.getCapacity().setWeightInTons( i ) ;
+		return this ;
+	}
 	@Deprecated // refactoring device, please inline
 	VehicleType setFixCost( double perDay );
 	@Deprecated // refactoring device, please inline
 	VehicleType setCostPerDistanceUnit( double perMeter );
 	@Deprecated // refactoring device, please inline
 	VehicleType setCostPerTimeUnit( double perSecond );
-	@Deprecated // refactoring device, please delete
-	VehicleType build();
+	@Deprecated // refactoring device, please inline
+	default CostInformation getVehicleCostInformation() {
+		return getCostInformation() ;
+	}
+	@Deprecated // refactoring device, please inline
+	default int getCarrierVehicleCapacity() {
+		return getCapacity().getOther().intValue() ;
+	}
+
 	@Deprecated
 	public enum DoorOperationMode{ serial, parallel }
+
+//	@Deprecated // refactoring device, please delete
+//	VehicleType build();
+	// after CarrierVehicleType.Builder is back, this should no longer be needed
+
 }

@@ -180,7 +180,7 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 				CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance( Id.create( vId, Vehicle.class ),
 					  Id.create( linkId, Link.class ) );
 				vehicleBuilder.setTypeId( Id.create( typeId, VehicleType.class ) );
-				vehicleBuilder.setType( VehicleUtils.getFactory().createVehicleType( Id.create( typeId, VehicleType.class ) ).build() );
+				vehicleBuilder.setType( VehicleUtils.getFactory().createVehicleType( Id.create( typeId, VehicleType.class ) ) );
 				if( startTime != null ) vehicleBuilder.setEarliestStart( getDouble( startTime ) );
 				if( endTime != null ) vehicleBuilder.setLatestEnd( getDouble( endTime ) );
 				CarrierVehicle vehicle = vehicleBuilder.build();

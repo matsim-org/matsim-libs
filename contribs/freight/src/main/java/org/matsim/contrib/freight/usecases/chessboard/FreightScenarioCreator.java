@@ -188,7 +188,7 @@ final class FreightScenarioCreator {
         typeBuilder.setFixCost(130.0);
         typeBuilder.setCostPerDistanceUnit(0.00077);
         typeBuilder.setCostPerTimeUnit(0.008);
-        return typeBuilder.build();
+        return typeBuilder ;
     }
 
 
