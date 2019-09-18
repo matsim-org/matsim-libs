@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Random;
 
 import lsp.*;
+import lsp.shipment.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -39,10 +40,6 @@ import lsp.events.EventUtils;
 import lsp.resources.Resource;
 import lsp.replanning.LSPReplanningModuleImpl;
 import lsp.scoring.LSPScoringModuleImpl;
-import lsp.shipment.AbstractShipmentPlanElement;
-import lsp.shipment.AbstractShipmentPlanElementComparator;
-import lsp.shipment.LSPShipment;
-import lsp.shipment.LSPShipmentImpl;
 
 public class MainRunOnlyLSPMobsimTest {
 	private Network network;
@@ -97,14 +94,14 @@ public class MainRunOnlyLSPMobsimTest {
         Resource mainRunAdapter = mainRunAdapterBuilder.build();
 	
         Id<LogisticsSolutionElement> mainRunElementId = Id.create("MainRunElement", LogisticsSolutionElement.class);
-		LogisticsSolutionElementImpl.Builder mainRunBuilder = LogisticsSolutionElementImpl.Builder.newInstance(mainRunElementId);
+		LSPUtils.LogisticsSolutionElementBuilder mainRunBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(mainRunElementId );
 		mainRunBuilder.setResource(mainRunAdapter);
 		LogisticsSolutionElement mainRunElement = mainRunBuilder.build();
 		
 		
 		
 		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
-		LogisticsSolutionImpl.Builder completeSolutionBuilder = LogisticsSolutionImpl.Builder.newInstance(solutionId);
+		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId );
 	
 		completeSolutionBuilder.addSolutionElement(mainRunElement);
 		completeSolution = completeSolutionBuilder.build();
@@ -131,7 +128,7 @@ public class MainRunOnlyLSPMobsimTest {
 		
 		 for(int i = 1; i < 2; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-	        	LSPShipmentImpl.Builder builder = LSPShipmentImpl.Builder.newInstance(id);
+	        	ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
 	        	int capacityDemand = 1 + new Random().nextInt(4);
 	        	builder.setCapacityDemand(capacityDemand);
 	        	

@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Random;
 
 import lsp.*;
+import lsp.shipment.ShipmentUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -43,7 +44,6 @@ import lsp.replanning.LSPReplanningModuleImpl;
 import lsp.scoring.LSPScorer;
 import lsp.scoring.LSPScoringModuleImpl;
 import lsp.shipment.LSPShipment;
-import lsp.shipment.LSPShipmentImpl;
 
 public class MultipleIterationsCollectionLSPScoringTest {
 
@@ -105,13 +105,13 @@ public class MultipleIterationsCollectionLSPScoringTest {
 		collectionAdapter = adapterBuilder.build();
 
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
-		LogisticsSolutionElementImpl.Builder collectionElementBuilder = LogisticsSolutionElementImpl.Builder
+		LSPUtils.LogisticsSolutionElementBuilder collectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder
 				.newInstance(elementId);
 		collectionElementBuilder.setResource(collectionAdapter);
 		collectionElement = collectionElementBuilder.build();
 
 		Id<LogisticsSolution> collectionSolutionId = Id.create("CollectionSolution", LogisticsSolution.class);
-		LogisticsSolutionImpl.Builder collectionSolutionBuilder = LogisticsSolutionImpl.Builder
+		LSPUtils.LogisticsSolutionBuilder collectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder
 				.newInstance(collectionSolutionId);
 		collectionSolutionBuilder.addSolutionElement(collectionElement);
 		LogisticsSolution collectionSolution = collectionSolutionBuilder.build();
@@ -147,7 +147,7 @@ public class MultipleIterationsCollectionLSPScoringTest {
 
 		for (int i = 1; i < (numberOfShipments + 1); i++) {
 			Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-			LSPShipmentImpl.Builder builder = LSPShipmentImpl.Builder.newInstance(id);
+			ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
 			Random random = new Random(1);
 			int capacityDemand = random.nextInt(10);
 			builder.setCapacityDemand(capacityDemand);

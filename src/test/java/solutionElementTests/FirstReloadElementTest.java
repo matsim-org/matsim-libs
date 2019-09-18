@@ -2,6 +2,7 @@ package solutionElementTests;
 
 import static org.junit.Assert.*;
 
+import lsp.LSPUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -10,7 +11,6 @@ import org.matsim.api.core.v01.network.Link;
 import lsp.usecase.ReloadingPoint;
 import lsp.usecase.ReloadingPointScheduler;
 import lsp.LogisticsSolutionElement;
-import lsp.LogisticsSolutionElementImpl;
 import lsp.resources.Resource;
 
 public class FirstReloadElementTest {
@@ -36,7 +36,7 @@ public class FirstReloadElementTest {
 	        point = reloadingPointBuilder.build();
 	        
 	        elementId = Id.create("FiretReloadElement", LogisticsSolutionElement.class);
-			LogisticsSolutionElementImpl.Builder reloadingElementBuilder = LogisticsSolutionElementImpl.Builder.newInstance(elementId);
+			LSPUtils.LogisticsSolutionElementBuilder reloadingElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId );
 			reloadingElementBuilder.setResource(point);
 			reloadingElement  = reloadingElementBuilder.build();
 	}

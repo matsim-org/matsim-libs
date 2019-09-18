@@ -8,13 +8,13 @@ import java.util.Comparator;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.ShipmentComparator;
 
-public class WaitingShipmentsImpl implements WaitingShipments {
+/* package-private */ class WaitingShipmentsImpl implements WaitingShipments {
 
 		
 	private ArrayList<ShipmentTuple> shipments;
 	
-	public WaitingShipmentsImpl() {
-		this.shipments = new ArrayList<ShipmentTuple>();
+	WaitingShipmentsImpl() {
+		this.shipments = new ArrayList<>();
 	}
 	
 	

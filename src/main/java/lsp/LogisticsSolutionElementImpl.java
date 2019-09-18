@@ -13,7 +13,7 @@ import lsp.tracking.SimulationTracker;
 
 
 
-public class LogisticsSolutionElementImpl implements LogisticsSolutionElement {
+/* package-private */ class LogisticsSolutionElementImpl implements LogisticsSolutionElement {
 
 	private Id<LogisticsSolutionElement>id;
 	//die beiden nicht im Builder. Die koennen erst in der Solution als ganzes gesetzt werden
@@ -27,43 +27,16 @@ public class LogisticsSolutionElementImpl implements LogisticsSolutionElement {
 	private Collection<SimulationTracker> trackers;
 	private Collection<EventHandler> handlers;
 	private EventsManager eventsManager;
-	
-	public static class Builder {
-		private Id<LogisticsSolutionElement>id;
-		private Resource resource;
-		private WaitingShipments incomingShipments;
-		private WaitingShipments outgoingShipments;	
-		
-		public static Builder newInstance(Id<LogisticsSolutionElement>id){
-			return new Builder(id);
-		}
-		
-		private Builder(Id<LogisticsSolutionElement>id){
-			this.id = id;
-			this.incomingShipments = new WaitingShipmentsImpl();
-			this.outgoingShipments = new WaitingShipmentsImpl();
-		}
-		
-		
-		public Builder setResource(Resource resource){
-			this.resource = resource;
-			return this;
-		}
-	
-		public LogisticsSolutionElementImpl build(){
-			return new LogisticsSolutionElementImpl(this);
-		}
-	}
-	
-	private LogisticsSolutionElementImpl(LogisticsSolutionElementImpl.Builder builder){
+
+	LogisticsSolutionElementImpl( LSPUtils.LogisticsSolutionElementBuilder builder ){
 		this.id = builder.id;
 		this.resource = builder.resource;
 		this.incomingShipments = builder.incomingShipments;
 		this.outgoingShipments = builder.outgoingShipments;
 		resource.getClientElements().add(this);
-		this.handlers = new ArrayList<EventHandler>();
-		this.infos = new ArrayList<Info>();
-		this.trackers = new ArrayList<SimulationTracker>();
+		this.handlers = new ArrayList<>();
+		this.infos = new ArrayList<>();
+		this.trackers = new ArrayList<>();
 	}
 	
 	@Override

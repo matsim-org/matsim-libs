@@ -12,7 +12,7 @@ import demand.utilityFunctions.UtilityFunction;
 import lsp.LogisticsSolution;
 import lsp.functions.Info;
 
-public class LSPShipmentImpl implements LSPShipment {
+/* package-private */ class LSPShipmentImpl implements LSPShipment {
 
 	private Id<LSPShipment> id;
 	private Id<Link> fromLinkId;
@@ -28,84 +28,8 @@ public class LSPShipmentImpl implements LSPShipment {
 	private ArrayList<UtilityFunction> utilityFunctions;
 	private ArrayList<Info> infos;
 	private Id<LogisticsSolution> solutionId;
-	
-	public static class Builder {	
 
-		private Id<LSPShipment> id;
-		private Id<Link> fromLinkId;
-		private Id<Link> toLinkId;
-		private TimeWindow startTimeWindow;
-		private TimeWindow endTimeWindow;
-		private int capacityDemand;
-		private double serviceTime;
-		private ArrayList<Requirement> requirements;
-		private ArrayList<UtilityFunction> utilityFunctions;
-		private ArrayList<Info> infos;
-	
-		public static Builder newInstance(Id<LSPShipment> id){
-			return new Builder(id);
-		}
-	
-	private Builder(Id<LSPShipment> id){
-		this.requirements = new ArrayList<Requirement>();
-		this.utilityFunctions = new ArrayList<UtilityFunction>();
-		this.infos = new ArrayList<Info>();
-		this.id = id;
-	}
-	
-	public Builder setFromLinkId(Id<Link> fromLinkId){
-		this.fromLinkId = fromLinkId;
-		return this;
-	}
-	
-	public Builder setToLinkId(Id<Link> toLinkId){
-		this.toLinkId = toLinkId;
-		return this;
-	}
-	
-	public Builder setStartTimeWindow(TimeWindow startTimeWindow){
-		this.startTimeWindow = startTimeWindow;
-		return this;
-	}
-	
-	public Builder setEndTimeWindow(TimeWindow endTimeWindow){
-		this.endTimeWindow = endTimeWindow;
-		return this;
-	}
-	
-	public Builder setCapacityDemand(int capacityDemand){
-		this.capacityDemand = capacityDemand;
-		return this;
-	}
-	
-	public Builder setServiceTime(double serviceTime){
-		this.serviceTime = serviceTime;
-		return this;
-	}
-	
-	public Builder addRequirement(Requirement requirement) {
-		requirements.add(requirement);
-		return this;
-	}
-	
-	public Builder addUtilityFunction(UtilityFunction utilityFunction) {
-		utilityFunctions.add(utilityFunction);
-		return this;
-	}
-	
-	public Builder addInfo(Info info) {
-		infos.add(info);
-		return this;
-	}
-	
-	public LSPShipmentImpl build(){
-		return new LSPShipmentImpl(this);
-	}
-	
-	
-	}	
-	
-	private LSPShipmentImpl(LSPShipmentImpl.Builder builder){
+	LSPShipmentImpl( ShipmentUtils.LSPShipmentBuilder builder ){
 		this.id = builder.id;
 		this.fromLinkId = builder.fromLinkId;
 		this.toLinkId = builder.toLinkId;
@@ -115,16 +39,16 @@ public class LSPShipmentImpl implements LSPShipment {
 		this.serviceTime = builder.serviceTime;
 		this.schedule = new Schedule(this);
 		this.log = new Log(this);
-		this.eventHandlers = new ArrayList<EventHandler>();
-		this.requirements = new ArrayList<Requirement>();
+		this.eventHandlers = new ArrayList<>();
+		this.requirements = new ArrayList<>();
 		for(Requirement requirement : builder.requirements) {
 			this.requirements.add(requirement);
 		}
-		this.utilityFunctions = new ArrayList<UtilityFunction>();
+		this.utilityFunctions = new ArrayList<>();
 		for(UtilityFunction utilityFunction : builder.utilityFunctions) {
 			this.utilityFunctions.add(utilityFunction);
 		}
-		this.infos = new ArrayList<Info>();
+		this.infos = new ArrayList<>();
 		for(Info info : builder.infos) {
 			this.infos.add(info);
 		}

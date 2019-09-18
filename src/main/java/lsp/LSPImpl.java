@@ -117,9 +117,9 @@ import lsp.shipment.LSPShipment;
 	}
 
 	public static LSPPlan copyPlan(LSPPlan plan2copy) {
-		List<LogisticsSolution> copiedSolutions = new ArrayList<LogisticsSolution>();
+		List<LogisticsSolution> copiedSolutions = new ArrayList<>();
 		for (LogisticsSolution solution : plan2copy.getSolutions()) {
-				LogisticsSolutionImpl copiedSolution = LogisticsSolutionImpl.Builder.newInstance(solution.getId()).build();
+				LogisticsSolution copiedSolution = LSPUtils.LogisticsSolutionBuilder.newInstance(solution.getId() ).build();
 				copiedSolution.getSolutionElements().addAll(solution.getSolutionElements());		
 				copiedSolutions.add(copiedSolution);
 		}

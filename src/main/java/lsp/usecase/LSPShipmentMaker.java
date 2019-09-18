@@ -1,7 +1,7 @@
 package lsp.usecase;
 
 import lsp.shipment.LSPShipment;
-import lsp.shipment.LSPShipmentImpl;
+import lsp.shipment.ShipmentUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -25,7 +25,7 @@ public class LSPShipmentMaker {
 	ArrayList<LSPShipment> shipments = new ArrayList<LSPShipment>();
 
 	for(int i = 0; i < 8; i++){	
-		LSPShipmentImpl.Builder builder = LSPShipmentImpl.Builder.newInstance(Id.create("Shipment " + i, LSPShipment.class));
+		ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(Id.create("Shipment " + i, LSPShipment.class ) );
 		builder.setServiceTime(180);
 		builder.setCapacityDemand(1);
 		TimeWindow startTimeWindow = TimeWindow.newInstance(0, Double.MAX_VALUE);

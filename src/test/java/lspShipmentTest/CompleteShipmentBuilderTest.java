@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 
+import lsp.shipment.ShipmentUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -19,9 +20,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import demand.demandAgent.DemandAgent;
 import lsp.shipment.LSPShipment;
-import lsp.shipment.LSPShipmentImpl;
 
 public class CompleteShipmentBuilderTest {
 	
@@ -40,7 +39,7 @@ public class CompleteShipmentBuilderTest {
         
         for(int i = 1; i < 11; i++) {
         	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-        	LSPShipmentImpl.Builder builder = LSPShipmentImpl.Builder.newInstance(id);
+        	ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
         	int capacityDemand = new Random().nextInt(10);
         	builder.setCapacityDemand(capacityDemand);
         	

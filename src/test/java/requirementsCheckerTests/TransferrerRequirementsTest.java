@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Random;
 
+import lsp.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -33,11 +34,6 @@ import demand.demandObject.DemandObjectImpl;
 import demand.offer.Offer;
 import demand.offer.OfferFactoryImpl;
 import demand.offer.OfferTransferrer;
-import lsp.LSP;
-import lsp.LogisticsSolution;
-import lsp.LogisticsSolutionElement;
-import lsp.LogisticsSolutionElementImpl;
-import lsp.SolutionScheduler;
 import lsp.resources.Resource;
 import lsp.shipment.Requirement;
 import lsp.usecase.CollectionCarrierAdapter;
@@ -93,7 +89,7 @@ public class TransferrerRequirementsTest {
 		Resource redCollectionAdapter = redAdapterBuilder.build();
 		
 		Id<LogisticsSolutionElement> redElementId = Id.create("RedCollectionElement", LogisticsSolutionElement.class);
-		LogisticsSolutionElementImpl.Builder redCollectionElementBuilder = LogisticsSolutionElementImpl.Builder.newInstance(redElementId);
+		LSPUtils.LogisticsSolutionElementBuilder redCollectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(redElementId );
 		redCollectionElementBuilder.setResource(redCollectionAdapter);
 		LogisticsSolutionElement redCollectionElement = redCollectionElementBuilder.build();
 		
@@ -131,7 +127,7 @@ public class TransferrerRequirementsTest {
 		Resource blueCollectionAdapter = blueAdapterBuilder.build();
 		
 		Id<LogisticsSolutionElement> blueElementId = Id.create("BlueCollectionElement", LogisticsSolutionElement.class);
-		LogisticsSolutionElementImpl.Builder blueCollectionElementBuilder = LogisticsSolutionElementImpl.Builder.newInstance(blueElementId);
+		LSPUtils.LogisticsSolutionElementBuilder blueCollectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(blueElementId );
 		blueCollectionElementBuilder.setResource(blueCollectionAdapter);
 		LogisticsSolutionElement blueCollectionElement = blueCollectionElementBuilder.build();
 		

@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
+import lsp.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -30,10 +31,6 @@ import lsp.usecase.MainRunCarrierAdapter;
 import lsp.usecase.MainRunCarrierScheduler;
 import lsp.usecase.ReloadingPoint;
 import lsp.usecase.ReloadingPointScheduler;
-import lsp.LogisticsSolution;
-import lsp.LogisticsSolutionElement;
-import lsp.LogisticsSolutionElementImpl;
-import lsp.LogisticsSolutionImpl;
 import lsp.resources.Resource;
 
 public class CompleteSolutionTest {
@@ -89,7 +86,7 @@ public class CompleteSolutionTest {
 
 		Id<LogisticsSolutionElement> collectionElementId = Id.create("CollectionElement",
 				LogisticsSolutionElement.class);
-		LogisticsSolutionElementImpl.Builder collectionBuilder = LogisticsSolutionElementImpl.Builder
+		LSPUtils.LogisticsSolutionElementBuilder collectionBuilder = LSPUtils.LogisticsSolutionElementBuilder
 				.newInstance(collectionElementId);
 		collectionBuilder.setResource(collectionAdapterBuilder.build());
 		collectionElement = collectionBuilder.build();
@@ -107,7 +104,7 @@ public class CompleteSolutionTest {
 
 		Id<LogisticsSolutionElement> firstReloadingElementId = Id.create("FiretReloadElement",
 				LogisticsSolutionElement.class);
-		LogisticsSolutionElementImpl.Builder firstReloadingElementBuilder = LogisticsSolutionElementImpl.Builder
+		LSPUtils.LogisticsSolutionElementBuilder firstReloadingElementBuilder = LSPUtils.LogisticsSolutionElementBuilder
 				.newInstance(firstReloadingElementId);
 		firstReloadingElementBuilder.setResource(firstReloadingPointBuilder.build());
 		firstReloadElement = firstReloadingElementBuilder.build();
@@ -146,7 +143,7 @@ public class CompleteSolutionTest {
 		mainRunAdapterBuilder.setCarrier(collectionCarrier);
 
 		Id<LogisticsSolutionElement> mainRunElementId = Id.create("MainRunElement", LogisticsSolutionElement.class);
-		LogisticsSolutionElementImpl.Builder mainRunBuilder = LogisticsSolutionElementImpl.Builder
+		LSPUtils.LogisticsSolutionElementBuilder mainRunBuilder = LSPUtils.LogisticsSolutionElementBuilder
 				.newInstance(mainRunElementId);
 		mainRunBuilder.setResource(mainRunAdapterBuilder.build());
 		mainRunElement = mainRunBuilder.build();
@@ -164,7 +161,7 @@ public class CompleteSolutionTest {
 
 		Id<LogisticsSolutionElement> secondReloadingElementId = Id.create("SecondReloadElement",
 				LogisticsSolutionElement.class);
-		LogisticsSolutionElementImpl.Builder secondReloadingElementBuilder = LogisticsSolutionElementImpl.Builder
+		LSPUtils.LogisticsSolutionElementBuilder secondReloadingElementBuilder = LSPUtils.LogisticsSolutionElementBuilder
 				.newInstance(secondReloadingElementId);
 		secondReloadingElementBuilder.setResource(secondReloadingPointBuilder.build());
 		secondReloadElement = secondReloadingElementBuilder.build();
@@ -204,7 +201,7 @@ public class CompleteSolutionTest {
 
 		Id<LogisticsSolutionElement> distributionElementId = Id.create("DistributionElement",
 				LogisticsSolutionElement.class);
-		LogisticsSolutionElementImpl.Builder distributionBuilder = LogisticsSolutionElementImpl.Builder
+		LSPUtils.LogisticsSolutionElementBuilder distributionBuilder = LSPUtils.LogisticsSolutionElementBuilder
 				.newInstance(distributionElementId);
 		distributionBuilder.setResource(distributionAdapterBuilder.build());
 		distributionElement = distributionBuilder.build();
@@ -219,7 +216,7 @@ public class CompleteSolutionTest {
 		distributionElement.setPreviousElement(secondReloadElement);
 
 		Id<LogisticsSolution> solutionId = Id.create("SolutionId", LogisticsSolution.class);
-		LogisticsSolutionImpl.Builder completeSolutionBuilder = LogisticsSolutionImpl.Builder.newInstance(solutionId);
+		LSPUtils.LogisticsSolutionBuilder completeSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(solutionId );
 		completeSolutionBuilder.addSolutionElement(collectionElement);
 		completeSolutionBuilder.addSolutionElement(firstReloadElement);
 		completeSolutionBuilder.addSolutionElement(mainRunElement);

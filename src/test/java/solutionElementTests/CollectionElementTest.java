@@ -2,6 +2,7 @@ package solutionElementTests;
 
 import static org.junit.Assert.*;
 
+import lsp.LSPUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -23,7 +24,6 @@ import org.matsim.vehicles.VehicleType;
 import lsp.usecase.CollectionCarrierAdapter;
 import lsp.usecase.CollectionCarrierScheduler;
 import lsp.LogisticsSolutionElement;
-import lsp.LogisticsSolutionElementImpl;
 import lsp.resources.Resource;
 
 public class CollectionElementTest {
@@ -78,7 +78,7 @@ public class CollectionElementTest {
 		adapter = builder.build();
 		
 		Id<LogisticsSolutionElement> elementId = Id.create("CollectionElement", LogisticsSolutionElement.class);
-		LogisticsSolutionElementImpl.Builder collectionBuilder = LogisticsSolutionElementImpl.Builder.newInstance(elementId);
+		LSPUtils.LogisticsSolutionElementBuilder collectionBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId );
 		collectionBuilder.setResource(adapter);
 		collectionElement = collectionBuilder.build();
 	}

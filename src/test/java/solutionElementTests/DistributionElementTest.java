@@ -2,6 +2,7 @@ package solutionElementTests;
 
 import static org.junit.Assert.assertTrue;
 
+import lsp.LSPUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -23,7 +24,6 @@ import org.matsim.vehicles.VehicleType;
 import lsp.usecase.DistributionCarrierAdapter;
 import lsp.usecase.DistributionCarrierScheduler;
 import lsp.LogisticsSolutionElement;
-import lsp.LogisticsSolutionElementImpl;
 import lsp.resources.Resource;
 
 public class DistributionElementTest {
@@ -79,7 +79,7 @@ public class DistributionElementTest {
 		adapter = builder.build();
 		
 		Id<LogisticsSolutionElement> elementId = Id.create("DistributionElement", LogisticsSolutionElement.class);
-		LogisticsSolutionElementImpl.Builder distributionBuilder = LogisticsSolutionElementImpl.Builder.newInstance(elementId);
+		LSPUtils.LogisticsSolutionElementBuilder distributionBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(elementId );
 		distributionBuilder.setResource(adapter);
 		distributionElement = distributionBuilder.build();
 	

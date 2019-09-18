@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Random;
 
 import lsp.*;
+import lsp.shipment.ShipmentUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -28,7 +29,6 @@ import org.matsim.vehicles.VehicleType;
 
 import lsp.resources.Resource;
 import lsp.shipment.LSPShipment;
-import lsp.shipment.LSPShipmentImpl;
 import lsp.usecase.CollectionCarrierAdapter;
 import lsp.usecase.CollectionCarrierScheduler;
 import lsp.usecase.SimpleForwardSolutionScheduler;
@@ -83,12 +83,12 @@ public class AssignerRequirementsTest {
 		Resource redCollectionAdapter = redAdapterBuilder.build();
 		
 		Id<LogisticsSolutionElement> redElementId = Id.create("RedCollectionElement", LogisticsSolutionElement.class);
-		LogisticsSolutionElementImpl.Builder redCollectionElementBuilder = LogisticsSolutionElementImpl.Builder.newInstance(redElementId);
+		LSPUtils.LogisticsSolutionElementBuilder redCollectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(redElementId );
 		redCollectionElementBuilder.setResource(redCollectionAdapter);
 		LogisticsSolutionElement redCollectionElement = redCollectionElementBuilder.build();
 		
 		Id<LogisticsSolution> redCollectionSolutionId = Id.create("RedCollectionSolution", LogisticsSolution.class);
-		LogisticsSolutionImpl.Builder redCollectionSolutionBuilder = LogisticsSolutionImpl.Builder.newInstance(redCollectionSolutionId);
+		LSPUtils.LogisticsSolutionBuilder redCollectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(redCollectionSolutionId );
 		redCollectionSolutionBuilder.addSolutionElement(redCollectionElement);
 		redSolution = redCollectionSolutionBuilder.build();
 		redSolution.getInfos().add(new RedInfo());
@@ -120,12 +120,12 @@ public class AssignerRequirementsTest {
 		Resource blueCollectionAdapter = blueAdapterBuilder.build();
 		
 		Id<LogisticsSolutionElement> blueElementId = Id.create("BlueCollectionElement", LogisticsSolutionElement.class);
-		LogisticsSolutionElementImpl.Builder blueCollectionElementBuilder = LogisticsSolutionElementImpl.Builder.newInstance(blueElementId);
+		LSPUtils.LogisticsSolutionElementBuilder blueCollectionElementBuilder = LSPUtils.LogisticsSolutionElementBuilder.newInstance(blueElementId );
 		blueCollectionElementBuilder.setResource(blueCollectionAdapter);
 		LogisticsSolutionElement blueCollectionElement = blueCollectionElementBuilder.build();
 		
 		Id<LogisticsSolution> blueCollectionSolutionId = Id.create("BlueCollectionSolution", LogisticsSolution.class);
-		LogisticsSolutionImpl.Builder blueCollectionSolutionBuilder = LogisticsSolutionImpl.Builder.newInstance(blueCollectionSolutionId);
+		LSPUtils.LogisticsSolutionBuilder blueCollectionSolutionBuilder = LSPUtils.LogisticsSolutionBuilder.newInstance(blueCollectionSolutionId );
 		blueCollectionSolutionBuilder.addSolutionElement(blueCollectionElement);
 		blueSolution = blueCollectionSolutionBuilder.build();
 		blueSolution.getInfos().add(new BlueInfo());
@@ -150,7 +150,7 @@ public class AssignerRequirementsTest {
 	    
 	    for(int i = 1; i < 11; i++) {
         	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
-        	LSPShipmentImpl.Builder builder = LSPShipmentImpl.Builder.newInstance(id);
+        	ShipmentUtils.LSPShipmentBuilder builder = ShipmentUtils.LSPShipmentBuilder.newInstance(id );
         	int capacityDemand = rand.nextInt(10);
         	builder.setCapacityDemand(capacityDemand);
         	

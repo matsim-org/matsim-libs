@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import lsp.resources.Resource;
 import lsp.shipment.LSPShipment;
 
-public class ForwardSolutionSchedulerImpl implements SolutionScheduler {
+/* package-private */ class ForwardSolutionSchedulerImpl implements SolutionScheduler {
 
 	private class ResourceNeighbours{
 		private ArrayList<Resource> predecessors;
@@ -32,7 +32,7 @@ public class ForwardSolutionSchedulerImpl implements SolutionScheduler {
 	private ArrayList<ResourceNeighbours> neighbourList;
 	private int bufferTime;
 	
-	public ForwardSolutionSchedulerImpl() {
+	ForwardSolutionSchedulerImpl() {
 		this.sortedResourceList = new ArrayList<Resource>();
 		this.neighbourList = new ArrayList<ResourceNeighbours>();
 	}
