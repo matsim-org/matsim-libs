@@ -90,9 +90,9 @@ public class UamNetworkCreator {
 			skyNodes.add(skyNode);
 
 			// create RED links
-			NetworkUtils.createAndAddLink(uamNetwork, Id.createLinkId("RED_LANDING_" + i), skyNode, hubTakeoffNode,
+			NetworkUtils.createAndAddLink(uamNetwork, Id.createLinkId("RED_LANDING_" + i), skyNode, hubLandingNode,
 					RED_LINK_LENGTH, RED_LINK_SPEED, RED_LINK_FLOW_CAPACITY, 1).setAllowedModes(uamLinkModes);
-			NetworkUtils.createAndAddLink(uamNetwork, Id.createLinkId("RED_TAKEOFF_" + i), hubLandingNode, skyNode,
+			NetworkUtils.createAndAddLink(uamNetwork, Id.createLinkId("RED_TAKEOFF_" + i), hubTakeoffNode, skyNode,
 					RED_LINK_LENGTH, RED_LINK_SPEED, RED_LINK_FLOW_CAPACITY, 1).setAllowedModes(uamLinkModes);
 
 			// create access/egress link
