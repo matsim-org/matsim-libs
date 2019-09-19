@@ -32,14 +32,14 @@ public class CarrierVehicleTypeTest extends MatsimTestCase{
 		//Setting up a copy of the one above
 		VehicleType newVehicleType1 = VehicleUtils.getFactory().createVehicleType( Id.create("medium2", VehicleType.class ) );
 		VehicleUtils.copyFromTo( mediumType, newVehicleType1 );
-		VehicleType mediumType2 = newVehicleType1.build();
+		VehicleType mediumType2 = newVehicleType1;
 		types.getVehicleTypes().put(mediumType2.getId(), mediumType2);
 
 		//Setting up a smaller one based of the one above and changing all values.
 		final Id<VehicleType> smallTypeId = Id.create( "small", VehicleType.class );
 		VehicleType newVehicleType = VehicleUtils.getFactory().createVehicleType( smallTypeId );
 		VehicleUtils.copyFromTo( mediumType, newVehicleType );
-		VehicleType smallType = newVehicleType.build() ;
+		VehicleType smallType = newVehicleType ;
 		{
 			CostInformation costInformation = smallType.getCostInformation() ;
 			costInformation.setFixedCost( 25. );
@@ -71,9 +71,9 @@ public class CarrierVehicleTypeTest extends MatsimTestCase{
 	@Test
 	public void test_whenCreatingTypeMedium_itCreatesCostInfoCorrectly(){
 		VehicleType medium = types.getVehicleTypes().get(Id.create("medium", org.matsim.vehicles.VehicleType.class ) );
-		assertEquals(50.0, medium.getCostInformation().getFixedCosts(),0.01);
-		assertEquals(1.0, medium.getCostInformation().getCostsPerMeter(),0.01);
-		assertEquals(0.5, medium.getCostInformation().getCostsPerSecond(),0.01);
+		assertEquals(50.0, medium.getCostInformation().getFixedCosts(),0.01 );
+		assertEquals(1.0, medium.getCostInformation().getCostsPerMeter(),0.01 );
+		assertEquals(0.5, medium.getCostInformation().getCostsPerSecond(),0.01 );
 	}
 
 	@Test
@@ -105,9 +105,9 @@ public class CarrierVehicleTypeTest extends MatsimTestCase{
 	@Test
 	public void test_whenCopyingTypeMedium_itCopiesCostInfoCorrectly(){
 		VehicleType medium2 = types.getVehicleTypes().get(Id.create("medium2", org.matsim.vehicles.VehicleType.class ) );
-		assertEquals(50.0, medium2.getCostInformation().getFixedCosts(),0.01);
-		assertEquals(1.0, medium2.getCostInformation().getCostsPerMeter(),0.01);
-		assertEquals(0.5, medium2.getCostInformation().getCostsPerSecond(),0.01);
+		assertEquals(50.0, medium2.getCostInformation().getFixedCosts(),0.01 );
+		assertEquals(1.0, medium2.getCostInformation().getCostsPerMeter(),0.01 );
+		assertEquals(0.5, medium2.getCostInformation().getCostsPerSecond(),0.01 );
 	}
 
 	@Test
@@ -139,9 +139,9 @@ public class CarrierVehicleTypeTest extends MatsimTestCase{
 	@Test
 	public void test_whenModifyingTypesmall_itModifiesCostInfoCorrectly(){
 		VehicleType small = types.getVehicleTypes().get(Id.create("small", org.matsim.vehicles.VehicleType.class ) );
-		assertEquals(25.0, small.getCostInformation().getFixedCosts(),0.01);
-		assertEquals(0.75, small.getCostInformation().getCostsPerMeter(),0.01);
-		assertEquals(0.25, small.getCostInformation().getCostsPerSecond(),0.01);
+		assertEquals(25.0, small.getCostInformation().getFixedCosts(),0.01 );
+		assertEquals(0.75, small.getCostInformation().getCostsPerMeter(),0.01 );
+		assertEquals(0.25, small.getCostInformation().getCostsPerSecond(),0.01 );
 	}
 
 	@Test

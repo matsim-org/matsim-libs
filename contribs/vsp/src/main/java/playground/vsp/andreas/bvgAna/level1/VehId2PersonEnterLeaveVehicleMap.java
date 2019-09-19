@@ -39,13 +39,13 @@ import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 public class VehId2PersonEnterLeaveVehicleMap implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	
 	private final Logger log = Logger.getLogger(VehId2PersonEnterLeaveVehicleMap.class);
-	private final Level logLevel = Level.DEBUG;
+//	private final Level logLevel = Level.DEBUG;
 	
 	private TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> vehId2PersonEnterEventMap = new TreeMap<Id, ArrayList<PersonEntersVehicleEvent>>();
 	private TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> vehId2PersonLeaveEventMap = new TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>>();
 	
 	public VehId2PersonEnterLeaveVehicleMap(){
-		this.log.setLevel(this.logLevel);
+//		this.log.setLevel(this.logLevel);
 	}
 	
 	/**

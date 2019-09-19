@@ -31,6 +31,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -90,7 +91,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		}
 
 		private org.matsim.vehicles.VehicleType makeType( String typeId, double maxVelocity ) {
-			org.matsim.vehicles.VehicleType vehicleTypeImpl = new org.matsim.vehicles.VehicleType(Id.create(typeId, org.matsim.vehicles.VehicleType.class ));
+			org.matsim.vehicles.VehicleType vehicleTypeImpl = VehicleUtils.createVehicleType(Id.create(typeId, VehicleType.class ) );
 			vehicleTypeImpl.setMaximumVelocity(maxVelocity);
 			return vehicleTypeImpl;
 		}
@@ -373,7 +374,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 
 		private void retrieveTypeSpecificCosts(Collection<VehicleType> vehicleTypes ) {
 			for( VehicleType type : vehicleTypes){
-				typeSpecificCosts.put(type.getId().toString(), new VehicleTypeVarCosts(type.getCostInformation().getCostsPerMeter(), type.getCostInformation().getCostsPerSecond()));
+				typeSpecificCosts.put(type.getId().toString(), new VehicleTypeVarCosts(type.getCostInformation().getCostsPerMeter(), type.getCostInformation().getCostsPerSecond()) );
 			}
 			typeSpecificCosts.put(defaultTypeId,new VehicleTypeVarCosts(1.,0.));
 		}

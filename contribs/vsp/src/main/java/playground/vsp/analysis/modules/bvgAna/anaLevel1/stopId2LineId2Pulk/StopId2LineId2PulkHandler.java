@@ -40,14 +40,14 @@ import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityE
 public class StopId2LineId2PulkHandler implements TransitDriverStartsEventHandler, VehicleDepartsAtFacilityEventHandler{
 	
 	private final Logger log = Logger.getLogger(StopId2LineId2PulkHandler.class);
-	private final Level logLevel = Level.DEBUG;
+//	private final Level logLevel = Level.DEBUG;
 	
 	private TreeMap<Id, Id> vehId2LineMap = new TreeMap<Id, Id>();
 	private TreeMap<Id, TreeMap<Id, VehicleDepartsAtFacilityEvent>> stopId2LineId2VehDepEvent = new TreeMap<Id, TreeMap<Id,VehicleDepartsAtFacilityEvent>>();
 	private TreeMap<Id, TreeMap<Id, List<StopId2LineId2PulkData>>> stopId2LineId2PulkDataList = new TreeMap<Id, TreeMap<Id, List<StopId2LineId2PulkData>>>();
 	
 	public StopId2LineId2PulkHandler(){
-		this.log.setLevel(this.logLevel);
+//		this.log.setLevel(this.logLevel);
 	}
 
 	/**

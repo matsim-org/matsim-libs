@@ -25,6 +25,8 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.vehicles.VehicleType;
 
 import com.google.inject.name.Names;
+import org.matsim.vehicles.VehicleUtils;
+
 /**
  * This module allows to de- or increase the amount of flow capacity used by a DVRP vehicle,
  * which may be useful for modelling autonomous vehicles within the Queue model.
@@ -44,7 +46,7 @@ public class AvIncreasedCapacityModule extends AbstractModule {
 	 *                               A factor below 1 would mean that more capacity is used.
 	 */
 	public AvIncreasedCapacityModule(double flowEfficiencyFactor) {
-		this(flowEfficiencyFactor, new VehicleType(Id.create("autonomousVehicleType", VehicleType.class )) );
+		this(flowEfficiencyFactor, VehicleUtils.createVehicleType(Id.create("autonomousVehicleType", VehicleType.class ) ) );
 	}
 
 	public AvIncreasedCapacityModule(double flowEfficiencyFactor, VehicleType vehicleType) {

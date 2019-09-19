@@ -197,13 +197,13 @@ public class MatsimJspritFactory {
 			vehicleLocationBuilder.setCoordinate(Coordinate.newInstance(locationCoord.getX(), locationCoord.getY()));
 		}
 		Location vehicleLocation = vehicleLocationBuilder.build();
-		com.graphhopper.jsprit.core.problem.vehicle.VehicleType vehicleType = createVehicleType(carrierVehicle.getType());
-		VehicleImpl.Builder vehicleBuilder = VehicleImpl.Builder.newInstance(carrierVehicle.getId().toString());
+		com.graphhopper.jsprit.core.problem.vehicle.VehicleType vehicleType = createVehicleType(carrierVehicle.getType() );
+		VehicleImpl.Builder vehicleBuilder = VehicleImpl.Builder.newInstance(carrierVehicle.getId().toString() );
 		vehicleBuilder.setEarliestStart(carrierVehicle.getEarliestStartTime())
 				.setLatestArrival(carrierVehicle.getLatestEndTime())
 				.setStartLocation(vehicleLocation)
 				.setType(vehicleType);
-		for (String skill : FreightUtils.getSkills(carrierVehicle.getType())) {
+		for (String skill : FreightUtils.getSkills(carrierVehicle.getType() )) {
 			vehicleBuilder.addSkill(skill);
 		}
 
@@ -233,7 +233,7 @@ public class MatsimJspritFactory {
 		CarrierVehicle carrierVehicle = vehicleBuilder.build();
 
 		for(String skill : vehicle.getSkills().values()){
-			FreightUtils.addSkill(carrierVehicle.getType(), skill);
+			FreightUtils.addSkill(carrierVehicle.getType(), skill );
 		}
 
 		assert vehicle.getEarliestDeparture() == carrierVehicle.getEarliestStartTime() : "vehicles must have the same earliestStartTime";
@@ -253,11 +253,13 @@ public class MatsimJspritFactory {
 	 */
 	static VehicleType createCarrierVehicleType( com.graphhopper.jsprit.core.problem.vehicle.VehicleType type ){
 		VehicleType typeBuilder = VehicleUtils.getFactory().createVehicleType( Id.create( type.getTypeId(), VehicleType.class ) );
-		typeBuilder.setCapacityWeightInTons(type.getCapacityDimensions().get(0 ) );
-		typeBuilder.setCostPerDistanceUnit(type.getVehicleCostParams().perDistanceUnit).setCostPerTimeUnit(type.getVehicleCostParams().perTransportTimeUnit)
-				.setFixCost(type.getVehicleCostParams().fix);
+		typeBuilder.getCapacity().setWeightInTons( type.getCapacityDimensions().get(0 ) ) ;
+		typeBuilder.getCostInformation().setCostsPerMeter( type.getVehicleCostParams().perDistanceUnit ) ;
+		typeBuilder.getCostInformation().setCostsPerSecond( type.getVehicleCostParams().perTransportTimeUnit ) ;
+		VehicleType vehicleType = typeBuilder;
+		vehicleType.getCostInformation().setFixedCost( type.getVehicleCostParams().fix ) ;
 		typeBuilder.setMaximumVelocity(type.getMaxVelocity() );
-		return typeBuilder.build();
+		return typeBuilder;
 	}
 
 	/**
@@ -281,9 +283,9 @@ public class MatsimJspritFactory {
 			// yyyyyy this implies that we would have fewer problems if we set vehicle capacity in kg instead of in tons in our data model.  kai, aug'19
 		}
 		typeBuilder.addCapacityDimension(0, vehicleCapacityInt);
-		typeBuilder.setCostPerDistance(carrierVehicleType.getCostInformation().getCostsPerMeter());
-		typeBuilder.setCostPerTransportTime(carrierVehicleType.getCostInformation().getCostsPerSecond());
-		typeBuilder.setFixedCost(carrierVehicleType.getCostInformation().getFixedCosts());
+		typeBuilder.setCostPerDistance(carrierVehicleType.getCostInformation().getCostsPerMeter() );
+		typeBuilder.setCostPerTransportTime(carrierVehicleType.getCostInformation().getCostsPerSecond() );
+		typeBuilder.setFixedCost(carrierVehicleType.getCostInformation().getFixedCosts() );
 		typeBuilder.setMaxVelocity(carrierVehicleType.getMaximumVelocity());
 		return typeBuilder.build();
 	}
@@ -414,7 +416,7 @@ public class MatsimJspritFactory {
 				if (link == null)
 					throw new IllegalStateException("vehicle.locationId cannot be found in network [vehicleId=" + v.getId() + "][locationId=" + v.getLocation() + "]");
 				coordinate = link.getCoord();
-			} else log.warn("cannot find linkId " + v.getId());
+			} else log.warn("cannot find linkId " + v.getId() );
 			Vehicle veh = createVehicle(v, coordinate);
 			assert veh.getEarliestDeparture() == v.getEarliestStartTime() : "earliestDeparture of both vehicles must be equal";
 			assert veh.getLatestArrival() == v.getLatestEndTime() : "latestArrTime of both vehicles must be equal";
@@ -496,7 +498,7 @@ public class MatsimJspritFactory {
 				if (link == null)
 					throw new IllegalStateException("vehicle.locationId cannot be found in network [vehicleId=" + v.getId() + "][locationId=" + v.getLocation() + "]");
 				coordinate = link.getCoord();
-			} else log.warn("cannot find linkId " + v.getId());
+			} else log.warn("cannot find linkId " + v.getId() );
 			vrpBuilder.addVehicle(createVehicle(v, coordinate));
 		}
 

@@ -93,6 +93,7 @@ env:
     - MODULE=contribs/emissions
     - MODULE=contribs/decongestion
     - MODULE=contribs/noise
+    - MODULE=contribs/accidents
     - MODULE=contribs/freight
     - MODULE=contribs/parking
     - MODULE=contribs/matrixbasedptrouter

@@ -40,7 +40,8 @@ public class DrtConfigs {
 
 	public static void adjustDrtConfig(DrtConfigGroup drtCfg, PlanCalcScoreConfigGroup planCalcScoreCfg) {
 		DrtStageActivityType drtStageActivityType = new DrtStageActivityType(drtCfg.getMode());
-		if (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stopbased)) {
+		if (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stopbased) ||
+				drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.serviceAreaBased)) {
 			if (planCalcScoreCfg.getActivityParams(drtStageActivityType.drtStageActivity) == null) {
 				addDrtStageActivityParams(planCalcScoreCfg, drtStageActivityType.drtStageActivity);
 			}

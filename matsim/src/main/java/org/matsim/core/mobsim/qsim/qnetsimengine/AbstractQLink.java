@@ -575,6 +575,10 @@ abstract class AbstractQLink implements QLinkI {
 		public int getNumberOfLanesAsInt(double now) {
 			return NetworkUtils.getNumberOfLanesAsInt(now,AbstractQLink.this.link) ;
 		}
+		
+		public Link getLink() {
+			return AbstractQLink.this.link;
+		}
 	}
 	private final QLinkInternalInterface qLinkInternalInterface = new QLinkInternalInterface() ;
 	public final QLinkInternalInterface getInternalInterface() {

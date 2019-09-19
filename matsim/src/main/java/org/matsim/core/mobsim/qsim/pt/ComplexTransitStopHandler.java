@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 /**
@@ -43,7 +44,7 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 
 	private final double personEntersTime;
 	private final double personLeavesTime;
-	private final VehicleUtils.DoorOperationMode doorOperationMode;
+	private final VehicleType.DoorOperationMode doorOperationMode;
 	
 	// TODO make it dynamic
 	private static final double openDoorsDuration = 1.0;
@@ -59,9 +60,9 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 	public double handleTransitStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers,
 			List<PTPassengerAgent> enteringPassengers, PassengerAccessEgress handler, MobsimVehicle vehicle) {
 		
-		if(this.doorOperationMode == VehicleUtils.DoorOperationMode.parallel){
+		if(this.doorOperationMode == VehicleType.DoorOperationMode.parallel){
 			return handleParallelStop(stop, now, leavingPassengers, enteringPassengers, handler, vehicle);			
-		} else if (this.doorOperationMode == VehicleUtils.DoorOperationMode.serial){
+		} else if (this.doorOperationMode == VehicleType.DoorOperationMode.serial){
 			return handleSerialStop(stop, now, leavingPassengers, enteringPassengers, handler, vehicle);
 		} else {
 			log.info("Unimplemented door operation mode " + this.doorOperationMode + " set. Using parralel mode as default.");

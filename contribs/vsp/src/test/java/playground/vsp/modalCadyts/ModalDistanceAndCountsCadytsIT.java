@@ -1,5 +1,6 @@
 package playground.vsp.modalCadyts;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,6 +53,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
+@Ignore
 public class ModalDistanceAndCountsCadytsIT {
 
 	@Parameterized.Parameters(name = "{index}: countsWeight == {0}; modalDistanceWeight == {1};")
@@ -80,6 +82,7 @@ public class ModalDistanceAndCountsCadytsIT {
 	 * is set to have an equal share of car and bike users. The accepted error in the test is 5%, due to stochastic fuzziness
 	 */
 	@Test
+//	@Ignore
 	public void test() {
 
 		Config config = createConfig();

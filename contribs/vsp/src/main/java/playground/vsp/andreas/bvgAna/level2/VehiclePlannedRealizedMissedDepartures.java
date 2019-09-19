@@ -40,7 +40,7 @@ import playground.vsp.andreas.bvgAna.level1.StopId2RouteId2DelayAtStopMapData;
 public class VehiclePlannedRealizedMissedDepartures {
 
 	private final Logger log = Logger.getLogger(VehiclePlannedRealizedMissedDepartures.class);
-	private final Level logLevel = Level.OFF;
+//	private final Level logLevel = Level.OFF;
 
 	private final String planned = "planned";
 	private final String realized = "realized";
@@ -49,7 +49,7 @@ public class VehiclePlannedRealizedMissedDepartures {
 
 
 	public VehiclePlannedRealizedMissedDepartures(StopId2RouteId2DelayAtStopMap vehicleDelayHandler){
-		this.log.setLevel(this.logLevel);
+//		this.log.setLevel(this.logLevel);
 		this.stopId2Route2DelayAtStopMap = vehicleDelayHandler.getStopId2RouteId2DelayAtStopMap();
 	}
 
@@ -74,7 +74,7 @@ public class VehiclePlannedRealizedMissedDepartures {
 
 		int numberOfMissedVehicles = realizedDeparture.getSecond().intValue() - plannedDeparture.getSecond().intValue();
 
-		if(this.logLevel == Level.DEBUG){
+		if(log.getLevel() == Level.DEBUG){
 			double delay = realizedDepartureTime - plannedDepartureTime;
 			if(numberOfMissedVehicles < 0 && delay > 0){
 				this.log.debug("Positive delay despite the fact that the agent could get a vehicle earlier. This could be right in case vehicles suffer from severe delay, please check.");

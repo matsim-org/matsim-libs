@@ -1,111 +1,101 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.matsim.contrib</groupId>
-  <artifactId>integration</artifactId>
-  <name>integration</name>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.matsim.contrib</groupId>
+	<artifactId>integration</artifactId>
+	<name>integration</name>
 
-  <parent>
-    <groupId>org.matsim</groupId>
-    <artifactId>contrib</artifactId>
-    <version>12.0-SNAPSHOT</version>
-  </parent>
-  
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <!-- We cannot define excludes for daily/weekly here, because
-               excludes always overpower includes, so having excludes here,
-               the profiles below would not be able re-enable/include the
-               desired tests.
-               Thus, define an include statement which basically configures
-               it to include nothing by default (an empty include tag did not 
-               work, resulting in NullPointerException within the surefire 
-               plugin. Thus, define some name that does not exist). This means
-               there is no possibility to execute regular unit test unless
-               they are in well defined packages that would have to be included
-               manually below. 
-               -->
-          <includes>
-            <include>**/SomeNonExistingTestName</include>
-          </includes>
-          <forkMode>always</forkMode>
-          <argLine>-Xmx1500m -Djava.awt.headless=true</argLine>
-          <enableAssertions>false</enableAssertions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+	<parent>
+		<groupId>org.matsim</groupId>
+		<artifactId>contrib</artifactId>
+		<version>12.0-SNAPSHOT</version>
+	</parent>
 
-  <profiles>
-    <profile>
-      <id>daily</id>
-      <build>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-surefire-plugin</artifactId>
-              <configuration>
-                <includes>
-                  <include>**/daily/**/*Test.java</include>
-                </includes>
-              </configuration>
-            </plugin>
-          </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>weekly</id>
-      <build>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-surefire-plugin</artifactId>
-              <configuration>
-                <includes>
-                  <include>**/weekly/**/*Test.java</include>
-                </includes>
-              </configuration>
-            </plugin>
-          </plugins>
-      </build>
-    </profile>
-  </profiles>
-  
-  	<repositories>
-		
-		<!-- For SwissRailRaptor test -->
-		<repository>
-			<id>jitpack.io</id>
-			<url>https://jitpack.io</url>
-		</repository>
-		
-	</repositories>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<!-- We cannot define excludes for daily/weekly here, because
+						 excludes always overpower includes, so having excludes here,
+						 the profiles below would not be able re-enable/include the
+						 desired tests.
+						 Thus, define an include statement which basically configures
+						 it to include nothing by default (an empty include tag did not
+						 work, resulting in NullPointerException within the surefire
+						 plugin. Thus, define some name that does not exist). This means
+						 there is no possibility to execute regular unit test unless
+						 they are in well defined packages that would have to be included
+						 manually below.
+						 -->
+					<includes>
+						<include>**/SomeNonExistingTestName</include>
+					</includes>
+					<forkMode>always</forkMode>
+					<argLine>-Xmx1500m -Djava.awt.headless=true</argLine>
+					<enableAssertions>false</enableAssertions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
-  <dependencies>
-  <dependency>
-  	<groupId>org.matsim.contrib</groupId>
-  	<artifactId>accessibility</artifactId>
-  	<version>12.0-SNAPSHOT</version>
-  </dependency>
-  <dependency>
-    <groupId>org.geotools.jdbc</groupId>
-    <artifactId>gt-jdbc-postgis</artifactId>
-	  <version>21.1</version>
-  </dependency>
-  <dependency>
-  	<groupId>org.matsim.contrib</groupId>
-  	<artifactId>analysis</artifactId>
-  	<version>12.0-SNAPSHOT</version>
-  </dependency>
-  <dependency>
-    <groupId>com.github.simunto</groupId>
-    <artifactId>matsim-sbb-extensions</artifactId>
-    <version>0.11.0-2018w44</version>
-	<!--(careful, this is not matsim, thus not ${matsim.version})-->
-  </dependency>
-  </dependencies>
+	<profiles>
+		<profile>
+			<id>daily</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<includes>
+								<include>**/daily/**/*Test.java</include>
+							</includes>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>weekly</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+							<includes>
+								<include>**/weekly/**/*Test.java</include>
+							</includes>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>accessibility</artifactId>
+			<version>12.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools.jdbc</groupId>
+			<artifactId>gt-jdbc-postgis</artifactId>
+			<version>21.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>analysis</artifactId>
+			<version>12.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.sbb</groupId>
+			<artifactId>matsim-sbb-extensions</artifactId>
+			<version>11.5</version>
+		</dependency>
+	</dependencies>
 </project>

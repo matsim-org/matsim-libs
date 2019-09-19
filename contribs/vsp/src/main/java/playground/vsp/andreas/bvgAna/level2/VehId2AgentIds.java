@@ -43,12 +43,12 @@ import playground.vsp.andreas.bvgAna.level1.VehId2PersonEnterLeaveVehicleMap;
 public class VehId2AgentIds implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	
 	private final Logger log = Logger.getLogger(VehId2AgentIds.class);
-	private final Level logLevel = Level.DEBUG;
+//	private final Level logLevel = Level.DEBUG;
 	
 	private VehId2PersonEnterLeaveVehicleMap vehId2PersonEnterLeaveVehicleMap;
 	
 	public VehId2AgentIds(){
-		this.log.setLevel(this.logLevel);
+//		this.log.setLevel(this.logLevel);
 		this.vehId2PersonEnterLeaveVehicleMap = new VehId2PersonEnterLeaveVehicleMap();
 	}
 	

@@ -26,6 +26,14 @@ public class CarrierVehicle implements Vehicle {
 	public static CarrierVehicle newInstance(Id<Vehicle> vehicleId, Id<Link> locationId){
 		return new CarrierVehicle(vehicleId, locationId);
 	}
+	@Deprecated // refactoring device, please inline
+	public Id<Vehicle> getVehicleId(){
+		return getId() ;
+	}
+	@Deprecated // refactoring device, please inline
+	public void setVehicleType( VehicleType collectionType ){
+		setType( collectionType );
+	}
 
 	/**
 	 * Builder to build vehicles.
@@ -119,7 +127,7 @@ public class CarrierVehicle implements Vehicle {
 	public Id<Link> getLocation() {
 		return locationId;
 	}
-
+	@Override
 	public Id<Vehicle> getId() {
 		return vehicleId;
 	}
@@ -128,7 +136,6 @@ public class CarrierVehicle implements Vehicle {
 	public String toString() {
 		return vehicleId + " stationed at " + locationId;
 	}
-
 	@Override
 	public VehicleType getType() {
 		return vehicleType;
