@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+
+<!-- ====================================================================== -->
+
+	<module name="controler" >
+
+		<!-- Default=0;  -->
+		<param name="firstIteration" value="0" />
+
+		<!-- Default=1000;  -->
+		<param name="lastIteration" value="5" />
+
+		<param name="outputDirectory" value="./test/output/" />
+
+		<!-- iterationNumber % writeEventsInterval == 0 defines in which iterations events are written to a file. `0' disables events writing completely. -->
+		<!-- <param name="writeEventsInterval" value="10" /> -->
+		<param name="writeEventsInterval" value="5" />
+
+		<!-- iterationNumber % writePlansInterval == 0 defines (hopefully) in which iterations plans are written to a file. `0' disables plans writing completely.  Some plans in early iterations are always written -->
+		<!-- <param name="writePlansInterval" value="10" /> -->
+		<param name="writePlansInterval" value="5" />
+
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="emissions" >
+
+		<!-- REQUIRED: file with HBEFA 3.1 fleet average cold emission factors -->
+		<param name="averageFleetColdEmissionFactorsFile" value="../sample_EFA_ColdStart_vehcat_2005average.txt" />
+
+		<!-- REQUIRED: file with HBEFA 3.1 fleet average warm emission factors -->
+		<param name="averageFleetWarmEmissionFactorsFile" value="../sample_EFA_HOT_vehcat_2005average.txt" />
+
+		<!-- following should eventually become default but currently is not: -->
+		<param name="hbefaRoadTypeSource" value="fromLinkAttributes" />
+
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="global" >
+		<param name="coordinateSystem" value="Atlantis" />
+
+		<!-- "global" number of threads.  This number is used, e.g., for replanning, but NOT in the mobsim.  This can typically be set to as many cores as you have available, or possibly even slightly more. -->
+		<param name="numberOfThreads" value="2" />
+
+		<param name="randomSeed" value="4711" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="network" >
+		<param name="inputChangeEventsFile" value="null" />
+		<param name="inputNetworkFile" value="../sample_network.xml" />
+		<param name="laneDefinitionsFile" value="null" />
+		<param name="timeVariantNetwork" value="false" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="parallelEventHandling" >
+
+		<!-- Estimated number of events during mobsim run. An optional optimization hint for the framework. -->
+		<param name="estimatedNumberOfEvents" value="null" />
+
+		<!-- Number of threads for parallel events handler. 0 or null means the framework decides by itself. -->
+		<param name="numberOfThreads" value="null" />
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="planCalcScore" >
+
+		<!-- [utils/hr] utility for arriving late (i.e. after the latest start time).  normally negative -->
+		<param name="lateArrival" value="-18.0" />
+
+		<!-- [utils/unit_of_money] conversion of money (e.g. toll, distance cost) into utils. Normall positive (i.e. toll/cost/fare are processed as negative amounts of money). -->
+		<param name="marginalUtilityOfMoney" value="1.0" />
+
+		<!-- [utils/hr] marginal utility of doing an activity.  normally positive.  also the opportunity cost of time if agent is doing nothing.  MATSim separates the resource value of time from the direct (dis)utility of travel time, see, e.g., Boerjesson and Eliasson, TR-A 59 (2014) 144-158. -->
+		<param name="performing" value="6.0" />
+
+		<!-- [utils] utility of switching a line (= transfer penalty).  Normally negative -->
+		<param name="utilityOfLineSwitch" value="-1.0" />
+
+		<parameterset type="activityParams" >
+			<param name="activityType" value="home" />
+			<param name="typicalDuration" value="43200.0" />
+		</parameterset>
+
+		<parameterset type="activityParams" >
+			<param name="activityType" value="work" />
+			<param name="typicalDuration" value="28800.0" />
+		</parameterset>
+
+		<parameterset type="modeParams" >
+
+			<!-- [utils] alternative-specific constant.  no guarantee that this is used anywhere. default=0 to be backwards compatible for the time being -->
+			<param name="constant" value="0.0" />
+
+			<!-- [utils/m] utility of walking per m, normally negative.  this is on top of the time (dis)utility. -->
+			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+
+			<!-- [utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top of the opportunity cost of time -->
+			<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
+
+			<param name="mode" value="car" />
+
+			<!-- [unit_of_money/m] conversion of distance into money. Probably needs to be negative to work. -->
+			<param name="monetaryDistanceRate" value="0.0" />
+		</parameterset>
+
+		<parameterset type="modeParams" >
+
+			<!-- [utils] alternative-specific constant.  no guarantee that this is used anywhere. default=0 to be backwards compatible for the time being -->
+			<param name="constant" value="0.0" />
+
+			<!-- [utils/m] utility of walking per m, normally negative.  this is on top of the time (dis)utility. -->
+			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+
+			<!-- [utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top of the opportunity cost of time -->
+			<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
+
+			<param name="mode" value="pt" />
+
+			<!-- [unit_of_money/m] conversion of distance into money. Probably needs to be negative to work. -->
+			<param name="monetaryDistanceRate" value="0.0" />
+		</parameterset>
+
+		<parameterset type="modeParams" >
+
+			<!-- [utils] alternative-specific constant.  no guarantee that this is used anywhere. default=0 to be backwards compatible for the time being -->
+			<param name="constant" value="0.0" />
+
+			<!-- [utils/m] utility of walking per m, normally negative.  this is on top of the time (dis)utility. -->
+			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+
+			<!-- [utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top of the opportunity cost of time -->
+			<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
+
+			<param name="mode" value="walk" />
+
+			<!-- [unit_of_money/m] conversion of distance into money. Probably needs to be negative to work. -->
+			<param name="monetaryDistanceRate" value="0.0" />
+		</parameterset>
+
+		<parameterset type="modeParams" >
+
+			<!-- [utils] alternative-specific constant.  no guarantee that this is used anywhere. default=0 to be backwards compatible for the time being -->
+			<param name="constant" value="0.0" />
+
+			<!-- [utils/m] utility of walking per m, normally negative.  this is on top of the time (dis)utility. -->
+			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+
+			<!-- [utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top of the opportunity cost of time -->
+			<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
+
+			<param name="mode" value="bike" />
+
+			<!-- [unit_of_money/m] conversion of distance into money. Probably needs to be negative to work. -->
+			<param name="monetaryDistanceRate" value="0.0" />
+		</parameterset>
+
+		<parameterset type="modeParams" >
+
+			<!-- [utils] alternative-specific constant.  no guarantee that this is used anywhere. default=0 to be backwards compatible for the time being -->
+			<param name="constant" value="0.0" />
+
+			<!-- [utils/m] utility of walking per m, normally negative.  this is on top of the time (dis)utility. -->
+			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+
+			<!-- [utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top of the opportunity cost of time -->
+			<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
+
+			<param name="mode" value="other" />
+
+			<!-- [unit_of_money/m] conversion of distance into money. Probably needs to be negative to work. -->
+			<param name="monetaryDistanceRate" value="0.0" />
+		</parameterset>
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="plans" >
+
+		<param name="inputPlansFile" value="../sample_population.xml" />
+
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="planscalcroute" >
+
+		<!-- factor with which beeline distances (and therefore times) are multiplied in order to obtain an estimate of the network distances/times.  Default is something like 1.3 -->
+		<param name="beelineDistanceFactor" value="1.3" />
+
+		<!-- All the modes for which the router is supposed to generate network routes (like car) -->
+		<!-- <param name="networkModes" value="car,ride" /> -->
+		<param name="networkModes" value="car" />
+
+		<parameterset type="teleportedModeParameters" >
+			<param name="mode" value="bike" />
+
+			<!-- Free-speed factor for a teleported mode. Travel time = teleportedModeFreespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. Please do not set teleportedModeFreespeedFactor as well as teleportedModeSpeed for the same mode, but if you do, +teleportedModeFreespeedFactor wins over teleportedModeSpeed. -->
+			<param name="teleportedModeFreespeedFactor" value="null" />
+
+			<!-- Speed for a teleported mode. Travel time = (<beeline distance> * beelineDistanceFactor) / teleportedModeSpeed. Insert a line like this for every such mode. -->
+			<param name="teleportedModeSpeed" value="4.166666666666667" />
+		</parameterset>
+
+		<parameterset type="teleportedModeParameters" >
+			<param name="mode" value="walk" />
+
+			<!-- Free-speed factor for a teleported mode. Travel time = teleportedModeFreespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. Please do not set teleportedModeFreespeedFactor as well as teleportedModeSpeed for the same mode, but if you do, +teleportedModeFreespeedFactor wins over teleportedModeSpeed. -->
+			<param name="teleportedModeFreespeedFactor" value="null" />
+
+			<!-- Speed for a teleported mode. Travel time = (<beeline distance> * beelineDistanceFactor) / teleportedModeSpeed. Insert a line like this for every such mode. -->
+			<param name="teleportedModeSpeed" value="0.8333333333333333" />
+		</parameterset>
+
+		<parameterset type="teleportedModeParameters" >
+			<param name="mode" value="undefined" />
+
+			<!-- Free-speed factor for a teleported mode. Travel time = teleportedModeFreespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. Please do not set teleportedModeFreespeedFactor as well as teleportedModeSpeed for the same mode, but if you do, +teleportedModeFreespeedFactor wins over teleportedModeSpeed. -->
+			<param name="teleportedModeFreespeedFactor" value="null" />
+
+			<!-- Speed for a teleported mode. Travel time = (<beeline distance> * beelineDistanceFactor) / teleportedModeSpeed. Insert a line like this for every such mode. -->
+			<param name="teleportedModeSpeed" value="13.88888888888889" />
+		</parameterset>
+
+		<parameterset type="teleportedModeParameters" >
+			<param name="mode" value="pt" />
+
+			<!-- Free-speed factor for a teleported mode. Travel time = teleportedModeFreespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. Please do not set teleportedModeFreespeedFactor as well as teleportedModeSpeed for the same mode, but if you do, +teleportedModeFreespeedFactor wins over teleportedModeSpeed. -->
+			<param name="teleportedModeFreespeedFactor" value="2.0" />
+
+			<!-- Speed for a teleported mode. Travel time = (<beeline distance> * beelineDistanceFactor) / teleportedModeSpeed. Insert a line like this for every such mode. -->
+			<param name="teleportedModeSpeed" value="null" />
+		</parameterset>
+	</module>
+
+<!-- ====================================================================== -->
+	
+	<module name="vehicles" >
+		<param name="vehiclesFile" value="sample_emissionVehicles_v2.xml" />
+	</module>
+	
+<!-- ====================================================================== -->
+
+	<module name="strategy" >
+
+		<!-- fraction of iterations where innovative strategies are switched off.  Something link 0.8 should be good.  E.g. if you run from iteration 400 to iteration 500, innovation is switched off at iteration 480 -->
+		<param name="fractionOfIterationsToDisableInnovation" value="Infinity" />
+
+		<parameterset type="strategysettings" >
+
+			<!-- iteration after which module will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...) -->
+			<param name="disableAfterIteration" value="-1" />
+
+			<!-- name of strategy (if not full class name, resolved in StrategyManagerConfigLoader) -->
+			<param name="strategyName" value="ChangeExpBeta" />
+
+			<!-- probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight'' -->
+			<param name="weight" value="1.0" />
+
+		</parameterset>
+	</module>
+
+<!-- ====================================================================== -->
+
+	<module name="vspExperimental" >
+
+		<!-- Options: `ignore', `warn', `abort'.  Default: either `ignore' or `warn'.
+		When violating VSP defaults, this results in nothing, warnings, or aborts.  Members of VSP should use `abort' or talk to kai. -->
+		<param name="vspDefaultsCheckingLevel" value="warn" />
+	</module>
+
+<!-- ====================================================================== -->
+
+</config>

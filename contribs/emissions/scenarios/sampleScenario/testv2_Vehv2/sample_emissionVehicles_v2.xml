@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
+	<vehicleType id="car_average">
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaVehicleCategory" class="Java.Lang.String">PASSENGER_CAR</attribute>
+				<attribute name="HbefaTechnology" class="Java.Lang.String">average</attribute>
+				<attribute name="HbefaSizeClass" class="Java.Lang.String">average</attribute>
+				<attribute name="HbefaEmissionsConcept" class="Java.Lang.String">average</attribute>
+			</attributes>
+		</engineInformation>
+	</vehicleType>
+
+	<vehicleType id="car_petrol">
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaVehicleCategory" class="Java.Lang.String">PASSENGER_CAR</attribute>
+				<attribute name="HbefaTechnology" class="Java.Lang.String">petrol (4S)</attribute>
+				<attribute name="HbefaSizeClass" class="Java.Lang.String">&gt;=2L</attribute>
+				<attribute name="HbefaEmissionsConcept" class="Java.Lang.String">PC-P-Euro-1</attribute>
+			</attributes>
+		</engineInformation>
+	</vehicleType>
+
+	<vehicleType id="car_diesel">
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaVehicleCategory" class="Java.Lang.String">PASSENGER_CAR</attribute>
+				<attribute name="HbefaTechnology" class="Java.Lang.String">diesel</attribute>
+				<attribute name="HbefaSizeClass" class="Java.Lang.String">&lt;1,4L</attribute>
+				<attribute name="HbefaEmissionsConcept" class="Java.Lang.String">PC-D-Euro-3</attribute>
+			</attributes>
+		</engineInformation>
+	</vehicleType>
+
+	<vehicleType id="truck">
+		<description>
+			BEGIN_EMISSIONSHEAVY_GOODS_VEHICLE;average;average;averageEND_EMISSIONS
+		</description>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<engineInformation>
+			<attributes>
+				<attribute name="HbefaVehicleCategory" class="Java.Lang.String">HEAVY_GOODS_VEHICLE</attribute>
+				<attribute name="HbefaTechnology" class="Java.Lang.String">average</attribute>
+				<attribute name="HbefaSizeClass" class="Java.Lang.String">average</attribute>
+				<attribute name="HbefaEmissionsConcept" class="Java.Lang.String">average</attribute>
+			</attributes>
+		</engineInformation>
+	</vehicleType>
+
+	<vehicle id="555928.1#7278" type="car_diesel"/>
+	<vehicle id="570902.2#10897" type="car_petrol"/>
+	<vehicle id="570902.2#14854" type="car_petrol"/>
+	<vehicle id="570902.2#2983" type="car_petrol"/>
+	<vehicle id="pv_car_10041_9162_1" type="car_average"/>
+	<vehicle id="pv_car_5315_9162_1" type="car_average"/>
+	<vehicle id="gv_4499" type="truck"/>
+	<vehicle id="gv_4500" type="truck"/>
+</vehicleDefinitions>
