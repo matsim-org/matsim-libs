@@ -16,10 +16,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.emissions.example;
+package org.matsim.contrib.emissions.example.V1;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.contrib.emissions.example.RunAverageEmissionToolOfflineExample;
+import org.matsim.contrib.emissions.example.RunDetailedEmissionToolOfflineExample;
 import org.matsim.core.config.Config;
 import org.matsim.testcases.MatsimTestUtils;
 

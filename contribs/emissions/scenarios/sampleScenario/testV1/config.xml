@@ -29,19 +29,19 @@
 	<module name="emissions" >
 
 		<!-- REQUIRED: file with HBEFA 3.1 fleet average cold emission factors -->
-		<param name="averageFleetColdEmissionFactorsFile" value="sample_EFA_ColdStart_vehcat_2005average.txt" />
+		<param name="averageFleetColdEmissionFactorsFile" value="../sample_EFA_ColdStart_vehcat_2005average.txt" />
 
 		<!-- REQUIRED: file with HBEFA 3.1 fleet average warm emission factors -->
-		<param name="averageFleetWarmEmissionFactorsFile" value="sample_EFA_HOT_vehcat_2005average.txt" />
+		<param name="averageFleetWarmEmissionFactorsFile" value="../sample_EFA_HOT_vehcat_2005average.txt" />
 
 		<!-- OPTIONAL: file with HBEFA 3.1 detailed cold emission factors -->
-		<param name="detailedColdEmissionFactorsFile" value="sample_EFA_ColdStart_SubSegm_2005detailed.txt" />
+		<param name="detailedColdEmissionFactorsFile" value="../sample_EFA_ColdStart_SubSegm_2005detailed.txt" />
 
 		<!-- OPTIONAL: file with HBEFA 3.1 detailed warm emission factors -->
-		<param name="detailedWarmEmissionFactorsFile" value="sample_EFA_HOT_SubSegm_2005detailed.txt" />
+		<param name="detailedWarmEmissionFactorsFile" value="../sample_EFA_HOT_SubSegm_2005detailed.txt" />
 
 		<!-- REQUIRED: mapping from input road types to HBEFA 3.1 road type strings -->
-		<param name="emissionRoadTypeMappingFile" value="sample_roadTypeMapping.txt" />
+		<param name="emissionRoadTypeMappingFile" value="../sample_roadTypeMapping.txt" />
 
 		<!-- if true then detailed emission factor files must be provided! -->
 		<param name="usingDetailedEmissionCalculation" value="true" />
@@ -62,7 +62,7 @@
 
 	<module name="network" >
 		<param name="inputChangeEventsFile" value="null" />
-		<param name="inputNetworkFile" value="sample_network.xml" />
+		<param name="inputNetworkFile" value="../sample_network.xml" />
 		<param name="laneDefinitionsFile" value="null" />
 		<param name="timeVariantNetwork" value="false" />
 	</module>
@@ -194,7 +194,7 @@
 
 	<module name="plans" >
 
-		<param name="inputPlansFile" value="sample_population.xml" />
+		<param name="inputPlansFile" value="../sample_population.xml" />
 
 	</module>
 

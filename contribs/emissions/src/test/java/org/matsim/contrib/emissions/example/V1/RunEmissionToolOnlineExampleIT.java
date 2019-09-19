@@ -16,15 +16,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.emissions.example;
-
-import static org.junit.Assert.*;
+package org.matsim.contrib.emissions.example.V1;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.emissions.example.RunEmissionToolOnlineExample;
 import org.matsim.core.config.Config;
 import org.matsim.testcases.MatsimTestUtils;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author nagel
@@ -34,13 +35,13 @@ public class RunEmissionToolOnlineExampleIT {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	/**
-	 * Test method for {@link RunEmissionToolOnlineExample#main(java.lang.String[])}.
+	 * Test method for {@link RunEmissionToolOnlineExample#main(String[])}.
 	 */
 	@SuppressWarnings("static-method")
 	@Test
 	public final void testMain() {
 		try {
-			Config config = RunEmissionToolOnlineExample.prepareConfig( null ) ;
+			Config config = RunEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testV1/config.xml"}) ;
 			
 			config.controler().setOutputDirectory( utils.getOutputDirectory() );
 			
