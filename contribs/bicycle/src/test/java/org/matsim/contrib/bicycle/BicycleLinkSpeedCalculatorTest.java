@@ -34,7 +34,7 @@ public class BicycleLinkSpeedCalculatorTest {
     @Test
     public void getMaximumVelocity_noBike() {
         Link link = createLinkWithNoGradientAndNoSpecialSurface();
-        VehicleType type = new VehicleType(Id.create("no-bike", VehicleType.class));
+        VehicleType type = VehicleUtils.createVehicleType(Id.create("no-bike", VehicleType.class ) );
         type.setMaximumVelocity(link.getFreespeed() / 2); // less than the link's freespeed
         QVehicle vehicle = new QVehicleImpl(VehicleUtils.createVehicle(Id.createVehicleId(1), type));
         BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(configGroup);
@@ -47,7 +47,7 @@ public class BicycleLinkSpeedCalculatorTest {
     @Test
     public void getMaximumVelocity_noBike_vehicleFasterThanFreespeed() {
         Link link = createLinkWithNoGradientAndNoSpecialSurface();
-        VehicleType type = new VehicleType(Id.create("no-bike", VehicleType.class));
+        VehicleType type = VehicleUtils.createVehicleType(Id.create("no-bike", VehicleType.class ) );
         type.setMaximumVelocity(link.getFreespeed() * 10); // more than the link's freespeed
         QVehicle vehicle = new QVehicleImpl(VehicleUtils.createVehicle(Id.createVehicleId(1), type));
         BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(configGroup);
@@ -61,7 +61,7 @@ public class BicycleLinkSpeedCalculatorTest {
     public void getMaximumVelocity_bike() {
 
         Link link = createLinkWithNoGradientAndNoSpecialSurface();
-        VehicleType type = new VehicleType(Id.create("bike", VehicleType.class));
+        VehicleType type = VehicleUtils.createVehicleType(Id.create("bike", VehicleType.class ) );
         type.setMaximumVelocity(1000); // more than in the config group
         QVehicle vehicle = new QVehicleImpl(VehicleUtils.createVehicle(Id.createVehicleId(1), type));
         BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(configGroup);
@@ -76,7 +76,7 @@ public class BicycleLinkSpeedCalculatorTest {
 
         Link link = createLinkWithNoGradientAndNoSpecialSurface();
         link.setFreespeed(configGroup.getMaxBicycleSpeedForRouting() * 0.5); // the freespeed should be less than the assumed bike speed
-        VehicleType type = new VehicleType(Id.create("bike", VehicleType.class));
+        VehicleType type = VehicleUtils.createVehicleType(Id.create("bike", VehicleType.class ) );
         type.setMaximumVelocity(link.getFreespeed() * 2);
         QVehicle vehicle = new QVehicleImpl(VehicleUtils.createVehicle(Id.createVehicleId(1), type));
         BicycleLinkSpeedCalculatorDefaultImpl calculator = new BicycleLinkSpeedCalculatorDefaultImpl(configGroup);

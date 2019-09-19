@@ -253,11 +253,13 @@ public class MatsimJspritFactory {
 	 */
 	static VehicleType createCarrierVehicleType( com.graphhopper.jsprit.core.problem.vehicle.VehicleType type ){
 		VehicleType typeBuilder = VehicleUtils.getFactory().createVehicleType( Id.create( type.getTypeId(), VehicleType.class ) );
-		typeBuilder.setCapacityWeightInTons(type.getCapacityDimensions().get(0 ) );
-		typeBuilder.setCostPerDistanceUnit(type.getVehicleCostParams().perDistanceUnit).setCostPerTimeUnit(type.getVehicleCostParams().perTransportTimeUnit)
-				.setFixCost(type.getVehicleCostParams().fix);
+		typeBuilder.getCapacity().setWeightInTons( type.getCapacityDimensions().get(0 ) ) ;
+		typeBuilder.getCostInformation().setCostsPerMeter( type.getVehicleCostParams().perDistanceUnit ) ;
+		typeBuilder.getCostInformation().setCostsPerSecond( type.getVehicleCostParams().perTransportTimeUnit ) ;
+		VehicleType vehicleType = typeBuilder;
+		vehicleType.getCostInformation().setFixedCost( type.getVehicleCostParams().fix ) ;
 		typeBuilder.setMaximumVelocity(type.getMaxVelocity() );
-		return typeBuilder.build();
+		return typeBuilder;
 	}
 
 	/**

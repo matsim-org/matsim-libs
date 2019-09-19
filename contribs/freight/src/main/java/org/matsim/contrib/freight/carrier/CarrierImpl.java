@@ -15,7 +15,10 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  *
  */
 public final class CarrierImpl implements Carrier {
-
+	@Deprecated // refactoring device, please inline
+	public static Carrier newInstance( Id<Carrier> carrierId ){
+		return CarrierUtils.createCarrier( carrierId ) ;
+	}
 	private final Id<Carrier> id;
 
 	private final List<CarrierPlan> plans;

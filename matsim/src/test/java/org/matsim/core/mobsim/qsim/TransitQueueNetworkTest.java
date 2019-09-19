@@ -1086,7 +1086,7 @@ public class TransitQueueNetworkTest extends TestCase {
             qsim.getSimTimer().setTime(100);
 
             // setup: vehicles
-            VehicleType vehicleType = new VehicleType(Id.create("testVehicleType", VehicleType.class ));
+            VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("testVehicleType", VehicleType.class ) );
 //            VehicleCapacity capacity = new VehicleCapacity();
             vehicleType.getCapacity().setSeats(Integer.valueOf(101));
 		  vehicleType.getCapacity().setStandingRoom(Integer.valueOf(0));
