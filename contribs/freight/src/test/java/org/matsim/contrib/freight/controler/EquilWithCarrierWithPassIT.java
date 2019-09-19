@@ -96,7 +96,7 @@ public class EquilWithCarrierWithPassIT {
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes() ;
 		Id<org.matsim.vehicles.VehicleType> id = Id.create( idString, org.matsim.vehicles.VehicleType.class ) ;
 		VehicleType builder = VehicleUtils.getFactory().createVehicleType( id );
-		VehicleType result = builder.build();
+		VehicleType result = builder;
 		carrierVehicleTypes.getVehicleTypes().put( result.getId(), result ) ;
 		new CarrierVehicleTypeLoader( carriers ).loadVehicleTypes( carrierVehicleTypes );
 	}

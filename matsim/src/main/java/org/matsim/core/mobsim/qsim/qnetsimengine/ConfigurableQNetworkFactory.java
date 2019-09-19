@@ -29,6 +29,8 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.flow_efficiency.DefaultFlowEfficiencyCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.flow_efficiency.FlowEfficiencyCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.DefaultVehicleHandler;
@@ -54,6 +56,7 @@ public final class ConfigurableQNetworkFactory implements QNetworkFactory {
 	private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
 	private TurnAcceptanceLogic turnAcceptanceLogic = new DefaultTurnAcceptanceLogic() ;
 	private VehicleHandler vehicleHandler = new DefaultVehicleHandler();
+	private FlowEfficiencyCalculator flowEfficiencyCalculator = new DefaultFlowEfficiencyCalculator();
 	private VehicleQ.Factory<QVehicle> vehicleQFactory = FIFOVehicleQ::new ;
 
 	public ConfigurableQNetworkFactory( EventsManager events, Scenario scenario ) {
@@ -81,6 +84,7 @@ public final class ConfigurableQNetworkFactory implements QNetworkFactory {
 		{
 			QueueWithBuffer.Builder laneFactory = new QueueWithBuffer.Builder( context );
 			laneFactory.setVehicleQueue( vehicleQFactory.createVehicleQ() );
+			laneFactory.setFlowEfficiencyCalculator(flowEfficiencyCalculator);
 			linkBuilder.setLaneFactory( laneFactory );
 		}
 		linkBuilder.setLinkSpeedCalculator( linkSpeedCalculator ) ;
@@ -107,6 +111,9 @@ public final class ConfigurableQNetworkFactory implements QNetworkFactory {
 	}
 	public final void setVehicleQFactory( VehicleQ.Factory<QVehicle> factory ) {
 		this.vehicleQFactory = factory ;
+	}
+	public final void setFlowEfficiencyCalculator(FlowEfficiencyCalculator flowEfficiencyCalculator) {
+		this.flowEfficiencyCalculator = flowEfficiencyCalculator;
 	}
 
 }

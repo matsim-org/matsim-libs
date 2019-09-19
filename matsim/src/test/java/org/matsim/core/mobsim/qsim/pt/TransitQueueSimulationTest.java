@@ -554,7 +554,7 @@ public class TransitQueueSimulationTest {
                     		TestHandleStopSimulation.this.route, TestHandleStopSimulation.this.departure, 
                     		transitEngine.getAgentTracker(), transitEngine);
 
-                    VehicleType vehicleType = new VehicleType(Id.create("transitVehicleType", VehicleType.class ));
+                    VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create("transitVehicleType", VehicleType.class ) );
 //                    VehicleCapacity capacity = new VehicleCapacity();
                     vehicleType.getCapacity().setSeats(101);
                     vehicleType.getCapacity().setStandingRoom(0);
