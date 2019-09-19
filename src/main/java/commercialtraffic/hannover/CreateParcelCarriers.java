@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 public class CreateParcelCarriers {
     public static void main(String[] args) {
@@ -77,12 +78,12 @@ public class CreateParcelCarriers {
         return vBuilder.build();
     }
 
-    public static CarrierVehicleType createLightType() {
-        CarrierVehicleType.Builder typeBuilder = CarrierVehicleType.Builder.newInstance(Id.create("small", VehicleType.class));
-        typeBuilder.setCapacity(100);
-        typeBuilder.setFixCost(80.0);
-        typeBuilder.setCostPerDistanceUnit(0.00047);
-        typeBuilder.setCostPerTimeUnit(0.008);
-        return typeBuilder.build();
+    public static VehicleType createLightType() {
+        VehicleType type = VehicleUtils.createVehicleType(Id.create("small", VehicleType.class));
+        type.getCapacity().setOther(100);
+        type.getCostInformation().setFixedCost(80.0);
+        type.getCostInformation().setCostsPerMeter(0.00047);
+        type.getCostInformation().setCostsPerSecond(0.008);
+        return type;
     }
 }

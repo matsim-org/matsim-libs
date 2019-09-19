@@ -36,6 +36,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 import static org.matsim.core.config.ConfigUtils.createConfig;
 import static org.matsim.core.scenario.ScenarioUtils.createScenario;
@@ -124,13 +125,13 @@ public class TestScenarioGeneration {
         return vBuilder.build();
     }
 
-    private static CarrierVehicleType createLightType() {
-        CarrierVehicleType.Builder typeBuilder = CarrierVehicleType.Builder.newInstance(Id.create("small", VehicleType.class));
-        typeBuilder.setCapacity(6);
-        typeBuilder.setFixCost(80.0);
-        typeBuilder.setCostPerDistanceUnit(0.00047);
-        typeBuilder.setCostPerTimeUnit(0.008);
-        return typeBuilder.build();
+    private static VehicleType createLightType() {
+        VehicleType type = VehicleUtils.createVehicleType(Id.create("small", VehicleType.class));
+        type.getCapacity().setOther(6);
+        type.getCostInformation().setFixedCost(80.0);
+        type.getCostInformation().setCostsPerMeter(0.00047);
+        type.getCostInformation().setCostsPerSecond(0.008);
+        return type;
     }
 
 

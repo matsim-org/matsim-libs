@@ -33,7 +33,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 //import org.matsim.contrib.drt.analysis.zonal.DrtZonalModule;
@@ -77,7 +77,7 @@ public class RunDrtScenarioBatchWOBAV {
 
             //Scenario scenario = ScenarioUtils.loadScenario(config);
 
-            VehicleType avType = new VehicleTypeImpl(Id.create("drt", VehicleType.class));
+            VehicleType avType = VehicleUtils.createVehicleType(Id.create("drt", VehicleType.class));
             double avFactor = 0.1;
             avType.setFlowEfficiencyFactor(avFactor);
 

@@ -74,7 +74,7 @@ public class CommercialTrafficModule extends AbstractModule {
 
         CommercialTrafficConfigGroup ctcg = CommercialTrafficConfigGroup.get(getConfig());
         Carriers carriers = new Carriers();
-        new CarrierPlanXmlReaderV2(carriers).readFile(ctcg.getCarriersFileUrl(getConfig().getContext()).getFile());
+        new CarrierPlanXmlReader(carriers).readFile(ctcg.getCarriersFileUrl(getConfig().getContext()).getFile());
         CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
         new CarrierVehicleTypeReader(vehicleTypes).readFile(ctcg.getCarriersVehicleTypesFileUrl(getConfig().getContext()).getFile());
         new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);

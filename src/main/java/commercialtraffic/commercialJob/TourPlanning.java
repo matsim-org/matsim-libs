@@ -42,6 +42,7 @@ import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 //import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.VehicleType;
 
 import javax.inject.Inject;
 import java.util.Collection;
@@ -55,7 +56,7 @@ public class TourPlanning  {
 
 
     static void runTourPlanningForCarriers(Carriers carriers, Scenario scenario, CarrierJSpritIterations iterations, int jSpritTimeSliceWidth, TravelTime travelTime) {
-        Set<CarrierVehicleType> vehicleTypes = new HashSet<>();
+        Set<VehicleType> vehicleTypes = new HashSet<>();
         carriers.getCarriers().values().forEach(carrier -> vehicleTypes.addAll(carrier.getCarrierCapabilities().getVehicleTypes()));
         NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), vehicleTypes);
         log.info("SETTING TIME SLICE TO " + jSpritTimeSliceWidth);
