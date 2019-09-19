@@ -32,9 +32,7 @@ public final class CostInformation implements Attributable{
 	private Double perSecond;
 	private Attributes attributes = new Attributes() ;
 
-	/* package-private */ protected CostInformation() {
-		// yyyyyy make package-private again
-	}
+	/* package-private */  CostInformation() { }
 	public Double getFixedCosts() {
 		return fixed;
 	}
