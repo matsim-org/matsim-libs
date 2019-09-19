@@ -253,7 +253,7 @@
 <!-- ====================================================================== -->
 	
 	<module name="vehicles" >
-		<param name="vehiclesFile" value="sample_emissionVehicles_v2.xml" /> 
+		<param name="vehiclesFile" value="sample_emissionVehicles_v1.xml" />
 	</module>
 	
 <!-- ====================================================================== -->

@@ -44,7 +44,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 public final class RunAverageEmissionToolOfflineExample{
 	
 	private final static String runDirectory = "./test/output/";
-	private static final String configFile = "./scenarios/sampleScenario/testV2/config_average.xml";
+	private static final String configFile = "./scenarios/sampleScenario/testv2_Vehv1/config_average.xml";
 	
 	private static final String eventsFile =  "./scenarios/sampleScenario/5.events.xml.gz";
 	// (remove dependency of one test/execution path from other. kai/ihab, nov'18)

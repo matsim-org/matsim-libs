@@ -44,7 +44,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 public final class RunDetailedEmissionToolOfflineExample{
 	
 	private final static String runDirectory = "./test/output/";
-	private static final String configFile = "./scenarios/sampleScenario/testV2/config_detailed.xml";
+	private static final String configFile = "./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml";
 	
 	private static final String eventsFile =  "./scenarios/sampleScenario/5.events.xml.gz";
 	// (remove dependency of one test/execution path from other. kai/ihab, nov'18)
@@ -55,8 +55,8 @@ public final class RunDetailedEmissionToolOfflineExample{
 	// =======================================================================================================		
 	
 	public static void main (String[] args) throws Exception{
-        RunDetailedEmissionToolOfflineExample emissionToolOfflineExampleV2 = new RunDetailedEmissionToolOfflineExample();
-        emissionToolOfflineExampleV2.run();
+        RunDetailedEmissionToolOfflineExample emissionToolOfflineExampleV2Vehv1 = new RunDetailedEmissionToolOfflineExample();
+        emissionToolOfflineExampleV2Vehv1.run();
 	}
 
 	public Config prepareConfig() {

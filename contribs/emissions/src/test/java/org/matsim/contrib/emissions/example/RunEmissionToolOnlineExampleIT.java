@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.emissions.example.V2;
+package org.matsim.contrib.emissions.example;
 
 import static org.junit.Assert.*;
 
