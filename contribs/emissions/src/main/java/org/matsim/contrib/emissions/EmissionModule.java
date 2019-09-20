@@ -218,7 +218,8 @@ public final class EmissionModule {
 
 				key.setHbefaRoadCategory(mapString2HbefaRoadCategory(array[indexFromKey.get("TrafficSit")]));
 				key.setHbefaTrafficSituation(mapString2HbefaTrafficSituation(array[indexFromKey.get("TrafficSit")]));
-				key.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
+				key.setHbefaVehicleValuesToAverage();
+//				key.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
 				
 				HbefaWarmEmissionFactor value = new HbefaWarmEmissionFactor();
 				value.setSpeed(Double.parseDouble(array[indexFromKey.get("V_weighted")]));
@@ -255,7 +256,7 @@ public final class EmissionModule {
 
 				key.setHbefaParkingTime(mapAmbientCondPattern2ParkingTime(array[indexFromKey.get("AmbientCondPattern")]));
 				key.setHbefaDistance(mapAmbientCondPattern2Distance(array[indexFromKey.get("AmbientCondPattern")]));
-				key.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
+				key.setHbefaVehicleValuesToAverage();
 
                 double weighting = Double.parseDouble(array[indexFromKey.get("EFA_weighted")]); //TODO better name
 				HbefaColdEmissionFactor value = new HbefaColdEmissionFactor(weighting);
@@ -292,11 +293,11 @@ public final class EmissionModule {
 
 				key.setHbefaRoadCategory(mapString2HbefaRoadCategory(array[indexFromKey.get("TrafficSit")]));
 				key.setHbefaTrafficSituation(mapString2HbefaTrafficSituation(array[indexFromKey.get("TrafficSit")]));
-				HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
-				hbefaVehicleAttributes.setHbefaTechnology(array[indexFromKey.get("Technology")]);
-				hbefaVehicleAttributes.setHbefaSizeClass(array[indexFromKey.get("SizeClasse")]);
-				hbefaVehicleAttributes.setHbefaEmConcept(array[indexFromKey.get("EmConcept")]);
-				key.setHbefaVehicleAttributes(hbefaVehicleAttributes);
+//				HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
+				key.setHbefaTechnology(array[indexFromKey.get("Technology")]);
+				key.setHbefaSizeClass(array[indexFromKey.get("SizeClasse")]);
+				key.setHbefaEmissionsConcept(array[indexFromKey.get("EmConcept")]);
+//				key.setHbefaVehicleAttributes(hbefaVehicleAttributes);
 
 				HbefaWarmEmissionFactor value = new HbefaWarmEmissionFactor();
 				value.setSpeed(Double.parseDouble(array[indexFromKey.get("V")]));
@@ -332,11 +333,11 @@ public final class EmissionModule {
 
 				key.setHbefaParkingTime(mapAmbientCondPattern2ParkingTime(array[indexFromKey.get("AmbientCondPattern")]));
 				key.setHbefaDistance(mapAmbientCondPattern2Distance(array[indexFromKey.get("AmbientCondPattern")]));
-				HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
-				hbefaVehicleAttributes.setHbefaTechnology(array[indexFromKey.get("Technology")]);
-				hbefaVehicleAttributes.setHbefaSizeClass(array[indexFromKey.get("SizeClasse")]);
-				hbefaVehicleAttributes.setHbefaEmConcept(array[indexFromKey.get("EmConcept")]);
-				key.setHbefaVehicleAttributes(hbefaVehicleAttributes);
+//				HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
+				key.setHbefaTechnology(array[indexFromKey.get("Technology")]);
+				key.setHbefaSizeClass(array[indexFromKey.get("SizeClasse")]);
+				key.setHbefaEmissionsConcept(array[indexFromKey.get("EmConcept")]);
+//				key.setHbefaVehicleAttributes(hbefaVehicleAttributes);
 
 				double weighting = Double.parseDouble(array[indexFromKey.get("EFA")]);
 				HbefaColdEmissionFactor value = new HbefaColdEmissionFactor(weighting);
