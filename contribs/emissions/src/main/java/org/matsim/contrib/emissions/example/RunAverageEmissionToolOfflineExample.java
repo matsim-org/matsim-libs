@@ -64,6 +64,11 @@ public final class RunAverageEmissionToolOfflineExample{
 		return config;
 	}
 
+	public Config prepareConfig(String configFile) {
+		config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
+		return config;
+	}
+
     public void run() {
 		if ( config==null ) {
 			this.prepareConfig() ;

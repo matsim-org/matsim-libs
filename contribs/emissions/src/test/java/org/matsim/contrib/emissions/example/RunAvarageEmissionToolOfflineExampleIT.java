@@ -18,43 +18,32 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.example;
 
-import static org.junit.Assert.*;
-
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.emissions.example.RunEmissionToolOnlineExample;
 import org.matsim.core.config.Config;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
- * @author nagel
+ * @author ihab
  *
  */
-public class RunEmissionToolOnlineExampleIT {
+public class RunAvarageEmissionToolOfflineExampleIT {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
-	/**
-	 * Test method for {@link RunEmissionToolOnlineExample#main(java.lang.String[])}.
-	 */
-	@SuppressWarnings("static-method")
 	@Test
-	public final void testMain() {
-		try {
-			Config config = RunEmissionToolOnlineExample.prepareConfig( null ) ;
-			
-			config.controler().setOutputDirectory( utils.getOutputDirectory() );
-			
-			config.controler().setLastIteration( 1 );
-			
-			Scenario scenario = RunEmissionToolOnlineExample.prepareScenario( config ) ;
-			
-			RunEmissionToolOnlineExample.run( scenario ) ;
+	public final void testAverage_vehTypeV1() {
+		RunAverageEmissionToolOfflineExample offlineExample = new RunAverageEmissionToolOfflineExample();
+		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv1/config_average.xml");
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		offlineExample.run();
+	}
 
-		} catch ( Exception ee ) {
-			ee.printStackTrace();
-			fail("something did not work" ) ;
-		}
+	@Test
+	public final void testAverage_vehTypeV2() {
+		RunAverageEmissionToolOfflineExample offlineExample = new RunAverageEmissionToolOfflineExample();
+		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_average.xml");
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		offlineExample.run();
 	}
 
 }

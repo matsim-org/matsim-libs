@@ -34,7 +34,7 @@ import org.matsim.core.controler.MatsimServices;
  * with necessary emission input files for the {@link EmissionsConfigGroup EmissionsConfigGroup}.
  * 
  * This config file is used by the {@link RunDetailedEmissionToolOfflineExample OfflineExample} and
- * the {@link RunEmissionToolOnlineExample OnlineExample}
+ * the {@link RunDetailedEmissionToolOnlineExample OnlineExample}
  * 
  * @author benjamin, julia
  *

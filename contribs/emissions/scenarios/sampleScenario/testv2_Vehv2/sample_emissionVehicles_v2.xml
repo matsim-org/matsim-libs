@@ -8,10 +8,10 @@
 		<width meter="1.0"/>
 		<engineInformation>
 			<attributes>
-				<attribute name="HbefaVehicleCategory" class="Java.Lang.String">PASSENGER_CAR</attribute>
-				<attribute name="HbefaTechnology" class="Java.Lang.String">average</attribute>
-				<attribute name="HbefaSizeClass" class="Java.Lang.String">average</attribute>
-				<attribute name="HbefaEmissionsConcept" class="Java.Lang.String">average</attribute>
+				<attribute name="HbefaVehicleCategory" class="java.lang.String">PASSENGER_CAR</attribute>
+				<attribute name="HbefaTechnology" class="java.lang.String">average</attribute>
+				<attribute name="HbefaSizeClass" class="java.lang.String">average</attribute>
+				<attribute name="HbefaEmissionsConcept" class="java.lang.String">average</attribute>
 			</attributes>
 		</engineInformation>
 	</vehicleType>
@@ -21,10 +21,10 @@
 		<width meter="1.0"/>
 		<engineInformation>
 			<attributes>
-				<attribute name="HbefaVehicleCategory" class="Java.Lang.String">PASSENGER_CAR</attribute>
-				<attribute name="HbefaTechnology" class="Java.Lang.String">petrol (4S)</attribute>
-				<attribute name="HbefaSizeClass" class="Java.Lang.String">&gt;=2L</attribute>
-				<attribute name="HbefaEmissionsConcept" class="Java.Lang.String">PC-P-Euro-1</attribute>
+				<attribute name="HbefaVehicleCategory" class="java.lang.String">PASSENGER_CAR</attribute>
+				<attribute name="HbefaTechnology" class="java.lang.String">petrol (4S)</attribute>
+				<attribute name="HbefaSizeClass" class="java.lang.String">&gt;=2L</attribute>
+				<attribute name="HbefaEmissionsConcept" class="java.lang.String">PC-P-Euro-1</attribute>
 			</attributes>
 		</engineInformation>
 	</vehicleType>
@@ -34,10 +34,10 @@
 		<width meter="1.0"/>
 		<engineInformation>
 			<attributes>
-				<attribute name="HbefaVehicleCategory" class="Java.Lang.String">PASSENGER_CAR</attribute>
-				<attribute name="HbefaTechnology" class="Java.Lang.String">diesel</attribute>
-				<attribute name="HbefaSizeClass" class="Java.Lang.String">&lt;1,4L</attribute>
-				<attribute name="HbefaEmissionsConcept" class="Java.Lang.String">PC-D-Euro-3</attribute>
+				<attribute name="HbefaVehicleCategory" class="java.lang.String">PASSENGER_CAR</attribute>
+				<attribute name="HbefaTechnology" class="java.lang.String">diesel</attribute>
+				<attribute name="HbefaSizeClass" class="java.lang.String">&lt;1,4L</attribute>
+				<attribute name="HbefaEmissionsConcept" class="java.lang.String">PC-D-Euro-3</attribute>
 			</attributes>
 		</engineInformation>
 	</vehicleType>
@@ -50,10 +50,10 @@
 		<width meter="1.0"/>
 		<engineInformation>
 			<attributes>
-				<attribute name="HbefaVehicleCategory" class="Java.Lang.String">HEAVY_GOODS_VEHICLE</attribute>
-				<attribute name="HbefaTechnology" class="Java.Lang.String">average</attribute>
-				<attribute name="HbefaSizeClass" class="Java.Lang.String">average</attribute>
-				<attribute name="HbefaEmissionsConcept" class="Java.Lang.String">average</attribute>
+				<attribute name="HbefaVehicleCategory" class="java.lang.String">HEAVY_GOODS_VEHICLE</attribute>
+				<attribute name="HbefaTechnology" class="java.lang.String">average</attribute>
+				<attribute name="HbefaSizeClass" class="java.lang.String">average</attribute>
+				<attribute name="HbefaEmissionsConcept" class="java.lang.String">average</attribute>
 			</attributes>
 		</engineInformation>
 	</vehicleType>

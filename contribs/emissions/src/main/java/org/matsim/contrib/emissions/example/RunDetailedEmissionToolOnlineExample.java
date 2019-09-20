@@ -41,7 +41,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author benjamin, julia
  */
 
-public final class RunEmissionToolOnlineExample{
+public final class RunDetailedEmissionToolOnlineExample {
 
 	private static final String configFile = "./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml";
 

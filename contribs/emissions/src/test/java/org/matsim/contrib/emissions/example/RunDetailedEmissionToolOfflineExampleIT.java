@@ -29,23 +29,24 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author ihab
  *
  */
-public class RunEmissionToolOfflineExampleTest {
+public class RunDetailedEmissionToolOfflineExampleIT {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	@Test
-	public final void testMain() {
+	public final void testDetailed_vehTypeV1() {
 		RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
-		Config config = offlineExample.prepareConfig();
+		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml");
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		offlineExample.run();
 	}
 
 	@Test
-	public final void testAverage() {
-		RunAverageEmissionToolOfflineExample offlineExample = new RunAverageEmissionToolOfflineExample();
-		Config config = offlineExample.prepareConfig();
+	public final void testDetailed_vehTypeV2() {
+		RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
+		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml");
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		offlineExample.run();
 	}
+
 
 }
