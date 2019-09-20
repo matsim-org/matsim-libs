@@ -16,7 +16,7 @@
 			<param name="dropoffDuration" value="150"/>
 			<param name="onlineVehicleTracker" value="true"/>
 
-			<param name="taxisFile" value="uam_fleet.xml"/>
+			<param name="taxisFile" value="uam_fleet_6x1.xml"/>
 
 			<param name="timeProfiles" value="true"/>
 			<param name="detailedStats" value="true"/>
@@ -30,7 +30,7 @@
 	</module>
 
 	<module name="plans">
-		<param name="inputPlansFile" value="uam_only_population.xml"/>
+		<param name="inputPlansFile" value="uam_only_population_6x5x10.xml"/>
 	</module>
 
 	<module name="qsim">

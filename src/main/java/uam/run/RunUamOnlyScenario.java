@@ -113,10 +113,10 @@ public class RunUamOnlyScenario {
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig("input/uam/uam_only_config.xml", new MultiModeTaxiConfigGroup(),
 				new DvrpConfigGroup(), new OTFVisConfigGroup());
-		//		run(config, false, 0); // switch to 'true' to turn on visualisation
-		//		runLimitedFleetMinPickupTime(config, false, 0); // switch to 'true' to turn on visualisation
-		//		runLimitedFleetMinWaitTime(config, false, 0); // switch to 'true' to turn on visualisation
-		//		runUnlimitedFleetMinPickupTime(config, false, 0); // switch to 'true' to turn on visualisation
-		runUnlimitedFleetMinWaitTime(config, false, 0); // switch to 'true' to turn on visualisation
+		run(config, false, 0);
+		//		runLimitedFleetMinPickupTime(config, false, 0);
+		//		runLimitedFleetMinWaitTime(config, false, 0);
+		//		runUnlimitedFleetMinPickupTime(config, false, 0);
+		//		runUnlimitedFleetMinWaitTime(config, false, 0);
 	}
 }
