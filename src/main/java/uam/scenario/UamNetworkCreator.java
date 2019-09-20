@@ -50,15 +50,19 @@ public class UamNetworkCreator {
 
 	static final String HUB_LINK_ID_PREFIX = "HUB_";
 
+	private static final double UAV_EFFECTIVE_CELL_SIZE = 7.5;//[m]; see DEFAULT_EFFECTIVE_CELL_SIZE
+
 	//XXX could be split into EGRESS and ACCESS links, each 2 min long
 	private static final double HUB_LINK_TRAVEL_TIME = 5 * 60;//[s]; 1 / 5-min frequency per port
-	private static final double HUB_LINK_LENGTH = 7.5;//[m] XXX any value is OK
+	private static final double HUB_LINK_LENGTH = UAV_EFFECTIVE_CELL_SIZE;//[m] only one UAV per lane at a time
 	private static final double HUB_LINK_NUM_LANES = 5;//[lanes] = number of ports at the hub
 	private static final double HUB_LINK_SPEED = HUB_LINK_LENGTH / HUB_LINK_TRAVEL_TIME;// [m/s]
 	private static final double HUB_LINK_FLOW_CAPACITY = 3600. * HUB_LINK_NUM_LANES / HUB_LINK_TRAVEL_TIME;// 60 [veh/h]
 
 	private static final double RED_LINK_TRAVEL_TIME = 30;//[s]
 	private static final double RED_LINK_LENGTH = 150;//[m]
+	private static final double RED_LINK_NUM_LANES = UAV_EFFECTIVE_CELL_SIZE
+			/ RED_LINK_LENGTH;//[lanes]; only 1 UAV at a time
 	private static final double RED_LINK_SPEED = RED_LINK_LENGTH / RED_LINK_TRAVEL_TIME;//5 [m/s]
 	private static final double RED_LINK_FLOW_CAPACITY = 3600. / RED_LINK_TRAVEL_TIME;// 120 [veh/h]
 
@@ -91,9 +95,11 @@ public class UamNetworkCreator {
 
 			// create RED links
 			NetworkUtils.createAndAddLink(uamNetwork, Id.createLinkId("RED_LANDING_" + i), skyNode, hubLandingNode,
-					RED_LINK_LENGTH, RED_LINK_SPEED, RED_LINK_FLOW_CAPACITY, 1).setAllowedModes(uamLinkModes);
+					RED_LINK_LENGTH, RED_LINK_SPEED, RED_LINK_FLOW_CAPACITY, RED_LINK_NUM_LANES)
+					.setAllowedModes(uamLinkModes);
 			NetworkUtils.createAndAddLink(uamNetwork, Id.createLinkId("RED_TAKEOFF_" + i), hubTakeoffNode, skyNode,
-					RED_LINK_LENGTH, RED_LINK_SPEED, RED_LINK_FLOW_CAPACITY, 1).setAllowedModes(uamLinkModes);
+					RED_LINK_LENGTH, RED_LINK_SPEED, RED_LINK_FLOW_CAPACITY, RED_LINK_NUM_LANES)
+					.setAllowedModes(uamLinkModes);
 
 			// create access/egress link
 			NetworkUtils.createAndAddLink(uamNetwork, Id.createLinkId(HUB_LINK_ID_PREFIX + i), hubLandingNode,

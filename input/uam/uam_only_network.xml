@@ -155,40 +155,40 @@
 			  permlanes="5.0" oneway="1" modes="uam">
 		</link>
 		<link id="RED_LANDING_0" from="UAM_SKY_0" to="HUB_LANDING_0" length="150.0" freespeed="5.0" capacity="120.0"
-			  permlanes="1.0" oneway="1" modes="uam">
+			  permlanes="0.05" oneway="1" modes="uam">
 		</link>
 		<link id="RED_LANDING_1" from="UAM_SKY_1" to="HUB_LANDING_1" length="150.0" freespeed="5.0" capacity="120.0"
-			  permlanes="1.0" oneway="1" modes="uam">
+			  permlanes="0.05" oneway="1" modes="uam">
 		</link>
 		<link id="RED_LANDING_2" from="UAM_SKY_2" to="HUB_LANDING_2" length="150.0" freespeed="5.0" capacity="120.0"
-			  permlanes="1.0" oneway="1" modes="uam">
+			  permlanes="0.05" oneway="1" modes="uam">
 		</link>
 		<link id="RED_LANDING_3" from="UAM_SKY_3" to="HUB_LANDING_3" length="150.0" freespeed="5.0" capacity="120.0"
-			  permlanes="1.0" oneway="1" modes="uam">
+			  permlanes="0.05" oneway="1" modes="uam">
 		</link>
 		<link id="RED_LANDING_4" from="UAM_SKY_4" to="HUB_LANDING_4" length="150.0" freespeed="5.0" capacity="120.0"
-			  permlanes="1.0" oneway="1" modes="uam">
+			  permlanes="0.05" oneway="1" modes="uam">
 		</link>
 		<link id="RED_LANDING_5" from="UAM_SKY_5" to="HUB_LANDING_5" length="150.0" freespeed="5.0" capacity="120.0"
-			  permlanes="1.0" oneway="1" modes="uam">
+			  permlanes="0.05" oneway="1" modes="uam">
 		</link>
 		<link id="RED_TAKEOFF_0" from="HUB_TAKEOFF0" to="UAM_SKY_0" length="150.0" freespeed="5.0" capacity="120.0"
-			  permlanes="1.0" oneway="1" modes="uam">
+			  permlanes="0.05" oneway="1" modes="uam">
 		</link>
 		<link id="RED_TAKEOFF_1" from="HUB_TAKEOFF1" to="UAM_SKY_1" length="150.0" freespeed="5.0" capacity="120.0"
-			  permlanes="1.0" oneway="1" modes="uam">
+			  permlanes="0.05" oneway="1" modes="uam">
 		</link>
 		<link id="RED_TAKEOFF_2" from="HUB_TAKEOFF2" to="UAM_SKY_2" length="150.0" freespeed="5.0" capacity="120.0"
-			  permlanes="1.0" oneway="1" modes="uam">
+			  permlanes="0.05" oneway="1" modes="uam">
 		</link>
 		<link id="RED_TAKEOFF_3" from="HUB_TAKEOFF3" to="UAM_SKY_3" length="150.0" freespeed="5.0" capacity="120.0"
-			  permlanes="1.0" oneway="1" modes="uam">
+			  permlanes="0.05" oneway="1" modes="uam">
 		</link>
 		<link id="RED_TAKEOFF_4" from="HUB_TAKEOFF4" to="UAM_SKY_4" length="150.0" freespeed="5.0" capacity="120.0"
-			  permlanes="1.0" oneway="1" modes="uam">
+			  permlanes="0.05" oneway="1" modes="uam">
 		</link>
 		<link id="RED_TAKEOFF_5" from="HUB_TAKEOFF5" to="UAM_SKY_5" length="150.0" freespeed="5.0" capacity="120.0"
-			  permlanes="1.0" oneway="1" modes="uam">
+			  permlanes="0.05" oneway="1" modes="uam">
 		</link>
 	</links>
 
