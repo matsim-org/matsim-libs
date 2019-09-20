@@ -1,0 +1,10 @@
+<!DOCTYPE vehicles SYSTEM "http://matsim.org/files/dtd/dvrp_vehicles_v1.dtd">
+
+<vehicles>
+	<vehicle id="UAV_0_0" start_link="HUB_0" t_0="0.0" t_1="216000.0" capacity="1"/>
+	<vehicle id="UAV_1_0" start_link="HUB_1" t_0="0.0" t_1="216000.0" capacity="1"/>
+	<vehicle id="UAV_2_0" start_link="HUB_2" t_0="0.0" t_1="216000.0" capacity="1"/>
+	<vehicle id="UAV_3_0" start_link="HUB_3" t_0="0.0" t_1="216000.0" capacity="1"/>
+	<vehicle id="UAV_4_0" start_link="HUB_4" t_0="0.0" t_1="216000.0" capacity="1"/>
+	<vehicle id="UAV_5_0" start_link="HUB_5" t_0="0.0" t_1="216000.0" capacity="1"/>
+</vehicles>

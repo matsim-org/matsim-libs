@@ -28,21 +28,17 @@ import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.fleet.FleetSpecificationImpl;
 import org.matsim.contrib.dvrp.fleet.FleetWriter;
 import org.matsim.contrib.dvrp.fleet.ImmutableDvrpVehicleSpecification;
-import org.matsim.contrib.util.random.RandomUtils;
-import org.matsim.contrib.util.random.UniformRandom;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class UamFleetCreator {
-	private final UniformRandom uniform = RandomUtils.getGlobalUniform();
-
-	private FleetSpecification generateFleet() {
+	private FleetSpecification generateFleet(int vehiclesPerHub) {
 		FleetSpecification fleet = new FleetSpecificationImpl();
 		for (int i = 0; i < UamNetworkCreator.SELECTED_LINK_IDS.size(); i++) {
 			Id<Link> hub = Id.createLinkId(UamNetworkCreator.HUB_LINK_ID_PREFIX + i);
 
-			int vehicles = 1;
+			int vehicles = vehiclesPerHub;
 			int capacity = 1;
 			for (int j = 0; j < vehicles; j++) {
 				Id<DvrpVehicle> vehicleId = Id.create("UAV_" + i + "_" + j, DvrpVehicle.class);
@@ -61,7 +57,9 @@ public class UamFleetCreator {
 	}
 
 	public static void main(String[] args) {
-		new FleetWriter(new UamFleetCreator().generateFleet().getVehicleSpecifications().values().stream()).write(
-				"output/uam/uam_fleet.xml");
+		int vehiclesPerHub = 1;
+		new FleetWriter(
+				new UamFleetCreator().generateFleet(vehiclesPerHub).getVehicleSpecifications().values().stream()).write(
+				"output/uam/uam_fleet_6x" + vehiclesPerHub + ".xml");
 	}
 }

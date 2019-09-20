@@ -25,6 +25,8 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
+import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter;
+import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.MultiModeTaxiModule;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -38,12 +40,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  * @author Michal Maciejewski (michalm)
  */
 public class RunUamOnlyScenario {
-	public static final String CONFIG_FILE_UAM_ONLY = "input/uam/uam_only_config.xml";
-
-	public static void run(String configFile, boolean otfvis, int lastIteration) {
-		// load config
-		Config config = ConfigUtils.loadConfig(configFile, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup(),
-				new OTFVisConfigGroup());
+	public static void run(Config config, boolean otfvis, int lastIteration) {
 		config.controler().setLastIteration(lastIteration);
 
 		// load scenario
@@ -65,7 +62,61 @@ public class RunUamOnlyScenario {
 		controler.run();
 	}
 
+	public static void runLimitedFleetMinPickupTime(Config config, boolean otfvis, int lastIteration) {
+		TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(config);
+		taxiCfg.setTaxisFile("uam_fleet_6x1.xml");
+		RuleBasedTaxiOptimizerParams taxiOptimizerParams = (RuleBasedTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams();
+		taxiOptimizerParams.setGoal(RuleBasedRequestInserter.Goal.MIN_PICKUP_TIME);
+
+		config.plans().setInputFile("uam_only_population_6x5x10.xml");
+
+		config.controler().setOutputDirectory("output/uam/uam_only_scenario_limitedFleet_minPickupTime");
+		run(config, otfvis, lastIteration);
+	}
+
+	public static void runLimitedFleetMinWaitTime(Config config, boolean otfvis, int lastIteration) {
+		TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(config);
+		taxiCfg.setTaxisFile("uam_fleet_6x1_60h.xml");
+		RuleBasedTaxiOptimizerParams taxiOptimizerParams = (RuleBasedTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams();
+		taxiOptimizerParams.setGoal(RuleBasedRequestInserter.Goal.MIN_WAIT_TIME);
+
+		config.plans().setInputFile("uam_only_population_6x5x10.xml");
+
+		config.controler().setOutputDirectory("output/uam/uam_only_scenario_limitedFleet_minWaitTime");
+		run(config, otfvis, lastIteration);
+	}
+
+	public static void runUnlimitedFleetMinPickupTime(Config config, boolean otfvis, int lastIteration) {
+		TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(config);
+		taxiCfg.setTaxisFile("uam_fleet_6x500.xml");
+		RuleBasedTaxiOptimizerParams taxiOptimizerParams = (RuleBasedTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams();
+		taxiOptimizerParams.setGoal(RuleBasedRequestInserter.Goal.MIN_PICKUP_TIME);
+
+		config.plans().setInputFile("uam_only_population_6x5x100.xml");
+
+		config.controler().setOutputDirectory("output/uam/uam_only_scenario_unlimitedFleet_minPickupTime");
+		run(config, otfvis, lastIteration);
+	}
+
+	public static void runUnlimitedFleetMinWaitTime(Config config, boolean otfvis, int lastIteration) {
+		TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(config);
+		taxiCfg.setTaxisFile("uam_fleet_6x500.xml");
+		RuleBasedTaxiOptimizerParams taxiOptimizerParams = (RuleBasedTaxiOptimizerParams)taxiCfg.getTaxiOptimizerParams();
+		taxiOptimizerParams.setGoal(RuleBasedRequestInserter.Goal.MIN_WAIT_TIME);
+
+		config.plans().setInputFile("uam_only_population_6x5x100.xml");
+
+		config.controler().setOutputDirectory("output/uam/uam_only_scenario_unlimitedFleet_minWaitTime");
+		run(config, otfvis, lastIteration);
+	}
+
 	public static void main(String[] args) {
-		run(CONFIG_FILE_UAM_ONLY, true, 0); // switch to 'true' to turn on visualisation
+		Config config = ConfigUtils.loadConfig("input/uam/uam_only_config.xml", new MultiModeTaxiConfigGroup(),
+				new DvrpConfigGroup(), new OTFVisConfigGroup());
+		//		run(config, false, 0); // switch to 'true' to turn on visualisation
+		//		runLimitedFleetMinPickupTime(config, false, 0); // switch to 'true' to turn on visualisation
+		//		runLimitedFleetMinWaitTime(config, false, 0); // switch to 'true' to turn on visualisation
+		//		runUnlimitedFleetMinPickupTime(config, false, 0); // switch to 'true' to turn on visualisation
+		runUnlimitedFleetMinWaitTime(config, false, 0); // switch to 'true' to turn on visualisation
 	}
 }
