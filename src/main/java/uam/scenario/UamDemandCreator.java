@@ -41,7 +41,7 @@ import org.matsim.core.population.routes.RouteUtils;
 public class UamDemandCreator {
 	private final UniformRandom uniform = RandomUtils.getGlobalUniform();
 
-	private Population generatePlans() {
+	private Population generatePlans(int tripsPerHubPair) {
 		Population population = PopulationUtils.createPopulation(new PlansConfigGroup(), null);
 		PopulationFactory populationFactory = population.getFactory();
 		for (int i = 0; i < UamNetworkCreator.SELECTED_LINK_IDS.size(); i++) {
@@ -51,9 +51,9 @@ public class UamDemandCreator {
 				if (i != j) {
 					Id<Link> toHub = Id.createLinkId(UamNetworkCreator.HUB_LINK_ID_PREFIX + j);
 
-					int trips = 1;
+					int trips = tripsPerHubPair;
 					double startTime = 0;
-					double duration = 3600;
+					double duration = 0;
 					for (int k = 0; k < trips; k++) {
 						double departureTime = (int)uniform.nextDouble(startTime, startTime + duration);
 						Id<Person> personId = Id.createPersonId("person_" + i + "_" + j + "_" + k);
@@ -90,6 +90,8 @@ public class UamDemandCreator {
 	}
 
 	public static void main(String[] args) {
-		new PopulationWriter(new UamDemandCreator().generatePlans()).write("output/uam/uam_only_population.xml");
+		int tripsPerHubPair = 10;
+		new PopulationWriter(new UamDemandCreator().generatePlans(tripsPerHubPair)).write(
+				"output/uam/uam_only_population_6x5x" + tripsPerHubPair + ".xml");
 	}
 }

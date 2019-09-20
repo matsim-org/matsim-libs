@@ -17,7 +17,6 @@
 			<param name="onlineVehicleTracker" value="true"/>
 
 			<param name="taxisFile" value="uam_fleet.xml"/>
-			<!-- param name="taxisFile" value="taxis-50.xml" / -->
 
 			<param name="timeProfiles" value="true"/>
 			<param name="detailedStats" value="true"/>
@@ -38,11 +37,13 @@
 		<param name="simStarttimeInterpretation" value="onlyUseStarttime"/>
 		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true"/>
 		<param name="snapshotStyle" value="queue"/>
+		<param name="stuckTime" value="36000"/>
 	</module>
 
 	<module name="otfvis">
 		<param name="coloringScheme" value="taxicab"/>
 		<param name="drawNonMovingItems" value="true"/>
+		<param name="linkWidth" value="1"/>
 	</module>
 
 	<module name="controler">
