@@ -126,7 +126,7 @@ public class PtAlongALine2Test{
 					IntermodalAccessEgressParameterSet paramSetXxx = new IntermodalAccessEgressParameterSet();
 					//					paramSetXxx.setMode( TransportMode.walk ); // this does not work because sbb raptor treats it in a special way
 					paramSetXxx.setMode( "walk2" );
-					paramSetXxx.setRadius( 1000000 );
+					paramSetXxx.setMaxRadius( 1000000 );
 					configRaptor.addIntermodalAccessEgress( paramSetXxx );
 					// (in principle, walk as alternative to drt will not work, since drt is always faster.  Need to give the ASC to the router!  However, with
 					// the reduced drt network we should be able to see differentiation.)
@@ -135,13 +135,13 @@ public class PtAlongALine2Test{
 					// drt
 					IntermodalAccessEgressParameterSet paramSetDrt = new IntermodalAccessEgressParameterSet();
 					paramSetDrt.setMode( TransportMode.drt );
-					paramSetDrt.setRadius( 1000000 );
+					paramSetDrt.setMaxRadius( 1000000 );
 					configRaptor.addIntermodalAccessEgress( paramSetDrt );
 				}
 				if ( drt2 ){
 					IntermodalAccessEgressParameterSet paramSetDrt2 = new IntermodalAccessEgressParameterSet();
 					paramSetDrt2.setMode( "drt2" );
-					paramSetDrt2.setRadius( 1000000 );
+					paramSetDrt2.setMaxRadius( 1000000 );
 					//				paramSetDrt2.setPersonFilterAttribute( null );
 					//				paramSetDrt2.setStopFilterAttribute( null );
 					configRaptor.addIntermodalAccessEgress( paramSetDrt2 );
@@ -149,7 +149,7 @@ public class PtAlongALine2Test{
 				if ( drt3 ){
 					IntermodalAccessEgressParameterSet paramSetDrt2 = new IntermodalAccessEgressParameterSet();
 					paramSetDrt2.setMode( "drt3" );
-					paramSetDrt2.setRadius( 1000000 );
+					paramSetDrt2.setMaxRadius( 1000000 );
 					//				paramSetDrt2.setPersonFilterAttribute( null );
 					//				paramSetDrt2.setStopFilterAttribute( null );
 					configRaptor.addIntermodalAccessEgress( paramSetDrt2 );
@@ -312,7 +312,7 @@ public class PtAlongALine2Test{
 		}
 
 		// This will start otfvis.  Comment out if not needed.
-//		controler.addOverridingModule( new OTFVisLiveModule() );
+		controler.addOverridingModule( new OTFVisLiveModule() );
 
 		controler.run();
 		
@@ -392,7 +392,7 @@ public class PtAlongALine2Test{
 					IntermodalAccessEgressParameterSet paramSetXxx = new IntermodalAccessEgressParameterSet();
 					//					paramSetXxx.setMode( TransportMode.walk ); // this does not work because sbb raptor treats it in a special way
 					paramSetXxx.setMode( "walk2" );
-					paramSetXxx.setRadius( 1000000 );
+					paramSetXxx.setMaxRadius( 1000000 );
 					configRaptor.addIntermodalAccessEgress( paramSetXxx );
 					// (in principle, walk as alternative to drt will not work, since drt is always faster.  Need to give the ASC to the router!  However, with
 					// the reduced drt network we should be able to see differentiation.)
@@ -401,13 +401,13 @@ public class PtAlongALine2Test{
 					// drt
 					IntermodalAccessEgressParameterSet paramSetDrt = new IntermodalAccessEgressParameterSet();
 					paramSetDrt.setMode( TransportMode.drt );
-					paramSetDrt.setRadius( 1000000 );
+					paramSetDrt.setMaxRadius( 1000000 );
 					configRaptor.addIntermodalAccessEgress( paramSetDrt );
 				}
 				if ( drt2 ){
 					IntermodalAccessEgressParameterSet paramSetDrt2 = new IntermodalAccessEgressParameterSet();
 					paramSetDrt2.setMode( "drt2" );
-					paramSetDrt2.setRadius( 1000000 );
+					paramSetDrt2.setMaxRadius( 1000000 );
 					//				paramSetDrt2.setPersonFilterAttribute( null );
 					//				paramSetDrt2.setStopFilterAttribute( null );
 					configRaptor.addIntermodalAccessEgress( paramSetDrt2 );
@@ -554,7 +554,7 @@ public class PtAlongALine2Test{
 				// Xxx
 				IntermodalAccessEgressParameterSet paramSetXxx = new IntermodalAccessEgressParameterSet();
 				paramSetXxx.setMode( TransportMode.walk );
-				paramSetXxx.setRadius( 1000000 );
+				paramSetXxx.setMaxRadius( 1000000 );
 				configRaptor.addIntermodalAccessEgress( paramSetXxx );
 			}
 

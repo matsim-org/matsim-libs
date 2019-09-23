@@ -255,7 +255,7 @@ public class PtAlongALineTest{
 			// drt
 			SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet paramSetDrt = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
 			paramSetDrt.setMode( TransportMode.drt );
-			paramSetDrt.setRadius( 1000000000 );
+			paramSetDrt.setMaxRadius( 1000000000 );
 //			paramSetDrt.setStopFilterAttribute( "drtAccessible" );
 //			paramSetDrt.setStopFilterValue( "true" );
 			configRaptor.addIntermodalAccessEgress( paramSetDrt );
@@ -415,7 +415,7 @@ public class PtAlongALineTest{
 		// Walk
 		IntermodalAccessEgressParameterSet paramSetWalk = new IntermodalAccessEgressParameterSet();
 		paramSetWalk.setMode(TransportMode.walk);
-		paramSetWalk.setRadius(radiusWalk);
+		paramSetWalk.setMaxRadius(radiusWalk);
 		paramSetWalk.setPersonFilterAttribute(null);
 		paramSetWalk.setStopFilterAttribute(null);
 		configRaptor.addIntermodalAccessEgress(paramSetWalk );
@@ -423,7 +423,7 @@ public class PtAlongALineTest{
 		// Bike
 		IntermodalAccessEgressParameterSet paramSetBike = new IntermodalAccessEgressParameterSet();
 		paramSetBike.setMode(TransportMode.bike);
-		paramSetBike.setRadius(radiusBike);
+		paramSetBike.setMaxRadius(radiusBike);
 		paramSetBike.setPersonFilterAttribute(null);
 		//		paramSetBike.setStopFilterAttribute("bikeAccessible");
 		//		paramSetBike.setStopFilterValue("true");
