@@ -73,37 +73,41 @@ public class CommercialTrafficModule extends AbstractModule {
         }
 
         CommercialTrafficConfigGroup ctcg = CommercialTrafficConfigGroup.get(getConfig());
+
+        //read input
         Carriers carriers = new Carriers();
         new CarrierPlanXmlReader(carriers).readFile(ctcg.getCarriersFileUrl(getConfig().getContext()).getFile());
         CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
         new CarrierVehicleTypeReader(vehicleTypes).readFile(ctcg.getCarriersVehicleTypesFileUrl(getConfig().getContext()).getFile());
         new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
+
+        //check consistency
         CommercialTrafficChecker consistencyChecker = new CommercialTrafficChecker();
+        bind(CommercialTrafficChecker.class).toInstance(consistencyChecker);
         if (consistencyChecker.checkCarrierConsistency(carriers, getConfig())) {
             throw new RuntimeException("Carrier definition is invalid. Please check the log for details.");
         }
-        bind(CommercialTrafficChecker.class).toInstance(consistencyChecker);
+
+//        bind commercial Traffic stuff
         bind(DeliveryScoreCalculator.class).toInstance(new DefaultCommercialServiceScore(ctcg.getMaxDeliveryScore(), ctcg.getMinDeliveryScore(), ctcg.getZeroUtilityDelay()));
         bind(Carriers.class).toInstance(carriers);
         bind(CommercialJobManager.class).in(Singleton.class);
         bind(ScoreCommercialServices.class).in(Singleton.class);
         bind(TourLengthAnalyzer.class).in(Singleton.class);
         bind(FreightAgentInserter.class).in(Singleton.class);
-
         bind(CarrierJSpritIterations.class).toInstance(iterationsForCarrier);
-
         if(this.carrierMode == null){
             bind(CarrierMode.class).toInstance(carrierId -> TransportMode.car);
 //            bind(CarrierMode.class).toInstance(carrierId -> TransportMode.drt);
         } else {
             bind(CarrierMode.class).toInstance(carrierMode);
         }
-
         addControlerListenerBinding().to(CommercialJobManager.class);
         addControlerListenerBinding().to(CommercialTrafficAnalysisListener.class);
         addMobsimListenerBinding().to(ScoreCommercialServices.class);
         addMobsimListenerBinding().to(CommercialTrafficChecker.class);
 
+        //bind strategy that enables to choose between operators
         addPlanStrategyBinding(ChangeDeliveryServiceOperator.SELECTOR_NAME).toProvider(new Provider<PlanStrategy>() {
             @Inject
             Config config;
