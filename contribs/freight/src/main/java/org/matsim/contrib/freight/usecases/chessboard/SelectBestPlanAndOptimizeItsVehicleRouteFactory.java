@@ -1,5 +1,6 @@
 package org.matsim.contrib.freight.usecases.chessboard;
 
+import java.net.URL;
 import java.util.Collection;
 
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
@@ -25,8 +26,12 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 
 final class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
+	
+	final URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
 	
 	private Network network;
 	
@@ -105,7 +110,7 @@ final class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
 				VehicleRoutingProblem vrp = vrpBuilder.build();
 				
 				//get configures algorithm
-				VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, "input/usecases/chessboard/vrpalgo/algorithm.xml");
+				VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, IOUtils.extendUrl(url, "algorithm.xml"));
 //				vra.getAlgorithmListeners().addListener(new AlgorithmSearchProgressChartListener("output/"+carrierPlan.getCarrier().getId() + "_" + carrierPlan.hashCode() + ".png"));
 				//add initial-solution - which is the initialSolution for the vehicle-routing-algo
 //				vra.addInitialSolution(MatsimJspritFactory.createSolution(carrierPlan, network));
