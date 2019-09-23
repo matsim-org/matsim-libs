@@ -312,7 +312,7 @@ public class PtAlongALine2Test{
 		}
 
 		// This will start otfvis.  Comment out if not needed.
-		controler.addOverridingModule( new OTFVisLiveModule() );
+//		controler.addOverridingModule( new OTFVisLiveModule() );
 
 		controler.run();
 		
