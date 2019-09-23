@@ -17,10 +17,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeWriter;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
-import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.filter.NetworkFilterManager;
@@ -311,7 +308,7 @@ if (commercialCompanyEntry.getValue().carrier.getId().toString().contains("groce
 			carriers.addCarrier(commercialCompanyEntry.getValue().carrier);}
 
 		}
-		new CarrierPlanXmlWriterV2(carriers).write(carrierOutputPath + "carrier_definition.xml");
+		new CarrierPlanWriter(carriers.getCarriers().values()).write(carrierOutputPath + "carrier_definition.xml");
 		new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers))
 				.write(carrierOutputPath + "carrier_vehicletypes.xml");
 

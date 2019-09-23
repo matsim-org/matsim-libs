@@ -63,7 +63,7 @@ public class CreateGenericCarriers {
 //        carriers.addCarrier(carrier3);
 //        carriers.addCarrier(carrier4);
 
-        new CarrierPlanXmlWriterV2(carriers).write(folder + "carrier_definition.xml");
+        new CarrierPlanWriter(carriers.getCarriers().values()).write(folder + "carrier_definition.xml");
         new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers)).write(folder + "carrier_vehicletypes.xml");
 
 
