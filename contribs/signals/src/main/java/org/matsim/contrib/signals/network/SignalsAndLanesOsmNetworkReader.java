@@ -467,6 +467,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					}
 				}
 			}
+//TODo this seems to be used several times
 			if (junctionNodes.size() > 1) {
 				double repXmin = 0;
 				double repXmax = 0;
@@ -1545,6 +1546,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	}
 
 	// Source: HBS 2001
+	//TODO Catch exception, negative numbers
 	private double getRadiusCapacityReductionFactor(double radius) {
 		if (radius <= 10)
 			return 0.85;
@@ -1940,7 +1942,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 		return false;
 	}
-
+	//TODO verwendung ändern zu + löschen:
+	//node1.getDistance(node2) bereits eine Methode
 	private double calcNode2NodeDistance(OsmNode node1, OsmNode node2) {
 		double x = node1.coord.getX() - node2.coord.getX();
 		double y = node1.coord.getY() - node2.coord.getY();
@@ -1958,6 +1961,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		return hasOneway;
 	}
 
+	//	//TODO hat er da was geändert von dem Original reader?
 	private final class SignalLanesOsmXmlParser extends OsmXmlParser {
 
 		private OsmRelation currentRelation = null;
@@ -2039,7 +2043,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 
 	}
-
+	//TODO hat er da was geändert von dem Original reader?
 	private static final class OsmRelation {
 		public final long id;
 		public OsmNode resNode;
@@ -2052,6 +2056,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 	}
 
+	//TODO checken ob es schon eine in Java implementierte Klasse gibt, die das macht; wenn compareTo() impl. dann auch verwenden später
 	private static final class LinkVector implements Comparable<LinkVector> {
 		private Link link;
 		private double x;
@@ -2118,8 +2123,11 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 	}
 
-	// TODO consider moving this out in some utils directory
+
+	//TODO consider moving this out in some utils directory
+	//TODO mit lambok abkürzen
 	private static final class BoundingBox {
+		//Attribute evtl irreführend für Eckpunkte
 		private double south;
 		private double west;
 		private double north;
