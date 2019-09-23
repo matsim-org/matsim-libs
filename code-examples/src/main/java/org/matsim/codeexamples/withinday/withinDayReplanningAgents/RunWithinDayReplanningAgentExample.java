@@ -88,11 +88,14 @@ public class RunWithinDayReplanningAgentExample {
 						final QSim qsim = new QSimBuilder(getConfig()).useDefaults().build(sc, ev);
 
 						// add my own agent(s):
-						qsim.addAgentSource(new AgentSource() {
-							VehicleType basicVehicleType = new VehicleType(Id.create("basicVehicleType", VehicleType.class));
+						qsim.addAgentSource(new AgentSource() {						
+							VehicleType basicVehicleType;
 
 							@Override
 							public void insertAgentsIntoMobsim() {
+								if (basicVehicleType == null) {
+									basicVehicleType = sc.getVehicles().getFactory().createVehicleType(Id.create("basicVehicleType", VehicleType.class));
+								}
 								final Id<Link> startLinkId = (Id<Link>) (sc.getNetwork().getLinks().keySet().toArray())[0];
 								final MobsimVehicle veh = new QVehicleImpl( VehicleUtils.createVehicle(Id.create("testVehicle", Vehicle.class ), basicVehicleType ));
 //								final MobsimVehicle veh = new QVehicle(new VehicleImpl(Id.create("testVehicle", Vehicle.class ), basicVehicleType));
