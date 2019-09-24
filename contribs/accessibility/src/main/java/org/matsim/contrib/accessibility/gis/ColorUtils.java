@@ -31,7 +31,7 @@ import java.awt.Color;
  * @author illenberger
  * 
  */
-public final class ColorUtils {
+final class ColorUtils {
 
 	/**
 	 * Returns a color from the spectrum green-yellow-red-pink-blue with
@@ -42,7 +42,7 @@ public final class ColorUtils {
 	 *            a value 0 < x < 1, or < 0 for black and = 0 for white.
 	 * @return a color for <tt>value</tt>.
 	 */
-	public static Color getGRBColor(double value) {
+	static Color getGRBColor( double value ) {
 		if (value < 0)
 			return Color.BLACK;
 		else if (value == 0)

@@ -43,7 +43,7 @@ import org.opengis.referencing.operation.TransformException;
  * @author illenberger
  * 
  */
-public final class CRSUtils {
+final class CRSUtils {
 
 	private static Logger logger = Logger.getLogger(CRSUtils.class);
 

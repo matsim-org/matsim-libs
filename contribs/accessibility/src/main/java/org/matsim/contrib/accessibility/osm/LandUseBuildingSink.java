@@ -60,7 +60,7 @@ import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 /**
  * @author dziemke
  */
-public class LandUseBuildingSink implements Sink {
+class LandUseBuildingSink implements Sink {
 	private final Logger log = Logger.getLogger(LandUseBuildingSink.class);
 	private final CoordinateTransformation ct;
 	private Map<Long, NodeContainer> nodeMap;

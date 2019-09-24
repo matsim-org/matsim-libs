@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.accessibility.gis;
+package org.matsim.contrib.accessibility;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

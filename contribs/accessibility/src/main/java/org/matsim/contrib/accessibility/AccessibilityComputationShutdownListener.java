@@ -44,7 +44,7 @@ import org.matsim.facilities.ActivityFacility;
 /**
  * @author dziemke
  */
-public final class AccessibilityComputationShutdownListener implements ShutdownListener {
+final class AccessibilityComputationShutdownListener implements ShutdownListener {
 	private static final Logger LOG = Logger.getLogger(AccessibilityComputationShutdownListener.class);
 
     private final ActivityFacilities measuringPoints;

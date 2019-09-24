@@ -63,7 +63,7 @@ import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 /**
  * @author dziemke
  */
-public class CombinedOsmSink implements Sink {
+class CombinedOsmSink implements Sink {
 	private final Logger log = Logger.getLogger(CombinedOsmSink.class);
 	
 	private Map<Long, NodeContainer> nodeMap;

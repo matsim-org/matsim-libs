@@ -22,7 +22,6 @@ import ch.sbb.matsim.routing.pt.raptor.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -39,7 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author dziemke
  */
-public class SwissRailRaptorAccessibilityContributionCalculator implements AccessibilityContributionCalculator {
+class SwissRailRaptorAccessibilityContributionCalculator implements AccessibilityContributionCalculator {
 	private static final Logger LOG = Logger.getLogger( SwissRailRaptorAccessibilityContributionCalculator.class );
 	private SwissRailRaptor raptor;
 	private String mode;
@@ -119,10 +118,10 @@ public class SwissRailRaptorAccessibilityContributionCalculator implements Acces
                 aggregatedOpportunities.put(opportunity.getId(), jco);
             }
             if (acg.isUseOpportunityWeights()) {
-                if (opportunity.getAttributes().getAttribute(AccessibilityAttributes.WEIGHT) == null) {
-                    throw new RuntimeException("If option \"useOpportunityWeights\" is used, the facilities must have an attribute with key " + AccessibilityAttributes.WEIGHT + ".");
+                if (opportunity.getAttributes().getAttribute( Labels.WEIGHT ) == null) {
+                    throw new RuntimeException("If option \"useOpportunityWeights\" is used, the facilities must have an attribute with key " + Labels.WEIGHT + ".");
                 } else {
-                    double weight = Double.parseDouble(opportunity.getAttributes().getAttribute(AccessibilityAttributes.WEIGHT).toString());
+                    double weight = Double.parseDouble(opportunity.getAttributes().getAttribute( Labels.WEIGHT ).toString() );
                     jco.addObject(opportunity.getId(), 1. * Math.pow(weight, acg.getWeightExponent()));
                 }
             } else {

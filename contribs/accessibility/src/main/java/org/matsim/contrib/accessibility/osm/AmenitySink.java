@@ -47,7 +47,7 @@ import org.openstreetmap.osmosis.core.domain.v0_6.TagCollectionImpl;
 import org.openstreetmap.osmosis.core.store.SimpleObjectStore;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 
-public class AmenitySink implements Sink {
+class AmenitySink implements Sink {
 	private final Logger log = Logger.getLogger(AmenitySink.class);
 	private final CoordinateTransformation ct;
 	private Map<Long, NodeContainer> nodeMap;

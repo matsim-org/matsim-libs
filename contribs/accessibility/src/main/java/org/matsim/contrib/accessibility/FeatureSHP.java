@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.accessibility.gis;
+package org.matsim.contrib.accessibility;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +36,7 @@ import org.opengis.feature.simple.SimpleFeature;
  * @author illenberger
  * 
  */
-public final class FeatureSHP {
+final class FeatureSHP {
 
 	/**
 	 * Calls {@link FeatureSHP#readFeatures(String, String)} with <tt>null</tt>

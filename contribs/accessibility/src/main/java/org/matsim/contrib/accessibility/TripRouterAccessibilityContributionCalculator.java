@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.Distances;
 import org.matsim.contrib.accessibility.utils.NetworkUtil;
@@ -50,7 +49,7 @@ import java.util.Map;
 /**
  * @author nagel, dziemke
  */
-public class TripRouterAccessibilityContributionCalculator implements AccessibilityContributionCalculator {
+class TripRouterAccessibilityContributionCalculator implements AccessibilityContributionCalculator {
 	private static final Logger LOG = Logger.getLogger( TripRouterAccessibilityContributionCalculator.class );
 	private TripRouter tripRouter ;
 	private String mode;

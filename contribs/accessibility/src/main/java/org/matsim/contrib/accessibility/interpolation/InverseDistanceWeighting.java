@@ -1,6 +1,6 @@
 package org.matsim.contrib.accessibility.interpolation;
 
-import org.matsim.contrib.accessibility.gis.SpatialGrid;
+import org.matsim.contrib.accessibility.SpatialGrid;
 
 /**
  * Implements inverse distance weighting for interpolation. Own implementation (no suitable implementation found).

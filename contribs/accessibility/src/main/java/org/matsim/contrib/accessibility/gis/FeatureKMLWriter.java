@@ -50,7 +50,7 @@ import net.opengis.kml.v_2_2_0.StyleType;
  * @author illenberger
  * 
  */
-public final class FeatureKMLWriter {
+final class FeatureKMLWriter {
 
 	private Colorizable colorizable = new DefaultColorizer();
 

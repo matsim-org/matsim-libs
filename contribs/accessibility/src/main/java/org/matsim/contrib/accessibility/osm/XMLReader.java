@@ -30,9 +30,9 @@ import org.xml.sax.SAXParseException;
 * 
 * @author Brett Henderson
 */
-class XmlReader implements RunnableSource {
+class XMLReader implements RunnableSource {
 
- private static Logger log = Logger.getLogger(XmlReader.class.getName());
+ private static Logger log = Logger.getLogger( XMLReader.class.getName() );
 
  private Sink sink;
 
@@ -50,8 +50,8 @@ class XmlReader implements RunnableSource {
   *        will be used thus saving parsing time.
   * @param compressionMethod Specifies the compression method to employ.
   */
- public XmlReader(InputStream file, boolean enableDateParsing,
-         CompressionMethod compressionMethod) {
+ public XMLReader( InputStream file, boolean enableDateParsing,
+			 CompressionMethod compressionMethod ) {
      this.file = file;
      this.enableDateParsing = enableDateParsing;
      this.compressionMethod = compressionMethod;

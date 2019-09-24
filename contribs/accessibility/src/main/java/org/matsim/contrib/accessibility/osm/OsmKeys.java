@@ -1,6 +1,6 @@
 package org.matsim.contrib.accessibility.osm;
 
-public final class OsmKeys {
+final class OsmKeys {
 	private OsmKeys() {} // Do not instantiate
 	
 	public static final String AMENITY = "amenity";
