@@ -28,13 +28,10 @@ package org.matsim.contrib.emissions;
 class HbefaColdEmissionFactorKey {
 	
 	private HbefaVehicleCategory hbefaVehicleCategory;
-	private String hbefaEmissionsConcept;
-	private String hbefaSizeClass;
-	private String hbefaTechnology;
 	private String hbefaComponent;
 	private int hbefaParkingTime;
 	private int hbefaDistance;
-//	private HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
+	private HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 	
 	public HbefaColdEmissionFactorKey(){
 	}
@@ -45,30 +42,6 @@ class HbefaColdEmissionFactorKey {
 
 	public void setHbefaVehicleCategory(HbefaVehicleCategory hbefaVehicleCategory) {
 		this.hbefaVehicleCategory = hbefaVehicleCategory;
-	}
-
-	public String getHbefaEmissionsConcept() {
-		return hbefaEmissionsConcept;
-	}
-
-	public void setHbefaEmissionsConcept(String hbefaEmissionsConcept) {
-		this.hbefaEmissionsConcept = hbefaEmissionsConcept;
-	}
-
-	public String getHbefaSizeClass() {
-		return hbefaSizeClass;
-	}
-
-	public void setHbefaSizeClass(String hbefaSizeClass) {
-		this.hbefaSizeClass = hbefaSizeClass;
-	}
-
-	public String getHbefaTechnology() {
-		return hbefaTechnology;
-	}
-
-	public void setHbefaTechnology(String hbefaTechnology) {
-		this.hbefaTechnology = hbefaTechnology;
 	}
 
 	public String getHbefaComponent() {
@@ -95,13 +68,13 @@ class HbefaColdEmissionFactorKey {
 		this.hbefaDistance = hbefaDistance;
 	}
 		
-//	public HbefaVehicleAttributes getHbefaVehicleAttributes() {
-//		return hbefaVehicleAttributes;
-//	}
+	public HbefaVehicleAttributes getHbefaVehicleAttributes() {
+		return hbefaVehicleAttributes;
+	}
 
-//	public void setHbefaVehicleAttributes(HbefaVehicleAttributes hbefaVehicleAttributes) {
-//		this.hbefaVehicleAttributes = hbefaVehicleAttributes;
-//	}
+	public void setHbefaVehicleAttributes(HbefaVehicleAttributes hbefaVehicleAttributes) {
+		this.hbefaVehicleAttributes = hbefaVehicleAttributes;
+	}
 
 	/* need to implement the "equals" method in order to be able to construct an "equal" key
 	 later on (e.g. from data available in the simulation)*/
@@ -118,10 +91,7 @@ class HbefaColdEmissionFactorKey {
 	         && hbefaComponent.equals(key.getHbefaComponent())
 	         && hbefaParkingTime == (key.getHbefaParkingTime())
 	         && hbefaDistance == (key.getHbefaDistance())
-			 &&	hbefaEmissionsConcept == (key.getHbefaEmissionsConcept())
-			 && hbefaTechnology == (key.getHbefaTechnology())
-			 && hbefaSizeClass == (key.getHbefaSizeClass());
-//	         && hbefaVehicleAttributes.equals(key.getHbefaVehicleAttributes());
+	         && hbefaVehicleAttributes.equals(key.getHbefaVehicleAttributes());
 	}
 
 	// if "equals" is implemented, "hashCode" also needs to be implemented
@@ -138,15 +108,6 @@ class HbefaColdEmissionFactorKey {
 		+ hbefaComponent + "; "
 		+ hbefaParkingTime + "; "
 		+ hbefaDistance+ "; "
-		+ hbefaEmissionsConcept + "; "
-		+ hbefaTechnology + "; "
-		+ hbefaSizeClass;
-//		+ hbefaVehicleAttributes;
-	}
-
-	/*package-private*/ void setHbefaVehicleValuesToAverage() {
-		hbefaEmissionsConcept = "average";
-		hbefaSizeClass = "average";
-		hbefaTechnology = "average";
+		+ hbefaVehicleAttributes;
 	}
 }

@@ -26,13 +26,10 @@ package org.matsim.contrib.emissions;
 class HbefaWarmEmissionFactorKey {
 	
 	private HbefaVehicleCategory hbefaVehicleCategory;
-	private String hbefaEmissionsConcept;
-	private String hbefaSizeClass;
-	private String hbefaTechnology;
 	private String hbefaComponent;
 	private String hbefaRoadCategory;
 	private HbefaTrafficSituation hbefaTrafficSituation;
-//	private HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
+	private HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 	
 	public HbefaWarmEmissionFactorKey(){
 	}
@@ -41,38 +38,11 @@ class HbefaWarmEmissionFactorKey {
         this.hbefaVehicleCategory = key.hbefaVehicleCategory;
         this.hbefaComponent = key.hbefaComponent;
         this.hbefaRoadCategory = key.hbefaRoadCategory;
-        this.hbefaEmissionsConcept = key.hbefaEmissionsConcept;
-        this.hbefaSizeClass = key.hbefaSizeClass;
-        this.hbefaTechnology = key.hbefaTechnology;
-//        this.hbefaVehicleAttributes = key.hbefaVehicleAttributes;
+        this.hbefaVehicleAttributes = key.hbefaVehicleAttributes;
     }
 
     HbefaVehicleCategory getHbefaVehicleCategory() {
 		return this.hbefaVehicleCategory;
-	}
-
-	public String getHbefaEmissionsConcept() {
-		return hbefaEmissionsConcept;
-	}
-
-	public void setHbefaEmissionsConcept(String hbefaEmissionsConcept) {
-		this.hbefaEmissionsConcept = hbefaEmissionsConcept;
-	}
-
-	public String getHbefaSizeClass() {
-		return hbefaSizeClass;
-	}
-
-	public void setHbefaSizeClass(String hbefaSizeClass) {
-		this.hbefaSizeClass = hbefaSizeClass;
-	}
-
-	public String getHbefaTechnology() {
-		return hbefaTechnology;
-	}
-
-	public void setHbefaTechnology(String hbefaTechnology) {
-		this.hbefaTechnology = hbefaTechnology;
 	}
 
 	public void setHbefaVehicleCategory(HbefaVehicleCategory hbefaVehicleCategory) {
@@ -103,13 +73,13 @@ class HbefaWarmEmissionFactorKey {
 		this.hbefaTrafficSituation = hbefaTrafficSituation;
 	}
 
-//	HbefaVehicleAttributes getHbefaVehicleAttributes(){
-//		return this.hbefaVehicleAttributes;
-//	}
-//
-//	public void setHbefaVehicleAttributes(HbefaVehicleAttributes hbefaVehicleAttributes) {
-//		this.hbefaVehicleAttributes = hbefaVehicleAttributes;
-//	}
+	HbefaVehicleAttributes getHbefaVehicleAttributes(){
+		return this.hbefaVehicleAttributes;
+	}
+	
+	public void setHbefaVehicleAttributes(HbefaVehicleAttributes hbefaVehicleAttributes) {
+		this.hbefaVehicleAttributes = hbefaVehicleAttributes;		
+	}
 	
 	/* need to implement the "equals" method in order to be able to construct an "equal" key
 	 later on (e.g. from data available in the simulation)*/
@@ -127,10 +97,7 @@ class HbefaWarmEmissionFactorKey {
 	         && hbefaComponent.equals(key.getHbefaComponent())
 	         && hbefaRoadCategory.equals(key.getHbefaRoadCategory())
 	         && hbefaTrafficSituation.equals(key.getHbefaTrafficSituation())
-			 &&	hbefaEmissionsConcept == (key.getHbefaEmissionsConcept())
-			 && hbefaTechnology == (key.getHbefaTechnology())
-			 && hbefaSizeClass == (key.getHbefaSizeClass());
-//	         && hbefaVehicleAttributes.equals(key.getHbefaVehicleAttributes());
+	         && hbefaVehicleAttributes.equals(key.getHbefaVehicleAttributes());
 	}
 
 	// if "equals" is implemented, "hashCode also needs to be implemented
@@ -147,15 +114,6 @@ class HbefaWarmEmissionFactorKey {
 		+ hbefaComponent + "; " 
 		+ hbefaRoadCategory + "; " 
 		+ hbefaTrafficSituation + "; "
-	    + hbefaEmissionsConcept + "; "
-		+ hbefaTechnology + "; "
-		+ hbefaSizeClass;
-//		+ hbefaVehicleAttributes;
-	}
-
-	/*package-private*/ void setHbefaVehicleValuesToAverage() {
-		hbefaEmissionsConcept = "average";
-		hbefaSizeClass = "average";
-		hbefaTechnology = "average";
+		+ hbefaVehicleAttributes;
 	}
 }
