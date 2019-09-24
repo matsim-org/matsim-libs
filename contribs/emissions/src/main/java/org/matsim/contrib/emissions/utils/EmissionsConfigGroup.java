@@ -280,14 +280,14 @@ extends ReflectiveConfigGroup
 	@Deprecated // kai, oct'18
 	private static final String USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION = "isUsingVehicleTypeIdAsVehicleDescription";
 	@StringGetter(USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION)
-	@Deprecated // is there for backwards compatibility; should eventually be removed.  kai, oct'18
+	@Deprecated // is there for backwards compatibility; in code please inline. kai/kai, sep'19
 	public Boolean isUsingVehicleTypeIdAsVehicleDescription() {
 		switch ( this.getHbefaVehicleDescriptionSource() ) {
 			case usingVehicleTypeId:
 				return true ;
 			case fromVehicleTypeDescription:
 				return false ;
-			case asVehicleTypeAttribute:
+			case asEngineInformationAttributes:
 				return null ;
 			default:
 				throw new RuntimeException( "config switch setting not understood" ) ;
@@ -297,10 +297,10 @@ extends ReflectiveConfigGroup
 	 * @param usingVehicleIdAsVehicleDescription -- {@value #USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION_CMT}
 	 */
 	@StringSetter(USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION)
-	@Deprecated // is there for backwards compatibility; should eventually be removed.  kai, oct'18
+	@Deprecated // is there for backwards compatibility; in code please inline.  kai/kai, sep19
 	public void setUsingVehicleTypeIdAsVehicleDescription(Boolean usingVehicleIdAsVehicleDescription) {
 		if ( usingVehicleIdAsVehicleDescription==null ) {
-			this.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.asVehicleTypeAttribute );
+			this.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.asEngineInformationAttributes );
 		} else if ( usingVehicleIdAsVehicleDescription ) {
 			this.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.usingVehicleTypeId );
 		} else {
@@ -311,16 +311,16 @@ extends ReflectiveConfigGroup
 	// ============================================
 	// yy I now think that one can get away without the following.  kai, mar'19
 //	private static final String HBEFA_VEHICLE_DESCRIPTION_SOURCE="hbefaVehicleDescriptionSource" ;
-	private enum HbefaVehicleDescriptionSource { usingVehicleTypeId, fromVehicleTypeDescription, asVehicleTypeAttribute }
-	private HbefaVehicleDescriptionSource hbefaVehicleDescriptionSource = HbefaVehicleDescriptionSource.fromVehicleTypeDescription ;
+	public enum HbefaVehicleDescriptionSource { usingVehicleTypeId, fromVehicleTypeDescription, asEngineInformationAttributes }
+	private HbefaVehicleDescriptionSource hbefaVehicleDescriptionSource = HbefaVehicleDescriptionSource.asEngineInformationAttributes ;
 	@Deprecated // is there for backwards compatibility; should eventually be removed.  kai, mar'19
 //	@StringSetter(HBEFA_VEHICLE_DESCRIPTION_SOURCE)
-	private void setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource hbefaVehicleDescriptionSource ) {
+	public void setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource hbefaVehicleDescriptionSource ) {
 		this.hbefaVehicleDescriptionSource = hbefaVehicleDescriptionSource ;
 	}
 	@Deprecated // is there for backwards compatibility; should eventually be removed.  kai, mar'19
 //	@StringGetter( HBEFA_VEHICLE_DESCRIPTION_SOURCE )
-	private HbefaVehicleDescriptionSource getHbefaVehicleDescriptionSource() {
+	public HbefaVehicleDescriptionSource getHbefaVehicleDescriptionSource() {
 		return this.hbefaVehicleDescriptionSource ;
 	}
 	// ============================================

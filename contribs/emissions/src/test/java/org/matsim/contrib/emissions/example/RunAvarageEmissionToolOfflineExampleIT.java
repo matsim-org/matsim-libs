@@ -20,7 +20,9 @@ package org.matsim.contrib.emissions.example;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -34,6 +36,8 @@ public class RunAvarageEmissionToolOfflineExampleIT {
 	public final void testAverage_vehTypeV1() {
 		RunAverageEmissionToolOfflineExample offlineExample = new RunAverageEmissionToolOfflineExample();
 		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv1/config_average.xml");
+		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );;
+		emissionsConfig.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		offlineExample.run();
 	}
@@ -42,6 +46,19 @@ public class RunAvarageEmissionToolOfflineExampleIT {
 	public final void testAverage_vehTypeV2() {
 		RunAverageEmissionToolOfflineExample offlineExample = new RunAverageEmissionToolOfflineExample();
 		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_average.xml");
+		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );;
+		emissionsConfig.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		offlineExample.run();
+	}
+
+	@Test
+	public final void testAverage_vehTypeV2b() {
+		RunAverageEmissionToolOfflineExample offlineExample = new RunAverageEmissionToolOfflineExample();
+		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_average.xml");
+		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );;
+		emissionsConfig.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
+		// (should also be the default)
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		offlineExample.run();
 	}

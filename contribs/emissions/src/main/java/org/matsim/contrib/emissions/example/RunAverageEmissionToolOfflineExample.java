@@ -31,10 +31,12 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.MatsimVehicleWriter;
+import org.matsim.vehicles.VehicleUtils;
 
 
 /**
- * 
+ *
  * Use the config file as created by the 
  * {@link CreateEmissionConfig CreateEmissionConfig} to calculate
  * emissions based on the link leave events of an events file. Resulting emission events are written into an event file.
@@ -42,21 +44,21 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author benjamin, julia
  */
 public final class RunAverageEmissionToolOfflineExample{
-	
+
 	private final static String runDirectory = "./test/output/";
 	private static final String configFile = "./scenarios/sampleScenario/testv2_Vehv1/config_average.xml";
-	
+
 	private static final String eventsFile =  "./scenarios/sampleScenario/5.events.xml.gz";
 	// (remove dependency of one test/execution path from other. kai/ihab, nov'18)
 
-	private static final String emissionEventOutputFile = runDirectory + "5.emission.events.offline.xml.gz";
+	private static final String emissionEventOutputFileName = "5.emission.events.offline.xml.gz";
 	private Config config;
 
 	// =======================================================================================================		
-	
+
 	public static void main (String[] args){
-        RunAverageEmissionToolOfflineExample emissionToolOfflineExampleV2 = new RunAverageEmissionToolOfflineExample();
-        emissionToolOfflineExampleV2.run();
+		RunAverageEmissionToolOfflineExample emissionToolOfflineExampleV2 = new RunAverageEmissionToolOfflineExample();
+		emissionToolOfflineExampleV2.run();
 	}
 
 	public Config prepareConfig() {
@@ -69,12 +71,12 @@ public final class RunAverageEmissionToolOfflineExample{
 		return config;
 	}
 
-    public void run() {
+	public void run() {
 		if ( config==null ) {
 			this.prepareConfig() ;
 		}
-        Scenario scenario = ScenarioUtils.loadScenario(config);
-        EventsManager eventsManager = EventsUtils.createEventsManager();
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		EventsManager eventsManager = EventsUtils.createEventsManager();
 
 		AbstractModule module = new AbstractModule(){
 			@Override
@@ -87,15 +89,18 @@ public final class RunAverageEmissionToolOfflineExample{
 
 		com.google.inject.Injector injector = Injector.createInjector(config, module );
 
-        EmissionModule emissionModule = injector.getInstance(EmissionModule.class);
+		EmissionModule emissionModule = injector.getInstance(EmissionModule.class);
 
-        EventWriterXML emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
-        emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
+		final String outputDirectory = scenario.getConfig().controler().getOutputDirectory();
+		EventWriterXML emissionEventWriter = new EventWriterXML( outputDirectory + emissionEventOutputFileName );
+		emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
 
-        MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
-        matsimEventsReader.readFile(eventsFile);
+		MatsimEventsReader matsimEventsReader = new MatsimEventsReader(eventsManager);
+		matsimEventsReader.readFile(eventsFile);
 
-        emissionEventWriter.closeFile();
+		emissionEventWriter.closeFile();
 
-    }
+		new MatsimVehicleWriter( scenario.getVehicles() ).writeFile( outputDirectory + "vehicles.xml.gz" );
+
+	}
 }

@@ -247,8 +247,14 @@ public class TestColdEmissionAnalysisModule {
 		Double rescaleFactor = -.001;
 		
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		ecg.setUsingVehicleTypeIdAsVehicleDescription( true );
-		
+		if ( (Boolean) true ==null ) {
+			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
+		} else if ( true ) {
+			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
+		} else {
+			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
+		}
+
 		ColdEmissionAnalysisModule ceam = new ColdEmissionAnalysisModule( new ColdEmissionAnalysisModuleParameter( avgHbefaColdTable, detailedHbefaColdTable, pollutants, ecg), emissionEventManager, rescaleFactor );
 		HandlerToTestEmissionAnalysisModules.reset();
 		
@@ -275,7 +281,13 @@ public class TestColdEmissionAnalysisModule {
 		
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		ecg.setUsingVehicleTypeIdAsVehicleDescription( true );
+		if ( (Boolean) true ==null ) {
+			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
+		} else if ( true ) {
+			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
+		} else {
+			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
+		}
 		coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( new ColdEmissionAnalysisModuleParameter( avgHbefaColdTable, detailedHbefaColdTable, pollutants , ecg), emissionEventManager, null );
 		
 	}

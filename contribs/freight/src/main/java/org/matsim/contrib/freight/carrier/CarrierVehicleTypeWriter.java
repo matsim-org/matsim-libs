@@ -31,11 +31,7 @@ public class CarrierVehicleTypeWriter implements MatsimWriter {
 	}
 
 	@Override public void write( String filename ){
-		try{
-			delegate.writeFile( filename );
-		} catch( IOException e ){
-			e.printStackTrace();
-		}
+		delegate.writeFile( filename );
 	}
 
 }

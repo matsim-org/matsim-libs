@@ -50,9 +50,13 @@ public final class MatsimVehicleWriter extends MatsimXmlWriter {
 	 * Writes the vehicles in the current default format
 	 * (currently vehicleDefinitions_v2.0.dtd).
 	 */
-	public void writeFile(String filename) throws UncheckedIOException, IOException {
+	public void writeFile(String filename) {
 		log.info( Gbl.aboutToWrite( "vehicles", filename) ) ;
-		delegate.writeFile(filename);
+		try{
+			delegate.writeFile(filename);
+		} catch( IOException e ){
+			e.printStackTrace();
+		}
 	}
 
 }
