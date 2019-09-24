@@ -168,7 +168,8 @@ final class ColdEmissionAnalysisModule {
 
 			Gbl.assertNotNull( hbefaVehicleTypeDescription );
 
-			Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = EmissionUtils.convertVehicleDescription2VehicleInformationTuple(hbefaVehicleTypeDescription);
+			Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = EmissionUtils.convertVehicleDescription2VehicleInformationTuple(
+				  vehicle.getType() );
 
 			Gbl.assertNotNull( vehicleInformationTuple );
 
