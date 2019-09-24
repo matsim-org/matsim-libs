@@ -72,6 +72,7 @@ public class TinyAccessibilityTest {
 		acg.setBoundingBoxTop(max);
 		acg.setBoundingBoxLeft(min);
 		acg.setBoundingBoxRight(max);
+		acg.setUseParallelization(false);
 
 		final Scenario scenario = createTestScenario(config);
 
@@ -85,7 +86,6 @@ public class TinyAccessibilityTest {
 	}
 
 	@Test
-	@Ignore // non-deterministic presumably because of multi-threading.  kai, sep'19
 	public void testWithBoundingBox() {
 		final Config config = createTestConfig();
 
@@ -98,6 +98,7 @@ public class TinyAccessibilityTest {
 		acg.setBoundingBoxTop(max);
 		acg.setBoundingBoxLeft(min);
 		acg.setBoundingBoxRight(max);
+		acg.setUseParallelization(false);
 
 		final Scenario sc = createTestScenario(config);
 

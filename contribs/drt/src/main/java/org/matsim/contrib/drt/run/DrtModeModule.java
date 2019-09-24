@@ -101,7 +101,8 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 			case serviceAreaBased:
 			case stopbased:
 				if (drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.serviceAreaBased) {
-					bindModal(TransitSchedule.class).toProvider(new ShapeFileStopProvider(getConfig(), drtCfg));
+					bindModal(TransitSchedule.class).toProvider(new ShapeFileStopProvider(getConfig(), drtCfg))
+							.asEagerSingleton();
 				} else {
 					bindModal(TransitSchedule.class).toInstance(readTransitSchedule());
 				}
