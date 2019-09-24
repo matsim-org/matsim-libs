@@ -257,6 +257,8 @@ public final class EmissionUtils {
 				if ( VehicleUtils.getHbefaTechnology( vehicleType.getEngineInformation() ) != null ) {
 					// information has already been moved to correct location
 					break ;
+					// yy Note: If the information is already at the new location (as engine attributes), then the following code will silently take
+					// it from there, and not complain that the config setting says it should be in the "description".  kai/kai, sep'19
 				}
 
 				// v2, hbefa vehicle description is in vehicle type description.  Move to where it is expected now:

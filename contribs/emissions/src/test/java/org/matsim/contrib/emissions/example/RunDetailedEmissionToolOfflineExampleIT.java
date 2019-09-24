@@ -22,7 +22,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.emissions.example.RunAverageEmissionToolOfflineExample;
 import org.matsim.contrib.emissions.example.RunDetailedEmissionToolOfflineExample;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -36,6 +38,8 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 	public final void testDetailed_vehTypeV1() {
 		RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
 		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml");
+		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
+		emissionsConfig.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		offlineExample.run();
 	}
