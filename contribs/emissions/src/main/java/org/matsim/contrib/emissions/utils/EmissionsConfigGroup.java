@@ -78,6 +78,8 @@ extends ReflectiveConfigGroup
 	@Deprecated // See elsewhere in this class.  kai, oct'18
 	private static final String Hbefa_ROADTYPE_SOURCE = "hbefaRoadTypeSource";
 	@Deprecated // my preference would be to phase out the "fromFile" option and use "fromLinkAttributes" only.  It can always be solved after reading the network.  kai, oct'18
+	// I am now thinking that it would be more expressive to keep that setting, because it makes users aware of the fact that there needs to be something
+	// in the vehicles file.  kai, dec'19
 	private HbefaRoadTypeSource hbefaRoadTypeSource = HbefaRoadTypeSource.fromFile; // fromFile is to support backward compatibility
 
 	public enum NonScenarioVehicles { ignore, abort }
@@ -172,7 +174,9 @@ extends ReflectiveConfigGroup
 		
 		map.put(NON_SCENARIO_VEHICLES, NON_SCENARIO_VEHICLES_CMT);
 
-        map.put(EMISSIONS_COMPUTATION_METHOD, EMISSIONS_COMPUTATION_METHOD_CMT);
+		map.put(EMISSIONS_COMPUTATION_METHOD, EMISSIONS_COMPUTATION_METHOD_CMT);
+
+		map.put(HBEFA_VEHICLE_DESCRIPTION_SOURCE, HBEFA_VEHICLE_DESCRIPTION_SOURCE_CMT) ;
 
 		return map;
 	}
@@ -310,16 +314,24 @@ extends ReflectiveConfigGroup
 	// ============================================
 	// ============================================
 	// yy I now think that one can get away without the following.  kai, mar'19
-//	private static final String HBEFA_VEHICLE_DESCRIPTION_SOURCE="hbefaVehicleDescriptionSource" ;
+	private static final String HBEFA_VEHICLE_DESCRIPTION_SOURCE="hbefaVehicleDescriptionSource" ;
+	private static final String HBEFA_VEHICLE_DESCRIPTION_SOURCE_CMT="Each vehicle in matsim points to a VehicleType.  For the emissions package to work, " +
+													 "each VehicleType needs to contain corresponding information.  This switch " +
+													 "determines _where_ in VehicleType that information is contained.  default: " +
+													 HbefaVehicleDescriptionSource.asEngineInformationAttributes.name() ;
 	public enum HbefaVehicleDescriptionSource { usingVehicleTypeId, fromVehicleTypeDescription, asEngineInformationAttributes }
 	private HbefaVehicleDescriptionSource hbefaVehicleDescriptionSource = HbefaVehicleDescriptionSource.asEngineInformationAttributes ;
 	@Deprecated // is there for backwards compatibility; should eventually be removed.  kai, mar'19
-//	@StringSetter(HBEFA_VEHICLE_DESCRIPTION_SOURCE)
+	// I am now thinking that it would be more expressive to keep that setting, because it makes users aware of the fact that there needs to be something
+	// in the vehicles file.  kai, dec'19
+	@StringSetter(HBEFA_VEHICLE_DESCRIPTION_SOURCE)
 	public void setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource hbefaVehicleDescriptionSource ) {
 		this.hbefaVehicleDescriptionSource = hbefaVehicleDescriptionSource ;
 	}
 	@Deprecated // is there for backwards compatibility; should eventually be removed.  kai, mar'19
-//	@StringGetter( HBEFA_VEHICLE_DESCRIPTION_SOURCE )
+	// I am now thinking that it would be more expressive to keep that setting, because it makes users aware of the fact that there needs to be something
+	// in the vehicles file.  kai, dec'19
+	@StringGetter( HBEFA_VEHICLE_DESCRIPTION_SOURCE )
 	public HbefaVehicleDescriptionSource getHbefaVehicleDescriptionSource() {
 		return this.hbefaVehicleDescriptionSource ;
 	}
