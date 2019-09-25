@@ -197,7 +197,7 @@ public final class EmissionUtils {
 //		EmissionUtils.getHbefaVehicleDescription( vehicleType, emissionsConfigGroup ) ;
 
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple;
-		HbefaVehicleCategory hbefaVehicleCategory = null;
+//		HbefaVehicleCategory hbefaVehicleCategory = null;
 		
 		// yyyy replace this by using Attributes.  kai, oct'18
 //		int startIndex = vehicleType.indexOf(EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() ) + EmissionSpecificationMarker.BEGIN_EMISSIONS.toString().length();
@@ -215,7 +215,10 @@ public final class EmissionUtils {
 //			}
 //		}
 		Gbl.assertNotNull( vehicleType );
-		hbefaVehicleCategory = HbefaVehicleCategory.valueOf( VehicleUtils.getHbefaVehicleCategory( vehicleType.getEngineInformation() ) ) ;
+		Gbl.assertNotNull(vehicleType.getEngineInformation());
+		logger.info(vehicleType.getEngineInformation().getAttributes().toString());
+		Gbl.assertNotNull(VehicleUtils.getHbefaVehicleCategory( vehicleType.getEngineInformation() ));
+		HbefaVehicleCategory hbefaVehicleCategory = HbefaVehicleCategory.valueOf( VehicleUtils.getHbefaVehicleCategory( vehicleType.getEngineInformation() ) ) ;
 
 		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 //		if (vehicleInformationArray.length == 4) {
@@ -260,23 +263,30 @@ public final class EmissionUtils {
 			throw new RuntimeException( "vehicleType is null; not possible for emissions contrib." );
 		}
 
+		EngineInformation engineInformation;
 		// get information from where it used to be in previous versions and move to where it should be now:
+		logger.debug("found following hbefaDescriptionSource in emissionsConfigGroup ... " + emissionsConfigGroup.getHbefaVehicleDescriptionSource());
 		switch( emissionsConfigGroup.getHbefaVehicleDescriptionSource() ) {
 			case usingVehicleTypeId:
 				// (v1, hbefa vehicle description is in vehicle type id.  Copy to where it is expected now)
-				vehicleType.getId().toString();
-				// yyyy maybe this should use the vehicle information tuple (see below)?
-				// yyyy replace this by using Attributes.  kai, oct'18
 
-//		vehicleType.getAttributes().putAttribute( HBEFA_VEHICLE_DESCRIPTION, hbefaVehicleDescription ) ;
+				//VehicleTypeId can contain ; to provide more specific information, e.g. for HbefaTechnology, HbefaSizeClass, HbefaEmissionsConcept
+				if (vehicleType.getId().toString().contains(";")) {
+					String[] vehicleInformationArray = vehicleType.getId().toString().split(";");
 
-				Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> result2 = convertVehicleDescription2VehicleInformationTuple( vehicleType );;
+					engineInformation = vehicleType.getEngineInformation();
+					VehicleUtils.setHbefaVehicleCategory(engineInformation, vehicleInformationArray[0]);
 
-				EngineInformation engineInformation1 = vehicleType.getEngineInformation();;
-				VehicleUtils.setHbefaEmissionsConcept( engineInformation1, result2.getSecond().getHbefaEmConcept() );
-				VehicleUtils.setHbefaSizeClass( engineInformation1, result2.getSecond().getHbefaSizeClass() );
-				VehicleUtils.setHbefaTechnology( engineInformation1, result2.getSecond().getHbefaTechnology() );
-				VehicleUtils.setHbefaVehicleCategory( engineInformation1, result2.getFirst().name() );
+					if (vehicleInformationArray.length == 4) {
+						VehicleUtils.setHbefaTechnology(engineInformation, vehicleInformationArray[1]);
+						VehicleUtils.setHbefaSizeClass(engineInformation, vehicleInformationArray[2]);
+						VehicleUtils.setHbefaEmissionsConcept(engineInformation, vehicleInformationArray[3]);
+					}
+				} else {
+					//VehicleTypeId contains only the hbefaVehicleCategory
+					VehicleUtils.setHbefaVehicleCategory(vehicleType.getEngineInformation(), vehicleType.getId().toString());
+				}
+
 				break;
 			case fromVehicleTypeDescription:
 
@@ -297,25 +307,21 @@ public final class EmissionUtils {
 				int endIndex = vehicleType.getDescription().lastIndexOf( EmissionSpecificationMarker.END_EMISSIONS.toString() );
 				final String substring = vehicleType.getDescription().substring( startIndex, endIndex );
 
-				// ==== begin refactoring
-
-
 				String[] vehicleInformationArray = substring.split( ";" ) ;
 
-				EngineInformation engineInformation = vehicleType.getEngineInformation();;
-				VehicleUtils.setHbefaVehicleCategory( engineInformation, result1.getFirst().name() );
-				if ( vehicleInformationArray.length==4 ){
-					VehicleUtils.setHbefaEmissionsConcept( engineInformation, result1.getSecond().getHbefaEmConcept() );
-					VehicleUtils.setHbefaSizeClass( engineInformation, result1.getSecond().getHbefaSizeClass() );
-					VehicleUtils.setHbefaTechnology( engineInformation, result1.getSecond().getHbefaTechnology() );
-				}
+				engineInformation = vehicleType.getEngineInformation();;
+				VehicleUtils.setHbefaVehicleCategory( engineInformation, vehicleInformationArray[0] );
 
-				// ==== begin refactoring
+				if ( vehicleInformationArray.length==4 ){
+					VehicleUtils.setHbefaTechnology( engineInformation, vehicleInformationArray[1] );
+					VehicleUtils.setHbefaSizeClass( engineInformation, vehicleInformationArray[2] );
+					VehicleUtils.setHbefaEmissionsConcept( engineInformation, vehicleInformationArray[3] );
+				}
 
 				// delete at old location:
 				String oldString = EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() + substring + EmissionSpecificationMarker.END_EMISSIONS.toString();;
-				String result = vehicleType.getDescription().replace( oldString, "" );
-				vehicleType.setDescription( result ) ;
+				String result2 = vehicleType.getDescription().replace( oldString, "" );
+				vehicleType.setDescription( result2 ) ;
 
 				break;
 			case asEngineInformationAttributes:

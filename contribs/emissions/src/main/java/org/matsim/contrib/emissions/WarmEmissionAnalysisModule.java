@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static org.matsim.contrib.emissions.EmissionUtils.convertVehicleDescription2VehicleInformationTuple;
 import static org.matsim.contrib.emissions.HbefaTrafficSituation.*;
 
 /**
@@ -159,7 +160,8 @@ public final class WarmEmissionAnalysisModule {
 		  Id<Vehicle> vehicleId, Link link,
 		  double travelTime ) {
 
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertVehicleTypeId2VehicleInformationTuple(vehicleType);
+
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertVehicleDescription2VehicleInformationTuple(vehicleType);
 		if (vehicleInformationTuple.getFirst() == null){
 			throw new RuntimeException("Vehicle category for vehicle " + vehicleType + " is not valid. " +
 					"Please make sure that requirements for emission vehicles in " + 
@@ -337,34 +339,34 @@ public final class WarmEmissionAnalysisModule {
 		}
 	}
 
-	private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleTypeId2VehicleInformationTuple( VehicleType vehicleType ) {
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple;
-		HbefaVehicleCategory hbefaVehicleCategory = null;
-		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
-
-//		int startIndex = vehicleDescription.indexOf(
-//			  EmissionUtils.EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() ) + EmissionUtils.EmissionSpecificationMarker.BEGIN_EMISSIONS.toString().length();
-//		int endIndex = vehicleDescription.lastIndexOf( EmissionUtils.EmissionSpecificationMarker.END_EMISSIONS.toString() );
+//	private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleDescription2VehicleInformationTuple(VehicleType vehicleType ) {
+//		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple;
+//		HbefaVehicleCategory hbefaVehicleCategory = null;
+//		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 //
-//		String[] vehicleInformationArray = vehicleDescription.substring(startIndex, endIndex).split(";");
-
-		String[] vehicleInformationArray = EmissionUtils.getHbefaVehicleDescription( vehicleType, this.ecg ).split( ";" ) ;
-
-		for(HbefaVehicleCategory vehCat : HbefaVehicleCategory.values()){
-			if(vehCat.toString().equals(vehicleInformationArray[0])){
-				hbefaVehicleCategory = vehCat;
-			}
-		}
-
-		if(vehicleInformationArray.length == 4){
-			hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationArray[1]);
-			hbefaVehicleAttributes.setHbefaSizeClass(vehicleInformationArray[2]);
-			hbefaVehicleAttributes.setHbefaEmConcept(vehicleInformationArray[3]);
-		} // else interpretation as "average vehicle"
-
-		vehicleInformationTuple = new Tuple<>(hbefaVehicleCategory, hbefaVehicleAttributes);
-		return vehicleInformationTuple;
-	}
+////		int startIndex = vehicleDescription.indexOf(
+////			  EmissionUtils.EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() ) + EmissionUtils.EmissionSpecificationMarker.BEGIN_EMISSIONS.toString().length();
+////		int endIndex = vehicleDescription.lastIndexOf( EmissionUtils.EmissionSpecificationMarker.END_EMISSIONS.toString() );
+////
+////		String[] vehicleInformationArray = vehicleDescription.substring(startIndex, endIndex).split(";");
+//
+//		String[] vehicleInformationArray = EmissionUtils.getHbefaVehicleDescription( vehicleType, this.ecg ).split( ";" ) ;
+//
+//		for(HbefaVehicleCategory vehCat : HbefaVehicleCategory.values()){
+//			if(vehCat.toString().equals(vehicleInformationArray[0])){
+//				hbefaVehicleCategory = vehCat;
+//			}
+//		}
+//
+//		if(vehicleInformationArray.length == 4){
+//			hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationArray[1]);
+//			hbefaVehicleAttributes.setHbefaSizeClass(vehicleInformationArray[2]);
+//			hbefaVehicleAttributes.setHbefaEmConcept(vehicleInformationArray[3]);
+//		} // else interpretation as "average vehicle"
+//
+//		vehicleInformationTuple = new Tuple<>(hbefaVehicleCategory, hbefaVehicleAttributes);
+//		return vehicleInformationTuple;
+//	}
 
 	public int getFreeFlowOccurences() {
 		return freeFlowCounter;
