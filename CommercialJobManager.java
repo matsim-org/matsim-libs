@@ -72,11 +72,14 @@ public class CommercialJobManager implements BeforeMobsimListener, AfterMobsimLi
             if(ctConfigGroup.getRunTourPlanning()) carrier.getServices().clear(); //initialize
         });
         this.carriers = carriers;
-        mapServicesToCustomer(scenario.getPopulation());
+        if(mapServicesToCustomer(scenario.getPopulation()))
+            throw new RuntimeException("there is a problem with consistency of location in services and activities." +
+                "please check the log for details.");
     }
 
 
-    private void mapServicesToCustomer(Population population){
+    private boolean mapServicesToCustomer(Population population){
+        final MutableBoolean fail = new MutableBoolean(false);
         for (Person p : population.getPersons().values()) {
             p.getPlans()
                 .forEach(plan -> {
@@ -88,6 +91,7 @@ public class CommercialJobManager implements BeforeMobsimListener, AfterMobsimLi
                         });
                 });
         }
+        return fail.getValue();
     }
 
     private void retrieveServicesIdsAndDoMapping(Id<Person> personId, Activity activity) {
