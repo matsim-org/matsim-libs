@@ -23,7 +23,9 @@ import static org.junit.Assert.*;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -43,6 +45,8 @@ public class RunDetailedEmissionToolOnlineExampleIT {
 			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml"} ) ;
 			config.controler().setOutputDirectory( utils.getOutputDirectory() );
 			config.controler().setLastIteration( 1 );
+			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
+			emissionsConfig.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
 			Scenario scenario = RunDetailedEmissionToolOnlineExample.prepareScenario( config ) ;
 			RunDetailedEmissionToolOnlineExample.run( scenario ) ;
 		} catch ( Exception ee ) {
