@@ -41,7 +41,6 @@ public class CommercialJobUtilsV2 {
     public static final String JOB_EARLIEST_START = "jobTimeStart";
     public static final String JOB_OPERATOR = "operator";
     public static final String JOB_TIME_END = "jobTimeEnd";
-    public static final String JOB_ID = "jobId";
 
     public static final String CARRIERSPLIT = "_";
 
@@ -90,7 +89,7 @@ public class CommercialJobUtilsV2 {
     public static boolean planExpectsDeliveries(Plan plan) {
         return plan.getPlanElements().stream()
                 .filter(Activity.class::isInstance)
-                .anyMatch(planElement -> planElement.getAttributes().getAsMap().containsKey(JOB_ID));
+                .anyMatch(planElement -> planElement.getAttributes().getAsMap().containsKey(JOB_TYPE));
     }
 
     public static String getCarrierMarket(Id<Carrier> carrierId) {
