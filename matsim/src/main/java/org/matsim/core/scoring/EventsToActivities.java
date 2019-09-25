@@ -55,7 +55,7 @@ public final class EventsToActivities implements ActivityStartEventHandler, Acti
 	    void handleActivity(PersonExperiencedActivity activity);
 	}
 
-    private IdMap<Person, Activity> activities = new IdMap<>(Person.class, Activity.class);
+    private IdMap<Person, Activity> activities = new IdMap<>(Person.class);
     private List<ActivityHandler> activityHandlers = new ArrayList<>();
 
     public EventsToActivities() {
