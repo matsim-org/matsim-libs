@@ -20,15 +20,10 @@
 
 package org.matsim.pt.counts;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
@@ -42,6 +37,12 @@ import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityE
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * @author yChen
@@ -58,6 +59,7 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 	private Map<Id<TransitStopFacility>, int[]> boards, alights, occupancies;
 
 	/** Map< vehId,stopFacilityId> */
+//	private final IdMap<Vehicle, Id<TransitStopFacility>> vehStops = new IdMap<>(Vehicle.class, Id.class);
 	private final Map<Id<Vehicle>, Id<TransitStopFacility>> vehStops = new HashMap<>();
 	/** Map<vehId,passengersNo. in Veh> */
 	private final Map<Id<Vehicle>, Integer> vehPassengers = new HashMap<>();
@@ -71,9 +73,9 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 		this.timeBinSize = timeBinSize;
 		this.maxTime = maxTime;
 		this.maxSlotIndex = ((int) this.maxTime) / this.timeBinSize + 1;
-		this.boards = new HashMap<>();
-		this.alights = new HashMap<>();
-		this.occupancies = new HashMap<>();
+		this.boards = new IdMap<>(TransitStopFacility.class);
+		this.alights = new IdMap<>(TransitStopFacility.class);
+		this.occupancies = new IdMap<>(TransitStopFacility.class);
 	}
 
 	public void setBoards(Map<Id<TransitStopFacility>, int[]> boards) {

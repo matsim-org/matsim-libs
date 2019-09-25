@@ -20,21 +20,22 @@
 
 package org.matsim.core.trafficmonitoring;
 
-import java.util.HashMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
+
+import java.util.HashMap;
 
 /**
  * Computes average departure delay on a link in a given time slot.
@@ -46,7 +47,7 @@ class DepartureDelayAverageCalculator implements PersonDepartureEventHandler, Li
 	private Network network;
 	private int timeBinSize;
 	private HashMap<DepartureEvent, Double> departureEventsTimes = new HashMap<DepartureEvent, Double>();
-	private final HashMap<Id<Link>, DepartureDelayData> linkData;
+	private final IdMap<Link, DepartureDelayData> linkData;
 	
 	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 	
@@ -60,14 +61,14 @@ class DepartureDelayAverageCalculator implements PersonDepartureEventHandler, Li
 		super();
 		this.network = network;
 		this.timeBinSize = timeBinSize;
-		this.linkData = new HashMap<>(this.network.getLinks().size());
+		this.linkData = new IdMap<>(Link.class);
 		this.resetDepartureDelays();
 	}
 
 	/**
 	 * get the departure delay estimation for a given departure time HERE
 	 *
-	 * @param link
+	 * @param linkId
 	 * @param departureTime
 	 * @return departure delay estimation
 	 */

@@ -20,23 +20,23 @@
 
 package org.matsim.analysis;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.vehicles.Vehicle;
 
 import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Counts the number of vehicles leaving a link, aggregated into time bins of a specified size.
@@ -49,12 +49,12 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, VehicleEntersTraf
 	private final int timeBinSize;
 	private final int maxTime;
 	private final int maxSlotIndex;
-	private final Map<Id<Link>, int[]> links;
+	private final IdMap<Link, int[]> links;
 	
 	// for multi-modal support
 	private final boolean observeModes;
-	private final Map<Id<Vehicle>, String> enRouteModes;
-	private final Map<Id<Link>, Map<String, int[]>> linksPerMode;
+	private final IdMap<Vehicle, String> enRouteModes;
+	private final IdMap<Link, Map<String, int[]>> linksPerMode;
 
 	@Inject
 	VolumesAnalyzer(Network network, EventsManager eventsManager) {
@@ -70,12 +70,12 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, VehicleEntersTraf
 		this.timeBinSize = timeBinSize;
 		this.maxTime = maxTime;
 		this.maxSlotIndex = (this.maxTime/this.timeBinSize) + 1;
-		this.links = new HashMap<>((int) (network.getLinks().size() * 1.1), 0.95f);
+		this.links = new IdMap<>(Link.class);
 		
 		this.observeModes = observeModes;
 		if (this.observeModes) {
-			this.enRouteModes = new HashMap<>();
-			this.linksPerMode = new HashMap<>((int) (network.getLinks().size() * 1.1), 0.95f);
+			this.enRouteModes = new IdMap<>(Vehicle.class);
+			this.linksPerMode = new IdMap<>(Link.class);
 		} else {
 			this.enRouteModes = null;
 			this.linksPerMode = null;
@@ -84,8 +84,8 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, VehicleEntersTraf
 	
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
-		if (observeModes) {
-			enRouteModes.put(event.getVehicleId(), event.getNetworkMode());
+		if (this.observeModes) {
+			this.enRouteModes.put(event.getVehicleId(), event.getNetworkMode());
 		}
 	}
 	
@@ -99,13 +99,13 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, VehicleEntersTraf
 		int timeslot = getTimeSlotIndex(event.getTime());
 		volumes[timeslot]++;
 		
-		if (observeModes) {
+		if (this.observeModes) {
 			Map<String, int[]> modeVolumes = this.linksPerMode.get(event.getLinkId());
 			if (modeVolumes == null) {
 				modeVolumes = new HashMap<>();
 				this.linksPerMode.put(event.getLinkId(), modeVolumes);
 			}
-			String mode = enRouteModes.get(event.getVehicleId());
+			String mode = this.enRouteModes.get(event.getVehicleId());
 			volumes = modeVolumes.get(mode);
 			if (volumes == null) {
 				volumes = new int[this.maxSlotIndex + 1]; // initialized to 0 by default, according to JVM specs

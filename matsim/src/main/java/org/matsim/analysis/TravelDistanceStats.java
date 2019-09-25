@@ -21,7 +21,7 @@
 package org.matsim.analysis;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -37,7 +37,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.DoubleSummaryStatistics;
 import java.util.Locale;
-import java.util.Map;
 
 /**
  *
@@ -99,7 +98,7 @@ public class TravelDistanceStats {
 		}
 	}
 
-	public void addIteration(int iteration, Map<Id<Person>, Plan> map) {
+	public void addIteration(int iteration, IdMap<Person, Plan> map) {
         DoubleSummaryStatistics stats = map.values()
                 .parallelStream()
                 .flatMap(plan -> plan.getPlanElements().stream())

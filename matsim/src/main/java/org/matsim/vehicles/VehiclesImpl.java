@@ -19,13 +19,12 @@
  * *********************************************************************** */
 package org.matsim.vehicles;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import java.util.Collections;
+import java.util.Map;
 
 
 /**
@@ -34,7 +33,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  */
 class VehiclesImpl implements Vehicles {
 	private final Map<Id<VehicleType>, VehicleType> vehicleTypes;
-	private final LinkedHashMap<Id<Vehicle>, Vehicle> vehicles;
+	private final Map<Id<Vehicle>, Vehicle> vehicles;
 	private final VehiclesFactoryImpl builder;
 
 	private final Counter counter = new Counter("[VehiclesImpl] added vehicle # " );
@@ -43,9 +42,9 @@ class VehiclesImpl implements Vehicles {
 	 * deliberately non-public since there is a factory.  kai, nov'11
 	 */
 	VehiclesImpl(){
-		this.vehicleTypes = new LinkedHashMap<>();
+		this.vehicleTypes = new IdMap<>(VehicleType.class); // FIXME potential iteration order change
 		this.builder = new VehiclesFactoryImpl() ;
-		this.vehicles = new LinkedHashMap<>();
+		this.vehicles = new IdMap<>(Vehicle.class); // FIXME potential iteration order change
 	}
 
 
@@ -95,7 +94,7 @@ class VehiclesImpl implements Vehicles {
 	/**
 	 * Removes the vehicle with the given Id
 	 *
-	 * @param v
+	 * @param vehicleId
 	 */
 	@Override
 	public void removeVehicle(final Id<Vehicle> vehicleId) {

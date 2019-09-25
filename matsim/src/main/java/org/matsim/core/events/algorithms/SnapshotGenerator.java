@@ -22,6 +22,7 @@ package org.matsim.core.events.algorithms;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -61,7 +62,7 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 	private final Network network;
 	private int lastSnapshotIndex = -1;
 	private final double snapshotPeriod;
-	private final HashMap<Id<Link>, EventLink> eventLinks;
+	private final IdMap<Link, EventLink> eventLinks;
 	private final ArrayList<EventLink> linkList;
 	private final HashMap<Id<Person>, EventAgent> eventAgents;
 	private final List<SnapshotWriter> snapshotWriters = new ArrayList<>();
@@ -77,7 +78,7 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 	public SnapshotGenerator(final Network network, final double snapshotPeriod, final QSimConfigGroup config) {
 		this.network = network;
 		int initialCapacity = (int)(network.getLinks().size()*1.1);
-		this.eventLinks = new HashMap<>(initialCapacity, 0.95f);
+		this.eventLinks = new IdMap<>(Link.class);
 		this.linkList = new ArrayList<>(initialCapacity);
 		this.eventAgents = new HashMap<>(1000, 0.95f);
 		this.snapshotPeriod = snapshotPeriod;

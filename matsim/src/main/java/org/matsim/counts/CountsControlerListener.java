@@ -23,6 +23,7 @@ package org.matsim.counts;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.ControlerConfigGroup;
@@ -45,7 +46,6 @@ import org.matsim.counts.algorithms.graphs.CountsSimReal24GraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraphCreator;
 
 import javax.inject.Inject;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -72,7 +72,7 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
     @com.google.inject.Inject(optional=true)
     private Counts<Link> counts = null;
 
-    private final Map<Id<Link>, double[]> linkStats = new HashMap<>();
+    private final IdMap<Link, double[]> linkStats = new IdMap<>(Link.class);
     private int iterationsUsed = 0;
 
     @Inject
@@ -82,7 +82,7 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
         this.controlerConfigGroup = controlerConfigGroup;
         this.config = countsConfigGroup;
         this.volumesAnalyzer = volumesAnalyzer;
-		this.analyzedModes = CollectionUtils.stringToSet(this.config.getAnalyzedModes());
+        this.analyzedModes = CollectionUtils.stringToSet(this.config.getAnalyzedModes());
         this.iterationStopwatch = iterationStopwatch;
         this.controlerIO = controlerIO;
 	}
@@ -96,7 +96,7 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
         }
 	}
 
-    @Override
+	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		if (counts != null && this.config.getWriteCountsInterval() > 0) {
             if (useVolumesOfIteration(event.getIteration(), controlerConfigGroup.getFirstIteration())) {
@@ -105,9 +105,9 @@ class CountsControlerListener implements StartupListener, IterationEndsListener 
 
             if (createCountsInIteration(event.getIteration())) {
                 iterationStopwatch.beginOperation(OPERATION_COMPARECOUNTS);
-                Map<Id<Link>, double[]> averages;
+                IdMap<Link, double[]> averages;
                 if (this.iterationsUsed > 1) {
-                    averages = new HashMap<>();
+                    averages = new IdMap<>(Link.class);
                     for (Map.Entry<Id<Link>, double[]> e : this.linkStats.entrySet()) {
                         Id<Link> linkId = e.getKey();
                         double[] totalVolumesPerHour = e.getValue();

@@ -21,7 +21,7 @@
 package org.matsim.analysis;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -39,7 +39,6 @@ import org.matsim.core.utils.misc.Time;
 import javax.inject.Inject;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -59,10 +58,10 @@ public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalE
 	private static final int SLOT_SIZE = 300;	// 5-min slots
 	private static final int MAXINDEX = 12; // slots 0..11 are regular slots, slot 12 is anything above
 
-	private final Map<Id<Person>, Double> agentDepartures = new HashMap<>();
-	private final Map<Id<Person>, Double> agentArrivals = new HashMap<>();
+	private final IdMap<Person, Double> agentDepartures = new IdMap<>(Person.class);
+	private final IdMap<Person, Double> agentArrivals = new IdMap<>(Person.class);
 	private final Map<String, int[]> legStats = new TreeMap<>();
-	private final Map<Id<Person>, String> previousActivityTypes = new HashMap<>();
+	private final IdMap<Person, String> previousActivityTypes = new IdMap<>(Person.class);
 	private double sumTripDurations = 0;
 	private int sumTrips = 0;
 

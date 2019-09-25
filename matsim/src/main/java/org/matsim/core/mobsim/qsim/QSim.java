@@ -20,8 +20,10 @@
 
 package org.matsim.core.mobsim.qsim;
 
+import com.google.inject.Injector;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
@@ -37,13 +39,15 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngineI;
-import org.matsim.core.mobsim.qsim.interfaces.*;
+import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
+import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicleImpl;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
@@ -53,11 +57,17 @@ import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 
-import com.google.inject.Injector;
-
 import javax.inject.Inject;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -118,7 +128,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	private final List<DepartureHandler> departureHandlers = new ArrayList<>();
 	private final org.matsim.core.mobsim.qsim.AgentCounter agentCounter;
 	private final Map<Id<Person>, MobsimAgent> agents = new LinkedHashMap<>();
-	private final Map<Id<Vehicle>,MobsimVehicle> vehicles = new LinkedHashMap<>() ;
+	private final IdMap<Vehicle, MobsimVehicle> vehicles = new IdMap<>(Vehicle.class);
 	private final List<AgentSource> agentSources = new ArrayList<>();
 
 	// for detailed run time analysis
