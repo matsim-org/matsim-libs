@@ -40,12 +40,12 @@ import java.util.Map.Entry;
 public class FacilityBasedParkingManager implements ParkingSearchManager {
 
 	protected Map<Id<Link>, Integer> capacity = new HashMap<>();
-	protected Map<Id<ActivityFacility>, MutableLong> occupation = new HashMap<>();
-	protected 	Map<Id<ActivityFacility>, ActivityFacility> parkingFacilities;
-	protected Map<Id<Vehicle>, Id<ActivityFacility>> parkingLocations = new HashMap<>();
-	protected Map<Id<Vehicle>, Id<ActivityFacility>> parkingReservation = new HashMap<>();
+	protected Map<Id<org.matsim.facilities.Facility>, MutableLong> occupation = new HashMap<>();
+	protected 	Map<Id<org.matsim.facilities.Facility>, ActivityFacility> parkingFacilities;
+	protected Map<Id<Vehicle>, Id<org.matsim.facilities.Facility>> parkingLocations = new HashMap<>();
+	protected Map<Id<Vehicle>, Id<org.matsim.facilities.Facility>> parkingReservation = new HashMap<>();
 	protected Map<Id<Vehicle>, Id<Link>> parkingLocationsOutsideFacilities = new HashMap<>();
-	protected Map<Id<Link>, Set<Id<ActivityFacility>>> facilitiesPerLink = new HashMap<>();
+	protected Map<Id<Link>, Set<Id<org.matsim.facilities.Facility>>> facilitiesPerLink = new HashMap<>();
 
     protected Network network;
 
@@ -58,7 +58,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 
 		for (ActivityFacility fac : this.parkingFacilities.values()) {
 			Id<Link> linkId = fac.getLinkId();
-			Set<Id<ActivityFacility>> parkingOnLink = new HashSet<>();
+			Set<Id<org.matsim.facilities.Facility>> parkingOnLink = new HashSet<>();
 			if (this.facilitiesPerLink.containsKey(linkId)) {
 				parkingOnLink = this.facilitiesPerLink.get(linkId);
 			}
@@ -94,8 +94,8 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 
 			return true;
 		}
-		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
-		for (Id<ActivityFacility> fac : parkingFacilitiesAtLink) {
+		Set<Id<org.matsim.facilities.Facility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
+		for (Id<org.matsim.facilities.Facility> fac : parkingFacilitiesAtLink) {
 			double cap = this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.PARKACTIVITYTYPE)
 					.getCapacity();
 			if (this.occupation.get(fac).doubleValue() < cap) {
@@ -126,12 +126,12 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	}
 
 	protected boolean parkVehicleAtLink(Id<Vehicle> vehicleId, Id<Link> linkId, double time) {
-		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
+		Set<Id<org.matsim.facilities.Facility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
 		if (parkingFacilitiesAtLink == null) {
 			this.parkingLocationsOutsideFacilities.put(vehicleId, linkId);
 			return true;
 		} else {
-			Id<ActivityFacility> fac = this.parkingReservation.remove(vehicleId);
+			Id<org.matsim.facilities.Facility> fac = this.parkingReservation.remove(vehicleId);
 			if (fac != null) {
 				this.parkingLocations.put(vehicleId, fac);
 				return true;
@@ -151,7 +151,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 			
 			// we assume the person parks somewhere else
 		} else {
-			Id<ActivityFacility> fac = this.parkingLocations.remove(vehicleId);
+			Id<org.matsim.facilities.Facility> fac = this.parkingLocations.remove(vehicleId);
 			this.occupation.get(fac).decrement();
 			return true;
 		}
@@ -160,7 +160,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	@Override
 	public List<String> produceStatistics() {
 		List<String> stats = new ArrayList<>();
-		for (Entry<Id<ActivityFacility>, MutableLong> e : this.occupation.entrySet()) {
+		for (Entry<Id<org.matsim.facilities.Facility>, MutableLong> e : this.occupation.entrySet()) {
 			Id<Link> linkId = this.parkingFacilities.get(e.getKey()).getLinkId();
 			double capacity = this.parkingFacilities.get(e.getKey()).getActivityOptions()
 					.get(ParkingUtils.PARKACTIVITYTYPE).getCapacity();
@@ -172,9 +172,9 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 
 	public double getNrOfAllParkingSpacesOnLink (Id<Link> linkId){
 		double allSpaces = 0;
-		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
+		Set<Id<org.matsim.facilities.Facility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
 		if (!(parkingFacilitiesAtLink == null)) {
-			for (Id<ActivityFacility> fac : parkingFacilitiesAtLink){
+			for (Id<org.matsim.facilities.Facility> fac : parkingFacilitiesAtLink){
 				allSpaces += this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.PARKACTIVITYTYPE).getCapacity();
 			}
 		}
@@ -183,11 +183,11 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	
 	public double getNrOfFreeParkingSpacesOnLink (Id<Link> linkId){
 		double allFreeSpaces = 0;
-		Set<Id<ActivityFacility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
+		Set<Id<org.matsim.facilities.Facility>> parkingFacilitiesAtLink = this.facilitiesPerLink.get(linkId);
 		if (parkingFacilitiesAtLink == null) {
 			return 0;
 		} else {
-			for (Id<ActivityFacility> fac : parkingFacilitiesAtLink){
+			for (Id<org.matsim.facilities.Facility> fac : parkingFacilitiesAtLink){
 				int cap = (int) this.parkingFacilities.get(fac).getActivityOptions().get(ParkingUtils.PARKACTIVITYTYPE).getCapacity();
 				allFreeSpaces += (cap - this.occupation.get(fac).intValue());
 			}

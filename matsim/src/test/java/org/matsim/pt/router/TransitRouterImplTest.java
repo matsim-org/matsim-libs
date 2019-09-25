@@ -103,8 +103,8 @@ public class TransitRouterImplTest {
 		assertEquals(TransportMode.transit_walk, legs.get(2).getMode());
 		assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
 		ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
-		assertEquals(Id.create("0", TransitStopFacility.class), ptRoute.getAccessStopId());
-		assertEquals(Id.create("6", TransitStopFacility.class), ptRoute.getEgressStopId());
+		assertEquals(Id.create("0", org.matsim.facilities.Facility.class), ptRoute.getAccessStopId());
+		assertEquals(Id.create("6", org.matsim.facilities.Facility.class), ptRoute.getEgressStopId());
 		assertEquals(f.blueLine.getId(), ptRoute.getLineId());
 		assertEquals(Id.create("blue A > I", TransitRoute.class), ptRoute.getRouteId());
 		double actualTravelTime = 0.0;
@@ -112,7 +112,7 @@ public class TransitRouterImplTest {
 			actualTravelTime += leg.getTravelTime();
 		}
 		double expectedTravelTime = 29.0 * 60 + // agent takes the *:06 course, arriving in D at *:29
-				CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("6", TransitStopFacility.class)).getCoord(), toCoord) / trConfig.getBeelineWalkSpeed();
+				CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("6", org.matsim.facilities.Facility.class)).getCoord(), toCoord) / trConfig.getBeelineWalkSpeed();
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
@@ -218,14 +218,14 @@ public class TransitRouterImplTest {
 		assertEquals(TransportMode.transit_walk, legs.get(4).getMode());
 		assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
 		ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
-		assertEquals(Id.create("0", TransitStopFacility.class), ptRoute.getAccessStopId());
-		assertEquals(Id.create("4", TransitStopFacility.class), ptRoute.getEgressStopId());
+		assertEquals(Id.create("0", org.matsim.facilities.Facility.class), ptRoute.getAccessStopId());
+		assertEquals(Id.create("4", org.matsim.facilities.Facility.class), ptRoute.getEgressStopId());
 		assertEquals(f.blueLine.getId(), ptRoute.getLineId());
 		assertEquals(Id.create("blue A > I", TransitRoute.class), ptRoute.getRouteId());
 		assertTrue("expected TransitRoute in leg.", legs.get(3).getRoute() instanceof ExperimentalTransitRoute);
 		ptRoute = (ExperimentalTransitRoute) legs.get(3).getRoute();
-		assertEquals(Id.create("18", TransitStopFacility.class), ptRoute.getAccessStopId());
-		assertEquals(Id.create("19", TransitStopFacility.class), ptRoute.getEgressStopId());
+		assertEquals(Id.create("18", org.matsim.facilities.Facility.class), ptRoute.getAccessStopId());
+		assertEquals(Id.create("19", org.matsim.facilities.Facility.class), ptRoute.getEgressStopId());
 		assertEquals(f.greenLine.getId(), ptRoute.getLineId());
 		assertEquals(Id.create("green clockwise", TransitRoute.class), ptRoute.getRouteId());
 		double actualTravelTime = 0.0;
@@ -233,7 +233,7 @@ public class TransitRouterImplTest {
 			actualTravelTime += leg.getTravelTime();
 		}
 		double expectedTravelTime = 31.0 * 60 + // agent takes the *:06 course, arriving in C at *:18, departing at *:21, arriving in K at*:31
-				CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("19", TransitStopFacility.class)).getCoord(), toCoord) / trConfig.getBeelineWalkSpeed();
+				CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("19", org.matsim.facilities.Facility.class)).getCoord(), toCoord) / trConfig.getBeelineWalkSpeed();
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
@@ -276,14 +276,14 @@ public class TransitRouterImplTest {
 		assertEquals(TransportMode.transit_walk, legs.get(3).getMode());
 		assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
 		ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
-		assertEquals(Id.create("0", TransitStopFacility.class), ptRoute.getAccessStopId());
-		assertEquals(Id.create("4", TransitStopFacility.class), ptRoute.getEgressStopId());
+		assertEquals(Id.create("0", org.matsim.facilities.Facility.class), ptRoute.getAccessStopId());
+		assertEquals(Id.create("4", org.matsim.facilities.Facility.class), ptRoute.getEgressStopId());
 		assertEquals(f.blueLine.getId(), ptRoute.getLineId());
 		assertEquals(Id.create("blue A > I", TransitRoute.class), ptRoute.getRouteId());
 		assertTrue("expected TransitRoute in leg.", legs.get(2).getRoute() instanceof ExperimentalTransitRoute);
 		ptRoute = (ExperimentalTransitRoute) legs.get(2).getRoute();
-		assertEquals(Id.create("4", TransitStopFacility.class), ptRoute.getAccessStopId());
-		assertEquals(Id.create("12", TransitStopFacility.class), ptRoute.getEgressStopId());
+		assertEquals(Id.create("4", org.matsim.facilities.Facility.class), ptRoute.getAccessStopId());
+		assertEquals(Id.create("12", org.matsim.facilities.Facility.class), ptRoute.getEgressStopId());
 		assertEquals(f.redLine.getId(), ptRoute.getLineId());
 		assertEquals(Id.create("red C > G", TransitRoute.class), ptRoute.getRouteId());
 		double actualTravelTime = 0.0;
@@ -291,7 +291,7 @@ public class TransitRouterImplTest {
 			actualTravelTime += leg.getTravelTime();
 		}
 		double expectedTravelTime = 29.0 * 60 + // agent takes the *:46 course, arriving in C at *:58, departing at *:00, arriving in G at*:09
-				CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("12", TransitStopFacility.class)).getCoord(), toCoord) / trConfig.getBeelineWalkSpeed();
+				CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("12", org.matsim.facilities.Facility.class)).getCoord(), toCoord) / trConfig.getBeelineWalkSpeed();
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
@@ -385,8 +385,8 @@ public class TransitRouterImplTest {
 		assertEquals(TransportMode.transit_walk, legs.get(2).getMode());
 		assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
 		ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
-		assertEquals(Id.create("0", TransitStopFacility.class), ptRoute.getAccessStopId());
-		assertEquals(Id.create("6", TransitStopFacility.class), ptRoute.getEgressStopId());
+		assertEquals(Id.create("0", org.matsim.facilities.Facility.class), ptRoute.getAccessStopId());
+		assertEquals(Id.create("6", org.matsim.facilities.Facility.class), ptRoute.getEgressStopId());
 		assertEquals(f.blueLine.getId(), ptRoute.getLineId());
 		assertEquals(Id.create("blue A > I", TransitRoute.class), ptRoute.getRouteId());
 		double actualTravelTime = 0.0;
@@ -394,7 +394,7 @@ public class TransitRouterImplTest {
 			actualTravelTime += leg.getTravelTime();
 		}
 		double expectedTravelTime = 4*3600 + 29.0 * 60 + // arrival at 05:29 at D
-				CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("6", TransitStopFacility.class)).getCoord(), toCoord) / trConfig.getBeelineWalkSpeed();
+				CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("6", org.matsim.facilities.Facility.class)).getCoord(), toCoord) / trConfig.getBeelineWalkSpeed();
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
@@ -415,8 +415,8 @@ public class TransitRouterImplTest {
 		assertEquals(TransportMode.transit_walk, legs.get(2).getMode());
 		assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
 		ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
-		assertEquals(Id.create("0", TransitStopFacility.class), ptRoute.getAccessStopId());
-		assertEquals(Id.create("16", TransitStopFacility.class), ptRoute.getEgressStopId());
+		assertEquals(Id.create("0", org.matsim.facilities.Facility.class), ptRoute.getAccessStopId());
+		assertEquals(Id.create("16", org.matsim.facilities.Facility.class), ptRoute.getEgressStopId());
 		assertEquals(f.blueLine.getId(), ptRoute.getLineId());
 		assertEquals(Id.create("blue A > I", TransitRoute.class), ptRoute.getRouteId());
 	}
@@ -699,13 +699,13 @@ public class TransitRouterImplTest {
 			this.schedule = this.scenario.getTransitSchedule();
 			TransitScheduleFactory sb = this.schedule.getFactory();
 
-			this.stop1 = sb.createTransitStopFacility(Id.create("1", TransitStopFacility.class), this.coord1, false);
-			this.stop2 = sb.createTransitStopFacility(Id.create("2", TransitStopFacility.class), this.coord2, false);
-			this.stop3 = sb.createTransitStopFacility(Id.create("3", TransitStopFacility.class), this.coord3, false);
-			this.stop4 = sb.createTransitStopFacility(Id.create("4", TransitStopFacility.class), this.coord4, false);
-			this.stop5 = sb.createTransitStopFacility(Id.create("5", TransitStopFacility.class), this.coord5, false);
-			this.stop6 = sb.createTransitStopFacility(Id.create("6", TransitStopFacility.class), this.coord6, false);
-			this.stop7 = sb.createTransitStopFacility(Id.create("7", TransitStopFacility.class), this.coord7, false);
+			this.stop1 = sb.createTransitStopFacility(Id.create("1", org.matsim.facilities.Facility.class), this.coord1, false);
+			this.stop2 = sb.createTransitStopFacility(Id.create("2", org.matsim.facilities.Facility.class), this.coord2, false);
+			this.stop3 = sb.createTransitStopFacility(Id.create("3", org.matsim.facilities.Facility.class), this.coord3, false);
+			this.stop4 = sb.createTransitStopFacility(Id.create("4", org.matsim.facilities.Facility.class), this.coord4, false);
+			this.stop5 = sb.createTransitStopFacility(Id.create("5", org.matsim.facilities.Facility.class), this.coord5, false);
+			this.stop6 = sb.createTransitStopFacility(Id.create("6", org.matsim.facilities.Facility.class), this.coord6, false);
+			this.stop7 = sb.createTransitStopFacility(Id.create("7", org.matsim.facilities.Facility.class), this.coord7, false);
 			this.stop1.setLinkId(link1.getId());
 			this.stop2.setLinkId(link1.getId());
 			this.stop3.setLinkId(link2.getId());
@@ -823,8 +823,8 @@ public class TransitRouterImplTest {
 			// facilities
 			ActivityFacilities facilities = this.scenario.getActivityFacilities();
 			
-			this.fromFacility = facilities.getFactory().createActivityFacility(Id.create("fromFacility", ActivityFacility.class), new Coord(0, 1102));
-			this.toFacility = facilities.getFactory().createActivityFacility(Id.create("toFacility", ActivityFacility.class), new Coord(50000, 898));
+			this.fromFacility = facilities.getFactory().createActivityFacility(Id.create("fromFacility", org.matsim.facilities.Facility.class), new Coord(0, 1102));
+			this.toFacility = facilities.getFactory().createActivityFacility(Id.create("toFacility", org.matsim.facilities.Facility.class), new Coord(50000, 898));
 			facilities.addActivityFacility(this.fromFacility);
 			facilities.addActivityFacility(this.toFacility);			
 			
@@ -832,10 +832,10 @@ public class TransitRouterImplTest {
 			this.schedule = this.scenario.getTransitSchedule();
 			TransitScheduleFactory sb = this.schedule.getFactory();
 
-			this.stop0 = sb.createTransitStopFacility(Id.create("0", TransitStopFacility.class), new Coord(0, 1002), false);
-			this.stop1 = sb.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord(25000,  1002), false);
-			this.stop2 = sb.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord(25000, 998), false);
-			this.stop3 = sb.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord(50000, 998), false);
+			this.stop0 = sb.createTransitStopFacility(Id.create("0", org.matsim.facilities.Facility.class), new Coord(0, 1002), false);
+			this.stop1 = sb.createTransitStopFacility(Id.create("1", org.matsim.facilities.Facility.class), new Coord(25000,  1002), false);
+			this.stop2 = sb.createTransitStopFacility(Id.create("2", org.matsim.facilities.Facility.class), new Coord(25000, 998), false);
+			this.stop3 = sb.createTransitStopFacility(Id.create("3", org.matsim.facilities.Facility.class), new Coord(50000, 998), false);
 			this.schedule.addStopFacility(this.stop0);
 			this.schedule.addStopFacility(this.stop1);
 			this.schedule.addStopFacility(this.stop2);

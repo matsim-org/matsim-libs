@@ -60,7 +60,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	/*package*/ String[] types;
 	/*package*/ Coord[] coords;
 	/*package*/ Id<Link>[] linkIds;
-	/*package*/ Id<ActivityFacility>[] facilityIds;
+	/*package*/ Id<org.matsim.facilities.Facility>[] facilityIds;
 	
 	// Leg related arrays
 	/*package*/ Route[] routes;

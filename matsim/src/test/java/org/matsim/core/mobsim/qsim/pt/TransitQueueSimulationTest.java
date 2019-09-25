@@ -145,10 +145,10 @@ public class TransitQueueSimulationTest {
         TransitSchedule schedule = scenario.getTransitSchedule();
         TransitScheduleFactory builder = schedule.getFactory();
 
-        TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("stop1", TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
-        TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("stop2", TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
-        TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("stop3", TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
-        TransitStopFacility stop4 = builder.createTransitStopFacility(Id.create("stop4", TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
+        TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("stop1", org.matsim.facilities.Facility.class), new Coord((double) 0, (double) 0), false);
+        TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("stop2", org.matsim.facilities.Facility.class), new Coord((double) 0, (double) 0), false);
+        TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("stop3", org.matsim.facilities.Facility.class), new Coord((double) 0, (double) 0), false);
+        TransitStopFacility stop4 = builder.createTransitStopFacility(Id.create("stop4", org.matsim.facilities.Facility.class), new Coord((double) 0, (double) 0), false);
         ArrayList<TransitRouteStop> stops = new ArrayList<>();
         stops.add(builder.createTransitRouteStop(stop1, 50, 60));
         stops.add(builder.createTransitRouteStop(stop2, 150, 160));
@@ -257,9 +257,9 @@ public class TransitQueueSimulationTest {
         TransitScheduleFactory builder = schedule.getFactory();
         TransitLine line = builder.createTransitLine(Id.create("1", TransitLine.class));
 
-        TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("stop1", TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
+        TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("stop1", org.matsim.facilities.Facility.class), new Coord((double) 0, (double) 0), false);
         stop1.setLinkId(link.getId());
-        TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("stop2", TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
+        TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("stop2", org.matsim.facilities.Facility.class), new Coord((double) 0, (double) 0), false);
         schedule.addStopFacility(stop1);
         schedule.addStopFacility(stop2);
 
@@ -329,9 +329,9 @@ public class TransitQueueSimulationTest {
         TransitScheduleFactory builder = schedule.getFactory();
         TransitLine line = builder.createTransitLine(Id.create("1", TransitLine.class));
 
-        TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("stop1", TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
+        TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("stop1", org.matsim.facilities.Facility.class), new Coord((double) 0, (double) 0), false);
         stop1.setLinkId(link1.getId());
-        TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("stop2", TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
+        TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("stop2", org.matsim.facilities.Facility.class), new Coord((double) 0, (double) 0), false);
         stop2.setLinkId(link2.getId());
         schedule.addStopFacility(stop1);
         schedule.addStopFacility(stop2);
@@ -416,10 +416,10 @@ public class TransitQueueSimulationTest {
         TransitLine line = builder.createTransitLine(Id.create("1", TransitLine.class));
         // important: do NOT add the line to the schedule, or agents will be created twice!
 
-        TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("stop1", TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
-        TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("stop2", TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
-        TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("stop3", TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
-        TransitStopFacility stop4 = builder.createTransitStopFacility(Id.create("stop4", TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
+        TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("stop1", org.matsim.facilities.Facility.class), new Coord((double) 0, (double) 0), false);
+        TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("stop2", org.matsim.facilities.Facility.class), new Coord((double) 0, (double) 0), false);
+        TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("stop3", org.matsim.facilities.Facility.class), new Coord((double) 0, (double) 0), false);
+        TransitStopFacility stop4 = builder.createTransitStopFacility(Id.create("stop4", org.matsim.facilities.Facility.class), new Coord((double) 0, (double) 0), false);
         ArrayList<TransitRouteStop> stops = new ArrayList<>();
         stops.add(builder.createTransitRouteStop(stop1, 50, 60));
         stops.add(builder.createTransitRouteStop(stop2, 150, 160));
@@ -652,8 +652,8 @@ public class TransitQueueSimulationTest {
         double depTime = 7.0*3600;
         TransitSchedule schedule = scenario.getTransitSchedule();
         TransitScheduleFactory sb = schedule.getFactory();
-        TransitStopFacility stopFacility1 = sb.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 1000, (double) 0), false);
-        TransitStopFacility stopFacility2 = sb.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord((double) 2000, (double) 0), false);
+        TransitStopFacility stopFacility1 = sb.createTransitStopFacility(Id.create("1", org.matsim.facilities.Facility.class), new Coord((double) 1000, (double) 0), false);
+        TransitStopFacility stopFacility2 = sb.createTransitStopFacility(Id.create("2", org.matsim.facilities.Facility.class), new Coord((double) 2000, (double) 0), false);
         schedule.addStopFacility(stopFacility1);
         schedule.addStopFacility(stopFacility2);
         stopFacility1.setLinkId(link1.getId());
@@ -749,8 +749,8 @@ public class TransitQueueSimulationTest {
         double depTime = 7.0*3600;
         TransitSchedule schedule = scenario.getTransitSchedule();
         TransitScheduleFactory sb = schedule.getFactory();
-        TransitStopFacility stopFacility1 = sb.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 1000, (double) 0), false);
-        TransitStopFacility stopFacility2 = sb.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord((double) 2000, (double) 0), false);
+        TransitStopFacility stopFacility1 = sb.createTransitStopFacility(Id.create("1", org.matsim.facilities.Facility.class), new Coord((double) 1000, (double) 0), false);
+        TransitStopFacility stopFacility2 = sb.createTransitStopFacility(Id.create("2", org.matsim.facilities.Facility.class), new Coord((double) 2000, (double) 0), false);
         schedule.addStopFacility(stopFacility1);
         schedule.addStopFacility(stopFacility2);
         stopFacility1.setLinkId(link1.getId());

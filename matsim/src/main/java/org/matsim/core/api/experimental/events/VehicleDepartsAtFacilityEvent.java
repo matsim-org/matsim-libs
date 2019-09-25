@@ -42,11 +42,11 @@ public final class VehicleDepartsAtFacilityEvent extends Event {
 	public static final String ATTRIBUTE_DELAY = "delay";
 	
 	private final Id<Vehicle> vehicleId;
-	private final Id<TransitStopFacility> facilityId;
+	private final Id<org.matsim.facilities.Facility> facilityId;
 	private final double delay;
 
 	public VehicleDepartsAtFacilityEvent(final double time, final Id<Vehicle> vehicleId, 
-			final Id<TransitStopFacility> facilityId, double delay) {
+			final Id<org.matsim.facilities.Facility> facilityId, double delay) {
 		super(time);
 		this.vehicleId = vehicleId;
 		this.facilityId = facilityId;
@@ -58,7 +58,7 @@ public final class VehicleDepartsAtFacilityEvent extends Event {
 		return this.delay;
 	}
 
-	public Id<TransitStopFacility> getFacilityId() {
+	public Id<org.matsim.facilities.Facility> getFacilityId() {
 		return this.facilityId;
 	}
 

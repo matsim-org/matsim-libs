@@ -143,9 +143,9 @@ import org.matsim.vehicles.VehiclesFactory;
 	}
 
 	void buildStops() {
-		this.stopFacilities[0] = this.builder.createTransitStopFacility(Id.create( "0", TransitStopFacility.class), new Coord((double) 4000, (double) 5002), true);
-		this.stopFacilities[1] = this.builder.createTransitStopFacility(Id.create( "1", TransitStopFacility.class), new Coord((double) 8000, (double) 4998), true);
-		this.stopFacilities[2] = this.builder.createTransitStopFacility(Id.create( "2", TransitStopFacility.class), new Coord((double) 12000, (double) 5002), true);
+		this.stopFacilities[0] = this.builder.createTransitStopFacility(Id.create( "0", org.matsim.facilities.Facility.class), new Coord((double) 4000, (double) 5002), true);
+		this.stopFacilities[1] = this.builder.createTransitStopFacility(Id.create( "1", org.matsim.facilities.Facility.class), new Coord((double) 8000, (double) 4998), true);
+		this.stopFacilities[2] = this.builder.createTransitStopFacility(Id.create( "2", org.matsim.facilities.Facility.class), new Coord((double) 12000, (double) 5002), true);
 		this.stopFacilities[0].setName("A");
 		this.stopFacilities[1].setName("B");
 		this.stopFacilities[2].setName("C");

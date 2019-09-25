@@ -67,11 +67,11 @@ public interface Activity extends PlanElement {
 	 */
 	public Id<Link> getLinkId();
 
-	public Id<ActivityFacility> getFacilityId();
+	public Id<org.matsim.facilities.Facility> getFacilityId();
 
 	public void setLinkId(final Id<Link> id);
 	
-	public void setFacilityId(final Id<ActivityFacility> id);
+	public void setFacilityId(final Id<org.matsim.facilities.Facility> id);
 
 	void setCoord(Coord coord);
 

@@ -44,7 +44,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 public class TransitScheduleImpl implements TransitSchedule {
 
 	private final Map<Id<TransitLine>, TransitLine> transitLines = new TreeMap<>();
-	private final Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities = new TreeMap<>();
+	private final Map<Id<org.matsim.facilities.Facility>, TransitStopFacility> stopFacilities = new TreeMap<>();
 	private final TransitScheduleFactory factory;
 	private final Attributes attributes = new Attributes();
 	private final MinimalTransferTimes minimalTransferTimes = new MinimalTransferTimesImpl();
@@ -77,7 +77,7 @@ public class TransitScheduleImpl implements TransitSchedule {
 	
 	@Override
 	public void addStopFacility(final TransitStopFacility stop) {
-		final Id<TransitStopFacility> id = stop.getId();
+		final Id<org.matsim.facilities.Facility> id = stop.getId();
 		if (this.stopFacilities.containsKey(id)) {
 			throw new IllegalArgumentException("There is already a stop facility with id " + id.toString());
 		}
@@ -90,7 +90,7 @@ public class TransitScheduleImpl implements TransitSchedule {
 	}
 	
 	@Override
-	public Map<Id<TransitStopFacility>, TransitStopFacility> getFacilities() {
+	public Map<Id<org.matsim.facilities.Facility>, TransitStopFacility> getFacilities() {
 		return Collections.unmodifiableMap(this.stopFacilities);
 	}
 	

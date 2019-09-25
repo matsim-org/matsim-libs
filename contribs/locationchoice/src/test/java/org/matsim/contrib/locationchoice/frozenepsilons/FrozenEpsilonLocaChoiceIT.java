@@ -90,7 +90,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		createExampleNetwork(scenario, scale, speed);
 
 		Link ll1 = scenario.getNetwork().getLinks().get( Id.create(1, Link.class ) ) ;
-		ActivityFacility ff1 = scenario.getActivityFacilities().getFacilities().get(Id.create(1, ActivityFacility.class ) );
+		ActivityFacility ff1 = scenario.getActivityFacilities().getFacilities().get(Id.create(1, org.matsim.facilities.Facility.class) );
 		Person person = localCreatePopWOnePerson(scenario, ff1, 8.*60*60+5*60 );
 
 		// joint context (based on scenario):
@@ -136,9 +136,9 @@ public class FrozenEpsilonLocaChoiceIT{
 		System.err.println( " newWork: " + newWork ) ;
 		System.err.println( " facilityId: " + newWork.getFacilityId() ) ;
 		assertNotNull( newWork ) ;
-		assertTrue( !newWork.getFacilityId().equals(Id.create(1, ActivityFacility.class) ) ) ; // should be different from facility number 1 !!
-//		assertEquals( Id.create(63, ActivityFacility.class), newWork.getFacilityId() ); // as I have changed the scoring (act is included) I also changed the test here: 27->92
-		assertEquals( Id.create(64, ActivityFacility.class), newWork.getFacilityId() ); // as I have changed the scoring (act is included) I also changed the test here: 27->92
+		assertTrue( !newWork.getFacilityId().equals(Id.create(1, org.matsim.facilities.Facility.class) ) ) ; // should be different from facility number 1 !!
+//		assertEquals( Id.create(63, org.matsim.facilities.Facility.class), newWork.getFacilityId() ); // as I have changed the scoring (act is included) I also changed the test here: 27->92
+		assertEquals( Id.create(64, org.matsim.facilities.Facility.class), newWork.getFacilityId() ); // as I have changed the scoring (act is included) I also changed the test here: 27->92
 	}
 
 	@Test
@@ -166,7 +166,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		createExampleNetwork(scenario, scale, speed);
 
 		Link ll1 = scenario.getNetwork().getLinks().get(Id.create(1, Link.class)) ;
-		ActivityFacility ff1 = scenario.getActivityFacilities().getFacilities().get(Id.create(1, ActivityFacility.class)) ;
+		ActivityFacility ff1 = scenario.getActivityFacilities().getFacilities().get(Id.create(1, org.matsim.facilities.Facility.class)) ;
 		Person person = localCreatePopWOnePerson(scenario, ff1, 8.*60*60+5*60 );
 
 		final DestinationChoiceContext lcContext = new DestinationChoiceContext(scenario) ;
@@ -290,8 +290,8 @@ public class FrozenEpsilonLocaChoiceIT{
 			prevNode = node ;
 		}
 		// ===
-		final Id<ActivityFacility> homeFacilityId = Id.create( "0-1", ActivityFacility.class ) ;
-		final Id<ActivityFacility> initialShopFacilityId = Id.create( "1-2", ActivityFacility.class );
+		final Id<org.matsim.facilities.Facility> homeFacilityId = Id.create( "0-1", org.matsim.facilities.Facility.class) ;
+		final Id<org.matsim.facilities.Facility> initialShopFacilityId = Id.create( "1-2", org.matsim.facilities.Facility.class);
 		for ( int jj=0 ; jj<1000 ; jj++ ){
 			Person person = pf.createPerson( Id.createPersonId( jj ) );
 			{
@@ -426,7 +426,7 @@ public class FrozenEpsilonLocaChoiceIT{
 		link.setFreespeed( 50./3.6 );
 		scenario.getNetwork().addLink( link );
 		// ---
-		ActivityFacility af = ff.createActivityFacility( Id.create( str, ActivityFacility.class ), link.getCoord(), link.getId() ) ;
+		ActivityFacility af = ff.createActivityFacility( Id.create( str, org.matsim.facilities.Facility.class), link.getCoord(), link.getId() ) ;
 		ActivityOption option = ff.createActivityOption( "shop" ) ;
 		af.addActivityOption( option );
 		scenario.getActivityFacilities().addActivityFacility( af );
@@ -473,13 +473,13 @@ public class FrozenEpsilonLocaChoiceIT{
 				network.addLink(link) ;
 			}
 
-			ActivityFacility facility = scenario.getActivityFacilities().getFactory().createActivityFacility(Id.create(ii, ActivityFacility.class), coord);
+			ActivityFacility facility = scenario.getActivityFacilities().getFactory().createActivityFacility(Id.create(ii, org.matsim.facilities.Facility.class), coord);
 			scenario.getActivityFacilities().addActivityFacility(facility);
 			facility.addActivityOption(new ActivityOptionImpl("work") );
 		}
 
 		// create one additional facility for the initial activity:
-		ActivityFacility facility1 = scenario.getActivityFacilities().getFactory().createActivityFacility(Id.create(1, ActivityFacility.class), new Coord(scale, (double) 0));
+		ActivityFacility facility1 = scenario.getActivityFacilities().getFactory().createActivityFacility(Id.create(1, org.matsim.facilities.Facility.class), new Coord(scale, (double) 0));
 		scenario.getActivityFacilities().addActivityFacility(facility1);
 		facility1.addActivityOption(new ActivityOptionImpl("work"));
 		// (as soon as you set a scoring function that looks if activity types match opportunities at facilities, you can only use

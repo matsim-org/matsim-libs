@@ -52,7 +52,7 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, SearchableAct
 	private final ActivityFacilitiesFactory factory ;
 	private final Attributes attributes = new Attributes();
 
-	private final Map<Id<ActivityFacility>, ActivityFacility> facilities = new LinkedHashMap<>();
+	private final Map<Id<org.matsim.facilities.Facility>, ActivityFacility> facilities = new LinkedHashMap<>();
 
 	private String name;
 
@@ -77,11 +77,11 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, SearchableAct
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final ActivityFacilityImpl createAndAddFacility(final Id<ActivityFacility> id, final Coord center) {
+	public final ActivityFacilityImpl createAndAddFacility(final Id<org.matsim.facilities.Facility> id, final Coord center) {
 		return createAndAddFacility(id, center, null);
 	}
 	
-	public final ActivityFacilityImpl createAndAddFacility(final Id<ActivityFacility> id, final Coord center, final Id<Link> linkId) {
+	public final ActivityFacilityImpl createAndAddFacility(final Id<org.matsim.facilities.Facility> id, final Coord center, final Id<Link> linkId) {
 		if (this.facilities.containsKey(id)) {
 			throw new IllegalArgumentException("Facility with id=" + id + " already exists.");
 		}
@@ -103,13 +103,13 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, SearchableAct
 	}
 
 	@Override
-	public final Map<Id<ActivityFacility>, ? extends ActivityFacility> getFacilities() {
+	public final Map<Id<org.matsim.facilities.Facility>, ? extends ActivityFacility> getFacilities() {
 		return this.facilities;
 	}
 
 	@Override
-	public final TreeMap<Id<ActivityFacility>, ActivityFacility> getFacilitiesForActivityType(final String act_type) {
-		TreeMap<Id<ActivityFacility>, ActivityFacility> facs = new TreeMap<>();
+	public final TreeMap<Id<org.matsim.facilities.Facility>, ActivityFacility> getFacilitiesForActivityType(final String act_type) {
+		TreeMap<Id<org.matsim.facilities.Facility>, ActivityFacility> facs = new TreeMap<>();
 		Iterator<ActivityFacility> iter = this.facilities.values().iterator();
 		while (iter.hasNext()){
 			ActivityFacility f = iter.next();
@@ -154,7 +154,7 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, SearchableAct
 		stb.append("[number of facilities=");
 		stb.append(this.facilities.size());
 		stb.append("]\n");
-		for ( Entry<Id<ActivityFacility>,? extends ActivityFacility> entry : this.facilities.entrySet() ) {
+		for ( Entry<Id<org.matsim.facilities.Facility>,? extends ActivityFacility> entry : this.facilities.entrySet() ) {
 			final ActivityFacility fac = entry.getValue();
 			stb.append("[key=");
 			stb.append(entry.getKey().toString());

@@ -97,7 +97,7 @@ public final class EndRouteExtension extends AbstractPStrategyModule {
 		Geometry bufferWithEndCaps = this.createBuffer(lineStrings, Math.max(this.bufferSize, bufferSizeBasedOnRatio), false);
 		Geometry buffer = bufferWithEndCaps.difference(bufferWithoutEndCaps);
 		
-		Set<Id<TransitStopFacility>> stopsUsed = this.getStopsUsed(oldPlan.getLine().getRoutes().values());
+		Set<Id<org.matsim.facilities.Facility>> stopsUsed = this.getStopsUsed(oldPlan.getLine().getRoutes().values());
 		TransitStopFacility newStop = this.drawRandomStop(buffer, operator.getRouteProvider(), stopsUsed);
 		
 		if (newStop == null) {
@@ -134,7 +134,7 @@ public final class EndRouteExtension extends AbstractPStrategyModule {
 		return newStopsToBeServed;
 	}
 
-	private TransitStopFacility drawRandomStop(Geometry buffer, PRouteProvider pRouteProvider, Set<Id<TransitStopFacility>> stopsUsed) {
+	private TransitStopFacility drawRandomStop(Geometry buffer, PRouteProvider pRouteProvider, Set<Id<org.matsim.facilities.Facility>> stopsUsed) {
 		List<TransitStopFacility> choiceSet = new LinkedList<>();
 		
 		// find choice-set

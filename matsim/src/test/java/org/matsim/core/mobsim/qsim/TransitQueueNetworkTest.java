@@ -1043,12 +1043,12 @@ public class TransitQueueNetworkTest extends TestCase {
             // setup: transit schedule
             TransitSchedule schedule = scenario.getTransitSchedule();
             TransitScheduleFactory builder = schedule.getFactory();
-            TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 0, (double) 0), firstStopisBlocking);
+            TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", org.matsim.facilities.Facility.class), new Coord((double) 0, (double) 0), firstStopisBlocking);
             schedule.addStopFacility(stop1);
             stop1.setLinkId(links[firstStopLocation].getId());
             TransitStopFacility stop2 = null;
             if (secondStopLocation > 0) {
-                stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord((double) 100, (double) 0), secondStopIsBlocking);
+                stop2 = builder.createTransitStopFacility(Id.create("2", org.matsim.facilities.Facility.class), new Coord((double) 100, (double) 0), secondStopIsBlocking);
                 schedule.addStopFacility(stop2);
                 stop2.setLinkId(links[secondStopLocation].getId());
             }

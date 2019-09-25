@@ -60,11 +60,11 @@ public final class StageContainer {
 		this.meterTravelled  += meterTravelled1;
 	}
 
-	public Id<TransitStopFacility> getStopEntered() {
+	public Id<org.matsim.facilities.Facility> getStopEntered() {
 		return this.vehArrivesAtFacilityEEntered.getFacilityId();
 	}
 
-	public Id<TransitStopFacility> getStopLeft() {
+	public Id<org.matsim.facilities.Facility> getStopLeft() {
 		return this.vehArrivesAtFacilityELeft.getFacilityId();
 	}
 	

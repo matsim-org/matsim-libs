@@ -124,11 +124,11 @@ public class TinyMultimodalAccessibilityTest {
 
 		// Creating test opportunities (facilities); one on each link with same ID as link and coord on center of link
 		final ActivityFacilities opportunities = scenario.getActivityFacilities();
-		ActivityFacility facility1 = opportunities.getFactory().createActivityFacility(Id.create("1", ActivityFacility.class), new Coord(200, 0));
+		ActivityFacility facility1 = opportunities.getFactory().createActivityFacility(Id.create("1", org.matsim.facilities.Facility.class), new Coord(200, 0));
 		opportunities.addActivityFacility(facility1);
-		ActivityFacility facility2 = opportunities.getFactory().createActivityFacility(Id.create("2", ActivityFacility.class), new Coord(200, 200));
+		ActivityFacility facility2 = opportunities.getFactory().createActivityFacility(Id.create("2", org.matsim.facilities.Facility.class), new Coord(200, 200));
 		opportunities.addActivityFacility(facility2);
-		//ActivityFacility facility3 = opportunities.getFactory().createActivityFacility(Id.create("3", ActivityFacility.class), new Coord(280, 40));
+		//ActivityFacility facility3 = opportunities.getFactory().createActivityFacility(Id.create("3", org.matsim.facilities.Facility.class), new Coord(280, 40));
 		//opportunities.addActivityFacility(facility3);
 		scenario.getConfig().facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.setInScenario);
 		return scenario;
@@ -141,9 +141,9 @@ public class TinyMultimodalAccessibilityTest {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleFactory builder = schedule.getFactory();
 
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("stop1", TransitStopFacility.class), new Coord((double) 40, (double) 40), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("stop2", TransitStopFacility.class), new Coord((double) 140, (double) 40), false);
-		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("stop3", TransitStopFacility.class), new Coord((double) 240, (double) 40), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("stop1", org.matsim.facilities.Facility.class), new Coord((double) 40, (double) 40), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("stop2", org.matsim.facilities.Facility.class), new Coord((double) 140, (double) 40), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("stop3", org.matsim.facilities.Facility.class), new Coord((double) 240, (double) 40), false);
 		ArrayList<TransitRouteStop> stops = new ArrayList<>();
 		stops.add(builder.createTransitRouteStop(stop1, 0, 0));
 		stops.add(builder.createTransitRouteStop(stop2, 20, 30));

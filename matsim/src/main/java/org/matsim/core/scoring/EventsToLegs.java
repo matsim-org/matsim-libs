@@ -81,9 +81,9 @@ public final class EventsToLegs
 
 	private static class PendingTransitTravel {
 		final Id<Vehicle> vehicleId;
-		final Id<TransitStopFacility> accessStop;
+		final Id<org.matsim.facilities.Facility> accessStop;
 
-		PendingTransitTravel(Id<Vehicle> vehicleId, Id<TransitStopFacility> accessStop) {
+		PendingTransitTravel(Id<Vehicle> vehicleId, Id<org.matsim.facilities.Facility> accessStop) {
 			this.vehicleId = vehicleId;
 			this.accessStop = accessStop;
 		}
@@ -93,7 +93,7 @@ public final class EventsToLegs
 		final Id<TransitLine> transitLineId;
 		final Id<TransitRoute> transitRouteId;
 		final Id<Person> driverId;
-		Id<TransitStopFacility> lastFacilityId;
+		Id<org.matsim.facilities.Facility> lastFacilityId;
 
 		LineAndRoute(Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId, Id<Person> driverId) {
 			this.transitLineId = transitLineId;
@@ -305,7 +305,7 @@ public final class EventsToLegs
 			final TransitRoute route = line.getRoutes().get(lineAndRoute.transitRouteId);
 			assert route != null;
 
-			final Id<TransitStopFacility> lastFacilityId = lineAndRoute.lastFacilityId;
+			final Id<org.matsim.facilities.Facility> lastFacilityId = lineAndRoute.lastFacilityId;
 			if (lastFacilityId == null) {
 				Logger.getLogger(this.getClass()).warn("breakpoint");
 			}

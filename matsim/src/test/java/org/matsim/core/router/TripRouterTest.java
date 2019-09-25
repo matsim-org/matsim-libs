@@ -206,7 +206,7 @@ public class TripRouterTest {
 			return this.delegate.getLinkId();
 		}
 		@Override
-		public Id<ActivityFacility> getFacilityId() {
+		public Id<org.matsim.facilities.Facility> getFacilityId() {
 			return this.delegate.getFacilityId();
 		}
 		public EqualsActivity(final String type, final Id<Link> link) {
@@ -225,7 +225,7 @@ public class TripRouterTest {
 			throw new RuntimeException("not implemented") ;
 		}
 		@Override
-		public void setFacilityId(Id<ActivityFacility> id) {
+		public void setFacilityId(Id<org.matsim.facilities.Facility> id) {
 			throw new RuntimeException("not implemented") ;
 		}
 		@Override

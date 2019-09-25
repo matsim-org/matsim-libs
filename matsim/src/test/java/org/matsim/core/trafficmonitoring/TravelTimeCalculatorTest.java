@@ -379,7 +379,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		ttc.handleEvent(new LinkEnterEvent(100, ivVehId, link1.getId()));
 		ttc.handleEvent(new LinkEnterEvent(150, ptVehId, link1.getId()));
 		ttc.handleEvent(new LinkLeaveEvent(200, ivVehId, link1.getId()));
-		ttc.handleEvent(new VehicleArrivesAtFacilityEvent(240, ptVehId, Id.create("stop", TransitStopFacility.class), 0));
+		ttc.handleEvent(new VehicleArrivesAtFacilityEvent(240, ptVehId, Id.create("stop", org.matsim.facilities.Facility.class), 0));
 		ttc.handleEvent(new LinkLeaveEvent(350, ptVehId, link1.getId()));
 
 		Assert.assertEquals("The time of transit vehicles at stop should not be counted", 100.0, ttc.getLinkTravelTimes().getLinkTravelTime(link1, 200, null, null), 1e-8);

@@ -49,7 +49,7 @@ public class CourtesyEventsGenerator implements ActivityStartEventHandler, Activ
 
 	private final EventsManager events;
 	private final SocialNetwork socialNetwork;
-	private final Map< Id<ActivityFacility> , Map<String, Set< Id<Person> > > > personsAtFacility = new HashMap< >();
+	private final Map< Id<org.matsim.facilities.Facility> , Map<String, Set< Id<Person> > > > personsAtFacility = new HashMap< >();
 
 	@Inject
 	public CourtesyEventsGenerator(
@@ -95,7 +95,7 @@ public class CourtesyEventsGenerator implements ActivityStartEventHandler, Activ
 			final CourtesyEvent.Type type,
 			final String actType,
 			final Id<Person> ego,
-			final Id<ActivityFacility> facility,
+			final Id<org.matsim.facilities.Facility> facility,
 			final double time) {
 		// TODO: handle wraparound (done improperly because we track people from their second act...)
 		final Set< Id<Person> > alters = socialNetwork.getAlters( ego );
@@ -134,7 +134,7 @@ public class CourtesyEventsGenerator implements ActivityStartEventHandler, Activ
 		}
 	}
 
-	private Set<Id<Person>> getPersonsAtFacilityForType( Id<ActivityFacility> facility, String actType ) {
+	private Set<Id<Person>> getPersonsAtFacilityForType( Id<org.matsim.facilities.Facility> facility, String actType ) {
 		return MapUtils.getSet(
 				actType,
 				MapUtils.getMap(

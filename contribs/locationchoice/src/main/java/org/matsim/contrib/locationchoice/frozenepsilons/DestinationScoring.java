@@ -80,7 +80,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 	/*
 	 * linear at the moment
 	 */
-	private double getAttributesScore(Id<ActivityFacility> facilityId, Id<Person> personId) {
+	private double getAttributesScore(Id<org.matsim.facilities.Facility> facilityId, Id<Person> personId) {
 		double accumulatedScore = 0.0;
 		
 		if (this.lcContext.getPersonsBetas() != null && this.lcContext.getFacilitiesAttributes() != null) {
@@ -98,7 +98,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 		return accumulatedScore;
 	}
 	
-	private double getEpsilonAlternative(Id<ActivityFacility> facilityId, Id<Person> personId, int actIndex) {
+	private double getEpsilonAlternative(Id<org.matsim.facilities.Facility> facilityId, Id<Person> personId, int actIndex) {
 		/*
 		 * k values are uniform in [0..1[, see class ReadOrCreateKVals.
 		 */		

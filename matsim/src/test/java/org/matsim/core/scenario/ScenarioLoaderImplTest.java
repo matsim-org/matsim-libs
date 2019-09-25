@@ -122,7 +122,7 @@ public class ScenarioLoaderImplTest {
 				"unexpected attribute value",
 				Boolean.TRUE,
 				TransitScheduleUtils.getStopFacilityAttribute(
-						scenario.getTransitSchedule().getFacilities().get(Id.create(1, TransitStopFacility.class)),
+						scenario.getTransitSchedule().getFacilities().get(Id.create(1, org.matsim.facilities.Facility.class)),
 						"hasP+R"));
 	}
 
@@ -136,7 +136,7 @@ public class ScenarioLoaderImplTest {
 				"unexpected attribute value",
 				"world",
 				FacilitiesUtils.getFacilityAttribute(
-						scenario.getActivityFacilities().getFacilities().get(Id.create(1, ActivityFacility.class)),
+						scenario.getActivityFacilities().getFacilities().get(Id.create(1, org.matsim.facilities.Facility.class)),
 						"hello"));
 	}
 

@@ -226,7 +226,7 @@ import org.xml.sax.Attributes;
 			log.info("NEW: Attribute freq in <location> is not supported at the moment!");
 		}
 
-		ActivityFacility currfacility = this.facilities.getFacilities().get(Id.create(id, ActivityFacility.class));
+		ActivityFacility currfacility = this.facilities.getFacilities().get(Id.create(id, org.matsim.facilities.Facility.class));
 		if (currfacility == null) {
 			throw new RuntimeException("facility id=" + id + " does not exist!");
 		}
@@ -280,7 +280,7 @@ import org.xml.sax.Attributes;
 		this.curract.setEndTime(Time.parseTime(atts.getValue("end_time")));
 		String fId = atts.getValue("facility");
 		if (fId != null) {
-			this.curract.setFacilityId(Id.create(fId, ActivityFacility.class));
+			this.curract.setFacilityId(Id.create(fId, org.matsim.facilities.Facility.class));
 		}
 		if (this.routeDescription != null) {
 			Id<Link> startLinkId = null;

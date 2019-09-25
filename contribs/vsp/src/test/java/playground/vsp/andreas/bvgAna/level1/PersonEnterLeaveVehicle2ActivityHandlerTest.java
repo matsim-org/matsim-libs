@@ -32,7 +32,7 @@ public class PersonEnterLeaveVehicle2ActivityHandlerTest {
 	    Id<Person> agentId1 = Id.create(4, Person.class);
 	    Id<Person> agentId2 = Id.create(8, Person.class);
 	    Id<Vehicle> vehicleId1 = Id.create(3, Vehicle.class);
-	    Id<ActivityFacility> facilityId1 = Id.create(6, ActivityFacility.class);   
+	    Id<org.matsim.facilities.Facility> facilityId1 = Id.create(6, org.matsim.facilities.Facility.class);
 
 		
 //		steht aus

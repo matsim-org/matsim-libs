@@ -43,7 +43,7 @@ public class TestsUtil {
 		Plan plan = PopulationUtils.createPlan(person);
 		String[] locationIdSequence = facString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
-			ActivityFacility location = layer.getFacilities().get(Id.create(locationIdSequence[aa], ActivityFacility.class));
+			ActivityFacility location = layer.getFacilities().get(Id.create(locationIdSequence[aa], org.matsim.facilities.Facility.class));
 			Activity act;
 			act = PopulationUtils.createAndAddActivity(plan, "actAtFacility" + locationIdSequence[aa]);
 			act.setFacilityId(location.getId());

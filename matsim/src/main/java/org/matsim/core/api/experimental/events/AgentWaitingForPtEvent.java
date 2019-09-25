@@ -39,11 +39,11 @@ public final class AgentWaitingForPtEvent extends Event implements HasPersonId {
 	public static final String ATTRIBUTE_WAITSTOP = "atStop";
 	public static final String ATTRIBUTE_DESTINATIONSTOP = "destinationStop";
 	public final Id<Person> agentId;
-	public final Id<TransitStopFacility> waitingAtStopId;
-	public final Id<TransitStopFacility> destinationStopId;
+	public final Id<org.matsim.facilities.Facility> waitingAtStopId;
+	public final Id<org.matsim.facilities.Facility> destinationStopId;
 	
 	public AgentWaitingForPtEvent(final double now, final Id<Person> agentId,
-			final Id<TransitStopFacility> waitingAtStopId, final Id<TransitStopFacility> destinationStopId) {
+			final Id<org.matsim.facilities.Facility> waitingAtStopId, final Id<org.matsim.facilities.Facility> destinationStopId) {
 		super(now);
 		this.agentId = agentId;
 		this.waitingAtStopId = waitingAtStopId;
@@ -54,11 +54,11 @@ public final class AgentWaitingForPtEvent extends Event implements HasPersonId {
 		return this.agentId;
 	}
 	
-	public Id<TransitStopFacility> getWaitingAtStopId() {
+	public Id<org.matsim.facilities.Facility> getWaitingAtStopId() {
 		return this.waitingAtStopId;
 	}
 	
-	public Id<TransitStopFacility> getDestinationStopId() {
+	public Id<org.matsim.facilities.Facility> getDestinationStopId() {
 		return this.destinationStopId;
 	}
 	

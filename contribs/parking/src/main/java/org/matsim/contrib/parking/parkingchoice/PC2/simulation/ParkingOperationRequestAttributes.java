@@ -29,7 +29,7 @@ public class ParkingOperationRequestAttributes {
 	public double arrivalTime;
 	public double parkingDurationInSeconds;
 	public Id<Person> personId;
-	public Id<ActivityFacility> facilityId;
+	public Id<org.matsim.facilities.Facility> facilityId;
 	public String actType;
 	public int legIndex;
 

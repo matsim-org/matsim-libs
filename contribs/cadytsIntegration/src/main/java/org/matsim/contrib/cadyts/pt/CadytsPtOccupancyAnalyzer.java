@@ -42,6 +42,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
+import org.matsim.facilities.Facility;
 import org.matsim.pt.counts.SimpleWriter;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -58,8 +59,8 @@ public class CadytsPtOccupancyAnalyzer implements CadytsPtOccupancyAnalyzerI {
 
 	private final int timeBinSize, maxSlotIndex;
 	private final double maxTime;
-	private Map<Id<TransitStopFacility>, int[]> occupancies; // Map< stopFacilityId,value[]>
-	private final Map<Id<Vehicle>, Id<TransitStopFacility>> vehStops = new HashMap<>(); // Map< vehId,stopFacilityId>
+	private Map<Id<Facility>, int[]> occupancies; // Map< stopFacilityId,value[]>
+	private final Map<Id<Vehicle>, Id<Facility>> vehStops = new HashMap<>(); // Map< vehId,stopFacilityId>
 	private final Map<Id<Vehicle>, Integer> vehPassengers = new HashMap<>(); // Map<vehId,passengersNo.in Veh>
 	private StringBuffer occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");
 	private final Set<Id> analyzedTransitDrivers = new HashSet<>();
@@ -107,7 +108,7 @@ public class CadytsPtOccupancyAnalyzer implements CadytsPtOccupancyAnalyzerI {
 
 		// ------------------veh_passenger- (for occupancy)-----------------
 		Id<Vehicle> vehId = event.getVehicleId();
-		Id<TransitStopFacility> stopId = this.vehStops.get(vehId);
+		Id<Facility> stopId = this.vehStops.get(vehId);
 		double time = event.getTime();
 		Integer nPassengers = this.vehPassengers.get(vehId);
 		this.vehPassengers.put(vehId, (nPassengers != null) ? (nPassengers + 1) : 1);
@@ -138,7 +139,7 @@ public class CadytsPtOccupancyAnalyzer implements CadytsPtOccupancyAnalyzerI {
 	@Override
 	public void handleEvent(final VehicleDepartsAtFacilityEvent event) {
 		Id<Vehicle> vehId = event.getVehicleId();
-		Id<TransitStopFacility> facId = event.getFacilityId();
+		Id<Facility> facId = event.getFacilityId();
 
 		// -----------------------occupancy--------------------------------
 		this.vehStops.remove(vehId);
@@ -166,7 +167,7 @@ public class CadytsPtOccupancyAnalyzer implements CadytsPtOccupancyAnalyzerI {
 
 	@Override
 	public void handleEvent(final VehicleArrivesAtFacilityEvent event) {
-		Id<TransitStopFacility> stopId = event.getFacilityId();
+		Id<Facility> stopId = event.getFacilityId();
 
 		this.vehStops.put(event.getVehicleId(), stopId);
 		// (constructing a table with vehId as key, and stopId as value; constructed when veh arrives at
@@ -188,14 +189,14 @@ public class CadytsPtOccupancyAnalyzer implements CadytsPtOccupancyAnalyzerI {
 	 *         (timeBinSize-1)seconds.
 	 */
 	@Override
-	public int[] getOccupancyVolumesForStop(final Id<TransitStopFacility> stopId) {
+	public int[] getOccupancyVolumesForStop(final Id<Facility> stopId) {
 		return this.occupancies.get(stopId);
 	}
 	 /* (non-Javadoc)
 	 * @see org.matsim.contrib.cadyts.pt.CadytsPtOccupancyAnalyzerI#getOccupancyVolumeForStopAndTime(org.matsim.api.core.v01.Id, int)
 	 */
 	@Override
-	public int getOccupancyVolumeForStopAndTime(final Id<TransitStopFacility> stopId, final int time_s ) {
+	public int getOccupancyVolumeForStopAndTime(final Id<Facility> stopId, final int time_s ) {
 		 if ( this.occupancies.get(stopId) != null ) {
 			 int timeBinIndex = getTimeSlotIndex( time_s ) ;
 			 return this.occupancies.get(stopId)[timeBinIndex] ;
@@ -204,12 +205,12 @@ public class CadytsPtOccupancyAnalyzer implements CadytsPtOccupancyAnalyzerI {
 		 }
 	 }
 
-	public Set<Id<TransitStopFacility>> getOccupancyStopIds() {
+	public Set<Id<Facility>> getOccupancyStopIds() {
 		return this.occupancies.keySet();
 	}
 
 	@Override
-	public void writeResultsForSelectedStopIds(final String filename, final Counts<Link> occupCounts, final Collection<Id<TransitStopFacility>> stopIds) {
+	public void writeResultsForSelectedStopIds(final String filename, final Counts<Link> occupCounts, final Collection<Id<Facility>> stopIds) {
 		SimpleWriter writer = new SimpleWriter(filename);
 
 		final String TAB = "\t";
@@ -226,7 +227,7 @@ public class CadytsPtOccupancyAnalyzer implements CadytsPtOccupancyAnalyzerI {
 		writer.write("coordinate\tcsId\n");
 
 		// write content
-		for (Id<TransitStopFacility> stopId : stopIds) {
+		for (Id<Facility> stopId : stopIds) {
 			// get count data
 			Count count = occupCounts.getCounts().get(Id.create(stopId, Link.class));
 			if (!occupCounts.getCounts().containsKey(Id.create(stopId, Link.class))) {
@@ -261,7 +262,7 @@ public class CadytsPtOccupancyAnalyzer implements CadytsPtOccupancyAnalyzerI {
 		final char TAB = '\t';
 		final char RETURN = '\n';
 
-		for (Id<TransitStopFacility> stopId : this.getOccupancyStopIds()) { // Only occupancy!
+		for (Id<Facility> stopId : this.getOccupancyStopIds()) { // Only occupancy!
 			StringBuilder stringBuffer = new StringBuilder();
 			stringBuffer.append(STOPID);
 			stringBuffer.append(stopId);

@@ -53,7 +53,7 @@ import org.openstreetmap.osmosis.xml.v0_6.XmlReader;
  */
 public class AmenityReader {
 	private final static Logger log = Logger.getLogger(AmenityReader.class);
-	private QuadTree<Id<ActivityFacility>> linkQT;
+	private QuadTree<Id<org.matsim.facilities.Facility>> linkQT;
 	private ActivityFacilities amenities;
 	private ObjectAttributes amenityAttributes;
 	private final CoordinateTransformation ct;
@@ -99,7 +99,7 @@ public class AmenityReader {
 	}
 	
 	
-	public QuadTree<Id<ActivityFacility>> getQuadTree(){
+	public QuadTree<Id<org.matsim.facilities.Facility>> getQuadTree(){
 		return this.linkQT;
 	}
 	
@@ -133,7 +133,7 @@ public class AmenityReader {
 		try{
 			bw.write("FacilityId,Long,Lat,Type");
 			bw.newLine();
-			for(Id<ActivityFacility> id : this.amenities.getFacilities().keySet()){
+			for(Id<org.matsim.facilities.Facility> id : this.amenities.getFacilities().keySet()){
 				ActivityFacility facility = this.amenities.getFacilities().get(id);
 				bw.write(id.toString());
 				bw.write(",");

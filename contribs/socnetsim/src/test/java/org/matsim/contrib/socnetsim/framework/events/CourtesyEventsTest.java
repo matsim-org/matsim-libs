@@ -48,7 +48,7 @@ public class CourtesyEventsTest {
 	public static final Id<Person> ID_1 = Id.create("tintin", Person.class);
 	public static final Id<Person> ID_2 = Id.create("milou", Person.class);
 	public static final Id<Link> LINK_ID = Id.createLinkId("Link");
-	public static final Id<ActivityFacility> FACILITY_ID = Id.create("Facility", ActivityFacility.class);
+	public static final Id<org.matsim.facilities.Facility> FACILITY_ID = Id.create("Facility", org.matsim.facilities.Facility.class);
 	public static final String TYPE = "type";
 
 	@Test

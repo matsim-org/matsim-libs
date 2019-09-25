@@ -57,7 +57,7 @@ public final class LogElement {
 	private double budget;
 	private double startTime;
 	private double endTime;
-	private ArrayList<Id<TransitStopFacility>> stopsToBeServed;
+	private ArrayList<Id<org.matsim.facilities.Facility>> stopsToBeServed;
 	private ArrayList<Id<Link>> linksServed;
 
 	
@@ -137,10 +137,10 @@ public final class LogElement {
 	public void setEndTime(double endTime) {
 		this.endTime = endTime;
 	}
-	public ArrayList<Id<TransitStopFacility>> getStopsToBeServed() {
+	public ArrayList<Id<org.matsim.facilities.Facility>> getStopsToBeServed() {
 		return stopsToBeServed;
 	}
-	public void setStopsToBeServed(ArrayList<Id<TransitStopFacility>> stopsServed) {
+	public void setStopsToBeServed(ArrayList<Id<org.matsim.facilities.Facility>> stopsServed) {
 		this.stopsToBeServed = stopsServed;
 	}
 	public ArrayList<Id<Link>> getLinksServed() {

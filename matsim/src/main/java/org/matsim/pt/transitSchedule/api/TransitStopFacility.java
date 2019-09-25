@@ -32,7 +32,7 @@ import org.matsim.utils.objectattributes.attributable.Attributable;
  *
  * @author mrieser
  */
-public interface TransitStopFacility extends Facility, Identifiable<TransitStopFacility>, Attributable {
+public interface TransitStopFacility extends Facility, Attributable {
 
 	boolean getIsBlockingLane();
 

@@ -262,7 +262,7 @@ public class LandUseBuildingSink implements Sink {
 
 				// Create facility for building
 				if (activityType != null) {
-					Id<ActivityFacility> facilityId = Id.create(entity.getId(), ActivityFacility.class);
+					Id<org.matsim.facilities.Facility> facilityId = Id.create(entity.getId(), org.matsim.facilities.Facility.class);
 					ActivityFacility activityFacility;
 
 					if(!facilities.getFacilities().containsKey(facilityId)){

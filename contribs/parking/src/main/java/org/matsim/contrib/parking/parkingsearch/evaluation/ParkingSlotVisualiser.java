@@ -72,16 +72,16 @@ public class ParkingSlotVisualiser implements PersonEntersVehicleEventHandler, P
 	@Inject
 	public ParkingSlotVisualiser(Scenario scenario) {
 		this.network = scenario.getNetwork();
-		Map<Id<ActivityFacility>, ActivityFacility> parkingFacilities = scenario.getActivityFacilities().getFacilitiesForActivityType(ParkingUtils.PARKACTIVITYTYPE);
+		Map<Id<org.matsim.facilities.Facility>, ActivityFacility> parkingFacilities = scenario.getActivityFacilities().getFacilitiesForActivityType(ParkingUtils.PARKACTIVITYTYPE);
 		initialize(parkingFacilities);
 	}
 	
-	public ParkingSlotVisualiser(Network network, Map<Id<ActivityFacility>, ActivityFacility> parkingFacilities) {
+	public ParkingSlotVisualiser(Network network, Map<Id<org.matsim.facilities.Facility>, ActivityFacility> parkingFacilities) {
 		this.network = network;
 		initialize(parkingFacilities);
 	}
 	
-	private void initialize(Map<Id<ActivityFacility>, ActivityFacility> parkingFacilities){
+	private void initialize(Map<Id<org.matsim.facilities.Facility>, ActivityFacility> parkingFacilities){
 		Map<Id<Link>,MutableDouble> nrOfSlotsPerLink = new HashMap<Id<Link>,MutableDouble>();
 		for (ActivityFacility fac : parkingFacilities.values()) {
 			Id<Link> linkId = fac.getLinkId();

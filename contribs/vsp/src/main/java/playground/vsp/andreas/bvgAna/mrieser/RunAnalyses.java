@@ -308,13 +308,13 @@ public class RunAnalyses {
 
 	}
 
-	private Id<TransitStopFacility> getBaseId(final Id<TransitStopFacility> stopId) {
+	private Id<org.matsim.facilities.Facility> getBaseId(final Id<org.matsim.facilities.Facility> stopId) {
 		String s = stopId.toString();
 		int pos = s.indexOf('.');
 		if (pos < 0) {
 			return stopId;
 		}
-		return Id.create(s.substring(0, pos), TransitStopFacility.class);
+		return Id.create(s.substring(0, pos), org.matsim.facilities.Facility.class);
 	}
 
 	private int getTimeSlot(final double time) {
@@ -398,7 +398,7 @@ public class RunAnalyses {
 
 	public void createCatchmentAreaStats(Set<Id<Person>> agentIds, Id<TransitLine> lineId, Id<TransitRoute>[] routeIds) {
 		TransitSchedule ts = ((MutableScenario) this.scenario).getTransitSchedule();
-		Set<Id<TransitStopFacility>> stopIds = new HashSet<>();
+		Set<Id<org.matsim.facilities.Facility>> stopIds = new HashSet<>();
 		Set<Id<Vehicle>> vehicleIds = new HashSet<>();
 		TransitLine line = ts.getTransitLines().get(lineId);
 		for (Id<TransitRoute> routeId : routeIds) {

@@ -34,7 +34,7 @@ public class ActStartEventTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
 		final ActivityStartEvent event = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml",
-				new ActivityStartEvent(5668.27, Id.create("a92", Person.class), Id.create("l081", Link.class), Id.create("f792", ActivityFacility.class), "work"));
+				new ActivityStartEvent(5668.27, Id.create("a92", Person.class), Id.create("l081", Link.class), Id.create("f792", org.matsim.facilities.Facility.class), "work"));
 		assertEquals(5668.27, event.getTime(), EPSILON);
 		assertEquals("a92", event.getPersonId().toString());
 		assertEquals("l081", event.getLinkId().toString());

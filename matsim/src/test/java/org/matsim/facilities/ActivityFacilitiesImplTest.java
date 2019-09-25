@@ -33,7 +33,7 @@ public class ActivityFacilitiesImplTest {
 	public void testAddActivityFacility() {
 		ActivityFacilities facilities = new ActivityFacilitiesImpl();
 		ActivityFacilitiesFactory factory = facilities.getFactory();
-		ActivityFacility facility1 = factory.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord((double) 200, (double) 5000));
+		ActivityFacility facility1 = factory.createActivityFacility(Id.create(1, org.matsim.facilities.Facility.class), new Coord((double) 200, (double) 5000));
 
 		Assert.assertEquals(0, facilities.getFacilities().size());
 
@@ -41,7 +41,7 @@ public class ActivityFacilitiesImplTest {
 
 		Assert.assertEquals(1, facilities.getFacilities().size());
 
-		ActivityFacility facility2 = factory.createActivityFacility(Id.create(2, ActivityFacility.class), new Coord((double) 300, (double) 4000));
+		ActivityFacility facility2 = factory.createActivityFacility(Id.create(2, org.matsim.facilities.Facility.class), new Coord((double) 300, (double) 4000));
 		facilities.addActivityFacility(facility2);
 
 		Assert.assertEquals(2, facilities.getFacilities().size());
@@ -51,8 +51,8 @@ public class ActivityFacilitiesImplTest {
 	public void testAddActivityFacility_addingTwice() {
 		ActivityFacilities facilities = new ActivityFacilitiesImpl();
 		ActivityFacilitiesFactory factory = facilities.getFactory();
-		ActivityFacility facility1 = factory.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord((double) 200, (double) 5000));
-		ActivityFacility facility2 = factory.createActivityFacility(Id.create(2, ActivityFacility.class), new Coord((double) 300, (double) 4000));
+		ActivityFacility facility1 = factory.createActivityFacility(Id.create(1, org.matsim.facilities.Facility.class), new Coord((double) 200, (double) 5000));
+		ActivityFacility facility2 = factory.createActivityFacility(Id.create(2, org.matsim.facilities.Facility.class), new Coord((double) 300, (double) 4000));
 
 		Assert.assertEquals(0, facilities.getFacilities().size());
 
@@ -72,8 +72,8 @@ public class ActivityFacilitiesImplTest {
 	public void testAddActivityFacility_sameId() {
 		ActivityFacilities facilities = new ActivityFacilitiesImpl();
 		ActivityFacilitiesFactory factory = facilities.getFactory();
-		ActivityFacility facility1 = factory.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord((double) 200, (double) 5000));
-		ActivityFacility facility2 = factory.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord((double) 300, (double) 4000));
+		ActivityFacility facility1 = factory.createActivityFacility(Id.create(1, org.matsim.facilities.Facility.class), new Coord((double) 200, (double) 5000));
+		ActivityFacility facility2 = factory.createActivityFacility(Id.create(1, org.matsim.facilities.Facility.class), new Coord((double) 300, (double) 4000));
 
 		Assert.assertEquals(0, facilities.getFacilities().size());
 
@@ -84,7 +84,7 @@ public class ActivityFacilitiesImplTest {
 		} catch (IllegalArgumentException expected) {}
 
         Assert.assertEquals(1, facilities.getFacilities().size());
-		Assert.assertEquals(facility1, facilities.getFacilities().get(Id.create(1, ActivityFacility.class)));
+		Assert.assertEquals(facility1, facilities.getFacilities().get(Id.create(1, org.matsim.facilities.Facility.class)));
 	}
 
 	/**
@@ -95,13 +95,13 @@ public class ActivityFacilitiesImplTest {
 	public void testRemove() {
 		ActivityFacilities facilities = new ActivityFacilitiesImpl();
 		ActivityFacilitiesFactory factory = facilities.getFactory();
-		ActivityFacility facility1 = factory.createActivityFacility(Id.create(1, ActivityFacility.class), new Coord((double) 200, (double) 5000));
-		ActivityFacility facility2 = factory.createActivityFacility(Id.create(2, ActivityFacility.class), new Coord((double) 300, (double) 4000));
+		ActivityFacility facility1 = factory.createActivityFacility(Id.create(1, org.matsim.facilities.Facility.class), new Coord((double) 200, (double) 5000));
+		ActivityFacility facility2 = factory.createActivityFacility(Id.create(2, org.matsim.facilities.Facility.class), new Coord((double) 300, (double) 4000));
 		facilities.addActivityFacility(facility1);
 		facilities.addActivityFacility(facility2);
 		Assert.assertEquals(2, facilities.getFacilities().size());
 
-		Assert.assertEquals(facility1, facilities.getFacilities().remove(Id.create(1, ActivityFacility.class)));
+		Assert.assertEquals(facility1, facilities.getFacilities().remove(Id.create(1, org.matsim.facilities.Facility.class)));
 		Assert.assertEquals(1, facilities.getFacilities().size());
 	}
 

@@ -193,7 +193,7 @@ import org.matsim.facilities.ActivityFacility;
 		} else throw new RuntimeException("Unexpected type of leg was found: " + leg.getClass().toString() + ". Aborting!");
 	}
 	
-	public static void setFacilityId(Activity activity, Id<ActivityFacility> facilityId) {
+	public static void setFacilityId(Activity activity, Id<org.matsim.facilities.Facility> facilityId) {
 		if (activity instanceof Activity) {
 			((Activity) activity).setFacilityId(facilityId);
 		} else if (activity instanceof LCActivity) {

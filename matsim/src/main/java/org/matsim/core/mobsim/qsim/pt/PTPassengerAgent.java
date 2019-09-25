@@ -63,9 +63,9 @@ public interface PTPassengerAgent extends PassengerAgent {
 	 * 
 	 * @return The transit stop id.
 	 */
-	public Id<TransitStopFacility> getDesiredAccessStopId();
+	public Id<org.matsim.facilities.Facility> getDesiredAccessStopId();
 	
-	public Id<TransitStopFacility> getDesiredDestinationStopId();
+	public Id<org.matsim.facilities.Facility> getDesiredDestinationStopId();
 
 	/**
 	 * @return a statistical weight, how many "real" agents this agent represents, e.g. "5.0" if you simulate a 20%-sample.

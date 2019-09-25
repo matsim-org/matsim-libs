@@ -171,11 +171,11 @@ public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent
 		return transitAgentDelegate.getWeight();
 	}
 	@Override
-	public final Id<TransitStopFacility> getDesiredAccessStopId() {
+	public final Id<org.matsim.facilities.Facility> getDesiredAccessStopId() {
 		return transitAgentDelegate.getDesiredAccessStopId();
 	}
 	@Override
-	public final Id<TransitStopFacility> getDesiredDestinationStopId() {
+	public final Id<org.matsim.facilities.Facility> getDesiredDestinationStopId() {
 		return transitAgentDelegate.getDesiredDestinationStopId();
 	}
 

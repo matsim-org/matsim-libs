@@ -119,7 +119,7 @@ public final class CreatePStopsOnJunctionApproachesAndBetweenJunctions{
 		
 		this.linkId2StopFacilityMap = new LinkedHashMap<>();
 		
-		Set<Id<TransitStopFacility>> stopsWithoutLinkIds = new TreeSet<>();
+		Set<Id<org.matsim.facilities.Facility>> stopsWithoutLinkIds = new TreeSet<>();
 
 		int warnCounter = 10;
 		
@@ -472,12 +472,12 @@ public final class CreatePStopsOnJunctionApproachesAndBetweenJunctions{
 			return 0;
 		}
 		
-		if (this.transitSchedule.getFacilities().get(Id.create(pConfigGroup.getPIdentifier() + link.getId().toString(), TransitStopFacility.class)) != null) {
+		if (this.transitSchedule.getFacilities().get(Id.create(pConfigGroup.getPIdentifier() + link.getId().toString(), org.matsim.facilities.Facility.class)) != null) {
 			log.warn("Link " + link.getId() + " has already a stop. This should not happen. Check code.");
 			return 0;
 		}
 		
-		Id<TransitStopFacility> stopId = Id.create(this.pConfigGroup.getPIdentifier() + link.getId(), TransitStopFacility.class);
+		Id<org.matsim.facilities.Facility> stopId = Id.create(this.pConfigGroup.getPIdentifier() + link.getId(), org.matsim.facilities.Facility.class);
 		TransitStopFacility stop = this.transitSchedule.getFactory().createTransitStopFacility(stopId, link.getToNode().getCoord(), false);
 		stop.setLinkId(link.getId());
 		this.transitSchedule.addStopFacility(stop);

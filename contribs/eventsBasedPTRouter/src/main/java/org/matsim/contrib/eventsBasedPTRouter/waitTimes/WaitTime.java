@@ -36,6 +36,6 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public interface WaitTime extends Serializable{
 
 	//Methods
-	public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time);
+	public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<org.matsim.facilities.Facility> stopId, double time);
 
 }

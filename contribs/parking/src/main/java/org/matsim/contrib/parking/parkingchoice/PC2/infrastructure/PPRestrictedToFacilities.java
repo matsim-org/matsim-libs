@@ -29,27 +29,27 @@ import org.matsim.facilities.ActivityFacility;
 // people performing activities at facilities, which are mentioned in HashSet facility Ids, can use this parking.
 public class PPRestrictedToFacilities extends PublicParking implements PrivateParking {
 
-	public PPRestrictedToFacilities(Id<PC2Parking> id, int capacity, Coord coord, ParkingCostModel parkingCostModel, String groupName, HashSet<Id<ActivityFacility>> facilityIds) {
+	public PPRestrictedToFacilities(Id<PC2Parking> id, int capacity, Coord coord, ParkingCostModel parkingCostModel, String groupName, HashSet<Id<org.matsim.facilities.Facility>> facilityIds) {
 		super(id, capacity, coord, parkingCostModel, groupName);
 		this.setFacilityIds(facilityIds);
 	}
 
-	private void setFacilityIds(HashSet<Id<ActivityFacility>> facilityIds) {
+	private void setFacilityIds(HashSet<Id<org.matsim.facilities.Facility>> facilityIds) {
 		this.facilityIds=facilityIds;
 	}
 
-	private HashSet<Id<ActivityFacility>> facilityIds;
+	private HashSet<Id<org.matsim.facilities.Facility>> facilityIds;
 
-	public void PPRestrictedToIndividuals(HashSet<Id<ActivityFacility>> facilityIds){
+	public void PPRestrictedToIndividuals(HashSet<Id<org.matsim.facilities.Facility>> facilityIds){
 		this.setFacilityIds(facilityIds);
 	}
 	
 	@Override
-	public boolean isAllowedToUseParking(Id<Person> personId, Id<ActivityFacility> actFacilityId, String actType) {
+	public boolean isAllowedToUseParking(Id<Person> personId, Id<org.matsim.facilities.Facility> actFacilityId, String actType) {
 		return getFacilityIds().contains(actFacilityId);
 	}
 
-	public HashSet<Id<ActivityFacility>> getFacilityIds() {
+	public HashSet<Id<org.matsim.facilities.Facility>> getFacilityIds() {
 		return facilityIds;
 	}
 

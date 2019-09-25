@@ -31,11 +31,11 @@ import org.matsim.core.api.internal.MatsimFactory;
  */
 public interface ActivityFacilitiesFactory extends MatsimFactory {
 
-	public ActivityFacility createActivityFacility(Id<ActivityFacility> id, Coord coord);
+	public ActivityFacility createActivityFacility(Id<org.matsim.facilities.Facility> id, Coord coord);
 	
-	public ActivityFacility createActivityFacility(Id<ActivityFacility> id, Id<Link> linkId);
+	public ActivityFacility createActivityFacility(Id<org.matsim.facilities.Facility> id, Id<Link> linkId);
 	
-	public ActivityFacility createActivityFacility(Id<ActivityFacility> id, Coord coord, Id<Link> linkId);
+	public ActivityFacility createActivityFacility(Id<org.matsim.facilities.Facility> id, Coord coord, Id<Link> linkId);
 
 	public ActivityOption createActivityOption(String type);
 

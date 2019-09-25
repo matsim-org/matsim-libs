@@ -33,10 +33,10 @@ public class VehId2DelayAtStopMapTest {
         Id<Person> driverId2 = Id.create(5, Person.class);
         Id<Person> driverId3 = Id.create(6, Person.class);
         Id<Person> driverId4 = Id.create(7, Person.class);
-        Id<TransitStopFacility> facilId1 = Id.create(8, TransitStopFacility.class);
-        Id<TransitStopFacility> facilId2 = Id.create(9, TransitStopFacility.class);        
-        Id<TransitStopFacility> facilId3 = Id.create(10, TransitStopFacility.class);
-        Id<TransitStopFacility> facilId4 = Id.create(11, TransitStopFacility.class);
+        Id<org.matsim.facilities.Facility> facilId1 = Id.create(8, org.matsim.facilities.Facility.class);
+        Id<org.matsim.facilities.Facility> facilId2 = Id.create(9, org.matsim.facilities.Facility.class);
+        Id<org.matsim.facilities.Facility> facilId3 = Id.create(10, org.matsim.facilities.Facility.class);
+        Id<org.matsim.facilities.Facility> facilId4 = Id.create(11, org.matsim.facilities.Facility.class);
         Id<TransitLine> transitLineId1 = Id.create(13, TransitLine.class);
         Id<TransitLine> transitLineId2 = Id.create(1, TransitLine.class);
         Id<TransitLine> transitLineId3 = Id.create(3, TransitLine.class);

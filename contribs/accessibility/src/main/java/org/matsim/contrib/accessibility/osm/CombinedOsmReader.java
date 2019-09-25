@@ -67,7 +67,7 @@ import org.openstreetmap.osmosis.xml.common.CompressionMethod;
  */
 public class CombinedOsmReader {
 	private final static Logger log = Logger.getLogger(CombinedOsmReader.class);
-	private QuadTree<Id<ActivityFacility>> linkQT;
+	private QuadTree<Id<org.matsim.facilities.Facility>> linkQT;
 	private ActivityFacilities facilities;
 	private ObjectAttributes facilityAttributes;
 	private String idPrefix = "";
@@ -117,7 +117,7 @@ public class CombinedOsmReader {
 	}
 	
 	
-	public QuadTree<Id<ActivityFacility>> getQuadTree(){
+	public QuadTree<Id<org.matsim.facilities.Facility>> getQuadTree(){
 		return this.linkQT;
 	}
 	
@@ -171,7 +171,7 @@ public class CombinedOsmReader {
 		try{
 			bw.write("FacilityId,Long,Lat,Type");
 			bw.newLine();
-			for(Id<ActivityFacility> id : this.facilities.getFacilities().keySet()){
+			for(Id<org.matsim.facilities.Facility> id : this.facilities.getFacilities().keySet()){
 				ActivityFacility facility = this.facilities.getFacilities().get(id);
 				bw.write(id.toString());
 				bw.write(",");

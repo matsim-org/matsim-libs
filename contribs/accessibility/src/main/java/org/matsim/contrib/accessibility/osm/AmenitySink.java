@@ -155,7 +155,7 @@ public class AmenitySink implements Sink {
 				/* Facility identified. Now get the centroid of all members. */ 
 				//Coord coord = getCoord(entity);
 				Coord coord = OSMCoordUtils.getCentroidCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
-				Id<ActivityFacility> newId = Id.create(entity.getId(), ActivityFacility.class);
+				Id<org.matsim.facilities.Facility> newId = Id.create(entity.getId(), org.matsim.facilities.Facility.class);
 				ActivityFacility af;
 				if(!facilities.getFacilities().containsKey(newId)){
 					af = aff.createActivityFacility(newId, coord);
@@ -181,7 +181,7 @@ public class AmenitySink implements Sink {
 				/* Facility identified. Now get the centroid of all members. */ 
 //				Coord coord = getCoord(entity);
 				Coord coord = OSMCoordUtils.getCentroidCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
-				Id<ActivityFacility> newId = Id.create(entity.getId(), ActivityFacility.class);
+				Id<org.matsim.facilities.Facility> newId = Id.create(entity.getId(), org.matsim.facilities.Facility.class);
 				ActivityFacility af;
 				if(!facilities.getFacilities().containsKey(newId)){
 					af = aff.createActivityFacility(newId, coord);					

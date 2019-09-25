@@ -228,7 +228,7 @@ public class AccessibilityUtils {
 		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities(facilityContainerName);
 		ActivityFacilitiesFactory aff = facilities.getFactory();
 		for (Link link : network.getLinks().values()) {
-			ActivityFacility facility = aff.createActivityFacility(Id.create(link.getId(),ActivityFacility.class), link.getCoord(), link.getId());
+			ActivityFacility facility = aff.createActivityFacility(Id.create(link.getId(),org.matsim.facilities.Facility.class), link.getCoord(), link.getId());
 			facilities.addActivityFacility(facility);
 		}
 		return facilities ;
@@ -249,7 +249,7 @@ public class AccessibilityUtils {
 			Coord coord = CoordUtils.createCoord(geometry.getCentroid().getX(), geometry.getCentroid().getY());
 			
 			for (int i = 0; i < numberOfHouseholds; i++) {
-				ActivityFacility facility = aff.createActivityFacility(Id.create(featureId + "_" + i, ActivityFacility.class), coord);
+				ActivityFacility facility = aff.createActivityFacility(Id.create(featureId + "_" + i, org.matsim.facilities.Facility.class), coord);
 				facilities.addActivityFacility(facility);
 			}
 		}
@@ -339,10 +339,10 @@ public class AccessibilityUtils {
 						
 						// In case an agent visits the same activity location twice, create another activity facility with a modified ID
 						Integer i = 1;					
-						Id<ActivityFacility> facilityId = Id.create(activityType + "_" + personId.toString() + "_" + i.toString(), ActivityFacility.class);
+						Id<org.matsim.facilities.Facility> facilityId = Id.create(activityType + "_" + personId.toString() + "_" + i.toString(), org.matsim.facilities.Facility.class);
 						while (facilities.getFacilities().containsKey(facilityId)) {
 							i++;
-							facilityId = Id.create(activityType + "_" + personId.toString() + "_" + i.toString(), ActivityFacility.class);
+							facilityId = Id.create(activityType + "_" + personId.toString() + "_" + i.toString(), org.matsim.facilities.Facility.class);
 						}
 
 						ActivityFacility facility = aff.createActivityFacility(facilityId, activity.getCoord());
@@ -370,7 +370,7 @@ public class AccessibilityUtils {
 	}
 
 
-	public static void assignAdditionalFacilitiesDataToMeasurePoint(ActivityFacilities measurePoints, Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap,
+	public static void assignAdditionalFacilitiesDataToMeasurePoint(ActivityFacilities measurePoints, Map<Id<org.matsim.facilities.Facility>, Geometry> measurePointGeometryMap,
 			Map<String, ActivityFacilities> additionalFacilityData) {
 		LOG.info("Start assigning additional facilities data to measure point.");
 		GeometryFactory geometryFactory = new GeometryFactory();
@@ -379,7 +379,7 @@ public class AccessibilityUtils {
 			String additionalDataName = additionalDataFacilities.getName();
 			int additionalDataFacilitiesToAssign = additionalDataFacilities.getFacilities().size();
 			
-			for (Id<ActivityFacility> measurePointId : measurePoints.getFacilities().keySet()) { // Iterate over all measure points
+			for (Id<org.matsim.facilities.Facility> measurePointId : measurePoints.getFacilities().keySet()) { // Iterate over all measure points
 				ActivityFacility measurePoint = measurePoints.getFacilities().get(measurePointId);
 				measurePoint.getAttributes().putAttribute(additionalDataName, 0);
 				Geometry geometry = measurePointGeometryMap.get(measurePointId);

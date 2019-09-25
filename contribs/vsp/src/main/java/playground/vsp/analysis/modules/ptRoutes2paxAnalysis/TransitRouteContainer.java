@@ -156,7 +156,7 @@ public class TransitRouteContainer {
 		v.setValue(value);
 	}
 	
-	private void create(Counts counts, Id<Link> stopIndexId, Id<TransitStopFacility> stationName, Double time, double value){
+	private void create(Counts counts, Id<Link> stopIndexId, Id<org.matsim.facilities.Facility> stationName, Double time, double value){
 		//create a new count
 		Count count = counts.createAndAddCount(stopIndexId, stationName.toString());
 //		if(count == null){

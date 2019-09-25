@@ -51,7 +51,7 @@ public class WorldConnectLocations {
 		this.config = config;
 	}
 
-	private final void connectByFile(final ActivityFacilities facilities, final Network network, final String file, final Set<Id<ActivityFacility>> remainingFacilities) {
+	private final void connectByFile(final ActivityFacilities facilities, final Network network, final String file, final Set<Id<org.matsim.facilities.Facility>> remainingFacilities) {
 		log.info("    connecting facilities with links via "+CONFIG_F2L_INPUTF2LFile+"="+file);
 		try (BufferedReader br = IOUtils.getBufferedReader(file)) {
 			int lineCnt = 0;
@@ -61,7 +61,7 @@ public class WorldConnectLocations {
 				String[] entries = currLine.split("\t", -1);
 				// fid  lid
 				// 0    1
-				Id<ActivityFacility> fid = Id.create(entries[0].trim(), ActivityFacility.class);
+				Id<org.matsim.facilities.Facility> fid = Id.create(entries[0].trim(), org.matsim.facilities.Facility.class);
 				Id<Link> lid = Id.create(entries[1].trim(), Link.class);
 				ActivityFacility f = facilities.getFacilities().get(fid);
 				Link l = network.getLinks().get(lid);
@@ -100,7 +100,7 @@ public class WorldConnectLocations {
 	public final void connectFacilitiesWithLinks(final ActivityFacilities facilities, final Network network) {
 		log.info("  connecting facilities with links...");
 
-		Set<Id<ActivityFacility>> remainingFacilities = new HashSet<>(facilities.getFacilities().keySet());
+		Set<Id<org.matsim.facilities.Facility>> remainingFacilities = new HashSet<>(facilities.getFacilities().keySet());
 		if (this.config != null) {
 			String inputF2LFile = this.config.findParam(CONFIG_F2L,CONFIG_F2L_INPUTF2LFile);
 			if (inputF2LFile != null) {
@@ -109,7 +109,7 @@ public class WorldConnectLocations {
 		}
 
 		log.info("    connecting remaining facilities with links ("+remainingFacilities.size()+" remaining)...");
-		for (Id<ActivityFacility> fid : remainingFacilities) {
+		for (Id<org.matsim.facilities.Facility> fid : remainingFacilities) {
 			ActivityFacility f = facilities.getFacilities().get(fid);
 			Link l = NetworkUtils.getNearestRightEntryLink(network, f.getCoord());
 			l = network.getLinks().get(l.getId());

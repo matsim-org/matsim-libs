@@ -359,8 +359,8 @@ public class TransitNetworkSink implements Sink {
 		return transitRouteStops;
 	}
 
-	private Id<TransitStopFacility> createTransitStopId(String ref, String stopName, int stopNo) {
-		return Id.create(ref + "_" + stopName + "_" + stopNo, TransitStopFacility.class);
+	private Id<org.matsim.facilities.Facility> createTransitStopId(String ref, String stopName, int stopNo) {
+		return Id.create(ref + "_" + stopName + "_" + stopNo, org.matsim.facilities.Facility.class);
 	}
 
 	private NetworkRoute createNetworkRoute(List<Id<Link>> plinkIds) {

@@ -223,8 +223,8 @@ public abstract class TransitScheduleValidator {
 
 		while (iter.hasNext()) {
 			iter.next();
-			Id<TransitStopFacility> fromStopId = iter.getFromStopId();
-			Id<TransitStopFacility> toStopId = iter.getToStopId();
+			Id<org.matsim.facilities.Facility> fromStopId = iter.getFromStopId();
+			Id<org.matsim.facilities.Facility> toStopId = iter.getToStopId();
 			double transferTime = iter.getSeconds();
 
 			if (fromStopId == null && toStopId == null) {

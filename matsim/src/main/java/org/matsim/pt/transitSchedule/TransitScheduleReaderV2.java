@@ -110,7 +110,7 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 					new Coord(Double.parseDouble(atts.getValue(Constants.X)), Double.parseDouble(atts.getValue(Constants.Y)), Double.parseDouble(atts.getValue(Constants.Z)));
 			TransitStopFacility stop =
 					this.schedule.getFactory().createTransitStopFacility(
-							Id.create(atts.getValue(Constants.ID), TransitStopFacility.class),
+							Id.create(atts.getValue(Constants.ID), org.matsim.facilities.Facility.class),
 							this.coordinateTransformation.transform(coord),
 							isBlocking);
 			this.currentAttributes = stop.getAttributes();
@@ -159,7 +159,7 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 				}
 			}
 		} else if (Constants.STOP.equals(name)) {
-			Id<TransitStopFacility> id = Id.create(atts.getValue(Constants.REF_ID), TransitStopFacility.class);
+			Id<org.matsim.facilities.Facility> id = Id.create(atts.getValue(Constants.REF_ID), org.matsim.facilities.Facility.class);
 			TransitStopFacility facility = this.schedule.getFacilities().get(id);
 			if (facility == null) {
 				throw new RuntimeException("no stop/facility with id " + atts.getValue(Constants.REF_ID));
@@ -176,8 +176,8 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 			stop.awaitDeparture = Boolean.parseBoolean(atts.getValue(Constants.AWAIT_DEPARTURE));
 			this.currentTransitRoute.stops.add(stop);
 		} else if (Constants.RELATION.equals(name)) {
-			Id<TransitStopFacility> fromStop = Id.create(atts.getValue(Constants.FROM_STOP), TransitStopFacility.class);
-			Id<TransitStopFacility> toStop = Id.create(atts.getValue(Constants.TO_STOP), TransitStopFacility.class);
+			Id<org.matsim.facilities.Facility> fromStop = Id.create(atts.getValue(Constants.FROM_STOP), org.matsim.facilities.Facility.class);
+			Id<org.matsim.facilities.Facility> toStop = Id.create(atts.getValue(Constants.TO_STOP), org.matsim.facilities.Facility.class);
 			double transferTime = Time.parseTime(atts.getValue(Constants.TRANSFER_TIME));
 			this.schedule.getMinimalTransferTimes().set(fromStop, toStop, transferTime);
 		} else if (Constants.ATTRIBUTE.equals(name)) {

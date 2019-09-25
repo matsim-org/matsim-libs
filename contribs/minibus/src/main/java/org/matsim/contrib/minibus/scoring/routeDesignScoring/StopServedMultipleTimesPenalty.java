@@ -68,10 +68,10 @@ class StopServedMultipleTimesPenalty implements RouteDesignScoringFunction {
 			new RuntimeException();
 		}
 
-		Set<Id<TransitStopFacility>> stopIdServed = new HashSet<>();
+		Set<Id<org.matsim.facilities.Facility>> stopIdServed = new HashSet<>();
 
 		for (int i = 0; i < stopListToEvaluate.size(); i++) {
-			Id<TransitStopFacility> currentStop = stopListToEvaluate.get(i).getId();
+			Id<org.matsim.facilities.Facility> currentStop = stopListToEvaluate.get(i).getId();
 			if (! stopIdServed.contains(currentStop)) {
 				stopIdServed.add(currentStop);
 			}

@@ -53,6 +53,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
+import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -165,7 +166,7 @@ CadytsContextI<TransitStopFacility> {
 		int it = event.getIteration();
 
 		// Get all stations of all analyzed lines and invoke the method write to get all information of them
-		Set<Id<TransitStopFacility>> stopIds = new HashSet<>();
+		Set<Id<Facility>> stopIds = new HashSet<>();
 		for ( String pseudoLineId : this.cadytsConfig.getCalibratedItems()) {
 			Id<TransitLine> lineId = Id.create(pseudoLineId, TransitLine.class);
 			TransitLine line = scenario.getTransitSchedule().getTransitLines().get(lineId);

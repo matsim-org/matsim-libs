@@ -31,8 +31,8 @@ public class StopId2RouteId2DelayAtStopMapTest {
 	    Id<TransitRoute> transitRouteId2 = Id.create(2, TransitRoute.class);
 	    Id<TransitLine> transitLineId1 = Id.create(4, TransitLine.class);
 	    Id<TransitLine> transitLineId2 = Id.create(6, TransitLine.class);
-	    Id<TransitStopFacility> facilityId1 = Id.create(8, TransitStopFacility.class);
-	    Id<TransitStopFacility> facilityId2 = Id.create(9, TransitStopFacility.class);
+	    Id<org.matsim.facilities.Facility> facilityId1 = Id.create(8, org.matsim.facilities.Facility.class);
+	    Id<org.matsim.facilities.Facility> facilityId2 = Id.create(9, org.matsim.facilities.Facility.class);
 	    
 //	    create events
 	    

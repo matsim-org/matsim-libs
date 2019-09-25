@@ -123,7 +123,7 @@ class PlanSerializable implements Serializable {
         public Activity getActivity() {
             Activity activity = PopulationUtils.createActivityFromCoordAndLinkId(type, coord.getCoord(), linkIdString == null ? null : Id.createLinkId(linkIdString));
             activity.setEndTime(endTime);
-            activity.setFacilityId(facIdString == null ? null : Id.create(facIdString, ActivityFacility.class));
+            activity.setFacilityId(facIdString == null ? null : Id.create(facIdString, org.matsim.facilities.Facility.class));
             activity.setMaximumDuration(maximumDuration);
             activity.setStartTime(startTime);
             return activity;

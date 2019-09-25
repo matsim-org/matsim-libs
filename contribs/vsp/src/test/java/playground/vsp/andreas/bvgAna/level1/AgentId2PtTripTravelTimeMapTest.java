@@ -47,8 +47,8 @@ public class AgentId2PtTripTravelTimeMapTest {
 	        Id<Link> linkId2 = Id.create(2, Link.class);
 	        Id<Link> linkId3 = Id.create(3, Link.class);
 	        Id<Person> agentId1 = Id.create(4, Person.class);
-	        Id<ActivityFacility> facilId1 = Id.create(5, ActivityFacility.class);
-	        Id<ActivityFacility> facilId2 = Id.create(6, ActivityFacility.class);        
+	        Id<org.matsim.facilities.Facility> facilId1 = Id.create(5, org.matsim.facilities.Facility.class);
+	        Id<org.matsim.facilities.Facility> facilId2 = Id.create(6, org.matsim.facilities.Facility.class);
 
 	        
 	        AgentId2PtTripTravelTimeMap test = new AgentId2PtTripTravelTimeMap(idSet);

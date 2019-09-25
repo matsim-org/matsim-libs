@@ -63,7 +63,7 @@ public class TransitLineRemover {
 //		}
 		
 		
-		Set<Id<TransitStopFacility>> stopsInArea = TransitLineRemover.getStopIdsWithinArea(baseCaseTransitSchedule, minCoord, maxCoord);
+		Set<Id<org.matsim.facilities.Facility>> stopsInArea = TransitLineRemover.getStopIdsWithinArea(baseCaseTransitSchedule, minCoord, maxCoord);
 		Set<Id<TransitLine>> linesToRemove = TransitLineRemover.getLinesServingTheseStops(baseCaseTransitSchedule, stopsInArea);
 		
 		TransitSchedule noTxlTransitSchedule = TransitLineRemover.removeTransitLinesFromTransitSchedule(baseCaseTransitSchedule, linesToRemove);
@@ -95,7 +95,7 @@ public class TransitLineRemover {
 		new TransitScheduleWriterV1(onlyBvgBusLinesSchedule).write(ONLY_BVG_BUSES);
 	}
 	
-	public static Set<Id<TransitLine>> getLinesServingTheseStops(TransitSchedule transitSchedule, Set<Id<TransitStopFacility>> stopIds){
+	public static Set<Id<TransitLine>> getLinesServingTheseStops(TransitSchedule transitSchedule, Set<Id<org.matsim.facilities.Facility>> stopIds){
 		log.info("Searching for lines serving one of the following stops:" + stopIds);
 		Set<Id<TransitLine>> linesServingOneOfThoseStops = new TreeSet<>();
 		
@@ -113,10 +113,10 @@ public class TransitLineRemover {
 		return linesServingOneOfThoseStops;
 	}
 	
-	public static Set<Id<TransitStopFacility>> getStopIdsWithinArea(TransitSchedule transitSchedule, Coord minCoord, Coord maxCoord){
+	public static Set<Id<org.matsim.facilities.Facility>> getStopIdsWithinArea(TransitSchedule transitSchedule, Coord minCoord, Coord maxCoord){
 		log.info("Searching for stops within the area of " + minCoord.toString() + " - " + maxCoord.toString());
 
-		Set<Id<TransitStopFacility>> stopsInArea = new TreeSet<>();
+		Set<Id<org.matsim.facilities.Facility>> stopsInArea = new TreeSet<>();
 		
 		for (TransitStopFacility stop : transitSchedule.getFacilities().values()) {
 			if (minCoord.getX() < stop.getCoord().getX() && maxCoord.getX() > stop.getCoord().getX()) {

@@ -81,8 +81,8 @@ public class TransitAgentTest extends TestCase {
 		person.addPlan(plan);
 		Activity homeAct = pb.createActivityFromLinkId("home", Id.create("1", Link.class));
 		Leg leg = pb.createLeg(TransportMode.pt);
-		TransitStopFacility stopFacility1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 100, (double) 100), false);
-		TransitStopFacility stopFacility2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord((double) 900, (double) 100), false);
+		TransitStopFacility stopFacility1 = builder.createTransitStopFacility(Id.create("1", org.matsim.facilities.Facility.class), new Coord((double) 100, (double) 100), false);
+		TransitStopFacility stopFacility2 = builder.createTransitStopFacility(Id.create("2", org.matsim.facilities.Facility.class), new Coord((double) 900, (double) 100), false);
 		TransitRouteStop stop1 = builder.createTransitRouteStop(stopFacility1, 50, 60);
 		TransitRouteStop stop2 = builder.createTransitRouteStop(stopFacility2, 100, 110);
 		TransitLine line1 = builder.createTransitLine(Id.create("L1", TransitLine.class));
@@ -132,9 +132,9 @@ public class TransitAgentTest extends TestCase {
 		person.addPlan(plan);
 		Activity homeAct = pb.createActivityFromLinkId("home", Id.create("1", Link.class));
 		Leg leg = pb.createLeg(TransportMode.pt);
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 100, (double) 100), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord((double) 900, (double) 100), false);
-		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord((double) 1900, (double) 100), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", org.matsim.facilities.Facility.class), new Coord((double) 100, (double) 100), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", org.matsim.facilities.Facility.class), new Coord((double) 900, (double) 100), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", org.matsim.facilities.Facility.class), new Coord((double) 1900, (double) 100), false);
 		TransitLine line1 = builder.createTransitLine(Id.create("L1", TransitLine.class));
 		leg.setRoute(new ExperimentalTransitRoute(stop1, line1, null, stop2));
 		Activity workAct = pb.createActivityFromLinkId("work", Id.create("2", Link.class));

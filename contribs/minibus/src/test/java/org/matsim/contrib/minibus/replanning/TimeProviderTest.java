@@ -91,7 +91,7 @@ public class TimeProviderTest {
 		
 		Id<Person> agentId = Id.create("id", Person.class);
 		Id<Link> linkId = Id.create("id", Link.class);
-		Id<ActivityFacility> facilityId = Id.create("id", ActivityFacility.class);
+		Id<org.matsim.facilities.Facility> facilityId = Id.create("id", org.matsim.facilities.Facility.class);
 		for (int i = 0; i < 100; i++) {
 			tP.handleEvent(new ActivityEndEvent(500.0 * i, agentId, linkId, facilityId, "type"));
 		}

@@ -171,12 +171,12 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 	}
 
 	@Override
-	public Id<TransitStopFacility> getDesiredAccessStopId() {
+	public Id<org.matsim.facilities.Facility> getDesiredAccessStopId() {
 		return null;
 	}
 
 	@Override
-	public Id<TransitStopFacility> getDesiredDestinationStopId() {
+	public Id<org.matsim.facilities.Facility> getDesiredDestinationStopId() {
 		return null;
 	}
 

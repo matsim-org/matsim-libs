@@ -58,7 +58,7 @@ public class FacilitiesUtils {
 	/**
 	 * @return sorted map containing containing the facilities as values and their ids as keys.
 	 */
-	public static SortedMap<Id<ActivityFacility>, ActivityFacility> getSortedFacilities(final ActivityFacilities facilities) {
+	public static SortedMap<Id<org.matsim.facilities.Facility>, ActivityFacility> getSortedFacilities(final ActivityFacilities facilities) {
 		return new TreeMap<>(facilities.getFacilities());
 	}
 	

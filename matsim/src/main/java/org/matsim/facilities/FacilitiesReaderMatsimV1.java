@@ -145,7 +145,7 @@ final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
             if (atts.getValue("linkId") !=null) { //both coord and link present
                 this.currfacility =
                         this.factory.createActivityFacility(
-                                Id.create(atts.getValue("id"), ActivityFacility.class),
+                                Id.create(atts.getValue("id"), org.matsim.facilities.Facility.class),
                                 coordinateTransformation.transform(
                                         new Coord(
                                                 Double.parseDouble(atts.getValue("x")),
@@ -154,7 +154,7 @@ final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
             } else { // only coord present
                 this.currfacility =
                         this.factory.createActivityFacility(
-                                Id.create(atts.getValue("id"), ActivityFacility.class),
+                                Id.create(atts.getValue("id"), org.matsim.facilities.Facility.class),
                                 coordinateTransformation.transform(
                                         new Coord(
                                                 Double.parseDouble(atts.getValue("x")),
@@ -164,7 +164,7 @@ final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
             if (atts.getValue("linkId") !=null) { //only link present
             this.currfacility =
                     this.factory.createActivityFacility(
-                            Id.create(atts.getValue("id"), ActivityFacility.class),
+                            Id.create(atts.getValue("id"), org.matsim.facilities.Facility.class),
                             Id.create(atts.getValue("linkId"),Link.class));
             } else { //neither coord nor link present
                 throw new RuntimeException("Neither coordinate nor linkId are available for facility id "+ atts.getValue("id")+". Aborting....");

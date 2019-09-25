@@ -43,5 +43,8 @@ public final class FakeFacility implements Facility {
 	public Id getLinkId() {
 		throw new RuntimeException("not implemented") ;
 	}
-	
+
+	@Override public Id<Facility> getId(){
+		throw new RuntimeException( "not implemented" );
+	}
 }

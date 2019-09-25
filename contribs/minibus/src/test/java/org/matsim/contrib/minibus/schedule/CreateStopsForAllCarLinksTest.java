@@ -65,7 +65,7 @@ public class CreateStopsForAllCarLinksTest {
 		TransitScheduleFactoryImpl tSF = new TransitScheduleFactoryImpl();
 		
 		TransitSchedule realTransitSchedule = tSF.createTransitSchedule();
-		TransitStopFacility stop1 = tSF.createTransitStopFacility(Id.create("1314", TransitStopFacility.class), new Coord(0.0, 0.0), false);
+		TransitStopFacility stop1 = tSF.createTransitStopFacility(Id.create("1314", org.matsim.facilities.Facility.class), new Coord(0.0, 0.0), false);
 		stop1.setLinkId(Id.create("1314", Link.class));
 		realTransitSchedule.addStopFacility(stop1);
 		

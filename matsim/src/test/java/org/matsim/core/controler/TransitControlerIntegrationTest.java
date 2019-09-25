@@ -75,8 +75,8 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleFactory sBuilder = schedule.getFactory();
 
-		TransitStopFacility stopF1 = sBuilder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord(1000.0, (double) 0), false);
-		TransitStopFacility stopF2 = sBuilder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord(2000.0, (double) 0), false);
+		TransitStopFacility stopF1 = sBuilder.createTransitStopFacility(Id.create("1", org.matsim.facilities.Facility.class), new Coord(1000.0, (double) 0), false);
+		TransitStopFacility stopF2 = sBuilder.createTransitStopFacility(Id.create("2", org.matsim.facilities.Facility.class), new Coord(2000.0, (double) 0), false);
 		stopF1.setLinkId(link1.getId());
 		stopF2.setLinkId(link2.getId());
 		schedule.addStopFacility(stopF1);

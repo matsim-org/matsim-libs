@@ -103,7 +103,7 @@ class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 	private static final class DummyActivity implements Activity {
 
 		private String type = null;
-		private Id<ActivityFacility> facilityId = null;
+		private Id<org.matsim.facilities.Facility> facilityId = null;
 		private final Id<Link> linkId;
 		
 		public DummyActivity(Id<Link> linkId) { this.linkId = linkId; }
@@ -139,9 +139,9 @@ class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 		public Id<Link> getLinkId() { return this.linkId; }
 
 		@Override
-		public Id<ActivityFacility> getFacilityId() { return this.facilityId; }
+		public Id<org.matsim.facilities.Facility> getFacilityId() { return this.facilityId; }
 		
-		public void setFacilityId(Id<ActivityFacility> facilityId) { this.facilityId = facilityId; }
+		public void setFacilityId(Id<org.matsim.facilities.Facility> facilityId) { this.facilityId = facilityId; }
 
 		@Override
 		public void setLinkId(Id<Link> id) {

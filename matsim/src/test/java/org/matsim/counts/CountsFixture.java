@@ -65,7 +65,7 @@ public class CountsFixture {
 		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
 		
 			@Override
-			public double[] getVolumesForStop(Id<TransitStopFacility> locationId) {
+			public double[] getVolumesForStop(Id<org.matsim.facilities.Facility> locationId) {
 				return linkStats.getAvgLinkVolumes(Id.create(locationId, Link.class));
 			}
 		

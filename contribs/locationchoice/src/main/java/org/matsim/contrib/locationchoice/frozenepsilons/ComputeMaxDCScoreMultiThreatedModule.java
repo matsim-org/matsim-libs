@@ -46,7 +46,7 @@ class ComputeMaxDCScoreMultiThreatedModule extends AbstractMultithreadedModule {
 		 * Get ActivityFacilies for type and then replace them with ActivityFacilityWithIndex
 		 * objects due to performance reasons.
 		 */
-		Map<Id<ActivityFacility>, ActivityFacility> map = lcContext.getScenario().getActivityFacilities().getFacilitiesForActivityType( type );
+		Map<Id<org.matsim.facilities.Facility>, ActivityFacility> map = lcContext.getScenario().getActivityFacilities().getFacilitiesForActivityType( type );
 		this.typedFacilities = new ActivityFacilityWithIndex[map.size()];
 		int i = 0;
 		for (ActivityFacility activityFacility : map.values()) {

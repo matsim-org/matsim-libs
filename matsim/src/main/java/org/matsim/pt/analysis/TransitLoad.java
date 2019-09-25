@@ -54,7 +54,7 @@ public class TransitLoad implements TransitDriverStartsEventHandler, VehicleArri
 
 	private final Map<Id<TransitLine>, LineData> lineData = new HashMap<>();
 
-	private final Map<Id<Vehicle>, Id<TransitStopFacility>> vehicleFacilityMap = new HashMap<>();
+	private final Map<Id<Vehicle>, Id<org.matsim.facilities.Facility>> vehicleFacilityMap = new HashMap<>();
 	private final Map<Id<Vehicle>, VehicleData> vehicleData = new HashMap<>();
 
 	public TransitLoad() {
@@ -87,7 +87,7 @@ public class TransitLoad implements TransitDriverStartsEventHandler, VehicleArri
 		 * route.getStops() to differentiate multiple servings of the same
 		 * TransitStopFacility. Count from 0, so count equals index in list
 		 */
-		Map<Id<TransitStopFacility>, Integer> stop2nrVisited = new HashMap<>();
+		Map<Id<org.matsim.facilities.Facility>, Integer> stop2nrVisited = new HashMap<>();
 		for (int i = 0; i < route.getStops().size(); i++) {
 			TransitRouteStop stop = route.getStops().get(i);
 			Integer nrVisited = stop2nrVisited.get(stop.getStopFacility().getId());
@@ -137,7 +137,7 @@ public class TransitLoad implements TransitDriverStartsEventHandler, VehicleArri
 
 	@Override
 	public void handleEvent(final VehicleDepartsAtFacilityEvent event) {
-		Id<TransitStopFacility> stopId = this.vehicleFacilityMap.remove(event.getVehicleId());
+		Id<org.matsim.facilities.Facility> stopId = this.vehicleFacilityMap.remove(event.getVehicleId());
 		VehicleData vData = this.vehicleData.get(event.getVehicleId());
 		if (vData != null) {
 			List<StopInformation> siList = getStopInformation(vData.lineId, vData.routeId, stopId, vData.departureId, true);
@@ -181,7 +181,7 @@ public class TransitLoad implements TransitDriverStartsEventHandler, VehicleArri
 		this.vehicleData.clear();
 	}
 
-	private List<StopInformation> getStopInformation(final Id<TransitLine> lineId, final Id<TransitRoute> routeId, final Id<TransitStopFacility> stopFacilityId, final Id<Departure> departureId, final boolean createIfMissing) {
+	private List<StopInformation> getStopInformation(final Id<TransitLine> lineId, final Id<TransitRoute> routeId, final Id<org.matsim.facilities.Facility> stopFacilityId, final Id<Departure> departureId, final boolean createIfMissing) {
 		LineData ld = this.lineData.get(lineId);
 		if (ld == null) {
 			if (createIfMissing) {
@@ -245,7 +245,7 @@ public class TransitLoad implements TransitDriverStartsEventHandler, VehicleArri
 	}
 
 	/*package*/ static class RouteData {
-		public final Map<Id<TransitStopFacility>, StopData> stopData = new HashMap<>(); // use stopFacilityId as key
+		public final Map<Id<org.matsim.facilities.Facility>, StopData> stopData = new HashMap<>(); // use stopFacilityId as key
 	}
 
 	/*package*/ static class StopData {

@@ -167,17 +167,17 @@ public class ActivityFacilitiesSourceTest {
 			ActivityFacilities facilities = scenario.getActivityFacilities();
 			ActivityFacilitiesFactory factory = facilities.getFactory();
 			if (facilitiesWithCoordOnly) {
-				facilities.addActivityFacility(factory.createActivityFacility(Id.create("1", ActivityFacility.class),
+				facilities.addActivityFacility(factory.createActivityFacility(Id.create("1", org.matsim.facilities.Facility.class),
 						new Coord(-25000.0, 0.),
 						null));
-				facilities.addActivityFacility(factory.createActivityFacility(Id.create("2", ActivityFacility.class),
+				facilities.addActivityFacility(factory.createActivityFacility(Id.create("2", org.matsim.facilities.Facility.class),
 						new Coord(10000.0, 0.0),
 						null));
 			} else {
-				facilities.addActivityFacility(factory.createActivityFacility(Id.create("1", ActivityFacility.class),
+				facilities.addActivityFacility(factory.createActivityFacility(Id.create("1", org.matsim.facilities.Facility.class),
 						null,
 						Id.createLinkId("1")));
-				facilities.addActivityFacility(factory.createActivityFacility(Id.create("2", ActivityFacility.class),
+				facilities.addActivityFacility(factory.createActivityFacility(Id.create("2", org.matsim.facilities.Facility.class),
 						null,
 						Id.createLinkId("20")));
 			}
@@ -192,20 +192,20 @@ public class ActivityFacilitiesSourceTest {
 			Activity home = populationFactory.createActivityFromCoord("h", new Coord(-25000.0, 0.0));
 			home.setEndTime(7 * 3600.0);
 			if (assignFacilityIdToActivity(facilitiesSource)) {
-				home.setFacilityId(Id.create("1", ActivityFacility.class));
+				home.setFacilityId(Id.create("1", org.matsim.facilities.Facility.class));
 			}
 			plan.addActivity(home);
 			plan.addLeg(populationFactory.createLeg( mode ) );
 			Activity work = populationFactory.createActivityFromCoord("w", new Coord(10000.0, 0.0));
 			work.setEndTime(16 * 3600.0);
 			if (assignFacilityIdToActivity(facilitiesSource)) {
-				work.setFacilityId(Id.create("2", ActivityFacility.class));
+				work.setFacilityId(Id.create("2", org.matsim.facilities.Facility.class));
 			}
 			plan.addActivity(work);
 			plan.addLeg(populationFactory.createLeg( mode ) );
 			Activity lastAct = populationFactory.createActivityFromCoord("h", new Coord(-25000.0, 0.0));
 			if (assignFacilityIdToActivity(facilitiesSource)) {
-				lastAct.setFacilityId(Id.create("1", ActivityFacility.class));
+				lastAct.setFacilityId(Id.create("1", org.matsim.facilities.Facility.class));
 			}
 			plan.addActivity(lastAct);
 			person.addPlan(plan);
@@ -219,20 +219,20 @@ public class ActivityFacilitiesSourceTest {
 			Activity home = populationFactory.createActivityFromLinkId("h", Id.createLinkId("1"));
 			home.setEndTime(8 * 3600.0);
 			if (assignFacilityIdToActivity(facilitiesSource)) {
-				home.setFacilityId(Id.create("1", ActivityFacility.class));
+				home.setFacilityId(Id.create("1", org.matsim.facilities.Facility.class));
 			}
 			plan.addActivity(home);
 			plan.addLeg(populationFactory.createLeg( mode ) );
 			Activity work = populationFactory.createActivityFromLinkId("w", Id.createLinkId("20"));
 			if (assignFacilityIdToActivity(facilitiesSource)) {
-				work.setFacilityId(Id.create("2", ActivityFacility.class));
+				work.setFacilityId(Id.create("2", org.matsim.facilities.Facility.class));
 			}
 			work.setEndTime(17.5 * 3600.0);
 			plan.addActivity(work);
 			plan.addLeg(populationFactory.createLeg( mode ) );
 			Activity lastAct = populationFactory.createActivityFromLinkId("h", Id.createLinkId("1"));
 			if (assignFacilityIdToActivity(facilitiesSource)) {
-				lastAct.setFacilityId(Id.create("1", ActivityFacility.class));
+				lastAct.setFacilityId(Id.create("1", org.matsim.facilities.Facility.class));
 			}
 			plan.addActivity(lastAct);
 			person.addPlan(plan);
@@ -243,7 +243,7 @@ public class ActivityFacilitiesSourceTest {
 			Plan plan = populationFactory.createPlan();
 			Activity home = populationFactory.createActivityFromCoord("h", new Coord(-25000.0, 0.0));
 			if (assignFacilityIdToActivity(facilitiesSource)) {
-				home.setFacilityId(Id.create("1", ActivityFacility.class));
+				home.setFacilityId(Id.create("1", org.matsim.facilities.Facility.class));
 			}
 			home.setEndTime(7.8 * 3600.0);
 			plan.addActivity(home);
@@ -255,14 +255,14 @@ public class ActivityFacilitiesSourceTest {
 			}
 
 			if (assignFacilityIdToActivity(facilitiesSource)) {
-				work.setFacilityId(Id.create("2", ActivityFacility.class));
+				work.setFacilityId(Id.create("2", org.matsim.facilities.Facility.class));
 			}
 			work.setEndTime(18 * 3600.0);
 			plan.addActivity(work);
 			plan.addLeg(populationFactory.createLeg( mode ) );
 			Activity lastAct = populationFactory.createActivityFromCoord("h", new Coord(-25000.0, 0.0));
 			if (assignFacilityIdToActivity(facilitiesSource)) {
-				lastAct.setFacilityId(Id.create("1", ActivityFacility.class));
+				lastAct.setFacilityId(Id.create("1", org.matsim.facilities.Facility.class));
 			}
 			plan.addActivity(lastAct);
 			person.addPlan(plan);
@@ -273,7 +273,7 @@ public class ActivityFacilitiesSourceTest {
 			Plan plan = populationFactory.createPlan();
 			Activity home = populationFactory.createActivityFromCoord("h", new Coord(-25000.0, 0.0));
 			if (assignFacilityIdToActivity(facilitiesSource)) {
-				home.setFacilityId(Id.create("1", ActivityFacility.class));
+				home.setFacilityId(Id.create("1", org.matsim.facilities.Facility.class));
 			}
 			home.setEndTime(9 * 3600.0);
 			home.setLinkId(Id.createLinkId("1"));
@@ -281,7 +281,7 @@ public class ActivityFacilitiesSourceTest {
 			plan.addLeg(populationFactory.createLeg( mode ) );
 			Activity work = populationFactory.createActivityFromCoord("w", new Coord(10000.0, 0.0));
 			if (assignFacilityIdToActivity(facilitiesSource)) {
-				work.setFacilityId(Id.create("2", ActivityFacility.class));
+				work.setFacilityId(Id.create("2", org.matsim.facilities.Facility.class));
 			}
 			work.setEndTime(18.5 * 3600.0);
 			work.setLinkId(Id.createLinkId("20"));
@@ -289,7 +289,7 @@ public class ActivityFacilitiesSourceTest {
 			plan.addLeg(populationFactory.createLeg( mode ) );
 			Activity lastAct = populationFactory.createActivityFromCoord("h", new Coord(-25000.0, 0.0));
 			if (assignFacilityIdToActivity(facilitiesSource)) {
-				lastAct.setFacilityId(Id.create("1", ActivityFacility.class));
+				lastAct.setFacilityId(Id.create("1", org.matsim.facilities.Facility.class));
 			}
 			plan.addActivity(lastAct);
 			person.addPlan(plan);

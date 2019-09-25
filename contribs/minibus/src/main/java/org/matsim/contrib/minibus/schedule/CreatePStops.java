@@ -106,7 +106,7 @@ public final class CreatePStops{
 		
 		this.linkId2StopFacilityMap = new LinkedHashMap<>();
 		
-		Set<Id<TransitStopFacility>> stopsWithoutLinkIds = new TreeSet<>();
+		Set<Id<org.matsim.facilities.Facility>> stopsWithoutLinkIds = new TreeSet<>();
 
 		int warnCounter = 10;
 		
@@ -301,7 +301,7 @@ public final class CreatePStops{
 			return 0;
 		}
 		
-		Id<TransitStopFacility> stopId = Id.create(this.pConfigGroup.getPIdentifier() + link.getId(), TransitStopFacility.class);
+		Id<org.matsim.facilities.Facility> stopId = Id.create(this.pConfigGroup.getPIdentifier() + link.getId(), org.matsim.facilities.Facility.class);
 		TransitStopFacility stop = this.transitSchedule.getFactory().createTransitStopFacility(stopId, link.getToNode().getCoord(), false);
 		stop.setLinkId(link.getId());
 		this.transitSchedule.addStopFacility(stop);

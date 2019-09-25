@@ -113,7 +113,7 @@ public class ZoneParkingManager extends FacilityBasedParkingManager {
 			return true;
 			// we assume the person parks somewhere else
 		} else {
-			Id<ActivityFacility> fac = this.parkingLocations.remove(vehicleId);
+			Id<org.matsim.facilities.Facility> fac = this.parkingLocations.remove(vehicleId);
 			this.occupation.get(fac).decrement();
 	
 			Id<Link> parkingLink = this.parkingFacilities.get(fac).getLinkId();

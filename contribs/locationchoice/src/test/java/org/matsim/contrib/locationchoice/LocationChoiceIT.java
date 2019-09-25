@@ -84,11 +84,11 @@ public class LocationChoiceIT extends MatsimTestCase {
 		final Node fromNode = node1;
 		final Node toNode = node2;
 		Link link = NetworkUtils.createAndAddLink(network,Id.create(1, Link.class), fromNode, toNode, (double) 1000, (double) 10, (double) 3600, (double) 1 );
-		ActivityFacility facility1 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(Id.create(1, ActivityFacility.class), new Coord((double) 0, (double) 500));
+		ActivityFacility facility1 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(Id.create(1, org.matsim.facilities.Facility.class), new Coord((double) 0, (double) 500));
 		facility1.addActivityOption(new ActivityOptionImpl("initial-work"));
-		ActivityFacility facility2 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(Id.create(2, ActivityFacility.class), new Coord((double) 0, (double) 400));
+		ActivityFacility facility2 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(Id.create(2, org.matsim.facilities.Facility.class), new Coord((double) 0, (double) 400));
 		facility2.addActivityOption(new ActivityOptionImpl("work"));
-		ActivityFacility facility3 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(Id.create(3, ActivityFacility.class), new Coord((double) 0, (double) 300));
+		ActivityFacility facility3 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(Id.create(3, org.matsim.facilities.Facility.class), new Coord((double) 0, (double) 300));
 		facility3.addActivityOption(new ActivityOptionImpl("work"));
 
 		Person person = localCreatePopWOnePerson(scenario, facility1, 17.*60.*60. );
@@ -130,7 +130,7 @@ public class LocationChoiceIT extends MatsimTestCase {
 		}
 		assertNotNull( newWork ) ;
 		assertNotNull( newWork.getFacilityId() ) ;
-		assertTrue(newWork.getFacilityId().equals(Id.create(2, ActivityFacility.class)) || newWork.getFacilityId().equals(Id.create(3, ActivityFacility.class)));
+		assertTrue(newWork.getFacilityId().equals(Id.create(2, org.matsim.facilities.Facility.class)) || newWork.getFacilityId().equals(Id.create(3, org.matsim.facilities.Facility.class)));
 	}
 
 	/**

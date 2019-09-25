@@ -8,6 +8,6 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public interface VehicleOccupancy {
 
 	//Methods
-	public double getVehicleOccupancy(Id<TransitStopFacility> stopOId, Id<TransitLine> lineId, Id<TransitRoute> routeId, double time);
+	public double getVehicleOccupancy(Id<org.matsim.facilities.Facility> stopOId, Id<TransitLine> lineId, Id<TransitRoute> routeId, double time);
 		
 }

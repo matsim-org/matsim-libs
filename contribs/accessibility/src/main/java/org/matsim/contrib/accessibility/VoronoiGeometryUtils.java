@@ -50,12 +50,12 @@ public class VoronoiGeometryUtils {
 	
 	private static GeometryFactory geometryFactory = new GeometryFactory();
 	
-	public static Map<Id<ActivityFacility>, Geometry> buildMeasurePointGeometryMap(ActivityFacilities measuringPoints, BoundingBox boundingBox, int tileSize_m) {
+	public static Map<Id<org.matsim.facilities.Facility>, Geometry> buildMeasurePointGeometryMap(ActivityFacilities measuringPoints, BoundingBox boundingBox, int tileSize_m) {
 		LOG.warn("Started building measure-point-to-geometry map.");
 		if (boundingBox == null) {
 			throw new IllegalArgumentException("Bounding box must be specified.");
 		}
-		Map<Id<ActivityFacility>, Geometry> measurePointPolygons = new HashMap<>();
+		Map<Id<org.matsim.facilities.Facility>, Geometry> measurePointPolygons = new HashMap<>();
 		
 		Collection<Geometry> geometries = determineVoronoiShapes(measuringPoints, boundingBox);
 		
@@ -64,7 +64,7 @@ public class VoronoiGeometryUtils {
 		}
 		
 		for (ActivityFacility measurePoint : measuringPoints.getFacilities().values()) {
-			Id<ActivityFacility> measurePointId = measurePoint.getId();
+			Id<org.matsim.facilities.Facility> measurePointId = measurePoint.getId();
 			Coord coord = measurePoint.getCoord();
 			
 			boolean polygonFound = false;
@@ -82,16 +82,16 @@ public class VoronoiGeometryUtils {
 				throw new RuntimeException("No polygon found for measure point " + measurePointId + " with coord = " + coord + ".");
 			}
 		}		
-		Map<Id<ActivityFacility>, Geometry> revisedMeasurePointPolygons = reduceEdgePolygons(measuringPoints, tileSize_m, measurePointPolygons);
+		Map<Id<org.matsim.facilities.Facility>, Geometry> revisedMeasurePointPolygons = reduceEdgePolygons(measuringPoints, tileSize_m, measurePointPolygons);
 		
 		LOG.warn("Finished building measure-point-to-geometry map.");
 		return revisedMeasurePointPolygons;
 	}
 
-	private static Map<Id<ActivityFacility>, Geometry> reduceEdgePolygons(ActivityFacilities measuringPoints,
-			int tileSize_m, Map<Id<ActivityFacility>, Geometry> measurePointPolygons) {
-		Map<Id<ActivityFacility>, Geometry> measurePointPolygons2 = new HashMap<>();
-		for (Id<ActivityFacility> measurePointId : measurePointPolygons.keySet()) {
+	private static Map<Id<org.matsim.facilities.Facility>, Geometry> reduceEdgePolygons(ActivityFacilities measuringPoints,
+			int tileSize_m, Map<Id<org.matsim.facilities.Facility>, Geometry> measurePointPolygons) {
+		Map<Id<org.matsim.facilities.Facility>, Geometry> measurePointPolygons2 = new HashMap<>();
+		for (Id<org.matsim.facilities.Facility> measurePointId : measurePointPolygons.keySet()) {
 			Coord measuringPointsCoord = measuringPoints.getFacilities().get(measurePointId).getCoord();
 			Polygon polygon = (Polygon) measurePointPolygons.get(measurePointId);
 

@@ -53,7 +53,7 @@ public interface PopulationFactory extends MatsimFactory {
 	 */
 	Activity createActivityFromLinkId(String actType, Id<Link> linkId);
 
-	Activity createActivityFromActivityFacilityId( String actType, Id<ActivityFacility> activityFacilityId ) ;
+	Activity createActivityFromActivityFacilityId( String actType, Id<org.matsim.facilities.Facility> activityFacilityId ) ;
 
 	Leg createLeg(String legMode);
 

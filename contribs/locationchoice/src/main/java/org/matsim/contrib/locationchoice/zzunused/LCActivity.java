@@ -101,11 +101,11 @@ class LCActivity implements Activity, LCPlanElement {
 	}
 	
 	@Override
-	public final Id<ActivityFacility> getFacilityId() {
+	public final Id<org.matsim.facilities.Facility> getFacilityId() {
 		return this.plan.facilityIds[this.arrayIndex];
 	}
 	
-	public final void setFacilityId(Id<ActivityFacility> facilityId) {
+	public final void setFacilityId(Id<org.matsim.facilities.Facility> facilityId) {
 		this.plan.facilityIds[this.arrayIndex] = facilityId;
 	}
 

@@ -114,9 +114,9 @@ public final class LogReader implements TabularFileHandler {
 					String stops = row[12];
 					stops = stops.substring(1, stops.length() - 1); // remove brackets
 					String[] stopArray = stops.split(","); // split the array
-					ArrayList<Id<TransitStopFacility>> stopIds = new ArrayList<Id<TransitStopFacility>>();
+					ArrayList<Id<org.matsim.facilities.Facility>> stopIds = new ArrayList<Id<org.matsim.facilities.Facility>>();
 					for (String stop : stopArray) {
-						stopIds.add(Id.create(stop.trim(), TransitStopFacility.class));
+						stopIds.add(Id.create(stop.trim(), org.matsim.facilities.Facility.class));
 					}
 					logElement.setStopsToBeServed(stopIds);
 					

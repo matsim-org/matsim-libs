@@ -43,7 +43,7 @@ public class Event2ProtoEventTest {
 	public final void testEvent2ProtoEventActivityEndEvent() {
 
 		ActivityEndEvent e = new ActivityEndEvent(42.0, Id.createPersonId("Alice"),
-				Id.createLinkId("link123"), Id.create(55, ActivityFacility.class), "sleep");
+				Id.createLinkId("link123"), Id.create(55, org.matsim.facilities.Facility.class), "sleep");
 		ProtobufEvents.Event pbe = Event2ProtoEvent.getProtoEvent(e);
 		Assert.assertTrue(pbe.getType() == ProtobufEvents.Event.Type.ActivityEnd);
 		Assert.assertTrue(pbe.hasActStart() == false);
@@ -72,7 +72,7 @@ public class Event2ProtoEventTest {
 	public final void testEvent2ProtoEventActivityStartEvent() {
 
 		ActivityStartEvent e = new ActivityStartEvent(42.0, Id.createPersonId("Bob"),
-				Id.createLinkId("link123"), Id.create(55, ActivityFacility.class), "sleep");
+				Id.createLinkId("link123"), Id.create(55, org.matsim.facilities.Facility.class), "sleep");
 		ProtobufEvents.Event pbe = Event2ProtoEvent.getProtoEvent(e);
 		Assert.assertTrue(pbe.getType() == ProtobufEvents.Event.Type.ActivityStart);
 		Assert.assertTrue(pbe.hasActStart() == true);

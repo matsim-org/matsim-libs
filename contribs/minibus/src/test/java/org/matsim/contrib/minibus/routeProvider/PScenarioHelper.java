@@ -269,10 +269,10 @@ public class PScenarioHelper {
 		
 		TransitScheduleFactory sf = schedule.getFactory();
 
-		TransitStopFacility s1 = sf.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 1000, (double) 1000), false);
-		TransitStopFacility s2a = sf.createTransitStopFacility(Id.create("2a", TransitStopFacility.class), new Coord((double) 2050, (double) 2950), false);
-		TransitStopFacility s2b = sf.createTransitStopFacility(Id.create("2b", TransitStopFacility.class), new Coord((double) 2050, (double) 2950), false);
-		TransitStopFacility s3 = sf.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord((double) 3950, (double) 1050), false);
+		TransitStopFacility s1 = sf.createTransitStopFacility(Id.create("1", org.matsim.facilities.Facility.class), new Coord((double) 1000, (double) 1000), false);
+		TransitStopFacility s2a = sf.createTransitStopFacility(Id.create("2a", org.matsim.facilities.Facility.class), new Coord((double) 2050, (double) 2950), false);
+		TransitStopFacility s2b = sf.createTransitStopFacility(Id.create("2b", org.matsim.facilities.Facility.class), new Coord((double) 2050, (double) 2950), false);
+		TransitStopFacility s3 = sf.createTransitStopFacility(Id.create("3", org.matsim.facilities.Facility.class), new Coord((double) 3950, (double) 1050), false);
 				
 		s1.setLinkId(Id.create("11", Link.class));
 		s2a.setLinkId(Id.create("12", Link.class));
@@ -426,8 +426,8 @@ class Route2111to2333 implements PStrategy{
 		newPlan.setNVehicles(1);
 		newPlan.setStartTime(8.0 * 3600.0);
 		newPlan.setEndTime(16.0 * 3600.0);
-		TransitStopFacility startStop = sched.getFacilities().get(Id.create(pId + "2111", TransitStopFacility.class));
-		TransitStopFacility endStop = sched.getFacilities().get(Id.create(pId + "2333", TransitStopFacility.class));
+		TransitStopFacility startStop = sched.getFacilities().get(Id.create(pId + "2111", org.matsim.facilities.Facility.class));
+		TransitStopFacility endStop = sched.getFacilities().get(Id.create(pId + "2333", org.matsim.facilities.Facility.class));
 		ArrayList<TransitStopFacility> stops = new ArrayList<>();
 		stops.add(startStop);
 		stops.add(endStop);
@@ -460,8 +460,8 @@ class Route2333to2111 implements PStrategy{
 		newPlan.setNVehicles(1);
 		newPlan.setStartTime(8.0 * 3600.0);
 		newPlan.setEndTime(16.0 * 3600.0);
-		TransitStopFacility startStop = sched.getFacilities().get(Id.create(pId + "2333", TransitStopFacility.class));
-		TransitStopFacility endStop = sched.getFacilities().get(Id.create(pId + "2111", TransitStopFacility.class));
+		TransitStopFacility startStop = sched.getFacilities().get(Id.create(pId + "2333", org.matsim.facilities.Facility.class));
+		TransitStopFacility endStop = sched.getFacilities().get(Id.create(pId + "2111", org.matsim.facilities.Facility.class));
 		ArrayList<TransitStopFacility> stops = new ArrayList<>();
 		stops.add(startStop);
 		stops.add(endStop);
@@ -493,8 +493,8 @@ class Route2414to3444 implements PStrategy{
 		newPlan.setNVehicles(1);
 		newPlan.setStartTime(8.0 * 3600.0);
 		newPlan.setEndTime(16.0 * 3600.0);
-		TransitStopFacility startStop = sched.getFacilities().get(Id.create(pId + "2414", TransitStopFacility.class));
-		TransitStopFacility endStop = sched.getFacilities().get(Id.create(pId + "3444", TransitStopFacility.class));
+		TransitStopFacility startStop = sched.getFacilities().get(Id.create(pId + "2414", org.matsim.facilities.Facility.class));
+		TransitStopFacility endStop = sched.getFacilities().get(Id.create(pId + "3444", org.matsim.facilities.Facility.class));
 		ArrayList<TransitStopFacility> stops = new ArrayList<>();
 		stops.add(startStop);
 		stops.add(endStop);
@@ -527,9 +527,9 @@ class Route2111to1314to4443 implements PStrategy{
 		newPlan.setNVehicles(1);
 		newPlan.setStartTime(8.0 * 3600.0);
 		newPlan.setEndTime(16.0 * 3600.0);
-		TransitStopFacility startStop = sched.getFacilities().get(Id.create(pId + "2111", TransitStopFacility.class));
-		TransitStopFacility middleStop = sched.getFacilities().get(Id.create(pId + "1314", TransitStopFacility.class));
-		TransitStopFacility endStop = sched.getFacilities().get(Id.create(pId + "4443", TransitStopFacility.class));
+		TransitStopFacility startStop = sched.getFacilities().get(Id.create(pId + "2111", org.matsim.facilities.Facility.class));
+		TransitStopFacility middleStop = sched.getFacilities().get(Id.create(pId + "1314", org.matsim.facilities.Facility.class));
+		TransitStopFacility endStop = sched.getFacilities().get(Id.create(pId + "4443", org.matsim.facilities.Facility.class));
 		ArrayList<TransitStopFacility> stops = new ArrayList<>();
 		stops.add(startStop);
 		stops.add(middleStop);
@@ -561,9 +561,9 @@ class RouteVShaped implements PStrategy{
 		newPlan.setNVehicles(1);
 		newPlan.setStartTime(8.0 * 3600.0);
 		newPlan.setEndTime(16.0 * 3600.0);
-		TransitStopFacility startStop = sched.getFacilities().get(Id.create(pId + "2111", TransitStopFacility.class));
-		TransitStopFacility mostDistantStop = sched.getFacilities().get(Id.create(pId + "3141", TransitStopFacility.class));
-		TransitStopFacility endStop = sched.getFacilities().get(Id.create(pId + "3222", TransitStopFacility.class));
+		TransitStopFacility startStop = sched.getFacilities().get(Id.create(pId + "2111", org.matsim.facilities.Facility.class));
+		TransitStopFacility mostDistantStop = sched.getFacilities().get(Id.create(pId + "3141", org.matsim.facilities.Facility.class));
+		TransitStopFacility endStop = sched.getFacilities().get(Id.create(pId + "3222", org.matsim.facilities.Facility.class));
 		ArrayList<TransitStopFacility> stopsToBeServed = new ArrayList<>();
 		stopsToBeServed.add(startStop);
 		stopsToBeServed.add(mostDistantStop);

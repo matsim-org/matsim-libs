@@ -50,7 +50,7 @@ public class AgentId2PtTripTravelTimeMapDataTest {
 	        Id<Link> linkId2 = Id.create(2, Link.class);
 	        Id<Link> linkId3 = Id.create(3, Link.class);
 	        Id<Person> agentId1 = Id.create(4, Person.class);
-	        Id<ActivityFacility> facilId1 = Id.create(5, ActivityFacility.class);
+	        Id<org.matsim.facilities.Facility> facilId1 = Id.create(5, org.matsim.facilities.Facility.class);
 
         ActivityEndEvent event = new ActivityEndEvent(1.2*3600, agentId1, linkId1, facilId1, "w");	
         PersonDepartureEvent event3 = new PersonDepartureEvent(1.2*3600, agentId1, linkId2, "pt");        

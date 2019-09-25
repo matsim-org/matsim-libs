@@ -40,7 +40,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public class ClosestAccessEgressStopFinder implements AccessEgressStopFinder {
 
 	private final Network network;
-	private final Map<Id<TransitStopFacility>, TransitStopFacility> stops;
+	private final Map<Id<org.matsim.facilities.Facility>, TransitStopFacility> stops;
 
 	public ClosestAccessEgressStopFinder(TransitSchedule transitSchedule, DrtConfigGroup drtconfig,
 			PlansCalcRouteConfigGroup planscCalcRouteCfg, Network network) {

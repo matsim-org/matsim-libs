@@ -68,7 +68,7 @@ final class BestReplyLocationChoiceStrategymodule extends AbstractMultithreadedM
 	private HashSet<String> flexibleTypes;
 	private final LeastCostPathCalculatorFactory forwardMultiNodeDijsktaFactory;
 	private final LeastCostPathCalculatorFactory backwardMultiNodeDijsktaFactory;
-	private final Map<Id<ActivityFacility>, Id<Link>> nearestLinks;
+	private final Map<Id<org.matsim.facilities.Facility>, Id<Link>> nearestLinks;
 
 	public static double useScaleEpsilonFromConfig = -99.0;
 	private ScoringFunctionFactory scoringFunctionFactory;

@@ -196,8 +196,8 @@ public class RouteUtils {
 		
 		Id<TransitLine> lineId = route.getLineId();
 		Id<TransitRoute> routeId = route.getRouteId();
-		Id<TransitStopFacility> enterStopId = route.getAccessStopId();
-		Id<TransitStopFacility> exitStopId = route.getEgressStopId();
+		Id<org.matsim.facilities.Facility> enterStopId = route.getAccessStopId();
+		Id<org.matsim.facilities.Facility> exitStopId = route.getEgressStopId();
 	
 		TransitLine line = ts.getTransitLines().get(lineId);
 		TransitRoute tr = line.getRoutes().get(routeId);

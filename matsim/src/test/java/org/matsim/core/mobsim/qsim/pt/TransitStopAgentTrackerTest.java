@@ -47,8 +47,8 @@ public class TransitStopAgentTrackerTest extends TestCase {
 		PTPassengerAgent agent1 = new FakeAgent(null, null);
 		PTPassengerAgent agent2 = new FakeAgent(null, null);
 		PTPassengerAgent agent3 = new FakeAgent(null, null);
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new Coord((double) 2, (double) 3), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new Coord((double) 3, (double) 4), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create(1, org.matsim.facilities.Facility.class), new Coord((double) 2, (double) 3), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create(2, org.matsim.facilities.Facility.class), new Coord((double) 3, (double) 4), false);
 
 		assertFalse(tracker.getAgentsAtFacility(stop1.getId()).contains(agent1));
 		tracker.addAgentToStop(10, agent1, stop1.getId());
@@ -72,8 +72,8 @@ public class TransitStopAgentTrackerTest extends TestCase {
 		PTPassengerAgent agent1 = new FakeAgent(null, null);
 		PTPassengerAgent agent2 = new FakeAgent(null, null);
 		PTPassengerAgent agent3 = new FakeAgent(null, null);
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new Coord((double) 2, (double) 3), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new Coord((double) 3, (double) 4), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create(1, org.matsim.facilities.Facility.class), new Coord((double) 2, (double) 3), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create(2, org.matsim.facilities.Facility.class), new Coord((double) 3, (double) 4), false);
 
 		tracker.addAgentToStop(10, agent1, stop1.getId());
 		tracker.addAgentToStop(10, agent2, stop1.getId());
@@ -95,7 +95,7 @@ public class TransitStopAgentTrackerTest extends TestCase {
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		PTPassengerAgent agent1 = new FakeAgent(null, null);
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new Coord((double) 2, (double) 3), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create(1, org.matsim.facilities.Facility.class), new Coord((double) 2, (double) 3), false);
 
 		try {
 			tracker.getAgentsAtFacility(stop1.getId()).add(agent1);

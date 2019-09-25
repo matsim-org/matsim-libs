@@ -92,7 +92,7 @@ public class TripStructureUtilsSubtoursTest {
 		final Activity act = fact.createActivityFromLinkId( type , linkLoc );
 
 		if (anchorAtFacilities) {
-			final Id<ActivityFacility> facLoc = Id.create(loc, ActivityFacility.class) ;
+			final Id<org.matsim.facilities.Facility> facLoc = Id.create(loc, org.matsim.facilities.Facility.class) ;
 			((Activity) act).setFacilityId( facLoc );
 		}
 
@@ -102,7 +102,7 @@ public class TripStructureUtilsSubtoursTest {
 	private static Id<?> createId(long no, boolean anchorAtFacilities){
 		Id<?> id;
 		if (anchorAtFacilities){
-			id = Id.create(no, ActivityFacility.class);
+			id = Id.create(no, org.matsim.facilities.Facility.class);
 		}else
 		{
 			id = Id.create(no, Link.class);

@@ -46,8 +46,8 @@ class ChoiceSet {
 	private final Network network;
 	private final FrozenTastesConfigGroup dccg;
 	private FrozenTastesConfigGroup.ApproximationLevel approximationLevel;
-	private List<Id<ActivityFacility>> destinations = new LinkedList<>();
-	private List<Id<ActivityFacility>> notYetVisited = new LinkedList<>();
+	private List<Id<org.matsim.facilities.Facility>> destinations = new LinkedList<>();
+	private List<Id<org.matsim.facilities.Facility>> notYetVisited = new LinkedList<>();
 	private final ActivityFacilities facilities;
 	private final Scenario scenario;
 
@@ -58,12 +58,12 @@ class ChoiceSet {
 	public String toString() {
 		StringBuilder stb = new StringBuilder() ;
 		stb.append("destinations:") ;
-		for ( Id<ActivityFacility> id : destinations ) {
+		for ( Id<org.matsim.facilities.Facility> id : destinations ) {
 			stb.append( " " ).append( id );
 		}
 		stb.append("\n") ;
 		stb.append("notYetVisited:" ) ;
-		for ( Id<ActivityFacility> id : notYetVisited ) {
+		for ( Id<org.matsim.facilities.Facility> id : notYetVisited ) {
 			stb.append( " " ).append( id );
 		}
 		return stb.toString() ;
@@ -79,12 +79,12 @@ class ChoiceSet {
 		this.network = scenario.getNetwork() ;
 	}
 
-	void addDestination(Id<ActivityFacility> facilityId) {
+	void addDestination(Id<org.matsim.facilities.Facility> facilityId) {
 		this.destinations.add(facilityId);
 		this.notYetVisited.add(facilityId);
 	}
 
-	Id<ActivityFacility> getWeightedRandomChoice( int actlegIndex,
+	Id<org.matsim.facilities.Facility> getWeightedRandomChoice( int actlegIndex,
 								    ScoringFunctionFactory scoringFunction, Plan plan, TripRouter tripRouter, double pKVal,
 								    MultiNodeDijkstra forwardMultiNodeDijkstra,
 								    BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra, int iteration ) {
@@ -145,7 +145,7 @@ class ChoiceSet {
 
 			// (0) collect all possible destinations and copy them into an "imaginary" node.
 			List<InitialNode> destinationNodes = new ArrayList<>();
-			for( Id<ActivityFacility> destinationId : this.destinations ){
+			for( Id<org.matsim.facilities.Facility> destinationId : this.destinations ){
 				ActivityFacility destinationFacility = this.scenario.getActivityFacilities().getFacilities().get( destinationId );
 				Link destinationLink = FacilitiesUtils.decideOnLink( destinationFacility, network );
 				;
@@ -181,9 +181,9 @@ class ChoiceSet {
 
 		ArrayList<ScoredAlternative> list = new ArrayList<ScoredAlternative>();
 		double largestValue = Double.NEGATIVE_INFINITY;
-		Id<ActivityFacility> facilityIdWithLargestScore = activityToRelocate.getFacilityId();
+		Id<org.matsim.facilities.Facility> facilityIdWithLargestScore = activityToRelocate.getFacilityId();
 
-		for (Id<ActivityFacility> destinationId : this.destinations) {
+		for (Id<org.matsim.facilities.Facility> destinationId : this.destinations) {
 
 			activityToRelocate.setFacilityId( destinationId );
 			final ActivityFacility activityFacility = facilities.getFacilities().get( destinationId );

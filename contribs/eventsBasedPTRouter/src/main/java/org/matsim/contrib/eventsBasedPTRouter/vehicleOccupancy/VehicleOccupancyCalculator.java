@@ -24,7 +24,7 @@ import java.util.Map;
 
 public class VehicleOccupancyCalculator implements VehicleDepartsAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TransitDriverStartsEventHandler {
 
-	private final Map<Tuple<Id<TransitLine>, Id<TransitRoute>>, Map<Id<TransitStopFacility>, VehicleOccupancyData>> vehicleOccupancy = new HashMap<Tuple<Id<TransitLine>, Id<TransitRoute>>, Map<Id<TransitStopFacility>, VehicleOccupancyData>>(1000);
+	private final Map<Tuple<Id<TransitLine>, Id<TransitRoute>>, Map<Id<org.matsim.facilities.Facility>, VehicleOccupancyData>> vehicleOccupancy = new HashMap<Tuple<Id<TransitLine>, Id<TransitRoute>>, Map<Id<org.matsim.facilities.Facility>, VehicleOccupancyData>>(1000);
 	private double timeSlot;
 	private Map<Id<Vehicle>, Integer> ptVehicles = new HashMap<Id<Vehicle>, Integer>();
 	private Map<Id<Vehicle>, Integer> capacities = new HashMap<Id<Vehicle>, Integer>();
@@ -39,7 +39,7 @@ public class VehicleOccupancyCalculator implements VehicleDepartsAtFacilityEvent
 		this.timeSlot = timeSlot;
 		for(TransitLine line:transitSchedule.getTransitLines().values())
 			for(TransitRoute route:line.getRoutes().values()) {
-				Map<Id<TransitStopFacility>, VehicleOccupancyData> routeMap = new HashMap<Id<TransitStopFacility>, VehicleOccupancyData>(100);
+				Map<Id<org.matsim.facilities.Facility>, VehicleOccupancyData> routeMap = new HashMap<Id<org.matsim.facilities.Facility>, VehicleOccupancyData>(100);
 				vehicleOccupancy.put(new Tuple<Id<TransitLine>, Id<TransitRoute>>(line.getId(), route.getId()), routeMap);
 				for(int s=0; s<route.getStops().size()-1; s++) {
 					routeMap.put(route.getStops().get(s).getStopFacility().getId(), new VehicleOccupancyDataArray((int) (totalTime/timeSlot)+1));
@@ -52,17 +52,17 @@ public class VehicleOccupancyCalculator implements VehicleDepartsAtFacilityEvent
 	public VehicleOccupancy getVehicleOccupancy() {
 		return new VehicleOccupancy() {
 			@Override
-			public double getVehicleOccupancy(Id<TransitStopFacility> stopOId, Id<TransitLine> lineId, Id<TransitRoute> routeId, double time) {
+			public double getVehicleOccupancy(Id<org.matsim.facilities.Facility> stopOId, Id<TransitLine> lineId, Id<TransitRoute> routeId, double time) {
 				return VehicleOccupancyCalculator.this.getVehicleOccupancy(stopOId, lineId, routeId, time);
 			}
 		};
 	}
-	private double getVehicleOccupancy(Id<TransitStopFacility> stopOId, Id<TransitLine> lineId, Id<TransitRoute> routeId, double time) {
+	private double getVehicleOccupancy(Id<org.matsim.facilities.Facility> stopOId, Id<TransitLine> lineId, Id<TransitRoute> routeId, double time) {
 		return vehicleOccupancy.get(new Tuple<Id<TransitLine>, Id<TransitRoute>>(lineId, routeId)).get(stopOId).getVehicleOccupancy((int) (time/timeSlot));
 	}
 	@Override
 	public void reset(int iteration) {
-		for(Map<Id<TransitStopFacility>, VehicleOccupancyData> map:vehicleOccupancy.values())
+		for(Map<Id<org.matsim.facilities.Facility>, VehicleOccupancyData> map:vehicleOccupancy.values())
 			for(VehicleOccupancyData vehicleOcupancyData:map.values())
 				vehicleOcupancyData.resetVehicleOccupancies();
 		this.ptVehicles.clear();

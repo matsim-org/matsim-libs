@@ -62,7 +62,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	private final BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra;
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final int iteration;
-	private final Map<Id<ActivityFacility>, Id<Link>> nearestLinks;
+	private final Map<Id<org.matsim.facilities.Facility>, Id<Link>> nearestLinks;
 	private final Map<String, Double> teleportedModeSpeeds;
 	private final Map<String, Double> beelineDistanceFactors;
 	private TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType;
@@ -75,7 +75,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		  ObjectAttributes personsMaxDCScoreUnscaled, DestinationChoiceContext lcContext,
 		  DestinationSampler sampler, TripRouter tripRouter, MultiNodeDijkstra forwardMultiNodeDijkstra,
 		  BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra, ScoringFunctionFactory scoringFunctionFactory,
-		  int iteration, Map<Id<ActivityFacility>, Id<Link>> nearestLinks ) {
+		  int iteration, Map<Id<org.matsim.facilities.Facility>, Id<Link>> nearestLinks ) {
 		this.facilities = lcContext.getScenario().getActivityFacilities();
 		this.personsMaxDCScoreUnscaled = personsMaxDCScoreUnscaled;
 		this.scaleEpsilon = lcContext.getScaleEpsilon();
@@ -155,7 +155,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 					ChoiceSet cs = createChoiceSetFromCircle(plan, personIndex, this.dccg.getTravelTimeApproximationLevel(), actToMove, maxRadius, center );
 
 					// === this is where the work is done:
-					final Id<ActivityFacility> choice = cs.getWeightedRandomChoice(
+					final Id<org.matsim.facilities.Facility> choice = cs.getWeightedRandomChoice(
 							actlegIndex, this.scoringFunctionFactory, plan, this.tripRouter, this.lcContext.getPersonsKValuesArray()[personIndex],
 							this.forwardMultiNodeDijkstra, this.backwardMultiNodeDijkstra, this.iteration);
 					// yy This looks like method envy, i.e. the method should rather be in this class here.  kai, mar'19
@@ -210,7 +210,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		return cs;
 	}
 
-	private void setLocationOfActivityToFacilityId( Activity act2, Id<ActivityFacility> facilityId ) {
+	private void setLocationOfActivityToFacilityId( Activity act2, Id<org.matsim.facilities.Facility> facilityId ) {
 		act2.setFacilityId( facilityId );
 		ActivityFacility facility = this.facilities.getFacilities().get(facilityId);
 		if ( facility != null ){

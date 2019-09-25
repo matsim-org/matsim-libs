@@ -32,7 +32,7 @@ public class ActivityFacilitiesFactoryImplTest {
 	@Test
 	public void testCreateActivityFacility() {
 		ActivityFacilitiesFactoryImpl factory = new ActivityFacilitiesFactoryImpl();
-		ActivityFacility facility = factory.createActivityFacility(Id.create(1980, ActivityFacility.class), new Coord((double) 5, (double) 11));
+		ActivityFacility facility = factory.createActivityFacility(Id.create(1980, org.matsim.facilities.Facility.class), new Coord((double) 5, (double) 11));
 
 		Assert.assertEquals("1980", facility.getId().toString());
 		Assert.assertEquals(5.0, facility.getCoord().getX(), 1e-9);

@@ -23,8 +23,8 @@ public class ReadBFKoord implements TabularFileHandler{
 	
 	private TabularFileParserConfig tabFileParserConfig;
 	
-	private HashMap<Id<TransitStopFacility>, Coord> stopCoords = new HashMap<>();
-	private HashMap<Id<TransitStopFacility>, String> stopNames = new HashMap<>();
+	private HashMap<Id<org.matsim.facilities.Facility>, Coord> stopCoords = new HashMap<>();
+	private HashMap<Id<org.matsim.facilities.Facility>, String> stopNames = new HashMap<>();
 	
 	public void readBFKoord(String filename) throws IOException {
 		
@@ -37,11 +37,11 @@ public class ReadBFKoord implements TabularFileHandler{
 				
 	}
 	
-	public HashMap<Id<TransitStopFacility>, Coord> getStopCoords(){
+	public HashMap<Id<org.matsim.facilities.Facility>, Coord> getStopCoords(){
 		return this.stopCoords;
 	}
 	
-	public HashMap<Id<TransitStopFacility>, String> getStopNames(){
+	public HashMap<Id<org.matsim.facilities.Facility>, String> getStopNames(){
 		return this.stopNames;
 	}
 
@@ -55,13 +55,13 @@ public class ReadBFKoord implements TabularFileHandler{
 			}
 			log.info("Ignoring: " + tempBuffer);
 		} else {
-			this.stopCoords.put(Id.create(row[0], TransitStopFacility.class), new Coord(Double.parseDouble(row[1]), Double.parseDouble(row[2])));
+			this.stopCoords.put(Id.create(row[0], org.matsim.facilities.Facility.class), new Coord(Double.parseDouble(row[1]), Double.parseDouble(row[2])));
 			StringBuffer sB = new StringBuffer();
 			for (int i = 3; i < row.length; i++) {
 				sB.append(row[i]);
 				sB.append(" ");
 			}
-			this.stopNames.put(Id.create(row[0], TransitStopFacility.class), sB.toString().trim());			
+			this.stopNames.put(Id.create(row[0], org.matsim.facilities.Facility.class), sB.toString().trim());
 		}
 		
 	}

@@ -99,7 +99,7 @@ public class StopServedMultipleTimesPenaltyTest {
 	}
 	
 	private TransitStopFacility getOrCreateStopAtCoord(int x, int y) {
-		Id<TransitStopFacility> stopId = getStopId(x, y);
+		Id<org.matsim.facilities.Facility> stopId = getStopId(x, y);
 		if (scenario.getTransitSchedule().getFacilities().containsKey(stopId)) {
 			return scenario.getTransitSchedule().getFacilities().get(stopId);
 		} else {
@@ -108,7 +108,7 @@ public class StopServedMultipleTimesPenaltyTest {
 		}
 	}
 	
-	private Id<TransitStopFacility> getStopId(int x, int y) {
-		return Id.create(x + "," + y, TransitStopFacility.class);
+	private Id<org.matsim.facilities.Facility> getStopId(int x, int y) {
+		return Id.create(x + "," + y, org.matsim.facilities.Facility.class);
 	}
 }

@@ -162,17 +162,17 @@ public class VariableAccessTransitRouterImplTest {
 		 * decision point at work destination xCoord = 3872.62448720342596, yCoord = 1050.0
 		 */
 		ActivityFacility homeXCoord2050 = actFacilFacImpl.createActivityFacility(
-				Id.create("homeXCoord2050", ActivityFacility.class), CoordUtils.createCoord(2050.0, 1050.0));
+				Id.create("homeXCoord2050", org.matsim.facilities.Facility.class), CoordUtils.createCoord(2050.0, 1050.0));
 
 		ActivityFacility workAtPtSideOfDecisionPoint = actFacilFacImpl.createActivityFacility(
-				Id.create("workAtPtSideOfDecisionPoint", ActivityFacility.class),
+				Id.create("workAtPtSideOfDecisionPoint", org.matsim.facilities.Facility.class),
 				CoordUtils.createCoord(3873.0, 1050.0));
 		// x-coordinate workAtDecisionPoint slightly rounded up in order to avoid rounding issues
 		ActivityFacility workAtDecisionPoint = actFacilFacImpl.createActivityFacility(
-				Id.create("workAtDecisionPoint", ActivityFacility.class),
+				Id.create("workAtDecisionPoint", org.matsim.facilities.Facility.class),
 				CoordUtils.createCoord(3872.62448720343, 1050.0));
 		ActivityFacility workAtDirectWalkSideOfDecisionPoint = actFacilFacImpl.createActivityFacility(
-				Id.create("workAtDirectWalkSideOfDecisionPoint", ActivityFacility.class),
+				Id.create("workAtDirectWalkSideOfDecisionPoint", org.matsim.facilities.Facility.class),
 				CoordUtils.createCoord(3872.0, 1050.0));
 
 		Person personCarNeverAvailable = scenario.getPopulation()
@@ -314,12 +314,12 @@ public class VariableAccessTransitRouterImplTest {
 		 *
 		 */
 		ActivityFacility workAtTransitStop1 = actFacilFacImpl.createActivityFacility(
-				Id.create("workAtTransitStop1", ActivityFacility.class), CoordUtils.createCoord(1050.0, 1050.0));
+				Id.create("workAtTransitStop1", org.matsim.facilities.Facility.class), CoordUtils.createCoord(1050.0, 1050.0));
 		ActivityFacility homeAtDirectTripSideOfDecisionPoint = actFacilFacImpl.createActivityFacility(
-				Id.create("homeAtDirectTripSideOfDecisionPoint", ActivityFacility.class),
+				Id.create("homeAtDirectTripSideOfDecisionPoint", org.matsim.facilities.Facility.class),
 				CoordUtils.createCoord(3950.0, 1050.0 + 1153.846)); //path cost 155.4387738424332
 		ActivityFacility homeAtTransferTripSideOfDecisionPoint = actFacilFacImpl.createActivityFacility(
-				Id.create("homeAtTransferTripSideOfDecisionPoint", ActivityFacility.class),
+				Id.create("homeAtTransferTripSideOfDecisionPoint", org.matsim.facilities.Facility.class),
 				CoordUtils.createCoord(3950.0,
 						1050.0 + 1154.0)); //path cost 182.81971583929237  travel cost 108.37171583929236
 
@@ -332,10 +332,10 @@ public class VariableAccessTransitRouterImplTest {
 
 		Assert.assertEquals(Id.create("Blue Line", TransitLine.class),
 				((ExperimentalTransitRoute)legsAtDirectTripSideOfDecisionPoint.get(1).getRoute()).getLineId());
-		Assert.assertEquals(Id.create("3", TransitStopFacility.class),
+		Assert.assertEquals(Id.create("3", org.matsim.facilities.Facility.class),
 				((ExperimentalTransitRoute)legsAtDirectTripSideOfDecisionPoint.get(1)
 						.getRoute()).getAccessStopId());//2a
-		Assert.assertEquals(Id.create("1", TransitStopFacility.class),
+		Assert.assertEquals(Id.create("1", org.matsim.facilities.Facility.class),
 				((ExperimentalTransitRoute)legsAtDirectTripSideOfDecisionPoint.get(1).getRoute()).getEgressStopId());
 
 		List<Leg> legsAtTransferTripSideOfDecisionPoint = router.calcRoute(homeAtTransferTripSideOfDecisionPoint,
@@ -349,15 +349,15 @@ public class VariableAccessTransitRouterImplTest {
 
 		Assert.assertEquals(Id.create("Red Line", TransitLine.class),
 				((ExperimentalTransitRoute)legsAtTransferTripSideOfDecisionPoint.get(1).getRoute()).getLineId());
-		Assert.assertEquals(Id.create("6", TransitStopFacility.class),
+		Assert.assertEquals(Id.create("6", org.matsim.facilities.Facility.class),
 				((ExperimentalTransitRoute)legsAtTransferTripSideOfDecisionPoint.get(1).getRoute()).getAccessStopId());
-		Assert.assertEquals(Id.create("5b", TransitStopFacility.class),
+		Assert.assertEquals(Id.create("5b", org.matsim.facilities.Facility.class),
 				((ExperimentalTransitRoute)legsAtTransferTripSideOfDecisionPoint.get(1).getRoute()).getEgressStopId());
 		Assert.assertEquals(Id.create("Blue Line", TransitLine.class),
 				((ExperimentalTransitRoute)legsAtTransferTripSideOfDecisionPoint.get(3).getRoute()).getLineId());
-		Assert.assertEquals(Id.create("2b", TransitStopFacility.class),
+		Assert.assertEquals(Id.create("2b", org.matsim.facilities.Facility.class),
 				((ExperimentalTransitRoute)legsAtTransferTripSideOfDecisionPoint.get(3).getRoute()).getAccessStopId());
-		Assert.assertEquals(Id.create("1", TransitStopFacility.class),
+		Assert.assertEquals(Id.create("1", org.matsim.facilities.Facility.class),
 				((ExperimentalTransitRoute)legsAtTransferTripSideOfDecisionPoint.get(3).getRoute()).getEgressStopId());
 
 	}

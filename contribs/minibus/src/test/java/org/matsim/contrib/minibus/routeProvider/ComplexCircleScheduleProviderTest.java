@@ -65,8 +65,8 @@ public class ComplexCircleScheduleProviderTest {
 		plan.setStartTime(7.0 * 3600.0);
 		plan.setEndTime(9.0 * 3600.0);
 		plan.setNVehicles(2);
-		TransitStopFacility startStop = tS.getFacilities().get(Id.create(pC.getPIdentifier() + "1424", TransitStopFacility.class));
-		TransitStopFacility endStop = tS.getFacilities().get(Id.create(pC.getPIdentifier() + "4434", TransitStopFacility.class));
+		TransitStopFacility startStop = tS.getFacilities().get(Id.create(pC.getPIdentifier() + "1424", org.matsim.facilities.Facility.class));
+		TransitStopFacility endStop = tS.getFacilities().get(Id.create(pC.getPIdentifier() + "4434", org.matsim.facilities.Facility.class));
 		ArrayList<TransitStopFacility> stopsToBeServed = new ArrayList<>();
 		stopsToBeServed.add(startStop);
 		stopsToBeServed.add(endStop);
@@ -100,7 +100,7 @@ public class ComplexCircleScheduleProviderTest {
 			// check stops
 			i = 0;
 			for (TransitRouteStop stop : route.getStops()) {
-				Assert.assertEquals("Route stop ids have to be the same", Id.create(pC.getPIdentifier() + refIds.get(i), TransitStopFacility.class), stop.getStopFacility().getId());
+				Assert.assertEquals("Route stop ids have to be the same", Id.create(pC.getPIdentifier() + refIds.get(i), org.matsim.facilities.Facility.class), stop.getStopFacility().getId());
 				i++;
 			}			
 		}	
@@ -124,11 +124,11 @@ public class ComplexCircleScheduleProviderTest {
 		plan.setStartTime(7.0 * 3600.0);
 		plan.setEndTime(9.0 * 3600.0);
 		plan.setNVehicles(2);
-		TransitStopFacility stop1 = tS.getFacilities().get(Id.create(pC.getPIdentifier() + "1424", TransitStopFacility.class));
-		TransitStopFacility stop2 = tS.getFacilities().get(Id.create(pC.getPIdentifier() + "2423", TransitStopFacility.class));
-		TransitStopFacility stop3 = tS.getFacilities().get(Id.create(pC.getPIdentifier() + "2333", TransitStopFacility.class));
-		TransitStopFacility stop4 = tS.getFacilities().get(Id.create(pC.getPIdentifier() + "3433", TransitStopFacility.class));
-		TransitStopFacility stop5 = tS.getFacilities().get(Id.create(pC.getPIdentifier() + "3334", TransitStopFacility.class));
+		TransitStopFacility stop1 = tS.getFacilities().get(Id.create(pC.getPIdentifier() + "1424", org.matsim.facilities.Facility.class));
+		TransitStopFacility stop2 = tS.getFacilities().get(Id.create(pC.getPIdentifier() + "2423", org.matsim.facilities.Facility.class));
+		TransitStopFacility stop3 = tS.getFacilities().get(Id.create(pC.getPIdentifier() + "2333", org.matsim.facilities.Facility.class));
+		TransitStopFacility stop4 = tS.getFacilities().get(Id.create(pC.getPIdentifier() + "3433", org.matsim.facilities.Facility.class));
+		TransitStopFacility stop5 = tS.getFacilities().get(Id.create(pC.getPIdentifier() + "3334", org.matsim.facilities.Facility.class));
 		ArrayList<TransitStopFacility> stopsToBeServed = new ArrayList<>();
 		stopsToBeServed.add(stop1);
 		stopsToBeServed.add(stop2);
@@ -166,7 +166,7 @@ public class ComplexCircleScheduleProviderTest {
 			// check stops
 			i = 0;
 			for (TransitRouteStop stop : route.getStops()) {
-				Assert.assertEquals("Route stop ids have to be the same", Id.create(pC.getPIdentifier() + refIds.get(i), TransitStopFacility.class), stop.getStopFacility().getId());
+				Assert.assertEquals("Route stop ids have to be the same", Id.create(pC.getPIdentifier() + refIds.get(i), org.matsim.facilities.Facility.class), stop.getStopFacility().getId());
 				i++;
 			}
 			

@@ -105,12 +105,12 @@ public class TestMain {
 		AgentId2StopDifferenceMap comp = new AgentId2StopDifferenceMap(plans, agentIds);
 		eventsManager.addHandler(comp);
 
-		TreeSet<Id<TransitStopFacility>> stopIds = new TreeSet<>();
-		stopIds.add(Id.create("812013.1", TransitStopFacility.class));
-		stopIds.add(Id.create("792200.4", TransitStopFacility.class));
-		stopIds.add(Id.create("792050.2", TransitStopFacility.class));
-		stopIds.add(Id.create("801040.1", TransitStopFacility.class));
-		stopIds.add(Id.create("804070.2", TransitStopFacility.class));
+		TreeSet<Id<org.matsim.facilities.Facility>> stopIds = new TreeSet<>();
+		stopIds.add(Id.create("812013.1", org.matsim.facilities.Facility.class));
+		stopIds.add(Id.create("792200.4", org.matsim.facilities.Facility.class));
+		stopIds.add(Id.create("792050.2", org.matsim.facilities.Facility.class));
+		stopIds.add(Id.create("801040.1", org.matsim.facilities.Facility.class));
+		stopIds.add(Id.create("804070.2", org.matsim.facilities.Facility.class));
 
 		StopId2PersonEnterLeaveVehicleHandler stophandler = new StopId2PersonEnterLeaveVehicleHandler(stopIds);
 //		eventsManager.addHandler(stophandler);

@@ -83,10 +83,10 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule1 = builder.createTransitSchedule();
 
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("stop1", TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("stop2", TransitStopFacility.class), new Coord((double) 1000, (double) 0), true);
-		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("stop3", TransitStopFacility.class), new Coord((double) 1000, (double) 1000), true);
-		TransitStopFacility stop4 = builder.createTransitStopFacility(Id.create("stop4", TransitStopFacility.class), new Coord((double) 0, (double) 1000), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("stop1", org.matsim.facilities.Facility.class), new Coord((double) 0, (double) 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("stop2", org.matsim.facilities.Facility.class), new Coord((double) 1000, (double) 0), true);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("stop3", org.matsim.facilities.Facility.class), new Coord((double) 1000, (double) 1000), true);
+		TransitStopFacility stop4 = builder.createTransitStopFacility(Id.create("stop4", org.matsim.facilities.Facility.class), new Coord((double) 0, (double) 1000), false);
 		stop2.setName("S + U Nirgendwo");
 		stop4.setName("Irgendwo");
 		schedule1.addStopFacility(stop1);

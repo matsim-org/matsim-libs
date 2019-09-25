@@ -127,14 +127,14 @@ public class WaitTimeCalculatorSerializable implements
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time) {
+			public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<org.matsim.facilities.Facility> stopId, double time) {
 				return WaitTimeCalculatorSerializable.this.getRouteStopWaitTime(lineId, routeId, stopId, time);
 			}
 		};
 	}
 
 	@Override
-	public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time) {
+	public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<org.matsim.facilities.Facility> stopId, double time) {
 		Tuple<String, String> key = new Tuple<String, String>(lineId.toString(), routeId.toString());
 		waitTimeCalls++;
 		WaitTimeData waitTimeData = waitTimes.get(key).get(stopId.toString());
@@ -197,7 +197,7 @@ public class WaitTimeCalculatorSerializable implements
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time) {
+			public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<org.matsim.facilities.Facility> stopId, double time) {
 				return WaitTimeCalculatorSerializable.this.getRouteStopWaitTime(lineId, routeId, stopId, time);
 			}
 		};

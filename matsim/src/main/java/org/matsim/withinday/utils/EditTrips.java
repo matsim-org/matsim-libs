@@ -649,7 +649,7 @@ public final class EditTrips {
 	}
 
 	private boolean transitRouteLaterStopsAt(Id<TransitLine> lineId, Id<TransitRoute> routeId,
-			Id<TransitStopFacility> currentStopId, Id<TransitStopFacility> egressStopId) {
+			Id<org.matsim.facilities.Facility> currentStopId, Id<org.matsim.facilities.Facility> egressStopId) {
 		boolean afterCurrentStop = false;
 		for (TransitRouteStop stop : scenario.getTransitSchedule().getTransitLines().get(lineId).getRoutes().get(routeId).getStops()) {
 			if ( currentStopId.equals(stop.getStopFacility().getId()) ) {

@@ -240,6 +240,9 @@ public class TripRouterFactoryImplTest {
 		public Id<Link> getLinkId() {
 			return l.getId();
 		}
+		@Override public Id<Facility> getId(){
+			throw new RuntimeException( "not implemented" );
+		}
 	}
 }
 

@@ -413,7 +413,7 @@ public class CombinedOsmSink implements Sink {
 	private void createFacility(
 			ActivityFacilitiesFactory activityFacilityFactory, Entity entity,
 			String name, Coord coord, String activityType) {
-		Id<ActivityFacility> facilityId = Id.create(idPrefix + entity.getId(), ActivityFacility.class);
+		Id<org.matsim.facilities.Facility> facilityId = Id.create(idPrefix + entity.getId(), org.matsim.facilities.Facility.class);
 		ActivityFacility activityFacility;
 
 		// activity facility

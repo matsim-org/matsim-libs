@@ -54,7 +54,7 @@ public class SwissRailRaptorAccessibilityContributionCalculator implements Acces
 
     SwissRailRaptorData raptorData;
 
-    Map<Id<ActivityFacility>, Collection<TransitStopFacility>> stopsPerAggregatedOpportunity = new LinkedHashMap<>();
+    Map<Id<org.matsim.facilities.Facility>, Collection<TransitStopFacility>> stopsPerAggregatedOpportunity = new LinkedHashMap<>();
 
 
     public SwissRailRaptorAccessibilityContributionCalculator(String mode, PlanCalcScoreConfigGroup planCalcScoreConfigGroup, Scenario scenario) {
@@ -91,7 +91,7 @@ public class SwissRailRaptorAccessibilityContributionCalculator implements Acces
         Gbl.assertNotNull(measuringPoints.getFacilities());
 
         for (ActivityFacility measuringPoint : measuringPoints.getFacilities().values()) {
-            Id<ActivityFacility> facilityId = measuringPoint.getId();
+            Id<org.matsim.facilities.Facility> facilityId = measuringPoint.getId();
             if(!aggregatedMeasurePoints.containsKey(facilityId)) {
                 aggregatedMeasurePoints.put(facilityId, new ArrayList<>());
             }
@@ -144,7 +144,8 @@ public class SwissRailRaptorAccessibilityContributionCalculator implements Acces
             Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities, Double departureTime) {
         double expSum = 0.;
 
-        final Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> idTravelInfoMap = raptor.calcTree(origin, departureTime, null);
+//		final Map<Id<org.matsim.facilities.Facility>, SwissRailRaptorCore.TravelInfo> idTravelInfoMap = raptor.calcTree(origin, departureTime, null);
+		final Map<Id<TransitStopFacility>, SwissRailRaptorCore.TravelInfo> idTravelInfoMap = raptor.calcTree(origin, departureTime, null );
 
         for (final AggregationObject destination : aggregatedOpportunities.values()) {
             //compute direct walk costs
@@ -157,7 +158,11 @@ public class SwissRailRaptorAccessibilityContributionCalculator implements Acces
             Collection<TransitStopFacility> stops = stopsPerAggregatedOpportunity.get(nearestStop.getId());
 
             for (TransitStopFacility stop : stops) {
-                final SwissRailRaptorCore.TravelInfo travelInfo = idTravelInfoMap.get(stop.getId());
+//			final SwissRailRaptorCore.TravelInfo travelInfo = idTravelInfoMap.get( Id.create( stop.getId().toString(), TransitStopFacility.class ) );
+			final SwissRailRaptorCore.TravelInfo travelInfo = idTravelInfoMap.get( Id.create( stop.getId().toString(), TransitStopFacility.class ) );
+			// (fix since the rail raptor is returning Id<TransitStopFacility> instead of Id<Facility>.  I would, however, think that swiss rail
+			// raptor also would need to be adapted.)
+
                 if (travelInfo != null) {
                     double distance = CoordUtils.calcEuclideanDistance(stop.getCoord(), toCoord);
                     double egressWalkCost = - distance / walkSpeed_m_h  * betaWalkTT;

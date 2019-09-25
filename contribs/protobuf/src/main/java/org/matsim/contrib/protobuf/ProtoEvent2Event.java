@@ -47,13 +47,13 @@ public abstract class ProtoEvent2Event {
 				if (pe.getType() == ProtobufEvents.Event.Type.ActivityEnd) {
 					return new ActivityEndEvent(pe.getActEnd().getTime(), Id.createPersonId(pe.getActEnd().getPersId().getId()),
 							Id.createLinkId(pe.getActEnd().getLinkId().getId()), Id.create(pe.getActEnd().getFacilityId().getId(),
-							ActivityFacility.class), pe.getActEnd().getActType());
+							org.matsim.facilities.Facility.class), pe.getActEnd().getActType());
 				}
 				else {
 					if (pe.getType() == ProtobufEvents.Event.Type.ActivityStart) {
 						return new ActivityStartEvent(pe.getActStart().getTime(), Id.createPersonId(pe.getActStart().getPersId().getId()),
 								Id.createLinkId(pe.getActStart().getLinkId().getId()), Id.create(pe.getActStart().getFacilityId().getId(),
-								ActivityFacility.class), pe.getActStart().getActType());
+								org.matsim.facilities.Facility.class), pe.getActStart().getActType());
 
 					}
 					else {

@@ -427,7 +427,7 @@ public class AccessibilityIntegrationTest {
 		// Creating test opportunities (facilities); one on each link with same ID as link and coord on center of link
 		final ActivityFacilities opportunities = scenario.getActivityFacilities();
 		for (Link link : scenario.getNetwork().getLinks().values()) {
-			ActivityFacility facility = opportunities.getFactory().createActivityFacility(Id.create(link.getId(), ActivityFacility.class), link.getCoord());
+			ActivityFacility facility = opportunities.getFactory().createActivityFacility(Id.create(link.getId(), org.matsim.facilities.Facility.class), link.getCoord());
 			System.err.println("facility = " + facility.toString() + " -- " + facility.getCoord());
 			opportunities.addActivityFacility(facility);
 		}
@@ -442,7 +442,7 @@ public class AccessibilityIntegrationTest {
 		// Creating test opportunities (facilities); one on each link with same ID as link and coord on center of link; with a weight
 		final ActivityFacilities opportunities = scenario.getActivityFacilities();
 		for (Link link : scenario.getNetwork().getLinks().values()) {
-			ActivityFacility facility = opportunities.getFactory().createActivityFacility(Id.create(link.getId(), ActivityFacility.class), link.getCoord());
+			ActivityFacility facility = opportunities.getFactory().createActivityFacility(Id.create(link.getId(), org.matsim.facilities.Facility.class), link.getCoord());
 			facility.getAttributes().putAttribute(AccessibilityAttributes.WEIGHT, 2.);
 			opportunities.addActivityFacility(facility);
 		}

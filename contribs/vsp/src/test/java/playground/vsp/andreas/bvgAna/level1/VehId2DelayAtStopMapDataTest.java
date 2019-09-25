@@ -25,7 +25,7 @@ public class VehId2DelayAtStopMapDataTest {
 
         Id<Vehicle> vehId1 = Id.create(4, Vehicle.class);
         Id<Person> driverId1 = Id.create(0, Person.class);
-        Id<TransitStopFacility> facilId1 = Id.create(9, TransitStopFacility.class);
+        Id<org.matsim.facilities.Facility> facilId1 = Id.create(9, org.matsim.facilities.Facility.class);
         Id<TransitLine> transitLineId1 = Id.create(14, TransitLine.class);
         Id<TransitRoute> transitRouteId1 = Id.create(12, TransitRoute.class);
         Id<Departure> departureId1 = Id.create(13, Departure.class);

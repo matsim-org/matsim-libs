@@ -41,10 +41,10 @@ public class PtCountSimComparisonTableWriter implements MatsimWriter {
 		SimpleWriter simpleWriter = null;
 		try {
 			simpleWriter = new SimpleWriter(filename);
-			Id<TransitStopFacility> lastStopId = null;
+			Id<org.matsim.facilities.Facility> lastStopId = null;
 			// Sorted by stopId
 			for (CountSimComparison count : countSimCompList) {
-				Id<TransitStopFacility> stopId = Id.create(count.getId(), TransitStopFacility.class);
+				Id<org.matsim.facilities.Facility> stopId = Id.create(count.getId(), org.matsim.facilities.Facility.class);
 				if (!stopId.equals(lastStopId)) {
 					simpleWriter.write("StopId :\t");
 					simpleWriter.write(stopId.toString());

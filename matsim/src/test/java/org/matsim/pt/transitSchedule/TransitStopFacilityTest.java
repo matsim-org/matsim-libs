@@ -41,12 +41,12 @@ public class TransitStopFacilityTest extends MatsimTestCase {
 	 * @param coord
 	 * @return a new instance of a TransitStopFacility with the given attributes
 	 */
-	protected TransitStopFacility createTransitStopFacility(final Id<TransitStopFacility> id, final Coord coord, final boolean isBlockingLane) {
+	protected TransitStopFacility createTransitStopFacility(final Id<org.matsim.facilities.Facility> id, final Coord coord, final boolean isBlockingLane) {
 		return new TransitStopFacilityImpl(id, coord, isBlockingLane);
 	}
 
 	public void testInitialization() {
-		Id<TransitStopFacility> id = Id.create(2491, TransitStopFacility.class);
+		Id<org.matsim.facilities.Facility> id = Id.create(2491, org.matsim.facilities.Facility.class);
 		Coord coord = new Coord((double) 30, (double) 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
 		assertEquals(id.toString(), stop.getId().toString());
@@ -56,7 +56,7 @@ public class TransitStopFacilityTest extends MatsimTestCase {
 	}
 
 	public void testBlockingStop() {
-		Id<TransitStopFacility> id = Id.create(2491, TransitStopFacility.class);
+		Id<org.matsim.facilities.Facility> id = Id.create(2491, org.matsim.facilities.Facility.class);
 		Coord coord = new Coord((double) 30, (double) 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
 		assertFalse(stop.getIsBlockingLane());
@@ -65,7 +65,7 @@ public class TransitStopFacilityTest extends MatsimTestCase {
 	}
 
 	public void testLink() {
-		Id<TransitStopFacility> id = Id.create(2491, TransitStopFacility.class);
+		Id<org.matsim.facilities.Facility> id = Id.create(2491, org.matsim.facilities.Facility.class);
 		Coord coord = new Coord((double) 30, (double) 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
 		assertNull(stop.getLinkId());
@@ -77,7 +77,7 @@ public class TransitStopFacilityTest extends MatsimTestCase {
 	}
 
 	public void testName() {
-		Id<TransitStopFacility> id = Id.create(9791, TransitStopFacility.class);
+		Id<org.matsim.facilities.Facility> id = Id.create(9791, org.matsim.facilities.Facility.class);
 		Coord coord = new Coord((double) 10, (double) 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
 		assertNull(stop.getName());

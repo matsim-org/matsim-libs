@@ -71,7 +71,7 @@ import org.matsim.facilities.ActivityFacility;
 	}
 
 	@Override
-	public Activity createActivityFromActivityFacilityId( String actType, Id<ActivityFacility> activityFacilityId ){
+	public Activity createActivityFromActivityFacilityId( String actType, Id<org.matsim.facilities.Facility> activityFacilityId ){
 		Activity act = new ActivityImpl( actType ) ;
 		act.setFacilityId( activityFacilityId );
 		return act ;

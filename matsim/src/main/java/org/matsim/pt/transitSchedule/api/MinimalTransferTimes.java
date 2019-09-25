@@ -42,14 +42,14 @@ public interface MinimalTransferTimes {
 	 * @param seconds the minimal transfer time, in seconds
 	 * @return the minimal transfer time previously assigned between the two stops, <code>Double.NaN</code> if none was specified.
 	 */
-	double set(Id<TransitStopFacility> fromStop, Id<TransitStopFacility> toStop, double seconds);
+	double set(Id<org.matsim.facilities.Facility> fromStop, Id<org.matsim.facilities.Facility> toStop, double seconds);
 
 	/**
 	 * @param fromStop
 	 * @param toStop
 	 * @return the minimal transfer time between the two stops if defined, <code>Double.NaN</code> if none is set.
 	 */
-	double get(Id<TransitStopFacility> fromStop, Id<TransitStopFacility> toStop);
+	double get(Id<org.matsim.facilities.Facility> fromStop, Id<org.matsim.facilities.Facility> toStop);
 
 	/**
 	 * @param fromStop
@@ -57,7 +57,7 @@ public interface MinimalTransferTimes {
 	 * @param defaultSeconds
 	 * @return the minimal transfer time between the two stops if defined, <code>defaultSeconds</code> if none is set.
 	 */
-	double get(Id<TransitStopFacility> fromStop, Id<TransitStopFacility> toStop, double defaultSeconds);
+	double get(Id<org.matsim.facilities.Facility> fromStop, Id<org.matsim.facilities.Facility> toStop, double defaultSeconds);
 
 	/**
 	 * Removes the minimal transfer time between the two stops if there was one set.
@@ -65,7 +65,7 @@ public interface MinimalTransferTimes {
 	 * @param toStop
 	 * @return the previously set minimal transfer time, or <code>Double.NaN</code> if none was set.
 	 */
-	double remove(Id<TransitStopFacility> fromStop, Id<TransitStopFacility> toStop);
+	double remove(Id<org.matsim.facilities.Facility> fromStop, Id<org.matsim.facilities.Facility> toStop);
 
 	/**
 	 * @return an iterator to iterate over all minimal transfer times set.
@@ -83,12 +83,12 @@ public interface MinimalTransferTimes {
 		/**
 		 * @return the Id of the fromStop of the current iterator element.
 		 */
-		Id<TransitStopFacility> getFromStopId();
+		Id<org.matsim.facilities.Facility> getFromStopId();
 
 		/**
 		 * @return the Id of the toStop of the current iterator element.
 		 */
-		Id<TransitStopFacility> getToStopId();
+		Id<org.matsim.facilities.Facility> getToStopId();
 
 		/**
 		 * @return the minimal transfer time in seconds of the current iterator element.

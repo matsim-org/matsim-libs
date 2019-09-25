@@ -35,8 +35,8 @@ public class ExperimentalTransitRoute extends AbstractRoute {
 
 	/*package*/ final static String ROUTE_TYPE = "experimentalPt1";
 
-	private Id<TransitStopFacility> accessStopId = null;
-	private Id<TransitStopFacility> egressStopId = null;
+	private Id<org.matsim.facilities.Facility> accessStopId = null;
+	private Id<org.matsim.facilities.Facility> egressStopId = null;
 	private Id<TransitLine> lineId = null;
 	private Id<TransitRoute> routeId = null;
 	private String description = null;
@@ -67,11 +67,11 @@ public class ExperimentalTransitRoute extends AbstractRoute {
 		return (ExperimentalTransitRoute) super.clone();
 	}
 
-	public Id<TransitStopFacility> getAccessStopId() {
+	public Id<org.matsim.facilities.Facility> getAccessStopId() {
 		return this.accessStopId;
 	}
 
-	public Id<TransitStopFacility> getEgressStopId() {
+	public Id<org.matsim.facilities.Facility> getEgressStopId() {
 		return this.egressStopId;
 	}
 
@@ -89,10 +89,10 @@ public class ExperimentalTransitRoute extends AbstractRoute {
 		this.routeDescription = routeDescription ;
 		if (routeDescription.startsWith(IDENTIFIER_1)) {
 			String[] parts = routeDescription.split(SEPARATOR, 6);//StringUtils.explode(routeDescription, '\t', 6);
-			this.accessStopId = Id.create(parts[1], TransitStopFacility.class);
+			this.accessStopId = Id.create(parts[1], org.matsim.facilities.Facility.class);
 			this.lineId = Id.create(parts[2], TransitLine.class);
 			this.routeId = Id.create(parts[3], TransitRoute.class);
-			this.egressStopId = Id.create(parts[4], TransitStopFacility.class);
+			this.egressStopId = Id.create(parts[4], org.matsim.facilities.Facility.class);
 			if (parts.length > 5) {
 				this.description = parts[5];
 			} else {

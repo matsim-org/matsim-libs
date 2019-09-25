@@ -167,11 +167,11 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 					time, 
 					Id.create(atts.getValue(ActivityEndEvent.ATTRIBUTE_PERSON), Person.class), 
 					Id.create(atts.getValue(ActivityEndEvent.ATTRIBUTE_LINK), Link.class), 
-					atts.getValue(ActivityEndEvent.ATTRIBUTE_FACILITY) == null ? null : Id.create(atts.getValue(ActivityEndEvent.ATTRIBUTE_FACILITY), ActivityFacility.class), 
+					atts.getValue(ActivityEndEvent.ATTRIBUTE_FACILITY) == null ? null : Id.create(atts.getValue(ActivityEndEvent.ATTRIBUTE_FACILITY), org.matsim.facilities.Facility.class),
 					atts.getValue(ActivityEndEvent.ATTRIBUTE_ACTTYPE)));
 		} else if (ActivityStartEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new ActivityStartEvent(time, Id.create(atts.getValue(
-				  HasPersonId.ATTRIBUTE_PERSON ), Person.class ), Id.create(atts.getValue(ActivityStartEvent.ATTRIBUTE_LINK ), Link.class ), atts.getValue(ActivityStartEvent.ATTRIBUTE_FACILITY ) == null ? null : Id.create(atts.getValue(ActivityStartEvent.ATTRIBUTE_FACILITY ), ActivityFacility.class ), atts.getValue(ActivityStartEvent.ATTRIBUTE_ACTTYPE )) );
+				  HasPersonId.ATTRIBUTE_PERSON ), Person.class ), Id.create(atts.getValue(ActivityStartEvent.ATTRIBUTE_LINK ), Link.class ), atts.getValue(ActivityStartEvent.ATTRIBUTE_FACILITY ) == null ? null : Id.create(atts.getValue(ActivityStartEvent.ATTRIBUTE_FACILITY ), org.matsim.facilities.Facility.class), atts.getValue(ActivityStartEvent.ATTRIBUTE_ACTTYPE )) );
 		} else if (PersonArrivalEvent.EVENT_TYPE.equals(eventType)) {
 			String legMode = atts.getValue(PersonArrivalEvent.ATTRIBUTE_LEGMODE);
 			String mode = legMode == null ? null : legMode.intern();
@@ -207,10 +207,10 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 					Double.parseDouble(atts.getValue(TeleportationArrivalEvent.ATTRIBUTE_DISTANCE))));
 		} else if (VehicleArrivesAtFacilityEvent.EVENT_TYPE.equals(eventType)) {
 			String delay = atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_DELAY);
-			this.events.processEvent(new VehicleArrivesAtFacilityEvent(time, Id.create(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_VEHICLE), Vehicle.class), Id.create(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_FACILITY), TransitStopFacility.class), delay == null ? 0.0 : Double.parseDouble(delay)));
+			this.events.processEvent(new VehicleArrivesAtFacilityEvent(time, Id.create(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_VEHICLE), Vehicle.class), Id.create(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_FACILITY), org.matsim.facilities.Facility.class), delay == null ? 0.0 : Double.parseDouble(delay)));
 		} else if (VehicleDepartsAtFacilityEvent.EVENT_TYPE.equals(eventType)) {
 			String delay = atts.getValue(VehicleDepartsAtFacilityEvent.ATTRIBUTE_DELAY);
-			this.events.processEvent(new VehicleDepartsAtFacilityEvent(time, Id.create(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_VEHICLE), Vehicle.class), Id.create(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_FACILITY), TransitStopFacility.class), delay == null ? 0.0 : Double.parseDouble(delay)));
+			this.events.processEvent(new VehicleDepartsAtFacilityEvent(time, Id.create(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_VEHICLE), Vehicle.class), Id.create(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_FACILITY), org.matsim.facilities.Facility.class), delay == null ? 0.0 : Double.parseDouble(delay)));
 		} else if (TransitDriverStartsEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new TransitDriverStartsEvent(time, Id.create(atts.getValue(TransitDriverStartsEvent.ATTRIBUTE_DRIVER_ID), Person.class), Id.create(atts.getValue(TransitDriverStartsEvent.ATTRIBUTE_VEHICLE_ID), Vehicle.class), Id.create(atts.getValue(TransitDriverStartsEvent.ATTRIBUTE_TRANSIT_LINE_ID), TransitLine.class), Id.create(atts.getValue(TransitDriverStartsEvent.ATTRIBUTE_TRANSIT_ROUTE_ID), TransitRoute.class), Id.create(atts.getValue(TransitDriverStartsEvent.ATTRIBUTE_DEPARTURE_ID), Departure.class)));
 		} else if (BoardingDeniedEvent.EVENT_TYPE.equals(eventType)){
@@ -219,8 +219,8 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 			this.events.processEvent(new BoardingDeniedEvent(time, personId, vehicleId));
 		} else if (AgentWaitingForPtEvent.EVENT_TYPE.equals(eventType)){
 			Id<Person> agentId = Id.create(atts.getValue(AgentWaitingForPtEvent.ATTRIBUTE_AGENT), Person.class);
-			Id<TransitStopFacility> waitStopId = Id.create(atts.getValue(AgentWaitingForPtEvent.ATTRIBUTE_WAITSTOP), TransitStopFacility.class);
-			Id<TransitStopFacility> destinationStopId = Id.create(atts.getValue(AgentWaitingForPtEvent.ATTRIBUTE_DESTINATIONSTOP), TransitStopFacility.class);
+			Id<org.matsim.facilities.Facility> waitStopId = Id.create(atts.getValue(AgentWaitingForPtEvent.ATTRIBUTE_WAITSTOP), org.matsim.facilities.Facility.class);
+			Id<org.matsim.facilities.Facility> destinationStopId = Id.create(atts.getValue(AgentWaitingForPtEvent.ATTRIBUTE_DESTINATIONSTOP), org.matsim.facilities.Facility.class);
 			this.events.processEvent(new AgentWaitingForPtEvent(time, agentId, waitStopId, destinationStopId));
 		} else {
 			GenericEvent event = new GenericEvent(eventType, time);

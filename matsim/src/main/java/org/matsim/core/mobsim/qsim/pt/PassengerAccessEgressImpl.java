@@ -152,7 +152,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 	
 
 	@Override
-	public boolean handlePassengerEntering(PTPassengerAgent passenger, MobsimVehicle vehicle,  Id<TransitStopFacility> fromStopFacilityId, double time) {
+	public boolean handlePassengerEntering(PTPassengerAgent passenger, MobsimVehicle vehicle,  Id<org.matsim.facilities.Facility> fromStopFacilityId, double time) {
 		boolean handled = vehicle.addPassenger(passenger);
 		if(handled){
 			this.agentTracker.removeAgentFromStop(passenger, fromStopFacilityId);

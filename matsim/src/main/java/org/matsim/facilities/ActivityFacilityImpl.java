@@ -55,7 +55,7 @@ public class ActivityFacilityImpl implements ActivityFacility, MatsimDataClassIm
 
 	private Coord coord;
 
-	private Id<ActivityFacility> id;
+	private Id<org.matsim.facilities.Facility> id;
 
 	private Id<Link> linkId;
 
@@ -69,7 +69,7 @@ public class ActivityFacilityImpl implements ActivityFacility, MatsimDataClassIm
 	 * @param id
 	 * @param center
 	 */
-	protected ActivityFacilityImpl(final Id<ActivityFacility> id, final Coord center, final Id<Link> linkId) {
+	protected ActivityFacilityImpl(final Id<org.matsim.facilities.Facility> id, final Coord center, final Id<Link> linkId) {
 		this.id = id;
 		this.coord = center;
 		this.linkId = linkId;
@@ -138,7 +138,7 @@ public class ActivityFacilityImpl implements ActivityFacility, MatsimDataClassIm
 	}
 
 	@Override
-	public final Id<ActivityFacility> getId() {
+	public final Id<org.matsim.facilities.Facility> getId() {
 		return this.id;
 	}
 

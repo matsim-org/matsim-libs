@@ -99,7 +99,7 @@ public class FacilitiesReprojectionIOTest {
 
 		// TODO: test also with loading from Controler C'tor?
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
-		for ( Id<ActivityFacility> id : originalScenario.getActivityFacilities().getFacilities().keySet() ) {
+		for ( Id<org.matsim.facilities.Facility> id : originalScenario.getActivityFacilities().getFacilities().keySet() ) {
 			final Coord originalCoord = originalScenario.getActivityFacilities().getFacilities().get( id ).getCoord();
 			final Coord internalCoord = scenario.getActivityFacilities().getFacilities().get( id ).getCoord();
 
@@ -123,7 +123,7 @@ public class FacilitiesReprojectionIOTest {
 		final Scenario dumpedScenario = ScenarioUtils.createScenario( config );
 		new MatsimFacilitiesReader( dumpedScenario ).readFile( outputDirectory+"/output_facilities.xml.gz" );
 
-		for ( Id<ActivityFacility> id : scenario.getActivityFacilities().getFacilities().keySet() ) {
+		for ( Id<org.matsim.facilities.Facility> id : scenario.getActivityFacilities().getFacilities().keySet() ) {
 			final Coord internalCoord = scenario.getActivityFacilities().getFacilities().get( id ).getCoord();
 			final Coord dumpedCoord = dumpedScenario.getActivityFacilities().getFacilities().get( id ).getCoord();
 
@@ -163,7 +163,7 @@ public class FacilitiesReprojectionIOTest {
 
 		// TODO: test also with loading from Controler C'tor?
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
-		for ( Id<ActivityFacility> id : originalScenario.getActivityFacilities().getFacilities().keySet() ) {
+		for ( Id<org.matsim.facilities.Facility> id : originalScenario.getActivityFacilities().getFacilities().keySet() ) {
 			final Coord originalCoord = originalScenario.getActivityFacilities().getFacilities().get( id ).getCoord();
 			final Coord internalCoord = scenario.getActivityFacilities().getFacilities().get( id ).getCoord();
 
@@ -188,7 +188,7 @@ public class FacilitiesReprojectionIOTest {
 		final Scenario dumpedScenario = ScenarioUtils.createScenario( config );
 		new MatsimFacilitiesReader( dumpedScenario ).readFile( outputDirectory+"/output_facilities.xml.gz" );
 
-		for ( Id<ActivityFacility> id : originalScenario.getActivityFacilities().getFacilities().keySet() ) {
+		for ( Id<org.matsim.facilities.Facility> id : originalScenario.getActivityFacilities().getFacilities().keySet() ) {
 			final Coord originalCoord = originalScenario.getActivityFacilities().getFacilities().get( id ).getCoord();
 			final Coord dumpedCoord = dumpedScenario.getActivityFacilities().getFacilities().get( id ).getCoord();
 
@@ -214,7 +214,7 @@ public class FacilitiesReprojectionIOTest {
 				originalFacilities.getFacilities().size(),
 				reprojectedFacilities.getFacilities().size() );
 
-		for (Id<ActivityFacility> id : originalFacilities.getFacilities().keySet() ) {
+		for (Id<org.matsim.facilities.Facility> id : originalFacilities.getFacilities().keySet() ) {
 			final ActivityFacility originalFacility = originalFacilities.getFacilities().get( id );
 			final ActivityFacility reprojectedFacility = reprojectedFacilities.getFacilities().get( id );
 

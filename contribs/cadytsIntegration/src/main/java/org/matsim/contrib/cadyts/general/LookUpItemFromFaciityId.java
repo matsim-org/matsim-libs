@@ -1,10 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * ActivityWrapperFacility.java
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,52 +16,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.facilities;
+package org.matsim.contrib.cadyts.general;
 
-import java.util.Map;
-
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
+import org.matsim.facilities.Facility;
 
 /**
- * When ActivityFacilities are not used, use this class
- * to wrap activity geographical information (coord and linkid)
- * in a facility interface (for example to pass to the router)
- * @author thibautd
+ * Interface for class that provides the method to look up the "counted" item from its id.
+ * Necessary to generalize CadytsBuilder.
+ * 
+ * @author nagel
+ *
  */
- class ActivityWrapperFacility implements Facility {
-	private final Activity wrapped;
+public interface LookUpItemFromFaciityId<T> {
+	
+	T getItem( Id<Facility> id ) ;
 
-	ActivityWrapperFacility( final Activity toWrap ) {
-		this.wrapped = toWrap;
-	}
-
-	@Override
-	public Coord getCoord() {
-		return this.wrapped.getCoord();
-	}
-
-	@Override
-	public Id<org.matsim.facilities.Facility> getId() {
-		return this.wrapped.getFacilityId();
-	}
-
-	@Override
-	public Map<String, Object> getCustomAttributes() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Id<Link> getLinkId() {
-		return this.wrapped.getLinkId();
-	}
-
-	@Override
-	public String toString() {
-		return "[ActivityWrapperFacility: wrapped="+this.wrapped+"]";
-	}
 }
-

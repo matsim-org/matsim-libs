@@ -42,7 +42,7 @@ public interface ActivityFacilities extends MatsimToplevelContainer, Attributabl
 	@Override
 	public ActivityFacilitiesFactory getFactory();
 
-	public Map<Id<ActivityFacility>, ? extends ActivityFacility> getFacilities();
+	public Map<Id<org.matsim.facilities.Facility>, ? extends ActivityFacility> getFacilities();
 
 	public void addActivityFacility(ActivityFacility facility);
 
@@ -52,6 +52,6 @@ public interface ActivityFacilities extends MatsimToplevelContainer, Attributabl
 	/* not sure if this method should be in the interface, but too many users seem to use and like it,
 	 * so there seems to be a need for it...   mrieser/jul13
 	 */
-	public TreeMap<Id<ActivityFacility>, ActivityFacility> getFacilitiesForActivityType(final String actType);
+	public TreeMap<Id<org.matsim.facilities.Facility>, ActivityFacility> getFacilitiesForActivityType(final String actType);
 	
 }

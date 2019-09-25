@@ -201,7 +201,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 					.getTransitSchedule();
 			relevantLinks.stream().forEach(link -> {
 				TransitStopFacility f = schedule.getFactory()
-						.createTransitStopFacility(Id.create(link.getId(), TransitStopFacility.class),
+						.createTransitStopFacility(Id.create(link.getId(), org.matsim.facilities.Facility.class),
 								link.getToNode().getCoord(), false);
 				f.setLinkId(link.getId());
 				schedule.addStopFacility(f);

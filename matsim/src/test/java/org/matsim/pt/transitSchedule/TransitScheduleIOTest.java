@@ -59,8 +59,8 @@ public class TransitScheduleIOTest {
 
 			schedule.getAttributes().putAttribute("source", "myImagination");
 
-			TransitStopFacility stop1 = f.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new Coord(123, 234), true);
-			TransitStopFacility stop2 = f.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new Coord(987, 876, 98765), false);
+			TransitStopFacility stop1 = f.createTransitStopFacility(Id.create(1, org.matsim.facilities.Facility.class), new Coord(123, 234), true);
+			TransitStopFacility stop2 = f.createTransitStopFacility(Id.create(2, org.matsim.facilities.Facility.class), new Coord(987, 876, 98765), false);
 			stop2.getAttributes().putAttribute("air", "thin");
 			stop2.setStopAreaId(Id.create("GZ", TransitStopArea.class));
 
@@ -116,9 +116,9 @@ public class TransitScheduleIOTest {
 		Assert.assertEquals("myImagination", schedule2.getAttributes().getAttribute("source"));
 
 		// assert stop facilities
-		TransitStopFacility stop1 = schedule2.getFacilities().get(Id.create(1, TransitStopFacility.class));
+		TransitStopFacility stop1 = schedule2.getFacilities().get(Id.create(1, org.matsim.facilities.Facility.class));
 		Assert.assertTrue(AttributesUtils.isEmpty(stop1.getAttributes()));
-		TransitStopFacility stop2 = schedule2.getFacilities().get(Id.create(2, TransitStopFacility.class));
+		TransitStopFacility stop2 = schedule2.getFacilities().get(Id.create(2, org.matsim.facilities.Facility.class));
 		Assert.assertFalse(AttributesUtils.isEmpty(stop2.getAttributes()));
 		Assert.assertEquals("thin", stop2.getAttributes().getAttribute("air"));
 		Assert.assertTrue(stop2.getCoord().hasZ());

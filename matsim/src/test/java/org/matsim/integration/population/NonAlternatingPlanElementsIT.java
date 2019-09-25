@@ -229,10 +229,10 @@ public class NonAlternatingPlanElementsIT {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleFactory f = schedule.getFactory();
 		final double x = -6000;
-		TransitStopFacility stopFacility1 = f.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new Coord(x, (double) 1500), false);
+		TransitStopFacility stopFacility1 = f.createTransitStopFacility(Id.create(1, org.matsim.facilities.Facility.class), new Coord(x, (double) 1500), false);
 		stopFacility1.setLinkId(Id.create(14, Link.class));
 		final double y = -4000;
-		TransitStopFacility stopFacility2 = f.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new Coord((double) 5000, y), false);
+		TransitStopFacility stopFacility2 = f.createTransitStopFacility(Id.create(2, org.matsim.facilities.Facility.class), new Coord((double) 5000, y), false);
 		stopFacility2.setLinkId(Id.create(21, Link.class));
 		schedule.addStopFacility(stopFacility1);
 		schedule.addStopFacility(stopFacility2);

@@ -27,7 +27,7 @@ import cadyts.utilities.misc.DynamicDataXMLFileIO;
 /**
  * Enables cadyts to persist the cost offsets to file.
  */
-public final class CadytsCostOffsetsXMLFileIO<T extends Identifiable<T>> extends DynamicDataXMLFileIO<T> {
+public final class CadytsCostOffsetsXMLFileIO<T extends Identifiable<? super T>> extends DynamicDataXMLFileIO<T> {
 	// yyyy this is most probably not "costs" but just "offsets" (which end up being added into the scoring function, so if anything
 	// they are negative costs).  --> rename kai/janek, feb'19
 
@@ -40,6 +40,9 @@ public final class CadytsCostOffsetsXMLFileIO<T extends Identifiable<T>> extends
 		this.lookUp = lookUp;
 		this.idType = idType;
 	}
+
+	// Have now problems here with Facility, where, e.g., TransitStopFacility implements Identifiable<Facility>, and thus no longer T implements
+	// Identifiable<T>. Gunnar looks up MeasurementItem from String and String from MeasurementItem (= object reference), so the mess is made by us.
 
 	@Override
 	protected T attrValue2key(final String stopId) {

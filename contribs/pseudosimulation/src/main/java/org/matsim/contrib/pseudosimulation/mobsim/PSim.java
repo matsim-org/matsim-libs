@@ -82,7 +82,7 @@ public class PSim implements Mobsim {
 //    private WaitTime waitTimes;
 //    private StopStopTime stopStopTimes;
 //    private Map<Id<TransitLine>, TransitLine> transitLines;
-//    private Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities;
+//    private Map<Id<org.matsim.facilities.Facility>, TransitStopFacility> stopFacilities;
     private final Collection<Plan> plans;
     private final double endTime;
     

@@ -100,7 +100,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 					schedule.getFactory().createTransitStopFacility(
 							Id.create(
 									atts.getValue(Constants.ID),
-									TransitStopFacility.class),
+									org.matsim.facilities.Facility.class),
 							coordinateTransformation.transform(
 									new Coord(
 											Double.parseDouble(atts.getValue("x")),
@@ -145,7 +145,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 				}
 			}
 		} else if (Constants.STOP.equals(name)) {
-			Id<TransitStopFacility> id = Id.create(atts.getValue(Constants.REF_ID), TransitStopFacility.class);
+			Id<org.matsim.facilities.Facility> id = Id.create(atts.getValue(Constants.REF_ID), org.matsim.facilities.Facility.class);
 			TransitStopFacility facility = this.schedule.getFacilities().get(id);
 			if (facility == null) {
 				throw new RuntimeException("no stop/facility with id " + atts.getValue(Constants.REF_ID));

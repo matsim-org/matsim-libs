@@ -55,11 +55,11 @@ public class WaitTimeCalculatorImpl implements WaitTimeCalculator, PersonDepartu
 
 	//Attributes
 	private final double timeSlot;
-	private final Map<Tuple<Id<TransitLine>, Id<TransitRoute>>, Map<Id<TransitStopFacility>, WaitTimeData>> waitTimes = new HashMap<Tuple<Id<TransitLine>, Id<TransitRoute>>, Map<Id<TransitStopFacility>, WaitTimeData>>(1000);
-	private final Map<Tuple<Id<TransitLine>, Id<TransitRoute>>, Map<Id<TransitStopFacility>, double[]>> scheduledWaitTimes = new HashMap<Tuple<Id<TransitLine>, Id<TransitRoute>>, Map<Id<TransitStopFacility>, double[]>>(1000);
+	private final Map<Tuple<Id<TransitLine>, Id<TransitRoute>>, Map<Id<org.matsim.facilities.Facility>, WaitTimeData>> waitTimes = new HashMap<Tuple<Id<TransitLine>, Id<TransitRoute>>, Map<Id<org.matsim.facilities.Facility>, WaitTimeData>>(1000);
+	private final Map<Tuple<Id<TransitLine>, Id<TransitRoute>>, Map<Id<org.matsim.facilities.Facility>, double[]>> scheduledWaitTimes = new HashMap<Tuple<Id<TransitLine>, Id<TransitRoute>>, Map<Id<org.matsim.facilities.Facility>, double[]>>(1000);
 	private final Map<Id<Person>, Double> agentsWaitingData = new HashMap<Id<Person>, Double>();
 	private Map<Id<Vehicle>, Tuple<Id<TransitLine>, Id<TransitRoute>>> linesRoutesOfVehicle = new HashMap<Id<Vehicle>, Tuple<Id<TransitLine>, Id<TransitRoute>>>();
-	private Map<Id<Vehicle>, Id<TransitStopFacility>> stopOfVehicle = new HashMap<Id<Vehicle>, Id<TransitStopFacility>>();
+	private Map<Id<Vehicle>, Id<org.matsim.facilities.Facility>> stopOfVehicle = new HashMap<Id<Vehicle>, Id<org.matsim.facilities.Facility>>();
 	
 	//Constructors
 	@Inject
@@ -76,8 +76,8 @@ public class WaitTimeCalculatorImpl implements WaitTimeCalculator, PersonDepartu
 				for(Departure departure:route.getDepartures().values())
 					sortedDepartures[d++] = departure.getDepartureTime();
 				Arrays.sort(sortedDepartures);
-				Map<Id<TransitStopFacility>, WaitTimeData> stopsMap = new HashMap<Id<TransitStopFacility>, WaitTimeData>(100);
-				Map<Id<TransitStopFacility>, double[]> stopsScheduledMap = new HashMap<Id<TransitStopFacility>, double[]>(100);
+				Map<Id<org.matsim.facilities.Facility>, WaitTimeData> stopsMap = new HashMap<Id<org.matsim.facilities.Facility>, WaitTimeData>(100);
+				Map<Id<org.matsim.facilities.Facility>, double[]> stopsScheduledMap = new HashMap<Id<org.matsim.facilities.Facility>, double[]>(100);
 				for(TransitRouteStop stop:route.getStops()) {
 					stopsMap.put(stop.getStopFacility().getId(), new WaitTimeDataArray((int) (totalTime/timeSlot)+1));
 					double[] cacheWaitTimes = new double[(int) (totalTime/timeSlot)+1];
@@ -115,13 +115,13 @@ public class WaitTimeCalculatorImpl implements WaitTimeCalculator, PersonDepartu
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time) {
+			public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<org.matsim.facilities.Facility> stopId, double time) {
 				return WaitTimeCalculatorImpl.this.getRouteStopWaitTime(lineId, routeId, stopId, time);
 			}
 		};
 	}
 	@Override
-	public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time) {
+	public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<org.matsim.facilities.Facility> stopId, double time) {
 		Tuple<Id<TransitLine>, Id<TransitRoute>> key = new Tuple<Id<TransitLine>, Id<TransitRoute>>(lineId, routeId);
 		WaitTimeData waitTimeData = waitTimes.get(key).get(stopId);
 		if(waitTimeData.getNumData((int) (time/timeSlot))==0) {
@@ -133,7 +133,7 @@ public class WaitTimeCalculatorImpl implements WaitTimeCalculator, PersonDepartu
 	}
 	@Override
 	public void reset(int iteration) {
-		for(Map<Id<TransitStopFacility>, WaitTimeData> routeData:waitTimes.values())
+		for(Map<Id<org.matsim.facilities.Facility>, WaitTimeData> routeData:waitTimes.values())
 			for(WaitTimeData waitTimeData:routeData.values())
 				waitTimeData.resetWaitTimes();
 		agentsWaitingData.clear();

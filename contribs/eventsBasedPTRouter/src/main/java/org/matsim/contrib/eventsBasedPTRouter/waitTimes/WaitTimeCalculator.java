@@ -9,7 +9,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 
 public interface WaitTimeCalculator extends Provider<WaitTime> {
-	double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time);
+	double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<org.matsim.facilities.Facility> stopId, double time);
 
 	@Override
 	@Provides

@@ -101,17 +101,17 @@ public class StopStopTimeCalculatorSerializable implements StopStopTimeCalculato
 			 */
 			private static final long serialVersionUID = 1L;
 			@Override
-			public double getStopStopTime(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time) {
+			public double getStopStopTime(Id<org.matsim.facilities.Facility> stopOId, Id<org.matsim.facilities.Facility> stopDId, double time) {
 				return StopStopTimeCalculatorSerializable.this.getStopStopTime(stopOId, stopDId, time);
 			}
 			@Override
-			public double getStopStopTimeVariance(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time) {
+			public double getStopStopTimeVariance(Id<org.matsim.facilities.Facility> stopOId, Id<org.matsim.facilities.Facility> stopDId, double time) {
 				return StopStopTimeCalculatorSerializable.this.getStopStopTimeVariance(stopOId, stopDId, time);
 			}
 		};
 	}
 	@Override
-	public double getStopStopTime(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time) {
+	public double getStopStopTime(Id<org.matsim.facilities.Facility> stopOId, Id<org.matsim.facilities.Facility> stopDId, double time) {
 		StopStopTimeData stopStopTimeData = stopStopTimes.get(stopOId.toString()).get(stopDId.toString());
 		totalCalls++;
 		if(stopStopTimeData.getNumData((int) (time/timeSlot))==0) {
@@ -124,7 +124,7 @@ public class StopStopTimeCalculatorSerializable implements StopStopTimeCalculato
 		}
 	}
 	@Override
-	public double getStopStopTimeVariance(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time) {
+	public double getStopStopTimeVariance(Id<org.matsim.facilities.Facility> stopOId, Id<org.matsim.facilities.Facility> stopDId, double time) {
 		StopStopTimeData stopStopTimeData = stopStopTimes.get(stopOId.toString()).get(stopDId.toString());
 		if(stopStopTimeData.getNumData((int) (time/timeSlot))==0)
 			return 0;
@@ -136,12 +136,12 @@ public class StopStopTimeCalculatorSerializable implements StopStopTimeCalculato
 	public StopStopTime get() {
 		return new StopStopTime() {
 			@Override
-			public double getStopStopTime(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time) {
+			public double getStopStopTime(Id<org.matsim.facilities.Facility> stopOId, Id<org.matsim.facilities.Facility> stopDId, double time) {
 				return StopStopTimeCalculatorSerializable.this.getStopStopTime(stopOId,stopDId,time);
 			}
 
 			@Override
-			public double getStopStopTimeVariance(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time) {
+			public double getStopStopTimeVariance(Id<org.matsim.facilities.Facility> stopOId, Id<org.matsim.facilities.Facility> stopDId, double time) {
 				return StopStopTimeCalculatorSerializable.this.getStopStopTimeVariance(stopOId,stopDId,time);
 			}
 		};

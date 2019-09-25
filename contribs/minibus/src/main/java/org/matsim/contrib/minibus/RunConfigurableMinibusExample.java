@@ -58,7 +58,7 @@ public final class RunConfigurableMinibusExample {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		final Set<Id<TransitStopFacility>> subsidizedStops = new TreeSet<>() ;
+		final Set<Id<org.matsim.facilities.Facility>> subsidizedStops = new TreeSet<>() ;
 		// subsidizedStops.add(...) ; // add subsidized stops
 		
 		Controler controler = new Controler(scenario);

@@ -8,7 +8,7 @@ import java.io.Serializable;
 public interface StopStopTime extends Serializable {
 
 	//Methods
-	public double getStopStopTime(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time);
-	public double getStopStopTimeVariance(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time);
+	public double getStopStopTime(Id<org.matsim.facilities.Facility> stopOId, Id<org.matsim.facilities.Facility> stopDId, double time);
+	public double getStopStopTimeVariance(Id<org.matsim.facilities.Facility> stopOId, Id<org.matsim.facilities.Facility> stopDId, double time);
 		
 }

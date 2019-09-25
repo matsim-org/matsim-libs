@@ -49,7 +49,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public class CountsComparisonAlgorithm {
 
 	public static interface VolumesForId {
-		double[] getVolumesForStop(Id<TransitStopFacility> locationId);
+		double[] getVolumesForStop(Id<org.matsim.facilities.Facility> locationId);
 	}
 	
 	public static interface DistanceFilter {
@@ -85,7 +85,7 @@ public class CountsComparisonAlgorithm {
 		this.volumesPerLinkPerHour = new VolumesForId() {
 
 			@Override
-			public double[] getVolumesForStop(Id<TransitStopFacility> locationId) {
+			public double[] getVolumesForStop(Id<org.matsim.facilities.Facility> locationId) {
 				return volumes.getVolumesPerHourForLink(Id.create(locationId, Link.class));
 			}
 
@@ -96,7 +96,7 @@ public class CountsComparisonAlgorithm {
 		this.volumesPerLinkPerHour = new VolumesForId() {
 
 			@Override
-			public double[] getVolumesForStop(Id<TransitStopFacility> locationId) {
+			public double[] getVolumesForStop(Id<org.matsim.facilities.Facility> locationId) {
 				return volumesPerLinkPerHour.get(Id.create(locationId, Link.class));
 			}
 
@@ -124,7 +124,7 @@ public class CountsComparisonAlgorithm {
 			if (!distanceFilter.isInRange(count)) {
 				continue;
 			}
-			double[] volumes = this.volumesPerLinkPerHour.getVolumesForStop(Id.create(count.getId(), TransitStopFacility.class));
+			double[] volumes = this.volumesPerLinkPerHour.getVolumesForStop(Id.create(count.getId(), org.matsim.facilities.Facility.class));
 			if (volumes == null || volumes.length == 0) {
 				log.warn("No volumes for count location: " + count.getId().toString());
 				continue;

@@ -57,9 +57,9 @@ public class FacilitiesFromPopulationTest {
 		
 		Assert.assertEquals(3, f.scenario.getActivityFacilities().getFacilities().size());
 		
-		Assert.assertEquals("bc", f.scenario.getActivityFacilities().getFacilities().get(Id.create("bc", ActivityFacility.class)).getLinkId().toString());
-		Assert.assertEquals("ca", f.scenario.getActivityFacilities().getFacilities().get(Id.create("ca", ActivityFacility.class)).getLinkId().toString());
-		Assert.assertEquals("ab", f.scenario.getActivityFacilities().getFacilities().get(Id.create("ab", ActivityFacility.class)).getLinkId().toString());
+		Assert.assertEquals("bc", f.scenario.getActivityFacilities().getFacilities().get(Id.create("bc", org.matsim.facilities.Facility.class)).getLinkId().toString());
+		Assert.assertEquals("ca", f.scenario.getActivityFacilities().getFacilities().get(Id.create("ca", org.matsim.facilities.Facility.class)).getLinkId().toString());
+		Assert.assertEquals("ab", f.scenario.getActivityFacilities().getFacilities().get(Id.create("ab", org.matsim.facilities.Facility.class)).getLinkId().toString());
 		
 		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan(), "ab", "bc", true);
 		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("2", Person.class)).getSelectedPlan(), "ab", "bc", true);
@@ -93,9 +93,9 @@ public class FacilitiesFromPopulationTest {
 		
 		Assert.assertEquals(3, f.scenario.getActivityFacilities().getFacilities().size());
 		
-		Map<Id<ActivityFacility>, ? extends ActivityFacility> ffs = f.scenario.getActivityFacilities().getFacilities();
-		Assert.assertEquals(7*3600, ffs.get(Id.create("ab", ActivityFacility.class)).getActivityOptions().get("work").getOpeningTimes().first().getStartTime(), 1e-7);
-		Assert.assertEquals(19*3600, ffs.get(Id.create("ab", ActivityFacility.class)).getActivityOptions().get("work").getOpeningTimes().first().getEndTime(), 1e-7);
+		Map<Id<org.matsim.facilities.Facility>, ? extends ActivityFacility> ffs = f.scenario.getActivityFacilities().getFacilities();
+		Assert.assertEquals(7*3600, ffs.get(Id.create("ab", org.matsim.facilities.Facility.class)).getActivityOptions().get("work").getOpeningTimes().first().getStartTime(), 1e-7);
+		Assert.assertEquals(19*3600, ffs.get(Id.create("ab", org.matsim.facilities.Facility.class)).getActivityOptions().get("work").getOpeningTimes().first().getEndTime(), 1e-7);
 		
 		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan(), "ab", "bc", true);
 		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("2", Person.class)).getSelectedPlan(), "ab", "bc", true);
@@ -124,20 +124,20 @@ public class FacilitiesFromPopulationTest {
 		
 		Assert.assertEquals(13, f.scenario.getActivityFacilities().getFacilities().size());
 
-		Map<Id<ActivityFacility>, ? extends ActivityFacility> ffs = f.scenario.getActivityFacilities().getFacilities();
-		Assert.assertEquals("ab", ffs.get(Id.create("0", ActivityFacility.class)).getLinkId().toString()); // home of agent 1
-		Assert.assertEquals("bc", ffs.get(Id.create("1", ActivityFacility.class)).getLinkId().toString()); // work of agent 1-3
-		Assert.assertEquals("ab", ffs.get(Id.create("2", ActivityFacility.class)).getLinkId().toString()); // home of agent 2
-		Assert.assertEquals("ab", ffs.get(Id.create("3", ActivityFacility.class)).getLinkId().toString()); // home of agent 3
-		Assert.assertEquals("bc", ffs.get(Id.create("4", ActivityFacility.class)).getLinkId().toString()); // home of agent 4
-		Assert.assertEquals("ca", ffs.get(Id.create("5", ActivityFacility.class)).getLinkId().toString()); // work of agent 4-7
-		Assert.assertEquals("bc", ffs.get(Id.create("6", ActivityFacility.class)).getLinkId().toString()); // home of agent 5
-		Assert.assertEquals("bc", ffs.get(Id.create("7", ActivityFacility.class)).getLinkId().toString()); // home of agent 6
-		Assert.assertEquals("bc", ffs.get(Id.create("8", ActivityFacility.class)).getLinkId().toString()); // home of agent 7
-		Assert.assertEquals("ca", ffs.get(Id.create("9", ActivityFacility.class)).getLinkId().toString()); // home of agent 8
-		Assert.assertEquals("ab", ffs.get(Id.create("10", ActivityFacility.class)).getLinkId().toString()); // work of agent 8-10
-		Assert.assertEquals("ca", ffs.get(Id.create("11", ActivityFacility.class)).getLinkId().toString()); // home of agent 9
-		Assert.assertEquals("ca", ffs.get(Id.create("12", ActivityFacility.class)).getLinkId().toString()); // home of agent 10
+		Map<Id<org.matsim.facilities.Facility>, ? extends ActivityFacility> ffs = f.scenario.getActivityFacilities().getFacilities();
+		Assert.assertEquals("ab", ffs.get(Id.create("0", org.matsim.facilities.Facility.class)).getLinkId().toString()); // home of agent 1
+		Assert.assertEquals("bc", ffs.get(Id.create("1", org.matsim.facilities.Facility.class)).getLinkId().toString()); // work of agent 1-3
+		Assert.assertEquals("ab", ffs.get(Id.create("2", org.matsim.facilities.Facility.class)).getLinkId().toString()); // home of agent 2
+		Assert.assertEquals("ab", ffs.get(Id.create("3", org.matsim.facilities.Facility.class)).getLinkId().toString()); // home of agent 3
+		Assert.assertEquals("bc", ffs.get(Id.create("4", org.matsim.facilities.Facility.class)).getLinkId().toString()); // home of agent 4
+		Assert.assertEquals("ca", ffs.get(Id.create("5", org.matsim.facilities.Facility.class)).getLinkId().toString()); // work of agent 4-7
+		Assert.assertEquals("bc", ffs.get(Id.create("6", org.matsim.facilities.Facility.class)).getLinkId().toString()); // home of agent 5
+		Assert.assertEquals("bc", ffs.get(Id.create("7", org.matsim.facilities.Facility.class)).getLinkId().toString()); // home of agent 6
+		Assert.assertEquals("bc", ffs.get(Id.create("8", org.matsim.facilities.Facility.class)).getLinkId().toString()); // home of agent 7
+		Assert.assertEquals("ca", ffs.get(Id.create("9", org.matsim.facilities.Facility.class)).getLinkId().toString()); // home of agent 8
+		Assert.assertEquals("ab", ffs.get(Id.create("10", org.matsim.facilities.Facility.class)).getLinkId().toString()); // work of agent 8-10
+		Assert.assertEquals("ca", ffs.get(Id.create("11", org.matsim.facilities.Facility.class)).getLinkId().toString()); // home of agent 9
+		Assert.assertEquals("ca", ffs.get(Id.create("12", org.matsim.facilities.Facility.class)).getLinkId().toString()); // home of agent 10
 		
 		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan(), "0", "1", true);
 		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("2", Person.class)).getSelectedPlan(), "2", "1", true);

@@ -49,8 +49,8 @@ abstract class AbstractPStrategyModule implements PStrategy {
 
 	}
 
-	final Set<Id<TransitStopFacility>> getStopsUsed(Collection<TransitRoute> routes) {
-		Set<Id<TransitStopFacility>> stopsUsed = new TreeSet<>();
+	final Set<Id<org.matsim.facilities.Facility>> getStopsUsed(Collection<TransitRoute> routes) {
+		Set<Id<org.matsim.facilities.Facility>> stopsUsed = new TreeSet<>();
 		for (TransitRoute route : routes) {
 			for (TransitRouteStop stop : route.getStops()) {
 				stopsUsed.add(stop.getStopFacility().getId());

@@ -122,7 +122,7 @@ public class BlockingStopDemo {
 
 		// line 1
 		for (int i = 0; i < nOfStops; i++) {
-			stops[i] = builder.createTransitStopFacility(Id.create(i, TransitStopFacility.class), new Coord(1000 + i * 500, 0), false);
+			stops[i] = builder.createTransitStopFacility(Id.create(i, org.matsim.facilities.Facility.class), new Coord(1000 + i * 500, 0), false);
 			stops[i].setLinkId(Id.create(i+1, Link.class));
 			schedule.addStopFacility(stops[i]);
 			stopList.add(builder.createTransitRouteStop(stops[i], 100 + i*70, 120 + i*70));
@@ -149,7 +149,7 @@ public class BlockingStopDemo {
 		// line 2
 		stopList = new ArrayList<>(nOfStops);
 		for (int i = 0; i < nOfStops; i++) {
-			stops[i+nOfStops] = builder.createTransitStopFacility(Id.create(i+nOfStops, TransitStopFacility.class), new Coord(1000 + i * 500, 500), true);
+			stops[i+nOfStops] = builder.createTransitStopFacility(Id.create(i+nOfStops, org.matsim.facilities.Facility.class), new Coord(1000 + i * 500, 500), true);
 			stops[i+nOfStops].setLinkId(Id.create(i+1+nOfLinks, Link.class));
 			schedule.addStopFacility(stops[i+nOfStops]);
 			stopList.add(builder.createTransitRouteStop(stops[i+nOfStops], 100 + i*70, 120 + i*70));
@@ -205,7 +205,7 @@ public class BlockingStopDemo {
 			Activity act1 = pb.createActivityFromLinkId("home", Id.create(i, Link.class));
 			act1.setEndTime(startTime + i*60);
 			Leg leg = pb.createLeg(TransportMode.pt);
-			leg.setRoute(new ExperimentalTransitRoute(schedule.getFacilities().get(Id.create(i-1, TransitStopFacility.class)), tLine1, tRoute1, schedule.getFacilities().get(Id.create(nOfStops-1, TransitStopFacility.class))));
+			leg.setRoute(new ExperimentalTransitRoute(schedule.getFacilities().get(Id.create(i-1, org.matsim.facilities.Facility.class)), tLine1, tRoute1, schedule.getFacilities().get(Id.create(nOfStops-1, org.matsim.facilities.Facility.class))));
 			Activity act2 = pb.createActivityFromLinkId("work", Id.create(nOfLinks-1, Link.class));
 
 			population.addPerson(person);
@@ -223,7 +223,7 @@ public class BlockingStopDemo {
 			Activity act1 = pb.createActivityFromLinkId("home", Id.create(nOfLinks+i, Link.class));
 			act1.setEndTime(startTime + i*60);
 			Leg leg = pb.createLeg(TransportMode.pt);
-			leg.setRoute(new ExperimentalTransitRoute(schedule.getFacilities().get(Id.create(nOfStops+i-1, TransitStopFacility.class)), tLine2, tRoute2, schedule.getFacilities().get(Id.create(2*nOfStops-1, TransitStopFacility.class))));
+			leg.setRoute(new ExperimentalTransitRoute(schedule.getFacilities().get(Id.create(nOfStops+i-1, org.matsim.facilities.Facility.class)), tLine2, tRoute2, schedule.getFacilities().get(Id.create(2*nOfStops-1, org.matsim.facilities.Facility.class))));
 			Activity act2 = pb.createActivityFromLinkId("work", Id.create(2*nOfLinks-1, Link.class));
 
 			population.addPerson(person);

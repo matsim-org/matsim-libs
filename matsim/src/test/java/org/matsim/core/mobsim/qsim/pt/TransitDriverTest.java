@@ -203,10 +203,10 @@ public class TransitDriverTest {
 		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(null, null);
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 500, (double) 0), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord((double) 1500, (double) 0), false);
-		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord((double) 2500, (double) 0), false);
-		TransitStopFacility stop4 = builder.createTransitStopFacility(Id.create("4", TransitStopFacility.class), new Coord((double) 3500, (double) 0), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", org.matsim.facilities.Facility.class), new Coord((double) 500, (double) 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", org.matsim.facilities.Facility.class), new Coord((double) 1500, (double) 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", org.matsim.facilities.Facility.class), new Coord((double) 2500, (double) 0), false);
+		TransitStopFacility stop4 = builder.createTransitStopFacility(Id.create("4", org.matsim.facilities.Facility.class), new Coord((double) 3500, (double) 0), false);
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
 		stops.add(builder.createTransitRouteStop(stop3, 250, 260));
@@ -254,9 +254,9 @@ public class TransitDriverTest {
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 500, (double) 0), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord((double) 1500, (double) 0), false);
-		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord((double) 1500, (double) 0), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", org.matsim.facilities.Facility.class), new Coord((double) 500, (double) 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", org.matsim.facilities.Facility.class), new Coord((double) 1500, (double) 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", org.matsim.facilities.Facility.class), new Coord((double) 1500, (double) 0), false);
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
 		stops.add(builder.createTransitRouteStop(stop3, 250, 260));
@@ -359,8 +359,8 @@ public class TransitDriverTest {
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 500, (double) 0), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord((double) 1500, (double) 0), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", org.matsim.facilities.Facility.class), new Coord((double) 500, (double) 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", org.matsim.facilities.Facility.class), new Coord((double) 1500, (double) 0), false);
 		stop1.setLinkId(Id.create("dummy", Link.class));
 		stop2.setLinkId(Id.create("dummy", Link.class));
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
@@ -426,8 +426,8 @@ public class TransitDriverTest {
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 500, (double) 0), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 1000, (double) 0), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", org.matsim.facilities.Facility.class), new Coord((double) 500, (double) 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("1", org.matsim.facilities.Facility.class), new Coord((double) 1000, (double) 0), false);
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 100, 110));
 		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(null, null);
@@ -469,9 +469,9 @@ public class TransitDriverTest {
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 500, (double) 0), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord((double) 500, (double) 0), false);
-		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord((double) 500, (double) 0), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", org.matsim.facilities.Facility.class), new Coord((double) 500, (double) 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", org.matsim.facilities.Facility.class), new Coord((double) 500, (double) 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", org.matsim.facilities.Facility.class), new Coord((double) 500, (double) 0), false);
 		double departureOffset1 = 60;
 		double departureOffset2 = 160;
 		double departureOffset3 = Time.getUndefinedTime();
@@ -529,9 +529,9 @@ public class TransitDriverTest {
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 500, (double) 0), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord((double) 1500, (double) 0), false);
-		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord((double) 2500, (double) 0), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", org.matsim.facilities.Facility.class), new Coord((double) 500, (double) 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", org.matsim.facilities.Facility.class), new Coord((double) 1500, (double) 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", org.matsim.facilities.Facility.class), new Coord((double) 2500, (double) 0), false);
 		stop1.setLinkId(Id.create("dummy", Link.class));
 		stop2.setLinkId(Id.create("dummy", Link.class));
 		stop3.setLinkId(Id.create("dummy", Link.class));
@@ -590,9 +590,9 @@ public class TransitDriverTest {
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
 		
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 500, (double) 0), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord((double) 1500, (double) 0), false);
-		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord((double) 2500, (double) 0), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", org.matsim.facilities.Facility.class), new Coord((double) 500, (double) 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", org.matsim.facilities.Facility.class), new Coord((double) 1500, (double) 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", org.matsim.facilities.Facility.class), new Coord((double) 2500, (double) 0), false);
 		stop1.setLinkId(Id.create("1", Link.class));
 		stop2.setLinkId(Id.create("2", Link.class));
 		stop3.setLinkId(Id.create("33", Link.class));
@@ -663,12 +663,12 @@ public class TransitDriverTest {
 		}
 
 		@Override
-		public Id<TransitStopFacility> getDesiredAccessStopId() {
+		public Id<org.matsim.facilities.Facility> getDesiredAccessStopId() {
 			return null;
 		}
 		
 		@Override
-		public Id<TransitStopFacility> getDesiredDestinationStopId() {
+		public Id<org.matsim.facilities.Facility> getDesiredDestinationStopId() {
 			return null;
 		}
 		

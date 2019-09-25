@@ -139,7 +139,7 @@ public final class AccessibilityModule extends AbstractModule {
 					measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(boundingBox, tileSize_m);
 				}
 
-				Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap;
+				Map<Id<org.matsim.facilities.Facility>, Geometry> measurePointGeometryMap;
 				if (acg.getMeasurePointGeometryProvision() == MeasurePointGeometryProvision.fromShapeFile) {
 					measurePointGeometryMap = acg.getMeasurePointGeometryMap();
 				} else {

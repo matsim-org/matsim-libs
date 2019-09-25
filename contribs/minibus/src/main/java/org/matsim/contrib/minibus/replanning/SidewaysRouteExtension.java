@@ -76,7 +76,7 @@ public final class SidewaysRouteExtension extends AbstractPStrategyModule {
 		List<Geometry> lineStrings = this.createGeometryFromStops(currentStopsToBeServed, remoteStopIndex);
 		Geometry buffer = this.createBuffer(lineStrings, Math.max(this.bufferSize, bufferSizeBasedOnRatio), this.excludeTermini);
 		
-		Set<Id<TransitStopFacility>> stopsUsed = this.getStopsUsed(oldPlan.getLine().getRoutes().values());
+		Set<Id<org.matsim.facilities.Facility>> stopsUsed = this.getStopsUsed(oldPlan.getLine().getRoutes().values());
 		TransitStopFacility newStop = this.drawRandomStop(buffer, operator.getRouteProvider(), stopsUsed);
 		
 		if (newStop == null) {
@@ -167,7 +167,7 @@ public final class SidewaysRouteExtension extends AbstractPStrategyModule {
 		return subRoutes;
 	}
 
-	private TransitStopFacility drawRandomStop(Geometry buffer, PRouteProvider pRouteProvider, Set<Id<TransitStopFacility>> stopsUsed) {
+	private TransitStopFacility drawRandomStop(Geometry buffer, PRouteProvider pRouteProvider, Set<Id<org.matsim.facilities.Facility>> stopsUsed) {
 		List<TransitStopFacility> choiceSet = new LinkedList<>();
 		
 		// find choice-set

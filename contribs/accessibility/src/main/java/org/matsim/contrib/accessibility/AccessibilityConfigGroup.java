@@ -110,7 +110,7 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	
 	// Optional; only used if measuring points are set directly
 	private ActivityFacilities measuringPointsFacilities;
-	private Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap;
+	private Map<Id<org.matsim.facilities.Facility>, Geometry> measurePointGeometryMap;
 
 	public static final String TIME_OF_DAY = "timeOfDay";
 	private Double timeOfDay = 8.*3600;
@@ -304,14 +304,14 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 		return this.measuringPointsFacilities;
 	}
     
-    public void setMeasurePointGeometryMap(Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap) {
+    public void setMeasurePointGeometryMap(Map<Id<org.matsim.facilities.Facility>, Geometry> measurePointGeometryMap) {
     	if (measuringPointsFacilities.getFacilities() == null) {
     		throw new RuntimeException("Setting geometries of measure points does not make sense if measure points are not yet set!");
     	}
 		this.measurePointGeometryMap = measurePointGeometryMap;
     }
   
-    public Map<Id<ActivityFacility>, Geometry> getMeasurePointGeometryMap(){
+    public Map<Id<org.matsim.facilities.Facility>, Geometry> getMeasurePointGeometryMap(){
 		return this.measurePointGeometryMap;
 	}
 }

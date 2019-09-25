@@ -57,13 +57,13 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 
 	private String crs;
 	private String name;
-	private Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap;
+	private Map<Id<org.matsim.facilities.Facility>, Geometry> measurePointGeometryMap;
 	private Set<String> additionalFacInfo;
 	private String outputDirectory;
 	private boolean pushing2Geoserver;
 	private boolean createQGisOutput;
 
-	public GeoserverUpdater (String crs, String name, Map<Id<ActivityFacility>, Geometry> measurePointGeometryMap, Set<String> additionalFacInfo,
+	public GeoserverUpdater (String crs, String name, Map<Id<org.matsim.facilities.Facility>, Geometry> measurePointGeometryMap, Set<String> additionalFacInfo,
 			String outputDirectory, boolean pushing2Geoserver, boolean createQGisOutput) {
 		this.crs = crs;
 		this.name = name;

@@ -33,7 +33,7 @@ import org.matsim.facilities.algorithms.FacilityAlgorithm;
  *
  * @author (of javadoc) nagel
  */
-public interface Facility extends BasicLocation, Customizable {
+public interface Facility extends BasicLocation, Customizable, Identifiable<Facility> {
 	// yyyyyy we might consider to not further differentiate the different facility types in id space.  Then it could just be
 	//   interface Facility extends BasicLocation<Facility>, ...
 	// kai, dec'15

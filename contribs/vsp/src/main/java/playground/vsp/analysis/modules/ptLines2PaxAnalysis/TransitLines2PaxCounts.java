@@ -75,7 +75,7 @@ public class TransitLines2PaxCounts {
 			int numberOfStops = tr.getStops().size();
 			for (int ii=0; ii < numberOfStops; ii++) {
 				TransitRouteStop s = tr.getStops().get(ii);
-				Id<TransitStopFacility> stopFacilId = s.getStopFacility().getId();
+				Id<org.matsim.facilities.Facility> stopFacilId = s.getStopFacility().getId();
 				if (this.boarding.getCounts().get(stopFacilId)==null) {
 					Id<Link> convertedId = Id.create(stopFacilId, Link.class);
 					this.boarding.createAndAddCount(convertedId, stopFacilId.toString());
@@ -289,7 +289,7 @@ public class TransitLines2PaxCounts {
 	 * @param facilityId
 	 * @param time
 	 */
-	public void paxBoarding(Id<TransitStopFacility> facilityId, double time) {
+	public void paxBoarding(Id<org.matsim.facilities.Facility> facilityId, double time) {
 		increase(this.boarding, facilityId, time, 1.);
 	}
 
@@ -297,7 +297,7 @@ public class TransitLines2PaxCounts {
 	 * @param facilityId
 	 * @param time
 	 */
-	public void paxAlighting(Id<TransitStopFacility> facilityId, double time) {
+	public void paxAlighting(Id<org.matsim.facilities.Facility> facilityId, double time) {
 		increase(this.alighting, facilityId, time, 1.);
 	}
 
@@ -307,7 +307,7 @@ public class TransitLines2PaxCounts {
 	 * @param nrSeatsInUse
 	 * @param stopIndexId
 	 */
-	public void vehicleDeparts(double time, double vehCapacity,	double nrSeatsInUse, Id<TransitStopFacility> stopFacilityId) {
+	public void vehicleDeparts(double time, double vehCapacity,	double nrSeatsInUse, Id<org.matsim.facilities.Facility> stopFacilityId) {
 		Id<Link> convertedId = Id.create(stopFacilityId, Link.class);
 		if(this.alighting.getCount(convertedId).getVolume(getTimeSlice(time)) == null){
 			set(this.alighting, stopFacilityId, time, 0);
@@ -322,7 +322,7 @@ public class TransitLines2PaxCounts {
 				this.capacity.getCount(convertedId).getVolume(slice).getValue());
 	}
 	
-	private void increase(Counts counts, Id<TransitStopFacility> stopFacilityId, Double time, double increaseBy){
+	private void increase(Counts counts, Id<org.matsim.facilities.Facility> stopFacilityId, Double time, double increaseBy){
 		Count count = counts.getCount(Id.create(stopFacilityId, Link.class));
 		Integer slice = getTimeSlice(time);
 		Volume v;
@@ -334,7 +334,7 @@ public class TransitLines2PaxCounts {
 		v.setValue(v.getValue() + increaseBy);
 	}
 	
-	private void set(Counts counts, Id<TransitStopFacility> stopFacilityId, Double time, double value){
+	private void set(Counts counts, Id<org.matsim.facilities.Facility> stopFacilityId, Double time, double value){
 		Count count =  counts.getCount(Id.create(stopFacilityId, Link.class));
 		Integer slice = getTimeSlice(time);
 		Volume v;

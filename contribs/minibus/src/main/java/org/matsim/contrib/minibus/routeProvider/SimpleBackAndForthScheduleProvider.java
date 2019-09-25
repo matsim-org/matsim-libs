@@ -163,10 +163,10 @@ final class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 		// additional stops
 		for (Link link : path.links) {
 			startTime += link.getLength() / Math.min(this.vehicleMaximumVelocity, link.getFreespeed());
-			if(this.scheduleWithStopsOnly.getFacilities().get(Id.create(this.pIdentifier + link.getId(), TransitStopFacility.class)) == null){
+			if(this.scheduleWithStopsOnly.getFacilities().get(Id.create(this.pIdentifier + link.getId(), org.matsim.facilities.Facility.class)) == null){
 				continue;
 			}
-			routeStop = this.scheduleWithStopsOnly.getFactory().createTransitRouteStop(this.scheduleWithStopsOnly.getFacilities().get(Id.create(this.pIdentifier + link.getId(), TransitStopFacility.class)), startTime, startTime);
+			routeStop = this.scheduleWithStopsOnly.getFactory().createTransitRouteStop(this.scheduleWithStopsOnly.getFacilities().get(Id.create(this.pIdentifier + link.getId(), org.matsim.facilities.Facility.class)), startTime, startTime);
 			stops.add(routeStop);
 		}
 		

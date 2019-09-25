@@ -265,7 +265,7 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public Id<ActivityFacility> getFacilityId() {
+		public Id<org.matsim.facilities.Facility> getFacilityId() {
 			return this.delegate.getFacilityId() ;
 		}
 		@Override
@@ -279,7 +279,7 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public void setFacilityId(Id<ActivityFacility> id) {
+		public void setFacilityId(Id<org.matsim.facilities.Facility> id) {
 			throw new UnsupportedOperationException() ;
 		}
 
@@ -1031,7 +1031,7 @@ public final class PopulationUtils {
 		return act.getLinkId() ;
 	}
 	public static Coord decideOnCoordForActivity( Activity act, Scenario sc ) {
-		Id<ActivityFacility> facilityId ;
+		Id<org.matsim.facilities.Facility> facilityId ;
 		try {
 			facilityId = act.getFacilityId() ;
 		} catch (Exception ee ) {

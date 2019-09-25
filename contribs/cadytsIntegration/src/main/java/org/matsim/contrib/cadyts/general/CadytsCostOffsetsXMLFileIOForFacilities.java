@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActivityWrapperFacility.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,52 +16,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.facilities;
 
-import java.util.Map;
+package org.matsim.contrib.cadyts.general;
 
-import org.matsim.api.core.v01.Coord;
+import cadyts.utilities.misc.DynamicDataXMLFileIO;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
+import org.matsim.facilities.Facility;
 
 /**
- * When ActivityFacilities are not used, use this class
- * to wrap activity geographical information (coord and linkid)
- * in a facility interface (for example to pass to the router)
- * @author thibautd
+ * Enables cadyts to persist the cost offsets to file.
  */
- class ActivityWrapperFacility implements Facility {
-	private final Activity wrapped;
+public final class CadytsCostOffsetsXMLFileIOForFacilities<T extends Identifiable<?>> extends DynamicDataXMLFileIO<T> {
+	// yyyy this is most probably not "costs" but just "offsets" (which end up being added into the scoring function, so if anything
+	// they are negative costs).  --> rename kai/janek, feb'19
 
-	ActivityWrapperFacility( final Activity toWrap ) {
-		this.wrapped = toWrap;
+	private static final long serialVersionUID = 1L;
+	private LookUpItemFromFaciityId<T> lookUp;
+
+	public CadytsCostOffsetsXMLFileIOForFacilities( final LookUpItemFromFaciityId<T> lookUp ) {
+		super();
+		this.lookUp = lookUp;
 	}
 
 	@Override
-	public Coord getCoord() {
-		return this.wrapped.getCoord();
+	protected T attrValue2key(final String stopId) {
+		return this.lookUp.getItem(Id.create(stopId, Facility.class) );
 	}
 
 	@Override
-	public Id<org.matsim.facilities.Facility> getId() {
-		return this.wrapped.getFacilityId();
+	protected String key2attrValue(final T key) {
+		return key.getId().toString();
 	}
 
-	@Override
-	public Map<String, Object> getCustomAttributes() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Id<Link> getLinkId() {
-		return this.wrapped.getLinkId();
-	}
-
-	@Override
-	public String toString() {
-		return "[ActivityWrapperFacility: wrapped="+this.wrapped+"]";
-	}
 }
-

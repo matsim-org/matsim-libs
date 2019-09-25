@@ -33,7 +33,7 @@ import java.util.Map;
 /*
  * Wraps a Link into a Facility.
  */
-public final class LinkWrapperFacility implements Facility, Identifiable<ActivityFacility> {
+public final class LinkWrapperFacility implements Facility {
 	
 	private final Link wrapped;
 
@@ -47,7 +47,7 @@ public final class LinkWrapperFacility implements Facility, Identifiable<Activit
 	}
 
 	@Override
-	public Id<ActivityFacility> getId() {
+	public Id<org.matsim.facilities.Facility> getId() {
 		throw new UnsupportedOperationException();
 	}
 

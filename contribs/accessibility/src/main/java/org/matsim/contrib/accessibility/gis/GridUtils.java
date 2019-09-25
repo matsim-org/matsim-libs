@@ -86,7 +86,7 @@ public final class GridUtils {
 
 				if(boundary.contains(centroid)) {
 					Coord center = new Coord(centerX, centerY);
-					measuringPoints.createAndAddFacility(Id.create( setPoints , ActivityFacility.class), center);
+					measuringPoints.createAndAddFacility(Id.create( setPoints , org.matsim.facilities.Facility.class), center);
 					setPoints++;
 				}
 				else skippedPoints++;
@@ -125,7 +125,7 @@ public final class GridUtils {
 
 				if (centerX <= maxX && centerX >= minX && centerY <= maxY && centerY >= minY) {
 					Coord center = new Coord(centerX, centerY);
-					measuringPoints.createAndAddFacility(Id.create(setPoints, ActivityFacility.class), center);
+					measuringPoints.createAndAddFacility(Id.create(setPoints, org.matsim.facilities.Facility.class), center);
 					setPoints++;
 				}
 				else skippedPoints++;
@@ -161,7 +161,7 @@ public final class GridUtils {
 
 				if (centerX <= maxX && centerX >= minX && centerY <= maxY && centerY >= minY) {
 					Coord center = new Coord(centerX, centerY);
-					measuringPoints.createAndAddFacility(Id.create(setPoints, ActivityFacility.class), center);
+					measuringPoints.createAndAddFacility(Id.create(setPoints, org.matsim.facilities.Facility.class), center);
 					setPoints++;
 				}
 				else skippedPoints++; 

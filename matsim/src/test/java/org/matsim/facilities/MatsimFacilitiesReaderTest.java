@@ -74,13 +74,13 @@ public class MatsimFacilitiesReaderTest {
 		ActivityFacilities facilities = scenario.getActivityFacilities();
 		Assert.assertEquals(3, facilities.getFacilities().size());
 		
-		ActivityFacility fac1 = facilities.getFacilities().get(Id.create(1, ActivityFacility.class));
+		ActivityFacility fac1 = facilities.getFacilities().get(Id.create(1, org.matsim.facilities.Facility.class));
 		Assert.assertEquals(Id.create("Aa", Link.class), fac1.getLinkId());
 		
-		ActivityFacility fac10 = facilities.getFacilities().get(Id.create(10, ActivityFacility.class));
+		ActivityFacility fac10 = facilities.getFacilities().get(Id.create(10, org.matsim.facilities.Facility.class));
 		Assert.assertEquals(Id.create("Bb", Link.class), fac10.getLinkId());
 
-		ActivityFacility fac20 = facilities.getFacilities().get(Id.create(20, ActivityFacility.class));
+		ActivityFacility fac20 = facilities.getFacilities().get(Id.create(20, org.matsim.facilities.Facility.class));
 		Assert.assertNull(fac20.getLinkId());
 	}
 }

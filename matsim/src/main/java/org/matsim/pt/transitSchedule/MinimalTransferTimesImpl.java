@@ -36,14 +36,14 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 class MinimalTransferTimesImpl implements MinimalTransferTimes {
 
-	private Map<Id<TransitStopFacility>, Map<Id<TransitStopFacility>, Double>> minimalTransferTimes = new ConcurrentHashMap<>();
+	private Map<Id<org.matsim.facilities.Facility>, Map<Id<org.matsim.facilities.Facility>, Double>> minimalTransferTimes = new ConcurrentHashMap<>();
 
 	@Override
-	public double set(Id<TransitStopFacility> fromStop, Id<TransitStopFacility> toStop, double seconds) {
+	public double set(Id<org.matsim.facilities.Facility> fromStop, Id<org.matsim.facilities.Facility> toStop, double seconds) {
 		if (Double.isNaN(seconds) || Time.isUndefinedTime(seconds)) {
 			return remove(fromStop, toStop);
 		}
-		Map<Id<TransitStopFacility>, Double> innerMap = this.minimalTransferTimes.computeIfAbsent(fromStop, key -> new ConcurrentHashMap<>());
+		Map<Id<org.matsim.facilities.Facility>, Double> innerMap = this.minimalTransferTimes.computeIfAbsent(fromStop, key -> new ConcurrentHashMap<>());
 		Double value = innerMap.put(toStop, seconds);
 		if (value == null) {
 			return Double.NaN;
@@ -52,13 +52,13 @@ class MinimalTransferTimesImpl implements MinimalTransferTimes {
 	}
 
 	@Override
-	public double get(Id<TransitStopFacility> fromStop, Id<TransitStopFacility> toStop) {
+	public double get(Id<org.matsim.facilities.Facility> fromStop, Id<org.matsim.facilities.Facility> toStop) {
 		return get(fromStop, toStop, Double.NaN);
 	}
 
 	@Override
-	public double get(Id<TransitStopFacility> fromStop, Id<TransitStopFacility> toStop, double defaultSeconds) {
-		Map<Id<TransitStopFacility>, Double> innerMap = this.minimalTransferTimes.get(fromStop);
+	public double get(Id<org.matsim.facilities.Facility> fromStop, Id<org.matsim.facilities.Facility> toStop, double defaultSeconds) {
+		Map<Id<org.matsim.facilities.Facility>, Double> innerMap = this.minimalTransferTimes.get(fromStop);
 		if (innerMap == null) {
 			return defaultSeconds;
 		}
@@ -70,8 +70,8 @@ class MinimalTransferTimesImpl implements MinimalTransferTimes {
 	}
 
 	@Override
-	public double remove(Id<TransitStopFacility> fromStop, Id<TransitStopFacility> toStop) {
-		Map<Id<TransitStopFacility>, Double> innerMap = this.minimalTransferTimes.get(fromStop);
+	public double remove(Id<org.matsim.facilities.Facility> fromStop, Id<org.matsim.facilities.Facility> toStop) {
+		Map<Id<org.matsim.facilities.Facility>, Double> innerMap = this.minimalTransferTimes.get(fromStop);
 		if (innerMap == null) {
 			return Double.NaN;
 		}
@@ -89,16 +89,16 @@ class MinimalTransferTimesImpl implements MinimalTransferTimes {
 
 	private static class MinimalTransferTimesIteratorImpl implements  MinimalTransferTimesIterator {
 
-		private Id<TransitStopFacility> nextFromStopId = null;
-		private Id<TransitStopFacility> fromStopId = null;
-		private Id<TransitStopFacility> toStopId = null;
+		private Id<org.matsim.facilities.Facility> nextFromStopId = null;
+		private Id<org.matsim.facilities.Facility> fromStopId = null;
+		private Id<org.matsim.facilities.Facility> toStopId = null;
 		private double seconds = Double.NaN;
 		private boolean hasElement = false;
 
-		private Iterator<Map.Entry<Id<TransitStopFacility>, Map<Id<TransitStopFacility>, Double>>> outerIterator;
-		private Iterator<Map.Entry<Id<TransitStopFacility>, Double>> innerIterator;
+		private Iterator<Map.Entry<Id<org.matsim.facilities.Facility>, Map<Id<org.matsim.facilities.Facility>, Double>>> outerIterator;
+		private Iterator<Map.Entry<Id<org.matsim.facilities.Facility>, Double>> innerIterator;
 
-		MinimalTransferTimesIteratorImpl(Map<Id<TransitStopFacility>, Map<Id<TransitStopFacility>, Double>> values) {
+		MinimalTransferTimesIteratorImpl(Map<Id<org.matsim.facilities.Facility>, Map<Id<org.matsim.facilities.Facility>, Double>> values) {
 			this.outerIterator = values.entrySet().iterator();
 		}
 
@@ -108,8 +108,8 @@ class MinimalTransferTimesImpl implements MinimalTransferTimes {
 				return true;
 			}
 			while (this.outerIterator.hasNext()) {
-				Map.Entry<Id<TransitStopFacility>, Map<Id<TransitStopFacility>, Double>> outerEntry = this.outerIterator.next();
-				Map<Id<TransitStopFacility>, Double> innerMap = outerEntry.getValue();
+				Map.Entry<Id<org.matsim.facilities.Facility>, Map<Id<org.matsim.facilities.Facility>, Double>> outerEntry = this.outerIterator.next();
+				Map<Id<org.matsim.facilities.Facility>, Double> innerMap = outerEntry.getValue();
 				this.innerIterator = innerMap.entrySet().iterator();
 				if (this.innerIterator.hasNext()) {
 					this.nextFromStopId = outerEntry.getKey();
@@ -124,7 +124,7 @@ class MinimalTransferTimesImpl implements MinimalTransferTimes {
 		@Override
 		public void next() {
 			if (this.innerIterator != null && this.innerIterator.hasNext()) {
-				Map.Entry<Id<TransitStopFacility>, Double> e = this.innerIterator.next();
+				Map.Entry<Id<org.matsim.facilities.Facility>, Double> e = this.innerIterator.next();
 				this.fromStopId = this.nextFromStopId;
 				this.toStopId = e.getKey();
 				this.seconds = e.getValue();
@@ -136,7 +136,7 @@ class MinimalTransferTimesImpl implements MinimalTransferTimes {
 		}
 
 		@Override
-		public Id<TransitStopFacility> getFromStopId() {
+		public Id<org.matsim.facilities.Facility> getFromStopId() {
 			if (this.hasElement) {
 				return this.fromStopId;
 			}
@@ -144,7 +144,7 @@ class MinimalTransferTimesImpl implements MinimalTransferTimes {
 		}
 
 		@Override
-		public Id<TransitStopFacility> getToStopId() {
+		public Id<org.matsim.facilities.Facility> getToStopId() {
 			if (this.hasElement) {
 				return this.toStopId;
 			}

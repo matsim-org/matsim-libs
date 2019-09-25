@@ -74,7 +74,7 @@ public class CharyparNagelLegScoringPtChangeTest {
 
 		// "simulate"
 		final EventsManager events = EventsUtils.createEventsManager();
-		final Event endFirstAct =  new ActivityEndEvent(leg.getDepartureTime(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), Id.create( 1, ActivityFacility.class ), "start");
+		final Event endFirstAct =  new ActivityEndEvent(leg.getDepartureTime(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), Id.create( 1, org.matsim.facilities.Facility.class), "start");
 		scoring1.handleEvent( endFirstAct );
 		scoring2.handleEvent( endFirstAct );
 

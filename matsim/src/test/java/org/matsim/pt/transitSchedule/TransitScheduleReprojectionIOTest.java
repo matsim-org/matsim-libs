@@ -117,7 +117,7 @@ public class TransitScheduleReprojectionIOTest {
 		
 		// TODO: test also with loading from Controler C'tor?
 		
-		for ( Id<TransitStopFacility> id : originalScenario.getTransitSchedule().getFacilities().keySet() ) {
+		for ( Id<org.matsim.facilities.Facility> id : originalScenario.getTransitSchedule().getFacilities().keySet() ) {
 			final Coord originalCoord = originalScenario.getTransitSchedule().getFacilities().get( id ).getCoord();
 			final Coord internalCoord = scenario.getTransitSchedule().getFacilities().get( id ).getCoord();
 
@@ -137,7 +137,7 @@ public class TransitScheduleReprojectionIOTest {
 		}
 		new TransitScheduleReader( dumpedScenario ).readFile( outputDirectory+"/output_transitSchedule.xml.gz" );
 
-		for ( Id<TransitStopFacility> id : originalScenario.getTransitSchedule().getFacilities().keySet() ) {
+		for ( Id<org.matsim.facilities.Facility> id : originalScenario.getTransitSchedule().getFacilities().keySet() ) {
 			final Coord internalCoord = scenario.getTransitSchedule().getFacilities().get( id ).getCoord();
 			final Coord dumpedCoord = dumpedScenario.getTransitSchedule().getFacilities().get( id ).getCoord();
 
@@ -188,7 +188,7 @@ public class TransitScheduleReprojectionIOTest {
 			// TODO: test also with loading from Controler C'tor?
 			scenario = ScenarioUtils.loadScenario( config );
 		}
-		for ( Id<TransitStopFacility> id : originalScenario.getTransitSchedule().getFacilities().keySet() ) {
+		for ( Id<org.matsim.facilities.Facility> id : originalScenario.getTransitSchedule().getFacilities().keySet() ) {
 			final Coord originalCoord = originalScenario.getTransitSchedule().getFacilities().get( id ).getCoord();
 			final Coord internalCoord = scenario.getTransitSchedule().getFacilities().get( id ).getCoord();
 
@@ -213,7 +213,7 @@ public class TransitScheduleReprojectionIOTest {
 		}
 		new TransitScheduleReader( dumpedScenario ).readFile( outputDirectory+"/output_transitSchedule.xml.gz" );
 
-		for ( Id<TransitStopFacility> id : originalScenario.getTransitSchedule().getFacilities().keySet() ) {
+		for ( Id<org.matsim.facilities.Facility> id : originalScenario.getTransitSchedule().getFacilities().keySet() ) {
 			final Coord internalCoord = scenario.getTransitSchedule().getFacilities().get( id ).getCoord();
 			final Coord dumpedCoord = dumpedScenario.getTransitSchedule().getFacilities().get( id ).getCoord();
 
@@ -232,7 +232,7 @@ public class TransitScheduleReprojectionIOTest {
 				originalSchedule.getFacilities().size(),
 				transformedSchedule.getFacilities().size() );
 
-		for ( Id<TransitStopFacility> stopId : originalSchedule.getFacilities().keySet() ) {
+		for ( Id<org.matsim.facilities.Facility> stopId : originalSchedule.getFacilities().keySet() ) {
 			final Coord original = originalSchedule.getFacilities().get( stopId ).getCoord();
 			final Coord transformed = transformedSchedule.getFacilities().get( stopId ).getCoord();
 

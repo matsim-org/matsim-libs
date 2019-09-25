@@ -55,7 +55,7 @@ class VehicleTracker implements Serializable {
     }
 
 
-    public double getInVehicleTime(DwellEvent dwellEvent, Id<TransitStopFacility> destinationStop) {
+    public double getInVehicleTime(DwellEvent dwellEvent, Id<org.matsim.facilities.Facility> destinationStop) {
         for (int i = dwellEvent.getIndexInVehicleDwellEventList(); i < stopsVisited.size(); i++) {
             if(stopsVisited.get(i).getStopId().equals(destinationStop.toString())){
                 return stopsVisited.get(i).getArrivalTime() - dwellEvent.getArrivalTime();

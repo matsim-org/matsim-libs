@@ -237,13 +237,13 @@ public final class DynAgent implements MobsimDriverPassengerAgent {
 
 	// PTPassengerAgent
 	@Override
-	public Id<TransitStopFacility> getDesiredAccessStopId() {
+	public Id<org.matsim.facilities.Facility> getDesiredAccessStopId() {
 		return ((PTPassengerDynLeg)dynLeg).getDesiredAccessStopId();
 	}
 
 	// PTPassengerAgent
 	@Override
-	public Id<TransitStopFacility> getDesiredDestinationStopId() {
+	public Id<org.matsim.facilities.Facility> getDesiredDestinationStopId() {
 		return ((PTPassengerDynLeg)dynLeg).getDesiredDestinationStopId();
 	}
 

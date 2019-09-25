@@ -171,11 +171,11 @@ public class TransitRouterCustomDataTest {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleFactory f = schedule.getFactory();
 
-		TransitStopFacility f1 = f.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
-		TransitStopFacility f2 = f.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord((double) 500, (double) 500), false);
-		TransitStopFacility f3 = f.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord((double) 1000, (double) 0), false);
-		TransitStopFacility f4 = f.createTransitStopFacility(Id.create("4", TransitStopFacility.class), new Coord((double) 1500, (double) 500), false);
-		TransitStopFacility f5 = f.createTransitStopFacility(Id.create("5", TransitStopFacility.class), new Coord((double) 2000, (double) 0), false);
+		TransitStopFacility f1 = f.createTransitStopFacility(Id.create("1", org.matsim.facilities.Facility.class), new Coord((double) 0, (double) 0), false);
+		TransitStopFacility f2 = f.createTransitStopFacility(Id.create("2", org.matsim.facilities.Facility.class), new Coord((double) 500, (double) 500), false);
+		TransitStopFacility f3 = f.createTransitStopFacility(Id.create("3", org.matsim.facilities.Facility.class), new Coord((double) 1000, (double) 0), false);
+		TransitStopFacility f4 = f.createTransitStopFacility(Id.create("4", org.matsim.facilities.Facility.class), new Coord((double) 1500, (double) 500), false);
+		TransitStopFacility f5 = f.createTransitStopFacility(Id.create("5", org.matsim.facilities.Facility.class), new Coord((double) 2000, (double) 0), false);
 		
 		schedule.addStopFacility(f1);
 		schedule.addStopFacility(f2);

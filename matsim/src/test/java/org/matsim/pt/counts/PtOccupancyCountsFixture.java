@@ -35,28 +35,28 @@ public class PtOccupancyCountsFixture extends PtCountsFixture {
 
 	@Override
 	public CountsComparisonAlgorithm getCCA() {
-		Map<Id<TransitStopFacility>, int[]> occupancies = new HashMap<>();
+		Map<Id<org.matsim.facilities.Facility>, int[]> occupancies = new HashMap<>();
 
 		int[] occupancyArrayStop1 = new int[24];
 		occupancyArrayStop1[8] = 65;
-		occupancies.put(Id.create("stop1", TransitStopFacility.class), occupancyArrayStop1);
+		occupancies.put(Id.create("stop1", org.matsim.facilities.Facility.class), occupancyArrayStop1);
 
 		int[] occupancyArrayStop2 = new int[24];
 		occupancyArrayStop2[8] = 65;
-		occupancies.put(Id.create("stop2", TransitStopFacility.class), occupancyArrayStop2);
+		occupancies.put(Id.create("stop2", org.matsim.facilities.Facility.class), occupancyArrayStop2);
 
 		int[] occupancyArrayStop3 = new int[24];
 		occupancyArrayStop3[8] = 15;
-		occupancies.put(Id.create("stop3", TransitStopFacility.class), occupancyArrayStop3);
+		occupancies.put(Id.create("stop3", org.matsim.facilities.Facility.class), occupancyArrayStop3);
 
 		int[] occupancyArrayStop4 = new int[24];
-		occupancies.put(Id.create("stop4", TransitStopFacility.class), occupancyArrayStop4);
+		occupancies.put(Id.create("stop4", org.matsim.facilities.Facility.class), occupancyArrayStop4);
 
 		this.oa.setOccupancies(occupancies);
 		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
 			
 			@Override
-			public double[] getVolumesForStop(Id<TransitStopFacility> locationId) {
+			public double[] getVolumesForStop(Id<org.matsim.facilities.Facility> locationId) {
 				return copyFromIntArray(oa.getOccupancyVolumesForStop(locationId));
 			}
 			

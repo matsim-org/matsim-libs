@@ -93,6 +93,9 @@ class DvrpTripInfo implements TripInfoWithRequiredBooking {
 
 	private static Facility createAdHocFacility(Link link) {
 		return new Facility() {
+			@Override public Id<Facility> getId(){
+				throw new RuntimeException( "not implemented" );
+			}
 			@Override
 			public Map<String, Object> getCustomAttributes() {
 				throw new RuntimeException("not implemented");

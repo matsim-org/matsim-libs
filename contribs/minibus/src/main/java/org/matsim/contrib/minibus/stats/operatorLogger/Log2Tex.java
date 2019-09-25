@@ -90,9 +90,9 @@ final class Log2Tex {
 
 					strB.append(" & ");
 
-					ArrayList<Id<TransitStopFacility>> stops = logElement.getStopsToBeServed(); //nodes.split(",");
+					ArrayList<Id<org.matsim.facilities.Facility>> stops = logElement.getStopsToBeServed(); //nodes.split(",");
 					boolean firstIsDone = false;
-					for (Id<TransitStopFacility> stop : stops) {
+					for (Id<org.matsim.facilities.Facility> stop : stops) {
 						if (firstIsDone) {
 							strB.append("--");
 						}

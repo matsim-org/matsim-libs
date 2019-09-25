@@ -55,7 +55,7 @@ public final class ReduceStopsToBeServedRFare extends AbstractPStrategyModule im
 	private final boolean useFareAsWeight;
 
 	private TicketMachineI ticketMachine;
-	private LinkedHashMap<Id<TransitRoute>, LinkedHashMap<Id<TransitStopFacility>, LinkedHashMap<Id<TransitStopFacility>, Double>>> route2StartStop2EndStop2WeightMap = new LinkedHashMap<>();
+	private LinkedHashMap<Id<TransitRoute>, LinkedHashMap<Id<org.matsim.facilities.Facility>, LinkedHashMap<Id<org.matsim.facilities.Facility>, Double>>> route2StartStop2EndStop2WeightMap = new LinkedHashMap<>();
 	
 	public ReduceStopsToBeServedRFare(ArrayList<String> parameter) {
 		super();
@@ -99,7 +99,7 @@ public final class ReduceStopsToBeServedRFare extends AbstractPStrategyModule im
 		return newPlan;
 	}
 
-	private ArrayList<TransitStopFacility> getStopsToBeServed(LinkedHashMap<Id<TransitStopFacility>, LinkedHashMap<Id<TransitStopFacility>, Double>> startStop2EndStop2WeightMap, TransitRoute routeToOptimize) {
+	private ArrayList<TransitStopFacility> getStopsToBeServed(LinkedHashMap<Id<org.matsim.facilities.Facility>, LinkedHashMap<Id<org.matsim.facilities.Facility>, Double>> startStop2EndStop2WeightMap, TransitRoute routeToOptimize) {
 		ArrayList<TransitStopFacility> tempStopsToBeServed = new ArrayList<>();
 		RecursiveStatsContainer stats = new RecursiveStatsContainer();
 		
@@ -109,7 +109,7 @@ public final class ReduceStopsToBeServedRFare extends AbstractPStrategyModule im
 		}
 		
 		// calculate standard deviation
-		for (LinkedHashMap<Id<TransitStopFacility>, Double> endStop2TripsMap : startStop2EndStop2WeightMap.values()) {
+		for (LinkedHashMap<Id<org.matsim.facilities.Facility>, Double> endStop2TripsMap : startStop2EndStop2WeightMap.values()) {
 			for (Double trips : endStop2TripsMap.values()) {
 				stats.handleNewEntry(trips);
 			}
@@ -121,11 +121,11 @@ public final class ReduceStopsToBeServedRFare extends AbstractPStrategyModule im
 		}
 		
 		double sigmaTreshold = stats.getStdDev() * this.sigmaScale;
-		Set<Id<TransitStopFacility>> stopIdsAboveTreshold = new TreeSet<>();
+		Set<Id<org.matsim.facilities.Facility>> stopIdsAboveTreshold = new TreeSet<>();
 		
 		// Get all stops serving a demand above threshold
-		for (Entry<Id<TransitStopFacility>, LinkedHashMap<Id<TransitStopFacility>, Double>> endStop2TripsMapEntry : startStop2EndStop2WeightMap.entrySet()) {
-			for (Entry<Id<TransitStopFacility>, Double> tripEntry : endStop2TripsMapEntry.getValue().entrySet()) {
+		for (Entry<Id<org.matsim.facilities.Facility>, LinkedHashMap<Id<org.matsim.facilities.Facility>, Double>> endStop2TripsMapEntry : startStop2EndStop2WeightMap.entrySet()) {
+			for (Entry<Id<org.matsim.facilities.Facility>, Double> tripEntry : endStop2TripsMapEntry.getValue().entrySet()) {
 				if (tripEntry.getValue() > sigmaTreshold) {
 					// ok - add the corresponding stops to the set
 					stopIdsAboveTreshold.add(endStop2TripsMapEntry.getKey());
@@ -177,15 +177,15 @@ public final class ReduceStopsToBeServedRFare extends AbstractPStrategyModule im
 	@Override
 	public void handleFareContainer(StageContainer stageContainer) {
 		Id<TransitRoute> routeId = stageContainer.getRouteId();
-		Id<TransitStopFacility> startStopId = stageContainer.getStopEntered();
-		Id<TransitStopFacility> endStopId = stageContainer.getStopLeft();
+		Id<org.matsim.facilities.Facility> startStopId = stageContainer.getStopEntered();
+		Id<org.matsim.facilities.Facility> endStopId = stageContainer.getStopLeft();
 		
 		if (this.route2StartStop2EndStop2WeightMap.get(routeId) == null) {
-			this.route2StartStop2EndStop2WeightMap.put(routeId, new LinkedHashMap<Id<TransitStopFacility>, LinkedHashMap<Id<TransitStopFacility>, Double>>());
+			this.route2StartStop2EndStop2WeightMap.put(routeId, new LinkedHashMap<Id<org.matsim.facilities.Facility>, LinkedHashMap<Id<org.matsim.facilities.Facility>, Double>>());
 		}
 
 		if (this.route2StartStop2EndStop2WeightMap.get(routeId).get(startStopId) == null) {
-			this.route2StartStop2EndStop2WeightMap.get(routeId).put(startStopId, new LinkedHashMap<Id<TransitStopFacility>, Double>());
+			this.route2StartStop2EndStop2WeightMap.get(routeId).put(startStopId, new LinkedHashMap<Id<org.matsim.facilities.Facility>, Double>());
 		}
 
 		if (this.route2StartStop2EndStop2WeightMap.get(routeId).get(startStopId).get(endStopId) == null) {

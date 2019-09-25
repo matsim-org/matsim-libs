@@ -65,7 +65,7 @@ public class TransitLoadIntegrationTest {
 
 		TransitLine line = s.getTransitSchedule().getTransitLines().get(Id.create("Blue Line", TransitLine.class));
 		TransitRoute route = line.getRoutes().get(Id.create("1to3", TransitRoute.class));
-		TransitStopFacility stopFacility = s.getTransitSchedule().getFacilities().get(Id.create("2a", TransitStopFacility.class));
+		TransitStopFacility stopFacility = s.getTransitSchedule().getFacilities().get(Id.create("2a", org.matsim.facilities.Facility.class));
 		Departure departure = route.getDepartures().get(Id.create("07", Departure.class));
 		int load = transitload.getLoadAtDeparture(line, route, stopFacility, departure);
 

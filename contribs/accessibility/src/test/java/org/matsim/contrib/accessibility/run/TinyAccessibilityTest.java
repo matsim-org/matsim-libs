@@ -137,9 +137,9 @@ public class TinyAccessibilityTest {
 
 		// Creating test opportunities (facilities); one on each link with same ID as link and coord on center of link
 		final ActivityFacilities opportunities = scenario.getActivityFacilities();
-		ActivityFacility facility1 = opportunities.getFactory().createActivityFacility(Id.create("1", ActivityFacility.class), new Coord(200, 0));
+		ActivityFacility facility1 = opportunities.getFactory().createActivityFacility(Id.create("1", org.matsim.facilities.Facility.class), new Coord(200, 0));
 		opportunities.addActivityFacility(facility1);
-		ActivityFacility facility2 = opportunities.getFactory().createActivityFacility(Id.create("2", ActivityFacility.class), new Coord(200, 200));
+		ActivityFacility facility2 = opportunities.getFactory().createActivityFacility(Id.create("2", org.matsim.facilities.Facility.class), new Coord(200, 200));
 		opportunities.addActivityFacility(facility2);
 		scenario.getConfig().facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.setInScenario);
 		return scenario;

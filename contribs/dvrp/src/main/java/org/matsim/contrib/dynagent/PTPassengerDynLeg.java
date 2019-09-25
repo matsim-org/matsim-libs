@@ -31,7 +31,7 @@ public interface PTPassengerDynLeg extends PassengerDynLeg {
 
 	public boolean getExitAtStop(final TransitStopFacility stop);
 
-	public Id<TransitStopFacility> getDesiredAccessStopId();
+	public Id<org.matsim.facilities.Facility> getDesiredAccessStopId();
 
-	public Id<TransitStopFacility> getDesiredDestinationStopId();
+	public Id<org.matsim.facilities.Facility> getDesiredDestinationStopId();
 }

@@ -26,7 +26,7 @@ public class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 	public class UmlaufKey {
 		
 		private Id<TransitLine> lineId;
-		private Id<TransitStopFacility> stopFacilityId;
+		private Id<org.matsim.facilities.Facility> stopFacilityId;
 		private double lastArrivalTime;
 		private Id<Umlauf> umlaufId;
 		
@@ -35,7 +35,7 @@ public class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 			return umlaufId;
 		}
 
-		public UmlaufKey(Id<TransitLine> lineId, Id<TransitStopFacility> stopFacilityId, double lastArrivalTime, Id<Umlauf> umlaufId) {
+		public UmlaufKey(Id<TransitLine> lineId, Id<org.matsim.facilities.Facility> stopFacilityId, double lastArrivalTime, Id<Umlauf> umlaufId) {
 			super();
 			this.lineId = lineId;
 			this.stopFacilityId = stopFacilityId;
@@ -47,7 +47,7 @@ public class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 			return lineId;
 		}
 		
-		public Id<TransitStopFacility> getStopFacility() {
+		public Id<org.matsim.facilities.Facility> getStopFacility() {
 			return stopFacilityId;
 		}
 
@@ -163,14 +163,14 @@ public class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 	}
 
 	private UmlaufKey getKey(Umlauf umlauf) {
-		return new UmlaufKey(umlauf.getLineId(), Id.create(getLastStopPostAreaId(umlauf), TransitStopFacility.class), getLastArrivalTime(umlauf), umlauf.getId());
+		return new UmlaufKey(umlauf.getLineId(), Id.create(getLastStopPostAreaId(umlauf), org.matsim.facilities.Facility.class), getLastArrivalTime(umlauf), umlauf.getId());
 	}
 
 	private Umlauf findFittingUmlauf(UmlaufStueck umlaufStueck) {
 		String firstStopPostAreaId = umlaufStueck.getRoute().getStops().get(0).getStopFacility().getStopAreaId().toString();
 		Id<TransitLine> lineId = umlaufStueck.getLine().getId();
-		UmlaufKey earliestAtPoint = new UmlaufKey(lineId, Id.create(firstStopPostAreaId, TransitStopFacility.class), 0.0, Id.create(0, Umlauf.class));
-		UmlaufKey latestAtPoint = new UmlaufKey(lineId, Id.create(firstStopPostAreaId, TransitStopFacility.class), umlaufStueck.getDeparture().getDepartureTime(), Id.create(0, Umlauf.class));
+		UmlaufKey earliestAtPoint = new UmlaufKey(lineId, Id.create(firstStopPostAreaId, org.matsim.facilities.Facility.class), 0.0, Id.create(0, Umlauf.class));
+		UmlaufKey latestAtPoint = new UmlaufKey(lineId, Id.create(firstStopPostAreaId, org.matsim.facilities.Facility.class), umlaufStueck.getDeparture().getDepartureTime(), Id.create(0, Umlauf.class));
 		log("Looking between " + earliestAtPoint + " and " + latestAtPoint);
 		SortedMap<UmlaufKey,Umlauf> fittingUmlaeufe = umlaeufe.subMap(earliestAtPoint, latestAtPoint);
 		Umlauf fittingUmlauf;

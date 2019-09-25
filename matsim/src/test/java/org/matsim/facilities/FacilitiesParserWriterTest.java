@@ -67,11 +67,11 @@ public class FacilitiesParserWriterTest {
 
 		ActivityFacilitiesFactory factory = facilities.getFactory();
 
-		ActivityFacility fac1 = factory.createActivityFacility(Id.create("1", ActivityFacility.class), new Coord(10.0, 15.0));
+		ActivityFacility fac1 = factory.createActivityFacility(Id.create("1", org.matsim.facilities.Facility.class), new Coord(10.0, 15.0));
 		fac1.addActivityOption(new ActivityOptionImpl("home"));
 		facilities.addActivityFacility(fac1);
 
-		ActivityFacility fac2 = factory.createActivityFacility(Id.create("2", ActivityFacility.class), new Coord(20.0, 25.0));
+		ActivityFacility fac2 = factory.createActivityFacility(Id.create("2", org.matsim.facilities.Facility.class), new Coord(20.0, 25.0));
 		ActivityOptionImpl shopOption = new ActivityOptionImpl("shop");
 		shopOption.addOpeningTime(new OpeningTimeImpl(8*3600, 20*3600));
 		fac2.addActivityOption(shopOption);
@@ -88,12 +88,12 @@ public class FacilitiesParserWriterTest {
 
 		Assert.assertEquals(2, facilities2.getFacilities().size());
 
-		ActivityFacility fac1b = facilities2.getFacilities().get(Id.create("1", ActivityFacility.class));
+		ActivityFacility fac1b = facilities2.getFacilities().get(Id.create("1", org.matsim.facilities.Facility.class));
 		Assert.assertEquals(1, fac1b.getActivityOptions().size());
 		Assert.assertTrue(fac1b.getActivityOptions().get("home").getOpeningTimes().isEmpty());
 		Assert.assertEquals(0, fac1b.getAttributes().size());
 
-		ActivityFacility fac2b = facilities2.getFacilities().get(Id.create("2", ActivityFacility.class));
+		ActivityFacility fac2b = facilities2.getFacilities().get(Id.create("2", org.matsim.facilities.Facility.class));
 		Assert.assertEquals(1, fac2b.getActivityOptions().size());
 		Assert.assertNotNull(fac2b.getActivityOptions().get("shop").getOpeningTimes());
 		Assert.assertEquals(8*3600, fac2b.getActivityOptions().get("shop").getOpeningTimes().first().getStartTime(), 0.0);
@@ -108,11 +108,11 @@ public class FacilitiesParserWriterTest {
 
 		ActivityFacilitiesFactory factory = facilities.getFactory();
 
-		ActivityFacility fac1 = factory.createActivityFacility(Id.create("1", ActivityFacility.class), new Coord(10.0, 15.0));
+		ActivityFacility fac1 = factory.createActivityFacility(Id.create("1", org.matsim.facilities.Facility.class), new Coord(10.0, 15.0));
 		fac1.getAttributes().putAttribute("size_m2", 100);
 		facilities.addActivityFacility(fac1);
 
-		ActivityFacility fac2 = factory.createActivityFacility(Id.create("2", ActivityFacility.class), new Coord(20.0, 25.0));
+		ActivityFacility fac2 = factory.createActivityFacility(Id.create("2", org.matsim.facilities.Facility.class), new Coord(20.0, 25.0));
 		fac2.getAttributes().putAttribute("size_m2", 500);
 		facilities.addActivityFacility(fac2);
 
@@ -127,12 +127,12 @@ public class FacilitiesParserWriterTest {
 
 		Assert.assertEquals(2, facilities2.getFacilities().size());
 
-		ActivityFacility fac1b = facilities2.getFacilities().get(Id.create("1", ActivityFacility.class));
+		ActivityFacility fac1b = facilities2.getFacilities().get(Id.create("1", org.matsim.facilities.Facility.class));
 		Assert.assertEquals(0, fac1b.getActivityOptions().size());
 		Assert.assertEquals(1, fac1b.getAttributes().size());
 		Assert.assertEquals(100, fac1b.getAttributes().getAttribute("size_m2"));
 
-		ActivityFacility fac2b = facilities2.getFacilities().get(Id.create("2", ActivityFacility.class));
+		ActivityFacility fac2b = facilities2.getFacilities().get(Id.create("2", org.matsim.facilities.Facility.class));
 		Assert.assertEquals(0, fac2b.getActivityOptions().size());
 		Assert.assertEquals(1, fac2b.getAttributes().size());
 		Assert.assertEquals(500, fac2b.getAttributes().getAttribute("size_m2"));
@@ -145,13 +145,13 @@ public class FacilitiesParserWriterTest {
 
 		ActivityFacilitiesFactory factory = facilities.getFactory();
 
-		ActivityFacility fac1 = factory.createActivityFacility(Id.create("1", ActivityFacility.class), new Coord(10.0, 15.0));
+		ActivityFacility fac1 = factory.createActivityFacility(Id.create("1", org.matsim.facilities.Facility.class), new Coord(10.0, 15.0));
 		fac1.addActivityOption(new ActivityOptionImpl("home"));
 		fac1.getAttributes().putAttribute("size_m2", 100);
 		facilities.addActivityFacility(fac1);
 
 
-		ActivityFacility fac2 = factory.createActivityFacility(Id.create("2", ActivityFacility.class), new Coord(20.0, 25.0));
+		ActivityFacility fac2 = factory.createActivityFacility(Id.create("2", org.matsim.facilities.Facility.class), new Coord(20.0, 25.0));
 		ActivityOptionImpl shopOption = new ActivityOptionImpl("shop");
 		shopOption.addOpeningTime(new OpeningTimeImpl(8*3600, 20*3600));
 		fac2.addActivityOption(shopOption);
@@ -169,13 +169,13 @@ public class FacilitiesParserWriterTest {
 
 		Assert.assertEquals(2, facilities2.getFacilities().size());
 
-		ActivityFacility fac1b = facilities2.getFacilities().get(Id.create("1", ActivityFacility.class));
+		ActivityFacility fac1b = facilities2.getFacilities().get(Id.create("1", org.matsim.facilities.Facility.class));
 		Assert.assertEquals(1, fac1b.getActivityOptions().size());
 		Assert.assertTrue(fac1b.getActivityOptions().get("home").getOpeningTimes().isEmpty());
 		Assert.assertEquals(1, fac1b.getAttributes().size());
 		Assert.assertEquals(100, fac1b.getAttributes().getAttribute("size_m2"));
 
-		ActivityFacility fac2b = facilities2.getFacilities().get(Id.create("2", ActivityFacility.class));
+		ActivityFacility fac2b = facilities2.getFacilities().get(Id.create("2", org.matsim.facilities.Facility.class));
 		Assert.assertEquals(1, fac2b.getActivityOptions().size());
 		Assert.assertNotNull(fac2b.getActivityOptions().get("shop").getOpeningTimes());
 		Assert.assertEquals(8*3600, fac2b.getActivityOptions().get("shop").getOpeningTimes().first().getStartTime(), 0.0);

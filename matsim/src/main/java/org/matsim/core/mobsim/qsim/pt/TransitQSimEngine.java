@@ -113,7 +113,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 	@Override
 	public void afterSim() {
 		double now = this.qSim.getSimTimer().getTimeOfDay();
-		for (Entry<Id<TransitStopFacility>, List<PTPassengerAgent>> agentsAtStop : this.agentTracker.getAgentsAtStop().entrySet()) {
+		for (Entry<Id<org.matsim.facilities.Facility>, List<PTPassengerAgent>> agentsAtStop : this.agentTracker.getAgentsAtStop().entrySet()) {
 			TransitStopFacility stop = this.schedule.getFacilities().get(agentsAtStop.getKey());
 			for (PTPassengerAgent agent : agentsAtStop.getValue()) {
 				this.qSim.getEventsManager().processEvent(new PersonStuckEvent( now, agent.getId(), stop.getLinkId(), ((MobsimAgent)agent).getMode()));
@@ -169,7 +169,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 
 	private void handleAgentPTDeparture(final MobsimAgent planAgent, Id<Link> linkId) {
 		// this puts the agent into the transit stop.
-		Id<TransitStopFacility> accessStopId = ((PTPassengerAgent) planAgent).getDesiredAccessStopId();
+		Id<org.matsim.facilities.Facility> accessStopId = ((PTPassengerAgent) planAgent).getDesiredAccessStopId();
 		if (accessStopId == null) {
 			// looks like this agent has a bad transit route, likely no
 			// route could be calculated for it

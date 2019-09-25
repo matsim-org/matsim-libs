@@ -111,7 +111,7 @@ public class AccessEgressDemo {
 		TransitStopFacility[] stops = new TransitStopFacility[nOfLinks];
 		ArrayList<TransitRouteStop> stopList = new ArrayList<>(nOfLinks);
 		for (int i = 0; i < nOfLinks; i++) {
-			stops[i] = builder.createTransitStopFacility(Id.create(i, TransitStopFacility.class), new Coord((i + 1) * 500, 0), stopsBlockLane);
+			stops[i] = builder.createTransitStopFacility(Id.create(i, org.matsim.facilities.Facility.class), new Coord((i + 1) * 500, 0), stopsBlockLane);
 			stops[i].setLinkId(Id.create(i, Link.class));
 			schedule.addStopFacility(stops[i]);
 			TransitRouteStop stop = builder.createTransitRouteStop(stops[i], i * 50, i * 50 + 10);
@@ -161,7 +161,7 @@ public class AccessEgressDemo {
 		TransitLine tLine = schedule.getTransitLines().get(Id.create(1, TransitLine.class));
 		TransitRoute tRoute = tLine.getRoutes().get(Id.create(1, TransitRoute.class));
 
-		TransitStopFacility lastStop = schedule.getFacilities().get(Id.create(stops.length - 1, TransitStopFacility.class));
+		TransitStopFacility lastStop = schedule.getFacilities().get(Id.create(stops.length - 1, org.matsim.facilities.Facility.class));
 		for (int i = 0; i < stops.length; i++) {
 			TransitStopFacility stop = stops[i];
 			if (stop == lastStop) {

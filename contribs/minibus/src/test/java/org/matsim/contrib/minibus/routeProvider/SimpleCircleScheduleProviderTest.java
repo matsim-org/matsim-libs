@@ -64,8 +64,8 @@ public class SimpleCircleScheduleProviderTest {
 		plan.setStartTime(7.0 * 3600.0);
 		plan.setEndTime(9.0 * 3600.0);
 		plan.setNVehicles(2);
-		TransitStopFacility startStop = tS.getFacilities().get(Id.create(pC.getPIdentifier() + "1424", TransitStopFacility.class));
-		TransitStopFacility endStop = tS.getFacilities().get(Id.create(pC.getPIdentifier() + "4434", TransitStopFacility.class));
+		TransitStopFacility startStop = tS.getFacilities().get(Id.create(pC.getPIdentifier() + "1424", org.matsim.facilities.Facility.class));
+		TransitStopFacility endStop = tS.getFacilities().get(Id.create(pC.getPIdentifier() + "4434", org.matsim.facilities.Facility.class));
 		ArrayList<TransitStopFacility> stopsToBeServed = new ArrayList<>();
 		stopsToBeServed.add(startStop);
 		stopsToBeServed.add(endStop);
@@ -88,7 +88,7 @@ public class SimpleCircleScheduleProviderTest {
 			// check stops
 			int i = 0;
 			for (TransitRouteStop stop : route.getStops()) {
-				Assert.assertEquals("Route stop ids have to be the same", Id.create(pC.getPIdentifier() + refIds.get(i), TransitStopFacility.class), stop.getStopFacility().getId());
+				Assert.assertEquals("Route stop ids have to be the same", Id.create(pC.getPIdentifier() + refIds.get(i), org.matsim.facilities.Facility.class), stop.getStopFacility().getId());
 				i++;
 			}
 			

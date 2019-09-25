@@ -35,7 +35,7 @@ public interface PassengerAccessEgress {
 	 * @param time time the agent should be handled
 	 * @return true, if handled correctly, otherwise false, e.g. vehicle has no capacity left
 	 */
-	public boolean handlePassengerEntering(final PTPassengerAgent agent, MobsimVehicle vehicle, Id<TransitStopFacility> fromStopFacilityId, final double time);
+	public boolean handlePassengerEntering(final PTPassengerAgent agent, MobsimVehicle vehicle, Id<org.matsim.facilities.Facility> fromStopFacilityId, final double time);
 
 	/** 
 	 * @param agent agent to be handled

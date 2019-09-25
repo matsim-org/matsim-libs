@@ -20,9 +20,9 @@ import java.util.Set;
 
 public class StopStopTimeCalculatorTuple implements VehicleArrivesAtFacilityEventHandler, PersonLeavesVehicleEventHandler {
 	
-	private final Map<Tuple<Id<TransitStopFacility>, Id<TransitStopFacility>>, StopStopTimeData> stopStopTimes = new HashMap<Tuple<Id<TransitStopFacility>, Id<TransitStopFacility>>, StopStopTimeData>();
-	private final Map<Tuple<Id<TransitStopFacility>, Id<TransitStopFacility>>, Double> scheduledStopStopTimes = new HashMap<Tuple<Id<TransitStopFacility>, Id<TransitStopFacility>>, Double>();
-	private final Map<Id<Vehicle>, Tuple<Id<TransitStopFacility>, Double>> inTransitVehicles = new HashMap<Id<Vehicle>, Tuple<Id<TransitStopFacility>, Double>>(1000);
+	private final Map<Tuple<Id<org.matsim.facilities.Facility>, Id<org.matsim.facilities.Facility>>, StopStopTimeData> stopStopTimes = new HashMap<Tuple<Id<org.matsim.facilities.Facility>, Id<org.matsim.facilities.Facility>>, StopStopTimeData>();
+	private final Map<Tuple<Id<org.matsim.facilities.Facility>, Id<org.matsim.facilities.Facility>>, Double> scheduledStopStopTimes = new HashMap<Tuple<Id<org.matsim.facilities.Facility>, Id<org.matsim.facilities.Facility>>, Double>();
+	private final Map<Id<Vehicle>, Tuple<Id<org.matsim.facilities.Facility>, Double>> inTransitVehicles = new HashMap<Id<Vehicle>, Tuple<Id<org.matsim.facilities.Facility>, Double>>(1000);
 	private final Set<Id<Vehicle>> vehicleIds = new HashSet<Id<Vehicle>>();
 	private double timeSlot;
 	
@@ -32,11 +32,11 @@ public class StopStopTimeCalculatorTuple implements VehicleArrivesAtFacilityEven
 	}
 	public StopStopTimeCalculatorTuple(final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {
 		this.timeSlot = timeSlot;
-		Map<Tuple<Id<TransitStopFacility>, Id<TransitStopFacility>>, Integer> numObservations = new HashMap<Tuple<Id<TransitStopFacility>, Id<TransitStopFacility>>, Integer>();
+		Map<Tuple<Id<org.matsim.facilities.Facility>, Id<org.matsim.facilities.Facility>>, Integer> numObservations = new HashMap<Tuple<Id<org.matsim.facilities.Facility>, Id<org.matsim.facilities.Facility>>, Integer>();
 		for(TransitLine line:transitSchedule.getTransitLines().values())
 			for(TransitRoute route:line.getRoutes().values()) {
 				for(int s=0; s<route.getStops().size()-1; s++) {
-					Tuple<Id<TransitStopFacility>, Id<TransitStopFacility>> key = new Tuple<Id<TransitStopFacility>, Id<TransitStopFacility>>(route.getStops().get(s).getStopFacility().getId(), route.getStops().get(s+1).getStopFacility().getId());
+					Tuple<Id<org.matsim.facilities.Facility>, Id<org.matsim.facilities.Facility>> key = new Tuple<Id<org.matsim.facilities.Facility>, Id<org.matsim.facilities.Facility>>(route.getStops().get(s).getStopFacility().getId(), route.getStops().get(s+1).getStopFacility().getId());
 					StopStopTimeData data = stopStopTimes.get(key);
 					if(data==null)
 						stopStopTimes.put(key, new StopStopTimeDataArray((int) (totalTime/timeSlot)+1));
@@ -70,25 +70,25 @@ public class StopStopTimeCalculatorTuple implements VehicleArrivesAtFacilityEven
 			 */
 			private static final long serialVersionUID = 1L;
 			@Override
-			public double getStopStopTime(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time) {
+			public double getStopStopTime(Id<org.matsim.facilities.Facility> stopOId, Id<org.matsim.facilities.Facility> stopDId, double time) {
 				return StopStopTimeCalculatorTuple.this.getStopStopTime(stopOId, stopDId, time);
 			}
 			@Override
-			public double getStopStopTimeVariance(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time) {
+			public double getStopStopTimeVariance(Id<org.matsim.facilities.Facility> stopOId, Id<org.matsim.facilities.Facility> stopDId, double time) {
 				return StopStopTimeCalculatorTuple.this.getStopStopTimeVariance(stopOId, stopDId, time);
 			}
 		};
 	}
-	private double getStopStopTime(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time) {
-		Tuple<Id<TransitStopFacility>, Id<TransitStopFacility>> key = new Tuple<Id<TransitStopFacility>, Id<TransitStopFacility>>(stopOId, stopDId);
+	private double getStopStopTime(Id<org.matsim.facilities.Facility> stopOId, Id<org.matsim.facilities.Facility> stopDId, double time) {
+		Tuple<Id<org.matsim.facilities.Facility>, Id<org.matsim.facilities.Facility>> key = new Tuple<Id<org.matsim.facilities.Facility>, Id<org.matsim.facilities.Facility>>(stopOId, stopDId);
 		StopStopTimeData stopStopTimeData = stopStopTimes.get(key);
 		if(stopStopTimeData.getNumData((int) (time/timeSlot))==0)
 			return scheduledStopStopTimes.get(key);
 		else
 			return stopStopTimeData.getStopStopTime((int) (time/timeSlot));
 	}
-	private double getStopStopTimeVariance(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time) {
-		Tuple<Id<TransitStopFacility>, Id<TransitStopFacility>> key = new Tuple<Id<TransitStopFacility>, Id<TransitStopFacility>>(stopOId, stopDId);
+	private double getStopStopTimeVariance(Id<org.matsim.facilities.Facility> stopOId, Id<org.matsim.facilities.Facility> stopDId, double time) {
+		Tuple<Id<org.matsim.facilities.Facility>, Id<org.matsim.facilities.Facility>> key = new Tuple<Id<org.matsim.facilities.Facility>, Id<org.matsim.facilities.Facility>>(stopOId, stopDId);
 		StopStopTimeData stopStopTimeData = stopStopTimes.get(key);
 		if(stopStopTimeData.getNumData((int) (time/timeSlot))==0)
 			return 0;
@@ -104,10 +104,10 @@ public class StopStopTimeCalculatorTuple implements VehicleArrivesAtFacilityEven
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
 		if(vehicleIds.contains(event.getVehicleId())) {
-			Tuple<Id<TransitStopFacility>, Double> route = inTransitVehicles.remove(event.getVehicleId());
+			Tuple<Id<org.matsim.facilities.Facility>, Double> route = inTransitVehicles.remove(event.getVehicleId());
 			if(route!=null)
-				stopStopTimes.get(new Tuple<Id<TransitStopFacility>, Id<TransitStopFacility>>(route.getFirst(), event.getFacilityId())).addStopStopTime((int) (route.getSecond()/timeSlot), event.getTime()-route.getSecond());
-			inTransitVehicles.put(event.getVehicleId(), new Tuple<Id<TransitStopFacility>, Double>(event.getFacilityId(), event.getTime()));
+				stopStopTimes.get(new Tuple<Id<org.matsim.facilities.Facility>, Id<org.matsim.facilities.Facility>>(route.getFirst(), event.getFacilityId())).addStopStopTime((int) (route.getSecond()/timeSlot), event.getTime()-route.getSecond());
+			inTransitVehicles.put(event.getVehicleId(), new Tuple<Id<org.matsim.facilities.Facility>, Double>(event.getFacilityId(), event.getTime()));
 		}
 	}
 	@Override

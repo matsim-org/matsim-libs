@@ -38,7 +38,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  */
 public class TransitStopFacilityImpl implements TransitStopFacility {
 	
-	private final Id<TransitStopFacility> id;
+	private final Id<org.matsim.facilities.Facility> id;
 	private Id<TransitStopArea> stopAreaId;
 	private Coord coord;
 	private Id<Link> linkId = null;
@@ -47,7 +47,7 @@ public class TransitStopFacilityImpl implements TransitStopFacility {
 	private Customizable customizableDelegate;
 	private final Attributes attributes = new Attributes();
 
-	protected TransitStopFacilityImpl(final Id<TransitStopFacility> id, final Coord coord, final boolean isBlockingLane) {
+	protected TransitStopFacilityImpl(final Id<org.matsim.facilities.Facility> id, final Coord coord, final boolean isBlockingLane) {
 		this.id = id;
 		this.coord = coord;
 		this.isBlockingLane = isBlockingLane;
@@ -74,7 +74,7 @@ public class TransitStopFacilityImpl implements TransitStopFacility {
 	}
 
 	@Override
-	public Id<TransitStopFacility> getId() {
+	public Id<org.matsim.facilities.Facility> getId() {
 		return this.id;
 	}
 

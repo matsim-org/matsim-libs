@@ -50,10 +50,10 @@ public class TransitLoadTest {
 	public void testTransitLoad_singleLine() {
 		TransitScheduleFactory factory = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = factory.createTransitSchedule();
-		TransitStopFacility stop1 = factory.createTransitStopFacility(Id.create(0, TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
-		TransitStopFacility stop2 = factory.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
-		TransitStopFacility stop3 = factory.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
-		TransitStopFacility stop4 = factory.createTransitStopFacility(Id.create(3, TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
+		TransitStopFacility stop1 = factory.createTransitStopFacility(Id.create(0, org.matsim.facilities.Facility.class), new Coord((double) 0, (double) 0), false);
+		TransitStopFacility stop2 = factory.createTransitStopFacility(Id.create(1, org.matsim.facilities.Facility.class), new Coord((double) 0, (double) 0), false);
+		TransitStopFacility stop3 = factory.createTransitStopFacility(Id.create(2, org.matsim.facilities.Facility.class), new Coord((double) 0, (double) 0), false);
+		TransitStopFacility stop4 = factory.createTransitStopFacility(Id.create(3, org.matsim.facilities.Facility.class), new Coord((double) 0, (double) 0), false);
 		schedule.addStopFacility(stop1);
 		schedule.addStopFacility(stop2);
 		schedule.addStopFacility(stop3);

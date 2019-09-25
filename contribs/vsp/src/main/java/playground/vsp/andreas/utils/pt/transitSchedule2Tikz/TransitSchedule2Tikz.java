@@ -115,7 +115,7 @@ public class TransitSchedule2Tikz {
 	/**
 	 * @param facilities
 	 */
-	private void createTikzNodes(Map<Id<TransitStopFacility>, TransitStopFacility> facilities) {
+	private void createTikzNodes(Map<Id<org.matsim.facilities.Facility>, TransitStopFacility> facilities) {
 		int i = 0;
 		this.tikzNodes = new HashMap<Id, TikzNode>();
 		this.stopId2tikzId = new HashMap<Id, Id>();

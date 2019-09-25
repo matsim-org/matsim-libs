@@ -24,7 +24,7 @@ import org.matsim.facilities.ActivityFacility;
 
 public interface PrivateParking extends PC2Parking{
 
-	public boolean isAllowedToUseParking(Id<Person> personId, Id<ActivityFacility> actFacilityId, String actType);
+	public boolean isAllowedToUseParking(Id<Person> personId, Id<org.matsim.facilities.Facility> actFacilityId, String actType);
 	
 //	//allow restricting to single person, actType at facility or whole facility.
 //	String restrictionType;

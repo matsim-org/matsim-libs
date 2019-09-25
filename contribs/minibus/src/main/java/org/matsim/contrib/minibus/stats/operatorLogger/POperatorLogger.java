@@ -130,7 +130,7 @@ public final class POperatorLogger implements StartupListener, IterationEndsList
 					local.setStartTime(plan.getStartTime());
 					local.setEndTime(plan.getEndTime());
 					
-					ArrayList<Id<TransitStopFacility>> stopsServed = new ArrayList<>();
+					ArrayList<Id<org.matsim.facilities.Facility>> stopsServed = new ArrayList<>();
 					for (TransitStopFacility stop : plan.getStopsToBeServed()) {
 						stopsServed.add(stop.getId());
 					}

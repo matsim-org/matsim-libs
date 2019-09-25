@@ -75,7 +75,7 @@ public class FreightActivity implements Activity {
 	}
 
 	@Override
-	public Id<ActivityFacility> getFacilityId() {
+	public Id<org.matsim.facilities.Facility> getFacilityId() {
 		return act.getFacilityId();
 	}
 
@@ -85,7 +85,7 @@ public class FreightActivity implements Activity {
 	}
 
 	@Override
-	public void setFacilityId(Id<ActivityFacility> id) {
+	public void setFacilityId(Id<org.matsim.facilities.Facility> id) {
 		throw new RuntimeException("not implemented") ;
 	}
 

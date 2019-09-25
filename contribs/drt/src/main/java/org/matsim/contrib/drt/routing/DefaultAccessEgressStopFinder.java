@@ -44,7 +44,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public class DefaultAccessEgressStopFinder implements AccessEgressStopFinder {
 
 	private final Network network;
-	private final Map<Id<TransitStopFacility>, TransitStopFacility> stops;
+	private final Map<Id<org.matsim.facilities.Facility>, TransitStopFacility> stops;
 	private final double maxWalkDistance;
 	private final double walkBeelineFactor;
 

@@ -30,7 +30,7 @@ public class StopId2LineId2PulkTest {
 	    Id<TransitRoute> transitRouteId1 = Id.create(5, TransitRoute.class);
 	    Id<Departure> departureId1 = Id.create(6, Departure.class);
 	    Id<Departure> departureId2 = Id.create(8, Departure.class);
-	    Id<TransitStopFacility> facilityId1 = Id.create(7, TransitStopFacility.class);
+	    Id<org.matsim.facilities.Facility> facilityId1 = Id.create(7, org.matsim.facilities.Facility.class);
 
 
 //	    create events

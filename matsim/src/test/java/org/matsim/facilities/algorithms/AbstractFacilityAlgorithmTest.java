@@ -31,8 +31,8 @@ public class AbstractFacilityAlgorithmTest extends MatsimTestCase {
 	public void testRunAlgorithms() {
 		final ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
 		// create 2 facilities
-		facilities.createAndAddFacility(Id.create(1, ActivityFacility.class), new Coord(1.0, 1.0));
-		facilities.createAndAddFacility(Id.create(2, ActivityFacility.class), new Coord(2.0, 2.0));
+		facilities.createAndAddFacility(Id.create(1, org.matsim.facilities.Facility.class), new Coord(1.0, 1.0));
+		facilities.createAndAddFacility(Id.create(2, org.matsim.facilities.Facility.class), new Coord(2.0, 2.0));
 		// create an algo and let it run over the facilities
 		MockAlgo1 algo1 = new MockAlgo1();
 		algo1.run(facilities);

@@ -57,8 +57,8 @@ public class SamplerTest {
     public void testSampler() {
         DestinationSampler sampler = new DestinationSampler(
                 context.getPersonsKValuesArray(), context.getFacilitiesKValuesArray(), ConfigUtils.addOrGetModule( scenario.getConfig(), FrozenTastesConfigGroup.class ) ) ;
-        assertTrue(sampler.sample(context.getFacilityIndex(Id.create(1, ActivityFacility.class)), context.getPersonIndex(Id.create(1, Person.class))));
-        assertTrue(!sampler.sample(context.getFacilityIndex(Id.create(1, ActivityFacility.class)), context.getPersonIndex(Id.create(2, Person.class))));
+        assertTrue(sampler.sample(context.getFacilityIndex(Id.create(1, org.matsim.facilities.Facility.class)), context.getPersonIndex(Id.create(1, Person.class))));
+        assertTrue(!sampler.sample(context.getFacilityIndex(Id.create(1, org.matsim.facilities.Facility.class)), context.getPersonIndex(Id.create(2, Person.class))));
     }
 
 }

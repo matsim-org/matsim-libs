@@ -35,21 +35,21 @@ public class PtAlightCountsFixture extends PtCountsFixture {
 
 	@Override
 	public CountsComparisonAlgorithm getCCA() {
-		Map<Id<TransitStopFacility>, int[]> alights = new HashMap<>();
+		Map<Id<org.matsim.facilities.Facility>, int[]> alights = new HashMap<>();
 
 		int[] alightArrayStop3 = new int[24];
 		alightArrayStop3[8] = 50;
-		alights.put(Id.create("stop3", TransitStopFacility.class), alightArrayStop3);
+		alights.put(Id.create("stop3", org.matsim.facilities.Facility.class), alightArrayStop3);
 
 		int[] alightArrayStop4 = new int[24];
 		alightArrayStop4[8] = 15;
-		alights.put(Id.create("stop4", TransitStopFacility.class), alightArrayStop4);
+		alights.put(Id.create("stop4", org.matsim.facilities.Facility.class), alightArrayStop4);
 
 		this.oa.setAlights(alights);
 		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
 			
 			@Override
-			public double[] getVolumesForStop(Id<TransitStopFacility> locationId) {
+			public double[] getVolumesForStop(Id<org.matsim.facilities.Facility> locationId) {
 				return copyFromIntArray(oa.getAlightVolumesForStop(locationId));
 			}
 			

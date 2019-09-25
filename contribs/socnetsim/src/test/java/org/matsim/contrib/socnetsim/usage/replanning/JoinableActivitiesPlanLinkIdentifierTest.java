@@ -46,7 +46,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 	@Test
 	public void testOpenPlansSamePlaceSameType() {
 		final String type = "type";
-		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class);
+		final Id<org.matsim.facilities.Facility> facility = Id.create( "fac" , org.matsim.facilities.Facility.class);
 
 		final Plan plan1 = createOpenPlan( Id.create( 1 , Person.class ) , type , facility );
 		final Plan plan2 = createOpenPlan( Id.create( 2 , Person.class ) , type , facility );
@@ -60,7 +60,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 	@Test
 	public void testOpenPlansSamePlaceDifferentType() {
 		final String type = "type";
-		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class );
+		final Id<org.matsim.facilities.Facility> facility = Id.create( "fac" , org.matsim.facilities.Facility.class);
 
 		final Plan plan1 = createOpenPlan( Id.create( 1 , Person.class ) , type , facility );
 		final Plan plan2 = createOpenPlan( Id.create( 2 , Person.class ) , "other type" , facility );
@@ -78,8 +78,8 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 	@Test
 	public void testOpenPlansDifferentPlaceSameType() {
 		final String type = "type";
-		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class );
-		final Id<ActivityFacility> facility2 = Id.create( "fa2" , ActivityFacility.class );
+		final Id<org.matsim.facilities.Facility> facility = Id.create( "fac" , org.matsim.facilities.Facility.class);
+		final Id<org.matsim.facilities.Facility> facility2 = Id.create( "fa2" , org.matsim.facilities.Facility.class);
 
 		final Plan plan1 = createOpenPlan( Id.create( 1 , Person.class ) , type , facility );
 		final Plan plan2 = createOpenPlan( Id.create( 2 , Person.class ) , type , facility2 );
@@ -97,7 +97,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 	@Test
 	public void testOpenPlansSamePlaceSameWrongType() {
 		final String type = "type";
-		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class);
+		final Id<org.matsim.facilities.Facility> facility = Id.create( "fac" , org.matsim.facilities.Facility.class);
 
 		final Plan plan1 = createOpenPlan( Id.create( 1 , Person.class ) , type , facility );
 		final Plan plan2 = createOpenPlan( Id.create( 2 , Person.class ) , type , facility );
@@ -115,7 +115,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 	private static Plan createOpenPlan(
 			final Id<Person> personId,
 			final String type,
-			final Id<ActivityFacility> facility) {
+			final Id<org.matsim.facilities.Facility> facility) {
 		final Person pers1 = factory.createPerson( personId );
 		final Plan plan1 = factory.createPlan();
 		pers1.addPlan( plan1 );
@@ -129,7 +129,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 	@Test
 	public void testSingleTourOverlaping() {
 		final String type = "type";
-		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class);
+		final Id<org.matsim.facilities.Facility> facility = Id.create( "fac" , org.matsim.facilities.Facility.class);
 
 		final Plan plan1 =
 			createSingleTripPlan(
@@ -161,7 +161,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 	public void testSingleTourPlansNonOverlaping() {
 		//Logger.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
 		final String type = "type";
-		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class );
+		final Id<org.matsim.facilities.Facility> facility = Id.create( "fac" , org.matsim.facilities.Facility.class);
 
 		final Plan plan1 =
 			createSingleTripPlan(
@@ -193,7 +193,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 	public void testSingleTourPlansZeroDurationAct() {
 		//Logger.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
 		final String type = "type";
-		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class);
+		final Id<org.matsim.facilities.Facility> facility = Id.create( "fac" , org.matsim.facilities.Facility.class);
 
 		final Plan plan1 =
 			createSingleTripPlan(
@@ -225,7 +225,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 	public void testSingleTourPlansZeroDurationBegin() {
 		//Logger.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
 		final String type = "type";
-		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class);
+		final Id<org.matsim.facilities.Facility> facility = Id.create( "fac" , org.matsim.facilities.Facility.class);
 
 		final Plan plan1 =
 			createSingleTripPlan(
@@ -257,7 +257,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 	public void testSingleTourPlansZeroDurationEnd() {
 		//Logger.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
 		final String type = "type";
-		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class );
+		final Id<org.matsim.facilities.Facility> facility = Id.create( "fac" , org.matsim.facilities.Facility.class);
 
 		final Plan plan1 =
 			createSingleTripPlan(
@@ -289,8 +289,8 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 	public void testDoubleTourPlansZeroDurationEnd() {
 		//Logger.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
 		final String type = "type";
-		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class );
-		final Id<ActivityFacility> wrongFacility = Id.create( "fac2" , ActivityFacility.class );
+		final Id<org.matsim.facilities.Facility> facility = Id.create( "fac" , org.matsim.facilities.Facility.class);
+		final Id<org.matsim.facilities.Facility> wrongFacility = Id.create( "fac2" , org.matsim.facilities.Facility.class);
 
 		final Plan plan1 =
 			createDoubleTripPlan(
@@ -326,7 +326,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 	public void testSingleTourPlansInconsistentDurationAct() {
 		//Logger.getLogger( JoinableActivitiesPlanLinkIdentifier.class ).setLevel( Level.TRACE );
 		final String type = "type";
-		final Id<ActivityFacility> facility = Id.create( "fac" , ActivityFacility.class );
+		final Id<org.matsim.facilities.Facility> facility = Id.create( "fac" , org.matsim.facilities.Facility.class);
 
 		final Plan plan1 =
 			createSingleTripPlan(
@@ -360,9 +360,9 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 			final Id<Person> personId,
 			final String type,
 			final double start1,
-			final Id<ActivityFacility> facility1,
+			final Id<org.matsim.facilities.Facility> facility1,
 			final double end1,
-			final Id<ActivityFacility> facility2,
+			final Id<org.matsim.facilities.Facility> facility2,
 			final double end2) {
 		final Person pers = factory.createPerson( personId );
 		final Plan plan = factory.createPlan();
@@ -370,7 +370,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 
 		{
 			final Activity act = (Activity) factory.createActivityFromLinkId( "home" , Id.create( "link" , Link.class ) );
-			act.setFacilityId( Id.create( "home" , ActivityFacility.class ) );
+			act.setFacilityId( Id.create( "home" , org.matsim.facilities.Facility.class) );
 			act.setEndTime( start1 );
 			plan.addActivity( act );
 		}
@@ -398,7 +398,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 
 		{
 			final Activity act = (Activity) factory.createActivityFromLinkId( "home" , Id.create( "link" , Link.class ) );
-			act.setFacilityId( Id.create( "home" , ActivityFacility.class ) );
+			act.setFacilityId( Id.create( "home" , org.matsim.facilities.Facility.class) );
 			plan.addActivity( act );
 		}
 
@@ -408,7 +408,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 	private static Plan createSingleTripPlan(
 			final Id<Person> personId,
 			final String type,
-			final Id<ActivityFacility> facility,
+			final Id<org.matsim.facilities.Facility> facility,
 			final double start,
 			final double end) {
 		final Person pers = factory.createPerson( personId );
@@ -417,7 +417,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 
 		{
 			final Activity act = (Activity) factory.createActivityFromLinkId( "home" , Id.create( "link" , Link.class ) );
-			act.setFacilityId( Id.create( "home" , ActivityFacility.class ) );
+			act.setFacilityId( Id.create( "home" , org.matsim.facilities.Facility.class) );
 			act.setEndTime( start );
 			plan.addActivity( act );
 		}
@@ -435,7 +435,7 @@ public class JoinableActivitiesPlanLinkIdentifierTest {
 
 		{
 			final Activity act = (Activity) factory.createActivityFromLinkId( "home" , Id.create( "link" , Link.class ) );
-			act.setFacilityId( Id.create( "home" , ActivityFacility.class ) );
+			act.setFacilityId( Id.create( "home" , org.matsim.facilities.Facility.class) );
 			plan.addActivity( act );
 		}
 

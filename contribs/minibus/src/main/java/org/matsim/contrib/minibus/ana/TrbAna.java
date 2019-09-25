@@ -91,7 +91,7 @@ final class TrbAna implements PersonEntersVehicleEventHandler, PersonLeavesVehic
 
 	private HashMap<Id<Vehicle>, Integer> vehId2NumberOfPassengers = new HashMap<>();
 	private HashMap<Id<Person>, String> agentId2ModeAlreadyUsed = new HashMap<>();
-	private HashMap<Id<Vehicle>, Id<TransitStopFacility>> vehId2StopIdMap = new HashMap<>();
+	private HashMap<Id<Vehicle>, Id<org.matsim.facilities.Facility>> vehId2StopIdMap = new HashMap<>();
 
 	private int boardingInServiceAreaPt = 0;
 	private int alightingInServiceAreaPt = 0;
@@ -250,7 +250,7 @@ final class TrbAna implements PersonEntersVehicleEventHandler, PersonLeavesVehic
 	}
 
 
-	private boolean stopIdInServiceArea(Id<TransitStopFacility> stopId) {
+	private boolean stopIdInServiceArea(Id<org.matsim.facilities.Facility> stopId) {
 
 		TransitStopFacility stop = this.transitSchedule.getFacilities().get(stopId);
 		

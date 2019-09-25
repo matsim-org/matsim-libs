@@ -25,7 +25,7 @@ public class DeterministicStopStopTimeCalculator implements StopStopTimeCalculat
 	}
 
 	@Override
-	public double getStopStopTime(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time) {
+	public double getStopStopTime(Id<org.matsim.facilities.Facility> stopOId, Id<org.matsim.facilities.Facility> stopDId, double time) {
 		// ATTENTION! This could be optimized. Basically, we probably don't need to
 		// route here. However, finding the travel time even on one route is not a
 		// computationally efficient task, because the same transit stop id may occur
@@ -39,7 +39,7 @@ public class DeterministicStopStopTimeCalculator implements StopStopTimeCalculat
 	}
 
 	@Override
-	public double getStopStopTimeVariance(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId,
+	public double getStopStopTimeVariance(Id<org.matsim.facilities.Facility> stopOId, Id<org.matsim.facilities.Facility> stopDId,
 			double time) {
 		return 0.0;
 	}
@@ -48,13 +48,13 @@ public class DeterministicStopStopTimeCalculator implements StopStopTimeCalculat
 	public StopStopTime get() {
 		return new StopStopTime() {
 			@Override
-			public double getStopStopTimeVariance(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId,
+			public double getStopStopTimeVariance(Id<org.matsim.facilities.Facility> stopOId, Id<org.matsim.facilities.Facility> stopDId,
 					double time) {
 				return 0.0;
 			}
 
 			@Override
-			public double getStopStopTime(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId,
+			public double getStopStopTime(Id<org.matsim.facilities.Facility> stopOId, Id<org.matsim.facilities.Facility> stopDId,
 					double time) {
 				return DeterministicStopStopTimeCalculator.this.getStopStopTime(stopOId, stopDId, time);
 			}

@@ -160,13 +160,13 @@ public class TwoLinesDemo {
 		TransitScheduleFactory builder = schedule.getFactory();
 		double x1 = -100;
 		double y = -50;
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new Coord(x1, y), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create(1, org.matsim.facilities.Facility.class), new Coord(x1, y), false);
 		double x = -100;
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new Coord(x, (double) 850), false);
-		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create(3, TransitStopFacility.class), new Coord((double) 1400, (double) 450), false);
-		TransitStopFacility stop4 = builder.createTransitStopFacility(Id.create(4, TransitStopFacility.class), new Coord((double) 3400, (double) 450), false);
-		TransitStopFacility stop5 = builder.createTransitStopFacility(Id.create(5, TransitStopFacility.class), new Coord((double) 3900, (double) 50), false);
-		TransitStopFacility stop6 = builder.createTransitStopFacility(Id.create(6, TransitStopFacility.class), new Coord((double) 3900, (double) 850), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create(2, org.matsim.facilities.Facility.class), new Coord(x, (double) 850), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create(3, org.matsim.facilities.Facility.class), new Coord((double) 1400, (double) 450), false);
+		TransitStopFacility stop4 = builder.createTransitStopFacility(Id.create(4, org.matsim.facilities.Facility.class), new Coord((double) 3400, (double) 450), false);
+		TransitStopFacility stop5 = builder.createTransitStopFacility(Id.create(5, org.matsim.facilities.Facility.class), new Coord((double) 3900, (double) 50), false);
+		TransitStopFacility stop6 = builder.createTransitStopFacility(Id.create(6, org.matsim.facilities.Facility.class), new Coord((double) 3900, (double) 850), false);
 
 		Link link1  = this.scenario.getNetwork().getLinks().get(Id.create( 1, Link.class));
 		Link link2  = this.scenario.getNetwork().getLinks().get(Id.create( 2, Link.class));
@@ -248,12 +248,12 @@ public class TwoLinesDemo {
 		TransitLine tLine2 = schedule.getTransitLines().get(Id.create(2, TransitLine.class));
 		TransitRoute tRoute2 = tLine1.getRoutes().get(Id.create(1, TransitRoute.class));
 
-		TransitStopFacility stop1 = schedule.getFacilities().get(Id.create(1, TransitStopFacility.class));
-		/*TransitStopFacility stop2 =*/ schedule.getFacilities().get(Id.create(2, TransitStopFacility.class));
-		TransitStopFacility stop3 = schedule.getFacilities().get(Id.create(3, TransitStopFacility.class));
-		TransitStopFacility stop4 = schedule.getFacilities().get(Id.create(4, TransitStopFacility.class));
-		/*TransitStopFacility stop5 =*/ schedule.getFacilities().get(Id.create(5, TransitStopFacility.class));
-		TransitStopFacility stop6 = schedule.getFacilities().get(Id.create(6, TransitStopFacility.class));
+		TransitStopFacility stop1 = schedule.getFacilities().get(Id.create(1, org.matsim.facilities.Facility.class));
+		/*TransitStopFacility stop2 =*/ schedule.getFacilities().get(Id.create(2, org.matsim.facilities.Facility.class));
+		TransitStopFacility stop3 = schedule.getFacilities().get(Id.create(3, org.matsim.facilities.Facility.class));
+		TransitStopFacility stop4 = schedule.getFacilities().get(Id.create(4, org.matsim.facilities.Facility.class));
+		/*TransitStopFacility stop5 =*/ schedule.getFacilities().get(Id.create(5, org.matsim.facilities.Facility.class));
+		TransitStopFacility stop6 = schedule.getFacilities().get(Id.create(6, org.matsim.facilities.Facility.class));
 
 		{ // person 1
 			Person person = pb.createPerson(Id.create(1, Person.class));
@@ -351,7 +351,7 @@ public class TwoLinesDemo {
 		System.out.println("stop\t#exitleaving\t#enter\t#inVehicle");
 		int inVehicle = 0;
 		for (TransitRouteStop stop : route1.getStops()) {
-			Id<TransitStopFacility> stopId = stop.getStopFacility().getId();
+			Id<org.matsim.facilities.Facility> stopId = stop.getStopFacility().getId();
 			int enter = analysis1.getNumberOfEnteringPassengers(stopId);
 			int leave = analysis1.getNumberOfLeavingPassengers(stopId);
 			inVehicle = inVehicle + enter - leave;
@@ -361,7 +361,7 @@ public class TwoLinesDemo {
 		System.out.println("stop\t#exitleaving\t#enter\t#inVehicle");
 		inVehicle = 0;
 		for (TransitRouteStop stop : route2.getStops()) {
-			Id<TransitStopFacility> stopId = stop.getStopFacility().getId();
+			Id<org.matsim.facilities.Facility> stopId = stop.getStopFacility().getId();
 			int enter = analysis2.getNumberOfEnteringPassengers(stopId);
 			int leave = analysis2.getNumberOfLeavingPassengers(stopId);
 			inVehicle = inVehicle + enter - leave;

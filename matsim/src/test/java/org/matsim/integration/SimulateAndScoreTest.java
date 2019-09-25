@@ -132,11 +132,11 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 
 
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord(100, 0), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", org.matsim.facilities.Facility.class), new Coord(100, 0), false);
 		stop1.setLinkId(link1.getId());
-		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new Coord(1100, 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", org.matsim.facilities.Facility.class), new Coord(1100, 0), false);
 		stop2.setLinkId(link2.getId());
-		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new Coord(1200, 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", org.matsim.facilities.Facility.class), new Coord(1200, 0), false);
 		stop3.setLinkId(link3.getId());
 
 

@@ -60,7 +60,7 @@ public class TransitScheduleValidatorTest {
 
 		Assert.assertThat(validationResult.getIssues(), containsInAnyOrder(Matchers.allOf(
 				hasProperty("severity", Matchers.equalTo(TransitScheduleValidator.ValidationResult.Severity.ERROR)),
-				hasProperty("entities", containsInAnyOrder(Matchers.equalTo(Id.create("2b", TransitStopFacility.class)))))));
+				hasProperty("entities", containsInAnyOrder(Matchers.equalTo(Id.create("2b", org.matsim.facilities.Facility.class)))))));
 	}
 
 	@Test
@@ -69,10 +69,10 @@ public class TransitScheduleValidatorTest {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleFactory factory = schedule.getFactory();
 
-		Id<TransitStopFacility> id1 = Id.create(1, TransitStopFacility.class);
-		Id<TransitStopFacility> id2 = Id.create(2, TransitStopFacility.class);
-		Id<TransitStopFacility> id3 = Id.create(3, TransitStopFacility.class);
-		Id<TransitStopFacility> id4 = Id.create(4, TransitStopFacility.class);
+		Id<org.matsim.facilities.Facility> id1 = Id.create(1, org.matsim.facilities.Facility.class);
+		Id<org.matsim.facilities.Facility> id2 = Id.create(2, org.matsim.facilities.Facility.class);
+		Id<org.matsim.facilities.Facility> id3 = Id.create(3, org.matsim.facilities.Facility.class);
+		Id<org.matsim.facilities.Facility> id4 = Id.create(4, org.matsim.facilities.Facility.class);
 
 		schedule.addStopFacility(factory.createTransitStopFacility(id1, new Coord(10000, 10000), false));
 		schedule.addStopFacility(factory.createTransitStopFacility(id2, new Coord(20000, 10000), false));
@@ -92,10 +92,10 @@ public class TransitScheduleValidatorTest {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleFactory factory = schedule.getFactory();
 
-		Id<TransitStopFacility> id1 = Id.create("stop1", TransitStopFacility.class);
-		Id<TransitStopFacility> id2 = Id.create("stop2", TransitStopFacility.class);
-		Id<TransitStopFacility> id3 = Id.create("stop3", TransitStopFacility.class);
-		Id<TransitStopFacility> id4 = Id.create("stop4", TransitStopFacility.class);
+		Id<org.matsim.facilities.Facility> id1 = Id.create("stop1", org.matsim.facilities.Facility.class);
+		Id<org.matsim.facilities.Facility> id2 = Id.create("stop2", org.matsim.facilities.Facility.class);
+		Id<org.matsim.facilities.Facility> id3 = Id.create("stop3", org.matsim.facilities.Facility.class);
+		Id<org.matsim.facilities.Facility> id4 = Id.create("stop4", org.matsim.facilities.Facility.class);
 
 		schedule.addStopFacility(factory.createTransitStopFacility(id1, new Coord(10000, 10000), false));
 		schedule.addStopFacility(factory.createTransitStopFacility(id2, new Coord(20000, 10000), false));

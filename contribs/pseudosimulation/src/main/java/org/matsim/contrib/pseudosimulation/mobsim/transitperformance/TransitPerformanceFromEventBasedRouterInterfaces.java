@@ -47,7 +47,7 @@ public class TransitPerformanceFromEventBasedRouterInterfaces implements Transit
 	private WaitTime waitTimes;
 	private StopStopTime stopStopTimes;
 	private Map<Id<TransitLine>, TransitLine> transitLines;
-	private Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities;
+	private Map<Id<org.matsim.facilities.Facility>, TransitStopFacility> stopFacilities;
 
 	@Inject
 	public TransitPerformanceFromEventBasedRouterInterfaces(WaitTime waitTimes, StopStopTime stopStopTimes,

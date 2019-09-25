@@ -36,6 +36,6 @@ import java.util.List;
  */
 public interface AgentTracker {
 
-	List<PTPassengerAgent> getAgentsAtFacility(Id<TransitStopFacility> stopId);
+	List<PTPassengerAgent> getAgentsAtFacility(Id<org.matsim.facilities.Facility> stopId);
 
 }

@@ -164,10 +164,10 @@ final class SimpleCircleScheduleProvider implements PRouteProvider {
 		// additional stops
 		for (Link link : completeLinkList) {
 			runningTime += link.getLength() / Math.min(this.vehicleMaximumVelocity, link.getFreespeed());
-			if(this.scheduleWithStopsOnly.getFacilities().get(Id.create(this.pIdentifier + link.getId(), TransitStopFacility.class)) == null){
+			if(this.scheduleWithStopsOnly.getFacilities().get(Id.create(this.pIdentifier + link.getId(), org.matsim.facilities.Facility.class)) == null){
 				continue;
 			}
-			routeStop = this.scheduleWithStopsOnly.getFactory().createTransitRouteStop(this.scheduleWithStopsOnly.getFacilities().get(Id.create(this.pIdentifier + link.getId(), TransitStopFacility.class)), runningTime, runningTime);
+			routeStop = this.scheduleWithStopsOnly.getFactory().createTransitRouteStop(this.scheduleWithStopsOnly.getFacilities().get(Id.create(this.pIdentifier + link.getId(), org.matsim.facilities.Facility.class)), runningTime, runningTime);
 			stops.add(routeStop);
 		}
 		

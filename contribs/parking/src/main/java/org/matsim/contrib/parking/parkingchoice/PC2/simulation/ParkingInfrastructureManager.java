@@ -50,7 +50,7 @@ public final class ParkingInfrastructureManager implements ParkingInfrastructure
 	private EventsManager eventsManager;
 
 	// facilityId -> parkings available to users of that facility
-	private LinkedListValueHashMap<Id<ActivityFacility>, PPRestrictedToFacilities> privateParkingsRestrictedToFacilities;
+	private LinkedListValueHashMap<Id<org.matsim.facilities.Facility>, PPRestrictedToFacilities> privateParkingsRestrictedToFacilities;
 
 	// available to parking owner and sometimes to others (renting out)
 	private HashMap<Id<Person>, RentableParking> rentablePrivateParking;
@@ -129,7 +129,7 @@ public final class ParkingInfrastructureManager implements ParkingInfrastructure
 	public synchronized void setPrivateParkingRestrictedToFacilities(
 			LinkedList<PPRestrictedToFacilities> ppRestrictedToFacilities) {
 		for (PPRestrictedToFacilities pp : ppRestrictedToFacilities) {
-			for (Id<ActivityFacility> facilityId : pp.getFacilityIds()) {
+			for (Id<org.matsim.facilities.Facility> facilityId : pp.getFacilityIds()) {
 				privateParkingsRestrictedToFacilities.put(facilityId, pp);
 				getAllParkings().put(pp.getId(), pp);
 			}

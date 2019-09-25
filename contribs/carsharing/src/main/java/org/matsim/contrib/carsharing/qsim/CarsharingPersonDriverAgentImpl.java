@@ -227,12 +227,12 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	}
 
 	@Override
-	public Id<TransitStopFacility> getDesiredAccessStopId() {
+	public Id<org.matsim.facilities.Facility> getDesiredAccessStopId() {
 		return this.transitAgentDelegate.getDesiredAccessStopId() ;
 	}
 
 	@Override
-	public Id<TransitStopFacility> getDesiredDestinationStopId() {
+	public Id<org.matsim.facilities.Facility> getDesiredDestinationStopId() {
 		return this.transitAgentDelegate.getDesiredAccessStopId() ;
 	}
 

@@ -48,7 +48,7 @@ public interface TransitSchedule extends MatsimToplevelContainer, Attributable {
 
 	Map<Id<TransitLine>, TransitLine> getTransitLines();
 
-	Map<Id<TransitStopFacility>, TransitStopFacility> getFacilities();
+	Map<Id<org.matsim.facilities.Facility>, TransitStopFacility> getFacilities();
 	
 	/**
 	 * @param stop the stop facility to be removed

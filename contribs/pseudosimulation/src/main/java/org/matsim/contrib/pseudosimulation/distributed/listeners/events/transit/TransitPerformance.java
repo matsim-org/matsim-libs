@@ -39,7 +39,7 @@ public class TransitPerformance implements Serializable {
         this.boardingModel = boardingModel;
     }
 
-    public void addVehicleDwellEventAtStop(Id<TransitLine> line, Id<TransitRoute> route, Id<TransitStopFacility> stopId, DwellEvent dwellEvent) {
+    public void addVehicleDwellEventAtStop(Id<TransitLine> line, Id<TransitRoute> route, Id<org.matsim.facilities.Facility> stopId, DwellEvent dwellEvent) {
         DwellEventsForLine stopDwellEventsForLine = linesToStopDwellEvents.get(line.toString());
         if (stopDwellEventsForLine == null) {
             stopDwellEventsForLine = new DwellEventsForLine();
@@ -49,7 +49,7 @@ public class TransitPerformance implements Serializable {
     }
 
 
-    public Tuple<Double, Double> getRouteTravelTime(Id<TransitLine> line, Id<TransitRoute> route, Id<TransitStopFacility> originStop, Id<TransitStopFacility> destinationStop, double time) {
+    public Tuple<Double, Double> getRouteTravelTime(Id<TransitLine> line, Id<TransitRoute> route, Id<org.matsim.facilities.Facility> originStop, Id<org.matsim.facilities.Facility> destinationStop, double time) {
         try {
             return linesToStopDwellEvents.get(line.toString()).getRouteTravelTime(route, originStop, destinationStop, time);
         }catch(NullPointerException ne){
@@ -70,7 +70,7 @@ public class TransitPerformance implements Serializable {
             this.dwellEvents.add(dwellEvent);
         }
 
-        public Tuple<Double, Double> getTravelTime(Id<TransitStopFacility> destinationStop, double time) {
+        public Tuple<Double, Double> getTravelTime(Id<org.matsim.facilities.Facility> destinationStop, double time) {
             double inVehicleTime = Double.POSITIVE_INFINITY;
             LinkedList<Double> lastInvehicleTime = new LinkedList<>();
             for (DwellEvent dwellEvent : dwellEvents) {
@@ -107,7 +107,7 @@ public class TransitPerformance implements Serializable {
 
         Map<String, DwellEventsAtStop> dwellEventsAtStops = new HashMap<>();
 
-        private void addVehicleDwellEventAtStop(Id<TransitStopFacility> stopId, DwellEvent dwellEvent) {
+        private void addVehicleDwellEventAtStop(Id<org.matsim.facilities.Facility> stopId, DwellEvent dwellEvent) {
             DwellEventsAtStop dwellEvents = dwellEventsAtStops.get(stopId.toString());
             if (dwellEvents == null) {
                 dwellEvents = new DwellEventsAtStop();
@@ -116,7 +116,7 @@ public class TransitPerformance implements Serializable {
             dwellEvents.addVehicleDwellEventAtStop(dwellEvent);
         }
 
-        public Tuple<Double, Double> getTravelTime(Id<TransitStopFacility> originStop, Id<TransitStopFacility> destinationStop, double time) {
+        public Tuple<Double, Double> getTravelTime(Id<org.matsim.facilities.Facility> originStop, Id<org.matsim.facilities.Facility> destinationStop, double time) {
             return dwellEventsAtStops.get(originStop.toString()).getTravelTime(destinationStop, time);
         }
 
@@ -126,7 +126,7 @@ public class TransitPerformance implements Serializable {
 
         private Map<String, DwellEventsForRoute> routesToDwellEvents = new HashMap<>();
 
-        private void addVehicleDwellEventAtStop(Id<TransitRoute> route, Id<TransitStopFacility> stopId, DwellEvent dwellEvent) {
+        private void addVehicleDwellEventAtStop(Id<TransitRoute> route, Id<org.matsim.facilities.Facility> stopId, DwellEvent dwellEvent) {
             DwellEventsForRoute stopDwellEventsForRoute = routesToDwellEvents.get(route.toString());
             if (stopDwellEventsForRoute == null) {
                 stopDwellEventsForRoute = new DwellEventsForRoute();
@@ -136,7 +136,7 @@ public class TransitPerformance implements Serializable {
         }
 
 
-        public Tuple<Double, Double> getRouteTravelTime(Id<TransitRoute> route, Id<TransitStopFacility> originStop, Id<TransitStopFacility> destinationStop, double time) {
+        public Tuple<Double, Double> getRouteTravelTime(Id<TransitRoute> route, Id<org.matsim.facilities.Facility> originStop, Id<org.matsim.facilities.Facility> destinationStop, double time) {
             return routesToDwellEvents.get(route.toString()).getTravelTime(originStop, destinationStop, time);
         }
     }

@@ -168,7 +168,7 @@ public final class FacilitiesFromPopulation {
 						if ( this.oneFacilityPerLink ) {
 							facility = facilitiesPerLinkId.get(linkId);
 							if (facility == null) {
-								final Id<ActivityFacility> facilityId = Id.create( this.idPrefix + linkId.toString() , ActivityFacility.class );
+								final Id<org.matsim.facilities.Facility> facilityId = Id.create( this.idPrefix + linkId.toString() , org.matsim.facilities.Facility.class);
 								final ActivityFacility preExistingFacilityIfAny = this.facilities.getFacilities().get( facilityId );
 								if ( preExistingFacilityIfAny == null ){
 									facility = factory.createActivityFacility( facilityId , coord , linkId );
@@ -193,7 +193,7 @@ public final class FacilitiesFromPopulation {
 
 							facility = facilitiesPerCoordinate.get(coord);
 							if (facility == null) {
-								final Id<ActivityFacility> facilityId = Id.create( this.idPrefix + idxCounter++ , ActivityFacility.class );
+								final Id<org.matsim.facilities.Facility> facilityId = Id.create( this.idPrefix + idxCounter++ , org.matsim.facilities.Facility.class);
 								final ActivityFacility preExistingFacilityIfAny = this.facilities.getFacilities().get( facilityId );
 								if ( preExistingFacilityIfAny == null ){
 									facility = factory.createActivityFacility( facilityId , coord , linkId );

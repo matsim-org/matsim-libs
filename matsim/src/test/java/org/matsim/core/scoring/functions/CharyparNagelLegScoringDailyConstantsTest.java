@@ -67,7 +67,7 @@ public class CharyparNagelLegScoringDailyConstantsTest {
 			leg.setDepartureTime( 0 );
 			leg.setTravelTime( legTravelTime1 );
 
-			final Event endFirstAct =  new ActivityEndEvent(leg.getDepartureTime(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), Id.create( 1, ActivityFacility.class ), "start");
+			final Event endFirstAct =  new ActivityEndEvent(leg.getDepartureTime(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), Id.create( 1, org.matsim.facilities.Facility.class), "start");
 			scoring1.handleEvent( endFirstAct );
 			scoring2.handleEvent( endFirstAct );
 
@@ -99,7 +99,7 @@ public class CharyparNagelLegScoringDailyConstantsTest {
 			leg.setDepartureTime( 0 );
 			leg.setTravelTime( legTravelTime2 );
 
-			final Event endFirstAct =  new ActivityEndEvent(leg.getDepartureTime(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), Id.create( 1, ActivityFacility.class ), "start");
+			final Event endFirstAct =  new ActivityEndEvent(leg.getDepartureTime(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), Id.create( 1, org.matsim.facilities.Facility.class), "start");
 			scoring1.handleEvent( endFirstAct );
 			scoring2.handleEvent( endFirstAct );
 
@@ -131,7 +131,7 @@ public class CharyparNagelLegScoringDailyConstantsTest {
 			leg.setDepartureTime( 0 );
 			leg.setTravelTime( legTravelTime3 );
 
-			final Event endFirstAct =  new ActivityEndEvent(leg.getDepartureTime(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), Id.create( 1, ActivityFacility.class ), "start");
+			final Event endFirstAct =  new ActivityEndEvent(leg.getDepartureTime(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), Id.create( 1, org.matsim.facilities.Facility.class), "start");
 			scoring1.handleEvent( endFirstAct );
 			scoring2.handleEvent( endFirstAct );
 

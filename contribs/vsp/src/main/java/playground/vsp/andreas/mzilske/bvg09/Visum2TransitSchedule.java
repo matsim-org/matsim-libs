@@ -44,7 +44,7 @@ public class Visum2TransitSchedule {
 	private final Map<String, String> transportModes = new HashMap<String, String>();
 	private final VehicleType defaultVehicleType;
 	private final TransitScheduleFactory builder;
-	private Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities;
+	private Map<Id<org.matsim.facilities.Facility>, TransitStopFacility> stopFacilities;
 	private long nextVehicleId;
 	private Collection<String> transitLineFilter = null;
 
@@ -151,7 +151,7 @@ public class Visum2TransitSchedule {
 			if (tpi.lineName.equals(line.id.toString()) && tpi.lineRouteName.equals(timeProfile.lineRouteName.toString()) && tpi.timeProfileName.equals(timeProfile.index.toString()) && tpi.dirCode.equals(timeProfile.dirCode.toString())){
 				String lineRouteItemKey = line.id.toString() +"/"+ timeProfile.lineRouteName.toString()+"/"+ tpi.lRIIndex.toString()+"/"+tpi.dirCode;
 				LineRouteItem lineRouteItem = this.visum.lineRouteItems.get(lineRouteItemKey);
-				Id<TransitStopFacility> stopFacilityId = Id.create(lineRouteItem.stopPointNo, TransitStopFacility.class);
+				Id<org.matsim.facilities.Facility> stopFacilityId = Id.create(lineRouteItem.stopPointNo, org.matsim.facilities.Facility.class);
 				if (stopFacilityId != null) {
 					TransitStopFacility stopFacility = stopFacilities.get(stopFacilityId);
 					if (stopFacility == null) {
@@ -174,14 +174,14 @@ public class Visum2TransitSchedule {
 		return tRoute;
 	}
 
-	private Map<Id<TransitStopFacility>, TransitStopFacility> convertStopPoints(
+	private Map<Id<org.matsim.facilities.Facility>, TransitStopFacility> convertStopPoints(
 			TransitScheduleFactory builder) {
-		final Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities = new TreeMap<>();
+		final Map<Id<org.matsim.facilities.Facility>, TransitStopFacility> stopFacilities = new TreeMap<>();
 
 		for (VisumNetwork.StopPoint stopPoint : this.visum.stopPoints.values()){
 			Coord coord = this.coordinateTransformation.transform(this.visum.stops.get(this.visum.stopAreas.get(stopPoint.stopAreaId).StopId).coord);
-			TransitStopFacility stop = builder.createTransitStopFacility(Id.create(stopPoint.id, TransitStopFacility.class), coord, false);
-			stopFacilities.put(Id.create(stopPoint.id, TransitStopFacility.class), stop);
+			TransitStopFacility stop = builder.createTransitStopFacility(Id.create(stopPoint.id, org.matsim.facilities.Facility.class), coord, false);
+			stopFacilities.put(Id.create(stopPoint.id, org.matsim.facilities.Facility.class), stop);
 			this.schedule.addStopFacility(stop);
 		}
 		return stopFacilities;

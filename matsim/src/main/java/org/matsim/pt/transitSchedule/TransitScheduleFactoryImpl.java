@@ -58,7 +58,7 @@ public class TransitScheduleFactoryImpl implements TransitScheduleFactory {
 	}
 
 	@Override
-	public TransitStopFacility createTransitStopFacility(final Id<TransitStopFacility> facilityId, final Coord coordinate, final boolean blocksLane) {
+	public TransitStopFacility createTransitStopFacility(final Id<org.matsim.facilities.Facility> facilityId, final Coord coordinate, final boolean blocksLane) {
 		return new TransitStopFacilityImpl(facilityId, coordinate, blocksLane);
 	}
 

@@ -28,9 +28,9 @@ class ScoredAlternative implements Comparable<ScoredAlternative> {
 	private final static double epsilon = 0.000001;
 	
 	private double score;
-	private Id<ActivityFacility> alternativeId;
+	private Id<org.matsim.facilities.Facility> alternativeId;
 	
-	public ScoredAlternative(double score, Id<ActivityFacility> alternativeId) {
+	public ScoredAlternative(double score, Id<org.matsim.facilities.Facility> alternativeId) {
 		this.score = score;
 		this.alternativeId = alternativeId;
 	}
@@ -41,10 +41,10 @@ class ScoredAlternative implements Comparable<ScoredAlternative> {
 	public void setScore(double score) {
 		this.score = score;
 	}
-	public Id<ActivityFacility> getAlternativeId() {
+	public Id<org.matsim.facilities.Facility> getAlternativeId() {
 		return alternativeId;
 	}
-	public void setAlternativeId(Id<ActivityFacility> alternativeId) {
+	public void setAlternativeId(Id<org.matsim.facilities.Facility> alternativeId) {
 		this.alternativeId = alternativeId;
 	}
 

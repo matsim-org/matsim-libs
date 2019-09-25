@@ -89,7 +89,7 @@ public class PendlerMatrixReader {
 			Double xcoordinate = coordinate.x;
 			Double ycoordinate = coordinate.y;
 			Coord coord = new Coord(Double.parseDouble(xcoordinate.toString()), Double.parseDouble(ycoordinate.toString()));
-			ActivityFacility facility = factory.createActivityFacility(Id.create(gemeindeschluessel, ActivityFacility.class), coord);
+			ActivityFacility facility = factory.createActivityFacility(Id.create(gemeindeschluessel, org.matsim.facilities.Facility.class), coord);
 			{
 				ActivityOption option = factory.createActivityOption("work");
 				option.setCapacity(1.);

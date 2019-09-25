@@ -126,8 +126,8 @@ class TripEventHandler implements ActivityEndEventHandler, ActivityStartEventHan
 		private Id<Link> arrivalLink;
 		private double departureTime;
 		private double arrivalTime;
-		private Id<ActivityFacility> departureFacility;
-		private Id<ActivityFacility> arrivalFacility;
+		private Id<org.matsim.facilities.Facility> departureFacility;
+		private Id<org.matsim.facilities.Facility> arrivalFacility;
 		private String mainMode = TransportMode.other;
 
 		private List<Leg> legs = new ArrayList<>();
@@ -148,11 +148,11 @@ class TripEventHandler implements ActivityEndEventHandler, ActivityStartEventHan
 			return arrivalTime;
 		}
 
-		Id<ActivityFacility> getDepartureFacility() {
+		Id<org.matsim.facilities.Facility> getDepartureFacility() {
 			return departureFacility;
 		}
 
-		Id<ActivityFacility> getArrivalFacility() {
+		Id<org.matsim.facilities.Facility> getArrivalFacility() {
 			return arrivalFacility;
 		}
 

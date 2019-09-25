@@ -31,17 +31,17 @@ import org.matsim.api.core.v01.network.Link;
 public class ActivityFacilitiesFactoryImpl implements ActivityFacilitiesFactory {
 
 	@Override
-	public ActivityFacility createActivityFacility(Id<ActivityFacility> id, Coord coord) {
+	public ActivityFacility createActivityFacility(Id<org.matsim.facilities.Facility> id, Coord coord) {
 		return new ActivityFacilityImpl(id, coord, null);
 	}
 	
 	@Override
-	public ActivityFacility createActivityFacility(Id<ActivityFacility> id, Id<Link> linkId) {
+	public ActivityFacility createActivityFacility(Id<org.matsim.facilities.Facility> id, Id<Link> linkId) {
 		return new ActivityFacilityImpl(id, null, linkId);
 	}
 	
 	@Override
-	public ActivityFacility createActivityFacility(Id<ActivityFacility> id, Coord coord, Id<Link> linkId) {
+	public ActivityFacility createActivityFacility(Id<org.matsim.facilities.Facility> id, Coord coord, Id<Link> linkId) {
 		return new ActivityFacilityImpl(id, coord, linkId);
 	}
 

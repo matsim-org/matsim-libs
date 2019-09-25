@@ -122,7 +122,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 		return false;
 	}
 
-	private double getArrivalOffsetFromRoute(TransitRoute transitRoute, Id<TransitStopFacility> egressStopId) {
+	private double getArrivalOffsetFromRoute(TransitRoute transitRoute, Id<org.matsim.facilities.Facility> egressStopId) {
 		for (TransitRouteStop routeStop : transitRoute.getStops()) {
 			if (egressStopId.equals(routeStop.getStopFacility().getId())) {
 				return routeStop.getArrivalOffset();
@@ -134,7 +134,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 		return -1.0;
 	}
 	
-	private double getDepartureOffsetFromRoute(TransitRoute transitRoute, Id<TransitStopFacility> accessStopId) {
+	private double getDepartureOffsetFromRoute(TransitRoute transitRoute, Id<org.matsim.facilities.Facility> accessStopId) {
 		for (TransitRouteStop routeStop : transitRoute.getStops()) {
 			if (accessStopId.equals(routeStop.getStopFacility().getId())) {
 				return routeStop.getDepartureOffset();
@@ -152,7 +152,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 		return (Leg) currentPlanElement;
 	}
 
-	private boolean containsId(List<TransitRouteStop> stopsToCome, Id<TransitStopFacility> egressStopId) {
+	private boolean containsId(List<TransitRouteStop> stopsToCome, Id<org.matsim.facilities.Facility> egressStopId) {
 		for (TransitRouteStop stop : stopsToCome) {
 			if (egressStopId.equals(stop.getStopFacility().getId())) {
 				return true;
@@ -167,7 +167,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 	}
 
 	@Override
-	public Id<TransitStopFacility> getDesiredAccessStopId() {
+	public Id<org.matsim.facilities.Facility> getDesiredAccessStopId() {
 		Leg leg = getCurrentLeg();
 		if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
 			log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + getId().toString());
@@ -183,7 +183,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 	}
 	
 	@Override
-	public Id<TransitStopFacility> getDesiredDestinationStopId() {
+	public Id<org.matsim.facilities.Facility> getDesiredDestinationStopId() {
 		Leg leg = getCurrentLeg();
 		if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
 			log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + getId().toString());

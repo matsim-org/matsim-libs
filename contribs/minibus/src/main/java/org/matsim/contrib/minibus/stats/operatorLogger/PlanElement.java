@@ -47,7 +47,7 @@ public final class PlanElement {
 	private final ArrayList<Tuple<Integer, Double>> budget;
 	private final double startTime;
 	private final double endTime;
-	private final ArrayList<Id<TransitStopFacility>> stopsToBeServed;
+	private final ArrayList<Id<org.matsim.facilities.Facility>> stopsToBeServed;
 	private final ArrayList<Id<Link>> linksServed;
 	
 	private PlanElement parentPlan;
@@ -136,7 +136,7 @@ public final class PlanElement {
 		return endTime;
 	}
 
-	public ArrayList<Id<TransitStopFacility>> getStopsToBeServed() {
+	public ArrayList<Id<org.matsim.facilities.Facility>> getStopsToBeServed() {
 		return stopsToBeServed;
 	}
 	

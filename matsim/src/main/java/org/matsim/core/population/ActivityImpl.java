@@ -57,7 +57,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private String type;
 	private Coord coord = null;
 	private Id<Link> linkId = null;
-	private Id<ActivityFacility> facilityId = null;
+	private Id<org.matsim.facilities.Facility> facilityId = null;
 
 	private final Attributes attributes = new Attributes();
 	
@@ -117,12 +117,12 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 	@Override
-	public final Id<ActivityFacility> getFacilityId() {
+	public final Id<org.matsim.facilities.Facility> getFacilityId() {
 		return this.facilityId;
 	}
 
 	@Override
-	public final void setFacilityId(final Id<ActivityFacility> facilityId) {
+	public final void setFacilityId(final Id<org.matsim.facilities.Facility> facilityId) {
 //		testForLocked();
 		this.facilityId = facilityId;
 	}

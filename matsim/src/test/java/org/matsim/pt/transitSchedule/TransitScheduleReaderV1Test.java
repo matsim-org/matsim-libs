@@ -77,7 +77,7 @@ public class TransitScheduleReaderV1Test {
 		reader.endTag(context.pop(), EMPTY_STRING, context);// TRANSIT_SCHEDULE
 
 		assertEquals(1, schedule.getFacilities().size());
-		TransitStopFacility stop = schedule.getFacilities().get(Id.create("stop1", TransitStopFacility.class));
+		TransitStopFacility stop = schedule.getFacilities().get(Id.create("stop1", org.matsim.facilities.Facility.class));
 		assertNotNull(stop);
 		assertEquals(79.0, stop.getCoord().getX(), MatsimTestCase.EPSILON);
 		assertEquals(80.0, stop.getCoord().getY(), MatsimTestCase.EPSILON);
@@ -111,7 +111,7 @@ public class TransitScheduleReaderV1Test {
 		reader.endTag(context.pop(), EMPTY_STRING, context);// TRANSIT_SCHEDULE
 
 		assertEquals(1, schedule.getFacilities().size());
-		TransitStopFacility stop = schedule.getFacilities().get(Id.create("stop1", TransitStopFacility.class));
+		TransitStopFacility stop = schedule.getFacilities().get(Id.create("stop1", org.matsim.facilities.Facility.class));
 		assertNotNull(stop);
 		assertEquals(79.0, stop.getCoord().getX(), MatsimTestCase.EPSILON);
 		assertEquals(80.0, stop.getCoord().getY(), MatsimTestCase.EPSILON);
@@ -144,7 +144,7 @@ public class TransitScheduleReaderV1Test {
 		context.pop();
 		reader.endTag(Constants.TRANSIT_SCHEDULE, "", context);
 
-		TransitStopFacility stop = schedule.getFacilities().get(Id.create("stop1", TransitStopFacility.class));
+		TransitStopFacility stop = schedule.getFacilities().get(Id.create("stop1", org.matsim.facilities.Facility.class));
 		assertEquals(Id.create("4", Link.class), stop.getLinkId());
 		assertNull(network.getLinks().get(stop.getLinkId()));
 	}
@@ -167,7 +167,7 @@ public class TransitScheduleReaderV1Test {
 		reader.endTag(context.pop(), EMPTY_STRING, context);// TRANSIT_SCHEDULE
 
 		assertEquals(1, schedule.getFacilities().size());
-		TransitStopFacility stop = schedule.getFacilities().get(Id.create("stop1", TransitStopFacility.class));
+		TransitStopFacility stop = schedule.getFacilities().get(Id.create("stop1", org.matsim.facilities.Facility.class));
 		assertNotNull(stop);
 		assertEquals(79.0, stop.getCoord().getX(), MatsimTestCase.EPSILON);
 		assertEquals(80.0, stop.getCoord().getY(), MatsimTestCase.EPSILON);
@@ -193,7 +193,7 @@ public class TransitScheduleReaderV1Test {
 		reader.endTag(context.pop(), EMPTY_STRING, context);// TRANSIT_SCHEDULE
 
 		assertEquals(1, schedule.getFacilities().size());
-		TransitStopFacility stop = schedule.getFacilities().get(Id.create("stop1", TransitStopFacility.class));
+		TransitStopFacility stop = schedule.getFacilities().get(Id.create("stop1", org.matsim.facilities.Facility.class));
 		assertNotNull(stop);
 		assertEquals(79.0, stop.getCoord().getX(), MatsimTestCase.EPSILON);
 		assertEquals(80.0, stop.getCoord().getY(), MatsimTestCase.EPSILON);
@@ -225,11 +225,11 @@ public class TransitScheduleReaderV1Test {
 		reader.endTag(context.pop(), EMPTY_STRING, context);// TRANSIT_SCHEDULE
 
 		assertEquals(2, schedule.getFacilities().size());
-		TransitStopFacility stop1 = schedule.getFacilities().get(Id.create("stop1", TransitStopFacility.class));
+		TransitStopFacility stop1 = schedule.getFacilities().get(Id.create("stop1", org.matsim.facilities.Facility.class));
 		assertNotNull(stop1);
 		assertEquals(79.0, stop1.getCoord().getX(), MatsimTestCase.EPSILON);
 		assertEquals(80.0, stop1.getCoord().getY(), MatsimTestCase.EPSILON);
-		TransitStopFacility stop2 = schedule.getFacilities().get(Id.create("stop2", TransitStopFacility.class));
+		TransitStopFacility stop2 = schedule.getFacilities().get(Id.create("stop2", org.matsim.facilities.Facility.class));
 		assertNotNull(stop2);
 		assertEquals(51.0, stop2.getCoord().getX(), MatsimTestCase.EPSILON);
 		assertEquals(42.0, stop2.getCoord().getY(), MatsimTestCase.EPSILON);
@@ -420,7 +420,7 @@ public class TransitScheduleReaderV1Test {
 		// define some transit stops
 		reader.startTag(Constants.TRANSIT_STOPS, AttributesBuilder.getEmpty(), context);
 		context.push(Constants.TRANSIT_STOPS);
-		Id<TransitStopFacility> stopId = Id.create("stop1", TransitStopFacility.class);
+		Id<org.matsim.facilities.Facility> stopId = Id.create("stop1", org.matsim.facilities.Facility.class);
 		Attributes atts = new AttributesBuilder().add(Constants.ID, stopId.toString()).
 				add(Constants.X, "79").add(Constants.Y, "80").get();
 		reader.startTag(Constants.STOP_FACILITY, atts, context);
@@ -474,17 +474,17 @@ public class TransitScheduleReaderV1Test {
 		// define some transit stops
 		reader.startTag(Constants.TRANSIT_STOPS, AttributesBuilder.getEmpty(), context);
 		context.push(Constants.TRANSIT_STOPS);
-		Id<TransitStopFacility> stopId1 = Id.create("stop1", TransitStopFacility.class);
+		Id<org.matsim.facilities.Facility> stopId1 = Id.create("stop1", org.matsim.facilities.Facility.class);
 		Attributes atts = new AttributesBuilder().add(Constants.ID, stopId1.toString()).
 				add(Constants.X, "79").add(Constants.Y, "80").get();
 		reader.startTag(Constants.STOP_FACILITY, atts, context);
 		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
-		Id<TransitStopFacility> stopId2 = Id.create("stop2", TransitStopFacility.class);
+		Id<org.matsim.facilities.Facility> stopId2 = Id.create("stop2", org.matsim.facilities.Facility.class);
 		atts = new AttributesBuilder().add(Constants.ID, stopId2.toString()).
 				add(Constants.X, "51").add(Constants.Y, "42").get();
 		reader.startTag(Constants.STOP_FACILITY, atts, context);
 		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
-		Id<TransitStopFacility> stopId3 = Id.create("stop3", TransitStopFacility.class);
+		Id<org.matsim.facilities.Facility> stopId3 = Id.create("stop3", org.matsim.facilities.Facility.class);
 		atts = new AttributesBuilder().add(Constants.ID, stopId3.toString()).
 				add(Constants.X, "76").add(Constants.Y, "80").get();
 		reader.startTag(Constants.STOP_FACILITY, atts, context);
@@ -545,22 +545,22 @@ public class TransitScheduleReaderV1Test {
 		// define some transit stops
 		reader.startTag(Constants.TRANSIT_STOPS, AttributesBuilder.getEmpty(), context);
 		context.push(Constants.TRANSIT_STOPS);
-		Id<TransitStopFacility> stopId1 = Id.create("stop1", TransitStopFacility.class);
+		Id<org.matsim.facilities.Facility> stopId1 = Id.create("stop1", org.matsim.facilities.Facility.class);
 		Attributes atts = new AttributesBuilder().add(Constants.ID, stopId1.toString()).
 				add(Constants.X, "79").add(Constants.Y, "80").get();
 		reader.startTag(Constants.STOP_FACILITY, atts, context);
 		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
-		Id<TransitStopFacility> stopId2 = Id.create("stop2", TransitStopFacility.class);
+		Id<org.matsim.facilities.Facility> stopId2 = Id.create("stop2", org.matsim.facilities.Facility.class);
 		atts = new AttributesBuilder().add(Constants.ID, stopId2.toString()).
 				add(Constants.X, "51").add(Constants.Y, "42").get();
 		reader.startTag(Constants.STOP_FACILITY, atts, context);
 		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
-		Id<TransitStopFacility> stopId3 = Id.create("stop3", TransitStopFacility.class);
+		Id<org.matsim.facilities.Facility> stopId3 = Id.create("stop3", org.matsim.facilities.Facility.class);
 		atts = new AttributesBuilder().add(Constants.ID, stopId3.toString()).
 				add(Constants.X, "76").add(Constants.Y, "80").get();
 		reader.startTag(Constants.STOP_FACILITY, atts, context);
 		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
-		Id<TransitStopFacility> stopId4 = Id.create("stop4", TransitStopFacility.class);
+		Id<org.matsim.facilities.Facility> stopId4 = Id.create("stop4", org.matsim.facilities.Facility.class);
 		atts = new AttributesBuilder().add(Constants.ID, stopId4.toString()).
 		add(Constants.X, "5").add(Constants.Y, "11").get();
 		reader.startTag(Constants.STOP_FACILITY, atts, context);
@@ -641,17 +641,17 @@ public class TransitScheduleReaderV1Test {
 		// define some transit stops
 		reader.startTag(Constants.TRANSIT_STOPS, AttributesBuilder.getEmpty(), context);
 		context.push(Constants.TRANSIT_STOPS);
-		Id<TransitStopFacility> stopId1 = Id.create("stop1", TransitStopFacility.class);
+		Id<org.matsim.facilities.Facility> stopId1 = Id.create("stop1", org.matsim.facilities.Facility.class);
 		Attributes atts = new AttributesBuilder().add(Constants.ID, stopId1.toString()).
 				add(Constants.X, "79").add(Constants.Y, "80").get();
 		reader.startTag(Constants.STOP_FACILITY, atts, context);
 		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
-		Id<TransitStopFacility> stopId2 = Id.create("stop2", TransitStopFacility.class);
+		Id<org.matsim.facilities.Facility> stopId2 = Id.create("stop2", org.matsim.facilities.Facility.class);
 		atts = new AttributesBuilder().add(Constants.ID, stopId2.toString()).
 				add(Constants.X, "51").add(Constants.Y, "42").get();
 		reader.startTag(Constants.STOP_FACILITY, atts, context);
 		reader.endTag(Constants.STOP_FACILITY, EMPTY_STRING, context);
-		Id<TransitStopFacility> stopId3 = Id.create("stop3", TransitStopFacility.class);
+		Id<org.matsim.facilities.Facility> stopId3 = Id.create("stop3", org.matsim.facilities.Facility.class);
 		atts = new AttributesBuilder().add(Constants.ID, stopId3.toString()).
 				add(Constants.X, "76").add(Constants.Y, "80").get();
 		reader.startTag(Constants.STOP_FACILITY, atts, context);

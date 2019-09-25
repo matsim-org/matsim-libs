@@ -119,7 +119,7 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 		pBox.notifyScoring(event);
 	}
 
-	private final Set<Id<TransitStopFacility>> currentExclusivePFacilityIDs = new HashSet<>();
+	private final Set<Id<org.matsim.facilities.Facility>> currentExclusivePFacilityIDs = new HashSet<>();
 	private final Set<Id<TransitLine>> currentExclusivePTransitLineIDs = new HashSet<>();
 
 	private void addPTransitScheduleToOriginalOne(TransitSchedule baseSchedule, TransitSchedule pSchedule) {
@@ -146,7 +146,7 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 			transitSchedule.removeTransitLine(transitSchedule.getTransitLines().get(transitLineId));
 		}
 		currentExclusivePTransitLineIDs.clear();
-		for (Id<TransitStopFacility> facilityId : currentExclusivePFacilityIDs) {
+		for (Id<org.matsim.facilities.Facility> facilityId : currentExclusivePFacilityIDs) {
 			transitSchedule.removeStopFacility(transitSchedule.getFacilities().get(facilityId));
 		}
 		currentExclusivePFacilityIDs.clear();

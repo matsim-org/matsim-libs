@@ -10,15 +10,16 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.counts.Counts;
+import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 public interface CadytsPtOccupancyAnalyzerI extends TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler,
 PersonLeavesVehicleEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
 
-	int getOccupancyVolumeForStopAndTime(Id<TransitStopFacility> stopId, int time_s);
+	int getOccupancyVolumeForStopAndTime(Id<Facility> stopId, int time_s);
 
-	void writeResultsForSelectedStopIds(String filename, Counts<Link> occupCounts, Collection<Id<TransitStopFacility>> stopIds);
+	void writeResultsForSelectedStopIds(String filename, Counts<Link> occupCounts, Collection<Id<Facility>> stopIds );
 
-	int[] getOccupancyVolumesForStop(Id<TransitStopFacility> stopId);
+	int[] getOccupancyVolumesForStop(Id<Facility> stopId);
 
 }

@@ -283,7 +283,7 @@ import java.util.Stack;
 		this.curract.setEndTime(Time.parseTime(atts.getValue(ATTR_ACT_ENDTIME)));
 		String fId = atts.getValue(ATTR_ACT_FACILITY);
 		if (fId != null) {
-			this.curract.setFacilityId(Id.create(fId, ActivityFacility.class));
+			this.curract.setFacilityId(Id.create(fId, org.matsim.facilities.Facility.class));
 		}
 		if (this.routeDescription != null) {
 			finishLastRoute();

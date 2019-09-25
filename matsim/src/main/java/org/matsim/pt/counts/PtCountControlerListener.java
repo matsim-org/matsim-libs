@@ -138,21 +138,21 @@ BeforeMobsimListener, AfterMobsimListener  {
 			cca.put( CountType.Boarding, new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
 
 				@Override
-				public double[] getVolumesForStop(Id<TransitStopFacility> locationId) {
+				public double[] getVolumesForStop(Id<org.matsim.facilities.Facility> locationId) {
 					return copyFromIntArray(occupancyAnalyzer.getBoardVolumesForStop(locationId));
 				}
 			}, this.boardCounts, network, countsScaleFactor)) ;
 			cca.put( CountType.Alighting, new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
 
 				@Override
-				public double[] getVolumesForStop(Id<TransitStopFacility> locationId) {
+				public double[] getVolumesForStop(Id<org.matsim.facilities.Facility> locationId) {
 					return copyFromIntArray(occupancyAnalyzer.getAlightVolumesForStop(locationId));
 				}
 			}, this.alightCounts, network, countsScaleFactor) ) ;
 			cca.put( CountType.Occupancy, new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
 
 				@Override
-				public double[] getVolumesForStop(Id<TransitStopFacility> locationId) {
+				public double[] getVolumesForStop(Id<org.matsim.facilities.Facility> locationId) {
 					return copyFromIntArray(occupancyAnalyzer.getOccupancyVolumesForStop(locationId));
 				}
 			}, this.occupancyCounts, network, countsScaleFactor) ) ;

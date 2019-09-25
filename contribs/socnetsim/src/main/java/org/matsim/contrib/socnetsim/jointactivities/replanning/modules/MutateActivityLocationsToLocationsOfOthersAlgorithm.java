@@ -79,7 +79,7 @@ public class MutateActivityLocationsToLocationsOfOthersAlgorithm implements Gene
 		}
 	}
 
-	private static class BasicFacility implements Facility, Identifiable {
+	private static class BasicFacility implements Facility {
 		private final Coord coord;
 		private final Id id;
 		private final Id link;

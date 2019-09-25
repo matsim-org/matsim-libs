@@ -26,7 +26,7 @@ public class DeterministicWaitTimeCalculator implements WaitTimeCalculator {
 	}
 
 	@Override
-	public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId,
+	public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<org.matsim.facilities.Facility> stopId,
 			double time) {
 		TransitRoute route = schedule.getTransitLines().get(lineId).getRoutes().get(routeId);
 
@@ -76,7 +76,7 @@ public class DeterministicWaitTimeCalculator implements WaitTimeCalculator {
 		return new WaitTime() {
 			@Override
 			public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId,
-					Id<TransitStopFacility> stopId, double time) {
+					Id<org.matsim.facilities.Facility> stopId, double time) {
 				return DeterministicWaitTimeCalculator.this.getRouteStopWaitTime(lineId, routeId, stopId, time);
 			}
 		};

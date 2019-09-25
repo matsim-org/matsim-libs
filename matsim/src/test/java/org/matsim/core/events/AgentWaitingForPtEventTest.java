@@ -39,8 +39,8 @@ public class AgentWaitingForPtEventTest {
 	@Test
 	public void testReadWriteXml() {
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
-		Id<TransitStopFacility> waitStopId = Id.create("1980", TransitStopFacility.class);
-		Id<TransitStopFacility> destinationStopId = Id.create("0511", TransitStopFacility.class);
+		Id<org.matsim.facilities.Facility> waitStopId = Id.create("1980", org.matsim.facilities.Facility.class);
+		Id<org.matsim.facilities.Facility> destinationStopId = Id.create("0511", org.matsim.facilities.Facility.class);
 		double time = 5.0 * 3600 + 11.0 + 60;
 		AgentWaitingForPtEvent event = new AgentWaitingForPtEvent(time, person.getId(), waitStopId, destinationStopId);
 		AgentWaitingForPtEvent event2 = XmlEventsTester.testWriteReadXml(helper.getOutputDirectory() + "events.xml", event);

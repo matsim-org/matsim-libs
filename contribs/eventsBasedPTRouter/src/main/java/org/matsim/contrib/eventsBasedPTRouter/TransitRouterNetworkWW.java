@@ -347,7 +347,7 @@ public final class TransitRouterNetworkWW implements Network {
 		final Counter linkCounter = new Counter(" link #");
 		final Counter nodeCounter = new Counter(" node #");
 		int numTravelLinks = 0, numWaitingLinks = 0, numInsideLinks = 0, numTransferLinks = 0;
-		Map<Id<TransitStopFacility>, TransitRouterNetworkNode> stops = new HashMap<Id<TransitStopFacility>, TransitRouterNetworkNode>();
+		Map<Id<org.matsim.facilities.Facility>, TransitRouterNetworkNode> stops = new HashMap<Id<org.matsim.facilities.Facility>, TransitRouterNetworkNode>();
 		TransitRouterNetworkNode nodeSR, nodeS;
 		// build stop nodes
 		for (TransitLine line : schedule.getTransitLines().values())

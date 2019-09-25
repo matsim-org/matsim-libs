@@ -32,11 +32,11 @@ import java.util.NoSuchElementException;
  */
 public class MinimalTransferTimesImplTest {
 
-	private Id<TransitStopFacility> stopId1 = Id.create(1, TransitStopFacility.class);
-	private Id<TransitStopFacility> stopId2 = Id.create(2, TransitStopFacility.class);
-	private Id<TransitStopFacility> stopId3 = Id.create(3, TransitStopFacility.class);
-	private Id<TransitStopFacility> stopId4 = Id.create(4, TransitStopFacility.class);
-	private Id<TransitStopFacility> stopId5 = Id.create(5, TransitStopFacility.class);
+	private Id<org.matsim.facilities.Facility> stopId1 = Id.create(1, org.matsim.facilities.Facility.class);
+	private Id<org.matsim.facilities.Facility> stopId2 = Id.create(2, org.matsim.facilities.Facility.class);
+	private Id<org.matsim.facilities.Facility> stopId3 = Id.create(3, org.matsim.facilities.Facility.class);
+	private Id<org.matsim.facilities.Facility> stopId4 = Id.create(4, org.matsim.facilities.Facility.class);
+	private Id<org.matsim.facilities.Facility> stopId5 = Id.create(5, org.matsim.facilities.Facility.class);
 
 	@Test
 	public void testSetGet() {
@@ -199,8 +199,8 @@ public class MinimalTransferTimesImplTest {
 		while (iter.hasNext()) {
 			count++;
 			iter.next();
-			Id<TransitStopFacility> fromStopId = iter.getFromStopId();
-			Id<TransitStopFacility> toStopId = iter.getToStopId();
+			Id<org.matsim.facilities.Facility> fromStopId = iter.getFromStopId();
+			Id<org.matsim.facilities.Facility> toStopId = iter.getToStopId();
 			double seconds = iter.getSeconds();
 			if (fromStopId == this.stopId1 && toStopId == this.stopId2 && seconds == 300) {
 				found1to2 = true;

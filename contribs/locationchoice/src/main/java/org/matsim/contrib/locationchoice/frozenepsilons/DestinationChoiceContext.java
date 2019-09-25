@@ -78,8 +78,8 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 
 	private double[] facilitiesKValuesArray;
 	private double[] personsKValuesArray;
-	private TObjectIntMap<Id<ActivityFacility>> facilityIndices;
-	private Map<Id<ActivityFacility>, ActivityFacilityWithIndex> faciliesWithIndexMap;
+	private TObjectIntMap<Id<org.matsim.facilities.Facility>> facilityIndices;
+	private Map<Id<org.matsim.facilities.Facility>, ActivityFacilityWithIndex> faciliesWithIndexMap;
 	private TObjectIntMap<Id<Person>> personIndices;
 
 	private Map<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType = new HashMap<String, QuadTree<ActivityFacilityWithIndex>>();
@@ -144,7 +144,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 		this.facilitiesKValuesArray = new double[this.scenario.getActivityFacilities().getFacilities().size()];
 		int facilityIndex = 0;
 		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
-			Id<ActivityFacility> facilityId = facility.getId();
+			Id<org.matsim.facilities.Facility> facilityId = facility.getId();
 			
 			this.facilityIndices.put(facilityId, facilityIndex);
 			this.facilitiesKValuesArray[facilityIndex] = (Double) facilitiesKValues.getAttribute(facilityId.toString(), "k");
@@ -309,11 +309,11 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 		return this.personIndices.get(id);
 	}
 	
-//	public Map<Id<ActivityFacility>, Integer> getFacilityIndices() {
+//	public Map<Id<org.matsim.facilities.Facility>, Integer> getFacilityIndices() {
 //		return Collections.unmodifiableMap(this.facilityIndices);
 //	}
 	
-	public int getFacilityIndex(Id<ActivityFacility> id) {
+	public int getFacilityIndex(Id<org.matsim.facilities.Facility> id) {
 		return this.facilityIndices.get(id);
 	}
 	
@@ -359,7 +359,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 		}
 
 		@Override
-		public Id<ActivityFacility> getId() {
+		public Id<org.matsim.facilities.Facility> getId() {
 			return this.activityFacility.getId();
 		}
 
