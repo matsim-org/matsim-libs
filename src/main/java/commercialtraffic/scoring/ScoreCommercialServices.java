@@ -24,7 +24,6 @@ package commercialtraffic.scoring;/*
 import com.google.inject.Inject;
 import commercialtraffic.commercialJob.CommercialJobUtilsV2;
 import commercialtraffic.commercialJob.DeliveryGenerator;
-import commercialtraffic.commercialJob.CommercialJobUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -77,7 +76,7 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
         currentExpectedDeliveriesPerLink.clear();
         Set<Plan> plans = population.getPersons().values().stream()
                 .map(p -> p.getSelectedPlan())
-                .filter(plan -> CommercialJobUtils.planExpectsDeliveries(plan)).collect(Collectors.toSet());
+                .filter(plan -> CommercialJobUtilsV2.planExpectsDeliveries(plan)).collect(Collectors.toSet());
         for (Plan plan : plans) {
             plan.getPlanElements().stream().filter(Activity.class::isInstance).forEach(pe -> {
                 Activity activity = (Activity) pe;
@@ -105,12 +104,14 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
         if (event.getActType().equals(FreightConstants.END)) {
             activeDeliveryAgents.remove(event.getPersonId());
         } else if (event.getActType().contains(FreightConstants.DELIVERY)) {
-            Id<Carrier> carrier = CommercialJobUtils.getCarrierIdFromDriver(event.getPersonId());
+            Id<Carrier> carrier = CommercialJobUtilsV2.getCarrierIdFromDriver(event.getPersonId());
             Id<Person> customerAboutToBeServed = DeliveryGenerator.getCustomerIdFromDeliveryActivityType(event.getActType());
             if (currentExpectedDeliveriesPerLink.containsKey(event.getLinkId())) {
                 ExpectedDelivery deliveryCandidate = currentExpectedDeliveriesPerLink.get(event.getLinkId()).stream()
-                        .filter(d -> d.getCarrier().equals(carrier)) //this probably is obsolete as customer can only order at one carrier anyways
+                        .filter(d -> d.getCarrier().equals(carrier))
                         .filter(d -> d.getPersonId().equals(customerAboutToBeServed)) // filter for the customer (whose id is contained in the activityType)
+                                                                                        // TODO: filter for specific serviceID in order to be really sure if the right service is scored...!
+                                                                                            //that means we need the serviceId in the activityType..
                         .min(Comparator.comparing(ExpectedDelivery::getStartTime))
                         .orElseThrow(() -> new RuntimeException("No available deliveries expected for customer " + customerAboutToBeServed + " by carrier " + carrier + " at link " + event.getLinkId()));
 
@@ -121,7 +122,9 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
                 logEntries.add(new DeliveryLogEntry(deliveryCandidate.getPersonId(), deliveryCandidate.getCarrier(), event.getTime(), score, event.getLinkId(), timeDifference, event.getPersonId()));
 
             } else {
-                Logger.getLogger(getClass()).warn("No available deliveries expected at link " + event.getLinkId());
+                throw new RuntimeException("No available deliveries expected at link " + event.getLinkId() + "." +
+                        "At the time being this should not happen as conventional simulation of freight transport (that is not linked to passenger transport demand via plan attributes)" +
+                        "is not supported at the same time as 'commercial traffic' where matsim agents order services while performing an activity.");
             }
         }
     }
