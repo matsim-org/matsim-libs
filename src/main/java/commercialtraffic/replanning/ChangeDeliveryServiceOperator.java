@@ -21,12 +21,12 @@ package commercialtraffic.replanning;/*
  * created by jbischoff, 22.05.2019
  */
 
-import commercialtraffic.commercialJob.CommercialJobManager;
 import commercialtraffic.commercialJob.CommercialJobUtils;
+import commercialtraffic.commercialJob.CommercialJobUtilsV2;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierService;
+import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
@@ -44,12 +44,12 @@ public class ChangeDeliveryServiceOperator extends AbstractMultithreadedModule {
 
     public static final String SELECTOR_NAME = "changeDeliveryServiceOperator";
 
+    private final Carriers carriers;
     private final Random random;
-    private final CommercialJobManager manager;
 
-    public ChangeDeliveryServiceOperator(GlobalConfigGroup globalConfigGroup, CommercialJobManager manager) {
+    public ChangeDeliveryServiceOperator(GlobalConfigGroup globalConfigGroup, Carriers carriers) {
         super(globalConfigGroup);
-        this.manager = manager;
+        this.carriers = carriers;
         random = MatsimRandom.getLocalInstance();
     }
 
@@ -57,26 +57,21 @@ public class ChangeDeliveryServiceOperator extends AbstractMultithreadedModule {
     public PlanAlgorithm getPlanAlgoInstance() {
         return plan -> {
             List<Activity> activitiesWithServices = new ArrayList<>();
-            plan.getPlanElements().stream()
-                    .filter(Activity.class::isInstance)
-                    .filter(a -> CommercialJobUtils.activityExpectsServices((Activity) a))
-                    .forEach(planElement -> activitiesWithServices.add((Activity) planElement));
+            plan.getPlanElements().stream().filter(Activity.class::isInstance).filter(a -> a.getAttributes().getAsMap().containsKey(CommercialJobUtilsV2.JOB_TYPE)).forEach(planElement -> activitiesWithServices.add((Activity) planElement));
             if (activitiesWithServices.isEmpty()) {
                 return;
             }
             int idx = random.nextInt(activitiesWithServices.size());
 
             Activity selectedActivity = activitiesWithServices.get(idx);
-            Id<CarrierService> service = CommercialJobUtils.getRandomServiceFromActivity(selectedActivity, random);
-
-            String deliveryType = manager.getServiceType(service);
-            Set<Id<Carrier>> operators4Service = manager.getOperatorsForDeliveryType(deliveryType);
-            Id<Carrier> currentCarrier = manager.getCurrentCarrierOfService(service);
+            String deliveryType = CommercialJobUtilsV2.getDeliveryType(selectedActivity);
+            Set<Id<Carrier>> operators4Service = CommercialJobUtilsV2.getOperatorsForDeliveryType(carriers, deliveryType);
+            Id<Carrier> currentCarrier = CommercialJobUtilsV2.getCarrierId(selectedActivity);
 
             if (operators4Service.remove(currentCarrier)) {
                 if (!operators4Service.isEmpty()) {
                     Id<Carrier> newCarrier = operators4Service.stream().skip(random.nextInt(operators4Service.size())).findFirst().orElse(currentCarrier);
-                    manager.setOperatorForService(service,newCarrier);
+                    CommercialJobUtilsV2.setServiceOperatorAndDeliveryType(selectedActivity, newCarrier);
                 }
             } else
                 throw new RuntimeException(currentCarrier.toString() + " is not part of the service carriers for deliverytype " + deliveryType);

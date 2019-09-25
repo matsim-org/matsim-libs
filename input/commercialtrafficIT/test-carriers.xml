@@ -7,13 +7,6 @@
                          latestEnd="16:00:00"/>
             </vehicles>
 
-			<services>
-				<service id="0" to="259" capacityDemand="1" earliestStart="09:00:00" latestEnd="24:00:00"
-                     serviceDuration="00:00:31"/>
-				<service id="1" to="258" capacityDemand="1" earliestStart="08:30:00" latestEnd="24:00:00"
-                     serviceDuration="00:00:31"/>
-			
-			</services>
         </capabilities>
     </carrier>
 
@@ -23,14 +16,7 @@
                 <vehicle id="carrier_1_lightVehicle_one" depotLinkId="111" typeId="small" earliestStart="06:00:00"
                          latestEnd="16:00:00"/>
             </vehicles>
-			<services>
-				<service id="salamipizza_2" to="258" capacityDemand="1" earliestStart="12:00:00" latestEnd="24:00:00"
-                     serviceDuration="00:00:31"/>
-			
-				<service id="3" to="259" capacityDemand="1" earliestStart="08:30:00" latestEnd="24:00:00"
-                     serviceDuration="00:00:31"/>
 
-			</services>
         </capabilities>
 
 

@@ -3,6 +3,7 @@ package commercialtraffic.replanning;
 import commercialtraffic.TestScenarioGeneration;
 import commercialtraffic.commercialJob.CommercialJobManager;
 import commercialtraffic.commercialJob.CommercialJobUtils;
+import commercialtraffic.commercialJob.CommercialJobUtilsV2;
 import commercialtraffic.commercialJob.FreightAgentInserter;
 import org.junit.Assert;
 import org.junit.Test;
@@ -32,12 +33,12 @@ public class ChangeDeliveryServiceOperatorTest {
         CommercialJobManager manager = new CommercialJobManager(carriers, (carrierId -> 20), scenario,
                 new FreightAgentInserter(scenario),
                 travelTimes);
-        ChangeDeliveryServiceOperator changeDeliveryServiceOperator = new ChangeDeliveryServiceOperator(scenario.getConfig().global(), manager);
+        ChangeDeliveryServiceOperator changeDeliveryServiceOperator = new ChangeDeliveryServiceOperator(scenario.getConfig().global(), carriers);
 
         Plan testPlan = scenario.getPopulation().getPersons().get(Id.createPersonId(1)).getSelectedPlan();
         Activity work = (Activity) testPlan.getPlanElements().get(2);
 
-        String serviceId = CommercialJobUtils.getServiceIdsFromActivity(work).iterator().next().toString();
+        String serviceId = CommercialJobUtilsV2.getServiceOperator(work);
         Assert.assertEquals("the person should expect a salamipizza","salamipizza", serviceId);
 
         String carrier = manager.getCurrentCarrierOfService(Id.create(serviceId, CarrierService.class)).toString();

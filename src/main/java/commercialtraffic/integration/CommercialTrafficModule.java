@@ -24,8 +24,7 @@ package commercialtraffic.integration;/*
 import com.google.inject.Singleton;
 import commercialtraffic.analysis.CommercialTrafficAnalysisListener;
 import commercialtraffic.analysis.TourLengthAnalyzer;
-import commercialtraffic.commercialJob.CommercialJobManager;
-import commercialtraffic.commercialJob.FreightAgentInserter;
+import commercialtraffic.commercialJob.DeliveryGenerator;
 import commercialtraffic.replanning.ChangeDeliveryServiceOperator;
 import commercialtraffic.scoring.DefaultCommercialServiceScore;
 import commercialtraffic.scoring.DeliveryScoreCalculator;
@@ -80,21 +79,19 @@ public class CommercialTrafficModule extends AbstractModule {
         CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
         new CarrierVehicleTypeReader(vehicleTypes).readFile(ctcg.getCarriersVehicleTypesFileUrl(getConfig().getContext()).getFile());
         new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
-
-        //check consistency
-        CommercialTrafficChecker consistencyChecker = new CommercialTrafficChecker();
-        bind(CommercialTrafficChecker.class).toInstance(consistencyChecker);
-        if (consistencyChecker.checkCarrierConsistency(carriers, getConfig())) {
+        if (CommercialTrafficCheckerV2.checkCarrierConsistency(carriers)) {
             throw new RuntimeException("Carrier definition is invalid. Please check the log for details.");
         }
 
 //        bind commercial Traffic stuff
         bind(DeliveryScoreCalculator.class).toInstance(new DefaultCommercialServiceScore(ctcg.getMaxDeliveryScore(), ctcg.getMinDeliveryScore(), ctcg.getZeroUtilityDelay()));
         bind(Carriers.class).toInstance(carriers);
-        bind(CommercialJobManager.class).in(Singleton.class);
+
+//        bind(CommercialJobManager.class).in(Singleton.class);
+//        bind(FreightAgentInserter.class).in(Singleton.class);
+
         bind(ScoreCommercialServices.class).in(Singleton.class);
         bind(TourLengthAnalyzer.class).in(Singleton.class);
-        bind(FreightAgentInserter.class).in(Singleton.class);
         bind(CarrierJSpritIterations.class).toInstance(iterationsForCarrier);
         if(this.carrierMode == null){
             bind(CarrierMode.class).toInstance(carrierId -> TransportMode.car);
@@ -102,27 +99,26 @@ public class CommercialTrafficModule extends AbstractModule {
         } else {
             bind(CarrierMode.class).toInstance(carrierMode);
         }
-        addControlerListenerBinding().to(CommercialJobManager.class);
+        addControlerListenerBinding().to(DeliveryGenerator.class);
         addControlerListenerBinding().to(CommercialTrafficAnalysisListener.class);
-        addMobsimListenerBinding().to(ScoreCommercialServices.class);
-        addMobsimListenerBinding().to(CommercialTrafficChecker.class);
+//        addMobsimListenerBinding().to(ScoreCommercialServices.class); TODO: make ScoreCommercialServices implement BeforeMobsimListener again instead of having CommercialTrafficAnalysisListener
+
+//        addMobsimListenerBinding().to(CommercialTrafficChecker.class);
 
         //bind strategy that enables to choose between operators
         addPlanStrategyBinding(ChangeDeliveryServiceOperator.SELECTOR_NAME).toProvider(new Provider<PlanStrategy>() {
             @Inject
             Config config;
             @Inject
-            CommercialJobManager manager;
+            Carriers carriers;
             @Override
             public PlanStrategy get() {
                 final PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
-                builder.addStrategyModule(new ChangeDeliveryServiceOperator(config.global(),manager));
+                builder.addStrategyModule(new ChangeDeliveryServiceOperator(config.global(), carriers));
                 return builder.build();
             }
         });
-
     }
-
 
     private void installDRT(){
         install(new MultiModeDrtModule());

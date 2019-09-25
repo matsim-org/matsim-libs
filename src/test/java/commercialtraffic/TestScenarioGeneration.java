@@ -101,7 +101,8 @@ public class TestScenarioGeneration {
         work.setLinkId(Id.createLinkId(259));
         work.setEndTime(16 * 3600);
 
-        work.getAttributes().putAttribute(CommercialJobUtils.JOB_ID, "salamipizza");
+        //TODO
+//        work.getAttributes().putAttribute(CommercialJobUtils.JOB_ID, "salamipizza");
 
         plan.addActivity(work);
 
