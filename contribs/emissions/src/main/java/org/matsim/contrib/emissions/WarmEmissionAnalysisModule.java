@@ -160,8 +160,16 @@ public final class WarmEmissionAnalysisModule {
 		  Id<Vehicle> vehicleId, Link link,
 		  double travelTime ) {
 
+		String hbefaVehicleTypeDescription = EmissionUtils.getHbefaVehicleDescription( vehicleType, this.ecg );
 
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertVehicleDescription2VehicleInformationTuple(vehicleType);
+		Gbl.assertNotNull( hbefaVehicleTypeDescription );
+
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = EmissionUtils.convertVehicleDescription2VehicleInformationTuple(
+				vehicleType );
+
+		Gbl.assertNotNull( vehicleInformationTuple );
+
+//		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertVehicleDescription2VehicleInformationTuple(vehicleType);
 		if (vehicleInformationTuple.getFirst() == null){
 			throw new RuntimeException("Vehicle category for vehicle " + vehicleType + " is not valid. " +
 					"Please make sure that requirements for emission vehicles in " + 
