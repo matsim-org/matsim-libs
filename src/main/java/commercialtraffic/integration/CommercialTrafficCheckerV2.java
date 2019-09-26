@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 public class CommercialTrafficCheckerV2 {
-    private static final Logger log = Logger.getLogger(CommercialTrafficChecker.class);
+    private static final Logger log = Logger.getLogger(CommercialTrafficCheckerV2.class);
     private static final List<String> attributesToCheck = Arrays.asList(CommercialJobUtilsV2.JOB_OPERATOR, CommercialJobUtilsV2.JOB_DURATION, CommercialJobUtilsV2.JOB_TIME_END, CommercialJobUtilsV2.JOB_EARLIEST_START, CommercialJobUtilsV2.JOB_SIZE);
 
     /**
