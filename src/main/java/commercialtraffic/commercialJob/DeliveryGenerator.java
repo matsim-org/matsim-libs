@@ -66,6 +66,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
     private final double firsttourTraveltimeBuffer;
     private final CarrierJSpritIterations iterationsPerCarrier;
     private final CarrierMode carrierMode;
+    private final int timeSliceWidth;
 
     private Scenario scenario;
     private Population population;
@@ -87,6 +88,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
         CommercialTrafficConfigGroup ctcg = CommercialTrafficConfigGroup.get(scenario.getConfig());
         this.hullcarriers = carriers;
         this.firsttourTraveltimeBuffer = ctcg.getFirstLegTraveltimeBufferFactor();
+        this.timeSliceWidth = ctcg.getJspritTimeSliceWidth();
         this.carrierMode = carrierMode;
         this.iterationsPerCarrier = iterationsPerCarrier;
         this.scenario = scenario;
@@ -106,6 +108,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
         this.hullcarriers = carriers;
         this.scenario = scenario;
         this.firsttourTraveltimeBuffer = 2;
+        this.timeSliceWidth = 1800;
         carrierMode = (m -> TransportMode.car);
         carTT = new FreeSpeedTravelTime();
         this.iterationsPerCarrier = iterationsPerCarrier;
@@ -178,31 +181,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
     }
 
     private void buildTours() {
-        Set<VehicleType> vehicleTypes = new HashSet<>();
-        hullcarriers.getCarriers().values().forEach(carrier -> vehicleTypes.addAll(carrier.getCarrierCapabilities().getVehicleTypes()));
-        NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), vehicleTypes);
-        netBuilder.setTimeSliceWidth(900); // !!!! otherwise it will not do anything.
-        netBuilder.setTravelTime(carTT);
-        final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
-        hullcarriers.getCarriers().values().parallelStream().forEach(carrier -> {
-                    //Build VRP
-                    VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork());
-                    //            vrpBuilder.setRoutingCost(netBasedCosts);
-                    // this is too expansive for the size of the problem
-                    VehicleRoutingProblem problem = vrpBuilder.build();
-                    // get the algorithm out-of-the-box, search solution and get the best one.
-                    VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
-                    algorithm.setMaxIterations(iterationsPerCarrier.getNrOfJSpritIterationsForCarrier(carrier.getId()));
-                    // variationCoefficient = stdDeviation/mean. so i set the threshold rather soft
-                    algorithm.addTerminationCriterion(new VariationCoefficientTermination(5, 0.1));
-                    Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
-                    VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
-                    //get the CarrierPlan
-                    CarrierPlan carrierPlan = MatsimJspritFactory.createPlan(carrier, bestSolution);
-                    NetworkRouter.routePlan(carrierPlan, netBasedCosts);
-                    carrier.setSelectedPlan(carrierPlan);
-                }
-        );
+        TourPlanning.runTourPlanningForCarriers(hullcarriers,scenario,iterationsPerCarrier,timeSliceWidth,carTT);
     }
 
     private void createFreightAgents() {
@@ -287,10 +266,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
                 freightVehicles.add(vid);
                 freightDrivers.add(driverPerson.getId());
             }
-
         }
-
-
     }
 
     private Person createDriverPerson(Id<Person> driverId) {
