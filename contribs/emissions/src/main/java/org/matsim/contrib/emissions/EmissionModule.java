@@ -117,15 +117,6 @@ public final class EmissionModule {
 			}
 		}
 
-//		if(scenario.getConfig().qsim().getVehiclesSource().equals(QSimConfigGroup.VehiclesSource.defaultVehicle)) {
-//			logger.warn("Vehicle source in the QSim is "+ QSimConfigGroup.VehiclesSource.defaultVehicle.name()+
-//							", however a vehicle file or vehicle information is provided. \n" +
-//					"Therefore, switching to "+ QSimConfigGroup.VehiclesSource.fromVehiclesData.name()+".");
-//			scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.fromVehiclesData);
-//			// yyyyyy code should not silently switch config options. kai, jul'18
-//			logger.error("code should not silently switch config options; needs to be modified.  kai, jul'18") ;
-//		}
-
 		avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
 		avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
 		hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(avgHbefaWarmTable);
@@ -259,7 +250,6 @@ public final class EmissionModule {
 
                 double weighting = Double.parseDouble(array[indexFromKey.get("EFA_weighted")]); //TODO better name
 				HbefaColdEmissionFactor value = new HbefaColdEmissionFactor(weighting);
-//				value.setColdEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA_weighted")]));
 				
 				avgColdTable.put(key, value);
 			}
@@ -340,7 +330,6 @@ public final class EmissionModule {
 
 				double weighting = Double.parseDouble(array[indexFromKey.get("EFA")]);
 				HbefaColdEmissionFactor value = new HbefaColdEmissionFactor(weighting);
-//				value.setColdEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA")]));
 				
 				hbefaColdTableDetailed.put(key, value);
 			}
@@ -429,13 +418,7 @@ public final class EmissionModule {
 				warmEmissionHandler.getLinkLeaveCnt() + " link leave events (no corresponding link enter event).");
 		
 		WarmEmissionAnalysisModule wam = warmEmissionHandler.getWarmEmissionAnalysisModule();
-//		ColdEmissionAnalysisModule cam = coldEmissionHandler.getColdEmissionAnalysisModule();
-		
-//		logger.info("Average speed was calculated to 0.0 or a negative value for " + wam.getAverageSpeedNegativeCnt() + " of " + 
-//				wam.getWarmEmissionEventCounter() + " warm emission events.");
-//		logger.info("Average speed was calculated greater than free flow speed for " + wam.getAverageSpeedTooHighCnt() + " of " +
-//				wam.getWarmEmissionEventCounter() + " warm emission events.");
-		
+
 		logger.info("Emission calculation based on `Free flow only' occured for " + wam.getFreeFlowOccurences() + " of " +
 				wam.getWarmEmissionEventCounter() + " warm emission events.");
 		logger.info("Emission calculation based on `Stop&Go only' occured for " + wam.getStopGoOccurences() + " of " +
@@ -447,13 +430,7 @@ public final class EmissionModule {
 				wam.getKmCounter() + " km, where emissions were calculated.");
 		logger.info("Stop&Go occured on " + wam.getStopGoKmCounter() + " km of total " +
 				wam.getKmCounter() + " km, where emissions were calculated.");
-		
-//		logger.info("Detailed vehicle attributes for warm emission calculation were not specified correctly for "
-//				+ wam.getVehAttributesNotSpecified().size() + " of "
-//				+ wam.getVehicleIdSet().size() + " vehicles.");
-//		logger.info("Detailed vehicle attributes for cold emission calculation were not specified correctly for "
-//				+ cam.getVehAttributesNotSpecified().size() + " of "
-//				+ cam.getVehicleIdSet().size() + " vehicles.");
+
 		
 		logger.info("Emission calculation terminated. Emission events can be found in regular events file.");
 	}

@@ -142,27 +142,6 @@ final class ColdEmissionAnalysisModule {
 			}
 							
 		} else {
-			
-//			if(this.ecg.isUsingVehicleTypeIdAsVehicleDescription() ) {
-//				if(vehicle.getType().getDescription()==null) { // emission specification is in vehicle type id
-//					vehicle.getType().setDescription( EmissionUtils.EmissionSpecificationMarker.BEGIN_EMISSIONS
-//							+vehicle.getType().getId().toString()+ EmissionUtils.EmissionSpecificationMarker.END_EMISSIONS );
-//				} else if( vehicle.getType().getDescription().contains( EmissionUtils.EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() ) ) {
-//					// emission specification is in vehicle type id and in vehicle description too.
-//				} else {
-//					String vehicleDescription = vehicle.getType().getDescription() + EmissionUtils.EmissionSpecificationMarker.BEGIN_EMISSIONS
-//							+ vehicle.getType().getId().toString()+ EmissionUtils.EmissionSpecificationMarker.END_EMISSIONS;
-//					vehicle.getType().setDescription(vehicleDescription);
-//				}
-//			}
-//
-//			String vehicleDescription = vehicle.getType().getDescription();
-//
-//		if(vehicle.getType().getDescription() == null){
-//			throw new RuntimeException("Vehicle type description for vehicle " + vehicle + "is missing. " +
-//					"Please make sure that requirements for emission vehicles in "
-//					+ EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
-//		}
 
 			String hbefaVehicleTypeDescription = EmissionUtils.getHbefaVehicleDescription( vehicle.getType(), this.ecg );
 
@@ -285,13 +264,6 @@ final class ColdEmissionAnalysisModule {
 			generatedEmissions = this.avgHbefaColdTable.get(key);
 		}
         return generatedEmissions.getColdEmissionFactor();
-	    
-	    // yy when thinking about the above, it is actually not so clear what that "fallback" actually means ... since
-	    // the exact key now just needs to be in the avg table.  So it is not really a fallback, but rather just
-	    // another lookup in another table. ---???  kai, jul'18
-	    // (It may implicitly work from convertVehicleDescription2VehicleInformationTuple, which essentially generates an empty vehicle
-	    // description if nothing specific is available.  And thus the "average" table should contain "empty" entries, different
-	    // from what the tests imply. kai, jul'18)
     }
 	
 	static HbefaVehicleAttributes createHbefaVehicleAttributes( final String hbefaTechnology, final String hbefaSizeClass, final String hbefaEmConcept ) {

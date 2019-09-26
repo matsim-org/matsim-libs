@@ -43,7 +43,9 @@ import java.util.stream.Stream;
  */
 public final class EmissionUtils {
 	private static final Logger logger = Logger.getLogger(EmissionUtils.class);
+
 	private static final String HBEFA_VEHICLE_DESCRIPTION = "hbefaVehicleTypeDescription";
+	private enum EmissionSpecificationMarker {BEGIN_EMISSIONS , END_EMISSIONS }
 
 	static Map<String, Integer> createIndexFromKey(String strLine) {
 		String[] keys = strLine.split(";");
@@ -194,38 +196,15 @@ public final class EmissionUtils {
 	static Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleDescription2VehicleInformationTuple( VehicleType vehicleType ) {
 		// yyyy what is the advantage of having this as a tuple over just using a class with four entries?  kai, oct'18
 
-//		EmissionUtils.getHbefaVehicleDescription( vehicleType, emissionsConfigGroup ) ;
-
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple;
-//		HbefaVehicleCategory hbefaVehicleCategory = null;
-		
-		// yyyy replace this by using Attributes.  kai, oct'18
-//		int startIndex = vehicleType.indexOf(EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() ) + EmissionSpecificationMarker.BEGIN_EMISSIONS.toString().length();
-//		int endIndex = vehicleType.lastIndexOf(EmissionSpecificationMarker.END_EMISSIONS.toString() );
 
-//		String[] vehicleInformationArray = vehicleType.substring(startIndex, endIndex ).split(";" );
-
-//		String[] vehicleInformationArray = hbefaVehicleTypeDescription.split(";" ) ;
-
-
-
-//		for (HbefaVehicleCategory vehCat : HbefaVehicleCategory.values()) {
-//			if (vehCat.toString().equals(vehicleInformationArray[0])) {
-//				hbefaVehicleCategory = vehCat;
-//			}
-//		}
-		Gbl.assertNotNull( vehicleType );
+		Gbl.assertNotNull(vehicleType);
 		Gbl.assertNotNull(vehicleType.getEngineInformation());
 		logger.info(vehicleType.getEngineInformation().getAttributes().toString());
 		Gbl.assertNotNull(VehicleUtils.getHbefaVehicleCategory( vehicleType.getEngineInformation() ));
 		HbefaVehicleCategory hbefaVehicleCategory = HbefaVehicleCategory.valueOf( VehicleUtils.getHbefaVehicleCategory( vehicleType.getEngineInformation() ) ) ;
 
 		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
-//		if (vehicleInformationArray.length == 4) {
-//			hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationArray[1]);
-//			hbefaVehicleAttributes.setHbefaSizeClass(vehicleInformationArray[2]);
-//			hbefaVehicleAttributes.setHbefaEmConcept(vehicleInformationArray[3]);
-//		} // else interpretation as "average vehicle"
 
 		final String hbefaTechnology = VehicleUtils.getHbefaTechnology( vehicleType.getEngineInformation() );
 		if ( hbefaTechnology!=null ){
@@ -253,7 +232,6 @@ public final class EmissionUtils {
 			table.putIfAbsent(roadVehicleCategoryKey, new HashMap<>());
 			table.get(roadVehicleCategoryKey).put(hbefaTrafficSituation, speed);
 		});
-
 
 		return table;
 	}
@@ -349,8 +327,4 @@ public final class EmissionUtils {
 		strb.append( VehicleUtils.getHbefaEmissionsConcept( engineInfo ) );
 		return strb.toString() ;
 	}
-
-
-
-	private enum EmissionSpecificationMarker {BEGIN_EMISSIONS , END_EMISSIONS }
 }

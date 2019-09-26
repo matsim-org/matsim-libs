@@ -105,9 +105,8 @@ public final class WarmEmissionAnalysisModule {
 		}
 	}
 
-	public WarmEmissionAnalysisModule(
-			WarmEmissionAnalysisModuleParameter parameterObject,
-			EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
+	public WarmEmissionAnalysisModule( WarmEmissionAnalysisModuleParameter parameterObject,
+									   EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
 
 		if(parameterObject == null){
 			logger.error("No warm emission analysis module parameter set. Aborting...");
@@ -148,28 +147,19 @@ public final class WarmEmissionAnalysisModule {
 		this.eventsManager.processEvent(warmEmissionEvent);
 	}
 
-	public Map<String, Double> checkVehicleInfoAndCalculateWarmEmissions(
-		  Vehicle vehicle,
-		  Link link,
-		  double travelTime ){
+	public Map<String, Double> checkVehicleInfoAndCalculateWarmEmissions(Vehicle vehicle, Link link, double travelTime ){
 		return checkVehicleInfoAndCalculateWarmEmissions( vehicle.getType(), vehicle.getId(), link, travelTime );
 	}
 
-	public Map<String, Double> checkVehicleInfoAndCalculateWarmEmissions(
-		  VehicleType vehicleType,
-		  Id<Vehicle> vehicleId, Link link,
-		  double travelTime ) {
+	public Map<String, Double> checkVehicleInfoAndCalculateWarmEmissions(VehicleType vehicleType, Id<Vehicle> vehicleId,
+																		 Link link,  double travelTime ) {
 
 		String hbefaVehicleTypeDescription = EmissionUtils.getHbefaVehicleDescription( vehicleType, this.ecg );
-
 		Gbl.assertNotNull( hbefaVehicleTypeDescription );
 
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = EmissionUtils.convertVehicleDescription2VehicleInformationTuple(
-				vehicleType );
-
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = EmissionUtils.convertVehicleDescription2VehicleInformationTuple(vehicleType );
 		Gbl.assertNotNull( vehicleInformationTuple );
 
-//		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertVehicleDescription2VehicleInformationTuple(vehicleType);
 		if (vehicleInformationTuple.getFirst() == null){
 			throw new RuntimeException("Vehicle category for vehicle " + vehicleType + " is not valid. " +
 					"Please make sure that requirements for emission vehicles in " + 
@@ -189,9 +179,7 @@ public final class WarmEmissionAnalysisModule {
 		return warmEmissions;
 	}
 
-	private Map<String, Double> rescaleWarmEmissions(Map<String, Double> warmEmissions) {
-		Map<String, Double> rescaledWarmEmissions = new HashMap<>();
-		
+	private Map<String, Double> rescaleWarmEmissions(Map<String, Double> warmEmissions) {Map<String, Double> rescaledWarmEmissions = new HashMap<>();
 		for(String wp : warmEmissions.keySet()){
 			Double orgValue = warmEmissions.get(wp);
 			Double rescaledValue = emissionEfficiencyFactor * orgValue;
@@ -200,13 +188,8 @@ public final class WarmEmissionAnalysisModule {
 		return rescaledWarmEmissions;
 	}
 
-	private Map<String, Double> calculateWarmEmissions(
-			Id<Vehicle> vehicleId,
-			double travelTime,
-			String roadType,
-			double freeVelocity,
-			double linkLength,
-			Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple) {
+	private Map<String, Double> calculateWarmEmissions(Id<Vehicle> vehicleId, double travelTime, String roadType, double freeVelocity,
+			double linkLength, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple) {
 
 		Map<String, Double> warmEmissionsOfEvent = new HashMap<>();
 
@@ -287,7 +270,6 @@ public final class WarmEmissionAnalysisModule {
 			warmEmissionsOfEvent.put(warmPollutant, generatedEmissions);
 		}
 		incrementCounters(trafficSituation, linkLength_km);
-//		vehicleIdSet.add(personId);
 		return warmEmissionsOfEvent;
 	}
 
@@ -346,35 +328,6 @@ public final class WarmEmissionAnalysisModule {
 
 		}
 	}
-
-//	private Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleDescription2VehicleInformationTuple(VehicleType vehicleType ) {
-//		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple;
-//		HbefaVehicleCategory hbefaVehicleCategory = null;
-//		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
-//
-////		int startIndex = vehicleDescription.indexOf(
-////			  EmissionUtils.EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() ) + EmissionUtils.EmissionSpecificationMarker.BEGIN_EMISSIONS.toString().length();
-////		int endIndex = vehicleDescription.lastIndexOf( EmissionUtils.EmissionSpecificationMarker.END_EMISSIONS.toString() );
-////
-////		String[] vehicleInformationArray = vehicleDescription.substring(startIndex, endIndex).split(";");
-//
-//		String[] vehicleInformationArray = EmissionUtils.getHbefaVehicleDescription( vehicleType, this.ecg ).split( ";" ) ;
-//
-//		for(HbefaVehicleCategory vehCat : HbefaVehicleCategory.values()){
-//			if(vehCat.toString().equals(vehicleInformationArray[0])){
-//				hbefaVehicleCategory = vehCat;
-//			}
-//		}
-//
-//		if(vehicleInformationArray.length == 4){
-//			hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationArray[1]);
-//			hbefaVehicleAttributes.setHbefaSizeClass(vehicleInformationArray[2]);
-//			hbefaVehicleAttributes.setHbefaEmConcept(vehicleInformationArray[3]);
-//		} // else interpretation as "average vehicle"
-//
-//		vehicleInformationTuple = new Tuple<>(hbefaVehicleCategory, hbefaVehicleAttributes);
-//		return vehicleInformationTuple;
-//	}
 
 	public int getFreeFlowOccurences() {
 		return freeFlowCounter;

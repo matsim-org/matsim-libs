@@ -205,11 +205,7 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 				Vehicle vehicle = this.emissionVehicles.getVehicles().get(vehicleId);
 				VehicleType vehicleType = vehicle.getType() ;
 
-				Map<String, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
-					  vehicleType,
-					  vehicleId,
-					  link,
-					  travelTime);
+				Map<String, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(vehicleType, vehicleId, link, travelTime);
 
 				warmEmissionAnalysisModule.throwWarmEmissionEvent(leaveTime, linkId, vehicleId, warmEmissions);
 			}
@@ -219,6 +215,7 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	public int getLinkLeaveCnt() {
 		return linkLeaveCnt;
 	}
+
 	public int getLinkLeaveWarnCnt() {
 		return linkLeaveFirstActWarnCnt;
 	}
