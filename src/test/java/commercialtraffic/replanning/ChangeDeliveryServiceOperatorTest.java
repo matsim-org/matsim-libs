@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.core.router.util.TravelTime;
@@ -38,21 +39,19 @@ public class ChangeDeliveryServiceOperatorTest {
         Plan testPlan = scenario.getPopulation().getPersons().get(Id.createPersonId(1)).getSelectedPlan();
         Activity work = (Activity) testPlan.getPlanElements().get(2);
 
-        String serviceId = CommercialJobUtilsV2.getServiceOperator(work);
-        Assert.assertEquals("the person should expect a salamipizza","salamipizza", serviceId);
-
-        String carrier = manager.getCurrentCarrierOfService(Id.create(serviceId, CarrierService.class)).toString();
-        Assert.assertEquals("pizza_1", carrier);
+        Id<Carrier> carrierId = CommercialJobUtilsV2.getCarrierId(work);
+        Assert.assertEquals("the person should expect a salami","pizza", CommercialJobUtilsV2.getCarrierMarket(carrierId));
+        Assert.assertEquals("the person should expect a salami from operator 1","1", CommercialJobUtilsV2.getCarrierOperator(carrierId));
 
         changeDeliveryServiceOperator.getPlanAlgoInstance().run(testPlan);
 
-        carrier = manager.getCurrentCarrierOfService(Id.create(serviceId, CarrierService.class)).toString();
-        Assert.assertEquals("pizza_2", carrier);
+        String operator = CommercialJobUtilsV2.getServiceOperator(work);
+        Assert.assertEquals("2", operator);
 
         changeDeliveryServiceOperator.getPlanAlgoInstance().run(testPlan);
 
-        carrier = manager.getCurrentCarrierOfService(Id.create(serviceId, CarrierService.class)).toString();
-        Assert.assertEquals("pizza_1", carrier);
+        operator = CommercialJobUtilsV2.getServiceOperator(work);
+        Assert.assertEquals("1", operator);
 
     }
 
