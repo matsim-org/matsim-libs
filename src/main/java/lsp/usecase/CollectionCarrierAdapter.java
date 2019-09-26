@@ -92,7 +92,7 @@ public static class Builder {
 	@Override
 	public Id<Link> getStartLinkId() {
 		Id<Link> depotLinkId = null;
-		for(CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles()){
+		for(CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()){
 			if(depotLinkId == null || depotLinkId == vehicle.getLocation()){
 				depotLinkId = vehicle.getLocation();
 			}
@@ -106,7 +106,7 @@ public static class Builder {
 	@Override
 	public Id<Link> getEndLinkId() {
 		Id<Link> depotLinkId = null;
-		for(CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles()){
+		for(CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles().values()){
 			if(depotLinkId == null || depotLinkId == vehicle.getLocation()){
 				depotLinkId = vehicle.getLocation();
 			}

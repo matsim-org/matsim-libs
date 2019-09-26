@@ -258,17 +258,19 @@ public class DistributionCarrierScheduler extends ResourceScheduler {
 	
 	private Carrier createAuxiliaryCarrier(ArrayList<ShipmentTuple> shipmentsInCurrentTour, double startTime){
 		Carrier auxiliaryCarrier = CarrierImpl.newInstance(carrier.getId());
-		CarrierVehicle carrierVehicle = carrier.getCarrierCapabilities().getCarrierVehicles().iterator().next();
+		CarrierVehicle carrierVehicle = carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next();
 		CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(carrierVehicle.getVehicleId(), carrierVehicle.getLocation());
 	    vBuilder.setEarliestStart(startTime);
 	    vBuilder.setLatestEnd(24*60*60);
 	    vBuilder.setType(carrier.getCarrierCapabilities().getVehicleTypes().iterator().next());
+	    CarrierVehicle cv = vBuilder.build();
 	    auxiliaryCarrier.getCarrierCapabilities().getVehicleTypes().add(carrier.getCarrierCapabilities().getVehicleTypes().iterator().next());
-	    auxiliaryCarrier.getCarrierCapabilities().getCarrierVehicles().add(vBuilder.build());
+	    auxiliaryCarrier.getCarrierCapabilities().getCarrierVehicles().put(cv.getId(), cv);
 	    auxiliaryCarrier.getCarrierCapabilities().setFleetSize(FleetSize.FINITE);
 	    
 	    for(ShipmentTuple tuple :  shipmentsInCurrentTour){
-	    	auxiliaryCarrier.getServices().add(convertToCarrierService(tuple));
+			CarrierService carrierService = convertToCarrierService(tuple);
+			auxiliaryCarrier.getServices().put(carrierService.getId(), carrierService);
 	    }
 	    return auxiliaryCarrier;
 	}	
