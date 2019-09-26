@@ -35,7 +35,7 @@ public class DeliveryGeneratorTest {
         travelTimes.put(TransportMode.car, new FreeSpeedTravelTime());
 
         DeliveryGenerator generator = new DeliveryGenerator(scenario,travelTimes, carriers, carrierId -> TransportMode.car, carrierId -> 50);
-        new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers)).write("vehicleTypes.xml");
+        new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers)).write(utils.getOutputDirectory() + "vehicleTypes.xml");
         scenario.getConfig().controler().setOutputDirectory(utils.getOutputDirectory());
         int iteration = 0;
         File file = new File(utils.getOutputDirectory() +  "/ITERS/it." + iteration + "/");
