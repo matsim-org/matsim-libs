@@ -429,4 +429,28 @@ public class IdMapTest {
 		Assert.assertTrue(map.containsValue("five"));
 	}
 
+	@Test
+	public void testKeySetToArray() {
+		Id<Person> id1 = Id.create(1, Person.class);
+		Id<Person> id2 = Id.create(2, Person.class);
+		Id<Person> id3 = Id.create(3, Person.class);
+		Id<Person> id4 = Id.create(4, Person.class);
+		Id<Person> id5 = Id.create(5, Person.class);
+		Id<Person> id6 = Id.create(6, Person.class);
+
+		IdMap<Person, String> map = new IdMap<>(Person.class, 10);
+
+		map.put(id1, "one");
+		map.put(id2, "two");
+		map.put(id4, "four");
+		map.put(id5, "five");
+
+		Id<Person>[] array = (Id<Person>[]) map.keySet().toArray();
+		Assert.assertEquals(id1, array[0]);
+		Assert.assertEquals(id2, array[1]);
+		Assert.assertEquals(id4, array[2]);
+		Assert.assertEquals(id5, array[3]);
+
+	}
+
 }

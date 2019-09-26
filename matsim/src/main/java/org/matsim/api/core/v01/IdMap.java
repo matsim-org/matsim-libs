@@ -1,6 +1,5 @@
 package org.matsim.api.core.v01;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -449,15 +448,15 @@ public class IdMap<T, V> implements Map<Id<T>, V>, Iterable<V> {
 		}
 
 		@Override
-		public Object[] toArray() {
-			return toArray(new Object[this.map.size]);
+		public Id<T>[] toArray() {
+			return toArray(new Id[this.map.size]);
 		}
 
 		@Override
 		public <K> K[] toArray(K[] a) {
 			Id[] keys = (Id[]) a;
 			if (keys == null) {
-				keys = (Id[]) Array.newInstance(Id.class, this.map.size);
+				keys = new Id[this.map.size];
 			} else if (keys.length < this.map.size) {
 				keys = Arrays.copyOf(keys, this.map.size);
 			} else if (keys.length > this.map.size) {
@@ -586,7 +585,7 @@ public class IdMap<T, V> implements Map<Id<T>, V>, Iterable<V> {
 		public <T> T[] toArray(T[] a) {
 			Entry[] entries = (Entry[]) a;
 			if (entries == null) {
-				entries = (Entry[]) Array.newInstance(Entry.class, this.map.size);
+				entries = new Entry[this.map.size];
 			} else if (entries.length < this.map.size) {
 				entries = Arrays.copyOf(entries, this.map.size);
 			} else if (entries.length > this.map.size) {
