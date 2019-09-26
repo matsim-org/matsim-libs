@@ -22,6 +22,7 @@ package commercialtraffic.scoring;/*
  */
 
 import com.google.inject.Inject;
+import commercialtraffic.commercialJob.CommercialJobUtils;
 import commercialtraffic.commercialJob.CommercialJobUtilsV2;
 import commercialtraffic.commercialJob.DeliveryGenerator;
 import org.apache.log4j.Logger;
@@ -53,7 +54,7 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
     private final EventsManager eventsManager;
 
     private final Set<Id<Person>> activeDeliveryAgents = new HashSet<>();
-    private final Map<Id<Link>, Set<ExpectedDelivery>> currentExpectedDeliveriesPerLink = new HashMap<>();
+    private final Map<Id<Person>, Set<ExpectedDelivery>> currentExpectedDeliveriesPerPerson = new HashMap<>();
     private final List<DeliveryLogEntry> logEntries = new ArrayList<>();
 
     @Inject
@@ -73,30 +74,32 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
 
 
     public void prepareTourArrivalsForDay() {
-        currentExpectedDeliveriesPerLink.clear();
+        currentExpectedDeliveriesPerPerson.clear();
         Set<Plan> plans = population.getPersons().values().stream()
                 .map(p -> p.getSelectedPlan())
                 .filter(plan -> CommercialJobUtilsV2.planExpectsDeliveries(plan)).collect(Collectors.toSet());
         for (Plan plan : plans) {
+            Id<Person> personId = plan.getPerson().getId();
             plan.getPlanElements().stream().filter(Activity.class::isInstance).forEach(pe -> {
                 Activity activity = (Activity) pe;
                 if (activity.getAttributes().getAsMap().containsKey(CommercialJobUtilsV2.JOB_TYPE)) {
                     ExpectedDelivery expectedDelivery = new ExpectedDelivery((String) activity.getAttributes().getAttribute(CommercialJobUtilsV2.JOB_TYPE)
                             , CommercialJobUtilsV2.getCarrierId(activity)
                             , plan.getPerson().getId()
+                            , activity.getLinkId()
                             , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtilsV2.JOB_DURATION)))
                             , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtilsV2.JOB_EARLIEST_START)))
                             , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtilsV2.JOB_TIME_END))));
-                    Set<ExpectedDelivery> set = currentExpectedDeliveriesPerLink.getOrDefault(activity.getLinkId(), new HashSet<>());
-                    set.add(expectedDelivery);
-                    currentExpectedDeliveriesPerLink.put(activity.getLinkId(), set);
+                    Set<ExpectedDelivery> set = currentExpectedDeliveriesPerPerson.getOrDefault(personId, new HashSet<>());
+                    if(!set.add(expectedDelivery)) throw new IllegalArgumentException("person " + personId + " expects two identical deliveries for activity\n"
+                            + activity + ". Please consider to bunch them or remove one of them. At the moment, it is not clear how to deal with that in terms of scoring..");
+                    currentExpectedDeliveriesPerPerson.put(personId, set);
 
                 }
 
             });
         }
-        Logger.getLogger(getClass()).info(currentExpectedDeliveriesPerLink.size() + " links expect deliveries");
-
+        Logger.getLogger(getClass()).info(currentExpectedDeliveriesPerPerson.size() + " persons expect deliveries");
     }
 
 
@@ -106,23 +109,23 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
         } else if (event.getActType().contains(FreightConstants.DELIVERY)) {
             Id<Carrier> carrier = CommercialJobUtilsV2.getCarrierIdFromDriver(event.getPersonId());
             Id<Person> customerAboutToBeServed = DeliveryGenerator.getCustomerIdFromDeliveryActivityType(event.getActType());
-            if (currentExpectedDeliveriesPerLink.containsKey(event.getLinkId())) {
-                ExpectedDelivery deliveryCandidate = currentExpectedDeliveriesPerLink.get(event.getLinkId()).stream()
+            if (currentExpectedDeliveriesPerPerson.containsKey(customerAboutToBeServed)) {
+                ExpectedDelivery deliveryCandidate = currentExpectedDeliveriesPerPerson.get(customerAboutToBeServed).stream()
                         .filter(d -> d.getCarrier().equals(carrier))
-                        .filter(d -> d.getPersonId().equals(customerAboutToBeServed)) // filter for the customer (whose id is contained in the activityType)
+                        .filter(d -> d.getLinkId().equals(event.getLinkId()))
                                                                                         // TODO: filter for specific serviceID in order to be really sure if the right service is scored...!
                                                                                             //that means we need the serviceId in the activityType..
                         .min(Comparator.comparing(ExpectedDelivery::getStartTime))
                         .orElseThrow(() -> new RuntimeException("No available deliveries expected for customer " + customerAboutToBeServed + " by carrier " + carrier + " at link " + event.getLinkId()));
 
-                currentExpectedDeliveriesPerLink.get(event.getLinkId()).remove(deliveryCandidate);
+                currentExpectedDeliveriesPerPerson.get(customerAboutToBeServed).remove(deliveryCandidate);
                 double timeDifference = calcDifference(deliveryCandidate, event.getTime());
                 double score = scoreCalculator.calcScore(timeDifference);
-                eventsManager.processEvent(new PersonMoneyEvent(event.getTime(), deliveryCandidate.getPersonId(), score));
-                logEntries.add(new DeliveryLogEntry(deliveryCandidate.getPersonId(), deliveryCandidate.getCarrier(), event.getTime(), score, event.getLinkId(), timeDifference, event.getPersonId()));
+                eventsManager.processEvent(new PersonMoneyEvent(event.getTime(), customerAboutToBeServed, score));
+                logEntries.add(new DeliveryLogEntry(customerAboutToBeServed, deliveryCandidate.getCarrier(), event.getTime(), score, event.getLinkId(), timeDifference, event.getPersonId()));
 
             } else {
-                throw new RuntimeException("No available deliveries expected at link " + event.getLinkId() + "." +
+                throw new RuntimeException("No available deliveries expected for person " + customerAboutToBeServed + "." +
                         "At the time being this should not happen as conventional simulation of freight transport (that is not linked to passenger transport demand via plan attributes)" +
                         "is not supported at the same time as 'commercial traffic' where matsim agents order services while performing an activity.");
             }
@@ -158,14 +161,16 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
         private final Id<Carrier> carrier;
 
         private final Id<Person> personId;
+        private final Id<Link> linkId;
         private final double deliveryDuration;
         private final double startTime;
         private final double endTime;
 
-        ExpectedDelivery(String type, Id<Carrier> carrier, Id<Person> personId, double deliveryDuration, double startTime, double endTime) {
+        ExpectedDelivery(String type, Id<Carrier> carrier, Id<Person> personId, Id<Link> linkId, double deliveryDuration, double startTime, double endTime) {
             this.type = type;
             this.carrier = carrier;
             this.personId = personId;
+            this.linkId = linkId;
             this.deliveryDuration = deliveryDuration;
             this.startTime = startTime;
             this.endTime = endTime;
@@ -181,6 +186,10 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
 
         public Id<Person> getPersonId() {
             return personId;
+        }
+
+        public Id<Link> getLinkId() {
+            return linkId;
         }
 
         public double getDeliveryDuration() {
