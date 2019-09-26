@@ -22,7 +22,6 @@ package commercialtraffic.analysis;/*
  */
 
 import com.google.inject.Inject;
-import commercialtraffic.commercialJob.CommercialJobUtils;
 import commercialtraffic.commercialJob.CommercialJobUtilsV2;
 import commercialtraffic.scoring.ScoreCommercialServices;
 import org.apache.commons.csv.CSVFormat;
@@ -156,7 +155,7 @@ public class CommercialTrafficAnalysisListener implements IterationEndsListener,
     private void writeIterationCarrierStats(IterationEndsEvent event) {
         for (Carrier carrier : carriers.getCarriers().values()) {
             DoubleSummaryStatistics distances = tourLengthAnalyzer.getDeliveryAgentDistances().entrySet().stream()
-                    .filter(entry -> CommercialJobUtils.getCarrierIdFromDriver(entry.getKey()).equals(carrier.getId()))
+                    .filter(entry -> CommercialJobUtilsV2.getCarrierIdFromDriver(entry.getKey()).equals(carrier.getId()))
                     .mapToDouble(e -> e.getValue())
                     .summaryStatistics();
             DoubleSummaryStatistics scores = scoreCommercialServices.getLogEntries().stream()

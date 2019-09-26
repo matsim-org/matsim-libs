@@ -22,7 +22,6 @@ package commercialtraffic.scoring;/*
  */
 
 import com.google.inject.Inject;
-import commercialtraffic.commercialJob.CommercialJobUtils;
 import commercialtraffic.commercialJob.CommercialJobUtilsV2;
 import commercialtraffic.commercialJob.DeliveryGenerator;
 import org.apache.log4j.Logger;

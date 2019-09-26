@@ -21,7 +21,6 @@ package commercialtraffic.replanning;/*
  * created by jbischoff, 22.05.2019
  */
 
-import commercialtraffic.commercialJob.CommercialJobUtils;
 import commercialtraffic.commercialJob.CommercialJobUtilsV2;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;

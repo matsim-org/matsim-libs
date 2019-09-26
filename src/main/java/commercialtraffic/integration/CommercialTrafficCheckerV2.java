@@ -21,7 +21,6 @@
 package commercialtraffic.integration;
 
 
-import commercialtraffic.commercialJob.CommercialJobUtils;
 import commercialtraffic.commercialJob.CommercialJobUtilsV2;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.log4j.Logger;
@@ -84,7 +83,7 @@ public class CommercialTrafficCheckerV2 {
     public static boolean checkCarrierConsistency(Carriers carriers) {
         boolean fail = false;
         for (Carrier carrier : carriers.getCarriers().values()) {
-            if (carrier.getId().toString().split(CommercialJobUtils.CARRIERSPLIT).length != 2) {
+            if (carrier.getId().toString().split(CommercialJobUtilsV2.CARRIERSPLIT).length != 2) {
                 log.error("Carrier ID " + carrier.getId() + " does not conform to scheme good_carrier, e.g. pizza_one, pizza_two, ...");
                 fail = true;
             }

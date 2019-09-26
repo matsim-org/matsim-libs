@@ -20,7 +20,6 @@
 
 package commercialtraffic;
 
-import commercialtraffic.commercialJob.CommercialJobUtils;
 import commercialtraffic.commercialJob.CommercialJobUtilsV2;
 import commercialtraffic.integration.CommercialTrafficConfigGroup;
 import org.matsim.api.core.v01.Coord;
