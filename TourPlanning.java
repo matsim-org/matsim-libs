@@ -60,17 +60,13 @@ public class TourPlanning  {
         carriers.getCarriers().values().forEach(carrier -> vehicleTypes.addAll(carrier.getCarrierCapabilities().getVehicleTypes()));
         NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), vehicleTypes);
         log.info("SETTING TIME SLICE TO " + jSpritTimeSliceWidth);
-        
-        
+
         netBuilder.setTimeSliceWidth(jSpritTimeSliceWidth); // !!!! otherwise it will not do anything.
         netBuilder.setTravelTime(travelTime);
 
-        
-
-        
         final NetworkBasedTransportCosts netBasedCosts1 = netBuilder.build();
         
-carriers.getCarriers().values().parallelStream().forEach(carrier -> {
+        carriers.getCarriers().values().parallelStream().forEach(carrier -> {
                     double start = System.currentTimeMillis();
                     int serviceCount =  carrier.getServices().size();
                     log.info("start tour planning for " + carrier.getId() + " which has " + serviceCount + " services");
