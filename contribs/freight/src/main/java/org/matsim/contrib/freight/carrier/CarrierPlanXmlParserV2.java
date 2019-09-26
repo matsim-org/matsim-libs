@@ -108,7 +108,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 			if(serviceTimeString != null) serviceBuilder.setServiceDuration(parseTimeToDouble(serviceTimeString));
 			CarrierService service = serviceBuilder.build();
 			serviceMap.put(service.getId(), service);
-			currentCarrier.getServices().add(service);
+			currentCarrier.getServices().put(service.getId(), service);
 		}
 
 		//shipments
@@ -142,7 +142,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 
 			CarrierShipment shipment = shipmentBuilder.build();
 			currentShipments.put(atts.getValue(ID), shipment);
-			currentCarrier.getShipments().add(shipment);
+			currentCarrier.getShipments().put(shipment.getId(), shipment);
 		}
 
 		//capabilities

@@ -110,9 +110,9 @@ public class FreightUtils {
 	 * @param carrier		the already existing carrier
 	 */
 	private static void copyShipments(Carrier carrierWS, Carrier carrier) {
-		for (CarrierShipment carrierShipment: carrier.getShipments()){
+		for (CarrierShipment carrierShipment: carrier.getShipments().values()){
 			log.debug("Copy CarrierShipment: " + carrierShipment.toString());
-			carrierWS.getShipments().add(carrierShipment);
+			carrierWS.getShipments().put(carrierShipment.getId(), carrierShipment);
 		}
 		
 	}
@@ -145,7 +145,7 @@ public class FreightUtils {
 				}
 			}
 		}
-		for (CarrierService carrierService : carrier.getServices()) {
+		for (CarrierService carrierService : carrier.getServices().values()) {
 			log.debug("Converting CarrierService to CarrierShipment: " + carrierService.getId());
 			CarrierShipment carrierShipment = CarrierShipment.Builder.newInstance(Id.create(carrierService.getId().toString(), CarrierShipment.class), 
 					depotServiceIsdeliveredFrom.get(carrierService.getId()),
@@ -156,7 +156,7 @@ public class FreightUtils {
 					.setDeliveryTimeWindow(carrierService.getServiceStartTimeWindow())
 					.setPickupTimeWindow(TimeWindow.newInstance(0.0, carrierService.getServiceStartTimeWindow().getEnd()))			// limited to end of delivery timeWindow (pickup later as latest delivery is not usefull)
 					.build();
-			carrierWS.getShipments().add(carrierShipment);
+			carrierWS.getShipments().put(carrierShipment.getId(), carrierShipment);
 		}
 	}
 

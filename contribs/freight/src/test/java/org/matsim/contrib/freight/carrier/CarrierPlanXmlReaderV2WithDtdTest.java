@@ -1,5 +1,6 @@
 package org.matsim.contrib.freight.carrier;
 
+import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -7,13 +8,11 @@ import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class CarrierPlanXmlReaderV2WithDtdTest extends MatsimTestCase {
-	
+
+	private static Logger log = Logger.getLogger(CarrierPlanXmlReaderV2WithDtdTest.class);
 	Carrier testCarrier;
 	
 	@Override
@@ -45,10 +44,10 @@ public class CarrierPlanXmlReaderV2WithDtdTest extends MatsimTestCase {
 	
 	@Test @Ignore
 	public void test_whenReadingCarrier_itReadsVehiclesCorrectly(){
-		Collection<CarrierVehicle> carrierVehicles = testCarrier.getCarrierCapabilities().getCarrierVehicles();
+		Map<Id<Vehicle>, CarrierVehicle> carrierVehicles = testCarrier.getCarrierCapabilities().getCarrierVehicles();
 		assertEquals(3,carrierVehicles.size());
 		assertTrue(exactlyTheseVehiclesAreInVehicleCollection(Arrays.asList(Id.create("lightVehicle", Vehicle.class),
-				Id.create("mediumVehicle", Vehicle.class),Id.create("heavyVehicle", Vehicle.class)),carrierVehicles));
+				Id.create("mediumVehicle", Vehicle.class),Id.create("heavyVehicle", Vehicle.class)),carrierVehicles.values()));
 	}
 	
 	@Test @Ignore
@@ -119,11 +118,11 @@ public class CarrierPlanXmlReaderV2WithDtdTest extends MatsimTestCase {
 	}
 
 	private CarrierVehicle getVehicle(String vehicleName) {
-		for(CarrierVehicle v : testCarrier.getCarrierCapabilities().getCarrierVehicles()){
-			if(v.getId().toString().equals(vehicleName )){
-				return v;
-			}
+		Id<Vehicle> vehicleId = Id.create(vehicleName, Vehicle.class);
+		if(testCarrier.getCarrierCapabilities().getCarrierVehicles().containsKey(vehicleId)){
+			return testCarrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
 		}
+		log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
 		return null;
 	}
 	

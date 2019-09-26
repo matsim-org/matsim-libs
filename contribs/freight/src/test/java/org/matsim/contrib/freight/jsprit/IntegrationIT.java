@@ -109,7 +109,7 @@ public class IntegrationIT {
 				serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(0., 24.*3600.) );
 				serviceBuilder.setServiceDuration( 10.*60. );
 				CarrierService service = serviceBuilder.build();
-				carrier.getServices().add(service);
+				carrier.getServices().put(service.getId(), service);
 			}
 			carriers.addCarrier(carrier);
 		}

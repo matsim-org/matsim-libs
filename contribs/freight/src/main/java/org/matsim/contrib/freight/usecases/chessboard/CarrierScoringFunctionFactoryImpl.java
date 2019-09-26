@@ -21,6 +21,7 @@ import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.jsprit.VehicleTypeDependentRoadPricingCalculator;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.scoring.FreightActivity;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -48,11 +49,8 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
         private static Logger log = Logger.getLogger(DriversActivityScoring.class);
 
         private double score;
-
         private double timeParameter = 0.008;
-
         private double missedTimeWindowPenalty = 0.01;
-
         private FileWriter fileWriter;
 
         public DriversActivityScoring() {
@@ -104,7 +102,6 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
     static class VehicleEmploymentScoring implements SumScoringFunction.BasicScoring {
 
         private Carrier carrier;
-
         private FileWriter fileWriter;
 
         public VehicleEmploymentScoring(Carrier carrier) {
@@ -140,12 +137,11 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
      */
     static class DriversLegScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.LegScoring {
 
+        private static Logger log = Logger.getLogger(DriversLegScoring.class);
+
         private double score = 0.0;
-
         private final Network network;
-
         private final Carrier carrier;
-
         private Set<CarrierVehicle> employedVehicles;
 
         public DriversLegScoring(Carrier carrier, Network network) {
@@ -178,11 +174,10 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 
 
         private CarrierVehicle getVehicle(Id vehicleId) {
-            for(CarrierVehicle cv : carrier.getCarrierCapabilities().getCarrierVehicles()){
-                if(cv.getId().equals(vehicleId )){
-                    return cv;
-                }
+            if(carrier.getCarrierCapabilities().getCarrierVehicles().containsKey(vehicleId)){
+                return carrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
             }
+            log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
             return null;
         }
 
@@ -192,7 +187,7 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
                 NetworkRoute nRoute = (NetworkRoute) leg.getRoute();
                 Id vehicleId = nRoute.getVehicleId();
                 CarrierVehicle vehicle = getVehicle(vehicleId);
-                if(vehicle == null) throw new IllegalStateException("vehicle with id " + vehicleId + " is missing");
+                Gbl.assertNotNull(vehicle);
                 if(!employedVehicles.contains(vehicle)){
                     employedVehicles.add(vehicle);
                 }
@@ -224,12 +219,11 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
 
     static class TollScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ArbitraryEventScoring {
 
+        private static Logger log = Logger.getLogger(TollScoring.class);
+
         private double score = 0.;
-
         private Carrier carrier;
-
         private Network network;
-
         private VehicleTypeDependentRoadPricingCalculator roadPricing;
 
         public TollScoring(Carrier carrier, Network network, VehicleTypeDependentRoadPricingCalculator roadPricing) {
@@ -250,11 +244,10 @@ public final class CarrierScoringFunctionFactoryImpl implements CarrierScoringFu
         }
 
         private CarrierVehicle getVehicle(Id<Vehicle> vehicleId) {
-            for(CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles()){
-                if(v.getId().equals(vehicleId )){
-                    return v;
-                }
+            if(carrier.getCarrierCapabilities().getCarrierVehicles().containsKey(vehicleId)){
+                return carrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
             }
+            log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
             return null;
         }
 
