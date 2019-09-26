@@ -142,13 +142,6 @@
 			<version>0.1.54</version>
 		</dependency>
 
-		<!-- for accessibility contrib -->
-		<dependency>
-			<groupId>ch.sbb</groupId>
-			<artifactId>matsim-sbb-extensions</artifactId>
-			<version>11.5</version>
-		</dependency>
-
 	</dependencies>
 
 	<profiles>

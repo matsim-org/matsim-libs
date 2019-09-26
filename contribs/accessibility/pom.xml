@@ -85,10 +85,5 @@
 			<artifactId>gt-jdbc-postgis</artifactId>
 			<version>21.2</version>
 		</dependency>
-		<dependency>
-			<groupId>com.github.vsp-gleich</groupId>
-			<artifactId>matsim-sbb-extensions</artifactId>
-			<version>11.6-vsp-2019-08-26</version>
-		</dependency>
 	</dependencies>
 </project>
