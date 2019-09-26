@@ -407,6 +407,10 @@ public final class EmissionModule {
 		return this. warmEmissionHandler.getWarmEmissionAnalysisModule();
 	}
 
+	public ColdEmissionAnalysisModule getColdEmissionAnalysisModule() {
+		return this. coldEmissionHandler.getColdEmissionAnalysisModule();
+	}
+
 	// probably, this is useful; e.g., emission events are not written and a few handlers must be attached to events manager
 	// for the analysis purpose. Need a test. Amit Apr'17
 	public EventsManager getEmissionEventsManager() {
@@ -425,13 +429,10 @@ public final class EmissionModule {
 				wam.getWarmEmissionEventCounter() + " warm emission events.");
 		logger.info("Emission calculation based on `Fractions' occured for " + wam.getFractionOccurences() + " of " +
 				wam.getWarmEmissionEventCounter() + " warm emission events.");
-		
 		logger.info("Free flow occured on " + wam.getFreeFlowKmCounter() + " km of total " + 
 				wam.getKmCounter() + " km, where emissions were calculated.");
 		logger.info("Stop&Go occured on " + wam.getStopGoKmCounter() + " km of total " +
 				wam.getKmCounter() + " km, where emissions were calculated.");
-
-		
 		logger.info("Emission calculation terminated. Emission events can be found in regular events file.");
 	}
 }

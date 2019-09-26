@@ -18,7 +18,7 @@ import java.util.Map;
 class VisumHbefaRoadTypeMapping extends HbefaRoadTypeMapping {
     private static Logger logger = Logger.getLogger(VisumHbefaRoadTypeMapping.class);
 
-    Map<String, String> mapping = new HashMap<>();
+    private Map<String, String> mapping = new HashMap<>();
 
     private VisumHbefaRoadTypeMapping(){}
 
@@ -36,7 +36,7 @@ class VisumHbefaRoadTypeMapping extends HbefaRoadTypeMapping {
         return new VisumHbefaRoadTypeMapping();
     }
 
-    public static HbefaRoadTypeMapping createVisumRoadTypeMapping(URL filename){
+    /*package-private*/ static HbefaRoadTypeMapping createVisumRoadTypeMapping(URL filename){
         logger.info("entering createRoadTypeMapping ...") ;
 
         VisumHbefaRoadTypeMapping mapping = new VisumHbefaRoadTypeMapping();

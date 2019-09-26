@@ -76,17 +76,17 @@ public final class WarmEmissionAnalysisModule {
 	private double saturatedKmCounter = 0.0;
 	private double stopGoKmCounter = 0.0;
 
-	public static class WarmEmissionAnalysisModuleParameter {
+	/*package-private*/ static class WarmEmissionAnalysisModuleParameter {
 
-		public final Map<HbefaWarmEmissionFactorKey,  HbefaWarmEmissionFactor> avgHbefaWarmTable;
-		public final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
+		/*package-private*/ final Map<HbefaWarmEmissionFactorKey,  HbefaWarmEmissionFactor> avgHbefaWarmTable;
+		/*package-private*/ final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
 		private final Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds;
 		private final EmissionsConfigGroup ecg;
 		private final Set<String> warmPollutants;
 
-		public WarmEmissionAnalysisModuleParameter(
-				Map<HbefaWarmEmissionFactorKey,  HbefaWarmEmissionFactor> avgHbefaWarmTable,
-				Map<HbefaWarmEmissionFactorKey,  HbefaWarmEmissionFactor> detailedHbefaWarmTable,
+		/*package-private*/ WarmEmissionAnalysisModuleParameter(
+				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable,
+				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable,
 				Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds,
 				Set<String> warmPollutants,
 				EmissionsConfigGroup emissionsConfigGroup) {
@@ -151,8 +151,8 @@ public final class WarmEmissionAnalysisModule {
 		return checkVehicleInfoAndCalculateWarmEmissions( vehicle.getType(), vehicle.getId(), link, travelTime );
 	}
 
-	public Map<String, Double> checkVehicleInfoAndCalculateWarmEmissions(VehicleType vehicleType, Id<Vehicle> vehicleId,
-																		 Link link,  double travelTime ) {
+	/*package-private*/ Map<String, Double> checkVehicleInfoAndCalculateWarmEmissions(VehicleType vehicleType, Id<Vehicle> vehicleId,
+																  Link link, double travelTime) {
 
 		String hbefaVehicleTypeDescription = EmissionUtils.getHbefaVehicleDescription( vehicleType, this.ecg );
 		Gbl.assertNotNull( hbefaVehicleTypeDescription );
@@ -329,43 +329,43 @@ public final class WarmEmissionAnalysisModule {
 		}
 	}
 
-	public int getFreeFlowOccurences() {
+	/*package-private*/ int getFreeFlowOccurences() {
 		return freeFlowCounter;
 	}
 
-	public int getHeavyOccurences() {
+	/*package-private*/ private int getHeavyOccurences() {
 		return heavyFlowCounter;
 	}
 
-	public int getSaturatedOccurences() {
+	/*package-private*/ private int getSaturatedOccurences() {
 		return saturatedCounter;
 	}
-	
-	public int getStopGoOccurences() {
+
+	/*package-private*/ int getStopGoOccurences() {
 		return stopGoCounter;
 	}
 
-	public double getKmCounter() {
+	/*package-private*/ double getKmCounter() {
 		return kmCounter;
 	}
 
-	public double getFreeFlowKmCounter() {
+	/*package-private*/ double getFreeFlowKmCounter() {
 		return freeFlowKmCounter;
 	}
 
-	public double getHeavyFlowKmCounter() {
+	/*package-private*/ private double getHeavyFlowKmCounter() {
 		return heavyFlowKmCounter;
 	}
 
-	public double getSaturatedKmCounter() {
+	/*package-private*/ private double getSaturatedKmCounter() {
 		return saturatedKmCounter;
 	}
 
-	public double getStopGoKmCounter() {
+	/*package-private*/ double getStopGoKmCounter() {
 		return stopGoKmCounter;
 	}
 
-	public int getWarmEmissionEventCounter() {
+	/*package-private*/ int getWarmEmissionEventCounter() {
 		return emissionEventCounter;
 	}
 
@@ -377,8 +377,8 @@ public final class WarmEmissionAnalysisModule {
 	public double getFractionKmCounter() {
 		return getSaturatedKmCounter() + getHeavyFlowKmCounter();
 	}
-  	
-	public EmissionsConfigGroup getEcg() {
+
+	/*package-private*/ EmissionsConfigGroup getEcg() {
 		return ecg;
 	}
 

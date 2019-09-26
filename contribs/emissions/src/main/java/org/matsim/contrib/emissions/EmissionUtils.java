@@ -59,13 +59,13 @@ public final class EmissionUtils {
 
 	private static final String HBEFA_ROAD_TYPE = "hbefa_road_type";
 
-	public static void setHbefaRoadType(Link link, String type) {
+	/*package-private*/ static void setHbefaRoadType(Link link, String type) {
 		if (type != null) {
 			link.getAttributes().putAttribute(HBEFA_ROAD_TYPE, type);
 		}
 	}
 
-	public static String getHbefaRoadType(Link link) {
+	/*package-private*/ static String getHbefaRoadType(Link link) {
 		return (String) link.getAttributes().getAttribute(HBEFA_ROAD_TYPE);
 	}
 
@@ -184,9 +184,9 @@ public final class EmissionUtils {
 
 //		vehicleType.getAttributes().putAttribute( HBEFA_VEHICLE_DESCRIPTION, hbefaVehicleDescription ) ;
 
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> result = convertVehicleDescription2VehicleInformationTuple( vehicleType );;
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> result = convertVehicleDescription2VehicleInformationTuple( vehicleType );
 
-		EngineInformation engineInformation = vehicleType.getEngineInformation();;
+		EngineInformation engineInformation = vehicleType.getEngineInformation();
 		VehicleUtils.setHbefaEmissionsConcept( engineInformation, result.getSecond().getHbefaEmConcept() );
 		VehicleUtils.setHbefaSizeClass( engineInformation, result.getSecond().getHbefaSizeClass() );
 		VehicleUtils.setHbefaTechnology( engineInformation, result.getSecond().getHbefaTechnology() );
@@ -236,7 +236,7 @@ public final class EmissionUtils {
 		return table;
 	}
 
-	public static String getHbefaVehicleDescription( VehicleType vehicleType, EmissionsConfigGroup emissionsConfigGroup ){
+	/*package-private*/ static String getHbefaVehicleDescription(VehicleType vehicleType, EmissionsConfigGroup emissionsConfigGroup){
 		if( vehicleType == null ){
 			throw new RuntimeException( "vehicleType is null; not possible for emissions contrib." );
 		}
@@ -287,7 +287,7 @@ public final class EmissionUtils {
 
 				String[] vehicleInformationArray = substring.split( ";" ) ;
 
-				engineInformation = vehicleType.getEngineInformation();;
+				engineInformation = vehicleType.getEngineInformation();
 				VehicleUtils.setHbefaVehicleCategory( engineInformation, vehicleInformationArray[0] );
 
 				if ( vehicleInformationArray.length==4 ){
@@ -297,7 +297,7 @@ public final class EmissionUtils {
 				}
 
 				// delete at old location:
-				String oldString = EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() + substring + EmissionSpecificationMarker.END_EMISSIONS.toString();;
+				String oldString = EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() + substring + EmissionSpecificationMarker.END_EMISSIONS.toString();
 				String result2 = vehicleType.getDescription().replace( oldString, "" );
 				vehicleType.setDescription( result2 ) ;
 
@@ -313,9 +313,8 @@ public final class EmissionUtils {
 		return getHbefaVehicleDescription( vehicleType ) ;
 	}
 
-	static String getHbefaVehicleDescription( VehicleType vehicleType ) {
+	public static String getHbefaVehicleDescription(VehicleType vehicleType) {
 		// not yet clear if this can be public (without access to config). kai/kai, sep'19
-//		return (String) vehicleType.getAttributes().getAttribute( HBEFA_VEHICLE_DESCRIPTION ) ;
 		EngineInformation engineInfo = vehicleType.getEngineInformation();;
 		StringBuffer strb = new StringBuffer();
 		strb.append( VehicleUtils.getHbefaVehicleCategory( engineInfo ) ) ;

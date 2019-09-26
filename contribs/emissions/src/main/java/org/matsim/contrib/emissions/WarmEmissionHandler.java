@@ -67,11 +67,8 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	private final Map<Id<Vehicle>, Tuple<Id<Link>, Double>> vehicleLeavesTraffic = new HashMap<>();
 	private final Map<Id<Vehicle>, Tuple<Id<Link>, Double>> vehicleEntersTraffic = new HashMap<>();
 
-	public WarmEmissionHandler(
-		  Vehicles emissionVehicles,
-		  final Network network,
-		  WarmEmissionAnalysisModuleParameter parameterObject,
-		  EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
+	/*package-private*/ WarmEmissionHandler(Vehicles emissionVehicles, final Network network, WarmEmissionAnalysisModuleParameter parameterObject,
+						EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
 
 		this.emissionVehicles = emissionVehicles;
 		this.network = network;
@@ -212,15 +209,15 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		}
 	}
 
-	public int getLinkLeaveCnt() {
+	/*package-private*/ int getLinkLeaveCnt() {
 		return linkLeaveCnt;
 	}
 
-	public int getLinkLeaveWarnCnt() {
+	/*package-private*/ int getLinkLeaveWarnCnt() {
 		return linkLeaveFirstActWarnCnt;
 	}
 
-	public WarmEmissionAnalysisModule getWarmEmissionAnalysisModule(){
+	/*package-private*/ WarmEmissionAnalysisModule getWarmEmissionAnalysisModule(){
 		return warmEmissionAnalysisModule;
 	}
 }

@@ -82,15 +82,15 @@ final class ColdEmissionAnalysisModule {
 	private final Set<String> coldPollutants;
   private int noVehWarnCnt = 0;
 
-	public static class ColdEmissionAnalysisModuleParameter {
-		public final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
-		public final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
+    /*package-private*/ static class ColdEmissionAnalysisModuleParameter {
+		final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
+		final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
 		private final Set<String> coldPollutants;
 		private final EmissionsConfigGroup ecg;
 
-		public ColdEmissionAnalysisModuleParameter(
-				Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable,
-				Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable, Set<String> coldPollutants, EmissionsConfigGroup emissionsConfigGroup) {
+        /*package-private*/ ColdEmissionAnalysisModuleParameter(Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable,
+                                                                Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable,
+                                                                Set<String> coldPollutants, EmissionsConfigGroup emissionsConfigGroup) {
 			this.avgHbefaColdTable = avgHbefaColdTable;
 			this.detailedHbefaColdTable = detailedHbefaColdTable;
 			this.coldPollutants = coldPollutants;
@@ -98,9 +98,9 @@ final class ColdEmissionAnalysisModule {
 		}
 	}
 
-	public ColdEmissionAnalysisModule(
-			ColdEmissionAnalysisModuleParameter parameterObject,
-			EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
+    /*package-private*/ ColdEmissionAnalysisModule(
+            ColdEmissionAnalysisModuleParameter parameterObject,
+            EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
 
 		this.avgHbefaColdTable = parameterObject.avgHbefaColdTable;
 		this.detailedHbefaColdTable = parameterObject.detailedHbefaColdTable;

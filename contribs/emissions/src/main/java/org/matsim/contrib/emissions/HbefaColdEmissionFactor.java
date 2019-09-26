@@ -29,8 +29,8 @@ class HbefaColdEmissionFactor {
 	// kai, jul'18
 
 	private double coldEmissionFactor;
-	
-	public HbefaColdEmissionFactor( double coldEmissionFactor ){
+
+	/*package-private*/ HbefaColdEmissionFactor(double coldEmissionFactor){
 		this.coldEmissionFactor = coldEmissionFactor ;
 	}
 	

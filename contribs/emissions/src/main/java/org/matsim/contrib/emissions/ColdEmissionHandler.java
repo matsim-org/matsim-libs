@@ -59,13 +59,9 @@ final class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesT
     private final Map<Id<Vehicle>, Double> vehicleId2accumulatedDistance = new HashMap<>();
     private final Map<Id<Vehicle>, Double> vehicleId2parkingDuration = new HashMap<>();
     private final Map<Id<Vehicle>, Id<Link>> vehicleId2coldEmissionEventLinkId = new HashMap<>();
-    
-    public ColdEmissionHandler(
-            Vehicles vehicles,
-            Network network,
-            ColdEmissionAnalysisModuleParameter parameterObject2,
-            EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
 
+    /*package-private*/ ColdEmissionHandler(Vehicles vehicles, Network network, ColdEmissionAnalysisModuleParameter parameterObject2,
+                                            EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
         this.vehicles = vehicles;
         this.network = network;
         this.coldEmissionAnalysisModule = new ColdEmissionAnalysisModule(parameterObject2, emissionEventsManager, emissionEfficiencyFactor);
@@ -170,5 +166,9 @@ final class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesT
                 parkingDuration,
                 1
         );
+    }
+
+    public ColdEmissionAnalysisModule getColdEmissionAnalysisModule(){
+        return coldEmissionAnalysisModule;
     }
 }
