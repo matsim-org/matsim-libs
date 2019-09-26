@@ -20,8 +20,9 @@
 
 package commercialtraffic;
 
-import commercialtraffic.integration.CommercialTrafficConfigGroup;
 import commercialtraffic.commercialJob.CommercialJobUtils;
+import commercialtraffic.commercialJob.CommercialJobUtilsV2;
+import commercialtraffic.integration.CommercialTrafficConfigGroup;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -58,28 +59,30 @@ public class TestScenarioGeneration {
         Carrier pizza_1 = CarrierImpl.newInstance(Id.create("pizza_1", Carrier.class));
         Carrier pizza_2 = CarrierImpl.newInstance(Id.create("pizza_2", Carrier.class));
         Carrier shopping_1 = CarrierImpl.newInstance(Id.create("shopping_1", Carrier.class));
+
+        VehicleType type = createLightType();
+
+        pizza_1.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+        pizza_1.getCarrierCapabilities().getVehicleTypes().add(createLightType());
+        pizza_1.getCarrierCapabilities().getCarrierVehicles().add(getLightVehicle(pizza_1.getId(), type, Id.createLinkId(111), "one"));
+//        pizza_1.getServices().add(CarrierService
+//                .Builder.newInstance(Id.create("salamipizza", CarrierService.class),Id.createLinkId("259"))
+//                .setCapacityDemand(1)
+//                .setServiceDuration(180)
+//                .setServiceStartTimeWindow(TimeWindow.newInstance(12*3600,13*3600))
+//                .build());
+
+        pizza_2.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+        pizza_2.getCarrierCapabilities().getCarrierVehicles().add(getLightVehicle(pizza_2.getId(), type, Id.createLinkId(111), "one"));
+        pizza_2.getCarrierCapabilities().getVehicleTypes().add(createLightType());
+
+        shopping_1.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+        shopping_1.getCarrierCapabilities().getCarrierVehicles().add(getLightVehicle(shopping_1.getId(), type, Id.createLinkId(111), "one"));
+        shopping_1.getCarrierCapabilities().getVehicleTypes().add(createLightType());
+
         carriers.addCarrier(pizza_1);
         carriers.addCarrier(pizza_2);
         carriers.addCarrier(shopping_1);
-        pizza_1.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
-        pizza_1.getCarrierCapabilities().getCarrierVehicles().add(getLightVehicle(Id.createVehicleId(1), Id.createLinkId(111), "one"));
-        pizza_1.getCarrierCapabilities().getVehicleTypes().add(createLightType());
-        pizza_1.getServices().add(CarrierService
-                .Builder.newInstance(Id.create("salamipizza", CarrierService.class),Id.createLinkId("259"))
-                .setCapacityDemand(1)
-                .setServiceDuration(180)
-                .setServiceStartTimeWindow(TimeWindow.newInstance(12*3600,13*3600))
-                .build());
-
-        pizza_2.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
-        pizza_2.getCarrierCapabilities().getCarrierVehicles().add(getLightVehicle(Id.createVehicleId(1), Id.createLinkId(111), "one"));
-        pizza_2.getCarrierCapabilities().getVehicleTypes().add(createLightType());
-
-
-        shopping_1.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
-        shopping_1.getCarrierCapabilities().getCarrierVehicles().add(getLightVehicle(Id.createVehicleId(2), Id.createLinkId(111), "one"));
-        shopping_1.getCarrierCapabilities().getVehicleTypes().add(createLightType());
-
 
         return carriers;
     }
@@ -101,8 +104,12 @@ public class TestScenarioGeneration {
         work.setLinkId(Id.createLinkId(259));
         work.setEndTime(16 * 3600);
 
-        //TODO
-//        work.getAttributes().putAttribute(CommercialJobUtils.JOB_ID, "salamipizza");
+        work.getAttributes().putAttribute(CommercialJobUtilsV2.JOB_TYPE, "pizza");
+        work.getAttributes().putAttribute(CommercialJobUtilsV2.JOB_DURATION, 180);
+        work.getAttributes().putAttribute(CommercialJobUtilsV2.JOB_EARLIEST_START, 12 * 3600);
+        work.getAttributes().putAttribute(CommercialJobUtilsV2.JOB_TIME_END, 13 * 3600);
+        work.getAttributes().putAttribute(CommercialJobUtilsV2.JOB_OPERATOR, 1);
+        work.getAttributes().putAttribute(CommercialJobUtilsV2.JOB_SIZE, 1);
 
         plan.addActivity(work);
 
@@ -118,11 +125,12 @@ public class TestScenarioGeneration {
     }
 
 
-    private static CarrierVehicle getLightVehicle(Id<?> id, Id<Link> homeId, String depot) {
-        CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(Id.create(("carrier_" + id.toString() + "_lightVehicle_" + depot), Vehicle.class), homeId);
+    private static CarrierVehicle getLightVehicle(Id<?> id, VehicleType type, Id<Link> homeId, String depot) {
+        CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(Id.create((id.toString() + "_lightVehicle_" + depot), Vehicle.class), homeId);
         vBuilder.setEarliestStart(6 * 60 * 60);
         vBuilder.setLatestEnd(16 * 60 * 60);
-        vBuilder.setType(createLightType());
+        vBuilder.setType(type);
+        vBuilder.setTypeId(type.getId());
         return vBuilder.build();
     }
 
