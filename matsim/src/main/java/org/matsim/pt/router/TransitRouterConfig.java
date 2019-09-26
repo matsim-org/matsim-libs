@@ -30,8 +30,6 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 
-import java.util.Map;
-
 /**
  * Design decisions:<ul>
  * <li>At this point, only those variables that are needed elsewhere (in particular in the scoring) are set from the
@@ -118,9 +116,6 @@ public class TransitRouterConfig implements MatsimParameters {
 		
 		// walk:
 		{
-			for( Map.Entry<String, PlansCalcRouteConfigGroup.ModeRoutingParams> entry : pcrConfig.getModeRoutingParams().entrySet() ){
-				Logger.getLogger( this.getClass() ).warn("mode=" + entry.getKey() + "; params=" + entry.getValue()) ;
-			}
 			final PlansCalcRouteConfigGroup.ModeRoutingParams params = pcrConfig.getModeRoutingParams().get( TransportMode.non_network_walk );
 			Gbl.assertNotNull( params );
 			this.beelineDistanceFactor = params.getBeelineDistanceFactor();
