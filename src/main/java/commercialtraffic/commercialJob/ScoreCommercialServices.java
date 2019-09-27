@@ -17,13 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package commercialtraffic.scoring;/*
+package commercialtraffic.commercialJob;/*
  * created by jbischoff, 17.06.2019
  */
 
 import com.google.inject.Inject;
-import commercialtraffic.commercialJob.CommercialJobUtils;
-import commercialtraffic.commercialJob.DeliveryGenerator;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -32,7 +30,6 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -79,23 +76,26 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
                 .filter(plan -> CommercialJobUtils.planExpectsCommercialJobs(plan)).collect(Collectors.toSet());
         for (Plan plan : plans) {
             Id<Person> personId = plan.getPerson().getId();
-            plan.getPlanElements().stream().filter(Activity.class::isInstance).forEach(pe -> {
-                Activity activity = (Activity) pe;
-                if (activity.getAttributes().getAsMap().containsKey(CommercialJobUtils.JOB_TYPE)) {
-                    ExpectedDelivery expectedDelivery = new ExpectedDelivery((String) activity.getAttributes().getAttribute(CommercialJobUtils.JOB_TYPE)
-                            , CommercialJobUtils.getCarrierId(activity)
+            CommercialJobUtils.getActivitiesWithJobs(plan).forEach(activity -> {
+
+                Map<String,Object> commercialJobAttributes = CommercialJobUtils.getCommercialJobAttributes(activity);
+                for (String commercialJobAttributeKey : commercialJobAttributes.keySet()) {
+                    String[] jobProperties = String.valueOf(commercialJobAttributes.get(commercialJobAttributeKey)).split(CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_DELIMITER);
+                    int jobIdx = Integer.valueOf(commercialJobAttributeKey.substring(CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_NAME.length()));
+
+                    ExpectedDelivery expectedDelivery = new ExpectedDelivery(jobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_TYPE_IDX]
+                            , CommercialJobUtils.getCurrentCarrierForJob(activity,jobIdx)
                             , plan.getPerson().getId()
                             , activity.getLinkId()
-                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_DURATION)))
-                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_EARLIEST_START)))
-                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_TIME_END))));
+                            , Double.valueOf(jobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_DURATION_IDX])
+                            , Double.valueOf(jobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_START_IDX])
+                            , Double.valueOf(jobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_END_IDX]));
                     Set<ExpectedDelivery> set = currentExpectedDeliveriesPerPerson.getOrDefault(personId, new HashSet<>());
-                    if(!set.add(expectedDelivery)) throw new IllegalArgumentException("person " + personId + " expects two identical deliveries for activity\n"
-                            + activity + ". Please consider to bunch them or remove one of them. At the moment, it is not clear how to deal with that in terms of scoring..");
+                    if (!set.add(expectedDelivery))
+                        throw new IllegalArgumentException("person " + personId + " expects two identical deliveries for activity\n"
+                                + activity + ". Please consider to bunch them or remove one of them. At the moment, it is not clear how to deal with that in terms of scoring..");
                     currentExpectedDeliveriesPerPerson.put(personId, set);
-
                 }
-
             });
         }
         Logger.getLogger(getClass()).info(currentExpectedDeliveriesPerPerson.size() + " persons expect deliveries");

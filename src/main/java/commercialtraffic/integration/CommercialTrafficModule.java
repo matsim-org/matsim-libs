@@ -24,11 +24,12 @@ package commercialtraffic.integration;/*
 import com.google.inject.Singleton;
 import commercialtraffic.analysis.CommercialTrafficAnalysisListener;
 import commercialtraffic.analysis.TourLengthAnalyzer;
+import commercialtraffic.commercialJob.CommercialTrafficChecker;
 import commercialtraffic.commercialJob.DeliveryGenerator;
 import commercialtraffic.replanning.ChangeDeliveryServiceOperator;
-import commercialtraffic.scoring.DefaultCommercialServiceScore;
-import commercialtraffic.scoring.DeliveryScoreCalculator;
-import commercialtraffic.scoring.ScoreCommercialServices;
+import commercialtraffic.commercialJob.DefaultCommercialServiceScore;
+import commercialtraffic.commercialJob.DeliveryScoreCalculator;
+import commercialtraffic.commercialJob.ScoreCommercialServices;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;

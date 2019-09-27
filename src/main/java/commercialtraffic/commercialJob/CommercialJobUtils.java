@@ -20,66 +20,83 @@
 
 package commercialtraffic.commercialJob;
 
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class CommercialJobUtils {
 
-    public static final String JOB_SIZE = "jobAmount";
-    public static final String JOB_TYPE = "jobType";
-    public static final String JOB_DURATION = "jobDuration";
-    public static final String JOB_EARLIEST_START = "jobTimeStart";
-    public static final String JOB_OPERATOR = "operator";
-    public static final String JOB_TIME_END = "jobTimeEnd";
+    public static final String COMMERCIALJOB_ATTRIBUTE_NAME = "commercialJob";
+    public static final String COMMERCIALJOB_ATTRIBUTE_DELIMITER = ";";
+
+    public static final int COMMERCIALJOB_ATTRIBUTE_TYPE_IDX = 0;
+    public static final int COMMERCIALJOB_ATTRIBUTE_OPERATOR_IDX = 1;
+    public static final int COMMERCIALJOB_ATTRIBUTE_AMOUNT_IDX = 2;
+    public static final int COMMERCIALJOB_ATTRIBUTE_START_IDX = 3;
+    public static final int COMMERCIALJOB_ATTRIBUTE_END_IDX = 4;
+    public static final int COMMERCIALJOB_ATTRIBUTE_DURATION_IDX = 5;
+
+
+
+//    public static final String JOB_TYPE = "jobType";
+//    public static final String JOB_SIZE = "jobAmount";
+//    public static final String JOB_DURATION = "jobDuration";
+//    public static final String JOB_EARLIEST_START = "jobTimeStart";
+//    public static final String JOB_OPERATOR = "operator";
+//    public static final String JOB_TIME_END = "jobTimeEnd";
 
     public static final String CARRIERSPLIT = "_";
 
 
-    public static Id<Carrier> getCarrierId(Activity activity) {
-        return Id.create(activity.getAttributes().getAttribute(JOB_TYPE).toString() + CARRIERSPLIT + activity.getAttributes().getAttribute(CommercialJobUtils.JOB_OPERATOR).toString(), Carrier.class);
-    }
-
-    public static String getJobOperator(Activity activity) {
-        return activity.getAttributes().getAttribute(JOB_OPERATOR).toString();
-    }
-
-    public static void setJobOperator(Activity activity, String operator) {
-        activity.getAttributes().putAttribute(JOB_OPERATOR, operator);
-    }
-
-    public static void setJobOperatorAndJobType(Activity activity, Id<Carrier> carrierId) {
-        String[] carrierString = carrierId.toString().split(CARRIERSPLIT);
-        setJobType(activity, carrierString[0]);
-        setJobOperator(activity, carrierString[1]);
-
-
+    public static Set<Activity> getActivitiesWithJobs (Plan plan){
+        Set<Activity> activitiesWithJob = new HashSet<>();
+        plan.getPlanElements().stream()
+                .filter(Activity.class::isInstance)
+                .filter(a -> activityExpectsCommercialJobs((Activity) a))
+                .forEach(a -> activitiesWithJob.add((Activity) a));
+        return activitiesWithJob;
     }
 
 
-    public static String getJobType(Activity activity) {
-        return (String) activity.getAttributes().getAttribute(JOB_TYPE);
+    public static Id<Carrier> getCurrentCarrierForJob(Activity activity, int commercialJobIndex) {
+        String[] commercialJobProperties = String.valueOf(getCommercialJob(activity, commercialJobIndex)).split(COMMERCIALJOB_ATTRIBUTE_DELIMITER);
+        String id = commercialJobProperties[COMMERCIALJOB_ATTRIBUTE_TYPE_IDX] + CARRIERSPLIT + commercialJobProperties[COMMERCIALJOB_ATTRIBUTE_OPERATOR_IDX];
+        return Id.create(id, Carrier.class);
     }
 
-    public static void setJobType(Activity activity, String operator) {
-        activity.getAttributes().putAttribute(JOB_TYPE, operator);
+    public static void setJobOperator(Activity activity, int commercialJobIndex, String operator) {
+        String[] commercialJobProperties = String.valueOf(getCommercialJob(activity, commercialJobIndex)).split(COMMERCIALJOB_ATTRIBUTE_DELIMITER);
+        commercialJobProperties[COMMERCIALJOB_ATTRIBUTE_OPERATOR_IDX] = operator;
+        activity.getAttributes().putAttribute(COMMERCIALJOB_ATTRIBUTE_NAME + commercialJobIndex, convertPropertiesArrayToAttributeValue(commercialJobProperties));
     }
 
-    public static Set<Id<Carrier>> getOperatorsForJobType(Carriers carriers, String jobType) {
+    public static String getJobOperator(Activity activity, int commercialJobIndex) {
+        return String.valueOf(getCommercialJob(activity, commercialJobIndex)).split(COMMERCIALJOB_ATTRIBUTE_DELIMITER)[COMMERCIALJOB_ATTRIBUTE_OPERATOR_IDX];
+    }
+
+    public static void setJobType(Activity activity, int commercialJobIndex, String operator) {
+        String[] commercialJobProperties = String.valueOf(getCommercialJob(activity, commercialJobIndex)).split(COMMERCIALJOB_ATTRIBUTE_DELIMITER);
+        commercialJobProperties[COMMERCIALJOB_ATTRIBUTE_TYPE_IDX] = operator;
+        activity.getAttributes().putAttribute(COMMERCIALJOB_ATTRIBUTE_NAME + commercialJobIndex, convertPropertiesArrayToAttributeValue(commercialJobProperties));
+    }
+
+    public static String getJobType(Activity activity, int commercialJobIndex) {
+        return String.valueOf(getCommercialJob(activity, commercialJobIndex)).split(COMMERCIALJOB_ATTRIBUTE_DELIMITER)[COMMERCIALJOB_ATTRIBUTE_TYPE_IDX];
+    }
+
+    public static Set<Id<Carrier>> getExistingOperatorsForJobType(Carriers carriers, String jobType) {
         return carriers.getCarriers().values().
                 stream().
                 filter(carrier -> carrier.getId().toString().startsWith(jobType)).map(Carrier::getId).
                 collect(Collectors.toSet());
-
     }
 
     public static Id<Carrier> getCarrierIdFromDriver(Id<Person> personId) {
@@ -89,12 +106,29 @@ public class CommercialJobUtils {
     public static boolean planExpectsCommercialJobs(Plan plan) {
         return plan.getPlanElements().stream()
                 .filter(Activity.class::isInstance)
-                .anyMatch(planElement -> planElement.getAttributes().getAsMap().containsKey(JOB_TYPE));
+                .anyMatch(planElement -> activityExpectsCommercialJobs((Activity) planElement));
     }
 
-    static boolean activityExpectsCommercialJobs(Activity activity){
-        return activity.getAttributes().getAsMap().containsKey(JOB_TYPE);
+    public static boolean activityExpectsCommercialJobs(Activity activity){
+        MutableBoolean activityExpectsCommercialJobs = new MutableBoolean(false);
+        activity.getAttributes().getAsMap().keySet().forEach(k -> {
+            if(k.toString().startsWith(COMMERCIALJOB_ATTRIBUTE_NAME)) activityExpectsCommercialJobs.setTrue();
+        });
+        return activityExpectsCommercialJobs.getValue();
     }
+
+    static Map<String,Object> getCommercialJobAttributes(Activity activity){
+        Map<String,Object> commercialJobs = new HashMap<>();
+        activity.getAttributes().getAsMap().entrySet().forEach(stringObjectEntry -> {
+            if(stringObjectEntry.getKey().startsWith(COMMERCIALJOB_ATTRIBUTE_NAME)) commercialJobs.put(stringObjectEntry.getKey(),stringObjectEntry.getValue());
+        });
+        return commercialJobs;
+    }
+
+    public static int getNumberOfJobsForActivity(Activity activity){
+        return getCommercialJobAttributes(activity).size();
+    }
+
 
     public static String getCarrierMarket(Id<Carrier> carrierId) {
         return carrierId.toString().split(CARRIERSPLIT)[0];
@@ -113,6 +147,19 @@ public class CommercialJobUtils {
             carriersSplitByMarket.put(market, carriersForMarket);
         }
         return carriersSplitByMarket;
+    }
+
+    private static Object getCommercialJob(Activity activity, int jobIndex){
+        return activity.getAttributes().getAttribute(COMMERCIALJOB_ATTRIBUTE_NAME + jobIndex);
+    }
+
+    private static String convertPropertiesArrayToAttributeValue(String[] jobProperties){
+        if (jobProperties.length != 6) throw new IllegalArgumentException("a commercialJob needs to have 6 properties");
+        String propertiesString = "";
+        for (String jobProperty : jobProperties) {
+            propertiesString += jobProperty + ";";
+        }
+        return propertiesString.substring(0,propertiesString.length() - 1 ); //cut off the last semicolon
     }
 
 }

@@ -55,22 +55,23 @@ public class ChangeDeliveryServiceOperator extends AbstractMultithreadedModule {
     @Override
     public PlanAlgorithm getPlanAlgoInstance() {
         return plan -> {
-            List<Activity> activitiesWithServices = new ArrayList<>();
-            plan.getPlanElements().stream().filter(Activity.class::isInstance).filter(a -> a.getAttributes().getAsMap().containsKey(CommercialJobUtils.JOB_TYPE)).forEach(planElement -> activitiesWithServices.add((Activity) planElement));
+            List<Activity> activitiesWithServices = new ArrayList<>(CommercialJobUtils.getActivitiesWithJobs(plan));
             if (activitiesWithServices.isEmpty()) {
                 return;
             }
-            int idx = random.nextInt(activitiesWithServices.size());
+            int randomActIdx = random.nextInt(activitiesWithServices.size());
 
-            Activity selectedActivity = activitiesWithServices.get(idx);
-            String deliveryType = CommercialJobUtils.getJobType(selectedActivity);
-            Set<Id<Carrier>> operators4Service = CommercialJobUtils.getOperatorsForJobType(carriers, deliveryType);
-            Id<Carrier> currentCarrier = CommercialJobUtils.getCarrierId(selectedActivity);
+            Activity selectedActivity = activitiesWithServices.get(randomActIdx);
+            int randomJobIdx = random.nextInt(CommercialJobUtils.getNumberOfJobsForActivity(selectedActivity));
+
+            String deliveryType = CommercialJobUtils.getJobType(selectedActivity,randomJobIdx);
+            Set<Id<Carrier>> operators4Service = CommercialJobUtils.getExistingOperatorsForJobType(carriers, deliveryType);
+            Id<Carrier> currentCarrier = CommercialJobUtils.getCurrentCarrierForJob(selectedActivity,randomJobIdx);
 
             if (operators4Service.remove(currentCarrier)) {
                 if (!operators4Service.isEmpty()) {
                     Id<Carrier> newCarrier = operators4Service.stream().skip(random.nextInt(operators4Service.size())).findFirst().orElse(currentCarrier);
-                    CommercialJobUtils.setJobOperatorAndJobType(selectedActivity, newCarrier);
+                    CommercialJobUtils.setJobOperator(selectedActivity,randomJobIdx,CommercialJobUtils.getCarrierOperator(newCarrier));
                 }
             } else
                 throw new RuntimeException(currentCarrier.toString() + " is not part of the service carriers for deliverytype " + deliveryType);

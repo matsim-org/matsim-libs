@@ -32,7 +32,7 @@ public class ChangeDeliveryServiceOperatorTest {
         Plan testPlan = scenario.getPopulation().getPersons().get(Id.createPersonId(1)).getSelectedPlan();
         Activity work = (Activity) testPlan.getPlanElements().get(2);
 
-        Id<Carrier> carrierId = CommercialJobUtils.getCarrierId(work);
+        Id<Carrier> carrierId = CommercialJobUtils.getCurrentCarrierForJob(work);
         Assert.assertEquals("the person should expect a salami","pizza", CommercialJobUtils.getCarrierMarket(carrierId));
         Assert.assertEquals("the person should expect a salami from operator 1","1", CommercialJobUtils.getCarrierOperator(carrierId));
 

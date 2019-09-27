@@ -23,7 +23,7 @@ package commercialtraffic.analysis;/*
 
 import com.google.inject.Inject;
 import commercialtraffic.commercialJob.CommercialJobUtils;
-import commercialtraffic.scoring.ScoreCommercialServices;
+import commercialtraffic.commercialJob.ScoreCommercialServices;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.matsim.api.core.v01.Id;

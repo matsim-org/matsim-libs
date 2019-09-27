@@ -18,10 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package commercialtraffic.integration;
+package commercialtraffic.commercialJob;
 
 
-import commercialtraffic.commercialJob.CommercialJobUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -38,7 +37,6 @@ import java.util.Map;
 
 public class CommercialTrafficChecker {
     private static final Logger log = Logger.getLogger(CommercialTrafficChecker.class);
-    private static final List<String> attributesToCheck = Arrays.asList(CommercialJobUtils.JOB_OPERATOR, CommercialJobUtils.JOB_DURATION, CommercialJobUtils.JOB_TIME_END, CommercialJobUtils.JOB_EARLIEST_START, CommercialJobUtils.JOB_SIZE);
 
     /**
      * @param population to check
@@ -48,11 +46,9 @@ public class CommercialTrafficChecker {
         final MutableBoolean fail = new MutableBoolean(false);
         for (Person p : population.getPersons().values()) {
             for (Plan plan : p.getPlans()) {
-                plan.getPlanElements().stream().filter(Activity.class::isInstance).filter(planElement -> planElement.getAttributes().getAsMap().containsKey(CommercialJobUtils.JOB_TYPE)).forEach(planElement -> {
-                    if (checkActivityConsistency((Activity) planElement, p.getId()) == true) {
-                        fail.setTrue();
+                    for(Activity activity : CommercialJobUtils.getActivitiesWithJobs(plan)) {
+                        if (checkActivityConsistency(activity, p.getId()) == true) fail.setTrue();
                     }
-                });
             }
         }
         return fail.booleanValue();
@@ -60,18 +56,19 @@ public class CommercialTrafficChecker {
 
     private static boolean checkActivityConsistency(Activity activity, Id<Person> pid) {
         boolean fail = false;
-        Map<String, Object> attributes = activity.getAttributes().getAsMap();
-        for (String attribute : attributesToCheck) {
-            if (!attributes.containsKey(attribute)) {
-                log.error("Person" + pid + " lacks " + attribute + " in Activity " + activity.getType());
+        Map<String, Object> attributes = CommercialJobUtils.getCommercialJobAttributes(activity);
+        for (String attribute : attributes.keySet()) {
+            String[] jobProperties = String.valueOf(attributes.get(attribute)).split(CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_DELIMITER);
+            if(jobProperties.length != 6){
+                log.error("Activity " + activity + " of person " + pid + " defines commercialJob attribute " + attribute + " with a wrong number of properties. Length should be 6");
                 fail = true;
             }
-        }
-        Double timeWindowStart = Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_EARLIEST_START)));
-        Double timeWindowEnd = Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_TIME_END)));
-        if (timeWindowEnd < timeWindowStart) {
-            log.error("Person " + pid + " has an error in timewindows in Activity " + activity.getType() + ". start=" + timeWindowStart + " end=" + timeWindowEnd);
-            fail = true;
+            Double timeWindowStart = Double.valueOf(jobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_START_IDX]);
+            Double timeWindowEnd = Double.valueOf(jobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_END_IDX]);
+            if (timeWindowEnd < timeWindowStart) {
+                log.error("Person " + pid + " has an error in properties of job attribute " + attribute + " in activity " + activity.getType() + ".TimeWindow: start=" + timeWindowStart + " end=" + timeWindowEnd);
+                fail = true;
+            }
         }
         return fail;
     }

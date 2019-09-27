@@ -1,4 +1,4 @@
-package commercialtraffic.scoring;
+package commercialtraffic.commercialJob;
 
 public interface DeliveryScoreCalculator {
 
