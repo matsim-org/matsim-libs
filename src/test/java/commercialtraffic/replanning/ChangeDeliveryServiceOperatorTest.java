@@ -38,12 +38,12 @@ public class ChangeDeliveryServiceOperatorTest {
 
         changeDeliveryServiceOperator.getPlanAlgoInstance().run(testPlan);
 
-        String operator = CommercialJobUtils.getServiceOperator(work);
+        String operator = CommercialJobUtils.getJobOperator(work);
         Assert.assertEquals("2", operator);
 
         changeDeliveryServiceOperator.getPlanAlgoInstance().run(testPlan);
 
-        operator = CommercialJobUtils.getServiceOperator(work);
+        operator = CommercialJobUtils.getJobOperator(work);
         Assert.assertEquals("1", operator);
 
     }

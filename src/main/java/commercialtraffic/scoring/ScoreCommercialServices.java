@@ -76,7 +76,7 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
         currentExpectedDeliveriesPerPerson.clear();
         Set<Plan> plans = population.getPersons().values().stream()
                 .map(p -> p.getSelectedPlan())
-                .filter(plan -> CommercialJobUtils.planExpectsDeliveries(plan)).collect(Collectors.toSet());
+                .filter(plan -> CommercialJobUtils.planExpectsCommercialJobs(plan)).collect(Collectors.toSet());
         for (Plan plan : plans) {
             Id<Person> personId = plan.getPerson().getId();
             plan.getPlanElements().stream().filter(Activity.class::isInstance).forEach(pe -> {

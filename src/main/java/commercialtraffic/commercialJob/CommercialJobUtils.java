@@ -49,35 +49,35 @@ public class CommercialJobUtils {
         return Id.create(activity.getAttributes().getAttribute(JOB_TYPE).toString() + CARRIERSPLIT + activity.getAttributes().getAttribute(CommercialJobUtils.JOB_OPERATOR).toString(), Carrier.class);
     }
 
-    public static String getServiceOperator(Activity activity) {
+    public static String getJobOperator(Activity activity) {
         return activity.getAttributes().getAttribute(JOB_OPERATOR).toString();
     }
 
-    public static void setServiceOperator(Activity activity, String operator) {
+    public static void setJobOperator(Activity activity, String operator) {
         activity.getAttributes().putAttribute(JOB_OPERATOR, operator);
     }
 
-    public static void setServiceOperatorAndDeliveryType(Activity activity, Id<Carrier> carrierId) {
+    public static void setJobOperatorAndJobType(Activity activity, Id<Carrier> carrierId) {
         String[] carrierString = carrierId.toString().split(CARRIERSPLIT);
-        setDeliveryType(activity, carrierString[0]);
-        setServiceOperator(activity, carrierString[1]);
+        setJobType(activity, carrierString[0]);
+        setJobOperator(activity, carrierString[1]);
 
 
     }
 
 
-    public static String getDeliveryType(Activity activity) {
+    public static String getJobType(Activity activity) {
         return (String) activity.getAttributes().getAttribute(JOB_TYPE);
     }
 
-    public static void setDeliveryType(Activity activity, String operator) {
+    public static void setJobType(Activity activity, String operator) {
         activity.getAttributes().putAttribute(JOB_TYPE, operator);
     }
 
-    public static Set<Id<Carrier>> getOperatorsForDeliveryType(Carriers carriers, String deliveryType) {
+    public static Set<Id<Carrier>> getOperatorsForJobType(Carriers carriers, String jobType) {
         return carriers.getCarriers().values().
                 stream().
-                filter(carrier -> carrier.getId().toString().startsWith(deliveryType)).map(Carrier::getId).
+                filter(carrier -> carrier.getId().toString().startsWith(jobType)).map(Carrier::getId).
                 collect(Collectors.toSet());
 
     }
@@ -86,10 +86,14 @@ public class CommercialJobUtils {
         return Id.create(personId.toString().split(CARRIERSPLIT)[1] + CARRIERSPLIT + personId.toString().split(CARRIERSPLIT)[2], Carrier.class);
     }
 
-    public static boolean planExpectsDeliveries(Plan plan) {
+    public static boolean planExpectsCommercialJobs(Plan plan) {
         return plan.getPlanElements().stream()
                 .filter(Activity.class::isInstance)
                 .anyMatch(planElement -> planElement.getAttributes().getAsMap().containsKey(JOB_TYPE));
+    }
+
+    static boolean activityExpectsCommercialJobs(Activity activity){
+        return activity.getAttributes().getAsMap().containsKey(JOB_TYPE);
     }
 
     public static String getCarrierMarket(Id<Carrier> carrierId) {

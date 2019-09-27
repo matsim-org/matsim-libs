@@ -63,14 +63,14 @@ public class ChangeDeliveryServiceOperator extends AbstractMultithreadedModule {
             int idx = random.nextInt(activitiesWithServices.size());
 
             Activity selectedActivity = activitiesWithServices.get(idx);
-            String deliveryType = CommercialJobUtils.getDeliveryType(selectedActivity);
-            Set<Id<Carrier>> operators4Service = CommercialJobUtils.getOperatorsForDeliveryType(carriers, deliveryType);
+            String deliveryType = CommercialJobUtils.getJobType(selectedActivity);
+            Set<Id<Carrier>> operators4Service = CommercialJobUtils.getOperatorsForJobType(carriers, deliveryType);
             Id<Carrier> currentCarrier = CommercialJobUtils.getCarrierId(selectedActivity);
 
             if (operators4Service.remove(currentCarrier)) {
                 if (!operators4Service.isEmpty()) {
                     Id<Carrier> newCarrier = operators4Service.stream().skip(random.nextInt(operators4Service.size())).findFirst().orElse(currentCarrier);
-                    CommercialJobUtils.setServiceOperatorAndDeliveryType(selectedActivity, newCarrier);
+                    CommercialJobUtils.setJobOperatorAndJobType(selectedActivity, newCarrier);
                 }
             } else
                 throw new RuntimeException(currentCarrier.toString() + " is not part of the service carriers for deliverytype " + deliveryType);
