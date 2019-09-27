@@ -40,13 +40,11 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ScoreCommercialServices implements ActivityStartEventHandler, ActivityEndEventHandler {
-
+public class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityEndEventHandler {
 
     private final Population population;
 
-
-    private final DeliveryScoreCalculator scoreCalculator;
+    private final CommercialJobScoreCalculator scoreCalculator;
     private final EventsManager eventsManager;
 
     private final Set<Id<Person>> activeDeliveryAgents = new HashSet<>();
@@ -54,7 +52,7 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
     private final List<DeliveryLogEntry> logEntries = new ArrayList<>();
 
     @Inject
-    public ScoreCommercialServices(Population population, DeliveryScoreCalculator scoreCalculator, EventsManager eventsManager) {
+    public ScoreCommercialJobs(Population population, CommercialJobScoreCalculator scoreCalculator, EventsManager eventsManager) {
         this.population = population;
         this.scoreCalculator = scoreCalculator;
         this.eventsManager = eventsManager;
