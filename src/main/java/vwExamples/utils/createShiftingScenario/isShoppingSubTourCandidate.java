@@ -38,7 +38,7 @@ public class isShoppingSubTourCandidate implements SubTourValidator {
 //			return true;
 //		}
 		
-		if (isWithinCityShoppingTour(subTour)) {
+		if (isWithinRegionShoppingTour(subTour)) {
 	
 			return true;
 		}
@@ -85,6 +85,15 @@ public class isShoppingSubTourCandidate implements SubTourValidator {
 		return false;
 
 	}
+	
+	public boolean isWithinRegionShoppingTour(Subtour subTour) {
+
+		if (shopInRegion(subTour) && livesInside(subTour)) {
+			return true;
+		}
+		return false;
+
+	}
 
 	public boolean shopInside(Subtour subTour) {
 
@@ -97,6 +106,28 @@ public class isShoppingSubTourCandidate implements SubTourValidator {
 				Coord coord = fromLink.getCoord();
 				// If work is inside zoneMap return true
 				if (isWithinZone(coord)) {
+					return true;
+				}
+
+			}
+
+		}
+
+		return false;
+
+	}
+	
+	public boolean shopInRegion(Subtour subTour) {
+
+		for (Trip trip : subTour.getTrips()) {
+			String ActBefore = trip.getOriginActivity().getType();
+
+			if (ActBefore.contains("shopping")) {
+				Link fromLink = network.getLinks().get(trip.getOriginActivity().getLinkId());
+
+				Coord coord = fromLink.getCoord();
+				// If work is inside zoneMap return true
+				if (isWithinRegion(coord)) {
 					return true;
 				}
 
@@ -188,5 +219,22 @@ public class isShoppingSubTourCandidate implements SubTourValidator {
 
 		return false;
 	}
+	
+	public boolean isWithinRegion(Coord coord) {
+		// Function assumes Shapes are in the same coordinate system like MATSim
+		// simulation
+
+		for (String zone : serviceAreazonesMap.keySet()) {
+			Geometry geometry = serviceAreazonesMap.get(zone);
+			if (geometry.intersects(MGC.coord2Point(coord))) {
+				// System.out.println("Coordinate in "+ zone);
+				return true;
+			}
+		}
+
+		return false;
+	}
+	
+	
 
 }

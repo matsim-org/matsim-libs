@@ -18,22 +18,24 @@ import com.opencsv.CSVReader;
 
 public class CommercialTripsReader {
 	List<String[]> rawTripList;
-	String csvTripFile;
+	String csvTripFolder;
 	public Map<String, List<CommercialTrip>> commercialTripMap;
 	Map<String, List<Double>> ServiceType2ServiceDurationsMap;
 	public File[] files;
+	public File[] tripFiles;
 	String serviceTimeDistInputPath;
 	Random r = MatsimRandom.getRandom();
 	long nr = 1896;
 	Double filterFactor = null;
 	public Map<String, Set<Integer>> vehBlackListIds;
 
-	public CommercialTripsReader(String csvTripFile, String serviceTimeDistInputPath, double filterFactor) {
-		this.csvTripFile = csvTripFile;
+	public CommercialTripsReader(String csvTripFolder, String serviceTimeDistInputPath, double filterFactor) {
+		this.csvTripFolder = csvTripFolder;
 		this.rawTripList = new ArrayList<String[]>();
 		this.commercialTripMap = new HashMap<String, List<CommercialTrip>>();
 		this.ServiceType2ServiceDurationsMap = new HashMap<String, List<Double>>();
 		this.files = new File(serviceTimeDistInputPath).listFiles();
+		this.tripFiles = new File(csvTripFolder).listFiles();
 		this.serviceTimeDistInputPath = serviceTimeDistInputPath;
 		this.filterFactor = filterFactor;
 		this.vehBlackListIds = new HashMap<String, Set<Integer>>();
@@ -97,6 +99,10 @@ public class CommercialTripsReader {
 	}
 
 	public double getRandomServiceDurationPerType(String serviceType) {
+		
+//		if (serviceType=="KEP") {
+//			return 1;
+//		}
 
 		int randromIdx = r.nextInt(ServiceType2ServiceDurationsMap.get(serviceType).size());
 
@@ -291,8 +297,10 @@ public class CommercialTripsReader {
 		// "EPSG:25832");
 
 		CSVReader reader = null;
+		for (File csvTripFile:tripFiles) {
 		try {
-			reader = new CSVReader(new FileReader(this.csvTripFile));
+			
+			reader = new CSVReader(new FileReader(csvTripFile));
 			rawTripList = reader.readAll();
 			for (int i = 1; i < rawTripList.size(); i++) {
 				String[] lineContents = rawTripList.get(i);
@@ -342,6 +350,7 @@ public class CommercialTripsReader {
 					e.printStackTrace();
 				}
 			}
+		}
 		}
 
 	}

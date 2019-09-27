@@ -42,7 +42,7 @@ public class AssignService {
 	// !!!!! Important !!!!!
 	// SET MAX SERVICES PER ACTIVITY
 	// !!!!! Important !!!!!
-	int maxServicesPerAct = 3;
+	int maxServicesPerAct = 4;
 
 	// !!!!! Filter CT Trips !!!!!
 	Double filterFactor = 0.1;
@@ -52,7 +52,8 @@ public class AssignService {
 	String addCompanyFolder;
 
 	Set<String> acceptedMainModes = new HashSet<>(
-			Arrays.asList("car", "pt", "drt", "walk", "ride", "bike", "stayHome", "preventedShoppingTrip"));
+			Arrays.asList("car", "pt", "drt", "walk", "ride", "bike", "stayHome", ""
+					+ ""));
 	Set<String> additionalLegModes = new HashSet<>(Arrays.asList("stayHome", "preventedShoppingTrip"));
 
 	Set<String> acceptedActivities = new HashSet<>(
@@ -66,7 +67,7 @@ public class AssignService {
 	String zoneSHP;
 	String outputpath;
 	DemandGenerator demand;
-	String commercialTripsFile;
+	String commercialTripsFolder;
 	String serviceDurationDistPath;
 	String networkFile;
 	String matsimInput;
@@ -76,28 +77,28 @@ public class AssignService {
 	MutableInt jobIdCounter = new MutableInt(0);
 	MutableInt eGroceryJobIdCounter = new MutableInt(0);
 	CompanyGenerator companyGenerator;
-	String comercialVehicleCSV;
+	String comercialVehicleFolder;
 	long nr = 1896;
 	Random r = MatsimRandom.getRandom();
 
-	AssignService(String plansFile, String addCompanyFolder, String commercialTripsFile, String comercialVehicleCSV,
+	AssignService(String plansFile, String addCompanyFolder, String commercialTripsFolder, String comercialVehicleFolder,
 			String networkFile, String serviceDurationDistPath, String companyFolder, String zoneSHP,
 			String matsimInput, String outputpath) {
 		this.outputpath = outputpath;
 		this.addCompanyFolder = addCompanyFolder;
-		this.comercialVehicleCSV = comercialVehicleCSV;
+		this.comercialVehicleFolder = comercialVehicleFolder;
 		this.networkFile = networkFile;
 		this.matsimInput = matsimInput;
 		new PopulationReader(scenario).readFile(plansFile);
 		r.setSeed(nr);
-		commercialTripReader = new CommercialTripsReader(commercialTripsFile, serviceDurationDistPath, filterFactor);
+		commercialTripReader = new CommercialTripsReader(commercialTripsFolder, serviceDurationDistPath, filterFactor);
 		commercialTripReader.run();
 
 		demand = new DemandGenerator(companyFolder, zoneSHP, outputpath);
 		demand.findNeighbourZones();
 
 		// companyGenerator is required in order to construct carriers with services
-		this.companyGenerator = new CompanyGenerator(comercialVehicleCSV, addCompanyFolder, commercialTripsFile,
+		this.companyGenerator = new CompanyGenerator(comercialVehicleFolder, addCompanyFolder, commercialTripsFolder,
 				serviceDurationDistPath, networkFile, companyFolder, zoneSHP, outputpath, matsimInput + "Carrier\\",
 				commercialTripReader.vehBlackListIds);
 		this.companyGenerator.initalize();
@@ -117,10 +118,10 @@ public class AssignService {
 	public static void main(String[] args) {
 
 		AssignService assignData = new AssignService(
-				"D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\vw243_0.1_EGrocery0.1_shops\\vw243_0.1_EGrocery0.1_input.xml.gz",
-				"D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\EGrocery\\Shops",
-				"D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\wege.csv",
-				"D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\fahrzeuge.csv",
+				"D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\vw272_0.1_CT_0.1\\vw272.0.1.output_plans.xml.gz",
+				"D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\EGrocery\\Fullfillment\\",
+				"D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\Trips\\",
+				"D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\Vehicles\\",
 				"D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Network\\00_Final_Network\\network_editedPt.xml.gz",
 				"D:\\Thiel\\Programme\\WVModell\\ServiceDurCalc\\Distributions\\",
 				"D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\Unternehmen\\",
@@ -131,8 +132,8 @@ public class AssignService {
 		assignData.initializeActCandidateMap();
 
 		assignData.findCandidates();
-		assignData.addCustomServices();
-		// assignData.manipulatePopulationAndCreateServices();
+		//assignData.addCustomServices();
+		assignData.manipulatePopulationAndCreateServices();
 		assignData.writeCustomerDemand();
 		assignData.writePopulation();
 		assignData.companyGenerator.writeCarriers();
@@ -176,7 +177,7 @@ public class AssignService {
 							if (result != null && !(serviceCounter > maxServicePerPerson)) {
 								double endTime = result.getRight();
 								double startTime = result.getMiddle();
-								int capacity = Math.max(1, (r.nextInt(16)));
+								int capacity = Math.max(5, (r.nextInt(16)));
 								int rdmIdx = r.nextInt(grocCompkeys.size());
 								companyGenerator.commercialCompanyMap.get(grocCompkeys.get(rdmIdx))
 										.addGroceryService(serviceId, linkId, startTime, endTime, capacity);
@@ -218,6 +219,7 @@ public class AssignService {
 				}
 
 				double serviceDuration = this.commercialTripReader.getRandomServiceDurationPerType(serviceType);
+				
 
 				Job finalJob = getActivityCandiate(serviceType, customerRelation, zone, serviceDuration, carrierId);
 
@@ -267,7 +269,7 @@ public class AssignService {
 	public Job getActivityCandiate(String serviceType, String customerRelation, String zone, double serviceDuration,
 			String carrierId) {
 
-		int maxCheckedZones = 4;
+		int maxCheckedZones = 5;
 		int checkedZonesCounter = 0;
 
 		List<String> neighbourZoneList = demand.neighbourMap.get(zone);
@@ -572,6 +574,9 @@ public class AssignService {
 
 		Set<String> VTypeSet_B2B = new HashSet<String>();
 		VTypeSet_B2B.add("work");
+		
+		Set<String> KEPTypeSet_B2B = new HashSet<String>();
+		KEPTypeSet_B2B.add("work");
 
 		////// B2C Type Set
 		// ################################################################################
@@ -640,6 +645,9 @@ public class AssignService {
 
 		Set<String> VTypeSet_B2C = new HashSet<String>();
 		VTypeSet_B2C.add("home");
+		
+		Set<String> KEPTypeSet_B2C = new HashSet<String>();
+		KEPTypeSet_B2C.add("home");
 
 		Set<Id<Person>> potentialPersons = new HashSet<>();
 		potentialPersons.addAll(population.getPersons().keySet());
@@ -855,6 +863,14 @@ public class AssignService {
 						if (isServiceTypeV_B2B) {
 							FillServiceMap("V", "B2B", zone, person.getId(), peIdx);
 						}
+						
+						// Service Type KEP
+						ActivityChecker ServiceTypeKEP_B2B_Checker = new ActivityChecker(activity, KEPTypeSet_B2B,
+								actInterval, null);
+						boolean isServiceTypeKEP_B2B = ServiceTypeKEP_B2B_Checker.proof();
+						if (isServiceTypeKEP_B2B) {
+							FillServiceMap("KEP", "B2B", zone, person.getId(), peIdx);
+						}
 
 						//
 						// #######################################################################################
@@ -1032,6 +1048,13 @@ public class AssignService {
 						boolean isServiceTypeV_B2C = ServiceTypeV_B2C_Checker.proof();
 						if (isServiceTypeV_B2C) {
 							FillServiceMap("V", "B2C", zone, person.getId(), peIdx);
+						}
+						
+						ActivityChecker ServiceTypeKEP_B2C_Checker = new ActivityChecker(activity, KEPTypeSet_B2C,
+								actInterval, null);
+						boolean isServiceTypeKEP_B2C = ServiceTypeKEP_B2C_Checker.proof();
+						if (isServiceTypeKEP_B2C) {
+							FillServiceMap("KEP", "B2C", zone, person.getId(), peIdx);
 						}
 
 						//

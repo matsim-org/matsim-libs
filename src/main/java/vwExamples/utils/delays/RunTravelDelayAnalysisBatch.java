@@ -73,7 +73,7 @@ public class RunTravelDelayAnalysisBatch {
 	static Map<String, Geometry> zoneMap = new HashMap<>();
 	static Geometry boundary;
 	static Set<String> zones = new HashSet<>();
-	static String shapeFile = "D:\\\\Matsim\\\\Axer\\\\Hannover\\\\ZIM\\\\input\\\\shp\\\\Hannover_Stadtteile.shp";
+	static String shapeFile = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Cemdap\\add_data\\shp\\Hannover_Stadtteile.shp";
 	static String shapeFeature = "NO";
 	static List<Geometry> districtGeometryList = new ArrayList<Geometry>();
 	static GeometryFactory geomfactory = JTSFactoryFinder.getGeometryFactory(null);
@@ -82,7 +82,7 @@ public class RunTravelDelayAnalysisBatch {
 
 	public static void main(String[] args) {
 
-		String runDir = "D:\\Matsim\\Axer\\Hannover\\ZIM\\output\\";
+		String runDir = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\";
 		// String runId = "vw219_netnet150_veh_idx0.";
 
 		readShape(shapeFile, shapeFeature);
@@ -107,9 +107,11 @@ public class RunTravelDelayAnalysisBatch {
 //			scenarioToBeAnalyzed.add("vw251.1.0");
 //			scenarioToBeAnalyzed.add("vw243_CityDRT_10pct_0.1300_veh_idx0");
 //			scenarioToBeAnalyzed.add("vw243_CityDRT_10pct_0.05300_veh_idx0");
-			scenarioToBeAnalyzed.add("vw243_CityDRT_10pct_0.1350_veh_idx0");
-			
-			
+//			scenarioToBeAnalyzed.add("vw243_CityDRT_10pct_0.1350_veh_idx0");
+//			scenarioToBeAnalyzed.add("vw243_0.1_EGrocery0.4_fulfillment.0.1");
+//			scenarioToBeAnalyzed.add("vw243_0.1_EGrocery0.3_fulfillment.0.1");
+//			scenarioToBeAnalyzed.add("vw243_0.1_EGrocery0.5_fulfillment.0.1");
+			scenarioToBeAnalyzed.add("vw243_cadON_ptSpeedAdj.0.1");
 //			
 			
 

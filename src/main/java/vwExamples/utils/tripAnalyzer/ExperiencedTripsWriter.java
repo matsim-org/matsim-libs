@@ -30,6 +30,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -204,8 +205,6 @@ public class ExperiencedTripsWriter {
 				// network.getLinks().get(trip.getToLinkId()).getCoord());
 				double totalDrivenTripDist = 0.0;
 
-				
-				
 				for (ExperiencedLeg leg : trip.getLegs()) {
 
 					List<Id<Link>> routeList = leg.getRouteListe();
@@ -213,7 +212,6 @@ public class ExperiencedTripsWriter {
 					totalDrivenTripDist = totalDrivenTripDist + getRouteDistance(routeList);
 
 				}
-				
 
 				// In case of beeline modes there will be no in vehicle mileage
 				// Extract part pf the beeline that is within the research boundary
@@ -418,12 +416,12 @@ public class ExperiencedTripsWriter {
 			{
 
 				for (ExperiencedTrip trip : triplist) {
-					
-//					if(trip.getAgent().toString().contains("freight"))
-//					{
-//						System.out.println(trip.getAgent());
-//					}
-					
+
+					// if(trip.getAgent().toString().contains("freight"))
+					// {
+					// System.out.println(trip.getAgent());
+					// }
+
 					if (tripWithinCity(trip)) {
 						String mainMode = trip.getMainMode();
 						String storeMode = null;
@@ -843,10 +841,10 @@ public class ExperiencedTripsWriter {
 	private void tourIdentifier() {
 		System.out.println("Working Tour Identification");
 		String tourMatchKey = "home";
-		HashSet<String> commercialTrafficActs = new  HashSet<String>();
+		HashSet<String> commercialTrafficActs = new HashSet<String>();
 		commercialTrafficActs.add("start");
 		commercialTrafficActs.add("end");
-				
+
 		// int checkedToursCounter = 0;
 
 		int realNumberTripStored = 0;
@@ -855,60 +853,69 @@ public class ExperiencedTripsWriter {
 		for (Entry<Id<Person>, List<ExperiencedTrip>> tripsPerPersonEntry : agent2trips.entrySet()) {
 
 			Id<Person> PersonId = tripsPerPersonEntry.getKey();
-						
+
 			List<ExperiencedTrip> tripList = tripsPerPersonEntry.getValue();
-
-			totalNumberTripToBeStored = totalNumberTripToBeStored + tripList.size();
-
-			List<ExperiencedTrip> tripsWithinTour = new ArrayList<ExperiencedTrip>();
-
-			for (ExperiencedTrip trip : tripList) {
-
-				String actAfter = trip.getActivityAfter();
-				
-				if (commercialTrafficActs.contains(actAfter))
-				{
-					Logger.getLogger(ExperiencedTripsWriter.class).warn("REWRITE FREIGHT ACTS");
-					actAfter = tourMatchKey;
-				}
-						
-				
-				// trip.setSubTourNr(subtourIdent);
-				tripsWithinTour.add(trip);
-
-				if (actAfter.contains(tourMatchKey)) {
-					// subtourIdent++;
-					// Create new List of ExperiencedTrip --> Tour
-					// Save this tour
-					// Clear the tripsWithinTour
-					List<ExperiencedTrip> saveTripsWithinTour = new ArrayList<ExperiencedTrip>();
-					saveTripsWithinTour.addAll(tripsWithinTour);
-
-					// if(tourId2trips.containsKey(TourId))
-					// {
-					// System.out.println("BUG Double tourId!");
-					// }
-					subtourIdent.increment();
-					String TourId = tripsPerPersonEntry.getKey().toString() + "_" + subtourIdent;
-					tourId2trips.put(TourId, saveTripsWithinTour);
-					realNumberTripStored = realNumberTripStored + saveTripsWithinTour.size();
-
-					// checkedToursCounter++;
-					tripsWithinTour.clear();
-
-				}
-				// System.out.println("Trip sorted into tour: "+realNumberTripStored +" || all
-				// trips: "+totalNumberTripToBeStored );
+			
+			if(PersonId.toString().contains("42_na_109031101"))
+			{
+				int bla=9;
+				boolean demo = proveTimeConsitency(tripList);
 			}
 
-			// if (tripsWithinTour.size()>0)
-			// {
-			// System.out.println("Agent did not reach home!");
-			//
-			// }
+			if (proveTimeConsitency(tripList)) {
 
+				totalNumberTripToBeStored = totalNumberTripToBeStored + tripList.size();
+
+				List<ExperiencedTrip> tripsWithinTour = new ArrayList<ExperiencedTrip>();
+
+				for (ExperiencedTrip trip : tripList) {
+
+					String actAfter = trip.getActivityAfter();
+
+					if (commercialTrafficActs.contains(actAfter)) {
+						Logger.getLogger(ExperiencedTripsWriter.class).warn("REWRITE FREIGHT ACTS");
+						actAfter = tourMatchKey;
+					}
+
+					// trip.setSubTourNr(subtourIdent);
+					tripsWithinTour.add(trip);
+
+					if (actAfter.contains(tourMatchKey)) {
+						// subtourIdent++;
+						// Create new List of ExperiencedTrip --> Tour
+						// Save this tour
+						// Clear the tripsWithinTour
+						List<ExperiencedTrip> saveTripsWithinTour = new ArrayList<ExperiencedTrip>();
+						saveTripsWithinTour.addAll(tripsWithinTour);
+
+						// if(tourId2trips.containsKey(TourId))
+						// {
+						// System.out.println("BUG Double tourId!");
+						// }
+						subtourIdent.increment();
+						String TourId = tripsPerPersonEntry.getKey().toString() + "_" + subtourIdent;
+						tourId2trips.put(TourId, saveTripsWithinTour);
+						realNumberTripStored = realNumberTripStored + saveTripsWithinTour.size();
+
+						// checkedToursCounter++;
+						tripsWithinTour.clear();
+
+					}
+					// System.out.println("Trip sorted into tour: "+realNumberTripStored +" || all
+					// trips: "+totalNumberTripToBeStored );
+				}
+
+				// if (tripsWithinTour.size()>0)
+				// {
+				// System.out.println("Agent did not reach home!");
+				//
+				// }
+
+			} else {
+				Logger.getLogger(ExperiencedTripsWriter.class)
+						.warn("Agent with time consitency bug: " + PersonId.toString());
+			}
 		}
-
 		// System.out.print("Seen Tours #" + checkedToursCounter + "\n");
 
 	}
@@ -1001,6 +1008,48 @@ public class ExperiencedTripsWriter {
 
 	}
 
+	ExperiencedTrip getPrevCarTrip(List<ExperiencedTrip> triplist, int actualTripIdx) {
+
+		// j counts the number of backward steps
+		for (int j = 1; j < triplist.size(); j++) {
+
+			// Is the index in the list which we will check now
+			int backwardPointer = (actualTripIdx - j);
+			if (backwardPointer < 0) {
+				backwardPointer = backwardPointer + triplist.size();
+			}
+
+			// System.out.println("ActualIdx: " + actualTripIdx + "Backward Pointer: " +
+			// backwardPointer);
+			ExperiencedTrip candidate = triplist.get(backwardPointer);
+
+			if (candidate.getMainMode().equals(TransportMode.car)) {
+				return candidate;
+			}
+
+		}
+
+		System.out.print("No prev car trip found!");
+		return null;
+
+	}
+
+	public boolean proveTimeConsitency(List<ExperiencedTrip> tripList) {
+
+		double actualTripStartTime = 0;
+		for (ExperiencedTrip trip : tripList) {
+			if (trip.getStartTime() > actualTripStartTime) {
+				actualTripStartTime = trip.getStartTime();
+			} else {
+				return false;
+			}
+
+		}
+
+		return true;
+
+	}
+
 	public void getParkingTimes() {
 		System.out.println("Working on Parking Data");
 
@@ -1016,10 +1065,15 @@ public class ExperiencedTripsWriter {
 
 				if (mainMode.equals(TransportMode.car)) {
 
-					int pointer = mod((i - 1), nrOfTrips);
+					// int pointer = mod((i - 1), nrOfTrips);
+
+					ExperiencedTrip prevCarTrip = getPrevCarTrip(triplist, i);
+
 					double endOfParking = trip.getStartTime(); // trip start time == act end time
 					Coord coord = network.getLinks().get(trip.getFromLinkId()).getCoord();
-					double startOfParking = triplist.get(pointer).getEndTime(); // trip end time == act start time
+					// double startOfParking = triplist.get(pointer).getEndTime(); // trip end time
+					// == act start time
+					double startOfParking = prevCarTrip.getEndTime();
 					double activityDuration = Math.abs(endOfParking - startOfParking);
 					String parkingZone = identParkingZone(coord);
 
@@ -1045,11 +1099,11 @@ public class ExperiencedTripsWriter {
 									.add(new ParkingEvent(startOfParking, endOfParking, personId, coord, parkingZone));
 						}
 
-					}else if (activityDuration < 0)
-					{
-						Logger.getLogger(ExperiencedTripsWriter.class).warn("Person "+ personId + " Act Start < Act End:" +" duration "+ activityDuration);
+					} else if (activityDuration < 0) {
+						Logger.getLogger(ExperiencedTripsWriter.class)
+								.warn("Person " + personId + " Act Start < Act End:" + " duration " + activityDuration);
 					}
-					
+
 				}
 
 				i++;

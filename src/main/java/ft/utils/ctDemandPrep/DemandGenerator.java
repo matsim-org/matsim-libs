@@ -230,7 +230,7 @@ public class DemandGenerator {
 	public void initializeZone2CompanyClassCounterMap() {
 
 		Set<String> uniqueClasses = new HashSet<String>(Arrays.asList("allCompanies", "A", "B", "C", "D", "E", "F", "G",
-				"H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U"));
+				"H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U","KEP"));
 
 		// for (Demand4CompanyClass demandPerFile : demand4CompanyClass2List) {
 		// uniqueClasses.add(demandPerFile.getCompanyClass());

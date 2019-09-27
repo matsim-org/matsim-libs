@@ -52,7 +52,7 @@ public class RunExperiencedTripsAnalysisBatch {
 
 	static Map<String, Geometry> zoneMap = new HashMap<>();
 	static Set<String> zones = new HashSet<>();
-	static String shapeFile = "D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\Zellen\\Stadtteile\\Hannover_Stadtteile_25832.shp";
+	static String shapeFile = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Cemdap\\add_data\\shp\\Hannover_Stadtteile.shp";
 	static String shapeFeature = "NO";
 
 	public static void main(String[] args) {
@@ -86,6 +86,9 @@ public class RunExperiencedTripsAnalysisBatch {
 //			scenarioToBeAnalyzed.add("CT_243_noJsprit.0.1");
 //			scenarioToBeAnalyzed.add("vw243_0.1_EGrocery0.1.0.1");
 //			scenarioToBeAnalyzed.add("vw243_0.1_EGrocery0.1_shops.0.1");
+//			scenarioToBeAnalyzed.add("vw243_0.1_EGrocery0.4_fulfillment.0.1");
+//			scenarioToBeAnalyzed.add("vw243_0.1_EGrocery0.3_fulfillment.0.1");
+//			scenarioToBeAnalyzed.add("vw243_0.1_EGrocery0.5_fulfillment.0.1");
 			
 			
 			
