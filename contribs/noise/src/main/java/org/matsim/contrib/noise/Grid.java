@@ -54,7 +54,9 @@ import org.matsim.pt.PtConstants;
 final class Grid {
 	
 	private static final Logger log = Logger.getLogger(Grid.class);
-			
+
+	public static final String NOISE_RECEIVER_POINTS = "noiseReceiverPoints";
+
 	private final Scenario scenario;
 	private final NoiseConfigGroup noiseParams;
 		
@@ -99,8 +101,11 @@ final class Grid {
 
 	private void initialize() {
 		setActivityCoords();
-		
-		if (this.noiseParams.getReceiverPointsCSVFile() == null) {
+
+		if(scenario.getScenarioElement(NOISE_RECEIVER_POINTS) != null) {
+			log.info("Loading receiver points based on provided coordinates.");
+			loadGridFromScenario();
+		} else if (this.noiseParams.getReceiverPointsCSVFile() == null) {
 			log.info("Creating receiver point square grid...");
 			createGrid();
 		} else {
@@ -114,6 +119,7 @@ final class Grid {
 		this.consideredActivityCoordsForReceiverPointGrid.clear();
 		this.consideredActivityCoordsForSpatialFunctionality.clear();
 	}
+
 
 	private void setActivityCoords () {
 		StageActivityTypes stages = new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE);
@@ -157,6 +163,18 @@ final class Grid {
 			e.printStackTrace();
 		}
 		
+		log.info("Total number of receiver points: " + receiverPoints.size());
+	}
+
+	private void loadGridFromScenario() {
+		Object rps = scenario.getScenarioElement(NOISE_RECEIVER_POINTS);
+		if(rps instanceof List) {
+			for(Object rp: ((List) rps)) {
+				if(rp instanceof ReceiverPoint) {
+					receiverPoints.put(((ReceiverPoint) rp).getId(), (ReceiverPoint) rp);
+				}
+			}
+		}
 		log.info("Total number of receiver points: " + receiverPoints.size());
 	}
 
