@@ -83,9 +83,6 @@ public class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsim
         this.scenario = scenario;
         this.population = scenario.getPopulation();
         carTT = travelTimes.get(TransportMode.car);
-        if (CommercialTrafficChecker.checkPopulationAttributesConsistency(population)) {
-            throw new RuntimeException("There is a problem with commercial job attributes in the plan file. Please check the log for CommercialTrafficChecker. Aborting.");
-        }
         getDrtModes(scenario.getConfig());
     }
 
@@ -107,9 +104,7 @@ public class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsim
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
         carriers.getCarriers().values().forEach(carrier -> carrier.getServices().clear());
 
-        CommercialTrafficChecker.checkPopulationAttributesConsistency(population);
-        CommercialTrafficChecker.checkCarrierConsistency(carriers);
-
+        CommercialTrafficChecker.run(population,carriers);
         generateIterationServices();
         buildTours();
         createFreightAgents();

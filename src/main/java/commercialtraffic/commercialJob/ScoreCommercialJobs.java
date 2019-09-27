@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
@@ -69,11 +70,11 @@ public class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityE
     }
 
 
-    public void prepareTourArrivalsForDay() {
+    private void prepareTourArrivalsForDay() {
         currentExpectedDeliveriesPerPerson.clear();
         Set<Plan> plans = population.getPersons().values().stream()
-                .map(p -> p.getSelectedPlan())
-                .filter(plan -> CommercialJobUtils.planExpectsCommercialJobs(plan)).collect(Collectors.toSet());
+                .map(HasPlansAndId::getSelectedPlan)
+                .filter(CommercialJobUtils::planExpectsCommercialJobs).collect(Collectors.toSet());
         for (Plan plan : plans) {
             Id<Person> personId = plan.getPerson().getId();
             CommercialJobUtils.getActivitiesWithJobs(plan).forEach(activity -> {
@@ -81,15 +82,15 @@ public class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityE
                 Map<String,Object> commercialJobAttributes = CommercialJobUtils.getCommercialJobAttributes(activity);
                 for (String commercialJobAttributeKey : commercialJobAttributes.keySet()) {
                     String[] jobProperties = String.valueOf(commercialJobAttributes.get(commercialJobAttributeKey)).split(CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_DELIMITER);
-                    int jobIdx = Integer.valueOf(commercialJobAttributeKey.substring(CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_NAME.length()));
+                    int jobIdx = Integer.parseInt(commercialJobAttributeKey.substring(CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_NAME.length()));
 
                     ExpectedDelivery expectedDelivery = new ExpectedDelivery(jobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_TYPE_IDX]
                             , CommercialJobUtils.getCurrentCarrierForJob(activity,jobIdx)
                             , plan.getPerson().getId()
                             , activity.getLinkId()
-                            , Double.valueOf(jobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_DURATION_IDX])
-                            , Double.valueOf(jobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_START_IDX])
-                            , Double.valueOf(jobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_END_IDX]));
+                            , Double.parseDouble(jobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_DURATION_IDX])
+                            , Double.parseDouble(jobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_START_IDX])
+                            , Double.parseDouble(jobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_END_IDX]));
                     Set<ExpectedDelivery> set = currentExpectedDeliveriesPerPerson.getOrDefault(personId, new HashSet<>());
                     if (!set.add(expectedDelivery))
                         throw new IllegalArgumentException("person " + personId + " expects two identical deliveries for activity\n"
@@ -230,7 +231,7 @@ public class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityE
         private final double timeDifference;
         private final Id<Person> driverId;
 
-        public DeliveryLogEntry(Id<Person> personId, Id<Carrier> carrierId, double time, double score, Id<Link> linkId, double timeDifference, Id<Person> driverId) {
+        DeliveryLogEntry(Id<Person> personId, Id<Carrier> carrierId, double time, double score, Id<Link> linkId, double timeDifference, Id<Person> driverId) {
             this.personId = personId;
             this.carrierId = carrierId;
             this.time = time;

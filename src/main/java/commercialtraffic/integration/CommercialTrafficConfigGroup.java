@@ -37,28 +37,28 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     @NotBlank
     private String carriersFile;
     public static final String CARRIERSFILEDE = "carriersFile";
-    public static final String CARRIERSFILEDESC = "Freight Carriers File, according to MATSim freight contrib";
+    private static final String CARRIERSFILEDESC = "Freight Carriers File, according to MATSim freight contrib";
 
 
     @NotBlank
     private String carriersVehicleTypesFile;
     public static final String CARRIERSVEHICLETYPED = "carriersVehicleTypeFile";
-    public static final String CARRIERSVEHICLETYPEDESC = "Carrier Vehicle Types file, according to MATSim freight contrib";
+    private static final String CARRIERSVEHICLETYPEDESC = "Carrier Vehicle Types file, according to MATSim freight contrib";
 
     @Positive
     private double firstLegTraveltimeBufferFactor = 2.0;
     public static final String FIRSTLEGBUFFER = "firstLegBufferFactor";
-    public static final String FIRSTLEGBUFFERDESC = "Buffer travel time factor for the first leg of a freight tour.";
+    private static final String FIRSTLEGBUFFERDESC = "Buffer travel time factor for the first leg of a freight tour.";
 
     private boolean runTourPlanning = true;
     public  static final String RUNJSPRIT = "runTourPlanning";
-    public static final String RUNJSPRITDESC = "Defines whether JSprit is run. " +
+    private static final String RUNJSPRITDESC = "Defines whether JSprit is run. " +
             "If this is set to false, ChangeDeliveryOperator strategy must not be switched on and all carriers need to have at least one plan containing at least one tour.";
 
     @Positive
     private int jSpritTimeSliceWidth = 1800;
     public static final String JSPRITTIMESLICEWIDTH = "jSpritTimeSliceWidth";
-    public static final String JSPRITTIMESLICEWIDTHDESC = "time slice width used in JSprit in seconds." +
+    private static final String JSPRITTIMESLICEWIDTHDESC = "time slice width used in JSprit in seconds." +
             " The smaller the value, the more precise the calculation of routing costs but the longer the computation time." +
             " Default value is 1800 seconds.";
 
@@ -66,16 +66,16 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     @Positive
     private double zeroUtilityDelay = 1800;
     public static final String ZEROUTILDELAY = "zeroUtilityDelay";
-    public static final String ZEROUTILDELAYDESC = "Delay (in seconds) that marks the threshold for zero utility";
+    private static final String ZEROUTILDELAYDESC = "Delay (in seconds) that marks the threshold for zero utility";
 
     @Positive
     private double maxDeliveryScore = 6;
     public static final String MAXDELIVERYSCORE = "maxDeliveryScore";
-    public static final String MAXDELIVERYSCOREDESC = "Score for On time delivery.";
+    private static final String MAXDELIVERYSCOREDESC = "Score for On time delivery.";
 
     private double minDeliveryScore = -6;
     public static final String MINDELIVERYSCORE = "minDeliveryScore";
-    public static final String MINDELIVERYSCOREDESC = "Minimum score for delayed deliveries.";
+    private static final String MINDELIVERYSCOREDESC = "Minimum score for delayed deliveries.";
 
 
     public static final String GROUP_NAME = "commercialTraffic";
@@ -97,7 +97,7 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
         return carriersFile;
     }
 
-    public URL getCarriersFileUrl(URL context) {
+    URL getCarriersFileUrl(URL context) {
         return ConfigGroup.getInputFileURL(context, this.carriersFile);
     }
 
@@ -117,7 +117,7 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
         return carriersVehicleTypesFile;
     }
 
-    public URL getCarriersVehicleTypesFileUrl(URL context) {
+    URL getCarriersVehicleTypesFileUrl(URL context) {
         return ConfigGroup.getInputFileURL(context, this.carriersVehicleTypesFile);
     }
 
