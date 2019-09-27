@@ -48,9 +48,10 @@ import java.util.*;
 /**
  * Generates carriers and tours depending on next iteration's freight demand
  */
-public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListener {
+public class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListener {
 
 
+    final static String COMMERCIALJOB_ACTIVITYTYPE_PREFIX = "commercialJob";
 
     private final double firsttourTraveltimeBuffer;
     private final CarrierJSpritIterations iterationsPerCarrier;
@@ -67,12 +68,12 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
     private Set<Id<Person>> freightDrivers = new HashSet<>();
     private Set<Id<Vehicle>> freightVehicles = new HashSet<>();
 
-    private final static Logger log = Logger.getLogger(DeliveryGenerator.class);
+    private final static Logger log = Logger.getLogger(CommercialJobGenerator.class);
 
     private Set<String> drtModes = new HashSet<>();
 
     @Inject
-    public DeliveryGenerator(Scenario scenario, Map<String, TravelTime> travelTimes, Carriers carriers, CarrierMode carrierMode, CarrierJSpritIterations iterationsPerCarrier) {
+    public CommercialJobGenerator(Scenario scenario, Map<String, TravelTime> travelTimes, Carriers carriers, CarrierMode carrierMode, CarrierJSpritIterations iterationsPerCarrier) {
         CommercialTrafficConfigGroup ctcg = CommercialTrafficConfigGroup.get(scenario.getConfig());
         this.carriers = carriers;
         this.firsttourTraveltimeBuffer = ctcg.getFirstLegTraveltimeBufferFactor();
@@ -82,8 +83,8 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
         this.scenario = scenario;
         this.population = scenario.getPopulation();
         carTT = travelTimes.get(TransportMode.car);
-        if (CommercialTrafficChecker.hasMissingAttributes(population)) {
-            throw new RuntimeException("Not all agents expecting deliveries contain all required attributes fo receival. Please check the log for DeliveryConsistencyChecker. Aborting.");
+        if (CommercialTrafficChecker.checkPopulationAttributesConsistency(population)) {
+            throw new RuntimeException("There is a problem with commercial job attributes in the plan file. Please check the log for CommercialTrafficChecker. Aborting.");
         }
         getDrtModes(scenario.getConfig());
     }
@@ -91,7 +92,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
     /**
      * Test only
      */
-    DeliveryGenerator(Scenario scenario, Carriers carriers, CarrierJSpritIterations iterationsPerCarrier) {
+    CommercialJobGenerator(Scenario scenario, Carriers carriers, CarrierJSpritIterations iterationsPerCarrier) {
         this.population = scenario.getPopulation();
         this.carriers = carriers;
         this.scenario = scenario;
@@ -161,19 +162,6 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
 
     }
 
-    private static  Id<CarrierService> createCarrierServiceIdXForCustomer(Person customer, int x){
-        return Id.create(customer.getId().toString() + CommercialJobUtils.CARRIERSPLIT + x, CarrierService.class);
-    }
-
-    private static String createDeliveryActTypeFromServiceId(Id<CarrierService> id) {
-        String idStr = id.toString();
-        return FreightConstants.DELIVERY + CommercialJobUtils.CARRIERSPLIT + idStr.substring(0,idStr.lastIndexOf(CommercialJobUtils.CARRIERSPLIT));
-    }
-
-    public static Id<Person> getCustomerIdFromDeliveryActivityType(String actType){
-        return Id.createPersonId(actType.substring(actType.indexOf(CommercialJobUtils.CARRIERSPLIT)+1,actType.length()));
-    }
-
     private void buildTours() {
         TourPlanning.runTourPlanningForCarriers(carriers,scenario,iterationsPerCarrier,timeSliceWidth,carTT);
     }
@@ -231,7 +219,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
 
                         Tour.ServiceActivity act = (Tour.ServiceActivity) tourElement;
 
-                        String actType = createDeliveryActTypeFromServiceId(act.getService().getId());
+                        String actType = createJobActTypeFromServiceId(act.getService().getId());
 
                         //here we would pass over the service Activity type containing the customer id...
                         Activity tourElementActivity = PopulationUtils.createActivityFromLinkId(actType, act.getLocation());
@@ -284,4 +272,27 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
             carrier.clearPlans();
         });
     }
+
+    /*
+     * do not change the following methods. if one of them is changed, the other methods need to be adopted!
+     */
+
+    private static  Id<CarrierService> createCarrierServiceIdXForCustomer(Person customer, int x){
+        return Id.create(customer.getId().toString() + CommercialJobUtils.CARRIERSPLIT + x, CarrierService.class);
+    }
+
+    private static String createJobActTypeFromServiceId(Id<CarrierService> id) {
+        String idStr = id.toString();
+        return "commercialJob" + CommercialJobUtils.CARRIERSPLIT + idStr.substring(0,idStr.lastIndexOf(CommercialJobUtils.CARRIERSPLIT));
+    }
+
+    public static Id<Person> getCustomerIdFromJobActivityType(String actType){
+        if(actType.startsWith(COMMERCIALJOB_ACTIVITYTYPE_PREFIX)) throw new IllegalArgumentException();
+        return Id.createPersonId(actType.substring(actType.indexOf(CommercialJobUtils.CARRIERSPLIT)+1));
+    }
+
+    /*
+     * do not change the above methods. if one of them is changed, the other methods need to be adopted!
+     */
+
 }
