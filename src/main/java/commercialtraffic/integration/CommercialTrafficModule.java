@@ -28,8 +28,8 @@ import commercialtraffic.commercialJob.CommercialTrafficChecker;
 import commercialtraffic.commercialJob.CommercialJobGenerator;
 import commercialtraffic.replanning.ChangeDeliveryServiceOperator;
 import commercialtraffic.commercialJob.DefaultCommercialServiceScore;
-import commercialtraffic.commercialJob.DeliveryScoreCalculator;
-import commercialtraffic.commercialJob.ScoreCommercialServices;
+import commercialtraffic.commercialJob.CommercialJobScoreCalculator;
+import commercialtraffic.commercialJob.ScoreCommercialJobs;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
@@ -85,13 +85,13 @@ public class CommercialTrafficModule extends AbstractModule {
         }
 
 //        bind commercial Traffic stuff
-        bind(DeliveryScoreCalculator.class).toInstance(new DefaultCommercialServiceScore(ctcg.getMaxDeliveryScore(), ctcg.getMinDeliveryScore(), ctcg.getZeroUtilityDelay()));
+        bind(CommercialJobScoreCalculator.class).toInstance(new DefaultCommercialServiceScore(ctcg.getMaxDeliveryScore(), ctcg.getMinDeliveryScore(), ctcg.getZeroUtilityDelay()));
         bind(Carriers.class).toInstance(carriers);
 
 //        bind(CommercialJobManager.class).in(Singleton.class);
 //        bind(FreightAgentInserter.class).in(Singleton.class);
 
-        bind(ScoreCommercialServices.class).in(Singleton.class);
+        bind(ScoreCommercialJobs.class).in(Singleton.class);
         bind(TourLengthAnalyzer.class).in(Singleton.class);
         bind(CarrierJSpritIterations.class).toInstance(iterationsForCarrier);
         if(this.carrierMode == null){
@@ -102,7 +102,7 @@ public class CommercialTrafficModule extends AbstractModule {
         }
         addControlerListenerBinding().to(CommercialJobGenerator.class);
         addControlerListenerBinding().to(CommercialTrafficAnalysisListener.class);
-//        addMobsimListenerBinding().to(ScoreCommercialServices.class); TODO: make ScoreCommercialServices implement BeforeMobsimListener again instead of having CommercialTrafficAnalysisListener
+//        addMobsimListenerBinding().to(ScoreCommercialJobs.class); TODO: make ScoreCommercialJobs implement BeforeMobsimListener again instead of having CommercialTrafficAnalysisListener
 
 //        addMobsimListenerBinding().to(CommercialTrafficChecker.class);
 

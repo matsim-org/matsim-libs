@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package commercialtraffic.hannover;/*
+package commercialtraffic.vwUserCode.hannover;/*
  * created by jbischoff, 20.06.2019
  */
 

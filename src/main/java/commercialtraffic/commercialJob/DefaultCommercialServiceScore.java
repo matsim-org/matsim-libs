@@ -21,7 +21,7 @@ package commercialtraffic.commercialJob;/*
  * created by jbischoff, 18.06.2019
  */
 
-public class DefaultCommercialServiceScore implements DeliveryScoreCalculator {
+public class DefaultCommercialServiceScore implements CommercialJobScoreCalculator {
 
     final double maxPerformedScore;
     final double minPerformedScore;

@@ -23,7 +23,7 @@ package commercialtraffic.analysis;/*
 
 import com.google.inject.Inject;
 import commercialtraffic.commercialJob.CommercialJobUtils;
-import commercialtraffic.commercialJob.ScoreCommercialServices;
+import commercialtraffic.commercialJob.ScoreCommercialJobs;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.matsim.api.core.v01.Id;
@@ -55,7 +55,7 @@ public class CommercialTrafficAnalysisListener implements IterationEndsListener,
     Carriers carriers;
 
     @Inject
-    ScoreCommercialServices scoreCommercialServices;
+    ScoreCommercialJobs scoreCommercialJobs;
 
     @Inject
     TourLengthAnalyzer tourLengthAnalyzer;
@@ -94,7 +94,7 @@ public class CommercialTrafficAnalysisListener implements IterationEndsListener,
 
             Map<Id<Carrier>, Long> carrierDeliveries = new TreeMap<>();
             for (Id<Carrier> carrierId : entry.getValue()) {
-                carrierDeliveries.put(carrierId, scoreCommercialServices.getLogEntries().stream()
+                carrierDeliveries.put(carrierId, scoreCommercialJobs.getLogEntries().stream()
                         .filter(k -> k.getCarrierId().equals(carrierId))
                         .count());
             }
@@ -133,10 +133,10 @@ public class CommercialTrafficAnalysisListener implements IterationEndsListener,
     }
 
     private void writeDeliveryStats(String filename) {
-        Collections.sort(scoreCommercialServices.getLogEntries(), Comparator.comparing(ScoreCommercialServices.DeliveryLogEntry::getTime));
+        Collections.sort(scoreCommercialJobs.getLogEntries(), Comparator.comparing(ScoreCommercialJobs.DeliveryLogEntry::getTime));
         try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(filename)), CSVFormat.DEFAULT.withDelimiter(sep.charAt(0)).withHeader("CarrierId"
                 , "PersonId", "Time", "Score", "LinkId", "TimeDerivation", "DriverId"))) {
-            for (ScoreCommercialServices.DeliveryLogEntry entry : scoreCommercialServices.getLogEntries()) {
+            for (ScoreCommercialJobs.DeliveryLogEntry entry : scoreCommercialJobs.getLogEntries()) {
                 csvPrinter.print(entry.getCarrierId());
                 csvPrinter.print(entry.getPersonId());
                 csvPrinter.print(Time.writeTime(entry.getTime()));
@@ -158,13 +158,13 @@ public class CommercialTrafficAnalysisListener implements IterationEndsListener,
                     .filter(entry -> CommercialJobUtils.getCarrierIdFromDriver(entry.getKey()).equals(carrier.getId()))
                     .mapToDouble(e -> e.getValue())
                     .summaryStatistics();
-            DoubleSummaryStatistics scores = scoreCommercialServices.getLogEntries().stream()
+            DoubleSummaryStatistics scores = scoreCommercialJobs.getLogEntries().stream()
                     .filter(deliveryLogEntry -> deliveryLogEntry.getCarrierId().equals(carrier.getId()))
-                    .mapToDouble(ScoreCommercialServices.DeliveryLogEntry::getScore)
+                    .mapToDouble(ScoreCommercialJobs.DeliveryLogEntry::getScore)
                     .summaryStatistics();
-            DoubleSummaryStatistics timeDerivations = scoreCommercialServices.getLogEntries().stream()
+            DoubleSummaryStatistics timeDerivations = scoreCommercialJobs.getLogEntries().stream()
                     .filter(deliveryLogEntry -> deliveryLogEntry.getCarrierId().equals(carrier.getId()))
-                    .mapToDouble(ScoreCommercialServices.DeliveryLogEntry::getTimeDifference)
+                    .mapToDouble(ScoreCommercialJobs.DeliveryLogEntry::getTimeDifference)
                     .summaryStatistics();
 
             try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(services.getControlerIO().getOutputFilename("carrierStats." + carrier.getId() + ".csv")), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND), CSVFormat.DEFAULT.withDelimiter(sep.charAt(0)))) {
@@ -190,6 +190,6 @@ public class CommercialTrafficAnalysisListener implements IterationEndsListener,
 
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-        scoreCommercialServices.prepareTourArrivalsForDay();
+        scoreCommercialJobs.prepareTourArrivalsForDay();
     }
 }

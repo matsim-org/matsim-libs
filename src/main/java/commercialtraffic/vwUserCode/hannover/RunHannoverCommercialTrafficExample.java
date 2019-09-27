@@ -20,7 +20,7 @@
 /**
  *
  */
-package commercialtraffic.hannover;
+package commercialtraffic.vwUserCode.hannover;
 
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import commercialtraffic.integration.CommercialTrafficConfigGroup;
