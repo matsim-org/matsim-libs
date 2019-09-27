@@ -1,7 +1,7 @@
 package commercialtraffic.replanning;
 
 import commercialtraffic.TestScenarioGeneration;
-import commercialtraffic.commercialJob.CommercialJobUtilsV2;
+import commercialtraffic.commercialJob.CommercialJobUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -32,18 +32,18 @@ public class ChangeDeliveryServiceOperatorTest {
         Plan testPlan = scenario.getPopulation().getPersons().get(Id.createPersonId(1)).getSelectedPlan();
         Activity work = (Activity) testPlan.getPlanElements().get(2);
 
-        Id<Carrier> carrierId = CommercialJobUtilsV2.getCarrierId(work);
-        Assert.assertEquals("the person should expect a salami","pizza", CommercialJobUtilsV2.getCarrierMarket(carrierId));
-        Assert.assertEquals("the person should expect a salami from operator 1","1", CommercialJobUtilsV2.getCarrierOperator(carrierId));
+        Id<Carrier> carrierId = CommercialJobUtils.getCarrierId(work);
+        Assert.assertEquals("the person should expect a salami","pizza", CommercialJobUtils.getCarrierMarket(carrierId));
+        Assert.assertEquals("the person should expect a salami from operator 1","1", CommercialJobUtils.getCarrierOperator(carrierId));
 
         changeDeliveryServiceOperator.getPlanAlgoInstance().run(testPlan);
 
-        String operator = CommercialJobUtilsV2.getServiceOperator(work);
+        String operator = CommercialJobUtils.getServiceOperator(work);
         Assert.assertEquals("2", operator);
 
         changeDeliveryServiceOperator.getPlanAlgoInstance().run(testPlan);
 
-        operator = CommercialJobUtilsV2.getServiceOperator(work);
+        operator = CommercialJobUtils.getServiceOperator(work);
         Assert.assertEquals("1", operator);
 
     }

@@ -21,7 +21,7 @@
 package commercialtraffic.integration;
 
 
-import commercialtraffic.commercialJob.CommercialJobUtilsV2;
+import commercialtraffic.commercialJob.CommercialJobUtils;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -36,9 +36,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class CommercialTrafficCheckerV2 {
-    private static final Logger log = Logger.getLogger(CommercialTrafficCheckerV2.class);
-    private static final List<String> attributesToCheck = Arrays.asList(CommercialJobUtilsV2.JOB_OPERATOR, CommercialJobUtilsV2.JOB_DURATION, CommercialJobUtilsV2.JOB_TIME_END, CommercialJobUtilsV2.JOB_EARLIEST_START, CommercialJobUtilsV2.JOB_SIZE);
+public class CommercialTrafficChecker {
+    private static final Logger log = Logger.getLogger(CommercialTrafficChecker.class);
+    private static final List<String> attributesToCheck = Arrays.asList(CommercialJobUtils.JOB_OPERATOR, CommercialJobUtils.JOB_DURATION, CommercialJobUtils.JOB_TIME_END, CommercialJobUtils.JOB_EARLIEST_START, CommercialJobUtils.JOB_SIZE);
 
     /**
      * @param population to check
@@ -48,7 +48,7 @@ public class CommercialTrafficCheckerV2 {
         final MutableBoolean fail = new MutableBoolean(false);
         for (Person p : population.getPersons().values()) {
             for (Plan plan : p.getPlans()) {
-                plan.getPlanElements().stream().filter(Activity.class::isInstance).filter(planElement -> planElement.getAttributes().getAsMap().containsKey(CommercialJobUtilsV2.JOB_TYPE)).forEach(planElement -> {
+                plan.getPlanElements().stream().filter(Activity.class::isInstance).filter(planElement -> planElement.getAttributes().getAsMap().containsKey(CommercialJobUtils.JOB_TYPE)).forEach(planElement -> {
                     if (checkActivityConsistency((Activity) planElement, p.getId()) == true) {
                         fail.setTrue();
                     }
@@ -67,8 +67,8 @@ public class CommercialTrafficCheckerV2 {
                 fail = true;
             }
         }
-        Double timeWindowStart = Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtilsV2.JOB_EARLIEST_START)));
-        Double timeWindowEnd = Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtilsV2.JOB_TIME_END)));
+        Double timeWindowStart = Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_EARLIEST_START)));
+        Double timeWindowEnd = Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_TIME_END)));
         if (timeWindowEnd < timeWindowStart) {
             log.error("Person " + pid + " has an error in timewindows in Activity " + activity.getType() + ". start=" + timeWindowStart + " end=" + timeWindowEnd);
             fail = true;
@@ -83,7 +83,7 @@ public class CommercialTrafficCheckerV2 {
     public static boolean checkCarrierConsistency(Carriers carriers) {
         boolean fail = false;
         for (Carrier carrier : carriers.getCarriers().values()) {
-            if (carrier.getId().toString().split(CommercialJobUtilsV2.CARRIERSPLIT).length != 2) {
+            if (carrier.getId().toString().split(CommercialJobUtils.CARRIERSPLIT).length != 2) {
                 log.error("Carrier ID " + carrier.getId() + " does not conform to scheme good_carrier, e.g. pizza_one, pizza_two, ...");
                 fail = true;
             }

@@ -22,7 +22,7 @@ package commercialtraffic.scoring;/*
  */
 
 import com.google.inject.Inject;
-import commercialtraffic.commercialJob.CommercialJobUtilsV2;
+import commercialtraffic.commercialJob.CommercialJobUtils;
 import commercialtraffic.commercialJob.DeliveryGenerator;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -76,19 +76,19 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
         currentExpectedDeliveriesPerPerson.clear();
         Set<Plan> plans = population.getPersons().values().stream()
                 .map(p -> p.getSelectedPlan())
-                .filter(plan -> CommercialJobUtilsV2.planExpectsDeliveries(plan)).collect(Collectors.toSet());
+                .filter(plan -> CommercialJobUtils.planExpectsDeliveries(plan)).collect(Collectors.toSet());
         for (Plan plan : plans) {
             Id<Person> personId = plan.getPerson().getId();
             plan.getPlanElements().stream().filter(Activity.class::isInstance).forEach(pe -> {
                 Activity activity = (Activity) pe;
-                if (activity.getAttributes().getAsMap().containsKey(CommercialJobUtilsV2.JOB_TYPE)) {
-                    ExpectedDelivery expectedDelivery = new ExpectedDelivery((String) activity.getAttributes().getAttribute(CommercialJobUtilsV2.JOB_TYPE)
-                            , CommercialJobUtilsV2.getCarrierId(activity)
+                if (activity.getAttributes().getAsMap().containsKey(CommercialJobUtils.JOB_TYPE)) {
+                    ExpectedDelivery expectedDelivery = new ExpectedDelivery((String) activity.getAttributes().getAttribute(CommercialJobUtils.JOB_TYPE)
+                            , CommercialJobUtils.getCarrierId(activity)
                             , plan.getPerson().getId()
                             , activity.getLinkId()
-                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtilsV2.JOB_DURATION)))
-                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtilsV2.JOB_EARLIEST_START)))
-                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtilsV2.JOB_TIME_END))));
+                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_DURATION)))
+                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_EARLIEST_START)))
+                            , Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_TIME_END))));
                     Set<ExpectedDelivery> set = currentExpectedDeliveriesPerPerson.getOrDefault(personId, new HashSet<>());
                     if(!set.add(expectedDelivery)) throw new IllegalArgumentException("person " + personId + " expects two identical deliveries for activity\n"
                             + activity + ". Please consider to bunch them or remove one of them. At the moment, it is not clear how to deal with that in terms of scoring..");
@@ -106,7 +106,7 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
         if (event.getActType().equals(FreightConstants.END)) {
             activeDeliveryAgents.remove(event.getPersonId());
         } else if (event.getActType().contains(FreightConstants.DELIVERY)) {
-            Id<Carrier> carrier = CommercialJobUtilsV2.getCarrierIdFromDriver(event.getPersonId());
+            Id<Carrier> carrier = CommercialJobUtils.getCarrierIdFromDriver(event.getPersonId());
             Id<Person> customerAboutToBeServed = DeliveryGenerator.getCustomerIdFromDeliveryActivityType(event.getActType());
             if (currentExpectedDeliveriesPerPerson.containsKey(customerAboutToBeServed)) {
                 ExpectedDelivery deliveryCandidate = currentExpectedDeliveriesPerPerson.get(customerAboutToBeServed).stream()

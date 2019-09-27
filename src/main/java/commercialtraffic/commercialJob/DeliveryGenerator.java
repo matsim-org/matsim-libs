@@ -20,12 +20,6 @@
 
 package commercialtraffic.commercialJob;
 
-import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
-import com.graphhopper.jsprit.core.algorithm.termination.VariationCoefficientTermination;
-import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
-import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
-import com.graphhopper.jsprit.core.util.Solutions;
 import commercialtraffic.integration.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -34,9 +28,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
-import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
-import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
@@ -49,7 +40,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 import javax.inject.Inject;
@@ -94,7 +84,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
         this.scenario = scenario;
         this.population = scenario.getPopulation();
         carTT = travelTimes.get(TransportMode.car);
-        if (CommercialTrafficCheckerV2.hasMissingAttributes(population)) {
+        if (CommercialTrafficChecker.hasMissingAttributes(population)) {
             throw new RuntimeException("Not all agents expecting deliveries contain all required attributes fo receival. Please check the log for DeliveryConsistencyChecker. Aborting.");
         }
         getDrtModes(scenario.getConfig());
@@ -142,7 +132,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
         {
             Set<PlanElement> activitiesWithServices = new HashSet<>(p.getSelectedPlan().getPlanElements().stream()
                     .filter(Activity.class::isInstance)
-                    .filter(a -> a.getAttributes().getAsMap().containsKey(CommercialJobUtilsV2.JOB_TYPE))
+                    .filter(a -> a.getAttributes().getAsMap().containsKey(CommercialJobUtils.JOB_TYPE))
                     .collect(Collectors.toSet()));
             if(!activitiesWithServices.isEmpty()) person2ActsWithServices.put(p,activitiesWithServices);
         });
@@ -151,11 +141,11 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
             for (PlanElement pe : person2ActsWithServices.get(personWithDelivieries)) {
                 Activity activity = (Activity) pe;
                 CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(createCarrierServiceIdXForCustomer(personWithDelivieries,i), activity.getLinkId());
-                serviceBuilder.setCapacityDemand(Integer.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtilsV2.JOB_SIZE))));
-                serviceBuilder.setServiceDuration(Integer.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtilsV2.JOB_DURATION))));
-                serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtilsV2.JOB_EARLIEST_START))), Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtilsV2.JOB_TIME_END)))));
+                serviceBuilder.setCapacityDemand(Integer.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_SIZE))));
+                serviceBuilder.setServiceDuration(Integer.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_DURATION))));
+                serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_EARLIEST_START))), Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_TIME_END)))));
                 i++;
-                Id<Carrier> carrierId = CommercialJobUtilsV2.getCarrierId(activity);
+                Id<Carrier> carrierId = CommercialJobUtils.getCarrierId(activity);
                 if (hullcarriers.getCarriers().containsKey(carrierId)) {
                     Carrier carrier = hullcarriers.getCarriers().get(carrierId);
                     carrier.getServices().add(serviceBuilder.build());
@@ -168,16 +158,16 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
     }
 
     private static  Id<CarrierService> createCarrierServiceIdXForCustomer(Person customer, int x){
-        return Id.create(customer.getId().toString() + CommercialJobUtilsV2.CARRIERSPLIT + x, CarrierService.class);
+        return Id.create(customer.getId().toString() + CommercialJobUtils.CARRIERSPLIT + x, CarrierService.class);
     }
 
     private static String createDeliveryActTypeFromServiceId(Id<CarrierService> id) {
         String idStr = id.toString();
-        return FreightConstants.DELIVERY + CommercialJobUtilsV2.CARRIERSPLIT + idStr.substring(0,idStr.lastIndexOf(CommercialJobUtilsV2.CARRIERSPLIT));
+        return FreightConstants.DELIVERY + CommercialJobUtils.CARRIERSPLIT + idStr.substring(0,idStr.lastIndexOf(CommercialJobUtils.CARRIERSPLIT));
     }
 
     public static Id<Person> getCustomerIdFromDeliveryActivityType(String actType){
-        return Id.createPersonId(actType.substring(actType.indexOf(CommercialJobUtilsV2.CARRIERSPLIT)+1,actType.length()));
+        return Id.createPersonId(actType.substring(actType.indexOf(CommercialJobUtils.CARRIERSPLIT)+1,actType.length()));
     }
 
     private void buildTours() {

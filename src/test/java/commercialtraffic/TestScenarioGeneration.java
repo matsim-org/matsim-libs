@@ -20,7 +20,7 @@
 
 package commercialtraffic;
 
-import commercialtraffic.commercialJob.CommercialJobUtilsV2;
+import commercialtraffic.commercialJob.CommercialJobUtils;
 import commercialtraffic.integration.CommercialTrafficConfigGroup;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -103,12 +103,12 @@ public class TestScenarioGeneration {
         work.setLinkId(Id.createLinkId(259));
         work.setEndTime(16 * 3600);
 
-        work.getAttributes().putAttribute(CommercialJobUtilsV2.JOB_TYPE, "pizza");
-        work.getAttributes().putAttribute(CommercialJobUtilsV2.JOB_DURATION, 180);
-        work.getAttributes().putAttribute(CommercialJobUtilsV2.JOB_EARLIEST_START, 12 * 3600);
-        work.getAttributes().putAttribute(CommercialJobUtilsV2.JOB_TIME_END, 13 * 3600);
-        work.getAttributes().putAttribute(CommercialJobUtilsV2.JOB_OPERATOR, 1);
-        work.getAttributes().putAttribute(CommercialJobUtilsV2.JOB_SIZE, 1);
+        work.getAttributes().putAttribute(CommercialJobUtils.JOB_TYPE, "pizza");
+        work.getAttributes().putAttribute(CommercialJobUtils.JOB_DURATION, 180);
+        work.getAttributes().putAttribute(CommercialJobUtils.JOB_EARLIEST_START, 12 * 3600);
+        work.getAttributes().putAttribute(CommercialJobUtils.JOB_TIME_END, 13 * 3600);
+        work.getAttributes().putAttribute(CommercialJobUtils.JOB_OPERATOR, 1);
+        work.getAttributes().putAttribute(CommercialJobUtils.JOB_SIZE, 1);
 
         plan.addActivity(work);
 

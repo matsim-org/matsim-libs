@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class CommercialJobUtilsV2 {
+public class CommercialJobUtils {
 
     public static final String JOB_SIZE = "jobAmount";
     public static final String JOB_TYPE = "jobType";
@@ -46,7 +46,7 @@ public class CommercialJobUtilsV2 {
 
 
     public static Id<Carrier> getCarrierId(Activity activity) {
-        return Id.create(activity.getAttributes().getAttribute(JOB_TYPE).toString() + CARRIERSPLIT + activity.getAttributes().getAttribute(CommercialJobUtilsV2.JOB_OPERATOR).toString(), Carrier.class);
+        return Id.create(activity.getAttributes().getAttribute(JOB_TYPE).toString() + CARRIERSPLIT + activity.getAttributes().getAttribute(CommercialJobUtils.JOB_OPERATOR).toString(), Carrier.class);
     }
 
     public static String getServiceOperator(Activity activity) {

@@ -22,7 +22,7 @@ package commercialtraffic.analysis;/*
  */
 
 import com.google.inject.Inject;
-import commercialtraffic.commercialJob.CommercialJobUtilsV2;
+import commercialtraffic.commercialJob.CommercialJobUtils;
 import commercialtraffic.scoring.ScoreCommercialServices;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -85,7 +85,7 @@ public class CommercialTrafficAnalysisListener implements IterationEndsListener,
     private void analyzeCarrierMarketShares(int iteration) {
 
 
-        Map<String, Set<Id<Carrier>>> carriersSplitByMarket = CommercialJobUtilsV2.splitCarriersByMarket(carriers);
+        Map<String, Set<Id<Carrier>>> carriersSplitByMarket = CommercialJobUtils.splitCarriersByMarket(carriers);
 
 
         for (Map.Entry<String, Set<Id<Carrier>>> entry : carriersSplitByMarket.entrySet()) {
@@ -155,7 +155,7 @@ public class CommercialTrafficAnalysisListener implements IterationEndsListener,
     private void writeIterationCarrierStats(IterationEndsEvent event) {
         for (Carrier carrier : carriers.getCarriers().values()) {
             DoubleSummaryStatistics distances = tourLengthAnalyzer.getDeliveryAgentDistances().entrySet().stream()
-                    .filter(entry -> CommercialJobUtilsV2.getCarrierIdFromDriver(entry.getKey()).equals(carrier.getId()))
+                    .filter(entry -> CommercialJobUtils.getCarrierIdFromDriver(entry.getKey()).equals(carrier.getId()))
                     .mapToDouble(e -> e.getValue())
                     .summaryStatistics();
             DoubleSummaryStatistics scores = scoreCommercialServices.getLogEntries().stream()

@@ -21,7 +21,7 @@ package commercialtraffic.replanning;/*
  * created by jbischoff, 22.05.2019
  */
 
-import commercialtraffic.commercialJob.CommercialJobUtilsV2;
+import commercialtraffic.commercialJob.CommercialJobUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.freight.carrier.Carrier;
@@ -56,21 +56,21 @@ public class ChangeDeliveryServiceOperator extends AbstractMultithreadedModule {
     public PlanAlgorithm getPlanAlgoInstance() {
         return plan -> {
             List<Activity> activitiesWithServices = new ArrayList<>();
-            plan.getPlanElements().stream().filter(Activity.class::isInstance).filter(a -> a.getAttributes().getAsMap().containsKey(CommercialJobUtilsV2.JOB_TYPE)).forEach(planElement -> activitiesWithServices.add((Activity) planElement));
+            plan.getPlanElements().stream().filter(Activity.class::isInstance).filter(a -> a.getAttributes().getAsMap().containsKey(CommercialJobUtils.JOB_TYPE)).forEach(planElement -> activitiesWithServices.add((Activity) planElement));
             if (activitiesWithServices.isEmpty()) {
                 return;
             }
             int idx = random.nextInt(activitiesWithServices.size());
 
             Activity selectedActivity = activitiesWithServices.get(idx);
-            String deliveryType = CommercialJobUtilsV2.getDeliveryType(selectedActivity);
-            Set<Id<Carrier>> operators4Service = CommercialJobUtilsV2.getOperatorsForDeliveryType(carriers, deliveryType);
-            Id<Carrier> currentCarrier = CommercialJobUtilsV2.getCarrierId(selectedActivity);
+            String deliveryType = CommercialJobUtils.getDeliveryType(selectedActivity);
+            Set<Id<Carrier>> operators4Service = CommercialJobUtils.getOperatorsForDeliveryType(carriers, deliveryType);
+            Id<Carrier> currentCarrier = CommercialJobUtils.getCarrierId(selectedActivity);
 
             if (operators4Service.remove(currentCarrier)) {
                 if (!operators4Service.isEmpty()) {
                     Id<Carrier> newCarrier = operators4Service.stream().skip(random.nextInt(operators4Service.size())).findFirst().orElse(currentCarrier);
-                    CommercialJobUtilsV2.setServiceOperatorAndDeliveryType(selectedActivity, newCarrier);
+                    CommercialJobUtils.setServiceOperatorAndDeliveryType(selectedActivity, newCarrier);
                 }
             } else
                 throw new RuntimeException(currentCarrier.toString() + " is not part of the service carriers for deliverytype " + deliveryType);
