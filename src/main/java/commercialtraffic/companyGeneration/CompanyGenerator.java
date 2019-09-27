@@ -17,10 +17,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeWriter;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
-import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.filter.NetworkFilterManager;
@@ -38,11 +35,10 @@ import ft.utils.ctDemandPrep.DemandGenerator;
 
 public class CompanyGenerator {
 
-	String csvVehicleFolder;
+	String csvVehiclefile;
 	String csvAddCompanyFolder;
 	String networkFile;
 	File[] addCompanyfiles;
-	File[] csvVehiclefiles;
 	DemandGenerator companyLocations;
 	String companyFolder;
 	String zoneSHP;
@@ -60,14 +56,13 @@ public class CompanyGenerator {
 	String serviceTimeDistributions;
 	Map<String, Set<Integer>> vehBlackListIds;
 
-	public CompanyGenerator(String csvVehicleFolder, String csvAddCompanyFolder, String ctTripsFile,
+	public CompanyGenerator(String csvVehiclefile, String csvAddCompanyFolder, String ctTripsFile,
 			String serviceTimeDistributions, String networkFile, String companyFolder, String zoneSHP,
 			String outputpath, String carrierOutputPath, Map<String, Set<Integer>> vehBlackListIds) {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
-		this.csvVehicleFolder = csvVehicleFolder;
+		this.csvVehiclefile = csvVehiclefile;
 		this.csvAddCompanyFolder = csvAddCompanyFolder;
 		this.addCompanyfiles = new File(csvAddCompanyFolder).listFiles();
-		this.csvVehiclefiles = new File(csvVehicleFolder).listFiles();
 		this.ctTripsFile = ctTripsFile;
 		this.networkFile = networkFile;
 		this.serviceTimeDistributions = serviceTimeDistributions;
@@ -162,10 +157,9 @@ public class CompanyGenerator {
 						String companyId = (lineContents[1]);
 						double companyX = Double.parseDouble(lineContents[2]);
 						double companyY = Double.parseDouble(lineContents[3]);
-						CoordinateTransformation transformation = TransformationFactory
-								.getCoordinateTransformation("EPSG:4326", "EPSG:25832");
+						CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("EPSG:4326", "EPSG:25832");
 						Coord companyCoord = new Coord(companyX, companyY);
-						companyCoord = transformation.transform(companyCoord);
+						companyCoord=transformation.transform(companyCoord);
 						// String zone = (lineContents[4]);
 						String companyClass = lineContents[5];
 						int vehicleType = Integer.parseInt(lineContents[6]);
@@ -237,65 +231,64 @@ public class CompanyGenerator {
 		addCustomCompany();
 
 		CSVReader reader = null;
-		for (File csvVehiclefile : csvVehiclefiles) {
-			try {
-				reader = new CSVReader(new FileReader(csvVehiclefile));
-				vehicleList = reader.readAll();
-				for (int i = 1; i < vehicleList.size(); i++) {
-					String[] lineContents = vehicleList.get(i);
-					int vehicleId = Integer.parseInt(lineContents[1]);
-					String companyId = (lineContents[2]);
-					String zone = (lineContents[3]);
-					String companyClass = lineContents[5];
-					int vehicleType = Integer.parseInt(lineContents[6]);
-					// TODO: Model two separate fleets
-					boolean active;
-					if (Integer.parseInt(lineContents[8]) == 1) {
-						active = true;
-					} else {
-						active = false;
-					}
-					;
-					// TODO Fix opening and closing times
-					if (commercialCompanyMap.containsKey(companyId)) {
-						// Add only not filtered and active new vehicle
-						if ((vehBlackListIds.isEmpty()) || (!vehBlackListIds.get(companyClass).contains(vehicleId))) {
-							if (active) {
-								commercialCompanyMap.get(companyId).addVehicle(
 
-										commercialCompanyMap.get(companyId).companyLinkId, vehicleType, 6.5 * 3600.0,
-										17.5 * 3600.0);
-							}
+		try {
+			reader = new CSVReader(new FileReader(this.csvVehiclefile));
+			vehicleList = reader.readAll();
+			for (int i = 1; i < vehicleList.size(); i++) {
+				String[] lineContents = vehicleList.get(i);
+				int vehicleId = Integer.parseInt(lineContents[1]);
+				String companyId = (lineContents[2]);
+				String zone = (lineContents[3]);
+				String companyClass = lineContents[5];
+				int vehicleType = Integer.parseInt(lineContents[6]);
+				// TODO: Model two separate fleets
+				boolean active;
+				if (Integer.parseInt(lineContents[8]) == 1) {
+					active = true;
+				} else {
+					active = false;
+				}
+				;
+				// TODO Fix opening and closing times
+				if (commercialCompanyMap.containsKey(companyId)) {
+					// Add only not filtered and active new vehicle
+					if ((vehBlackListIds.isEmpty()) || (!vehBlackListIds.get(companyClass).contains(vehicleId))) {
+						if (active) {
+							commercialCompanyMap.get(companyId).addVehicle(
+
+									commercialCompanyMap.get(companyId).companyLinkId, vehicleType, 6.5 * 3600.0,
+									17.5 * 3600.0);
 						}
-					} else {
-						// Create company
-						Id<Link> companyLinkId = infereCompanyLink(companyClass, zone);
-
-						// TODO
-						CommericalCompany commericalCompany = new CommericalCompany(companyId, 6.0 * 3600.0,
-								18.0 * 3600.0, 300.0, companyClass, companyLinkId);
-						// Add only not filtered and active new vehicle
-						if ((vehBlackListIds.isEmpty()) || (!vehBlackListIds.get(companyClass).contains(vehicleId))) {
-							if (active) {
-								commericalCompany.addVehicle(companyLinkId, vehicleType, 6.5 * 3600.0, 17.5 * 3600.0);
-							}
-						}
-						commercialCompanyMap.put(companyId, commericalCompany);
-
 					}
+				} else {
+					// Create company
+					Id<Link> companyLinkId = infereCompanyLink(companyClass, zone);
+
+					// TODO
+					CommericalCompany commericalCompany = new CommericalCompany(companyId, 6.0 * 3600.0, 18.0 * 3600.0,
+							300.0, companyClass, companyLinkId);
+					// Add only not filtered and active new vehicle
+					if ((vehBlackListIds.isEmpty()) || (!vehBlackListIds.get(companyClass).contains(vehicleId))) {
+						if (active) {
+							commericalCompany.addVehicle(companyLinkId, vehicleType, 6.5 * 3600.0, 17.5 * 3600.0);
+						}
+					}
+					commercialCompanyMap.put(companyId, commericalCompany);
 
 				}
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
-				if (reader != null) {
-					try {
-						reader.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
 		}
@@ -311,20 +304,11 @@ public class CompanyGenerator {
 				// Delete Companies without vehicles
 				continue;
 			}
-			if (commercialCompanyEntry.getValue().carrier.getServices().isEmpty()) {
-				// Delete Companies without Services
-				continue;
-			}
-			
-			
-			// if
-			// (commercialCompanyEntry.getValue().carrier.getId().toString().contains("grocery"))
-			// {
-			carriers.addCarrier(commercialCompanyEntry.getValue().carrier);
-		}
+if (commercialCompanyEntry.getValue().carrier.getId().toString().contains("grocery")) {
+			carriers.addCarrier(commercialCompanyEntry.getValue().carrier);}
 
-		// }
-		new CarrierPlanXmlWriterV2(carriers).write(carrierOutputPath + "carrier_definition.xml");
+		}
+		new CarrierPlanWriter(carriers.getCarriers().values()).write(carrierOutputPath + "carrier_definition.xml");
 		new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers))
 				.write(carrierOutputPath + "carrier_vehicletypes.xml");
 

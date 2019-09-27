@@ -29,10 +29,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -75,14 +72,11 @@ public class CommercialJobManager implements BeforeMobsimListener, AfterMobsimLi
             if(ctConfigGroup.getRunTourPlanning()) carrier.getServices().clear(); //initialize
         });
         this.carriers = carriers;
-        if(mapServicesToCustomer(scenario.getPopulation()))
-            throw new RuntimeException("there is a problem with consistency of location in services and activities." +
-                "please check the log for details.");
+        mapServicesToCustomer(scenario.getPopulation());
     }
 
 
-    private boolean mapServicesToCustomer(Population population){
-        final MutableBoolean fail = new MutableBoolean(false);
+    private void mapServicesToCustomer(Population population){
         for (Person p : population.getPersons().values()) {
             p.getPlans()
                 .forEach(plan -> {
@@ -94,7 +88,6 @@ public class CommercialJobManager implements BeforeMobsimListener, AfterMobsimLi
                         });
                 });
         }
-        return fail.getValue();
     }
 
     private void retrieveServicesIdsAndDoMapping(Id<Person> personId, Activity activity) {
@@ -182,7 +175,7 @@ public class CommercialJobManager implements BeforeMobsimListener, AfterMobsimLi
     private void writeCarriersFileForIteration(AfterMobsimEvent event) {
         String dir = event.getServices().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/";
 //        log.info("writing carrier file of iteration " + event.getIteration() + " to " + dir);
-        CarrierPlanXmlWriterV2 planWriter = new CarrierPlanXmlWriterV2(carriers);
+        CarrierPlanWriter planWriter = new CarrierPlanWriter(carriers.getCarriers().values());
         planWriter.write(dir + "carriers_it" + event.getIteration() + ".xml");
     }
 

@@ -45,15 +45,9 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.TransitScheduleValidator;
 import org.matsim.pt.utils.TransitScheduleValidator.ValidationResult;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleCapacityImpl;
-import org.matsim.vehicles.VehicleReaderV1;
-import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.*;
 import org.matsim.vehicles.VehicleType.DoorOperationMode;
-import org.matsim.vehicles.VehicleTypeImpl;
-import org.matsim.vehicles.VehicleWriterV1;
-import org.matsim.vehicles.VehiclesFactory;
+import org.matsim.vehicles.VehicleType;
 
 /**
  * @author jbischoff
@@ -65,22 +59,20 @@ public class CreateStopsAndSchedule {
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(
 				"C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/versions/networkpt-feb.xml");
-		new VehicleReaderV1(scenario.getTransitVehicles()).readFile(
+		new MatsimVehicleReader.VehicleReader(scenario.getTransitVehicles()).readFile(
 				"C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/pt/new/transitVehicles.xml");
 		new TransitScheduleReader(scenario).readFile(
 				"C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/pt/new/bs-scheduleNetwork.xml");
 
 		final TransitScheduleFactory transitScheduleFactory = scenario.getTransitSchedule().getFactory();
-		final VehicleType type = new VehicleTypeImpl(Id.create("train", VehicleType.class));
+		final VehicleType type = VehicleUtils.createVehicleType(Id.create("train", VehicleType.class));
 		final VehiclesFactory vfact = scenario.getTransitVehicles().getFactory();
-		type.setAccessTime(0.5);
-		type.setEgressTime(0.5);
+		VehicleUtils.setAccessTime(type, 0.5);
+		VehicleUtils.setEgressTime(type, 0.5);
 		type.setDescription("regional train");
-		type.setDoorOperationMode(DoorOperationMode.parallel);
-		VehicleCapacity cap = new VehicleCapacityImpl();
-		cap.setSeats(500);
-		cap.setStandingRoom(1000);
-		type.setCapacity(cap);
+		VehicleUtils.setDoorOperationMode(type, DoorOperationMode.parallel) ;
+		type.getCapacity().setSeats(500);
+		type.getCapacity().setStandingRoom(1000);
 		type.setLength(150);
 		type.setWidth(3);
 		scenario.getTransitVehicles().addVehicleType(type);

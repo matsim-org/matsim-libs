@@ -14,8 +14,8 @@ import org.matsim.contrib.freight.carrier.CarrierVehicleType;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 public class CommericalCompany {
 
@@ -94,110 +94,97 @@ public class CommericalCompany {
 		return vBuilder.build();
 	}
 
-	public static CarrierVehicleType createType(int vehicleType) {
+	public static VehicleType createType(int vehicleTypeIndex) {
 
-		CarrierVehicleType.Builder typeBuilder = CarrierVehicleType.Builder
-				.newInstance(Id.create(vehicleType, VehicleType.class));
-		
-		switch (vehicleType) {
+		VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create(vehicleTypeIndex, VehicleType.class));
+
+		switch (vehicleTypeIndex) {
 		case 1:
-			
-			typeBuilder.setCapacity(1);
-			typeBuilder.setFixCost(80.0);
-			typeBuilder.setCostPerDistanceUnit(0.00047);
-			typeBuilder.setCostPerTimeUnit(0.008);
-			typeBuilder.setMaxVelocity(200.0 / 3.6);
-			return typeBuilder.build();
+			vehicleType.getCapacity().setOther(1);
+			vehicleType.getCostInformation().setFixedCost(80.0);
+			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
+			vehicleType.getCostInformation().setCostsPerSecond(0.008);
+			vehicleType.setMaximumVelocity(200.0 / 3.6);
+			return vehicleType;
 		case 2:
 
-			typeBuilder.setCapacity(25);
-			typeBuilder.setFixCost(80.0);
-			typeBuilder.setCostPerDistanceUnit(0.00047);
-			typeBuilder.setCostPerTimeUnit(0.008);
-			typeBuilder.setMaxVelocity(160.0 / 3.6);
-			return typeBuilder.build();
+			vehicleType.getCapacity().setOther(25);
+			vehicleType.getCostInformation().setFixedCost(80.0);
+			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
+			vehicleType.getCostInformation().setCostsPerSecond(0.008);
+			vehicleType.setMaximumVelocity(160.0 / 3.6);
 		case 3:
 
-			typeBuilder.setCapacity(150);
-			typeBuilder.setFixCost(80.0);
-			typeBuilder.setCostPerDistanceUnit(0.00047);
-			typeBuilder.setCostPerTimeUnit(0.008);
-			typeBuilder.setMaxVelocity(160.0 / 3.6);
-			return typeBuilder.build();
+			vehicleType.getCapacity().setOther(150);
+			vehicleType.getCostInformation().setFixedCost(80.0);
+			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
+			vehicleType.getCostInformation().setCostsPerSecond(0.008);
+			vehicleType.setMaximumVelocity(160.0 / 3.6);
 		case 4:
 
-			typeBuilder.setCapacity(400);
-			typeBuilder.setFixCost(80.0);
-			typeBuilder.setCostPerDistanceUnit(0.00047);
-			typeBuilder.setCostPerTimeUnit(0.008);
-			typeBuilder.setMaxVelocity(93.0 / 3.6);
-			return typeBuilder.build();
+			vehicleType.getCapacity().setOther(400);
+			vehicleType.getCostInformation().setFixedCost(80.0);
+			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
+			vehicleType.getCostInformation().setCostsPerSecond(0.008);
+			vehicleType.setMaximumVelocity(93.0 / 3.6);
 		case 5:
 
-			typeBuilder.setCapacity(400);
-			typeBuilder.setFixCost(80.0);
-			typeBuilder.setCostPerDistanceUnit(0.00047);
-			typeBuilder.setCostPerTimeUnit(0.008);
-			typeBuilder.setMaxVelocity(93.0 / 3.6);
-			return typeBuilder.build();
+			vehicleType.getCapacity().setOther(400);
+			vehicleType.getCostInformation().setFixedCost(80.0);
+			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
+			vehicleType.getCostInformation().setCostsPerSecond(0.008);
+			vehicleType.setMaximumVelocity(93.0 / 3.6);
 		case 6:
 
-			typeBuilder.setCapacity(80);
-			typeBuilder.setFixCost(80.0);
-			typeBuilder.setCostPerDistanceUnit(0.00047);
-			typeBuilder.setCostPerTimeUnit(0.008);
-			typeBuilder.setMaxVelocity(110.0 / 3.6);
-			return typeBuilder.build();
+			vehicleType.getCapacity().setOther(80);
+			vehicleType.getCostInformation().setFixedCost(80.0);
+			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
+			vehicleType.getCostInformation().setCostsPerSecond(0.008);
+			vehicleType.setMaximumVelocity(110.0 / 3.6);
 		case 7:
 
-			typeBuilder.setCapacity(80);
-			typeBuilder.setFixCost(80.0);
-			typeBuilder.setCostPerDistanceUnit(0.00047);
-			typeBuilder.setCostPerTimeUnit(0.008);
-			typeBuilder.setMaxVelocity(80.0 / 3.6);
-			return typeBuilder.build();
+			vehicleType.getCapacity().setOther(80);
+			vehicleType.getCostInformation().setFixedCost(80.0);
+			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
+			vehicleType.getCostInformation().setCostsPerSecond(0.008);
+			vehicleType.setMaximumVelocity(80.0 / 3.6);
 		case 8:
 
-			typeBuilder.setCapacity(80);
-			typeBuilder.setFixCost(80.0);
-			typeBuilder.setCostPerDistanceUnit(0.00047);
-			typeBuilder.setCostPerTimeUnit(0.008);
-			typeBuilder.setMaxVelocity(93.0 / 3.6);
-			return typeBuilder.build();
+			vehicleType.getCapacity().setOther(80);
+			vehicleType.getCostInformation().setFixedCost(80.0);
+			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
+			vehicleType.getCostInformation().setCostsPerSecond(0.008);
+			vehicleType.setMaximumVelocity(93.0 / 3.6);
 		case 9:
 
-			typeBuilder.setCapacity(50);
-			typeBuilder.setFixCost(80.0);
-			typeBuilder.setCostPerDistanceUnit(0.00047);
-			typeBuilder.setCostPerTimeUnit(0.008);
-			typeBuilder.setMaxVelocity(40.0 / 3.6);
-			return typeBuilder.build();
+			vehicleType.getCapacity().setOther(50);
+			vehicleType.getCostInformation().setFixedCost(80.0);
+			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
+			vehicleType.getCostInformation().setCostsPerSecond(0.008);
+			vehicleType.setMaximumVelocity(40.0 / 3.6);
 		case 10:
 
-			typeBuilder.setCapacity(100);
-			typeBuilder.setFixCost(80.0);
-			typeBuilder.setCostPerDistanceUnit(0.00047);
-			typeBuilder.setCostPerTimeUnit(0.008);
-			typeBuilder.setMaxVelocity(160.0 / 3.6);
-			return typeBuilder.build();
+			vehicleType.getCapacity().setOther(100);
+			vehicleType.getCostInformation().setFixedCost(80.0);
+			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
+			vehicleType.getCostInformation().setCostsPerSecond(0.008);
+			vehicleType.setMaximumVelocity(160.0 / 3.6);
 		case 11:
 
-			typeBuilder.setCapacity(100);
-			typeBuilder.setFixCost(80.0);
-			typeBuilder.setCostPerDistanceUnit(0.00047);
-			typeBuilder.setCostPerTimeUnit(0.008);
-			typeBuilder.setMaxVelocity(160.0 / 3.6);
-			return typeBuilder.build();
+			vehicleType.getCapacity().setOther(100);
+			vehicleType.getCostInformation().setFixedCost(80.0);
+			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
+			vehicleType.getCostInformation().setCostsPerSecond(0.008);
+			vehicleType.setMaximumVelocity(160.0 / 3.6);
 		default:
 
-			typeBuilder.setCapacity(100);
-			typeBuilder.setFixCost(80.0);
-			typeBuilder.setCostPerDistanceUnit(0.00047);
-			typeBuilder.setCostPerTimeUnit(0.008);
-			typeBuilder.setMaxVelocity(160.0 / 3.6);
-			return typeBuilder.build();
+			vehicleType.getCapacity().setOther(100);
+			vehicleType.getCostInformation().setFixedCost(80.0);
+			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
+			vehicleType.getCostInformation().setCostsPerSecond(0.008);
+			vehicleType.setMaximumVelocity(160.0 / 3.6);
 		}
-
+		return vehicleType;
 	}
 
 	// public static CarrierVehicleType createType(int vehicleType) {

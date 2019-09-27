@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.analysis.zonal.DrtGridUtils;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType;
 import org.matsim.contrib.freight.jsprit.FiFoTravelTime;
 import org.matsim.contrib.freight.jsprit.VehicleTypeDependentRoadPricingCalculator;
 import org.matsim.core.network.NetworkUtils;
@@ -37,7 +36,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
  * This calculates transport-times and transport-costs to cover the distance
@@ -107,10 +106,10 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts 
 		}
 
 		private VehicleType makeType(String typeId, double maxVelocity) {
-			VehicleTypeImpl vehicleTypeImpl = new VehicleTypeImpl(
+			VehicleType vehicleType = VehicleUtils.createVehicleType(
 					Id.create(typeId, org.matsim.vehicles.VehicleType.class));
-			vehicleTypeImpl.setMaximumVelocity(maxVelocity);
-			return vehicleTypeImpl;
+			vehicleType.setMaximumVelocity(maxVelocity);
+			return vehicleType;
 		}
 
 		@Override
@@ -341,12 +340,12 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts 
 
 	public static class Builder {
 
-		public static Builder newInstance(Network network, Collection<CarrierVehicleType> vehicleTypes) {
+		public static Builder newInstance(Network network, Collection<VehicleType> vehicleTypes) {
 			return new Builder(network, vehicleTypes);
 		}
 
 		public static Builder newInstance(Network network) {
-			return new Builder(network, Collections.<CarrierVehicleType>emptyList());
+			return new Builder(network, Collections.<VehicleType>emptyList());
 		}
 
 		/**
@@ -398,20 +397,20 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts 
 
 		/**
 		 * Creates the builder requiring {@link Network} and a collection of
-		 * {@link CarrierVehicleType}.
+		 * {@link VehicleType}.
 		 * 
 		 * @param network
 		 * @param vehicleTypes
 		 *            must be all vehicleTypes and their assigned costInformation in the
 		 *            system.
 		 */
-		private Builder(Network network, Collection<CarrierVehicleType> vehicleTypes) {
+		private Builder(Network network, Collection<VehicleType> vehicleTypes) {
 			this.network = network;
 			retrieveTypeSpecificCosts(vehicleTypes);
 		}
 
-		private void retrieveTypeSpecificCosts(Collection<CarrierVehicleType> vehicleTypes) {
-			for (CarrierVehicleType type : vehicleTypes) {
+		private void retrieveTypeSpecificCosts(Collection<VehicleType> vehicleTypes) {
+			for (VehicleType type : vehicleTypes) {
 				typeSpecificCosts.put(type.getId().toString(),
 						new VehicleTypeVarCosts(type.getVehicleCostInformation().getPerDistanceUnit(),
 								type.getVehicleCostInformation().getPerTimeUnit()));
