@@ -74,6 +74,7 @@ public final class AccidentsConfigGroup extends ReflectiveConfigGroup {
 		this.accidentsComputationMethod = accidentsComputationMethod;
 	}
 	
+	// yyyyyy this implies that you can change the accidents computation method PER LINK.  Is that what you want?  kai, sep'19
 	public String getAccidentsComputationMethodAttributeName() {
 		return accidentsComputationMethodAttributeName;
 	}
