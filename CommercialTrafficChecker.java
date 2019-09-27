@@ -58,6 +58,10 @@ public class CommercialTrafficChecker {
         boolean fail = false;
         Map<String, Object> attributes = CommercialJobUtils.getCommercialJobAttributes(activity);
         for (String attribute : attributes.keySet()) {
+            if(attribute.endsWith("0")){
+                log.error("index 0 is not supported for commercial job attributes. please start with index 1. See activity " + activity + " of person " + pid);
+                fail = true;
+            }
             String[] jobProperties = String.valueOf(attributes.get(attribute)).split(CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_DELIMITER);
             if(jobProperties.length != 6){
                 log.error("Activity " + activity + " of person " + pid + " defines commercialJob attribute " + attribute + " with a wrong number of properties. Length should be 6");
