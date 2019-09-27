@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.Id;
  * @author nagel
  *
  */
-public interface LookUpItemFromId<T> {
+public interface LookUpItemFromId<T,U> {
 	
-	T getItem( Id<T> id ) ;
+	T getItem( Id<U> id ) ;
 
 }

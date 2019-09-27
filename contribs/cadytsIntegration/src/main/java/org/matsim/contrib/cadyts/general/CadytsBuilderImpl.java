@@ -41,8 +41,9 @@ import java.util.Map;
 public final class CadytsBuilderImpl {
 	private static Logger log = Logger.getLogger( CadytsBuilderImpl.class ) ;
 
-	public static <T> AnalyticalCalibrator<T> buildCalibratorAndAddMeasurements(final Config config, final Counts<T> occupCounts,
-																				LookUpItemFromId<T> lookUp, Class<T> idType) {
+	public static <T,U> AnalyticalCalibrator<T> buildCalibratorAndAddMeasurements(final Config config, final Counts<T> occupCounts,
+																				LookUpItemFromId<T,U> lookUp,
+														  Class<U> idType) {
 		
 		if (occupCounts.getCounts().size() == 0) {
 			log.warn("Counts container is empty.");

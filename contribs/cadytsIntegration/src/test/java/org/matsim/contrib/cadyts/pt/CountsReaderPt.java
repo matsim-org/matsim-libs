@@ -44,7 +44,7 @@ final class CountsReaderPt {
 	final String ZERO = "0.0";
 
 	String countsTextFile;
-	Map<Id<TransitStopFacility>, Map<String, double[]>> count = new TreeMap<>();
+	Map<Id<org.matsim.facilities.Facility>, Map<String, double[]>> count = new TreeMap<>();
 
 	CountsReaderPt(final String countsTextFile){
 		this.countsTextFile = countsTextFile;
@@ -59,13 +59,13 @@ final class CountsReaderPt {
 			String row = bufferedReader.readLine(); // TODO : include the first row inside the iteration
 			String[] values = StringUtils.explode(row, '\t');
 
-			Id<TransitStopFacility> id = Id.create(values[1], TransitStopFacility.class);
+			Id<org.matsim.facilities.Facility> id = Id.create(values[1], org.matsim.facilities.Facility.class);
 			while (row != null) {
 				row = bufferedReader.readLine();
 				if (row != null && row != "") {
 					values = StringUtils.explode(row, '\t');
 					if (values[0].equals(this.STOP_ID_STRING_0)) {
-						id = Id.create(values[1], TransitStopFacility.class);
+						id = Id.create(values[1], org.matsim.facilities.Facility.class);
 					} else if (values[0].equals(this.HEAD_STRING_0)) {
 						// it does nothing, correct this condition
 					} else {
@@ -87,28 +87,28 @@ final class CountsReaderPt {
 	/**
 	 * I am reasonably sure that the first entry (hour 1) is at array-position 0. kai, sep'14
 	 */
-	double[]getSimulatedValues(final Id<TransitStopFacility> stopId) {
+	double[]getSimulatedValues(final Id<org.matsim.facilities.Facility> stopId) {
 		return this.getCountValues(stopId, 0);
 	}
 
 	/**
 	 * I am reasonably sure that the first entry (hour 1) is at array-position 0. kai, sep'14
 	 */
-	double[]getSimulatedScaled(final Id<TransitStopFacility> stopId) {
+	double[]getSimulatedScaled(final Id<org.matsim.facilities.Facility> stopId) {
 		return this.getCountValues(stopId, 1);
 	}
 
 	/**
 	 * I am reasonably sure that the first entry (hour 1) is at array-position 0. kai, sep'14
 	 */
-	double[]getRealValues(final Id<TransitStopFacility> stopId) {
+	double[]getRealValues(final Id<org.matsim.facilities.Facility> stopId) {
 		return this.getCountValues(stopId, 2);
 	}
 
 	/**
 	 * I am reasonably sure that the first entry (hour 1) is at array-position 0. kai, sep'14
 	 */
-	double[]getCountValues(final Id<TransitStopFacility> stopId, final int col) {
+	double[]getCountValues(final Id<org.matsim.facilities.Facility> stopId, final int col) {
 		double[] valueArray = new double[24];
 		for (byte i= 0; i<24 ; i++) {
 			String hour = String.valueOf(i+1);

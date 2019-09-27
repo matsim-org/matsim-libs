@@ -210,26 +210,26 @@ public class CadytsPtIT {
 			double[] simValues;
 			double[] realValues;
 
-			Id<TransitStopFacility> stopId1 = Id.create("stop1", TransitStopFacility.class);
+			Id<org.matsim.facilities.Facility> stopId1 = Id.create("stop1", org.matsim.facilities.Facility.class);
 			simValues = reader.getSimulatedValues(stopId1);
 			realValues= reader.getRealValues(stopId1);
 			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, realValues[6], MatsimTestUtils.EPSILON);
 
-			Id<TransitStopFacility> stopId2 = Id.create("stop2", TransitStopFacility.class);
+			Id<org.matsim.facilities.Facility> stopId2 = Id.create("stop2", org.matsim.facilities.Facility.class);
 			simValues = reader.getSimulatedValues(stopId2);
 			realValues= reader.getRealValues(stopId2);
 //			Assert.assertEquals("Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 is wrong", 2.0, simValues[6], MatsimTestUtils.EPSILON); // Altered after using ChangeExpBeta instead of "ccc"
 			Assert.assertEquals("Volume of hour 6 is wrong", 1.0, realValues[6] , MatsimTestUtils.EPSILON);
 
-			Id<TransitStopFacility> stopId6 = Id.create("stop6", TransitStopFacility.class);
+			Id<org.matsim.facilities.Facility> stopId6 = Id.create("stop6", org.matsim.facilities.Facility.class);
 			simValues = reader.getSimulatedValues(stopId6);
 			realValues= reader.getRealValues(stopId6);
 			Assert.assertEquals("Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 is wrong", 2.0, realValues[6], MatsimTestUtils.EPSILON);
 
-			Id<TransitStopFacility> stopId10 = Id.create("stop10", TransitStopFacility.class);
+			Id<org.matsim.facilities.Facility> stopId10 = Id.create("stop10", org.matsim.facilities.Facility.class);
 			simValues = reader.getSimulatedValues(stopId10);
 			realValues= reader.getRealValues(stopId10);
 //			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, simValues[6], MatsimTestUtils.EPSILON);
@@ -264,7 +264,7 @@ public class CadytsPtIT {
 			String linkOffsetFile = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".linkCostOffsets.xml";
 			//			CadytsPtLinkCostOffsetsXMLFileIO offsetReader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
 			CadytsCostOffsetsXMLFileIO<TransitStopFacility> offsetReader 
-			= new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(controler.getScenario()), TransitStopFacility.class);
+			= new CadytsCostOffsetsXMLFileIO<> (new TransitStopFacilityLookUp(controler.getScenario()), TransitStopFacility.class);
 			DynamicData<TransitStopFacility> stopOffsets = offsetReader.read(linkOffsetFile);
 
 			TransitStopFacility stop2 = schedule.getFacilities().get(stopId2);
@@ -361,25 +361,25 @@ public class CadytsPtIT {
 			double[] simValues;
 			double[] realValues;
 
-			Id<TransitStopFacility> stopId1 = Id.create("stop1", TransitStopFacility.class);
+			Id<org.matsim.facilities.Facility> stopId1 = Id.create("stop1", org.matsim.facilities.Facility.class);
 			simValues = reader.getSimulatedValues(stopId1);
 			realValues= reader.getRealValues(stopId1);
 			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, realValues[6], MatsimTestUtils.EPSILON);
 
-			Id<TransitStopFacility> stopId2 = Id.create("stop2", TransitStopFacility.class);
+			Id<org.matsim.facilities.Facility> stopId2 = Id.create("stop2", org.matsim.facilities.Facility.class);
 			simValues = reader.getSimulatedValues(stopId2);
 			realValues= reader.getRealValues(stopId2);
 			Assert.assertEquals("Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 is wrong", 1.0, realValues[6] , MatsimTestUtils.EPSILON);
 
-			Id<TransitStopFacility> stopId6 = Id.create("stop6", TransitStopFacility.class);
+			Id<org.matsim.facilities.Facility> stopId6 = Id.create("stop6", org.matsim.facilities.Facility.class);
 			simValues = reader.getSimulatedValues(stopId6);
 			realValues= reader.getRealValues(stopId6);
 			Assert.assertEquals("Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 is wrong", 2.0, realValues[6], MatsimTestUtils.EPSILON);
 
-			Id<TransitStopFacility> stopId10 = Id.create("stop10", TransitStopFacility.class);
+			Id<org.matsim.facilities.Facility> stopId10 = Id.create("stop10", org.matsim.facilities.Facility.class);
 			simValues = reader.getSimulatedValues(stopId10);
 			realValues= reader.getRealValues(stopId10);
 			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, simValues[6], MatsimTestUtils.EPSILON);
@@ -409,7 +409,7 @@ public class CadytsPtIT {
 			String linkOffsetFile = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".linkCostOffsets.xml";
 			//			CadytsPtLinkCostOffsetsXMLFileIO offsetReader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
 			CadytsCostOffsetsXMLFileIO<TransitStopFacility> offsetReader 
-			= new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(controler.getScenario()), TransitStopFacility.class);
+			= new CadytsCostOffsetsXMLFileIO<> (new TransitStopFacilityLookUp(controler.getScenario()), TransitStopFacility.class);
 			DynamicData<TransitStopFacility> stopOffsets = offsetReader.read(linkOffsetFile);
 
 			TransitStopFacility stop2 = schedule.getFacilities().get(stopId2);
@@ -517,28 +517,28 @@ public class CadytsPtIT {
 		// test resulting simulation volumes
 		String outCounts = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".simCountCompareOccupancy.txt";
 		CountsReaderPt reader = new CountsReaderPt(outCounts);
-		Id<TransitStopFacility> stopId1 = Id.create("stop1", TransitStopFacility.class);
+		Id<org.matsim.facilities.Facility> stopId1 = Id.create("stop1", org.matsim.facilities.Facility.class);
 		{
 			double[] simValues = reader.getSimulatedValues(stopId1);
 			double[] realValues= reader.getRealValues(stopId1);
 			Assert.assertEquals("Volume of hour 6 (probably: 7) is wrong", 4.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 (probably: 7) is wrong", 4.0, realValues[6], MatsimTestUtils.EPSILON);
 		}
-		Id<TransitStopFacility> stopId2 = Id.create("stop2", TransitStopFacility.class);
+		Id<org.matsim.facilities.Facility> stopId2 = Id.create("stop2", org.matsim.facilities.Facility.class);
 		{
 			double[] simValues = reader.getSimulatedValues(stopId2);
 			double[] realValues= reader.getRealValues(stopId2);
 			Assert.assertEquals("Volume of hour 6 (probably: 7) is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 (probably: 7) is wrong", 1.0, realValues[6] , MatsimTestUtils.EPSILON);
 		}
-		Id<TransitStopFacility> stopId6 = Id.create("stop6", TransitStopFacility.class);
+		Id<org.matsim.facilities.Facility> stopId6 = Id.create("stop6", org.matsim.facilities.Facility.class);
 		{
 			double[] simValues = reader.getSimulatedValues(stopId6);
 			double[] realValues= reader.getRealValues(stopId6);
 			Assert.assertEquals("Volume of hour 6 (probably: 7) is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 (probably: 7) is wrong", 2.0, realValues[6], MatsimTestUtils.EPSILON);
 		}
-		Id<TransitStopFacility> stopId10 = Id.create("stop10", TransitStopFacility.class);
+		Id<org.matsim.facilities.Facility> stopId10 = Id.create("stop10", org.matsim.facilities.Facility.class);
 		{
 			double[] simValues = reader.getSimulatedValues(stopId10);
 			double[] realValues= reader.getRealValues(stopId10);
@@ -581,7 +581,7 @@ public class CadytsPtIT {
 		//test link offsets
 		final TransitSchedule schedule = controler.getScenario().getTransitSchedule();
 		CadytsCostOffsetsXMLFileIO<TransitStopFacility> offsetReader = 
-				new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(controler.getScenario()), TransitStopFacility.class);
+				new CadytsCostOffsetsXMLFileIO<> (new TransitStopFacilityLookUp(controler.getScenario()), TransitStopFacility.class);
 		DynamicData<TransitStopFacility> stopOffsets = 
 				offsetReader.read(outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".linkCostOffsets.xml");
 
