@@ -30,9 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.core.controler.MatsimServices;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.misc.Time;
@@ -49,22 +47,26 @@ import java.util.*;
 public class CommercialTrafficAnalysisListener implements IterationEndsListener {
 
     @Inject
+    private
     MatsimServices services;
 
     @Inject
+    private
     Carriers carriers;
 
     @Inject
+    private
     ScoreCommercialJobs scoreCommercialJobs;
 
     @Inject
+    private
     TourLengthAnalyzer tourLengthAnalyzer;
 
     private boolean firstIteration = true;
     private String sep = ";";
     private Map<String, Map<Id<Carrier>, Map<Integer, Double>>> carrierShareHistories = new HashMap<>();
 
-    DecimalFormat format = new DecimalFormat();
+    private DecimalFormat format = new DecimalFormat();
 
 
     @Override
@@ -156,7 +158,7 @@ public class CommercialTrafficAnalysisListener implements IterationEndsListener 
         for (Carrier carrier : carriers.getCarriers().values()) {
             DoubleSummaryStatistics distances = tourLengthAnalyzer.getDeliveryAgentDistances().entrySet().stream()
                     .filter(entry -> CommercialJobUtils.getCarrierIdFromDriver(entry.getKey()).equals(carrier.getId()))
-                    .mapToDouble(e -> e.getValue())
+                    .mapToDouble(Map.Entry::getValue)
                     .summaryStatistics();
             DoubleSummaryStatistics scores = scoreCommercialJobs.getLogEntries().stream()
                     .filter(deliveryLogEntry -> deliveryLogEntry.getCarrierId().equals(carrier.getId()))

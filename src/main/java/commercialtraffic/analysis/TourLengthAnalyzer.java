@@ -96,7 +96,7 @@ public class TourLengthAnalyzer implements ActivityEndEventHandler, LinkEnterEve
         currentFreightVehicleForDelivery.clear();
     }
 
-    public Map<Id<Person>, Double> getDeliveryAgentDistances() {
+    Map<Id<Person>, Double> getDeliveryAgentDistances() {
         return deliveryAgentDistances;
     }
 }
