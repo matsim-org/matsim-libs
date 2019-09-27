@@ -101,8 +101,6 @@ public class CommercialTrafficModule extends AbstractModule {
         addControlerListenerBinding().to(CommercialTrafficAnalysisListener.class);
         addControlerListenerBinding().to(ScoreCommercialJobs.class);
 
-//        addMobsimListenerBinding().to(CommercialTrafficChecker.class);
-
         //bind strategy that enables to choose between operators
         addPlanStrategyBinding(ChangeDeliveryServiceOperator.SELECTOR_NAME).toProvider(new Provider<PlanStrategy>() {
             @Inject
