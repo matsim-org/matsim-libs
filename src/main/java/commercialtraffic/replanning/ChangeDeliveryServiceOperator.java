@@ -55,26 +55,26 @@ public class ChangeDeliveryServiceOperator extends AbstractMultithreadedModule {
     @Override
     public PlanAlgorithm getPlanAlgoInstance() {
         return plan -> {
-            List<Activity> activitiesWithServices = new ArrayList<>(CommercialJobUtils.getActivitiesWithJobs(plan));
-            if (activitiesWithServices.isEmpty()) {
+            List<Activity> activitiesWithJobs = new ArrayList<>(CommercialJobUtils.getActivitiesWithJobs(plan));
+            if (activitiesWithJobs.isEmpty()) {
                 return;
             }
-            int randomActIdx = random.nextInt(activitiesWithServices.size());
+            int randomActIdx = random.nextInt(activitiesWithJobs.size());
 
-            Activity selectedActivity = activitiesWithServices.get(randomActIdx);
-            int randomJobIdx = random.nextInt(CommercialJobUtils.getNumberOfJobsForActivity(selectedActivity));
+            Activity selectedActivity = activitiesWithJobs.get(randomActIdx);
+            int randomJobIdx = random.nextInt(CommercialJobUtils.getNumberOfJobsForActivity(selectedActivity)) + 1; //the smallest index is 1.
 
-            String deliveryType = CommercialJobUtils.getJobType(selectedActivity,randomJobIdx);
-            Set<Id<Carrier>> operators4Service = CommercialJobUtils.getExistingOperatorsForJobType(carriers, deliveryType);
+            String jobType = CommercialJobUtils.getJobType(selectedActivity,randomJobIdx);
+            Set<Id<Carrier>> operators4JobType = CommercialJobUtils.getExistingOperatorsForJobType(carriers, jobType);
             Id<Carrier> currentCarrier = CommercialJobUtils.getCurrentCarrierForJob(selectedActivity,randomJobIdx);
 
-            if (operators4Service.remove(currentCarrier)) {
-                if (!operators4Service.isEmpty()) {
-                    Id<Carrier> newCarrier = operators4Service.stream().skip(random.nextInt(operators4Service.size())).findFirst().orElse(currentCarrier);
+            if (operators4JobType.remove(currentCarrier)) {
+                if (!operators4JobType.isEmpty()) {
+                    Id<Carrier> newCarrier = operators4JobType.stream().skip(random.nextInt(operators4JobType.size())).findFirst().orElse(currentCarrier);
                     CommercialJobUtils.setJobOperator(selectedActivity,randomJobIdx,CommercialJobUtils.getCarrierOperator(newCarrier));
                 }
             } else
-                throw new RuntimeException(currentCarrier.toString() + " is not part of the service carriers for deliverytype " + deliveryType);
+                throw new RuntimeException(currentCarrier.toString() + " is not part of the commercial traffic carriers for job type " + jobType);
         };
     }
 }
