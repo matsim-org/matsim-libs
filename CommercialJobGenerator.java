@@ -287,7 +287,7 @@ public class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsim
     }
 
     public static Id<Person> getCustomerIdFromJobActivityType(String actType){
-        if(actType.startsWith(COMMERCIALJOB_ACTIVITYTYPE_PREFIX)) throw new IllegalArgumentException();
+        if(!actType.startsWith(COMMERCIALJOB_ACTIVITYTYPE_PREFIX)) throw new IllegalArgumentException();
         return Id.createPersonId(actType.substring(actType.indexOf(CommercialJobUtils.CARRIERSPLIT)+1));
     }
 
