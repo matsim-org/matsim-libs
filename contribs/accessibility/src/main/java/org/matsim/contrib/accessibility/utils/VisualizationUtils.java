@@ -97,7 +97,7 @@ public class VisualizationUtils {
 //				range, symbolSize);
 		GraduatedSymbolRenderer renderer = new GraduatedSymbolRenderer(accessibilityLayer, lowerBound, upperBound,
 				range, symbolSize, colorRange);
-			renderer.setRenderingAttribute(mode.toString() + "_accessibility");
+			renderer.setRenderingAttribute( mode + "_accessibility" );
 		writer.addLayer(accessibilityLayer);
 
 		writer.write(qGisProjectFile);

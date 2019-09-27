@@ -28,7 +28,7 @@ import org.matsim.contrib.cadyts.general.LookUpItemFromId;
  * @author nagel
  *
  */
-class LinkLookUp implements LookUpItemFromId<Link>{
+class LinkLookUp implements LookUpItemFromId<Link,Link>{
 	
 	private Network network;
 

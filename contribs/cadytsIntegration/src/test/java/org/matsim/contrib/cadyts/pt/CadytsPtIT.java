@@ -62,6 +62,7 @@ import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
+import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
@@ -263,8 +264,8 @@ public class CadytsPtIT {
 			final TransitSchedule schedule = controler.getScenario().getTransitSchedule();
 			String linkOffsetFile = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".linkCostOffsets.xml";
 			//			CadytsPtLinkCostOffsetsXMLFileIO offsetReader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
-			CadytsCostOffsetsXMLFileIO<TransitStopFacility> offsetReader 
-			= new CadytsCostOffsetsXMLFileIO<> (new TransitStopFacilityLookUp(controler.getScenario()), TransitStopFacility.class);
+			CadytsCostOffsetsXMLFileIO<TransitStopFacility,Facility> offsetReader
+			= new CadytsCostOffsetsXMLFileIO<> (new TransitStopFacilityLookUp(controler.getScenario()), Facility.class);
 			DynamicData<TransitStopFacility> stopOffsets = offsetReader.read(linkOffsetFile);
 
 			TransitStopFacility stop2 = schedule.getFacilities().get(stopId2);
@@ -408,8 +409,7 @@ public class CadytsPtIT {
 			final TransitSchedule schedule = controler.getScenario().getTransitSchedule();
 			String linkOffsetFile = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".linkCostOffsets.xml";
 			//			CadytsPtLinkCostOffsetsXMLFileIO offsetReader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
-			CadytsCostOffsetsXMLFileIO<TransitStopFacility> offsetReader 
-			= new CadytsCostOffsetsXMLFileIO<> (new TransitStopFacilityLookUp(controler.getScenario()), TransitStopFacility.class);
+			CadytsCostOffsetsXMLFileIO<TransitStopFacility,Facility> offsetReader = new CadytsCostOffsetsXMLFileIO<> (new TransitStopFacilityLookUp(controler.getScenario()), Facility.class);
 			DynamicData<TransitStopFacility> stopOffsets = offsetReader.read(linkOffsetFile);
 
 			TransitStopFacility stop2 = schedule.getFacilities().get(stopId2);
@@ -580,10 +580,8 @@ public class CadytsPtIT {
 
 		//test link offsets
 		final TransitSchedule schedule = controler.getScenario().getTransitSchedule();
-		CadytsCostOffsetsXMLFileIO<TransitStopFacility> offsetReader = 
-				new CadytsCostOffsetsXMLFileIO<> (new TransitStopFacilityLookUp(controler.getScenario()), TransitStopFacility.class);
-		DynamicData<TransitStopFacility> stopOffsets = 
-				offsetReader.read(outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".linkCostOffsets.xml");
+		CadytsCostOffsetsXMLFileIO<TransitStopFacility,Facility> offsetReader = new CadytsCostOffsetsXMLFileIO<> (new TransitStopFacilityLookUp(controler.getScenario()), Facility.class);
+		DynamicData<TransitStopFacility> stopOffsets = offsetReader.read(outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".linkCostOffsets.xml");
 
 		TransitStopFacility stop1 = schedule.getFacilities().get(stopId1);
 		TransitStopFacility stop2 = schedule.getFacilities().get(stopId2);

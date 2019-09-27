@@ -27,15 +27,15 @@ import cadyts.utilities.misc.DynamicDataXMLFileIO;
 /**
  * Enables cadyts to persist the cost offsets to file.
  */
-public final class CadytsCostOffsetsXMLFileIO<T extends Identifiable<? super T>> extends DynamicDataXMLFileIO<T> {
+public final class CadytsCostOffsetsXMLFileIO<T extends Identifiable<? super T>,U> extends DynamicDataXMLFileIO<T> {
 	// yyyy this is most probably not "costs" but just "offsets" (which end up being added into the scoring function, so if anything
 	// they are negative costs).  --> rename kai/janek, feb'19
 
 	private static final long serialVersionUID = 1L;
-	private LookUpItemFromId<T> lookUp;
-	private Class<T> idType;
+	private LookUpItemFromId<T,U> lookUp;
+	private Class<U> idType;
 
-	public CadytsCostOffsetsXMLFileIO(final LookUpItemFromId<T> lookUp, Class<T> idType) {
+	public CadytsCostOffsetsXMLFileIO(final LookUpItemFromId<T,U> lookUp, Class<U> idType) {
 		super();
 		this.lookUp = lookUp;
 		this.idType = idType;

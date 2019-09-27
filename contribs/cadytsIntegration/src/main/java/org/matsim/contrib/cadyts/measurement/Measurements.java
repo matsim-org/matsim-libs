@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.cadyts.general.LookUpItemFromId;
 import org.matsim.counts.Count;
 
-public final class Measurements implements LookUpItemFromId<Measurement> {
+public final class Measurements implements LookUpItemFromId<Measurement,Measurement> {
 	private static final Logger log = Logger.getLogger( Measurements.class );
 	
 	private final Map< Id<Measurement>,Measurement > map = new TreeMap<>() ;

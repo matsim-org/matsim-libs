@@ -125,8 +125,7 @@ public class MeasurementCadytsContext implements CadytsContextI<Measurement>, St
 		// write some output
 		String filename = event.getServices().getControlerIO().getIterationFilename(event.getIteration(), COSTOFFSET_FILENAME);
 		try {
-			new CadytsCostOffsetsXMLFileIO<Measurement>( this.measurements, Measurement.class)
-			.write(filename, this.calibrator.getLinkCostOffsets());
+			new CadytsCostOffsetsXMLFileIO<>( this.measurements, Measurement.class ).write(filename, this.calibrator.getLinkCostOffsets());
 		} catch (IOException e) {
 			log.error("Could not write link cost offsets!", e);
 		}

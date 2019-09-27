@@ -288,7 +288,7 @@ public class CadytsCarIT {
 		final Network network = scenario.getNetwork();
 		String linkOffsetFile = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".linkCostOffsets.xml";
 
-		CadytsCostOffsetsXMLFileIO<Link> offsetReader = new CadytsCostOffsetsXMLFileIO<Link>(new LinkLookUp(network), Link.class);
+		CadytsCostOffsetsXMLFileIO<Link,Link> offsetReader = new CadytsCostOffsetsXMLFileIO<>( new LinkLookUp( network ), Link.class );
 
 		DynamicData<Link> linkOffsets = offsetReader.read(linkOffsetFile);
 

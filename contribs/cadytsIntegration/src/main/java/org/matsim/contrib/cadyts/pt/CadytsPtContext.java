@@ -146,7 +146,7 @@ CadytsContextI<TransitStopFacility> {
 		new MatsimCountsReader(this.occupCounts).readFile(occupancyCountsFilename);
 
 		// === build the calibrator:
-		this.calibrator = CadytsBuilderImpl.buildCalibratorAndAddMeasurements(scenario.getConfig(), this.occupCounts, new TransitStopFacilityLookUp(scenario) , TransitStopFacility.class);
+		this.calibrator = CadytsBuilderImpl.buildCalibratorAndAddMeasurements(scenario.getConfig(), this.occupCounts, new TransitStopFacilityLookUp(scenario) , Facility.class);
 
 		// === find out which plan is contributing what to each measurement:
 		this.ptStep = new PtPlanToPlanStepBasedOnEvents<>(scenario, CadytsPtOccupancyAnalyzer.toTransitLineIdSet(cadytsConfig.getCalibratedItems()));
@@ -192,7 +192,7 @@ CadytsContextI<TransitStopFacility> {
 		// write some output
 		String filename = controlerIO.getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
 		try {
-			new CadytsCostOffsetsXMLFileIO<>(new TransitStopFacilityLookUp(scenario), TransitStopFacility.class)
+			new CadytsCostOffsetsXMLFileIO<>(new TransitStopFacilityLookUp(scenario), Facility.class)
 			.write(filename, this.calibrator.getLinkCostOffsets());
 		} catch (IOException e) {
 			log.error("Could not write link cost offsets!", e);
