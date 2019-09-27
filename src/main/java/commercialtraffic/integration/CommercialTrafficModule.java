@@ -84,25 +84,22 @@ public class CommercialTrafficModule extends AbstractModule {
             throw new RuntimeException("Carrier definition is invalid. Please check the log for details.");
         }
 
-//        bind commercial Traffic stuff
+        //bind commercial Traffic stuff
         bind(CommercialJobScoreCalculator.class).toInstance(new DefaultCommercialServiceScore(ctcg.getMaxDeliveryScore(), ctcg.getMinDeliveryScore(), ctcg.getZeroUtilityDelay()));
         bind(Carriers.class).toInstance(carriers);
-
-//        bind(CommercialJobManager.class).in(Singleton.class);
-//        bind(FreightAgentInserter.class).in(Singleton.class);
 
         bind(ScoreCommercialJobs.class).in(Singleton.class);
         bind(TourLengthAnalyzer.class).in(Singleton.class);
         bind(CarrierJSpritIterations.class).toInstance(iterationsForCarrier);
         if(this.carrierMode == null){
             bind(CarrierMode.class).toInstance(carrierId -> TransportMode.car);
-//            bind(CarrierMode.class).toInstance(carrierId -> TransportMode.drt);
+            //bind(CarrierMode.class).toInstance(carrierId -> TransportMode.drt);
         } else {
             bind(CarrierMode.class).toInstance(carrierMode);
         }
         addControlerListenerBinding().to(CommercialJobGenerator.class);
         addControlerListenerBinding().to(CommercialTrafficAnalysisListener.class);
-//        addMobsimListenerBinding().to(ScoreCommercialJobs.class); TODO: make ScoreCommercialJobs implement BeforeMobsimListener again instead of having CommercialTrafficAnalysisListener
+        addControlerListenerBinding().to(ScoreCommercialJobs.class);
 
 //        addMobsimListenerBinding().to(CommercialTrafficChecker.class);
 

@@ -36,11 +36,13 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityEndEventHandler {
+public class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityEndEventHandler, BeforeMobsimListener {
 
     private final Population population;
 
@@ -151,6 +153,16 @@ public class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityE
 
     public List<DeliveryLogEntry> getLogEntries() {
         return logEntries;
+    }
+
+    /**
+     * Notifies all observers of the Controler that the mobility simulation will start next.
+     *
+     * @param event
+     */
+    @Override
+    public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+        prepareTourArrivalsForDay();
     }
 
     static class ExpectedDelivery {
