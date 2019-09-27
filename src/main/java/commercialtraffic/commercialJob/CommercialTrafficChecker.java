@@ -42,7 +42,7 @@ public class CommercialTrafficChecker {
      * @param population to check
      * @return true if errors exist, false if all attributes are set
      */
-    public static boolean hasMissingAttributes(Population population) {
+    public static boolean checkPopulationAttributesConsistency(Population population) {
         final MutableBoolean fail = new MutableBoolean(false);
         for (Person p : population.getPersons().values()) {
             for (Plan plan : p.getPlans()) {

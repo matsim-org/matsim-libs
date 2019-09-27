@@ -105,9 +105,9 @@ public class ScoreCommercialServices implements ActivityStartEventHandler, Activ
     private void handleFreightActivityStart(ActivityStartEvent event) {
         if (event.getActType().equals(FreightConstants.END)) {
             activeDeliveryAgents.remove(event.getPersonId());
-        } else if (event.getActType().contains(FreightConstants.DELIVERY)) {
+        } else if (event.getActType().startsWith(CommercialJobGenerator.COMMERCIALJOB_ACTIVITYTYPE_PREFIX)) {
             Id<Carrier> carrier = CommercialJobUtils.getCarrierIdFromDriver(event.getPersonId());
-            Id<Person> customerAboutToBeServed = DeliveryGenerator.getCustomerIdFromDeliveryActivityType(event.getActType());
+            Id<Person> customerAboutToBeServed = CommercialJobGenerator.getCustomerIdFromJobActivityType(event.getActType());
             if (currentExpectedDeliveriesPerPerson.containsKey(customerAboutToBeServed)) {
                 ExpectedDelivery deliveryCandidate = currentExpectedDeliveriesPerPerson.get(customerAboutToBeServed).stream()
                         .filter(d -> d.getCarrier().equals(carrier))

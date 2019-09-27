@@ -5,10 +5,8 @@ import org.junit.Rule;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.freight.carrier.*;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.testcases.MatsimTestUtils;
@@ -18,9 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.matsim.core.config.ConfigUtils.createConfig;
-import static org.matsim.core.scenario.ScenarioUtils.createScenario;
 
-public class DeliveryGeneratorTest {
+public class CommercialJobGeneratorTest {
 
 
     @Rule
@@ -34,7 +31,7 @@ public class DeliveryGeneratorTest {
         Map<String,TravelTime> travelTimes = new HashMap<>();
         travelTimes.put(TransportMode.car, new FreeSpeedTravelTime());
 
-        DeliveryGenerator generator = new DeliveryGenerator(scenario,travelTimes, carriers, carrierId -> TransportMode.car, carrierId -> 50);
+        CommercialJobGenerator generator = new CommercialJobGenerator(scenario,travelTimes, carriers, carrierId -> TransportMode.car, carrierId -> 50);
         new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers)).write(utils.getOutputDirectory() + "vehicleTypes.xml");
         scenario.getConfig().controler().setOutputDirectory(utils.getOutputDirectory());
         int iteration = 0;

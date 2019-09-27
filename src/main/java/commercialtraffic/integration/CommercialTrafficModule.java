@@ -25,7 +25,7 @@ import com.google.inject.Singleton;
 import commercialtraffic.analysis.CommercialTrafficAnalysisListener;
 import commercialtraffic.analysis.TourLengthAnalyzer;
 import commercialtraffic.commercialJob.CommercialTrafficChecker;
-import commercialtraffic.commercialJob.DeliveryGenerator;
+import commercialtraffic.commercialJob.CommercialJobGenerator;
 import commercialtraffic.replanning.ChangeDeliveryServiceOperator;
 import commercialtraffic.commercialJob.DefaultCommercialServiceScore;
 import commercialtraffic.commercialJob.DeliveryScoreCalculator;
@@ -100,7 +100,7 @@ public class CommercialTrafficModule extends AbstractModule {
         } else {
             bind(CarrierMode.class).toInstance(carrierMode);
         }
-        addControlerListenerBinding().to(DeliveryGenerator.class);
+        addControlerListenerBinding().to(CommercialJobGenerator.class);
         addControlerListenerBinding().to(CommercialTrafficAnalysisListener.class);
 //        addMobsimListenerBinding().to(ScoreCommercialServices.class); TODO: make ScoreCommercialServices implement BeforeMobsimListener again instead of having CommercialTrafficAnalysisListener
 
