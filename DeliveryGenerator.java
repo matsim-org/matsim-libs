@@ -44,7 +44,6 @@ import org.matsim.vehicles.VehicleUtils;
 
 import javax.inject.Inject;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Generates carriers and tours depending on next iteration's freight demand
@@ -61,8 +60,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
     private Scenario scenario;
     private Population population;
 
-    private Carriers hullcarriers;
-    private Carriers jspritcarriers;
+    private Carriers carriers;
 
     private final TravelTime carTT;
 
@@ -76,7 +74,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
     @Inject
     public DeliveryGenerator(Scenario scenario, Map<String, TravelTime> travelTimes, Carriers carriers, CarrierMode carrierMode, CarrierJSpritIterations iterationsPerCarrier) {
         CommercialTrafficConfigGroup ctcg = CommercialTrafficConfigGroup.get(scenario.getConfig());
-        this.hullcarriers = carriers;
+        this.carriers = carriers;
         this.firsttourTraveltimeBuffer = ctcg.getFirstLegTraveltimeBufferFactor();
         this.timeSliceWidth = ctcg.getJspritTimeSliceWidth();
         this.carrierMode = carrierMode;
@@ -95,7 +93,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
      */
     DeliveryGenerator(Scenario scenario, Carriers carriers, CarrierJSpritIterations iterationsPerCarrier) {
         this.population = scenario.getPopulation();
-        this.hullcarriers = carriers;
+        this.carriers = carriers;
         this.scenario = scenario;
         this.firsttourTraveltimeBuffer = 2;
         this.timeSliceWidth = 1800;
@@ -112,7 +110,7 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
 
         String dir = event.getServices().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/";
         log.info("writing carrier file of iteration " + event.getIteration() + " to " + dir);
-        CarrierPlanWriter planWriter = new CarrierPlanWriter(hullcarriers.getCarriers().values());
+        CarrierPlanWriter planWriter = new CarrierPlanWriter(carriers.getCarriers().values());
         planWriter.write(dir + "carriers_it" + event.getIteration() + ".xml");
     }
 
@@ -124,33 +122,39 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
     }
 
     private void generateIterationServices() {
-        hullcarriers.getCarriers().values().forEach(carrier -> carrier.getServices().clear());
+        carriers.getCarriers().values().forEach(carrier -> carrier.getServices().clear());
 
-        Map<Person,Set<PlanElement>> person2ActsWithServices = new HashMap();
+        Map<Person,Set<Activity>> customer2ActsWithJobs = new HashMap();
 
         population.getPersons().values().forEach(p ->
         {
-            Set<PlanElement> activitiesWithServices = new HashSet<>(p.getSelectedPlan().getPlanElements().stream()
-                    .filter(Activity.class::isInstance)
-                    .filter(a -> a.getAttributes().getAsMap().containsKey(CommercialJobUtils.JOB_TYPE))
-                    .collect(Collectors.toSet()));
-            if(!activitiesWithServices.isEmpty()) person2ActsWithServices.put(p,activitiesWithServices);
+            Set<Activity> activitiesWithServices = CommercialJobUtils.getActivitiesWithJobs(p.getSelectedPlan());
+            if(!activitiesWithServices.isEmpty()) customer2ActsWithJobs.put(p,activitiesWithServices);
         });
-        for(Person personWithDelivieries : person2ActsWithServices.keySet()){
-            int i = 0;
-            for (PlanElement pe : person2ActsWithServices.get(personWithDelivieries)) {
-                Activity activity = (Activity) pe;
-                CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(createCarrierServiceIdXForCustomer(personWithDelivieries,i), activity.getLinkId());
-                serviceBuilder.setCapacityDemand(Integer.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_SIZE))));
-                serviceBuilder.setServiceDuration(Integer.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_DURATION))));
-                serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_EARLIEST_START))), Double.valueOf(String.valueOf(activity.getAttributes().getAttribute(CommercialJobUtils.JOB_TIME_END)))));
-                i++;
-                Id<Carrier> carrierId = CommercialJobUtils.getCarrierId(activity);
-                if (hullcarriers.getCarriers().containsKey(carrierId)) {
-                    Carrier carrier = hullcarriers.getCarriers().get(carrierId);
-                    carrier.getServices().add(serviceBuilder.build());
-                } else {
-                    throw new RuntimeException("Carrier Id does not exist: " + carrierId.toString());
+        for(Person customer : customer2ActsWithJobs.keySet()){
+            for (Activity activity : customer2ActsWithJobs.get(customer)) {
+                Map<String,Object> commercialJobAttributes = CommercialJobUtils.getCommercialJobAttributes(activity);
+                for (String commercialJobAttributeKey : commercialJobAttributes.keySet()) {
+                    String[] commercialJobProperties = String.valueOf(commercialJobAttributes.get(commercialJobAttributeKey)).split(CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_DELIMITER);
+
+                    int jobIdx = Integer.valueOf(commercialJobAttributeKey.substring(CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_NAME.length()));
+                    Id<CarrierService> serviceId = createCarrierServiceIdXForCustomer(customer,jobIdx);
+
+                    double earliestStart = Double.valueOf(commercialJobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_START_IDX]);
+                    double latestStart = Double.valueOf(commercialJobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_END_IDX]);
+
+                    CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(serviceId, activity.getLinkId());
+                    serviceBuilder.setCapacityDemand(Integer.valueOf(commercialJobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_AMOUNT_IDX]));
+                    serviceBuilder.setServiceDuration(Double.valueOf(commercialJobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_DURATION_IDX]));
+                    serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(earliestStart,latestStart));
+
+                    Id<Carrier> carrierId = CommercialJobUtils.getCurrentCarrierForJob(activity,jobIdx);
+                    if (carriers.getCarriers().containsKey(carrierId)) {
+                        Carrier carrier = carriers.getCarriers().get(carrierId);
+                        carrier.getServices().add(serviceBuilder.build());
+                    } else {
+                        throw new RuntimeException("Carrier Id does not exist: " + carrierId.toString());
+                    }
                 }
             }
         }
@@ -171,11 +175,11 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
     }
 
     private void buildTours() {
-        TourPlanning.runTourPlanningForCarriers(hullcarriers,scenario,iterationsPerCarrier,timeSliceWidth,carTT);
+        TourPlanning.runTourPlanningForCarriers(carriers,scenario,iterationsPerCarrier,timeSliceWidth,carTT);
     }
 
     private void createFreightAgents() {
-        for (Carrier carrier : hullcarriers.getCarriers().values()) {
+        for (Carrier carrier : carriers.getCarriers().values()) {
             int nextId = 0;
             String modeForCarrier = carrierMode.getCarrierMode(carrier.getId());
             for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
@@ -273,8 +277,8 @@ public class DeliveryGenerator implements BeforeMobsimListener, AfterMobsimListe
     private void removeFreightAgents() {
         freightDrivers.forEach(d -> scenario.getPopulation().removePerson(d));
         freightVehicles.forEach(vehicleId -> scenario.getVehicles().removeVehicle(vehicleId));
-        CarrierVehicleTypes.getVehicleTypes(hullcarriers).getVehicleTypes().keySet().forEach(vehicleTypeId -> scenario.getVehicles().removeVehicleType(vehicleTypeId));
-        hullcarriers.getCarriers().values().forEach(carrier -> {
+        CarrierVehicleTypes.getVehicleTypes(carriers).getVehicleTypes().keySet().forEach(vehicleTypeId -> scenario.getVehicles().removeVehicleType(vehicleTypeId));
+        carriers.getCarriers().values().forEach(carrier -> {
             carrier.getServices().clear();
             carrier.getShipments().clear();
             carrier.clearPlans();
