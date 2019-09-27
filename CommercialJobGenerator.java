@@ -105,6 +105,11 @@ public class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsim
 
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+        carriers.getCarriers().values().forEach(carrier -> carrier.getServices().clear());
+
+        CommercialTrafficChecker.checkPopulationAttributesConsistency(population);
+        CommercialTrafficChecker.checkCarrierConsistency(carriers);
+
         generateIterationServices();
         buildTours();
         createFreightAgents();
@@ -123,7 +128,6 @@ public class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsim
     }
 
     private void generateIterationServices() {
-        carriers.getCarriers().values().forEach(carrier -> carrier.getServices().clear());
 
         Map<Person,Set<Activity>> customer2ActsWithJobs = new HashMap();
 
