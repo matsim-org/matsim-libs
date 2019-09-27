@@ -29,7 +29,7 @@ import com.graphhopper.jsprit.core.problem.constraint.ServiceDeliveriesFirstCons
 import com.graphhopper.jsprit.core.problem.constraint.VehicleDependentTimeWindowConstraints;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
-import commercialtraffic.NetworkBasedTransportCosts;
+//import commercialtraffic.NetworkBasedTransportCosts;
 import commercialtraffic.NetworkRouter;
 import commercialtraffic.integration.CarrierJSpritIterations;
 import org.apache.log4j.Logger;
@@ -38,7 +38,7 @@ import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierVehicleType;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
-//import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
+import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 //import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
@@ -67,7 +67,7 @@ public class TourPlanning  {
         
 
         
-        final NetworkBasedTransportCosts netBasedCosts1 = netBuilder.build();
+        final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
         
 carriers.getCarriers().values().parallelStream().forEach(carrier -> {
                     double start = System.currentTimeMillis();
@@ -78,7 +78,7 @@ carriers.getCarriers().values().parallelStream().forEach(carrier -> {
                     
                     VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork());
                     
-                    vrpBuilder.setRoutingCost(netBasedCosts1);// this may be too expensive for the size of the problem
+                    vrpBuilder.setRoutingCost(netBasedCosts);// this may be too expensive for the size of the problem
                     
                     VehicleRoutingProblem problem = vrpBuilder.build();
 
@@ -128,7 +128,7 @@ carriers.getCarriers().values().parallelStream().forEach(carrier -> {
                     CarrierPlan carrierPlan = MatsimJspritFactory.createPlan(carrier, bestSolution);
 
                     log.info("routing plan for carrier " + carrier.getId());
-                    NetworkRouter.routePlan(carrierPlan, netBasedCosts1);    //we need to route the plans in order to create reasonable freight-agent plans
+                    org.matsim.contrib.freight.jsprit.NetworkRouter.routePlan(carrierPlan, netBasedCosts);    //we need to route the plans in order to create reasonable freight-agent plans
                     log.info("routing for carrier " + carrier.getId() + " finished. Tour planning plus routing took " + (System.currentTimeMillis() - start)/1000 + " seconds." );
                     carrier.setSelectedPlan(carrierPlan);
                 }
