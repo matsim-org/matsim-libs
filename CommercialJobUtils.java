@@ -35,14 +35,14 @@ import java.util.stream.Collectors;
 public class CommercialJobUtils {
 
     public static final String COMMERCIALJOB_ATTRIBUTE_NAME = "commercialJob";
-    public static final String COMMERCIALJOB_ATTRIBUTE_DELIMITER = ";";
+    static final String COMMERCIALJOB_ATTRIBUTE_DELIMITER = ";";
 
-    public static final int COMMERCIALJOB_ATTRIBUTE_TYPE_IDX = 0;
-    public static final int COMMERCIALJOB_ATTRIBUTE_OPERATOR_IDX = 1;
-    public static final int COMMERCIALJOB_ATTRIBUTE_AMOUNT_IDX = 2;
-    public static final int COMMERCIALJOB_ATTRIBUTE_START_IDX = 3;
-    public static final int COMMERCIALJOB_ATTRIBUTE_END_IDX = 4;
-    public static final int COMMERCIALJOB_ATTRIBUTE_DURATION_IDX = 5;
+    static final int COMMERCIALJOB_ATTRIBUTE_TYPE_IDX = 0;
+    static final int COMMERCIALJOB_ATTRIBUTE_OPERATOR_IDX = 1;
+    static final int COMMERCIALJOB_ATTRIBUTE_AMOUNT_IDX = 2;
+    static final int COMMERCIALJOB_ATTRIBUTE_START_IDX = 3;
+    static final int COMMERCIALJOB_ATTRIBUTE_END_IDX = 4;
+    static final int COMMERCIALJOB_ATTRIBUTE_DURATION_IDX = 5;
 
 
 
@@ -53,10 +53,10 @@ public class CommercialJobUtils {
 //    public static final String JOB_OPERATOR = "operator";
 //    public static final String JOB_TIME_END = "jobTimeEnd";
 
-    public static final String CARRIERSPLIT = "_";
+    static final String CARRIERSPLIT = "_";
 
 
-    public static Set<Activity> getActivitiesWithJobs (Plan plan){
+    static Set<Activity> getActivitiesWithJobs (Plan plan){
         Set<Activity> activitiesWithJob = new HashSet<>();
         plan.getPlanElements().stream()
                 .filter(Activity.class::isInstance)
@@ -72,7 +72,7 @@ public class CommercialJobUtils {
         return Id.create(id, Carrier.class);
     }
 
-    public static void setJobOperator(Activity activity, int commercialJobIndex, String operator) {
+    static void setJobOperator(Activity activity, int commercialJobIndex, String operator) {
         String[] commercialJobProperties = String.valueOf(getCommercialJob(activity, commercialJobIndex)).split(COMMERCIALJOB_ATTRIBUTE_DELIMITER);
         commercialJobProperties[COMMERCIALJOB_ATTRIBUTE_OPERATOR_IDX] = operator;
         activity.getAttributes().putAttribute(COMMERCIALJOB_ATTRIBUTE_NAME + commercialJobIndex, convertPropertiesArrayToAttributeValue(commercialJobProperties));
@@ -82,17 +82,11 @@ public class CommercialJobUtils {
         return String.valueOf(getCommercialJob(activity, commercialJobIndex)).split(COMMERCIALJOB_ATTRIBUTE_DELIMITER)[COMMERCIALJOB_ATTRIBUTE_OPERATOR_IDX];
     }
 
-    public static void setJobType(Activity activity, int commercialJobIndex, String operator) {
-        String[] commercialJobProperties = String.valueOf(getCommercialJob(activity, commercialJobIndex)).split(COMMERCIALJOB_ATTRIBUTE_DELIMITER);
-        commercialJobProperties[COMMERCIALJOB_ATTRIBUTE_TYPE_IDX] = operator;
-        activity.getAttributes().putAttribute(COMMERCIALJOB_ATTRIBUTE_NAME + commercialJobIndex, convertPropertiesArrayToAttributeValue(commercialJobProperties));
-    }
-
-    public static String getJobType(Activity activity, int commercialJobIndex) {
+    static String getJobType(Activity activity, int commercialJobIndex) {
         return String.valueOf(getCommercialJob(activity, commercialJobIndex)).split(COMMERCIALJOB_ATTRIBUTE_DELIMITER)[COMMERCIALJOB_ATTRIBUTE_TYPE_IDX];
     }
 
-    public static Set<Id<Carrier>> getExistingOperatorsForJobType(Carriers carriers, String jobType) {
+    static Set<Id<Carrier>> getExistingOperatorsForJobType(Carriers carriers, String jobType) {
         return carriers.getCarriers().values().
                 stream().
                 filter(carrier -> carrier.getId().toString().startsWith(jobType)).map(Carrier::getId).
@@ -103,32 +97,31 @@ public class CommercialJobUtils {
         return Id.create(personId.toString().split(CARRIERSPLIT)[1] + CARRIERSPLIT + personId.toString().split(CARRIERSPLIT)[2], Carrier.class);
     }
 
-    public static boolean planExpectsCommercialJobs(Plan plan) {
+    static boolean planExpectsCommercialJobs(Plan plan) {
         return plan.getPlanElements().stream()
                 .filter(Activity.class::isInstance)
                 .anyMatch(planElement -> activityExpectsCommercialJobs((Activity) planElement));
     }
 
-    public static boolean activityExpectsCommercialJobs(Activity activity){
+    private static boolean activityExpectsCommercialJobs(Activity activity){
         MutableBoolean activityExpectsCommercialJobs = new MutableBoolean(false);
         activity.getAttributes().getAsMap().keySet().forEach(k -> {
-            if(k.toString().startsWith(COMMERCIALJOB_ATTRIBUTE_NAME)) activityExpectsCommercialJobs.setTrue();
+            if(k.startsWith(COMMERCIALJOB_ATTRIBUTE_NAME)) activityExpectsCommercialJobs.setTrue();
         });
         return activityExpectsCommercialJobs.getValue();
     }
 
     static Map<String,Object> getCommercialJobAttributes(Activity activity){
         Map<String,Object> commercialJobs = new HashMap<>();
-        activity.getAttributes().getAsMap().entrySet().forEach(stringObjectEntry -> {
-            if(stringObjectEntry.getKey().startsWith(COMMERCIALJOB_ATTRIBUTE_NAME)) commercialJobs.put(stringObjectEntry.getKey(),stringObjectEntry.getValue());
+        activity.getAttributes().getAsMap().forEach((key, value) -> {
+            if (key.startsWith(COMMERCIALJOB_ATTRIBUTE_NAME)) commercialJobs.put(key, value);
         });
         return commercialJobs;
     }
 
-    public static int getNumberOfJobsForActivity(Activity activity){
+    static int getNumberOfJobsForActivity(Activity activity){
         return getCommercialJobAttributes(activity).size();
     }
-
 
     public static String getCarrierMarket(Id<Carrier> carrierId) {
         return carrierId.toString().split(CARRIERSPLIT)[0];
