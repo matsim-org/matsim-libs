@@ -41,16 +41,22 @@ import java.util.Map;
 public class CommercialTrafficChecker {
     private static final Logger log = Logger.getLogger(CommercialTrafficChecker.class);
 
+    static void run(Population population, Carriers carriers){
+        boolean fail = checkPopulationAttributesConsistency(population);
+        if(checkCarrierConsistency(carriers)) fail = true;
+        if(fail) throw new RuntimeException("there is a problem with consistency for commercial traffic either in the plans or in the carriers. Please check the log for details.");
+    }
+
     /**
      * @param population to check
      * @return true if errors exist, false if all attributes are set
      */
-    public static boolean checkPopulationAttributesConsistency(Population population) {
+    private static boolean checkPopulationAttributesConsistency(Population population) {
         final MutableBoolean fail = new MutableBoolean(false);
         for (Person p : population.getPersons().values()) {
             for (Plan plan : p.getPlans()) {
                     for(Activity activity : CommercialJobUtils.getActivitiesWithJobs(plan)) {
-                        if (checkActivityConsistency(activity, p.getId()) == true) fail.setTrue();
+                        if (checkActivityConsistency(activity, p.getId())) fail.setTrue();
                     }
             }
         }
@@ -84,7 +90,7 @@ public class CommercialTrafficChecker {
      * @param carriers to check
      * @return true if errors exist, false if carriers are set properly
      */
-    public static boolean checkCarrierConsistency(Carriers carriers) {
+    private static boolean checkCarrierConsistency(Carriers carriers) {
         boolean fail = false;
         for (Carrier carrier : carriers.getCarriers().values()) {
             if (carrier.getId().toString().split(CommercialJobUtils.CARRIERSPLIT).length != 2) {
