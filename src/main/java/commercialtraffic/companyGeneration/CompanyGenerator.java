@@ -157,9 +157,10 @@ public class CompanyGenerator {
 						String companyId = (lineContents[1]);
 						double companyX = Double.parseDouble(lineContents[2]);
 						double companyY = Double.parseDouble(lineContents[3]);
-						CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("EPSG:4326", "EPSG:25832");
+						CoordinateTransformation transformation = TransformationFactory
+								.getCoordinateTransformation("EPSG:4326", "EPSG:25832");
 						Coord companyCoord = new Coord(companyX, companyY);
-						companyCoord=transformation.transform(companyCoord);
+						companyCoord = transformation.transform(companyCoord);
 						// String zone = (lineContents[4]);
 						String companyClass = lineContents[5];
 						int vehicleType = Integer.parseInt(lineContents[6]);
@@ -304,10 +305,17 @@ public class CompanyGenerator {
 				// Delete Companies without vehicles
 				continue;
 			}
-if (commercialCompanyEntry.getValue().carrier.getId().toString().contains("grocery")) {
-			carriers.addCarrier(commercialCompanyEntry.getValue().carrier);}
-
+			if (commercialCompanyEntry.getValue().carrier.getServices().isEmpty()) {
+				// Delete Companies without Services
+				continue;
+			}
+			// if
+			// (commercialCompanyEntry.getValue().carrier.getId().toString().contains("grocery"))
+			// {
+			carriers.addCarrier(commercialCompanyEntry.getValue().carrier);
 		}
+
+		// }
 		new CarrierPlanWriter(carriers.getCarriers().values()).write(carrierOutputPath + "carrier_definition.xml");
 		new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers))
 				.write(carrierOutputPath + "carrier_vehicletypes.xml");
