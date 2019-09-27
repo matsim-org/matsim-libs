@@ -31,14 +31,11 @@ import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolutio
 import com.graphhopper.jsprit.core.util.Solutions;
 import commercialtraffic.vwUserCode.NetworkBasedTransportCosts;
 import commercialtraffic.vwUserCode.NetworkRouter;
-import commercialtraffic.integration.CarrierJSpritIterations;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
-//import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
-//import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.VehicleType;
 
@@ -46,9 +43,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+//import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
+//import org.matsim.contrib.freight.jsprit.NetworkRouter;
+
 public class TourPlanning  {
 
-    static Logger log = Logger.getLogger(TourPlanning.class);
+    private static Logger log = Logger.getLogger(TourPlanning.class);
 
 
     static void runTourPlanningForCarriers(Carriers carriers, Scenario scenario, CarrierJSpritIterations iterations, int jSpritTimeSliceWidth, TravelTime travelTime) {

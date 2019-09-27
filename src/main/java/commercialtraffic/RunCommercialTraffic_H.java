@@ -21,9 +21,10 @@ package commercialtraffic;/*
 							* created by jbischoff, 03.05.2019
 							*/
 
-import commercialtraffic.integration.CommercialTrafficConfigGroup;
-import commercialtraffic.integration.CommercialTrafficModule;
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import commercialtraffic.commercialJob.ChangeDeliveryServiceOperator;
+import commercialtraffic.commercialJob.CommercialTrafficConfigGroup;
+import commercialtraffic.commercialJob.CommercialTrafficModule;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -38,9 +39,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
-
-import static org.matsim.core.config.ConfigUtils.createConfig;
 import static org.matsim.core.scenario.ScenarioUtils.loadScenario;
 
 public class RunCommercialTraffic_H {

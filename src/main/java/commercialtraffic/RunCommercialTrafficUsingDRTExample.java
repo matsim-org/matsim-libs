@@ -21,8 +21,9 @@ package commercialtraffic;/*
  * created by jbischoff, 03.05.2019
  */
 
-import static org.matsim.core.config.ConfigUtils.createConfig;
-
+import commercialtraffic.commercialJob.ChangeDeliveryServiceOperator;
+import commercialtraffic.commercialJob.CommercialTrafficConfigGroup;
+import commercialtraffic.commercialJob.CommercialTrafficModule;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -40,9 +41,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import commercialtraffic.integration.CommercialTrafficConfigGroup;
-import commercialtraffic.integration.CommercialTrafficModule;
-import commercialtraffic.commercialJob.ChangeDeliveryServiceOperator;
+import static org.matsim.core.config.ConfigUtils.createConfig;
 
 public class RunCommercialTrafficUsingDRTExample {
     public static void main(String[] args) {

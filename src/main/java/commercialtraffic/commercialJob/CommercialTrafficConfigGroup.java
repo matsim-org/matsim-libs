@@ -17,11 +17,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package commercialtraffic.integration;/*
+package commercialtraffic.commercialJob;/*
  * created by jbischoff, 08.05.2019
  */
 
-import commercialtraffic.commercialJob.ChangeDeliveryServiceOperator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -134,7 +133,7 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
      * @return -- {@value #FIRSTLEGBUFFERDESC}
      */
     @StringGetter(FIRSTLEGBUFFER)
-    public double getFirstLegTraveltimeBufferFactor() {
+    double getFirstLegTraveltimeBufferFactor() {
         return firstLegTraveltimeBufferFactor;
     }
 
@@ -156,7 +155,7 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
      * @return jspritTimeSliceWidth --{@value #JSPRITTIMESLICEWIDTHDESC}
      */
     @StringGetter(JSPRITTIMESLICEWIDTH)
-    public int getJspritTimeSliceWidth() {
+    int getJspritTimeSliceWidth() {
         return jSpritTimeSliceWidth;
     }
 

@@ -1,7 +1,7 @@
 package commercialtraffic;
 
-import commercialtraffic.integration.CommercialTrafficConfigGroup;
-import commercialtraffic.integration.CommercialTrafficModule;
+import commercialtraffic.commercialJob.CommercialTrafficConfigGroup;
+import commercialtraffic.commercialJob.CommercialTrafficModule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;

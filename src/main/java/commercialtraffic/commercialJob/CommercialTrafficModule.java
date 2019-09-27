@@ -17,19 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package commercialtraffic.integration;/*
+package commercialtraffic.commercialJob;/*
  * created by jbischoff, 03.05.2019
  */
 
 import com.google.inject.Singleton;
 import commercialtraffic.analysis.CommercialTrafficAnalysisListener;
 import commercialtraffic.analysis.TourLengthAnalyzer;
-import commercialtraffic.commercialJob.CommercialTrafficChecker;
-import commercialtraffic.commercialJob.CommercialJobGenerator;
-import commercialtraffic.commercialJob.ChangeDeliveryServiceOperator;
-import commercialtraffic.commercialJob.DefaultCommercialServiceScore;
-import commercialtraffic.commercialJob.CommercialJobScoreCalculator;
-import commercialtraffic.commercialJob.ScoreCommercialJobs;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
