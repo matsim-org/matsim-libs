@@ -26,7 +26,7 @@ import commercialtraffic.analysis.CommercialTrafficAnalysisListener;
 import commercialtraffic.analysis.TourLengthAnalyzer;
 import commercialtraffic.commercialJob.CommercialTrafficChecker;
 import commercialtraffic.commercialJob.CommercialJobGenerator;
-import commercialtraffic.replanning.ChangeDeliveryServiceOperator;
+import commercialtraffic.commercialJob.ChangeDeliveryServiceOperator;
 import commercialtraffic.commercialJob.DefaultCommercialServiceScore;
 import commercialtraffic.commercialJob.CommercialJobScoreCalculator;
 import commercialtraffic.commercialJob.ScoreCommercialJobs;

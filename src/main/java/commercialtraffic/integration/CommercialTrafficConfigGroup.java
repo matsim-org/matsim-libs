@@ -21,7 +21,7 @@ package commercialtraffic.integration;/*
  * created by jbischoff, 08.05.2019
  */
 
-import commercialtraffic.replanning.ChangeDeliveryServiceOperator;
+import commercialtraffic.commercialJob.ChangeDeliveryServiceOperator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;

@@ -23,10 +23,8 @@ package commercialtraffic;/*
 
 import commercialtraffic.integration.CommercialTrafficConfigGroup;
 import commercialtraffic.integration.CommercialTrafficModule;
-import commercialtraffic.replanning.ChangeDeliveryServiceOperator;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;

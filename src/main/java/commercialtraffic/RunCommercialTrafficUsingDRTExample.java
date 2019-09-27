@@ -42,7 +42,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import commercialtraffic.integration.CommercialTrafficConfigGroup;
 import commercialtraffic.integration.CommercialTrafficModule;
-import commercialtraffic.replanning.ChangeDeliveryServiceOperator;
+import commercialtraffic.commercialJob.ChangeDeliveryServiceOperator;
 
 public class RunCommercialTrafficUsingDRTExample {
     public static void main(String[] args) {
