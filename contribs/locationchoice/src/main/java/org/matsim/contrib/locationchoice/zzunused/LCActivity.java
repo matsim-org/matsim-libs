@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
@@ -101,11 +102,11 @@ class LCActivity implements Activity, LCPlanElement {
 	}
 	
 	@Override
-	public final Id<ActivityFacility> getFacilityId() {
+	public final Id<? extends Facility> getFacilityId() {
 		return this.plan.facilityIds[this.arrayIndex];
 	}
 	
-	public final void setFacilityId(Id<ActivityFacility> facilityId) {
+	public final void setFacilityId( Id<? extends Facility> facilityId ) {
 		this.plan.facilityIds[this.arrayIndex] = facilityId;
 	}
 

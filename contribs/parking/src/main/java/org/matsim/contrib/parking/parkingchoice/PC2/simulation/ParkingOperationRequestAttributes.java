@@ -22,6 +22,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.Facility;
 
 public class ParkingOperationRequestAttributes {
 
@@ -29,7 +30,7 @@ public class ParkingOperationRequestAttributes {
 	public double arrivalTime;
 	public double parkingDurationInSeconds;
 	public Id<Person> personId;
-	public Id<ActivityFacility> facilityId;
+	public Id<? extends Facility> facilityId;
 	public String actType;
 	public int legIndex;
 

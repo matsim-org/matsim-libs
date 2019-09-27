@@ -50,6 +50,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
+import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.attributable.Attributes;
@@ -313,7 +314,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 //		return Collections.unmodifiableMap(this.facilityIndices);
 //	}
 	
-	public int getFacilityIndex(Id<ActivityFacility> id) {
+	public int getFacilityIndex( Id<? extends Facility> id ) {
 		return this.facilityIndices.get(id);
 	}
 	

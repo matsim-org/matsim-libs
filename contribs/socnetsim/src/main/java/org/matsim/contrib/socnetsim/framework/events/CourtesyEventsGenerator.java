@@ -77,7 +77,7 @@ public class CourtesyEventsGenerator implements ActivityStartEventHandler, Activ
 				CourtesyEvent.Type.sayHelloEvent,
 				event.getActType(),
 				event.getPersonId(),
-				event.getFacilityId(),
+			  (Id<ActivityFacility>) event.getFacilityId(),
 				event.getTime());
 	}
 
@@ -87,7 +87,7 @@ public class CourtesyEventsGenerator implements ActivityStartEventHandler, Activ
 				CourtesyEvent.Type.sayGoodbyeEvent,
 				event.getActType(),
 				event.getPersonId(),
-				event.getFacilityId(),
+			  (Id<ActivityFacility>) event.getFacilityId(),
 				event.getTime() );
 	}
 

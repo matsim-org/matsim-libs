@@ -39,6 +39,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.facilities.Facility;
 
 class ChoiceSet {
 	private static final Logger log = Logger.getLogger( ChoiceSet.class ) ;
@@ -84,10 +85,10 @@ class ChoiceSet {
 		this.notYetVisited.add(facilityId);
 	}
 
-	Id<ActivityFacility> getWeightedRandomChoice( int actlegIndex,
-								    ScoringFunctionFactory scoringFunction, Plan plan, TripRouter tripRouter, double pKVal,
-								    MultiNodeDijkstra forwardMultiNodeDijkstra,
-								    BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra, int iteration ) {
+	Id<? extends Facility> getWeightedRandomChoice( int actlegIndex,
+									ScoringFunctionFactory scoringFunction, Plan plan, TripRouter tripRouter, double pKVal,
+									MultiNodeDijkstra forwardMultiNodeDijkstra,
+									BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra, int iteration ) {
 		this.forwardMultiNodeDijkstra = forwardMultiNodeDijkstra;
 		this.backwardMultiNodeDijkstra = backwardMultiNodeDijkstra;
 
@@ -181,7 +182,7 @@ class ChoiceSet {
 
 		ArrayList<ScoredAlternative> list = new ArrayList<ScoredAlternative>();
 		double largestValue = Double.NEGATIVE_INFINITY;
-		Id<ActivityFacility> facilityIdWithLargestScore = activityToRelocate.getFacilityId();
+		Id<? extends Facility> facilityIdWithLargestScore = activityToRelocate.getFacilityId();
 
 		for (Id<ActivityFacility> destinationId : this.destinations) {
 

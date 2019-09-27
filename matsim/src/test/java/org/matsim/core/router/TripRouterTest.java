@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
@@ -206,7 +206,7 @@ public class TripRouterTest {
 			return this.delegate.getLinkId();
 		}
 		@Override
-		public Id<ActivityFacility> getFacilityId() {
+		public Id<? extends Facility> getFacilityId() {
 			return this.delegate.getFacilityId();
 		}
 		public EqualsActivity(final String type, final Id<Link> link) {
@@ -225,7 +225,7 @@ public class TripRouterTest {
 			throw new RuntimeException("not implemented") ;
 		}
 		@Override
-		public void setFacilityId(Id<ActivityFacility> id) {
+		public void setFacilityId( Id<? extends Facility> id ) {
 			throw new RuntimeException("not implemented") ;
 		}
 		@Override

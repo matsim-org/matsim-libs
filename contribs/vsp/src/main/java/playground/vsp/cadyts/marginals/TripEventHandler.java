@@ -13,6 +13,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.Facility;
 
 import java.util.*;
 
@@ -126,8 +127,8 @@ class TripEventHandler implements ActivityEndEventHandler, ActivityStartEventHan
 		private Id<Link> arrivalLink;
 		private double departureTime;
 		private double arrivalTime;
-		private Id<ActivityFacility> departureFacility;
-		private Id<ActivityFacility> arrivalFacility;
+		private Id<? extends Facility> departureFacility;
+		private Id<? extends Facility> arrivalFacility;
 		private String mainMode = TransportMode.other;
 
 		private List<Leg> legs = new ArrayList<>();
@@ -148,11 +149,11 @@ class TripEventHandler implements ActivityEndEventHandler, ActivityStartEventHan
 			return arrivalTime;
 		}
 
-		Id<ActivityFacility> getDepartureFacility() {
+		Id<? extends Facility> getDepartureFacility() {
 			return departureFacility;
 		}
 
-		Id<ActivityFacility> getArrivalFacility() {
+		Id<? extends Facility> getArrivalFacility() {
 			return arrivalFacility;
 		}
 

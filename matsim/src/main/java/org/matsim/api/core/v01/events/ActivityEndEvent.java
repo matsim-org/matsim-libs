@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.Facility;
 
 public final class ActivityEndEvent extends Event implements HasPersonId {
 
@@ -38,11 +39,11 @@ public final class ActivityEndEvent extends Event implements HasPersonId {
 
 	private final Id<Person> personId;
 	private final Id<Link> linkId;
-	private final Id<ActivityFacility> facilityId;
+	private final Id<? extends Facility> facilityId;
 	private final String acttype;
 	
-	public ActivityEndEvent(final double time, final Id<Person> agentId, final Id<Link> linkId, 
-			final Id<ActivityFacility> facilityId, final String acttype) {
+	public ActivityEndEvent( final double time, final Id<Person> agentId, final Id<Link> linkId,
+					 final Id<? extends Facility> facilityId, final String acttype ) {
 		super(time);
 		this.linkId = linkId;
 		this.facilityId = facilityId;
@@ -63,7 +64,7 @@ public final class ActivityEndEvent extends Event implements HasPersonId {
 		return this.linkId;
 	}
 
-	public Id<ActivityFacility> getFacilityId() {
+	public Id<? extends Facility> getFacilityId() {
 		return this.facilityId;
 	}
 	

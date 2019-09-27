@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
@@ -60,7 +61,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	/*package*/ String[] types;
 	/*package*/ Coord[] coords;
 	/*package*/ Id<Link>[] linkIds;
-	/*package*/ Id<ActivityFacility>[] facilityIds;
+	/*package*/ Id<? extends Facility>[] facilityIds;
 	
 	// Leg related arrays
 	/*package*/ Route[] routes;

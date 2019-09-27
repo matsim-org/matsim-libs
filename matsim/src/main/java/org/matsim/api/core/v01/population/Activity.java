@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.Facility;
 
 /**
  * Specifies the kind of activity an agent performs during its day.
@@ -67,11 +68,11 @@ public interface Activity extends PlanElement {
 	 */
 	public Id<Link> getLinkId();
 
-	public Id<ActivityFacility> getFacilityId();
+	public Id<? extends Facility> getFacilityId();
 
 	public void setLinkId(final Id<Link> id);
 	
-	public void setFacilityId(final Id<ActivityFacility> id);
+	public void setFacilityId(final Id<? extends Facility> id );
 
 	void setCoord(Coord coord);
 

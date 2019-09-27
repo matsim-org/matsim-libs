@@ -47,7 +47,9 @@ import org.matsim.api.core.v01.population.Activity;
 
 	@Override
 	public Id<ActivityFacility> getId() {
-		return this.wrapped.getFacilityId();
+		return (Id<ActivityFacility>) this.wrapped.getFacilityId();
+		// this shouldn't really have a facility ID at all, because that is the whole point.  Thus, casting the ID, if there is one, seems to be acceptable.
+		// (quite possibly, rather throw an exception when this method is called).
 	}
 
 	@Override

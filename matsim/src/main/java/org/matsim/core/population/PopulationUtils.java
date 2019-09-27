@@ -57,6 +57,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
@@ -265,7 +266,7 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public Id<ActivityFacility> getFacilityId() {
+		public Id<? extends Facility> getFacilityId() {
 			return this.delegate.getFacilityId() ;
 		}
 		@Override
@@ -279,7 +280,7 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public void setFacilityId(Id<ActivityFacility> id) {
+		public void setFacilityId( Id<? extends Facility> id ) {
 			throw new UnsupportedOperationException() ;
 		}
 
@@ -1031,7 +1032,7 @@ public final class PopulationUtils {
 		return act.getLinkId() ;
 	}
 	public static Coord decideOnCoordForActivity( Activity act, Scenario sc ) {
-		Id<ActivityFacility> facilityId ;
+		Id<? extends Facility> facilityId ;
 		try {
 			facilityId = act.getFacilityId() ;
 		} catch (Exception ee ) {

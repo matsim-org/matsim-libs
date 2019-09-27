@@ -40,6 +40,7 @@ import org.matsim.contrib.parking.parkingchoice.lib.obj.network.QuadTreeInitiali
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.Facility;
 
 // TODO: make abstract and create algorithm in Zuerich case -> provide protected helper methods already here.
 public final class ParkingInfrastructureManager implements ParkingInfrastructure {
@@ -50,7 +51,7 @@ public final class ParkingInfrastructureManager implements ParkingInfrastructure
 	private EventsManager eventsManager;
 
 	// facilityId -> parkings available to users of that facility
-	private LinkedListValueHashMap<Id<ActivityFacility>, PPRestrictedToFacilities> privateParkingsRestrictedToFacilities;
+	private LinkedListValueHashMap<Id<? extends Facility>, PPRestrictedToFacilities> privateParkingsRestrictedToFacilities;
 
 	// available to parking owner and sometimes to others (renting out)
 	private HashMap<Id<Person>, RentableParking> rentablePrivateParking;

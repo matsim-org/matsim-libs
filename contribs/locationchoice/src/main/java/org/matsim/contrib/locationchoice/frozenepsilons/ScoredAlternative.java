@@ -21,6 +21,7 @@ package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.Facility;
 
 class ScoredAlternative implements Comparable<ScoredAlternative> {
 
@@ -28,9 +29,9 @@ class ScoredAlternative implements Comparable<ScoredAlternative> {
 	private final static double epsilon = 0.000001;
 	
 	private double score;
-	private Id<ActivityFacility> alternativeId;
+	private Id<? extends Facility> alternativeId;
 	
-	public ScoredAlternative(double score, Id<ActivityFacility> alternativeId) {
+	public ScoredAlternative(double score, Id<? extends Facility> alternativeId ) {
 		this.score = score;
 		this.alternativeId = alternativeId;
 	}
@@ -41,7 +42,7 @@ class ScoredAlternative implements Comparable<ScoredAlternative> {
 	public void setScore(double score) {
 		this.score = score;
 	}
-	public Id<ActivityFacility> getAlternativeId() {
+	public Id<? extends Facility> getAlternativeId() {
 		return alternativeId;
 	}
 	public void setAlternativeId(Id<ActivityFacility> alternativeId) {
@@ -74,6 +75,7 @@ class ScoredAlternative implements Comparable<ScoredAlternative> {
 		if (Math.abs(this.score - o.getScore()) > 0.0) {
 			if (this.score > o.getScore()) return -1;
 			else return +1;
-		} else return this.alternativeId.compareTo(o.getAlternativeId());
+//		} else return this.alternativeId.compareTo(o.getAlternativeId());
+		} else return this.alternativeId.toString().compareTo(o.getAlternativeId().toString());
 	}
 }

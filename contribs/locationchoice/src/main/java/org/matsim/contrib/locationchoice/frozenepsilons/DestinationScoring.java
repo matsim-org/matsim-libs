@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.utils.ScaleEpsilon;
 import org.matsim.core.config.Config;
 import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 
  class DestinationScoring {
@@ -80,7 +81,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 	/*
 	 * linear at the moment
 	 */
-	private double getAttributesScore(Id<ActivityFacility> facilityId, Id<Person> personId) {
+	private double getAttributesScore( Id<? extends Facility> facilityId, Id<Person> personId ) {
 		double accumulatedScore = 0.0;
 		
 		if (this.lcContext.getPersonsBetas() != null && this.lcContext.getFacilitiesAttributes() != null) {
@@ -98,7 +99,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 		return accumulatedScore;
 	}
 	
-	private double getEpsilonAlternative(Id<ActivityFacility> facilityId, Id<Person> personId, int actIndex) {
+	private double getEpsilonAlternative( Id<? extends Facility> facilityId, Id<Person> personId, int actIndex ) {
 		/*
 		 * k values are uniform in [0..1[, see class ReadOrCreateKVals.
 		 */		

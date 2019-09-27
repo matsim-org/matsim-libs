@@ -47,6 +47,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
@@ -155,9 +156,9 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 					ChoiceSet cs = createChoiceSetFromCircle(plan, personIndex, this.dccg.getTravelTimeApproximationLevel(), actToMove, maxRadius, center );
 
 					// === this is where the work is done:
-					final Id<ActivityFacility> choice = cs.getWeightedRandomChoice(
+					final Id<? extends Facility> choice = cs.getWeightedRandomChoice(
 							actlegIndex, this.scoringFunctionFactory, plan, this.tripRouter, this.lcContext.getPersonsKValuesArray()[personIndex],
-							this.forwardMultiNodeDijkstra, this.backwardMultiNodeDijkstra, this.iteration);
+							this.forwardMultiNodeDijkstra, this.backwardMultiNodeDijkstra, this.iteration );
 					// yy This looks like method envy, i.e. the method should rather be in this class here.  kai, mar'19
 					// ===
 
@@ -210,7 +211,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		return cs;
 	}
 
-	private void setLocationOfActivityToFacilityId( Activity act2, Id<ActivityFacility> facilityId ) {
+	private void setLocationOfActivityToFacilityId( Activity act2, Id<? extends Facility> facilityId ) {
 		act2.setFacilityId( facilityId );
 		ActivityFacility facility = this.facilities.getFacilities().get(facilityId);
 		if ( facility != null ){

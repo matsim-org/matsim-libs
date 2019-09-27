@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.freight.carrier.TimeWindow;
-import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public class FreightActivity implements Activity {
@@ -75,7 +75,7 @@ public class FreightActivity implements Activity {
 	}
 
 	@Override
-	public Id<ActivityFacility> getFacilityId() {
+	public Id<? extends Facility> getFacilityId() {
 		return act.getFacilityId();
 	}
 
@@ -85,7 +85,7 @@ public class FreightActivity implements Activity {
 	}
 
 	@Override
-	public void setFacilityId(Id<ActivityFacility> id) {
+	public void setFacilityId( Id<? extends Facility> id ) {
 		throw new RuntimeException("not implemented") ;
 	}
 

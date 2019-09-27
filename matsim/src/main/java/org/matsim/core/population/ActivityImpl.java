@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
@@ -57,7 +57,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private String type;
 	private Coord coord = null;
 	private Id<Link> linkId = null;
-	private Id<ActivityFacility> facilityId = null;
+	private Id<? extends Facility> facilityId = null;
 
 	private final Attributes attributes = new Attributes();
 	
@@ -117,12 +117,12 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 	@Override
-	public final Id<ActivityFacility> getFacilityId() {
+	public final Id<? extends Facility> getFacilityId() {
 		return this.facilityId;
 	}
 
 	@Override
-	public final void setFacilityId(final Id<ActivityFacility> facilityId) {
+	public final void setFacilityId(final Id<? extends Facility> facilityId ) {
 //		testForLocked();
 		this.facilityId = facilityId;
 	}
