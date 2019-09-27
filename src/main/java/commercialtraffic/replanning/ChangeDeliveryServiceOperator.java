@@ -44,16 +44,15 @@ public class ChangeDeliveryServiceOperator extends AbstractMultithreadedModule {
     public static final String SELECTOR_NAME = "changeDeliveryServiceOperator";
 
     private final Carriers carriers;
-    private final Random random;
 
     public ChangeDeliveryServiceOperator(GlobalConfigGroup globalConfigGroup, Carriers carriers) {
         super(globalConfigGroup);
         this.carriers = carriers;
-        random = MatsimRandom.getLocalInstance();
     }
 
     @Override
     public PlanAlgorithm getPlanAlgoInstance() {
+        Random random = MatsimRandom.getLocalInstance();
         return plan -> {
             List<Activity> activitiesWithJobs = new ArrayList<>(CommercialJobUtils.getActivitiesWithJobs(plan));
             if (activitiesWithJobs.isEmpty()) {
