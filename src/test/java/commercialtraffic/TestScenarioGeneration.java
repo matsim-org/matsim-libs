@@ -55,32 +55,26 @@ public class TestScenarioGeneration {
 
     public static Carriers generateCarriers() {
         Carriers carriers = new Carriers();
-        Carrier pizza_1 = CarrierImpl.newInstance(Id.create("pizza_1", Carrier.class));
-        Carrier pizza_2 = CarrierImpl.newInstance(Id.create("pizza_2", Carrier.class));
+        Carrier italianPizzaPlace = CarrierImpl.newInstance(Id.create("pizza_italian", Carrier.class));
+        Carrier americanPizzaPlace = CarrierImpl.newInstance(Id.create("pizza_american", Carrier.class));
         Carrier shopping_1 = CarrierImpl.newInstance(Id.create("shopping_1", Carrier.class));
 
         VehicleType type = createLightType();
 
-        pizza_1.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
-        pizza_1.getCarrierCapabilities().getVehicleTypes().add(createLightType());
-        pizza_1.getCarrierCapabilities().getCarrierVehicles().add(getLightVehicle(pizza_1.getId(), type, Id.createLinkId(111), "one"));
-//        pizza_1.getServices().add(CarrierService
-//                .Builder.newInstance(Id.create("salamipizza", CarrierService.class),Id.createLinkId("259"))
-//                .setCapacityDemand(1)
-//                .setServiceDuration(180)
-//                .setServiceStartTimeWindow(TimeWindow.newInstance(12*3600,13*3600))
-//                .build());
+        italianPizzaPlace.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+        italianPizzaPlace.getCarrierCapabilities().getVehicleTypes().add(createLightType());
+        italianPizzaPlace.getCarrierCapabilities().getCarrierVehicles().add(getLightVehicle(italianPizzaPlace.getId(), type, Id.createLinkId(111), "one"));
 
-        pizza_2.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
-        pizza_2.getCarrierCapabilities().getCarrierVehicles().add(getLightVehicle(pizza_2.getId(), type, Id.createLinkId(111), "one"));
-        pizza_2.getCarrierCapabilities().getVehicleTypes().add(createLightType());
+        americanPizzaPlace.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+        americanPizzaPlace.getCarrierCapabilities().getCarrierVehicles().add(getLightVehicle(americanPizzaPlace.getId(), type, Id.createLinkId(111), "one"));
+        americanPizzaPlace.getCarrierCapabilities().getVehicleTypes().add(createLightType());
 
         shopping_1.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
         shopping_1.getCarrierCapabilities().getCarrierVehicles().add(getLightVehicle(shopping_1.getId(), type, Id.createLinkId(111), "one"));
         shopping_1.getCarrierCapabilities().getVehicleTypes().add(createLightType());
 
-        carriers.addCarrier(pizza_1);
-        carriers.addCarrier(pizza_2);
+        carriers.addCarrier(italianPizzaPlace);
+        carriers.addCarrier(americanPizzaPlace);
         carriers.addCarrier(shopping_1);
 
         return carriers;
@@ -103,16 +97,8 @@ public class TestScenarioGeneration {
         work.setLinkId(Id.createLinkId(259));
         work.setEndTime(16 * 3600);
 
-        work.getAttributes().putAttribute(CommercialJobUtils.JOB_TYPE, "pizza");
-        work.getAttributes().putAttribute(CommercialJobUtils.JOB_DURATION, 180);
-        work.getAttributes().putAttribute(CommercialJobUtils.JOB_EARLIEST_START, 12 * 3600);
-        work.getAttributes().putAttribute(CommercialJobUtils.JOB_TIME_END, 13 * 3600);
-        work.getAttributes().putAttribute(CommercialJobUtils.JOB_OPERATOR, 1);
-        work.getAttributes().putAttribute(CommercialJobUtils.JOB_SIZE, 1);
-
+        work.getAttributes().putAttribute(CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_NAME + "1", "pizza;italian;1;" + 12*3600 + ";" + 13*3600 + ";180");
         plan.addActivity(work);
-
-
         plan.addLeg(PopulationUtils.createLeg(TransportMode.car));
 
 

@@ -32,19 +32,19 @@ public class ChangeDeliveryServiceOperatorTest {
         Plan testPlan = scenario.getPopulation().getPersons().get(Id.createPersonId(1)).getSelectedPlan();
         Activity work = (Activity) testPlan.getPlanElements().get(2);
 
-        Id<Carrier> carrierId = CommercialJobUtils.getCurrentCarrierForJob(work);
-        Assert.assertEquals("the person should expect a salami","pizza", CommercialJobUtils.getCarrierMarket(carrierId));
-        Assert.assertEquals("the person should expect a salami from operator 1","1", CommercialJobUtils.getCarrierOperator(carrierId));
+        Id<Carrier> carrierId = CommercialJobUtils.getCurrentCarrierForJob(work,1);
+        Assert.assertEquals("the person should expect a pizza","pizza", CommercialJobUtils.getCarrierMarket(carrierId));
+        Assert.assertEquals("the person should expect a pizza from the italian place","italian", CommercialJobUtils.getCarrierOperator(carrierId));
 
         changeDeliveryServiceOperator.getPlanAlgoInstance().run(testPlan);
 
-        String operator = CommercialJobUtils.getJobOperator(work);
-        Assert.assertEquals("2", operator);
+        String operator = CommercialJobUtils.getJobOperator(work,1);
+        Assert.assertEquals("american", operator);
 
         changeDeliveryServiceOperator.getPlanAlgoInstance().run(testPlan);
 
-        operator = CommercialJobUtils.getJobOperator(work);
-        Assert.assertEquals("1", operator);
+        operator = CommercialJobUtils.getJobOperator(work,1);
+        Assert.assertEquals("italian", operator);
 
     }
 
