@@ -142,15 +142,15 @@ public class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsim
                 for (String commercialJobAttributeKey : commercialJobAttributes.keySet()) {
                     String[] commercialJobProperties = String.valueOf(commercialJobAttributes.get(commercialJobAttributeKey)).split(CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_DELIMITER);
 
-                    int jobIdx = Integer.valueOf(commercialJobAttributeKey.substring(CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_NAME.length()));
+                    int jobIdx = Integer.parseInt(commercialJobAttributeKey.substring(CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_NAME.length()));
                     Id<CarrierService> serviceId = createCarrierServiceIdXForCustomer(customer,jobIdx);
 
-                    double earliestStart = Double.valueOf(commercialJobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_START_IDX]);
-                    double latestStart = Double.valueOf(commercialJobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_END_IDX]);
+                    double earliestStart = Double.parseDouble(commercialJobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_START_IDX]);
+                    double latestStart = Double.parseDouble(commercialJobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_END_IDX]);
 
                     CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(serviceId, activity.getLinkId());
-                    serviceBuilder.setCapacityDemand(Integer.valueOf(commercialJobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_AMOUNT_IDX]));
-                    serviceBuilder.setServiceDuration(Double.valueOf(commercialJobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_DURATION_IDX]));
+                    serviceBuilder.setCapacityDemand(Integer.parseInt(commercialJobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_AMOUNT_IDX]));
+                    serviceBuilder.setServiceDuration(Double.parseDouble(commercialJobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_DURATION_IDX]));
                     serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(earliestStart,latestStart));
 
                     Id<Carrier> carrierId = CommercialJobUtils.getCurrentCarrierForJob(activity,jobIdx);
@@ -178,7 +178,7 @@ public class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsim
 
                 CarrierVehicle carrierVehicle = scheduledTour.getVehicle();
 
-                Id<Person> driverId = Id.createPersonId("freight_" + carrier.getId() + "_veh_" + carrierVehicle.getVehicleId() + "_" + nextId);
+                Id<Person> driverId = Id.createPersonId("freight_" + carrier.getId() + "_veh_" + carrierVehicle.getId() + "_" + nextId);
                 nextId++;
 
                 Person driverPerson = createDriverPerson(driverId);
@@ -243,12 +243,13 @@ public class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsim
 
                 scenario.getPopulation().addPerson(driverPerson);
                 try {
-                    scenario.getVehicles().addVehicleType(carrierVehicle.getVehicleType());
+                    scenario.getVehicles().addVehicleType(carrierVehicle.getType());
                 } catch (IllegalArgumentException e) {
+                    e.printStackTrace();
                 }
                 Id<Vehicle> vid = Id.createVehicleId(driverPerson.getId());
                 VehicleUtils.insertVehicleIdIntoAttributes(driverPerson,carrierMode.getCarrierMode(carrier.getId()),vid);
-                scenario.getVehicles().addVehicle(scenario.getVehicles().getFactory().createVehicle(vid, carrierVehicle.getVehicleType()));
+                scenario.getVehicles().addVehicle(scenario.getVehicles().getFactory().createVehicle(vid, carrierVehicle.getType()));
                 freightVehicles.add(vid);
                 freightDrivers.add(driverPerson.getId());
             }
@@ -256,9 +257,7 @@ public class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsim
     }
 
     private Person createDriverPerson(Id<Person> driverId) {
-        final Id<Person> id = driverId;
-        Person person = PopulationUtils.getFactory().createPerson(id);
-        return person;
+        return  PopulationUtils.getFactory().createPerson(driverId);
     }
 
     @Override
@@ -290,7 +289,7 @@ public class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsim
         return "commercialJob" + CommercialJobUtils.CARRIERSPLIT + idStr.substring(0,idStr.lastIndexOf(CommercialJobUtils.CARRIERSPLIT));
     }
 
-    public static Id<Person> getCustomerIdFromJobActivityType(String actType){
+    static Id<Person> getCustomerIdFromJobActivityType(String actType){
         if(!actType.startsWith(COMMERCIALJOB_ACTIVITYTYPE_PREFIX)) throw new IllegalArgumentException();
         return Id.createPersonId(actType.substring(actType.indexOf(CommercialJobUtils.CARRIERSPLIT)+1));
     }
