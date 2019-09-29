@@ -50,7 +50,7 @@ import org.matsim.pt.PtConstants;
 public class PersonEnterLeaveVehicle2ActivityHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, ActivityStartEventHandler, ActivityEndEventHandler{
 
 	private final Logger log = Logger.getLogger(PersonEnterLeaveVehicle2ActivityHandler.class);
-	private final Level logLevel = Level.DEBUG;
+//	private final Level logLevel = Level.DEBUG;
 	private Set<Id<Person>> agentIds;
 	private TreeMap<Id, ActivityEndEvent> agentId2ActEndEvent = new TreeMap<Id, ActivityEndEvent>();
 	private TreeMap<Id, List<PersonLeavesVehicleEvent>> agentId2LeaveVehEvent = new TreeMap<Id, List<PersonLeavesVehicleEvent>>();
@@ -59,7 +59,7 @@ public class PersonEnterLeaveVehicle2ActivityHandler implements PersonEntersVehi
 	private HashMap<PersonLeavesVehicleEvent, ActivityStartEvent> personLeavesVehicleEvent2ActivityStartEvent = new HashMap<PersonLeavesVehicleEvent, ActivityStartEvent>();
 
 	public PersonEnterLeaveVehicle2ActivityHandler(Set<Id<Person>> agentIds){
-		this.log.setLevel(this.logLevel);
+//		this.log.setLevel(this.logLevel);
 		this.agentIds = agentIds;
 	}
 

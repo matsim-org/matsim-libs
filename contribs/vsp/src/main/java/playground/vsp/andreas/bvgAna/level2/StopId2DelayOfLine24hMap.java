@@ -43,13 +43,13 @@ import playground.vsp.andreas.bvgAna.level1.StopId2RouteId2DelayAtStopMapData;
 public class StopId2DelayOfLine24hMap implements VehicleDepartsAtFacilityEventHandler, TransitDriverStartsEventHandler{
 	
 	private final Logger log = Logger.getLogger(StopId2DelayOfLine24hMap.class);
-	private final Level logLevel = Level.DEBUG;
+//	private final Level logLevel = Level.DEBUG;
 	
 	private final StopId2RouteId2DelayAtStopMap stopId2RouteId2DelayAtStopMap = new StopId2RouteId2DelayAtStopMap();
 	private TreeMap<Id, StopId2DelayOfLine24hMapData> stopId2DelayOfLine24hMap = null;
 	
 	public StopId2DelayOfLine24hMap(){
-		this.log.setLevel(this.logLevel);
+//		this.log.setLevel(this.logLevel);
 	}
 	
 	/**

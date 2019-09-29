@@ -61,7 +61,7 @@ import playground.vsp.andreas.bvgAna.level2.VehiclePlannedRealizedMissedDepartur
 public class AgentId2StopDifferenceMap implements TransitDriverStartsEventHandler, VehicleDepartsAtFacilityEventHandler, PersonDepartureEventHandler, PersonEntersVehicleEventHandler {
 
 	private final Logger log = Logger.getLogger(AgentId2StopDifferenceMap.class);
-	private final Level logLevel = Level.OFF;
+//	private final Level logLevel = Level.OFF;
 
 	private Population pop;
 	private Set<Id<Person>> agentIds;
@@ -73,7 +73,7 @@ public class AgentId2StopDifferenceMap implements TransitDriverStartsEventHandle
 	private Map<Id,List<Tuple<Id,Integer>>> agentIds2MissedVehMap = null;
 
 	public AgentId2StopDifferenceMap(Population pop, Set<Id<Person>> agentIds){
-		this.log.setLevel(this.logLevel);
+//		this.log.setLevel(this.logLevel);
 		this.pop = pop;
 		this.agentIds = agentIds;
 

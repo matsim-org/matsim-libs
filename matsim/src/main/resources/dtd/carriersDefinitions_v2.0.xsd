@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://www.matsim.org/files/dtd" xmlns="http://www.matsim.org/files/dtd"
+           elementFormDefault="qualified"
+           xml:lang="en">
+  <!-- Editor: Kai Martins-Turner, VSP, Berlin Institute of Technology -->
+  <!-- This xml schema contains xml definitions for freight carriers information in the MATSim framework (freight contrib)  -->
+
+  <xs:include schemaLocation="http://www.matsim.org/files/dtd/matsimCommon.xsd"/>
+
+  <xs:element name="carriers">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="carrier" type="carrierDefinition" maxOccurs="unbounded" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="carrierDefinition">
+    <xs:complexContent>
+      <xs:extension base="matsimObjectType">
+        <xs:sequence>
+          <xs:element name="description" type="xs:string" minOccurs="0"  />
+          <xs:element name="capabilities" >
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="vehicles" type="VehicleType"/>
+              </xs:sequence>
+              <xs:attribute name="fleetSize" type="xs:string" use="required"/>
+            </xs:complexType>
+          </xs:element>
+
+          <xs:element name="services" type="ServiceType" minOccurs="0" />
+
+          <xs:element name="shipments" type="ShipmentType" minOccurs="0" />
+
+          <xs:element name="plans" type="PlanType" minOccurs="0" />
+
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="VehicleType">
+    <xs:sequence>
+      <xs:element name="vehicle" maxOccurs="unbounded" >
+        <xs:complexType>
+          <xs:attribute name="id" type="xs:string" use="required"/>
+          <xs:attribute name="depotLinkId" type="xs:string" use="required"/>
+          <xs:attribute name="typeId" type="xs:string" use="required"/>
+          <xs:attribute name="earliestStart" />
+          <xs:attribute name="latestEnd" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+
+  <xs:complexType name="ServiceType">
+    <xs:sequence>
+      <xs:element name="service" maxOccurs="unbounded" >
+        <xs:complexType>
+          <xs:attribute name="id" type="xs:string" use="required"/>
+          <xs:attribute name="to" type="xs:string" use="required"/>
+          <xs:attribute name="capacityDemand" type="xs:double" use="required"/>
+          <xs:attribute name="earliestStart" />
+          <xs:attribute name="latestEnd" />
+          <xs:attribute name="serviceDuration" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ShipmentType">
+    <xs:sequence>
+      <xs:element name="shipment" maxOccurs="unbounded" >
+        <xs:complexType>
+          <xs:attribute name="id" type="xs:string" use="required"/>
+          <xs:attribute name="from" type="xs:string" use="required"/>
+          <xs:attribute name="to" type="xs:string" use="required"/>
+          <xs:attribute name="size" type="xs:double" use="required"/>
+          <xs:attribute name="startPickup" />
+          <xs:attribute name="endPickup"/>
+          <xs:attribute name="pickupServiceTime" />
+          <xs:attribute name="startDelivery" />
+          <xs:attribute name="endDelivery" />
+          <xs:attribute name="deliveryServiceTime" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="PlanType">
+    <xs:sequence>
+      <xs:element name="plan" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="tour" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence maxOccurs="unbounded">
+                  <xs:element name="act" minOccurs="0" >
+                    <xs:complexType>
+                      <xs:attribute name="type" type="xs:string" />
+                      <xs:attribute name="serviceId" type="xs:string" />
+                      <xs:attribute name="shipmentId" type="xs:string" />
+                      <xs:attribute name="end_time"/>
+                    </xs:complexType>
+                  </xs:element>
+                  <xs:element name="leg" minOccurs="0" >
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element name="route" minOccurs="0" />
+                      </xs:sequence>
+                      <xs:attribute name="dep_time" />
+                      <xs:attribute name="transp_time"/>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute name="vehicleId" type="xs:string" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="score" type="xs:double" />
+          <xs:attribute name="selected" type="xs:boolean" />
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>

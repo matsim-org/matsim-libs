@@ -43,14 +43,14 @@ import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityE
 public class StopId2RemainSeatedHandler implements VehicleArrivesAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 
 	private final Logger log = Logger.getLogger(StopId2RemainSeatedHandler.class);
-	private final Level logLevel = Level.DEBUG;
+//	private final Level logLevel = Level.DEBUG;
 
 	private TransitLoadByTimeHandler vehId2OccupancyHandler;
 	private TreeMap<Id, StopId2RemainSeatedData> vehId2PersonsLeavingMap = new TreeMap<Id, StopId2RemainSeatedData>();
 	private TreeMap<Id, List<StopId2RemainSeatedData>> stopId2RemainSeatedDataMap = new TreeMap<Id, List<StopId2RemainSeatedData>>();
 
 	public StopId2RemainSeatedHandler(){
-		this.log.setLevel(this.logLevel);
+//		this.log.setLevel(this.logLevel);
 		this.vehId2OccupancyHandler = new TransitLoadByTimeHandler();
 	}
 

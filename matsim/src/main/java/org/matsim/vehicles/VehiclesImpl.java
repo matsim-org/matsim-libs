@@ -31,7 +31,7 @@ import java.util.Map;
  * @author dgrether
  * @author jwjoubert
  */
-class VehiclesImpl implements Vehicles {
+final class VehiclesImpl implements Vehicles {
 	private final Map<Id<VehicleType>, VehicleType> vehicleTypes;
 	private final Map<Id<Vehicle>, Vehicle> vehicles;
 	private final VehiclesFactoryImpl builder;
@@ -80,7 +80,7 @@ class VehiclesImpl implements Vehicles {
 
 		/* Check if the VehicleType associated with the vehicle already exist.
 		 * Here only an error message is given. A RuntimeException is thrown
-		 * when the VehicleWriterV1 is called (JWJ, '14). */
+		 * when the MatsimVehicleWriter is called (JWJ, '14). */
 		if(!this.vehicleTypes.containsKey(v.getType().getId())){
 			throw new IllegalArgumentException("Cannot add Vehicle with type = " + v.getType().getId().toString() +
 					" if the VehicleType has not been added to the Vehicles container.");

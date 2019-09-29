@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  * A carrier.
@@ -12,7 +13,7 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
  * @author sschroeder
  *
  */
-public interface Carrier extends HasPlansAndId<CarrierPlan, Carrier> {
+public interface Carrier extends HasPlansAndId<CarrierPlan, Carrier>, Attributable{
 	
 	public static int PLAN_MEMORY = 5;
 

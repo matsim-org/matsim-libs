@@ -16,14 +16,14 @@ public class CarrierVehicleTypeLoaderTest extends MatsimTestCase{
 		types = new CarrierVehicleTypes();
 		new CarrierVehicleTypeReader(types).readFile(getClassInputDirectory() + "vehicleTypes.xml");
 		carriers = new Carriers();
-		new CarrierPlanXmlReaderV2(carriers).readFile(getClassInputDirectory() + "carrierPlansEquils.xml");
+		new CarrierPlanXmlReader(carriers).readFile(getClassInputDirectory() + "carrierPlansEquils.xml" );
 	}
 
 	@Test
 	public void test_whenLoadingTypes_allAssignmentsInLightVehicleAreCorrectly(){
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 		CarrierVehicle v = getVehicle("lightVehicle");
-		assertNotNull(v.getVehicleType());
+		assertNotNull(v.getType() );
 		
 	}
 	
@@ -31,13 +31,13 @@ public class CarrierVehicleTypeLoaderTest extends MatsimTestCase{
 	public void test_whenLoadingTypes_allAssignmentsInMediumVehicleAreCorrectly(){
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
 		CarrierVehicle v = getVehicle("mediumVehicle");
-		assertNotNull(v.getVehicleType());
+		assertNotNull(v.getType() );
 		
 	}
 
 	private CarrierVehicle getVehicle(String vehicleName) {
 		for(CarrierVehicle v : carriers.getCarriers().get(Id.create("testCarrier", Carrier.class)).getCarrierCapabilities().getCarrierVehicles()){
-			if(v.getVehicleId().toString().equals(vehicleName)){
+			if(v.getId().toString().equals(vehicleName )){
 				return v;
 			}
 		}

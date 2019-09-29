@@ -26,6 +26,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
  * Continuous queue model like transit stop handler using either serial or parallel doors operation mode.
@@ -50,16 +51,16 @@ public class ComplexTransitStopHandler implements TransitStopHandler {
 	private static final double closeDoorsDuration = 1.0;
 
 	/*package*/ ComplexTransitStopHandler(Vehicle vehicle) {
-		this.personEntersTime = vehicle.getType().getAccessTime();
-		this.personLeavesTime = vehicle.getType().getEgressTime();
-		this.doorOperationMode = vehicle.getType().getDoorOperationMode();
+        this.personEntersTime = VehicleUtils.getAccessTime(vehicle.getType());
+		this.personLeavesTime = VehicleUtils.getEgressTime(vehicle.getType());
+		this.doorOperationMode = VehicleUtils.getDoorOperationMode(vehicle.getType());
 	}
 
 	@Override
 	public double handleTransitStop(TransitStopFacility stop, double now, List<PTPassengerAgent> leavingPassengers,
 			List<PTPassengerAgent> enteringPassengers, PassengerAccessEgress handler, MobsimVehicle vehicle) {
 		
-		if(this.doorOperationMode == VehicleType.DoorOperationMode.parallel){			
+		if(this.doorOperationMode == VehicleType.DoorOperationMode.parallel){
 			return handleParallelStop(stop, now, leavingPassengers, enteringPassengers, handler, vehicle);			
 		} else if (this.doorOperationMode == VehicleType.DoorOperationMode.serial){
 			return handleSerialStop(stop, now, leavingPassengers, enteringPassengers, handler, vehicle);

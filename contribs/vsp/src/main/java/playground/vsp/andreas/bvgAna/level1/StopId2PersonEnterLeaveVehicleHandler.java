@@ -45,7 +45,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public class StopId2PersonEnterLeaveVehicleHandler implements VehicleArrivesAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 
 	private final Logger log = Logger.getLogger(StopId2PersonEnterLeaveVehicleHandler.class);
-	private final Level logLevel = Level.WARN;
+//	private final Level logLevel = Level.WARN;
 
 	private Set<Id<TransitStopFacility>> stopIds;
 	private Map<Id, Id> vehId2stopIdMap = new TreeMap<Id, Id>();
@@ -53,7 +53,7 @@ public class StopId2PersonEnterLeaveVehicleHandler implements VehicleArrivesAtFa
 	private Map<Id, List<PersonLeavesVehicleEvent>> stopId2PersonLeaveEventMap = new TreeMap<Id, List<PersonLeavesVehicleEvent>>();
 
 	public StopId2PersonEnterLeaveVehicleHandler(Set<Id<TransitStopFacility>> stopIds){
-		this.log.setLevel(this.logLevel);
+//		this.log.setLevel(this.logLevel);
 		this.stopIds = stopIds;
 	}
 

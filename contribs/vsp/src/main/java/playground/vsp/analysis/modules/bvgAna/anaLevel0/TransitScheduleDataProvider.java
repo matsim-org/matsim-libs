@@ -37,13 +37,13 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 public class TransitScheduleDataProvider {
 	
 	private final Logger log = Logger.getLogger(TransitScheduleDataProvider.class);
-	private final Level logLevel = Level.DEBUG;
+//	private final Level logLevel = Level.DEBUG;
 
 	private TransitSchedule transitSchedule;
 	private TreeMap<Id, Id> routeId2lineIdMap;
 	
 	public TransitScheduleDataProvider(TransitSchedule transitSchedule){
-		this.log.setLevel(this.logLevel);
+//		this.log.setLevel(this.logLevel);
 		this.transitSchedule = transitSchedule;
 	}
 	

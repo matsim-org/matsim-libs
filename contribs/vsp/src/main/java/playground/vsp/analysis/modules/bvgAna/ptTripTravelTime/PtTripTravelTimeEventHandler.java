@@ -48,14 +48,14 @@ import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
 public class PtTripTravelTimeEventHandler implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler{
 	
 	private final Logger log = Logger.getLogger(PtTripTravelTimeEventHandler.class);
-	private final Level logLevel = Level.DEBUG;
+//	private final Level logLevel = Level.DEBUG;
 	
 	private PtDriverIdAnalyzer ptDriverIdAnalyzer;
 	private TreeMap<Id, ArrayList<PtTripTravelTimeData>> agentId2PtTripTravelTimeMap = new TreeMap<Id, ArrayList<PtTripTravelTimeData>>();
 	private TreeMap<Id, PtTripTravelTimeData> tempList = new TreeMap<Id, PtTripTravelTimeData>();
 	
 	public PtTripTravelTimeEventHandler(PtDriverIdAnalyzer ptDriverPrefixAnalyzer){
-		this.log.setLevel(this.logLevel);
+//		this.log.setLevel(this.logLevel);
 		this.ptDriverIdAnalyzer = ptDriverPrefixAnalyzer;
 	}
 	

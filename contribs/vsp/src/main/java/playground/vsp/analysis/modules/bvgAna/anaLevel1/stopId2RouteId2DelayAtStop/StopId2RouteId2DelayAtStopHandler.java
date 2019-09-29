@@ -39,13 +39,13 @@ import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityE
 public class StopId2RouteId2DelayAtStopHandler implements VehicleDepartsAtFacilityEventHandler, TransitDriverStartsEventHandler{
 
 	private final Logger log = Logger.getLogger(StopId2RouteId2DelayAtStopHandler.class);
-	private final Level logLevel = Level.OFF;
+//	private final Level logLevel = Level.OFF;
 
 	private TreeMap<Id, TransitDriverStartsEvent> veh2LastStartsEvent = new TreeMap<Id, TransitDriverStartsEvent>();
 	private TreeMap<Id, TreeMap<Id, StopId2RouteId2DelayAtStopData>> stopId2RouteId2DelayAtStopMap = new TreeMap<Id, TreeMap<Id, StopId2RouteId2DelayAtStopData>>();
 
 	public StopId2RouteId2DelayAtStopHandler(){
-		this.log.setLevel(this.logLevel);
+//		this.log.setLevel(this.logLevel);
 	}
 
 	/**

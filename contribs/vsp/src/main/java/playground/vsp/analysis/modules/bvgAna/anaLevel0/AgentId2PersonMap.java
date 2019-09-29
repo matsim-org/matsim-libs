@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Population;
 public class AgentId2PersonMap {
 
 	private static final Logger log = Logger.getLogger(AgentId2PersonMap.class);
-	private static final Level logLevel = Level.DEBUG;
+//	private static final Level logLevel = Level.DEBUG;
 	
 	/**
 	 * @param pop The given population
@@ -44,7 +44,7 @@ public class AgentId2PersonMap {
 	 * @return Returns a map holding the populations person for each given agent id
 	 */
 	public static TreeMap<Id, Person> getAgentId2PersonMap(Population pop){
-		AgentId2PersonMap.log.setLevel(AgentId2PersonMap.logLevel);
+//		AgentId2PersonMap.log.setLevel(AgentId2PersonMap.logLevel);
 		
 		TreeMap<Id, Person> agentId2PersonMap = new TreeMap<Id, Person>();
 		

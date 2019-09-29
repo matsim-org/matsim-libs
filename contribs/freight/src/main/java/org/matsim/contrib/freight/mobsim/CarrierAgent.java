@@ -93,7 +93,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			if (currentRoute.size() > 1) {
 				NetworkRoute networkRoute = RouteUtils.createNetworkRoute(currentRoute, null);
 				networkRoute.setTravelTime(travelTime);
-				networkRoute.setVehicleId(getVehicle().getVehicleId());
+				networkRoute.setVehicleId(getVehicle().getId() );
 				currentLeg.setRoute(networkRoute);
 				currentRoute = null;
 			} else {
@@ -119,7 +119,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		}
 
 		public void handleEvent(LinkEnterEvent event) {
-            scoringFunction.handleEvent(new LinkEnterEvent(event.getTime(),getVehicle().getVehicleId(),event.getLinkId()));
+            scoringFunction.handleEvent(new LinkEnterEvent(event.getTime(),getVehicle().getId(),event.getLinkId()) );
             /* why can't we do something like:
             scoringFunction.handleEvent(event);
             (causes test failures in playground kturner), Theresa Dec'2015 */
@@ -290,8 +290,8 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 
 	private Vehicle createVehicle(Person driverPerson, CarrierVehicle carrierVehicle) {
 		Gbl.assertNotNull(driverPerson);
-		Gbl.assertNotNull( carrierVehicle.getVehicleType() );
-		return VehicleUtils.getFactory().createVehicle(Id.create(driverPerson.getId(), Vehicle.class), carrierVehicle.getVehicleType());
+		Gbl.assertNotNull( carrierVehicle.getType() );
+		return VehicleUtils.getFactory().createVehicle(Id.create(driverPerson.getId(), Vehicle.class), carrierVehicle.getType() );
 	}
 
 	private void clear() {
@@ -312,7 +312,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	}
 
 	private Id<Person> createDriverId(CarrierVehicle carrierVehicle) {
-		Id<Person> id = Id.create("freight_" + carrier.getId() + "_veh_" + carrierVehicle.getVehicleId() + "_" + nextId, Person.class);
+		Id<Person> id = Id.create("freight_" + carrier.getId() + "_veh_" + carrierVehicle.getId() + "_" + nextId, Person.class );
 		driverIds.add(id);
 		++nextId;
 		return id;

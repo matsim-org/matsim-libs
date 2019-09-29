@@ -33,9 +33,9 @@ import playground.vsp.andreas.bvgAna.mrieser.analysis.TransitLoadByTime;
 public class VehId2OccupancyHandler extends TransitLoadByTime{
 	
 	private final Logger log = Logger.getLogger(VehId2OccupancyHandler.class);
-	private final Level logLevel = Level.DEBUG;	
+//	private final Level logLevel = Level.DEBUG;
 	
 	public VehId2OccupancyHandler(){
-		this.log.setLevel(this.logLevel);
+//		this.log.setLevel(this.logLevel);
 	}
 }

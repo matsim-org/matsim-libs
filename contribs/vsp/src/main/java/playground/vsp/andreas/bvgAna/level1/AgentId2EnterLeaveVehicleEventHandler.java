@@ -41,14 +41,14 @@ import org.matsim.api.core.v01.population.Person;
 public class AgentId2EnterLeaveVehicleEventHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	
 	private final Logger log = Logger.getLogger(AgentId2EnterLeaveVehicleEventHandler.class);
-	private final Level logLevel = Level.DEBUG;
+//	private final Level logLevel = Level.DEBUG;
 	
 	private Set<Id<Person>> agentIds;
 	private TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> agentId2EnterEventMap = new TreeMap<Id, ArrayList<PersonEntersVehicleEvent>>();
 	private TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> agentId2LeaveEventMap = new TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>>();
 	
 	public AgentId2EnterLeaveVehicleEventHandler(Set<Id<Person>> agentIds){
-		this.log.setLevel(this.logLevel);
+//		this.log.setLevel(this.logLevel);
 		this.agentIds = agentIds;
 	}	
 	

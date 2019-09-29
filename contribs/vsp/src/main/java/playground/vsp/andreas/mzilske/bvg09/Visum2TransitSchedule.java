@@ -192,11 +192,12 @@ public class Visum2TransitSchedule {
 		for (VehicleCombination vehComb : this.visum.vehicleCombinations.values()) {
 			VehicleType type = vb.createVehicleType(Id.create(vehComb.id, VehicleType.class));
 			type.setDescription(vehComb.name);
-			VehicleCapacity capacity = vb.createVehicleCapacity();
+//			VehicleCapacity capacity = vb.createVehicleCapacity();
+			VehicleCapacity capacity = type.getCapacity() ;
 			VehicleUnit vu = this.visum.vehicleUnits.get(vehComb.vehUnitId);
 			capacity.setSeats(Integer.valueOf(vehComb.numOfVehicles * vu.seats));
 			capacity.setStandingRoom(Integer.valueOf(vehComb.numOfVehicles * (vu.passengerCapacity - vu.seats)));
-			type.setCapacity(capacity);
+//			type.setCapacity(capacity);
 			this.vehicles.addVehicleType(type);
 		}
 		

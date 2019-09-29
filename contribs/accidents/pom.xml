@@ -1,0 +1,22 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <groupId>org.matsim</groupId>
+    <artifactId>contrib</artifactId>
+    <version>12.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.matsim.contrib</groupId>
+  <artifactId>accidents</artifactId>
+  <name>accidents</name>
+  
+  	<dependencies>
+		<!-- This dependency is required to be able to push to the GeoServer -->
+		<dependency>
+  		  <groupId>org.geotools.jdbc</groupId>
+  		  <artifactId>gt-jdbc-postgis</artifactId>
+			<version>20.2</version>
+ 		 </dependency>
+		
+	</dependencies>
+  
+</project>

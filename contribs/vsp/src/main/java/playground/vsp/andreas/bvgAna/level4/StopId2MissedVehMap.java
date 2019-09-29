@@ -55,13 +55,13 @@ import playground.vsp.andreas.bvgAna.level3.AgentId2StopDifferenceMap;
 public class StopId2MissedVehMap implements TransitDriverStartsEventHandler, VehicleDepartsAtFacilityEventHandler, PersonDepartureEventHandler, PersonEntersVehicleEventHandler{
 
 	private final Logger log = Logger.getLogger(StopId2MissedVehMap.class);
-	private final Level logLevel = Level.DEBUG;
+//	private final Level logLevel = Level.DEBUG;
 
 	private AgentId2StopDifferenceMap agentId2StopDifferenceMap;
 	private TreeMap<Id, StopId2MissedVehMapData> stopId2StopId2MissedVehMapDataMap = null;
 
 	public StopId2MissedVehMap(Population pop){
-		this.log.setLevel(this.logLevel);
+//		this.log.setLevel(this.logLevel);
 		Set<Id<Person>> agentIds = new TreeSet<>(pop.getPersons().keySet());
 		this.agentId2StopDifferenceMap = new AgentId2StopDifferenceMap(pop, agentIds);
 	}

@@ -36,6 +36,10 @@ public class DvrpVehicleImpl implements DvrpVehicle {
 	private final Schedule schedule;
 
 	public DvrpVehicleImpl(DvrpVehicleSpecification specification, Link startLink) {
+		if (startLink == null) {
+			throw new RuntimeException("Start link " + specification.getStartLinkId() + " of vehicle " + specification.getId() + " is null."
+					+ " Please make sure the link is part of the mode-filtered (and cleaned?) network! Aborting...");
+		}
 		if (!startLink.getId().equals(specification.getStartLinkId())) {
 			throw new IllegalArgumentException("startLink.id != specification.startLinkId");
 		}

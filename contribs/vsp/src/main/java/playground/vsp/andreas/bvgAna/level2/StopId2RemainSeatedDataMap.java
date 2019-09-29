@@ -45,14 +45,14 @@ import playground.vsp.andreas.bvgAna.level1.VehId2OccupancyHandler;
 public class StopId2RemainSeatedDataMap implements VehicleArrivesAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 
 	private final Logger log = Logger.getLogger(StopId2RemainSeatedDataMap.class);
-	private final Level logLevel = Level.DEBUG;
+//	private final Level logLevel = Level.DEBUG;
 
 	private VehId2OccupancyHandler vehId2OccupancyHandler;
 	private TreeMap<Id, StopId2RemainSeatedDataMapData> vehId2PersonsLeavingMap = new TreeMap<Id, StopId2RemainSeatedDataMapData>();
 	private TreeMap<Id, List<StopId2RemainSeatedDataMapData>> stopId2RemainSeatedDataMap = new TreeMap<Id, List<StopId2RemainSeatedDataMapData>>();
 
 	public StopId2RemainSeatedDataMap(){
-		this.log.setLevel(this.logLevel);
+//		this.log.setLevel(this.logLevel);
 		this.vehId2OccupancyHandler = new VehId2OccupancyHandler();
 	}
 

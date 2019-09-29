@@ -35,8 +35,8 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.vehicles.VehicleReaderV1;
 
+import org.matsim.vehicles.MatsimVehicleReader;
 import playground.vsp.andreas.bvgAna.level1.AgentId2EnterLeaveVehicleEventHandler;
 import playground.vsp.andreas.bvgAna.level1.AgentId2PtTripTravelTimeMap;
 import playground.vsp.andreas.bvgAna.level1.PersonEnterLeaveVehicle2ActivityHandler;
@@ -93,7 +93,7 @@ public class TestMain {
 
 		new TransitScheduleReader(sc).readFile(transitScheduleFile);
 
-		new VehicleReaderV1(sc.getTransitVehicles()).readFile(vehDefinitionFile);
+		new MatsimVehicleReader(sc.getTransitVehicles()).readFile(vehDefinitionFile );
 
 		TreeSet<Id<Person>> agentIds = new TreeSet<>();
 		agentIds.add(Id.create("1000", Person.class));

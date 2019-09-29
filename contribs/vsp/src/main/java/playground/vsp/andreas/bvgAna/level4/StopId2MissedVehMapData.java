@@ -35,14 +35,14 @@ import org.matsim.api.core.v01.Id;
 public class StopId2MissedVehMapData {
 	
 	private final Logger log = Logger.getLogger(StopId2MissedVehMapData.class);
-	private final Level logLevel = Level.DEBUG;
+//	private final Level logLevel = Level.DEBUG;
 	
 	private final Id stopId;	
 	private List<Integer> missedVehList = new ArrayList<Integer>();
 	private List<Double> delays = new ArrayList<Double>();
 	
 	public StopId2MissedVehMapData(Id stopId){
-		this.log.setLevel(this.logLevel);
+//		this.log.setLevel(this.logLevel);
 		this.stopId = stopId;
 	}
 	
