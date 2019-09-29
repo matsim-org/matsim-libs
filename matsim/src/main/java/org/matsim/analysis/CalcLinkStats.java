@@ -20,14 +20,9 @@
 
 package org.matsim.analysis;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.util.TravelTime;
@@ -35,6 +30,10 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
 import javax.inject.Inject;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * Calculates the average link volumes and travel times over any number of iterations.
@@ -58,7 +57,7 @@ public class CalcLinkStats {
 	private double volScaleFactor = 1.0;
 
 	private int count = 0;
-	private final Map<Id<Link>, LinkData> linkData;
+	private final IdMap<Link, LinkData> linkData;
 	private final int nofHours;
 	private final Network network;
 
@@ -70,7 +69,7 @@ public class CalcLinkStats {
 	@Inject
 	public CalcLinkStats(final Network network) {
 		this.network = network;
-		this.linkData = new TreeMap<>();
+		this.linkData = new IdMap<>(Link.class);
 		this.nofHours = 24;
 		reset();
 	}

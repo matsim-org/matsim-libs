@@ -26,6 +26,7 @@ import gnu.trove.iterator.TDoubleIterator;
 import gnu.trove.list.array.TDoubleArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
@@ -53,10 +54,7 @@ import org.matsim.vehicles.Vehicle;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -92,10 +90,10 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 	 *
 	 * cdobler, nov'15
 	 */
-	private final Map<Id<Person>, ScoringFunction> agentScorers = new HashMap<>();
-	private final Map<Id<Person>, TDoubleCollection> partialScores = new LinkedHashMap<>();
+	private final IdMap<Person, ScoringFunction> agentScorers = new IdMap<>(Person.class);
+	private final IdMap<Person, TDoubleCollection> partialScores = new IdMap<>(Person.class);
 	private final AtomicReference<Throwable> exception = new AtomicReference<>();
-	private final Map<Id<Person>, Plan> tripRecords = new LinkedHashMap<>() ;
+	private final IdMap<Person, Plan> tripRecords = new IdMap<>(Person.class);
 	
 //	/**
 //	 * For something like the bicycle scoring, we need to know individual links at the level of the scoring function.  This is a first sketch how this could be implemented.
