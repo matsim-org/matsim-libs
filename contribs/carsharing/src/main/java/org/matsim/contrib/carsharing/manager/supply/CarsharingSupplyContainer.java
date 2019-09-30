@@ -1,5 +1,7 @@
 package org.matsim.contrib.carsharing.manager.supply;
 
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -13,6 +15,7 @@ import org.matsim.contrib.carsharing.config.FreefloatingAreasReader;
 import org.matsim.contrib.carsharing.readers.CarsharingXmlReaderNew;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -92,7 +95,19 @@ public class CarsharingSupplyContainer implements CarsharingSupplyInterface {
 			reader.setFreefloatingAreas(ffAreasReader.getFreefloatingAreas());
 		}
 
-		reader.readFile(configGroup.getvehiclelocations());
+
+		// Tried to make this understand relative paths. Gunnar, 2019-09-30
+		// reader.readFile(configGroup.getvehiclelocations());
+		try {
+			reader.readFile(Paths.get(ConfigGroup.getInputFileURL(scenario.getConfig().getContext(), configGroup.getvehiclelocations()).toURI()).toFile().toString());
+		} catch (UncheckedIOException e) {
+			throw new RuntimeException(e);
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
+
+
+		
 		this.companies = reader.getCompanies();
 		this.allVehicleLocations = reader.getAllVehicleLocations();
 		this.allVehicles = reader.getAllVehicles();
