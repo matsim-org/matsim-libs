@@ -272,7 +272,7 @@ public class TestFreightUtils {
 	public void convertionOfServicesIsDoneCorrectly() {
 		boolean foundSercice1 = false;
 		boolean foundService2 = false;
-		CarrierShipment carrierShipment1 = CarrierUtils.getShipment(carrierWShipmentsOnlyFromCarrierWShipments, Id.create("Service1", CarrierShipment.class));
+		CarrierShipment carrierShipment1 = CarrierUtils.getShipment(carrierWShipmentsOnlyFromCarrierWServices, Id.create("Service1", CarrierShipment.class));
 			if (carrierShipment1.getId() == Id.create("Service1", CarrierShipment.class)) {
 				foundSercice1 = true;
 				Assert.assertEquals(Id.createLinkId("i(6,0)"), carrierShipment1.getFrom());
@@ -285,7 +285,7 @@ public class TestFreightUtils {
 				Assert.assertEquals(0.0, carrierShipment1.getPickupTimeWindow().getStart(), 0);
 				Assert.assertEquals(36001.0, carrierShipment1.getPickupTimeWindow().getEnd(), 0);
 			}
-		CarrierShipment carrierShipment2 = CarrierUtils.getShipment(carrierWShipmentsOnlyFromCarrierWShipments, Id.create("Service2", CarrierShipment.class));
+		CarrierShipment carrierShipment2 = CarrierUtils.getShipment(carrierWShipmentsOnlyFromCarrierWServices, Id.create("Service2", CarrierShipment.class));
 			if (carrierShipment2.getId() == Id.create("Service2", CarrierShipment.class)) {
 				foundService2 = true;
 				Assert.assertEquals(Id.createLinkId("i(6,0)"), carrierShipment2.getFrom());
