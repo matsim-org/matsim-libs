@@ -71,9 +71,6 @@ public class IntegrationIT {
 			carrier.setSelectedPlan(newPlan) ;
 
 			SolutionPrinter.print(problem, solution, SolutionPrinter.Print.VERBOSE);
-
-
-
 		}
 	}
 
@@ -108,8 +105,8 @@ public class IntegrationIT {
 				serviceBuilder.setCapacityDemand( 33 );
 				serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(0., 24.*3600.) );
 				serviceBuilder.setServiceDuration( 10.*60. );
-				CarrierService service = serviceBuilder.build();
-				carrier.getServices().put(service.getId(), service);
+				CarrierService carrierService = serviceBuilder.build();
+				CarrierUtils.addService(carrier, carrierService);
 			}
 			carriers.addCarrier(carrier);
 		}

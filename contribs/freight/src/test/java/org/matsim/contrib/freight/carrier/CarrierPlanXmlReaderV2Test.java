@@ -31,13 +31,13 @@ public class CarrierPlanXmlReaderV2Test extends MatsimTestCase {
 	@Test
 	public void test_whenReadingCarrier_itReadsTypeIdsCorrectly(){
 		
-		CarrierVehicle light = getVehicle("lightVehicle");
+		CarrierVehicle light = CarrierUtils.getCarrierVehicle(testCarrier, Id.createVehicleId("lightVehicle"));
 		assertEquals("light",light.getVehicleTypeId().toString());
-		
-		CarrierVehicle medium = getVehicle("mediumVehicle");
+
+		CarrierVehicle medium = CarrierUtils.getCarrierVehicle(testCarrier, Id.createVehicleId("mediumVehicle"));
 		assertEquals("medium",medium.getVehicleTypeId().toString());
-		
-		CarrierVehicle heavy = getVehicle("heavyVehicle");
+
+		CarrierVehicle heavy = CarrierUtils.getCarrierVehicle(testCarrier, Id.createVehicleId("heavyVehicle"));
 		assertEquals("heavy",heavy.getVehicleTypeId().toString());
 	}
 	
@@ -116,13 +116,13 @@ public class CarrierPlanXmlReaderV2Test extends MatsimTestCase {
 		return vehicles.isEmpty();
 	}
 
-	private CarrierVehicle getVehicle(String vehicleName) {
-		Id<Vehicle> vehicleId = Id.create(vehicleName, Vehicle.class);
-		if(testCarrier.getCarrierCapabilities().getCarrierVehicles().containsKey(vehicleId)){
-			return testCarrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
-		}
-		log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
-		return null;
-	}
+//	private CarrierVehicle getVehicle(String vehicleName) {
+//		Id<Vehicle> vehicleId = Id.create(vehicleName, Vehicle.class);
+//		if(testCarrier.getCarrierCapabilities().getCarrierVehicles().containsKey(vehicleId)){
+//			return testCarrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
+//		}
+//		log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
+//		return null;
+//	}
 	
 }

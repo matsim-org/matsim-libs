@@ -74,17 +74,17 @@ public class TestFreightUtils {
 		//Create carrier with services and shipments
 		carriersWithServicesAndShpiments = new Carriers() ;
 		carrierWServices = CarrierUtils.createCarrier(CARRIER_SERVICES_ID );
-		CarrierService carrierService = createMatsimService("Service1", "i(3,9)", 2);
-		carrierWServices.getServices().put(carrierService.getId(), carrierService);
-		CarrierService carrierService2 = createMatsimService("Service2", "i(4,9)", 2);
-		carrierWServices.getServices().put(carrierService2.getId(), carrierService2);
+		CarrierService service1 = createMatsimService("Service1", "i(3,9)", 2);
+		CarrierUtils.addService(carrierWServices, service1);
+		CarrierService service2 = createMatsimService("Service2", "i(4,9)", 2);
+		CarrierUtils.addService(carrierWServices, service2);
 		
 		//Create carrier with shipments
 		carrierWShipments = CarrierUtils.createCarrier(CARRIER_SHIPMENTS_ID );
 		CarrierShipment shipment1 = createMatsimShipment("shipment1", "i(1,0)", "i(7,6)R", 1);
-		carrierWShipments.getShipments().put(shipment1.getId(), shipment1);
+		CarrierUtils.addShipment(carrierWShipments, shipment1);
 		CarrierShipment shipment2 = createMatsimShipment("shipment2", "i(3,0)", "i(3,7)", 2);
-		carrierWShipments.getShipments().put(shipment2.getId(), shipment2);
+		CarrierUtils.addShipment(carrierWShipments, shipment2);
 
 		//Create vehicle for Carriers
 		final Id<VehicleType> vehicleTypeId = Id.create( "gridType", VehicleType.class );
@@ -235,7 +235,7 @@ public class TestFreightUtils {
 	public void copiingOfShipmentsIsDoneCorrectly() {
 		boolean foundShipment1 = false;
 		boolean foundShipment2 = false;
-		CarrierShipment carrierShipment1 = carrierWShipmentsOnlyFromCarrierWShipments.getShipments().get(Id.create("shipment1", CarrierShipment.class));
+		CarrierShipment carrierShipment1 = CarrierUtils.getShipment(carrierWShipmentsOnlyFromCarrierWShipments, Id.create("shipment1", CarrierShipment.class));
 			if (carrierShipment1.getId() == Id.create("shipment1", CarrierShipment.class)) {
 				System.out.println("Found Shipment1");
 				foundShipment1 = true;
@@ -249,7 +249,7 @@ public class TestFreightUtils {
 				Assert.assertEquals(0.0, carrierShipment1.getPickupTimeWindow().getStart(), 0);
 				Assert.assertEquals(7200.0, carrierShipment1.getPickupTimeWindow().getEnd(), 0);
 			}
-		CarrierShipment carrierShipment2 = carrierWShipmentsOnlyFromCarrierWShipments.getShipments().get(Id.create("shipment2", CarrierShipment.class));
+		CarrierShipment carrierShipment2 = CarrierUtils.getShipment(carrierWShipmentsOnlyFromCarrierWShipments, Id.create("shipment2", CarrierShipment.class));
 			if (carrierShipment2.getId() == Id.create("shipment2", CarrierShipment.class)) {
 				System.out.println("Found Shipment2");
 				foundShipment2 = true;
@@ -272,7 +272,7 @@ public class TestFreightUtils {
 	public void convertionOfServicesIsDoneCorrectly() {
 		boolean foundSercice1 = false;
 		boolean foundService2 = false;
-		CarrierShipment carrierShipment1 = carrierWShipmentsOnlyFromCarrierWServices.getShipments().get(Id.create("Service1", CarrierShipment.class));
+		CarrierShipment carrierShipment1 = CarrierUtils.getShipment(carrierWShipmentsOnlyFromCarrierWShipments, Id.create("Service1", CarrierShipment.class));
 			if (carrierShipment1.getId() == Id.create("Service1", CarrierShipment.class)) {
 				foundSercice1 = true;
 				Assert.assertEquals(Id.createLinkId("i(6,0)"), carrierShipment1.getFrom());
@@ -285,7 +285,7 @@ public class TestFreightUtils {
 				Assert.assertEquals(0.0, carrierShipment1.getPickupTimeWindow().getStart(), 0);
 				Assert.assertEquals(36001.0, carrierShipment1.getPickupTimeWindow().getEnd(), 0);
 			}
-		CarrierShipment carrierShipment2 = carrierWShipmentsOnlyFromCarrierWServices.getShipments().get(Id.create("Service2", CarrierShipment.class));
+		CarrierShipment carrierShipment2 = CarrierUtils.getShipment(carrierWShipmentsOnlyFromCarrierWShipments, Id.create("Service2", CarrierShipment.class));
 			if (carrierShipment2.getId() == Id.create("Service2", CarrierShipment.class)) {
 				foundService2 = true;
 				Assert.assertEquals(Id.createLinkId("i(6,0)"), carrierShipment2.getFrom());
@@ -310,9 +310,9 @@ public class TestFreightUtils {
 	public void exceptionIsThrownWhenUsingMixedShipmentsAndServices() {
 		Carrier carrierMixedWServicesAndShipments = CarrierUtils.createCarrier(Id.create("CarrierMixed", Carrier.class ) );
 		CarrierService service1 = createMatsimService("Service1", "i(3,9)", 2);
-		carrierMixedWServicesAndShipments.getServices().put(service1.getId(), service1);
+		CarrierUtils.addService(carrierMixedWServicesAndShipments, service1);
 		CarrierShipment shipment1 = createMatsimShipment("shipment1", "i(1,0)", "i(7,6)R", 1);
-		carrierMixedWServicesAndShipments.getShipments().put(shipment1.getId(), shipment1);
+		CarrierUtils.addShipment(carrierMixedWServicesAndShipments, shipment1);
 		
 		Network network = NetworkUtils.createNetwork();
 		new MatsimNetworkReader(network).readFile(getPackageInputDirectory() + "grid-network.xml"); 

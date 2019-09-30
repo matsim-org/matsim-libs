@@ -88,7 +88,7 @@ final class FreightScenarioCreator {
             serviceBuilder.setServiceDuration(5*60);
             serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(6*60*60, 15*60*60));
             CarrierService carrierService = serviceBuilder.build();
-            carrier.getServices().put(carrierService.getId(), carrierService);
+            CarrierUtils.addService(carrier, carrierService);
         }
     }
 
@@ -132,15 +132,15 @@ final class FreightScenarioCreator {
 
         //light
         CarrierVehicle carrierVehicle_lightA = createLightVehicle(carrier.getId(), homeId, "a");
-        carrier.getCarrierCapabilities().getCarrierVehicles().put(carrierVehicle_lightA.getId(), carrierVehicle_lightA);
+        CarrierUtils.addCarrierVehicle(carrier, carrierVehicle_lightA);
         CarrierVehicle carrierVehicle_lightB = createLightVehicle(carrier.getId(), oppositeId, "b");
-        carrier.getCarrierCapabilities().getCarrierVehicles().put(carrierVehicle_lightB.getId(), carrierVehicle_lightB);
+        CarrierUtils.addCarrierVehicle(carrier, carrierVehicle_lightB);
 
         //heavy
         CarrierVehicle carrierVehicle_heavyA = createHeavyVehicle(carrier.getId(), homeId, "a");
-        carrier.getCarrierCapabilities().getCarrierVehicles().put(carrierVehicle_heavyA.getId(), carrierVehicle_heavyA);
+        CarrierUtils.addCarrierVehicle(carrier, carrierVehicle_heavyA);
         CarrierVehicle carrierVehicle_heavyB = createHeavyVehicle(carrier.getId(), oppositeId, "b");
-        carrier.getCarrierCapabilities().getCarrierVehicles().put(carrierVehicle_heavyB.getId(), carrierVehicle_heavyB);
+        CarrierUtils.addCarrierVehicle(carrier, carrierVehicle_heavyB);
 
         carrier.getCarrierCapabilities().setFleetSize(FleetSize.INFINITE);
     }

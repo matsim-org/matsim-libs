@@ -112,7 +112,7 @@ public class FreightUtils {
 	private static void copyShipments(Carrier carrierWS, Carrier carrier) {
 		for (CarrierShipment carrierShipment: carrier.getShipments().values()){
 			log.debug("Copy CarrierShipment: " + carrierShipment.toString());
-			carrierWS.getShipments().put(carrierShipment.getId(), carrierShipment);
+			CarrierUtils.addShipment(carrierWS, carrierShipment);
 		}
 		
 	}
@@ -156,7 +156,7 @@ public class FreightUtils {
 					.setDeliveryTimeWindow(carrierService.getServiceStartTimeWindow())
 					.setPickupTimeWindow(TimeWindow.newInstance(0.0, carrierService.getServiceStartTimeWindow().getEnd()))			// limited to end of delivery timeWindow (pickup later as latest delivery is not usefull)
 					.build();
-			carrierWS.getShipments().put(carrierShipment.getId(), carrierShipment);
+			CarrierUtils.addShipment(carrierWS, carrierShipment);
 		}
 	}
 

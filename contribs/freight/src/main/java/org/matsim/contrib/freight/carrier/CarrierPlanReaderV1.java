@@ -159,7 +159,8 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 				if( deliveryServiceTime != null ) shipmentBuilder.setDeliveryServiceTime( getDouble( deliveryServiceTime ) );
 				CarrierShipment shipment = shipmentBuilder.build();
 				currentShipments.put( atts.getValue( ID ), shipment );
-				currentCarrier.getShipments().put( shipment.getId(), shipment );
+				CarrierUtils.addShipment(currentCarrier, shipment);
+//				currentCarrier.getShipments().put( shipment.getId(), shipment );
 				break ;
 			}
 			case VEHICLES:
@@ -184,7 +185,8 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 				if( startTime != null ) vehicleBuilder.setEarliestStart( getDouble( startTime ) );
 				if( endTime != null ) vehicleBuilder.setLatestEnd( getDouble( endTime ) );
 				CarrierVehicle vehicle = vehicleBuilder.build();
-				currentCarrier.getCarrierCapabilities().getCarrierVehicles().put( vehicle.getId(), vehicle );
+//				currentCarrier.getCarrierCapabilities().getCarrierVehicles().put( vehicle.getId(), vehicle );
+				CarrierUtils.addCarrierVehicle(currentCarrier, vehicle);
 				vehicles.put( vId, vehicle );
 				break;
 			}

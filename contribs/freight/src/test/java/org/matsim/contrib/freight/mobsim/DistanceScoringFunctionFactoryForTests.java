@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierUtils;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.FreightConstants;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
@@ -80,7 +81,7 @@ public class DistanceScoringFunctionFactoryForTests implements CarrierScoringFun
 				if(currentLeg.getRoute() instanceof NetworkRoute){
 					NetworkRoute nRoute = (NetworkRoute) currentLeg.getRoute();
 					Id<Vehicle> vehicleId = nRoute.getVehicleId();
-					CarrierVehicle vehicle = getVehicle(vehicleId);
+					CarrierVehicle vehicle = CarrierUtils.getCarrierVehicle(carrier, vehicleId);
 					Gbl.assertNotNull(vehicle);
 					if(!employedVehicles.contains(vehicle)){
 						employedVehicles.add(vehicle);
@@ -123,14 +124,13 @@ public class DistanceScoringFunctionFactoryForTests implements CarrierScoringFun
 //				return vehicle.getVehicleType().getCostInformation().perTimeUnit;
 			}
 
-			private CarrierVehicle getVehicle(Id<Vehicle> vehicleId) {
-				if(carrier.getCarrierCapabilities().getCarrierVehicles().containsKey(vehicleId)){
-					return carrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
-				}
-				log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
-				return null;
-			}
-			
+//			private CarrierVehicle getVehicle(Id<Vehicle> vehicleId) {
+//				if(carrier.getCarrierCapabilities().getCarrierVehicles().containsKey(vehicleId)){
+//					return carrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
+//				}
+//				log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
+//				return null;
+//			}
 		}
 	
 	 static class DriverActScoring implements BasicScoring, ActivityScoring{

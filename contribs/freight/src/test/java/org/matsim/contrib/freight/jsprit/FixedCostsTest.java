@@ -65,16 +65,16 @@ public class FixedCostsTest extends MatsimTestCase {
 		CarrierService service2 = createMatsimService("Service2", "i(9,9)R", 1);
 		
 		Carrier carrier1 = CarrierUtils.createCarrier(Id.create("carrier1", Carrier.class ) );
-		carrier1.getServices().put(service1.getId(), service1);
-		carrier1.getServices().put(service2.getId(), service2);
+		CarrierUtils.addService(carrier1, service1);
+		CarrierUtils.addService(carrier1, service2);
 
 		Carrier carrier2 = CarrierUtils.createCarrier(Id.create("carrier2", Carrier.class ) );
-		carrier2.getServices().put(service1.getId(), service1);
-		carrier2.getServices().put(service2.getId(), service2);
+		CarrierUtils.addService(carrier2, service1);
+		CarrierUtils.addService(carrier2, service2);
 
 		Carrier carrier3 = CarrierUtils.createCarrier(Id.create("carrier3", Carrier.class ) );
-		carrier3.getServices().put(service1.getId(), service1);
-		carrier3.getServices().put(service2.getId(), service2);
+		CarrierUtils.addService(carrier3, service1);
+		CarrierUtils.addService(carrier3, service2);
 
 
 		//Create add vehicle for carriers
