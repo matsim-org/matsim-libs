@@ -1,7 +1,7 @@
 package org.matsim.contrib.freight.carrier;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
@@ -38,14 +38,14 @@ public interface Carrier extends HasPlansAndId<CarrierPlan, Carrier>, Attributab
 	 * 
 	 * @return collection of {@link CarrierShipment}
 	 */
-	public abstract Collection<CarrierShipment> getShipments();
+	public abstract Map<Id<CarrierShipment>, CarrierShipment> getShipments();
 	
 	/**
 	 * Gets a collection of carrierServices
 	 * 
 	 * @return collection of {@link CarrierService}
 	 */
-	public abstract Collection<CarrierService> getServices();
+	public abstract Map<Id<CarrierService>, CarrierService> getServices();
 
 	/**
 	 * Gets the selected plan.

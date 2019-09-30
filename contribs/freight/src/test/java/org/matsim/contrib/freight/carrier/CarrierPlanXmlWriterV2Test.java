@@ -1,10 +1,8 @@
 package org.matsim.contrib.freight.carrier;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
+import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
@@ -12,7 +10,8 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
 
 public class CarrierPlanXmlWriterV2Test extends MatsimTestCase{
-	
+
+	private static Logger log = Logger.getLogger(CarrierPlanXmlWriterV2Test.class);
 	Carrier testCarrier;
 	
 	@Override
@@ -34,23 +33,23 @@ public class CarrierPlanXmlWriterV2Test extends MatsimTestCase{
 	
 	@Test
 	public void test_whenReadingCarrier_itReadsTypeIdsCorrectly(){
-		
-		CarrierVehicle light = getVehicle("lightVehicle");
+
+		CarrierVehicle light = CarrierUtils.getCarrierVehicle(testCarrier, Id.createVehicleId("lightVehicle"));
 		assertEquals("light",light.getVehicleTypeId().toString());
-		
-		CarrierVehicle medium = getVehicle("mediumVehicle");
+
+		CarrierVehicle medium = CarrierUtils.getCarrierVehicle(testCarrier, Id.createVehicleId("mediumVehicle"));
 		assertEquals("medium",medium.getVehicleTypeId().toString());
-		
-		CarrierVehicle heavy = getVehicle("heavyVehicle");
+
+		CarrierVehicle heavy = CarrierUtils.getCarrierVehicle(testCarrier, Id.createVehicleId("heavyVehicle"));
 		assertEquals("heavy",heavy.getVehicleTypeId().toString());
 	}
 	
 	@Test
 	public void test_whenReadingCarrier_itReadsVehiclesCorrectly(){
-		Collection<CarrierVehicle> carrierVehicles = testCarrier.getCarrierCapabilities().getCarrierVehicles();
+		Map<Id<Vehicle>, CarrierVehicle> carrierVehicles = testCarrier.getCarrierCapabilities().getCarrierVehicles();
 		assertEquals(3,carrierVehicles.size());
 		assertTrue(exactlyTheseVehiclesAreInVehicleCollection(Arrays.asList(Id.create("lightVehicle", Vehicle.class),
-				Id.create("mediumVehicle", Vehicle.class),Id.create("heavyVehicle", Vehicle.class)),carrierVehicles));
+				Id.create("mediumVehicle", Vehicle.class),Id.create("heavyVehicle", Vehicle.class)),carrierVehicles.values()));
 	}
 	
 	@Test
@@ -113,13 +112,13 @@ public class CarrierPlanXmlWriterV2Test extends MatsimTestCase{
 		return vehicles.isEmpty();
 	}
 
-	private CarrierVehicle getVehicle(String vehicleName) {
-		for(CarrierVehicle v : testCarrier.getCarrierCapabilities().getCarrierVehicles()){
-			if(v.getId().toString().equals(vehicleName )){
-				return v;
-			}
-		}
-		return null;
-	}
+//	private CarrierVehicle getVehicle(String vehicleName) {
+//		Id<Vehicle> vehicleId = Id.create(vehicleName, Vehicle.class);
+//		if(testCarrier.getCarrierCapabilities().getCarrierVehicles().containsKey(vehicleId)){
+//			return testCarrier.getCarrierCapabilities().getCarrierVehicles().get(vehicleId);
+//		}
+//		log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
+//		return null;
+//	}
 
 }
