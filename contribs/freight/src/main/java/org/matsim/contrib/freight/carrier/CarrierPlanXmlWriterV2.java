@@ -97,7 +97,7 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 //		writer.write("\t\t\t\t</vehicleTypes>\n\n");
 		//vehicles
 		writer.write("\t\t\t\t<vehicles>\n");
-		for (CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles()) {
+		for (CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
 			Id<VehicleType> vehicleTypeId = v.getVehicleTypeId();
 			if(vehicleTypeId == null) vehicleTypeId = v.getType().getId();
 			if(vehicleTypeId == null) throw new IllegalStateException("vehicleTypeId is missing.");
@@ -115,7 +115,7 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 	private void writeShipments(Carrier carrier, BufferedWriter writer) throws IOException {
 		if(carrier.getShipments().isEmpty()) return;
 		writer.write("\t\t\t<shipments>\n");
-		for (CarrierShipment s : carrier.getShipments()) {
+		for (CarrierShipment s : carrier.getShipments().values()) {
 			// CarrierShipment s = contract.getShipment();
 			Id<CarrierShipment> shipmentId = s.getId();
 			registeredShipments.put(s, shipmentId);
@@ -142,7 +142,7 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 
 	private void writeServices(Carrier carrier, BufferedWriter writer) throws IOException {
 		writer.write("\t\t\t<services>\n");
-		for (CarrierService s : carrier.getServices()) {
+		for (CarrierService s : carrier.getServices().values()) {
 			serviceMap.put(s, s.getId());
 			writer.write("\t\t\t\t<service ");
 			writer.write("id=\"" + s.getId().toString() + "\" ");
