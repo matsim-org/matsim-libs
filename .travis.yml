@@ -10,8 +10,14 @@ jdk: openjdk11
 # https://docs.travis-ci.com/user/customizing-the-build/#Skipping-the-Installation-Step
 #install: true
 
+# define the order of the stages:
+stages:
+  # - package
+  - test
+
 script:
-- mvn install -B --also-make -DskipTests && mvn failsafe:integration-test failsafe:verify -B -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
+- mvn package -B --also-make -DskipTests -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-en
+-  mvn failsafe:integration-test failsafe:verify -B -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
 #- mvn package -B -Dmatsim.preferLocalDtds=true
 # --fail-at-end
 # -Dmaven.test.redirectTestOutputToFile 
