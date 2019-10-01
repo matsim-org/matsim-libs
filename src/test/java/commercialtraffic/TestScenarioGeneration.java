@@ -63,14 +63,17 @@ public class TestScenarioGeneration {
 
         italianPizzaPlace.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
         italianPizzaPlace.getCarrierCapabilities().getVehicleTypes().add(createLightType());
-        italianPizzaPlace.getCarrierCapabilities().getCarrierVehicles().add(getLightVehicle(italianPizzaPlace.getId(), type, Id.createLinkId(111), "one"));
+        CarrierVehicle v = getLightVehicle(italianPizzaPlace.getId(), type, Id.createLinkId(111), "one");
+        italianPizzaPlace.getCarrierCapabilities().getCarrierVehicles().put(v.getId(), v);
 
         americanPizzaPlace.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
-        americanPizzaPlace.getCarrierCapabilities().getCarrierVehicles().add(getLightVehicle(americanPizzaPlace.getId(), type, Id.createLinkId(111), "one"));
+        v = getLightVehicle(americanPizzaPlace.getId(), type, Id.createLinkId(111), "one");
+        americanPizzaPlace.getCarrierCapabilities().getCarrierVehicles().put(v.getId(), v);
         americanPizzaPlace.getCarrierCapabilities().getVehicleTypes().add(createLightType());
 
         shopping_1.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
-        shopping_1.getCarrierCapabilities().getCarrierVehicles().add(getLightVehicle(shopping_1.getId(), type, Id.createLinkId(111), "one"));
+        v = getLightVehicle(shopping_1.getId(), type, Id.createLinkId(111), "one");
+        shopping_1.getCarrierCapabilities().getCarrierVehicles().put(v.getId(), v);
         shopping_1.getCarrierCapabilities().getVehicleTypes().add(createLightType());
 
         carriers.addCarrier(italianPizzaPlace);

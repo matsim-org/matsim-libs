@@ -39,12 +39,13 @@ public class CreateGenericCarriers {
 //        Carrier carrier4 = CarrierImpl.newInstance(Id.create("smallParcel_op4", Carrier.class));
 
         carrier1.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
-        carrier1.getCarrierCapabilities().getCarrierVehicles().add(getLightVehicle(Id.createVehicleId(1), Id.createLinkId(340834), "dhlhannover"));
+        Id<Vehicle> vehicleId = Id.createVehicleId(1);
+        carrier1.getCarrierCapabilities().getCarrierVehicles().put(vehicleId, getLightVehicle(vehicleId, Id.createLinkId(340834), "dhlhannover"));
         carrier1.getCarrierCapabilities().getVehicleTypes().add(createLightType());
 
 
         carrier2.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
-        carrier2.getCarrierCapabilities().getCarrierVehicles().add(getLightVehicle(Id.createVehicleId(1), Id.createLinkId(62912), "dpdlehrte"));
+        carrier2.getCarrierCapabilities().getCarrierVehicles().put(vehicleId, getLightVehicle(vehicleId, Id.createLinkId(62912), "dpdlehrte"));
         carrier2.getCarrierCapabilities().getVehicleTypes().add(createLightType());
 
 

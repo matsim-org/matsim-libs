@@ -2,12 +2,7 @@ package commercialtraffic.vwUserCode.companyGeneration;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities;
-import org.matsim.contrib.freight.carrier.CarrierImpl;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -39,47 +34,8 @@ public class CommericalCompany {
 
 	}
 
-	void addVehicle(Id<Link> linkId, int vehicleType, Double openingTime, Double closingTime) {
+    private static CarrierVehicle getVehicle(Id<?> id, Id<Link> homeId, String depot, int vehicleType, double openingTime, double closingTime) {
 
-		this.carrier.getCarrierCapabilities().getCarrierVehicles().add(getVehicle(Id.createVehicleId(carrierId + "_" + fleetIterator + "_vehTyp_" + vehicleType), linkId, companyId, vehicleType,openingTime,closingTime));
-		this.carrier.getCarrierCapabilities().getVehicleTypes().add(createType(vehicleType));
-		fleetIterator++;
-	}
-	
-	public void addService(String serviceId, Id<Link> linkId,double startTime, double endTime, double serviceDuration)
-	{
-		//FAIL! double trueEndTime = endTime-serviceDuration;
-		double trueEndTime = endTime;
-		CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(Id.create(serviceId, CarrierService.class ), linkId);
-		//TODO: Please change to non fixed number
-		serviceBuilder.setCapacityDemand( 1 );
-		serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(startTime, trueEndTime) );
-		serviceBuilder.setServiceDuration( serviceDuration);
-		CarrierService service = serviceBuilder.build();
-		carrier.getServices().add(service);
-	}
-	public void addGroceryService(String serviceId, Id<Link> linkId,double startTime, double endTime, int Capacity)
-	{
-		//FAIL! double trueEndTime = endTime-serviceDuration;
-		double trueEndTime = endTime;
-		CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(Id.create(serviceId, CarrierService.class ), linkId);
-		//TODO: Please change to non fixed number
-		serviceBuilder.setCapacityDemand( Capacity );
-		serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(startTime, trueEndTime) );
-		serviceBuilder.setServiceDuration( 300);
-		CarrierService service = serviceBuilder.build();
-		carrier.getServices().add(service);
-	}
-	
-	public double getClosingTime(String companyId) {
-		
-		
-		return closingTime;
-		
-	}
-
-	public static CarrierVehicle getVehicle(Id<?> id, Id<Link> homeId, String depot, int vehicleType, double openingTime, double closingTime) {
-				
 		CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder
 				.newInstance(Id.create((id.toString()), Vehicle.class), homeId);
 		vBuilder.setEarliestStart(openingTime);
@@ -89,7 +45,7 @@ public class CommericalCompany {
 		return vBuilder.build();
 	}
 
-	public static VehicleType createType(int vehicleTypeIndex) {
+    private static VehicleType createType(int vehicleTypeIndex) {
 
 		VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create(vehicleTypeIndex, VehicleType.class));
 
@@ -181,6 +137,45 @@ public class CommericalCompany {
 		}
 		return vehicleType;
 	}
+
+    void addVehicle(Id<Link> linkId, int vehicleType, Double openingTime, Double closingTime) {
+
+        Id<Vehicle> vehicleId = Id.createVehicleId(carrierId + "_" + fleetIterator + "_vehTyp_" + vehicleType);
+        this.carrier.getCarrierCapabilities().getCarrierVehicles().put(vehicleId, getVehicle(vehicleId, linkId, companyId, vehicleType, openingTime, closingTime));
+        this.carrier.getCarrierCapabilities().getVehicleTypes().add(createType(vehicleType));
+        fleetIterator++;
+    }
+
+    public double getClosingTime(String companyId) {
+
+
+        return closingTime;
+
+    }
+
+    public void addService(String serviceId, Id<Link> linkId, double startTime, double endTime, double serviceDuration) {
+        //FAIL! double trueEndTime = endTime-serviceDuration;
+        double trueEndTime = endTime;
+        CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(Id.create(serviceId, CarrierService.class), linkId);
+        //TODO: Please change to non fixed number
+        serviceBuilder.setCapacityDemand(1);
+        serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(startTime, trueEndTime));
+        serviceBuilder.setServiceDuration(serviceDuration);
+        CarrierService service = serviceBuilder.build();
+        carrier.getServices().put(service.getId(), service);
+    }
+
+    public void addGroceryService(String serviceId, Id<Link> linkId, double startTime, double endTime, int Capacity) {
+        //FAIL! double trueEndTime = endTime-serviceDuration;
+        double trueEndTime = endTime;
+        CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(Id.create(serviceId, CarrierService.class), linkId);
+        //TODO: Please change to non fixed number
+        serviceBuilder.setCapacityDemand(Capacity);
+        serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(startTime, trueEndTime));
+        serviceBuilder.setServiceDuration(300);
+        CarrierService service = serviceBuilder.build();
+        carrier.getServices().put(service.getId(), service);
+    }
 
 	// public static CarrierVehicleType createType(int vehicleType) {
 	// CarrierVehicleType.Builder typeBuilder = CarrierVehicleType.Builder
