@@ -40,7 +40,7 @@ import java.util.Set;
  */
 public class ChangeCommercialJobOperator extends AbstractMultithreadedModule {
 
-    public static final String SELECTOR_NAME = "changeDeliveryServiceOperator";
+    public static final String SELECTOR_NAME = "changeCommercialJobOperator";
 
     private final Carriers carriers;
 
