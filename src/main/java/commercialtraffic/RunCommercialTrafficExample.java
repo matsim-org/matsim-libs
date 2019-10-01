@@ -36,13 +36,24 @@ import static org.matsim.core.scenario.ScenarioUtils.loadScenario;
 public class RunCommercialTrafficExample {
     public static void main(String[] args) {
 
-        String inputDir = "D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\Test\\";
+
+        String inputDir = "C:/Users/Work/tubCloud/Shared/CommercialTraffic/AP1.1/TestRuns_Okt/input/";
+        String outputDir = "C:/Users/Work/tubCloud/Shared/CommercialTraffic/AP1.1/TestRuns_Okt/output/";
+
+//        String inputDir = args[0];
+//        String outputDir = args[1];
 
         Config config = createConfig();
         CommercialTrafficConfigGroup commercialTrafficConfigGroup = new CommercialTrafficConfigGroup();
-        commercialTrafficConfigGroup.setCarriersFile(inputDir + "carrier_definition.xml");
+//        commercialTrafficConfigGroup.setCarriersFile(inputDir + "carrier_definition.xml");
+//        commercialTrafficConfigGroup.setCarriersFile("C:/Users/Work/tubCloud/Shared/CommercialTraffic/AP1.1/TestRuns_Okt/input/carrier_definition.xml");
+        commercialTrafficConfigGroup.setCarriersFile("C:/Users/Work/tubCloud/VSP_WiMi/VW/commercialTraffic/AP1.1/input_ap1.1/neu_mehrereJobsProAktivität/AP1.1/Carrier/carrier_definition.xml");
+
+
+        
         commercialTrafficConfigGroup.setCarriersVehicleTypesFile(inputDir + "carrier_vehicletypes.xml");
         commercialTrafficConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
+        commercialTrafficConfigGroup.setjSpritTimeSliceWidth(3600);
         config.addModule(commercialTrafficConfigGroup);
         StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
         changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
@@ -50,7 +61,7 @@ public class RunCommercialTrafficExample {
         config.strategy().addStrategySettings(changeExpBeta);
 
 //        StrategyConfigGroup.StrategySettings changeServiceOperator = new StrategyConfigGroup.StrategySettings();
-//        changeServiceOperator.setStrategyName(ChangeDeliveryServiceOperator.SELECTOR_NAME);
+//        changeServiceOperator.setStrategyName(ChangeCommercialJobOperator.SELECTOR_NAME);
 //        changeServiceOperator.setWeight(0.5);
 //        config.strategy().addStrategySettings(changeServiceOperator);
 
@@ -63,9 +74,10 @@ public class RunCommercialTrafficExample {
 //        work.setOpeningTime(8 * 3600);
 //        work.setClosingTime(8 * 3600);
 //        config.planCalcScore().addActivityParams(work);
-        config.controler().setLastIteration(10);
-        config.controler().setWriteEventsInterval(1);
-        config.controler().setOutputDirectory("D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\Test\\output\\commercialtraffictestrun");
+        config.controler().setLastIteration(100);
+        config.controler().setWriteEventsInterval(5);
+//        config.controler().setOutputDirectory("D:/Thiel/Programme/WVModell/01_MatSimInput/Test/output/commercialtraffictestrun");
+        config.controler().setOutputDirectory(outputDir);
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         config.network().setInputFile(inputDir + "network_editedPt.xml.gz");
         config.plans().setInputFile(inputDir + "populationWithCTdemand.xml.gz");
@@ -76,7 +88,7 @@ public class RunCommercialTrafficExample {
 
         Controler controler = new Controler(scenario);
 
-        controler.addOverridingModule(new CommercialTrafficModule(config, (carrierId -> 20)));
+        controler.addOverridingModule(new CommercialTrafficModule(config, (carrierId -> 50)));
 
         controler.run();
 

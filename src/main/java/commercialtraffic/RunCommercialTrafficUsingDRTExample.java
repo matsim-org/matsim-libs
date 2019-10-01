@@ -21,7 +21,7 @@ package commercialtraffic;/*
  * created by jbischoff, 03.05.2019
  */
 
-import commercialtraffic.commercialJob.ChangeDeliveryServiceOperator;
+import commercialtraffic.commercialJob.ChangeCommercialJobOperator;
 import commercialtraffic.commercialJob.CommercialTrafficConfigGroup;
 import commercialtraffic.commercialJob.CommercialTrafficModule;
 import org.matsim.api.core.v01.Scenario;
@@ -63,8 +63,6 @@ public class RunCommercialTrafficUsingDRTExample {
         commercialTrafficConfigGroup.setCarriersVehicleTypesFile(inputDir + "vehicleTypes.xml");
         commercialTrafficConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
 
-        //        commercialTrafficConfigGroup.setBreakSimulationIfNotAllServicesServed(false); //TODO: for preliminary studies only
-
         Config config = createConfig(new DvrpConfigGroup(), commercialTrafficConfigGroup, multiModeDrtConfigGroup);
 
         config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
@@ -75,7 +73,7 @@ public class RunCommercialTrafficUsingDRTExample {
         config.strategy().addStrategySettings(changeExpBeta);
 
         StrategyConfigGroup.StrategySettings changeServiceOperator = new StrategyConfigGroup.StrategySettings();
-        changeServiceOperator.setStrategyName(ChangeDeliveryServiceOperator.SELECTOR_NAME);
+        changeServiceOperator.setStrategyName(ChangeCommercialJobOperator.SELECTOR_NAME);
         changeServiceOperator.setWeight(0.5);
         config.strategy().addStrategySettings(changeServiceOperator);
 

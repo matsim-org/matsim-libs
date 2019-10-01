@@ -21,7 +21,6 @@ package commercialtraffic.commercialJob;/*
  * created by jbischoff, 22.05.2019
  */
 
-import commercialtraffic.commercialJob.CommercialJobUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.freight.carrier.Carrier;
@@ -39,13 +38,13 @@ import java.util.Set;
 /**
  * Changes the carrier for a single commercial delivery of the day.
  */
-public class ChangeDeliveryServiceOperator extends AbstractMultithreadedModule {
+public class ChangeCommercialJobOperator extends AbstractMultithreadedModule {
 
     public static final String SELECTOR_NAME = "changeDeliveryServiceOperator";
 
     private final Carriers carriers;
 
-    public ChangeDeliveryServiceOperator(GlobalConfigGroup globalConfigGroup, Carriers carriers) {
+    public ChangeCommercialJobOperator(GlobalConfigGroup globalConfigGroup, Carriers carriers) {
         super(globalConfigGroup);
         this.carriers = carriers;
     }

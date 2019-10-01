@@ -93,7 +93,7 @@ public class CommercialTrafficModule extends AbstractModule {
         addControlerListenerBinding().to(ScoreCommercialJobs.class);
 
         //bind strategy that enables to choose between operators
-        addPlanStrategyBinding(ChangeDeliveryServiceOperator.SELECTOR_NAME).toProvider(new Provider<PlanStrategy>() {
+        addPlanStrategyBinding(ChangeCommercialJobOperator.SELECTOR_NAME).toProvider(new Provider<PlanStrategy>() {
             @Inject
             Config config;
             @Inject
@@ -101,7 +101,7 @@ public class CommercialTrafficModule extends AbstractModule {
             @Override
             public PlanStrategy get() {
                 final PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<>());
-                builder.addStrategyModule(new ChangeDeliveryServiceOperator(config.global(), carriers));
+                builder.addStrategyModule(new ChangeCommercialJobOperator(config.global(), carriers));
                 return builder.build();
             }
         });

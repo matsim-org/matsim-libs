@@ -1,7 +1,7 @@
 package commercialtraffic.replanning;
 
 import commercialtraffic.TestScenarioGeneration;
-import commercialtraffic.commercialJob.ChangeDeliveryServiceOperator;
+import commercialtraffic.commercialJob.ChangeCommercialJobOperator;
 import commercialtraffic.commercialJob.CommercialJobUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -18,7 +18,7 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChangeDeliveryServiceOperatorTest {
+public class ChangeCommercialJobOperatorTest {
 
     @Test
     public void getPlanAlgoInstance() {
@@ -28,7 +28,7 @@ public class ChangeDeliveryServiceOperatorTest {
         Scenario scenario = TestScenarioGeneration.generateScenario();
         Map<String, TravelTime> travelTimes = new HashMap<>();
         travelTimes.put(TransportMode.car, new FreeSpeedTravelTime());
-        ChangeDeliveryServiceOperator changeDeliveryServiceOperator = new ChangeDeliveryServiceOperator(scenario.getConfig().global(), carriers);
+        ChangeCommercialJobOperator changeCommercialJobOperator = new ChangeCommercialJobOperator(scenario.getConfig().global(), carriers);
 
         Plan testPlan = scenario.getPopulation().getPersons().get(Id.createPersonId(1)).getSelectedPlan();
         Activity work = (Activity) testPlan.getPlanElements().get(2);
@@ -37,12 +37,12 @@ public class ChangeDeliveryServiceOperatorTest {
         Assert.assertEquals("the person should expect a pizza","pizza", CommercialJobUtils.getCarrierMarket(carrierId));
         Assert.assertEquals("the person should expect a pizza from the italian place","italian", CommercialJobUtils.getCarrierOperator(carrierId));
 
-        changeDeliveryServiceOperator.getPlanAlgoInstance().run(testPlan);
+        changeCommercialJobOperator.getPlanAlgoInstance().run(testPlan);
 
         String operator = CommercialJobUtils.getJobOperator(work,1);
         Assert.assertEquals("american", operator);
 
-        changeDeliveryServiceOperator.getPlanAlgoInstance().run(testPlan);
+        changeCommercialJobOperator.getPlanAlgoInstance().run(testPlan);
 
         operator = CommercialJobUtils.getJobOperator(work,1);
         Assert.assertEquals("italian", operator);

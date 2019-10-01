@@ -22,7 +22,7 @@ package commercialtraffic;/*
 							*/
 
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
-import commercialtraffic.commercialJob.ChangeDeliveryServiceOperator;
+import commercialtraffic.commercialJob.ChangeCommercialJobOperator;
 import commercialtraffic.commercialJob.CommercialTrafficConfigGroup;
 import commercialtraffic.commercialJob.CommercialTrafficModule;
 import org.matsim.api.core.v01.Scenario;
@@ -69,7 +69,7 @@ public class RunCommercialTraffic_H {
 		ctcg.setjSpritTimeSliceWidth(3600);
 		
         StrategyConfigGroup.StrategySettings changeServiceOperator = new StrategyConfigGroup.StrategySettings();
-        changeServiceOperator.setStrategyName(ChangeDeliveryServiceOperator.SELECTOR_NAME);
+		changeServiceOperator.setStrategyName(ChangeCommercialJobOperator.SELECTOR_NAME);
         changeServiceOperator.setWeight(0.5);
         config.strategy().addStrategySettings(changeServiceOperator);
 		
