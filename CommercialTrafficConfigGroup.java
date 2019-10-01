@@ -236,10 +236,10 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
             throw new RuntimeException("Minimum Score for delivery is higher than maximum score");
         } //TODO test
         if(!getRunTourPlanning() && config.strategy().getStrategySettings().stream()
-                .anyMatch(strategySettings -> strategySettings.getStrategyName().equals(ChangeDeliveryServiceOperator.SELECTOR_NAME))){
-            throw new RuntimeException("if tour planning is switched off, the replanning  strategy " + ChangeDeliveryServiceOperator.SELECTOR_NAME
+                .anyMatch(strategySettings -> strategySettings.getStrategyName().equals(ChangeCommercialJobOperator.SELECTOR_NAME))) {
+            throw new RuntimeException("if tour planning is switched off, the replanning  strategy " + ChangeCommercialJobOperator.SELECTOR_NAME
                                         + " is forbidden. Either let the carriers do tour planning before each  iteration by setting " + RUNJSPRIT + "=true "
-                                         + "or exclude the replanning strategy " + ChangeDeliveryServiceOperator.SELECTOR_NAME);
+                    + "or exclude the replanning strategy " + ChangeCommercialJobOperator.SELECTOR_NAME);
         }
     }
 }
