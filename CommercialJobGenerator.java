@@ -153,7 +153,7 @@ public class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsim
                     Id<Carrier> carrierId = CommercialJobUtils.getCurrentCarrierForJob(activity,jobIdx);
                     if (carriers.getCarriers().containsKey(carrierId)) {
                         Carrier carrier = carriers.getCarriers().get(carrierId);
-                        carrier.getServices().add(serviceBuilder.build());
+                        carrier.getServices().put(serviceId, serviceBuilder.build());
                     } else {
                         throw new RuntimeException("Carrier Id does not exist: " + carrierId.toString());
                     }
