@@ -25,36 +25,29 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CommercialJobUtils {
 
     public static final String COMMERCIALJOB_ATTRIBUTE_NAME = "commercialJob";
     static final String COMMERCIALJOB_ATTRIBUTE_DELIMITER = ";";
+    static final String CARRIERSPLIT = "_";
 
+    //the pattern for the activity attribute is the following:
+    //<attribute name="commercialJob[NUMBER]" class="java.lang.String">[TYPE];[OPERATOR];[CAPACITYDEMAND];[EARLIESTSTART];[LATESTSTART];[DURATION]</attribute>
+    static final int COMMERCIALJOB_ATTRIBUTE_DURATION_IDX = 5;
     static final int COMMERCIALJOB_ATTRIBUTE_TYPE_IDX = 0;
     static final int COMMERCIALJOB_ATTRIBUTE_OPERATOR_IDX = 1;
     static final int COMMERCIALJOB_ATTRIBUTE_AMOUNT_IDX = 2;
     static final int COMMERCIALJOB_ATTRIBUTE_START_IDX = 3;
     static final int COMMERCIALJOB_ATTRIBUTE_END_IDX = 4;
-    static final int COMMERCIALJOB_ATTRIBUTE_DURATION_IDX = 5;
-
-
-
-//    public static final String JOB_TYPE = "jobType";
-//    public static final String JOB_SIZE = "jobAmount";
-//    public static final String JOB_DURATION = "jobDuration";
-//    public static final String JOB_EARLIEST_START = "jobTimeStart";
-//    public static final String JOB_OPERATOR = "operator";
-//    public static final String JOB_TIME_END = "jobTimeEnd";
-
-    static final String CARRIERSPLIT = "_";
-
 
     static Set<Activity> getActivitiesWithJobs (Plan plan){
         Set<Activity> activitiesWithJob = new HashSet<>();

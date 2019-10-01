@@ -14,6 +14,8 @@
             </leg>
             <activity type="home" link="259" x="0.0" y="0.0" end_time="16:00:00">
                 <attributes>
+                    <!-- the pattern is the following
+                    <attribute name="commercialJob[NUMBER]" class="java.lang.String">[TYPE];[OPERATOR];[CAPACITYDEMAND];[EARLIESTSTART];[LATESTSTART];[DURATION]</attribute> !-->
                     <attribute name="commercialJob1" class="java.lang.String">pizza;1;1;43200;46800;180</attribute>
                 </attributes>
             </activity>
