@@ -16,7 +16,7 @@ stages:
   - test
 
 script:
-- mvn package -B --also-make -DskipTests -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-en
+- mvn package -B --also-make -DskipTests -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
 -  mvn failsafe:integration-test failsafe:verify -B -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
 #- mvn package -B -Dmatsim.preferLocalDtds=true
 # --fail-at-end
