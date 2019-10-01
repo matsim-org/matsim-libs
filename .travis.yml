@@ -11,8 +11,8 @@ jdk: openjdk11
 #install: true
 
 script:
-  - mvn test --batch-mode -Dmatsim.preferLocalDtds=true -Dmaven.javadoc.skip -e
-#  - mvn package -B -Dmatsim.preferLocalDtds=true
+- mvn install -B --also-make -DskipTests && mvn failsafe:integration-test failsafe:verify -B -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
+#- mvn package -B -Dmatsim.preferLocalDtds=true
 # --fail-at-end
 # -Dmaven.test.redirectTestOutputToFile 
 env:
