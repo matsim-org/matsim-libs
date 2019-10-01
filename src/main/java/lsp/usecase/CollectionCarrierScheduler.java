@@ -97,7 +97,7 @@ public class CollectionCarrierScheduler extends ResourceScheduler {
 	public void scheduleResource() {
 		for(ShipmentTuple tupleToBeAssigned: shipments){
 			CarrierService carrierService = convertToCarrierService(tupleToBeAssigned);
-			carrier.getServices().add(carrierService);
+			carrier.getServices().put(carrierService.getId(), carrierService);
 		}
 		
 		routeCarrier();	

@@ -124,7 +124,7 @@ public class MainRunCarrierScheduler extends ResourceScheduler {
 		tourBuilder.addLeg(new Leg());
 		tourBuilder.scheduleEnd(Id.create(adapter.getEndLinkId(), Link.class));
 		org.matsim.contrib.freight.carrier.Tour vehicleTour = tourBuilder.build();
-		CarrierVehicle vehicle = carrier.getCarrierCapabilities().getCarrierVehicles().iterator().next();
+		CarrierVehicle vehicle = carrier.getCarrierCapabilities().getCarrierVehicles().values().iterator().next();
 		double tourStartTime = latestTupleTime + totalLoadingTime;
 		ScheduledTour sTour = ScheduledTour.newInstance(vehicleTour, vehicle, tourStartTime);
 		tours.add(sTour);
