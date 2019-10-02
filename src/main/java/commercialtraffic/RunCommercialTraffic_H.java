@@ -41,7 +41,7 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 
 import static org.matsim.core.scenario.ScenarioUtils.loadScenario;
 
-public class RunCommercialTraffic_H {
+class RunCommercialTraffic_H {
 	public static void main(String[] args) {
 		String runId = "vw243_0.1_EGrocery0.1_shops_changeCar";
 		String pct = ".0.1";
@@ -105,10 +105,7 @@ public class RunCommercialTraffic_H {
 
 		controler.addOverridingModule(new SwissRailRaptorModule());
 
-		controler.addOverridingModule(new CommercialTrafficModule(config, carrierId -> {
-            if(carrierId.toString().startsWith("H1")) return 15;
-            return 1;
-        }));
+		controler.addOverridingModule(new CommercialTrafficModule() );
 
 		controler.run();
 

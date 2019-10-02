@@ -33,7 +33,7 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import static org.matsim.core.config.ConfigUtils.createConfig;
 import static org.matsim.core.scenario.ScenarioUtils.loadScenario;
 
-public class RunCommercialTrafficExample {
+class RunCommercialTrafficExample {
     public static void main(String[] args) {
 
 
@@ -88,7 +88,7 @@ public class RunCommercialTrafficExample {
 
         Controler controler = new Controler(scenario);
 
-        controler.addOverridingModule(new CommercialTrafficModule(config, (carrierId -> 50)));
+        controler.addOverridingModule(new CommercialTrafficModule() );
 
         controler.run();
 

@@ -17,13 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package commercialtraffic.analysis;/*
+package commercialtraffic.commercialJob;/*
  * created by jbischoff, 19.06.2019
  */
 
 import com.google.inject.Inject;
-import commercialtraffic.commercialJob.CommercialJobUtils;
-import commercialtraffic.commercialJob.ScoreCommercialJobs;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.matsim.api.core.v01.Id;
@@ -44,7 +42,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.*;
 
 
-public class CommercialTrafficAnalysisListener implements IterationEndsListener {
+class CommercialTrafficAnalysisListener implements IterationEndsListener {
 
     @Inject
     private

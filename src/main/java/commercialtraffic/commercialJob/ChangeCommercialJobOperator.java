@@ -38,13 +38,13 @@ import java.util.Set;
 /**
  * Changes the carrier for a single commercial delivery of the day.
  */
-public class ChangeCommercialJobOperator extends AbstractMultithreadedModule {
+public final class ChangeCommercialJobOperator extends AbstractMultithreadedModule {
 
     public static final String SELECTOR_NAME = "changeCommercialJobOperator";
 
     private final Carriers carriers;
 
-    public ChangeCommercialJobOperator(GlobalConfigGroup globalConfigGroup, Carriers carriers) {
+	ChangeCommercialJobOperator(GlobalConfigGroup globalConfigGroup, Carriers carriers) {
         super(globalConfigGroup);
         this.carriers = carriers;
     }

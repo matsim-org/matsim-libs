@@ -43,7 +43,7 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityEndEventHandler, BeforeMobsimListener {
+class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityEndEventHandler, BeforeMobsimListener {
 
     private final Population population;
 
@@ -55,7 +55,7 @@ public class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityE
     private final List<DeliveryLogEntry> logEntries = new ArrayList<>();
 
     @Inject
-    public ScoreCommercialJobs(Population population, CommercialJobScoreCalculator scoreCalculator, EventsManager eventsManager) {
+    ScoreCommercialJobs(Population population, CommercialJobScoreCalculator scoreCalculator, EventsManager eventsManager) {
         this.population = population;
         this.scoreCalculator = scoreCalculator;
         this.eventsManager = eventsManager;

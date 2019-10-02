@@ -25,7 +25,6 @@ import commercialtraffic.commercialJob.ChangeCommercialJobOperator;
 import commercialtraffic.commercialJob.CommercialTrafficConfigGroup;
 import commercialtraffic.commercialJob.CommercialTrafficModule;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -43,7 +42,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import static org.matsim.core.config.ConfigUtils.createConfig;
 
-public class RunCommercialTrafficUsingDRTExample {
+class RunCommercialTrafficUsingDRTExample {
     public static void main(String[] args) {
 
         String inputDir = "input/commercialtrafficIt/";
@@ -106,7 +105,7 @@ public class RunCommercialTrafficUsingDRTExample {
         Controler controler = new Controler(scenario);
 
         controler.addOverridingModule(
-                new CommercialTrafficModule(config, (carrierId -> 20), (carrierId -> TransportMode.drt)));
+                new CommercialTrafficModule() );
 
         controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(MultiModeDrtConfigGroup.get(config)));
         controler.run();

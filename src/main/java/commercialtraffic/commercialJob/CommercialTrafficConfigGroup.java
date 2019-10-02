@@ -91,7 +91,7 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     /**
      * @return -- {@value #CARRIERSFILEDESC}
      */
-    @StringGetter(CARRIERSFILEDE)
+//    @StringGetter(CARRIERSFILEDE)
     public String getCarriersFile() {
         return carriersFile;
     }
@@ -103,7 +103,7 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     /**
      * @param -- {@value #CARRIERSFILEDESC}
      */
-    @StringSetter(CARRIERSFILEDE)
+//    @StringSetter(CARRIERSFILEDE)
     public void setCarriersFile(String carriersFile) {
         this.carriersFile = carriersFile;
     }
@@ -111,7 +111,7 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     /**
      * @return -- {@value #CARRIERSVEHICLETYPEDESC}
      */
-    @StringGetter(CARRIERSVEHICLETYPED)
+//    @StringGetter(CARRIERSVEHICLETYPED)
     public String getCarriersVehicleTypesFile() {
         return carriersVehicleTypesFile;
     }
@@ -124,7 +124,7 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     /**
      * @param -- {@value #CARRIERSVEHICLETYPEDESC}
      */
-    @StringSetter(CARRIERSVEHICLETYPED)
+//    @StringSetter(CARRIERSVEHICLETYPED)
     public void setCarriersVehicleTypesFile(String carriersVehicleTypesFile) {
         this.carriersVehicleTypesFile = carriersVehicleTypesFile;
     }
@@ -132,7 +132,7 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     /**
      * @return -- {@value #FIRSTLEGBUFFERDESC}
      */
-    @StringGetter(FIRSTLEGBUFFER)
+//    @StringGetter(FIRSTLEGBUFFER)
     double getFirstLegTraveltimeBufferFactor() {
         return firstLegTraveltimeBufferFactor;
     }
@@ -140,21 +140,21 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     /**
      * @param -- {@value #FIRSTLEGBUFFERDESC}
      */
-    @StringSetter(FIRSTLEGBUFFER)
+//    @StringSetter(FIRSTLEGBUFFER)
     public void setFirstLegTraveltimeBufferFactor(double firstLegTraveltimeBufferFactor) {
         this.firstLegTraveltimeBufferFactor = firstLegTraveltimeBufferFactor;
     }
 
-    @StringSetter(RUNJSPRIT)
+//    @StringSetter(RUNJSPRIT)
     public void setRunTourPlanning(boolean runTourPlanning){ this.runTourPlanning = runTourPlanning; }
 
-    @StringGetter(RUNJSPRIT)
+//    @StringGetter(RUNJSPRIT)
     public boolean getRunTourPlanning(){ return runTourPlanning; }
 
     /**
      * @return jspritTimeSliceWidth --{@value #JSPRITTIMESLICEWIDTHDESC}
      */
-    @StringGetter(JSPRITTIMESLICEWIDTH)
+//    @StringGetter(JSPRITTIMESLICEWIDTH)
     int getJspritTimeSliceWidth() {
         return jSpritTimeSliceWidth;
     }
@@ -162,15 +162,17 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     /**
      * @param jspritTimeSliceWidth --{@value #JSPRITTIMESLICEWIDTHDESC}
      */
-    @StringSetter(JSPRITTIMESLICEWIDTH)
+//    @StringSetter(JSPRITTIMESLICEWIDTH)
     public void setjSpritTimeSliceWidth(int jspritTimeSliceWidth) {
         this.jSpritTimeSliceWidth = jspritTimeSliceWidth;
     }
 
+    // ---
+
     /**
      * @return zeroUtilityDelay --{@value #ZEROUTILDELAYDESC}
      */
-    @StringGetter(ZEROUTILDELAY)
+//    @StringGetter(ZEROUTILDELAY)
     public double getZeroUtilityDelay() {
         return zeroUtilityDelay;
     }
@@ -178,7 +180,7 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     /**
      * @param zeroUtilityDelay --{@value #ZEROUTILDELAYDESC}
      */
-    @StringSetter(ZEROUTILDELAY)
+//    @StringSetter(ZEROUTILDELAY)
     public void setZeroUtilityDelay(double zeroUtilityDelay) {
         this.zeroUtilityDelay = zeroUtilityDelay;
     }
@@ -186,7 +188,7 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     /**
      * @return maxDeliveryScore --{@value #MAXDELIVERYSCOREDESC}
      */
-    @StringGetter(MAXDELIVERYSCORE)
+//    @StringGetter(MAXDELIVERYSCORE)
     public double getMaxDeliveryScore() {
         return maxDeliveryScore;
     }
@@ -194,7 +196,7 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     /**
      * @param maxDeliveryScore --{@value #MAXDELIVERYSCOREDESC}
      */
-    @StringSetter(MAXDELIVERYSCORE)
+//    @StringSetter(MAXDELIVERYSCORE)
     public void setMaxDeliveryScore(double maxDeliveryScore) {
         this.maxDeliveryScore = maxDeliveryScore;
     }
@@ -202,7 +204,7 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     /**
      * @return minDeliveryScore --{@value #MINDELIVERYSCOREDESC}
      */
-    @StringGetter(MINDELIVERYSCORE)
+//    @StringGetter(MINDELIVERYSCORE)
     public double getMinDeliveryScore() {
         return minDeliveryScore;
     }
@@ -210,7 +212,7 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     /**
      * @param minDeliveryScore --{@value #MINDELIVERYSCOREDESC}
      */
-    @StringSetter(MINDELIVERYSCORE)
+//    @StringSetter(MINDELIVERYSCORE)
     public void setMinDeliveryScore(double minDeliveryScore) {
         this.minDeliveryScore = minDeliveryScore;
     }

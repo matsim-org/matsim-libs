@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package commercialtraffic.analysis;/*
+package commercialtraffic.commercialJob;/*
  * created by jbischoff, 19.06.2019
  */
 
@@ -42,7 +42,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class TourLengthAnalyzer implements ActivityEndEventHandler, LinkEnterEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
+class TourLengthAnalyzer implements ActivityEndEventHandler, LinkEnterEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
     private final Map<Id<Vehicle>, Set<Id<Person>>> currentFreightVehicleForDelivery = new HashMap<>();
     private final Map<Id<Person>, Double> deliveryAgentDistances = new HashMap<>();

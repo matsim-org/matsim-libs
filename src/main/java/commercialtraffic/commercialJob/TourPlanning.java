@@ -33,7 +33,9 @@ import commercialtraffic.vwUserCode.NetworkBasedTransportCosts;
 import commercialtraffic.vwUserCode.NetworkRouter;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
+import org.matsim.contrib.freight.carrier.CarrierUtils;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.core.router.util.TravelTime;
@@ -46,12 +48,13 @@ import java.util.Set;
 //import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 //import org.matsim.contrib.freight.jsprit.NetworkRouter;
 
-public class TourPlanning  {
+class TourPlanning  {
 
     private static Logger log = Logger.getLogger(TourPlanning.class);
 
 
-    static void runTourPlanningForCarriers(Carriers carriers, Scenario scenario, CarrierJSpritIterations iterations, int jSpritTimeSliceWidth, TravelTime travelTime) {
+    static void runTourPlanningForCarriers( Carriers carriers, Scenario scenario, int jSpritTimeSliceWidth,
+							  TravelTime travelTime ) {
         Set<VehicleType> vehicleTypes = new HashSet<>();
         carriers.getCarriers().values().forEach(carrier -> vehicleTypes.addAll(carrier.getCarrierCapabilities().getVehicleTypes()));
         NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), vehicleTypes);
@@ -108,7 +111,7 @@ public class TourPlanning  {
                         log.info("setting maxIterations=1 as carrier has no services");
                         algorithm.setMaxIterations(1);
                     } else{
-                        algorithm.setMaxIterations(iterations.getNrOfJSpritIterationsForCarrier(carrier.getId()));
+                        algorithm.setMaxIterations( CarrierUtils.getJspritIterations( carrier ) ) ;
                     }
 
                     // variationCoefficient = stdDeviation/mean. so i set the threshold rather soft

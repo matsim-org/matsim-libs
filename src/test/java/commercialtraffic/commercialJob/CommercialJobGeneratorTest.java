@@ -31,7 +31,7 @@ public class CommercialJobGeneratorTest {
         Map<String,TravelTime> travelTimes = new HashMap<>();
         travelTimes.put(TransportMode.car, new FreeSpeedTravelTime());
 
-        CommercialJobGenerator generator = new CommercialJobGenerator(scenario,travelTimes, carriers, carrierId -> TransportMode.car, carrierId -> 50);
+        CommercialJobGenerator generator = new CommercialJobGenerator(scenario,travelTimes, carriers );
         new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers)).write(utils.getOutputDirectory() + "vehicleTypes.xml");
         scenario.getConfig().controler().setOutputDirectory(utils.getOutputDirectory());
         int iteration = 0;

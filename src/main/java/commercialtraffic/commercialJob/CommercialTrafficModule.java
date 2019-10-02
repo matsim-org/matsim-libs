@@ -22,9 +22,7 @@ package commercialtraffic.commercialJob;/*
  */
 
 import com.google.inject.Singleton;
-import commercialtraffic.analysis.CommercialTrafficAnalysisListener;
-import commercialtraffic.analysis.TourLengthAnalyzer;
-import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.dvrp.run.DvrpModule;
@@ -40,29 +38,10 @@ import javax.inject.Provider;
 
 public class CommercialTrafficModule extends AbstractModule {
 
-    private final Config config;
-    private final MultiModeDrtConfigGroup multiModeDrtCfgGroup = null;
-    private final CarrierJSpritIterations iterationsForCarrier;
-    private CarrierMode carrierMode;
-
-    public CommercialTrafficModule(Config config, CarrierJSpritIterations iterationsForCarrier){
-        super();
-        this.config = config;
-        this.iterationsForCarrier = iterationsForCarrier;
-    }
-
-    public CommercialTrafficModule(Config config, CarrierJSpritIterations iterationsForCarrier, CarrierMode carrierMode){
-        super();
-        this.carrierMode = carrierMode;
-        this.config = config;
-        this.iterationsForCarrier = iterationsForCarrier;
-    }
-
-
     @Override
     public void install() {
 
-        if(MultiModeDrtConfigGroup.get(config) != null){
+        if(MultiModeDrtConfigGroup.get(getConfig()) != null){
             installDRT();
         }
 
@@ -81,13 +60,6 @@ public class CommercialTrafficModule extends AbstractModule {
 
         bind(ScoreCommercialJobs.class).in(Singleton.class);
         bind(TourLengthAnalyzer.class).in(Singleton.class);
-        bind(CarrierJSpritIterations.class).toInstance(iterationsForCarrier);
-        if(this.carrierMode == null){
-            bind(CarrierMode.class).toInstance(carrierId -> TransportMode.car);
-            //bind(CarrierMode.class).toInstance(carrierId -> TransportMode.drt);
-        } else {
-            bind(CarrierMode.class).toInstance(carrierMode);
-        }
         addControlerListenerBinding().to(CommercialJobGenerator.class);
         addControlerListenerBinding().to(CommercialTrafficAnalysisListener.class);
         addControlerListenerBinding().to(ScoreCommercialJobs.class);
