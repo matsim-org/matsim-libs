@@ -66,12 +66,12 @@ public class RunCommercialTrafficUsingDRTExample {
         Config config = createConfig(new DvrpConfigGroup(), commercialTrafficConfigGroup, multiModeDrtConfigGroup);
 
         config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
-
-        StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
-        changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
-        changeExpBeta.setWeight(0.5);
-        config.strategy().addStrategySettings(changeExpBeta);
-
+	    {
+		    StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
+		    changeExpBeta.setStrategyName( DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta );
+		    changeExpBeta.setWeight( 0.5 );
+		    config.strategy().addStrategySettings( changeExpBeta );
+	    }
         StrategyConfigGroup.StrategySettings changeServiceOperator = new StrategyConfigGroup.StrategySettings();
         changeServiceOperator.setStrategyName(ChangeCommercialJobOperator.SELECTOR_NAME);
         changeServiceOperator.setWeight(0.5);
