@@ -53,28 +53,28 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
 
 /**
  * @author jbischoff
  */
 
-public class DynModeTripsAnalyser {
+public class DrtTripsAnalyser {
 
-	public static Map<Double, List<DynModeTrip>> splitTripsIntoBins(Collection<DynModeTrip> trips, int startTime,
-			int endTime, int binSize_s) {
-		LinkedList<DynModeTrip> alltrips = new LinkedList<>();
+	public static Map<Double, List<DrtTrip>> splitTripsIntoBins(Collection<DrtTrip> trips, int startTime,
+																int endTime, int binSize_s) {
+		LinkedList<DrtTrip> alltrips = new LinkedList<>();
 		alltrips.addAll(trips);
 		Collections.sort(alltrips);
-		DynModeTrip currentTrip = alltrips.pollFirst();
+		DrtTrip currentTrip = alltrips.pollFirst();
 		if (currentTrip.getDepartureTime() > endTime) {
-			Logger.getLogger(DynModeTripsAnalyser.class).error("wrong end / start Times for analysis");
+			Logger.getLogger(DrtTripsAnalyser.class).error("wrong end / start Times for analysis");
 		}
-		Map<Double, List<DynModeTrip>> splitTrips = new TreeMap<>();
+		Map<Double, List<DrtTrip>> splitTrips = new TreeMap<>();
 		for (int time = startTime; time < endTime; time = time + binSize_s) {
-			List<DynModeTrip> currentList = new ArrayList<>();
+			List<DrtTrip> currentList = new ArrayList<>();
 			splitTrips.put(Double.valueOf(time), currentList);
 			while (currentTrip.getDepartureTime() < time + binSize_s) {
 				currentList.add(currentTrip);
@@ -90,8 +90,8 @@ public class DynModeTripsAnalyser {
 
 	}
 
-	public static void analyzeBoardingsAndDeboardings(List<DynModeTrip> trips, String delimiter, double startTime,
-			double endTime, double timeBinSize, String boardingsFile, String deboardingsFile, Network network) {
+	public static void analyzeBoardingsAndDeboardings(List<DrtTrip> trips, String delimiter, double startTime,
+													  double endTime, double timeBinSize, String boardingsFile, String deboardingsFile, Network network) {
 		if (endTime < startTime) {
 			throw new IllegalArgumentException("endTime < startTime");
 		}
@@ -100,7 +100,7 @@ public class DynModeTripsAnalyser {
 		double actualstartTime = Math.max(startTime, 0.0);
 		int bins = (int)((endTime - actualstartTime) / timeBinSize);
 
-		for (DynModeTrip trip : trips) {
+		for (DrtTrip trip : trips) {
 			int[] board = boardings.getOrDefault(trip.getFromLinkId(), new int[bins]);
 			int startTimeBin = (int)((trip.getDepartureTime() - startTime) / timeBinSize);
 			if (startTimeBin < bins) {
@@ -141,7 +141,7 @@ public class DynModeTripsAnalyser {
 		}
 	}
 
-	public static String summarizeTrips(List<DynModeTrip> trips, String delimiter) {
+	public static String summarizeTrips(List<DrtTrip> trips, String delimiter) {
 		DescriptiveStatistics waitStats = new DescriptiveStatistics();
 		DescriptiveStatistics rideStats = new DescriptiveStatistics();
 		DescriptiveStatistics distanceStats = new DescriptiveStatistics();
@@ -155,7 +155,7 @@ public class DynModeTripsAnalyser {
 		format.setMaximumFractionDigits(2);
 		format.setGroupingUsed(false);
 
-		for (DynModeTrip trip : trips) {
+		for (DrtTrip trip : trips) {
 			if (trip.getToLinkId() == null) {
 				continue;
 			}
@@ -187,11 +187,11 @@ public class DynModeTripsAnalyser {
 		return value;
 	}
 
-	public static double getDirectDistanceMean(List<DynModeTrip> trips) {
+	public static double getDirectDistanceMean(List<DrtTrip> trips) {
 
 		DescriptiveStatistics directDistanceStats = new DescriptiveStatistics();
 
-		for (DynModeTrip trip : trips) {
+		for (DrtTrip trip : trips) {
 			if (trip.getToLinkId() == null) {
 				continue;
 			}
@@ -201,8 +201,8 @@ public class DynModeTripsAnalyser {
 		return directDistanceStats.getMean();
 	}
 
-	public static void analyseDetours(Network network, List<DynModeTrip> trips, DrtConfigGroup drtCfg,
-			String fileName, boolean createGraphs) {
+	public static void analyseDetours(Network network, List<DrtTrip> trips, DrtConfigGroup drtCfg,
+									  String fileName, boolean createGraphs) {
 		if (trips == null)
 			return;
 
@@ -211,7 +211,7 @@ public class DynModeTripsAnalyser {
 		XYSeries travelTimes = new XYSeries("travel times");
 		XYSeries rideTimes = new XYSeries("ride times");
 
-		for (DynModeTrip trip : trips) {
+		for (DrtTrip trip : trips) {
 			if (trip.getToLinkId() == null) {
 				continue; // unfinished trip (simulation stopped before arrival)
 			}
@@ -258,13 +258,13 @@ public class DynModeTripsAnalyser {
 		}
 	}
 
-	public static void analyseWaitTimes(String fileName, List<DynModeTrip> trips, int binsize_s, boolean createGraphs) {
+	public static void analyseWaitTimes(String fileName, List<DrtTrip> trips, int binsize_s, boolean createGraphs) {
 		Collections.sort(trips);
 		if (trips.size() == 0)
 			return;
 		int startTime = ((int)(trips.get(0).getDepartureTime() / binsize_s)) * binsize_s;
 		int endTime = ((int)(trips.get(trips.size() - 1).getDepartureTime() / binsize_s) + binsize_s) * binsize_s;
-		Map<Double, List<DynModeTrip>> splitTrips = splitTripsIntoBins(trips, startTime, endTime, binsize_s);
+		Map<Double, List<DrtTrip>> splitTrips = splitTripsIntoBins(trips, startTime, endTime, binsize_s);
 
 		DecimalFormat format = new DecimalFormat();
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
@@ -285,7 +285,7 @@ public class DynModeTripsAnalyser {
 
 		try {
 			bw.write("timebin;trips;average_wait;min;p_5;p_25;median;p_75;p_95;max");
-			for (Entry<Double, List<DynModeTrip>> e : splitTrips.entrySet()) {
+			for (Entry<Double, List<DrtTrip>> e : splitTrips.entrySet()) {
 				long rides = 0;
 				double averageWait = 0;
 				double min = 0;
@@ -297,7 +297,7 @@ public class DynModeTripsAnalyser {
 				double max = 0;
 				if (!e.getValue().isEmpty()) {
 					DescriptiveStatistics stats = new DescriptiveStatistics();
-					for (DynModeTrip t : e.getValue()) {
+					for (DrtTrip t : e.getValue()) {
 						stats.addValue(t.getWaitTime());
 					}
 					rides = stats.getN();

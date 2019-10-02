@@ -19,17 +19,17 @@
 
 package org.matsim.contrib.drt.analysis;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
-public class DynModeTrip implements Comparable<DynModeTrip> {
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
+
+public class DrtTrip implements Comparable<DrtTrip> {
 	private final double departureTime;
 	private final Id<Person> person;
 	private final Id<Vehicle> vehicle;
@@ -52,7 +52,7 @@ public class DynModeTrip implements Comparable<DynModeTrip> {
 			+ demitter + "toY" + demitter + "waitTime" + demitter + "arrivalTime" + demitter + "travelTime" + demitter
 			+ "travelDistance_m"+demitter+"direcTravelDistance_m";
 
-	DynModeTrip(double departureTime, Id<Person> person, Id<Vehicle> vehicle, Id<Link> fromLinkId, Coord fromCoord,
+	DrtTrip(double departureTime, Id<Person> person, Id<Vehicle> vehicle, Id<Link> fromLinkId, Coord fromCoord,
 			double waitTime) {
 		this.departureTime = departureTime;
 		this.person = person;
@@ -151,7 +151,7 @@ public class DynModeTrip implements Comparable<DynModeTrip> {
 	}
 
 	@Override
-	public int compareTo(DynModeTrip o) {
+	public int compareTo(DrtTrip o) {
 		return getDepartureTime().compareTo(o.getDepartureTime());
 	}
 
