@@ -20,6 +20,7 @@
 
 package org.matsim.core.scoring.functions;
 
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.scoring.SumScoringFunction;
 
 /**
@@ -28,7 +29,7 @@ import org.matsim.core.scoring.SumScoringFunction;
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
-public final class CharyparNagelMoneyScoring implements SumScoringFunction.MoneyScoring {
+public final class CharyparNagelMoneyScoring implements SumScoringFunction.MoneyScoring, SumScoringFunction.ArbitraryEventScoring {
 
 	private double score;
 
@@ -56,4 +57,9 @@ public final class CharyparNagelMoneyScoring implements SumScoringFunction.Money
 		return this.score;
 	}
 
+	@Override public void handleEvent( Event event ){
+		if ( event instanceof DirectScoreEvent ) {
+			this.score += ((DirectScoreEvent)event).getScore() ;
+		}
+	}
 }
