@@ -1,6 +1,6 @@
 package commercialtraffic.commercialJob;
 
-public interface CommercialJobScoreCalculator {
+interface CommercialJobScoreCalculator {
 
     /**
      * @param timeDifference

@@ -36,7 +36,6 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
@@ -56,8 +55,6 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
     final static String COMMERCIALJOB_ACTIVITYTYPE_PREFIX = "commercialJob";
 
     private final double firsttourTraveltimeBuffer;
-    private final CarrierJSpritIterations iterationsPerCarrier;
-    private final CarrierMode carrierMode;
     private final int timeSliceWidth;
 
     private Scenario scenario;
@@ -75,32 +72,17 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
     private Set<String> drtModes = new HashSet<>();
 
     @Inject
-    public CommercialJobGenerator(Scenario scenario, Map<String, TravelTime> travelTimes, Carriers carriers, CarrierMode carrierMode, CarrierJSpritIterations iterationsPerCarrier) {
+    /* package */ CommercialJobGenerator( Scenario scenario, Map<String, TravelTime> travelTimes, Carriers carriers ) {
         CommercialTrafficConfigGroup ctcg = CommercialTrafficConfigGroup.get(scenario.getConfig());
         this.carriers = carriers;
         this.firsttourTraveltimeBuffer = ctcg.getFirstLegTraveltimeBufferFactor();
         this.timeSliceWidth = ctcg.getJspritTimeSliceWidth();
-        this.carrierMode = carrierMode;
-        this.iterationsPerCarrier = iterationsPerCarrier;
         this.scenario = scenario;
         this.population = scenario.getPopulation();
         carTT = travelTimes.get(TransportMode.car);
         getDrtModes(scenario.getConfig());
     }
 
-    /**
-     * Test only
-     */
-    CommercialJobGenerator(Scenario scenario, Carriers carriers, CarrierJSpritIterations iterationsPerCarrier) {
-        this.population = scenario.getPopulation();
-        this.carriers = carriers;
-        this.scenario = scenario;
-        this.firsttourTraveltimeBuffer = 2;
-        this.timeSliceWidth = 1800;
-        carrierMode = (m -> TransportMode.car);
-        carTT = new FreeSpeedTravelTime();
-        this.iterationsPerCarrier = iterationsPerCarrier;
-    }
 
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
@@ -164,13 +146,13 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
     }
 
     private void buildTours() {
-        TourPlanning.runTourPlanningForCarriers(carriers,scenario,iterationsPerCarrier,timeSliceWidth,carTT);
+        TourPlanning.runTourPlanningForCarriers(carriers,scenario, timeSliceWidth,carTT );
     }
 
     private void createFreightAgents() {
         for (Carrier carrier : carriers.getCarriers().values()) {
             int nextId = 0;
-            String modeForCarrier = carrierMode.getCarrierMode(carrier.getId());
+            String modeForCarrier = CarrierUtils.getCarrierMode( carrier ) ;
             for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 
                 CarrierVehicle carrierVehicle = scheduledTour.getVehicle();
@@ -245,7 +227,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
                     e.printStackTrace();
                 }
                 Id<Vehicle> vid = Id.createVehicleId(driverPerson.getId());
-                VehicleUtils.insertVehicleIdIntoAttributes(driverPerson,carrierMode.getCarrierMode(carrier.getId()),vid);
+                VehicleUtils.insertVehicleIdIntoAttributes(driverPerson,CarrierUtils.getCarrierMode(carrier),vid);
                 scenario.getVehicles().addVehicle(scenario.getVehicles().getFactory().createVehicle(vid, carrierVehicle.getType()));
                 freightVehicles.add(vid);
                 freightDrivers.add(driverPerson.getId());

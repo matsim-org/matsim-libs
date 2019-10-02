@@ -21,13 +21,13 @@ package commercialtraffic.commercialJob;/*
  * created by jbischoff, 18.06.2019
  */
 
-public class DefaultCommercialServiceScore implements CommercialJobScoreCalculator {
+class DefaultCommercialServiceScore implements CommercialJobScoreCalculator {
 
     final double maxPerformedScore;
     final double minPerformedScore;
     final double negativeScoreThreshold;
 
-    public DefaultCommercialServiceScore(double maxPerformedScore, double minPerformedScore, double negativeScoreThreshold) {
+	DefaultCommercialServiceScore(double maxPerformedScore, double minPerformedScore, double negativeScoreThreshold) {
         this.maxPerformedScore = maxPerformedScore;
         this.minPerformedScore = minPerformedScore;
         this.negativeScoreThreshold = negativeScoreThreshold;
