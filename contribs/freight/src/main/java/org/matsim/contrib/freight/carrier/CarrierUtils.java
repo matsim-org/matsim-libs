@@ -2,6 +2,7 @@ package org.matsim.contrib.freight.carrier;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -86,5 +87,19 @@ public class CarrierUtils{
 		return copiedPlan;
 
 	}
+
+	private static final String CARRIER_MODE_KEY = "carrierMode" ;
+	public static String getCarrierMode( Carrier carrier ) {
+		String result = (String) carrier.getAttributes().getAttribute( CARRIER_MODE_KEY );
+		if ( result == null ){
+			return TransportMode.car ;
+		} else {
+			return result ;
+		}
+	}
+	public static void setCarrierModeKey( Carrier carrier,  String carrierMode ) {
+		carrier.getAttributes().putAttribute( CARRIER_MODE_KEY, carrierMode ) ;
+	}
+
 
 }
