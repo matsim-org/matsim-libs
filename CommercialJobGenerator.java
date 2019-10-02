@@ -50,7 +50,7 @@ import java.util.Set;
 /**
  * Generates carriers and tours depending on next iteration's freight demand
  */
-public class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListener {
+class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListener {
 
 
     final static String COMMERCIALJOB_ACTIVITYTYPE_PREFIX = "commercialJob";

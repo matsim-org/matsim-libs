@@ -38,7 +38,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class CommercialTrafficChecker {
+class CommercialTrafficChecker {
     private static final Logger log = Logger.getLogger(CommercialTrafficChecker.class);
 
     static void run(Population population, Carriers carriers){
