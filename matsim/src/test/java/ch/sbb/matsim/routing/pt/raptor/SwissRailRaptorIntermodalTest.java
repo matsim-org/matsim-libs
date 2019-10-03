@@ -1093,7 +1093,6 @@ public class SwissRailRaptorIntermodalTest {
             this.srrConfig.addIntermodalAccessEgress(bikeAccess);
         }
     }
-
     private static class IntermodalCarFixture{
 
         final SwissRailRaptorConfigGroup srrConfig;
@@ -1156,7 +1155,7 @@ public class SwissRailRaptorIntermodalTest {
 
             for (Link i : network.getLinks().values()) {
                 i.setCapacity(1000);
-                i.setFreespeed(0./3.6); // yyy jr --  this is the only way to prevent agent from using car2
+                i.setFreespeed(1000./3.6); // yyy jr --  this is the only way to prevent agent from using car2
                 i.setLength(1000.);
             }
 
@@ -1248,7 +1247,5 @@ public class SwissRailRaptorIntermodalTest {
 
         }
     }
-
-
 
 }
