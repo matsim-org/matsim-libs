@@ -976,6 +976,30 @@ public class SwissRailRaptorTest {
     }
 
     /**
+     * Tests what happens if there is a transit service available, but the agent's departure time (11 AM) is after the last transit
+     * departure time (9:46 AM). The expectation is that the dummy agent will use transit_walk to get from the fromFacility to the toFacility.
+     */
+    @Test
+    public void testDepartureAfterLastBus(){
+        Fixture f = new Fixture();
+        f.init();
+        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
+        TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
+        Coord fromCoord = new Coord(3800, 5100);
+        Coord toCoord = new Coord(8100, 5050);
+        List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 11.0*3600, null);
+        assertEquals(1, legs.size());
+        assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
+
+        double actualTravelTime = 0.0;
+        for (Leg leg : legs) {
+            actualTravelTime += leg.getTravelTime();
+        }
+        double expectedTravelTime = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / raptorParams.getBeelineWalkSpeed();
+        assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
+    }
+
+    /**
      * Generates the following network for testing:
      * <pre>
      *                (5)
