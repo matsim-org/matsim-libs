@@ -169,7 +169,7 @@ public class SkillsIT {
 				.setDeliveryServiceTime(Time.parseTime("00:05:00"))
 				.build();
 		FreightUtils.addSkill(shipmentOne, "skill 1");
-		carrier.getShipments().add(shipmentOne);
+		CarrierUtils.addShipment(carrier, shipmentOne);
 
 		CarrierShipment shipmentTwo = CarrierShipment.Builder.newInstance(
 				Id.create("2", CarrierShipment.class),
@@ -182,7 +182,7 @@ public class SkillsIT {
 				.setDeliveryServiceTime(Time.parseTime("00:05:00"))
 				.build();
 		FreightUtils.addSkill(shipmentTwo, "skill 2");
-		carrier.getShipments().add(shipmentTwo);
+		CarrierUtils.addShipment(carrier, shipmentTwo);
 	}
 
 	private void addShipmentsRequiringSameSkills(Scenario scenario) {
@@ -198,7 +198,7 @@ public class SkillsIT {
 				.setDeliveryServiceTime(Time.parseTime("00:05:00"))
 				.build();
 		FreightUtils.addSkill(shipmentOne, "skill 1");
-		carrier.getShipments().add(shipmentOne);
+		CarrierUtils.addShipment(carrier, shipmentOne);
 
 		CarrierShipment shipmentTwo = CarrierShipment.Builder.newInstance(
 				Id.create("2", CarrierShipment.class),
@@ -211,7 +211,7 @@ public class SkillsIT {
 				.setDeliveryServiceTime(Time.parseTime("00:05:00"))
 				.build();
 		FreightUtils.addSkill(shipmentTwo, "skill 1");
-		carrier.getShipments().add(shipmentTwo);
+		CarrierUtils.addShipment(carrier, shipmentTwo);
 	}
 
 }
