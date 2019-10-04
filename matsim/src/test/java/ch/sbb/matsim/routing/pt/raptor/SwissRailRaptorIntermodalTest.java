@@ -675,7 +675,7 @@ public class SwissRailRaptorIntermodalTest {
         SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork());
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), f.routingModules);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-            new LeastCostRaptorRouteSelector(), stopFinder, null );
+                new LeastCostRaptorRouteSelector(), stopFinder, null );
 
         List<Leg> legs = raptor.calcRoute(fromFac, toFac, 8 * 3600 - 900, f.dummyPerson);
         for (Leg leg : legs) {
@@ -834,36 +834,81 @@ public class SwissRailRaptorIntermodalTest {
     }
 
     /**
-     * Possible access/egress modes are walk and car. The radius for car encompasses the pt stop, and the car and there
-     * are no filter attributes restricting an access/egress using car. However, the links between the fromFacility and the
-     * pt stop have a freespeed of 0. Therefore, the car router should return null for the route, and the
-     * Raptor should assign a transit_walk to the agent between the fromFacility and the toFacility.
+     * Agent is placed close to stop B, which is bike accessible. The agent is 600 meters away from stop B, which puts it
+     * inside the Bike Radius for Access/Egress Mode but not in the Walk radius. However, the speed for bike is set to 0 m/s
+     * which means that the router will return null. The result will be that the agent will conduct a transit_walk to his/her
+     * destination.
      *
-     * so
+     * The first part of this test checks makes sure intermodal access/egress module is working, by having Agent use bike to get to
+     * the pt stop. The second part modifies the bike speed to 0, and makes the agent use transit_walk.
      */
+
     @Test
     public void testIntermodalTrip_accessModeRouterReturnsNull() {
-        IntermodalCarFixture f = new IntermodalCarFixture();
 
-        Facility fromFac = new FakeFacility(new Coord(0 , 0), Id.create("from", Link.class)); // node a
-        Facility toFac = new FakeFacility(new Coord(2200, 0), Id.create("to", Link.class));
+        // Part 1: Bike with normal speed. Bike Router will return route.
+        IntermodalTransferFixture f = new IntermodalTransferFixture();
+
+        Facility fromFac = new FakeFacility(new Coord(9980, -600), Id.create("from", Link.class)); // stop B
+        Facility toFac = new FakeFacility(new Coord(0, 100), Id.create("to", Link.class)); // stop A
 
         SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork());
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), f.routingModules);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-                new LeastCostRaptorRouteSelector(), stopFinder, null);
+                new LeastCostRaptorRouteSelector(), stopFinder, null );
 
-        List<Leg> legs = raptor.calcRoute(fromFac, toFac, 5. * 3600, f.dummyPerson);
+        List<Leg> legs = raptor.calcRoute(fromFac, toFac, 8 * 3600 - 900, f.dummyPerson);
         for (Leg leg : legs) {
             System.out.println(leg);
         }
 
-        Assert.assertEquals(1, legs.size());
+        Assert.assertEquals(4, legs.size());
 
-        Leg legAccess = legs.get(0);
-        Assert.assertEquals(TransportMode.transit_walk, legAccess.getMode());
-        Assert.assertEquals("from", legAccess.getRoute().getStartLinkId().toString());
+        Leg legBike = legs.get(0);
+        Assert.assertEquals("bike", legBike.getMode());
+        Assert.assertEquals("from", legBike.getRoute().getStartLinkId().toString());
+        Assert.assertEquals("bike_B", legBike.getRoute().getEndLinkId().toString());
+
+        Leg legTransfer = legs.get(1);
+        Assert.assertEquals("non_network_walk", legTransfer.getMode());
+        Assert.assertEquals("bike_B", legTransfer.getRoute().getStartLinkId().toString());
+        Assert.assertEquals("BB", legTransfer.getRoute().getEndLinkId().toString());
+
+        Leg legTransfer2 = legs.get(2);
+        Assert.assertEquals("pt", legTransfer2.getMode());
+        Assert.assertEquals("BB", legTransfer2.getRoute().getStartLinkId().toString());
+        Assert.assertEquals("AA", legTransfer2.getRoute().getEndLinkId().toString());
+
+        Leg legAccess = legs.get(3);
+        Assert.assertEquals(TransportMode.non_network_walk, legAccess.getMode());
+        Assert.assertEquals("AA", legAccess.getRoute().getStartLinkId().toString());
         Assert.assertEquals("to", legAccess.getRoute().getEndLinkId().toString());
+        
+        
+        // Part 2: Change bike speed to 0. Bike Router will return null.
+        f.routingModules.remove(TransportMode.bike);
+        f.routingModules.put(TransportMode.bike,
+                new TeleportationRoutingModule(TransportMode.bike, f.scenario, 0., 1.4)); // make bike very fast
+
+        SwissRailRaptorData data2 = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork());
+        DefaultRaptorStopFinder stopFinder2 = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), f.routingModules);
+        SwissRailRaptor raptor2 = new SwissRailRaptor(data2, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
+                new LeastCostRaptorRouteSelector(), stopFinder2, null );
+
+        List<Leg> legs2 = raptor2.calcRoute(fromFac, toFac, 8 * 3600 - 900, f.dummyPerson);
+
+        for (Leg leg : legs2) {
+            System.out.println(leg);
+        }
+
+        Assert.assertEquals(1, legs2.size());
+
+        Leg legTransitWalk = legs2.get(0);
+        Assert.assertEquals(TransportMode.transit_walk, legTransitWalk.getMode());
+        Assert.assertEquals("from", legTransitWalk.getRoute().getStartLinkId().toString());
+        Assert.assertEquals("to", legTransitWalk.getRoute().getEndLinkId().toString());
+        
+        
     }
 
     /* for test of intermodal routing requiring transfers at the beginning or end of the pt trip,
@@ -1093,159 +1138,4 @@ public class SwissRailRaptorIntermodalTest {
             this.srrConfig.addIntermodalAccessEgress(bikeAccess);
         }
     }
-    private static class IntermodalCarFixture{
-
-        final SwissRailRaptorConfigGroup srrConfig;
-        final Config config;
-        final Scenario scenario;
-        final Person dummyPerson;
-        final Map<String, RoutingModule> routingModules;
-
-        public IntermodalCarFixture() {
-            this.srrConfig = new SwissRailRaptorConfigGroup();
-            this.config = ConfigUtils.createConfig(this.srrConfig);
-            this.scenario = ScenarioUtils.createScenario(this.config);
-
-            /*
-
-
-            (A) ------- (B) ========= (C)
-
-
-             */
-
-
-            Network network = this.scenario.getNetwork();
-            NetworkFactory nf = network.getFactory();
-
-            Node nodeA = nf.createNode(Id.create("A", Node.class), new Coord(0, 0));
-            Node nodeB = nf.createNode(Id.create("B", Node.class), new Coord(1000, 0));
-            Node nodeC = nf.createNode(Id.create("C", Node.class), new Coord(2000, 0));
-
-
-            network.addNode(nodeA);
-            network.addNode(nodeB);
-            network.addNode(nodeC);
-
-
-            Link linkAA = nf.createLink(Id.create("AA", Link.class), nodeA, nodeA);
-            Link linkAB = nf.createLink(Id.create("AB", Link.class), nodeA, nodeB);
-            Link linkBA = nf.createLink(Id.create("BA", Link.class), nodeB, nodeA);
-            Link linkBB = nf.createLink(Id.create("BB", Link.class), nodeB, nodeB);
-            Link linkBC = nf.createLink(Id.create("BC", Link.class), nodeB, nodeC);
-            Link linkCB = nf.createLink(Id.create("CB", Link.class), nodeC, nodeB);
-            Link linkCC = nf.createLink(Id.create("CC", Link.class), nodeC, nodeC);
-
-//            Set<String> modes = new HashSet<>(Arrays.asList("car2"));
-////            linkAA.setAllowedModes(modes);
-////            linkAB.setAllowedModes(modes);
-////            linkBA.setAllowedModes(modes);
-////            linkBB.setAllowedModes(modes);
-//            linkBC.setAllowedModes(modes);
-//            linkCB.setAllowedModes(modes);
-//            linkCC.setAllowedModes(modes);
-
-            network.addLink(linkAA);
-            network.addLink(linkAB);
-            network.addLink(linkBA);
-            network.addLink(linkBB);
-            network.addLink(linkCC);
-            network.addLink(linkBC);
-            network.addLink(linkCB);
-
-            for (Link i : network.getLinks().values()) {
-                i.setCapacity(1000);
-                i.setFreespeed(1000./3.6); // yyy jr --  this is the only way to prevent agent from using car2
-                i.setLength(1000.);
-            }
-
-
-            // ----
-
-            TransitSchedule schedule = this.scenario.getTransitSchedule();
-            TransitScheduleFactory sf = schedule.getFactory();
-
-
-            TransitStopFacility stopB = sf.createTransitStopFacility(Id.create("B", TransitStopFacility.class), nodeB.getCoord(), false);
-            TransitStopFacility stopC = sf.createTransitStopFacility(Id.create("C", TransitStopFacility.class), nodeC.getCoord(), false);
-
-            stopB.setLinkId(linkBB.getId());
-            stopC.setLinkId(linkCC.getId());
-
-            schedule.addStopFacility(stopB);
-            schedule.addStopFacility(stopC);
-
-            // red transit line
-
-            TransitLine redLine = sf.createTransitLine(Id.create("red", TransitLine.class));
-
-            NetworkRoute networkRouteBC = RouteUtils.createLinkNetworkRouteImpl(linkBB.getId(), new Id[] { linkBC.getId() }, linkCC.getId());
-            List<TransitRouteStop> stopsRedBC = new ArrayList<>(2);
-            stopsRedBC.add(sf.createTransitRouteStop(stopB, Time.getUndefinedTime(), 0.0));
-            stopsRedBC.add(sf.createTransitRouteStop(stopC, 600, Time.getUndefinedTime()));
-            TransitRoute redBCRoute = sf.createTransitRoute(Id.create("redBC", TransitRoute.class), networkRouteBC, stopsRedBC, "train");
-            redBCRoute.addDeparture(sf.createDeparture(Id.create("1", Departure.class), 7.5*3600));
-            redLine.addRoute(redBCRoute);
-
-            schedule.addTransitLine(redLine);
-
-            // ---
-
-            this.dummyPerson = this.scenario.getPopulation().getFactory().createPerson(Id.create("dummy", Person.class));
-
-            // ---
-
-            this.routingModules = new HashMap<>();
-            this.routingModules.put(TransportMode.non_network_walk,
-                    new TeleportationRoutingModule(TransportMode.non_network_walk, this.scenario, 1.1, 1.3));
-
-            // adds car routing module
-            FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-0.0016666666666666668D, 0.0016666666666666668D, 0.0D);
-            DijkstraFactory df = new DijkstraFactory();
-            LeastCostPathCalculator routeAlgo = df.createPathCalculator(this.scenario.getNetwork(), freespeed, freespeed);
-            NetworkRoutingModule carRoutingModule = new NetworkRoutingModule(TransportMode.car, this.scenario.getPopulation().getFactory(), this.scenario.getNetwork(), routeAlgo);
-            routingModules.put(TransportMode.car, carRoutingModule);
-
-            this.config.transitRouter().setMaxBeelineWalkConnectionDistance(150);
-
-            PlanCalcScoreConfigGroup.ModeParams transitWalk = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.transit_walk);
-            transitWalk.setMarginalUtilityOfTraveling(0);
-            this.config.planCalcScore().addModeParams(transitWalk);
-
-            PlanCalcScoreConfigGroup.ModeParams nonNetworkWalk = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.non_network_walk);
-            nonNetworkWalk.setMarginalUtilityOfTraveling(-7);
-            this.config.planCalcScore().addModeParams(nonNetworkWalk);
-
-            PlanCalcScoreConfigGroup.ModeParams carParams = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.car);
-            nonNetworkWalk.setMarginalUtilityOfTraveling(0);
-            this.config.planCalcScore().addModeParams(carParams);
-
-
-            config.qsim().setVehiclesSource( QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData );
-
-            VehiclesFactory vf = scenario.getVehicles().getFactory();
-            VehicleType vehType = vf.createVehicleType( Id.create( TransportMode.car, VehicleType.class ) );
-            vehType.setMaximumVelocity( 100./3.6 );
-            scenario.getVehicles().addVehicleType( vehType );
-
-            this.config.plansCalcRoute().setNetworkModes( Arrays.asList( TransportMode.car, TransportMode.pt ) );
-            scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory( GenericRouteImpl.class, new GenericRouteFactory() );
-
-            // Intermodal
-            this.srrConfig.setUseIntermodalAccessEgress(true);
-            IntermodalAccessEgressParameterSet walkAccess = new IntermodalAccessEgressParameterSet();
-            walkAccess.setMode(TransportMode.non_network_walk);
-            walkAccess.setMaxRadius(500);
-            walkAccess.setInitialSearchRadius(1100);
-            this.srrConfig.addIntermodalAccessEgress(walkAccess);
-
-            IntermodalAccessEgressParameterSet carAccess = new IntermodalAccessEgressParameterSet();
-            carAccess.setMode(TransportMode.car);
-            carAccess.setMaxRadius(1500);
-            carAccess.setInitialSearchRadius(1100);
-            this.srrConfig.addIntermodalAccessEgress(carAccess);
-
-        }
-    }
-
 }
