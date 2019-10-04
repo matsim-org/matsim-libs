@@ -172,6 +172,14 @@ public class SwissRailRaptorTest {
         assertEquals(Math.ceil(expectedEgressWalkTime), legs.get(2).getTravelTime(), MatsimTestUtils.EPSILON);
     }
 
+
+    /**
+     * The fromFacility and toFacility are both closest to TransitStopFacility I. The expectation is that the Swiss Rail
+     * Raptor will return a transit_walk between the fromFacility and toFacility instead of routing the agent to make a
+     * major detour by walking the triangle from the fromFacility to the transitStopFacility and then to the toFacility,
+     * without once using pt.
+     */
+
     @Test
     public void testFromToSameStop() {
         Fixture f = new Fixture();
@@ -190,6 +198,8 @@ public class SwissRailRaptorTest {
         double expectedTravelTime = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / raptorParams.getBeelineWalkSpeed();
         assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
     }
+
+
 
     // now the pt router should always try to return a pt route no matter whether a direct walk would be faster
     // adjusted the test - gl aug'19
@@ -987,7 +997,9 @@ public class SwissRailRaptorTest {
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         Coord fromCoord = new Coord(3800, 5100);
         Coord toCoord = new Coord(8100, 5050);
+
         List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 11.0*3600, null);
+
         assertEquals(1, legs.size());
         assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
 
