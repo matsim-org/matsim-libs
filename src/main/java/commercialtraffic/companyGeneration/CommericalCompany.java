@@ -46,8 +46,10 @@ public class CommericalCompany {
 
 	void addVehicle(Id<Link> linkId, int vehicleType, Double openingTime, Double closingTime) {
 
-		this.carrier.getCarrierCapabilities().getCarrierVehicles().add(getVehicle(Id.createVehicleId(carrierId + "_" + fleetIterator + "_vehTyp_" + vehicleType), linkId, companyId, vehicleType,openingTime,closingTime));
-		this.carrier.getCarrierCapabilities().getVehicleTypes().add(createType(vehicleType));
+		CarrierVehicle carrierVehicle = getVehicle(Id.createVehicleId(carrierId + "_" + fleetIterator + "_vehTyp_" + vehicleType), linkId, companyId, vehicleType,openingTime,closingTime);
+		
+		this.carrier.getCarrierCapabilities().getCarrierVehicles().put(carrierVehicle.getId(),carrierVehicle);
+		//this.carrier.getCarrierCapabilities().getVehicleTypes().add(createType(vehicleType));
 		fleetIterator++;
 	}
 	
@@ -61,7 +63,7 @@ public class CommericalCompany {
 		serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(startTime, trueEndTime) );
 		serviceBuilder.setServiceDuration( serviceDuration);
 		CarrierService service = serviceBuilder.build();
-		carrier.getServices().add(service);
+		carrier.getServices().put(service.getId(), service);
 	}
 	public void addGroceryService(String serviceId, Id<Link> linkId,double startTime, double endTime, int Capacity)
 	{
@@ -73,7 +75,7 @@ public class CommericalCompany {
 		serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(startTime, trueEndTime) );
 		serviceBuilder.setServiceDuration( 300);
 		CarrierService service = serviceBuilder.build();
-		carrier.getServices().add(service);
+		carrier.getServices().put(service.getId(),service);
 	}
 	
 	public double getClosingTime(String companyId) {

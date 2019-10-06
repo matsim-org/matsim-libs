@@ -35,7 +35,8 @@ import ft.utils.ctDemandPrep.DemandGenerator;
 
 public class CompanyGenerator {
 
-	String csvVehiclefile;
+	String ctVehicleFolder;
+	File[] csvVehiclefiles;
 	String csvAddCompanyFolder;
 	String networkFile;
 	File[] addCompanyfiles;
@@ -52,18 +53,19 @@ public class CompanyGenerator {
 	List<String[]> vehicleList;
 	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	CommercialTripsReader tripReader;
-	String ctTripsFile;
+	String ctTripsFolder;
+	File[] ctTripsFiles;
 	String serviceTimeDistributions;
 	Map<String, Set<Integer>> vehBlackListIds;
 
-	public CompanyGenerator(String csvVehiclefile, String csvAddCompanyFolder, String ctTripsFile,
+	public CompanyGenerator(String ctVehicleFolder, String csvAddCompanyFolder, String ctTripsFolder,
 			String serviceTimeDistributions, String networkFile, String companyFolder, String zoneSHP,
 			String outputpath, String carrierOutputPath, Map<String, Set<Integer>> vehBlackListIds) {
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkFile);
-		this.csvVehiclefile = csvVehiclefile;
+		this.csvVehiclefiles = new File(ctVehicleFolder).listFiles();
 		this.csvAddCompanyFolder = csvAddCompanyFolder;
 		this.addCompanyfiles = new File(csvAddCompanyFolder).listFiles();
-		this.ctTripsFile = ctTripsFile;
+		this.ctTripsFiles = new File(ctTripsFolder).listFiles();
 		this.networkFile = networkFile;
 		this.serviceTimeDistributions = serviceTimeDistributions;
 		this.companyFolder = companyFolder;
@@ -234,51 +236,53 @@ public class CompanyGenerator {
 		CSVReader reader = null;
 
 		try {
-			reader = new CSVReader(new FileReader(this.csvVehiclefile));
-			vehicleList = reader.readAll();
-			for (int i = 1; i < vehicleList.size(); i++) {
-				String[] lineContents = vehicleList.get(i);
-				int vehicleId = Integer.parseInt(lineContents[1]);
-				String companyId = (lineContents[2]);
-				String zone = (lineContents[3]);
-				String companyClass = lineContents[5];
-				int vehicleType = Integer.parseInt(lineContents[6]);
-				// TODO: Model two separate fleets
-				boolean active;
-				if (Integer.parseInt(lineContents[8]) == 1) {
-					active = true;
-				} else {
-					active = false;
-				}
-				;
-				// TODO Fix opening and closing times
-				if (commercialCompanyMap.containsKey(companyId)) {
-					// Add only not filtered and active new vehicle
-					if ((vehBlackListIds.isEmpty()) || (!vehBlackListIds.get(companyClass).contains(vehicleId))) {
-						if (active) {
-							commercialCompanyMap.get(companyId).addVehicle(
-
-									commercialCompanyMap.get(companyId).companyLinkId, vehicleType, 6.5 * 3600.0,
-									17.5 * 3600.0);
-						}
+			for (File csvVehiclefile : csvVehiclefiles) {
+				reader = new CSVReader(new FileReader(csvVehiclefile));
+				vehicleList = reader.readAll();
+				for (int i = 1; i < vehicleList.size(); i++) {
+					String[] lineContents = vehicleList.get(i);
+					int vehicleId = Integer.parseInt(lineContents[1]);
+					String companyId = (lineContents[2]);
+					String zone = (lineContents[3]);
+					String companyClass = lineContents[5];
+					int vehicleType = Integer.parseInt(lineContents[6]);
+					// TODO: Model two separate fleets
+					boolean active;
+					if (Integer.parseInt(lineContents[8]) == 1) {
+						active = true;
+					} else {
+						active = false;
 					}
-				} else {
-					// Create company
-					Id<Link> companyLinkId = infereCompanyLink(companyClass, zone);
+					;
+					// TODO Fix opening and closing times
+					if (commercialCompanyMap.containsKey(companyId)) {
+						// Add only not filtered and active new vehicle
+						if ((vehBlackListIds.isEmpty()) || (!vehBlackListIds.get(companyClass).contains(vehicleId))) {
+							if (active) {
+								commercialCompanyMap.get(companyId).addVehicle(
 
-					// TODO
-					CommericalCompany commericalCompany = new CommericalCompany(companyId, 6.0 * 3600.0, 18.0 * 3600.0,
-							300.0, companyClass, companyLinkId);
-					// Add only not filtered and active new vehicle
-					if ((vehBlackListIds.isEmpty()) || (!vehBlackListIds.get(companyClass).contains(vehicleId))) {
-						if (active) {
-							commericalCompany.addVehicle(companyLinkId, vehicleType, 6.5 * 3600.0, 17.5 * 3600.0);
+										commercialCompanyMap.get(companyId).companyLinkId, vehicleType, 6.5 * 3600.0,
+										17.5 * 3600.0);
+							}
 						}
+					} else {
+						// Create company
+						Id<Link> companyLinkId = infereCompanyLink(companyClass, zone);
+
+						// TODO
+						CommericalCompany commericalCompany = new CommericalCompany(companyId, 6.0 * 3600.0,
+								18.0 * 3600.0, 300.0, companyClass, companyLinkId);
+						// Add only not filtered and active new vehicle
+						if ((vehBlackListIds.isEmpty()) || (!vehBlackListIds.get(companyClass).contains(vehicleId))) {
+							if (active) {
+								commericalCompany.addVehicle(companyLinkId, vehicleType, 6.5 * 3600.0, 17.5 * 3600.0);
+							}
+						}
+						commercialCompanyMap.put(companyId, commericalCompany);
+
 					}
-					commercialCompanyMap.put(companyId, commericalCompany);
 
 				}
-
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

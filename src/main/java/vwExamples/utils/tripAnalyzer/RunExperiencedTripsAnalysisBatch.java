@@ -58,8 +58,8 @@ public class RunExperiencedTripsAnalysisBatch {
 	public static void main(String[] args) {
 
 //		run("D:\\Matsim\\Axer\\Hannover\\ZIM\\output\\");
-		run("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\");
-//		run("D:\\Thiel\\Programme\\WVModell\\02_MatSimOutput\\");
+//		run("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\");
+		run("D:\\Thiel\\Programme\\WVModell\\02_MatSimOutput\\");
 	}
 
 	public static void run(String runDir) {
@@ -78,7 +78,7 @@ public class RunExperiencedTripsAnalysisBatch {
 //			scenarioToBeAnalyzed.add("VW243_CityCommuterDRTAmpel2.0_10pct300_veh_idx0");
 //			scenarioToBeAnalyzed.add("VW243_HomeOfficeInOut1x_10pct");
 //			scenarioToBeAnalyzed.add("VW243_HomeOfficeInOut2x_10pct");
-			scenarioToBeAnalyzed.add("vw243_cadON_ptSpeedAdj.0.1");
+//			scenarioToBeAnalyzed.add("vw243_cadON_ptSpeedAdj.0.1");
 //			scenarioToBeAnalyzed.add("VW243_Drt_HomeOffice_LinkFlow1.15300_veh_idx0");
 //			scenarioToBeAnalyzed.add("VW251_CityCommuterDRT_100pct2800_veh_idx0");
 //			scenarioToBeAnalyzed.add("vw251.1.0");
@@ -89,6 +89,8 @@ public class RunExperiencedTripsAnalysisBatch {
 //			scenarioToBeAnalyzed.add("vw243_0.1_EGrocery0.4_fulfillment.0.1");
 //			scenarioToBeAnalyzed.add("vw243_0.1_EGrocery0.3_fulfillment.0.1");
 //			scenarioToBeAnalyzed.add("vw243_0.1_EGrocery0.5_fulfillment.0.1");
+			scenarioToBeAnalyzed.add("vw272_0.1_CT_KEP.0.1");
+			
 			
 			
 			

@@ -32,9 +32,9 @@ public class RunHereValidation {
 	public static void main(String[] args) {
 		
 		
-		String folder = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw236_nocad.0.1\\";
-		String run = "vw236_nocad.0.1";
+		String folder = "D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\vw274_cadytsOn_NoMultiWork_Mutat36000.1\\";
+		String run = "vw274_cadytsOn_NoMultiWork_Mutat36000.1";
 				
-		RunTraveltimeValidationExample.main(new String[]{folder+run+".output_plans.xml.gz",folder+run+".output_events.xml.gz",folder+run+".output_network.xml.gz","EPSG:25832","MTIHglK7a71g2jG6GopJ","5dBURxwsfwPPcxgNhSAGbQ",folder,"2018-05-15","5000"});
+		RunTraveltimeValidationExample.main(new String[]{folder+run+".output_plans.xml.gz",folder+run+".output_events.xml.gz",folder+run+".output_network.xml.gz","EPSG:25832","MTIHglK7a71g2jG6GopJ","5dBURxwsfwPPcxgNhSAGbQ",folder,"2019-05-14","5000"});
 	}
 }

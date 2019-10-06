@@ -118,7 +118,7 @@ public class AssignService {
 	public static void main(String[] args) {
 
 		AssignService assignData = new AssignService(
-				"D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\vw272_0.1_CT_0.1\\vw272.0.1.output_plans.xml.gz",
+				"D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\vw280_0.1_CT_0.1\\vw280_0.1.output_plans.xml.gz",
 				"D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\EGrocery\\Fullfillment\\",
 				"D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\Trips\\",
 				"D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\Vehicles\\",
