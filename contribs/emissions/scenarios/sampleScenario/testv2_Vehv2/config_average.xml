@@ -29,10 +29,10 @@
 	<module name="emissions" >
 
 		<!-- REQUIRED: file with HBEFA 3.1 fleet average cold emission factors -->
-		<param name="averageFleetColdEmissionFactorsFile" value="sample_EFA_ColdStart_vehcat_2005average.txt" />
+		<param name="averageFleetColdEmissionFactorsFile" value="../sample_EFA_ColdStart_vehcat_2005average.txt" />
 
 		<!-- REQUIRED: file with HBEFA 3.1 fleet average warm emission factors -->
-		<param name="averageFleetWarmEmissionFactorsFile" value="sample_EFA_HOT_vehcat_2005average.txt" />
+		<param name="averageFleetWarmEmissionFactorsFile" value="../sample_EFA_HOT_vehcat_2005average.txt" />
 
 		<!-- following should eventually become default but currently is not: -->
 		<param name="hbefaRoadTypeSource" value="fromLinkAttributes" />
@@ -54,7 +54,7 @@
 
 	<module name="network" >
 		<param name="inputChangeEventsFile" value="null" />
-		<param name="inputNetworkFile" value="sample_network.xml" />
+		<param name="inputNetworkFile" value="../sample_network.xml" />
 		<param name="laneDefinitionsFile" value="null" />
 		<param name="timeVariantNetwork" value="false" />
 	</module>
@@ -186,7 +186,7 @@
 
 	<module name="plans" >
 
-		<param name="inputPlansFile" value="sample_population.xml" />
+		<param name="inputPlansFile" value="../sample_population.xml" />
 
 	</module>
 
@@ -245,7 +245,7 @@
 <!-- ====================================================================== -->
 	
 	<module name="vehicles" >
-		<param name="vehiclesFile" value="sample_emissionVehicles_v2.xml" /> 
+		<param name="vehiclesFile" value="sample_emissionVehicles_v2.xml" />
 	</module>
 	
 <!-- ====================================================================== -->
