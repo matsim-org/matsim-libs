@@ -847,7 +847,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			// TODO what happens for ways that are no oneway??
 		}
 	}
-
+	//TODO Method name a little bit confousing - maybe integrate in above method
 	private void pushSignalOverShortWay(OsmWay shortWay, OsmNode fromNode, OsmNode toNode) {
 		if (shortWay.nodes.size() == 2 && calcNode2NodeDistance(fromNode, toNode) < SIGNAL_MERGE_DISTANCE) {
 			if (fromNode.ways.size() == 2 && toNode.ways.size() > 2
@@ -858,7 +858,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			}
 		}
 	}
-
+	//TODO integrate this method elsewhere
 	private void pushingSingnalsIntoEndpoints() {
 		for (OsmWay way : this.ways.values()) {
 			for (int i = 1; i < way.nodes.size() - 1; i++) {
@@ -887,6 +887,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 	// TODO this method already moves signals over crossings to endpoints of ways. do we still need pushingSingnalsIntoEndpoints? 
 	// or, if we need it because it does additional stuff, can we remove the case for crossings/endpoints here in this method??
+	//TODO sbraun 07102019 - We will integrate "pushingSingnalsIntoEndpoints" here as we save one loop over all ways
 	private void pushSignalsIntoNearbyJunctions() {
 		for (OsmWay way : this.ways.values()) {
 			// go through all nodes, except the first and the last
@@ -894,7 +895,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				OsmNode signalNode = this.nodes.get(way.nodes.get(i));
 				OsmNode junctionNode = null;
 				String oneway = way.tags.get(TAG_ONEWAY);
-
+    //TODO sbraun 07102019 - Is it sensible to loop over all ways and nodes? Can't we loop over the Set "signalizedOsmNodes"?
 				if (signalizedOsmNodes.contains(signalNode.id) && !isNodeAtJunction(signalNode)) {
 					if ((oneway != null && !oneway.equals("-1")) || oneway == null) {
 						// positive oneway or no oneway
