@@ -106,7 +106,7 @@ final class RunPassengerAlongWithCarriers {
 		final LegHistogram withoutFreight = new LegHistogram(900);
 		withoutFreight.setPopulation(scenario.getPopulation());
 
-		CarrierScoreStats scores = new CarrierScoreStats(carriers, "output/carrier_scores", true);
+		CarrierScoreStats scores = new CarrierScoreStats(carriers, scenario.getConfig().controler().getOutputDirectory()+ "carrier_scores", true);
 
 		eventsManager.addHandler(withoutFreight);
 		eventsManager.addHandler(freightOnly);
