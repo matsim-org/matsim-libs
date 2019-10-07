@@ -172,12 +172,15 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		Network network = scenario.getNetwork();
 
 		SignalsAndLanesOsmNetworkReader reader = new SignalsAndLanesOsmNetworkReader(network, ct, signalsData, lanes);
-		reader.setAssumptions(false, // minimize small roundabouts
-				false, // merge oneway Signal Systems
-				false, // use radius reduction
-				true, // allow U-turn at left lane only
-				true, // make pedestrian signals
-				false); // accept 4+ crossings
+
+
+        reader.setMinimizeSmallRoundabouts(false);
+		reader.setMergeOnewaySignalSystems(false);
+		reader.setUseRadiusReduction(false);
+		reader.setAllowUTurnAtLeftLaneOnly(true);
+		reader.setMakePedestrianSignals(true);
+		reader.setMakePedestrianSignals(false);
+
 		reader.setBoundingBox(51.7464, 14.3087, 51.7761, 14.3639); // setting Bounding Box for signals and lanes
 																	// (south,west,north,east)
 		reader.parse(inputOSM);
@@ -234,7 +237,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		this.bbox = new BoundingBox(se.getY(), nw.getX(), nw.getY(), se.getX());
 	}
 
-	// TODO single setters for all
+	// TODO single setters for all - sbraun 07102019 done
+    /*
 	public void setAssumptions(boolean minimizeSmallRoundabouts, boolean mergeOnewaySignalSystems,
 			boolean useRadiusReduction, boolean allowUTurnAtLeftLaneOnly, boolean makePedestrianSignals,
 			boolean acceptFourPlusCrossings) {
@@ -245,7 +249,26 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		this.makePedestrianSignals = makePedestrianSignals;
 		this.acceptFourPlusCrossings = acceptFourPlusCrossings;
 	}
+    */
 
+	public void setMinimizeSmallRoundabouts(boolean minimizeSmallRoundabouts){
+        this.minimizeSmallRoundabouts = minimizeSmallRoundabouts;
+    }
+    public void setMergeOnewaySignalSystems(boolean mergeOnewaySignalSystems){
+        this.mergeOnewaySignalSystems = mergeOnewaySignalSystems;
+    }
+    public void setUseRadiusReduction(boolean useRadiusReduction){
+        this.useRadiusReduction = mergeOnewaySignalSystems;
+    }
+    public void setAllowUTurnAtLeftLaneOnly(boolean allowUTurnAtLeftLaneOnly){
+        this.allowUTurnAtLeftLaneOnly = allowUTurnAtLeftLaneOnly;
+    }
+    public void setMakePedestrianSignals(boolean makePedestrianSignals){
+        this.makePedestrianSignals = makePedestrianSignals;
+    }
+    public void setAcceptFourPlusCrossings(boolean acceptFourPlusCrossings){
+        this.acceptFourPlusCrossings = acceptFourPlusCrossings;
+    }
 
 	/**
 	 * Extends the super class method: Signal data (which is often located at
