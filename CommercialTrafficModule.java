@@ -22,7 +22,6 @@ package commercialtraffic.commercialJob;/*
  */
 
 import com.google.inject.Singleton;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.dvrp.run.DvrpModule;
@@ -62,7 +61,7 @@ public class CommercialTrafficModule extends AbstractModule {
         bind(TourLengthAnalyzer.class).in(Singleton.class);
         addControlerListenerBinding().to(CommercialJobGenerator.class);
         addControlerListenerBinding().to(CommercialTrafficAnalysisListener.class);
-        addControlerListenerBinding().to(ScoreCommercialJobs.class);
+//        addControlerListenerBinding().to(ScoreCommercialJobs.class);
 
         //bind strategy that enables to choose between operators
         addPlanStrategyBinding(ChangeCommercialJobOperator.SELECTOR_NAME).toProvider(new Provider<PlanStrategy>() {
