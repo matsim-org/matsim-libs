@@ -44,8 +44,8 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
 
     @Positive
     private int jSpritTimeSliceWidth = 1800;
-    public static final String JSPRITTIMESLICEWIDTH = "jSpritTimeSliceWidth";
-    private static final String JSPRITTIMESLICEWIDTHDESC = "time slice width used in JSprit in seconds." +
+    public static final String JSPRITTIMESLICEWIDTH = "travelTimeSliceWidth";
+    private static final String JSPRITTIMESLICEWIDTHDESC = "time slice width used for calculation of travel times in seconds." +
             " The smaller the value, the more precise the calculation of routing costs but the longer the computation time." +
             " Default value is 1800 seconds.";
 
