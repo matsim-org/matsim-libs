@@ -43,9 +43,9 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
     private static final String CARRIERSVEHICLETYPEDESC = "Carrier Vehicle Types file, according to MATSim freight contrib";
 
     @Positive
-    private int jSpritTimeSliceWidth = 1800;
-    public static final String JSPRITTIMESLICEWIDTH = "travelTimeSliceWidth";
-    private static final String JSPRITTIMESLICEWIDTHDESC = "time slice width used for calculation of travel times in seconds." +
+    private int travelTimeSliceWidth = 1800;
+    public static final String TRAVELTIMESLICEWIDTH = "travelTimeSliceWidth";
+    private static final String TRAVELTIMESLICEWIDTHDESC = "time slice width used for calculation of travel times in seconds." +
             " The smaller the value, the more precise the calculation of routing costs but the longer the computation time." +
             " Default value is 1800 seconds.";
 
@@ -104,19 +104,19 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
 
 
     /**
-     * @return jspritTimeSliceWidth --{@value #JSPRITTIMESLICEWIDTHDESC}
+     * @return travelTimeSliceWidth --{@value #TRAVELTIMESLICEWIDTHDESC}
      */
-//    @StringGetter(JSPRITTIMESLICEWIDTH)
-    int getJspritTimeSliceWidth() {
-        return jSpritTimeSliceWidth;
+//    @StringGetter(TRAVELTIMESLICEWIDTH)
+    int getTravelTimeSliceWidth() {
+        return travelTimeSliceWidth;
     }
 
     /**
-     * @param jspritTimeSliceWidth --{@value #JSPRITTIMESLICEWIDTHDESC}
+     * @param travelTimeSliceWidth --{@value #TRAVELTIMESLICEWIDTHDESC}
      */
 //    @StringSetter(JSPRITTIMESLICEWIDTH)
-    public void setjSpritTimeSliceWidth(int jspritTimeSliceWidth) {
-        this.jSpritTimeSliceWidth = jspritTimeSliceWidth;
+    public void setTravelTimeSliceWidth(int travelTimeSliceWidth) {
+        this.travelTimeSliceWidth = travelTimeSliceWidth;
     }
 
     public boolean getPhysicallyEnforceTimeWindowBeginnings() {
@@ -143,7 +143,7 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
         Map<String, String> map = super.getComments();
         map.put(CARRIERSFILEDE, CARRIERSFILEDESC);
         map.put(CARRIERSVEHICLETYPED, CARRIERSVEHICLETYPEDESC);
-        map.put(JSPRITTIMESLICEWIDTH,JSPRITTIMESLICEWIDTHDESC);
+        map.put(TRAVELTIMESLICEWIDTH, TRAVELTIMESLICEWIDTHDESC);
         return map;
     }
 
