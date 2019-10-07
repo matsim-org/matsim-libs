@@ -41,8 +41,8 @@ import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -125,8 +125,13 @@ public class DrtRoutingModule implements RoutingModule {
 
 		// === access:
 		if (plansCalcRouteConfig.isInsertingAccessEgressWalk()) {
-			now = addBushwhackingLegFromFacilityToLinkIfNecessary(fromFacility, person, accessActLink, now, result,
-					populationFactory, drtStageActivityType.drtStageActivity);
+//			now = addBushwhackingLegFromFacilityToLinkIfNecessary(fromFacility, person, accessActLink, now, result,
+//					populationFactory, drtStageActivityType.drtStageActivity);
+			List<? extends PlanElement> result2 = walkRouter.calcRoute( fromFacility, new LinkWrapperFacility( accessActLink ), now, person );
+			result.addAll( result2 ) ;
+			for( PlanElement planElement : result2 ){
+				now = TripRouter.calcEndOfPlanElement( now, planElement,  config ) ;
+			}
 		}
 
 		// === drt proper:

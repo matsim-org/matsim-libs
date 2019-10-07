@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -109,27 +110,44 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 
 		List<PlanElement> trip = new ArrayList<>();
 
-		Leg walkToAccessStopLeg = createDrtWalkLeg(fromFacility, accessFacility, departureTime, person);
-		trip.add(walkToAccessStopLeg);
+		double now = departureTime;;
 
+		// access leg:
+		List<? extends PlanElement> abc = createDrtWalkLeg(fromFacility, accessFacility, now, person );
+		trip.addAll(abc);
+		for( PlanElement planElement : abc ){
+			TripRouter.calcEndOfPlanElement( now, planElement, config ) ;
+		}
+
+		// interaction activity:
 		trip.add(createDrtStageActivity(accessFacility));
 
-		double drtLegStartTime = departureTime + walkToAccessStopLeg.getTravelTime() + 1;
-		Leg drtLeg = (Leg)drtRoutingModule.calcRoute(accessFacility, egressFacility, drtLegStartTime, person).get(0);
-		trip.add(drtLeg);
+		// drt proper:
+//		double drtLegStartTime = departureTime + walkToAccessStopLeg.getTravelTime() + 1;
+		now++ ;
+//		Leg drtLeg = (Leg)drtRoutingModule.calcRoute(accessFacility, egressFacility, now, person).get(0);
+		List<? extends PlanElement> drtLeg = drtRoutingModule.calcRoute( accessFacility, egressFacility, now, person );
+		trip.addAll(drtLeg);
+		for( PlanElement planElement : drtLeg ){
+			TripRouter.calcEndOfPlanElement( now, planElement, config ) ;
+		}
 
+		// interaction activity:
 		trip.add(createDrtStageActivity(egressFacility));
 
+		// egress leg:
 		double walkFromStopStartTime = drtLeg.getDepartureTime() + drtLeg.getTravelTime() + 1;
-		trip.add(createDrtWalkLeg(egressFacility, toFacility, walkFromStopStartTime, person));
+		trip.addAll(createDrtWalkLeg(egressFacility, toFacility, walkFromStopStartTime, person));
 
 		return trip;
 	}
 
-	private Leg createDrtWalkLeg(Facility fromFacility, Facility toFacility, double departureTime, Person person) {
-		Leg leg = (Leg)walkRouter.calcRoute(fromFacility, toFacility, departureTime, person).get(0);
-		leg.setMode(drtStageActivityType.drtWalk);
-		return leg;
+	private List<? extends PlanElement> createDrtWalkLeg(Facility fromFacility, Facility toFacility, double departureTime, Person person) {
+//		Leg leg = (Leg)walkRouter.calcRoute(fromFacility, toFacility, departureTime, person).get(0);
+//		leg.setMode(drtStageActivityType.drtWalk);
+//		return leg;
+		List<? extends PlanElement> result = walkRouter.calcRoute( fromFacility, toFacility, departureTime, person );
+		return result ;
 	}
 
 	private Activity createDrtStageActivity(Facility stopFacility) {
