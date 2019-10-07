@@ -485,8 +485,10 @@ public class TestMatsimTransformer {
 				.addVehicle(getMatsimVehicle("matsimVehicle", "i(6,0)", matsimType))
 				.setFleetSize(FleetSize.INFINITE);				
 		carrier.setCarrierCapabilities(ccBuilder.build());
-		carrier.getServices().add(CarrierService.Builder.newInstance(Id.create("serviceId", CarrierService.class),Id.create("i(7,4)R", Link.class)).setCapacityDemand(20).setServiceDuration(10.0).build());
-		carrier.getServices().add(CarrierService.Builder.newInstance(Id.create("serviceId2", CarrierService.class),Id.create("i(3,9)", Link.class)).setCapacityDemand(10).setServiceDuration(20.0).build());
+		CarrierService carrierService1 = CarrierService.Builder.newInstance(Id.create("serviceId", CarrierService.class), Id.create("i(7,4)R", Link.class)).setCapacityDemand(20).setServiceDuration(10.0).build();
+		CarrierUtils.addService(carrier, carrierService1);
+		CarrierService carrierService2 = CarrierService.Builder.newInstance(Id.create("serviceId2", CarrierService.class), Id.create("i(3,9)", Link.class)).setCapacityDemand(10).setServiceDuration(20.0).build();
+		CarrierUtils.addService(carrier, carrierService2);
 		return carrier;
 	}
 	
@@ -497,8 +499,10 @@ public class TestMatsimTransformer {
 				.addVehicle(getMatsimVehicle("matsimVehicle", "i(6,0)", matsimType))
 				.setFleetSize(FleetSize.INFINITE);				
 		carrier.setCarrierCapabilities(ccBuilder.build());
-		carrier.getShipments().add(getMatsimShipment("shipment1", "i(6,0)", "i(7,4)R", 10));
-		carrier.getShipments().add(getMatsimShipment("shipment2", "i(6,0)", "i(3,9)", 20));
+		CarrierShipment shipment1 = getMatsimShipment("shipment1", "i(6,0)", "i(7,4)R", 10);
+		CarrierUtils.addShipment(carrier, shipment1);
+		CarrierShipment shipment2 = getMatsimShipment("shipment2", "i(6,0)", "i(3,9)", 20);
+		CarrierUtils.addShipment(carrier, shipment2);
 		return carrier;
 	}
 	

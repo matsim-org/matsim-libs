@@ -61,17 +61,20 @@ public class FixedCostsTest extends MatsimTestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 //        Create carrier with services; service1 nearby the depot, service2 at the opposite side of the network
+		CarrierService service1 = createMatsimService("Service1", "i(3,0)", 1);
+		CarrierService service2 = createMatsimService("Service2", "i(9,9)R", 1);
+		
 		Carrier carrier1 = CarrierUtils.createCarrier(Id.create("carrier1", Carrier.class ) );
-		carrier1.getServices().add(createMatsimService("Service1", "i(3,0)", 1));
-		carrier1.getServices().add(createMatsimService("Service2", "i(9,9)R", 1));
+		CarrierUtils.addService(carrier1, service1);
+		CarrierUtils.addService(carrier1, service2);
 
 		Carrier carrier2 = CarrierUtils.createCarrier(Id.create("carrier2", Carrier.class ) );
-		carrier2.getServices().add(createMatsimService("Service1", "i(3,0)", 1));
-		carrier2.getServices().add(createMatsimService("Service2", "i(9,9)R", 1));
+		CarrierUtils.addService(carrier2, service1);
+		CarrierUtils.addService(carrier2, service2);
 
 		Carrier carrier3 = CarrierUtils.createCarrier(Id.create("carrier3", Carrier.class ) );
-		carrier3.getServices().add(createMatsimService("Service1", "i(3,0)", 1));
-		carrier3.getServices().add(createMatsimService("Service2", "i(9,9)R", 1));
+		CarrierUtils.addService(carrier3, service1);
+		CarrierUtils.addService(carrier3, service2);
 
 
 		//Create add vehicle for carriers
