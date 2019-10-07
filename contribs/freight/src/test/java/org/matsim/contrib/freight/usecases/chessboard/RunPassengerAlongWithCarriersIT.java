@@ -23,7 +23,7 @@ public class RunPassengerAlongWithCarriersIT {
             abc.run();
         } catch (Exception ee ) {
             ee.printStackTrace();
-            Assert.fail("something went wrong");
+            Assert.fail("something went wrong: " + ee.getMessage());
         }
     }
 
