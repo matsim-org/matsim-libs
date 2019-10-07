@@ -127,7 +127,7 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 				break;
 			}
 			case SHIPMENTS:{
-				currentShipments = new HashMap<String, CarrierShipment>();
+				currentShipments = new HashMap<>();
 				break;
 			}
 			case SHIPMENT:{
@@ -159,12 +159,13 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 				if( deliveryServiceTime != null ) shipmentBuilder.setDeliveryServiceTime( getDouble( deliveryServiceTime ) );
 				CarrierShipment shipment = shipmentBuilder.build();
 				currentShipments.put( atts.getValue( ID ), shipment );
-				currentCarrier.getShipments().add( shipment );
+				CarrierUtils.addShipment(currentCarrier, shipment);
+//				currentCarrier.getShipments().put( shipment.getId(), shipment );
 				break ;
 			}
 			case VEHICLES:
 			{
-				vehicles = new HashMap<String, CarrierVehicle>();
+				vehicles = new HashMap<>();
 				break;
 			}
 			case VEHICLE:{
@@ -184,7 +185,8 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 				if( startTime != null ) vehicleBuilder.setEarliestStart( getDouble( startTime ) );
 				if( endTime != null ) vehicleBuilder.setLatestEnd( getDouble( endTime ) );
 				CarrierVehicle vehicle = vehicleBuilder.build();
-				currentCarrier.getCarrierCapabilities().getCarrierVehicles().add( vehicle );
+//				currentCarrier.getCarrierCapabilities().getCarrierVehicles().put( vehicle.getId(), vehicle );
+				CarrierUtils.addCarrierVehicle(currentCarrier, vehicle);
 				vehicles.put( vId, vehicle );
 				break;
 			}
@@ -207,7 +209,7 @@ class CarrierPlanReaderV1 extends MatsimXmlParser {
 				else{
 					this.selected = false;
 				}
-				scheduledTours = new ArrayList<ScheduledTour>();
+				scheduledTours = new ArrayList<>();
 				break ;
 			}
 			case "tour":

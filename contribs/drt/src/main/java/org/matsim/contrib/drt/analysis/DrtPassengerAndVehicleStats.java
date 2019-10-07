@@ -22,22 +22,13 @@
  */
 package org.matsim.contrib.drt.analysis;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
@@ -52,24 +43,26 @@ import org.matsim.contrib.dvrp.fleet.FleetSpecification;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author jbischoff
  */
-public class DynModePassengerStats
+public class DrtPassengerAndVehicleStats
 		implements PersonEntersVehicleEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
-		LinkEnterEventHandler, ActivityEndEventHandler, DrtRequestSubmittedEventHandler,
+		LinkEnterEventHandler, DrtRequestSubmittedEventHandler,
 		PassengerRequestRejectedEventHandler {
 
 	private final Map<Id<Person>, Double> departureTimes = new HashMap<>();
 	private final Map<Id<Person>, Id<Link>> departureLinks = new HashMap<>();
-	private final List<DynModeTrip> drtTrips = new ArrayList<>();
+	private final List<DrtTrip> drtTrips = new ArrayList<>();
 	private final Map<Id<Vehicle>, Map<Id<Person>, MutableDouble>> inVehicleDistance = new HashMap<>();
 	private final Map<Id<Vehicle>, double[]> vehicleDistances = new HashMap<>();
-	private final Map<Id<Person>, DynModeTrip> currentTrips = new HashMap<>();
+	private final Map<Id<Person>, DrtTrip> currentTrips = new HashMap<>();
 	private final Map<Id<Person>, Double> unsharedDistances = new HashMap<>();
 	private final Map<Id<Person>, Double> unsharedTimes = new HashMap<>();
 	private final Set<Id<Person>> rejectedPersons = new HashSet<>();
@@ -77,13 +70,21 @@ public class DynModePassengerStats
 	private final String mode;
 	private final int maxcap;
 	private final Network network;
+	private Set<Id<Vehicle>> monitoredVehicles;
 
-	public DynModePassengerStats(Network network, EventsManager events, DrtConfigGroup drtCfg,
-			FleetSpecification fleet) {
+
+	public DrtPassengerAndVehicleStats(Network network, EventsManager events, DrtConfigGroup drtCfg,
+									   FleetSpecification fleetSpecification) {
 		this.mode = drtCfg.getMode();
 		this.network = network;
 		events.addHandler(this);
-		maxcap = DynModeTripsAnalyser.findMaxVehicleCapacity(fleet);
+		maxcap = DrtTripsAnalyser.findMaxVehicleCapacity(fleetSpecification);
+		this.monitoredVehicles = fleetSpecification.getVehicleSpecifications()
+				.keySet()
+				.stream()
+				.map(vid -> Id.createVehicleId(vid))
+				.collect(Collectors.toSet());
+		initializeVehicles();
 	}
 
 	@Override
@@ -98,12 +99,12 @@ public class DynModePassengerStats
 		unsharedTimes.clear();
 		rejectedPersons.clear();
 		request2person.clear();
+		initializeVehicles();
 	}
 
-	@Override
-	public void handleEvent(ActivityEndEvent event) {
-		if (event.getActType().equals(VrpAgentLogic.BEFORE_SCHEDULE_ACTIVITY_TYPE)) {
-			Id<Vehicle> vid = Id.createVehicleId(event.getPersonId().toString());
+
+	private void initializeVehicles() {
+		for (Id<Vehicle> vid : monitoredVehicles) {
 			this.inVehicleDistance.put(vid, new HashMap<>());
 			this.vehicleDistances.put(vid, new double[3 + maxcap]);
 		}
@@ -132,7 +133,7 @@ public class DynModePassengerStats
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
 		if (event.getLegMode().equals(mode)) {
-			DynModeTrip trip = currentTrips.remove(event.getPersonId());
+			DrtTrip trip = currentTrips.remove(event.getPersonId());
 			if (trip != null) {
 				double distance = inVehicleDistance.get(trip.getVehicle()).remove(event.getPersonId()).doubleValue();
 				trip.setTravelDistance(distance);
@@ -172,7 +173,7 @@ public class DynModePassengerStats
 			double unsharedDistance = this.unsharedDistances.remove(event.getPersonId());
 			double unsharedTime = this.unsharedTimes.remove(event.getPersonId());
 			Coord departureCoord = this.network.getLinks().get(departureLink).getCoord();
-			DynModeTrip trip = new DynModeTrip(departureTime, event.getPersonId(), event.getVehicleId(), departureLink,
+			DrtTrip trip = new DrtTrip(departureTime, event.getPersonId(), event.getVehicleId(), departureLink,
 					departureCoord, waitTime);
 			trip.setUnsharedDistanceEstimate_m(unsharedDistance);
 			trip.setUnsharedTimeEstimate_m(unsharedTime);
@@ -185,7 +186,7 @@ public class DynModePassengerStats
 	/**
 	 * @return the drtTrips
 	 */
-	public List<DynModeTrip> getDrtTrips() {
+	public List<DrtTrip> getDrtTrips() {
 		return drtTrips;
 	}
 
