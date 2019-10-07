@@ -47,6 +47,11 @@ public class CarrierModule extends AbstractModule {
 
 
     public CarrierModule() {
+        this.carriers = new Carriers();
+        new CarrierPlanXmlReader(carriers).readFile(freightConfig.getCarriersFile());
+        CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
+        new CarrierVehicleTypeReader(vehicleTypes).readFile(freightConfig.getCarriersVehicleTypesFile());
+        new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
     }
 
     /**
@@ -67,11 +72,6 @@ public class CarrierModule extends AbstractModule {
     public void install() {
         // We put some things under dependency injection.
         bind( FreightConfigGroup.class ).toInstance(freightConfig);
-
-        new CarrierPlanXmlReader(carriers).readFile(freightConfig.getCarriersFile());
-        CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
-        new CarrierVehicleTypeReader(vehicleTypes).readFile(freightConfig.getCarriersVehicleTypesFile());
-        new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
 
         bind(Carriers.class).toInstance(carriers);
         if (strategyManagerFactory != null) {
