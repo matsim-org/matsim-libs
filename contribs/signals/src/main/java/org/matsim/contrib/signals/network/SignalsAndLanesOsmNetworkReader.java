@@ -149,10 +149,10 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 //		String outputDir = "../../../shared-svn/studies/countries/de/cottbus-osmSignalsLanes/input/matsim/";
 //		String inputOSM = "../../../shared-svn/studies/tthunig/osmData/brandenburg-latest.osm";
 //		String outputDir = "../../../shared-svn/studies/tthunig/osmData/signalsAndLanesReader/brandenburg/";
-//		String inputOSM = "../../../shared-svn/studies/tthunig/osmData/berlin-latest.osm";
-//		String outputDir = "../../../shared-svn/studies/tthunig/osmData/signalsAndLanesReader/berlin/";
-		String inputOSM = "../../../shared-svn/studies/tthunig/osmData/interpreter.osm";
-		String outputDir = "../../../shared-svn/studies/tthunig/osmData/signalsAndLanesReader/cottbusCity/";
+		String inputOSM = "../../../shared-svn/studies/sbraun/osmData/RawOSM/brandenburg.osm";
+		String outputDir = "../../../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/cottbus/";
+//		String inputOSM = "../../../shared-svn/studies/tthunig/osmData/interpreter.osm";
+//		String outputDir = "../../../shared-svn/studies/tthunig/osmData/signalsAndLanesReader/cottbusCity/";
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84_UTM33N);
 
@@ -246,6 +246,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		this.acceptFourPlusCrossings = acceptFourPlusCrossings;
 	}
 
+
 	/**
 	 * Extends the super class method: Signal data (which is often located at
 	 * upstream nodes) is pushed into intersection nodes, such that signalized 
@@ -279,7 +280,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		List<OsmNode> checkedNodes = new ArrayList<>();
 		List<OsmWay> checkedWays = new ArrayList<>();
 		if (this.minimizeSmallRoundabouts)
-			findingSmallRoundabouts(addingNodes, checkedNodes, checkedWays);
+            findingSmallRoundabouts(addingNodes, checkedNodes, checkedWays);
 
 		findingFourNodeJunctions(addingNodes, checkedNodes);
 
@@ -2125,7 +2126,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 
 	//TODO consider moving this out in some utils directory
-	//TODO mit lambok abkürzen
+	//TODO mit lambok abkürzen - weg
 	private static final class BoundingBox {
 		//Attribute evtl irreführend für Eckpunkte
 		private double south;
