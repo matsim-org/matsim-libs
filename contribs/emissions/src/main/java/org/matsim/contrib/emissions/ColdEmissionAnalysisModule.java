@@ -82,15 +82,15 @@ final class ColdEmissionAnalysisModule {
 	private final Set<String> coldPollutants;
   private int noVehWarnCnt = 0;
 
-	public static class ColdEmissionAnalysisModuleParameter {
-		public final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
-		public final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
+    /*package-private*/ static class ColdEmissionAnalysisModuleParameter {
+		final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
+		final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
 		private final Set<String> coldPollutants;
 		private final EmissionsConfigGroup ecg;
 
-		public ColdEmissionAnalysisModuleParameter(
-				Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable,
-				Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable, Set<String> coldPollutants, EmissionsConfigGroup emissionsConfigGroup) {
+        /*package-private*/ ColdEmissionAnalysisModuleParameter(Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable,
+                                                                Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable,
+                                                                Set<String> coldPollutants, EmissionsConfigGroup emissionsConfigGroup) {
 			this.avgHbefaColdTable = avgHbefaColdTable;
 			this.detailedHbefaColdTable = detailedHbefaColdTable;
 			this.coldPollutants = coldPollutants;
@@ -98,9 +98,9 @@ final class ColdEmissionAnalysisModule {
 		}
 	}
 
-	public ColdEmissionAnalysisModule(
-			ColdEmissionAnalysisModuleParameter parameterObject,
-			EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
+    /*package-private*/ ColdEmissionAnalysisModule(
+            ColdEmissionAnalysisModuleParameter parameterObject,
+            EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
 
 		this.avgHbefaColdTable = parameterObject.avgHbefaColdTable;
 		this.detailedHbefaColdTable = parameterObject.detailedHbefaColdTable;
@@ -142,28 +142,16 @@ final class ColdEmissionAnalysisModule {
 			}
 							
 		} else {
-			
-			if(this.ecg.isUsingVehicleTypeIdAsVehicleDescription() ) {
-				if(vehicle.getType().getDescription()==null) { // emission specification is in vehicle type id
-					vehicle.getType().setDescription(EmissionSpecificationMarker.BEGIN_EMISSIONS
-							+vehicle.getType().getId().toString()+ EmissionSpecificationMarker.END_EMISSIONS);
-				} else if( vehicle.getType().getDescription().contains(EmissionSpecificationMarker.BEGIN_EMISSIONS.toString()) ) {
-					// emission specification is in vehicle type id and in vehicle description too.
-				} else {
-					String vehicleDescription = vehicle.getType().getDescription() + EmissionSpecificationMarker.BEGIN_EMISSIONS
-							+ vehicle.getType().getId().toString()+ EmissionSpecificationMarker.END_EMISSIONS;
-					vehicle.getType().setDescription(vehicleDescription);
-				}
-			}
 
-			String vehicleDescription = vehicle.getType().getDescription();
+			String hbefaVehicleTypeDescription = EmissionUtils.getHbefaVehicleDescription( vehicle.getType(), this.ecg );
 
-		if(vehicle.getType().getDescription() == null){
-			throw new RuntimeException("Vehicle type description for vehicle " + vehicle + "is missing. " +
-					"Please make sure that requirements for emission vehicles in "
-					+ EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
-		}
-		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = EmissionUtils.convertVehicleDescription2VehicleInformationTuple(vehicleDescription);
+			Gbl.assertNotNull( hbefaVehicleTypeDescription );
+
+			Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = EmissionUtils.convertVehicleDescription2VehicleInformationTuple(
+				  vehicle.getType() );
+
+			Gbl.assertNotNull( vehicleInformationTuple );
+
 		if (vehicleInformationTuple.getFirst() == null){
 			throw new RuntimeException("Vehicle category for vehicle " + vehicle + " is not valid. " +
 					"Please make sure that requirements for emission vehicles in " + 
@@ -276,13 +264,6 @@ final class ColdEmissionAnalysisModule {
 			generatedEmissions = this.avgHbefaColdTable.get(key);
 		}
         return generatedEmissions.getColdEmissionFactor();
-	    
-	    // yy when thinking about the above, it is actually not so clear what that "fallback" actually means ... since
-	    // the exact key now just needs to be in the avg table.  So it is not really a fallback, but rather just
-	    // another lookup in another table. ---???  kai, jul'18
-	    // (It may implicitly work from convertVehicleDescription2VehicleInformationTuple, which essentially generates an empty vehicle
-	    // description if nothing specific is available.  And thus the "average" table should contain "empty" entries, different
-	    // from what the tests imply. kai, jul'18)
     }
 	
 	static HbefaVehicleAttributes createHbefaVehicleAttributes( final String hbefaTechnology, final String hbefaSizeClass, final String hbefaEmConcept ) {

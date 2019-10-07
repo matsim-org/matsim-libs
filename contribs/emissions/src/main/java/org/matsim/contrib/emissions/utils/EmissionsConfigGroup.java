@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.emissions.utils;
 
-import org.matsim.contrib.emissions.EmissionSpecificationMarker;
+import com.sun.org.apache.bcel.internal.classfile.Unknown;
+import org.matsim.contrib.emissions.EmissionUtils;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
@@ -29,10 +30,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class EmissionsConfigGroup
-extends ReflectiveConfigGroup
+	  extends ReflectiveConfigGroup
 {
 	public static final String GROUP_NAME = "emissions";
-	
+
 	@Deprecated // See elsewhere in this class.  kai, oct'18
 	private static final String EMISSION_ROADTYPE_MAPPING_FILE = "emissionRoadTypeMappingFile";
 	@Deprecated // kai, oct'18
@@ -52,23 +53,18 @@ extends ReflectiveConfigGroup
 
 	private static final String EMISSION_FACTORS_COLD_FILE_DETAILED = "detailedColdEmissionFactorsFile";
 	private String detailedColdEmissionFactorsFile;
-	
-	@Deprecated // kai, oct'18
-	private static final String USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION = "isUsingVehicleTypeIdAsVehicleDescription";
-	@Deprecated // kai, oct'18
-	private boolean isUsingVehicleIdAsVehicleDescription = false;
 
 	private static final String WRITING_EMISSIONS_EVENTS = "isWritingEmissionsEvents";
 	private boolean isWritingEmissionsEvents = true;
 
 	private static final String EMISSION_EFFICIENCY_FACTOR = "emissionEfficiencyFactor";
 	private double emissionEfficiencyFactor = 1.0;
-	
+
 	@Deprecated // kai, oct'18
 	private static final String EMISSION_COST_MULTIPLICATION_FACTOR = "emissionCostMultiplicationFactor";
 	@Deprecated // kai, oct'18
 	private double emissionCostMultiplicationFactor = 1.0;
-	
+
 	@Deprecated // kai, oct'18
 	private static final String CONSIDERING_CO2_COSTS = "consideringCO2Costs";
 	@Deprecated // kai, oct'18
@@ -76,12 +72,14 @@ extends ReflectiveConfigGroup
 
 	private static final String HANDLE_HIGH_AVERAGE_SPEEDS = "handleHighAverageSpeeds";
 	private boolean handleHighAverageSpeeds = false;
-	
+
 	@Deprecated // See elsewhere in this class.  kai, oct'18
 	public enum HbefaRoadTypeSource { fromFile, fromLinkAttributes, fromOsm }
 	@Deprecated // See elsewhere in this class.  kai, oct'18
 	private static final String Hbefa_ROADTYPE_SOURCE = "hbefaRoadTypeSource";
 	@Deprecated // my preference would be to phase out the "fromFile" option and use "fromLinkAttributes" only.  It can always be solved after reading the network.  kai, oct'18
+	// I am now thinking that it would be more expressive to keep that setting, because it makes users aware of the fact that there needs to be something
+	// in the vehicles file.  kai, dec'19
 	private HbefaRoadTypeSource hbefaRoadTypeSource = HbefaRoadTypeSource.fromFile; // fromFile is to support backward compatibility
 
 	public enum NonScenarioVehicles { ignore, abort }
@@ -91,7 +89,7 @@ extends ReflectiveConfigGroup
 	public enum EmissionsComputationMethod {StopAndGoFraction,AverageSpeed}
 	private static final String EMISSIONS_COMPUTATION_METHOD = "emissionsComputationMethod";
 	private EmissionsComputationMethod emissionsComputationMethod = EmissionsComputationMethod.StopAndGoFraction;
-	
+
 	@Deprecated // should be phased out.  kai, oct'18
 	private static final String EMISSION_ROADTYPE_MAPPING_FILE_CMT = "REQUIRED if source of the HBEFA road type is set to "+HbefaRoadTypeSource.fromFile +". It maps from input road types to HBEFA 3.1 road type strings";
 	private static final String EMISSION_FACTORS_WARM_FILE_AVERAGE_CMT = "REQUIRED: file with HBEFA 3.1 fleet average warm emission factors";
@@ -101,16 +99,16 @@ extends ReflectiveConfigGroup
 	private static final String EMISSION_FACTORS_COLD_FILE_DETAILED_CMT = "OPTIONAL: file with HBEFA 3.1 detailed cold emission factors";
 	@Deprecated // should be phased out.  kai, oct'18
 	private static final String USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION_CMT = "The vehicle information (or vehicles file) should be passed to the scenario." +
-			"The definition of emission specifications:" +  "\n\t\t" +
-			" - REQUIRED: it must start with the respective HbefaVehicleCategory followed by `;'" + "\n\t\t" +
-			" - OPTIONAL: if detailed emission calculation is switched on, the emission specifications should aditionally contain" +
-			" HbefaVehicleAttributes (`Technology;SizeClasse;EmConcept'), corresponding to the strings in " + EMISSION_FACTORS_WARM_FILE_DETAILED+"."+
-			"\n\t\t" +
-			"TRUE (DO NOT USE except for backwards compatibility): vehicle type id is used for the emission specifications." + "\n\t\t"+
-			"FALSE: vehicle description is used for the emission specifications." +
-			"The emission specifications of a vehicle type should be surrounded by emission specification markers i.e."+
-			EmissionSpecificationMarker.BEGIN_EMISSIONS + " and " + EmissionSpecificationMarker.END_EMISSIONS + "." ;
-	
+															   "The definition of emission specifications:" +  "\n\t\t" +
+															   " - REQUIRED: it must start with the respective HbefaVehicleCategory followed by `;'" + "\n\t\t" +
+															   " - OPTIONAL: if detailed emission calculation is switched on, the emission specifications should aditionally contain" +
+															   " HbefaVehicleAttributes (`Technology;SizeClasse;EmConcept'), corresponding to the strings in " + EMISSION_FACTORS_WARM_FILE_DETAILED+"."+
+															   "\n\t\t" +
+															   "TRUE (DO NOT USE except for backwards compatibility): vehicle type id is used for the emission specifications.\n\t\t" +
+															   "FALSE (DO NOT USE except for backwards compability): vehicle description is used for the emission specifications. The emission specifications of a vehicle " +
+															   "type should be surrounded by emission specification markers.\n\t\t" +
+															   "do not actively set (or set to null) (default): hbefa vehicle type description comes from attribute in vehicle type." ;
+
 	// yyyy the EmissionsSpecificationMarker thing should be replaced by link attributes.  Did not exist when this functionality was written.  kai, oct'18
 
 	private static final String WRITING_EMISSIONS_EVENTS_CMT = "if false, emission events will not appear in the events file.";
@@ -125,11 +123,11 @@ extends ReflectiveConfigGroup
 
 	private static final String NON_SCENARIO_VEHICLES_CMT = "Specifies the handling of non-scenario vehicles.  The options are: "
 //			+ Arrays.stream(NonScenarioVehicles.values()).map(handling -> " " + handling.toString()).collect(Collectors.joining()) +"."
-			//    https://stackoverflow.com/questions/48300252/getting-stackoverflowerror-while-initializing-a-static-variable .
-			// really ugly compilation error with java8, difficult to find.  kai, nov'18
-			+ NonScenarioVehicles.values()
-			+ " Should eventually be extended by 'getVehiclesFromMobsim'."
-	 ;
+											    //    https://stackoverflow.com/questions/48300252/getting-stackoverflowerror-while-initializing-a-static-variable .
+											    // really ugly compilation error with java8, difficult to find.  kai, nov'18
+											    + NonScenarioVehicles.values()
+											    + " Should eventually be extended by 'getVehiclesFromMobsim'."
+		  ;
 
 	private static final String EMISSIONS_COMPUTATION_METHOD_CMT = "if true, the original fractional method from Hülsmann et al (2011) will be used to calculate emission factors";
 
@@ -143,10 +141,10 @@ extends ReflectiveConfigGroup
 
 		{
 			String Hbefa_ROADTYPE_SOURCE_CMT = "Source of the HBEFFA road type. The options are:"+ Arrays.stream(HbefaRoadTypeSource.values())
-																							 .map(source -> " " + source.toString())
-																							 .collect(Collectors.joining()) +"."
+																		   .map(source -> " " + source.toString())
+																		   .collect(Collectors.joining()) +"."
 //			"\n"+HbefaRoadTypeSource.fromLinkAttributes+" is default i.e. put HBEFA road type directly to the link attributes." // unfortunately not default
-			;
+				  ;
 
 			map.put(Hbefa_ROADTYPE_SOURCE, Hbefa_ROADTYPE_SOURCE_CMT);
 		}
@@ -173,10 +171,12 @@ extends ReflectiveConfigGroup
 		map.put(CONSIDERING_CO2_COSTS, CONSIDERING_CO2_COSTS_CMT);
 
 		map.put(HANDLE_HIGH_AVERAGE_SPEEDS, HANDLE_HIGH_AVERAGE_SPEEDS_CMT);
-		
+
 		map.put(NON_SCENARIO_VEHICLES, NON_SCENARIO_VEHICLES_CMT);
 
-        map.put(EMISSIONS_COMPUTATION_METHOD, EMISSIONS_COMPUTATION_METHOD_CMT);
+		map.put(EMISSIONS_COMPUTATION_METHOD, EMISSIONS_COMPUTATION_METHOD_CMT);
+
+		map.put(HBEFA_VEHICLE_DESCRIPTION_SOURCE, HBEFA_VEHICLE_DESCRIPTION_SOURCE_CMT) ;
 
 		return map;
 	}
@@ -194,7 +194,7 @@ extends ReflectiveConfigGroup
 	public String getEmissionRoadTypeMappingFile() {
 		return this.emissionRoadTypeMappingFile;
 	}
-	
+
 	@Deprecated // See elsewhere in this class.  kai, oct'18
 	public URL getEmissionRoadTypeMappingFileURL(URL context) {
 		return ConfigGroup.getInputFileURL(context, this.emissionRoadTypeMappingFile);
@@ -279,21 +279,64 @@ extends ReflectiveConfigGroup
 	{
 		super(GROUP_NAME);
 	}
-
+	// ============================================
+	// ============================================
+	@Deprecated // kai, oct'18
+	private static final String USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION = "isUsingVehicleTypeIdAsVehicleDescription";
 	@StringGetter(USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION)
-	@Deprecated // is there for backwards compatibility; should eventually be removed.  kai, oct'18
-	public boolean isUsingVehicleTypeIdAsVehicleDescription() {
-		return isUsingVehicleIdAsVehicleDescription;
+	@Deprecated // is there for backwards compatibility; in code please inline. kai/kai, sep'19
+	public Boolean isUsingVehicleTypeIdAsVehicleDescription() {
+		switch ( this.getHbefaVehicleDescriptionSource() ) {
+			case usingVehicleTypeId:
+				return true ;
+			case fromVehicleTypeDescription:
+				return false ;
+			case asEngineInformationAttributes:
+				return null ;
+			default:
+				throw new RuntimeException( "config switch setting not understood" ) ;
+		}
 	}
 	/**
 	 * @param usingVehicleIdAsVehicleDescription -- {@value #USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION_CMT}
 	 */
 	@StringSetter(USING_VEHICLE_TYPE_ID_AS_VEHICLE_DESCRIPTION)
-	@Deprecated // is there for backwards compatibility; should eventually be removed.  kai, oct'18
-	public void setUsingVehicleTypeIdAsVehicleDescription(boolean usingVehicleIdAsVehicleDescription) {
-		isUsingVehicleIdAsVehicleDescription = usingVehicleIdAsVehicleDescription;
+	@Deprecated // is there for backwards compatibility; in code please inline.  kai/kai, sep19
+	public void setUsingVehicleTypeIdAsVehicleDescription(Boolean usingVehicleIdAsVehicleDescription) {
+		if ( usingVehicleIdAsVehicleDescription==null ) {
+			this.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.asEngineInformationAttributes );
+		} else if ( usingVehicleIdAsVehicleDescription ) {
+			this.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.usingVehicleTypeId );
+		} else {
+			this.setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
+		}
 	}
-	// ---
+	// ============================================
+	// ============================================
+	// yy I now think that one can get away without the following.  kai, mar'19
+	private static final String HBEFA_VEHICLE_DESCRIPTION_SOURCE="hbefaVehicleDescriptionSource" ;
+	private static final String HBEFA_VEHICLE_DESCRIPTION_SOURCE_CMT="Each vehicle in matsim points to a VehicleType.  For the emissions package to work, " +
+													 "each VehicleType needs to contain corresponding information.  This switch " +
+													 "determines _where_ in VehicleType that information is contained.  default: " +
+													 HbefaVehicleDescriptionSource.asEngineInformationAttributes.name() ;
+	public enum HbefaVehicleDescriptionSource { usingVehicleTypeId, fromVehicleTypeDescription, asEngineInformationAttributes }
+	private HbefaVehicleDescriptionSource hbefaVehicleDescriptionSource = HbefaVehicleDescriptionSource.asEngineInformationAttributes ;
+	//	@Deprecated // is there for backwards compatibility; should eventually be removed.  kai, mar'19
+	// I am now thinking that it would be more expressive to keep that setting, because it makes users aware of the fact that there needs to be something
+	// in the vehicles file.  kai, dec'19
+	@StringSetter(HBEFA_VEHICLE_DESCRIPTION_SOURCE)
+	public void setHbefaVehicleDescriptionSource( HbefaVehicleDescriptionSource hbefaVehicleDescriptionSource ) {
+		this.hbefaVehicleDescriptionSource = hbefaVehicleDescriptionSource ;
+	}
+	//	@Deprecated // is there for backwards compatibility; should eventually be removed.  kai, mar'19
+	// I am now thinking that it would be more expressive to keep that setting, because it makes users aware of the fact that there needs to be something
+	// in the vehicles file.  kai, dec'19
+	@StringGetter( HBEFA_VEHICLE_DESCRIPTION_SOURCE )
+	public HbefaVehicleDescriptionSource getHbefaVehicleDescriptionSource() {
+		return this.hbefaVehicleDescriptionSource ;
+	}
+	// ============================================
+	// ============================================
 	/**
 	 * @return {@value #WRITING_EMISSIONS_EVENTS_CMT}
 	 */
@@ -389,14 +432,14 @@ extends ReflectiveConfigGroup
 		this.nonScenarioVehicles = nonScenarioVehicles;
 	}
 
-    @StringGetter(EMISSIONS_COMPUTATION_METHOD)
-    public EmissionsComputationMethod getEmissionsComputationMethod() {
-        return emissionsComputationMethod;
-    }
+	@StringGetter(EMISSIONS_COMPUTATION_METHOD)
+	public EmissionsComputationMethod getEmissionsComputationMethod() {
+		return emissionsComputationMethod;
+	}
 
-    @StringSetter(EMISSIONS_COMPUTATION_METHOD)
-    public void setEmissionsComputationMethod(EmissionsComputationMethod emissionsComputationMethod) {
-        this.emissionsComputationMethod = emissionsComputationMethod;
-    }
+	@StringSetter(EMISSIONS_COMPUTATION_METHOD)
+	public void setEmissionsComputationMethod(EmissionsComputationMethod emissionsComputationMethod) {
+		this.emissionsComputationMethod = emissionsComputationMethod;
+	}
 
 }
