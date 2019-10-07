@@ -35,7 +35,6 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
-import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.xml.sax.Attributes;
 
@@ -55,6 +54,8 @@ final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 	private final static String LINKS = "links";
 	private final static String NODE = "node";
 	private final static String LINK = "link";
+	private final static String ATTRIBUTES = "attributes";
+	private final static String ATTRIBUTE = "attribute";
 
 	private final Network network;
 
@@ -95,8 +96,9 @@ final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 			case LINKS:
 				startLinks(atts);
 				break;
-			case AttributesUtils.ATTRIBUTES:
-			case AttributesUtils.ATTRIBUTE:
+			case ATTRIBUTES:
+				/* fall-through */
+			case ATTRIBUTE:
 				attributesDelegate.startTag( name , atts , context , currentAttributes );
 				break;
 		}
@@ -105,7 +107,7 @@ final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		switch( name ) {
-			case AttributesUtils.ATTRIBUTES:
+			case ATTRIBUTES:
                 if (context.peek().equals(NETWORK)) {
 					String inputCRS = (String) network.getAttributes().getAttribute(ProjectionUtils.INPUT_CRS_ATT);
 					if (inputCRS != null && targetCRS != null) {
@@ -117,7 +119,8 @@ final class NetworkReaderMatsimV2 extends MatsimXmlParser {
 						ProjectionUtils.putCRS(network, targetCRS);
 					}
 				}
-			case AttributesUtils.ATTRIBUTE:
+				/* fall-through */
+			case ATTRIBUTE:
 				attributesDelegate.endTag(name, content, context);
 				break;
 		}

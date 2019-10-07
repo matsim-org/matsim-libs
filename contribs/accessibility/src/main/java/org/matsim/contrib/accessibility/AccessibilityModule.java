@@ -80,7 +80,10 @@ public final class AccessibilityModule extends AbstractModule {
 			@Inject private Network network ;
 			@Inject private Scenario scenario;
 
-			@Inject (optional = true) PtMatrix ptMatrix = null; // Downstream code knows how to handle a null PtMatrix
+//			@Inject (optional = true) PtMatrix ptMatrix = null; // Downstream code knows how to handle a null PtMatrix
+			// not consistent with guice-grapher, but also a result of garbled design: There should rather be a routing-mode that uses PtMatrix.
+			// Commenting it out for the time being.  kai, sep'19
+
 			@Inject private Map<String,TravelDisutilityFactory> travelDisutilityFactories ;
 			@Inject private Map<String,TravelTime> travelTimes ;
 			
@@ -150,31 +153,29 @@ public final class AccessibilityModule extends AbstractModule {
 				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
 					AccessibilityContributionCalculator calculator;
 					switch(mode) {
-					case bike:
-						calculator = new ConstantSpeedAccessibilityExpContributionCalculator(mode.name(), scenario);
-//                        final TravelTime bikeTravelTime = travelTimes.get(mode.name());
-//                        Gbl.assertNotNull(bikeTravelTime);
-//                        final TravelDisutilityFactory bikeTravelDisutilityFactory = travelDisutilityFactories.get(mode.name());
-//                        calculator = new NetworkModeAccessibilityExpContributionCalculator(bikeTravelTime, bikeTravelDisutilityFactory, scenario, measuringPoints, opportunities);
-						break;
-					case car: {
-						final TravelTime travelTime = travelTimes.get(mode.name());
-						Gbl.assertNotNull(travelTime);
-						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(mode.name());
-						calculator = new NetworkModeAccessibilityExpContributionCalculator(mode.name(), travelTime, travelDisutilityFactory, scenario);
-						break; }
 					case freespeed: {
 						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(TransportMode.car);
 						Gbl.assertNotNull(travelDisutilityFactory);
 						calculator = new NetworkModeAccessibilityExpContributionCalculator(mode.name(), new FreeSpeedTravelTime(), travelDisutilityFactory, scenario);
 						break; }
+					case car: {
+						final TravelTime carTravelTime = travelTimes.get(mode.name());
+						Gbl.assertNotNull(carTravelTime);
+						final TravelDisutilityFactory carTravelDisutilityFactory = travelDisutilityFactories.get(mode.name());
+						calculator = new NetworkModeAccessibilityExpContributionCalculator(mode.name(), carTravelTime, carTravelDisutilityFactory, scenario);
+						break; }
+					case bike:
+                        calculator = new ConstantSpeedAccessibilityExpContributionCalculator(mode.name(), scenario);
+                        break;
 					case walk:
 						calculator = new ConstantSpeedAccessibilityExpContributionCalculator(mode.name(), scenario);
 						break;
 					case matrixBasedPt:
-						calculator = new LeastCostPathCalculatorAccessibilityContributionCalculator(
-								config.planCalcScore(),	ptMatrix.asPathCalculator(config.planCalcScore()), scenario);
-						break;
+						throw new RuntimeException("currently not supported because implementation not consistent with guice grapher.  kai, " +
+											     "sep'19") ;
+//						calculator = new LeastCostPathCalculatorAccessibilityContributionCalculator(
+//								config.planCalcScore(),	ptMatrix.asPathCalculator(config.planCalcScore()), scenario);
+//						break;
 					case pt:
 						calculator = new SwissRailRaptorAccessibilityContributionCalculator(mode.name(), config.planCalcScore(), scenario);
 						break;

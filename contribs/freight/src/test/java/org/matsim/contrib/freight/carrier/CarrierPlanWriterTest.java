@@ -42,8 +42,8 @@ public class CarrierPlanWriterTest {
 	@Test
 	public void testCarrierPlanWriterWrites() {
 		Carriers carriers = new Carriers();
-		CarrierPlanReader carrierPlanReader = new CarrierPlanReader(carriers);
-		carrierPlanReader.readFile(testUtils.getClassInputDirectory() + "carrierPlansEquils.xml");
+		CarrierPlanReaderV1 carrierPlanReaderV1 = new CarrierPlanReaderV1(carriers);
+		carrierPlanReaderV1.readFile(testUtils.getClassInputDirectory() + "carrierPlansEquils.xml");
 		CarrierPlanWriter planWriter = new CarrierPlanWriter(carriers.getCarriers().values());
 		planWriter.write(testUtils.getOutputDirectory() + "carrierPlansEquilsWritten.xml");
 	}

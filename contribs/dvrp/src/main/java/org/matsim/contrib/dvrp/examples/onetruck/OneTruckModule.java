@@ -33,7 +33,6 @@ import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -74,9 +73,10 @@ public class OneTruckModule extends AbstractDvrpModeModule {
 	private static VehicleType createTruckType() {
 		VehicleType truckType = VehicleUtils.getFactory().createVehicleType(Id.create("truckType", VehicleType.class));
 		truckType.setLength(15.);
-		VehicleCapacity vehicleCapacity = new VehicleCapacityImpl();
-		vehicleCapacity.setSeats(1);
-		truckType.setCapacity(vehicleCapacity);
+//		VehicleCapacity vehicleCapacity = new VehicleCapacity();
+//		vehicleCapacity.setSeats(1);
+//		truckType.setCapacity(vehicleCapacity);
+		truckType.getCapacity().setSeats( 1 );
 		return truckType;
 	}
 

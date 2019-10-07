@@ -53,7 +53,9 @@ import org.matsim.pt.transitSchedule.api.Transit;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.utils.objectattributes.AttributeConverter;
-import org.matsim.vehicles.VehicleWriterV1;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+import org.matsim.vehicles.MatsimVehicleWriter;
 import org.matsim.vehicles.Vehicles;
 
 import java.io.File;
@@ -210,7 +212,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	private void dumpVehicles() {
 		try {
-			new VehicleWriterV1(this.vehicles).writeFile(this.controlerIO.getOutputFilename(Controler.DefaultFiles.vehicles));
+			new MatsimVehicleWriter(this.vehicles).writeFile(this.controlerIO.getOutputFilename(Controler.DefaultFiles.vehicles));
 		} catch ( Exception ee ) {
 			log.error("Exception writing vehicles.", ee);
 		}
@@ -219,7 +221,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	private void dumpTransitVehicles() {
 		try {
 			if (this.transitVehicles != null ) {
-				new VehicleWriterV1(this.transitVehicles).writeFile(this.controlerIO.getOutputFilename(Controler.DefaultFiles.transitVehicles));
+				new MatsimVehicleWriter(this.transitVehicles).writeFile(this.controlerIO.getOutputFilename(Controler.DefaultFiles.transitVehicles));
 			}
 		} catch ( Exception ee ) {
 			log.error("Exception writing transit vehicles.", ee);

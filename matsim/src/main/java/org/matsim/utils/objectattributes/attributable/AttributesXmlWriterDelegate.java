@@ -37,6 +37,10 @@ public class AttributesXmlWriterDelegate {
 	private final ObjectAttributesConverter converter = new ObjectAttributesConverter();
 
 	public final void writeAttributes(final String indentation, final BufferedWriter writer, final Attributes attributes) {
+		writeAttributes(indentation, writer, attributes, true);
+	}
+
+	public final void writeAttributes(final String indentation, final BufferedWriter writer, final Attributes attributes, boolean emptyLineAfter) {
 		if (attributes.size() == 0) {
 			return;
 		}
@@ -53,7 +57,7 @@ public class AttributesXmlWriterDelegate {
 				if (converted != null) {
 					writer.write(indentation + "\t");
 					writer.write("<attribute name=\"" + XmlUtils.encodeAttributeValue(objAttribute.getKey()) + "\" ");
-					writer.write("class=\"" + clazz.getCanonicalName() + "\" >");
+					writer.write("class=\"" + clazz.getName() + "\">");
 					writer.write(XmlUtils.encodeContent(converted));
 					writer.write("</attribute>");
 					writer.newLine();
@@ -62,7 +66,9 @@ public class AttributesXmlWriterDelegate {
 
 			writer.write(indentation);
 			writer.write("</attributes>");
-			writer.newLine();
+			if (emptyLineAfter) {
+				writer.newLine();
+			}
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

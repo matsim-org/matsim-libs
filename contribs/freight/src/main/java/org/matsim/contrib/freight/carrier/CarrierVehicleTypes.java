@@ -17,8 +17,8 @@ public class CarrierVehicleTypes {
 	public static CarrierVehicleTypes getVehicleTypes(Carriers carriers){
 		CarrierVehicleTypes types = new CarrierVehicleTypes();
 		for(Carrier c : carriers.getCarriers().values()){
-			for(CarrierVehicle v : c.getCarrierCapabilities().getCarrierVehicles()){
-				CarrierVehicleType vehicleType = v.getVehicleType();
+			for(CarrierVehicle v : c.getCarrierCapabilities().getCarrierVehicles().values()){
+				VehicleType vehicleType = v.getType();
 				if(vehicleType != null){
 					types.getVehicleTypes().put(vehicleType.getId(), vehicleType);
 				}
@@ -27,14 +27,14 @@ public class CarrierVehicleTypes {
 		return types;
 	}
 	
-	private Map<Id<VehicleType>,CarrierVehicleType> vehicleTypes;
+	private Map<Id<VehicleType>, VehicleType> vehicleTypes;
 
 	public CarrierVehicleTypes() {
 		super();
 		this.vehicleTypes = new HashMap<>();
 	}
 
-	public Map<Id<VehicleType>, CarrierVehicleType> getVehicleTypes() {
+	public Map<Id<VehicleType>, VehicleType> getVehicleTypes() {
 		return vehicleTypes;
 	}
 }

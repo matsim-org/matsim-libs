@@ -42,7 +42,6 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 /**
@@ -63,7 +62,6 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 	private final DrtConfigGroup drtCfg;
 	private final DrtRoutingModule drtRoutingModule;
 
-	@Inject
 	public StopBasedDrtRoutingModule(PopulationFactory populationFactory, DrtRoutingModule drtRoutingModule,
 			@Named(TransportMode.walk) RoutingModule walkRouter, AccessEgressStopFinder stopFinder,
 			DrtConfigGroup drtCfg) {

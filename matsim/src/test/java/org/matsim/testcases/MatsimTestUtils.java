@@ -19,11 +19,14 @@
 
 package org.matsim.testcases;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.Permission;
+import java.util.Objects;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -39,6 +42,10 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
+import org.matsim.vehicles.VehicleWriteReadTest;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Some helper methods for writing JUnit 4 tests in MATSim.
@@ -47,9 +54,32 @@ import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
  * @author mrieser
  */
 public final class MatsimTestUtils extends TestWatchman {
+	private static final Logger log = Logger.getLogger( MatsimTestUtils.class ) ;
 
 	/** A constant for the exactness when comparing doubles. */
 	public static final double EPSILON = 1e-10;
+	public static void compareFilesLineByLine( String inputFilename, String outputFilename ){
+		try (
+			BufferedReader readerV1Input = IOUtils.getBufferedReader( inputFilename );
+			BufferedReader readerV1Output = IOUtils.getBufferedReader( outputFilename );
+		){
+
+			String lineInput;
+			String lineOutput;
+
+			while( ((lineInput = readerV1Input.readLine()) != null) && ((lineOutput = readerV1Output.readLine()) != null) ){
+				if ( !Objects.equals( lineInput.trim(), lineOutput.trim() ) ){
+					log.info( "Reading line...  " );
+					log.info( lineInput );
+					log.info( lineOutput );
+					log.info( "" );
+				}
+				assertEquals( "Lines have different content: ", lineInput.trim(), lineOutput.trim() );
+			}
+		} catch ( Exception ee ) {
+			ee.printStackTrace();
+		}
+	}
 
 	/** The default output directory, where files of this test should be written to.
 	 * Includes the trailing '/' to denote a directory. */

@@ -123,7 +123,7 @@ public class MatsimFileTypeGuesserTest {
 
 	@Test
 	public void testVehiclesV1XML() throws IOException {
-		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/vehicles/testVehicles.xml");
+		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/vehicles/testVehicles_v1.xml");
 		assertEquals(MatsimFileTypeGuesser.FileType.Vehicles, g.getGuessedFileType());
 		assertNull(g.getPublicId());
 		assertNotNull(g.getSystemId());

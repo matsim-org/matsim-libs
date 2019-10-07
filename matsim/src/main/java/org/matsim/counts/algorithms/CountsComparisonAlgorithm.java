@@ -20,14 +20,11 @@
 
 package org.matsim.counts.algorithms;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -38,6 +35,9 @@ import org.matsim.counts.CountSimComparisonImpl;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This algorithm can be used to obtain a List of CountSimComparison objects from the
@@ -92,7 +92,7 @@ public class CountsComparisonAlgorithm {
 		};
 	}
 
-	public CountsComparisonAlgorithm(final Map<Id<Link>, double[]> volumesPerLinkPerHour, final Counts<Link> counts, final Network network, final double countsScaleFactor) {
+	public CountsComparisonAlgorithm(final IdMap<Link, double[]> volumesPerLinkPerHour, final Counts<Link> counts, final Network network, final double countsScaleFactor) {
 		this.volumesPerLinkPerHour = new VolumesForId() {
 
 			@Override
@@ -102,7 +102,7 @@ public class CountsComparisonAlgorithm {
 
 		};
 		this.counts = counts;
-		this.result = new ArrayList<CountSimComparison>();
+		this.result = new ArrayList<>();
 		this.network = network;
 		this.countsScaleFactor = countsScaleFactor;
 	}
@@ -110,7 +110,7 @@ public class CountsComparisonAlgorithm {
 	public CountsComparisonAlgorithm(VolumesForId volumesPerLinkPerHour, final Counts<Link> counts, final Network network, final double countsScaleFactor) {
 		this.volumesPerLinkPerHour = volumesPerLinkPerHour;
 		this.counts = counts;
-		this.result = new ArrayList<CountSimComparison>();
+		this.result = new ArrayList<>();
 		this.network = network;
 		this.countsScaleFactor = countsScaleFactor;
 	}
