@@ -51,14 +51,8 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
 
     private boolean physicallyEnforceTimeWindowBeginnings = true;
 
-    /**
-     * Creates an instance which will crash if an unknown parameter name
-     * is given.
-     *
-     * @param name the name of the module in the config file.
-     */
-    public FreightConfigGroup(String name) {
-        super(name);
+    public FreightConfigGroup() {
+        super(GROUPNAME);
     }
 
     /**
