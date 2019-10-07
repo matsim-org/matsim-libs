@@ -103,6 +103,12 @@ public class Sim02_DrtCommuter {
 
 		String inbase = "D:\\Matsim\\Axer\\Hannover\\ZIM\\";
 
+		
+		//Create empty multiModeDrtConfigGroup
+        DrtConfigGroup drtCfg = new DrtConfigGroup();
+        MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
+        multiModeDrtConfigGroup.addParameterSet(drtCfg);
+		
 		// With EV
 		//		final Config config = ConfigUtils.loadConfig(inbase + "\\input\\Sim02_CommuterDRT.xml", new MultiModeDrtConfigGroup(),
 //				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(),
@@ -110,7 +116,7 @@ public class Sim02_DrtCommuter {
 		//
 		// Without EV
 		 final Config config = ConfigUtils.loadConfig(inbase + "\\input\\Sim02_CommuterDRT.xml",
-				 new MultiModeDrtConfigGroup(),
+				 multiModeDrtConfigGroup,
 		 new DvrpConfigGroup(), new OTFVisConfigGroup());
 
 		// With EV
@@ -126,8 +132,8 @@ public class Sim02_DrtCommuter {
 
 		// config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		// Overwrite existing configuration parameters
-//		config.plans().setInputFile(inbase + "\\input\\plans\\w243_inOutWithDRT_selected.xml.gz");
-		config.plans().setInputFile(inbase + "\\input\\plans\\vw243_cadON_ptSpeedAdj.0.1_DRT_0.1.output_plans.xml.gz");
+		config.plans().setInputFile(inbase + "\\input\\plans\\w243_inOutWithDRT_selected.xml.gz");
+//		config.plans().setInputFile(inbase + "\\input\\plans\\vw243_cadON_ptSpeedAdj.0.1_DRT_0.1.output_plans.xml.gz");
 		config.controler().setLastIteration(6); // Number of simulation iterations
 		config.controler().setWriteEventsInterval(2); // Write Events file every x-Iterations
 		config.controler().setWritePlansInterval(2); // Write Plan file every x-Iterations

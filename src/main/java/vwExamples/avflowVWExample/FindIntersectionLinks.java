@@ -39,7 +39,7 @@ public class FindIntersectionLinks {
 
 	public static void main(String[] args) {
 		trafficLightsCSV = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\network\\osmTrafficSignals_clustered.csv";
-		networkFile = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\network\\network.xml.gz";
+		networkFile = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\network\\vw280_0.1.output_network.xml.gz";
 		List<String[]> csvContent = processByOpenCsv(trafficLightsCSV);
 		System.out.println(csvContent.get(0)[0]);
 
@@ -48,9 +48,9 @@ public class FindIntersectionLinks {
 		new MatsimNetworkReader(network).readFile(networkFile);
 		new MatsimNetworkReader(networkIntersectionLinks).readFile(networkFile);
 		getTrafficLightLinksFast(network, Coords);
-		adjustLinkCapacity(1.15);
+		adjustLinkCapacity(1.28);
 		new NetworkWriter(networkIntersectionLinks)
-				.write("D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\network\\network_intersectionLinks_1.15_.xml.gz");
+				.write("D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\network\\network_intersectionLinks_1.28_.xml.gz");
 	}
 
 	static void adjustLinkCapacity(double flowIncreaseFactor) {

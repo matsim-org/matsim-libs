@@ -130,7 +130,7 @@ public class PlanModifierDRT {
 
 		subTourValidator = new isWithinCityTourCandidate(network, cityZonesMap, serviceAreazonesMap);
 		assignTourValidator = new isWithinCityTourCandidate(network, cityZonesMap, serviceAreazonesMap);
-		shiftingScenario = new ShiftingScenario(0.05);
+		shiftingScenario = new ShiftingScenario(0.20);
 
 	}
 
@@ -140,7 +140,7 @@ public class PlanModifierDRT {
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Hannover_Stadtteile.shp",
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Real_Region_Hannover.shp",
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\vw243_cadON_ptSpeedAdj.0.1.output_plans.xml.gz",
-				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\vw243_cadON_ptSpeedAdj.0.1_DRT_0.05noShort.output_plans.xml.gz",
+				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\vw243_cadON_ptSpeedAdj.0.1_DRT_0.20_noShort.output_plans.xml.gz",
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\network\\network.xml.gz");
 		planmodifier.count();
 		planmodifier.assign();
@@ -251,7 +251,7 @@ public class PlanModifierDRT {
 		String shift2mode = "drt";
 		String shiftingType = shiftingScenario.type;
 		int tripCounter = 0;
-		double minTourDistance = 5000.0;
+		double minTripDistance = 2500.0;
 
 		// Part for subtourConversion
 		if (shiftingType.equals("subtourConversion")) {
@@ -278,21 +278,25 @@ public class PlanModifierDRT {
 				// Loop over all subtours of this agent
 
 				for (Subtour subTour : TripStructureUtils.getSubtours(plan, blackList)) {
-
+					
+					double numberOfTrips = subTour.getTrips().size();
 					double estimatedTourDistance = getBeelineTourLength(subTour);
+					
+					double meanTripDistance = estimatedTourDistance / numberOfTrips;
+					
 					// Get subtour mode
 					String subtourMode = getSubtourMode(subTour, plan);
 
 					if (subtourMode.equals("walk")) {
-						minTourDistance = 2500.0;
+						minTripDistance = 1700.0;
 					} else if (subtourMode.equals("bike")) {
-						minTourDistance = 10000.0;
+						minTripDistance = 3900.0;
 					}
 
 					// Check if this subtour can be shifted to an other mode
 					// It is not allowed to shift an already shifted tour
 					if (assignTourValidator.isValidSubTour(subTour) && (subtourMode != shift2mode)
-							&& estimatedTourDistance > minTourDistance) {
+							&& meanTripDistance > minTripDistance) {
 
 						// System.out.println("Trip Size:" + subTour.getTrips().size());
 
