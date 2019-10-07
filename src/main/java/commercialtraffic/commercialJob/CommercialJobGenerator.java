@@ -52,7 +52,10 @@ import java.util.Set;
 class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListener {
 
 
-    final static String COMMERCIALJOB_ACTIVITYTYPE_PREFIX = "commercialJob";
+    static final String COMMERCIALJOB_ACTIVITYTYPE_PREFIX = "commercialJob";
+    static final String CUSTOMER_ATTRIBUTE_NAME = "customer";
+    static final String SERVICEID_ATTRIBUTE_NAME = "serviceId";
+    static final String FREIGHT_DRIVER_PREFIX = "freight";
 
     private final double firsttourTraveltimeBuffer;
     private final int timeSliceWidth;
@@ -93,6 +96,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
         buildTours();
         createFreightAgents();
 
+        event.getServices().getInjector().getInstance(ScoreCommercialJobs.class).prepareTourArrivalsForDay();
         String dir = event.getServices().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/";
         log.info("writing carrier file of iteration " + event.getIteration() + " to " + dir);
         CarrierPlanWriter planWriter = new CarrierPlanWriter(carriers.getCarriers().values());
@@ -135,7 +139,9 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
                     Id<Carrier> carrierId = CommercialJobUtils.getCurrentCarrierForJob(activity,jobIdx);
                     if (carriers.getCarriers().containsKey(carrierId)) {
                         Carrier carrier = carriers.getCarriers().get(carrierId);
-                        carrier.getServices().put(serviceId, serviceBuilder.build());
+                        CarrierService service = serviceBuilder.build();
+                        service.getAttributes().putAttribute(CUSTOMER_ATTRIBUTE_NAME, customer.getId().toString());
+                        carrier.getServices().put(serviceId, service);
                     } else {
                         throw new RuntimeException("Carrier Id does not exist: " + carrierId.toString());
                     }
@@ -157,7 +163,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
 
                 CarrierVehicle carrierVehicle = scheduledTour.getVehicle();
 
-                Id<Person> driverId = Id.createPersonId("freight_" + carrier.getId() + "_veh_" + carrierVehicle.getId() + "_" + nextId);
+                Id<Person> driverId = Id.createPersonId(FREIGHT_DRIVER_PREFIX + "freight_" + carrier.getId() + "_veh_" + carrierVehicle.getId() + "_" + nextId);
                 nextId++;
 
                 Person driverPerson = createDriverPerson(driverId);
@@ -202,10 +208,16 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
 
                         Tour.ServiceActivity act = (Tour.ServiceActivity) tourElement;
 
-                        String actType = createJobActTypeFromServiceId(act.getService().getId());
+                        CarrierService service = carrier.getServices().get(act.getService().getId()); //for some reason, the serviceAct only has a copy of the CarrierService object and this copy does not have the attributes..
+                        String actType = createJobActTypeFromServiceId(service.getId());
+                        String customer = (String) service.getAttributes().getAsMap().get(CUSTOMER_ATTRIBUTE_NAME);
+
 
                         //here we would pass over the service Activity type containing the customer id...
                         Activity tourElementActivity = PopulationUtils.createActivityFromLinkId(actType, act.getLocation());
+                        tourElementActivity.getAttributes().putAttribute(CUSTOMER_ATTRIBUTE_NAME, customer);
+                        tourElementActivity.getAttributes().putAttribute(SERVICEID_ATTRIBUTE_NAME, service.getId().toString());
+
                         plan.addActivity(tourElementActivity);
                         if (lastTourElementActivity == null) {
                             tourElementActivity.setMaximumDuration(act.getDuration());
@@ -221,11 +233,8 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
                 plan.setPerson(driverPerson);
 
                 scenario.getPopulation().addPerson(driverPerson);
-                try {
+                if (!scenario.getVehicles().getVehicleTypes().containsKey(carrierVehicle.getId()))
                     scenario.getVehicles().addVehicleType(carrierVehicle.getType());
-                } catch (IllegalArgumentException e) {
-                    e.printStackTrace();
-                }
                 Id<Vehicle> vid = Id.createVehicleId(driverPerson.getId());
                 VehicleUtils.insertVehicleIdIntoAttributes(driverPerson,CarrierUtils.getCarrierMode(carrier),vid);
                 scenario.getVehicles().addVehicle(scenario.getVehicles().getFactory().createVehicle(vid, carrierVehicle.getType()));
