@@ -57,6 +57,7 @@ class RunCommercialTrafficUsingDRTExample {
         MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
         multiModeDrtConfigGroup.addParameterSet(drtCfg);
 
+
         CommercialTrafficConfigGroup commercialTrafficConfigGroup = new CommercialTrafficConfigGroup();
         commercialTrafficConfigGroup.setCarriersFile(inputDir + "test-carriers.xml");
         commercialTrafficConfigGroup.setCarriersVehicleTypesFile(inputDir + "vehicleTypes.xml");
