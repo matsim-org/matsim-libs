@@ -1,6 +1,5 @@
-package commercialtraffic.scoring;
+package commercialtraffic.commercialJob;
 
-import commercialtraffic.commercialJob.DefaultCommercialServiceScore;
 import org.junit.Assert;
 import org.junit.Test;
 

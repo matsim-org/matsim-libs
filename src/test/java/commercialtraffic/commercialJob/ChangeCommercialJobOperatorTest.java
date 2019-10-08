@@ -1,8 +1,6 @@
-package commercialtraffic.replanning;
+package commercialtraffic.commercialJob;
 
 import commercialtraffic.TestScenarioGeneration;
-import commercialtraffic.commercialJob.ChangeCommercialJobOperator;
-import commercialtraffic.commercialJob.CommercialJobUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;

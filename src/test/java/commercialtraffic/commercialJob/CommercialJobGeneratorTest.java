@@ -4,7 +4,9 @@ import commercialtraffic.TestScenarioGeneration;
 import org.junit.Rule;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypeWriter;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
+import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.router.util.TravelTime;
@@ -14,8 +16,6 @@ import org.matsim.testcases.MatsimTestUtils;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.matsim.core.config.ConfigUtils.createConfig;
 
 public class CommercialJobGeneratorTest {
 
