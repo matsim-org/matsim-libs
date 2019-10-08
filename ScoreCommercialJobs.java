@@ -101,15 +101,15 @@ class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityEndEvent
             Carrier carrier = carriers.getCarriers().get(carrierId);
             CarrierService job = carrier.getServices().get(freightAgent2Jobs.get(event.getPersonId()).poll());
 
+            //TODO: delete customer id in activity type. derive it only by attribute
             Id<Person> customerAboutToBeServed = CommercialJobGenerator.getCustomerIdFromJobActivityType(event.getActType());
             if (!customerAboutToBeServed.equals(Id.createPersonId((String) job.getAttributes().getAttribute(CommercialJobGenerator.CUSTOMER_ATTRIBUTE_NAME))))
                 throw new IllegalStateException();
 
             double timeDifference = calcDifference(job, event.getTime());
-                double score = scoreCalculator.calcScore(timeDifference);
-                eventsManager.processEvent(new PersonMoneyEvent(event.getTime(), customerAboutToBeServed, score));
+            double score = scoreCalculator.calcScore(timeDifference);
+            eventsManager.processEvent(new PersonMoneyEvent(event.getTime(), customerAboutToBeServed, score));
             logEntries.add(new DeliveryLogEntry(customerAboutToBeServed, carrier.getId(), event.getTime(), score, event.getLinkId(), timeDifference, event.getPersonId()));
-
         }
     }
 
