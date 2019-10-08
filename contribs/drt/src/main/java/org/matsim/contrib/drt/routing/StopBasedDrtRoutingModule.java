@@ -23,7 +23,6 @@
 package org.matsim.contrib.drt.routing;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -38,6 +37,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.core.config.Config;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
@@ -52,6 +52,7 @@ import com.google.inject.name.Named;
  */
 public class StopBasedDrtRoutingModule implements RoutingModule {
 	private static final Logger logger = Logger.getLogger(StopBasedDrtRoutingModule.class);
+	private static final String walkRouterMode = TransportMode.walk;
 
 	public interface AccessEgressStopFinder {
 		Pair<TransitStopFacility, TransitStopFacility> findStops(Facility fromFacility, Facility toFacility);
@@ -62,16 +63,18 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 	private final RoutingModule walkRouter;
 	private final AccessEgressStopFinder stopFinder;
 	private final DrtConfigGroup drtCfg;
+	private final Config config;
 	private final DrtRoutingModule drtRoutingModule;
 
 	public StopBasedDrtRoutingModule(PopulationFactory populationFactory, DrtRoutingModule drtRoutingModule,
-			@Named(TransportMode.walk) RoutingModule walkRouter, AccessEgressStopFinder stopFinder,
-			DrtConfigGroup drtCfg) {
+			@Named(walkRouterMode) RoutingModule walkRouter, AccessEgressStopFinder stopFinder,
+			DrtConfigGroup drtCfg, Config config) {
 		this.populationFactory = populationFactory;
 		this.drtRoutingModule = drtRoutingModule;
 		this.walkRouter = walkRouter;
 		this.stopFinder = stopFinder;
 		this.drtCfg = drtCfg;
+		this.config = config;
 		this.drtStageActivityType = new DrtStageActivityType(drtCfg.getMode());
 	}
 
@@ -86,7 +89,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 					+ drtStageActivityType.drtWalk
 					+ ". Agent Id:\t"
 					+ person.getId());
-			return Collections.singletonList(createDrtWalkLeg(fromFacility, toFacility, departureTime, person));
+			return createWalkTrip(fromFacility, toFacility, departureTime, person, drtStageActivityType.drtWalk);
 		}
 
 		TransitStopFacility egressFacility = stops.getRight();
@@ -95,7 +98,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 					+ drtStageActivityType.drtWalk
 					+ ". Agent Id:\t"
 					+ person.getId());
-			return Collections.singletonList(createDrtWalkLeg(fromFacility, toFacility, departureTime, person));
+			return createWalkTrip(fromFacility, toFacility, departureTime, person, drtStageActivityType.drtWalk);
 		}
 
 		if (accessFacility.getLinkId() == egressFacility.getLinkId()) {
@@ -105,18 +108,18 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 						+ ". Agent Id:\t"
 						+ person.getId());
 			}
-			return Collections.singletonList(createDrtWalkLeg(fromFacility, toFacility, departureTime, person));
+			return createWalkTrip(fromFacility, toFacility, departureTime, person, drtStageActivityType.drtWalk);
 		}
 
 		List<PlanElement> trip = new ArrayList<>();
 
-		double now = departureTime;;
+		double now = departureTime;
 
 		// access leg:
-		List<? extends PlanElement> abc = createDrtWalkLeg(fromFacility, accessFacility, now, person );
-		trip.addAll(abc);
-		for( PlanElement planElement : abc ){
-			TripRouter.calcEndOfPlanElement( now, planElement, config ) ;
+		List<? extends PlanElement> accessWalk = createWalkTrip(fromFacility, accessFacility, now, person, null );
+		trip.addAll(accessWalk);
+		for( PlanElement planElement : accessWalk ){
+			now = TripRouter.calcEndOfPlanElement( now, planElement, config ) ;
 		}
 
 		// interaction activity:
@@ -129,24 +132,35 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		List<? extends PlanElement> drtLeg = drtRoutingModule.calcRoute( accessFacility, egressFacility, now, person );
 		trip.addAll(drtLeg);
 		for( PlanElement planElement : drtLeg ){
-			TripRouter.calcEndOfPlanElement( now, planElement, config ) ;
+			now = TripRouter.calcEndOfPlanElement( now, planElement, config ) ;
 		}
 
 		// interaction activity:
 		trip.add(createDrtStageActivity(egressFacility));
 
 		// egress leg:
-		double walkFromStopStartTime = drtLeg.getDepartureTime() + drtLeg.getTravelTime() + 1;
-		trip.addAll(createDrtWalkLeg(egressFacility, toFacility, walkFromStopStartTime, person));
+//		double walkFromStopStartTime = drtLeg.getDepartureTime() + drtLeg.getTravelTime() + 1;
+		now++ ;
+		trip.addAll(createWalkTrip(egressFacility, toFacility, now, person, null));
 
 		return trip;
 	}
 
-	private List<? extends PlanElement> createDrtWalkLeg(Facility fromFacility, Facility toFacility, double departureTime, Person person) {
-//		Leg leg = (Leg)walkRouter.calcRoute(fromFacility, toFacility, departureTime, person).get(0);
-//		leg.setMode(drtStageActivityType.drtWalk);
-//		return leg;
+	private List<? extends PlanElement> createWalkTrip(Facility fromFacility, Facility toFacility, double departureTime, Person person, String mode) {
 		List<? extends PlanElement> result = walkRouter.calcRoute( fromFacility, toFacility, departureTime, person );
+		if (mode != null) {
+			// Overwrite real walk mode legs with fallback mode for respective drt mode
+			for (PlanElement pe: result) {
+				if (pe instanceof Leg) {
+					Leg leg = (Leg) pe;
+					if (leg.getMode().equals(walkRouterMode)) {
+						// keep non_network_walk bushwhacking to network, but replace real network walk leg
+						leg.setMode(mode);
+					}
+				}
+			}
+		}
+
 		return result ;
 	}
 

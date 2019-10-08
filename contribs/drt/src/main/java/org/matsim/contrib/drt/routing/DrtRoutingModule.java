@@ -39,6 +39,7 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
@@ -61,6 +62,7 @@ public class DrtRoutingModule implements RoutingModule {
 	private static final Logger LOGGER = Logger.getLogger(DrtRoutingModule.class);
 
 	private final DrtConfigGroup drtCfg;
+	private final Config config;
 	private final Network network;
 	private final TravelTime travelTime;
 	private final LeastCostPathCalculator router;
@@ -69,7 +71,7 @@ public class DrtRoutingModule implements RoutingModule {
 	private final DrtStageActivityType drtStageActivityType;
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfig;
 
-	public DrtRoutingModule(DrtConfigGroup drtCfg, Network network,
+	public DrtRoutingModule(DrtConfigGroup drtCfg, Config config, Network network,
 			LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
 			TravelDisutilityFactory travelDisutilityFactory, @Named(TransportMode.walk) RoutingModule walkRouter,
@@ -78,6 +80,7 @@ public class DrtRoutingModule implements RoutingModule {
 		// flexibility for changes without having to change the argument list every time.  kai, jul'19
 
 		this.drtCfg = drtCfg;
+		this.config = config;
 		this.network = network;
 		this.travelTime = travelTime;
 		this.populationFactory = scenario.getPopulation().getFactory();
