@@ -29,6 +29,7 @@ import java.util.function.Supplier;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -68,13 +69,13 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 
 	public StopBasedDrtRoutingModule(PopulationFactory populationFactory, DrtRoutingModule drtRoutingModule,
 			@Named(walkRouterMode) RoutingModule walkRouter, AccessEgressStopFinder stopFinder,
-			DrtConfigGroup drtCfg, Config config) {
+			DrtConfigGroup drtCfg, Scenario scenario) {
 		this.populationFactory = populationFactory;
 		this.drtRoutingModule = drtRoutingModule;
 		this.walkRouter = walkRouter;
 		this.stopFinder = stopFinder;
 		this.drtCfg = drtCfg;
-		this.config = config;
+		this.config = scenario.getConfig();
 		this.drtStageActivityType = new DrtStageActivityType(drtCfg.getMode());
 	}
 

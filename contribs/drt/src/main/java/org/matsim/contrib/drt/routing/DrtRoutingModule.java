@@ -19,7 +19,6 @@
 
 package org.matsim.contrib.drt.routing;
 
-import static org.matsim.core.router.NetworkRoutingInclAccessEgressModule.addBushwhackingLegFromFacilityToLinkIfNecessary;
 import static org.matsim.core.router.NetworkRoutingInclAccessEgressModule.addBushwhackingLegFromLinkToFacilityIfNecessary;
 
 import java.util.ArrayList;
@@ -42,7 +41,6 @@ import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -71,7 +69,7 @@ public class DrtRoutingModule implements RoutingModule {
 	private final DrtStageActivityType drtStageActivityType;
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfig;
 
-	public DrtRoutingModule(DrtConfigGroup drtCfg, Config config, Network network,
+	public DrtRoutingModule(DrtConfigGroup drtCfg, Network network,
 			LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
 			TravelDisutilityFactory travelDisutilityFactory, @Named(TransportMode.walk) RoutingModule walkRouter,
@@ -80,7 +78,7 @@ public class DrtRoutingModule implements RoutingModule {
 		// flexibility for changes without having to change the argument list every time.  kai, jul'19
 
 		this.drtCfg = drtCfg;
-		this.config = config;
+		this.config = scenario.getConfig();
 		this.network = network;
 		this.travelTime = travelTime;
 		this.populationFactory = scenario.getPopulation().getFactory();

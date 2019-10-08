@@ -71,12 +71,10 @@ import com.google.inject.name.Named;
  */
 public final class DrtModeModule extends AbstractDvrpModeModule {
 	private final DrtConfigGroup drtCfg;
-	private final Config config;
 
-	public DrtModeModule(DrtConfigGroup drtCfg, Config config) {
+	public DrtModeModule(DrtConfigGroup drtCfg) {
 		super(drtCfg.getMode());
 		this.drtCfg = drtCfg;
-		this.config = config;
 	}
 
 	@Override
@@ -97,7 +95,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 		switch (drtCfg.getOperationalScheme()) {
 			case door2door:
-				addRoutingModuleBinding(getMode()).toProvider(new DrtRoutingModuleProvider(drtCfg, config));//not singleton
+				addRoutingModuleBinding(getMode()).toProvider(new DrtRoutingModuleProvider(drtCfg));//not singleton
 				break;
 
 			case serviceAreaBased:
@@ -108,13 +106,13 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 				} else {
 					bindModal(TransitSchedule.class).toInstance(readTransitSchedule());
 				}
-				bindModal(DrtRoutingModule.class).toProvider(new DrtRoutingModuleProvider(drtCfg, config));//not singleton
+				bindModal(DrtRoutingModule.class).toProvider(new DrtRoutingModuleProvider(drtCfg));//not singleton
 
 				addRoutingModuleBinding(getMode()).toProvider(modalProvider(
 						getter -> new StopBasedDrtRoutingModule(getter.get(PopulationFactory.class),
 								getter.getModal(DrtRoutingModule.class),
 								getter.getNamed(RoutingModule.class, TransportMode.walk),
-								getter.getModal(AccessEgressStopFinder.class), drtCfg, config)));//not singleton
+								getter.getModal(AccessEgressStopFinder.class), drtCfg, getter.get(Scenario.class))));//not singleton
 
 				bindModal(AccessEgressStopFinder.class).toProvider(modalProvider(
 						getter -> new ClosestAccessEgressStopFinder(getter.getModal(TransitSchedule.class), drtCfg,
@@ -152,7 +150,6 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 	private static class DrtRoutingModuleProvider extends ModalProviders.AbstractProvider<DrtRoutingModule> {
 		private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = new FastAStarEuclideanFactory();
 		private final DrtConfigGroup drtCfg;
-		private final Config config;
 
 		@Inject
 		@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
@@ -165,16 +162,15 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		@Named(TransportMode.walk)
 		private RoutingModule walkRouter;
 
-		private DrtRoutingModuleProvider(DrtConfigGroup drtCfg, Config config) {
+		private DrtRoutingModuleProvider(DrtConfigGroup drtCfg) {
 			super(drtCfg.getMode());
 			this.drtCfg = drtCfg;
-			this.config = config;
 		}
 
 		@Override
 		public DrtRoutingModule get() {
 			Network network = getModalInstance(Network.class);
-			return new DrtRoutingModule(drtCfg, config, network, leastCostPathCalculatorFactory, travelTime,
+			return new DrtRoutingModule(drtCfg, network, leastCostPathCalculatorFactory, travelTime,
 					getModalInstance(TravelDisutilityFactory.class), walkRouter, scenario);
 		}
 	}
