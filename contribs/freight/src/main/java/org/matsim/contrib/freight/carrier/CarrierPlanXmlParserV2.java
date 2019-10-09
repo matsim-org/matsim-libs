@@ -322,6 +322,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				default:
 					throw new RuntimeException( "could not derive context for attributes. context=" + context.peek() );
 			}
+			attributesReader.startTag( name , atts , context, currAttributes );
 		}
 		else if (name.equals(ATTRIBUTE)) {
 			attributesReader.startTag( name , atts , context, currAttributes );
