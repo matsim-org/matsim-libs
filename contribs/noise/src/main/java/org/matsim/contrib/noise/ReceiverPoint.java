@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.Identifiable;
  * @author ikaddoura
  *
  */
-class ReceiverPoint implements Identifiable<ReceiverPoint>{
+public class ReceiverPoint implements Identifiable<ReceiverPoint>{
 	
 	// initialization
 	private final Id<ReceiverPoint> id;

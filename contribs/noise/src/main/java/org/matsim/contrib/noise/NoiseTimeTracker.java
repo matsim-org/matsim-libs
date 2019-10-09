@@ -222,20 +222,20 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 					calculateMarginalDamageCost(rp, immisions);
 				}
 			}
-			if ( listeners!=null ) {
-				XYTRecord record = new XYTRecord.Builder()
-										   .setStartTime( 0. )
-										   .setEndTime( 0. )
-										   .setCoord( rp.getCoord() )
-										   .setFacilityId( null )
-										   .put( "immissions", rp.getCurrentImmission() )
-										   .build() ;
-				for( NoiseModule.NoiseListener listener : listeners ){
-					listener.newRecord( record );
-				}
-			} else {
-				log.warn("listeners=null") ;
-			}
+//			if ( listeners!=null ) {
+//				XYTRecord record = new XYTRecord.Builder()
+//										   .setStartTime( 0. )
+//										   .setEndTime( 0. )
+//										   .setCoord( rp.getCoord() )
+//										   .setFacilityId( null )
+//										   .put( "immissions", rp.getCurrentImmission() )
+//										   .build() ;
+//				for( NoiseModule.NoiseListener listener : listeners ){
+//					listener.newRecord( record );
+//				}
+//			} else {
+//				log.warn("listeners=null") ;
+//			}
 		}
 		calculateCostsPerVehiclePerLinkPerTimeInterval();
 		

@@ -22,17 +22,6 @@
  */
 package org.matsim.contrib.noise;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.locationtech.jts.algorithm.Angle;
@@ -47,6 +36,9 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Contains the grid and further noise-specific information.
@@ -176,53 +168,50 @@ final class NoiseContext {
 	private void setRelevantLinkInfo() {
 
 		Counter cnt = new Counter("set relevant link-info # ");
-		// go through all rp's and throw them away. We need noise-rps from here on.
-		ConcurrentLinkedQueue<ReceiverPoint> rps = new ConcurrentLinkedQueue<>(this.grid.getAndClearReceiverPoints().values());
-		ReceiverPoint rp = null;
-		while((rp = rps.poll()) != null){
-			
-			NoiseReceiverPoint nrp = new NoiseReceiverPoint(rp.getId(), rp.getCoord());
-
-			// get the zone grid cell around the receiver point
-			Set<Id<Link>> potentialLinks = new HashSet<>();
-			Tuple<Integer,Integer>[] zoneTuples = getZoneTuplesForLinks(nrp.getCoord());
-			for(Tuple<Integer, Integer> key: zoneTuples) {
-				List<Id<Link>> links = zoneTuple2listOfLinkIds.get(key);
-				if(links != null) {
-					potentialLinks.addAll(links);
-				}
-			}
-
-			// go through these potential relevant link Ids
-			Set<Id<Link>> relevantLinkIds = ConcurrentHashMap.newKeySet();
-			potentialLinks.parallelStream().forEach( linkId -> {
-				if (!(relevantLinkIds.contains(linkId))) {
-					Link candidateLink = scenario.getNetwork().getLinks().get(linkId);
-					double projectedDistance = CoordUtils.distancePointLinesegment(candidateLink.getFromNode().getCoord(), candidateLink.getToNode().getCoord(), nrp.getCoord());
-
-					if (projectedDistance < noiseParams.getRelevantRadius()){
-						
-						relevantLinkIds.add(linkId);
-						// wouldn't it be good to check distance < minDistance here? DR20180215
-						if (projectedDistance == 0) {
-							double minimumDistance = 5.;
-							projectedDistance = minimumDistance;
-							log.warn("Distance between " + linkId + " and " + nrp.getId() + " is 0. The calculation of the correction term Ds requires a distance > 0. Therefore, setting the distance to a minimum value of " + minimumDistance + ".");
-						}
-						double correctionTermDs = NoiseEquations.calculateDistanceCorrection(projectedDistance);
-						double correctionTermAngle = calculateAngleImmissionCorrection(nrp.getCoord(), scenario.getNetwork().getLinks().get(linkId));
-						nrp.setLinkId2distanceCorrection(linkId, correctionTermDs);
-						nrp.setLinkId2angleCorrection(linkId, correctionTermAngle);
-						if(noiseParams.isConsiderNoiseBarriers()) {
-							Coord projectedSourceCoord = CoordUtils.orthogonalProjectionOnLineSegment(
-									candidateLink.getFromNode().getCoord(), candidateLink.getToNode().getCoord(), nrp.getCoord());
-							double correctionTermShielding =
-                                    shielding.determineShieldingCorrection(nrp, candidateLink, projectedSourceCoord);
-							nrp.setLinkId2ShieldingCorrection(linkId, correctionTermShielding);
-						}
+		for(NoiseReceiverPoint nrp: this.grid.getReceiverPoints().values()) {
+			if(!nrp.isInitialized()) {
+				// get the zone grid cell around the receiver point
+				Set<Id<Link>> potentialLinks = new HashSet<>();
+				Tuple<Integer, Integer>[] zoneTuples = getZoneTuplesForLinks(nrp.getCoord());
+				for (Tuple<Integer, Integer> key : zoneTuples) {
+					List<Id<Link>> links = zoneTuple2listOfLinkIds.get(key);
+					if (links != null) {
+						potentialLinks.addAll(links);
 					}
 				}
-			});
+
+				// go through these potential relevant link Ids
+				Set<Id<Link>> relevantLinkIds = ConcurrentHashMap.newKeySet();
+				potentialLinks.parallelStream().forEach(linkId -> {
+					if (!(relevantLinkIds.contains(linkId))) {
+						Link candidateLink = scenario.getNetwork().getLinks().get(linkId);
+						double projectedDistance = CoordUtils.distancePointLinesegment(candidateLink.getFromNode().getCoord(), candidateLink.getToNode().getCoord(), nrp.getCoord());
+
+						if (projectedDistance < noiseParams.getRelevantRadius()) {
+
+							relevantLinkIds.add(linkId);
+							// wouldn't it be good to check distance < minDistance here? DR20180215
+							if (projectedDistance == 0) {
+								double minimumDistance = 5.;
+								projectedDistance = minimumDistance;
+								log.warn("Distance between " + linkId + " and " + nrp.getId() + " is 0. The calculation of the correction term Ds requires a distance > 0. Therefore, setting the distance to a minimum value of " + minimumDistance + ".");
+							}
+							double correctionTermDs = NoiseEquations.calculateDistanceCorrection(projectedDistance);
+							double correctionTermAngle = calculateAngleImmissionCorrection(nrp.getCoord(), scenario.getNetwork().getLinks().get(linkId));
+							nrp.setLinkId2distanceCorrection(linkId, correctionTermDs);
+							nrp.setLinkId2angleCorrection(linkId, correctionTermAngle);
+							if (noiseParams.isConsiderNoiseBarriers()) {
+								Coord projectedSourceCoord = CoordUtils.orthogonalProjectionOnLineSegment(
+										candidateLink.getFromNode().getCoord(), candidateLink.getToNode().getCoord(), nrp.getCoord());
+								double correctionTermShielding =
+										shielding.determineShieldingCorrection(nrp, candidateLink, projectedSourceCoord);
+								nrp.setLinkId2ShieldingCorrection(linkId, correctionTermShielding);
+							}
+						}
+					}
+				});
+				nrp.setInitialized();
+			}
 			
 			this.noiseReceiverPoints.put(nrp.getId(), nrp);
 			cnt.incCounter();

@@ -55,8 +55,6 @@ final class Grid {
 	
 	private static final Logger log = Logger.getLogger(Grid.class);
 
-	public static final String NOISE_RECEIVER_POINTS = "noiseReceiverPoints";
-
 	private final Scenario scenario;
 	private final NoiseConfigGroup noiseParams;
 		
@@ -74,7 +72,7 @@ final class Grid {
 	private double yCoordMax = Double.MIN_VALUE;
 	
 	private final Map<Coord,Id<ReceiverPoint>> activityCoord2receiverPointId = new HashMap<Coord, Id<ReceiverPoint>>();
-	private Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
+	private Map<Id<ReceiverPoint>, NoiseReceiverPoint> receiverPoints;
 	
 	public Grid(Scenario scenario) {
 		this.scenario = scenario;	
@@ -102,7 +100,7 @@ final class Grid {
 	private void initialize() {
 		setActivityCoords();
 
-		if(scenario.getScenarioElement(NOISE_RECEIVER_POINTS) != null) {
+		if(scenario.getScenarioElement(NoiseReceiverPoints.NOISE_RECEIVER_POINTS) != null) {
 			log.info("Loading receiver points based on provided coordinates.");
 			loadGridFromScenario();
 		} else if (this.noiseParams.getReceiverPointsCSVFile() == null) {
@@ -167,14 +165,7 @@ final class Grid {
 	}
 
 	private void loadGridFromScenario() {
-		Object rps = scenario.getScenarioElement(NOISE_RECEIVER_POINTS);
-		if(rps instanceof List) {
-			for(Object rp: ((List) rps)) {
-				if(rp instanceof ReceiverPoint) {
-					receiverPoints.put(((ReceiverPoint) rp).getId(), (ReceiverPoint) rp);
-				}
-			}
-		}
+		this.receiverPoints = (NoiseReceiverPoints) scenario.getScenarioElement(NoiseReceiverPoints.NOISE_RECEIVER_POINTS);
 		log.info("Total number of receiver points: " + receiverPoints.size());
 	}
 
@@ -223,7 +214,7 @@ final class Grid {
 				
 				Id<ReceiverPoint> id = Id.create(counter.getCounter(), ReceiverPoint.class);
 				Coord coord = new Coord(x, y);
-				ReceiverPoint rp = new ReceiverPoint(id, coord);
+				NoiseReceiverPoint rp = new NoiseReceiverPoint(id, coord);
 				receiverPoints.put(id, rp);
 				counter.incCounter();
 			}
@@ -304,7 +295,7 @@ final class Grid {
 
                 Coord coord = new Coord(x,y);
                 Coord transformedCoord = ct.transform(coord);
-                ReceiverPoint rp = new ReceiverPoint(Id.create(id, ReceiverPoint.class), transformedCoord);
+                NoiseReceiverPoint rp = new NoiseReceiverPoint(Id.create(id, ReceiverPoint.class), transformedCoord);
                 receiverPoints.put(rp.getId(), rp);
 				lineCounter++;
 			}			
@@ -319,14 +310,11 @@ final class Grid {
 	public Map<Coord, Id<ReceiverPoint>> getActivityCoord2receiverPointId() {
 		return activityCoord2receiverPointId;
 	}
-	
-	Map<Id<ReceiverPoint>, ReceiverPoint> getAndClearReceiverPoints() {
-		Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints = this.receiverPoints;
-		this.receiverPoints = null;
+
+	public Map<Id<ReceiverPoint>, NoiseReceiverPoint> getReceiverPoints() {
 		return receiverPoints;
 	}
-	
-	
+
 	public NoiseConfigGroup getGridParams() {
 		return noiseParams;
 	}

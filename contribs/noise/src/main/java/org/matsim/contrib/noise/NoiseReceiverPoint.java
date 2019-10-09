@@ -40,7 +40,7 @@ import org.matsim.api.core.v01.population.Person;
  * @author ikaddoura
  *
  */
-class NoiseReceiverPoint extends ReceiverPoint {
+public class NoiseReceiverPoint extends ReceiverPoint {
 
 	public NoiseReceiverPoint(Id<ReceiverPoint> id, Coord coord) {
 		super(id, coord);
@@ -48,6 +48,12 @@ class NoiseReceiverPoint extends ReceiverPoint {
 
 
 	private Map<Id<Person>, List<PersonActivityInfo>> personId2actInfos = null;//new HashMap<>(0);
+
+	/**
+	 * Set to true once correction terms are set to re-use points over multiple MATSim runs
+	 * without the need to recalculate correction terms.
+	 */
+	private boolean initialized = false;
 
 	// initialization
 	private Map<Id<Link>, Double> linkId2distanceCorrection = null;//new HashMap<>(0);
@@ -70,14 +76,14 @@ class NoiseReceiverPoint extends ReceiverPoint {
 	private double l1619 = Double.NaN;
 
 
-	public Map<Id<Person>, List<PersonActivityInfo>> getPersonId2actInfos() {
+	Map<Id<Person>, List<PersonActivityInfo>> getPersonId2actInfos() {
 		if(personId2actInfos == null) {
 			personId2actInfos = new HashMap<>(4);
 		}
 		return Collections.unmodifiableMap(personId2actInfos);
 	}
 
-	public void addPersonActInfo(Id<Person> person, PersonActivityInfo info) {
+	void addPersonActInfo(Id<Person> person, PersonActivityInfo info) {
 		if(personId2actInfos == null) {
 			personId2actInfos = new HashMap<>(4);
 		}
@@ -89,42 +95,42 @@ class NoiseReceiverPoint extends ReceiverPoint {
 		infos.add(info);
 	}
 	
-	public Map<Id<Link>, Double> getLinkId2distanceCorrection() {
+	Map<Id<Link>, Double> getLinkId2distanceCorrection() {
 		if(linkId2distanceCorrection == null) {
 			linkId2distanceCorrection = new HashMap<>();
 		}
 		return Collections.unmodifiableMap(linkId2distanceCorrection);
 	}
 
-	public synchronized void setLinkId2distanceCorrection(Id<Link> linkId,  Double distanceCorrection) {
+	synchronized void setLinkId2distanceCorrection(Id<Link> linkId, Double distanceCorrection) {
 		if(linkId2distanceCorrection == null) {
 			linkId2distanceCorrection = new HashMap<>();
 		}
 		this.linkId2distanceCorrection.put(linkId, distanceCorrection);
 	}
 
-	public Map<Id<Link>, Double> getLinkId2angleCorrection() {
+	Map<Id<Link>, Double> getLinkId2angleCorrection() {
 		if(linkId2angleCorrection== null) {
 			linkId2angleCorrection = new HashMap<>();
 		}
 		return Collections.unmodifiableMap(linkId2angleCorrection);
 	}
 
-	public synchronized void setLinkId2angleCorrection(Id<Link> linkId, Double angleCorrection) {
+	synchronized void setLinkId2angleCorrection(Id<Link> linkId, Double angleCorrection) {
 		if(linkId2angleCorrection== null) {
 			linkId2angleCorrection = new HashMap<>();
 		}
 		this.linkId2angleCorrection.put(linkId, angleCorrection);
 	}
 
-	public synchronized void setLinkId2ShieldingCorrection(Id<Link> linkId, Double shieldingCorrection) {
+	synchronized void setLinkId2ShieldingCorrection(Id<Link> linkId, Double shieldingCorrection) {
 		if(linkId2ShieldingCorrection== null) {
 			linkId2ShieldingCorrection = new HashMap<>();
 		}
 		this.linkId2ShieldingCorrection.put(linkId, shieldingCorrection);
 	}
 
-	public Map<Id<Link>, Double> getLinkId2ShieldingCorrection() {
+	Map<Id<Link>, Double> getLinkId2ShieldingCorrection() {
 		if(linkId2ShieldingCorrection == null) {
 			linkId2ShieldingCorrection = new HashMap<>();
 		}
@@ -135,7 +141,7 @@ class NoiseReceiverPoint extends ReceiverPoint {
 		return currentImmission;
 	}
 
-	public void setCurrentImmission(double currentImmission, double time) {
+	void setCurrentImmission(double currentImmission, double time) {
 		this.currentImmission = currentImmission;
 
 		if(time <= 24 * 3600.) {
@@ -163,7 +169,7 @@ class NoiseReceiverPoint extends ReceiverPoint {
 		return damageCosts;
 	}
 
-	public void setDamageCosts(double damageCosts) {
+	void setDamageCosts(double damageCosts) {
 		this.damageCosts = damageCosts;
 	}
 
@@ -171,7 +177,7 @@ class NoiseReceiverPoint extends ReceiverPoint {
 		return damageCostsPerAffectedAgentUnit;
 	}
 
-	public void setDamageCostsPerAffectedAgentUnit(
+	void setDamageCostsPerAffectedAgentUnit(
 			double damageCostsPerAffectedAgentUnit) {
 		this.damageCostsPerAffectedAgentUnit = damageCostsPerAffectedAgentUnit;
 	}
@@ -180,7 +186,7 @@ class NoiseReceiverPoint extends ReceiverPoint {
 		return affectedAgentUnits;
 	}
 
-	public void setAffectedAgentUnits(double affectedAgentsUnits) {
+	void setAffectedAgentUnits(double affectedAgentsUnits) {
 		this.affectedAgentUnits = affectedAgentsUnits;
 	}
 
@@ -223,15 +229,23 @@ class NoiseReceiverPoint extends ReceiverPoint {
 		l1619 =  10 * Math.log10(1./3. * aggregatedImmissionTerm1619);
 	}
 
-	double getLden() {
+	public double getLden() {
 		return lden;
 	}
 
-	double getL69() {
+	public double getL69() {
 		return l69;
 	}
 
-	double getL1619() {
+	public double getL1619() {
 		return l1619;
+	}
+
+	void setInitialized() {
+		this.initialized = true;
+	}
+
+	boolean isInitialized() {
+		return initialized;
 	}
 }
