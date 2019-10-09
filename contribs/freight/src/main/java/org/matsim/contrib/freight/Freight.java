@@ -14,8 +14,8 @@ import org.matsim.core.gbl.Gbl;
 
 public class Freight{
 	// yyyy todo:
-	// * introduce freight config group
-	// * read freight input files in module
+	// * introduce freight config group		=> DONE by oct' 07 '19,	tschlenther
+	// * read freight input files in module => DONE by oct' 07 '19,	tschlenther
 	// * repair execution path where config instead of scenario is given to controler
 
 	public static void configure( AllowsConfiguration ao ) {
