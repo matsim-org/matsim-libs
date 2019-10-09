@@ -25,10 +25,8 @@ package org.matsim.contrib.freight.controler;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
 import org.matsim.contrib.freight.CarrierConfigGroup;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeWriter;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
-import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.FreightConfigGroup;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
 import org.matsim.contrib.freight.mobsim.FreightQSimFactory;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
@@ -41,7 +39,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 public class CarrierModule extends AbstractModule {
 
     // Not a real config group yet, but could be one.
-    private CarrierConfigGroup carrierConfig = new CarrierConfigGroup();
+    private FreightConfigGroup freightConfig = new FreightConfigGroup();
 
     private Carriers carriers;
     private CarrierPlanStrategyManagerFactory strategyManagerFactory;
@@ -49,6 +47,11 @@ public class CarrierModule extends AbstractModule {
 
 
     public CarrierModule() {
+        this.carriers = new Carriers();
+        new CarrierPlanXmlReader(carriers).readFile(freightConfig.getCarriersFile());
+        CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
+        new CarrierVehicleTypeReader(vehicleTypes).readFile(freightConfig.getCarriersVehicleTypesFile());
+        new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
     }
 
     /**
@@ -68,7 +71,8 @@ public class CarrierModule extends AbstractModule {
     @Override
     public void install() {
         // We put some things under dependency injection.
-        bind( CarrierConfigGroup.class ).toInstance(carrierConfig );
+        bind( FreightConfigGroup.class ).toInstance(freightConfig);
+
         bind(Carriers.class).toInstance(carriers);
         if (strategyManagerFactory != null) {
             bind(CarrierPlanStrategyManagerFactory.class).toInstance(strategyManagerFactory);
@@ -101,7 +105,7 @@ public class CarrierModule extends AbstractModule {
     }
 
     public void setPhysicallyEnforceTimeWindowBeginnings(boolean physicallyEnforceTimeWindowBeginnings) {
-        this.carrierConfig.setPhysicallyEnforceTimeWindowBeginnings(physicallyEnforceTimeWindowBeginnings);
+        this.freightConfig.setPhysicallyEnforceTimeWindowBeginnings(physicallyEnforceTimeWindowBeginnings);
     }
 
 
