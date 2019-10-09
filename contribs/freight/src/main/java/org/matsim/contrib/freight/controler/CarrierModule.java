@@ -38,20 +38,14 @@ import org.matsim.core.controler.listener.ShutdownListener;
 
 public class CarrierModule extends AbstractModule {
 
-    // Not a real config group yet, but could be one.
-    private FreightConfigGroup freightConfig = new FreightConfigGroup();
+    private FreightConfigGroup freightConfig;
 
-    private Carriers carriers;
+    private Carriers carriers = null;
     private CarrierPlanStrategyManagerFactory strategyManagerFactory;
     private CarrierScoringFunctionFactory scoringFunctionFactory;
 
 
     public CarrierModule() {
-        this.carriers = new Carriers();
-        new CarrierPlanXmlReader(carriers).readFile(freightConfig.getCarriersFile());
-        CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
-        new CarrierVehicleTypeReader(vehicleTypes).readFile(freightConfig.getCarriersVehicleTypesFile());
-        new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
     }
 
     /**
@@ -70,8 +64,17 @@ public class CarrierModule extends AbstractModule {
 
     @Override
     public void install() {
+        this.freightConfig = (FreightConfigGroup) getConfig().getModules().get(FreightConfigGroup.GROUPNAME);
         // We put some things under dependency injection.
         bind( FreightConfigGroup.class ).toInstance(freightConfig);
+
+        if(this.carriers == null){
+            this.carriers = new Carriers();
+            new CarrierPlanXmlReader(carriers).readFile(freightConfig.getCarriersFile());
+            CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
+            new CarrierVehicleTypeReader(vehicleTypes).readFile(freightConfig.getCarriersVehicleTypesFile());
+            new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
+        }
 
         bind(Carriers.class).toInstance(carriers);
         if (strategyManagerFactory != null) {
@@ -103,11 +106,6 @@ public class CarrierModule extends AbstractModule {
     CarrierAgentTracker provideCarrierAgentTracker(CarrierControlerListener carrierControlerListener) {
         return carrierControlerListener.getCarrierAgentTracker();
     }
-
-    public void setPhysicallyEnforceTimeWindowBeginnings(boolean physicallyEnforceTimeWindowBeginnings) {
-        this.freightConfig.setPhysicallyEnforceTimeWindowBeginnings(physicallyEnforceTimeWindowBeginnings);
-    }
-
 
     private static void writeAdditionalRunOutput( Config config, Carriers carriers ) {
         // ### some final output: ###

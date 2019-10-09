@@ -25,6 +25,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.freight.Freight;
+import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReader;
 import org.matsim.contrib.freight.carrier.Carriers;
@@ -50,6 +52,7 @@ public class EquilWithCarrierWithoutPassIT {
 
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
+	private FreightConfigGroup freightConfigGroup;
 
 	@Before
 	public void setUp() throws Exception{
@@ -68,6 +71,9 @@ public class EquilWithCarrierWithoutPassIT {
 		config.controler().setLastIteration(2);
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		config.network().setInputFile(NETWORK_FILENAME);
+
+		freightConfigGroup = new FreightConfigGroup();
+		config.addModule(freightConfigGroup);
 
 		controler = new Controler(config);
 		controler.getConfig().controler().setWriteEventsInterval(1);
@@ -121,8 +127,8 @@ public class EquilWithCarrierWithoutPassIT {
 		Carriers carriers = new Carriers();
 		new CarrierPlanXmlReader(carriers).readFile(planFile );
 		addDummyVehicleType( carriers, "default") ;
+		freightConfigGroup.setPhysicallyEnforceTimeWindowBeginnings( false );
 		final CarrierModule carrierModule = new CarrierModule( carriers );
-		carrierModule.setPhysicallyEnforceTimeWindowBeginnings( false );
 		controler.addOverridingModule( carrierModule );
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -147,8 +153,8 @@ public class EquilWithCarrierWithoutPassIT {
 		Carriers carriers = new Carriers();
 		new CarrierPlanXmlReader(carriers).readFile(planFile );
 		addDummyVehicleType( carriers, "default") ;
+		freightConfigGroup.setPhysicallyEnforceTimeWindowBeginnings( true );
 		final CarrierModule carrierModule = new CarrierModule( carriers );
-		carrierModule.setPhysicallyEnforceTimeWindowBeginnings( true );
 		controler.addOverridingModule( carrierModule );
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -173,8 +179,8 @@ public class EquilWithCarrierWithoutPassIT {
 		Carriers carriers = new Carriers();
 		new CarrierPlanXmlReader(carriers).readFile(planFile );
 		addDummyVehicleType( carriers, "default") ;
+		freightConfigGroup.setPhysicallyEnforceTimeWindowBeginnings(true);
 		CarrierModule carrierControler = new CarrierModule(carriers);
-		carrierControler.setPhysicallyEnforceTimeWindowBeginnings(true);
 		controler.addOverridingModule(carrierControler);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

@@ -22,8 +22,8 @@ public class Freight{
 		Gbl.assertIf( ao instanceof Controler);  // we need the scenario; otherwise find other way
 		Controler controler = (Controler) ao;
 		Carriers carriers = FreightUtils.getCarriers( controler.getScenario() );
+		((FreightConfigGroup)controler.getConfig().getModules().get(FreightConfigGroup.GROUPNAME)).setPhysicallyEnforceTimeWindowBeginnings(true);
 		final CarrierModule carrierModule = new CarrierModule( carriers );
-		carrierModule.setPhysicallyEnforceTimeWindowBeginnings( true );
 		ao.addOverridingModule( carrierModule ) ;
 
 		ao.addOverridingModule( new AbstractModule(){
