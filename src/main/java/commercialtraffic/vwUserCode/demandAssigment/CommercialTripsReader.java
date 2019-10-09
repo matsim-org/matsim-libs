@@ -1,39 +1,34 @@
 package commercialtraffic.vwUserCode.demandAssigment;
 
+import com.opencsv.CSVReader;
+import org.matsim.core.gbl.MatsimRandom;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
-import org.matsim.core.gbl.MatsimRandom;
-
-import com.opencsv.CSVReader;
+import java.util.*;
 
 public class CommercialTripsReader {
 	List<String[]> rawTripList;
-	String csvTripFile;
+    public File[] tripFiles;
 	public Map<String, List<CommercialTrip>> commercialTripMap;
 	Map<String, List<Double>> ServiceType2ServiceDurationsMap;
 	public File[] files;
+    String csvTripFolder;
 	String serviceTimeDistInputPath;
 	Random r = MatsimRandom.getRandom();
 	long nr = 1896;
 	Double filterFactor = null;
 	public Map<String, Set<Integer>> vehBlackListIds;
 
-	public CommercialTripsReader(String csvTripFile, String serviceTimeDistInputPath, double filterFactor) {
-		this.csvTripFile = csvTripFile;
+    public CommercialTripsReader(String csvTripFolder, String serviceTimeDistInputPath, double filterFactor) {
+        this.csvTripFolder = csvTripFolder;
 		this.rawTripList = new ArrayList<String[]>();
 		this.commercialTripMap = new HashMap<String, List<CommercialTrip>>();
 		this.ServiceType2ServiceDurationsMap = new HashMap<String, List<Double>>();
 		this.files = new File(serviceTimeDistInputPath).listFiles();
+        this.tripFiles = new File(csvTripFolder).listFiles();
 		this.serviceTimeDistInputPath = serviceTimeDistInputPath;
 		this.filterFactor = filterFactor;
 		this.vehBlackListIds = new HashMap<String, Set<Integer>>();
@@ -97,6 +92,10 @@ public class CommercialTripsReader {
 	}
 
 	public double getRandomServiceDurationPerType(String serviceType) {
+
+//		if (serviceType=="KEP") {
+//			return 1;
+//		}
 
 		int randromIdx = r.nextInt(ServiceType2ServiceDurationsMap.get(serviceType).size());
 
@@ -291,58 +290,61 @@ public class CommercialTripsReader {
 		// "EPSG:25832");
 
 		CSVReader reader = null;
-		try {
-			reader = new CSVReader(new FileReader(this.csvTripFile));
-			rawTripList = reader.readAll();
-			for (int i = 1; i < rawTripList.size(); i++) {
-				String[] lineContents = rawTripList.get(i);
-				int id = Integer.parseInt(lineContents[1]);
-				int unternehmensID = Integer.parseInt(lineContents[2]);
-				int fahrtID = Integer.parseInt(lineContents[27]); //
-				String unternehmenszelle = (lineContents[3]);
-				String wirtschaftszweig = (lineContents[5]);
-				int fahrzeugtyp = Integer.parseInt(lineContents[6]);
-				int zweck = Integer.parseInt(lineContents[21]);
-				String quellzelle = (lineContents[24]);
-				String zielzelle = (lineContents[25]);
-				int art_ziel = Integer.parseInt(lineContents[22]);
-				String customerRelation = "";
-				if (art_ziel == 8) {
+        for (File csvTripFile : tripFiles) {
+            try {
 
-					customerRelation = "B2C";
-				} else if (art_ziel == 10) {
-					customerRelation = "private";
-				} else {
-					customerRelation = "B2B";
-				}
+                reader = new CSVReader(new FileReader(csvTripFile));
+                rawTripList = reader.readAll();
+                for (int i = 1; i < rawTripList.size(); i++) {
+                    String[] lineContents = rawTripList.get(i);
+                    int id = Integer.parseInt(lineContents[1]);
+                    int unternehmensID = Integer.parseInt(lineContents[2]);
+                    int fahrtID = Integer.parseInt(lineContents[27]); //
+                    String unternehmenszelle = (lineContents[3]);
+                    String wirtschaftszweig = (lineContents[5]);
+                    int fahrzeugtyp = Integer.parseInt(lineContents[6]);
+                    int zweck = Integer.parseInt(lineContents[21]);
+                    String quellzelle = (lineContents[24]);
+                    String zielzelle = (lineContents[25]);
+                    int art_ziel = Integer.parseInt(lineContents[22]);
+                    String customerRelation = "";
+                    if (art_ziel == 8) {
 
-				double fahrzeit = Double.parseDouble(lineContents[26]) * 60.0;
+                        customerRelation = "B2C";
+                    } else if (art_ziel == 10) {
+                        customerRelation = "private";
+                    } else {
+                        customerRelation = "B2B";
+                    }
 
-				CommercialTrip commercialTrip = new CommercialTrip(id, unternehmensID, fahrtID, unternehmenszelle,
-						wirtschaftszweig, fahrzeugtyp, zweck, quellzelle, zielzelle, art_ziel, fahrzeit,
-						customerRelation);
+                    double fahrzeit = Double.parseDouble(lineContents[26]) * 60.0;
 
-				if (commercialTripMap.containsKey(wirtschaftszweig)) {
-					commercialTripMap.get(wirtschaftszweig).add(commercialTrip);
-				} else {
-					commercialTripMap.put(wirtschaftszweig, new ArrayList<CommercialTrip>());
-					commercialTripMap.get(wirtschaftszweig).add(commercialTrip);
-				}
+                    CommercialTrip commercialTrip = new CommercialTrip(id, unternehmensID, fahrtID, unternehmenszelle,
+                            wirtschaftszweig, fahrzeugtyp, zweck, quellzelle, zielzelle, art_ziel, fahrzeit,
+                            customerRelation);
 
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			if (reader != null) {
-				try {
-					reader.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
+                    if (commercialTripMap.containsKey(wirtschaftszweig)) {
+                        commercialTripMap.get(wirtschaftszweig).add(commercialTrip);
+                    } else {
+                        commercialTripMap.put(wirtschaftszweig, new ArrayList<CommercialTrip>());
+                        commercialTripMap.get(wirtschaftszweig).add(commercialTrip);
+                    }
+
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
 
 	}
 

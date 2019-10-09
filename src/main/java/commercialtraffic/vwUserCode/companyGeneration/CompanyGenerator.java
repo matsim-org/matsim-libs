@@ -1,23 +1,20 @@
 package commercialtraffic.vwUserCode.companyGeneration;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
-
+import com.opencsv.CSVReader;
+import commercialtraffic.vwUserCode.demandAssigment.CommercialTripsReader;
+import ft.utils.ctDemandPrep.Company;
+import ft.utils.ctDemandPrep.Demand4CompanyClass;
+import ft.utils.ctDemandPrep.DemandGenerator;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.carrier.CarrierPlanWriter;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypeWriter;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
+import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.filter.NetworkFilterManager;
@@ -26,12 +23,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-import com.opencsv.CSVReader;
-
-import commercialtraffic.vwUserCode.demandAssigment.CommercialTripsReader;
-import ft.utils.ctDemandPrep.Company;
-import ft.utils.ctDemandPrep.Demand4CompanyClass;
-import ft.utils.ctDemandPrep.DemandGenerator;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class CompanyGenerator {
 
@@ -157,27 +154,23 @@ public class CompanyGenerator {
 						String companyId = (lineContents[1]);
 						double companyX = Double.parseDouble(lineContents[2]);
 						double companyY = Double.parseDouble(lineContents[3]);
-						CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("EPSG:4326", "EPSG:25832");
+                        CoordinateTransformation transformation = TransformationFactory
+                                .getCoordinateTransformation("EPSG:4326", "EPSG:25832");
 						Coord companyCoord = new Coord(companyX, companyY);
-						companyCoord=transformation.transform(companyCoord);
+                        companyCoord = transformation.transform(companyCoord);
 						// String zone = (lineContents[4]);
 						String companyClass = lineContents[5];
 						int vehicleType = Integer.parseInt(lineContents[6]);
 						// TODO: Model two separate fleets
 						boolean active;
-						if (Integer.parseInt(lineContents[7]) == 1) {
-							active = true;
-						} else {
-							active = false;
-						}
+                        active = Integer.parseInt(lineContents[7]) == 1;
 						double compOpening = Double.parseDouble(lineContents[8]);
 						double compClosing = Double.parseDouble(lineContents[9]);
 						double vehOpening = Double.parseDouble(lineContents[10]);
 						double vehClosing = Double.parseDouble(lineContents[11]);
 						double servDur = Double.parseDouble(lineContents[12]);
-						;
 
-						// TODO Fix opening and closing times
+                        // TODO Fix opening and closing times
 						if (commercialCompanyMap.containsKey(companyId)) {
 							// Add only not filtered and active new vehicle
 
@@ -244,13 +237,8 @@ public class CompanyGenerator {
 				int vehicleType = Integer.parseInt(lineContents[6]);
 				// TODO: Model two separate fleets
 				boolean active;
-				if (Integer.parseInt(lineContents[8]) == 1) {
-					active = true;
-				} else {
-					active = false;
-				}
-				;
-				// TODO Fix opening and closing times
+                active = Integer.parseInt(lineContents[8]) == 1;
+                // TODO Fix opening and closing times
 				if (commercialCompanyMap.containsKey(companyId)) {
 					// Add only not filtered and active new vehicle
 					if ((vehBlackListIds.isEmpty()) || (!vehBlackListIds.get(companyClass).contains(vehicleId))) {
@@ -304,10 +292,17 @@ public class CompanyGenerator {
 				// Delete Companies without vehicles
 				continue;
 			}
-if (commercialCompanyEntry.getValue().carrier.getId().toString().contains("grocery")) {
-			carriers.addCarrier(commercialCompanyEntry.getValue().carrier);}
+            if (commercialCompanyEntry.getValue().carrier.getServices().isEmpty()) {
+                // Delete Companies without Services
+                continue;
+            }
+            // if
+            // (commercialCompanyEntry.getValue().carrier.getId().toString().contains("grocery"))
+            // {
+            carriers.addCarrier(commercialCompanyEntry.getValue().carrier);
+        }
 
-		}
+        // }
 		new CarrierPlanWriter(carriers.getCarriers().values()).write(carrierOutputPath + "carrier_definition.xml");
 		new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers))
 				.write(carrierOutputPath + "carrier_vehicletypes.xml");

@@ -33,6 +33,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -43,17 +44,23 @@ import static org.matsim.core.scenario.ScenarioUtils.loadScenario;
 
 class RunCommercialTraffic_H {
 	public static void main(String[] args) {
-		String runId = "vw243_0.1_EGrocery0.1_shops_changeCar";
+		String runId = "vw272_0.1_CT";
 		String pct = ".0.1";
 
-		String inputDir = "D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\vw243_0.1_EGrocery0.1_shops_changeCar\\";
+		String inputDir = "D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\vw272_0.1_CT_0.1\\";
 
-		Config config = ConfigUtils.loadConfig(inputDir + "config_0.1.xml", new CommercialTrafficConfigGroup());
+		Config config = ConfigUtils.loadConfig(inputDir + "config_0.1_CT.xml", new CommercialTrafficConfigGroup());
+		config.plans().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
+		config.global().setNumberOfThreads(16);
+		config.parallelEventHandling().setNumberOfThreads(16);
+		config.qsim().setNumberOfThreads(16);
+		config.strategy().setFractionOfIterationsToDisableInnovation(0.75); //Fraction to disable Innovation
 
 		StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
 		changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
 		changeExpBeta.setWeight(0.5);
 		config.strategy().addStrategySettings(changeExpBeta);
+
 		config.controler().setWriteEventsInterval(5);
 		config.controler().setOutputDirectory("D:\\Thiel\\Programme\\WVModell\\02_MatSimOutput\\" + runId + pct);
 		config.controler()
@@ -86,10 +93,10 @@ class RunCommercialTraffic_H {
 		config.plansCalcRoute().addModeRoutingParams(params);
 
 		config.planCalcScore().addModeParams(scoreParams);
-		
-		
-		config.controler().setLastIteration(50);
-		config.strategy().setFractionOfIterationsToDisableInnovation(0.80); // Fraction to disable Innovation
+
+
+		config.controler().setLastIteration(5);
+		config.strategy().setFractionOfIterationsToDisableInnovation(0.00); // Fraction to disable Innovation
 		Scenario scenario = loadScenario(config);
 		adjustPtNetworkCapacity(scenario.getNetwork(), config.qsim().getFlowCapFactor());
 

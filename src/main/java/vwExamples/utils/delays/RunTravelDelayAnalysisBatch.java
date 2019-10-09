@@ -18,26 +18,9 @@
 
 package vwExamples.utils.delays;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
+import analysis.drtOccupancy.DynModeTripsAnalyser;
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.geotools.filter.expression.ThisPropertyAccessorFactory;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
@@ -64,8 +47,13 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
-import analysis.drtOccupancy.DynModeTripsAnalyser;
-import vwExamples.utils.LinksToShape.Links2ESRIShape;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class RunTravelDelayAnalysisBatch {
 
@@ -73,7 +61,7 @@ public class RunTravelDelayAnalysisBatch {
 	static Map<String, Geometry> zoneMap = new HashMap<>();
 	static Geometry boundary;
 	static Set<String> zones = new HashSet<>();
-	static String shapeFile = "D:\\\\Matsim\\\\Axer\\\\Hannover\\\\ZIM\\\\input\\\\shp\\\\Hannover_Stadtteile.shp";
+    static String shapeFile = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Cemdap\\add_data\\shp\\Hannover_Stadtteile.shp";
 	static String shapeFeature = "NO";
 	static List<Geometry> districtGeometryList = new ArrayList<Geometry>();
 	static GeometryFactory geomfactory = JTSFactoryFinder.getGeometryFactory(null);
@@ -82,7 +70,7 @@ public class RunTravelDelayAnalysisBatch {
 
 	public static void main(String[] args) {
 
-		String runDir = "D:\\Matsim\\Axer\\Hannover\\ZIM\\output\\";
+        String runDir = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\";
 		// String runId = "vw219_netnet150_veh_idx0.";
 
 		readShape(shapeFile, shapeFeature);
@@ -107,9 +95,11 @@ public class RunTravelDelayAnalysisBatch {
 //			scenarioToBeAnalyzed.add("vw251.1.0");
 //			scenarioToBeAnalyzed.add("vw243_CityDRT_10pct_0.1300_veh_idx0");
 //			scenarioToBeAnalyzed.add("vw243_CityDRT_10pct_0.05300_veh_idx0");
-			scenarioToBeAnalyzed.add("vw243_CityDRT_10pct_0.1350_veh_idx0");
-			
-			
+//			scenarioToBeAnalyzed.add("vw243_CityDRT_10pct_0.1350_veh_idx0");
+//			scenarioToBeAnalyzed.add("vw243_0.1_EGrocery0.4_fulfillment.0.1");
+//			scenarioToBeAnalyzed.add("vw243_0.1_EGrocery0.3_fulfillment.0.1");
+//			scenarioToBeAnalyzed.add("vw243_0.1_EGrocery0.5_fulfillment.0.1");
+            scenarioToBeAnalyzed.add("vw243_cadON_ptSpeedAdj.0.1");
 //			
 			
 

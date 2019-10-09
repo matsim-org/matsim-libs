@@ -19,32 +19,6 @@
 
 package vwExamples.utils.tripAnalyzer;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.StringJoiner;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang.mutable.MutableInt;
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -57,13 +31,8 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryCollection;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineSegment;
-import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.*;
 import org.locationtech.jts.io.WKTWriter;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -71,15 +40,23 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.util.distance.DistanceUtils;
-import org.matsim.core.utils.geometry.GeometryUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
-import analysis.drtOccupancy.DynModeTripsAnalyser;
+import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 public class ExperiencedTripsWriter {
 	private String path;
@@ -204,8 +181,6 @@ public class ExperiencedTripsWriter {
 				// network.getLinks().get(trip.getToLinkId()).getCoord());
 				double totalDrivenTripDist = 0.0;
 
-				
-				
 				for (ExperiencedLeg leg : trip.getLegs()) {
 
 					List<Id<Link>> routeList = leg.getRouteListe();
@@ -213,7 +188,6 @@ public class ExperiencedTripsWriter {
 					totalDrivenTripDist = totalDrivenTripDist + getRouteDistance(routeList);
 
 				}
-				
 
 				// In case of beeline modes there will be no in vehicle mileage
 				// Extract part pf the beeline that is within the research boundary
@@ -418,12 +392,12 @@ public class ExperiencedTripsWriter {
 			{
 
 				for (ExperiencedTrip trip : triplist) {
-					
-//					if(trip.getAgent().toString().contains("freight"))
-//					{
-//						System.out.println(trip.getAgent());
-//					}
-					
+
+                    // if(trip.getAgent().toString().contains("freight"))
+                    // {
+                    // System.out.println(trip.getAgent());
+                    // }
+
 					if (tripWithinCity(trip)) {
 						String mainMode = trip.getMainMode();
 						String storeMode = null;
@@ -684,30 +658,21 @@ public class ExperiencedTripsWriter {
 
 	private boolean isInboundCommuterTour(List<ExperiencedTrip> triplist) {
 
-		if (livesOutside(triplist) && worksInside(triplist)) {
-			return true;
-		}
-		return false;
+        return livesOutside(triplist) && worksInside(triplist);
 
-	}
+    }
 
 	private boolean isOutboundCommuterTour(List<ExperiencedTrip> triplist) {
 
-		if (worksOutside(triplist) && livesInside(triplist)) {
-			return true;
-		}
-		return false;
+        return worksOutside(triplist) && livesInside(triplist);
 
-	}
+    }
 
 	private boolean isWithinCommuterTour(List<ExperiencedTrip> triplist) {
 
-		if (worksInside(triplist) && livesInside(triplist)) {
-			return true;
-		}
-		return false;
+        return worksInside(triplist) && livesInside(triplist);
 
-	}
+    }
 
 	// private boolean isWithinCommuterTour(List<ExperiencedTrip> triplist) {
 	//
@@ -833,20 +798,17 @@ public class ExperiencedTripsWriter {
 		Coord coord1 = fromLink.getCoord();
 		Coord coord2 = toLink.getCoord();
 		// return false if act is outside city area
-		if (isWithinZone(coord1) && isWithinZone(coord2)) {
-			return true;
-		} else
-			return false;
+        return isWithinZone(coord1) && isWithinZone(coord2);
 
 	}
 
 	private void tourIdentifier() {
 		System.out.println("Working Tour Identification");
 		String tourMatchKey = "home";
-		HashSet<String> commercialTrafficActs = new  HashSet<String>();
+        HashSet<String> commercialTrafficActs = new HashSet<String>();
 		commercialTrafficActs.add("start");
 		commercialTrafficActs.add("end");
-				
+
 		// int checkedToursCounter = 0;
 
 		int realNumberTripStored = 0;
@@ -855,60 +817,68 @@ public class ExperiencedTripsWriter {
 		for (Entry<Id<Person>, List<ExperiencedTrip>> tripsPerPersonEntry : agent2trips.entrySet()) {
 
 			Id<Person> PersonId = tripsPerPersonEntry.getKey();
-						
+
 			List<ExperiencedTrip> tripList = tripsPerPersonEntry.getValue();
 
-			totalNumberTripToBeStored = totalNumberTripToBeStored + tripList.size();
+            if (PersonId.toString().contains("42_na_109031101")) {
+                int bla = 9;
+                boolean demo = proveTimeConsitency(tripList);
+            }
 
-			List<ExperiencedTrip> tripsWithinTour = new ArrayList<ExperiencedTrip>();
+            if (proveTimeConsitency(tripList)) {
 
-			for (ExperiencedTrip trip : tripList) {
+                totalNumberTripToBeStored = totalNumberTripToBeStored + tripList.size();
 
-				String actAfter = trip.getActivityAfter();
-				
-				if (commercialTrafficActs.contains(actAfter))
-				{
-					Logger.getLogger(ExperiencedTripsWriter.class).warn("REWRITE FREIGHT ACTS");
-					actAfter = tourMatchKey;
-				}
-						
-				
-				// trip.setSubTourNr(subtourIdent);
-				tripsWithinTour.add(trip);
+                List<ExperiencedTrip> tripsWithinTour = new ArrayList<ExperiencedTrip>();
 
-				if (actAfter.contains(tourMatchKey)) {
-					// subtourIdent++;
-					// Create new List of ExperiencedTrip --> Tour
-					// Save this tour
-					// Clear the tripsWithinTour
-					List<ExperiencedTrip> saveTripsWithinTour = new ArrayList<ExperiencedTrip>();
-					saveTripsWithinTour.addAll(tripsWithinTour);
+                for (ExperiencedTrip trip : tripList) {
 
-					// if(tourId2trips.containsKey(TourId))
-					// {
-					// System.out.println("BUG Double tourId!");
-					// }
-					subtourIdent.increment();
-					String TourId = tripsPerPersonEntry.getKey().toString() + "_" + subtourIdent;
-					tourId2trips.put(TourId, saveTripsWithinTour);
-					realNumberTripStored = realNumberTripStored + saveTripsWithinTour.size();
+                    String actAfter = trip.getActivityAfter();
 
-					// checkedToursCounter++;
-					tripsWithinTour.clear();
+                    if (commercialTrafficActs.contains(actAfter)) {
+                        Logger.getLogger(ExperiencedTripsWriter.class).warn("REWRITE FREIGHT ACTS");
+                        actAfter = tourMatchKey;
+                    }
 
-				}
-				// System.out.println("Trip sorted into tour: "+realNumberTripStored +" || all
-				// trips: "+totalNumberTripToBeStored );
-			}
+                    // trip.setSubTourNr(subtourIdent);
+                    tripsWithinTour.add(trip);
 
-			// if (tripsWithinTour.size()>0)
-			// {
-			// System.out.println("Agent did not reach home!");
-			//
-			// }
+                    if (actAfter.contains(tourMatchKey)) {
+                        // subtourIdent++;
+                        // Create new List of ExperiencedTrip --> Tour
+                        // Save this tour
+                        // Clear the tripsWithinTour
+                        List<ExperiencedTrip> saveTripsWithinTour = new ArrayList<ExperiencedTrip>();
+                        saveTripsWithinTour.addAll(tripsWithinTour);
 
-		}
+                        // if(tourId2trips.containsKey(TourId))
+                        // {
+                        // System.out.println("BUG Double tourId!");
+                        // }
+                        subtourIdent.increment();
+                        String TourId = tripsPerPersonEntry.getKey().toString() + "_" + subtourIdent;
+                        tourId2trips.put(TourId, saveTripsWithinTour);
+                        realNumberTripStored = realNumberTripStored + saveTripsWithinTour.size();
 
+                        // checkedToursCounter++;
+                        tripsWithinTour.clear();
+
+                    }
+                    // System.out.println("Trip sorted into tour: "+realNumberTripStored +" || all
+                    // trips: "+totalNumberTripToBeStored );
+                }
+
+                // if (tripsWithinTour.size()>0)
+                // {
+                // System.out.println("Agent did not reach home!");
+                //
+                // }
+
+            } else {
+                Logger.getLogger(ExperiencedTripsWriter.class)
+                        .warn("Agent with time consitency bug: " + PersonId.toString());
+            }
+        }
 		// System.out.print("Seen Tours #" + checkedToursCounter + "\n");
 
 	}
@@ -1001,6 +971,48 @@ public class ExperiencedTripsWriter {
 
 	}
 
+    ExperiencedTrip getPrevCarTrip(List<ExperiencedTrip> triplist, int actualTripIdx) {
+
+        // j counts the number of backward steps
+        for (int j = 1; j < triplist.size(); j++) {
+
+            // Is the index in the list which we will check now
+            int backwardPointer = (actualTripIdx - j);
+            if (backwardPointer < 0) {
+                backwardPointer = backwardPointer + triplist.size();
+            }
+
+            // System.out.println("ActualIdx: " + actualTripIdx + "Backward Pointer: " +
+            // backwardPointer);
+            ExperiencedTrip candidate = triplist.get(backwardPointer);
+
+            if (candidate.getMainMode().equals(TransportMode.car)) {
+                return candidate;
+            }
+
+        }
+
+        System.out.print("No prev car trip found!");
+        return null;
+
+    }
+
+    public boolean proveTimeConsitency(List<ExperiencedTrip> tripList) {
+
+        double actualTripStartTime = 0;
+        for (ExperiencedTrip trip : tripList) {
+            if (trip.getStartTime() > actualTripStartTime) {
+                actualTripStartTime = trip.getStartTime();
+            } else {
+                return false;
+            }
+
+        }
+
+        return true;
+
+    }
+
 	public void getParkingTimes() {
 		System.out.println("Working on Parking Data");
 
@@ -1016,10 +1028,15 @@ public class ExperiencedTripsWriter {
 
 				if (mainMode.equals(TransportMode.car)) {
 
-					int pointer = mod((i - 1), nrOfTrips);
+                    // int pointer = mod((i - 1), nrOfTrips);
+
+                    ExperiencedTrip prevCarTrip = getPrevCarTrip(triplist, i);
+
 					double endOfParking = trip.getStartTime(); // trip start time == act end time
 					Coord coord = network.getLinks().get(trip.getFromLinkId()).getCoord();
-					double startOfParking = triplist.get(pointer).getEndTime(); // trip end time == act start time
+                    // double startOfParking = triplist.get(pointer).getEndTime(); // trip end time
+                    // == act start time
+                    double startOfParking = prevCarTrip.getEndTime();
 					double activityDuration = Math.abs(endOfParking - startOfParking);
 					String parkingZone = identParkingZone(coord);
 
@@ -1045,11 +1062,11 @@ public class ExperiencedTripsWriter {
 									.add(new ParkingEvent(startOfParking, endOfParking, personId, coord, parkingZone));
 						}
 
-					}else if (activityDuration < 0)
-					{
-						Logger.getLogger(ExperiencedTripsWriter.class).warn("Person "+ personId + " Act Start < Act End:" +" duration "+ activityDuration);
+                    } else if (activityDuration < 0) {
+                        Logger.getLogger(ExperiencedTripsWriter.class)
+                                .warn("Person " + personId + " Act Start < Act End:" + " duration " + activityDuration);
 					}
-					
+
 				}
 
 				i++;
@@ -1149,7 +1166,7 @@ public class ExperiencedTripsWriter {
 			bw.write("timebin");
 
 			for (String zoneId : zoneMap.keySet()) {
-				bw.write(";" + zoneId.toString());
+                bw.write(";" + zoneId);
 			}
 			bw.newLine();
 
@@ -1291,7 +1308,7 @@ public class ExperiencedTripsWriter {
 			ModalSplitSegment dummyModalSplitForHeader = ModalSplitSegments.iterator().next();
 			String header_modes = dummyModalSplitForHeader.mode2TripDistance.keySet().stream().map(Object::toString)
 					.collect(Collectors.joining(";"));
-			bw.write("modalSplitType" + ";" + header_modes.toString());
+            bw.write("modalSplitType" + ";" + header_modes);
 
 			bw.newLine();
 
@@ -1401,7 +1418,7 @@ public class ExperiencedTripsWriter {
 			bw.write("timebin");
 
 			for (String zoneId : zoneMap.keySet()) {
-				bw.write(";" + zoneId.toString());
+                bw.write(";" + zoneId);
 			}
 			bw.newLine();
 
@@ -1777,13 +1794,13 @@ public class ExperiencedTripsWriter {
 
 	private void writeExperiencedLeg(ExperiencedLeg leg, int legNr) {
 		try {
-			bw.write(sep + Integer.toString(legNr + 1) + sep + leg.getFromLinkId() + sep + leg.getToLinkId() + sep
+            bw.write(sep + (legNr + 1) + sep + leg.getFromLinkId() + sep + leg.getToLinkId() + sep
 					+ convertSecondsToTimeString(leg.getStartTime()) + sep
 					+ convertSecondsToTimeString(leg.getEndTime()) + sep + leg.getMode() + sep + leg.getWaitTime() + sep
 					+ leg.getGrossWaitTime() + sep + leg.getInVehicleTime() + sep + leg.getDistance() + sep
-					+ String.valueOf(leg.getTransitRouteId()));
+                    + leg.getTransitRouteId());
 			if (leg.getMode().equals(TransportMode.pt)) {
-				bw.write(sep + String.valueOf(leg.getPtFromStop()) + sep + String.valueOf(leg.getPtToStop()));
+                bw.write(sep + leg.getPtFromStop() + sep + leg.getPtToStop());
 			} else {
 				bw.write(sep + "no pt" + sep + "no pt");
 			}
