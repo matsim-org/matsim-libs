@@ -81,7 +81,7 @@ final class PPlanRouter implements PlanAlgorithm, PersonAlgorithm {
 
 	@Override
 	public void run(final Plan plan) {
-		final List<Trip> trips = TripStructureUtils.getTrips( plan , routingHandler.getStageActivityTypes() );
+		final List<Trip> trips = TripStructureUtils.getTrips( plan );
 
 		for (Trip trip : trips) {
 			

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * EmptyStageActivityTypes.java
+ * StageActivityCheckerImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,20 +20,16 @@
 package org.matsim.core.router;
 
 /**
- * A {@link StageActivityTypes} that identifies no activity as a "stage activity".
- * To use for modes for which no activities are generated.
- * @author thibautd
+ * It is used by the {@link TripRouter} to detect trips, and can be used by
+ * replanning modules as a "black list" of activities not to touch.
+ *
+ * @author gleich
  */
-public final class EmptyStageActivityTypes implements StageActivityTypes {
-	/**
-	 * The only instance.
-	 */
-	public static final EmptyStageActivityTypes INSTANCE = new EmptyStageActivityTypes();
+public final class StageActivityTypeIdentifier {
 
-	private EmptyStageActivityTypes() {}
-	@Override
-	public boolean isStageActivity(final String activityType) {
-		return false;
+	public static final boolean isStageActivity(final String activityType) {
+		return activityType.endsWith("interaction");
 	}
+
 }
 
