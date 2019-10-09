@@ -59,7 +59,7 @@ class RunCommercialTrafficUsingDRTExample {
 
 
         CommercialTrafficConfigGroup commercialTrafficConfigGroup = new CommercialTrafficConfigGroup();
-        commercialTrafficConfigGroup.setCarriersFile(inputDir + "test-carriers.xml");
+        commercialTrafficConfigGroup.setCarriersFile(inputDir + "test-carriers-drt.xml");
         commercialTrafficConfigGroup.setCarriersVehicleTypesFile(inputDir + "vehicleTypes.xml");
         commercialTrafficConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
 
