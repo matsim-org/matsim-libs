@@ -41,7 +41,7 @@ import org.matsim.core.population.algorithms.PlanMutateTimeAllocationSimplified;
 import org.matsim.core.population.algorithms.TripPlanMutateTimeAllocation;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
-import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 
 /**
  * Wraps the {@link org.matsim.core.population.algorithms.PlanMutateTimeAllocation}-
@@ -55,7 +55,6 @@ class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 
 	private static final Logger log = Logger.getLogger( TimeAllocationMutatorModule.class );
 	
-	private final Provider<TripRouter> tripRouterProvider;
 	private final double mutationRange;
 	private final boolean affectingDuration;
 	private final String subpopulationAttribute;
@@ -70,7 +69,6 @@ class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 	@Deprecated
 	TimeAllocationMutatorModule( Config config, Provider<TripRouter> tripRouterProvider, final double mutationRange, boolean affectingDuration ) {
 		super(config.global());
-		this.tripRouterProvider = tripRouterProvider;
 		this.affectingDuration = affectingDuration;
 		this.mutationRange = mutationRange;
 		this.activityDurationInterpretation = (config.plans().getActivityDurationInterpretation());
@@ -87,7 +85,6 @@ class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 	TimeAllocationMutatorModule( Provider<TripRouter> tripRouterProvider, PlansConfigGroup plansConfigGroup, TimeAllocationMutatorConfigGroup timeAllocationMutatorConfigGroup, GlobalConfigGroup globalConfigGroup,
 							final Population population ) {
 		super(globalConfigGroup);
-		this.tripRouterProvider = tripRouterProvider;
 		this.activityDurationInterpretation = plansConfigGroup.getActivityDurationInterpretation();
 		this.mutationRange = timeAllocationMutatorConfigGroup.getMutationRange();
 		this.affectingDuration = timeAllocationMutatorConfigGroup.isAffectingDuration();
@@ -118,7 +115,7 @@ class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 		PlanAlgorithm pmta;
 		switch (this.activityDurationInterpretation) {
 		case minOfDurationAndEndTime:
-			pmta = new TripPlanMutateTimeAllocation(this.tripRouterProvider.get().getStageActivityTypes(), this.mutationRange, this.affectingDuration, MatsimRandom.getLocalInstance(),
+			pmta = new TripPlanMutateTimeAllocation(this.mutationRange, this.affectingDuration, MatsimRandom.getLocalInstance(),
 					this.subpopulationAttribute, this.subpopulationMutationRanges, this.subpopulationAffectingDuration);
 			break;
 		default:
@@ -128,7 +125,8 @@ class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 					"b) agents with only one or two initial plans.\n" +
 					"This can have impact on scoring and maybe even on qsim execution. It is recommended to set affectingDuration=false for such set up.");
 			pmta = new PlanMutateTimeAllocationSimplified(
-					this.tripRouterProvider.get().getStageActivityTypes(), this.mutationRange, this.affectingDuration, MatsimRandom.getLocalInstance());
+					// TODO: is StageActivityHandling.ExcludeStageActivities right here?
+					StageActivityHandling.ExcludeStageActivities, this.mutationRange, this.affectingDuration, MatsimRandom.getLocalInstance());
 		}
 		return pmta;
 	}

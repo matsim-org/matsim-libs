@@ -29,8 +29,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.replanning.selectors.AbstractPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -57,38 +57,25 @@ import org.matsim.pt.PtConstants;
  */
 public final class DiversityGeneratingPlansRemoverANIK extends AbstractPlanSelector {
 	
-	private final StageActivityTypes stageActivities;
 	private final double similarTimeInterval;
 	
 	/**
 	 * Private - use the {@link DiversityGeneratingPlansRemoverANIK.Builder} instead.
 	 */
-	private DiversityGeneratingPlansRemoverANIK(Network network, double similarTimeInterval, StageActivityTypes stageActivities) {
+	private DiversityGeneratingPlansRemoverANIK(Network network, double similarTimeInterval) {
 		this.similarTimeInterval = similarTimeInterval;
-		this.stageActivities = stageActivities;
 	}
 
 	public static final class Builder {
 		// Defining default values
 		private double similarTimeInterval = 5.0 * 60.;
-		
-		private StageActivityTypes stageActivities = new StageActivityTypes() {
-			@Override
-			public boolean isStageActivity(String activityType) {
-				return activityType.equals(PtConstants.TRANSIT_ACTIVITY_TYPE);
-			}
-		};
 
 		public final void setSimilarTimeInterval(double setSimilarTimeInterval) {
 			this.similarTimeInterval = setSimilarTimeInterval;
 		}
 
-		public final void setStageActivityTypes(StageActivityTypes stageActivities) {
-			this.stageActivities = stageActivities;
-		}
-
 		public final DiversityGeneratingPlansRemoverANIK build(Network network) {
-			return new DiversityGeneratingPlansRemoverANIK(network,	this.similarTimeInterval, this.stageActivities);
+			return new DiversityGeneratingPlansRemoverANIK(network,	this.similarTimeInterval);
 		}
 	}
 	
@@ -115,7 +102,7 @@ public final class DiversityGeneratingPlansRemoverANIK extends AbstractPlanSelec
 					// same plan, those are definitely similar. So, ignore them.
 				} else {
 					// check two plans for similarity TODO Should be a kind of builder passed further down that configures all similarity checkers
-					if (similarity( plan1, plan2, this.stageActivities, this.similarTimeInterval)) {
+					if (similarity( plan1, plan2, this.similarTimeInterval)) {
 						// This one is similar. Tag it as to be removed and return. We only can remove one plan. So we remove the newer one.
 						map.put(plan2, 1.);
 						return map;
@@ -143,10 +130,10 @@ public final class DiversityGeneratingPlansRemoverANIK extends AbstractPlanSelec
 	 * @param similarTimeInterval The interval in which two activities are considered as being the same. TODO Builder implemenation
 	 * @return <code>true</code> if both plans are considered similar, otherwise <code>false</code>.
 	 */
-	private boolean similarity( Plan plan1, Plan plan2, StageActivityTypes stageActivities, double similarTimeInterval) {
+	private boolean similarity( Plan plan1, Plan plan2, double similarTimeInterval) {
 		
 		// Check for the first dimension
-		boolean similarTimes = checkActivityTimes(plan1, plan2, stageActivities, similarTimeInterval);
+		boolean similarTimes = checkActivityTimes(plan1, plan2, similarTimeInterval);
 		
 		// Further checks can be implemented the same way.
 		// boolean similarModes = checkTransportModes(plan1, plan2);
@@ -168,10 +155,10 @@ public final class DiversityGeneratingPlansRemoverANIK extends AbstractPlanSelec
 	 * @param similarTimeInterval The interval in which two activities are considered as being the same.
 	 * @return <code>true</code> if both plans are considered similar, otherwise <code>false</code>.
 	 */
-	private boolean checkActivityTimes(Plan plan1, Plan plan2, StageActivityTypes stageActivities, double similarTimeInterval) {
+	private boolean checkActivityTimes(Plan plan1, Plan plan2, double similarTimeInterval) {
 		
-		List<Activity> activities1 = TripStructureUtils.getActivities(plan1, stageActivities) ;
-		List<Activity> activities2 = TripStructureUtils.getActivities(plan2, stageActivities) ;
+		List<Activity> activities1 = TripStructureUtils.getActivities(plan1, StageActivityHandling.ExcludeStageActivities) ;
+		List<Activity> activities2 = TripStructureUtils.getActivities(plan2, StageActivityHandling.ExcludeStageActivities) ;
 		
 		Iterator<Activity> it1 = activities1.iterator() ;
 		Iterator<Activity> it2 = activities2.iterator() ;

@@ -88,7 +88,7 @@ public class AllocateVehicleToSubtourAlgorithm implements PlanAlgorithm {
 	}
 
 	private List<Subtour> getRootSubtoursWithMode(final Plan plan) {
-		final Collection<Subtour> allSubtours = TripStructureUtils.getSubtours( plan , tripRouter.getStageActivityTypes() );
+		final Collection<Subtour> allSubtours = TripStructureUtils.getSubtours( plan );
 		final List<Subtour> roots = new ArrayList<Subtour>();
 
 		for ( Subtour s : allSubtours ) {

@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
@@ -39,12 +38,8 @@ class PlanTimesAdapter {
 	private static final Logger log = Logger.getLogger( PlanTimesAdapter.class ) ;
 
 	private final Config config;
-	private final StageActivityTypes stageActivityTypes;
 
-	/* package */ PlanTimesAdapter(
-		  final StageActivityTypes stageActivityTypes,
-		  final Scenario scenario ) {
-		this.stageActivityTypes = stageActivityTypes;
+	/* package */ PlanTimesAdapter( final Scenario scenario ) {
 		this.config = scenario.getConfig();
 	}
 
@@ -92,7 +87,7 @@ class PlanTimesAdapter {
 		lastAct.setStartTime( now );
 		scoringFunction.handleActivity( lastAct );
 		// the following is hedging against the newer tripscoring; not clear if this will work out-of-sequence.
-		for( Trip trip : getTrips( planTmp, stageActivityTypes ) ){
+		for( Trip trip : getTrips( planTmp ) ){
 			scoringFunction.handleTrip( trip );
 		}
 
