@@ -27,10 +27,6 @@
         <param name="modes" value="car,pt"/>
     </module>
     <module name="commercialTraffic">
-        <!-- Freight Carriers File, according to MATSim freight contrib -->
-        <param name="carriersFile" value="test-carriers.xml"/>
-        <!-- Carrier Vehicle Types file, according to MATSim freight contrib -->
-        <param name="carriersVehicleTypeFile" value="vehicleTypes.xml"/>
         <!-- Buffer travel time factor for the first leg of a freight tour. -->
         <param name="firstLegBufferFactor" value="1.5"/>
         <!-- Score for On time delivery. -->
