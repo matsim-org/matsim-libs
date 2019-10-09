@@ -69,6 +69,8 @@ public class CarrierModuleTest {
         freightConfigGroup.setCarriersFile( testUtils.getClassInputDirectory() + "carrierPlansEquils.xml");
         freightConfigGroup.setCarriersVehicleTypesFile( testUtils.getClassInputDirectory() + "vehicleTypes.xml");
 
+        config.addModule(freightConfigGroup);
+
         Scenario scenario = ScenarioUtils.loadScenario( config );
         controler = new Controler(scenario);
         controler.getConfig().controler().setWriteEventsInterval(1);
