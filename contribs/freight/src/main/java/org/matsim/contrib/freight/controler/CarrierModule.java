@@ -65,7 +65,6 @@ public class CarrierModule extends AbstractModule {
     @Override
     public void install() {
         this.freightConfig = (FreightConfigGroup) getConfig().getModules().get(FreightConfigGroup.GROUPNAME);
-
         if(this.carriers == null){
             this.carriers = new Carriers();
             new CarrierPlanXmlReader(carriers).readFile(freightConfig.getCarriersFile());
