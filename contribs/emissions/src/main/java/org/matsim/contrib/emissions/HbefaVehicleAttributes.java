@@ -37,7 +37,7 @@ public final class HbefaVehicleAttributes {
 	/**
 	 * @return {@value #TECHNOLOGY_CMT}
 	 */
-	public String getHbefaTechnology(){
+	String getHbefaTechnology(){
 		return this.hbefaTechnology;
 	}
 	/**
@@ -109,6 +109,6 @@ public final class HbefaVehicleAttributes {
 	}
 
 	public boolean isDetailed() {
-		return !hbefaEmConcept.equals("average") && !hbefaSizeClass.equals("average") && !hbefaEmConcept.equals("average");
+		return !hbefaTechnology.equals("average") && !hbefaSizeClass.equals("average") && !hbefaEmConcept.equals("average");
 	}
 }
