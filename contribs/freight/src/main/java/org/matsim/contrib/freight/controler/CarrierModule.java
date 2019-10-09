@@ -65,8 +65,6 @@ public class CarrierModule extends AbstractModule {
     @Override
     public void install() {
         this.freightConfig = (FreightConfigGroup) getConfig().getModules().get(FreightConfigGroup.GROUPNAME);
-        // We put some things under dependency injection.
-        bind( FreightConfigGroup.class ).toInstance(freightConfig);
 
         if(this.carriers == null){
             this.carriers = new Carriers();
