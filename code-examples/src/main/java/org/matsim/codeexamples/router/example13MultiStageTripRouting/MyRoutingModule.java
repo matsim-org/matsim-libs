@@ -23,19 +23,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.inject.Provider;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.RouteFactories;
-import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.Facility;
 
@@ -46,7 +41,7 @@ import org.matsim.facilities.Facility;
  * @author thibautd
  */
 public class MyRoutingModule implements RoutingModule {
-	public static final String STAGE = "teleportationInteraction";
+	public static final String STAGE = "teleportation interaction";
 	public static final String TELEPORTATION_LEG_MODE = "teleportationLeg";
 
 	public static final String TELEPORTATION_MAIN_MODE = "myTeleportationMainMode";
@@ -119,16 +114,5 @@ public class MyRoutingModule implements RoutingModule {
 		return trip;
 	}
 
-	@Override
-	public StageActivityTypes getStageActivityTypes() {
-		final CompositeStageActivityTypes stageTypes = new CompositeStageActivityTypes();
-
-		// trips for this mode contain the ones we create, plus the ones of the
-		// pt router we use.
-		stageTypes.addActivityTypes( routingDelegate.get().getStageActivityTypes() );
-		stageTypes.addActivityTypes( new StageActivityTypesImpl( STAGE ) );
-
-		return stageTypes;
-	}
 }
 
