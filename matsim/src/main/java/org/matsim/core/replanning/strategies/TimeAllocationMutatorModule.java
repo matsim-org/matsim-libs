@@ -122,6 +122,11 @@ class TimeAllocationMutatorModule extends AbstractMultithreadedModule{
 					this.subpopulationAttribute, this.subpopulationMutationRanges, this.subpopulationAffectingDuration);
 			break;
 		default:
+			if(this.affectingDuration) log.warn("Please be aware that durations of activities now can mutate freely and possibly become negative." +
+					"This might be a problem if you have \n" +
+					"a) short activities that are only provided with duration and not with endtime  AND\n" +
+					"b) agents with only one or two initial plans.\n" +
+					"This can have impact on scoring and maybe even on qsim execution. It is recommended to set affectingDuration=false for such set up.");
 			pmta = new PlanMutateTimeAllocationSimplified(
 					this.tripRouterProvider.get().getStageActivityTypes(), this.mutationRange, this.affectingDuration, MatsimRandom.getLocalInstance());
 		}
