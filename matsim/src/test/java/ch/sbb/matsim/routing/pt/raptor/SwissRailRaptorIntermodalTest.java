@@ -827,19 +827,19 @@ public class SwissRailRaptorIntermodalTest {
     }
 
     /**
-     * The agent is placed close to stop B, which is bike accessible. The agent is 600 meters away from stop B, which puts it
-     * inside the Bike Radius for Access/Egress Mode but not in the Walk radius. This test is meant to verify that the
-     * Swiss Rail Raptor will give the agent a transit_walk route if all the applicable intermodal access/egress mode
-     * routers return null. This will be shown in part 2 of this test.
-     *
-     * Part 1 is mainly meant to check that the intermodal access/egress module is working properly. Bike is given a fast
-     * speed, the test checks that the agent actually uses bike to get to the pt Stop B.
-     *
-     * Part 2 modifies the speed of mode bike to zero. The bike router will be called, since the agent is within the
-     * access/egress radius for mode bike and all the attributes are correct (as shown in part 1). However, the router will
-     * return null, since it cannot create a route with a speed of zero.  The expected outcome is that the Swiss Rail Raptor will return a
-     * transit_walk between the fromFacility and the toFacility.
-     */
+	 * The agent is placed close to stop B, which is bike accessible. The agent is 600 meters away from stop B, which
+	 * puts it inside the Bike Radius for Access/Egress Mode but not in the Walk radius. This test is meant to verify
+	 * that the Swiss Rail Raptor will give the agent a transit_walk route if all the applicable intermodal
+	 * access/egress mode routers return null. This will be shown in part 2 of this test.
+	 *
+	 * Part 1 is mainly meant to check that the intermodal access/egress module is working properly. Bike is given a
+	 * fast speed, the test checks that the agent actually uses bike to get to the pt Stop B.
+	 *
+	 * Part 2 replaces the bike router. The bike router will be called, since the agent is within the access/egress
+	 * radius for mode bike and all the attributes are correct (as shown in part 1). However, the router will return
+	 * null, since we replaced it with a routing module which always returns null. The expected outcome is that the
+	 * Swiss Rail Raptor will return a transit_walk between the fromFacility and the toFacility.
+	 */
 
     @Test
     public void testIntermodalTrip_accessModeRouterReturnsNull() {
@@ -883,10 +883,18 @@ public class SwissRailRaptorIntermodalTest {
         Assert.assertEquals("to", legAccess.getRoute().getEndLinkId().toString());
         
         
-        // Part 2: Change bike speed to 0. Bike Router will return null.
+        // Part 2: Change bike router to return null.
         f.routingModules.remove(TransportMode.bike);
         f.routingModules.put(TransportMode.bike,
-                new TeleportationRoutingModule(TransportMode.bike, f.scenario, 0., 1.4)); // set bike speed to 0 to make bike router return null
+        		new RoutingModule() {
+
+					@Override
+					public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility,
+							double departureTime, Person person) {
+						return null;
+					}
+        	
+        });
 
         SwissRailRaptorData data2 = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork());
         DefaultRaptorStopFinder stopFinder2 = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), f.routingModules);
