@@ -24,6 +24,7 @@ package org.matsim.contrib.freight.controler;
 
 import com.google.inject.Inject;
 import com.google.inject.Provides;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.CarrierConfigGroup;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
@@ -51,6 +52,8 @@ public class CarrierModule extends AbstractModule {
     /**
      * CarrierPlanStrategyManagerFactory and CarrierScoringFunctionFactory must me bound separately
      * when this constructor is used.
+     * <br>
+     *       The above statement is not true; one can get it out of scenario by {@link org.matsim.contrib.freight.utils.FreightUtils#getCarriers(Scenario)}.
      */
     public CarrierModule(Carriers carriers) {
         this.carriers = carriers;
@@ -64,16 +67,10 @@ public class CarrierModule extends AbstractModule {
 
     @Override
     public void install() {
-        this.freightConfig = (FreightConfigGroup) getConfig().getModules().get(FreightConfigGroup.GROUPNAME);
-        if(this.carriers == null){
-            this.carriers = new Carriers();
-            new CarrierPlanXmlReader(carriers).readFile(freightConfig.getCarriersFile());
-            CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
-            new CarrierVehicleTypeReader(vehicleTypes).readFile(freightConfig.getCarriersVehicleTypesFile());
-            new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
-        }
 
         bind(Carriers.class).toInstance(carriers);
+        // yyyy try to replace by FreightUtils.getCarriers(scenario)
+
         if (strategyManagerFactory != null) {
             bind(CarrierPlanStrategyManagerFactory.class).toInstance(strategyManagerFactory);
         }

@@ -23,7 +23,6 @@ package org.matsim.contrib.freight.carrier;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.controler.CarrierModule;
@@ -31,6 +30,7 @@ import org.matsim.contrib.freight.mobsim.DistanceScoringFunctionFactoryForTests;
 import org.matsim.contrib.freight.mobsim.StrategyManagerFactoryForTests;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
+import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -65,19 +65,20 @@ public class CarrierModuleTest {
         config.network().setInputFile( testUtils.getClassInputDirectory() + "network.xml" );
         config.plans().setInputFile( testUtils.getClassInputDirectory() + "plans100.xml" );
 
-        freightConfigGroup = new FreightConfigGroup();
+        freightConfigGroup = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class ) ;
         freightConfigGroup.setCarriersFile( testUtils.getClassInputDirectory() + "carrierPlansEquils.xml");
         freightConfigGroup.setCarriersVehicleTypesFile( testUtils.getClassInputDirectory() + "vehicleTypes.xml");
 
-        config.addModule(freightConfigGroup);
-
         Scenario scenario = ScenarioUtils.loadScenario( config );
-        controler = new Controler(scenario);
+
+	    FreightUtils.loadCarriersAccordingToFreightConfig( scenario );
+
+	    controler = new Controler(scenario);
         controler.getConfig().controler().setWriteEventsInterval(1);
         controler.getConfig().controler().setCreateGraphs(false);
     }
 
-    @Test
+	@Test
     public void test_ConstructorWOParameters(){
         controler.addOverridingModule(new CarrierModule());
         controler.addOverridingModule(new AbstractModule() {

@@ -22,9 +22,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.VehicleType;
 
@@ -84,6 +86,14 @@ public class FreightUtils {
 			scenario.addScenarioElement( CARRIERS, carriers );
 		}
 		return carriers;
+	}
+	public static void loadCarriersAccordingToFreightConfig( Scenario scenario ){
+		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( scenario.getConfig(), FreightConfigGroup.class ) ;
+		Carriers carriers = getCarriers( scenario ); // also registers with scenario
+		new CarrierPlanXmlReader( carriers ).readFile( freightConfigGroup.getCarriersFile() );
+		CarrierVehicleTypes vehTypes = new CarrierVehicleTypes();
+		new CarrierVehicleTypeReader( vehTypes ).readFile( freightConfigGroup.getCarriersVehicleTypesFile() );
+		new CarrierVehicleTypeLoader( carriers ).loadVehicleTypes( vehTypes );
 	}
 
 	/**
