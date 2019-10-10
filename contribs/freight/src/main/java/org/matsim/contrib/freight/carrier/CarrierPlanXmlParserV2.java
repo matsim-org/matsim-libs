@@ -306,7 +306,6 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				finishLeg(currentVehicle.getLocation());
 				currentTourBuilder.scheduleEnd(currentVehicle.getLocation(), TimeWindow.newInstance(currentVehicle.getEarliestStartTime(),currentVehicle.getLatestEndTime()));
 			}
-
 		}
 		else if(name.equals(ATTRIBUTES)) {
 			switch( context.peek() ) {
