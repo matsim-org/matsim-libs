@@ -22,18 +22,6 @@
  */
 package ft.cemdap4H.planspreprocessing;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.locationtech.jts.geom.Geometry;
@@ -49,7 +37,6 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -59,6 +46,10 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author  saxer
@@ -209,7 +200,7 @@ public class FilterAgentsnotinNetwork {
 
 		for (Plan plan : person.getPlans()) {
 			List<Activity> activities = TripStructureUtils.getActivities(plan.getPlanElements(),
-			        EmptyStageActivityTypes.INSTANCE);
+					TripStructureUtils.StageActivityHandling.StagesAsNormalActivities);
 
 			for (Activity act : activities) {
 				
@@ -246,7 +237,7 @@ public class FilterAgentsnotinNetwork {
 		double maxDistance = 0.0;
 
 		List<Activity> activities = TripStructureUtils.getActivities(plan.getPlanElements(),
-		        EmptyStageActivityTypes.INSTANCE);
+				TripStructureUtils.StageActivityHandling.StagesAsNormalActivities);
 
 		for (Activity act : activities) {
 			double actualDistance = NetworkUtils.getEuclideanDistance(act.getCoord(),
@@ -285,7 +276,7 @@ public class FilterAgentsnotinNetwork {
 		Geometry boundingBox = null;
 
 		List<Activity> activities = TripStructureUtils.getActivities(plan.getPlanElements(),
-		        EmptyStageActivityTypes.INSTANCE);
+				TripStructureUtils.StageActivityHandling.StagesAsNormalActivities);
 
 		Point[] actPointArray = new Point[activities.size()];
 
@@ -302,10 +293,7 @@ public class FilterAgentsnotinNetwork {
 		Geometry geometryColl = geomfact.createMultiPoint(actPointArray);
 		boundingBox = geometryColl.getEnvelope();
 
-		if (boundingBox.intersects(researchAreaBoundary)) {
-			return true;
-		} else
-			return false;
+		return boundingBox.intersects(researchAreaBoundary);
 
 	}
 

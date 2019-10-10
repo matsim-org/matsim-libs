@@ -1,18 +1,5 @@
 package ft.cemdap4H.planspreprocessing;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.Set;
-
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.NormalDistribution;
 import org.apache.commons.math.distribution.NormalDistributionImpl;
@@ -23,23 +10,23 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class AssignAgentsToMajorWorkplaces {
 	// A map which connects a workPlaces with the number of workers, stored as
@@ -193,10 +180,7 @@ public class AssignAgentsToMajorWorkplaces {
 	}
 
 	public static boolean planWithSingleWorkPlace(Plan plan) {
-		if (countDistinctWorkLocationsPerPlan(plan) == 1) {
-			return true;
-		} else
-			return false;
+		return countDistinctWorkLocationsPerPlan(plan) == 1;
 	}
 
 	public static Coord getParkingCoordWithinDistance(Id<Link> linkId) {
@@ -230,7 +214,7 @@ public class AssignAgentsToMajorWorkplaces {
 		Set<Double> locationSet = new HashSet<Double>();
 
 		List<Activity> activities = TripStructureUtils.getActivities(plan.getPlanElements(),
-		        EmptyStageActivityTypes.INSTANCE);
+				TripStructureUtils.StageActivityHandling.StagesAsNormalActivities);
 
 		for (Activity act : activities) {
 
@@ -249,7 +233,7 @@ public class AssignAgentsToMajorWorkplaces {
 		Coord homeCoord = null;
 
 		List<Activity> activities = TripStructureUtils.getActivities(plan.getPlanElements(),
-		        EmptyStageActivityTypes.INSTANCE);
+				TripStructureUtils.StageActivityHandling.StagesAsNormalActivities);
 
 		for (Activity act : activities) {
 
@@ -267,7 +251,7 @@ public class AssignAgentsToMajorWorkplaces {
 		Coord workCoord = null;
 
 		List<Activity> activities = TripStructureUtils.getActivities(plan.getPlanElements(),
-		        EmptyStageActivityTypes.INSTANCE);
+				TripStructureUtils.StageActivityHandling.StagesAsNormalActivities);
 
 		for (Activity act : activities) {
 
@@ -283,7 +267,7 @@ public class AssignAgentsToMajorWorkplaces {
 	public static int getActWorkIdxInZone(Plan plan, String zoneId) {
 
 		List<Activity> activities = TripStructureUtils.getActivities(plan.getPlanElements(),
-		        EmptyStageActivityTypes.INSTANCE);
+				TripStructureUtils.StageActivityHandling.StagesAsNormalActivities);
 
 		int actIdx = 0;
 		for (Activity act : activities) {
@@ -373,7 +357,7 @@ public class AssignAgentsToMajorWorkplaces {
 				        Id.createLinkId(mapWorkPlaceToLinks.get(workingplace)));
 
 				List<Activity> activities = TripStructureUtils.getActivities(plan.getPlanElements(),
-				        EmptyStageActivityTypes.INSTANCE);
+						TripStructureUtils.StageActivityHandling.StagesAsNormalActivities);
 
 				int actIdx = getActWorkIdxInZone(plan, mapWorkPlaceToZoneID.get(workingplace));
 

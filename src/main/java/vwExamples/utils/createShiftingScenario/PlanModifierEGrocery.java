@@ -34,7 +34,9 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.router.*;
+import org.matsim.core.router.MainModeIdentifier;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -71,7 +73,6 @@ public class PlanModifierEGrocery {
 	Scenario scenario;
 
 	Collection<String> stages;
-	StageActivityTypes blackList;
 
 	Network network;
 	SubTourValidator subTourValidator; // Defines the rule to calculate absolute number of trips or agents that might
@@ -112,7 +113,6 @@ public class PlanModifierEGrocery {
 		stages.add(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		stages.add(new DrtStageActivityType("drt").drtStageActivity);
 		stages.add(parking.ParkingRouterNetworkRoutingModule.parkingStageActivityType);
-		blackList = new StageActivityTypesImpl(stages);
 
 		subTourValidator = new isShoppingSubTourCandidate(network, cityZonesMap, serviceAreazonesMap);
 		assignTourValidator = new assignShoppingCandidate(network, cityZonesMap, serviceAreazonesMap);
@@ -191,7 +191,7 @@ public class PlanModifierEGrocery {
 
 			PersonUtils.removeUnselectedPlans(person);
 			Plan plan = person.getSelectedPlan();
-			for (Subtour subTour : TripStructureUtils.getSubtours(plan, blackList)) {
+			for (Subtour subTour : TripStructureUtils.getSubtours(plan, new HashSet<>(stages))) {
 
 				String subtourMode = getSubtourMode(subTour, plan);
 
@@ -267,7 +267,7 @@ public class PlanModifierEGrocery {
 
 				// Loop over all subtours of this agent
 
-				for (Subtour subTour : TripStructureUtils.getSubtours(plan, blackList)) {
+				for (Subtour subTour : TripStructureUtils.getSubtours(plan, new HashSet<>(stages))) {
 
 					double estimatedTourDistance = getBeelineTourLength(subTour);
 					// Get subtour mode
@@ -287,7 +287,7 @@ public class PlanModifierEGrocery {
 
 						// System.out.println("Trip Size:" + subTour.getTrips().size());
 
-                        PlanElement searchPlanElement = subTour.getTrips().get(0).getOriginActivity();
+						PlanElement searchPlanElement = subTour.getTrips().get(0).getOriginActivity();
 						int planElementToBeModifiedIdx = PopulationUtils.getActLegIndex(plan, searchPlanElement);
 
 						Activity testAct = (Activity) plan.getPlanElements().get(planElementToBeModifiedIdx);

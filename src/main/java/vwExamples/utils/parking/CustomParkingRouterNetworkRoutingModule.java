@@ -37,12 +37,10 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
-
 import parking.ParkingZone;
 import parking.ZonalLinkParkingInfo;
 
@@ -58,34 +56,6 @@ import java.util.Map.Entry;
  */
 public final class CustomParkingRouterNetworkRoutingModule implements RoutingModule {
     private static final Logger log = Logger.getLogger(CustomParkingRouterNetworkRoutingModule.class);
-
-    public static final class ParkingAccessEgressStageActivityTypes implements StageActivityTypes {
-        @Override
-        public boolean isStageActivity(String activityType) {
-            if (CustomParkingRouterNetworkRoutingModule.stageActivityType.equals(activityType) ||
-                    CustomParkingRouterNetworkRoutingModule.parkingStageActivityType.equals(activityType) || activityType.endsWith("interaction")
-                    ) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (!(obj instanceof ParkingAccessEgressStageActivityTypes)) {
-                return false;
-            }
-            ParkingAccessEgressStageActivityTypes other = (ParkingAccessEgressStageActivityTypes) obj;
-            return other.isStageActivity(CustomParkingRouterNetworkRoutingModule.stageActivityType);
-        }
-
-        @Override
-        public int hashCode() {
-            return CustomParkingRouterNetworkRoutingModule.stageActivityType.hashCode();// TODO update this too
-        }
-    }
-
 
     private final String mode;
     private final PopulationFactory populationFactory;
@@ -200,7 +170,7 @@ public final class CustomParkingRouterNetworkRoutingModule implements RoutingMod
                 now += routeLeg(person, newLeg, egressActLink, parkEndLink, now);
 
                 // an activity will help in identifying the start of the parking search
-                final Activity interactionActivity = PopulationUtils.createActivityFromCoordAndLinkId(this.parkingStageActivityType,
+                final Activity interactionActivity = PopulationUtils.createActivityFromCoordAndLinkId(parkingStageActivityType,
                         egressActLink.getToNode().getCoord(),
                         egressActLink.getId());
                 interactionActivity.setMaximumDuration(0.0);
@@ -346,7 +316,7 @@ public final class CustomParkingRouterNetworkRoutingModule implements RoutingMod
     }
 
     private Activity createInteractionActivity(final Coord interactionCoord, final Id<Link> interactionLink) {
-        Activity act = PopulationUtils.createActivityFromCoordAndLinkId(this.stageActivityType,
+        Activity act = PopulationUtils.createActivityFromCoordAndLinkId(stageActivityType,
                 interactionCoord,
                 interactionLink);
         act.setMaximumDuration(0.0);
@@ -383,17 +353,10 @@ public final class CustomParkingRouterNetworkRoutingModule implements RoutingMod
         return travTime;
     }
 
-
-    @Override
-    public StageActivityTypes getStageActivityTypes() {
-        return new ParkingAccessEgressStageActivityTypes();
-    }
-
     @Override
     public String toString() {
         return "[NetworkRoutingModule: mode=" + this.mode + "]";
     }
-
 
     /*package (Tests)*/ double routeLeg(Person person, Leg leg, Link fromLink, Link toLink, double depTime) {
         double travTime = 0;
