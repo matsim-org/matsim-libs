@@ -1276,6 +1276,9 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			return subpopulation;
 		}
 
+		/**
+		 * This method is there to make the StringSetter/Getter automagic happy, but it is not meant to be used.
+		 */
 		@StringSetter("subpopulation")
 		public void setSubpopulation(String subpopulation) {
 			// TODO: handle case of default subpopulation
