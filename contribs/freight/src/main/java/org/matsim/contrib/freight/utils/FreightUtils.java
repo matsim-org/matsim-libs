@@ -27,6 +27,7 @@ import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.VehicleType;
 
@@ -46,9 +47,11 @@ public class FreightUtils {
 	 */
 	@Deprecated
 	public static final String CARRIERS = "carriers" ;
+	private static final String CARRIERVEHICLETYPES = "carrierVehicleTypes";
 	private static final Logger log = Logger.getLogger(FreightUtils.class );
 
 	private static final String ATTR_SKILLS = "skills";
+
 	/**
 	 * Creates a new {@link Carriers} container only with {@link CarrierShipment}s for creating a new VRP.
 	 * As consequence of the transformation of {@link CarrierService}s to {@link CarrierShipment}s the solution of the VRP can have tours with
@@ -87,12 +90,23 @@ public class FreightUtils {
 		}
 		return carriers;
 	}
+
+	public static CarrierVehicleTypes getCarrierVehicleTypes( Scenario scenario ){
+		CarrierVehicleTypes types = (CarrierVehicleTypes) scenario.getScenarioElement( CARRIERVEHICLETYPES );
+		if ( types==null ) {
+			types = new CarrierVehicleTypes(  ) ;
+			scenario.addScenarioElement( CARRIERVEHICLETYPES, types );
+		}
+		return types;
+	}
+
 	public static void loadCarriersAccordingToFreightConfig( Scenario scenario ){
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( scenario.getConfig(), FreightConfigGroup.class ) ;
+
 		Carriers carriers = getCarriers( scenario ); // also registers with scenario
-		new CarrierPlanXmlReader( carriers ).readFile( freightConfigGroup.getCarriersFile() );
-		CarrierVehicleTypes vehTypes = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader( vehTypes ).readFile( freightConfigGroup.getCarriersVehicleTypesFile() );
+		new CarrierPlanXmlReader( carriers ).readURL( IOUtils.extendUrl(scenario.getConfig().getContext(), freightConfigGroup.getCarriersFile()) );
+		CarrierVehicleTypes vehTypes = getCarrierVehicleTypes(scenario);
+		new CarrierVehicleTypeReader( vehTypes ).readURL( IOUtils.extendUrl(scenario.getConfig().getContext(), freightConfigGroup.getCarriersVehicleTypesFile()) );
 		new CarrierVehicleTypeLoader( carriers ).loadVehicleTypes( vehTypes );
 	}
 
