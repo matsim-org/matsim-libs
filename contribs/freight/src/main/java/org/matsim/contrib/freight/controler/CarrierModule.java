@@ -29,13 +29,21 @@ import org.matsim.contrib.freight.CarrierConfigGroup;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
+import org.matsim.contrib.freight.mobsim.FreightAgentSource;
 import org.matsim.contrib.freight.mobsim.FreightQSimFactory;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
+
+import java.util.List;
 
 public class CarrierModule extends AbstractModule {
 
@@ -83,9 +91,21 @@ public class CarrierModule extends AbstractModule {
         addControlerListenerBinding().to(CarrierControlerListener.class);
 
         // Set the Mobsim. The FreightQSimFactory needs the CarrierAgentTracker (see constructor).
-        bindMobsim().toProvider(FreightQSimFactory.class);
+//        bindMobsim().toProvider(FreightQSimFactory.class);
 
-        this.addControlerListenerBinding().toInstance( new ShutdownListener(){
+	    QSimComponentsConfigGroup qsimComponents = ConfigUtils.addOrGetModule( getConfig(), QSimComponentsConfigGroup.class );
+	    List<String> abc = qsimComponents.getActiveComponents();
+	    abc.add( "abc" ) ;
+	    qsimComponents.setActiveComponents( abc );
+
+	    this.installQSimModule( new AbstractQSimModule(){
+		    @Override protected void configureQSim(){
+			    this.addQSimComponentBinding( "abc" ).to( FreightAgentSource.class );
+		    }
+	    } );
+
+
+	    this.addControlerListenerBinding().toInstance( new ShutdownListener(){
             @Inject Config config ;
             @Override public void notifyShutdown( ShutdownEvent event ){
                 writeAdditionalRunOutput( config, carriers );
