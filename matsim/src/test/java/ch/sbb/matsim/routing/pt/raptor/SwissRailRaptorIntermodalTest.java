@@ -20,17 +20,12 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.population.routes.GenericRouteFactory;
-import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.router.*;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.TeleportationRoutingModule;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.PtConstants;
@@ -41,8 +36,6 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehiclesFactory;
 
 import java.util.*;
 
@@ -875,7 +868,7 @@ public class SwissRailRaptorIntermodalTest {
         Assert.assertEquals("bike_B", legBike.getRoute().getEndLinkId().toString());
 
         Leg legTransfer = legs.get(1);
-        Assert.assertEquals("non_network_walk", legTransfer.getMode());
+        Assert.assertEquals(TransportMode.non_network_walk, legTransfer.getMode());
         Assert.assertEquals("bike_B", legTransfer.getRoute().getStartLinkId().toString());
         Assert.assertEquals("BB", legTransfer.getRoute().getEndLinkId().toString());
 
@@ -893,7 +886,7 @@ public class SwissRailRaptorIntermodalTest {
         // Part 2: Change bike speed to 0. Bike Router will return null.
         f.routingModules.remove(TransportMode.bike);
         f.routingModules.put(TransportMode.bike,
-                new TeleportationRoutingModule(TransportMode.bike, f.scenario, 0., 1.4)); // make bike very fast
+                new TeleportationRoutingModule(TransportMode.bike, f.scenario, 0., 1.4)); // set bike speed to 0 to make bike router return null
 
         SwissRailRaptorData data2 = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork());
         DefaultRaptorStopFinder stopFinder2 = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), f.routingModules);
