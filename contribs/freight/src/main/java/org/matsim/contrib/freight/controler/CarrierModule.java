@@ -23,7 +23,9 @@
 package org.matsim.contrib.freight.controler;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.CarrierConfigGroup;
 import org.matsim.contrib.freight.FreightConfigGroup;
@@ -47,6 +49,7 @@ public class CarrierModule extends AbstractModule {
     private CarrierPlanStrategyManagerFactory strategyManagerFactory;
     private CarrierScoringFunctionFactory scoringFunctionFactory;
 
+
     public CarrierModule() {
 
     }
@@ -56,11 +59,18 @@ public class CarrierModule extends AbstractModule {
      * when this constructor is used.
      * <br>
      *       The above statement is not true; one can get it out of scenario by {@link org.matsim.contrib.freight.utils.FreightUtils#getCarriers(Scenario)}.
+     *
+     * @deprecated please use FreightUtils.getCarriers(Scenario scenario) to load carriers into scenario and use CarrierModule()
      */
+    @Deprecated
     public CarrierModule(Carriers carriers) {
         this.carriers = carriers;
     }
 
+    /**
+     * @deprecated please use FreightUtils.getCarriers(Scenario scenario) to load carriers into scenario and use CarrierModule()
+     */
+    @Deprecated
     public CarrierModule(Carriers carriers, CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory) {
         this.carriers = carriers;
         this.strategyManagerFactory = strategyManagerFactory;
@@ -70,8 +80,8 @@ public class CarrierModule extends AbstractModule {
     @Override
     public void install() {
 
-        bind(Carriers.class).toInstance(carriers);
-        // yyyy try to replace by FreightUtils.getCarriers(scenario)
+        bind(Carriers.class).toProvider(new CarrierProvider()).in(Singleton.class);
+//         yyyy try to replace by FreightUtils.getCarriers(scenario)
         // i am not sure how to retrieve scenario (or controler respectively).. tschlenther oct 10 '19
 
         if (strategyManagerFactory != null) {
@@ -113,5 +123,14 @@ public class CarrierModule extends AbstractModule {
     }
 
 
+    private class CarrierProvider implements Provider<Carriers> {
+        @Inject
+        Scenario scenario;
 
+
+        @Override
+        public Carriers get() {
+            return FreightUtils.getCarriers(scenario);
+        }
+    }
 }

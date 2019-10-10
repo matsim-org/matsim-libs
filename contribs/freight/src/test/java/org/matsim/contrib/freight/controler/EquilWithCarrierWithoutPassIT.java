@@ -115,10 +115,10 @@ public class EquilWithCarrierWithoutPassIT {
 		});
 		controler.run();
 
-		Carrier carrier1 = controler.getInjector().getInstance(Carriers.class).getCarriers().get(Id.create("carrier1", Carrier.class));
+		Carrier carrier1 = FreightUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier1", Carrier.class));
 		Assert.assertEquals(-170000.0, carrier1.getSelectedPlan().getScore().doubleValue(), 0.0);
 
-		Carrier carrier2 = controler.getInjector().getInstance(Carriers.class).getCarriers().get(Id.create("carrier2", Carrier.class));
+		Carrier carrier2 = FreightUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier2", Carrier.class));
 		Assert.assertEquals(-85000.0, carrier2.getSelectedPlan().getScore().doubleValue(), 0.0);
 	}
 
@@ -136,10 +136,10 @@ public class EquilWithCarrierWithoutPassIT {
 		});
 		controler.run();
 
-		Carrier carrier1 = controler.getInjector().getInstance(Carriers.class).getCarriers().get(Id.create("carrier1", Carrier.class));
+		Carrier carrier1 = FreightUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier1", Carrier.class));
 		Assert.assertEquals(-240.0, carrier1.getSelectedPlan().getScore(), 2.0);
 
-		Carrier carrier2 = controler.getInjector().getInstance(Carriers.class).getCarriers().get(Id.create("carrier2", Carrier.class));
+		Carrier carrier2 = FreightUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier2", Carrier.class));
 		Assert.assertEquals(0.0, carrier2.getSelectedPlan().getScore(), 0.0 );
 
 	}
@@ -158,10 +158,10 @@ public class EquilWithCarrierWithoutPassIT {
 		});
 		controler.run();
 
-		Carrier carrier1 = controler.getInjector().getInstance(Carriers.class).getCarriers().get(Id.create("carrier1", Carrier.class));
+		Carrier carrier1 = FreightUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier1", Carrier.class));
 		Assert.assertEquals(-4873.0, carrier1.getSelectedPlan().getScore(), 2.0);
 
-		Carrier carrier2 = controler.getInjector().getInstance(Carriers.class).getCarriers().get(Id.create("carrier2", Carrier.class));
+		Carrier carrier2 = FreightUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier2", Carrier.class));
 		Assert.assertEquals(0.0, carrier2.getSelectedPlan().getScore(), 0.0 );
 
 	}
@@ -180,7 +180,7 @@ public class EquilWithCarrierWithoutPassIT {
 		});
 		controler.run();
 
-		Carrier carrier1 = controler.getInjector().getInstance(Carriers.class).getCarriers().get(Id.create("carrier1", Carrier.class));
+		Carrier carrier1 = FreightUtils.getCarriers(controler.getScenario()).getCarriers().get(Id.create("carrier1", Carrier.class));
 		Assert.assertEquals(-4871.0, carrier1.getSelectedPlan().getScore(), 2.0);
 	}
 
