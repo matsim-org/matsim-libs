@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.facilities.ActivityFacility;
 
 import java.util.*;
@@ -20,9 +20,6 @@ class TripEventHandler implements ActivityEndEventHandler, ActivityStartEventHan
 
 	@Inject
 	private Network network;
-
-	@Inject
-	private StageActivityTypes stageActivityTypes;
 
 	@Inject
 	private MainModeIdentifier mainModeIdentifier;
@@ -45,7 +42,7 @@ class TripEventHandler implements ActivityEndEventHandler, ActivityStartEventHan
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		if (stageActivityTypes.isStageActivity(event.getActType()) || drivers.contains(event.getPersonId()) || !agentFilter.includeAgent(event.getPersonId()))
+		if (StageActivityTypeIdentifier.isStageActivity(event.getActType()) || drivers.contains(event.getPersonId()) || !agentFilter.includeAgent(event.getPersonId()))
 			return;
 
 		// maybe handle drt? Drt drivers have their own activities

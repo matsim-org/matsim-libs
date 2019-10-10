@@ -31,10 +31,10 @@ import org.matsim.core.controler.MatsimServices;
 /**
  * 
  * Creates a config file 
- * with necessary emission input files for the {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup}.
+ * with necessary emission input files for the {@link EmissionsConfigGroup EmissionsConfigGroup}.
  * 
  * This config file is used by the {@link RunDetailedEmissionToolOfflineExample OfflineExample} and
- * the {@link RunEmissionToolOnlineExample OnlineExample}
+ * the {@link RunDetailedEmissionToolOnlineExample OnlineExample}
  * 
  * @author benjamin, julia
  *
@@ -116,9 +116,15 @@ public final class CreateEmissionConfig {
 	        // emission vehicles are now set in the default vehicle container
 	        config.vehicles().setVehiclesFile(emissionVehicleFile);
 
-	        ecg.setUsingVehicleTypeIdAsVehicleDescription(false);
+			if ( (Boolean) false ==null ) {
+				ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
+			} else if ( false ) {
+				ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
+			} else {
+				ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
+			}
 
-	        ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
+			ecg.setAverageWarmEmissionFactorsFile(averageFleetWarmEmissionFactorsFile);
 	        ecg.setAverageColdEmissionFactorsFile(averageFleetColdEmissionFactorsFile);
 	        ecg.setUsingDetailedEmissionCalculation(isUsingDetailedEmissionCalculation);
 	        ecg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);

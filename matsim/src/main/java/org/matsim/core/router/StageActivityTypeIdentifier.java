@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * StageActivityCheckerImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,18 +17,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-
-package org.matsim.contrib.emissions;
+package org.matsim.core.router;
 
 /**
- * Created by amit on 29/09/16.
+ * It is used by the {@link TripRouter} to detect trips, and can be used by
+ * replanning modules as a "black list" of activities not to touch.
+ *
+ * @author gleich
  */
-@Deprecated // introduce EmissionsUtils.set/getXxx(...) first, and eventually move to Attributes.  kai, oct'18
-public enum EmissionSpecificationMarker {
-    
-    @Deprecated // introduce EmissionsUtils.set/getXxx(...) first, and eventually move to Attributes.  kai, oct'18
-    BEGIN_EMISSIONS ,
-    @Deprecated // introduce EmissionsUtils.set/getXxx(...) first, and eventually move to Attributes.  kai, oct'18
-    END_EMISSIONS ;
+public final class StageActivityTypeIdentifier {
+
+	public static final boolean isStageActivity(final String activityType) {
+		return activityType.endsWith("interaction");
+	}
+
 }
+

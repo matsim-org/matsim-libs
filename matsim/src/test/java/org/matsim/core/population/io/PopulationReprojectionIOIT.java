@@ -42,8 +42,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.ProjectionUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -187,8 +187,8 @@ public class PopulationReprojectionIOIT {
 			final Person originalPerson = originalScenario.getPopulation().getPersons().get( id );
 			final Person internalPerson = scenario.getPopulation().getPersons().get( id );
 
-			final List<Activity> originalActivities = TripStructureUtils.getActivities( originalPerson.getSelectedPlan() , EmptyStageActivityTypes.INSTANCE );
-			final List<Activity> reprojectedActivities = TripStructureUtils.getActivities( internalPerson.getSelectedPlan() , EmptyStageActivityTypes.INSTANCE );
+			final List<Activity> originalActivities = TripStructureUtils.getActivities( originalPerson.getSelectedPlan() , StageActivityHandling.StagesAsNormalActivities );
+			final List<Activity> reprojectedActivities = TripStructureUtils.getActivities( internalPerson.getSelectedPlan() , StageActivityHandling.StagesAsNormalActivities );
 
 			Assert.assertEquals(
 					"unexpected number of activities in reprojected plan",
@@ -228,8 +228,8 @@ public class PopulationReprojectionIOIT {
 			final Person internalPerson = scenario.getPopulation().getPersons().get( id );
 			final Person dumpedPerson = dumpedScenario.getPopulation().getPersons().get( id );
 
-			final List<Activity> internalActivities = TripStructureUtils.getActivities( internalPerson.getSelectedPlan() , EmptyStageActivityTypes.INSTANCE );
-			final List<Activity> reprojectedActivities = TripStructureUtils.getActivities( dumpedPerson.getSelectedPlan() , EmptyStageActivityTypes.INSTANCE );
+			final List<Activity> internalActivities = TripStructureUtils.getActivities( internalPerson.getSelectedPlan() , StageActivityHandling.StagesAsNormalActivities );
+			final List<Activity> reprojectedActivities = TripStructureUtils.getActivities( dumpedPerson.getSelectedPlan() , StageActivityHandling.StagesAsNormalActivities );
 
 			Assert.assertEquals(
 					"unexpected number of activities in reprojected plan",
@@ -296,8 +296,8 @@ public class PopulationReprojectionIOIT {
 			final Person originalPerson = originalScenario.getPopulation().getPersons().get( id );
 			final Person internalPerson = scenario.getPopulation().getPersons().get( id );
 
-			final List<Activity> originalActivities = TripStructureUtils.getActivities( originalPerson.getSelectedPlan() , EmptyStageActivityTypes.INSTANCE );
-			final List<Activity> reprojectedActivities = TripStructureUtils.getActivities( internalPerson.getSelectedPlan() , EmptyStageActivityTypes.INSTANCE );
+			final List<Activity> originalActivities = TripStructureUtils.getActivities( originalPerson.getSelectedPlan() , StageActivityHandling.StagesAsNormalActivities );
+			final List<Activity> reprojectedActivities = TripStructureUtils.getActivities( internalPerson.getSelectedPlan() , StageActivityHandling.StagesAsNormalActivities );
 
 			Assert.assertEquals(
 					"unexpected number of activities in reprojected plan",
@@ -332,8 +332,8 @@ public class PopulationReprojectionIOIT {
 			final Person internalPerson = scenario.getPopulation().getPersons().get( id );
 			final Person dumpedPerson = dumpedScenario.getPopulation().getPersons().get( id );
 
-			final List<Activity> internalActivities = TripStructureUtils.getActivities( internalPerson.getSelectedPlan() , EmptyStageActivityTypes.INSTANCE );
-			final List<Activity> reprojectedActivities = TripStructureUtils.getActivities( dumpedPerson.getSelectedPlan() , EmptyStageActivityTypes.INSTANCE );
+			final List<Activity> internalActivities = TripStructureUtils.getActivities( internalPerson.getSelectedPlan() , StageActivityHandling.StagesAsNormalActivities );
+			final List<Activity> reprojectedActivities = TripStructureUtils.getActivities( dumpedPerson.getSelectedPlan() , StageActivityHandling.StagesAsNormalActivities );
 
 			Assert.assertEquals(
 					"unexpected number of activities in reprojected plan",
@@ -398,8 +398,8 @@ public class PopulationReprojectionIOIT {
 	private void assertPlanCorrectlyTransformed(
 			final Plan originalPlan,
 			final Plan reprojectedPlan) {
-		final List<Activity> originalActivities = TripStructureUtils.getActivities( originalPlan , EmptyStageActivityTypes.INSTANCE );
-		final List<Activity> reprojectedActivities = TripStructureUtils.getActivities( reprojectedPlan , EmptyStageActivityTypes.INSTANCE );
+		final List<Activity> originalActivities = TripStructureUtils.getActivities( originalPlan , StageActivityHandling.StagesAsNormalActivities );
+		final List<Activity> reprojectedActivities = TripStructureUtils.getActivities( reprojectedPlan , StageActivityHandling.StagesAsNormalActivities );
 
 		Assert.assertEquals(
 				"unexpected number of activities in reprojected plan",

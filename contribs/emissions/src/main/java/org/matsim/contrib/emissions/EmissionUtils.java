@@ -25,8 +25,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -40,6 +44,9 @@ import java.util.stream.Stream;
 public final class EmissionUtils {
 	private static final Logger logger = Logger.getLogger(EmissionUtils.class);
 
+	private static final String HBEFA_VEHICLE_DESCRIPTION = "hbefaVehicleTypeDescription";
+	private enum EmissionSpecificationMarker {BEGIN_EMISSIONS , END_EMISSIONS }
+
 	static Map<String, Integer> createIndexFromKey(String strLine) {
 		String[] keys = strLine.split(";");
 
@@ -52,13 +59,13 @@ public final class EmissionUtils {
 
 	private static final String HBEFA_ROAD_TYPE = "hbefa_road_type";
 
-	public static void setHbefaRoadType(Link link, String type) {
+	/*package-private*/ static void setHbefaRoadType(Link link, String type) {
 		if (type != null) {
 			link.getAttributes().putAttribute(HBEFA_ROAD_TYPE, type);
 		}
 	}
 
-	public static String getHbefaRoadType(Link link) {
+	/*package-private*/ static String getHbefaRoadType(Link link) {
 		return (String) link.getAttributes().getAttribute(HBEFA_ROAD_TYPE);
 	}
 
@@ -171,39 +178,41 @@ public final class EmissionUtils {
 	}
 
 
-	public static void setHbefaVehicleDescription(final VehicleType vt, final String hbefaVehicleDescription) {
+	public static void setHbefaVehicleDescription( final VehicleType vehicleType, final String hbefaVehicleDescription ) {
 		// yyyy maybe this should use the vehicle information tuple (see below)?
 		// yyyy replace this by using Attributes.  kai, oct'18
-		vt.setDescription((vt.getDescription() == null ? "" : vt.getDescription() + " ") +
-				EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() +
-				hbefaVehicleDescription +
-				EmissionSpecificationMarker.END_EMISSIONS.toString());
+
+//		vehicleType.getAttributes().putAttribute( HBEFA_VEHICLE_DESCRIPTION, hbefaVehicleDescription ) ;
+
+		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> result = convertVehicleDescription2VehicleInformationTuple( vehicleType );
+
+		EngineInformation engineInformation = vehicleType.getEngineInformation();
+		VehicleUtils.setHbefaEmissionsConcept( engineInformation, result.getSecond().getHbefaEmConcept() );
+		VehicleUtils.setHbefaSizeClass( engineInformation, result.getSecond().getHbefaSizeClass() );
+		VehicleUtils.setHbefaTechnology( engineInformation, result.getSecond().getHbefaTechnology() );
+		VehicleUtils.setHbefaVehicleCategory( engineInformation, result.getFirst().name() );
 	}
 
-	static Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleDescription2VehicleInformationTuple(String vehicleDescription) {
+	static Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> convertVehicleDescription2VehicleInformationTuple( VehicleType vehicleType ) {
 		// yyyy what is the advantage of having this as a tuple over just using a class with four entries?  kai, oct'18
 
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple;
-		HbefaVehicleCategory hbefaVehicleCategory = null;
 
-		// yyyy replace this by using Attributes.  kai, oct'18
-		int startIndex = vehicleDescription.indexOf(EmissionSpecificationMarker.BEGIN_EMISSIONS.toString()) + EmissionSpecificationMarker.BEGIN_EMISSIONS.toString().length();
-		int endIndex = vehicleDescription.lastIndexOf(EmissionSpecificationMarker.END_EMISSIONS.toString());
-
-		String[] vehicleInformationArray = vehicleDescription.substring(startIndex, endIndex).split(";");
-
-		for (HbefaVehicleCategory vehCat : HbefaVehicleCategory.values()) {
-			if (vehCat.toString().equals(vehicleInformationArray[0])) {
-				hbefaVehicleCategory = vehCat;
-			}
-		}
+		Gbl.assertNotNull(vehicleType);
+		Gbl.assertNotNull(vehicleType.getEngineInformation());
+		logger.info(vehicleType.getEngineInformation().getAttributes().toString());
+		Gbl.assertNotNull(VehicleUtils.getHbefaVehicleCategory( vehicleType.getEngineInformation() ));
+		HbefaVehicleCategory hbefaVehicleCategory = HbefaVehicleCategory.valueOf( VehicleUtils.getHbefaVehicleCategory( vehicleType.getEngineInformation() ) ) ;
 
 		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
-		if (vehicleInformationArray.length == 4) {
-			hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationArray[1]);
-			hbefaVehicleAttributes.setHbefaSizeClass(vehicleInformationArray[2]);
-			hbefaVehicleAttributes.setHbefaEmConcept(vehicleInformationArray[3]);
-		} // else interpretation as "average vehicle"
+
+		final String hbefaTechnology = VehicleUtils.getHbefaTechnology( vehicleType.getEngineInformation() );
+		if ( hbefaTechnology!=null ){
+			hbefaVehicleAttributes.setHbefaTechnology( hbefaTechnology );
+			hbefaVehicleAttributes.setHbefaSizeClass( VehicleUtils.getHbefaSizeClass( vehicleType.getEngineInformation() ) );
+			hbefaVehicleAttributes.setHbefaEmConcept( VehicleUtils.getHbefaEmissionsConcept( vehicleType.getEngineInformation() ) );
+		}
+		// yyyy we are as of now not catching the case where the information is not there. kai/kai, sep'19
 
 		vehicleInformationTuple = new Tuple<>(hbefaVehicleCategory, hbefaVehicleAttributes);
 		return vehicleInformationTuple;
@@ -224,7 +233,97 @@ public final class EmissionUtils {
 			table.get(roadVehicleCategoryKey).put(hbefaTrafficSituation, speed);
 		});
 
-
 		return table;
+	}
+
+	/*package-private*/ static String getHbefaVehicleDescription(VehicleType vehicleType, EmissionsConfigGroup emissionsConfigGroup){
+		if( vehicleType == null ){
+			throw new RuntimeException( "vehicleType is null; not possible for emissions contrib." );
+		}
+
+		EngineInformation engineInformation;
+		// get information from where it used to be in previous versions and move to where it should be now:
+		logger.debug("found following hbefaDescriptionSource in emissionsConfigGroup ... " + emissionsConfigGroup.getHbefaVehicleDescriptionSource());
+		switch( emissionsConfigGroup.getHbefaVehicleDescriptionSource() ) {
+			case usingVehicleTypeId:
+				// (v1, hbefa vehicle description is in vehicle type id.  Copy to where it is expected now)
+
+				//VehicleTypeId can contain ; to provide more specific information, e.g. for HbefaTechnology, HbefaSizeClass, HbefaEmissionsConcept
+				if (vehicleType.getId().toString().contains(";")) {
+					String[] vehicleInformationArray = vehicleType.getId().toString().split(";");
+
+					engineInformation = vehicleType.getEngineInformation();
+					VehicleUtils.setHbefaVehicleCategory(engineInformation, vehicleInformationArray[0]);
+
+					if (vehicleInformationArray.length == 4) {
+						VehicleUtils.setHbefaTechnology(engineInformation, vehicleInformationArray[1]);
+						VehicleUtils.setHbefaSizeClass(engineInformation, vehicleInformationArray[2]);
+						VehicleUtils.setHbefaEmissionsConcept(engineInformation, vehicleInformationArray[3]);
+					}
+				} else {
+					//VehicleTypeId contains only the hbefaVehicleCategory
+					VehicleUtils.setHbefaVehicleCategory(vehicleType.getEngineInformation(), vehicleType.getId().toString());
+				}
+
+				break;
+			case fromVehicleTypeDescription:
+
+				if ( VehicleUtils.getHbefaTechnology( vehicleType.getEngineInformation() ) != null ) {
+					// information has already been moved to correct location
+					break ;
+					// yy Note: If the information is already at the new location (as engine attributes), then the following code will silently take
+					// it from there, and not complain that the config setting says it should be in the "description".  kai/kai, sep'19
+				}
+
+				// v2, hbefa vehicle description is in vehicle type description.  Move to where it is expected now:
+
+				// copy to new location:
+				if( vehicleType.getDescription() == null ){
+					throw new RuntimeException( "vehicleType.getDescription() is null; not possible for selected config setting" );
+				}
+				int startIndex = vehicleType.getDescription().indexOf( EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() ) + EmissionSpecificationMarker.BEGIN_EMISSIONS.toString().length();
+				int endIndex = vehicleType.getDescription().lastIndexOf( EmissionSpecificationMarker.END_EMISSIONS.toString() );
+				final String substring = vehicleType.getDescription().substring( startIndex, endIndex );
+
+				String[] vehicleInformationArray = substring.split( ";" ) ;
+
+				engineInformation = vehicleType.getEngineInformation();
+				VehicleUtils.setHbefaVehicleCategory( engineInformation, vehicleInformationArray[0] );
+
+				if ( vehicleInformationArray.length==4 ){
+					VehicleUtils.setHbefaTechnology( engineInformation, vehicleInformationArray[1] );
+					VehicleUtils.setHbefaSizeClass( engineInformation, vehicleInformationArray[2] );
+					VehicleUtils.setHbefaEmissionsConcept( engineInformation, vehicleInformationArray[3] );
+				}
+
+				// delete at old location:
+				String oldString = EmissionSpecificationMarker.BEGIN_EMISSIONS.toString() + substring + EmissionSpecificationMarker.END_EMISSIONS.toString();
+				String result2 = vehicleType.getDescription().replace( oldString, "" );
+				vehicleType.setDescription( result2 ) ;
+
+				break;
+			case asEngineInformationAttributes:
+				// v3, info is already where it should be
+				break;
+			default:
+				throw new IllegalStateException( "Unexpected value: " + emissionsConfigGroup.getHbefaVehicleDescriptionSource() );
+		}
+
+		// return information from where it should be:
+		return getHbefaVehicleDescription( vehicleType ) ;
+	}
+
+	public static String getHbefaVehicleDescription(VehicleType vehicleType) {
+		// not yet clear if this can be public (without access to config). kai/kai, sep'19
+		EngineInformation engineInfo = vehicleType.getEngineInformation();;
+		StringBuffer strb = new StringBuffer();
+		strb.append( VehicleUtils.getHbefaVehicleCategory( engineInfo ) ) ;
+		strb.append( ";" ) ;
+		strb.append( VehicleUtils.getHbefaTechnology( engineInfo ) ) ;
+		strb.append( ";" ) ;
+		strb.append( VehicleUtils.getHbefaSizeClass( engineInfo ) ) ;
+		strb.append( ";" ) ;
+		strb.append( VehicleUtils.getHbefaEmissionsConcept( engineInfo ) );
+		return strb.toString() ;
 	}
 }

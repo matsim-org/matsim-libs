@@ -42,7 +42,6 @@ import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -58,7 +57,7 @@ import com.google.inject.name.Named;
  * @author Kai Nagel
  */
 public class DrtRoutingModule implements RoutingModule {
-	private static final Logger LOGGER = Logger.getLogger(DrtRoutingModule.class);
+	private static final Logger LOGGER = Logger.getLogger( DrtRoutingModule.class );
 
 	private final DrtConfigGroup drtCfg;
 	private final Network network;
@@ -160,11 +159,6 @@ public class DrtRoutingModule implements RoutingModule {
 		}
 
 		return result;
-	}
-
-	@Override
-	public StageActivityTypes getStageActivityTypes() {
-		return drtStageActivityType;
 	}
 
 	/**

@@ -5,6 +5,7 @@ import java.util.*;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.Vehicle;
@@ -120,5 +121,21 @@ public class CarrierPlanXmlWriterV2Test extends MatsimTestCase{
 //		log.error("Vehicle with Id does not exists", new IllegalStateException("vehicle with id " + vehicleId + " is missing"));
 //		return null;
 //	}
+
+	@Test
+	public void test_CarrierHasAttributes(){
+		assertEquals((TransportMode.drt),CarrierUtils.getCarrierMode(testCarrier));
+		assertEquals(50,CarrierUtils.getJspritIterations(testCarrier));
+	}
+
+	@Test
+	public void test_ServicesAndShipmentsHaveAttributes(){
+		Object serviceCustomerAtt = testCarrier.getServices().get(Id.create("serv1",CarrierService.class)).getAttributes().getAttribute("customer");
+		assertNotNull(serviceCustomerAtt);
+		assertEquals("someRandomCustomer", (String) serviceCustomerAtt);
+		Object shipmentCustomerAtt = testCarrier.getShipments().get(Id.create("s1",CarrierShipment.class)).getAttributes().getAttribute("customer");
+		assertNotNull(shipmentCustomerAtt);
+		assertEquals("someRandomCustomer", (String) shipmentCustomerAtt);
+	}
 
 }

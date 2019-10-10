@@ -47,7 +47,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -79,7 +78,6 @@ ShutdownListener {
 	Map<String,Map<Integer,Double>> modeHistories = new HashMap<>() ;
 	private int minIteration = 0;
 	private final Provider<TripRouter> tripRouterFactory;
-	private StageActivityTypes stageActivities;
 	private MainModeIdentifier mainModeIdentifier;
 	private Map<String,Double> modeCnt = new TreeMap<>() ;
 	
@@ -113,7 +111,6 @@ ShutdownListener {
 	public void notifyStartup(final StartupEvent event) {
 		this.minIteration = controlerConfigGroup.getFirstIteration();
 		TripRouter tripRouter = tripRouterFactory.get();
-		this.stageActivities = tripRouter.getStageActivityTypes() ;
 		this.mainModeIdentifier = tripRouter.getMainModeIdentifier() ;
 	}
 
@@ -125,7 +122,7 @@ ShutdownListener {
 	private void collectModeShareInfo(final IterationEndsEvent event) {
 		for (Person person : this.population.getPersons().values()) {
 			Plan plan = person.getSelectedPlan() ;
-			List<Trip> trips = TripStructureUtils.getTrips(plan, stageActivities) ;
+			List<Trip> trips = TripStructureUtils.getTrips(plan) ;
 			for ( Trip trip : trips ) {
 				String mode = this.mainModeIdentifier.identifyMainMode( trip.getTripElements() ) ;
 				// yy as stated elsewhere, the "computer science" mode identification may not be the same as the "transport planning" 
