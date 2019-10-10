@@ -1,4 +1,4 @@
-package org.matsim.contrib.freight.utils;
+package org.matsim.contrib.freight.mobsim;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
@@ -56,7 +56,7 @@ public class Visualiser {
 		FreightConfigGroup freightConfig = new FreightConfigGroup();
 		freightConfig.setPhysicallyEnforceTimeWindowBeginnings(true);
 
-		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker, freightConfig);
+		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker);
 
 		Mobsim mobsim = mobsimFactory.get();
 		
@@ -85,7 +85,7 @@ public class Visualiser {
 		FreightConfigGroup freightConfig = new FreightConfigGroup();
 		freightConfig.setPhysicallyEnforceTimeWindowBeginnings(true);
 
-		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker, freightConfig);
+		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker);
 
 		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
 		Mobsim mobsim = mobsimFactory.get();
