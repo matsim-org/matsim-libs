@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -16,6 +17,8 @@ import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.utils.objectattributes.AttributeConverter;
+import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 import org.matsim.vehicles.VehicleType;
 
 /**
@@ -34,6 +37,9 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 	
 	private Map<CarrierService, Id<CarrierService>> serviceMap = new HashMap<>();
 
+	private final AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
+
+
 	/**
 	 * Constructs the writer with the carriers to be written.
 	 * 
@@ -42,6 +48,11 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 	public CarrierPlanXmlWriterV2(Carriers carriers) {
 		super();
 		this.carriers = carriers.getCarriers().values();
+	}
+
+	@Inject
+	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
+		attributesWriter.putAttributeConverters( converters );
 	}
 
 	/**
@@ -80,6 +91,7 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 	private void startCarrier(Carrier carrier, BufferedWriter writer)
 			throws IOException {
 		writer.write("\t\t<carrier id=\"" + carrier.getId() + "\">\n");
+		attributesWriter.writeAttributes("\t\t\t", writer, carrier.getAttributes());
 	}
 
 	private void writeVehiclesAndTheirTypes(Carrier carrier, BufferedWriter writer)throws IOException {
@@ -135,7 +147,14 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 			writer.write("pickupServiceTime=\""
 					+ getTime(s.getPickupServiceTime()) + "\" ");
 			writer.write("deliveryServiceTime=\""
-					+ getTime(s.getDeliveryServiceTime()) + "\"/>\n");
+					+ getTime(s.getDeliveryServiceTime()));
+			if (s.getAttributes().isEmpty()){
+				writer.write("\"/>\n");
+			} else {
+				writer.write("\">\n");
+				this.attributesWriter.writeAttributes("\t\t\t\t\t", writer, s.getAttributes());
+				writer.write("\t\t\t\t</shipment>\n");
+			}
 		}
 		writer.write("\t\t\t</shipments>\n\n");
 	}
@@ -152,7 +171,15 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 			writer.write("capacityDemand=\"" + s.getCapacityDemand() + "\" "); 
 			writer.write("earliestStart=\"" + getTime(s.getServiceStartTimeWindow().getStart()) + "\" ");
 			writer.write("latestEnd=\"" + getTime(s.getServiceStartTimeWindow().getEnd()) + "\" ");
-			writer.write("serviceDuration=\"" + getTime(s.getServiceDuration()) + "\"/>\n");
+			writer.write("serviceDuration=\"" + getTime(s.getServiceDuration()));
+			if (s.getAttributes().isEmpty()){
+				writer.write("\"/>\n");
+			} else {
+				writer.write("\">\n");
+				this.attributesWriter.writeAttributes("\t\t\t\t\t", writer, s.getAttributes());
+				writer.write("\t\t\t\t</service>\n");
+			}
+
 		}
 		writer.write("\t\t\t</services>\n\n");
 		
