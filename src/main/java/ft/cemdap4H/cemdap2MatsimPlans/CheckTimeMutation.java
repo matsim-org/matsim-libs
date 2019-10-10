@@ -28,13 +28,8 @@ import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.algorithms.TripPlanMutateTimeAllocation;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.StreamingPopulationWriter;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.PtConstants;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Random;
 
 /**
@@ -42,41 +37,43 @@ import java.util.Random;
  */
 public class CheckTimeMutation {
 
-    public static void main(String[] args) {
+	public static void main(String[] args) {
 
-        Collection<String> stages = new ArrayList<String>();
-        stages.add(PtConstants.TRANSIT_ACTIVITY_TYPE);
-        StageActivityTypes blackList = new StageActivityTypesImpl(stages);
+//		Collection<String> stages = new ArrayList<String>();
+//		stages.add(PtConstants.TRANSIT_ACTIVITY_TYPE);
+//		StageActivityTypes blackList = new StageActivityTypesImpl(stages);
 
-        long nr = 1896;
-        Random r = MatsimRandom.getRandom();
-        r.setSeed(nr);
 
-        TripPlanMutateTimeAllocation TripPlanMutator = new TripPlanMutateTimeAllocation(blackList, 7200,
-                true, r);
+		long nr = 1896;
+		Random r = MatsimRandom.getRandom();
+		r.setSeed(nr);
 
-        // Create a Scenario
-        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        // Fill this Scenario with a population.
-        new PopulationReader(scenario).readFile("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw251.1.0\\vw251.1.0.output_plans.xml.gz");
-        String modifiedPop_Path = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw251.1.0\\vw251.1.0.output_plans_endFix.xml.gz";
-        StreamingPopulationWriter modifiedPop = new StreamingPopulationWriter();
-        modifiedPop.startStreaming(modifiedPop_Path);
+        //since PtConstants.TRANSIT_ACTIVITY_TYPE ends on 'interaction', TripPlanMutateTimeAllocation still acounts for this stageActivityType
+        TripPlanMutateTimeAllocation TripPlanMutator = new TripPlanMutateTimeAllocation(7200,
+				true, r);
 
-        for (Person person : scenario.getPopulation().getPersons().values()) {
-            PersonUtils.removeUnselectedPlans(person);
-            //TimeMutate each plan 100 times
+		// Create a Scenario
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		// Fill this Scenario with a population.
+		new PopulationReader(scenario).readFile("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw251.1.0\\vw251.1.0.output_plans.xml.gz");
+		String modifiedPop_Path = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw251.1.0\\vw251.1.0.output_plans_endFix.xml.gz";
+		StreamingPopulationWriter modifiedPop = new StreamingPopulationWriter();
+		modifiedPop.startStreaming(modifiedPop_Path);
+
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			PersonUtils.removeUnselectedPlans(person);
+			//TimeMutate each plan 100 times
 //			for (int i = 0; i < 100; i++) {
 //				
 //			}
-
-            for (Plan plan : person.getPlans()) {
-
-                TripPlanMutator.run(plan);
+			
+			for (Plan plan : person.getPlans()) {
+			
+			TripPlanMutator.run(plan);
             }
 
             //Check time consistency between end times of activities
-            double now = 0;
+			double now = 0;
 
 //			for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
 //				if (pe instanceof Activity) {
@@ -96,10 +93,10 @@ public class CheckTimeMutation {
 //
 //			}
 
-            modifiedPop.writePerson(person);
-        }
+			modifiedPop.writePerson(person);
+		}
 
-        modifiedPop.closeStreaming();
+		modifiedPop.closeStreaming();
 
-    }
+	}
 }

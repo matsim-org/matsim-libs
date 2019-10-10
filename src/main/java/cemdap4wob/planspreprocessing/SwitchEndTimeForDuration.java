@@ -39,7 +39,7 @@ public class SwitchEndTimeForDuration {
         String inputFile = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\input\\finishedPlans.xml.gz";
         String outputFile = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\input\\finishedPlans_1.0_timeFIX.xml.gz";
         final int[] i = {0, 0};
-        TripsToLegsAlgorithm tripsToLegsAlgorithm = new TripsToLegsAlgorithm(activityType -> activityType.endsWith("interaction"), new MainModeIdentifierImpl());
+        TripsToLegsAlgorithm tripsToLegsAlgorithm = new TripsToLegsAlgorithm(new MainModeIdentifierImpl());
 
         StreamingPopulationReader spr = new StreamingPopulationReader(ScenarioUtils.createScenario(ConfigUtils.createConfig()));
         StreamingPopulationWriter spw = new StreamingPopulationWriter();
