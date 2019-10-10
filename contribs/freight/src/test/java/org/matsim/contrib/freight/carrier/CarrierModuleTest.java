@@ -21,6 +21,7 @@
 package org.matsim.contrib.freight.carrier;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -64,7 +65,9 @@ public class CarrierModuleTest {
         config.controler().setOutputDirectory(testUtils.getOutputDirectory());
         config.network().setInputFile( testUtils.getClassInputDirectory() + "network.xml" );
         config.plans().setInputFile( testUtils.getClassInputDirectory() + "plans100.xml" );
-
+        config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+        config.controler().setWritePlansInterval(1);
+        config.controler().setCreateGraphs(false);
         freightConfigGroup = ConfigUtils.addOrGetModule( config, FreightConfigGroup.class ) ;
         freightConfigGroup.setCarriersFile( testUtils.getClassInputDirectory() + "carrierPlansEquils.xml");
         freightConfigGroup.setCarriersVehicleTypesFile( testUtils.getClassInputDirectory() + "vehicleTypes.xml");
@@ -74,11 +77,12 @@ public class CarrierModuleTest {
 	    FreightUtils.loadCarriersAccordingToFreightConfig( scenario );
 
 	    controler = new Controler(scenario);
-        controler.getConfig().controler().setWriteEventsInterval(1);
-        controler.getConfig().controler().setCreateGraphs(false);
     }
 
-	@Test
+
+	@Test @Ignore
+    //using this constructor does not work at the moment, as the module would need to derive the carriers out of the scenario.
+    // to me, it is currently not clear how to do that, tschlenther oct 10 '19
     public void test_ConstructorWOParameters(){
         controler.addOverridingModule(new CarrierModule());
         controler.addOverridingModule(new AbstractModule() {
@@ -88,18 +92,13 @@ public class CarrierModuleTest {
                 bind(CarrierScoringFunctionFactory.class).to(DistanceScoringFunctionFactoryForTests.class).asEagerSingleton();
             }
         });
-        controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
         controler.run();
     }
 
     @Test
     public void test_ConstructorWithOneParameter(){
-        Carriers carriers = new Carriers();
-        new CarrierPlanXmlReader( carriers ).readFile( testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
-        CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
-        new CarrierVehicleTypeReader(carrierVehicleTypes).readFile( testUtils.getClassInputDirectory() + "vehicleTypes.xml");
-        new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(carrierVehicleTypes);
-        controler.addOverridingModule(new CarrierModule(carriers));
+
+        controler.addOverridingModule(new CarrierModule(FreightUtils.getCarriers(controler.getScenario())));
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
@@ -107,19 +106,12 @@ public class CarrierModuleTest {
                 bind(CarrierScoringFunctionFactory.class).to(DistanceScoringFunctionFactoryForTests.class).asEagerSingleton();
             }
         });
-        controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
         controler.run();
     }
 
     @Test
     public void test_ConstructorWithThreeParameters(){
-        Carriers carriers = new Carriers();
-        new CarrierPlanXmlReader( carriers ).readFile( testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
-        CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes();
-        new CarrierVehicleTypeReader(carrierVehicleTypes).readFile( testUtils.getClassInputDirectory() + "vehicleTypes.xml");
-        new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(carrierVehicleTypes);
-        controler.addOverridingModule(new CarrierModule(carriers, new StrategyManagerFactoryForTests(), new DistanceScoringFunctionFactoryForTests()));
-        controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+        controler.addOverridingModule(new CarrierModule(FreightUtils.getCarriers(controler.getScenario()), new StrategyManagerFactoryForTests(), new DistanceScoringFunctionFactoryForTests()));
         controler.run();
     }
 

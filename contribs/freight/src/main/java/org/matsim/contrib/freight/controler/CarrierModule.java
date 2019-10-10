@@ -32,8 +32,10 @@ import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
 import org.matsim.contrib.freight.mobsim.FreightQSimFactory;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
+import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 
@@ -41,12 +43,12 @@ public class CarrierModule extends AbstractModule {
 
     private FreightConfigGroup freightConfig;
 
-    private Carriers carriers = null;
+    private Carriers carriers;
     private CarrierPlanStrategyManagerFactory strategyManagerFactory;
     private CarrierScoringFunctionFactory scoringFunctionFactory;
 
-
     public CarrierModule() {
+
     }
 
     /**
@@ -70,6 +72,7 @@ public class CarrierModule extends AbstractModule {
 
         bind(Carriers.class).toInstance(carriers);
         // yyyy try to replace by FreightUtils.getCarriers(scenario)
+        // i am not sure how to retrieve scenario (or controler respectively).. tschlenther oct 10 '19
 
         if (strategyManagerFactory != null) {
             bind(CarrierPlanStrategyManagerFactory.class).toInstance(strategyManagerFactory);
