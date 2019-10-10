@@ -26,18 +26,6 @@
         <!-- Defines all the modes available, including chain-based modes, seperated by commas -->
         <param name="modes" value="car,pt"/>
     </module>
-    <module name="commercialTraffic">
-        <!-- Buffer travel time factor for the first leg of a freight tour. -->
-        <param name="firstLegBufferFactor" value="1.5"/>
-        <!-- Score for On time delivery. -->
-        <param name="maxDeliveryScore" value="6.0"/>
-        <!-- Minimum score for delayed deliveries. -->
-        <param name="minDeliveryScore" value="-6.0"/>
-		<!-- Defines whether JSprit is run. If this is set to true, ChangeDeliveryOperator strategy must not be switched on and all carriers need to have at least one plan containing at least one tour. -->
-		<param name="runTourPlanning" value="true" />
-        <!-- Delay (in seconds) that marks the threshold for zero utility -->
-        <param name="zeroUtilityDelay" value="1800.0"/>
-    </module>
     <module name="controler">
         <!-- Sets whether graphs showing some analyses should automatically be generated during the simulation. The generation of graphs usually takes a small amount of time that does not have any weight in big simulations, but add a significant overhead in smaller runs or in test cases where the graphical output is not even requested. -->
         <param name="createGraphs" value="true"/>
