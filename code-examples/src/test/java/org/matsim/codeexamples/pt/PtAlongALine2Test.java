@@ -311,7 +311,7 @@ public class PtAlongALine2Test{
 		}
 
 		// This will start otfvis.  Comment out if not needed.
-//		controler.addOverridingModule( new OTFVisLiveModule() );
+		controler.addOverridingModule( new OTFVisLiveModule() );
 
 		controler.run();
 		
@@ -331,7 +331,8 @@ public class PtAlongALine2Test{
 		 * route at all including a pt leg, it returned instead a direct walk).
 		 * 
 		 */
-		
+		List<PlanElement> pes = controler.getScenario().getPopulation().getPersons().get(Id.createPersonId("Case2.3Agent")).getSelectedPlan().getPlanElements();
+		Leg accessLeg = (Leg) pes.get(1);
 	}
 
 	@Test
