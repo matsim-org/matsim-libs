@@ -23,12 +23,11 @@ package org.matsim.analysis;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.jfree.chart.axis.CategoryLabelPositions;
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.charts.StackedBarChart;
 
@@ -63,7 +62,7 @@ public class PKMbyModeCalculator {
         this.controlerIO = controlerIO;
     }
 
-    void addIteration(int iteration, Map<Id<Person>, Plan> map) {
+    void addIteration(int iteration, IdMap<Person, Plan> map) {
         Map<String,Double> pmtbyMode = map.values()
                 .parallelStream()
                 .flatMap(plan -> plan.getPlanElements().stream())

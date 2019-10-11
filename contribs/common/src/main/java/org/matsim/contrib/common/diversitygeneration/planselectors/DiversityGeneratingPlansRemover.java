@@ -25,14 +25,12 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.selectors.AbstractPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.pt.PtConstants;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 
 import javax.inject.Inject;
 import java.util.HashMap;
@@ -76,7 +74,6 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 		private double sameRoutePenalty = 0.3;
 		private double sameModePenalty = 0.3;
 
-		private StageActivityTypes stageActivities ;
 		private Network network;
 
 		@Inject final void setNetwork(Network network) {
@@ -105,7 +102,6 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 		}
 		@Inject final void setTripRouter( TripRouter val ) {
 			// (not user settable)
-			stageActivities = val.getStageActivityTypes() ;
 		}
 		@Override
 		public final DiversityGeneratingPlansRemover get() {
@@ -115,22 +111,20 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 					this.locationWeight,
 					this.actTimeParameter,
 					this.sameRoutePenalty,
-					this.sameModePenalty,
-					this.stageActivities);
+					this.sameModePenalty);
 		}
 	}
 
 	private DiversityGeneratingPlansRemover(Network network,
 			double actTypeWeight, double locationWeight,
 			double actTimeParameter, double sameRoutePenalty,
-			double sameModePenalty, StageActivityTypes stageActivities) {
+			double sameModePenalty) {
 		this.network = network;
 		this.actTypeWeight = actTypeWeight;
 		this.locationWeight = locationWeight;
 		this.actTimeWeight = actTimeParameter;
 		this.sameRoutePenalty = sameRoutePenalty;
 		this.sameModePenalty = sameModePenalty;
-		this.stageActivities = stageActivities;
 	}
 
 	static private final Logger log = Logger.getLogger(DiversityGeneratingPlansRemover.class);
@@ -143,7 +137,6 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 
 	private final double sameRoutePenalty;
 	private final double sameModePenalty;
-	private final StageActivityTypes stageActivities;
 
 	@Override
 	protected final Map<Plan, Double> calcWeights(List<? extends Plan> plans) {
@@ -236,8 +229,10 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 	/* package-private, for testing */ double similarity( Plan plan1, Plan plan2 ) {
 		double simil = 0. ;
 		{
-			List<Activity> activities1 = TripStructureUtils.getActivities(plan1, stageActivities) ;
-			List<Activity> activities2 = TripStructureUtils.getActivities(plan2, stageActivities) ;
+			// TODO: Is StageActivityHandling.ExcludeStageActivities always right here or should we allow to pass 
+			// the StageActivityHandling setting via get() / constructor?
+			List<Activity> activities1 = TripStructureUtils.getActivities(plan1, StageActivityHandling.ExcludeStageActivities) ;
+			List<Activity> activities2 = TripStructureUtils.getActivities(plan2, StageActivityHandling.ExcludeStageActivities) ;
 			simil += PopulationUtils.calculateSimilarity(activities1, activities2, actTypeWeight, locationWeight, actTimeWeight ) ;
 			if ( Double.isNaN(simil) ) {
 				log.warn("simil is NaN; id: " + plan1.getPerson().getId() ) ;

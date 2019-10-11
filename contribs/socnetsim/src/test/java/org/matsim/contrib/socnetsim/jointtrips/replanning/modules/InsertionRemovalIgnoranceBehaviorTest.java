@@ -29,10 +29,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.contrib.socnetsim.framework.cliques.config.JointTripInsertorConfigGroup;
@@ -72,7 +70,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 
 	@Test
 	public void testRemoverIgnorance() throws Exception {
-		final JointTripRemoverAlgorithm algo = new JointTripRemoverAlgorithm( random , EmptyStageActivityTypes.INSTANCE , new MainModeIdentifierImpl() );
+		final JointTripRemoverAlgorithm algo = new JointTripRemoverAlgorithm( random , new MainModeIdentifierImpl() );
 		
 		JointPlan jointPlan = createPlanWithJointTrips();
 

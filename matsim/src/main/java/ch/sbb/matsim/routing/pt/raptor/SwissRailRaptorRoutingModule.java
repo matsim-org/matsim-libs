@@ -14,8 +14,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -32,8 +30,6 @@ import java.util.List;
  * @author mrieser / SBB
  */
 public class SwissRailRaptorRoutingModule implements RoutingModule {
-
-    private static final StageActivityTypes STAGE_ACT_TYPES = new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE);
 
     private final SwissRailRaptor raptor;
     private final RoutingModule walkRouter;
@@ -95,8 +91,4 @@ public class SwissRailRaptorRoutingModule implements RoutingModule {
         return link.getToNode().getCoord();
     }
 
-    @Override
-    public StageActivityTypes getStageActivityTypes() {
-        return STAGE_ACT_TYPES;
-    }
 }

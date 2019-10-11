@@ -24,14 +24,19 @@
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.IdMap;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.ControlerListenerManager;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.population.PopulationUtils;
 
-import java.util.HashMap;
 import java.util.Map;
 
 class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLegs.LegHandler, EventsToActivities.ActivityHandler {
@@ -42,7 +47,7 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 	@Inject private Population population;
 	@Inject(optional = true) private ScoringFunctionsForPopulation scoringFunctionsForPopulation;
 
-	private final Map<Id<Person>, Plan> agentRecords = new HashMap<>();
+	private final IdMap<Person, Plan> agentRecords = new IdMap<>(Person.class);
 
 	@Inject
 	ExperiencedPlansServiceImpl(ControlerListenerManager controlerListenerManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs) {
@@ -113,7 +118,7 @@ class ExperiencedPlansServiceImpl implements ExperiencedPlansService, EventsToLe
 	}
 
 	@Override
-	public Map<Id<Person>, Plan> getExperiencedPlans() {
+	public IdMap<Person, Plan> getExperiencedPlans() {
 		return this.agentRecords;
 	}
 

@@ -24,7 +24,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -70,7 +69,6 @@ public class ModalDistanceCadytsMultipleDistancesIT {
 			@Override
 			public void install() {
 				bind(DistanceDistribution.class).toInstance(createDistanceDistribution());
-				bind(StageActivityTypes.class).toInstance(type -> type.endsWith(" interaction"));
 			}
 		});
 		controler.addOverridingModule(new ModalDistanceCadytsModule());

@@ -54,7 +54,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -118,7 +118,7 @@ public final class EditTrips {
 	}
 	public Trip findTripAtPlanElement(MobsimAgent agent, PlanElement pe) {
 //		log.debug("plan element to be found=" + pe ) ;
-		List<Trip> trips = TripStructureUtils.getTrips( WithinDayAgentUtils.getModifiablePlan(agent), tripRouter.getStageActivityTypes() ) ;
+		List<Trip> trips = TripStructureUtils.getTrips( WithinDayAgentUtils.getModifiablePlan(agent) ) ;
 		for ( Trip trip : trips ) {
 			for ( PlanElement te : trip.getTripElements() ) {
 //				log.debug("trip element to be compared with=" + te ) ;
@@ -478,7 +478,7 @@ public final class EditTrips {
 		int currPosPlanElements = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
 		Activity nextAct = (Activity) plan.getPlanElements().get(currPosPlanElements + 1);
 
-		if ( tripRouter.getStageActivityTypes().isStageActivity(nextAct.getType()) ) {
+		if ( StageActivityTypeIdentifier.isStageActivity(nextAct.getType()) ) {
 			Trip trip = findCurrentTrip( agent ) ;
 			Facility fromFacility = FacilitiesUtils.toFacility(nextAct, scenario.getActivityFacilities());
 			Facility toFacility = FacilitiesUtils.toFacility(trip.getDestinationActivity(), scenario.getActivityFacilities());
@@ -701,12 +701,8 @@ public final class EditTrips {
 		return replanFutureTrip(trip, plan, mainMode, departureTime, tripRouter, scenario );
 	}
 
-	public StageActivityTypes getStageActivities() {
-		return tripRouter.getStageActivityTypes();
-	}
-
 	public Trip findTripAfterActivity(Plan plan, Activity activity) {
-		return TripStructureUtils.findTripStartingAtActivity(activity, plan, tripRouter.getStageActivityTypes());
+		return TripStructureUtils.findTripStartingAtActivity(activity, plan);
 	}
 
 }

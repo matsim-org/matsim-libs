@@ -64,7 +64,7 @@ public class CarsharingTripModeChoice extends AbstractMultithreadedModule{
 	public PlanAlgorithm getPlanAlgoInstance() {
 		final TripRouter tripRouter = tripRouterProvider.get();
 		ChooseRandomTripMode algo = new ChooseRandomTripMode(this.scenario, this.availableModes,
-				MatsimRandom.getLocalInstance(), tripRouter.getStageActivityTypes(), this.memberships);
+				MatsimRandom.getLocalInstance(), this.memberships);
 		return algo;
 	}
 

@@ -37,14 +37,14 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypeIdentifier;
 
 /**
  * If someone starts with transit_walk leg, and do not use pt before starting a regular act (home/work/leis/shop); it is walk
  * else it is pt mode.
  * @author amit
  */
-public class ModalShareEventHandler implements PersonDepartureEventHandler, TransitDriverStartsEventHandler, ActivityStartEventHandler, PersonStuckEventHandler, StageActivityTypes {
+public class ModalShareEventHandler implements PersonDepartureEventHandler, TransitDriverStartsEventHandler, ActivityStartEventHandler, PersonStuckEventHandler {
 
 	private final SortedMap<String, Integer> mode2numberOflegs = new TreeMap<>();
 	private final List<Id<Person>> transitDriverPersons = new ArrayList<>();
@@ -82,7 +82,7 @@ public class ModalShareEventHandler implements PersonDepartureEventHandler, Tran
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		if( person2Modes.containsKey(event.getPersonId()) ) {
-			if( ! isStageActivity(event.getActType()) ) {
+			if( ! StageActivityTypeIdentifier.isStageActivity(event.getActType()) ) {
 				String legMode = getMainMode(person2Modes.remove(event.getPersonId()));
 				storeMode(legMode);
 			} else { 
@@ -120,11 +120,6 @@ public class ModalShareEventHandler implements PersonDepartureEventHandler, Tran
 			handleRemainingTransitUsers();
 		}
 		return mode2numberOflegs;
-	}
-
-	@Override
-	public boolean isStageActivity(String actType){
-		return actType.endsWith("interaction");
 	}
 
 	private String getMainMode(List<String> modes){

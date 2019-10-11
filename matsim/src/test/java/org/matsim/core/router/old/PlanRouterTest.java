@@ -110,10 +110,6 @@ public class PlanRouterTest {
                   return trip;
               }
 
-              @Override
-              public StageActivityTypes getStageActivityTypes() {
-                  return EmptyStageActivityTypes.INSTANCE;
-              }
           };
         com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
             @Override

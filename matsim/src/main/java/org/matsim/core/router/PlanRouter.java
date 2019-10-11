@@ -83,7 +83,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 
 	@Override
 	public void run(final Plan plan) {
-		final List<Trip> trips = TripStructureUtils.getTrips( plan , tripRouter.getStageActivityTypes() );
+		final List<Trip> trips = TripStructureUtils.getTrips( plan );
 
 		for (Trip oldTrip : trips) {
 			final List<? extends PlanElement> newTrip =
