@@ -99,7 +99,7 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
      * @return travelTimeSliceWidth --{@value #TRAVELTIMESLICEWIDTHDESC}
      */
 //    @StringGetter(TRAVELTIMESLICEWIDTH)
-    int getTravelTimeSliceWidth() {
+    public int getTravelTimeSliceWidth() {
         return travelTimeSliceWidth;
     }
 
