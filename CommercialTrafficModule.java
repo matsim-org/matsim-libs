@@ -54,7 +54,7 @@ public class CommercialTrafficModule extends AbstractModule {
         new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
 
         //bind commercial Traffic stuff
-        bind(CommercialJobScoreCalculator.class).toInstance(new DefaultCommercialServiceScore(ctcg.getMaxDeliveryScore(), ctcg.getMinDeliveryScore(), ctcg.getZeroUtilityDelay()));
+        bind(CommercialJobScoreCalculator.class).toInstance(new DefaultCommercialServiceScore(ctcg.getMaxJobScore(), ctcg.getMinJobScore(), ctcg.getZeroUtilityDelay()));
         bind(Carriers.class).toInstance(carriers);
 
         bind(ScoreCommercialJobs.class).in(Singleton.class);

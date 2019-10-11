@@ -49,7 +49,7 @@ public class CommercialJobUtils {
     static final int COMMERCIALJOB_ATTRIBUTE_START_IDX = 3;
     static final int COMMERCIALJOB_ATTRIBUTE_END_IDX = 4;
 
-    static Set<Activity> getCustomerActivitiesWithJobs(Plan plan) {
+    static Set<Activity> getCustomerActivitiesExpectingJobs(Plan plan) {
         Set<Activity> activitiesWithJob = new HashSet<>();
         plan.getPlanElements().stream()
                 .filter(Activity.class::isInstance)
@@ -147,8 +147,8 @@ public class CommercialJobUtils {
         return propertiesString.substring(0,propertiesString.length() - 1 ); //cut off the last semicolon
     }
 
-    public void addCustomerCommercialJobAttribute(Activity activity, String type, String operator,
-                                                  int amount, double earliestStart, double latestStart, double duration) {
+    public static void addCustomerCommercialJobAttribute(Activity activity, String type, String operator,
+                                                         int amount, double earliestStart, double latestStart, double duration) {
         int commercialJobIndex = getNumberOfJobsForActivity(activity) + 1;
         String jobProperties = type + ";" + operator + ";" + amount + ";" + earliestStart + ";" + latestStart + ";" + duration;
         if (activity.getAttributes().getAsMap().containsKey(COMMERCIALJOB_ATTRIBUTE_NAME + commercialJobIndex)) throw new RuntimeException("");

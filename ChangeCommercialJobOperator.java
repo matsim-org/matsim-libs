@@ -53,7 +53,7 @@ public final class ChangeCommercialJobOperator extends AbstractMultithreadedModu
     public PlanAlgorithm getPlanAlgoInstance() {
         Random random = MatsimRandom.getLocalInstance();
         return plan -> {
-            List<Activity> activitiesWithJobs = new ArrayList<>(CommercialJobUtils.getActivitiesWithJobs(plan));
+            List<Activity> activitiesWithJobs = new ArrayList<>(CommercialJobUtils.getCustomerActivitiesExpectingJobs(plan));
             if (activitiesWithJobs.isEmpty()) {
                 return;
             }
