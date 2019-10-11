@@ -79,7 +79,8 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
         CommercialTrafficConfigGroup ctcg = CommercialTrafficConfigGroup.get(scenario.getConfig());
         this.carriers = carriers;
         this.firsttourTraveltimeBuffer = ctcg.getFirstLegTraveltimeBufferFactor();
-        this.timeSliceWidth = ctcg.getJspritTimeSliceWidth();
+//        this.timeSliceWidth = ConfigUtils.addOrGetModule(scenario.getConfig(), FreightConfigGroup.class).getTravelTimeSliceWidth(); TODO
+        this.timeSliceWidth = 1800;
         this.scenario = scenario;
         this.population = scenario.getPopulation();
         carTT = travelTimes.get(TransportMode.car);

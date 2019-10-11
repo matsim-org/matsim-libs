@@ -22,10 +22,12 @@ package commercialtraffic.commercialJob;/*
  */
 
 import com.google.inject.Singleton;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
 import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.replanning.PlanStrategy;
@@ -46,16 +48,8 @@ public class CommercialTrafficModule extends AbstractModule {
 
         CommercialTrafficConfigGroup ctcg = CommercialTrafficConfigGroup.get(getConfig());
 
-        //read input
-        Carriers carriers = new Carriers();
-        new CarrierPlanXmlReader(carriers).readFile(ctcg.getCarriersFileUrl(getConfig().getContext()).getFile());
-        CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
-        new CarrierVehicleTypeReader(vehicleTypes).readFile(ctcg.getCarriersVehicleTypesFileUrl(getConfig().getContext()).getFile());
-        new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
-
-        //bind commercial Traffic stuff
         bind(CommercialJobScoreCalculator.class).toInstance(new DefaultCommercialServiceScore(ctcg.getMaxJobScore(), ctcg.getMinJobScore(), ctcg.getZeroUtilityDelay()));
-        bind(Carriers.class).toInstance(carriers);
+        bind(Carriers.class).toProvider(new CarrierProvider());
 
         bind(ScoreCommercialJobs.class).in(Singleton.class);
         bind(TourLengthAnalyzer.class).in(Singleton.class);
@@ -81,6 +75,19 @@ public class CommercialTrafficModule extends AbstractModule {
     private void installDRT(){
         install(new MultiModeDrtModule());
         install(new DvrpModule());
+    }
+
+
+    private class CarrierProvider implements com.google.inject.Provider<Carriers> {
+        @com.google.inject.Inject
+        Scenario scenario;
+
+        private CarrierProvider() {
+        }
+
+        public Carriers get() {
+            return FreightUtils.getCarriers(this.scenario);
+        }
     }
 
 }
