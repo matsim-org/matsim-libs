@@ -233,7 +233,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
                 plan.setPerson(driverPerson);
 
                 scenario.getPopulation().addPerson(driverPerson);
-                if (!scenario.getVehicles().getVehicleTypes().containsKey(carrierVehicle.getId()))
+                if (!scenario.getVehicles().getVehicleTypes().containsKey(carrierVehicle.getType().getId()))
                     scenario.getVehicles().addVehicleType(carrierVehicle.getType());
                 Id<Vehicle> vid = Id.createVehicleId(driverPerson.getId());
                 VehicleUtils.insertVehicleIdIntoAttributes(driverPerson,CarrierUtils.getCarrierMode(carrier),vid);
