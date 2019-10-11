@@ -2,6 +2,7 @@ package commercialtraffic.commercialJob;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -12,7 +13,9 @@ public class CommercialTrafficIntegrationTest {
 
     @Test
     public void runCommercialTrafficIT() {
-        Config config = ConfigUtils.loadConfig("input/commercialtrafficIT/config.xml", new CommercialTrafficConfigGroup());
+        Config config = ConfigUtils.loadConfig("input/commercialtrafficIT/config.xml");
+        ConfigUtils.addOrGetModule(config, CommercialTrafficConfigGroup.class);
+        ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new CommercialTrafficModule() );

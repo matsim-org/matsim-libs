@@ -30,12 +30,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
 
-import javax.inject.Inject;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 class CommercialTrafficChecker {
@@ -55,7 +50,7 @@ class CommercialTrafficChecker {
         final MutableBoolean fail = new MutableBoolean(false);
         for (Person p : population.getPersons().values()) {
             for (Plan plan : p.getPlans()) {
-                    for(Activity activity : CommercialJobUtils.getActivitiesWithJobs(plan)) {
+                for (Activity activity : CommercialJobUtils.getCustomerActivitiesExpectingJobs(plan)) {
                         if (checkActivityConsistency(activity, p.getId())) fail.setTrue();
                     }
             }

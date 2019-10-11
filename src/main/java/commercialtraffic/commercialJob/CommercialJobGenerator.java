@@ -116,7 +116,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
 
         population.getPersons().values().forEach(p ->
         {
-            Set<Activity> activitiesWithServices = CommercialJobUtils.getActivitiesWithJobs(p.getSelectedPlan());
+            Set<Activity> activitiesWithServices = CommercialJobUtils.getCustomerActivitiesExpectingJobs(p.getSelectedPlan());
             if(!activitiesWithServices.isEmpty()) customer2ActsWithJobs.put(p,activitiesWithServices);
         });
         for(Person customer : customer2ActsWithJobs.keySet()){
