@@ -46,7 +46,9 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     private static final String RUNJSPRITDESC = "Defines whether JSprit is run. " +
             "If this is set to false, ChangeJobOperator strategy must not be switched on and all carriers need to have at least one plan containing at least one tour.";
     private static final String MAXJOBSCOREDESC = "Score for performing job in time.";
-    private static final String MINJOBSCOREDESC = "Minimum score for delayed commercial jobs.";
+    private static final String MINJOBSCOREDESC = "Minimum score for delayed commercial jobs. " +
+            "Note that if the customer is not served at all, that creates a score of zero. " +
+            "So if this value is set to negative, that means an intensively delayed job is worse than no job.";
     @Positive
     private double maxJobScore = 6;
     private double minJobScore = -6;
