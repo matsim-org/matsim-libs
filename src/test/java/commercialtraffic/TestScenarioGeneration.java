@@ -55,9 +55,18 @@ public class TestScenarioGeneration {
 
     public static Carriers generateCarriers() {
         Carriers carriers = new Carriers();
+
         Carrier italianPizzaPlace = CarrierImpl.newInstance(Id.create("pizza_italian", Carrier.class));
+        CarrierUtils.setCarrierMode(italianPizzaPlace, TransportMode.car);
+        CarrierUtils.setJspritIterations(italianPizzaPlace, 20);
+
         Carrier americanPizzaPlace = CarrierImpl.newInstance(Id.create("pizza_american", Carrier.class));
+        CarrierUtils.setCarrierMode(americanPizzaPlace, TransportMode.car);
+        CarrierUtils.setJspritIterations(americanPizzaPlace, 20);
+
         Carrier shopping_1 = CarrierImpl.newInstance(Id.create("shopping_1", Carrier.class));
+        CarrierUtils.setCarrierMode(shopping_1, TransportMode.car);
+        CarrierUtils.setJspritIterations(shopping_1, 20);
 
         VehicleType type = createLightType();
 
