@@ -49,7 +49,7 @@ public class CommercialJobUtils {
     static final int COMMERCIALJOB_ATTRIBUTE_START_IDX = 3;
     static final int COMMERCIALJOB_ATTRIBUTE_END_IDX = 4;
 
-    static Set<Activity> getActivitiesWithJobs (Plan plan){
+    static Set<Activity> getCustomerActivitiesWithJobs(Plan plan) {
         Set<Activity> activitiesWithJob = new HashSet<>();
         plan.getPlanElements().stream()
                 .filter(Activity.class::isInstance)
@@ -58,8 +58,7 @@ public class CommercialJobUtils {
         return activitiesWithJob;
     }
 
-
-    public static Id<Carrier> getCurrentCarrierForJob(Activity activity, int commercialJobIndex) {
+    static Id<Carrier> getCurrentCarrierForJob(Activity activity, int commercialJobIndex) {
         String[] commercialJobProperties = String.valueOf(getCommercialJob(activity, commercialJobIndex)).split(COMMERCIALJOB_ATTRIBUTE_DELIMITER);
         String id = commercialJobProperties[COMMERCIALJOB_ATTRIBUTE_TYPE_IDX] + CARRIERSPLIT + commercialJobProperties[COMMERCIALJOB_ATTRIBUTE_OPERATOR_IDX];
         return Id.create(id, Carrier.class);
@@ -71,7 +70,7 @@ public class CommercialJobUtils {
         activity.getAttributes().putAttribute(COMMERCIALJOB_ATTRIBUTE_NAME + commercialJobIndex, convertPropertiesArrayToAttributeValue(commercialJobProperties));
     }
 
-    public static String getJobOperator(Activity activity, int commercialJobIndex) {
+    static String getJobOperator(Activity activity, int commercialJobIndex) {
         return String.valueOf(getCommercialJob(activity, commercialJobIndex)).split(COMMERCIALJOB_ATTRIBUTE_DELIMITER)[COMMERCIALJOB_ATTRIBUTE_OPERATOR_IDX];
     }
 
@@ -86,7 +85,7 @@ public class CommercialJobUtils {
                 collect(Collectors.toSet());
     }
 
-    public static Id<Carrier> getCarrierIdFromDriver(Id<Person> personId) {
+    static Id<Carrier> getCarrierIdFromDriver(Id<Person> personId) {
         return Id.create(personId.toString().split(CARRIERSPLIT)[1] + CARRIERSPLIT + personId.toString().split(CARRIERSPLIT)[2], Carrier.class);
     }
 
@@ -146,6 +145,14 @@ public class CommercialJobUtils {
             propertiesString += jobProperty + ";";
         }
         return propertiesString.substring(0,propertiesString.length() - 1 ); //cut off the last semicolon
+    }
+
+    public void addCustomerCommercialJobAttribute(Activity activity, String type, String operator,
+                                                  int amount, double earliestStart, double latestStart, double duration) {
+        int commercialJobIndex = getNumberOfJobsForActivity(activity) + 1;
+        String jobProperties = type + ";" + operator + ";" + amount + ";" + earliestStart + ";" + latestStart + ";" + duration;
+        if (activity.getAttributes().getAsMap().containsKey(COMMERCIALJOB_ATTRIBUTE_NAME + commercialJobIndex)) throw new RuntimeException("");
+        activity.getAttributes().putAttribute(COMMERCIALJOB_ATTRIBUTE_NAME + commercialJobIndex, jobProperties);
     }
 
 }
