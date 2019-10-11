@@ -49,8 +49,7 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
 
     private boolean runTourPlanning = true;
     public  static final String RUNJSPRIT = "runTourPlanning";
-    private static final String RUNJSPRITDESC = "Defines whether JSprit is run. " +
-            "If this is set to false, ChangeDeliveryOperator strategy must not be switched on and all carriers need to have at least one plan containing at least one tour.";
+    public static final String MAXJOBSCORE = "maxJobScore";
     @NotBlank
     private String carriersFile;
     @NotBlank
@@ -63,15 +62,14 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     private double zeroUtilityDelay = 1800;
     public static final String ZEROUTILDELAY = "zeroUtilityDelay";
     private static final String ZEROUTILDELAYDESC = "Delay (in seconds) that marks the threshold for zero utility";
-
+    public static final String MINJOBSCORE = "minJobScore";
+    private static final String RUNJSPRITDESC = "Defines whether JSprit is run. " +
+            "If this is set to false, ChangeJobOperator strategy must not be switched on and all carriers need to have at least one plan containing at least one tour.";
+    private static final String MAXJOBSCOREDESC = "Score for performing job in time.";
+    private static final String MINJOBSCOREDESC = "Minimum score for delayed commercial jobs.";
     @Positive
-    private double maxDeliveryScore = 6;
-    public static final String MAXDELIVERYSCORE = "maxDeliveryScore";
-    private static final String MAXDELIVERYSCOREDESC = "Score for On time delivery.";
-
-    private double minDeliveryScore = -6;
-    public static final String MINDELIVERYSCORE = "minDeliveryScore";
-    private static final String MINDELIVERYSCOREDESC = "Minimum score for delayed deliveries.";
+    private double maxJobScore = 6;
+    private double minJobScore = -6;
 
 
     public static final String GROUP_NAME = "commercialTraffic";
@@ -181,35 +179,35 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     }
 
     /**
-     * @return maxDeliveryScore --{@value #MAXDELIVERYSCOREDESC}
+     * @return maxJobScore --{@value #MAXJOBSCOREDESC}
      */
-//    @StringGetter(MAXDELIVERYSCORE)
-    public double getMaxDeliveryScore() {
-        return maxDeliveryScore;
+//    @StringGetter(MAXJOBSCORE)
+    public double getMaxJobScore() {
+        return maxJobScore;
     }
 
     /**
-     * @param maxDeliveryScore --{@value #MAXDELIVERYSCOREDESC}
+     * @param maxJobScore --{@value #MAXJOBSCOREDESC}
      */
-//    @StringSetter(MAXDELIVERYSCORE)
-    public void setMaxDeliveryScore(double maxDeliveryScore) {
-        this.maxDeliveryScore = maxDeliveryScore;
+//    @StringSetter(MAXJOBSCORE)
+    public void setMaxJobScore(double maxJobScore) {
+        this.maxJobScore = maxJobScore;
     }
 
     /**
-     * @return minDeliveryScore --{@value #MINDELIVERYSCOREDESC}
+     * @return minJobScore --{@value #MINJOBSCOREDESC}
      */
-//    @StringGetter(MINDELIVERYSCORE)
-    public double getMinDeliveryScore() {
-        return minDeliveryScore;
+//    @StringGetter(MINJOBSCORE)
+    public double getMinJobScore() {
+        return minJobScore;
     }
 
     /**
-     * @param minDeliveryScore --{@value #MINDELIVERYSCOREDESC}
+     * @param minJobScore --{@value #MINJOBSCOREDESC}
      */
-//    @StringSetter(MINDELIVERYSCORE)
-    public void setMinDeliveryScore(double minDeliveryScore) {
-        this.minDeliveryScore = minDeliveryScore;
+//    @StringSetter(MINJOBSCORE)
+    public void setMinJobScore(double minJobScore) {
+        this.minJobScore = minJobScore;
     }
 
     @Override
@@ -220,8 +218,8 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
         map.put(FIRSTLEGBUFFER, FIRSTLEGBUFFERDESC);
         map.put(JSPRITTIMESLICEWIDTH, JSPRITTIMESLICEWIDTHDESC);
         map.put(RUNJSPRIT,RUNJSPRITDESC);
-        map.put(MAXDELIVERYSCORE, MAXDELIVERYSCOREDESC);
-        map.put(MINDELIVERYSCORE, MINDELIVERYSCOREDESC);
+        map.put(MAXJOBSCORE, MAXJOBSCOREDESC);
+        map.put(MINJOBSCORE, MINJOBSCOREDESC);
         map.put(ZEROUTILDELAY, ZEROUTILDELAYDESC);
         return map;
     }
@@ -229,8 +227,8 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     @Override
     protected void checkConsistency(Config config) {
         super.checkConsistency(config);
-        if (getMaxDeliveryScore() < getMinDeliveryScore()) {
-            throw new RuntimeException("Minimum Score for delivery is higher than maximum score");
+        if (getMaxJobScore() < getMinJobScore()) {
+            throw new RuntimeException("Minimum Score for commercial jobs is higher than maximum score");
         } //TODO test
         if(!getRunTourPlanning() && config.strategy().getStrategySettings().stream()
                 .anyMatch(strategySettings -> strategySettings.getStrategyName().equals(ChangeCommercialJobOperator.SELECTOR_NAME))) {
