@@ -180,7 +180,7 @@ public class AssignAgentsToMajorWorkplaces {
 	}
 
 	public static boolean planWithSingleWorkPlace(Plan plan) {
-		return countDistinctWorkLocationsPerPlan(plan) == 1;
+        return countDistinctWorkLocationsPerPlan(plan) == 1;
 	}
 
 	public static Coord getParkingCoordWithinDistance(Id<Link> linkId) {
@@ -214,7 +214,7 @@ public class AssignAgentsToMajorWorkplaces {
 		Set<Double> locationSet = new HashSet<Double>();
 
 		List<Activity> activities = TripStructureUtils.getActivities(plan.getPlanElements(),
-				TripStructureUtils.StageActivityHandling.StagesAsNormalActivities);
+                TripStructureUtils.StageActivityHandling.StagesAsNormalActivities);
 
 		for (Activity act : activities) {
 
@@ -233,7 +233,7 @@ public class AssignAgentsToMajorWorkplaces {
 		Coord homeCoord = null;
 
 		List<Activity> activities = TripStructureUtils.getActivities(plan.getPlanElements(),
-				TripStructureUtils.StageActivityHandling.StagesAsNormalActivities);
+                TripStructureUtils.StageActivityHandling.StagesAsNormalActivities);
 
 		for (Activity act : activities) {
 
@@ -251,7 +251,7 @@ public class AssignAgentsToMajorWorkplaces {
 		Coord workCoord = null;
 
 		List<Activity> activities = TripStructureUtils.getActivities(plan.getPlanElements(),
-				TripStructureUtils.StageActivityHandling.StagesAsNormalActivities);
+                TripStructureUtils.StageActivityHandling.StagesAsNormalActivities);
 
 		for (Activity act : activities) {
 
@@ -267,7 +267,7 @@ public class AssignAgentsToMajorWorkplaces {
 	public static int getActWorkIdxInZone(Plan plan, String zoneId) {
 
 		List<Activity> activities = TripStructureUtils.getActivities(plan.getPlanElements(),
-				TripStructureUtils.StageActivityHandling.StagesAsNormalActivities);
+                TripStructureUtils.StageActivityHandling.StagesAsNormalActivities);
 
 		int actIdx = 0;
 		for (Activity act : activities) {
@@ -357,7 +357,7 @@ public class AssignAgentsToMajorWorkplaces {
 				        Id.createLinkId(mapWorkPlaceToLinks.get(workingplace)));
 
 				List<Activity> activities = TripStructureUtils.getActivities(plan.getPlanElements(),
-						TripStructureUtils.StageActivityHandling.StagesAsNormalActivities);
+                        TripStructureUtils.StageActivityHandling.StagesAsNormalActivities);
 
 				int actIdx = getActWorkIdxInZone(plan, mapWorkPlaceToZoneID.get(workingplace));
 

@@ -191,7 +191,7 @@ public class PlanModifierEGrocery {
 
 			PersonUtils.removeUnselectedPlans(person);
 			Plan plan = person.getSelectedPlan();
-			for (Subtour subTour : TripStructureUtils.getSubtours(plan, new HashSet<>(stages))) {
+            for (Subtour subTour : TripStructureUtils.getSubtours(plan, new HashSet<>(stages))) {
 
 				String subtourMode = getSubtourMode(subTour, plan);
 
@@ -267,7 +267,7 @@ public class PlanModifierEGrocery {
 
 				// Loop over all subtours of this agent
 
-				for (Subtour subTour : TripStructureUtils.getSubtours(plan, new HashSet<>(stages))) {
+                for (Subtour subTour : TripStructureUtils.getSubtours(plan, new HashSet<>(stages))) {
 
 					double estimatedTourDistance = getBeelineTourLength(subTour);
 					// Get subtour mode
@@ -287,7 +287,7 @@ public class PlanModifierEGrocery {
 
 						// System.out.println("Trip Size:" + subTour.getTrips().size());
 
-						PlanElement searchPlanElement = subTour.getTrips().get(0).getOriginActivity();
+                        PlanElement searchPlanElement = subTour.getTrips().get(0).getOriginActivity();
 						int planElementToBeModifiedIdx = PopulationUtils.getActLegIndex(plan, searchPlanElement);
 
 						Activity testAct = (Activity) plan.getPlanElements().get(planElementToBeModifiedIdx);
