@@ -15,10 +15,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -45,11 +42,13 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.*;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehiclesFactory;
@@ -57,6 +56,7 @@ import org.matsim.withinday.replanning.identifiers.filter.TransportModeFilter;
 
 import java.util.*;
 
+import static java.util.stream.Collectors.toList;
 import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.*;
 
 public class PtAlongALine2Test{
@@ -251,6 +251,33 @@ public class PtAlongALine2Test{
 
 		Scenario scenario = PtAlongALineTest.createScenario(config , 30 );
 
+		// Add Test Agents to Scenario
+		PopulationFactory pf = scenario.getPopulation().getFactory();
+
+
+		List<ActivityFacility> facilitiesAsList = new ArrayList<>( scenario.getActivityFacilities().getFacilities().values() ) ;
+		List<String> testAgents = Arrays.asList("2-3", "50-51" , "300-301", "550-551", "690-691", "800-801");
+		for (String str : testAgents) {
+			Person testAgent = pf.createPerson( Id.createPersonId("agent" + str ));
+			scenario.getPopulation().addPerson( testAgent );
+			Plan plan = pf.createPlan();
+			testAgent.addPlan( plan );
+
+			Id<ActivityFacility> homeFacilityId = Id.create( str, ActivityFacility.class ) ;
+			Activity home = pf.createActivityFromActivityFacilityId( "dummy", homeFacilityId );
+			home.setEndTime( 7. * 3600. + 1. );
+			plan.addActivity( home );
+
+			Leg leg = pf.createLeg( TransportMode.pt );
+			leg.setDepartureTime( 7. * 3600. );
+			leg.setTravelTime( 1800. );
+			plan.addLeg( leg );
+
+			Activity shop = pf.createActivityFromActivityFacilityId( "dummy", Id.create("999-1000" , ActivityFacility.class));
+			plan.addActivity( shop );
+		}
+
+
 		if ( drtMode==DrtMode.full ) {
 			scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory( DrtRoute.class, new DrtRouteFactory() );
 		}
@@ -311,7 +338,7 @@ public class PtAlongALine2Test{
 		}
 
 		// This will start otfvis.  Comment out if not needed.
-		controler.addOverridingModule( new OTFVisLiveModule() );
+//		controler.addOverridingModule( new OTFVisLiveModule() );
 
 		controler.run();
 		
@@ -331,9 +358,84 @@ public class PtAlongALine2Test{
 		 * route at all including a pt leg, it returned instead a direct walk).
 		 * 
 		 */
-		List<PlanElement> pes = controler.getScenario().getPopulation().getPersons().get(Id.createPersonId("Case2.3Agent")).getSelectedPlan().getPlanElements();
-		Leg accessLeg = (Leg) pes.get(1);
+		for (String agent : testAgents) {
+			System.out.println("\n\n**** AGENT : " + agent);
+			List<PlanElement> pes = controler.getScenario().getPopulation().getPersons().get(Id.createPersonId("agent" + agent )).getSelectedPlan().getPlanElements();
+			pes.stream().filter(s -> s instanceof Leg).forEach(s -> System.out.println(s.toString()));
+		}
+
+		/** Case 1: The agent starts on link 2-3. While the agent is in the drt service area, s/he is so close to the pt
+		 * stop that it doesn't make sense for him/her to use drt as an intermodal access to get the pt. Therefore the
+		 * agent will just walk to the pt stop.
+		 *
+		 * TODO: why does the plan show drt2_walk as access mode? The agent isn't even in the drt2 service area...
+		 */
+
+		List<PlanElement> planFullCase1 = controler.getScenario().getPopulation().getPersons().get(Id.createPersonId("agent" + testAgents.get(0) )).getSelectedPlan().getPlanElements();
+		List<Leg> planLegCase1 = planFullCase1.stream().filter(pe -> pe instanceof Leg).map(pe -> (Leg) pe).collect(toList()) ;
+		Assert.assertTrue("Incorrect Mode, case 1",planLegCase1.get(0).getMode().contains("walk"));
+		Assert.assertTrue("Incorrect Mode, case 1",planLegCase1.get(1).getMode().equals("pt"));
+		Assert.assertTrue("Incorrect Mode, case 1",planLegCase1.get(2).getMode().contains("walk"));
+
+		/**
+		 * Case 2a: Agent starts at Link "50-51". This is within the drt service area. Agent is expected use drt as
+		 * intermodal access to the left pt stop. The plan should be walk -> drt -> walk -> pt -> walk
+		 */
+
+		List<PlanElement> planFullCase2a = controler.getScenario().getPopulation().getPersons().get(Id.createPersonId("agent" + testAgents.get(1) )).getSelectedPlan().getPlanElements();
+		List<Leg> planLegCase2a = planFullCase2a.stream().filter(pe -> pe instanceof Leg).map(pe -> (Leg) pe).collect(toList()) ;
+		Assert.assertTrue("Incorrect Mode, case 2a",planLegCase2a.get(0).getMode().contains("walk"));
+		Assert.assertTrue("Incorrect Mode, case 2a",planLegCase2a.get(1).getMode().contains("drt"));
+		Assert.assertTrue("Incorrect Mode, case 2a",planLegCase2a.get(2).getMode().contains("walk"));
+		Assert.assertTrue("Incorrect Mode, case 2a",planLegCase2a.get(3).getMode().equals("pt"));
+		Assert.assertTrue("Incorrect Mode, case 2a",planLegCase2a.get(4).getMode().contains("walk"));
+
+		/**
+		 * Case 2b: Agent starts at Link "300-301". This is within the drt service area. Agent is expected use drt as
+		 * intermodal access to the middle pt stop. The plan should be walk -> drt -> walk -> pt -> walk
+		 */
+		List<PlanElement> planFullCase2b = controler.getScenario().getPopulation().getPersons().get(Id.createPersonId("agent" + testAgents.get(2) )).getSelectedPlan().getPlanElements();
+		List<Leg> planLegCase2b = planFullCase2b.stream().filter(pe -> pe instanceof Leg).map(pe -> (Leg) pe).collect(toList()) ;
+		Assert.assertTrue("Incorrect Mode, case 2b",planLegCase2b.get(0).getMode().contains("walk"));
+		Assert.assertTrue("Incorrect Mode, case 2b",planLegCase2b.get(1).getMode().equals("drt"));
+		Assert.assertTrue("Incorrect Mode, case 2b",planLegCase2b.get(2).getMode().contains("walk"));
+		Assert.assertTrue("Incorrect Mode, case 2b",planLegCase2b.get(3).getMode().equals("pt"));
+		Assert.assertTrue("Incorrect Mode, case 2b",planLegCase2b.get(4).getMode().contains("walk"));
+
+		/**
+		 * Case 2c: Agent starts at Link "550-551". This is within the drt3 service area. Agent is expected use drt3 as
+		 * intermodal access to the middle pt stop. The plan should be walk -> drt3 -> walk -> pt -> walk
+		 */
+		List<PlanElement> planFullCase2c = controler.getScenario().getPopulation().getPersons().get(Id.createPersonId("agent" + testAgents.get(3) )).getSelectedPlan().getPlanElements();
+		List<Leg> planLegCase2c = planFullCase2c.stream().filter(pe -> pe instanceof Leg).map(pe -> (Leg) pe).collect(toList()) ;
+		Assert.assertTrue("Incorrect Mode, case 2c",planLegCase2c.get(0).getMode().contains("walk"));
+		Assert.assertTrue("Incorrect Mode, case 2c",planLegCase2c.get(1).getMode().equals("drt3"));
+		Assert.assertTrue("Incorrect Mode, case 2c",planLegCase2c.get(2).getMode().contains("walk"));
+		Assert.assertTrue("Incorrect Mode, case 2c",planLegCase2c.get(3).getMode().equals("pt"));
+		Assert.assertTrue("Incorrect Mode, case 2c",planLegCase2c.get(4).getMode().contains("walk"));
+
+
+		/**
+		 * Case 3a: Agent starts at Link "690-691". This is not within any drt service areas. Agent is expected to use
+		 * transit_walk to get to his/her destination.
+		 */
+		List<PlanElement> planFullCase3a = controler.getScenario().getPopulation().getPersons().get(Id.createPersonId("agent" + testAgents.get(4) )).getSelectedPlan().getPlanElements();
+		List<Leg> planLegCase3a = planFullCase3a.stream().filter(pe -> pe instanceof Leg).map(pe -> (Leg) pe).collect(toList()) ;
+		Assert.assertTrue("Incorrect Mode, case 3a",planLegCase3a.get(0).getMode().equals("transit_walk"));
+
+
+		/**
+		 * Case 3b: Agent starts at Link "800-801". This is within the drt2 service area. Agent is NOT expected to utilize
+		 * drt2, since s/he is on a pt trip, and can only use drt as access/egress to a pt stop. Therefore, the agent is
+		 * agent is expected to use transit_walk to get to his/her destination.
+		 */
+		List<PlanElement> planFullCase3b = controler.getScenario().getPopulation().getPersons().get(Id.createPersonId("agent" + testAgents.get(5) )).getSelectedPlan().getPlanElements();
+		List<Leg> planLegCase3b = planFullCase3b.stream().filter(pe -> pe instanceof Leg).map(pe -> (Leg) pe).collect(toList()) ;
+		Assert.assertTrue("Incorrect Mode, case 3b",planLegCase3b.get(0).getMode().equals("transit_walk"));
+
 	}
+
+
 
 	@Test
 	public void intermodalAccessEgressPicksWrongVariant() {
