@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -69,11 +70,12 @@ class RunCommercialTraffic_H {
 
 		config.network().setInputFile(inputDir + "Network\\network_editedPt.xml.gz");
 		config.plans().setInputFile(inputDir + "Population\\populationWithCTdemand.xml.gz");
-		
-		CommercialTrafficConfigGroup ctcg = (CommercialTrafficConfigGroup) config.getModules().get(CommercialTrafficConfigGroup.GROUP_NAME);
-		ctcg.setCarriersFile(inputDir+"Carrier\\carrier_definition.xml");
-		ctcg.setCarriersVehicleTypesFile(inputDir+"Carrier\\carrier_vehicletypes.xml");
-		ctcg.setjSpritTimeSliceWidth(3600);
+
+		CommercialTrafficConfigGroup ctcg = ConfigUtils.addOrGetModule(config, CommercialTrafficConfigGroup.class);
+		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
+		freightConfigGroup.setCarriersFile(inputDir + "Carrier\\carrier_definition.xml");
+		freightConfigGroup.setCarriersVehicleTypesFile(inputDir + "Carrier\\carrier_vehicletypes.xml");
+		freightConfigGroup.setTravelTimeSliceWidth(3600);
 		
         StrategyConfigGroup.StrategySettings changeServiceOperator = new StrategyConfigGroup.StrategySettings();
 		changeServiceOperator.setStrategyName(ChangeCommercialJobOperator.SELECTOR_NAME);

@@ -31,7 +31,10 @@ import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
+import org.matsim.contrib.freight.FreightConfigGroup;
+import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
@@ -47,31 +50,34 @@ class RunCommercialTrafficUsingDRTExample {
 
         String inputDir = "input/commercialtrafficIt/";
 
-        DrtConfigGroup drtCfg = new DrtConfigGroup();
-        drtCfg.setMaxWaitTime(2 * 3600);
-        drtCfg.setMaxTravelTimeAlpha(5);
-        drtCfg.setMaxTravelTimeBeta(15 * 60);
-        drtCfg.setStopDuration(60);
-        drtCfg.setVehiclesFile(inputDir + "drtVehicles.xml");
+        Config config = createConfig();
 
-        MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
-        multiModeDrtConfigGroup.addParameterSet(drtCfg);
+        loadConfigGroups(inputDir, config);
+        prepareConfig(inputDir, config);
+        DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.planCalcScore());
 
+        Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
+        ScenarioUtils.loadScenario(scenario);
+        FreightUtils.loadCarriersAccordingToFreightConfig(scenario); //assumes that input file paths are set in FreightConfigGroup
+        //alternatively, one can read in the input Carriers and CarrierVehicleTypes manually and use
+        //FreightUtils.getCarriers(scenario) and FreightUtils.getCarrierVehicleTypes(scenario)
 
-        CommercialTrafficConfigGroup commercialTrafficConfigGroup = new CommercialTrafficConfigGroup();
-        commercialTrafficConfigGroup.setCarriersFile(inputDir + "test-carriers-drt.xml");
-        commercialTrafficConfigGroup.setCarriersVehicleTypesFile(inputDir + "vehicleTypes.xml");
-        commercialTrafficConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
+        Controler controler = new Controler(scenario);
 
-        Config config = createConfig(new DvrpConfigGroup(), commercialTrafficConfigGroup, multiModeDrtConfigGroup);
+        controler.addOverridingModule(
+                new CommercialTrafficModule() );
 
+        controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(MultiModeDrtConfigGroup.get(config)));
+        controler.run();
+
+    }
+
+    private static void prepareConfig(String inputDir, Config config) {
         config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
-	    {
-		    StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
-		    changeExpBeta.setStrategyName( DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta );
-		    changeExpBeta.setWeight( 0.5 );
-		    config.strategy().addStrategySettings( changeExpBeta );
-	    }
+        StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
+        changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
+        changeExpBeta.setWeight(0.5);
+        config.strategy().addStrategySettings(changeExpBeta);
         StrategyConfigGroup.StrategySettings changeServiceOperator = new StrategyConfigGroup.StrategySettings();
         changeServiceOperator.setStrategyName(ChangeCommercialJobOperator.SELECTOR_NAME);
         changeServiceOperator.setWeight(0.5);
@@ -98,18 +104,25 @@ class RunCommercialTrafficUsingDRTExample {
         config.qsim().setSimEndtimeInterpretation(QSimConfigGroup.EndtimeInterpretation.onlyUseEndtime);
 
         config.controler().setLastIteration(5);
+    }
 
-        DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.planCalcScore());
+    private static void loadConfigGroups(String inputDir, Config config) {
+        ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
+        MultiModeDrtConfigGroup multiModeDrtConfigGroup = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 
-        Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
-        ScenarioUtils.loadScenario(scenario);
-        Controler controler = new Controler(scenario);
+        DrtConfigGroup drtCfg = new DrtConfigGroup();
+        drtCfg.setMaxWaitTime(2 * 3600);
+        drtCfg.setMaxTravelTimeAlpha(5);
+        drtCfg.setMaxTravelTimeBeta(15 * 60);
+        drtCfg.setStopDuration(60);
+        drtCfg.setVehiclesFile(inputDir + "drtVehicles.xml");
+        multiModeDrtConfigGroup.addParameterSet(drtCfg);
 
-        controler.addOverridingModule(
-                new CommercialTrafficModule() );
+        CommercialTrafficConfigGroup commercialTrafficConfigGroup = ConfigUtils.addOrGetModule(config, CommercialTrafficConfigGroup.class);
+        commercialTrafficConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
 
-        controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(MultiModeDrtConfigGroup.get(config)));
-        controler.run();
-
+        FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
+        freightConfigGroup.setCarriersFile(inputDir + "test-carriers-drt.xml");
+        freightConfigGroup.setCarriersVehicleTypesFile(inputDir + "vehicleTypes.xml");
     }
 }

@@ -25,7 +25,10 @@ import commercialtraffic.commercialJob.ChangeCommercialJobOperator;
 import commercialtraffic.commercialJob.CommercialTrafficConfigGroup;
 import commercialtraffic.commercialJob.CommercialTrafficModule;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.freight.FreightConfigGroup;
+import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -42,14 +45,27 @@ class RunCommercialTrafficExample {
         String inputDir = "input/commercialtrafficIt/";
 
         Config config = createConfig();
-        CommercialTrafficConfigGroup commercialTrafficConfigGroup = new CommercialTrafficConfigGroup();
-        commercialTrafficConfigGroup.setCarriersFile(inputDir + "test-carriers-car.xml");
-        commercialTrafficConfigGroup.setCarriersVehicleTypesFile(inputDir + "vehicleTypes.xml");
+        CommercialTrafficConfigGroup commercialTrafficConfigGroup = ConfigUtils.addOrGetModule(config, CommercialTrafficConfigGroup.class);
         commercialTrafficConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
-        commercialTrafficConfigGroup.setCarriersVehicleTypesFile(inputDir + "carrier_vehicletypes.xml");
-        commercialTrafficConfigGroup.setjSpritTimeSliceWidth(3600);
-        config.addModule(commercialTrafficConfigGroup);
 
+        FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
+        freightConfigGroup.setTravelTimeSliceWidth(3600);
+        freightConfigGroup.setCarriersFile(inputDir + "test-carriers-car.xml");
+        freightConfigGroup.setCarriersVehicleTypesFile(inputDir + "vehicleTypes.xml");
+
+        prepareConfig(config, inputDir);
+
+        Scenario scenario = loadScenario(config);
+        FreightUtils.loadCarriersAccordingToFreightConfig(scenario); //assumes that input file paths are set in FreightConfigGroup
+        //alternatively, one can read in the input Carriers and CarrierVehicleTypes manually and use
+        //FreightUtils.getCarriers(scenario) and FreightUtils.getCarrierVehicleTypes(scenario)
+
+        Controler controler = new Controler(scenario);
+        controler.addOverridingModule(new CommercialTrafficModule() );
+        controler.run();
+    }
+
+    private static void prepareConfig(Config config, String inputDir) {
         StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
         changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
         changeExpBeta.setWeight(0.5);
@@ -75,17 +91,6 @@ class RunCommercialTrafficExample {
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         config.network().setInputFile(inputDir + "grid_network.xml");
         config.plans().setInputFile(inputDir + "testpop.xml");
-
         config.controler().setLastIteration(5);
-
-        Scenario scenario = loadScenario(config);
-
-        Controler controler = new Controler(scenario);
-
-        controler.addOverridingModule(new CommercialTrafficModule() );
-
-        controler.run();
-
-
     }
 }
