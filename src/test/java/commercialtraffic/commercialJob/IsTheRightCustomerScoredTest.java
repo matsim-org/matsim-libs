@@ -60,7 +60,7 @@ public class IsTheRightCustomerScoredTest {
         FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
 
         //limit the fleet size of carrier pizza_1 so that it can handly only one order/job
-        FreightUtils.getCarriers(scenario).getCarriers().get(Id.create("pizza_1", Carrier.class)).getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.FINITE);
+        FreightUtils.getCarriers(scenario).getCarriers().get(Id.create("salamiPizza", Carrier.class)).getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.FINITE);
 
         preparePopulation(scenario);
 
@@ -83,7 +83,7 @@ public class IsTheRightCustomerScoredTest {
         nonCustomer.addPlan(planNonCustomer);
         scenario.getPopulation().addPerson(nonCustomer);
 
-        Id<Carrier> pizzaCarrier = Id.create("pizza_1", Carrier.class);
+        Id<Carrier> pizzaCarrier = Id.create("salamiPizza", Carrier.class);
         Plan planCustomerOrderingForParty = factory.createPlan();
         Activity pizzaParty = factory.createActivityFromLinkId("pizzaAlone", Id.createLinkId("116"));
         CommercialJobUtils.addCustomerCommercialJobAttribute(pizzaParty, pizzaCarrier, 6,
@@ -109,7 +109,7 @@ public class IsTheRightCustomerScoredTest {
         Plan nonCustomerPlan = scenario.getPopulation().getPersons().get(Id.createPersonId("nonCustomer")).getSelectedPlan();
 
         //derive the service activity from the carrier plan and compare the service id (which should contain the customer id) with the person id of the expected customer
-        Carrier pizzaCarrier = FreightUtils.getCarriers(scenario).getCarriers().get(Id.create("pizza_1", Carrier.class));
+        Carrier pizzaCarrier = FreightUtils.getCarriers(scenario).getCarriers().get(Id.create("salamiPizza", Carrier.class));
         ScheduledTour tour = (ScheduledTour) pizzaCarrier.getSelectedPlan().getScheduledTours().toArray()[0];
         Id<CarrierService> serviceActivity = tour.getTour().getTourElements().stream()
                 .filter(tourElement -> tourElement instanceof Tour.ServiceActivity)
