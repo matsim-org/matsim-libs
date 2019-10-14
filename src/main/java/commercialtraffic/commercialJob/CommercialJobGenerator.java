@@ -144,7 +144,8 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
                         service.getAttributes().putAttribute(CUSTOMER_ATTRIBUTE_NAME, customer.getId().toString());
                         carrier.getServices().put(serviceId, service);
                     } else {
-                        throw new RuntimeException("Carrier Id does not exist: " + carrierId.toString());
+                        throw new RuntimeException("Carrier Id does not exist: " + carrierId.toString()
+                                + ". There is a wrong reference in activity attribute of person " + customer);
                     }
                 }
             }
