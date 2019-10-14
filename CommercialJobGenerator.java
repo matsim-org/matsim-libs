@@ -57,7 +57,6 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
     static final String COMMERCIALJOB_ACTIVITYTYPE_PREFIX = "commercialJob";
     static final String CUSTOMER_ATTRIBUTE_NAME = "customer";
     static final String SERVICEID_ATTRIBUTE_NAME = "serviceId";
-    static final String FREIGHT_DRIVER_PREFIX = "freight";
 
     private final double firsttourTraveltimeBuffer;
     private final int timeSliceWidth;
@@ -138,7 +137,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
                     serviceBuilder.setServiceDuration(Double.parseDouble(commercialJobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_DURATION_IDX]));
                     serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(earliestStart,latestStart));
 
-                    Id<Carrier> carrierId = CommercialJobUtils.getCurrentCarrierForJob(activity,jobIdx);
+                    Id<Carrier> carrierId = CommercialJobUtils.getCurrentlySelectedCarrierForJob(activity, jobIdx);
                     if (carriers.getCarriers().containsKey(carrierId)) {
                         Carrier carrier = carriers.getCarriers().get(carrierId);
                         CarrierService service = serviceBuilder.build();
@@ -165,7 +164,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
 
                 CarrierVehicle carrierVehicle = scheduledTour.getVehicle();
 
-                Id<Person> driverId = Id.createPersonId(FREIGHT_DRIVER_PREFIX + "freight_" + carrier.getId() + "_veh_" + carrierVehicle.getId() + "_" + nextId);
+                Id<Person> driverId = CommercialJobUtils.generateDriverId(carrier, carrierVehicle, nextId);
                 nextId++;
 
                 Person driverPerson = createDriverPerson(driverId);
@@ -245,6 +244,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
             }
         }
     }
+
 
     private Person createDriverPerson(Id<Person> driverId) {
         return  PopulationUtils.getFactory().createPerson(driverId);
