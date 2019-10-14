@@ -23,7 +23,10 @@
 package org.matsim.contrib.freight.controler;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Provides;
+import com.google.inject.Singleton;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.CarrierConfigGroup;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
@@ -31,15 +34,16 @@ import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
 import org.matsim.contrib.freight.mobsim.FreightQSimFactory;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
+import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 
 public class CarrierModule extends AbstractModule {
 
-    // Not a real config group yet, but could be one.
-    private FreightConfigGroup freightConfig = new FreightConfigGroup();
+    private FreightConfigGroup freightConfig;
 
     private Carriers carriers;
     private CarrierPlanStrategyManagerFactory strategyManagerFactory;
@@ -47,21 +51,26 @@ public class CarrierModule extends AbstractModule {
 
 
     public CarrierModule() {
-        this.carriers = new Carriers();
-        new CarrierPlanXmlReader(carriers).readFile(freightConfig.getCarriersFile());
-        CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes();
-        new CarrierVehicleTypeReader(vehicleTypes).readFile(freightConfig.getCarriersVehicleTypesFile());
-        new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes);
+
     }
 
     /**
      * CarrierPlanStrategyManagerFactory and CarrierScoringFunctionFactory must me bound separately
      * when this constructor is used.
+     * <br>
+     *       The above statement is not true; one can get it out of scenario by {@link org.matsim.contrib.freight.utils.FreightUtils#getCarriers(Scenario)}.
+     *
+     * @deprecated please use FreightUtils.getCarriers(Scenario scenario) to load carriers into scenario and use CarrierModule()
      */
+    @Deprecated
     public CarrierModule(Carriers carriers) {
         this.carriers = carriers;
     }
 
+    /**
+     * @deprecated please use FreightUtils.getCarriers(Scenario scenario) to load carriers into scenario and use CarrierModule()
+     */
+    @Deprecated
     public CarrierModule(Carriers carriers, CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory) {
         this.carriers = carriers;
         this.strategyManagerFactory = strategyManagerFactory;
@@ -70,10 +79,11 @@ public class CarrierModule extends AbstractModule {
 
     @Override
     public void install() {
-        // We put some things under dependency injection.
-        bind( FreightConfigGroup.class ).toInstance(freightConfig);
 
-        bind(Carriers.class).toInstance(carriers);
+        bind(Carriers.class).toProvider(new CarrierProvider()).in(Singleton.class);
+//         yyyy try to replace by FreightUtils.getCarriers(scenario)
+        // i am not sure how to retrieve scenario (or controler respectively).. tschlenther oct 10 '19
+
         if (strategyManagerFactory != null) {
             bind(CarrierPlanStrategyManagerFactory.class).toInstance(strategyManagerFactory);
         }
@@ -104,11 +114,6 @@ public class CarrierModule extends AbstractModule {
         return carrierControlerListener.getCarrierAgentTracker();
     }
 
-    public void setPhysicallyEnforceTimeWindowBeginnings(boolean physicallyEnforceTimeWindowBeginnings) {
-        this.freightConfig.setPhysicallyEnforceTimeWindowBeginnings(physicallyEnforceTimeWindowBeginnings);
-    }
-
-
     private static void writeAdditionalRunOutput( Config config, Carriers carriers ) {
         // ### some final output: ###
         new CarrierPlanXmlWriterV2(carriers).write( config.controler().getOutputDirectory() + "/output_carriers.xml" ) ;
@@ -118,5 +123,14 @@ public class CarrierModule extends AbstractModule {
     }
 
 
+    private class CarrierProvider implements Provider<Carriers> {
+        @Inject
+        Scenario scenario;
 
+
+        @Override
+        public Carriers get() {
+            return FreightUtils.getCarriers(scenario);
+        }
+    }
 }
