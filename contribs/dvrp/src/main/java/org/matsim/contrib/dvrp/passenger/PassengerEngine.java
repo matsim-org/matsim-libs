@@ -19,14 +19,7 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
+import com.google.common.collect.ImmutableList;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -45,15 +38,11 @@ import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.PreplanningEngine;
-import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.interfaces.TripInfo;
-import org.matsim.core.mobsim.qsim.interfaces.TripInfoRequest;
-import org.matsim.core.mobsim.qsim.interfaces.TripInfoWithRequiredBooking;
+import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.facilities.FacilitiesUtils;
 
-import com.google.common.collect.ImmutableList;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public final class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo.Provider {
 
@@ -309,11 +298,13 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 
 	private void processRequestScheduledEvents(PassengerRequestScheduledEvent event) {
 		RequestEntry requestEntry = requests.get(event.getRequestId());
-		if (requestEntry.prebooked) {
-			PassengerRequest request = requestEntry.request;
-			preplanningEngine.notifyChangedTripInformation(requestEntry.passenger, Optional.of(
-					new DvrpTripInfo(mode, request.getFromLink(), request.getToLink(), event.getPickupTime(),
-							event.getTime(), requestEntry.originalRequest)));
+		if (requestEntry != null) {
+			if (requestEntry.prebooked) {
+				PassengerRequest request = requestEntry.request;
+				preplanningEngine.notifyChangedTripInformation(requestEntry.passenger, Optional.of(
+						new DvrpTripInfo(mode, request.getFromLink(), request.getToLink(), event.getPickupTime(),
+								event.getTime(), requestEntry.originalRequest)));
+			}
 		}
 	}
 
