@@ -367,8 +367,6 @@ public class PtAlongALine2Test{
 		/** Case 1: The agent starts on link 2-3. While the agent is in the drt service area, s/he is so close to the pt
 		 * stop that it doesn't make sense for him/her to use drt as an intermodal access to get the pt. Therefore the
 		 * agent will just walk to the pt stop.
-		 *
-		 * TODO: why does the plan show drt2_walk as access mode? The agent isn't even in the drt2 service area...
 		 */
 
 		List<PlanElement> planFullCase1 = controler.getScenario().getPopulation().getPersons().get(Id.createPersonId("agent" + testAgents.get(0) )).getSelectedPlan().getPlanElements();
@@ -385,7 +383,7 @@ public class PtAlongALine2Test{
 		List<PlanElement> planFullCase2a = controler.getScenario().getPopulation().getPersons().get(Id.createPersonId("agent" + testAgents.get(1) )).getSelectedPlan().getPlanElements();
 		List<Leg> planLegCase2a = planFullCase2a.stream().filter(pe -> pe instanceof Leg).map(pe -> (Leg) pe).collect(toList()) ;
 		Assert.assertTrue("Incorrect Mode, case 2a",planLegCase2a.get(0).getMode().contains("walk"));
-		Assert.assertTrue("Incorrect Mode, case 2a",planLegCase2a.get(1).getMode().contains("drt"));
+		Assert.assertTrue("Incorrect Mode, case 2a",planLegCase2a.get(1).getMode().equals("drt"));
 		Assert.assertTrue("Incorrect Mode, case 2a",planLegCase2a.get(2).getMode().contains("walk"));
 		Assert.assertTrue("Incorrect Mode, case 2a",planLegCase2a.get(3).getMode().equals("pt"));
 		Assert.assertTrue("Incorrect Mode, case 2a",planLegCase2a.get(4).getMode().contains("walk"));
