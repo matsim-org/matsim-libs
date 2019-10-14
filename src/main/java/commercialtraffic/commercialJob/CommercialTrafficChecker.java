@@ -88,6 +88,10 @@ class CommercialTrafficChecker {
     private static boolean checkCarrierConsistency(Carriers carriers) {
         boolean fail = false;
         for (Carrier carrier : carriers.getCarriers().values()) {
+            if (carrier.getAttributes().getAttribute(CommercialJobUtils.CARRIER_MARKET_ATTRIBUTE_NAME) == null) {
+                log.error("carrier " + carrier.getId() + " has no market attribute set. this is mandatory in the commercialTraffic set up.");
+                fail = true;
+            }
             if (carrier.getCarrierCapabilities().getVehicleTypes().isEmpty()) {
                 log.error("Carrier " + carrier.getId() + " needs to have at least one vehicle type defined");
                 fail = true;

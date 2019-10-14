@@ -4,6 +4,7 @@
         <attributes>
             <attribute name="carrierMode" class="java.lang.String">car</attribute>
             <attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+            <attribute name="market" class="java.lang.String">shopping</attribute>
         </attributes>
         <capabilities fleetSize="INFINITE">
             <vehicles>
@@ -18,6 +19,7 @@
         <attributes>
             <attribute name="carrierMode" class="java.lang.String">car</attribute>
             <attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+            <attribute name="market" class="java.lang.String">pizza</attribute>
         </attributes>
         <capabilities fleetSize="INFINITE">
             <vehicles>
@@ -34,6 +36,7 @@
         <attributes>
             <attribute name="carrierMode" class="java.lang.String">car</attribute>
             <attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+            <attribute name="market" class="java.lang.String">pizza</attribute>
         </attributes>
         <capabilities fleetSize="INFINITE">
             <vehicles>
