@@ -151,7 +151,7 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
         super.checkConsistency(config);
         if (getMaxJobScore() < getMinJobScore()) {
             throw new RuntimeException("Minimum Score for commercial jobs is higher than maximum score");
-        } //TODO test
+        }
         if(!getRunTourPlanning() && config.strategy().getStrategySettings().stream()
                 .anyMatch(strategySettings -> strategySettings.getStrategyName().equals(ChangeCommercialJobOperator.SELECTOR_NAME))) {
             throw new RuntimeException("if tour planning is switched off, the replanning  strategy " + ChangeCommercialJobOperator.SELECTOR_NAME
