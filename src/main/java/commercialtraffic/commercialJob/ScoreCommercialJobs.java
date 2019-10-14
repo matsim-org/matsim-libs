@@ -72,7 +72,7 @@ class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityEndEvent
         freightAgent2Jobs.clear();
 
         Set<Plan> freightPlans = population.getPersons().values().stream()
-                .filter(p -> p.getId().toString().startsWith(CommercialJobGenerator.FREIGHT_DRIVER_PREFIX))
+                .filter(p -> p.getId().toString().startsWith(CommercialJobUtils.FREIGHT_DRIVER_PREFIX))
                 .map(HasPlansAndId::getSelectedPlan)
                 .collect(Collectors.toSet());
 

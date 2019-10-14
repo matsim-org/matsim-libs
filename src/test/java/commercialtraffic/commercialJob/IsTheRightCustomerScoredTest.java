@@ -83,9 +83,10 @@ public class IsTheRightCustomerScoredTest {
         nonCustomer.addPlan(planNonCustomer);
         scenario.getPopulation().addPerson(nonCustomer);
 
+        Id<Carrier> pizzaCarrier = Id.create("pizza_1", Carrier.class);
         Plan planCustomerOrderingForParty = factory.createPlan();
         Activity pizzaParty = factory.createActivityFromLinkId("pizzaAlone", Id.createLinkId("116"));
-        CommercialJobUtils.addCustomerCommercialJobAttribute(pizzaParty, "pizza", "1", 6,
+        CommercialJobUtils.addCustomerCommercialJobAttribute(pizzaParty, pizzaCarrier, 6,
                 6 * 3600, 7 * 3600, 180);
         planCustomerOrderingForParty.addActivity(pizzaParty);
         customerOrderingForParty.addPlan(planCustomerOrderingForParty);
@@ -93,7 +94,7 @@ public class IsTheRightCustomerScoredTest {
 
         Plan planCustomerOrderingJustForItself = factory.createPlan();
         Activity pizzaAlone = factory.createActivityFromLinkId("pizzaAlone", Id.createLinkId("116"));
-        CommercialJobUtils.addCustomerCommercialJobAttribute(pizzaAlone, "pizza", "1", 6,
+        CommercialJobUtils.addCustomerCommercialJobAttribute(pizzaAlone, pizzaCarrier, 2,
                 6 * 3600, 7 * 3600, 180);
         planCustomerOrderingJustForItself.addActivity(pizzaAlone);
         customerOrderingJustForItself.addPlan(planCustomerOrderingJustForItself);

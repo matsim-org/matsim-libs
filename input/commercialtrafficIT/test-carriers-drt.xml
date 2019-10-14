@@ -4,6 +4,7 @@
         <attributes>
             <attribute name="carrierMode" class="java.lang.String">drt</attribute>
             <attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+            <attribute name="market" class="java.lang.String">shopping</attribute>
         </attributes>
         <capabilities fleetSize="INFINITE">
             <vehicles>
@@ -14,10 +15,11 @@
         </capabilities>
     </carrier>
 
-    <carrier id="pizza_1">
+    <carrier id="salamiPizza">
         <attributes>
             <attribute name="carrierMode" class="java.lang.String">drt</attribute>
             <attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+            <attribute name="market" class="java.lang.String">pizza</attribute>
         </attributes>
         <capabilities fleetSize="INFINITE">
             <vehicles>
@@ -30,10 +32,11 @@
 
     </carrier>
 
-    <carrier id="pizza_2">
+    <carrier id="funghiPizza">
         <attributes>
             <attribute name="carrierMode" class="java.lang.String">drt</attribute>
             <attribute name="jspritIterations" class="java.lang.Integer">50</attribute>
+            <attribute name="market" class="java.lang.String">pizza</attribute>
         </attributes>
         <capabilities fleetSize="INFINITE">
             <vehicles>

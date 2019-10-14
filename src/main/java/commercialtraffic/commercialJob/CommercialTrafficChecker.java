@@ -66,8 +66,8 @@ class CommercialTrafficChecker {
                 log.error("index 0 is not supported for commercial job attributes. please start with index 1. See activity " + activity + " of person " + pid);
                 fail = true;
             }
-            String[] jobProperties = String.valueOf(attributes.get(attribute)).split(CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_DELIMITER);
-            if(jobProperties.length != 6){
+            String[] jobProperties = ((String) (attributes.get(attribute))).split(CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_DELIMITER);
+            if (jobProperties.length != 5) {
                 log.error("Activity " + activity + " of person " + pid + " defines commercialJob attribute " + attribute + " with a wrong number of properties. Length should be 6");
                 fail = true;
             }
@@ -88,10 +88,6 @@ class CommercialTrafficChecker {
     private static boolean checkCarrierConsistency(Carriers carriers) {
         boolean fail = false;
         for (Carrier carrier : carriers.getCarriers().values()) {
-            if (carrier.getId().toString().split(CommercialJobUtils.CARRIERSPLIT).length != 2) {
-                log.error("Carrier ID " + carrier.getId() + " does not conform to scheme good_carrier, e.g. pizza_one, pizza_two, ...");
-                fail = true;
-            }
             if (carrier.getCarrierCapabilities().getVehicleTypes().isEmpty()) {
                 log.error("Carrier " + carrier.getId() + " needs to have at least one vehicle type defined");
                 fail = true;

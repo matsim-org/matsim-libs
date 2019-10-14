@@ -62,17 +62,17 @@ public final class ChangeCommercialJobOperator extends AbstractMultithreadedModu
             Activity selectedActivity = activitiesWithJobs.get(randomActIdx);
             int randomJobIdx = random.nextInt(CommercialJobUtils.getNumberOfJobsForActivity(selectedActivity)) + 1; //the smallest index is 1.
 
-            String jobType = CommercialJobUtils.getJobType(selectedActivity,randomJobIdx);
-            Set<Id<Carrier>> operators4JobType = CommercialJobUtils.getExistingOperatorsForJobType(carriers, jobType);
-            Id<Carrier> currentCarrier = CommercialJobUtils.getCurrentCarrierForJob(selectedActivity,randomJobIdx);
+            Id<Carrier> currentCarrier = CommercialJobUtils.getCurrentlySelectedCarrierForJob(selectedActivity, randomJobIdx);
+            String market = CommercialJobUtils.getCarrierMarket(carriers.getCarriers().get(currentCarrier));
+            Set<Id<Carrier>> operators4Market = CommercialJobUtils.getExistingOperatorsForMarket(carriers, market);
 
-            if (operators4JobType.remove(currentCarrier)) {
-                if (!operators4JobType.isEmpty()) {
-                    Id<Carrier> newCarrier = operators4JobType.stream().skip(random.nextInt(operators4JobType.size())).findFirst().orElse(currentCarrier);
-                    CommercialJobUtils.setJobOperator(selectedActivity,randomJobIdx,CommercialJobUtils.getCarrierOperator(newCarrier));
+            if (operators4Market.remove(currentCarrier)) {
+                if (!operators4Market.isEmpty()) {
+                    Id<Carrier> newCarrier = operators4Market.stream().skip(random.nextInt(operators4Market.size())).findFirst().orElse(currentCarrier);
+                    CommercialJobUtils.setJobCarrier(selectedActivity, randomJobIdx, newCarrier);
                 }
             } else
-                throw new RuntimeException(currentCarrier.toString() + " is not part of the commercial traffic carriers for job type " + jobType);
+                throw new RuntimeException(currentCarrier.toString() + " is not part of the commercial traffic carriers for market " + market);
         };
     }
 }
