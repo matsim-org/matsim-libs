@@ -7,6 +7,7 @@ import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
 import org.matsim.contrib.freight.utils.FreightUtils;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.AllowsConfiguration;
 import org.matsim.core.controler.Controler;
@@ -22,8 +23,9 @@ public class Freight{
 		Gbl.assertIf( ao instanceof Controler);  // we need the scenario; otherwise find other way
 		Controler controler = (Controler) ao;
 		Carriers carriers = FreightUtils.getCarriers( controler.getScenario() );
+		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class );;
+		freightConfig.setPhysicallyEnforceTimeWindowBeginnings(true);
 		final CarrierModule carrierModule = new CarrierModule( carriers );
-		carrierModule.setPhysicallyEnforceTimeWindowBeginnings( true );
 		ao.addOverridingModule( carrierModule ) ;
 
 		ao.addOverridingModule( new AbstractModule(){

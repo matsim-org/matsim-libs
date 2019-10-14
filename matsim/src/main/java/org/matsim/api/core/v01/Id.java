@@ -26,7 +26,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.vehicles.Vehicle;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -42,7 +44,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class Id<T> implements Comparable<Id<T>> {
 
 	private final static Map<Class<?>, Map<String, Id<?>>> cacheId = new ConcurrentHashMap<>();
-	private final static Map<Class<?>, Map<Integer, Id<?>>> cacheIndex = new ConcurrentHashMap<>();
+	private final static Map<Class<?>, List<Id<?>>> cacheIndex = new ConcurrentHashMap<>();
 
 	public static <T> Id<T> create(final long key, final Class<T> type) {
 		return create(Long.toString(key), type);
@@ -62,15 +64,15 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 		Gbl.assertNotNull(key);
 
 		Map<String, Id<?>> mapId = cacheId.computeIfAbsent(type, k -> new ConcurrentHashMap<>(1000));
-		Map<Integer, Id<?>> mapIndex = cacheIndex.computeIfAbsent(type, k -> new ConcurrentHashMap<>(1000));
+		List<Id<?>> mapIndex = cacheIndex.computeIfAbsent(type, k -> new ArrayList<>(1000));
 
 		Id<?> id = mapId.get(key);
 
 		if (id == null) {
-			int index = mapIndex.size(); // TODO - this is not thread safe
+			int index = mapIndex.size(); // this is not thread safe, but basically all id-generating code is in a single-threaded loop anyway
 			id = new IdImpl<T>(key, index);
 			mapId.put(key, id);
-			mapIndex.put(index, id);
+			mapIndex.add(id);
 		}
 
 		return (Id<T>) id;
@@ -79,7 +81,7 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 	public abstract int index();
 
 	public static <T> Id<T> get(int index, final Class<T> type) {
-		Map<Integer, Id<?>> mapIndex = cacheIndex.get(type);
+		List<Id<?>> mapIndex = cacheIndex.get(type);
 
 		if (mapIndex == null) {
 			return null;
@@ -99,7 +101,7 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 	}
 
 	public static <T> int getNumberOfIds(final Class<T> type) {
-		return cacheIndex.getOrDefault(type, Collections.emptyMap()).size();
+		return cacheIndex.getOrDefault(type, Collections.emptyList()).size();
 	}
 	
 	/**
