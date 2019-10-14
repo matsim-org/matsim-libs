@@ -211,7 +211,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
                         Tour.ServiceActivity act = (Tour.ServiceActivity) tourElement;
 
                         CarrierService service = carrier.getServices().get(act.getService().getId()); //for some reason, the serviceAct only has a copy of the CarrierService object and this copy does not have the attributes..
-                        String actType = createJobActTypeFromServiceId(service.getId());
+                        String actType = COMMERCIALJOB_ACTIVITYTYPE_PREFIX + CommercialJobUtils.CARRIERSPLIT + carrier.getId();
                         String customer = (String) service.getAttributes().getAsMap().get(CUSTOMER_ATTRIBUTE_NAME);
 
 
@@ -266,26 +266,8 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
         });
     }
 
-    /*
-     * do not change the following methods. if one of them is changed, the other methods need to be adopted!
-     */
-
     private static  Id<CarrierService> createCarrierServiceIdXForCustomer(Person customer, int x){
         return Id.create(customer.getId().toString() + CommercialJobUtils.CARRIERSPLIT + x, CarrierService.class);
     }
-
-    private static String createJobActTypeFromServiceId(Id<CarrierService> id) {
-        String idStr = id.toString();
-        return "commercialJob" + CommercialJobUtils.CARRIERSPLIT + idStr.substring(0,idStr.lastIndexOf(CommercialJobUtils.CARRIERSPLIT));
-    }
-
-    static Id<Person> getCustomerIdFromJobActivityType(String actType){
-        if(!actType.startsWith(COMMERCIALJOB_ACTIVITYTYPE_PREFIX)) throw new IllegalArgumentException();
-        return Id.createPersonId(actType.substring(actType.indexOf(CommercialJobUtils.CARRIERSPLIT)+1));
-    }
-
-    /*
-     * do not change the above methods. if one of them is changed, the other methods need to be adopted!
-     */
 
 }
