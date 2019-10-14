@@ -20,7 +20,6 @@
 
 package commercialtraffic.commercialJob;
 
-import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -42,12 +41,12 @@ public class CommercialJobUtils {
 
     //the pattern for the activity attribute is the following:
     //<attribute name="commercialJob[NUMBER]" class="java.lang.String">[TYPE];[OPERATOR];[CAPACITYDEMAND];[EARLIESTSTART];[LATESTSTART];[DURATION]</attribute>
-    static final int COMMERCIALJOB_ATTRIBUTE_DURATION_IDX = 5;
     static final int COMMERCIALJOB_ATTRIBUTE_TYPE_IDX = 0;
     static final int COMMERCIALJOB_ATTRIBUTE_OPERATOR_IDX = 1;
     static final int COMMERCIALJOB_ATTRIBUTE_AMOUNT_IDX = 2;
     static final int COMMERCIALJOB_ATTRIBUTE_START_IDX = 3;
     static final int COMMERCIALJOB_ATTRIBUTE_END_IDX = 4;
+    static final int COMMERCIALJOB_ATTRIBUTE_DURATION_IDX = 5;
 
     static Set<Activity> getCustomerActivitiesExpectingJobs(Plan plan) {
         Set<Activity> activitiesWithJob = new HashSet<>();
@@ -96,11 +95,12 @@ public class CommercialJobUtils {
     }
 
     private static boolean activityExpectsCommercialJobs(Activity activity){
-        MutableBoolean activityExpectsCommercialJobs = new MutableBoolean(false);
-        activity.getAttributes().getAsMap().keySet().forEach(k -> {
-            if(k.startsWith(COMMERCIALJOB_ATTRIBUTE_NAME)) activityExpectsCommercialJobs.setTrue();
-        });
-        return activityExpectsCommercialJobs.getValue();
+        for (String attKey : activity.getAttributes().getAsMap().keySet()) {
+            if (attKey.startsWith(COMMERCIALJOB_ATTRIBUTE_NAME)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     static Map<String,Object> getCommercialJobAttributes(Activity activity){
