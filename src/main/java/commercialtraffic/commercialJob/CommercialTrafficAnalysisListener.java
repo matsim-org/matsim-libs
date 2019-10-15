@@ -75,7 +75,7 @@ class CommercialTrafficAnalysisListener implements IterationEndsListener {
         format.setGroupingUsed(false);
 
         writeIterationCarrierStats(event);
-        writeDeliveryStats(services.getControlerIO().getIterationFilename(event.getIteration(), "deliveryStats.csv"));
+        writeJobStats(services.getControlerIO().getIterationFilename(event.getIteration(), "commercialJobStats.csv"));
         analyzeCarrierMarketShares(event.getIteration());
         
         firstIteration = false;
@@ -118,7 +118,7 @@ class CommercialTrafficAnalysisListener implements IterationEndsListener {
                 throw new RuntimeException(e);
             }
 
-            XYLineChart chart = new XYLineChart(entry.getKey() + " Carrier market Share Statistics", "iteration", "mode");
+            XYLineChart chart = new XYLineChart(entry.getKey() + " Carrier market Share Statistics", "iteration", "share of jobs in market " + entry.getKey());
             for (Map.Entry<Id<Carrier>, Map<Integer, Double>> idMapEntry : marketShareHistory.entrySet()) {
                 String carrier = idMapEntry.getKey().toString();
                 Map<Integer, Double> history = idMapEntry.getValue();
@@ -132,7 +132,7 @@ class CommercialTrafficAnalysisListener implements IterationEndsListener {
 
     }
 
-    private void writeDeliveryStats(String filename) {
+    private void writeJobStats(String filename) {
         Collections.sort(scoreCommercialJobs.getLogEntries(), Comparator.comparing(ScoreCommercialJobs.DeliveryLogEntry::getTime));
         try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(filename)), CSVFormat.DEFAULT.withDelimiter(sep.charAt(0)).withHeader("CarrierId"
                 , "PersonId", "Time", "Score", "LinkId", "TimeDerivation", "DriverId"))) {
