@@ -34,8 +34,6 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     public static final String FIRSTLEGBUFFER = "firstLegBufferFactor";
     private static final String FIRSTLEGBUFFERDESC = "Buffer travel time factor for the first leg of a freight tour.";
 
-    private boolean runTourPlanning = true;
-    public  static final String RUNJSPRIT = "runTourPlanning";
     public static final String MAXJOBSCORE = "maxJobScore";
 
     @Positive
@@ -43,8 +41,6 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     public static final String ZEROUTILDELAY = "zeroUtilityDelay";
     private static final String ZEROUTILDELAYDESC = "Delay (in seconds) that marks the threshold for zero utility";
     public static final String MINJOBSCORE = "minJobScore";
-    private static final String RUNJSPRITDESC = "Defines whether JSprit is run. " +
-            "If this is set to false, ChangeJobOperator strategy must not be switched on and all carriers need to have at least one plan containing at least one tour.";
     private static final String MAXJOBSCOREDESC = "Score for performing job in time.";
     private static final String MINJOBSCOREDESC = "Minimum score for delayed commercial jobs. " +
             "Note that if the customer is not served at all, that creates a score of zero. " +
@@ -80,12 +76,6 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     public void setFirstLegTraveltimeBufferFactor(double firstLegTraveltimeBufferFactor) {
         this.firstLegTraveltimeBufferFactor = firstLegTraveltimeBufferFactor;
     }
-
-//    @StringSetter(RUNJSPRIT)
-    public void setRunTourPlanning(boolean runTourPlanning){ this.runTourPlanning = runTourPlanning; }
-
-//    @StringGetter(RUNJSPRIT)
-    public boolean getRunTourPlanning(){ return runTourPlanning; }
 
     /**
      * @return zeroUtilityDelay --{@value #ZEROUTILDELAYDESC}
@@ -139,7 +129,6 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
     public Map<String, String> getComments() {
         Map<String, String> map = super.getComments();
         map.put(FIRSTLEGBUFFER, FIRSTLEGBUFFERDESC);
-        map.put(RUNJSPRIT,RUNJSPRITDESC);
         map.put(MAXJOBSCORE, MAXJOBSCOREDESC);
         map.put(MINJOBSCORE, MINJOBSCOREDESC);
         map.put(ZEROUTILDELAY, ZEROUTILDELAYDESC);
@@ -151,12 +140,6 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
         super.checkConsistency(config);
         if (getMaxJobScore() < getMinJobScore()) {
             throw new RuntimeException("Minimum Score for commercial jobs is higher than maximum score");
-        }
-        if(!getRunTourPlanning() && config.strategy().getStrategySettings().stream()
-                .anyMatch(strategySettings -> strategySettings.getStrategyName().equals(ChangeCommercialJobOperator.SELECTOR_NAME))) {
-            throw new RuntimeException("if tour planning is switched off, the replanning  strategy " + ChangeCommercialJobOperator.SELECTOR_NAME
-                                        + " is forbidden. Either let the carriers do tour planning before each  iteration by setting " + RUNJSPRIT + "=true "
-                    + "or exclude the replanning strategy " + ChangeCommercialJobOperator.SELECTOR_NAME);
         }
     }
 }
