@@ -31,14 +31,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.core.config.Config;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.Facility;
@@ -52,30 +51,29 @@ import com.google.inject.name.Named;
  */
 public class StopBasedDrtRoutingModule implements RoutingModule {
 	private static final Logger logger = Logger.getLogger(StopBasedDrtRoutingModule.class);
-	private static final String walkRouterMode = TransportMode.walk;
-
+	
 	public interface AccessEgressStopFinder {
 		Pair<TransitStopFacility, TransitStopFacility> findStops(Facility fromFacility, Facility toFacility);
 	}
 
 	private final DrtStageActivityType drtStageActivityType;
-	private final PopulationFactory populationFactory;
+	private final Network modalNetwork;
 	private final RoutingModule walkRouter;
 	private final AccessEgressStopFinder stopFinder;
 	private final DrtConfigGroup drtCfg;
-	private final Config config;
+	private final Scenario scenario;
 	private final DrtRoutingModule drtRoutingModule;
 
-	public StopBasedDrtRoutingModule(PopulationFactory populationFactory, DrtRoutingModule drtRoutingModule,
-			@Named(walkRouterMode) RoutingModule walkRouter, AccessEgressStopFinder stopFinder,
-			DrtConfigGroup drtCfg, Scenario scenario) {
-		this.populationFactory = populationFactory;
+	public StopBasedDrtRoutingModule(DrtRoutingModule drtRoutingModule,
+			@Named(TransportMode.walk) RoutingModule walkRouter, AccessEgressStopFinder stopFinder,
+			DrtConfigGroup drtCfg, Scenario scenario, Network modalNetwork) {
 		this.drtRoutingModule = drtRoutingModule;
 		this.walkRouter = walkRouter;
 		this.stopFinder = stopFinder;
 		this.drtCfg = drtCfg;
-		this.config = scenario.getConfig();
+		this.scenario = scenario;
 		this.drtStageActivityType = new DrtStageActivityType(drtCfg.getMode());
+		this.modalNetwork = modalNetwork;
 	}
 
 	@Override
@@ -119,7 +117,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		List<? extends PlanElement> accessWalk = createWalkTrip(fromFacility, accessFacility, now, person, null );
 		trip.addAll(accessWalk);
 		for( PlanElement planElement : accessWalk ){
-			now = TripRouter.calcEndOfPlanElement( now, planElement, config ) ;
+			now = TripRouter.calcEndOfPlanElement( now, planElement, scenario.getConfig() ) ;
 		}
 
 		// interaction activity:
@@ -129,10 +127,13 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 //		double drtLegStartTime = departureTime + walkToAccessStopLeg.getTravelTime() + 1;
 		now++ ;
 //		Leg drtLeg = (Leg)drtRoutingModule.calcRoute(accessFacility, egressFacility, now, person).get(0);
-		List<? extends PlanElement> drtLeg = drtRoutingModule.calcRoute( accessFacility, egressFacility, now, person );
+//		List<? extends PlanElement> drtLeg = drtRoutingModule.calcRoute( accessFacility, egressFacility, now, person );
+		Link accessActLink = modalNetwork.getLinks().get(  accessFacility.getLinkId() ) ; // we want that this crashes if not found.  kai/gl, oct'19
+		Link egressActLink = modalNetwork.getLinks().get(  egressFacility.getLinkId() ) ; // we want that this crashes if not found.  kai/gl, oct'19
+		List<? extends PlanElement> drtLeg = drtRoutingModule.createRealDrtRoute( departureTime, accessActLink, egressActLink ) ;
 		trip.addAll(drtLeg);
 		for( PlanElement planElement : drtLeg ){
-			now = TripRouter.calcEndOfPlanElement( now, planElement, config ) ;
+			now = TripRouter.calcEndOfPlanElement( now, planElement, scenario.getConfig() ) ;
 		}
 
 		// interaction activity:
@@ -147,16 +148,14 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 	}
 
 	private List<? extends PlanElement> createWalkTrip(Facility fromFacility, Facility toFacility, double departureTime, Person person, String mode) {
-		List<? extends PlanElement> result = walkRouter.calcRoute( fromFacility, toFacility, departureTime, person );
-		if (mode != null) {
-			// Overwrite real walk mode legs with fallback mode for respective drt mode
-			for (PlanElement pe: result) {
-				if (pe instanceof Leg) {
-					Leg leg = (Leg) pe;
-					if (leg.getMode().equals(walkRouterMode)) {
-						// keep non_network_walk bushwhacking to network, but replace real network walk leg
-						leg.setMode(mode);
-					}
+		List<? extends PlanElement> result = walkRouter.calcRoute( fromFacility, toFacility, departureTime, person ); 
+		// Overwrite real walk mode legs with non_network_walk
+		for (PlanElement pe: result) {
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
+				if (leg.getMode().equals(TransportMode.walk)) {
+					// keep non_network_walk bushwhacking to network, but replace real network walk leg
+					leg.setMode(TransportMode.non_network_walk);
 				}
 			}
 		}
@@ -165,7 +164,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 	}
 
 	private Activity createDrtStageActivity(Facility stopFacility) {
-		Activity activity = populationFactory.createActivityFromCoord(drtStageActivityType.drtStageActivity,
+		Activity activity = scenario.getPopulation().getFactory().createActivityFromCoord(drtStageActivityType.drtStageActivity,
 				stopFacility.getCoord());
 		activity.setMaximumDuration(1);
 		activity.setLinkId(stopFacility.getLinkId());

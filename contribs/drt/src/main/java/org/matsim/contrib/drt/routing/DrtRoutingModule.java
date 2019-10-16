@@ -137,26 +137,11 @@ public class DrtRoutingModule implements RoutingModule {
 
 		// === drt proper:
 		{
-			VrpPathWithTravelData unsharedPath = VrpPaths.calcAndCreatePath(accessActLink, egressActLink, departureTime,
-					router, travelTime);
-			double unsharedRideTime = unsharedPath.getTravelTime();//includes first & last link
-			double maxTravelTime = getMaxTravelTime(drtCfg, unsharedRideTime);
-			double unsharedDistance = VrpPaths.calcDistance(unsharedPath);//includes last link
-
-			DrtRoute route = populationFactory.getRouteFactories()
-					.createRoute(DrtRoute.class, accessActLink.getId(), egressActLink.getId());
-			route.setDistance(unsharedDistance);
-			route.setTravelTime(maxTravelTime);
-			route.setUnsharedRideTime(unsharedRideTime);
-			route.setMaxWaitTime(drtCfg.getMaxWaitTime());
-
-			Leg leg = populationFactory.createLeg(drtCfg.getMode());
-			leg.setDepartureTime(departureTime);
-			leg.setTravelTime(maxTravelTime);
-			leg.setRoute(route);
-
-			result.add(leg);
-			now += maxTravelTime;
+			final List<PlanElement> newResult = createRealDrtRoute( departureTime, accessActLink, egressActLink );
+			result.addAll( newResult ) ;
+			for ( final PlanElement planElement : newResult ) {
+				now = TripRouter.calcEndOfPlanElement( now, planElement, config ) ;
+			}
 		}
 
 		// === egress:
@@ -177,5 +162,28 @@ public class DrtRoutingModule implements RoutingModule {
 	 */
 	public static double getMaxTravelTime(DrtConfigGroup drtCfg, double unsharedRideTime) {
 		return drtCfg.getMaxTravelTimeAlpha() * unsharedRideTime + drtCfg.getMaxTravelTimeBeta();
+	}
+	
+	/* package */ List<PlanElement> createRealDrtRoute( final double departureTime, final Link accessActLink, final Link egressActLink ) {
+		VrpPathWithTravelData unsharedPath = VrpPaths.calcAndCreatePath(accessActLink, egressActLink, departureTime,
+				router, travelTime);
+		double unsharedRideTime = unsharedPath.getTravelTime();//includes first & last link
+		double maxTravelTime = getMaxTravelTime(drtCfg, unsharedRideTime);
+		double unsharedDistance = VrpPaths.calcDistance(unsharedPath);//includes last link
+
+		DrtRoute route = populationFactory.getRouteFactories()
+				.createRoute(DrtRoute.class, accessActLink.getId(), egressActLink.getId());
+		route.setDistance(unsharedDistance);
+		route.setTravelTime(maxTravelTime);
+		route.setUnsharedRideTime(unsharedRideTime);
+		route.setMaxWaitTime(drtCfg.getMaxWaitTime());
+
+		Leg leg = populationFactory.createLeg(drtCfg.getMode());
+		leg.setDepartureTime(departureTime);
+		leg.setTravelTime(maxTravelTime);
+		leg.setRoute(route);
+		List<PlanElement> result = new ArrayList<>() ;
+		result.add(leg);
+		return result;
 	}
 }
