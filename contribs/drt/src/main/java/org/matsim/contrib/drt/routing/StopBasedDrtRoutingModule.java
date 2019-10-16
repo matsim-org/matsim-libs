@@ -124,13 +124,10 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		trip.add(createDrtStageActivity(accessFacility));
 
 		// drt proper:
-//		double drtLegStartTime = departureTime + walkToAccessStopLeg.getTravelTime() + 1;
 		now++ ;
-//		Leg drtLeg = (Leg)drtRoutingModule.calcRoute(accessFacility, egressFacility, now, person).get(0);
-//		List<? extends PlanElement> drtLeg = drtRoutingModule.calcRoute( accessFacility, egressFacility, now, person );
 		Link accessActLink = modalNetwork.getLinks().get(  accessFacility.getLinkId() ) ; // we want that this crashes if not found.  kai/gl, oct'19
 		Link egressActLink = modalNetwork.getLinks().get(  egressFacility.getLinkId() ) ; // we want that this crashes if not found.  kai/gl, oct'19
-		List<? extends PlanElement> drtLeg = drtRoutingModule.createRealDrtRoute( departureTime, accessActLink, egressActLink ) ;
+		List<? extends PlanElement> drtLeg = drtRoutingModule.createRealDrtLeg( departureTime, accessActLink, egressActLink ) ;
 		trip.addAll(drtLeg);
 		for( PlanElement planElement : drtLeg ){
 			now = TripRouter.calcEndOfPlanElement( now, planElement, scenario.getConfig() ) ;
@@ -140,7 +137,6 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		trip.add(createDrtStageActivity(egressFacility));
 
 		// egress leg:
-//		double walkFromStopStartTime = drtLeg.getDepartureTime() + drtLeg.getTravelTime() + 1;
 		now++ ;
 		trip.addAll(createWalkTrip(egressFacility, toFacility, now, person, TransportMode.non_network_walk));
 
@@ -149,7 +145,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 
 	private List<? extends PlanElement> createWalkTrip(Facility fromFacility, Facility toFacility, double departureTime, Person person, String mode) {
 		List<? extends PlanElement> result = walkRouter.calcRoute( fromFacility, toFacility, departureTime, person ); 
-		// Overwrite real walk mode legs with non_network_walk
+		// Overwrite real walk mode legs with non_network_walk / drt fallback mode
 		for (PlanElement pe: result) {
 			if (pe instanceof Leg) {
 				Leg leg = (Leg) pe;

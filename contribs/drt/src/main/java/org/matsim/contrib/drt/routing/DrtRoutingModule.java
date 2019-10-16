@@ -137,7 +137,7 @@ public class DrtRoutingModule implements RoutingModule {
 
 		// === drt proper:
 		{
-			final List<PlanElement> newResult = createRealDrtRoute( departureTime, accessActLink, egressActLink );
+			final List<PlanElement> newResult = createRealDrtLeg( departureTime, accessActLink, egressActLink );
 			result.addAll( newResult ) ;
 			for ( final PlanElement planElement : newResult ) {
 				now = TripRouter.calcEndOfPlanElement( now, planElement, config ) ;
@@ -164,7 +164,7 @@ public class DrtRoutingModule implements RoutingModule {
 		return drtCfg.getMaxTravelTimeAlpha() * unsharedRideTime + drtCfg.getMaxTravelTimeBeta();
 	}
 	
-	/* package */ List<PlanElement> createRealDrtRoute( final double departureTime, final Link accessActLink, final Link egressActLink ) {
+	/* package */ List<PlanElement> createRealDrtLeg( final double departureTime, final Link accessActLink, final Link egressActLink ) {
 		VrpPathWithTravelData unsharedPath = VrpPaths.calcAndCreatePath(accessActLink, egressActLink, departureTime,
 				router, travelTime);
 		double unsharedRideTime = unsharedPath.getTravelTime();//includes first & last link
