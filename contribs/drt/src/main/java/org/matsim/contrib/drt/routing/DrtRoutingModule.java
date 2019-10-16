@@ -168,11 +168,6 @@ public class DrtRoutingModule implements RoutingModule {
 		return result;
 	}
 
-	@Override
-	public StageActivityTypes getStageActivityTypes() {
-		return drtStageActivityType;
-	}
-
 	/**
 	 * Calculates the maximum travel time defined as: drtCfg.getMaxTravelTimeAlpha() * unsharedRideTime + drtCfg.getMaxTravelTimeBeta()
 	 *

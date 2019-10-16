@@ -23,33 +23,50 @@ import static org.junit.Assert.*;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author nagel
  *
  */
-public class RunEmissionToolOnlineExampleIT {
+public class RunDetailedEmissionToolOnlineExampleIT {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	/**
-	 * Test method for {@link RunEmissionToolOnlineExample#main(java.lang.String[])}.
+	 * Test method for {@link RunDetailedEmissionToolOnlineExample#main(java.lang.String[])}.
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	public final void testMain() {
+	public final void testDetailed_vehTypeV1() {
 		try {
-			Config config = RunEmissionToolOnlineExample.prepareConfig( null ) ;
-			
+			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml"} ) ;
 			config.controler().setOutputDirectory( utils.getOutputDirectory() );
-			
 			config.controler().setLastIteration( 1 );
-			
-			Scenario scenario = RunEmissionToolOnlineExample.prepareScenario( config ) ;
-			
-			RunEmissionToolOnlineExample.run( scenario ) ;
+			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
+			emissionsConfig.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
+			Scenario scenario = RunDetailedEmissionToolOnlineExample.prepareScenario( config ) ;
+			RunDetailedEmissionToolOnlineExample.run( scenario ) ;
+		} catch ( Exception ee ) {
+			ee.printStackTrace();
+			fail("something did not work" ) ;
+		}
+	}
 
+	/**
+	 * Test method for {@link RunDetailedEmissionToolOnlineExample#main(java.lang.String[])}.
+	 */
+	@SuppressWarnings("static-method")
+	@Test
+	public final void testDetailed_vehTypeV2() {
+		try {
+			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml"} ) ;
+			config.controler().setOutputDirectory( utils.getOutputDirectory() );
+			config.controler().setLastIteration( 1 );
+			Scenario scenario = RunDetailedEmissionToolOnlineExample.prepareScenario( config ) ;
+			RunDetailedEmissionToolOnlineExample.run( scenario ) ;
 		} catch ( Exception ee ) {
 			ee.printStackTrace();
 			fail("something did not work" ) ;

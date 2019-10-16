@@ -1,10 +1,11 @@
-package org.matsim.contrib.freight.utils;
+package org.matsim.contrib.freight.mobsim;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.freight.CarrierConfigGroup;
+import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
@@ -52,10 +53,10 @@ public class Visualiser {
 			
 		});
 
-		CarrierConfigGroup carrierConfig = new CarrierConfigGroup();
-		carrierConfig.setPhysicallyEnforceTimeWindowBeginnings(true);
+		FreightConfigGroup freightConfig = new FreightConfigGroup();
+		freightConfig.setPhysicallyEnforceTimeWindowBeginnings(true);
 
-		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker, carrierConfig);
+		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker);
 
 		Mobsim mobsim = mobsimFactory.get();
 		
@@ -81,10 +82,10 @@ public class Visualiser {
 			
 		});
 
-		CarrierConfigGroup carrierConfig = new CarrierConfigGroup();
-		carrierConfig.setPhysicallyEnforceTimeWindowBeginnings(true);
+		FreightConfigGroup freightConfig = new FreightConfigGroup();
+		freightConfig.setPhysicallyEnforceTimeWindowBeginnings(true);
 
-		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker, carrierConfig);
+		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker);
 
 		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
 		Mobsim mobsim = mobsimFactory.get();

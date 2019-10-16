@@ -157,7 +157,13 @@ public class TestWarmEmissionAnalysisModule {
 	public void testWarmEmissionAnalysisParameter(){
 		setUp();
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
+		if ( (Boolean) true ==null ) {
+			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
+		} else if ( true ) {
+			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
+		} else {
+			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
+		}
 
 		WarmEmissionAnalysisModuleParameter weamp
 				= new WarmEmissionAnalysisModuleParameter(avgHbefaWarmTable, null, hbefaRoadTrafficSpeeds, pollutants, ecg);
@@ -774,7 +780,13 @@ public class TestWarmEmissionAnalysisModule {
 		double rescaleF = 1.0003;
 
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
+		if ( (Boolean) true ==null ) {
+			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
+		} else if ( true ) {
+			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
+		} else {
+			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
+		}
 
 		WarmEmissionAnalysisModuleParameter weamParameter
 				= new WarmEmissionAnalysisModuleParameter(avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, ecg);
@@ -815,7 +827,13 @@ public class TestWarmEmissionAnalysisModule {
 
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
         EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
+		if ( (Boolean) true ==null ) {
+			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
+		} else if ( true ) {
+			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
+		} else {
+			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
+		}
 
 		WarmEmissionAnalysisModuleParameter warmEmissionParameterObject = new WarmEmissionAnalysisModuleParameter(
 				avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, ecg);

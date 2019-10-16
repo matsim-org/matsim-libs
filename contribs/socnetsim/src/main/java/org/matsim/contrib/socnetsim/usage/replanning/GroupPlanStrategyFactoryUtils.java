@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.TourModeUnifierModule;
@@ -68,8 +67,7 @@ public class GroupPlanStrategyFactoryUtils {
 			final Provider<TripRouter> tripRouterFactory) {
 		return new JointPlanBasedGroupStrategyModule(
 				new SynchronizeCoTravelerPlansModule(
-					config.global().getNumberOfThreads(),
-					tripRouterFactory.get().getStageActivityTypes() ) );
+					config.global().getNumberOfThreads() ) );
 	}
 
 	public static GenericStrategyModule<GroupPlans> createReRouteModule(
@@ -89,14 +87,11 @@ public class GroupPlanStrategyFactoryUtils {
 			final Config config,
 			final Provider<TripRouter> tripRouterFactory) {
 		final TripRouter router = tripRouterFactory.get();
-		final CompositeStageActivityTypes stageTypes = new CompositeStageActivityTypes();
-		stageTypes.addActivityTypes( router.getStageActivityTypes() );
-		stageTypes.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
 
 		return new IndividualBasedGroupStrategyModule(
 				new TourModeUnifierModule(
 					config.global().getNumberOfThreads(),
-					stageTypes,
+					JointActingTypes.JOINT_STAGE_ACTS,
 					new MainModeIdentifier() {
 						@Override
 						public String identifyMainMode(

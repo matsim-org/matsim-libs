@@ -40,7 +40,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -177,11 +176,6 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		if (drtCfg.isPrintDetailedWarnings()) {
 			logger.warn(supplier.get());
 		}
-	}
-
-	@Override
-	public StageActivityTypes getStageActivityTypes() {
-		return drtStageActivityType;
 	}
 
 	static Coord getFacilityCoord(Facility facility, Network network) {

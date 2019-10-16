@@ -57,7 +57,6 @@ import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.QSimModule;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 
 import com.google.inject.Inject;
@@ -105,14 +104,7 @@ public final class DvrpParkingModule extends AbstractModule {
 	public void install() {
 
 		final DynRoutingModule routingModuleCar = new DynRoutingModule(TransportMode.car);
-		StageActivityTypes stageActivityTypesCar = new StageActivityTypes() {
-			@Override
-			public boolean isStageActivity(String activityType) {
 
-				return (activityType.equals(ParkingUtils.PARKACTIVITYTYPE));
-			}
-		};
-		routingModuleCar.setStageActivityTypes(stageActivityTypesCar);
 		addRoutingModuleBinding(TransportMode.car).toInstance(routingModuleCar);
 
 		String mode = TaxiConfigGroup.getSingleModeTaxiConfig(getConfig()).getMode();

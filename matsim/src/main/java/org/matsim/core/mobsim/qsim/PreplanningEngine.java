@@ -57,8 +57,6 @@ import org.matsim.core.mobsim.qsim.interfaces.TripInfoRequest;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfoWithRequiredBooking;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -77,9 +75,6 @@ public final class PreplanningEngine implements MobsimEngine {
 	// layer of infrastructure?  Am currently leaning towards the second argument.  kai, mar'19
 
 	private static final Logger log = Logger.getLogger( PreplanningEngine.class );
-
-	public static final StageActivityTypes drtStageActivities = new StageActivityTypesImpl(
-		  createStageActivityType(TransportMode.drt), createStageActivityType(TransportMode.walk));
 
 	private final ActivityFacilities facilities;
 
@@ -305,8 +300,10 @@ public final class PreplanningEngine implements MobsimEngine {
 
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 
-		// search for drt trip corresponding to drt leg.  Trick is using our own stage activities.
-		TripStructureUtils.Trip drtTrip = TripStructureUtils.findTripAtPlanElement(leg, plan, drtStageActivities );
+		// search for drt trip corresponding to drt leg.  Trick is using our own stage activities (drtStageActivities).
+		// TODO: existing tests pass, but probably it is currently wrong after removing stage activity types
+		// and thereby losing the ability to only consider drtStageActivities as stage activities and nothing else
+		TripStructureUtils.Trip drtTrip = TripStructureUtils.findTripAtPlanElement(leg, plan );
 		Gbl.assertNotNull(drtTrip );
 
 		final TripInfoRequest request = new TripInfoRequest.Builder(scenario).setFromActivity(drtTrip.getOriginActivity() )
@@ -328,7 +325,8 @@ public final class PreplanningEngine implements MobsimEngine {
 		TripStructureUtils.Trip inputTrip = null;
 		Coord pickupCoord = FacilitiesUtils.decideOnCoord( tripInfo.getPickupLocation(), network ) ;
 		Coord dropoffCoord = FacilitiesUtils.decideOnCoord( tripInfo.getDropoffLocation(), network ) ;
-		for (TripStructureUtils.Trip drtTrip : TripStructureUtils.getTrips(plan, PreplanningEngine.drtStageActivities )) {
+		// TODO: check: was PreplanningEngine.drtStageActivities, so drt* interaction only?
+		for (TripStructureUtils.Trip drtTrip : TripStructureUtils.getTrips( plan )) {
 			// recall that we have set the activity end time of the current activity to infinity, so we cannot use that any more.  :-( ?!
 			// could instead use some kind of ID.  Not sure if that would really be better.
 			// So here we are looking for a trip where origin and destination are close to pickup and dropoff:

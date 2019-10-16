@@ -2,14 +2,11 @@ package org.matsim.contrib.freight.carrier;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.vehicles.EngineInformation;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class CarrierUtils{
 
@@ -85,6 +82,28 @@ public class CarrierUtils{
 		copiedPlan.setScore(initialScoreOfCopiedPlan);
 		return copiedPlan;
 
+	}
+
+	private static final String CARRIER_MODE = "carrierMode" ;
+	public static String getCarrierMode( Carrier carrier ) {
+		String result = (String) carrier.getAttributes().getAttribute( CARRIER_MODE );
+		if ( result == null ){
+			return TransportMode.car ;
+		} else {
+			return result ;
+		}
+	}
+	public static void setCarrierMode( Carrier carrier,  String carrierMode ) {
+		carrier.getAttributes().putAttribute( CARRIER_MODE, carrierMode ) ;
+	}
+
+	private static final String JSPRIT_ITERATIONS="jspritIterations" ;
+	public static int getJspritIterations( Carrier carrier ) {
+		Integer result = (Integer) carrier.getAttributes().getAttribute( JSPRIT_ITERATIONS );
+		return (int) result ;
+	}
+	public static void setJspritIterations( Carrier carrier, int jspritIterations ) {
+		carrier.getAttributes().putAttribute( JSPRIT_ITERATIONS , jspritIterations ) ;
 	}
 
 }

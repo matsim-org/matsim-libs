@@ -20,7 +20,6 @@
 package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.TripRouter;
 
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
@@ -60,14 +59,11 @@ public class GroupOptimizingTourVehicleAllocationFactory extends AbstractConfigu
 	public GroupPlanStrategy get() {
 		final GroupPlanStrategy strategy = instantiateStrategy( sc.getConfig() );
 
-		final CompositeStageActivityTypes stageActs = new CompositeStageActivityTypes();
-		stageActs.addActivityTypes( tripRouterFactory.get().getStageActivityTypes() );
-		stageActs.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
 		strategy.addStrategyModule(
 				//new AllocateVehicleToPlansInGroupPlanModule(
 				new OptimizeVehicleAllocationAtTourLevelModule(
 						sc.getConfig().global().getNumberOfThreads(),
-						stageActs,
+						JointActingTypes.JOINT_STAGE_ACTS,
 						(VehicleRessources) sc.getScenarioElement(
 							VehicleRessources.ELEMENT_NAME ),
 						SharedVehicleUtils.DEFAULT_VEHICULAR_MODES,
