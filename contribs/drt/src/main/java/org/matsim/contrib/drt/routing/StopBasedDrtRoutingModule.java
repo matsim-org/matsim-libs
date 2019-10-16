@@ -114,7 +114,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		double now = departureTime;
 
 		// access leg:
-		List<? extends PlanElement> accessWalk = createWalkTrip(fromFacility, accessFacility, now, person, null );
+		List<? extends PlanElement> accessWalk = createWalkTrip(fromFacility, accessFacility, now, person, TransportMode.non_network_walk );
 		trip.addAll(accessWalk);
 		for( PlanElement planElement : accessWalk ){
 			now = TripRouter.calcEndOfPlanElement( now, planElement, scenario.getConfig() ) ;
@@ -142,7 +142,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		// egress leg:
 //		double walkFromStopStartTime = drtLeg.getDepartureTime() + drtLeg.getTravelTime() + 1;
 		now++ ;
-		trip.addAll(createWalkTrip(egressFacility, toFacility, now, person, null));
+		trip.addAll(createWalkTrip(egressFacility, toFacility, now, person, TransportMode.non_network_walk));
 
 		return trip;
 	}
@@ -154,8 +154,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 			if (pe instanceof Leg) {
 				Leg leg = (Leg) pe;
 				if (leg.getMode().equals(TransportMode.walk)) {
-					// keep non_network_walk bushwhacking to network, but replace real network walk leg
-					leg.setMode(TransportMode.non_network_walk);
+					leg.setMode(mode);
 				}
 			}
 		}
