@@ -161,7 +161,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 	private Activity createDrtStageActivity(Facility stopFacility) {
 		Activity activity = scenario.getPopulation().getFactory().createActivityFromCoord(drtStageActivityType.drtStageActivity,
 				stopFacility.getCoord());
-		activity.setMaximumDuration(1);
+		activity.setMaximumDuration(0);
 		activity.setLinkId(stopFacility.getLinkId());
 		return activity;
 	}

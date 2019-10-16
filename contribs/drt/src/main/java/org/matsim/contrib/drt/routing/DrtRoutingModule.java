@@ -19,10 +19,7 @@
 
 package org.matsim.contrib.drt.routing;
 
-import static org.matsim.core.router.NetworkRoutingInclAccessEgressModule.addBushwhackingLegFromLinkToFacilityIfNecessary;
-
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -30,6 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -106,6 +104,7 @@ public class DrtRoutingModule implements RoutingModule {
 		Link egressActLink = FacilitiesUtils.decideOnLink(toFacility, network);
 
 		double now = departureTime;
+		List<PlanElement> trip = new ArrayList<>();
 
 		if (accessActLink == egressActLink) {
 			if (drtCfg.isPrintDetailedWarnings()) {
@@ -114,31 +113,30 @@ public class DrtRoutingModule implements RoutingModule {
 						+ ". Agent Id:\t"
 						+ person.getId());
 			}
-			Leg leg = (Leg)walkRouter.calcRoute(fromFacility, toFacility, departureTime, person).get(0);
-			leg.setDepartureTime(now);
-			leg.setMode(drtStageActivityType.drtWalk);
-			LOGGER.debug("travel time on walk leg=" + leg.getTravelTime());
-			return Collections.singletonList(leg);
+			trip.addAll(createWalkTrip(fromFacility, toFacility, departureTime, person, drtStageActivityType.drtWalk));
+			double travelTime = 0;
+			for( PlanElement planElement : trip ){
+				travelTime = TripRouter.calcEndOfPlanElement( now, planElement, config ) ;
+			}
+			LOGGER.debug("travel time on walk leg=" + travelTime);
+			return trip;
 		}
 		// yyyy I think that our life will become easier if we don't do direct walk.  kai, jul'19
 
-		List<PlanElement> result = new ArrayList<>();
-
 		// === access:
 		if (plansCalcRouteConfig.isInsertingAccessEgressWalk()) {
-//			now = addBushwhackingLegFromFacilityToLinkIfNecessary(fromFacility, person, accessActLink, now, result,
-//					populationFactory, drtStageActivityType.drtStageActivity);
-			List<? extends PlanElement> result2 = walkRouter.calcRoute( fromFacility, new LinkWrapperFacility( accessActLink ), now, person );
-			result.addAll( result2 ) ;
-			for( PlanElement planElement : result2 ){
+			List<? extends PlanElement> accessWalkTrip = createWalkTrip(fromFacility, new LinkWrapperFacility( accessActLink ), now, person, TransportMode.non_network_walk );
+			for( PlanElement planElement : accessWalkTrip ){
 				now = TripRouter.calcEndOfPlanElement( now, planElement,  config ) ;
 			}
+			// interaction activity:
+			trip.add(createDrtStageActivity(new LinkWrapperFacility( accessActLink )));
 		}
 
 		// === drt proper:
 		{
 			final List<PlanElement> newResult = createRealDrtLeg( departureTime, accessActLink, egressActLink );
-			result.addAll( newResult ) ;
+			trip.addAll( newResult ) ;
 			for ( final PlanElement planElement : newResult ) {
 				now = TripRouter.calcEndOfPlanElement( now, planElement, config ) ;
 			}
@@ -146,11 +144,16 @@ public class DrtRoutingModule implements RoutingModule {
 
 		// === egress:
 		if (plansCalcRouteConfig.isInsertingAccessEgressWalk()) {
-			addBushwhackingLegFromLinkToFacilityIfNecessary(toFacility, person, egressActLink, now, result,
-					populationFactory, drtStageActivityType.drtStageActivity);
+			// interaction activity:
+			trip.add(createDrtStageActivity(new LinkWrapperFacility( egressActLink )));
+			List<? extends PlanElement> accessWalkTrip = createWalkTrip(new LinkWrapperFacility( egressActLink ), toFacility, now, person, TransportMode.non_network_walk );
+			for( PlanElement planElement : accessWalkTrip ){
+				now = TripRouter.calcEndOfPlanElement( now, planElement,  config ) ;
+			}
+
 		}
 
-		return result;
+		return trip;
 	}
 
 	/**
@@ -185,5 +188,28 @@ public class DrtRoutingModule implements RoutingModule {
 		List<PlanElement> result = new ArrayList<>() ;
 		result.add(leg);
 		return result;
+	}
+	
+	private Activity createDrtStageActivity(Facility stopFacility) {
+		Activity activity = populationFactory.createActivityFromCoord(drtStageActivityType.drtStageActivity,
+				stopFacility.getCoord());
+		activity.setMaximumDuration(0);
+		activity.setLinkId(stopFacility.getLinkId());
+		return activity;
+	}
+	
+	private List<? extends PlanElement> createWalkTrip(Facility fromFacility, Facility toFacility, double departureTime, Person person, String mode) {
+		List<? extends PlanElement> result = walkRouter.calcRoute( fromFacility, toFacility, departureTime, person ); 
+		// Overwrite real walk mode legs with non_network_walk / drt fallback mode
+		for (PlanElement pe: result) {
+			if (pe instanceof Leg) {
+				Leg leg = (Leg) pe;
+				if (leg.getMode().equals(TransportMode.walk)) {
+					leg.setMode(mode);
+				}
+			}
+		}
+
+		return result ;
 	}
 }
