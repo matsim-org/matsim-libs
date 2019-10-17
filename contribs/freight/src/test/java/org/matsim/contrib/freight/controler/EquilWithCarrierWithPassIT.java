@@ -103,7 +103,7 @@ public class EquilWithCarrierWithPassIT {
 	@Test
 	public void testScoringInMeters(){
 		//		controler.addOverridingModule(new CarrierModule(carriers));
-		controler.addOverridingModule(new CarrierModule(FreightUtils.getCarriers(controler.getScenario())));
+		controler.addOverridingModule(new CarrierModule(FreightUtils.getOrCreateCarriers(controler.getScenario())));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

@@ -98,7 +98,7 @@ public class CarrierModuleTest {
     @Test
     public void test_ConstructorWithOneParameter(){
 
-        controler.addOverridingModule(new CarrierModule(FreightUtils.getCarriers(controler.getScenario())));
+        controler.addOverridingModule(new CarrierModule(FreightUtils.getOrCreateCarriers(controler.getScenario())));
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
@@ -111,7 +111,8 @@ public class CarrierModuleTest {
 
     @Test
     public void test_ConstructorWithThreeParameters(){
-        controler.addOverridingModule(new CarrierModule(FreightUtils.getCarriers(controler.getScenario()), new StrategyManagerFactoryForTests(), new DistanceScoringFunctionFactoryForTests()));
+        controler.addOverridingModule(new CarrierModule(FreightUtils.getOrCreateCarriers(controler.getScenario()), new StrategyManagerFactoryForTests(),
+		    new DistanceScoringFunctionFactoryForTests()));
         controler.run();
     }
 
