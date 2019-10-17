@@ -60,9 +60,9 @@ public class RunCommercialTraffic_H {
 
 		Config config = ConfigUtils.loadConfig(inputDir + "config_0.1_CT.xml", new CommercialTrafficConfigGroup());
 		config.plans().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
-		config.global().setNumberOfThreads(1);
-		config.parallelEventHandling().setNumberOfThreads(1);
-		config.qsim().setNumberOfThreads(1);
+		config.global().setNumberOfThreads(8);
+		config.parallelEventHandling().setNumberOfThreads(8);
+		config.qsim().setNumberOfThreads(8);
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.00); //Fraction to disable Innovation
 		
 		//RECREATE ACTIVITY PARAMS 

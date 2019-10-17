@@ -93,7 +93,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts 
 
 		private Id<org.matsim.vehicles.Vehicle> id;
 
-		private VehicleType type;
+		private org.matsim.vehicles.VehicleType type;
 
 		public MatsimVehicleWrapper(com.graphhopper.jsprit.core.problem.vehicle.Vehicle vehicle) {
 			this.id = Id.create(vehicle.getId(), org.matsim.vehicles.Vehicle.class);
@@ -101,15 +101,15 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts 
 		}
 
 		public MatsimVehicleWrapper(CarrierVehicle vehicle) {
-			this.id = vehicle.getVehicleId();
-			this.type = vehicle.getVehicleType();
+			this.id = vehicle.getId();
+			this.type = vehicle.getType();
 		}
 
-		private VehicleType makeType(String typeId, double maxVelocity) {
-			VehicleType vehicleType = VehicleUtils.createVehicleType(
-					Id.create(typeId, org.matsim.vehicles.VehicleType.class));
-			vehicleType.setMaximumVelocity(maxVelocity);
-			return vehicleType;
+		private org.matsim.vehicles.VehicleType makeType(String typeId, double maxVelocity) {
+			org.matsim.vehicles.VehicleType vehicleTypeImpl = VehicleUtils
+					.createVehicleType(Id.create(typeId, VehicleType.class));
+			vehicleTypeImpl.setMaximumVelocity(maxVelocity);
+			return vehicleTypeImpl;
 		}
 
 		@Override
@@ -118,7 +118,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts 
 		}
 
 		@Override
-		public VehicleType getType() {
+		public org.matsim.vehicles.VehicleType getType() {
 			return type;
 		}
 	}
@@ -411,9 +411,8 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts 
 
 		private void retrieveTypeSpecificCosts(Collection<VehicleType> vehicleTypes) {
 			for (VehicleType type : vehicleTypes) {
-				typeSpecificCosts.put(type.getId().toString(),
-						new VehicleTypeVarCosts(type.getVehicleCostInformation().getPerDistanceUnit(),
-								type.getVehicleCostInformation().getPerTimeUnit()));
+				typeSpecificCosts.put(type.getId().toString(), new VehicleTypeVarCosts(
+						type.getCostInformation().getCostsPerMeter(), type.getCostInformation().getCostsPerSecond()));
 			}
 			typeSpecificCosts.put(defaultTypeId, new VehicleTypeVarCosts(1., 0.));
 		}
@@ -591,19 +590,17 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts 
 		this.ttRequestedCounter = new Counter("numTravelCosts requested ");
 		this.zones = DrtGridUtils.createGridFromNetwork(network, 1000.0);
 		this.link2zone = new LinkedHashMap<>();
-		
-		//Create for each link a zone key
+
+		// Create for each link a zone key
 		initalizeZones();
 	}
 
-	public void initalizeZones()
-	{
-		for (Link link : network.getLinks().values())
-		{
+	public void initalizeZones() {
+		for (Link link : network.getLinks().values()) {
 			getZoneForLinkId(link.getId());
 		}
 	}
-	
+
 	public String getZoneForLinkId(Id<Link> linkId) {
 
 		if (this.link2zone.containsKey(linkId)) {
@@ -707,7 +704,6 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts 
 		// New wrapped location ids based on centroid links
 		Location toLocation = toLocationBuilder.build();
 		Location fromLocation = fromLocationBuilder.build();
-		
 
 		TransportDataKey transportDataKey = makeKey(fromLocation.getId(), toLocation.getId(), timeSlice, typeId);
 		TransportData data = costCache.get(transportDataKey);
@@ -813,16 +809,15 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts 
 		// New wrapped location ids based on centroid links
 		Location toLocation = toLocationBuilder.build();
 		Location fromLocation = fromLocationBuilder.build();
-		
 
-//		Id<Link> fromLinkId = Id.create(fromId.getId(), Link.class);
-//		Id<Link> toLinkId = Id.create(toId.getId(), Link.class);
-//		Link fromLink = network.getLinks().get(fromLinkId);
-//		Link toLink = network.getLinks().get(toLinkId);
-		
+		// Id<Link> fromLinkId = Id.create(fromId.getId(), Link.class);
+		// Id<Link> toLinkId = Id.create(toId.getId(), Link.class);
+		// Link fromLink = network.getLinks().get(fromLinkId);
+		// Link toLink = network.getLinks().get(toLinkId);
+
 		Link fromLink = fromCentroidLink;
 		Link toLink = toCentroidLink;
-		
+
 		LeastCostPathCalculator router = createLeastCostPathCalculator();
 
 		int timeSlice = getTimeSlice(departureTime);
@@ -832,7 +827,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts 
 		double transportCost;
 		if (data != null) {
 			transportCost = data.transportCosts;
-	//		System.out.println("real Cached!");
+			// System.out.println("real Cached!");
 		} else {
 			informStartCalc();
 			org.matsim.vehicles.Vehicle matsimVehicle = getMatsimVehicle(vehicle);
