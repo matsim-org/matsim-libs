@@ -129,6 +129,7 @@ public class DrtRoutingModule implements RoutingModule {
 			for( PlanElement planElement : accessWalkTrip ){
 				now = TripRouter.calcEndOfPlanElement( now, planElement,  config ) ;
 			}
+			trip.addAll(accessWalkTrip);
 			// interaction activity:
 			trip.add(createDrtStageActivity(new LinkWrapperFacility( accessActLink )));
 		}
@@ -146,11 +147,11 @@ public class DrtRoutingModule implements RoutingModule {
 		if (plansCalcRouteConfig.isInsertingAccessEgressWalk()) {
 			// interaction activity:
 			trip.add(createDrtStageActivity(new LinkWrapperFacility( egressActLink )));
-			List<? extends PlanElement> accessWalkTrip = createWalkTrip(new LinkWrapperFacility( egressActLink ), toFacility, now, person, TransportMode.non_network_walk );
-			for( PlanElement planElement : accessWalkTrip ){
+			List<? extends PlanElement> egressWalkTrip = createWalkTrip(new LinkWrapperFacility( egressActLink ), toFacility, now, person, TransportMode.non_network_walk );
+			for( PlanElement planElement : egressWalkTrip ){
 				now = TripRouter.calcEndOfPlanElement( now, planElement,  config ) ;
 			}
-
+			trip.addAll(egressWalkTrip);
 		}
 
 		return trip;
