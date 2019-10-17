@@ -60,9 +60,9 @@ public class RunCommercialTraffic_H {
 
 		Config config = ConfigUtils.loadConfig(inputDir + "config_0.1_CT.xml", new CommercialTrafficConfigGroup());
 		config.plans().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
-		config.global().setNumberOfThreads(16);
-		config.parallelEventHandling().setNumberOfThreads(16);
-		config.qsim().setNumberOfThreads(16);
+		config.global().setNumberOfThreads(1);
+		config.parallelEventHandling().setNumberOfThreads(1);
+		config.qsim().setNumberOfThreads(1);
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.00); //Fraction to disable Innovation
 		
 		//RECREATE ACTIVITY PARAMS 
@@ -117,10 +117,12 @@ public class RunCommercialTraffic_H {
         CommercialTrafficConfigGroup commercialTrafficConfigGroup = ConfigUtils.addOrGetModule(config, CommercialTrafficConfigGroup.class);
         commercialTrafficConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
         
+        
         FreightConfigGroup ctcg = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
 		ctcg.setCarriersFile(inputDir+"Carrier\\carrier_definition.xml");
 		ctcg.setCarriersVehicleTypesFile(inputDir+"Carrier\\carrier_vehicletypes.xml");
 		ctcg.setTravelTimeSliceWidth(3600);
+		
 		
 		
 //        StrategyConfigGroup.StrategySettings changeServiceOperator = new StrategyConfigGroup.StrategySettings();
