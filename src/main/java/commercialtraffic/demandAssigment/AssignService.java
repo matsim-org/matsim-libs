@@ -118,7 +118,7 @@ public class AssignService {
 	public static void main(String[] args) {
 
 		AssignService assignData = new AssignService(
-				"D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\vw280_0.1_CT_0.1\\vw280_0.1.output_plans.xml.gz",
+				"D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\vw280_0.1_CT_0.1\\vw280_0.1.output_sel_plans.xml.gz",
 				"D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\EGrocery\\Fullfillment\\",
 				"D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\Trips\\",
 				"D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\Vehicles\\",
@@ -227,27 +227,29 @@ public class AssignService {
 
 					this.jobList.add(finalJob);
 
-					companyMap.get(companyId).addService(finalJob.jobId, finalJob.regularAgentActivity.getLinkId(),
-							finalJob.startTime, finalJob.endTime, serviceDuration);
+					//companyMap.get(companyId).addService(finalJob.jobId, finalJob.regularAgentActivity.getLinkId(),
+					//		finalJob.startTime, finalJob.endTime, serviceDuration);
 
 					// Check for Attributes
-					Object actAttr = this.scenario.getPopulation().getPersons().get(finalJob.personid).getSelectedPlan()
-							.getPlanElements().get(finalJob.planIdx).getAttributes().getAttribute("jobId");
+//					Object actAttr = this.scenario.getPopulation().getPersons().get(finalJob.personid).getSelectedPlan()
+//							.getPlanElements().get(finalJob.planIdx).getAttributes();
 					// E-Grocery Service is attributed with -99
 
-					if (actAttr == null) {
+//					if (actAttr == null) {
+					String commercialJobString=(finalJob.serviceType.toString()+";"+finalJob.carrierId.toString()+";"+"1"+";"+finalJob.startTime+";"+finalJob.endTime+";"+finalJob.serviceDuration);
+					
 						this.scenario.getPopulation().getPersons().get(finalJob.personid).getSelectedPlan()
 								.getPlanElements().get(finalJob.planIdx).getAttributes()
-								.putAttribute("jobId", finalJob.jobId);
-					} else {
-						String prevJobId = actAttr.toString();
-						this.scenario.getPopulation().getPersons().get(finalJob.personid).getSelectedPlan()
-								.getPlanElements().get(finalJob.planIdx).getAttributes()
-								.putAttribute("jobId", prevJobId + ";" + finalJob.jobId);
-
-						// System.out.println(prevJobId + ";" + finalJob.jobId);
-
-					}
+								.putAttribute(finalJob.jobId, commercialJobString);
+//					} else {
+//						String prevJobId = actAttr.toString();
+//						this.scenario.getPopulation().getPersons().get(finalJob.personid).getSelectedPlan()
+//								.getPlanElements().get(finalJob.planIdx).getAttributes()
+//								.putAttribute("jobId", prevJobId + ";" + finalJob.jobId);
+//
+//						// System.out.println(prevJobId + ";" + finalJob.jobId);
+//
+//					}
 
 					this.jobIdCounter.increment();
 					foundCounter.increment();
@@ -322,7 +324,7 @@ public class AssignService {
 									// int test=1;
 									// System.out.println(test);
 									// }
-									return new Job(jobIdCounter.toString(), carrierId, candidatePerson, serviceType,
+									return new Job("commercialJob"+jobIdCounter.toString(), carrierId, candidatePerson, serviceType,
 											customerRelation, zone, serviceDuration, matchedPeIdx,
 											finalActivityDestination, startTime, endTime);
 
@@ -365,8 +367,7 @@ public class AssignService {
 
 			if (actAttr != null) {
 
-				int servicesPerAct = Arrays.asList(activity.getAttributes().getAttribute("jobId").toString().split(";"))
-						.size();
+				int servicesPerAct = activity.getAttributes().size();
 
 				if (servicesPerAct >= maxServicesPerAct) {
 					continue;

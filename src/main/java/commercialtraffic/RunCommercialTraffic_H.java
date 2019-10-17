@@ -109,6 +109,8 @@ public class RunCommercialTraffic_H {
 
 		config.network().setInputFile(inputDir + "Network\\network_editedPt.xml.gz");
 		config.plans().setInputFile(inputDir + "Population\\populationWithCTdemand.xml.gz");
+		config.transit().setTransitScheduleFile(inputDir + "Network\\transitSchedule.xml.gz");
+		config.transit().setVehiclesFile(inputDir + "Network\\transitVehicles.xml.gz");
 		
 		CommercialTrafficConfigGroup ctcg = (CommercialTrafficConfigGroup) config.getModules().get(CommercialTrafficConfigGroup.GROUP_NAME);
 		ctcg.setCarriersFile(inputDir+"Carrier\\carrier_definition.xml");

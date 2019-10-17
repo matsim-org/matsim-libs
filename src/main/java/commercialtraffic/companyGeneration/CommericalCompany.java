@@ -9,6 +9,7 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities;
 import org.matsim.contrib.freight.carrier.CarrierImpl;
 import org.matsim.contrib.freight.carrier.CarrierService;
+import org.matsim.contrib.freight.carrier.CarrierUtils;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.CarrierVehicleType;
 import org.matsim.contrib.freight.carrier.Carriers;
@@ -16,6 +17,8 @@ import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import commercialtraffic.commercialJob.CommercialJobUtils;
 
 public class CommericalCompany {
 
@@ -35,12 +38,15 @@ public class CommericalCompany {
 		// A company is also the carrier
 		this.companyId = companyId;
 		this.carrierId = serviceType+"_"+companyId;
-		this.carrier = CarrierImpl.newInstance(Id.create(carrierId, Carrier.class));
+		this.carrier = CarrierUtils.createCarrier(Id.create(carrierId, Carrier.class));
 		this.openingTime = openingTime;
 		this.closingTime = closingTime;
 		this.serviceType = serviceType;
 		this.companyLinkId = companyLinkId;
 		this.carrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.FINITE);
+		//this.carrier.getAttributes().putAttribute("carrierMode", "car");
+		//this.carrier.getAttributes().putAttribute("jspritIterations", 1);
+		//this.carrier.getAttributes().putAttribute(CommercialJobUtils.CARRIER_MARKET_ATTRIBUTE_NAME, serviceType);
 
 	}
 
@@ -92,6 +98,7 @@ public class CommericalCompany {
 		vBuilder.setEarliestStart(openingTime);
 		vBuilder.setLatestEnd(closingTime);
 		vBuilder.setType(createType(vehicleType));
+		vBuilder.setTypeId(Id.create(vehicleType, VehicleType.class));
 		//TODO: We could add vehicle length for each vehicleType according to KID at this stage
 		return vBuilder.build();
 	}
@@ -107,6 +114,12 @@ public class CommericalCompany {
 			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
 			vehicleType.getCostInformation().setCostsPerSecond(0.008);
 			vehicleType.setMaximumVelocity(200.0 / 3.6);
+			vehicleType.setLength(3.5);
+			vehicleType.setWidth(1.0);
+			vehicleType.setNetworkMode("car");
+			vehicleType.setFlowEfficiencyFactor(1.0);
+			
+			
 			return vehicleType;
 		case 2:
 
@@ -115,6 +128,10 @@ public class CommericalCompany {
 			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
 			vehicleType.getCostInformation().setCostsPerSecond(0.008);
 			vehicleType.setMaximumVelocity(160.0 / 3.6);
+			vehicleType.setLength(4.5);
+			vehicleType.setWidth(1.0);
+			vehicleType.setNetworkMode("car");
+			vehicleType.setFlowEfficiencyFactor(1.0);
 		case 3:
 
 			vehicleType.getCapacity().setOther(150);
@@ -122,6 +139,10 @@ public class CommericalCompany {
 			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
 			vehicleType.getCostInformation().setCostsPerSecond(0.008);
 			vehicleType.setMaximumVelocity(160.0 / 3.6);
+			vehicleType.setLength(7.5);
+			vehicleType.setWidth(1.0);
+			vehicleType.setNetworkMode("car");
+			vehicleType.setFlowEfficiencyFactor(1.0);
 		case 4:
 
 			vehicleType.getCapacity().setOther(400);
@@ -129,6 +150,10 @@ public class CommericalCompany {
 			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
 			vehicleType.getCostInformation().setCostsPerSecond(0.008);
 			vehicleType.setMaximumVelocity(93.0 / 3.6);
+			vehicleType.setLength(12.5);
+			vehicleType.setWidth(1.0);
+			vehicleType.setNetworkMode("car");
+			vehicleType.setFlowEfficiencyFactor(1.0);
 		case 5:
 
 			vehicleType.getCapacity().setOther(400);
@@ -136,6 +161,10 @@ public class CommericalCompany {
 			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
 			vehicleType.getCostInformation().setCostsPerSecond(0.008);
 			vehicleType.setMaximumVelocity(93.0 / 3.6);
+			vehicleType.setLength(12.5);
+			vehicleType.setWidth(1.0);
+			vehicleType.setNetworkMode("car");
+			vehicleType.setFlowEfficiencyFactor(1.0);
 		case 6:
 
 			vehicleType.getCapacity().setOther(80);
@@ -143,6 +172,10 @@ public class CommericalCompany {
 			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
 			vehicleType.getCostInformation().setCostsPerSecond(0.008);
 			vehicleType.setMaximumVelocity(110.0 / 3.6);
+			vehicleType.setLength(12.5);
+			vehicleType.setWidth(1.0);
+			vehicleType.setNetworkMode("car");
+			vehicleType.setFlowEfficiencyFactor(1.0);
 		case 7:
 
 			vehicleType.getCapacity().setOther(80);
@@ -150,6 +183,10 @@ public class CommericalCompany {
 			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
 			vehicleType.getCostInformation().setCostsPerSecond(0.008);
 			vehicleType.setMaximumVelocity(80.0 / 3.6);
+			vehicleType.setLength(12.5);
+			vehicleType.setWidth(1.0);
+			vehicleType.setNetworkMode("car");
+			vehicleType.setFlowEfficiencyFactor(1.0);
 		case 8:
 
 			vehicleType.getCapacity().setOther(80);
@@ -157,6 +194,10 @@ public class CommericalCompany {
 			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
 			vehicleType.getCostInformation().setCostsPerSecond(0.008);
 			vehicleType.setMaximumVelocity(93.0 / 3.6);
+			vehicleType.setLength(12.5);
+			vehicleType.setWidth(1.0);
+			vehicleType.setNetworkMode("car");
+			vehicleType.setFlowEfficiencyFactor(1.0);
 		case 9:
 
 			vehicleType.getCapacity().setOther(50);
@@ -164,6 +205,10 @@ public class CommericalCompany {
 			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
 			vehicleType.getCostInformation().setCostsPerSecond(0.008);
 			vehicleType.setMaximumVelocity(40.0 / 3.6);
+			vehicleType.setLength(8.5);
+			vehicleType.setWidth(1.0);
+			vehicleType.setNetworkMode("car");
+			vehicleType.setFlowEfficiencyFactor(1.0);
 		case 10:
 
 			vehicleType.getCapacity().setOther(100);
@@ -171,6 +216,10 @@ public class CommericalCompany {
 			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
 			vehicleType.getCostInformation().setCostsPerSecond(0.008);
 			vehicleType.setMaximumVelocity(160.0 / 3.6);
+			vehicleType.setLength(7.5);
+			vehicleType.setWidth(1.0);
+			vehicleType.setNetworkMode("car");
+			vehicleType.setFlowEfficiencyFactor(1.0);
 		case 11:
 
 			vehicleType.getCapacity().setOther(100);
@@ -178,6 +227,10 @@ public class CommericalCompany {
 			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
 			vehicleType.getCostInformation().setCostsPerSecond(0.008);
 			vehicleType.setMaximumVelocity(160.0 / 3.6);
+			vehicleType.setLength(7.5);
+			vehicleType.setWidth(1.0);
+			vehicleType.setNetworkMode("car");
+			vehicleType.setFlowEfficiencyFactor(1.0);
 		default:
 
 			vehicleType.getCapacity().setOther(100);
@@ -185,6 +238,10 @@ public class CommericalCompany {
 			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
 			vehicleType.getCostInformation().setCostsPerSecond(0.008);
 			vehicleType.setMaximumVelocity(160.0 / 3.6);
+			vehicleType.setLength(7.5);
+			vehicleType.setWidth(1.0);
+			vehicleType.setNetworkMode("car");
+			vehicleType.setFlowEfficiencyFactor(1.0);
 		}
 		return vehicleType;
 	}

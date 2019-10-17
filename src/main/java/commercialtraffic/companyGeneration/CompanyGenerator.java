@@ -302,27 +302,31 @@ public class CompanyGenerator {
 
 	public void writeCarriers() {
 		Carriers carriers = new Carriers();
+		//List<Entry<String, CommericalCompany>> rmvList=new ArrayList<Entry<String, CommericalCompany>>();
 
 		for (Entry<String, CommericalCompany> commercialCompanyEntry : commercialCompanyMap.entrySet()) {
 			// String companyId=commercialCompanyEntry.getKey();
 			if (commercialCompanyEntry.getValue().carrier.getCarrierCapabilities().getCarrierVehicles().isEmpty()) {
 				// Delete Companies without vehicles
+				//rmvList.add(commercialCompanyEntry);
 				continue;
 			}
-			if (commercialCompanyEntry.getValue().carrier.getServices().isEmpty()) {
+			
+			//if (commercialCompanyEntry.getValue().carrier.getServices().isEmpty()) {
 				// Delete Companies without Services
-				continue;
-			}
+			//	continue;
+			//}
 			// if
 			// (commercialCompanyEntry.getValue().carrier.getId().toString().contains("grocery"))
 			// {
 			carriers.addCarrier(commercialCompanyEntry.getValue().carrier);
 		}
+		
 
 		// }
-		new CarrierPlanWriter(carriers.getCarriers().values()).write(carrierOutputPath + "carrier_definition.xml");
-		new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers))
-				.write(carrierOutputPath + "carrier_vehicletypes.xml");
+		//new CarrierPlanWriter(carriers.getCarriers().values()).write(carrierOutputPath + "carrier_definition.xml");
+		new CarrierPlanXmlWriterV2(carriers).write(carrierOutputPath + "carrier_definition.xml");
+		new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers)).write(carrierOutputPath + "carrier_vehicletypes.xml");
 
 	}
 
