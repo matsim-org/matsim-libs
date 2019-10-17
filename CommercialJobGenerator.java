@@ -157,6 +157,31 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
         TourPlanning.runTourPlanningForCarriers(carriers,scenario, timeSliceWidth,carTT );
     }
 
+    private static Id<CarrierService> createCarrierServiceIdXForCustomer(Person customer, int x) {
+        return Id.create(customer.getId().toString() + "_" + x, CarrierService.class);
+    }
+
+
+    private Person createDriverPerson(Id<Person> driverId) {
+        return PopulationUtils.getFactory().createPerson(driverId);
+    }
+
+    @Override
+    public void notifyAfterMobsim(AfterMobsimEvent event) {
+        removeFreightAgents();
+    }
+
+    private void removeFreightAgents() {
+        freightDrivers.forEach(d -> scenario.getPopulation().removePerson(d));
+        freightVehicles.forEach(vehicleId -> scenario.getVehicles().removeVehicle(vehicleId));
+        CarrierVehicleTypes.getVehicleTypes(carriers).getVehicleTypes().keySet().forEach(vehicleTypeId -> scenario.getVehicles().removeVehicleType(vehicleTypeId));
+        carriers.getCarriers().values().forEach(carrier -> {
+            carrier.getServices().clear();
+            carrier.getShipments().clear();
+            carrier.clearPlans();
+        });
+    }
+
     private void createFreightAgents() {
         for (Carrier carrier : carriers.getCarriers().values()) {
             int nextId = 0;
@@ -211,7 +236,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
                         Tour.ServiceActivity act = (Tour.ServiceActivity) tourElement;
 
                         CarrierService service = carrier.getServices().get(act.getService().getId()); //for some reason, the serviceAct only has a copy of the CarrierService object and this copy does not have the attributes..
-                        String actType = COMMERCIALJOB_ACTIVITYTYPE_PREFIX + CommercialJobUtils.CARRIERSPLIT + carrier.getId();
+                        String actType = COMMERCIALJOB_ACTIVITYTYPE_PREFIX + "_" + carrier.getId();
                         String customer = (String) service.getAttributes().getAsMap().get(CUSTOMER_ATTRIBUTE_NAME);
 
 
@@ -244,31 +269,6 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
                 freightDrivers.add(driverPerson.getId());
             }
         }
-    }
-
-
-    private Person createDriverPerson(Id<Person> driverId) {
-        return  PopulationUtils.getFactory().createPerson(driverId);
-    }
-
-    @Override
-    public void notifyAfterMobsim(AfterMobsimEvent event) {
-        removeFreightAgents();
-    }
-
-    private void removeFreightAgents() {
-        freightDrivers.forEach(d -> scenario.getPopulation().removePerson(d));
-        freightVehicles.forEach(vehicleId -> scenario.getVehicles().removeVehicle(vehicleId));
-        CarrierVehicleTypes.getVehicleTypes(carriers).getVehicleTypes().keySet().forEach(vehicleTypeId -> scenario.getVehicles().removeVehicleType(vehicleTypeId));
-        carriers.getCarriers().values().forEach(carrier -> {
-            carrier.getServices().clear();
-            carrier.getShipments().clear();
-            carrier.clearPlans();
-        });
-    }
-
-    private static  Id<CarrierService> createCarrierServiceIdXForCustomer(Person customer, int x){
-        return Id.create(customer.getId().toString() + CommercialJobUtils.CARRIERSPLIT + x, CarrierService.class);
     }
 
 }

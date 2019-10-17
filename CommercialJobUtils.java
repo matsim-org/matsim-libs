@@ -39,7 +39,6 @@ public class CommercialJobUtils {
     public static final String COMMERCIALJOB_ATTRIBUTE_NAME = "commercialJob";
     public static final String CARRIER_MARKET_ATTRIBUTE_NAME = "market";
     static final String COMMERCIALJOB_ATTRIBUTE_DELIMITER = ";";
-    static final String CARRIERSPLIT = "_";
     static final String FREIGHT_DRIVER_PREFIX = "freight";
 
     //the pattern for the activity attribute is the following:
@@ -83,7 +82,9 @@ public class CommercialJobUtils {
     }
 
     static Id<Carrier> getCarrierIdFromDriver(Id<Person> personId) {
-        return Id.create(personId.toString().split(CARRIERSPLIT)[1], Carrier.class);
+        String idStr = personId.toString();
+        String subStr = idStr.substring(FREIGHT_DRIVER_PREFIX.length() + 1, idStr.indexOf("_veh"));
+        return Id.create(subStr, Carrier.class);
     }
 
     static boolean planExpectsCommercialJobs(Plan plan) {
