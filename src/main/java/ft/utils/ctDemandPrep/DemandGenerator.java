@@ -1,22 +1,5 @@
 package ft.utils.ctDemandPrep;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
@@ -24,6 +7,12 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class DemandGenerator {
 	String inputpath;
@@ -107,9 +96,9 @@ public class DemandGenerator {
 
 			if (!filesPerCompanyClass.containsKey(companyClass)) {
 				filesPerCompanyClass.put(companyClass, new ArrayList<String>());
-				filesPerCompanyClass.get(companyClass).add(f.getAbsolutePath().toString());
+                filesPerCompanyClass.get(companyClass).add(f.getAbsolutePath());
 			} else {
-				filesPerCompanyClass.get(companyClass).add(f.getAbsolutePath().toString());
+                filesPerCompanyClass.get(companyClass).add(f.getAbsolutePath());
 			}
 
 		}
@@ -230,7 +219,7 @@ public class DemandGenerator {
 	public void initializeZone2CompanyClassCounterMap() {
 
 		Set<String> uniqueClasses = new HashSet<String>(Arrays.asList("allCompanies", "A", "B", "C", "D", "E", "F", "G",
-				"H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U","KEP"));
+                "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "KEP"));
 
 		// for (Demand4CompanyClass demandPerFile : demand4CompanyClass2List) {
 		// uniqueClasses.add(demandPerFile.getCompanyClass());

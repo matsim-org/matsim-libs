@@ -14,7 +14,9 @@
             </leg>
             <activity type="home" link="259" x="0.0" y="0.0" end_time="16:00:00">
                 <attributes>
-                    <attribute name="jobId" class="java.lang.String">0</attribute>
+                    <!-- the pattern is the following
+                    <attribute name="commercialJob[NUMBER]" class="java.lang.String">[TYPE];[OPERATOR];[CAPACITYDEMAND];[EARLIESTSTART];[LATESTSTART];[DURATION]</attribute> !-->
+                    <attribute name="commercialJob1" class="java.lang.String">salamiPizza;1;43200;46800;180</attribute>
                 </attributes>
             </activity>
             <leg mode="car">
@@ -33,7 +35,7 @@
             </leg>
             <activity type="home" x="-200.0" y="800.0" end_time="16:00:00">
                 <attributes>
-                    <attribute name="jobId" class="java.lang.String">1;salamipizza_2</attribute>
+                    <attribute name="commercialJob1" class="java.lang.String">salamiPizza;1;43200;46800;180</attribute>
                 </attributes>
             </activity>
             <leg mode="car">
@@ -52,7 +54,7 @@
             </leg>
             <activity type="home" link="259" x="0.0" y="0.0" end_time="16:00:00">
                 <attributes>
-                    <attribute name="jobId" class="java.lang.String">3</attribute>
+                    <attribute name="commercialJob1" class="java.lang.String">salamiPizza;1;50000;51000;180</attribute>
                 </attributes>
             </activity>
             <leg mode="car">

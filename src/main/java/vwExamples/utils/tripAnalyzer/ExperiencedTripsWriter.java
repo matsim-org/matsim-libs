@@ -19,33 +19,6 @@
 
 package vwExamples.utils.tripAnalyzer;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.StringJoiner;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang.mutable.MutableInt;
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
@@ -58,13 +31,8 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryCollection;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineSegment;
-import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.*;
 import org.locationtech.jts.io.WKTWriter;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -72,15 +40,23 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.util.distance.DistanceUtils;
-import org.matsim.core.utils.geometry.GeometryUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
-import analysis.drtOccupancy.DynModeTripsAnalyser;
+import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 public class ExperiencedTripsWriter {
 	private String path;
@@ -157,7 +133,6 @@ public class ExperiencedTripsWriter {
 			tourClassifier();
 			getParkingTimes();
 			String folder = new File(path).getParentFile().getName();
-			writeTripLengthDist(new File(path).getParent() + "\\" + folder + ".tripLength");
 			analyseCarParking(new File(path).getParent() + "\\" + folder + ".parking", parkingEvents, 120);
 			analyseActiveVehicles(new File(path).getParent() + "\\" + folder + ".activeVehicles");
 			writeMileagePerMode(new File(path).getParent() + "\\" + folder + ".mileage");
@@ -418,10 +393,10 @@ public class ExperiencedTripsWriter {
 
 				for (ExperiencedTrip trip : triplist) {
 
-					// if(trip.getAgent().toString().contains("freight"))
-					// {
-					// System.out.println(trip.getAgent());
-					// }
+                    // if(trip.getAgent().toString().contains("freight"))
+                    // {
+                    // System.out.println(trip.getAgent());
+                    // }
 
 					if (tripWithinCity(trip)) {
 						String mainMode = trip.getMainMode();
@@ -683,30 +658,21 @@ public class ExperiencedTripsWriter {
 
 	private boolean isInboundCommuterTour(List<ExperiencedTrip> triplist) {
 
-		if (livesOutside(triplist) && worksInside(triplist)) {
-			return true;
-		}
-		return false;
+        return livesOutside(triplist) && worksInside(triplist);
 
-	}
+    }
 
 	private boolean isOutboundCommuterTour(List<ExperiencedTrip> triplist) {
 
-		if (worksOutside(triplist) && livesInside(triplist)) {
-			return true;
-		}
-		return false;
+        return worksOutside(triplist) && livesInside(triplist);
 
-	}
+    }
 
 	private boolean isWithinCommuterTour(List<ExperiencedTrip> triplist) {
 
-		if (worksInside(triplist) && livesInside(triplist)) {
-			return true;
-		}
-		return false;
+        return worksInside(triplist) && livesInside(triplist);
 
-	}
+    }
 
 	// private boolean isWithinCommuterTour(List<ExperiencedTrip> triplist) {
 	//
@@ -832,17 +798,14 @@ public class ExperiencedTripsWriter {
 		Coord coord1 = fromLink.getCoord();
 		Coord coord2 = toLink.getCoord();
 		// return false if act is outside city area
-		if (isWithinZone(coord1) && isWithinZone(coord2)) {
-			return true;
-		} else
-			return false;
+        return isWithinZone(coord1) && isWithinZone(coord2);
 
 	}
 
 	private void tourIdentifier() {
 		System.out.println("Working Tour Identification");
 		String tourMatchKey = "home";
-		HashSet<String> commercialTrafficActs = new HashSet<String>();
+        HashSet<String> commercialTrafficActs = new HashSet<String>();
 		commercialTrafficActs.add("start");
 		commercialTrafficActs.add("end");
 
@@ -857,60 +820,65 @@ public class ExperiencedTripsWriter {
 
 			List<ExperiencedTrip> tripList = tripsPerPersonEntry.getValue();
 
-			boolean isAgentMoving = proveAgentMoves(tripList);
-			boolean isAgentTimeConsistent = proveTimeConsitency(tripList);
+            if (PersonId.toString().contains("42_na_109031101")) {
+                int bla = 9;
+                boolean demo = proveTimeConsitency(tripList);
+            }
 
-			if (isAgentTimeConsistent && isAgentMoving) {
+            if (proveTimeConsitency(tripList)) {
 
-				totalNumberTripToBeStored = totalNumberTripToBeStored + tripList.size();
+                totalNumberTripToBeStored = totalNumberTripToBeStored + tripList.size();
 
-				List<ExperiencedTrip> tripsWithinTour = new ArrayList<ExperiencedTrip>();
+                List<ExperiencedTrip> tripsWithinTour = new ArrayList<ExperiencedTrip>();
 
-				for (ExperiencedTrip trip : tripList) {
+                for (ExperiencedTrip trip : tripList) {
 
-					String actAfter = trip.getActivityAfter();
+                    String actAfter = trip.getActivityAfter();
 
-					if (commercialTrafficActs.contains(actAfter)) {
-						Logger.getLogger(ExperiencedTripsWriter.class).warn("REWRITE FREIGHT ACTS");
-						actAfter = tourMatchKey;
-					}
+                    if (commercialTrafficActs.contains(actAfter)) {
+                        Logger.getLogger(ExperiencedTripsWriter.class).warn("REWRITE FREIGHT ACTS");
+                        actAfter = tourMatchKey;
+                    }
 
-					// trip.setSubTourNr(subtourIdent);
-					tripsWithinTour.add(trip);
+                    // trip.setSubTourNr(subtourIdent);
+                    tripsWithinTour.add(trip);
 
-					if (actAfter.contains(tourMatchKey)) {
-						// subtourIdent++;
-						// Create new List of ExperiencedTrip --> Tour
-						// Save this tour
-						// Clear the tripsWithinTour
-						List<ExperiencedTrip> saveTripsWithinTour = new ArrayList<ExperiencedTrip>();
-						saveTripsWithinTour.addAll(tripsWithinTour);
+                    if (actAfter.contains(tourMatchKey)) {
+                        // subtourIdent++;
+                        // Create new List of ExperiencedTrip --> Tour
+                        // Save this tour
+                        // Clear the tripsWithinTour
+                        List<ExperiencedTrip> saveTripsWithinTour = new ArrayList<ExperiencedTrip>();
+                        saveTripsWithinTour.addAll(tripsWithinTour);
 
-						// if(♣.containsKey(TourId))
-						// {
-						// System.out.println("BUG Double tourId!");
-						// }
-						subtourIdent.increment();
-						String TourId = tripsPerPersonEntry.getKey().toString() + "_" + subtourIdent;
-						tourId2trips.put(TourId, saveTripsWithinTour);
-						realNumberTripStored = realNumberTripStored + saveTripsWithinTour.size();
+                        // if(tourId2trips.containsKey(TourId))
+                        // {
+                        // System.out.println("BUG Double tourId!");
+                        // }
+                        subtourIdent.increment();
+                        String TourId = tripsPerPersonEntry.getKey().toString() + "_" + subtourIdent;
+                        tourId2trips.put(TourId, saveTripsWithinTour);
+                        realNumberTripStored = realNumberTripStored + saveTripsWithinTour.size();
 
-						// checkedToursCounter++;
-						tripsWithinTour.clear();
+                        // checkedToursCounter++;
+                        tripsWithinTour.clear();
 
-					}
-					// System.out.println("Trip sorted into tour: "+realNumberTripStored +" || all
-					// trips: "+totalNumberTripToBeStored );
-				}
+                    }
+                    // System.out.println("Trip sorted into tour: "+realNumberTripStored +" || all
+                    // trips: "+totalNumberTripToBeStored );
+                }
 
-				// if (tripsWithinTour.size()>0)
-				// {
-				// System.out.println("Agent did not reach home!");
-				//
-				// }
+                // if (tripsWithinTour.size()>0)
+                // {
+                // System.out.println("Agent did not reach home!");
+                //
+                // }
 
-			}
-		}
+            } else {
+                Logger.getLogger(ExperiencedTripsWriter.class)
+                        .warn("Agent with time consitency bug: " + PersonId.toString());
+            }
+        }
 		// System.out.print("Seen Tours #" + checkedToursCounter + "\n");
 
 	}
@@ -1003,77 +971,52 @@ public class ExperiencedTripsWriter {
 
 	}
 
-	ExperiencedTrip getPrevCarTrip(List<ExperiencedTrip> triplist, int actualTripIdx) {
+    ExperiencedTrip getPrevCarTrip(List<ExperiencedTrip> triplist, int actualTripIdx) {
 
-		// j counts the number of backward steps
-		for (int j = 1; j < triplist.size(); j++) {
+        // j counts the number of backward steps
+        for (int j = 1; j < triplist.size(); j++) {
 
-			// Is the index in the list which we will check now
-			int backwardPointer = (actualTripIdx - j);
-			if (backwardPointer < 0) {
-				backwardPointer = backwardPointer + triplist.size();
-			}
+            // Is the index in the list which we will check now
+            int backwardPointer = (actualTripIdx - j);
+            if (backwardPointer < 0) {
+                backwardPointer = backwardPointer + triplist.size();
+            }
 
-			// System.out.println("ActualIdx: " + actualTripIdx + "Backward Pointer: " +
-			// backwardPointer);
-			ExperiencedTrip candidate = triplist.get(backwardPointer);
+            // System.out.println("ActualIdx: " + actualTripIdx + "Backward Pointer: " +
+            // backwardPointer);
+            ExperiencedTrip candidate = triplist.get(backwardPointer);
 
-			if (candidate.getMainMode().equals(TransportMode.car)) {
-				return candidate;
-			}
+            if (candidate.getMainMode().equals(TransportMode.car)) {
+                return candidate;
+            }
 
-		}
+        }
 
-		System.out.print("No prev car trip found: " + triplist.get(0).getAgent());
-		return null;
+        System.out.print("No prev car trip found!");
+        return null;
 
-	}
+    }
 
-	// TODO
-	public boolean proveTimeConsitency(List<ExperiencedTrip> tripList) {
-		// Logger.getLogger(ExperiencedTripsWriter.class).warn("TIME CONSISTENCY CHECK
-		// ACTIVATED!");
-		double actualTripStartTime = 0;
-		for (ExperiencedTrip trip : tripList) {
-			if (trip.getStartTime() >= actualTripStartTime) {
-				actualTripStartTime = trip.getStartTime();
-			} else {
-				Logger.getLogger(ExperiencedTripsWriter.class)
-						.warn("Agent with time consitency bug: " + tripList.get(0).getAgent().toString());
-				return false;
-			}
+    public boolean proveTimeConsitency(List<ExperiencedTrip> tripList) {
 
-		}
+        double actualTripStartTime = 0;
+        for (ExperiencedTrip trip : tripList) {
+            if (trip.getStartTime() > actualTripStartTime) {
+                actualTripStartTime = trip.getStartTime();
+            } else {
+                return false;
+            }
 
-		return true;
+        }
 
-	}
+        return true;
 
-	public boolean proveAgentMoves(List<ExperiencedTrip> tripList) {
-		// Logger.getLogger(ExperiencedTripsWriter.class).warn("TIME CONSISTENCY CHECK
-		// ACTIVATED!");
-		HashSet<Id<Link>> linkSet = new HashSet<Id<Link>>();
-		for (ExperiencedTrip trip : tripList) {
-			linkSet.add(trip.getFromLinkId());
-
-		}
-
-		if (linkSet.size() > 1) {
-			return true;
-		} else {
-			Logger.getLogger(ExperiencedTripsWriter.class)
-					.warn("Agent is not moving, not considered in analysis:" + tripList.get(0).getAgent());
-			return false;
-		}
-
-	}
+    }
 
 	public void getParkingTimes() {
 		System.out.println("Working on Parking Data");
 
 		for (Entry<String, List<ExperiencedTrip>> TourEntrySet : tourId2trips.entrySet()) {
-			// for (Entry<Id<Person>, List<ExperiencedTrip>> TourEntrySet :
-			// agent2trips.entrySet()) {
 			// String tourId = TourEntrySet.getKey();
 			List<ExperiencedTrip> triplist = TourEntrySet.getValue();
 
@@ -1085,59 +1028,52 @@ public class ExperiencedTripsWriter {
 
 				if (mainMode.equals(TransportMode.car)) {
 
-					if (trip.getFromLinkId() != trip.getToLinkId()) {
+                    // int pointer = mod((i - 1), nrOfTrips);
 
-						// int pointer = mod((i - 1), nrOfTrips);
+                    ExperiencedTrip prevCarTrip = getPrevCarTrip(triplist, i);
 
-						ExperiencedTrip prevCarTrip = getPrevCarTrip(triplist, i);
+					double endOfParking = trip.getStartTime(); // trip start time == act end time
+					Coord coord = network.getLinks().get(trip.getFromLinkId()).getCoord();
+                    // double startOfParking = triplist.get(pointer).getEndTime(); // trip end time
+                    // == act start time
+                    double startOfParking = prevCarTrip.getEndTime();
+					double activityDuration = Math.abs(endOfParking - startOfParking);
+					String parkingZone = identParkingZone(coord);
 
-						double startOfParking = prevCarTrip.getEndTime();
+					// trip.setParkingStart(startOfParking);
+					// trip.setParkingEnd(endOfParking);
+					Id<Person> personId = trip.getAgent();
 
-						double endOfParking = trip.getStartTime(); // trip start time == act end time
-						Coord coord = network.getLinks().get(trip.getFromLinkId()).getCoord();
-						// double startOfParking = triplist.get(pointer).getEndTime(); // trip end time
-						// == act start time
+					// If the activity was 0, there was no parking
+					// Acutal Hanover model contains activities with 0 duration
+					if (activityDuration > 0) {
 
-						double activityDuration = Math.abs(endOfParking - startOfParking);
-						String parkingZone = identParkingZone(coord);
+						// If person parks over night (>24h) one needs to create two parking events
+						// Split into two parking events till mid-night startOfParking---->mid-night +
+						// mid-night ----> endOfParking
+						if (endOfParking < startOfParking) {
+							parkingEvents
+									.add(new ParkingEvent(startOfParking, 24 * 3600.0, personId, coord, parkingZone));
+							parkingEvents.add(new ParkingEvent(0.0, endOfParking, personId, coord, parkingZone));
 
-						// trip.setParkingStart(startOfParking);
-						// trip.setParkingEnd(endOfParking);
-						Id<Person> personId = trip.getAgent();
+						} else {
 
-						// If the activity was 0, there was no parking
-						// Acutal Hanover model contains activities with 0 duration
-						if (activityDuration > 0) {
-
-							// If person parks over night (>24h) one needs to create two parking events
-							// Split into two parking events till mid-night startOfParking---->mid-night +
-							// mid-night ----> endOfParking
-							if (endOfParking < startOfParking) {
-								parkingEvents.add(
-										new ParkingEvent(startOfParking, 24 * 3600.0, personId, coord, parkingZone));
-								parkingEvents.add(new ParkingEvent(0.0, endOfParking, personId, coord, parkingZone));
-
-							} else {
-
-								parkingEvents.add(
-										new ParkingEvent(startOfParking, endOfParking, personId, coord, parkingZone));
-							}
-
-						} else if (activityDuration < 0) {
-							Logger.getLogger(ExperiencedTripsWriter.class).warn(
-									"Person " + personId + " Act Start < Act End:" + " duration " + activityDuration);
+							parkingEvents
+									.add(new ParkingEvent(startOfParking, endOfParking, personId, coord, parkingZone));
 						}
 
-					} else {
-						Logger.getLogger(ExperiencedTripsWriter.class)
-								.warn("Car trip with no distance, skipped for parking:" + trip.getAgent());
+                    } else if (activityDuration < 0) {
+                        Logger.getLogger(ExperiencedTripsWriter.class)
+                                .warn("Person " + personId + " Act Start < Act End:" + " duration " + activityDuration);
 					}
 
-					i++;
 				}
 
+				i++;
 			}
+
 		}
+
 	}
 
 	private void calucalteCarLinkLengthPerZone() {
@@ -1230,7 +1166,7 @@ public class ExperiencedTripsWriter {
 			bw.write("timebin");
 
 			for (String zoneId : zoneMap.keySet()) {
-				bw.write(";" + zoneId.toString());
+                bw.write(";" + zoneId);
 			}
 			bw.newLine();
 
@@ -1358,84 +1294,6 @@ public class ExperiencedTripsWriter {
 
 	}
 
-	public void writeTripLengthDist(String fileName) {
-		DecimalFormat format = new DecimalFormat();
-		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
-		format.setMinimumIntegerDigits(1);
-		format.setMaximumFractionDigits(2);
-		format.setGroupingUsed(false);
-
-		double[] binBorders = { 0, 0.5, 1, 2, 5, 10, 20, 50, 100 };
-//		double[] binBorders = { 0,2, 4, 6, 8, 10, 20, 50, 100 };
-
-		for(ModalSplitSegment segment : ModalSplitSegments)
-		
-		
-		{
-
-			BufferedWriter bw = IOUtils.getBufferedWriter(fileName+"_"+segment.SegmentClassNr + ".csv");
-
-			try {
-				// Write header
-				ModalSplitSegment dummyModalSplitForHeader = ModalSplitSegments.iterator().next();
-				String header_modes = dummyModalSplitForHeader.mode2TripDistance.keySet().stream().map(Object::toString)
-						.collect(Collectors.joining(";"));
-				bw.write("modalSplitType" + ";" + header_modes.toString());
-
-				bw.newLine();
-
-				int binIdx = 0;
-
-				
-
-				double binRightBorder = Double.NaN;
-
-				// Loop over all range bins
-				for (double binLeftBorder : binBorders) {
-
-					int j = binIdx + 1;
-
-					String row;
-
-					if (j < (binBorders.length)) {
-						binRightBorder = binBorders[j];
-						row = "[" + binLeftBorder + "<" + binRightBorder + "]";
-					} else {
-						binRightBorder = Double.MAX_VALUE;
-						row = "[" + binLeftBorder + "<" + "inf" + "]";
-					}
-
-					// Create an entry to specify the bin
-					for (Entry<String, ArrayList<Double>> e : segment.mode2TripDistance.entrySet()) {
-
-						ArrayList<Double> values = e.getValue();
-
-						int binCount = 0;
-
-						for (Double value : values) {
-							if ((value / 1000.0) >= binLeftBorder && (value / 1000.0) < binRightBorder) {
-								binCount++;
-							}
-						}
-
-						row = row + ";" + binCount;
-
-					}
-					bw.write(row);
-					bw.newLine();
-					binIdx++;
-				}
-
-				bw.flush();
-				bw.close();
-
-			} catch (IOException e) {
-
-				e.printStackTrace();
-			}
-		}
-	}
-
 	public void writeModalSplits(String fileName) {
 		DecimalFormat format = new DecimalFormat();
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
@@ -1450,7 +1308,7 @@ public class ExperiencedTripsWriter {
 			ModalSplitSegment dummyModalSplitForHeader = ModalSplitSegments.iterator().next();
 			String header_modes = dummyModalSplitForHeader.mode2TripDistance.keySet().stream().map(Object::toString)
 					.collect(Collectors.joining(";"));
-			bw.write("modalSplitType" + ";" + header_modes.toString());
+            bw.write("modalSplitType" + ";" + header_modes);
 
 			bw.newLine();
 
@@ -1560,7 +1418,7 @@ public class ExperiencedTripsWriter {
 			bw.write("timebin");
 
 			for (String zoneId : zoneMap.keySet()) {
-				bw.write(";" + zoneId.toString());
+                bw.write(";" + zoneId);
 			}
 			bw.newLine();
 
@@ -1936,13 +1794,13 @@ public class ExperiencedTripsWriter {
 
 	private void writeExperiencedLeg(ExperiencedLeg leg, int legNr) {
 		try {
-			bw.write(sep + Integer.toString(legNr + 1) + sep + leg.getFromLinkId() + sep + leg.getToLinkId() + sep
+            bw.write(sep + (legNr + 1) + sep + leg.getFromLinkId() + sep + leg.getToLinkId() + sep
 					+ convertSecondsToTimeString(leg.getStartTime()) + sep
 					+ convertSecondsToTimeString(leg.getEndTime()) + sep + leg.getMode() + sep + leg.getWaitTime() + sep
 					+ leg.getGrossWaitTime() + sep + leg.getInVehicleTime() + sep + leg.getDistance() + sep
-					+ String.valueOf(leg.getTransitRouteId()));
+                    + leg.getTransitRouteId());
 			if (leg.getMode().equals(TransportMode.pt)) {
-				bw.write(sep + String.valueOf(leg.getPtFromStop()) + sep + String.valueOf(leg.getPtToStop()));
+                bw.write(sep + leg.getPtFromStop() + sep + leg.getPtToStop());
 			} else {
 				bw.write(sep + "no pt" + sep + "no pt");
 			}

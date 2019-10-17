@@ -29,9 +29,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.matsim.core.config.ConfigUtils.createConfig;
@@ -43,7 +44,6 @@ public class PlanModeIdentifier {
         Config config = createConfig();
 
         Scenario scenario = createScenario(config);
-        StageActivityTypes blackList = new ParkingRouterNetworkRoutingModule.ParkingAccessEgressStageActivityTypes();
         MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
 
         new PopulationReader(scenario).readFile("D:/runs-svn/vw_rufbus/vw220park10T/vw220park10T.output_plans.xml.gz");
@@ -52,7 +52,7 @@ public class PlanModeIdentifier {
             Plan plan = person.getSelectedPlan();
             final List<PlanElement> planElements = plan.getPlanElements();
 
-            final List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(plan, blackList);
+            final List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(plan, new HashSet<String>(Arrays.asList(ParkingRouterNetworkRoutingModule.parkingStageActivityType)));
 
             for (TripStructureUtils.Trip trip : trips) {
                 final List<PlanElement> fullTrip =

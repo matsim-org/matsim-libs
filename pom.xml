@@ -6,8 +6,8 @@
 	<artifactId>matsim-vw</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
-	<name>MATSim example project</name>
-	<description>MATSim example project</description>
+	<name>VW-projects</name>
+	<description>repository for development of MATSim functionality related to projects</description>
 
 	<properties>
 

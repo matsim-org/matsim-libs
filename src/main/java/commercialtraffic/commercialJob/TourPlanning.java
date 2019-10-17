@@ -29,48 +29,41 @@ import com.graphhopper.jsprit.core.problem.constraint.ServiceDeliveriesFirstCons
 import com.graphhopper.jsprit.core.problem.constraint.VehicleDependentTimeWindowConstraints;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
-//import commercialtraffic.NetworkBasedTransportCosts;
-import commercialtraffic.NetworkRouter;
-import commercialtraffic.integration.CarrierJSpritIterations;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType;
+import org.matsim.contrib.freight.carrier.CarrierUtils;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
-//import org.matsim.contrib.freight.jsprit.NetworkRouter;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.VehicleType;
 
-import javax.inject.Inject;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ForkJoinPool;
 
-public class TourPlanning  {
-
-    static Logger log = Logger.getLogger(TourPlanning.class);
+//import org.matsim.contrib.freight.jsprit.NetworkRouter;
 
 
-    static void runTourPlanningForCarriers(Carriers carriers, Scenario scenario, CarrierJSpritIterations iterations, int jSpritTimeSliceWidth, TravelTime travelTime) {
+class TourPlanning  {
+
+    private static Logger log = Logger.getLogger(TourPlanning.class);
+
+
+    static void runTourPlanningForCarriers( Carriers carriers, Scenario scenario, int jSpritTimeSliceWidth,
+							  TravelTime travelTime ) {
         Set<VehicleType> vehicleTypes = new HashSet<>();
         carriers.getCarriers().values().forEach(carrier -> vehicleTypes.addAll(carrier.getCarrierCapabilities().getVehicleTypes()));
         NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), vehicleTypes);
         log.info("SETTING TIME SLICE TO " + jSpritTimeSliceWidth);
-        
-        
+
         netBuilder.setTimeSliceWidth(jSpritTimeSliceWidth); // !!!! otherwise it will not do anything.
         netBuilder.setTravelTime(travelTime);
 
-        
-
-        
         final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
         
-carriers.getCarriers().values().parallelStream().forEach(carrier -> {
+        carriers.getCarriers().values().parallelStream().forEach(carrier -> {
                     double start = System.currentTimeMillis();
                     int serviceCount =  carrier.getServices().size();
                     log.info("start tour planning for " + carrier.getId() + " which has " + serviceCount + " services");
@@ -78,7 +71,7 @@ carriers.getCarriers().values().parallelStream().forEach(carrier -> {
                     //Build VRP
                     
                     VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork());
-                    
+
                     vrpBuilder.setRoutingCost(netBasedCosts);// this may be too expensive for the size of the problem
                     
                     VehicleRoutingProblem problem = vrpBuilder.build();
@@ -116,7 +109,7 @@ carriers.getCarriers().values().parallelStream().forEach(carrier -> {
                         log.info("setting maxIterations=1 as carrier has no services");
                         algorithm.setMaxIterations(1);
                     } else{
-                        algorithm.setMaxIterations(iterations.getNrOfJSpritIterationsForCarrier(carrier.getId()));
+                        algorithm.setMaxIterations( CarrierUtils.getJspritIterations( carrier ) ) ;
                     }
 
                     // variationCoefficient = stdDeviation/mean. so i set the threshold rather soft

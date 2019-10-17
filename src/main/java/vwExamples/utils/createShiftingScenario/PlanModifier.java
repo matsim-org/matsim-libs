@@ -19,28 +19,12 @@
 
 package vwExamples.utils.createShiftingScenario;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.drt.routing.DrtStageActivityType;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -48,9 +32,6 @@ import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.MainModeIdentifierImpl;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
@@ -60,6 +41,12 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.PtConstants;
 import org.opengis.feature.simple.SimpleFeature;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author saxer
@@ -83,7 +70,6 @@ public class PlanModifier {
 	Scenario scenario;
 
 	Collection<String> stages;
-	StageActivityTypes blackList;
 
 	Network network;
 	SubTourValidator subTourValidator; // Defines the rule to calculate absolute number of trips or agents that might
@@ -124,7 +110,6 @@ public class PlanModifier {
 		stages.add(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		stages.add(new DrtStageActivityType("drt").drtStageActivity);
 		stages.add(parking.ParkingRouterNetworkRoutingModule.parkingStageActivityType);
-		blackList = new StageActivityTypesImpl(stages);
 
 		subTourValidator = new isHomeOfficeSubTourCandidate(network, cityZonesMap, serviceAreazonesMap);
 		assignTourValidator = new assignHomeOfficeSubTour(network, cityZonesMap, serviceAreazonesMap);
@@ -204,7 +189,7 @@ public class PlanModifier {
 
 			PersonUtils.removeUnselectedPlans(person);
 			Plan plan = person.getSelectedPlan();
-			for (Subtour subTour : TripStructureUtils.getSubtours(plan, blackList)) {
+			for (Subtour subTour : TripStructureUtils.getSubtours(plan, new HashSet<>(stages))) {
 
 				String subtourMode = getSubtourMode(subTour, plan);
 				//&&subtourmode equals transportmode car
@@ -276,7 +261,7 @@ public class PlanModifier {
 				
 				// Loop over all subtours of this agent
 
-				for (Subtour subTour : TripStructureUtils.getSubtours(plan, blackList)) {
+				for (Subtour subTour : TripStructureUtils.getSubtours(plan, new HashSet<>(stages))) {
 
 					// Get subtour mode
 					String subtourMode = getSubtourMode(subTour, plan);

@@ -1,8 +1,5 @@
 package vwExamples.utils.createShiftingScenario;
 
-import java.util.Map;
-import java.util.StringJoiner;
-
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -10,6 +7,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.geometry.geotools.MGC;
+
+import java.util.Map;
+import java.util.StringJoiner;
 
 public class assignShoppingCandidate implements SubTourValidator {
 	Network network;
@@ -30,12 +30,7 @@ public class assignShoppingCandidate implements SubTourValidator {
 		String chain = getSubtourActivityChain(subTour);
 		String requiredChain = "home-shopping-home";
 
-		if (isWithinRegionShoppingTour(subTour) && (chain.equals(requiredChain))) {
-			return true;
-		}
-
-		else
-			return false;
+        return isWithinRegionShoppingTour(subTour) && (chain.equals(requiredChain));
 	}
 
 	public String getSubtourActivityChain(Subtour subtour) {
@@ -67,23 +62,39 @@ public class assignShoppingCandidate implements SubTourValidator {
 
 	public boolean isWithinCityShoppingTour(Subtour subTour) {
 
-		if (shopInside(subTour) && livesInside(subTour)) {
-			return true;
-		}
+        return shopInside(subTour) && livesInside(subTour);
+
+    }
+
+    public boolean isWithinRegionShoppingTour(Subtour subTour) {
+
+        return shopInRegion(subTour) && livesInside(subTour);
+
+    }
+
+    public boolean shopInside(Subtour subTour) {
+
+        for (Trip trip : subTour.getTrips()) {
+            String ActBefore = trip.getOriginActivity().getType();
+
+            if (ActBefore.contains("shopping")) {
+                Link fromLink = network.getLinks().get(trip.getOriginActivity().getLinkId());
+
+                Coord coord = fromLink.getCoord();
+                // If work is inside zoneMap return true
+                if (isWithinZone(coord)) {
+                    return true;
+                }
+
+            }
+
+        }
+
 		return false;
 
 	}
-	
-	public boolean isWithinRegionShoppingTour(Subtour subTour) {
 
-		if (shopInRegion(subTour) && livesInside(subTour)) {
-			return true;
-		}
-		return false;
-
-	}
-
-	public boolean shopInside(Subtour subTour) {
+    public boolean shopInRegion(Subtour subTour) {
 
 		for (Trip trip : subTour.getTrips()) {
 			String ActBefore = trip.getOriginActivity().getType();
@@ -93,29 +104,7 @@ public class assignShoppingCandidate implements SubTourValidator {
 
 				Coord coord = fromLink.getCoord();
 				// If work is inside zoneMap return true
-				if (isWithinZone(coord)) {
-					return true;
-				}
-
-			}
-
-		}
-
-		return false;
-
-	}
-	
-	public boolean shopInRegion(Subtour subTour) {
-
-		for (Trip trip : subTour.getTrips()) {
-			String ActBefore = trip.getOriginActivity().getType();
-
-			if (ActBefore.contains("shopping")) {
-				Link fromLink = network.getLinks().get(trip.getOriginActivity().getLinkId());
-
-				Coord coord = fromLink.getCoord();
-				// If work is inside zoneMap return true
-				if (isWithinRegion(coord)) {
+                if (isWithinRegion(coord)) {
 					return true;
 				}
 
@@ -191,34 +180,34 @@ public class assignShoppingCandidate implements SubTourValidator {
 
 	}
 
-	public boolean isWithinZone(Coord coord) {
-		// Function assumes Shapes are in the same coordinate system like MATSim
-		// simulation
+    public boolean isWithinZone(Coord coord) {
+        // Function assumes Shapes are in the same coordinate system like MATSim
+        // simulation
 
-		for (String zone : cityZonesMap.keySet()) {
-			Geometry geometry = cityZonesMap.get(zone);
-			if (geometry.intersects(MGC.coord2Point(coord))) {
-				// System.out.println("Coordinate in "+ zone);
-				return true;
-			}
-		}
+        for (String zone : cityZonesMap.keySet()) {
+            Geometry geometry = cityZonesMap.get(zone);
+            if (geometry.intersects(MGC.coord2Point(coord))) {
+                // System.out.println("Coordinate in "+ zone);
+                return true;
+            }
+        }
 
-		return false;
-	}
-	
-	public boolean isWithinRegion(Coord coord) {
-		// Function assumes Shapes are in the same coordinate system like MATSim
-		// simulation
+        return false;
+    }
 
-		for (String zone : serviceAreazonesMap.keySet()) {
-			Geometry geometry = serviceAreazonesMap.get(zone);
-			if (geometry.intersects(MGC.coord2Point(coord))) {
-				// System.out.println("Coordinate in "+ zone);
-				return true;
-			}
-		}
+    public boolean isWithinRegion(Coord coord) {
+        // Function assumes Shapes are in the same coordinate system like MATSim
+        // simulation
 
-		return false;
-	}
+        for (String zone : serviceAreazonesMap.keySet()) {
+            Geometry geometry = serviceAreazonesMap.get(zone);
+            if (geometry.intersects(MGC.coord2Point(coord))) {
+                // System.out.println("Coordinate in "+ zone);
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 }

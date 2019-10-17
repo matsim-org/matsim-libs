@@ -19,85 +19,76 @@
 
 package vwExamples.utils;
 
-import java.util.StringJoiner;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.population.io.StreamingPopulationWriter;
-import org.matsim.core.router.TripStructureUtils.Subtour;
-import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.util.StringJoiner;
 
 /**
  * @author saxer
  */
 public class ActivityChainCounter {
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
-		// Create a Scenario
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		// Fill this Scenario with a population.
-		new PopulationReader(scenario).readFile(
-				"D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw272.0.1\\vw272.0.1.output_plans.xml.gz");
+        // Create a Scenario
+        Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        // Fill this Scenario with a population.
+        new PopulationReader(scenario).readFile(
+                "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw272.0.1\\vw272.0.1.output_plans.xml.gz");
 //		String randomOrderedPop = "D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\vw270_0.1_CT_0.1\\Population\\populationWithCTdemand_sel.xml.gz";
 //		StreamingPopulationWriter filteredPop = new StreamingPopulationWriter();
 //		filteredPop.startStreaming(randomOrderedPop);
 
-		int personCounter = 0;
-		int personMultiWorkCounter = 0;
-		for (Person person : scenario.getPopulation().getPersons().values()) {
-			
-			if(checkMultiWorkPlans(person.getSelectedPlan()))
-			{
-				personMultiWorkCounter++;
-			}
+        int personCounter = 0;
+        int personMultiWorkCounter = 0;
+        for (Person person : scenario.getPopulation().getPersons().values()) {
+
+            if (checkMultiWorkPlans(person.getSelectedPlan())) {
+                personMultiWorkCounter++;
+            }
 //			filteredPop.writePerson(person);
-			personCounter++;
-		}
-		
-		System.out.println("Persons: "+ personCounter +" || "+ "MultiWorker > 2: "+personMultiWorkCounter );
+            personCounter++;
+        }
+
+        System.out.println("Persons: " + personCounter + " || " + "MultiWorker > 2: " + personMultiWorkCounter);
 
 //		filteredPop.closeStreaming();
 
-	}
+    }
 
-	public static boolean checkMultiWorkPlans(Plan plan) {
-		StringJoiner joiner = new StringJoiner("-");
+    public static boolean checkMultiWorkPlans(Plan plan) {
+        StringJoiner joiner = new StringJoiner("-");
 
-		String requiredChain = "work-work-work-work-work-work-work-work-work";
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				String act = ((Activity) pe).toString();
+        String requiredChain = "work-work-work-work-work-work-work-work-work";
+        for (PlanElement pe : plan.getPlanElements()) {
+            if (pe instanceof Activity) {
+                String act = pe.toString();
 
-				if (act.contains("home")) {
-					act = "home";
-				} else if (act.contains("work")) {
-					act = "work";
-				} else if (act.contains("shopping")) {
-					act = "shopping";
-				} else if (act.contains("other")) {
-					act = "other";
-				} else if (act.contains("leisure")) {
-					act = "leisure";
-				}
+                if (act.contains("home")) {
+                    act = "home";
+                } else if (act.contains("work")) {
+                    act = "work";
+                } else if (act.contains("shopping")) {
+                    act = "shopping";
+                } else if (act.contains("other")) {
+                    act = "other";
+                } else if (act.contains("leisure")) {
+                    act = "leisure";
+                }
 
-				joiner.add(act);
-			}
+                joiner.add(act);
+            }
 
-		}
+        }
 
-		if (joiner.toString().contains(requiredChain)) {
-			return true;
-		}
+        return joiner.toString().contains(requiredChain);
 
-		return false;
-
-	}
+    }
 }

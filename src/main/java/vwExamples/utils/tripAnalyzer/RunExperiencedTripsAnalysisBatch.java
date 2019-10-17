@@ -22,14 +22,6 @@
 
 package vwExamples.utils.tripAnalyzer;
 
-import java.io.File;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -42,17 +34,19 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.opengis.feature.simple.SimpleFeature;
 
+import java.io.File;
+import java.util.*;
+
 public class RunExperiencedTripsAnalysisBatch {
 
 	static Map<String, Geometry> zoneMap = new HashMap<>();
 	static Set<String> zones = new HashSet<>();
-	static String shapeFile = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Cemdap\\add_data\\shp\\Hannover_Stadtteile.shp";
+    static String shapeFile = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Cemdap\\add_data\\shp\\Hannover_Stadtteile.shp";
 	static String shapeFeature = "NO";
 
 	public static void main(String[] args) {

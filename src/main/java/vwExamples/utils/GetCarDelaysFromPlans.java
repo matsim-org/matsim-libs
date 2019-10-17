@@ -19,37 +19,25 @@
 
 package vwExamples.utils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.router.EmptyStageActivityTypes;
-import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.*;
 
 /**
  * @author saxer
@@ -74,41 +62,40 @@ public class GetCarDelaysFromPlans {
         new MatsimNetworkReader(scenario.getNetwork()).readFile("D:\\Axer\\MatsimDataStore\\Berlin_DRT\\input\\network\\modifiedNetwork.xml.gz");
 
         for (Person person : scenario.getPopulation().getPersons().values()) {
-            List<Trip> trips = TripStructureUtils.getTrips(person.getSelectedPlan(), EmptyStageActivityTypes.INSTANCE);
 
+            Activity previousAct = (Activity) person.getSelectedPlan().getPlanElements().get(0);
+            Activity followingAct;
+            Leg currentLeg = null;
 
-            for (Trip trip : trips) {
+            List<PlanElement> planElements = person.getSelectedPlan().getPlanElements();
+            for (int i = 1; i < planElements.size(); i++) {
+                if (planElements.get(i) instanceof Leg) currentLeg = (Leg) planElements.get(i);
+                else if (planElements.get(i) instanceof Activity) {
+                    followingAct = (Activity) planElements.get(i);
 
-                Coord from = trip.getOriginActivity().getCoord();
-                Coord to = trip.getDestinationActivity().getCoord();
+                    Coord from = previousAct.getCoord();
+                    Coord to = followingAct.getCoord();
 
-                if (vwExamples.utils.modalSplitAnalyzer.modalSplitEvaluator.isWithinZone(from, zoneMap) &&
-                        vwExamples.utils.modalSplitAnalyzer.modalSplitEvaluator.isWithinZone(to, zoneMap)) {
+                    if (vwExamples.utils.modalSplitAnalyzer.modalSplitEvaluator.isWithinZone(from, zoneMap) &&
+                            vwExamples.utils.modalSplitAnalyzer.modalSplitEvaluator.isWithinZone(to, zoneMap)) {
 
-                    List<Leg> legs = trip.getLegsOnly();
-
-                    for (Leg leg : legs) {
-                        //Reset values
                         double usedTravelTime = 0;
                         double ffTravelTime = 0;
                         double delay = 0;
 
-                        if (leg.getMode().equals(TransportMode.car)) {
-                            usedTravelTime = leg.getTravelTime();
-                            ffTravelTime = getFreeFlowTravelTime(leg.getRoute());
-
-
+                        if (currentLeg.getMode().equals(TransportMode.car)) {
+                            usedTravelTime = currentLeg.getTravelTime();
+                            ffTravelTime = getFreeFlowTravelTime(currentLeg.getRoute());
                             delay = usedTravelTime - ffTravelTime;
                             if (delay < 0) delay = 0;
 //								System.out.println(delay);
                             carLegDelayList.add(person.getId().toString() + ";" + usedTravelTime + ";" + ffTravelTime + ";" + delay + ";" + from.getX() + ";" + from.getY() + ";" + to.getX() + ";" + to.getY() + "\n");
                         }
 
-
                     }
+                    previousAct = followingAct;
                 }
             }
-
         }
 
 

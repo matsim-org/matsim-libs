@@ -22,8 +22,7 @@
  */
 package ft.cemdap4H.run;
 
-import javax.inject.Inject;
-
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -34,7 +33,6 @@ import org.matsim.contrib.cadyts.car.CadytsCarModule;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
-import org.matsim.contrib.ev.temperature.TemperatureChangeConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.CountsConfigGroup;
@@ -45,14 +43,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.ScoringParameters;
-import org.matsim.core.scoring.functions.ScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
+import org.matsim.core.scoring.functions.*;
 
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
+import javax.inject.Inject;
 
 //import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 
@@ -66,26 +59,26 @@ import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 
 public class RunCemdapBasecase {
 public static void main(String[] args) {
-	String runId = "vw272";
-	String pct = ".0.1";
-	
-	String configPath = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\config_0.1.xml"; 
+    String runId = "vw272";
+    String pct = ".0.1";
+
+    String configPath = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\config_0.1.xml";
 		
 	Config config = ConfigUtils.loadConfig(configPath, new CadytsConfigGroup());
-	
-	
-	config.plans().setInputFile("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw271.0.1\\vw271.0.1.output_plans.xml.gz");
+
+
+    config.plans().setInputFile("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw271.0.1\\vw271.0.1.output_plans.xml.gz");
 	config.network().setInputFile("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\input\\network_editedPt.xml.gz");
-	
-	config.plans().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
+
+    config.plans().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
 	
 	
 	Scenario scenario = ScenarioUtils.loadScenario(config);
 	adjustPtNetworkCapacity(scenario.getNetwork(),config.qsim().getFlowCapFactor());
-	config.global().setNumberOfThreads(32);
-	config.parallelEventHandling().setNumberOfThreads(32);
-	config.qsim().setNumberOfThreads(32);
-	config.strategy().setFractionOfIterationsToDisableInnovation(0.70); //Fraction to disable Innovation
+    config.global().setNumberOfThreads(32);
+    config.parallelEventHandling().setNumberOfThreads(32);
+    config.qsim().setNumberOfThreads(32);
+    config.strategy().setFractionOfIterationsToDisableInnovation(0.70); //Fraction to disable Innovation
 	
 	Controler controler = new Controler(scenario);
 	controler.addOverridingModule(new CadytsCarModule());
@@ -102,9 +95,9 @@ public static void main(String[] args) {
 	
 	config.controler().setOutputDirectory("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\"+runId+pct);
 	config.controler().setRunId(runId+pct);
-	config.controler().setWritePlansInterval(50);
-	config.controler().setWriteEventsInterval(50);
-	config.controler().setLastIteration(200); //Number of simulation iterations
+    config.controler().setWritePlansInterval(50);
+    config.controler().setWriteEventsInterval(50);
+    config.controler().setLastIteration(200); //Number of simulation iterations
 
 	
 
@@ -142,7 +135,7 @@ public static void main(String[] args) {
 			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
 			final CadytsScoring<Link> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config, cContext);
-			final double cadytsScoringWeight = 10. * config.planCalcScore().getBrainExpBeta();
+            final double cadytsScoringWeight = 10. * config.planCalcScore().getBrainExpBeta();
 			
 			scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
 			scoringFunctionAccumulator.addScoringFunction(scoringFunction );
@@ -150,15 +143,15 @@ public static void main(String[] args) {
 			return scoringFunctionAccumulator;
 		}
 	}) ;
-	boolean deleteRoutes = false;
+    boolean deleteRoutes = false;
 
-	if (deleteRoutes) {
-		controler.getScenario().getPopulation().getPersons().values().stream().flatMap(p -> p.getPlans().stream())
-				.flatMap(pl -> pl.getPlanElements().stream()).filter(Leg.class::isInstance)
-				.forEach(pe -> ((Leg) pe).setRoute(null));
+    if (deleteRoutes) {
+        controler.getScenario().getPopulation().getPersons().values().stream().flatMap(p -> p.getPlans().stream())
+                .flatMap(pl -> pl.getPlanElements().stream()).filter(Leg.class::isInstance)
+                .forEach(pe -> ((Leg) pe).setRoute(null));
 
-		
-	}
+
+    }
 
 		
 	controler.run();
