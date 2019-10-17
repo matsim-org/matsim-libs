@@ -1,35 +1,48 @@
 package commercialtraffic.vwUserCode.demandAssigment;
 
-import commercialtraffic.vwUserCode.companyGeneration.CommericalCompany;
-import commercialtraffic.vwUserCode.companyGeneration.CompanyGenerator;
-import ft.utils.ctDemandPrep.Demand4CompanyClass;
-import ft.utils.ctDemandPrep.DemandGenerator;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.tuple.Triple;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
+import commercialtraffic.vwUserCode.companyGeneration.CommericalCompany;
+import commercialtraffic.vwUserCode.companyGeneration.CompanyGenerator;
+import ft.utils.ctDemandPrep.Company;
+import ft.utils.ctDemandPrep.Demand4CompanyClass;
+import ft.utils.ctDemandPrep.DemandGenerator;
 
 public class AssignService {
 
 	// !!!!! Important !!!!!
 	// SET MAX SERVICES PER ACTIVITY
 	// !!!!! Important !!!!!
-    int maxServicesPerAct = 4;
+	int maxServicesPerAct = 4;
 
 	// !!!!! Filter CT Trips !!!!!
 	Double filterFactor = 0.1;
@@ -39,8 +52,8 @@ public class AssignService {
 	String addCompanyFolder;
 
 	Set<String> acceptedMainModes = new HashSet<>(
-            Arrays.asList("car", "pt", "drt", "walk", "ride", "bike", "stayHome", ""
-                    + ""));
+			Arrays.asList("car", "pt", "drt", "walk", "ride", "bike", "stayHome", ""
+					+ ""));
 	Set<String> additionalLegModes = new HashSet<>(Arrays.asList("stayHome", "preventedShoppingTrip"));
 
 	Set<String> acceptedActivities = new HashSet<>(
@@ -54,38 +67,38 @@ public class AssignService {
 	String zoneSHP;
 	String outputpath;
 	DemandGenerator demand;
-    String commercialTripsFolder;
+	String commercialTripsFolder;
 	String serviceDurationDistPath;
 	String networkFile;
 	String matsimInput;
 	MutableInt noFoundCounter = new MutableInt(0);
 	MutableInt foundCounter = new MutableInt(0);
 	List<Job> jobList = new ArrayList<Job>();
-	MutableInt jobIdCounter = new MutableInt(0);
-	MutableInt eGroceryJobIdCounter = new MutableInt(0);
+	MutableInt jobIdCounter = new MutableInt(1);
+	MutableInt eGroceryJobIdCounter = new MutableInt(1);
 	CompanyGenerator companyGenerator;
-    String comercialVehicleFolder;
+	String comercialVehicleFolder;
 	long nr = 1896;
 	Random r = MatsimRandom.getRandom();
 
-    AssignService(String plansFile, String addCompanyFolder, String commercialTripsFolder, String comercialVehicleFolder,
-                  String networkFile, String serviceDurationDistPath, String companyFolder, String zoneSHP,
-                  String matsimInput, String outputpath) {
+	AssignService(String plansFile, String addCompanyFolder, String commercialTripsFolder, String comercialVehicleFolder,
+			String networkFile, String serviceDurationDistPath, String companyFolder, String zoneSHP,
+			String matsimInput, String outputpath) {
 		this.outputpath = outputpath;
 		this.addCompanyFolder = addCompanyFolder;
-        this.comercialVehicleFolder = comercialVehicleFolder;
+		this.comercialVehicleFolder = comercialVehicleFolder;
 		this.networkFile = networkFile;
 		this.matsimInput = matsimInput;
 		new PopulationReader(scenario).readFile(plansFile);
 		r.setSeed(nr);
-        commercialTripReader = new CommercialTripsReader(commercialTripsFolder, serviceDurationDistPath, filterFactor);
+		commercialTripReader = new CommercialTripsReader(commercialTripsFolder, serviceDurationDistPath, filterFactor);
 		commercialTripReader.run();
 
 		demand = new DemandGenerator(companyFolder, zoneSHP, outputpath);
 		demand.findNeighbourZones();
 
 		// companyGenerator is required in order to construct carriers with services
-        this.companyGenerator = new CompanyGenerator(comercialVehicleFolder, addCompanyFolder, commercialTripsFolder,
+		this.companyGenerator = new CompanyGenerator(comercialVehicleFolder, addCompanyFolder, commercialTripsFolder,
 				serviceDurationDistPath, networkFile, companyFolder, zoneSHP, outputpath, matsimInput + "Carrier\\",
 				commercialTripReader.vehBlackListIds);
 		this.companyGenerator.initalize();
@@ -105,10 +118,10 @@ public class AssignService {
 	public static void main(String[] args) {
 
 		AssignService assignData = new AssignService(
-                "D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\vw272_0.1_CT_0.1\\vw272.0.1.output_plans.xml.gz",
-                "D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\EGrocery\\Fullfillment\\",
-                "D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\Trips\\",
-                "D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\Vehicles\\",
+				"D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\vw280_0.1_CT_0.1\\vw280_0.1.output_sel_plans.xml.gz",
+				"D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\EGrocery\\Fullfillment\\",
+				"D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\Trips\\",
+				"D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\Vehicles\\",
 				"D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Network\\00_Final_Network\\network_editedPt.xml.gz",
 				"D:\\Thiel\\Programme\\WVModell\\ServiceDurCalc\\Distributions\\",
 				"D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\Unternehmen\\",
@@ -119,8 +132,8 @@ public class AssignService {
 		assignData.initializeActCandidateMap();
 
 		assignData.findCandidates();
-        //assignData.addCustomServices();
-        assignData.manipulatePopulationAndCreateServices();
+		//assignData.addCustomServices();
+		assignData.manipulatePopulationAndCreateServices();
 		assignData.writeCustomerDemand();
 		assignData.writePopulation();
 		assignData.companyGenerator.writeCarriers();
@@ -164,7 +177,7 @@ public class AssignService {
 							if (result != null && !(serviceCounter > maxServicePerPerson)) {
 								double endTime = result.getRight();
 								double startTime = result.getMiddle();
-                                int capacity = Math.max(5, (r.nextInt(16)));
+								int capacity = Math.max(5, (r.nextInt(16)));
 								int rdmIdx = r.nextInt(grocCompkeys.size());
 								companyGenerator.commercialCompanyMap.get(grocCompkeys.get(rdmIdx))
 										.addGroceryService(serviceId, linkId, startTime, endTime, capacity);
@@ -206,7 +219,7 @@ public class AssignService {
 				}
 
 				double serviceDuration = this.commercialTripReader.getRandomServiceDurationPerType(serviceType);
-
+				
 
 				Job finalJob = getActivityCandiate(serviceType, customerRelation, zone, serviceDuration, carrierId);
 
@@ -214,27 +227,29 @@ public class AssignService {
 
 					this.jobList.add(finalJob);
 
-					companyMap.get(companyId).addService(finalJob.jobId, finalJob.regularAgentActivity.getLinkId(),
-							finalJob.startTime, finalJob.endTime, serviceDuration);
+					//companyMap.get(companyId).addService(finalJob.jobId, finalJob.regularAgentActivity.getLinkId(),
+					//		finalJob.startTime, finalJob.endTime, serviceDuration);
 
 					// Check for Attributes
-					Object actAttr = this.scenario.getPopulation().getPersons().get(finalJob.personid).getSelectedPlan()
-							.getPlanElements().get(finalJob.planIdx).getAttributes().getAttribute("jobId");
+//					Object actAttr = this.scenario.getPopulation().getPersons().get(finalJob.personid).getSelectedPlan()
+//							.getPlanElements().get(finalJob.planIdx).getAttributes();
 					// E-Grocery Service is attributed with -99
 
-					if (actAttr == null) {
+//					if (actAttr == null) {
+					String commercialJobString=(finalJob.carrierId.toString()+";"+"1"+";"+finalJob.startTime+";"+finalJob.endTime+";"+finalJob.serviceDuration);
+					
 						this.scenario.getPopulation().getPersons().get(finalJob.personid).getSelectedPlan()
 								.getPlanElements().get(finalJob.planIdx).getAttributes()
-								.putAttribute("jobId", finalJob.jobId);
-					} else {
-						String prevJobId = actAttr.toString();
-						this.scenario.getPopulation().getPersons().get(finalJob.personid).getSelectedPlan()
-								.getPlanElements().get(finalJob.planIdx).getAttributes()
-								.putAttribute("jobId", prevJobId + ";" + finalJob.jobId);
-
-						// System.out.println(prevJobId + ";" + finalJob.jobId);
-
-					}
+								.putAttribute(finalJob.jobId, commercialJobString);
+//					} else {
+//						String prevJobId = actAttr.toString();
+//						this.scenario.getPopulation().getPersons().get(finalJob.personid).getSelectedPlan()
+//								.getPlanElements().get(finalJob.planIdx).getAttributes()
+//								.putAttribute("jobId", prevJobId + ";" + finalJob.jobId);
+//
+//						// System.out.println(prevJobId + ";" + finalJob.jobId);
+//
+//					}
 
 					this.jobIdCounter.increment();
 					foundCounter.increment();
@@ -256,7 +271,7 @@ public class AssignService {
 	public Job getActivityCandiate(String serviceType, String customerRelation, String zone, double serviceDuration,
 			String carrierId) {
 
-        int maxCheckedZones = 5;
+		int maxCheckedZones = 5;
 		int checkedZonesCounter = 0;
 
 		List<String> neighbourZoneList = demand.neighbourMap.get(zone);
@@ -309,7 +324,7 @@ public class AssignService {
 									// int test=1;
 									// System.out.println(test);
 									// }
-									return new Job(jobIdCounter.toString(), carrierId, candidatePerson, serviceType,
+									return new Job("commercialJob"+jobIdCounter.toString(), carrierId, candidatePerson, serviceType,
 											customerRelation, zone, serviceDuration, matchedPeIdx,
 											finalActivityDestination, startTime, endTime);
 
@@ -352,8 +367,7 @@ public class AssignService {
 
 			if (actAttr != null) {
 
-				int servicesPerAct = Arrays.asList(activity.getAttributes().getAttribute("jobId").toString().split(";"))
-						.size();
+				int servicesPerAct = activity.getAttributes().size();
 
 				if (servicesPerAct >= maxServicesPerAct) {
 					continue;
@@ -368,13 +382,13 @@ public class AssignService {
 				// //peIdx++;
 				// continue;
 				//
-                if (!(additionalLegModes.contains(prevLeg.getMode()))
+				if (!(additionalLegModes.contains(prevLeg.getMode().toString()))
 						&& prevLeg.getTravelTime() == Double.NEGATIVE_INFINITY) {
 
 					throw new IllegalArgumentException(
 							"Found leg with no travel time! Please provide iterated output plans1");
 				}
-                if (additionalLegModes.contains(prevLeg.getMode())) {
+				if (additionalLegModes.contains(prevLeg.getMode().toString())) {
 					actStartTime = 6.0 * 3600.0;
 				} else {
 					actStartTime = prevLeg.getDepartureTime() + prevLeg.getTravelTime();
@@ -561,9 +575,9 @@ public class AssignService {
 
 		Set<String> VTypeSet_B2B = new HashSet<String>();
 		VTypeSet_B2B.add("work");
-
-        Set<String> KEPTypeSet_B2B = new HashSet<String>();
-        KEPTypeSet_B2B.add("work");
+		
+		Set<String> KEPTypeSet_B2B = new HashSet<String>();
+		KEPTypeSet_B2B.add("work");
 
 		////// B2C Type Set
 		// ################################################################################
@@ -632,9 +646,9 @@ public class AssignService {
 
 		Set<String> VTypeSet_B2C = new HashSet<String>();
 		VTypeSet_B2C.add("home");
-
-        Set<String> KEPTypeSet_B2C = new HashSet<String>();
-        KEPTypeSet_B2C.add("home");
+		
+		Set<String> KEPTypeSet_B2C = new HashSet<String>();
+		KEPTypeSet_B2C.add("home");
 
 		Set<Id<Person>> potentialPersons = new HashSet<>();
 		potentialPersons.addAll(population.getPersons().keySet());
@@ -670,7 +684,7 @@ public class AssignService {
 						if (peIdx > 1) {
 
 							Leg prevLeg = (Leg) person.getSelectedPlan().getPlanElements().get(peIdx - 1);
-                            if (additionalLegModes.contains(prevLeg.getMode())) {
+							if (additionalLegModes.contains(prevLeg.getMode().toString())) {
 								peIdx++;
 								continue;
 							}
@@ -850,14 +864,14 @@ public class AssignService {
 						if (isServiceTypeV_B2B) {
 							FillServiceMap("V", "B2B", zone, person.getId(), peIdx);
 						}
-
-                        // Service Type KEP
-                        ActivityChecker ServiceTypeKEP_B2B_Checker = new ActivityChecker(activity, KEPTypeSet_B2B,
-                                actInterval, null);
-                        boolean isServiceTypeKEP_B2B = ServiceTypeKEP_B2B_Checker.proof();
-                        if (isServiceTypeKEP_B2B) {
-                            FillServiceMap("KEP", "B2B", zone, person.getId(), peIdx);
-                        }
+						
+						// Service Type KEP
+						ActivityChecker ServiceTypeKEP_B2B_Checker = new ActivityChecker(activity, KEPTypeSet_B2B,
+								actInterval, null);
+						boolean isServiceTypeKEP_B2B = ServiceTypeKEP_B2B_Checker.proof();
+						if (isServiceTypeKEP_B2B) {
+							FillServiceMap("KEP", "B2B", zone, person.getId(), peIdx);
+						}
 
 						//
 						// #######################################################################################
@@ -1036,13 +1050,13 @@ public class AssignService {
 						if (isServiceTypeV_B2C) {
 							FillServiceMap("V", "B2C", zone, person.getId(), peIdx);
 						}
-
-                        ActivityChecker ServiceTypeKEP_B2C_Checker = new ActivityChecker(activity, KEPTypeSet_B2C,
-                                actInterval, null);
-                        boolean isServiceTypeKEP_B2C = ServiceTypeKEP_B2C_Checker.proof();
-                        if (isServiceTypeKEP_B2C) {
-                            FillServiceMap("KEP", "B2C", zone, person.getId(), peIdx);
-                        }
+						
+						ActivityChecker ServiceTypeKEP_B2C_Checker = new ActivityChecker(activity, KEPTypeSet_B2C,
+								actInterval, null);
+						boolean isServiceTypeKEP_B2C = ServiceTypeKEP_B2C_Checker.proof();
+						if (isServiceTypeKEP_B2C) {
+							FillServiceMap("KEP", "B2C", zone, person.getId(), peIdx);
+						}
 
 						//
 						// #######################################################################################
@@ -1068,7 +1082,7 @@ public class AssignService {
 				if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
 
-                    if (!(additionalLegModes.contains(leg.getMode()))
+					if (!(additionalLegModes.contains(leg.getMode().toString()))
 							&& (leg.getTravelTime() == Double.NEGATIVE_INFINITY)) {
 
 						throw new IllegalArgumentException(

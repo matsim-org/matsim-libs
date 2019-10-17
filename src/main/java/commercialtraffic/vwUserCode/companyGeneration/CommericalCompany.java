@@ -1,11 +1,24 @@
 package commercialtraffic.vwUserCode.companyGeneration;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.freight.carrier.*;
+import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierCapabilities;
+import org.matsim.contrib.freight.carrier.CarrierImpl;
+import org.matsim.contrib.freight.carrier.CarrierService;
+import org.matsim.contrib.freight.carrier.CarrierUtils;
+import org.matsim.contrib.freight.carrier.CarrierVehicle;
+import org.matsim.contrib.freight.carrier.CarrierVehicleType;
+import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import commercialtraffic.commercialJob.CommercialJobUtils;
 
 public class CommericalCompany {
 
@@ -25,27 +38,72 @@ public class CommericalCompany {
 		// A company is also the carrier
 		this.companyId = companyId;
 		this.carrierId = serviceType+"_"+companyId;
-		this.carrier = CarrierImpl.newInstance(Id.create(carrierId, Carrier.class));
+		this.carrier = CarrierUtils.createCarrier(Id.create(carrierId, Carrier.class));
 		this.openingTime = openingTime;
 		this.closingTime = closingTime;
 		this.serviceType = serviceType;
 		this.companyLinkId = companyLinkId;
 		this.carrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.FINITE);
+		this.carrier.getAttributes().putAttribute("carrierMode", "car");		
+		this.carrier.getAttributes().putAttribute("jspritIterations", 1);
+		this.carrier.getAttributes().putAttribute(CommercialJobUtils.CARRIER_MARKET_ATTRIBUTE_NAME, serviceType);
 
 	}
 
-    private static CarrierVehicle getVehicle(Id<?> id, Id<Link> homeId, String depot, int vehicleType, double openingTime, double closingTime) {
+	void addVehicle(Id<Link> linkId, int vehicleType, Double openingTime, Double closingTime) {
 
+		CarrierVehicle carrierVehicle = getVehicle(Id.createVehicleId(carrierId + "_" + fleetIterator + "_vehTyp_" + vehicleType), linkId, companyId, vehicleType,openingTime,closingTime);
+		
+		this.carrier.getCarrierCapabilities().getCarrierVehicles().put(carrierVehicle.getId(),carrierVehicle);
+		//this.carrier.getCarrierCapabilities().getVehicleTypes().add(createType(vehicleType));
+		fleetIterator++;
+	}
+	
+	public void addService(String serviceId, Id<Link> linkId,double startTime, double endTime, double serviceDuration)
+	{
+		//FAIL! double trueEndTime = endTime-serviceDuration;
+		double trueEndTime = endTime;
+		CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(Id.create(serviceId, CarrierService.class ), linkId);
+		//TODO: Please change to non fixed number
+		serviceBuilder.setCapacityDemand( 1 );
+		serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(startTime, trueEndTime) );
+		serviceBuilder.setServiceDuration( serviceDuration);
+		CarrierService service = serviceBuilder.build();
+		carrier.getServices().put(service.getId(), service);
+	}
+	public void addGroceryService(String serviceId, Id<Link> linkId,double startTime, double endTime, int Capacity)
+	{
+		//FAIL! double trueEndTime = endTime-serviceDuration;
+		double trueEndTime = endTime;
+		CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(Id.create(serviceId, CarrierService.class ), linkId);
+		//TODO: Please change to non fixed number
+		serviceBuilder.setCapacityDemand( Capacity );
+		serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(startTime, trueEndTime) );
+		serviceBuilder.setServiceDuration( 300);
+		CarrierService service = serviceBuilder.build();
+		carrier.getServices().put(service.getId(),service);
+	}
+	
+	public double getClosingTime(String companyId) {
+		
+		
+		return closingTime;
+		
+	}
+
+	public static CarrierVehicle getVehicle(Id<?> id, Id<Link> homeId, String depot, int vehicleType, double openingTime, double closingTime) {
+				
 		CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder
 				.newInstance(Id.create((id.toString()), Vehicle.class), homeId);
 		vBuilder.setEarliestStart(openingTime);
 		vBuilder.setLatestEnd(closingTime);
 		vBuilder.setType(createType(vehicleType));
+		vBuilder.setTypeId(Id.create(vehicleType, VehicleType.class));
 		//TODO: We could add vehicle length for each vehicleType according to KID at this stage
 		return vBuilder.build();
 	}
 
-    private static VehicleType createType(int vehicleTypeIndex) {
+	public static VehicleType createType(int vehicleTypeIndex) {
 
 		VehicleType vehicleType = VehicleUtils.createVehicleType(Id.create(vehicleTypeIndex, VehicleType.class));
 
@@ -56,6 +114,12 @@ public class CommericalCompany {
 			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
 			vehicleType.getCostInformation().setCostsPerSecond(0.008);
 			vehicleType.setMaximumVelocity(200.0 / 3.6);
+			vehicleType.setLength(3.5);
+			vehicleType.setWidth(1.0);
+			vehicleType.setNetworkMode("car");
+			vehicleType.setFlowEfficiencyFactor(1.0);
+			
+			
 			return vehicleType;
 		case 2:
 
@@ -64,6 +128,10 @@ public class CommericalCompany {
 			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
 			vehicleType.getCostInformation().setCostsPerSecond(0.008);
 			vehicleType.setMaximumVelocity(160.0 / 3.6);
+			vehicleType.setLength(4.5);
+			vehicleType.setWidth(1.0);
+			vehicleType.setNetworkMode("car");
+			vehicleType.setFlowEfficiencyFactor(1.0);
 		case 3:
 
 			vehicleType.getCapacity().setOther(150);
@@ -71,6 +139,10 @@ public class CommericalCompany {
 			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
 			vehicleType.getCostInformation().setCostsPerSecond(0.008);
 			vehicleType.setMaximumVelocity(160.0 / 3.6);
+			vehicleType.setLength(7.5);
+			vehicleType.setWidth(1.0);
+			vehicleType.setNetworkMode("car");
+			vehicleType.setFlowEfficiencyFactor(1.0);
 		case 4:
 
 			vehicleType.getCapacity().setOther(400);
@@ -78,6 +150,10 @@ public class CommericalCompany {
 			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
 			vehicleType.getCostInformation().setCostsPerSecond(0.008);
 			vehicleType.setMaximumVelocity(93.0 / 3.6);
+			vehicleType.setLength(12.5);
+			vehicleType.setWidth(1.0);
+			vehicleType.setNetworkMode("car");
+			vehicleType.setFlowEfficiencyFactor(1.0);
 		case 5:
 
 			vehicleType.getCapacity().setOther(400);
@@ -85,6 +161,10 @@ public class CommericalCompany {
 			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
 			vehicleType.getCostInformation().setCostsPerSecond(0.008);
 			vehicleType.setMaximumVelocity(93.0 / 3.6);
+			vehicleType.setLength(12.5);
+			vehicleType.setWidth(1.0);
+			vehicleType.setNetworkMode("car");
+			vehicleType.setFlowEfficiencyFactor(1.0);
 		case 6:
 
 			vehicleType.getCapacity().setOther(80);
@@ -92,6 +172,10 @@ public class CommericalCompany {
 			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
 			vehicleType.getCostInformation().setCostsPerSecond(0.008);
 			vehicleType.setMaximumVelocity(110.0 / 3.6);
+			vehicleType.setLength(12.5);
+			vehicleType.setWidth(1.0);
+			vehicleType.setNetworkMode("car");
+			vehicleType.setFlowEfficiencyFactor(1.0);
 		case 7:
 
 			vehicleType.getCapacity().setOther(80);
@@ -99,6 +183,10 @@ public class CommericalCompany {
 			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
 			vehicleType.getCostInformation().setCostsPerSecond(0.008);
 			vehicleType.setMaximumVelocity(80.0 / 3.6);
+			vehicleType.setLength(12.5);
+			vehicleType.setWidth(1.0);
+			vehicleType.setNetworkMode("car");
+			vehicleType.setFlowEfficiencyFactor(1.0);
 		case 8:
 
 			vehicleType.getCapacity().setOther(80);
@@ -106,6 +194,10 @@ public class CommericalCompany {
 			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
 			vehicleType.getCostInformation().setCostsPerSecond(0.008);
 			vehicleType.setMaximumVelocity(93.0 / 3.6);
+			vehicleType.setLength(12.5);
+			vehicleType.setWidth(1.0);
+			vehicleType.setNetworkMode("car");
+			vehicleType.setFlowEfficiencyFactor(1.0);
 		case 9:
 
 			vehicleType.getCapacity().setOther(50);
@@ -113,6 +205,10 @@ public class CommericalCompany {
 			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
 			vehicleType.getCostInformation().setCostsPerSecond(0.008);
 			vehicleType.setMaximumVelocity(40.0 / 3.6);
+			vehicleType.setLength(8.5);
+			vehicleType.setWidth(1.0);
+			vehicleType.setNetworkMode("car");
+			vehicleType.setFlowEfficiencyFactor(1.0);
 		case 10:
 
 			vehicleType.getCapacity().setOther(100);
@@ -120,6 +216,10 @@ public class CommericalCompany {
 			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
 			vehicleType.getCostInformation().setCostsPerSecond(0.008);
 			vehicleType.setMaximumVelocity(160.0 / 3.6);
+			vehicleType.setLength(7.5);
+			vehicleType.setWidth(1.0);
+			vehicleType.setNetworkMode("car");
+			vehicleType.setFlowEfficiencyFactor(1.0);
 		case 11:
 
 			vehicleType.getCapacity().setOther(100);
@@ -127,6 +227,10 @@ public class CommericalCompany {
 			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
 			vehicleType.getCostInformation().setCostsPerSecond(0.008);
 			vehicleType.setMaximumVelocity(160.0 / 3.6);
+			vehicleType.setLength(7.5);
+			vehicleType.setWidth(1.0);
+			vehicleType.setNetworkMode("car");
+			vehicleType.setFlowEfficiencyFactor(1.0);
 		default:
 
 			vehicleType.getCapacity().setOther(100);
@@ -134,48 +238,13 @@ public class CommericalCompany {
 			vehicleType.getCostInformation().setCostsPerMeter(0.00047);
 			vehicleType.getCostInformation().setCostsPerSecond(0.008);
 			vehicleType.setMaximumVelocity(160.0 / 3.6);
+			vehicleType.setLength(7.5);
+			vehicleType.setWidth(1.0);
+			vehicleType.setNetworkMode("car");
+			vehicleType.setFlowEfficiencyFactor(1.0);
 		}
 		return vehicleType;
 	}
-
-    void addVehicle(Id<Link> linkId, int vehicleType, Double openingTime, Double closingTime) {
-
-        Id<Vehicle> vehicleId = Id.createVehicleId(carrierId + "_" + fleetIterator + "_vehTyp_" + vehicleType);
-        this.carrier.getCarrierCapabilities().getCarrierVehicles().put(vehicleId, getVehicle(vehicleId, linkId, companyId, vehicleType, openingTime, closingTime));
-        this.carrier.getCarrierCapabilities().getVehicleTypes().add(createType(vehicleType));
-        fleetIterator++;
-    }
-
-    public double getClosingTime(String companyId) {
-
-
-        return closingTime;
-
-    }
-
-    public void addService(String serviceId, Id<Link> linkId, double startTime, double endTime, double serviceDuration) {
-        //FAIL! double trueEndTime = endTime-serviceDuration;
-        double trueEndTime = endTime;
-        CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(Id.create(serviceId, CarrierService.class), linkId);
-        //TODO: Please change to non fixed number
-        serviceBuilder.setCapacityDemand(1);
-        serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(startTime, trueEndTime));
-        serviceBuilder.setServiceDuration(serviceDuration);
-        CarrierService service = serviceBuilder.build();
-        carrier.getServices().put(service.getId(), service);
-    }
-
-    public void addGroceryService(String serviceId, Id<Link> linkId, double startTime, double endTime, int Capacity) {
-        //FAIL! double trueEndTime = endTime-serviceDuration;
-        double trueEndTime = endTime;
-        CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(Id.create(serviceId, CarrierService.class), linkId);
-        //TODO: Please change to non fixed number
-        serviceBuilder.setCapacityDemand(Capacity);
-        serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(startTime, trueEndTime));
-        serviceBuilder.setServiceDuration(300);
-        CarrierService service = serviceBuilder.build();
-        carrier.getServices().put(service.getId(), service);
-    }
 
 	// public static CarrierVehicleType createType(int vehicleType) {
 	// CarrierVehicleType.Builder typeBuilder = CarrierVehicleType.Builder

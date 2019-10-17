@@ -62,7 +62,7 @@ class CommercialTrafficChecker {
         boolean fail = false;
         Map<String, Object> attributes = CommercialJobUtils.getCommercialJobAttributes(activity);
         for (String attribute : attributes.keySet()) {
-            if(attribute.endsWith("0")){
+            if(attribute.split(CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_NAME)[1].equals("0")){
                 log.error("index 0 is not supported for commercial job attributes. please start with index 1. See activity " + activity + " of person " + pid);
                 fail = true;
             }
