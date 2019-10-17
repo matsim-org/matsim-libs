@@ -99,7 +99,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 			return createWalkTrip(fromFacility, toFacility, departureTime, person, drtStageActivityType.drtWalk);
 		}
 
-		if (accessFacility.getLinkId() == egressFacility.getLinkId()) {
+		if (accessFacility.getLinkId().equals(egressFacility.getLinkId())) {
 			if( drtCfg.isPrintDetailedWarnings() ){
 				printWarning(() -> "Start and end stop are the same, agent will walk, using mode "
 						+ drtStageActivityType.drtWalk
