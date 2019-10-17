@@ -94,7 +94,7 @@ class TourPlanning  {
                     //add Multiple Threads
                     VehicleRoutingAlgorithm algorithm = Jsprit.Builder.newInstance(problem)
                             .setStateAndConstraintManager(stateManager,constraintManager)
-                            .setProperty(Jsprit.Parameter.THREADS,String.valueOf(32))
+                            .setProperty(Jsprit.Parameter.THREADS,String.valueOf(1))
                             .setProperty(Jsprit.Parameter.RADIAL_MIN_SHARE, String.valueOf(radialServicesReplanned))
                             .setProperty(Jsprit.Parameter.RADIAL_MAX_SHARE, String.valueOf(radialServicesReplanned))
                             .setProperty(Jsprit.Parameter.RANDOM_BEST_MIN_SHARE, String.valueOf(randomServicesReplanned))
