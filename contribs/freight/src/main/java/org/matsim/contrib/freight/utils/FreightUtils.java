@@ -82,13 +82,19 @@ public class FreightUtils {
 		return carriersWithShipments;
 	}
 
-	public static Carriers getCarriers( Scenario scenario ){
+	public static Carriers getOrCreateCarriers( Scenario scenario ){
+		// I have separated getOrCreateCarriers and getCarriers, since when the controler is started, it is  better to fail if the carriers are not found.  kai, oct'19
 		Carriers carriers = (Carriers) scenario.getScenarioElement( CARRIERS );
 		if ( carriers==null ) {
 			carriers = new Carriers(  ) ;
 			scenario.addScenarioElement( CARRIERS, carriers );
 		}
 		return carriers;
+	}
+
+	public static Carriers getCarriers( Scenario scenario ){
+		// I have separated getOrCreateCarriers and getCarriers, since when the controler is started, it is better to fail if the carriers are not found.  kai, oct'19
+		return (Carriers) scenario.getScenarioElement( CARRIERS );
 	}
 
 	public static CarrierVehicleTypes getCarrierVehicleTypes( Scenario scenario ){
