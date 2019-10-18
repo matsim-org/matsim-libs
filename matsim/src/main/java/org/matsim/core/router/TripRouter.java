@@ -207,7 +207,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 				//				throw new NullPointerException( "Routing module "+module+" returned a null Trip for main mode "+mainMode );
 				trip = fallbackRoutingModule.calcRoute( fromFacility, toFacility, departureTime, person ) ;
 				for( Leg leg : TripStructureUtils.getLegs( trip ) ){
-					leg.setMode( mainMode + FallbackRoutingModuleDefaultImpl._fallback );
+					leg.setMode( getFallbackMode(mainMode) );
 				}
 			}
 			return trip;
@@ -348,6 +348,10 @@ public final class TripRouter implements MatsimExtensionPoint {
 
 	public Config getConfig() {
 		return config;
+	}
+	
+	public static final String getFallbackMode(String transportMode) {
+		return transportMode + FallbackRoutingModuleDefaultImpl._fallback;
 	}
 
 }
