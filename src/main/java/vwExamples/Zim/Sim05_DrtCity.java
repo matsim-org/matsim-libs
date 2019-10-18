@@ -49,6 +49,8 @@ import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.temperature.TemperatureChangeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
@@ -77,7 +79,8 @@ public class Sim05_DrtCity {
 	public static final double BATTERYREPLACETIME = 180.0;
 
 	static boolean BatteryReplace = false;
-	static int[] fleetRange = { 350 }; //Pendler DRT
+	static int[] fleetRange = { 900 }; //20 % all City tours to DRT
+//	static int[] fleetRange = { 120 }; //20 % of City car tours to DRT
 //	static int[] fleetRange = { 300 }; //Pendler DRT
 //	static int[] fleetRange = { 2800 };
 	// static int[] fleetRange = {50,60,70};
@@ -98,7 +101,7 @@ public class Sim05_DrtCity {
 	public static void run(int fleet, int iterationIdx) throws IOException {
 
 		// Enable or Disable rebalancing
-		String runId = "vw243_CityDRT_10pct_0.1" + fleet + "_veh_idx" + iterationIdx;
+		String runId = "vw280_CityDRT_20pct_0.1_" + fleet + "_veh_idx" + iterationIdx;
 		boolean rebalancing = true;
 
 		String inbase = "D:\\Matsim\\Axer\\Hannover\\ZIM\\";
@@ -135,17 +138,17 @@ public class Sim05_DrtCity {
 		// config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		// Overwrite existing configuration parameters
 //		config.plans().setInputFile(inbase + "\\input\\plans\\w243_inOutWithDRT_selected.xml.gz");
-		config.plans().setInputFile(inbase + "\\input\\plans\\vw243_cadON_ptSpeedAdj.0.1_DRT_0.10_noShort.output_plans.xml.gz");
-		config.controler().setLastIteration(6); // Number of simulation iterations
-		config.controler().setWriteEventsInterval(2); // Write Events file every x-Iterations
-		config.controler().setWritePlansInterval(2); // Write Plan file every x-Iterations
+		config.plans().setInputFile(inbase + "\\input\\plans\\vw280_0.1.output_plans_cityDRT.xml.gz");
+		config.controler().setLastIteration(3); // Number of simulation iterations
+		config.controler().setWriteEventsInterval(3); // Write Events file every x-Iterations
+		config.controler().setWritePlansInterval(3); // Write Plan file every x-Iterations
 		config.qsim().setStartTime(0);
 		config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 		config.qsim().setFlowCapFactor(0.1);
 		config.qsim().setStorageCapFactor(0.11);
 
 		String networkFilePath = inbase + "\\input\\network\\network.xml.gz";
-		String shapeFilePath = inbase + "\\input\\shp\\Real_Region_Hannover.shp";
+		String shapeFilePath = inbase + "\\input\\shp\\Hannover_Stadtteile.shp";
 		String shapeFeature = "NO"; // shapeFeature is used to read the shapeFilePath. All zones in shapeFile are
 									// used to generate a drt service area
 		String drtTag = "drt"; // drtTag is assigned to roads that should be used by the drt service
@@ -185,61 +188,12 @@ public class Sim05_DrtCity {
 		// Define infrastructure for eDRT (vehicles, depots and chargers)
 		CreateEDRTVehiclesAndChargers vehiclesAndChargers = new CreateEDRTVehiclesAndChargers();
 		Map<Id<Link>, Integer> depotsAndVehicles = new HashMap<>();
-		// depotsAndVehicles.put(Id.createLinkId(314700), vehiclePerDepot); // H HBF
-		// depotsAndVehicles.put(Id.createLinkId(108636), vehiclePerDepot); // VWN
-		// depotsAndVehicles.put(Id.createLinkId(162930), vehiclePerDepot); // Linden
-		// Süd
-		// depotsAndVehicles.put(Id.createLinkId(123095), vehiclePerDepot); // Wülferode
 
-		// Periphery Hubs
-		depotsAndVehicles.put(Id.createLinkId(96245), (int) (fleet * 0.108328079325959)); // 1
-		depotsAndVehicles.put(Id.createLinkId(105093), (int) (fleet * 0.0393763970883246)); // 2
-		depotsAndVehicles.put(Id.createLinkId(315038), (int) (fleet * 0.160887258554479)); // 3
-		depotsAndVehicles.put(Id.createLinkId(18783), (int) (fleet * 0.0829942110391471)); // 4
-		depotsAndVehicles.put(Id.createLinkId(63049), (int) (fleet * 0.0884965896715768)); // 5
-		depotsAndVehicles.put(Id.createLinkId(164000), (int) (fleet * 0.0262509313922164)); // 6
-		depotsAndVehicles.put(Id.createLinkId(167625), (int) (fleet * 0.0632773542729409)); // 7
-		depotsAndVehicles.put(Id.createLinkId(171996), (int) (fleet * 0.0556542672092623)); // 8
-		depotsAndVehicles.put(Id.createLinkId(19414), (int) (fleet * 0.0195449074339428)); // 9
-		depotsAndVehicles.put(Id.createLinkId(353160), (int) (fleet * 0.0592652031867943)); // 10
-		depotsAndVehicles.put(Id.createLinkId(293914), (int) (fleet * 0.0717601879979366)); // 11
-		depotsAndVehicles.put(Id.createLinkId(336279), (int) (fleet * 0.0166790852295524)); // 12
-		depotsAndVehicles.put(Id.createLinkId(66854), (int) (fleet * 0.0597810511835846)); // 13
-		depotsAndVehicles.put(Id.createLinkId(191018), (int) (fleet * 0.0523872298962572)); // 14
-		depotsAndVehicles.put(Id.createLinkId(133782), (int) (fleet * 0.0406946753023442)); // 15
-		depotsAndVehicles.put(Id.createLinkId(261435), (int) (fleet * 0.02458875451367)); // 16
-		depotsAndVehicles.put(Id.createLinkId(325814), (int) (fleet * 0.0300338167020118)); // 17
-
-//		// City Hubs (these hubs are empty at the beginning of the simulation)
-//		depotsAndVehicles.put(Id.createLinkId(93695), 1); // 1
-		int cityFleet = 100;
-		depotsAndVehicles.put(Id.createLinkId(181441), (int) (cityFleet*0.20)); // 2
-		depotsAndVehicles.put(Id.createLinkId(108498), (int) (cityFleet*0.20)); // 3
-		depotsAndVehicles.put(Id.createLinkId(279990), (int) (cityFleet*0.20)); // 4
-//		depotsAndVehicles.put(Id.createLinkId(150245), 1); // 5
-//		depotsAndVehicles.put(Id.createLinkId(25519), 1); // 6
-//		depotsAndVehicles.put(Id.createLinkId(95881), 1); // 7
-//		depotsAndVehicles.put(Id.createLinkId(254323), 1); // 8
-		depotsAndVehicles.put(Id.createLinkId(167788), (int) (cityFleet*0.2)); // 9
-//		depotsAndVehicles.put(Id.createLinkId(335414), 1); // 10
-//		depotsAndVehicles.put(Id.createLinkId(105449), 1); // 11
-//		depotsAndVehicles.put(Id.createLinkId(317396), 1); // 12
-//		// 13 --> central hub deleted in order to avoid traffic problems due to traffic
-//		// concentration
-//		depotsAndVehicles.put(Id.createLinkId(337846), 1); // 14
-//		depotsAndVehicles.put(Id.createLinkId(319495), 1); // 15
-//		depotsAndVehicles.put(Id.createLinkId(93365), 1); // 16
-		depotsAndVehicles.put(Id.createLinkId(137655), (int) (cityFleet*0.20)); // 17
-//		depotsAndVehicles.put(Id.createLinkId(55525), 1); // 18
-//		depotsAndVehicles.put(Id.createLinkId(166126), 1); // 19
-
-		// depotsAndVehicles.put(Id.createLinkId(90785), vehiclePerDepot); //
-		// depotsAndVehicles.put(Id.createLinkId(119060), vehiclePerDepot); //
-		// depotsAndVehicles.put(Id.createLinkId(111476), vehiclePerDepot); //
-		// depotsAndVehicles.put(Id.createLinkId(202515), vehiclePerDepot); //
-		// depotsAndVehicles.put(Id.createLinkId(303512), vehiclePerDepot); //
-		// depotsAndVehicles.put(Id.createLinkId(239977), vehiclePerDepot); //
-		// depotsAndVehicles.put(Id.createLinkId(361079), vehiclePerDepot); //
+		depotsAndVehicles.put(Id.createLinkId(181441), (int) (fleet*0.20));
+		depotsAndVehicles.put(Id.createLinkId(108498), (int) (fleet*0.20));
+		depotsAndVehicles.put(Id.createLinkId(279990), (int) (fleet*0.20));
+		depotsAndVehicles.put(Id.createLinkId(167788), (int) (fleet*0.20));
+		depotsAndVehicles.put(Id.createLinkId(137655), (int) (fleet*0.20));
 
 		vehiclesAndChargers.CHARGER_FILE = inbase + "\\input\\chargers\\chargers.xml.gz";
 		vehiclesAndChargers.NETWORKFILE = inbase + "\\input\\network\\drtServiceAreaNetwork.xml.gz";
@@ -276,7 +230,18 @@ public class Sim05_DrtCity {
 		// prc.setCapacityCalculationMethod("useFromNetwork");
 		// prc.setShape_key("NO");
 
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+//		Scenario scenario = ScenarioUtils.loadScenario(config);
+		config.controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastAStarLandmarks );
+		config.plansCalcRoute().setRoutingRandomness( 3. );
+
+		// vsp defaults
+		config.qsim().setUsingTravelTimeCheckInTeleportation( true );
+		config.qsim().setTrafficDynamics( TrafficDynamics.kinematicWaves );
+		
+		config.global().setNumberOfThreads(32);
+		config.parallelEventHandling().setNumberOfThreads(32);
+//		config.qsim().setNumberOfThreads(32);
+		
 
 		// Scale PT Network Capacities
 //		adjustPtNetworkCapacity(scenario.getNetwork(), config.qsim().getFlowCapFactor());

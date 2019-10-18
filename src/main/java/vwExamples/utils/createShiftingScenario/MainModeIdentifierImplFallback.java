@@ -29,6 +29,7 @@ import org.matsim.core.router.MainModeIdentifier;
 /**
  * @author thibaut
  */
+@Deprecated
 public final class MainModeIdentifierImplFallback implements MainModeIdentifier {
 	@Override
 	public String identifyMainMode( final List<? extends PlanElement> tripElements) {

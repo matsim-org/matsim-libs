@@ -49,6 +49,8 @@ import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
 import org.matsim.contrib.ev.temperature.TemperatureChangeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
@@ -77,7 +79,7 @@ public class Sim02_DrtCommuter {
 	public static final double BATTERYREPLACETIME = 180.0;
 
 	static boolean BatteryReplace = false;
-	static int[] fleetRange = { 350 }; //Pendler DRT
+	static int[] fleetRange = { 250 }; //Pendler DRT
 //	static int[] fleetRange = { 300 }; //Pendler DRT
 //	static int[] fleetRange = { 2800 };
 	// static int[] fleetRange = {50,60,70};
@@ -98,7 +100,7 @@ public class Sim02_DrtCommuter {
 	public static void run(int fleet, int iterationIdx) throws IOException {
 
 		// Enable or Disable rebalancing
-		String runId = "vw243_CityDRT_10pct_0.1" + fleet + "_veh_idx" + iterationIdx;
+		String runId = "vw280_CityCommuterDRTcarOnly_20pct_0.1_" + fleet + "_veh_idx" + iterationIdx;
 		boolean rebalancing = true;
 
 		String inbase = "D:\\Matsim\\Axer\\Hannover\\ZIM\\";
@@ -132,7 +134,7 @@ public class Sim02_DrtCommuter {
 
 		// config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		// Overwrite existing configuration parameters
-		config.plans().setInputFile(inbase + "\\input\\plans\\w243_inOutWithDRT_selected.xml.gz");
+		config.plans().setInputFile(inbase + "\\input\\plans\\vw280_0.1.output_plans_cityCommuterDRT_carOnly.xml.gz");
 //		config.plans().setInputFile(inbase + "\\input\\plans\\vw243_cadON_ptSpeedAdj.0.1_DRT_0.1.output_plans.xml.gz");
 		config.controler().setLastIteration(6); // Number of simulation iterations
 		config.controler().setWriteEventsInterval(2); // Write Events file every x-Iterations
@@ -141,6 +143,14 @@ public class Sim02_DrtCommuter {
 		config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 		config.qsim().setFlowCapFactor(0.1);
 		config.qsim().setStorageCapFactor(0.11);
+		
+		config.controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastAStarLandmarks );
+		config.plansCalcRoute().setRoutingRandomness( 3. );
+
+		// vsp defaults
+		config.qsim().setUsingTravelTimeCheckInTeleportation( true );
+		config.qsim().setTrafficDynamics( TrafficDynamics.kinematicWaves );
+		
 
 		String networkFilePath = inbase + "\\input\\network\\network.xml.gz";
 		String shapeFilePath = inbase + "\\input\\shp\\Real_Region_Hannover.shp";
@@ -209,7 +219,7 @@ public class Sim02_DrtCommuter {
 
 //		// City Hubs (these hubs are empty at the beginning of the simulation)
 //		depotsAndVehicles.put(Id.createLinkId(93695), 1); // 1
-		int cityFleet = 100;
+		int cityFleet = 75;
 		depotsAndVehicles.put(Id.createLinkId(181441), (int) (cityFleet*0.20)); // 2
 		depotsAndVehicles.put(Id.createLinkId(108498), (int) (cityFleet*0.20)); // 3
 		depotsAndVehicles.put(Id.createLinkId(279990), (int) (cityFleet*0.20)); // 4
@@ -272,11 +282,6 @@ public class Sim02_DrtCommuter {
 		// prc.setShapeFile(shapeFile);
 		// prc.setCapacityCalculationMethod("useFromNetwork");
 		// prc.setShape_key("NO");
-
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-
-		// Scale PT Network Capacities
-//		adjustPtNetworkCapacity(scenario.getNetwork(), config.qsim().getFlowCapFactor());
 
 		// Filter Links with higher speeds than x km/h
 		// setXY2Links(scenario, 80 / 3.6);

@@ -61,10 +61,13 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.PtConstants;
 import org.opengis.feature.simple.SimpleFeature;
 
+import vwExamples.utils.createShiftingScenario.homeOffice.assignHomeOfficeSubTour;
+import vwExamples.utils.createShiftingScenario.homeOffice.isHomeOfficeSubTourCandidate;
+
 /**
  * @author saxer
  */
-public class PlanModifier {
+public class PlanModifierHomeOffice {
 
 	// Shape File to check home and work locations of the agents
 	Set<String> cityZones;
@@ -93,7 +96,7 @@ public class PlanModifier {
 	ShiftingScenario shiftingScenario;
 	String sep = ";";
 
-	PlanModifier(String cityZonesFile, String serviceAreaZonesFile, String plansFile, String modPlansFile,
+	PlanModifierHomeOffice(String cityZonesFile, String serviceAreaZonesFile, String plansFile, String modPlansFile,
 			String networkFile) {
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		// this.modifiedPopulationWriter = new StreamingPopulationWriter();
@@ -134,7 +137,7 @@ public class PlanModifier {
 
 	public static void main(String[] args) {
 
-		PlanModifier planmodifier = new PlanModifier(
+		PlanModifierHomeOffice planmodifier = new PlanModifierHomeOffice(
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Hannover_Stadtteile.shp",
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Real_Region_Hannover.shp",
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\vw243_cadON_ptSpeedAdj.0.1.output_plans.xml.gz",
@@ -343,7 +346,7 @@ public class PlanModifier {
 		String subtourMode = null;
 		List<Trip> trips = subTour.getTrips();
 
-		MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImplFallback();
+		MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
 
 		for (TripStructureUtils.Trip trip : trips) {
 			final List<PlanElement> fullTrip = plan.getPlanElements().subList(

@@ -66,8 +66,8 @@ public class PlanAttributeChanger {
 	public static void main(String[] args) {
 
 		PlanAttributeChanger manipulator = new PlanAttributeChanger(
-				"D:\\\\Matsim\\\\Axer\\\\Hannover\\\\ZIM\\\\input\\\\plans\\\\finishedPlans_0.1_timeFIX.xml.gz",
-				"D:\\\\Matsim\\\\Axer\\\\Hannover\\\\ZIM\\\\input\\\\plans\\\\finishedPlans_0.1_timeFIX_License.xml.gz");
+				"Y:\\aws\\vw280_100pct\\input\\plans\\finishedPlans_1.0_timeFIX.xml.gz",
+				"Y:\\\\aws\\\\vw280_100pct\\\\input\\\\plans\\\\finishedPlans_1.0_timeFIX_License.xml.gz");
 
 		manipulator.run();
 

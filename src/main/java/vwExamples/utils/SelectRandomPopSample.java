@@ -34,7 +34,7 @@ import java.util.Random;
 public class SelectRandomPopSample {
 
     //Initialize SubsamplePopulation class
-    static double samplePct = 0.1; //Global sample ratio
+    static double samplePct = 0.01; //Global sample ratio
 
 
     public static void main(String[] args) {
@@ -43,8 +43,8 @@ public class SelectRandomPopSample {
         //Create a Scenario
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         //Fill this Scenario with a population.
-        new PopulationReader(scenario).readFile("D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\commuterdrt_out_in_withinAll_vw235_nocad.1.0_20pct.output_plans_selected.xml.gz");
-        String randomOrderedPop = "D:\\\\Matsim\\\\Axer\\\\Hannover\\\\ZIM\\\\input\\\\plans\\\\commuterdrt_out_in_withinAll_vw235_nocad.1.0_20pct.output_plans_selected_10pct.xml.gz";
+        new PopulationReader(scenario).readFile("D:\\Matsim\\Axer\\Hannover\\Base\\vw280_0.1\\vw280_0.1.output_plans.xml.gz");
+        String randomOrderedPop = "Y:\\vw280_0.001.output_plans.xml.gz";
         StreamingPopulationWriter filteredPop = new StreamingPopulationWriter();
         filteredPop.startStreaming(randomOrderedPop);
 

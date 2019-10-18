@@ -1,4 +1,4 @@
-package vwExamples.utils.createShiftingScenario;
+package vwExamples.utils.createShiftingScenario.cityCommuterDRT;
 
 import java.util.Map;
 import java.util.StringJoiner;
@@ -12,12 +12,15 @@ import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
-public class isWithinCityTourCandidate implements SubTourValidator {
+import vwExamples.utils.createShiftingScenario.SubTourValidator;
+
+public class assignCityCommuterTourCandidate implements SubTourValidator {
 	Network network;
 	Map<String, Geometry> cityZonesMap;
 	Map<String, Geometry> serviceAreazonesMap;
 
-	isWithinCityTourCandidate(Network network, Map<String, Geometry> cityZonesMap, Map<String, Geometry> serviceAreazonesMap) {
+	public assignCityCommuterTourCandidate(Network network, Map<String, Geometry> cityZonesMap,
+			Map<String, Geometry> serviceAreazonesMap) {
 		this.network = network;
 		this.cityZonesMap = cityZonesMap;
 		this.serviceAreazonesMap = serviceAreazonesMap;
@@ -26,8 +29,9 @@ public class isWithinCityTourCandidate implements SubTourValidator {
 
 	@Override
 	public boolean isValidSubTour(Subtour subTour) {
-
-		if ((isWithinCityTourCheck(subTour))) {
+		// Considers that only tour can be assigned to drt if they are within the service area
+		if (((isInboundCommuterTour(subTour) || isOutboundCommuterTour(subTour) || isWithinCommuterTour(subTour))
+				&& subTourIsWithinServiceArea(subTour))) {
 
 			return true;
 		}
@@ -54,7 +58,7 @@ public class isWithinCityTourCandidate implements SubTourValidator {
 			Coord fromCoord = trip.getOriginActivity().getCoord();
 			Coord toCoord = trip.getDestinationActivity().getCoord();
 
-			if (!isWithinZone(fromCoord) && !isWithinZone(toCoord)) {
+			if (!isWithinZone(fromCoord) || !isWithinZone(toCoord)) {
 				return false;
 			}
 

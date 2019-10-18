@@ -63,10 +63,12 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.PtConstants;
 import org.opengis.feature.simple.SimpleFeature;
 
+import vwExamples.utils.createShiftingScenario.cityDRT.isWithinCityTourCandidate;
+
 /**
  * @author saxer
  */
-public class PlanModifierDRT {
+public class PlanModifierCityDRT {
 
 	// Shape File to check home and work locations of the agents
 	Set<String> cityZones;
@@ -95,7 +97,7 @@ public class PlanModifierDRT {
 	ShiftingScenario shiftingScenario;
 	String sep = ";";
 
-	PlanModifierDRT(String cityZonesFile, String serviceAreaZonesFile, String plansFile, String modPlansFile,
+	PlanModifierCityDRT(String cityZonesFile, String serviceAreaZonesFile, String plansFile, String modPlansFile,
 			String networkFile) {
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		// this.modifiedPopulationWriter = new StreamingPopulationWriter();
@@ -136,11 +138,11 @@ public class PlanModifierDRT {
 
 	public static void main(String[] args) {
 
-		PlanModifierDRT planmodifier = new PlanModifierDRT(
+		PlanModifierCityDRT planmodifier = new PlanModifierCityDRT(
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Hannover_Stadtteile.shp",
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Real_Region_Hannover.shp",
-				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\vw243_cadON_ptSpeedAdj.0.1.output_plans.xml.gz",
-				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\vw243_cadON_ptSpeedAdj.0.1_DRT_0.20_noShort.output_plans.xml.gz",
+				"D:\\Matsim\\Axer\\Hannover\\Base\\vw280_0.1\\vw280_0.1.output_plans.xml.gz",
+				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\vw280_0.1.output_plans_cityDRT_Test.xml.gz",
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\network\\network.xml.gz");
 		planmodifier.count();
 		planmodifier.assign();
@@ -209,6 +211,7 @@ public class PlanModifierDRT {
 
 				String subtourMode = getSubtourMode(subTour, plan);
 
+//				if (subTourValidator.isValidSubTour(subTour) && subtourMode.equals("car")) {
 				if (subTourValidator.isValidSubTour(subTour)) {
 					shiftingScenario.agentSet.add(person.getId());
 					shiftingScenario.totalSubtourCounter.increment();
@@ -295,12 +298,15 @@ public class PlanModifierDRT {
 
 					// Check if this subtour can be shifted to an other mode
 					// It is not allowed to shift an already shifted tour
+//					if (assignTourValidator.isValidSubTour(subTour) && (subtourMode != shift2mode)
+//							&& meanTripDistance > minTripDistance && subtourMode.contains("car")) {
 					if (assignTourValidator.isValidSubTour(subTour) && (subtourMode != shift2mode)
 							&& meanTripDistance > minTripDistance) {
 
 						// System.out.println("Trip Size:" + subTour.getTrips().size());
 
 						for (Trip trip : subTour.getTrips()) {
+
 							for (Leg l : trip.getLegsOnly()) {
 								l.setRoute(null);
 								l.setTravelTime(0.0);
@@ -355,7 +361,7 @@ public class PlanModifierDRT {
 		String subtourMode = null;
 		List<Trip> trips = subTour.getTrips();
 
-		MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImplFallback();
+		MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
 
 		for (TripStructureUtils.Trip trip : trips) {
 			final List<PlanElement> fullTrip = plan.getPlanElements().subList(

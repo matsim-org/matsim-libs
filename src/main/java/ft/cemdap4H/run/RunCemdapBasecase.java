@@ -34,7 +34,6 @@ import org.matsim.contrib.cadyts.car.CadytsCarModule;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
-import org.matsim.contrib.ev.temperature.TemperatureChangeConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
@@ -54,61 +53,35 @@ import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
-
-//import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
-
-//import ch.sbb.matsim.routing.pt.raptor.*;
 
 
 /**
- * @author  jbischoff
+ * @author  axer
  *
  */
 
 public class RunCemdapBasecase {
 public static void main(String[] args) {
-	String runId = "vw280";
-	String pct = "_0.1";
 	
-	String configPath = "D:\\Matsim\\Axer\\Hannover\\Base\\vw243_cadON_ptSpeedAdj.0.1\\config_0.1_changeTimes_3.xml"; 
+	
+	String runId = args[0];
+	String base = args[1];
+	String configFileName = args[2];
+	String network = args[3];
+	String inputPlans = args[4];
+	String counts = args[5];
+	int qsimcores =Integer.parseInt(args[6]);
+	int hdlcores =Integer.parseInt(args[7]);
 		
-	Config config = ConfigUtils.loadConfig(configPath, new CadytsConfigGroup());
-	
-	
-	config.plans().setInputFile("D:\\\\Matsim\\\\Axer\\\\Hannover\\\\ZIM\\\\input\\\\plans\\\\finishedPlans_0.1_timeFIX_License.xml.gz");
-	config.network().setInputFile("D:\\Matsim\\Axer\\Hannover\\Base\\vw243_cadON_ptSpeedAdj.0.1\\vw243_cadON_ptSpeedAdj.0.1.output_network.xml.gz");
-	config.transit().setTransitScheduleFile("D:\\Matsim\\Axer\\Hannover\\Base\\vw275_cadytsOn_NoMuWo_Mu3600_TimeAdj_Lic0.1_2\\vw275_cadytsOn_NoMuWo_Mu3600_TimeAdj_Lic0.1_2.output_transitSchedule.xml.gz");
-	config.transit().setVehiclesFile("D:\\Matsim\\Axer\\Hannover\\Base\\vw275_cadytsOn_NoMuWo_Mu3600_TimeAdj_Lic0.1_2\\vw275_cadytsOn_NoMuWo_Mu3600_TimeAdj_Lic0.1_2.output_transitVehicles.xml.gz");
-//	config.qsim().setFlowCapFactor(1.15);
-	config.global().setNumberOfThreads(32);
-	config.parallelEventHandling().setNumberOfThreads(32);
-	config.qsim().setNumberOfThreads(32);
-	config.plans().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
+	String input = base + "input//";
+	String ouput = base + "output//"+runId;
+	Config config = ConfigUtils.loadConfig(input + configFileName,new CadytsConfigGroup());
+	config.plans().setInputFile(input + "plans//"+inputPlans);
 
-
-
-	
-	Scenario scenario = ScenarioUtils.loadScenario(config);
-	adjustPtNetworkCapacity(scenario.getNetwork(),config.qsim().getFlowCapFactor());
-	
-	Controler controler = new Controler(scenario);
-	controler.addOverridingModule(new CadytsCarModule());
-	
-//	//Override cadyts params
-	CadytsConfigGroup ccg = (CadytsConfigGroup) config.getModules().get(CadytsConfigGroup.GROUP_NAME);
-	ccg.setStartTime(0);	
-	ccg.setEndTime(24*3600);
-	
-	//Override Counts params
-	CountsConfigGroup countsccg = (CountsConfigGroup) config.getModules().get(CountsConfigGroup.GROUP_NAME);
-	countsccg.setInputFile("D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\network\\counts_H_LSA.xml");
-	
-	
 	//RECREATE ACTIVITY PARAMS 
 	{
-	config.planCalcScore().getActivityParams().clear();
+//	config.planCalcScore().getActivityParams().clear();
 	// activities:
 	for ( long ii = 1 ; ii <= 30; ii+=1 ) {
 
@@ -132,14 +105,22 @@ public static void main(String[] args) {
 	config.planCalcScore().addActivityParams( new ActivityParams( "education").setTypicalDuration(8*3600 ).setOpeningTime(8. * 3600. ).setClosingTime(18. * 3600. ) );
 	}
 
-			
+	config.controler().setOutputDirectory(ouput);
+	config.network().setInputFile(input + "network//"+network);
+	config.transit().setTransitScheduleFile(input + "transit//vw280_0.1.output_transitSchedule.xml.gz");
+	config.transit().setVehiclesFile(input + "transit//vw280_0.1.output_transitVehicles.xml.gz");
+
+	config.global().setNumberOfThreads(Runtime.getRuntime().availableProcessors());
+	config.parallelEventHandling().setNumberOfThreads(hdlcores);
+	config.qsim().setNumberOfThreads(qsimcores);
+	config.plans().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
 	
 	
-	config.controler().setOutputDirectory("D:\\Matsim\\Axer\\Hannover\\Base\\"+runId+pct);
-	config.controler().setRunId(runId+pct);
-	config.controler().setWritePlansInterval(10);
-	config.controler().setWriteEventsInterval(10);
-	config.controler().setLastIteration(500); //Number of simulation iterations
+	config.controler().setOutputDirectory(ouput);
+	config.controler().setRunId(runId);
+	config.controler().setWritePlansInterval(20);
+//	config.controler().setWriteEventsInterval(20);
+	config.controler().setLastIteration(340); //Number of simulation iterations
 	config.controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastAStarLandmarks );
 	config.plansCalcRoute().setRoutingRandomness( 3. );
 
@@ -154,6 +135,29 @@ public static void main(String[] args) {
 	config.qsim().setTrafficDynamics( TrafficDynamics.kinematicWaves );
 //	config.plansCalcRoute().setInsertingAccessEgressWalk( true );
 	
+	
+//	//Override cadyts params
+	CadytsConfigGroup ccg = (CadytsConfigGroup) config.getModules().get(CadytsConfigGroup.GROUP_NAME);
+	ccg.setStartTime(0);	
+	ccg.setEndTime(24*3600);
+	
+	//Override Counts params
+	CountsConfigGroup countsccg = (CountsConfigGroup) config.getModules().get(CountsConfigGroup.GROUP_NAME);
+//	countsccg.setInputFile("D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\network\\counts_H_LSA.xml");
+	countsccg.setInputFile(input + "network//"+counts);
+	
+		
+	Scenario scenario = ScenarioUtils.loadScenario(config);
+	Controler controler = new Controler(scenario);
+	controler.addOverridingModule(new CadytsCarModule());
+	
+
+	
+
+
+			
+	
+
 	
 	// tell the system to use the congested car router for the ride mode:
 	controler.addOverridingModule(new AbstractModule(){
@@ -203,6 +207,7 @@ public static void main(String[] args) {
 				.forEach(pe -> ((Leg) pe).setRoute(null));
 	}
 	
+	adjustPtNetworkCapacity(controler.getScenario().getNetwork(), config.qsim().getFlowCapFactor());
 	controler.run();
 	
 	
