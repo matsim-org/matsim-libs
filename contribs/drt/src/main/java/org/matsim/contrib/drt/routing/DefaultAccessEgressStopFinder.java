@@ -135,7 +135,7 @@ public class DefaultAccessEgressStopFinder implements AccessEgressStopFinder {
 		if (closestStopDistance > maxWalkDistance) {
 			return Collections.emptySet();
 		}
-		double searchRadius = Math.max(closestStopDistance + extensionRadius, maxWalkDistance);
+		double searchRadius = Math.min(closestStopDistance + extensionRadius, maxWalkDistance);
 		return stopsQT.getDisk(coord.getX(), coord.getY(), searchRadius);
 	}
 
