@@ -18,20 +18,15 @@
 
 package org.matsim.contrib.drt.routing;
 
-import java.util.Comparator;
-import java.util.Map;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.util.distance.DistanceUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
@@ -40,12 +35,13 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public class ClosestAccessEgressStopFinder implements AccessEgressStopFinder {
 
 	private final Network network;
-	private final Map<Id<TransitStopFacility>, TransitStopFacility> stops;
+	private final QuadTree<TransitStopFacility> stopsQT;
+	private final double maxWalkDistance;
 
-	public ClosestAccessEgressStopFinder(TransitSchedule transitSchedule, DrtConfigGroup drtconfig,
-			PlansCalcRouteConfigGroup planscCalcRouteCfg, Network network) {
+	public ClosestAccessEgressStopFinder(DrtConfigGroup drtconfig, Network network, QuadTree<TransitStopFacility> stopsQT) {
 		this.network = network;
-		this.stops = transitSchedule.getFacilities();
+		this.stopsQT = stopsQT;
+		this.maxWalkDistance = drtconfig.getMaxWalkDistance();
 	}
 
 	@Override
@@ -61,12 +57,11 @@ public class ClosestAccessEgressStopFinder implements AccessEgressStopFinder {
 
 	private TransitStopFacility findClosestStop(Facility facility) {
 		Coord coord = StopBasedDrtRoutingModule.getFacilityCoord(facility, network);
-
-		TransitStopFacility closest = stops.values()
-				.stream()
-				.min(Comparator.comparing(s -> DistanceUtils.calculateSquaredDistance(coord, s.getCoord())))
-				.orElse(null);
-
-		return closest;
+		TransitStopFacility closestStop = stopsQT.getClosest(coord.getX(), coord.getY());
+		double closestStopDistance = CoordUtils.calcEuclideanDistance(coord, closestStop.getCoord());
+		if (closestStopDistance > maxWalkDistance) {
+			return null;
+		}
+		return stopsQT.getClosest(coord.getX(), coord.getY());
 	}
 }
