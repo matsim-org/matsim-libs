@@ -108,7 +108,7 @@ public class StopBasedDrtRoutingModuleTest {
 
 		Assert.assertEquals(5, routedList.size());
 		Assert.assertEquals(5, routedList2.size());
-		Assert.assertEquals(1, routedList3.size());
+		Assert.assertNull(routedList3);
 
 		System.out.println(routedList);
 
