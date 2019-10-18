@@ -25,7 +25,6 @@ import org.junit.Test;
 import org.matsim.contrib.minibus.PConstants;
 import org.matsim.contrib.minibus.operator.Operator;
 import org.matsim.contrib.minibus.operator.PPlan;
-import org.matsim.contrib.minibus.replanning.SidewaysRouteExtension;
 import org.matsim.contrib.minibus.routeProvider.PScenarioHelper;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -33,6 +32,17 @@ import java.io.File;
 import java.util.ArrayList;
 
 
+/*
+ * This test might fail if it is run as part of all Minibus-Tests in IntelliJ or Eclipse,
+ * but it runs correctly when being run from Maven or individually.
+ * This is likely due relying somewhere on an internal iteration order (likely in IdMap), which
+ * may be different if other tests have run before in the same JVM and thus Id-indices are different
+ * than when running this test alone.
+ *
+ * For Maven, the surefire-plugin can be configured to run each test individually in a separate JVM which
+ * solves this problem, but I don't know how to solve this in IntelliJ or Eclipse.
+ * -mrieser/2019Sept30
+ */
 public class SidewaysRouteExtensionTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	

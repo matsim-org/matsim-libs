@@ -54,9 +54,10 @@ public class ChargerReader extends MatsimXmlParser {
 				.linkId(Id.createLinkId(atts.getValue("link")))
 				.chargerType(
 						Optional.ofNullable(atts.getValue("type")).orElse(ChargerSpecification.DEFAULT_CHARGER_TYPE))
-				.maxPower(
-						EvUnits.kW_to_W(Double.parseDouble(atts.getValue("power"))))//TODO rename to "maxPower" in DTD??
-				.plugCount(Integer.parseInt(atts.getValue("capacity")))//TODO rename to "plugCount" in DTD
+				.plugPower(EvUnits.kW_to_W(Double.parseDouble(atts.getValue("plug_power"))))
+				.plugCount(Optional.ofNullable(atts.getValue("plug_count"))
+						.map(Integer::parseInt)
+						.orElse(ChargerSpecification.DEFAULT_PLUG_COUNT))
 				.build();
 	}
 }

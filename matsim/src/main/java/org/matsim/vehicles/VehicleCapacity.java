@@ -20,20 +20,62 @@
 package org.matsim.vehicles;
 
 
+import org.matsim.utils.objectattributes.attributable.Attributable;
+import org.matsim.utils.objectattributes.attributable.Attributes;
+
 /**
  * @author dgrether
  */
-public interface VehicleCapacity {
-	
-	public Integer getSeats();
-	
-	public Integer getStandingRoom();
-	
-	public FreightCapacity getFreightCapacity();
-	
-	public void setSeats(Integer seats);
-	
-	public void setStandingRoom(Integer standingRoom);
-	
-	public void setFreightCapacity(FreightCapacity freightCap);
+public final class VehicleCapacity implements Attributable {
+	// maybe at least these subtypes should be immutable?
+	// --> no, we make them fully settable, "data base in memory".  This has been the matsim design from the beginning, and all attempts to deviate from it
+	// always seem to lead to awkward code.  If parallel computing pieces need immutable data structures, they first need to copy them from the in-memory
+	// data base.  kai, sep'19
+
+	private Integer seats = 1; // one seat for the driver
+	private Integer standingRoom = 0 ;
+	private Double volumeInCubicMeters = Double.POSITIVE_INFINITY ;
+	private Double weightInTons = Double.POSITIVE_INFINITY ;
+	private Attributes attributes = new Attributes() ;
+	private Double other = Double.POSITIVE_INFINITY ;
+
+	/* package-private */ VehicleCapacity(){
+	}
+	public Integer getSeats() {
+		return seats;
+	}
+	public Integer getStandingRoom() {
+		return standingRoom;
+	}
+	public VehicleCapacity setSeats( Integer seats ) {
+		this.seats = seats;
+		return this ;
+	}
+	public VehicleCapacity setStandingRoom( Integer standingRoom ) {
+		this.standingRoom = standingRoom;
+		return this ;
+	}
+	public Double getVolumeInCubicMeters() {
+		return volumeInCubicMeters;
+	}
+	public VehicleCapacity setVolumeInCubicMeters( double volumeInCubicMeters ) {
+		this.volumeInCubicMeters = volumeInCubicMeters;
+		return this ;
+	}
+	public Double getWeightInTons() {
+		return weightInTons;
+	}
+	public VehicleCapacity setWeightInTons( double weightInTons ) {
+		this.weightInTons = weightInTons;
+		return this ;
+	}
+	public Attributes getAttributes(){
+		return this.attributes ;
+	}
+	public void setOther( double other ){
+		this.other = other ;
+	}
+	public Double getOther() {
+		return this.other;
+	}
 }

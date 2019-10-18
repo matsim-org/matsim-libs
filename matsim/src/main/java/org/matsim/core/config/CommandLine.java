@@ -412,11 +412,11 @@ public class CommandLine {
 		List<String> flatArguments = new LinkedList<>();
 
 		for (String argument : args) {
-			int index = argument.lastIndexOf("=");
-			int bracketIndex = argument.lastIndexOf("]");
+			int index = argument.lastIndexOf('=');
+			int bracketIndex = argument.lastIndexOf(']');
 
 			if (bracketIndex > index) {
-				index = argument.indexOf("=", bracketIndex);
+				index = argument.indexOf('=', bracketIndex);
 			}
 
 			if (index > -1) {
@@ -509,7 +509,7 @@ public class CommandLine {
 		List<String> nonPrefixedOptions = new LinkedList<>();
 
 		for (String option : options.keySet()) {
-			int separatorIndex = option.indexOf(":");
+			int separatorIndex = option.indexOf(':');
 
 			if (separatorIndex > -1) {
 				String prefix = option.substring(0, separatorIndex);
@@ -546,7 +546,7 @@ public class CommandLine {
 	}
 
 	private void processConfigOption(Config config, String option, String remainder) throws ConfigurationException {
-		int separatorIndex = remainder.indexOf(".");
+		int separatorIndex = remainder.indexOf('.');
 
 		if (separatorIndex > -1) {
 			String module = remainder.substring(0, separatorIndex);
@@ -567,9 +567,9 @@ public class CommandLine {
 	private void processParameter(String option, String path, ConfigGroup configGroup, String remainder)
 			throws ConfigurationException {
 		if (remainder.contains("[")) {
-			int selectorStartIndex = remainder.indexOf("[");
-			int selectorEndIndex = remainder.indexOf("]");
-			int equalIndex = remainder.indexOf("=");
+			int selectorStartIndex = remainder.indexOf('[');
+			int selectorEndIndex = remainder.indexOf(']');
+			int equalIndex = remainder.indexOf('=');
 
 			if (selectorStartIndex > -1 && selectorEndIndex > -1 && equalIndex > -1) {
 				if (selectorStartIndex < equalIndex && equalIndex < selectorEndIndex) {

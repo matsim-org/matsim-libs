@@ -143,7 +143,7 @@ public class RoutingIT {
 			}
 			@Override
 			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
-				return new AStarLandmarksFactory();
+				return new AStarLandmarksFactory(2);
 			}
 		});
 	}
@@ -156,7 +156,7 @@ public class RoutingIT {
 			}
 			@Override
 			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
-				return new FastAStarLandmarksFactory();
+				return new FastAStarLandmarksFactory(2);
 			}
 		});
 	}

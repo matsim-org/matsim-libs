@@ -21,7 +21,7 @@ public class BestReplyIT {
 	public void testRunControler() {
 		// load chessboard scenario config:
         Config config = utils.loadConfig(
-        		IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "config.xml"),
+        		IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "config.xml"),
 				new FrozenTastesConfigGroup()
 		);
   

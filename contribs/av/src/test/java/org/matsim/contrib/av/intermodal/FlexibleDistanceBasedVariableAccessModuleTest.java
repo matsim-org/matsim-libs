@@ -13,7 +13,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.av.intermodal.router.FlexibleDistanceBasedVariableAccessModule;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -49,7 +49,7 @@ public class FlexibleDistanceBasedVariableAccessModuleTest {
 	@Test
 	public void testGetAccessEgressModeAndTraveltime() throws MalformedURLException {
 		URL configUrl = new File(utils.getPackageInputDirectory() + "config.xml").toURI().toURL();
-		Config config = ConfigUtils.loadConfig(configUrl, new TaxiConfigGroup());
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		FlexibleDistanceBasedVariableAccessModule module = new FlexibleDistanceBasedVariableAccessModule(
 				scenario.getNetwork(), config);
@@ -139,7 +139,7 @@ public class FlexibleDistanceBasedVariableAccessModuleTest {
 				leg1001mCar.getMode().equals("bike") || leg1001mCar.getMode().equals("av") || leg1001mCar.getMode()
 						.equals("car"));
 
-		// Diagonal leg: total beeline egressDistance > maximumAccessDistance of walk, but orthogonal part on the road network < maximumAccessDistance of walk  
+		// Diagonal leg: total beeline egressDistance > maximumAccessDistance of walk, but orthogonal part on the road network < maximumAccessDistance of walk
 		Leg leg1001mDiagonal = module.getAccessEgressModeAndTraveltime(personCarNeverAvailable,
 				CoordUtils.createCoord(4949.00, 1113.25), CoordUtils.createCoord(3950.00, 1050.00), 8 * 60 * 60);
 		Assert.assertTrue(leg1001mDiagonal.getMode().equals("bike") || leg1001mDiagonal.getMode().equals("av"));

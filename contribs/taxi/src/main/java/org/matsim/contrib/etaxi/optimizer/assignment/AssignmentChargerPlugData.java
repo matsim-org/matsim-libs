@@ -51,13 +51,13 @@ class AssignmentChargerPlugData {
 			int plugged = logic.getPluggedVehicles().size();
 
 			int assignedVehicles = plugged + queued + dispatched;
-			if (assignedVehicles == 2 * c.getPlugs()) {
+			if (assignedVehicles == 2 * c.getPlugCount()) {
 				continue;
-			} else if (assignedVehicles > 2 * c.getPlugs()) {
+			} else if (assignedVehicles > 2 * c.getPlugCount()) {
 				throw new IllegalStateException();// XXX temp check
 			}
 
-			int unassignedPlugs = Math.max(c.getPlugs() - assignedVehicles, 0);
+			int unassignedPlugs = Math.max(c.getPlugCount() - assignedVehicles, 0);
 			for (int p = 0; p < unassignedPlugs; p++) {
 				ChargerPlug plug = new ChargerPlug(c, p);
 				builder.add(new DestEntry<ChargerPlug>(idx++, plug, c.getLink(), currentTime));
@@ -66,7 +66,7 @@ class AssignmentChargerPlugData {
 			// we do not want to have long queues at chargers: 1 awaiting veh per plug is the limit
 			// moreover, in a single run we can assign up to one veh to each plug
 			// (sequencing is not possible with AP)
-			int assignableVehicles = Math.min(2 * c.getPlugs() - assignedVehicles, c.getPlugs());
+			int assignableVehicles = Math.min(2 * c.getPlugCount() - assignedVehicles, c.getPlugCount());
 			if (assignableVehicles == unassignedPlugs) {
 				continue;
 			}
@@ -76,7 +76,7 @@ class AssignmentChargerPlugData {
 					Streams.concat(logic.getPluggedVehicles().stream(), logic.getQueuedVehicles().stream(),
 							logic.getAssignedVehicles().stream()));
 
-			double chargeStart = currentTime + assignedWorkload / (c.getPlugs() - unassignedPlugs);
+			double chargeStart = currentTime + assignedWorkload / (c.getPlugCount() - unassignedPlugs);
 			for (int p = unassignedPlugs; p < assignableVehicles; p++) {
 				ChargerPlug plug = new ChargerPlug(c, p);
 				builder.add(new DestEntry<ChargerPlug>(idx++, plug, c.getLink(), chargeStart));

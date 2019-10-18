@@ -27,6 +27,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -40,6 +41,19 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks, FastDijkstra, FastAStarLandmarks}
 
 	public enum EventsFileFormat {xml}
+
+	public enum CompressionType {
+		none(""),
+		gzip(".gz"),
+		lz4(".lz4"),
+		zst(".zst");
+
+		public final String fileEnding;
+
+		CompressionType(String fileEnding) {
+			this.fileEnding = fileEnding;
+		}
+	}
 
 	public static final String GROUP_NAME = "controler";
 
@@ -56,6 +70,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private static final String OVERWRITE_FILE = "overwriteFiles";
 	private static final String CREATE_GRAPHS = "createGraphs";
 	private static final String DUMP_DATA_AT_END = "dumpDataAtEnd";
+	private static final String COMPRESSION_TYPE = "compressionType";
 
 	/*package*/ static final String MOBSIM = "mobsim";
 	public enum MobsimType {qsim, JDEQSim}
@@ -81,6 +96,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private int writeSnapshotsInterval = 1;
 	private boolean createGraphs = true;
 	private boolean dumpDataAtEnd = true;
+	private CompressionType compressionType = CompressionType.gzip;
 	private OverwriteFileSetting overwriteFileSetting = OverwriteFileSetting.failIfDirectoryExists;
 
 	public ControlerConfigGroup() {
@@ -106,6 +122,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 		map.put(CREATE_GRAPHS, "Sets whether graphs showing some analyses should automatically be generated during the simulation." +
 				" The generation of graphs usually takes a small amount of time that does not have any weight in big simulations," +
 				" but add a significant overhead in smaller runs or in test cases where the graphical output is not even requested." );
+		map.put(COMPRESSION_TYPE, "Compression algorithm to use when writing out data to files. Possible values: " + Arrays.toString(CompressionType.values()));
 
 		StringBuilder mobsimTypes = new StringBuilder();
 		for ( MobsimType mtype : MobsimType.values() ) {
@@ -162,6 +179,16 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( ROUTINGALGORITHM_TYPE )
 	public void setRoutingAlgorithmType(final RoutingAlgorithmType type) {
 		this.routingAlgorithmType = type;
+	}
+
+	@StringGetter( COMPRESSION_TYPE )
+	public CompressionType getCompressionType() {
+		return this.compressionType;
+	}
+
+	@StringSetter( COMPRESSION_TYPE )
+	public void setCompressionType(CompressionType type) {
+		this.compressionType = type;
 	}
 
 	@StringGetter( RUNID )

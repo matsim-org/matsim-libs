@@ -20,12 +20,12 @@
 package org.matsim.contrib.socnetsim.framework.replanning.modules;
 
 import java.util.Collections;
+import java.util.Set;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -38,11 +38,11 @@ import org.matsim.core.router.TripStructureUtils.Subtour;
  * @author thibautd
  */
 public class TourModeUnifierAlgorithm implements PlanAlgorithm {
-	private final StageActivityTypes stages;
+	private final Set<String> stages; // formerly StageActivityTypes
 	private final SubtourModeIdentifier modeIdentifier;
 
 	public TourModeUnifierAlgorithm(
-			final StageActivityTypes stages,
+			final Set<String> stages,
 			final MainModeIdentifier modeIdentifier) {
 		this( stages,
 				new SubtourFirstModeIdentifier(
@@ -50,7 +50,7 @@ public class TourModeUnifierAlgorithm implements PlanAlgorithm {
 	}
 
 	public TourModeUnifierAlgorithm(
-			final StageActivityTypes stages,
+			final Set<String> stages,
 			final SubtourModeIdentifier modeIdentifier) {
 		this.stages = stages;
 		this.modeIdentifier = modeIdentifier;

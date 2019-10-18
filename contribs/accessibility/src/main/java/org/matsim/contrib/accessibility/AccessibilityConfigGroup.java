@@ -58,6 +58,9 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	private boolean useOpportunityWeights = false;
 	private static final String WEIGHT_EXPONENT = "weightExponent";
 	private Double weightExponent = 1.;
+
+	private static final String USE_PARALLELIZATION = "useParallelization";
+	private boolean useParallelization = true;
 	
 //	private static final String ACCESSIBILITY_DESTINATION_SAMPLING_RATE = "accessibilityDestinationSamplingRate";
 //	private Double accessibilityDestinationSamplingRate;
@@ -221,6 +224,14 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
     public void setUseOpportunityWeights(Boolean useOpportunityWeights) {
     	this.useOpportunityWeights = useOpportunityWeights;
     }
+	@StringGetter(USE_PARALLELIZATION)
+	public boolean isUseParallelization() {
+		return useParallelization;
+	}
+	@StringSetter(USE_PARALLELIZATION)
+	public void setUseParallelization(Boolean useParallelization) {
+		this.useParallelization = useParallelization;
+	}
     @StringGetter(WEIGHT_EXPONENT)
     public double getWeightExponent() {
     	return weightExponent;

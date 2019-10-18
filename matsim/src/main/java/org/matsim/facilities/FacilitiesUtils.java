@@ -29,10 +29,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.NetworkRoutingInclAccessEgressModule;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  * Contains several helper methods for working with {@link ActivityFacility facilities}.
@@ -145,4 +148,18 @@ public class FacilitiesUtils {
 		return coord ;
 	}
 
+	// Logic gotten from PopulationUtils, but I am actually a bit unsure about the value of those methods now that
+	// attributable is the only way to get attributes...
+
+	public static <F extends Facility & Attributable> Object getFacilityAttribute(F facility, String key) {
+		return facility.getAttributes().getAttribute( key );
+	}
+
+	public static <F extends Facility & Attributable> void putFacilityAttribute(F facility, String key, Object value ) {
+		facility.getAttributes().putAttribute( key, value ) ;
+	}
+
+	public static <F extends Facility & Attributable> Object removeFacilityAttribute( F facility, String key ) {
+		return facility.getAttributes().removeAttribute( key );
+	}
 }

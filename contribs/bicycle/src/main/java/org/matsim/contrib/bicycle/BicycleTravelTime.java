@@ -27,7 +27,7 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author dziemke
  */
-class BicycleTravelTime implements TravelTime {
+public class BicycleTravelTime implements TravelTime {
 
 	@Inject
 	private BicycleLinkSpeedCalculator linkSpeedCalculator;

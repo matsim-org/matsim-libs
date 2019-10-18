@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -23,7 +24,9 @@ public class DrtMainModeIdentifierTest {
 		DrtConfigGroup drtConfigGroup = new DrtConfigGroup();
 		drtConfigGroup.setMode("drt");
 		Config config = ConfigUtils.createConfig();
-		config.addModule(drtConfigGroup);
+		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
+		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
+		config.addModule(multiModeDrtConfigGroup);
 		MainModeIdentifier mmi = new DrtMainModeIdentifier(drtConfigGroup);
 		{
 			List<PlanElement> testElements = new ArrayList<>();

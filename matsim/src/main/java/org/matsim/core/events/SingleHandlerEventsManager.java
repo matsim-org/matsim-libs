@@ -115,63 +115,26 @@ public final class SingleHandlerEventsManager implements EventsManager {
 	
 	public SingleHandlerEventsManager(EventHandler eventHandler) {
 		this.eventHandler = eventHandler;
-		
-		if (this.eventHandler instanceof LinkLeaveEventHandler) this.isLeaveLinkHandler = true;
-		else this.isLeaveLinkHandler = false;
-		
-		if (this.eventHandler instanceof LinkEnterEventHandler) this.isLinkEnterHandler = true;
-		else this.isLinkEnterHandler = false;
 
-		if (this.eventHandler instanceof VehicleEntersTrafficEventHandler) this.isWait2LinkHandler = true;
-		else this.isWait2LinkHandler = false;
-
-		if (this.eventHandler instanceof PersonArrivalEventHandler) this.isPersonArrivalHandler = true;
-		else this.isPersonArrivalHandler = false;
-
-		if (this.eventHandler instanceof PersonDepartureEventHandler) this.isPersonDepatureHandler = true;
-		else this.isPersonDepatureHandler = false;
-
-		if (this.eventHandler instanceof ActivityEndEventHandler) this.isActivityEndHandler = true;
-		else this.isActivityEndHandler = false;
-
-		if (this.eventHandler instanceof ActivityStartEventHandler) this.isActivityStartHandler = true;
-		else this.isActivityStartHandler = false;
-
-		if (this.eventHandler instanceof TeleportationArrivalEventHandler) this.isTeleportationArrivalHandler = true;
-		else this.isTeleportationArrivalHandler = false;
-		
-		if (this.eventHandler instanceof TransitDriverStartsEventHandler) this.isTransitDriverStartsHandler = true;
-		else this.isTransitDriverStartsHandler = false;
-
-		if (this.eventHandler instanceof PersonStuckEventHandler) this.isPersonStuckHandler = true;
-		else this.isPersonStuckHandler = false;
-
-		if (this.eventHandler instanceof PersonMoneyEventHandler) this.isPersonMoneyHandler = true;
-		else this.isPersonMoneyHandler = false;
-
-		if (this.eventHandler instanceof AgentWaitingForPtEventHandler) this.isAgentWaitingForPtHandler = true;
-		else this.isAgentWaitingForPtHandler = false;
-
-		if (this.eventHandler instanceof PersonEntersVehicleEventHandler) this.isPersonEntersVehicleHandler = true;
-		else this.isPersonEntersVehicleHandler = false;
-
-		if (this.eventHandler instanceof PersonLeavesVehicleEventHandler) this.isPersonLeavesVehicleHandler = true;
-		else this.isPersonLeavesVehicleHandler = false;
-
-		if (this.eventHandler instanceof VehicleDepartsAtFacilityEventHandler) this.isVehicleDepartsAtFacilityHandler = true;
-		else this.isVehicleDepartsAtFacilityHandler = false;
-
-		if (this.eventHandler instanceof VehicleArrivesAtFacilityEventHandler) this.isVehicleArrivesAtFacilityHandler = true;
-		else this.isVehicleArrivesAtFacilityHandler = false;
-		
-		if (this.eventHandler instanceof VehicleLeavesTrafficEventHandler) this.isVehicleLeavesTrafficHandler = true;
-		else this.isVehicleLeavesTrafficHandler = false;
-
-		if (this.eventHandler instanceof VehicleAbortsEventHandler) this.isVehicleAbortsHandler = true;
-		else this.isVehicleAbortsHandler = false;
-		
-		if (this.eventHandler instanceof BasicEventHandler) this.isBasicEventHandler = true;
-		else this.isBasicEventHandler = false;
+		this.isLeaveLinkHandler = this.eventHandler instanceof LinkLeaveEventHandler;
+		this.isLinkEnterHandler = this.eventHandler instanceof LinkEnterEventHandler;
+		this.isWait2LinkHandler = this.eventHandler instanceof VehicleEntersTrafficEventHandler;
+		this.isPersonArrivalHandler = this.eventHandler instanceof PersonArrivalEventHandler;
+		this.isPersonDepatureHandler = this.eventHandler instanceof PersonDepartureEventHandler;
+		this.isActivityEndHandler = this.eventHandler instanceof ActivityEndEventHandler;
+		this.isActivityStartHandler = this.eventHandler instanceof ActivityStartEventHandler;
+		this.isTeleportationArrivalHandler = this.eventHandler instanceof TeleportationArrivalEventHandler;
+		this.isTransitDriverStartsHandler = this.eventHandler instanceof TransitDriverStartsEventHandler;
+		this.isPersonStuckHandler = this.eventHandler instanceof PersonStuckEventHandler;
+		this.isPersonMoneyHandler = this.eventHandler instanceof PersonMoneyEventHandler;
+		this.isAgentWaitingForPtHandler = this.eventHandler instanceof AgentWaitingForPtEventHandler;
+		this.isPersonEntersVehicleHandler = this.eventHandler instanceof PersonEntersVehicleEventHandler;
+		this.isPersonLeavesVehicleHandler = this.eventHandler instanceof PersonLeavesVehicleEventHandler;
+		this.isVehicleDepartsAtFacilityHandler = this.eventHandler instanceof VehicleDepartsAtFacilityEventHandler;
+		this.isVehicleArrivesAtFacilityHandler = this.eventHandler instanceof VehicleArrivesAtFacilityEventHandler;
+		this.isVehicleLeavesTrafficHandler = this.eventHandler instanceof VehicleLeavesTrafficEventHandler;
+		this.isVehicleAbortsHandler = this.eventHandler instanceof VehicleAbortsEventHandler;
+		this.isBasicEventHandler = this.eventHandler instanceof BasicEventHandler;
 
 		// identify the implemented Handler Interfaces
 		Set<Class<?>> addedHandlers = new HashSet<Class<?>>();
@@ -262,11 +225,7 @@ public final class SingleHandlerEventsManager implements EventsManager {
 		try {
 			Method method = this.getHandlersForClass(event.getClass());
 			if (method != null) method.invoke(this.eventHandler, event);
-		} catch (IllegalArgumentException e) {
-			throw new RuntimeException("problem invoking EventHandler " + this.eventHandler.getClass().getCanonicalName() + " for event-class " + event.getClass().getCanonicalName(), e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException("problem invoking EventHandler " + this.eventHandler.getClass().getCanonicalName() + " for event-class " + event.getClass().getCanonicalName(), e);
-		} catch (InvocationTargetException e) {
+		} catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException e) {
 			throw new RuntimeException("problem invoking EventHandler " + this.eventHandler.getClass().getCanonicalName() + " for event-class " + event.getClass().getCanonicalName(), e);
 		}
 	}
@@ -345,58 +304,76 @@ public final class SingleHandlerEventsManager implements EventsManager {
 		if (this.isLeaveLinkHandler && klass == LinkLeaveEvent.class) {
 			((LinkLeaveEventHandler) this.eventHandler).handleEvent((LinkLeaveEvent)ev);
 			return true;
-		} else if (this.isLinkEnterHandler && klass == LinkEnterEvent.class) {
+		}
+		if (this.isLinkEnterHandler && klass == LinkEnterEvent.class) {
 			((LinkEnterEventHandler) this.eventHandler).handleEvent((LinkEnterEvent)ev);
 			return true;
-		} else if (this.isWait2LinkHandler && klass == VehicleEntersTrafficEvent.class) {
+		}
+		if (this.isWait2LinkHandler && klass == VehicleEntersTrafficEvent.class) {
 			((VehicleEntersTrafficEventHandler) this.eventHandler).handleEvent((VehicleEntersTrafficEvent)ev);
 			return true;
-		} else if (this.isPersonArrivalHandler && klass == PersonArrivalEvent.class) {
+		}
+		if (this.isPersonArrivalHandler && klass == PersonArrivalEvent.class) {
 			((PersonArrivalEventHandler) this.eventHandler).handleEvent((PersonArrivalEvent)ev);
 			return true;
-		} else if (this.isPersonDepatureHandler && klass == PersonDepartureEvent.class) {
+		}
+		if (this.isPersonDepatureHandler && klass == PersonDepartureEvent.class) {
 			((PersonDepartureEventHandler) this.eventHandler).handleEvent((PersonDepartureEvent)ev);
 			return true;
-		} else if (this.isActivityEndHandler && klass == ActivityEndEvent.class) {
+		}
+		if (this.isActivityEndHandler && klass == ActivityEndEvent.class) {
 			((ActivityEndEventHandler) this.eventHandler).handleEvent((ActivityEndEvent)ev);
 			return true;
-		} else if (this.isActivityStartHandler && klass == ActivityStartEvent.class) {
+		}
+		if (this.isActivityStartHandler && klass == ActivityStartEvent.class) {
 			((ActivityStartEventHandler) this.eventHandler).handleEvent((ActivityStartEvent)ev);
 			return true;
-		} else if (this.isTeleportationArrivalHandler && klass == TeleportationArrivalEvent.class) {
+		}
+		if (this.isTeleportationArrivalHandler && klass == TeleportationArrivalEvent.class) {
 			((TeleportationArrivalEventHandler) this.eventHandler).handleEvent((TeleportationArrivalEvent)ev);
 			return true;
-		} else if (this.isTransitDriverStartsHandler && klass == TransitDriverStartsEvent.class) {
+		}
+		if (this.isTransitDriverStartsHandler && klass == TransitDriverStartsEvent.class) {
 			((TransitDriverStartsEventHandler) this.eventHandler).handleEvent((TransitDriverStartsEvent) ev);
 			return true;
-		} else if (this.isPersonStuckHandler && klass == PersonStuckEvent.class) {
+		}
+		if (this.isPersonStuckHandler && klass == PersonStuckEvent.class) {
 			((PersonStuckEventHandler) this.eventHandler).handleEvent((PersonStuckEvent)ev);
 			return true;
-		} else if (this.isPersonMoneyHandler && klass == PersonMoneyEvent.class) {
+		}
+		if (this.isPersonMoneyHandler && klass == PersonMoneyEvent.class) {
 			((PersonMoneyEventHandler) this.eventHandler).handleEvent((PersonMoneyEvent)ev);
 			return true;
-		} else if (this.isAgentWaitingForPtHandler && klass == AgentWaitingForPtEvent.class) {
+		}
+		if (this.isAgentWaitingForPtHandler && klass == AgentWaitingForPtEvent.class) {
 			((AgentWaitingForPtEventHandler) this.eventHandler).handleEvent((AgentWaitingForPtEvent)ev);
 			return true;
-		} else if (this.isPersonEntersVehicleHandler && klass == PersonEntersVehicleEvent.class) {
+		}
+		if (this.isPersonEntersVehicleHandler && klass == PersonEntersVehicleEvent.class) {
 			((PersonEntersVehicleEventHandler) this.eventHandler).handleEvent((PersonEntersVehicleEvent)ev);
 			return true;
-		} else if (this.isPersonLeavesVehicleHandler && klass == PersonLeavesVehicleEvent.class) {
+		}
+		if (this.isPersonLeavesVehicleHandler && klass == PersonLeavesVehicleEvent.class) {
 			((PersonLeavesVehicleEventHandler) this.eventHandler).handleEvent((PersonLeavesVehicleEvent)ev);
 			return true;
-		} else if (this.isVehicleDepartsAtFacilityHandler && klass == VehicleDepartsAtFacilityEvent.class) {
+		}
+		if (this.isVehicleDepartsAtFacilityHandler && klass == VehicleDepartsAtFacilityEvent.class) {
 			((VehicleDepartsAtFacilityEventHandler) this.eventHandler).handleEvent((VehicleDepartsAtFacilityEvent) ev);
 			return true;
-		} else if (this.isVehicleArrivesAtFacilityHandler && klass == VehicleArrivesAtFacilityEvent.class) {
+		}
+		if (this.isVehicleArrivesAtFacilityHandler && klass == VehicleArrivesAtFacilityEvent.class) {
 			((VehicleArrivesAtFacilityEventHandler) this.eventHandler).handleEvent((VehicleArrivesAtFacilityEvent) ev);
 			return true;
-		} else if (this.isVehicleLeavesTrafficHandler && klass == VehicleLeavesTrafficEvent.class) {
+		}
+		if (this.isVehicleLeavesTrafficHandler && klass == VehicleLeavesTrafficEvent.class) {
 			((VehicleLeavesTrafficEventHandler) this.eventHandler).handleEvent((VehicleLeavesTrafficEvent) ev);
 			return true;
-		} else if (this.isVehicleAbortsHandler && klass == VehicleAbortsEvent.class) {
+		}
+		if (this.isVehicleAbortsHandler && klass == VehicleAbortsEvent.class) {
 			((VehicleAbortsEventHandler) this.eventHandler).handleEvent((VehicleAbortsEvent) ev);
 			return true;
-		} else if (this.isBasicEventHandler && klass == Event.class) {
+		}
+		if (this.isBasicEventHandler && klass == Event.class) {
 			((BasicEventHandler) this.eventHandler).handleEvent(ev);
 			return true;
 		}

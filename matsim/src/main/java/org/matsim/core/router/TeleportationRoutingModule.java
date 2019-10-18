@@ -81,11 +81,6 @@ public class TeleportationRoutingModule implements RoutingModule {
 	}
 
 	@Override
-	public StageActivityTypes getStageActivityTypes() {
-		return EmptyStageActivityTypes.INSTANCE;
-	}
-
-	@Override
 	public String toString() {
 		return "[TeleportationRoutingModule: mode="+this.mode+"]";
 	}

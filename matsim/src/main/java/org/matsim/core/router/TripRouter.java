@@ -62,10 +62,8 @@ public final class TripRouter implements MatsimExtensionPoint {
 	
 	private final Map<String, RoutingModule> routingModules = new HashMap<>();
 	
-	private final CompositeStageActivityTypes checker = new CompositeStageActivityTypes();
-	private final FallbackRoutingModule fallbackRoutingModule;
-
 	private MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
+	private final FallbackRoutingModule fallbackRoutingModule;
 
 	private Config config;
 	// (I need the config in the PlanRouter to figure out activity end times. And since the PlanRouter is not
@@ -137,22 +135,6 @@ public final class TripRouter implements MatsimExtensionPoint {
 			final RoutingModule module) {
 		RoutingModule old = routingModules.put( mainMode , module );
 
-		if (old != null) {
-			final StageActivityTypes oldTypes = old.getStageActivityTypes();
-			final boolean removed = checker.removeActivityTypes( oldTypes );
-			if ( !removed ) {
-				throw new RuntimeException( "could not remove "+oldTypes+" associated to "+old+". This may be due to a routing module creating a new instance at each call of getStageActivityTypes()" );
-			}
-		}
-
-		final StageActivityTypes types = module.getStageActivityTypes();
-		if ( types == null ) {
-			// we do not want to accept that, this would risk to mess up
-			// with replacement, and it generally makes code messy.
-			throw new RuntimeException( module+" returns null stage activity types. This is not a valid value. Return EmptyStageActivityTypes.INSTANCE instead." );
-		}
-		checker.addActivityTypes( types );
-
 		return old;
 	}
 
@@ -162,14 +144,6 @@ public final class TripRouter implements MatsimExtensionPoint {
 
 	public Set<String> getRegisteredModes() {
 		return Collections.unmodifiableSet( routingModules.keySet() );
-	}
-
-	/**
-	 * Gives access to the stage activity types, for all modes.
-	 * @return a {@link StageActivityTypes} considering all registered modules
-	 */
-	public StageActivityTypes getStageActivityTypes() {
-		return checker;
 	}
 
 	/**

@@ -102,12 +102,13 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		this.checkCapacitySemantics();
 		this.nofLanes = lanes;
 		this.checkNumberOfLanesSemantics();
-		if (this.from.equals(this.to) && (loopWarnCnt < maxLoopWarnCnt)) {
-			loopWarnCnt++ ;
-			log.warn("fromNode=toNode=" + this.to + ": link is a loop");
-			if ( loopWarnCnt == maxLoopWarnCnt )
-				log.warn(Gbl.FUTURE_SUPPRESSED ) ;
-		}
+//		if (this.from.equals(this.to) && (loopWarnCnt < maxLoopWarnCnt)) {
+//			loopWarnCnt++ ;
+//			log.warn("fromNode=toNode=" + this.to + ": link is a loop");
+//			if ( loopWarnCnt == maxLoopWarnCnt )
+//				log.warn(Gbl.FUTURE_SUPPRESSED ) ;
+//		}
+		// loop links have become an acceptable thing for matsim.  kai, sep'19
 	}
 
 	private void checkCapacitySemantics() {

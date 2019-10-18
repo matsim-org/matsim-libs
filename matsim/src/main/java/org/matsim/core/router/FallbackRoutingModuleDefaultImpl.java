@@ -32,8 +32,4 @@ class FallbackRoutingModuleDefaultImpl implements  FallbackRoutingModule {
 		NetworkRoutingInclAccessEgressModule.routeBushwhackingLeg( person, leg, fromCoord, toCoord, departureTime, dpLinkId, arLinkId, population.getFactory() ) ;
 		return Collections.singletonList( leg ) ;
 	}
-
-	@Override public StageActivityTypes getStageActivityTypes(){
-		return EmptyStageActivityTypes.INSTANCE ;
-	}
 }

@@ -45,7 +45,7 @@ public class RoadPricingControlerIT {
 	@Test
 	public void testPaidTollsEndUpInScores() {
 		// first run basecase
-		Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil-extended"), "config.xml"));
+		Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil-extended"), "config.xml"));
 		config.controler().setLastIteration(0);
 		config.plans().setInputFile("plans1.xml");
 		config.controler().setOutputDirectory(utils.getOutputDirectory() + "/basecase/");

@@ -85,19 +85,4 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 		}
 		throw new RuntimeException("Unsupported taxi optimizer type: " + taxiCfg.getTaxiOptimizerParams().getName());
 	}
-
-	public static AbstractTaxiOptimizerParams createParameterSet(String type) {
-		switch (type) {
-			case AssignmentTaxiOptimizerParams.SET_NAME:
-				return new AssignmentTaxiOptimizerParams();
-			case FifoTaxiOptimizerParams.SET_NAME:
-				return new FifoTaxiOptimizerParams();
-			case RuleBasedTaxiOptimizerParams.SET_NAME:
-				return new RuleBasedTaxiOptimizerParams();
-			case ZonalTaxiOptimizerParams.SET_NAME:
-				return new ZonalTaxiOptimizerParams();
-			default:
-				return null;
-		}
-	}
 }

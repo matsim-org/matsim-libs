@@ -40,7 +40,7 @@ public class NewControlerTest {
 
 	@Test
 	public void testInjectionBeforeControler() {
-		Config config = testUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+		Config config = testUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 
 		// a scenario is created and none of the files are loaded;
 		// facility file is provided in config and facilitySource is 'fromFile', the facilitySource must be changed. Amit Jan'18

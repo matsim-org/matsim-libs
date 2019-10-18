@@ -56,7 +56,7 @@ public class FacilitiesAttributeConvertionTest {
 	public void testDefaultsStream() {
 		final String path = utils.getOutputDirectory()+"/facilities.xml";
 
-		testWriteAndReread(w -> w.write(IOUtils.getOutputStream(path)), w -> w.readFile(path));
+		testWriteAndReread(w -> w.write(IOUtils.getOutputStream(IOUtils.getFileUrl(path), false)), w -> w.readFile(path));
 	}
 
 	public void testWriteAndReread(

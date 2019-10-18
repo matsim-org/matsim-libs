@@ -109,7 +109,6 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 		
 		final ChooseRandomLegModeForSubtour chooseRandomLegMode =
 				new ChooseRandomLegModeForSubtour(
-						tripRouter.getStageActivityTypes(),
 						tripRouter.getMainModeIdentifier(),
 						this.permissibleModesCalculator,
 						this.modes,

@@ -41,10 +41,10 @@ import com.google.inject.name.Named;
 /**
  * Used for offline estimation of travel times for VrpOptimizer by means of the exponential moving average. The
  * weighting decrease, alpha, must be in (0,1]. We suggest small values of alpha, e.g. 0.05.
- * 
+ * <p>
  * The averaging starts from the initial travel time estimates. If not provided, the free-speed TTs is used as the
  * initial estimates
- * 
+ *
  * @author michalm
  */
 public class DvrpOfflineTravelTimeEstimator implements DvrpTravelTimeEstimator, MobsimBeforeCleanupListener {
@@ -59,8 +59,8 @@ public class DvrpOfflineTravelTimeEstimator implements DvrpTravelTimeEstimator, 
 	@Inject
 	public DvrpOfflineTravelTimeEstimator(@Named(DvrpTravelTimeModule.DVRP_INITIAL) TravelTime initialTT,
 			@Named(DvrpTravelTimeModule.DVRP_OBSERVED) TravelTime observedTT,
-			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, TravelTimeCalculatorConfigGroup ttCalcConfig,
-			DvrpConfigGroup dvrpConfig) {
+			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
+			TravelTimeCalculatorConfigGroup ttCalcConfig, DvrpConfigGroup dvrpConfig) {
 		this(initialTT, observedTT, network, ttCalcConfig, dvrpConfig.getTravelTimeEstimationAlpha());
 	}
 

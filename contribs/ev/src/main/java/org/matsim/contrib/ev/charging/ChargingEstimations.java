@@ -25,16 +25,16 @@ import org.matsim.contrib.ev.infrastructure.Charger;
 
 /**
  * TODO Does not include future energy demand (e.g. AUX for plugged/queued vehs)
- * 
+ *
  * @author michalm
  */
 public class ChargingEstimations {
 	// TODO overestimates for short queues!!! (which is often the case for more advanced dispatch strategies)
 	public static double estimateMaxWaitTimeForNextVehicle(Charger charger) {
-		if (charger.getLogic().getPluggedVehicles().size() < charger.getPlugs()) {
+		if (charger.getLogic().getPluggedVehicles().size() < charger.getPlugCount()) {
 			return 0;
 		}
-		return ChargingEstimations.estimateTotalTimeToCharge(charger.getLogic()) / charger.getPlugs();
+		return ChargingEstimations.estimateTotalTimeToCharge(charger.getLogic()) / charger.getPlugCount();
 	}
 
 	public static double estimateTotalTimeToCharge(ChargingLogic logic) {

@@ -35,7 +35,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.BasicEventHandler;
 
-public class Worker extends Thread implements BasicEventHandler{
+class Worker extends Thread implements BasicEventHandler{
 
 	private static final Logger log = Logger.getLogger(Worker.class);
 
@@ -49,12 +49,13 @@ public class Worker extends Thread implements BasicEventHandler{
 	private volatile boolean finished = false;
 	private volatile int numEvents = 0;
 
-	public Worker(String eFile1, final CyclicBarrier doComparison) {
+	Worker( String eFile1 , final CyclicBarrier doComparison ) {
 		this.eFile = eFile1;
 		this.doComparison = doComparison;
 
 		this.eventsManager = EventsUtils.createEventsManager();
 		this.eventsManager.addHandler(this);
+
 	}
 
 	/*package*/ String getEventsFile() {
@@ -141,9 +142,10 @@ public class Worker extends Thread implements BasicEventHandler{
 		Collections.sort(strings);
 		StringBuilder eventStr = new StringBuilder();
 		for (String str : strings) {
-			eventStr.append("|");
+			eventStr.append(" | ");
 			eventStr.append(str);
 		}
+		eventStr.append(" | ") ;
 		return eventStr.toString();
 	}
 

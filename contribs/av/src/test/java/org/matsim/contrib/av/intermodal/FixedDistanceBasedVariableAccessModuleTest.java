@@ -13,7 +13,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.av.intermodal.router.FixedDistanceBasedVariableAccessModule;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -30,7 +30,7 @@ public class FixedDistanceBasedVariableAccessModuleTest {
 	@Test
 	public void testGetAccessEgressModeAndTraveltime() throws MalformedURLException {
 		URL configUrl = new File(utils.getPackageInputDirectory() + "config.xml").toURI().toURL();
-		Config config = ConfigUtils.loadConfig(configUrl, new TaxiConfigGroup());
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		FixedDistanceBasedVariableAccessModule module = new FixedDistanceBasedVariableAccessModule(
 				scenario.getNetwork(), config);

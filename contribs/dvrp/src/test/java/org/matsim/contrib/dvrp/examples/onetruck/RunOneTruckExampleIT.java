@@ -28,7 +28,7 @@ import org.matsim.examples.ExamplesUtils;
 public class RunOneTruckExampleIT {
 	@Test
 	public void testRun() {
-		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_truck_config.xml");
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_truck_config.xml");
 		RunOneTruckExample.run(configUrl, "one_truck_vehicles.xml", false, 0);
 	}
 }

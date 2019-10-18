@@ -21,6 +21,7 @@
 package org.matsim.core.population.algorithms;
 
 import java.util.HashSet;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -32,9 +33,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.facilities.ActivityFacilities;
 
 /**
@@ -112,6 +114,19 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 		for (Plan plan : person.getPlans()) {
 			boolean needsXY2Links = false;
 			boolean needsReRoute = false;
+			
+			// for backward compatibility: replace all non-direct transit_walk legs (trips with more than one leg) by non_network_walk
+			for (Trip trip : TripStructureUtils.getTrips(plan.getPlanElements())) {
+				if (trip.getLegsOnly().size() > 1) {
+					
+					for (Leg leg : trip.getLegsOnly()) {
+						if (leg.getMode().equals("transit_walk")) {
+							leg.setMode(TransportMode.non_network_walk);
+						}
+					}					
+				}					
+			}
+			
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					Activity act = (Activity) pe;

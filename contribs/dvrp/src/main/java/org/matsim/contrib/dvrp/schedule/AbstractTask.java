@@ -21,6 +21,8 @@ package org.matsim.contrib.dvrp.schedule;
 
 import org.matsim.contrib.dvrp.tracker.TaskTracker;
 
+import com.google.common.base.Preconditions;
+
 /**
  * @author michalm
  */
@@ -36,10 +38,7 @@ public abstract class AbstractTask implements Task {
 	private TaskTracker taskTracker;
 
 	public AbstractTask(double beginTime, double endTime) {
-		if (beginTime > endTime) {
-			throw new IllegalArgumentException("beginTime=" + beginTime + "; endTime=" + endTime);
-		}
-
+		Preconditions.checkArgument(beginTime <= endTime, "beginTime=%s; endTime=%s", beginTime, endTime);
 		this.beginTime = beginTime;
 		this.endTime = endTime;
 	}
@@ -66,41 +65,27 @@ public abstract class AbstractTask implements Task {
 
 	@Override
 	public final void setBeginTime(double beginTime) {
-		if (status == TaskStatus.STARTED || status == TaskStatus.PERFORMED) {
-			throw new IllegalStateException("It is too late to change the beginTime");
-		}
-
+		Preconditions.checkState(status != TaskStatus.STARTED && status != TaskStatus.PERFORMED,
+				"It is too late to change the beginTime");
 		this.beginTime = beginTime;
 	}
 
 	@Override
 	public final void setEndTime(double endTime) {
-		if (status == TaskStatus.PERFORMED) {
-			throw new IllegalStateException("It is too late to change the endTime");
-		}
-
+		Preconditions.checkState(status != TaskStatus.PERFORMED, "It is too late to change the endTime");
 		this.endTime = endTime;
 	}
 
 	@Override
 	public final TaskTracker getTaskTracker() {
-		if (status != TaskStatus.STARTED) {
-			throw new IllegalStateException("Allowed only for STARTED tasks");
-		}
-
+		Preconditions.checkState(status == TaskStatus.STARTED, "Allowed only for STARTED tasks");
 		return taskTracker;
 	}
 
 	@Override
 	public final void initTaskTracker(TaskTracker taskTracker) {
-		if (this.taskTracker != null) {
-			throw new IllegalStateException("Tracking already initialized");
-		}
-
-		if (status != TaskStatus.STARTED) {
-			throw new IllegalStateException("Allowed only for STARTED tasks");
-		}
-
+		Preconditions.checkState(this.taskTracker == null, "Tracking already initialized");
+		Preconditions.checkState(status == TaskStatus.STARTED, "Allowed only for STARTED tasks");
 		this.taskTracker = taskTracker;
 	}
 

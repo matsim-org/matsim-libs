@@ -157,6 +157,9 @@ public final class Attributes {
 
 		@Override
 		public Map.Entry<String, Object> next() {
+			if (index >= keys.length) {
+				throw new NoSuchElementException();
+			}
 			Map.Entry<String, Object> entry = new AbstractMap.SimpleEntry<>(keys[index], values[index]) ;
 			index++;
 			return entry;

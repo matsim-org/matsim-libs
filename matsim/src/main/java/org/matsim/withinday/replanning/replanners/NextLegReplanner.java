@@ -24,10 +24,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
@@ -46,12 +44,10 @@ import org.matsim.withinday.utils.EditTrips;
 public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 
 	private final TripRouter tripRouter;
-	private final QSim qsim;
-	
-	/*package*/ NextLegReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler internalInterface, TripRouter tripRouter, QSim qsim) {
+
+	NextLegReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler internalInterface, TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.tripRouter = tripRouter;
-		this.qsim = qsim;
 	}
 
 	@Override
@@ -64,7 +60,7 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 
 		// Get the activity currently performed by the agent as well as the subsequent trip.
 		Activity currentActivity = (Activity) WithinDayAgentUtils.getCurrentPlanElement(withinDayAgent);
-		Trip trip = TripStructureUtils.findTripStartingAtActivity(currentActivity, executedPlan, this.tripRouter.getStageActivityTypes() );
+		Trip trip = TripStructureUtils.findTripStartingAtActivity( currentActivity, executedPlan );
 
 		// If there is no trip after the activity.
 		if (trip == null) return false;

@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
@@ -46,11 +45,13 @@ public class EmptyVehicleChargingScheduler {
 	private final EDrtTaskFactoryImpl taskFactory;
 	private final Map<Id<Link>, Charger> linkToChargerMap;
 
-	public EmptyVehicleChargingScheduler(Network network, MobsimTimer timer, DrtTaskFactory taskFactory,
+	public EmptyVehicleChargingScheduler(MobsimTimer timer, DrtTaskFactory taskFactory,
 			ChargingInfrastructure chargingInfrastructure) {
 		this.timer = timer;
 		this.taskFactory = (EDrtTaskFactoryImpl)taskFactory;
-		linkToChargerMap = chargingInfrastructure.getChargers().values().stream()
+		linkToChargerMap = chargingInfrastructure.getChargers()
+				.values()
+				.stream()
 				.collect(Collectors.toMap(c -> c.getLink().getId(), c -> c));
 	}
 

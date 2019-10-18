@@ -68,7 +68,7 @@ public class PtScoringTest {
 
 	@Test
 	public void test_PtScoringLineswitch() {
-		Config config = this.utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch"), "config.xml"));
+		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch"), "config.xml"));
 		PlanCalcScoreConfigGroup pcs = config.planCalcScore() ;
 
 		if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
@@ -220,7 +220,7 @@ public class PtScoringTest {
 	}
 	@Test
 	public void test_PtScoringLineswitchAndPtConstant() {
-		Config config = this.utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch"), "config.xml"));
+		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch"), "config.xml"));
 		PlanCalcScoreConfigGroup pcs = config.planCalcScore() ;
 
 		if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform))
@@ -375,7 +375,7 @@ public class PtScoringTest {
 	}
 	@Test
 	public void test_PtScoring_Wait() {
-		Config config = this.utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-simple"), "config.xml"));
+		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple"), "config.xml"));
 		PlanCalcScoreConfigGroup pcs = config.planCalcScore() ;
 		
 		if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
@@ -461,7 +461,7 @@ public class PtScoringTest {
 
 	@Test
 	public void test_PtScoring() {
-		Config config = this.utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-simple"), "config.xml"));
+		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-simple"), "config.xml"));
 		PlanCalcScoreConfigGroup pcs = config.planCalcScore() ;
 
 		if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform))

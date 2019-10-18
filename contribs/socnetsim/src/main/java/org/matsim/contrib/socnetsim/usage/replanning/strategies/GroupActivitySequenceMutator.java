@@ -63,8 +63,7 @@ public class GroupActivitySequenceMutator extends AbstractConfigurableSelectionS
 		strategy.addStrategyModule(
 				new IndividualBasedGroupStrategyModule(
 					new ActivitySequenceMutatorModule(
-						sc.getConfig().global().getNumberOfThreads(),
-						JointActingTypes.JOINT_STAGE_ACTS, tripRouterFactory) ) );
+						sc.getConfig().global().getNumberOfThreads()) ) );
 	
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createJointTripAwareTourModeUnifierModule(

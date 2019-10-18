@@ -29,7 +29,7 @@ class HbefaWarmEmissionFactor {
 	private double speed;
 	private double warmEmissionFactor;
 
-	public HbefaWarmEmissionFactor(){
+	/*package-private*/ HbefaWarmEmissionFactor(){
 	}
 
 	public double getSpeed() {
@@ -39,12 +39,12 @@ class HbefaWarmEmissionFactor {
 	public void setSpeed(double speed) {
 		this.speed = speed;
 	}
-	
-	public double getWarmEmissionFactor() {
+
+	/*package-private*/ double getWarmEmissionFactor() {
 		return this.warmEmissionFactor;
 	}
-	
-	public void setWarmEmissionFactor(double warmEmissionFactor) {
+
+	/*package-private*/ void setWarmEmissionFactor(double warmEmissionFactor) {
 		this.warmEmissionFactor = warmEmissionFactor;
 	}
 }

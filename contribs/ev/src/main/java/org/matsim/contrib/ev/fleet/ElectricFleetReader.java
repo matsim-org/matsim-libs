@@ -59,9 +59,9 @@ public class ElectricFleetReader extends MatsimXmlParser {
 				.id(Id.create(atts.getValue("id"), ElectricVehicle.class))
 				.batteryCapacity(EvUnits.kWh_to_J(Double.parseDouble(atts.getValue("battery_capacity"))))
 				.initialSoc(EvUnits.kWh_to_J(Double.parseDouble(atts.getValue("initial_soc"))))
-				.vehicleType(Optional.ofNullable(atts.getValue("vehicleType"))
+				.vehicleType(Optional.ofNullable(atts.getValue("vehicle_type"))
 						.orElse(ElectricVehicleSpecification.DEFAULT_VEHICLE_TYPE))
-				.chargerTypes(ImmutableList.copyOf(Optional.ofNullable(atts.getValue("chargerTypes"))
+				.chargerTypes(ImmutableList.copyOf(Optional.ofNullable(atts.getValue("charger_types"))
 						.orElse(ChargerSpecification.DEFAULT_CHARGER_TYPE)
 						.split(",")))
 				.build();

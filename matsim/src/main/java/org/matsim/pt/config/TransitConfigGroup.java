@@ -46,6 +46,14 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 	/*package*/ static final String TRANSIT_MODES = "transitModes";
 	private static final String SCHEDULE_CRS = "inputScheduleCRS";
 
+	private static final String INSISTING_ON_USING_DEPRECATED_ATTRIBUTE_FILE = "insistingOnUsingDeprecatedAttributeFiles" ;
+
+	public static final String TRANSIT_ATTRIBUTES_DEPRECATION_MESSAGE = "using the separate transit stops and lines attribute files is deprecated." +
+			"  Add the information directly into each stop or line, using " +
+			"the Attributable feature.  If you insist on continuing to use the separate attribute files, set " +
+			"insistingOnUsingDeprecatedAttributeFiles to true.  The files will then be read, but the values " +
+			"will be entered into each stop or line using Attributable, and written as such to output_transitSchedule.";
+
 	private String transitScheduleFile = null;
 	private String vehiclesFile = null;
 	private String transitLinesAttributesFile = null;
@@ -57,6 +65,7 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 	// ---
 	private static final String USE_TRANSIT = "useTransit";
 	private boolean useTransit = false;
+	private boolean insistingOnUsingDeprecatedAttributeFiles = false;
 
 	// ---
 
@@ -200,4 +209,14 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 	public final boolean isUsingTransitInMobsim(){
 		return usingTransitInMobsim ;
 	}
+
+	@StringSetter(INSISTING_ON_USING_DEPRECATED_ATTRIBUTE_FILE)
+	public final void setInsistingOnUsingDeprecatedAttributeFiles( boolean val ) {
+		this.insistingOnUsingDeprecatedAttributeFiles = val ;
+	}
+	@StringGetter(INSISTING_ON_USING_DEPRECATED_ATTRIBUTE_FILE)
+	public final boolean isInsistingOnUsingDeprecatedAttributeFiles() {
+		return insistingOnUsingDeprecatedAttributeFiles;
+	}
+
 }

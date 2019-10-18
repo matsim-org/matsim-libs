@@ -20,7 +20,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.awt.*;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -78,10 +77,6 @@ public class FallbackRoutingModuleTest{
 					@Override
 					public List<? extends PlanElement> calcRoute( Facility fromFacility, Facility toFacility, double departureTime, Person person ){
 						return null;
-					}
-					@Override
-					public StageActivityTypes getStageActivityTypes(){
-						return EmptyStageActivityTypes.INSTANCE;
 					}
 				} );
 			}

@@ -1297,8 +1297,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			this.utilityOfLineSwitch = utilityOfLineSwitch;
 		}
 
-		private static int setWaitingCnt = 0;
-
 		@StringGetter(WAITING)
 		public double getMarginalUtlOfWaiting_utils_hr() {
 			return this.waiting;
