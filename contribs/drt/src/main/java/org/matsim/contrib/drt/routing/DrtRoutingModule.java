@@ -107,6 +107,12 @@ public class DrtRoutingModule implements RoutingModule {
 		List<PlanElement> trip = new ArrayList<>();
 
 		if (accessActLink == egressActLink) {
+			if (drtCfg.isPrintDetailedWarnings()) {
+				LOGGER.error("Start and end stop are the same, agent will use fallback mode " 
+						+ drtCfg.getMode() + "_walk"
+						+ ". Agent Id:\t"
+						+ person.getId());
+			}
 			return null;
 		}
 		// yyyy I think that our life will become easier if we don't do direct walk.  kai, jul'19
