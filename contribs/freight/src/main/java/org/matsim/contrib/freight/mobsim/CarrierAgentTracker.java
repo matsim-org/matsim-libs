@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -43,6 +44,7 @@ import org.matsim.core.scoring.ScoringFunction;
  *
  */
 public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,  LinkEnterEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
+	private static final Logger log = Logger.getLogger( CarrierAgentTracker.class ) ;
 
 	private final Carriers carriers;
 
@@ -55,14 +57,21 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 	private Map<Id<Person>, CarrierAgent> driverAgentMap = new HashMap<Id<Person>, CarrierAgent>();
 
 	public CarrierAgentTracker(Carriers carriers, Network network, CarrierScoringFunctionFactory carrierScoringFunctionFactory) {
+		log.warn( "calling ctor; carrierScoringFunctionFactory=" + carrierScoringFunctionFactory.getClass() );
 		this.carriers = carriers;
 		createCarrierAgents(carrierScoringFunctionFactory);
+
 		eventsManager = EventsUtils.createEventsManager();
+		// yyyy this is not using the central events manager; I have no idea why this might work.  kai, oct'19
 	}
 
 	private void createCarrierAgents(CarrierScoringFunctionFactory carrierScoringFunctionFactory) {
 		for (Carrier carrier : carriers.getCarriers().values()) {
+			log.warn( "" );
+			log.warn( "about to create scoring function for carrierId=" + carrier.getId() );
 			ScoringFunction carrierScoringFunction = carrierScoringFunctionFactory.createScoringFunction(carrier);
+			log.warn( "have now created scoring function for carrierId=" + carrier.getId() );
+			log.warn( "" );
 			CarrierAgent carrierAgent = new CarrierAgent(this, carrier, carrierScoringFunction, delegate);
 			carrierAgents.add(carrierAgent);
 		}
@@ -92,6 +101,7 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 	 * 
 	 */
 	public void scoreSelectedPlans() {
+//		log.warn("calling scoreSelectedPlans") ;
 		for (Carrier carrier : carriers.getCarriers().values()) {
 			CarrierAgent agent = findCarrierAgent(carrier.getId());
 			agent.scoreSelectedPlan();

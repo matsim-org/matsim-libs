@@ -21,11 +21,11 @@ public class CarrierPlan implements BasicPlan {
 	@Override
 	public String toString() {
 		StringBuilder strb = new StringBuilder(  ) ;
-		strb.append( "[carrierId=" ).append( carrier.getId() ).append("; score=").append( score ).append( "; tours=") ;
-		for( ScheduledTour tour : scheduledTours ){
-			strb.append( tour.toString() ) ;
-		}
-		strb.append( "]" ) ;
+		strb.append( "carrierPlan=[carrierId=" ).append( carrier.getId() ).append("][score=").append( score ).append( "][#tours=").append( scheduledTours.size() ).append( "]" ) ;
+//		for( ScheduledTour tour : scheduledTours ){
+//			strb.append( tour.toString() ) ;
+//		}
+//		strb.append( "]" ) ;
 		return strb.toString() ;
 	}
 

@@ -123,7 +123,9 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
      * of early arrival to the Scoring.
      *
      *
-     * @see org.matsim.contrib.freight.mobsim.WithinDayActivityReScheduling
+//     * @see org.matsim.contrib.freight.mobsim.WithinDayActivityReScheduling
+     *
+     * @deprecated change argument to enum and rename method accordingly (e.g. setMethodToDealWithTimeWindows(...)). yyyy, kai, oct'19
      */
     public void setPhysicallyEnforceTimeWindowBeginnings(boolean physicallyEnforceTimeWindowBeginnings) {
         this.physicallyEnforceTimeWindowBeginnings = physicallyEnforceTimeWindowBeginnings;

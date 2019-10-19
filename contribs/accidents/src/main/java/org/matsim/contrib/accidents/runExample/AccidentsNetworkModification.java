@@ -176,7 +176,7 @@ public class AccidentsNetworkModification {
 			}
 			bvwpRoadType.add(2, numberOfLanesBVWP);
 			
-			link.getAttributes().putAttribute(accidentsCfg.getBvwpRoadTypeAttributeName(), bvwpRoadType.get(0) + "," + bvwpRoadType.get(1) + "," + bvwpRoadType.get(2));
+			link.getAttributes().putAttribute( AccidentsConfigGroup.BVWP_ROAD_TYPE_ATTRIBUTE_NAME, bvwpRoadType.get(0) + "," + bvwpRoadType.get(1) + "," + bvwpRoadType.get(2));
 		}
 		log.info("Initializing all link-specific information... Done.");
 	}
