@@ -109,7 +109,7 @@ public class FreightUtils {
 	public static void loadCarriersAccordingToFreightConfig( Scenario scenario ){
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( scenario.getConfig(), FreightConfigGroup.class ) ;
 
-		Carriers carriers = getCarriers( scenario ); // also registers with scenario
+		Carriers carriers = getOrCreateCarriers( scenario ); // also registers with scenario
 		new CarrierPlanXmlReader( carriers ).readURL( IOUtils.extendUrl(scenario.getConfig().getContext(), freightConfigGroup.getCarriersFile()) );
 		CarrierVehicleTypes vehTypes = getCarrierVehicleTypes(scenario);
 		new CarrierVehicleTypeReader( vehTypes ).readURL( IOUtils.extendUrl(scenario.getConfig().getContext(), freightConfigGroup.getCarriersVehicleTypesFile()) );

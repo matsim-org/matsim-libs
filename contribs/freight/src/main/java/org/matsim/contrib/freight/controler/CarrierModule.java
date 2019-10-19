@@ -97,8 +97,9 @@ public class CarrierModule extends AbstractModule {
 
 		this.addControlerListenerBinding().toInstance( new ShutdownListener(){
 			@Inject Config config ;
+			@Inject Scenario scenario ;
 			@Override public void notifyShutdown( ShutdownEvent event ){
-				writeAdditionalRunOutput( config, carriers );
+				writeAdditionalRunOutput( config, FreightUtils.getCarriers( scenario ) );
 			}
 		} );
 

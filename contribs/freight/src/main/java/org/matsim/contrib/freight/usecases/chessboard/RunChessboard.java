@@ -83,7 +83,7 @@ public final class RunChessboard {
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                install(new CarrierModule(carriers));
+                install(new CarrierModule());
                 bind(CarrierPlanStrategyManagerFactory.class).toInstance( new MyCarrierPlanStrategyManagerFactory(types) );
                 bind(CarrierScoringFunctionFactory.class).toInstance( new MyCarrierScoringFunctionFactory() );
             }
