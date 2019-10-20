@@ -80,10 +80,11 @@ public class CarrierModuleTest {
     }
 
 
-	@Test @Ignore
+	@Test
     //using this constructor does not work at the moment, as the module would need to derive the carriers out of the scenario.
     // to me, it is currently not clear how to do that, tschlenther oct 10 '19
     public void test_ConstructorWOParameters(){
+		// note setUp method!
         controler.addOverridingModule(new CarrierModule());
         controler.addOverridingModule(new AbstractModule() {
             @Override
@@ -97,8 +98,8 @@ public class CarrierModuleTest {
 
     @Test
     public void test_ConstructorWithOneParameter(){
-
-        controler.addOverridingModule(new CarrierModule(FreightUtils.getCarriers(controler.getScenario())));
+	    // note setUp method!
+        controler.addOverridingModule(new CarrierModule(null));
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
@@ -111,7 +112,9 @@ public class CarrierModuleTest {
 
     @Test
     public void test_ConstructorWithThreeParameters(){
-        controler.addOverridingModule(new CarrierModule(FreightUtils.getCarriers(controler.getScenario()), new StrategyManagerFactoryForTests(), new DistanceScoringFunctionFactoryForTests()));
+	    // note setUp method!
+        controler.addOverridingModule(new CarrierModule(null, new StrategyManagerFactoryForTests(),
+		    new DistanceScoringFunctionFactoryForTests()));
         controler.run();
     }
 

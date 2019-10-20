@@ -43,94 +43,97 @@ import org.matsim.core.controler.listener.ShutdownListener;
 
 public class CarrierModule extends AbstractModule {
 
-    private FreightConfigGroup freightConfig;
+	private FreightConfigGroup freightConfig;
 
-    private Carriers carriers;
-    private CarrierPlanStrategyManagerFactory strategyManagerFactory;
-    private CarrierScoringFunctionFactory scoringFunctionFactory;
-
-
-    public CarrierModule() {
-
-    }
-
-    /**
-     * CarrierPlanStrategyManagerFactory and CarrierScoringFunctionFactory must me bound separately
-     * when this constructor is used.
-     * <br>
-     *       The above statement is not true; one can get it out of scenario by {@link org.matsim.contrib.freight.utils.FreightUtils#getCarriers(Scenario)}.
-     *
-     * @deprecated please use FreightUtils.getCarriers(Scenario scenario) to load carriers into scenario and use CarrierModule()
-     */
-    @Deprecated
-    public CarrierModule(Carriers carriers) {
-        this.carriers = carriers;
-    }
-
-    /**
-     * @deprecated please use FreightUtils.getCarriers(Scenario scenario) to load carriers into scenario and use CarrierModule()
-     */
-    @Deprecated
-    public CarrierModule(Carriers carriers, CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory) {
-        this.carriers = carriers;
-        this.strategyManagerFactory = strategyManagerFactory;
-        this.scoringFunctionFactory = scoringFunctionFactory;
-    }
-
-    @Override
-    public void install() {
-
-        bind(Carriers.class).toProvider(new CarrierProvider()).in(Singleton.class);
-//         yyyy try to replace by FreightUtils.getCarriers(scenario)
-        // i am not sure how to retrieve scenario (or controler respectively).. tschlenther oct 10 '19
-
-        if (strategyManagerFactory != null) {
-            bind(CarrierPlanStrategyManagerFactory.class).toInstance(strategyManagerFactory);
-        }
-        if (scoringFunctionFactory != null) {
-            bind(CarrierScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
-        }
-
-        // First, we need a ControlerListener.
-        bind(CarrierControlerListener.class).asEagerSingleton();
-        addControlerListenerBinding().to(CarrierControlerListener.class);
-
-        // Set the Mobsim. The FreightQSimFactory needs the CarrierAgentTracker (see constructor).
-        bindMobsim().toProvider(FreightQSimFactory.class);
-
-        this.addControlerListenerBinding().toInstance( new ShutdownListener(){
-            @Inject Config config ;
-            @Override public void notifyShutdown( ShutdownEvent event ){
-                writeAdditionalRunOutput( config, carriers );
-            }
-        } );
-
-    }
-
-    // We export CarrierAgentTracker, which is kept by the ControlerListener, which happens to re-create it every iteration.
-    // The freight QSim needs it (see below).
-    @Provides
-    CarrierAgentTracker provideCarrierAgentTracker(CarrierControlerListener carrierControlerListener) {
-        return carrierControlerListener.getCarrierAgentTracker();
-    }
-
-    private static void writeAdditionalRunOutput( Config config, Carriers carriers ) {
-        // ### some final output: ###
-        new CarrierPlanXmlWriterV2(carriers).write( config.controler().getOutputDirectory() + "/output_carriers.xml" ) ;
-        new CarrierPlanXmlWriterV2(carriers).write( config.controler().getOutputDirectory() + "/output_carriers.xml.gz") ;
-        new CarrierVehicleTypeWriter( CarrierVehicleTypes.getVehicleTypes(carriers )).write(config.controler().getOutputDirectory() + "/output_vehicleTypes.xml" );
-        new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers)).write(config.controler().getOutputDirectory() + "/output_vehicleTypes.xml.gz");
-    }
+	private Carriers carriers;
+	private CarrierPlanStrategyManagerFactory strategyManagerFactory;
+	private CarrierScoringFunctionFactory scoringFunctionFactory;
 
 
-    private class CarrierProvider implements Provider<Carriers> {
-        @Inject
-        Scenario scenario;
+	public CarrierModule() {
+
+	}
+
+	/**
+	 * CarrierPlanStrategyManagerFactory and CarrierScoringFunctionFactory must me bound separately
+	 * when this constructor is used.
+	 *
+	 * @deprecated please use FreightUtils.getCarriers(Scenario scenario) to load carriers into scenario and use CarrierModule()
+	 */
+	@Deprecated
+	public CarrierModule(Carriers carriers) {
+		this.carriers = carriers;
+	}
+
+	/**
+	 * @deprecated please use FreightUtils.getCarriers(Scenario scenario) to load carriers into scenario and use CarrierModule()
+	 */
+	@Deprecated
+	public CarrierModule(Carriers carriers, CarrierPlanStrategyManagerFactory strategyManagerFactory, CarrierScoringFunctionFactory scoringFunctionFactory) {
+		this.carriers = carriers;
+		this.strategyManagerFactory = strategyManagerFactory;
+		this.scoringFunctionFactory = scoringFunctionFactory;
+	}
+
+	@Override
+	public void install() {
+
+		bind(Carriers.class).toProvider(new CarrierProvider()).asEagerSingleton(); // needs to be eager since it is still scenario construction. kai, oct'19
+		// this is probably ok
+
+		if (strategyManagerFactory != null) {
+			bind(CarrierPlanStrategyManagerFactory.class).toInstance(strategyManagerFactory);
+		}
+		if (scoringFunctionFactory != null) {
+			bind(CarrierScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
+		}
+
+		// First, we need a ControlerListener.
+		bind(CarrierControlerListener.class).asEagerSingleton();
+		addControlerListenerBinding().to(CarrierControlerListener.class);
+
+		// Set the Mobsim. The FreightQSimFactory needs the CarrierAgentTracker (see constructor).
+		bindMobsim().toProvider(FreightQSimFactory.class);
+
+		this.addControlerListenerBinding().toInstance( new ShutdownListener(){
+			@Inject Config config ;
+			@Inject Scenario scenario ;
+			@Override public void notifyShutdown( ShutdownEvent event ){
+				writeAdditionalRunOutput( config, FreightUtils.getCarriers( scenario ) );
+			}
+		} );
+
+	}
+
+	// We export CarrierAgentTracker, which is kept by the ControlerListener, which happens to re-create it every iteration.
+	// The freight QSim needs it (see below [[where?]]).
+	// yyyy this feels rather scary.  kai, oct'19
+	@Provides
+	CarrierAgentTracker provideCarrierAgentTracker(CarrierControlerListener carrierControlerListener) {
+		return carrierControlerListener.getCarrierAgentTracker();
+	}
+
+	private static void writeAdditionalRunOutput( Config config, Carriers carriers ) {
+		// ### some final output: ###
+		new CarrierPlanXmlWriterV2(carriers).write( config.controler().getOutputDirectory() + "/output_carriers.xml" ) ;
+		new CarrierPlanXmlWriterV2(carriers).write( config.controler().getOutputDirectory() + "/output_carriers.xml.gz") ;
+		new CarrierVehicleTypeWriter( CarrierVehicleTypes.getVehicleTypes(carriers )).write(config.controler().getOutputDirectory() + "/output_vehicleTypes.xml" );
+		new CarrierVehicleTypeWriter(CarrierVehicleTypes.getVehicleTypes(carriers)).write(config.controler().getOutputDirectory() + "/output_vehicleTypes.xml.gz");
+	}
 
 
-        @Override
-        public Carriers get() {
-            return FreightUtils.getCarriers(scenario);
-        }
-    }
+	private class CarrierProvider implements Provider<Carriers> {
+		@Inject Scenario scenario;
+		@Override public Carriers get() {
+			if ( carriers!=null ){
+				if ( scenario.getScenarioElement( FreightUtils.CARRIERS ) != null ) {
+					throw new RuntimeException("carriers are provided as scenario element AND per the CarrierModule constructor.  I could check if " +
+										     "they are the same, but in general the second way to do this is deprecated so please put " +
+										     "null into your constructor (and expect more cleanup here).") ;
+				}
+				scenario.addScenarioElement( FreightUtils.CARRIERS, carriers );
+			}
+			return FreightUtils.getCarriers(scenario);
+		}
+	}
 }

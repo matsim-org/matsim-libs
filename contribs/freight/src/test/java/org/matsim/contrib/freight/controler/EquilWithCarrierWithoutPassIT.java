@@ -81,7 +81,7 @@ public class EquilWithCarrierWithoutPassIT {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		Carriers carriers = FreightUtils.getCarriers(scenario);
+		Carriers carriers = FreightUtils.getOrCreateCarriers(scenario);
 		new CarrierPlanXmlReader(carriers).readFile(testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
 		addDummyVehicleType( carriers, "default") ;
 
@@ -92,7 +92,7 @@ public class EquilWithCarrierWithoutPassIT {
 	@Test
 	public void testMobsimWithCarrierRunsWithoutException() {
 
-		controler.addOverridingModule(new CarrierModule(FreightUtils.getCarriers(controler.getScenario())));
+		controler.addOverridingModule(new CarrierModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -105,7 +105,7 @@ public class EquilWithCarrierWithoutPassIT {
 
 	@Test
 	public void testScoringInMeters(){
-		controler.addOverridingModule(new CarrierModule(FreightUtils.getCarriers(controler.getScenario())));
+		controler.addOverridingModule(new CarrierModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -125,7 +125,7 @@ public class EquilWithCarrierWithoutPassIT {
 	@Test
 	public void testScoringInSecondsWoTimeWindowEnforcement(){
 		freightConfigGroup.setPhysicallyEnforceTimeWindowBeginnings( false );
-		final CarrierModule carrierModule = new CarrierModule( FreightUtils.getCarriers(controler.getScenario()) );
+		final CarrierModule carrierModule = new CarrierModule( );
 		controler.addOverridingModule( carrierModule );
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -147,7 +147,7 @@ public class EquilWithCarrierWithoutPassIT {
 	@Test
 	public void testScoringInSecondsWTimeWindowEnforcement(){
 		freightConfigGroup.setPhysicallyEnforceTimeWindowBeginnings( true );
-		final CarrierModule carrierModule = new CarrierModule( FreightUtils.getCarriers(controler.getScenario()) );
+		final CarrierModule carrierModule = new CarrierModule( );
 		controler.addOverridingModule( carrierModule );
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -169,7 +169,7 @@ public class EquilWithCarrierWithoutPassIT {
 	@Test
 	public void testScoringInSecondsWithWithinDayRescheduling(){
 		freightConfigGroup.setPhysicallyEnforceTimeWindowBeginnings(true);
-		CarrierModule carrierControler = new CarrierModule(FreightUtils.getCarriers(controler.getScenario()));
+		CarrierModule carrierControler = new CarrierModule();
 		controler.addOverridingModule(carrierControler);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

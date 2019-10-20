@@ -63,7 +63,7 @@ public final class RunChessboard {
             prepareScenario() ;
         }
 
-        Carriers carriers = FreightUtils.getCarriers(scenario);
+        Carriers carriers = FreightUtils.getOrCreateCarriers(scenario);
         CarrierVehicleTypes types = FreightUtils.getCarrierVehicleTypes(scenario);
 
         Controler controler = new Controler(scenario);
@@ -83,7 +83,7 @@ public final class RunChessboard {
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                install(new CarrierModule(carriers));
+                install(new CarrierModule());
                 bind(CarrierPlanStrategyManagerFactory.class).toInstance( new MyCarrierPlanStrategyManagerFactory(types) );
                 bind(CarrierScoringFunctionFactory.class).toInstance( new MyCarrierScoringFunctionFactory() );
             }

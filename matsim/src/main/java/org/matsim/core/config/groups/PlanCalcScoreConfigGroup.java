@@ -85,56 +85,21 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		this.addModeParams(new ModeParams(TransportMode.ride));
 		this.addModeParams(new ModeParams(TransportMode.other));
 
-		{
-			ActivityParams params = new ActivityParams("dummy");
-			params.setTypicalDuration(2. * 3600.);
+		this.addActivityParams( new ActivityParams("dummy").setTypicalDuration(2. * 3600. ) );
+		// (this is there so that an empty config prints out at least one activity type, so that the explanations of this
+		// important concept show up e.g. in defaultConfig.xml, created from the GUI. kai, jul'17
 //			params.setScoringThisActivityAtAll(false); // no longer minimal when included here. kai, jun'18
-			this.addActivityParams(params);
-			// (this is there so that an empty config prints out at least one
-			// activity type,
-			// so that the explanations of this important concept show up e.g.
-			// in defaultConfig.xml, created from the GUI. kai, jul'17
-		}
 
 		// yyyyyy find better solution for this. kai, dec'15
-		{
-			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.car ) ) ;
-			params.setScoringThisActivityAtAll(false);
-			this.addActivityParams(params);
-		}
-		{
-			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.pt ));
-			// need this for self-programmed pseudo pt. kai, nov'16
-
-			params.setScoringThisActivityAtAll(false);
-			this.addActivityParams(params);
-		}
-		{
-			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.bike ) ) ;
-			params.setScoringThisActivityAtAll(false);
-			this.addActivityParams(params);
-		}
-		{
-			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.drt ) ) ;
-			params.setScoringThisActivityAtAll(false);
-			this.addActivityParams(params);
-		}
-		{
-			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.taxi ) ) ;
-			params.setScoringThisActivityAtAll(false);
-			this.addActivityParams(params);
-		}
-		{
-			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.other ) ) ;
-			params.setScoringThisActivityAtAll(false);
-			this.addActivityParams(params);
-		}
-		{
-			ActivityParams params = new ActivityParams( createStageActivityType( TransportMode.walk ) );
-			params.setScoringThisActivityAtAll(false);
-			this.addActivityParams(params);
-			// bushwhacking_walk---network_walk---bushwhacking_walk
-		}
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.car ) ).setScoringThisActivityAtAll(false ) );
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.pt )).setScoringThisActivityAtAll(false ) );
+		// (need this for self-programmed pseudo pt. kai, nov'16)
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.bike ) ).setScoringThisActivityAtAll(false ) );
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.drt ) ).setScoringThisActivityAtAll(false ) );
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.taxi ) ).setScoringThisActivityAtAll(false ) );
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.other ) ).setScoringThisActivityAtAll(false ) );
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.walk ) ).setScoringThisActivityAtAll(false ) );
+		// (bushwhacking_walk---network_walk---bushwhacking_walk)
 	}
 
 	// ---
@@ -789,10 +754,8 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	// CLASSES
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public static class ActivityParams extends ReflectiveConfigGroup implements MatsimParameters {
-		// in normal pgm execution, code will presumably lock instance of
-		// PlanCalcScoreConfigGroup, but not instance of
-		// ActivityParams. I will try to pass the locked setting through the
-		// getters. kai, jun'15
+		// in normal pgm execution, code will presumably lock instance of PlanCalcScoreConfigGroup, but not instance of
+		// ActivityParams. I will try to pass the locked setting through the getters. kai, jun'15
 
 		public final static String SET_TYPE = "activityParams";
 		
@@ -1313,6 +1276,9 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			return subpopulation;
 		}
 
+		/**
+		 * This method is there to make the StringSetter/Getter automagic happy, but it is not meant to be used.
+		 */
 		@StringSetter("subpopulation")
 		public void setSubpopulation(String subpopulation) {
 			// TODO: handle case of default subpopulation
