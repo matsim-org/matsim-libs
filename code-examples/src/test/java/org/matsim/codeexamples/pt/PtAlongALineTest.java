@@ -147,7 +147,7 @@ public class PtAlongALineTest{
 		}
 
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
-			DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore());
+			DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore(), config.plansCalcRoute());
 		}
 
 		config.controler().setOutputDirectory( utils.getOutputDirectory() );
@@ -281,7 +281,7 @@ public class PtAlongALineTest{
 		}
 
 		for( DrtConfigGroup drtConfigGroup : mm.getModalElements() ){
-			DrtConfigs.adjustDrtConfig( drtConfigGroup, config.planCalcScore() );
+			DrtConfigs.adjustDrtConfig( drtConfigGroup, config.planCalcScore(), config.plansCalcRoute() );
 		}
 		PtAlongALineTest.createDrtVehiclesFile(drtVehiclesFile, "DRT-", 10, Id.createLinkId("0-1" ) );
 

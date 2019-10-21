@@ -91,7 +91,7 @@ class RunDrtExample{
 		}
 
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
-			DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore());
+			DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore(), config.plansCalcRoute());
 		}
 
 		config.controler().setOutputDirectory("output/RunDrtExample/multi_mode_one_shared_taxi");

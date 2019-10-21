@@ -228,7 +228,7 @@ public class PtAlongALine2Test{
 			}
 
 			for( DrtConfigGroup drtConfigGroup : mm.getModalElements() ){
-				DrtConfigs.adjustDrtConfig( drtConfigGroup, config.planCalcScore() );
+				DrtConfigs.adjustDrtConfig( drtConfigGroup, config.planCalcScore(), config.plansCalcRoute() );
 			}
 
 			// TODO: avoid really writing out these files. However so far it is unclear how
