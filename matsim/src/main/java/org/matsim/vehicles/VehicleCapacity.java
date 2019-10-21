@@ -39,8 +39,7 @@ public final class VehicleCapacity implements Attributable {
 	private Attributes attributes = new Attributes() ;
 	private Double other = Double.POSITIVE_INFINITY ;
 
-	/* package-private */ VehicleCapacity(){
-	}
+	/* package-private */ VehicleCapacity(){ }
 	public Integer getSeats() {
 		return seats;
 	}
@@ -72,8 +71,9 @@ public final class VehicleCapacity implements Attributable {
 	public Attributes getAttributes(){
 		return this.attributes ;
 	}
-	public void setOther( double other ){
+	public VehicleCapacity setOther( double other ){
 		this.other = other ;
+		return this ;
 	}
 	public Double getOther() {
 		return this.other;

@@ -81,7 +81,7 @@ public class EquilWithCarrierWithPassIT {
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 
-		Carriers carriers = FreightUtils.getCarriers(scenario);
+		Carriers carriers = FreightUtils.getOrCreateCarriers(scenario);
 		new CarrierPlanXmlReader( carriers ).readFile( testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
 		final String idString = "foo";
 		addDummyVehicleType( carriers, idString );
@@ -102,8 +102,9 @@ public class EquilWithCarrierWithPassIT {
 
 	@Test
 	public void testScoringInMeters(){
+		// note setUp method!
 		//		controler.addOverridingModule(new CarrierModule(carriers));
-		controler.addOverridingModule(new CarrierModule(FreightUtils.getCarriers(controler.getScenario())));
+		controler.addOverridingModule(new CarrierModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

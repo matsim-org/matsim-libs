@@ -110,8 +110,8 @@ public class StopBasedDrtRoutingModuleTest {
 		List<? extends PlanElement> routedList3 = stopBasedDRTRoutingModule.calcRoute(hf3, wf3, 8 * 3600, p3);
 
 		Assert.assertEquals(5, routedList.size());
-		Assert.assertEquals(1, routedList2.size());
-		Assert.assertEquals(1, routedList3.size());
+		Assert.assertNull(routedList2);
+		Assert.assertNull(routedList3);
 
 		System.out.println(routedList);
 

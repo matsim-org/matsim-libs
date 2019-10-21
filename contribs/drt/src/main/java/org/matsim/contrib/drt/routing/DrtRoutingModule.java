@@ -108,18 +108,12 @@ public class DrtRoutingModule implements RoutingModule {
 
 		if (accessActLink == egressActLink) {
 			if (drtCfg.isPrintDetailedWarnings()) {
-				LOGGER.error("Start and end stop are the same, agent will walk using mode "
-						+ drtStageActivityType.drtWalk
+				LOGGER.error("Start and end stop are the same, agent will use fallback mode " 
+						+ drtCfg.getMode() + "_walk"
 						+ ". Agent Id:\t"
 						+ person.getId());
 			}
-			trip.addAll(createWalkTrip(fromFacility, toFacility, departureTime, person, drtStageActivityType.drtWalk));
-			double travelTime = 0;
-			for( PlanElement planElement : trip ){
-				travelTime = TripRouter.calcEndOfPlanElement( now, planElement, config ) ;
-			}
-			LOGGER.debug("travel time on walk leg=" + travelTime);
-			return trip;
+			return null;
 		}
 		// yyyy I think that our life will become easier if we don't do direct walk.  kai, jul'19
 

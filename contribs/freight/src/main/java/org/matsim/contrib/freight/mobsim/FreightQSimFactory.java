@@ -32,6 +32,7 @@ import java.util.Collection;
 
 import javax.inject.Inject;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.CarrierConfigGroup;
 import org.matsim.contrib.freight.FreightConfigGroup;
@@ -47,6 +48,7 @@ import com.google.inject.Provider;
 
 
 public class FreightQSimFactory implements Provider<Mobsim> {
+	private static final Logger log = Logger.getLogger( FreightQSimFactory.class ) ;
 
 	private final Scenario scenario;
 	private EventsManager eventsManager;
@@ -72,6 +74,7 @@ public class FreightQSimFactory implements Provider<Mobsim> {
 		FreightAgentSource agentSource = new FreightAgentSource(vRoutes, new DefaultAgentFactory(sim), sim);
 		sim.addAgentSource(agentSource);
 		if (freightConfig.getPhysicallyEnforceTimeWindowBeginnings()) {
+			log.info( "activating time window enforcement") ;
 			WithinDayActivityReScheduling withinDayActivityRescheduling = new WithinDayActivityReScheduling(agentSource, carrierAgentTracker);
 			sim.addQueueSimulationListeners(withinDayActivityRescheduling);
 		}

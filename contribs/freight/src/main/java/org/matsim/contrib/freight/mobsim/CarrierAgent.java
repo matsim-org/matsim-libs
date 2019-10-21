@@ -1,36 +1,12 @@
 package org.matsim.contrib.freight.mobsim;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierShipment;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.FreightConstants;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.Tour;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.Delivery;
 import org.matsim.contrib.freight.carrier.Tour.Pickup;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
@@ -45,6 +21,8 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
+
+import java.util.*;
 
 /**
  * This keeps track of the carrier during simulation.
@@ -328,6 +306,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	}
 
 	public void scoreSelectedPlan() {
+//		Logger.getLogger(this.getClass()).warn("calling scoreSelectedPlan" ) ;
 		if (carrier.getSelectedPlan() == null) {
 			return;
 		}
