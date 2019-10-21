@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -144,11 +145,7 @@ public class StopBasedDrtRoutingModuleTest {
 
 		List<? extends PlanElement> routedList2 = stopBasedDRTRoutingModule.calcRoute(hf2, wf2, 8 * 3600, p2);
 		
-		/* 
-		 * In the git history it can be seen, that this test has assumed that 5 route elements would be right here since commit 
-		 * d99ef91, but that seems wrong if drtConfigGroup.setMaxWalkDistance(200) shall have any effect. gl-oct'19
-		 */
-		Assert.assertEquals(5, routedList2.size()); // TODO !!!!!!
+		Assert.assertNull(routedList2);
 
 		// case 3: origin and destination at the same coordinate, > 2000 m walking distance from next stop
 		Person p3 = scenario.getPopulation().getPersons().get(Id.createPersonId(3));
@@ -160,12 +157,7 @@ public class StopBasedDrtRoutingModuleTest {
 
 		List<? extends PlanElement> routedList3 = stopBasedDRTRoutingModule.calcRoute(hf3, wf3, 8 * 3600, p3);
 
-		Assert.assertEquals(1, routedList3.size());
-		Leg fallbackModeLegP3 = (Leg) routedList3.get(0);
-		GenericRouteImpl fallbackModeLegP3Route = (GenericRouteImpl) fallbackModeLegP3.getRoute();
-		Assert.assertEquals(drtMode + "_walk", fallbackModeLegP3.getMode());
-		Assert.assertEquals(Id.createLinkId(9541), fallbackModeLegP3Route.getStartLinkId());
-		Assert.assertEquals(Id.createLinkId(7717), fallbackModeLegP3Route.getEndLinkId());
+		Assert.assertNull(routedList3);
 		
 		// case 4: origin and destination at the same coordinate, in 200 m walking distance from next stop
 		Person p4 = scenario.getPopulation().getPersons().get(Id.createPersonId(4));
@@ -177,12 +169,7 @@ public class StopBasedDrtRoutingModuleTest {
 
 		List<? extends PlanElement> routedList4 = stopBasedDRTRoutingModule.calcRoute(hf4, wf4, 8 * 3600, p4);
 
-		Assert.assertEquals(1, routedList4.size());
-		Leg fallbackModeLegP4 = (Leg) routedList4.get(0);
-		GenericRouteImpl fallbackModeLegP4Route = (GenericRouteImpl) fallbackModeLegP4.getRoute();
-		Assert.assertEquals(drtMode + "_walk", fallbackModeLegP4.getMode());
-		Assert.assertEquals(Id.createLinkId(3699), fallbackModeLegP4Route.getStartLinkId());
-		Assert.assertEquals(Id.createLinkId(3699), fallbackModeLegP4Route.getEndLinkId());
+		Assert.assertNull(routedList4);
 		
 		// case 5: origin within 200 m walking distance from next stop, but destination outside walking distance
 		Person p5 = scenario.getPopulation().getPersons().get(Id.createPersonId(5));
@@ -195,12 +182,7 @@ public class StopBasedDrtRoutingModuleTest {
 		List<? extends PlanElement> routedList5 = stopBasedDRTRoutingModule.calcRoute(hf5, wf5, 8 * 3600, p5);
 
 		// TODO: Asserts are prepared for interpreting maxWalkingDistance as a real maximum, but routing still works wrongly
-		Assert.assertEquals(1, routedList5.size());
-		Leg fallbackModeLegP5 = (Leg) routedList5.get(0);
-		GenericRouteImpl fallbackModeLegP5Route = (GenericRouteImpl) fallbackModeLegP5.getRoute();
-		Assert.assertEquals(drtMode + "_walk", fallbackModeLegP5.getMode());
-		Assert.assertEquals(Id.createLinkId(3699), fallbackModeLegP5Route.getStartLinkId());
-		Assert.assertEquals(Id.createLinkId(9541), fallbackModeLegP5Route.getEndLinkId());
+		Assert.assertNull(routedList5);
 		
 		// case 6: destination within 200 m walking distance from next stop, but origin outside walking distance
 		Person p6 = scenario.getPopulation().getPersons().get(Id.createPersonId(6));
@@ -213,12 +195,7 @@ public class StopBasedDrtRoutingModuleTest {
 		List<? extends PlanElement> routedList6 = stopBasedDRTRoutingModule.calcRoute(hf6, wf6, 8 * 3600, p6);
 
 		// TODO: Asserts are prepared for interpreting maxWalkingDistance as a real maximum, but routing still works wrongly
-		Assert.assertEquals(1, routedList6.size());
-		Leg fallbackModeLegP6 = (Leg) routedList6.get(0);
-		GenericRouteImpl fallbackModeLegP6Route = (GenericRouteImpl) fallbackModeLegP6.getRoute();
-		Assert.assertEquals(drtMode + "_walk", fallbackModeLegP6.getMode());
-		Assert.assertEquals(Id.createLinkId(9541), fallbackModeLegP6Route.getStartLinkId());
-		Assert.assertEquals(Id.createLinkId(3699), fallbackModeLegP6Route.getEndLinkId());
+		Assert.assertNull(routedList6);
 
 	}
 	
@@ -281,14 +258,20 @@ public class StopBasedDrtRoutingModuleTest {
 		
 		Assert.assertEquals(drtMode, realDrtLegP1.getMode());
 		Assert.assertEquals(Id.createLinkId(2184), realDrtLegP1Route.getStartLinkId());
-		Assert.assertEquals(Id.createLinkId(5866), realDrtLegP1Route.getEndLinkId());
+		/*
+		 * links 5866 and 5867 are located between the same nodes, so their drt stops should be at the same place place,
+		 * too. Therefore it is not clear which one of these is the right one, as ClosestAccessEgressStopFinder should
+		 * find the nearest drt stop, but both have the same distance from the destination facility.
+		 */
+		Assert.assertTrue(realDrtLegP1Route.getEndLinkId().equals(Id.createLinkId(5866)) || realDrtLegP1Route.getEndLinkId().equals(Id.createLinkId(5867)));
+		Id<Link> endLink = realDrtLegP1Route.getEndLinkId();
 		// Check of other, more drt-specific attributes of the DrtRoute is missing, maybe these should be tested in DrtRoutingModule instead
 		
 		Assert.assertEquals(drtMode + " interaction", stageActivityEgressP1.getType());
-		Assert.assertEquals(Id.createLinkId(5866), stageActivityEgressP1.getLinkId());
+		Assert.assertEquals(endLink, stageActivityEgressP1.getLinkId());
 		
 		Assert.assertEquals(TransportMode.non_network_walk, egressLegP1.getMode());
-		Assert.assertEquals(Id.createLinkId(5866), egressLegP1Route.getStartLinkId());
+		Assert.assertEquals(endLink, egressLegP1Route.getStartLinkId());
 		Assert.assertEquals(Id.createLinkId(7871), egressLegP1Route.getEndLinkId());
 
 		// case 2: origin and destination outside max walking distance from next stop (>2000m vs. max 200m)
@@ -301,11 +284,7 @@ public class StopBasedDrtRoutingModuleTest {
 
 		List<? extends PlanElement> routedList2 = stopBasedDRTRoutingModule.calcRoute(hf2, wf2, 8 * 3600, p2);
 		
-		/* 
-		 * In the git history it can be seen, that this test has assumed that 5 route elements would be right here since commit 
-		 * d99ef91, but that seems wrong if drtConfigGroup.setMaxWalkDistance(200) shall have any effect. gl-oct'19
-		 */
-		Assert.assertEquals(5, routedList2.size()); // TODO !!!!!!
+		Assert.assertNull(routedList2);
 
 		// case 3: origin and destination at the same coordinate, > 2000 m walking distance from next stop
 		Person p3 = scenario.getPopulation().getPersons().get(Id.createPersonId(3));
@@ -317,12 +296,7 @@ public class StopBasedDrtRoutingModuleTest {
 
 		List<? extends PlanElement> routedList3 = stopBasedDRTRoutingModule.calcRoute(hf3, wf3, 8 * 3600, p3);
 
-		Assert.assertEquals(1, routedList3.size());
-		Leg fallbackModeLegP3 = (Leg) routedList3.get(0);
-		GenericRouteImpl fallbackModeLegP3Route = (GenericRouteImpl) fallbackModeLegP3.getRoute();
-		Assert.assertEquals(drtMode + "_walk", fallbackModeLegP3.getMode());
-		Assert.assertEquals(Id.createLinkId(9541), fallbackModeLegP3Route.getStartLinkId());
-		Assert.assertEquals(Id.createLinkId(7717), fallbackModeLegP3Route.getEndLinkId());
+		Assert.assertNull(routedList3);
 		
 		// case 4: origin and destination at the same coordinate, in 200 m walking distance from next stop
 		Person p4 = scenario.getPopulation().getPersons().get(Id.createPersonId(4));
@@ -334,12 +308,7 @@ public class StopBasedDrtRoutingModuleTest {
 
 		List<? extends PlanElement> routedList4 = stopBasedDRTRoutingModule.calcRoute(hf4, wf4, 8 * 3600, p4);
 
-		Assert.assertEquals(1, routedList4.size());
-		Leg fallbackModeLegP4 = (Leg) routedList4.get(0);
-		GenericRouteImpl fallbackModeLegP4Route = (GenericRouteImpl) fallbackModeLegP4.getRoute();
-		Assert.assertEquals(drtMode + "_walk", fallbackModeLegP4.getMode());
-		Assert.assertEquals(Id.createLinkId(3699), fallbackModeLegP4Route.getStartLinkId());
-		Assert.assertEquals(Id.createLinkId(3699), fallbackModeLegP4Route.getEndLinkId());
+		Assert.assertNull(routedList4);
 		
 		// case 5: origin within 200 m walking distance from next stop, but destination outside walking distance
 		Person p5 = scenario.getPopulation().getPersons().get(Id.createPersonId(5));
@@ -352,12 +321,7 @@ public class StopBasedDrtRoutingModuleTest {
 		List<? extends PlanElement> routedList5 = stopBasedDRTRoutingModule.calcRoute(hf5, wf5, 8 * 3600, p5);
 
 		// TODO: Asserts are prepared for interpreting maxWalkingDistance as a real maximum, but routing still works wrongly
-		Assert.assertEquals(1, routedList5.size());
-		Leg fallbackModeLegP5 = (Leg) routedList5.get(0);
-		GenericRouteImpl fallbackModeLegP5Route = (GenericRouteImpl) fallbackModeLegP5.getRoute();
-		Assert.assertEquals(drtMode + "_walk", fallbackModeLegP5.getMode());
-		Assert.assertEquals(Id.createLinkId(3699), fallbackModeLegP5Route.getStartLinkId());
-		Assert.assertEquals(Id.createLinkId(9541), fallbackModeLegP5Route.getEndLinkId());
+		Assert.assertNull(routedList5);
 		
 		// case 6: destination within 200 m walking distance from next stop, but origin outside walking distance
 		Person p6 = scenario.getPopulation().getPersons().get(Id.createPersonId(6));
@@ -370,12 +334,7 @@ public class StopBasedDrtRoutingModuleTest {
 		List<? extends PlanElement> routedList6 = stopBasedDRTRoutingModule.calcRoute(hf6, wf6, 8 * 3600, p6);
 
 		// TODO: Asserts are prepared for interpreting maxWalkingDistance as a real maximum, but routing still works wrongly
-		Assert.assertEquals(1, routedList6.size());
-		Leg fallbackModeLegP6 = (Leg) routedList6.get(0);
-		GenericRouteImpl fallbackModeLegP6Route = (GenericRouteImpl) fallbackModeLegP6.getRoute();
-		Assert.assertEquals(drtMode + "_walk", fallbackModeLegP6.getMode());
-		Assert.assertEquals(Id.createLinkId(9541), fallbackModeLegP6Route.getStartLinkId());
-		Assert.assertEquals(Id.createLinkId(3699), fallbackModeLegP6Route.getEndLinkId());
+		Assert.assertNull(routedList6);
 
 	}
 
