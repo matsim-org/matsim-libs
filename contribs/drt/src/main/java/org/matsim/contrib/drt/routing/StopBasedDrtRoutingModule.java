@@ -83,30 +83,30 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 
 		TransitStopFacility accessFacility = stops.getLeft();
 		if (accessFacility == null) {
-			printWarning(() -> "No access stop found, agent will walk, using mode "
-					+ drtStageActivityType.drtWalk
+			printWarning(() -> "No access stop found, agent will use fallback mode " 
+					+ drtCfg.getMode() + "_walk"
 					+ ". Agent Id:\t"
 					+ person.getId());
-			return createWalkTrip(fromFacility, toFacility, departureTime, person, drtStageActivityType.drtWalk);
+			return null;
 		}
 
 		TransitStopFacility egressFacility = stops.getRight();
 		if (egressFacility == null) {
-			printWarning(() -> "No egress stop found, agent will walk, using mode "
-					+ drtStageActivityType.drtWalk
+			printWarning(() -> "No egress stop found, agent will use fallback mode " 
+					+ drtCfg.getMode() + "_walk"
 					+ ". Agent Id:\t"
 					+ person.getId());
-			return createWalkTrip(fromFacility, toFacility, departureTime, person, drtStageActivityType.drtWalk);
+			return null;
 		}
 
-		if (accessFacility.getLinkId() == egressFacility.getLinkId()) {
+		if (accessFacility.getLinkId().equals(egressFacility.getLinkId())) {
 			if( drtCfg.isPrintDetailedWarnings() ){
-				printWarning(() -> "Start and end stop are the same, agent will walk, using mode "
-						+ drtStageActivityType.drtWalk
+				printWarning(() -> "Start and end stop are the same, agent will use fallback mode " 
+						+ drtCfg.getMode() + "_walk"
 						+ ". Agent Id:\t"
 						+ person.getId());
 			}
-			return createWalkTrip(fromFacility, toFacility, departureTime, person, drtStageActivityType.drtWalk);
+			return null;
 		}
 
 		List<PlanElement> trip = new ArrayList<>();

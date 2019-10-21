@@ -13,6 +13,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.Builder;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -348,6 +349,9 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 		}
 
 		else if (name.equals("carrier")) {
+			Gbl.assertNotNull( currentCarrier );
+			Gbl.assertNotNull( carriers );
+			Gbl.assertNotNull( carriers.getCarriers() );
 			carriers.getCarriers().put(currentCarrier.getId(), currentCarrier);
 			currentCarrier = null;
 		}

@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.routing.DrtStageActivityType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.router.TripRouter;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -46,8 +47,8 @@ public class DrtConfigs {
 				addDrtStageActivityParams(planCalcScoreCfg, drtStageActivityType.drtStageActivity);
 			}
 		}
-		if (!planCalcScoreCfg.getModes().containsKey(drtStageActivityType.drtWalk)) {
-			addDrtWalkModeParams(planCalcScoreCfg, drtStageActivityType.drtWalk);
+		if (!planCalcScoreCfg.getModes().containsKey(TripRouter.getFallbackMode(drtCfg.getMode()))) {
+			addDrtWalkModeParams(planCalcScoreCfg, TripRouter.getFallbackMode(drtCfg.getMode()));
 		}
 	}
 

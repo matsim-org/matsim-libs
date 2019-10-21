@@ -4,11 +4,9 @@ import java.util.Objects;
 
 public class DrtStageActivityType {
 	public final String drtStageActivity;
-	public final String drtWalk;
 
 	public DrtStageActivityType(String drtMode) {
 		drtStageActivity = drtMode + " interaction";
-		drtWalk = drtMode + "_walk";
 	}
 
 	@Override
@@ -20,11 +18,11 @@ public class DrtStageActivityType {
 			return false;
 		}
 		DrtStageActivityType that = (DrtStageActivityType)o;
-		return Objects.equals(drtWalk, that.drtWalk);
+		return Objects.equals(drtStageActivity, that.drtStageActivity);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(drtStageActivity, drtWalk);
+		return Objects.hash(drtStageActivity);
 	}
 }

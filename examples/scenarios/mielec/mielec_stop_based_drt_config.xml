@@ -13,7 +13,7 @@
 			<!-- Operational Scheme, either door2door or stopbased. door2door by default -->
 			<param name="operationalScheme" value="stopbased"/>
 			<!-- Stop locations file (transit schedule format, but without lines) for DRT stops. Used only for the stopbased mode -->
-			<param name="transitStopFile" value="drtstops.xml"/>
+			<param name="transitStopFile" value="drtstops_wLinkIds_lessStops.xml"/>
 
 			<param name="vehiclesFile" value="vehicles-10-cap-4.xml"/>
 			<!-- param name="vehiclesFile" value="vehicles-20-cap-2.xml" / -->
