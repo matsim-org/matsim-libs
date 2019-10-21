@@ -99,7 +99,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 			return null;
 		}
 
-		if (accessFacility.getLinkId() == egressFacility.getLinkId()) {
+		if (accessFacility.getLinkId().equals(egressFacility.getLinkId())) {
 			if( drtCfg.isPrintDetailedWarnings() ){
 				printWarning(() -> "Start and end stop are the same, agent will use fallback mode " 
 						+ drtCfg.getMode() + "_walk"
