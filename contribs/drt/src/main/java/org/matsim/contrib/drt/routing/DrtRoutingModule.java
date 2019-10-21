@@ -109,7 +109,7 @@ public class DrtRoutingModule implements RoutingModule {
 		if (accessActLink == egressActLink) {
 			if (drtCfg.isPrintDetailedWarnings()) {
 				LOGGER.error("Start and end stop are the same, agent will use fallback mode " 
-						+ drtCfg.getMode() + "_walk"
+						+ TripRouter.getFallbackMode(drtCfg.getMode())
 						+ ". Agent Id:\t"
 						+ person.getId());
 			}
