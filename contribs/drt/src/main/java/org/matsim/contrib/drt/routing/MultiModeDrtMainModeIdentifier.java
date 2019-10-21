@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
+import org.matsim.core.router.TripRouter;
 
 import com.google.inject.Inject;
 
@@ -50,7 +51,7 @@ public class MultiModeDrtMainModeIdentifier implements MainModeIdentifier {
 		drtWalkTypes = drtCfg.getModalElements()
 				.stream()
 				.map(drtConfigGroup -> drtConfigGroup.getMode())
-				.collect(Collectors.toMap(s -> new DrtStageActivityType(s).drtWalk, s -> s));
+				.collect(Collectors.toMap(s -> TripRouter.getFallbackMode(s), s -> s));
 	}
 
 	@Override
