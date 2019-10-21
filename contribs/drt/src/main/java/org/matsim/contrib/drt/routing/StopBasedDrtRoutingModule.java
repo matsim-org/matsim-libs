@@ -84,7 +84,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		TransitStopFacility accessFacility = stops.getLeft();
 		if (accessFacility == null) {
 			printWarning(() -> "No access stop found, agent will use fallback mode " 
-					+ drtCfg.getMode() + "_walk"
+					+ TripRouter.getFallbackMode(drtCfg.getMode())
 					+ ". Agent Id:\t"
 					+ person.getId());
 			return null;
@@ -93,7 +93,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		TransitStopFacility egressFacility = stops.getRight();
 		if (egressFacility == null) {
 			printWarning(() -> "No egress stop found, agent will use fallback mode " 
-					+ drtCfg.getMode() + "_walk"
+					+ TripRouter.getFallbackMode(drtCfg.getMode())
 					+ ". Agent Id:\t"
 					+ person.getId());
 			return null;
@@ -102,7 +102,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		if (accessFacility.getLinkId().equals(egressFacility.getLinkId())) {
 			if( drtCfg.isPrintDetailedWarnings() ){
 				printWarning(() -> "Start and end stop are the same, agent will use fallback mode " 
-						+ drtCfg.getMode() + "_walk"
+						+ TripRouter.getFallbackMode(drtCfg.getMode())
 						+ ". Agent Id:\t"
 						+ person.getId());
 			}
