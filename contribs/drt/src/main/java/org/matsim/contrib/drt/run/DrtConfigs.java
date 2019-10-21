@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.routing.DrtStageActivityType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.TripRouter;
 
 /**
@@ -33,16 +34,19 @@ public class DrtConfigs {
 	private static final Logger LOGGER = Logger.getLogger(DrtControlerCreator.class);
 
 	public static void adjustMultiModeDrtConfig(MultiModeDrtConfigGroup multiModeDrtCfg,
-			PlanCalcScoreConfigGroup planCalcScoreCfg) {
+			PlanCalcScoreConfigGroup planCalcScoreCfg, PlansCalcRouteConfigGroup plansCalcRouteCfg) {
 		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
-			DrtConfigs.adjustDrtConfig(drtCfg, planCalcScoreCfg);
+			DrtConfigs.adjustDrtConfig(drtCfg, planCalcScoreCfg, plansCalcRouteCfg);
 		}
 	}
 
-	public static void adjustDrtConfig(DrtConfigGroup drtCfg, PlanCalcScoreConfigGroup planCalcScoreCfg) {
+	public static void adjustDrtConfig(DrtConfigGroup drtCfg, PlanCalcScoreConfigGroup planCalcScoreCfg, 
+			PlansCalcRouteConfigGroup plansCalcRouteCfg) {
 		DrtStageActivityType drtStageActivityType = new DrtStageActivityType(drtCfg.getMode());
 		if (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stopbased) ||
-				drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.serviceAreaBased)) {
+				drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.serviceAreaBased) ||
+						( drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.door2door) && 
+								plansCalcRouteCfg.isInsertingAccessEgressWalk()) ) {
 			if (planCalcScoreCfg.getActivityParams(drtStageActivityType.drtStageActivity) == null) {
 				addDrtStageActivityParams(planCalcScoreCfg, drtStageActivityType.drtStageActivity);
 			}
