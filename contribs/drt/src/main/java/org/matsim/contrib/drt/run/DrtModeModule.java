@@ -23,7 +23,6 @@ package org.matsim.contrib.drt.run;
 import java.net.URL;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.locationtech.jts.geom.prep.PreparedGeometry;
@@ -33,7 +32,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.drt.optimizer.rebalancing.NoRebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.DrtModeMinCostFlowRebalancingModule;
@@ -49,25 +47,23 @@ import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.run.ModalProviders;
-import org.matsim.contrib.dvrp.run.ModalProviders.InstanceGetter;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.pt.transitSchedule.TransitScheduleUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 
 import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Provider;
 import com.google.inject.name.Named;
 
 /**
@@ -113,11 +109,12 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 			bindModal(DrtRoutingModule.class).toProvider(new DrtRoutingModuleProvider(drtCfg));// not singleton
 
 			addRoutingModuleBinding(getMode()).toProvider(new StopBasedDrtRoutingModuleProvider(drtCfg));// not singleton
+			
+			bindModal(QuadTree.class).toProvider(new StopsQuadTreeProvider(drtCfg));
 
 			bindModal(AccessEgressStopFinder.class)
 					.toProvider(modalProvider(
-							getter -> new ClosestAccessEgressStopFinder(getter.getModal(TransitSchedule.class), drtCfg,
-									getter.get(PlansCalcRouteConfigGroup.class), getter.get(Network.class))))
+							getter -> new ClosestAccessEgressStopFinder(drtCfg, getter.get(Network.class), getter.getModal(QuadTree.class))))
 					.asEagerSingleton();
 
 			break;
@@ -239,6 +236,24 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new TransitScheduleReader(scenario).readURL(url);
 		return scenario.getTransitSchedule();
+	}
+	
+	private static class StopsQuadTreeProvider extends ModalProviders.AbstractProvider<QuadTree<TransitStopFacility>> {
+
+		private QuadTree<TransitStopFacility> stopsQT = null;
+
+		protected StopsQuadTreeProvider(DrtConfigGroup drtCfg) {
+			super(drtCfg.getMode());
+		}
+
+		@Override
+		public QuadTree<TransitStopFacility> get() {
+			if (stopsQT == null) {
+				TransitSchedule stopsTransitSchedule = getModalInstance(TransitSchedule.class);
+				stopsQT = TransitScheduleUtils.createQuadTreeOfTransitStopFacilities(stopsTransitSchedule);
+			}
+			return stopsQT;
+		}
 	}
 
 }
