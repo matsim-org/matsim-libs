@@ -45,11 +45,11 @@ public class CommericalCompany {
 		this.companyLinkId = companyLinkId;
 		this.carrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.FINITE);
 		this.carrier.getAttributes().putAttribute("carrierMode", "car");
-		if (serviceType.contains("KEP")){
-			this.carrier.getAttributes().putAttribute("jspritIterations", 100);
+		if (serviceType.contains("KEP")||serviceType.contains("H1")){
+			this.carrier.getAttributes().putAttribute("jspritIterations", 150);
 		}
 		else {
-			this.carrier.getAttributes().putAttribute("jspritIterations", 3);
+			this.carrier.getAttributes().putAttribute("jspritIterations", 15);
 		}		
 		this.carrier.getAttributes().putAttribute(CommercialJobUtils.CARRIER_MARKET_ATTRIBUTE_NAME, serviceType);
 
@@ -78,6 +78,10 @@ public class CommericalCompany {
 		serviceBuilder.setServiceDuration(serviceDuration);
 		CarrierService service = serviceBuilder.build();
 		carrier.getServices().put(service.getId(), service);
+	}
+	
+	public  String getCarrierID(){
+		return this.carrierId;
 	}
 
 	public void addGroceryService(String serviceId, Id<Link> linkId, double startTime, double endTime, int Capacity) {

@@ -52,8 +52,7 @@ public class AssignService {
 	String addCompanyFolder;
 
 	Set<String> acceptedMainModes = new HashSet<>(
-			Arrays.asList("car", "pt", "drt", "walk", "ride", "bike", "stayHome", ""
-					+ ""));
+			Arrays.asList("car", "pt", "drt", "walk", "ride", "bike", "stayHome", "" + ""));
 	Set<String> additionalLegModes = new HashSet<>(Arrays.asList("stayHome", "preventedShoppingTrip"));
 
 	Set<String> acceptedActivities = new HashSet<>(
@@ -81,9 +80,9 @@ public class AssignService {
 	long nr = 1896;
 	Random r = MatsimRandom.getRandom();
 
-	AssignService(String plansFile, String addCompanyFolder, String commercialTripsFolder, String comercialVehicleFolder,
-			String networkFile, String serviceDurationDistPath, String companyFolder, String zoneSHP,
-			String matsimInput, String outputpath) {
+	AssignService(String plansFile, String addCompanyFolder, String commercialTripsFolder,
+			String comercialVehicleFolder, String networkFile, String serviceDurationDistPath, String companyFolder,
+			String zoneSHP, String matsimInput, String outputpath) {
 		this.outputpath = outputpath;
 		this.addCompanyFolder = addCompanyFolder;
 		this.comercialVehicleFolder = comercialVehicleFolder;
@@ -118,7 +117,7 @@ public class AssignService {
 	public static void main(String[] args) {
 
 		AssignService assignData = new AssignService(
-				"D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\vw280_0.1_CT_0.1\\vw280_0.1.output_sel_plans.xml.gz",
+				"D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\EGrocery\\vw280_0.1_EGrocery0.5_fulfillment\\vw280_0.1_EGrocery0.5_input_carOnly.xml.gz",
 				"D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\EGrocery\\Fullfillment\\",
 				"D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\Trips\\",
 				"D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\Vehicles\\",
@@ -132,8 +131,8 @@ public class AssignService {
 		assignData.initializeActCandidateMap();
 
 		assignData.findCandidates();
-		//assignData.addCustomServices();
-		assignData.manipulatePopulationAndCreateServices();
+		assignData.addCustomServices();
+		// assignData.manipulatePopulationAndCreateServices();
 		assignData.writeCustomerDemand();
 		assignData.writePopulation();
 		assignData.companyGenerator.writeCarriers();
@@ -179,11 +178,18 @@ public class AssignService {
 								double startTime = result.getMiddle();
 								int capacity = Math.max(5, (r.nextInt(16)));
 								int rdmIdx = r.nextInt(grocCompkeys.size());
-								companyGenerator.commercialCompanyMap.get(grocCompkeys.get(rdmIdx))
-										.addGroceryService(serviceId, linkId, startTime, endTime, capacity);
-								pe.getAttributes().putAttribute("jobId", serviceId);
-								serviceCounter++;
 
+								String CarrierID = companyGenerator.commercialCompanyMap.get(grocCompkeys.get(rdmIdx))
+										.getCarrierID();
+
+								String commercialJobString = (CarrierID + ";" + capacity + ";" + startTime + ";"
+										+ endTime + ";" + eGrocServDur);
+
+								pe.getAttributes().putAttribute("commercialJob" + eGroceryJobIdCounter,
+										commercialJobString);
+
+								serviceCounter++;
+								pe.getAttributes().removeAttribute("jobId");
 							} else {
 								pe.getAttributes().removeAttribute("jobId");
 							}
@@ -219,7 +225,6 @@ public class AssignService {
 				}
 
 				double serviceDuration = this.commercialTripReader.getRandomServiceDurationPerType(serviceType);
-				
 
 				Job finalJob = getActivityCandiate(serviceType, customerRelation, zone, serviceDuration, carrierId);
 
@@ -227,29 +232,32 @@ public class AssignService {
 
 					this.jobList.add(finalJob);
 
-					//companyMap.get(companyId).addService(finalJob.jobId, finalJob.regularAgentActivity.getLinkId(),
-					//		finalJob.startTime, finalJob.endTime, serviceDuration);
+					// companyMap.get(companyId).addService(finalJob.jobId,
+					// finalJob.regularAgentActivity.getLinkId(),
+					// finalJob.startTime, finalJob.endTime, serviceDuration);
 
 					// Check for Attributes
-//					Object actAttr = this.scenario.getPopulation().getPersons().get(finalJob.personid).getSelectedPlan()
-//							.getPlanElements().get(finalJob.planIdx).getAttributes();
+					// Object actAttr =
+					// this.scenario.getPopulation().getPersons().get(finalJob.personid).getSelectedPlan()
+					// .getPlanElements().get(finalJob.planIdx).getAttributes();
 					// E-Grocery Service is attributed with -99
 
-//					if (actAttr == null) {
-					String commercialJobString=(finalJob.carrierId.toString()+";"+"1"+";"+finalJob.startTime+";"+finalJob.endTime+";"+finalJob.serviceDuration);
-					
-						this.scenario.getPopulation().getPersons().get(finalJob.personid).getSelectedPlan()
-								.getPlanElements().get(finalJob.planIdx).getAttributes()
-								.putAttribute(finalJob.jobId, commercialJobString);
-//					} else {
-//						String prevJobId = actAttr.toString();
-//						this.scenario.getPopulation().getPersons().get(finalJob.personid).getSelectedPlan()
-//								.getPlanElements().get(finalJob.planIdx).getAttributes()
-//								.putAttribute("jobId", prevJobId + ";" + finalJob.jobId);
-//
-//						// System.out.println(prevJobId + ";" + finalJob.jobId);
-//
-//					}
+					// if (actAttr == null) {
+					String commercialJobString = (finalJob.carrierId.toString() + ";" + "1" + ";" + finalJob.startTime
+							+ ";" + finalJob.endTime + ";" + finalJob.serviceDuration);
+
+					this.scenario.getPopulation().getPersons().get(finalJob.personid).getSelectedPlan()
+							.getPlanElements().get(finalJob.planIdx).getAttributes()
+							.putAttribute(finalJob.jobId, commercialJobString);
+					// } else {
+					// String prevJobId = actAttr.toString();
+					// this.scenario.getPopulation().getPersons().get(finalJob.personid).getSelectedPlan()
+					// .getPlanElements().get(finalJob.planIdx).getAttributes()
+					// .putAttribute("jobId", prevJobId + ";" + finalJob.jobId);
+					//
+					// // System.out.println(prevJobId + ";" + finalJob.jobId);
+					//
+					// }
 
 					this.jobIdCounter.increment();
 					foundCounter.increment();
@@ -324,9 +332,9 @@ public class AssignService {
 									// int test=1;
 									// System.out.println(test);
 									// }
-									return new Job("commercialJob"+jobIdCounter.toString(), carrierId, candidatePerson, serviceType,
-											customerRelation, zone, serviceDuration, matchedPeIdx,
-											finalActivityDestination, startTime, endTime);
+									return new Job("commercialJob" + jobIdCounter.toString(), carrierId,
+											candidatePerson, serviceType, customerRelation, zone, serviceDuration,
+											matchedPeIdx, finalActivityDestination, startTime, endTime);
 
 								}
 							}
@@ -575,7 +583,7 @@ public class AssignService {
 
 		Set<String> VTypeSet_B2B = new HashSet<String>();
 		VTypeSet_B2B.add("work");
-		
+
 		Set<String> KEPTypeSet_B2B = new HashSet<String>();
 		KEPTypeSet_B2B.add("work");
 
@@ -646,7 +654,7 @@ public class AssignService {
 
 		Set<String> VTypeSet_B2C = new HashSet<String>();
 		VTypeSet_B2C.add("home");
-		
+
 		Set<String> KEPTypeSet_B2C = new HashSet<String>();
 		KEPTypeSet_B2C.add("home");
 
@@ -864,7 +872,7 @@ public class AssignService {
 						if (isServiceTypeV_B2B) {
 							FillServiceMap("V", "B2B", zone, person.getId(), peIdx);
 						}
-						
+
 						// Service Type KEP
 						ActivityChecker ServiceTypeKEP_B2B_Checker = new ActivityChecker(activity, KEPTypeSet_B2B,
 								actInterval, null);
@@ -1050,7 +1058,7 @@ public class AssignService {
 						if (isServiceTypeV_B2C) {
 							FillServiceMap("V", "B2C", zone, person.getId(), peIdx);
 						}
-						
+
 						ActivityChecker ServiceTypeKEP_B2C_Checker = new ActivityChecker(activity, KEPTypeSet_B2C,
 								actInterval, null);
 						boolean isServiceTypeKEP_B2C = ServiceTypeKEP_B2C_Checker.proof();

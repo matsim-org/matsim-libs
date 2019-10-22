@@ -319,14 +319,14 @@ public class CompanyGenerator {
 				// Delete Companies without Services
 			//	continue;
 			//}
-			// if
-			// (commercialCompanyEntry.getValue().carrier.getId().toString().contains("grocery"))
-			// {
+			 if
+			 (commercialCompanyEntry.getValue().carrier.getId().toString().contains("grocery"))
+			 {
 			carriers.addCarrier(commercialCompanyEntry.getValue().carrier);
 		}
 		
 
-		// }
+		 }
 		//new CarrierPlanWriter(carriers.getCarriers().values()).write(carrierOutputPath + "carrier_definition.xml");
 		new CarrierPlanXmlWriterV2(carriers).write(carrierOutputPath + "carrier_definition.xml");
 

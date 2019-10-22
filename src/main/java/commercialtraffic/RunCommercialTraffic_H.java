@@ -53,16 +53,16 @@ import static org.matsim.core.scenario.ScenarioUtils.loadScenario;
 
 public class RunCommercialTraffic_H {
 	public static void main(String[] args) {
-		String runId = "vw280_0.1_CT";
+		String runId = "vw280_0.1_EGrocery0.5_fulfillment";
 		String pct = ".0.1";
 
-		String inputDir = "D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\vw280_0.1_CT_0.1\\";
+		String inputDir = "D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\EGrocery\\vw280_0.1_EGrocery0.5_fulfillment\\";
 
 		Config config = ConfigUtils.loadConfig(inputDir + "config_0.1_CT.xml", new CommercialTrafficConfigGroup());
 		config.plans().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
-		config.global().setNumberOfThreads(8);
-		config.parallelEventHandling().setNumberOfThreads(8);
-		config.qsim().setNumberOfThreads(8);
+		config.global().setNumberOfThreads(16);
+		config.parallelEventHandling().setNumberOfThreads(16);
+		config.qsim().setNumberOfThreads(16);
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.00); //Fraction to disable Innovation
 		
 		//RECREATE ACTIVITY PARAMS 
