@@ -75,7 +75,7 @@ import org.xml.sax.Attributes;
 
 
 public class RunNilsOSMSignalReader{
-    public static void main(string[] args){
+    public static void main(String[] args){
         String inputOSM = "../../../shared-svn/studies/tthunig/osmData/interpreter.osm";
         String outputDir = "../../../shared-svn/studies/tthunig/osmData/signalsAndLanesReader/cottbusCity/";
         CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
@@ -102,11 +102,12 @@ public class RunNilsOSMSignalReader{
                 false, // use radius reduction
                 true, // allow U-turn at left lane only
                 true, // make pedestrian signals
-                false); // accept 4+ crossings
+                false,
+                null); // accept 4+ crossings
 		reader.setBoundingBox(51.7464, 14.3087, 51.7761, 14.3639); // setting Bounding Box for signals and lanes
     // (south,west,north,east)
 		reader.parse(inputOSM);
-		reader.stats();
+	//	reader.stats();
 
     /*
      * Clean the Network. Cleaning means removing disconnected components, so that
