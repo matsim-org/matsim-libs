@@ -97,7 +97,8 @@ class TourPlanning {
 					problem.getTransportCosts(), problem.getActivityCosts()), ConstraintManager.Priority.HIGH);
 			// add Multiple Threads
 			int jspritThreads = 1;
-			if (carrier.getServices().size()>200) {
+			
+			if (serviceCount>200) {
 				jspritThreads = 16;
 			}
 			VehicleRoutingAlgorithm algorithm = Jsprit.Builder.newInstance(problem)
