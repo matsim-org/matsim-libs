@@ -61,7 +61,7 @@ public final class DrtControlerCreator {
 	 */
 	public static Controler createControlerWithSingleModeDrt(Config config, boolean otfvis) {
 		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(config);
-		DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore());
+		DrtConfigs.adjustDrtConfig(drtCfg, config.planCalcScore(), config.plansCalcRoute());
 
 		Scenario scenario = createScenarioWithDrtRouteFactory(config);
 		ScenarioUtils.loadScenario(scenario);

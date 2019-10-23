@@ -19,11 +19,10 @@
 
 package org.matsim.facilities;
 
-import java.util.*;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -37,6 +36,12 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Generates {@link ActivityFacility}s from the {@link Activity Activities} in a population
@@ -141,12 +146,12 @@ public final class FacilitiesFromPopulation {
 	}
 
 	private void handleActivities(final Population population) {
+		Gbl.assertNotNull( network ) ;
+
 		int idxCounter = 0;
 		ActivityFacilitiesFactory factory = this.facilities.getFactory();
-		Map<Id<Link>, ActivityFacility> facilitiesPerLinkId = new HashMap<>();
+		IdMap<Link, ActivityFacility> facilitiesPerLinkId = new IdMap<>(Link.class);
 		Map<Coord, ActivityFacility> facilitiesPerCoordinate = new HashMap<>();
-
-		Gbl.assertNotNull( network ) ;
 
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {

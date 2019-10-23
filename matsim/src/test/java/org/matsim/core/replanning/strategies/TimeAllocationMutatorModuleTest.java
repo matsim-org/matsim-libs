@@ -41,11 +41,10 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.algorithms.PlanMutateTimeAllocation;
 import org.matsim.core.population.algorithms.PlanMutateTimeAllocationSimplified;
 import org.matsim.core.population.algorithms.TripPlanMutateTimeAllocation;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.PtConstants;
 import org.matsim.testcases.MatsimTestCase;
 
 import javax.inject.Provider;
@@ -66,15 +65,15 @@ public class TimeAllocationMutatorModuleTest extends MatsimTestCase {
 	public void testMutationRangeParam() {
 		boolean affectingDuration = true ;
 
-		runMutationRangeTest(new TripPlanMutateTimeAllocation(new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE ), 750, affectingDuration, MatsimRandom.getLocalInstance()), 750);
-		runMutationRangeTest(new TripPlanMutateTimeAllocation(new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE ), 7200, affectingDuration, MatsimRandom.getLocalInstance()), 7200);
+		runMutationRangeTest(new TripPlanMutateTimeAllocation(750, affectingDuration, MatsimRandom.getLocalInstance()), 750);
+		runMutationRangeTest(new TripPlanMutateTimeAllocation(7200, affectingDuration, MatsimRandom.getLocalInstance()), 7200);
 	}
 
 	public void testSimplifiedMutation() {
 		boolean affectingDuration = true ;
 
-		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified(new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE ), 750, affectingDuration, MatsimRandom.getLocalInstance()), 750);
-		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified(new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE ), 7200, affectingDuration, MatsimRandom.getLocalInstance()), 7200);
+		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified(StageActivityHandling.ExcludeStageActivities, 750, affectingDuration, MatsimRandom.getLocalInstance()), 750);
+		runSimplifiedMutationRangeTest(new PlanMutateTimeAllocationSimplified(StageActivityHandling.ExcludeStageActivities, 7200, affectingDuration, MatsimRandom.getLocalInstance()), 7200);
 	}
 
 	public void testSubpopulations() {

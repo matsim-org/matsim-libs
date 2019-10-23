@@ -161,7 +161,7 @@ final public class IOUtils {
 	public static URL resolveFileOrResource(String filename) throws UncheckedIOException {
 		try {
 			// I) do not handle URLs
-			if (filename.startsWith("jar:file:") || filename.startsWith("file:")) {
+			if (filename.startsWith("jar:file:") || filename.startsWith("file:") || filename.startsWith( "https:" )) {
 				// looks like an URI
 				return new URL(filename);
 			}

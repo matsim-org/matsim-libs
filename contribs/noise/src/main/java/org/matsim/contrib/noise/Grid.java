@@ -32,15 +32,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.pt.PtConstants;
 
 
 
@@ -120,10 +119,9 @@ final class Grid {
 
 
 	private void setActivityCoords () {
-		StageActivityTypes stages = new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		for (Person person: scenario.getPopulation().getPersons().values()) {
 
-			for(Activity activity: TripStructureUtils.getActivities(person.getSelectedPlan(), stages)){
+			for(Activity activity: TripStructureUtils.getActivities(person.getSelectedPlan(), StageActivityHandling.ExcludeStageActivities)){
 				if (this.consideredActivitiesForSpatialFunctionality.contains(activity.getType()) || consideredActivityPrefix(activity.getType(), this.consideredActivitiesForSpatialFunctionality)) {
 					List<Coord> activityCoordinates = personId2consideredActivityCoords.computeIfAbsent(person.getId(), value -> new ArrayList<>());
 
@@ -169,7 +167,7 @@ final class Grid {
 		log.info("Total number of receiver points: " + receiverPoints.size());
 	}
 
-	
+
 	private void createGrid() {
 		
 		if (this.noiseParams.getReceiverPointsGridMinX() == 0. && this.noiseParams.getReceiverPointsGridMinY() == 0. && this.noiseParams.getReceiverPointsGridMaxX() == 0. && this.noiseParams.getReceiverPointsGridMaxY() == 0.) {

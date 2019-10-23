@@ -253,11 +253,13 @@ public class MatsimJspritFactory {
 	 */
 	static VehicleType createCarrierVehicleType( com.graphhopper.jsprit.core.problem.vehicle.VehicleType type ){
 		VehicleType typeBuilder = VehicleUtils.getFactory().createVehicleType( Id.create( type.getTypeId(), VehicleType.class ) );
-		typeBuilder.setCapacityWeightInTons(type.getCapacityDimensions().get(0 ) );
-		typeBuilder.setCostPerDistanceUnit(type.getVehicleCostParams().perDistanceUnit).setCostPerTimeUnit(type.getVehicleCostParams().perTransportTimeUnit)
-				.setFixCost(type.getVehicleCostParams().fix);
+		typeBuilder.getCapacity().setWeightInTons( type.getCapacityDimensions().get(0 ) ) ;
+		typeBuilder.getCostInformation().setCostsPerMeter( type.getVehicleCostParams().perDistanceUnit ) ;
+		typeBuilder.getCostInformation().setCostsPerSecond( type.getVehicleCostParams().perTransportTimeUnit ) ;
+		VehicleType vehicleType = typeBuilder;
+		vehicleType.getCostInformation().setFixedCost( type.getVehicleCostParams().fix ) ;
 		typeBuilder.setMaximumVelocity(type.getMaxVelocity() );
-		return typeBuilder.build();
+		return typeBuilder;
 	}
 
 	/**
@@ -407,7 +409,7 @@ public class MatsimJspritFactory {
 			fleetSize = FleetSize.FINITE;
 			vrpBuilder.setFleetSize(fleetSize);
 		}
-		for (CarrierVehicle v : carrierCapabilities.getCarrierVehicles()) {
+		for (CarrierVehicle v : carrierCapabilities.getCarrierVehicles().values()) {
 			Coord coordinate = null;
 			if (network != null) {
 				Link link = network.getLinks().get(v.getLocation());
@@ -421,7 +423,7 @@ public class MatsimJspritFactory {
 			vrpBuilder.addVehicle(veh);
 		}
 
-		for (CarrierService service : carrier.getServices()) {
+		for (CarrierService service : carrier.getServices().values()) {
 			if (shipmentInVrp) {
 				throw new UnsupportedOperationException("VRP with miexed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
 			}
@@ -437,7 +439,7 @@ public class MatsimJspritFactory {
 		}
 
 
-		for (CarrierShipment carrierShipment : carrier.getShipments()) {
+		for (CarrierShipment carrierShipment : carrier.getShipments().values()) {
 			if (serviceInVrp) {
 				throw new UnsupportedOperationException("VRP with miexed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
 			}
@@ -489,7 +491,7 @@ public class MatsimJspritFactory {
 			fleetSize = FleetSize.FINITE;
 			vrpBuilder.setFleetSize(fleetSize);
 		}
-		for (CarrierVehicle v : carrierCapabilities.getCarrierVehicles()) {
+		for (CarrierVehicle v : carrierCapabilities.getCarrierVehicles().values()) {
 			Coord coordinate = null;
 			if (network != null) {
 				Link link = network.getLinks().get(v.getLocation());
@@ -500,7 +502,7 @@ public class MatsimJspritFactory {
 			vrpBuilder.addVehicle(createVehicle(v, coordinate));
 		}
 
-		for (CarrierService service : carrier.getServices()) {
+		for (CarrierService service : carrier.getServices().values()) {
 			log.debug("Handle CarrierService: " + service.toString());
 			if (shipmentInVrp) {
 				throw new UnsupportedOperationException("VRP with miexed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");
@@ -517,7 +519,7 @@ public class MatsimJspritFactory {
 		}
 
 
-		for (CarrierShipment carrierShipment : carrier.getShipments()) {
+		for (CarrierShipment carrierShipment : carrier.getShipments().values()) {
 			log.debug("Handle CarrierShipment: " + carrierShipment.toString());
 			if (serviceInVrp) {
 				throw new UnsupportedOperationException("VRP with miexed Services and Shipments may lead to invalid solutions because of vehicle capacity handling are different");

@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.Freight;
+import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.mobsim.DistanceScoringFunctionFactoryForTests;
 import org.matsim.contrib.freight.mobsim.StrategyManagerFactoryForTests;
@@ -79,14 +80,12 @@ public class EquilWithCarrierWithPassIT {
 		config.strategy().addStrategySettings(reRoute);
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );
-		{
-			Carriers carriers = new Carriers();
-			new CarrierPlanXmlReader( carriers ).readFile( testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
-			scenario.addScenarioElement( FreightUtils.CARRIERS, carriers );
 
-			final String idString = "foo";
-			addDummyVehicleType( carriers, idString );
-		}
+		Carriers carriers = FreightUtils.getOrCreateCarriers(scenario);
+		new CarrierPlanXmlReader( carriers ).readFile( testUtils.getClassInputDirectory() + "carrierPlansEquils.xml" );
+		final String idString = "foo";
+		addDummyVehicleType( carriers, idString );
+
 		controler = new Controler(scenario);
 		controler.getConfig().controler().setWriteEventsInterval(1);
 		controler.getConfig().controler().setCreateGraphs(false);
@@ -96,15 +95,16 @@ public class EquilWithCarrierWithPassIT {
 		CarrierVehicleTypes carrierVehicleTypes = new CarrierVehicleTypes() ;
 		Id<org.matsim.vehicles.VehicleType> id = Id.create( idString, org.matsim.vehicles.VehicleType.class ) ;
 		VehicleType builder = VehicleUtils.getFactory().createVehicleType( id );
-		VehicleType result = builder.build();
+		VehicleType result = builder;
 		carrierVehicleTypes.getVehicleTypes().put( result.getId(), result ) ;
 		new CarrierVehicleTypeLoader( carriers ).loadVehicleTypes( carrierVehicleTypes );
 	}
 
 	@Test
 	public void testScoringInMeters(){
+		// note setUp method!
 		//		controler.addOverridingModule(new CarrierModule(carriers));
-		Freight.configure( controler );
+		controler.addOverridingModule(new CarrierModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

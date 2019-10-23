@@ -1,8 +1,9 @@
 package org.matsim.contrib.freight.carrier;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.utils.objectattributes.attributable.Attributes;
@@ -15,14 +16,17 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  *
  */
 public final class CarrierImpl implements Carrier {
-
+	@Deprecated // refactoring device, please inline
+	public static Carrier newInstance( Id<Carrier> carrierId ){
+		return CarrierUtils.createCarrier( carrierId ) ;
+	}
 	private final Id<Carrier> id;
 
 	private final List<CarrierPlan> plans;
 
-	private final Collection<CarrierShipment> shipments; 
+	private final Map<Id<CarrierShipment>, CarrierShipment> shipments;
 
-	private final Collection<CarrierService> services;
+	private final Map<Id<CarrierService>, CarrierService> services;
 
 	private CarrierCapabilities carrierCapabilities;
 	
@@ -34,9 +38,9 @@ public final class CarrierImpl implements Carrier {
 		super();
 		this.carrierCapabilities = CarrierCapabilities.newInstance();
 		this.id = id;
-		services = new ArrayList<CarrierService>();
-		shipments = new ArrayList<CarrierShipment>();
-		plans = new ArrayList<CarrierPlan>();
+		services = new LinkedHashMap<>();
+		shipments = new LinkedHashMap<>();
+		plans = new ArrayList<>();
 	}
 
 	@Override
@@ -55,7 +59,7 @@ public final class CarrierImpl implements Carrier {
 	}
 
 	@Override
-	public Collection<CarrierShipment> getShipments() {
+	public Map<Id<CarrierShipment>, CarrierShipment> getShipments() {
 		return shipments;
 	}
 
@@ -88,7 +92,7 @@ public final class CarrierImpl implements Carrier {
 	}
 
 	@Override
-	public Collection<CarrierService> getServices(){
+	public Map<Id<CarrierService>, CarrierService> getServices(){
 		return services;
 	}
 

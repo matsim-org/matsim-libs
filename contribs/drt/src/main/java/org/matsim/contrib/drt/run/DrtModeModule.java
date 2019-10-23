@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.drt.optimizer.rebalancing.NoRebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.DrtModeMinCostFlowRebalancingModule;
@@ -51,13 +50,14 @@ import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.pt.transitSchedule.TransitScheduleUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -94,34 +94,33 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		}
 
 		switch (drtCfg.getOperationalScheme()) {
-			case door2door:
-				addRoutingModuleBinding(getMode()).toProvider(new DrtRoutingModuleProvider(drtCfg));//not singleton
-				break;
+		case door2door:
+			addRoutingModuleBinding(getMode()).toProvider(new DrtRoutingModuleProvider(drtCfg));// not singleton
+			break;
 
-			case serviceAreaBased:
-			case stopbased:
-				if (drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.serviceAreaBased) {
-					bindModal(TransitSchedule.class).toProvider(new ShapeFileStopProvider(getConfig(), drtCfg));
-				} else {
-					bindModal(TransitSchedule.class).toInstance(readTransitSchedule());
-				}
-				bindModal(DrtRoutingModule.class).toProvider(new DrtRoutingModuleProvider(drtCfg));//not singleton
-
-				addRoutingModuleBinding(getMode()).toProvider(modalProvider(
-						getter -> new StopBasedDrtRoutingModule(getter.get(PopulationFactory.class),
-								getter.getModal(DrtRoutingModule.class),
-								getter.getNamed(RoutingModule.class, TransportMode.walk),
-								getter.getModal(AccessEgressStopFinder.class), drtCfg)));//not singleton
-
-				bindModal(AccessEgressStopFinder.class).toProvider(modalProvider(
-						getter -> new ClosestAccessEgressStopFinder(getter.getModal(TransitSchedule.class), drtCfg,
-								getter.get(PlansCalcRouteConfigGroup.class), getter.get(Network.class))))
+		case serviceAreaBased:
+		case stopbased:
+			if (drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.serviceAreaBased) {
+				bindModal(TransitSchedule.class).toProvider(new ShapeFileStopProvider(getConfig(), drtCfg))
 						.asEagerSingleton();
+			} else {
+				bindModal(TransitSchedule.class).toInstance(readTransitSchedule());
+			}
+			bindModal(DrtRoutingModule.class).toProvider(new DrtRoutingModuleProvider(drtCfg));// not singleton
 
-				break;
+			addRoutingModuleBinding(getMode()).toProvider(new StopBasedDrtRoutingModuleProvider(drtCfg));// not singleton
+			
+			bindModal(QuadTree.class).toProvider(new StopsQuadTreeProvider(drtCfg));
 
-			default:
-				throw new IllegalStateException();
+			bindModal(AccessEgressStopFinder.class)
+					.toProvider(modalProvider(
+							getter -> new ClosestAccessEgressStopFinder(drtCfg, getter.get(Network.class), getter.getModal(QuadTree.class))))
+					.asEagerSingleton();
+
+			break;
+
+		default:
+			throw new IllegalStateException();
 		}
 
 		bindModal(DrtRouteUpdater.class).toProvider(new ModalProviders.AbstractProvider<DrtRouteUpdater>(getMode()) {
@@ -144,6 +143,32 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		}).asEagerSingleton();
 
 		addControlerListenerBinding().to(modalKey(DrtRouteUpdater.class));
+	}
+
+	private static class StopBasedDrtRoutingModuleProvider extends ModalProviders.AbstractProvider<StopBasedDrtRoutingModule> {
+		@Inject
+		@Named(TransportMode.walk) private RoutingModule walkRouter;
+		
+		@Inject
+		private Scenario scenario;
+		
+		private final DrtConfigGroup drtCfg;
+
+		private StopBasedDrtRoutingModuleProvider(DrtConfigGroup drtCfg) {
+			super(drtCfg.getMode());
+			this.drtCfg = drtCfg;
+		}
+
+		@Override
+		public StopBasedDrtRoutingModule get() {
+			return new StopBasedDrtRoutingModule(
+					getModalInstance(DrtRoutingModule.class),
+					walkRouter,
+					getModalInstance(AccessEgressStopFinder.class), 
+					drtCfg, 
+					scenario,
+					getModalInstance(Network.class));
+		}
 	}
 
 	private static class DrtRoutingModuleProvider extends ModalProviders.AbstractProvider<DrtRoutingModule> {
@@ -187,21 +212,18 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 		@Override
 		public TransitSchedule get() {
-			final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils.loadPreparedGeometries(
-					drtCfg.getDrtServiceAreaShapeFileURL(context));
+			final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils
+					.loadPreparedGeometries(drtCfg.getDrtServiceAreaShapeFileURL(context));
 			Network network = getModalInstance(Network.class);
-			Set<Link> relevantLinks = network.getLinks()
-					.values()
-					.stream()
-					.filter(link -> ShpGeometryUtils.isCoordInPreparedGeometries(link.getToNode().getCoord(),
-							preparedGeometries))
+			Set<Link> relevantLinks = network
+					.getLinks().values().stream().filter(link -> ShpGeometryUtils
+							.isCoordInPreparedGeometries(link.getToNode().getCoord(), preparedGeometries))
 					.collect(Collectors.toSet());
 			final TransitSchedule schedule = ScenarioUtils.createScenario(ConfigUtils.createConfig())
 					.getTransitSchedule();
 			relevantLinks.stream().forEach(link -> {
-				TransitStopFacility f = schedule.getFactory()
-						.createTransitStopFacility(Id.create(link.getId(), TransitStopFacility.class),
-								link.getToNode().getCoord(), false);
+				TransitStopFacility f = schedule.getFactory().createTransitStopFacility(
+						Id.create(link.getId(), TransitStopFacility.class), link.getToNode().getCoord(), false);
 				f.setLinkId(link.getId());
 				schedule.addStopFacility(f);
 			});
@@ -214,6 +236,24 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new TransitScheduleReader(scenario).readURL(url);
 		return scenario.getTransitSchedule();
+	}
+	
+	private static class StopsQuadTreeProvider extends ModalProviders.AbstractProvider<QuadTree<TransitStopFacility>> {
+
+		private QuadTree<TransitStopFacility> stopsQT = null;
+
+		protected StopsQuadTreeProvider(DrtConfigGroup drtCfg) {
+			super(drtCfg.getMode());
+		}
+
+		@Override
+		public QuadTree<TransitStopFacility> get() {
+			if (stopsQT == null) {
+				TransitSchedule stopsTransitSchedule = getModalInstance(TransitSchedule.class);
+				stopsQT = TransitScheduleUtils.createQuadTreeOfTransitStopFacilities(stopsTransitSchedule);
+			}
+			return stopsQT;
+		}
 	}
 
 }

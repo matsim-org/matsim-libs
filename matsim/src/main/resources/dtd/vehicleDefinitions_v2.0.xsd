@@ -106,9 +106,9 @@
 				</xs:complexType>
 			</xs:element>
 		</xs:sequence>
-		<xs:attribute name="fixedCostsPerDay" type="xs:decimal"/>
-		<xs:attribute name="costsPerMeter" type="xs:decimal"/>
-		<xs:attribute name="costsPerSecond" type="xs:decimal"/>
+        <xs:attribute name="fixedCostsPerDay" type="xs:double"/>
+        <xs:attribute name="costsPerMeter" type="xs:double"/>
+        <xs:attribute name="costsPerSecond" type="xs:double"/>
 	</xs:complexType>
 
 

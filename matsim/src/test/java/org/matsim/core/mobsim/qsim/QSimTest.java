@@ -1042,7 +1042,7 @@ public class QSimTest {
 		NetsimLink qlink2 = qnet.getNetsimLink(Id.create(2, Link.class));
 		NetsimLink qlink3 = qnet.getNetsimLink(Id.create(3, Link.class));
 
-		VehicleType defaultVehicleType = new VehicleType(Id.create("defaultVehicleType", VehicleType.class ));
+		VehicleType defaultVehicleType = VehicleUtils.createVehicleType(Id.create("defaultVehicleType", VehicleType.class ) );
 		QVehicle vehicle1 = new QVehicleImpl( VehicleUtils.createVehicle(Id.create(1, Vehicle.class ), defaultVehicleType ) );
 		QVehicle vehicle2 = new QVehicleImpl( VehicleUtils.createVehicle(Id.create(2, Vehicle.class ), defaultVehicleType ) );
 		sim.addParkedVehicle(vehicle1, Id.create(2, Link.class));

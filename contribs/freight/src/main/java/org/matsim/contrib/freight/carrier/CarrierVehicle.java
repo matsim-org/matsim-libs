@@ -26,6 +26,14 @@ public class CarrierVehicle implements Vehicle {
 	public static CarrierVehicle newInstance(Id<Vehicle> vehicleId, Id<Link> locationId){
 		return new CarrierVehicle(vehicleId, locationId);
 	}
+	@Deprecated // refactoring device, please inline
+	public Id<Vehicle> getVehicleId(){
+		return getId() ;
+	}
+	@Deprecated // refactoring device, please inline
+	public void setVehicleType( VehicleType collectionType ){
+		setType( collectionType );
+	}
 
 	/**
 	 * Builder to build vehicles.

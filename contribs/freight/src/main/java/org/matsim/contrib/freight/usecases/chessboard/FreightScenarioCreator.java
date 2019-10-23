@@ -87,7 +87,8 @@ final class FreightScenarioCreator {
             serviceBuilder.setCapacityDemand(1);
             serviceBuilder.setServiceDuration(5*60);
             serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(6*60*60, 15*60*60));
-            carrier.getServices().add(serviceBuilder.build());
+            CarrierService carrierService = serviceBuilder.build();
+            CarrierUtils.addService(carrier, carrierService);
         }
     }
 
@@ -130,12 +131,16 @@ final class FreightScenarioCreator {
         Id<Link> oppositeId = getOpposite(homeId);
 
         //light
-        carrier.getCarrierCapabilities().getCarrierVehicles().add(getLightVehicle(carrier.getId(), homeId, "a"));
-        carrier.getCarrierCapabilities().getCarrierVehicles().add(getLightVehicle(carrier.getId(), oppositeId, "b"));
+        CarrierVehicle carrierVehicle_lightA = createLightVehicle(carrier.getId(), homeId, "a");
+        CarrierUtils.addCarrierVehicle(carrier, carrierVehicle_lightA);
+        CarrierVehicle carrierVehicle_lightB = createLightVehicle(carrier.getId(), oppositeId, "b");
+        CarrierUtils.addCarrierVehicle(carrier, carrierVehicle_lightB);
 
         //heavy
-        carrier.getCarrierCapabilities().getCarrierVehicles().add(getHeavyVehicle(carrier.getId(), homeId, "a"));
-        carrier.getCarrierCapabilities().getCarrierVehicles().add(getHeavyVehicle(carrier.getId(), oppositeId, "b"));
+        CarrierVehicle carrierVehicle_heavyA = createHeavyVehicle(carrier.getId(), homeId, "a");
+        CarrierUtils.addCarrierVehicle(carrier, carrierVehicle_heavyA);
+        CarrierVehicle carrierVehicle_heavyB = createHeavyVehicle(carrier.getId(), oppositeId, "b");
+        CarrierUtils.addCarrierVehicle(carrier, carrierVehicle_heavyB);
 
         carrier.getCarrierCapabilities().setFleetSize(FleetSize.INFINITE);
     }
@@ -157,7 +162,7 @@ final class FreightScenarioCreator {
         }
     }
 
-    private static CarrierVehicle getLightVehicle(Id<?> id, Id<Link> homeId, String depot) {
+    private static CarrierVehicle createLightVehicle(Id<?> id, Id<Link> homeId, String depot) {
         CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(Id.create(("carrier_"+id.toString()+"_lightVehicle_" + depot) ,Vehicle.class), homeId);
         vBuilder.setEarliestStart(6*60*60);
         vBuilder.setLatestEnd(16*60*60);
@@ -174,7 +179,7 @@ final class FreightScenarioCreator {
         return typeBuilder ;
     }
 
-    private static CarrierVehicle getHeavyVehicle(Id<?> id, Id<Link> homeId, String depot) {
+    private static CarrierVehicle createHeavyVehicle(Id<?> id, Id<Link> homeId, String depot) {
         CarrierVehicle.Builder vBuilder = CarrierVehicle.Builder.newInstance(Id.create("carrier_" + id.toString() + "_heavyVehicle_" + depot, Vehicle.class), homeId);
         vBuilder.setEarliestStart(6*60*60);
         vBuilder.setLatestEnd(16*60*60);
@@ -184,11 +189,11 @@ final class FreightScenarioCreator {
 
     private static VehicleType createHeavyType() {
 	    VehicleType typeBuilder = VehicleUtils.getFactory().createVehicleType( Id.create( "heavy", VehicleType.class ) );
-        typeBuilder.setCapacityWeightInTons(25 );
-        typeBuilder.setFixCost(130.0);
-        typeBuilder.setCostPerDistanceUnit(0.00077);
-        typeBuilder.setCostPerTimeUnit(0.008);
-        return typeBuilder.build();
+	    typeBuilder.getCapacity().setWeightInTons( 25 ) ;
+	    typeBuilder.getCostInformation().setFixedCost( 130.0 ) ;
+	    typeBuilder.getCostInformation().setCostsPerMeter( 0.00077 ) ;
+	    typeBuilder.getCostInformation().setCostsPerSecond( 0.008 ) ;
+	    return typeBuilder ;
     }
 
 

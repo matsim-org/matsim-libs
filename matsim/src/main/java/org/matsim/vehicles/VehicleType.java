@@ -27,7 +27,11 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 /**
  * @author dgrether
  */
-public final class VehicleType implements Attributable {
+public final class VehicleType implements Attributable{
+	// deliberately final, please do not change.
+	// If something like inheritance is needed, please change this class to VehicleTypeImpl, and extract interface under previous name VehicleType.
+	// And then use delegation. kai, sep'19
+
 	// yy should maybe the whole type be immutable? I guess that the question is how people use this.  If they have a vehicle, get the type, and then keep
 	// a reference to the type, then replacing the type means that it will have another reference, and these users will not notice.  ???????
 
@@ -38,14 +42,13 @@ public final class VehicleType implements Attributable {
 	private double flowEfficiencyFactor = 1.0;
 	private final EngineInformation engineInformation = new EngineInformation() ;
 	private final CostInformation costInformation = new CostInformation() ;
-	//	private FreightCapacity freightCapacity;
 	private String description;
 	private final VehicleCapacity capacity = new VehicleCapacity();
 	private String networkMode = TransportMode.car ;
 	private Id<VehicleType> id;
 	private final Attributes attributes = new Attributes();
 
-	public VehicleType( Id<VehicleType> typeId ) {
+	VehicleType( Id<VehicleType> typeId ) {
 		this.id = typeId;
 	}
 	public final String getDescription() {
@@ -56,48 +59,6 @@ public final class VehicleType implements Attributable {
 	}
 	public final Id<VehicleType> getId() {
 		return id;
-	}
-	/**
-	 * @deprecated please use {@see VehicleUtils} instead.
-	 */
-	@Deprecated
-	public final double getAccessTime() {
-		return VehicleUtils.getAccessTime(this);
-	}
-	/**
-	 * @deprecated please use {@see VehicleUtils} instead.
-	 */
-	@Deprecated
-	public final double getEgressTime() {
-		return VehicleUtils.getEgressTime(this);
-	}
-	/**
-	 * @deprecated please use {@see VehicleUtils} instead.
-	 */
-	@Deprecated
-	public final void setAccessTime(double seconds) {
-		VehicleUtils.setAccessTime(this, seconds);
-	}
-	/**
-	 * @deprecated please use {@see VehicleUtils} instead.
-	 */
-	@Deprecated
-	public final void setEgressTime(double seconds) {
-		VehicleUtils.setEgressTime(this, seconds);
-	}
-	/**
-	 * @deprecated please use {@see VehicleUtils} instead.
-	 */
-	@Deprecated
-	public final DoorOperationMode getDoorOperationMode() {
-		return VehicleUtils.getDoorOperationMode( this ) ;
-	}
-	/**
-	 * @deprecated please use {@see VehicleUtils} instead.
-	 */
-	@Deprecated
-	public final void setDoorOperationMode( DoorOperationMode mode ) {
-		VehicleUtils.setDoorOperationMode( this, mode ) ;
 	}
 	public final double getPcuEquivalents() {
 		return pcuEquivalents;
@@ -113,8 +74,7 @@ public final class VehicleType implements Attributable {
 		this.flowEfficiencyFactor = flowEfficiencyFactor;
 		return this;
 	}
-	@Override
-	public final  Attributes getAttributes() {
+	@Override public final  Attributes getAttributes() {
 		return attributes ;
 	}
 	public final VehicleType setDescription( String desc ) {
@@ -151,34 +111,58 @@ public final class VehicleType implements Attributable {
 	public final String getNetworkMode() {
 		return networkMode;
 	}
-	public final void setNetworkMode(String networkMode) {
+	public final void setNetworkMode( String networkMode ) {
 		this.networkMode = networkMode;
 	}
-	@Deprecated // refactoring device, please inline
-	public VehicleType setCapacityWeightInTons( int i ){
-		this.getCapacity().setWeightInTons( i ) ;
-		return this ;
+
+	// the following are attributes that did not seem universal enough and thus were relegated to free-form Attributes for the time being.  kai/kai, sep'19
+	/**
+	 * @deprecated please use {@see VehicleUtils} instead.
+	 */
+	@Deprecated
+	public final double getAccessTime() {
+		return VehicleUtils.getAccessTime(this);
+	}
+	/**
+	 * @deprecated please use {@see VehicleUtils} instead.
+	 */
+	@Deprecated
+	public final double getEgressTime() {
+		return VehicleUtils.getEgressTime(this);
+	}
+	/**
+	 * @deprecated please use {@see VehicleUtils} instead.
+	 */
+	@Deprecated
+	public final void setAccessTime( double seconds ) {
+		VehicleUtils.setAccessTime(this, seconds);
+	}
+	/**
+	 * @deprecated please use {@see VehicleUtils} instead.
+	 */
+	@Deprecated
+	public final void setEgressTime( double seconds ) {
+		VehicleUtils.setEgressTime(this, seconds);
+	}
+	/**
+	 * @deprecated please use {@see VehicleUtils} instead.
+	 */
+	@Deprecated
+	public final DoorOperationMode getDoorOperationMode() {
+		return VehicleUtils.getDoorOperationMode( this ) ;
+	}
+	/**
+	 * @deprecated please use {@see VehicleUtils} instead.
+	 */
+	@Deprecated
+	public final void setDoorOperationMode( DoorOperationMode mode ) {
+		VehicleUtils.setDoorOperationMode( this, mode ) ;
 	}
 	@Deprecated // refactoring device, please inline
-	public VehicleType setFixCost( double perDay ){
-		this.getCostInformation().setFixedCost( perDay ) ;
-		return this ;
-	}
-	@Deprecated // refactoring device, please inline
-	public VehicleType setCostPerDistanceUnit( double perMeter ){
-		this.getCostInformation().setCostsPerMeter( perMeter ) ;
-		return this ;
-	}
-	@Deprecated // refactoring device, please inline
-	public VehicleType setCostPerTimeUnit( double perSecond ){
-		this.getCostInformation().setCostsPerSecond( perSecond ) ;
-		return this ;
-	}
-	@Deprecated // refactoring device, please delete
-	public VehicleType build(){
-		return this;
+	public final CostInformation getVehicleCostInformation() {
+		return this.getCostInformation() ;
 	}
 
-	@Deprecated
-	public enum DoorOperationMode{ serial, parallel }
+	public enum DoorOperationMode { serial, parallel }
+
 }

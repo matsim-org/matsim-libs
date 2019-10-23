@@ -49,7 +49,7 @@ final class VehiclesFactoryImpl implements VehiclesFactory {
 	
 	@Override
 	public VehicleType createVehicleType(Id<VehicleType> typeId) {
-		return new VehicleType(typeId);
+		return VehicleUtils.createVehicleType(typeId );
 	}
 
 

@@ -4,9 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.vehicles.*;
 import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleType;
 
 public class DefaultVehTypes {
@@ -41,7 +40,7 @@ public class DefaultVehTypes {
 	}
 	
 	private static VehicleType getBusBerlin(String id){
-		VehicleType veh = new VehicleType(Id.create(id, VehicleType.class));
+		VehicleType veh = VehicleUtils.createVehicleType(Id.create(id, VehicleType.class ) );
 
 		veh.setDescription("Standard 3 doors");
 
@@ -62,7 +61,7 @@ public class DefaultVehTypes {
 	}
 	
 	private static VehicleType getBusUmland(String id){
-		VehicleType veh = new VehicleType(Id.create(id, VehicleType.class));
+		VehicleType veh = VehicleUtils.createVehicleType(Id.create(id, VehicleType.class ) );
 
 		veh.setDescription("Standard 2 doors");
 		
@@ -82,7 +81,7 @@ public class DefaultVehTypes {
 	}
 	
 	private static VehicleType getTramBerlin(String id){
-		VehicleType veh = new VehicleType(Id.create(id, VehicleType.class));
+		VehicleType veh = VehicleUtils.createVehicleType(Id.create(id, VehicleType.class ) );
 		
 		veh.setDescription("GT6, one wagon");
 		
@@ -102,7 +101,7 @@ public class DefaultVehTypes {
 	}
 	
 	private static VehicleType getTramUmland(String id){
-		VehicleType veh = new VehicleType(Id.create(id, VehicleType.class));
+		VehicleType veh = VehicleUtils.createVehicleType(Id.create(id, VehicleType.class ) );
 		
 		veh.setDescription("Tatra long KT4D mod, one wagon");
 		
@@ -122,7 +121,7 @@ public class DefaultVehTypes {
 	}
 	
 	private static VehicleType getUBahn(String id){
-		VehicleType veh = new VehicleType(Id.create(id, VehicleType.class));
+		VehicleType veh = VehicleUtils.createVehicleType(Id.create(id, VehicleType.class ) );
 		
 		veh.setDescription("Baureihe F gross, 6 wagon unit");
 		
@@ -142,7 +141,7 @@ public class DefaultVehTypes {
 	}
 	
 	private static VehicleType getSBahn(String id){
-		VehicleType veh = new VehicleType(Id.create(id, VehicleType.class));
+		VehicleType veh = VehicleUtils.createVehicleType(Id.create(id, VehicleType.class ) );
 		
 		veh.setDescription("Baureihe 481, 8 wagon unit");
 		
@@ -162,7 +161,7 @@ public class DefaultVehTypes {
 	}
 	
 	private static VehicleType getRegionalBahn(String id){
-		VehicleType veh = new VehicleType(Id.create(id, VehicleType.class));
+		VehicleType veh = VehicleUtils.createVehicleType(Id.create(id, VehicleType.class ) );
 		
 		veh.setDescription("Baureihe DBpza 752 RE160, 5 wagon unit");
 		

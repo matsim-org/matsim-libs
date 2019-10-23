@@ -40,7 +40,7 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 	protected abstract TransitVehicle createTransitVehicle(final Vehicle vehicle);
 
 	public void testInitialization_SeatAndStandCapacity() {
-		VehicleType vehType = new VehicleType(Id.create("busType", VehicleType.class ));
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
 //		VehicleCapacity capacity = new VehicleCapacity();
 		vehType.getCapacity().setSeats(Integer.valueOf(5));
 		vehType.getCapacity().setStandingRoom(Integer.valueOf(2));
@@ -52,7 +52,7 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 	}
 
 	public void testInitialization_SeatOnlyCapacity() {
-		VehicleType vehType = new VehicleType(Id.create("busType", VehicleType.class ));
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
 //		VehicleCapacity capacity = new VehicleCapacity();
 		vehType.getCapacity().setSeats(Integer.valueOf(4));
 //		vehType.setCapacity(capacity);
@@ -63,7 +63,7 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 	}
 
 	public void testInitialization_NoCapacity() {
-		VehicleType vehType = new VehicleType(Id.create("busType", VehicleType.class ));
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
 		Vehicle vehicle = VehicleUtils.createVehicle(Id.create(1976, Vehicle.class ), vehType );
 		try {
 			createTransitVehicle(vehicle);
@@ -75,7 +75,7 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 	}
 
 	public void testAddPassenger() {
-		VehicleType vehType = new VehicleType(Id.create("busType", VehicleType.class ));
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
 //		VehicleCapacity capacity = new VehicleCapacity();
 		vehType.getCapacity().setSeats(Integer.valueOf(5));
 //		vehType.setCapacity(capacity);
@@ -97,7 +97,7 @@ public abstract class AbstractTransitVehicleTest extends TestCase {
 	}
 
 	public void testRemovePassenger() {
-		VehicleType vehType = new VehicleType(Id.create("busType", VehicleType.class ));
+		VehicleType vehType = VehicleUtils.createVehicleType(Id.create("busType", VehicleType.class ) );
 //		VehicleCapacity capacity = new VehicleCapacity();
 		vehType.getCapacity().setSeats(Integer.valueOf(5));
 //		vehType.setCapacity(capacity);

@@ -31,7 +31,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -82,7 +81,7 @@ public class ModalDistanceAndCountsCadytsIT {
 	 * is set to have an equal share of car and bike users. The accepted error in the test is 5%, due to stochastic fuzziness
 	 */
 	@Test
-	@Ignore
+//	@Ignore
 	public void test() {
 
 		Config config = createConfig();
@@ -102,7 +101,6 @@ public class ModalDistanceAndCountsCadytsIT {
 			@Override
 			public void install() {
 				bind(DistanceDistribution.class).toInstance(createDistanceDistribution());
-				bind(StageActivityTypes.class).toInstance(type -> type.endsWith(" interaction"));
 				addEventHandlerBinding().toInstance(linkIdEventHandler);
 			}
 		});

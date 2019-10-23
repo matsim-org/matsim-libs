@@ -7,6 +7,7 @@ import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
 import org.matsim.contrib.freight.utils.FreightUtils;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.AllowsConfiguration;
 import org.matsim.core.controler.Controler;
@@ -14,16 +15,17 @@ import org.matsim.core.gbl.Gbl;
 
 public class Freight{
 	// yyyy todo:
-	// * introduce freight config group
-	// * read freight input files in module
+	// * introduce freight config group		=> DONE by oct' 07 '19,	tschlenther
+	// * read freight input files in module => DONE by oct' 07 '19,	tschlenther
 	// * repair execution path where config instead of scenario is given to controler
 
 	public static void configure( AllowsConfiguration ao ) {
 		Gbl.assertIf( ao instanceof Controler);  // we need the scenario; otherwise find other way
 		Controler controler = (Controler) ao;
 		Carriers carriers = FreightUtils.getCarriers( controler.getScenario() );
+		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class );;
+		freightConfig.setPhysicallyEnforceTimeWindowBeginnings(true);
 		final CarrierModule carrierModule = new CarrierModule( carriers );
-		carrierModule.setPhysicallyEnforceTimeWindowBeginnings( true );
 		ao.addOverridingModule( carrierModule ) ;
 
 		ao.addOverridingModule( new AbstractModule(){

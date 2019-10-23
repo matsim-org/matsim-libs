@@ -72,7 +72,7 @@ public class RunAVExample {
                 config.plans().setInputFile("");
                 Scenario scenario = ScenarioUtils.loadScenario(config);
                 
-                VehicleType avType = new VehicleType(Id.create("autonomousVehicleType", VehicleType.class ));
+                VehicleType avType = VehicleUtils.createVehicleType(Id.create("autonomousVehicleType", VehicleType.class ) );
                 avType.setFlowEfficiencyFactor(0.8);
                 scenario.getVehicles().addVehicleType(avType);
                 
