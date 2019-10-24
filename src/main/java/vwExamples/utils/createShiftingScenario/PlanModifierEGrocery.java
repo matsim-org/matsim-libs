@@ -116,7 +116,7 @@ public class PlanModifierEGrocery {
 
 		subTourValidator = new isShoppingSubTourCandidate(network, cityZonesMap, serviceAreazonesMap);
 		assignTourValidator = new assignShoppingCandidate(network, cityZonesMap, serviceAreazonesMap);
-        shiftingScenario = new ShiftingScenario(0.5);
+        shiftingScenario = new ShiftingScenario(0.4);
 
 	}
 
@@ -126,7 +126,7 @@ public class PlanModifierEGrocery {
 				"D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\Zellen\\Stadtteile\\Hannover_Stadtteile_25832.shp",
                 "D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\Zellen\\Stadtteile\\1Real_Region_Hannover.shp",
 				"D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw280_0.1\\vw280_0.1.output_plans.xml.gz",
-                "D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\EGrocery\\vw280_0.1_EGrocery0.5_fulfillment\\vw280_0.1_EGrocery0.5_input_carOnly.xml.gz",
+                "D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\EGrocery\\vw280_0.1_EGrocery0.4_fulfillment\\vw280_0.1_EGrocery0.4_input_carOnly.xml.gz",
 				"D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\EGrocery\\network\\network_editedPt.xml.gz");
 		planmodifier.count();
 		planmodifier.assign();

@@ -51,7 +51,7 @@ public class RunMultiModeDrtBSWOBExample {
 		config.controler().setOutputDirectory(INPUTDIR + "../output/" + runId);
 
 		MultiModeDrtConfigGroup multiModeDrtCfg = MultiModeDrtConfigGroup.get(config);
-		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtCfg, config.planCalcScore());
+		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtCfg, config.planCalcScore(),config.plansCalcRoute());
 
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
 		ScenarioUtils.loadScenario(scenario);

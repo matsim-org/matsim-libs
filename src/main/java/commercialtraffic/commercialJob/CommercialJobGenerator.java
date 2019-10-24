@@ -47,6 +47,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Generates carriers and tours depending on next iteration's freight demand
@@ -94,7 +95,12 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
 
         CommercialTrafficChecker.run(population,carriers);
         generateIterationServices();
-        buildTours();
+        try {
+			buildTours();
+		} catch (InterruptedException | ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         createFreightAgents();
 
         event.getServices().getInjector().getInstance(ScoreCommercialJobs.class).prepareTourArrivalsForDay();
@@ -153,7 +159,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
 
     }
 
-    private void buildTours() {
+    private void buildTours() throws InterruptedException, ExecutionException {
         TourPlanning.runTourPlanningForCarriers(carriers,scenario, timeSliceWidth,carTT );
     }
 

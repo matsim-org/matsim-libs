@@ -30,7 +30,9 @@ import com.graphhopper.jsprit.core.problem.constraint.VehicleDependentTimeWindow
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierUtils;
 import org.matsim.contrib.freight.carrier.Carriers;
@@ -40,9 +42,17 @@ import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.VehicleType;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
+import java.util.stream.Collectors;
 
 //import org.matsim.contrib.freight.jsprit.NetworkRouter;
 
@@ -51,7 +61,7 @@ class TourPlanning {
 	private static Logger log = Logger.getLogger(TourPlanning.class);
 
 	static void runTourPlanningForCarriers(Carriers carriers, Scenario scenario, int jSpritTimeSliceWidth,
-			TravelTime travelTime) {
+			TravelTime travelTime) throws InterruptedException, ExecutionException {
 		Set<VehicleType> vehicleTypes = new HashSet<>();
 		carriers.getCarriers().values()
 				.forEach(carrier -> vehicleTypes.addAll(carrier.getCarrierCapabilities().getVehicleTypes()));
@@ -64,7 +74,25 @@ class TourPlanning {
 
 		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
 
-		carriers.getCarriers().values().parallelStream().forEach(carrier -> {
+		HashMap<Id<Carrier>, Integer> carrierServiceCounterMap = new HashMap<>();
+
+		// Fill carrierServiceCounterMap
+		for (Carrier carrier : carriers.getCarriers().values()) {
+			carrierServiceCounterMap.put(carrier.getId(), carrier.getServices().size());
+
+		}
+
+		HashMap<Id<Carrier>, Integer> sortedMap = carrierServiceCounterMap.entrySet().stream()
+				.sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
+		
+		
+		ArrayList<Id<Carrier>> tempList = new ArrayList<>(sortedMap.keySet());
+		ForkJoinPool forkJoinPool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
+		forkJoinPool.submit(() -> tempList.parallelStream().forEach(carrierId -> {
+			Carrier carrier = carriers.getCarriers().get(carrierId);
+
+			// carriers.getCarriers().values().parallelStream().forEach(carrier -> {
 			double start = System.currentTimeMillis();
 			int serviceCount = carrier.getServices().size();
 			log.info("start tour planning for " + carrier.getId() + " which has " + serviceCount + " services");
@@ -97,9 +125,9 @@ class TourPlanning {
 					problem.getTransportCosts(), problem.getActivityCosts()), ConstraintManager.Priority.HIGH);
 			// add Multiple Threads
 			int jspritThreads = 1;
-			
-			if (serviceCount>200) {
-				jspritThreads = 16;
+
+			if (serviceCount > 50) {
+				jspritThreads = (Runtime.getRuntime().availableProcessors()/2);
 			}
 			VehicleRoutingAlgorithm algorithm = Jsprit.Builder.newInstance(problem)
 					.setStateAndConstraintManager(stateManager, constraintManager)
@@ -142,6 +170,7 @@ class TourPlanning {
 			log.info("routing for carrier " + carrier.getId() + " finished. Tour planning plus routing took "
 					+ (System.currentTimeMillis() - start) / 1000 + " seconds.");
 			carrier.setSelectedPlan(carrierPlan);
-		});
+		})).get();
+		;
 	}
 }

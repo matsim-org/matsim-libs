@@ -117,7 +117,7 @@ public class AssignService {
 	public static void main(String[] args) {
 
 		AssignService assignData = new AssignService(
-				"D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\EGrocery\\vw280_0.1_EGrocery0.5_fulfillment\\vw280_0.1_EGrocery0.5_input_carOnly.xml.gz",
+				"D:\\Thiel\\Programme\\WVModell\\01_MatSimInput\\vw280_0.1_CT_0.1\\vw280_0.1.output_sel_plans.xml.gz",
 				"D:\\Thiel\\Programme\\WVModell\\00_Eingangsdaten\\EGrocery\\Fullfillment\\",
 				"D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\Trips\\",
 				"D:\\Thiel\\Programme\\WVModell\\WV_Modell_KIT_H\\Vehicles\\",
@@ -131,8 +131,8 @@ public class AssignService {
 		assignData.initializeActCandidateMap();
 
 		assignData.findCandidates();
-		assignData.addCustomServices();
-		// assignData.manipulatePopulationAndCreateServices();
+		//assignData.addCustomServices();
+		assignData.manipulatePopulationAndCreateServices();
 		assignData.writeCustomerDemand();
 		assignData.writePopulation();
 		assignData.companyGenerator.writeCarriers();
@@ -245,10 +245,15 @@ public class AssignService {
 					// if (actAttr == null) {
 					String commercialJobString = (finalJob.carrierId.toString() + ";" + "1" + ";" + finalJob.startTime
 							+ ";" + finalJob.endTime + ";" + finalJob.serviceDuration);
-
+					
+					
+					//if(finalJob.carrierId.toString().contains("Q")) {
 					this.scenario.getPopulation().getPersons().get(finalJob.personid).getSelectedPlan()
 							.getPlanElements().get(finalJob.planIdx).getAttributes()
 							.putAttribute(finalJob.jobId, commercialJobString);
+					//}
+					
+					
 					// } else {
 					// String prevJobId = actAttr.toString();
 					// this.scenario.getPopulation().getPersons().get(finalJob.personid).getSelectedPlan()
@@ -262,7 +267,8 @@ public class AssignService {
 					this.jobIdCounter.increment();
 					foundCounter.increment();
 
-				} else
+				} 
+			else
 
 					noFoundCounter.increment();
 			}
@@ -371,15 +377,15 @@ public class AssignService {
 
 			Activity activity = (Activity) plan.getPlanElements().get(peIdx);
 
-			Object actAttr = activity.getAttributes().getAttribute("jobId");
+			//Object actAttr = activity.getAttributes().getAttribute("jobId");
 
-			if (actAttr != null) {
+			//if (actAttr != null) {
 
 				int servicesPerAct = activity.getAttributes().size();
 
 				if (servicesPerAct >= maxServicesPerAct) {
 					continue;
-				}
+			//	}
 
 			}
 
@@ -408,7 +414,7 @@ public class AssignService {
 			actEndTime = activity.getEndTime();
 
 			if (actEndTime == Double.NEGATIVE_INFINITY) {
-				actEndTime = 20 * 3600.0;
+				actEndTime = actStartTime + activity.getMaximumDuration();
 			}
 
 			if (actStartTime != Double.NaN && actEndTime != Double.NaN) {

@@ -1,6 +1,7 @@
 package commercialtraffic.vwUserCode.companyGeneration;
 
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -14,6 +15,7 @@ import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.CarrierVehicleType;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -32,7 +34,10 @@ public class CommericalCompany {
 	int totalFleetSize;
 	int fleetIterator = 0;
 	Id<Link> companyLinkId;
-
+	long nr = 1896;
+	Random r = MatsimRandom.getRandom();
+	
+	
 	CommericalCompany(String companyId, Double openingTime, Double closingTime, double serviceDuration,
 			String serviceType, Id<Link> companyLinkId) {
 		// A company is also the carrier
@@ -44,7 +49,13 @@ public class CommericalCompany {
 		this.serviceType = serviceType;
 		this.companyLinkId = companyLinkId;
 		this.carrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.FINITE);
+		if (serviceType.contains("H1")) {
+		this.carrier.getCarrierCapabilities().setFleetSize(CarrierCapabilities.FleetSize.INFINITE);
+		}
 		this.carrier.getAttributes().putAttribute("carrierMode", "car");
+		if (serviceType.contains("Q") && r.nextDouble()<= 0.3 ) {
+			this.carrier.getAttributes().putAttribute("carrierMode", "drt");
+		}		
 		if (serviceType.contains("KEP")||serviceType.contains("H1")){
 			this.carrier.getAttributes().putAttribute("jspritIterations", 150);
 		}
@@ -52,6 +63,7 @@ public class CommericalCompany {
 			this.carrier.getAttributes().putAttribute("jspritIterations", 15);
 		}		
 		this.carrier.getAttributes().putAttribute(CommercialJobUtils.CARRIER_MARKET_ATTRIBUTE_NAME, serviceType);
+		r.setSeed(nr);
 
 	}
 

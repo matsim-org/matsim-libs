@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.Map.Entry;
 
@@ -19,18 +20,15 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.vehicles.MatsimVehicleWriter;
-import org.matsim.vehicles.Vehicles;
-
 import com.opencsv.CSVReader;
 
-import commercialtraffic.vwUserCode.demandAssigment.CommercialTripsReader;
 import commercialtraffic.vwUserCode.demandAssigment.CommercialTrip;
 import ft.utils.ctDemandPrep.Company;
 import ft.utils.ctDemandPrep.Demand4CompanyClass;
@@ -50,6 +48,7 @@ public class CompanyGenerator {
 	String carrierOutputPath;
 	Network network;
 	Network carNetwork;
+
 	// This map contains our companies and their carriers. In this case each company
 	// is its own carrier. String Key = companyId
 	public Map<String, CommericalCompany> commercialCompanyMap = new HashMap<String, CommericalCompany>();
@@ -60,6 +59,8 @@ public class CompanyGenerator {
 	File[] ctTripsFiles;
 	String serviceTimeDistributions;
 	Map<String, Set<Integer>> vehBlackListIds;
+	long nr = 1896;
+	Random r = MatsimRandom.getRandom();
 
 	public CompanyGenerator(String ctVehicleFolder, String csvAddCompanyFolder, String ctTripsFolder,
 			String serviceTimeDistributions, String networkFile, String companyFolder, String zoneSHP,
@@ -85,7 +86,7 @@ public class CompanyGenerator {
 		// CommercialTripsReader tripReader = new CommercialTripsReader(ctTripsFile,
 		// serviceTimeDistributions);
 		// tripReader.run();
-
+		r.setSeed(nr);
 	}
 
 	public static void main(String[] args) {
@@ -278,7 +279,9 @@ public class CompanyGenerator {
 						// Add only not filtered and active new vehicle
 						if ((vehBlackListIds.isEmpty()) || (!vehBlackListIds.get(companyClass).contains(vehicleId))) {
 							if (active) {
-								commericalCompany.addVehicle(companyLinkId, vehicleType, 6.5 * 3600.0, 17.5 * 3600.0);
+								double randomopening= r.nextDouble();
+								double randomclosing= r.nextDouble();
+								commericalCompany.addVehicle(companyLinkId, vehicleType, (6.5+randomopening) * 3600.0, (17.0+randomclosing) * 3600.0);
 							}
 						}
 						commercialCompanyMap.put(companyId, commericalCompany);
@@ -319,11 +322,11 @@ public class CompanyGenerator {
 				// Delete Companies without Services
 			//	continue;
 			//}
-			 if
-			 (commercialCompanyEntry.getValue().carrier.getId().toString().contains("grocery"))
-			 {
+			 //if
+			 //(commercialCompanyEntry.getValue().carrier.getId().toString().contains("Q"))
+			// {
 			carriers.addCarrier(commercialCompanyEntry.getValue().carrier);
-		}
+		//}
 		
 
 		 }
