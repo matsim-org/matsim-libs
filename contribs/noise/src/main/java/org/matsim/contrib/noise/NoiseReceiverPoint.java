@@ -224,11 +224,17 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	}
 
 	void processImmission() {
+		// yy why is it meaningful to not compute them in the getters?  (If the getters are called very often, then precomputing the relatively expensive
+		// log operation makes sense, but the computational speed difference should be documented.).  kai, oct'19
 		lden = 10 * Math.log10(1./24. * aggregatedImmissionTermLden);
 		l69 =  10 * Math.log10(1./3. * aggregatedImmissionTerm69);
 		l1619 =  10 * Math.log10(1./3. * aggregatedImmissionTerm1619);
 	}
 
+	/**
+	 * @return the German L_DEN, where "L" stands for "Laerm" (=noise), and DEN for  DayEveningNight.  It is some weighted average according to the German
+	 * norm.
+	 */
 	public double getLden() {
 		return lden;
 	}

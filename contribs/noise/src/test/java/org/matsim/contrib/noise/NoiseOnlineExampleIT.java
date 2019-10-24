@@ -71,15 +71,15 @@ public class NoiseOnlineExampleIT {
 	@Test
 	public final void testNoiseListener(){
 
-		String configFile = testUtils.getPackageInputDirectory() + "config.xml";
-		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
+		Config config = ConfigUtils.loadConfig( testUtils.getPackageInputDirectory() + "config.xml", new NoiseConfigGroup() );
 		config.controler().setLastIteration(1);
 		config.controler().setOutputDirectory( testUtils.getOutputDirectory() );
 
 		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		noiseParameters.setWriteOutputIteration(1);
-
+		// ---
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+		// ---
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new NoiseModule());
 		controler.addOverridingModule( new AbstractModule(){
