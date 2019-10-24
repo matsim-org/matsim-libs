@@ -102,6 +102,10 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private final static String TO_LINK_REFERENCE = "toLinkReference";
 	private final static String NON_CRIT_LANES = "non_critical_lane";
 	private final static String CRIT_LANES = "critical_lane";
+	//TODO I added this one: sbraun24102019
+	private final static String IS_ORIG_LANE = "isOrigLane";
+
+
 
 	// specify turn restrictions of lanes without turn:lanes information on OSM
 	private final MiddleLaneRestriction MIDDLE_LANE_TYPE = MiddleLaneRestriction.REALISTIC;
@@ -149,10 +153,10 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 //		String outputDir = "../../../shared-svn/studies/countries/de/cottbus-osmSignalsLanes/input/matsim/";
 //		String inputOSM = "../../../shared-svn/studies/tthunig/osmData/brandenburg-latest.osm";
 //		String outputDir = "../../../shared-svn/studies/tthunig/osmData/signalsAndLanesReader/brandenburg/";
-		String inputOSM = "../../../shared-svn/studies/sbraun/osmData/RawOSM/brandenburg.osm";
-		String outputDir = "../../../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/cottbus/";
-//		String inputOSM = "../../../shared-svn/studies/tthunig/osmData/interpreter.osm";
-//		String outputDir = "../../../shared-svn/studies/tthunig/osmData/signalsAndLanesReader/cottbusCity/";
+//		String inputOSM = "C:\\Users\\braun\\Documents\\Uni\\VSP\\shared-svn\\studies\\sbraun\\osmData\\RawOSM/brandenburg.osm";
+//		String outputDir = "../../../../../../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/cottbus/";
+		String inputOSM = "../shared-svn/studies/tthunig/osmData/interpreter.osm";
+		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/";
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84_UTM33N);
 
@@ -193,7 +197,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		 */
 
 		new NetworkCleaner().run(network);
-		new LanesAndSignalsCleaner().run(scenario);
+		//TODO What is this method doing exactly - it doesnt work here - but we need it
+		//new LanesAndSignalsCleaner().run(scenario);
 
 		/*
 		 * Write the files out: network, lanes, signalSystems, signalGroups,
@@ -1418,6 +1423,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 	}
 
+	//TODO I took the method from Nils original reader
+	/*
 	private void simplifyLanesAndAddOrigLane(Link link) {
 		// create 'original' lane, i.e. first lane of the link
 		Lane origLane = lanes.getFactory().createLane(Id.create("Lane" + link.getId() + ".ol", Lane.class));
@@ -1436,15 +1443,19 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				mergeCheck: 
 				for (int indexLane2 = indexLane1+1; indexLane2 <= lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().size(); indexLane2++) {
 					Lane lane2 = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().get(Id.create("Lane" + link.getId() + "." + indexLane2, Lane.class));
-					if (lane1.getToLinkIds().size() == lane2.getToLinkIds().size()) {
-						for (int i = 0; i < lane1.getToLinkIds().size(); i++) {
-							if (!lane1.getToLaneIds().get(i).equals(lane2.getToLinkIds().get(i))) {
-								break mergeCheck; // the lanes have not the same to-links
+					//TODO check if this is sensible. I added the if ToLinkList==null to make it work ---sbraun 20191024
+					if (lane1.getToLinkIds() != null && lane2.getToLinkIds() != null) {
+						if (lane1.getToLinkIds().size() == lane2.getToLinkIds().size()) {
+							for (int i = 0; i < lane1.getToLinkIds().size(); i++) {
+								//if (!lane1.getToLaneIds().get(i).equals(lane2.getToLinkIds().get(i))) { TODO---> makes more sense???
+								if (!lane1.getToLinkIds().get(i).equals(lane2.getToLinkIds().get(i))) {
+									break mergeCheck; // the lanes have not the same to-links
+								}
 							}
+							// lane2 has the same outgoing links as lane1. save it as to be merged
+							lanesToBeRemoved.add(lane2.getId());
+							lane1.setNumberOfRepresentedLanes(lane1.getNumberOfRepresentedLanes() + 1);
 						}
-						// lane2 has the same outgoing links as lane1. save it as to be merged
-						lanesToBeRemoved.add(lane2.getId());
-						lane1.setNumberOfRepresentedLanes(lane1.getNumberOfRepresentedLanes()+1);
 					}
 				}
 			}
@@ -1452,6 +1463,40 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		lanes.getLanesToLinkAssignments().get(link.getId()).addLane(origLane);
 		for (Id<Lane> laneToBeRemoved : lanesToBeRemoved) {
 			lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().remove(laneToBeRemoved);
+		}
+	}
+	*/
+	private void simplifyLanesAndAddOrigLane(Link link) {
+		Lane origLane = lanes.getFactory().createLane(Id.create("Lane" + link.getId() + ".ol", Lane.class));
+		lanes.getLanesToLinkAssignments().get(link.getId()).addLane(origLane);
+		origLane.setCapacityVehiclesPerHour(0);
+		origLane.setStartsAtMeterFromLinkEnd(link.getLength());
+		origLane.setNumberOfRepresentedLanes(link.getNumberOfLanes());
+
+		Lane rightLane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
+				.get(Id.create("Lane" + link.getId() + "." + ((int) link.getNumberOfLanes()), Lane.class));
+		rightLane.getAttributes().putAttribute(IS_ORIG_LANE, false);
+		origLane.addToLaneId(rightLane.getId());
+		origLane.setCapacityVehiclesPerHour(origLane.getCapacityVehiclesPerHour()+rightLane.getCapacityVehiclesPerHour());
+		origLane.getAttributes().putAttribute(IS_ORIG_LANE, true);
+		for (int i = (int) link.getNumberOfLanes() - 1; i > 0; i--) {
+			Lane leftLane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
+					.get(Id.create("Lane" + link.getId() + "." + i, Lane.class));
+			origLane.addToLaneId(leftLane.getId());
+			origLane.setCapacityVehiclesPerHour(origLane.getCapacityVehiclesPerHour()+leftLane.getCapacityVehiclesPerHour());
+			if (rightLane.getToLinkIds().equals(leftLane.getToLinkIds())) {
+				leftLane.setNumberOfRepresentedLanes(
+						leftLane.getNumberOfRepresentedLanes() + rightLane.getNumberOfRepresentedLanes());
+				leftLane.setCapacityVehiclesPerHour(leftLane.getCapacityVehiclesPerHour()+rightLane.getCapacityVehiclesPerHour());
+				// log.info("Put together Lane " +
+				// leftLane.getId().toString() + " and Lane " +
+				// rightLane.getId().toString());
+				LanesToLinkAssignment linkLanes = lanes.getLanesToLinkAssignments().get(link.getId());
+				origLane.getToLaneIds().remove(rightLane.getId());
+				linkLanes.getLanes().remove(rightLane.getId());
+			}
+			rightLane = leftLane;
+			rightLane.getAttributes().putAttribute(IS_ORIG_LANE, false);
 		}
 	}
 
@@ -2159,6 +2204,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		private double east;
 
 		public BoundingBox(double south, double west, double north, double east) {
+			//TODO Check if BB is valid
 			this.south = south;
 			this.west = west;
 			this.north = north;
