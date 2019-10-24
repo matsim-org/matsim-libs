@@ -152,35 +152,9 @@ public class Road extends SimUnit {
 		 * time for entering the road
 		 */
 		if (this.interestedInEnteringRoad.size() > 0) {
-			Vehicle nextVehicle = this.interestedInEnteringRoad.removeFirst();
-			DeadlockPreventionMessage m = this.deadlockPreventionMessages.removeFirst();
-			assert (m.vehicle == nextVehicle);
-			this.scheduler.unschedule(m);
-
-			double nextAvailableTimeForEnteringStreet = Math.max(this.timeOfLastEnteringVehicle
-					+ this.inverseInFlowCapacity, simTime + this.gapTravelTime);
-
-			this.noOfCarsPromisedToEnterRoad++;
-
-			nextVehicle.scheduleEnterRoadMessage(nextAvailableTimeForEnteringStreet, this);
+			processIfInterestedInEnteringRoadTrue(vehicle, simTime);
 		} else {
-			if (this.gap != null) {
-
-				/*
-				 * as long as the road is not full once, there is no need to
-				 * keep track of the gaps
-				 */
-				this.gap.add(simTime + this.gapTravelTime);
-
-				/*
-				 * if no one is interested in entering this road (precondition)
-				 * and there are no cars on the road, then reset gap (this is
-				 * required, for enterRequest to function properly)
-				 */
-				if (this.carsOnTheRoad.size() == 0) {
-					this.gap = null;
-				}
-			}
+			processIfInterestedInEnteringRoadFalse(vehicle, simTime);
 		}
 
 		/*
@@ -193,7 +167,41 @@ public class Road extends SimUnit {
 					this.timeOfLastLeavingVehicle + this.inverseOutFlowCapacity);
 			nextVehicle.scheduleEndRoadMessage(nextAvailableTimeForLeavingStreet, this);
 		}
+	}
 
+	public void processIfInterestedInEnteringRoadTrue(Vehicle vehicle, double simTime){
+		Vehicle nextVehicle = this.interestedInEnteringRoad.removeFirst();
+		DeadlockPreventionMessage m = this.deadlockPreventionMessages.removeFirst();
+		assert (m.vehicle == nextVehicle);
+		this.scheduler.unschedule(m);
+
+		double nextAvailableTimeForEnteringStreet = Math.max(this.timeOfLastEnteringVehicle
+				+ this.inverseInFlowCapacity, simTime + this.gapTravelTime);
+
+		this.noOfCarsPromisedToEnterRoad++;
+
+		nextVehicle.scheduleEnterRoadMessage(nextAvailableTimeForEnteringStreet, this);
+	}
+
+
+	public void processIfInterestedInEnteringRoadFalse(Vehicle vehicle, double simTime){
+		if (this.gap != null) {
+
+			/*
+			 * as long as the road is not full once, there is no need to
+			 * keep track of the gaps
+			 */
+			this.gap.add(simTime + this.gapTravelTime);
+
+			/*
+			 * if no one is interested in entering this road (precondition)
+			 * and there are no cars on the road, then reset gap (this is
+			 * required, for enterRequest to function properly)
+			 */
+			if (this.carsOnTheRoad.size() == 0) {
+				this.gap = null;
+			}
+		}
 	}
 
 	public void enterRoad(Vehicle vehicle, double simTime) {
@@ -245,68 +253,76 @@ public class Road extends SimUnit {
 
 		// is there any space on the road (including promised entries?)
 		if (this.carsOnTheRoad.size() + this.noOfCarsPromisedToEnterRoad < this.maxNumberOfCarsOnRoad) {
-			/*
-			 * - check, if the gap needs to be considered for entering the road -
-			 * we can find out, the time since when we have a free road for
-			 * entrance for sure:
-			 */
-
-			// the gap queue will only be empty in the beginning
-			double arrivalTimeOfGap = Double.MIN_VALUE;
-			// if the road has been full recently then find out, when the next
-			// gap arrives
-			if ((this.gap != null) && (this.gap.size() > 0)) {
-				arrivalTimeOfGap = this.gap.remove();
-			}
-
-			this.noOfCarsPromisedToEnterRoad++;
-			double nextAvailableTimeForEnteringStreet = Math.max(Math.max(this.timeOfLastEnteringVehicle
-					+ this.inverseInFlowCapacity, simTime), arrivalTimeOfGap);
-
-			this.timeOfLastEnteringVehicle = nextAvailableTimeForEnteringStreet;
-			vehicle.scheduleEnterRoadMessage(nextAvailableTimeForEnteringStreet, this);
+			processSpaceOnRoad(vehicle, simTime);
 		} else {
-			/*
-			 * - if the road was empty then create a new queue else empty the
-			 * old queue As long as the gap is null, the road is not full (and
-			 * there is no reason to keep track of the gaps => see leaveRoad)
-			 * But when the road gets full once, we need to start keeping track
-			 * of the gaps Once the road is empty again, gap is reset to null
-			 * (see leaveRoad).
-			 *
-			 * The gap variable in only needed for the situation, where the
-			 * street has been full recently, but the interestedInEnteringRoad
-			 * is empty and a new car arrives (or a few). So, if the street is
-			 * long, it takes time for the gap to come back.
-			 *
-			 * As long as interestedInEnteringRoad is not empty, newly generated
-			 * gaps get used by the new cars (see leaveRoad)
-			 */
-			if (this.gap == null) {
-				this.gap = new LinkedList<>();
-			} else {
-				this.gap.clear();
-			}
-
-			this.interestedInEnteringRoad.add(vehicle);
-
-			/*
-			 * the first car interested in entering a road has to wait
-			 * 'stuckTime' the car behind has to wait an additional stuckTime
-			 * (this logic was adapted to adhere to the C++ implementation)
-			 */
-			if (this.deadlockPreventionMessages.size() > 0) {
-				this.deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(
-						this.deadlockPreventionMessages.getLast().getMessageArrivalTime()
-								+ config.getSqueezeTime(), this));
-
-			} else {
-				this.deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(simTime
-						+ config.getSqueezeTime(), this));
-			}
-
-			assert (this.interestedInEnteringRoad.size()==this.deadlockPreventionMessages.size()) :this.interestedInEnteringRoad.size() + " - " + this.deadlockPreventionMessages.size();
+			procsessFilledRoad(vehicle, simTime);
 		}
+	}
+
+	public void processSpaceOnRoad(Vehicle vehicle, double simTime){
+		/*
+		 * - check, if the gap needs to be considered for entering the road -
+		 * we can find out, the time since when we have a free road for
+		 * entrance for sure:
+		 */
+
+		// the gap queue will only be empty in the beginning
+		double arrivalTimeOfGap = Double.MIN_VALUE;
+		// if the road has been full recently then find out, when the next
+		// gap arrives
+		if ((this.gap != null) && (this.gap.size() > 0)) {
+			arrivalTimeOfGap = this.gap.remove();
+		}
+
+		this.noOfCarsPromisedToEnterRoad++;
+		double nextAvailableTimeForEnteringStreet = Math.max(Math.max(this.timeOfLastEnteringVehicle
+				+ this.inverseInFlowCapacity, simTime), arrivalTimeOfGap);
+
+		this.timeOfLastEnteringVehicle = nextAvailableTimeForEnteringStreet;
+		vehicle.scheduleEnterRoadMessage(nextAvailableTimeForEnteringStreet, this);
+	}
+
+	public void procsessFilledRoad(Vehicle vehicle, double simTime){
+		/*
+		 * - if the road was empty then create a new queue else empty the
+		 * old queue As long as the gap is null, the road is not full (and
+		 * there is no reason to keep track of the gaps => see leaveRoad)
+		 * But when the road gets full once, we need to start keeping track
+		 * of the gaps Once the road is empty again, gap is reset to null
+		 * (see leaveRoad).
+		 *
+		 * The gap variable in only needed for the situation, where the
+		 * street has been full recently, but the interestedInEnteringRoad
+		 * is empty and a new car arrives (or a few). So, if the street is
+		 * long, it takes time for the gap to come back.
+		 *
+		 * As long as interestedInEnteringRoad is not empty, newly generated
+		 * gaps get used by the new cars (see leaveRoad)
+		 */
+		if (this.gap == null) {
+			this.gap = new LinkedList<>();
+		} else {
+			this.gap.clear();
+		}
+
+		this.interestedInEnteringRoad.add(vehicle);
+
+		/*
+		 * the first car interested in entering a road has to wait
+		 * 'stuckTime' the car behind has to wait an additional stuckTime
+		 * (this logic was adapted to adhere to the C++ implementation)
+		 */
+		if (this.deadlockPreventionMessages.size() > 0) {
+			this.deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(
+					this.deadlockPreventionMessages.getLast().getMessageArrivalTime()
+							+ config.getSqueezeTime(), this));
+
+		} else {
+			this.deadlockPreventionMessages.add(vehicle.scheduleDeadlockPreventionMessage(simTime
+					+ config.getSqueezeTime(), this));
+		}
+
+		assert (this.interestedInEnteringRoad.size()==this.deadlockPreventionMessages.size()) :this.interestedInEnteringRoad.size() + " - " + this.deadlockPreventionMessages.size();
 	}
 
 	public void giveBackPromisedSpaceToRoad() {
@@ -340,4 +356,99 @@ public class Road extends SimUnit {
 		return getAllRoads().get(linkId);
 	}
 
+	public void setLink(Link link) {
+		this.link = link;
+	}
+
+	public LinkedList<Double> getGap() {
+		return gap;
+	}
+
+	public void setGap(LinkedList<Double> gap) {
+		this.gap = gap;
+	}
+
+	public LinkedList<Vehicle> getInterestedInEnteringRoad() {
+		return interestedInEnteringRoad;
+	}
+
+	public void setInterestedInEnteringRoad(LinkedList<Vehicle> interestedInEnteringRoad) {
+		this.interestedInEnteringRoad = interestedInEnteringRoad;
+	}
+
+	public double getTimeOfLastEnteringVehicle() {
+		return timeOfLastEnteringVehicle;
+	}
+
+	public double getTimeOfLastLeavingVehicle() {
+		return timeOfLastLeavingVehicle;
+	}
+
+	public void setTimeOfLastLeavingVehicle(double timeOfLastLeavingVehicle) {
+		this.timeOfLastLeavingVehicle = timeOfLastLeavingVehicle;
+	}
+
+	public double getInverseInFlowCapacity() {
+		return inverseInFlowCapacity;
+	}
+
+	public void setInverseInFlowCapacity(double inverseInFlowCapacity) {
+		this.inverseInFlowCapacity = inverseInFlowCapacity;
+	}
+
+	public double getInverseOutFlowCapacity() {
+		return inverseOutFlowCapacity;
+	}
+
+	public void setInverseOutFlowCapacity(double inverseOutFlowCapacity) {
+		this.inverseOutFlowCapacity = inverseOutFlowCapacity;
+	}
+
+	public int getNoOfCarsPromisedToEnterRoad() {
+		return noOfCarsPromisedToEnterRoad;
+	}
+
+	public void setNoOfCarsPromisedToEnterRoad(int noOfCarsPromisedToEnterRoad) {
+		this.noOfCarsPromisedToEnterRoad = noOfCarsPromisedToEnterRoad;
+	}
+
+	public long getMaxNumberOfCarsOnRoad() {
+		return maxNumberOfCarsOnRoad;
+	}
+
+	public void setMaxNumberOfCarsOnRoad(long maxNumberOfCarsOnRoad) {
+		this.maxNumberOfCarsOnRoad = maxNumberOfCarsOnRoad;
+	}
+
+	public double getGapTravelTime() {
+		return gapTravelTime;
+	}
+
+	public void setGapTravelTime(double gapTravelTime) {
+		this.gapTravelTime = gapTravelTime;
+	}
+
+	public LinkedList<Vehicle> getCarsOnTheRoad() {
+		return carsOnTheRoad;
+	}
+
+	public void setCarsOnTheRoad(LinkedList<Vehicle> carsOnTheRoad) {
+		this.carsOnTheRoad = carsOnTheRoad;
+	}
+
+	public LinkedList<Double> getEarliestDepartureTimeOfCar() {
+		return earliestDepartureTimeOfCar;
+	}
+
+	public void setEarliestDepartureTimeOfCar(LinkedList<Double> earliestDepartureTimeOfCar) {
+		this.earliestDepartureTimeOfCar = earliestDepartureTimeOfCar;
+	}
+
+	public LinkedList<DeadlockPreventionMessage> getDeadlockPreventionMessages() {
+		return deadlockPreventionMessages;
+	}
+
+	public void setDeadlockPreventionMessages(LinkedList<DeadlockPreventionMessage> deadlockPreventionMessages) {
+		this.deadlockPreventionMessages = deadlockPreventionMessages;
+	}
 }
