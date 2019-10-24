@@ -41,6 +41,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.MutableScenario;
@@ -48,6 +49,8 @@ import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.testcases.MatsimTestUtils;
+
+import com.google.inject.Provider;
 
 /**
  * Tests {@link PlansCalcRouteWithTollOrNot} as isolated as possible.
@@ -142,15 +145,24 @@ public class PlansCalcRouteWithTollOrNotTest {
 	}
 
 	private PlansCalcRouteWithTollOrNot testee(final Scenario scenario, final RoadPricingScheme toll) {
-		return Injector.createInjector(
-				scenario.getConfig(),
-				new RoadPricingModuleDefaults(toll),
-				/* FIXME Check/understand why the following is INcorrect, jwj '19. What's the difference? */
-//				RoadPricingUtils.createModule(toll),
+//		return Injector.createInjector(
+//				scenario.getConfig(),
+//				new RoadPricingModuleDefaults(toll),
+//				/* FIXME Check/understand why the following is INcorrect, jwj '19. What's the difference? */
+////				RoadPricingUtils.createModule(toll),
+//				new ScenarioByInstanceModule(scenario),
+//				new ControlerDefaultCoreListenersModule(),
+//				new NewControlerModule())
+//				.getInstance(PlansCalcRouteWithTollOrNot.class);
+		
+		Provider<TripRouter> tripRouterProvider = Injector.createInjector(scenario.getConfig(),
+				new RoadPricingModuleDefaults(toll), 
 				new ScenarioByInstanceModule(scenario),
-				new ControlerDefaultCoreListenersModule(),
-				new NewControlerModule())
-				.getInstance(PlansCalcRouteWithTollOrNot.class);
+				new ControlerDefaultCoreListenersModule(), 
+				new NewControlerModule()).getProvider(TripRouter.class);
+
+			return new PlansCalcRouteWithTollOrNot( toll, tripRouterProvider ) ;
+			// yy might be more plausible to get the full class out of the injector, but that ain't that easy ...  kai, oct'19
 	}
 
 	/**

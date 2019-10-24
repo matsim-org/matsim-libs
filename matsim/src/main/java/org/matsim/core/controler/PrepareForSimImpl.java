@@ -37,6 +37,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.population.algorithms.PersonPrepareForSim;
+import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.Lockable;
@@ -70,11 +71,13 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	private final Provider<TripRouter> tripRouterProvider;
 	private final QSimConfigGroup qSimConfigGroup;
 	private final FacilitiesConfigGroup facilitiesConfigGroup;
+	private final MainModeIdentifier mainModeIdentifier;
 
 	@Inject
 	PrepareForSimImpl(GlobalConfigGroup globalConfigGroup, Scenario scenario, Network network,
 				Population population, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider,
-				QSimConfigGroup qSimConfigGroup, FacilitiesConfigGroup facilitiesConfigGroup) {
+				QSimConfigGroup qSimConfigGroup, FacilitiesConfigGroup facilitiesConfigGroup, 
+				MainModeIdentifier mainModeIdentifier) {
 		this.globalConfigGroup = globalConfigGroup;
 		this.scenario = scenario;
 		this.network = network;
@@ -83,6 +86,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		this.tripRouterProvider = tripRouterProvider;
 		this.qSimConfigGroup = qSimConfigGroup;
 		this.facilitiesConfigGroup = facilitiesConfigGroup;
+		this.mainModeIdentifier = mainModeIdentifier;
 	}
 
 
@@ -151,7 +155,8 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		// At least xy2links is needed here, i.e. earlier than PrepareForMobsimImpl.  It could, however, presumably be separated out
 		// (i.e. we introduce a separate PersonPrepareForMobsim).  kai, jul'18
 		ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(),
-				() -> new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, carOnlyNetwork)
+				() -> new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, 
+						carOnlyNetwork, mainModeIdentifier)
 		);
 		
 		if (scenario instanceof Lockable) {

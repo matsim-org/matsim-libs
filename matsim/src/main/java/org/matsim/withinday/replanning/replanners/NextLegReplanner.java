@@ -65,7 +65,7 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 		// If there is no trip after the activity.
 		if (trip == null) return false;
 		
-		String mainMode = this.tripRouter.getMainModeIdentifier().identifyMainMode(trip.getTripElements());
+		String mainMode = TripStructureUtils.getMainModeIdentifier().identifyMainMode(trip.getTripElements());
 		double departureTime = TripStructureUtils.getDepartureTime(trip);
 		// To replan pt legs, we would need internalInterface of type InternalInterface.class
 		new EditTrips( this.tripRouter, scenario, null ).replanFutureTrip(trip, executedPlan, mainMode, departureTime );

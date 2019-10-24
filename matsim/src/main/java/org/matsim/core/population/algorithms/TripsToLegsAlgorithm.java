@@ -40,7 +40,7 @@ public final class TripsToLegsAlgorithm implements PlanAlgorithm {
 	private final MainModeIdentifier mainModeIdentifier;
 
 	public TripsToLegsAlgorithm(final TripRouter router) {
-		this( router.getMainModeIdentifier() );
+		this( TripStructureUtils.getMainModeIdentifier() );
 	}
 
 

@@ -30,6 +30,7 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -38,12 +39,14 @@ import javax.inject.Provider;
 
 	static final String CAR_WITH_PAYED_AREA_TOLL = "car_with_payed_area_toll";
 	private RoadPricingScheme roadPricingScheme;
-	private Provider<TripRouter> tripRouterFactory;
+//	private Provider<TripRouter> tripRouterProvider;
+	private final PlanRouter planRouter ;
 
 	@Inject
-	PlansCalcRouteWithTollOrNot(RoadPricingScheme roadPricingScheme, Provider<TripRouter> tripRouterFactory) {
+	PlansCalcRouteWithTollOrNot(RoadPricingScheme roadPricingScheme, Provider<TripRouter> tripRouterProvider) {
 		this.roadPricingScheme = roadPricingScheme;
-		this.tripRouterFactory = tripRouterFactory;
+//		this.tripRouterProvider = tripRouterProvider;
+		this.planRouter = new PlanRouter( tripRouterProvider.get() ) ;
 	}
 
 	@Override
@@ -56,16 +59,19 @@ import javax.inject.Provider;
 		// From what I understand, it may be simpler/better to just throw a coin and produce
 		// one of the two options.
 		replaceCarModeWithTolledCarMode(plan);
-		PlanRouter untolledPlanRouter = new PlanRouter(tripRouterFactory.get());
-		untolledPlanRouter.run(plan);
+//		PlanRouter untolledPlanRouter = new PlanRouter(tripRouterProvider.get());
+//		untolledPlanRouter.run(plan);
+		planRouter.run( plan );
 		double areaToll = roadPricingScheme.getTypicalCosts().iterator().next().amount;
 		double routeCostWithAreaToll = sumNetworkModeCosts(plan) + areaToll;
 		replaceTolledCarModeWithCarMode(plan);
-		new PlanRouter(tripRouterFactory.get()).run(plan);
+//		new PlanRouter(tripRouterProvider.get()).run(plan);
+		planRouter.run( plan );
 		double routeCostWithoutAreaToll = sumNetworkModeCosts(plan);
 		if (routeCostWithAreaToll < routeCostWithoutAreaToll) {
 			replaceCarModeWithTolledCarMode(plan);
-			untolledPlanRouter.run(plan);
+//			untolledPlanRouter.run(plan);
+			planRouter.run( plan );
 		}
 	}
 
@@ -73,20 +79,25 @@ import javax.inject.Provider;
 		for (PlanElement planElement : plan.getPlanElements()) {
 			if (planElement instanceof Leg) {
 				if (((Leg) planElement).getMode().equals(TransportMode.car)) {
-					((Leg) planElement).setMode(CAR_WITH_PAYED_AREA_TOLL);
+//					((Leg) planElement).setMode(CAR_WITH_PAYED_AREA_TOLL);
+					TripStructureUtils.setRoutingMode( (Leg)planElement , CAR_WITH_PAYED_AREA_TOLL );
 				}
 			}
 		}
+//		throw new RuntimeException( "the above is not consistent with routing mode." ) ;
 	}
 
 	private void replaceTolledCarModeWithCarMode(Plan plan) {
 		for (PlanElement planElement : plan.getPlanElements()) {
 			if (planElement instanceof Leg) {
-				if (((Leg) planElement).getMode().equals(CAR_WITH_PAYED_AREA_TOLL)) {
-					((Leg) planElement).setMode("car");
+//				if (((Leg) planElement).getMode().equals(CAR_WITH_PAYED_AREA_TOLL)) {
+				if (((Leg) planElement).getMode().equals( TransportMode.car )) {
+//					((Leg) planElement).setMode("car");
+					TripStructureUtils.setRoutingMode( (Leg)planElement , TransportMode.car );
 				}
 			}
 		}
+//		throw new RuntimeException( "the above is not consistent with routing mode." ) ;
 	}
 
 	private double sumNetworkModeCosts(Plan plan) {

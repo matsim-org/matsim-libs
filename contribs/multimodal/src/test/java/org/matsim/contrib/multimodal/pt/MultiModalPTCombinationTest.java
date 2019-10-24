@@ -67,7 +67,7 @@ public class MultiModalPTCombinationTest {
 	 * - Multi-modal simulation can handle TransitAgents (previously, the TransitAgent class did not implement
 	 *   the HasPerson interface. As a result, the multi-modal simulation crashed since it could not access
 	 *   the person).
-	 * - Multi-modal simulaition can handle transit_walk legs (not yet ready...).
+	 * - Multi-modal simulation can handle transit_walk legs (not yet ready...).
 	 */
 	@Test
 	public void testMultiModalPtCombination() {
@@ -102,13 +102,9 @@ public class MultiModalPTCombinationTest {
 		// set default walk speed; according to Weidmann 1.34 [m/s]
 		double defaultWalkSpeed = 1.34;
 		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.walk, defaultWalkSpeed);
-//		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.transit_walk, defaultWalkSpeed);
 		final PlansCalcRouteConfigGroup.ModeRoutingParams pt = new PlansCalcRouteConfigGroup.ModeRoutingParams( TransportMode.pt );
 		pt.setTeleportedModeFreespeedFactor( 2.0 );
 		config.plansCalcRoute().addParameterSet( pt );
-
-//		config.plansCalcRoute().setNetworkModes(CollectionUtils.stringToSet(TransportMode.car + "," + TransportMode.walk +
-//				"," + TransportMode.transit_walk));
 
         config.travelTimeCalculator().setFilterModes(true);
 
@@ -130,13 +126,13 @@ public class MultiModalPTCombinationTest {
 		 * "home-transit_walk-pt_interact-pt-pt_interact-transit_walk-home"
 		 */
 		Plan ptPlan = ptPerson.getSelectedPlan();
-		Assert.assertEquals(7, ptPlan.getPlanElements().size());
+		Assert.assertEquals(ptPlan.getPlanElements().toString(), 7, ptPlan.getPlanElements().size());
 
 		Plan walkPlan = walkPerson.getSelectedPlan();
 		if ( config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
-			Assert.assertEquals(7, walkPlan.getPlanElements().size());
+			Assert.assertEquals(walkPlan.getPlanElements().toString(), 7, walkPlan.getPlanElements().size());
 		} else {
-			Assert.assertEquals(3, walkPlan.getPlanElements().size());
+			Assert.assertEquals(walkPlan.getPlanElements().toString(), 3, walkPlan.getPlanElements().size());
 		}
 		
 		/*

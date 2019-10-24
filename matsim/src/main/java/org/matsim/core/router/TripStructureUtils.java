@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -49,6 +50,7 @@ import org.matsim.core.gbl.Gbl;
  * @author thibautd
  */
 public class TripStructureUtils {
+	private static final Logger log = Logger.getLogger(TripStructureUtils.class);
 	
 	public enum StageActivityHandling { StagesAsNormalActivities, ExcludeStageActivities };
 
@@ -551,6 +553,35 @@ public class TripStructureUtils {
 		return null ;
 	}
 
+	public static String getRoutingMode(Leg leg) {
+		return (String) leg.getAttributes().getAttribute("routingMode");
+	}
+
+	public static void setRoutingMode(Leg leg, String mode) {
+		leg.getAttributes().putAttribute("routingMode", mode);
+	}
+
+	public static MainModeIdentifier getMainModeIdentifier() {
+		return new MainModeIdentifier() {
+			@Override
+			public String identifyMainMode(List<? extends PlanElement> tripElements) {
+				return TripStructureUtils.identifyMainMode(tripElements);
+			}
+		};
+	}
+
+	public static String identifyMainMode( final List<? extends PlanElement> tripElements) {
+		// first try the routing mode:
+		String mode = TripStructureUtils.getRoutingMode(((Leg) tripElements.get( 0 )));
+		// else see if trip has only one leg, if so, use that mode (situation after initial demand generation)
+		if ( mode == null && tripElements.size()==1 ) {
+			mode = ((Leg) tripElements.get(0)).getMode() ;
+		}
+		if (mode == null) {
+			log.error("Could not find routing mode for trip " + tripElements);
+		}
+		return mode;
+	}
 
 }
 
