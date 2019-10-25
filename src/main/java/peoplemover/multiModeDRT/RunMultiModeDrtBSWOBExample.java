@@ -20,6 +20,7 @@
 
 package peoplemover.multiModeDRT;
 
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -33,8 +34,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 
 /**
  * @author michal.mac
@@ -51,7 +50,7 @@ public class RunMultiModeDrtBSWOBExample {
 		config.controler().setOutputDirectory(INPUTDIR + "../output/" + runId);
 
 		MultiModeDrtConfigGroup multiModeDrtCfg = MultiModeDrtConfigGroup.get(config);
-		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtCfg, config.planCalcScore(),config.plansCalcRoute());
+		DrtConfigs.adjustMultiModeDrtConfig(multiModeDrtCfg, config.planCalcScore());
 
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
 		ScenarioUtils.loadScenario(scenario);

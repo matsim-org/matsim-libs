@@ -54,7 +54,7 @@ class RunCommercialTrafficUsingDRTExample {
 
         loadConfigGroups(inputDir, config);
         prepareConfig(inputDir, config);
-        DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.planCalcScore(), config.plansCalcRoute());
+        DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.planCalcScore());
 
         Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
         ScenarioUtils.loadScenario(scenario);

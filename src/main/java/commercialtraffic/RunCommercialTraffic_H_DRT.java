@@ -21,9 +21,9 @@ package commercialtraffic;/*
 							* created by jbischoff, 03.05.2019
 							*/
 
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import commercialtraffic.commercialJob.CommercialTrafficConfigGroup;
 import commercialtraffic.commercialJob.CommercialTrafficModule;
-import commercialtraffic.commercialJob.ChangeCommercialJobOperator;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -41,23 +41,15 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
-import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
-import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
-
-import static org.matsim.core.config.ConfigUtils.createConfig;
-import static org.matsim.core.scenario.ScenarioUtils.loadScenario;
 
 public class RunCommercialTraffic_H_DRT {
 	public static void main(String[] args) {
@@ -198,8 +190,7 @@ public class RunCommercialTraffic_H_DRT {
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
 		ScenarioUtils.loadScenario(scenario);
 
-		DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.planCalcScore(),
-				config.plansCalcRoute());
+		DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.planCalcScore());
 		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
 		adjustPtNetworkCapacity(scenario.getNetwork(), config.qsim().getFlowCapFactor());
 
