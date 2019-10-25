@@ -71,11 +71,6 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	private double aggregatedImmissionTerm69 = 0;
 	private double aggregatedImmissionTerm1619 = 0;
 
-	private double lden = Double.NaN;
-	private double l69 = Double.NaN;
-	private double l1619 = Double.NaN;
-
-
 	Map<Id<Person>, List<PersonActivityInfo>> getPersonId2actInfos() {
 		if(personId2actInfos == null) {
 			personId2actInfos = new HashMap<>(4);
@@ -149,10 +144,10 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 			double adjustedImmision = currentImmission;
 
 			if (time > 19 * 3600. && time <= 23 * 3600.) {
-				adjustedImmision = currentImmission + 5;
+				adjustedImmision += 5;
 			} else if ((time > 23 * 3600. && time <= 24 * 3600.)
 					|| (time > 0 * 3600. && time <= 7 * 3600.)) {
-				adjustedImmision = currentImmission + 10;
+				adjustedImmision += 10;
 			}
 
 			aggregatedImmissionTermLden += Math.pow(10, adjustedImmision / 10.);
@@ -207,9 +202,6 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	void reset() {
 		resetTimeInterval();
 		this.personId2actInfos = null;
-		lden = Double.NaN;
-		l69 = Double.NaN;
-		l1619 = Double.NaN;
 		aggregatedImmissionTermLden = 0;
 		aggregatedImmissionTerm69 = 0;
 		aggregatedImmissionTerm1619 = 0;
@@ -223,28 +215,20 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 		this.setDamageCostsPerAffectedAgentUnit(0.);
 	}
 
-	void processImmission() {
-		// yy why is it meaningful to not compute them in the getters?  (If the getters are called very often, then precomputing the relatively expensive
-		// log operation makes sense, but the computational speed difference should be documented.).  kai, oct'19
-		lden = 10 * Math.log10(1./24. * aggregatedImmissionTermLden);
-		l69 =  10 * Math.log10(1./3. * aggregatedImmissionTerm69);
-		l1619 =  10 * Math.log10(1./3. * aggregatedImmissionTerm1619);
-	}
-
 	/**
 	 * @return the German L_DEN, where "L" stands for "Laerm" (=noise), and DEN for  DayEveningNight.  It is some weighted average according to the German
 	 * norm.
 	 */
 	public double getLden() {
-		return lden;
+		return 10 * Math.log10(1./24. * aggregatedImmissionTermLden);
 	}
 
 	public double getL69() {
-		return l69;
+		return 10 * Math.log10(1./3. * aggregatedImmissionTerm69);
 	}
 
 	public double getL1619() {
-		return l1619;
+		return 10 * Math.log10(1./3. * aggregatedImmissionTerm1619);
 	}
 
 	void setInitialized() {

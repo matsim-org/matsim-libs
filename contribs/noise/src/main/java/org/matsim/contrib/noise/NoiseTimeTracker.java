@@ -980,10 +980,4 @@ class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEnters
 			}
 		}
 	}
-
-	void processImmissions() {
-		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
-			rp.processImmission();
-		}
-	}
 }

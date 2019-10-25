@@ -126,7 +126,6 @@ public class NoiseOfflineCalculation{
 		log.info("Reading events file... Done.");
 
 		timeTracker.computeFinalTimeIntervals();
-		timeTracker.processImmissions();
 
 		if (noiseContext.getNoiseParams().isThrowNoiseEventsAffected() || noiseContext.getNoiseParams().isThrowNoiseEventsCaused()) {
 			eventWriter.closeFile();
