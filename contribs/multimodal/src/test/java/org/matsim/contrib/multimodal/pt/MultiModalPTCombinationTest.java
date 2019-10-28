@@ -213,7 +213,7 @@ public class MultiModalPTCombinationTest {
 		@Override
 		public void handleEvent(PersonArrivalEvent event) {
 			String mode = this.modes.remove(event.getPersonId());
-			if ( mode.contains(TransportMode.access_walk) || mode.contains(TransportMode.egress_walk) ) {
+			if ( mode.contains(TransportMode.non_network_walk ) || mode.contains(TransportMode.non_network_walk ) ) {
 				return ;
 			}
 			

@@ -34,6 +34,8 @@ import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.DefaultVehicleHandler;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicle_handler.VehicleHandler;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.lanes.VisLaneModelBuilder;
@@ -59,6 +61,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		private final NetsimEngineContext context;
 		private LaneFactory laneFactory;
 		private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
+		private VehicleHandler vehicleHandler = new DefaultVehicleHandler();
 		
 		Builder(NetsimEngineContext context, NetsimInternalInterface netsimEngine2) {
 			this.context = context ;
@@ -71,11 +74,16 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		public void setLinkSpeedCalculator(LinkSpeedCalculator linkSpeedCalculator) {
 			this.linkSpeedCalculator = linkSpeedCalculator;
 		}
+		
+		public void setVehicleHandler(VehicleHandler vehicleHandler) {
+			this.vehicleHandler = vehicleHandler;
+		}
+		
 		QLinkImpl build( Link link, QNodeI toNode ) {
 			if ( laneFactory == null ) {
 				laneFactory = new QueueWithBuffer.Builder( context ) ;
 			}
-			return new QLinkImpl( link, toNode, laneFactory, context, netsimEngine, linkSpeedCalculator) ;
+			return new QLinkImpl( link, toNode, laneFactory, context, netsimEngine, linkSpeedCalculator, vehicleHandler) ;
 		}
 	}
 
@@ -97,8 +105,8 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	private NetsimEngineContext context;
 	
 	private QLinkImpl(final Link link2, final QNodeI toNode, final LaneFactory roadFactory, NetsimEngineContext context,
-					  NetsimInternalInterface netsimEngine, LinkSpeedCalculator linkSpeedCalculator) {
-		super(link2, toNode, context, netsimEngine, linkSpeedCalculator) ;
+					  NetsimInternalInterface netsimEngine, LinkSpeedCalculator linkSpeedCalculator, VehicleHandler vehicleHandler) {
+		super(link2, toNode, context, netsimEngine, linkSpeedCalculator, vehicleHandler) ;
 		this.context = context ;
 		// The next line must must by contract stay within the constructor,
 		// so that the caller can use references to the created roads to wire them together,

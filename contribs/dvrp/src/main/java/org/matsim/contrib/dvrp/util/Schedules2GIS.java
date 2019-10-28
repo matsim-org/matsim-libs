@@ -44,13 +44,13 @@ public class Schedules2GIS {
 	public Schedules2GIS(Iterable<? extends DvrpVehicle> vehicles, String coordSystem) {
 		this.vehicles = vehicles;
 
-		factory = new PolylineFeatureFactory.Builder().//
-				setCrs(MGC.getCRS(coordSystem)).//
-				setName("vrp_route").//
-				addAttribute("VEH_ID", Integer.class).//
-				addAttribute("VEH_NAME", String.class).//
-				addAttribute("ROUTE_ID", Integer.class).//
-				addAttribute("ARC_IDX", Integer.class).//
+		factory = new PolylineFeatureFactory.Builder().
+				setCrs(MGC.getCRS(coordSystem)).
+				setName("vrp_route").
+				addAttribute("VEH_ID", Integer.class).
+				addAttribute("VEH_NAME", String.class).
+				addAttribute("ROUTE_ID", Integer.class).
+				addAttribute("ARC_IDX", Integer.class).
 				create();
 	}
 

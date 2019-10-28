@@ -19,30 +19,39 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.bicycle.BicycleConfigGroup.BicycleScoringType;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.ScoringParameters;
-import org.matsim.core.scoring.functions.ScoringParametersForPerson;
-
-import com.google.inject.Inject;
+import org.matsim.core.scoring.functions.*;
 
 /**
  * @author dziemke
  */
-public class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
-	@Inject ScoringParametersForPerson parameters;
-	
-	@Inject Scenario scenario;
-	@Inject BicycleTravelTime bicycleTravelTime;
-	
-	@Inject EventsManager eventsManager;
+final class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
+	// ok to have this public final when the constructor is package-private/injected: can only used through injection
+
+	@Inject
+	private ScoringParametersForPerson parameters;
+
+	@Inject
+	private Scenario scenario;
+
+	@Inject
+	private EventsManager eventsManager;
+
+	@Inject
+	private BicycleConfigGroup bicycleConfigGroup;
+
+	@Inject
+	private BicycleScoringFunctionFactory() {
+	}
 	
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
@@ -51,9 +60,10 @@ public class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
 		final ScoringParameters params = parameters.getScoringParameters(person);
 		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+		sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring( params ));
 
-		BicycleConfigGroup bicycleConfigGroup = (BicycleConfigGroup) scenario.getConfig().getModule("bicycle");
 		BicycleScoringType bicycleScoringType = bicycleConfigGroup.getBicycleScoringType();
+		
 		if (bicycleScoringType == BicycleScoringType.legBased) {
 			sumScoringFunction.addScoringFunction(new BicycleLegScoring(params, scenario.getNetwork(), scenario.getConfig().transit().getTransitModes(), bicycleConfigGroup));
 		} else if (bicycleScoringType == BicycleScoringType.linkBased) {
@@ -66,21 +76,22 @@ public class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
 			throw new IllegalArgumentException("Bicycle scoring type " + bicycleScoringType + " not known.");
 		}
 
-
 		return sumScoringFunction;
 	}
 
 	
-	private class CarCounter implements MotorizedInteractionEventHandler {
+	private class CarCounter implements BasicEventHandler{
 		private BicycleLinkScoring bicycleLinkScoring;
 
-		public CarCounter(BicycleLinkScoring bicycleLinkScoring) {
+		private CarCounter( BicycleLinkScoring bicycleLinkScoring ) {
 			this.bicycleLinkScoring = bicycleLinkScoring;
 		}
 
 		@Override
-		public void handleEvent(MotorizedInteractionEvent event) {
-			bicycleLinkScoring.handleEvent(event);
+		public void handleEvent( Event event ) {
+			if ( event instanceof MotorizedInteractionEvent ){
+				bicycleLinkScoring.handleEvent(event);
+			}
 		}
 	}
 }

@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.optimizer.Request;
@@ -28,11 +29,11 @@ public class AwaitingPickupStorage {
 	// passenger's request id -> driver's stay task
 	private final Map<Id<Request>, PassengerPickupActivity> awaitingPickups = new HashMap<>();
 
-	public void storeAwaitingPickup(PassengerRequest request, PassengerPickupActivity pickupActivity) {
-		awaitingPickups.put(request.getId(), pickupActivity);
+	public void storeAwaitingPickup(Id<Request> requestId, PassengerPickupActivity pickupActivity) {
+		awaitingPickups.put(requestId, pickupActivity);
 	}
 
-	public PassengerPickupActivity retrieveAwaitingPickup(PassengerRequest request) {
-		return awaitingPickups.remove(request.getId());
+	public PassengerPickupActivity retrieveAwaitingPickup(Id<Request> requestId) {
+		return awaitingPickups.remove(requestId);
 	}
 }

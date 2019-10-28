@@ -1,4 +1,25 @@
-package org.matsim.pt.transitSchedule;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * TransitScheduleReprojectionIOTest.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.pt.transitSchedule;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -44,7 +65,7 @@ public class TransitScheduleReprojectionIOTest {
 
 	@Test
 	public void testInput() {
-		URL transitSchedule = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "transitschedule.xml");
+		URL transitSchedule = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "transitschedule.xml");
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new TransitScheduleReader( originalScenario ).readURL(transitSchedule );
 
@@ -56,7 +77,7 @@ public class TransitScheduleReprojectionIOTest {
 
 	@Test
 	public void testOutput() {
-		URL transitSchedule = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "transitschedule.xml");
+		URL transitSchedule = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "transitschedule.xml");
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new TransitScheduleReader(originalScenario).readURL(transitSchedule );
 

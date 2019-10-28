@@ -52,16 +52,16 @@ public class DrtRequestSubmittedEvent extends PassengerRequestSubmittedEvent {
 	}
 
 	/**
-	 * the estimated traveltime it would take to ride without any detours
+	 * @return estimated travel time it would take to ride without any detours
 	 */
-	public double getUnsharedRideTime() {
+	public final double getUnsharedRideTime() {
 		return unsharedRideTime;
 	}
 
 	/**
-	 * the estimated distance it would take to ride without any detours
+	 * @return estimated distance it would take to ride without any detours
 	 */
-	public double getUnsharedRideDistance() {
+	public final double getUnsharedRideDistance() {
 		return unsharedRideDistance;
 	}
 

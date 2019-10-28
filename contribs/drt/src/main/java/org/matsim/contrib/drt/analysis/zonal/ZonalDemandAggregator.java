@@ -48,7 +48,7 @@ public class ZonalDemandAggregator implements PersonDepartureEventHandler {
 	public ZonalDemandAggregator(EventsManager events, DrtZonalSystem zonalSystem, DrtConfigGroup drtCfg) {
 		this.zonalSystem = zonalSystem;
 		mode = drtCfg.getMode();
-		timeBinSize = drtCfg.getMinCostFlowRebalancing().getInterval();
+		timeBinSize = drtCfg.getMinCostFlowRebalancing().get().getInterval();
 		events.addHandler(this);
 	}
 

@@ -13,6 +13,11 @@
 		<param name="lastIteration" value="0" />
 	</module>
 
+	<module name="households">
+		<param name="inputFile" value="households1.xml"/>
+		<param name="inputHouseholdAttributesFile" value="householdsAttributes.xml"/>
+	</module>
+
 	<module name="planCalcScore">
 		<param name="learningRate" value="1.0" />
 		<param name="BrainExpBeta" value="2.0" />

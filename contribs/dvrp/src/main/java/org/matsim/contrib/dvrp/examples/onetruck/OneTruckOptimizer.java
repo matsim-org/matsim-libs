@@ -30,7 +30,6 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
@@ -47,7 +46,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 /**
  * @author michalm
@@ -64,8 +62,8 @@ final class OneTruckOptimizer implements VrpOptimizer {
 	private static final double DELIVERY_DURATION = 60;
 
 	@Inject
-	public OneTruckOptimizer(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
-			@DvrpMode(TransportMode.truck) Fleet fleet, MobsimTimer timer) {
+	public OneTruckOptimizer(@DvrpMode(TransportMode.truck) Network network, @DvrpMode(TransportMode.truck) Fleet fleet,
+			MobsimTimer timer) {
 		this.timer = timer;
 		travelTime = new FreeSpeedTravelTime();
 		router = new DijkstraFactory().createPathCalculator(network, new TimeAsTravelDisutility(travelTime),
@@ -101,8 +99,8 @@ final class OneTruckOptimizer implements VrpOptimizer {
 		Link fromLink = req.getFromLink();
 		Link toLink = req.getToLink();
 
-		double t0 = schedule.getStatus() == ScheduleStatus.UNPLANNED ? //
-				Math.max(vehicle.getServiceBeginTime(), currentTime) : //
+		double t0 = schedule.getStatus() == ScheduleStatus.UNPLANNED ?
+				Math.max(vehicle.getServiceBeginTime(), currentTime) :
 				Schedules.getLastTask(schedule).getEndTime();
 
 		VrpPathWithTravelData pathToCustomer = VrpPaths.calcAndCreatePath(lastTask.getLink(), fromLink, t0, router,

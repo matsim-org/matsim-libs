@@ -70,10 +70,10 @@ public class TaxiBenchmarkStats
 
 	protected CSVLineBuilder createAndInitLineBuilder() {
 		return new CSVLineBuilder()//
-				.addf("%.1f", passengerWaitTime.getMean())//
-				.addf("%.0f", pc95PassengerWaitTime.getMean())//
-				.addf("%.0f", maxPassengerWaitTime.getMean())//
-				.addf("%.3f", emptyDriveRatio.getMean())//
+				.addf("%.1f", passengerWaitTime.getMean())
+				.addf("%.0f", pc95PassengerWaitTime.getMean())
+				.addf("%.0f", maxPassengerWaitTime.getMean())
+				.addf("%.3f", emptyDriveRatio.getMean())
 				.addf("%.3f", stayRatio.getMean());
 	}
 }

@@ -24,7 +24,6 @@ import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
-
 import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -59,11 +58,7 @@ import org.matsim.core.scenario.ScenarioByConfigModule;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The Controler is responsible for complete simulation runs, including the
@@ -78,31 +73,40 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 	// not sufficient, people should use AbstractController.  kai, jan'13
 
 	public static final String DIRECTORY_ITERS = "ITERS";
-	public static final String FILENAME_CONFIG = "config.xml";
-	public static final String FILENAME_CONFIG_REDUCED = "config_reduced.xml";
-	public static final String FILENAME_NETWORK = "network.xml.gz";
-	public static final String FILENAME_LANES = "lanes.xml.gz";
-	public static final String FILENAME_CHANGE_EVENTS_XML = "change_events.xml.gz";
-	public static final String FILENAME_COUNTS = "counts.xml.gz" ;
-	public static final String FILENAME_POPULATION = "plans.xml.gz";
-	public static final String FILENAME_EXPERIENCED_PLANS = "experienced_plans.xml.gz";
-	public static final String FILENAME_PERSON_ATTRIBUTES = "personAttributes.xml.gz" ;
-	public static final String FILENAME_HOUSEHOLDS = "households.xml.gz";
-	public static final String FILENAME_FACILITIES = "facilities.xml.gz";
-	public static final String FILENAME_EVENTS_XML = "events.xml.gz";
-	public static final String FILENAME_TRANSIT_SCHEDULE = "transitSchedule.xml.gz";
-	public static final String FILENAME_TRANSIT_VEHICLES = "transitVehicles.xml.gz";
-	public static final String FILENAME_VEHICLES = "vehicles.xml.gz";
-	public static final String FILENAME_LINKSTATS = "linkstats.txt.gz";
-	public static final String FILENAME_TRAVELDISTANCESTATS = "traveldistancestats";
-	public static final String OUTPUT_PREFIX = "output_";
+
+	public enum DefaultFiles {
+		config("config.xml"),
+		configReduced("config_reduced.xml"),
+		network("network.xml"),
+		lanes("lanes.xml"),
+		changeEvents("change_events.xml"),
+		counts("counts.xml"),
+		population("plans.xml"),
+		experiencedPlans("experienced_plans.xml"),
+		households("households.xml"),
+		facilities("facilities.xml"),
+		events("events.xml"),
+		transitSchedule("transitSchedule.xml"),
+		transitVehicles("transitVehicles.xml"),
+		vehicles("vehicles.xml"),
+		linkstats("linkstats.txt")
+		;
+
+		final String filename;
+
+		DefaultFiles(String filename) {
+			this.filename = filename;
+		}
+	}
+
+	static final String OUTPUT_PREFIX = "output_";
 
 	public static final String DIVIDER = "###################################################";
-	
+
 	private static final Logger log = Logger.getLogger(Controler.class);
 
 	public static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout(
-			"%d{ISO8601} %5p %C{1}:%L %m%n");
+		  "%d{ISO8601} %5p %C{1}:%L %m%n");
 
 	private final Config config;
 	private Scenario scenario;
@@ -116,14 +120,14 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 	}
 
 	// DefaultControlerModule includes submodules. If you want less than what the Controler does
-    // by default, you can leave ControlerDefaultsModule out, look at what it does,
-    // and only include what you want.
-    private List<AbstractModule> modules = Collections.singletonList(new ControlerDefaultsModule());
+	// by default, you can leave ControlerDefaultsModule out, look at what it does,
+	// and only include what you want.
+	private List<AbstractModule> modules = Collections.singletonList(new ControlerDefaultsModule());
 
 	// The module which is currently defined by the sum of the setXX methods called on this Controler.
-    private AbstractModule overrides = AbstractModule.emptyModule();
-    
-    private List<AbstractQSimModule> overridingQSimModules = new LinkedList<>();
+	private AbstractModule overrides = AbstractModule.emptyModule();
+
+	private List<AbstractQSimModule> overridingQSimModules = new LinkedList<>();
 
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
@@ -188,9 +192,9 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 		this.config.parallelEventHandling().makeLocked();
 		this.scenario = scenario;
 		this.overrides = scenario == null ?
-				new ScenarioByConfigModule() :
-				new ScenarioByInstanceModule(this.scenario);
-		
+						 new ScenarioByConfigModule() :
+						 new ScenarioByInstanceModule(this.scenario);
+
 		this.config.qsim().setLocked();
 		// yy this is awfully ad-hoc.  kai, jul'18
 		// yy should probably come even earlier, before the scenario is generated. kai, jul'18
@@ -210,7 +214,7 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 		// And this happens silently, leading to lots of time and hair lost.
 		// td, nov 16
 		this.injectorCreated = true;
-		
+
 		this.overrides = AbstractModule.override(Collections.singletonList(this.overrides), new AbstractModule() {
 			@Override
 			public void install() {
@@ -224,18 +228,21 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 		config.checkConsistency();
 		config.addConfigConsistencyChecker( new UnmaterializedConfigGroupChecker() );
 
-		this.injector = Injector.createInjector(config, AbstractModule.override(Collections.singleton(new AbstractModule() {
-			@Override
-			public void install() {
-				install(new NewControlerModule());
-				install(new ControlerDefaultCoreListenersModule());
-				for (AbstractModule module : modules) {
-					install(module);
-				}
-				// should not be necessary: created in the controler
-				//install(new ScenarioByInstanceModule(scenario));
-			}
-		}), overrides));
+		final Set<AbstractModule> standardModules = Collections.singleton(
+			  new AbstractModule(){
+				  @Override
+				  public void install(){
+					  install( new NewControlerModule() );
+					  install( new ControlerDefaultCoreListenersModule() );
+					  for( AbstractModule module : modules ){
+						  install( module );
+					  }
+					  // should not be necessary: created in the controler
+					  //install(new ScenarioByInstanceModule(scenario));
+				  }
+			  }
+												  );
+		this.injector = Injector.createInjector( config, AbstractModule.override( standardModules, overrides ) );
 		ControlerI controler = injector.getInstance(ControlerI.class);
 		controler.run();
 	}
@@ -249,28 +256,28 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 	@Override
 	public final TravelTime getLinkTravelTimes() {
 		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelTime>>() {}))
-				.get(TransportMode.car);
+					  .get(TransportMode.car);
 	}
 
-    /**
-     * Gives access to a {@link org.matsim.core.router.TripRouter} instance.
-     * This is a routing service which you can use
-     * to calculate routes, e.g. from your own replanning code or your own within-day replanning
-     * agent code.
-     * You get a Provider (and not an instance directly) because your code may want to later
-     * create more than one instance. A TripRouter is not guaranteed to be thread-safe, so
-     * you must get() an instance for each thread if you plan to write multi-threaded code.
-     *
-     * See {@link org.matsim.core.router.TripRouter} for more information and pointers to examples.
-     */
-    @Override
+	/**
+	 * Gives access to a {@link org.matsim.core.router.TripRouter} instance.
+	 * This is a routing service which you can use
+	 * to calculate routes, e.g. from your own replanning code or your own within-day replanning
+	 * agent code.
+	 * You get a Provider (and not an instance directly) because your code may want to later
+	 * create more than one instance. A TripRouter is not guaranteed to be thread-safe, so
+	 * you must get() an instance for each thread if you plan to write multi-threaded code.
+	 *
+	 * See {@link org.matsim.core.router.TripRouter} for more information and pointers to examples.
+	 */
+	@Override
 	public final Provider<TripRouter> getTripRouterProvider() {
 		return this.injector.getProvider(TripRouter.class);
 	}
-	
+
 	@Override
 	public final TravelDisutility createTravelDisutilityCalculator() {
-        return getTravelDisutilityFactory().createTravelDisutility(this.injector.getInstance(TravelTime.class));
+		return getTravelDisutilityFactory().createTravelDisutility(this.injector.getInstance(TravelTime.class));
 	}
 
 	@Override
@@ -283,12 +290,12 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 		return this.injector.getInstance(ScoringFunctionFactory.class);
 	}
 
-    @Override
+	@Override
 	public final Config getConfig() {
 		return config;
 	}
 
-    @Override
+	@Override
 	public final Scenario getScenario() {
 		if (this.injectorCreated) {
 			Gbl.assertNotNull(this.injector);
@@ -302,9 +309,9 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 			}
 			return this.scenario;
 		}
-    }
+	}
 
-	
+
 	@Override
 	public final EventsManager getEvents() {
 		if (this.injector != null) {
@@ -379,10 +386,10 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 		return this.injector.getInstance(ScoreStats.class);
 	}
 
-    @Override
+	@Override
 	public final TravelDisutilityFactory getTravelDisutilityFactory() {
 		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelDisutilityFactory>>(){}))
-				.get(TransportMode.car);
+					  .get(TransportMode.car);
 	}
 
 	/**
@@ -424,13 +431,13 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 	}
 
 	public final void setScoringFunctionFactory(
-			final ScoringFunctionFactory scoringFunctionFactory) {
-        this.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-            		this.bindScoringFunctionFactory().toInstance(scoringFunctionFactory);
+		  final ScoringFunctionFactory scoringFunctionFactory) {
+		this.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				this.bindScoringFunctionFactory().toInstance(scoringFunctionFactory);
 			}
-        });
+		});
 	}
 
 	public final void setTerminationCriterion(final TerminationCriterion terminationCriterion) {
@@ -442,20 +449,6 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 		});
 	}
 
-	/**
-     * Allows you to set a factory for {@link org.matsim.core.router.TripRouter} instances.
-     * Do this if your use-case requires custom routing logic, for instance if you
-     * implement your own complex travel mode.
-     * See {@link org.matsim.core.router.TripRouter} for more information and pointers to examples.
-     */
-	public final void setTripRouterFactory(final javax.inject.Provider<TripRouter> factory) {
-        this.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-				bind(TripRouter.class).toProvider(factory);
-			}
-        });
-	}
 	@Override
 	public final Controler addOverridingModule( AbstractModule abstractModule ) {
 		if (this.injectorCreated) {
@@ -465,34 +458,38 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 		return this ;
 	}
 
-    public final void setModules(AbstractModule... modules) {
-        if (this.injectorCreated) {
-            throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
-        }
-        this.modules = Arrays.asList(modules);
-    }
+	public final void setModules(AbstractModule... modules) {
+		if (this.injectorCreated) {
+			throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
+		}
+		this.modules = Arrays.asList(modules);
+	}
 
-    @Override
-    public final Controler addOverridingQSimModule( AbstractQSimModule qsimModule ) {
-	    if (this.injectorCreated) {
-		    throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
-	    }
-	    overridingQSimModules.add(qsimModule);
-	    return this ;
-    }
-    @Override
-    public final Controler addQSimModule(AbstractQSimModule qsimModule) {
-    	this.addOverridingModule(new AbstractModule() {
+	@Override
+	public final Controler addOverridingQSimModule( AbstractQSimModule qsimModule ) {
+		if (this.injectorCreated) {
+			throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
+		}
+		overridingQSimModules.add(qsimModule);
+		return this ;
+	}
+	@Override
+	public final Controler addQSimModule(AbstractQSimModule qsimModule) {
+		this.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				installQSimModule(qsimModule);
 			}
 		});
-    	return this ;
-    }
-    @Override
-    public final Controler configureQSimComponents(QSimComponentsConfigurator configurator) {
-    	this.addOverridingModule(new AbstractModule() {
+		return this ;
+	}
+
+    /**
+     * Only use if you know what you are doing, for experts only.
+     */
+	@Override
+	public final Controler configureQSimComponents(QSimComponentsConfigurator configurator) {
+		this.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				QSimComponentsConfig components = new QSimComponentsConfig();
@@ -501,6 +498,6 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 				bind(QSimComponentsConfig.class).toInstance(components);
 			}
 		});
-    	return this ;
-    }
+		return this ;
+	}
 }

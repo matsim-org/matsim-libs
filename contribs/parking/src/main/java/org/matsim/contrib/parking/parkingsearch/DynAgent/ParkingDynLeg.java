@@ -19,8 +19,6 @@
 
 package org.matsim.contrib.parking.parkingsearch.DynAgent;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dynagent.DriverDynLeg;
@@ -32,6 +30,8 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.List;
 
 public class ParkingDynLeg implements DriverDynLeg {
 	protected final NetworkRoute route;
@@ -100,7 +100,7 @@ public class ParkingDynLeg implements DriverDynLeg {
 					}
 				}
 				// need to find the next link
-				Id<Link> nextLinkId = this.logic.getNextLink(currentLinkId, vehicleId);
+				Id<Link> nextLinkId = this.logic.getNextLink(currentLinkId, vehicleId, mode);
 				currentAndNextParkLink = new Tuple<Id<Link>, Id<Link>>(currentLinkId, nextLinkId);
 				return nextLinkId;
 

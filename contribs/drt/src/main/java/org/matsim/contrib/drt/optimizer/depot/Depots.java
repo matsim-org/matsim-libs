@@ -57,9 +57,7 @@ public class Depots {
 
 	public static Link findStraightLineNearestDepot(DvrpVehicle vehicle, Set<Link> links) {
 		Link currentLink = ((DrtStayTask)vehicle.getSchedule().getCurrentTask()).getLink();
-		return links.contains(currentLink)//
-				? null // already at a depot
-				: links.stream()
+		return links.contains(currentLink) ? null /* already at a depot*/ : links.stream()
 						.min(Comparator.comparing(
 								l -> DistanceUtils.calculateSquaredDistance(currentLink.getCoord(), l.getCoord())))
 						.get();

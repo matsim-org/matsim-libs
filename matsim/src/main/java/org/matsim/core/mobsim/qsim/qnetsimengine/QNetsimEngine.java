@@ -472,8 +472,8 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 		int roundRobin = 0;
 		for (QNodeI node : network.getNetsimNodes().values()) {
 			int i = roundRobin % this.numOfRunners;
-			if ( node instanceof QNodeImpl ) {
-				((QNodeImpl) node).setNetElementActivationRegistry(this.engines.get(i));
+			if( node instanceof AbstractQNode){
+				((AbstractQNode) node).setNetElementActivationRegistry(this.engines.get(i));
 			}
 			nodes[i]++;
 

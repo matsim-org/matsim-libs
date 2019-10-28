@@ -32,10 +32,11 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.edrt.schedule.EDrtTask;
-import org.matsim.contrib.ev.data.Battery;
 import org.matsim.contrib.ev.dvrp.ChargingTask;
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
 import org.matsim.contrib.ev.dvrp.tracker.ETaskTracker;
+import org.matsim.contrib.ev.fleet.Battery;
+import org.matsim.core.config.Config;
 
 import com.google.inject.Provider;
 
@@ -105,7 +106,7 @@ public class EDrtVehicleDataEntryFactory implements EntryFactory {
 		private final double minimumRelativeSoc;
 
 		@Inject
-		private DrtConfigGroup drtCfg;
+		private Config config;
 
 		public EDrtVehicleDataEntryFactoryProvider(double minimumRelativeSoc) {
 			this.minimumRelativeSoc = minimumRelativeSoc;
@@ -113,7 +114,7 @@ public class EDrtVehicleDataEntryFactory implements EntryFactory {
 
 		@Override
 		public EDrtVehicleDataEntryFactory get() {
-			return new EDrtVehicleDataEntryFactory(drtCfg, minimumRelativeSoc);
+			return new EDrtVehicleDataEntryFactory(DrtConfigGroup.getSingleModeDrtConfig(config), minimumRelativeSoc);
 		}
 	}
 }

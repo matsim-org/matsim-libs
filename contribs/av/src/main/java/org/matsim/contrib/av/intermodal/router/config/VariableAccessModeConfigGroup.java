@@ -29,7 +29,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  *
  */
 
-public class VariableAccessModeConfigGroup extends ReflectiveConfigGroup {
+public final class VariableAccessModeConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUPNAME = VariableAccessConfigGroup.MODEGROUPNAME;
 

@@ -20,8 +20,8 @@
 package org.matsim.contrib.dynagent.run;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.util.BeanValidationConfigConsistencyChecker;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.consistency.BeanValidationConfigConsistencyChecker;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
 import org.matsim.core.utils.misc.Time;

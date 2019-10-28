@@ -44,7 +44,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.TurnAcceptanceLogic.AcceptTurn;
 /**
  * Represents a node in the QSimulation.
  */
-final class QNodeImpl implements QNodeI {
+final class QNodeImpl extends AbstractQNode {
 	private static final Logger log = Logger.getLogger(QNodeImpl.class);
 	public static class Builder {
 		private final NetsimInternalInterface netsimEngine;
@@ -65,21 +65,6 @@ final class QNodeImpl implements QNodeI {
 	private final QLinkI[] inLinksArrayCache;
 	private final QLinkI[] tempLinks;
 	
-	/*
-	 * This needs to be atomic since this allows us to ensure that an node which is
-	 * already active is not activated again. This could happen if multiple thread call
-	 * activateNode() concurrently.
-	 * cdobler, sep'14
-	 */
-	private final AtomicBoolean active = new AtomicBoolean(false);
-	
-	private final Node node;
-	
-	// necessary if Nodes are (de)activated
-	private NetElementActivationRegistry activator = null;
-	
-	// for Customizable
-	private final Map<String, Object> customAttributes = new HashMap<>();
 	
 	private final Random random;
 	private final NetsimEngineContext context;
@@ -88,11 +73,11 @@ final class QNodeImpl implements QNodeI {
 	private final TurnAcceptanceLogic turnAcceptanceLogic ;
 	
 	private QNodeImpl(final Node n, NetsimEngineContext context, NetsimInternalInterface netsimEngine2, TurnAcceptanceLogic turnAcceptanceLogic) {
-		this.node = n;
+		super(n) ;
 		this.netsimEngine = netsimEngine2 ;
 		this.context = context ;
 		this.turnAcceptanceLogic = turnAcceptanceLogic;
-		int nofInLinks = this.node.getInLinks().size();
+		int nofInLinks = n.getInLinks().size();
 		this.inLinksArrayCache = new QLinkI[nofInLinks];
 		this.tempLinks = new QLinkI[nofInLinks];
 		if (this.context.qsimConfig.getNumberOfThreads() > 1) {
@@ -129,51 +114,7 @@ final class QNodeImpl implements QNodeI {
 			}
 		});
 	}
-	
-	@Override
-	public Node getNode() {
-		return this.node;
-	}
-	
-	/**
-	 * The ParallelQSim replaces the activator with the QSimEngineRunner 
-	 * that handles this node.
-	 */
-	/*package*/ void setNetElementActivationRegistry(NetElementActivationRegistry activator) {
-		// yyyy I cannot say if this needs to be in QNodeI or not.  The mechanics of this are tricky to implement, so it would 
-		// not be a stable/robust API.  kai, jul'17
-		
-		this.activator = activator;
-	}
-	
-	/**
-	 * This method is called from QueueWithBuffer.addToBuffer(...) which is triggered at 
-	 * some placed, but always initially by a QLink's doSomStep(...) method. I.e. QNodes
-	 * are only activated while moveNodes(...) is performed. However, multiple threads
-	 * could try to activate the same node at a time, therefore this has to be thread-safe.
-	 * cdobler, sep'14 
-	 */
-	/*package*/ final void activateNode() {
-		// yyyy I cannot say if this needs to be in QNodeI or not.  The mechanics of this are tricky to implement, so it would 
-		// not be a stable/robust API.  kai, jul'17
-		
-		/*
-		 * this.active.compareAndSet(boolean expected, boolean update)
-		 * We expect the value to be false, i.e. the node is de-activated. If this is
-		 * true, the value is changed to true and the activator is informed.
-		 */
-		if (this.active.compareAndSet(false, true)) {
-			this.activator.registerNodeAsActive(this);
-		}
-	}
-	
-	final boolean isActive() {
-		// yyyy I cannot say if this needs to be in QNodeI or not.  The mechanics of this are tricky to implement, so it would 
-		// not be a stable/robust API.  kai, jul'17
-		
-		return this.active.get();
-	}
-	
+
 	/**
 	 * Moves vehicles from the inlinks' buffer to the outlinks where possible.<br>
 	 * The inLinks are randomly chosen, and for each link all vehicles in the
@@ -206,9 +147,9 @@ final class QNodeImpl implements QNodeI {
 		}
 		
 		if (inLinksCounter == 0) {
-			this.active.set(false);
+			this.setActive(false);
 			return false; // Nothing to do
-		}
+		} 
 		
 		// randomize based on capacity
 		for (int auxCounter = 0; auxCounter < inLinksCounter; auxCounter++) {
@@ -254,7 +195,7 @@ final class QNodeImpl implements QNodeI {
 	private boolean moveVehicleOverNode( final QVehicle veh, QLinkI fromLink, final QLaneI fromLane, final double now ) {
 		Id<Link> nextLinkId = veh.getDriver().chooseNextLinkId();
 		Link currentLink = fromLink.getLink() ;
-
+	
 		AcceptTurn turn = turnAcceptanceLogic.isAcceptingTurn(currentLink, fromLane, nextLinkId, veh, this.netsimEngine.getNetsimNetwork(), now);
 		if ( turn.equals(AcceptTurn.ABORT) ) {
 			moveVehicleFromInlinkToAbort( veh, fromLane, now, currentLink.getId() ) ;
@@ -338,9 +279,5 @@ final class QNodeImpl implements QNodeI {
 		return (now - fromLaneBuffer.getLastMovementTimeOfFirstVehicle()) > stuckTime;
 	}
 	
-	@Override
-	public Map<String, Object> getCustomAttributes() {
-		return customAttributes;
-	}
-	
+
 }

@@ -23,6 +23,8 @@ package org.matsim.api.core.v01.events;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.matsim.core.api.internal.HasPersonId;
+
 public abstract class Event {
 
 	public final static String ATTRIBUTE_TIME = "time";
@@ -38,13 +40,18 @@ public abstract class Event {
 		Map<String, String> attr = new LinkedHashMap<String, String>();
 		attr.put(ATTRIBUTE_TIME, Double.toString(this.time));
 		attr.put(ATTRIBUTE_TYPE, getEventType());
+		if ( this instanceof HasPersonId ) {
+			attr.put( HasPersonId.ATTRIBUTE_PERSON, ((HasPersonId) this).getPersonId().toString() ) ;
+			// many derived types do this by themselves, for historical reasons.  Since the information is put into a map, it still exists only once under that key.  kai,
+			// mar'19
+		}
 		return attr;
 	}
 
 	/** @return a unique, descriptive name for this event type, used to identify event types in files. */
 	abstract public String getEventType();
 
-	public double getTime() {
+	public final double getTime() {
 		return this.time;
 	}
 	
@@ -67,7 +74,7 @@ public abstract class Event {
 			return false;
 		} else {
 			Event other = (Event) obj;
-			return time == other.getTime() &&
+			return time == other.time &&
 					getEventType().equals(other.getEventType()) &&
 					getAttributes().equals(other.getAttributes());
 		}
@@ -77,7 +84,6 @@ public abstract class Event {
 	public int hashCode() {
 		return getAttributes().hashCode(); // Two equal events must at least have the same attributes, so they will get the same hashCode like this.
 	}
-
 }
 
 

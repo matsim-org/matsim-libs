@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -55,12 +56,14 @@ public class StrategyManagerSubpopulationsTest {
 			case 0:
 				break; // "default" population
 			case 1:
-				population.getPersonAttributes().putAttribute(
-						p.getId().toString(), SUBPOP_ATT_NAME, POP_NAME_1);
+//				population.getPersonAttributes().putAttribute(
+//						p.getId().toString(), SUBPOP_ATT_NAME, POP_NAME_1);
+				PopulationUtils.putPersonAttribute( p, SUBPOP_ATT_NAME, POP_NAME_1 );
 				break;
 			case 2:
-				population.getPersonAttributes().putAttribute(
-						p.getId().toString(), SUBPOP_ATT_NAME, POP_NAME_2);
+//				population.getPersonAttributes().putAttribute(
+//						p.getId().toString(), SUBPOP_ATT_NAME, POP_NAME_2);
+				PopulationUtils.putPersonAttribute( p, SUBPOP_ATT_NAME, POP_NAME_2 );
 				break;
 			default:
 				throw new RuntimeException(group + " ???");
@@ -73,11 +76,11 @@ public class StrategyManagerSubpopulationsTest {
 					@Override
 					public void run(HasPlansAndId<Plan, Person> person) {
 						counter.incCounter();
+						Person person1 = population.getPersons().get( person.getId() ) ;
+						Gbl.assertNotNull( person1 );
 						Assert.assertNull(
 							"unexpected subpopulation",
-							population.getPersonAttributes().getAttribute(
-								person.getId().toString(),
-								SUBPOP_ATT_NAME) );
+							  PopulationUtils.getPersonAttribute( person1, SUBPOP_ATT_NAME) );
 
 					}
 
@@ -93,12 +96,12 @@ public class StrategyManagerSubpopulationsTest {
 					@Override
 					public void run(HasPlansAndId<Plan, Person> person) {
 						counter.incCounter();
+						Person person1 = population.getPersons().get( person.getId() ) ;
+						Gbl.assertNotNull( person1 );
 						Assert.assertEquals(
 							"unexpected subpopulation",
 							POP_NAME_1,
-							population.getPersonAttributes().getAttribute(
-								person.getId().toString(),
-								SUBPOP_ATT_NAME) );
+							  PopulationUtils.getPersonAttribute( person1, SUBPOP_ATT_NAME) );
 					}
 
 					@Override
@@ -113,12 +116,12 @@ public class StrategyManagerSubpopulationsTest {
 					@Override
 					public void run(HasPlansAndId<Plan, Person> person) {
 						counter.incCounter();
+						Person person1 = population.getPersons().get( person.getId() ) ;
+						Gbl.assertNotNull( person1 );
 						Assert.assertEquals(
 							"unexpected subpopulation",
 							POP_NAME_2,
-							population.getPersonAttributes().getAttribute(
-								person.getId().toString(),
-								SUBPOP_ATT_NAME) );
+							  PopulationUtils.getPersonAttribute( person1, SUBPOP_ATT_NAME) );
 					}
 
 					@Override

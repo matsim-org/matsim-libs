@@ -20,12 +20,11 @@
 
 package org.matsim.contrib.drt.run;
 
+import com.google.inject.Inject;
 import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
 import org.matsim.contrib.drt.routing.MultiModeDrtMainModeIdentifier;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.MainModeIdentifier;
-
-import com.google.inject.Inject;
 
 /**
  * @author jbischoff

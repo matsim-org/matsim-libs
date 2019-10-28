@@ -19,6 +19,9 @@ release:
 matsim-quick:
 	cd matsim ; mvn clean install ${QUICK}
 
+quick:
+	mvn clean install ${QUICK}
+
 
 #	cd matsim ; mvn clean ; mvn install -DskipTests=true 
 ##	cd contribs ; mvn clean ; mvn install --fail-at-end -DskipTests=true

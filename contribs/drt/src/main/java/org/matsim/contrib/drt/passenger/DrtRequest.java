@@ -37,8 +37,6 @@ public class DrtRequest implements PassengerRequest {
 	private final double latestStartTime;
 	private final double latestArrivalTime;
 
-	private boolean rejected = false;
-
 	private final Id<Person> passengerId;
 	private final String mode;
 
@@ -83,16 +81,6 @@ public class DrtRequest implements PassengerRequest {
 
 	public double getLatestArrivalTime() {
 		return latestArrivalTime;
-	}
-
-	@Override
-	public boolean isRejected() {
-		return rejected;
-	}
-
-	@Override
-	public void setRejected(boolean rejected) {
-		this.rejected = rejected;
 	}
 
 	@Override

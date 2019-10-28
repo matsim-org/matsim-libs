@@ -1,4 +1,25 @@
-package org.matsim.withinday.utils;
+
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * EditPlans.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+ package org.matsim.withinday.utils;
 
 import java.util.List;
 
@@ -15,6 +36,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
+import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -70,8 +92,8 @@ public final class EditPlans {
 
 		checkIfNotInPastOrCurrent(agent, index);
 
-		final Trip tripBefore = TripStructureUtils.findTripEndingAtActivity( (Activity) planElements.get(index),plan,tripRouter.getStageActivityTypes() );
-		final Trip tripAfter = TripStructureUtils.findTripStartingAtActivity( (Activity)planElements.get(index),plan,tripRouter.getStageActivityTypes() );
+		final Trip tripBefore = TripStructureUtils.findTripEndingAtActivity( (Activity) planElements.get(index),plan );
+		final Trip tripAfter = TripStructureUtils.findTripStartingAtActivity( (Activity)planElements.get(index),plan );
 		if ( mode==null ) {
 			final String mainModeBefore = tripRouter.getMainModeIdentifier().identifyMainMode( tripBefore.getTripElements() );
 			final String mainModeAfter = tripRouter.getMainModeIdentifier().identifyMainMode( tripAfter.getTripElements() );
@@ -125,7 +147,7 @@ public final class EditPlans {
 
 		// trip before (if any):
 		if ( index > 0 ) {
-			Trip tripBeforeAct = TripStructureUtils.findTripEndingAtActivity(newAct,plan,tripRouter.getStageActivityTypes());
+			Trip tripBeforeAct = TripStructureUtils.findTripEndingAtActivity( newAct,plan );
 			Gbl.assertNotNull( tripBeforeAct );  // there could also just be a sequence of activities?!
 
 			final List<PlanElement> currentTripElements = tripBeforeAct.getTripElements();
@@ -145,7 +167,7 @@ public final class EditPlans {
 		}
 		// trip after (if any):
 		if ( index < planElements.size()-1 ) {
-			Trip tripAfterAct = TripStructureUtils.findTripStartingAtActivity(origAct,plan,tripRouter.getStageActivityTypes());
+			Trip tripAfterAct = TripStructureUtils.findTripStartingAtActivity(origAct,plan);
 			Gbl.assertIf( tripAfterAct!=null ); // there could also just be a sequence of activities?!
 			if ( downstreamMode==null ) {
 				final String currentMainMode = this.tripRouter.getMainModeIdentifier().identifyMainMode( tripAfterAct.getTripElements() );
@@ -211,7 +233,7 @@ public final class EditPlans {
 
 	// === internal utility methods: ===
 	private void checkIfNotStageActivity(Activity origAct) {
-		if( this.tripRouter.getStageActivityTypes().isStageActivity(origAct.getType()) ){
+		if( StageActivityTypeIdentifier.isStageActivity(origAct.getType()) ){
 			throw new ReplanningException("trying to replace a helper activity (stage activity) by a real activity; this is not possible") ;
 		}
 	}
@@ -254,7 +276,7 @@ public final class EditPlans {
 		for ( int ii=planElements.size()-1 ; ii>index; ii-- ) {
 			if ( planElements.get(ii) instanceof Activity ) {
 				Activity act = (Activity) planElements.get(ii) ;
-				if ( !this.tripRouter.getStageActivityTypes().isStageActivity( act.getType() ) ) {
+				if ( !StageActivityTypeIdentifier.isStageActivity( act.getType() ) ) {
 					theIndex = ii ;
 				}
 			}
@@ -269,7 +291,7 @@ public final class EditPlans {
 		for ( int ii=0 ; ii<index ; ii++ ) {
 			if ( planElements.get(ii) instanceof Activity ) {
 				Activity act = (Activity) planElements.get(ii) ;
-				if ( !this.tripRouter.getStageActivityTypes().isStageActivity( act.getType() ) ) {
+				if ( !StageActivityTypeIdentifier.isStageActivity( act.getType() ) ) {
 					prevAct = act ;
 				}
 			}
@@ -300,7 +322,7 @@ public final class EditPlans {
 		}
 	}
 	public boolean isRealActivity(PlanElement pe) {
-		return pe instanceof Activity && ! ( tripRouter.getStageActivityTypes().isStageActivity( ((Activity)pe).getType() ) );
+		return pe instanceof Activity && ! ( StageActivityTypeIdentifier.isStageActivity( ((Activity)pe).getType() ) );
 	}
 	
 	public String getModeOfCurrentOrNextTrip(MobsimAgent agent) {

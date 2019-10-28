@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup.Algotype;
-import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
+//import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.contrib.locationchoice.utils.TreesBuilder;
 import org.matsim.core.gbl.Gbl;
@@ -49,7 +49,7 @@ class DestinationChoice extends AbstractMultithreadedModule {
 
 	private final List<PlanAlgorithm>  planAlgoInstances = new Vector<PlanAlgorithm>();
 	private ActivitiesHandler defineFlexibleActivities;
-	private ActTypeConverter actTypeConverter;
+//	private ActTypeConverter actTypeConverter;
 
 	protected TreeMap<String, QuadTree<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTree<ActivityFacility>>();
 
@@ -71,7 +71,7 @@ class DestinationChoice extends AbstractMultithreadedModule {
 		this.defineFlexibleActivities = new ActivitiesHandler((DestinationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
 //		((NetworkImpl) this.scenario.getNetwork()).connect();
 
-		this.actTypeConverter = this.defineFlexibleActivities.getConverter();
+//		this.actTypeConverter = this.defineFlexibleActivities.getConverter();
 		this.initTrees(this.scenario.getActivityFacilities(), (DestinationChoiceConfigGroup) this.scenario.getConfig().getModule("locationchoice"));
 	}
 
@@ -81,7 +81,7 @@ class DestinationChoice extends AbstractMultithreadedModule {
 	private void initTrees(ActivityFacilities facilities, DestinationChoiceConfigGroup config) {
 		log.info("Doing location choice for activities: " + defineFlexibleActivities.getFlexibleTypes().toString());
 		TreesBuilder treesBuilder = new TreesBuilder(defineFlexibleActivities.getFlexibleTypes(), this.scenario.getNetwork(), config);
-		treesBuilder.setActTypeConverter(actTypeConverter);
+//		treesBuilder.setActTypeConverter(actTypeConverter);
 		treesBuilder.createTrees(facilities);
 		this.facilitiesOfType = treesBuilder.getFacilitiesOfType();
 		this.quadTreesOfType = treesBuilder.getQuadTreesOfType();

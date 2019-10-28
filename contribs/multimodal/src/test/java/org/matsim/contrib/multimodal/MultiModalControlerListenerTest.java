@@ -206,7 +206,7 @@ public class MultiModalControlerListenerTest {
 	void runBerlinScenario(int numberOfThreads) {
 
 		String inputDir = this.utils.getClassInputDirectory();
-		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("berlin"), "config.xml"));
+		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("berlin"), "config.xml"));
 		ConfigUtils.loadConfig(config, inputDir + "config_berlin_multimodal.xml");
 		config.addModule(new MultiModalConfigGroup());
 		config.controler().setOutputDirectory(this.utils.getOutputDirectory());
@@ -413,7 +413,7 @@ public class MultiModalControlerListenerTest {
 			// assume that the agent is allowed to travel on the link
 			Assert.assertEquals(true, link.getAllowedModes().contains(mode));
 
-			if ( mode.contains(TransportMode.access_walk) || mode.contains(TransportMode.egress_walk) ) {
+			if ( mode.contains(TransportMode.non_network_walk ) || mode.contains(TransportMode.non_network_walk ) ) {
 				return ;
 			}
 			this.linkLeftCount++;
@@ -428,7 +428,7 @@ public class MultiModalControlerListenerTest {
 			this.arrivalCount++;
 
 			double tripTravelTime = event.getTime() - this.departures.remove(event.getPersonId());
-			if ( mode.contains(TransportMode.access_walk) || mode.contains(TransportMode.egress_walk) ) {
+			if ( mode.contains(TransportMode.non_network_walk ) || mode.contains(TransportMode.non_network_walk ) ) {
 				return ;
 			}
 			Double modeTravelTime = this.travelTimesPerMode.get(mode);

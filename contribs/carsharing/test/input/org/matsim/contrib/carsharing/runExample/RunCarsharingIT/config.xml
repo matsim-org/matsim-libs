@@ -34,6 +34,7 @@
 			<param name="flowCapacityFactor" value="1"   />
 			<param name="storageCapacityFactor" value="10.0"   />
 			<param name="mainMode" value="car,oneway_vehicle,twoway_vehicle,freefloating_vehicle"   />
+			<param name="simStarttimeInterpretation" value="onlyUseStarttime"/>
 		</module>
 
     <module name="Carsharing" >
@@ -103,7 +104,9 @@
 <!-- ====================================================================== -->
 
 	<module name="plans" >
-		<param name="inputPersonAttributesFile" value="1000desiresAttributes.xml" />
+<!--		<param name="inputPersonAttributesFile" value="1000desiresAttributes.xml" />-->
+<!--		(is working without. kai, jun'19)-->
+
 		<param name="inputPlansFile" value="10persons.xml" />
 	</module>
 

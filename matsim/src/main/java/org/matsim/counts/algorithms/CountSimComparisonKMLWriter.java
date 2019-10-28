@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -828,7 +828,7 @@ public class CountSimComparisonKMLWriter<T> extends CountSimComparisonWriter {
 	 */
 	private void writeChartToKmz(final String filename, final JFreeChart chart) throws IOException {
 		byte [] img;
-		img = ChartUtilities.encodeAsPNG(chart.createBufferedImage(CHARTWIDTH, CHARTHEIGHT));
+		img = ChartUtils.encodeAsPNG(chart.createBufferedImage(CHARTWIDTH, CHARTHEIGHT));
 		this.writer.addNonKMLFile(img, filename);
 	}
 

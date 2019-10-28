@@ -21,29 +21,39 @@
 package org.matsim.contrib.ev.stats;
 
 import org.matsim.contrib.ev.EvConfigGroup;
+import org.matsim.contrib.ev.EvModule;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+
+import com.google.inject.Inject;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
 public class EvStatsModule extends AbstractModule {
-	private final EvConfigGroup evCfg;
-
-	public EvStatsModule(EvConfigGroup evCfg) {
-		this.evCfg = evCfg;
-	}
+	@Inject
+	private EvConfigGroup evCfg;
 
 	@Override
 	public void install() {
-		if (evCfg.getTimeProfiles()) {
-			addMobsimListenerBinding().toProvider(SocHistogramTimeProfileCollectorProvider.class);
-			addMobsimListenerBinding().toProvider(IndividualSocTimeProfileCollectorProvider.class);
-			addMobsimListenerBinding().toProvider(ChargerOccupancyTimeProfileCollectorProvider.class);
-			addMobsimListenerBinding().toProvider(ChargerOccupancyXYDataProvider.class);
-			addMobsimListenerBinding().toProvider(VehicleTypeAggregatedSocTimeProfileCollectorProvider.class);
-			// add more time profiles if necessary
-		}
-		addControlerListenerBinding().to(EvControlerListener.class).asEagerSingleton();
-		bind(ChargerPowerCollector.class).asEagerSingleton();
+		installQSimModule(new AbstractQSimModule() {
+			@Override
+			protected void configureQSim() {
+				if (evCfg.getTimeProfiles()) {
+					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
+							SocHistogramTimeProfileCollectorProvider.class);
+					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
+							IndividualSocTimeProfileCollectorProvider.class);
+					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
+							ChargerOccupancyTimeProfileCollectorProvider.class);
+					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(ChargerOccupancyXYDataProvider.class);
+					addQSimComponentBinding(EvModule.EV_COMPONENT).toProvider(
+							VehicleTypeAggregatedSocTimeProfileCollectorProvider.class);
+					addQSimComponentBinding(EvModule.EV_COMPONENT).to(EvMobsimListener.class);
+					bind(ChargerPowerCollector.class).asEagerSingleton();
+					// add more time profiles if necessary
+				}
+			}
+		});
 	}
 }

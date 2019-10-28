@@ -3,23 +3,20 @@
  */
 package org.matsim.contrib.parking.parkingsearch.manager;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
-import org.matsim.contrib.parking.parkingsearch.manager.FacilityBasedParkingManager;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.inject.Inject;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author tschlenther
@@ -54,7 +51,7 @@ public class ZoneParkingManager extends FacilityBasedParkingManager {
 	
 	/**
 	 * reads in a tabular file that declares which link id's are in the monitored zone
-	 * the part between the last '/' and ".txt" of the given path is considered to be the zone name
+     * the part between the last '/' and the file type extension in the given path is considered to be the zone name
 	 * @param pathToZoneFile
 	 */
 	void readZone(String pathToZoneFile){

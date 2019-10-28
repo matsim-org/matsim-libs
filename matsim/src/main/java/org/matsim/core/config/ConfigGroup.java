@@ -30,6 +30,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import javax.validation.Valid;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.utils.io.IOUtils;
@@ -49,7 +51,7 @@ public class ConfigGroup implements MatsimExtensionPoint {
 
 	private final String name;
 	private final TreeMap<String,String> params;
-	private final Map<String, Collection<ConfigGroup>> parameterSetsPerType = new HashMap<>();
+	private final Map<String, Collection<@Valid ConfigGroup>> parameterSetsPerType = new HashMap<>();
 	private boolean locked = false ;
 
 	private final static Logger log = Logger.getLogger(ConfigGroup.class);
@@ -243,13 +245,13 @@ public class ConfigGroup implements MatsimExtensionPoint {
 	public static URL getInputFileURL(URL context, String filename) {
 		if (filename.startsWith("~" + File.separator)) {
 			filename = System.getProperty("user.home") + filename.substring(1);
-			return IOUtils.newUrl( null, filename ) ;
+			return IOUtils.getFileUrl(filename) ;
 		}
 		if ( filename.startsWith( File.separator ) ) {
 			// (= filename is absolute)
 			// (yyyy this may possibly fail on win systems. kai, sep.18)
-			return IOUtils.newUrl( null, filename ) ;
+			return IOUtils.getFileUrl(filename) ;
 		}
-		return IOUtils.newUrl(context, filename);
+		return IOUtils.extendUrl(context, filename);
 	}
 }

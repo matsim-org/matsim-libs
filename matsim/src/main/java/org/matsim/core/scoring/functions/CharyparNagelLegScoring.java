@@ -33,7 +33,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -93,8 +92,8 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 		double travelTime = arrivalTime - departureTime; // travel time in seconds	
 		ModeUtilityParameters modeParams = this.params.modeParams.get(leg.getMode());
 		if (modeParams == null) {
-			if (leg.getMode().equals(TransportMode.transit_walk) || leg.getMode().equals(TransportMode.access_walk) 
-					|| leg.getMode().equals(TransportMode.egress_walk) ) {
+			if (leg.getMode().equals(TransportMode.transit_walk) || leg.getMode().equals(TransportMode.non_network_walk )
+					|| leg.getMode().equals(TransportMode.non_network_walk ) ) {
 				modeParams = this.params.modeParams.get(TransportMode.walk);
 			} else {
 //				modeParams = this.params.modeParams.get(TransportMode.other);

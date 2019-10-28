@@ -49,22 +49,20 @@ public class Schedules {
 	}
 
 	public static Task getNextTask(Schedule schedule) {
-		int taskIdx = schedule.getStatus() == ScheduleStatus.PLANNED ? //
-				0 : schedule.getCurrentTask().getTaskIdx() + 1;
+		int taskIdx = schedule.getStatus() == ScheduleStatus.PLANNED ? 0 : schedule.getCurrentTask().getTaskIdx() + 1;
 		return schedule.getTasks().get(taskIdx);
 	}
 
 	public static Task getPreviousTask(Schedule schedule) {
-		int taskIdx = schedule.getStatus() == ScheduleStatus.COMPLETED ? //
-				schedule.getTaskCount() - 1 : schedule.getCurrentTask().getTaskIdx() - 1;
+		int taskIdx = schedule.getStatus() == ScheduleStatus.COMPLETED ?
+				schedule.getTaskCount() - 1 :
+				schedule.getCurrentTask().getTaskIdx() - 1;
 		return schedule.getTasks().get(taskIdx);
 	}
 
 	public static Link getLastLinkInSchedule(DvrpVehicle vehicle) {
 		List<? extends Task> tasks = vehicle.getSchedule().getTasks();
-		return tasks.isEmpty() ? //
-				vehicle.getStartLink() : //
-				Tasks.getEndLink(tasks.get(tasks.size() - 1));
+		return tasks.isEmpty() ? vehicle.getStartLink() : Tasks.getEndLink(tasks.get(tasks.size() - 1));
 	}
 
 	@SuppressWarnings("unchecked")

@@ -28,11 +28,11 @@ import java.util.concurrent.ForkJoinPool;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.log4j.Logger;
-import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.DetourLinksProvider.DetourLinksSet;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
@@ -71,13 +71,13 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 
 		pathDataProvider.precalculatePathData(drtRequest, detourLinksProvider.getDetourLinksSet());
 
-		return forkJoinPool.submit(() -> filteredInsertions.entrySet().parallelStream()//
-				.map(e -> new SingleVehicleInsertionProblem(pathDataProvider, insertionCostCalculator)
-						.findBestInsertion(drtRequest, e.getKey(), e.getValue()))//
-				.filter(Optional::isPresent)//
-				.map(Optional::get)//
-				.min(Comparator.comparing(i -> i.cost)))//
-				.join();
+		return forkJoinPool.submit(() -> filteredInsertions.entrySet()
+				.parallelStream()
+				.map(e -> new SingleVehicleInsertionProblem(pathDataProvider,
+						insertionCostCalculator).findBestInsertion(drtRequest, e.getKey(), e.getValue()))
+				.filter(Optional::isPresent)
+				.map(Optional::get)
+				.min(Comparator.comparing(i -> i.cost))).join();
 	}
 
 	public void shutdown() {

@@ -54,8 +54,7 @@ public class TaskTrackers {
 		}
 
 		TaskTracker tracker = task.getTaskTracker();
-		return tracker != null ? //
-				tracker.predictEndTime() : predictEndTimeOffline(task, currentTime);
+		return tracker != null ? tracker.predictEndTime() : predictEndTimeOffline(task, currentTime);
 	}
 
 	private static double predictEndTimeOffline(Task task, double currentTime) {

@@ -21,74 +21,78 @@ package org.matsim.contrib.ev.temperature;/*
  * created by jbischoff, 15.08.2018
  */
 
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
-
 import java.net.URL;
 import java.util.Map;
 
-public class TemperatureChangeConfigGroup extends ReflectiveConfigGroup {
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
-    public static final String GROUP_NAME = "temperature";
-    public static final String TEMP_CHANGE_FILE = "temperatureChangeFile";
-    public static final String TEMP_CHANGE_FILE_EXP = "Filename containing temperature changes. Expects CSV file with time;linkId;newTemperature";
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
-    public static final String DELIMITER_TAG = "delimiterString";
-    public static final String DELIMITER_EXP = "Delimiter. Default `;`";
+public final class TemperatureChangeConfigGroup extends ReflectiveConfigGroup {
+	public static final String GROUP_NAME = "temperature";
 
-    String delimiter = ";";
-    String tempFile;
+	public static final String TEMPERATURE_CHANGE_FILE = "temperatureChangeFile";
+	public static final String TEMPERATURE_CHANGE_FILE_EXP = "Filename containing temperature changes. Expects CSV file with time;linkId;newTemperature";
 
+	public static final String DELIMITER = "delimiter";
+	public static final String DELIMITER_EXP = "Delimiter. Default `;`";
 
-    public TemperatureChangeConfigGroup() {
-        super(GROUP_NAME);
-    }
+	@NotBlank
+	private String delimiter = ";";
 
-    /**
-     * @return -- {@value #DELIMITER_EXP}
-     */
-    @StringGetter(DELIMITER_TAG)
-    public String getDelimiter() {
-        return delimiter;
-    }
+	@NotNull
+	private String temperatureChangeFile;
 
-    /**
-     * @param delimiter -- {@value #DELIMITER_EXP}
-     */
-    @StringSetter(DELIMITER_TAG)
-    public void setDelimiter(String delimiter) {
-        this.delimiter = delimiter;
-    }
+	public TemperatureChangeConfigGroup() {
+		super(GROUP_NAME);
+	}
 
-    /**
-     * @return -- {@value #TEMP_CHANGE_FILE_EXP}
-     */
-    @StringGetter(TEMP_CHANGE_FILE)
-    public String getTempFile() {
-        return tempFile;
-    }
+	/**
+	 * @return -- {@value #DELIMITER_EXP}
+	 */
+	@StringGetter(DELIMITER)
+	public String getDelimiter() {
+		return delimiter;
+	}
 
-    /**
-     * @return -- {@value #TEMP_CHANGE_FILE_EXP}
-     */
-    public URL getTemperatureFileURL(URL context) {
-        return ConfigGroup.getInputFileURL(context, this.tempFile);
-    }
+	/**
+	 * @param delimiter -- {@value #DELIMITER_EXP}
+	 */
+	@StringSetter(DELIMITER)
+	public void setDelimiter(String delimiter) {
+		this.delimiter = delimiter;
+	}
 
+	/**
+	 * @return -- {@value #TEMPERATURE_CHANGE_FILE_EXP}
+	 */
+	@StringGetter(TEMPERATURE_CHANGE_FILE)
+	public String getTemperatureChangeFile() {
+		return temperatureChangeFile;
+	}
 
-    /**
-     * @param tempFile -- {@value #TEMP_CHANGE_FILE_EXP}
-     */
-    @StringSetter(TEMP_CHANGE_FILE)
-    public void setTempFile(String tempFile) {
-        this.tempFile = tempFile;
-    }
+	/**
+	 * @return -- {@value #TEMPERATURE_CHANGE_FILE_EXP}
+	 */
+	public URL getTemperatureFileURL(URL context) {
+		return ConfigGroup.getInputFileURL(context, this.temperatureChangeFile);
+	}
 
-    @Override
-    public Map<String, String> getComments() {
-        Map<String, String> map = super.getComments();
-        map.put(DELIMITER_TAG, DELIMITER_EXP);
-        map.put(TEMP_CHANGE_FILE, TEMP_CHANGE_FILE_EXP);
-        return map;
-    }
+	/**
+	 * @param temperatureChangeFile -- {@value #TEMPERATURE_CHANGE_FILE_EXP}
+	 */
+	@StringSetter(TEMPERATURE_CHANGE_FILE)
+	public void setTemperatureChangeFile(String temperatureChangeFile) {
+		this.temperatureChangeFile = temperatureChangeFile;
+	}
+
+	@Override
+	public Map<String, String> getComments() {
+		Map<String, String> map = super.getComments();
+		map.put(DELIMITER, DELIMITER_EXP);
+		map.put(TEMPERATURE_CHANGE_FILE, TEMPERATURE_CHANGE_FILE_EXP);
+		return map;
+	}
 }

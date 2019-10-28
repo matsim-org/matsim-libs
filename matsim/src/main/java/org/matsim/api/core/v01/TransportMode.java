@@ -44,10 +44,16 @@ public final class TransportMode {
 	public static final String ship = "ship";
 	public static final String airplane = "airplane";
 
-	
-	public static final String access_walk = "access_walk" ; // "bushwhacking" from facility to network
-	public static final String egress_walk = "egress_walk" ; // "bushwhacking" from network to facility
-	
+
+	@Deprecated // use non_network_walk
+	public static final String access_walk = "non_network_walk" ;
+	@Deprecated // use non_network_walk
+	public static final String egress_walk = "non_network_walk" ;
+	// (The directionality is not useful: what may be an egress_walk from the point of view of drt may be an access_walk from the point of view of pt.
+	// kai, jun'19)
+
+	public static final String non_network_walk = "non_network_walk" ;
+
 	public static final String other = "other";
 
 	private TransportMode() {

@@ -110,7 +110,7 @@ public class ScheduleCharts {
 			setShadowVisible(false);
 			setDrawBarOutline(true);
 
-			setBaseToolTipGenerator(new XYToolTipGenerator() {
+			setDefaultToolTipGenerator(new XYToolTipGenerator() {
 				@Override
 				public String generateToolTip(XYDataset dataset, int series, int item) {
 					return getTask(series, item).getDescription();
@@ -176,8 +176,7 @@ public class ScheduleCharts {
 			for (Task t : schedule.getTasks()) {
 				String description = descriptionCreator.create(t);
 
-				TimePeriod duration = new SimpleTimePeriod(//
-						new Date((int)Math.floor(t.getBeginTime() * 1000)), //
+				TimePeriod duration = new SimpleTimePeriod(new Date((int)Math.floor(t.getBeginTime() * 1000)),
 						new Date((int)Math.ceil(t.getEndTime() * 1000)));
 
 				scheduleTaskSeries.add(new ChartTask(description, duration, t));

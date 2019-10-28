@@ -22,24 +22,40 @@ package org.matsim.contrib.drt.run;
 
 import java.util.Collection;
 
+import javax.validation.Valid;
+
 import org.matsim.contrib.dvrp.run.MultiModal;
+import org.matsim.contrib.dvrp.run.MultiModals;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
+import com.google.common.base.Verify;
+
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class MultiModeDrtConfigGroup extends ReflectiveConfigGroup implements MultiModal<DrtConfigGroup> {
+public final class MultiModeDrtConfigGroup extends ReflectiveConfigGroup implements MultiModal<DrtConfigGroup> {
 	public static final String GROUP_NAME = "multiModeDrt";
 
-	@SuppressWarnings("deprecation")
+	/**
+	 * @param config
+	 * @return MultiModeDrtConfigGroup if exists. Otherwise fails
+	 */
 	public static MultiModeDrtConfigGroup get(Config config) {
 		return (MultiModeDrtConfigGroup)config.getModule(GROUP_NAME);
 	}
 
 	public MultiModeDrtConfigGroup() {
 		super(GROUP_NAME);
+	}
+
+	@Override
+	protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
+		Verify.verify(config.getModule(DrtConfigGroup.GROUP_NAME) == null,
+				"In the multi-mode DRT setup, DrtConfigGroup must not be defined at the config top level");
+		MultiModals.requireAllModesUnique(this);
 	}
 
 	@Override
@@ -52,7 +68,7 @@ public class MultiModeDrtConfigGroup extends ReflectiveConfigGroup implements Mu
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Collection<DrtConfigGroup> getModalElements() {
+	public Collection<@Valid DrtConfigGroup> getModalElements() {
 		return (Collection<DrtConfigGroup>)getParameterSets(DrtConfigGroup.GROUP_NAME);
 	}
 }

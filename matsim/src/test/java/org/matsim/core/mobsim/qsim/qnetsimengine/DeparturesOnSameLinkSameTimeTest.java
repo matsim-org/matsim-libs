@@ -18,7 +18,6 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -46,6 +45,8 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import java.util.*;
 
 /**
  * @author amit
@@ -154,24 +155,24 @@ public class DeparturesOnSameLinkSameTimeTest {
 			config.travelTimeCalculator().setSeparateModes(true);
 			config.planCalcScore().getOrCreateModeParams(travelMode);
 
-			network =  (Network) this.scenario.getNetwork();
+			network = this.scenario.getNetwork();
 			population = this.scenario.getPopulation();
 		}
 
 		private void createNetwork(double departureLinkCapacity){
 
-			Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId("1"), new Coord((double) 0, (double) 0)) ;
-			Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId("2"), new Coord((double) 100, (double) 10));
+			Node node1 = NetworkUtils.createAndAddNode(network, Id.createNodeId("1"), new Coord(0, 0));
+			Node node2 = NetworkUtils.createAndAddNode(network, Id.createNodeId("2"), new Coord(100, 10));
 			double y = -10;
-			Node node3 = NetworkUtils.createAndAddNode(network, Id.createNodeId("3"), new Coord((double) 300, y));
+			Node node3 = NetworkUtils.createAndAddNode(network, Id.createNodeId("3"), new Coord(300, y));
 			final Node fromNode = node1;
 			final Node toNode = node2;
 			final double capacity = departureLinkCapacity;
 
-			link1 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("1")), fromNode, toNode, 1000.0, 20.0, capacity, (double) 1, null, "7");
+			link1 = NetworkUtils.createAndAddLink(network, Id.createLinkId("1"), fromNode, toNode, 1000.0, 20.0, capacity, 1, null, "7");
 			final Node fromNode1 = node2;
 			final Node toNode1 = node3;
-			link2 = NetworkUtils.createAndAddLink(network,Id.createLinkId(String.valueOf("2")), fromNode1, toNode1, 1000.0, 20.0, (double) 3600, (double) 1, null, "7");
+			link2 = NetworkUtils.createAndAddLink(network, Id.createLinkId("2"), fromNode1, toNode1, 1000.0, 20.0, 3600, 1, null, "7");
 		}
 
 		private void createPopulation(){
@@ -209,7 +210,8 @@ public class DeparturesOnSameLinkSameTimeTest {
 				plan.addActivity(a2);
 				population.addPerson(p);
 
-				Id<Vehicle> vehId = Id.create(i,Vehicle.class);
+				Id<Vehicle> vehId = Id.createVehicleId(i);
+				VehicleUtils.insertVehicleIdIntoAttributes(p, travelMode, vehId);
 				Vehicle veh = VehicleUtils.getFactory().createVehicle(vehId, vt);
 				scenario.getVehicles().addVehicle(veh);
 			}

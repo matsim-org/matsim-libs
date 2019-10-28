@@ -23,7 +23,8 @@ import java.util.List;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
-import org.matsim.contrib.util.*;
+import org.matsim.contrib.util.CSVLineBuilder;
+import org.matsim.contrib.util.CompactCSVWriter;
 import org.matsim.core.utils.io.IOUtils;
 
 public class TaxiStatsWriter {
@@ -59,7 +60,7 @@ public class TaxiStatsWriter {
 		writer.writeNext(getStatsSubheader("fleetAvg"));
 
 		for (TaxiStats s : taxiStats) {
-			CSVLineBuilder lineBuilder = new CSVLineBuilder().add(s.id).//
+			CSVLineBuilder lineBuilder = new CSVLineBuilder().add(s.id).
 					addf("%.4f", s.getFleetEmptyDriveRatio());
 			addStats(lineBuilder, "%.4f", "%.3f", s.vehicleEmptyDriveRatio);
 			writer.writeNext(lineBuilder);
@@ -72,7 +73,7 @@ public class TaxiStatsWriter {
 		writer.writeNext(getStatsSubheader("fleetAvg"));
 
 		for (TaxiStats s : taxiStats) {
-			CSVLineBuilder lineBuilder = new CSVLineBuilder().add(s.id).//
+			CSVLineBuilder lineBuilder = new CSVLineBuilder().add(s.id).
 					addf("%.4f", s.getFleetStayRatio());
 			addStats(lineBuilder, "%.4f", "%.3f", s.vehicleStayRatio);
 			writer.writeNext(lineBuilder);
@@ -86,17 +87,17 @@ public class TaxiStatsWriter {
 	}
 
 	private void addStats(CSVLineBuilder lineBuilder, String format1, String format2, DescriptiveStatistics stats) {
-		lineBuilder.addf(format1, stats.getMean()).//
-				addf(format1, stats.getStandardDeviation()).//
-				addEmpty().//
-				addf(format2, stats.getMin()). //
-				addf(format2, stats.getPercentile(2)). //
-				addf(format2, stats.getPercentile(5)). //
-				addf(format2, stats.getPercentile(25)). //
-				addf(format2, stats.getPercentile(50)). //
-				addf(format2, stats.getPercentile(75)). //
-				addf(format2, stats.getPercentile(95)). //
-				addf(format2, stats.getPercentile(98)). //
+		lineBuilder.addf(format1, stats.getMean()).
+				addf(format1, stats.getStandardDeviation()).
+				addEmpty().
+				addf(format2, stats.getMin()).
+				addf(format2, stats.getPercentile(2)).
+				addf(format2, stats.getPercentile(5)).
+				addf(format2, stats.getPercentile(25)).
+				addf(format2, stats.getPercentile(50)).
+				addf(format2, stats.getPercentile(75)).
+				addf(format2, stats.getPercentile(95)).
+				addf(format2, stats.getPercentile(98)).
 				addf(format2, stats.getMax());
 	}
 

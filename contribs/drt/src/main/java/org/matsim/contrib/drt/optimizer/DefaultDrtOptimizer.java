@@ -26,21 +26,21 @@ import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.depot.Depots;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
 import org.matsim.contrib.drt.scheduler.DrtScheduleTimingUpdater;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
-import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequests;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -52,8 +52,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	private static final Logger log = Logger.getLogger(DefaultDrtOptimizer.class);
 
 	private final DrtConfigGroup drtCfg;
-	private final MinCostFlowRebalancingParams rebalancingParams;
-	private final boolean rebalancingEnabled;
+	private final Integer rebalancingInterval;
 	private final Fleet fleet;
 	private final DrtScheduleInquiry scheduleInquiry;
 	private final DrtScheduleTimingUpdater scheduleTimingUpdater;
@@ -80,8 +79,9 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		this.scheduleTimingUpdater = scheduleTimingUpdater;
 		this.relocator = relocator;
 		this.requestInserter = requestInserter;
-		rebalancingParams = drtCfg.getMinCostFlowRebalancing();
-		rebalancingEnabled = MinCostFlowRebalancingParams.isRebalancingEnabled(rebalancingParams);
+		rebalancingInterval = drtCfg.getMinCostFlowRebalancing()
+				.map(MinCostFlowRebalancingParams::getInterval)
+				.orElse(null);
 	}
 
 	@Override
@@ -95,7 +95,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 			requiresReoptimization = false;
 		}
 
-		if (rebalancingEnabled && e.getSimulationTime() % rebalancingParams.getInterval() == 0) {
+		if (rebalancingInterval != null && e.getSimulationTime() % rebalancingInterval == 0) {
 			rebalanceFleet();
 		}
 	}

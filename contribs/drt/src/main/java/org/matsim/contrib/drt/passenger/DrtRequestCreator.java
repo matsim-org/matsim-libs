@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.drt.passenger;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
@@ -35,6 +36,7 @@ import org.matsim.core.mobsim.framework.PlanAgent;
  * @author michalm
  */
 public class DrtRequestCreator implements PassengerRequestCreator {
+	private static final Logger log = Logger.getLogger(DrtRequestCreator.class);
 	private final String mode;
 	private final EventsManager eventsManager;
 	private final MobsimTimer timer;
@@ -48,13 +50,27 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 	@Override
 	public DrtRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
 			double departureTime, double submissionTime) {
+		// yyyy remove parameter MobsimPassengerAgent and get necessary info from somewhere else.
+		// (Also in reality, such information is not pushed into the person, but stored somewhere on the provider side.)
+		// kai, gregor, jan'19
 
-		//XXX this will not work if pre-booking is allowed in DRT
+		//FIXME this will not work if pre-booking is allowed in DRT
 		Leg leg = (Leg)((PlanAgent)passenger).getCurrentPlanElement();
 		DrtRoute drtRoute = (DrtRoute)leg.getRoute();
 		double latestDepartureTime = departureTime + drtRoute.getMaxWaitTime();
 		double latestArrivalTime = departureTime + drtRoute.getTravelTime();
 
+		log.debug("");
+		log.debug(timer.getTimeOfDay() + " ");
+		log.debug(mode + " ");
+		log.debug(id + " ");
+		log.debug(passenger.getId() + " ");
+		log.debug(fromLink.getId() + " ");
+		log.debug(toLink.getId() + " ");
+		log.debug(drtRoute.getDirectRideTime() + " ");
+		log.debug(drtRoute.getDistance() + " ");
+		log.debug("");
+		
 		eventsManager.processEvent(
 				new DrtRequestSubmittedEvent(timer.getTimeOfDay(), mode, id, passenger.getId(), fromLink.getId(),
 						toLink.getId(), drtRoute.getDirectRideTime(), drtRoute.getDistance()));

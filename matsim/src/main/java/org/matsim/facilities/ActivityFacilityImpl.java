@@ -126,8 +126,10 @@ public class ActivityFacilityImpl implements ActivityFacility, MatsimDataClassIm
 	@Override
 	public final String toString() {
 		return "[" + super.toString() +
-				" ID=" + this.id +
-		       " nof_activities=" + this.activities.size() + "]";
+				   " ID=" + this.id +
+				   "| linkID=" + this.linkId +
+				   "| nof_activities=" + this.activities.size() +
+				   "]";
 	}
 
 	@Override

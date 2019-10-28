@@ -83,7 +83,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 
 	@Override
 	public void run(final Plan plan) {
-		final List<Trip> trips = TripStructureUtils.getTrips( plan , tripRouter.getStageActivityTypes() );
+		final List<Trip> trips = TripStructureUtils.getTrips( plan );
 
 		for (Trip oldTrip : trips) {
 			final List<? extends PlanElement> newTrip =
@@ -146,7 +146,9 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 			final Activity activity,
 			final Plan plan,
 			final Config config ) {
-		
+		// yyyy similar method in PopulationUtils.  TripRouter.calcEndOfPlanElement in fact uses it.  However, this seems doubly inefficient; calling the
+		// method in PopulationUtils directly would probably be faster.  kai, jul'19
+
 		if (!Time.isUndefinedTime(activity.getEndTime())) return activity.getEndTime();
 
 		// no sufficient information in the activity...

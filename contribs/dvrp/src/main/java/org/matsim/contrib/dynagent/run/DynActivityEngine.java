@@ -19,18 +19,10 @@
 
 package org.matsim.contrib.dynagent.run;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.inject.Inject;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dynagent.DynAgent;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
@@ -38,21 +30,22 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * DynActivityEngine and ActivityEngine could be decoupled (if we can ensure DynActivityEngine's handleActivity() is
  * called before that of ActivityEngine)
  */
 public class DynActivityEngine implements MobsimEngine, ActivityHandler {
+	// This is now _additive_ to the normal ActivityEngine!
+
 	private InternalInterface internalInterface;
-	private final ActivityEngine activityEngine;
 
 	private final List<DynAgent> dynAgents = new LinkedList<>();
 	private final List<DynAgent> newDynAgents = new ArrayList<>();// will to be handled in the next timeStep
-
-	@Inject
-	public DynActivityEngine(EventsManager eventsManager) {
-		this.activityEngine = new ActivityEngine(eventsManager);
-	}
 
 	// See handleActivity for the reason for this.
 	private boolean beforeFirstSimStep = true;
@@ -84,14 +77,13 @@ public class DynActivityEngine implements MobsimEngine, ActivityHandler {
 			}
 			// TODO what if not activity?
 		}
-
-		activityEngine.doSimStep(time);
 	}
 
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
 		if (!(agent instanceof DynAgent)) {
-			return activityEngine.handleActivity(agent);
+			return false ;
+			// (this means "I am not responsible").
 		}
 
 		double endTime = agent.getActivityEndTime();
@@ -122,14 +114,12 @@ public class DynActivityEngine implements MobsimEngine, ActivityHandler {
 
 	@Override
 	public void afterSim() {
-		activityEngine.afterSim();
 		dynAgents.clear();
 	}
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
-		activityEngine.setInternalInterface(internalInterface);
 	}
 
 	private void unregisterAgentAtActivityLocation(final MobsimAgent agent) {
@@ -142,11 +132,9 @@ public class DynActivityEngine implements MobsimEngine, ActivityHandler {
 
 	@Override
 	public void onPrepareSim() {
-		activityEngine.onPrepareSim();
 	}
 
 	@Override
 	public void rescheduleActivityEnd(MobsimAgent agent) {
-		activityEngine.rescheduleActivityEnd(agent);
 	}
 }

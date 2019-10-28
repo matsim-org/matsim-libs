@@ -26,6 +26,7 @@ import gnu.trove.iterator.TDoubleIterator;
 import gnu.trove.list.array.TDoubleArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
@@ -45,18 +46,14 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -80,8 +77,6 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 	private final Population population;
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	
-	private StageActivityTypes stageActivityTypes;
-
 	/*
 	 * Replaced TreeMaps with (Linked)HashMaps since they should perform much better. For 'partialScores'
 	 * a LinkedHashMap is used to ensure that agents are written in a deterministic order to the output files.
@@ -92,10 +87,10 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 	 *
 	 * cdobler, nov'15
 	 */
-	private final Map<Id<Person>, ScoringFunction> agentScorers = new HashMap<>();
-	private final Map<Id<Person>, TDoubleCollection> partialScores = new LinkedHashMap<>();
+	private final IdMap<Person, ScoringFunction> agentScorers = new IdMap<>(Person.class);
+	private final IdMap<Person, TDoubleCollection> partialScores = new IdMap<>(Person.class);
 	private final AtomicReference<Throwable> exception = new AtomicReference<>();
-	private final Map<Id<Person>, Plan> tripRecords = new LinkedHashMap<>() ;
+	private final IdMap<Person, Plan> tripRecords = new IdMap<>(Person.class);
 	
 //	/**
 //	 * For something like the bicycle scoring, we need to know individual links at the level of the scoring function.  This is a first sketch how this could be implemented.
@@ -104,8 +99,6 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 //	private boolean passLinkEventsToPerson = false;
 	
 	private Vehicle2DriverEventHandler vehicles2Drivers = new Vehicle2DriverEventHandler();
-	@Inject(optional = true)
-	private TripRouter tripRouter;
 
 	@Inject
 	ScoringFunctionsForPopulation( ControlerListenerManager controlerListenerManager, EventsManager eventsManager, EventsToActivities eventsToActivities, EventsToLegs eventsToLegs,
@@ -134,27 +127,6 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 			this.tripRecords.put(person.getId(), PopulationUtils.createPlan());
 		}
 	}
-
-	private StageActivityTypes getStageActivities() {
-		if (this.stageActivityTypes == null) {
-			if (this.tripRouter !=null ) {
-				this.stageActivityTypes = this.tripRouter.getStageActivityTypes() ;
-			} else {
-				this.stageActivityTypes = new StageActivityTypes() {
-					@Override public boolean isStageActivity( final String activityType ) {
-						if ( activityType.contains( "_interaction" ) ) {
-							return true;
-						} else {
-							return false;
-						}
-					}
-				};
-				// yyyyyy this is really terrible, needs to come from global data structure instead.
-			}
-		}
-		return this.stageActivityTypes;
-	}
-	
 
 	@Override
 	synchronized public void handleEvent(Event o) {
@@ -238,12 +210,12 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 		if ( plan!= null ) {
 			if ( !plan.getPlanElements().isEmpty() ) {
 				// plan != null, meaning we already have pre-existing material
-				if (getStageActivities().isStageActivity( activity.getType() ) ) {
+				if (StageActivityTypeIdentifier.isStageActivity( activity.getType() ) ) {
 					// we are at a stage activity.  Don't do anything ; activity will be added later
 				} else {
 					// we are at a real activity, which is not the first one we see for this agent.  output the trip ...
 					plan.addActivity( activity );
-					final List<Trip> trips = TripStructureUtils.getTrips( plan, getStageActivities());
+					final List<Trip> trips = TripStructureUtils.getTrips( plan );
 					// yyyyyy should in principle only return one trip.  There are, however, situations where
 					// it returns two trips, in particular in conjunction with the minibus raptor.  Possibly
 					// something that has to do with not alternativing between acts and legs.

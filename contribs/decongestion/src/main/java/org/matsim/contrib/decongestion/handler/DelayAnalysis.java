@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.contrib.decongestion.data.DecongestionInfo;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
@@ -85,17 +86,19 @@ public class DelayAnalysis implements LinkEnterEventHandler, LinkLeaveEventHandl
 			
 			if (delayThisAgent < -1.)  { 
 				if (warnCnt2 <= 5) {
-					log.warn("The delay is negative! Delay:" + delayThisAgent + " - traveltime: " + traveltimeThisAgent + " - freespeed traveltime: " + freespeedTravelTime + " - link: " + event.getLinkId() );
+					log.warn("The delay is negative! Delay:" + delayThisAgent + " | traveltime: " + traveltimeThisAgent + " | freespeed traveltime: " + freespeedTravelTime + " | link: " + event.getLinkId() );
 					log.warn(event.toString());
 					if (warnCnt2 == 5) {
-						log.warn("Further warnings of this type will not be printed out.");
+						log.warn( Gbl.FUTURE_SUPPRESSED ) ;
 					}
 					warnCnt2++;
 				}
 			} else if (delayThisAgent < 0.) {
 				if (warnCnt  == 0) {
-					log.warn("Delay is " + delayThisAgent + ". A delay of 1 sec may result from rounding errors. Therefore a delay of 1 sec is ignored and set to zero.");
 					warnCnt ++;
+					log.info("Delay is " + delayThisAgent + ". A negative delay of down to -1 sec may result from rounding errors. Therefore it is ignored and set to " +
+								 "zero.");
+					log.info( Gbl.ONLYONCE ) ;
 				}
 				delayThisAgent = 0.;
 				

@@ -36,11 +36,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class ExternalModuleTest {
@@ -56,7 +52,7 @@ public class ExternalModuleTest {
     public void setUp() {
         scenario = ScenarioUtils.loadScenario(utils.loadConfig("test/scenarios/equil/config.xml"));
         originalScenario = ScenarioUtils.loadScenario(utils.loadConfig("test/scenarios/equil/config.xml"));
-        outputDirectoryHierarchy = new OutputDirectoryHierarchy(utils.getOutputDirectory(), OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+        outputDirectoryHierarchy = new OutputDirectoryHierarchy(utils.getOutputDirectory(), OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists, this.scenario.getConfig().controler().getCompressionType());
     }
 
     @Test

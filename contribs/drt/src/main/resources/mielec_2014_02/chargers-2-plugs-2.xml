@@ -1,7 +1,0 @@
-<?xml version="1.0" ?>
-<!DOCTYPE chargers SYSTEM "http://matsim.org/files/dtd/chargers_v1.dtd">
-
-<chargers>
-	<charger id="charger_1" link="385" capacity="2" power="50"/>
-	<charger id="charger_2" link="499" capacity="2" power="50"/>
-</chargers>

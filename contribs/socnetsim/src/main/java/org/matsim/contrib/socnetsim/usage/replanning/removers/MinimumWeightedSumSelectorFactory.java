@@ -57,6 +57,6 @@ public class MinimumWeightedSumSelectorFactory extends AbstractDumbRemoverFactor
 				new WeightedWeight(
 					new InverseScoreWeight(),
 					weights.getWeightAttributeName(),
-					sc.getPopulation().getPersonAttributes()  ));
+					sc.getPopulation()  ));
 	}
 }

@@ -33,9 +33,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
-import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
+//import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.contrib.locationchoice.utils.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.utils.TreesBuilder;
@@ -60,7 +58,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * @author nagel
  *
  */
-public class DestinationChoiceContext implements MatsimToplevelContainer {
+class DestinationChoiceContext implements MatsimToplevelContainer {
 	
 	private static final Logger log = Logger.getLogger(DestinationChoiceContext.class);
 	
@@ -68,10 +66,10 @@ public class DestinationChoiceContext implements MatsimToplevelContainer {
 	
 	private final Scenario scenario;
 	private ScaleEpsilon scaleEpsilon;
-	private ActTypeConverter actTypeConverter;
+//	private ActTypeConverter actTypeConverter;
 	private HashSet<String> flexibleTypes;
 	private ScoringParameters params;
-	private DestinationChoiceConfigGroup dccg;
+	private FrozenTastesConfigGroup dccg;
 	private int arekValsRead = 1;
 	private ObjectAttributes personsBetas = new ObjectAttributes();
 	private ObjectAttributes facilitiesAttributes = new ObjectAttributes();
@@ -83,17 +81,7 @@ public class DestinationChoiceContext implements MatsimToplevelContainer {
 	private TObjectIntMap<Id<ActivityFacility>> facilityIndices;
 	private Map<Id<ActivityFacility>, ActivityFacilityWithIndex> faciliesWithIndexMap;
 	private TObjectIntMap<Id<Person>> personIndices;
-		
-	/**
-	 * If this is set to true, QuadTrees are stored in memory.
-	 * As a result...
-	 * - It is ensured that identical QuadTrees are not created multiple times.
-	 * - Code is sped up if QuadTrees are used multiple times (e.g. once in every MATSim iteration).
-	 * - Memory consumption is increased since the QuadTrees remain in memory!
-	 * This feature was added in nov'14. Its default value is false which was the value before
-	 * introduction the feature.
-	 */
-	private boolean cacheQuadTrees = false;
+
 	private Map<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType = new HashMap<String, QuadTree<ActivityFacilityWithIndex>>();
 	private TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 	
@@ -122,10 +110,10 @@ public class DestinationChoiceContext implements MatsimToplevelContainer {
 		if ( params==null ){
 			this.params = new ScoringParameters.Builder( scenario.getConfig().planCalcScore(), scenario.getConfig().planCalcScore().getScoringParameters( null ),
 				  scenario.getConfig().scenario() ).build();
-			this.dccg = ConfigUtils.addOrGetModule( this.scenario.getConfig(), DestinationChoiceConfigGroup.class );
+			this.dccg = ConfigUtils.addOrGetModule( this.scenario.getConfig(), FrozenTastesConfigGroup.class );
 			ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler( this.dccg );
 			this.scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
-			this.actTypeConverter = defineFlexibleActivities.getConverter();
+//			this.actTypeConverter = defineFlexibleActivities.getConverter();
 			this.flexibleTypes = defineFlexibleActivities.getFlexibleTypes();
 
 			this.readOrCreateKVals( dccg.getRandomSeed() );
@@ -207,27 +195,37 @@ public class DestinationChoiceContext implements MatsimToplevelContainer {
 		}
 	}
 	
-	public boolean cacheQuadTrees() {
-		return this.cacheQuadTrees;
-	}
+//	public boolean cacheQuadTrees() {
+//		return this.cacheQuadTrees;
+//	}
+//
+//	public void cacheQuadTrees(boolean cacheQuadTrees) {
+//		this.cacheQuadTrees = cacheQuadTrees;
+//		if (!cacheQuadTrees) {
+//			this.quadTreesOfType.clear();
+//			this.facilitiesOfType.clear();
+//		}
+//	}
 	
-	public void cacheQuadTrees(boolean cacheQuadTrees) {
-		this.cacheQuadTrees = cacheQuadTrees;
-		if (!cacheQuadTrees) {
-			this.quadTreesOfType.clear();
-			this.facilitiesOfType.clear();
-		}
-	}
-	
-	public Tuple<QuadTree<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> getQuadTreeAndFacilities(String activityType) {
-		if (this.cacheQuadTrees) {
+	Tuple<QuadTree<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> getQuadTreeAndFacilities( String activityType ) {
+		/**
+		 * If this is set to true, QuadTrees are stored in memory.
+		 * As a result...
+		 * - It is ensured that identical QuadTrees are not created multiple times.
+		 * - Code is sped up if QuadTrees are used multiple times (e.g. once in every MATSim iteration).
+		 * - Memory consumption is increased since the QuadTrees remain in memory!
+		 * This feature was added in nov'14. Its default value is false which was the value before
+		 * introduction the feature.
+		 */
+		boolean cacheQuadTrees = false;
+		if ( cacheQuadTrees ) {
 			QuadTree<ActivityFacilityWithIndex> quadTree = this.quadTreesOfType.get(activityType);
 			ActivityFacilityImpl[] facilities = this.facilitiesOfType.get(activityType);
-			if (quadTree == null || facilities == null) {				
+			if (quadTree == null || facilities == null) {
 				Tuple<QuadTree<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> tuple = getTuple(activityType);
 				this.quadTreesOfType.put(activityType, tuple.getFirst());
 				this.facilitiesOfType.put(activityType, tuple.getSecond());
-				
+
 				return tuple;
 			} else return new Tuple<>( quadTree, facilities );
 		} else return getTuple(activityType);
@@ -236,7 +234,7 @@ public class DestinationChoiceContext implements MatsimToplevelContainer {
 	private Tuple<QuadTree<ActivityFacilityWithIndex>, ActivityFacilityImpl[]> getTuple(String activityType) {
 
 		TreesBuilder treesBuilder = new TreesBuilder(CollectionUtils.stringToSet(activityType), this.scenario.getNetwork(), this.dccg);
-		treesBuilder.setActTypeConverter(this.getConverter());
+//		treesBuilder.setActTypeConverter(this.getConverter());
 		treesBuilder.createTrees(scenario.getActivityFacilities());
 		
 		ActivityFacilityImpl[] facilities = treesBuilder.getFacilitiesOfType().get(activityType);
@@ -271,9 +269,9 @@ public class DestinationChoiceContext implements MatsimToplevelContainer {
 		return scaleEpsilon;
 	}
 
-	public ActTypeConverter getConverter() {
-		return actTypeConverter;
-	}
+//	public ActTypeConverter getConverter() {
+//		return actTypeConverter;
+//	}
 
 	public HashSet<String> getFlexibleTypes() {
 		return flexibleTypes;
@@ -283,7 +281,7 @@ public class DestinationChoiceContext implements MatsimToplevelContainer {
 		return params;
 	}
 
-	public boolean kValsAreRead() {
+	private boolean kValsAreRead() {
 		return (this.arekValsRead == 0);
 	}
 
@@ -319,11 +317,11 @@ public class DestinationChoiceContext implements MatsimToplevelContainer {
 		return this.facilityIndices.get(id);
 	}
 	
-	public ObjectAttributes getPersonsBetas() {
+	ObjectAttributes getPersonsBetas() {
 		return personsBetas;
 	}
 
-	public ObjectAttributes getFacilitiesAttributes() {
+	ObjectAttributes getFacilitiesAttributes() {
 		return facilitiesAttributes;
 	}
 
@@ -332,7 +330,7 @@ public class DestinationChoiceContext implements MatsimToplevelContainer {
 		return null;
 	}
 
-	public ObjectAttributes getPrefsAttributes() {
+	ObjectAttributes getPrefsAttributes() {
 		return prefsAttributes;
 	}
 
@@ -345,7 +343,7 @@ public class DestinationChoiceContext implements MatsimToplevelContainer {
 		private final ActivityFacility activityFacility;
 		private final int index;
 		
-		public ActivityFacilityWithIndex(ActivityFacility activityFacility, int index) {
+		ActivityFacilityWithIndex( ActivityFacility activityFacility, int index ) {
 			this.activityFacility = activityFacility;
 			this.index = index;
 		}

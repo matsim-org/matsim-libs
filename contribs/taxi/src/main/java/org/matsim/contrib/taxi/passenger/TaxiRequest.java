@@ -46,8 +46,6 @@ public class TaxiRequest implements PassengerRequest {
 	private final double submissionTime;
 	private final double earliestStartTime;
 
-	private boolean rejected = false;
-
 	private final Id<Person> passengerId;
 	private final String mode;
 
@@ -101,16 +99,6 @@ public class TaxiRequest implements PassengerRequest {
 	@Override
 	public String getMode() {
 		return mode;
-	}
-
-	@Override
-	public boolean isRejected() {
-		return rejected;
-	}
-
-	@Override
-	public void setRejected(boolean rejected) {
-		this.rejected = rejected;
 	}
 
 	public TaxiPickupTask getPickupTask() {

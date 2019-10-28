@@ -19,14 +19,7 @@
 
 package org.matsim.contrib.parking.parkingsearch.manager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
+import com.google.inject.Inject;
 import org.apache.commons.lang3.mutable.MutableLong;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -37,7 +30,8 @@ import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.vehicles.Vehicle;
 
-import com.google.inject.Inject;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author  jbischoff, schlenther
@@ -53,7 +47,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	protected Map<Id<Vehicle>, Id<Link>> parkingLocationsOutsideFacilities = new HashMap<>();
 	protected Map<Id<Link>, Set<Id<ActivityFacility>>> facilitiesPerLink = new HashMap<>();
 
-	Network network;
+    protected Network network;
 
 	@Inject
 	public FacilityBasedParkingManager(Scenario scenario) {
@@ -128,10 +122,7 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 
 	@Override
 	public boolean parkVehicleHere(Id<Vehicle> vehicleId, Id<Link> linkId, double time) {
-		if (parkVehicleAtLink(vehicleId, linkId, time)) {
-			return true;
-		} else
-			return false;
+        return parkVehicleAtLink(vehicleId, linkId, time);
 	}
 
 	protected boolean parkVehicleAtLink(Id<Vehicle> vehicleId, Id<Link> linkId, double time) {

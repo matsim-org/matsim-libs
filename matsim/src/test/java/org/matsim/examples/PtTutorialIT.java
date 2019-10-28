@@ -62,7 +62,7 @@ public class PtTutorialIT {
 	
 	@Test
 	public void ensure_tutorial_runs() throws MalformedURLException {
-		Config config = this.utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "0.config.xml"));
+		Config config = this.utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "0.config.xml"));
 		config.controler().setLastIteration(1);
 
 

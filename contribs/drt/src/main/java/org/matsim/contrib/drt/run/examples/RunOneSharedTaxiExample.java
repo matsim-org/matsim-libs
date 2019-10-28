@@ -19,8 +19,10 @@
 
 package org.matsim.contrib.drt.run.examples;
 
-import org.matsim.contrib.drt.run.DrtConfigGroup;
+import java.net.URL;
+
 import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -30,17 +32,11 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  * @author michalm
  */
 public class RunOneSharedTaxiExample {
-	private static final String CONFIG_FILE = "one_shared_taxi/one_shared_taxi_config.xml";
-
-	public static void run(boolean otfvis, int lastIteration) {
-		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new DrtConfigGroup(), new DvrpConfigGroup(),
+	public static void run(URL configUrl, boolean otfvis, int lastIteration) {
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 		config.controler().setLastIteration(lastIteration);
 		config.controler().setWriteEventsInterval(lastIteration);
 		DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis).run();
-	}
-
-	public static void main(String[] args) {
-		run(false, 2); // switch to 'true' to turn on visualisation
 	}
 }

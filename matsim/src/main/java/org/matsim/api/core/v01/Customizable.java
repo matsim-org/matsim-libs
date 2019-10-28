@@ -38,7 +38,10 @@ import org.matsim.core.api.internal.MatsimExtensionPoint;
  * from any point inside the MATSim core (<tt>org.matsim</tt>).</p>
  * 
  * @author balmermi
+ *
+ * @deprecated use {@link org.matsim.utils.objectattributes.attributable.Attributable instead}
  */
+@Deprecated
 public interface Customizable extends MatsimExtensionPoint {
 
 	//////////////////////////////////////////////////////////////////////

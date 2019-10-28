@@ -19,23 +19,25 @@
 
 package org.matsim.contrib.drt.optimizer.depot;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+
+import com.google.common.collect.ImmutableSet;
 
 /**
  * @author michalm
  */
 public class NearestStartLinkAsDepot implements DepotFinder {
-	private final Set<Link> startLinks = new HashSet<>();
+	private final ImmutableSet<Link> startLinks;
 
 	public NearestStartLinkAsDepot(Fleet fleet) {
-		for (DvrpVehicle v : fleet.getVehicles().values()) {
-			startLinks.add(v.getStartLink());
-		}
+		startLinks = fleet.getVehicles()
+				.values()
+				.stream()
+				.map(DvrpVehicle::getStartLink)
+				.collect(ImmutableSet.toImmutableSet());
+
 	}
 
 	// TODO a simple straight-line search (for the time being)... MultiNodeDijkstra should be the ultimate solution

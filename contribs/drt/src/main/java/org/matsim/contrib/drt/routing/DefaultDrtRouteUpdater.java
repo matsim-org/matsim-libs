@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.util.ExecutorServiceWithResource;
 import org.matsim.core.config.Config;
@@ -38,6 +37,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.name.Named;
@@ -53,8 +53,7 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 	private final Population population;
 	private final ExecutorServiceWithResource<LeastCostPathCalculator> executorService;
 
-	public DefaultDrtRouteUpdater(DrtConfigGroup drtCfg,
-			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
+	public DefaultDrtRouteUpdater(DrtConfigGroup drtCfg, Network network,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
 			TravelDisutilityFactory travelDisutilityFactory, Population population, Config config) {
 		this.drtCfg = drtCfg;
@@ -64,9 +63,10 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 
 		// Euclidean with overdoFactor > 1.0 could lead to 'experiencedTT < unsharedRideTT',
 		// while the benefit would be a marginal reduction of computation time ==> so stick to 1.0
-		// XXX uses the global.numberOfThreads, not drt.numberOfThreads as this is executed in the replanning phase
+		LeastCostPathCalculatorFactory factory = new FastAStarEuclideanFactory();
+		// XXX uses the global.numberOfThreads, not drt.numberOfThreads, as this is executed in the replanning phase
 		executorService = new ExecutorServiceWithResource<>(IntStream.range(0, config.global().getNumberOfThreads())
-				.mapToObj(i -> new FastAStarEuclideanFactory().createPathCalculator(network,
+				.mapToObj(i -> factory.createPathCalculator(network,
 						travelDisutilityFactory.createTravelDisutility(travelTime), travelTime))
 				.collect(Collectors.toList()));
 	}

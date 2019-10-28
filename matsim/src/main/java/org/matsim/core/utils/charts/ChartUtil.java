@@ -25,13 +25,13 @@ import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 
-import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.title.ImageTitle;
 import org.jfree.chart.title.Title;
-import org.jfree.ui.HorizontalAlignment;
-import org.jfree.ui.RectangleEdge;
-import org.jfree.ui.VerticalAlignment;
+import org.jfree.chart.ui.HorizontalAlignment;
+import org.jfree.chart.ui.RectangleEdge;
+import org.jfree.chart.ui.VerticalAlignment;
 import org.matsim.core.gbl.MatsimResource;
 
 /**
@@ -64,7 +64,7 @@ public abstract class ChartUtil {
 	 */
 	public void saveAsPng(final String filename, final int width, final int height) {
 		try {
-			ChartUtilities.saveChartAsPNG(new File(filename), getChart(), width, height, null, true, 9);
+			ChartUtils.saveChartAsPNG(new File(filename), getChart(), width, height, null, true, 9);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch ( Exception e ) {

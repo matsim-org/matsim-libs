@@ -3,19 +3,18 @@
  */
 package org.matsim.contrib.parking.parkingsearch.search;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.parking.parkingsearch.search.ParkingSearchLogic;
+import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author tschlenther
@@ -43,36 +42,34 @@ public class DistanceMemoryParkingSearchLogic implements ParkingSearchLogic {
 		this.knownLinks = new HashSet<Id<Link>>();
 	}
 
-	public Id<Link> getNextLink(Id<Link> currentLinkId, Id<Link> destLinkId, Id<Vehicle> vehicleId) {
-		
-		Node toNode = network.getLinks().get(currentLinkId).getToNode();
-		
-		Set<Id<Link>> outLinks = toNode.getOutLinks().keySet();
+	public Id<Link> getNextLink(Id<Link> currentLinkId, Id<Link> destLinkId, Id<Vehicle> vehicleId, String mode) {
+
+		List<Link> outLinks = ParkingUtils.getOutgoingLinksForMode(network.getLinks().get(currentLinkId), mode);
 		double shortestDistance = Double.MAX_VALUE;
 		int nrKnownLinks = 0;
 		Id<Link> nextLink = null;
 		
 		if(doLogging) logger.info("number of outlinks of link " + currentLinkId + ": " + outLinks.size());
-		
-		for(Id<Link> outLink : outLinks){
-			
-			if(this.knownLinks.contains(outLink)) nrKnownLinks ++;
+
+		for (Link outLink : outLinks) {
+			Id<Link> outLinkId = outLink.getId();
+			if (this.knownLinks.contains(outLinkId)) nrKnownLinks++;
 			else{
-				double distToDest = NetworkUtils.getEuclideanDistance(network.getLinks().get(outLink).getCoord(), network.getLinks().get(destLinkId).getCoord());
+				double distToDest = NetworkUtils.getEuclideanDistance(outLink.getCoord(), network.getLinks().get(destLinkId).getCoord());
 				if (distToDest < shortestDistance){
-					nextLink = outLink;
+					nextLink = outLinkId;
 					shortestDistance = distToDest;
 					if(doLogging) logger.info("currently chosen link: " + nextLink + " distToDest: " + shortestDistance);
 				}
 				else if(distToDest == shortestDistance){
-					String message = "link " + nextLink + " and link " + outLink + " both are " + distToDest + "m away from destination.";
+					String message = "link " + nextLink + " and link " + outLinkId + " both are " + distToDest + "m away from destination.";
 						if (Math.random() > 0.5)
-							nextLink = outLink;	
+							nextLink = outLinkId;
 						if(doLogging) logger.info(message + " link " + nextLink + " is chosen.");
 				}
 				else{
 					if (doLogging){
-						logger.info("link " + outLink + " was not chosen because it is " + distToDest + "m away whereas shortest distance is " + shortestDistance);
+						logger.info("link " + outLinkId + " was not chosen because it is " + distToDest + "m away whereas shortest distance is " + shortestDistance);
 					}
 				}
 			}
@@ -83,11 +80,11 @@ public class DistanceMemoryParkingSearchLogic implements ParkingSearchLogic {
 			
 			//return random Link
 			int index = MatsimRandom.getRandom().nextInt(outLinks.size());
-			Iterator<Id<Link>> iter = outLinks.iterator();
+			Iterator<Link> iter = outLinks.iterator();
 			for (int i = 0; i < index; i++) {
 			    iter.next();
 			}
-			nextLink = iter.next();
+			nextLink = iter.next().getId();
 		}				
 		
 		if(nextLink == null){
@@ -103,7 +100,7 @@ public class DistanceMemoryParkingSearchLogic implements ParkingSearchLogic {
 	}
 
 	@Override
-	public Id<Link> getNextLink(Id<Link> currentLinkId, Id<Vehicle> vehicleId) {
+	public Id<Link> getNextLink(Id<Link> currentLinkId, Id<Vehicle> vehicleId, String mode) {
 		throw new RuntimeException("shouldn't happen - method not implemented");
 	}
 

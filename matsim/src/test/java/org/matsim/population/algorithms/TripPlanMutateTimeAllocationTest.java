@@ -28,12 +28,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.TripPlanMutateTimeAllocation;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -69,7 +67,6 @@ public class TripPlanMutateTimeAllocationTest {
 
 		TripPlanMutateTimeAllocation mutator =
 				new TripPlanMutateTimeAllocation(
-						new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ),
 						3600.,
 						affectingDuration, new Random(2011));
 		mutator.run(plan);

@@ -34,7 +34,7 @@ public class NextLegReplannerFactory extends WithinDayDuringActivityReplannerFac
 	private final Provider<TripRouter> tripRouterFactory;
 
 	public NextLegReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
-								   Provider<TripRouter> tripRouterFactory) {
+																 Provider<TripRouter> tripRouterFactory) {
 		super(withinDayEngine);
 		this.scenario = scenario;
 		this.tripRouterFactory = tripRouterFactory;
@@ -42,7 +42,7 @@ public class NextLegReplannerFactory extends WithinDayDuringActivityReplannerFac
 
 	@Override
 	public WithinDayDuringActivityReplanner createReplanner() {
-		WithinDayDuringActivityReplanner replanner = new NextLegReplanner(super.getId(), scenario, 
+		WithinDayDuringActivityReplanner replanner = new NextLegReplanner(super.getId(), this.scenario,
 				this.getWithinDayEngine().getActivityRescheduler(),
 				this.tripRouterFactory.get());
 		return replanner;

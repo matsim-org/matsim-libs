@@ -24,17 +24,8 @@ import java.util.Iterator;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.dynagent.DynAction;
-import org.matsim.contrib.dynagent.DynActivity;
-import org.matsim.contrib.dynagent.DynAgent;
-import org.matsim.contrib.dynagent.DynAgentLogic;
-import org.matsim.contrib.dynagent.IdleDynActivity;
-import org.matsim.contrib.dynagent.StaticPassengerDynLeg;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.dynagent.*;
 import org.matsim.contrib.parking.parkingsearch.DynAgent.ParkingDynLeg;
 import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
@@ -188,7 +179,7 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		// add a walk leg after parking
 		Leg currentPlannedLeg = (Leg) currentPlanElement;
 		Id<Link> walkDestination = currentPlannedLeg.getRoute().getEndLinkId();
-		Leg walkLeg = walkLegFactory.createWalkLeg(agent.getCurrentLinkId(), walkDestination, now, TransportMode.egress_walk);
+		Leg walkLeg = walkLegFactory.createWalkLeg(agent.getCurrentLinkId(), walkDestination, now, TransportMode.non_network_walk );
 		this.lastParkActionState = LastParkActionState.WALKFROMPARK;
 		this.stageInteractionType = null;
 		return new StaticPassengerDynLeg(walkLeg.getRoute(), walkLeg.getMode());
@@ -232,9 +223,9 @@ public class ParkingAgentLogic implements DynAgentLogic {
 				//this is the first activity of a day and our parking manager does not provide informations about initial stages. We suppose the car is parked where we are
 				parkLink = agent.getCurrentLinkId();
 			}
-			
-			Id<Link> telePortedParkLink = this.teleportationLogic.getVehicleLocation(agent.getCurrentLinkId(), vehicleId, parkLink, now);
-			Leg walkleg = walkLegFactory.createWalkLeg(agent.getCurrentLinkId(), telePortedParkLink, now, TransportMode.access_walk);
+
+            Id<Link> teleportedParkLink = this.teleportationLogic.getVehicleLocation(agent.getCurrentLinkId(), vehicleId, parkLink, now, currentLeg.getMode());
+            Leg walkleg = walkLegFactory.createWalkLeg(agent.getCurrentLinkId(), teleportedParkLink, now, TransportMode.non_network_walk );
 			this.lastParkActionState = LastParkActionState.WALKTOPARK;
 			this.currentlyAssignedVehicleId = vehicleId;
 			this.stageInteractionType = ParkingUtils.PARKACTIVITYTYPE;

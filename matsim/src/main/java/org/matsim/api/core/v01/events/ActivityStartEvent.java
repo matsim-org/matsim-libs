@@ -30,7 +30,6 @@ import org.matsim.facilities.ActivityFacility;
 
 public class ActivityStartEvent extends Event implements HasPersonId {
 
-	public static final String ATTRIBUTE_PERSON = "person";
 	public static final String EVENT_TYPE = "actstart";
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_FACILITY = "facility";

@@ -13,7 +13,6 @@ import org.matsim.contrib.carsharing.manager.demand.membership.MembershipContain
 import org.matsim.contrib.carsharing.manager.demand.membership.PersonMembership;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -29,19 +28,17 @@ public final class ChooseRandomTripMode implements PlanAlgorithm {
 	private final Scenario scenario;
 	private MembershipContainer memberships;
 	
-	private final StageActivityTypes stageActivityTypes;
 	public ChooseRandomTripMode(final Scenario scenario, final String[] possibleModes,
-								final Random rng, final StageActivityTypes stageActivityTypes, MembershipContainer memberships) {
+								final Random rng, MembershipContainer memberships) {
 		this.possibleModes = possibleModes.clone();
 		this.rng = rng;
-		this.stageActivityTypes = stageActivityTypes;
 		this.scenario = scenario;
 		this.memberships = memberships;
 	}
 	@Override
 	public void run(Plan plan) {
 		Id<Person> personId = plan.getPerson().getId();
-		List<Trip> trips = TripStructureUtils.getTrips(plan, stageActivityTypes);
+		List<Trip> trips = TripStructureUtils.getTrips( plan );
 		boolean ffcard = false;
 		boolean owcard = false;
 		int cnt = trips.size();

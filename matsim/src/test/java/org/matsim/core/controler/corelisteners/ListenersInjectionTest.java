@@ -80,7 +80,7 @@ public class ListenersInjectionTest {
                     public void install() {
                         // put dummy dependencies to get the listenners happy
 						bind(ControlerListenerManager.class).to(ControlerListenerManagerImpl.class);
-						bind(OutputDirectoryHierarchy.class).toInstance( new OutputDirectoryHierarchy( outputDir , OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists ) );
+						bind(OutputDirectoryHierarchy.class).toInstance( new OutputDirectoryHierarchy( outputDir , OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists, config.controler().getCompressionType() ) );
 						bind(IterationStopWatch.class).toInstance( new IterationStopWatch() );
 						install(new ScenarioByInstanceModule(ScenarioUtils.createScenario(config)));
                     }

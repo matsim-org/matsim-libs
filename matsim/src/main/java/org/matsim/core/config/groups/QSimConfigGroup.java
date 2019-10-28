@@ -25,6 +25,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -69,13 +72,19 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
 	private double startTime = Time.getUndefinedTime();
 	private double endTime = Time.getUndefinedTime();
+	@Positive
 	private double timeStepSize = 1.0;
+	@PositiveOrZero
 	private double snapshotPeriod = 0; // off, no snapshots
+	@Positive
 	private double flowCapFactor = 1.0;
+	@Positive
 	private double storageCapFactor = 1.0;
+	@Positive
 	private double stuckTime = 10;
 	private boolean removeStuckVehicles = false;
 	private boolean usePersonIdForMissingVehicleId = true;
+	@Positive
 	private int numberOfThreads = 1;
 	private TrafficDynamics trafficDynamics = TrafficDynamics.queue ;
 	

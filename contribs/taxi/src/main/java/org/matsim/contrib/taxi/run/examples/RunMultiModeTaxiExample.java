@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.taxi.run.examples;
 
+import java.net.URL;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
@@ -27,7 +29,6 @@ import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.MultiModeTaxiModule;
-import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -35,15 +36,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class RunMultiModeTaxiExample {
-	private static final String CONFIG_FILE = "multi_mode_one_taxi/multi_mode_one_taxi_config.xml";
-
-	public static void run(boolean otfvis, int lastIteration) {
+	public static void run(URL configUrl, boolean otfvis, int lastIteration) {
 		// load config
-		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup(),
+		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 		config.controler().setLastIteration(lastIteration);
-		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
-		config.checkConsistency();
 
 		// load scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -61,9 +58,5 @@ public class RunMultiModeTaxiExample {
 
 		// run simulation
 		controler.run();
-	}
-
-	public static void main(String[] args) {
-		run(false, 0); // switch to 'true' to turn on visualisation
 	}
 }

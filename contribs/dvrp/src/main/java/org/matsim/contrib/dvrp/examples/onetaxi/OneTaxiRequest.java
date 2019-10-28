@@ -88,11 +88,6 @@ public final class OneTaxiRequest implements PassengerRequest {
 		return mode;
 	}
 
-	@Override
-	public void setRejected(boolean rejected) {
-		throw new UnsupportedOperationException();
-	}
-
 	static final class OneTaxiRequestCreator implements PassengerRequestCreator {
 		@Override
 		public OneTaxiRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
