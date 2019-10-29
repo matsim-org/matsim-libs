@@ -28,10 +28,13 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
@@ -72,12 +75,13 @@ public class Sim03_HomeOffice {
 
 	public void run(boolean otfvis) {
 
-		String runId = "VW243_HomeOfficeInOut1x_10pct";
+		String runId = "vw280_HomeOffice_6pct_0.1";
 		String base = "D:\\Matsim\\Axer\\Hannover\\Zim\\";
 		String input = base + "input\\";
 		String ouput = base + "output\\"+runId;
-		Config config = ConfigUtils.loadConfig(input + "Sim03_HomeOffice.xml", new OTFVisConfigGroup());
-		config.plans().setInputFile(input + "plans\\vw243_cadON_ptSpeedAdj.0.1_homeOffice_InOutWithin1x.output_plans.xml.gz");
+		Config config = ConfigUtils.loadConfig(input + "vw280_0.1.output_config.xml", new OTFVisConfigGroup(),new CadytsConfigGroup());
+		config.plans().setInputFile(input + "plans\\vw280_0.1.output_plans_homeOffice.xml.gz");
+		config.strategy().setFractionOfIterationsToDisableInnovation(0);
 		
 
 		// StrategySettings strategySettings = new StrategySettings();
@@ -107,18 +111,30 @@ public class Sim03_HomeOffice {
 		config.controler().setWriteEventsInterval(2); // Write Events file every x-Iterations
 		config.controler().setWritePlansInterval(2); // Write Plan file every x-Iterations
 		config.qsim().setStartTime(0);
-		config.qsim().setNumberOfThreads(16);
+		config.global().setNumberOfThreads(Runtime.getRuntime().availableProcessors());
+		config.parallelEventHandling().setNumberOfThreads(5);
+		config.qsim().setNumberOfThreads(6);
 		config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 		config.qsim().setFlowCapFactor(0.1);
 		config.qsim().setStorageCapFactor(0.11);
 		config.controler().setRunId(runId);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		adjustPtNetworkCapacity(scenario.getNetwork(),config.qsim().getFlowCapFactor());
+		
+		config.controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastAStarLandmarks );
+		config.plansCalcRoute().setRoutingRandomness( 3. );
 
+		// vsp defaults
+		config.qsim().setUsingTravelTimeCheckInTeleportation( true );
+		config.qsim().setTrafficDynamics( TrafficDynamics.kinematicWaves );
+		config.controler().setRunId(runId);
+
+		
+		
 		// Run Simulation
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		
 		controler.addOverridingModule(new SwissRailRaptorModule());
+		adjustPtNetworkCapacity(controler.getScenario().getNetwork(), config.qsim().getFlowCapFactor());
 		controler.run();
 	}
 	

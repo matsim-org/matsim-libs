@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
@@ -63,7 +64,7 @@ public class Sim01_LocalLinkFlowIncrease {
 //		String base = "D:\\Matsim\\Axer\\Hannover\\Zim\\";
 		String input = base + "input//";
 		String ouput = base + "output//"+runId;
-		Config config = ConfigUtils.loadConfig(input + configFilename);
+		Config config = ConfigUtils.loadConfig(input + configFilename,new CadytsConfigGroup());
 		config.plans().setInputFile(input + "plans//"+inputPlans);
 
 		//Disable any innovation from the beginning of the simulation
@@ -81,8 +82,8 @@ public class Sim01_LocalLinkFlowIncrease {
 		config.parallelEventHandling().setNumberOfThreads(hdlcores);
 		config.qsim().setNumberOfThreads(qsimcores);
 		config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
-		config.qsim().setFlowCapFactor(0.1);
-		config.qsim().setStorageCapFactor(0.11);
+//		config.qsim().setFlowCapFactor(0.1);
+//		config.qsim().setStorageCapFactor(0.11);
 		config.controler().setRunId(runId);
 		
 		config.controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastAStarLandmarks );

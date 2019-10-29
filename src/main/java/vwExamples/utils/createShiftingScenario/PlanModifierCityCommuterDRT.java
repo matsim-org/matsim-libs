@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.locationtech.jts.geom.Geometry;
@@ -143,8 +144,8 @@ public class PlanModifierCityCommuterDRT {
 		PlanModifierCityCommuterDRT planmodifier = new PlanModifierCityCommuterDRT(
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Hannover_Stadtteile.shp",
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Real_Region_Hannover.shp",
-				"D:\\Matsim\\Axer\\Hannover\\Base\\vw280_0.1\\vw280_0.1.output_plans.xml.gz",
-				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\vw280_0.1.output_plans_cityCommuterDRT_carOnly.xml.gz",
+				"D:\\Matsim\\Axer\\Hannover\\Base\\vw280_100pct_output\\2019-10-19_13-50-24__vw280_100pct.output_plans.xml.gz",
+				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\vw280_1.0.output_plans_cityCommuterDRT_carOnly.xml.gz",
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\network\\network.xml.gz");
 		planmodifier.count();
 		planmodifier.assign();
@@ -250,6 +251,13 @@ public class PlanModifierCityCommuterDRT {
 
 		// modifiedPopulationWriter.closeStreaming();
 	}
+	
+	public static <E> Optional<E> getRandom (Collection<E> e) {
+
+	    return e.stream()
+	            .skip((int) (e.size() * Math.random()))
+	            .findFirst();
+	}
 
 	public void assign() {
 		String shift2mode = "drt";
@@ -279,9 +287,16 @@ public class PlanModifierCityCommuterDRT {
 				// Select a random person from agentSet
 				Plan plan = scenario.getPopulation().getPersons().get(personId).getSelectedPlan();
 
-				// Loop over all subtours of this agent
-
-				for (Subtour subTour : TripStructureUtils.getSubtours(plan, blackList)) {
+				// Get random subtour of this agent
+				Collection<Subtour> subtoursCol = TripStructureUtils.getSubtours(plan, blackList);
+				
+				ArrayList<Subtour> subtours = new ArrayList<Subtour>(subtoursCol);
+				int randomTourdx = (int) (Math.random() * (subtours.size() - 1));
+				
+				Subtour subTour = subtours.get(randomTourdx);
+				
+				//for (Subtour subTour : TripStructureUtils.getSubtours(plan, blackList))
+				{
 					
 					double numberOfTrips = subTour.getTrips().size();
 					double estimatedTourDistance = getBeelineTourLength(subTour);

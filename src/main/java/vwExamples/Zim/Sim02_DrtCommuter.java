@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -50,9 +51,11 @@ import org.matsim.contrib.ev.temperature.TemperatureChangeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.network.filter.NetworkLinkFilter;
@@ -79,7 +82,7 @@ public class Sim02_DrtCommuter {
 	public static final double BATTERYREPLACETIME = 180.0;
 
 	static boolean BatteryReplace = false;
-	static int[] fleetRange = { 250 }; //Pendler DRT
+	static int[] fleetRange = { 2500 }; //Pendler DRT
 //	static int[] fleetRange = { 300 }; //Pendler DRT
 //	static int[] fleetRange = { 2800 };
 	// static int[] fleetRange = {50,60,70};
@@ -100,7 +103,7 @@ public class Sim02_DrtCommuter {
 	public static void run(int fleet, int iterationIdx) throws IOException {
 
 		// Enable or Disable rebalancing
-		String runId = "vw280_CityCommuterDRTcarOnly_20pct_0.1_" + fleet + "_veh_idx" + iterationIdx;
+		String runId = "vw280_CityCommuterDRTcarOnly_20pct_1.0_" + fleet + "_veh_idx" + iterationIdx;
 		boolean rebalancing = true;
 
 		String inbase = "D:\\Matsim\\Axer\\Hannover\\ZIM\\";
@@ -119,7 +122,7 @@ public class Sim02_DrtCommuter {
 		// Without EV
 		 final Config config = ConfigUtils.loadConfig(inbase + "\\input\\Sim02_CommuterDRT.xml",
 				 multiModeDrtConfigGroup,
-		 new DvrpConfigGroup(), new OTFVisConfigGroup());
+		 new DvrpConfigGroup(), new OTFVisConfigGroup(), new CadytsConfigGroup());
 
 		// With EV
 //		TemperatureChangeConfigGroup tcg = (TemperatureChangeConfigGroup) config.getModules()
@@ -131,18 +134,20 @@ public class Sim02_DrtCommuter {
 		modes.add("car");
 		modes.add("drt");
 		config.travelTimeCalculator().setAnalyzedModes(modes);
+		config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		// config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		// Overwrite existing configuration parameters
-		config.plans().setInputFile(inbase + "\\input\\plans\\vw280_0.1.output_plans_cityCommuterDRT_carOnly.xml.gz");
+		config.plans().setInputFile(inbase + "\\input\\plans\\vw280_1.0.output_plans_cityCommuterDRT_carOnly.xml.gz");
 //		config.plans().setInputFile(inbase + "\\input\\plans\\vw243_cadON_ptSpeedAdj.0.1_DRT_0.1.output_plans.xml.gz");
 		config.controler().setLastIteration(6); // Number of simulation iterations
-		config.controler().setWriteEventsInterval(2); // Write Events file every x-Iterations
-		config.controler().setWritePlansInterval(2); // Write Plan file every x-Iterations
+//		config.controler().setWriteEventsInterval(2); // Write Events file every x-Iterations
+//		config.controler().setWritePlansInterval(2); // Write Plan file every x-Iterations
 		config.qsim().setStartTime(0);
 		config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
-		config.qsim().setFlowCapFactor(0.1);
-		config.qsim().setStorageCapFactor(0.11);
+//		config.qsim().setFlowCapFactor(0.1);
+//		config.qsim().setStorageCapFactor(0.11);
 		
 		config.controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastAStarLandmarks );
 		config.plansCalcRoute().setRoutingRandomness( 3. );
@@ -150,6 +155,7 @@ public class Sim02_DrtCommuter {
 		// vsp defaults
 		config.qsim().setUsingTravelTimeCheckInTeleportation( true );
 		config.qsim().setTrafficDynamics( TrafficDynamics.kinematicWaves );
+		config.qsim().setNumberOfThreads(1);
 		
 
 		String networkFilePath = inbase + "\\input\\network\\network.xml.gz";

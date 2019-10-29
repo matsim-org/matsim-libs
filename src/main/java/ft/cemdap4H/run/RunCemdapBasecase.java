@@ -120,13 +120,13 @@ public static void main(String[] args) {
 	config.controler().setRunId(runId);
 	config.controler().setWritePlansInterval(20);
 //	config.controler().setWriteEventsInterval(20);
-	config.controler().setLastIteration(340); //Number of simulation iterations
+	config.controler().setLastIteration(200); //Number of simulation iterations
 	config.controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastAStarLandmarks );
 	config.plansCalcRoute().setRoutingRandomness( 3. );
 
 	
 	
-	config.strategy().setFractionOfIterationsToDisableInnovation(0.6); //Fraction to disable Innovation
+	config.strategy().setFractionOfIterationsToDisableInnovation(0.3); //Fraction to disable Innovation
 
 	
 	
