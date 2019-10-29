@@ -348,11 +348,12 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		for (Link link : network.getLinks().values()) {
 			if (link.getToNode().getOutLinks().size() > 1) {
 				if (link.getNumberOfLanes() > 1) {
+					//LOG.warn(link.getNumberOfLanes());
 					fillLanesAndCheckRestrictions(link);
 				} else {
 					Long toNodeId = Long.valueOf(link.getToNode().getId().toString());
 					Set<OsmRelation> restrictions = osmNodeRestrictions.get(toNodeId);
-					if (restrictions != null && !restrictions.isEmpty() && (this.bbox == null || this.bbox.contains(nodes.get(toNodeId).coord))) {
+					if (restrictions != null && !restrictions.isEmpty() /*&& (this.bbox == null || this.bbox.contains(nodes.get(toNodeId).coord))*/) {
 						// if there exists an Restriction in the ToNode, we want to
 						// create a Lane to represent the restriction,
 						// as the toLinks cannot be restricted otherwise
@@ -375,7 +376,42 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				// no lanes needed on this link -> delete the lane container for this link
 				lanes.getLanesToLinkAssignments().remove(link.getId());
 			}
+			//TODO BRUTE FORCE SolUTION DELETE lanes if they dont have a toLink
+			if (link.getNumberOfLanes()!=0){
+				if(lanes.getLanesToLinkAssignments().get(link.getId())==null){
+					lanes.getLanesToLinkAssignments().remove(link.getId());
+				} else {
+					if ((link.getNumberOfLanes() != lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().keySet().size())) {
+						LOG.warn("ss");
+						lanes.getLanesToLinkAssignments().remove(link.getId());
+						link.setNumberOfLanes(0);
+					}else{
+						boolean lanesHaveToLink = true;
+						for(Lane lane : lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().values()){
+							if(lanesHaveToLink && lane.getToLinkIds()==null){
+								LOG.info(lane.getId().toString()+ " doesnt have a toLink -> Remove Lanes");
+								lanes.getLanesToLinkAssignments().remove(link.getId());
+								link.setNumberOfLanes(0);
+								lanesHaveToLink = false;
+							}
+						}
+					}
+				}
+			}
+
+
+
 		}
+		//TESTER sbraun2019102019
+		/*for (Link link : network.getLinks().values()) {
+			LOG.info(link.getId().toString());
+			LOG.info(link.getNumberOfLanes());
+			Map lanesOnLInk = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes();
+			for(Lane lane : lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().values()){
+				LOG.info(lane.getToLinkIds().toString());
+			}
+			//LOG.info(lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().toString());
+		}*/
 
 		for (Link link : network.getLinks().values()) {
 			if (lanes.getLanesToLinkAssignments().get(link.getId()) != null) {
@@ -1423,15 +1459,16 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 	}
 
-	//TODO I took the method from Nils original reader
-	/*
 	private void simplifyLanesAndAddOrigLane(Link link) {
 		// create 'original' lane, i.e. first lane of the link
 		Lane origLane = lanes.getFactory().createLane(Id.create("Lane" + link.getId() + ".ol", Lane.class));
 		origLane.setStartsAtMeterFromLinkEnd(link.getLength());
 		origLane.setNumberOfRepresentedLanes(link.getNumberOfLanes());
 		// note: lane capacities are set later 
-
+		/*for(Lane lane : lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().values()){
+			LOG.info(lane.getId().toString());
+			LOG.info(lane.getToLinkIds());
+		}*/
 		// merge duplicated lanes (lanes with same to-links)
 		Set<Id<Lane>> lanesToBeRemoved = new HashSet<>();
 		for (int indexLane1 = 1; indexLane1 <= lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().size(); indexLane1++) {
@@ -1444,18 +1481,16 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				for (int indexLane2 = indexLane1+1; indexLane2 <= lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().size(); indexLane2++) {
 					Lane lane2 = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().get(Id.create("Lane" + link.getId() + "." + indexLane2, Lane.class));
 					//TODO check if this is sensible. I added the if ToLinkList==null to make it work ---sbraun 20191024
-					if (lane1.getToLinkIds() != null && lane2.getToLinkIds() != null) {
-						if (lane1.getToLinkIds().size() == lane2.getToLinkIds().size()) {
-							for (int i = 0; i < lane1.getToLinkIds().size(); i++) {
-								//if (!lane1.getToLaneIds().get(i).equals(lane2.getToLinkIds().get(i))) { TODO---> makes more sense???
-								if (!lane1.getToLinkIds().get(i).equals(lane2.getToLinkIds().get(i))) {
-									break mergeCheck; // the lanes have not the same to-links
-								}
+					if (lane1.getToLinkIds().size() == lane2.getToLinkIds().size()) {
+						for (int i = 0; i < lane1.getToLinkIds().size(); i++) {
+							//if (!lane1.getToLaneIds().get(i).equals(lane2.getToLinkIds().get(i))) { TODO---> makes more sense???
+							if (!lane1.getToLinkIds().get(i).equals(lane2.getToLinkIds().get(i))) {
+								break mergeCheck; // the lanes have not the same to-links
 							}
-							// lane2 has the same outgoing links as lane1. save it as to be merged
-							lanesToBeRemoved.add(lane2.getId());
-							lane1.setNumberOfRepresentedLanes(lane1.getNumberOfRepresentedLanes() + 1);
 						}
+						// lane2 has the same outgoing links as lane1. save it as to be merged
+						lanesToBeRemoved.add(lane2.getId());
+						lane1.setNumberOfRepresentedLanes(lane1.getNumberOfRepresentedLanes() + 1);
 					}
 				}
 			}
@@ -1463,40 +1498,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		lanes.getLanesToLinkAssignments().get(link.getId()).addLane(origLane);
 		for (Id<Lane> laneToBeRemoved : lanesToBeRemoved) {
 			lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().remove(laneToBeRemoved);
-		}
-	}
-	*/
-	private void simplifyLanesAndAddOrigLane(Link link) {
-		Lane origLane = lanes.getFactory().createLane(Id.create("Lane" + link.getId() + ".ol", Lane.class));
-		lanes.getLanesToLinkAssignments().get(link.getId()).addLane(origLane);
-		origLane.setCapacityVehiclesPerHour(0);
-		origLane.setStartsAtMeterFromLinkEnd(link.getLength());
-		origLane.setNumberOfRepresentedLanes(link.getNumberOfLanes());
-
-		Lane rightLane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
-				.get(Id.create("Lane" + link.getId() + "." + ((int) link.getNumberOfLanes()), Lane.class));
-		rightLane.getAttributes().putAttribute(IS_ORIG_LANE, false);
-		origLane.addToLaneId(rightLane.getId());
-		origLane.setCapacityVehiclesPerHour(origLane.getCapacityVehiclesPerHour()+rightLane.getCapacityVehiclesPerHour());
-		origLane.getAttributes().putAttribute(IS_ORIG_LANE, true);
-		for (int i = (int) link.getNumberOfLanes() - 1; i > 0; i--) {
-			Lane leftLane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
-					.get(Id.create("Lane" + link.getId() + "." + i, Lane.class));
-			origLane.addToLaneId(leftLane.getId());
-			origLane.setCapacityVehiclesPerHour(origLane.getCapacityVehiclesPerHour()+leftLane.getCapacityVehiclesPerHour());
-			if (rightLane.getToLinkIds().equals(leftLane.getToLinkIds())) {
-				leftLane.setNumberOfRepresentedLanes(
-						leftLane.getNumberOfRepresentedLanes() + rightLane.getNumberOfRepresentedLanes());
-				leftLane.setCapacityVehiclesPerHour(leftLane.getCapacityVehiclesPerHour()+rightLane.getCapacityVehiclesPerHour());
-				// log.info("Put together Lane " +
-				// leftLane.getId().toString() + " and Lane " +
-				// rightLane.getId().toString());
-				LanesToLinkAssignment linkLanes = lanes.getLanesToLinkAssignments().get(link.getId());
-				origLane.getToLaneIds().remove(rightLane.getId());
-				linkLanes.getLanes().remove(rightLane.getId());
-			}
-			rightLane = leftLane;
-			rightLane.getAttributes().putAttribute(IS_ORIG_LANE, false);
 		}
 	}
 
