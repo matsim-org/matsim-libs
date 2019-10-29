@@ -18,12 +18,9 @@
  * *********************************************************************** */
 
 package commercialtraffic;/*
-							* created by jbischoff, 03.05.2019
-							*/
+ * created by jbischoff, 03.05.2019
+ */
 
-import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
-import commercialtraffic.commercialJob.CommercialTrafficConfigGroup;
-import commercialtraffic.commercialJob.CommercialTrafficModule;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -51,6 +48,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
+import commercialtraffic.commercialJob.CommercialTrafficConfigGroup;
+import commercialtraffic.commercialJob.CommercialTrafficModule;
+
 public class RunCommercialTraffic_H_DRT {
 	public static void main(String[] args) {
 		String runId = "vw280_CT_DRT_Q_0.3_DRT";
@@ -76,14 +77,20 @@ public class RunCommercialTraffic_H_DRT {
 				config.planCalcScore()
 						.addActivityParams(new ActivityParams("home_" + ii).setTypicalDuration(ii * 3600));
 
-				config.planCalcScore().addActivityParams(new ActivityParams("work_" + ii).setTypicalDuration(ii * 3600)
-						.setOpeningTime(6. * 3600.).setClosingTime(20. * 3600.));
+				config.planCalcScore()
+						.addActivityParams(new ActivityParams("work_" + ii).setTypicalDuration(ii * 3600)
+								.setOpeningTime(6. * 3600.)
+								.setClosingTime(20. * 3600.));
 
-				config.planCalcScore().addActivityParams(new ActivityParams("leisure_" + ii)
-						.setTypicalDuration(ii * 3600).setOpeningTime(9. * 3600.).setClosingTime(27. * 3600.));
+				config.planCalcScore()
+						.addActivityParams(new ActivityParams("leisure_" + ii).setTypicalDuration(ii * 3600)
+								.setOpeningTime(9. * 3600.)
+								.setClosingTime(27. * 3600.));
 
-				config.planCalcScore().addActivityParams(new ActivityParams("shopping_" + ii)
-						.setTypicalDuration(ii * 3600).setOpeningTime(8. * 3600.).setClosingTime(21. * 3600.));
+				config.planCalcScore()
+						.addActivityParams(new ActivityParams("shopping_" + ii).setTypicalDuration(ii * 3600)
+								.setOpeningTime(8. * 3600.)
+								.setClosingTime(21. * 3600.));
 
 				config.planCalcScore()
 						.addActivityParams(new ActivityParams("other_" + ii).setTypicalDuration(ii * 3600));
@@ -91,15 +98,23 @@ public class RunCommercialTraffic_H_DRT {
 			}
 
 			config.planCalcScore().addActivityParams(new ActivityParams("home").setTypicalDuration(14 * 3600));
-			config.planCalcScore().addActivityParams(new ActivityParams("work").setTypicalDuration(8 * 3600)
-					.setOpeningTime(6. * 3600.).setClosingTime(20. * 3600.));
-			config.planCalcScore().addActivityParams(new ActivityParams("leisure").setTypicalDuration(1 * 3600)
-					.setOpeningTime(9. * 3600.).setClosingTime(27. * 3600.));
-			config.planCalcScore().addActivityParams(new ActivityParams("shopping").setTypicalDuration(1 * 3600)
-					.setOpeningTime(8. * 3600.).setClosingTime(21. * 3600.));
+			config.planCalcScore()
+					.addActivityParams(new ActivityParams("work").setTypicalDuration(8 * 3600)
+							.setOpeningTime(6. * 3600.)
+							.setClosingTime(20. * 3600.));
+			config.planCalcScore()
+					.addActivityParams(new ActivityParams("leisure").setTypicalDuration(1 * 3600)
+							.setOpeningTime(9. * 3600.)
+							.setClosingTime(27. * 3600.));
+			config.planCalcScore()
+					.addActivityParams(new ActivityParams("shopping").setTypicalDuration(1 * 3600)
+							.setOpeningTime(8. * 3600.)
+							.setClosingTime(21. * 3600.));
 			config.planCalcScore().addActivityParams(new ActivityParams("other").setTypicalDuration(1 * 3600));
-			config.planCalcScore().addActivityParams(new ActivityParams("education").setTypicalDuration(8 * 3600)
-					.setOpeningTime(8. * 3600.).setClosingTime(18. * 3600.));
+			config.planCalcScore()
+					.addActivityParams(new ActivityParams("education").setTypicalDuration(8 * 3600)
+							.setOpeningTime(8. * 3600.)
+							.setClosingTime(18. * 3600.));
 		}
 
 		config.controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastAStarLandmarks);
@@ -190,7 +205,8 @@ public class RunCommercialTraffic_H_DRT {
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
 		ScenarioUtils.loadScenario(scenario);
 
-		DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.planCalcScore());
+		DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.planCalcScore(),
+				config.plansCalcRoute());
 		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
 		adjustPtNetworkCapacity(scenario.getNetwork(), config.qsim().getFlowCapFactor());
 
