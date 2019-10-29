@@ -127,7 +127,7 @@ class TourPlanning {
 			int jspritThreads = 1;
 
 			if (serviceCount > 50) {
-				jspritThreads = (Runtime.getRuntime().availableProcessors()/2);
+				jspritThreads = (Runtime.getRuntime().availableProcessors());
 			}
 			VehicleRoutingAlgorithm algorithm = Jsprit.Builder.newInstance(problem)
 					.setStateAndConstraintManager(stateManager, constraintManager)
