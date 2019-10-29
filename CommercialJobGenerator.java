@@ -106,7 +106,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
         event.getServices().getInjector().getInstance(ScoreCommercialJobs.class).prepareTourArrivalsForDay();
         String dir = event.getServices().getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/";
         log.info("writing carrier file of iteration " + event.getIteration() + " to " + dir);
-        CarrierPlanWriter planWriter = new CarrierPlanWriter(carriers.getCarriers().values());
+        CarrierPlanXmlWriterV2 planWriter = new CarrierPlanXmlWriterV2(carriers);
         planWriter.write(dir + "carriers_it" + event.getIteration() + ".xml");
     }
 
