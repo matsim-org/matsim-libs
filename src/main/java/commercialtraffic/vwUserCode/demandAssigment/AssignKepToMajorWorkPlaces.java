@@ -37,8 +37,8 @@ public class AssignKepToMajorWorkPlaces {
 		Random r = MatsimRandom.getRandom();
 		r.setSeed(nr);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		String input="D:\\Thiel\\Programme\\WVModell\\02_MatSimOutput\\vw280_CT_0.1_output\\";
-		new PopulationReader(scenario).readFile(input+"\\2019-10-22_15-59-18__vw280_CT_0.1.output_plans.xml.gz");
+		String input="D:\\Thiel\\Programme\\WVModell\\02_MatSimOutput\\00_Base\\vw280_0.1_CT_0.1base\\";
+		new PopulationReader(scenario).readFile(input+"\\vw280_0.1_CT_0.1base.output_plans.xml.gz");
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(
 				"D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Network\\00_Final_Network\\network_editedPt.xml.gz");
 
@@ -103,7 +103,7 @@ public class AssignKepToMajorWorkPlaces {
 						Map<String, Object> attMap = pe.getAttributes().getAsMap();
 						for (Entry<String, Object> attr : attMap.entrySet()) {
 							if (attr.getValue().toString().contains("KEP")) {
-								if (workers2workPlaceMap.containsKey(p)&&r.nextDouble()<=0.5) {
+								if (workers2workPlaceMap.containsKey(p)&&r.nextDouble()<=1.0) {
 									String[] att =attr.getValue().toString().split(";");
 									String newAtt=att[0]+";"+att[1]+";"+"23400"+";"+"64800"+";"+"15";
 									
@@ -125,7 +125,7 @@ public class AssignKepToMajorWorkPlaces {
 	}
 	
 	public static void writePopulation(Scenario scenario, String matsimInput) {
-		String filename = matsimInput + "KepToMajorWorkLocations_0.5_plans_0.1.xml.gz";
+		String filename = matsimInput + "KepToMajorWorkLocations_1.0_plans_0.1.xml.gz";
 		PopulationWriter writer = new PopulationWriter(scenario.getPopulation());
 		writer.write(filename);
 	}

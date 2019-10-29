@@ -143,14 +143,15 @@ public class RunCommercialTraffic_H {
 		ctcg.setCarriersFile(inputDir + "Carrier\\carrier_definition.xml");
 		ctcg.setCarriersVehicleTypesFile(inputDir + "Carrier\\carrier_vehicletypes.xml");
 		ctcg.setTravelTimeSliceWidth(3600);
-				
-		//Override cadyts params
-		CadytsConfigGroup cadccg=ConfigUtils.addOrGetModule(config, CadytsConfigGroup.class);
-		cadccg.setStartTime(0);	
-		cadccg.setEndTime(24*3600);
-		
+
+		// Override cadyts params
+		CadytsConfigGroup cadccg = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.class);
+		cadccg.setStartTime(0);
+		cadccg.setEndTime(24 * 3600);
+
 		CountsConfigGroup countsccg = ConfigUtils.addOrGetModule(config, CountsConfigGroup.class);
-		countsccg.setInputFile("D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\input\\Counts\\counts_H_LSA.xml");
+		countsccg.setInputFile(
+				"D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\input\\Counts\\counts_H_LSA.xml");
 
 		// StrategyConfigGroup.StrategySettings changeServiceOperator = new
 		// StrategyConfigGroup.StrategySettings();
@@ -172,12 +173,14 @@ public class RunCommercialTraffic_H {
 
 		config.planCalcScore().addModeParams(scoreParams);
 
-		config.controler().setLastIteration(2);
+		config.controler().setLastIteration(80);
 		Scenario scenario = loadScenario(config);
+
 		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
 		adjustPtNetworkCapacity(scenario.getNetwork(), config.qsim().getFlowCapFactor());
 
 		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new CadytsCarModule());
 		config.controler().setRunId(runId + pct);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -186,11 +189,10 @@ public class RunCommercialTraffic_H {
 				addTravelDisutilityFactoryBinding(TransportMode.ride).to(carTravelDisutilityFactoryKey());
 			}
 		});
-		
+
 		// include cadyts into the plan scoring (this will add the cadyts corrections to
 		// the scores):
-		
-		controler.addOverridingModule(new CadytsCarModule());
+
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			private final ScoringParametersForPerson parameters = new SubpopulationScoringParameters(scenario);
 			@Inject
