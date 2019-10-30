@@ -23,7 +23,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
@@ -36,12 +35,12 @@ public class ClosestAccessEgressStopFinder implements AccessEgressStopFinder {
 
 	private final Network network;
 	private final QuadTree<TransitStopFacility> stopsQT;
-	private final double maxWalkDistance;
+	private final double maxDistance;
 
-	public ClosestAccessEgressStopFinder(DrtConfigGroup drtconfig, Network network, QuadTree<TransitStopFacility> stopsQT) {
+	public ClosestAccessEgressStopFinder(double maxDistance, Network network, QuadTree<TransitStopFacility> stopsQT) {
 		this.network = network;
 		this.stopsQT = stopsQT;
-		this.maxWalkDistance = drtconfig.getMaxWalkDistance();
+		this.maxDistance = maxDistance;
 	}
 
 	@Override
@@ -52,14 +51,14 @@ public class ClosestAccessEgressStopFinder implements AccessEgressStopFinder {
 		}
 
 		TransitStopFacility egressFacility = findClosestStop(toFacility);
-		return new ImmutablePair<TransitStopFacility, TransitStopFacility>(accessFacility, egressFacility);
+		return new ImmutablePair<>(accessFacility, egressFacility);
 	}
 
 	private TransitStopFacility findClosestStop(Facility facility) {
 		Coord coord = StopBasedDrtRoutingModule.getFacilityCoord(facility, network);
 		TransitStopFacility closestStop = stopsQT.getClosest(coord.getX(), coord.getY());
 		double closestStopDistance = CoordUtils.calcEuclideanDistance(coord, closestStop.getCoord());
-		if (closestStopDistance > maxWalkDistance) {
+		if (closestStopDistance > maxDistance) {
 			return null;
 		}
 		return stopsQT.getClosest(coord.getX(), coord.getY());

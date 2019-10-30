@@ -118,8 +118,8 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 				bindModal(quadTreeTypeLiteral).toProvider(new StopsQuadTreeProvider(drtCfg));
 
 				bindModal(AccessEgressStopFinder.class).toProvider(modalProvider(
-						getter -> new ClosestAccessEgressStopFinder(drtCfg, getter.get(Network.class),
-								getter.getModal(quadTreeTypeLiteral)))).asEagerSingleton();
+						getter -> new ClosestAccessEgressStopFinder(drtCfg.getMaxWalkDistance(),
+								getter.get(Network.class), getter.getModal(quadTreeTypeLiteral)))).asEagerSingleton();
 
 				break;
 
