@@ -177,7 +177,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 					}
 					
 					// transit_walk was replaced by walk + leg attribute routingMode 
-					// TODO: The same for other pt modes? How can those be identified if in they ended up as transit_walk
+					// TODO: The same for other pt modes? How can those be identified if they ended up as transit_walk
 					if (leg.getMode().equals(TransportMode.transit_walk)) {
 						leg.setMode(TransportMode.walk);
 //						TripStructureUtils.setRoutingMode(leg, TransportMode.pt);
