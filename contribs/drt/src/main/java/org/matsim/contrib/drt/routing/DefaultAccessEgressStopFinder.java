@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
@@ -39,15 +38,15 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public class DefaultAccessEgressStopFinder implements AccessEgressStopFinder {
 	private static final Logger LOGGER = Logger.getLogger(DefaultAccessEgressStopFinder.class);
-	
+
 	private final Network network;
-	private final double maxWalkDistance;
+	private final double maxDistance;
 	private final double extensionRadius = 300.0; // not configurable, not sure whether it should be - gl-oct'19
 	private final QuadTree<TransitStopFacility> stopsQT;
 
-	public DefaultAccessEgressStopFinder(DrtConfigGroup drtconfig,Network network, QuadTree<TransitStopFacility> stopsQT) {
+	public DefaultAccessEgressStopFinder(double maxDistance, Network network, QuadTree<TransitStopFacility> stopsQT) {
 		this.network = network;
-		this.maxWalkDistance = drtconfig.getMaxWalkDistance();
+		this.maxDistance = maxDistance;
 		this.stopsQT = stopsQT;
 	}
 
@@ -128,14 +127,18 @@ public class DefaultAccessEgressStopFinder implements AccessEgressStopFinder {
 		TransitStopFacility closestStop = stopsQT.getClosest(coord.getX(), coord.getY());
 		if (closestStop == null) {
 			// no stops, e.g. empty TransitSchedule file loaded / no suitable links in drt service area
-			LOGGER.error("No drt stop could be found for coord x=" + coord.getX() + ", y=" + coord.getY() + " (neither within nor outside the maxWalkDistance).");
+			LOGGER.error("No drt stop could be found for coord x="
+					+ coord.getX()
+					+ ", y="
+					+ coord.getY()
+					+ " (neither within nor outside the maxWalkDistance).");
 			throw new RuntimeException("No drt stop could be found");
 		}
 		double closestStopDistance = CoordUtils.calcEuclideanDistance(coord, closestStop.getCoord());
-		if (closestStopDistance > maxWalkDistance) {
+		if (closestStopDistance > maxDistance) {
 			return Collections.emptySet();
 		}
-		double searchRadius = Math.min(closestStopDistance + extensionRadius, maxWalkDistance);
+		double searchRadius = Math.min(closestStopDistance + extensionRadius, maxDistance);
 		return stopsQT.getDisk(coord.getX(), coord.getY(), searchRadius);
 	}
 
