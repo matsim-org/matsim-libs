@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -177,6 +178,11 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 	
 	public void testThreadLocals() {
 		Config config = ConfigUtils.createConfig();
+		{
+			PlansCalcRouteConfigGroup.ModeRoutingParams params = new PlansCalcRouteConfigGroup.ModeRoutingParams( TransportMode.bike );
+			params.setTeleportedModeSpeed( 15./3.6 ) ;
+			config.plansCalcRoute().addModeRoutingParams( params );
+		}
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		Person p1 = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
