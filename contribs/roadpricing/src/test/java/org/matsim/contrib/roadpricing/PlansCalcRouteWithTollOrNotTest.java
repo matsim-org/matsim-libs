@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.NewControlerModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -69,6 +70,12 @@ public class PlansCalcRouteWithTollOrNotTest {
 	public void testBestAlternatives() {
 		Config config = matsimTestUtils.createConfig();
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		{
+			final PlansCalcRouteConfigGroup.ModeRoutingParams pt = new PlansCalcRouteConfigGroup.ModeRoutingParams( TransportMode.pt );
+			pt.setTeleportedModeFreespeedFactor( 2.0 );
+			config.plansCalcRoute().addModeRoutingParams( pt );
+		}
+
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		RoadPricingTestUtils.createNetwork2(scenario);
 
