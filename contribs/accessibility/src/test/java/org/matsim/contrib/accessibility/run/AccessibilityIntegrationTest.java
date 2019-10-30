@@ -53,6 +53,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -124,6 +125,12 @@ public class AccessibilityIntegrationTest {
 	@Test
 	public void testWithBoundingBoxConfigFile() {
 		Config config = ConfigUtils.loadConfig(utils.getInputDirectory() + "config.xml");
+
+		{
+			PlansCalcRouteConfigGroup.ModeRoutingParams params = new PlansCalcRouteConfigGroup.ModeRoutingParams( TransportMode.bike );
+			params.setTeleportedModeSpeed( 15./3.6 ) ;
+			config.plansCalcRoute().addModeRoutingParams( params );
+		}
 
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, true);
@@ -376,6 +383,12 @@ public class AccessibilityIntegrationTest {
 
 	private Config createTestConfig() {
 		final Config config = ConfigUtils.createConfig();
+
+		{
+			PlansCalcRouteConfigGroup.ModeRoutingParams params = new PlansCalcRouteConfigGroup.ModeRoutingParams( TransportMode.bike );
+			params.setTeleportedModeSpeed( 15.0 / 3.6 ); // 15.0 km/h --> m/s
+			config.plansCalcRoute().addModeRoutingParams( params );
+		}
 
 		final AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
 		acg.setTileSize_m(100);

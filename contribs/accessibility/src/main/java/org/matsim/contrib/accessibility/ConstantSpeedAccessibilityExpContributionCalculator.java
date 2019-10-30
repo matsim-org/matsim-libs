@@ -35,6 +35,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -89,7 +90,7 @@ public final class ConstantSpeedAccessibilityExpContributionCalculator implement
 		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta();
 
 		if (config.plansCalcRoute().getTeleportedModeSpeeds().get(mode) == null) {
-			LOG.error("No teleported mode speed for mode " + mode + " set.");
+			throw new RuntimeException("No teleported mode speed for mode " + mode + " set. " + TripRouter.TELEPORTATION_ROUTER_MSG );
 		}
 		this.modeSpeed_m_h = config.plansCalcRoute().getTeleportedModeSpeeds().get(mode) * 3600.;
 
