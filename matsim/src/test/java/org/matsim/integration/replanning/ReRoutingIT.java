@@ -28,16 +28,20 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import javax.sql.rowset.spi.TransactionalWriter;
 
 public class ReRoutingIT {
 
@@ -62,6 +66,16 @@ public class ReRoutingIT {
 		 * contain this artifacts). theresa, sep'17
 		 * */
 		config.travelTimeCalculator().setTravelTimeGetterType("linearinterpolation");
+		{
+			PlansCalcRouteConfigGroup.ModeRoutingParams params = new PlansCalcRouteConfigGroup.ModeRoutingParams( TransportMode.ride );
+			params.setTeleportedModeFreespeedFactor( 1. );
+			config.plansCalcRoute().addModeRoutingParams( params );
+		}
+		{
+			PlansCalcRouteConfigGroup.ModeRoutingParams params = new PlansCalcRouteConfigGroup.ModeRoutingParams( TransportMode.pt );
+			params.setTeleportedModeFreespeedFactor( 2. );
+			config.plansCalcRoute().addModeRoutingParams( params );
+		}
 
 		/*
 		 * The input plans file is not sorted. After switching from TreeMap to LinkedHashMap
