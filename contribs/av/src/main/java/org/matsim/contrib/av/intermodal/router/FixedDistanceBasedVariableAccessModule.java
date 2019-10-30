@@ -34,9 +34,11 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -81,6 +83,9 @@ public class FixedDistanceBasedVariableAccessModule implements VariableAccessEgr
 
 	@Override
 	public Leg getAccessEgressModeAndTraveltime(Person person, Coord coord, Coord toCoord, double time) {
+		// yyyy Is it not possible to use or possibly write more generic centralized infrastructure for this method or possibly the whole class?  kai,
+		// oct'19
+
 		double egressDistance = CoordUtils.calcEuclideanDistance(coord, toCoord);
 		String mode = getModeForDistance(egressDistance);
 		Leg leg = PopulationUtils.createLeg(mode);
@@ -89,8 +94,12 @@ public class FixedDistanceBasedVariableAccessModule implements VariableAccessEgr
 		Route route = RouteUtils.createGenericRouteImpl(startLink.getId(), endLink.getId());
 		leg.setRoute(route);
 		if (this.teleportedModes.get(mode)) {
-			double distf = config.plansCalcRoute().getModeRoutingParams().get(mode).getBeelineDistanceFactor();
-			double speed = config.plansCalcRoute().getModeRoutingParams().get(mode).getTeleportedModeSpeed();
+			final PlansCalcRouteConfigGroup.ModeRoutingParams modeRoutingParams = config.plansCalcRoute().getModeRoutingParams().get( mode );
+			if ( modeRoutingParams==null ) {
+				throw new RuntimeException( "No router registered for mode=" + mode +TripRouter.TELEPORTATION_ROUTER_MSG ) ;
+			}
+			double distf = modeRoutingParams.getBeelineDistanceFactor();
+			double speed = modeRoutingParams.getTeleportedModeSpeed();
 			double distance = egressDistance * distf;
 			double travelTime = distance / speed;
 			leg.setTravelTime(travelTime);

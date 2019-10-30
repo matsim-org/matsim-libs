@@ -59,7 +59,17 @@ import javax.inject.Provider;
  */
 public final class TripRouter implements MatsimExtensionPoint {
 	private static final Logger log = Logger.getLogger(TripRouter.class );
-	
+
+	public static final String TELEPORTATION_ROUTER_MSG = "For a teleportation " +
+									"router, you will need in your config something like:" + System.lineSeparator() +
+									"<module name=\"planscalcroute\" >" + System.lineSeparator() +
+									"   <parameterset type=\"teleportedModeParameters\" >" + System.lineSeparator() +
+									"      <param name=\"mode\" value=\"<mode>\" />" + System.lineSeparator() +
+									"      <param name=\"teleportedModeSpeed\" value=\"<speed in m/s>\" />" + System.lineSeparator() +
+									"   </parameterset>" + System.lineSeparator() +
+									"   ...";
+
+
 	private final Map<String, RoutingModule> routingModules = new HashMap<>();
 	
 	private MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
@@ -213,15 +223,10 @@ public final class TripRouter implements MatsimExtensionPoint {
 			return trip;
 		}
 
-		throw new UnknownModeException( "unregistered main mode |"+mainMode+"|: does not pertain to "+routingModules.keySet() + "." + System.lineSeparator() +
-								    "If this worked before: The default teleportation routers were removed in apr'19.  In any case, you will " +
-								    "need in your config something like:" + System.lineSeparator() +
-								    "<module name=\"planscalcroute\" >" + System.lineSeparator() +
-								    "   <parameterset type=\"teleportedModeParameters\" >" + System.lineSeparator() +
-								    "      <param name=\"mode\" value=\"<mode>\" />" + System.lineSeparator() +
-								    "      <param name=\"teleportedModeSpeed\" value=\"<speed in m/s>\" />" + System.lineSeparator() +
-								    "   </parameterset>" + System.lineSeparator() +
-								    "   ..."
+		throw new UnknownModeException(
+			  "unregistered routing mode |" + mainMode + "|: does not pertain to " + routingModules.keySet() + "." + System.lineSeparator() +
+				    "If this worked before: The default teleportation routers were removed in apr'19.  " +
+				    TELEPORTATION_ROUTER_MSG
 		);
 	}
 

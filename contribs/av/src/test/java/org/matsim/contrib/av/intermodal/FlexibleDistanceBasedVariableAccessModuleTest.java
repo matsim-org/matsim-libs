@@ -9,6 +9,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -16,6 +17,7 @@ import org.matsim.contrib.av.intermodal.router.FlexibleDistanceBasedVariableAcce
 import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -50,6 +52,12 @@ public class FlexibleDistanceBasedVariableAccessModuleTest {
 	public void testGetAccessEgressModeAndTraveltime() throws MalformedURLException {
 		URL configUrl = new File(utils.getPackageInputDirectory() + "config.xml").toURI().toURL();
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup());
+		{
+			PlansCalcRouteConfigGroup.ModeRoutingParams params = new PlansCalcRouteConfigGroup.ModeRoutingParams( TransportMode.bike );
+			params.setTeleportedModeSpeed( 15.0 / 3.6 ); // 15.0 km/h --> m/s
+			config.plansCalcRoute().addModeRoutingParams( params );
+		}
+
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		FlexibleDistanceBasedVariableAccessModule module = new FlexibleDistanceBasedVariableAccessModule(
 				scenario.getNetwork(), config);
