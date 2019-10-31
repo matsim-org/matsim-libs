@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.noise.data;
+package org.matsim.contrib.noise;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;

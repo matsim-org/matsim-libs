@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,16 +20,12 @@
 /**
  * 
  */
-package org.matsim.contrib.noise.handler;
-
-import org.matsim.contrib.noise.events.NoiseEventCaused;
-import org.matsim.core.events.handler.EventHandler;
+package org.matsim.contrib.noise;
 
 /**
- * @author lkroeger
+ * @author ikaddoura
  *
  */
-
-public interface NoiseEventCausedHandler extends EventHandler{
-	public void handleEvent (NoiseEventCaused event);
+enum NoiseVehicleType {
+	car , hgv
 }

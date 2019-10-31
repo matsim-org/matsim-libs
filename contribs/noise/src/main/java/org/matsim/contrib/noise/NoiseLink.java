@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.noise.data;
+package org.matsim.contrib.noise;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,7 @@ import org.matsim.vehicles.Vehicle;
  * @author ikaddoura
  *
  */
-public class NoiseLink {
+final class NoiseLink {
 
 	private final Id<Link> id;	
 	private List<Id<Vehicle>> enteringVehicleIds = new ArrayList<Id<Vehicle>>();

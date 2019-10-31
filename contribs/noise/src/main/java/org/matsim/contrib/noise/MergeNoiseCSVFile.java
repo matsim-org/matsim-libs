@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.noise.utils;
+package org.matsim.contrib.noise;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.noise.data.ReceiverPoint;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;

@@ -20,16 +20,12 @@
 /**
  * 
  */
-package org.matsim.contrib.noise.handler;
+package org.matsim.contrib.noise;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.log4j.Logger;
+import org.matsim.analysis.XYTRecord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -41,15 +37,6 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.noise.NoiseConfigGroup;
-import org.matsim.contrib.noise.NoiseWriter;
-import org.matsim.contrib.noise.data.NoiseAllocationApproach;
-import org.matsim.contrib.noise.data.NoiseContext;
-import org.matsim.contrib.noise.data.NoiseLink;
-import org.matsim.contrib.noise.data.NoiseReceiverPoint;
-import org.matsim.contrib.noise.data.PersonActivityInfo;
-import org.matsim.contrib.noise.events.NoiseEventAffected;
-import org.matsim.contrib.noise.events.NoiseEventCaused;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
@@ -65,16 +52,16 @@ import com.google.inject.Inject;
  *
  */
 
-public class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEntersVehicleEventHandler, LinkEnterEventHandler, TransitDriverStartsEventHandler {
+class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, PersonEntersVehicleEventHandler, LinkEnterEventHandler, TransitDriverStartsEventHandler {
 
 	private static final Logger log = Logger.getLogger(NoiseTimeTracker.class);
 	private static final boolean printLog = false;
 	
-	@Inject
-	private NoiseContext noiseContext;
+	@Inject private NoiseContext noiseContext;
 		
-	@Inject
-	private EventsManager events;
+	@Inject private EventsManager events;
+
+	@Inject(optional = true) Set<NoiseModule.NoiseListener> listeners ;
 
 	private String outputDirectory;
 	private int iteration;
@@ -235,11 +222,26 @@ public class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, Perso
 					calculateMarginalDamageCost(rp, immisions);
 				}
 			}
+//			if ( listeners!=null ) {
+//				XYTRecord record = new XYTRecord.Builder()
+//										   .setStartTime( 0. )
+//										   .setEndTime( 0. )
+//										   .setCoord( rp.getCoord() )
+//										   .setFacilityId( null )
+//										   .put( "immissions", rp.getCurrentImmission() )
+//										   .build() ;
+//				for( NoiseModule.NoiseListener listener : listeners ){
+//					listener.newRecord( record );
+//				}
+//			} else {
+//				log.warn("listeners=null") ;
+//			}
 		}
 		calculateCostsPerVehiclePerLinkPerTimeInterval();
 		
 		finishNoiseDamageCosts();
-		
+
+
 		if (writeOutput()) {
 			NoiseWriter.writeNoiseImmissionStatsPerHour(noiseContext, outputDirectory);
 			if (this.noiseContext.getNoiseParams().isComputePopulationUnits()) {
@@ -386,7 +388,7 @@ public class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, Perso
 		
 //		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 				
-			double noiseImmission = rp.getFinalImmission();
+			double noiseImmission = rp.getCurrentImmission();
 			double affectedAgentUnits = rp.getAffectedAgentUnits();
 			
 			double damageCost = NoiseEquations.calculateDamageCosts(noiseImmission, affectedAgentUnits, currentTimeBinEndTime, annualCostRate, timeBinsSize);
@@ -454,7 +456,7 @@ public class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, Perso
 					double costs = 0.;
 						
 					if (!(noiseImmission == 0.)) {
-						double costShare = NoiseEquations.calculateShareOfResultingNoiseImmission(noiseImmission, rp.getFinalImmission());
+						double costShare = NoiseEquations.calculateShareOfResultingNoiseImmission(noiseImmission, rp.getCurrentImmission());
 						costs = costShare * rp.getDamageCosts();	
 					}
 					linkId2costShare.put(linkId, costs);
@@ -575,8 +577,8 @@ public class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, Perso
 			if (rp.getAffectedAgentUnits() != 0.) {
 				for (Id<Link> thisLink : immision.getLinkId2IsolatedImmission().keySet()) {
 										
-					double noiseImmissionPlusOneCarThisLink = NoiseEquations.calculateResultingNoiseImmissionPlusOneVehicle(rp.getFinalImmission(), immision.getLinkId2IsolatedImmission().get(thisLink), immision.getLinkId2IsolatedImmissionPlusOneCar().get(thisLink));
-					double noiseImmissionPlusOneHGVThisLink = NoiseEquations.calculateResultingNoiseImmissionPlusOneVehicle(rp.getFinalImmission(), immision.getLinkId2IsolatedImmission().get(thisLink), immision.getLinkId2IsolatedImmissionPlusOneHGV().get(thisLink));
+					double noiseImmissionPlusOneCarThisLink = NoiseEquations.calculateResultingNoiseImmissionPlusOneVehicle(rp.getCurrentImmission(), immision.getLinkId2IsolatedImmission().get(thisLink), immision.getLinkId2IsolatedImmissionPlusOneCar().get(thisLink));
+					double noiseImmissionPlusOneHGVThisLink = NoiseEquations.calculateResultingNoiseImmissionPlusOneVehicle(rp.getCurrentImmission(), immision.getLinkId2IsolatedImmission().get(thisLink), immision.getLinkId2IsolatedImmissionPlusOneHGV().get(thisLink));
 					
 					double damageCostsPlusOneCarThisLink = NoiseEquations.calculateDamageCosts(noiseImmissionPlusOneCarThisLink, rp.getAffectedAgentUnits(), this.noiseContext.getCurrentTimeBinEndTime(), this.noiseContext.getNoiseParams().getAnnualCostRate(), this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation());
 					double marginalDamageCostCarThisLink = (damageCostsPlusOneCarThisLink - rp.getDamageCosts()) / this.noiseContext.getNoiseParams().getScaleFactor();
@@ -587,7 +589,7 @@ public class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, Perso
 						} else {
 							if (cWarn3 == 0) {
 								log.warn("The marginal damage cost per car on link " + thisLink.toString() + " for receiver point " + rp.getId().toString() + " is " + marginalDamageCostCarThisLink + ".");
-								log.warn("final immission: " + rp.getFinalImmission() + " - immission plus one car " + noiseImmissionPlusOneCarThisLink + " - marginal damage cost car: " + marginalDamageCostCarThisLink);
+								log.warn("final immission: " + rp.getCurrentImmission() + " - immission plus one car " + noiseImmissionPlusOneCarThisLink + " - marginal damage cost car: " + marginalDamageCostCarThisLink);
 								log.warn("Setting the marginal damage cost per car to 0.");
 								log.warn("This message is only given once.");
 								cWarn3++;
@@ -606,7 +608,7 @@ public class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, Perso
 						} else {
 							if (cWarn4 == 0) {
 								log.warn("The marginal damage cost per HGV on link " + thisLink.toString() + " for receiver point " + rp.getId().toString() + " is " + marginalDamageCostHGVThisLink + ".");
-								log.warn("final immission: " + rp.getFinalImmission() + " - immission plus one car " + noiseImmissionPlusOneCarThisLink + " - marginal damage cost car: " + marginalDamageCostHGVThisLink);
+								log.warn("final immission: " + rp.getCurrentImmission() + " - immission plus one car " + noiseImmissionPlusOneCarThisLink + " - marginal damage cost car: " + marginalDamageCostHGVThisLink);
 								log.warn("Setting the marginal damage cost per HGV to 0.");
 								log.warn("This message is only given once.");
 								cWarn4++;
@@ -773,7 +775,7 @@ public class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, Perso
 				finalNoiseImmission = NoiseEquations.calculateResultingNoiseImmission(linkId2isolatedImmission.values());
 			}
 			
-			rp.setFinalImmission(finalNoiseImmission);
+			rp.setCurrentImmission(finalNoiseImmission, this.noiseContext.getCurrentTimeBinEndTime());
 			immision.setLinkId2IsolatedImmissionPlusOneCar(linkId2isolatedImmissionPlusOneCar);
 			immision.setLinkId2IsolatedImmissionPlusOneHGV(linkId2isolatedImmissionPlusOneHGV);
 			return immision;
@@ -923,18 +925,17 @@ public class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, Perso
 		return vCarVHdv;
 	}
 
-	public void computeFinalTimeIntervals() {
-
+	void computeFinalTimeIntervals() {
 		while (this.noiseContext.getCurrentTimeBinEndTime() <= Math.max(24. * 3600., this.noiseContext.getScenario().getConfig().qsim().getEndTime())) {
 			processTimeBin();			
 		}
 	}
 	
-	public List<NoiseEventCaused> getNoiseEventsCaused() {
+	List<NoiseEventCaused> getNoiseEventsCaused() {
 		return noiseEventsCaused;
 	}
 
-	public List<NoiseEventAffected> getNoiseEventsAffected() {
+	List<NoiseEventAffected> getNoiseEventsAffected() {
 		return noiseEventsAffected;
 	}
 
@@ -979,7 +980,4 @@ public class NoiseTimeTracker implements VehicleEntersTrafficEventHandler, Perso
 			}
 		}
 	}
-	
-	
-	
 }

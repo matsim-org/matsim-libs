@@ -17,13 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.noise.routing;
+package org.matsim.contrib.noise;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.noise.data.NoiseAllocationApproach;
-import org.matsim.contrib.noise.data.NoiseContext;
+import org.matsim.contrib.noise.NoiseAllocationApproach;
+import org.matsim.contrib.noise.NoiseContext;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.vehicles.Vehicle;
 
@@ -31,7 +31,7 @@ import org.matsim.vehicles.Vehicle;
 * @author ikaddoura
 */
 
-public class NoiseTollTimeDistanceTravelDisutility implements TravelDisutility {
+class NoiseTollTimeDistanceTravelDisutility implements TravelDisutility {
 	
 	private final TravelDisutility randomizedTimeDistanceTravelDisutility;
 	private final NoiseContext noiseContext;

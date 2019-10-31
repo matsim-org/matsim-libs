@@ -1,4 +1,4 @@
-package org.matsim.contrib.noise.utils;
+package org.matsim.contrib.noise;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -19,8 +19,6 @@ import org.locationtech.jts.geom.CoordinateFilter;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.noise.data.FeatureNoiseBarrierImpl;
-import org.matsim.contrib.noise.data.NoiseBarrier;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -30,7 +28,7 @@ import org.opengis.referencing.operation.TransformException;
 /**
  * @author nkuehnel
  */
-public class FeatureNoiseBarriersReader {
+class FeatureNoiseBarriersReader {
 
     private final static Logger logger = Logger.getLogger(FeatureNoiseBarriersReader.class);
     private static final double HEIGHT_PER_LEVEL = 3.5;
@@ -69,7 +67,6 @@ public class FeatureNoiseBarriersReader {
 
             final Object geometry = feature.getAttribute("geometry");
             if(!(geometry instanceof  Polygon)) {
-                System.out.println("test1");
                 continue;
             }
             Polygon polygon = (Polygon) geometry;
@@ -82,7 +79,6 @@ public class FeatureNoiseBarriersReader {
             }
             transformedPolygon.apply(FILTER);
             if(!polygon.isValid()) {
-                System.out.println("test");
                 continue;
             }
             Id<NoiseBarrier> id = Id.create((String) feature.getAttribute("id"), NoiseBarrier.class);
@@ -113,6 +109,9 @@ public class FeatureNoiseBarriersReader {
         return height;
     }
 
+    /**
+     * GeoJson uses x and y the other way around
+     */
     private static class InvertCoordinateFilter implements CoordinateFilter {
         @Override
         public void filter(Coordinate coord) {

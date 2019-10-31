@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.noise.data;
+package org.matsim.contrib.noise;
 
 import org.matsim.core.utils.misc.Time;
 
@@ -29,7 +29,7 @@ import org.matsim.core.utils.misc.Time;
  * @author ikaddoura
  *
  */
-public class PersonActivityInfo {
+final class PersonActivityInfo {
 	
 	private String activityType;
 	private double startTime;

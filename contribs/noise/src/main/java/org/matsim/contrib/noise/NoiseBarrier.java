@@ -1,4 +1,4 @@
-package org.matsim.contrib.noise.data;
+package org.matsim.contrib.noise;
 
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Id;
@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.Id;
  * @author nkuehnel
  *
  */
-public interface NoiseBarrier {
+interface NoiseBarrier {
 
     Geometry getGeometry();
 

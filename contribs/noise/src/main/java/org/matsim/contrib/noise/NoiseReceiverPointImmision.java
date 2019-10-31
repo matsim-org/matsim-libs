@@ -1,4 +1,4 @@
-package org.matsim.contrib.noise.handler;
+package org.matsim.contrib.noise;
 
 import java.util.Collections;
 import java.util.HashMap;

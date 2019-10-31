@@ -17,14 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.noise.events;
+package org.matsim.contrib.noise;
 
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.noise.data.ReceiverPoint;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.vehicles.Vehicle;

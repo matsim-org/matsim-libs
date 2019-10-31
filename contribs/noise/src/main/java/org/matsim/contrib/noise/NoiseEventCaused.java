@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.noise.events;
+package org.matsim.contrib.noise;
 
 import java.util.Map;
 
