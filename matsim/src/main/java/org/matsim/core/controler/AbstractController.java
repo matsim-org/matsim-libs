@@ -24,6 +24,7 @@ import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.utils.MemoryObserver;
 
 /*package*/ abstract class AbstractController {
     // we already had one case where a method of this was removed, causing downstream failures; better just not
@@ -58,10 +59,8 @@ import org.matsim.core.gbl.MatsimRandom;
     private void resetRandomNumbers(long seed, int iteration) {
         MatsimRandom.reset(seed + iteration);
         MatsimRandom.getRandom().nextDouble(); // draw one because of strange
-        // "not-randomness" is the first
-        // draw...
-        // Fixme [kn] this should really be ten thousand draws instead of just
-        // one
+        // "not-randomness" is the first draw...
+        // Fixme [kn] this should really be ten thousand draws instead of just one
     }
 
     final void setupOutputDirectory(OutputDirectoryHierarchy controlerIO) {
@@ -70,6 +69,7 @@ import org.matsim.core.gbl.MatsimRandom;
     }
 
     protected final void run(final Config config) {
+        MemoryObserver.start(60);
         MatsimRuntimeModifications.MyRunnable runnable = new MatsimRuntimeModifications.MyRunnable() {
             @Override
             public void run() throws MatsimRuntimeModifications.UnexpectedShutdownException {
@@ -87,6 +87,7 @@ import org.matsim.core.gbl.MatsimRandom;
         };
         MatsimRuntimeModifications.run(runnable);
         OutputDirectoryLogging.closeOutputDirLogging();
+        MemoryObserver.stop();
     }
 
     protected abstract void loadCoreListeners();

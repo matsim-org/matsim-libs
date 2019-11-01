@@ -26,7 +26,6 @@ package org.matsim.contrib.noise;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -85,6 +84,7 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	private static final String WRITE_OUTPUT_ITERATION_CMT = "Specifies how often the noise-specific output is written out.";
 	private static final String CONSIDER_NOISE_BARRIERS = "considerNoiseBarriers";
 	private static final String NOISE_BARRIERS_GEOJSON_FILE = "noiseBarriersGeojsonPath";
+	private static final String NOISE_BARRIERS_SOURCE_CRS = "source coordinate reference system of noise barriers geojson file";
 	private static final String NETWORK_MODES_TO_IGNORE = "networkModesToIgnore";
 
     public NoiseConfigGroup() {
@@ -134,6 +134,7 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 
 	private boolean considerNoiseBarriers = false;
     private String noiseBarriersFilePath = null;
+    private String noiseBarriersSourceCrs = null;
     
     // ########################################################################################################
 	
@@ -186,6 +187,7 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 
 		comments.put(CONSIDER_NOISE_BARRIERS, "Set to 'true' if noise barriers / building shielding should be considered. Otherwise set to 'false'.");
         comments.put(NOISE_BARRIERS_GEOJSON_FILE, "Path to the geojson file for noise barriers.");
+        comments.put(NOISE_BARRIERS_SOURCE_CRS, "Source coordinate reference system of noise barriers geojson file.");
 
         comments.put(NETWORK_MODES_TO_IGNORE, "Specifies the network modes to be excluded from the noise computation, e.g. 'bike'.");
 
@@ -202,16 +204,11 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 			
 	private void checkGridParametersForConsistency() {
 		
-		List<String> consideredActivitiesForReceiverPointGridList = new ArrayList<String>();
-		List<String> consideredActivitiesForDamagesList = new ArrayList<String>();
+		List<String> consideredActivitiesForReceiverPointGridList = new ArrayList<>();
+		List<String> consideredActivitiesForDamagesList = new ArrayList<>();
 
-		for (int i = 0; i < consideredActivitiesForDamageCalculation.length; i++) {
-			consideredActivitiesForDamagesList.add(consideredActivitiesForDamageCalculation[i]);
-		}
-
-		for (int i = 0; i < this.consideredActivitiesForReceiverPointGrid.length; i++) {
-			consideredActivitiesForReceiverPointGridList.add(consideredActivitiesForReceiverPointGrid[i]);
-		}
+		Collections.addAll(consideredActivitiesForDamagesList, consideredActivitiesForDamageCalculation);
+		consideredActivitiesForReceiverPointGridList.addAll(Arrays.asList(consideredActivitiesForReceiverPointGrid));
 		
 		if (this.receiverPointGap == 0.) {
 			throw new RuntimeException("The receiver point gap is 0. Aborting...");
@@ -277,7 +274,7 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 			}
 		}
 		
-		if (this.tunnelLinkIdFile != null && this.tunnelLinkIdFile != "") {
+		if  (this.tunnelLinkIdFile != null && !"".equals(this.tunnelLinkIdFile)) {
 			
 			if (this.tunnelLinkIDs.size() > 0) {
 				log.warn("Loading the tunnel link IDs from a file. Deleting the existing tunnel link IDs that are added manually.");
@@ -780,8 +777,17 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
     }
 
     @StringSetter(NOISE_BARRIERS_GEOJSON_FILE)
-    public void setConsiderNoiseBarriers(String noiseBarriersFilePath) {
+    public void setNoiseBarriersFilePath(String noiseBarriersFilePath) {
         this.noiseBarriersFilePath = noiseBarriersFilePath;
     }
-    
+
+    @StringGetter(NOISE_BARRIERS_SOURCE_CRS)
+    public String getNoiseBarriersSourceCRS() {
+        return this.noiseBarriersSourceCrs;
+    }
+
+    @StringSetter(NOISE_BARRIERS_SOURCE_CRS)
+    public void setNoiseBarriersSourceCRS(String noiseBarriersSourceCrs) {
+        this.noiseBarriersSourceCrs = noiseBarriersSourceCrs;
+    }
 }

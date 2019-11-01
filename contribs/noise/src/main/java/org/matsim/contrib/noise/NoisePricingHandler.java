@@ -22,57 +22,50 @@
  */
 package org.matsim.contrib.noise;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.contrib.noise.personLinkMoneyEvents.PersonLinkMoneyEvent;
+import org.matsim.core.api.experimental.events.EventsManager;
 
 import com.google.inject.Inject;
 
 
 /**
+ * This handler calculates agent money events based on the noise damages an agent may cause (NoiseEventCaused).
  * 
  * @author ikaddoura
  *
  */
-final class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsimListener, StartupListener {
-	private static final Logger log = Logger.getLogger(NoiseCalculationOnline.class);
+class NoisePricingHandler implements NoiseEventCausedHandler {
+
+	@Inject
+	private EventsManager events;
 	
 	@Inject
 	private NoiseContext noiseContext;
-	
-	@Inject
-	private NoiseTimeTracker timeTracker;
-			
+
+	private double amountSum = 0.;
+
 	@Override
-	public void notifyStartup(StartupEvent event) {
-		NoiseWriter.writeReceiverPoints(noiseContext, event.getServices().getConfig().controler().getOutputDirectory() + "/receiverPoints/", false);	
+	public void reset(int iteration) {
+		this.amountSum = 0.;
 	}
-	
+
 	@Override
-	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-
-		log.info("Resetting noise immissions, activity information and damages...");
-
-		this.noiseContext.getNoiseLinks().clear();
-		this.noiseContext.getTimeInterval2linkId2noiseLinks().clear();
+	public void handleEvent(NoiseEventCaused event) {
 		
-		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
-			rp.reset();
-		}
-	}
-	
-	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		timeTracker.computeFinalTimeIntervals();
-		log.info("Noise calculation completed.");
+		// negative amount since from here the amount is interpreted as costs
+		double amount = this.noiseContext.getNoiseParams().getNoiseTollFactor() * event.getAmount() * (-1);
+		this.amountSum = this.amountSum + amount;
+		
+		PersonMoneyEvent moneyEvent = new PersonMoneyEvent(event.getTime(), event.getCausingAgentId(), amount);
+		this.events.processEvent(moneyEvent);
+		
+		PersonLinkMoneyEvent linkMoneyEvent = new PersonLinkMoneyEvent(event.getTime(), event.getCausingAgentId(), event.getLinkId(), amount, event.getLinkEnteringTime(), "noise");
+		this.events.processEvent(linkMoneyEvent);
 	}
 
-	NoiseContext getNoiseContext() {
-		return noiseContext;
+	public double getAmountSum() {
+		return amountSum;
 	}
 	
 }
