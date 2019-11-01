@@ -103,8 +103,9 @@ public final class ChooseRandomSingleLegMode implements PlanAlgorithm {
 	}
 
 	private void setRandomLegMode(final Leg leg, final boolean forbidCar) {
-		leg.setMode(chooseModeOtherThan(leg.getMode(), forbidCar));
-		TripStructureUtils.setRoutingMode(leg, chooseModeOtherThan(leg.getMode(), forbidCar));
+		String newMode = chooseModeOtherThan(leg.getMode(), forbidCar);
+		leg.setMode(newMode);
+		TripStructureUtils.setRoutingMode(leg, newMode);
 		Route route = leg.getRoute() ;
 		if ( route != null && route instanceof NetworkRoute) {
 			((NetworkRoute)route).setVehicleId(null);
