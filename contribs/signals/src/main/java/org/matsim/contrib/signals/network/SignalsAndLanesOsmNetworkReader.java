@@ -197,7 +197,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		 */
 
 		new NetworkCleaner().run(network);
-		//TODO What is this method doing exactly - it doesnt work here - but we need it
 		new LanesAndSignalsCleaner().run(scenario);
 
 		/*
