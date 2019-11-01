@@ -198,7 +198,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 		new NetworkCleaner().run(network);
 		//TODO What is this method doing exactly - it doesnt work here - but we need it
-		//new LanesAndSignalsCleaner().run(scenario);
+		new LanesAndSignalsCleaner().run(scenario);
 
 		/*
 		 * Write the files out: network, lanes, signalSystems, signalGroups,
@@ -515,6 +515,24 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 		}
 		LOG.info(badCounter);
+
+
+		//TODO BRUTE FORCE THIS LOGIC PRODUCES SIGNALSYSTEMS WITHOUT SIGNALDATA	OR WITHOUT LINKS/LANES -> delete them
+		Set<Id<SignalSystem>> badSignalSystemData= new HashSet<Id<SignalSystem>>();
+		for (Id<SignalSystem> signalsystem : this.systems.getSignalSystemData().keySet()){
+			if (this.systems.getSignalSystemData().get(signalsystem).getSignalData()==null) {
+				badSignalSystemData.add(signalsystem);
+			} else {
+				for (SignalData signalData : this.systems.getSignalSystemData().get(signalsystem).getSignalData().values()){
+					signalData.getLinkId();
+					signalData.getLaneIds();
+				}
+			}
+		}
+		LOG.warn("Bad SignalSystemData: "+badSignalSystemData.size()+" ->remove them from the system");
+		for(Id<SignalSystem> badData :badSignalSystemData) {
+			this.systems.getSignalSystemData().remove(badData);
+		}
 	}
 
 	private void mergeOnewaySignalSystems(List<OsmNode> addingNodes, List<OsmNode> checkedNodes) {
