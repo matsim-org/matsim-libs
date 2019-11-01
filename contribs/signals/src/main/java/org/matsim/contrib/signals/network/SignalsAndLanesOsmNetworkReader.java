@@ -523,6 +523,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				badSignalSystemData.add(signalsystem);
 			} else {
 				for (SignalData signalData : this.systems.getSignalSystemData().get(signalsystem).getSignalData().values()){
+					//TODO check if the Signaldata has Link and Lane
 					signalData.getLinkId();
 					signalData.getLaneIds();
 				}
