@@ -22,12 +22,12 @@ The project is published via Jitpack. To include it into your project simply add
     </dependency>
 </dependencies>
 ```
-## Ho to use it
+## How to use it
 The reader uses the builder pattern. With a simple set up you can convert your network the following way
 ```
 String file = "path/to/your/file.osm.pbf";
 String outputFile = "path/to/your/matsim-network.xml.gz";
-// you may choose your own target coordinate system, but UTM32 is a good choice if you run a simulatio in Germany
+// you may choose your own target coordinate system, but UTM32 is a good choice if you run a simulation in Germany
 CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832");
 Network network = NetworkUtils.createNetwork();
 
@@ -56,7 +56,7 @@ transport mode on all links to 'car' and 'bike'.
  ```
  String file = "path/to/your/file.osm.pbf";
  String outputFile = "path/to/your/matsim-network.xml.gz";
- // you may choose your own target coordinate system, but UTM32 is a good choice if you run a simulatio in Germany
+ // you may choose your own target coordinate system, but UTM32 is a good choice if you run a simulation in Germany
  CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832");
  Network network = NetworkUtils.createNetwork();
  
