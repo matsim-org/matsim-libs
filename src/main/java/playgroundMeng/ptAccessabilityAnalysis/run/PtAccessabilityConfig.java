@@ -33,8 +33,9 @@ public class PtAccessabilityConfig {
 	private String shapeFile = null;
 	private String transitFile = null;
 
-	private String outputDirectory = "C:/Users/VW3RCOM/Desktop/ptAnalysisOutputFileTest/";
-	private String eventFile =  "W:/08_Temporaere_Mitarbeiter/082_K-GGSN//0822_Praktikanten/Meng/vw243_cadON_ptSpeedAdj.0.1/vw243_cadON_ptSpeedAdj.0.1.output_events.xml.gz";
+	private String outputDirectory = null;
+	private String eventFile =  null;
+	private String analysisNetworkFile = null;
 	
 	private double analysisTimeSlice = 0;
 	private int analysisGridSlice = 0;
@@ -50,6 +51,15 @@ public class PtAccessabilityConfig {
 	private boolean considerActivities = true;
 	private boolean writeArea2Time2Score = true;
 	private boolean writeArea2Time2Activities = true;
+	
+	
+	public void setAnalysisNetworkFile(String analysisNetworkFile) {
+		this.analysisNetworkFile = analysisNetworkFile;
+	}
+	
+	public String getAnalysisNetworkFile() {
+		return analysisNetworkFile;
+	}
 	
 	public void setMinx(double minx) {
 		this.minx = minx;

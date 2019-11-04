@@ -26,6 +26,7 @@ import playgroundMeng.ptAccessabilityAnalysis.areaSplit.AreaSplit;
 import playgroundMeng.ptAccessabilityAnalysis.areaSplit.DistrictBasedSplit;
 import playgroundMeng.ptAccessabilityAnalysis.areaSplit.GridBasedSplit;
 import playgroundMeng.ptAccessabilityAnalysis.prepare.TimeConvert;
+import playgroundMeng.ptAccessabilityAnalysis.run.ConsoleProgressBar;
 import playgroundMeng.ptAccessabilityAnalysis.run.PtAccessabilityConfig;
 
 
@@ -45,6 +46,7 @@ public class AllActivitiesAnalysis implements ActivitiesAnalysisInterface{
 	public AllActivitiesAnalysis(Network network, PtAccessabilityConfig ptAccessabilityConfig, AreaSplit areaSplit){
 		this.network = network;
 		this.ptAccessabilityConfig = ptAccessabilityConfig;
+		logger.info("have areasplit");
 		this.areaSplit = areaSplit;
 		if(ptAccessabilityConfig.isConsiderActivities()) {
 			this.run();
@@ -67,11 +69,10 @@ public class AllActivitiesAnalysis implements ActivitiesAnalysisInterface{
 		}
 		logger.info("beginn to filter the activities into area");
 		this.getArea2Activities();
-		for(String string: this.area2Activities.keySet()) {
-			logger.info("area "+ string + " has "+ area2Activities.get(string).size()+" activities");
-		}
 	}
 	public void getArea2Activities(){
+
+		
 		if(this.areaSplit instanceof DistrictBasedSplit) {
 			ShapeFileReader shapeFileReader = new ShapeFileReader();
 			this.simpleFeatures = shapeFileReader.getAllFeatures(ptAccessabilityConfig.getShapeFile());
@@ -90,14 +91,19 @@ public class AllActivitiesAnalysis implements ActivitiesAnalysisInterface{
 						this.area2Activities.get(simpleFeature.getAttribute("NAME").toString()).add(activityImp);
 						break;
 					}
-				}	
+				}
 			}	
 		} else if (this.areaSplit instanceof GridBasedSplit) {
+			int remain = 0;
+			int total = activities.size();
+			String activitiesDividedProgress = "ActivitiesDivided2AreaProgress";
+			
 			this.areaSplit = (GridBasedSplit) areaSplit;
 			Geometry geometry = null;
 			GeometryFactory gf = new GeometryFactory();
 			for(ActivityImp activityImp : activities) {
 				for(String string: ((GridBasedSplit) areaSplit).getNum2Polygon().keySet()) {
+					
 					if(!this.area2Activities.keySet().contains(string)) {
 						this.area2Activities.put(string, new LinkedList<ActivityImp>());
 					}
@@ -106,14 +112,25 @@ public class AllActivitiesAnalysis implements ActivitiesAnalysisInterface{
 					if(bo){
 						this.area2Activities.get(string).add(activityImp);
 						break;
-					}
+					}	
+				}
+				remain ++;
+				if(remain%(total/10) == 0) {
+					ConsoleProgressBar.progressPercentage(remain, total, activitiesDividedProgress, logger);
+				} else if (remain == total) {
+					ConsoleProgressBar.progressPercentage(remain, total, activitiesDividedProgress, logger);
 				}
 			}
 		}
 	}
 	public void setArea2Time2Activities() {
+		int remain = 0;
+		int total = this.area2Activities.keySet().size();
+		String activitiesDivided2TimeProgress = "ActivitiesDivided2TimeProgress";
+		
 		for(String string: this.area2Activities.keySet()) {
 			this.area2Time2Activities.put(string, new HashedMap());
+			
 			for(double x=ptAccessabilityConfig.getBeginnTime(); x<ptAccessabilityConfig.getEndTime(); x+=ptAccessabilityConfig.getAnalysisTimeSlice()) {
 				this.area2Time2Activities.get(string).put(x, new LinkedList<ActivityImp>());
 				for(ActivityImp activityImp: this.area2Activities.get(string)) {
@@ -122,7 +139,12 @@ public class AllActivitiesAnalysis implements ActivitiesAnalysisInterface{
 						this.area2Time2Activities.get(string).get(x).add(activityImp);
 					}
 				}
-				logger.info(string +" area at time "+x+ " has activities "+ this.area2Time2Activities.get(string).get(x).size());
+			}
+			remain ++;
+			if(remain%(total/10) == 0) {
+				ConsoleProgressBar.progressPercentage(remain, total, activitiesDivided2TimeProgress, logger);
+			} else if (remain == total) {
+				ConsoleProgressBar.progressPercentage(remain, total, activitiesDivided2TimeProgress, logger);
 			}
 		}
 	}

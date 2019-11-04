@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.commons.collections.map.HashedMap;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -16,10 +17,10 @@ import org.opengis.feature.simple.SimpleFeature;
 
 
 public class GridShapeFileWriter {
-	Map<String, Polygon> string2PolygonMap = new HashedMap();
+	Map<String, Geometry> string2PolygonMap = new HashedMap();
 	String outputString;
 	
-	public GridShapeFileWriter(Map<String, Polygon> string2PolygonMap, String outputString) {
+	public GridShapeFileWriter(Map<String, Geometry> string2PolygonMap, String outputString) {
 		this.outputString = outputString;
 		this.string2PolygonMap = string2PolygonMap;
 	}

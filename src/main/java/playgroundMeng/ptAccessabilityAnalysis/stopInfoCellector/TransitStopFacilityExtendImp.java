@@ -14,6 +14,8 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
+import playgroundMeng.ptAccessabilityAnalysis.prepare.TimeConvert;
+
 
 public class TransitStopFacilityExtendImp extends TransitStopFacilityImpl implements TransitStopFacility  {
 	
@@ -59,8 +61,14 @@ public class TransitStopFacilityExtendImp extends TransitStopFacilityImpl implem
 			RouteStopInfo routeStopInfo = new RouteStopInfo();
 			routeStopInfo.setTransportMode(mode);
 			routeStopInfo.setVehicleId(vId);
-			routeStopInfo.setDepatureTime(vehicleId2departure.get(vId) + departureOffset);
-			routeStopInfo.setArrivalTime(vehicleId2departure.get(vId) + arrivalOffset);
+			if(vehicleId2departure.get(vId) >= 24*3600) {
+				routeStopInfo.setDepatureTime(vehicleId2departure.get(vId) + departureOffset);
+				routeStopInfo.setArrivalTime(vehicleId2departure.get(vId) + arrivalOffset);
+			} else {
+				routeStopInfo.setDepatureTime(TimeConvert.timeConvert(vehicleId2departure.get(vId) + departureOffset));
+				routeStopInfo.setArrivalTime(TimeConvert.timeConvert(vehicleId2departure.get(vId) + arrivalOffset));
+			}
+			
 			this.addRouteStopInfo(routeStopInfo);
 		}	
 	}

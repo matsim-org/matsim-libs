@@ -23,6 +23,7 @@ import com.google.inject.Inject;
 import playgroundMeng.ptAccessabilityAnalysis.activitiesAnalysis.ActivitiesAnalysisInterface;
 import playgroundMeng.ptAccessabilityAnalysis.areaSplit.AreaSplit;
 import playgroundMeng.ptAccessabilityAnalysis.areaSplit.GridBasedSplit;
+import playgroundMeng.ptAccessabilityAnalysis.run.ConsoleProgressBar;
 import playgroundMeng.ptAccessabilityAnalysis.run.PtAccessabilityConfig;
 import playgroundMeng.ptAccessabilityAnalysis.stopInfoCellector.RouteStopInfo;
 import playgroundMeng.ptAccessabilityAnalysis.stopInfoCellector.TransitStopFacilityExtendImp;
@@ -33,11 +34,11 @@ public class LinksPtInfoCollector {
 	
 	private static final Logger logger = Logger.getLogger(LinksPtInfoCollector.class);
 	
-	@Inject
+
 	AreaSplit areaSplit;
-	@Inject
+
 	PtAccessabilityConfig analysisConfig;
-	@Inject
+	
 	ActivitiesAnalysisInterface activitiesAnalysis;
 	
 
@@ -47,33 +48,27 @@ public class LinksPtInfoCollector {
 	List<NetworkChangeEvent> allNetworkChangeEvents = new LinkedList<NetworkChangeEvent>();
 	List<NetworkChangeEvent> networkChangeEventsInArea = new LinkedList<NetworkChangeEvent>();
 	
-	public LinksPtInfoCollector() throws Exception {
+	@Inject
+	public LinksPtInfoCollector(AreaSplit areaSplit,PtAccessabilityConfig analysisConfig,ActivitiesAnalysisInterface activitiesAnalysis){
+		this.areaSplit = areaSplit;
+		this.analysisConfig = analysisConfig;
+		this.activitiesAnalysis = activitiesAnalysis;
 		
 	}
 	public void runAndFile () throws Exception {
-		int a = 1;
+		int remain = 0;
+		int total = areaSplit.getLinksClassification().keySet().size();
+		String linksInfoCollectProcess = "LinksInfoCollectProcess";
+		
 		List<Id<Link>> emptyLinkList = new ArrayList<Id<Link>>();
 
 		for(String string : areaSplit.getLinksClassification().keySet()) {
-			//if(list.contains(string)) {
-			//if(string .equals("Bornum")) {
-			logger.info("beginn to collect "+string+" area");
-
 			for(LinkExtendImp linkExtendImp: areaSplit.getLinksClassification().get(string)) {
-				if(a%1000 == 0) {
-					logger.info("beginn to collect the "+a+"th link");
+				if(areaSplit.getStopsClassification().keySet().contains(string)) {
+					for(TransitStopFacilityExtendImp transitStopFacilityExtendImp: areaSplit.getStopsClassification().get(string)) {
+						linkExtendImp.addStopsInfo(transitStopFacilityExtendImp);
+					}
 				}
-				for(TransitStopFacilityExtendImp transitStopFacilityExtendImp: areaSplit.getStopsClassification().get(string)) {
-					linkExtendImp.addStopsInfo(transitStopFacilityExtendImp);
-				}
-				a++;
-				if(linkExtendImp.getPtInfos().isEmpty()) {
-					emptyLinkList.add(linkExtendImp.getId());
-				}
-			}
-			
-			for(Id<Link> linkId : emptyLinkList) {
-				areaSplit.getStopsClassification().get(string).remove(linkId);
 			}
 			if(analysisConfig.isWriteLinksInfo()) {
 				logger.info("beginn to write" + string +" area");
@@ -89,27 +84,25 @@ public class LinksPtInfoCollector {
 					new NetworkChangeEventsWriter().write(analysisConfig.getOutputDirectory()+"networkChangeEvent_"+string+"_area.xml", this.district2changeEvents.get(string));
 				}
 			}
-			
+			remain++;
+			if(remain % (total/10) == 0) {
+				ConsoleProgressBar.progressPercentage(remain, total, linksInfoCollectProcess, logger);
+			}  else if (remain == total) {
+				ConsoleProgressBar.progressPercentage(remain, total, linksInfoCollectProcess,logger);
+			}
 			
 		}
-		//}
 		new NetworkChangeEventsWriter().write(analysisConfig.getOutputDirectory()+"allNetworkChangeEvent.xml", this.allNetworkChangeEvents);
 		
 		if(this.analysisConfig.isWriteArea2Time2Score()) {
-			this.printDistrict2Score();
+			this.printDistrict2Time2Score();
 		}
-		if(this.analysisConfig.isWriteArea2Time2Activities()) {
-			this.printDistrict2Activities();
-		}
-//		if(areaSplit instanceof GridBasedSplit) {
-//			GridBasedSplit gridBasedSplit = (GridBasedSplit) areaSplit;
-//			new GridShapeFileWriter(gridBasedSplit.getNum2Polygon(),this.analysisConfig.getOutputDirectory()).write();
-//		}
 		if(this.analysisConfig.isConsiderActivities()) {
+			if(this.analysisConfig.isWriteArea2Time2Activities()) {
+				this.printDistrict2Time2Activities();
+			}
 			this.caculateKPI();
 			this.printDistrict2KPI();
-//			this.addNetworkChangeEvent2Area();
-//			new NetworkChangeEventsWriter().write(analysisConfig.getOutputDirectory()+"KPI.xml", this.networkChangeEventsInArea);
 		}
 		logger.info("finish");
 	}
@@ -171,7 +164,7 @@ public class LinksPtInfoCollector {
 		}
 	}	
 	
-	private void printDistrict2Score() {
+	private void printDistrict2Time2Score() {
 		File file = new File(this.analysisConfig.getOutputDirectory()+"District2Time2Score.csv");
 		try {
 			logger.info("beginn to write District2Time2Scores' info");
@@ -181,12 +174,21 @@ public class LinksPtInfoCollector {
 			for(double x=analysisConfig.getBeginnTime(); x<analysisConfig.getEndTime(); x+=analysisConfig.getAnalysisTimeSlice()) {
 				bufferedWriter.write(","+x);
 			}
+			int remain = 0;
+			int total = this.district2Time2Score.keySet().size();
+			String printDistrict2ScoreProcess = "PrintDistrict2ScoreProcess";
+			
 			for(String string: this.district2Time2Score.keySet()){
 				bufferedWriter.newLine();
 				bufferedWriter.write(string);
 				for(double x=analysisConfig.getBeginnTime(); x<analysisConfig.getEndTime(); x+=analysisConfig.getAnalysisTimeSlice()) {
 					bufferedWriter.write(","+this.district2Time2Score.get(string).get(x));
-					logger.info("Area "+string+" at timeBeginn "+x+ " has a score "+this.district2Time2Score.get(string).get(x));
+				}
+				remain++;
+				if(remain % (total/10) == 0) {
+					ConsoleProgressBar.progressPercentage(remain, total, printDistrict2ScoreProcess, logger);
+				}  else if (remain == total) {
+					ConsoleProgressBar.progressPercentage(remain, total, printDistrict2ScoreProcess,logger);
 				}
 			
 			}
@@ -196,7 +198,7 @@ public class LinksPtInfoCollector {
 			e.printStackTrace();
 		}
 	}
-	private void printDistrict2Activities() {
+	private void printDistrict2Time2Activities() {
 		File file = new File(this.analysisConfig.getOutputDirectory()+"District2Time2Activities.csv");
 		try {
 			logger.info("beginn to write District2Time2Activities' info");
@@ -211,7 +213,6 @@ public class LinksPtInfoCollector {
 				bufferedWriter.write(string);
 				for(double x=analysisConfig.getBeginnTime(); x<analysisConfig.getEndTime(); x+=analysisConfig.getAnalysisTimeSlice()) {
 					bufferedWriter.write(","+this.activitiesAnalysis.getArea2time2activities().get(string).get(x).size());
-					logger.info("Area "+string+" at timeBeginn "+x+ " has activities "+this.activitiesAnalysis.getArea2time2activities().get(string).get(x).size());
 				}
 			
 			}
@@ -274,7 +275,7 @@ public class LinksPtInfoCollector {
 			for(String string: this.district2Time2KPI.keySet()){
 				
 				for(double x: this.district2Time2KPI.get(string).keySet()) {
-					if(x< 24*3600) {
+					if(x< 24*3600 && this.district2Time2KPI.get(string).get(x) > -1) {
 						int h = (int)(x/3600);
 						int m = (int)((x-h*3600)/60);
 						int s = (int) (x-h*3600-m*60);
