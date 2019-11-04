@@ -79,7 +79,7 @@ public class TimeWindow {
 		int startHash = (int) (startLong^(startLong>>>32));
 		result = 31 * result + startHash;
 		Long endLong  = Double.doubleToLongBits(end);
-		int endHash = (int) (startLong^(startLong>>>32));
+		int endHash = (int) (endLong^(endLong>>>32));
 		result = 31 * result + endHash;
 		return result;
 	}
