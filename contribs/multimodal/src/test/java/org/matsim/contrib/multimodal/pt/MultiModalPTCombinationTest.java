@@ -68,6 +68,8 @@ public class MultiModalPTCombinationTest {
 	 *   the HasPerson interface. As a result, the multi-modal simulation crashed since it could not access
 	 *   the person).
 	 * - Multi-modal simulation can handle transit_walk legs (not yet ready...).
+	 * ---> in nov'19 we are trying to replace transit_walk by normal walk and routingMode=pt, so this test is 
+	 * probably no longer very useful, there is no more special walk mode for pt agents - gl-nov'19
 	 */
 	@Test
 	public void testMultiModalPtCombination() {
@@ -75,8 +77,9 @@ public class MultiModalPTCombinationTest {
 		Fixture f = new Fixture();
 		f.init();
 		
-		Person ptPerson = f.createPersonAndAdd(f.scenario, "0", TransportMode.transit_walk);
-		Person walkPerson = f.createPersonAndAdd(f.scenario, "1", TransportMode.walk);
+//		Person ptPerson = f.createPersonAndAdd(f.scenario, "0", TransportMode.transit_walk);
+		Person ptPerson = f.createPersonAndAdd(f.scenario, "0", TransportMode.walk, TransportMode.pt);
+		Person walkPerson = f.createPersonAndAdd(f.scenario, "1", TransportMode.walk, TransportMode.walk);
 		
 		Scenario scenario = f.scenario;
 		Config config = scenario.getConfig();
@@ -84,7 +87,7 @@ public class MultiModalPTCombinationTest {
 		
 		MultiModalConfigGroup mmcg = new MultiModalConfigGroup();
 		mmcg.setMultiModalSimulationEnabled(true);
-		mmcg.setSimulatedModes(TransportMode.walk + "," + TransportMode.transit_walk);
+		mmcg.setSimulatedModes(TransportMode.walk + "," + TransportMode.transit_walk);//TODO: is this still useful if no agent can still use transit_walk?
 		config.addModule(mmcg);
 		
 		config.qsim().setEndTime(24*3600);
