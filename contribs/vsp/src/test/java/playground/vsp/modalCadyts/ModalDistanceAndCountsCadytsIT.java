@@ -1,6 +1,5 @@
 package playground.vsp.modalCadyts;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,7 +51,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(Parameterized.class)
-@Ignore
 public class ModalDistanceAndCountsCadytsIT {
 
 	@Parameterized.Parameters(name = "{index}: countsWeight == {0}; modalDistanceWeight == {1};")
@@ -75,118 +73,16 @@ public class ModalDistanceAndCountsCadytsIT {
 		this.countsWeight = countsWeight;
 	}
 
-	/**
-	 * This test runs a population of 1000 agents which have the same home and work place. All agents start with two plans.
-	 * One with mode car and one with mode bike. The selected plan is the car plan. Now, the desired distance distribution
-	 * is set to have an equal share of car and bike users. The accepted error in the test is 5%, due to stochastic fuzziness
-	 */
-	@Test
-//	@Ignore
-	public void test() {
+	private static DistanceDistribution createDistanceDistribution() {
 
-		Config config = createConfig();
-		CadytsConfigGroup cadytsConfigGroup = new CadytsConfigGroup();
-		cadytsConfigGroup.setWriteAnalysisFile(true);
-		config.addModule(cadytsConfigGroup);
-
-		Scenario scenario = createScenario(config);
-		Counts<Link> counts = createCounts();
-		scenario.addScenarioElement(Counts.ELEMENT_NAME, counts);
-
-		LinkIdEventHandler linkIdEventHandler = new LinkIdEventHandler();
-
-		Controler controler = new Controler(scenario);
-
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(DistanceDistribution.class).toInstance(createDistanceDistribution());
-				addEventHandlerBinding().toInstance(linkIdEventHandler);
-			}
-		});
-		controler.addOverridingModule(new ModalDistanceCadytsModule());
-		controler.addOverridingModule(new CadytsCarModule(counts));
-
-		// we need to also set the scoring function to see an effect
-		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-
-			@Inject
-			private ScoringParametersForPerson parameters;
-
-			@Inject
-			private ModalDistanceCadytsContext modalDistanceCadytsContext;
-
-			@Inject
-			private CadytsContext cadytsContext;
-
-			@Override
-			public ScoringFunction createNewScoringFunction(Person person) {
-
-				// add the usual stuff to the scoring function
-				SumScoringFunction sumScoringFunction = new SumScoringFunction();
-
-				final ScoringParameters params = parameters.getScoringParameters(person);
-				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params,
-						controler.getScenario().getNetwork()));
-				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
-				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-
-				// add modal distance cadyts
-				final CadytsScoring<Id<DistanceDistribution.DistanceBin>> scoringFunctionMarginals = new CadytsScoring<>(person.getSelectedPlan(),
-						config,
-						modalDistanceCadytsContext);
-
-				scoringFunctionMarginals.setWeightOfCadytsCorrection(modalDistanceWeight);
-				sumScoringFunction.addScoringFunction(scoringFunctionMarginals);
-
-				// add counts cadyts
-				final CadytsScoring<Link> scoringFunctionCounts = new CadytsScoring<Link>(person.getSelectedPlan(),
-						config,
-						cadytsContext);
-				scoringFunctionCounts.setWeightOfCadytsCorrection(countsWeight);
-				sumScoringFunction.addScoringFunction(scoringFunctionCounts);
-
-				return sumScoringFunction;
-			}
-		});
-
-		controler.run();
-
-		Map<String, Integer> modalDistanceCount = new HashMap<>();
-
-		for (Person person : scenario.getPopulation().getPersons().values()) {
-			Activity home = (Activity) person.getSelectedPlan().getPlanElements().get(0);
-			Activity work = (Activity) person.getSelectedPlan().getPlanElements().get(person.getSelectedPlan().getPlanElements().size() - 1);
-
-			double distance = CoordUtils.calcEuclideanDistance(
-					scenario.getNetwork().getLinks().get(home.getLinkId()).getCoord(),
-					scenario.getNetwork().getLinks().get(work.getLinkId()).getCoord()
-			);
-
-			String mode = person.getSelectedPlan().getPlanElements().stream()
-					.filter(element -> element instanceof Activity)
-					.map(element -> (Activity) element)
-					.filter(activity -> activity.getType().endsWith(" interaction"))
-					.map(activity -> activity.getType().substring(0, activity.getType().length() - " interaction".length()))
-					.findFirst()
-					.orElseThrow(() -> new RuntimeException("no interaction activities"));
-
-			modalDistanceCount.merge(mode + "_" + distance, 1, Integer::sum);
-		}
-
-		if (this.modalDistanceWeight > 0 && this.countsWeight == 0) {
-			// don't know how to get a better accuracy than 8%
-			assertEquals(100, modalDistanceCount.get("car_2050.0"), 80);
-			assertEquals(100, modalDistanceCount.get("car_2150.0"), 80);
-			assertEquals(400, modalDistanceCount.get("bike_2050.0"), 80);
-			assertEquals(400, modalDistanceCount.get("bike_2150.0"), 80);
-		} else if (this.modalDistanceWeight == 0 && this.countsWeight > 0) {
-			assertEquals(5, modalDistanceCount.size());
-			assertTrue(modalDistanceCount.get("car_2250.0") > 500); // don't know. one would assume a stronger impact when only running the cadyts count corretion but there isn't
-		} else if (this.modalDistanceWeight > 0 && this.countsWeight > 0) {
-			assertTrue(modalDistanceCount.get("car_2250.0") > modalDistanceCount.get("car_2150.0"));
-			assertTrue(modalDistanceCount.get("car_2250.0") > modalDistanceCount.get("car_2050.0"));
-		}
+		DistanceDistribution result = new DistanceDistribution();
+		result.add(TransportMode.car, 2050, 2149, 10, 100);
+		result.add(TransportMode.car, 2150, 2249, 10, 100);
+		result.add(TransportMode.car, 2250, 2349, 10, 0);
+		result.add(TransportMode.bike, 2050, 2149, 10, 400);
+		result.add(TransportMode.bike, 2150, 2249, 10, 400);
+		result.add(TransportMode.bike, 2250, 2349, 10, 0);
+		return result;
 	}
 
 	private Config createConfig() {
@@ -360,16 +256,117 @@ public class ModalDistanceAndCountsCadytsIT {
 		return plan;
 	}
 
-	private static DistanceDistribution createDistanceDistribution() {
+	/**
+	 * This test runs a population of 1000 agents which have the same home and work place. All agents start with two plans.
+	 * One with mode car and one with mode bike. The selected plan is the car plan. Now, the desired distance distribution
+	 * is set to have an equal share of car and bike users. The accepted error in the test is 5%, due to stochastic fuzziness
+	 */
+	@Test
+	public void test() {
 
-		DistanceDistribution result = new DistanceDistribution(1.0);
-		result.add(TransportMode.car, 2050, 2149, 10, 100);
-		result.add(TransportMode.car, 2150, 2249, 10, 100);
-		result.add(TransportMode.car, 2250, 2349, 10, 0);
-		result.add(TransportMode.bike, 2050, 2149, 10, 400);
-		result.add(TransportMode.bike, 2150, 2249, 10, 400);
-		result.add(TransportMode.bike, 2250, 2349, 10, 0);
-		return result;
+		Config config = createConfig();
+		CadytsConfigGroup cadytsConfigGroup = new CadytsConfigGroup();
+		cadytsConfigGroup.setWriteAnalysisFile(true);
+		config.addModule(cadytsConfigGroup);
+
+		Scenario scenario = createScenario(config);
+		Counts<Link> counts = createCounts();
+		scenario.addScenarioElement(Counts.ELEMENT_NAME, counts);
+
+		LinkIdEventHandler linkIdEventHandler = new LinkIdEventHandler();
+
+		Controler controler = new Controler(scenario);
+
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(DistanceDistribution.class).toInstance(createDistanceDistribution());
+				addEventHandlerBinding().toInstance(linkIdEventHandler);
+			}
+		});
+		controler.addOverridingModule(new ModalDistanceCadytsModule());
+		controler.addOverridingModule(new CadytsCarModule(counts));
+
+		// we need to also set the scoring function to see an effect
+		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+
+			@Inject
+			private ScoringParametersForPerson parameters;
+
+			@Inject
+			private ModalDistanceCadytsContext modalDistanceCadytsContext;
+
+			@Inject
+			private CadytsContext cadytsContext;
+
+			@Override
+			public ScoringFunction createNewScoringFunction(Person person) {
+
+				// add the usual stuff to the scoring function
+				SumScoringFunction sumScoringFunction = new SumScoringFunction();
+
+				final ScoringParameters params = parameters.getScoringParameters(person);
+				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params,
+						controler.getScenario().getNetwork()));
+				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
+				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+
+				// add modal distance cadyts
+				final CadytsScoring<Id<DistanceDistribution.DistanceBin>> scoringFunctionMarginals = new CadytsScoring<>(person.getSelectedPlan(),
+						config,
+						modalDistanceCadytsContext);
+
+				scoringFunctionMarginals.setWeightOfCadytsCorrection(modalDistanceWeight);
+				sumScoringFunction.addScoringFunction(scoringFunctionMarginals);
+
+				// add counts cadyts
+				final CadytsScoring<Link> scoringFunctionCounts = new CadytsScoring<>(person.getSelectedPlan(),
+						config,
+						cadytsContext);
+				scoringFunctionCounts.setWeightOfCadytsCorrection(countsWeight);
+				sumScoringFunction.addScoringFunction(scoringFunctionCounts);
+
+				return sumScoringFunction;
+			}
+		});
+
+		controler.run();
+
+		Map<String, Integer> modalDistanceCount = new HashMap<>();
+
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			Activity home = (Activity) person.getSelectedPlan().getPlanElements().get(0);
+			Activity work = (Activity) person.getSelectedPlan().getPlanElements().get(person.getSelectedPlan().getPlanElements().size() - 1);
+
+			double distance = CoordUtils.calcEuclideanDistance(
+					scenario.getNetwork().getLinks().get(home.getLinkId()).getCoord(),
+					scenario.getNetwork().getLinks().get(work.getLinkId()).getCoord()
+			);
+
+			String mode = person.getSelectedPlan().getPlanElements().stream()
+					.filter(element -> element instanceof Activity)
+					.map(element -> (Activity) element)
+					.filter(activity -> activity.getType().endsWith(" interaction"))
+					.map(activity -> activity.getType().substring(0, activity.getType().length() - " interaction".length()))
+					.findFirst()
+					.orElseThrow(() -> new RuntimeException("no interaction activities"));
+
+			modalDistanceCount.merge(mode + "_" + distance, 1, Integer::sum);
+		}
+
+		if (this.modalDistanceWeight > 0 && this.countsWeight == 0) {
+			// don't know how to get a better accuracy than 8%
+			assertEquals(100, modalDistanceCount.get("car_2050.0"), 80);
+			assertEquals(100, modalDistanceCount.get("car_2150.0"), 80);
+			assertEquals(400, modalDistanceCount.get("bike_2050.0"), 80);
+			assertEquals(400, modalDistanceCount.get("bike_2150.0"), 80);
+		} else if (this.modalDistanceWeight == 0 && this.countsWeight > 0) {
+			assertEquals(5, modalDistanceCount.size());
+			assertTrue(modalDistanceCount.get("car_2250.0") > 500); // don't know. one would assume a stronger impact when only running the cadyts count corretion but there isn't
+		} else if (this.modalDistanceWeight > 0 && this.countsWeight > 0) {
+			assertTrue(modalDistanceCount.get("car_2250.0") > modalDistanceCount.get("car_2150.0"));
+			assertTrue(modalDistanceCount.get("car_2250.0") > modalDistanceCount.get("car_2050.0"));
+		}
 	}
 
 	private static Counts<Link> createCounts() {

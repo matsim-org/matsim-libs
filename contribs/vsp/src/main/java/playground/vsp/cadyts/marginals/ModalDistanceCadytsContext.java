@@ -117,7 +117,7 @@ public class ModalDistanceCadytsContext implements CadytsContextI<Id<DistanceDis
 		// as a parameter it takes a SimResults function. As our result we just return the count value of the distance
 		// bin defined by the bin id. This safes us at least three classes
 		this.calibrator.afterNetworkLoading((binId, lower, upper, type) ->
-				simulatedDistanceDistribution.getBin(binId).getValue() * simulatedDistanceDistribution.getScalingFactor());
+				simulatedDistanceDistribution.getBin(binId).getValue());
 
 		String offsetFilename = outputDirectoryHierarchy.getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
 		try {
