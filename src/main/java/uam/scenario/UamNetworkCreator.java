@@ -34,6 +34,10 @@ import org.matsim.contrib.accessibility.utils.MergeNetworks;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -75,6 +79,7 @@ public class UamNetworkCreator {
 		new MatsimNetworkReader(hanoverNetwork).readFile("input/uam/network.xml.gz");
 
 		Network uamNetwork = NetworkUtils.createNetwork();
+		TransitSchedule transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		List<Node> skyNodes = new ArrayList<>();
 		Set<String> uamLinkModes = ImmutableSet.of(UAM_MODE);
 		for (int i = 0; i < SELECTED_LINK_IDS.size(); i++) {
@@ -102,9 +107,15 @@ public class UamNetworkCreator {
 					.setAllowedModes(uamLinkModes);
 
 			// create access/egress link
-			NetworkUtils.createAndAddLink(uamNetwork, Id.createLinkId(HUB_LINK_ID_PREFIX + i), hubLandingNode,
-					hubTakeoffNode, HUB_LINK_LENGTH, HUB_LINK_SPEED, HUB_LINK_FLOW_CAPACITY, HUB_LINK_NUM_LANES)
-					.setAllowedModes(uamLinkModes);
+			Link hubLink = NetworkUtils.createAndAddLink(uamNetwork, Id.createLinkId(HUB_LINK_ID_PREFIX + i),
+					hubLandingNode, hubTakeoffNode, HUB_LINK_LENGTH, HUB_LINK_SPEED, HUB_LINK_FLOW_CAPACITY,
+					HUB_LINK_NUM_LANES);
+			hubLink.setAllowedModes(uamLinkModes);
+
+			TransitStopFacility transitStop = transitSchedule.getFactory()
+					.createTransitStopFacility(Id.create("STOP_HUB_" + i, TransitStopFacility.class), hubCoord, false);
+			transitStop.setLinkId(hubLink.getId());
+			transitSchedule.addStopFacility(transitStop);
 		}
 
 		for (int i = 0; i < skyNodes.size(); i++) {
@@ -122,5 +133,7 @@ public class UamNetworkCreator {
 		new NetworkWriter(uamNetwork).write("output/uam/uam_only_network.xml");
 		MergeNetworks.merge(hanoverNetwork, "", uamNetwork);
 		new NetworkWriter(hanoverNetwork).write("output/uam/network_with_uam.xml.gz");
+
+		new TransitScheduleWriter(transitSchedule).writeFile("output/uam/uam_stops.xml");
 	}
 }

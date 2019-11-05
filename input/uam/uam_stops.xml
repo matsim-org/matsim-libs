@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v2.dtd">
+
+<transitSchedule>
+
+	<transitStops>
+		<stopFacility id="STOP_HUB_0" x="568690.0049580961" y="5812546.609416321" linkRefId="HUB_0" isBlocking="false"/>
+		<stopFacility id="STOP_HUB_1" x="564418.2811688676" y="5780667.55214392" linkRefId="HUB_1" isBlocking="false"/>
+		<stopFacility id="STOP_HUB_2" x="525507.990424061" y="5799269.937021481" linkRefId="HUB_2" isBlocking="false"/>
+		<stopFacility id="STOP_HUB_3" x="528585.9346217033" y="5808749.889772218" linkRefId="HUB_3" isBlocking="false"/>
+		<stopFacility id="STOP_HUB_4" x="542456.2902004212" y="5836851.520141924" linkRefId="HUB_4" isBlocking="false"/>
+		<stopFacility id="STOP_HUB_5" x="550413.0624197081" y="5803301.803610637" linkRefId="HUB_5" isBlocking="false"/>
+	</transitStops>
+</transitSchedule>
