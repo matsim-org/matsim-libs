@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,25 +17,40 @@
  *                                                                         *
  * *********************************************************************** */
 
+/**
+ * 
+ */
 package org.matsim.contrib.noise;
 
-import org.matsim.analysis.XYTRecord;
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 
 /**
-* @author ikaddoura
-*/
-public final class NoiseModule extends AbstractModule {
-
+ * 
+ * Contains the relevant information for a single receiver point.
+ * 
+ * @author ikaddoura
+ *
+ */
+public class ReceiverPoint implements Identifiable<ReceiverPoint>{
+	
+	// initialization
+	private final Id<ReceiverPoint> id;
+	private Coord coord;
+	
+	public ReceiverPoint(Id<ReceiverPoint> id, Coord coord) {
+		this.id = id;
+		this.coord = coord;
+	}
+	
 	@Override
-	public void install() {
-		install(new NoiseComputationModule());
-		install(new NoiseDefaultCarTravelDisutilityModule());
+	public Id<ReceiverPoint> getId() {
+		return this.id;
 	}
 
-	interface NoiseListener{
-		void newRecord( XYTRecord record ) ;
+	public Coord getCoord() {
+		return coord;
 	}
-
+	
 }
-
