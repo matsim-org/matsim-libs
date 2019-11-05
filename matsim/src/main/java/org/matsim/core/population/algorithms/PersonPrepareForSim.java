@@ -135,7 +135,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			// for backward compatibility: replace all non-direct transit_walk legs (trips with more than one leg) by non_network_walk
 			for (Trip trip : TripStructureUtils.getTrips(plan.getPlanElements())) {
 				List<Leg> legs = trip.getLegsOnly();
-				if (legs.size() > 1) {
+				if (legs.size() >= 1) {
 					String routingMode = null;
 
 					for (Leg leg : legs) {
