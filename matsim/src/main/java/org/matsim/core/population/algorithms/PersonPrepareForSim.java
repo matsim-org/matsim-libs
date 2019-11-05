@@ -132,14 +132,13 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			boolean needsXY2Links = false;
 			boolean needsReRoute = false;
 			
-			// for backward compatibility: replace all non-direct transit_walk legs (trips with more than one leg) by non_network_walk
+			// for backward compatibility: add routingMode to legs if not present		
 			for (Trip trip : TripStructureUtils.getTrips(plan.getPlanElements())) {
 				List<Leg> legs = trip.getLegsOnly();
 				if (legs.size() >= 1) {
 					String routingMode = null;
 
-					for (Leg leg : legs) {
-						// for backward compatibility: add routingMode to legs if not present			
+					for (Leg leg : legs) {	
 						if (TripStructureUtils.getRoutingMode(leg) == null) {
 							if (routingMode == null) {
 								if (backwardCompatibilityMainModeIdentifier == null) {
