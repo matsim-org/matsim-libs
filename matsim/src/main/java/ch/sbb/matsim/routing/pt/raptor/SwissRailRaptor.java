@@ -19,6 +19,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -163,7 +164,15 @@ public class SwissRailRaptor implements TransitRouter {
         RaptorRoute foundRoute = selector.selectOne(foundRoutes, desiredDepartureTime);
         RaptorRoute directWalk = createDirectWalk(fromFacility, toFacility, desiredDepartureTime, person, parameters);
 
-        if (foundRoute == null || directWalk.getTotalCosts() < foundRoute.getTotalCosts()) {
+        if (foundRoute == null || foundRoute.parts.size() == 0 || hasNoPtLeg(foundRoute.parts)) {
+        	if (person == null) {
+            	log.debug("No route found for person null: trip from x=" + fromFacility.getCoord().getX() + ",y=" + fromFacility.getCoord().getY() + " departure at " + desiredDepartureTime + " to x=" + toFacility.getCoord().getX() + ",y=" + toFacility.getCoord().getY());
+        	} else {
+            	log.debug("No route found for person " + person.getId() + ": trip from x=" + fromFacility.getCoord().getX() + ",y=" + fromFacility.getCoord().getY() + " departure at " + desiredDepartureTime + " to x=" + toFacility.getCoord().getX() + ",y=" + toFacility.getCoord().getY());
+        	}
+        	return null; 
+        }
+        if (directWalk.getTotalCosts() * parameters.getDirectWalkFactor() < foundRoute.getTotalCosts()) {
             foundRoute = directWalk;
         }
         List<Leg> legs = RaptorUtils.convertRouteToLegs(foundRoute);
@@ -193,7 +202,14 @@ public class SwissRailRaptor implements TransitRouter {
         if (foundRoutes == null) {
             foundRoutes = new ArrayList<>(1);
         }
-        if (foundRoutes.isEmpty() || directWalk.getTotalCosts() < foundRoutes.get(0).getTotalCosts()) {
+        Iterator<RaptorRoute> iter = foundRoutes.iterator();
+        while (iter.hasNext()) {
+        	RaptorRoute foundRoute = iter.next();
+        	if (foundRoute.parts.size() == 0 || hasNoPtLeg(foundRoute.parts)) {
+        		iter.remove();
+        	}
+        }
+        if (foundRoutes.isEmpty() || directWalk.getTotalCosts() * parameters.getDirectWalkFactor() < foundRoutes.get(0).getTotalCosts()) {
             foundRoutes.add(directWalk); // add direct walk if it seems plausible
         }
         return foundRoutes;
