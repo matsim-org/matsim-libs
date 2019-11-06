@@ -348,7 +348,7 @@ public class SwissRailRaptorIntermodalTest {
 
         Assert.assertEquals("wrong number of legs.", 1, legs.size());
         Leg leg = legs.get(0);
-        Assert.assertEquals(TransportMode.transit_walk, leg.getMode());
+        Assert.assertEquals(TransportMode.walk, leg.getMode());
         Assert.assertEquals(Id.create("from", Link.class), leg.getRoute().getStartLinkId());
         Assert.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
         

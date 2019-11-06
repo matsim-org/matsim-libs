@@ -207,7 +207,7 @@ public class SwissRailRaptorTest {
         List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 5.0*3600, null);
         
         assertEquals(1, legs.size());
-        assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
+        assertEquals(TransportMode.walk, legs.get(0).getMode());
         assertEquals(4000*1.3, legs.get(0).getRoute().getDistance(), 0.0);
         double actualTravelTime = legs.get(0).getTravelTime();
         double expectedTravelTime = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / raptorParams.getBeelineWalkSpeed();

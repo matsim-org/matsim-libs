@@ -253,15 +253,16 @@ public class SwissRailRaptor implements TransitRouter {
         return this.stopFinder.findStops(facility, person, departureTime, parameters, this.data, RaptorStopFinder.Direction.EGRESS);
     }
 
+    // TODO: replace with call to FallbackRoutingModule ?!
     private RaptorRoute createDirectWalk(Facility fromFacility, Facility toFacility, double departureTime, Person person, RaptorParameters parameters) {
         double beelineDistance = CoordUtils.calcEuclideanDistance(fromFacility.getCoord(), toFacility.getCoord());
         double walkTime = beelineDistance / parameters.getBeelineWalkSpeed();
-        double walkCost_per_s = -parameters.getMarginalUtilityOfTravelTime_utl_s(TransportMode.transit_walk);
+        double walkCost_per_s = -parameters.getMarginalUtilityOfTravelTime_utl_s(TransportMode.walk);
         double walkCost = walkTime * walkCost_per_s;
         double beelineDistanceFactor = this.data.config.getBeelineWalkDistanceFactor();
 
         RaptorRoute route = new RaptorRoute(fromFacility, toFacility, walkCost);
-        route.addNonPt(null, null, departureTime, walkTime, beelineDistance * beelineDistanceFactor, TransportMode.transit_walk);
+        route.addNonPt(null, null, departureTime, walkTime, beelineDistance * beelineDistanceFactor, TransportMode.walk);
         return route;
     }
 
