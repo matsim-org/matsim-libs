@@ -290,7 +290,7 @@ public class ModalDistanceCadytsSingleDistanceIT {
 
     private static DistanceDistribution createDistanceDistribution() {
 
-        DistanceDistribution result = new DistanceDistribution(1.0);
+        DistanceDistribution result = new DistanceDistribution();
         result.add(TransportMode.car, 1900, 2150, 10, 400);
         result.add(TransportMode.bike, 1900, 2150, 10, 600);
         return result;
