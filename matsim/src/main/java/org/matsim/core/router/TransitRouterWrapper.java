@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouter;

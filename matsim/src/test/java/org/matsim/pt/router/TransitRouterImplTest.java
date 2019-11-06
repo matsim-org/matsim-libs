@@ -489,13 +489,12 @@ public class TransitRouterImplTest {
 			RoutingModule walkRoutingModule = DefaultRoutingModules.createTeleportationRouter(TransportMode.non_network_walk, f.scenario,
 					f.config.plansCalcRoute().getModeRoutingParams().get(TransportMode.walk));
 			
-			TransitRouterWrapper routingModule = new TransitRouterWrapper(
+			TransitRouterWrapper wrapper = new TransitRouterWrapper(
 	        		router,
 	                f.schedule,
 	                f.scenario.getNetwork(), // use a walk router in case no PT path is found
 	                walkRoutingModule);
 			
-			TransitRouterWrapper wrapper = new TransitRouterWrapper(router, f.schedule, f.scenario.getNetwork(), routingModule);
 			List<PlanElement> planElements = (List<PlanElement>) wrapper.calcRoute(f.fromFacility, f.toFacility, 7.0*3600 + 50*60, null);
 			double tripDuration = calcTripDuration(planElements);
 			Assert.assertEquals(9, planElements.size());
@@ -526,13 +525,12 @@ public class TransitRouterImplTest {
 			RoutingModule walkRoutingModule = DefaultRoutingModules.createTeleportationRouter(TransportMode.non_network_walk, f.scenario,
 					f.config.plansCalcRoute().getModeRoutingParams().get(TransportMode.walk));
 			
-			TransitRouterWrapper routingModule = new TransitRouterWrapper(
+			TransitRouterWrapper wrapper = new TransitRouterWrapper(
 	        		router,
 	                f.schedule,
 	                f.scenario.getNetwork(), // use a walk router in case no PT path is found
 	                walkRoutingModule);
 			
-			TransitRouterWrapper wrapper = new TransitRouterWrapper(router, f.schedule, f.scenario.getNetwork(), routingModule);
 			List<PlanElement> planElements = (List<PlanElement>) wrapper.calcRoute(f.fromFacility, f.toFacility, 7.0*3600 + 50*60, null);
 			double tripDuration = calcTripDuration(planElements);
 			Assert.assertEquals(9, planElements.size());
@@ -556,13 +554,12 @@ public class TransitRouterImplTest {
 			RoutingModule walkRoutingModule = DefaultRoutingModules.createTeleportationRouter(TransportMode.non_network_walk, f.scenario,
 					f.config.plansCalcRoute().getModeRoutingParams().get(TransportMode.walk));
 			
-			TransitRouterWrapper routingModule = new TransitRouterWrapper(
+			TransitRouterWrapper wrapper = new TransitRouterWrapper(
 	        		router,
 	                f.schedule,
 	                f.scenario.getNetwork(), // use a walk router in case no PT path is found
 	                walkRoutingModule);
 			
-			TransitRouterWrapper wrapper = new TransitRouterWrapper(router, f.schedule, f.scenario.getNetwork(), routingModule);
 			List<PlanElement> planElements = (List<PlanElement>) wrapper.calcRoute(f.fromFacility, f.toFacility, 7.0*3600 + 50*60, null);
 	        Assert.assertNull("The router should not find a route and return null, but did return something else.", planElements);
 		}
