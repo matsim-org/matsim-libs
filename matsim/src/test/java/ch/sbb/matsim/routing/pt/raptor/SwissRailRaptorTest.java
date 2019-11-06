@@ -580,9 +580,7 @@ public class SwissRailRaptorTest {
 
             TransitRouterWrapper wrapper = new TransitRouterWrapper(router, f.schedule, f.scenario.getNetwork(), routingModule);
             List<PlanElement> planElements = (List<PlanElement>) wrapper.calcRoute(f.fromFacility, f.toFacility, 7.0*3600 + 50*60, null);
-            double tripDuration = calcTripDuration(planElements);
-            Assert.assertEquals(1, planElements.size());
-            Assert.assertEquals(50000, tripDuration, 1.0);
+            Assert.assertNull("The router should not find a route and return null, but did return something else.", planElements);
         }
     }
 
