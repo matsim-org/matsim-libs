@@ -175,28 +175,21 @@ public class SwissRailRaptorTest {
 
     /**
      * The fromFacility and toFacility are both closest to TransitStopFacility I. The expectation is that the Swiss Rail
-     * Raptor will return a transit_walk between the fromFacility and toFacility instead of routing the agent to make a
-     * major detour by walking the triangle from the fromFacility to the transitStopFacility and then to the toFacility,
-     * without once using pt.
+     * Raptor will return null (TripRouter / FallbackRouter will create a transit_walk between the fromFacility and 
+     * toFacility) instead of routing the agent to make a major detour by walking the triangle from the fromFacility to 
+     * the transitStopFacility and then to the toFacility, without once using pt.
      */
 
     @Test
     public void testFromToSameStop() {
         Fixture f = new Fixture();
         f.init();
-        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         Coord fromCoord = new Coord(3800, 5100);
         Coord toCoord = new Coord(4100, 5050);
         List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 5.0*3600, null);
-        assertEquals(1, legs.size());
-        assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
-        double actualTravelTime = 0.0;
-        for (Leg leg : legs) {
-            actualTravelTime += leg.getTravelTime();
-        }
-        double expectedTravelTime = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / raptorParams.getBeelineWalkSpeed();
-        assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
+        
+        Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
     }
 
 
@@ -430,20 +423,12 @@ public class SwissRailRaptorTest {
         // is no late service in the schedule.
         Fixture f = new Fixture();
         f.init();
-        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         Coord fromCoord = new Coord(3800, 5100);
         Coord toCoord = new Coord(16100, 5050);
         List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 25.0*3600, null);
-        assertEquals(1, legs.size());
-        assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
-        assertEquals("expected GenericRoute in leg.", "generic", legs.get(0).getRoute().getRouteType());
-        double actualTravelTime = 0.0;
-        for (Leg leg : legs) {
-            actualTravelTime += leg.getTravelTime();
-        }
-        double expectedTravelTime = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / raptorParams.getBeelineWalkSpeed();
-        assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
+        
+        Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
     }
 
     @Test
@@ -468,7 +453,7 @@ public class SwissRailRaptorTest {
 
     /**
      * Tests that if only a single transfer-/walk-link is found, the router correctly only returns
-     * on walk leg from start to end.
+     * null (TripRouter/FallbackRouter will create a walk leg from start to end).
      */
     @Test
     public void testSingleWalkOnly() {
@@ -478,15 +463,15 @@ public class SwissRailRaptorTest {
 
         TransitRouter router = createTransitRouter(f.schedule, f.scenario.getConfig(), f.scenario.getNetwork());
         List<Leg> legs = router.calcRoute(new FakeFacility(f.coord2), new FakeFacility(f.coord4), 990, null);
-        assertEquals(1, legs.size());
-        assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
+        Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
     }
 
 
     /**
      * Tests that if only exactly two transfer-/walk-link are found, the router correctly only returns
-     * on walk leg from start to end. Differs from {@link #testSingleWalkOnly()} in that it tests for
-     * the correct internal working when more than one walk links are returned.
+     * null (which will be replaced by the TripRouter and FallbackRouter with one walk leg from start 
+     * to end). Differs from {@link #testSingleWalkOnly()} in that it tests for the correct internal 
+     * working when more than one walk links are returned.
      */
     @Test
     public void testDoubleWalkOnly() {
@@ -496,8 +481,8 @@ public class SwissRailRaptorTest {
 
         TransitRouter router = createTransitRouter(f.schedule, f.scenario.getConfig(), f.scenario.getNetwork());
         List<Leg> legs = router.calcRoute(new FakeFacility(f.coord2), new FakeFacility(f.coord6), 990, null);
-        assertEquals(1, legs.size());
-        assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
+        
+        Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
     }
 
     @SuppressWarnings("unchecked")
@@ -582,9 +567,7 @@ public class SwissRailRaptorTest {
             Coord fromCoord = f.fromFacility.getCoord();
             Coord toCoord = f.toFacility.getCoord();
             List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 7.0*3600 + 50*60, null);
-            double legDuration = calcTripDuration(new ArrayList<>(legs));
-            Assert.assertEquals(1, legs.size());
-            Assert.assertEquals(50000, legDuration, 1.0);
+            Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
 
             RoutingModule walkRoutingModule = DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, f.scenario,
                     f.config.plansCalcRoute().getModeRoutingParams().get(TransportMode.walk));
@@ -987,28 +970,20 @@ public class SwissRailRaptorTest {
 
     /**
      * Tests what happens if there is a transit service available, but the agent's departure time (11 AM) is after the last transit
-     * departure time (9:46 AM). The expectation is that the dummy agent will use transit_walk to get from the fromFacility to the toFacility.
+     * departure time (9:46 AM). The expectation is that the router returns null and TripRouter/FallbackRouter will create a direct 
+     * walk leg to get from the fromFacility to the toFacility.
      */
     @Test
     public void testDepartureAfterLastBus(){
         Fixture f = new Fixture();
         f.init();
-        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         Coord fromCoord = new Coord(3800, 5100);
         Coord toCoord = new Coord(8100, 5050);
 
         List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 11.0*3600, null);
 
-        assertEquals(1, legs.size());
-        assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
-
-        double actualTravelTime = 0.0;
-        for (Leg leg : legs) {
-            actualTravelTime += leg.getTravelTime();
-        }
-        double expectedTravelTime = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / raptorParams.getBeelineWalkSpeed();
-        assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
+        Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
     }
 
     /**

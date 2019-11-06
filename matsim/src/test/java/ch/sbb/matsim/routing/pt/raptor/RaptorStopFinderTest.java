@@ -82,17 +82,11 @@ public class RaptorStopFinderTest {
                     new LeastCostRaptorRouteSelector(), stopFinder, null);
 
             List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7 * 3600, f0.dummyPerson);
-            for (Leg leg : legs) {
-                System.out.println(leg);
-            }
 
-            Assert.assertEquals("wrong number of legs.", 1, legs.size());
-            Leg leg = legs.get(0);
-            Assert.assertEquals(TransportMode.transit_walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
-
+            Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
+            
         }
+        
         /* General Radius includes stop B. Search_Extension_Radius is 0.
         Expected: Stop Finder will only find stop B. Lines C, D, and E are set to very fast, so as to check that only
         stop B is included.
@@ -226,16 +220,9 @@ public class RaptorStopFinderTest {
                     new LeastCostRaptorRouteSelector(), stopFinder, null);
 
             List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7 * 3600, f0.dummyPerson);
-            for (Leg leg : legs) {
-                System.out.println(leg);
-            }
-
-            Assert.assertEquals("wrong number of legs.", 1, legs.size());
-            Leg leg = legs.get(0);
-            Assert.assertEquals(TransportMode.transit_walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
-
+            
+            Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
+            
         }
 
         /* General Radius includes stop B. Search_Extension_Radius is 0.
@@ -432,17 +419,11 @@ public class RaptorStopFinderTest {
                     new LeastCostRaptorRouteSelector(), stopFinder, null);
 
             List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7 * 3600, f0.dummyPerson);
-            for (Leg leg : legs) {
-                System.out.println(leg);
-            }
 
-            Assert.assertEquals("wrong number of legs.", 1, legs.size());
-            Leg leg = legs.get(0);
-            Assert.assertEquals(TransportMode.transit_walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
-
+            Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
+            
         }
+        
         /* General Radius includes stop B. Search_Extension_Radius is 0.
         Expected: Stop Finder will only find stop B. Lines C, D, and E are set to very fast, so as to check that only
         stop B is included.
@@ -576,16 +557,9 @@ public class RaptorStopFinderTest {
                     new LeastCostRaptorRouteSelector(), stopFinder, null);
 
             List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7 * 3600, f0.dummyPerson);
-            for (Leg leg : legs) {
-                System.out.println(leg);
-            }
 
-            Assert.assertEquals("wrong number of legs.", 1, legs.size());
-            Leg leg = legs.get(0);
-            Assert.assertEquals(TransportMode.transit_walk, leg.getMode());
-            Assert.assertEquals(Id.create("AA", Link.class), leg.getRoute().getStartLinkId());
-            Assert.assertEquals(Id.create("XX", Link.class), leg.getRoute().getEndLinkId());
-
+            Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
+            
         }
 
         /* General Radius includes stop B. Search_Extension_Radius is 0.

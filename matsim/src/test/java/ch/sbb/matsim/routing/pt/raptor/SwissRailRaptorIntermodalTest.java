@@ -289,14 +289,8 @@ public class SwissRailRaptorIntermodalTest {
         Facility toFac = new FakeFacility(new Coord(11000, 11000), Id.create("to", Link.class));
 
         List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7*3600, f.dummyPerson);
-        for (Leg leg : legs) {
-            System.out.println(leg);
-        }
-        
-        Assert.assertEquals("wrong number of legs.", 1, legs.size());
-        Leg leg = legs.get(0);
-        Assert.assertEquals(TransportMode.transit_walk, leg.getMode());
-        Assert.assertEquals(Math.sqrt(1000*1000+2000*2000)*1.3, leg.getRoute().getDistance(), 1e-7);
+
+        Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
     }
     
     @Test
@@ -440,21 +434,14 @@ public class SwissRailRaptorIntermodalTest {
         Facility toFac = new FakeFacility(new Coord(10500, 10500), Id.create("to", Link.class));
 
         List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7*3600, f.dummyPerson);
-        for (Leg leg : legs) {
-            System.out.println(leg);
-        }
         
         /* 
          * Going by access/egress mode bike from "fromFac" to stop 3 (which is bikeAccessible) and from there by bike
          * to the destination is faster than any alternative including pt (because bike is extremely fast in this test).
          * Therefore, the raptor returns as fastest path a v-shaped bike trip from the fromFac via stop 3 to the toFac,
-         * alternatives including pt are not found  
+         * alternatives including pt are not found. This should be caught by SwissRailRaptor and it should return null.  
          */
-        Assert.assertEquals("wrong number of legs.", 1, legs.size());
-        Leg leg = legs.get(0);
-        Assert.assertEquals(TransportMode.transit_walk, leg.getMode());
-        Assert.assertEquals(Id.create("from", Link.class), leg.getRoute().getStartLinkId());
-        Assert.assertEquals(Id.create("to", Link.class), leg.getRoute().getEndLinkId());
+        Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
     }
 
     @Test
@@ -814,16 +801,8 @@ public class SwissRailRaptorIntermodalTest {
                 new LeastCostRaptorRouteSelector(), stopFinder, null);
 
         List<Leg> legs = raptor.calcRoute(fromFac, toFac, 7.5 * 3600, f.dummyPerson);
-        for (Leg leg : legs) {
-            System.out.println(leg);
-        }
 
-        Assert.assertEquals(1, legs.size());
-
-        Leg legAccess = legs.get(0);
-        Assert.assertEquals(TransportMode.transit_walk, legAccess.getMode());
-        Assert.assertEquals("from", legAccess.getRoute().getStartLinkId().toString());
-        Assert.assertEquals("to", legAccess.getRoute().getEndLinkId().toString());
+        Assert.assertNull("The router should not find a route and return null, but did return something else.", legs);
     }
 
     /**
@@ -902,19 +881,8 @@ public class SwissRailRaptorIntermodalTest {
                 new LeastCostRaptorRouteSelector(), stopFinder2, null );
 
         List<Leg> legs2 = raptor2.calcRoute(fromFac, toFac, 8 * 3600 - 900, f.dummyPerson);
-
-        for (Leg leg : legs2) {
-            System.out.println(leg);
-        }
-
-        Assert.assertEquals(1, legs2.size());
-
-        Leg legTransitWalk = legs2.get(0);
-        Assert.assertEquals(TransportMode.transit_walk, legTransitWalk.getMode());
-        Assert.assertEquals("from", legTransitWalk.getRoute().getStartLinkId().toString());
-        Assert.assertEquals("to", legTransitWalk.getRoute().getEndLinkId().toString());
         
-        
+        Assert.assertNull("The router should not find a route and return null, but did return something else.", legs2);        
     }
 
     /* for test of intermodal routing requiring transfers at the beginning or end of the pt trip,
