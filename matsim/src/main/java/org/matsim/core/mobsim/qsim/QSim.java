@@ -533,8 +533,6 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 					+ this.agentCounter.getLost() + " simT=" + diffsim
 					+ "s realT=" + (diffreal) + "s; (s/r): "
 					+ (diffsim / (diffreal + Double.MIN_VALUE)));
-
-			Gbl.printMemoryUsage();
 		}
 	}
 

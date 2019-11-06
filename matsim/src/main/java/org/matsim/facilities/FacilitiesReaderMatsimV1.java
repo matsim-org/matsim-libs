@@ -110,6 +110,7 @@ final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
     @Override
     public void endTag(final String name, final String content, final Stack<String> context) {
         if (FACILITY.equals(name)) {
+            this.facilities.addActivityFacility(this.currfacility);
             this.currfacility = null;
         } else if (ACTIVITY.equals(name)) {
             this.curractivity = null;
@@ -171,7 +172,6 @@ final class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
             }
         }
 
-        this.facilities.addActivityFacility(this.currfacility);
         ((ActivityFacilityImpl) this.currfacility).setDesc(atts.getValue("desc"));
     }
 

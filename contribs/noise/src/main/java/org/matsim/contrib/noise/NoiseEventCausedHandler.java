@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,25 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
+/**
+ * 
+ */
 package org.matsim.contrib.noise;
 
-import org.matsim.analysis.XYTRecord;
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.events.handler.EventHandler;
 
 /**
-* @author ikaddoura
-*/
-public final class NoiseModule extends AbstractModule {
+ * @author lkroeger
+ *
+ */
 
-	@Override
-	public void install() {
-		install(new NoiseComputationModule());
-		install(new NoiseDefaultCarTravelDisutilityModule());
-	}
-
-	interface NoiseListener{
-		void newRecord( XYTRecord record ) ;
-	}
-
+public interface NoiseEventCausedHandler extends EventHandler{
+	public void handleEvent (NoiseEventCaused event);
 }
-
