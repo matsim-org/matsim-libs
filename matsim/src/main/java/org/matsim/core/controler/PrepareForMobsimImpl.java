@@ -56,19 +56,16 @@ public final class PrepareForMobsimImpl implements PrepareForMobsim {
 	private final Population population;
 	private final ActivityFacilities activityFacilities;
 	private final Provider<TripRouter> tripRouterProvider;
-	private final MainModeIdentifier mainModeIdentifier;
 	
 	@Inject
 	PrepareForMobsimImpl(GlobalConfigGroup globalConfigGroup, Scenario scenario, Network network,
-				Population population, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider,
-				MainModeIdentifier mainModeIdentifier) {
+				Population population, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider) {
 		this.globalConfigGroup = globalConfigGroup;
 		this.scenario = scenario;
 		this.network = network;
 		this.population = population;
 		this.activityFacilities = activityFacilities;
 		this.tripRouterProvider = tripRouterProvider;
-		this.mainModeIdentifier = mainModeIdentifier;
 	}
 	
 	
@@ -99,7 +96,7 @@ public final class PrepareForMobsimImpl implements PrepareForMobsim {
 					@Override
 					public AbstractPersonAlgorithm getPersonAlgorithm() {
 						return new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, 
-								carOnlyNetwork, mainModeIdentifier );
+								carOnlyNetwork );
 					}
 					// yyyyyy This prepared network is only used for computing the distance.  So the full network would
 					// actually be better than the car-only network, without doing damage elsewhere.  No?  kai, jul'18

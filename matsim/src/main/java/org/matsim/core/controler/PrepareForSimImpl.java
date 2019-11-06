@@ -27,7 +27,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
@@ -40,6 +42,8 @@ import org.matsim.core.population.algorithms.PersonPrepareForSim;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesFromPopulation;
@@ -51,8 +55,10 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ForkJoinPool;
 
 public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim {
 	// I think it is ok to have this public final.  Since one may want to use it as a delegate.  kai, may'18
@@ -71,13 +77,19 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	private final Provider<TripRouter> tripRouterProvider;
 	private final QSimConfigGroup qSimConfigGroup;
 	private final FacilitiesConfigGroup facilitiesConfigGroup;
-	private final MainModeIdentifier mainModeIdentifier;
+	private final MainModeIdentifier backwardCompatibilityMainModeIdentifier;
+	private final ForkJoinPool forkJoinPool;
 
+	/**
+	 * TODO: This should be a separate MainModeidentifier, neither the routing mode identifier from TripStructureUtils, 
+	 * nor the MainModeidentifier used for analysis (ModeStats etc.).
+	 * Use @Named ... ?
+	 */
 	@Inject
 	PrepareForSimImpl(GlobalConfigGroup globalConfigGroup, Scenario scenario, Network network,
 				Population population, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider,
 				QSimConfigGroup qSimConfigGroup, FacilitiesConfigGroup facilitiesConfigGroup, 
-				MainModeIdentifier mainModeIdentifier) {
+				MainModeIdentifier backwardCompatibilityMainModeIdentifier) {
 		this.globalConfigGroup = globalConfigGroup;
 		this.scenario = scenario;
 		this.network = network;
@@ -86,7 +98,8 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		this.tripRouterProvider = tripRouterProvider;
 		this.qSimConfigGroup = qSimConfigGroup;
 		this.facilitiesConfigGroup = facilitiesConfigGroup;
-		this.mainModeIdentifier = mainModeIdentifier;
+		this.backwardCompatibilityMainModeIdentifier = backwardCompatibilityMainModeIdentifier;
+		this.forkJoinPool = new ForkJoinPool(globalConfigGroup.getNumberOfThreads());
 	}
 
 
@@ -149,6 +162,8 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		// the person (maybe via the household).    kai, feb'18
 		// each agent receives a vehicle for each main mode now. janek, aug'19
 		createAndAddVehiclesForEveryNetworkMode();
+		
+		adaptOutdatedPlansForRoutingMode();
 
 		// make sure all routes are calculated.
 		// the above creation of vehicles per agent has to be run before executing the initial routing here. janek, aug'19
@@ -156,7 +171,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		// (i.e. we introduce a separate PersonPrepareForMobsim).  kai, jul'18
 		ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(),
 				() -> new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, 
-						carOnlyNetwork, mainModeIdentifier)
+						carOnlyNetwork)
 		);
 		
 		if (scenario instanceof Lockable) {
@@ -251,5 +266,57 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 					throw new RuntimeException("Expecting a vehicle id which is missing in the vehicles database: " + vehicleId);
 			}
 		}
+	}
+	
+	private void adaptOutdatedPlansForRoutingMode() {
+		forkJoinPool.submit(() -> population.getPersons().values().parallelStream().forEach(person -> {
+			for (Plan plan: person.getPlans()) {
+				for (Trip trip : TripStructureUtils.getTrips(plan.getPlanElements())) {
+					List<Leg> legs = trip.getLegsOnly();
+					if (legs.size() >= 1) {
+						String routingMode = null;
+
+						for (Leg leg : legs) {
+							if (TripStructureUtils.getRoutingMode(leg) == null) {
+								if (routingMode == null) {
+									if (backwardCompatibilityMainModeIdentifier == null) {
+										log.error("Found a trip without routingMode, but there is no MainModeIdentifier set up for PrepareForSim, so cannot infer the routing mode from a MainModeIdentifier. Trip: " + trip.getTripElements());
+										new RuntimeException("no MainModeIdentifier set up for PrepareForSim");
+									}
+									routingMode = backwardCompatibilityMainModeIdentifier.identifyMainMode(trip.getTripElements());
+								}
+								TripStructureUtils.setRoutingMode(leg, routingMode);
+							}
+							
+							// replace outdated helper TransportModes
+							
+							// access_walk and egress_walk were replaced by non_network_walk
+							if (leg.getMode().equals("access_walk") || leg.getMode().equals("egress_walk")) {
+								leg.setMode(TransportMode.non_network_walk);
+							}
+							
+							// not clear whether we should set the routing mode here. Probably not, because it should already be done in
+							// line 149 using the backwardCompatibilityMainModeIdentifier and we might have drt_walk/drt_fallback as
+							// access/egress to pt. In that latter case we should not overwrite the routing mode
+							
+							// transit_walk was replaced by walk + leg attribute routingMode
+							if (leg.getMode().equals(TransportMode.transit_walk)) {
+								leg.setMode(TransportMode.walk);
+							}
+
+							// replace drt_walk etc.
+							if (leg.getMode().endsWith("_walk") && !leg.getMode().equals(TransportMode.non_network_walk)) {
+								leg.setMode(TransportMode.walk);
+							}
+							
+							// replace drt_fallback etc.
+							if (leg.getMode().endsWith("_fallback")) {
+								leg.setMode(TransportMode.walk);
+							}
+						}
+					}
+				}
+			}
+		}));
 	}
 }

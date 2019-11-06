@@ -21,7 +21,6 @@
 package org.matsim.core.population.algorithms;
 
 import java.util.HashSet;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -36,9 +35,6 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.facilities.ActivityFacilities;
 
 /**
@@ -59,23 +55,10 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 	private final XY2Links xy2links;
 	private final Network carOnlyNetwork;
 	private final ActivityFacilities activityFacilities;
-	private final MainModeIdentifier backwardCompatibilityMainModeIdentifier;
 
 	private static final Logger log = Logger.getLogger(PersonPrepareForSim.class);
 	private final Scenario scenario;
 	
-	public PersonPrepareForSim(final PlanAlgorithm router, final Scenario scenario, final Network carOnlyNetwork, final MainModeIdentifier backwardCompatibilityMainModeIdentifier) {
-		super();
-		this.router = router;
-		this.carOnlyNetwork = carOnlyNetwork ;
-		if (NetworkUtils.isMultimodal(carOnlyNetwork)) {
-			throw new RuntimeException("Expected carOnlyNetwork not to be multi-modal. Aborting!");
-		}
-		this.xy2links = new XY2Links(carOnlyNetwork, scenario.getActivityFacilities());
-		this.activityFacilities = scenario.getActivityFacilities();
-		this.scenario = scenario ;
-		this.backwardCompatibilityMainModeIdentifier = backwardCompatibilityMainModeIdentifier;
-	}
 	/*
 	 * To be used by the controller which creates multiple instances of this class which would
 	 * create multiple copies of a car-only-network. Instead, we can create that network once in
@@ -91,7 +74,6 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 		this.xy2links = new XY2Links(carOnlyNetwork, scenario.getActivityFacilities());
 		this.activityFacilities = scenario.getActivityFacilities();
 		this.scenario = scenario ;
-		this.backwardCompatibilityMainModeIdentifier = null;
 	}
 	
 	public PersonPrepareForSim(final PlanAlgorithm router, final Scenario scenario) {
@@ -111,7 +93,6 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 		this.xy2links = new XY2Links(net, scenario.getActivityFacilities());
 		this.activityFacilities = scenario.getActivityFacilities();
 		this.scenario = scenario ;
-		this.backwardCompatibilityMainModeIdentifier = null;
 	}
 
 	@Override
@@ -133,25 +114,7 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			boolean needsReRoute = false;
 			
 			// for backward compatibility: add routingMode to legs if not present		
-			for (Trip trip : TripStructureUtils.getTrips(plan.getPlanElements())) {
-				List<Leg> legs = trip.getLegsOnly();
-				if (legs.size() >= 1) {
-					String routingMode = null;
 
-					for (Leg leg : legs) {	
-						if (TripStructureUtils.getRoutingMode(leg) == null) {
-							if (routingMode == null) {
-								if (backwardCompatibilityMainModeIdentifier == null) {
-									log.error("Found a trip without routingMode, but there is no MainModeIdentifier set up for PrepareForSim, so cannot infer the routing mode from a MainModeIdentifier. Trip: " + trip.getTripElements());
-									new RuntimeException("no MainModeIdentifier set up for PrepareForSim");
-								}
-								routingMode = backwardCompatibilityMainModeIdentifier.identifyMainMode(trip.getTripElements());
-							}
-							TripStructureUtils.setRoutingMode(leg, routingMode);
-						}
-					}
-				}
-			}
 			
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
@@ -170,35 +133,6 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 					}
 				} else if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
-					// access_walk and egress_walk were replaced by non_network_walk
-					if (leg.getMode().equals("access_walk") || leg.getMode().equals("egress_walk")) {
-						leg.setMode(TransportMode.non_network_walk);
-					}
-					
-					// transit_walk was replaced by walk + leg attribute routingMode 
-					// TODO: The same for other pt modes? How can those be identified if they ended up as transit_walk
-					if (leg.getMode().equals(TransportMode.transit_walk)) {
-						leg.setMode(TransportMode.walk);
-//						TripStructureUtils.setRoutingMode(leg, TransportMode.pt);
-					}
-
-					// not clear whether we should set the routing mode here. Probably not, because it should already be done in
-					// line 149 using the backwardCompatibilityMainModeIdentifier and we might have drt_walk/drt_fallback as
-					// access/egress to pt. In that latter case we should not overwrite the routing mode
-
-					// replace drt_walk etc.
-					if (leg.getMode().endsWith("_walk") && !leg.getMode().equals(TransportMode.non_network_walk)) {
-//						String mode = leg.getMode().substring(0, leg.getMode().length() - 5);
-						leg.setMode(TransportMode.walk);
-//						TripStructureUtils.setRoutingMode(leg, mode);
-					}
-					
-					// replace drt_fallback etc.
-					if (leg.getMode().endsWith("_fallback")) {
-//						String mode = leg.getMode().substring(0, leg.getMode().length() - 9);
-						leg.setMode(TransportMode.walk);
-//						TripStructureUtils.setRoutingMode(leg, mode);
-					}
 					
 					if (leg.getRoute() == null) {
 						needsReRoute = true;
