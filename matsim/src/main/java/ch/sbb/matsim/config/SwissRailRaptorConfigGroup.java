@@ -569,6 +569,10 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
 						+ "for mode " + paramset.mode + " is negative or 0. Please set a positive value in the config.");
 				Verify.verify(paramset.searchExtensionRadius > 0.0, "searchExtensionRadius of IntermodalAccessEgressParameterSet "
 						+ "for mode " + paramset.mode + " is negative or 0. Please set a positive value in the config.");
+				
+				Verify.verify(paramset.maxRadius >= paramset.initialSearchRadius, "maxRadius of IntermodalAccessEgressParameterSet "
+						+ "for mode " + paramset.mode + " is smaller than initialSearchRadius. This is inconsistent.");
+				
 			}
 		}
 	}
