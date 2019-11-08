@@ -97,7 +97,7 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 //	 * kai, mar'17
 //	 */
 //	private boolean passLinkEventsToPerson = false;
-	
+
 	private Vehicle2DriverEventHandler vehicles2Drivers = new Vehicle2DriverEventHandler();
 
 	@Inject
@@ -114,9 +114,6 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 		eventsManager.addHandler(this);
 		eventsToActivities.addActivityHandler(this);
 		eventsToLegs.addLegHandler(this);
-//		if ( passLinkEventsToPerson ) {
-			eventsManager.addHandler(this.vehicles2Drivers);
-//		}
 	}
 
 	private void init() {
