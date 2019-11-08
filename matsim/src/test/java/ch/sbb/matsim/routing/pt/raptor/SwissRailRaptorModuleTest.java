@@ -248,15 +248,9 @@ public class SwissRailRaptorModuleTest {
         workScoring.setTypicalDuration(8*3600);
         f.config.planCalcScore().addActivityParams(workScoring);
 
-        PlanCalcScoreConfigGroup.ModeParams accessWalk = new PlanCalcScoreConfigGroup.ModeParams("non_network_walk");
-        accessWalk.setMarginalUtilityOfTraveling(0.0);
-        f.config.planCalcScore().addModeParams(accessWalk);
-        PlanCalcScoreConfigGroup.ModeParams transitWalk = new PlanCalcScoreConfigGroup.ModeParams("transit_walk");
-        transitWalk.setMarginalUtilityOfTraveling(0.0);
-        f.config.planCalcScore().addModeParams(transitWalk);
-        PlanCalcScoreConfigGroup.ModeParams egressWalk = new PlanCalcScoreConfigGroup.ModeParams("non_network_walk");
-        egressWalk.setMarginalUtilityOfTraveling(0.0);
-        f.config.planCalcScore().addModeParams(egressWalk);
+        PlanCalcScoreConfigGroup.ModeParams nonNetworkWalk = new PlanCalcScoreConfigGroup.ModeParams("non_network_walk");
+        nonNetworkWalk.setMarginalUtilityOfTraveling(0.0);
+        f.config.planCalcScore().addModeParams(nonNetworkWalk);
 
         StrategySettings reRoute = new StrategySettings();
         reRoute.setStrategyName("ReRoute");
