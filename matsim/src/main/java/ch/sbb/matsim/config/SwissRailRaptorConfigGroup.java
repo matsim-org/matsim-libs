@@ -5,9 +5,12 @@
 package ch.sbb.matsim.config;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
+
+import com.google.common.base.Verify;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -547,4 +550,22 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
             this.passengerMode = passengerMode;
         }
     }
+    
+    // TODO: add more
+	@Override
+	protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
+		if (useIntermodality) {
+			Verify.verify(intermodalAccessEgressSettings.size() >= 1, "Using intermodal routing, but there are no access/egress" 
+					+ "modes defined. Add at least one parameterset with an access/egress mode and ensure "
+					+ "SwissRailRaptorConfigGroup is loaded correctly.");
+			
+			for (IntermodalAccessEgressParameterSet paramset: intermodalAccessEgressSettings) {
+				if (paramset.maxRadius < 500.0) {
+					log.warn("maxRadius of IntermodalAccessEgressParameterSet for mode " + paramset.mode + " is very small: "
+							+ paramset.maxRadius + ". This severly restricts the usability of that mode for access/egress to pt");
+				}
+			}
+		}
+	}
 }
