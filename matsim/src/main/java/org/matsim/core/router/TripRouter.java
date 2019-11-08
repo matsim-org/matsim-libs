@@ -179,6 +179,9 @@ public final class TripRouter implements MatsimExtensionPoint {
 			if ( trip == null ) {
 				trip = fallbackRoutingModule.calcRoute( fromFacility, toFacility, departureTime, person ) ;
 			}
+			for (Leg leg: TripStructureUtils.getLegs(trip)) {
+				TripStructureUtils.setRoutingMode(leg, mainMode);
+			}
 			return trip;
 		}
 
