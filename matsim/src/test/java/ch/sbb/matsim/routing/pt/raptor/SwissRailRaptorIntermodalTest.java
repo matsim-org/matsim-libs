@@ -327,11 +327,13 @@ public class SwissRailRaptorIntermodalTest {
         walkAccess.setMode(TransportMode.non_network_walk);
         walkAccess.setMaxRadius(5000);
         walkAccess.setInitialSearchRadius(5000);
+        walkAccess.setSearchExtensionRadius(1000);
         f.srrConfig.addIntermodalAccessEgress(walkAccess);
         IntermodalAccessEgressParameterSet bikeAccess = new IntermodalAccessEgressParameterSet();
         bikeAccess.setMode(TransportMode.bike);
         bikeAccess.setMaxRadius(5000);
         bikeAccess.setInitialSearchRadius(5000);
+        bikeAccess.setSearchExtensionRadius(0);
         bikeAccess.setStopFilterAttribute("bikeAccessible");
         bikeAccess.setLinkIdAttribute("accessLinkId_bike");
         bikeAccess.setStopFilterValue("true");
@@ -483,12 +485,14 @@ public class SwissRailRaptorIntermodalTest {
         walkAccess.setMode(TransportMode.non_network_walk);
         walkAccess.setMaxRadius(100); // force to nearest stops
         walkAccess.setInitialSearchRadius(100);
+        walkAccess.setSearchExtensionRadius(1);
         f.srrConfig.addIntermodalAccessEgress(walkAccess);
 
         IntermodalAccessEgressParameterSet bikeAccess = new IntermodalAccessEgressParameterSet();
         bikeAccess.setMode(TransportMode.bike);
         bikeAccess.setMaxRadius(100); // force to nearest stops
         bikeAccess.setInitialSearchRadius(100);
+        bikeAccess.setSearchExtensionRadius(1);
         f.srrConfig.addIntermodalAccessEgress(bikeAccess);
 
         Facility fromFac = new FakeFacility(new Coord(10500, 10050), Id.create("from", Link.class)); // stop 3
@@ -580,11 +584,15 @@ public class SwissRailRaptorIntermodalTest {
         IntermodalAccessEgressParameterSet walkAccess = new IntermodalAccessEgressParameterSet();
         walkAccess.setMode(TransportMode.non_network_walk);
         walkAccess.setMaxRadius(100); // force to nearest stops
+        walkAccess.setInitialSearchRadius(100);
+        walkAccess.setSearchExtensionRadius(1);
         f.srrConfig.addIntermodalAccessEgress(walkAccess);
 
         IntermodalAccessEgressParameterSet bikeAccess = new IntermodalAccessEgressParameterSet();
         bikeAccess.setMode(TransportMode.bike);
         bikeAccess.setMaxRadius(100); // force to nearest stops
+        bikeAccess.setInitialSearchRadius(100);
+        bikeAccess.setSearchExtensionRadius(1);
         f.srrConfig.addIntermodalAccessEgress(bikeAccess);
 
         Facility fromFac = new FakeFacility(new Coord(10500, 10050), Id.create("from", Link.class)); // stop 3
@@ -1132,12 +1140,14 @@ public class SwissRailRaptorIntermodalTest {
             walkAccess.setMode(TransportMode.non_network_walk);
             walkAccess.setMaxRadius(500);
             walkAccess.setInitialSearchRadius(500);
+            walkAccess.setSearchExtensionRadius(100);
             this.srrConfig.addIntermodalAccessEgress(walkAccess);
 
             IntermodalAccessEgressParameterSet bikeAccess = new IntermodalAccessEgressParameterSet();
             bikeAccess.setMode(TransportMode.bike);
             bikeAccess.setMaxRadius(1000);
             bikeAccess.setInitialSearchRadius(1000);
+            bikeAccess.setSearchExtensionRadius(100);
             bikeAccess.setStopFilterAttribute("bikeAccessible");
             bikeAccess.setStopFilterValue("true");
             bikeAccess.setLinkIdAttribute("accessLinkId_bike");
