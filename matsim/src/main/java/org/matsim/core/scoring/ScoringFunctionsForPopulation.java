@@ -78,9 +78,6 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	
 	/*
-	 * Replaced TreeMaps with (Linked)HashMaps since they should perform much better. For 'partialScores'
-	 * a LinkedHashMap is used to ensure that agents are written in a deterministic order to the output files.
-	 *
 	 * Replaced List with TDoubleCollection (TDoubleArrayList) in the partialScores map. This collection allows
 	 * storing primitive objects, i.e. its double entries don't have to be wrapped into Double objects which
 	 * should be faster and reduce the memory overhead.
@@ -91,12 +88,6 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 	private final IdMap<Person, TDoubleCollection> partialScores = new IdMap<>(Person.class);
 	private final AtomicReference<Throwable> exception = new AtomicReference<>();
 	private final IdMap<Person, Plan> tripRecords = new IdMap<>(Person.class);
-	
-//	/**
-//	 * For something like the bicycle scoring, we need to know individual links at the level of the scoring function.  This is a first sketch how this could be implemented.
-//	 * kai, mar'17
-//	 */
-//	private boolean passLinkEventsToPerson = false;
 	
 	private Vehicle2DriverEventHandler vehicles2Drivers = new Vehicle2DriverEventHandler();
 
@@ -114,9 +105,6 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 		eventsManager.addHandler(this);
 		eventsToActivities.addActivityHandler(this);
 		eventsToLegs.addLegHandler(this);
-//		if ( passLinkEventsToPerson ) {
-			eventsManager.addHandler(this.vehicles2Drivers);
-//		}
 	}
 
 	private void init() {
@@ -151,32 +139,31 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 //				}
 			}
 		}
-//		if ( passLinkEventsToPerson ) {
-			// Establish and end connection between driver and vehicle
-			if (o instanceof VehicleEntersTrafficEvent) {
-				this.vehicles2Drivers.handleEvent((VehicleEntersTrafficEvent) o);
+
+		// Establish and end connection between driver and vehicle
+		if (o instanceof VehicleEntersTrafficEvent) {
+			this.vehicles2Drivers.handleEvent((VehicleEntersTrafficEvent) o);
+		}
+		if (o instanceof VehicleLeavesTrafficEvent) {
+			this.vehicles2Drivers.handleEvent((VehicleLeavesTrafficEvent) o);
+		}
+		// Pass LinkEnterEvent to person scoring, required e.g. for bicycle where link attributes are observed in scoring
+		/*
+		 * (This shouldn't really be more expensive than passing the link events to the router: here, we have a map lookup
+		 * for agentId, there we have a map lookup for linkId. Should be somewhat similar in terms of average
+		 * computational complexity. In BetaTravelTest, 194sec w/ "false", 193sec w/ "true". However, the experienced
+		 * plans service in fact does the same thing, so we should be able to get away without having to do this twice.
+		 * kai, mar'17)
+		 */
+		if ( o instanceof LinkEnterEvent ) {
+			Id<Vehicle> vehicleId = ((LinkEnterEvent)o).getVehicleId();
+			Id<Person> driverId = this.vehicles2Drivers.getDriverOfVehicle(vehicleId);
+			ScoringFunction scoringFunction = getScoringFunctionForAgent( driverId );
+			// (this will NOT do the scoring function lookup twice since LinkEnterEvent is not an instance of HasPersonId.  kai, mar'17)
+			if (scoringFunction != null) {
+				scoringFunction.handleEvent(o);
 			}
-			if (o instanceof VehicleLeavesTrafficEvent) {
-				this.vehicles2Drivers.handleEvent((VehicleLeavesTrafficEvent) o);
-			}
-			// Pass LinkEnterEvent to person scoring, required e.g. for bicycle where link attributes are observed in scoring
-			if ( o instanceof LinkEnterEvent ) {
-				Id<Vehicle> vehicleId = ((LinkEnterEvent)o).getVehicleId() ;
-				Id<Person> driverId = this.vehicles2Drivers.getDriverOfVehicle(vehicleId) ;
-				ScoringFunction scoringFunction = getScoringFunctionForAgent( driverId );
-				// (this will NOT do the scoring function lookup twice since LinkEnterEvent is not an instance of HasPersonId.  kai, mar'17)
-				if (scoringFunction != null) {
-					scoringFunction.handleEvent(o) ;
-				}
-			}
-			/*
-			 * (This shouldn't really be more expensive than passing the link events to the router: here, we have a map lookup
-			 * for agentId, there we have a map lookup for linkId. Should be somewhat similar in terms of average
-			 * computational complexity. In BetaTravelTest, 194sec w/ "false", 193sec w/ "true". However, the experienced
-			 * plans service in fact does the same thing, so we should be able to get away without having to do this twice.
-			 * kai, mar'17)
-			 */
-//		}
+		}
 	}
 
 	@Override
@@ -276,7 +263,8 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 				out.write(entry.getKey().toString());
 				TDoubleIterator iterator = entry.getValue().iterator();
 				while (iterator.hasNext()) {
-					out.write('\t' + String.valueOf(iterator.next()));
+					out.write('\t');
+					out.write(String.valueOf(iterator.next()));
 				}
 				out.newLine();
 			}
@@ -290,11 +278,4 @@ import static org.matsim.core.router.TripStructureUtils.Trip;
 
 	}
 
-//	public boolean isPassLinkEventsToPerson() {
-//		return passLinkEventsToPerson;
-//	}
-
-//	public void setPassLinkEventsToPerson(boolean passLinkEventsToPerson) {
-//		this.passLinkEventsToPerson = passLinkEventsToPerson;
-//	}
 }
