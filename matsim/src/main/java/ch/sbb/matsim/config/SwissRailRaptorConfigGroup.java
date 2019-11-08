@@ -393,8 +393,8 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
 
         private String mode;
         private double maxRadius;
-        private double initialSearchRadius = Double.POSITIVE_INFINITY;
-        private double searchExtensionRadius = 1000.0;
+        private double initialSearchRadius = Double.NEGATIVE_INFINITY;
+        private double searchExtensionRadius = Double.NEGATIVE_INFINITY;
         private String linkIdAttribute;
         private String personFilterAttribute;
         private String personFilterValue;
@@ -554,17 +554,21 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     // TODO: add more
 	@Override
 	protected void checkConsistency(Config config) {
-		super.checkConsistency(config);
+
 		if (useIntermodality) {
 			Verify.verify(intermodalAccessEgressSettings.size() >= 1, "Using intermodal routing, but there are no access/egress " 
 					+ "modes defined. Add at least one parameterset with an access/egress mode and ensure "
 					+ "SwissRailRaptorConfigGroup is loaded correctly.");
 			
 			for (IntermodalAccessEgressParameterSet paramset: intermodalAccessEgressSettings) {
-				if (paramset.maxRadius < 500.0) {
-					log.warn("maxRadius of IntermodalAccessEgressParameterSet for mode " + paramset.mode + " is very small: "
-							+ paramset.maxRadius + ". This severly restricts the usability of that mode for access/egress to pt");
-				}
+				Verify.verifyNotNull(paramset.mode, "mode of an IntermodalAccessEgressParameterSet "
+						+ "is undefined. Please set a value in the config.");
+				Verify.verify(paramset.maxRadius > 0.0, "maxRadius of IntermodalAccessEgressParameterSet "
+						+ "for mode " + paramset.mode + " is negative or 0. Please set a positive value in the config.");
+				Verify.verify(paramset.initialSearchRadius > 0.0, "initialSearchRadius of IntermodalAccessEgressParameterSet "
+						+ "for mode " + paramset.mode + " is negative or 0. Please set a positive value in the config.");
+				Verify.verify(paramset.searchExtensionRadius > 0.0, "searchExtensionRadius of IntermodalAccessEgressParameterSet "
+						+ "for mode " + paramset.mode + " is negative or 0. Please set a positive value in the config.");
 			}
 		}
 	}
