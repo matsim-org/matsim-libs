@@ -106,8 +106,11 @@ public class RandomAccessEgressModeRaptorStopFinder implements RaptorStopFinder 
 		String personId = person.getId().toString();
 		List<InitialStop> initialStops = new ArrayList<>();
 		int counter = 0;
+		log.debug("findIntermodalStops: srrCfg.getIntermodalAccessEgressParameterSets().size()="  + srrCfg.getIntermodalAccessEgressParameterSets().size());
+		
 		do {
 			int rndSelector = (int) (MatsimRandom.getRandom().nextDouble() * srrCfg.getIntermodalAccessEgressParameterSets().size());
+			log.debug("findIntermodalStops: rndSelector="  + rndSelector);
 			addInitialStopsForParamSet(facility, person, departureTime, direction, parameters, data, x, y, personId,
 					initialStops, srrCfg.getIntermodalAccessEgressParameterSets().get(rndSelector));
 			counter++;
