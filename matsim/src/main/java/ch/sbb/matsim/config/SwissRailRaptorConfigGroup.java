@@ -556,7 +556,7 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
 		if (useIntermodality) {
-			Verify.verify(intermodalAccessEgressSettings.size() >= 1, "Using intermodal routing, but there are no access/egress" 
+			Verify.verify(intermodalAccessEgressSettings.size() >= 1, "Using intermodal routing, but there are no access/egress " 
 					+ "modes defined. Add at least one parameterset with an access/egress mode and ensure "
 					+ "SwissRailRaptorConfigGroup is loaded correctly.");
 			
