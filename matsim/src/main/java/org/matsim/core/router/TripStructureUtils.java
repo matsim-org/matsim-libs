@@ -562,12 +562,7 @@ public class TripStructureUtils {
 	}
 
 	public static MainModeIdentifier getMainModeIdentifier() {
-		return new MainModeIdentifier() {
-			@Override
-			public String identifyMainMode(List<? extends PlanElement> tripElements) {
-				return TripStructureUtils.identifyMainMode(tripElements);
-			}
-		};
+		return new RoutingModeMainModeIdentifier();
 	}
 
 	public static String identifyMainMode( final List<? extends PlanElement> tripElements) {
