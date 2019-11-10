@@ -49,7 +49,6 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	private static final String NETWORK_MODES = "networkModes";
 	private static final String TELEPORTED_MODE_SPEEDS = "teleportedModeSpeed_";
 	private static final String TELEPORTED_MODE_FREESPEED_FACTORS = "teleportedModeFreespeedFactor_";
-	private static final String CLEAR_MODE_ROUTING_PARAMS = "clearModeRoutingParams";
 
 
 	public static final String UNDEFINED = "undefined";
@@ -73,10 +72,14 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	private boolean insertingAccessEgressWalk = false ;
 	
 	// ---
-	
 	private static final String RANDOMNESS = "routingRandomness" ;
 	private double routingRandomness = 3. ;
-	
+	// ---
+	private static final String CLEAR_MODE_ROUTING_PARAMS = "clearDefaultTeleportedModeParams";
+	private static final String CLEAR_MODE_ROUTING_PARAMS_CMT = "Some typical teleportation routing params are set by default, such as for walk and bike.  " +
+																		"Setting this switch to \"true\" will clear them.  Note that this will also clear " +
+																		"settings for helper modes such as for " + TransportMode.non_network_walk;
+	private boolean clearingDefaultModeRoutingParams = false ;
 	// ---
 
 	public static class ModeRoutingParams extends ReflectiveConfigGroup implements MatsimParameters {
@@ -299,8 +302,9 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 				throw new IllegalArgumentException( module.getName() );
 		}
 	}
-
-	private boolean clearingDefaultModeRoutingParams = false ;
+	/**
+	 * {@value CLEAR_MODE_ROUTING_PARAMS_CMT}
+	 */
 	public void setClearingDefaultModeRoutingParams( boolean val ) {
 		if ( val ) {
 			clearModeRoutingParams();
@@ -326,9 +330,9 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		if ( set.getName().equals( ModeRoutingParams.SET_TYPE ) && !this.acceptModeParamsWithoutClearing ) {
 			clearParameterSetsForType( set.getName() );
 			this.acceptModeParamsWithoutClearing = true;
-			log.warn( "The first mode routing params that are explicitly defined kill the default mode routing params.  This functionality was changed for some " +
-							  "time in the development head, after release 11.x, and before release 12.x; it is now back.  If you want to avoid this warning," +
-							  "  use clearModeRoutingParams(true) if in code.  In xml, the functionality is not yet there." );
+			log.warn( "The first mode routing params that are explicitly defined clear the default mode routing params.  This functionality was removed for " );
+			log.warn( "    some weeks in the development head, after release 11.x, and before release 12.x; it is now back.  If you want to avoid this " );
+			log.warn( "    warning, use clearModeRoutingParams(true) in code, and \"" + CLEAR_MODE_ROUTING_PARAMS + "\"=true in xml config.");
 			// A bit more info:
 			//
 			// (1) I wanted to keep the default teleportation routers ... since for novice users I find it better if they all use the same teleportation
@@ -363,8 +367,10 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 			}
 		}
 		if ( getParameterSets( ModeRoutingParams.SET_TYPE ).isEmpty() ) {
-			log.warn( "you have removed the last mode routing parameter with the removeModeRoutingParams method.  If you write the resulting config to file, " +
-							  "and read it back in, all default teleported modes will be resurrected.  Better use clearModeRoutingParams(true)." );
+			log.warn( "You have removed the last mode routing parameter with the removeModeRoutingParams method.  If you wrote the resulting config to " ) ;
+			log.warn("    file, and read it back in, all default teleported modes would be resurrected.  The code will therefore also call  " );
+			log.warn( "    \"clearModeRoutingParams()\".  It would be better if you did this yourself." ) ;
+			this.clearModeRoutingParams();
 		}
 	}
 
@@ -458,9 +464,10 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		map.put(BEELINE_DISTANCE_FACTOR, "factor with which beeline distances (and therefore times) " +
 				"are multiplied in order to obtain an estimate of the network distances/times.  Default is something like 1.3") ;
 		map.put(NETWORK_MODES, "All the modes for which the router is supposed to generate network routes (like car)") ;
-	        map.put(RANDOMNESS, "strength of the randomness for the utility of money in routing under toll.  "
+		map.put(RANDOMNESS, "strength of the randomness for the utility of money in routing under toll.  "
 	          		+ "Leads to Pareto-optimal route with randomly drawn money-vs-other-attributes tradeoff. "
 	          		+ "Technically the width parameter of a log-normal distribution. 3.0 seems to be a good value. " ) ;
+		map.put( CLEAR_MODE_ROUTING_PARAMS, CLEAR_MODE_ROUTING_PARAMS_CMT ) ;
 		return map;
 	}
 
