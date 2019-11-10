@@ -124,10 +124,10 @@ public class CoordTest {
 	@Test
 	public void testToString() {
 		Coord c2 = new Coord(0.0, 1.0);
-		assertTrue(c2.toString().equalsIgnoreCase("[x=0.0][y=1.0]"));
+		assertTrue(c2.toString().equalsIgnoreCase("[x=0.0 | y=1.0]"));
 		
 		Coord c3 = new Coord(0.0, 1.0, 2.0);
-		assertTrue(c3.toString().equalsIgnoreCase("[x=0.0][y=1.0][z=2.0]"));
+		assertTrue(c3.toString().equalsIgnoreCase("[x=0.0 | y=1.0 | z=2.0]"));
 	}
 
 }

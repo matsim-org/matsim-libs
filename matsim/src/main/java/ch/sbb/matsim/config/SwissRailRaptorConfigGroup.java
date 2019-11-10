@@ -5,9 +5,12 @@
 package ch.sbb.matsim.config;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
+
+import com.google.common.base.Verify;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -390,8 +393,8 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
 
         private String mode;
         private double maxRadius;
-        private double initialSearchRadius = Double.POSITIVE_INFINITY;
-        private double searchExtensionRadius = 1000.0;
+        private double initialSearchRadius = Double.NEGATIVE_INFINITY;
+        private double searchExtensionRadius = Double.NEGATIVE_INFINITY;
         private String linkIdAttribute;
         private String personFilterAttribute;
         private String personFilterValue;
@@ -547,4 +550,30 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
             this.passengerMode = passengerMode;
         }
     }
+    
+    // TODO: add more
+	@Override
+	protected void checkConsistency(Config config) {
+
+		if (useIntermodality) {
+			Verify.verify(intermodalAccessEgressSettings.size() >= 1, "Using intermodal routing, but there are no access/egress " 
+					+ "modes defined. Add at least one parameterset with an access/egress mode and ensure "
+					+ "SwissRailRaptorConfigGroup is loaded correctly.");
+			
+			for (IntermodalAccessEgressParameterSet paramset: intermodalAccessEgressSettings) {
+				Verify.verifyNotNull(paramset.mode, "mode of an IntermodalAccessEgressParameterSet "
+						+ "is undefined. Please set a value in the config.");
+				Verify.verify(paramset.maxRadius > 0.0, "maxRadius of IntermodalAccessEgressParameterSet "
+						+ "for mode " + paramset.mode + " is negative or 0. Please set a positive value in the config.");
+				Verify.verify(paramset.initialSearchRadius > 0.0, "initialSearchRadius of IntermodalAccessEgressParameterSet "
+						+ "for mode " + paramset.mode + " is negative or 0. Please set a positive value in the config.");
+				Verify.verify(paramset.searchExtensionRadius > 0.0, "searchExtensionRadius of IntermodalAccessEgressParameterSet "
+						+ "for mode " + paramset.mode + " is negative or 0. Please set a positive value in the config.");
+				
+				Verify.verify(paramset.maxRadius >= paramset.initialSearchRadius, "maxRadius of IntermodalAccessEgressParameterSet "
+						+ "for mode " + paramset.mode + " is smaller than initialSearchRadius. This is inconsistent.");
+				
+			}
+		}
+	}
 }
