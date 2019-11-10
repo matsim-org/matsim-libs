@@ -45,18 +45,57 @@ public class PlansCalcRouteConfigGroupTest {
 
 	@Test
 	public void test1() {
-		PlansCalcRouteConfigGroup group = new PlansCalcRouteConfigGroup();
-		Assert.assertEquals( N_MODE_ROUTING_PARAMS_DEFAULT, group.getModeRoutingParams().size() );
-		group.setTeleportedModeSpeed( TransportMode.bike, 1. );
-		Assert.assertEquals( 1, group.getModeRoutingParams().size() );
-		group.setTeleportedModeSpeed( "abc", 1. );
-		Assert.assertEquals( 2, group.getModeRoutingParams().size() );
-		group.clearModeRoutingParams(  );
-		Assert.assertEquals( 0, group.getModeRoutingParams().size() );
+		String outdir = utils.getOutputDirectory();
+		final String filename = outdir + "config.xml";
+		{
+			Config config = ConfigUtils.createConfig();
+			PlansCalcRouteConfigGroup group = config.plansCalcRoute();
+			Assert.assertEquals( N_MODE_ROUTING_PARAMS_DEFAULT, group.getModeRoutingParams().size() );
+			group.clearModeRoutingParams();
+			group.setTeleportedModeSpeed( TransportMode.bike, 1. );
+			Assert.assertEquals( 1, group.getModeRoutingParams().size() );
+			group.setTeleportedModeSpeed( "abc", 1. );
+			Assert.assertEquals( 2, group.getModeRoutingParams().size() );
+			group.clearModeRoutingParams();
+			Assert.assertEquals( 0, group.getModeRoutingParams().size() );
+
+			ConfigUtils.writeConfig( config, filename );
+		}
+		{
+			Config config = ConfigUtils.loadConfig( filename ) ;
+			PlansCalcRouteConfigGroup group = config.plansCalcRoute();
+			Assert.assertEquals( 0, group.getModeRoutingParams().size() );
+		}
+	}
+	@Test
+	public void test1b() {
+		String outdir = utils.getOutputDirectory();
+		final String filename = outdir + "config.xml";
+		{
+			Config config = ConfigUtils.createConfig();
+			PlansCalcRouteConfigGroup group = config.plansCalcRoute();
+			Assert.assertEquals( N_MODE_ROUTING_PARAMS_DEFAULT, group.getModeRoutingParams().size() );
+			group.setTeleportedModeSpeed( TransportMode.bike, 1. );
+			Assert.assertEquals( 1, group.getModeRoutingParams().size() );
+			group.setTeleportedModeSpeed( "abc", 1. );
+			Assert.assertEquals( 2, group.getModeRoutingParams().size() );
+			for( String mode : group.getModeRoutingParams().keySet() ){
+				group.removeModeRoutingParams( mode );
+			}
+			Assert.assertEquals( 0, group.getModeRoutingParams().size() );
+
+			ConfigUtils.writeConfig( config, filename );
+		}
+		{
+			Config config = ConfigUtils.loadConfig( filename ) ;
+			PlansCalcRouteConfigGroup group = config.plansCalcRoute();
+			Assert.assertEquals( 0, group.getModeRoutingParams().size() );
+		}
 	}
 	@Test
 	public void test2() {
-		PlansCalcRouteConfigGroup group = new PlansCalcRouteConfigGroup();
+		Config config = ConfigUtils.createConfig(  ) ;
+		PlansCalcRouteConfigGroup group = config.plansCalcRoute() ;
 		Assert.assertEquals( N_MODE_ROUTING_PARAMS_DEFAULT, group.getModeRoutingParams().size() );
 		group.setTeleportedModeSpeed( "def", 1. );
 		Assert.assertEquals( 1, group.getModeRoutingParams().size() );
@@ -67,7 +106,8 @@ public class PlansCalcRouteConfigGroupTest {
 	}
 	@Test
 	public void test3() {
-		PlansCalcRouteConfigGroup group = new PlansCalcRouteConfigGroup() ;
+		Config config = ConfigUtils.createConfig(  ) ;
+		PlansCalcRouteConfigGroup group = config.plansCalcRoute() ;
 		group.clearModeRoutingParams();
 		group.setClearingDefaultModeRoutingParams( true ); // should be ok
 	}
