@@ -5,11 +5,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.map.HashedMap;
+import org.geotools.filter.expression.ThisPropertyAccessorFactory;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -17,7 +20,7 @@ import org.matsim.api.core.v01.population.Person;
 import com.google.inject.Inject;
 
 
-public class ActivitiesEventHandler implements ActivityEndEventHandler, ActivityStartEventHandler{
+public class ActivitiesEventHandler implements ActivityEndEventHandler, ActivityStartEventHandler, PersonDepartureEventHandler{
 
 	@Inject
 	private Network network;
@@ -36,6 +39,7 @@ public class ActivitiesEventHandler implements ActivityEndEventHandler, Activity
 			Trip trip = new Trip();
 			trip.setPersonId(event.getPersonId());
 			Link link = network.getLinks().get(event.getLinkId());
+			
 			ActivityImp activityImp = new ActivityImp(event.getActType(),link.getCoord(), event.getTime());
 			trip.setActivityEndImp(activityImp);
 			personId2Trip.put(event.getPersonId(), trip);
@@ -44,6 +48,7 @@ public class ActivitiesEventHandler implements ActivityEndEventHandler, Activity
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
+
 		if(!event.getActType().endsWith("interaction")) {
 			Link link = network.getLinks().get(event.getLinkId());
 			personId2Trip.get(event.getPersonId()).setActivityStartImp(new ActivityImp(event.getActType(),link.getCoord(), event.getTime()));
@@ -52,9 +57,15 @@ public class ActivitiesEventHandler implements ActivityEndEventHandler, Activity
 			} else {
 				this.personId2Trips.put(event.getPersonId(), new LinkedList<Trip>());
 				this.personId2Trips.get(event.getPersonId()).add(personId2Trip.get(event.getPersonId()));
-				this.personId2Trip.put(event.getPersonId(), null);
 			}
-	
+			this.personId2Trip.put(event.getPersonId(), null);
+		}
+		
+	}
+	@Override
+	public void handleEvent(PersonDepartureEvent event) {
+		if(this.personId2Trip.containsKey(event.getPersonId())) {
+			this.personId2Trip.get(event.getPersonId()).getModes().add(event.getLegMode());
 		}
 		
 	}
@@ -66,5 +77,6 @@ public class ActivitiesEventHandler implements ActivityEndEventHandler, Activity
 	public Map<Id<Person>, List<Trip>> getPersonId2Trips() {
 		return personId2Trips;
 	}
+
 
 }

@@ -28,14 +28,21 @@ import playgroundMeng.ptAccessabilityAnalysis.stopInfoCellector.RouteStopInfoCol
 
 public class PtAccessabilityModule extends AbstractModule{
 	
+	
 	private String configFile = "W:/08_Temporaere_Mitarbeiter/082_K-GGSN/0822_Praktikanten/Meng/vw243_cadON_ptSpeedAdj.0.1/vw243_cadON_ptSpeedAdj.0.1.output_config.xml";
-	private String networkFile = "C:/Users/VW3RCOM/Desktop/outputNetworkFileFinal.xml";
-	private String analysisNetworkFile = "C:/Users/VW3RCOM/Desktop/outputNetworkFileNew.xml";
+	private String networkFile = "W:/08_Temporaere_Mitarbeiter/082_K-GGSN/0822_Praktikanten/Meng/vw243_cadON_ptSpeedAdj.0.1/vw243_cadON_ptSpeedAdj.0.1.output_network.xml.gz";
+	//private String analysisNetworkFile = "C:/Users/VW3RCOM/Desktop/outputNetworkFileNew.xml";
 	private String transitFile = "W:/08_Temporaere_Mitarbeiter/082_K-GGSN/0822_Praktikanten/Meng/vw243_cadON_ptSpeedAdj.0.1/vw243_cadON_ptSpeedAdj.0.1.output_transitSchedule.xml.gz";
-	//private String transitFile = "W:/08_Temporaere_Mitarbeiter/082_K-GGSN/0822_Praktikanten/Meng/vw243_cadON_ptSpeedAdj.0.1/test-Transit.xml";
-	private String shapeFile = "C:/Users/VW3RCOM/Documents/shp/Hannover_Stadtteile.shp";
-	//private String eventFile = "W:/08_Temporaere_Mitarbeiter/082_K-GGSN//0822_Praktikanten/Meng/vw243_cadON_ptSpeedAdj.0.1/vw243_cadON_ptSpeedAdj.0.1.output_events.xml.gz";
-	private String eventFile = "C:/Users/VW3RCOM/Documents/2019-10-19_13-50-24__vw280_100pct.output_events.xml.gz";
+	private String eventFile =  "W:/08_Temporaere_Mitarbeiter/082_K-GGSN/0822_Praktikanten/Meng/vw243_cadON_ptSpeedAdj.0.1/vw243_cadON_ptSpeedAdj.0.1.output_events.xml.gz";
+	
+//	private String configFile = "W:/08_Temporaere_Mitarbeiter/082_K-GGSN/0822_Praktikanten/Meng/vw243_cadON_ptSpeedAdj.0.1/vw243_cadON_ptSpeedAdj.0.1.output_config.xml";
+//	private String networkFile = "C:/Users/VW3RCOM/Desktop/outputNetworkFileFinal.xml";
+//	private String analysisNetworkFile = "C:/Users/VW3RCOM/Desktop/outputNetworkFileNew.xml";
+//	private String transitFile = "W:/08_Temporaere_Mitarbeiter/082_K-GGSN/0822_Praktikanten/Meng/vw243_cadON_ptSpeedAdj.0.1/vw243_cadON_ptSpeedAdj.0.1.output_transitSchedule.xml.gz";
+//	//private String transitFile = "W:/08_Temporaere_Mitarbeiter/082_K-GGSN/0822_Praktikanten/Meng/vw243_cadON_ptSpeedAdj.0.1/test-Transit.xml";
+//	private String shapeFile = "C:/Users/VW3RCOM/Documents/shp/Hannover_Stadtteile.shp";
+//	//private String eventFile = "W:/08_Temporaere_Mitarbeiter/082_K-GGSN//0822_Praktikanten/Meng/vw243_cadON_ptSpeedAdj.0.1/vw243_cadON_ptSpeedAdj.0.1.output_events.xml.gz";
+//	private String eventFile = "C:/Users/VW3RCOM/Documents/2019-10-19_13-50-24__vw280_100pct.output_events.xml.gz";
 
 	@Override
 	protected void configure() {
@@ -79,7 +86,7 @@ public class PtAccessabilityModule extends AbstractModule{
 		modeScore.put("train", 1.);
 		ptAccessabilityConfig.setModeScore(modeScore);
 		//anaylsis Network
-		ptAccessabilityConfig.setAnalysisNetworkFile(analysisNetworkFile);
+		//ptAccessabilityConfig.setAnalysisNetworkFile(analysisNetworkFile);
 			
 		// print?
 		ptAccessabilityConfig.setIfWriteLinksInfo(false);
