@@ -79,7 +79,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	private final QSimConfigGroup qSimConfigGroup;
 	private final FacilitiesConfigGroup facilitiesConfigGroup;
 	private final MainModeIdentifier backwardCompatibilityMainModeIdentifier;
-	private final ForkJoinPool forkJoinPool;
+//	private final ForkJoinPool forkJoinPool;
 
 	/**
 	 * TODO: This should be a separate MainModeidentifier, neither the routing mode identifier from TripStructureUtils, 
@@ -100,7 +100,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		this.qSimConfigGroup = qSimConfigGroup;
 		this.facilitiesConfigGroup = facilitiesConfigGroup;
 		this.backwardCompatibilityMainModeIdentifier = backwardCompatibilityMainModeIdentifier;
-		this.forkJoinPool = new ForkJoinPool(globalConfigGroup.getNumberOfThreads());
+//		this.forkJoinPool = new ForkJoinPool(globalConfigGroup.getNumberOfThreads());
 	}
 
 
@@ -269,8 +269,10 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		}
 	}
 	
+	// TODO: parallelize, forkJoinPool initialization causes problems
 	private void adaptOutdatedPlansForRoutingMode() {
-		forkJoinPool.submit(() -> population.getPersons().values().parallelStream().forEach(person -> {
+//		forkJoinPool.submit(() -> 
+		population.getPersons().values().parallelStream().forEach(person -> {
 			for (Plan plan: person.getPlans()) {
 				for (Trip trip : TripStructureUtils.getTrips(plan.getPlanElements())) {
 					List<Leg> legs = trip.getLegsOnly();
@@ -318,6 +320,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 					}
 				}
 			}
-		}));
+		});
+//		);
 	}
 }
