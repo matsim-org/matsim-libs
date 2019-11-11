@@ -65,12 +65,20 @@ class TripEventHandler implements ActivityEndEventHandler, ActivityStartEventHan
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 
-		if (!tripToPerson.containsKey(event.getPersonId())) return;
+		// Don't end the trip until we have a real activity
+		if (StageActivityTypeIdentifier.isStageActivity(event.getActType()) || !tripToPerson.containsKey(event.getPersonId())) return;
 
 		BeelineTrip trip = getCurrentTrip(event.getPersonId());
 		trip.arrivalLink = event.getLinkId();
 		trip.arrivalTime = event.getTime();
 		trip.arrivalFacility = event.getFacilityId();
+
+		try {
+			trip.mainMode = mainModeIdentifier.identifyMainMode(trip.legs);
+		} catch (Exception e) {
+			// the default main mode identifier can't handle non-network-walk only
+			trip.mainMode = TransportMode.non_network_walk;
+		}
 	}
 
 	@Override
@@ -91,14 +99,9 @@ class TripEventHandler implements ActivityEndEventHandler, ActivityStartEventHan
 		// a new leg is started
 		Leg leg = PopulationUtils.createLeg(event.getLegMode());
 		leg.setDepartureTime(event.getTime());
+		leg.setMode(event.getLegMode());
 		BeelineTrip trip = getCurrentTrip(event.getPersonId());
 		trip.legs.add(leg);
-
-		// only investigate a mode if it is not the access/egress leg. If this is used in a multi-modal scenario,
-		// the last leg, will define the mainMode of the whole trip, if the current default main mode identifier is used
-		if (!leg.getMode().equals(TransportMode.non_network_walk)) {
-			trip.mainMode = mainModeIdentifier.identifyMainMode(trip.legs);
-		}
 	}
 
 	@Override
