@@ -52,6 +52,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -89,7 +90,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	PrepareForSimImpl(GlobalConfigGroup globalConfigGroup, Scenario scenario, Network network,
 				Population population, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider,
 				QSimConfigGroup qSimConfigGroup, FacilitiesConfigGroup facilitiesConfigGroup, 
-				MainModeIdentifier backwardCompatibilityMainModeIdentifier) {
+				@Named(MainModeIdentifier.BACKWARD_COMPATIBILITY_ROUTING_MODE_IDENTIFIER) MainModeIdentifier backwardCompatibilityMainModeIdentifier) {
 		this.globalConfigGroup = globalConfigGroup;
 		this.scenario = scenario;
 		this.network = network;

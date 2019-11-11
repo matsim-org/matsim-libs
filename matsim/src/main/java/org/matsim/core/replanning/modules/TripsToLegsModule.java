@@ -51,7 +51,7 @@ public class TripsToLegsModule extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new TripsToLegsAlgorithm( TripStructureUtils.getMainModeIdentifier() );
+		return new TripsToLegsAlgorithm( TripStructureUtils.getRoutingModeIdentifier() );
 	}
 }
 

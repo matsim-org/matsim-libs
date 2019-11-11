@@ -31,6 +31,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
@@ -84,7 +85,7 @@ ShutdownListener {
 
 	@Inject
 	ModeStatsControlerListener(ControlerConfigGroup controlerConfigGroup, Population population1, OutputDirectoryHierarchy controlerIO,
-			PlanCalcScoreConfigGroup scoreConfig, MainModeIdentifier mainModeIdentifier ) {
+			PlanCalcScoreConfigGroup scoreConfig, @Named(MainModeIdentifier.ANALYSIS_MAIN_MODE_IDENTIFIER) MainModeIdentifier mainModeIdentifier ) {
 		this.controlerConfigGroup = controlerConfigGroup;
 		this.population = population1;
 		this.modeFileName = controlerIO.getOutputFilename( FILENAME_MODESTATS ) ;

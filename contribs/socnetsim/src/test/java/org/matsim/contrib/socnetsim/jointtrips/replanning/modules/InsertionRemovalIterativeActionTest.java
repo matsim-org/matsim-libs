@@ -81,7 +81,7 @@ public class InsertionRemovalIterativeActionTest {
 					ScenarioUtils.createScenario( config ),
 					random,
 					false,
-					TripStructureUtils.getMainModeIdentifier() // yyyyyy ??????
+					TripStructureUtils.getRoutingModeIdentifier() // yyyyyy ??????
 					);
 		JointPlan jointPlan = createPlanWithJointTrips();
 		algo.run( jointPlan );
@@ -124,7 +124,7 @@ public class InsertionRemovalIterativeActionTest {
 					ScenarioUtils.createScenario( config ),
 					random,
 					true,
-					TripStructureUtils.getMainModeIdentifier() // yyyyyy ??????
+					TripStructureUtils.getRoutingModeIdentifier() // yyyyyy ??????
 					);
 		JointPlan jointPlan = createPlanWithJointTrips();
 		algo.run( jointPlan );
@@ -167,7 +167,7 @@ public class InsertionRemovalIterativeActionTest {
 					ScenarioUtils.createScenario( config ),
 					random,
 					false,
-					TripStructureUtils.getMainModeIdentifier() // yyyyyy ??????
+					TripStructureUtils.getRoutingModeIdentifier() // yyyyyy ??????
 					);
 		JointPlan jointPlan = createPlanWithoutJointTrips();
 		algo.run( jointPlan );
@@ -226,7 +226,7 @@ public class InsertionRemovalIterativeActionTest {
 					ScenarioUtils.createScenario( config ),
 					random,
 					true,
-					TripStructureUtils.getMainModeIdentifier() // yyyyyy ??????
+					TripStructureUtils.getRoutingModeIdentifier() // yyyyyy ??????
 					);
 		JointPlan jointPlan = createPlanWithoutJointTrips();
 		algo.run( jointPlan );

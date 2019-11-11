@@ -74,7 +74,7 @@ public class JointTripInsertionWithSocialNetworkTest {
 //						new TripRouter() );
 //						new TripRouter.Builder( scenario.getConfig() ).build() ) ;
 //						  new MainModeIdentifierImpl() // yyyyyy ????
-							  TripStructureUtils.getMainModeIdentifier() // yyyyyy ??????
+							  TripStructureUtils.getRoutingModeIdentifier() // yyyyyy ??????
 						) ;
 
 			final JointPlan jp = groupAllPlansInJointPlan( scenario.getPopulation() );

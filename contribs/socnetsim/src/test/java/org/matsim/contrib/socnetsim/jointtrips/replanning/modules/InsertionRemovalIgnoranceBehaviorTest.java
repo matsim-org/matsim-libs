@@ -88,7 +88,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 					random,
 					null,
 					(JointTripInsertorConfigGroup) config.getModule( JointTripInsertorConfigGroup.GROUP_NAME ),
-					TripStructureUtils.getMainModeIdentifier() ); // yyyyyy ??????
+					TripStructureUtils.getRoutingModeIdentifier() ); // yyyyyy ??????
 		
 		JointPlan jointPlan = createPlanWithoutJointTrips();
 
