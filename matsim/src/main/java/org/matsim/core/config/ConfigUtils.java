@@ -41,7 +41,8 @@ import java.util.Iterator;
  * @author nagel
  *
  */
-public abstract class ConfigUtils implements MatsimExtensionPoint {
+public class ConfigUtils implements MatsimExtensionPoint {
+	private ConfigUtils() {} // do not instantiate
 
 	public static Config createConfig(final String context) {
 		URL url = IOUtils.resolveFileOrResource(context) ;
