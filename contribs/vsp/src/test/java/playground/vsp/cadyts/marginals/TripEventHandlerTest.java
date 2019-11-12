@@ -16,7 +16,7 @@ import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
+import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -35,14 +35,13 @@ public class TripEventHandlerTest {
 	 * <p>
 	 * Also one agent is excluded from the recording, to test, whether the agent filter works correctly.
 	 *
-	 * @throws URISyntaxException    stupid api
 	 * @throws MalformedURLException another stupid api
 	 */
 	@Test
-	public void test() throws URISyntaxException, MalformedURLException {
+	public void test() throws MalformedURLException {
 
 		// url is such a weird api
-		URL ptTutorial = ExamplesUtils.getTestScenarioURL("pt-tutorial").toURI().resolve("0.config.xml").toURL();
+		URL ptTutorial = URI.create(ExamplesUtils.getTestScenarioURL("pt-tutorial").toString() + "/0.config.xml").toURL();
 		Config config = ConfigUtils.loadConfig(ptTutorial);
 
 		// use the config and run only one iteration
