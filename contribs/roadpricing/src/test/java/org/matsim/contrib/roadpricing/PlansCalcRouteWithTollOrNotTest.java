@@ -110,7 +110,10 @@ public class PlansCalcRouteWithTollOrNotTest {
 
 		// case 3: change the second leg to a non-car mode, than it should be the same as case 1
 		String oldMode = getLeg3(config, population, id1).getMode();
-		getLeg3(config, population, id1).setMode(TransportMode.pt);
+		Leg leg = getLeg3(config, population, id1);
+//		leg.setMode(TransportMode.pt);
+		leg.setRoute(null);
+		TripStructureUtils.setRoutingMode(leg, TransportMode.pt);
 		runOnAll(testee(scenario, toll), population);
 		RoadPricingTestUtils.compareRoutes("2 3 4 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
 		// and change the mode back
