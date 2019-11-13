@@ -91,8 +91,8 @@ public class ModalDistanceCadytsContext implements CadytsContextI<Id<DistanceDis
 		// copy the bins from expected distance distribution
 		DistanceDistribution simulatedDistanceDistribution = expectedDistanceDistribution.copyWithEmptyBins();
 
-		for (Map.Entry<Id<Person>, List<TripEventHandler.BeelineTrip>> entry : tripEventHandler.getTrips().entrySet()) {
-			for (TripEventHandler.BeelineTrip trip : entry.getValue()) {
+		for (Map.Entry<Id<Person>, List<TripEventHandler.Trip>> entry : tripEventHandler.getTrips().entrySet()) {
+			for (TripEventHandler.Trip trip : entry.getValue()) {
 
 				double distance = calculateBeelineDistance(trip);
 
@@ -130,7 +130,7 @@ public class ModalDistanceCadytsContext implements CadytsContextI<Id<DistanceDis
 		}
 	}
 
-	private double calculateBeelineDistance(TripEventHandler.BeelineTrip trip) {
+	private double calculateBeelineDistance(TripEventHandler.Trip trip) {
 
 		if (scenario.getActivityFacilities().getFacilities().containsKey(trip.getDepartureFacility()) ||
 				scenario.getActivityFacilities().getFacilities().containsKey(trip.getArrivalFacility())
