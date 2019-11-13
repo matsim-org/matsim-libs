@@ -74,6 +74,7 @@ public class StopBasedDrtRoutingModuleTest {
 		final Double beelineFactor = 1.3;
 		TeleportationRoutingModule walkRouter = new TeleportationRoutingModule(TransportMode.walk, scenario,
 				networkTravelSpeed, beelineFactor);
+		NonNetworkWalkRouter  nonNetworkWalkRouter = new NonNetworkWalkRouter(walkRouter);
 		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(scenario.getConfig());
 		String drtMode = "DrtX";
 		drtCfg.setMode(drtMode);
@@ -82,10 +83,10 @@ public class StopBasedDrtRoutingModuleTest {
 		AccessEgressStopFinder stopFinder = new ClosestAccessEgressStopFinder(drtCfg.getMaxWalkDistance(),
 				scenario.getNetwork(), stopsQT);
 		DrtRoutingModule drtRoutingModule = new DrtRoutingModule(drtCfg, scenario.getNetwork(),
-				new FastAStarEuclideanFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new, walkRouter,
+				new FastAStarEuclideanFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new, nonNetworkWalkRouter,
 				scenario);
 		StopBasedDrtRoutingModule stopBasedDRTRoutingModule = new StopBasedDrtRoutingModule(drtRoutingModule,
-				walkRouter, stopFinder, drtCfg, scenario, scenario.getNetwork());
+				nonNetworkWalkRouter, nonNetworkWalkRouter, stopFinder, drtCfg, scenario, scenario.getNetwork());
 
 		// case 1: origin and destination within max walking distance from next stop (200m)
 		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId(1));
