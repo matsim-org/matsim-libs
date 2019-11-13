@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
@@ -159,7 +160,8 @@ public class PSim implements Mobsim {
             PLANS:
             for (Plan plan : threadPlans) {
                 Queue<Event> eventQueue = new LinkedList<>();
-                Id personId = plan.getPerson().getId();
+                Id<Person> personId = plan.getPerson().getId();
+                Id<Vehicle> personVehicleId = Id.createVehicleId(personId.toString()); // TODO: find cleaner access to vehicle id
                 List<PlanElement> elements = plan.getPlanElements();
 
                 double prevEndTime = 0;
@@ -183,13 +185,13 @@ public class PSim implements Mobsim {
                         double travelTime = 0.0;
                         if (prevLeg.getMode().equals(TransportMode.car)) {
                             try {
-                                eventQueue.add(new PersonEntersVehicleEvent(prevEndTime, personId, personId));
-                                eventQueue.add(new VehicleEntersTrafficEvent(prevEndTime,personId, prevLeg.getRoute().getStartLinkId(),personId, TransportMode.car,1.0));
+                                eventQueue.add(new PersonEntersVehicleEvent(prevEndTime, personId, personVehicleId));
+                                eventQueue.add(new VehicleEntersTrafficEvent(prevEndTime,personId, prevLeg.getRoute().getStartLinkId(),personVehicleId, TransportMode.car,1.0));
                                 NetworkRoute croute = (NetworkRoute) prevLeg.getRoute();
 
-                                travelTime = calcRouteTravelTime(croute, prevEndTime, carLinkTravelTimes, network, eventQueue, personId);
-                                eventQueue.add(new VehicleLeavesTrafficEvent(prevEndTime + travelTime,personId, prevLeg.getRoute().getEndLinkId(),personId, TransportMode.car,1.0));
-                                eventQueue.add(new PersonLeavesVehicleEvent(prevEndTime + travelTime, personId, personId));
+                                travelTime = calcRouteTravelTime(croute, prevEndTime, carLinkTravelTimes, network, eventQueue, personVehicleId);
+                                eventQueue.add(new VehicleLeavesTrafficEvent(prevEndTime + travelTime,personId, prevLeg.getRoute().getEndLinkId(),personVehicleId, TransportMode.car,1.0));
+                                eventQueue.add(new PersonLeavesVehicleEvent(prevEndTime + travelTime, personId, personVehicleId));
                             } catch (NullPointerException ne) {
                                 Logger.getLogger(this.getClass()).error("No route for car leg. Continuing with next leg");
                                 continue;
@@ -279,14 +281,14 @@ public class PSim implements Mobsim {
             numThreads.decrementAndGet();
         }
 
-        private double calcRouteTravelTime(NetworkRoute route, double startTime, TravelTime travelTime, Network network, Queue<Event> eventQueue, Id agentId) {
+        private double calcRouteTravelTime(NetworkRoute route, double startTime, TravelTime travelTime, Network network, Queue<Event> eventQueue, Id<Vehicle> personVehicleId) {
 
             double tt = 0;
             if (route.getStartLinkId() != route.getEndLinkId()) {
                 Id<Link> startLink = route.getStartLinkId();
                 double linkEnterTime = startTime;
                 LinkEnterEvent linkEnterEvent = null;
-                LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(++linkEnterTime, agentId, startLink);
+                LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(++linkEnterTime, personVehicleId, startLink);
                 eventQueue.add(linkLeaveEvent);
                 double linkLeaveTime = linkEnterTime;
                 List<Id<Link>> routeLinkIds = route.getLinkIds();
@@ -295,19 +297,19 @@ public class PSim implements Mobsim {
                         int mmm = 0;
                     }
                     linkEnterTime = linkLeaveTime;
-                    linkEnterEvent = new LinkEnterEvent(linkEnterTime, agentId, routeLinkId);
+                    linkEnterEvent = new LinkEnterEvent(linkEnterTime, personVehicleId, routeLinkId);
                     eventQueue.add(linkEnterEvent);
 
                     double linkTime = travelTime.getLinkTravelTime(network.getLinks().get(routeLinkId), linkEnterTime, null, null);
                     tt += Math.max(linkTime, 1.0);
 
                     linkLeaveTime = Math.max(linkEnterTime + 1, linkEnterTime + linkTime);
-                    linkLeaveEvent = new LinkLeaveEvent(linkLeaveTime, agentId, routeLinkId);
+                    linkLeaveEvent = new LinkLeaveEvent(linkLeaveTime, personVehicleId, routeLinkId);
                     eventQueue.add(linkLeaveEvent);
                 }
                 tt = linkLeaveTime - startTime;
             }
-            LinkEnterEvent linkEnterEvent = new LinkEnterEvent(startTime + tt, agentId, route.getEndLinkId());
+            LinkEnterEvent linkEnterEvent = new LinkEnterEvent(startTime + tt, personVehicleId, route.getEndLinkId());
             eventQueue.add(linkEnterEvent);
             return tt + travelTime.getLinkTravelTime(network.getLinks().get(route.getEndLinkId()), tt + startTime, null, null);
         }
