@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
@@ -72,17 +73,11 @@ public class PSim implements Mobsim {
 
     private final SimThread[] threads;
     private final double beelineDistanceFactor;
-//    private TransitPerformance transitPerformance;
-//    private boolean isUseTransit;
     AtomicInteger numThreads;
 
     private final double walkSpeed;
 
     private final TravelTime carLinkTravelTimes;
-//    private WaitTime waitTimes;
-//    private StopStopTime stopStopTimes;
-//    private Map<Id<TransitLine>, TransitLine> transitLines;
-//    private Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities;
     private final Collection<Plan> plans;
     private final double endTime;
     
@@ -108,29 +103,8 @@ public class PSim implements Mobsim {
         this.plans = plans;
     }
 
-//    public PSim(Scenario sc, EventsManager eventsManager, Collection<Plan> plans, TravelTime carLinkTravelTimes, WaitTime waitTimes, StopStopTime stopStopTimes, TransitPerformance transitPerformance) {
-//        this(sc, eventsManager, plans, carLinkTravelTimes);
-//        isUseTransit = true;
-//        this.waitTimes = waitTimes;
-//        this.stopStopTimes = stopStopTimes;
-//        this.transitPerformance = transitPerformance;
-//
-//        transitLines = scenario.getTransitSchedule().getTransitLines();
-//        stopFacilities = scenario.getTransitSchedule().getFacilities();
-//
-//    }
-
     public PSim(Scenario sc, EventsManager eventsManager, Collection<Plan> plans, TravelTime carLinkTravelTimes, TransitEmulator transitEmulator) {
         this(sc, eventsManager, plans, carLinkTravelTimes);
-//        isUseTransit = true;
-       
-//        this.waitTimes = waitTimes;
-//        this.stopStopTimes = stopStopTimes;
-//        this.transitPerformance = transitPerformance;
-//
-//        transitLines = scenario.getTransitSchedule().getTransitLines();
-//        stopFacilities = scenario.getTransitSchedule().getFacilities();
-
         this.transitEmulator = transitEmulator;
         this.transitModes = ConfigUtils.addOrGetModule(sc.getConfig(), TransitConfigGroup.class).getTransitModes();
     }
@@ -186,7 +160,8 @@ public class PSim implements Mobsim {
             PLANS:
             for (Plan plan : threadPlans) {
                 Queue<Event> eventQueue = new LinkedList<>();
-                Id personId = plan.getPerson().getId();
+                Id<Person> personId = plan.getPerson().getId();
+                Id<Vehicle> personVehicleId = Id.createVehicleId(personId.toString()); // TODO: find cleaner access to vehicle id
                 List<PlanElement> elements = plan.getPlanElements();
 
                 double prevEndTime = 0;
@@ -210,13 +185,13 @@ public class PSim implements Mobsim {
                         double travelTime = 0.0;
                         if (prevLeg.getMode().equals(TransportMode.car)) {
                             try {
-                                eventQueue.add(new PersonEntersVehicleEvent(prevEndTime, personId, personId));
-                                eventQueue.add(new VehicleEntersTrafficEvent(prevEndTime,personId, prevLeg.getRoute().getStartLinkId(),personId, TransportMode.car,1.0));
+                                eventQueue.add(new PersonEntersVehicleEvent(prevEndTime, personId, personVehicleId));
+                                eventQueue.add(new VehicleEntersTrafficEvent(prevEndTime,personId, prevLeg.getRoute().getStartLinkId(),personVehicleId, TransportMode.car,1.0));
                                 NetworkRoute croute = (NetworkRoute) prevLeg.getRoute();
 
-                                travelTime = calcRouteTravelTime(croute, prevEndTime, carLinkTravelTimes, network, eventQueue, personId);
-                                eventQueue.add(new VehicleLeavesTrafficEvent(prevEndTime + travelTime,personId, prevLeg.getRoute().getEndLinkId(),personId, TransportMode.car,1.0));
-                                eventQueue.add(new PersonLeavesVehicleEvent(prevEndTime + travelTime, personId, personId));
+                                travelTime = calcRouteTravelTime(croute, prevEndTime, carLinkTravelTimes, network, eventQueue, personVehicleId);
+                                eventQueue.add(new VehicleLeavesTrafficEvent(prevEndTime + travelTime,personId, prevLeg.getRoute().getEndLinkId(),personVehicleId, TransportMode.car,1.0));
+                                eventQueue.add(new PersonLeavesVehicleEvent(prevEndTime + travelTime, personId, personVehicleId));
                             } catch (NullPointerException ne) {
                                 Logger.getLogger(this.getClass()).error("No route for car leg. Continuing with next leg");
                                 continue;
@@ -225,40 +200,17 @@ public class PSim implements Mobsim {
                             TransitWalkTimeAndDistance tnd = new TransitWalkTimeAndDistance(act.getCoord(), prevAct.getCoord());
                             travelTime = tnd.time;
                             eventQueue.add(new TeleportationArrivalEvent(prevEndTime + tnd.time, personId, tnd.distance));
-//                        } else if (prevLeg.getMode().equals(TransportMode.pt)) {
                         } else if (transitModes.contains(prevLeg.getMode())) {
                         	TransitEmulator.Trip trip = transitEmulator.findTrip(prevLeg, prevEndTime);
-                        	if (trip != null) {
-//                        	if (isUseTransit) {                            	
+                        	if (trip != null) {                           	
                             	
-//                        		Id dummyVehicleId = Id.create("dummy", TransitVehicle.class);
                         		Id<Vehicle> vehicleId = trip.vehicleId();
                         		if (vehicleId == null) {
                         			vehicleId = Id.create("dummy", Vehicle.class);
                         		}
                                 eventQueue.add(new PersonEntersVehicleEvent(trip.accessTime_s(), personId, vehicleId)); // dummyVehicleId));
                                 eventQueue.add(new PersonLeavesVehicleEvent(trip.egressTime_s(), personId, vehicleId)); // dummyVehicleId));
-                                travelTime = trip.egressTime_s() - prevEndTime;
-                            	
-//                                ExperimentalTransitRoute route = (ExperimentalTransitRoute) prevLeg.getRoute();
-//                                Id accessStopId = route.getAccessStopId();
-//                                Id egressStopId = route.getEgressStopId();
-//                                Id dummyVehicleId = Id.create("dummy", TransitVehicle.class);
-//                                TransitLine line = transitLines.get(route.getLineId());
-//                                TransitRoute transitRoute = line.getRoutes().get(route.getRouteId());
-//                                if (transitPerformance == null) {
-//                                    travelTime += waitTimes.getRouteStopWaitTime(line.getId(), transitRoute.getId(), accessStopId, prevEndTime);
-//                                    eventQueue.add(new PersonEntersVehicleEvent(prevEndTime + travelTime, personId, dummyVehicleId));
-//                                    travelTime += findTransitTravelTime(route, prevEndTime + travelTime);
-//                                    eventQueue.add(new PersonLeavesVehicleEvent(prevEndTime + travelTime, personId, dummyVehicleId));
-//                                } else {
-//                                    Tuple<Double, Double> routeTravelTime = transitPerformance.getRouteTravelTime(line.getId(), route.getRouteId(), accessStopId, egressStopId, prevEndTime);
-//                                    travelTime += routeTravelTime.getFirst();
-//                                    eventQueue.add(new PersonEntersVehicleEvent(prevEndTime + travelTime, personId, dummyVehicleId));
-//                                    travelTime += routeTravelTime.getSecond();
-//                                    eventQueue.add(new PersonLeavesVehicleEvent(prevEndTime + travelTime, personId, dummyVehicleId));
-//                                }                                
-                                
+                                travelTime = trip.egressTime_s() - prevEndTime;                                
                             }
                         } else {
                             try {
@@ -329,61 +281,14 @@ public class PSim implements Mobsim {
             numThreads.decrementAndGet();
         }
 
-//        private double findTransitTravelTime(ExperimentalTransitRoute route, double prevEndTime) {
-//            double travelTime = 0;
-//            double prevStopTime = prevEndTime;
-//            TransitRouteImpl transitRoute = (TransitRouteImpl) transitLines.get(route.getLineId()).getRoutes().get(route.getRouteId());
-//            // cannot just get the indices of the two transitstops, because
-//            // sometimes routes visit the same stop facility more than once
-//            // and the transitroutestop is different for each time it stops at
-//            // the same facility
-//            TransitRouteStop orig = transitRoute.getStop(stopFacilities.get(route.getAccessStopId()));
-//            Id dest = route.getEgressStopId();
-//            int i = transitRoute.getStops().indexOf(orig);
-//            // int j = transitRoute.getStops().indexOf(dest);
-//            // if(i>=j){
-//            // throw new
-//            // RuntimeException(String.format("Cannot route from origin stop %s to destination stop %s on route %s.",
-//            // orig.getStopFacility().getId().toString()
-//            // ,dest.getStopFacility().getId().toString()
-//            // ,route.getRouteId().toString()
-//            // ));
-//            //
-//            // }
-//            boolean destinationFound = false;
-//            while (i < transitRoute.getStops().size() - 1) {
-//                Id fromId = transitRoute.getStops().get(i).getStopFacility().getId();
-//                TransitRouteStop toStop = transitRoute.getStops().get(i + 1);
-//                Id toId = toStop.getStopFacility().getId();
-//                travelTime += stopStopTimes.getStopStopTime(fromId, toId, prevStopTime);
-//                prevStopTime += travelTime;
-//                if (toStop.getStopFacility().getId().equals(dest)) {
-//                    destinationFound = true;
-//                    break;
-//                }
-//                if (toStop.getStopFacility().getId().equals(route.getAccessStopId())) {
-//                    //this is a repeating stop, for routes that loop on themselves more than once
-//                    travelTime = 0;
-//                    prevStopTime = prevEndTime;
-//                }
-//                i++;
-//            }
-//            if (destinationFound) {
-//                return travelTime;
-//            } else {
-//
-//                return Double.NEGATIVE_INFINITY;
-//            }
-//        }
-
-        private double calcRouteTravelTime(NetworkRoute route, double startTime, TravelTime travelTime, Network network, Queue<Event> eventQueue, Id agentId) {
+        private double calcRouteTravelTime(NetworkRoute route, double startTime, TravelTime travelTime, Network network, Queue<Event> eventQueue, Id<Vehicle> personVehicleId) {
 
             double tt = 0;
             if (route.getStartLinkId() != route.getEndLinkId()) {
                 Id<Link> startLink = route.getStartLinkId();
                 double linkEnterTime = startTime;
                 LinkEnterEvent linkEnterEvent = null;
-                LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(++linkEnterTime, agentId, startLink);
+                LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(++linkEnterTime, personVehicleId, startLink);
                 eventQueue.add(linkLeaveEvent);
                 double linkLeaveTime = linkEnterTime;
                 List<Id<Link>> routeLinkIds = route.getLinkIds();
@@ -392,19 +297,19 @@ public class PSim implements Mobsim {
                         int mmm = 0;
                     }
                     linkEnterTime = linkLeaveTime;
-                    linkEnterEvent = new LinkEnterEvent(linkEnterTime, agentId, routeLinkId);
+                    linkEnterEvent = new LinkEnterEvent(linkEnterTime, personVehicleId, routeLinkId);
                     eventQueue.add(linkEnterEvent);
 
                     double linkTime = travelTime.getLinkTravelTime(network.getLinks().get(routeLinkId), linkEnterTime, null, null);
                     tt += Math.max(linkTime, 1.0);
 
                     linkLeaveTime = Math.max(linkEnterTime + 1, linkEnterTime + linkTime);
-                    linkLeaveEvent = new LinkLeaveEvent(linkLeaveTime, agentId, routeLinkId);
+                    linkLeaveEvent = new LinkLeaveEvent(linkLeaveTime, personVehicleId, routeLinkId);
                     eventQueue.add(linkLeaveEvent);
                 }
                 tt = linkLeaveTime - startTime;
             }
-            LinkEnterEvent linkEnterEvent = new LinkEnterEvent(startTime + tt, agentId, route.getEndLinkId());
+            LinkEnterEvent linkEnterEvent = new LinkEnterEvent(startTime + tt, personVehicleId, route.getEndLinkId());
             eventQueue.add(linkEnterEvent);
             return tt + travelTime.getLinkTravelTime(network.getLinks().get(route.getEndLinkId()), tt + startTime, null, null);
         }
