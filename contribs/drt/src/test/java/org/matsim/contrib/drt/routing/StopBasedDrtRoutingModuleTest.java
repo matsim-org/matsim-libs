@@ -74,17 +74,17 @@ public class StopBasedDrtRoutingModuleTest {
 		final Double beelineFactor = 1.3;
 		TeleportationRoutingModule walkRouter = new TeleportationRoutingModule(TransportMode.walk, scenario,
 				networkTravelSpeed, beelineFactor);
-		NonNetworkWalkRouter  nonNetworkWalkRouter = new NonNetworkWalkRouter(walkRouter);
+		NonNetworkWalkRouter nonNetworkWalkRouter = new NonNetworkWalkRouter(walkRouter);
 		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(scenario.getConfig());
 		String drtMode = "DrtX";
 		drtCfg.setMode(drtMode);
 		QuadTree<TransitStopFacility> stopsQT = TransitScheduleUtils.createQuadTreeOfTransitStopFacilities(
 				scenario.getTransitSchedule());
-		AccessEgressFacilityFinder stopFinder = new ClosestFacilityAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
+		AccessEgressFacilityFinder stopFinder = new ClosestAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
 				scenario.getNetwork(), stopsQT);
 		DrtRoutingModule drtRoutingModule = new DrtRoutingModule(drtCfg, scenario.getNetwork(),
-				new FastAStarEuclideanFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new, nonNetworkWalkRouter,
-				scenario);
+				new FastAStarEuclideanFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new,
+				nonNetworkWalkRouter, scenario);
 		StopBasedDrtRoutingModule stopBasedDRTRoutingModule = new StopBasedDrtRoutingModule(drtRoutingModule,
 				nonNetworkWalkRouter, nonNetworkWalkRouter, stopFinder, drtCfg, scenario, scenario.getNetwork());
 
