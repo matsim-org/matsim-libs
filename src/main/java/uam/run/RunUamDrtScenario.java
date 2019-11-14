@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.routing.DrtRoutingModule;
+import org.matsim.contrib.drt.routing.DrtRouteLegCalculator;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
@@ -132,7 +132,7 @@ public class RunUamDrtScenario {
 			RoutingModule egressRoutingModule = (fromFacility, toFacility, departureTime, person) -> tripRouter.calcRoute(
 					"car", fromFacility, toFacility, departureTime, person);
 
-			return new StopBasedDrtRoutingModule(getModalInstance(DrtRoutingModule.class), accessRoutingModule,
+			return new StopBasedDrtRoutingModule(getModalInstance(DrtRouteLegCalculator.class), accessRoutingModule,
 					egressRoutingModule, getModalInstance(StopBasedDrtRoutingModule.AccessEgressFacilityFinder.class),
 					drtCfg, scenario, getModalInstance(Network.class));
 		}
