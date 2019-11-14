@@ -183,7 +183,7 @@ public class AbstractTransitRouter {
 	}
 
 	private Leg createTransitWalkLeg(Coord fromCoord, Coord toCoord) {
-		Leg leg = PopulationUtils.createLeg(TransportMode.non_network_walk);
+		Leg leg = PopulationUtils.createLeg(TransportMode.walk);
 		double walkTime = getWalkTime(null, fromCoord, toCoord);
 		leg.setTravelTime(walkTime);
 		return leg;
