@@ -22,7 +22,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
+import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressFacilityFinder;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
@@ -31,20 +31,20 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 /**
  * @author michalm
  */
-public class ClosestAccessEgressStopFinder implements AccessEgressStopFinder {
+public class ClosestStopAccessEgressFacilityFinder implements AccessEgressFacilityFinder {
 
 	private final Network network;
 	private final QuadTree<TransitStopFacility> stopsQT;
 	private final double maxDistance;
 
-	public ClosestAccessEgressStopFinder(double maxDistance, Network network, QuadTree<TransitStopFacility> stopsQT) {
+	public ClosestStopAccessEgressFacilityFinder(double maxDistance, Network network, QuadTree<TransitStopFacility> stopsQT) {
 		this.network = network;
 		this.stopsQT = stopsQT;
 		this.maxDistance = maxDistance;
 	}
 
 	@Override
-	public Pair<TransitStopFacility, TransitStopFacility> findStops(Facility fromFacility, Facility toFacility) {
+	public Pair<Facility, Facility> findFacilities(Facility fromFacility, Facility toFacility) {
 		TransitStopFacility accessFacility = findClosestStop(fromFacility);
 		if (accessFacility == null) {
 			return new ImmutablePair<>(null, null);

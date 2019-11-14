@@ -39,7 +39,6 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * @author jbischoff
@@ -48,13 +47,13 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public class StopBasedDrtRoutingModule implements RoutingModule {
 	private static final Logger logger = Logger.getLogger(StopBasedDrtRoutingModule.class);
 
-	public interface AccessEgressStopFinder {
-		Pair<TransitStopFacility, TransitStopFacility> findStops(Facility fromFacility, Facility toFacility);
+	public interface AccessEgressFacilityFinder {
+		Pair<Facility, Facility> findFacilities(Facility fromFacility, Facility toFacility);
 	}
 
 	private final DrtStageActivityType drtStageActivityType;
 	private final Network modalNetwork;
-	private final AccessEgressStopFinder stopFinder;
+	private final AccessEgressFacilityFinder stopFinder;
 	private final DrtConfigGroup drtCfg;
 	private final Scenario scenario;
 	private final DrtRoutingModule drtRoutingModule;
@@ -62,7 +61,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 	private final RoutingModule egressRouter;
 
 	public StopBasedDrtRoutingModule(DrtRoutingModule drtRoutingModule, RoutingModule accessRouter,
-			RoutingModule egressRouter, AccessEgressStopFinder stopFinder, DrtConfigGroup drtCfg, Scenario scenario,
+			RoutingModule egressRouter, AccessEgressFacilityFinder stopFinder, DrtConfigGroup drtCfg, Scenario scenario,
 			Network modalNetwork) {
 		this.drtRoutingModule = drtRoutingModule;
 		this.stopFinder = stopFinder;
@@ -77,16 +76,16 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 	@Override
 	public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime,
 			Person person) {
-		Pair<TransitStopFacility, TransitStopFacility> stops = stopFinder.findStops(fromFacility, toFacility);
+		Pair<Facility, Facility> stops = stopFinder.findFacilities(fromFacility, toFacility);
 
-		TransitStopFacility accessFacility = stops.getLeft();
+		Facility accessFacility = stops.getLeft();
 		if (accessFacility == null) {
 			printWarning(() -> "No access stop found, agent will use fallback mode " + TripRouter.getFallbackMode(
 					drtCfg.getMode()) + ". Agent Id:\t" + person.getId());
 			return null;
 		}
 
-		TransitStopFacility egressFacility = stops.getRight();
+		Facility egressFacility = stops.getRight();
 		if (egressFacility == null) {
 			printWarning(() -> "No egress stop found, agent will use fallback mode " + TripRouter.getFallbackMode(
 					drtCfg.getMode()) + ". Agent Id:\t" + person.getId());
