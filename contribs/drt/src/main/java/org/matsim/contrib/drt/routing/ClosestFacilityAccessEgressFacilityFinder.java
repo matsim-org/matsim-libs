@@ -59,9 +59,6 @@ public class ClosestFacilityAccessEgressFacilityFinder implements AccessEgressFa
 		Coord coord = StopBasedDrtRoutingModule.getFacilityCoord(facility, network);
 		Facility closestStop = stopsQT.getClosest(coord.getX(), coord.getY());
 		double closestStopDistance = CoordUtils.calcEuclideanDistance(coord, closestStop.getCoord());
-		if (closestStopDistance > maxDistance) {
-			return null;
-		}
-		return closestStop;
+		return closestStopDistance > maxDistance ? null : closestStop;
 	}
 }
