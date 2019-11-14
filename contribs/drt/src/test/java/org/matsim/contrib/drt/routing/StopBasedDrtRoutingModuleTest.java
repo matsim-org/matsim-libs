@@ -80,7 +80,7 @@ public class StopBasedDrtRoutingModuleTest {
 		drtCfg.setMode(drtMode);
 		QuadTree<TransitStopFacility> stopsQT = TransitScheduleUtils.createQuadTreeOfTransitStopFacilities(
 				scenario.getTransitSchedule());
-		AccessEgressFacilityFinder stopFinder = new ClosestStopAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
+		AccessEgressFacilityFinder stopFinder = new ClosestFacilityAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
 				scenario.getNetwork(), stopsQT);
 		DrtRoutingModule drtRoutingModule = new DrtRoutingModule(drtCfg, scenario.getNetwork(),
 				new FastAStarEuclideanFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new, nonNetworkWalkRouter,

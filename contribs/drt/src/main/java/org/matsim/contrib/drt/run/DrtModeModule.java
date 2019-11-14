@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.optimizer.rebalancing.NoRebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.DrtModeMinCostFlowRebalancingModule;
-import org.matsim.contrib.drt.routing.ClosestStopAccessEgressFacilityFinder;
+import org.matsim.contrib.drt.routing.ClosestFacilityAccessEgressFacilityFinder;
 import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtRoutingModule;
@@ -119,7 +119,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 				bindModal(quadTreeTypeLiteral).toProvider(new StopsQuadTreeProvider(drtCfg));
 
 				bindModal(AccessEgressFacilityFinder.class).toProvider(modalProvider(
-						getter -> new ClosestStopAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
+						getter -> new ClosestFacilityAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
 								getter.get(Network.class), getter.getModal(quadTreeTypeLiteral)))).asEagerSingleton();
 
 				break;
