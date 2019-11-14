@@ -34,7 +34,7 @@ import one.util.streamex.StreamEx;
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class NonNetworkWalkRouter implements RoutingModule {
+public final class NonNetworkWalkRouter implements RoutingModule {
 	private final RoutingModule walkRouter;
 
 	public NonNetworkWalkRouter(RoutingModule walkRouter) {

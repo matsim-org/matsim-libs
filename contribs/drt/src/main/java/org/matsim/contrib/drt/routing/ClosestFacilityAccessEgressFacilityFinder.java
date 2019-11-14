@@ -18,49 +18,53 @@
 
 package org.matsim.contrib.drt.routing;
 
+import java.util.Optional;
+
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
+import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressFacilityFinder;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * @author michalm
  */
-public class ClosestAccessEgressStopFinder implements AccessEgressStopFinder {
-
+public class ClosestFacilityAccessEgressFacilityFinder implements AccessEgressFacilityFinder {
 	private final Network network;
-	private final QuadTree<TransitStopFacility> stopsQT;
+	private final QuadTree<? extends Facility> facilityQT;
 	private final double maxDistance;
 
-	public ClosestAccessEgressStopFinder(double maxDistance, Network network, QuadTree<TransitStopFacility> stopsQT) {
+	public ClosestFacilityAccessEgressFacilityFinder(double maxDistance, Network network,
+			QuadTree<? extends Facility> facilityQT) {
+		if (facilityQT.size() == 0) {
+			throw new IllegalArgumentException("Empty facility QuadTree");
+		}
+
 		this.network = network;
-		this.stopsQT = stopsQT;
+		this.facilityQT = facilityQT;
 		this.maxDistance = maxDistance;
 	}
 
 	@Override
-	public Pair<TransitStopFacility, TransitStopFacility> findStops(Facility fromFacility, Facility toFacility) {
-		TransitStopFacility accessFacility = findClosestStop(fromFacility);
+	public Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility) {
+		Facility accessFacility = findClosestStop(fromFacility);
 		if (accessFacility == null) {
-			return new ImmutablePair<>(null, null);
+			return Optional.empty();
 		}
 
-		TransitStopFacility egressFacility = findClosestStop(toFacility);
-		return new ImmutablePair<>(accessFacility, egressFacility);
+		Facility egressFacility = findClosestStop(toFacility);
+		return egressFacility == null ?
+				Optional.empty() :
+				Optional.of(new ImmutablePair<>(accessFacility, egressFacility));
 	}
 
-	private TransitStopFacility findClosestStop(Facility facility) {
+	private Facility findClosestStop(Facility facility) {
 		Coord coord = StopBasedDrtRoutingModule.getFacilityCoord(facility, network);
-		TransitStopFacility closestStop = stopsQT.getClosest(coord.getX(), coord.getY());
+		Facility closestStop = facilityQT.getClosest(coord.getX(), coord.getY());
 		double closestStopDistance = CoordUtils.calcEuclideanDistance(coord, closestStop.getCoord());
-		if (closestStopDistance > maxDistance) {
-			return null;
-		}
-		return stopsQT.getClosest(coord.getX(), coord.getY());
+		return closestStopDistance > maxDistance ? null : closestStop;
 	}
 }

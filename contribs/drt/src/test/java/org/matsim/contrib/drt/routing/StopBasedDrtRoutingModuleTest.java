@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
+import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressFacilityFinder;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
@@ -80,7 +80,7 @@ public class StopBasedDrtRoutingModuleTest {
 		drtCfg.setMode(drtMode);
 		QuadTree<TransitStopFacility> stopsQT = TransitScheduleUtils.createQuadTreeOfTransitStopFacilities(
 				scenario.getTransitSchedule());
-		AccessEgressStopFinder stopFinder = new ClosestAccessEgressStopFinder(drtCfg.getMaxWalkDistance(),
+		AccessEgressFacilityFinder stopFinder = new ClosestFacilityAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
 				scenario.getNetwork(), stopsQT);
 		DrtRoutingModule drtRoutingModule = new DrtRoutingModule(drtCfg, scenario.getNetwork(),
 				new FastAStarEuclideanFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new, nonNetworkWalkRouter,
@@ -98,9 +98,6 @@ public class StopBasedDrtRoutingModuleTest {
 
 		List<? extends PlanElement> routedList = stopBasedDRTRoutingModule.calcRoute(hf, wf, 8 * 3600, p1);
 
-		for (PlanElement pe : routedList) {
-			System.out.println(pe);
-		}
 		Assert.assertEquals(5, routedList.size());
 
 		Leg accessLegP1 = (Leg)routedList.get(0);
