@@ -18,7 +18,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
 
-public class DrtMainModeIdentifierTest {
+public class MultiModeDrtMainModeIdentifierTest {
 
 	@Test
 	public void test() {
@@ -29,7 +29,7 @@ public class DrtMainModeIdentifierTest {
 		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
 		multiModeDrtConfigGroup.addParameterSet(drtConfigGroup);
 		config.addModule(multiModeDrtConfigGroup);
-		MainModeIdentifier mmi = new DrtMainModeIdentifier(drtConfigGroup);
+		MultiModeDrtMainModeIdentifier mmi = new MultiModeDrtMainModeIdentifier(multiModeDrtConfigGroup);
 		{
 			List<PlanElement> testElements = new ArrayList<>();
 			Leg l1 = PopulationUtils.createLeg(TransportMode.car);

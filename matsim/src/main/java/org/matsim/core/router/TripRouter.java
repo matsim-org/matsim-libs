@@ -59,16 +59,16 @@ import javax.inject.Provider;
  */
 public final class TripRouter implements MatsimExtensionPoint {
 	private static final Logger log = Logger.getLogger(TripRouter.class );
-	
+
 	private final Map<String, RoutingModule> routingModules = new HashMap<>();
-	
+
 	private MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
 	private final FallbackRoutingModule fallbackRoutingModule;
 
 	private Config config;
 	// (I need the config in the PlanRouter to figure out activity end times. And since the PlanRouter is not
 	// injected, I cannot get it there directly.  kai, oct'17)
-	
+
 	public static final class Builder {
 		private final Config config;
 		private MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
@@ -189,12 +189,12 @@ public final class TripRouter implements MatsimExtensionPoint {
 			final Person person) {
 		// I need this "synchronized" since I want mobsim agents to be able to call this during the mobsim.  So when the
 		// mobsim is multi-threaded, multiple agents might call this here at the same time.  kai, nov'17
-		
+
 		Gbl.assertNotNull( fromFacility );
 		Gbl.assertNotNull( toFacility );
-		
+
 		RoutingModule module = routingModules.get( mainMode );
-		
+
 		if (module != null) {
 			List<? extends PlanElement> trip =
 					module.calcRoute(
@@ -330,10 +330,10 @@ public final class TripRouter implements MatsimExtensionPoint {
 
 		// check validity
 		if (indexOfOrigin < 0) {
-			throw new RuntimeException( "could not find origin "+origin+" in "+plan ); 
+			throw new RuntimeException( "could not find origin "+origin+" in "+plan );
 		}
 		if (indexOfDestination < 0) {
-			throw new RuntimeException( "could not find destination "+destination+" in "+plan ); 
+			throw new RuntimeException( "could not find destination "+destination+" in "+plan );
 		}
 
 		// replace the trip and return the former one
@@ -349,10 +349,13 @@ public final class TripRouter implements MatsimExtensionPoint {
 	public Config getConfig() {
 		return config;
 	}
-	
-	public static final String getFallbackMode(String transportMode) {
+
+	public static String getFallbackMode(String transportMode) {
 		return transportMode + FallbackRoutingModuleDefaultImpl._fallback;
 	}
 
+	public static boolean isFallbackMode(String mode) {
+		return mode.endsWith(FallbackRoutingModuleDefaultImpl._fallback);
+	}
 }
 
