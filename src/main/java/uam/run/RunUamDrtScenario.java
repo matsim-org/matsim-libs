@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.routing.DrtRoutingModule;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule;
-import org.matsim.contrib.drt.routing.StopBasedUamRoutingModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -114,11 +113,7 @@ public class RunUamDrtScenario {
 	}
 
 	private static class StopBasedUamRoutingModuleProvider
-			extends ModalProviders.AbstractProvider<StopBasedUamRoutingModule> {
-		@Inject
-		@Named(TransportMode.walk)
-		private RoutingModule walkRouter;
-
+			extends ModalProviders.AbstractProvider<StopBasedDrtRoutingModule> {
 		@Inject
 		private Scenario scenario;
 
@@ -133,10 +128,15 @@ public class RunUamDrtScenario {
 		}
 
 		@Override
-		public StopBasedUamRoutingModule get() {
-			return new StopBasedUamRoutingModule(getModalInstance(DrtRoutingModule.class), walkRouter,
-					getModalInstance(StopBasedDrtRoutingModule.AccessEgressStopFinder.class), drtCfg, scenario,
-					getModalInstance(Network.class), tripRouter, "drt", "drt");
+		public StopBasedDrtRoutingModule get() {
+			RoutingModule accessRoutingModule = (fromFacility, toFacility, departureTime, person) -> tripRouter.calcRoute(
+					"drt", fromFacility, toFacility, departureTime, person);
+			RoutingModule egressRoutingModule = (fromFacility, toFacility, departureTime, person) -> tripRouter.calcRoute(
+					"car", fromFacility, toFacility, departureTime, person);
+
+			return new StopBasedDrtRoutingModule(getModalInstance(DrtRoutingModule.class), accessRoutingModule,
+					egressRoutingModule, getModalInstance(StopBasedDrtRoutingModule.AccessEgressStopFinder.class),
+					drtCfg, scenario, getModalInstance(Network.class));
 		}
 	}
 
