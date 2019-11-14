@@ -66,6 +66,6 @@ public class ClosestStopAccessEgressFacilityFinder implements AccessEgressFacili
 		if (closestStopDistance > maxDistance) {
 			return null;
 		}
-		return stopsQT.getClosest(coord.getX(), coord.getY());
+		return closestStop;
 	}
 }
