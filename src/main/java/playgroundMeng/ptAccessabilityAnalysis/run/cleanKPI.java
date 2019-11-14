@@ -3,13 +3,10 @@ package playgroundMeng.ptAccessabilityAnalysis.run;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.locationtech.jts.geom.LinearRing;
-import org.omg.PortableInterceptor.INACTIVE;
 
 public class cleanKPI {
 	public static void main(String[] args) throws IOException {
