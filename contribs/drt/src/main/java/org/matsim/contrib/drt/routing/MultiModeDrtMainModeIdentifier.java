@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
@@ -46,12 +47,12 @@ public class MultiModeDrtMainModeIdentifier implements MainModeIdentifier {
 	public MultiModeDrtMainModeIdentifier(MultiModeDrtConfigGroup drtCfg) {
 		drtStageActivityTypes = drtCfg.getModalElements()
 				.stream()
-				.map(drtConfigGroup -> drtConfigGroup.getMode())
+				.map(DrtConfigGroup::getMode)
 				.collect(Collectors.toMap(s -> new DrtStageActivityType(s).drtStageActivity, s -> s));
 		drtWalkTypes = drtCfg.getModalElements()
 				.stream()
-				.map(drtConfigGroup -> drtConfigGroup.getMode())
-				.collect(Collectors.toMap(s -> TripRouter.getFallbackMode(s), s -> s));
+				.map(DrtConfigGroup::getMode)
+				.collect(Collectors.toMap(TripRouter::getFallbackMode, s -> s));
 	}
 
 	@Override
