@@ -54,6 +54,8 @@ import org.matsim.vehicles.VehicleUtils;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -79,6 +81,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	private final QSimConfigGroup qSimConfigGroup;
 	private final FacilitiesConfigGroup facilitiesConfigGroup;
 	private final MainModeIdentifier backwardCompatibilityMainModeIdentifier;
+	private final Set<String> drtPtModes;
 //	private final ForkJoinPool forkJoinPool;
 
 	/**
@@ -100,6 +103,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		this.qSimConfigGroup = qSimConfigGroup;
 		this.facilitiesConfigGroup = facilitiesConfigGroup;
 		this.backwardCompatibilityMainModeIdentifier = backwardCompatibilityMainModeIdentifier;
+		drtPtModes = new HashSet<>(Arrays.asList(TransportMode.pt, TransportMode.drt)); // TODO: make configurable for other pt/drt modes
 //		this.forkJoinPool = new ForkJoinPool(globalConfigGroup.getNumberOfThreads());
 	}
 
@@ -296,6 +300,10 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 							// access_walk and egress_walk were replaced by non_network_walk
 							if (leg.getMode().equals("access_walk") || leg.getMode().equals("egress_walk")) {
 								leg.setMode(TransportMode.non_network_walk);
+							}
+							
+							if (leg.getMode().equals(TransportMode.non_network_walk) && drtPtModes.contains(routingMode)) {
+								leg.setMode(TransportMode.walk);
 							}
 							
 							// not clear whether we should set the routing mode here. Probably not, because it should already be done in
