@@ -37,10 +37,15 @@ public class ClosestStopAccessEgressFacilityFinder implements AccessEgressFacili
 	private final QuadTree<TransitStopFacility> stopsQT;
 	private final double maxDistance;
 
-	public ClosestStopAccessEgressFacilityFinder(double maxDistance, Network network, QuadTree<TransitStopFacility> stopsQT) {
+	public ClosestStopAccessEgressFacilityFinder(double maxDistance, Network network,
+			QuadTree<TransitStopFacility> stopsQT) {
 		this.network = network;
 		this.stopsQT = stopsQT;
 		this.maxDistance = maxDistance;
+
+		if (stopsQT.size() == 0) {
+			throw new IllegalArgumentException("Empty QuadTree");
+		}
 	}
 
 	@Override
