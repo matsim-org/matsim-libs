@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
+import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressFacilityFinder;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
@@ -67,141 +67,6 @@ public class StopBasedDrtRoutingModuleTest {
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testCottbusDefaultAccessEgressStopFinder() {
-		Scenario scenario = createTestScenario();
-		ActivityFacilities facilities = scenario.getActivityFacilities();
-		final Double networkTravelSpeed = 0.83333;
-		final Double beelineFactor = 1.3;
-		TeleportationRoutingModule walkRouter = new TeleportationRoutingModule(TransportMode.walk, scenario,
-				networkTravelSpeed, beelineFactor);
-		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(scenario.getConfig());
-		String drtMode = "DrtX";
-		drtCfg.setMode(drtMode);
-		QuadTree<TransitStopFacility> stopsQT = TransitScheduleUtils.createQuadTreeOfTransitStopFacilities(
-				scenario.getTransitSchedule());
-		AccessEgressStopFinder stopFinder = new DefaultAccessEgressStopFinder(drtCfg.getMaxWalkDistance(),
-				scenario.getNetwork(), stopsQT);
-		DrtRoutingModule drtRoutingModule = new DrtRoutingModule(drtCfg, scenario.getNetwork(),
-				new FastAStarEuclideanFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new, walkRouter,
-				scenario);
-		StopBasedDrtRoutingModule stopBasedDRTRoutingModule = new StopBasedDrtRoutingModule(drtRoutingModule,
-				walkRouter, stopFinder, drtCfg, scenario, scenario.getNetwork());
-
-		// case 1: origin and destination within max walking distance from next stop (200m)
-		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId(1));
-		Activity h = (Activity)p1.getSelectedPlan().getPlanElements().get(0);
-		Facility hf = FacilitiesUtils.toFacility(h, facilities);
-
-		Activity w = (Activity)p1.getSelectedPlan().getPlanElements().get(2);
-		Facility wf = FacilitiesUtils.toFacility(w, facilities);
-
-		List<? extends PlanElement> routedList = stopBasedDRTRoutingModule.calcRoute(hf, wf, 8 * 3600, p1);
-
-		for (PlanElement pe : routedList) {
-			System.out.println(pe);
-		}
-		Assert.assertEquals(5, routedList.size());
-
-		Leg accessLegP1 = (Leg)routedList.get(0);
-		GenericRouteImpl accessLegP1Route = (GenericRouteImpl)accessLegP1.getRoute();
-
-		Activity stageActivityAccessP1 = (Activity)routedList.get(1);
-
-		Leg realDrtLegP1 = (Leg)routedList.get(2);
-		DrtRoute realDrtLegP1Route = (DrtRoute)realDrtLegP1.getRoute();
-
-		Activity stageActivityEgressP1 = (Activity)routedList.get(3);
-
-		Leg egressLegP1 = (Leg)routedList.get(4);
-		GenericRouteImpl egressLegP1Route = (GenericRouteImpl)egressLegP1.getRoute();
-
-		// drt boarding should be at link id 2183 or 2184, not totally clear which one of these (from and to nodes inverted)
-		// drt alighting should be at link id 5866 or 5867, not totally clear which one of these (from and to nodes inverted)
-
-		Assert.assertEquals(TransportMode.walk, accessLegP1.getMode());
-		Assert.assertEquals(Id.createLinkId(3699), accessLegP1Route.getStartLinkId());
-		Assert.assertEquals(Id.createLinkId(2184), accessLegP1Route.getEndLinkId());
-
-		Assert.assertEquals(drtMode + " interaction", stageActivityAccessP1.getType());
-		Assert.assertEquals(Id.createLinkId(2184), stageActivityAccessP1.getLinkId());
-
-		Assert.assertEquals(drtMode, realDrtLegP1.getMode());
-		Assert.assertEquals(Id.createLinkId(2184), realDrtLegP1Route.getStartLinkId());
-		Assert.assertEquals(Id.createLinkId(5867), realDrtLegP1Route.getEndLinkId());
-		// Check of other, more drt-specific attributes of the DrtRoute is missing, maybe these should be tested in DrtRoutingModule instead
-
-		Assert.assertEquals(drtMode + " interaction", stageActivityEgressP1.getType());
-		Assert.assertEquals(Id.createLinkId(5867), stageActivityEgressP1.getLinkId());
-
-		Assert.assertEquals(TransportMode.walk, egressLegP1.getMode());
-		Assert.assertEquals(Id.createLinkId(5867), egressLegP1Route.getStartLinkId());
-		Assert.assertEquals(Id.createLinkId(7871), egressLegP1Route.getEndLinkId());
-
-		// case 2: origin and destination outside max walking distance from next stop (>2000m vs. max 200m)
-		Person p2 = scenario.getPopulation().getPersons().get(Id.createPersonId(2));
-		Activity h2 = (Activity)p2.getSelectedPlan().getPlanElements().get(0);
-		Facility hf2 = FacilitiesUtils.toFacility(h2, facilities);
-
-		Activity w2 = (Activity)p2.getSelectedPlan().getPlanElements().get(2);
-		Facility wf2 = FacilitiesUtils.toFacility(w2, facilities);
-
-		List<? extends PlanElement> routedList2 = stopBasedDRTRoutingModule.calcRoute(hf2, wf2, 8 * 3600, p2);
-
-		Assert.assertNull(routedList2);
-
-		// case 3: origin and destination at the same coordinate, > 2000 m walking distance from next stop
-		Person p3 = scenario.getPopulation().getPersons().get(Id.createPersonId(3));
-		Activity h3 = (Activity)p3.getSelectedPlan().getPlanElements().get(0);
-		Facility hf3 = FacilitiesUtils.toFacility(h3, facilities);
-
-		Activity w3 = (Activity)p3.getSelectedPlan().getPlanElements().get(2);
-		Facility wf3 = FacilitiesUtils.toFacility(w3, facilities);
-
-		List<? extends PlanElement> routedList3 = stopBasedDRTRoutingModule.calcRoute(hf3, wf3, 8 * 3600, p3);
-
-		Assert.assertNull(routedList3);
-
-		// case 4: origin and destination at the same coordinate, in 200 m walking distance from next stop
-		Person p4 = scenario.getPopulation().getPersons().get(Id.createPersonId(4));
-		Activity h4 = (Activity)p4.getSelectedPlan().getPlanElements().get(0);
-		Facility hf4 = FacilitiesUtils.toFacility(h4, facilities);
-
-		Activity w4 = (Activity)p4.getSelectedPlan().getPlanElements().get(2);
-		Facility wf4 = FacilitiesUtils.toFacility(w4, facilities);
-
-		List<? extends PlanElement> routedList4 = stopBasedDRTRoutingModule.calcRoute(hf4, wf4, 8 * 3600, p4);
-
-		Assert.assertNull(routedList4);
-
-		// case 5: origin within 200 m walking distance from next stop, but destination outside walking distance
-		Person p5 = scenario.getPopulation().getPersons().get(Id.createPersonId(5));
-		Activity h5 = (Activity)p5.getSelectedPlan().getPlanElements().get(0);
-		Facility hf5 = FacilitiesUtils.toFacility(h5, facilities);
-
-		Activity w5 = (Activity)p5.getSelectedPlan().getPlanElements().get(2);
-		Facility wf5 = FacilitiesUtils.toFacility(w5, facilities);
-
-		List<? extends PlanElement> routedList5 = stopBasedDRTRoutingModule.calcRoute(hf5, wf5, 8 * 3600, p5);
-
-		// TODO: Asserts are prepared for interpreting maxWalkingDistance as a real maximum, but routing still works wrongly
-		Assert.assertNull(routedList5);
-
-		// case 6: destination within 200 m walking distance from next stop, but origin outside walking distance
-		Person p6 = scenario.getPopulation().getPersons().get(Id.createPersonId(6));
-		Activity h6 = (Activity)p6.getSelectedPlan().getPlanElements().get(0);
-		Facility hf6 = FacilitiesUtils.toFacility(h6, facilities);
-
-		Activity w6 = (Activity)p6.getSelectedPlan().getPlanElements().get(2);
-		Facility wf6 = FacilitiesUtils.toFacility(w6, facilities);
-
-		List<? extends PlanElement> routedList6 = stopBasedDRTRoutingModule.calcRoute(hf6, wf6, 8 * 3600, p6);
-
-		// TODO: Asserts are prepared for interpreting maxWalkingDistance as a real maximum, but routing still works wrongly
-		Assert.assertNull(routedList6);
-
-	}
-
-	@Test
 	public void testCottbusClosestAccessEgressStopFinder() {
 		Scenario scenario = createTestScenario();
 		ActivityFacilities facilities = scenario.getActivityFacilities();
@@ -214,13 +79,13 @@ public class StopBasedDrtRoutingModuleTest {
 		drtCfg.setMode(drtMode);
 		QuadTree<TransitStopFacility> stopsQT = TransitScheduleUtils.createQuadTreeOfTransitStopFacilities(
 				scenario.getTransitSchedule());
-		AccessEgressStopFinder stopFinder = new DefaultAccessEgressStopFinder(drtCfg.getMaxWalkDistance(),
+		AccessEgressFacilityFinder stopFinder = new ClosestFacilityAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
 				scenario.getNetwork(), stopsQT);
 		DrtRoutingModule drtRoutingModule = new DrtRoutingModule(drtCfg, scenario.getNetwork(),
 				new FastAStarEuclideanFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new, walkRouter,
 				scenario);
 		StopBasedDrtRoutingModule stopBasedDRTRoutingModule = new StopBasedDrtRoutingModule(drtRoutingModule,
-				walkRouter, stopFinder, drtCfg, scenario, scenario.getNetwork());
+				walkRouter, walkRouter, stopFinder, drtCfg, scenario, scenario.getNetwork());
 
 		// case 1: origin and destination within max walking distance from next stop (200m)
 		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId(1));

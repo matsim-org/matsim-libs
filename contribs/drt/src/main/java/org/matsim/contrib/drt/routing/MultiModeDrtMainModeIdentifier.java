@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
@@ -39,31 +40,31 @@ import com.google.inject.Inject;
 public class MultiModeDrtMainModeIdentifier implements MainModeIdentifier {
 
 	private final MainModeIdentifier delegate = new MainModeIdentifierImpl();
-	private final Map<String, String> drtStageActivityTypes;
-	private final Map<String, String> drtWalkTypes;
+	private final Map<String, String> stageActivityTypeToDrtMode;
+	private final Map<String, String> fallbackModeToDrtMode;
 
 	@Inject
 	public MultiModeDrtMainModeIdentifier(MultiModeDrtConfigGroup drtCfg) {
-		drtStageActivityTypes = drtCfg.getModalElements()
+		stageActivityTypeToDrtMode = drtCfg.getModalElements()
 				.stream()
-				.map(drtConfigGroup -> drtConfigGroup.getMode())
+				.map(DrtConfigGroup::getMode)
 				.collect(Collectors.toMap(s -> new DrtStageActivityType(s).drtStageActivity, s -> s));
-		drtWalkTypes = drtCfg.getModalElements()
+		fallbackModeToDrtMode = drtCfg.getModalElements()
 				.stream()
-				.map(drtConfigGroup -> drtConfigGroup.getMode())
-				.collect(Collectors.toMap(s -> TripRouter.getFallbackMode(s), s -> s));
+				.map(DrtConfigGroup::getMode)
+				.collect(Collectors.toMap(TripRouter::getFallbackMode, s -> s));
 	}
 
 	@Override
 	public String identifyMainMode(List<? extends PlanElement> tripElements) {
 		for (PlanElement pe : tripElements) {
 			if (pe instanceof Activity) {
-				String type = drtStageActivityTypes.get(((Activity)pe).getType());
+				String type = stageActivityTypeToDrtMode.get(((Activity)pe).getType());
 				if (type != null) {
 					return type;
 				}
 			} else if (pe instanceof Leg) {
-				String mode = drtWalkTypes.get(((Leg)pe).getMode());
+				String mode = fallbackModeToDrtMode.get(((Leg)pe).getMode());
 				if (mode != null) {
 					return mode;
 				}

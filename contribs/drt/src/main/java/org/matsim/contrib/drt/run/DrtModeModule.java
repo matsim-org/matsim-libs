@@ -35,12 +35,12 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.optimizer.rebalancing.NoRebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.DrtModeMinCostFlowRebalancingModule;
-import org.matsim.contrib.drt.routing.ClosestAccessEgressStopFinder;
+import org.matsim.contrib.drt.routing.ClosestFacilityAccessEgressFacilityFinder;
 import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtRoutingModule;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule;
-import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
+import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
@@ -117,8 +117,8 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 				bindModal(quadTreeTypeLiteral).toProvider(new StopsQuadTreeProvider(drtCfg));
 
-				bindModal(AccessEgressStopFinder.class).toProvider(modalProvider(
-						getter -> new ClosestAccessEgressStopFinder(drtCfg.getMaxWalkDistance(),
+				bindModal(AccessEgressFacilityFinder.class).toProvider(modalProvider(
+						getter -> new ClosestFacilityAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
 								getter.get(Network.class), getter.getModal(quadTreeTypeLiteral)))).asEagerSingleton();
 
 				break;
@@ -168,7 +168,8 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		@Override
 		public StopBasedDrtRoutingModule get() {
 			return new StopBasedDrtRoutingModule(getModalInstance(DrtRoutingModule.class), walkRouter,
-					getModalInstance(AccessEgressStopFinder.class), drtCfg, scenario, getModalInstance(Network.class));
+					walkRouter, getModalInstance(AccessEgressFacilityFinder.class), drtCfg, scenario,
+					getModalInstance(Network.class));
 		}
 	}
 

@@ -39,7 +39,9 @@ import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.router.*;
+import org.matsim.core.router.LinkWrapperFacility;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -125,15 +127,15 @@ public class DrtRoutingModule implements RoutingModule {
 			}
 			trip.addAll(accessWalkTrip);
 			// interaction activity:
-			trip.add(createDrtStageActivity(new LinkWrapperFacility( accessActLink )));
+			trip.add(createDrtStageActivity(new LinkWrapperFacility(accessActLink)));
 		}
 
 		// === drt proper:
 		{
-			final List<PlanElement> newResult = createRealDrtLeg( departureTime, accessActLink, egressActLink );
-			trip.addAll( newResult ) ;
-			for ( final PlanElement planElement : newResult ) {
-				now = TripRouter.calcEndOfPlanElement( now, planElement, config ) ;
+			final List<PlanElement> newResult = createRealDrtLeg(departureTime, accessActLink, egressActLink);
+			trip.addAll(newResult);
+			for (final PlanElement planElement : newResult) {
+				now = TripRouter.calcEndOfPlanElement(now, planElement, config);
 			}
 		}
 
