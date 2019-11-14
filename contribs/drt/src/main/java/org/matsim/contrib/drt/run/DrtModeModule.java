@@ -100,7 +100,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 			bindModal(RebalancingStrategy.class).to(NoRebalancingStrategy.class).asEagerSingleton();
 		}
 
-		bindModal(DrtRouteLegCalculator.class).toProvider(new DrtRoutingModuleProvider(drtCfg));// not singleton
+		bindModal(DrtRouteLegCalculator.class).toProvider(new DrtRouteLegCalculatorProvider(drtCfg));// not singleton
 		addRoutingModuleBinding(getMode()).toProvider(
 				new StopBasedDrtRoutingModuleProvider(drtCfg, plansCalcRouteCfg));// not singleton
 
@@ -188,7 +188,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		}
 	}
 
-	private static class DrtRoutingModuleProvider extends ModalProviders.AbstractProvider<DrtRouteLegCalculator> {
+	private static class DrtRouteLegCalculatorProvider extends ModalProviders.AbstractProvider<DrtRouteLegCalculator> {
 		private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = new FastAStarEuclideanFactory();
 		private final DrtConfigGroup drtCfg;
 
@@ -199,7 +199,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		@Inject
 		private Scenario scenario;
 
-		private DrtRoutingModuleProvider(DrtConfigGroup drtCfg) {
+		private DrtRouteLegCalculatorProvider(DrtConfigGroup drtCfg) {
 			super(drtCfg.getMode());
 			this.drtCfg = drtCfg;
 		}
