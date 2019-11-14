@@ -33,20 +33,19 @@ import org.matsim.facilities.Facility;
  * @author michalm
  */
 public class ClosestFacilityAccessEgressFacilityFinder implements AccessEgressFacilityFinder {
-
 	private final Network network;
-	private final QuadTree<? extends Facility> stopsQT;
+	private final QuadTree<? extends Facility> facilityQT;
 	private final double maxDistance;
 
 	public ClosestFacilityAccessEgressFacilityFinder(double maxDistance, Network network,
-			QuadTree<? extends Facility> stopsQT) {
-		this.network = network;
-		this.stopsQT = stopsQT;
-		this.maxDistance = maxDistance;
-
-		if (stopsQT.size() == 0) {
-			throw new IllegalArgumentException("Empty QuadTree");
+			QuadTree<? extends Facility> facilityQT) {
+		if (facilityQT.size() == 0) {
+			throw new IllegalArgumentException("Empty facility QuadTree");
 		}
+
+		this.network = network;
+		this.facilityQT = facilityQT;
+		this.maxDistance = maxDistance;
 	}
 
 	@Override
@@ -64,7 +63,7 @@ public class ClosestFacilityAccessEgressFacilityFinder implements AccessEgressFa
 
 	private Facility findClosestStop(Facility facility) {
 		Coord coord = StopBasedDrtRoutingModule.getFacilityCoord(facility, network);
-		Facility closestStop = stopsQT.getClosest(coord.getX(), coord.getY());
+		Facility closestStop = facilityQT.getClosest(coord.getX(), coord.getY());
 		double closestStopDistance = CoordUtils.calcEuclideanDistance(coord, closestStop.getCoord());
 		return closestStopDistance > maxDistance ? null : closestStop;
 	}
