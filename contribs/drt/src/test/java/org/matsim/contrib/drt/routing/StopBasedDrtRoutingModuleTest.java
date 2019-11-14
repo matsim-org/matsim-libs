@@ -98,9 +98,6 @@ public class StopBasedDrtRoutingModuleTest {
 
 		List<? extends PlanElement> routedList = stopBasedDRTRoutingModule.calcRoute(hf, wf, 8 * 3600, p1);
 
-		for (PlanElement pe : routedList) {
-			System.out.println(pe);
-		}
 		Assert.assertEquals(5, routedList.size());
 
 		Leg accessLegP1 = (Leg)routedList.get(0);
