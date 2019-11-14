@@ -18,6 +18,8 @@
 
 package org.matsim.contrib.drt.routing;
 
+import java.util.Optional;
+
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.Coord;
@@ -48,11 +50,16 @@ public class ClosestFacilityAccessEgressFacilityFinder implements AccessEgressFa
 	}
 
 	@Override
-	public Pair<Facility, Facility> findFacilities(Facility fromFacility, Facility toFacility) {
+	public Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility) {
 		Facility accessFacility = findClosestStop(fromFacility);
-		return accessFacility == null ?
-				new ImmutablePair<>(null, null) :
-				new ImmutablePair<>(accessFacility, findClosestStop(toFacility));
+		if (accessFacility == null) {
+			return Optional.empty();
+		}
+
+		Facility egressFacility = findClosestStop(toFacility);
+		return egressFacility == null ?
+				Optional.empty() :
+				Optional.of(new ImmutablePair<>(accessFacility, egressFacility));
 	}
 
 	private Facility findClosestStop(Facility facility) {

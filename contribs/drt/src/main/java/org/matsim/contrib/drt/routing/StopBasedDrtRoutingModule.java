@@ -24,6 +24,7 @@ package org.matsim.contrib.drt.routing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -48,7 +49,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 	private static final Logger logger = Logger.getLogger(StopBasedDrtRoutingModule.class);
 
 	public interface AccessEgressFacilityFinder {
-		Pair<Facility, Facility> findFacilities(Facility fromFacility, Facility toFacility);
+		Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility);
 	}
 
 	private final DrtStageActivityType drtStageActivityType;
@@ -76,22 +77,16 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 	@Override
 	public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime,
 			Person person) {
-		Pair<Facility, Facility> stops = stopFinder.findFacilities(fromFacility, toFacility);
-
-		Facility accessFacility = stops.getLeft();
-		if (accessFacility == null) {
-			printWarning(() -> "No access stop found, agent will use fallback mode " + TripRouter.getFallbackMode(
-					drtCfg.getMode()) + ". Agent Id:\t" + person.getId());
+		Optional<Pair<Facility, Facility>> stops = stopFinder.findFacilities(fromFacility, toFacility);
+		if (!stops.isPresent()) {
+			printWarning(
+					() -> "No access/egress stops found, agent will use fallback mode " + TripRouter.getFallbackMode(
+							drtCfg.getMode()) + ". Agent Id:\t" + person.getId());
 			return null;
 		}
 
-		Facility egressFacility = stops.getRight();
-		if (egressFacility == null) {
-			printWarning(() -> "No egress stop found, agent will use fallback mode " + TripRouter.getFallbackMode(
-					drtCfg.getMode()) + ". Agent Id:\t" + person.getId());
-			return null;
-		}
-
+		Facility accessFacility = stops.get().getLeft();
+		Facility egressFacility = stops.get().getRight();
 		if (accessFacility.getLinkId().equals(egressFacility.getLinkId())) {
 			printWarning(
 					() -> "Start and end stop are the same, agent will use fallback mode " + TripRouter.getFallbackMode(
