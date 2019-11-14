@@ -100,12 +100,12 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 			bindModal(RebalancingStrategy.class).to(NoRebalancingStrategy.class).asEagerSingleton();
 		}
 
+		bindModal(DrtRouteLegCalculator.class).toProvider(new DrtRoutingModuleProvider(drtCfg));// not singleton
+		addRoutingModuleBinding(getMode()).toProvider(
+				new StopBasedDrtRoutingModuleProvider(drtCfg, plansCalcRouteCfg));// not singleton
+
 		switch (drtCfg.getOperationalScheme()) {
 			case door2door:
-				bindModal(DrtRouteLegCalculator.class).toProvider(new DrtRoutingModuleProvider(drtCfg));// not singleton
-				addRoutingModuleBinding(getMode()).toProvider(
-						new StopBasedDrtRoutingModuleProvider(drtCfg, plansCalcRouteCfg));// not singleton
-
 				bindModal(AccessEgressFacilityFinder.class).toProvider(modalProvider(
 						getter -> new DecideOnLinkAccessEgressFacilityFinder(getter.getModal(Network.class))))
 						.asEagerSingleton();
@@ -119,10 +119,6 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 				} else {
 					bindModal(TransitSchedule.class).toInstance(readTransitSchedule());
 				}
-				bindModal(DrtRouteLegCalculator.class).toProvider(new DrtRoutingModuleProvider(drtCfg));// not singleton
-
-				addRoutingModuleBinding(getMode()).toProvider(
-						new StopBasedDrtRoutingModuleProvider(drtCfg, plansCalcRouteCfg));// not singleton
 
 				TypeLiteral<QuadTree<TransitStopFacility>> quadTreeTypeLiteral = new TypeLiteral<QuadTree<TransitStopFacility>>() {
 				};
@@ -132,7 +128,6 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 				bindModal(AccessEgressFacilityFinder.class).toProvider(modalProvider(
 						getter -> new ClosestAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
 								getter.get(Network.class), getter.getModal(quadTreeTypeLiteral)))).asEagerSingleton();
-
 				break;
 
 			default:
