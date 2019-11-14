@@ -24,6 +24,7 @@ package org.matsim.contrib.drt.routing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -77,7 +78,9 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 	@Override
 	public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime,
 			Person person) {
-		Optional<Pair<Facility, Facility>> stops = stopFinder.findFacilities(fromFacility, toFacility);
+		Optional<Pair<Facility, Facility>> stops = stopFinder.findFacilities(
+				Objects.requireNonNull(fromFacility, "fromFacility is null"),
+				Objects.requireNonNull(toFacility, "toFacility is null"));
 		if (!stops.isPresent()) {
 			printWarning(
 					() -> "No access/egress stops found, agent will use fallback mode " + TripRouter.getFallbackMode(
