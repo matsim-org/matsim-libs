@@ -39,6 +39,7 @@ import org.matsim.contrib.drt.routing.ClosestAccessEgressStopFinder;
 import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtRoutingModule;
+import org.matsim.contrib.drt.routing.NonNetworkWalkRouter;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
@@ -167,8 +168,10 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 		@Override
 		public StopBasedDrtRoutingModule get() {
-			return new StopBasedDrtRoutingModule(getModalInstance(DrtRoutingModule.class), walkRouter,
-					getModalInstance(AccessEgressStopFinder.class), drtCfg, scenario, getModalInstance(Network.class));
+			RoutingModule nonNetworkWalkRouter = new NonNetworkWalkRouter(walkRouter);
+			return new StopBasedDrtRoutingModule(getModalInstance(DrtRoutingModule.class), nonNetworkWalkRouter,
+					nonNetworkWalkRouter, getModalInstance(AccessEgressStopFinder.class), drtCfg, scenario,
+					getModalInstance(Network.class));
 		}
 	}
 
@@ -195,8 +198,9 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		@Override
 		public DrtRoutingModule get() {
 			Network network = getModalInstance(Network.class);
+			NonNetworkWalkRouter nonNetworkWalkRouter = new NonNetworkWalkRouter(walkRouter);
 			return new DrtRoutingModule(drtCfg, network, leastCostPathCalculatorFactory, travelTime,
-					getModalInstance(TravelDisutilityFactory.class), walkRouter, scenario);
+					getModalInstance(TravelDisutilityFactory.class), nonNetworkWalkRouter, scenario);
 		}
 	}
 

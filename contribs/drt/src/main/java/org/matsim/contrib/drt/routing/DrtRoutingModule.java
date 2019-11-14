@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -39,7 +38,9 @@ import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.router.*;
+import org.matsim.core.router.LinkWrapperFacility;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -63,14 +64,14 @@ public class DrtRoutingModule implements RoutingModule {
 	private final TravelTime travelTime;
 	private final LeastCostPathCalculator router;
 	private final PopulationFactory populationFactory;
-	private final RoutingModule walkRouter;
+	private final RoutingModule nonNetworkWalkRouter;
 	private final DrtStageActivityType drtStageActivityType;
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfig;
 
 	public DrtRoutingModule(DrtConfigGroup drtCfg, Network network,
 			LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			TravelDisutilityFactory travelDisutilityFactory, @Named(TransportMode.walk) RoutingModule walkRouter,
+			TravelDisutilityFactory travelDisutilityFactory, NonNetworkWalkRouter nonNetworkWalkRouter,
 			Scenario scenario) {
 		// constructor was public when I found it, and cannot be made package private.  Thus now passing scenario as argument so we have a bit more
 		// flexibility for changes without having to change the argument list every time.  kai, jul'19
@@ -80,7 +81,7 @@ public class DrtRoutingModule implements RoutingModule {
 		this.network = network;
 		this.travelTime = travelTime;
 		this.populationFactory = scenario.getPopulation().getFactory();
-		this.walkRouter = walkRouter;
+		this.nonNetworkWalkRouter = nonNetworkWalkRouter;
 		this.drtStageActivityType = new DrtStageActivityType(drtCfg.getMode());
 		this.plansCalcRouteConfig = scenario.getConfig().plansCalcRoute();
 
@@ -108,10 +109,9 @@ public class DrtRoutingModule implements RoutingModule {
 
 		if (accessActLink == egressActLink) {
 			if (drtCfg.isPrintDetailedWarnings()) {
-				LOGGER.error("Start and end stop are the same, agent will use fallback mode " 
-						+ TripRouter.getFallbackMode(drtCfg.getMode())
-						+ ". Agent Id:\t"
-						+ person.getId());
+				LOGGER.error(
+						"Start and end stop are the same, agent will use fallback mode " + TripRouter.getFallbackMode(
+								drtCfg.getMode()) + ". Agent Id:\t" + person.getId());
 			}
 			return null;
 		}
@@ -119,31 +119,33 @@ public class DrtRoutingModule implements RoutingModule {
 
 		// === access:
 		if (plansCalcRouteConfig.isInsertingAccessEgressWalk()) {
-			List<? extends PlanElement> accessWalkTrip = createWalkTrip(fromFacility, new LinkWrapperFacility( accessActLink ), now, person, TransportMode.non_network_walk );
-			for( PlanElement planElement : accessWalkTrip ){
-				now = TripRouter.calcEndOfPlanElement( now, planElement,  config ) ;
+			List<? extends PlanElement> accessWalkTrip = nonNetworkWalkRouter.calcRoute(fromFacility,
+					new LinkWrapperFacility(accessActLink), now, person);
+			for (PlanElement planElement : accessWalkTrip) {
+				now = TripRouter.calcEndOfPlanElement(now, planElement, config);
 			}
 			trip.addAll(accessWalkTrip);
 			// interaction activity:
-			trip.add(createDrtStageActivity(new LinkWrapperFacility( accessActLink )));
+			trip.add(createDrtStageActivity(new LinkWrapperFacility(accessActLink)));
 		}
 
 		// === drt proper:
 		{
-			final List<PlanElement> newResult = createRealDrtLeg( departureTime, accessActLink, egressActLink );
-			trip.addAll( newResult ) ;
-			for ( final PlanElement planElement : newResult ) {
-				now = TripRouter.calcEndOfPlanElement( now, planElement, config ) ;
+			final List<PlanElement> newResult = createRealDrtLeg(departureTime, accessActLink, egressActLink);
+			trip.addAll(newResult);
+			for (final PlanElement planElement : newResult) {
+				now = TripRouter.calcEndOfPlanElement(now, planElement, config);
 			}
 		}
 
 		// === egress:
 		if (plansCalcRouteConfig.isInsertingAccessEgressWalk()) {
 			// interaction activity:
-			trip.add(createDrtStageActivity(new LinkWrapperFacility( egressActLink )));
-			List<? extends PlanElement> egressWalkTrip = createWalkTrip(new LinkWrapperFacility( egressActLink ), toFacility, now, person, TransportMode.non_network_walk );
-			for( PlanElement planElement : egressWalkTrip ){
-				now = TripRouter.calcEndOfPlanElement( now, planElement,  config ) ;
+			trip.add(createDrtStageActivity(new LinkWrapperFacility(egressActLink)));
+			List<? extends PlanElement> egressWalkTrip = nonNetworkWalkRouter.calcRoute(
+					new LinkWrapperFacility(egressActLink), toFacility, now, person);
+			for (PlanElement planElement : egressWalkTrip) {
+				now = TripRouter.calcEndOfPlanElement(now, planElement, config);
 			}
 			trip.addAll(egressWalkTrip);
 		}
@@ -161,8 +163,9 @@ public class DrtRoutingModule implements RoutingModule {
 	public static double getMaxTravelTime(DrtConfigGroup drtCfg, double unsharedRideTime) {
 		return drtCfg.getMaxTravelTimeAlpha() * unsharedRideTime + drtCfg.getMaxTravelTimeBeta();
 	}
-	
-	/* package */ List<PlanElement> createRealDrtLeg( final double departureTime, final Link accessActLink, final Link egressActLink ) {
+
+	/* package */ List<PlanElement> createRealDrtLeg(final double departureTime, final Link accessActLink,
+			final Link egressActLink) {
 		VrpPathWithTravelData unsharedPath = VrpPaths.calcAndCreatePath(accessActLink, egressActLink, departureTime,
 				router, travelTime);
 		double unsharedRideTime = unsharedPath.getTravelTime();//includes first & last link
@@ -180,31 +183,16 @@ public class DrtRoutingModule implements RoutingModule {
 		leg.setDepartureTime(departureTime);
 		leg.setTravelTime(maxTravelTime);
 		leg.setRoute(route);
-		List<PlanElement> result = new ArrayList<>() ;
+		List<PlanElement> result = new ArrayList<>();
 		result.add(leg);
 		return result;
 	}
-	
+
 	private Activity createDrtStageActivity(Facility stopFacility) {
 		Activity activity = populationFactory.createActivityFromCoord(drtStageActivityType.drtStageActivity,
 				stopFacility.getCoord());
 		activity.setMaximumDuration(0);
 		activity.setLinkId(stopFacility.getLinkId());
 		return activity;
-	}
-	
-	private List<? extends PlanElement> createWalkTrip(Facility fromFacility, Facility toFacility, double departureTime, Person person, String mode) {
-		List<? extends PlanElement> result = walkRouter.calcRoute( fromFacility, toFacility, departureTime, person ); 
-		// Overwrite real walk mode legs with non_network_walk / drt fallback mode
-		for (PlanElement pe: result) {
-			if (pe instanceof Leg) {
-				Leg leg = (Leg) pe;
-				if (leg.getMode().equals(TransportMode.walk)) {
-					leg.setMode(mode);
-				}
-			}
-		}
-
-		return result ;
 	}
 }
