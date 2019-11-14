@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.lanes.data.consistency;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -51,7 +52,7 @@ public class LanesConsistencyChecker {
 		log.info("checking consistency...");
 		List<Id<Link>> linksWithMalformedLanes = new LinkedList<>();
 		for (LanesToLinkAssignment l2l : this.lanes.getLanesToLinkAssignments().values()){
-			if (!isLaneOnLinkConsistent(l2l)){
+			if (!areLanesOnLinkConsistent(l2l)){
 				linksWithMalformedLanes.add(l2l.getLinkId());
 			}
 		}		
@@ -65,7 +66,7 @@ public class LanesConsistencyChecker {
 		log.info("checked consistency. Lanes on " + linksWithMalformedLanes.size() + " links have been removed.");
 	}
 	
-	private boolean isLaneOnLinkConsistent(LanesToLinkAssignment l2l) {
+	private boolean areLanesOnLinkConsistent(LanesToLinkAssignment l2l) {
 		//check if link exists for each assignment of one or more lanes to a link
 		if (!this.network.getLinks().containsKey(l2l.getLinkId())) {
 			log.error("No link found for lanesToLinkAssignment on link Id(linkIdRef): "  + l2l.getLinkId());
@@ -85,32 +86,51 @@ public class LanesConsistencyChecker {
 		//check toLinks or toLanes specified in the lanes 
 		for (Lane lane : l2l.getLanes().values()) {
 			if (lane.getToLaneIds() != null) {
-				for (Id<Lane> toLaneId : lane.getToLaneIds()){
+				Iterator<Id<Lane>> toLaneIdIterator = lane.getToLaneIds().iterator();
+				while (toLaneIdIterator.hasNext()){
+					Id<Lane> toLaneId = toLaneIdIterator.next();
 					if (! l2l.getLanes().containsKey(toLaneId)){
 						log.error("Error: toLane not existing:");
 						log.error("  Lane Id: " + lane.getId() + " on Link Id: " + l2l.getLinkId() + 
 								" leads to Lane Id: " + toLaneId + " that is not existing!");
-						return false;
-						// TODO just delete this toLane?
+//						return false; // do not return false because this would remove the whole l2l on this link
+						// delete this toLane from the lane
+						if (this.removeMalformed) {
+							toLaneIdIterator.remove();
+						}
 					}
 				}
 			}
 			//check availability of toLink in network
-			else if (lane.getToLinkIds() != null){
-				for (Id<Link> toLinkId : lane.getToLinkIds()) {
+			if (lane.getToLinkIds() != null){
+				Iterator<Id<Link>> toLinkIdIterator = lane.getToLinkIds().iterator();
+				while (toLinkIdIterator.hasNext()) {
+					Id<Link> toLinkId = toLinkIdIterator.next();
 					if (! this.network.getLinks().containsKey(toLinkId)){
 						log.error("No link found in network for toLinkId " + toLinkId + " of laneId " + lane.getId() + " of link id " + l2l.getLinkId());
-						return false;
-						// TODO just delete this toLink?
+//						return false; // do not return false because this would remove the whole l2l on this link
+						// delete this toLink from the lane
+						if (this.removeMalformed) {
+							toLinkIdIterator.remove();
+						}
 					} else {
 						Link link = this.network.getLinks().get(l2l.getLinkId());
 						if (! link.getToNode().getOutLinks().containsKey(toLinkId)){
 							log.error("The given toLink " + toLinkId + " is not reachable from lane " + lane.getId() + " on link " + link.getId());
-							return false;
-							// TODO just delete this toLink?
+//							return false; // do not return false because this would remove the whole l2l on this link
+							// delete this toLink from the lane
+							if (this.removeMalformed) {
+								toLinkIdIterator.remove();
+							}
 						}
 					}
 				}
+			}
+			// identify lanes without tolanes and tolinks
+			if ((lane.getToLaneIds() == null || lane.getToLaneIds().isEmpty()) 
+					&& (lane.getToLinkIds() == null || lane.getToLinkIds().isEmpty())) {
+				log.error("The lane " + lane.getId() + " on link " + l2l.getLinkId() + " does not lead to any lane nor link.");
+				return false;
 			}
 		}
 		
