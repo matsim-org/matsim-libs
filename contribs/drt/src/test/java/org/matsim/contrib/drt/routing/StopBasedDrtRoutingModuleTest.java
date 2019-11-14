@@ -82,10 +82,9 @@ public class StopBasedDrtRoutingModuleTest {
 				scenario.getTransitSchedule());
 		AccessEgressFacilityFinder stopFinder = new ClosestAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
 				scenario.getNetwork(), stopsQT);
-		DrtRoutingModule drtRoutingModule = new DrtRoutingModule(drtCfg, scenario.getNetwork(),
-				new FastAStarEuclideanFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new,
-				nonNetworkWalkRouter, scenario);
-		StopBasedDrtRoutingModule stopBasedDRTRoutingModule = new StopBasedDrtRoutingModule(drtRoutingModule,
+		DrtRouteLegCalculator drtRouteLegCalculator = new DrtRouteLegCalculator(drtCfg, scenario.getNetwork(),
+				new FastAStarEuclideanFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new, scenario);
+		StopBasedDrtRoutingModule stopBasedDRTRoutingModule = new StopBasedDrtRoutingModule(drtRouteLegCalculator,
 				nonNetworkWalkRouter, nonNetworkWalkRouter, stopFinder, drtCfg, scenario, scenario.getNetwork());
 
 		// case 1: origin and destination within max walking distance from next stop (200m)
