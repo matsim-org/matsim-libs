@@ -101,6 +101,9 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
         if (usedStrategyNames.contains(DefaultStrategy.ReRoute)) {
             addPlanStrategyBinding(DefaultStrategy.ReRoute).toProvider(ReRoute.class);
         }
+        if (usedStrategyNames.contains(DefaultStrategy.SingleTripReRoute)) {
+            addPlanStrategyBinding(DefaultStrategy.SingleTripReRoute).toProvider(SingleTripReRoute.class);
+        }
         if (usedStrategyNames.contains(DefaultStrategy.TimeAllocationMutator)) {
             addPlanStrategyBinding(DefaultStrategy.TimeAllocationMutator).toProvider(TimeAllocationMutator.class);
         }
@@ -142,6 +145,7 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
 
     public interface DefaultStrategy {
         String ReRoute="ReRoute";
+        String SingleTripReRoute="SingleTripReRoute";
         String TimeAllocationMutator="TimeAllocationMutator";
         @Deprecated String ChangeLegMode="ChangeLegMode";
         String TimeAllocationMutator_ReRoute="TimeAllocationMutator_ReRoute" ;

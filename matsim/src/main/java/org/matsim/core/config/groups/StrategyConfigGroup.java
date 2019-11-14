@@ -100,6 +100,7 @@ public final class StrategyConfigGroup extends ConfigGroup {
 			
 			StringBuilder strats = new StringBuilder() ;
 			strats.append( DefaultStrategy.ReRoute ) ;
+			strats.append( DefaultStrategy.SingleTripReRoute ) ;
 			strats.append( DefaultStrategy.TimeAllocationMutator ) ;
 			strats.append( DefaultStrategy.TimeAllocationMutator_ReRoute ) ;
 			strats.append( DefaultStrategy.ChangeSingleTripMode ) ;
