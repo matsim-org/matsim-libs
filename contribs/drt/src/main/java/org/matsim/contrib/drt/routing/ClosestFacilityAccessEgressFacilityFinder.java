@@ -50,12 +50,9 @@ public class ClosestFacilityAccessEgressFacilityFinder implements AccessEgressFa
 	@Override
 	public Pair<Facility, Facility> findFacilities(Facility fromFacility, Facility toFacility) {
 		Facility accessFacility = findClosestStop(fromFacility);
-		if (accessFacility == null) {
-			return new ImmutablePair<>(null, null);
-		}
-
-		Facility egressFacility = findClosestStop(toFacility);
-		return new ImmutablePair<>(accessFacility, egressFacility);
+		return accessFacility == null ?
+				new ImmutablePair<>(null, null) :
+				new ImmutablePair<>(accessFacility, findClosestStop(toFacility));
 	}
 
 	private Facility findClosestStop(Facility facility) {
