@@ -345,14 +345,14 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 		// lanes were already created but without toLinks. add toLinks now:
 		for (Link link : network.getLinks().values()) {
-			if (link.getToNode().getOutLinks().size() > 1) {
+			if (link.getToNode().getOutLinks().size() >= 1) {
 				if (link.getNumberOfLanes() > 1) {
 					//LOG.warn(link.getNumberOfLanes());
 					fillLanesAndCheckRestrictions(link);
 				} else {
 					Long toNodeId = Long.valueOf(link.getToNode().getId().toString());
 					Set<OsmRelation> restrictions = osmNodeRestrictions.get(toNodeId);
-					if (restrictions != null && !restrictions.isEmpty() /*&& (this.bbox == null || this.bbox.contains(nodes.get(toNodeId).coord))*/) {
+					if (restrictions != null && !restrictions.isEmpty() && (this.bbox == null || this.bbox.contains(nodes.get(toNodeId).coord))) {
 						// if there exists an Restriction in the ToNode, we want to
 						// create a Lane to represent the restriction,
 						// as the toLinks cannot be restricted otherwise
@@ -370,13 +370,15 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				}
 			}
 				
-			if (lanes.getLanesToLinkAssignments().containsKey(link.getId()) 
+			if (lanes.getLanesToLinkAssignments().containsKey(link.getId())
 					&& lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().isEmpty() ) {
 				// no lanes needed on this link -> delete the lane container for this link
 				lanes.getLanesToLinkAssignments().remove(link.getId());
 			}
+
+
 			//TODO BRUTE FORCE SolUTION DELETE lanes if they dont have a toLink
-			if (link.getNumberOfLanes()!=0){
+			/*if (link.getNumberOfLanes()!=0){
 				if(lanes.getLanesToLinkAssignments().get(link.getId())==null){
 					lanes.getLanesToLinkAssignments().remove(link.getId());
 				} else {
@@ -396,7 +398,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						}
 					}
 				}
-			}
+			}*/
 
 
 
@@ -530,9 +532,12 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			}
 		}
 		LOG.warn("Bad SignalSystemData: "+badSignalSystemData.size()+" ->remove them from the system");
+		String a = "Deleted systems: ";
 		for(Id<SignalSystem> badData :badSignalSystemData) {
+			a += badData.toString()+ ", ";
 			this.systems.getSignalSystemData().remove(badData);
 		}
+		LOG.warn(a);
 	}
 
 	private void mergeOnewaySignalSystems(List<OsmNode> addingNodes, List<OsmNode> checkedNodes) {
@@ -1308,14 +1313,14 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			this.nonCritLanes.put(lane.getId(), nonCritLanes);
 			int i = 1;
 			for (Id<Lane> laneId : nonCritLanes) {
-				lane.getAttributes().putAttribute(NON_CRIT_LANES + "_" + i, laneId.toString());
+				//lane.getAttributes().putAttribute(NON_CRIT_LANES + "_" + i, laneId.toString());
 				i++;
 			}
 			if (!critLanes.isEmpty()) {
 				i = 1;
 				this.critLanes.put(lane.getId(), critLanes);
 				for (Id<Lane> laneId : critLanes) {
-					lane.getAttributes().putAttribute(CRIT_LANES + "_" + i, laneId.toString());
+					//lane.getAttributes().putAttribute(CRIT_LANES + "_" + i, laneId.toString());
 					i++;
 				}
 			}
@@ -1683,7 +1688,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				else
 					lane.addToLinkId(toLinks.get(1).getLink().getId());
 				lane.setAlignment(-2);
-				lane.getAttributes().putAttribute(TO_LINK_REFERENCE, OUTER_LANE_TYPE);
+				//lane.getAttributes().putAttribute(TO_LINK_REFERENCE, OUTER_LANE_TYPE);
 				
 				// add left turn
 				lane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
@@ -1695,7 +1700,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				else
 					lane.addToLinkId(toLinks.get(toLinks.size() - 1).getLink().getId());
 				lane.setAlignment(2);
-				lane.getAttributes().putAttribute(TO_LINK_REFERENCE, OUTER_LANE_TYPE);
+				//lane.getAttributes().putAttribute(TO_LINK_REFERENCE, OUTER_LANE_TYPE);
 			}
 
 			if (!OUTER_LANE_TYPE.equals(OuterLaneRestriction.RESTRICTIVE)) {
@@ -1746,7 +1751,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						lane.addToLinkId(toLinks.get(straightestLink).getLink().getId());
 						midLink = straightestLink;
 					}
-					lane.getAttributes().putAttribute(TO_LINK_REFERENCE, MIDDLE_LANE_TYPE);
+					//lane.getAttributes().putAttribute(TO_LINK_REFERENCE, MIDDLE_LANE_TYPE);
 				}
 			}
 
@@ -1780,7 +1785,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	// Fills Lanes with turn:lane informations
 	private void setToLinksForLaneWithTurnLanes(Lane lane, Stack<Integer> laneStack, List<LinkVector> toLinks,
 			boolean singleLaneOfTheLink) {
-		lane.getAttributes().putAttribute(TO_LINK_REFERENCE, "OSM-Information");
+		//lane.getAttributes().putAttribute(TO_LINK_REFERENCE, "OSM-Information");
 		int alignmentAnte;
 		LinkVector throughLink = toLinks.get(0);
 		double minDiff = Math.PI;
@@ -1820,7 +1825,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					}
 				}
 				lane.setAlignment(0);
-				lane.getAttributes().putAttribute(TO_LINK_REFERENCE, MIDDLE_LANE_TYPE);
+				//lane.getAttributes().putAttribute(TO_LINK_REFERENCE, MIDDLE_LANE_TYPE);
 				break;
 			}
 			if (tempDir < 0 && tempDir > -5) { // all right directions (right,
