@@ -32,12 +32,12 @@ import org.matsim.facilities.Facility;
 /**
  * @author michalm
  */
-public class ClosestFacilityAccessEgressFacilityFinder implements AccessEgressFacilityFinder {
+public class ClosestAccessEgressFacilityFinder implements AccessEgressFacilityFinder {
 	private final Network network;
 	private final QuadTree<? extends Facility> facilityQT;
 	private final double maxDistance;
 
-	public ClosestFacilityAccessEgressFacilityFinder(double maxDistance, Network network,
+	public ClosestAccessEgressFacilityFinder(double maxDistance, Network network,
 			QuadTree<? extends Facility> facilityQT) {
 		if (facilityQT.size() == 0) {
 			throw new IllegalArgumentException("Empty facility QuadTree");

@@ -18,38 +18,33 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.edrt.run;
+package org.matsim.contrib.drt.routing;
 
-import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
-import org.matsim.contrib.drt.routing.MultiModeDrtMainModeIdentifier;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.run.DrtModeModule;
-import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.router.MainModeIdentifier;
+import java.util.Optional;
 
-import com.google.inject.Inject;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressFacilityFinder;
+import org.matsim.core.router.LinkWrapperFacility;
+import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.facilities.Facility;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class MultiModeEDrtModule extends AbstractModule {
+public class DecideOnLinkAccessEgressFacilityFinder implements AccessEgressFacilityFinder {
+	private final Network network;
 
-	@Inject
-	private MultiModeDrtConfigGroup multiModeDrtCfg;
-
-	@Inject
-	private PlansCalcRouteConfigGroup plansCalcRouteCfg;
+	public DecideOnLinkAccessEgressFacilityFinder(Network network) {
+		this.network = network;
+	}
 
 	@Override
-	public void install() {
-		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
-			install(new DrtModeModule(drtCfg, plansCalcRouteCfg));
-			installQSimModule(new EDrtModeQSimModule(drtCfg));
-			install(new DrtModeAnalysisModule(drtCfg));
-		}
-
-		bind(MainModeIdentifier.class).toInstance(new MultiModeDrtMainModeIdentifier(multiModeDrtCfg));
+	public Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility) {
+		LinkWrapperFacility accessFacility = new LinkWrapperFacility(
+				FacilitiesUtils.decideOnLink(fromFacility, network));
+		LinkWrapperFacility egressFacility = new LinkWrapperFacility(FacilitiesUtils.decideOnLink(toFacility, network));
+		return Optional.of(ImmutablePair.of(accessFacility, egressFacility));
 	}
 }

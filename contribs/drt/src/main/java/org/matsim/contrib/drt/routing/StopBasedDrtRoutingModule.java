@@ -24,6 +24,7 @@ package org.matsim.contrib.drt.routing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -57,14 +58,14 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 	private final AccessEgressFacilityFinder stopFinder;
 	private final DrtConfigGroup drtCfg;
 	private final Scenario scenario;
-	private final DrtRoutingModule drtRoutingModule;
+	private final DrtRouteLegCalculator drtRouteLegCalculator;
 	private final RoutingModule accessRouter;
 	private final RoutingModule egressRouter;
 
-	public StopBasedDrtRoutingModule(DrtRoutingModule drtRoutingModule, RoutingModule accessRouter,
+	public StopBasedDrtRoutingModule(DrtRouteLegCalculator drtRouteLegCalculator, RoutingModule accessRouter,
 			RoutingModule egressRouter, AccessEgressFacilityFinder stopFinder, DrtConfigGroup drtCfg, Scenario scenario,
 			Network modalNetwork) {
-		this.drtRoutingModule = drtRoutingModule;
+		this.drtRouteLegCalculator = drtRouteLegCalculator;
 		this.stopFinder = stopFinder;
 		this.drtCfg = drtCfg;
 		this.scenario = scenario;
@@ -77,7 +78,9 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 	@Override
 	public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime,
 			Person person) {
-		Optional<Pair<Facility, Facility>> stops = stopFinder.findFacilities(fromFacility, toFacility);
+		Optional<Pair<Facility, Facility>> stops = stopFinder.findFacilities(
+				Objects.requireNonNull(fromFacility, "fromFacility is null"),
+				Objects.requireNonNull(toFacility, "toFacility is null"));
 		if (!stops.isPresent()) {
 			printWarning(
 					() -> "No access/egress stops found, agent will use fallback mode " + TripRouter.getFallbackMode(
@@ -114,7 +117,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 				.get(accessFacility.getLinkId()); // we want that this crashes if not found.  kai/gl, oct'19
 		Link egressActLink = modalNetwork.getLinks()
 				.get(egressFacility.getLinkId()); // we want that this crashes if not found.  kai/gl, oct'19
-		List<? extends PlanElement> drtLeg = drtRoutingModule.createRealDrtLeg(departureTime, accessActLink,
+		List<? extends PlanElement> drtLeg = drtRouteLegCalculator.createRealDrtLeg(departureTime, accessActLink,
 				egressActLink);
 		trip.addAll(drtLeg);
 		for (PlanElement planElement : drtLeg) {
