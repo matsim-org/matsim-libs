@@ -114,7 +114,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		double now = departureTime;
 
 		// access leg:
-		List<? extends PlanElement> accessWalk = createWalkTrip(fromFacility, accessFacility, now, person, TransportMode.non_network_walk );
+		List<? extends PlanElement> accessWalk = walkRouter.calcRoute( fromFacility, accessFacility, now, person );
 		trip.addAll(accessWalk);
 		for( PlanElement planElement : accessWalk ){
 			now = TripRouter.calcEndOfPlanElement( now, planElement, scenario.getConfig() ) ;
@@ -138,24 +138,9 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 
 		// egress leg:
 		now++ ;
-		trip.addAll(createWalkTrip(egressFacility, toFacility, now, person, TransportMode.non_network_walk));
+		trip.addAll(walkRouter.calcRoute( egressFacility, toFacility, now, person ));
 
 		return trip;
-	}
-
-	private List<? extends PlanElement> createWalkTrip(Facility fromFacility, Facility toFacility, double departureTime, Person person, String mode) {
-		List<? extends PlanElement> result = walkRouter.calcRoute( fromFacility, toFacility, departureTime, person ); 
-		// Overwrite real walk mode legs with non_network_walk / drt fallback mode
-		for (PlanElement pe: result) {
-			if (pe instanceof Leg) {
-				Leg leg = (Leg) pe;
-				if (leg.getMode().equals(TransportMode.walk)) {
-					leg.setMode(mode);
-				}
-			}
-		}
-
-		return result ;
 	}
 
 	private Activity createDrtStageActivity(Facility stopFacility) {

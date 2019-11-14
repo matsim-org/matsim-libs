@@ -119,7 +119,7 @@ public class DrtRoutingModule implements RoutingModule {
 
 		// === access:
 		if (plansCalcRouteConfig.isInsertingAccessEgressWalk()) {
-			List<? extends PlanElement> accessWalkTrip = createWalkTrip(fromFacility, new LinkWrapperFacility( accessActLink ), now, person, TransportMode.non_network_walk );
+			List<? extends PlanElement> accessWalkTrip = walkRouter.calcRoute( fromFacility, new LinkWrapperFacility( accessActLink ), now, person );
 			for( PlanElement planElement : accessWalkTrip ){
 				now = TripRouter.calcEndOfPlanElement( now, planElement,  config ) ;
 			}
@@ -141,7 +141,7 @@ public class DrtRoutingModule implements RoutingModule {
 		if (plansCalcRouteConfig.isInsertingAccessEgressWalk()) {
 			// interaction activity:
 			trip.add(createDrtStageActivity(new LinkWrapperFacility( egressActLink )));
-			List<? extends PlanElement> egressWalkTrip = createWalkTrip(new LinkWrapperFacility( egressActLink ), toFacility, now, person, TransportMode.non_network_walk );
+			List<? extends PlanElement> egressWalkTrip = walkRouter.calcRoute( new LinkWrapperFacility( egressActLink ), toFacility, now, person );
 			for( PlanElement planElement : egressWalkTrip ){
 				now = TripRouter.calcEndOfPlanElement( now, planElement,  config ) ;
 			}
@@ -191,20 +191,5 @@ public class DrtRoutingModule implements RoutingModule {
 		activity.setMaximumDuration(0);
 		activity.setLinkId(stopFacility.getLinkId());
 		return activity;
-	}
-	
-	private List<? extends PlanElement> createWalkTrip(Facility fromFacility, Facility toFacility, double departureTime, Person person, String mode) {
-		List<? extends PlanElement> result = walkRouter.calcRoute( fromFacility, toFacility, departureTime, person ); 
-		// Overwrite real walk mode legs with non_network_walk / drt fallback mode
-		for (PlanElement pe: result) {
-			if (pe instanceof Leg) {
-				Leg leg = (Leg) pe;
-				if (leg.getMode().equals(TransportMode.walk)) {
-					leg.setMode(mode);
-				}
-			}
-		}
-
-		return result ;
 	}
 }

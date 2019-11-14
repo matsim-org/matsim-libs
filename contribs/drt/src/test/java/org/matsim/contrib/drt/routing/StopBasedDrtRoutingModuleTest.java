@@ -118,7 +118,7 @@ public class StopBasedDrtRoutingModuleTest {
 		// drt boarding should be at link id 2183 or 2184, not totally clear which one of these (from and to nodes inverted)
 		// drt alighting should be at link id 5866 or 5867, not totally clear which one of these (from and to nodes inverted)
 
-		Assert.assertEquals(TransportMode.non_network_walk, accessLegP1.getMode());
+		Assert.assertEquals(TransportMode.walk, accessLegP1.getMode());
 		Assert.assertEquals(Id.createLinkId(3699), accessLegP1Route.getStartLinkId());
 		Assert.assertEquals(Id.createLinkId(2184), accessLegP1Route.getEndLinkId());
 
@@ -133,7 +133,7 @@ public class StopBasedDrtRoutingModuleTest {
 		Assert.assertEquals(drtMode + " interaction", stageActivityEgressP1.getType());
 		Assert.assertEquals(Id.createLinkId(5867), stageActivityEgressP1.getLinkId());
 
-		Assert.assertEquals(TransportMode.non_network_walk, egressLegP1.getMode());
+		Assert.assertEquals(TransportMode.walk, egressLegP1.getMode());
 		Assert.assertEquals(Id.createLinkId(5867), egressLegP1Route.getStartLinkId());
 		Assert.assertEquals(Id.createLinkId(7871), egressLegP1Route.getEndLinkId());
 
@@ -253,7 +253,7 @@ public class StopBasedDrtRoutingModuleTest {
 		// drt boarding should be at link id 2183 or 2184, not totally clear which one of these (from and to nodes inverted)
 		// drt alighting should be at link id 5866 or 5867, not totally clear which one of these (from and to nodes inverted)
 
-		Assert.assertEquals(TransportMode.non_network_walk, accessLegP1.getMode());
+		Assert.assertEquals(TransportMode.walk, accessLegP1.getMode());
 		Assert.assertEquals(Id.createLinkId(3699), accessLegP1Route.getStartLinkId());
 		Assert.assertEquals(Id.createLinkId(2184), accessLegP1Route.getEndLinkId());
 
@@ -276,7 +276,7 @@ public class StopBasedDrtRoutingModuleTest {
 		Assert.assertEquals(drtMode + " interaction", stageActivityEgressP1.getType());
 		Assert.assertEquals(endLink, stageActivityEgressP1.getLinkId());
 
-		Assert.assertEquals(TransportMode.non_network_walk, egressLegP1.getMode());
+		Assert.assertEquals(TransportMode.walk, egressLegP1.getMode());
 		Assert.assertEquals(endLink, egressLegP1Route.getStartLinkId());
 		Assert.assertEquals(Id.createLinkId(7871), egressLegP1Route.getEndLinkId());
 
