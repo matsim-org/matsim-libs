@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.routing.DrtRoutingModule;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule;
@@ -53,7 +52,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -135,7 +133,7 @@ public class RunUamDrtScenario {
 					"car", fromFacility, toFacility, departureTime, person);
 
 			return new StopBasedDrtRoutingModule(getModalInstance(DrtRoutingModule.class), accessRoutingModule,
-					egressRoutingModule, getModalInstance(StopBasedDrtRoutingModule.AccessEgressStopFinder.class),
+					egressRoutingModule, getModalInstance(StopBasedDrtRoutingModule.AccessEgressFacilityFinder.class),
 					drtCfg, scenario, getModalInstance(Network.class));
 		}
 	}
