@@ -77,9 +77,9 @@ public class SwissRailRaptorTest {
         Coord toCoord = new Coord(16100, 5050);
         List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 5.0*3600, null);
         assertEquals(3, legs.size());
-        assertEquals(TransportMode.non_network_walk, legs.get(0).getMode());
+        assertEquals(TransportMode.walk, legs.get(0).getMode());
         assertEquals(TransportMode.pt, legs.get(1).getMode());
-        assertEquals(TransportMode.non_network_walk, legs.get(2).getMode());
+        assertEquals(TransportMode.walk, legs.get(2).getMode());
         assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
         ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
         assertEquals(Id.create("0", TransitStopFacility.class), ptRoute.getAccessStopId());
@@ -111,10 +111,10 @@ public class SwissRailRaptorTest {
         Id<Link> toLinkId = Id.create("ttoo", Link.class);
         List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord, fromLinkId), new FakeFacility(toCoord, toLinkId), 5.0*3600, null);
         assertEquals(3, legs.size());
-        assertEquals(TransportMode.non_network_walk, legs.get(0).getMode());
+        assertEquals(TransportMode.walk, legs.get(0).getMode());
         assertEquals(fromLinkId, legs.get(0).getRoute().getStartLinkId());
         assertEquals(TransportMode.pt, legs.get(1).getMode());
-        assertEquals(TransportMode.non_network_walk, legs.get(2).getMode());
+        assertEquals(TransportMode.walk, legs.get(2).getMode());
         assertEquals(toLinkId, legs.get(2).getRoute().getEndLinkId());
         assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
         ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
@@ -141,9 +141,9 @@ public class SwissRailRaptorTest {
         Coord toCoord = new Coord(16100, 5050);
         List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 5.0*3600, null);
         assertEquals(3, legs.size());
-        assertEquals(TransportMode.non_network_walk, legs.get(0).getMode());
+        assertEquals(TransportMode.walk, legs.get(0).getMode());
         assertEquals(TransportMode.pt, legs.get(1).getMode());
-        assertEquals(TransportMode.non_network_walk, legs.get(2).getMode());
+        assertEquals(TransportMode.walk, legs.get(2).getMode());
 
         double expectedAccessWalkTime = CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("0", TransitStopFacility.class)).getCoord(), fromCoord) / raptorParams.getBeelineWalkSpeed();
         assertEquals(Math.ceil(expectedAccessWalkTime), legs.get(0).getTravelTime(), MatsimTestUtils.EPSILON);
@@ -162,9 +162,9 @@ public class SwissRailRaptorTest {
         double depTime = 5.0 * 3600;
         List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), depTime - 300, depTime, depTime + 300, null);
         assertEquals(3, legs.size());
-        assertEquals(TransportMode.non_network_walk, legs.get(0).getMode());
+        assertEquals(TransportMode.walk, legs.get(0).getMode());
         assertEquals(TransportMode.pt, legs.get(1).getMode());
-        assertEquals(TransportMode.non_network_walk, legs.get(2).getMode());
+        assertEquals(TransportMode.walk, legs.get(2).getMode());
 
         double expectedAccessWalkTime = CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("0", TransitStopFacility.class)).getCoord(), fromCoord) / raptorParams.getBeelineWalkSpeed();
         assertEquals(Math.ceil(expectedAccessWalkTime), legs.get(0).getTravelTime(), MatsimTestUtils.EPSILON);
@@ -226,9 +226,9 @@ public class SwissRailRaptorTest {
         List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 5.0*3600, null);
         
         assertEquals(3, legs.size());
-        assertEquals(TransportMode.non_network_walk, legs.get(0).getMode());
+        assertEquals(TransportMode.walk, legs.get(0).getMode());
         assertEquals(TransportMode.pt, legs.get(1).getMode());
-        assertEquals(TransportMode.non_network_walk, legs.get(2).getMode());
+        assertEquals(TransportMode.walk, legs.get(2).getMode());
         // check individual legs
         Coord ptStop0 = f.schedule.getFacilities().get(Id.create("0", TransitStopFacility.class)).getCoord();
         double expectedAccessWalkTravelTime = CoordUtils.calcEuclideanDistance(fromCoord, ptStop0) / raptorParams.getBeelineWalkSpeed();
@@ -274,11 +274,11 @@ public class SwissRailRaptorTest {
         Coord toCoord = new Coord(16100, 10050);
         List<Leg> legs = router.calcRoute(new FakeFacility(new Coord(3800, 5100)), new FakeFacility(toCoord), 6.0*3600, null);
         assertEquals(5, legs.size());
-        assertEquals(TransportMode.non_network_walk, legs.get(0).getMode());
+        assertEquals(TransportMode.walk, legs.get(0).getMode());
         assertEquals(TransportMode.pt, legs.get(1).getMode());
-        assertEquals(TransportMode.non_network_walk, legs.get(2).getMode());
+        assertEquals(TransportMode.walk, legs.get(2).getMode());
         assertEquals(TransportMode.pt, legs.get(3).getMode());
-        assertEquals(TransportMode.non_network_walk, legs.get(4).getMode());
+        assertEquals(TransportMode.walk, legs.get(4).getMode());
         assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
         ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
         assertEquals(Id.create("0", TransitStopFacility.class), ptRoute.getAccessStopId());
@@ -315,10 +315,10 @@ public class SwissRailRaptorTest {
         Coord toCoord = new Coord(28100, 4950);
         List<Leg> legs = router.calcRoute(new FakeFacility( new Coord(3800, 5100)), new FakeFacility(toCoord), 5.0*3600 + 40.0*60, null);
         assertEquals("wrong number of legs", 4, legs.size());
-        assertEquals(TransportMode.non_network_walk, legs.get(0).getMode());
+        assertEquals(TransportMode.walk, legs.get(0).getMode());
         assertEquals(TransportMode.pt, legs.get(1).getMode());
         assertEquals(TransportMode.pt, legs.get(2).getMode());
-        assertEquals(TransportMode.non_network_walk, legs.get(3).getMode());
+        assertEquals(TransportMode.walk, legs.get(3).getMode());
         assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
         ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
         assertEquals(Id.create("0", TransitStopFacility.class), ptRoute.getAccessStopId());
@@ -357,13 +357,13 @@ public class SwissRailRaptorTest {
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         List<Leg> legs = router.calcRoute(new FakeFacility(new Coord(11900, 5100)), new FakeFacility(new Coord(24100, 4950)), 6.0*3600 - 5.0*60, null);
         assertEquals("wrong number of legs", 5, legs.size());
-        assertEquals(TransportMode.non_network_walk, legs.get(0).getMode());
+        assertEquals(TransportMode.walk, legs.get(0).getMode());
         assertEquals(TransportMode.pt, legs.get(1).getMode());
         assertEquals(f.redLine.getId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getLineId());
-        assertEquals(TransportMode.non_network_walk, legs.get(2).getMode());
+        assertEquals(TransportMode.walk, legs.get(2).getMode());
         assertEquals(TransportMode.pt, legs.get(3).getMode());
         assertEquals(f.blueLine.getId(), ((ExperimentalTransitRoute) legs.get(3).getRoute()).getLineId());
-        assertEquals(TransportMode.non_network_walk, legs.get(4).getMode());
+        assertEquals(TransportMode.walk, legs.get(4).getMode());
 
         Config config = ConfigUtils.createConfig();
         double transferUtility = 300.0 * raptorParams.getMarginalUtilityOfTravelTime_utl_s(TransportMode.pt); // corresponds to 5 minutes transit travel time
@@ -373,10 +373,10 @@ public class SwissRailRaptorTest {
         router = createTransitRouter(f.schedule, config, f.network);
         legs = router.calcRoute(new FakeFacility(new Coord(11900, 5100)), new FakeFacility(new Coord(24100, 4950)), 6.0*3600 - 5.0*60, null);
         assertEquals(3, legs.size());
-        assertEquals(TransportMode.non_network_walk, legs.get(0).getMode());
+        assertEquals(TransportMode.walk, legs.get(0).getMode());
         assertEquals(TransportMode.pt, legs.get(1).getMode());
         assertEquals(f.blueLine.getId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getLineId());
-        assertEquals(TransportMode.non_network_walk, legs.get(2).getMode());
+        assertEquals(TransportMode.walk, legs.get(2).getMode());
     }
 
     @Test
@@ -396,23 +396,23 @@ public class SwissRailRaptorTest {
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         List<Leg> legs = router.calcRoute(new FakeFacility(new Coord(11900, 5100)), new FakeFacility(new Coord(24100, 4950)), 6.0*3600 - 5.0*60, null);
         assertEquals("wrong number of legs",5, legs.size());
-        assertEquals(TransportMode.non_network_walk, legs.get(0).getMode());
+        assertEquals(TransportMode.walk, legs.get(0).getMode());
         assertEquals(TransportMode.pt, legs.get(1).getMode());
         assertEquals(f.redLine.getId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getLineId());
-        assertEquals(TransportMode.non_network_walk, legs.get(2).getMode());
+        assertEquals(TransportMode.walk, legs.get(2).getMode());
         assertEquals(TransportMode.pt, legs.get(3).getMode());
         assertEquals(f.blueLine.getId(), ((ExperimentalTransitRoute) legs.get(3).getRoute()).getLineId());
-        assertEquals(TransportMode.non_network_walk, legs.get(4).getMode());
+        assertEquals(TransportMode.walk, legs.get(4).getMode());
 
         Config config = ConfigUtils.createConfig();
         config.transitRouter().setAdditionalTransferTime(3*60 + 1);
         router = createTransitRouter(f.schedule, config, f.network); // this is necessary to update the router for any change in config.
         legs = router.calcRoute(new FakeFacility(new Coord(11900, 5100)), new FakeFacility(new Coord(24100, 4950)), 6.0*3600 - 5.0*60, null);
         assertEquals("wrong number of legs",3, legs.size());
-        assertEquals(TransportMode.non_network_walk, legs.get(0).getMode());
+        assertEquals(TransportMode.walk, legs.get(0).getMode());
         assertEquals(TransportMode.pt, legs.get(1).getMode());
         assertEquals(f.blueLine.getId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getLineId());
-        assertEquals(TransportMode.non_network_walk, legs.get(2).getMode());
+        assertEquals(TransportMode.walk, legs.get(2).getMode());
     }
 
 
@@ -440,9 +440,9 @@ public class SwissRailRaptorTest {
         double x1 = -2000;
         List<Leg> legs = router.calcRoute(new FakeFacility(new Coord(x1, 0)), new FakeFacility(new Coord(x, 0)), 5.5*3600, null); // should map to stops A and I
         assertEquals(3, legs.size());
-        assertEquals(TransportMode.non_network_walk, legs.get(0).getMode());
+        assertEquals(TransportMode.walk, legs.get(0).getMode());
         assertEquals(TransportMode.pt, legs.get(1).getMode());
-        assertEquals(TransportMode.non_network_walk, legs.get(2).getMode());
+        assertEquals(TransportMode.walk, legs.get(2).getMode());
         assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
         ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
         assertEquals(Id.create("0", TransitStopFacility.class), ptRoute.getAccessStopId());
@@ -613,11 +613,11 @@ public class SwissRailRaptorTest {
         Coord toCoord = new Coord(5010, 5010);
         List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 8.0*3600-2*60, null);
         assertEquals(5, legs.size());
-        assertEquals(TransportMode.non_network_walk, legs.get(0).getMode());
+        assertEquals(TransportMode.walk, legs.get(0).getMode());
         assertEquals(TransportMode.pt, legs.get(1).getMode());
         assertEquals(TransportMode.pt, legs.get(2).getMode());
         assertEquals(TransportMode.pt, legs.get(3).getMode());
-        assertEquals(TransportMode.non_network_walk, legs.get(4).getMode());
+        assertEquals(TransportMode.walk, legs.get(4).getMode());
         assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
         ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
         assertEquals(f.stop0.getId(), ptRoute.getAccessStopId());
@@ -652,10 +652,10 @@ public class SwissRailRaptorTest {
         }
 
         Assert.assertEquals(4, legs.size());
-        Assert.assertEquals(TransportMode.non_network_walk, legs.get(0).getMode());
+        Assert.assertEquals(TransportMode.walk, legs.get(0).getMode());
         Assert.assertEquals(TransportMode.pt, legs.get(1).getMode());
         Assert.assertEquals(TransportMode.pt, legs.get(2).getMode());
-        Assert.assertEquals(TransportMode.non_network_walk, legs.get(3).getMode());
+        Assert.assertEquals(TransportMode.walk, legs.get(3).getMode());
 
         Assert.assertEquals(f.greenLine.getId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getLineId());
         Assert.assertEquals(Id.create(23, TransitStopFacility.class), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getAccessStopId());
@@ -821,10 +821,6 @@ public class SwissRailRaptorTest {
         PlansCalcRouteConfigGroup.ModeRoutingParams walkParameters = new PlansCalcRouteConfigGroup.ModeRoutingParams(TransportMode.walk);
         walkParameters.setTeleportedModeSpeed(beelineDistanceFactor); // set it such that the beelineWalkSpeed is exactly 1
         config.plansCalcRoute().addParameterSet(walkParameters);
-        
-        PlansCalcRouteConfigGroup.ModeRoutingParams non_network_walkParameters = new PlansCalcRouteConfigGroup.ModeRoutingParams(TransportMode.non_network_walk);
-        non_network_walkParameters.setTeleportedModeSpeed(beelineDistanceFactor); // set it such that the beelineWalkSpeed is exactly 1
-        config.plansCalcRoute().addParameterSet(non_network_walkParameters);
 
         config.planCalcScore().setUtilityOfLineSwitch(-transferFixedCost);
         srrConfig.setTransferPenaltyBaseCost(transferFixedCost);
@@ -865,11 +861,11 @@ public class SwissRailRaptorTest {
         Coord toCoord = new Coord(16100, 10050);
         List<Leg> legs = router.calcRoute(new FakeFacility(new Coord(3800, 5100)), new FakeFacility(toCoord), 6.0*3600, null);
         assertEquals(5, legs.size());
-        assertEquals(TransportMode.non_network_walk, legs.get(0).getMode());
+        assertEquals(TransportMode.walk, legs.get(0).getMode());
         assertEquals("rail", legs.get(1).getMode());
-        assertEquals(TransportMode.non_network_walk, legs.get(2).getMode());
+        assertEquals(TransportMode.walk, legs.get(2).getMode());
         assertEquals("road", legs.get(3).getMode());
-        assertEquals(TransportMode.non_network_walk, legs.get(4).getMode());
+        assertEquals(TransportMode.walk, legs.get(4).getMode());
     }
 
     @Test
@@ -884,9 +880,9 @@ public class SwissRailRaptorTest {
             TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
             List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 6.0 * 3600 - 5 * 60, null);
             assertEquals(3, legs.size());
-            assertEquals(TransportMode.non_network_walk, legs.get(0).getMode());
+            assertEquals(TransportMode.walk, legs.get(0).getMode());
             assertEquals("pt", legs.get(1).getMode());
-            assertEquals(TransportMode.non_network_walk, legs.get(2).getMode());
+            assertEquals(TransportMode.walk, legs.get(2).getMode());
 
             ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
             assertEquals(Id.create("4", TransitStopFacility.class), ptRoute.getAccessStopId());
@@ -928,9 +924,9 @@ public class SwissRailRaptorTest {
             TransitRouter router = createTransitRouter(f.schedule, config, f.network);
             List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 6.0 * 3600 - 5 * 60, null);
             assertEquals(3, legs.size());
-            assertEquals(TransportMode.non_network_walk, legs.get(0).getMode());
+            assertEquals(TransportMode.walk, legs.get(0).getMode());
             assertEquals("rail", legs.get(1).getMode());
-            assertEquals(TransportMode.non_network_walk, legs.get(2).getMode());
+            assertEquals(TransportMode.walk, legs.get(2).getMode());
 
             ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
             assertEquals(Id.create("4", TransitStopFacility.class), ptRoute.getAccessStopId());
@@ -954,9 +950,9 @@ public class SwissRailRaptorTest {
             TransitRouter router = createTransitRouter(f.schedule, config, f.network);
             List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 6.0 * 3600 - 5 * 60, null);
             assertEquals(3, legs.size());
-            assertEquals(TransportMode.non_network_walk, legs.get(0).getMode());
+            assertEquals(TransportMode.walk, legs.get(0).getMode());
             assertEquals("road", legs.get(1).getMode());
-            assertEquals(TransportMode.non_network_walk, legs.get(2).getMode());
+            assertEquals(TransportMode.walk, legs.get(2).getMode());
 
             ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
             assertEquals(Id.create("18", TransitStopFacility.class), ptRoute.getAccessStopId());
@@ -1188,11 +1184,6 @@ public class SwissRailRaptorTest {
             PlansCalcRouteConfigGroup.ModeRoutingParams walkParameters = new PlansCalcRouteConfigGroup.ModeRoutingParams(TransportMode.walk);
             walkParameters.setTeleportedModeSpeed(beelineDistanceFactor); // set it such that the beelineWalkSpeed is exactly 1
             this.config.plansCalcRoute().addParameterSet(walkParameters);
-            
-            PlansCalcRouteConfigGroup.ModeRoutingParams non_network_walkParameters = new PlansCalcRouteConfigGroup.ModeRoutingParams(TransportMode.non_network_walk);
-            non_network_walkParameters.setTeleportedModeSpeed(beelineDistanceFactor); // set it such that the beelineWalkSpeed is exactly 1
-            this.config.plansCalcRoute().addParameterSet(non_network_walkParameters);
-//            double beelineWalkSpeed = this.config.plansCalcRoute().addParameterSet(walk);getTeleportedModeSpeeds().get(TransportMode.walk) / beelineDistanceFactor;
 
             // network
             Network network = this.scenario.getNetwork();

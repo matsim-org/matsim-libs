@@ -46,8 +46,7 @@ public class IntermodalAwareRouterModeIdentifier implements MainModeIdentifier {
                     identifiedMode = TransportMode.pt;
                 }
                 if (identifiedMode == null
-                        && !TransportMode.non_network_walk.equals(mode)
-                        && !TransportMode.transit_walk.equals(mode)) {
+                        && !TransportMode.walk.equals(mode)) {
                     identifiedMode = mode;
                 }
             }
