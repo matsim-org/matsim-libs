@@ -96,7 +96,6 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 			bindModal(RebalancingStrategy.class).to(NoRebalancingStrategy.class).asEagerSingleton();
 		}
 
-		bindModal(DrtRouteLegCalculator.class).toProvider(new DrtRouteLegCalculatorProvider(drtCfg));// not singleton
 		addRoutingModuleBinding(getMode()).toProvider(
 				new DrtRoutingModuleProvider(drtCfg, plansCalcRouteCfg));// not singleton
 
@@ -145,11 +144,17 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 	private static class DrtRoutingModuleProvider extends ModalProviders.AbstractProvider<DrtRoutingModule> {
 		@Inject
+		@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
+		private TravelTime travelTime;
+
+		@Inject
 		@Named(TransportMode.walk)
 		private RoutingModule walkRouter;
 
 		@Inject
 		private Scenario scenario;
+
+		private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = new FastAStarEuclideanFactory();
 
 		private final DrtConfigGroup drtCfg;
 		private final boolean insertingAccessEgressWalk;
@@ -168,33 +173,15 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 			RoutingModule accessEgressRouter = insertingAccessEgressWalk ?
 					new NonNetworkWalkRouter(walkRouter) :
 					(fromFacility, toFacility, departureTime, person) -> Collections.emptyList();
-			return new DrtRoutingModule(getModalInstance(DrtRouteLegCalculator.class), accessEgressRouter,
-					accessEgressRouter, getModalInstance(AccessEgressFacilityFinder.class), drtCfg, scenario,
-					getModalInstance(Network.class));
-		}
-	}
 
-	private static class DrtRouteLegCalculatorProvider extends ModalProviders.AbstractProvider<DrtRouteLegCalculator> {
-		private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = new FastAStarEuclideanFactory();
-		private final DrtConfigGroup drtCfg;
-
-		@Inject
-		@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-		private TravelTime travelTime;
-
-		@Inject
-		private Scenario scenario;
-
-		private DrtRouteLegCalculatorProvider(DrtConfigGroup drtCfg) {
-			super(drtCfg.getMode());
-			this.drtCfg = drtCfg;
-		}
-
-		@Override
-		public DrtRouteLegCalculator get() {
 			Network network = getModalInstance(Network.class);
-			return new DrtRouteLegCalculator(drtCfg, network, leastCostPathCalculatorFactory, travelTime,
-					getModalInstance(TravelDisutilityFactory.class), scenario);
+			DrtRouteLegCalculator drtRouteLegCalculator = new DrtRouteLegCalculator(drtCfg, network,
+					leastCostPathCalculatorFactory, travelTime, getModalInstance(TravelDisutilityFactory.class),
+					scenario);
+
+			return new DrtRoutingModule(drtRouteLegCalculator, accessEgressRouter, accessEgressRouter,
+					getModalInstance(AccessEgressFacilityFinder.class), drtCfg, scenario,
+					getModalInstance(Network.class));
 		}
 	}
 
