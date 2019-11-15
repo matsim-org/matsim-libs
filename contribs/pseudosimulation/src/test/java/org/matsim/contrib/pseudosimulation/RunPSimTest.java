@@ -33,11 +33,11 @@ public class RunPSimTest {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	Logger logger = Logger.getLogger(RunPSimTest.class);
+	private Logger logger = Logger.getLogger(RunPSimTest.class );
 
-	final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"),"0.config.xml"));
+	private final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial" ),"0.config.xml" ) );
 
-	static double psimscore, qsimscore = Double.NEGATIVE_INFINITY;
+	private static double psimscore;
 
 
 	@Test
@@ -56,11 +56,9 @@ public class RunPSimTest {
 		}
 
 		//lower the weight of non-selector strategies, as we will run many iters
-		Iterator<StrategyConfigGroup.StrategySettings> iterator = config.strategy().getStrategySettings().iterator();
-		while (iterator.hasNext()) {
-			StrategyConfigGroup.StrategySettings settings = iterator.next();
-			if (!selectorNames.contains(settings.getStrategyName()))
-				settings.setWeight(settings.getWeight() / 20);
+		for( StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings() ){
+			if( !selectorNames.contains( settings.getStrategyName() ) )
+				settings.setWeight( settings.getWeight() / 20 );
 		}
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(20);
@@ -91,9 +89,9 @@ public class RunPSimTest {
 		ExecScoreTracker execScoreTracker = new ExecScoreTracker(controler);
 		controler.addControlerListener(execScoreTracker);
 		controler.run();
-		qsimscore = execScoreTracker.executedScore;
+		double qsimscore = execScoreTracker.executedScore;
 		logger.info("RunPSim score was " + psimscore);
-		logger.info("Default controler score was " + qsimscore);
+		logger.info("Default controler score was " + qsimscore );
 		final double relError = (psimscore - qsimscore) / qsimscore;
 		if ( relError < 0.01){
 			logger.warn( "relative score error=" + relError  );
