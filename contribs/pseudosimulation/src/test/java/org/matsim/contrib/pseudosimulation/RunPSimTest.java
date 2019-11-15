@@ -94,8 +94,12 @@ public class RunPSimTest {
 		qsimscore = execScoreTracker.executedScore;
 		logger.info("RunPSim score was " + psimscore);
 		logger.info("Default controler score was " + qsimscore);
-		if ((psimscore - qsimscore) / qsimscore < 0.01)
-			Assert.fail("Usually RunPSim outperforms default Controler on this test for executed score by a margin > 1%; something changed. psimscore=" + psimscore + "; qsimscore=" + qsimscore);
+		final double relError = (psimscore - qsimscore) / qsimscore;
+		if ( relError < 0.01){
+			logger.warn( "relative score error=" + relError  );
+			Assert.fail(
+					"Usually RunPSim outperforms default Controler on this test for executed score by a margin > 1%; something changed. psimscore=" + psimscore + "; qsimscore=" + qsimscore );
+		}
 	}
 
 	class ExecScoreTracker implements ShutdownListener {
