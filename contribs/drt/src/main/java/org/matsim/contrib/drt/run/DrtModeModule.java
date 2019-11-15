@@ -23,14 +23,11 @@ package org.matsim.contrib.drt.run;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.optimizer.rebalancing.NoRebalancingStrategy;
@@ -43,6 +40,9 @@ import org.matsim.contrib.drt.routing.DrtRouteLegCalculator;
 import org.matsim.contrib.drt.routing.DrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtRoutingModule;
 import org.matsim.contrib.drt.routing.DrtRoutingModule.AccessEgressFacilityFinder;
+import org.matsim.contrib.drt.routing.DrtStopFacility;
+import org.matsim.contrib.drt.routing.DrtStopFacilityImpl;
+import org.matsim.contrib.drt.routing.DrtStopNetwork;
 import org.matsim.contrib.drt.routing.NonNetworkWalkRouter;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
@@ -60,15 +60,11 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.pt.transitSchedule.TransitScheduleUtils;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
-import com.google.inject.TypeLiteral;
 import com.google.inject.name.Named;
 
 /**
@@ -114,20 +110,15 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 			case serviceAreaBased:
 			case stopbased:
 				if (drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.serviceAreaBased) {
-					bindModal(TransitSchedule.class).toProvider(new ShapeFileStopProvider(getConfig(), drtCfg))
+					bindModal(DrtStopNetwork.class).toProvider(new ShapeFileStopProvider(getConfig(), drtCfg))
 							.asEagerSingleton();
 				} else {
-					bindModal(TransitSchedule.class).toInstance(readTransitSchedule());
+					bindModal(DrtStopNetwork.class).toInstance(readDrtStopNetwork());
 				}
-
-				TypeLiteral<QuadTree<TransitStopFacility>> quadTreeTypeLiteral = new TypeLiteral<QuadTree<TransitStopFacility>>() {
-				};
-
-				bindModal(quadTreeTypeLiteral).toProvider(new StopsQuadTreeProvider(drtCfg));
 
 				bindModal(AccessEgressFacilityFinder.class).toProvider(modalProvider(
 						getter -> new ClosestAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
-								getter.get(Network.class), getter.getModal(quadTreeTypeLiteral)))).asEagerSingleton();
+								getter.get(Network.class), getter.getModal(DrtStopNetwork.class)))).asEagerSingleton();
 				break;
 
 			default:
@@ -211,7 +202,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		}
 	}
 
-	private static class ShapeFileStopProvider extends ModalProviders.AbstractProvider<TransitSchedule> {
+	private static class ShapeFileStopProvider extends ModalProviders.AbstractProvider<DrtStopNetwork> {
 
 		private final DrtConfigGroup drtCfg;
 		private final URL context;
@@ -223,52 +214,30 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		}
 
 		@Override
-		public TransitSchedule get() {
+		public DrtStopNetwork get() {
 			final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils.loadPreparedGeometries(
 					drtCfg.getDrtServiceAreaShapeFileURL(context));
-			Network network = getModalInstance(Network.class);
-			Set<Link> relevantLinks = network.getLinks()
+			ImmutableMap<Id<DrtStopFacility>, DrtStopFacility> drtStops = getModalInstance(Network.class).getLinks()
 					.values()
 					.stream()
 					.filter(link -> ShpGeometryUtils.isCoordInPreparedGeometries(link.getToNode().getCoord(),
 							preparedGeometries))
-					.collect(Collectors.toSet());
-			final TransitSchedule schedule = ScenarioUtils.createScenario(ConfigUtils.createConfig())
-					.getTransitSchedule();
-			relevantLinks.stream().forEach(link -> {
-				TransitStopFacility f = schedule.getFactory()
-						.createTransitStopFacility(Id.create(link.getId(), TransitStopFacility.class),
-								link.getToNode().getCoord(), false);
-				f.setLinkId(link.getId());
-				schedule.addStopFacility(f);
-			});
-			return schedule;
+					.map(DrtStopFacilityImpl::createFromLink)
+					.collect(ImmutableMap.toImmutableMap(DrtStopFacility::getId, f -> f));
+			return () -> drtStops;
 		}
 	}
 
-	private TransitSchedule readTransitSchedule() {
+	private DrtStopNetwork readDrtStopNetwork() {
 		URL url = drtCfg.getTransitStopsFileUrl(getConfig().getContext());
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new TransitScheduleReader(scenario).readURL(url);
-		return scenario.getTransitSchedule();
+		ImmutableMap<Id<DrtStopFacility>, DrtStopFacility> drtStops = scenario.getTransitSchedule()
+				.getFacilities()
+				.values()
+				.stream()
+				.map(DrtStopFacilityImpl::createFromIdentifiableFacility)
+				.collect(ImmutableMap.toImmutableMap(DrtStopFacility::getId, f -> f));
+		return () -> drtStops;
 	}
-
-	private static class StopsQuadTreeProvider extends ModalProviders.AbstractProvider<QuadTree<TransitStopFacility>> {
-
-		private QuadTree<TransitStopFacility> stopsQT = null;
-
-		private StopsQuadTreeProvider(DrtConfigGroup drtCfg) {
-			super(drtCfg.getMode());
-		}
-
-		@Override
-		public QuadTree<TransitStopFacility> get() {
-			if (stopsQT == null) {
-				TransitSchedule stopsTransitSchedule = getModalInstance(TransitSchedule.class);
-				stopsQT = TransitScheduleUtils.createQuadTreeOfTransitStopFacilities(stopsTransitSchedule);
-			}
-			return stopsQT;
-		}
-	}
-
 }

@@ -50,14 +50,13 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.TeleportationRoutingModule;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.transitSchedule.TransitScheduleUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * @author jbischoff
@@ -78,14 +77,20 @@ public class DrtRoutingModuleTest {
 		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(scenario.getConfig());
 		String drtMode = "DrtX";
 		drtCfg.setMode(drtMode);
-		QuadTree<TransitStopFacility> stopsQT = TransitScheduleUtils.createQuadTreeOfTransitStopFacilities(
-				scenario.getTransitSchedule());
+
+		ImmutableMap<Id<DrtStopFacility>, DrtStopFacility> drtStops = scenario.getTransitSchedule()
+				.getFacilities()
+				.values()
+				.stream()
+				.map(DrtStopFacilityImpl::createFromIdentifiableFacility)
+				.collect(ImmutableMap.toImmutableMap(DrtStopFacility::getId, f -> f));
+
 		AccessEgressFacilityFinder stopFinder = new ClosestAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
-				scenario.getNetwork(), stopsQT);
+				scenario.getNetwork(), () -> drtStops);
 		DrtRouteLegCalculator drtRouteLegCalculator = new DrtRouteLegCalculator(drtCfg, scenario.getNetwork(),
 				new FastAStarEuclideanFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new, scenario);
-		DrtRoutingModule drtRoutingModule = new DrtRoutingModule(drtRouteLegCalculator,
-				nonNetworkWalkRouter, nonNetworkWalkRouter, stopFinder, drtCfg, scenario, scenario.getNetwork());
+		DrtRoutingModule drtRoutingModule = new DrtRoutingModule(drtRouteLegCalculator, nonNetworkWalkRouter,
+				nonNetworkWalkRouter, stopFinder, drtCfg, scenario, scenario.getNetwork());
 
 		// case 1: origin and destination within max walking distance from next stop (200m)
 		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId(1));
