@@ -99,25 +99,16 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		addRoutingModuleBinding(getMode()).toProvider(
 				new DrtRoutingModuleProvider(drtCfg, plansCalcRouteCfg));// not singleton
 
-		switch (drtCfg.getOperationalScheme()) {
-			case door2door:
-				bindModal(AccessEgressFacilityFinder.class).toProvider(modalProvider(
-						getter -> new DecideOnLinkAccessEgressFacilityFinder(getter.getModal(Network.class))))
-						.asEagerSingleton();
-				break;
+		bindModal(DrtStopNetwork.class).toProvider(new DrtStopNetworkProvider(getConfig(), drtCfg)).asEagerSingleton();
 
-			case serviceAreaBased:
-			case stopbased:
-				bindModal(DrtStopNetwork.class).toProvider(new DrtStopNetworkProvider(getConfig(), drtCfg))
-						.asEagerSingleton();
-
-				bindModal(AccessEgressFacilityFinder.class).toProvider(modalProvider(
-						getter -> new ClosestAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
-								getter.get(Network.class), getter.getModal(DrtStopNetwork.class)))).asEagerSingleton();
-				break;
-
-			default:
-				throw new IllegalStateException();
+		if (drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.door2door) {
+			bindModal(AccessEgressFacilityFinder.class).toProvider(
+					modalProvider(getter -> new DecideOnLinkAccessEgressFacilityFinder(getter.getModal(Network.class))))
+					.asEagerSingleton();
+		} else {
+			bindModal(AccessEgressFacilityFinder.class).toProvider(modalProvider(
+					getter -> new ClosestAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
+							getter.get(Network.class), getter.getModal(DrtStopNetwork.class)))).asEagerSingleton();
 		}
 
 		bindModal(DrtRouteUpdater.class).toProvider(new ModalProviders.AbstractProvider<DrtRouteUpdater>(getMode()) {
@@ -199,6 +190,8 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		@Override
 		public DrtStopNetwork get() {
 			switch (drtCfg.getOperationalScheme()) {
+				case door2door:
+					return ImmutableMap::of;
 				case stopbased:
 					return createDrtStopNetworkFromTransitSchedule(config, drtCfg);
 				case serviceAreaBased:
