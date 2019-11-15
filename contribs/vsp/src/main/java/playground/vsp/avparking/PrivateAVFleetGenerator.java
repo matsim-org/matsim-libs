@@ -80,7 +80,7 @@ public class PrivateAVFleetGenerator implements Fleet, BeforeMobsimListener {
 	
 	
 	@Override
-	public ImmutableMap<Id<DvrpVehicle>, ? extends DvrpVehicle> getVehicles() {
+	public ImmutableMap<Id<DvrpVehicle>, DvrpVehicle> getVehicles() {
 		return vehiclesForIteration;
 	}
 
