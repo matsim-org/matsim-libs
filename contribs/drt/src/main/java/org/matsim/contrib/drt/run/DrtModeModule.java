@@ -109,12 +109,8 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 			case serviceAreaBased:
 			case stopbased:
-				if (drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.serviceAreaBased) {
-					bindModal(DrtStopNetwork.class).toProvider(new ShapeFileStopProvider(getConfig(), drtCfg))
-							.asEagerSingleton();
-				} else {
-					bindModal(DrtStopNetwork.class).toInstance(readDrtStopNetwork());
-				}
+				bindModal(DrtStopNetwork.class).toProvider(new DrtStopNetworkProvider(getConfig(), drtCfg))
+						.asEagerSingleton();
 
 				bindModal(AccessEgressFacilityFinder.class).toProvider(modalProvider(
 						getter -> new ClosestAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
@@ -202,34 +198,46 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		}
 	}
 
-	private static class ShapeFileStopProvider extends ModalProviders.AbstractProvider<DrtStopNetwork> {
+	private static class DrtStopNetworkProvider extends ModalProviders.AbstractProvider<DrtStopNetwork> {
 
 		private final DrtConfigGroup drtCfg;
-		private final URL context;
+		private final Config config;
 
-		private ShapeFileStopProvider(Config config, DrtConfigGroup drtCfg) {
+		private DrtStopNetworkProvider(Config config, DrtConfigGroup drtCfg) {
 			super(drtCfg.getMode());
 			this.drtCfg = drtCfg;
-			this.context = config.getContext();
+			this.config = config;
 		}
 
 		@Override
 		public DrtStopNetwork get() {
-			final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils.loadPreparedGeometries(
-					drtCfg.getDrtServiceAreaShapeFileURL(context));
-			ImmutableMap<Id<DrtStopFacility>, DrtStopFacility> drtStops = getModalInstance(Network.class).getLinks()
-					.values()
-					.stream()
-					.filter(link -> ShpGeometryUtils.isCoordInPreparedGeometries(link.getToNode().getCoord(),
-							preparedGeometries))
-					.map(DrtStopFacilityImpl::createFromLink)
-					.collect(ImmutableMap.toImmutableMap(DrtStopFacility::getId, f -> f));
-			return () -> drtStops;
+			switch (drtCfg.getOperationalScheme()) {
+				case stopbased:
+					return createDrtStopNetworkFromTransitSchedule(config, drtCfg);
+				case serviceAreaBased:
+					return createDrtStopNetworkFromServiceArea(config, drtCfg, getModalInstance(Network.class));
+				default:
+					throw new RuntimeException("Unsupported operational scheme: " + drtCfg.getOperationalScheme());
+			}
 		}
 	}
 
-	private DrtStopNetwork readDrtStopNetwork() {
-		URL url = drtCfg.getTransitStopsFileUrl(getConfig().getContext());
+	private static DrtStopNetwork createDrtStopNetworkFromServiceArea(Config config, DrtConfigGroup drtCfg,
+			Network drtNetwork) {
+		final List<PreparedGeometry> preparedGeometries = ShpGeometryUtils.loadPreparedGeometries(
+				drtCfg.getDrtServiceAreaShapeFileURL(config.getContext()));
+		ImmutableMap<Id<DrtStopFacility>, DrtStopFacility> drtStops = drtNetwork.getLinks()
+				.values()
+				.stream()
+				.filter(link -> ShpGeometryUtils.isCoordInPreparedGeometries(link.getToNode().getCoord(),
+						preparedGeometries))
+				.map(DrtStopFacilityImpl::createFromLink)
+				.collect(ImmutableMap.toImmutableMap(DrtStopFacility::getId, f -> f));
+		return () -> drtStops;
+	}
+
+	private static DrtStopNetwork createDrtStopNetworkFromTransitSchedule(Config config, DrtConfigGroup drtCfg) {
+		URL url = drtCfg.getTransitStopsFileUrl(config.getContext());
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new TransitScheduleReader(scenario).readURL(url);
 		ImmutableMap<Id<DrtStopFacility>, DrtStopFacility> drtStops = scenario.getTransitSchedule()
