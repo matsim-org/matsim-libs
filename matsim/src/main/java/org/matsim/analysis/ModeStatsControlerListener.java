@@ -85,7 +85,7 @@ ShutdownListener {
 
 	@Inject
 	ModeStatsControlerListener(ControlerConfigGroup controlerConfigGroup, Population population1, OutputDirectoryHierarchy controlerIO,
-			PlanCalcScoreConfigGroup scoreConfig, @Named(MainModeIdentifier.ANALYSIS_MAIN_MODE_IDENTIFIER) MainModeIdentifier mainModeIdentifier ) {
+			PlanCalcScoreConfigGroup scoreConfig, MainModeIdentifier mainModeIdentifier ) {
 		this.controlerConfigGroup = controlerConfigGroup;
 		this.population = population1;
 		this.modeFileName = controlerIO.getOutputFilename( FILENAME_MODESTATS ) ;

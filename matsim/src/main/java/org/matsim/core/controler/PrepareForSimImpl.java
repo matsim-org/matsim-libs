@@ -95,7 +95,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	PrepareForSimImpl(GlobalConfigGroup globalConfigGroup, Scenario scenario, Network network,
 				Population population, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider,
 				QSimConfigGroup qSimConfigGroup, FacilitiesConfigGroup facilitiesConfigGroup, 
-				@Named(MainModeIdentifier.BACKWARD_COMPATIBILITY_ROUTING_MODE_IDENTIFIER) MainModeIdentifier backwardCompatibilityMainModeIdentifier) {
+				MainModeIdentifier backwardCompatibilityMainModeIdentifier) {
 		this.globalConfigGroup = globalConfigGroup;
 		this.scenario = scenario;
 		this.network = network;
