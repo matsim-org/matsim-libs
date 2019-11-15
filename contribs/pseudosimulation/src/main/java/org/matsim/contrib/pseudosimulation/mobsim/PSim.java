@@ -198,10 +198,6 @@ public class PSim implements Mobsim {
                                 Logger.getLogger( this.getClass() ).error( "No route for car leg. Continuing with next leg" );
                                 continue;
                             }
-                        } else if( prevLeg.getMode().equals( TransportMode.transit_walk ) ){
-                            TransitWalkTimeAndDistance tnd = new TransitWalkTimeAndDistance( act.getCoord(), prevAct.getCoord() );
-                            travelTime = tnd.time;
-                            eventQueue.add( new TeleportationArrivalEvent( prevEndTime + tnd.time, personId, tnd.distance ) );
                         } else if( transitModes.contains( prevLeg.getMode() ) ){
                             TransitEmulator.Trip trip = transitEmulator.findTrip( prevLeg, prevEndTime );
                             if( trip != null ){
