@@ -41,9 +41,9 @@ import org.matsim.contrib.drt.routing.DecideOnLinkAccessEgressFacilityFinder;
 import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtRouteLegCalculator;
 import org.matsim.contrib.drt.routing.DrtRouteUpdater;
+import org.matsim.contrib.drt.routing.DrtRoutingModule;
+import org.matsim.contrib.drt.routing.DrtRoutingModule.AccessEgressFacilityFinder;
 import org.matsim.contrib.drt.routing.NonNetworkWalkRouter;
-import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule;
-import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
@@ -102,7 +102,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 		bindModal(DrtRouteLegCalculator.class).toProvider(new DrtRouteLegCalculatorProvider(drtCfg));// not singleton
 		addRoutingModuleBinding(getMode()).toProvider(
-				new StopBasedDrtRoutingModuleProvider(drtCfg, plansCalcRouteCfg));// not singleton
+				new DrtRoutingModuleProvider(drtCfg, plansCalcRouteCfg));// not singleton
 
 		switch (drtCfg.getOperationalScheme()) {
 			case door2door:
@@ -156,8 +156,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		addControlerListenerBinding().to(modalKey(DrtRouteUpdater.class));
 	}
 
-	private static class StopBasedDrtRoutingModuleProvider
-			extends ModalProviders.AbstractProvider<StopBasedDrtRoutingModule> {
+	private static class DrtRoutingModuleProvider extends ModalProviders.AbstractProvider<DrtRoutingModule> {
 		@Inject
 		@Named(TransportMode.walk)
 		private RoutingModule walkRouter;
@@ -168,7 +167,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		private final DrtConfigGroup drtCfg;
 		private final boolean insertingAccessEgressWalk;
 
-		private StopBasedDrtRoutingModuleProvider(DrtConfigGroup drtCfg, PlansCalcRouteConfigGroup plansCalcRouteCfg) {
+		private DrtRoutingModuleProvider(DrtConfigGroup drtCfg, PlansCalcRouteConfigGroup plansCalcRouteCfg) {
 			super(drtCfg.getMode());
 			this.drtCfg = drtCfg;
 			//TODO this is a temporary switch for backward compatibility with (original) DrtRoutingModule
@@ -178,11 +177,11 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		}
 
 		@Override
-		public StopBasedDrtRoutingModule get() {
+		public DrtRoutingModule get() {
 			RoutingModule accessEgressRouter = insertingAccessEgressWalk ?
 					new NonNetworkWalkRouter(walkRouter) :
 					(fromFacility, toFacility, departureTime, person) -> Collections.emptyList();
-			return new StopBasedDrtRoutingModule(getModalInstance(DrtRouteLegCalculator.class), accessEgressRouter,
+			return new DrtRoutingModule(getModalInstance(DrtRouteLegCalculator.class), accessEgressRouter,
 					accessEgressRouter, getModalInstance(AccessEgressFacilityFinder.class), drtCfg, scenario,
 					getModalInstance(Network.class));
 		}
