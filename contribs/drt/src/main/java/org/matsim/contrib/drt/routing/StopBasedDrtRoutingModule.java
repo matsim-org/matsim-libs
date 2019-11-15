@@ -42,6 +42,8 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.Facility;
 
+import com.google.common.base.Verify;
+
 /**
  * @author jbischoff
  * @author michalm (Michal Maciejewski)
@@ -115,10 +117,10 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		}
 
 		// drt proper leg:
-		Link accessActLink = modalNetwork.getLinks()
-				.get(accessFacility.getLinkId()); // we want that this crashes if not found.  kai/gl, oct'19
-		Link egressActLink = modalNetwork.getLinks()
-				.get(egressFacility.getLinkId()); // we want that this crashes if not found.  kai/gl, oct'19
+		Link accessActLink = Verify.verifyNotNull(modalNetwork.getLinks().get(accessFacility.getLinkId()),
+				"link: %s does not exist in the network of mode: %s", accessFacility.getLinkId(), drtCfg.getMode());
+		Link egressActLink = Verify.verifyNotNull(modalNetwork.getLinks().get(egressFacility.getLinkId()),
+				"link: %s does not exist in the network of mode: %s", egressFacility.getLinkId(), drtCfg.getMode());
 		List<? extends PlanElement> drtLeg = drtRouteLegCalculator.createRealDrtLeg(departureTime, accessActLink,
 				egressActLink);
 		trip.addAll(drtLeg);
