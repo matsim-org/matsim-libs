@@ -93,7 +93,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import com.google.inject.Inject;
 
 /**
-* @author smueller
+* @author smueller, gleich
 */
 
 public class EditTripsTest {
@@ -103,6 +103,8 @@ public class EditTripsTest {
 	// this is messy, but DisturbanceAndReplanningEngine needs to be static and there is no 
 	// constructor or similar to pass the replanning time
 	private static double testReplanTime = 0;
+	private static final URL configURL = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("ptdisturbances"),"config.xml");
+	
 
 	/**
 	 * Case 1.1.1
@@ -112,7 +114,7 @@ public class EditTripsTest {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils
-				.loadConfig("./scenarios/ptdisturbances/config_agents-pt3-pt5_wo-disturbance_reduced.xml");
+				.loadConfig(configURL);
 		String outputDirectory = utils.getOutputDirectory();
 		config.controler()
 				.setOutputDirectory(outputDirectory);
@@ -152,7 +154,7 @@ public class EditTripsTest {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils
-				.loadConfig("./scenarios/ptdisturbances/config_agents-pt3-pt5_wo-disturbance_reduced.xml");
+				.loadConfig(configURL);
 		String outputDirectory = utils.getOutputDirectory();
 		config.controler()
 				.setOutputDirectory(outputDirectory);
@@ -191,7 +193,7 @@ public class EditTripsTest {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils
-				.loadConfig("./scenarios/ptdisturbances/config_agents-pt3-pt5_wo-disturbance_reduced.xml");
+				.loadConfig(configURL);;
 		String outputDirectory = utils.getOutputDirectory();
 		config.controler()
 				.setOutputDirectory(outputDirectory);
@@ -228,7 +230,7 @@ public class EditTripsTest {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils
-				.loadConfig("./scenarios/ptdisturbances/config_agents-pt3-pt5_wo-disturbance_reduced.xml");
+				.loadConfig(configURL);
 		String outputDirectory = utils.getOutputDirectory();
 		config.controler()
 				.setOutputDirectory(outputDirectory);
@@ -272,7 +274,7 @@ public class EditTripsTest {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils
-				.loadConfig("./scenarios/ptdisturbances/config_agents-pt3-pt5_wo-disturbance_reduced.xml");
+				.loadConfig(configURL);
 		String outputDirectory = utils.getOutputDirectory();
 		config.controler()
 				.setOutputDirectory(outputDirectory);
@@ -312,7 +314,7 @@ public class EditTripsTest {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils
-				.loadConfig("./scenarios/ptdisturbances/config_agents-pt3-pt5_wo-disturbance_reduced.xml");
+				.loadConfig(configURL);;
 		String outputDirectory = utils.getOutputDirectory();
 		config.controler()
 				.setOutputDirectory(outputDirectory);
@@ -352,7 +354,7 @@ public class EditTripsTest {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
 		Config config = ConfigUtils
-				.loadConfig("./scenarios/ptdisturbances/config_agents-pt3-pt5_wo-disturbance_reduced.xml");
+				.loadConfig(configURL);
 		String outputDirectory = utils.getOutputDirectory();
 		config.controler()
 				.setOutputDirectory(outputDirectory);
@@ -390,7 +392,6 @@ public class EditTripsTest {
 	public void testOneAgentEveryFourSeconds() {
 		HashMap<Id<Person>, Double> arrivalTimes = new HashMap<>();
 		HashMap<Id<Person>, List<String>> trips = new HashMap<>();
-		URL configURL = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("ptdisturbances"),"config_agents-pt3-pt5_wo-disturbance_reduced.xml");
 		Config config = ConfigUtils
 				.loadConfig(configURL);
 		String outputDirectory = utils.getOutputDirectory();

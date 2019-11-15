@@ -4,7 +4,7 @@
 	<module name="controler" >
 		<!-- Default=1000;  -->
 		<param name="lastIteration" value="0" />
-		<param name="outputDirectory" value="./scenarios/ptdisturbances/output/pt3-pt5" />
+		<param name="outputDirectory" value="./" />
 		<!-- Possible values: failIfDirectoryExists, overwriteExistingFiles, deleteDirectoryIfExists -->
 		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
 	</module>
@@ -52,9 +52,6 @@
 				<param name="mode" value="pt" />
 			</parameterset>
 		</parameterset>
-	</module>
-	<module name="plans" >
-		<param name="inputPlansFile" value="./population_pt3-pt5.xml" />
 	</module>
 	<module name="planscalcroute" >
 		<parameterset type="teleportedModeParameters" >
