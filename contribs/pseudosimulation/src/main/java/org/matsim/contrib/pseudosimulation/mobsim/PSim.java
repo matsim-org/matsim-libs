@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -41,11 +40,9 @@ import org.matsim.contrib.pseudosimulation.util.CollectionUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.vehicles.Vehicle;
 
@@ -72,10 +69,7 @@ public class PSim implements Mobsim {
     private final static double MIN_LEG_DURATION = 0.0;
 
     private final SimThread[] threads;
-    private final double beelineDistanceFactor;
     AtomicInteger numThreads;
-
-    private final double walkSpeed;
 
     private final TravelTime carLinkTravelTimes;
     private final Collection<Plan> plans;
@@ -95,10 +89,6 @@ public class PSim implements Mobsim {
         for (int i = 0; i < numThreads; i++)
             threads[i] = new SimThread();
 
-
-        PlansCalcRouteConfigGroup pcrConfig = sc.getConfig().plansCalcRoute();
-        this.beelineDistanceFactor = pcrConfig.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
-        this.walkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk) ;
         this.carLinkTravelTimes = carLinkTravelTimes;
         this.plans = plans;
     }
@@ -326,17 +316,5 @@ public class PSim implements Mobsim {
 
             return tt;
         }
-    }
-
-
-    class TransitWalkTimeAndDistance {
-        final double time;
-        final double distance;
-
-        public TransitWalkTimeAndDistance(Coord startCoord, Coord endCoord) {
-            distance = beelineDistanceFactor * CoordUtils.calcEuclideanDistance(startCoord, endCoord);
-            time = distance / walkSpeed;
-        }
-
     }
 }
