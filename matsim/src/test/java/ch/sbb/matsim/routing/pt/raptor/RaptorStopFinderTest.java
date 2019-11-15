@@ -1765,15 +1765,6 @@ public class RaptorStopFinderTest {
             walkAccess.setSearchExtensionRadius(0); // includes D (if neccessary)
             f0.srrConfig.addIntermodalAccessEgress(walkAccess);
 
-//            SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet nonNetworkAccess = new SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet();
-//            nonNetworkAccess.setMode(TransportMode.non_network_walk);
-//            nonNetworkAccess.setRadius(0); // should not be limiting factor
-//            nonNetworkAccess.setInitialSearchRadius(0); // Should include stops B and C and D
-//            nonNetworkAccess.setSearchExtensionRadius(0); // includes D (if neccessary)
-//            f0.srrConfig.addIntermodalAccessEgress(nonNetworkAccess);
-
-
-
             SwissRailRaptorData data = SwissRailRaptorData.create(f0.scenario.getTransitSchedule(), RaptorUtils.createStaticConfig(f0.config), f0.scenario.getNetwork());
             DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), routingModules);
             SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f0.scenario.getConfig()),
