@@ -27,7 +27,7 @@ import org.matsim.core.controler.AbstractModule;
 /**
 * @author ikaddoura
 */
-final class NoiseComputationModule extends AbstractModule {
+public final class NoiseComputationModule extends AbstractModule {
 	private static final Logger log = Logger.getLogger(NoiseComputationModule.class);
 
 
