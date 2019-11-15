@@ -103,16 +103,18 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 
 		// access (sub-)trip:
 		List<? extends PlanElement> accessTrip = accessRouter.calcRoute(fromFacility, accessFacility, now, person);
-		trip.addAll(accessTrip);
-		for (PlanElement planElement : accessTrip) {
-			now = TripRouter.calcEndOfPlanElement(now, planElement, scenario.getConfig());
+		if (!accessTrip.isEmpty()) {
+			trip.addAll(accessTrip);
+			for (PlanElement planElement : accessTrip) {
+				now = TripRouter.calcEndOfPlanElement(now, planElement, scenario.getConfig());
+			}
+
+			// interaction activity:
+			trip.add(createDrtStageActivity(accessFacility));
+			now++;
 		}
 
-		// interaction activity:
-		trip.add(createDrtStageActivity(accessFacility));
-
 		// drt proper leg:
-		now++;
 		Link accessActLink = modalNetwork.getLinks()
 				.get(accessFacility.getLinkId()); // we want that this crashes if not found.  kai/gl, oct'19
 		Link egressActLink = modalNetwork.getLinks()
@@ -124,13 +126,15 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 			now = TripRouter.calcEndOfPlanElement(now, planElement, scenario.getConfig());
 		}
 
-		// interaction activity:
-		trip.add(createDrtStageActivity(egressFacility));
-
-		// egress (sub-)trip:
 		now++;
 		List<? extends PlanElement> egressTrip = egressRouter.calcRoute(egressFacility, toFacility, now, person);
-		trip.addAll(egressTrip);
+		if (!egressTrip.isEmpty()) {
+			// interaction activity:
+			trip.add(createDrtStageActivity(egressFacility));
+
+			// egress (sub-)trip:
+			trip.addAll(egressTrip);
+		}
 
 		return trip;
 	}
