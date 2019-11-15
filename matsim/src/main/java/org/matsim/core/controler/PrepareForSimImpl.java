@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -47,6 +48,7 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesFromPopulation;
+import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -103,7 +105,8 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		this.qSimConfigGroup = qSimConfigGroup;
 		this.facilitiesConfigGroup = facilitiesConfigGroup;
 		this.backwardCompatibilityMainModeIdentifier = backwardCompatibilityMainModeIdentifier;
-		drtPtModes = new HashSet<>(Arrays.asList(TransportMode.pt, TransportMode.drt)); // TODO: make configurable for other pt/drt modes
+		drtPtModes = new HashSet<>(Arrays.asList(TransportMode.drt)); // TODO: make configurable for other pt/drt modes
+		drtPtModes.addAll(ConfigUtils.addOrGetModule(scenario.getConfig(), TransitConfigGroup.class).getTransitModes());
 //		this.forkJoinPool = new ForkJoinPool(globalConfigGroup.getNumberOfThreads());
 	}
 
