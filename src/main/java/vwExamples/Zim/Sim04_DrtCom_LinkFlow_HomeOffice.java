@@ -162,7 +162,6 @@ public class Sim04_DrtCom_LinkFlow_HomeOffice {
 		// This part allows to change dynamically DRT config parameters
 		DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
 
-		drt.setPrintDetailedWarnings(false);
 		// Parameters to setup the DRT service
 		drt.setMaxTravelTimeBeta(900.0);
 		drt.setMaxTravelTimeAlpha(1.4);

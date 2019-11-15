@@ -149,7 +149,6 @@ public class Sim02_DrtCommuter {
 		// This part allows to change dynamically DRT config parameters
 		DrtConfigGroup drt = DrtConfigGroup.getSingleModeDrtConfig(config);
 
-		drt.setPrintDetailedWarnings(false);
 		// Parameters to setup the DRT service
 		drt.setMaxTravelTimeBeta(900.0);
 		drt.setMaxTravelTimeAlpha(1.4);

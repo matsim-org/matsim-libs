@@ -131,7 +131,6 @@ public class RunDrtScenarioBatchBS_DRT_Commuter {
 //		dvrp.setTravelTimeEstimationAlpha(.15);
 //		dvrp.setTravelTimeEstimationBeta(600);
 
-		drt.setPrintDetailedWarnings(false);
 		// Parameters to setup the DRT service
 		drt.setMaxTravelTimeBeta(900.0);
 		drt.setMaxTravelTimeAlpha(1.3);

@@ -114,7 +114,6 @@ public class RunDrtScenarioBatchH_MOIA {
 		// This part allows to change dynamically DRT config parameters
 		DrtConfigGroup drt = DrtConfigGroup.getSingleModeDrtConfig(config);
 
-		drt.setPrintDetailedWarnings(false);
 		// Parameters to setup the DRT service
 		drt.setMaxTravelTimeBeta(600.0);
 		drt.setMaxTravelTimeAlpha(1.4);
