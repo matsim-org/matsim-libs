@@ -39,6 +39,7 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.dvrp.run.ModalProviders;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -46,12 +47,17 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -111,10 +117,16 @@ public class RunUamDrtScenario {
 
 	private static class UamRoutingModuleProvider extends ModalProviders.AbstractProvider<DrtRoutingModule> {
 		@Inject
+		@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
+		private TravelTime travelTime;
+
+		@Inject
 		private Scenario scenario;
 
 		@Inject
 		private TripRouter tripRouter;
+
+		private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = new FastAStarEuclideanFactory();
 
 		private final DrtConfigGroup drtCfg;
 
@@ -130,9 +142,14 @@ public class RunUamDrtScenario {
 			RoutingModule egressRoutingModule = (fromFacility, toFacility, departureTime, person) -> tripRouter.calcRoute(
 					"car", fromFacility, toFacility, departureTime, person);
 
-			return new DrtRoutingModule(getModalInstance(DrtRouteLegCalculator.class), accessRoutingModule,
-					egressRoutingModule, getModalInstance(DrtRoutingModule.AccessEgressFacilityFinder.class), drtCfg,
-					scenario, getModalInstance(Network.class));
+			Network network = getModalInstance(Network.class);
+			DrtRouteLegCalculator drtRouteLegCalculator = new DrtRouteLegCalculator(drtCfg, network,
+					leastCostPathCalculatorFactory, travelTime, getModalInstance(TravelDisutilityFactory.class),
+					scenario);
+
+			return new DrtRoutingModule(drtRouteLegCalculator, accessRoutingModule, egressRoutingModule,
+					getModalInstance(DrtRoutingModule.AccessEgressFacilityFinder.class), drtCfg, scenario,
+					getModalInstance(Network.class));
 		}
 	}
 
