@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
@@ -84,18 +83,16 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 				Objects.requireNonNull(fromFacility, "fromFacility is null"),
 				Objects.requireNonNull(toFacility, "toFacility is null"));
 		if (!stops.isPresent()) {
-			printWarning(
-					() -> "No access/egress stops found, agent will use fallback mode " + TripRouter.getFallbackMode(
-							drtCfg.getMode()) + ". Agent Id:\t" + person.getId());
+			logger.debug("No access/egress stops found, agent will use fallback mode " + TripRouter.getFallbackMode(
+					drtCfg.getMode()) + ". Agent Id:\t" + person.getId());
 			return null;
 		}
 
 		Facility accessFacility = stops.get().getLeft();
 		Facility egressFacility = stops.get().getRight();
 		if (accessFacility.getLinkId().equals(egressFacility.getLinkId())) {
-			printWarning(
-					() -> "Start and end stop are the same, agent will use fallback mode " + TripRouter.getFallbackMode(
-							drtCfg.getMode()) + ". Agent Id:\t" + person.getId());
+			logger.debug("Start and end stop are the same, agent will use fallback mode " + TripRouter.getFallbackMode(
+					drtCfg.getMode()) + ". Agent Id:\t" + person.getId());
 			return null;
 		}
 
@@ -148,12 +145,6 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		activity.setMaximumDuration(0);
 		activity.setLinkId(stopFacility.getLinkId());
 		return activity;
-	}
-
-	private void printWarning(Supplier<String> supplier) {
-		if (drtCfg.isPrintDetailedWarnings()) {
-			logger.warn(supplier.get());
-		}
 	}
 
 	static Coord getFacilityCoord(Facility facility, Network network) {
