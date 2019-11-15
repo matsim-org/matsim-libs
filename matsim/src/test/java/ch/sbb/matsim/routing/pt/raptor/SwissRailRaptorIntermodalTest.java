@@ -48,12 +48,9 @@ public class SwissRailRaptorIntermodalTest {
     public void testIntermodalTrip() {
         IntermodalFixture f = new IntermodalFixture();
 
-        PlanCalcScoreConfigGroup.ModeParams nonNetworkWalk = new PlanCalcScoreConfigGroup.ModeParams("non_network_walk");
-        nonNetworkWalk.setMarginalUtilityOfTraveling(0.0);
-        f.config.planCalcScore().addModeParams(nonNetworkWalk);
-        PlanCalcScoreConfigGroup.ModeParams transitWalk = new PlanCalcScoreConfigGroup.ModeParams("transit_walk");
-        transitWalk.setMarginalUtilityOfTraveling(0.0);
-        f.config.planCalcScore().addModeParams(transitWalk);
+        PlanCalcScoreConfigGroup.ModeParams walk = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.walk);
+        walk.setMarginalUtilityOfTraveling(0.0);
+        f.config.planCalcScore().addModeParams(walk);
 
         Map<String, RoutingModule> routingModules = new HashMap<>();
         routingModules.put(TransportMode.walk,
@@ -144,12 +141,9 @@ public class SwissRailRaptorIntermodalTest {
         bikeAccess.setStopFilterValue("true");
         f.srrConfig.addIntermodalAccessEgress(bikeAccess);
 
-        PlanCalcScoreConfigGroup.ModeParams nonNetworkWalk = new PlanCalcScoreConfigGroup.ModeParams("non_network_walk");
-        nonNetworkWalk.setMarginalUtilityOfTraveling(0.0);
-        f.config.planCalcScore().addModeParams(nonNetworkWalk);
-        PlanCalcScoreConfigGroup.ModeParams transitWalk = new PlanCalcScoreConfigGroup.ModeParams("transit_walk");
-        transitWalk.setMarginalUtilityOfTraveling(0.0);
-        f.config.planCalcScore().addModeParams(transitWalk);
+        PlanCalcScoreConfigGroup.ModeParams walk = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.walk);
+        walk.setMarginalUtilityOfTraveling(0.0);
+        f.config.planCalcScore().addModeParams(walk);
 
         SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork());
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), routingModules);
@@ -201,12 +195,9 @@ public class SwissRailRaptorIntermodalTest {
     public void testIntermodalTrip_walkOnlyNoSubpop() {
         IntermodalFixture f = new IntermodalFixture();
 
-        PlanCalcScoreConfigGroup.ModeParams nonNetworkWalk = new PlanCalcScoreConfigGroup.ModeParams("non_network_walk");
-        nonNetworkWalk.setMarginalUtilityOfTraveling(-8.0);
-        f.config.planCalcScore().addModeParams(nonNetworkWalk);
-        PlanCalcScoreConfigGroup.ModeParams transitWalk = new PlanCalcScoreConfigGroup.ModeParams("transit_walk");
-        transitWalk.setMarginalUtilityOfTraveling(0.0);
-        f.config.planCalcScore().addModeParams(transitWalk);
+        PlanCalcScoreConfigGroup.ModeParams walk = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.walk);
+        walk.setMarginalUtilityOfTraveling(-8.0);
+        f.config.planCalcScore().addModeParams(walk);
 
         Map<String, RoutingModule> routingModules = new HashMap<>();
         routingModules.put(TransportMode.walk,
@@ -257,12 +248,9 @@ public class SwissRailRaptorIntermodalTest {
     public void testIntermodalTrip_withoutPt() {
         IntermodalFixture f = new IntermodalFixture();
 
-        PlanCalcScoreConfigGroup.ModeParams nonNetworkWalk = new PlanCalcScoreConfigGroup.ModeParams("non_network_walk");
-        nonNetworkWalk.setMarginalUtilityOfTraveling(0.0);
-        f.config.planCalcScore().addModeParams(nonNetworkWalk);
-        PlanCalcScoreConfigGroup.ModeParams transitWalk = new PlanCalcScoreConfigGroup.ModeParams("transit_walk");
-        transitWalk.setMarginalUtilityOfTraveling(0.0);
-        f.config.planCalcScore().addModeParams(transitWalk);
+        PlanCalcScoreConfigGroup.ModeParams walk = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.walk);
+        walk.setMarginalUtilityOfTraveling(0.0);
+        f.config.planCalcScore().addModeParams(walk);
 
         Map<String, RoutingModule> routingModules = new HashMap<>();
         routingModules.put(TransportMode.walk,
@@ -298,12 +286,9 @@ public class SwissRailRaptorIntermodalTest {
         IntermodalFixture f = new IntermodalFixture();
 
         f.config.planCalcScore().setPerforming_utils_hr(6.0);
-        PlanCalcScoreConfigGroup.ModeParams nonNetworkWalk = new PlanCalcScoreConfigGroup.ModeParams("non_network_walk");
-        nonNetworkWalk.setMarginalUtilityOfTraveling(0.0);
-        f.config.planCalcScore().addModeParams(nonNetworkWalk);
-        PlanCalcScoreConfigGroup.ModeParams transitWalk = new PlanCalcScoreConfigGroup.ModeParams("transit_walk");
-        transitWalk.setMarginalUtilityOfTraveling(0.0);
-        f.config.planCalcScore().addModeParams(transitWalk);
+        PlanCalcScoreConfigGroup.ModeParams walk = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.walk);
+        walk.setMarginalUtilityOfTraveling(0.0);
+        f.config.planCalcScore().addModeParams(walk);
         PlanCalcScoreConfigGroup.ModeParams bike = new PlanCalcScoreConfigGroup.ModeParams("bike");
         bike.setMarginalUtilityOfTraveling(0.0);
         f.config.planCalcScore().addModeParams(bike);
@@ -399,12 +384,9 @@ public class SwissRailRaptorIntermodalTest {
          */
         f.config.transitRouter().setDirectWalkFactor(Double.POSITIVE_INFINITY);
 
-        PlanCalcScoreConfigGroup.ModeParams nonNetworkWalk = new PlanCalcScoreConfigGroup.ModeParams("non_network_walk");
-        nonNetworkWalk.setMarginalUtilityOfTraveling(0.0);
-        f.config.planCalcScore().addModeParams(nonNetworkWalk);
-        PlanCalcScoreConfigGroup.ModeParams transitWalk = new PlanCalcScoreConfigGroup.ModeParams("transit_walk");
-        transitWalk.setMarginalUtilityOfTraveling(0.0);
-        f.config.planCalcScore().addModeParams(transitWalk);
+        PlanCalcScoreConfigGroup.ModeParams walk = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.walk);
+        walk.setMarginalUtilityOfTraveling(0.0);
+        f.config.planCalcScore().addModeParams(walk);
 
         Map<String, RoutingModule> routingModules = new HashMap<>();
         routingModules.put(TransportMode.walk,
@@ -456,16 +438,13 @@ public class SwissRailRaptorIntermodalTest {
         routingModules.put(TransportMode.bike,
                 new TeleportationRoutingModule(TransportMode.bike, f.scenario, 3, 1.4));
 
-        // we need to set special values for walk and bike as the defaults are the same for walk(=non_network_walk), bike and waiting
+        // we need to set special values for walk and bike as the defaults are the same for walk, bike and waiting
         // which would result in all options having the same cost in the end.
         f.config.planCalcScore().getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(-8);
 
-        PlanCalcScoreConfigGroup.ModeParams nonNetworkWalk = new PlanCalcScoreConfigGroup.ModeParams("non_network_walk");
-        nonNetworkWalk.setMarginalUtilityOfTraveling(-7);
-        f.config.planCalcScore().addModeParams(nonNetworkWalk);
-        PlanCalcScoreConfigGroup.ModeParams transitWalk = new PlanCalcScoreConfigGroup.ModeParams("transit_walk");
-        transitWalk.setMarginalUtilityOfTraveling(0);
-        f.config.planCalcScore().addModeParams(transitWalk);
+        PlanCalcScoreConfigGroup.ModeParams walk = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.walk);
+        walk.setMarginalUtilityOfTraveling(-7);
+        f.config.planCalcScore().addModeParams(walk);
 
         f.srrConfig.setUseIntermodalAccessEgress(true);
         IntermodalAccessEgressParameterSet walkAccess = new IntermodalAccessEgressParameterSet();
@@ -556,16 +535,13 @@ public class SwissRailRaptorIntermodalTest {
         routingModules.put(TransportMode.bike,
                 new TeleportationRoutingModule(TransportMode.bike, f.scenario, 3, 1.4));
 
-        // we need to set special values for walk and bike as the defaults are the same for walk(=non_network_walk), bike and waiting
+        // we need to set special values for walk and bike as the defaults are the same for walk, bike and waiting
         // which would result in all options having the same cost in the end.
         f.config.planCalcScore().getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(-8);
 
-        PlanCalcScoreConfigGroup.ModeParams nonNetworkWalk = new PlanCalcScoreConfigGroup.ModeParams("non_network_walk");
-        nonNetworkWalk.setMarginalUtilityOfTraveling(-7);
-        f.config.planCalcScore().addModeParams(nonNetworkWalk);
-        PlanCalcScoreConfigGroup.ModeParams transitWalk = new PlanCalcScoreConfigGroup.ModeParams("transit_walk");
-        transitWalk.setMarginalUtilityOfTraveling(0);
-        f.config.planCalcScore().addModeParams(transitWalk);
+        PlanCalcScoreConfigGroup.ModeParams walk = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.walk);
+        walk.setMarginalUtilityOfTraveling(-7);
+        f.config.planCalcScore().addModeParams(walk);
 
         f.srrConfig.setUseIntermodalAccessEgress(true);
         IntermodalAccessEgressParameterSet walkAccess = new IntermodalAccessEgressParameterSet();
@@ -831,7 +807,7 @@ public class SwissRailRaptorIntermodalTest {
     @Test
     public void testIntermodalTrip_accessModeRouterReturnsNull() {
 
-        // Part 1: Bike is very fast. Bike Router will return intermodal route including bike, pt, and non_network_walk.
+        // Part 1: Bike is very fast. Bike Router will return intermodal route including bike, pt, and walk.
         IntermodalTransferFixture f = new IntermodalTransferFixture();
 
         Facility fromFac = new FakeFacility(new Coord(9980, -600), Id.create("from", Link.class)); // stop B
@@ -1073,15 +1049,11 @@ public class SwissRailRaptorIntermodalTest {
             this.routingModules.put(TransportMode.bike,
                     new TeleportationRoutingModule(TransportMode.bike, this.scenario, 10, 1.4)); // make bike very fast
 
-            // we need to set special values for walk and bike as the defaults are the same for walk (=non_network_walk), bike and waiting
+            // we need to set special values for walk and bike as the defaults are the same for walk, bike and waiting
             // which would result in all options having the same cost in the end.
             this.config.planCalcScore().getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(-8);
 
             this.config.transitRouter().setMaxBeelineWalkConnectionDistance(150);
-            
-            PlanCalcScoreConfigGroup.ModeParams transitWalk = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.transit_walk);
-            transitWalk.setMarginalUtilityOfTraveling(0);
-            this.config.planCalcScore().addModeParams(transitWalk);
             
 			/*
 			 * Prior to non_network_walk the utilities of access_walk and egress_walk were set to 0 here.
@@ -1096,10 +1068,13 @@ public class SwissRailRaptorIntermodalTest {
 			 * bike (and access / egress transfer) are rather short and thereby have little influence on the total cost.
 			 * Furthermore, this is additional cost for the path including bike, so we are on the safe side with that
 			 * change. - gleich aug'19
+			 * 
+			 * Instead of TransportMode.non_network_walk we are now (after the introduction of routing mode) using 
+			 * TransportMode.walk for access and egress to pt.
 			 */
-            PlanCalcScoreConfigGroup.ModeParams nonNetworkWalk = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.walk);
-            nonNetworkWalk.setMarginalUtilityOfTraveling(-7);
-            this.config.planCalcScore().addModeParams(nonNetworkWalk);
+            PlanCalcScoreConfigGroup.ModeParams walk = new PlanCalcScoreConfigGroup.ModeParams(TransportMode.walk);
+            walk.setMarginalUtilityOfTraveling(-7);
+            this.config.planCalcScore().addModeParams(walk);
 
             this.srrConfig.setUseIntermodalAccessEgress(true);
             IntermodalAccessEgressParameterSet walkAccess = new IntermodalAccessEgressParameterSet();
