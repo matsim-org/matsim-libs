@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
@@ -42,12 +41,14 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.Facility;
 
+import com.google.common.base.Verify;
+
 /**
  * @author jbischoff
  * @author michalm (Michal Maciejewski)
  */
-public class StopBasedDrtRoutingModule implements RoutingModule {
-	private static final Logger logger = Logger.getLogger(StopBasedDrtRoutingModule.class);
+public class DrtRoutingModule implements RoutingModule {
+	private static final Logger logger = Logger.getLogger(DrtRoutingModule.class);
 
 	public interface AccessEgressFacilityFinder {
 		Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility);
@@ -62,7 +63,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 	private final RoutingModule accessRouter;
 	private final RoutingModule egressRouter;
 
-	public StopBasedDrtRoutingModule(DrtRouteLegCalculator drtRouteLegCalculator, RoutingModule accessRouter,
+	public DrtRoutingModule(DrtRouteLegCalculator drtRouteLegCalculator, RoutingModule accessRouter,
 			RoutingModule egressRouter, AccessEgressFacilityFinder stopFinder, DrtConfigGroup drtCfg, Scenario scenario,
 			Network modalNetwork) {
 		this.drtRouteLegCalculator = drtRouteLegCalculator;
@@ -82,18 +83,16 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 				Objects.requireNonNull(fromFacility, "fromFacility is null"),
 				Objects.requireNonNull(toFacility, "toFacility is null"));
 		if (!stops.isPresent()) {
-			printWarning(
-					() -> "No access/egress stops found, agent will use fallback mode " + TripRouter.getFallbackMode(
-							drtCfg.getMode()) + ". Agent Id:\t" + person.getId());
+			logger.debug("No access/egress stops found, agent will use fallback mode " + TripRouter.getFallbackMode(
+					drtCfg.getMode()) + ". Agent Id:\t" + person.getId());
 			return null;
 		}
 
 		Facility accessFacility = stops.get().getLeft();
 		Facility egressFacility = stops.get().getRight();
 		if (accessFacility.getLinkId().equals(egressFacility.getLinkId())) {
-			printWarning(
-					() -> "Start and end stop are the same, agent will use fallback mode " + TripRouter.getFallbackMode(
-							drtCfg.getMode()) + ". Agent Id:\t" + person.getId());
+			logger.debug("Start and end stop are the same, agent will use fallback mode " + TripRouter.getFallbackMode(
+					drtCfg.getMode()) + ". Agent Id:\t" + person.getId());
 			return null;
 		}
 
@@ -103,20 +102,22 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 
 		// access (sub-)trip:
 		List<? extends PlanElement> accessTrip = accessRouter.calcRoute(fromFacility, accessFacility, now, person);
-		trip.addAll(accessTrip);
-		for (PlanElement planElement : accessTrip) {
-			now = TripRouter.calcEndOfPlanElement(now, planElement, scenario.getConfig());
+		if (!accessTrip.isEmpty()) {
+			trip.addAll(accessTrip);
+			for (PlanElement planElement : accessTrip) {
+				now = TripRouter.calcEndOfPlanElement(now, planElement, scenario.getConfig());
+			}
+
+			// interaction activity:
+			trip.add(createDrtStageActivity(accessFacility));
+			now++;
 		}
 
-		// interaction activity:
-		trip.add(createDrtStageActivity(accessFacility));
-
 		// drt proper leg:
-		now++;
-		Link accessActLink = modalNetwork.getLinks()
-				.get(accessFacility.getLinkId()); // we want that this crashes if not found.  kai/gl, oct'19
-		Link egressActLink = modalNetwork.getLinks()
-				.get(egressFacility.getLinkId()); // we want that this crashes if not found.  kai/gl, oct'19
+		Link accessActLink = Verify.verifyNotNull(modalNetwork.getLinks().get(accessFacility.getLinkId()),
+				"link: %s does not exist in the network of mode: %s", accessFacility.getLinkId(), drtCfg.getMode());
+		Link egressActLink = Verify.verifyNotNull(modalNetwork.getLinks().get(egressFacility.getLinkId()),
+				"link: %s does not exist in the network of mode: %s", egressFacility.getLinkId(), drtCfg.getMode());
 		List<? extends PlanElement> drtLeg = drtRouteLegCalculator.createRealDrtLeg(departureTime, accessActLink,
 				egressActLink);
 		trip.addAll(drtLeg);
@@ -124,13 +125,15 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 			now = TripRouter.calcEndOfPlanElement(now, planElement, scenario.getConfig());
 		}
 
-		// interaction activity:
-		trip.add(createDrtStageActivity(egressFacility));
-
-		// egress (sub-)trip:
 		now++;
 		List<? extends PlanElement> egressTrip = egressRouter.calcRoute(egressFacility, toFacility, now, person);
-		trip.addAll(egressTrip);
+		if (!egressTrip.isEmpty()) {
+			// interaction activity:
+			trip.add(createDrtStageActivity(egressFacility));
+
+			// egress (sub-)trip:
+			trip.addAll(egressTrip);
+		}
 
 		return trip;
 	}
@@ -142,12 +145,6 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		activity.setMaximumDuration(0);
 		activity.setLinkId(stopFacility.getLinkId());
 		return activity;
-	}
-
-	private void printWarning(Supplier<String> supplier) {
-		if (drtCfg.isPrintDetailedWarnings()) {
-			logger.warn(supplier.get());
-		}
 	}
 
 	static Coord getFacilityCoord(Facility facility, Network network) {
