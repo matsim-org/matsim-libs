@@ -24,7 +24,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressFacilityFinder;
+import org.matsim.contrib.drt.routing.DrtRoutingModule.AccessEgressFacilityFinder;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
@@ -62,7 +62,7 @@ public class ClosestAccessEgressFacilityFinder implements AccessEgressFacilityFi
 	}
 
 	private Facility findClosestStop(Facility facility) {
-		Coord coord = StopBasedDrtRoutingModule.getFacilityCoord(facility, network);
+		Coord coord = DrtRoutingModule.getFacilityCoord(facility, network);
 		Facility closestStop = facilityQT.getClosest(coord.getX(), coord.getY());
 		double closestStopDistance = CoordUtils.calcEuclideanDistance(coord, closestStop.getCoord());
 		return closestStopDistance > maxDistance ? null : closestStop;

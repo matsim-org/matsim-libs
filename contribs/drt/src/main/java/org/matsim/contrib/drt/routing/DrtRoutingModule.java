@@ -47,8 +47,8 @@ import com.google.common.base.Verify;
  * @author jbischoff
  * @author michalm (Michal Maciejewski)
  */
-public class StopBasedDrtRoutingModule implements RoutingModule {
-	private static final Logger logger = Logger.getLogger(StopBasedDrtRoutingModule.class);
+public class DrtRoutingModule implements RoutingModule {
+	private static final Logger logger = Logger.getLogger(DrtRoutingModule.class);
 
 	public interface AccessEgressFacilityFinder {
 		Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility);
@@ -63,7 +63,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 	private final RoutingModule accessRouter;
 	private final RoutingModule egressRouter;
 
-	public StopBasedDrtRoutingModule(DrtRouteLegCalculator drtRouteLegCalculator, RoutingModule accessRouter,
+	public DrtRoutingModule(DrtRouteLegCalculator drtRouteLegCalculator, RoutingModule accessRouter,
 			RoutingModule egressRouter, AccessEgressFacilityFinder stopFinder, DrtConfigGroup drtCfg, Scenario scenario,
 			Network modalNetwork) {
 		this.drtRouteLegCalculator = drtRouteLegCalculator;
