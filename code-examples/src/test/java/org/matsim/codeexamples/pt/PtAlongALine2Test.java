@@ -10,11 +10,9 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.locationtech.jts.awt.PointShapeFactory;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.drt.routing.DrtRouteFactory;
@@ -22,37 +20,23 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.contrib.etaxi.optimizer.assignment.ETaxiToPlugAssignmentCostProvider;
-import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.*;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehiclesFactory;
-import org.matsim.withinday.replanning.identifiers.filter.TransportModeFilter;
 
 import java.util.*;
 
@@ -91,12 +75,21 @@ public class PtAlongALine2Test{
 		// (as of today, will also influence router. kai, jun'19)
 
 		if(  drtMode == DrtMode.teleportBeeline ){// (configure teleportation router)
-				config.plansCalcRoute().addModeRoutingParams( new ModeRoutingParams().setMode( TransportMode.drt ).setTeleportedModeSpeed( 100. / 3.6 ) );
+				ModeRoutingParams drtParams = new ModeRoutingParams();
+				drtParams.setMode( TransportMode.drt );
+				drtParams.setTeleportedModeSpeed( 100. / 3.6 );
+				config.plansCalcRoute().addModeRoutingParams(drtParams);
 			if( drt2 ){
-				config.plansCalcRoute().addModeRoutingParams( new ModeRoutingParams().setMode( "drt2" ).setTeleportedModeSpeed( 100. / 3.6 ) );
+				ModeRoutingParams drt2Params = new ModeRoutingParams();
+				drt2Params.setMode( "drt2" );
+				drt2Params.setTeleportedModeSpeed( 100. / 3.6 );
+				config.plansCalcRoute().addModeRoutingParams(drt2Params);
 			}
 			if( drt3 ){
-				config.plansCalcRoute().addModeRoutingParams( new ModeRoutingParams().setMode( "drt3" ).setTeleportedModeSpeed( 100. / 3.6 ) );
+				ModeRoutingParams drt3Params = new ModeRoutingParams();
+				drt3Params.setMode( "drt3" );
+				drt3Params.setTeleportedModeSpeed( 100. / 3.6 );
+				config.plansCalcRoute().addModeRoutingParams(drt3Params);
 			}
 			// teleportation router for walk or bike is automatically defined.
 		} else if( drtMode == DrtMode.teleportBasedOnNetworkRoute ){// (route as network route)
@@ -112,7 +105,10 @@ public class PtAlongALine2Test{
 		}
 
 		// set up walk2 so we don't need walk in raptor:
-		config.plansCalcRoute().addModeRoutingParams( new ModeRoutingParams(  ).setMode( "walk2" ).setTeleportedModeSpeed( 5./3.6 ) );
+		ModeRoutingParams walkParams = new ModeRoutingParams();
+		walkParams.setMode( "walk2" );
+		walkParams.setTeleportedModeSpeed( 5. / 3.6 );
+		config.plansCalcRoute().addModeRoutingParams(walkParams);
 
 		// === RAPTOR: ===
 		{
@@ -254,8 +250,6 @@ public class PtAlongALine2Test{
 		// Add Test Agents to Scenario
 		PopulationFactory pf = scenario.getPopulation().getFactory();
 
-
-		List<ActivityFacility> facilitiesAsList = new ArrayList<>( scenario.getActivityFacilities().getFacilities().values() ) ;
 		List<String> testAgents = Arrays.asList("2-3", "50-51" , "300-301", "550-551", "690-691", "800-801");
 		for (String str : testAgents) {
 			Person testAgent = pf.createPerson( Id.createPersonId("agent" + str ));
