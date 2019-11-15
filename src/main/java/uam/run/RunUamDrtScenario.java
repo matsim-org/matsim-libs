@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.routing.DrtRouteLegCalculator;
-import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule;
+import org.matsim.contrib.drt.routing.DrtRoutingModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -97,8 +97,7 @@ public class RunUamDrtScenario {
 		controler.addOverridingModule(new AbstractDvrpModeModule(uamCfg.getMode()) {
 			@Override
 			public void install() {
-				addRoutingModuleBinding(getMode()).toProvider(
-						new StopBasedUamRoutingModuleProvider(uamCfg));// not singleton
+				addRoutingModuleBinding(getMode()).toProvider(new UamRoutingModuleProvider(uamCfg));// not singleton
 			}
 		});
 
@@ -110,8 +109,7 @@ public class RunUamDrtScenario {
 		controler.run();
 	}
 
-	private static class StopBasedUamRoutingModuleProvider
-			extends ModalProviders.AbstractProvider<StopBasedDrtRoutingModule> {
+	private static class UamRoutingModuleProvider extends ModalProviders.AbstractProvider<DrtRoutingModule> {
 		@Inject
 		private Scenario scenario;
 
@@ -120,21 +118,21 @@ public class RunUamDrtScenario {
 
 		private final DrtConfigGroup drtCfg;
 
-		private StopBasedUamRoutingModuleProvider(DrtConfigGroup drtCfg) {
+		private UamRoutingModuleProvider(DrtConfigGroup drtCfg) {
 			super(drtCfg.getMode());
 			this.drtCfg = drtCfg;
 		}
 
 		@Override
-		public StopBasedDrtRoutingModule get() {
+		public DrtRoutingModule get() {
 			RoutingModule accessRoutingModule = (fromFacility, toFacility, departureTime, person) -> tripRouter.calcRoute(
 					"drt", fromFacility, toFacility, departureTime, person);
 			RoutingModule egressRoutingModule = (fromFacility, toFacility, departureTime, person) -> tripRouter.calcRoute(
 					"car", fromFacility, toFacility, departureTime, person);
 
-			return new StopBasedDrtRoutingModule(getModalInstance(DrtRouteLegCalculator.class), accessRoutingModule,
-					egressRoutingModule, getModalInstance(StopBasedDrtRoutingModule.AccessEgressFacilityFinder.class),
-					drtCfg, scenario, getModalInstance(Network.class));
+			return new DrtRoutingModule(getModalInstance(DrtRouteLegCalculator.class), accessRoutingModule,
+					egressRoutingModule, getModalInstance(DrtRoutingModule.AccessEgressFacilityFinder.class), drtCfg,
+					scenario, getModalInstance(Network.class));
 		}
 	}
 
