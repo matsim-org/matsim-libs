@@ -94,6 +94,11 @@
 			<version>${matsim.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>signals</artifactId>
+			<version>${matsim.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-core</artifactId>
 			<version>0.45</version>
