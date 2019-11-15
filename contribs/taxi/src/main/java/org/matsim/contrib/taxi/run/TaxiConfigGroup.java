@@ -117,9 +117,6 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	static final String DETAILED_STATS_EXP = "If true, detailed hourly taxi stats are dumped after each iteration."
 			+ " False by default.";
 
-	public static final String PRINT_WARNINGS = "plotDetailedWarnings";
-	static final String PRINT_WARNINGS_EXP = "Prints detailed warnings for taxi customers that cannot be served or routed. True by default.";
-
 	public static final String BREAK_IF_NOT_ALL_REQUESTS_SERVED = "breakIfNotAllRequestsServed";
 	static final String BREAK_IF_NOT_ALL_REQUESTS_SERVED_EXP =
 			"Specifies whether the simulation should interrupt if not all requests were performed when"
@@ -152,8 +149,6 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	private boolean detailedStats = false;
 
 	private boolean breakSimulationIfNotAllRequestsServed = true;
-
-	private boolean printDetailedWarnings = true;
 
 	private AbstractTaxiOptimizerParams taxiOptimizerParams;
 
@@ -192,7 +187,6 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 		map.put(TIME_PROFILES, TIME_PROFILES_EXP);
 		map.put(DETAILED_STATS, DETAILED_STATS_EXP);
 		map.put(BREAK_IF_NOT_ALL_REQUESTS_SERVED, BREAK_IF_NOT_ALL_REQUESTS_SERVED_EXP);
-		map.put(PRINT_WARNINGS, PRINT_WARNINGS_EXP);
 		return map;
 	}
 
@@ -457,15 +451,5 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 
 	public URL getTaxisFileUrl(URL context) {
 		return ConfigGroup.getInputFileURL(context, this.taxisFile);
-	}
-
-	@StringGetter(PRINT_WARNINGS)
-	public boolean isPrintDetailedWarnings() {
-		return printDetailedWarnings;
-	}
-
-	@StringSetter(PRINT_WARNINGS)
-	public void setPrintDetailedWarnings(boolean printDetailedWarnings) {
-		this.printDetailedWarnings = printDetailedWarnings;
 	}
 }
