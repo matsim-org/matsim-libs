@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -40,6 +39,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.population.algorithms.PersonPrepareForSim;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
@@ -48,22 +48,18 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesFromPopulation;
-import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ForkJoinPool;
 
 public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim {
 	// I think it is ok to have this public final.  Since one may want to use it as a delegate.  kai, may'18
@@ -83,8 +79,6 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	private final QSimConfigGroup qSimConfigGroup;
 	private final FacilitiesConfigGroup facilitiesConfigGroup;
 	private final MainModeIdentifier backwardCompatibilityMainModeIdentifier;
-	private final Set<String> drtPtModes;
-//	private final ForkJoinPool forkJoinPool;
 
 	/**
 	 * TODO: This should be a separate MainModeidentifier, neither the routing mode identifier from TripStructureUtils, 
@@ -105,9 +99,6 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		this.qSimConfigGroup = qSimConfigGroup;
 		this.facilitiesConfigGroup = facilitiesConfigGroup;
 		this.backwardCompatibilityMainModeIdentifier = backwardCompatibilityMainModeIdentifier;
-		drtPtModes = new HashSet<>(Arrays.asList(TransportMode.drt)); // TODO: make configurable for other pt/drt modes
-		drtPtModes.addAll(ConfigUtils.addOrGetModule(scenario.getConfig(), TransitConfigGroup.class).getTransitModes());
-//		this.forkJoinPool = new ForkJoinPool(globalConfigGroup.getNumberOfThreads());
 	}
 
 
@@ -276,9 +267,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		}
 	}
 	
-	// TODO: parallelize, forkJoinPool initialization causes problems
 	private void adaptOutdatedPlansForRoutingMode() {
-//		forkJoinPool.submit(() -> 
 		population.getPersons().values().parallelStream().forEach(person -> {
 			for (Plan plan: person.getPlans()) {
 				for (Trip trip : TripStructureUtils.getTrips(plan.getPlanElements())) {
@@ -305,8 +294,16 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 								leg.setMode(TransportMode.non_network_walk);
 							}
 							
-							if (leg.getMode().equals(TransportMode.non_network_walk) && drtPtModes.contains(routingMode)) {
+							// non_network_walk as access/egress to modes other than walk on the network was replaced by walk. - kn/gl-nov'19 
+							if (leg.getMode().equals(TransportMode.non_network_walk)) {
 								leg.setMode(TransportMode.walk);
+							}
+							
+							if (leg.getMode().equals(TransportMode.walk) && leg.getRoute() instanceof NetworkRoute) {
+								log.error("Found a walk leg with a NetworkRoute. This is the only allowed use case of having "
+										+ "non_network_walk as an access/egress mode. PrepareForSimImpl replaces " 
+										+ "non_network_walk with walk, because access/egress to modes other than walk should "
+										+ "use the walk Router. If this causes any problem please report to gleich or kai -nov'19");
 							}
 							
 							// not clear whether we should set the routing mode here. Probably not, because it should already be done in
