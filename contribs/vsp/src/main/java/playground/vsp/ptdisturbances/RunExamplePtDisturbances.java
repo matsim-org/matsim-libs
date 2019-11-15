@@ -21,6 +21,7 @@
 
 package playground.vsp.ptdisturbances;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,6 +63,8 @@ import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.TransitScheduleChangedEvent;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -80,15 +83,16 @@ import org.matsim.withinday.utils.ReplanningException;
 import com.google.inject.Inject;
 
 /**
-* @author smueller
+* @author smueller, gleich
 */
 
 public class RunExamplePtDisturbances {
 	private static final Logger log = Logger.getLogger( RunExamplePtDisturbances.class ) ;
+	private static final URL configURL = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("ptdisturbances"),"config.xml");
 
 	public static void main(String[] args) {
 		if ( args==null || args.length == 0 ){
-			run( ConfigUtils.loadConfig( "./scenarios/u9_3agents/config_3agents.xml" ) );
+			run( ConfigUtils.loadConfig( configURL ) );
 		} else {
 			run( ConfigUtils.loadConfig(  args ) ) ;
 		}
@@ -140,27 +144,19 @@ public class RunExamplePtDisturbances {
 	static void run(Config config) {
 		
 		adaptConfig(config);
-
-		// ---
-		
-		
-		// pt passengers board every line which goes to the desired exit stop instead of only the planned line
-//		config.transit().setBoardingAcceptance(BoardingAcceptance.checkStopOnly);
+		config.network().setTimeVariantNetwork(true);
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		
-		NetworkChangeEvent networkChangeEvent1 = new NetworkChangeEvent(8.5*3600);
-		Link link = scenario.getNetwork().getLinks().get(Id.createLinkId("dummyRathausSteglitzLink"));
+		NetworkChangeEvent networkChangeEvent1 = new NetworkChangeEvent(7.5*3600);
+		Link link = scenario.getNetwork().getLinks().get(Id.createLinkId("pt6b"));
 		networkChangeEvent1.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, link.getLength()/3600));
 		networkChangeEvent1.addLink(link);
 		NetworkUtils.addNetworkChangeEvent(scenario.getNetwork(), networkChangeEvent1);
-		NetworkChangeEvent networkChangeEvent2 = new NetworkChangeEvent(9.5*3600);
-		networkChangeEvent2.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 60));
+		NetworkChangeEvent networkChangeEvent2 = new NetworkChangeEvent(8.5*3600);
+		networkChangeEvent2.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 30. / 3.6));
 		networkChangeEvent2.addLink(link);
 		NetworkUtils.addNetworkChangeEvent(scenario.getNetwork(), networkChangeEvent2);
-		
-		
-//		addDisturbedRouteToScenario(scenario);
 
 		// ---
 		Controler controler = prepareControler( scenario );
@@ -201,7 +197,7 @@ public class RunExamplePtDisturbances {
 		@Override public void doSimStep( double now ) {
 			
 			// replan after an affected bus has already departed -> pax on the bus are replanned to get off earlier
-			double replanTime = 8.5 * 3600. + 300; 
+			double replanTime = 7.5 * 3600.; 
 
 			if ( (int) now == replanTime -1. ){ // yyyyyy this needs to come one sec earlier. :-(
 				// clear transit schedule from transit router provider:
@@ -212,18 +208,18 @@ public class RunExamplePtDisturbances {
 
 				// modify transit schedule:
 
-				final Id<TransitLine> disturbedLineId = Id.create( "U9-U-009", TransitLine.class );
+				final Id<TransitLine> disturbedLineId = Id.create( "2", TransitLine.class );
 				TransitLine disturbedLine = scenario.getTransitSchedule().getTransitLines().get( disturbedLineId ) ;
 				Gbl.assertNotNull(disturbedLine);
 
-				TransitRoute disturbedRoute = disturbedLine.getRoutes().get( Id.create("U9-U-009.1.1.R", TransitRoute.class ) );
+				TransitRoute disturbedRoute = disturbedLine.getRoutes().get( Id.create("345", TransitRoute.class ) );
 				Gbl.assertNotNull( disturbedRoute );
 
 				log.warn("before removal: nDepartures=" + disturbedRoute.getDepartures().size() ) ;
 
 				List<Departure> toRemove = new ArrayList<>() ;
 				for( Departure departure : disturbedRoute.getDepartures().values() ){
-					if ( departure.getDepartureTime() >= 8.5*3600. && departure.getDepartureTime() < 9.5*3600.) {
+					if ( departure.getDepartureTime() >= 7.5*3600. && departure.getDepartureTime() < 8.5*3600.) {
 						toRemove.add( departure ) ;
 					}
 				}
@@ -354,53 +350,6 @@ public class RunExamplePtDisturbances {
 		}
 	}
 	
-	public static void addDisturbedRouteToScenario (Scenario scenario) {
-		
-		TransitSchedule ts = scenario.getTransitSchedule();
-		TransitScheduleFactory tsf = ts.getFactory();
-		
-		TransitLine disturbedLine = tsf.createTransitLine(Id.create("U9_disturbed", TransitLine.class));
-		ts.addTransitLine(disturbedLine);
-		
-		TransitLine undisturbedLine = ts.getTransitLines().get(Id.create("U9-U-009", TransitLine.class));
-		TransitRoute undisturbedRoute = undisturbedLine.getRoutes().get(Id.create("U9-U-009.1.1.R", TransitRoute.class));
-		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		
-		stops.add(undisturbedRoute.getStops().get(0));
-		stops.add(undisturbedRoute.getStops().get(1));
-		stops.add(undisturbedRoute.getStops().get(2));
-		stops.add(undisturbedRoute.getStops().get(3));
-		stops.add(undisturbedRoute.getStops().get(4));
-		stops.add(undisturbedRoute.getStops().get(5));
-		stops.add(undisturbedRoute.getStops().get(6));
-		stops.add(undisturbedRoute.getStops().get(7));
-		stops.add(undisturbedRoute.getStops().get(8));
-		stops.add(undisturbedRoute.getStops().get(9));
-		stops.add(undisturbedRoute.getStops().get(10));
-		stops.add(undisturbedRoute.getStops().get(11));
-		stops.add(undisturbedRoute.getStops().get(12));
-		stops.add(undisturbedRoute.getStops().get(13));
-		stops.add(undisturbedRoute.getStops().get(14));
-		stops.add(undisturbedRoute.getStops().get(15));
-//		stops.add(undisturbedRoute.getStops().get(16));
-//		stops.add(undisturbedRoute.getStops().get(17));
-		
-		TransitRoute disturbedRoute = tsf.createTransitRoute(Id.create("U9_disturbed_Route", TransitRoute.class), undisturbedRoute.getRoute(), stops, "pt");
-		disturbedLine.addRoute(disturbedRoute);
-		
-		for (Departure departure : undisturbedRoute.getDepartures().values()) {
-			if (departure.getDepartureTime() > 9. *3600 + 15. * 60) {
-				Departure disturbedDeparture = tsf.createDeparture(Id.create(departure.getId() + "_disturbed", Departure.class), departure.getDepartureTime());
-				Id<Vehicle> vehicleId = Id.createVehicleId(departure.getVehicleId() + "_disturbed");
-				disturbedDeparture.setVehicleId(vehicleId);
-				disturbedRoute.addDeparture(disturbedDeparture);
-				VehiclesFactory vf = scenario.getTransitVehicles().getFactory();
-				scenario.getTransitVehicles().addVehicle(vf.createVehicle(vehicleId, scenario.getTransitVehicles().getVehicles().get(departure.getVehicleId()).getType()));
-			}
-		}
-		
-//		TransitScheduleWriter writer = new TransitScheduleWriter(ts);
-//		writer.writeFile("modifiedScedule.xml");
-	}
+	
 
 }
