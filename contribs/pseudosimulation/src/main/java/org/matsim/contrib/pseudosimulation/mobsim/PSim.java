@@ -170,7 +170,6 @@ public class PSim implements Mobsim {
                          */
 
                         Leg prevLeg = (Leg) elements.get( idx - 1 );
-                        Activity prevAct = (Activity) elements.get( idx - 2 );
                         double travelTime = 0.0;
                         if( prevLeg.getMode().equals( TransportMode.car ) ){
                             try{
@@ -281,9 +280,6 @@ public class PSim implements Mobsim {
                 double linkLeaveTime = linkEnterTime;
                 List<Id<Link>> routeLinkIds = route.getLinkIds();
                 for (Id<Link> routeLinkId : routeLinkIds) {
-                    if (linkEnterTime > 1E16) {
-                        int mmm = 0;
-                    }
                     linkEnterTime = linkLeaveTime;
                     linkEnterEvent = new LinkEnterEvent(linkEnterTime, personVehicleId, routeLinkId);
                     eventQueue.add(linkEnterEvent);
@@ -300,21 +296,6 @@ public class PSim implements Mobsim {
             LinkEnterEvent linkEnterEvent = new LinkEnterEvent(startTime + tt, personVehicleId, route.getEndLinkId());
             eventQueue.add(linkEnterEvent);
             return tt + travelTime.getLinkTravelTime(network.getLinks().get(route.getEndLinkId()), tt + startTime, null, null);
-        }
-
-        private double calcRouteTravelTime(NetworkRoute route, double startTime, TravelTime travelTime, Network network) {
-            double tt = 0;
-            if (route.getStartLinkId() != route.getEndLinkId()) {
-
-                List<Id<Link>> ids = route.getLinkIds();
-                for (Id<Link> id : ids) {
-                    tt += travelTime.getLinkTravelTime(network.getLinks().get(id), startTime, null, null);
-                    tt++;// 1 sec for each node
-                }
-                tt += travelTime.getLinkTravelTime(network.getLinks().get(route.getEndLinkId()), startTime, null, null);
-            }
-
-            return tt;
         }
     }
 }
