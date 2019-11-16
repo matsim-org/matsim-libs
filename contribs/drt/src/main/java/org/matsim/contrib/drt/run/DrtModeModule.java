@@ -21,7 +21,6 @@
 package org.matsim.contrib.drt.run;
 
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +53,6 @@ import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -76,12 +74,10 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 	public enum Direction {ACCESS, EGRESS}
 
 	private final DrtConfigGroup drtCfg;
-	private final PlansCalcRouteConfigGroup plansCalcRouteCfg;
 
-	public DrtModeModule(DrtConfigGroup drtCfg, PlansCalcRouteConfigGroup plansCalcRouteCfg) {
+	public DrtModeModule(DrtConfigGroup drtCfg) {
 		super(drtCfg.getMode());
 		this.drtCfg = drtCfg;
-		this.plansCalcRouteCfg = plansCalcRouteCfg;
 	}
 
 	@Override
@@ -100,8 +96,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 			bindModal(RebalancingStrategy.class).to(NoRebalancingStrategy.class).asEagerSingleton();
 		}
 
-		addRoutingModuleBinding(getMode()).toProvider(
-				new DrtRoutingModuleProvider(drtCfg, plansCalcRouteCfg));// not singleton
+		addRoutingModuleBinding(getMode()).toProvider(new DrtRoutingModuleProvider(drtCfg));// not singleton
 
 		modalMapBinder(Direction.class, RoutingModule.class);//empty mapbinder for customising access/egress routing
 		bindModal(DrtStopNetwork.class).toProvider(new DrtStopNetworkProvider(getConfig(), drtCfg)).asEagerSingleton();
@@ -153,25 +148,14 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = new FastAStarEuclideanFactory();
 
 		private final DrtConfigGroup drtCfg;
-		private final boolean insertingAccessEgressWalk;
 
-		private DrtRoutingModuleProvider(DrtConfigGroup drtCfg, PlansCalcRouteConfigGroup plansCalcRouteCfg) {
+		private DrtRoutingModuleProvider(DrtConfigGroup drtCfg) {
 			super(drtCfg.getMode());
 			this.drtCfg = drtCfg;
-			//TODO this is a temporary switch for backward compatibility with (original) DrtRoutingModule
-			//XXX in the long term: always insert access/egress walk by default
-			insertingAccessEgressWalk = drtCfg.getOperationalScheme() != DrtConfigGroup.OperationalScheme.door2door
-					|| plansCalcRouteCfg.isInsertingAccessEgressWalk();
 		}
 
 		@Override
 		public DrtRoutingModule get() {
-			//TODO this is a temporary switch for backward compatibility with (original) DrtRoutingModule
-			//XXX in the long term: always insert non_network_walk by default
-			RoutingModule defaultAccessEgressRoutingModule = insertingAccessEgressWalk ?
-					new NonNetworkWalkRouter(walkRouter) :
-					(fromFacility, toFacility, departureTime, person) -> Collections.emptyList();
-
 			Map<Direction, RoutingModule> accessEgressRouters = getModalInstance(
 					new TypeLiteral<Map<Direction, RoutingModule>>() {
 					});
@@ -181,8 +165,8 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 					getModalInstance(TravelDisutilityFactory.class), scenario);
 
 			return new DrtRoutingModule(drtRouteLegCalculator,
-					accessEgressRouters.getOrDefault(Direction.ACCESS, defaultAccessEgressRoutingModule),
-					accessEgressRouters.getOrDefault(Direction.EGRESS, defaultAccessEgressRoutingModule),
+					accessEgressRouters.getOrDefault(Direction.ACCESS, new NonNetworkWalkRouter(walkRouter)),
+					accessEgressRouters.getOrDefault(Direction.EGRESS, new NonNetworkWalkRouter(walkRouter)),
 					getModalInstance(AccessEgressFacilityFinder.class), drtCfg, scenario,
 					getModalInstance(Network.class));
 		}
