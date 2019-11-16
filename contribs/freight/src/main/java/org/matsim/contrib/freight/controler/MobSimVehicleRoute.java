@@ -1,4 +1,4 @@
-package org.matsim.contrib.freight.mobsim;
+package org.matsim.contrib.freight.controler;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.vehicles.Vehicle;
