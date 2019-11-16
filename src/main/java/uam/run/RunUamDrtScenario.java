@@ -20,14 +20,14 @@
 
 package uam.run;
 
+import static org.matsim.contrib.drt.run.DrtModeModule.Direction;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.routing.DrtRouteLegCalculator;
-import org.matsim.contrib.drt.routing.DrtRoutingModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -39,7 +39,6 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
 import org.matsim.contrib.dvrp.run.ModalProviders;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -47,17 +46,15 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import com.google.inject.Injector;
+import com.google.inject.Provider;
+import com.google.inject.multibindings.MapBinder;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -103,7 +100,9 @@ public class RunUamDrtScenario {
 		controler.addOverridingModule(new AbstractDvrpModeModule(uamCfg.getMode()) {
 			@Override
 			public void install() {
-				addRoutingModuleBinding(getMode()).toProvider(new UamRoutingModuleProvider(uamCfg));// not singleton
+				MapBinder<Direction, RoutingModule> mapBinder = modalMapBinder(Direction.class, RoutingModule.class);
+				mapBinder.addBinding(Direction.ACCESS).toProvider(new UamAccessEgressRoutingModuleProvider("drt"));
+				mapBinder.addBinding(Direction.EGRESS).toProvider(new UamAccessEgressRoutingModuleProvider("car"));
 			}
 		});
 
@@ -115,41 +114,20 @@ public class RunUamDrtScenario {
 		controler.run();
 	}
 
-	private static class UamRoutingModuleProvider extends ModalProviders.AbstractProvider<DrtRoutingModule> {
+	private static class UamAccessEgressRoutingModuleProvider implements Provider<RoutingModule> {
 		@Inject
-		@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
-		private TravelTime travelTime;
+		private Injector injector;
 
-		@Inject
-		private Scenario scenario;
+		private final String mode;
 
-		@Inject
-		private TripRouter tripRouter;
-
-		private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = new FastAStarEuclideanFactory();
-
-		private final DrtConfigGroup drtCfg;
-
-		private UamRoutingModuleProvider(DrtConfigGroup drtCfg) {
-			super(drtCfg.getMode());
-			this.drtCfg = drtCfg;
+		private UamAccessEgressRoutingModuleProvider(String mode) {
+			this.mode = mode;
 		}
 
 		@Override
-		public DrtRoutingModule get() {
-			RoutingModule accessRoutingModule = (fromFacility, toFacility, departureTime, person) -> tripRouter.calcRoute(
-					"drt", fromFacility, toFacility, departureTime, person);
-			RoutingModule egressRoutingModule = (fromFacility, toFacility, departureTime, person) -> tripRouter.calcRoute(
-					"car", fromFacility, toFacility, departureTime, person);
-
-			Network network = getModalInstance(Network.class);
-			DrtRouteLegCalculator drtRouteLegCalculator = new DrtRouteLegCalculator(drtCfg, network,
-					leastCostPathCalculatorFactory, travelTime, getModalInstance(TravelDisutilityFactory.class),
-					scenario);
-
-			return new DrtRoutingModule(drtRouteLegCalculator, accessRoutingModule, egressRoutingModule,
-					getModalInstance(DrtRoutingModule.AccessEgressFacilityFinder.class), drtCfg, scenario,
-					getModalInstance(Network.class));
+		public RoutingModule get() {
+			return (fromFacility, toFacility, departureTime, person) -> injector.getInstance(TripRouter.class)
+					.calcRoute(mode, fromFacility, toFacility, departureTime, person);
 		}
 	}
 
