@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.vsp.modalCadyts;
+package playground.vsp.cadyts.marginals;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,9 +50,6 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.*;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
-import playground.vsp.cadyts.marginals.DistanceDistribution;
-import playground.vsp.cadyts.marginals.ModalDistanceCadytsContext;
-import playground.vsp.cadyts.marginals.ModalDistanceCadytsModule;
 
 import javax.inject.Inject;
 import java.util.Arrays;

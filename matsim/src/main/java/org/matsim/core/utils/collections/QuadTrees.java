@@ -18,38 +18,53 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.edrt.run;
+package org.matsim.core.utils.collections;
 
-import org.matsim.contrib.drt.analysis.DrtModeAnalysisModule;
-import org.matsim.contrib.drt.routing.MultiModeDrtMainModeIdentifier;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.run.DrtModeModule;
-import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.router.MainModeIdentifier;
+import java.util.Collection;
+import java.util.function.Function;
 
-import com.google.inject.Inject;
+import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Coord;
+
+import com.google.common.base.Preconditions;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class MultiModeEDrtModule extends AbstractModule {
+public class QuadTrees {
+	public static <E extends BasicLocation> QuadTree<E> createQuadTree(Collection<E> elements) {
+		return createQuadTree(elements, BasicLocation::getCoord, 0);
+	}
 
-	@Inject
-	private MultiModeDrtConfigGroup multiModeDrtCfg;
+	public static <E> QuadTree<E> createQuadTree(Collection<E> elements, Function<E, Coord> coordFunction,
+			double buffer) {
+		Preconditions.checkArgument(buffer >= 0, "Only non-negative buffer allowed");
+		double minX = Double.POSITIVE_INFINITY;
+		double minY = Double.POSITIVE_INFINITY;
+		double maxX = Double.NEGATIVE_INFINITY;
+		double maxY = Double.NEGATIVE_INFINITY;
 
-	@Inject
-	private PlansCalcRouteConfigGroup plansCalcRouteCfg;
-
-	@Override
-	public void install() {
-		for (DrtConfigGroup drtCfg : multiModeDrtCfg.getModalElements()) {
-			install(new DrtModeModule(drtCfg, plansCalcRouteCfg));
-			installQSimModule(new EDrtModeQSimModule(drtCfg));
-			install(new DrtModeAnalysisModule(drtCfg));
+		for (E e : elements) {
+			Coord c = coordFunction.apply(e);
+			if (c.getX() < minX) {
+				minX = c.getX();
+			}
+			if (c.getY() < minY) {
+				minY = c.getY();
+			}
+			if (c.getX() > maxX) {
+				maxX = c.getX();
+			}
+			if (c.getY() > maxY) {
+				maxY = c.getY();
+			}
 		}
 
-		bind(MainModeIdentifier.class).toInstance(new MultiModeDrtMainModeIdentifier(multiModeDrtCfg));
+		QuadTree<E> quadTree = new QuadTree<E>(minX - buffer, minY - buffer, maxX + buffer, maxY + buffer);
+		for (E stop : elements) {
+			Coord c = coordFunction.apply(stop);
+			quadTree.put(c.getX(), c.getY(), stop);
+		}
+		return quadTree;
 	}
 }

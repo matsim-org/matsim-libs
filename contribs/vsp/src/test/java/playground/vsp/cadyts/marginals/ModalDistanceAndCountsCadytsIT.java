@@ -1,4 +1,4 @@
-package playground.vsp.modalCadyts;
+package playground.vsp.cadyts.marginals;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -8,8 +8,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -40,9 +38,6 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
-import playground.vsp.cadyts.marginals.DistanceDistribution;
-import playground.vsp.cadyts.marginals.ModalDistanceCadytsContext;
-import playground.vsp.cadyts.marginals.ModalDistanceCadytsModule;
 
 import javax.inject.Inject;
 import java.util.*;
@@ -98,16 +93,16 @@ public class ModalDistanceAndCountsCadytsIT {
 		config.counts().setAverageCountsOverIterations(1);
 
 		PlanCalcScoreConfigGroup.ActivityParams home = new PlanCalcScoreConfigGroup.ActivityParams("home");
-		home.setMinimalDuration(1 * 3600);
-		home.setTypicalDuration(1 * 3600);
-		home.setEarliestEndTime(0 * 3600);
+		home.setMinimalDuration(3600);
+		home.setTypicalDuration(3600);
+		home.setEarliestEndTime(0);
 		config.planCalcScore().addActivityParams(home);
 
 		PlanCalcScoreConfigGroup.ActivityParams work = new PlanCalcScoreConfigGroup.ActivityParams("work");
-		work.setMinimalDuration(1 * 3600);
-		work.setTypicalDuration(1 * 3600);
-		work.setEarliestEndTime(0 * 3600);
-		work.setOpeningTime(1 * 3600);
+		work.setMinimalDuration(3600);
+		work.setTypicalDuration(3600);
+		work.setEarliestEndTime(0);
+		work.setOpeningTime(3600);
 		work.setClosingTime(10 * 3600);
 		config.planCalcScore().addActivityParams(work);
 
@@ -273,15 +268,12 @@ public class ModalDistanceAndCountsCadytsIT {
 		Counts<Link> counts = createCounts();
 		scenario.addScenarioElement(Counts.ELEMENT_NAME, counts);
 
-		LinkIdEventHandler linkIdEventHandler = new LinkIdEventHandler();
-
 		Controler controler = new Controler(scenario);
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(DistanceDistribution.class).toInstance(createDistanceDistribution());
-				addEventHandlerBinding().toInstance(linkIdEventHandler);
 			}
 		});
 		controler.addOverridingModule(new ModalDistanceCadytsModule());
@@ -378,22 +370,5 @@ public class ModalDistanceAndCountsCadytsIT {
 		count.createVolume(1, 1000);
 
 		return counts;
-	}
-
-	private static class LinkIdEventHandler implements LinkLeaveEventHandler {
-
-		private Map<Id<Link>, Integer> visitedLinks = new HashMap<>();
-
-		@Override
-		public void handleEvent(LinkLeaveEvent event) {
-			if (event.getLinkId().equals(Id.createLinkId("long-link")) || event.getLinkId().equals(Id.createLinkId("short-link")) || event.getLinkId().equals(Id.createLinkId("counts-link"))) {
-				visitedLinks.merge(event.getLinkId(), 1, Integer::sum);
-			}
-		}
-
-		@Override
-		public void reset(int iteration) {
-			visitedLinks.clear();
-		}
 	}
 }

@@ -18,25 +18,37 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.ev.fleet;
+package org.matsim.contrib.drt.routing;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.ev.charging.ChargingPower;
-import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
-import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
+import java.util.List;
 
-import com.google.common.collect.ImmutableMap;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.facilities.Facility;
 
-public class ElectricFleets {
-	public static ElectricFleet createDefaultFleet(ElectricFleetSpecification fleetSpecification,
-			DriveEnergyConsumption.Factory driveConsumptionFactory, AuxEnergyConsumption.Factory auxConsumptionFactory,
-			ChargingPower.Factory chargingFactory) {
-		ImmutableMap<Id<ElectricVehicle>, ElectricVehicle> vehicles = fleetSpecification.getVehicleSpecifications()
-				.values()
-				.stream()
-				.map(s -> ElectricVehicleImpl.create(s, driveConsumptionFactory, auxConsumptionFactory,
-						chargingFactory))
-				.collect(ImmutableMap.toImmutableMap(ElectricVehicle::getId, v -> v));
-		return () -> vehicles;
+import one.util.streamex.StreamEx;
+
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public final class NonNetworkWalkRouter implements RoutingModule {
+	private final RoutingModule walkRouter;
+
+	public NonNetworkWalkRouter(RoutingModule walkRouter) {
+		this.walkRouter = walkRouter;
+	}
+
+	@Override
+	public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime,
+			Person person) {
+		List<? extends PlanElement> result = walkRouter.calcRoute(fromFacility, toFacility, departureTime, person);
+		StreamEx.of(result)
+				.select(Leg.class)
+				.filterBy(Leg::getMode, TransportMode.walk)
+				.forEach(leg -> leg.setMode(TransportMode.non_network_walk));
+		return result;
 	}
 }

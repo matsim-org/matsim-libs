@@ -95,14 +95,12 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 				eventsManager.processEvent(
 						new PassengerRequestRejectedEvent(mobsimTimer.getTimeOfDay(), drtCfg.getMode(), req.getId(),
 								req.getPassengerId(), NO_INSERTION_FOUND_CAUSE));
-				if (drtCfg.isPrintDetailedWarnings()) {
-					log.warn("No insertion found for drt request "
-							+ req
-							+ " from passenger id="
-							+ req.getPassengerId()
-							+ " fromLinkId="
-							+ req.getFromLink().getId());
-				}
+				log.debug("No insertion found for drt request "
+						+ req
+						+ " from passenger id="
+						+ req.getPassengerId()
+						+ " fromLinkId="
+						+ req.getFromLink().getId());
 			} else {
 				eventsManager.processEvent(
 						new PassengerRequestAcceptedEvent(mobsimTimer.getTimeOfDay(), drtCfg.getMode(), req.getId(),

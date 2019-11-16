@@ -18,25 +18,33 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.ev.fleet;
+package org.matsim.contrib.drt.routing;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.ev.charging.ChargingPower;
-import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
-import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
+import java.util.Optional;
 
-import com.google.common.collect.ImmutableMap;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.routing.DrtRoutingModule.AccessEgressFacilityFinder;
+import org.matsim.core.router.LinkWrapperFacility;
+import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.facilities.Facility;
 
-public class ElectricFleets {
-	public static ElectricFleet createDefaultFleet(ElectricFleetSpecification fleetSpecification,
-			DriveEnergyConsumption.Factory driveConsumptionFactory, AuxEnergyConsumption.Factory auxConsumptionFactory,
-			ChargingPower.Factory chargingFactory) {
-		ImmutableMap<Id<ElectricVehicle>, ElectricVehicle> vehicles = fleetSpecification.getVehicleSpecifications()
-				.values()
-				.stream()
-				.map(s -> ElectricVehicleImpl.create(s, driveConsumptionFactory, auxConsumptionFactory,
-						chargingFactory))
-				.collect(ImmutableMap.toImmutableMap(ElectricVehicle::getId, v -> v));
-		return () -> vehicles;
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public class DecideOnLinkAccessEgressFacilityFinder implements AccessEgressFacilityFinder {
+	private final Network network;
+
+	public DecideOnLinkAccessEgressFacilityFinder(Network network) {
+		this.network = network;
+	}
+
+	@Override
+	public Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility) {
+		LinkWrapperFacility accessFacility = new LinkWrapperFacility(
+				FacilitiesUtils.decideOnLink(fromFacility, network));
+		LinkWrapperFacility egressFacility = new LinkWrapperFacility(FacilitiesUtils.decideOnLink(toFacility, network));
+		return Optional.of(ImmutablePair.of(accessFacility, egressFacility));
 	}
 }
