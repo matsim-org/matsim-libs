@@ -1,4 +1,4 @@
-package org.matsim.contrib.freight.replanning.modules;
+package org.matsim.contrib.freight.controler;
 
 import java.io.File;
 import java.util.Collection;
@@ -30,7 +30,7 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;
 import org.matsim.core.router.util.TravelTime;
 
-public class VehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
+class VehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
 
     private final Network network;
 //

@@ -1,4 +1,4 @@
-package org.matsim.contrib.freight.mobsim;
+package org.matsim.contrib.freight.controler;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -11,7 +11,6 @@ import org.matsim.contrib.freight.carrier.Tour.Delivery;
 import org.matsim.contrib.freight.carrier.Tour.Pickup;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.contrib.freight.scoring.FreightActivity;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;

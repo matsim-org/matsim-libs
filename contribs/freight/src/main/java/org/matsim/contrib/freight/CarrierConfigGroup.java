@@ -22,6 +22,7 @@
 
 package org.matsim.contrib.freight;
 
+import org.matsim.contrib.freight.controler.WithinDayActivityReScheduling;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 public class CarrierConfigGroup extends ReflectiveConfigGroup {
@@ -49,7 +50,7 @@ public class CarrierConfigGroup extends ReflectiveConfigGroup {
      * <p>The default value is false. Time windows will be ignored by the physical simulation, leaving treatment
      * of early arrival to the Scoring.
      *
-     * @see org.matsim.contrib.freight.mobsim.WithinDayActivityReScheduling
+     * @see WithinDayActivityReScheduling
      */
     @Deprecated
     public void setPhysicallyEnforceTimeWindowBeginnings(boolean physicallyEnforceTimeWindowBeginnings) {

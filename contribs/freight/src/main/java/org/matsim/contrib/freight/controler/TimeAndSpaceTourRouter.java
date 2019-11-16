@@ -1,4 +1,4 @@
-package org.matsim.contrib.freight.router;
+package org.matsim.contrib.freight.controler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ import org.matsim.vehicles.VehicleType;
  * @author sschroeder
  *
  */
-public class TimeAndSpaceTourRouter {
+class TimeAndSpaceTourRouter {
 	
 	static class MatsimVehicleAdapter implements Vehicle {
 
