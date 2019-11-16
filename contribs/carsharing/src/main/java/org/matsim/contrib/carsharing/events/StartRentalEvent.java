@@ -21,7 +21,7 @@ public class StartRentalEvent extends Event implements HasPersonId{
 	private final Id<Link> destinationLinkId;
 
 	private final Id<Person> personId;
-	
+
 	private final String vehicleId;
 	
 	private String carsharingType;
@@ -36,7 +36,6 @@ public class StartRentalEvent extends Event implements HasPersonId{
 		this.originlinkId = currentLink.getId();
 		this.pickuplinkId = stationLink.getId();
 		this.destinationLinkId = destinationLink.getId();
-
 		this.personId = id;
 		this.vehicleId = vehId;
 		this.carsharingType = carsharingType;
@@ -92,17 +91,4 @@ public class StartRentalEvent extends Event implements HasPersonId{
 		return attr;
 	}	
 	
-	@Override
-	public String toString() {
-		Map<String,String> attr = this.getAttributes() ;
-		StringBuilder eventXML = new StringBuilder("\t<event ");
-		for (Map.Entry<String, String> entry : attr.entrySet()) {
-			eventXML.append(entry.getKey());
-			eventXML.append("=\"");
-			eventXML.append(entry.getValue());
-			eventXML.append("\" ");
-		}
-		eventXML.append(" />");
-		return eventXML.toString();
-	} 
 }
