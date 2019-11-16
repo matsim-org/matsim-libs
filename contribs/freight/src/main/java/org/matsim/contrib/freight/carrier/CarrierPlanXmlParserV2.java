@@ -7,16 +7,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.Builder;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.utils.objectattributes.AttributeConverter;
+import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.matsim.vehicles.*;
 import org.matsim.vehicles.EngineInformation.FuelType;
 import org.xml.sax.Attributes;
@@ -30,6 +34,8 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 	public static final String LINKID = "linkId";
 	public static final String SHIPMENTS = "shipments";
 	public static final String SHIPMENT = "shipment";
+	static final String SERVICES = "services";
+	static final String SERVICE = "service";
 	public static final String ID = "id";
 	public static final String FROM = "from";
 	public static final String TO = "to";
@@ -44,9 +50,13 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 	private static final String VEHICLEEND = "latestEnd";
 	private static final String VEHICLE_TYPES_MSG = "It used to be possible to have vehicle types both in the plans file, and in a separate file.  The " +
 										  "first option is no longer possible." ;
+	private static final String ATTRIBUTES = "attributes";
+	private static final String ATTRIBUTE = "attribute";
 
 	private Carrier currentCarrier = null;
 	private CarrierVehicle currentVehicle = null;
+	private CarrierService currentService = null;
+	private CarrierShipment currentShipment = null;
 	private Tour.Builder currentTourBuilder = null;
 	private Id<Link> previousActLoc = null;
 	private String previousRouteContent;
@@ -67,6 +77,10 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 	private Map<Id<CarrierService>, CarrierService> serviceMap;
 //	private VehicleType vehicleType;
 
+	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
+	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes =
+			new org.matsim.utils.objectattributes.attributable.Attributes();
+
 	/**
 	 * Constructs a reader with an empty carriers-container for the carriers to be constructed. 
 	 *
@@ -77,6 +91,15 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 		this.carriers = carriers;
 	}
 
+	public void putAttributeConverter( final Class<?> clazz , AttributeConverter<?> converter ) {
+		attributesReader.putAttributeConverter( clazz , converter );
+	}
+
+	@Inject
+	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
+		attributesReader.putAttributeConverters( converters );
+	}
+
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if (name.equals(CARRIER)) {
@@ -85,10 +108,10 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 			currentCarrier = CarrierUtils.createCarrier(Id.create(id, Carrier.class ) );
 		}
 		//services
-		else if (name.equals("services")) {
+		else if (name.equals(SERVICES)) {
 			serviceMap = new HashMap<>();
 		}
-		else if (name.equals("service")) {
+		else if (name.equals(SERVICE)) {
 			String idString = atts.getValue("id");
 			if(idString == null) throw new IllegalStateException("service.id is missing.");
 			Id<CarrierService> id = Id.create(idString, CarrierService.class);
@@ -106,9 +129,9 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 			serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(start, end));
 			String serviceTimeString = atts.getValue("serviceDuration");
 			if(serviceTimeString != null) serviceBuilder.setServiceDuration(parseTimeToDouble(serviceTimeString));
-			CarrierService service = serviceBuilder.build();
-			serviceMap.put(service.getId(), service);
-			CarrierUtils.addService(currentCarrier, service);
+			currentService =  serviceBuilder.build();
+			serviceMap.put(currentService.getId(), currentService);
+			CarrierUtils.addService(currentCarrier, currentService);
 		}
 
 		//shipments
@@ -140,9 +163,9 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 			if (pickupServiceTime != null) shipmentBuilder.setPickupServiceTime(parseTimeToDouble(pickupServiceTime));
 			if (deliveryServiceTime != null) shipmentBuilder.setDeliveryServiceTime(parseTimeToDouble(deliveryServiceTime));
 
-			CarrierShipment shipment = shipmentBuilder.build();
-			currentShipments.put(atts.getValue(ID), shipment);
-			CarrierUtils.addShipment(currentCarrier, shipment);
+			currentShipment = shipmentBuilder.build();
+			currentShipments.put(atts.getValue(ID), currentShipment);
+			CarrierUtils.addShipment(currentCarrier, currentShipment);
 //			currentCarrier.getShipments().put(shipment.getId(), shipment);
 		}
 
@@ -284,7 +307,25 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 				finishLeg(currentVehicle.getLocation());
 				currentTourBuilder.scheduleEnd(currentVehicle.getLocation(), TimeWindow.newInstance(currentVehicle.getEarliestStartTime(),currentVehicle.getLatestEndTime()));
 			}
-
+		}
+		else if(name.equals(ATTRIBUTES)) {
+			switch( context.peek() ) {
+				case CARRIER:
+					currAttributes = currentCarrier.getAttributes();
+					break;
+				case SERVICE:
+					currAttributes = currentService.getAttributes();
+					break;
+				case SHIPMENT:
+					currAttributes = currentShipment.getAttributes();
+					break;
+				default:
+					throw new RuntimeException( "could not derive context for attributes. context=" + context.peek() );
+			}
+			attributesReader.startTag( name , atts , context, currAttributes );
+		}
+		else if (name.equals(ATTRIBUTE)) {
+			attributesReader.startTag( name , atts , context, currAttributes );
 		}
 	}
 
@@ -308,7 +349,11 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 		}
 
 		else if (name.equals("carrier")) {
+			Gbl.assertNotNull( currentCarrier );
+			Gbl.assertNotNull( carriers );
+			Gbl.assertNotNull( carriers.getCarriers() );
 			carriers.getCarriers().put(currentCarrier.getId(), currentCarrier);
+			currentCarrier = null;
 		}
 		else if (name.equals("plan")) {
 			CarrierPlan currentPlan = new CarrierPlan( currentCarrier, scheduledTours );
@@ -325,6 +370,18 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 		else if(name.equals("description")){
 			throw new RuntimeException( VEHICLE_TYPES_MSG ) ;
 //			vehicleType.setDescription(content );
+		}
+		else if(name.equals(SERVICE)){
+			this.currentService = null;
+		}
+		else if(name.equals(SHIPMENT)){
+			this.currentShipment = null;
+		}
+		else if(name.equals(ATTRIBUTE)){
+			this.attributesReader.endTag(name, content, context);
+		}
+		else if(name.equals(ATTRIBUTES)){
+			this.currAttributes = null;
 		}
 	}
 

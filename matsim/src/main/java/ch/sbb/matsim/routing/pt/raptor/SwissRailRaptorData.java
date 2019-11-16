@@ -14,6 +14,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.transitSchedule.TransitScheduleUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.MinimalTransferTimes;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -161,26 +162,8 @@ public class SwissRailRaptorData {
         }
 
         // only put used transit stops into the quad tree
-        double minX = Double.POSITIVE_INFINITY;
-        double minY = Double.POSITIVE_INFINITY;
-        double maxX = Double.NEGATIVE_INFINITY;
-        double maxY = Double.NEGATIVE_INFINITY;
         Set<TransitStopFacility> stops = routeStopsPerStopFacility.keySet();
-        for (TransitStopFacility stopFacility : stops) {
-            double x = stopFacility.getCoord().getX();
-            double y = stopFacility.getCoord().getY();
-
-            if (x < minX) minX = x;
-            if (y < minY) minY = y;
-            if (x > maxX) maxX = x;
-            if (y > maxY) maxY = y;
-        }
-        QuadTree<TransitStopFacility> stopsQT = new QuadTree<>(minX, minY, maxX, maxY);
-        for (TransitStopFacility stopFacility : stops) {
-            double x = stopFacility.getCoord().getX();
-            double y = stopFacility.getCoord().getY();
-            stopsQT.put(x, y, stopFacility);
-        }
+        QuadTree<TransitStopFacility> stopsQT = TransitScheduleUtils.createQuadTreeOfTransitStopFacilities(stops);
         int countStopFacilities = stops.size();
 
         Map<Integer, RTransfer[]> allTransfers = calculateRouteStopTransfers(schedule, stopsQT, routeStopsPerStopFacility, routeStops, staticConfig);

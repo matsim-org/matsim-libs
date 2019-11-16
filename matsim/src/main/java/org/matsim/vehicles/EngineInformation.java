@@ -30,9 +30,7 @@ public final class EngineInformation implements Attributable {
 
 	private Attributes attributes = new Attributes() ;
 
-	/* package-private */ EngineInformation() {
-		// yyyy leaving this public for the time being because otherwise the carrier vehicle type reading logic needs to change completely.  kai, sep'19
-	}
+	/* package-private */ EngineInformation() { }
 	@Deprecated
 	public FuelType getFuelType() {
 		return VehicleUtils.getFuelType( this ) ;
@@ -42,12 +40,14 @@ public final class EngineInformation implements Attributable {
 		return VehicleUtils.getFuelConsumption(this);
 	}
 	@Deprecated
-	public void setFuelType( FuelType fueltype ) {
+	public EngineInformation setFuelType( FuelType fueltype ) {
 		VehicleUtils.setFuelType(this, fueltype);
+		return this ;
 	}
 	@Deprecated
-	public void setFuelConsumption( double literPerMeter ) {
+	public EngineInformation setFuelConsumption( double literPerMeter ) {
 		VehicleUtils.setFuelConsumption(this, literPerMeter);
+		return this ;
 	}
 	public Attributes getAttributes(){
 		return attributes ;

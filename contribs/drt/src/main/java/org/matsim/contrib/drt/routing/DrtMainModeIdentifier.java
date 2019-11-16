@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
+import org.matsim.core.router.TripRouter;
 
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class DrtMainModeIdentifier implements MainModeIdentifier{
 				if (((Activity) pe).getType().equals(drtStageActivityType.drtStageActivity))
 					return mode;
 			} else if (pe instanceof Leg) {
-				if (((Leg) pe).getMode().equals(drtStageActivityType.drtWalk)) {
+				if (((Leg) pe).getMode().equals(TripRouter.getFallbackMode(mode))) {
 					return mode;
 				}
 			}

@@ -51,6 +51,7 @@ public final class PopulationAgentSource implements AgentSource {
 	private final QSim qsim;
 	private final Collection<String> mainModes;
 	private Map<Id<Vehicle>,Id<Link>> seenVehicleIds = new HashMap<>() ;
+    private int warnCnt = 0;
 
 	@Inject
 	PopulationAgentSource( Population population, AgentFactory agentFactory, QVehicleFactory qVehicleFactory, QSim qsim ) {
@@ -141,7 +142,13 @@ public final class PopulationAgentSource implements AgentSource {
 			// Checking if the vehicle has been seen before:
 			Id<Link> result = this.seenVehicleIds.get( vehicleId ) ;
 			if ( result != null ) {
-				log.info( "have seen vehicle with id " + vehicleId + " before; not placing it again." );
+                if (warnCnt <= 5) {
+                    log.info("have seen vehicle with id " + vehicleId + " before; not placing it again.");
+                }
+                if (warnCnt == 5) {
+                    log.warn(Gbl.FUTURE_SUPPRESSED);
+                }
+                warnCnt++;
 				if ( result != vehicleLinkId ) {
 					throw new RuntimeException("vehicle placement error: vehicleId=" + vehicleId +
 											   "; previous placement link=" + vehicleLinkId + "; current placement link=" + result ) ;

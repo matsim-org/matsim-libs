@@ -109,7 +109,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	static final String OP_SCHEME_EXP = "Operational Scheme, either of door2door, stopbased or serviceAreaBased. door2door by default";
 
 	public static final String MAX_WALK_DISTANCE = "maxWalkDistance";
-	static final String MAX_WALK_EXP = "Maximum desired walk distance (in meters) to next stop location in stopbased system. If no suitable stop is found in that range, the search radius will be extended in steps of maxWalkDistance until a stop is found.";
+	static final String MAX_WALK_EXP = "Maximum beeline distance (in meters) to next stop location in stopbased system for access/egress walk leg to/from drt. If no stop can be found within this maximum distance will return a direct walk of type drtMode_walk";
 
 	public static final String ESTIMATED_DRT_SPEED = "estimatedDrtSpeed";
 	static final String ESTIMATED_DRT_SPEED_EXP =
@@ -174,7 +174,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	private OperationalScheme operationalScheme = OperationalScheme.door2door;
 
 	@PositiveOrZero // used only for stopbased DRT scheme
-	private double maxWalkDistance = 0;// [m];
+	private double maxWalkDistance = Double.MAX_VALUE;// [m];
 
 	@PositiveOrZero
 	private double estimatedDrtSpeed = 25. / 3.6;// [m/s]

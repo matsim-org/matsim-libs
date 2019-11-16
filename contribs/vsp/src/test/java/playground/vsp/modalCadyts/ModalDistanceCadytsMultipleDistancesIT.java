@@ -291,7 +291,7 @@ public class ModalDistanceCadytsMultipleDistancesIT {
 
 	private static DistanceDistribution createDistanceDistribution() {
 
-		DistanceDistribution result = new DistanceDistribution(1.0);
+		DistanceDistribution result = new DistanceDistribution();
 		result.add(TransportMode.car, 2050, 2149, 10, 250);
 		result.add(TransportMode.car, 2150, 2249, 10, 250);
 		result.add(TransportMode.bike, 2050, 2149, 10, 250);

@@ -18,44 +18,36 @@
 
 package org.matsim.contrib.drt.routing;
 
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.Collections;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.util.distance.DistanceUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * @author michalm
  */
 public class DefaultAccessEgressStopFinder implements AccessEgressStopFinder {
+	private static final Logger LOGGER = Logger.getLogger(DefaultAccessEgressStopFinder.class);
 
 	private final Network network;
-	private final Map<Id<TransitStopFacility>, TransitStopFacility> stops;
-	private final double maxWalkDistance;
-	private final double walkBeelineFactor;
+	private final double maxDistance;
+	private final double extensionRadius = 300.0; // not configurable, not sure whether it should be - gl-oct'19
+	private final QuadTree<TransitStopFacility> stopsQT;
 
-	public DefaultAccessEgressStopFinder(TransitSchedule transitSchedule, DrtConfigGroup drtconfig,
-			PlansCalcRouteConfigGroup planscCalcRouteCfg, Network network) {
+	public DefaultAccessEgressStopFinder(double maxDistance, Network network, QuadTree<TransitStopFacility> stopsQT) {
 		this.network = network;
-		this.stops = transitSchedule.getFacilities();
-		this.maxWalkDistance = drtconfig.getMaxWalkDistance();
-		this.walkBeelineFactor = planscCalcRouteCfg.getModeRoutingParams()
-				.get(TransportMode.walk)
-				.getBeelineDistanceFactor();
+		this.maxDistance = maxDistance;
+		this.stopsQT = stopsQT;
 	}
 
 	@Override
@@ -77,7 +69,7 @@ public class DefaultAccessEgressStopFinder implements AccessEgressStopFinder {
 	private TransitStopFacility findAccessFacility(Facility fromFacility, Facility toFacility) {
 		Coord fromCoord = StopBasedDrtRoutingModule.getFacilityCoord(fromFacility, network);
 		Coord toCoord = StopBasedDrtRoutingModule.getFacilityCoord(toFacility, network);
-		Set<TransitStopFacility> stopCandidates = findStopCandidates(fromCoord);
+		Collection<TransitStopFacility> stopCandidates = findStopCandidates(fromCoord);
 		TransitStopFacility accessFacility = null;
 		double bestHeading = Double.MAX_VALUE;
 		for (TransitStopFacility stop : stopCandidates) {
@@ -101,7 +93,7 @@ public class DefaultAccessEgressStopFinder implements AccessEgressStopFinder {
 	private TransitStopFacility findEgressFacility(TransitStopFacility fromStopFacility, Facility toFacility) {
 		Coord fromCoord = fromStopFacility.getCoord();
 		Coord toCoord = StopBasedDrtRoutingModule.getFacilityCoord(toFacility, network);
-		Set<TransitStopFacility> stopCandidates = findStopCandidates(toCoord);
+		Collection<TransitStopFacility> stopCandidates = findStopCandidates(toCoord);
 
 		TransitStopFacility egressFacility = null;
 		double bestHeading = Double.MAX_VALUE;
@@ -131,19 +123,23 @@ public class DefaultAccessEgressStopFinder implements AccessEgressStopFinder {
 				destinationVector[0] * destinationVector[0] + destinationVector[1] * destinationVector[1])));
 	}
 
-	private Set<TransitStopFacility> findStopCandidates(Coord coord) {
-		Set<TransitStopFacility> candidates = new LinkedHashSet<>();
-		double extensionRadius = 0.0;
-		while (candidates.isEmpty()) {
-			double maxBeelineDistance = ((maxWalkDistance + extensionRadius) / walkBeelineFactor);
-			double maxSquaredBeelineDistance = maxBeelineDistance * maxBeelineDistance;
-			candidates = stops.values().stream()
-					.filter(s -> DistanceUtils.calculateSquaredDistance(coord, s.getCoord())
-							< maxSquaredBeelineDistance)
-					.collect(Collectors.toSet());
-			extensionRadius += maxWalkDistance;
+	private Collection<TransitStopFacility> findStopCandidates(Coord coord) {
+		TransitStopFacility closestStop = stopsQT.getClosest(coord.getX(), coord.getY());
+		if (closestStop == null) {
+			// no stops, e.g. empty TransitSchedule file loaded / no suitable links in drt service area
+			LOGGER.error("No drt stop could be found for coord x="
+					+ coord.getX()
+					+ ", y="
+					+ coord.getY()
+					+ " (neither within nor outside the maxWalkDistance).");
+			throw new RuntimeException("No drt stop could be found");
 		}
-		return candidates;
+		double closestStopDistance = CoordUtils.calcEuclideanDistance(coord, closestStop.getCoord());
+		if (closestStopDistance > maxDistance) {
+			return Collections.emptySet();
+		}
+		double searchRadius = Math.min(closestStopDistance + extensionRadius, maxDistance);
+		return stopsQT.getDisk(coord.getX(), coord.getY(), searchRadius);
 	}
 
 	private double[] getVector(Coord from, Coord to) {

@@ -27,6 +27,7 @@ import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.VehicleType;
 
@@ -46,9 +47,11 @@ public class FreightUtils {
 	 */
 	@Deprecated
 	public static final String CARRIERS = "carriers" ;
+	private static final String CARRIERVEHICLETYPES = "carrierVehicleTypes";
 	private static final Logger log = Logger.getLogger(FreightUtils.class );
 
 	private static final String ATTR_SKILLS = "skills";
+
 	/**
 	 * Creates a new {@link Carriers} container only with {@link CarrierShipment}s for creating a new VRP.
 	 * As consequence of the transformation of {@link CarrierService}s to {@link CarrierShipment}s the solution of the VRP can have tours with
@@ -79,7 +82,8 @@ public class FreightUtils {
 		return carriersWithShipments;
 	}
 
-	public static Carriers getCarriers( Scenario scenario ){
+	public static Carriers getOrCreateCarriers( Scenario scenario ){
+		// I have separated getOrCreateCarriers and getCarriers, since when the controler is started, it is  better to fail if the carriers are not found.  kai, oct'19
 		Carriers carriers = (Carriers) scenario.getScenarioElement( CARRIERS );
 		if ( carriers==null ) {
 			carriers = new Carriers(  ) ;
@@ -87,12 +91,28 @@ public class FreightUtils {
 		}
 		return carriers;
 	}
+
+	public static Carriers getCarriers( Scenario scenario ){
+		// I have separated getOrCreateCarriers and getCarriers, since when the controler is started, it is better to fail if the carriers are not found.  kai, oct'19
+		return (Carriers) scenario.getScenarioElement( CARRIERS );
+	}
+
+	public static CarrierVehicleTypes getCarrierVehicleTypes( Scenario scenario ){
+		CarrierVehicleTypes types = (CarrierVehicleTypes) scenario.getScenarioElement( CARRIERVEHICLETYPES );
+		if ( types==null ) {
+			types = new CarrierVehicleTypes(  ) ;
+			scenario.addScenarioElement( CARRIERVEHICLETYPES, types );
+		}
+		return types;
+	}
+
 	public static void loadCarriersAccordingToFreightConfig( Scenario scenario ){
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule( scenario.getConfig(), FreightConfigGroup.class ) ;
-		Carriers carriers = getCarriers( scenario ); // also registers with scenario
-		new CarrierPlanXmlReader( carriers ).readFile( freightConfigGroup.getCarriersFile() );
-		CarrierVehicleTypes vehTypes = new CarrierVehicleTypes();
-		new CarrierVehicleTypeReader( vehTypes ).readFile( freightConfigGroup.getCarriersVehicleTypesFile() );
+
+		Carriers carriers = getOrCreateCarriers( scenario ); // also registers with scenario
+		new CarrierPlanXmlReader( carriers ).readURL( IOUtils.extendUrl(scenario.getConfig().getContext(), freightConfigGroup.getCarriersFile()) );
+		CarrierVehicleTypes vehTypes = getCarrierVehicleTypes(scenario);
+		new CarrierVehicleTypeReader( vehTypes ).readURL( IOUtils.extendUrl(scenario.getConfig().getContext(), freightConfigGroup.getCarriersVehicleTypesFile()) );
 		new CarrierVehicleTypeLoader( carriers ).loadVehicleTypes( vehTypes );
 	}
 

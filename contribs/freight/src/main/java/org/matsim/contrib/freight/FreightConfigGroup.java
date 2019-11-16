@@ -32,12 +32,10 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
 
     public static final String GROUPNAME="freight" ;
 
-    @NotBlank
     private String carriersFile;
     public static final String CARRIERSFILEDE = "carriersFile";
     private static final String CARRIERSFILEDESC = "Freight Carriers File, according to MATSim freight contrib";
 
-    @NotBlank
     private String carriersVehicleTypesFile;
     public static final String CARRIERSVEHICLETYPED = "carriersVehicleTypeFile";
     private static final String CARRIERSVEHICLETYPEDESC = "Carrier Vehicle Types file, according to MATSim freight contrib";
@@ -101,7 +99,7 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
      * @return travelTimeSliceWidth --{@value #TRAVELTIMESLICEWIDTHDESC}
      */
 //    @StringGetter(TRAVELTIMESLICEWIDTH)
-    int getTravelTimeSliceWidth() {
+    public int getTravelTimeSliceWidth() {
         return travelTimeSliceWidth;
     }
 
@@ -125,7 +123,9 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
      * of early arrival to the Scoring.
      *
      *
-     * @see org.matsim.contrib.freight.mobsim.WithinDayActivityReScheduling
+//     * @see org.matsim.contrib.freight.mobsim.WithinDayActivityReScheduling
+     *
+     * @deprecated change argument to enum and rename method accordingly (e.g. setMethodToDealWithTimeWindows(...)). yyyy, kai, oct'19
      */
     public void setPhysicallyEnforceTimeWindowBeginnings(boolean physicallyEnforceTimeWindowBeginnings) {
         this.physicallyEnforceTimeWindowBeginnings = physicallyEnforceTimeWindowBeginnings;

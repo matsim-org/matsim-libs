@@ -22,6 +22,7 @@ package org.matsim.core.config.groups;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -36,11 +37,46 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams
 import org.matsim.testcases.MatsimTestUtils;
 
 public class PlansCalcRouteConfigGroupTest {
-
 	private final static Logger log = Logger.getLogger(PlansCalcRouteConfigGroupTest.class);
+	private final static int N_MODE_ROUTING_PARAMS_DEFAULT = 5 ;
 
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
+
+	@Test
+	public void test1() {
+		PlansCalcRouteConfigGroup group = new PlansCalcRouteConfigGroup();
+		Assert.assertEquals( N_MODE_ROUTING_PARAMS_DEFAULT, group.getModeRoutingParams().size() );
+		group.setTeleportedModeSpeed( TransportMode.bike, 1. );
+		Assert.assertEquals( 1, group.getModeRoutingParams().size() );
+		group.setTeleportedModeSpeed( "abc", 1. );
+		Assert.assertEquals( 2, group.getModeRoutingParams().size() );
+		group.clearModeRoutingParams(  );
+		Assert.assertEquals( 0, group.getModeRoutingParams().size() );
+	}
+	@Test
+	public void test2() {
+		PlansCalcRouteConfigGroup group = new PlansCalcRouteConfigGroup();
+		Assert.assertEquals( N_MODE_ROUTING_PARAMS_DEFAULT, group.getModeRoutingParams().size() );
+		group.setTeleportedModeSpeed( "def", 1. );
+		Assert.assertEquals( 1, group.getModeRoutingParams().size() );
+		group.setTeleportedModeSpeed( "abc", 1. );
+		Assert.assertEquals( 2, group.getModeRoutingParams().size() );
+		group.clearModeRoutingParams( );
+		Assert.assertEquals( 0, group.getModeRoutingParams().size() );
+	}
+	@Test
+	public void test3() {
+		PlansCalcRouteConfigGroup group = new PlansCalcRouteConfigGroup() ;
+		group.clearModeRoutingParams();
+		group.setClearingDefaultModeRoutingParams( true ); // should be ok
+	}
+	@Test( expected = RuntimeException.class )
+	public void test4() {
+		PlansCalcRouteConfigGroup group = new PlansCalcRouteConfigGroup() ;
+		group.clearModeRoutingParams();
+		group.setClearingDefaultModeRoutingParams( false ); // should fail
+	}
 
 	@Test
 	public void testBackwardsCompatibility() {
@@ -63,7 +99,7 @@ public class PlansCalcRouteConfigGroupTest {
 	@Test
 	public void testDefaultsAreCleared() {
 		PlansCalcRouteConfigGroup group = new PlansCalcRouteConfigGroup();
-		group.clearModeRoutingParams();
+//		group.clearModeRoutingParams();
 		group.setTeleportedModeSpeed( "skateboard" , 20 / 3.6 );
 		group.setTeleportedModeSpeed( "longboard" , 20 / 3.6 );
 		Assert.assertEquals(

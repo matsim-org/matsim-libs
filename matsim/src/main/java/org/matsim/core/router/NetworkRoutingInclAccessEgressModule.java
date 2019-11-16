@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -204,9 +205,17 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		return act;
 	}
 
-
-	private static double routeBushwhackingLeg(Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime,
+	static double routeBushwhackingLeg(Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime,
 			Id<Link> dpLinkId, Id<Link> arLinkId, PopulationFactory pf) {
+		PlansCalcRouteConfigGroup.ModeRoutingParams params = new PlansCalcRouteConfigGroup.ModeRoutingParams();
+		// old defaults
+		params.setBeelineDistanceFactor(1.3);
+		params.setTeleportedModeSpeed(2.0);
+		return routeBushwhackingLeg(person, leg, fromCoord, toCoord, depTime, dpLinkId, arLinkId, pf, params);
+	}
+
+	static double routeBushwhackingLeg(Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime,
+			Id<Link> dpLinkId, Id<Link> arLinkId, PopulationFactory pf, PlansCalcRouteConfigGroup.ModeRoutingParams params) {
 		// I don't think that it makes sense to use a RoutingModule for this, since that again makes assumptions about how to
 		// map facilities, and if you follow through to the teleportation routers one even finds activity wrappers, which is yet another
 		// complication which I certainly don't want here.  kai, dec'15
@@ -220,9 +229,9 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		// create an empty route, but with realistic travel time
 		Route route =pf.getRouteFactories().createRoute(Route.class, dpLinkId, arLinkId ); 
 
-		double beelineDistanceFactor = 1.3 ;
-		double networkTravelSpeed = 2.0 ;
-		// yyyyyy take this from config!
+		Gbl.assertNotNull( params );
+		double beelineDistanceFactor = params.getBeelineDistanceFactor();
+		double networkTravelSpeed = params.getTeleportedModeSpeed();
 
 		double estimatedNetworkDistance = dist * beelineDistanceFactor;
 		int travTime = (int) (estimatedNetworkDistance / networkTravelSpeed);
