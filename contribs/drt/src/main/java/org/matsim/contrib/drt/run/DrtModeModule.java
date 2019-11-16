@@ -23,6 +23,7 @@ package org.matsim.contrib.drt.run;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Id;
@@ -65,12 +66,15 @@ import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
+import com.google.inject.TypeLiteral;
 import com.google.inject.name.Named;
 
 /**
  * @author michalm (Michal Maciejewski)
  */
 public final class DrtModeModule extends AbstractDvrpModeModule {
+	public enum Direction {ACCESS, EGRESS}
+
 	private final DrtConfigGroup drtCfg;
 	private final PlansCalcRouteConfigGroup plansCalcRouteCfg;
 
@@ -99,6 +103,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		addRoutingModuleBinding(getMode()).toProvider(
 				new DrtRoutingModuleProvider(drtCfg, plansCalcRouteCfg));// not singleton
 
+		modalMapBinder(Direction.class, RoutingModule.class);//empty mapbinder for customising access/egress routing
 		bindModal(DrtStopNetwork.class).toProvider(new DrtStopNetworkProvider(getConfig(), drtCfg)).asEagerSingleton();
 
 		if (drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.door2door) {
@@ -161,16 +166,23 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 		@Override
 		public DrtRoutingModule get() {
-			RoutingModule accessEgressRouter = insertingAccessEgressWalk ?
+			//TODO this is a temporary switch for backward compatibility with (original) DrtRoutingModule
+			//XXX in the long term: always insert non_network_walk by default
+			RoutingModule defaultAccessEgressRoutingModule = insertingAccessEgressWalk ?
 					new NonNetworkWalkRouter(walkRouter) :
 					(fromFacility, toFacility, departureTime, person) -> Collections.emptyList();
 
-			Network network = getModalInstance(Network.class);
-			DrtRouteLegCalculator drtRouteLegCalculator = new DrtRouteLegCalculator(drtCfg, network,
-					leastCostPathCalculatorFactory, travelTime, getModalInstance(TravelDisutilityFactory.class),
-					scenario);
+			Map<Direction, RoutingModule> accessEgressRouters = getModalInstance(
+					new TypeLiteral<Map<Direction, RoutingModule>>() {
+					});
 
-			return new DrtRoutingModule(drtRouteLegCalculator, accessEgressRouter, accessEgressRouter,
+			DrtRouteLegCalculator drtRouteLegCalculator = new DrtRouteLegCalculator(drtCfg,
+					getModalInstance(Network.class), leastCostPathCalculatorFactory, travelTime,
+					getModalInstance(TravelDisutilityFactory.class), scenario);
+
+			return new DrtRoutingModule(drtRouteLegCalculator,
+					accessEgressRouters.getOrDefault(Direction.ACCESS, defaultAccessEgressRoutingModule),
+					accessEgressRouters.getOrDefault(Direction.EGRESS, defaultAccessEgressRoutingModule),
 					getModalInstance(AccessEgressFacilityFinder.class), drtCfg, scenario,
 					getModalInstance(Network.class));
 		}
