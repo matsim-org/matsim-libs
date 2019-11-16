@@ -1,4 +1,4 @@
-package org.matsim.contrib.freight.replanning;
+package org.matsim.contrib.freight.controler;
 
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;

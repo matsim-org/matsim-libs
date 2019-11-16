@@ -26,7 +26,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.freight.Freight;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReader;
@@ -34,8 +33,6 @@ import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.mobsim.DistanceScoringFunctionFactoryForTests;
 import org.matsim.contrib.freight.mobsim.StrategyManagerFactoryForTests;
 import org.matsim.contrib.freight.mobsim.TimeScoringFunctionFactoryForTests;
-import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
-import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -124,7 +121,11 @@ public class EquilWithCarrierWithoutPassIT {
 
 	@Test
 	public void testScoringInSecondsWoTimeWindowEnforcement(){
-		freightConfigGroup.setPhysicallyEnforceTimeWindowBeginnings( false );
+		if ( false ){
+			freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.enforceBeginnings );
+		} else{
+			freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
+		}
 		controler.addOverridingModule( new CarrierModule( ) );
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -145,7 +146,11 @@ public class EquilWithCarrierWithoutPassIT {
 
 	@Test
 	public void testScoringInSecondsWTimeWindowEnforcement(){
-		freightConfigGroup.setPhysicallyEnforceTimeWindowBeginnings( true );
+		if ( true ){
+			freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.enforceBeginnings );
+		} else{
+			freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
+		}
 		final CarrierModule carrierModule = new CarrierModule( );
 		controler.addOverridingModule( carrierModule );
 		controler.addOverridingModule(new AbstractModule() {
@@ -167,7 +172,11 @@ public class EquilWithCarrierWithoutPassIT {
 
 	@Test
 	public void testScoringInSecondsWithWithinDayRescheduling(){
-		freightConfigGroup.setPhysicallyEnforceTimeWindowBeginnings(true);
+		if ( true ){
+			freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.enforceBeginnings );
+		} else{
+			freightConfigGroup.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
+		}
 		CarrierModule carrierControler = new CarrierModule();
 		controler.addOverridingModule(carrierControler);
 		controler.addOverridingModule(new AbstractModule() {

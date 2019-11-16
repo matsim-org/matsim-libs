@@ -1,4 +1,4 @@
-package org.matsim.contrib.freight.router;
+package org.matsim.contrib.freight.controler;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;

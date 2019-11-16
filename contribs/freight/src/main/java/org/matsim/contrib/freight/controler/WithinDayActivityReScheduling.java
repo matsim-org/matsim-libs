@@ -1,4 +1,4 @@
-package org.matsim.contrib.freight.mobsim;
+package org.matsim.contrib.freight.controler;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.freight.carrier.Tour.Start;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
-import org.matsim.contrib.freight.mobsim.CarrierAgent.CarrierDriverAgent;
+import org.matsim.contrib.freight.controler.CarrierAgent.CarrierDriverAgent;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
@@ -31,7 +31,7 @@ import org.matsim.core.utils.misc.Time;
  * which allows this. Then this could go away.
  * 
  */
-public class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimStepListener {
+class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimStepListener {
 	public static final String COMPONENT_NAME=WithinDayActivityReScheduling.class.getSimpleName() ;
 
 	private static Logger logger = Logger.getLogger(WithinDayActivityReScheduling.class);

@@ -13,7 +13,7 @@
 package org.matsim.contrib.freight.jsprit;
 
 import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.router.TimeAndSpacePlanRouter;
+import org.matsim.contrib.freight.controler.TimeAndSpacePlanRouter;
 
 /**
  * Router that routes {@link CarrierPlan}.

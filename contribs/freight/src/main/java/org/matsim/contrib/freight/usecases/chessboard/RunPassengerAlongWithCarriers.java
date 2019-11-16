@@ -1,20 +1,10 @@
 package org.matsim.contrib.freight.usecases.chessboard;
 
-import java.net.URL;
-import java.util.Collection;
-import java.util.Map;
-
-import javax.inject.Inject;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.controler.CarrierModule;
-import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
-import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
-import org.matsim.contrib.freight.replanning.modules.TimeAllocationMutator;
-import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
+import org.matsim.contrib.freight.controler.*;
 import org.matsim.contrib.freight.usecases.analysis.CarrierScoreStats;
 import org.matsim.contrib.freight.usecases.analysis.LegHistogram;
 import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl.DriversActivityScoring;
@@ -41,6 +31,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
+
+import javax.inject.Inject;
+import java.net.URL;
+import java.util.Collection;
+import java.util.Map;
 
 final class RunPassengerAlongWithCarriers {
 
