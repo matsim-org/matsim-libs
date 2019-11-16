@@ -58,18 +58,5 @@ public class EndRentalEvent extends Event implements HasPersonId{
 		return attr;
 	}	
 	
-	@Override
-	public String toString() {
-		Map<String,String> attr = this.getAttributes() ;
-		StringBuilder eventXML = new StringBuilder("\t<event ");
-		for (Map.Entry<String, String> entry : attr.entrySet()) {
-			eventXML.append(entry.getKey());
-			eventXML.append("=\"");
-			eventXML.append(entry.getValue());
-			eventXML.append("\" ");
-		}
-		eventXML.append(" />");
-		return eventXML.toString();
-	} 
 
 }
