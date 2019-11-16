@@ -53,8 +53,10 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.name.Names;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -101,8 +103,10 @@ public class RunUamDrtScenario {
 			@Override
 			public void install() {
 				MapBinder<Direction, RoutingModule> mapBinder = modalMapBinder(Direction.class, RoutingModule.class);
-				mapBinder.addBinding(Direction.ACCESS).toProvider(new UamAccessEgressRoutingModuleProvider("drt"));
-				mapBinder.addBinding(Direction.EGRESS).toProvider(new UamAccessEgressRoutingModuleProvider("car"));
+				//DRT as access mode (fixed)
+				mapBinder.addBinding(Direction.ACCESS).to(Key.get(RoutingModule.class, Names.named("drt")));
+				//more flexible approach
+				mapBinder.addBinding(Direction.EGRESS).toProvider(new UamAccessEgressRoutingModuleProvider());
 			}
 		});
 
@@ -118,14 +122,9 @@ public class RunUamDrtScenario {
 		@Inject
 		private Injector injector;
 
-		private final String mode;
-
-		private UamAccessEgressRoutingModuleProvider(String mode) {
-			this.mode = mode;
-		}
-
 		@Override
 		public RoutingModule get() {
+			String mode = "car";//or a more less random choice here
 			return (fromFacility, toFacility, departureTime, person) -> injector.getInstance(TripRouter.class)
 					.calcRoute(mode, fromFacility, toFacility, departureTime, person);
 		}
