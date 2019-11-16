@@ -29,6 +29,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.facilities.Facility;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+
 import one.util.streamex.StreamEx;
 
 /**
@@ -37,7 +40,8 @@ import one.util.streamex.StreamEx;
 public final class NonNetworkWalkRouter implements RoutingModule {
 	private final RoutingModule walkRouter;
 
-	public NonNetworkWalkRouter(RoutingModule walkRouter) {
+	@Inject
+	public NonNetworkWalkRouter(@Named(TransportMode.walk) RoutingModule walkRouter) {
 		this.walkRouter = walkRouter;
 	}
 
