@@ -125,8 +125,7 @@ public class EquilWithCarrierWithoutPassIT {
 	@Test
 	public void testScoringInSecondsWoTimeWindowEnforcement(){
 		freightConfigGroup.setPhysicallyEnforceTimeWindowBeginnings( false );
-		final CarrierModule carrierModule = new CarrierModule( );
-		controler.addOverridingModule( carrierModule );
+		controler.addOverridingModule( new CarrierModule( ) );
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
