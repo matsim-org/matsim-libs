@@ -17,13 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.freight.replanning.modules;
+package org.matsim.contrib.freight.controler;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.router.TimeAndSpaceTourRouter;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.GenericPlanStrategyModule;

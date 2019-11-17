@@ -430,8 +430,10 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 			setTeleportedModeSpeed(key.substring(TELEPORTED_MODE_SPEEDS.length()), Double.parseDouble(value));
 		} else if (key.startsWith(TELEPORTED_MODE_FREESPEED_FACTORS)){
 			setTeleportedModeFreespeedFactor( key.substring( TELEPORTED_MODE_FREESPEED_FACTORS.length() ), Double.parseDouble( value ) );
-		} else if ( CLEAR_MODE_ROUTING_PARAMS.equals( key ) ) {
-				this.setClearingDefaultModeRoutingParams( Boolean.parseBoolean( value ) );
+		} else if ( CLEAR_MODE_ROUTING_PARAMS.equals( key ) ){
+			this.setClearingDefaultModeRoutingParams( Boolean.parseBoolean( value ) );
+		} else if (RANDOMNESS.equals( key ) ) {
+			this.setRoutingRandomness( Double.parseDouble( value ) );
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -442,6 +444,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		Map<String, String> map = super.getParams();
 		map.put( NETWORK_MODES, CollectionUtils.arrayToString(this.networkModes.toArray( new String[0] ) ) );
 		map.put(  CLEAR_MODE_ROUTING_PARAMS, Boolean.toString( this.clearingDefaultModeRoutingParams ) ) ;
+		map.put(  RANDOMNESS, Double.toString( this.routingRandomness ) ) ;
 
 		//		map.put( BEELINE_DISTANCE_FACTOR, Double.toString(this.getBeelineDistanceFactor()) );
 

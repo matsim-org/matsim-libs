@@ -26,7 +26,7 @@
  * ${type_declaration}
  */
 
-package org.matsim.contrib.freight.mobsim;
+package org.matsim.contrib.freight.controler;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,7 +47,7 @@ import org.matsim.vehicles.VehicleUtils;
  * this template use File | Settings | File Templates.
  * 
  */
-public class FreightAgentSource implements AgentSource {
+ class FreightAgentSource implements AgentSource {
 	public static final String COMPONENT_NAME=FreightAgentSource.class.getSimpleName();
 
 	private static Logger log = Logger.getLogger(FreightAgentSource.class);
