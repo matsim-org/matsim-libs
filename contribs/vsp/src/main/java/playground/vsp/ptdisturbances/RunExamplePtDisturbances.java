@@ -148,6 +148,7 @@ public class RunExamplePtDisturbances {
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		
+//		Time variant network is used to depict the disturbance
 		NetworkChangeEvent networkChangeEvent1 = new NetworkChangeEvent(7.5*3600);
 		Link link = scenario.getNetwork().getLinks().get(Id.createLinkId("pt6b"));
 		networkChangeEvent1.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, link.getLength()/3600));
@@ -178,11 +179,6 @@ public class RunExamplePtDisturbances {
 
 		// This will start otfvis.  Comment out if not needed.
 		controler.addOverridingModule( new OTFVisLiveModule() );
-
-//		controler.addOverridingModule( new SwissRailRaptorModule() ) ;
-
-		// ---
-
 		controler.run();
 	}
 
