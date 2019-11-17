@@ -7,7 +7,7 @@ import lsp.mobsim.CarrierResourceTracker;
 import lsp.mobsim.FreightQSimFactory;
 import lsp.replanning.LSPReplanningModule;
 import lsp.scoring.LSPScoringModule;
-import org.matsim.contrib.freight.CarrierConfigGroup;
+import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 
 import java.util.Collection;
@@ -21,7 +21,7 @@ public class LSPModule extends AbstractModule {
 	private LSPScoringModule scoringModule;
 	private Collection<EventCreator> creators;
 	
-	private CarrierConfigGroup carrierConfig = new CarrierConfigGroup();
+	private FreightConfigGroup carrierConfig = new FreightConfigGroup();
 	
 	public LSPModule(LSPs  lsps, LSPReplanningModule replanningModule, LSPScoringModule scoringModule, Collection<EventCreator> creators) {
 	   this.lsps = lsps;
@@ -33,7 +33,7 @@ public class LSPModule extends AbstractModule {
 		    
 	@Override
 	public void install() {
-		bind(CarrierConfigGroup.class).toInstance(carrierConfig);
+		bind(FreightConfigGroup.class).toInstance(carrierConfig);
 		bind(LSPs.class).toInstance(lsps);
         if(replanningModule != null) {
         	bind(LSPReplanningModule.class).toInstance(replanningModule);
@@ -55,10 +55,6 @@ public class LSPModule extends AbstractModule {
 	@Provides
     CarrierResourceTracker provideCarrierResourceTracker(LSPControlerListener lSPControlerListener) {
         return lSPControlerListener.getCarrierResourceTracker();
-    }
-
-    public void setPhysicallyEnforceTimeWindowBeginnings(boolean physicallyEnforceTimeWindowBeginnings) {
-        this.carrierConfig.setPhysicallyEnforceTimeWindowBeginnings(physicallyEnforceTimeWindowBeginnings);
     }
 
 }
