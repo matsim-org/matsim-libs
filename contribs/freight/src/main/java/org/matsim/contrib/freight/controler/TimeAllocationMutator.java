@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.freight.replanning.modules;
+package org.matsim.contrib.freight.controler;
 
 import java.util.ArrayList;
 import java.util.Collection;

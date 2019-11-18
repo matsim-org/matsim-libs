@@ -24,28 +24,28 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressFacilityFinder;
+import org.matsim.contrib.drt.routing.DrtRoutingModule.AccessEgressFacilityFinder;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.collections.QuadTrees;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
+
+import com.google.common.base.Preconditions;
 
 /**
  * @author michalm
  */
 public class ClosestAccessEgressFacilityFinder implements AccessEgressFacilityFinder {
 	private final Network network;
-	private final QuadTree<? extends Facility> facilityQT;
+	private final QuadTree<DrtStopFacility> drtStopQuadTree;
 	private final double maxDistance;
 
-	public ClosestAccessEgressFacilityFinder(double maxDistance, Network network,
-			QuadTree<? extends Facility> facilityQT) {
-		if (facilityQT.size() == 0) {
-			throw new IllegalArgumentException("Empty facility QuadTree");
-		}
-
+	public ClosestAccessEgressFacilityFinder(double maxDistance, Network network, DrtStopNetwork drtStopNetwork) {
+		Preconditions.checkArgument(!drtStopNetwork.getDrtStops().isEmpty(), "Empty DrtStopNetwork");
 		this.network = network;
-		this.facilityQT = facilityQT;
 		this.maxDistance = maxDistance;
+
+		drtStopQuadTree = QuadTrees.createQuadTree(drtStopNetwork.getDrtStops().values());
 	}
 
 	@Override
@@ -62,8 +62,8 @@ public class ClosestAccessEgressFacilityFinder implements AccessEgressFacilityFi
 	}
 
 	private Facility findClosestStop(Facility facility) {
-		Coord coord = StopBasedDrtRoutingModule.getFacilityCoord(facility, network);
-		Facility closestStop = facilityQT.getClosest(coord.getX(), coord.getY());
+		Coord coord = DrtRoutingModule.getFacilityCoord(facility, network);
+		Facility closestStop = drtStopQuadTree.getClosest(coord.getX(), coord.getY());
 		double closestStopDistance = CoordUtils.calcEuclideanDistance(coord, closestStop.getCoord());
 		return closestStopDistance > maxDistance ? null : closestStop;
 	}

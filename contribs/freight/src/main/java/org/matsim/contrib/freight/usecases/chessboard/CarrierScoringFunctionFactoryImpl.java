@@ -15,13 +15,12 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.jsprit.VehicleTypeDependentRoadPricingCalculator;
-import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
-import org.matsim.contrib.freight.scoring.FreightActivity;
+import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
+import org.matsim.contrib.freight.controler.FreightActivity;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.vehicles.Vehicle;
 
 /**
  * Defines example carrier scoring function (factory).

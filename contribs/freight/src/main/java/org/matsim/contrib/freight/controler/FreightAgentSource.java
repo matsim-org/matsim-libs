@@ -26,11 +26,12 @@
  * ${type_declaration}
  */
 
-package org.matsim.contrib.freight.mobsim;
+package org.matsim.contrib.freight.controler;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -46,20 +47,21 @@ import org.matsim.vehicles.VehicleUtils;
  * this template use File | Settings | File Templates.
  * 
  */
-class FreightAgentSource implements AgentSource {
+ class FreightAgentSource implements AgentSource {
+	public static final String COMPONENT_NAME=FreightAgentSource.class.getSimpleName();
 
 	private static Logger log = Logger.getLogger(FreightAgentSource.class);
-	
-	private Collection<MobSimVehicleRoute> vehicleRoutes;
-	
+	private final CarrierAgentTracker tracker;
+
 	private Collection<MobsimAgent> mobSimAgents;
 
 	private AgentFactory agentFactory;
 
 	private QSim qsim;
 
-	FreightAgentSource(Collection<MobSimVehicleRoute> vehicleRoutes, AgentFactory agentFactory, QSim qsim) {
-		this.vehicleRoutes = vehicleRoutes;
+	@Inject
+	FreightAgentSource(CarrierAgentTracker tracker, AgentFactory agentFactory, QSim qsim) {
+		this.tracker = tracker;
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;
 		mobSimAgents = new ArrayList<MobsimAgent>();
@@ -67,7 +69,7 @@ class FreightAgentSource implements AgentSource {
 
 	@Override
 	public void insertAgentsIntoMobsim() {
-		for (MobSimVehicleRoute vRoute : vehicleRoutes) {
+		for (MobSimVehicleRoute vRoute : tracker.createPlans()) {
 			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(vRoute.getPlan().getPerson());
 			Vehicle vehicle = null;
 			if(vRoute.getVehicle() == null){

@@ -47,8 +47,6 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
             " The smaller the value, the more precise the calculation of routing costs but the longer the computation time." +
             " Default value is 1800 seconds.";
 
-    private boolean physicallyEnforceTimeWindowBeginnings = true;
-
     public FreightConfigGroup() {
         super(GROUPNAME);
     }
@@ -110,27 +108,20 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
     public void setTravelTimeSliceWidth(int travelTimeSliceWidth) {
         this.travelTimeSliceWidth = travelTimeSliceWidth;
     }
-
-    public boolean getPhysicallyEnforceTimeWindowBeginnings() {
-        return physicallyEnforceTimeWindowBeginnings;
-    }
-
+    // ---
+    public enum TimeWindowHandling{ ignore, enforceBeginnings }
+    private TimeWindowHandling timeWindowHandling = TimeWindowHandling.enforceBeginnings ;
     /**
      * Physically enforces beginnings of time windows for freight activities, i.e. freight agents
      * wait before closed doors until they can deliver / pick up their goods, and then take their required duration.
-     *
-     * <p>The default value is false. Time windows will be ignored by the physical simulation, leaving treatment
-     * of early arrival to the Scoring.
-     *
-     *
-//     * @see org.matsim.contrib.freight.mobsim.WithinDayActivityReScheduling
-     *
-     * @deprecated change argument to enum and rename method accordingly (e.g. setMethodToDealWithTimeWindows(...)). yyyy, kai, oct'19
      */
-    public void setPhysicallyEnforceTimeWindowBeginnings(boolean physicallyEnforceTimeWindowBeginnings) {
-        this.physicallyEnforceTimeWindowBeginnings = physicallyEnforceTimeWindowBeginnings;
+    public void setTimeWindowHandling( TimeWindowHandling handling ) {
+        this.timeWindowHandling = handling ;
     }
-
+    public TimeWindowHandling getTimeWindowHandling() {
+        return this.timeWindowHandling ;
+    }
+    // ---
 
     @Override
     public Map<String, String> getComments() {

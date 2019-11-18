@@ -134,9 +134,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	public static final String WRITE_DETAILED_CUSTOMER_STATS = "writeDetailedCustomerStats";
 	static final String WRITE_DETAILED_CUSTOMER_STATS_EXP = "Writes out detailed DRT customer stats in each iteration. True by default.";
 
-	public static final String PLOT_DETAILED_WARNINGS = "plotDetailedWarnings";
-	static final String PLOT_DETAILED_WARNING_EXP = "Prints detailed warnings for DRT customers that cannot be served or routed. Default is true.";
-
 	public static final String NUMBER_OF_THREADS = "numberOfThreads";
 	static final String NUMBER_OF_THREADS_EXP =
 			"Number of threads used for parallel evaluation of request insertion into existing schedules."
@@ -192,7 +189,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	private String drtServiceAreaShapeFile = null; // only for serviceAreaBased DRT scheme
 
 	private boolean plotDetailedCustomerStats = true;
-	private boolean printDetailedWarnings = true;
 
 	@Positive
 	private int numberOfThreads = Math.min(Runtime.getRuntime().availableProcessors(),
@@ -277,7 +273,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		map.put(ESTIMATED_DRT_SPEED, ESTIMATED_DRT_SPEED_EXP);
 		map.put(ESTIMATED_BEELINE_DISTANCE_FACTOR, ESTIMATED_BEELINE_DISTANCE_FACTOR_EXP);
 		map.put(NUMBER_OF_THREADS, NUMBER_OF_THREADS_EXP);
-		map.put(PLOT_DETAILED_WARNINGS, PLOT_DETAILED_WARNING_EXP);
 		map.put(REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED,
 				REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP);
 		map.put(DRT_SERVICE_AREA_SHAPE_FILE, DRT_SERVICE_AREA_SHAPE_FILE_EXP);
@@ -589,22 +584,6 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	@StringSetter(NUMBER_OF_THREADS)
 	public void setNumberOfThreads(final int numberOfThreads) {
 		this.numberOfThreads = numberOfThreads;
-	}
-
-	/**
-	 * @return -- {@value #PLOT_DETAILED_WARNING_EXP}
-	 */
-	@StringGetter(PLOT_DETAILED_WARNINGS)
-	public boolean isPrintDetailedWarnings() {
-		return printDetailedWarnings;
-	}
-
-	/**
-	 * @param -- {@value #PLOT_DETAILED_WARNING_EXP}
-	 */
-	@StringSetter(PLOT_DETAILED_WARNINGS)
-	public void setPrintDetailedWarnings(boolean printDetailedWarnings) {
-		this.printDetailedWarnings = printDetailedWarnings;
 	}
 
 	/**

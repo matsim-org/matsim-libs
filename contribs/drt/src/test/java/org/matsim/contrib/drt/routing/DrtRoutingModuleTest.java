@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressFacilityFinder;
+import org.matsim.contrib.drt.routing.DrtRoutingModule.AccessEgressFacilityFinder;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
@@ -50,19 +50,18 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.TeleportationRoutingModule;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.transitSchedule.TransitScheduleUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * @author jbischoff
  */
-public class StopBasedDrtRoutingModuleTest {
+public class DrtRoutingModuleTest {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -78,14 +77,20 @@ public class StopBasedDrtRoutingModuleTest {
 		DrtConfigGroup drtCfg = DrtConfigGroup.getSingleModeDrtConfig(scenario.getConfig());
 		String drtMode = "DrtX";
 		drtCfg.setMode(drtMode);
-		QuadTree<TransitStopFacility> stopsQT = TransitScheduleUtils.createQuadTreeOfTransitStopFacilities(
-				scenario.getTransitSchedule());
+
+		ImmutableMap<Id<DrtStopFacility>, DrtStopFacility> drtStops = scenario.getTransitSchedule()
+				.getFacilities()
+				.values()
+				.stream()
+				.map(DrtStopFacilityImpl::createFromIdentifiableFacility)
+				.collect(ImmutableMap.toImmutableMap(DrtStopFacility::getId, f -> f));
+
 		AccessEgressFacilityFinder stopFinder = new ClosestAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
-				scenario.getNetwork(), stopsQT);
+				scenario.getNetwork(), () -> drtStops);
 		DrtRouteLegCalculator drtRouteLegCalculator = new DrtRouteLegCalculator(drtCfg, scenario.getNetwork(),
 				new FastAStarEuclideanFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new, scenario);
-		StopBasedDrtRoutingModule stopBasedDRTRoutingModule = new StopBasedDrtRoutingModule(drtRouteLegCalculator,
-				nonNetworkWalkRouter, nonNetworkWalkRouter, stopFinder, drtCfg, scenario, scenario.getNetwork());
+		DrtRoutingModule drtRoutingModule = new DrtRoutingModule(drtRouteLegCalculator, nonNetworkWalkRouter,
+				nonNetworkWalkRouter, stopFinder, drtCfg, scenario, scenario.getNetwork());
 
 		// case 1: origin and destination within max walking distance from next stop (200m)
 		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId(1));
@@ -95,7 +100,7 @@ public class StopBasedDrtRoutingModuleTest {
 		Activity w = (Activity)p1.getSelectedPlan().getPlanElements().get(2);
 		Facility wf = FacilitiesUtils.toFacility(w, facilities);
 
-		List<? extends PlanElement> routedList = stopBasedDRTRoutingModule.calcRoute(hf, wf, 8 * 3600, p1);
+		List<? extends PlanElement> routedList = drtRoutingModule.calcRoute(hf, wf, 8 * 3600, p1);
 
 		Assert.assertEquals(5, routedList.size());
 
@@ -150,7 +155,7 @@ public class StopBasedDrtRoutingModuleTest {
 		Activity w2 = (Activity)p2.getSelectedPlan().getPlanElements().get(2);
 		Facility wf2 = FacilitiesUtils.toFacility(w2, facilities);
 
-		List<? extends PlanElement> routedList2 = stopBasedDRTRoutingModule.calcRoute(hf2, wf2, 8 * 3600, p2);
+		List<? extends PlanElement> routedList2 = drtRoutingModule.calcRoute(hf2, wf2, 8 * 3600, p2);
 
 		Assert.assertNull(routedList2);
 
@@ -162,7 +167,7 @@ public class StopBasedDrtRoutingModuleTest {
 		Activity w3 = (Activity)p3.getSelectedPlan().getPlanElements().get(2);
 		Facility wf3 = FacilitiesUtils.toFacility(w3, facilities);
 
-		List<? extends PlanElement> routedList3 = stopBasedDRTRoutingModule.calcRoute(hf3, wf3, 8 * 3600, p3);
+		List<? extends PlanElement> routedList3 = drtRoutingModule.calcRoute(hf3, wf3, 8 * 3600, p3);
 
 		Assert.assertNull(routedList3);
 
@@ -174,7 +179,7 @@ public class StopBasedDrtRoutingModuleTest {
 		Activity w4 = (Activity)p4.getSelectedPlan().getPlanElements().get(2);
 		Facility wf4 = FacilitiesUtils.toFacility(w4, facilities);
 
-		List<? extends PlanElement> routedList4 = stopBasedDRTRoutingModule.calcRoute(hf4, wf4, 8 * 3600, p4);
+		List<? extends PlanElement> routedList4 = drtRoutingModule.calcRoute(hf4, wf4, 8 * 3600, p4);
 
 		Assert.assertNull(routedList4);
 
@@ -186,7 +191,7 @@ public class StopBasedDrtRoutingModuleTest {
 		Activity w5 = (Activity)p5.getSelectedPlan().getPlanElements().get(2);
 		Facility wf5 = FacilitiesUtils.toFacility(w5, facilities);
 
-		List<? extends PlanElement> routedList5 = stopBasedDRTRoutingModule.calcRoute(hf5, wf5, 8 * 3600, p5);
+		List<? extends PlanElement> routedList5 = drtRoutingModule.calcRoute(hf5, wf5, 8 * 3600, p5);
 
 		// TODO: Asserts are prepared for interpreting maxWalkingDistance as a real maximum, but routing still works wrongly
 		Assert.assertNull(routedList5);
@@ -199,7 +204,7 @@ public class StopBasedDrtRoutingModuleTest {
 		Activity w6 = (Activity)p6.getSelectedPlan().getPlanElements().get(2);
 		Facility wf6 = FacilitiesUtils.toFacility(w6, facilities);
 
-		List<? extends PlanElement> routedList6 = stopBasedDRTRoutingModule.calcRoute(hf6, wf6, 8 * 3600, p6);
+		List<? extends PlanElement> routedList6 = drtRoutingModule.calcRoute(hf6, wf6, 8 * 3600, p6);
 
 		// TODO: Asserts are prepared for interpreting maxWalkingDistance as a real maximum, but routing still works wrongly
 		Assert.assertNull(routedList6);

@@ -18,33 +18,53 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.drt.routing;
+package org.matsim.core.utils.collections;
 
-import java.util.Optional;
+import java.util.Collection;
+import java.util.function.Function;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.routing.DrtRoutingModule.AccessEgressFacilityFinder;
-import org.matsim.core.router.LinkWrapperFacility;
-import org.matsim.facilities.FacilitiesUtils;
-import org.matsim.facilities.Facility;
+import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Coord;
+
+import com.google.common.base.Preconditions;
 
 /**
  * @author Michal Maciejewski (michalm)
  */
-public class DecideOnLinkAccessEgressFacilityFinder implements AccessEgressFacilityFinder {
-	private final Network network;
-
-	public DecideOnLinkAccessEgressFacilityFinder(Network network) {
-		this.network = network;
+public class QuadTrees {
+	public static <E extends BasicLocation> QuadTree<E> createQuadTree(Collection<E> elements) {
+		return createQuadTree(elements, BasicLocation::getCoord, 0);
 	}
 
-	@Override
-	public Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility) {
-		LinkWrapperFacility accessFacility = new LinkWrapperFacility(
-				FacilitiesUtils.decideOnLink(fromFacility, network));
-		LinkWrapperFacility egressFacility = new LinkWrapperFacility(FacilitiesUtils.decideOnLink(toFacility, network));
-		return Optional.of(ImmutablePair.of(accessFacility, egressFacility));
+	public static <E> QuadTree<E> createQuadTree(Collection<E> elements, Function<E, Coord> coordFunction,
+			double buffer) {
+		Preconditions.checkArgument(buffer >= 0, "Only non-negative buffer allowed");
+		double minX = Double.POSITIVE_INFINITY;
+		double minY = Double.POSITIVE_INFINITY;
+		double maxX = Double.NEGATIVE_INFINITY;
+		double maxY = Double.NEGATIVE_INFINITY;
+
+		for (E e : elements) {
+			Coord c = coordFunction.apply(e);
+			if (c.getX() < minX) {
+				minX = c.getX();
+			}
+			if (c.getY() < minY) {
+				minY = c.getY();
+			}
+			if (c.getX() > maxX) {
+				maxX = c.getX();
+			}
+			if (c.getY() > maxY) {
+				maxY = c.getY();
+			}
+		}
+
+		QuadTree<E> quadTree = new QuadTree<E>(minX - buffer, minY - buffer, maxX + buffer, maxY + buffer);
+		for (E stop : elements) {
+			Coord c = coordFunction.apply(stop);
+			quadTree.put(c.getX(), c.getY(), stop);
+		}
+		return quadTree;
 	}
 }

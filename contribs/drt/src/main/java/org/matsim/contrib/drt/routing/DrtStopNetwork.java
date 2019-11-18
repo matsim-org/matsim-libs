@@ -1,8 +1,6 @@
-
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- * MockComponentAnnotation.java
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
  * copyright       : (C) 2019 by the members listed in the COPYING,        *
@@ -17,23 +15,18 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
- package org.matsim.core.mobsim.qsim.components.mock;
+package org.matsim.contrib.drt.routing;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import org.matsim.api.core.v01.Id;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+import com.google.common.collect.ImmutableMap;
 
-import com.google.inject.BindingAnnotation;
-
-@BindingAnnotation
-@Target({ FIELD, PARAMETER, METHOD, TYPE })
-@Retention(RUNTIME)
-public @interface MockComponentAnnotation {
+/**
+ * @author Michal Maciejewski (michalm)
+ */
+public interface DrtStopNetwork {
+	ImmutableMap<Id<DrtStopFacility>, DrtStopFacility> getDrtStops();
 }

@@ -1,4 +1,4 @@
-package org.matsim.contrib.freight.scoring;
+package org.matsim.contrib.freight.controler;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;

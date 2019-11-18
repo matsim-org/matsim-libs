@@ -1,9 +1,9 @@
-/* *********************************************************************** *
- * project: org.matsim.*												   *
- *                                                                         *
+/*
+ * *********************************************************************** *
+ * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,21 +15,16 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
-package org.matsim.contrib.freight.utils;
+ * *********************************************************************** *
+ */
+
+package org.matsim.contrib.drt.routing;
+
+import org.matsim.api.core.v01.Identifiable;
+import org.matsim.facilities.Facility;
 
 /**
- * @author nagel
- *
+ * @author Michal Maciejewski (michalm)
  */
-public class FreightGbl {
-	
-	private FreightGbl(){} // do not instantiate
-	
-	public static void debug( String str ) {
-		System.out.flush();
-		System.err.println(str);
-		System.err.flush();
-	}
-
+public interface DrtStopFacility extends Identifiable<DrtStopFacility>, Facility {
 }
