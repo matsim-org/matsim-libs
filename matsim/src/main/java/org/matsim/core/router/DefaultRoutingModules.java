@@ -64,8 +64,9 @@ public final class DefaultRoutingModules {
 				routeAlgo);
 	}
 	
+	// TODO: make package private again
 	// Please use injection (NetworkRoutingProvider) to get a NetworkRoutingInclAccessEgressModule - kn/gl nov'19
-	static RoutingModule createAccessEgressNetworkRouter( String mode,
+	public static RoutingModule createAccessEgressNetworkRouter( String mode,
 											 final LeastCostPathCalculator routeAlgo, Scenario scenario,
 											 Network filteredNetwork, RoutingModule accessEgressToNetworkRouter ) {
 		return new NetworkRoutingInclAccessEgressModule(
