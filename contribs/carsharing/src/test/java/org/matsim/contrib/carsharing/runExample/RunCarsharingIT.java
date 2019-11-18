@@ -76,7 +76,8 @@ public class RunCarsharingIT {
 		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile);
 		
 		config.plansCalcRoute().setInsertingAccessEgressWalk(false); // otherwise does not work. kai,feb'16
-
+//		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
+		
 		CarsharingConfigGroup csConfig = (CarsharingConfigGroup) config.getModule( CarsharingConfigGroup.GROUP_NAME ) ;
 		csConfig.setvehiclelocations( utils.getClassInputDirectory()+"/CarsharingStations.xml");
 		csConfig.setmembership(utils.getClassInputDirectory() + "/CSMembership.xml");
@@ -137,7 +138,9 @@ public class RunCarsharingIT {
 				}
 				if ( iteration==0 ) {
 					if ( TransportMode.walk.equals(legMode) ) {
-						Assert.assertEquals(0, nOfModeLegs );
+						// walk is used for access+egress to car 
+						// -> number of walk legs for access+egress equals twice the number of car legs = 44
+						Assert.assertEquals(44, nOfModeLegs );
 					} else if ( "oneway_vehicle".equals(legMode) ) {
 						Assert.assertEquals( 0, nOfModeLegs ) ;
 					} else if ( TransportMode.car.equals(legMode) ) {
@@ -152,6 +155,8 @@ public class RunCarsharingIT {
 				else if (iteration == 10) {
 					
 					if ( TransportMode.walk.equals(legMode) ) {
+						// walk is used for access+egress to car 
+						// -> number of walk legs for access+egress equals twice the number of car legs = 0
 						Assert.assertEquals(0, nOfModeLegs );
 //						Assert.assertEquals(8, nOfModeLegs );
 					} else if ( "bike".equals(legMode) ) {
