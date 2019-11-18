@@ -26,20 +26,23 @@ import java.util.Objects;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.router.NetworkRoutingInclAccessEgressModule;
+import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 public class DynRoutingModule implements RoutingModule {
 	private final String stageActivityType;
@@ -48,7 +51,11 @@ public class DynRoutingModule implements RoutingModule {
 	@Inject
 	private Population population;
 	@Inject
-	private PlansCalcRouteConfigGroup calcRouteConfig;
+	private Config config;
+	
+	@Inject
+	@Named(TransportMode.walk)
+	RoutingModule walkRouter;
 
 	private final String mode;
 
@@ -63,13 +70,18 @@ public class DynRoutingModule implements RoutingModule {
 		Link accessActLink = FacilitiesUtils.decideOnLink(Objects.requireNonNull(fromFacility), network);
 		Link egressActLink = FacilitiesUtils.decideOnLink(Objects.requireNonNull(toFacility), network);
 
-		List<PlanElement> result = new ArrayList<>();
+		List<PlanElement> trip = new ArrayList<>();
+		double now = departureTime;
 
 		// access leg:
-		if (calcRouteConfig.isInsertingAccessEgressWalk()) {
-			departureTime += NetworkRoutingInclAccessEgressModule.addBushwhackingLegFromFacilityToLinkIfNecessary(
-					fromFacility, person, accessActLink, departureTime, result, population.getFactory(),
-					stageActivityType);
+		if (config.plansCalcRoute().isInsertingAccessEgressWalk()) {
+			List<? extends PlanElement> accessWalkTrip = walkRouter.calcRoute( fromFacility, new LinkWrapperFacility( accessActLink ), now, person );
+			for( PlanElement planElement : accessWalkTrip ){
+				now = TripRouter.calcEndOfPlanElement( now, planElement,  config ) ;
+			}
+			trip.addAll(accessWalkTrip);
+			// interaction activity:
+			trip.add(createStageActivity(new LinkWrapperFacility(accessActLink)));
 		}
 
 		// leg proper:
@@ -79,22 +91,35 @@ public class DynRoutingModule implements RoutingModule {
 			route.setTravelTime(Double.NaN);
 
 			Leg leg = PopulationUtils.createLeg(mode);
-			leg.setDepartureTime(departureTime);
+			leg.setDepartureTime(now);
 			leg.setTravelTime(Double.NaN);
 			leg.setRoute(route);
 			if (fromFacility.getLinkId().equals(toFacility.getLinkId())) {
 				leg.setMode(TransportMode.walk);
 			}
-			result.add(leg);
+			trip.add(leg);
 		}
 
 		// egress leg:
-		if (calcRouteConfig.isInsertingAccessEgressWalk()) {
-			NetworkRoutingInclAccessEgressModule.addBushwhackingLegFromLinkToFacilityIfNecessary(toFacility, person,
-					egressActLink, departureTime, result, population.getFactory(), stageActivityType);
+		if (config.plansCalcRoute().isInsertingAccessEgressWalk()) {
+			// interaction activity:
+			trip.add(createStageActivity(new LinkWrapperFacility( egressActLink )));
+			List<? extends PlanElement> egressWalkTrip = walkRouter.calcRoute( new LinkWrapperFacility( egressActLink ), toFacility, now, person );
+			for( PlanElement planElement : egressWalkTrip ){
+				now = TripRouter.calcEndOfPlanElement( now, planElement,  config ) ;
+			}
+			trip.addAll(egressWalkTrip);
 		}
 
-		return result;
+		return trip;
+	}
+	
+	private Activity createStageActivity(Facility stopFacility) {
+		Activity activity = population.getFactory().createActivityFromCoord(stageActivityType,
+				stopFacility.getCoord());
+		activity.setMaximumDuration(0);
+		activity.setLinkId(stopFacility.getLinkId());
+		return activity;
 	}
 
 }
