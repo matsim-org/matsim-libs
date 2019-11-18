@@ -31,10 +31,12 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.facilities.ActivityFacilities;
 
 /**
@@ -133,6 +135,8 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 					}
 				} else if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
+					
+					Gbl.assertNotNull(TripStructureUtils.getRoutingMode(leg));
 					
 					if (leg.getRoute() == null) {
 						needsReRoute = true;
