@@ -179,6 +179,10 @@ public abstract class AbstractModule implements Module {
 		return attributeConverterMapBinder.addBinding( clazz );
 	}
 
+	/**
+	 * @deprecated -- use {@link #addTravelDisutilityFactoryBinding(TransportMode.car) instead}
+	 */
+	@Deprecated // kai, nov'19
 	protected final com.google.inject.binder.LinkedBindingBuilder<TravelDisutilityFactory> bindCarTravelDisutilityFactory() {
 		return bind(carTravelDisutilityFactoryKey());
 	}
@@ -208,6 +212,10 @@ public abstract class AbstractModule implements Module {
 		return binder().bind(EventsManager.class);
 	}
 
+	/**
+	 * @deprecated -- use {@link #addTravelTimeBinding(TransportMode.car) instead}
+	 */
+	@Deprecated // kai, nov'19
 	protected final LinkedBindingBuilder<TravelTime> bindNetworkTravelTime() {
 		return bind(networkTravelTime());
 	}
