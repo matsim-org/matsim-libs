@@ -558,7 +558,11 @@ public class TripStructureUtils {
 	}
 
 	public static void setRoutingMode(Leg leg, String mode) {
-		leg.getAttributes().putAttribute("routingMode", mode);
+		if ( mode != null ){
+			leg.getAttributes().putAttribute( "routingMode", mode );
+		} else {
+			leg.getAttributes().removeAttribute(  "routingMode" ) ;
+		}
 	}
 
 	@Deprecated // if we make the routing mode identifier replaceable via Guice/Inject, we should return that one here or get rid of the method
