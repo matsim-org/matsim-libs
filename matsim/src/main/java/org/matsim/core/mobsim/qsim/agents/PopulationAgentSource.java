@@ -72,7 +72,7 @@ public final class PopulationAgentSource implements AgentSource {
 			insertVehicles(p);
 		}
 	}
-	
+	private static int cnt = 5 ;
 	private void insertVehicles(Person person) {
 		// this is called in every iteration.  So if a route without a vehicle id is found (e.g. after mode choice),
 		// then the id is generated here.  kai/amit, may'18
@@ -100,14 +100,32 @@ public final class PopulationAgentSource implements AgentSource {
 			
 			// determine the vehicle (not the same as just its ID):
 
-			// we have seen the mode before in the plan:
-			if ( seenModes.keySet().contains( leg.getMode() ) ) {
-				if (vehicleId == null && route != null) {
-					vehicleId = seenModes.get(leg.getMode());
-					route.setVehicleId(vehicleId);
-					// yyyy what is the meaning of route==null? kai, jun'18
+			final QSimConfigGroup.VehiclesSource vehiclesSource = qsim.getScenario().getConfig().qsim().getVehiclesSource();
+
+			if ( vehiclesSource!= QSimConfigGroup.VehiclesSource.fromVehiclesData ){
+				// without this condition, it is surely wrong when the vehicles come from the vehicles data ... because a second vehicle for
+				// the same mode is not placed.  kai, nov'19
+
+				// yyyy I am not sure if at this point vehicleId actually can be null ... because the above VehicleUtils.getVehicleId(...,
+				// mode) already should contain a map of all the vehicles per person.   ???  kai, nov'19
+
+				// we have seen the mode before in the plan:
+				if( seenModes.keySet().contains( leg.getMode() ) ){
+					if( vehicleId == null && route != null ){
+						vehicleId = seenModes.get( leg.getMode() );
+						route.setVehicleId( vehicleId );
+						// yyyy what is the meaning of route==null? kai, jun'18
+
+						if ( cnt > 0 ) {
+							log.warn( "encountered vehicleId=null where I am not sure how and why this should happen ..." );
+							cnt-- ;
+							if ( cnt==0 ) {
+								log.warn(  Gbl.FUTURE_SUPPRESSED );
+							}
+						}
+					}
+					continue;
 				}
-				continue;
 			}
 			
 			// if we are here, we haven't seen the mode before in this plan
@@ -119,7 +137,6 @@ public final class PopulationAgentSource implements AgentSource {
 			Vehicle vehicle = qsim.getScenario().getVehicles().getVehicles().get(vehicleId);
 			if ( vehicle==null ) {
 				String msg = "Could not get the requested vehicle with ID=" + vehicleId + " from the vehicles container. " ;
-				final QSimConfigGroup.VehiclesSource vehiclesSource = qsim.getScenario().getConfig().qsim().getVehiclesSource();
 				switch ( vehiclesSource ) {
 					case defaultVehicle:
 					case modeVehicleTypesFromVehiclesData:
