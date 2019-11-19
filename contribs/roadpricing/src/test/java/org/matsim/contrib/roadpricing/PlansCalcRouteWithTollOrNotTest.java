@@ -117,7 +117,9 @@ public class PlansCalcRouteWithTollOrNotTest {
 		runOnAll(testee(scenario, toll), population);
 		RoadPricingTestUtils.compareRoutes("2 3 4 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
 		// and change the mode back
-		getLeg3(config, population, id1).setMode(oldMode);
+		Leg leg3 = getLeg3(config, population, id1);
+		leg3.setMode(oldMode);
+		TripStructureUtils.setRoutingMode(leg, oldMode);
 
 		// case 4: now remove the costs and add them again, but with a higher amount
 		toll.removeCost(morningCost);

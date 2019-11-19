@@ -820,6 +820,7 @@ public final class PopulationUtils {
 
 	public static void copyFromTo(Leg in, Leg out) {
 		out.setMode( in.getMode() );
+		TripStructureUtils.setRoutingMode( out, TripStructureUtils.getRoutingMode( in ));
 		out.setDepartureTime(in.getDepartureTime());
 		out.setTravelTime(in.getTravelTime());
 		if (in.getRoute() != null) {
