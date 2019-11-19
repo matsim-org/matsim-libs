@@ -82,10 +82,11 @@ public class RunPSimTest {
 	}
 
 	/**
-	 *  For comparison run 2 normal qsim iterations. Psim score should be slightly higher than default Controler score.
-	 *  
-	 *  Prior to implementing routing mode RunPSim outperformed default Controler on this test for executed score by a margin > 1%
-	 *  (psim score in testA() was 134.52369453719413 and qsim score in testB was 131.84309487251033).
+	 * For comparison run 2 normal qsim iterations. Psim score should be slightly higher than default Controler score.
+	 * 
+	 * Prior to implementing routing mode RunPSimTest tested only that psimScore outperformed default Controler on this
+	 * test for executed score by a margin > 1%. In the last commit in matsim master where the test ran, the psim score
+	 * in testA() was 134.52369453719413 and qsim score in testB was 131.84309487251033).
 	 */
 	@Test
 	public void testB() {
