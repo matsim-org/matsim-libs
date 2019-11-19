@@ -136,7 +136,11 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 				} else if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
 					
-					Gbl.assertNotNull(TripStructureUtils.getRoutingMode(leg));
+					if (TripStructureUtils.getRoutingMode(leg) == null) {
+						String errorMessage = "Routing mode not set for leg :" + leg.toString() + " of agent id " + person.getId().toString();
+						log.error( errorMessage );
+						throw new RuntimeException( errorMessage );
+					}
 					
 					if (leg.getRoute() == null) {
 						needsReRoute = true;
