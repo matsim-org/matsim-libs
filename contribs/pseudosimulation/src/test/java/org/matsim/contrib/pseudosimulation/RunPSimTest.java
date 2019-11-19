@@ -77,6 +77,7 @@ public class RunPSimTest {
 		runPSim.run();
 		double psimScore = execScoreTracker.executedScore;
 		logger.info("RunPSim score was " + psimScore);
+//		Assert.assertEquals("RunPsim score changed.", 134.52369453719413d, psimScore, MatsimTestUtils.EPSILON);
 		Assert.assertEquals("RunPsim score changed.", 132.73129073101293d, psimScore, MatsimTestUtils.EPSILON);
 	}
 
@@ -86,7 +87,6 @@ public class RunPSimTest {
 	 *  Prior to implementing routing mode RunPSim outperformed default Controler on this test for executed score by a margin > 1%
 	 *  (psim score in testA() was 134.52369453719413 and qsim score in testB was 131.84309487251033).
 	 */
-	// 
 	@Test
 	public void testB() {
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
@@ -100,6 +100,7 @@ public class RunPSimTest {
 		
 		double qsimScore = execScoreTracker.executedScore;
 		logger.info("Default controler score was " + qsimScore );
+//		Assert.assertEquals("Default controler score changed.", 131.84309487251033d, qsimScore, MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Default controler score changed.", 131.84350487113088d, qsimScore, MatsimTestUtils.EPSILON);
 	}
 
