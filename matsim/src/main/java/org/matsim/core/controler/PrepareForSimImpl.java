@@ -268,7 +268,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	}
 	
 	private void adaptOutdatedPlansForRoutingMode() {
-		population.getPersons().values().parallelStream().forEach(person -> {
+		population.getPersons().values().stream().forEach(person -> {
 			for (Plan plan: person.getPlans()) {
 				for (Trip trip : TripStructureUtils.getTrips(plan.getPlanElements())) {
 					List<Leg> legs = trip.getLegsOnly();
