@@ -3,7 +3,6 @@ package org.matsim.contrib.pseudosimulation;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -37,9 +36,9 @@ public class RunPSimTest {
 
 	private final Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial" ),"0.config.xml" ) );
 
-	private static double psimscore;
-
-
+	/**
+	 * Run 1 normal qsim iteration, a couple of psim iterations and a final 2nd qsim iteration.
+	 */
 	@Test
 	public void testA() {
 		config.controler().setCreateGraphs(false);
@@ -76,9 +75,18 @@ public class RunPSimTest {
 		
 		
 		runPSim.run();
-		psimscore = execScoreTracker.executedScore;
+		double psimScore = execScoreTracker.executedScore;
+		logger.info("RunPSim score was " + psimScore);
+		Assert.assertEquals("RunPsim score changed.", 132.73129073101293d, psimScore, MatsimTestUtils.EPSILON);
 	}
 
+	/**
+	 *  For comparison run 2 normal qsim iterations. Psim score should be slightly higher than default Controler score.
+	 *  
+	 *  Prior to implementing routing mode RunPSim outperformed default Controler on this test for executed score by a margin > 1%
+	 *  (psim score in testA() was 134.52369453719413 and qsim score in testB was 131.84309487251033).
+	 */
+	// 
 	@Test
 	public void testB() {
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
@@ -89,15 +97,10 @@ public class RunPSimTest {
 		ExecScoreTracker execScoreTracker = new ExecScoreTracker(controler);
 		controler.addControlerListener(execScoreTracker);
 		controler.run();
-		double qsimscore = execScoreTracker.executedScore;
-		logger.info("RunPSim score was " + psimscore);
-		logger.info("Default controler score was " + qsimscore );
-		final double relError = (psimscore - qsimscore) / qsimscore;
-		if ( relError < 0.01){
-			logger.warn( "relative score error=" + relError  );
-			Assert.fail(
-					"Usually RunPSim outperforms default Controler on this test for executed score by a margin > 1%; something changed. psimscore=" + psimscore + "; qsimscore=" + qsimscore );
-		}
+		
+		double qsimScore = execScoreTracker.executedScore;
+		logger.info("Default controler score was " + qsimScore );
+		Assert.assertEquals("Default controler score changed.", 131.84350487113088d, qsimScore, MatsimTestUtils.EPSILON);
 	}
 
 	class ExecScoreTracker implements ShutdownListener {
