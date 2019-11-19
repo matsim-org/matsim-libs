@@ -36,7 +36,6 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentQueryHelper;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
-import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.contrib.parking.parkingsearch.evaluation.ParkingListener;
 import org.matsim.contrib.parking.parkingsearch.manager.FacilityBasedParkingManager;
 import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
@@ -46,11 +45,9 @@ import org.matsim.contrib.parking.parkingsearch.manager.vehicleteleportationlogi
 import org.matsim.contrib.parking.parkingsearch.routing.ParkingRouter;
 import org.matsim.contrib.parking.parkingsearch.routing.WithinDayParkingRouter;
 import org.matsim.contrib.parking.parkingsearch.sim.ParkingSearchPopulationModule;
-import org.matsim.contrib.parking.parkingsearch.sim.ParkingSearchPrepareForSimImpl;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.PrepareForSim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.PopulationModule;
@@ -59,7 +56,6 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 
-import com.google.inject.Inject;
 import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
@@ -67,9 +63,6 @@ import com.google.inject.name.Named;
 
 public final class DvrpParkingModule extends AbstractModule {
 	public static final String DVRP_ROUTING = "dvrp_routing";// TODO ==> dvrp_optimizer???
-
-	@Inject
-	private DvrpConfigGroup dvrpCfg;
 
 	private final Module module;
 	private final List<Class<? extends MobsimListener>> listeners;
@@ -111,7 +104,6 @@ public final class DvrpParkingModule extends AbstractModule {
 		addRoutingModuleBinding(mode).toInstance(new DynRoutingModule(mode));
 		bind(ParkingSearchManager.class).to(FacilityBasedParkingManager.class).asEagerSingleton();
 		bind(WalkLegFactory.class).asEagerSingleton();
-		bind(PrepareForSim.class).to(ParkingSearchPrepareForSimImpl.class);
 		addControlerListenerBinding().to(ParkingListener.class);
 		bind(ParkingRouter.class).to(WithinDayParkingRouter.class);
 		bind(VehicleTeleportationLogic.class).to(VehicleTeleportationToNearbyParking.class);
