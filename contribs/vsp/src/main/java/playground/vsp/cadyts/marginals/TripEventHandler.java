@@ -6,7 +6,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PopulationUtils;
@@ -19,19 +18,16 @@ import java.util.*;
 class TripEventHandler implements ActivityEndEventHandler, ActivityStartEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler, TransitDriverStartsEventHandler {
 
 	@Inject
-	private Network network;
-
-	@Inject
 	private MainModeIdentifier mainModeIdentifier;
 
 	@Inject(optional = true)
 	private AgentFilter agentFilter = id -> true; // by default include all agents
 
 	private final Set<Id<Person>> drivers = new HashSet<>();
-	private final Map<Id<Person>, List<BeelineTrip>> tripToPerson = new HashMap<>();
+	private final Map<Id<Person>, List<Trip>> tripToPerson = new HashMap<>();
 
-	Map<Id<Person>, List<BeelineTrip>> getTrips() {
-		return tripToPerson;
+	Map<Id<Person>, List<Trip>> getTrips() {
+		return new HashMap<>(tripToPerson);
 	}
 
 	@Override
@@ -48,13 +44,13 @@ class TripEventHandler implements ActivityEndEventHandler, ActivityStartEventHan
 		// maybe handle drt? Drt drivers have their own activities
 
 		if (!tripToPerson.containsKey(event.getPersonId())) {
-			List<BeelineTrip> trips = new ArrayList<>();
+			List<Trip> trips = new ArrayList<>();
 			tripToPerson.put(event.getPersonId(), trips);
 		}
 
 		// we have to put in the trip here, since the activity end lets us know whether we have a main activity or a
 		// staging acitivity
-		BeelineTrip trip = new BeelineTrip();
+		Trip trip = new Trip();
 		trip.departureTime = event.getTime();
 		trip.departureLink = event.getLinkId();
 		trip.departureFacility = event.getFacilityId();
@@ -65,12 +61,20 @@ class TripEventHandler implements ActivityEndEventHandler, ActivityStartEventHan
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 
-		if (!tripToPerson.containsKey(event.getPersonId())) return;
+		// Don't end the trip until we have a real activity
+		if (StageActivityTypeIdentifier.isStageActivity(event.getActType()) || !tripToPerson.containsKey(event.getPersonId())) return;
 
-		BeelineTrip trip = getCurrentTrip(event.getPersonId());
+		Trip trip = getCurrentTrip(event.getPersonId());
 		trip.arrivalLink = event.getLinkId();
 		trip.arrivalTime = event.getTime();
 		trip.arrivalFacility = event.getFacilityId();
+
+		try {
+			trip.mainMode = mainModeIdentifier.identifyMainMode(trip.legs);
+		} catch (Exception e) {
+			// the default main mode identifier can't handle non-network-walk only
+			trip.mainMode = TransportMode.non_network_walk;
+		}
 	}
 
 	@Override
@@ -78,7 +82,7 @@ class TripEventHandler implements ActivityEndEventHandler, ActivityStartEventHan
 
 		if (!tripToPerson.containsKey(event.getPersonId())) return;
 
-		BeelineTrip trip = getCurrentTrip(event.getPersonId());
+		Trip trip = getCurrentTrip(event.getPersonId());
 		Leg leg = trip.legs.get(trip.legs.size() - 1);
 		leg.setTravelTime(event.getTime() - leg.getDepartureTime());
 	}
@@ -91,14 +95,9 @@ class TripEventHandler implements ActivityEndEventHandler, ActivityStartEventHan
 		// a new leg is started
 		Leg leg = PopulationUtils.createLeg(event.getLegMode());
 		leg.setDepartureTime(event.getTime());
-		BeelineTrip trip = getCurrentTrip(event.getPersonId());
+		leg.setMode(event.getLegMode());
+		Trip trip = getCurrentTrip(event.getPersonId());
 		trip.legs.add(leg);
-
-		// only investigate a mode if it is not the access/egress leg. If this is used in a multi-modal scenario,
-		// the last leg, will define the mainMode of the whole trip, if the current default main mode identifier is used
-		if (!leg.getMode().equals(TransportMode.non_network_walk)) {
-			trip.mainMode = mainModeIdentifier.identifyMainMode(trip.legs);
-		}
 	}
 
 	@Override
@@ -112,13 +111,13 @@ class TripEventHandler implements ActivityEndEventHandler, ActivityStartEventHan
 		tripToPerson.clear();
 	}
 
-	private BeelineTrip getCurrentTrip(Id<Person> personId) {
+	private Trip getCurrentTrip(Id<Person> personId) {
 
-		List<BeelineTrip> trips = tripToPerson.get(personId);
+		List<Trip> trips = tripToPerson.get(personId);
 		return trips.get(trips.size() - 1);
 	}
 
-	static class BeelineTrip {
+	static class Trip {
 		private Id<Link> departureLink;
 		private Id<Link> arrivalLink;
 		private double departureTime;
@@ -155,6 +154,10 @@ class TripEventHandler implements ActivityEndEventHandler, ActivityStartEventHan
 
 		public String getMainMode() {
 			return mainMode;
+		}
+
+		public List<Leg> getLegs() {
+			return new ArrayList<>(legs);
 		}
 	}
 }

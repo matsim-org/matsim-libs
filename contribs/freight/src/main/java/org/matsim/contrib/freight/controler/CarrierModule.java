@@ -27,19 +27,22 @@ import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.freight.CarrierConfigGroup;
+import org.matsim.contrib.freight.Freight;
 import org.matsim.contrib.freight.FreightConfigGroup;
-import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
-import org.matsim.contrib.freight.mobsim.FreightQSimFactory;
-import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
-import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
+import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypeWriter;
+import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
+import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.mobsim.qsim.AbstractQSimModule;
+import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
+
+import java.util.List;
 
 public class CarrierModule extends AbstractModule {
 
@@ -77,6 +80,7 @@ public class CarrierModule extends AbstractModule {
 
 	@Override
 	public void install() {
+		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( getConfig(), FreightConfigGroup.class ) ;
 
 		bind(Carriers.class).toProvider(new CarrierProvider()).asEagerSingleton(); // needs to be eager since it is still scenario construction. kai, oct'19
 		// this is probably ok
@@ -92,8 +96,36 @@ public class CarrierModule extends AbstractModule {
 		bind(CarrierControlerListener.class).asEagerSingleton();
 		addControlerListenerBinding().to(CarrierControlerListener.class);
 
-		// Set the Mobsim. The FreightQSimFactory needs the CarrierAgentTracker (see constructor).
-		bindMobsim().toProvider(FreightQSimFactory.class);
+	    QSimComponentsConfigGroup qsimComponents = ConfigUtils.addOrGetModule( getConfig(), QSimComponentsConfigGroup.class );
+	    List<String> abc = qsimComponents.getActiveComponents();
+		abc.add( FreightAgentSource.COMPONENT_NAME ) ;
+		switch ( freightConfig.getTimeWindowHandling() ) {
+			case ignore:
+				break;
+			case enforceBeginnings:
+				abc.add( WithinDayActivityReScheduling.COMPONENT_NAME );
+				break;
+			default:
+				throw new IllegalStateException( "Unexpected value: " + freightConfig.getTimeWindowHandling() );
+		}
+		qsimComponents.setActiveComponents( abc );
+
+	    this.installQSimModule( new AbstractQSimModule(){
+		    @Override protected void configureQSim(){
+		    	this.bind( FreightAgentSource.class ).in( Singleton.class );
+			    this.addQSimComponentBinding( FreightAgentSource.COMPONENT_NAME ).to( FreightAgentSource.class );
+			    switch( freightConfig.getTimeWindowHandling() ) {
+					case ignore:
+						break;
+					case enforceBeginnings:
+						this.addQSimComponentBinding(WithinDayActivityReScheduling.COMPONENT_NAME).to( WithinDayActivityReScheduling.class );
+						break;
+					default:
+						throw new IllegalStateException( "Unexpected value: " + freightConfig.getTimeWindowHandling() );
+				}
+			}
+	    } );
+
 
 		this.addControlerListenerBinding().toInstance( new ShutdownListener(){
 			@Inject Config config ;

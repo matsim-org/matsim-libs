@@ -41,7 +41,8 @@ import java.util.Iterator;
  * @author nagel
  *
  */
-public abstract class ConfigUtils implements MatsimExtensionPoint {
+public class ConfigUtils implements MatsimExtensionPoint {
+	private ConfigUtils() {} // do not instantiate
 
 	public static Config createConfig(final String context) {
 		URL url = IOUtils.resolveFileOrResource(context) ;
@@ -89,6 +90,30 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 	public static Config loadConfig( Config config, String [] args, ConfigGroup... customModules ) {
 		String[] typedArgs = Arrays.copyOfRange( args, 1, args.length );
 		return loadConfig( config, IOUtils.resolveFileOrResource( args[0] ), typedArgs, customModules );
+	}
+
+	/**
+	 * A standard version, where we ignore the 1st argument (which should be the config file), and take everything afterwards.  Standard usage should be
+	 * something like
+	 * <pre>
+	 *     Config config = ConfigUtils.loadConfig( args ) ; // note that this already sets the config-related arguments from the command line
+	 *     CommandLine cmd = ConfigUtils.getCommandLine( args ) ;
+	 *     ... = cmd.getOption( "abc" )... ;
+	 * </pre>
+	 *
+	 * @param args
+	 * @return
+	 */
+	public static CommandLine getCommandLine( String[] args ){
+		String[] typedArgs = Arrays.copyOfRange( args, 1, args.length );
+		try{
+			return new CommandLine.Builder( typedArgs )
+					.allowPositionalArguments( false )
+					.allowAnyOption( true )
+					.build() ;
+		} catch( CommandLine.ConfigurationException e ){
+			throw new RuntimeException( e ) ;
+		}
 	}
 
 	public static Config loadConfig( final URL url, String [] typedArgs, ConfigGroup... customModules ) {
