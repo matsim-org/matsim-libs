@@ -508,6 +508,9 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 				double linkTTimeFromObservation = TravelTimeCalculator.this.getLinkTravelTime(link, time);
 				return Math.max( linkTtimeFromVehicle, linkTTimeFromObservation) ;
 				// yyyyyy should this not be min?  kai/janek, may'19
+				// No, it is correct. It is preventing the router to route with an empirical speed from
+				// the previous iteration that exceeds the maximum vehicle speed.
+				// Thus, the lowest speed (highest travel time) of the two should be used.    Mads, Nov'19
 			}
 
 		};
@@ -518,9 +521,23 @@ public final class TravelTimeCalculator implements LinkEnterEventHandler, LinkLe
 		return new LinkToLinkTravelTime() {
 
 			@Override
-			public double getLinkToLinkTravelTime(Link fromLink, Link toLink, double time) {
-				return TravelTimeCalculator.this.getLinkToLinkTravelTime(fromLink.getId(), toLink.getId(), time);
-				// todo yyyy fix the above with maximum vehicle speeds as for plain links above.  kai, feb'19
+			public double getLinkToLinkTravelTime(Link fromLink, Link toLink, double time, Person person, Vehicle vehicle) {
+				double linkTtimeFromVehicle = 0. ;
+				if ( vehicle!=null ){
+					final VehicleType vehicleType = vehicle.getType();
+					if ( vehicleType==null ){
+						if( cnt < 1 ){
+							cnt++;
+							log.warn( "encountered vehicle where vehicle.getType() returns null.  That should be repaired (whereever it comes from)." );
+							log.warn( Gbl.ONLYONCE );
+						}
+					} else{
+						linkTtimeFromVehicle = fromLink.getLength() / vehicleType.getMaximumVelocity();
+					}
+				}
+				double linkTTimeFromObservation = TravelTimeCalculator.this.getLinkToLinkTravelTime(fromLink.getId(), toLink.getId(), time);
+				
+				return Math.max(linkTTimeFromObservation, linkTtimeFromVehicle);
 			}
 		};
 	}
