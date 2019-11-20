@@ -133,6 +133,12 @@ public class LanesConsistencyChecker {
 				return false;
 			}
 		}
+		// identify lanes on links that only have one outlink
+		Link link = this.network.getLinks().get(l2l.getLinkId());
+		if (link.getToNode().getOutLinks().size() <= 1){
+			log.error("The link " + link.getId() + " has lanes but only one outLink.");
+			return false;
+		}
 		
 		// comment this out, because not every out-link of a node has to be reached by every in-link. theresa, aug'17
 //		//second check matching of link's outlinks and lane's toLinks
