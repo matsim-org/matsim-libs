@@ -21,6 +21,7 @@
 package org.matsim.core.population.algorithms;
 
 import java.util.HashSet;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -37,6 +38,7 @@ import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.facilities.ActivityFacilities;
 
 /**
@@ -116,7 +118,49 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			boolean needsReRoute = false;
 			
 			// for backward compatibility: add routingMode to legs if not present		
+			for (Trip trip : TripStructureUtils.getTrips(plan.getPlanElements())) {
+				List<Leg> legs = trip.getLegsOnly();
+				if (legs.size() >= 1) {
+					String routingMode = TripStructureUtils.getRoutingMode(legs.get(0));
 
+					for (Leg leg : legs) {
+						// check all legs either have the same routing mode or all have routingMode==null
+						if (TripStructureUtils.getRoutingMode(leg) == null) {
+							if (routingMode == null) {
+								// outdated initial plan without routingMode
+							} else {
+								String errorMessage = "Found a mixed trip, some legs with routingMode and others without. "
+										+ "This is inconsistent. Agent id: " + person.getId().toString();
+								log.error(errorMessage);
+								throw new RuntimeException(errorMessage);
+							}
+						} else {
+							if (routingMode.equals(TripStructureUtils.getRoutingMode(leg))) {
+								TripStructureUtils.setRoutingMode(leg, routingMode);
+							} else {
+								String errorMessage = "Found a trip whose legs have different routingModes. "
+										+ "This is inconsistent. Agent id: " + person.getId().toString();
+								log.error(errorMessage);
+								throw new RuntimeException(errorMessage);
+							}
+						}
+					}
+
+					// add routing mode
+					if (routingMode == null) {
+						if (legs.size() == 1) {
+							// there is only a single leg (e.g. after Trips2Legs and a mode choice replanning module)
+							routingMode = legs.get(0).getMode();
+							TripStructureUtils.setRoutingMode(legs.get(0), routingMode);
+						} else {
+							String errorMessage = "Found a trip whose legs have different routingModes. "
+									+ "This is inconsistent. Agent id: " + person.getId().toString();
+							log.error(errorMessage);
+							throw new RuntimeException(errorMessage);
+						}
+					}
+				}
+			}
 			
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {

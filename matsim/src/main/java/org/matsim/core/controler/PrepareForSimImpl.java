@@ -273,30 +273,80 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 				for (Trip trip : TripStructureUtils.getTrips(plan.getPlanElements())) {
 					List<Leg> legs = trip.getLegsOnly();
 					if (legs.size() >= 1) {
-						String routingMode = null;
+						String routingMode = TripStructureUtils.getRoutingMode(legs.get(0));
 
 						for (Leg leg : legs) {
+							// 1. check all legs either have the same routing mode or all have routingMode==null
 							if (TripStructureUtils.getRoutingMode(leg) == null) {
 								if (routingMode == null) {
+									// outdated initial plan without routingMode
+								} else {
+									String errorMessage = "Found a mixed trip having some legs with routingMode set and others without. "
+											+ "This is inconsistent. Agent id: " + person.getId().toString() + "\nTrip: "
+													+ trip.getTripElements().toString();
+									log.error(errorMessage);
+									throw new RuntimeException(errorMessage);
+								}
+							} else {
+								if (routingMode.equals(TripStructureUtils.getRoutingMode(leg))) {
+									TripStructureUtils.setRoutingMode(leg, routingMode);
+								} else {
+									String errorMessage = "Found a trip whose legs have different routingModes. "
+											+ "This is inconsistent. Agent id: " + person.getId().toString() + "\nTrip: "
+													+ trip.getTripElements().toString();
+									log.error(errorMessage);
+									throw new RuntimeException(errorMessage);
+								}
+							}
+						}
+
+						// add routing mode
+						if (routingMode == null) {
+							if (legs.size() == 1) {
+								// there is only a single leg (e.g. after Trips2Legs and a mode choice replanning module
+								routingMode = legs.get(0).getMode();
+								TripStructureUtils.setRoutingMode(legs.get(0), routingMode);
+							} else {
+								if (true /* config switch insisting on bla */) {
 									if (backwardCompatibilityMainModeIdentifier == null) {
-										log.error("Found a trip without routingMode, but there is no MainModeIdentifier set up for PrepareForSim, so cannot infer the routing mode from a MainModeIdentifier. Trip: " + trip.getTripElements());
+										log.error(
+												"Found a trip without routingMode, but there is no MainModeIdentifier set up for PrepareForSim, so cannot infer the routing mode from a MainModeIdentifier. Trip: "
+														+ trip.getTripElements());
 										new RuntimeException("no MainModeIdentifier set up for PrepareForSim");
 									}
-									routingMode = backwardCompatibilityMainModeIdentifier.identifyMainMode(trip.getTripElements());
+									routingMode = backwardCompatibilityMainModeIdentifier
+											.identifyMainMode(trip.getTripElements());
+									if (routingMode != null) {
+										for (Leg leg : legs) {
+											TripStructureUtils.setRoutingMode(leg, routingMode);
+										}
+									} else {
+										String errorMessage = "Found a trip whose legs had no routingMode. "
+												+ "The backwardCompatibilityMainModeIdentifier could not identify the mode. "
+												+ "Agent id: " + person.getId().toString() + "\nTrip: "
+												+ trip.getTripElements().toString();
+										log.error(errorMessage);
+										throw new RuntimeException(errorMessage);
+									}
+								} else {
+									// error config switch insisting on bla
 								}
-								TripStructureUtils.setRoutingMode(leg, routingMode);
 							}
-							
+						}
+						
+						for (Leg leg : legs) {
 							// replace outdated helper TransportModes
 							
 							// access_walk and egress_walk were replaced by non_network_walk
 							if (leg.getMode().equals("access_walk") || leg.getMode().equals("egress_walk")) {
 								leg.setMode(TransportMode.non_network_walk);
+								TripStructureUtils.setRoutingMode(leg, routingMode);
 							}
 							
 							// non_network_walk as access/egress to modes other than walk on the network was replaced by walk. - kn/gl-nov'19 
 							if (leg.getMode().equals(TransportMode.non_network_walk)) {
 								leg.setMode(TransportMode.walk);
+								TripStructureUtils.setRoutingMode(leg, routingMode);
 							}
 							
 							if (leg.getMode().equals(TransportMode.walk) && leg.getRoute() instanceof NetworkRoute) {
@@ -313,16 +363,19 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 							// transit_walk was replaced by walk + leg attribute routingMode
 							if (leg.getMode().equals(TransportMode.transit_walk)) {
 								leg.setMode(TransportMode.walk);
+								TripStructureUtils.setRoutingMode(leg, routingMode);
 							}
 
 							// replace drt_walk etc.
 							if (leg.getMode().endsWith("_walk") && !leg.getMode().equals(TransportMode.non_network_walk)) {
 								leg.setMode(TransportMode.walk);
+								TripStructureUtils.setRoutingMode(leg, routingMode);
 							}
 							
 							// replace drt_fallback etc.
 							if (leg.getMode().endsWith("_fallback")) {
 								leg.setMode(TransportMode.walk);
+								TripStructureUtils.setRoutingMode(leg, routingMode);
 							}
 						}
 					}

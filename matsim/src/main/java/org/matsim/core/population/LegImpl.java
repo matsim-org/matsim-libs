@@ -48,6 +48,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	@Override
 	public final void setMode(String transportMode) {
 		this.mode = transportMode;
+		TripStructureUtils.setRoutingMode( this, null );
 //		TripStructureUtils.setRoutingMode( this, null ); // setting routingMode to null leads to exceptions in AttributesXmlWriterDelegate.writeAttributes() : Class<?> clazz = objAttribute.getValue().getClass();
 		// (yyyy or maybe "transportMode" instead of "null"?? kai, oct'19)
 	}
