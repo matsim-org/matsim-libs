@@ -118,7 +118,7 @@ public class SignalSystemsDataConsistencyChecker {
 		}
 
 		for(SignalSystemData system : signalsData.getSignalSystemsData().getSignalSystemData().values()){
-			if (system.getSignalData().isEmpty()) {
+			if (system.getSignalData() == null || system.getSignalData().isEmpty()) {
 				emptySystems.add(system.getId());
 				if (!signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(system.getId()).isEmpty()){
 					log.warn("a system contains no signals but groups");
