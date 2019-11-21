@@ -49,7 +49,7 @@ public class LanesConsistencyChecker {
 	}
 	
 	public void checkConsistency() {
-		log.info("checking consistency...");
+		log.info("Checking consistency of lane data...");
 		List<Id<Link>> linksWithMalformedLanes = new LinkedList<>();
 		for (LanesToLinkAssignment l2l : this.lanes.getLanesToLinkAssignments().values()){
 			if (!areLanesOnLinkConsistent(l2l)){
@@ -132,6 +132,12 @@ public class LanesConsistencyChecker {
 				log.error("The lane " + lane.getId() + " on link " + l2l.getLinkId() + " does not lead to any lane nor link.");
 				return false;
 			}
+		}
+		// identify lanes on links that only have one outlink
+		Link link = this.network.getLinks().get(l2l.getLinkId());
+		if (link.getToNode().getOutLinks().size() <= 1){
+			log.error("The link " + link.getId() + " has lanes but only one outLink.");
+			return false;
 		}
 		
 		// comment this out, because not every out-link of a node has to be reached by every in-link. theresa, aug'17
