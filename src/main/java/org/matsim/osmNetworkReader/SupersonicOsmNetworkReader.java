@@ -29,6 +29,9 @@ public class SupersonicOsmNetworkReader {
 	private static final Set<String> oneWayTags = new HashSet<>(Arrays.asList("yes", "true", "1"));
 	private static final Set<String> notOneWayTags = new HashSet<>(Arrays.asList("no", "false", "0"));
 
+    private final Object nodesLockObject = new Object();
+    private final Object linksLockObject = new Object();
+
 	private final Map<String, LinkProperties> linkProperties;
 	private final BiPredicate<Coord, Integer> linkFilter;
 	private final Predicate<Long> preserveNodeWithId;
@@ -69,7 +72,6 @@ public class SupersonicOsmNetworkReader {
 		read(Paths.get(inputFile));
 	}
 
-	@SuppressWarnings("WeakerAccess")
 	public void read(Path inputFile) {
 
 		var nodesAndWays = OsmNetworkParser.parse(inputFile, linkProperties);
@@ -208,7 +210,11 @@ public class SupersonicOsmNetworkReader {
 		LinkProperties properties = linkProperties.get(highwayType);
 
 		long linkId = isReverse ? segment.getSegmentId() + 1 : segment.getSegmentId();
-		Link link = network.getFactory().createLink(Id.createLinkId(linkId), fromNode, toNode);
+        Link link;
+        // my guess is that somehow the creation of ids causes a race condition when adding links to the network
+        synchronized (Id.class) {
+            link = network.getFactory().createLink(Id.createLinkId(linkId), fromNode, toNode);
+        }
 		link.setLength(segment.getLength());
 		link.setFreespeed(getFreespeed(segment.getTags(), link.getLength(), properties));
 		link.setNumberOfLanes(getNumberOfLanes(segment.getTags(), isReverse, properties));
@@ -313,17 +319,25 @@ public class SupersonicOsmNetworkReader {
 	private synchronized void addLinkToNetwork(Link link) {
 
 		//we have to test for presence
-		if (!network.getNodes().containsKey(link.getFromNode().getId())) {
-			network.addNode(link.getFromNode());
-		}
-		if (!network.getNodes().containsKey(link.getToNode().getId())) {
-			network.addNode(link.getToNode());
-		}
-		if (!network.getLinks().containsKey(link.getId())) {
-			network.addLink(link);
-		} else {
-			throw new RuntimeException("ups");
-		}
+        synchronized (nodesLockObject) {
+            if (!network.getNodes().containsKey(link.getFromNode().getId())) {
+                network.addNode(link.getFromNode());
+            }
+        }
+        synchronized (nodesLockObject) {
+            if (!network.getNodes().containsKey(link.getToNode().getId())) {
+                network.addNode(link.getToNode());
+            }
+        }
+        synchronized (linksLockObject) {
+            if (!network.getLinks().containsKey(link.getId())) {
+                network.addLink(link);
+            } else {
+                log.error("Link id: " + link.getId() + " was already present. This should not happen");
+                log.error("The link associated with this id: " + link.toString());
+                throw new RuntimeException("Link id: " + link.getId() + " was already present!");
+            }
+        }
 	}
 
 	@RequiredArgsConstructor
