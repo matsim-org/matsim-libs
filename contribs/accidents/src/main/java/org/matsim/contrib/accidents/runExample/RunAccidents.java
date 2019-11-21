@@ -66,7 +66,7 @@ public class RunAccidents {
 		String[] tunnelLinks = readCSVFile("tunnelLinksCSVfile");
 		String[] planfreeLinks = readCSVFile("planfreeLinksCSVfile");
 				
-		networkModification.setLinkAttributsBasedOnOSMFile("osmlandUseFile", "osmPopDensityFile", "EPSG:31468" , tunnelLinks, planfreeLinks );
+		networkModification.setLinkAttributsBasedOnOSMFile("osmlandUseFile", "EPSG:31468" , tunnelLinks, planfreeLinks );
 		
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AccidentsModule());

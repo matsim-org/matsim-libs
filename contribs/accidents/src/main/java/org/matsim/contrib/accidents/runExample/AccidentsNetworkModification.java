@@ -55,15 +55,13 @@ public class AccidentsNetworkModification {
 		this.scenario = scenario;
 	}
 	
-	public void setLinkAttributsBasedOnOSMFile(String landuseOsmFile, String placesOsmFile, String osmCRS, String[] tunnelLinkIDs, String[] planfreeLinkIDs) {
+	public void setLinkAttributsBasedOnOSMFile(String landuseOsmFile, String osmCRS, String[] tunnelLinkIDs, String[] planfreeLinkIDs) {
 		
 		AccidentsConfigGroup accidentsCfg = (AccidentsConfigGroup) scenario.getConfig().getModules().get(AccidentsConfigGroup.GROUP_NAME);
 		
 		Map<String, SimpleFeature> landUseFeaturesBB = new HashMap<>();
 		Map<String, String> landUseDataBB = new HashMap<>();
 
-		Map<String, SimpleFeature> popDensityFeatures = new HashMap<>();
-		Map<String, Double> popDensityData = new HashMap<>();
 		
 		log.info("Initializing all link-specific information...");
 						
@@ -88,26 +86,6 @@ public class AccidentsNetworkModification {
 			}
 		}
 		
-		if (placesOsmFile == null) {
-			log.warn("Places shape file is null. Using default values...");
-		} else {
-			SimpleFeatureSource ftsPlaces = ShapeFileReader.readDataFile(placesOsmFile);
-			try (SimpleFeatureIterator itPlaces = ftsPlaces.getFeatures().features()){
-				while (itPlaces.hasNext()){
-					SimpleFeature ftPlaces = itPlaces.next();
-					String osmId = ftPlaces.getAttribute("osm_id").toString();
-					double popDensity = Double.parseDouble(ftPlaces.getAttribute("pop_dens").toString());
-					popDensityFeatures.put(osmId, ftPlaces);
-					popDensityData.put(osmId, popDensity);
-				}
-				itPlaces.close();
-				DataStore ds = (DataStore) ftsPlaces.getDataStore();
-				ds.dispose();
-				log.info("Reading shp file for population density... Done.");
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
 
 		int linkCounter = 0;
 		for (Link link : this.scenario.getNetwork().getLinks().values()) {
