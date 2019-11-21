@@ -26,6 +26,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -149,11 +150,27 @@ public class FacilitiesUtils {
 	 *  We have situations where the coordinate field in facility is not filled out.
 	 */
 	public static Coord decideOnCoord( final Facility facility, final Network network, double relativePositionOfEntryExitOnLink ) {
-		Coord coord = facility.getCoord() ;
-		if ( coord == null ) {
-			coord = network.getLinks().get( facility.getLinkId() ).getCoord() ;
+		if ( facility.getCoord() != null ) {
+			return facility.getCoord() ;
 		}
-		return coord ;
+
+		if ( facility.getLinkId()==null ) {
+			if ( facility instanceof Identifiable ) {
+				throw new RuntimeException( "facility with id=" + ((Identifiable) facility).getId() + " has neither coord nor linkId.  This " +
+									    "does not work ..." ) ;
+			} else {
+				throw new RuntimeException( "facility which does not implement Identifiable has neither coord nor linkId.  This " +
+									    "does not work ..." ) ;
+			}
+		}
+
+		Gbl.assertNotNull( network ) ;
+		Link link = network.getLinks().get( facility.getLinkId() ) ;
+		Gbl.assertNotNull( link );
+		Coord fromCoord = link.getFromNode().getCoord() ;
+		Coord toCoord = link.getToNode().getCoord() ;
+		return new Coord( fromCoord.getX() + relativePositionOfEntryExitOnLink *( toCoord.getX() - fromCoord.getX()) , fromCoord.getY() + relativePositionOfEntryExitOnLink *( toCoord.getY() - fromCoord.getY() ) );
+
 	}
 
 	// Logic gotten from PopulationUtils, but I am actually a bit unsure about the value of those methods now that
