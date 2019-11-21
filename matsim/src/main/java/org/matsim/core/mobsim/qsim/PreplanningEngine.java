@@ -323,8 +323,8 @@ public final class PreplanningEngine implements MobsimEngine {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 
 		TripStructureUtils.Trip inputTrip = null;
-		Coord pickupCoord = FacilitiesUtils.decideOnCoord( tripInfo.getPickupLocation(), network ) ;
-		Coord dropoffCoord = FacilitiesUtils.decideOnCoord( tripInfo.getDropoffLocation(), network ) ;
+		Coord pickupCoord = FacilitiesUtils.decideOnCoord( tripInfo.getPickupLocation(), network, scenario.getConfig() ) ;
+		Coord dropoffCoord = FacilitiesUtils.decideOnCoord( tripInfo.getDropoffLocation(), network, scenario.getConfig() ) ;
 		// TODO: check: was PreplanningEngine.drtStageActivities, so drt* interaction only?
 		for (TripStructureUtils.Trip drtTrip : TripStructureUtils.getTrips( plan )) {
 			// recall that we have set the activity end time of the current activity to infinity, so we cannot use that any more.  :-( ?!
@@ -334,7 +334,8 @@ public final class PreplanningEngine implements MobsimEngine {
 			if ( CoordUtils.calcEuclideanDistance( coordOrigin, pickupCoord ) > 1000.) {
 				continue;
 			}
-			Coord coordDestination = PopulationUtils.decideOnCoordForActivity( drtTrip.getDestinationActivity(), scenario ) ;
+			Coord coordDestination = PopulationUtils.decideOnCoordForActivity( drtTrip.getDestinationActivity(), scenario
+											 ) ;
 			if (CoordUtils.calcEuclideanDistance( coordDestination, dropoffCoord ) > 1000.) {
 				continue;
 			}

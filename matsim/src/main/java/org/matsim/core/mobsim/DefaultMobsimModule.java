@@ -34,11 +34,18 @@ public class DefaultMobsimModule extends AbstractModule {
     public void install() {
         if (getConfig().controler().getMobsim().equals(ControlerConfigGroup.MobsimType.qsim.toString())) {
             install(new QSimModule());
+//            bind(  RelativePositionOfEntryExitOnLink.class ).toInstance( () -> 1. );
         } else if (getConfig().controler().getMobsim().equals(ControlerConfigGroup.MobsimType.JDEQSim.toString())) {
             bindMobsim().to(JDEQSimulation.class);
+//            bind(  RelativePositionOfEntryExitOnLink.class ).toInstance( () -> 0. );
         } else if (getConfig().getModule(ExternalMobimConfigGroup.GROUP_NAME) != null &&
                 ((ExternalMobimConfigGroup) getConfig().getModule(ExternalMobimConfigGroup.GROUP_NAME)).getExternalExe() != null) {
             bindMobsim().to(ExternalMobsim.class);
+            // since we do not know what the external mobsim does here, we leave it open, which should force the user to fill this with meaning.  ???  kai,
+            // nov'19
         }
     }
+//    public interface RelativePositionOfEntryExitOnLink{
+//        double get() ;
+//    }
 }

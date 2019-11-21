@@ -10,6 +10,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
@@ -22,13 +24,14 @@ class FallbackRoutingModuleDefaultImpl implements  FallbackRoutingModule {
 	public static final String _fallback = "_fallback";
 
 	@Inject private PlansCalcRouteConfigGroup pcrCfg;
+	@Inject private Config config ;
 	@Inject private Population population ;
 	@Inject private Network network ;
 
 	@Override public List<? extends PlanElement> calcRoute( Facility fromFacility, Facility toFacility, double departureTime, Person person ){
 		Leg leg = population.getFactory().createLeg( "dummy" ) ;
-		Coord fromCoord = FacilitiesUtils.decideOnCoord( fromFacility, network );
-		Coord toCoord = FacilitiesUtils.decideOnCoord( toFacility, network ) ;
+		Coord fromCoord = FacilitiesUtils.decideOnCoord( fromFacility, network, config );
+		Coord toCoord = FacilitiesUtils.decideOnCoord( toFacility, network, config ) ;
 		Id<Link> dpLinkId = FacilitiesUtils.decideOnLink( fromFacility, network ).getId() ;
 		Id<Link> arLinkId = FacilitiesUtils.decideOnLink( toFacility, network ).getId() ;
 		NetworkRoutingInclAccessEgressModule.routeBushwhackingLeg( person, leg, fromCoord, toCoord, departureTime, dpLinkId, arLinkId, population.getFactory(), 

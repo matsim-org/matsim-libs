@@ -26,11 +26,13 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.LinkWrapperFacility;
@@ -69,7 +71,7 @@ public class FacilitiesUtils {
 			throw new RuntimeException("cannot set linkID for this facility type; API needs to be cleaned up") ;
 		}
 	}
-	
+
 	public static Link decideOnLink( final Facility facility, final Network network ) {
 		Link accessActLink = null ;
 		
@@ -140,7 +142,13 @@ public class FacilitiesUtils {
 	/**
 	 *  We have situations where the coordinate field in facility is not filled out.
 	 */
-	public static Coord decideOnCoord( final Facility facility, final Network network ) {
+	public static Coord decideOnCoord( final Facility facility, final Network network, final Config config ) {
+		return decideOnCoord( facility, network, config.global().getRelativePositionOfEntryExitOnLink() ) ;
+	}
+	/**
+	 *  We have situations where the coordinate field in facility is not filled out.
+	 */
+	public static Coord decideOnCoord( final Facility facility, final Network network, double relativePositionOfEntryExitOnLink ) {
 		Coord coord = facility.getCoord() ;
 		if ( coord == null ) {
 			coord = network.getLinks().get( facility.getLinkId() ).getCoord() ;
