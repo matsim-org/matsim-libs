@@ -7,11 +7,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.compress.compressors.FileNameUtil;
 import org.apache.log4j.Logger;
@@ -57,8 +59,9 @@ public class EmissionsCalculator {
 	public static void main(String[] args) throws IOException {
 
 		EmissionsCalculator emissionsCalculator = new EmissionsCalculator(
-				"C:\\Users\\VWBIDGN\\Desktop\\Emissions_base.csv",
-				"D:\\Matsim\\Axer\\Hannover\\ZIM\\output\\vw280_CityCommuterDRTcarOnly_20pct_1.0_2500_veh_idx0\\vw280_CityCommuterDRTcarOnly_20pct_1.0_2500_veh_idx0.mileage.csv");
+				"C:\\Users\\VWBIDGN\\Desktop\\Emissions_decarbo.csv",
+				"D:\\Matsim\\Axer\\Hannover\\Base\\vw280_100pct\\vw280_100pct.mileage.csv");
+
 
 		emissionsCalculator.validityCheck();
 		emissionsCalculator.allocateMilages();
@@ -160,8 +163,13 @@ public class EmissionsCalculator {
 		String fileName = ".co2Emissions.csv";
 		String scenarioName = new File(this.mileageDefinitionFile).getParentFile().getName();
 		String path = new File(this.mileageDefinitionFile).getParentFile().toString();
-
-		NumberFormat formatter = new DecimalFormat("#0.00");
+		
+		DecimalFormat format = new DecimalFormat();
+		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
+		format.setMinimumIntegerDigits(1);
+		format.setMaximumFractionDigits(2);
+		format.setGroupingUsed(false);
+		
 		BufferedWriter bw = IOUtils.getBufferedWriter(path + "//" + scenarioName + fileName);
 
 		try {
@@ -171,8 +179,8 @@ public class EmissionsCalculator {
 
 			for (CO2EmissionsEntry co2EmissionsInput : co2EmissionsInputs) {
 				String row = co2EmissionsInput.generalMode + ";" + co2EmissionsInput.vehicleType + ";"
-						+ co2EmissionsInput.powerTrain + ";" + formatter.format(co2EmissionsInput.co2Emissions) + ";"
-						+ formatter.format(co2EmissionsInput.mileage);
+						+ co2EmissionsInput.powerTrain + ";" + format.format(co2EmissionsInput.co2Emissions) + ";"
+						+ format.format(co2EmissionsInput.mileage);
 
 				bw.write(row);
 				bw.newLine();

@@ -30,9 +30,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.locationtech.jts.geom.Geometry;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -42,6 +44,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.drt.routing.DrtStageActivityType;
+import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PersonUtils;
@@ -61,13 +64,16 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.PtConstants;
 import org.opengis.feature.simple.SimpleFeature;
 
-import vwExamples.utils.createShiftingScenario.homeOffice.assignHomeOfficeSubTour;
-import vwExamples.utils.createShiftingScenario.homeOffice.isHomeOfficeSubTourCandidate;
+import vwExamples.utils.createShiftingScenario.cityCommuterDRT.assignCityCommuterTourCandidate;
+import vwExamples.utils.createShiftingScenario.cityCommuterDRT.isCityCommuterTourCandidate;
+import vwExamples.utils.createShiftingScenario.cityDRT.isWithinCityTourCandidate;
+import vwExamples.utils.createShiftingScenario.commuterDRT.assignCommuterTourCandidate;
+import vwExamples.utils.createShiftingScenario.commuterDRT.isCommuterTourCandidate;
 
 /**
  * @author saxer
  */
-public class PlanModifierHomeOffice {
+public class PlanModifierCommuterDRT {
 
 	// Shape File to check home and work locations of the agents
 	Set<String> cityZones;
@@ -96,7 +102,7 @@ public class PlanModifierHomeOffice {
 	ShiftingScenario shiftingScenario;
 	String sep = ";";
 
-	PlanModifierHomeOffice(String cityZonesFile, String serviceAreaZonesFile, String plansFile, String modPlansFile,
+	PlanModifierCommuterDRT(String cityZonesFile, String serviceAreaZonesFile, String plansFile, String modPlansFile,
 			String networkFile) {
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		// this.modifiedPopulationWriter = new StreamingPopulationWriter();
@@ -129,19 +135,19 @@ public class PlanModifierHomeOffice {
 		stages.add(parking.ParkingRouterNetworkRoutingModule.parkingStageActivityType);
 		blackList = new StageActivityTypesImpl(stages);
 
-		subTourValidator = new isHomeOfficeSubTourCandidate(network, cityZonesMap, serviceAreazonesMap);
-		assignTourValidator = new assignHomeOfficeSubTour(network, cityZonesMap, serviceAreazonesMap);
-		shiftingScenario = new ShiftingScenario(0.06);
+		subTourValidator = new isCommuterTourCandidate(network, cityZonesMap, serviceAreazonesMap);
+		assignTourValidator = new assignCommuterTourCandidate(network, cityZonesMap, serviceAreazonesMap);
+		shiftingScenario = new ShiftingScenario(0.20);
 
 	}
 
 	public static void main(String[] args) {
 
-		PlanModifierHomeOffice planmodifier = new PlanModifierHomeOffice(
+		PlanModifierCommuterDRT planmodifier = new PlanModifierCommuterDRT(
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Hannover_Stadtteile.shp",
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Real_Region_Hannover.shp",
-				"D:\\Matsim\\Axer\\Hannover\\Base\\vw280_100pct\\vw280_100pct.output_plans.xml.gz",
-				"D:\\Matsim\\Axer\\Hannover\\Base\\vw280_100pct\\vw280_100pct.output_plans_homeOffice.xml.gz",
+				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\vw280_100pct.output_plans_cityDRT_carOnly.xml.gz",
+				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\vw280_100pct.output_plans_cityCommuterDRTadditiv_carOnly.xml.gz",
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\network\\network.xml.gz");
 		planmodifier.count();
 		planmodifier.assign();
@@ -210,7 +216,7 @@ public class PlanModifierHomeOffice {
 
 				String subtourMode = getSubtourMode(subTour, plan);
 
-				if (subTourValidator.isValidSubTour(subTour)) {
+				if (subTourValidator.isValidSubTour(subTour) && subtourMode.equals("car")) {
 					shiftingScenario.agentSet.add(person.getId());
 					shiftingScenario.totalSubtourCounter.increment();
 
@@ -247,11 +253,19 @@ public class PlanModifierHomeOffice {
 
 		// modifiedPopulationWriter.closeStreaming();
 	}
+	
+	public static <E> Optional<E> getRandom (Collection<E> e) {
+
+	    return e.stream()
+	            .skip((int) (e.size() * Math.random()))
+	            .findFirst();
+	}
 
 	public void assign() {
-		String shit2Mode = "stayHome";
+		String shift2mode = "drt";
 		String shiftingType = shiftingScenario.type;
 		int tripCounter = 0;
+		double minTripDistance = 2500.0;
 
 		// Part for subtourConversion
 		if (shiftingType.equals("subtourConversion")) {
@@ -275,19 +289,36 @@ public class PlanModifierHomeOffice {
 				// Select a random person from agentSet
 				Plan plan = scenario.getPopulation().getPersons().get(personId).getSelectedPlan();
 
+				// Get random subtour of this agent
+				Collection<Subtour> subtoursCol = TripStructureUtils.getSubtours(plan, blackList);
 				
-				// Loop over all subtours of this agent
-
-				for (Subtour subTour : TripStructureUtils.getSubtours(plan, blackList)) {
-
+				ArrayList<Subtour> subtours = new ArrayList<Subtour>(subtoursCol);
+				int randomTourdx = (int) (Math.random() * (subtours.size() - 1));
+				
+				Subtour subTour = subtours.get(randomTourdx);
+				
+				//for (Subtour subTour : TripStructureUtils.getSubtours(plan, blackList))
+				{
+					
+					double numberOfTrips = subTour.getTrips().size();
+					double estimatedTourDistance = getBeelineTourLength(subTour);
+					
+					double meanTripDistance = estimatedTourDistance / numberOfTrips;
+					
 					// Get subtour mode
 					String subtourMode = getSubtourMode(subTour, plan);
 
+					if (subtourMode.equals("walk")) {
+						minTripDistance = 1700.0;
+					} else if (subtourMode.equals("bike")) {
+						minTripDistance = 3900.0;
+					}
+
 					// Check if this subtour can be shifted to an other mode
 					// It is not allowed to shift an already shifted tour
-					if (assignTourValidator.isValidSubTour(subTour) && (subtourMode != shit2Mode)) {
+					if (assignTourValidator.isValidSubTour(subTour) && (subtourMode != shift2mode)
+							&& meanTripDistance > minTripDistance && subtourMode.equals("car")) {
 
-					
 						// System.out.println("Trip Size:" + subTour.getTrips().size());
 
 						for (Trip trip : subTour.getTrips()) {
@@ -296,7 +327,7 @@ public class PlanModifierHomeOffice {
 								l.setTravelTime(0.0);
 
 								TripRouter.insertTrip(plan, trip.getOriginActivity(),
-										Collections.singletonList(PopulationUtils.createLeg(shit2Mode)),
+										Collections.singletonList(PopulationUtils.createLeg(shift2mode)),
 										trip.getDestinationActivity());
 							}
 
@@ -310,19 +341,18 @@ public class PlanModifierHomeOffice {
 
 							tripCounter++;
 						}
-						
+
 						shiftingScenario.assignedSubTours++;
-						
+
 					}
-	
 
 				}
 				// If no tour for this agent can be found, this agent could be deleted from
 				// agentCandidateList
-//				if (foundTour == false) {
-//					agentCandidateList.remove(randomAgentCandidateIdx);
-//
-//				}
+				// if (foundTour == false) {
+				// agentCandidateList.remove(randomAgentCandidateIdx);
+				//
+				// }
 
 			}
 
@@ -336,7 +366,7 @@ public class PlanModifierHomeOffice {
 		new PopulationWriter(scenario.getPopulation(), null).write(modPlansFile);
 		// modifiedPopulationWriter.startStreaming(modPlansFile);
 		// modifiedPopulationWriter.closeStreaming();
-//		System.out.println(tripCounter);
+		// System.out.println(tripCounter);
 
 	}
 
@@ -358,6 +388,19 @@ public class PlanModifierHomeOffice {
 
 		return subtourMode;
 
+	}
+
+	public double getBeelineTourLength(Subtour subTour) {
+		double distance = 0;
+		for (Trip trip : subTour.getTrips()) {
+
+			Coord fromCoord = trip.getOriginActivity().getCoord();
+			Coord toCoord = trip.getDestinationActivity().getCoord();
+
+			distance = distance + DistanceUtils.calculateDistance(fromCoord, toCoord);
+
+		}
+		return distance;
 	}
 
 	public void readCityShape(String shapeFile, String featureKeyInShapeFile) {

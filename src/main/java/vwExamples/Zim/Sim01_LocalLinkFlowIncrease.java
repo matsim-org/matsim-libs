@@ -28,7 +28,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 
@@ -68,13 +71,34 @@ public class Sim01_LocalLinkFlowIncrease {
 		config.plans().setInputFile(input + "plans//"+inputPlans);
 
 		//Disable any innovation from the beginning of the simulation
-		config.strategy().setFractionOfIterationsToDisableInnovation(0);
-
+		config.strategy().clearStrategySettings();
+//		StrategySettings strat = new StrategySettings();
+//		strat.setStrategyName(DefaultSelector.KeepLastSelected.toString());
+//		strat.setWeight(1.0);
+//		config.strategy().addStrategySettings(strat);
+		
+		StrategySettings reroute = new StrategySettings();
+		reroute.setStrategyName(DefaultStrategy.ReRoute);
+		reroute.setWeight(0.1);
+		config.strategy().addStrategySettings(reroute);
+		
+		StrategySettings timeMutator = new StrategySettings();
+		timeMutator.setStrategyName(DefaultStrategy.TimeAllocationMutator);
+		timeMutator.setWeight(0.1);
+		config.strategy().addStrategySettings(timeMutator);
+		
+		StrategySettings changeExpBeta = new StrategySettings();
+		changeExpBeta.setStrategyName(DefaultSelector.ChangeExpBeta);
+		changeExpBeta.setWeight(0.8);
+		config.strategy().addStrategySettings(changeExpBeta);
+		
+		config.strategy().setFractionOfIterationsToDisableInnovation(0.7);
+		
 		config.controler().setOutputDirectory(ouput);
 		config.network().setInputFile(input + "network//"+networkWithCapacities);
 		config.transit().setTransitScheduleFile(input + "transit//vw280_0.1.output_transitSchedule.xml.gz");
 		config.transit().setVehiclesFile(input + "transit//vw280_0.1.output_transitVehicles.xml.gz");
-		config.controler().setLastIteration(2); // Number of simulation iterations
+		config.controler().setLastIteration(30); // Number of simulation iterations
 //		config.controler().setWriteEventsInterval(2); // Write Events file every x-Iterations
 //		config.controler().setWritePlansInterval(2); // Write Plan file every x-Iterations
 		config.qsim().setStartTime(0);

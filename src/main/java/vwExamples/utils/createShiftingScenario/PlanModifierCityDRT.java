@@ -141,8 +141,8 @@ public class PlanModifierCityDRT {
 		PlanModifierCityDRT planmodifier = new PlanModifierCityDRT(
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Hannover_Stadtteile.shp",
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Real_Region_Hannover.shp",
-				"D:\\Matsim\\Axer\\Hannover\\Base\\vw280_0.1\\vw280_0.1.output_plans.xml.gz",
-				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\vw280_0.1.output_plans_cityDRT_Test.xml.gz",
+				"D:\\Matsim\\Axer\\Hannover\\Base\\vw280_100pct\\vw280_100pct.output_plans.xml.gz",
+				"D:\\Matsim\\Axer\\Hannover\\Base\\vw280_100pct\\vw280_100pct.output_plans_cityDRT_carOnly.xml.gz",
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\network\\network.xml.gz");
 		planmodifier.count();
 		planmodifier.assign();
@@ -211,8 +211,8 @@ public class PlanModifierCityDRT {
 
 				String subtourMode = getSubtourMode(subTour, plan);
 
-//				if (subTourValidator.isValidSubTour(subTour) && subtourMode.equals("car")) {
-				if (subTourValidator.isValidSubTour(subTour)) {
+				if (subTourValidator.isValidSubTour(subTour) && subtourMode.equals("car")) {
+//				if (subTourValidator.isValidSubTour(subTour)) {
 					shiftingScenario.agentSet.add(person.getId());
 					shiftingScenario.totalSubtourCounter.increment();
 
@@ -278,9 +278,16 @@ public class PlanModifierCityDRT {
 				// Select a random person from agentSet
 				Plan plan = scenario.getPopulation().getPersons().get(personId).getSelectedPlan();
 
-				// Loop over all subtours of this agent
+				// Get random subtour of this agent
+				Collection<Subtour> subtoursCol = TripStructureUtils.getSubtours(plan, blackList);
+				
+				ArrayList<Subtour> subtours = new ArrayList<Subtour>(subtoursCol);
+				int randomTourdx = (int) (Math.random() * (subtours.size() - 1));
+				
+				Subtour subTour = subtours.get(randomTourdx);
 
-				for (Subtour subTour : TripStructureUtils.getSubtours(plan, blackList)) {
+//				for (Subtour subTour : TripStructureUtils.getSubtours(plan, blackList))
+				{
 					
 					double numberOfTrips = subTour.getTrips().size();
 					double estimatedTourDistance = getBeelineTourLength(subTour);
@@ -298,10 +305,10 @@ public class PlanModifierCityDRT {
 
 					// Check if this subtour can be shifted to an other mode
 					// It is not allowed to shift an already shifted tour
-//					if (assignTourValidator.isValidSubTour(subTour) && (subtourMode != shift2mode)
-//							&& meanTripDistance > minTripDistance && subtourMode.contains("car")) {
 					if (assignTourValidator.isValidSubTour(subTour) && (subtourMode != shift2mode)
-							&& meanTripDistance > minTripDistance) {
+							&& meanTripDistance > minTripDistance && subtourMode.contains("car")) {
+//					if (assignTourValidator.isValidSubTour(subTour) && (subtourMode != shift2mode)
+//							&& meanTripDistance > minTripDistance) {
 
 						// System.out.println("Trip Size:" + subTour.getTrips().size());
 

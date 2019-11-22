@@ -90,13 +90,11 @@ public class RunExperiencedTripsAnalysisBatch {
 //			scenarioToBeAnalyzed.add("vw280_0.1");
 //			scenarioToBeAnalyzed.add("vw280_CityCommuterDRTcarOnly_20pct_0.1_250_veh_idx0");
 //			scenarioToBeAnalyzed.add("vw280_CityDRT_20pctCarOnly_0.1_120_veh_idx0");
-			scenarioToBeAnalyzed.add("vw280_100pct");
-			
-			
-		
-			
-			
-			
+//			scenarioToBeAnalyzed.add("VW280_LocalLinkFlow_1.15_100pct_2");
+//			scenarioToBeAnalyzed.add("VW280_LocalLinkFlow_1.28_100pct_2");
+//			scenarioToBeAnalyzed.add("VW280_CityCommuterDRT_carOnly_100pct_2");
+			scenarioToBeAnalyzed.add("VW280_CityCommuterDRT_carOnly_100pct_additiv");
+
 			
 			
 

@@ -33,39 +33,30 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.edrt.optimizer.EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider;
-import org.matsim.contrib.ev.charging.ChargeUpToMaxSocStrategy;
-import org.matsim.contrib.ev.charging.ChargingLogic;
-import org.matsim.contrib.ev.charging.ChargingPower;
-import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
-import org.matsim.contrib.ev.charging.FastThenSlowCharging;
-import org.matsim.contrib.ev.discharging.AuxEnergyConsumption;
-import org.matsim.contrib.ev.discharging.DriveEnergyConsumption;
-import org.matsim.contrib.ev.temperature.TemperatureChangeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.population.algorithms.XY2Links;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vis.otfvis.OTFVisConfigGroup;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
-import electric.edrt.energyconsumption.VwAVAuxEnergyConsumptionWithTemperatures;
-import electric.edrt.energyconsumption.VwDrtDriveEnergyConsumption;
 import vwExamples.utils.CreateEDRTVehiclesAndChargers;
-import vwExamples.utils.customEV.BatteryReplacementCharging;
-import vwExamples.utils.customEdrtModule.CustomEDrtControlerCreator;
 
 /**
  * @author axer
@@ -73,95 +64,95 @@ import vwExamples.utils.customEdrtModule.CustomEDrtControlerCreator;
 
 public class Sim05_DrtCity {
 
-	public static final double MAX_RELATIVE_SOC = 0.8;// charge up to 80% SOC
-	public static final double MIN_RELATIVE_SOC = 0.1;// send to chargers vehicles below 20% SOC
-	public static final double CHARGING_SPEED_FACTOR = 1.0;
-	public static final double BATTERYREPLACETIME = 180.0;
-
-	static boolean BatteryReplace = false;
-	static int[] fleetRange = { 900 }; //20 % all City tours to DRT
-//	static int[] fleetRange = { 120 }; //20 % of City car tours to DRT
-//	static int[] fleetRange = { 300 }; //Pendler DRT
-//	static int[] fleetRange = { 2800 };
-	// static int[] fleetRange = {50,60,70};
-
 	public static void main(String[] args) throws IOException {
-		// int count = 7;
-		int n_iterations = 1;
-		for (int it = 0; it < n_iterations; it++) {
-			for (int fleet : fleetRange) {
 
-				run(fleet, it);
-			}
-
-		}
-
+		String runId = args[0];
+		String base = args[1];
+		String configFileName = args[2];
+		String networkWithCapacities = args[3];
+		String inputPlans = args[4];
+		int fleet = Integer.parseInt(args[5]);
+		int qsimcores =Integer.parseInt(args[6]);
+		int hdlcores =Integer.parseInt(args[7]);
+		new Sim05_DrtCity().run(runId,base,configFileName,networkWithCapacities,inputPlans,fleet,qsimcores,hdlcores);
 	}
 
-	public static void run(int fleet, int iterationIdx) throws IOException {
+	public void run(String runId,String base, String configFilename, String networkWithCapacities, String inputPlans,int fleet, int qsimcores, int hdlcores) throws IOException {
 
+		
 		// Enable or Disable rebalancing
-		String runId = "vw280_CityDRT_20pct_0.1_" + fleet + "_veh_idx" + iterationIdx;
+		// String runId = "vw280_CityCommuterDRTcarOnly_20pct_1.0_" + fleet + "_veh";
 		boolean rebalancing = true;
 
-		String inbase = "D:\\Matsim\\Axer\\Hannover\\ZIM\\";
+		String inbase = base;
+		
+		String input = inbase + "input//";
 
-		// With EV
-		//		final Config config = ConfigUtils.loadConfig(inbase + "\\input\\Sim02_CommuterDRT.xml", new MultiModeDrtConfigGroup(),
-//				new DvrpConfigGroup(), new OTFVisConfigGroup(), new EvConfigGroup(),
-//				new TemperatureChangeConfigGroup());
-		//
-		// Without EV
-		
-		
-		//Create empty multiModeDrtConfigGroup
-        DrtConfigGroup drtCfg = new DrtConfigGroup();
-        MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
-        multiModeDrtConfigGroup.addParameterSet(drtCfg);
-		
-		
-		 final Config config = ConfigUtils.loadConfig(inbase + "\\input\\Sim02_CommuterDRT.xml",
-				 multiModeDrtConfigGroup,
-		 new DvrpConfigGroup(), new OTFVisConfigGroup());
+		// Create empty multiModeDrtConfigGroup
+		DrtConfigGroup drtCfg = new DrtConfigGroup();
+		MultiModeDrtConfigGroup multiModeDrtConfigGroup = new MultiModeDrtConfigGroup();
+		multiModeDrtConfigGroup.addParameterSet(drtCfg);
 
-		// With EV
-//		TemperatureChangeConfigGroup tcg = (TemperatureChangeConfigGroup) config.getModules()
-//				.get(TemperatureChangeConfigGroup.GROUP_NAME);
-		//		tcg.setTemperatureChangeFile(inbase + "\\input\\temp\\temperatures_0.csv");
+		final Config config = ConfigUtils.loadConfig(inbase + "//input//"+configFilename, multiModeDrtConfigGroup,
+				new DvrpConfigGroup(), new CadytsConfigGroup());
 
+		
+		//Disable any innovation from the beginning of the simulation
+		config.strategy().clearStrategySettings();
+		StrategySettings strat = new StrategySettings();
+
+		strat.setStrategyName(DefaultSelector.KeepLastSelected.toString());
+		strat.setWeight(1.0);
+		config.strategy().addStrategySettings(strat);
+		config.strategy().setFractionOfIterationsToDisableInnovation(0);
+		
+		PlanCalcScoreConfigGroup.ModeParams scoreParams =  new PlanCalcScoreConfigGroup.ModeParams("drt");
+		config.planCalcScore().addModeParams(scoreParams);
+		PlanCalcScoreConfigGroup.ModeParams scoreParams2 =  new PlanCalcScoreConfigGroup.ModeParams("drt_walk");
+		config.planCalcScore().addModeParams(scoreParams2);
+		
 		config.travelTimeCalculator().setTraveltimeBinSize(900);
 		Set<String> modes = new HashSet<String>();
 		modes.add("car");
 		modes.add("drt");
 		config.travelTimeCalculator().setAnalyzedModes(modes);
+		config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-		// config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		// Overwrite existing configuration parameters
-//		config.plans().setInputFile(inbase + "\\input\\plans\\w243_inOutWithDRT_selected.xml.gz");
-		config.plans().setInputFile(inbase + "\\input\\plans\\vw280_0.1.output_plans_cityDRT.xml.gz");
-		config.controler().setLastIteration(3); // Number of simulation iterations
-		config.controler().setWriteEventsInterval(3); // Write Events file every x-Iterations
-		config.controler().setWritePlansInterval(3); // Write Plan file every x-Iterations
+		config.plans().setInputFile(inbase + "//input//plans//"+inputPlans);
+
+		config.controler().setLastIteration(6); // Number of simulation iterations
+		
+		config.transit().setTransitScheduleFile(input + "transit//vw280_0.1.output_transitSchedule.xml.gz");
+		config.transit().setVehiclesFile(input + "transit//vw280_0.1.output_transitVehicles.xml.gz");
+
 		config.qsim().setStartTime(0);
 		config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
-		config.qsim().setFlowCapFactor(0.1);
-		config.qsim().setStorageCapFactor(0.11);
+		// config.qsim().setFlowCapFactor(0.1);
+		// config.qsim().setStorageCapFactor(0.11);
 
-		String networkFilePath = inbase + "\\input\\network\\network.xml.gz";
-		String shapeFilePath = inbase + "\\input\\shp\\Hannover_Stadtteile.shp";
+		config.controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastAStarLandmarks);
+		config.plansCalcRoute().setRoutingRandomness(3.);
+
+		// vsp defaults
+		config.qsim().setUsingTravelTimeCheckInTeleportation(true);
+		config.qsim().setTrafficDynamics(TrafficDynamics.kinematicWaves);
+		config.qsim().setNumberOfThreads(1);
+
+		String networkFilePath = inbase + "//input//network//"+networkWithCapacities;
+		String shapeFilePath = inbase + "//input//shp//Hannover_Stadtteile.shp";
 		String shapeFeature = "NO"; // shapeFeature is used to read the shapeFilePath. All zones in shapeFile are
 									// used to generate a drt service area
 		String drtTag = "drt"; // drtTag is assigned to roads that should be used by the drt service
 		// Adding drtTag to the network in order to define a service area
 		vwExamples.utils.serviceAreaShapeToNetwork.run(networkFilePath, shapeFilePath, shapeFeature, drtTag);
 
-		config.network().setInputFile(inbase + "\\input\\network\\drtServiceAreaNetwork.xml.gz");
+		config.network().setInputFile(inbase + "//input//network//drtServiceAreaNetwork.xml.gz");
 
 		// This part allows to change dynamically DRT config parameters
 		DrtConfigGroup drt = DrtConfigGroup.getSingleModeDrtConfig(config);
 
 		drt.setPrintDetailedWarnings(false);
-		drt.setMode("drt");
 		// Parameters to setup the DRT service
 		drt.setMaxTravelTimeBeta(900.0);
 		drt.setMaxTravelTimeAlpha(1.4);
@@ -172,12 +163,12 @@ public class Sim05_DrtCity {
 		// Create the virtual stops for the drt service
 		// VirtualStops are dynamically generated
 		vwExamples.utils.CreateStopsFromGrid.run(config.network().getInputFile(), 400.0, drtTag);
-		drt.setTransitStopFile(inbase + "\\input\\network\\virtualStops.xml");
+		drt.setTransitStopFile(inbase + "//input//network//virtualStops.xml");
 		drt.setMaxWalkDistance(800.0);
 
 		config.controler().setRunId(runId);
 
-		config.controler().setOutputDirectory(inbase + "\\output\\" + runId); // Define dynamically the the
+		config.controler().setOutputDirectory(inbase + "//output//" + runId); // Define dynamically the the
 		// output path
 
 		// For each demand scenario we are using a predefined drt vehicle fleet size
@@ -189,16 +180,19 @@ public class Sim05_DrtCity {
 		CreateEDRTVehiclesAndChargers vehiclesAndChargers = new CreateEDRTVehiclesAndChargers();
 		Map<Id<Link>, Integer> depotsAndVehicles = new HashMap<>();
 
-		depotsAndVehicles.put(Id.createLinkId(181441), (int) (fleet*0.20));
-		depotsAndVehicles.put(Id.createLinkId(108498), (int) (fleet*0.20));
-		depotsAndVehicles.put(Id.createLinkId(279990), (int) (fleet*0.20));
-		depotsAndVehicles.put(Id.createLinkId(167788), (int) (fleet*0.20));
-		depotsAndVehicles.put(Id.createLinkId(137655), (int) (fleet*0.20));
+		// // City Hubs (these hubs are empty at the beginning of the simulation)
 
-		vehiclesAndChargers.CHARGER_FILE = inbase + "\\input\\chargers\\chargers.xml.gz";
-		vehiclesAndChargers.NETWORKFILE = inbase + "\\input\\network\\drtServiceAreaNetwork.xml.gz";
-		vehiclesAndChargers.DRT_VEHICLE_FILE = inbase + "\\input\\fleets\\fleet.xml.gz";
-		vehiclesAndChargers.E_VEHICLE_FILE = inbase + "\\input\\fleets\\eFleet.xml.gz";
+		int cityFleet = (int) (fleet);
+		depotsAndVehicles.put(Id.createLinkId(181441), (int) (cityFleet*0.2)); // 2
+		depotsAndVehicles.put(Id.createLinkId(108498), (int) (cityFleet*0.2)); // 3
+		depotsAndVehicles.put(Id.createLinkId(279990), (int) (cityFleet*0.2)); // 4
+		depotsAndVehicles.put(Id.createLinkId(167788), (int) (cityFleet*0.2)); // 9
+		depotsAndVehicles.put(Id.createLinkId(137655), (int) (cityFleet*0.2)); // 17
+
+		vehiclesAndChargers.CHARGER_FILE = inbase + "//input//chargers//chargers.xml.gz";
+		vehiclesAndChargers.NETWORKFILE = inbase + "//input//network//drtServiceAreaNetwork.xml.gz";
+		vehiclesAndChargers.DRT_VEHICLE_FILE = inbase + "//input//fleets//fleet.xml.gz";
+		vehiclesAndChargers.E_VEHICLE_FILE = inbase + "//input//fleets//eFleet.xml.gz";
 		vehiclesAndChargers.drtTag = drtTag;
 		vehiclesAndChargers.SEATS = 6;
 		vehiclesAndChargers.MAX_START_CAPACITY_KWH = 78;
@@ -209,51 +203,17 @@ public class Sim05_DrtCity {
 		vehiclesAndChargers.CHAGERSPERDEPOT = 35;
 		vehiclesAndChargers.run(depotsAndVehicles);
 
-		drt.setVehiclesFile(inbase + "\\input\\fleets\\fleet.xml.gz");
+		drt.setVehiclesFile(inbase + "//input//fleets//fleet.xml.gz");
 		drt.setIdleVehiclesReturnToDepots(false);
 		drt.setOperationalScheme(DrtConfigGroup.OperationalScheme.stopbased);
-		
+
 		drt.setPlotDetailedCustomerStats(true);
-
-//		 EvConfigGroup eDrt = (EvConfigGroup)
-//		 config.getModules().get(EvConfigGroup.GROUP_NAME);
-//		 eDrt.setChargersFile(inbase + "\\input\\chargers\\chargers.xml.gz");
-//		 eDrt.setVehiclesFile(inbase + "\\input\\fleets\\eFleet.xml.gz");
-//		 eDrt.setAuxDischargeTimeStep(10);
-//		 eDrt.setAuxDischargingSimulation(EvConfigGroup.AuxDischargingSimulation.seperateAuxDischargingHandler);
-//		 eDrt.setTimeProfiles(true);
-
-		// config.addModule(new ParkingRouterConfigGroup());
-		// ParkingRouterConfigGroup prc = ParkingRouterConfigGroup.get(config);
-		// String shapeFile = inbase + "shp\\parking-zones.shp";
-		// prc.setShapeFile(shapeFile);
-		// prc.setCapacityCalculationMethod("useFromNetwork");
-		// prc.setShape_key("NO");
-
-//		Scenario scenario = ScenarioUtils.loadScenario(config);
-		config.controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastAStarLandmarks );
-		config.plansCalcRoute().setRoutingRandomness( 3. );
-
-		// vsp defaults
-		config.qsim().setUsingTravelTimeCheckInTeleportation( true );
-		config.qsim().setTrafficDynamics( TrafficDynamics.kinematicWaves );
-		
-		config.global().setNumberOfThreads(32);
-		config.parallelEventHandling().setNumberOfThreads(32);
-//		config.qsim().setNumberOfThreads(32);
-		
-
-		// Scale PT Network Capacities
-//		adjustPtNetworkCapacity(scenario.getNetwork(), config.qsim().getFlowCapFactor());
-
-		// Filter Links with higher speeds than x km/h
-		// setXY2Links(scenario, 80 / 3.6);
 
 		// Define the MATSim Controler
 		// Based on the prepared configuration this part creates a controller that runs
 		Controler controler = createDRTControler(config, false);
 
-//		 Controler controler = createControler(config);
+		// Controler controler = createControler(config);
 
 		if (rebalancing == true) {
 
@@ -265,14 +225,6 @@ public class Sim05_DrtCity {
 			System.out.println("Rebalancing Online");
 
 			MinCostFlowRebalancingParams rebalancingParams = new MinCostFlowRebalancingParams();
-
-			// rebalancingParams.setInterval(300);
-			// rebalancingParams.setCellSize(1000);
-			// rebalancingParams.setTargetAlpha(0.3);
-			// rebalancingParams.setTargetBeta(0.3);
-			// rebalancingParams.setMaxTimeBeforeIdle(500);
-			// rebalancingParams.setMinServiceTime(3600);
-			// drt.addParameterSet(rebalancingParams);
 
 			rebalancingParams.setInterval(1800);
 			rebalancingParams.setCellSize(2000);
@@ -291,26 +243,13 @@ public class Sim05_DrtCity {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				// addRoutingModuleBinding(DvrpConfigGroup.get(config).getMode())
-				// .to(ClosestStopBasedDrtRoutingModule.class);
-				// Link travel times are iterativly updated between iteration
-				// tt[i] = alpha * experiencedTT + (1 - alpha) * oldEstimatedTT;
-				// Remark: Small alpha leads to more smoothing and longer lags in reaction.
-				// Default alpha is 0.05. Which means i.e. 0.3 is not smooth in comparison to
-				// 0.05
+
 				DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.05);
 				DvrpConfigGroup.get(config).setTravelTimeEstimationBeta(900);
-				// DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.05);
-				// DvrpConfigGroup.get(config).setTravelTimeEstimationBeta(3600*24);
-				// bind(RelocationWriter.class).asEagerSingleton();
-				// addControlerListenerBinding().to(RelocationWriter.class);
+
 
 			}
 		});
-
-		// controler.addOverridingModule(new ParkingRouterModule());
-		controler.addOverridingModule(new SwissRailRaptorModule());
-		// controler.addOverridingModule(new MyDrtTrajectoryAnalysisModule(drt));
 
 		// We finally run the controller to start MATSim
 
@@ -321,9 +260,9 @@ public class Sim05_DrtCity {
 					.flatMap(pl -> pl.getPlanElements().stream()).filter(Leg.class::isInstance)
 					.forEach(pe -> ((Leg) pe).setRoute(null));
 		}
-		
-		adjustPtNetworkCapacity(controler.getScenario().getNetwork(), config.qsim().getFlowCapFactor());
 
+		adjustPtNetworkCapacity(controler.getScenario().getNetwork(), config.qsim().getFlowCapFactor());
+		controler.addOverridingModule(new SwissRailRaptorModule());
 		controler.run();
 
 		// }
@@ -359,84 +298,8 @@ public class Sim05_DrtCity {
 
 	}
 
-	// public static Controler createControler(Config config) {
-	// Controler controler = CustomEDrtControlerCreator.createControler(config,
-	// false);
-	// controler.addOverridingModule(new TemperatureChangeModule());
-	//
-	//
-	// controler.addOverridingModule(createEvDvrpIntegrationModule(DrtConfigGroup.get(config)));
-	// controler.addOverridingModule(new AbstractModule() {
-	// @Override
-	// public void install() {
-	// bind(EDrtVehicleDataEntryFactoryProvider.class)
-	// .toInstance(new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
-	// bind(DriveEnergyConsumption.Factory.class)
-	// .toInstance(evconsumption -> new VwDrtDriveEnergyConsumption());
-	// bind(AuxEnergyConsumption.Factory.class)
-	// .to(VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
-	//
-	// if (BatteryReplace) {
-	// bind(ChargingLogic.Factory.class)
-	// .toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-	// new BatteryReplacementCharge(BATTERYREPLACETIME)));
-	// bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
-	// } else {
-	// bind(ChargingLogic.Factory.class)
-	// .toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger,
-	// new CustomFastThenSlowCharging(charger.getPower(), MAX_RELATIVE_SOC)));
-	// bind(VehicleAtChargerLinkTracker.class).asEagerSingleton();
-	// }
-	// }
-	// });
-	//
-	// return controler;
-	// }
-
 	public static Controler createDRTControler(Config config, boolean otfvis) {
 		return DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis);
 	}
-
-	public static Controler createControler(Config config) {
-		Controler controler = CustomEDrtControlerCreator.createControler(config, false);
-		controler.addOverridingModule(new TemperatureChangeModule());
-
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(EDrtVehicleDataEntryFactoryProvider.class).toInstance(
-						new EDrtVehicleDataEntryFactoryProvider(MIN_RELATIVE_SOC));
-				bind(DriveEnergyConsumption.Factory.class).toInstance(
-						evconsumption -> new VwDrtDriveEnergyConsumption());
-				bind(AuxEnergyConsumption.Factory.class).to(
-						VwAVAuxEnergyConsumptionWithTemperatures.VwAuxFactory.class);
-
-				if (BatteryReplace) {
-					bind(ChargingLogic.Factory.class).toProvider(
-							new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
-									charger -> new BatteryReplacementCharging.Strategy(charger,
-											new ChargeUpToMaxSocStrategy(charger, MAX_RELATIVE_SOC))));
-					bind(ChargingPower.Factory.class).toInstance(
-							ev -> new BatteryReplacementCharging(ev, BATTERYREPLACETIME));
-				} else {
-					bind(ChargingLogic.Factory.class).toProvider(
-							new ChargingWithQueueingAndAssignmentLogic.FactoryProvider(
-									charger -> new ChargeUpToMaxSocStrategy(charger, MAX_RELATIVE_SOC)));
-					bind(ChargingPower.Factory.class).toInstance(FastThenSlowCharging::new);
-				}
-
-				//				bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new FastThenSlowCharging(charger.getPower())));
-				//				//bind(ChargingLogic.Factory.class).toInstance(charger -> new ChargingWithQueueingAndAssignmentLogic(charger, new BatteryReplacementCharging(240.0)));
-			}
-		});
-
-		return controler;
-	}
-
-	// public static EvDvrpIntegrationModule
-	// createEvDvrpIntegrationModule(DrtConfigGroup drtCfg) {
-	// return new EvDvrpIntegrationModule(drtCfg.getMode())
-	// .setTurnedOnPredicate(RunDrtScenarioBatchH_eDRT_KGERAK::isTurnedOn);
-	// }
 
 }

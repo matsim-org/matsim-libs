@@ -54,7 +54,7 @@ public class serviceAreaShapeToNetwork {
         this.networkFile = new File(networkFilePath);
         this.shapeFile = new File(shapeFilePath);
         this.networkfolder = networkFile.getParent();
-        this.outputNetworkFile = networkfolder + "\\drtServiceAreaNetwork.xml.gz";
+        this.outputNetworkFile = networkfolder + "//drtServiceAreaNetwork.xml.gz";
         readShape(shapeFile, shapeFeature);
     }
 

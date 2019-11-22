@@ -84,7 +84,7 @@ public class RunTravelDelayAnalysisBatch {
 
 	public static void main(String[] args) {
 
-		String runDir = "D:\\Matsim\\Axer\\Hannover\\Base\\";
+		String runDir = "D:\\Matsim\\Axer\\Hannover\\ZIM\\output\\";
 		// String runId = "vw219_netnet150_veh_idx0.";
 
 		readShape(shapeFile, shapeFeature);
@@ -102,7 +102,13 @@ public class RunTravelDelayAnalysisBatch {
 //			scenarioToBeAnalyzed.add("vw280_CityCommuterDRTcarOnly_20pct_0.1_250_veh_idx0");
 //			scenarioToBeAnalyzed.add("vw280_CityDRT_20pctCarOnly_0.1_120_veh_idx0");
 //			scenarioToBeAnalyzed.add("vw280_HomeOffice_6pct_0.1");
-			scenarioToBeAnalyzed.add("vw280_100pct");
+//			scenarioToBeAnalyzed.add("VW280_CityDRT_carOnly_100pct");
+//			scenarioToBeAnalyzed.add("VW280_HomeOffice_100pct");
+//			scenarioToBeAnalyzed.add("VW280_LocalLinkFlow_1.15_100pct_Inno");
+			scenarioToBeAnalyzed.add("VW280_CityCommuterDRT_carOnly_100pct_additiv");
+
+			
+			
 
 			//
 

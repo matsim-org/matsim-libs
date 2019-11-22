@@ -144,7 +144,7 @@ public class PlanModifierCityCommuterDRT {
 		PlanModifierCityCommuterDRT planmodifier = new PlanModifierCityCommuterDRT(
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Hannover_Stadtteile.shp",
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Real_Region_Hannover.shp",
-				"D:\\Matsim\\Axer\\Hannover\\Base\\vw280_100pct_output\\2019-10-19_13-50-24__vw280_100pct.output_plans.xml.gz",
+				"D:\\Matsim\\Axer\\Hannover\\Base\\vw280_100pct\\vw280_100pct.output_plans.xml.gz",
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\vw280_1.0.output_plans_cityCommuterDRT_carOnly.xml.gz",
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\network\\network.xml.gz");
 		planmodifier.count();
