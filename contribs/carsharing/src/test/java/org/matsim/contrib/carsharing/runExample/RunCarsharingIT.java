@@ -96,7 +96,7 @@ public class RunCarsharingIT {
 		// ---
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-        config.plansCalcRoute().setInsertingAccessEgressWalk(true);
+		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
 
 		// ---
 

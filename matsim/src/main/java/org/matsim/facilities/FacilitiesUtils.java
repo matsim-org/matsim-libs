@@ -174,7 +174,9 @@ public class FacilitiesUtils {
 	}
 
 	// Logic gotten from PopulationUtils, but I am actually a bit unsure about the value of those methods now that
-	// attributable is the only way to get attributes...
+	// attributable is the only way to get attributes... td, aug'19
+	// yy I would agree.  They are useful to manage the transition, but can be inlined afterwards.  I would inline for all code we can reach, afterwards
+	// resurrect them but mark as deprecated.  kai, nov'19
 
 	public static <F extends Facility & Attributable> Object getFacilityAttribute(F facility, String key) {
 		return facility.getAttributes().getAttribute( key );

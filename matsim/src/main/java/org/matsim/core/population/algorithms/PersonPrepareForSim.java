@@ -158,8 +158,8 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 							 * This means that the end link is considered in route distance and the start link not.
 							 * tt feb'16
 							 */
-							double relativePositionStartLink = 1.0;
-							double relativePositionEndLink  = 1.0;
+							double relativePositionStartLink = scenario.getConfig().global().getRelativePositionOfEntryExitOnLink() ;
+							double relativePositionEndLink  = scenario.getConfig().global().getRelativePositionOfEntryExitOnLink() ;
 //							dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), relativePositionStartLink, relativePositionEndLink, this.network);
 							dist = RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), relativePositionStartLink, relativePositionEndLink, scenario.getNetwork() );
 							// using the full network for the distance calculation.  kai, jul'18
