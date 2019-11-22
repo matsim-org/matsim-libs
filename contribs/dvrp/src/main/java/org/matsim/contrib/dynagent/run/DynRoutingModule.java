@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
@@ -49,6 +50,8 @@ public class DynRoutingModule implements RoutingModule {
 	private Population population;
 	@Inject
 	private PlansCalcRouteConfigGroup calcRouteConfig;
+	@Inject
+	private Config config ;
 
 	private final String mode;
 
@@ -69,7 +72,7 @@ public class DynRoutingModule implements RoutingModule {
 		if (calcRouteConfig.isInsertingAccessEgressWalk()) {
 			departureTime += NetworkRoutingInclAccessEgressModule.addBushwhackingLegFromFacilityToLinkIfNecessary(
 					fromFacility, person, accessActLink, departureTime, result, population.getFactory(),
-					stageActivityType);
+					stageActivityType, config );
 		}
 
 		// leg proper:
@@ -91,7 +94,7 @@ public class DynRoutingModule implements RoutingModule {
 		// egress leg:
 		if (calcRouteConfig.isInsertingAccessEgressWalk()) {
 			NetworkRoutingInclAccessEgressModule.addBushwhackingLegFromLinkToFacilityIfNecessary(toFacility, person,
-					egressActLink, departureTime, result, population.getFactory(), stageActivityType);
+					egressActLink, departureTime, result, population.getFactory(), stageActivityType, config );
 		}
 
 		return result;
