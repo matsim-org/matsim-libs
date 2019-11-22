@@ -29,9 +29,6 @@ public class SupersonicOsmNetworkReader {
 	private static final Set<String> oneWayTags = new HashSet<>(Arrays.asList("yes", "true", "1"));
 	private static final Set<String> notOneWayTags = new HashSet<>(Arrays.asList("no", "false", "0"));
 
-    private final Object nodesLockObject = new Object();
-    private final Object linksLockObject = new Object();
-
 	private final Map<String, LinkProperties> linkProperties;
 	private final BiPredicate<Coord, Integer> linkFilter;
 	private final Predicate<Long> preserveNodeWithId;
@@ -199,10 +196,13 @@ public class SupersonicOsmNetworkReader {
 		return result.stream();
 	}
 
-	private Node createNode(Coord coord, long nodeId) {
-		Id<Node> id = Id.createNodeId(nodeId);
-		return network.getFactory().createNode(id, coord);
-	}
+    // same here. Node id-creation seems to be tricky when multi-threading
+    private Node createNode(Coord coord, long nodeId) {
+        synchronized (Id.class) {
+            Id<Node> id = Id.createNodeId(nodeId);
+            return network.getFactory().createNode(id, coord);
+        }
+    }
 
 	private Link createLink(Node fromNode, Node toNode, WaySegment segment, boolean isReverse) {
 
@@ -282,7 +282,7 @@ public class SupersonicOsmNetworkReader {
 	 * All links longer than 300m the default freesped property is assumed
 	 */
 	private double calculateSpeedIfNoSpeedTag(LinkProperties properties, double linkLength) {
-		if (properties.hierachyLevel > LinkProperties.LEVEL_MOTORWAY && properties.hierachyLevel < LinkProperties.LEVEL_SMALLER_THAN_TERTIARY
+        if (properties.hierachyLevel > LinkProperties.LEVEL_MOTORWAY && properties.hierachyLevel <= LinkProperties.LEVEL_TERTIARY
 				&& linkLength < 300) {
 			return ((10 + (properties.freespeed - 10) / 300 * linkLength) / 3.6);
 		}
@@ -319,26 +319,23 @@ public class SupersonicOsmNetworkReader {
 	private synchronized void addLinkToNetwork(Link link) {
 
 		//we have to test for presence
-        synchronized (nodesLockObject) {
             if (!network.getNodes().containsKey(link.getFromNode().getId())) {
                 network.addNode(link.getFromNode());
             }
-        }
-        synchronized (nodesLockObject) {
-            if (!network.getNodes().containsKey(link.getToNode().getId())) {
+
+        if (!network.getNodes().containsKey(link.getToNode().getId())) {
                 network.addNode(link.getToNode());
             }
-        }
-        synchronized (linksLockObject) {
-            if (!network.getLinks().containsKey(link.getId())) {
+
+        if (!network.getLinks().containsKey(link.getId())) {
                 network.addLink(link);
             } else {
                 log.error("Link id: " + link.getId() + " was already present. This should not happen");
                 log.error("The link associated with this id: " + link.toString());
                 throw new RuntimeException("Link id: " + link.getId() + " was already present!");
             }
-        }
-	}
+
+    }
 
 	@RequiredArgsConstructor
 	@Getter

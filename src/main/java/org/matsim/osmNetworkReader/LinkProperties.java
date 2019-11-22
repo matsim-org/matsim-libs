@@ -14,7 +14,9 @@ public class LinkProperties {
 	public static final int LEVEL_PRIMARY = 3;
 	public static final int LEVEL_SECONDARY = 4;
 	public static final int LEVEL_TERTIARY = 5;
-	public static final int LEVEL_SMALLER_THAN_TERTIARY = 6; // choose a better name
+    public static final int LEVEL_UNCLASSIFIED = 6;
+    public static final int LEVEL_RESIDENTIAL = 7;
+    public static final int LEVEL_LIVING_STREET = 8;
 
 	final int hierachyLevel;
 	final double lanesPerDirection;
@@ -63,15 +65,15 @@ public class LinkProperties {
 	}
 
 	static LinkProperties createUnclassified() {
-		return new LinkProperties(LEVEL_SMALLER_THAN_TERTIARY, 1, 15 / 3.6, 600, false);
+        return new LinkProperties(LEVEL_UNCLASSIFIED, 1, 15 / 3.6, 600, false);
 	}
 
 	static LinkProperties createResidential() {
-		return new LinkProperties(LEVEL_SMALLER_THAN_TERTIARY, 1, 15 / 3.6, 600, false);
+        return new LinkProperties(LEVEL_RESIDENTIAL, 1, 15 / 3.6, 600, false);
 	}
 
 	static LinkProperties createLivingStreet() {
-		return new LinkProperties(LEVEL_SMALLER_THAN_TERTIARY, 1, 10 / 3.6, 300, false);
+        return new LinkProperties(LEVEL_LIVING_STREET, 1, 10 / 3.6, 300, false);
 	}
 
 	static Map<String, LinkProperties> createLinkProperties() {
