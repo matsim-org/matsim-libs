@@ -19,12 +19,6 @@
 
 package vwExamples.utils;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -34,12 +28,12 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.StreamingPopulationReader;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
-
 import vwExamples.utils.modalSplitAnalyzer.PersonValidator;
+
+import java.util.*;
 
 /**
  * @author saxer
@@ -53,7 +47,6 @@ public class CountAgentsWithinArea {
     static Map<String, Geometry> zoneMap = new HashMap<>();
     static String shapeFile = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Cemdap\\add_data\\shp\\Real_Region_Hannover.shp";
     static String shapeFeature = "NO";
-    StageActivityTypes stageActs;
     static Set<Id<Person>> relevantAgents = new HashSet<>();
     static Set<Id<Person>> allAgents = new HashSet<>();
 

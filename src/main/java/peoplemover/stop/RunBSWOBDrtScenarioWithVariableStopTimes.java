@@ -53,7 +53,6 @@ public class RunBSWOBDrtScenarioWithVariableStopTimes {
         drt.setStopDuration(15);
         drt.setTransitStopFile("virtualstops/stopsGrid_300m.xml");
         drt.setMaxWalkDistance(800.0);
-        drt.setPrintDetailedWarnings(false);
         drt.setVehiclesFile("edrt/e-drt_bs_100.xml");
 
         String runId = "drt-test-very-short-stoptimes";

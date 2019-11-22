@@ -1,39 +1,24 @@
 package ft.utils;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.StringJoiner;
-import java.util.TreeSet;
-import java.util.stream.Stream;
-
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.math3.util.Precision;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.router.TransitActsRemover;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.StringJoiner;
 
 public class GetMobilityPatternPerGroup {
 
@@ -75,7 +60,6 @@ public class GetMobilityPatternPerGroup {
 				personGroup.put(actChain, new MutableInt(1));
 			} else {
 				personGroup.get(actChain).increment();
-				;
 			}
 
 		}
@@ -181,7 +165,7 @@ public class GetMobilityPatternPerGroup {
 	public static boolean hasActivity(Person person, String activityType) {
 
 		List<Activity> activities = TripStructureUtils.getActivities(person.getSelectedPlan().getPlanElements(),
-				EmptyStageActivityTypes.INSTANCE);
+				TripStructureUtils.StageActivityHandling.StagesAsNormalActivities);
 
 		for (Activity act : activities) {
 

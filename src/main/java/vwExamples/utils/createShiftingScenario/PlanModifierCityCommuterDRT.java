@@ -43,7 +43,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.contrib.drt.routing.DrtStageActivityType;
+//import org.matsim.contrib.drt.routing.DrtStageActivityType;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -52,21 +52,22 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
+//import org.matsim.core.router.StageActivityTypes;
+//import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
+//import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.pt.PtConstants;
+//import org.matsim.pt.PtConstants;
 import org.opengis.feature.simple.SimpleFeature;
 
 import vwExamples.utils.createShiftingScenario.cityCommuterDRT.assignCityCommuterTourCandidate;
 import vwExamples.utils.createShiftingScenario.cityCommuterDRT.isCityCommuterTourCandidate;
-import vwExamples.utils.createShiftingScenario.cityDRT.isWithinCityTourCandidate;
+//import vwExamples.utils.createShiftingScenario.cityDRT.isWithinCityTourCandidate;
 
 /**
  * @author saxer
@@ -90,7 +91,7 @@ public class PlanModifierCityCommuterDRT {
 	Scenario scenario;
 
 	Collection<String> stages;
-	StageActivityTypes blackList;
+//	StageActivityTypes blackList;
 
 	Network network;
 	SubTourValidator subTourValidator; // Defines the rule to calculate absolute number of trips or agents that might
@@ -127,11 +128,11 @@ public class PlanModifierCityCommuterDRT {
 		// modifiedPopulationWriter = new StreamingPopulationWriter();
 
 		// Add staging acts for pt and drt
-		stages = new ArrayList<String>();
-		stages.add(PtConstants.TRANSIT_ACTIVITY_TYPE);
-		stages.add(new DrtStageActivityType("drt").drtStageActivity);
-		stages.add(parking.ParkingRouterNetworkRoutingModule.parkingStageActivityType);
-		blackList = new StageActivityTypesImpl(stages);
+//		stages = new ArrayList<String>();
+//		stages.add(PtConstants.TRANSIT_ACTIVITY_TYPE);
+//		stages.add(new DrtStageActivityType("drt").drtStageActivity);
+//		stages.add(parking.ParkingRouterNetworkRoutingModule.parkingStageActivityType);
+//		blackList = new StageActivityTypesImpl(stages);
 
 		subTourValidator = new isCityCommuterTourCandidate(network, cityZonesMap, serviceAreazonesMap);
 		assignTourValidator = new assignCityCommuterTourCandidate(network, cityZonesMap, serviceAreazonesMap);
@@ -145,7 +146,7 @@ public class PlanModifierCityCommuterDRT {
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Hannover_Stadtteile.shp",
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Real_Region_Hannover.shp",
 				"D:\\Matsim\\Axer\\Hannover\\Base\\vw280_100pct\\vw280_100pct.output_plans.xml.gz",
-				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\vw280_1.0.output_plans_cityCommuterDRT_carOnly.xml.gz",
+				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\vw280_1.0.output_plans_cityCommuterDRT_carOnly_Test.xml.gz",
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\network\\network.xml.gz");
 		planmodifier.count();
 		planmodifier.assign();
@@ -210,7 +211,7 @@ public class PlanModifierCityCommuterDRT {
 
 			PersonUtils.removeUnselectedPlans(person);
 			Plan plan = person.getSelectedPlan();
-			for (Subtour subTour : TripStructureUtils.getSubtours(plan, blackList)) {
+			for (Subtour subTour : TripStructureUtils.getSubtours(plan)) {
 
 				String subtourMode = getSubtourMode(subTour, plan);
 
@@ -288,7 +289,7 @@ public class PlanModifierCityCommuterDRT {
 				Plan plan = scenario.getPopulation().getPersons().get(personId).getSelectedPlan();
 
 				// Get random subtour of this agent
-				Collection<Subtour> subtoursCol = TripStructureUtils.getSubtours(plan, blackList);
+				Collection<Subtour> subtoursCol = TripStructureUtils.getSubtours(plan);
 				
 				ArrayList<Subtour> subtours = new ArrayList<Subtour>(subtoursCol);
 				int randomTourdx = (int) (Math.random() * (subtours.size() - 1));

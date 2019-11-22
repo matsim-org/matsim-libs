@@ -34,7 +34,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleTypeImpl;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import java.util.Random;
@@ -73,7 +73,7 @@ public class RunAVExample {
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
-        VehicleType avType = new VehicleTypeImpl(Id.create("autonomousVehicleType", VehicleType.class));
+        VehicleType avType = VehicleUtils.createVehicleType(Id.create("autonomousVehicleType", VehicleType.class));
 //                avType.setFlowEfficiencyFactor(0.69);
         avType.setFlowEfficiencyFactor(0.33);
         scenario.getVehicles().addVehicleType(avType);

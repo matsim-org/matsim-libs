@@ -81,7 +81,7 @@ import java.util.Map.Entry;
 public class DrtPtTripEventHandler implements ActivityStartEventHandler, ActivityEndEventHandler,
 		PersonDepartureEventHandler, PersonArrivalEventHandler, PersonEntersVehicleEventHandler, LinkEnterEventHandler,
 		LinkLeaveEventHandler, TeleportationArrivalEventHandler, AgentWaitingForPtEventHandler,
-		VehicleLeavesTrafficEventHandler, DrtRequestSubmittedEventHandler, TransitDriverStartsEventHandler {
+		VehicleLeavesTrafficEventHandler, DrtRequestSubmittedEventHandler, TransitDriverStartsEventHandler, PersonStuckEventHandler {
 
 	// private Set<Id<Person>> agentsOnMonitoredTrip = new HashSet<>(); ->
 	// agent2CurrentTripStartLink.contains()
@@ -693,14 +693,11 @@ public class DrtPtTripEventHandler implements ActivityStartEventHandler, Activit
 
 	}
 
-//	@Override
-//	public void handleEvent(PersonStuckEvent event) {
-//		if(event.getLegMode().equals(TransportMode.car)){
-//			stuckPersonCounter++;
-//		}
-//		
-//		
-//	}
+	@Override
+	public void handleEvent(PersonStuckEvent event) {
+		stuckPersonCounter++;
+		
+	}
 
 	// @Override
 	// public void handleEvent(PersonStuckEvent event) {

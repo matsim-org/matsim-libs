@@ -178,7 +178,6 @@ public class RunDrtScenarioBatchH_eDRT_TUB {
 
 		DrtConfigGroup drt = DrtConfigGroup.getSingleModeDrtConfig(config);
 
-		drt.setPrintDetailedWarnings(false);
 		drt.setMaxTravelTimeBeta(500.0);
 		drt.setMaxTravelTimeAlpha(1.3);
 		drt.setMaxWaitTime(500.0);

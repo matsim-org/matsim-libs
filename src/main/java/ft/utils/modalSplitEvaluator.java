@@ -22,39 +22,19 @@
  */
 package ft.utils;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeMap;
-
+import analysis.traveldistances.PersonValidator;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.StreamingPopulationReader;
 import org.matsim.core.population.io.StreamingPopulationWriter;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
@@ -67,7 +47,10 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.PtConstants;
 import org.opengis.feature.simple.SimpleFeature;
 
-import analysis.traveldistances.PersonValidator;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author axer
@@ -78,11 +61,10 @@ public class modalSplitEvaluator {
 	private Map<String, PersonValidator> groups = new HashMap<>();
 	Set<String> zones = new HashSet<>();
 	static Map<String, Geometry> zoneMap = new HashMap<>();
-	String shapeFile = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Cemdap\\add_data\\shp\\Real_Region_Hannover.shp";
-	//String shapeFile = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Cemdap\\add_data\\shp\\Hannover_Stadtteile.shp";
+	//String shapeFile = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Cemdap\\add_data\\shp\\Real_Region_Hannover.shp";
+	String shapeFile = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Cemdap\\add_data\\shp\\Hannover_Stadtteile.shp";
 	String shapeFeature = "NO";
-	StageActivityTypes stageActs;
-	static String inFileName = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw251.1.0\\vw251.1.0.output_plans.xml.gz";
+	static String inFileName = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw243_cadON_ptSpeedAdj.0.1\\vw243_cadON_ptSpeedAdj.0.1.output_plans.xml.gz";
 	static String OutFileName = "D:\\Thiel\\Programme\\MatSim\\01_HannoverModel_2.0\\Simulation\\output\\vw237_cadON.0.1\\output.xml.gz";
 
 	static List<String> primaryActivies = new ArrayList<>();
@@ -268,11 +250,8 @@ public class modalSplitEvaluator {
 		if (isWithinZone(nextAct.getCoord(), zoneMap))
 			nextActInZone = true;
 
-		if ((prevActInZone == true) && (nextActInZone == true)) {
-			// System.out.println("Leg in Zone: "+plan.getPerson().getId().toString());
-			return true;
-		} else
-			return false;
+		// System.out.println("Leg in Zone: "+plan.getPerson().getId().toString());
+		return (prevActInZone == true) && (nextActInZone == true);
 	}
 
 	public static boolean isPrimaryActivity(Activity act) {
@@ -518,7 +497,6 @@ public class modalSplitEvaluator {
 				public void run(Person person) {
 
 					String STAGE = PtConstants.TRANSIT_ACTIVITY_TYPE;
-					StageActivityTypes stagesActivities = new StageActivityTypesImpl(STAGE);
 
 					// We are only modifying person that are living in area
 					// The value of e is the defined person validator that
@@ -531,7 +509,7 @@ public class modalSplitEvaluator {
 						// We dont't need to drop all transit acts
 						// new TransitActsRemover().run(plan, true);
 
-						for (Subtour subTour : TripStructureUtils.getSubtours(plan, stagesActivities)) {
+						for (Subtour subTour : TripStructureUtils.getSubtours(plan, new HashSet<>(Arrays.asList(STAGE)))) {
 
 							List<Integer> replaceTripIndices = getReplaceableTripIndices(subTour);
 							String SubtourMode = getSubtourMode(subTour);
@@ -547,7 +525,7 @@ public class modalSplitEvaluator {
 
 							// System.out.println(SubtourMode);
 
-							if (desiredModalShiftRatesMap.keySet().contains(SubtourMode)) {
+							if (desiredModalShiftRatesMap.containsKey(SubtourMode)) {
 
 								double limit = maxShiftNumbersPerMode(SubtourMode, desiredModalShiftRatesMap,
 										allTrafficModalShare.modeTripsMap, allTrafficModalShare.modeTripsMapRelative);
@@ -705,10 +683,7 @@ public class modalSplitEvaluator {
 		public boolean isValidPerson(Person person) {
 			Id<Person> id = person.getId();
 			// //Braunschweig
-			if ((id.toString().startsWith("1")) && (id.toString().split("_")[0].length() == 3))
-				return true;
-			else
-				return false;
+			return (id.toString().startsWith("1")) && (id.toString().split("_")[0].length() == 3);
 		}
 
 	}
@@ -725,10 +700,7 @@ public class modalSplitEvaluator {
 		@Override
 		public boolean isValidPerson(Person person) {
 			Id<Person> id = person.getId();
-			if ((id.toString().startsWith("3")) && (id.toString().split("_")[0].length() == 3))
-				return true;
-			else
-				return false;
+			return (id.toString().startsWith("3")) && (id.toString().split("_")[0].length() == 3);
 
 		}
 

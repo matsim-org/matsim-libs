@@ -29,94 +29,148 @@ import com.graphhopper.jsprit.core.problem.constraint.ServiceDeliveriesFirstCons
 import com.graphhopper.jsprit.core.problem.constraint.VehicleDependentTimeWindowConstraints;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.util.Solutions;
-import commercialtraffic.integration.CarrierJSpritIterations;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType;
+import org.matsim.contrib.freight.carrier.CarrierUtils;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
-import org.matsim.contrib.freight.jsprit.NetworkRouter;
+//import commercialtraffic.vwUserCode.NetworkBasedTransportCosts;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.vehicles.VehicleType;
 
-import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
+import java.util.stream.Collectors;
 
-public class TourPlanning  {
+//import org.matsim.contrib.freight.jsprit.NetworkRouter;
 
-    static Logger log = Logger.getLogger(TourPlanning.class);
+class TourPlanning {
 
+	private static Logger log = Logger.getLogger(TourPlanning.class);
 
-    static void runTourPlanningForCarriers(Carriers carriers, Scenario scenario, CarrierJSpritIterations iterations, int jSpritTimeSliceWidth, TravelTime travelTime) {
-        Set<CarrierVehicleType> vehicleTypes = new HashSet<>();
-        carriers.getCarriers().values().forEach(carrier -> vehicleTypes.addAll(carrier.getCarrierCapabilities().getVehicleTypes()));
-        NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(), vehicleTypes);
-        log.info("SETTING TIME SLICE TO " + jSpritTimeSliceWidth);
-        netBuilder.setTimeSliceWidth(jSpritTimeSliceWidth); // !!!! otherwise it will not do anything.
-        netBuilder.setTravelTime(travelTime);
-        final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
-        carriers.getCarriers().values().parallelStream().forEach(carrier -> {
-                    double start = System.currentTimeMillis();
-                    int serviceCount =  carrier.getServices().size();
-                    log.info("start tour planning for " + carrier.getId() + " which has " + serviceCount + " services");
+	static void runTourPlanningForCarriers(Carriers carriers, Scenario scenario, int jSpritTimeSliceWidth,
+			TravelTime travelTime) throws InterruptedException, ExecutionException {
+		Set<VehicleType> vehicleTypes = new HashSet<>();
+		carriers.getCarriers().values()
+				.forEach(carrier -> vehicleTypes.addAll(carrier.getCarrierCapabilities().getVehicleTypes()));
+		NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder
+				.newInstance(scenario.getNetwork(), vehicleTypes);
+		log.info("SETTING TIME SLICE TO " + jSpritTimeSliceWidth);
 
-                    //Build VRP
-                    VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier, scenario.getNetwork());
-                    vrpBuilder.setRoutingCost(netBasedCosts);// this may be too expensive for the size of the problem
+		netBuilder.setTimeSliceWidth(jSpritTimeSliceWidth); // !!!! otherwise it will not do anything.
+		netBuilder.setTravelTime(travelTime);
 
-                    VehicleRoutingProblem problem = vrpBuilder.build();
+		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
 
-                    double radialShare =  0.3;  //standard radial share is 0.3
-                    double randomShare = 0.5;   //standard random share is 0.5
-                    if(serviceCount > 1000){ //if problem is huge, take only half the share for replanning
-                        radialShare = 0.15;
-                        randomShare = 0.25;
-                    }
+		HashMap<Id<Carrier>, Integer> carrierServiceCounterMap = new HashMap<>();
 
-                    int radialServicesReplanned = Math.max( 1, (int) (serviceCount * radialShare));
-                    int randomServicesReplanned = Math.max( 1, (int) (serviceCount * randomShare));
+		// Fill carrierServiceCounterMap
+		for (Carrier carrier : carriers.getCarriers().values()) {
+			carrierServiceCounterMap.put(carrier.getId(), carrier.getServices().size());
 
-                    //use this in order to set a 'hard' constraint on time windows
-                    StateManager stateManager = new StateManager(problem);
-                    ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
-                    constraintManager.addConstraint(new ServiceDeliveriesFirstConstraint(), ConstraintManager.Priority.CRITICAL);
-                    constraintManager.addConstraint(new VehicleDependentTimeWindowConstraints(stateManager, problem.getTransportCosts(), problem.getActivityCosts()), ConstraintManager.Priority.HIGH);
-                    VehicleRoutingAlgorithm algorithm = Jsprit.Builder.newInstance(problem)
-                            .setStateAndConstraintManager(stateManager,constraintManager)
-                            .setProperty(Jsprit.Parameter.RADIAL_MIN_SHARE, String.valueOf(radialServicesReplanned))
-                            .setProperty(Jsprit.Parameter.RADIAL_MAX_SHARE, String.valueOf(radialServicesReplanned))
-                            .setProperty(Jsprit.Parameter.RANDOM_BEST_MIN_SHARE, String.valueOf(randomServicesReplanned))
-                            .setProperty(Jsprit.Parameter.RANDOM_BEST_MAX_SHARE, String.valueOf(randomServicesReplanned))
-                            .buildAlgorithm();
+		}
 
+		HashMap<Id<Carrier>, Integer> sortedMap = carrierServiceCounterMap.entrySet().stream()
+				.sorted(Collections.reverseOrder(Map.Entry.comparingByValue()))
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
+		
+		
+		ArrayList<Id<Carrier>> tempList = new ArrayList<>(sortedMap.keySet());
+		ForkJoinPool forkJoinPool = new ForkJoinPool(Runtime.getRuntime().availableProcessors());
+		forkJoinPool.submit(() -> tempList.parallelStream().forEach(carrierId -> {
+			Carrier carrier = carriers.getCarriers().get(carrierId);
 
-                    // get the algorithm out-of-the-box, search solution and get the best one.
-//                    VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
+			// carriers.getCarriers().values().parallelStream().forEach(carrier -> {
+			double start = System.currentTimeMillis();
+			int serviceCount = carrier.getServices().size();
+			log.info("start tour planning for " + carrier.getId() + " which has " + serviceCount + " services");
 
-                    if(serviceCount == 0){
-                        log.info("setting maxIterations=1 as carrier has no services");
-                        algorithm.setMaxIterations(1);
-                    } else{
-                        algorithm.setMaxIterations(iterations.getNrOfJSpritIterationsForCarrier(carrier.getId()));
-                    }
+			// Build VRP
 
-                    // variationCoefficient = stdDeviation/mean. so i set the threshold rather soft
-//                    algorithm.addTerminationCriterion(new VariationCoefficientTermination(5, 0.1)); //this does not seem to work, tschlenther august 2019
+			VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(carrier,
+					scenario.getNetwork());
 
-                    Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
-                    VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
-                    log.info("tour planning for carrier " + carrier.getId() + " took " + (System.currentTimeMillis() - start)/1000 + " seconds.");
-                    //get the CarrierPlan
-                    CarrierPlan carrierPlan = MatsimJspritFactory.createPlan(carrier, bestSolution);
+			vrpBuilder.setRoutingCost(netBasedCosts);// this may be too expensive for the size of the problem
 
-                    log.info("routing plan for carrier " + carrier.getId());
-                    NetworkRouter.routePlan(carrierPlan, netBasedCosts);    //we need to route the plans in order to create reasonable freight-agent plans
-                    log.info("routing for carrier " + carrier.getId() + " finished. Tour planning plus routing took " + (System.currentTimeMillis() - start)/1000 + " seconds." );
-                    carrier.setSelectedPlan(carrierPlan);
-                }
-        );
-    }
+			VehicleRoutingProblem problem = vrpBuilder.build();
+
+			double radialShare = 0.3; // standard radial share is 0.3
+			double randomShare = 0.5; // standard random share is 0.5
+			if (serviceCount > 1000) { // if problem is huge, take only half the share for replanning
+				radialShare = 0.15;
+				randomShare = 0.25;
+			}
+
+			int radialServicesReplanned = Math.max(1, (int) (serviceCount * radialShare));
+			int randomServicesReplanned = Math.max(1, (int) (serviceCount * randomShare));
+
+			// use this in order to set a 'hard' constraint on time windows
+			StateManager stateManager = new StateManager(problem);
+			ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
+			constraintManager.addConstraint(new ServiceDeliveriesFirstConstraint(),
+					ConstraintManager.Priority.CRITICAL);
+			constraintManager.addConstraint(new VehicleDependentTimeWindowConstraints(stateManager,
+					problem.getTransportCosts(), problem.getActivityCosts()), ConstraintManager.Priority.HIGH);
+			// add Multiple Threads
+			int jspritThreads = 1;
+
+			if (serviceCount > 50) {
+				jspritThreads = (Runtime.getRuntime().availableProcessors());
+			}
+			VehicleRoutingAlgorithm algorithm = Jsprit.Builder.newInstance(problem)
+					.setStateAndConstraintManager(stateManager, constraintManager)
+					.setProperty(Jsprit.Parameter.THREADS, String.valueOf(jspritThreads))
+					.setProperty(Jsprit.Parameter.RADIAL_MIN_SHARE, String.valueOf(radialServicesReplanned))
+					.setProperty(Jsprit.Parameter.RADIAL_MAX_SHARE, String.valueOf(radialServicesReplanned))
+					.setProperty(Jsprit.Parameter.RANDOM_BEST_MIN_SHARE, String.valueOf(randomServicesReplanned))
+					.setProperty(Jsprit.Parameter.RANDOM_BEST_MAX_SHARE, String.valueOf(randomServicesReplanned))
+					.buildAlgorithm();
+
+			// get the algorithm out-of-the-box, search solution and get the best one.
+			// VehicleRoutingAlgorithm algorithm = new
+			// SchrimpfFactory().createAlgorithm(problem);
+
+			if (serviceCount == 0) {
+				log.info("setting maxIterations=1 as carrier has no services");
+				algorithm.setMaxIterations(1);
+			} else {
+				algorithm.setMaxIterations(CarrierUtils.getJspritIterations(carrier));
+			}
+
+			// variationCoefficient = stdDeviation/mean. so i set the threshold rather soft
+			// algorithm.addTerminationCriterion(new VariationCoefficientTermination(5,
+			// 0.1)); //this does not seem to work, tschlenther august 2019
+
+			Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
+			VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
+			log.info("tour planning for carrier " + carrier.getId() + " took "
+					+ (System.currentTimeMillis() - start) / 1000 + " seconds.");
+			// get the CarrierPlan
+			CarrierPlan carrierPlan = MatsimJspritFactory.createPlan(carrier, bestSolution);
+
+			log.info("routing plan for carrier " + carrier.getId());
+			org.matsim.contrib.freight.jsprit.NetworkRouter.routePlan(carrierPlan, netBasedCosts); // we need to route
+																									// the plans in
+																									// order to create
+																									// reasonable
+																									// freight-agent
+																									// plans
+			log.info("routing for carrier " + carrier.getId() + " finished. Tour planning plus routing took "
+					+ (System.currentTimeMillis() - start) / 1000 + " seconds.");
+			carrier.setSelectedPlan(carrierPlan);
+		})).get();
+		;
+	}
 }

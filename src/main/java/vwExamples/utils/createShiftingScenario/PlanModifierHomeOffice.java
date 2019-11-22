@@ -49,8 +49,8 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.StageActivityTypesImpl;
+//import org.matsim.core.router.StageActivityTypes;
+//import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
@@ -86,7 +86,7 @@ public class PlanModifierHomeOffice {
 	Scenario scenario;
 
 	Collection<String> stages;
-	StageActivityTypes blackList;
+//	StageActivityTypes blackList;
 
 	Network network;
 	SubTourValidator subTourValidator; // Defines the rule to calculate absolute number of trips or agents that might
@@ -127,7 +127,7 @@ public class PlanModifierHomeOffice {
 		stages.add(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		stages.add(new DrtStageActivityType("drt").drtStageActivity);
 		stages.add(parking.ParkingRouterNetworkRoutingModule.parkingStageActivityType);
-		blackList = new StageActivityTypesImpl(stages);
+//		blackList = new StageActivityTypesImpl(stages);
 
 		subTourValidator = new isHomeOfficeSubTourCandidate(network, cityZonesMap, serviceAreazonesMap);
 		assignTourValidator = new assignHomeOfficeSubTour(network, cityZonesMap, serviceAreazonesMap);
@@ -206,7 +206,7 @@ public class PlanModifierHomeOffice {
 
 			PersonUtils.removeUnselectedPlans(person);
 			Plan plan = person.getSelectedPlan();
-			for (Subtour subTour : TripStructureUtils.getSubtours(plan, blackList)) {
+			for (Subtour subTour : TripStructureUtils.getSubtours(plan)) {
 
 				String subtourMode = getSubtourMode(subTour, plan);
 
@@ -278,7 +278,7 @@ public class PlanModifierHomeOffice {
 				
 				// Loop over all subtours of this agent
 
-				for (Subtour subTour : TripStructureUtils.getSubtours(plan, blackList)) {
+				for (Subtour subTour : TripStructureUtils.getSubtours(plan)) {
 
 					// Get subtour mode
 					String subtourMode = getSubtourMode(subTour, plan);

@@ -78,7 +78,6 @@ public class RunVWEDrtScenario {
 		drt.setStopDuration(15);
 		drt.setTransitStopFile("virtualstops/stopsGrid_300m.xml");
 		drt.setMaxWalkDistance(800.0);
-		drt.setPrintDetailedWarnings(false);
 		drt.setVehiclesFile("edrt/e-drt_bs_100.xml");
 		drt.setIdleVehiclesReturnToDepots(true);
 

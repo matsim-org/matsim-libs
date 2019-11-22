@@ -22,33 +22,13 @@
  */
 package vwExamples.utils.modalSplitAnalyzer;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.Set;
-import java.util.TreeMap;
-
 import org.apache.commons.lang.mutable.MutableInt;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
@@ -56,7 +36,6 @@ import org.matsim.core.population.io.StreamingPopulationReader;
 import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
@@ -67,8 +46,12 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
-
 import parking.ParkingRouterNetworkRoutingModule;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author axer
@@ -89,7 +72,6 @@ public class modalSplitCommuterIn {
 	String serviceArea = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Real_Region_Hannover.shp";
 	String shapeFeature2 = "NO";
 
-	StageActivityTypes stageActs;
 	static String inFileName = "D:\\Matsim\\Axer\\Hannover\\Base\\vw251.1.0\\vw251.1.0.output_plans.xml.gz";
 	static String OutFileName = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\w251_inDRT.xml.gz";
 
@@ -197,74 +179,22 @@ public class modalSplitCommuterIn {
 
 	}
 
-	public void removeCarStagingActivities(Plan plan) {
+	public static boolean judgeLeg(Activity prevAct, Activity nextAct, Map<String, Geometry> zoneMap) {
+		boolean prevActInZone = false;
+		boolean nextActInZone = false;
 
-		List<Integer> idxList = new ArrayList<Integer>();
-		Activity nexAct = null;
+		// if(isWithinSpecificZone(prevAct.getCoord(), zoneMap,zoneList)) prevActInZone=
+		// true;
+		// if(isWithinSpecificZone(nextAct.getCoord(), zoneMap,zoneList)) nextActInZone=
+		// true;
 
-		List<Leg> legList = PopulationUtils.getLegs(plan);
+		if (isWithinZone(prevAct.getCoord(), zoneMap))
+			prevActInZone = true;
+		if (isWithinZone(nextAct.getCoord(), zoneMap))
+			nextActInZone = true;
 
-		for (Leg leg : legList) {
-
-			// Next activity after this leg
-			nexAct = PopulationUtils.getNextActivity(plan, leg);
-
-			// If this nexAct is car_interaction, it can be deleted
-			if (nexAct.getType().equals("car interaction")) {
-				Leg prevLeg = PopulationUtils.getPreviousLeg(plan, nexAct);
-				Leg nextLeg = PopulationUtils.getNextLeg(plan, nexAct);
-				int elementIdx = PopulationUtils.getActLegIndex(plan, (PlanElement) nexAct);
-				idxList.add(elementIdx);
-
-				// Check if there is an access or egress walk
-
-				// PopulationUtils.removeActivity(plan, elementIdx);
-
-				if (prevLeg.getMode().equals("access_walk")) {
-					elementIdx = PopulationUtils.getActLegIndex(plan, (PlanElement) prevLeg);
-					// PopulationUtils.removeLeg(plan, elementIdx);
-					idxList.add(elementIdx);
-				}
-
-				if (nextLeg.getMode().equals("egress_walk")) {
-					elementIdx = PopulationUtils.getActLegIndex(plan, (PlanElement) nextLeg);
-					// PopulationUtils.removeLeg(plan, elementIdx);
-					idxList.add(elementIdx);
-				}
-
-			}
-
-			if (nexAct.getType().equals("car parkingSearch")) {
-				int elementIdx = PopulationUtils.getActLegIndex(plan, (PlanElement) nexAct);
-				Leg nextLeg = PopulationUtils.getNextLeg(plan, nexAct);
-				// PopulationUtils.removeActivity(plan, elementIdx);
-				idxList.add(elementIdx);
-
-				if (nextLeg.getMode().equals("car")) {
-					elementIdx = PopulationUtils.getActLegIndex(plan, (PlanElement) nextLeg);
-					// PopulationUtils.removeLeg(plan, elementIdx);
-					idxList.add(elementIdx);
-				}
-
-			}
-
-		}
-		if (!idxList.isEmpty()) {
-
-			int actIdx = 0;
-			for (Iterator<PlanElement> iter = plan.getPlanElements().iterator(); iter.hasNext();) {
-
-				PlanElement element = iter.next();
-
-				if (idxList.contains(actIdx)) {
-					// System.out.println(element);
-					iter.remove();
-				}
-				actIdx++;
-			}
-			// System.out.println("finished");
-		}
-
+		// System.out.println("Leg in Zone: "+plan.getPerson().getId().toString());
+		return (prevActInZone == true) && (nextActInZone == true);
 	}
 
 	public static boolean subTourIsWithinServiceArea(Subtour subtour) {
@@ -415,25 +345,74 @@ public class modalSplitCommuterIn {
 
 	}
 
-	public static boolean judgeLeg(Activity prevAct, Activity nextAct, Map<String, Geometry> zoneMap) {
-		boolean prevActInZone = false;
-		boolean nextActInZone = false;
+	public void removeCarStagingActivities(Plan plan) {
 
-		// if(isWithinSpecificZone(prevAct.getCoord(), zoneMap,zoneList)) prevActInZone=
-		// true;
-		// if(isWithinSpecificZone(nextAct.getCoord(), zoneMap,zoneList)) nextActInZone=
-		// true;
+		List<Integer> idxList = new ArrayList<Integer>();
+		Activity nexAct = null;
 
-		if (isWithinZone(prevAct.getCoord(), zoneMap))
-			prevActInZone = true;
-		if (isWithinZone(nextAct.getCoord(), zoneMap))
-			nextActInZone = true;
+		List<Leg> legList = PopulationUtils.getLegs(plan);
 
-		if ((prevActInZone == true) && (nextActInZone == true)) {
-			// System.out.println("Leg in Zone: "+plan.getPerson().getId().toString());
-			return true;
-		} else
-			return false;
+		for (Leg leg : legList) {
+
+			// Next activity after this leg
+			nexAct = PopulationUtils.getNextActivity(plan, leg);
+
+			// If this nexAct is car_interaction, it can be deleted
+			if (nexAct.getType().equals("car interaction")) {
+				Leg prevLeg = PopulationUtils.getPreviousLeg(plan, nexAct);
+				Leg nextLeg = PopulationUtils.getNextLeg(plan, nexAct);
+				int elementIdx = PopulationUtils.getActLegIndex(plan, nexAct);
+				idxList.add(elementIdx);
+
+				// Check if there is an access or egress walk
+
+				// PopulationUtils.removeActivity(plan, elementIdx);
+
+				if (prevLeg.getMode().equals("access_walk")) {
+					elementIdx = PopulationUtils.getActLegIndex(plan, prevLeg);
+					// PopulationUtils.removeLeg(plan, elementIdx);
+					idxList.add(elementIdx);
+				}
+
+				if (nextLeg.getMode().equals("egress_walk")) {
+					elementIdx = PopulationUtils.getActLegIndex(plan, nextLeg);
+					// PopulationUtils.removeLeg(plan, elementIdx);
+					idxList.add(elementIdx);
+				}
+
+			}
+
+			if (nexAct.getType().equals("car parkingSearch")) {
+				int elementIdx = PopulationUtils.getActLegIndex(plan, nexAct);
+				Leg nextLeg = PopulationUtils.getNextLeg(plan, nexAct);
+				// PopulationUtils.removeActivity(plan, elementIdx);
+				idxList.add(elementIdx);
+
+				if (nextLeg.getMode().equals("car")) {
+					elementIdx = PopulationUtils.getActLegIndex(plan, nextLeg);
+					// PopulationUtils.removeLeg(plan, elementIdx);
+					idxList.add(elementIdx);
+				}
+
+			}
+
+		}
+		if (!idxList.isEmpty()) {
+
+			int actIdx = 0;
+			for (Iterator<PlanElement> iter = plan.getPlanElements().iterator(); iter.hasNext(); ) {
+
+				PlanElement element = iter.next();
+
+				if (idxList.contains(actIdx)) {
+					// System.out.println(element);
+					iter.remove();
+				}
+				actIdx++;
+			}
+			// System.out.println("finished");
+		}
+
 	}
 
 	public static boolean isPrimaryActivity(Activity act) {
@@ -699,9 +678,8 @@ public class modalSplitCommuterIn {
 						// Collection<Subtour> subtours = TripStructureUtils.getSubtours(plan,
 						// stagesActivities);
 
-						StageActivityTypes blackList = new ParkingRouterNetworkRoutingModule.ParkingAccessEgressStageActivityTypes();
 
-						for (Subtour subTour : TripStructureUtils.getSubtours(plan, blackList)) {
+						for (Subtour subTour : TripStructureUtils.getSubtours(plan, new HashSet<>(Arrays.asList(ParkingRouterNetworkRoutingModule.parkingStageActivityType)))) {
 							// List<Integer> replaceTripIndices = null;
 							// replaceTripIndices = getReplaceableTripIndices(subTour, plan);
 							// System.out.println(replaceTripIndices);
@@ -722,7 +700,7 @@ public class modalSplitCommuterIn {
 
 							// System.out.println(SubtourMode);
 
-							if (desiredModalShiftRatesMap.keySet().contains(SubtourMode) && isCommuterSubtour && subTourInServiceArea) {
+							if (desiredModalShiftRatesMap.containsKey(SubtourMode) && isCommuterSubtour && subTourInServiceArea) {
 
 								double limit = maxShiftNumbersPerMode(SubtourMode, desiredModalShiftRatesMap,
 										allTrafficModalShare.modeTripsMap, allTrafficModalShare.modeTripsMapRelative);
@@ -875,10 +853,7 @@ public class modalSplitCommuterIn {
 		public boolean isValidPerson(Person person) {
 			Id<Person> id = person.getId();
 			// //Braunschweig
-			if ((id.toString().startsWith("1")) && (id.toString().split("_")[0].length() == 3))
-				return true;
-			else
-				return false;
+			return (id.toString().startsWith("1")) && (id.toString().split("_")[0].length() == 3);
 		}
 
 	}
@@ -895,10 +870,7 @@ public class modalSplitCommuterIn {
 		@Override
 		public boolean isValidPerson(Person person) {
 			Id<Person> id = person.getId();
-			if ((id.toString().startsWith("3")) && (id.toString().split("_")[0].length() == 3))
-				return true;
-			else
-				return false;
+			return (id.toString().startsWith("3")) && (id.toString().split("_")[0].length() == 3);
 
 		}
 

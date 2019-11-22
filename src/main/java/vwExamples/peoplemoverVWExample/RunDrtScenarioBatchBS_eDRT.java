@@ -80,7 +80,6 @@ public class RunDrtScenarioBatchBS_eDRT {
         // This part allows to change dynamically DRT config parameters
         DrtConfigGroup drt = DrtConfigGroup.getSingleModeDrtConfig(config);
 
-        drt.setPrintDetailedWarnings(true);
         //Parameters to setup the DRT service
         drt.setMaxTravelTimeBeta(500.0);
         drt.setMaxTravelTimeAlpha(1.3);

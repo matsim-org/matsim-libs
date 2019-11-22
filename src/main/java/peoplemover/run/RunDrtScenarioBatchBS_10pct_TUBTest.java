@@ -72,7 +72,6 @@ public class RunDrtScenarioBatchBS_10pct_TUBTest {
 		drt.setStopDuration(15);
 		drt.setTransitStopFile("virtualstops/stopsGrid_300m.xml");
 		drt.setMaxWalkDistance(800.0);
-		drt.setPrintDetailedWarnings(false);
 
 		String runId = "0.1_drt_100veh";
 		config.controler().setRunId(runId);
