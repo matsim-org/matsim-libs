@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -45,6 +44,9 @@ import org.matsim.vehicles.VehicleUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.*;
 
 
 /**
@@ -108,7 +110,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 		// === access:
 		{
-			now = addBushwhackingLegFromFacilityToLinkIfNecessary( fromFacility, person, accessActLink, now, result, populationFactory, stageActivityType );
+			now = addBushwhackingLegFromFacilityToLinkIfNecessary( fromFacility, person, accessActLink, now, result, populationFactory, stageActivityType,
+					scenario.getConfig() );
 		}
 
 		// === compute the network leg:
@@ -123,15 +126,17 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 		// === egress:
 		{
-			addBushwhackingLegFromLinkToFacilityIfNecessary( toFacility, person, egressActLink, now, result, populationFactory, stageActivityType );
+			addBushwhackingLegFromLinkToFacilityIfNecessary( toFacility, person, egressActLink, now, result, populationFactory, stageActivityType,
+					scenario.getConfig() );
 		}
 
 		return result ;
 	}
 	
 	private void addBushwhackingLegFromLinkToFacilityIfNecessary( final Facility toFacility, final Person person,
-												   final Link egressActLink, double now, final List<PlanElement> result,
-												   final PopulationFactory populationFactory, final String stageActivityType ) {
+									    final Link egressActLink, double now, final List<PlanElement> result,
+									    final PopulationFactory populationFactory, final String stageActivityType,
+									    Config config ) {
 
 		log.debug( "do bushwhacking leg from link=" + egressActLink.getId() + " to facility=" + toFacility.toString() ) ;
 
@@ -159,11 +164,11 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		if ( endLinkId==null ) {
 			endLinkId = startLinkId;
 		}
-		
+
 		if (mode.equals(TransportMode.walk)) {
 			Leg egressLeg = populationFactory.createLeg( TransportMode.non_network_walk ) ;
 			egressLeg.setDepartureTime( now );
-			routeBushwhackingLeg(person, egressLeg, startCoord, toFacility.getCoord(), now, startLinkId, endLinkId, populationFactory ) ;
+		routeBushwhackingLeg(person, egressLeg, startCoord, toFacility.getCoord(), now, startLinkId, endLinkId, populationFactory, config ) ;
 			result.add( egressLeg ) ;
 		} else {
 			Facility fromFacility = FacilitiesUtils.wrapLink(egressActLink);
@@ -181,7 +186,9 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	}
 
 	private double addBushwhackingLegFromFacilityToLinkIfNecessary( final Facility fromFacility, final Person person,
-												     final Link accessActLink, double now, final List<PlanElement> result, final PopulationFactory populationFactory, final String stageActivityType ) {
+									      final Link accessActLink, double now, final List<PlanElement> result,
+									      final PopulationFactory populationFactory, final String stageActivityType,
+									      Config config ) {
 		if ( isNotNeedingBushwhackingLeg( fromFacility ) ) {
 			return now ;
 		}
@@ -189,7 +196,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		Coord endCoord  = accessActLink.getToNode().getCoord() ;
 		// yyyy think about better solution: this may generate long walks along the link. (e.g. orthogonal projection)
 		Gbl.assertNotNull(endCoord);
-		
+
 		if (mode.equals(TransportMode.walk)) {
 			Leg accessLeg = populationFactory.createLeg( TransportMode.non_network_walk ) ;
 			accessLeg.setDepartureTime( now );
@@ -199,7 +206,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 				accessActLink.getId();
 			}
 
-			now += routeBushwhackingLeg(person, accessLeg, fromFacility.getCoord(), endCoord, now, startLinkId, accessActLink.getId(), populationFactory ) ;
+		now += routeBushwhackingLeg(person, accessLeg, fromFacility.getCoord(), endCoord, now, startLinkId, accessActLink.getId(), populationFactory,
+				config ) ;
 			// yyyy might be possible to set the link ids to null. kai & dominik, may'16
 
 			result.add( accessLeg ) ;
@@ -224,17 +232,26 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		return act;
 	}
 
-	static double routeBushwhackingLeg(Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime,
-			Id<Link> dpLinkId, Id<Link> arLinkId, PopulationFactory pf) {
-		PlansCalcRouteConfigGroup.ModeRoutingParams params = new PlansCalcRouteConfigGroup.ModeRoutingParams();
-		// old defaults
-		params.setBeelineDistanceFactor(1.3);
-		params.setTeleportedModeSpeed(2.0);
+	private static double routeBushwhackingLeg( Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime,
+						    Id<Link> dpLinkId, Id<Link> arLinkId, PopulationFactory pf, Config config ) {
+		ModeRoutingParams params = null ;
+		ModeRoutingParams tmp;
+		final Map<String, ModeRoutingParams> paramsMap = config.plansCalcRoute().getModeRoutingParams();
+		if ( (tmp = paramsMap.get( TransportMode.non_network_walk ) ) != null ){
+			params = tmp;
+		} else if ( (tmp = paramsMap.get(  TransportMode.walk ) ) != null ) {
+			params = tmp ;
+		} else{
+			params = new ModeRoutingParams();
+			// old defaults
+			params.setBeelineDistanceFactor( 1.3 );
+			params.setTeleportedModeSpeed( 2.0 );
+		}
 		return routeBushwhackingLeg(person, leg, fromCoord, toCoord, depTime, dpLinkId, arLinkId, pf, params);
 	}
 
 	static double routeBushwhackingLeg(Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime,
-			Id<Link> dpLinkId, Id<Link> arLinkId, PopulationFactory pf, PlansCalcRouteConfigGroup.ModeRoutingParams params) {
+			Id<Link> dpLinkId, Id<Link> arLinkId, PopulationFactory pf, ModeRoutingParams params) {
 		// I don't think that it makes sense to use a RoutingModule for this, since that again makes assumptions about how to
 		// map facilities, and if you follow through to the teleportation routers one even finds activity wrappers, which is yet another
 		// complication which I certainly don't want here.  kai, dec'15

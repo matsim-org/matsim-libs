@@ -39,7 +39,7 @@ public class Fleets {
 
 	public static Fleet createCustomFleet(FleetSpecification fleetSpecification,
 			Function<DvrpVehicleSpecification, DvrpVehicle> vehicleCreator) {
-		ImmutableMap<Id<DvrpVehicle>, ? extends DvrpVehicle> vehicles = fleetSpecification.getVehicleSpecifications()
+		ImmutableMap<Id<DvrpVehicle>, DvrpVehicle> vehicles = fleetSpecification.getVehicleSpecifications()
 				.values()
 				.stream()
 				.map(vehicleCreator)

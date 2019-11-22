@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
@@ -90,7 +89,7 @@ public class TeleportationRoutingModule implements RoutingModule {
 		// make simple assumption about distance and walking speed
 
 
-		final Coord fromActCoord = 	PopulationUtils.decideOnCoordForActivity( fromAct, scenario) ;
+		final Coord fromActCoord = 	PopulationUtils.decideOnCoordForActivity( fromAct, scenario ) ;
 		Gbl.assertNotNull( fromActCoord );
 		final Coord toActCoord = PopulationUtils.decideOnCoordForActivity( toAct, scenario ) ;
 		Gbl.assertNotNull( toActCoord );

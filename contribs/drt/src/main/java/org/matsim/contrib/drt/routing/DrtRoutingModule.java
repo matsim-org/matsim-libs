@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,181 +17,143 @@
  *                                                                         *
  * *********************************************************************** */
 
+/**
+ *
+ */
 package org.matsim.contrib.drt.routing;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
-import com.google.inject.name.Named;
+import com.google.common.base.Verify;
 
 /**
  * @author jbischoff
  * @author michalm (Michal Maciejewski)
- * @author Kai Nagel
  */
 public class DrtRoutingModule implements RoutingModule {
-	private static final Logger LOGGER = Logger.getLogger(DrtRoutingModule.class);
+	private static final Logger logger = Logger.getLogger(DrtRoutingModule.class);
 
-	private final DrtConfigGroup drtCfg;
-	private final Config config;
-	private final Network network;
-	private final TravelTime travelTime;
-	private final LeastCostPathCalculator router;
-	private final PopulationFactory populationFactory;
-	private final RoutingModule walkRouter;
+	public interface AccessEgressFacilityFinder {
+		Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility);
+	}
+
 	private final DrtStageActivityType drtStageActivityType;
-	private final PlansCalcRouteConfigGroup plansCalcRouteConfig;
+	private final Network modalNetwork;
+	private final AccessEgressFacilityFinder stopFinder;
+	private final DrtConfigGroup drtCfg;
+	private final Scenario scenario;
+	private final DrtRouteLegCalculator drtRouteLegCalculator;
+	private final RoutingModule accessRouter;
+	private final RoutingModule egressRouter;
 
-	public DrtRoutingModule(DrtConfigGroup drtCfg, Network network,
-			LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			TravelDisutilityFactory travelDisutilityFactory, @Named(TransportMode.walk) RoutingModule walkRouter,
-			Scenario scenario) {
-		// constructor was public when I found it, and cannot be made package private.  Thus now passing scenario as argument so we have a bit more
-		// flexibility for changes without having to change the argument list every time.  kai, jul'19
-
+	public DrtRoutingModule(DrtRouteLegCalculator drtRouteLegCalculator, RoutingModule accessRouter,
+			RoutingModule egressRouter, AccessEgressFacilityFinder stopFinder, DrtConfigGroup drtCfg, Scenario scenario,
+			Network modalNetwork) {
+		this.drtRouteLegCalculator = drtRouteLegCalculator;
+		this.stopFinder = stopFinder;
 		this.drtCfg = drtCfg;
-		this.config = scenario.getConfig();
-		this.network = network;
-		this.travelTime = travelTime;
-		this.populationFactory = scenario.getPopulation().getFactory();
-		this.walkRouter = walkRouter;
+		this.scenario = scenario;
 		this.drtStageActivityType = new DrtStageActivityType(drtCfg.getMode());
-		this.plansCalcRouteConfig = scenario.getConfig().plansCalcRoute();
-
-		// Euclidean with overdoFactor > 1.0 could lead to 'experiencedTT < unsharedRideTT',
-		// while the benefit would be a marginal reduction of computation time ==> so stick to 1.0
-		router = leastCostPathCalculatorFactory.createPathCalculator(network,
-				travelDisutilityFactory.createTravelDisutility(travelTime), travelTime);
+		this.modalNetwork = modalNetwork;
+		this.accessRouter = accessRouter;
+		this.egressRouter = egressRouter;
 	}
 
 	@Override
 	public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime,
 			Person person) {
-		LOGGER.debug("entering calcRoute ...");
-		LOGGER.debug("fromFacility=" + fromFacility.toString());
-		LOGGER.debug("toFacility=" + toFacility.toString());
-
-		Gbl.assertNotNull(fromFacility);
-		Gbl.assertNotNull(toFacility);
-
-		Link accessActLink = FacilitiesUtils.decideOnLink(fromFacility, network);
-		Link egressActLink = FacilitiesUtils.decideOnLink(toFacility, network);
-
-		double now = departureTime;
-		List<PlanElement> trip = new ArrayList<>();
-
-		if (accessActLink == egressActLink) {
-			if (drtCfg.isPrintDetailedWarnings()) {
-				LOGGER.error("Start and end stop are the same, agent will use fallback mode " 
-						+ TripRouter.getFallbackMode(drtCfg.getMode())
-						+ ". Agent Id:\t"
-						+ person.getId());
-			}
+		Optional<Pair<Facility, Facility>> stops = stopFinder.findFacilities(
+				Objects.requireNonNull(fromFacility, "fromFacility is null"),
+				Objects.requireNonNull(toFacility, "toFacility is null"));
+		if (!stops.isPresent()) {
+			logger.debug("No access/egress stops found, agent will use fallback mode " + TripRouter.getFallbackMode(
+					drtCfg.getMode()) + ". Agent Id:\t" + person.getId());
 			return null;
 		}
-		// yyyy I think that our life will become easier if we don't do direct walk.  kai, jul'19
 
-		// === access:
-		if (plansCalcRouteConfig.isInsertingAccessEgressWalk()) {
-			List<? extends PlanElement> accessWalkTrip = walkRouter.calcRoute( fromFacility, new LinkWrapperFacility( accessActLink ), now, person );
-			for( PlanElement planElement : accessWalkTrip ){
-				now = TripRouter.calcEndOfPlanElement( now, planElement,  config ) ;
-			}
-			trip.addAll(accessWalkTrip);
-			// interaction activity:
-			trip.add(createDrtStageActivity(new LinkWrapperFacility(accessActLink)));
+		Facility accessFacility = stops.get().getLeft();
+		Facility egressFacility = stops.get().getRight();
+		if (accessFacility.getLinkId().equals(egressFacility.getLinkId())) {
+			logger.debug("Start and end stop are the same, agent will use fallback mode " + TripRouter.getFallbackMode(
+					drtCfg.getMode()) + ". Agent Id:\t" + person.getId());
+			return null;
 		}
 
-		// === drt proper:
-		{
-			final List<PlanElement> newResult = createRealDrtLeg(departureTime, accessActLink, egressActLink);
-			trip.addAll(newResult);
-			for (final PlanElement planElement : newResult) {
-				now = TripRouter.calcEndOfPlanElement(now, planElement, config);
+		List<PlanElement> trip = new ArrayList<>();
+
+		double now = departureTime;
+
+		// access (sub-)trip:
+		List<? extends PlanElement> accessTrip = accessRouter.calcRoute(fromFacility, accessFacility, now, person);
+		if (!accessTrip.isEmpty()) {
+			trip.addAll(accessTrip);
+			for (PlanElement planElement : accessTrip) {
+				now = TripRouter.calcEndOfPlanElement(now, planElement, scenario.getConfig());
 			}
+
+			// interaction activity:
+			trip.add(createDrtStageActivity(accessFacility));
+			now++;
 		}
 
-		// === egress:
-		if (plansCalcRouteConfig.isInsertingAccessEgressWalk()) {
+		// drt proper leg:
+		Link accessActLink = Verify.verifyNotNull(modalNetwork.getLinks().get(accessFacility.getLinkId()),
+				"link: %s does not exist in the network of mode: %s", accessFacility.getLinkId(), drtCfg.getMode());
+		Link egressActLink = Verify.verifyNotNull(modalNetwork.getLinks().get(egressFacility.getLinkId()),
+				"link: %s does not exist in the network of mode: %s", egressFacility.getLinkId(), drtCfg.getMode());
+		List<? extends PlanElement> drtLeg = drtRouteLegCalculator.createRealDrtLeg(departureTime, accessActLink,
+				egressActLink);
+		trip.addAll(drtLeg);
+		for (PlanElement planElement : drtLeg) {
+			now = TripRouter.calcEndOfPlanElement(now, planElement, scenario.getConfig());
+		}
+
+		now++;
+		List<? extends PlanElement> egressTrip = egressRouter.calcRoute(egressFacility, toFacility, now, person);
+		if (!egressTrip.isEmpty()) {
 			// interaction activity:
-			trip.add(createDrtStageActivity(new LinkWrapperFacility( egressActLink )));
-			List<? extends PlanElement> egressWalkTrip = walkRouter.calcRoute( new LinkWrapperFacility( egressActLink ), toFacility, now, person );
-			for( PlanElement planElement : egressWalkTrip ){
-				now = TripRouter.calcEndOfPlanElement( now, planElement,  config ) ;
-			}
-			trip.addAll(egressWalkTrip);
+			trip.add(createDrtStageActivity(egressFacility));
+
+			// egress (sub-)trip:
+			trip.addAll(egressTrip);
 		}
 
 		return trip;
 	}
 
-	/**
-	 * Calculates the maximum travel time defined as: drtCfg.getMaxTravelTimeAlpha() * unsharedRideTime + drtCfg.getMaxTravelTimeBeta()
-	 *
-	 * @param drtCfg
-	 * @param unsharedRideTime ride time of the direct (shortest-time) route
-	 * @return maximum travel time
-	 */
-	public static double getMaxTravelTime(DrtConfigGroup drtCfg, double unsharedRideTime) {
-		return drtCfg.getMaxTravelTimeAlpha() * unsharedRideTime + drtCfg.getMaxTravelTimeBeta();
-	}
-	
-	/* package */ List<PlanElement> createRealDrtLeg( final double departureTime, final Link accessActLink, final Link egressActLink ) {
-		VrpPathWithTravelData unsharedPath = VrpPaths.calcAndCreatePath(accessActLink, egressActLink, departureTime,
-				router, travelTime);
-		double unsharedRideTime = unsharedPath.getTravelTime();//includes first & last link
-		double maxTravelTime = getMaxTravelTime(drtCfg, unsharedRideTime);
-		double unsharedDistance = VrpPaths.calcDistance(unsharedPath);//includes last link
-
-		DrtRoute route = populationFactory.getRouteFactories()
-				.createRoute(DrtRoute.class, accessActLink.getId(), egressActLink.getId());
-		route.setDistance(unsharedDistance);
-		route.setTravelTime(maxTravelTime);
-		route.setUnsharedRideTime(unsharedRideTime);
-		route.setMaxWaitTime(drtCfg.getMaxWaitTime());
-
-		Leg leg = populationFactory.createLeg(drtCfg.getMode());
-		leg.setDepartureTime(departureTime);
-		leg.setTravelTime(maxTravelTime);
-		leg.setRoute(route);
-		List<PlanElement> result = new ArrayList<>() ;
-		result.add(leg);
-		return result;
-	}
-	
 	private Activity createDrtStageActivity(Facility stopFacility) {
-		Activity activity = populationFactory.createActivityFromCoord(drtStageActivityType.drtStageActivity,
-				stopFacility.getCoord());
+		Activity activity = scenario.getPopulation()
+				.getFactory()
+				.createActivityFromCoord(drtStageActivityType.drtStageActivity, stopFacility.getCoord());
 		activity.setMaximumDuration(0);
 		activity.setLinkId(stopFacility.getLinkId());
 		return activity;
+	}
+
+	static Coord getFacilityCoord(Facility facility, Network network) {
+		Coord coord = facility.getCoord();
+		if (coord == null) {
+			coord = network.getLinks().get(facility.getLinkId()).getCoord();
+			if (coord == null)
+				throw new RuntimeException("From facility has neither coordinates nor link Id. Should not happen.");
+		}
+		return coord;
 	}
 }

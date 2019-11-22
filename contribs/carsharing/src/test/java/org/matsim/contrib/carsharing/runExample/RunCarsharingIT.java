@@ -33,6 +33,7 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -43,6 +44,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import com.google.inject.Inject;
+
+import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.*;
 
 /**
  * @author nagel
@@ -93,11 +96,19 @@ public class RunCarsharingIT {
 		
 //		config.global().setNumberOfThreads(1);
 //		config.qsim().setNumberOfThreads(1);
+
+		{
+			ModeRoutingParams params = new ModeRoutingParams( TransportMode.non_network_walk );
+			params.setTeleportedModeSpeed( 0.83333333333 );
+//			params.setTeleportedModeSpeed( 2.0 );
+			params.setBeelineDistanceFactor( 1.3 );
+			config.plansCalcRoute().addModeRoutingParams( params );
+		}
 		
 		// ---
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-        config.plansCalcRoute().setInsertingAccessEgressWalk(true);
+		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
 
 		// ---
 
@@ -193,18 +204,20 @@ public class RunCarsharingIT {
 					if ( TransportMode.walk.equals(legMode) ) {
 						Assert.assertEquals(2, nOfModeLegs );
 					} else if ( "twoway_vehicle".equals(legMode) ) {
-
-						Assert.assertEquals( 8, nOfModeLegs ) ;
-
+//						Assert.assertEquals( 8, nOfModeLegs ) ;
+						Assert.assertEquals( 6, nOfModeLegs ) ;
+						// (value changed after non_network_walk speed was reduced to walk speed. kai, nov'19)
 					} else if ( TransportMode.car.equals(legMode) ) {
 						Assert.assertEquals( 2, nOfModeLegs ) ;
 					} else if ( "egress_walk_tw".equals(legMode) ) {
-						Assert.assertEquals( 4, nOfModeLegs ) ;
-					}
-					else if ( "access_walk_tw".equals(legMode) ) {
-						Assert.assertEquals( 4, nOfModeLegs ) ;
-					}
-					else if ( "access_walk_ff".equals(legMode) ) {
+//						Assert.assertEquals( 4, nOfModeLegs ) ;
+						Assert.assertEquals( 3, nOfModeLegs ) ;
+						// (value changed after non_network_walk speed was reduced to walk speed. kai, nov'19)
+					} else if ( "access_walk_tw".equals(legMode) ) {
+//						Assert.assertEquals( 4, nOfModeLegs ) ;
+						Assert.assertEquals( 3, nOfModeLegs ) ;
+						// (value changed after non_network_walk speed was reduced to walk speed. kai, nov'19)
+					} else if ( "access_walk_ff".equals(legMode) ) {
 						Assert.assertEquals( 1, nOfModeLegs ) ;
 					}
 				}

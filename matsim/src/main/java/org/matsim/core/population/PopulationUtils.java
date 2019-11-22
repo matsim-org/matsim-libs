@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -52,6 +53,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
@@ -1046,14 +1048,18 @@ public final class PopulationUtils {
 			Gbl.assertNotNull( facility.getCoord() ) ;
 			return facility.getCoord() ;
 		}
+
 		if ( act.getCoord()!=null ) {
 			return act.getCoord() ;
-		} else {
-			Gbl.assertNotNull( sc.getNetwork() );
-			Link link = sc.getNetwork().getLinks().get( act.getLinkId() ) ;
-			Gbl.assertNotNull( link );
-			return link.getCoord() ;
 		}
+
+		Gbl.assertNotNull( sc.getNetwork() );
+		Link link = sc.getNetwork().getLinks().get( act.getLinkId() ) ;
+		Gbl.assertNotNull( link );
+		Coord fromCoord = link.getFromNode().getCoord() ;
+		Coord toCoord = link.getToNode().getCoord() ;
+		double rel = sc.getConfig().global().getRelativePositionOfEntryExitOnLink() ;
+		return new Coord( fromCoord.getX() + rel*( toCoord.getX() - fromCoord.getX()) , fromCoord.getY() + rel*( toCoord.getY() - fromCoord.getY() ) );
 	}
 	public static double decideOnTravelTimeForLeg( Leg leg ) {
 		if ( leg.getRoute()!=null ) {
