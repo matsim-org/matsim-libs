@@ -27,10 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -305,7 +302,25 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 							if (legs.size() == 1) {
 								// there is only a single leg (e.g. after Trips2Legs and a mode choice replanning module
 								routingMode = legs.get(0).getMode();
-								TripStructureUtils.setRoutingMode(legs.get(0), routingMode);
+								if ( routingMode.equals( TransportMode.transit_walk ) ) {
+									legs.get(0).setMode( TransportMode.walk );
+									TripStructureUtils.setRoutingMode( legs.get( 0 ), TransportMode.pt );
+									log.warn( "yyyyyy this is not so good" );
+								} else{
+									TripStructureUtils.setRoutingMode( legs.get( 0 ), routingMode );
+								}
+
+//								log.warn( "" );
+//								log.warn( "found trip with only one leg; now looks like:" );
+//								log.warn(  trip.getOriginActivity() );
+//								for( PlanElement tripElement : trip.getTripElements() ){
+//									log.warn( tripElement );
+//								}
+//								log.warn(  trip.getDestinationActivity() );
+//								log.warn( "" );
+
+								// yyyyyy the above is causing the problem with the ensure_tutorial_runs
+
 							} else {
 								if (true /* config switch insisting on bla */) {
 									if (backwardCompatibilityMainModeIdentifier == null) {
