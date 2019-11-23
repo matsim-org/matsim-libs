@@ -104,7 +104,15 @@ public class RunCarsharingIT {
 			params.setBeelineDistanceFactor( 1.3 );
 			config.plansCalcRoute().addModeRoutingParams( params );
 		}
-		
+		{
+			config.plansCalcRoute().removeModeRoutingParams( TransportMode.walk );
+			ModeRoutingParams params = new ModeRoutingParams( TransportMode.walk );
+			params.setTeleportedModeSpeed( 0.83333333333 );
+//			params.setTeleportedModeSpeed( 2.0 );
+			params.setBeelineDistanceFactor( 1.3 );
+			config.plansCalcRoute().addModeRoutingParams( params );
+		}
+
 		// ---
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
@@ -202,7 +210,10 @@ public class RunCarsharingIT {
 							
 				else if ( iteration==20 ) {
 					if ( TransportMode.walk.equals(legMode) ) {
-						Assert.assertEquals(2, nOfModeLegs );
+//						Assert.assertEquals(2, nOfModeLegs );
+						Assert.assertEquals(6, nOfModeLegs );
+						// (The above was changed because the two car trips have two access/egress walks each, which now have changed
+						// to true "walk". kai, nov'19)
 					} else if ( "twoway_vehicle".equals(legMode) ) {
 //						Assert.assertEquals( 8, nOfModeLegs ) ;
 						Assert.assertEquals( 6, nOfModeLegs ) ;
