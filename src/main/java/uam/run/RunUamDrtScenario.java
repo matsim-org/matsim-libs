@@ -23,11 +23,17 @@ package uam.run;
 import static org.matsim.contrib.drt.run.DrtModeModule.Direction;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.drt.routing.DrtStageActivityType;
+import org.matsim.contrib.drt.routing.MultiModeDrtMainModeIdentifier;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -46,6 +52,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -100,13 +107,18 @@ public class RunUamDrtScenario {
 		});
 
 		controler.addOverridingModule(new AbstractDvrpModeModule(uamCfg.getMode()) {
+			@Inject
+			private MultiModeDrtConfigGroup multiModeDrtCfg;
+
 			@Override
 			public void install() {
 				MapBinder<Direction, RoutingModule> mapBinder = modalMapBinder(Direction.class, RoutingModule.class);
 				//DRT as access mode (fixed)
-				mapBinder.addBinding(Direction.ACCESS).to(Key.get(RoutingModule.class, Names.named("drt")));
+				mapBinder.addBinding(Direction.ACCESS).to(Key.get(RoutingModule.class, Names.named("car")));
 				//more flexible approach
 				mapBinder.addBinding(Direction.EGRESS).toProvider(new UamAccessEgressRoutingModuleProvider());
+
+				bind(MainModeIdentifier.class).toInstance(new UamMainModeIdentifier(multiModeDrtCfg));
 			}
 		});
 
@@ -127,6 +139,33 @@ public class RunUamDrtScenario {
 			String mode = "car";//or a more less random choice here
 			return (fromFacility, toFacility, departureTime, person) -> injector.getInstance(TripRouter.class)
 					.calcRoute(mode, fromFacility, toFacility, departureTime, person);
+		}
+	}
+
+	private static class UamMainModeIdentifier implements MainModeIdentifier {
+		private final String mode = "uam";
+		private final String drtStageActivityType = new DrtStageActivityType(mode).drtStageActivity;
+		private final MultiModeDrtMainModeIdentifier delegate;
+
+		@Inject
+		public UamMainModeIdentifier(MultiModeDrtConfigGroup drtCfg) {
+			delegate = new MultiModeDrtMainModeIdentifier(drtCfg);
+		}
+
+		@Override
+		public String identifyMainMode(List<? extends PlanElement> tripElements) {
+			for (PlanElement pe : tripElements) {
+				if (pe instanceof Activity) {
+					if (((Activity)pe).getType().equals(drtStageActivityType))
+						return mode;
+				} else if (pe instanceof Leg) {
+					if (TripRouter.isFallbackMode(((Leg)pe).getMode())) {
+						return mode;
+					}
+				}
+			}
+
+			return delegate.identifyMainMode(tripElements);
 		}
 	}
 
