@@ -118,7 +118,7 @@ public class DrtRoutingModule implements RoutingModule {
 				"link: %s does not exist in the network of mode: %s", accessFacility.getLinkId(), drtCfg.getMode());
 		Link egressActLink = Verify.verifyNotNull(modalNetwork.getLinks().get(egressFacility.getLinkId()),
 				"link: %s does not exist in the network of mode: %s", egressFacility.getLinkId(), drtCfg.getMode());
-		List<? extends PlanElement> drtLeg = drtRouteLegCalculator.createRealDrtLeg(departureTime, accessActLink,
+		List<? extends PlanElement> drtLeg = drtRouteLegCalculator.createRealDrtLeg(now, accessActLink,
 				egressActLink);
 		trip.addAll(drtLeg);
 		for (PlanElement planElement : drtLeg) {
