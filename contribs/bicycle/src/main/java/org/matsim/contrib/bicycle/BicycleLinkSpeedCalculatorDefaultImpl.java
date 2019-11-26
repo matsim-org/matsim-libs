@@ -2,7 +2,7 @@ package org.matsim.contrib.bicycle;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
+import org.matsim.vehicles.Vehicle;
 
 import javax.inject.Inject;
 
@@ -26,12 +26,12 @@ public class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkSpeedCa
 	public double getMaximumVelocity(QVehicle qVehicle, Link link, double time) {
 
 		if (isBike(qVehicle))
-			return getMaximumVelocityForLink(link);
+			return getMaximumVelocityForLink(link, qVehicle.getVehicle());
 		else
 			return getDefaultMaximumVelocity(qVehicle, link, time);
 	}
 	@Override
-	public double getMaximumVelocityForLink( Link link ) {
+	public double getMaximumVelocityForLink(Link link, Vehicle vehicle) {
 		if (hasNotAttribute(link, BicycleUtils.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR)) {
 			throw new RuntimeException("Infrastructure speed factors must be set for all links that allow the bicycle mode!");
 		}
@@ -39,7 +39,8 @@ public class BicycleLinkSpeedCalculatorDefaultImpl implements BicycleLinkSpeedCa
 		// This is not yet available, but might be at some point, see https://matsim.atlassian.net/browse/MATSIM-700
 		// double bicycleVelocity = vehicle.getType().getMaximumVelocity()
 
-		double maxBicycleSpeed = bicycleConfigGroup.getMaxBicycleSpeedForRouting();
+		// prior to matsim 12.0 routers would not pass a vehicle. This is why we have a fallback for a default value from the config
+		double maxBicycleSpeed = vehicle == null ? bicycleConfigGroup.getMaxBicycleSpeedForRouting() : vehicle.getType().getMaximumVelocity();
 		double bicycleInfrastructureFactor = Double.parseDouble(link.getAttributes().getAttribute(BicycleUtils.BICYCLE_INFRASTRUCTURE_SPEED_FACTOR).toString());
 		double surfaceFactor = computeSurfaceFactor(link);
 		double gradientFactor = computeGradientFactor(link);
