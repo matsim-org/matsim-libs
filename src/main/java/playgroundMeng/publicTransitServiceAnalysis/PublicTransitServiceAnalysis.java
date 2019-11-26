@@ -73,12 +73,7 @@ public class PublicTransitServiceAnalysis {
 		if(!args[7].isEmpty()) {
 			analysisNetworkFile = directory + args[7];
 		}
-//		String networkFile = "W:/08_Temporaere_Mitarbeiter/082_K-GGSN/0822_Praktikanten/Meng/vw280_0.1/vw280_0.1.output_network.xml";
-//		String analysisNetworkFile = "C:/Users/VW3RCOM/Desktop/ptAccessAnalysis/outputNetworkFileNew.xml";
-//		String configFile = "W:/08_Temporaere_Mitarbeiter/082_K-GGSN/0822_Praktikanten/Meng/vw280_0.1/vw280_0.1.output_config.xml";
-//		String eventFile = "W:/08_Temporaere_Mitarbeiter/082_K-GGSN/0822_Praktikanten/Meng/vw280_0.1/vw280_0.1.output_events.xml.gz";
-//		String transitSchedule = "W:/08_Temporaere_Mitarbeiter/082_K-GGSN/0822_Praktikanten/Meng/vw280_0.1/vw280_0.1.output_transitSchedule.xml.gz";
-//		String outputFile = "C:/Users/VW3RCOM/Desktop/ptAnalysisOutputFileGrid_";
+
 		ptAccessabilityConfig = PtAccessabilityConfig.getInstance();
 		ptAccessabilityConfig.setConfigFile(configFile);
 		ptAccessabilityConfig.setNetworkFile(networkFile);
