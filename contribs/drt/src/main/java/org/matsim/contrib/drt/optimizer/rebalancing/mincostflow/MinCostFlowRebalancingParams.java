@@ -48,11 +48,11 @@ public final class MinCostFlowRebalancingParams extends ReflectiveConfigGroup {
 
 	public static final String TARGET_ALPHA = "targetAlpha";
 	static final String TARGET_ALPHA_EXP = "alpha coefficient in linear target calculation."
-			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty milleage.";
+			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage.";
 
 	public static final String TARGET_BETA = "targetBeta";
 	static final String TARGET_BETA_EXP = "beta constant in linear target calculation."
-			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty milleage.";
+			+ " In general, should be lower than 1.0 to prevent over-reacting and high empty mileage.";
 
 	public static final String CELL_SIZE = "cellSize";
 	static final String CELL_SIZE_EXP = "size of square cells used for demand aggregation."
