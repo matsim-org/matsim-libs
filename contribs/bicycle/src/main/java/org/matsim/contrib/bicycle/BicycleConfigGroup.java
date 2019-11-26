@@ -36,10 +36,14 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	private static final String MAX_BICYCLE_SPEED_FOR_ROUTING = "maxBicycleSpeedForRouting";
 	private static final String BICYCLE_MODE = "bicycleMode";
 	private static final String MOTORIZED_INTERACTION = "motorizedInteraction";
-	
-	public enum BicycleScoringType {legBased, linkBased};
 
 	private double marginalUtilityOfComfort;
+
+	@Deprecated
+	@StringGetter(MAX_BICYCLE_SPEED_FOR_ROUTING)
+	public double getMaxBicycleSpeedForRouting() {
+		return this.maxBicycleSpeedForRouting;
+	}
 	private double marginalUtilityOfInfrastructure;
 	private double marginalUtilityOfGradient;
 	private BicycleScoringType bicycleScoringType = BicycleScoringType.legBased;
@@ -90,14 +94,14 @@ public final class BicycleConfigGroup extends ReflectiveConfigGroup {
 	public BicycleScoringType getBicycleScoringType() {
 		return this.bicycleScoringType;
 	}
+
 	@StringSetter( MAX_BICYCLE_SPEED_FOR_ROUTING )
+	@Deprecated
 	public void setMaxBicycleSpeedForRouting(final double value) {
 		this.maxBicycleSpeedForRouting = value;
 	}
-	@StringGetter( MAX_BICYCLE_SPEED_FOR_ROUTING )
-	public double getMaxBicycleSpeedForRouting() {
-		return this.maxBicycleSpeedForRouting;
-	}
+
+	public enum BicycleScoringType {legBased, linkBased}
 	@StringGetter( BICYCLE_MODE )
 	public String getBicycleMode() {
 		return this.bicycleMode;
