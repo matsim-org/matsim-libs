@@ -109,7 +109,8 @@ public class PlansCalcRouteWithTollOrNotTest {
 		RoadPricingTestUtils.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
 
 		// case 3: change the second leg to a non-car mode, than it should be the same as case 1
-		String oldMode = getLeg3(config, population, id1).getMode();
+		String oldLegMode = getLeg3(config, population, id1).getMode();
+		String oldRoutingMode = TripStructureUtils.getRoutingMode(getLeg3(config, population, id1));
 		Leg leg = getLeg3(config, population, id1);
 //		leg.setMode(TransportMode.pt);
 		leg.setRoute(null);
@@ -118,8 +119,8 @@ public class PlansCalcRouteWithTollOrNotTest {
 		RoadPricingTestUtils.compareRoutes("2 3 4 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
 		// and change the mode back
 		Leg leg3 = getLeg3(config, population, id1);
-		leg3.setMode(oldMode);
-		TripStructureUtils.setRoutingMode(leg, oldMode);
+		leg3.setMode(oldLegMode);
+		TripStructureUtils.setRoutingMode(leg3, oldRoutingMode);
 
 		// case 4: now remove the costs and add them again, but with a higher amount
 		toll.removeCost(morningCost);
