@@ -51,8 +51,8 @@ public class PersonPrepareForSimTest {
 	@Test
 	public void testRun_MultimodalNetwork() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-
-		Link link1 = createNetwork(sc);
+		createAndAddNetwork(sc);
+		Id<Link> link1id = Id.createLinkId("1");
 
 		Population pop = sc.getPopulation();
 		Person person;
@@ -76,15 +76,15 @@ public class PersonPrepareForSimTest {
 
 		new PersonPrepareForSim(new DummyRouter(), sc).run(person);
 
-		Assert.assertEquals(link1.getId(), activity1.getLinkId());
-		Assert.assertEquals(link1.getId(), activity2.getLinkId()); // must also be linked to l1, as l2 has no car mode
+		Assert.assertEquals(link1id, activity1.getLinkId());
+		Assert.assertEquals(link1id, activity2.getLinkId()); // must also be linked to l1, as l2 has no car mode
 	}
 
 	@Test
 	public void testRun_MultimodalScenario() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		
-		Link l1 = createNetwork(sc);
+		createAndAddNetwork(sc);
+		Id<Link> link1id = Id.createLinkId("1");
 		
 		Population pop = sc.getPopulation();
 		Person person;
@@ -108,9 +108,11 @@ public class PersonPrepareForSimTest {
 		
 		new PersonPrepareForSim(new DummyRouter(), sc).run(person);
 		
-		Assert.assertEquals(l1.getId(), a1.getLinkId());
-		Assert.assertEquals(l1.getId(), a2.getLinkId()); // must also be linked to l1, as l2 has no car mode
+		Assert.assertEquals(link1id, a1.getLinkId());
+		Assert.assertEquals(link1id, a2.getLinkId()); // must also be linked to l1, as l2 has no car mode
 	}
+	
+	
 
 	private static class DummyRouter implements PlanAlgorithm {
 		@Override
@@ -118,7 +120,7 @@ public class PersonPrepareForSimTest {
 		}
 	}
 	
-	private Link createNetwork(Scenario sc) {
+	private Link createAndAddNetwork(Scenario sc) {
 		Network net = sc.getNetwork();
 		Link link1;
 		{
