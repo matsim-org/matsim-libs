@@ -52,27 +52,7 @@ public class PersonPrepareForSimTest {
 	public void testRun_MultimodalNetwork() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		Network net = sc.getNetwork();
-		Link link1;
-		{
-			NetworkFactory nf = net.getFactory();
-			Set<String> modes = new HashSet<String>();
-			Node n1 = nf.createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-			Node n2 = nf.createNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
-			Node n3 = nf.createNode(Id.create("3", Node.class), new Coord((double) 2000, (double) 0));
-			net.addNode(n1);
-			net.addNode(n2);
-			net.addNode(n3);
-			link1 = nf.createLink(Id.create("1", Link.class), n1, n2);
-			modes.add(TransportMode.car);
-			link1.setAllowedModes(modes);
-			Link l2 = nf.createLink(Id.create("2", Link.class), n2, n3);
-			modes.clear();
-			modes.add(TransportMode.pt);
-			l2.setAllowedModes(modes);
-			net.addLink(link1);
-			net.addLink(l2);
-		}
+		Link link1 = createNetwork(sc);
 
 		Population pop = sc.getPopulation();
 		Person person;
@@ -104,27 +84,7 @@ public class PersonPrepareForSimTest {
 	public void testRun_MultimodalScenario() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
-		Network net = sc.getNetwork();
-		Link l1;
-		{
-			NetworkFactory nf = net.getFactory();
-			Set<String> modes = new HashSet<String>();
-			Node n1 = nf.createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
-			Node n2 = nf.createNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
-			Node n3 = nf.createNode(Id.create("3", Node.class), new Coord((double) 2000, (double) 0));
-			net.addNode(n1);
-			net.addNode(n2);
-			net.addNode(n3);
-			l1 = nf.createLink(Id.create("1", Link.class), n1, n2);
-			modes.add(TransportMode.car);
-			l1.setAllowedModes(modes);
-			Link l2 = nf.createLink(Id.create("2", Link.class), n2, n3);
-			modes.clear();
-			modes.add(TransportMode.pt);
-			l2.setAllowedModes(modes);
-			net.addLink(l1);
-			net.addLink(l2);
-		}
+		Link l1 = createNetwork(sc);
 		
 		Population pop = sc.getPopulation();
 		Person person;
@@ -156,5 +116,30 @@ public class PersonPrepareForSimTest {
 		@Override
 		public void run(final Plan plan) {
 		}
+	}
+	
+	private Link createNetwork(Scenario sc) {
+		Network net = sc.getNetwork();
+		Link link1;
+		{
+			NetworkFactory nf = net.getFactory();
+			Set<String> modes = new HashSet<String>();
+			Node n1 = nf.createNode(Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+			Node n2 = nf.createNode(Id.create("2", Node.class), new Coord((double) 1000, (double) 0));
+			Node n3 = nf.createNode(Id.create("3", Node.class), new Coord((double) 2000, (double) 0));
+			net.addNode(n1);
+			net.addNode(n2);
+			net.addNode(n3);
+			link1 = nf.createLink(Id.create("1", Link.class), n1, n2);
+			modes.add(TransportMode.car);
+			link1.setAllowedModes(modes);
+			Link l2 = nf.createLink(Id.create("2", Link.class), n2, n3);
+			modes.clear();
+			modes.add(TransportMode.pt);
+			l2.setAllowedModes(modes);
+			net.addLink(link1);
+			net.addLink(l2);
+		}
+		return link1;
 	}
 }
