@@ -12,6 +12,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.matsim.analysis.ScoreStatsControlerListener;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.NoTransitEmulator;
 import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.TransitEmulator;
 import org.matsim.core.config.Config;
@@ -22,6 +23,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.PopulationComparison;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -61,7 +64,7 @@ public class RunPSimTest {
 		}
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(20);
-		config.controler().setDumpDataAtEnd(false);
+//		config.controler().setDumpDataAtEnd(false);
 		RunPSim runPSim = new RunPSim(config, pSimConfigGroup);
 		ExecScoreTracker execScoreTracker = new ExecScoreTracker(runPSim.getMatsimControler());
 		runPSim.getMatsimControler().addControlerListener(execScoreTracker);
@@ -77,8 +80,11 @@ public class RunPSimTest {
 		runPSim.run();
 		double psimScore = execScoreTracker.executedScore;
 		logger.info("RunPSim score was " + psimScore);
-//		Assert.assertEquals("RunPsim score changed.", 134.52369453719413d, psimScore, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("RunPsim score changed.", 132.73129073101293d, psimScore, MatsimTestUtils.EPSILON);
+		Population popExpected = PopulationUtils.createPopulation( config ) ;
+//		PopulationUtils.readPopulation( popExpected, utils.getClassInputDirectory() + "" );
+//		new PopulationComparison().compare( runPSim.getMatsimControler().getScenario().getPopulation() ) ;
+		Assert.assertEquals("RunPsim score changed.", 134.52369453719413d, psimScore, MatsimTestUtils.EPSILON);
+//		Assert.assertEquals("RunPsim score changed.", 132.73129073101293d, psimScore, MatsimTestUtils.EPSILON);
 	}
 
 	/**
