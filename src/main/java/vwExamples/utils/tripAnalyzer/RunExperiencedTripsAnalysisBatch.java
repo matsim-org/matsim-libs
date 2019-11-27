@@ -85,7 +85,7 @@ public class RunExperiencedTripsAnalysisBatch {
 //			scenarioToBeAnalyzed.add("vw256_1.1.0");
 //			scenarioToBeAnalyzed.add("vw243_CityDRT_10pct_0.05300_veh_idx0");
 //			scenarioToBeAnalyzed.add("CT_243.0.1");
-//			scenarioToBeAnalyzed.add("VW280_LocalLinkFlow_1.15_10pct");
+			scenarioToBeAnalyzed.add("VW280_LocalLinkFlow_1.15_10pct");
 //			scenarioToBeAnalyzed.add("VW280_LocalLinkFlow_1.28_10pct");
 //			scenarioToBeAnalyzed.add("vw280_0.1");
 //			scenarioToBeAnalyzed.add("vw280_CityCommuterDRTcarOnly_20pct_0.1_250_veh_idx0");
@@ -93,7 +93,7 @@ public class RunExperiencedTripsAnalysisBatch {
 //			scenarioToBeAnalyzed.add("VW280_LocalLinkFlow_1.15_100pct_2");
 //			scenarioToBeAnalyzed.add("VW280_LocalLinkFlow_1.28_100pct_2");
 //			scenarioToBeAnalyzed.add("VW280_CityCommuterDRT_carOnly_100pct_2");
-			scenarioToBeAnalyzed.add("VW280_CityCommuterDRT_carOnly_100pct_additiv");
+//			scenarioToBeAnalyzed.add("VW280_CityCommuterDRT_carOnly_100pct_additiv");
 
 			
 			

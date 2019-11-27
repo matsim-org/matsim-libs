@@ -295,10 +295,12 @@ public class PlanModifierHomeOffice {
 								l.setRoute(null);
 								l.setTravelTime(0.0);
 
-								TripRouter.insertTrip(plan, trip.getOriginActivity(),
-										Collections.singletonList(PopulationUtils.createLeg(shit2Mode)),
-										trip.getDestinationActivity());
+
 							}
+							
+							TripRouter.insertTrip(plan, trip.getOriginActivity(),
+									Collections.singletonList(PopulationUtils.createLeg(shit2Mode)),
+									trip.getDestinationActivity());
 
 							if (shiftingScenario.mode2ShiftedTripCounter.containsKey(subtourMode)) {
 								shiftingScenario.mode2ShiftedTripCounter.get(subtourMode).increment();

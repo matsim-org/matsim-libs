@@ -65,14 +65,20 @@ import org.matsim.core.utils.io.IOUtils;
 //import org.matsim.pt.PtConstants;
 import org.opengis.feature.simple.SimpleFeature;
 
+import uam.scenario.UamNetworkCreator;
+import vwExamples.utils.createShiftingScenario.airDRT.assignAirDRTTourCandidate;
 import vwExamples.utils.createShiftingScenario.cityCommuterDRT.assignCityCommuterTourCandidate;
 import vwExamples.utils.createShiftingScenario.cityCommuterDRT.isCityCommuterTourCandidate;
+import vwExamples.utils.createShiftingScenario.commuterDRT.assignCommuterTourCandidate;
+import vwExamples.utils.createShiftingScenario.commuterDRT.isCommuterTourCandidate;
 //import vwExamples.utils.createShiftingScenario.cityDRT.isWithinCityTourCandidate;
 
 /**
  * @author saxer
  */
-public class PlanModifierCityCommuterDRT {
+public class PlanModifierAirDRT {
+
+	ArrayList<String> changedTripsLog;
 
 	// Shape File to check home and work locations of the agents
 	Set<String> cityZones;
@@ -91,7 +97,7 @@ public class PlanModifierCityCommuterDRT {
 	Scenario scenario;
 
 	Collection<String> stages;
-//	StageActivityTypes blackList;
+	// StageActivityTypes blackList;
 
 	Network network;
 	SubTourValidator subTourValidator; // Defines the rule to calculate absolute number of trips or agents that might
@@ -101,13 +107,15 @@ public class PlanModifierCityCommuterDRT {
 	ShiftingScenario shiftingScenario;
 	String sep = ";";
 
-	PlanModifierCityCommuterDRT(String cityZonesFile, String serviceAreaZonesFile, String plansFile, String modPlansFile,
+	PlanModifierAirDRT(String cityZonesFile, String serviceAreaZonesFile, String plansFile, String modPlansFile,
 			String networkFile) {
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		// this.modifiedPopulationWriter = new StreamingPopulationWriter();
 		this.modPlansFile = modPlansFile;
 		this.cityZonesFile = cityZonesFile;
 		this.serviceAreaZonesFile = serviceAreaZonesFile;
+
+		this.changedTripsLog = new ArrayList<String>();
 
 		this.plansFile = plansFile;
 		this.networkFile = networkFile;
@@ -128,35 +136,68 @@ public class PlanModifierCityCommuterDRT {
 		// modifiedPopulationWriter = new StreamingPopulationWriter();
 
 		// Add staging acts for pt and drt
-//		stages = new ArrayList<String>();
-//		stages.add(PtConstants.TRANSIT_ACTIVITY_TYPE);
-//		stages.add(new DrtStageActivityType("drt").drtStageActivity);
-//		stages.add(parking.ParkingRouterNetworkRoutingModule.parkingStageActivityType);
-//		blackList = new StageActivityTypesImpl(stages);
+		// stages = new ArrayList<String>();
+		// stages.add(PtConstants.TRANSIT_ACTIVITY_TYPE);
+		// stages.add(new DrtStageActivityType("drt").drtStageActivity);
+		// stages.add(parking.ParkingRouterNetworkRoutingModule.parkingStageActivityType);
+		// blackList = new StageActivityTypesImpl(stages);
 
-		subTourValidator = new isCityCommuterTourCandidate(network, cityZonesMap, serviceAreazonesMap);
-		assignTourValidator = new assignCityCommuterTourCandidate(network, cityZonesMap, serviceAreazonesMap);
-		shiftingScenario = new ShiftingScenario(0.20);
+		subTourValidator = new isCommuterTourCandidate(network, cityZonesMap, serviceAreazonesMap);
+		assignTourValidator = new assignAirDRTTourCandidate(network, cityZonesMap, serviceAreazonesMap);
+		shiftingScenario = new ShiftingScenario(0.10);
 
 	}
 
 	public static void main(String[] args) {
 
-		PlanModifierCityCommuterDRT planmodifier = new PlanModifierCityCommuterDRT(
+		PlanModifierAirDRT planmodifier = new PlanModifierAirDRT(
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Hannover_Stadtteile.shp",
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Real_Region_Hannover.shp",
-				"D:\\Matsim\\Axer\\Hannover\\Base\\vw280_100pct\\vw280_100pct.output_plans.xml.gz",
-				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\vw280_1.0.output_plans_cityCommuterDRT_carOnly_Test.xml.gz",
+				"D:\\Matsim\\Axer\\Hannover\\Base\\vw280_0.1\\vw280_0.1.output_plans.xml.gz",
+				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\vw280_0.1.output_plans_airDRT.xml.gz",
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\network\\network.xml.gz");
 		planmodifier.count();
 		planmodifier.assign();
 		planmodifier.writeScenarioInformation();
+		planmodifier.writeChangedTripsLog();
+
+	}
+
+	public void writeChangedTripsLog() {
+		String header= "personId;tripStartTime;fromAct;toAct;fromX;fromY;toX;toY";
+		
+
+
+		String outputFolder = new File(this.modPlansFile).getParent();
+
+		try {
+
+			BufferedWriter bw = IOUtils.getBufferedWriter(outputFolder + "\\changedTripsLog.csv");
+
+			bw.write(header);
+			bw.newLine();
+	
+			for (String trip : changedTripsLog) {
+
+				bw.write(trip);
+				bw.newLine();
+			}
+
+
+			bw.flush();
+			bw.close();
+
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			throw new RuntimeException("Could not write scenario statistics");
+		}
+
 
 	}
 
 	public void writeScenarioInformation() {
 
-		String outputFolder = new File(this.plansFile).getParent();
+		String outputFolder = new File(this.modPlansFile).getParent();
 
 		try {
 
@@ -252,19 +293,18 @@ public class PlanModifierCityCommuterDRT {
 
 		// modifiedPopulationWriter.closeStreaming();
 	}
-	
-	public static <E> Optional<E> getRandom (Collection<E> e) {
 
-	    return e.stream()
-	            .skip((int) (e.size() * Math.random()))
-	            .findFirst();
+	public static <E> Optional<E> getRandom(Collection<E> e) {
+
+		return e.stream().skip((int) (e.size() * Math.random())).findFirst();
 	}
 
 	public void assign() {
-		String shift2mode = "drt";
+		String shift2mode = "uam";
 		String shiftingType = shiftingScenario.type;
 		int tripCounter = 0;
 		double minTripDistance = 2500.0;
+		double minUAMDistance = 15000.0;
 
 		// Part for subtourConversion
 		if (shiftingType.equals("subtourConversion")) {
@@ -290,20 +330,20 @@ public class PlanModifierCityCommuterDRT {
 
 				// Get random subtour of this agent
 				Collection<Subtour> subtoursCol = TripStructureUtils.getSubtours(plan);
-				
+
 				ArrayList<Subtour> subtours = new ArrayList<Subtour>(subtoursCol);
 				int randomTourdx = (int) (Math.random() * (subtours.size() - 1));
-				
+
 				Subtour subTour = subtours.get(randomTourdx);
-				
-				//for (Subtour subTour : TripStructureUtils.getSubtours(plan, blackList))
+
+				// for (Subtour subTour : TripStructureUtils.getSubtours(plan, blackList))
 				{
-					
+
 					double numberOfTrips = subTour.getTrips().size();
 					double estimatedTourDistance = getBeelineTourLength(subTour);
-					
+
 					double meanTripDistance = estimatedTourDistance / numberOfTrips;
-					
+
 					// Get subtour mode
 					String subtourMode = getSubtourMode(subTour, plan);
 
@@ -316,20 +356,28 @@ public class PlanModifierCityCommuterDRT {
 					// Check if this subtour can be shifted to an other mode
 					// It is not allowed to shift an already shifted tour
 					if (assignTourValidator.isValidSubTour(subTour) && (subtourMode != shift2mode)
-							&& meanTripDistance > minTripDistance && subtourMode.equals("car")) {
+							&& meanTripDistance > minUAMDistance && subtourMode.equals("car")) {
 
 						// System.out.println("Trip Size:" + subTour.getTrips().size());
 
 						for (Trip trip : subTour.getTrips()) {
-							for (Leg l : trip.getLegsOnly()) {
-								l.setRoute(null);
-								l.setTravelTime(0.0);
 
-							}
-							
 							TripRouter.insertTrip(plan, trip.getOriginActivity(),
 									Collections.singletonList(PopulationUtils.createLeg(shift2mode)),
 									trip.getDestinationActivity());
+
+//							assignTourValidator.isWithinZone(trip.getDestinationActivity());
+							
+							String tripLine = personId.toString()+";"
+									+ trip.getOriginActivity().getEndTime()+";"
+									+ trip.getOriginActivity().getType()+";"
+									+ trip.getDestinationActivity().getType()+";"
+									+ trip.getOriginActivity().getCoord().getX()+";"
+									+ trip.getOriginActivity().getCoord().getY()+";"
+									+ trip.getDestinationActivity().getCoord().getX()+";"
+									+ trip.getDestinationActivity().getCoord().getY();
+
+							this.changedTripsLog.add(tripLine);
 
 							if (shiftingScenario.mode2ShiftedTripCounter.containsKey(subtourMode)) {
 								shiftingScenario.mode2ShiftedTripCounter.get(subtourMode).increment();

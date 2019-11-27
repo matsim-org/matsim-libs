@@ -83,7 +83,7 @@ public class PlanModifierCityDRT {
 	Scenario scenario;
 
 	Collection<String> stages;
-//	StageActivityTypes blackList;
+	// StageActivityTypes blackList;
 
 	Network network;
 	SubTourValidator subTourValidator; // Defines the rule to calculate absolute number of trips or agents that might
@@ -120,11 +120,11 @@ public class PlanModifierCityDRT {
 		// modifiedPopulationWriter = new StreamingPopulationWriter();
 
 		// Add staging acts for pt and drt
-//		stages = new ArrayList<String>();
-//		stages.add(PtConstants.TRANSIT_ACTIVITY_TYPE);
-//		stages.add(new DrtStageActivityType("drt").drtStageActivity);
-//		stages.add(parking.ParkingRouterNetworkRoutingModule.parkingStageActivityType);
-//		blackList = new StageActivityTypesImpl(stages);
+		// stages = new ArrayList<String>();
+		// stages.add(PtConstants.TRANSIT_ACTIVITY_TYPE);
+		// stages.add(new DrtStageActivityType("drt").drtStageActivity);
+		// stages.add(parking.ParkingRouterNetworkRoutingModule.parkingStageActivityType);
+		// blackList = new StageActivityTypesImpl(stages);
 
 		subTourValidator = new isWithinCityTourCandidate(network, cityZonesMap, serviceAreazonesMap);
 		assignTourValidator = new isWithinCityTourCandidate(network, cityZonesMap, serviceAreazonesMap);
@@ -208,7 +208,7 @@ public class PlanModifierCityDRT {
 				String subtourMode = getSubtourMode(subTour, plan);
 
 				if (subTourValidator.isValidSubTour(subTour) && subtourMode.equals("car")) {
-//				if (subTourValidator.isValidSubTour(subTour)) {
+					// if (subTourValidator.isValidSubTour(subTour)) {
 					shiftingScenario.agentSet.add(person.getId());
 					shiftingScenario.totalSubtourCounter.increment();
 
@@ -276,20 +276,20 @@ public class PlanModifierCityDRT {
 
 				// Get random subtour of this agent
 				Collection<Subtour> subtoursCol = TripStructureUtils.getSubtours(plan);
-				
+
 				ArrayList<Subtour> subtours = new ArrayList<Subtour>(subtoursCol);
 				int randomTourdx = (int) (Math.random() * (subtours.size() - 1));
-				
+
 				Subtour subTour = subtours.get(randomTourdx);
 
-//				for (Subtour subTour : TripStructureUtils.getSubtours(plan, blackList))
+				// for (Subtour subTour : TripStructureUtils.getSubtours(plan, blackList))
 				{
-					
+
 					double numberOfTrips = subTour.getTrips().size();
 					double estimatedTourDistance = getBeelineTourLength(subTour);
-					
+
 					double meanTripDistance = estimatedTourDistance / numberOfTrips;
-					
+
 					// Get subtour mode
 					String subtourMode = getSubtourMode(subTour, plan);
 
@@ -303,8 +303,9 @@ public class PlanModifierCityDRT {
 					// It is not allowed to shift an already shifted tour
 					if (assignTourValidator.isValidSubTour(subTour) && (subtourMode != shift2mode)
 							&& meanTripDistance > minTripDistance && subtourMode.contains("car")) {
-//					if (assignTourValidator.isValidSubTour(subTour) && (subtourMode != shift2mode)
-//							&& meanTripDistance > minTripDistance) {
+						// if (assignTourValidator.isValidSubTour(subTour) && (subtourMode !=
+						// shift2mode)
+						// && meanTripDistance > minTripDistance) {
 
 						// System.out.println("Trip Size:" + subTour.getTrips().size());
 
@@ -314,10 +315,12 @@ public class PlanModifierCityDRT {
 								l.setRoute(null);
 								l.setTravelTime(0.0);
 
-								TripRouter.insertTrip(plan, trip.getOriginActivity(),
-										Collections.singletonList(PopulationUtils.createLeg(shift2mode)),
-										trip.getDestinationActivity());
 							}
+
+							TripRouter.insertTrip(plan, trip.getOriginActivity(),
+									Collections.singletonList(PopulationUtils.createLeg(shift2mode)),
+									trip.getDestinationActivity());
+
 
 							if (shiftingScenario.mode2ShiftedTripCounter.containsKey(subtourMode)) {
 								shiftingScenario.mode2ShiftedTripCounter.get(subtourMode).increment();

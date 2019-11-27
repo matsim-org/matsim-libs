@@ -303,10 +303,12 @@ public class PlanModifierEGrocery {
 								l.setRoute(null);
 								l.setTravelTime(0.0);
 
-								TripRouter.insertTrip(plan, trip.getOriginActivity(),
-										Collections.singletonList(PopulationUtils.createLeg(shift2mode)),
-										trip.getDestinationActivity());
+
 							}
+							
+							TripRouter.insertTrip(plan, trip.getOriginActivity(),
+									Collections.singletonList(PopulationUtils.createLeg(shift2mode)),
+									trip.getDestinationActivity());
 
 							if (shiftingScenario.mode2ShiftedTripCounter.containsKey(subtourMode)) {
 								shiftingScenario.mode2ShiftedTripCounter.get(subtourMode).increment();
