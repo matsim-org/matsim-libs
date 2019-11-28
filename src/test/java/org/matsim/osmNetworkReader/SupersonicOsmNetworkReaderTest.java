@@ -10,7 +10,6 @@ import de.topobyte.osm4j.pbf.seq.PbfWriter;
 import lombok.extern.java.Log;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -22,7 +21,6 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.OsmNetworkReader;
 
 import java.io.IOException;
@@ -33,7 +31,6 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -80,10 +77,10 @@ public class SupersonicOsmNetworkReaderTest {
 				"pedestrian", new LinkProperties(9, 1, 10.0 / 3.6, 600, false),
 				"path", new LinkProperties(9, 1, 20.0 / 3.6, 600, false));
 
-		List<Geometry> ruhrShape = ShapeFileReader.getAllFeatures(Paths.get("G:\\Users\\Janek\\shared-svn\\projects\\nemo_mercator\\data\\original_files\\shapeFiles\\shapeFile_Ruhrgebiet\\ruhrgebiet_boundary.shp").toString()).stream()
+	/*	List<Geometry> ruhrShape = ShapeFileReader.getAllFeatures(Paths.get("G:\\Users\\Janek\\shared-svn\\projects\\nemo_mercator\\data\\original_files\\shapeFiles\\shapeFile_Ruhrgebiet\\ruhrgebiet_boundary.shp").toString()).stream()
 				.map(feature -> (Geometry) feature.getDefaultGeometry())
 				.collect(Collectors.toList());
-
+*/
 		Instant start = Instant.now();
 		new SupersonicOsmNetworkReader.Builder()
 				.network(network)

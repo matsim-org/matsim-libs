@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.Coord;
 class LightOsmNode {
 
 	private final long id;
+    private final boolean isEndNode;
 	private final int numberOfWays;
 	private final Coord coord;
 

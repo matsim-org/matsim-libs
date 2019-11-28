@@ -6,16 +6,18 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executors;
 
 @Log4j2
 class OsmNetworkParser {
 
-	static NodesAndWays parse(Path inputFile, Map<String, LinkProperties> linkProperties) {
+	static NodesAndWays parse(Path inputFile, ConcurrentMap<String, LinkProperties> linkProperties) {
 
 		log.info("start reading ways");
 
-		var waysParser = new WaysPbfParser(linkProperties);
+		var executor = Executors.newWorkStealingPool();
+		var waysParser = new ParallelWaysPbfParser(executor, linkProperties);
 
 		try (var fileInputStream = new FileInputStream(inputFile.toFile())) {
 			var input = new BufferedInputStream(fileInputStream);

@@ -2,8 +2,8 @@ package org.matsim.osmNetworkReader;
 
 import lombok.RequiredArgsConstructor;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @SuppressWarnings("WeakerAccess")
 @RequiredArgsConstructor
@@ -76,8 +76,8 @@ public class LinkProperties {
         return new LinkProperties(LEVEL_LIVING_STREET, 1, 10 / 3.6, 300, false);
 	}
 
-	static Map<String, LinkProperties> createLinkProperties() {
-		Map<String, LinkProperties> result = new HashMap<>();
+    static ConcurrentMap<String, LinkProperties> createLinkProperties() {
+        ConcurrentMap<String, LinkProperties> result = new ConcurrentHashMap<>();
 		result.put("motorway", createMotorway());
 		result.put("motorway_link", createMotorwayLink());
 		result.put("trunk", createTrunk());

@@ -18,6 +18,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -29,7 +30,7 @@ public class SupersonicOsmNetworkReader {
 	private static final Set<String> oneWayTags = new HashSet<>(Arrays.asList("yes", "true", "1"));
 	private static final Set<String> notOneWayTags = new HashSet<>(Arrays.asList("no", "false", "0"));
 
-	private final Map<String, LinkProperties> linkProperties;
+	private final ConcurrentMap<String, LinkProperties> linkProperties;
 	private final BiPredicate<Coord, Integer> linkFilter;
 	private final Predicate<Long> preserveNodeWithId;
 	private final AfterLinkCreated afterLinkCreated;
