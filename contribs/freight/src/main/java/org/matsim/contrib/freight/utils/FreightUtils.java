@@ -18,6 +18,14 @@
 
 package org.matsim.contrib.freight.utils;
 
+import com.graphhopper.jsprit.analysis.toolbox.StopWatch;
+import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
+import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
+import com.graphhopper.jsprit.core.algorithm.listener.VehicleRoutingAlgorithmListeners;
+import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import com.graphhopper.jsprit.core.util.Solutions;
+import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -26,11 +34,16 @@ import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
+import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
+import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
+import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.VehicleType;
 
+import javax.management.InvalidAttributeValueException;
 import java.util.*;
 
 /**
@@ -51,6 +64,60 @@ public class FreightUtils {
 	private static final Logger log = Logger.getLogger(FreightUtils.class );
 
 	private static final String ATTR_SKILLS = "skills";
+
+	/**
+	 * Runs jsprit and so solves the VehicleRoutingProblem (VRP) for all {@link Carriers}, doing the following steps:
+	 * 	- creating NetbasedCosts based on the network
+	 * 	- building and solving the VRP for all carriers using jsprit
+	 * 	- take the (best) solution, route and add it as {@link CarrierPlan} to the {@link Carrier}.
+	 *
+	 *
+	 * @param controler The MATSim controler.
+	 * @throws InvalidAttributeValueException
+	 */
+	public void runJsprit(Controler controler) throws InvalidAttributeValueException {
+
+		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ) ;
+
+		NetworkBasedTransportCosts.Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(
+				controler.getScenario().getNetwork(), FreightUtils.getCarrierVehicleTypes(controler.getScenario()).getVehicleTypes().values() );
+		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build() ;
+
+		Carriers carriers = FreightUtils.getCarriers(controler.getScenario());
+
+		for (Carrier carrier : carriers.getCarriers().values()){
+				VehicleRoutingProblem vrp = MatsimJspritFactory.createRoutingProblemBuilder(carrier, controler.getScenario().getNetwork())
+					.setRoutingCost(netBasedCosts)
+					.build();
+
+			VehicleRoutingAlgorithm vra;
+			final String vehicleRoutingAlgortihmFile = freightConfig.getVehicleRoutingAlgortihmFile();
+			if(vehicleRoutingAlgortihmFile != null && !vehicleRoutingAlgortihmFile.equals(""))	{
+				log.info("Will read in VehicleRoutingAlgorithm from " + vehicleRoutingAlgortihmFile);
+				vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, vehicleRoutingAlgortihmFile);
+			} else {
+				log.info("Use a VehicleRoutingAlgorithm out of the box.");
+				vra = Jsprit.Builder.newInstance(vrp).setProperty(Jsprit.Parameter.THREADS, "5").buildAlgorithm();
+			}
+
+			vra.getAlgorithmListeners().addListener(new StopWatch(), VehicleRoutingAlgorithmListeners.Priority.HIGH);
+			int jspritIterations = CarrierUtils.getJspritIterations(carrier);
+			if(jspritIterations > 0) {
+				vra.setMaxIterations(jspritIterations);
+			} else {
+				throw new InvalidAttributeValueException("Carrier has invalid number of jsprit iterations. They must be positive." + carrier.getId().toString());
+			}
+
+			VehicleRoutingProblemSolution solution = Solutions.bestOf(vra.searchSolutions());
+
+			CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution) ;
+
+			NetworkRouter.routePlan(newPlan,netBasedCosts) ;
+
+			carrier.setSelectedPlan(newPlan) ;
+		}
+	}
+
 
 	/**
 	 * Creates a new {@link Carriers} container only with {@link CarrierShipment}s for creating a new VRP.
