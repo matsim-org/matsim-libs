@@ -85,7 +85,7 @@ ShutdownListener {
 
 	@Inject
 	ModeStatsControlerListener(ControlerConfigGroup controlerConfigGroup, Population population1, OutputDirectoryHierarchy controlerIO,
-			PlanCalcScoreConfigGroup scoreConfig, MainModeIdentifier mainModeIdentifier ) {
+			PlanCalcScoreConfigGroup scoreConfig) {
 		this.controlerConfigGroup = controlerConfigGroup;
 		this.population = population1;
 		this.modeFileName = controlerIO.getOutputFilename( FILENAME_MODESTATS ) ;
@@ -102,7 +102,7 @@ ShutdownListener {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-		this.mainModeIdentifier = mainModeIdentifier;
+		this.mainModeIdentifier = TripStructureUtils.getRoutingModeIdentifier();
 	}
 
 	@Override
