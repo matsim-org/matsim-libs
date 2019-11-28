@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -151,10 +150,18 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 						if (legs.size() == 1) {
 							// there is only a single leg (e.g. after Trips2Legs and a mode choice replanning module)
 							routingMode = legs.get(0).getMode();
+							if (routingMode.equals(TransportMode.transit_walk)) {
+								String errorMessage = "Found a trip of only one leg of mode transit_walk. "
+										+ "This should not happen during simulation since transit_walk was replaced by walk and "
+										+ "routingMode. Agent id: " + person.getId().toString();
+								log.error(errorMessage);
+								throw new RuntimeException(errorMessage);
+							}
 							TripStructureUtils.setRoutingMode(legs.get(0), routingMode);
 						} else {
-							String errorMessage = "Found a trip whose legs have different routingModes. "
-									+ "This is inconsistent. Agent id: " + person.getId().toString();
+							String errorMessage = "Found a trip whose legs have no routingMode. "
+									+ "This is only allowed for (outdated) input plans, not during simulation (after PrepareForSim). Agent id: "
+									+ person.getId().toString();
 							log.error(errorMessage);
 							throw new RuntimeException(errorMessage);
 						}
