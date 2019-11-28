@@ -221,7 +221,7 @@ public class FreightUtils {
 	 * @param carrier		the already existing carrier
 	 */
 	private static void createShipmentsFromServices(Carrier carrierWS, Carrier carrier) {
-		TreeMap<Id<CarrierService>, Id<Link>> depotServiceIsdeliveredFrom = new TreeMap<Id<CarrierService>, Id<Link>>();
+		TreeMap<Id<CarrierService>, Id<Link>> depotServiceIsdeliveredFrom = new TreeMap<>();
 		try {
 			carrier.getSelectedPlan();
 		} catch (Exception e) {
