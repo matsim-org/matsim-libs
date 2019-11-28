@@ -406,4 +406,22 @@ public class TestFreightUtils {
 		Assert.assertTrue("Should have skill 'testSkillTwo'.", FreightUtils.hasSkill(service, "testSkillTwo"));
 	}
 
+	@Test
+	public void testRunJsprit_allInformationGiven(){
+		//TODO
+		Assert.fail("not implemented");
+	}
+
+	@Test
+	public void testRunJsprit_NoOfJsprtiIterationsMissing(){
+		//TODO
+		Assert.fail("not implemented");
+	}
+
+	@Test
+	public void testRunJsprit_NoAlgortihmFileGiven(){
+		//TODO
+		Assert.fail("not implemented");
+	}
+
 }
