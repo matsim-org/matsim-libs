@@ -18,25 +18,31 @@
   
 package org.matsim.contrib.freight.utils;
 
+import java.net.URL;
 import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.vehicles.*;
 import org.matsim.vehicles.EngineInformation.FuelType;
 
@@ -47,6 +53,8 @@ import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolutio
 import com.graphhopper.jsprit.core.util.Solutions;
 
 import org.junit.Assert;
+
+import javax.management.InvalidAttributeValueException;
 
 public class TestFreightUtils {
 	
@@ -408,20 +416,81 @@ public class TestFreightUtils {
 
 	@Test
 	public void testRunJsprit_allInformationGiven(){
-		//TODO
-		Assert.fail("not implemented");
+		Config config = prepareConfig();
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
+
+		Controler controler = new Controler(scenario);
+		for (Carrier carrier : FreightUtils.getCarriers(controler.getScenario()).getCarriers().values()){
+			CarrierUtils.setJspritIterations(carrier, 1);
+		}
+
+		Assert.assertEquals("", ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).getVehicleRoutingAlgortihmFile()); //Not set yet
+
+		URL scenarioUrl = ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ) ;
+		String vraFile= IOUtils.extendUrl(scenarioUrl, "config.xml" ).toString(); //TODO: anpassen
+		ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).setVehicleRoutingAlgortihmFileFile(vraFile);
+
+		Assert.assertEquals("", ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).getVehicleRoutingAlgortihmFile());
+
+		try {
+			controler.run();
+		} catch (Exception e) {
+			Assert.fail();
+		}
+
+		Assert.assertEquals(vraFile, ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).getVehicleRoutingAlgortihmFile()); //now is set
+
 	}
 
-	@Test
+	/**
+	 * This test should lead to an exception, because the NumberOfJspritIterations is not set for carriers.
+	 */
+	@Test(expected= InvalidAttributeValueException.class)
 	public void testRunJsprit_NoOfJsprtiIterationsMissing(){
-		//TODO
-		Assert.fail("not implemented");
+		Config config = prepareConfig();
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
+
+		Controler controler = new Controler(scenario);
+		controler.run();
 	}
 
+	/**
+	 * Don't crash even if there is no algortihm file specified.
+	 */
 	@Test
 	public void testRunJsprit_NoAlgortihmFileGiven(){
-		//TODO
-		Assert.fail("not implemented");
+		Config config = prepareConfig();
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
+		Controler controler = new Controler(scenario);
+
+		for (Carrier carrier : FreightUtils.getCarriers(controler.getScenario()).getCarriers().values()){
+			CarrierUtils.setJspritIterations(carrier, 1);
+		}
+		try {
+			controler.run();
+		} catch (Exception e) {
+			Assert.fail();
+		}
+		Assert.assertEquals("", ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).getVehicleRoutingAlgortihmFile());
+	}
+
+	private Config prepareConfig(){
+		URL scenarioUrl = ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ) ;
+		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(scenarioUrl, "config.xml" ) );
+		config.controler().setLastIteration(0);
+		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration );
+		//freight configstuff
+		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
+		freightConfigGroup.setCarriersFile(IOUtils.extendUrl(scenarioUrl, "singleCarrierFiveActivitiesWithoutRoutes.xml" ).getFile() );
+		freightConfigGroup.setCarriersVehicleTypesFile(IOUtils.extendUrl(scenarioUrl, "vehicleTypes.xml" ).toString() );
+		freightConfigGroup.setTravelTimeSliceWidth(24*3600);
+		freightConfigGroup.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.enforceBeginnings);
+		return config;
 	}
 
 }
