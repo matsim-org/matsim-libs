@@ -192,12 +192,54 @@ public class PrepareForSimImplTest {
 	}
 	
 	@Test
-	public void testRoutingModeConsistency() {
+	public void testCorrectTripsRemainUnchanged() {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		createAndAddNetwork(scenario);
 		Population pop = scenario.getPopulation();
+		
+		// test car trip with access/egress walk legs
+		{
+			PopulationFactory pf = pop.getFactory();
+			Person person = pf.createPerson(Id.create("1", Person.class));
+			Plan plan = pf.createPlan();
+			Activity activity1 = pf.createActivityFromCoord("h", new Coord((double) 10, -10));
+			plan.addActivity(activity1);
+			Leg leg1 = pf.createLeg(TransportMode.walk);
+			TripStructureUtils.setRoutingMode(leg1, TransportMode.car);
+			plan.addLeg(leg1);
+			Activity activity2 = pf.createActivityFromCoord("car interaction", new Coord((double) 0, -10));
+			plan.addActivity(activity2);
+			Leg leg2 = pf.createLeg(TransportMode.car);
+			TripStructureUtils.setRoutingMode(leg2, TransportMode.car);
+			plan.addLeg(leg2);
+			Activity activity3 = pf.createActivityFromCoord("car interaction", new Coord((double) -10, -10));
+			plan.addActivity(activity3);
+			Leg leg3 = pf.createLeg(TransportMode.walk);
+			TripStructureUtils.setRoutingMode(leg3, TransportMode.car);
+			plan.addLeg(leg3);
+			Activity activity4 = pf.createActivityFromCoord("w", new Coord((double) 1900, -10));
+			plan.addActivity(activity4);
+			person.addPlan(plan);
+			pop.addPerson(person);
+			
+			final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
+					pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
+					new MainModeIdentifierImpl());
+			
+			prepareForSimImpl.run();
+			
+			// Check leg modes remain unchanged
+			Assert.assertEquals("wrong routing mode!", TransportMode.walk, leg1.getMode());
+			Assert.assertEquals("wrong routing mode!", TransportMode.car, leg2.getMode());
+			Assert.assertEquals("wrong routing mode!", TransportMode.walk, leg3.getMode());
+			
+			// Check routing mode:
+			Assert.assertEquals("wrong routing mode!", TransportMode.car, TripStructureUtils.getRoutingMode(leg1));
+			Assert.assertEquals("wrong routing mode!", TransportMode.car, TripStructureUtils.getRoutingMode(leg2));
+			Assert.assertEquals("wrong routing mode!", TransportMode.car, TripStructureUtils.getRoutingMode(leg3));
+		}
 		
 		// test complicated intermodal trip with consistent routing modes passes unchanged
 		{
@@ -299,6 +341,15 @@ public class PrepareForSimImplTest {
 			Assert.assertEquals("wrong routing mode!", "intermodal pt", TripStructureUtils.getRoutingMode(leg10));
 			Assert.assertEquals("wrong routing mode!", "intermodal pt", TripStructureUtils.getRoutingMode(leg11));
 		}
+	}
+	
+	@Test
+	public void testRoutingModeConsistency() {
+		Config config = ConfigUtils.createConfig();
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		createAndAddNetwork(scenario);
+		Population pop = scenario.getPopulation();
 		
 		// test trip with inconsistent routing modes causes exception
 		{
@@ -421,10 +472,52 @@ public class PrepareForSimImplTest {
 			Assert.assertEquals("wrong routing mode!", TransportMode.car, TripStructureUtils.getRoutingMode(leg3));
 		}
 		
-		// test complicated intermodal drt+pt trip with outdated access/egress walk modes
+		// test car trip with outdated access/egress walk modes
 		{
 			PopulationFactory pf = pop.getFactory();
 			Person person = pf.createPerson(Id.create("2", Person.class));
+			Plan plan = pf.createPlan();
+			Activity activity1 = pf.createActivityFromCoord("h", new Coord((double) 10, -10));
+			plan.addActivity(activity1);
+			Leg leg1 = pf.createLeg(TransportMode.non_network_walk);
+			TripStructureUtils.setRoutingMode(leg1, null);
+			plan.addLeg(leg1);
+			Activity activity2 = pf.createActivityFromCoord("car interaction", new Coord((double) 0, -10));
+			plan.addActivity(activity2);
+			Leg leg2 = pf.createLeg(TransportMode.car);
+			TripStructureUtils.setRoutingMode(leg2, null);
+			plan.addLeg(leg2);
+			Activity activity3 = pf.createActivityFromCoord("car interaction", new Coord((double) -10, -10));
+			plan.addActivity(activity3);
+			Leg leg3 = pf.createLeg(TransportMode.non_network_walk);
+			TripStructureUtils.setRoutingMode(leg3, null);
+			plan.addLeg(leg3);
+			Activity activity4 = pf.createActivityFromCoord("w", new Coord((double) 1900, -10));
+			plan.addActivity(activity4);
+			person.addPlan(plan);
+			pop.addPerson(person);
+			
+			final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
+					pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
+					new MainModeIdentifierImpl());
+			
+			prepareForSimImpl.run();
+			
+			// Check replacement of outdated helper modes.
+			Assert.assertEquals("wrong routing mode!", TransportMode.walk, leg1.getMode());
+			Assert.assertEquals("wrong routing mode!", TransportMode.car, leg2.getMode());
+			Assert.assertEquals("wrong routing mode!", TransportMode.walk, leg3.getMode());
+			
+			// Check routing mode:
+			Assert.assertEquals("wrong routing mode!", TransportMode.car, TripStructureUtils.getRoutingMode(leg1));
+			Assert.assertEquals("wrong routing mode!", TransportMode.car, TripStructureUtils.getRoutingMode(leg2));
+			Assert.assertEquals("wrong routing mode!", TransportMode.car, TripStructureUtils.getRoutingMode(leg3));
+		}
+		
+		// test complicated intermodal drt+pt trip with outdated access/egress walk modes
+		{
+			PopulationFactory pf = pop.getFactory();
+			Person person = pf.createPerson(Id.create("3", Person.class));
 			Plan plan = pf.createPlan();
 			Activity activity1 = pf.createActivityFromCoord("h", new Coord((double) 10, -10));
 			plan.addActivity(activity1);

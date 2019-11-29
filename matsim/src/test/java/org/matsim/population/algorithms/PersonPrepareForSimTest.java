@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.PrepareForSimImpl;
 import org.matsim.core.population.algorithms.PersonPrepareForSim;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.TripStructureUtils;
@@ -225,10 +226,48 @@ public class PersonPrepareForSimTest {
 	}
 	
 	@Test
-	public void testRoutingModeConsistency() {
+	public void testCorrectTripsRemainUnchanged() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		createAndAddNetwork(sc);
 		Population pop = sc.getPopulation();
+		
+		// test car trip with access/egress walk legs
+		{
+			PopulationFactory pf = pop.getFactory();
+			Person person = pf.createPerson(Id.create("1", Person.class));
+			Plan plan = pf.createPlan();
+			Activity activity1 = pf.createActivityFromCoord("h", new Coord((double) 10, -10));
+			plan.addActivity(activity1);
+			Leg leg1 = pf.createLeg(TransportMode.walk);
+			TripStructureUtils.setRoutingMode(leg1, TransportMode.car);
+			plan.addLeg(leg1);
+			Activity activity2 = pf.createActivityFromCoord("car interaction", new Coord((double) 0, -10));
+			plan.addActivity(activity2);
+			Leg leg2 = pf.createLeg(TransportMode.car);
+			TripStructureUtils.setRoutingMode(leg2, TransportMode.car);
+			plan.addLeg(leg2);
+			Activity activity3 = pf.createActivityFromCoord("car interaction", new Coord((double) -10, -10));
+			plan.addActivity(activity3);
+			Leg leg3 = pf.createLeg(TransportMode.walk);
+			TripStructureUtils.setRoutingMode(leg3, TransportMode.car);
+			plan.addLeg(leg3);
+			Activity activity4 = pf.createActivityFromCoord("w", new Coord((double) 1900, -10));
+			plan.addActivity(activity4);
+			person.addPlan(plan);
+			pop.addPerson(person);
+			
+			new PersonPrepareForSim(new DummyRouter(), sc).run(person);
+			
+			// Check leg modes remain unchanged
+			Assert.assertEquals("wrong routing mode!", TransportMode.walk, leg1.getMode());
+			Assert.assertEquals("wrong routing mode!", TransportMode.car, leg2.getMode());
+			Assert.assertEquals("wrong routing mode!", TransportMode.walk, leg3.getMode());
+			
+			// Check routing mode:
+			Assert.assertEquals("wrong routing mode!", TransportMode.car, TripStructureUtils.getRoutingMode(leg1));
+			Assert.assertEquals("wrong routing mode!", TransportMode.car, TripStructureUtils.getRoutingMode(leg2));
+			Assert.assertEquals("wrong routing mode!", TransportMode.car, TripStructureUtils.getRoutingMode(leg3));
+		}
 		
 		// test complicated intermodal trip with consistent routing modes passes unchanged
 		{
@@ -309,6 +348,13 @@ public class PersonPrepareForSimTest {
 			Assert.assertEquals("wrong routing mode set", TransportMode.pt, TripStructureUtils.getRoutingMode(leg10));
 			Assert.assertEquals("wrong routing mode set", TransportMode.pt, TripStructureUtils.getRoutingMode(leg11));
 		}
+	}
+		
+	@Test
+	public void testRoutingModeConsistency() {
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		createAndAddNetwork(sc);
+		Population pop = sc.getPopulation();
 		
 		// test trip with inconsistent routing modes causes exception
 		{
