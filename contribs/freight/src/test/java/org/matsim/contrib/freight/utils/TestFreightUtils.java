@@ -22,6 +22,7 @@ import java.net.URL;
 import java.util.Collection;
 
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -43,6 +44,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.*;
 import org.matsim.vehicles.EngineInformation.FuelType;
 
@@ -58,6 +60,9 @@ import org.apache.log4j.Logger;
 import javax.management.InvalidAttributeValueException;
 
 public class TestFreightUtils {
+
+	@Rule
+	MatsimTestUtils utils = new MatsimTestUtils();
 
 	private static final Logger log = Logger.getLogger(TestFreightUtils.class);
 	
@@ -418,26 +423,24 @@ public class TestFreightUtils {
 	@Test
 	public void testRunJsprit_allInformationGiven(){
 		Config config = prepareConfig();
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+
+		URL scenarioUrl = ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ) ;
+		String vraFile= IOUtils.extendUrl(scenarioUrl, "algorithm_v2.xml" ).getPath(); //TODO: anpassen
+		ConfigUtils.addOrGetModule( config, FreightConfigGroup.class ).setVehicleRoutingAlgortihmFileFile(vraFile);
+
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
-
 		Controler controler = new Controler(scenario);
+
 		for (Carrier carrier : FreightUtils.getCarriers(controler.getScenario()).getCarriers().values()){
 			CarrierUtils.setJspritIterations(carrier, 1);
 		}
-
-		Assert.assertEquals(null , ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).getVehicleRoutingAlgortihmFile()); //Not set yet
-
-		URL scenarioUrl = ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ) ;
-		String vraFile= IOUtils.extendUrl(scenarioUrl, "algorithm.xml" ).toString(); //TODO: anpassen
-		ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).setVehicleRoutingAlgortihmFileFile(vraFile);
-
-		Assert.assertEquals(vraFile, ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).getVehicleRoutingAlgortihmFile());
-
 		try {
-			controler.run();
+			FreightUtils.runJsprit(controler);
 		} catch (Exception e) {
+			e.printStackTrace();
 			Assert.fail();
 		}
 
@@ -447,23 +450,15 @@ public class TestFreightUtils {
 	/**
 	 * This test should lead to an exception, because the NumberOfJspritIterations is not set for carriers.
 	 */
-	@Test(expected=InvalidAttributeValueException.class)
-	public void testRunJsprit_NoOfJsprtiIterationsMissing(){
+	@Test(expected = javax.management.InvalidAttributeValueException.class)
+	public void testRunJsprit_NoOfJsprtiIterationsMissing() throws InvalidAttributeValueException {
 		Config config = prepareConfig();
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-
 		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
-
 		Controler controler = new Controler(scenario);
-		try {
-			controler.run();
-		} catch (Exception e) {
-			if (e instanceof InvalidAttributeValueException){
-				log.info("This is the expected Exception");
-			} else {
-				Assert.fail("This is not the _expected_ exception.");
-			}
-		}
+
+		FreightUtils.runJsprit(controler);
 	}
 
 	/**
@@ -472,6 +467,7 @@ public class TestFreightUtils {
 	@Test
 	public void testRunJsprit_NoAlgortihmFileGiven(){
 		Config config = prepareConfig();
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
 		Controler controler = new Controler(scenario);
@@ -480,11 +476,12 @@ public class TestFreightUtils {
 			CarrierUtils.setJspritIterations(carrier, 1);
 		}
 		try {
-			controler.run();
+			FreightUtils.runJsprit(controler);
 		} catch (Exception e) {
 			Assert.fail();
 		}
 		Assert.assertEquals(null, ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).getVehicleRoutingAlgortihmFile());
+//		controler.run();
 	}
 
 	private Config prepareConfig(){
