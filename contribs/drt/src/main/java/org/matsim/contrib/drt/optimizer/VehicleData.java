@@ -106,7 +106,7 @@ public class VehicleData {
 
 	private final double currentTime;
 	private final EntryFactory entryFactory;
-	private final Map<Id<DvrpVehicle>, Entry> entries;
+	protected final Map<Id<DvrpVehicle>, Entry> entries;
 
 	public VehicleData(double currentTime, Stream<? extends DvrpVehicle> vehicles, EntryFactory entryFactory,
 			ForkJoinPool forkJoinPool) {
