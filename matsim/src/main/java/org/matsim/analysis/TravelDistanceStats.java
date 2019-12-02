@@ -141,9 +141,9 @@ public class TravelDistanceStats {
                 .summaryStatistics();
         
         log.info("-- average leg distance per plan (executed plans only): " + legStats.getAverage() + " meters");
-        log.info("average leg distance per Person (executed plans only): " + legStats.getSum() / map.size() + " meters");
+        log.info("average leg distance per Person (executed plans only): " + legStats.getSum() / map.size() + " meters (statistic on all " + legStats.getCount() + " legs which have a finite distance)");
         log.info("-- average trip distance per plan (executed plans only): " + tripStats.getAverage() + " meters");
-        log.info("average trip distance per Person (executed plans only): " + tripStats.getSum() / map.size() + " meters");
+        log.info("average trip distance per Person (executed plans only): " + tripStats.getSum() / map.size() + " meters (statistic on all " + tripStats.getCount() + " trips which have a finite distance)");
         log.info("(TravelDistanceStats takes an average over all legs where the simulation reports travelled (network) distances");
 		log.info("(and teleported legs whose route contains a distance.)");// TODO: still valid?
 
