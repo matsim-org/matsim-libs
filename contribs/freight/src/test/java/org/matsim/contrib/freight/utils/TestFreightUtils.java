@@ -434,9 +434,8 @@ public class TestFreightUtils {
 		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
 		Controler controler = new Controler(scenario);
 
-		for (Carrier carrier : FreightUtils.getCarriers(controler.getScenario()).getCarriers().values()){
-			CarrierUtils.setJspritIterations(carrier, 1);
-		}
+		setJspritIterationsForCarriers(controler);
+
 		try {
 			FreightUtils.runJsprit(controler);
 		} catch (Exception e) {
@@ -472,16 +471,14 @@ public class TestFreightUtils {
 		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
 		Controler controler = new Controler(scenario);
 
-		for (Carrier carrier : FreightUtils.getCarriers(controler.getScenario()).getCarriers().values()){
-			CarrierUtils.setJspritIterations(carrier, 1);
-		}
+		setJspritIterationsForCarriers(controler);
+
 		try {
 			FreightUtils.runJsprit(controler);
 		} catch (Exception e) {
 			Assert.fail();
 		}
 		Assert.assertEquals(null, ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).getVehicleRoutingAlgortihmFile());
-//		controler.run();
 	}
 
 	private Config prepareConfig(){
@@ -496,6 +493,12 @@ public class TestFreightUtils {
 		freightConfigGroup.setTravelTimeSliceWidth(24*3600);
 		freightConfigGroup.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.enforceBeginnings);
 		return config;
+	}
+
+	private void setJspritIterationsForCarriers(Controler controler) {
+		for (Carrier carrier : FreightUtils.getCarriers(controler.getScenario()).getCarriers().values()) {
+			CarrierUtils.setJspritIterations(carrier, 1);
+		}
 	}
 
 }
