@@ -427,7 +427,7 @@ public class TestFreightUtils {
 		Assert.assertEquals("", ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).getVehicleRoutingAlgortihmFile()); //Not set yet
 
 		URL scenarioUrl = ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ) ;
-		String vraFile= IOUtils.extendUrl(scenarioUrl, "config.xml" ).toString(); //TODO: anpassen
+		String vraFile= IOUtils.extendUrl(scenarioUrl, "algorithm.xml" ).toString(); //TODO: anpassen
 		ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).setVehicleRoutingAlgortihmFileFile(vraFile);
 
 		Assert.assertEquals("", ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).getVehicleRoutingAlgortihmFile());
@@ -438,7 +438,7 @@ public class TestFreightUtils {
 			Assert.fail();
 		}
 
-		Assert.assertEquals(vraFile, ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).getVehicleRoutingAlgortihmFile()); //now is set
+		Assert.assertEquals(vraFile, ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).getVehicleRoutingAlgortihmFile());
 
 	}
 
