@@ -8,6 +8,10 @@ package playgroundMeng.publicTransitServiceAnalysis.others;
 import java.util.Hashtable;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+
 public class CoordinateConversion {
 
 	public static void main(String[] args) {
@@ -15,6 +19,15 @@ public class CoordinateConversion {
 		String utm = coordinateConversion.latLon2UTM(52.38759032, 9.78574073);
 		String utm2 = "32 U 573179.2687690047 5829109.063233924";
 		double[] coord = coordinateConversion.utm2LatLon(utm2);
+		System.out.println(coord[0] + " " + coord[1]);
+		
+
+		CoordinateTransformation transformation = TransformationFactory
+				.getCoordinateTransformation("EPSG:25832", "EPSG:4326"); 
+		Coord companyCoord = new Coord(573179.2687690047, 5829109.063233924);
+		companyCoord = transformation.transform(companyCoord);
+		
+		System.out.println(companyCoord.getX() + " " + companyCoord.getY());
 	}
 
 	public CoordinateConversion() {

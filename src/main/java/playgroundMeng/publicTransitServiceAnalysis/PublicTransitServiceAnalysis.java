@@ -5,9 +5,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.log4j.Logger;
+import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -17,7 +19,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
+import com.sun.javafx.image.impl.IntArgb;
+
 import playgroundMeng.publicTransitServiceAnalysis.basicDataBank.GridImp;
+import playgroundMeng.publicTransitServiceAnalysis.basicDataBank.Trip;
 import playgroundMeng.publicTransitServiceAnalysis.gridAnalysis.GridCreator;
 import playgroundMeng.publicTransitServiceAnalysis.kpiCalculator.GridCalculator;
 import playgroundMeng.publicTransitServiceAnalysis.others.ConsoleProgressBar;
@@ -25,9 +30,9 @@ import playgroundMeng.publicTransitServiceAnalysis.others.PtAccessabilityConfig;
 
 public class PublicTransitServiceAnalysis {
 	private static final Logger logger = Logger.getLogger(PublicTransitServiceAnalysis.class);
-	static PtAccessabilityConfig ptAccessabilityConfig;;
+	static PtAccessabilityConfig ptAccessabilityConfig;
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		configure(args);
 		GridCreator gridCreator = GridCreator.getInstacne();
 
@@ -35,12 +40,11 @@ public class PublicTransitServiceAnalysis {
 		int total = gridCreator.getNum2Grid().values().size();
 		String string = "kpiCalculateProgress";
 		ConsoleProgressBar.progressPercentage(remain, total, string, logger);
-
+		int a = 1;
 		for (GridImp gridImp : gridCreator.getNum2Grid().values()) {
 			GridCalculator.calculateTime2Score(gridImp);
 			GridCalculator.calculateTime2Ratio(gridImp);
 			GridCalculator.calculateTime2Kpi(gridImp);
-
 			remain++;
 			if (total / 10 != 0) {
 				if (remain % (total / 10) == 0) {
@@ -49,16 +53,19 @@ public class PublicTransitServiceAnalysis {
 					ConsoleProgressBar.progressPercentage(remain, total, string, logger);
 				}
 			}
+			a++;
 		}
 
 		try {
+			logger.info("beginn to print the result");
 			print3DGrafikFile();
+			logger.info("finished");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 	}
+	
 
 	private static void configure(String[] args) {
 		
@@ -129,8 +136,8 @@ public class PublicTransitServiceAnalysis {
 		FileWriter fileWriter2 = new FileWriter(file2);
 		BufferedWriter bufferedWriter2 = new BufferedWriter(fileWriter2);
 
-		bufferedWriter1.write("District,Latitude,longitude,time,ratio,score,kpi,numOfTrips,numofNoPtTrips");
-		bufferedWriter2.write("District,Latitude,longitude,time,ratio,score,kpi,numOfTrips,numofNoPtTrips");
+		bufferedWriter1.write("District,Latitude,longitude,time,ratio,ratioWW,score,kpi,numOfTrips,numofNoPtTrips");
+		bufferedWriter2.write("District,Latitude,longitude,time,ratio,ratioWW,score,kpi,numOfTrips,numofNoPtTrips");
 		for (int x = 0; x < 24 * 3600; x += ptAccessabilityConfig.getAnalysisTimeSlice()) {
 			int h = (int) (x / 3600);
 			int m = (int) ((x - h * 3600) / 60);
@@ -144,20 +151,30 @@ public class PublicTransitServiceAnalysis {
 						+ GridCreator.getInstacne().getNum2Grid().get(string).getCoordinate()[0] + ","
 						+ GridCreator.getInstacne().getNum2Grid().get(string).getCoordinate()[1] + time + ","
 						+ GridCreator.getInstacne().getNum2Grid().get(string).getTime2RatioOfOrigin().get(x) + ","
+						+ GridCreator.getInstacne().getNum2Grid().get(string).getTime2RatioWWOfOrigin().get(x) + ","
 						+ GridCreator.getInstacne().getNum2Grid().get(string).getTime2Score().get(x) + ","
 						+ GridCreator.getInstacne().getNum2Grid().get(string).getTime2OriginKpi().get(x) + ","
 						+ GridCreator.getInstacne().getNum2Grid().get(string).getTime2NumTripsOfOrigin().get(x) + ","
 						+ GridCreator.getInstacne().getNum2Grid().get(string).getTime2NumNoPtTripsOfOrigin().get(x));
+				
+				for(Trip trip: GridCreator.getInstacne().getNum2Grid().get(string).getTime2OriginTrips().get(x)) {
+					bufferedWriter1.write(","+trip.getRatio());
+				}
 
 				bufferedWriter2.write(string + ","
 						+ GridCreator.getInstacne().getNum2Grid().get(string).getCoordinate()[0] + ","
 						+ GridCreator.getInstacne().getNum2Grid().get(string).getCoordinate()[1] + time + ","
 						+ GridCreator.getInstacne().getNum2Grid().get(string).getTime2RatioOfDestination().get(x) + ","
+						+ GridCreator.getInstacne().getNum2Grid().get(string).getTime2RatioWWOfDestination().get(x) + ","
 						+ GridCreator.getInstacne().getNum2Grid().get(string).getTime2Score().get(x) + ","
 						+ GridCreator.getInstacne().getNum2Grid().get(string).getTime2DestinationKpi().get(x) + ","
 						+ GridCreator.getInstacne().getNum2Grid().get(string).getTime2NumTripsOfDestination().get(x)
 						+ "," + GridCreator.getInstacne().getNum2Grid().get(string).getTime2NumNoPtTripsOfDestination()
 								.get(x));
+				
+				for(Trip trip: GridCreator.getInstacne().getNum2Grid().get(string).getTime2DestinationTrips().get(x)) {
+					bufferedWriter2.write(","+trip.getRatio());
+				}
 			}
 		}
 		bufferedWriter1.close();

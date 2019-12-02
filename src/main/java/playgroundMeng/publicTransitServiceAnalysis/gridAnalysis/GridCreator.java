@@ -3,6 +3,7 @@ package playgroundMeng.publicTransitServiceAnalysis.gridAnalysis;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.log4j.Logger;
@@ -47,7 +48,7 @@ public class GridCreator {
 		int total = this.num2Polygon.keySet().size();
 		String caculateRatioProgress = "DivideIntoGridProgress";
 
-		for (String string : num2Polygon.keySet()) {
+		for (String string : this.num2Polygon.keySet()) {
 			this.num2Grid.put(string,
 					new GridImp(num2Polygon.get(string), ptAccessabilityConfig.getAnalysisTimeSlice()));
 			InfrastructureIntoGridDivider.divideLinksIntoGrid(this.num2Grid.get(string), linkExtendImps);
@@ -61,8 +62,30 @@ public class GridCreator {
 			} else if (remain == total) {
 				ConsoleProgressBar.progressPercentage(remain, total, caculateRatioProgress, logger);
 			}
-
 		}
+	}
+
+	public Map<String, Geometry> getSubGeometriesByRadom(Map<String, Geometry> map, int count) {
+		Map<String, Geometry> subMap = new HashedMap();
+		Random random = new Random();
+		int backSum = 0;
+		if (map.size() >= count) {
+			backSum = count;
+		} else {
+			backSum = map.size();
+		}
+		for (int i = 0; i < backSum; i++) {
+
+			int target = random.nextInt(map.size());
+			int a = 0;
+			for (String string : map.keySet()) {
+				if (a == target) {
+					subMap.put(string, map.get(string));
+				}
+				a++;
+			}
+		}
+		return subMap;
 	}
 
 	public static GridCreator getInstacne() {

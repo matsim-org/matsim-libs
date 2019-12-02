@@ -9,6 +9,9 @@ import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import playgroundMeng.publicTransitServiceAnalysis.others.CoordinateConversion;
 import playgroundMeng.publicTransitServiceAnalysis.others.TimeConvert;
@@ -18,6 +21,8 @@ public class GridImp {
 	private static final Logger logger = Logger.getLogger(GridImp.class);
 	private final Geometry geometry;
 	int timeSlice;
+	CoordinateTransformation transformation = TransformationFactory
+			.getCoordinateTransformation("EPSG:25832", "EPSG:4326"); 
 	private double[] coordinate = new double[2];
 
 	// Links and Stops which in this area;
@@ -36,6 +41,11 @@ public class GridImp {
 
 	Map<Integer, Double> time2RatioOfOrigin = new HashedMap();
 	Map<Integer, Double> time2RatioOfDestination = new HashedMap();
+	
+	Map<Integer, Double> time2RatioWWOfOrigin = new HashedMap();
+	Map<Integer, Double> time2RatioWWOfDestination = new HashedMap();
+	
+	
 	Map<Integer, Integer> time2NumTripsOfOrigin = new HashedMap();
 	Map<Integer, Integer> time2NumTripsOfDestination = new HashedMap();
 	Map<Integer, Integer> time2NumNoPtTripsOfOrigin = new HashedMap();
@@ -56,6 +66,10 @@ public class GridImp {
 
 			time2RatioOfOrigin.put(a, 0.);
 			time2RatioOfDestination.put(a, 0.);
+			
+			time2RatioWWOfOrigin.put(a, 0.);
+			time2RatioWWOfDestination.put(a, 0.);
+			
 			time2NumTripsOfOrigin.put(a, 0);
 			time2NumTripsOfDestination.put(a, 0);
 			time2NumNoPtTripsOfOrigin.put(a, 0);
@@ -66,11 +80,20 @@ public class GridImp {
 	}
 
 	public void setCoordinate() {
-		CoordinateConversion coordinateConversion = new CoordinateConversion();
+		
 		double x = geometry.getCentroid().getX();
 		double y = geometry.getCentroid().getY();
-		String utm = "32 U " + String.valueOf(x) + " " + String.valueOf(y);
-		this.coordinate = coordinateConversion.utm2LatLon(utm);
+		
+		Coord companyCoord = new Coord(x, y);
+		companyCoord = transformation.transform(companyCoord);
+		this.coordinate[0] = companyCoord.getY();
+		this.coordinate[1] = companyCoord.getX();		
+//		CoordinateConversion coordinateConversion = new CoordinateConversion();
+//		double x = geometry.getCentroid().getX();
+//		double y = geometry.getCentroid().getY();
+//		String utm = "32 U " + String.valueOf(x) + " " + String.valueOf(y);
+//		this.coordinate = coordinateConversion.utm2LatLon(utm);
+//		
 	}
 
 	public void findTripsInThePolygon(List<Trip> trips) {
@@ -149,6 +172,22 @@ public class GridImp {
 			this.time2NumTripsOfDestination.put(a, num);
 		}
 
+	}
+	
+	public void setTime2RatioWWOfDestination(Map<Integer, Double> time2RatioWWOfDestination) {
+		this.time2RatioWWOfDestination = time2RatioWWOfDestination;
+	}
+	
+	public void setTime2RatioWWOfOrigin(Map<Integer, Double> time2RatioWWOfOrigin) {
+		this.time2RatioWWOfOrigin = time2RatioWWOfOrigin;
+	}
+	
+	public Map<Integer, Double> getTime2RatioWWOfDestination() {
+		return time2RatioWWOfDestination;
+	}
+	
+	public Map<Integer, Double> getTime2RatioWWOfOrigin() {
+		return time2RatioWWOfOrigin;
 	}
 
 	public double[] getCoordinate() {

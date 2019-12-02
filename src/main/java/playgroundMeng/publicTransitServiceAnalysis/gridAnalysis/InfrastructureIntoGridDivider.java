@@ -50,17 +50,14 @@ public class InfrastructureIntoGridDivider {
 			double maxy = Collections.max(yLinkedList) + maxDistance;
 
 			for (TransitStopFacilityExtendImp transitStopFacilityExtendImp : transitStopFacilityExtendImps) {
-//					if(!transitStopFacilityExtendImp.isFindGrid()) {
 				if (transitStopFacilityExtendImp.getCoord().getX() > minx
 						&& transitStopFacilityExtendImp.getCoord().getX() < maxx
 						&& transitStopFacilityExtendImp.getCoord().getY() > miny
 						&& transitStopFacilityExtendImp.getCoord().getY() < maxy) {
 					gridImp.getTransitStopFacilityExtendImps().add(transitStopFacilityExtendImp);
-//							transitStopFacilityExtendImp.setFindGrid(true);
 				}
 			}
 		}
-//			}
 	}
 
 }
