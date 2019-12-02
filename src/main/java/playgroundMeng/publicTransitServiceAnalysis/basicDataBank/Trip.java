@@ -19,6 +19,7 @@ public class Trip {
 	CarTravelInfo carTravelInfo;
 	PtTraveInfo ptTraveInfo;
 	double ratio;
+	double ratioWithOutWaitingTime;
 	boolean foundOriginZone = false;
 	boolean foundDestinationZone = false;
 
@@ -40,6 +41,14 @@ public class Trip {
 
 	public Trip() {
 		// TODO Auto-generated constructor stub
+	}
+	
+	public void setRatioWithOutWaitingTime(double ratioWithOutWaitingTime) {
+		this.ratioWithOutWaitingTime = ratioWithOutWaitingTime;
+	}
+	
+	public double getRatioWithOutWaitingTime() {
+		return ratioWithOutWaitingTime;
 	}
 
 	public void setTravelDistance(double travelDistance) {

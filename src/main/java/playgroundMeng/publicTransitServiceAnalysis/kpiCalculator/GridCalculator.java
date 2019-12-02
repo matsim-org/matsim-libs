@@ -29,7 +29,6 @@ public class GridCalculator {
 								linkExtendImp.setTime2Score(x,
 										(linkExtendImp.getTime2Score().get(x) + scorecalculateFromMode(routeStopInfo)));
 							} catch (Exception e) {
-								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 						}
@@ -42,10 +41,11 @@ public class GridCalculator {
 		}
 	}
 
-	public static void calculateTime2Ratio(GridImp gridImp) {
+	public static void calculateTime2Ratio(GridImp gridImp) throws Exception {
 		for (int a : gridImp.getTime2OriginTrips().keySet()) {
 			int num = 0;
 			double sumRatio = 0.;
+			double sumRatioWW = 0.;
 			int numNoPt = 0;
 
 			if (!gridImp.getTime2OriginTrips().get(a).isEmpty()) {
@@ -53,6 +53,7 @@ public class GridCalculator {
 					tripRatioCalculate(trip);
 					if (trip.getRatio() > 0) {
 						sumRatio = sumRatio + trip.getRatio();
+						sumRatioWW = sumRatioWW + trip.getRatioWithOutWaitingTime();
 						num++;
 					} else if (trip.getRatio() < 0) {
 						numNoPt++;
@@ -62,6 +63,7 @@ public class GridCalculator {
 
 			if (num != 0) {
 				gridImp.getTime2RatioOfOrigin().put(a, sumRatio / num);
+				gridImp.getTime2RatioWWOfOrigin().put(a, sumRatioWW / num);
 			}
 			gridImp.getTime2NumNoPtTripsOfOrigin().put(a, numNoPt);
 			gridImp.getTime2NumTripsOfOrigin().put(a, num + numNoPt);
@@ -70,6 +72,7 @@ public class GridCalculator {
 		for (int a : gridImp.getTime2DestinationTrips().keySet()) {
 			int num = 0;
 			double sumRatio = 0.;
+			double sumRatioWW = 0.;
 			int numNoPt = 0;
 
 			if (!gridImp.getTime2DestinationTrips().get(a).isEmpty()) {
@@ -77,6 +80,7 @@ public class GridCalculator {
 					tripRatioCalculate(trip);
 					if (trip.getRatio() > 0) {
 						sumRatio = sumRatio + trip.getRatio();
+						sumRatioWW = sumRatioWW + trip.getRatioWithOutWaitingTime();
 						num++;
 					} else if (trip.getRatio() < 0) {
 						numNoPt++;
@@ -86,6 +90,7 @@ public class GridCalculator {
 
 			if (num != 0) {
 				gridImp.getTime2RatioOfDestination().put(a, sumRatio / num);
+				gridImp.getTime2RatioWWOfDestination().put(a, sumRatioWW / num);
 			}
 			gridImp.getTime2NumNoPtTripsOfDestination().put(a, numNoPt);
 			gridImp.getTime2NumTripsOfDestination().put(a, num + numNoPt);
@@ -111,16 +116,18 @@ public class GridCalculator {
 		}
 	}
 
-	private static void tripRatioCalculate(Trip trip) {
+	private static void tripRatioCalculate(Trip trip) throws Exception {
 		CarTravelTimeCalculator.getInstance().caculate(trip);
 		PtTravelTimeCaculator.getInstance().caculate(trip);
 
-		if (trip.getTravelDistance() <= 500) {
+		if (trip.getTravelDistance() <= 200) {
 			trip.setRatio(0.);
 		} else if (!trip.getPtTraveInfo().isUsePt()) {
 			trip.setRatio(-1.);
 		} else {
 			trip.setRatio(trip.getPtTraveInfo().getTravelTime() / trip.getCarTravelInfo().getTravelTime());
+			trip.setRatioWithOutWaitingTime(
+					trip.getPtTraveInfo().getTraveLTimeWithOutWaitingTime() / trip.getCarTravelInfo().getTravelTime());
 		}
 	}
 
@@ -132,7 +139,6 @@ public class GridCalculator {
 					try {
 						linkExtendImp.addStopsInfo(transitStopFacilityExtendImp);
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
