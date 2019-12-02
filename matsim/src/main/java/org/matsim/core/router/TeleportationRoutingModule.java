@@ -38,7 +38,7 @@ import org.matsim.facilities.Facility;
 /**
  * @author thibautd
  */
-public class TeleportationRoutingModule implements RoutingModule {
+public final class TeleportationRoutingModule implements RoutingModule {
 
 	private final String mode;
 

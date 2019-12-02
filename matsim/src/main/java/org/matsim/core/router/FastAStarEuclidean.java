@@ -46,7 +46,7 @@ import org.matsim.vehicles.Vehicle;
  * @see org.matsim.core.router.util.RoutingNetwork
  * @author cdobler
  */
-public class FastAStarEuclidean extends AStarEuclidean {
+class FastAStarEuclidean extends AStarEuclidean {
 
 	private final RoutingNetwork routingNetwork;
 	private final FastRouterDelegate fastRouter;

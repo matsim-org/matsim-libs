@@ -36,7 +36,7 @@ import org.matsim.pt.router.TransitRouterModule;
 import javax.inject.Provider;
 import java.util.Arrays;
 
-public class TripRouterFactoryBuilderWithDefaults {
+public final class TripRouterFactoryBuilderWithDefaults {
 
 	private Provider<TransitRouter> transitRouterFactory;
 	

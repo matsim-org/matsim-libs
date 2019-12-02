@@ -24,7 +24,7 @@ import org.matsim.core.router.util.ArrayRoutingNetwork;
 import org.matsim.core.router.util.NodeDataFactory;
 import org.matsim.core.router.util.RoutingNetwork;
 
-public class ArrayFastRouterDelegateFactory implements FastRouterDelegateFactory {
+public final class ArrayFastRouterDelegateFactory implements FastRouterDelegateFactory {
 
 	@Override
 	public ArrayFastRouterDelegate createFastRouterDelegate( DijkstraImpl dijkstra,

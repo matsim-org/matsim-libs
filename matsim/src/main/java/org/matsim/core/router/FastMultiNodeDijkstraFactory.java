@@ -34,7 +34,7 @@ import org.matsim.core.router.util.RoutingNetworkNode;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-public class FastMultiNodeDijkstraFactory implements LeastCostPathCalculatorFactory {
+public final class FastMultiNodeDijkstraFactory implements LeastCostPathCalculatorFactory {
 
 	private final boolean searchAllEndNodes;
 	private final boolean usePreProcessData;

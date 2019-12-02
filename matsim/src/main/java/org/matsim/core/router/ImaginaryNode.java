@@ -37,6 +37,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
  * @author cdobler
  */
 public class ImaginaryNode implements Node {
+	// yyyyyy can neither make final nor package-private.  kai, dec'19
 
 	/*package*/ final Collection<? extends InitialNode> initialNodes;
 	/*package*/ final Coord coord;

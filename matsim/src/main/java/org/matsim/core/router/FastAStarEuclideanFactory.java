@@ -37,7 +37,7 @@ import org.matsim.core.router.util.TravelTime;
 /**
  * @author cdobler
  */
-public class FastAStarEuclideanFactory implements LeastCostPathCalculatorFactory {
+public final class FastAStarEuclideanFactory implements LeastCostPathCalculatorFactory {
 
 	private final RoutingNetworkFactory routingNetworkFactory;
 	private final Map<Network, RoutingNetwork> routingNetworks = new HashMap<>();

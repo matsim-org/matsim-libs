@@ -29,7 +29,7 @@ import org.matsim.pt.router.TransitRouter;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class Transit implements Provider<RoutingModule> {
+public final class Transit implements Provider<RoutingModule> {
 
 	private final TransitRouter transitRouter;
 

@@ -29,7 +29,7 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
-public class FacilityWrapperActivity implements Activity {
+public final class FacilityWrapperActivity implements Activity {
 	private final Facility wrapped;
 
 	public FacilityWrapperActivity(final Facility toWrap) {

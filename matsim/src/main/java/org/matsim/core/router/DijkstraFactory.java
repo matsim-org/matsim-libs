@@ -34,7 +34,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 @Singleton
-public class DijkstraFactory implements LeastCostPathCalculatorFactory {
+public final class DijkstraFactory implements LeastCostPathCalculatorFactory {
 
 	private final boolean usePreProcessData;
 	private final Map<Network, PreProcessDijkstra> preProcessData = new HashMap<>();

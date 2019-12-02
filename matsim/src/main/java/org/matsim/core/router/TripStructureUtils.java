@@ -48,7 +48,7 @@ import org.matsim.core.gbl.Gbl;
  *
  * @author thibautd
  */
-public class TripStructureUtils {
+public final class TripStructureUtils {
 	
 	public enum StageActivityHandling { StagesAsNormalActivities, ExcludeStageActivities };
 

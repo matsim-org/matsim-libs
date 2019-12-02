@@ -48,6 +48,7 @@ import org.matsim.vehicles.Vehicle;
  * @author cdobler
  */
 public class FastMultiNodeDijkstra extends MultiNodeDijkstra {
+	// yyyyyy can neither be final nor package-private.  kai, dec'19
 
 	/*package*/ final RoutingNetwork routingNetwork;
 	private final FastRouterDelegate fastRouter;

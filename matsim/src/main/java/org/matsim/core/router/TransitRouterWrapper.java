@@ -42,7 +42,7 @@ import java.util.List;
  *
  * @author thibautd
  */
-public class TransitRouterWrapper implements RoutingModule {
+public final class TransitRouterWrapper implements RoutingModule {
 	private final TransitRouter router;
 	private final RoutingModule walkRouter;
 	private final TransitSchedule transitSchedule;

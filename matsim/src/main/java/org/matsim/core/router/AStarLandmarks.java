@@ -64,7 +64,7 @@ import org.matsim.vehicles.Vehicle;
  * @see DijkstraImpl
  * @author lnicolas
  */
-public class AStarLandmarks extends AStarEuclidean {
+class AStarLandmarks extends AStarEuclidean {
 
 	protected int[] activeLandmarkIndexes;
 

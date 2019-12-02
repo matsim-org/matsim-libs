@@ -32,7 +32,7 @@ import org.matsim.core.router.util.TravelTime;
 /**
  * @author dgrether
  */
-public class AStarEuclideanFactory implements LeastCostPathCalculatorFactory {
+public final class AStarEuclideanFactory implements LeastCostPathCalculatorFactory {
 
 	private final Map<Network, PreProcessEuclidean> preProcessData = new HashMap<>();
 	private final double overdoFactor;

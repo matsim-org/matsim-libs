@@ -32,7 +32,7 @@ import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
 import org.matsim.pt.router.TransitRouterModule;
 
 
-public class TripRouterModule extends AbstractModule {
+public final class TripRouterModule extends AbstractModule {
 
     @Override
     public void install() {

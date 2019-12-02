@@ -45,7 +45,7 @@ import org.matsim.vehicles.Vehicle;
  * @see org.matsim.core.router.util.RoutingNetwork
  * @author cdobler
  */
-public class FastAStarLandmarks extends AStarLandmarks {
+class FastAStarLandmarks extends AStarLandmarks {
 
 	private final RoutingNetwork routingNetwork;
 	private final FastRouterDelegate fastRouter;
