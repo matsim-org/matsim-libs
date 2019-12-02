@@ -53,10 +53,13 @@ import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolutio
 import com.graphhopper.jsprit.core.util.Solutions;
 
 import org.junit.Assert;
+import org.apache.log4j.Logger;
 
 import javax.management.InvalidAttributeValueException;
 
 public class TestFreightUtils {
+
+	private static final Logger log = Logger.getLogger(TestFreightUtils.class);
 	
 	private static final Id<Carrier> CARRIER_SERVICES_ID = Id.create("CarrierWServices", Carrier.class);
 	private static final Id<Carrier> CARRIER_SHIPMENTS_ID = Id.create("CarrierWShipments", Carrier.class);
@@ -424,13 +427,13 @@ public class TestFreightUtils {
 			CarrierUtils.setJspritIterations(carrier, 1);
 		}
 
-		Assert.assertEquals("", ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).getVehicleRoutingAlgortihmFile()); //Not set yet
+		Assert.assertEquals(null , ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).getVehicleRoutingAlgortihmFile()); //Not set yet
 
 		URL scenarioUrl = ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ) ;
 		String vraFile= IOUtils.extendUrl(scenarioUrl, "algorithm.xml" ).toString(); //TODO: anpassen
 		ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).setVehicleRoutingAlgortihmFileFile(vraFile);
 
-		Assert.assertEquals("", ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).getVehicleRoutingAlgortihmFile());
+		Assert.assertEquals(vraFile, ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).getVehicleRoutingAlgortihmFile());
 
 		try {
 			controler.run();
@@ -439,13 +442,12 @@ public class TestFreightUtils {
 		}
 
 		Assert.assertEquals(vraFile, ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).getVehicleRoutingAlgortihmFile());
-
 	}
 
 	/**
 	 * This test should lead to an exception, because the NumberOfJspritIterations is not set for carriers.
 	 */
-	@Test(expected= InvalidAttributeValueException.class)
+	@Test(expected=InvalidAttributeValueException.class)
 	public void testRunJsprit_NoOfJsprtiIterationsMissing(){
 		Config config = prepareConfig();
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -453,7 +455,15 @@ public class TestFreightUtils {
 		FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
 
 		Controler controler = new Controler(scenario);
-		controler.run();
+		try {
+			controler.run();
+		} catch (Exception e) {
+			if (e instanceof InvalidAttributeValueException){
+				log.info("This is the expected Exception");
+			} else {
+				Assert.fail("This is not the _expected_ exception.");
+			}
+		}
 	}
 
 	/**
@@ -474,7 +484,7 @@ public class TestFreightUtils {
 		} catch (Exception e) {
 			Assert.fail();
 		}
-		Assert.assertEquals("", ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).getVehicleRoutingAlgortihmFile());
+		Assert.assertEquals(null, ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ).getVehicleRoutingAlgortihmFile());
 	}
 
 	private Config prepareConfig(){
