@@ -62,7 +62,7 @@ import javax.management.InvalidAttributeValueException;
 public class TestFreightUtils {
 
 	@Rule
-	MatsimTestUtils utils = new MatsimTestUtils();
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private static final Logger log = Logger.getLogger(TestFreightUtils.class);
 	
