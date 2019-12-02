@@ -75,7 +75,7 @@ public class FreightUtils {
 	 * @param controler The MATSim controler.
 	 * @throws InvalidAttributeValueException
 	 */
-	public void runJsprit(Controler controler) throws InvalidAttributeValueException {
+	public static void runJsprit(Controler controler) throws InvalidAttributeValueException {
 
 		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class ) ;
 
@@ -105,7 +105,7 @@ public class FreightUtils {
 			if(jspritIterations > 0) {
 				vra.setMaxIterations(jspritIterations);
 			} else {
-				throw new InvalidAttributeValueException("Carrier has invalid number of jsprit iterations. They must be positive." + carrier.getId().toString());
+				throw new InvalidAttributeValueException ("Carrier has invalid number of jsprit iterations. They must be positive." + carrier.getId().toString());
 			}
 
 			VehicleRoutingProblemSolution solution = Solutions.bestOf(vra.searchSolutions());
