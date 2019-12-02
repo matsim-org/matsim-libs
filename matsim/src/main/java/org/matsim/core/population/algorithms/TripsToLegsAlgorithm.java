@@ -21,6 +21,7 @@ package org.matsim.core.population.algorithms;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
@@ -40,7 +41,7 @@ public final class TripsToLegsAlgorithm implements PlanAlgorithm {
 	private final MainModeIdentifier mainModeIdentifier;
 
 	public TripsToLegsAlgorithm(final TripRouter router) {
-		this( router.getMainModeIdentifier() );
+		this( TripStructureUtils.getRoutingModeIdentifier() );
 	}
 
 
@@ -61,7 +62,9 @@ public final class TripsToLegsAlgorithm implements PlanAlgorithm {
 						planElements.indexOf( trip.getDestinationActivity() ));
 			final String mode = mainModeIdentifier.identifyMainMode( fullTrip );
 			fullTrip.clear();
-			fullTrip.add( PopulationUtils.createLeg(mode) );
+			Leg leg = PopulationUtils.createLeg(mode);
+			TripStructureUtils.setRoutingMode(leg, mode);
+			fullTrip.add( leg );
 			if ( fullTrip.size() != 1 ) throw new RuntimeException( fullTrip.toString() );
 		}
 	}

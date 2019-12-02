@@ -41,6 +41,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.MutableScenario;
@@ -48,6 +49,8 @@ import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.testcases.MatsimTestUtils;
+
+import com.google.inject.Provider;
 
 /**
  * Tests {@link PlansCalcRouteWithTollOrNot} as isolated as possible.
@@ -106,12 +109,18 @@ public class PlansCalcRouteWithTollOrNotTest {
 		RoadPricingTestUtils.compareRoutes("8 11 12", (NetworkRoute) getLeg3(config, population, id1).getRoute());
 
 		// case 3: change the second leg to a non-car mode, than it should be the same as case 1
-		String oldMode = getLeg3(config, population, id1).getMode();
-		getLeg3(config, population, id1).setMode(TransportMode.pt);
+		String oldLegMode = getLeg3(config, population, id1).getMode();
+		String oldRoutingMode = TripStructureUtils.getRoutingMode(getLeg3(config, population, id1));
+		Leg leg = getLeg3(config, population, id1);
+//		leg.setMode(TransportMode.pt);
+		leg.setRoute(null);
+		TripStructureUtils.setRoutingMode(leg, TransportMode.pt);
 		runOnAll(testee(scenario, toll), population);
 		RoadPricingTestUtils.compareRoutes("2 3 4 6", (NetworkRoute) getLeg1(config, population, id1).getRoute());
 		// and change the mode back
-		getLeg3(config, population, id1).setMode(oldMode);
+		Leg leg3 = getLeg3(config, population, id1);
+		leg3.setMode(oldLegMode);
+		TripStructureUtils.setRoutingMode(leg3, oldRoutingMode);
 
 		// case 4: now remove the costs and add them again, but with a higher amount
 		toll.removeCost(morningCost);
@@ -142,15 +151,24 @@ public class PlansCalcRouteWithTollOrNotTest {
 	}
 
 	private PlansCalcRouteWithTollOrNot testee(final Scenario scenario, final RoadPricingScheme toll) {
-		return Injector.createInjector(
-				scenario.getConfig(),
-				new RoadPricingModuleDefaults(toll),
-				/* FIXME Check/understand why the following is INcorrect, jwj '19. What's the difference? */
-//				RoadPricingUtils.createModule(toll),
+//		return Injector.createInjector(
+//				scenario.getConfig(),
+//				new RoadPricingModuleDefaults(toll),
+//				/* FIXME Check/understand why the following is INcorrect, jwj '19. What's the difference? */
+////				RoadPricingUtils.createModule(toll),
+//				new ScenarioByInstanceModule(scenario),
+//				new ControlerDefaultCoreListenersModule(),
+//				new NewControlerModule())
+//				.getInstance(PlansCalcRouteWithTollOrNot.class);
+		
+		Provider<TripRouter> tripRouterProvider = Injector.createInjector(scenario.getConfig(),
+				new RoadPricingModuleDefaults(toll), 
 				new ScenarioByInstanceModule(scenario),
-				new ControlerDefaultCoreListenersModule(),
-				new NewControlerModule())
-				.getInstance(PlansCalcRouteWithTollOrNot.class);
+				new ControlerDefaultCoreListenersModule(), 
+				new NewControlerModule()).getProvider(TripRouter.class);
+
+			return new PlansCalcRouteWithTollOrNot( toll, tripRouterProvider ) ;
+			// yy might be more plausible to get the full class out of the injector, but that ain't that easy ...  kai, oct'19
 	}
 
 	/**

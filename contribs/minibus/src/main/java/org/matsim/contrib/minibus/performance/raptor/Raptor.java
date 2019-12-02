@@ -100,16 +100,15 @@ public class Raptor extends AbstractTransitRouter implements TransitRouter {
 		TransitPassengerRoute p = this.raptorWalker.calcLeastCostPath(fromStops, toStops);
 
 		if (p == null) {
-			// return null;
-			// returning at least walk legs if no PT route is found. Amit Aug'17
-			return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
+			 return null;
 		}
 
 		double directWalkCost = getWalkDisutility(fromFacility.getCoord(), toFacility.getCoord());
 		double pathCost = p.getTravelCost();
 
 		if (directWalkCost * getConfig().getDirectWalkFactor() < pathCost) {
-			return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
+//			return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
+			return null;
 		}
 		return convertPassengerRouteToLegList(departureTime, p, fromFacility.getCoord(), toFacility.getCoord(), person);
 	}

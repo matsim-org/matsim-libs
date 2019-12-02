@@ -1,6 +1,8 @@
 package playground.vsp.cadyts.marginals;
 
 import com.google.inject.Inject;
+
+import org.matsim.analysis.TransportPlanningMainModeIdentifier;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.*;
@@ -17,8 +19,7 @@ import java.util.*;
 
 class TripEventHandler implements ActivityEndEventHandler, ActivityStartEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler, TransitDriverStartsEventHandler {
 
-	@Inject
-	private MainModeIdentifier mainModeIdentifier;
+	private MainModeIdentifier mainModeIdentifier = new TransportPlanningMainModeIdentifier();
 
 	@Inject(optional = true)
 	private AgentFilter agentFilter = id -> true; // by default include all agents

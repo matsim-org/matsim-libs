@@ -21,6 +21,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.vehicles.Vehicle;
@@ -133,12 +134,14 @@ class PlanSerializable implements Serializable {
     class LegSerializable implements PlanElementSerializable {
         private final double departureTime;
         private final String mode;
+        private final String routingMode;
         private final double travelTime;
         private RouteSerializable route;
 
         public LegSerializable(Leg leg) {
             departureTime = leg.getDepartureTime();
             mode = leg.getMode();
+            routingMode = TripStructureUtils.getRoutingMode(leg);
             travelTime = leg.getTravelTime();
 
             if (leg.getRoute() != null) {
@@ -154,6 +157,7 @@ class PlanSerializable implements Serializable {
 
         public Leg getLeg() {
             Leg leg = PopulationUtils.createLeg(mode);
+            TripStructureUtils.setRoutingMode(leg, routingMode);
             leg.setDepartureTime(departureTime);
             leg.setTravelTime(travelTime);
             leg.setRoute(route == null ? null : route.getRoute(mode));

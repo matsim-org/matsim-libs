@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -41,11 +40,9 @@ import org.matsim.contrib.pseudosimulation.util.CollectionUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.vehicles.Vehicle;
 
@@ -72,10 +69,7 @@ public class PSim implements Mobsim {
     private final static double MIN_LEG_DURATION = 0.0;
 
     private final SimThread[] threads;
-    private final double beelineDistanceFactor;
     AtomicInteger numThreads;
-
-    private final double walkSpeed;
 
     private final TravelTime carLinkTravelTimes;
     private final Collection<Plan> plans;
@@ -90,15 +84,11 @@ public class PSim implements Mobsim {
         this.scenario = sc;
         this.endTime = sc.getConfig().qsim().getEndTime();
         this.eventManager = eventsManager;
-        int numThreads = Integer.parseInt(sc.getConfig().getParam("global", "numberOfThreads"));
+        int numThreads = sc.getConfig().global().getNumberOfThreads() ;
         threads = new SimThread[numThreads];
         for (int i = 0; i < numThreads; i++)
             threads[i] = new SimThread();
 
-
-        PlansCalcRouteConfigGroup pcrConfig = sc.getConfig().plansCalcRoute();
-        this.beelineDistanceFactor = pcrConfig.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
-        this.walkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk) ;
         this.carLinkTravelTimes = carLinkTravelTimes;
         this.plans = plans;
     }
@@ -157,124 +147,121 @@ public class PSim implements Mobsim {
 
         @Override
         public void run() {
-            PLANS:
-            for (Plan plan : threadPlans) {
+            // plans:
+            for( Plan plan : threadPlans ){
                 Queue<Event> eventQueue = new LinkedList<>();
                 Id<Person> personId = plan.getPerson().getId();
-                Id<Vehicle> personVehicleId = Id.createVehicleId(personId.toString()); // TODO: find cleaner access to vehicle id
+                Id<Vehicle> personVehicleId = Id.createVehicleId( personId.toString() ); // TODO: find cleaner access to vehicle id
                 List<PlanElement> elements = plan.getPlanElements();
 
                 double prevEndTime = 0;
-                LEGS:
-                for (int idx = 0; idx < elements.size(); idx += 2) {
-                    Activity act = (Activity) elements.get(idx);
-					/*
-					 * Make sure that the activity does not end before the
-					 * previous activity.
-					 */
-                    double actEndTime = Math.max(prevEndTime + MIN_ACT_DURATION, act.getEndTime());
 
-                    if (idx > 0) {
-						/*
-						 * If this is not the first activity, then there must
-						 * exist a leg before.
-						 */
+                // legs:
+                for( int idx = 0 ; idx < elements.size() ; idx += 2 ){
+                    Activity act = (Activity) elements.get( idx );
+                    /*
+                     * Make sure that the activity does not end before the previous activity.
+                     */
+                    double actEndTime = Math.max( prevEndTime + MIN_ACT_DURATION, act.getEndTime() );
 
-                        Leg prevLeg = (Leg) elements.get(idx - 1);
-                        Activity prevAct = (Activity) elements.get(idx - 2);
+                    if( idx > 0 ){
+                        /*
+                         * If this is not the first activity, then there must exist a leg before.
+                         */
+
+                        Leg prevLeg = (Leg) elements.get( idx - 1 );
                         double travelTime = 0.0;
-                        if (prevLeg.getMode().equals(TransportMode.car)) {
-                            try {
-                                eventQueue.add(new PersonEntersVehicleEvent(prevEndTime, personId, personVehicleId));
-                                eventQueue.add(new VehicleEntersTrafficEvent(prevEndTime,personId, prevLeg.getRoute().getStartLinkId(),personVehicleId, TransportMode.car,1.0));
+                        if( prevLeg.getMode().equals( TransportMode.car ) ){
+                            try{
+                                eventQueue.add( new PersonEntersVehicleEvent( prevEndTime, personId, personVehicleId ) );
+                                eventQueue.add( new VehicleEntersTrafficEvent( prevEndTime, personId, prevLeg.getRoute().getStartLinkId(), personVehicleId,
+                                        TransportMode.car, 1.0 ) );
                                 NetworkRoute croute = (NetworkRoute) prevLeg.getRoute();
 
-                                travelTime = calcRouteTravelTime(croute, prevEndTime, carLinkTravelTimes, network, eventQueue, personVehicleId);
-                                eventQueue.add(new VehicleLeavesTrafficEvent(prevEndTime + travelTime,personId, prevLeg.getRoute().getEndLinkId(),personVehicleId, TransportMode.car,1.0));
-                                eventQueue.add(new PersonLeavesVehicleEvent(prevEndTime + travelTime, personId, personVehicleId));
-                            } catch (NullPointerException ne) {
-                                Logger.getLogger(this.getClass()).error("No route for car leg. Continuing with next leg");
+                                travelTime = calcRouteTravelTime( croute, prevEndTime, carLinkTravelTimes, network, eventQueue, personVehicleId );
+                                eventQueue.add(
+                                        new VehicleLeavesTrafficEvent( prevEndTime + travelTime, personId, prevLeg.getRoute().getEndLinkId(), personVehicleId,
+                                                TransportMode.car, 1.0 ) );
+                                eventQueue.add( new PersonLeavesVehicleEvent( prevEndTime + travelTime, personId, personVehicleId ) );
+                            } catch( NullPointerException ne ){
+                                Logger.getLogger( this.getClass() ).error( "No route for car leg. Continuing with next leg" );
                                 continue;
                             }
-                        } else if (prevLeg.getMode().equals(TransportMode.transit_walk)) {
-                            TransitWalkTimeAndDistance tnd = new TransitWalkTimeAndDistance(act.getCoord(), prevAct.getCoord());
-                            travelTime = tnd.time;
-                            eventQueue.add(new TeleportationArrivalEvent(prevEndTime + tnd.time, personId, tnd.distance));
-                        } else if (transitModes.contains(prevLeg.getMode())) {
-                        	TransitEmulator.Trip trip = transitEmulator.findTrip(prevLeg, prevEndTime);
-                        	if (trip != null) {                           	
-                            	
-                        		Id<Vehicle> vehicleId = trip.vehicleId();
-                        		if (vehicleId == null) {
-                        			vehicleId = Id.create("dummy", Vehicle.class);
-                        		}
-                                eventQueue.add(new PersonEntersVehicleEvent(trip.accessTime_s(), personId, vehicleId)); // dummyVehicleId));
-                                eventQueue.add(new PersonLeavesVehicleEvent(trip.egressTime_s(), personId, vehicleId)); // dummyVehicleId));
-                                travelTime = trip.egressTime_s() - prevEndTime;                                
+                        } else if( transitModes.contains( prevLeg.getMode() ) ){
+                            TransitEmulator.Trip trip = transitEmulator.findTrip( prevLeg, prevEndTime );
+                            if( trip != null ){
+
+                                Id<Vehicle> vehicleId = trip.vehicleId();
+                                if( vehicleId == null ){
+                                    vehicleId = Id.create( "dummy", Vehicle.class );
+                                }
+                                eventQueue.add( new PersonEntersVehicleEvent( trip.accessTime_s(), personId, vehicleId ) ); // dummyVehicleId));
+                                eventQueue.add( new PersonLeavesVehicleEvent( trip.egressTime_s(), personId, vehicleId ) ); // dummyVehicleId));
+                                travelTime = trip.egressTime_s() - prevEndTime;
                             }
-                        } else {
-                            try {
+                        } else{
+                            try{
                                 Route route = prevLeg.getRoute();
                                 travelTime = route.getTravelTime();
-                                eventQueue.add(new TeleportationArrivalEvent(prevEndTime + travelTime, personId, 
-                                		route.getDistance()
-                                		// Double.NaN
-                                		));
-                            } catch (NullPointerException e) {
-                                Logger.getLogger(this.getClass()).error("No route for this leg. Continuing with next leg");
+                                eventQueue.add( new TeleportationArrivalEvent( prevEndTime + travelTime, personId,
+                                        route.getDistance()
+                                        // Double.NaN
+                                ) );
+                            } catch( NullPointerException e ){
+                                Logger.getLogger( this.getClass() ).error( "No route for this leg. Continuing with next leg" );
                                 continue;
                             }
                         }
 
-                        travelTime = Math.max(MIN_LEG_DURATION, travelTime);
+                        travelTime = Math.max( MIN_LEG_DURATION, travelTime );
                         double arrivalTime = travelTime + prevEndTime;
 
-						/*
-						 * Make sure that the activity does not end before the
-						 * agent arrives.
-						 */
-                        actEndTime = Math.max(arrivalTime + MIN_ACT_DURATION, actEndTime);
-						/*
-						 * If act end time is not specified...
-						 */
-                        if (Double.isInfinite(actEndTime)) {
+                        /*
+                         * Make sure that the activity does not end before the
+                         * agent arrives.
+                         */
+                        actEndTime = Math.max( arrivalTime + MIN_ACT_DURATION, actEndTime );
+                        /*
+                         * If act end time is not specified...
+                         */
+                        if( Double.isInfinite( actEndTime ) ){
                             // if(transitPerformance!=null){
-                            if (transitEmulator != null) {
+                            if( transitEmulator != null ){
                                 //this guy is stuck, will be caught in events handling outside the loop
                                 break;
-                            }else
-                                throw new RuntimeException("I think this is discuraged.");
+                            } else
+                                throw new RuntimeException( "I think this is discuraged." );
                         }
-						/*
-						 * Send arrival and activity start events.
-						 */
-                        PersonArrivalEvent arrivalEvent = new PersonArrivalEvent(arrivalTime, personId, act.getLinkId(), prevLeg.getMode());
-                        eventQueue.add(arrivalEvent);
-                        ActivityStartEvent startEvent = new ActivityStartEvent(arrivalTime, personId, act.getLinkId(), act.getFacilityId(), act.getType());
-                        eventQueue.add(startEvent);
+                        /*
+                         * Send arrival and activity start events.
+                         */
+                        PersonArrivalEvent arrivalEvent = new PersonArrivalEvent( arrivalTime, personId, act.getLinkId(), prevLeg.getMode() );
+                        eventQueue.add( arrivalEvent );
+                        ActivityStartEvent startEvent = new ActivityStartEvent( arrivalTime, personId, act.getLinkId(), act.getFacilityId(), act.getType() );
+                        eventQueue.add( startEvent );
                     }
 
-                    if (idx < elements.size() - 1) {
-						/*
-						 * This is not the last activity, send activity end and
-						 * departure events.
-						 */
-                        Leg nextLeg = (Leg) elements.get(idx + 1);
-                        ActivityEndEvent endEvent = new ActivityEndEvent(actEndTime, personId, act.getLinkId(), act.getFacilityId(), act.getType());
-                        eventQueue.add(endEvent);
-                        PersonDepartureEvent departureEvent = new PersonDepartureEvent(actEndTime, personId, act.getLinkId(), nextLeg.getMode());
+                    if( idx < elements.size() - 1 ){
+                        /*
+                         * This is not the last activity, send activity end and
+                         * departure events.
+                         */
+                        Leg nextLeg = (Leg) elements.get( idx + 1 );
+                        ActivityEndEvent endEvent = new ActivityEndEvent( actEndTime, personId, act.getLinkId(), act.getFacilityId(), act.getType() );
+                        eventQueue.add( endEvent );
+                        PersonDepartureEvent departureEvent = new PersonDepartureEvent( actEndTime, personId, act.getLinkId(), nextLeg.getMode() );
 
-                        eventQueue.add(departureEvent);
+                        eventQueue.add( departureEvent );
                     }
 
                     prevEndTime = actEndTime;
                 }
-                for (Event event : eventQueue) {
-                    if (event.getTime() > endTime) {
-                        eventManager.processEvent(new PersonStuckEvent(endTime, personId, null, null));
+                for( Event event : eventQueue ){
+                    if( event.getTime() > endTime ){
+                        eventManager.processEvent( new PersonStuckEvent( endTime, personId, null, null ) );
                         break;
                     }
-                    eventManager.processEvent(event);
+                    eventManager.processEvent( event );
                 }
             }
 
@@ -293,9 +280,6 @@ public class PSim implements Mobsim {
                 double linkLeaveTime = linkEnterTime;
                 List<Id<Link>> routeLinkIds = route.getLinkIds();
                 for (Id<Link> routeLinkId : routeLinkIds) {
-                    if (linkEnterTime > 1E16) {
-                        int mmm = 0;
-                    }
                     linkEnterTime = linkLeaveTime;
                     linkEnterEvent = new LinkEnterEvent(linkEnterTime, personVehicleId, routeLinkId);
                     eventQueue.add(linkEnterEvent);
@@ -313,32 +297,5 @@ public class PSim implements Mobsim {
             eventQueue.add(linkEnterEvent);
             return tt + travelTime.getLinkTravelTime(network.getLinks().get(route.getEndLinkId()), tt + startTime, null, null);
         }
-
-        private double calcRouteTravelTime(NetworkRoute route, double startTime, TravelTime travelTime, Network network) {
-            double tt = 0;
-            if (route.getStartLinkId() != route.getEndLinkId()) {
-
-                List<Id<Link>> ids = route.getLinkIds();
-                for (Id<Link> id : ids) {
-                    tt += travelTime.getLinkTravelTime(network.getLinks().get(id), startTime, null, null);
-                    tt++;// 1 sec for each node
-                }
-                tt += travelTime.getLinkTravelTime(network.getLinks().get(route.getEndLinkId()), startTime, null, null);
-            }
-
-            return tt;
-        }
-    }
-
-
-    class TransitWalkTimeAndDistance {
-        final double time;
-        final double distance;
-
-        public TransitWalkTimeAndDistance(Coord startCoord, Coord endCoord) {
-            distance = beelineDistanceFactor * CoordUtils.calcEuclideanDistance(startCoord, endCoord);
-            time = distance / walkSpeed;
-        }
-
     }
 }
