@@ -42,6 +42,7 @@ public class TripRouterModule extends AbstractModule {
 
         bind(TripRouter.class); // not thread-safe, not a singleton
         bind(MainModeIdentifier.class).to(MainModeIdentifierImpl.class);
+        bind(AnalysisMainModeIdentifier.class).to(RoutingModeMainModeIdentifier.class);
 
         install(new LeastCostPathCalculatorModule());
         install(new TransitRouterModule());
