@@ -34,10 +34,10 @@ import java.util.ArrayList;
 
 /*package*/ abstract class AbstractFastRouterDelegate implements FastRouterDelegate {
 
-	/*package*/ final Dijkstra dijkstra;
+	/*package*/ final DijkstraImpl dijkstra;
 	/*package*/ final NodeDataFactory nodeDataFactory;
 	
-	/*package*/ AbstractFastRouterDelegate(final Dijkstra dijkstra, final NodeDataFactory nodeDataFactory) {
+	/*package*/ AbstractFastRouterDelegate( final DijkstraImpl dijkstra, final NodeDataFactory nodeDataFactory ) {
 		this.dijkstra = dijkstra;
 		this.nodeDataFactory = nodeDataFactory;
 	}

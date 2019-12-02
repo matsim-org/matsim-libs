@@ -67,11 +67,11 @@ import org.matsim.core.utils.geometry.CoordUtils;
  * <code>LeastCostPathCalculator routingAlgo = new AStarEuclidean(network, preProcessData, 2);</code>
  * <br />
  * @see org.matsim.core.router.util.PreProcessEuclidean
- * @see org.matsim.core.router.Dijkstra
+ * @see DijkstraImpl
  * @see org.matsim.core.router.AStarLandmarks
  * @author lnicolas
  */
-public class AStarEuclidean extends Dijkstra {
+class AStarEuclidean extends DijkstraImpl{
 	private static final Logger log = Logger.getLogger( AStarEuclidean.class ) ;
 
 	protected final double overdoFactor;

@@ -54,13 +54,13 @@ import org.matsim.core.utils.collections.RouterPriorityQueue;
  * will terminate before all end nodes have been reached. This behaviour can be changed
  * by setting the searchAllEndNodes parameter to true.</p>
  * 
- * @see org.matsim.core.router.Dijkstra
+ * @see DijkstraImpl
  * @see org.matsim.core.router.InitialNode
  * @see org.matsim.core.router.ImaginaryNode
  * 
  * @author cdobler
  */
-public class MultiNodeDijkstra extends Dijkstra implements MultiNodePathCalculator {
+public class MultiNodeDijkstra extends DijkstraImpl implements MultiNodePathCalculator {
 	
 	private final static Logger log = Logger.getLogger(MultiNodeDijkstra.class);
 	

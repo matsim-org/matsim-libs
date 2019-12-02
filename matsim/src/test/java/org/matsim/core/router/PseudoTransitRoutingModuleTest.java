@@ -59,7 +59,7 @@ public class PseudoTransitRoutingModuleTest {
 	public void testRouteLeg() {
 		final Fixture f = new Fixture();
 		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-6.0/3600, +6.0/3600, 0.0);
-		LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), freespeed, freespeed);
+		LeastCostPathCalculator routeAlgo = new DijkstraImpl(f.s.getNetwork(), freespeed, freespeed);
 		
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Leg leg = PopulationUtils.createLeg(TransportMode.pt);

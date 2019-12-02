@@ -593,7 +593,7 @@ public class MultiNodeDijkstraTest {
 		Assert.assertEquals(600.0, p.travelCost, 0.0);
 	}
 	
-	/*package*/ static Path createPath(Dijkstra dijsktra, Node fromNode, Node toNode) {
+	/*package*/ static Path createPath( DijkstraImpl dijsktra, Node fromNode, Node toNode ) {
 		Path path = dijsktra.calcLeastCostPath(fromNode, toNode, 0., null, null);
 		
 		if (path == null) return path;

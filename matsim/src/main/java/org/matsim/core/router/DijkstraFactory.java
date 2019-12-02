@@ -62,8 +62,8 @@ public class DijkstraFactory implements LeastCostPathCalculatorFactory {
 				preProcessDijkstra.run(network);
 				this.preProcessData.put(network, preProcessDijkstra);
 			}
-			return new Dijkstra(network, travelCosts, travelTimes, preProcessDijkstra);
+			return new DijkstraImpl(network, travelCosts, travelTimes, preProcessDijkstra);
 		}
-		return new Dijkstra(network, travelCosts, travelTimes);
+		return new DijkstraImpl(network, travelCosts, travelTimes);
 	}
 }

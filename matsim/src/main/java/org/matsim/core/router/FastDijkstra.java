@@ -37,15 +37,15 @@ import org.matsim.vehicles.Vehicle;
 
 /**
  * <p>
- * Performance optimized version of the Dijkstra {@link org.matsim.core.router.Dijkstra} 
+ * Performance optimized version of the Dijkstra {@link DijkstraImpl}
  * least cost path router which uses its own network to route within.
  * </p>
  * 
- * @see org.matsim.core.router.Dijkstra
+ * @see DijkstraImpl
  * @see org.matsim.core.router.util.RoutingNetwork
  * @author cdobler
  */
-public class FastDijkstra extends Dijkstra {
+class FastDijkstra extends DijkstraImpl{
 
 	private final RoutingNetwork routingNetwork;
 	private final FastRouterDelegate fastRouter;

@@ -54,7 +54,7 @@ public class NetworkRoutingModuleTest {
 	public void testRouteLeg() {
 		Fixture f = new Fixture();
 		FreespeedTravelTimeAndDisutility freespeed = new FreespeedTravelTimeAndDisutility(-6.0/3600, +6.0/3600, 0.0);
-		LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), freespeed, freespeed);
+		LeastCostPathCalculator routeAlgo = new DijkstraImpl(f.s.getNetwork(), freespeed, freespeed);
 
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Activity fromAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 0));
@@ -91,7 +91,7 @@ public class NetworkRoutingModuleTest {
 		{
 			TravelDisutility costObject = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, f.s.getConfig().planCalcScore() ).createTravelDisutility(timeObject);
 
-			LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), costObject, timeObject );
+			LeastCostPathCalculator routeAlgo = new DijkstraImpl(f.s.getNetwork(), costObject, timeObject );
 
 			NetworkRoutingModule router =
                     new NetworkRoutingModule(
@@ -119,7 +119,7 @@ public class NetworkRoutingModuleTest {
 
 			TravelDisutility costObject = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, f.s.getConfig().planCalcScore() ).createTravelDisutility(timeObject);
 
-			LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), costObject, timeObject );
+			LeastCostPathCalculator routeAlgo = new DijkstraImpl(f.s.getNetwork(), costObject, timeObject );
 
 			NetworkRoutingModule router =
 					new NetworkRoutingModule(

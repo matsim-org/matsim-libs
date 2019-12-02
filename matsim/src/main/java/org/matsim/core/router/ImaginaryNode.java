@@ -32,7 +32,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 /**
  * Used by the MultiNodeDijkstra for backwards compatibility with default Dijkstra. 
  * 
- * @see org.matsim.core.router.Dijkstra
+ * @see DijkstraImpl
  * @see org.matsim.core.router.MultiNodeDijkstra
  * @author cdobler
  */

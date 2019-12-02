@@ -32,8 +32,8 @@ import org.matsim.core.router.util.NodeDataFactory;
 	private final NodeData[] nodeData;
 	private boolean isInitialized = false;
 	
-	/*package*/ ArrayFastRouterDelegate(final Dijkstra dijkstra, final NodeDataFactory nodeDataFactory,
-			final ArrayRoutingNetwork network) {
+	/*package*/ ArrayFastRouterDelegate( final DijkstraImpl dijkstra, final NodeDataFactory nodeDataFactory,
+					     final ArrayRoutingNetwork network) {
 		super(dijkstra, nodeDataFactory);
 		this.network = network;
 		this.nodeData = new NodeData[network.getNodes().size()];

@@ -49,7 +49,7 @@ public class PersonalizableDisutilityIntegrationTest {
 	public void testPersonAvailableForDisutility_Dijkstra() {
 		Fixture f = new Fixture();
 		
-		Dijkstra router = new Dijkstra(f.network, f.costFunction, new FreeSpeedTravelTime());
+		DijkstraImpl router = new DijkstraImpl(f.network, f.costFunction, new FreeSpeedTravelTime());
 		router.calcLeastCostPath(
 				f.network.getNodes().get(Id.create("2", Node.class)), 
 				f.network.getNodes().get(Id.create("1", Node.class)),

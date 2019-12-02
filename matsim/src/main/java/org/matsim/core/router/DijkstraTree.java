@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.router;
+package org.matsim.core.router;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -33,7 +33,7 @@ import org.matsim.vehicles.Vehicle;
  * Calculates full Dijkstra (to all nodes in the network).
  * To calculate shortest-path to a subset of nodes, consider {@link org.matsim.core.router.MultiNodeDijkstra}
  */
-public class DijkstraTree extends Dijkstra {
+public final class DijkstraTree extends DijkstraImpl {
 	private Node fromNode;
 	private double startTime;
 

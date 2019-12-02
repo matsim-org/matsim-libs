@@ -61,7 +61,7 @@ import org.matsim.vehicles.Vehicle;
  * <br>...</code></p>
  * @see org.matsim.core.router.AStarEuclidean
  * @see org.matsim.core.router.util.PreProcessLandmarks
- * @see org.matsim.core.router.Dijkstra
+ * @see DijkstraImpl
  * @author lnicolas
  */
 public class AStarLandmarks extends AStarEuclidean {
