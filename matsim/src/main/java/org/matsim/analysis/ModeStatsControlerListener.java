@@ -143,6 +143,7 @@ ShutdownListener {
 		
 		try {
 			this.modeOut.write( String.valueOf(event.getIteration()) ) ;
+			log.info("Mode shares over all " + sum + " trips found. MainModeIdentifier: " + mainModeIdentifier.getClass());
 			for ( String mode : modes ) {
 				Double cnt = this.modeCnt.get(mode) ;
 				double share = 0. ;
