@@ -32,6 +32,10 @@ public class IntermodalAwareRouterModeIdentifier implements MainModeIdentifier {
      * - if there is a leg with a pt mode (based on config.transit().getTransitModes(), it returns that pt mode.
      * - if there is only a leg with mode transit_walk, one of the configured transit modes is returned.
      * - otherwise, the first mode not being an non_network_walk or transit_walk.
+     * 
+     * The above comment is a little outdated since we introduced routing mode. However, with routing mode this MainModeIdentifier
+     * will no longer be used except for backward compatibility, i.e. update old plans to the new format adding the attribute 
+     * routing mode. -gl nov'19
      */
     @Override
     public String identifyMainMode(List<? extends PlanElement> tripElements) {
@@ -46,8 +50,7 @@ public class IntermodalAwareRouterModeIdentifier implements MainModeIdentifier {
                     identifiedMode = TransportMode.pt;
                 }
                 if (identifiedMode == null
-                        && !TransportMode.non_network_walk.equals(mode)
-                        && !TransportMode.transit_walk.equals(mode)) {
+                        && !TransportMode.walk.equals(mode)) {
                     identifiedMode = mode;
                 }
             }

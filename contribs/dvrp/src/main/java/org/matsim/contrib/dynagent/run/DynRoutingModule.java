@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.google.inject.name.Named;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -52,6 +53,8 @@ public class DynRoutingModule implements RoutingModule {
 	private PlansCalcRouteConfigGroup calcRouteConfig;
 	@Inject
 	private Config config ;
+	@Inject
+	private @Named(TransportMode.walk) RoutingModule walkRouter ;
 
 	private final String mode;
 
@@ -70,9 +73,13 @@ public class DynRoutingModule implements RoutingModule {
 
 		// access leg:
 		if (calcRouteConfig.isInsertingAccessEgressWalk()) {
-			departureTime += NetworkRoutingInclAccessEgressModule.addBushwhackingLegFromFacilityToLinkIfNecessary(
-					fromFacility, person, accessActLink, departureTime, result, population.getFactory(),
-					stageActivityType, config );
+//			departureTime += NetworkRoutingInclAccessEgressModule.addBushwhackingLegFromFacilityToLinkIfNecessary(
+//					fromFacility, person, accessActLink, departureTime, result, population.getFactory(),
+//					stageActivityType, config );
+
+			List<? extends PlanElement> route = walkRouter.calcRoute( fromFacility, FacilitiesUtils.wrapLink( accessActLink ), departureTime, person );
+			result.addAll( route ) ;
+
 		}
 
 		// leg proper:
@@ -93,8 +100,12 @@ public class DynRoutingModule implements RoutingModule {
 
 		// egress leg:
 		if (calcRouteConfig.isInsertingAccessEgressWalk()) {
-			NetworkRoutingInclAccessEgressModule.addBushwhackingLegFromLinkToFacilityIfNecessary(toFacility, person,
-					egressActLink, departureTime, result, population.getFactory(), stageActivityType, config );
+//			NetworkRoutingInclAccessEgressModule.addBushwhackingLegFromLinkToFacilityIfNecessary(toFacility, person,
+//					egressActLink, departureTime, result, population.getFactory(), stageActivityType, config );
+
+			List<? extends PlanElement> route = walkRouter.calcRoute( FacilitiesUtils.wrapLink( egressActLink ), toFacility, departureTime, person );;
+			result.addAll( route ) ;
+
 		}
 
 		return result;

@@ -43,7 +43,6 @@ import org.matsim.contrib.drt.routing.DrtRoutingModule.AccessEgressFacilityFinde
 import org.matsim.contrib.drt.routing.DrtStopFacility;
 import org.matsim.contrib.drt.routing.DrtStopFacilityImpl;
 import org.matsim.contrib.drt.routing.DrtStopNetwork;
-import org.matsim.contrib.drt.routing.NonNetworkWalkRouter;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
@@ -165,8 +164,8 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 					getModalInstance(TravelDisutilityFactory.class), scenario);
 
 			return new DrtRoutingModule(drtRouteLegCalculator,
-					accessEgressRouters.getOrDefault(Direction.ACCESS, new NonNetworkWalkRouter(walkRouter)),
-					accessEgressRouters.getOrDefault(Direction.EGRESS, new NonNetworkWalkRouter(walkRouter)),
+					accessEgressRouters.getOrDefault(Direction.ACCESS, walkRouter),
+					accessEgressRouters.getOrDefault(Direction.EGRESS, walkRouter),
 					getModalInstance(AccessEgressFacilityFinder.class), drtCfg, scenario,
 					getModalInstance(Network.class));
 		}

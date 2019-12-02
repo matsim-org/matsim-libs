@@ -61,11 +61,11 @@ import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils.JointTrip;
  * @author thibautd
  */
 public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPlan> {
-	private final TripRouter router;
 	private final List<String> chainBasedModes;
 	private final double betaDetour;
 	private final double scale;
 	private final Random random;
+	private final MainModeIdentifier mainModeIdentifier;
 
 	private final SocialNetwork socialNetwork;
 
@@ -73,13 +73,13 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 			final Random random,
 			final SocialNetwork socialNetwork,
 			final JointTripInsertorConfigGroup config,
-			final TripRouter router) {
-		this.router = router;
+			final MainModeIdentifier mainModeIdentifier ) {
 		this.socialNetwork = socialNetwork;
 		chainBasedModes = config.getChainBasedModes();
 		betaDetour = config.getBetaDetour();
 		scale = config.getScale();
 		this.random = random;
+		this.mainModeIdentifier = mainModeIdentifier;
 	}
 
 	@Override
@@ -117,7 +117,7 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 			// or go from drop offs...
 			final MainModeIdentifier mainModeIdentifier =
 				new JointMainModeIdentifier(
-						router.getMainModeIdentifier() );
+						this.mainModeIdentifier );
 
 			for ( TripStructureUtils.Trip trip : TripStructureUtils.getTrips( plan , JointActingTypes.JOINT_STAGE_ACTS ) ) {
 				final String mode = mainModeIdentifier.identifyMainMode( trip.getTripElements() );

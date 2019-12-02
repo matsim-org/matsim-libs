@@ -26,7 +26,7 @@ public class VariableAccessTransit implements Provider<RoutingModule> {
 	private final LeastCostPathCalculator routeAlgo;
 
 	@Inject
-    VariableAccessTransit(@Named("variableAccess") TransitRouter transitRouter, Scenario scenario, @Named(TransportMode.transit_walk) RoutingModule transitWalkRouter, LeastCostPathCalculatorFactory routeAlgoF, Map<String,TravelTime> travelTimes) {
+    VariableAccessTransit(@Named("variableAccess") TransitRouter transitRouter, Scenario scenario, @Named(TransportMode.walk) RoutingModule transitWalkRouter, LeastCostPathCalculatorFactory routeAlgoF, Map<String,TravelTime> travelTimes) {
 		this.transitRouter = transitRouter;
 		this.scenario = scenario;
 		this.transitWalkRouter = transitWalkRouter;

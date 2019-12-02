@@ -72,6 +72,28 @@ public class FacilitiesUtils {
 			throw new RuntimeException("cannot set linkID for this facility type; API needs to be cleaned up") ;
 		}
 	}
+	/**
+	 * Compare to {@link #decideOnLink(Facility, Network)}.  Sometimes only the linkId is needed, and often it is cheaper to obtain than the full link.
+	 * Then call this method.
+	 *
+	 * @param facility
+	 * @param network
+	 * @return
+	 */
+	public static Id<Link> decideOnLinkId( final Facility facility, final Network network ) {
+		Link accessActLink = null ;
+
+		Id<Link> accessActLinkId = null ;
+		try {
+			accessActLinkId = facility.getLinkId() ;
+		} catch ( Exception ee ) {
+			// there are implementations that throw an exception here although "null" is, in fact, an interpretable value. kai, oct'18
+		}
+		if ( accessActLinkId!=null ) {
+			return accessActLinkId ;
+		}
+		return decideOnLink( facility, network ).getId() ;
+	}
 
 	public static Link decideOnLink( final Facility facility, final Network network ) {
 		Link accessActLink = null ;
@@ -150,7 +172,7 @@ public class FacilitiesUtils {
 	 *  We have situations where the coordinate field in facility is not filled out.
 	 */
 	public static Coord decideOnCoord( final Facility facility, final Network network, double relativePositionOfEntryExitOnLink ) {
-		if ( facility.getCoord() != null ) {
+		if ( facility.getCoord() != null && ! ( facility instanceof LinkWrapperFacility)) {
 			return facility.getCoord() ;
 		}
 

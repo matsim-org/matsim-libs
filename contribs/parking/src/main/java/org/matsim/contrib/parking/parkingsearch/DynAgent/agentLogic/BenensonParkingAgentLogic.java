@@ -3,6 +3,7 @@
  */
 package org.matsim.contrib.parking.parkingsearch.DynAgent.agentLogic;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
@@ -10,7 +11,6 @@ import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.parking.parkingsearch.DynAgent.BenensonDynLeg;
 import org.matsim.contrib.parking.parkingsearch.DynAgent.agentLogic.ParkingAgentLogic;
 import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
-import org.matsim.contrib.parking.parkingsearch.manager.WalkLegFactory;
 import org.matsim.contrib.parking.parkingsearch.manager.vehicleteleportationlogic.VehicleTeleportationLogic;
 import org.matsim.contrib.parking.parkingsearch.routing.ParkingRouter;
 import org.matsim.contrib.parking.parkingsearch.search.ParkingSearchLogic;
@@ -18,6 +18,7 @@ import org.matsim.contrib.parking.parkingsearch.sim.ParkingSearchConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.RoutingModule;
 
 /**
  * @author Work
@@ -37,10 +38,10 @@ public class BenensonParkingAgentLogic extends ParkingAgentLogic {
 	 */
 	
 	
-	public BenensonParkingAgentLogic(Plan plan, ParkingSearchManager parkingManager, WalkLegFactory walkLegFactory,
+	public BenensonParkingAgentLogic(Plan plan, ParkingSearchManager parkingManager, RoutingModule walkRouter, Network network,
 			ParkingRouter parkingRouter, EventsManager events, ParkingSearchLogic parkingLogic, MobsimTimer timer,
 			VehicleTeleportationLogic teleportationLogic, ParkingSearchConfigGroup configGroup) {
-		super(plan, parkingManager, walkLegFactory, parkingRouter, events, parkingLogic, timer, teleportationLogic, configGroup);
+		super(plan, parkingManager, walkRouter, network, parkingRouter, events, parkingLogic, timer, teleportationLogic, configGroup);
 	}
 
 	

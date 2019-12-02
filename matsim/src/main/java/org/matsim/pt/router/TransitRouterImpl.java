@@ -147,15 +147,14 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
         transitPassengerRoute = tree.getTransitPassengerRoute(wrappedToNodes);
 
         if (transitPassengerRoute == null) {
-//				return null; // yyyyyy why not return the direct walk leg?? kai/dz, mar'17
-            return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
+			return null; // TripRouter / FallbackRoutingModule will create a direct walk leg
         }
         double pathCost = transitPassengerRoute.getTravelCost();
 
         double directWalkCost = getWalkDisutility(person, fromFacility.getCoord(), toFacility.getCoord());
 
         if (directWalkCost * getConfig().getDirectWalkFactor() < pathCost) {
-            return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
+			return null; // TripRouter / FallbackRoutingModule will create a direct walk leg
         }
         
         previousFromFacility = fromFacility;

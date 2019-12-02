@@ -29,13 +29,13 @@ class FallbackRoutingModuleDefaultImpl implements  FallbackRoutingModule {
 	@Inject private Network network ;
 
 	@Override public List<? extends PlanElement> calcRoute( Facility fromFacility, Facility toFacility, double departureTime, Person person ){
-		Leg leg = population.getFactory().createLeg( "dummy" ) ;
+		Leg leg = population.getFactory().createLeg( TransportMode.walk ) ;
 		Coord fromCoord = FacilitiesUtils.decideOnCoord( fromFacility, network, config );
 		Coord toCoord = FacilitiesUtils.decideOnCoord( toFacility, network, config ) ;
 		Id<Link> dpLinkId = FacilitiesUtils.decideOnLink( fromFacility, network ).getId() ;
 		Id<Link> arLinkId = FacilitiesUtils.decideOnLink( toFacility, network ).getId() ;
 		NetworkRoutingInclAccessEgressModule.routeBushwhackingLeg( person, leg, fromCoord, toCoord, departureTime, dpLinkId, arLinkId, population.getFactory(), 
-				pcrCfg.getModeRoutingParams().get(TransportMode.non_network_walk) ) ;
+				pcrCfg.getModeRoutingParams().get(TransportMode.walk) ) ;
 		return Collections.singletonList( leg ) ;
 	}
 }

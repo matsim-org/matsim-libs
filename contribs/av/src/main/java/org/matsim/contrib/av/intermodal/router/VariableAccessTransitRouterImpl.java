@@ -225,7 +225,7 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 						transitRouteStart = ((TransitRouterNetworkLink) ll).getFromNode().stop;
 						if (accessStop != egressStop) {
 							if (accessStop != null) {
-								leg = PopulationUtils.createLeg(TransportMode.transit_walk);
+								leg = PopulationUtils.createLeg(TransportMode.walk);
 								//							    double walkTime = getWalkTime(person, accessStop.getCoord(), egressStop.getCoord());
 								double transferTime = getTransferTime(person, accessStop.getCoord(), egressStop.getCoord());
 								Route walkRoute = RouteUtils.createGenericRouteImpl(accessStop.getLinkId(),
@@ -247,7 +247,7 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 								time += transferTime;
 								legs.add(leg);
 							} else {
-								// accessStop == null, so it must be the first access-leg. If mode is e.g. taxi, we need a transit_walk to get to pt link
+								// accessStop == null, so it must be the first access-leg. If mode is e.g. taxi, we need a walk to get to pt link
 								leg = getAccessEgressLeg(person, fromCoord, egressStop.getCoord(),time);
 								if (variableAccessEgressTravelDisutility.isTeleportedAccessEgressMode(leg.getMode()))
 								{
@@ -267,7 +267,7 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 									walkRoute.setDistance(trConfig.getBeelineDistanceFactor() * 
 											NetworkUtils.getEuclideanDistance(network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord(), egressStop.getCoord()) );
 								
-									Leg walkleg = PopulationUtils.createLeg(TransportMode.transit_walk);
+									Leg walkleg = PopulationUtils.createLeg(TransportMode.walk);
 									walkleg.setTravelTime(walkTime);
 									walkleg.setRoute(walkRoute);
 									time += walkTime;
@@ -324,7 +324,7 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 
 				}
 				else {
-					leg = PopulationUtils.createLeg(TransportMode.transit_walk);
+					leg = PopulationUtils.createLeg(TransportMode.walk);
 					double walkTime = getTransferTime(person, accessStop.getCoord(), network.getLinks().get(eleg.getRoute().getStartLinkId()).getCoord());
 					leg.setTravelTime(walkTime);
 					Route walkRoute = RouteUtils.createGenericRouteImpl(accessStop.getLinkId(), eleg.getRoute().getStartLinkId());
