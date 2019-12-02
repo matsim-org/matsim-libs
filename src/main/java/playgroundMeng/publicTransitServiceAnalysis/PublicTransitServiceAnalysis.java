@@ -61,16 +61,16 @@ public class PublicTransitServiceAnalysis {
 	}
 
 	private static void configure(String[] args) {
-		
+
 		String directory = args[0];
 		String configFile = directory + args[1];
-		String networkFile = directory+args[2];
+		String networkFile = directory + args[2];
 		String transitFile = directory + args[3];
-		String eventFile = directory +args[4];
+		String eventFile = directory + args[4];
 		int timeSlice = Integer.valueOf(args[5]);
 		int girdSlice = Integer.valueOf(args[6]);
 		String analysisNetworkFile = null;
-		if(!args[7].isEmpty()) {
+		if (args.length == 8) {
 			analysisNetworkFile = directory + args[7];
 		}
 
@@ -86,7 +86,7 @@ public class PublicTransitServiceAnalysis {
 		ptAccessabilityConfig.setAnalysisTimeSlice(timeSlice);
 		ptAccessabilityConfig.setBeginnTime(0);
 		ptAccessabilityConfig.setEndTime(36 * 3600);
-		
+
 		Network network = NetworkUtils.readNetwork(networkFile);
 		Config config = ConfigUtils.createConfig();
 		ptAccessabilityConfig.setNetwork(network);
@@ -95,7 +95,7 @@ public class PublicTransitServiceAnalysis {
 		new TransitScheduleReader(scenario).readFile(transitFile);
 		TransitSchedule transitSchedule = scenario.getTransitSchedule();
 		ptAccessabilityConfig.setTransitSchedule(transitSchedule);
-		
+
 		// modeDistance?
 		Map<String, Double> modeDistance = new HashedMap();
 		modeDistance.put("bus", 250.);

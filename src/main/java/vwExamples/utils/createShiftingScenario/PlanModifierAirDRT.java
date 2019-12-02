@@ -164,7 +164,7 @@ public class PlanModifierAirDRT {
 	}
 
 	public void writeChangedTripsLog() {
-		String header= "personId;tripStartTime;fromAct;toAct;fromX;fromY;toX;toY";
+		String header= "personId;tripClass;tripStartTime;fromAct;toAct;fromX;fromY;toX;toY";
 		
 
 
@@ -366,9 +366,18 @@ public class PlanModifierAirDRT {
 									Collections.singletonList(PopulationUtils.createLeg(shift2mode)),
 									trip.getDestinationActivity());
 
-//							assignTourValidator.isWithinZone(trip.getDestinationActivity());
+							String tripClass;
+							if(assignTourValidator.isWithinZone(trip.getDestinationActivity().getCoord()))	
+							{
+								tripClass="inbound";
+							}
+							else{
+								tripClass="outbound";
+							}
+							
 							
 							String tripLine = personId.toString()+";"
+									+ tripClass +";"
 									+ trip.getOriginActivity().getEndTime()+";"
 									+ trip.getOriginActivity().getType()+";"
 									+ trip.getDestinationActivity().getType()+";"

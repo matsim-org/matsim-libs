@@ -9,6 +9,9 @@ import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import playgroundMeng.publicTransitServiceAnalysis.others.CoordinateConversion;
 import playgroundMeng.publicTransitServiceAnalysis.others.TimeConvert;
@@ -270,10 +273,6 @@ public class GridImp {
 
 	public void setTime2DestinationKpi(Map<Integer, Double> time2DestinationKpi) {
 		this.time2DestinationKpi = time2DestinationKpi;
-	}
-
-	public void setCoordinate(double[] coordinate) {
-		this.coordinate = coordinate;
 	}
 	
 }
