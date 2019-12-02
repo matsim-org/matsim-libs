@@ -12,12 +12,7 @@ public final class RunAbcSimpleExample{
 
 	public static void main ( String [] args ) {
 
-		Config config ;
-		if ( args != null && args.length>=1 ) {
-			config = ConfigUtils.loadConfig( args ) ;
-		} else {
-			config = ConfigUtils.loadConfig( IOUtils.extendUrl( ExamplesUtils.getTestScenarioURL( "equil" ), "config.xml" ) ) ;
-		}
+		Config config = ConfigUtils.loadConfig( args );
 
 		Scenario scenario = ScenarioUtils.loadScenario( config );
 
