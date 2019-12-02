@@ -103,7 +103,6 @@ public final class DvrpParkingModule extends AbstractModule {
 		String mode = TaxiConfigGroup.getSingleModeTaxiConfig(getConfig()).getMode();
 		addRoutingModuleBinding(mode).toInstance(new DynRoutingModule(mode));
 		bind(ParkingSearchManager.class).to(FacilityBasedParkingManager.class).asEagerSingleton();
-		bind(WalkLegFactory.class).asEagerSingleton();
 		addControlerListenerBinding().to(ParkingListener.class);
 		bind(ParkingRouter.class).to(WithinDayParkingRouter.class);
 		bind(VehicleTeleportationLogic.class).to(VehicleTeleportationToNearbyParking.class);

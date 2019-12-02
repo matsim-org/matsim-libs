@@ -68,7 +68,6 @@ public class SetupParking {
 				addRoutingModuleBinding(TransportMode.car).toInstance(routingModuleCar);
 				bind(Network.class).annotatedWith(Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING)).to(Network.class).asEagerSingleton();
 				bind(ParkingSearchManager.class).to(FacilityBasedParkingManager.class).asEagerSingleton();
-				bind(WalkLegFactory.class).asEagerSingleton();
 				this.install(new ParkingSearchQSimModule());
 				addControlerListenerBinding().to(ParkingListener.class);
 				bind(ParkingRouter.class).to(WithinDayParkingRouter.class);
