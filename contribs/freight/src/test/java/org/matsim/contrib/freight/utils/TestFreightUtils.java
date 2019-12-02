@@ -60,12 +60,10 @@ public class TestFreightUtils {
 	
 	private static final Id<Carrier> CARRIER_SERVICES_ID = Id.create("CarrierWServices", Carrier.class);
 	private static final Id<Carrier> CARRIER_SHIPMENTS_ID = Id.create("CarrierWShipments", Carrier.class);
-	
-	private static Carriers carriersWithServicesAndShpiments;
+
 	private static Carrier carrierWServices;
 	private static Carrier carrierWShipments;
-	
-	private static Carriers carriersWithShipmentsOnly;
+
 	private static Carrier carrierWShipmentsOnlyFromCarrierWServices;
 	private static Carrier carrierWShipmentsOnlyFromCarrierWShipments;
 	
@@ -80,7 +78,7 @@ public class TestFreightUtils {
 	public static void setUp() {
 		
 		//Create carrier with services and shipments
-		carriersWithServicesAndShpiments = new Carriers() ;
+		Carriers carriersWithServicesAndShpiments = new Carriers();
 		carrierWServices = CarrierUtils.createCarrier(CARRIER_SERVICES_ID );
 		CarrierService service1 = createMatsimService("Service1", "i(3,9)", 2);
 		CarrierUtils.addService(carrierWServices, service1);
@@ -96,12 +94,12 @@ public class TestFreightUtils {
 
 		//Create vehicle for Carriers
 		final Id<VehicleType> vehicleTypeId = Id.create( "gridType", VehicleType.class );
-		VehicleType carrierVehType = VehicleUtils.getFactory().createVehicleType( vehicleTypeId );;
+		VehicleType carrierVehType = VehicleUtils.getFactory().createVehicleType( vehicleTypeId );
 		final EngineInformation engineInfo = carrierVehType.getEngineInformation() ;
 		engineInfo.setFuelType( FuelType.diesel );
 		engineInfo.setFuelConsumption( 0.015 );
 		VehicleCapacity vehicleCapacity = carrierVehType.getCapacity();
-		vehicleCapacity.setOther( 3 ); ;
+		vehicleCapacity.setOther( 3 );
 		CostInformation costInfo = carrierVehType.getCostInformation();
 		costInfo.setCostsPerMeter( 0.0001 ) ;
 		costInfo.setCostsPerSecond( 0.001 ) ;
@@ -154,7 +152,7 @@ public class TestFreightUtils {
 		 */
 
 		//Convert to jsprit VRP
-		carriersWithShipmentsOnly = FreightUtils.createShipmentVRPCarrierFromServiceVRPSolution(carriersWithServicesAndShpiments);
+		Carriers carriersWithShipmentsOnly = FreightUtils.createShipmentVRPCarrierFromServiceVRPSolution(carriersWithServicesAndShpiments);
 		carrierWShipmentsOnlyFromCarrierWServices = carriersWithShipmentsOnly.getCarriers().get(CARRIER_SERVICES_ID);		//with converted Service
 		carrierWShipmentsOnlyFromCarrierWShipments = carriersWithShipmentsOnly.getCarriers().get(CARRIER_SHIPMENTS_ID);		//with copied Shipments
 
@@ -217,7 +215,7 @@ public class TestFreightUtils {
 		Assert.assertEquals(FleetSize.INFINITE, carrierWShipmentsOnlyFromCarrierWServices.getCarrierCapabilities().getFleetSize());
 		Assert.assertEquals(1, carrierWShipmentsOnlyFromCarrierWServices.getCarrierCapabilities().getVehicleTypes().size());
 		for ( VehicleType carrierVehicleType : carrierWShipmentsOnlyFromCarrierWServices.getCarrierCapabilities().getVehicleTypes()){
-			Assert.assertEquals(3., (double) carrierVehicleType.getCapacity().getOther(), Double.MIN_VALUE );
+			Assert.assertEquals(3., carrierVehicleType.getCapacity().getOther(), Double.MIN_VALUE );
 			Assert.assertEquals(130, carrierVehicleType.getCostInformation().getFixedCosts(), 0.0 );
 			Assert.assertEquals(0.0001, carrierVehicleType.getCostInformation().getCostsPerMeter(), 0.0 );
 			Assert.assertEquals(0.001, carrierVehicleType.getCostInformation().getCostsPerSecond(), 0.0 );
@@ -229,7 +227,7 @@ public class TestFreightUtils {
 		Assert.assertEquals(FleetSize.INFINITE, carrierWShipmentsOnlyFromCarrierWShipments.getCarrierCapabilities().getFleetSize());
 		Assert.assertEquals(1, carrierWShipmentsOnlyFromCarrierWShipments.getCarrierCapabilities().getVehicleTypes().size());
 		for ( VehicleType carrierVehicleType : carrierWShipmentsOnlyFromCarrierWShipments.getCarrierCapabilities().getVehicleTypes()){
-			Assert.assertEquals(3.,(double) carrierVehicleType.getCapacity().getOther(), Double.MIN_VALUE );
+			Assert.assertEquals(3., carrierVehicleType.getCapacity().getOther(), Double.MIN_VALUE );
 			Assert.assertEquals(130, carrierVehicleType.getCostInformation().getFixedCosts(), 0.0 );
 			Assert.assertEquals(0.0001, carrierVehicleType.getCostInformation().getCostsPerMeter(), 0.0 );
 			Assert.assertEquals(0.001, carrierVehicleType.getCostInformation().getCostsPerSecond(), 0.0 );
