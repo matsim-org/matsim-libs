@@ -6,28 +6,27 @@ import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmRelation;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.pbf.protobuf.Osmformat;
-import de.topobyte.osm4j.pbf.seq.BlockParser;
 import de.topobyte.osm4j.pbf.seq.PrimParser;
-import de.topobyte.osm4j.pbf.util.PbfUtil;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
-import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Log4j2
-public class PrallelNodesPbfParser extends BlockParser implements OsmHandler {
+public class PrallelNodesPbfParser extends PbfParser implements OsmHandler {
 
     private final Phaser phaser = new Phaser();
     private final AtomicInteger counter = new AtomicInteger();
@@ -35,39 +34,52 @@ public class PrallelNodesPbfParser extends BlockParser implements OsmHandler {
     private final ExecutorService executor;
     private final BiPredicate<Coord, Integer> linkFilter;
     private final Predicate<Long> preserveNodesFilter;
-    private final ConcurrentMap<Long, List<OsmNodeToKeep>> nodesToKeep;
+    private final ConcurrentMap<Long, List<ParallelWaysPbfParser.OsmWayWrapper>> nodesToKeep;
     private final CoordinateTransformation coordinateTransformation;
 
+    @Getter
+    private final ConcurrentMap<Long, LightOsmNode> nodes = new ConcurrentHashMap<>();
+
     @Override
-    protected void parse(Osmformat.HeaderBlock block) throws IOException {
-        Osmformat.HeaderBBox bbox = block.getBbox();
-        this.handle(PbfUtil.bounds(bbox));
+    void parse(InputStream inputStream) throws IOException {
+
+        log.info("Register main thread at phaser");
+        phaser.register();
+        super.parse(inputStream);
+        log.info("awaiting all parsing tasks before interrupting the parsing");
+        phaser.arriveAndAwaitAdvance();
+        log.info("deregister main thread from phaser");
+        phaser.arriveAndDeregister();
     }
 
     @Override
-    protected void parse(Osmformat.PrimitiveBlock block) throws IOException {
+    ParsingResult parse(Osmformat.HeaderBlock block) throws IOException {
+        return ParsingResult.Continue;
+    }
+
+    @Override
+    protected ParsingResult parse(Osmformat.PrimitiveBlock block) throws IOException {
 
         for (var primitiveGroup : block.getPrimitivegroupList()) {
             if (primitiveGroup.hasDense()) {
+                phaser.register();
                 executor.execute(() -> startParseDenseTask(block, primitiveGroup));
             }
             if (primitiveGroup.getNodesCount() > 0) {
+                phaser.register();
                 executor.execute(() -> startParseNodesTask(block, primitiveGroup));
             }
             if (primitiveGroup.getWaysCount() > 0) {
-                // wait for all parser tasks to finish
-                log.info("awaiting all parsing tasks before interrupting the parsing");
-                phaser.arriveAndAwaitAdvance();
-                log.info("All parsing tasks have finished. stop reading the file.");
-                // relations are supposed to occur after ways in an osm file therefore stop it here
-                throw new EOFException("don't want to read all the relations");
+                // ways are supposed to occur after ways in an osm file therefore stop it here
+                return ParsingResult.Abort;
             }
         }
+        return ParsingResult.Continue;
     }
 
+    // have these more or less identical methods, since I currently don't know how to handle IOExceptions otherwise
     private void startParseDenseTask(Osmformat.PrimitiveBlock block, Osmformat.PrimitiveGroup group) {
 
-        phaser.register();
         try {
             var primParser = new PrimParser(block, false);
             primParser.parseDense(group.getDense(), this);
@@ -80,7 +92,6 @@ public class PrallelNodesPbfParser extends BlockParser implements OsmHandler {
 
     private void startParseNodesTask(Osmformat.PrimitiveBlock block, Osmformat.PrimitiveGroup group) {
 
-        phaser.register();
         try {
             var primParser = new PrimParser(block, false);
             primParser.parseNodes(group.getNodesList(), this);
@@ -103,38 +114,40 @@ public class PrallelNodesPbfParser extends BlockParser implements OsmHandler {
 
         if (nodesToKeep.containsKey(osmNode.getId())) {
 
-            var references = nodesToKeep.get(osmNode.getId());
+            var waysThatReferenceNode = nodesToKeep.get(osmNode.getId());
+            var isEndNode = isEndNodeOfAnyWay(osmNode, waysThatReferenceNode);
 
-            // if node is used by more than one way or is an end node of any way
-            if (references.size() > 1 || references.stream().anyMatch(OsmNodeToKeep::isEndNode)) {
+            if (waysThatReferenceNode.size() > 1 || isEndNode) {
 
-                Coord coord = coordinateTransformation.transform(new Coord(osmNode.getLatitude(), osmNode.getLatitude()));
-                // we must test whether this node should be included
-                var referencesWhichMatchFilter = references.stream()
-                        .filter(ref -> linkFilter.test(coord, ref.getHierachyLevel()))
-                        .collect(Collectors.toList());
+                var nodeCoord = coordinateTransformation.transform(new Coord(osmNode.getLongitude(), osmNode.getLatitude()));
+                var filteredReferenceCount = doSomeFiltering(nodeCoord, waysThatReferenceNode);
 
-                // if still more than 1 way references this node preserve it
-                if (referencesWhichMatchFilter.size() > 1) {
-                    // use this node
-                }
-                // if only one way references this node but it is its end node
-                else if (referencesWhichMatchFilter.size() == 1 && referencesWhichMatchFilter.get(0).isEndNode()) {
-                    // use this node
+                LightOsmNode result;
+                if (filteredReferenceCount > 1) {
+                    result = new LightOsmNode(osmNode.getId(), true, nodeCoord);
+                } else if (filteredReferenceCount == 1 && isEndNode) {
+                    result = new LightOsmNode(osmNode.getId(), true, nodeCoord);
+                } else if (filteredReferenceCount == 1 /*Test for isPreserve here*/) {
+                    result = new LightOsmNode(osmNode.getId(), true, nodeCoord);
                 } else {
-                    // we could exclude the node, except the preserve nodes filter prohibits this
-                    if (preserveNodesFilter.test(osmNode.getId())) {
-                        // use this node
-                    } else {
-                        // don't use this node
-                    }
+                    result = new LightOsmNode(osmNode.getId(), false, nodeCoord);
                 }
-            } else if (preserveNodesFilter.test(osmNode.getId())) {
-                // use this node
-            } else {
-                // don't use this node
+
             }
         }
+    }
+
+
+    private boolean isEndNodeOfAnyWay(OsmNode node, List<ParallelWaysPbfParser.OsmWayWrapper> waysThatReferenceNode) {
+        return waysThatReferenceNode.stream()
+                .anyMatch(way -> way.getStartNodeId() == node.getId() || way.getEndNodeId() == node.getId());
+    }
+
+    private long doSomeFiltering(Coord nodeCoord, List<ParallelWaysPbfParser.OsmWayWrapper> waysThatReferenceNode) {
+
+        return waysThatReferenceNode.stream()
+                .filter(way -> linkFilter.test(nodeCoord, way.getLinkProperties().hierachyLevel))
+                .count();
     }
 
     @Override

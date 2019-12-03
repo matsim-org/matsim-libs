@@ -63,10 +63,11 @@ class NodesPbfParser extends BlockParser implements OsmHandler {
 		counter++;
 
 		if (nodeIdsOfInterest.containsKey(osmNode.getId())) {
-			Coord coord = new Coord(osmNode.getLongitude(), osmNode.getLatitude());
-			int numberOfWays = nodeIdsOfInterest.get(osmNode.getId());
-			nodes.put(osmNode.getId(), new LightOsmNode(osmNode.getId(), numberOfWays, coord));
-		}
+            Coord coord = new Coord(osmNode.getLongitude(), osmNode.getLatitude());
+            int numberOfWays = nodeIdsOfInterest.get(osmNode.getId());
+            //nodes.put(osmNode.getId(), new LightOsmNode(osmNode.getId(), numberOfWays, coord));
+            throw new RuntimeException("not implemented");
+        }
 		if (counter % 1000000 == 0) {
 			log.info("Read: " + counter / 1000000 + "M nodes");
 		}

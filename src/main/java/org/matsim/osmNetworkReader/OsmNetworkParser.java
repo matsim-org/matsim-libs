@@ -21,17 +21,20 @@ class OsmNetworkParser {
 
 		try (var fileInputStream = new FileInputStream(inputFile.toFile())) {
 			var input = new BufferedInputStream(fileInputStream);
-			waysParser.parse(input);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+            waysParser.parse(input);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-		log.info("finished reading ways.");
-		log.info("Kept " + waysParser.getWays().size() + "/" + waysParser.getCounter() + " ways");
-		log.info("Marked " + waysParser.getNodes().size() + " nodes to be kept");
-		log.info("starting to read nodes");
+        log.info("finished reading ways.");
+        log.info("Kept " + waysParser.getWays().size() + "/" + waysParser.getCounter() + " ways");
+        log.info("Marked " + waysParser.getNodes().size() + " nodes to be kept");
+        log.info("starting to read nodes");
 
-		var nodesParser = new NodesPbfParser(waysParser.getNodes());
+        throw new RuntimeException("not implemented");
+/*
+		var nodesParser = new NodesPbfParser(null);//waysParser.getNodes());
+
 
 		try (var fileInputStream = new FileInputStream(inputFile.toFile())) {
 			var input = new BufferedInputStream(fileInputStream);
@@ -43,5 +46,7 @@ class OsmNetworkParser {
 		log.info("finished reading nodes");
 		log.info("Kept " + nodesParser.getNodes().size() + "/" + nodesParser.getCounter() + " nodes");
 		return new NodesAndWays(nodesParser.getNodes(), waysParser.getWays());
-	}
+		*/
+
+    }
 }

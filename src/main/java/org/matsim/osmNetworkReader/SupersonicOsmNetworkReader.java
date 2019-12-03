@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 import java.nio.file.Path;
@@ -95,7 +94,9 @@ public class SupersonicOsmNetworkReader {
 		// set up first node for segment
 		long fromNodeId = way.getNodeId(0);
 		var fromNodeForSegmentWithoutTransform = nodes.get(fromNodeId);
-		var fromNodeForSegment = new LightOsmNode(fromNodeForSegmentWithoutTransform.getId(), fromNodeForSegmentWithoutTransform.getNumberOfWays(),
+
+		throw new RuntimeException("not implemented");
+		/*var fromNodeForSegment = new LightOsmNode(fromNodeForSegmentWithoutTransform.getId(), fromNodeForSegmentWithoutTransform.getNumberOfWays(),
 				coordinateTransformation.transform(fromNodeForSegmentWithoutTransform.getCoord()));
 
 		for (int i = 1, linkdIdPostfix = 1; i < way.getNumberOfNodes(); i++, linkdIdPostfix += 2) {
@@ -140,7 +141,9 @@ public class SupersonicOsmNetworkReader {
 			fromNodeId = toOsmNode.getId();
 		}
 		return segments.stream();
+		*/
 	}
+
 
 	private Collection<WaySegment> handleLoop(Map<Long, LightOsmNode> nodes, LightOsmNode fromNode, LightOsmNode toNode, OsmWay way, int toNodeIndex, int idPostfix) {
 
@@ -155,8 +158,8 @@ public class SupersonicOsmNetworkReader {
 			var fromSegmentNode = nodes.get(fromId);
 			Coord fromCoord = coordinateTransformation.transform(fromSegmentNode.getCoord());
 			Coord toCoord = coordinateTransformation.transform(toSegmentNode.getCoord());
-
-			result.add(new WaySegment(
+			throw new RuntimeException("not implemented");
+			/*result.add(new WaySegment(
 					new LightOsmNode(fromSegmentNode.getId(), fromSegmentNode.getNumberOfWays(), fromCoord),
 					new LightOsmNode(toSegmentNode.getId(), toSegmentNode.getNumberOfWays(), toCoord),
 					CoordUtils.calcEuclideanDistance(fromCoord, toCoord),
@@ -164,14 +167,19 @@ public class SupersonicOsmNetworkReader {
 					way.getId(), way.getId() * 10000 + idPostfix)
 			);
 
+
+
 			if (fromId == fromNode.getId()) {
 				// finish creating segments after creating the last one
 				break;
 			}
 			toSegmentNode = fromSegmentNode;
 			idPostfix += 2;
+			*/
 		}
 		return result;
+
+
 	}
 
 	private Stream<Link> createLinks(WaySegment segment) {
