@@ -34,6 +34,11 @@ class FallbackRoutingModuleDefaultImpl implements  FallbackRoutingModule {
 		Coord toCoord = FacilitiesUtils.decideOnCoord( toFacility, network, config ) ;
 		Id<Link> dpLinkId = FacilitiesUtils.decideOnLink( fromFacility, network ).getId() ;
 		Id<Link> arLinkId = FacilitiesUtils.decideOnLink( toFacility, network ).getId() ;
+		/*
+		 * Even TransportMode.walk needs an "UltimateFallbackRoutingModule", but for all other modes (pt, drt, ...) it
+		 * would be better if we would try the walkRouter first and fall back to "UltimateFallbackRoutingModule" or a
+		 * handwritten teleported walk like below only if the walkRouter returns null. - gl/kn-dec'19
+		 */
 		NetworkRoutingInclAccessEgressModule.routeBushwhackingLeg( person, leg, fromCoord, toCoord, departureTime, dpLinkId, arLinkId, population.getFactory(), 
 				pcrCfg.getModeRoutingParams().get(TransportMode.walk) ) ;
 		return Collections.singletonList( leg ) ;
