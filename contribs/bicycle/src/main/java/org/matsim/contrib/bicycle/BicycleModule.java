@@ -31,7 +31,7 @@ import org.matsim.vehicles.VehicleType;
 /**
  * @author smetzler, dziemke
  */
-final class BicycleModule extends AbstractModule {
+public final class BicycleModule extends AbstractModule {
 	// needs to be public since otherwise nobody can overwrite parts of Bicycles.addAsOverridingModules(...).  kai, sep'19
 
 	private static final Logger LOG = Logger.getLogger(BicycleModule.class);
@@ -39,11 +39,12 @@ final class BicycleModule extends AbstractModule {
 	@Inject
 	private BicycleConfigGroup bicycleConfigGroup;
 
-	BicycleModule() {
+	public BicycleModule() {
 	}
 
 	@Override
 	public void install() {
+		installQSimModule(new BicycleQSimModule());
 
 		addTravelTimeBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelTime.class).in(Singleton.class);
 		addTravelDisutilityFactoryBinding(bicycleConfigGroup.getBicycleMode()).to(BicycleTravelDisutilityFactory.class).in(Singleton.class);

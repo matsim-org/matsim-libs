@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.builder.Signals;
+import org.matsim.contrib.signals.builder.SignalsModule;
 import org.matsim.contrib.signals.controller.fixedTime.DefaultPlanbasedSignalSystemController;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
@@ -79,8 +79,8 @@ public class RunSimpleResponsiveSignalExample {
 
 		// add the general signals module
 //		controler.addOverridingModule(new SignalsModule());
-		Signals.configure( controler );
-		
+		controler.addOverridingModule( new SignalsModule() );
+
 		// add the responsive signal as a controler listener
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

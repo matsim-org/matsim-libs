@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.bicycle.BicycleConfigGroup;
 import org.matsim.contrib.bicycle.BicycleConfigGroup.BicycleScoringType;
-import org.matsim.contrib.bicycle.Bicycles;
+import org.matsim.contrib.bicycle.BicycleModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -379,8 +379,9 @@ public class BicycleTest {
 		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
 		Controler controler = new Controler(scenario);
-		Bicycles.addAsOverridingModule(controler);
-		
+
+		controler.addOverridingModule(new BicycleModule());
+
 		LinkDemandEventHandler linkHandler = new LinkDemandEventHandler();
 
 		controler.addOverridingModule(new AbstractModule() {
@@ -471,8 +472,9 @@ public class BicycleTest {
 		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
 		Controler controler = new Controler(scenario);
-		Bicycles.addAsOverridingModule(controler);
-		
+
+		controler.addOverridingModule(new BicycleModule());
+
 		LinkDemandEventHandler linkHandler = new LinkDemandEventHandler();
 
 		controler.addOverridingModule(new AbstractModule() {

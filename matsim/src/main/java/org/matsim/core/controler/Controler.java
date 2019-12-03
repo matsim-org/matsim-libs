@@ -67,7 +67,7 @@ import java.util.*;
  *
  * @author mrieser
  */
-public final class Controler implements ControlerI, MatsimServices, AllowsConfiguration{
+public final class Controler implements ControlerI, MatsimServices {
 	// yyyy Design thoughts:
 	// * Seems to me that we should try to get everything here final.  Flexibility is provided by the ability to set or add factories.  If this is
 	// not sufficient, people should use AbstractController.  kai, jan'13
@@ -449,7 +449,6 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 		});
 	}
 
-	@Override
 	public final Controler addOverridingModule( AbstractModule abstractModule ) {
 		if (this.injectorCreated) {
 			throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
@@ -465,7 +464,6 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 		this.modules = Arrays.asList(modules);
 	}
 
-	@Override
 	public final Controler addOverridingQSimModule( AbstractQSimModule qsimModule ) {
 		if (this.injectorCreated) {
 			throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
@@ -473,7 +471,6 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 		overridingQSimModules.add(qsimModule);
 		return this ;
 	}
-	@Override
 	public final Controler addQSimModule(AbstractQSimModule qsimModule) {
 		this.addOverridingModule(new AbstractModule() {
 			@Override
@@ -487,7 +484,6 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
     /**
      * Only use if you know what you are doing, for experts only.
      */
-	@Override
 	public final Controler configureQSimComponents(QSimComponentsConfigurator configurator) {
 		this.addOverridingModule(new AbstractModule() {
 			@Override

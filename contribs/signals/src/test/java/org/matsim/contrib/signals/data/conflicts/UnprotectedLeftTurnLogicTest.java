@@ -26,7 +26,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup.IntersectionLogic;
-import org.matsim.contrib.signals.builder.Signals;
+import org.matsim.contrib.signals.builder.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.core.config.Config;
@@ -78,9 +78,9 @@ public class UnprotectedLeftTurnLogicTest {
         
 		// add the signals module
 //		controler.addOverridingModule(new SignalsModule());
-		Signals.configure(controler);
-				
-		// add analysis tools
+        controler.addOverridingModule( new SignalsModule() );
+
+        // add analysis tools
 		AnalyzeSingleIntersectionLeftTurnDelays handler = new AnalyzeSingleIntersectionLeftTurnDelays();
 		controler.addOverridingModule(new AbstractModule() {			
 			@Override

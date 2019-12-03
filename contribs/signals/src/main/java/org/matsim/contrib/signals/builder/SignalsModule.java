@@ -37,12 +37,9 @@ import org.matsim.contrib.signals.sensor.DownstreamSensor;
 import org.matsim.contrib.signals.sensor.LinkSensorManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QSignalsNetworkFactory;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
 
 import com.google.inject.TypeLiteral;
-import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
 
 /**
@@ -56,7 +53,7 @@ import com.google.inject.multibindings.MapBinder;
  * 
  * @author tthunig
  */
-class SignalsModule extends AbstractModule {
+public class SignalsModule extends AbstractModule {
 	// This is no longer public since there is now also material that needs to be injected at the QSim level (see
 	// Signals.configure(...)), and making SignalsModule nonpublic seems the best way of forcibly notifying users.  kai, nov'18
 
@@ -65,7 +62,7 @@ class SignalsModule extends AbstractModule {
 	private MapBinder<String, SignalControllerFactory> signalControllerFactoryMultibinder;
 	private Map<String, Class<? extends SignalControllerFactory>> signalControllerFactoryClassNames = new HashMap<>();
 
-	SignalsModule() {
+	public SignalsModule() {
 		// specify default signal controller. you can add your own by calling addSignalControllerFactory (see method java-doc below)
 		signalControllerFactoryClassNames.put(DefaultPlanbasedSignalSystemController.IDENTIFIER, DefaultPlanbasedSignalSystemController.FixedTimeFactory.class);
 		signalControllerFactoryClassNames.put(SylviaSignalController.IDENTIFIER, SylviaSignalController.SylviaFactory.class);
@@ -74,6 +71,7 @@ class SignalsModule extends AbstractModule {
 	
 	@Override
 	public void install() {
+		installQSimModule(new SignalsQSimModule());
 
 		getConfig().travelTimeCalculator().setSeparateModes( false );
 		log.warn("setting travelTimeCalculatur.setSeparateModes to false since otherwise link2link routing does not work") ;

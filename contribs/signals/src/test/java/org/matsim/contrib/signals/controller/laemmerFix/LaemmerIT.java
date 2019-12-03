@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.signals.analysis.DelayAnalysisTool;
 import org.matsim.contrib.signals.analysis.SignalAnalysisTool;
-import org.matsim.contrib.signals.builder.Signals;
+import org.matsim.contrib.signals.builder.SignalsModule;
 import org.matsim.contrib.signals.controller.laemmerFix.LaemmerConfigGroup.Regime;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
@@ -516,8 +516,8 @@ public class LaemmerIT {
 			
 			// add the signals module
 //			controler.addOverridingModule(new SignalsModule());
-			Signals.configure( controler );
-			
+			controler.addOverridingModule( new SignalsModule() );
+
 			// add signal analysis tool
 			controler.addOverridingModule(new AbstractModule() {
 				@Override

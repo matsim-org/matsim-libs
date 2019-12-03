@@ -51,7 +51,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.builder.Signals;
+import org.matsim.contrib.signals.builder.SignalsModule;
 import org.matsim.contrib.signals.controller.fixedTime.DefaultPlanbasedSignalSystemController;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
@@ -464,9 +464,9 @@ public class EditTripsTest {
 		buildSignals(scenario, signalSystemsConfigGroup);
 
 		Controler controler = new Controler(scenario);
-		
-		Signals.configure( controler ) ;
-		
+
+		controler.addOverridingModule( new SignalsModule() );
+
 		// We need to direct to our local DisturbanceAndReplanningEngine, because it is hard to access,
 		// so we cannot re-use the one in RunMatsim and configure it via constructor or similar 
 		{

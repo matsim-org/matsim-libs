@@ -8,9 +8,7 @@ import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFact
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.AllowsConfiguration;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
 
 public class Freight{
 	// yyyy todo:
@@ -18,9 +16,7 @@ public class Freight{
 	// * read freight input files in module => DONE by oct' 07 '19,	tschlenther
 	// * repair execution path where config instead of scenario is given to controler
 
-	public static void configure( AllowsConfiguration ao ) {
-		Gbl.assertIf( ao instanceof Controler);  // we need the scenario; otherwise find other way
-		Controler controler = (Controler) ao;
+	public static void configure( Controler controler ) {
 		Carriers carriers = FreightUtils.getCarriers( controler.getScenario() );
 		FreightConfigGroup freightConfig = ConfigUtils.addOrGetModule( controler.getConfig(), FreightConfigGroup.class );;
 		if ( true ){
@@ -29,9 +25,9 @@ public class Freight{
 			freightConfig.setTimeWindowHandling( FreightConfigGroup.TimeWindowHandling.ignore );
 		}
 		final CarrierModule carrierModule = new CarrierModule( carriers );
-		ao.addOverridingModule( carrierModule ) ;
+		controler.addOverridingModule( carrierModule ) ;
 
-		ao.addOverridingModule( new AbstractModule(){
+		controler.addOverridingModule( new AbstractModule(){
 			@Override
 			public void install(){
 				// yyyy these two are just quick fixes in order to get the material up and running without having it all in the run script.
