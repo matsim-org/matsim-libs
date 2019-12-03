@@ -342,7 +342,7 @@ public class VariableAccessTransitRouterImplTest {
 				workAtTransitStop1, 7 * 60 * 60, personCarNeverAvailable);
 		Assert.assertEquals("walk", legsAtTransferTripSideOfDecisionPoint.get(0).getMode());
 		Assert.assertEquals("pt", legsAtTransferTripSideOfDecisionPoint.get(1).getMode());
-		Assert.assertEquals("transit_walk", legsAtTransferTripSideOfDecisionPoint.get(2).getMode());
+		Assert.assertEquals("walk", legsAtTransferTripSideOfDecisionPoint.get(2).getMode());
 		Assert.assertEquals("pt", legsAtTransferTripSideOfDecisionPoint.get(3).getMode());
 		Assert.assertEquals("walk", legsAtTransferTripSideOfDecisionPoint.get(4).getMode());
 		Assert.assertEquals(5, legsAtTransferTripSideOfDecisionPoint.size()); // 3

@@ -30,6 +30,7 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -38,12 +39,12 @@ import javax.inject.Provider;
 
 	static final String CAR_WITH_PAYED_AREA_TOLL = "car_with_payed_area_toll";
 	private RoadPricingScheme roadPricingScheme;
-	private Provider<TripRouter> tripRouterFactory;
+	private final PlanRouter planRouter ;
 
 	@Inject
-	PlansCalcRouteWithTollOrNot(RoadPricingScheme roadPricingScheme, Provider<TripRouter> tripRouterFactory) {
+	PlansCalcRouteWithTollOrNot(RoadPricingScheme roadPricingScheme, Provider<TripRouter> tripRouterProvider) {
 		this.roadPricingScheme = roadPricingScheme;
-		this.tripRouterFactory = tripRouterFactory;
+		this.planRouter = new PlanRouter( tripRouterProvider.get() ) ;
 	}
 
 	@Override
@@ -56,24 +57,26 @@ import javax.inject.Provider;
 		// From what I understand, it may be simpler/better to just throw a coin and produce
 		// one of the two options.
 		replaceCarModeWithTolledCarMode(plan);
-		PlanRouter untolledPlanRouter = new PlanRouter(tripRouterFactory.get());
-		untolledPlanRouter.run(plan);
+		planRouter.run( plan );
 		double areaToll = roadPricingScheme.getTypicalCosts().iterator().next().amount;
 		double routeCostWithAreaToll = sumNetworkModeCosts(plan) + areaToll;
 		replaceTolledCarModeWithCarMode(plan);
-		new PlanRouter(tripRouterFactory.get()).run(plan);
+		planRouter.run( plan );
 		double routeCostWithoutAreaToll = sumNetworkModeCosts(plan);
 		if (routeCostWithAreaToll < routeCostWithoutAreaToll) {
 			replaceCarModeWithTolledCarMode(plan);
-			untolledPlanRouter.run(plan);
+			planRouter.run( plan );
 		}
 	}
 
+	// This most likely will not work for intermodal setups with car e.g. as access mode to pt and routing mode of the trip 
+	// something else than car.
+	// However, it did not work before the switch to routing mode either. - gl-nov'19
 	private void replaceCarModeWithTolledCarMode(Plan plan) {
 		for (PlanElement planElement : plan.getPlanElements()) {
 			if (planElement instanceof Leg) {
-				if (((Leg) planElement).getMode().equals(TransportMode.car)) {
-					((Leg) planElement).setMode(CAR_WITH_PAYED_AREA_TOLL);
+				if (TripStructureUtils.getRoutingMode((Leg) planElement).equals(TransportMode.car)) {
+					TripStructureUtils.setRoutingMode( (Leg)planElement , CAR_WITH_PAYED_AREA_TOLL );
 				}
 			}
 		}
@@ -82,8 +85,8 @@ import javax.inject.Provider;
 	private void replaceTolledCarModeWithCarMode(Plan plan) {
 		for (PlanElement planElement : plan.getPlanElements()) {
 			if (planElement instanceof Leg) {
-				if (((Leg) planElement).getMode().equals(CAR_WITH_PAYED_AREA_TOLL)) {
-					((Leg) planElement).setMode("car");
+				if (TripStructureUtils.getRoutingMode((Leg) planElement).equals(CAR_WITH_PAYED_AREA_TOLL)) {
+					TripStructureUtils.setRoutingMode( (Leg)planElement , TransportMode.car );
 				}
 			}
 		}

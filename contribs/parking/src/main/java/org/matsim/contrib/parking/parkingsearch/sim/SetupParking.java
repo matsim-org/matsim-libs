@@ -38,7 +38,6 @@ import org.matsim.contrib.parking.parkingsearch.routing.ParkingRouter;
 import org.matsim.contrib.parking.parkingsearch.routing.WithinDayParkingRouter;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.PrepareForSim;
 import org.matsim.core.mobsim.qsim.PopulationModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.StandardQSimComponentConfigurator;
@@ -69,8 +68,6 @@ public class SetupParking {
 				addRoutingModuleBinding(TransportMode.car).toInstance(routingModuleCar);
 				bind(Network.class).annotatedWith(Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING)).to(Network.class).asEagerSingleton();
 				bind(ParkingSearchManager.class).to(FacilityBasedParkingManager.class).asEagerSingleton();
-				bind(WalkLegFactory.class).asEagerSingleton();
-				bind(PrepareForSim.class).to(ParkingSearchPrepareForSimImpl.class);
 				this.install(new ParkingSearchQSimModule());
 				addControlerListenerBinding().to(ParkingListener.class);
 				bind(ParkingRouter.class).to(WithinDayParkingRouter.class);

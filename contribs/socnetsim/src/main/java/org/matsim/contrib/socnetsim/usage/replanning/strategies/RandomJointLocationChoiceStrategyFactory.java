@@ -20,6 +20,7 @@
 package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
 
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
@@ -43,14 +44,17 @@ public class RandomJointLocationChoiceStrategyFactory extends AbstractConfigurab
 	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
 	private final Provider<TripRouter> tripRouterFactory;
 	private final PlanLinkIdentifier planLinkIdentifier;
+	private final MainModeIdentifier mainModeIdentifier;
 
 	@Inject
 	public RandomJointLocationChoiceStrategyFactory( Scenario sc , PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory ,
-			Provider<TripRouter> tripRouterFactory , @Strong PlanLinkIdentifier planLinkIdentifier ) {
+			Provider<TripRouter> tripRouterFactory , @Strong PlanLinkIdentifier planLinkIdentifier,
+			MainModeIdentifier mainModeIdentifier) {
 		this.sc = sc;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;
 		this.planLinkIdentifier = planLinkIdentifier;
+		this.mainModeIdentifier = mainModeIdentifier;
 	}
 
 
@@ -65,7 +69,7 @@ public class RandomJointLocationChoiceStrategyFactory extends AbstractConfigurab
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createJointTripAwareTourModeUnifierModule(
 					sc.getConfig(),
-					tripRouterFactory ) );
+					mainModeIdentifier ) );
 
 		// TODO: add an option to enable or disable this part?
 		final VehicleRessources vehicles =
