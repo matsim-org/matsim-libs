@@ -91,14 +91,14 @@ public class DrtModeQSimModule extends AbstractDvrpModeQSimModule {
 				modalProvider(getter -> new NearestStartLinkAsDepot(getter.getModal(Fleet.class))));
 
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
-
-		addModalComponent(DefaultUnplannedRequestInserter.class, modalProvider(
-				getter -> new DefaultUnplannedRequestInserter(drtCfg, getter.getModal(Fleet.class),
-						getter.get(MobsimTimer.class), getter.get(EventsManager.class),
-						getter.getModal(RequestInsertionScheduler.class),
-						getter.getModal(VehicleData.EntryFactory.class),
-						getter.getModal(PrecalculablePathDataProvider.class),
-						getter.getModal(InsertionCostCalculator.PenaltyCalculator.class))));
+//
+//		addModalComponent(DefaultUnplannedRequestInserter.class, modalProvider(
+//				getter -> new DefaultUnplannedRequestInserter(drtCfg, getter.getModal(Fleet.class),
+//						getter.get(MobsimTimer.class), getter.get(EventsManager.class),
+//						getter.getModal(RequestInsertionScheduler.class),
+//						getter.getModal(VehicleData.EntryFactory.class),
+//						getter.getModal(PrecalculablePathDataProvider.class),
+//						getter.getModal(InsertionCostCalculator.PenaltyCalculator.class))));
 		bindModal(UnplannedRequestInserter.class).to(modalKey(DefaultUnplannedRequestInserter.class));
 
 		bindModal(VehicleData.EntryFactory.class).toInstance(new VehicleDataEntryFactoryImpl(drtCfg));
