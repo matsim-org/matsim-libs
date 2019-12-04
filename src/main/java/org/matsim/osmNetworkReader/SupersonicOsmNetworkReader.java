@@ -149,13 +149,15 @@ public class SupersonicOsmNetworkReader {
 			var fromId = way.getNodeIds().get(i);
 			var fromSegmentNode = nodes.get(fromId);
 
-			result.add(new WaySegment(
-					fromSegmentNode, toSegmentNode,
-					CoordUtils.calcEuclideanDistance(fromSegmentNode.getCoord(), toSegmentNode.getCoord()),
-					way.getLinkProperties(),
-					way.getTags(),
-					way.getId(), way.getId() * 10000 + idPostfix));
+			if (fromSegmentNode.isWayReferenced(way.getId()) || toSegmentNode.isWayReferenced(way.getId())) {
 
+				result.add(new WaySegment(
+						fromSegmentNode, toSegmentNode,
+						CoordUtils.calcEuclideanDistance(fromSegmentNode.getCoord(), toSegmentNode.getCoord()),
+						way.getLinkProperties(),
+						way.getTags(),
+						way.getId(), way.getId() * 10000 + idPostfix));
+			}
 			if (fromId == fromNode.getId()) {
 				// finish creating segments after creating the last one
 				break;

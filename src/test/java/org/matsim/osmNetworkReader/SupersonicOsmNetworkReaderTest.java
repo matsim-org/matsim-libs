@@ -10,6 +10,7 @@ import de.topobyte.osm4j.pbf.seq.PbfWriter;
 import lombok.extern.java.Log;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -21,6 +22,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.OsmNetworkReader;
 
 import java.io.IOException;
@@ -31,6 +33,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -64,8 +67,9 @@ public class SupersonicOsmNetworkReaderTest {
     @Ignore
 	public void test() {
 
-		Path file = Paths.get("G:\\Users\\Janek\\shared-svn\\projects\\nemo_mercator\\data\\original_files\\osm_data\\nordrhein-westfalen-2019-11-21.osm.pbf");
-		Path output = Paths.get("G:\\Users\\Janek\\Desktop\\nest-network.xml.gz");
+		Path file = Paths.get("C:\\Users\\Janek\\repos\\shared-svn\\projects\\nemo_mercator\\data\\original_files\\osm_data\\nordrhein-westfalen-2019-11-21.osm.pbf");
+		//Path file = Paths.get("C:\\Users\\Janek\\Downloads\\bremen-latest.osm(1).pbf");
+		Path output = Paths.get("C:\\Users\\Janek\\Desktop\\test-network.xml.gz");
 		Network network = NetworkUtils.createNetwork();
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832");
 		var linkProperties = Map.of(
@@ -77,16 +81,16 @@ public class SupersonicOsmNetworkReaderTest {
 				"pedestrian", new LinkProperties(9, 1, 10.0 / 3.6, 600, false),
 				"path", new LinkProperties(9, 1, 20.0 / 3.6, 600, false));
 
-	/*	List<Geometry> ruhrShape = ShapeFileReader.getAllFeatures(Paths.get("G:\\Users\\Janek\\shared-svn\\projects\\nemo_mercator\\data\\original_files\\shapeFiles\\shapeFile_Ruhrgebiet\\ruhrgebiet_boundary.shp").toString()).stream()
+		List<Geometry> ruhrShape = ShapeFileReader.getAllFeatures(Paths.get("C:\\Users\\Janek\\repos\\shared-svn\\projects\\nemo_mercator\\data\\original_files\\shapeFiles\\shapeFile_Ruhrgebiet\\ruhrgebiet_boundary.shp").toString()).stream()
 				.map(feature -> (Geometry) feature.getDefaultGeometry())
 				.collect(Collectors.toList());
-*/
+
 		Instant start = Instant.now();
 		new SupersonicOsmNetworkReader.Builder()
 				.network(network)
 				.coordinateTransformation(coordinateTransformation)
 				.linkFilter((coord, level) -> {
-					return (level <= LinkProperties.LEVEL_TERTIARY);
+					return (level <= LinkProperties.LEVEL_SECONDARY); //return true;
 
 					//return (level <= LinkProperties.LEVEL_RESIDENTIAL && ruhrShape.stream().anyMatch(g -> g.contains(MGC.coord2Point(coord))));
 				})

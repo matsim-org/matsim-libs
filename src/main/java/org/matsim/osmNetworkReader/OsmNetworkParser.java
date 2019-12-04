@@ -8,6 +8,8 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
 import java.util.function.BiPredicate;
@@ -30,8 +32,9 @@ class OsmNetworkParser {
 		}
 
 		log.info("finished reading ways.");
-		log.info("Kept " + waysParser.getWays().size() + "/" + waysParser.getCounter() + " ways");
-		log.info("Marked " + waysParser.getNodes().size() + " nodes to be kept");
+		log.info("Kept " + NumberFormat.getNumberInstance(Locale.US).format(waysParser.getWays().size()) + "/" +
+				NumberFormat.getNumberInstance(Locale.US).format(waysParser.getCounter()) + " ways");
+		log.info("Marked " + NumberFormat.getNumberInstance(Locale.US).format(waysParser.getNodes().size()) + " nodes to be kept");
 		log.info("starting to read nodes");
 
 		var nodesParser = new NodesPbfParser(executor, linkFilter, waysParser.getNodes(), transformation);
@@ -45,7 +48,8 @@ class OsmNetworkParser {
 		}
 
 		log.info("finished reading nodes");
-		log.info("Kept " + nodesParser.getNodes().size() + "/" + nodesParser.getCount() + " nodes");
+		log.info("Kept " + NumberFormat.getNumberInstance(Locale.US).format(nodesParser.getNodes().size()) + "/"
+				+ NumberFormat.getNumberInstance(Locale.US).format(nodesParser.getCount()) + " nodes");
 
 		return new NodesAndWays(nodesParser.getNodes(), waysParser.getWays());
 	}

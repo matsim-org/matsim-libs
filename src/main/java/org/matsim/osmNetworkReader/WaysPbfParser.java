@@ -15,8 +15,10 @@ import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -107,7 +109,7 @@ class WaysPbfParser extends PbfParser implements OsmHandler {
             }
         }
         if (counter.get() % 100000 == 0) {
-            log.info("Read: " + counter.get() / 1000 + "K ways");
+            log.info("Read: " + NumberFormat.getNumberInstance(Locale.US).format(counter.get()) + " ways");
         }
     }
 

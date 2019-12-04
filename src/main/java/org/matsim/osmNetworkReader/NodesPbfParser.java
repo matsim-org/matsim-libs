@@ -15,7 +15,9 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
@@ -117,6 +119,9 @@ class NodesPbfParser extends PbfParser implements OsmHandler {
 
             var result = new ProcessedOsmNode(osmNode.getId(), filteredReferencingLinks, transformedCoord);
             this.nodes.put(result.getId(), result);
+        }
+        if (counter.get() % 500000 == 0) {
+            log.info("Read: " + NumberFormat.getNumberInstance(Locale.US).format(counter.get()) + " nodes");
         }
     }
 
