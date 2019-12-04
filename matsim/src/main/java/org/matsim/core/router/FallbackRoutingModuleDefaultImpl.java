@@ -21,6 +21,7 @@ import java.util.List;
 
 class FallbackRoutingModuleDefaultImpl implements  FallbackRoutingModule {
 
+	@Deprecated // #deleteBeforeRelease : only used to retrofit plans created since the merge of fallback routing module (sep'-dec'19)
 	public static final String _fallback = "_fallback";
 
 	@Inject private PlansCalcRouteConfigGroup pcrCfg;
