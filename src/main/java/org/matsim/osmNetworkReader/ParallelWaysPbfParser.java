@@ -38,9 +38,7 @@ class ParallelWaysPbfParser extends PbfParser implements OsmHandler {
     private final ConcurrentMap<String, LinkProperties> linkProperties;
     private final AtomicInteger counter = new AtomicInteger();
 
-    private boolean isStreetOfInterest(Map<String, String> tags) {
-        return tags.containsKey(OsmTags.HIGHWAY) && linkProperties.containsKey(tags.get(OsmTags.HIGHWAY));
-    }
+
 
     public int getCounter() {
         return counter.get();
@@ -58,14 +56,14 @@ class ParallelWaysPbfParser extends PbfParser implements OsmHandler {
     }
 
     @Override
-    ParsingResult parse(Osmformat.HeaderBlock block) throws IOException {
+    ParsingResult parse(Osmformat.HeaderBlock block) {
         Osmformat.HeaderBBox box = block.getBbox();
         this.handle(PbfUtil.bounds(box));
         return ParsingResult.Continue;
     }
 
     @Override
-    ParsingResult parse(Osmformat.PrimitiveBlock block) throws IOException {
+    ParsingResult parse(Osmformat.PrimitiveBlock block) {
 
         for (var primitiveGroup : block.getPrimitivegroupList()) {
             if (primitiveGroup.getWaysCount() > 0) {
@@ -94,7 +92,7 @@ class ParallelWaysPbfParser extends PbfParser implements OsmHandler {
     }
 
     @Override
-    public void handle(OsmWay osmWay) throws IOException {
+    public void handle(OsmWay osmWay) {
 
         counter.incrementAndGet();
 
@@ -115,20 +113,24 @@ class ParallelWaysPbfParser extends PbfParser implements OsmHandler {
         }
     }
 
-    @Override
-    public void handle(OsmBounds osmBounds) throws IOException {
+    private boolean isStreetOfInterest(Map<String, String> tags) {
+        return tags.containsKey(OsmTags.HIGHWAY) && linkProperties.containsKey(tags.get(OsmTags.HIGHWAY));
     }
 
     @Override
-    public void handle(OsmNode osmNode) throws IOException {
+    public void handle(OsmBounds osmBounds) {
     }
 
     @Override
-    public void handle(OsmRelation osmRelation) throws IOException {
+    public void handle(OsmNode osmNode) {
     }
 
     @Override
-    public void complete() throws IOException {
+    public void handle(OsmRelation osmRelation) {
+    }
+
+    @Override
+    public void complete() {
     }
 
     @RequiredArgsConstructor
