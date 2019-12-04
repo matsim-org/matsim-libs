@@ -13,4 +13,13 @@ class LightOsmNode {
 	private final long id;
 	private final List<ParallelWaysPbfParser.OsmWayWrapper> filteredReferencedWays;
 	private final Coord coord;
+
+	boolean isWayReferenced(long wayId) {
+		return filteredReferencedWays.stream()
+				.anyMatch(wrapper -> wrapper.getWay().getId() == wayId);
+	}
+
+	boolean isIntersection() {
+		return filteredReferencedWays.size() > 1;
+	}
 }

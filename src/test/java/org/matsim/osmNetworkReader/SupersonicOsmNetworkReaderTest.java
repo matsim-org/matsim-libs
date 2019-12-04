@@ -137,16 +137,10 @@ public class SupersonicOsmNetworkReaderTest {
 	@Test
 	public void singleLink() {
 
-		var node1 = new Node(1, 0, 0);
-		var node2 = new Node(2, 100, 100);
-		var node3 = new Node(3, 0, 200);
-		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId(), node3.getId()});
-		var tags = List.of(new Tag(OsmTags.HIGHWAY, MOTORWAY));
-		var way = new Way(1, nodeReference, tags);
+		var singleLink = Utils.createSingleLink();
 
 		Path file = Paths.get("single-link-one-way.pbf");
-
-		writeOsmData(List.of(node1, node2, node3), List.of(way), file);
+		writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
 		var network = NetworkUtils.createNetwork();
 		new SupersonicOsmNetworkReader.Builder()
@@ -159,6 +153,11 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getNodes().size());
 
 		// now, test that the link has all the required properties
+		var node1 = singleLink.getNodes().get(0);
+		var node2 = singleLink.getNodes().get(1);
+		var node3 = singleLink.getNodes().get(2);
+		var way = singleLink.getWays().get(0);
+
 		Link link = network.getLinks().values().iterator().next(); // get the only link
 		double expectedLengthPart1 = CoordUtils.calcEuclideanDistance(new Coord(node1.getLongitude(), node1.getLatitude()), new Coord(node2.getLongitude(), node2.getLatitude()));
 		double expectedLengthPart2 = CoordUtils.calcEuclideanDistance(new Coord(node2.getLongitude(), node2.getLatitude()), new Coord(node3.getLongitude(), node3.getLatitude()));

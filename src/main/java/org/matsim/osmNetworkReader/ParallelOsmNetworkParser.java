@@ -15,7 +15,7 @@ import java.util.function.BiPredicate;
 @Log4j2
 public class ParallelOsmNetworkParser {
 
-	NodesAndWays parse(Path inputFile, ConcurrentMap<String, LinkProperties> linkPropertiesMap, CoordinateTransformation transformation, BiPredicate<Coord, Integer> linkFilter) {
+	static NodesAndWays parse(Path inputFile, ConcurrentMap<String, LinkProperties> linkPropertiesMap, CoordinateTransformation transformation, BiPredicate<Coord, Integer> linkFilter) {
 
 		log.info("start reading ways");
 

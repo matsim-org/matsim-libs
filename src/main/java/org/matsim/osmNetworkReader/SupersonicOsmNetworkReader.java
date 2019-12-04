@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 import java.nio.file.Path;
@@ -71,44 +72,61 @@ public class SupersonicOsmNetworkReader {
 
 	public void read(Path inputFile) {
 
-		var nodesAndWays = OsmNetworkParser.parse(inputFile, linkProperties);
+		var nodesAndWays = ParallelOsmNetworkParser.parse(inputFile, linkProperties, coordinateTransformation, linkFilter);
 		log.info("starting convertion \uD83D\uDE80");
 		convert(nodesAndWays.getWays(), nodesAndWays.getNodes());
 		log.info("finished convertion");
 	}
 
-	private void convert(Collection<OsmWay> ways, Map<Long, LightOsmNode> nodes) {
+	private void convert(Map<Long, ParallelWaysPbfParser.OsmWayWrapper> ways, Map<Long, LightOsmNode> nodes) {
 
-		ways.parallelStream()
+		ways.values().parallelStream()
 				.flatMap(way -> this.createWaySegments(nodes, way))
 				.flatMap(this::createLinks)
 				.forEach(this::addLinkToNetwork);
 	}
 
-	private Stream<WaySegment> createWaySegments(Map<Long, LightOsmNode> nodes, OsmWay way) {
+	private Stream<WaySegment> createWaySegments(Map<Long, LightOsmNode> nodes, ParallelWaysPbfParser.OsmWayWrapper wayWrapper) {
 
+		var way = wayWrapper.getWay();
 		final var tags = OsmModelUtil.getTagsAsMap(way);
 		List<WaySegment> segments = new ArrayList<>();
 		double segmentLength = 0;
 
 		// set up first node for segment
 		long fromNodeId = way.getNodeId(0);
-		var fromNodeForSegmentWithoutTransform = nodes.get(fromNodeId);
-
-		throw new RuntimeException("not implemented");
-		/*var fromNodeForSegment = new LightOsmNode(fromNodeForSegmentWithoutTransform.getId(), fromNodeForSegmentWithoutTransform.getNumberOfWays(),
-				coordinateTransformation.transform(fromNodeForSegmentWithoutTransform.getCoord()));
+		var fromNodeForSegment = nodes.get(fromNodeId);
 
 		for (int i = 1, linkdIdPostfix = 1; i < way.getNumberOfNodes(); i++, linkdIdPostfix += 2) {
 
 			// get the from and to nodes for a sub segment of the current way
-			var fromOsmNode = nodes.get(fromNodeId);
+			var fromOsmNode = nodes.get(way.getNodeId(i - 1));
 			var toOsmNode = nodes.get(way.getNodeId(i));
 
 			// add the distance between those nodes to the overal length of segment
-			Coord fromCoord = coordinateTransformation.transform(fromOsmNode.getCoord());
-			Coord toCoord = coordinateTransformation.transform(toOsmNode.getCoord());
-			segmentLength += CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
+			segmentLength += CoordUtils.calcEuclideanDistance(fromOsmNode.getCoord(), toOsmNode.getCoord());
+
+			// if we have an intersection or the end of the way
+			if (toOsmNode.isIntersection() || toOsmNode.getId() == wayWrapper.getEndNodeId() || preserveNodeWithId.test(toOsmNode.getId())) {
+
+				// check whether to and fromNode want to have this link
+				if (toOsmNode.isWayReferenced(way.getId()) || fromNodeForSegment.isWayReferenced(way.getId())) {
+					segments.add(
+							new WaySegment(fromOsmNode, toOsmNode, segmentLength, wayWrapper.getLinkProperties(), tags, way.getId(),
+									//if the way id is 1234 we will get a link id like 12340001, this is necessary because we need to generate unique
+									// ids. The osm wiki says ways have no more than 2000 nodes which means that i will never be greater 1999.
+									// we have to increase the appendix by two for each segment, to leave room for backwards links
+									way.getId() * 10000 + linkdIdPostfix)
+					);
+
+					//prepare for next segment
+					segmentLength = 0;
+					fromNodeForSegment = toOsmNode;
+				}
+			}
+
+			/*
+
 
 			if (fromNodeForSegment.getId() == toOsmNode.getId()) {
 				// detected a loop. Keep all nodes of the segment
@@ -137,11 +155,12 @@ public class SupersonicOsmNetworkReader {
 				fromNodeForSegment = toOsmNode;
 			}
 
+			 */
+
 			//prepare for next iteration
-			fromNodeId = toOsmNode.getId();
+			//fromNodeId = toOsmNode.getId();
 		}
 		return segments.stream();
-		*/
 	}
 
 
@@ -185,7 +204,7 @@ public class SupersonicOsmNetworkReader {
 	private Stream<Link> createLinks(WaySegment segment) {
 
 		var highwayType = segment.getTags().get(OsmTags.HIGHWAY);
-		var properties = linkProperties.get(highwayType);
+		var properties = segment.getLinkProperties();
 		List<Link> result = new ArrayList<>();
 
 		if (linkFilter.test(segment.getFromNode().getCoord(), properties.hierachyLevel) || linkFilter.test(segment.getToNode().getCoord(), properties.hierachyLevel)) {
@@ -352,6 +371,7 @@ public class SupersonicOsmNetworkReader {
 		private final LightOsmNode fromNode;
 		private final LightOsmNode toNode;
 		private final double length;
+		private final LinkProperties linkProperties;
 		private final Map<String, String> tags;
 		private final long originalWayId;
 		private final long segmentId;
