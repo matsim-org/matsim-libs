@@ -71,6 +71,33 @@ public class Utils {
 		return new WaysAndLinks(List.of(node1, node2, node3, node4, node5), List.of(way1, way2));
 	}
 
+	static WaysAndLinks createGridWithDifferentLevels() {
+
+		List<OsmNode> nodesList = List.of(
+				new Node(1, 100, 0),
+				new Node(2, 200, 0),
+				new Node(3, 0, 100),
+				new Node(4, 100, 100),
+				new Node(5, 200, 100),
+				new Node(6, 300, 100),
+				new Node(7, 0, 200),
+				new Node(8, 100, 200),
+				new Node(9, 200, 200),
+				new Node(10, 300, 200),
+				new Node(11, 100, 300),
+				new Node(12, 200, 300)
+		);
+
+		List<OsmWay> waysList = List.of(
+				new Way(1, new TLongArrayList(new long[]{3, 4, 5, 6}), List.of(new Tag("highway", MOTORWAY))),
+				new Way(2, new TLongArrayList(new long[]{7, 8, 9, 10}), List.of(new Tag("highway", MOTORWAY))),
+				new Way(3, new TLongArrayList(new long[]{1, 4, 8, 11}), List.of(new Tag("highway", TERTIARY))),
+				new Way(4, new TLongArrayList(new long[]{2, 5, 9, 12}), List.of(new Tag("highway", TERTIARY)))
+		);
+
+		return new WaysAndLinks(nodesList, waysList);
+	}
+
 	@Getter
 	@RequiredArgsConstructor
 	static class WaysAndLinks {

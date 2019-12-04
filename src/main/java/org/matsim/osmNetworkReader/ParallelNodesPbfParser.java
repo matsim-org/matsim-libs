@@ -115,11 +115,17 @@ public class ParallelNodesPbfParser extends PbfParser implements OsmHandler {
             var waysThatReferenceNode = nodesToKeep.get(osmNode.getId());
             var transformedCoord = coordinateTransformation.transform(new Coord(osmNode.getLongitude(), osmNode.getLatitude()));
             var filteredReferencingLinks = testWhetherReferencingLinksAreInFilter(transformedCoord, waysThatReferenceNode);
-            if (filteredReferencingLinks.size() > 0) {
-                var result = new LightOsmNode(osmNode.getId(), filteredReferencingLinks, transformedCoord);
-                this.nodes.put(result.getId(), result);
-            }
+
+            // if (filteredReferencingLinks.size() > 0) {
+            var result = new LightOsmNode(osmNode.getId(), filteredReferencingLinks, transformedCoord);
+            this.nodes.put(result.getId(), result);
+            // }
         }
+    }
+
+    private boolean isEndNodeOfAnyLink(OsmNode node, List<ParallelWaysPbfParser.OsmWayWrapper> waysThatReferenceNode) {
+        return waysThatReferenceNode.stream()
+                .anyMatch(way -> way.getEndNodeId() == node.getId() || way.getStartNodeId() == node.getId());
     }
 
     private List<ParallelWaysPbfParser.OsmWayWrapper> testWhetherReferencingLinksAreInFilter(Coord coord, List<ParallelWaysPbfParser.OsmWayWrapper> waysThatReferenceNode) {

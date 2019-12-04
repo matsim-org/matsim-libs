@@ -118,22 +118,7 @@ public class SupersonicOsmNetworkReaderTest {
 		new NetworkWriter(network).write(output.toString());
 	}
 
-	/**
-	 * Single link with three nodes
-	 * <p>
-	 * (0,0), id: 1
-	 * \
-	 * \
-	 * \
-	 * (1000,1000), id: 2
-	 * /
-	 * /
-	 * /
-	 * (0,2000), id: 3
-	 * <p>
-	 * nodes 1 and 3 should be kept, node 2 should be removed to simplify link
-	 *
-	 */
+
 	@Test
 	public void singleLink() {
 
@@ -149,7 +134,9 @@ public class SupersonicOsmNetworkReaderTest {
 				.build()
 				.read(file);
 
+		// we expect one link
 		assertEquals(1, network.getLinks().size());
+		// we expect two nodes, since the middle node should be removed for simplification
 		assertEquals(2, network.getNodes().size());
 
 		// now, test that the link has all the required properties
@@ -177,34 +164,14 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(MOTORWAY, link.getAttributes().getAttribute(NetworkUtils.TYPE));
 	}
 
-	/**
-	 * Single link with three nodes
-	 * <p>
-	 * (0,0), id: 1
-	 * \
-	 * \
-	 * \
-	 * (10,10), id: 2
-	 * /
-	 * /
-	 * /
-	 * (0,10), id: 3
-	 * <p>
-	 * nodes 1 and 3 should be kept, node 2 should be removed to simplify link
-	 */
 	@Test
 	public void singleLinkPreserveMiddleNode() {
 
-		var node1 = new Node(1, 0, 0);
-		var node2 = new Node(2, 100, 100);
-		var node3 = new Node(3, 100, 0);
-		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId(), node3.getId()});
-		var tags = List.of(new Tag(OsmTags.HIGHWAY, MOTORWAY));
-		var way = new Way(1, nodeReference, tags);
+		var singleLink = Utils.createSingleLink();
 
 		Path file = Paths.get("single-link-preserve-node.pbf");
 
-		writeOsmData(List.of(node1, node2, node3), List.of(way), file);
+		writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
 		var network = NetworkUtils.createNetwork();
 
@@ -228,6 +195,7 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(Set.of(TransportMode.car), link.getAllowedModes());
 
 		//test attributes
+		var way = singleLink.getWays().get(0);
 		assertNotNull(link.getAttributes().getAttribute(NetworkUtils.ORIGID));
 		assertEquals(way.getId(), (long) link.getAttributes().getAttribute(NetworkUtils.ORIGID));
 
@@ -480,7 +448,7 @@ public class SupersonicOsmNetworkReaderTest {
 	}
 
 	@Test
-	public void singleLink_lanesForewardAndBackwardTag() {
+	public void singleLink_lanesForwardAndBackwardTag() {
 		var node1 = new Node(1, 0, 0);
 		var node2 = new Node(2, 10, 10);
 		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
@@ -591,20 +559,6 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(linkProperties.freespeed, link.getFreespeed(), 0);
 	}
 
-
-	/**
-	 * Two links
-	 * <p>
-	 * (0,0), id:1   (2,0), id:5
-	 * \        /
-	 * \      /
-	 * \    /
-	 * (1,1), id: 2
-	 * /    \
-	 * /      \
-	 * /        \
-	 * (0,2), id:4  (2,2), id:3
-	 */
 	@Test
 	public void twoIntersectingLinks() {
 
@@ -697,21 +651,68 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(CoordUtils.calcEuclideanDistance(link4.getFromNode().getCoord(), link4.getToNode().getCoord()), link4.getLength(), 0);
 	}
 
-	/**
-	 * Two links
-	 * <p>
-	 * (0,0), id:1   (4,0), id:5
-	 * \        /
-	 * \      /
-	 * \    /
-	 * (2,2), id: 2       (4, 2), id:8
-	 * /    \	  -------/	|
-	 * \	/			|
-	 * (3,3), id:6 -(4, 3), id:7
-	 * /      \
-	 * /        \
-	 * (0,4), id:4  (4,4), id:3
-	 */
+	@Test
+	public void twoIntersectingLinks_oneShouldBeSimplified() {
+
+		final var tags = List.of(new Tag("highway", MOTORWAY));
+		final List<OsmNode> nodes = List.of(new Node(1, 0, 0),
+				new Node(2, 1, 1), new Node(3, 2, 2),
+				new Node(4, 0, 2), new Node(5, 2, 0),
+				new Node(6, 3, 3));
+		final List<OsmWay> ways = List.of(new Way(1, new TLongArrayList(new long[]{1, 2, 3, 6}), tags),
+				new Way(2, new TLongArrayList(new long[]{4, 2, 5}), tags));
+		final var file = Paths.get("two-intersecting-links.pbf");
+		writeOsmData(nodes, ways, file);
+
+		var network = NetworkUtils.createNetwork();
+		new SupersonicOsmNetworkReader.Builder()
+				.network(network)
+				.coordinateTransformation(transformation)
+				.build()
+				.read(file);
+
+		// node 5 should be simplified
+		assertEquals(5, network.getNodes().size());
+		assertEquals(4, network.getLinks().size());
+
+		var simplifiedLink = network.getLinks().get(Id.createLinkId(10005));
+		assertEquals(Id.createNodeId(6), simplifiedLink.getToNode().getId());
+		assertEquals(Id.createNodeId(2), simplifiedLink.getFromNode().getId());
+	}
+
+	@Test
+	public void linkGrid_oneWayNotInFilter() {
+
+		var grid = Utils.createGridWithDifferentLevels();
+		final var file = Paths.get("grid-with-filter.pbf");
+		writeOsmData(grid.getNodes(), grid.getWays(), file);
+
+		var network = NetworkUtils.createNetwork();
+		new SupersonicOsmNetworkReader.Builder()
+				.network(network)
+				.coordinateTransformation(transformation)
+				// we don't want the tertiary link wich is on the 'right' side of the grid
+				.linkFilter((coord, level) -> !(level == LinkProperties.LEVEL_TERTIARY && coord.getX() > 100))
+				.build()
+				.read(file);
+
+		// we want 10 links (4 highways which are oneway, 6 tertiary which are two way
+		assertEquals(10, network.getLinks().size());
+		// we want 8 nodes, since 4 should be simplified
+		assertEquals(8, network.getNodes().size());
+
+		// check that way 4 is not added
+		for (Link link : network.getLinks().values()) {
+			assertFalse(link.getId().toString().startsWith("4"));
+		}
+
+		// check that ids 2, 5, 9, 12 were not added
+		assertFalse(network.getNodes().containsKey(Id.createNodeId(2)));
+		assertFalse(network.getNodes().containsKey(Id.createNodeId(5)));
+		assertFalse(network.getNodes().containsKey(Id.createNodeId(9)));
+		assertFalse(network.getNodes().containsKey(Id.createNodeId(12)));
+	}
+
 	@Test
 	public void twoIntersectingLinks_oneWithLoop() {
 
