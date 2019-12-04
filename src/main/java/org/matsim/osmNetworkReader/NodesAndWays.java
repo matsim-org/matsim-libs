@@ -8,6 +8,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Getter
 class NodesAndWays {
-	private final Map<Long, LightOsmNode> nodes;
-	private final Map<Long, ParallelWaysPbfParser.OsmWayWrapper> ways;
+	private final Map<Long, ProcessedOsmNode> nodes;
+	private final Map<Long, ProcessedOsmWay> ways;
 }

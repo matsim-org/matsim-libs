@@ -12,18 +12,18 @@ import java.util.concurrent.Executors;
 
 import static org.junit.Assert.assertEquals;
 
-public class ParallelWaysPbfParserTest {
+public class WaysPbfParserTest {
 
     private static ExecutorService executor = Executors.newSingleThreadExecutor();
 
     @Test
     public void parse_singleLink() throws IOException {
 
-       var singleLink = Utils.createSingleLink();
+        var singleLink = Utils.createSingleLink();
         Path file = Paths.get("parallel-ways-parser-single-link.pbf");
         Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
-        var waysParser = new ParallelWaysPbfParser(executor, LinkProperties.createLinkProperties());
+        var waysParser = new WaysPbfParser(executor, LinkProperties.createLinkProperties());
 
         try (var fileInputStream = new FileInputStream(file.toFile())) {
             var input = new BufferedInputStream(fileInputStream);
@@ -38,7 +38,7 @@ public class ParallelWaysPbfParserTest {
         for (var wayReferences : nodes.values()) {
             assertEquals(1, wayReferences.size());
             var wayReference = wayReferences.get(0);
-            assertEquals(singleLink.getWays().get(0).getId(), wayReference.getWay().getId());
+            assertEquals(singleLink.getWays().get(0).getId(), wayReference.getId());
         }
     }
 
@@ -49,7 +49,7 @@ public class ParallelWaysPbfParserTest {
         Path file = Paths.get("parallel-ways-parser-two-intersecting-links.pbf");
         Utils.writeOsmData(twoIntersectingLinks.getNodes(), twoIntersectingLinks.getWays(), file);
 
-        var waysParser = new ParallelWaysPbfParser(executor, LinkProperties.createLinkProperties());
+        var waysParser = new WaysPbfParser(executor, LinkProperties.createLinkProperties());
 
         try (var fileInputStream = new FileInputStream(file.toFile())) {
             var input = new BufferedInputStream(fileInputStream);

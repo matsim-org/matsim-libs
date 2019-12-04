@@ -11,7 +11,6 @@ public class OsmTags {
 	public static final String LANES_FORWARD = "lanes:forward";
 	public static final String LANES_BACKWARD = "lanes:backward";
 
-
 	public static final String MPH = "mph";
 
 }

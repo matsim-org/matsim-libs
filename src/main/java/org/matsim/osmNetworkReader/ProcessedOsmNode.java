@@ -8,15 +8,15 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Getter
-class LightOsmNode {
+class ProcessedOsmNode {
 
 	private final long id;
-	private final List<ParallelWaysPbfParser.OsmWayWrapper> filteredReferencedWays;
+	private final List<ProcessedOsmWay> filteredReferencedWays;
 	private final Coord coord;
 
 	boolean isWayReferenced(long wayId) {
 		return filteredReferencedWays.stream()
-				.anyMatch(wrapper -> wrapper.getWay().getId() == wayId);
+				.anyMatch(way -> way.getId() == wayId);
 	}
 
 	boolean isIntersection() {

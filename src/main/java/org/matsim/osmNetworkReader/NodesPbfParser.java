@@ -6,85 +6,140 @@ import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmRelation;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.pbf.protobuf.Osmformat;
-import de.topobyte.osm4j.pbf.seq.BlockParser;
 import de.topobyte.osm4j.pbf.seq.PrimParser;
-import de.topobyte.osm4j.pbf.util.PbfUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 
-import java.io.EOFException;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.InputStream;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Phaser;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiPredicate;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Log4j2
-class NodesPbfParser extends BlockParser implements OsmHandler {
+class NodesPbfParser extends PbfParser implements OsmHandler {
 
-	private final Map<Long, Integer> nodeIdsOfInterest;
+    private final Phaser phaser = new Phaser();
+    private final AtomicInteger counter = new AtomicInteger();
 
-	@Getter
-	private final Map<Long, LightOsmNode> nodes = new HashMap<>();
-	@Getter
-	private int counter = 0;
+    private final ExecutorService executor;
+    private final BiPredicate<Coord, Integer> linkFilter;
+    private final ConcurrentMap<Long, List<ProcessedOsmWay>> nodesToKeep;
+    private final CoordinateTransformation coordinateTransformation;
 
-	@Override
-	protected void parse(Osmformat.HeaderBlock block) {
-		Osmformat.HeaderBBox bbox = block.getBbox();
-		this.handle(PbfUtil.bounds(bbox));
-	}
+    @Getter
+    private final ConcurrentMap<Long, ProcessedOsmNode> nodes = new ConcurrentHashMap<>();
 
-	@Override
-	protected void parse(Osmformat.PrimitiveBlock block) throws IOException {
+    int getCount() {
+        return counter.get();
+    }
 
-		PrimParser primParser = new PrimParser(block, false);
+    @Override
+    void parse(InputStream inputStream) throws IOException {
 
-		for (Osmformat.PrimitiveGroup group : block.getPrimitivegroupList()) {
-			if (group.hasDense()) {
-				primParser.parseDense(group.getDense(), this);
-			} else if (group.getNodesCount() > 0) {
-				primParser.parseNodes(group.getNodesList(), this);
-			} else if (group.getWaysCount() > 0) {
-				// ways are supposed to occur after nodes in an osm file. Therefore stop parsing here
-				throw new EOFException("don't want to parse all the stuff");
-			}
-		}
-	}
+        // register main thread at phaser
+        phaser.register();
+        super.parse(inputStream);
+        log.info("awaiting all parsing tasks before interrupting the parsing");
+        phaser.arriveAndAwaitAdvance();
+        phaser.arriveAndDeregister();
+    }
 
-	@Override
-	public void handle(OsmBounds osmBounds) {
+    @Override
+    ParsingResult parse(Osmformat.HeaderBlock block) {
+        return ParsingResult.Continue;
+    }
 
-	}
+    @Override
+    protected ParsingResult parse(Osmformat.PrimitiveBlock block) {
 
-	@Override
-	public void handle(OsmNode osmNode) {
-		counter++;
-
-		if (nodeIdsOfInterest.containsKey(osmNode.getId())) {
-            Coord coord = new Coord(osmNode.getLongitude(), osmNode.getLatitude());
-            int numberOfWays = nodeIdsOfInterest.get(osmNode.getId());
-            //nodes.put(osmNode.getId(), new LightOsmNode(osmNode.getId(), numberOfWays, coord));
-            throw new RuntimeException("not implemented");
+        for (var primitiveGroup : block.getPrimitivegroupList()) {
+            if (primitiveGroup.hasDense()) {
+                phaser.register();
+                executor.execute(() -> startParseDenseTask(block, primitiveGroup));
+            }
+            if (primitiveGroup.getNodesCount() > 0) {
+                phaser.register();
+                executor.execute(() -> startParseNodesTask(block, primitiveGroup));
+            }
+            if (primitiveGroup.getWaysCount() > 0) {
+                // ways are supposed to occur after ways in an osm file therefore stop it here
+                return ParsingResult.Abort;
+            }
         }
-		if (counter % 1000000 == 0) {
-			log.info("Read: " + counter / 1000000 + "M nodes");
-		}
-	}
+        return ParsingResult.Continue;
+    }
 
-	@Override
-	public void handle(OsmWay osmWay) {
+    // have these more or less identical methods, since I currently don't know how to handle IOExceptions otherwise
+    private void startParseDenseTask(Osmformat.PrimitiveBlock block, Osmformat.PrimitiveGroup group) {
 
-	}
+        try {
+            var primParser = new PrimParser(block, false);
+            primParser.parseDense(group.getDense(), this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            phaser.arriveAndDeregister();
+        }
+    }
 
-	@Override
-	public void handle(OsmRelation osmRelation) {
+    private void startParseNodesTask(Osmformat.PrimitiveBlock block, Osmformat.PrimitiveGroup group) {
 
-	}
+        try {
+            var primParser = new PrimParser(block, false);
+            primParser.parseNodes(group.getNodesList(), this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            phaser.arriveAndDeregister();
+        }
+    }
 
-	@Override
-	public void complete() {
+    @Override
+    public void handle(OsmNode osmNode) {
 
-	}
+        counter.incrementAndGet();
+
+        if (nodesToKeep.containsKey(osmNode.getId())) {
+
+            var waysThatReferenceNode = nodesToKeep.get(osmNode.getId());
+            var transformedCoord = coordinateTransformation.transform(new Coord(osmNode.getLongitude(), osmNode.getLatitude()));
+            var filteredReferencingLinks = testWhetherReferencingLinksAreInFilter(transformedCoord, waysThatReferenceNode);
+
+            var result = new ProcessedOsmNode(osmNode.getId(), filteredReferencingLinks, transformedCoord);
+            this.nodes.put(result.getId(), result);
+        }
+    }
+
+    private List<ProcessedOsmWay> testWhetherReferencingLinksAreInFilter(Coord coord, List<ProcessedOsmWay> waysThatReferenceNode) {
+
+        return waysThatReferenceNode.stream()
+                .filter(way -> linkFilter.test(coord, way.getLinkProperties().hierachyLevel))
+                .collect(Collectors.toUnmodifiableList());
+    }
+
+    @Override
+    public void handle(OsmBounds osmBounds) {
+    }
+
+    @Override
+    public void handle(OsmWay osmWay) {
+    }
+
+    @Override
+    public void handle(OsmRelation osmRelation) {
+    }
+
+    @Override
+    public void complete() {
+    }
 }

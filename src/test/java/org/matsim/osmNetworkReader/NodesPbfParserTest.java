@@ -14,7 +14,7 @@ import java.util.concurrent.Executors;
 
 import static org.junit.Assert.assertEquals;
 
-public class ParallelNodesPbfParserTest {
+public class NodesPbfParserTest {
 
 	private static ExecutorService executor = Executors.newSingleThreadExecutor();
 
@@ -26,14 +26,14 @@ public class ParallelNodesPbfParserTest {
 		Path file = Paths.get("parallel-nodes-parser-single-link.pbf");
 		Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
-		var waysParser = new ParallelWaysPbfParser(executor, LinkProperties.createLinkProperties());
+		var waysParser = new WaysPbfParser(executor, LinkProperties.createLinkProperties());
 
 		try (var fileInputStream = new FileInputStream(file.toFile())) {
 			var input = new BufferedInputStream(fileInputStream);
 			waysParser.parse(input);
 		}
 
-		var nodesParser = new ParallelNodesPbfParser(executor,
+		var nodesParser = new NodesPbfParser(executor,
 				(coord, level) -> true,
 				waysParser.getNodes(),
 				Utils.transformation
@@ -65,14 +65,14 @@ public class ParallelNodesPbfParserTest {
 		Path file = Paths.get("parallel-nodes-parser-single-link-with-transformation.pbf");
 		Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
-		var waysParser = new ParallelWaysPbfParser(executor, LinkProperties.createLinkProperties());
+		var waysParser = new WaysPbfParser(executor, LinkProperties.createLinkProperties());
 
 		try (var fileInputStream = new FileInputStream(file.toFile())) {
 			var input = new BufferedInputStream(fileInputStream);
 			waysParser.parse(input);
 		}
 
-		var nodesParser = new ParallelNodesPbfParser(executor,
+		var nodesParser = new NodesPbfParser(executor,
 				(coord, level) -> true,
 				waysParser.getNodes(),
 				transformation
@@ -101,14 +101,14 @@ public class ParallelNodesPbfParserTest {
 		Path file = Paths.get("parallel-nodes-parser-intersecting-links.pbf");
 		Utils.writeOsmData(twoIntersectingLinks.getNodes(), twoIntersectingLinks.getWays(), file);
 
-		var waysParser = new ParallelWaysPbfParser(executor, LinkProperties.createLinkProperties());
+		var waysParser = new WaysPbfParser(executor, LinkProperties.createLinkProperties());
 
 		try (var fileInputStream = new FileInputStream(file.toFile())) {
 			var input = new BufferedInputStream(fileInputStream);
 			waysParser.parse(input);
 		}
 
-		var nodesParser = new ParallelNodesPbfParser(executor,
+		var nodesParser = new NodesPbfParser(executor,
 				(coord, level) -> true,
 				waysParser.getNodes(),
 				Utils.transformation
@@ -125,7 +125,7 @@ public class ParallelNodesPbfParserTest {
 		assertEquals(5, nodes.size());
 
 		// all nodes should have a reference count of 1 exept node with id 2 is referenced by both links
-		for (LightOsmNode node : nodes.values()) {
+		for (ProcessedOsmNode node : nodes.values()) {
 			if (node.getId() == 2) assertEquals(2, node.getFilteredReferencedWays().size());
 			else assertEquals(1, node.getFilteredReferencedWays().size());
 		}
@@ -139,14 +139,14 @@ public class ParallelNodesPbfParserTest {
 		Path file = Paths.get("parallel-nodes-parser-intersecting-links.pbf");
 		Utils.writeOsmData(twoIntersectingLinks.getNodes(), twoIntersectingLinks.getWays(), file);
 
-		var waysParser = new ParallelWaysPbfParser(executor, LinkProperties.createLinkProperties());
+		var waysParser = new WaysPbfParser(executor, LinkProperties.createLinkProperties());
 
 		try (var fileInputStream = new FileInputStream(file.toFile())) {
 			var input = new BufferedInputStream(fileInputStream);
 			waysParser.parse(input);
 		}
 
-		var nodesParser = new ParallelNodesPbfParser(executor,
+		var nodesParser = new NodesPbfParser(executor,
 				(coord, level) -> level == LinkProperties.LEVEL_MOTORWAY, // just take the motorway link
 				waysParser.getNodes(),
 				Utils.transformation
@@ -159,13 +159,17 @@ public class ParallelNodesPbfParserTest {
 
 		var nodes = nodesParser.getNodes();
 
-		// we only expect the nodes referenced by the motorway
-		assertEquals(3, nodes.size());
+		// we expect all nodes to be stored
+		assertEquals(5, nodes.size());
 
 		// all nodes should be referenced only by the motorway
-		for (LightOsmNode node : nodes.values()) {
-			assertEquals(1, node.getFilteredReferencedWays().size());
-			assertEquals(twoIntersectingLinks.getWays().get(0).getId(), node.getFilteredReferencedWays().get(0).getWay().getId());
+		for (ProcessedOsmNode node : nodes.values()) {
+			if (node.getId() == 4 || node.getId() == 5) {
+				assertEquals(0, node.getFilteredReferencedWays().size());
+			} else {
+				assertEquals(1, node.getFilteredReferencedWays().size());
+				assertEquals(twoIntersectingLinks.getWays().get(0).getId(), node.getFilteredReferencedWays().get(0).getId());
+			}
 		}
 	}
 }

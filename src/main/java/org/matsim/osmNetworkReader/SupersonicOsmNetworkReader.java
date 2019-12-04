@@ -1,6 +1,5 @@
 package org.matsim.osmNetworkReader;
 
-import de.topobyte.osm4j.core.model.util.OsmModelUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -71,13 +70,13 @@ public class SupersonicOsmNetworkReader {
 
 	public void read(Path inputFile) {
 
-		var nodesAndWays = ParallelOsmNetworkParser.parse(inputFile, linkProperties, coordinateTransformation, linkFilter);
+		var nodesAndWays = OsmNetworkParser.parse(inputFile, linkProperties, coordinateTransformation, linkFilter);
 		log.info("starting convertion \uD83D\uDE80");
 		convert(nodesAndWays.getWays(), nodesAndWays.getNodes());
 		log.info("finished convertion");
 	}
 
-	private void convert(Map<Long, ParallelWaysPbfParser.OsmWayWrapper> ways, Map<Long, LightOsmNode> nodes) {
+	private void convert(Map<Long, ProcessedOsmWay> ways, Map<Long, ProcessedOsmNode> nodes) {
 
 		ways.values().parallelStream()
 				.flatMap(way -> this.createWaySegments(nodes, way))
@@ -85,29 +84,27 @@ public class SupersonicOsmNetworkReader {
 				.forEach(this::addLinkToNetwork);
 	}
 
-	private Stream<WaySegment> createWaySegments(Map<Long, LightOsmNode> nodes, ParallelWaysPbfParser.OsmWayWrapper wayWrapper) {
+	private Stream<WaySegment> createWaySegments(Map<Long, ProcessedOsmNode> nodes, ProcessedOsmWay way) {
 
-		var way = wayWrapper.getWay();
-		final var tags = OsmModelUtil.getTagsAsMap(way);
 		List<WaySegment> segments = new ArrayList<>();
 		double segmentLength = 0;
 
 		// set up first node for segment
-		long fromNodeId = way.getNodeId(0);
-		LightOsmNode fromNodeForSegment = nodes.get(fromNodeId);
+		long fromNodeId = way.getNodeIds().get(0);
+		ProcessedOsmNode fromNodeForSegment = nodes.get(fromNodeId);
 
-		for (int i = 1, linkdIdPostfix = 1; i < way.getNumberOfNodes(); i++, linkdIdPostfix += 2) {
+		for (int i = 1, linkdIdPostfix = 1; i < way.getNodeIds().size(); i++, linkdIdPostfix += 2) {
 
 			// get the from and to nodes for a sub segment of the current way
-			var fromOsmNode = nodes.get(way.getNodeId(i - 1));
-			var toOsmNode = nodes.get(way.getNodeId(i));
+			var fromOsmNode = nodes.get(way.getNodeIds().get(i - 1));
+			var toOsmNode = nodes.get(way.getNodeIds().get(i));
 
 			// add the distance between those nodes to the overal length of segment
 			segmentLength += CoordUtils.calcEuclideanDistance(fromOsmNode.getCoord(), toOsmNode.getCoord());
 
 			if (isLoop(fromNodeForSegment, toOsmNode)) {
 				// detected a loop. Keep all nodes of the segment
-				var loopSegments = handleLoop(nodes, fromNodeForSegment, toOsmNode, wayWrapper, i, linkdIdPostfix);
+				var loopSegments = handleLoop(nodes, fromNodeForSegment, toOsmNode, way, i, linkdIdPostfix);
 				segments.addAll(loopSegments);
 
 				// set up next iteration
@@ -116,12 +113,12 @@ public class SupersonicOsmNetworkReader {
 				fromNodeForSegment = toOsmNode;
 			}
 			// if we have an intersection or the end of the way
-			else if (toOsmNode.isIntersection() || toOsmNode.getId() == wayWrapper.getEndNodeId() || preserveNodeWithId.test(toOsmNode.getId())) {
+			else if (toOsmNode.isIntersection() || toOsmNode.getId() == way.getEndNodeId() || preserveNodeWithId.test(toOsmNode.getId())) {
 
 				// check whether to and fromNode want to have this link
 				if (toOsmNode.isWayReferenced(way.getId()) || fromNodeForSegment.isWayReferenced(way.getId())) {
 					segments.add(
-							new WaySegment(fromNodeForSegment, toOsmNode, segmentLength, wayWrapper.getLinkProperties(), tags, way.getId(),
+							new WaySegment(fromNodeForSegment, toOsmNode, segmentLength, way.getLinkProperties(), way.getTags(), way.getId(),
 									//if the way id is 1234 we will get a link id like 12340001, this is necessary because we need to generate unique
 									// ids. The osm wiki says ways have no more than 2000 nodes which means that i will never be greater 1999.
 									// we have to increase the appendix by two for each segment, to leave room for backwards links
@@ -137,27 +134,26 @@ public class SupersonicOsmNetworkReader {
 		return segments.stream();
 	}
 
-	private boolean isLoop(LightOsmNode fromNode, LightOsmNode toNode) {
+	private boolean isLoop(ProcessedOsmNode fromNode, ProcessedOsmNode toNode) {
 		return fromNode.getId() == toNode.getId();
 	}
 
 
-	private Collection<WaySegment> handleLoop(Map<Long, LightOsmNode> nodes, LightOsmNode fromNode, LightOsmNode toNode, ParallelWaysPbfParser.OsmWayWrapper wayWrapper, int toNodeIndex, int idPostfix) {
+	private Collection<WaySegment> handleLoop(Map<Long, ProcessedOsmNode> nodes, ProcessedOsmNode fromNode, ProcessedOsmNode toNode, ProcessedOsmWay way, int toNodeIndex, int idPostfix) {
 
 		List<WaySegment> result = new ArrayList<>();
-		var way = wayWrapper.getWay();
 		var toSegmentNode = toNode;
 		// iterate backwards and keep all elements of the loop. Don't do thinning since this is an edge case
 		for (int i = toNodeIndex - 1; i > 0; i--) {
 
-			var fromId = way.getNodeId(i);
+			var fromId = way.getNodeIds().get(i);
 			var fromSegmentNode = nodes.get(fromId);
 
 			result.add(new WaySegment(
 					fromSegmentNode, toSegmentNode,
 					CoordUtils.calcEuclideanDistance(fromSegmentNode.getCoord(), toSegmentNode.getCoord()),
-					wayWrapper.getLinkProperties(),
-					OsmModelUtil.getTagsAsMap(way),
+					way.getLinkProperties(),
+					way.getTags(),
 					way.getId(), way.getId() * 10000 + idPostfix));
 
 			if (fromId == fromNode.getId()) {
@@ -174,7 +170,6 @@ public class SupersonicOsmNetworkReader {
 
 		var properties = segment.getLinkProperties();
 		List<Link> result = new ArrayList<>();
-
 
 		var fromNode = createNode(segment.getFromNode().getCoord(), segment.getFromNode().getId());
 			var toNode = createNode(segment.getToNode().getCoord(), segment.getToNode().getId());
@@ -336,8 +331,8 @@ public class SupersonicOsmNetworkReader {
 	@RequiredArgsConstructor
 	@Getter
 	private static class WaySegment {
-		private final LightOsmNode fromNode;
-		private final LightOsmNode toNode;
+		private final ProcessedOsmNode fromNode;
+		private final ProcessedOsmNode toNode;
 		private final double length;
 		private final LinkProperties linkProperties;
 		private final Map<String, String> tags;
