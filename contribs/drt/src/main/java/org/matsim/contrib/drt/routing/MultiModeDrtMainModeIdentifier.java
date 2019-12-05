@@ -49,6 +49,8 @@ public class MultiModeDrtMainModeIdentifier implements MainModeIdentifier {
 				.stream()
 				.map(DrtConfigGroup::getMode)
 				.collect(Collectors.toMap(s -> new DrtStageActivityType(s).drtStageActivity, s -> s));
+		
+		// #deleteBeforeRelease : only used to retrofit plans created since the merge of fallback routing module (sep'-dec'19)
 		fallbackModeToDrtMode = drtCfg.getModalElements()
 				.stream()
 				.map(DrtConfigGroup::getMode)
@@ -64,6 +66,7 @@ public class MultiModeDrtMainModeIdentifier implements MainModeIdentifier {
 					return type;
 				}
 			} else if (pe instanceof Leg) {
+				// #deleteBeforeRelease : only used to retrofit plans created since the merge of fallback routing module (sep'-dec'19)
 				String mode = fallbackModeToDrtMode.get(((Leg)pe).getMode());
 				if (mode != null) {
 					return mode;
