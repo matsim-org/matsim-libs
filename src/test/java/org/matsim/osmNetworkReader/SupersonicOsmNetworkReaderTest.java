@@ -70,7 +70,6 @@ public class SupersonicOsmNetworkReaderTest {
 		Path file = Paths.get("C:\\Users\\Janek\\repos\\shared-svn\\projects\\nemo_mercator\\data\\original_files\\osm_data\\nordrhein-westfalen-2019-11-21.osm.pbf");
 		//Path file = Paths.get("C:\\Users\\Janek\\Downloads\\bremen-latest.osm(1).pbf");
 		Path output = Paths.get("C:\\Users\\Janek\\Desktop\\test-network.xml.gz");
-		Network network = NetworkUtils.createNetwork();
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832");
 		var linkProperties = Map.of(
 				"residential", new LinkProperties(9, 1, 30.0 / 3.6, 1500, false),
@@ -86,8 +85,7 @@ public class SupersonicOsmNetworkReaderTest {
 				.collect(Collectors.toList());
 
 		Instant start = Instant.now();
-		new SupersonicOsmNetworkReader.Builder()
-				.network(network)
+		var network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(coordinateTransformation)
 				.includeLinkAtCoordWithHierarchy((coord, level) -> {
 					if (level <= LinkProperties.LEVEL_SECONDARY) return true;
@@ -131,9 +129,8 @@ public class SupersonicOsmNetworkReaderTest {
 		Path file = Paths.get("single-link-one-way.pbf");
 		writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
-		var network = NetworkUtils.createNetwork();
-		new SupersonicOsmNetworkReader.Builder()
-				.network(network)
+
+		var network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -177,10 +174,7 @@ public class SupersonicOsmNetworkReaderTest {
 
 		writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
-		var network = NetworkUtils.createNetwork();
-
-		new SupersonicOsmNetworkReader.Builder()
-				.network(network)
+		var network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.preserveNodeWithId(id -> id == 2)
 				.build()
@@ -220,10 +214,7 @@ public class SupersonicOsmNetworkReaderTest {
 		Path file = Paths.get("single-link-with-max-speed.pbf");
 		writeOsmData(List.of(node1, node2), List.of(wayWithMaxSpeed), file);
 
-		var network = NetworkUtils.createNetwork();
-
-		new SupersonicOsmNetworkReader.Builder()
-				.network(network)
+		var network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -247,9 +238,7 @@ public class SupersonicOsmNetworkReaderTest {
 		Path file = Paths.get("single-link-with-max-speed-in-mph.pbf");
 		writeOsmData(List.of(node1, node2), List.of(wayWithMaxSpeedMph), file);
 
-		var network = NetworkUtils.createNetwork();
-		new SupersonicOsmNetworkReader.Builder()
-				.network(network)
+		var network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -273,9 +262,7 @@ public class SupersonicOsmNetworkReaderTest {
 		Path file = Paths.get("single-link-with-max-speed-urban-link.pbf");
 		writeOsmData(List.of(node1, node2), List.of(wayWithMaxSpeedUrban), file);
 
-		var network = NetworkUtils.createNetwork();
-		new SupersonicOsmNetworkReader.Builder()
-				.network(network)
+		var network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -299,9 +286,7 @@ public class SupersonicOsmNetworkReaderTest {
 		Path file = Paths.get("single-link-with-unknown-max-speed.pbf");
 		writeOsmData(List.of(node1, node2), List.of(wayWithInvalidMaxSpeed), file);
 
-		var network = NetworkUtils.createNetwork();
-		new SupersonicOsmNetworkReader.Builder()
-				.network(network)
+		var network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -326,9 +311,7 @@ public class SupersonicOsmNetworkReaderTest {
 		Path file = Paths.get("single-link-no-max-speed-rural-link.pbf");
 		writeOsmData(List.of(node1, node2), List.of(wayWithoutMaxSpeed), file);
 
-		var network = NetworkUtils.createNetwork();
-		new SupersonicOsmNetworkReader.Builder()
-				.network(network)
+		var network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -353,9 +336,7 @@ public class SupersonicOsmNetworkReaderTest {
 		Path file = Paths.get("single-link-no-max-speed-urban-link.pbf");
 		writeOsmData(List.of(node1, node2), List.of(wayWithoutMaxSpeed), file);
 
-		var network = NetworkUtils.createNetwork();
-		new SupersonicOsmNetworkReader.Builder()
-				.network(network)
+		var network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -381,9 +362,7 @@ public class SupersonicOsmNetworkReaderTest {
 		Path file = Paths.get("single-link-with-no-lanes-tag.pbf");
 		writeOsmData(List.of(node1, node2), List.of(way), file);
 
-		var network = NetworkUtils.createNetwork();
-		new SupersonicOsmNetworkReader.Builder()
-				.network(network)
+		var network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -409,9 +388,7 @@ public class SupersonicOsmNetworkReaderTest {
 		Path file = Paths.get("single-link-with-lanes-tag.pbf");
 		writeOsmData(List.of(node1, node2), List.of(way), file);
 
-		var network = NetworkUtils.createNetwork();
-		new SupersonicOsmNetworkReader.Builder()
-				.network(network)
+		var network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -436,9 +413,7 @@ public class SupersonicOsmNetworkReaderTest {
 		Path file = Paths.get("single-oneway-link-with-lanes-tag.pbf");
 		writeOsmData(List.of(node1, node2), List.of(way), file);
 
-		var network = NetworkUtils.createNetwork();
-		new SupersonicOsmNetworkReader.Builder()
-				.network(network)
+		var network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -463,9 +438,8 @@ public class SupersonicOsmNetworkReaderTest {
 		Path file = Paths.get("single-link-with-lanes-forward-and-backward-tag.pbf");
 		writeOsmData(List.of(node1, node2), List.of(way), file);
 
-		var network = NetworkUtils.createNetwork();
-		new SupersonicOsmNetworkReader.Builder()
-				.network(network)
+
+		var network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -492,9 +466,7 @@ public class SupersonicOsmNetworkReaderTest {
 		Path file = Paths.get("single-link-capacity-for-long-link.pbf");
 		writeOsmData(List.of(node1, node2), List.of(way), file);
 
-		var network = NetworkUtils.createNetwork();
-		new SupersonicOsmNetworkReader.Builder()
-				.network(network)
+		var network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -518,9 +490,7 @@ public class SupersonicOsmNetworkReaderTest {
 		Path file = Paths.get("single-link-capacity-for-short-link.pbf");
 		writeOsmData(List.of(node1, node2), List.of(way), file);
 
-		var network = NetworkUtils.createNetwork();
-		new SupersonicOsmNetworkReader.Builder()
-				.network(network)
+		var network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -546,9 +516,7 @@ public class SupersonicOsmNetworkReaderTest {
 		Path file = Paths.get("single-link-overriding-link-properties.pbf");
 		writeOsmData(List.of(node1, node2), List.of(way), file);
 
-		var network = NetworkUtils.createNetwork();
-		new SupersonicOsmNetworkReader.Builder()
-				.network(network)
+		var network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.overridingLinkProperties(Map.of(linkCategory, linkProperties))
 				.build()
@@ -574,9 +542,7 @@ public class SupersonicOsmNetworkReaderTest {
 		final var file = Paths.get("two-intersecting-links.pbf");
 		writeOsmData(nodes, ways, file);
 
-		var network = NetworkUtils.createNetwork();
-		new SupersonicOsmNetworkReader.Builder()
-				.network(network)
+		var network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -618,9 +584,7 @@ public class SupersonicOsmNetworkReaderTest {
 		writeOsmData(nodes, ways, file);
 
 		var allowedModes = new HashSet<>(List.of(TransportMode.car, TransportMode.airplane));
-		var network = NetworkUtils.createNetwork();
-		new SupersonicOsmNetworkReader.Builder()
-				.network(network)
+		var network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.afterLinkCreated((link, osmTags, isReverse) -> link.setAllowedModes(allowedModes))
 				.build()
@@ -668,9 +632,7 @@ public class SupersonicOsmNetworkReaderTest {
 		final var file = Paths.get("two-intersecting-links.pbf");
 		writeOsmData(nodes, ways, file);
 
-		var network = NetworkUtils.createNetwork();
-		new SupersonicOsmNetworkReader.Builder()
-				.network(network)
+		var network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -691,9 +653,7 @@ public class SupersonicOsmNetworkReaderTest {
 		final var file = Paths.get("grid-with-filter.pbf");
 		writeOsmData(grid.getNodes(), grid.getWays(), file);
 
-		var network = NetworkUtils.createNetwork();
-		new SupersonicOsmNetworkReader.Builder()
-				.network(network)
+		var network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				// we don't want the tertiary link wich is on the 'right' side of the grid
 				.includeLinkAtCoordWithHierarchy((coord, level) -> !(level == LinkProperties.LEVEL_TERTIARY && coord.getX() > 100))
@@ -729,9 +689,7 @@ public class SupersonicOsmNetworkReaderTest {
 		final var file = Paths.get("two-intersecting-links-with-loop.pbf");
 		writeOsmData(nodes, ways, file);
 
-		var network = NetworkUtils.createNetwork();
-		new SupersonicOsmNetworkReader.Builder()
-				.network(network)
+		var network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);

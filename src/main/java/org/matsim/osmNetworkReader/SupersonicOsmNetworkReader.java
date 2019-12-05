@@ -34,18 +34,17 @@ public class SupersonicOsmNetworkReader {
 	private final AfterLinkCreated afterLinkCreated;
 	private final CoordinateTransformation coordinateTransformation;
 
-	@Getter
-	private final Network network;
+	private Network network;
 
 	@lombok.Builder(builderClassName = "Builder", access = AccessLevel.PUBLIC)
-	private SupersonicOsmNetworkReader(Network network, CoordinateTransformation coordinateTransformation,
+	private SupersonicOsmNetworkReader(CoordinateTransformation coordinateTransformation,
 									   Map<String, LinkProperties> overridingLinkProperties,
 									   BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy, Predicate<Long> preserveNodeWithId,
 									   AfterLinkCreated afterLinkCreated) {
-		if (network == null || coordinateTransformation == null) {
-			throw new IllegalArgumentException("Target network and coordinate transformation are required parameters!");
+		if (coordinateTransformation == null) {
+			throw new IllegalArgumentException("Target coordinate transformation is required parameter!");
 		}
-		this.network = network;
+
 		this.coordinateTransformation = coordinateTransformation;
 
 		// set default implementations if properties were not supplied by builder
@@ -63,16 +62,20 @@ public class SupersonicOsmNetworkReader {
 		this.linkProperties = linkProperties;
 	}
 
-	public void read(String inputFile) {
-		read(Paths.get(inputFile));
+	public Network read(String inputFile) {
+		return read(Paths.get(inputFile));
 	}
 
-	public void read(Path inputFile) {
+	public Network read(Path inputFile) {
 
 		var nodesAndWays = OsmNetworkParser.parse(inputFile, linkProperties, coordinateTransformation, includeLinkAtCoordWithHierarchy);
+		this.network = NetworkUtils.createNetwork();
+
 		log.info("starting convertion \uD83D\uDE80");
 		convert(nodesAndWays.getWays(), nodesAndWays.getNodes());
+
 		log.info("finished convertion");
+		return network;
 	}
 
 	private void convert(Map<Long, ProcessedOsmWay> ways, Map<Long, ProcessedOsmNode> nodes) {

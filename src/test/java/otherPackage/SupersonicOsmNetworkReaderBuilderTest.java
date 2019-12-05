@@ -1,7 +1,6 @@
 package otherPackage;
 
 import org.junit.Test;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.osmNetworkReader.SupersonicOsmNetworkReader;
 
@@ -13,7 +12,6 @@ public class SupersonicOsmNetworkReaderBuilderTest {
 	public void testPublicApi() {
 
 		var reader = SupersonicOsmNetworkReader.builder()
-				.network(NetworkUtils.createNetwork())
 				.coordinateTransformation(new IdentityTransformation())
 				.build();
 
