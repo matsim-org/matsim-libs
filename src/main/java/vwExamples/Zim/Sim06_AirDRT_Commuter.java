@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.routing.DrtStageActivityType;
 import org.matsim.contrib.drt.routing.MultiModeDrtMainModeIdentifier;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -98,7 +99,7 @@ public class Sim06_AirDRT_Commuter {
 		uamCfg.setStopDuration(105);
 		uamCfg.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
 		uamCfg.setTransitStopFile(inbase + "//input//uam//uam_stops.xml");
-		uamCfg.setMaxWalkDistance(6000.0);
+		uamCfg.setMaxWalkDistance(10000.0);
 		uamCfg.setVehiclesFile(inbase + "//input//uam//uam_fleet.xml");
 		uamCfg.setUseModeFilteredSubnetwork(true);
 		uamCfg.setOperationalScheme(OperationalScheme.stopbased);
@@ -140,6 +141,29 @@ public class Sim06_AirDRT_Commuter {
 
 		config.controler().setOutputDirectory(inbase + "//output//" + runId); // Define dynamically the the
 
+		
+		
+		if (true) {
+
+			// Every x-seconds the simulation calls a re-balancing process.
+			// Re-balancing has the task to move vehicles into cells or zones that fits
+			// typically with the demand situation
+			// The technically used re-balancing strategy is then installed/binded within
+			// the initialized controler
+			System.out.println("Rebalancing Online");
+
+			MinCostFlowRebalancingParams rebalancingParams = new MinCostFlowRebalancingParams();
+
+			rebalancingParams.setInterval(1800);
+			rebalancingParams.setCellSize(1000);
+			rebalancingParams.setTargetAlpha(0.3);
+			rebalancingParams.setTargetBeta(0.3);
+			rebalancingParams.setMaxTimeBeforeIdle(900);
+			rebalancingParams.setMinServiceTime(3600);
+			uamCfg.addParameterSet(rebalancingParams);
+
+		}
+		
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
 		ScenarioUtils.loadScenario(scenario);
 

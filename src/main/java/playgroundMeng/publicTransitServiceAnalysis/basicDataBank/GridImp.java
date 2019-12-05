@@ -81,19 +81,19 @@ public class GridImp {
 
 	public void setCoordinate() {
 		
-		double x = geometry.getCentroid().getX();
-		double y = geometry.getCentroid().getY();
-		
-		Coord companyCoord = new Coord(x, y);
-		companyCoord = transformation.transform(companyCoord);
-		this.coordinate[0] = companyCoord.getY();
-		this.coordinate[1] = companyCoord.getX();		
-//		CoordinateConversion coordinateConversion = new CoordinateConversion();
 //		double x = geometry.getCentroid().getX();
 //		double y = geometry.getCentroid().getY();
-//		String utm = "32 U " + String.valueOf(x) + " " + String.valueOf(y);
-//		this.coordinate = coordinateConversion.utm2LatLon(utm);
 //		
+//		Coord companyCoord = new Coord(x, y);
+//		companyCoord = transformation.transform(companyCoord);
+//		this.coordinate[0] = companyCoord.getY();
+//		this.coordinate[1] = companyCoord.getX();		
+		CoordinateConversion coordinateConversion = new CoordinateConversion();
+		double x = geometry.getCentroid().getX();
+		double y = geometry.getCentroid().getY();
+		String utm = "32 U " + String.valueOf(x) + " " + String.valueOf(y);
+		this.coordinate = coordinateConversion.utm2LatLon(utm);
+		
 	}
 
 	public void findTripsInThePolygon(List<Trip> trips) {
