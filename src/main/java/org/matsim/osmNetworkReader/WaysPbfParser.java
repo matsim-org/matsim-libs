@@ -5,95 +5,132 @@ import de.topobyte.osm4j.core.model.iface.OsmBounds;
 import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmRelation;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
+import de.topobyte.osm4j.core.model.util.OsmModelUtil;
 import de.topobyte.osm4j.pbf.protobuf.Osmformat;
-import de.topobyte.osm4j.pbf.seq.BlockParser;
 import de.topobyte.osm4j.pbf.seq.PrimParser;
 import de.topobyte.osm4j.pbf.util.PbfUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
-import java.io.EOFException;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.io.InputStream;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Phaser;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RequiredArgsConstructor
 @Log4j2
-class WaysPbfParser extends BlockParser implements OsmHandler {
+class WaysPbfParser extends PbfParser implements OsmHandler {
 
-	@Getter
-	private final Set<OsmWay> ways = new HashSet<>();
-	@Getter
-	private final Map<Long, Integer> nodes = new HashMap<>();
-	private final Map<String, LinkProperties> linkProperties;
+    private final Phaser phaser = new Phaser();
+    private final ExecutorService executor;
 
-	@Getter
-	private int counter = 0;
+    @Getter
+    private final ConcurrentMap<Long, ProcessedOsmWay> ways = new ConcurrentHashMap<>();
+    @Getter
+    private final ConcurrentMap<Long, List<ProcessedOsmWay>> nodes = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, LinkProperties> linkProperties;
+    private final AtomicInteger counter = new AtomicInteger();
 
-	private static boolean isStreetOfInterest(OsmWay way, Map<String, LinkProperties> linkProperties) {
-		for (int i = 0; i < way.getNumberOfTags(); i++) {
-			String tag = way.getTag(i).getKey();
-			String tagvalue = way.getTag(i).getValue();
-			if (tag.equals(OsmTags.HIGHWAY) && linkProperties.containsKey(tagvalue)) return true;
-		}
-		return false;
-	}
+    public int getCounter() {
+        return counter.get();
+    }
 
-	@Override
-	protected void parse(Osmformat.HeaderBlock block) {
-		Osmformat.HeaderBBox bbox = block.getBbox();
-		this.handle(PbfUtil.bounds(bbox));
-	}
+    @Override
+    void parse(InputStream inputStream) throws IOException {
 
-	@Override
-	protected void parse(Osmformat.PrimitiveBlock block) throws IOException {
+        phaser.register(); // register the main thread which reads from the file
+        super.parse(inputStream);
+        log.info("awaiting all parsing tasks before interrupting the parsing");
+        phaser.arriveAndAwaitAdvance();
+        phaser.arriveAndDeregister();
+    }
 
-		PrimParser primParser = new PrimParser(block, false);
+    @Override
+    ParsingResult parse(Osmformat.HeaderBlock block) {
+        Osmformat.HeaderBBox box = block.getBbox();
+        this.handle(PbfUtil.bounds(box));
+        return ParsingResult.Continue;
+    }
 
-		for (Osmformat.PrimitiveGroup group : block.getPrimitivegroupList()) {
-			if (group.getWaysCount() > 0) {
-				primParser.parseWays(group.getWaysList(), this);
-			} else if (group.getRelationsCount() > 0) {
-				// relations are supposed to occur after ways in an osm file therefore stop it here
-				throw new EOFException("don't want to read all the relations");
-			}
-		}
-	}
+    @Override
+    ParsingResult parse(Osmformat.PrimitiveBlock block) {
 
-	@Override
-	public void handle(OsmBounds osmBounds) {
+        for (var primitiveGroup : block.getPrimitivegroupList()) {
+            if (primitiveGroup.getWaysCount() > 0) {
+                phaser.register();
+                executor.execute(() -> startParseWaysTask(block, primitiveGroup));
+            }
+            if (primitiveGroup.getRelationsCount() > 0) {
 
-	}
+                // relations are supposed to occur after ways in an osm file therefore stop it here
+                return ParsingResult.Abort;
+            }
+        }
+        return ParsingResult.Continue;
+    }
 
-	@Override
-	public void handle(OsmNode osmNode) {
+    private void startParseWaysTask(Osmformat.PrimitiveBlock block, Osmformat.PrimitiveGroup group) {
 
-	}
+        try {
+            var primParser = new PrimParser(block, false);
+            primParser.parseWays(group.getWaysList(), this);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            phaser.arriveAndDeregister();
+        }
+    }
 
-	@Override
-	public void handle(OsmWay osmWay) {
-		counter++;
-		if (isStreetOfInterest(osmWay, linkProperties)) {
-			ways.add(osmWay);
-			for (int i = 0; i < osmWay.getNumberOfNodes(); i++) {
-				nodes.merge(osmWay.getNodeId(i), 1, Integer::sum);
-			}
-		}
-		if (counter % 100000 == 0) {
-			log.info("Read: " + counter / 1000 + "K ways");
-		}
-	}
+    @Override
+    public void handle(OsmWay osmWay) {
 
-	@Override
-	public void handle(OsmRelation osmRelation) {
+        counter.incrementAndGet();
 
-	}
+        var tags = OsmModelUtil.getTagsAsMap(osmWay);
 
-	@Override
-	public void complete() {
+        if (isStreetOfInterest(tags)) {
 
-	}
+            var linkProperty = this.linkProperties.get(tags.get(OsmTags.HIGHWAY));
+            var wayWrapper = ProcessedOsmWay.create(osmWay, tags, linkProperty);
+            ways.put(osmWay.getId(), wayWrapper);
+
+            for (int i = 0; i < osmWay.getNumberOfNodes(); i++) {
+                var nodeId = osmWay.getNodeId(i);
+                nodes.computeIfAbsent(nodeId, id -> new ArrayList<>()).add(wayWrapper);
+            }
+        }
+        if (counter.get() % 100000 == 0) {
+            log.info("Read: " + NumberFormat.getNumberInstance(Locale.US).format(counter.get()) + " ways");
+        }
+    }
+
+    private boolean isStreetOfInterest(Map<String, String> tags) {
+        return tags.containsKey(OsmTags.HIGHWAY) && linkProperties.containsKey(tags.get(OsmTags.HIGHWAY));
+    }
+
+    @Override
+    public void handle(OsmBounds osmBounds) {
+    }
+
+    @Override
+    public void handle(OsmNode osmNode) {
+    }
+
+    @Override
+    public void handle(OsmRelation osmRelation) {
+    }
+
+    @Override
+    public void complete() {
+    }
+
 }
