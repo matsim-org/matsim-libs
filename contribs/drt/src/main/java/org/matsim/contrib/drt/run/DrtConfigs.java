@@ -51,9 +51,6 @@ public class DrtConfigs {
 				addDrtStageActivityParams(planCalcScoreCfg, drtStageActivityType.drtStageActivity);
 			}
 		}
-		if (!planCalcScoreCfg.getModes().containsKey(TripRouter.getFallbackMode(drtCfg.getMode()))) {
-			addDrtWalkModeParams(planCalcScoreCfg, TripRouter.getFallbackMode(drtCfg.getMode()));
-		}
 	}
 
 	private static void addDrtStageActivityParams(PlanCalcScoreConfigGroup planCalcScoreCfg, String stageActivityType) {
@@ -65,14 +62,4 @@ public class DrtConfigs {
 		LOGGER.info("drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
 	}
 
-	private static void addDrtWalkModeParams(PlanCalcScoreConfigGroup planCalcScoreCfg, String drtWalkMode) {
-		PlanCalcScoreConfigGroup.ModeParams drtWalk = new PlanCalcScoreConfigGroup.ModeParams(drtWalkMode);
-		PlanCalcScoreConfigGroup.ModeParams walk = planCalcScoreCfg.getModes().get(TransportMode.walk);
-		drtWalk.setConstant(walk.getConstant());
-		drtWalk.setMarginalUtilityOfDistance(walk.getMarginalUtilityOfDistance());
-		drtWalk.setMarginalUtilityOfTraveling(walk.getMarginalUtilityOfTraveling());
-		drtWalk.setMonetaryDistanceRate(walk.getMonetaryDistanceRate());
-		planCalcScoreCfg.getScoringParametersPerSubpopulation().values().forEach(k -> k.addModeParams(drtWalk));
-		LOGGER.info("drt_walk scoring parameters not set. Adding default values (same as for walk mode).");
-	}
 }
