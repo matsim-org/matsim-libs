@@ -70,7 +70,6 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		forkJoinPool = new ForkJoinPool(drtCfg.getNumberOfThreads());
 		insertionProblem = new ParallelMultiVehicleInsertionProblem(pathDataProvider, drtCfg, mobsimTimer, forkJoinPool,
 				penaltyCalculator);
-		insertionScheduler.initSchedules();
 	}
 
 	@Override

@@ -68,9 +68,10 @@ public class RequestInsertionScheduler {
 		this.travelTime = travelTime;
 		this.scheduleTimingUpdater = scheduleTimingUpdater;
 		this.taskFactory = taskFactory;
+		initSchedules();
 	}
 
-	public void initSchedules() {
+	private void initSchedules() {
 		for (DvrpVehicle veh : fleet.getVehicles().values()) {
 			veh.getSchedule()
 					.addTask(taskFactory.createStayTask(veh, veh.getServiceBeginTime(), veh.getServiceEndTime(),
