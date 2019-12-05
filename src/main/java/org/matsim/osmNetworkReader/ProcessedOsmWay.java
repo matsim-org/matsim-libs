@@ -37,4 +37,8 @@ class ProcessedOsmWay {
 	long getEndNodeId() {
 		return nodeIds.get(nodeIds.size() - 1);
 	}
+
+	long getStartNode() {
+		return nodeIds.get(0);
+	}
 }

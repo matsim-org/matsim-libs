@@ -51,7 +51,7 @@ public class NodesPbfParserTest {
 
 		// all nodes should have a reference count of one
 		assertEquals(1, nodes.get(singleLink.getNodes().get(0).getId()).getFilteredReferencedWays().size());
-		assertEquals(1, nodes.get(singleLink.getNodes().get(1).getId()).getFilteredReferencedWays().size());
+		assertEquals(0, nodes.get(singleLink.getNodes().get(1).getId()).getFilteredReferencedWays().size());
 		assertEquals(1, nodes.get(singleLink.getNodes().get(2).getId()).getFilteredReferencedWays().size());
 	}
 

@@ -20,6 +20,7 @@ import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -90,9 +91,9 @@ public class SupersonicOsmNetworkReaderTest {
 				.network(network)
 				.coordinateTransformation(coordinateTransformation)
 				.linkFilter((coord, level) -> {
-					return (level <= LinkProperties.LEVEL_SECONDARY); //return true;
+					if (level <= LinkProperties.LEVEL_SECONDARY) return true;
 
-					//return (level <= LinkProperties.LEVEL_RESIDENTIAL && ruhrShape.stream().anyMatch(g -> g.contains(MGC.coord2Point(coord))));
+					return (level <= LinkProperties.LEVEL_RESIDENTIAL && ruhrShape.stream().anyMatch(g -> g.contains(MGC.coord2Point(coord))));
 				})
 				//.overridingLinkProperties(linkProperties)
 				.build()

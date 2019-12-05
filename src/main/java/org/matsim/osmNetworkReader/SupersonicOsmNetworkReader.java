@@ -104,7 +104,7 @@ public class SupersonicOsmNetworkReader {
 
 			if (isLoop(fromNodeForSegment, toOsmNode)) {
 				// detected a loop. Keep all nodes of the segment
-				var loopSegments = handleLoop(nodes, fromNodeForSegment, toOsmNode, way, i, linkdIdPostfix);
+				var loopSegments = handleLoop(nodes, fromNodeForSegment, way, i, linkdIdPostfix);
 				segments.addAll(loopSegments);
 
 				// set up next iteration
@@ -139,26 +139,30 @@ public class SupersonicOsmNetworkReader {
 	}
 
 
-	private Collection<WaySegment> handleLoop(Map<Long, ProcessedOsmNode> nodes, ProcessedOsmNode fromNode, ProcessedOsmNode toNode, ProcessedOsmWay way, int toNodeIndex, int idPostfix) {
+	private Collection<WaySegment> handleLoop(Map<Long, ProcessedOsmNode> nodes, ProcessedOsmNode node, ProcessedOsmWay way, int toNodeIndex, int idPostfix) {
 
+		// we need an extra test whether the loop is within the link filter
+		if (!linkFilter.test(node.getCoord(), way.getLinkProperties().hierachyLevel))
+			return Collections.emptyList();
+
+		// we assume that the whole loop should be included
 		List<WaySegment> result = new ArrayList<>();
-		var toSegmentNode = toNode;
+		var toSegmentNode = node;
+
 		// iterate backwards and keep all elements of the loop. Don't do thinning since this is an edge case
 		for (int i = toNodeIndex - 1; i > 0; i--) {
 
 			var fromId = way.getNodeIds().get(i);
 			var fromSegmentNode = nodes.get(fromId);
 
-			if (fromSegmentNode.isWayReferenced(way.getId()) || toSegmentNode.isWayReferenced(way.getId())) {
+			result.add(new WaySegment(
+					fromSegmentNode, toSegmentNode,
+					CoordUtils.calcEuclideanDistance(fromSegmentNode.getCoord(), toSegmentNode.getCoord()),
+					way.getLinkProperties(),
+					way.getTags(),
+					way.getId(), way.getId() * 10000 + idPostfix));
 
-				result.add(new WaySegment(
-						fromSegmentNode, toSegmentNode,
-						CoordUtils.calcEuclideanDistance(fromSegmentNode.getCoord(), toSegmentNode.getCoord()),
-						way.getLinkProperties(),
-						way.getTags(),
-						way.getId(), way.getId() * 10000 + idPostfix));
-			}
-			if (fromId == fromNode.getId()) {
+			if (fromId == node.getId()) {
 				// finish creating segments after creating the last one
 				break;
 			}
@@ -174,28 +178,28 @@ public class SupersonicOsmNetworkReader {
 		List<Link> result = new ArrayList<>();
 
 		var fromNode = createNode(segment.getFromNode().getCoord(), segment.getFromNode().getId());
-			var toNode = createNode(segment.getToNode().getCoord(), segment.getToNode().getId());
+		var toNode = createNode(segment.getToNode().getCoord(), segment.getToNode().getId());
 
-			if (!isOnewayReverse(segment.tags)) {
-				Link forwardLink = createLink(fromNode, toNode, segment, false);
-				result.add(forwardLink);
-			}
+		if (!isOnewayReverse(segment.tags)) {
+			Link forwardLink = createLink(fromNode, toNode, segment, false);
+			result.add(forwardLink);
+		}
 
-			if (!isOneway(segment.getTags(), properties)) {
-				Link reverseLink = createLink(toNode, fromNode, segment, true);
-				result.add(reverseLink);
-			}
+		if (!isOneway(segment.getTags(), properties)) {
+			Link reverseLink = createLink(toNode, fromNode, segment, true);
+			result.add(reverseLink);
+		}
 
 		return result.stream();
 	}
 
-    // same here. Node id-creation seems to be tricky when multi-threading
-    private Node createNode(Coord coord, long nodeId) {
-        synchronized (Id.class) {
-            Id<Node> id = Id.createNodeId(nodeId);
-            return network.getFactory().createNode(id, coord);
-        }
-    }
+	// same here. Node id-creation seems to be tricky when multi-threading
+	private Node createNode(Coord coord, long nodeId) {
+		synchronized (Id.class) {
+			Id<Node> id = Id.createNodeId(nodeId);
+			return network.getFactory().createNode(id, coord);
+		}
+	}
 
 	private Link createLink(Node fromNode, Node toNode, WaySegment segment, boolean isReverse) {
 
@@ -203,11 +207,11 @@ public class SupersonicOsmNetworkReader {
 		LinkProperties properties = linkProperties.get(highwayType);
 
 		long linkId = isReverse ? segment.getSegmentId() + 1 : segment.getSegmentId();
-        Link link;
-        // my guess is that somehow the creation of ids causes a race condition when adding links to the network
-        synchronized (Id.class) {
-            link = network.getFactory().createLink(Id.createLinkId(linkId), fromNode, toNode);
-        }
+		Link link;
+		// my guess is that somehow the creation of ids causes a race condition when adding links to the network
+		synchronized (Id.class) {
+			link = network.getFactory().createLink(Id.createLinkId(linkId), fromNode, toNode);
+		}
 		link.setLength(segment.getLength());
 		link.setFreespeed(getFreespeed(segment.getTags(), link.getLength(), properties));
 		link.setNumberOfLanes(getNumberOfLanes(segment.getTags(), isReverse, properties));
@@ -275,7 +279,7 @@ public class SupersonicOsmNetworkReader {
 	 * All links longer than 300m the default freesped property is assumed
 	 */
 	private double calculateSpeedIfNoSpeedTag(LinkProperties properties, double linkLength) {
-        if (properties.hierachyLevel > LinkProperties.LEVEL_MOTORWAY && properties.hierachyLevel <= LinkProperties.LEVEL_TERTIARY
+		if (properties.hierachyLevel > LinkProperties.LEVEL_MOTORWAY && properties.hierachyLevel <= LinkProperties.LEVEL_TERTIARY
 				&& linkLength < 300) {
 			return ((10 + (properties.freespeed - 10) / 300 * linkLength) / 3.6);
 		}
@@ -312,23 +316,23 @@ public class SupersonicOsmNetworkReader {
 	private synchronized void addLinkToNetwork(Link link) {
 
 		//we have to test for presence
-            if (!network.getNodes().containsKey(link.getFromNode().getId())) {
-                network.addNode(link.getFromNode());
-            }
+		if (!network.getNodes().containsKey(link.getFromNode().getId())) {
+			network.addNode(link.getFromNode());
+		}
 
-        if (!network.getNodes().containsKey(link.getToNode().getId())) {
-                network.addNode(link.getToNode());
-            }
+		if (!network.getNodes().containsKey(link.getToNode().getId())) {
+			network.addNode(link.getToNode());
+		}
 
-        if (!network.getLinks().containsKey(link.getId())) {
-                network.addLink(link);
-            } else {
-                log.error("Link id: " + link.getId() + " was already present. This should not happen");
-                log.error("The link associated with this id: " + link.toString());
-                throw new RuntimeException("Link id: " + link.getId() + " was already present!");
-            }
+		if (!network.getLinks().containsKey(link.getId())) {
+			network.addLink(link);
+		} else {
+			log.error("Link id: " + link.getId() + " was already present. This should not happen");
+			log.error("The link associated with this id: " + link.toString());
+			throw new RuntimeException("Link id: " + link.getId() + " was already present!");
+		}
 
-    }
+	}
 
 	@RequiredArgsConstructor
 	@Getter

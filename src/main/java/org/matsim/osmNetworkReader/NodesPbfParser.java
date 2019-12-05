@@ -16,6 +16,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.NumberFormat;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
@@ -115,7 +116,12 @@ class NodesPbfParser extends PbfParser implements OsmHandler {
 
             var waysThatReferenceNode = nodesToKeep.get(osmNode.getId());
             var transformedCoord = coordinateTransformation.transform(new Coord(osmNode.getLongitude(), osmNode.getLatitude()));
-            var filteredReferencingLinks = testWhetherReferencingLinksAreInFilter(transformedCoord, waysThatReferenceNode);
+
+            List<ProcessedOsmWay> filteredReferencingLinks;
+            if (waysThatReferenceNode.size() > 1 || isEndNodeOfReferencingLink(osmNode, waysThatReferenceNode.get(0)))
+                filteredReferencingLinks = testWhetherReferencingLinksAreInFilter(transformedCoord, waysThatReferenceNode);
+            else
+                filteredReferencingLinks = Collections.emptyList();
 
             var result = new ProcessedOsmNode(osmNode.getId(), filteredReferencingLinks, transformedCoord);
             this.nodes.put(result.getId(), result);
@@ -123,6 +129,10 @@ class NodesPbfParser extends PbfParser implements OsmHandler {
         if (counter.get() % 500000 == 0) {
             log.info("Read: " + NumberFormat.getNumberInstance(Locale.US).format(counter.get()) + " nodes");
         }
+    }
+
+    private boolean isEndNodeOfReferencingLink(OsmNode node, ProcessedOsmWay processedOsmWay) {
+        return processedOsmWay.getEndNodeId() == node.getId() || processedOsmWay.getStartNode() == node.getId();
     }
 
     private List<ProcessedOsmWay> testWhetherReferencingLinksAreInFilter(Coord coord, List<ProcessedOsmWay> waysThatReferenceNode) {
