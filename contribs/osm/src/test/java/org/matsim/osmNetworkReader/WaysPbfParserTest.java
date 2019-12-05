@@ -1,6 +1,8 @@
 package org.matsim.osmNetworkReader;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -16,11 +18,14 @@ public class WaysPbfParserTest {
 
     private static ExecutorService executor = Executors.newSingleThreadExecutor();
 
+    @Rule
+    public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
+
     @Test
     public void parse_singleLink() throws IOException {
 
         var singleLink = Utils.createSingleLink();
-        Path file = Paths.get("parallel-ways-parser-single-link.pbf");
+        Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "parallel-ways-parser-single-link.pbf");
         Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
         var waysParser = new WaysPbfParser(executor, LinkProperties.createLinkProperties());
@@ -46,7 +51,7 @@ public class WaysPbfParserTest {
     public void test_twoIntersectingWays() throws IOException {
 
         var twoIntersectingLinks = Utils.createTwoIntersectingLinksWithDifferentLevels();
-        Path file = Paths.get("parallel-ways-parser-two-intersecting-links.pbf");
+        Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "parallel-ways-parser-two-intersecting-links.pbf");
         Utils.writeOsmData(twoIntersectingLinks.getNodes(), twoIntersectingLinks.getWays(), file);
 
         var waysParser = new WaysPbfParser(executor, LinkProperties.createLinkProperties());

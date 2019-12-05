@@ -1,8 +1,10 @@
 package org.matsim.osmNetworkReader;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.transformations.AtlantisToWGS84;
+import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -18,12 +20,15 @@ public class NodesPbfParserTest {
 
 	private static ExecutorService executor = Executors.newSingleThreadExecutor();
 
+	@Rule
+	public MatsimTestUtils matsimUtils = new MatsimTestUtils();
+
 	@Test
 	public void parse_singleLink() throws IOException {
 
 		var singleLink = Utils.createSingleLink();
 
-		Path file = Paths.get("parallel-nodes-parser-single-link.pbf");
+		Path file = Paths.get(matsimUtils.getOutputDirectory(), "parallel-nodes-parser-single-link.pbf");
 		Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
 		var waysParser = new WaysPbfParser(executor, LinkProperties.createLinkProperties());
@@ -62,7 +67,7 @@ public class NodesPbfParserTest {
 
 		var singleLink = Utils.createSingleLink();
 
-		Path file = Paths.get("parallel-nodes-parser-single-link-with-transformation.pbf");
+		Path file = Paths.get(matsimUtils.getOutputDirectory(), "parallel-nodes-parser-single-link-with-transformation.pbf");
 		Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
 		var waysParser = new WaysPbfParser(executor, LinkProperties.createLinkProperties());
@@ -98,7 +103,7 @@ public class NodesPbfParserTest {
 
 		var twoIntersectingLinks = Utils.createTwoIntersectingLinksWithDifferentLevels();
 
-		Path file = Paths.get("parallel-nodes-parser-intersecting-links.pbf");
+		Path file = Paths.get(matsimUtils.getOutputDirectory(), "parallel-nodes-parser-intersecting-links.pbf");
 		Utils.writeOsmData(twoIntersectingLinks.getNodes(), twoIntersectingLinks.getWays(), file);
 
 		var waysParser = new WaysPbfParser(executor, LinkProperties.createLinkProperties());
@@ -136,7 +141,7 @@ public class NodesPbfParserTest {
 
 		var twoIntersectingLinks = Utils.createTwoIntersectingLinksWithDifferentLevels();
 
-		Path file = Paths.get("parallel-nodes-parser-intersecting-links.pbf");
+		Path file = Paths.get(matsimUtils.getOutputDirectory(), "parallel-nodes-parser-intersecting-links.pbf");
 		Utils.writeOsmData(twoIntersectingLinks.getNodes(), twoIntersectingLinks.getWays(), file);
 
 		var waysParser = new WaysPbfParser(executor, LinkProperties.createLinkProperties());

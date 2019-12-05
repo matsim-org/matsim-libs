@@ -9,6 +9,7 @@ import de.topobyte.osm4j.core.model.impl.Way;
 import de.topobyte.osm4j.pbf.seq.PbfWriter;
 import org.apache.log4j.Logger;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
@@ -25,6 +26,7 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.OsmNetworkReader;
+import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -47,6 +49,9 @@ public class SupersonicOsmNetworkReaderTest {
 	private static final CoordinateTransformation transformation = new IdentityTransformation();
 	private static final String MOTORWAY = "motorway";
 	private static final String TERTIARY = "tertiary";
+
+	@Rule
+	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
 
 	private static void writeOsmData(Collection<OsmNode> nodes, Collection<OsmWay> ways, Path file) {
 
@@ -125,7 +130,7 @@ public class SupersonicOsmNetworkReaderTest {
 
 		var singleLink = Utils.createSingleLink();
 
-		Path file = Paths.get("single-link-one-way.pbf");
+		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-one-way.pbf");
 		writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
 
@@ -169,7 +174,7 @@ public class SupersonicOsmNetworkReaderTest {
 
 		var singleLink = Utils.createSingleLink();
 
-		Path file = Paths.get("single-link-preserve-node.pbf");
+		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-preserve-node.pbf");
 
 		writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
@@ -210,7 +215,7 @@ public class SupersonicOsmNetworkReaderTest {
 		var wayWithMaxSpeed = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY),
 				new Tag(OsmTags.MAXSPEED, "60")));
 
-		Path file = Paths.get("single-link-with-max-speed.pbf");
+		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-with-max-speed.pbf");
 		writeOsmData(List.of(node1, node2), List.of(wayWithMaxSpeed), file);
 
 		var network = new SupersonicOsmNetworkReader.Builder()
@@ -234,7 +239,7 @@ public class SupersonicOsmNetworkReaderTest {
 		var wayWithMaxSpeedMph = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY),
 				new Tag(OsmTags.MAXSPEED, "60 mph")));
 
-		Path file = Paths.get("single-link-with-max-speed-in-mph.pbf");
+		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-with-max-speed-in-mph.pbf");
 		writeOsmData(List.of(node1, node2), List.of(wayWithMaxSpeedMph), file);
 
 		var network = new SupersonicOsmNetworkReader.Builder()
@@ -258,7 +263,7 @@ public class SupersonicOsmNetworkReaderTest {
 		var wayWithMaxSpeedUrban = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY),
 				new Tag(OsmTags.MAXSPEED, "50")));
 
-		Path file = Paths.get("single-link-with-max-speed-urban-link.pbf");
+		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-with-max-speed-urban-link.pbf");
 		writeOsmData(List.of(node1, node2), List.of(wayWithMaxSpeedUrban), file);
 
 		var network = new SupersonicOsmNetworkReader.Builder()
@@ -282,7 +287,7 @@ public class SupersonicOsmNetworkReaderTest {
 		var wayWithInvalidMaxSpeed = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, MOTORWAY),
 				new Tag(OsmTags.MAXSPEED, "not a number")));
 
-		Path file = Paths.get("single-link-with-unknown-max-speed.pbf");
+		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-with-unknown-max-speed.pbf");
 		writeOsmData(List.of(node1, node2), List.of(wayWithInvalidMaxSpeed), file);
 
 		var network = new SupersonicOsmNetworkReader.Builder()
@@ -307,7 +312,7 @@ public class SupersonicOsmNetworkReaderTest {
 		var wayWithoutMaxSpeed = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY)
 		));
 
-		Path file = Paths.get("single-link-no-max-speed-rural-link.pbf");
+		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-no-max-speed-rural-link.pbf");
 		writeOsmData(List.of(node1, node2), List.of(wayWithoutMaxSpeed), file);
 
 		var network = new SupersonicOsmNetworkReader.Builder()
@@ -332,7 +337,7 @@ public class SupersonicOsmNetworkReaderTest {
 		var wayWithoutMaxSpeed = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY)
 		));
 
-		Path file = Paths.get("single-link-no-max-speed-urban-link.pbf");
+		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-no-max-speed-urban-link.pbf");
 		writeOsmData(List.of(node1, node2), List.of(wayWithoutMaxSpeed), file);
 
 		var network = new SupersonicOsmNetworkReader.Builder()
@@ -358,7 +363,7 @@ public class SupersonicOsmNetworkReaderTest {
 
 		var way = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY)));
 
-		Path file = Paths.get("single-link-with-no-lanes-tag.pbf");
+		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-with-no-lanes-tag.pbf");
 		writeOsmData(List.of(node1, node2), List.of(way), file);
 
 		var network = new SupersonicOsmNetworkReader.Builder()
@@ -384,7 +389,7 @@ public class SupersonicOsmNetworkReaderTest {
 		var way = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY),
 				new Tag("lanes", "4")));
 
-		Path file = Paths.get("single-link-with-lanes-tag.pbf");
+		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-with-lanes-tag.pbf");
 		writeOsmData(List.of(node1, node2), List.of(way), file);
 
 		var network = new SupersonicOsmNetworkReader.Builder()
@@ -409,7 +414,7 @@ public class SupersonicOsmNetworkReaderTest {
 		var way = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY),
 				new Tag("lanes", "4"), new Tag("oneway", "true")));
 
-		Path file = Paths.get("single-oneway-link-with-lanes-tag.pbf");
+		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-oneway-link-with-lanes-tag.pbf");
 		writeOsmData(List.of(node1, node2), List.of(way), file);
 
 		var network = new SupersonicOsmNetworkReader.Builder()
@@ -434,7 +439,7 @@ public class SupersonicOsmNetworkReaderTest {
 		var way = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY),
 				new Tag("lanes", "4"), new Tag("lanes:forward", "4"), new Tag("lanes:backward", "1")));
 
-		Path file = Paths.get("single-link-with-lanes-forward-and-backward-tag.pbf");
+		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-with-lanes-forward-and-backward-tag.pbf");
 		writeOsmData(List.of(node1, node2), List.of(way), file);
 
 
@@ -462,7 +467,7 @@ public class SupersonicOsmNetworkReaderTest {
 
 		var way = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY)));
 
-		Path file = Paths.get("single-link-capacity-for-long-link.pbf");
+		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-capacity-for-long-link.pbf");
 		writeOsmData(List.of(node1, node2), List.of(way), file);
 
 		var network = new SupersonicOsmNetworkReader.Builder()
@@ -486,7 +491,7 @@ public class SupersonicOsmNetworkReaderTest {
 
 		var way = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY)));
 
-		Path file = Paths.get("single-link-capacity-for-short-link.pbf");
+		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-capacity-for-short-link.pbf");
 		writeOsmData(List.of(node1, node2), List.of(way), file);
 
 		var network = new SupersonicOsmNetworkReader.Builder()
@@ -512,7 +517,7 @@ public class SupersonicOsmNetworkReaderTest {
 
 		var way = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, linkCategory)));
 
-		Path file = Paths.get("single-link-overriding-link-properties.pbf");
+		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-overriding-link-properties.pbf");
 		writeOsmData(List.of(node1, node2), List.of(way), file);
 
 		var network = new SupersonicOsmNetworkReader.Builder()
@@ -538,7 +543,7 @@ public class SupersonicOsmNetworkReaderTest {
 				new Node(4, 0, 2), new Node(5, 2, 0));
 		final List<OsmWay> ways = List.of(new Way(1, new TLongArrayList(new long[]{1, 2, 3}), tags),
 				new Way(2, new TLongArrayList(new long[]{4, 2, 5}), tags));
-		final var file = Paths.get("two-intersecting-links.pbf");
+		final var file = Paths.get(matsimTestUtils.getOutputDirectory(), "two-intersecting-links.pbf");
 		writeOsmData(nodes, ways, file);
 
 		var network = new SupersonicOsmNetworkReader.Builder()
@@ -579,7 +584,7 @@ public class SupersonicOsmNetworkReaderTest {
 				new Node(4, 0, 2), new Node(5, 2, 0));
 		final List<OsmWay> ways = List.of(new Way(1, new TLongArrayList(new long[]{1, 2, 3}), tags),
 				new Way(2, new TLongArrayList(new long[]{4, 2, 5}), tags));
-		final var file = Paths.get("two-intersecting-links.pbf");
+		final var file = Paths.get(matsimTestUtils.getOutputDirectory(), "two-intersecting-links.pbf");
 		writeOsmData(nodes, ways, file);
 
 		var allowedModes = new HashSet<>(List.of(TransportMode.car, TransportMode.airplane));
@@ -628,7 +633,7 @@ public class SupersonicOsmNetworkReaderTest {
 				new Node(6, 3, 3));
 		final List<OsmWay> ways = List.of(new Way(1, new TLongArrayList(new long[]{1, 2, 3, 6}), tags),
 				new Way(2, new TLongArrayList(new long[]{4, 2, 5}), tags));
-		final var file = Paths.get("two-intersecting-links.pbf");
+		final var file = Paths.get(matsimTestUtils.getOutputDirectory(), "two-intersecting-links.pbf");
 		writeOsmData(nodes, ways, file);
 
 		var network = new SupersonicOsmNetworkReader.Builder()
@@ -649,7 +654,7 @@ public class SupersonicOsmNetworkReaderTest {
 	public void linkGrid_oneWayNotInFilter() {
 
 		var grid = Utils.createGridWithDifferentLevels();
-		final var file = Paths.get("grid-with-filter.pbf");
+		final var file = Paths.get(matsimTestUtils.getOutputDirectory(), "grid-with-filter.pbf");
 		writeOsmData(grid.getNodes(), grid.getWays(), file);
 
 		var network = new SupersonicOsmNetworkReader.Builder()
@@ -685,7 +690,7 @@ public class SupersonicOsmNetworkReaderTest {
 				new Node(7, 4, 3), new Node(8, 4, 2));
 		final List<OsmWay> ways = List.of(new Way(1, new TLongArrayList(new long[]{1, 2, 6, 7, 8, 6, 3}), tags),
 				new Way(2, new TLongArrayList(new long[]{4, 2, 5}), tags));
-		final var file = Paths.get("two-intersecting-links-with-loop.pbf");
+		final var file = Paths.get(matsimTestUtils.getOutputDirectory(), "two-intersecting-links-with-loop.pbf");
 		writeOsmData(nodes, ways, file);
 
 		var network = new SupersonicOsmNetworkReader.Builder()
