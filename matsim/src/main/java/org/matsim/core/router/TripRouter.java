@@ -293,7 +293,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 			}
 			if( indexOfDestination != -1 && indexOfOrigin != -1){
 				if (indexOfDestination < indexOfOrigin ) {
-					if(indexOfDestination == 0){ //the last activity in the plan might be the same as the firt activity, so this could be the last (return) trip of the day. we should continue searching
+					if(indexOfDestination == 0){ //the last activity in the plan might be the same as the first activity, so this could be the last (return) trip of the day. we should continue searching
 						indexOfDestination = -1;
 						currentIndex ++;
 						continue;
