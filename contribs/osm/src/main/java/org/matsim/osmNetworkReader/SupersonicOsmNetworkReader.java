@@ -35,28 +35,16 @@ public class SupersonicOsmNetworkReader {
 	private Network network;
 
 	private SupersonicOsmNetworkReader(CoordinateTransformation coordinateTransformation,
-									   Map<String, LinkProperties> overridingLinkProperties,
+									   ConcurrentMap<String, LinkProperties> linkPropertiesMap,
 									   BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy, Predicate<Long> preserveNodeWithId,
 									   AfterLinkCreated afterLinkCreated) {
-		if (coordinateTransformation == null) {
-			throw new IllegalArgumentException("Target coordinate transformation is required parameter!");
-		}
 
 		this.coordinateTransformation = coordinateTransformation;
+		this.includeLinkAtCoordWithHierarchy = includeLinkAtCoordWithHierarchy;
+		this.afterLinkCreated = afterLinkCreated;
+		this.preserveNodeWithId = preserveNodeWithId;
 
-		// set default implementations if properties were not supplied by builder
-		this.includeLinkAtCoordWithHierarchy = includeLinkAtCoordWithHierarchy == null ? (coord, level) -> true : includeLinkAtCoordWithHierarchy;
-		this.afterLinkCreated = afterLinkCreated == null ? (link, tags, reverse) -> {
-		} : afterLinkCreated;
-		this.preserveNodeWithId = preserveNodeWithId == null ? id -> false : preserveNodeWithId;
-
-		var linkProperties = LinkProperties.createLinkProperties();
-		if (overridingLinkProperties != null) {
-			for (Map.Entry<String, LinkProperties> entry : overridingLinkProperties.entrySet()) {
-				linkProperties.put(entry.getKey(), entry.getValue());
-			}
-		}
-		this.linkProperties = linkProperties;
+		this.linkProperties = linkPropertiesMap;
 	}
 
 	public Network read(String inputFile) {
@@ -371,6 +359,11 @@ public class SupersonicOsmNetworkReader {
 		}
 
 		public SupersonicOsmNetworkReader build() {
+
+			if (coordinateTransformation == null) {
+				throw new IllegalArgumentException("Target coordinate transformation is required parameter!");
+			}
+
 			return new SupersonicOsmNetworkReader(
 					coordinateTransformation, linkProperties, includeLinkAtCoordWithHierarchy,
 					preserveNodeWithId, afterLinkCreated
