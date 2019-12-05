@@ -43,7 +43,6 @@ public class SupersonicOsmNetworkReaderTest {
 
 	private static final CoordinateTransformation transformation = new IdentityTransformation();
 	private static final String MOTORWAY = "motorway";
-	private static final String TRUNK = "trunk";
 	private static final String TERTIARY = "tertiary";
 
 	private static void writeOsmData(Collection<OsmNode> nodes, Collection<OsmWay> ways, Path file) {
@@ -90,12 +89,12 @@ public class SupersonicOsmNetworkReaderTest {
 		new SupersonicOsmNetworkReader.Builder()
 				.network(network)
 				.coordinateTransformation(coordinateTransformation)
-				.linkFilter((coord, level) -> {
+				.includeLinkAtCoordWithHierarchy((coord, level) -> {
 					if (level <= LinkProperties.LEVEL_SECONDARY) return true;
 
 					return (level <= LinkProperties.LEVEL_RESIDENTIAL && ruhrShape.stream().anyMatch(g -> g.contains(MGC.coord2Point(coord))));
 				})
-				//.overridingLinkProperties(linkProperties)
+				.overridingLinkProperties(linkProperties)
 				.build()
 				.read(file);
 
@@ -697,7 +696,7 @@ public class SupersonicOsmNetworkReaderTest {
 				.network(network)
 				.coordinateTransformation(transformation)
 				// we don't want the tertiary link wich is on the 'right' side of the grid
-				.linkFilter((coord, level) -> !(level == LinkProperties.LEVEL_TERTIARY && coord.getX() > 100))
+				.includeLinkAtCoordWithHierarchy((coord, level) -> !(level == LinkProperties.LEVEL_TERTIARY && coord.getX() > 100))
 				.build()
 				.read(file);
 

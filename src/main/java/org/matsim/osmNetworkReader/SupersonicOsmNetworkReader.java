@@ -29,7 +29,7 @@ public class SupersonicOsmNetworkReader {
 	private static final Set<String> notOneWayTags = new HashSet<>(Arrays.asList("no", "false", "0"));
 
 	private final ConcurrentMap<String, LinkProperties> linkProperties;
-	private final BiPredicate<Coord, Integer> linkFilter;
+	private final BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy;
 	private final Predicate<Long> preserveNodeWithId;
 	private final AfterLinkCreated afterLinkCreated;
 	private final CoordinateTransformation coordinateTransformation;
@@ -37,11 +37,10 @@ public class SupersonicOsmNetworkReader {
 	@Getter
 	private final Network network;
 
-
 	@lombok.Builder(builderClassName = "Builder", access = AccessLevel.PUBLIC)
 	private SupersonicOsmNetworkReader(Network network, CoordinateTransformation coordinateTransformation,
 									   Map<String, LinkProperties> overridingLinkProperties,
-									   BiPredicate<Coord, Integer> linkFilter, Predicate<Long> preserveNodeWithId,
+									   BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy, Predicate<Long> preserveNodeWithId,
 									   AfterLinkCreated afterLinkCreated) {
 		if (network == null || coordinateTransformation == null) {
 			throw new IllegalArgumentException("Target network and coordinate transformation are required parameters!");
@@ -50,7 +49,7 @@ public class SupersonicOsmNetworkReader {
 		this.coordinateTransformation = coordinateTransformation;
 
 		// set default implementations if properties were not supplied by builder
-		this.linkFilter = linkFilter == null ? (coord, level) -> true : linkFilter;
+		this.includeLinkAtCoordWithHierarchy = includeLinkAtCoordWithHierarchy == null ? (coord, level) -> true : includeLinkAtCoordWithHierarchy;
 		this.afterLinkCreated = afterLinkCreated == null ? (link, tags, reverse) -> {
 		} : afterLinkCreated;
 		this.preserveNodeWithId = preserveNodeWithId == null ? id -> false : preserveNodeWithId;
@@ -70,7 +69,7 @@ public class SupersonicOsmNetworkReader {
 
 	public void read(Path inputFile) {
 
-		var nodesAndWays = OsmNetworkParser.parse(inputFile, linkProperties, coordinateTransformation, linkFilter);
+		var nodesAndWays = OsmNetworkParser.parse(inputFile, linkProperties, coordinateTransformation, includeLinkAtCoordWithHierarchy);
 		log.info("starting convertion \uD83D\uDE80");
 		convert(nodesAndWays.getWays(), nodesAndWays.getNodes());
 		log.info("finished convertion");
@@ -142,7 +141,7 @@ public class SupersonicOsmNetworkReader {
 	private Collection<WaySegment> handleLoop(Map<Long, ProcessedOsmNode> nodes, ProcessedOsmNode node, ProcessedOsmWay way, int toNodeIndex, int idPostfix) {
 
 		// we need an extra test whether the loop is within the link filter
-		if (!linkFilter.test(node.getCoord(), way.getLinkProperties().hierachyLevel))
+		if (!includeLinkAtCoordWithHierarchy.test(node.getCoord(), way.getLinkProperties().hierachyLevel))
 			return Collections.emptyList();
 
 		// we assume that the whole loop should be included
