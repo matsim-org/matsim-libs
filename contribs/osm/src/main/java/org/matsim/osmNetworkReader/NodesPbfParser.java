@@ -7,9 +7,7 @@ import de.topobyte.osm4j.core.model.iface.OsmRelation;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.pbf.protobuf.Osmformat;
 import de.topobyte.osm4j.pbf.seq.PrimParser;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
@@ -27,9 +25,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
-@Log4j2
+
 class NodesPbfParser extends PbfParser implements OsmHandler {
+
+    private static final Logger log = Logger.getLogger(NodesPbfParser.class);
 
     private final Phaser phaser = new Phaser();
     private final AtomicInteger counter = new AtomicInteger();
@@ -39,8 +38,18 @@ class NodesPbfParser extends PbfParser implements OsmHandler {
     private final ConcurrentMap<Long, List<ProcessedOsmWay>> nodesToKeep;
     private final CoordinateTransformation coordinateTransformation;
 
-    @Getter
     private final ConcurrentMap<Long, ProcessedOsmNode> nodes = new ConcurrentHashMap<>();
+
+    public NodesPbfParser(ExecutorService executor, BiPredicate<Coord, Integer> linkFilter, ConcurrentMap<Long, List<ProcessedOsmWay>> nodesToKeep, CoordinateTransformation coordinateTransformation) {
+        this.executor = executor;
+        this.linkFilter = linkFilter;
+        this.nodesToKeep = nodesToKeep;
+        this.coordinateTransformation = coordinateTransformation;
+    }
+
+    public ConcurrentMap<Long, ProcessedOsmNode> getNodes() {
+        return nodes;
+    }
 
     int getCount() {
         return counter.get();

@@ -1,9 +1,6 @@
 package org.matsim.osmNetworkReader;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -21,8 +18,9 @@ import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-@Log4j2
 public class SupersonicOsmNetworkReader {
+
+	private static final Logger log = Logger.getLogger(SupersonicOsmNetworkReader.class);
 
 	private static final Set<String> reverseTags = new HashSet<>(Arrays.asList("-1", "reverse"));
 	private static final Set<String> oneWayTags = new HashSet<>(Arrays.asList("yes", "true", "1"));
@@ -36,7 +34,6 @@ public class SupersonicOsmNetworkReader {
 
 	private Network network;
 
-	@lombok.Builder(builderClassName = "Builder", access = AccessLevel.PUBLIC)
 	private SupersonicOsmNetworkReader(CoordinateTransformation coordinateTransformation,
 									   Map<String, LinkProperties> overridingLinkProperties,
 									   BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy, Predicate<Long> preserveNodeWithId,
@@ -315,6 +312,10 @@ public class SupersonicOsmNetworkReader {
 		return properties.lanesPerDirection;
 	}
 
+	public static Builder builder() {
+		return new Builder();
+	}
+
 	private synchronized void addLinkToNetwork(Link link) {
 
 		//we have to test for presence
@@ -333,11 +334,50 @@ public class SupersonicOsmNetworkReader {
 			log.error("The link associated with this id: " + link.toString());
 			throw new RuntimeException("Link id: " + link.getId() + " was already present!");
 		}
-
 	}
 
-	@RequiredArgsConstructor
-	@Getter
+	public static class Builder {
+
+		private ConcurrentMap<String, LinkProperties> linkProperties = LinkProperties.createLinkProperties();
+		private BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy = (coord, level) -> true;
+		private Predicate<Long> preserveNodeWithId = id -> true;
+		private AfterLinkCreated afterLinkCreated = (link, tags, isReverse) -> {
+		};
+		private CoordinateTransformation coordinateTransformation;
+
+		public Builder coordinateTransformation(CoordinateTransformation coordinateTransformation) {
+			this.coordinateTransformation = coordinateTransformation;
+			return this;
+		}
+
+		public Builder includeLinkAtCoordWithHierarchy(BiPredicate<Coord, Integer> predicate) {
+			this.includeLinkAtCoordWithHierarchy = predicate;
+			return this;
+		}
+
+		public Builder preserveNodeWithId(Predicate<Long> predicate) {
+			this.preserveNodeWithId = predicate;
+			return this;
+		}
+
+		public Builder afterLinkCreated(AfterLinkCreated consumer) {
+			this.afterLinkCreated = consumer;
+			return this;
+		}
+
+		public Builder addOverridingLinkProperties(String highwayType, LinkProperties properties) {
+			linkProperties.put(highwayType, properties);
+			return this;
+		}
+
+		public SupersonicOsmNetworkReader build() {
+			return new SupersonicOsmNetworkReader(
+					coordinateTransformation, linkProperties, includeLinkAtCoordWithHierarchy,
+					preserveNodeWithId, afterLinkCreated
+			);
+		}
+	}
+
 	private static class WaySegment {
 		private final ProcessedOsmNode fromNode;
 		private final ProcessedOsmNode toNode;
@@ -346,6 +386,44 @@ public class SupersonicOsmNetworkReader {
 		private final Map<String, String> tags;
 		private final long originalWayId;
 		private final long segmentId;
+
+		public WaySegment(ProcessedOsmNode fromNode, ProcessedOsmNode toNode, double length, LinkProperties linkProperties, Map<String, String> tags, long originalWayId, long segmentId) {
+			this.fromNode = fromNode;
+			this.toNode = toNode;
+			this.length = length;
+			this.linkProperties = linkProperties;
+			this.tags = tags;
+			this.originalWayId = originalWayId;
+			this.segmentId = segmentId;
+		}
+
+		public ProcessedOsmNode getFromNode() {
+			return fromNode;
+		}
+
+		public ProcessedOsmNode getToNode() {
+			return toNode;
+		}
+
+		public double getLength() {
+			return length;
+		}
+
+		public LinkProperties getLinkProperties() {
+			return linkProperties;
+		}
+
+		public Map<String, String> getTags() {
+			return tags;
+		}
+
+		public long getOriginalWayId() {
+			return originalWayId;
+		}
+
+		public long getSegmentId() {
+			return segmentId;
+		}
 	}
 
 	@FunctionalInterface

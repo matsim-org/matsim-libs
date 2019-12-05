@@ -1,18 +1,32 @@
 package org.matsim.osmNetworkReader;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.matsim.api.core.v01.Coord;
 
 import java.util.List;
 
-@RequiredArgsConstructor
-@Getter
 class ProcessedOsmNode {
 
 	private final long id;
 	private final List<ProcessedOsmWay> filteredReferencedWays;
 	private final Coord coord;
+
+	public ProcessedOsmNode(long id, List<ProcessedOsmWay> filteredReferencedWays, Coord coord) {
+		this.id = id;
+		this.filteredReferencedWays = filteredReferencedWays;
+		this.coord = coord;
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public List<ProcessedOsmWay> getFilteredReferencedWays() {
+		return filteredReferencedWays;
+	}
+
+	public Coord getCoord() {
+		return coord;
+	}
 
 	boolean isWayReferenced(long wayId) {
 		return filteredReferencedWays.stream()

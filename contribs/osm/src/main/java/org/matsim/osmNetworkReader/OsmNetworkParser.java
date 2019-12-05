@@ -1,6 +1,6 @@
 package org.matsim.osmNetworkReader;
 
-import lombok.extern.log4j.Log4j2;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
@@ -14,8 +14,9 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
 import java.util.function.BiPredicate;
 
-@Log4j2
 class OsmNetworkParser {
+
+	private static Logger log = Logger.getLogger(OsmNetworkParser.class);
 
 	static NodesAndWays parse(Path inputFile, ConcurrentMap<String, LinkProperties> linkPropertiesMap, CoordinateTransformation transformation, BiPredicate<Coord, Integer> linkFilter) {
 

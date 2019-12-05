@@ -7,9 +7,7 @@ import de.topobyte.osm4j.core.model.impl.Node;
 import de.topobyte.osm4j.core.model.impl.Tag;
 import de.topobyte.osm4j.core.model.impl.Way;
 import de.topobyte.osm4j.pbf.seq.PbfWriter;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import org.apache.log4j.Logger;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 
@@ -20,13 +18,13 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 
-@Log4j2
 public class Utils {
 
-    static final CoordinateTransformation transformation = new IdentityTransformation();
-    static final String MOTORWAY = "motorway";
-    static final String TRUNK = "trunk";
-    static final String TERTIARY = "tertiary";
+	static final CoordinateTransformation transformation = new IdentityTransformation();
+	static final String MOTORWAY = "motorway";
+	static final String TRUNK = "trunk";
+	static final String TERTIARY = "tertiary";
+	private static final Logger log = Logger.getLogger(Utils.class);
 
 
 	static void writeOsmData(Collection<OsmNode> nodes, Collection<OsmWay> ways, Path file) {
@@ -98,11 +96,22 @@ public class Utils {
 		return new WaysAndLinks(nodesList, waysList);
 	}
 
-	@Getter
-	@RequiredArgsConstructor
 	static class WaysAndLinks {
 
 		private final List<OsmNode> nodes;
 		private final List<OsmWay> ways;
+
+		public WaysAndLinks(List<OsmNode> nodes, List<OsmWay> ways) {
+			this.nodes = nodes;
+			this.ways = ways;
+		}
+
+		public List<OsmNode> getNodes() {
+			return nodes;
+		}
+
+		public List<OsmWay> getWays() {
+			return ways;
+		}
 	}
 }

@@ -7,7 +7,7 @@ import de.topobyte.osm4j.core.model.impl.Node;
 import de.topobyte.osm4j.core.model.impl.Tag;
 import de.topobyte.osm4j.core.model.impl.Way;
 import de.topobyte.osm4j.pbf.seq.PbfWriter;
-import lombok.extern.java.Log;
+import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.locationtech.jts.geom.Geometry;
@@ -33,14 +33,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
-@Log
 public class SupersonicOsmNetworkReaderTest {
 
+	private static final Logger log = Logger.getLogger(SupersonicOsmNetworkReaderTest.class);
 	private static final CoordinateTransformation transformation = new IdentityTransformation();
 	private static final String MOTORWAY = "motorway";
 	private static final String TERTIARY = "tertiary";
@@ -58,7 +61,7 @@ public class SupersonicOsmNetworkReaderTest {
 			}
 			writer.complete();
 		} catch (IOException e) {
-			log.severe("could not write osm data");
+			log.error("could not write osm data");
 			e.printStackTrace();
 		}
 	}
@@ -71,14 +74,6 @@ public class SupersonicOsmNetworkReaderTest {
 		//Path file = Paths.get("C:\\Users\\Janek\\Downloads\\bremen-latest.osm(1).pbf");
 		Path output = Paths.get("C:\\Users\\Janek\\Desktop\\test-network.xml.gz");
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832");
-		var linkProperties = Map.of(
-				"residential", new LinkProperties(9, 1, 30.0 / 3.6, 1500, false),
-				"cycleway", new LinkProperties(9, 1, 30.0 / 3.6, 1500, false),
-				"service", new LinkProperties(9, 1, 10.0 / 3.6, 1000, false),
-
-				"footway", new LinkProperties(9, 1, 10.0 / 3.6, 600, false),
-				"pedestrian", new LinkProperties(9, 1, 10.0 / 3.6, 600, false),
-				"path", new LinkProperties(9, 1, 20.0 / 3.6, 600, false));
 
 		List<Geometry> ruhrShape = ShapeFileReader.getAllFeatures(Paths.get("C:\\Users\\Janek\\repos\\shared-svn\\projects\\nemo_mercator\\data\\original_files\\shapeFiles\\shapeFile_Ruhrgebiet\\ruhrgebiet_boundary.shp").toString()).stream()
 				.map(feature -> (Geometry) feature.getDefaultGeometry())
@@ -92,7 +87,11 @@ public class SupersonicOsmNetworkReaderTest {
 
 					return (level <= LinkProperties.LEVEL_RESIDENTIAL && ruhrShape.stream().anyMatch(g -> g.contains(MGC.coord2Point(coord))));
 				})
-				.overridingLinkProperties(linkProperties)
+				.addOverridingLinkProperties("residential", new LinkProperties(9, 1, 30.0 / 3.6, 1500, false))
+				.addOverridingLinkProperties("cycleway", new LinkProperties(9, 1, 30.0 / 3.6, 1500, false))
+				.addOverridingLinkProperties("service", new LinkProperties(9, 1, 10.0 / 3.6, 1000, false))
+				.addOverridingLinkProperties("footway", new LinkProperties(9, 1, 10.0 / 3.6, 600, false))
+				.addOverridingLinkProperties("path", new LinkProperties(9, 1, 20.0 / 3.6, 600, false))
 				.build()
 				.read(file);
 
@@ -518,7 +517,7 @@ public class SupersonicOsmNetworkReaderTest {
 
 		var network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
-				.overridingLinkProperties(Map.of(linkCategory, linkProperties))
+				.addOverridingLinkProperties(linkCategory, linkProperties)
 				.build()
 				.read(file);
 

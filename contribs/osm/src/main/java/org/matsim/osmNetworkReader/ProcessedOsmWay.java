@@ -2,19 +2,38 @@ package org.matsim.osmNetworkReader;
 
 import com.slimjars.dist.gnu.trove.list.array.TLongArrayList;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 
-@RequiredArgsConstructor
-@Getter
 class ProcessedOsmWay {
 
 	private final long id;
 	private final TLongArrayList nodeIds;
 	private final Map<String, String> tags;
 	private final LinkProperties linkProperties;
+
+	public ProcessedOsmWay(long id, TLongArrayList nodeIds, Map<String, String> tags, LinkProperties linkProperties) {
+		this.id = id;
+		this.nodeIds = nodeIds;
+		this.tags = tags;
+		this.linkProperties = linkProperties;
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public TLongArrayList getNodeIds() {
+		return nodeIds;
+	}
+
+	public Map<String, String> getTags() {
+		return tags;
+	}
+
+	public LinkProperties getLinkProperties() {
+		return linkProperties;
+	}
 
 	static ProcessedOsmWay create(OsmWay osmWay, Map<String, String> tags, LinkProperties linkProperties) {
 

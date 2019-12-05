@@ -1,12 +1,9 @@
 package org.matsim.osmNetworkReader;
 
-import lombok.RequiredArgsConstructor;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-@SuppressWarnings("WeakerAccess")
-@RequiredArgsConstructor
 public class LinkProperties {
 
 	public static final int LEVEL_MOTORWAY = 1;
@@ -14,15 +11,43 @@ public class LinkProperties {
 	public static final int LEVEL_PRIMARY = 3;
 	public static final int LEVEL_SECONDARY = 4;
 	public static final int LEVEL_TERTIARY = 5;
-    public static final int LEVEL_UNCLASSIFIED = 6;
-    public static final int LEVEL_RESIDENTIAL = 7;
-    public static final int LEVEL_LIVING_STREET = 8;
+	public static final int LEVEL_UNCLASSIFIED = 6;
+	public static final int LEVEL_RESIDENTIAL = 7;
+	public static final int LEVEL_LIVING_STREET = 8;
 
 	final int hierachyLevel;
 	final double lanesPerDirection;
 	final double freespeed;
 	final double laneCapacity;
 	final boolean oneway;
+
+	public LinkProperties(int hierachyLevel, double lanesPerDirection, double freespeed, double laneCapacity, boolean oneway) {
+		this.hierachyLevel = hierachyLevel;
+		this.lanesPerDirection = lanesPerDirection;
+		this.freespeed = freespeed;
+		this.laneCapacity = laneCapacity;
+		this.oneway = oneway;
+	}
+
+	public int getHierachyLevel() {
+		return hierachyLevel;
+	}
+
+	public double getLanesPerDirection() {
+		return lanesPerDirection;
+	}
+
+	public double getFreespeed() {
+		return freespeed;
+	}
+
+	public double getLaneCapacity() {
+		return laneCapacity;
+	}
+
+	public boolean isOneway() {
+		return oneway;
+	}
 
 	static LinkProperties createMotorway() {
 		return new LinkProperties(LEVEL_MOTORWAY, 2, 120 / 3.6, 2000, true);
