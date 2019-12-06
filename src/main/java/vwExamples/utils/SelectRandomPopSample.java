@@ -29,22 +29,24 @@ import org.matsim.core.scenario.ScenarioUtils;
 import java.util.Random;
 
 /**
- * @author saxer
+ * @author kranke, based on axer
+ * This class generates a random sub sample of a population
  */
 public class SelectRandomPopSample {
 
     //Initialize SubsamplePopulation class
-    static double samplePct = 0.01; //Global sample ratio
-
 
     public static void main(String[] args) {
 
+    	String inputPlan = args[0];
+    	String outputPlan = args[1];
+    	Double samplePct = Double.valueOf(args[2]);
 
         //Create a Scenario
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         //Fill this Scenario with a population.
-        new PopulationReader(scenario).readFile("D:\\Matsim\\Axer\\Hannover\\Base\\vw280_0.1\\vw280_0.1.output_plans.xml.gz");
-        String randomOrderedPop = "Y:\\vw280_0.001.output_plans.xml.gz";
+        new PopulationReader(scenario).readFile(inputPlan);
+        String randomOrderedPop = outputPlan;
         StreamingPopulationWriter filteredPop = new StreamingPopulationWriter();
         filteredPop.startStreaming(randomOrderedPop);
 
