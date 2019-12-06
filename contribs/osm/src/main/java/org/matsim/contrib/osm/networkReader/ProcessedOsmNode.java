@@ -1,4 +1,4 @@
-package org.matsim.osmNetworkReader;
+package org.matsim.contrib.osm.networkReader;
 
 import org.matsim.api.core.v01.Coord;
 

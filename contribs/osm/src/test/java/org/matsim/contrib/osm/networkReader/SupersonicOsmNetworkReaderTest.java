@@ -1,4 +1,4 @@
-package org.matsim.osmNetworkReader;
+package org.matsim.contrib.osm.networkReader;
 
 import com.slimjars.dist.gnu.trove.list.array.TLongArrayList;
 import de.topobyte.osm4j.core.model.iface.OsmNode;
@@ -8,24 +8,17 @@ import de.topobyte.osm4j.core.model.impl.Tag;
 import de.topobyte.osm4j.core.model.impl.Way;
 import de.topobyte.osm4j.pbf.seq.PbfWriter;
 import org.apache.log4j.Logger;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.testcases.MatsimTestUtils;
 
 import java.io.IOException;
@@ -33,10 +26,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -67,60 +57,6 @@ public class SupersonicOsmNetworkReaderTest {
 			e.printStackTrace();
 		}
 	}
-
-    @Test
-    @Ignore
-	public void test() {
-
-		Path file = Paths.get("C:\\Users\\Janek\\repos\\shared-svn\\projects\\nemo_mercator\\data\\original_files\\osm_data\\nordrhein-westfalen-2019-11-21.osm.pbf");
-		//Path file = Paths.get("C:\\Users\\Janek\\Downloads\\bremen-latest.osm(1).pbf");
-		Path output = Paths.get("C:\\Users\\Janek\\Desktop\\test-network.xml.gz");
-		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832");
-
-		List<Geometry> ruhrShape = ShapeFileReader.getAllFeatures(Paths.get("C:\\Users\\Janek\\repos\\shared-svn\\projects\\nemo_mercator\\data\\original_files\\shapeFiles\\shapeFile_Ruhrgebiet\\ruhrgebiet_boundary.shp").toString()).stream()
-				.map(feature -> (Geometry) feature.getDefaultGeometry())
-				.collect(Collectors.toList());
-
-		Instant start = Instant.now();
-		Network network = new SupersonicOsmNetworkReader.Builder()
-				.coordinateTransformation(coordinateTransformation)
-				.includeLinkAtCoordWithHierarchy((coord, level) -> {
-					if (level <= LinkProperties.LEVEL_SECONDARY) return true;
-
-					return (level <= LinkProperties.LEVEL_RESIDENTIAL && ruhrShape.stream().anyMatch(g -> g.contains(MGC.coord2Point(coord))));
-				})
-				.addOverridingLinkProperties("residential", new LinkProperties(9, 1, 30.0 / 3.6, 1500, false))
-				.addOverridingLinkProperties("cycleway", new LinkProperties(9, 1, 30.0 / 3.6, 1500, false))
-				.addOverridingLinkProperties("service", new LinkProperties(9, 1, 10.0 / 3.6, 1000, false))
-				.addOverridingLinkProperties("footway", new LinkProperties(9, 1, 10.0 / 3.6, 600, false))
-				.addOverridingLinkProperties("path", new LinkProperties(9, 1, 20.0 / 3.6, 600, false))
-				.build()
-				.read(file);
-
-		Duration duration = Duration.between(start, Instant.now());
-		System.out.println(duration.toString());
-
-		new NetworkWriter(network).write(output.toString());
-	}
-
-    @Test
-    @Ignore
-	public void testOldNetworkReader() {
-
-        Path file = Paths.get("G:\\Users\\Janek\\Downloads\\nordrhein-westfalen-latest.osm\\nordrhein-westfalen-latest.osm");
-		Path output = Paths.get("G:\\Users\\Janek\\Desktop\\nordrhein-westfalen-latest-matsim-reader.xml.gz");
-		Network network = NetworkUtils.createNetwork();
-		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:25832");
-
-		Instant start = Instant.now();
-		new OsmNetworkReader(network, coordinateTransformation, true, true).parse(file.toString());
-
-		Duration duration = Duration.between(start, Instant.now());
-		System.out.println(duration.toString());
-
-		new NetworkWriter(network).write(output.toString());
-	}
-
 
 	@Test
 	public void singleLink() {

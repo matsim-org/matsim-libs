@@ -1,4 +1,4 @@
-package org.matsim.osmNetworkReader;
+package org.matsim.contrib.osm.networkReader;
 
 import org.junit.Rule;
 import org.junit.Test;

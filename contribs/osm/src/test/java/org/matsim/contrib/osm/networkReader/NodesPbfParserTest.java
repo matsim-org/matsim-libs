@@ -1,4 +1,4 @@
-package org.matsim.osmNetworkReader;
+package org.matsim.contrib.osm.networkReader;
 
 import de.topobyte.osm4j.core.model.iface.OsmNode;
 import org.junit.Rule;

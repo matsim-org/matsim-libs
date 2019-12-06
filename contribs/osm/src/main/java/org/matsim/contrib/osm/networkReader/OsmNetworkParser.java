@@ -1,4 +1,4 @@
-package org.matsim.osmNetworkReader;
+package org.matsim.contrib.osm.networkReader;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;

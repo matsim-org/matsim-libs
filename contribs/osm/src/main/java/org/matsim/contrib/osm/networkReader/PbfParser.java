@@ -1,4 +1,4 @@
-package org.matsim.osmNetworkReader;
+package org.matsim.contrib.osm.networkReader;
 
 import de.topobyte.osm4j.pbf.Constants;
 import de.topobyte.osm4j.pbf.protobuf.Fileformat;
