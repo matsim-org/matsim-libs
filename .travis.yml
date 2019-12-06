@@ -108,4 +108,5 @@ env:
     - MODULE=contribs/eventsBasedPTRouter
     - MODULE=contribs/hybridsim
     - MODULE=contribs/otfvis
+    - MODULE=contribs/osm
 
