@@ -74,7 +74,7 @@ class NodesPbfParser extends PbfParser implements OsmHandler {
     @Override
     protected ParsingResult parse(Osmformat.PrimitiveBlock block) {
 
-        for (var primitiveGroup : block.getPrimitivegroupList()) {
+        for (Osmformat.PrimitiveGroup primitiveGroup : block.getPrimitivegroupList()) {
             if (primitiveGroup.hasDense()) {
                 phaser.register();
                 executor.execute(() -> startParseDenseTask(block, primitiveGroup));
@@ -95,7 +95,7 @@ class NodesPbfParser extends PbfParser implements OsmHandler {
     private void startParseDenseTask(Osmformat.PrimitiveBlock block, Osmformat.PrimitiveGroup group) {
 
         try {
-            var primParser = new PrimParser(block, false);
+            PrimParser primParser = new PrimParser(block, false);
             primParser.parseDense(group.getDense(), this);
         } catch (IOException e) {
             e.printStackTrace();
@@ -107,7 +107,7 @@ class NodesPbfParser extends PbfParser implements OsmHandler {
     private void startParseNodesTask(Osmformat.PrimitiveBlock block, Osmformat.PrimitiveGroup group) {
 
         try {
-            var primParser = new PrimParser(block, false);
+            PrimParser primParser = new PrimParser(block, false);
             primParser.parseNodes(group.getNodesList(), this);
         } catch (IOException e) {
             e.printStackTrace();
@@ -123,8 +123,8 @@ class NodesPbfParser extends PbfParser implements OsmHandler {
 
         if (nodesToKeep.containsKey(osmNode.getId())) {
 
-            var waysThatReferenceNode = nodesToKeep.get(osmNode.getId());
-            var transformedCoord = coordinateTransformation.transform(new Coord(osmNode.getLongitude(), osmNode.getLatitude()));
+            List<ProcessedOsmWay> waysThatReferenceNode = nodesToKeep.get(osmNode.getId());
+            Coord transformedCoord = coordinateTransformation.transform(new Coord(osmNode.getLongitude(), osmNode.getLatitude()));
 
             List<ProcessedOsmWay> filteredReferencingLinks;
             if (waysThatReferenceNode.size() > 1 || isEndNodeOfReferencingLink(osmNode, waysThatReferenceNode.get(0)))
@@ -132,7 +132,7 @@ class NodesPbfParser extends PbfParser implements OsmHandler {
             else
                 filteredReferencingLinks = Collections.emptyList();
 
-            var result = new ProcessedOsmNode(osmNode.getId(), filteredReferencingLinks, transformedCoord);
+            ProcessedOsmNode result = new ProcessedOsmNode(osmNode.getId(), filteredReferencingLinks, transformedCoord);
             this.nodes.put(result.getId(), result);
         }
         if (counter.get() % 500000 == 0) {
@@ -148,7 +148,7 @@ class NodesPbfParser extends PbfParser implements OsmHandler {
 
         return waysThatReferenceNode.stream()
                 .filter(way -> linkFilter.test(coord, way.getLinkProperties().hierachyLevel))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
     }
 
     @Override

@@ -15,14 +15,15 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class Utils {
 
 	static final CoordinateTransformation transformation = new IdentityTransformation();
 	static final String MOTORWAY = "motorway";
-	static final String TRUNK = "trunk";
 	static final String TERTIARY = "tertiary";
 	private static final Logger log = Logger.getLogger(Utils.class);
 
@@ -30,7 +31,7 @@ public class Utils {
 	static void writeOsmData(Collection<OsmNode> nodes, Collection<OsmWay> ways, Path file) {
 
 		try (OutputStream outputStream = Files.newOutputStream(file)) {
-			var writer = new PbfWriter(outputStream, true);
+			PbfWriter writer = new PbfWriter(outputStream, true);
 			for (OsmNode node : nodes) {
 				writer.write(node);
 			}
@@ -46,32 +47,32 @@ public class Utils {
 	}
 
 	static WaysAndLinks createSingleLink() {
-		var node1 = new Node(1, 0, 0);
-		var node2 = new Node(2, 100, 100);
-		var node3 = new Node(3, 0, 200);
-		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId(), node3.getId()});
-		var tags = List.of(new Tag(OsmTags.HIGHWAY, Utils.MOTORWAY));
-		var way = new Way(1, nodeReference, tags);
+		Node node1 = new Node(1, 0, 0);
+		Node node2 = new Node(2, 100, 100);
+		Node node3 = new Node(3, 0, 200);
+		TLongArrayList nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId(), node3.getId()});
+		List<Tag> tags = Collections.singletonList(new Tag(OsmTags.HIGHWAY, Utils.MOTORWAY));
+		Way way = new Way(1, nodeReference, tags);
 
-		return new WaysAndLinks(List.of(node1, node2, node3), List.of(way));
+		return new WaysAndLinks(Arrays.asList(node1, node2, node3), Collections.singletonList(way));
 	}
 
 	static WaysAndLinks createTwoIntersectingLinksWithDifferentLevels() {
-		var node1 = new Node(1, 0, 0);
-		var node2 = new Node(2, 100, 100);
-		var node3 = new Node(3, 0, 200);
-		var node4 = new Node(4, 200, 0);
-		var node5 = new Node(5, 200, 200);
-		var nodeReferenceForWay1 = new TLongArrayList(new long[]{node1.getId(), node2.getId(), node3.getId()});
-		var nodeReferenceForWay2 = new TLongArrayList(new long[]{node4.getId(), node2.getId(), node5.getId()});
-		var way1 = new Way(1, nodeReferenceForWay1, List.of(new Tag(OsmTags.HIGHWAY, Utils.MOTORWAY)));
-		var way2 = new Way(2, nodeReferenceForWay2, List.of(new Tag(OsmTags.HIGHWAY, Utils.TERTIARY)));
-		return new WaysAndLinks(List.of(node1, node2, node3, node4, node5), List.of(way1, way2));
+		Node node1 = new Node(1, 0, 0);
+		Node node2 = new Node(2, 100, 100);
+		Node node3 = new Node(3, 0, 200);
+		Node node4 = new Node(4, 200, 0);
+		Node node5 = new Node(5, 200, 200);
+		TLongArrayList nodeReferenceForWay1 = new TLongArrayList(new long[]{node1.getId(), node2.getId(), node3.getId()});
+		TLongArrayList nodeReferenceForWay2 = new TLongArrayList(new long[]{node4.getId(), node2.getId(), node5.getId()});
+		Way way1 = new Way(1, nodeReferenceForWay1, Collections.singletonList(new Tag(OsmTags.HIGHWAY, Utils.MOTORWAY)));
+		Way way2 = new Way(2, nodeReferenceForWay2, Collections.singletonList(new Tag(OsmTags.HIGHWAY, Utils.TERTIARY)));
+		return new WaysAndLinks(Arrays.asList(node1, node2, node3, node4, node5), Arrays.asList(way1, way2));
 	}
 
 	static WaysAndLinks createGridWithDifferentLevels() {
 
-		List<OsmNode> nodesList = List.of(
+		List<OsmNode> nodesList = Arrays.asList(
 				new Node(1, 100, 0),
 				new Node(2, 200, 0),
 				new Node(3, 0, 100),
@@ -86,11 +87,11 @@ public class Utils {
 				new Node(12, 200, 300)
 		);
 
-		List<OsmWay> waysList = List.of(
-				new Way(1, new TLongArrayList(new long[]{3, 4, 5, 6}), List.of(new Tag("highway", MOTORWAY))),
-				new Way(2, new TLongArrayList(new long[]{7, 8, 9, 10}), List.of(new Tag("highway", MOTORWAY))),
-				new Way(3, new TLongArrayList(new long[]{1, 4, 8, 11}), List.of(new Tag("highway", TERTIARY))),
-				new Way(4, new TLongArrayList(new long[]{2, 5, 9, 12}), List.of(new Tag("highway", TERTIARY)))
+		List<OsmWay> waysList = Arrays.asList(
+				new Way(1, new TLongArrayList(new long[]{3, 4, 5, 6}), Collections.singletonList(new Tag("highway", MOTORWAY))),
+				new Way(2, new TLongArrayList(new long[]{7, 8, 9, 10}), Collections.singletonList(new Tag("highway", MOTORWAY))),
+				new Way(3, new TLongArrayList(new long[]{1, 4, 8, 11}), Collections.singletonList(new Tag("highway", TERTIARY))),
+				new Way(4, new TLongArrayList(new long[]{2, 5, 9, 12}), Collections.singletonList(new Tag("highway", TERTIARY)))
 		);
 
 		return new WaysAndLinks(nodesList, waysList);

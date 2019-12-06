@@ -7,10 +7,12 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiPredicate;
 
@@ -22,11 +24,11 @@ class OsmNetworkParser {
 
 		log.info("start reading ways");
 
-		var executor = Executors.newWorkStealingPool();
-		var waysParser = new WaysPbfParser(executor, linkPropertiesMap);
+		ExecutorService executor = Executors.newWorkStealingPool();
+		WaysPbfParser waysParser = new WaysPbfParser(executor, linkPropertiesMap);
 
-		try (var fileInputStream = new FileInputStream(inputFile.toFile())) {
-			var input = new BufferedInputStream(fileInputStream);
+		try (InputStream fileInputStream = new FileInputStream(inputFile.toFile())) {
+			BufferedInputStream input = new BufferedInputStream(fileInputStream);
 			waysParser.parse(input);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -38,11 +40,11 @@ class OsmNetworkParser {
 		log.info("Marked " + NumberFormat.getNumberInstance(Locale.US).format(waysParser.getNodes().size()) + " nodes to be kept");
 		log.info("starting to read nodes");
 
-		var nodesParser = new NodesPbfParser(executor, linkFilter, waysParser.getNodes(), transformation);
+		NodesPbfParser nodesParser = new NodesPbfParser(executor, linkFilter, waysParser.getNodes(), transformation);
 
-		try (var fileInputStream = new FileInputStream(inputFile.toFile())) {
+		try (InputStream fileInputStream = new FileInputStream(inputFile.toFile())) {
 
-			var input = new BufferedInputStream(fileInputStream);
+			BufferedInputStream input = new BufferedInputStream(fileInputStream);
 			nodesParser.parse(input);
 		} catch (IOException e) {
 			throw new RuntimeException(e);

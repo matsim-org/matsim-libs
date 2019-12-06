@@ -33,12 +33,12 @@ class WaysPbfParser extends PbfParser implements OsmHandler {
 
     private final ConcurrentMap<Long, ProcessedOsmWay> ways = new ConcurrentHashMap<>();
     private final ConcurrentMap<Long, List<ProcessedOsmWay>> nodes = new ConcurrentHashMap<>();
-    private final ConcurrentMap<String, LinkProperties> linkProperties;
+    private final ConcurrentMap<String, LinkProperties> linkPropertiesMap;
     private final AtomicInteger counter = new AtomicInteger();
 
-    public WaysPbfParser(ExecutorService executor, ConcurrentMap<String, LinkProperties> linkProperties) {
+    public WaysPbfParser(ExecutorService executor, ConcurrentMap<String, LinkProperties> linkPropertiesMap) {
         this.executor = executor;
-        this.linkProperties = linkProperties;
+        this.linkPropertiesMap = linkPropertiesMap;
     }
 
     public ConcurrentMap<Long, ProcessedOsmWay> getWays() {
@@ -73,7 +73,7 @@ class WaysPbfParser extends PbfParser implements OsmHandler {
     @Override
     ParsingResult parse(Osmformat.PrimitiveBlock block) {
 
-        for (var primitiveGroup : block.getPrimitivegroupList()) {
+        for (Osmformat.PrimitiveGroup primitiveGroup : block.getPrimitivegroupList()) {
             if (primitiveGroup.getWaysCount() > 0) {
                 phaser.register();
                 executor.execute(() -> startParseWaysTask(block, primitiveGroup));
@@ -90,7 +90,7 @@ class WaysPbfParser extends PbfParser implements OsmHandler {
     private void startParseWaysTask(Osmformat.PrimitiveBlock block, Osmformat.PrimitiveGroup group) {
 
         try {
-            var primParser = new PrimParser(block, false);
+            PrimParser primParser = new PrimParser(block, false);
             primParser.parseWays(group.getWaysList(), this);
         } catch (IOException e) {
             e.printStackTrace();
@@ -104,16 +104,16 @@ class WaysPbfParser extends PbfParser implements OsmHandler {
 
         counter.incrementAndGet();
 
-        var tags = OsmModelUtil.getTagsAsMap(osmWay);
+        Map<String, String> tags = OsmModelUtil.getTagsAsMap(osmWay);
 
         if (isStreetOfInterest(tags)) {
 
-            var linkProperty = this.linkProperties.get(tags.get(OsmTags.HIGHWAY));
-            var wayWrapper = ProcessedOsmWay.create(osmWay, tags, linkProperty);
+            LinkProperties linkProperty = this.linkPropertiesMap.get(tags.get(OsmTags.HIGHWAY));
+            ProcessedOsmWay wayWrapper = ProcessedOsmWay.create(osmWay, tags, linkProperty);
             ways.put(osmWay.getId(), wayWrapper);
 
             for (int i = 0; i < osmWay.getNumberOfNodes(); i++) {
-                var nodeId = osmWay.getNodeId(i);
+                long nodeId = osmWay.getNodeId(i);
                 nodes.computeIfAbsent(nodeId, id -> new ArrayList<>()).add(wayWrapper);
             }
         }
@@ -123,7 +123,7 @@ class WaysPbfParser extends PbfParser implements OsmHandler {
     }
 
     private boolean isStreetOfInterest(Map<String, String> tags) {
-        return tags.containsKey(OsmTags.HIGHWAY) && linkProperties.containsKey(tags.get(OsmTags.HIGHWAY));
+        return tags.containsKey(OsmTags.HIGHWAY) && linkPropertiesMap.containsKey(tags.get(OsmTags.HIGHWAY));
     }
 
     @Override

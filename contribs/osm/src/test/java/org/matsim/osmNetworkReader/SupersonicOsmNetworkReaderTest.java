@@ -35,10 +35,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
@@ -56,7 +53,7 @@ public class SupersonicOsmNetworkReaderTest {
 	private static void writeOsmData(Collection<OsmNode> nodes, Collection<OsmWay> ways, Path file) {
 
 		try (OutputStream outputStream = Files.newOutputStream(file)) {
-			var writer = new PbfWriter(outputStream, true);
+			PbfWriter writer = new PbfWriter(outputStream, true);
 			for (OsmNode node : nodes) {
 				writer.write(node);
 			}
@@ -85,7 +82,7 @@ public class SupersonicOsmNetworkReaderTest {
 				.collect(Collectors.toList());
 
 		Instant start = Instant.now();
-		var network = new SupersonicOsmNetworkReader.Builder()
+		Network network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(coordinateTransformation)
 				.includeLinkAtCoordWithHierarchy((coord, level) -> {
 					if (level <= LinkProperties.LEVEL_SECONDARY) return true;
@@ -128,38 +125,37 @@ public class SupersonicOsmNetworkReaderTest {
 	@Test
 	public void singleLink() {
 
-		var singleLink = Utils.createSingleLink();
+		Utils.WaysAndLinks singleLink = Utils.createSingleLink();
 
 		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-one-way.pbf");
 		writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
-
-		var network = new SupersonicOsmNetworkReader.Builder()
+		Network network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
 
-		// we expect one link
+		// we expect two links one forward, one backwards
 		assertEquals(1, network.getLinks().size());
 		// we expect two nodes, since the middle node should be removed for simplification
 		assertEquals(2, network.getNodes().size());
 
 		// now, test that the link has all the required properties
-		var node1 = singleLink.getNodes().get(0);
-		var node2 = singleLink.getNodes().get(1);
-		var node3 = singleLink.getNodes().get(2);
-		var way = singleLink.getWays().get(0);
+		OsmNode node1 = singleLink.getNodes().get(0);
+		OsmNode node2 = singleLink.getNodes().get(1);
+		OsmNode node3 = singleLink.getNodes().get(2);
+		OsmWay way = singleLink.getWays().get(0);
 
 		Link link = network.getLinks().values().iterator().next(); // get the only link
 		double expectedLengthPart1 = CoordUtils.calcEuclideanDistance(new Coord(node1.getLongitude(), node1.getLatitude()), new Coord(node2.getLongitude(), node2.getLatitude()));
 		double expectedLengthPart2 = CoordUtils.calcEuclideanDistance(new Coord(node2.getLongitude(), node2.getLatitude()), new Coord(node3.getLongitude(), node3.getLatitude()));
 		assertEquals(expectedLengthPart1 + expectedLengthPart2, link.getLength(), 0);
 
-		var linkProperties = LinkProperties.createMotorway();
+		LinkProperties linkProperties = LinkProperties.createMotorway();
 		assertEquals(linkProperties.freespeed, link.getFreespeed(), 0);
 		assertEquals(linkProperties.laneCapacity * linkProperties.lanesPerDirection, link.getCapacity(), 0);
 		assertEquals(linkProperties.lanesPerDirection, link.getNumberOfLanes(), 0);
-		assertEquals(Set.of(TransportMode.car), link.getAllowedModes());
+		assertEquals(Collections.singleton(TransportMode.car), link.getAllowedModes());
 
 		//test attributes
 		assertNotNull(link.getAttributes().getAttribute(NetworkUtils.ORIGID));
@@ -172,13 +168,13 @@ public class SupersonicOsmNetworkReaderTest {
 	@Test
 	public void singleLinkPreserveMiddleNode() {
 
-		var singleLink = Utils.createSingleLink();
+		Utils.WaysAndLinks singleLink = Utils.createSingleLink();
 
 		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-preserve-node.pbf");
 
 		writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
-		var network = new SupersonicOsmNetworkReader.Builder()
+		Network network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.preserveNodeWithId(id -> id == 2)
 				.build()
@@ -190,14 +186,14 @@ public class SupersonicOsmNetworkReaderTest {
 		// now, test that the link has all the required properties
 		Link link = network.getLinks().values().iterator().next(); // get the only link
 
-		var linkProperties = LinkProperties.createMotorway();
+		LinkProperties linkProperties = LinkProperties.createMotorway();
 		assertEquals(linkProperties.freespeed, link.getFreespeed(), 0);
 		assertEquals(linkProperties.laneCapacity * linkProperties.lanesPerDirection, link.getCapacity(), 0);
 		assertEquals(linkProperties.lanesPerDirection, link.getNumberOfLanes(), 0);
-		assertEquals(Set.of(TransportMode.car), link.getAllowedModes());
+		assertEquals(Collections.singleton(TransportMode.car), link.getAllowedModes());
 
 		//test attributes
-		var way = singleLink.getWays().get(0);
+		OsmWay way = singleLink.getWays().get(0);
 		assertNotNull(link.getAttributes().getAttribute(NetworkUtils.ORIGID));
 		assertEquals(way.getId(), (long) link.getAttributes().getAttribute(NetworkUtils.ORIGID));
 
@@ -208,17 +204,17 @@ public class SupersonicOsmNetworkReaderTest {
 	@Test
 	public void singleLink_withMaxSpeedTag() {
 
-		var node1 = new Node(1, 0, 0);
-		var node2 = new Node(2, 10, 10);
-		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
+		Node node1 = new Node(1, 0, 0);
+		Node node2 = new Node(2, 10, 10);
+		TLongArrayList nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
 
-		var wayWithMaxSpeed = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY),
+		Way wayWithMaxSpeed = new Way(1, nodeReference, Arrays.asList(new Tag(OsmTags.HIGHWAY, TERTIARY),
 				new Tag(OsmTags.MAXSPEED, "60")));
 
 		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-with-max-speed.pbf");
-		writeOsmData(List.of(node1, node2), List.of(wayWithMaxSpeed), file);
+		writeOsmData(Arrays.asList(node1, node2), Collections.singletonList(wayWithMaxSpeed), file);
 
-		var network = new SupersonicOsmNetworkReader.Builder()
+		Network network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -226,23 +222,22 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		var link = network.getLinks().get(Id.createLinkId(10001));
+		Link link = network.getLinks().get(Id.createLinkId(10001));
 		assertEquals(60 / 3.6, link.getFreespeed(), 0);
-
 	}
 
 	@Test
 	public void singleLink_withMaxSpeedTag_milesPerHour() {
-		var node1 = new Node(1, 0, 0);
-		var node2 = new Node(2, 10, 10);
-		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
-		var wayWithMaxSpeedMph = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY),
+		Node node1 = new Node(1, 0, 0);
+		Node node2 = new Node(2, 10, 10);
+		TLongArrayList nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
+		Way wayWithMaxSpeedMph = new Way(1, nodeReference, Arrays.asList(new Tag(OsmTags.HIGHWAY, TERTIARY),
 				new Tag(OsmTags.MAXSPEED, "60 mph")));
 
 		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-with-max-speed-in-mph.pbf");
-		writeOsmData(List.of(node1, node2), List.of(wayWithMaxSpeedMph), file);
+		writeOsmData(Arrays.asList(node1, node2), Collections.singletonList(wayWithMaxSpeedMph), file);
 
-		var network = new SupersonicOsmNetworkReader.Builder()
+		Network network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -250,23 +245,23 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		var link = network.getLinks().get(Id.createLinkId(10001));
+		Link link = network.getLinks().get(Id.createLinkId(10001));
 		assertEquals(60 * 1.609344 / 3.6, link.getFreespeed(), 0);
 	}
 
 	@Test
 	public void singleLink_withMaxSpeedTag_urbanLink() {
-		var node1 = new Node(1, 0, 0);
-		var node2 = new Node(2, 10, 10);
-		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
+		Node node1 = new Node(1, 0, 0);
+		Node node2 = new Node(2, 10, 10);
+		TLongArrayList nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
 
-		var wayWithMaxSpeedUrban = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY),
+		Way wayWithMaxSpeedUrban = new Way(1, nodeReference, Arrays.asList(new Tag(OsmTags.HIGHWAY, TERTIARY),
 				new Tag(OsmTags.MAXSPEED, "50")));
 
 		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-with-max-speed-urban-link.pbf");
-		writeOsmData(List.of(node1, node2), List.of(wayWithMaxSpeedUrban), file);
+		writeOsmData(Arrays.asList(node1, node2), Collections.singletonList(wayWithMaxSpeedUrban), file);
 
-		var network = new SupersonicOsmNetworkReader.Builder()
+		Network network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -274,23 +269,23 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		var link = network.getLinks().get(Id.createLinkId(10001));
+		Link link = network.getLinks().get(Id.createLinkId(10001));
 		assertEquals(50 / 3.6 * 0.5, link.getFreespeed(), 0);
 	}
 
 	@Test
 	public void singleLink_withMaxSpeedTag_cantParseMaxSpeed() {
-		var node1 = new Node(1, 0, 0);
-		var node2 = new Node(2, 10, 10);
-		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
+		Node node1 = new Node(1, 0, 0);
+		Node node2 = new Node(2, 10, 10);
+		TLongArrayList nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
 
-		var wayWithInvalidMaxSpeed = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, MOTORWAY),
+		Way wayWithInvalidMaxSpeed = new Way(1, nodeReference, Arrays.asList(new Tag(OsmTags.HIGHWAY, MOTORWAY),
 				new Tag(OsmTags.MAXSPEED, "not a number")));
 
 		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-with-unknown-max-speed.pbf");
-		writeOsmData(List.of(node1, node2), List.of(wayWithInvalidMaxSpeed), file);
+		writeOsmData(Arrays.asList(node1, node2), Collections.singletonList(wayWithInvalidMaxSpeed), file);
 
-		var network = new SupersonicOsmNetworkReader.Builder()
+		Network network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -298,24 +293,24 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(1, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		var link = network.getLinks().get(Id.createLinkId(10001));
+		Link link = network.getLinks().get(Id.createLinkId(10001));
 		assertEquals(LinkProperties.createMotorway().freespeed, link.getFreespeed(), 0);
 	}
 
 	@Test
 	public void singleLink_noMaxSpeedTag_ruralLink() {
 
-		var node1 = new Node(1, 0, 0);
-		var node2 = new Node(2, 1000, 1000);
-		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
+		Node node1 = new Node(1, 0, 0);
+		Node node2 = new Node(2, 1000, 1000);
+		TLongArrayList nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
 
-		var wayWithoutMaxSpeed = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY)
+		Way wayWithoutMaxSpeed = new Way(1, nodeReference, Collections.singletonList(new Tag(OsmTags.HIGHWAY, TERTIARY)
 		));
 
 		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-no-max-speed-rural-link.pbf");
-		writeOsmData(List.of(node1, node2), List.of(wayWithoutMaxSpeed), file);
+		writeOsmData(Arrays.asList(node1, node2), Collections.singletonList(wayWithoutMaxSpeed), file);
 
-		var network = new SupersonicOsmNetworkReader.Builder()
+		Network network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -323,24 +318,24 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		var link = network.getLinks().get(Id.createLinkId(10001));
+		Link link = network.getLinks().get(Id.createLinkId(10001));
 		assertEquals(LinkProperties.createTertiary().freespeed, link.getFreespeed(), 0);
 	}
 
 	@Test
 	public void singleLink_noMaxSpeedTag_urbanLink() {
 
-		var node1 = new Node(1, 0, 0);
-		var node2 = new Node(2, 10, 10);
-		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
+		Node node1 = new Node(1, 0, 0);
+		Node node2 = new Node(2, 10, 10);
+		TLongArrayList nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
 
-		var wayWithoutMaxSpeed = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY)
+		Way wayWithoutMaxSpeed = new Way(1, nodeReference, Collections.singletonList(new Tag(OsmTags.HIGHWAY, TERTIARY)
 		));
 
 		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-no-max-speed-urban-link.pbf");
-		writeOsmData(List.of(node1, node2), List.of(wayWithoutMaxSpeed), file);
+		writeOsmData(Arrays.asList(node1, node2), Collections.singletonList(wayWithoutMaxSpeed), file);
 
-		var network = new SupersonicOsmNetworkReader.Builder()
+		Network network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -348,7 +343,7 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		var link = network.getLinks().get(Id.createLinkId(10001));
+		Link link = network.getLinks().get(Id.createLinkId(10001));
 
 		// the freespeed for 'urban' links (links without a speed tag and shorter than 300m) freespeed is reduced depending on the length of the link
 		assertTrue(LinkProperties.createTertiary().freespeed > link.getFreespeed());
@@ -357,16 +352,16 @@ public class SupersonicOsmNetworkReaderTest {
 	@Test
 	public void singleLink_noLanesTag() {
 
-		var node1 = new Node(1, 0, 0);
-		var node2 = new Node(2, 10, 10);
-		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
+		Node node1 = new Node(1, 0, 0);
+		Node node2 = new Node(2, 10, 10);
+		TLongArrayList nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
 
-		var way = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY)));
+		Way way = new Way(1, nodeReference, Collections.singletonList(new Tag(OsmTags.HIGHWAY, TERTIARY)));
 
 		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-with-no-lanes-tag.pbf");
-		writeOsmData(List.of(node1, node2), List.of(way), file);
+		writeOsmData(Arrays.asList(node1, node2), Collections.singletonList(way), file);
 
-		var network = new SupersonicOsmNetworkReader.Builder()
+		Network network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -374,7 +369,7 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		var link = network.getLinks().get(Id.createLinkId(10001));
+		Link link = network.getLinks().get(Id.createLinkId(10001));
 
 		assertEquals(LinkProperties.createTertiary().lanesPerDirection, link.getNumberOfLanes(), 0);
 	}
@@ -382,17 +377,17 @@ public class SupersonicOsmNetworkReaderTest {
 	@Test
 	public void singleLink_withLanesTag() {
 
-		var node1 = new Node(1, 0, 0);
-		var node2 = new Node(2, 10, 10);
-		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
+		Node node1 = new Node(1, 0, 0);
+		Node node2 = new Node(2, 10, 10);
+		TLongArrayList nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
 
-		var way = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY),
+		Way way = new Way(1, nodeReference, Arrays.asList(new Tag(OsmTags.HIGHWAY, TERTIARY),
 				new Tag("lanes", "4")));
 
 		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-with-lanes-tag.pbf");
-		writeOsmData(List.of(node1, node2), List.of(way), file);
+		writeOsmData(Arrays.asList(node1, node2), Collections.singletonList(way), file);
 
-		var network = new SupersonicOsmNetworkReader.Builder()
+		Network network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -400,24 +395,24 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		var link = network.getLinks().get(Id.createLinkId(10001));
+		Link link = network.getLinks().get(Id.createLinkId(10001));
 
 		assertEquals(2, link.getNumberOfLanes(), 0);
 	}
 
 	@Test
 	public void singleLink_lanesTagOneWay() {
-		var node1 = new Node(1, 0, 0);
-		var node2 = new Node(2, 10, 10);
-		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
+		Node node1 = new Node(1, 0, 0);
+		Node node2 = new Node(2, 10, 10);
+		TLongArrayList nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
 
-		var way = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY),
+		Way way = new Way(1, nodeReference, Arrays.asList(new Tag(OsmTags.HIGHWAY, TERTIARY),
 				new Tag("lanes", "4"), new Tag("oneway", "true")));
 
 		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-oneway-link-with-lanes-tag.pbf");
-		writeOsmData(List.of(node1, node2), List.of(way), file);
+		writeOsmData(Arrays.asList(node1, node2), Collections.singletonList(way), file);
 
-		var network = new SupersonicOsmNetworkReader.Builder()
+		Network network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -425,25 +420,24 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(1, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		var link = network.getLinks().get(Id.createLinkId(10001));
+		Link link = network.getLinks().get(Id.createLinkId(10001));
 
 		assertEquals(4, link.getNumberOfLanes(), 0);
 	}
 
 	@Test
 	public void singleLink_lanesForwardAndBackwardTag() {
-		var node1 = new Node(1, 0, 0);
-		var node2 = new Node(2, 10, 10);
-		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
+		Node node1 = new Node(1, 0, 0);
+		Node node2 = new Node(2, 10, 10);
+		TLongArrayList nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
 
-		var way = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY),
+		Way way = new Way(1, nodeReference, Arrays.asList(new Tag(OsmTags.HIGHWAY, TERTIARY),
 				new Tag("lanes", "4"), new Tag("lanes:forward", "4"), new Tag("lanes:backward", "1")));
 
 		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-with-lanes-forward-and-backward-tag.pbf");
-		writeOsmData(List.of(node1, node2), List.of(way), file);
+		writeOsmData(Arrays.asList(node1, node2), Collections.singletonList(way), file);
 
-
-		var network = new SupersonicOsmNetworkReader.Builder()
+		Network network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -451,8 +445,8 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		var forwardLink = network.getLinks().get(Id.createLinkId(10001));
-		var backwardLink = network.getLinks().get(Id.createLinkId(10002));
+		Link forwardLink = network.getLinks().get(Id.createLinkId(10001));
+		Link backwardLink = network.getLinks().get(Id.createLinkId(10002));
 
 		assertEquals(4, forwardLink.getNumberOfLanes(), 0);
 		assertEquals(1, backwardLink.getNumberOfLanes(), 0);
@@ -461,16 +455,16 @@ public class SupersonicOsmNetworkReaderTest {
 	@Test
 	public void singleLink_capacityLongLink() {
 
-		var node1 = new Node(1, 0, 0);
-		var node2 = new Node(2, 100, 100);
-		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
+		Node node1 = new Node(1, 0, 0);
+		Node node2 = new Node(2, 100, 100);
+		TLongArrayList nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
 
-		var way = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY)));
+		Way way = new Way(1, nodeReference, Collections.singletonList(new Tag(OsmTags.HIGHWAY, TERTIARY)));
 
 		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-capacity-for-long-link.pbf");
-		writeOsmData(List.of(node1, node2), List.of(way), file);
+		writeOsmData(Arrays.asList(node1, node2), Collections.singletonList(way), file);
 
-		var network = new SupersonicOsmNetworkReader.Builder()
+		Network network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -478,23 +472,23 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		var link = network.getLinks().get(Id.createLinkId(10001));
+		Link link = network.getLinks().get(Id.createLinkId(10001));
 		assertEquals(LinkProperties.createTertiary().laneCapacity, link.getCapacity(), 0);
 	}
 
 	@Test
 	public void singleLink_capacityShortLink() {
 
-		var node1 = new Node(1, 0, 0);
-		var node2 = new Node(2, 10, 10);
-		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
+		Node node1 = new Node(1, 0, 0);
+		Node node2 = new Node(2, 10, 10);
+		TLongArrayList nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
 
-		var way = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, TERTIARY)));
+		Way way = new Way(1, nodeReference, Collections.singletonList(new Tag(OsmTags.HIGHWAY, TERTIARY)));
 
 		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-capacity-for-short-link.pbf");
-		writeOsmData(List.of(node1, node2), List.of(way), file);
+		writeOsmData(Arrays.asList(node1, node2), Collections.singletonList(way), file);
 
-		var network = new SupersonicOsmNetworkReader.Builder()
+		Network network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -502,25 +496,25 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		var link = network.getLinks().get(Id.createLinkId(10001));
+		Link link = network.getLinks().get(Id.createLinkId(10001));
 		assertEquals(LinkProperties.createTertiary().laneCapacity * 2, link.getCapacity(), 0);
 	}
 
 	@Test
 	public void singleLink_overridingLinkProperties() {
 
-		var node1 = new Node(1, 0, 0);
-		var node2 = new Node(2, 100, 100);
-		var nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
-		final var linkCategory = "some-category";
-		final var linkProperties = new LinkProperties(9, 1, 100, 100, false);
+		Node node1 = new Node(1, 0, 0);
+		Node node2 = new Node(2, 100, 100);
+		TLongArrayList nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId()});
+		final String linkCategory = "some-category";
+		final LinkProperties linkProperties = new LinkProperties(9, 1, 100, 100, false);
 
-		var way = new Way(1, nodeReference, List.of(new Tag(OsmTags.HIGHWAY, linkCategory)));
+		Way way = new Way(1, nodeReference, Collections.singletonList(new Tag(OsmTags.HIGHWAY, linkCategory)));
 
 		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-overriding-link-properties.pbf");
-		writeOsmData(List.of(node1, node2), List.of(way), file);
+		writeOsmData(Arrays.asList(node1, node2), Collections.singletonList(way), file);
 
-		var network = new SupersonicOsmNetworkReader.Builder()
+		Network network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.addOverridingLinkProperties(linkCategory, linkProperties)
 				.build()
@@ -529,7 +523,7 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		var link = network.getLinks().get(Id.createLinkId(10001));
+		Link link = network.getLinks().get(Id.createLinkId(10001));
 		assertEquals(linkProperties.laneCapacity, link.getCapacity(), 0);
 		assertEquals(linkProperties.lanesPerDirection, link.getNumberOfLanes(), 0);
 		assertEquals(linkProperties.freespeed, link.getFreespeed(), 0);
@@ -538,15 +532,15 @@ public class SupersonicOsmNetworkReaderTest {
 	@Test
 	public void twoIntersectingLinks() {
 
-		final var tags = List.of(new Tag("highway", MOTORWAY));
-		final List<OsmNode> nodes = List.of(new Node(1, 0, 0), new Node(2, 1, 1), new Node(3, 2, 2),
+		final List<Tag> tags = Collections.singletonList(new Tag("highway", MOTORWAY));
+		final List<OsmNode> nodes = Arrays.asList(new Node(1, 0, 0), new Node(2, 1, 1), new Node(3, 2, 2),
 				new Node(4, 0, 2), new Node(5, 2, 0));
-		final List<OsmWay> ways = List.of(new Way(1, new TLongArrayList(new long[]{1, 2, 3}), tags),
+		final List<OsmWay> ways = Arrays.asList(new Way(1, new TLongArrayList(new long[]{1, 2, 3}), tags),
 				new Way(2, new TLongArrayList(new long[]{4, 2, 5}), tags));
-		final var file = Paths.get(matsimTestUtils.getOutputDirectory(), "two-intersecting-links.pbf");
+		final Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "two-intersecting-links.pbf");
 		writeOsmData(nodes, ways, file);
 
-		var network = new SupersonicOsmNetworkReader.Builder()
+		Network network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -555,22 +549,22 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(4, network.getLinks().size());
 
 		// check whether the links were correctly split
-		var link1 = network.getLinks().get(Id.createLinkId(10001));
+		Link link1 = network.getLinks().get(Id.createLinkId(10001));
 		assertEquals(Id.createNodeId(1), link1.getFromNode().getId());
 		assertEquals(Id.createNodeId(2), link1.getToNode().getId());
 		assertEquals(CoordUtils.calcEuclideanDistance(link1.getFromNode().getCoord(), link1.getToNode().getCoord()), link1.getLength(), 0);
 
-		var link2 = network.getLinks().get(Id.createLinkId(10003));
+		Link link2 = network.getLinks().get(Id.createLinkId(10003));
 		assertEquals(Id.createNodeId(2), link2.getFromNode().getId());
 		assertEquals(Id.createNodeId(3), link2.getToNode().getId());
 		assertEquals(CoordUtils.calcEuclideanDistance(link2.getFromNode().getCoord(), link2.getToNode().getCoord()), link2.getLength(), 0);
 
-		var link3 = network.getLinks().get(Id.createLinkId(20001));
+		Link link3 = network.getLinks().get(Id.createLinkId(20001));
 		assertEquals(Id.createNodeId(4), link3.getFromNode().getId());
 		assertEquals(Id.createNodeId(2), link3.getToNode().getId());
 		assertEquals(CoordUtils.calcEuclideanDistance(link3.getFromNode().getCoord(), link3.getToNode().getCoord()), link3.getLength(), 0);
 
-		var link4 = network.getLinks().get(Id.createLinkId(20003));
+		Link link4 = network.getLinks().get(Id.createLinkId(20003));
 		assertEquals(Id.createNodeId(2), link4.getFromNode().getId());
 		assertEquals(Id.createNodeId(5), link4.getToNode().getId());
 		assertEquals(CoordUtils.calcEuclideanDistance(link4.getFromNode().getCoord(), link4.getToNode().getCoord()), link4.getLength(), 0);
@@ -579,16 +573,16 @@ public class SupersonicOsmNetworkReaderTest {
 	@Test
 	public void twoIntersectingLinks_withAfterLinkCreatedHook() {
 
-		final var tags = List.of(new Tag("highway", MOTORWAY));
-		final List<OsmNode> nodes = List.of(new Node(1, 0, 0), new Node(2, 1, 1), new Node(3, 2, 2),
+		final List<Tag> tags = Collections.singletonList(new Tag("highway", MOTORWAY));
+		final List<OsmNode> nodes = Arrays.asList(new Node(1, 0, 0), new Node(2, 1, 1), new Node(3, 2, 2),
 				new Node(4, 0, 2), new Node(5, 2, 0));
-		final List<OsmWay> ways = List.of(new Way(1, new TLongArrayList(new long[]{1, 2, 3}), tags),
+		final List<OsmWay> ways = Arrays.asList(new Way(1, new TLongArrayList(new long[]{1, 2, 3}), tags),
 				new Way(2, new TLongArrayList(new long[]{4, 2, 5}), tags));
-		final var file = Paths.get(matsimTestUtils.getOutputDirectory(), "two-intersecting-links.pbf");
+		final Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "two-intersecting-links.pbf");
 		writeOsmData(nodes, ways, file);
 
-		var allowedModes = new HashSet<>(List.of(TransportMode.car, TransportMode.airplane));
-		var network = new SupersonicOsmNetworkReader.Builder()
+		HashSet<String> allowedModes = new HashSet<>(Arrays.asList(TransportMode.car, TransportMode.airplane));
+		Network network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.afterLinkCreated((link, osmTags, isReverse) -> link.setAllowedModes(allowedModes))
 				.build()
@@ -598,25 +592,25 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(4, network.getLinks().size());
 
 		// check whether the links were correctly split
-		var link1 = network.getLinks().get(Id.createLinkId(10001));
+		Link link1 = network.getLinks().get(Id.createLinkId(10001));
 		allowedModes.forEach(mode -> assertTrue(link1.getAllowedModes().contains(mode)));
 		assertEquals(Id.createNodeId(1), link1.getFromNode().getId());
 		assertEquals(Id.createNodeId(2), link1.getToNode().getId());
 		assertEquals(CoordUtils.calcEuclideanDistance(link1.getFromNode().getCoord(), link1.getToNode().getCoord()), link1.getLength(), 0);
 
-		var link2 = network.getLinks().get(Id.createLinkId(10003));
+		Link link2 = network.getLinks().get(Id.createLinkId(10003));
 		allowedModes.forEach(mode -> assertTrue(link2.getAllowedModes().contains(mode)));
 		assertEquals(Id.createNodeId(2), link2.getFromNode().getId());
 		assertEquals(Id.createNodeId(3), link2.getToNode().getId());
 		assertEquals(CoordUtils.calcEuclideanDistance(link2.getFromNode().getCoord(), link2.getToNode().getCoord()), link2.getLength(), 0);
 
-		var link3 = network.getLinks().get(Id.createLinkId(20001));
+		Link link3 = network.getLinks().get(Id.createLinkId(20001));
 		allowedModes.forEach(mode -> assertTrue(link3.getAllowedModes().contains(mode)));
 		assertEquals(Id.createNodeId(4), link3.getFromNode().getId());
 		assertEquals(Id.createNodeId(2), link3.getToNode().getId());
 		assertEquals(CoordUtils.calcEuclideanDistance(link3.getFromNode().getCoord(), link3.getToNode().getCoord()), link3.getLength(), 0);
 
-		var link4 = network.getLinks().get(Id.createLinkId(20003));
+		Link link4 = network.getLinks().get(Id.createLinkId(20003));
 		allowedModes.forEach(mode -> assertTrue(link4.getAllowedModes().contains(mode)));
 		assertEquals(Id.createNodeId(2), link4.getFromNode().getId());
 		assertEquals(Id.createNodeId(5), link4.getToNode().getId());
@@ -626,17 +620,17 @@ public class SupersonicOsmNetworkReaderTest {
 	@Test
 	public void twoIntersectingLinks_oneShouldBeSimplified() {
 
-		final var tags = List.of(new Tag("highway", MOTORWAY));
-		final List<OsmNode> nodes = List.of(new Node(1, 0, 0),
+		final List<Tag> tags = Collections.singletonList(new Tag("highway", MOTORWAY));
+		final List<OsmNode> nodes = Arrays.asList(new Node(1, 0, 0),
 				new Node(2, 1, 1), new Node(3, 2, 2),
 				new Node(4, 0, 2), new Node(5, 2, 0),
 				new Node(6, 3, 3));
-		final List<OsmWay> ways = List.of(new Way(1, new TLongArrayList(new long[]{1, 2, 3, 6}), tags),
+		final List<OsmWay> ways = Arrays.asList(new Way(1, new TLongArrayList(new long[]{1, 2, 3, 6}), tags),
 				new Way(2, new TLongArrayList(new long[]{4, 2, 5}), tags));
-		final var file = Paths.get(matsimTestUtils.getOutputDirectory(), "two-intersecting-links.pbf");
+		final Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "two-intersecting-links.pbf");
 		writeOsmData(nodes, ways, file);
 
-		var network = new SupersonicOsmNetworkReader.Builder()
+		Network network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -645,7 +639,7 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(5, network.getNodes().size());
 		assertEquals(4, network.getLinks().size());
 
-		var simplifiedLink = network.getLinks().get(Id.createLinkId(10005));
+		Link simplifiedLink = network.getLinks().get(Id.createLinkId(10005));
 		assertEquals(Id.createNodeId(6), simplifiedLink.getToNode().getId());
 		assertEquals(Id.createNodeId(2), simplifiedLink.getFromNode().getId());
 	}
@@ -653,11 +647,11 @@ public class SupersonicOsmNetworkReaderTest {
 	@Test
 	public void linkGrid_oneWayNotInFilter() {
 
-		var grid = Utils.createGridWithDifferentLevels();
-		final var file = Paths.get(matsimTestUtils.getOutputDirectory(), "grid-with-filter.pbf");
+		Utils.WaysAndLinks grid = Utils.createGridWithDifferentLevels();
+		final Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "grid-with-filter.pbf");
 		writeOsmData(grid.getNodes(), grid.getWays(), file);
 
-		var network = new SupersonicOsmNetworkReader.Builder()
+		Network network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				// we don't want the tertiary link wich is on the 'right' side of the grid
 				.includeLinkAtCoordWithHierarchy((coord, level) -> !(level == LinkProperties.LEVEL_TERTIARY && coord.getX() > 100))
@@ -684,16 +678,16 @@ public class SupersonicOsmNetworkReaderTest {
 	@Test
 	public void twoIntersectingLinks_oneWithLoop() {
 
-		final var tags = List.of(new Tag("highway", MOTORWAY));
-		final List<OsmNode> nodes = List.of(new Node(1, 0, 0), new Node(2, 1, 1), new Node(3, 2, 2),
+		final List<Tag> tags = Collections.singletonList(new Tag("highway", MOTORWAY));
+		final List<OsmNode> nodes = Arrays.asList(new Node(1, 0, 0), new Node(2, 1, 1), new Node(3, 2, 2),
 				new Node(4, 0, 2), new Node(5, 2, 0), new Node(6, 3, 3),
 				new Node(7, 4, 3), new Node(8, 4, 2));
-		final List<OsmWay> ways = List.of(new Way(1, new TLongArrayList(new long[]{1, 2, 6, 7, 8, 6, 3}), tags),
+		final List<OsmWay> ways = Arrays.asList(new Way(1, new TLongArrayList(new long[]{1, 2, 6, 7, 8, 6, 3}), tags),
 				new Way(2, new TLongArrayList(new long[]{4, 2, 5}), tags));
-		final var file = Paths.get(matsimTestUtils.getOutputDirectory(), "two-intersecting-links-with-loop.pbf");
+		final Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "two-intersecting-links-with-loop.pbf");
 		writeOsmData(nodes, ways, file);
 
-		var network = new SupersonicOsmNetworkReader.Builder()
+		Network network = new SupersonicOsmNetworkReader.Builder()
 				.coordinateTransformation(transformation)
 				.build()
 				.read(file);
@@ -702,16 +696,16 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(8, network.getLinks().size());
 
 		// check for node 6 and if it has two incoming and two outgoing links
-		var node6 = network.getNodes().get(Id.createNodeId(6));
+		org.matsim.api.core.v01.network.Node node6 = network.getNodes().get(Id.createNodeId(6));
 		assertEquals(2, node6.getOutLinks().size());
 		assertEquals(2, node6.getInLinks().size());
 
 		// check for node7 and 8, and that they have one incoming and on outgoing link
-		var node7 = network.getNodes().get(Id.createNodeId(7));
+		org.matsim.api.core.v01.network.Node node7 = network.getNodes().get(Id.createNodeId(7));
 		assertEquals(1, node7.getInLinks().size());
 		assertEquals(1, node7.getOutLinks().size());
 
-		var node8 = network.getNodes().get(Id.createNodeId(7));
+		org.matsim.api.core.v01.network.Node node8 = network.getNodes().get(Id.createNodeId(7));
 		assertEquals(1, node8.getInLinks().size());
 		assertEquals(1, node8.getOutLinks().size());
 	}

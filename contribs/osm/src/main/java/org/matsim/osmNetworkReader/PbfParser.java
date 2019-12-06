@@ -13,8 +13,8 @@ abstract class PbfParser {
 
     void parse(InputStream input) throws IOException {
 
-        var data = new DataInputStream(input);
-        ParsingResult parsingResult = ParsingResult.Continue;
+        DataInputStream data = new DataInputStream(input);
+		ParsingResult parsingResult = ParsingResult.Continue;
         while (parsingResult.equals(ParsingResult.Continue)) {
             try {
                 parsingResult = parseBlob(data);

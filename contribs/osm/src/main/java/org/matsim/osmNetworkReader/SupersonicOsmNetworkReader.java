@@ -53,7 +53,7 @@ public class SupersonicOsmNetworkReader {
 
 	public Network read(Path inputFile) {
 
-		var nodesAndWays = OsmNetworkParser.parse(inputFile, linkProperties, coordinateTransformation, includeLinkAtCoordWithHierarchy);
+		NodesAndWays nodesAndWays = OsmNetworkParser.parse(inputFile, linkProperties, coordinateTransformation, includeLinkAtCoordWithHierarchy);
 		this.network = NetworkUtils.createNetwork();
 
 		log.info("starting convertion \uD83D\uDE80");
@@ -83,15 +83,15 @@ public class SupersonicOsmNetworkReader {
 		for (int i = 1, linkdIdPostfix = 1; i < way.getNodeIds().size(); i++, linkdIdPostfix += 2) {
 
 			// get the from and to nodes for a sub segment of the current way
-			var fromOsmNode = nodes.get(way.getNodeIds().get(i - 1));
-			var toOsmNode = nodes.get(way.getNodeIds().get(i));
+			ProcessedOsmNode fromOsmNode = nodes.get(way.getNodeIds().get(i - 1));
+			ProcessedOsmNode toOsmNode = nodes.get(way.getNodeIds().get(i));
 
 			// add the distance between those nodes to the overal length of segment
 			segmentLength += CoordUtils.calcEuclideanDistance(fromOsmNode.getCoord(), toOsmNode.getCoord());
 
 			if (isLoop(fromNodeForSegment, toOsmNode)) {
 				// detected a loop. Keep all nodes of the segment
-				var loopSegments = handleLoop(nodes, fromNodeForSegment, way, i, linkdIdPostfix);
+				Collection<WaySegment> loopSegments = handleLoop(nodes, fromNodeForSegment, way, i, linkdIdPostfix);
 				segments.addAll(loopSegments);
 
 				// set up next iteration
@@ -134,13 +134,13 @@ public class SupersonicOsmNetworkReader {
 
 		// we assume that the whole loop should be included
 		List<WaySegment> result = new ArrayList<>();
-		var toSegmentNode = node;
+		ProcessedOsmNode toSegmentNode = node;
 
 		// iterate backwards and keep all elements of the loop. Don't do thinning since this is an edge case
 		for (int i = toNodeIndex - 1; i > 0; i--) {
 
-			var fromId = way.getNodeIds().get(i);
-			var fromSegmentNode = nodes.get(fromId);
+			long fromId = way.getNodeIds().get(i);
+			ProcessedOsmNode fromSegmentNode = nodes.get(fromId);
 
 			result.add(new WaySegment(
 					fromSegmentNode, toSegmentNode,
@@ -161,11 +161,11 @@ public class SupersonicOsmNetworkReader {
 
 	private Stream<Link> createLinks(WaySegment segment) {
 
-		var properties = segment.getLinkProperties();
+		LinkProperties properties = segment.getLinkProperties();
 		List<Link> result = new ArrayList<>();
 
-		var fromNode = createNode(segment.getFromNode().getCoord(), segment.getFromNode().getId());
-		var toNode = createNode(segment.getToNode().getCoord(), segment.getToNode().getId());
+		Node fromNode = createNode(segment.getFromNode().getCoord(), segment.getFromNode().getId());
+		Node toNode = createNode(segment.getToNode().getCoord(), segment.getToNode().getId());
 
 		if (!isOnewayReverse(segment.tags)) {
 			Link forwardLink = createLink(fromNode, toNode, segment, false);
@@ -328,7 +328,7 @@ public class SupersonicOsmNetworkReader {
 
 		private ConcurrentMap<String, LinkProperties> linkProperties = LinkProperties.createLinkProperties();
 		private BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy = (coord, level) -> true;
-		private Predicate<Long> preserveNodeWithId = id -> true;
+		private Predicate<Long> preserveNodeWithId = id -> false;
 		private AfterLinkCreated afterLinkCreated = (link, tags, isReverse) -> {
 		};
 		private CoordinateTransformation coordinateTransformation;
