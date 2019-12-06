@@ -45,6 +45,8 @@ public class MultiModeDrtMainModeIdentifierTest {
 		{
 			DrtStageActivityType drtStageActivityType = new DrtStageActivityType(drtMode);
 			List<PlanElement> testElements = new ArrayList<>();
+			
+			// #deleteBeforeRelease : only used to retrofit plans created since the merge of fallback routing module (sep'-dec'19)
 			Leg l1 = PopulationUtils.createLeg(TripRouter.getFallbackMode(drtMode));
 			Activity a2 = PopulationUtils.createActivityFromCoord(drtStageActivityType.drtStageActivity,
 					new Coord(0, 0));
