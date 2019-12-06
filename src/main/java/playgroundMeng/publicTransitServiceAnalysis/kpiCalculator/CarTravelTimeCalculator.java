@@ -70,11 +70,12 @@ public class CarTravelTimeCalculator {
 
 	public class CarTravelInfo {
 		LeastCostPathCalculator.Path carPath;
-		double travelTime;
+		double travelTime ;
+		PtAccessabilityConfig ptAccessabilityConfig = PtAccessabilityConfig.getInstance();
 
 		public CarTravelInfo(LeastCostPathCalculator.Path carPath) {
 			this.carPath = carPath;
-			this.travelTime = carPath.travelTime;
+			this.travelTime = carPath.travelTime + ptAccessabilityConfig.getParkingTime();
 		}
 
 		public void setCarPath(LeastCostPathCalculator.Path carPath) {

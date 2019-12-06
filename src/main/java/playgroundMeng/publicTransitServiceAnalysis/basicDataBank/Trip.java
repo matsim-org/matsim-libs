@@ -3,25 +3,34 @@ package playgroundMeng.publicTransitServiceAnalysis.basicDataBank;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import playgroundMeng.publicTransitServiceAnalysis.kpiCalculator.CarTravelTimeCalculator.CarTravelInfo;
 import playgroundMeng.publicTransitServiceAnalysis.kpiCalculator.PtTravelTimeCaculator.PtTraveInfo;
 
 public class Trip {
-	ActivityImp activityEndImp;
-	ActivityImp activityStartImp;
-	double travelTime;
-	double travelDistance;
-	Id<Person> personId;
-	List<String> modes = new LinkedList<String>();
-	CarTravelInfo carTravelInfo;
-	PtTraveInfo ptTraveInfo;
-	double ratio;
-	double ratioWithOutWaitingTime;
-	boolean foundOriginZone = false;
-	boolean foundDestinationZone = false;
+	
+	private double[] OriginCoordinate = new double[2];
+	private double[] DestinationCoordinate = new double[2];
+	
+	private ActivityImp activityEndImp;
+	private ActivityImp activityStartImp;
+	
+	private double travelTime;
+	private double travelDistance;
+	private Id<Person> personId;
+	private List<String> modes = new LinkedList<String>();
+	private String mode;
+	private CarTravelInfo carTravelInfo;
+	private PtTraveInfo ptTraveInfo;
+	private double ratio;
+	private double ratioWithOutWaitingTime;
+	private boolean foundOriginZone = false;
+	private boolean foundDestinationZone = false;
 
 	public void setFoundDestinationZone(boolean foundDestinationZone) {
 		this.foundDestinationZone = foundDestinationZone;
@@ -41,6 +50,34 @@ public class Trip {
 
 	public Trip() {
 		// TODO Auto-generated constructor stub
+	}
+	
+	public double[] getOriginCoordinate() {
+		CoordinateTransformation transformation = TransformationFactory
+				.getCoordinateTransformation("EPSG:25832", "EPSG:4326");
+		double x = activityEndImp.getCoord().getX();
+		double y = activityEndImp.getCoord().getY();
+		
+		Coord companyCoord = new Coord(x, y);
+		companyCoord = transformation.transform(companyCoord);
+		this.OriginCoordinate[0] = companyCoord.getY();
+		this.OriginCoordinate[1] = companyCoord.getX();		
+		
+		return OriginCoordinate;
+	}
+	
+	public double[] getDestinationCoordinate() {
+		CoordinateTransformation transformation = TransformationFactory
+				.getCoordinateTransformation("EPSG:25832", "EPSG:4326");
+		double x = activityStartImp.getCoord().getX();
+		double y = activityStartImp.getCoord().getY();
+		
+		Coord companyCoord = new Coord(x, y);
+		companyCoord = transformation.transform(companyCoord);
+		this.DestinationCoordinate[0] = companyCoord.getY();
+		this.DestinationCoordinate[1] = companyCoord.getX();		
+		
+		return DestinationCoordinate;
 	}
 	
 	public void setRatioWithOutWaitingTime(double ratioWithOutWaitingTime) {
@@ -133,6 +170,15 @@ public class Trip {
 
 	public List<String> getModes() {
 		return modes;
+	}
+	public String getMode() throws Exception {
+		if(this.getModes().size() == 1) {
+			return this.getModes().get(0);
+		} else if (this.getModes().contains("pt")) {
+			return "pt";
+		} else {
+			throw new Exception("unknown trip mode");
+		}
 	}
 
 }

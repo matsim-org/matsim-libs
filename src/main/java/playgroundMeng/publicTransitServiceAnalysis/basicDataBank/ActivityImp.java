@@ -4,10 +4,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 
 public class ActivityImp {
-	String type;
-	Coord coord;
-	Link link;
-	Double time;
+	private String type;
+	private Coord coord;
+	private Link link;
+	private Double time;
 
 	public ActivityImp(String type, Coord coord, double startTime) {
 		this.type = type;

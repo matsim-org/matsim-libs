@@ -29,27 +29,27 @@ public class GridImp {
 	private List<LinkExtendImp> linkExtendImps = new LinkedList<LinkExtendImp>();
 	private LinkedList<TransitStopFacilityExtendImp> transitStopFacilityExtendImps = new LinkedList<TransitStopFacilityExtendImp>();
 
-	Map<Integer, LinkedList<Trip>> time2OriginTrips = new HashedMap();
-	Map<Integer, LinkedList<Trip>> time2DestinationTrips = new HashedMap();
+	private Map<Integer, LinkedList<Trip>> time2OriginTrips = new HashedMap();
+	private Map<Integer, LinkedList<Trip>> time2DestinationTrips = new HashedMap();
 
 	// for kpi
-	Map<Integer, Double> time2Score = new HashedMap();
-	Map<Integer, Double> time2OriginKpi = new HashedMap();
-	Map<Integer, Double> time2DestinationKpi = new HashedMap();
+	private Map<Integer, Double> time2Score = new HashedMap();
+	private Map<Integer, Double> time2OriginKpi = new HashedMap();
+	private Map<Integer, Double> time2DestinationKpi = new HashedMap();
 
 	// for ratio
 
-	Map<Integer, Double> time2RatioOfOrigin = new HashedMap();
-	Map<Integer, Double> time2RatioOfDestination = new HashedMap();
+	private Map<Integer, Double> time2RatioOfOrigin = new HashedMap();
+	private Map<Integer, Double> time2RatioOfDestination = new HashedMap();
 	
-	Map<Integer, Double> time2RatioWWOfOrigin = new HashedMap();
-	Map<Integer, Double> time2RatioWWOfDestination = new HashedMap();
+	private Map<Integer, Double> time2RatioWWOfOrigin = new HashedMap();
+	private Map<Integer, Double> time2RatioWWOfDestination = new HashedMap();
 	
 	
-	Map<Integer, Integer> time2NumTripsOfOrigin = new HashedMap();
-	Map<Integer, Integer> time2NumTripsOfDestination = new HashedMap();
-	Map<Integer, Integer> time2NumNoPtTripsOfOrigin = new HashedMap();
-	Map<Integer, Integer> time2NumNoPtTripsOfDestination = new HashedMap();
+	private Map<Integer, Integer> time2NumTripsOfOrigin = new HashedMap();
+	private Map<Integer, Integer> time2NumTripsOfDestination = new HashedMap();
+	private Map<Integer, Integer> time2NumNoPtTripsOfOrigin = new HashedMap();
+	private Map<Integer, Integer> time2NumNoPtTripsOfDestination = new HashedMap();
 
 	public GridImp(Geometry geometry, int timeSlice) {
 		this.timeSlice = timeSlice;

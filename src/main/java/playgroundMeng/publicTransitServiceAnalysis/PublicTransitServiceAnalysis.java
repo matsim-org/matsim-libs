@@ -4,12 +4,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Random;
-
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.log4j.Logger;
-import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -19,11 +18,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
-import com.sun.javafx.image.impl.IntArgb;
-
 import playgroundMeng.publicTransitServiceAnalysis.basicDataBank.GridImp;
 import playgroundMeng.publicTransitServiceAnalysis.basicDataBank.Trip;
 import playgroundMeng.publicTransitServiceAnalysis.gridAnalysis.GridCreator;
+import playgroundMeng.publicTransitServiceAnalysis.infoCollector.EventsReader;
 import playgroundMeng.publicTransitServiceAnalysis.kpiCalculator.GridCalculator;
 import playgroundMeng.publicTransitServiceAnalysis.others.ConsoleProgressBar;
 import playgroundMeng.publicTransitServiceAnalysis.others.PtAccessabilityConfig;
@@ -35,7 +33,11 @@ public class PublicTransitServiceAnalysis {
 	public static void main(String[] args) throws Exception {
 		configure(args);
 		GridCreator gridCreator = GridCreator.getInstacne();
+		calculateRun(gridCreator);
+	}
 
+
+	private static void calculateRun(GridCreator gridCreator) throws Exception {
 		int remain = 0;
 		int total = gridCreator.getNum2Grid().values().size();
 		String string = "kpiCalculateProgress";
@@ -59,11 +61,11 @@ public class PublicTransitServiceAnalysis {
 		try {
 			logger.info("beginn to print the result");
 			print3DGrafikFile();
+			printTripInfo();
 			logger.info("finished");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 	
 
@@ -77,7 +79,7 @@ public class PublicTransitServiceAnalysis {
 		int timeSlice = Integer.valueOf(args[5]);
 		int girdSlice = Integer.valueOf(args[6]);
 		String analysisNetworkFile = null;
-		if(!args[7].isEmpty()) {
+		if(args.length == 8) {
 			analysisNetworkFile = directory + args[7];
 		}
 
@@ -119,6 +121,12 @@ public class PublicTransitServiceAnalysis {
 		modeScore.put("pt", 1.);
 		modeScore.put("train", 1.);
 		ptAccessabilityConfig.setModeScore(modeScore);
+		
+		ptAccessabilityConfig.setParkingTime(5*60);
+		List<String> consideredModes = new ArrayList<String>();
+		consideredModes.add("pt");
+		consideredModes.add("car");
+		ptAccessabilityConfig.setConsideredModes(consideredModes);
 
 		ptAccessabilityConfig.setOutputDirectory(directory + ptAccessabilityConfig.getAnalysisTimeSlice() + "_"
 				+ ptAccessabilityConfig.getAnalysisGridSlice() + "/");
@@ -126,6 +134,31 @@ public class PublicTransitServiceAnalysis {
 		if (!theDir.exists()) {
 			theDir.mkdir();
 		}
+	}
+	
+	private static void printTripInfo() throws Exception {
+		File file = new File(ptAccessabilityConfig.getOutputDirectory() + "tripInfo.csv");
+		FileWriter fileWriter = new FileWriter(file);
+		BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+		
+		bufferedWriter.write("OriginLatitude,OriginLongtitude,DestinationLatitude,DestinationLongtitude,departureTime,carTravelTime,ptTravelTime,Ratio,ptTravelTimeWW,ratioWW,oldMode");
+		for(Trip trip: EventsReader.getInstance().getTrips()) {
+			if(trip.isFoundDestinationZone() && trip.isFoundOriginZone()) {
+				bufferedWriter.newLine();
+				bufferedWriter.write(trip.getOriginCoordinate()[0]+ ","
+						+ trip.getOriginCoordinate()[1]+ ","
+						+ trip.getDestinationCoordinate()[0] + ","
+						+ trip.getDestinationCoordinate()[1] + ","
+						+ trip.getActivityEndImp().getTime() + ","
+						+ trip.getCarTravelInfo().getTravelTime() + ","
+						+ trip.getPtTraveInfo().getTravelTime()+ ","
+						+ trip.getRatio()+","
+						+ trip.getPtTraveInfo().getTraveLTimeWithOutWaitingTime() + ","
+						+ trip.getRatioWithOutWaitingTime() + ","
+						+ trip.getMode());
+			}
+		}
+		bufferedWriter.close();
 	}
 
 	private static void print3DGrafikFile() throws IOException {
@@ -156,10 +189,6 @@ public class PublicTransitServiceAnalysis {
 						+ GridCreator.getInstacne().getNum2Grid().get(string).getTime2OriginKpi().get(x) + ","
 						+ GridCreator.getInstacne().getNum2Grid().get(string).getTime2NumTripsOfOrigin().get(x) + ","
 						+ GridCreator.getInstacne().getNum2Grid().get(string).getTime2NumNoPtTripsOfOrigin().get(x));
-				
-				for(Trip trip: GridCreator.getInstacne().getNum2Grid().get(string).getTime2OriginTrips().get(x)) {
-					bufferedWriter1.write(","+trip.getRatio());
-				}
 
 				bufferedWriter2.write(string + ","
 						+ GridCreator.getInstacne().getNum2Grid().get(string).getCoordinate()[0] + ","
@@ -172,9 +201,6 @@ public class PublicTransitServiceAnalysis {
 						+ "," + GridCreator.getInstacne().getNum2Grid().get(string).getTime2NumNoPtTripsOfDestination()
 								.get(x));
 				
-				for(Trip trip: GridCreator.getInstacne().getNum2Grid().get(string).getTime2DestinationTrips().get(x)) {
-					bufferedWriter2.write(","+trip.getRatio());
-				}
 			}
 		}
 		bufferedWriter1.close();

@@ -120,7 +120,7 @@ public class GridCalculator {
 		CarTravelTimeCalculator.getInstance().caculate(trip);
 		PtTravelTimeCaculator.getInstance().caculate(trip);
 
-		if (trip.getTravelDistance() <= 200) {
+		if (trip.getTravelDistance() <= 200 && trip.getCarTravelInfo().getTravelTime() == 0) {
 			trip.setRatio(0.);
 		} else if (!trip.getPtTraveInfo().isUsePt()) {
 			trip.setRatio(-1.);
