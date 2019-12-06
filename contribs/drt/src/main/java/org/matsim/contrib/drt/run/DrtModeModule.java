@@ -161,7 +161,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 			DrtRouteLegCalculator drtRouteLegCalculator = new DrtRouteLegCalculator(drtCfg,
 					getModalInstance(Network.class), leastCostPathCalculatorFactory, travelTime,
-					getModalInstance(TravelDisutilityFactory.class), scenario);
+					getModalInstance(TravelDisutilityFactory.class), scenario.getPopulation().getFactory());
 
 			return new DrtRoutingModule(drtRouteLegCalculator,
 					accessEgressRouters.getOrDefault(Direction.ACCESS, walkRouter),
