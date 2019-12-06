@@ -109,12 +109,16 @@ class WaysPbfParser extends PbfParser implements OsmHandler {
         if (isStreetOfInterest(tags)) {
 
             LinkProperties linkProperty = this.linkPropertiesMap.get(tags.get(OsmTags.HIGHWAY));
-            ProcessedOsmWay wayWrapper = ProcessedOsmWay.create(osmWay, tags, linkProperty);
-            ways.put(osmWay.getId(), wayWrapper);
+            ProcessedOsmWay processedWay = ProcessedOsmWay.create(osmWay, tags, linkProperty);
+            ways.put(osmWay.getId(), processedWay);
 
             for (int i = 0; i < osmWay.getNumberOfNodes(); i++) {
                 long nodeId = osmWay.getNodeId(i);
-                nodes.computeIfAbsent(nodeId, id -> new ArrayList<>()).add(wayWrapper);
+                List<ProcessedOsmWay> referencingWays = nodes.computeIfAbsent(nodeId, id -> new ArrayList<>());
+                // we actually want to sycn on this very list
+                synchronized (referencingWays) {
+                    referencingWays.add(processedWay);
+                }
             }
         }
         if (counter.get() % 100000 == 0) {
