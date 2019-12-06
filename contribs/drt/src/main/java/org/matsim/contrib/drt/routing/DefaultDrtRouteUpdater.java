@@ -39,6 +39,8 @@ import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.name.Named;
 
+import one.util.streamex.StreamEx;
+
 /**
  * @author michalm (Michal Maciejewski)
  */
@@ -68,12 +70,10 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 
 	@Override
 	public void notifyReplanning(ReplanningEvent event) {
-		Stream<Leg> drtLegs = population.getPersons()
-				.values()
-				.stream()
+		Stream<Leg> drtLegs = StreamEx.of(population.getPersons().values())
 				.flatMap(p -> p.getSelectedPlan().getPlanElements().stream())
-				.filter(e -> e instanceof Leg && ((Leg)e).getMode().equals(drtCfg.getMode()))
-				.map(e -> (Leg)e);
+				.select(Leg.class)
+				.filterBy(Leg::getMode, drtCfg.getMode());
 		executorService.submitRunnablesAndWait(drtLegs.map(l -> (router -> updateDrtRoute(router, l))));
 	}
 
