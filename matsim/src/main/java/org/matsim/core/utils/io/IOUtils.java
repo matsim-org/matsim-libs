@@ -298,7 +298,7 @@ final public class IOUtils {
 			File file = new File(url.toURI());
 			CompressionType compression = getCompression(url);
 
-			if (compression != null && append && file.exists()) {
+			if ((compression != null && compression != CompressionType.ZSTD) && append && file.exists()) {
 				throw new UncheckedIOException("Cannot append to compressed files.");
 			}
 
