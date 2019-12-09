@@ -426,7 +426,7 @@ public class TestFreightUtils {
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 
 		URL scenarioUrl = ExamplesUtils.getTestScenarioURL( "freight-chessboard-9x9" ) ;
-		String vraFile= IOUtils.extendUrl(scenarioUrl, "algorithm_v2.xml" ).getPath(); //TODO: anpassen
+		String vraFile= IOUtils.extendUrl(scenarioUrl, "algorithm_v2.xml" ).toString();
 		ConfigUtils.addOrGetModule( config, FreightConfigGroup.class ).setVehicleRoutingAlgortihmFileFile(vraFile);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
