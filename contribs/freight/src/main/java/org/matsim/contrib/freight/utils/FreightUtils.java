@@ -97,7 +97,7 @@ public class FreightUtils {
 				log.info("Will read in VehicleRoutingAlgorithm from " + vehicleRoutingAlgortihmFile);
 				URL vraURL;
 				try {
-					vraURL = new URL(vehicleRoutingAlgortihmFile);
+					vraURL = IOUtils.resolveFileOrResource(vehicleRoutingAlgortihmFile);
 				} catch (Exception e){
 					throw new RuntimeException(e);
 				}
