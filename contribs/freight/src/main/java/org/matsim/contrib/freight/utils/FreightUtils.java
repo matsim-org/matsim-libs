@@ -44,6 +44,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.VehicleType;
 
 import javax.management.InvalidAttributeValueException;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -94,7 +95,13 @@ public class FreightUtils {
 			final String vehicleRoutingAlgortihmFile = freightConfig.getVehicleRoutingAlgortihmFile();
 			if(vehicleRoutingAlgortihmFile != null && !vehicleRoutingAlgortihmFile.equals(""))	{
 				log.info("Will read in VehicleRoutingAlgorithm from " + vehicleRoutingAlgortihmFile);
-				vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, vehicleRoutingAlgortihmFile);
+				URL vraURL;
+				try {
+					vraURL = new URL(vehicleRoutingAlgortihmFile);
+				} catch (Exception e){
+					throw new RuntimeException(e);
+				}
+				vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, vraURL);
 			} else {
 				log.info("Use a VehicleRoutingAlgorithm out of the box.");
 				vra = Jsprit.Builder.newInstance(vrp).setProperty(Jsprit.Parameter.THREADS, "5").buildAlgorithm();
