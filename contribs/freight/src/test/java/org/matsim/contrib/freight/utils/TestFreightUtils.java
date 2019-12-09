@@ -488,7 +488,7 @@ public class TestFreightUtils {
 		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration );
 		//freight configstuff
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-		freightConfigGroup.setCarriersFile(IOUtils.extendUrl(scenarioUrl, "singleCarrierFiveActivitiesWithoutRoutes.xml" ).getFile() );
+		freightConfigGroup.setCarriersFile(IOUtils.extendUrl(scenarioUrl, "singleCarrierFiveActivitiesWithoutRoutes.xml" ).toString() );
 		freightConfigGroup.setCarriersVehicleTypesFile(IOUtils.extendUrl(scenarioUrl, "vehicleTypes.xml" ).toString() );
 		freightConfigGroup.setTravelTimeSliceWidth(24*3600);
 		freightConfigGroup.setTimeWindowHandling(FreightConfigGroup.TimeWindowHandling.enforceBeginnings);
