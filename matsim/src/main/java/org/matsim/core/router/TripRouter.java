@@ -322,10 +322,12 @@ public final class TripRouter implements MatsimExtensionPoint {
 		return config;
 	}
 
+	@Deprecated // #deleteBeforeRelease : only used to retrofit plans created since the merge of fallback routing module (sep'-dec'19)
 	public static String getFallbackMode(String transportMode) {
 		return transportMode + FallbackRoutingModuleDefaultImpl._fallback;
 	}
 
+	@Deprecated // #deleteBeforeRelease : only used to retrofit plans created since the merge of fallback routing module (sep'-dec'19)
 	public static boolean isFallbackMode(String mode) {
 		return mode.endsWith(FallbackRoutingModuleDefaultImpl._fallback);
 	}

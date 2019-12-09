@@ -284,7 +284,7 @@ public class IOUtilsTest {
 		writer.write("12345678901234567890123456789012345678901234567890");
 		writer.close();
 		File file = new File(filename);
-		Assert.assertEquals("compressed file should be equal 50 bytes, but is " + file.length(), 50, file.length());
+		Assert.assertEquals("compressed file should be equal 28 bytes, but is " + file.length(), 28, file.length());
 	}
 
 	@Test
