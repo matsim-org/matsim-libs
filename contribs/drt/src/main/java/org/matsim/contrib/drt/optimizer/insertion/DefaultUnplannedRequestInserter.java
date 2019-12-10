@@ -70,7 +70,6 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 
 		insertionProblem = new ParallelMultiVehicleInsertionProblem(pathDataProvider, drtCfg, mobsimTimer, forkJoinPool,
 				penaltyCalculator);
-		insertionScheduler.initSchedules();
 	}
 
 	@Override
