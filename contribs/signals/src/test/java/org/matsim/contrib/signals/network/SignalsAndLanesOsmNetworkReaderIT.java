@@ -4,8 +4,11 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
@@ -19,6 +22,9 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.lanes.data.Lanes;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class SignalsAndLanesOsmNetworkReaderIT {
     @Rule
@@ -73,6 +79,8 @@ public class SignalsAndLanesOsmNetworkReaderIT {
 
 
         signalReader.parse(inputOSM);
+
+
         new NetworkCleaner().run(network);
         new LanesAndSignalsCleaner().run(scenario);
 
@@ -85,7 +93,34 @@ public class SignalsAndLanesOsmNetworkReaderIT {
 //        Assert.assertEquals("Number of Links", noLinks1,noLinks2);
 //        Assert.assertEquals("Number of Nodes", noNodes1,noNodes2);
         System.out.println("Number of Links: original: "+noLinks1+" SignalReader: "+ noLinks2);
-        System.out.println("Number of Links: original: "+noNodes1+" SignalReader: "+ noNodes2);
+        System.out.println("Number of Nodes: original: "+noNodes1+" SignalReader: "+ noNodes2);
+
+
+//        //Coordinate Set....
+//        for(Id<Node> node:this.origNetwork.getNodes().keySet()){
+//            if (!network.getNodes().keySet().contains(node)) {
+//                this.origNetwork.getNodes().get(node).getCoord()
+//
+//            }
+//        }
+
+
+
+        Set<Id<Link>> linkSet = new HashSet<>();
+        for (Id<Link> link : this.origNetwork.getLinks().keySet()) {
+            if (!network.getLinks().keySet().contains(link)){
+                linkSet.add(link);
+            }
+        }
+        Set<Id<Link>> linkSet2 = new HashSet<>();
+        for (Id<Link> link : network.getLinks().keySet()) {
+            if (!this.origNetwork.getLinks().keySet().contains(link)){
+                linkSet2.add(link);
+            }
+        }
+
+        System.out.println("Links in original Network, but not in new one "+linkSet.size());
+        System.out.println("Links in new Network, but not in original one "+linkSet2.size());
     }
 
     //Prepare Network with Original-Reader
