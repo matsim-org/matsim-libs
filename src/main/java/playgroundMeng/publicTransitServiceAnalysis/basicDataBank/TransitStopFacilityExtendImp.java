@@ -18,8 +18,8 @@ import playgroundMeng.publicTransitServiceAnalysis.others.TimeConvert;
 
 public class TransitStopFacilityExtendImp extends TransitStopFacilityImpl implements TransitStopFacility {
 
-	Map<Integer, RouteStopInfo> routeStopInfoMap = new HashedMap();
-	Map<String, Integer> modeInfo = new HashedMap();
+	private Map<Integer, RouteStopInfo> routeStopInfoMap = new HashedMap();
+	private Map<String, Integer> modeInfo = new HashedMap();
 	private boolean findGrid = false;
 
 	public TransitStopFacilityExtendImp(Id<TransitStopFacility> id, Coord coord, boolean isBlockingLane) {

@@ -3,25 +3,53 @@ package playgroundMeng.publicTransitServiceAnalysis.basicDataBank;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.geotools.filter.expression.ThisPropertyAccessorFactory;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
+import playgroundMeng.publicTransitServiceAnalysis.gridAnalysis.GridCreator;
 import playgroundMeng.publicTransitServiceAnalysis.kpiCalculator.CarTravelTimeCalculator.CarTravelInfo;
 import playgroundMeng.publicTransitServiceAnalysis.kpiCalculator.PtTravelTimeCaculator.PtTraveInfo;
+import playgroundMeng.publicTransitServiceAnalysis.others.CoordinateConversion;
 
 public class Trip {
-	ActivityImp activityEndImp;
-	ActivityImp activityStartImp;
-	double travelTime;
-	double travelDistance;
-	Id<Person> personId;
-	List<String> modes = new LinkedList<String>();
-	CarTravelInfo carTravelInfo;
-	PtTraveInfo ptTraveInfo;
-	double ratio;
-	double ratioWithOutWaitingTime;
-	boolean foundOriginZone = false;
-	boolean foundDestinationZone = false;
+	
+	private ActivityImp activityEndImp;
+	private ActivityImp activityStartImp;
+	
+	private double travelTime;
+	private double travelDistance;
+	private Id<Person> personId;
+	private List<String> modes = new LinkedList<String>();
+	private CarTravelInfo carTravelInfo;
+	private PtTraveInfo ptTraveInfo;
+	private double ratio;
+	private double ratioWithOutWaitingTime;
+	private boolean foundOriginZone = false;
+	private boolean foundDestinationZone = false;
+	private String originZoneId;
+	private String destinationZoneId;
+	
+
+
+	public String getOriginZoneId() {
+		return originZoneId;
+	}
+
+	public void setOriginZoneId(String originZoneId) {
+		this.originZoneId = originZoneId;
+	}
+
+	public String getDestinationZoneId() {
+		return destinationZoneId;
+	}
+
+	public void setDestinationZoneId(String destinationZoneId) {
+		this.destinationZoneId = destinationZoneId;
+	}
 
 	public void setFoundDestinationZone(boolean foundDestinationZone) {
 		this.foundDestinationZone = foundDestinationZone;
@@ -41,6 +69,63 @@ public class Trip {
 
 	public Trip() {
 		// TODO Auto-generated constructor stub
+	}
+	
+	public double[] getOriginZoneCoord() {
+		double[] coord = new double[2];
+		if(this.getOriginZoneId() != null) {
+			return GridCreator.getInstacne().getNum2Grid().get(this.getOriginZoneId()).getCoordinate();
+		} else {
+			coord[0] = -1.;
+			coord[1] = -1.;
+			return coord;
+		}
+	}
+	
+	public double[] getDestinationZoneCoord() {
+		double[] coord = new double[2];
+		if(this.getDestinationZoneId() != null) {
+			return GridCreator.getInstacne().getNum2Grid().get(this.getDestinationZoneId()).getCoordinate();
+		} else {
+			coord[0] = -1.;
+			coord[1] = -1.;
+			return coord;
+		}
+	}
+	
+	public double[] getOriginCoordinate() {
+		double x = activityEndImp.getCoord().getX();
+		double y = activityEndImp.getCoord().getY();
+		
+//		CoordinateTransformation transformation = TransformationFactory
+//				.getCoordinateTransformation("EPSG:25832", "EPSG:4326");
+//		Coord companyCoord = new Coord(x, y);
+//		companyCoord = transformation.transform(companyCoord);
+//		this.OriginCoordinate[0] = companyCoord.getY();
+//		this.OriginCoordinate[1] = companyCoord.getX();		
+//		
+//		return OriginCoordinate;
+		
+		CoordinateConversion coordinateConversion = new CoordinateConversion();
+		String utm = "32 U " + String.valueOf(x) + " " + String.valueOf(y);
+		return coordinateConversion.utm2LatLon(utm);
+	}
+	
+	public double[] getDestinationCoordinate() {
+		double x = activityStartImp.getCoord().getX();
+		double y = activityStartImp.getCoord().getY();
+		
+//		CoordinateTransformation transformation = TransformationFactory
+//				.getCoordinateTransformation("EPSG:25832", "EPSG:4326");
+//		Coord companyCoord = new Coord(x, y);
+//		companyCoord = transformation.transform(companyCoord);
+//		this.DestinationCoordinate[0] = companyCoord.getY();
+//		this.DestinationCoordinate[1] = companyCoord.getX();
+//		return DestinationCoordinate;
+		
+		CoordinateConversion coordinateConversion = new CoordinateConversion();
+		String utm = "32 U " + String.valueOf(x) + " " + String.valueOf(y);
+		return coordinateConversion.utm2LatLon(utm);
 	}
 	
 	public void setRatioWithOutWaitingTime(double ratioWithOutWaitingTime) {
@@ -133,6 +218,15 @@ public class Trip {
 
 	public List<String> getModes() {
 		return modes;
+	}
+	public String getMode() throws Exception {
+		if(this.getModes().size() == 1) {
+			return this.getModes().get(0);
+		} else if (this.getModes().contains("pt")) {
+			return "pt";
+		} else {
+			throw new Exception("unknown trip mode");
+		}
 	}
 
 }

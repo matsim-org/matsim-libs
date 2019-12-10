@@ -12,7 +12,7 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator.Builder;
 
 import playgroundMeng.publicTransitServiceAnalysis.basicDataBank.Trip;
 import playgroundMeng.publicTransitServiceAnalysis.others.ActivitiesEventHandler;
-import playgroundMeng.publicTransitServiceAnalysis.others.PtAccessabilityConfig;
+import playgroundMeng.publicTransitServiceAnalysis.run.PtAccessabilityConfig;
 
 public class EventsReader {
 	private static EventsReader reader = null;

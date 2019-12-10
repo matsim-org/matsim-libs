@@ -11,7 +11,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import playgroundMeng.publicTransitServiceAnalysis.basicDataBank.GridImp;
 import playgroundMeng.publicTransitServiceAnalysis.basicDataBank.LinkExtendImp;
 import playgroundMeng.publicTransitServiceAnalysis.basicDataBank.TransitStopFacilityExtendImp;
-import playgroundMeng.publicTransitServiceAnalysis.others.PtAccessabilityConfig;
+import playgroundMeng.publicTransitServiceAnalysis.run.PtAccessabilityConfig;
 
 public class InfrastructureIntoGridDivider {
 

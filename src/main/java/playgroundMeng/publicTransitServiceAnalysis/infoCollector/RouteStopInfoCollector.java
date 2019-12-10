@@ -16,7 +16,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
 import playgroundMeng.publicTransitServiceAnalysis.basicDataBank.TransitStopFacilityExtendImp;
-import playgroundMeng.publicTransitServiceAnalysis.others.PtAccessabilityConfig;
+import playgroundMeng.publicTransitServiceAnalysis.run.PtAccessabilityConfig;
 
 public class RouteStopInfoCollector {
 	private static final Logger logger = Logger.getLogger(RouteStopInfoCollector.class);

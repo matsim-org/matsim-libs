@@ -21,35 +21,34 @@ public class GridImp {
 	private static final Logger logger = Logger.getLogger(GridImp.class);
 	private final Geometry geometry;
 	int timeSlice;
-	CoordinateTransformation transformation = TransformationFactory
-			.getCoordinateTransformation("EPSG:25832", "EPSG:4326"); 
+
 	private double[] coordinate = new double[2];
 
 	// Links and Stops which in this area;
 	private List<LinkExtendImp> linkExtendImps = new LinkedList<LinkExtendImp>();
 	private LinkedList<TransitStopFacilityExtendImp> transitStopFacilityExtendImps = new LinkedList<TransitStopFacilityExtendImp>();
 
-	Map<Integer, LinkedList<Trip>> time2OriginTrips = new HashedMap();
-	Map<Integer, LinkedList<Trip>> time2DestinationTrips = new HashedMap();
+	private Map<Integer, LinkedList<Trip>> time2OriginTrips = new HashedMap();
+	private Map<Integer, LinkedList<Trip>> time2DestinationTrips = new HashedMap();
 
 	// for kpi
-	Map<Integer, Double> time2Score = new HashedMap();
-	Map<Integer, Double> time2OriginKpi = new HashedMap();
-	Map<Integer, Double> time2DestinationKpi = new HashedMap();
+	private Map<Integer, Double> time2Score = new HashedMap();
+	private Map<Integer, Double> time2OriginKpi = new HashedMap();
+	private Map<Integer, Double> time2DestinationKpi = new HashedMap();
 
 	// for ratio
 
-	Map<Integer, Double> time2RatioOfOrigin = new HashedMap();
-	Map<Integer, Double> time2RatioOfDestination = new HashedMap();
+	private Map<Integer, Double> time2RatioOfOrigin = new HashedMap();
+	private Map<Integer, Double> time2RatioOfDestination = new HashedMap();
 	
-	Map<Integer, Double> time2RatioWWOfOrigin = new HashedMap();
-	Map<Integer, Double> time2RatioWWOfDestination = new HashedMap();
+	private Map<Integer, Double> time2RatioWWOfOrigin = new HashedMap();
+	private Map<Integer, Double> time2RatioWWOfDestination = new HashedMap();
 	
 	
-	Map<Integer, Integer> time2NumTripsOfOrigin = new HashedMap();
-	Map<Integer, Integer> time2NumTripsOfDestination = new HashedMap();
-	Map<Integer, Integer> time2NumNoPtTripsOfOrigin = new HashedMap();
-	Map<Integer, Integer> time2NumNoPtTripsOfDestination = new HashedMap();
+	private Map<Integer, Integer> time2NumTripsOfOrigin = new HashedMap();
+	private Map<Integer, Integer> time2NumTripsOfDestination = new HashedMap();
+	private Map<Integer, Integer> time2NumNoPtTripsOfOrigin = new HashedMap();
+	private Map<Integer, Integer> time2NumNoPtTripsOfDestination = new HashedMap();
 
 	public GridImp(Geometry geometry, int timeSlice) {
 		this.timeSlice = timeSlice;
@@ -81,6 +80,9 @@ public class GridImp {
 
 	public void setCoordinate() {
 		
+//		CoordinateTransformation transformation = TransformationFactory
+//				.getCoordinateTransformation("EPSG:25832", "EPSG:4326"); 
+		
 //		double x = geometry.getCentroid().getX();
 //		double y = geometry.getCentroid().getY();
 //		
@@ -93,7 +95,7 @@ public class GridImp {
 		double y = geometry.getCentroid().getY();
 		String utm = "32 U " + String.valueOf(x) + " " + String.valueOf(y);
 		this.coordinate = coordinateConversion.utm2LatLon(utm);
-		
+//		
 	}
 
 	public void findTripsInThePolygon(List<Trip> trips) {
@@ -309,6 +311,10 @@ public class GridImp {
 
 	public void setTime2DestinationKpi(Map<Integer, Double> time2DestinationKpi) {
 		this.time2DestinationKpi = time2DestinationKpi;
+	}
+
+	public void setCoordinate(double[] coordinate) {
+		this.coordinate = coordinate;
 	}
 	
 }

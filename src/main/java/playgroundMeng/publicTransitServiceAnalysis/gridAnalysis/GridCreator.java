@@ -18,7 +18,7 @@ import playgroundMeng.publicTransitServiceAnalysis.basicDataBank.LinkExtendImp;
 import playgroundMeng.publicTransitServiceAnalysis.infoCollector.EventsReader;
 import playgroundMeng.publicTransitServiceAnalysis.infoCollector.RouteStopInfoCollector;
 import playgroundMeng.publicTransitServiceAnalysis.others.ConsoleProgressBar;
-import playgroundMeng.publicTransitServiceAnalysis.others.PtAccessabilityConfig;
+import playgroundMeng.publicTransitServiceAnalysis.run.PtAccessabilityConfig;
 
 public class GridCreator {
 	private static final Logger logger = Logger.getLogger(GridCreator.class);
@@ -54,7 +54,7 @@ public class GridCreator {
 			InfrastructureIntoGridDivider.divideLinksIntoGrid(this.num2Grid.get(string), linkExtendImps);
 			InfrastructureIntoGridDivider.divideStopsIntoGrid(this.num2Grid.get(string),
 					RouteStopInfoCollector.getInstance().getTransitStopFacilities().values());
-			TripsIntoGridDivider.divideTripsIntoGrid(this.num2Grid.get(string), EventsReader.getInstance().getTrips());
+			TripsIntoGridDivider.divideTripsIntoGrid(this.num2Grid.get(string), string, EventsReader.getInstance().getTrips());
 
 			remain++;
 			if (remain % (total / 10) == 0) {

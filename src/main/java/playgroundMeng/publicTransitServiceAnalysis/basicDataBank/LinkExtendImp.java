@@ -13,7 +13,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import playgroundMeng.publicTransitServiceAnalysis.basicDataBank.TransitStopFacilityExtendImp;
 import playgroundMeng.publicTransitServiceAnalysis.basicDataBank.TransitStopFacilityExtendImp.RouteStopInfo;
-import playgroundMeng.publicTransitServiceAnalysis.others.PtAccessabilityConfig;
+import playgroundMeng.publicTransitServiceAnalysis.run.PtAccessabilityConfig;
 
 public class LinkExtendImp implements Link {
 

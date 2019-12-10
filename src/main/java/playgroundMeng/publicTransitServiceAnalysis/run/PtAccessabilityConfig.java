@@ -1,5 +1,6 @@
-package playgroundMeng.publicTransitServiceAnalysis.others;
+package playgroundMeng.publicTransitServiceAnalysis.run;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +28,9 @@ public class PtAccessabilityConfig {
 
 	private double beginnTime = 0;
 	private double EndTime = 0;
+	
+	private double parkingTime = 0;
+	private List<String> consideredModes = new ArrayList<String>();
 
 	private static PtAccessabilityConfig ptAccessabilityConfig = null;
 
@@ -157,6 +161,22 @@ public class PtAccessabilityConfig {
 
 	public TransitSchedule getTransitSchedule() {
 		return transitSchedule;
+	}
+	
+	public void setParkingTime(double parkingTime) {
+		this.parkingTime = parkingTime;
+	}
+	
+	public double getParkingTime() {
+		return parkingTime;
+	}
+	
+	public void setConsideredModes(List<String> consideredModes) {
+		this.consideredModes = consideredModes;
+	}
+	
+	public List<String> getConsideredModes() {
+		return consideredModes;
 	}
 
 }
