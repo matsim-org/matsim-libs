@@ -1,7 +1,9 @@
 package playgroundMeng.publicTransitServiceAnalysis.kpiCalculator;
 
+import java.io.IOException;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -9,12 +11,45 @@ import playgroundMeng.publicTransitServiceAnalysis.basicDataBank.GridImp;
 import playgroundMeng.publicTransitServiceAnalysis.basicDataBank.LinkExtendImp;
 import playgroundMeng.publicTransitServiceAnalysis.basicDataBank.TransitStopFacilityExtendImp;
 import playgroundMeng.publicTransitServiceAnalysis.basicDataBank.TransitStopFacilityExtendImp.RouteStopInfo;
+import playgroundMeng.publicTransitServiceAnalysis.gridAnalysis.GridCreator;
 import playgroundMeng.publicTransitServiceAnalysis.basicDataBank.Trip;
-import playgroundMeng.publicTransitServiceAnalysis.others.PtAccessabilityConfig;
+import playgroundMeng.publicTransitServiceAnalysis.others.ConsoleProgressBar;
+import playgroundMeng.publicTransitServiceAnalysis.run.PtAccessabilityConfig;
+import playgroundMeng.publicTransitServiceAnalysis.run.PublicTransitServiceAnalysis;
 
 public class GridCalculator {
+	
+	private static final Logger logger = Logger.getLogger(PublicTransitServiceAnalysis.class);
+	
+	
+	public static void calculate(GridCreator gridCreator) {
+		int remain = 0;
+		int total = gridCreator.getNum2Grid().values().size();
+		String string = "kpiCalculateProgress";
+		ConsoleProgressBar.progressPercentage(remain, total, string, logger);
+		int a = 1;
+		for (GridImp gridImp : gridCreator.getNum2Grid().values()) {
+			GridCalculator.calculateTime2Score(gridImp);
+			try {
+				GridCalculator.calculateTime2Ratio(gridImp);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			GridCalculator.calculateTime2Kpi(gridImp);
+			remain++;
+			if (total / 10 != 0) {
+				if (remain % (total / 10) == 0) {
+					ConsoleProgressBar.progressPercentage(remain, total, string, logger);
+				} else if (remain == total) {
+					ConsoleProgressBar.progressPercentage(remain, total, string, logger);
+				}
+			}
+			a++;
+		}
+	}
+	
 
-	public static void calculateTime2Score(GridImp gridImp) {
+	private static void calculateTime2Score(GridImp gridImp) {
 		addStopsInfo2Link(gridImp);
 		PtAccessabilityConfig ptAccessabilityConfig = PtAccessabilityConfig.getInstance();
 		for (int x : gridImp.getTime2Score().keySet()) {
@@ -41,7 +76,7 @@ public class GridCalculator {
 		}
 	}
 
-	public static void calculateTime2Ratio(GridImp gridImp) throws Exception {
+	private static void calculateTime2Ratio(GridImp gridImp) throws Exception {
 		for (int a : gridImp.getTime2OriginTrips().keySet()) {
 			int num = 0;
 			double sumRatio = 0.;
@@ -98,7 +133,7 @@ public class GridCalculator {
 
 	}
 
-	public static void calculateTime2Kpi(GridImp gridImp) {
+	private static void calculateTime2Kpi(GridImp gridImp) {
 		for (int a : gridImp.getTime2Score().keySet()) {
 			if (gridImp.getTime2OriginTrips().get(a).size() == 0) {
 				gridImp.getTime2OriginKpi().put(a, -1.);

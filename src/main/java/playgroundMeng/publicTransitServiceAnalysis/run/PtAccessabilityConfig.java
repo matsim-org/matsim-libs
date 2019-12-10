@@ -1,4 +1,4 @@
-package playgroundMeng.publicTransitServiceAnalysis.others;
+package playgroundMeng.publicTransitServiceAnalysis.run;
 
 import java.util.ArrayList;
 import java.util.List;

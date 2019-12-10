@@ -21,8 +21,7 @@ public class GridImp {
 	private static final Logger logger = Logger.getLogger(GridImp.class);
 	private final Geometry geometry;
 	int timeSlice;
-	CoordinateTransformation transformation = TransformationFactory
-			.getCoordinateTransformation("EPSG:25832", "EPSG:4326"); 
+
 	private double[] coordinate = new double[2];
 
 	// Links and Stops which in this area;
@@ -81,18 +80,21 @@ public class GridImp {
 
 	public void setCoordinate() {
 		
-		double x = geometry.getCentroid().getX();
-		double y = geometry.getCentroid().getY();
+//		CoordinateTransformation transformation = TransformationFactory
+//				.getCoordinateTransformation("EPSG:25832", "EPSG:4326"); 
 		
-		Coord companyCoord = new Coord(x, y);
-		companyCoord = transformation.transform(companyCoord);
-		this.coordinate[0] = companyCoord.getY();
-		this.coordinate[1] = companyCoord.getX();		
-//		CoordinateConversion coordinateConversion = new CoordinateConversion();
 //		double x = geometry.getCentroid().getX();
 //		double y = geometry.getCentroid().getY();
-//		String utm = "32 U " + String.valueOf(x) + " " + String.valueOf(y);
-//		this.coordinate = coordinateConversion.utm2LatLon(utm);
+//		
+//		Coord companyCoord = new Coord(x, y);
+//		companyCoord = transformation.transform(companyCoord);
+//		this.coordinate[0] = companyCoord.getY();
+//		this.coordinate[1] = companyCoord.getX();		
+		CoordinateConversion coordinateConversion = new CoordinateConversion();
+		double x = geometry.getCentroid().getX();
+		double y = geometry.getCentroid().getY();
+		String utm = "32 U " + String.valueOf(x) + " " + String.valueOf(y);
+		this.coordinate = coordinateConversion.utm2LatLon(utm);
 //		
 	}
 

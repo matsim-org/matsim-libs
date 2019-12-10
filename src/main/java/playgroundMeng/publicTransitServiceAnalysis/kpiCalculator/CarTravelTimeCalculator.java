@@ -20,7 +20,7 @@ import org.matsim.vehicles.Vehicle;
 
 import playgroundMeng.publicTransitServiceAnalysis.basicDataBank.Trip;
 import playgroundMeng.publicTransitServiceAnalysis.infoCollector.EventsReader;
-import playgroundMeng.publicTransitServiceAnalysis.others.PtAccessabilityConfig;
+import playgroundMeng.publicTransitServiceAnalysis.run.PtAccessabilityConfig;
 
 public class CarTravelTimeCalculator {
 	private final Network network;

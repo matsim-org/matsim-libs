@@ -25,7 +25,7 @@ import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorCore;
 import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData;
 import ch.sbb.matsim.routing.pt.raptor.RaptorRoute.RoutePart;
 import playgroundMeng.publicTransitServiceAnalysis.basicDataBank.Trip;
-import playgroundMeng.publicTransitServiceAnalysis.others.PtAccessabilityConfig;
+import playgroundMeng.publicTransitServiceAnalysis.run.PtAccessabilityConfig;
 
 public class PtTravelTimeCaculator {
 

@@ -85,8 +85,8 @@ public class ActivitiesEventHandler
 	}
 
 	public List<Trip> getTrips() {
-//		return getSubTripsByRadom(trips, 10000);
-		return this.trips;
+		return getSubTripsByRadom(trips, 10000);
+		//return this.trips;
 	}
 
 	public List<Trip> getSubTripsByRadom(List<Trip> list, int count) {
@@ -100,7 +100,6 @@ public class ActivitiesEventHandler
 			backSum = list.size();
 		}
 		for (int i = 0; i < backSum; i++) {
-//			随机数的范围为0-list.size()-1
 			int target = random.nextInt(list.size());
 			backList.add(list.get(target));
 			list.remove(target);
