@@ -179,11 +179,11 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 
         reader.setMinimizeSmallRoundabouts(false);
-		reader.setMergeOnewaySignalSystems(false);
+		reader.setMergeOnewaySignalSystems(true);
 		reader.setUseRadiusReduction(false);
 		reader.setAllowUTurnAtLeftLaneOnly(true);
-		reader.setMakePedestrianSignals(true);
 		reader.setMakePedestrianSignals(false);
+//		reader.setMakePedestrianSignals(false);
 
 		reader.setBoundingBox(51.7464, 14.3087, 51.7761, 14.3639); // setting Bounding Box for signals and lanes
 																	// (south,west,north,east)
@@ -198,6 +198,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 		new NetworkCleaner().run(network);
 		new LanesAndSignalsCleaner().run(scenario);
+
+
 
 		/*
 		 * Write the files out: network, lanes, signalSystems, signalGroups,
@@ -240,20 +242,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		Coord se = this.transform.transform(new Coord(east, south));
 		this.bbox = new BoundingBox(se.getY(), nw.getX(), nw.getY(), se.getX());
 	}
-
-	// TODO single setters for all - sbraun 07102019 done
-    /*
-	public void setAssumptions(boolean minimizeSmallRoundabouts, boolean mergeOnewaySignalSystems,
-			boolean useRadiusReduction, boolean allowUTurnAtLeftLaneOnly, boolean makePedestrianSignals,
-			boolean acceptFourPlusCrossings) {
-		this.minimizeSmallRoundabouts = minimizeSmallRoundabouts;
-		this.mergeOnewaySignalSystems = mergeOnewaySignalSystems;
-		this.useRadiusReduction = mergeOnewaySignalSystems;
-		this.allowUTurnAtLeftLaneOnly = allowUTurnAtLeftLaneOnly;
-		this.makePedestrianSignals = makePedestrianSignals;
-		this.acceptFourPlusCrossings = acceptFourPlusCrossings;
-	}
-    */
 
 	public void setMinimizeSmallRoundabouts(boolean minimizeSmallRoundabouts){
         this.minimizeSmallRoundabouts = minimizeSmallRoundabouts;
@@ -340,14 +328,17 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	@Override
 	protected void createMatsimData() {
 		super.createMatsimData();
-		
-		// TODO check and clean this method!
 
+		// TODO check and clean this method!
+//		for (Id<SignalSystem> set : this.systems.getSignalSystemData().keySet()) {
+//			LOG.warn(set.toString());
+//			this.systems.getSignalSystemData().get(set).
+//		}
 		// lanes were already created but without toLinks. add toLinks now:
 		for (Link link : network.getLinks().values()) {
 			if (link.getToNode().getOutLinks().size() >= 1) {
 				if (link.getNumberOfLanes() > 1) {
-					//LOG.warn(link.getNumberOfLanes());
+                    if(link.getNumberOfLanes()<1.) LOG.warn(link.getNumberOfLanes());
 					fillLanesAndCheckRestrictions(link);
 				} else {
 					Long toNodeId = Long.valueOf(link.getToNode().getId().toString());
@@ -375,71 +366,44 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				// no lanes needed on this link -> delete the lane container for this link
 				lanes.getLanesToLinkAssignments().remove(link.getId());
 			}
-
-
-			//TODO BRUTE FORCE SolUTION DELETE lanes if they dont have a toLink
-			/*if (link.getNumberOfLanes()!=0){
-				if(lanes.getLanesToLinkAssignments().get(link.getId())==null){
-					lanes.getLanesToLinkAssignments().remove(link.getId());
-				} else {
-					if ((link.getNumberOfLanes() != lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().keySet().size())) {
-						LOG.warn("ss");
-						lanes.getLanesToLinkAssignments().remove(link.getId());
-						link.setNumberOfLanes(0);
-					}else{
-						boolean lanesHaveToLink = true;
-						for(Lane lane : lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().values()){
-							if(lanesHaveToLink && lane.getToLinkIds()==null){
-								LOG.info(lane.getId().toString()+ " doesnt have a toLink -> Remove Lanes");
-								lanes.getLanesToLinkAssignments().remove(link.getId());
-								link.setNumberOfLanes(0);
-								lanesHaveToLink = false;
-							}
-						}
-					}
-				}
-			}*/
-
-
-
 		}
-		//TESTER sbraun2019102019
-		/*for (Link link : network.getLinks().values()) {
-			LOG.info(link.getId().toString());
-			LOG.info(link.getNumberOfLanes());
-			Map lanesOnLInk = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes();
-			for(Lane lane : lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().values()){
-				LOG.info(lane.getToLinkIds().toString());
-			}
-			//LOG.info(lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().toString());
-		}*/
 
 		for (Link link : network.getLinks().values()) {
 			if (lanes.getLanesToLinkAssignments().get(link.getId()) != null) {
 				simplifyLanesAndAddOrigLane(link);
 			}
+			//Id<SignalSystem> systemId = Id.create("System" + node.id, SignalSystem.class);
 			Id<SignalSystem> systemId = Id.create("System" + link.getToNode().getId(), SignalSystem.class);
-			if (this.systems.getSignalSystemData().containsKey(systemId)
-					&& lanes.getLanesToLinkAssignments().containsKey(link.getId())) {
-				for (Lane lane : lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().values()) {
-					String end = lane.getId().toString().split("\\.")[1];
-					if (!end.equals("ol")) {
-						SignalData signal = this.systems.getFactory()
-								.createSignalData(Id.create("Signal" + link.getId() + "." + end, Signal.class));
-						signal.setLinkId(link.getId());
-						signal.addLaneId(lane.getId());
-						this.systems.getSignalSystemData().get(systemId).addSignalData(signal);
+			if (this.systems.getSignalSystemData().containsKey(systemId)){
+				if (lanes.getLanesToLinkAssignments().containsKey(link.getId())) {
+					for (Lane lane : lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().values()) {
+						String end = lane.getId().toString().split("\\.")[1];
+						if (!end.equals("ol")) {
+							SignalData signal = this.systems.getFactory()
+									.createSignalData(Id.create("Signal" + link.getId() + "." + end, Signal.class));
+							signal.setLinkId(link.getId());
+							signal.addLaneId(lane.getId());
+							this.systems.getSignalSystemData().get(systemId).addSignalData(signal);
+						}
 					}
+				} else {
+					SignalData signal = this.systems.getFactory()
+							.createSignalData(Id.create("Signal" + link.getId() + ".single", Signal.class));
+					signal.setLinkId(link.getId());
+					this.systems.getSignalSystemData().get(systemId).addSignalData(signal);
 				}
 			}
-			if (this.systems.getSignalSystemData().containsKey(systemId)
-					&& !lanes.getLanesToLinkAssignments().containsKey(link.getId())) {
-				SignalData signal = this.systems.getFactory()
-						.createSignalData(Id.create("Signal" + link.getId() + ".single", Signal.class));
-				signal.setLinkId(link.getId());
-				this.systems.getSignalSystemData().get(systemId).addSignalData(signal);
-			}
 		}
+
+
+//		for (Id<SignalSystem> signalsystem : this.systems.getSignalSystemData().keySet()) {
+//			if (this.systems.getSignalSystemData().get(signalsystem).getSignalData() == null) {
+//				LOG.warn(signalsystem.toString()+" is missing SignalData");
+//			}
+//		}
+
+
+
 		int badCounter = 0;
 		for (Node node : network.getNodes().values()) {
 
@@ -453,7 +417,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						badCounter++;
 					} else {
 						this.systems.getSignalSystemData().remove(systemId);
-
 					}
 				}
 
@@ -524,11 +487,16 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			if (this.systems.getSignalSystemData().get(signalsystem).getSignalData()==null) {
 				badSignalSystemData.add(signalsystem);
 			} else {
-				for (SignalData signalData : this.systems.getSignalSystemData().get(signalsystem).getSignalData().values()){
-					//TODO check if the Signaldata has Link and Lane
-					signalData.getLinkId();
-					signalData.getLaneIds();
-				}
+//				for (SignalData signalData : this.systems.getSignalSystemData().get(signalsystem).getSignalData().values()){
+//					//TODO delete this if signals can be without lanes
+//					if ((signalData.getLaneIds()==null)){
+//						this.systems.getSignalSystemData().get(signalsystem).getSignalData().clear();
+//						this.groups.getSignalGroupDataBySignalSystemId().remove(signalsystem);
+//						this.control.getSignalSystemControllerDataBySystemId().remove(signalsystem);
+//						badSignalSystemData.add(signalsystem);
+//						break;
+//					}
+//				}
 			}
 		}
 		LOG.warn("Bad SignalSystemData: "+badSignalSystemData.size()+" ->remove them from the system");
@@ -1175,6 +1143,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		if (inLinksAngle > 3 / 4 * Math.PI && inLinksAngle < 5 / 4 * Math.PI) {
 			if (!this.makePedestrianSignals) {
 				this.systems.getSignalSystemData().remove(signalSystem.getId());
+				LOG.warn(signalSystem.getId().toString());
 				return;
 			} else {
 				SignalGroupData group = this.groups.getFactory().createSignalGroupData(signalSystem.getId(),
@@ -1461,6 +1430,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	// created - useful?************
 	// **************************************************************************************************
 	private void createLanes(final Link l, final Lanes lanes, final double nofLanes) {
+	    //if (nofLanes==0.5) LOG.warn("ACHTUNG"+ l.getId());
 		OsmHighwayDefaults defaults = this.highwayDefaults.get(l.getAttributes().getAttribute(TYPE).toString());
 		LanesFactory factory = lanes.getFactory();
 		LanesToLinkAssignment lanesForLink = factory.createLanesToLinkAssignment(Id.create(l.getId(), Link.class));
@@ -1480,6 +1450,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			lane.setCapacityVehiclesPerHour(defaults.laneCapacity);
 			lanesForLink.addLane(lane);
 		}
+		if(l.getNumberOfLanes()==0.5) LOG.warn("ACHTUNG"+ l.getId());
 	}
 
 	private void simplifyLanesAndAddOrigLane(Link link) {
@@ -2004,7 +1975,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			if (l.getNumberOfLanes() < turnLanesOfThisLink.size()) {
 				// TODO dies stellt die info der turn lanes über die info der #lanes.
 				// konsistent? adapt capacity too?
-				l.setNumberOfLanes(turnLanesOfThisLink.size());
+				if(turnLanesOfThisLink.size()==0.5) LOG.warn(turnLanesOfThisLink.size());
+                l.setNumberOfLanes(turnLanesOfThisLink.size());
 			}
 		}
 

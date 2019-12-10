@@ -73,7 +73,7 @@ import org.xml.sax.InputSource;
  *
  * @author mrieser, aneumann, nschirrmacher
  */
-@Deprecated // use SignalsAndLanesOsmNetworkReader that extends the general OsmNetworkReader
+//@Deprecated // use SignalsAndLanesOsmNetworkReader that extends the general OsmNetworkReader
 public class OsmNetworkWithLanesAndSignalsReader implements MatsimSomeReader {
 
 	private final static Logger log = Logger.getLogger(OsmNetworkWithLanesAndSignalsReader.class);
