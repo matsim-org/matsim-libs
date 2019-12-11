@@ -1,4 +1,4 @@
-package org.matsim.contib.osm.examples;
+package org.matsim.contrib.osm.examples;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
