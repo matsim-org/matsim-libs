@@ -18,22 +18,26 @@ import java.util.function.Predicate;
 
 public class SupersonicBicycleOsmNetworkReader {
 
-	public static final String SURFACE = "surface";
-	public static final String SMOOTHNESS = "smoothness";
+
 	public static final String BICYCLE_INFRASTRUCTURE_SPEED_FACTOR = "bicycleInfrastructureSpeedFactor";
 	private static final double BIKE_PCU = 0.25;
-	private Set<String> bicycleNotAllowed = new HashSet<>(Arrays.asList("motorway", "motorway_link", "trunk", "trunk_link"));
+	private Set<String> bicycleNotAllowed = new HashSet<>(Arrays.asList(OsmTags.MOTORWAY, OsmTags.MOTORWAY_LINK,
+			OsmTags.TRUNK, OsmTags.TRUNK_LINK));
+	private Set<String> onlyBicycleAllowed = new HashSet<>(Arrays.asList(OsmTags.TRACK, OsmTags.CYCLEWAY, OsmTags.SERVICE,
+			OsmTags.FOOTWAY, OsmTags.PEDESTRIAN, OsmTags.PATH, OsmTags.STEPS));
 
 	private CoordinateTransformation coordinateTransformation;
 	private BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy;
 	private Predicate<Long> preserveNodeWithId;
+	private SupersonicOsmNetworkReader.AfterLinkCreated afterLinkCreated;
 
 	private Set<Id<Link>> linksWhichNeedBackwardBicycleDirection = ConcurrentHashMap.newKeySet();
 
-	public SupersonicBicycleOsmNetworkReader(CoordinateTransformation coordinateTransformation, BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy, Predicate<Long> preserveNodeWithId) {
+	public SupersonicBicycleOsmNetworkReader(CoordinateTransformation coordinateTransformation, BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy, Predicate<Long> preserveNodeWithId, SupersonicOsmNetworkReader.AfterLinkCreated afterLinkCreated) {
 		this.coordinateTransformation = coordinateTransformation;
 		this.includeLinkAtCoordWithHierarchy = includeLinkAtCoordWithHierarchy;
 		this.preserveNodeWithId = preserveNodeWithId;
+		this.afterLinkCreated = afterLinkCreated;
 	}
 
 	public static Builder builder() {
@@ -44,13 +48,13 @@ public class SupersonicBicycleOsmNetworkReader {
 
 		return SupersonicOsmNetworkReader.builder()
 				.coordinateTransformation(this.coordinateTransformation)
-				.addOverridingLinkProperties("track", new LinkProperties(9, 1, 30 / 3.6, 1500 * BIKE_PCU, false))
-				.addOverridingLinkProperties("cycleway", new LinkProperties(9, 1, 30 / 3.6, 1500 * BIKE_PCU, false))
-				.addOverridingLinkProperties("service", new LinkProperties(9, 1, 10 / 3.6, 100 * BIKE_PCU, false))
-				.addOverridingLinkProperties("footway", new LinkProperties(10, 1, 10 / 3.6, 600 * BIKE_PCU, false))
-				.addOverridingLinkProperties("pedestrian", new LinkProperties(10, 1, 10 / 3.6, 600 * BIKE_PCU, false))
-				.addOverridingLinkProperties("path", new LinkProperties(10, 1, 20 / 3.6, 600 * BIKE_PCU, false))
-				.addOverridingLinkProperties("steps", new LinkProperties(11, 1, 1 / 3.6, 50 * BIKE_PCU, false))
+				.addOverridingLinkProperties(OsmTags.TRACK, new LinkProperties(9, 1, 30 / 3.6, 1500 * BIKE_PCU, false))
+				.addOverridingLinkProperties(OsmTags.CYCLEWAY, new LinkProperties(9, 1, 30 / 3.6, 1500 * BIKE_PCU, false))
+				.addOverridingLinkProperties(OsmTags.SERVICE, new LinkProperties(9, 1, 10 / 3.6, 100 * BIKE_PCU, false))
+				.addOverridingLinkProperties(OsmTags.FOOTWAY, new LinkProperties(10, 1, 10 / 3.6, 600 * BIKE_PCU, false))
+				.addOverridingLinkProperties(OsmTags.PEDESTRIAN, new LinkProperties(10, 1, 10 / 3.6, 600 * BIKE_PCU, false))
+				.addOverridingLinkProperties(OsmTags.PATH, new LinkProperties(10, 1, 20 / 3.6, 600 * BIKE_PCU, false))
+				.addOverridingLinkProperties(OsmTags.STEPS, new LinkProperties(11, 1, 1 / 3.6, 50 * BIKE_PCU, false))
 				.includeLinkAtCoordWithHierarchy(this.includeLinkAtCoordWithHierarchy)
 				.preserveNodeWithId(this.preserveNodeWithId)
 				.afterLinkCreated(this::handleLink)
@@ -60,32 +64,54 @@ public class SupersonicBicycleOsmNetworkReader {
 
 	private void handleLink(Link link, Map<String, String> tags, boolean isReverse) {
 
-		// add bike mode to most streets
 		String highwayType = tags.get(OsmTags.HIGHWAY);
-		if (!bicycleNotAllowed.contains(highwayType)) {
-			HashSet<String> allowedModes = new HashSet<>(link.getAllowedModes());
-			allowedModes.add(TransportMode.bike);
-			allowedModes.add(TransportMode.ride);
-			link.setAllowedModes(allowedModes);
-		}
 
-		//do surface
-		if (tags.containsKey(SURFACE)) {
-			link.getAttributes().putAttribute(SURFACE, tags.get(SURFACE));
-		} else if (highwayType.equals("primary") || highwayType.equals("primary_link") || highwayType.equals("secondary") || highwayType.equals("secondary_link")) {
-			link.getAttributes().putAttribute(SURFACE, "asphalt");
-		}
-
-		// do smoothness
-		if (tags.containsKey(SMOOTHNESS)) {
-			link.getAttributes().putAttribute(SMOOTHNESS, tags.get(SMOOTHNESS));
-		}
+		setAllowedModes(link, highwayType);
+		setSurface(link, tags, highwayType);
+		setSmoothness(link, tags);
+		setCycleWay(link, tags);
+		setRestrictions(link, tags);
 
 		// do infrastructure factor
 		link.getAttributes().putAttribute(BICYCLE_INFRASTRUCTURE_SPEED_FACTOR, 0.5);
 
 		//TODO add reverse direction for bicylces if street is only one way. Not sure how to fit that into the model of the reader
 
+		afterLinkCreated.accept(link, tags, isReverse);
+	}
+
+	private void setAllowedModes(Link link, String highwayType) {
+		HashSet<String> allowedModes = new HashSet<>(link.getAllowedModes());
+		if (!bicycleNotAllowed.contains(highwayType))
+			allowedModes.add(TransportMode.bike);
+		if (onlyBicycleAllowed.contains(highwayType))
+			allowedModes.remove(TransportMode.car);
+		link.setAllowedModes(allowedModes);
+	}
+
+	private void setSurface(Link link, Map<String, String> tags, String highwayType) {
+		if (tags.containsKey(OsmTags.SURFACE)) {
+			link.getAttributes().putAttribute(OsmTags.SURFACE, tags.get(OsmTags.SURFACE));
+		} else if (highwayType.equals(OsmTags.PRIMARY) || highwayType.equals(OsmTags.PRIMARY_LINK)
+				|| highwayType.equals(OsmTags.SECONDARY) || highwayType.equals(OsmTags.SECONDARY_LINK)) {
+			link.getAttributes().putAttribute(OsmTags.SURFACE, "asphalt");
+		}
+	}
+
+	private void setSmoothness(Link link, Map<String, String> tags) {
+		if (tags.containsKey(OsmTags.SMOOTHNESS)) {
+			link.getAttributes().putAttribute(OsmTags.SMOOTHNESS, tags.get(OsmTags.SMOOTHNESS));
+		}
+	}
+
+	private void setCycleWay(Link link, Map<String, String> tags) {
+		if (tags.containsKey(OsmTags.CYCLEWAY))
+			link.getAttributes().putAttribute(OsmTags.CYCLEWAY, tags.get(OsmTags.CYCLEWAY));
+	}
+
+	private void setRestrictions(Link link, Map<String, String> tags) {
+		if (tags.containsKey(OsmTags.BICYCLE))
+			link.getAttributes().putAttribute(TransportMode.bike, tags.get(OsmTags.BICYCLE));
 	}
 
 	public static class Builder {
@@ -93,6 +119,7 @@ public class SupersonicBicycleOsmNetworkReader {
 		private CoordinateTransformation transformation;
 		private BiPredicate<Coord, Integer> linkFilter;
 		private Predicate<Long> preserveNodes;
+		private SupersonicOsmNetworkReader.AfterLinkCreated afterLinkCreated;
 
 		private Builder() {
 		}
@@ -112,8 +139,13 @@ public class SupersonicBicycleOsmNetworkReader {
 			return this;
 		}
 
+		public Builder afterLinkCreated(SupersonicOsmNetworkReader.AfterLinkCreated consumer) {
+			this.afterLinkCreated = consumer;
+			return this;
+		}
+
 		public SupersonicBicycleOsmNetworkReader build() {
-			return new SupersonicBicycleOsmNetworkReader(transformation, linkFilter, preserveNodes);
+			return new SupersonicBicycleOsmNetworkReader(transformation, linkFilter, preserveNodes, afterLinkCreated);
 		}
 	}
 }
