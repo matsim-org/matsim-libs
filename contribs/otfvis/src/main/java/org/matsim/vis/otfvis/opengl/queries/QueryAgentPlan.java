@@ -129,7 +129,10 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 						continue ; // skip
 					}
 					Coord c2 = getCoord(act);
-					ActivityInfo activityInfo = new ActivityInfo((float) c2.getX(), (float) c2.getY(), act.getType());
+					ActivityInfo activityInfo = new ActivityInfo((float) c2.getX(), (float) c2.getY(), act.getType().substring( 0,3 ) );
+					if ( act.getType().endsWith( "_interaction" ) ) {
+						activityInfo = new ActivityInfo( (float) c2.getX(), (float) c2.getY(), act.getType().replace( "_interaction", "i" ) ) ;
+					}
 					result.acts.add(activityInfo);
 				}
 			}
