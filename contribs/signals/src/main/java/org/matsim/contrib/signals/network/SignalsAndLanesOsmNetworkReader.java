@@ -57,6 +57,7 @@ import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -96,7 +97,14 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private final static int CYCLE_TIME = 90;
 	private final int minimalTimeForPair = 2 * INTERGREENTIME + 2 * MIN_GREENTIME;
 
-	private final static String ORIG_ID = "origid";
+	//Define what a small Roundabout is (used in method findingSmallRoundabouts())
+	private final double roundaboutRadius = 20;
+
+
+
+
+
+    private final static String ORIG_ID = "origid";
 	private final static String TYPE = "type";
 	private final static String TO_LINKS_ANGLES = "toLinksAngles";
 	private final static String TO_LINK_REFERENCE = "toLinkReference";
@@ -334,7 +342,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 //			LOG.warn(set.toString());
 //			this.systems.getSignalSystemData().get(set).
 //		}
-		// lanes were already created but without toLinks. add toLinks now:
+		// lanes were already created (via setOrModifyLinkAttributes()) but without toLinks. add toLinks now:
 		for (Link link : network.getLinks().values()) {
 			if (link.getToNode().getOutLinks().size() >= 1) {
 				if (link.getNumberOfLanes() > 1) {
@@ -515,8 +523,9 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					&& !oldToSimplifiedJunctionNodeMap.containsKey(node.id) && hasNodeOneway(node)) {
 				junctionNodes.add(node);
 				for (OsmNode otherNode : this.nodes.values()) {
-					if (signalizedOsmNodes.contains(otherNode.id) && isNodeAtJunction(otherNode)
-							&& calcNode2NodeDistance(node, otherNode) < SIGNAL_MERGE_DISTANCE 
+                    if (signalizedOsmNodes.contains(otherNode.id) && isNodeAtJunction(otherNode)
+							&& NetworkUtils.getEuclideanDistance(node.coord.getX(), node.coord.getY(),
+                            otherNode.coord.getX(), otherNode.coord.getY()) < SIGNAL_MERGE_DISTANCE
 							&& !oldToSimplifiedJunctionNodeMap.containsKey(otherNode.id)
 							&& hasNodeOneway(otherNode)) {
 						junctionNodes.add(otherNode);
@@ -606,7 +615,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				for (int i = way.nodes.indexOf(node.id) + 1; i < way.nodes.size(); i++) {
 					OsmNode otherNode = nodes.get(way.nodes.get(i));
 					if (otherNode.used && !checkedNodes.contains(otherNode) && !junctionNodes.contains(otherNode)) {
-						if (calcNode2NodeDistance(node, otherNode) < distance) {
+                        if (NetworkUtils.getEuclideanDistance(node.coord.getX(), node.coord.getY(),
+                                otherNode.coord.getX(), otherNode.coord.getY()) < distance) {
 							if (otherNode.id == firstNode.id) {
 								junctionNodes.add(otherNode);
 							} else {
@@ -634,7 +644,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			String roundabout = way.tags.get(TAG_JUNCTION);
 			if (roundabout != null && roundabout.equals("roundabout") && !checkedWays.contains(way)) {
 				List<OsmNode> roundaboutNodes = new ArrayList<>();
-				double radius = 20;
 				if (this.nodes.get(way.nodes.get(0)).equals(this.nodes.get(way.nodes.get(way.nodes.size() - 1)))) {
 					checkedWays.add(way);
 					for (Long nodeId : way.nodes) {
@@ -642,31 +651,44 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					}
 				}
 
+				//Find middlepoint and circumference of Roundabout
 				if (roundaboutNodes.size() > 1) {
-					double repXmin = 0;
-					double repXmax = 0;
-					double repYmin = 0;
-					double repYmax = 0;
-					double repX;
-					double repY;
-					OsmNode lastNode = roundaboutNodes.get(roundaboutNodes.size() - 1);
+					OsmNode lastNode = roundaboutNodes.get(0);
+                    double repXmin = lastNode.coord.getX();
+                    double repXmax = lastNode.coord.getX();
+                    double repYmin = lastNode.coord.getY();
+                    double repYmax = lastNode.coord.getY();
+                    double repX;
+                    double repY;
+
 					double circumference = 0;
+
 					for (OsmNode tempNode : roundaboutNodes) {
-						if (repXmin == 0 || tempNode.coord.getX() < repXmin)
-							repXmin = tempNode.coord.getX();
-						if (repXmax == 0 || tempNode.coord.getX() > repXmax)
-							repXmax = tempNode.coord.getX();
-						if (repYmin == 0 || tempNode.coord.getY() < repYmin)
-							repYmin = tempNode.coord.getY();
-						if (repYmax == 0 || tempNode.coord.getY() > repYmax)
-							repYmax = tempNode.coord.getY();
-						circumference += calcNode2NodeDistance(tempNode,lastNode);
+					    double tempNodeX = tempNode.coord.getX();
+                        double tempNodeY = tempNode.coord.getY();
+
+                        if (tempNodeX < repXmin){
+                            repXmin = tempNodeX;
+                        } else if (tempNodeX > repXmax){
+                            repXmax = tempNodeX;
+                        }
+                        if (tempNodeY < repYmin){
+                            repYmin = tempNodeY;
+                        } else if (tempNodeY > repYmax){
+                            repYmax = tempNodeY;
+                        }
+
+
+                        circumference += NetworkUtils.getEuclideanDistance(tempNodeX, tempNodeY,
+                                lastNode.coord.getX(), lastNode.coord.getY());
 						lastNode = tempNode;
 					}
 					repX = repXmin + (repXmax - repXmin) / 2;
 					repY = repYmin + (repYmax - repYmin) / 2;
-					if ((circumference / (2 * Math.PI)) < radius) {
-						OsmNode roundaboutNode = new OsmNode(this.id, new Coord(repX, repY));
+
+					//If this is a small Roundabout merge it to one point
+					if ((circumference / (2 * Math.PI)) < this.roundaboutRadius) {
+					    OsmNode roundaboutNode = new OsmNode(this.id, new Coord(repX, repY));
 						roundaboutNode.used = true;
 						for (OsmNode tempNode : roundaboutNodes) {
 							oldToSimplifiedJunctionNodeMap.put(tempNode.id, roundaboutNode);
@@ -683,6 +705,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			}
 		}
 	}
+
+
 
 	private void findingMoreNodeJunctions(List<OsmNode> addingNodes, List<OsmNode> checkedNodes) {
 		for (OsmNode node : this.nodes.values()) {
@@ -758,7 +782,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 							boolean nodeSignalized = signalizedOsmNodes.contains(node.id);
 							boolean otherNodeSignalized = signalizedOsmNodes.contains(otherNode.id);
-							if (calcNode2NodeDistance(node, otherNode) < SIGNAL_MERGE_DISTANCE
+                            if (NetworkUtils.getEuclideanDistance(node.coord.getX(), node.coord.getY(),
+                                    otherNode.coord.getX(), otherNode.coord.getY()) < SIGNAL_MERGE_DISTANCE
 									&& !checkedNodes.contains(otherNode) && isNodeAtJunction(otherNode)
 									&& otherNode.used && !node.equals(otherNode)
 									&& nodeSignalized == otherNodeSignalized) {
@@ -817,7 +842,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					for (OsmNode tempNode : junctionNodes) {
 						repX += tempNode.coord.getX();
 						repY += tempNode.coord.getY();
-						leftTurnRadius += calcNode2NodeDistance(tempNode, lastNode);
+                        leftTurnRadius += NetworkUtils.getEuclideanDistance(tempNode.coord.getX(), tempNode.coord.getY(),
+                                lastNode.coord.getX(), lastNode.coord.getY());
 						lastNode = tempNode;
 					}
 					leftTurnRadius /= junctionNodes.size();
@@ -881,7 +907,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	}
 	//TODO Method name a little bit confousing - maybe integrate in above method
 	private void pushSignalOverShortWay(OsmWay shortWay, OsmNode fromNode, OsmNode toNode) {
-		if (shortWay.nodes.size() == 2 && calcNode2NodeDistance(fromNode, toNode) < SIGNAL_MERGE_DISTANCE) {
+        if (shortWay.nodes.size() == 2 && NetworkUtils.getEuclideanDistance(fromNode.coord.getX(), fromNode.coord.getY(),
+                toNode.coord.getX(), toNode.coord.getY()) < SIGNAL_MERGE_DISTANCE) {
 			if (fromNode.ways.size() == 2 && toNode.ways.size() > 2
 					&& signalizedOsmNodes.contains(fromNode.id) && !signalizedOsmNodes.contains(toNode.id)) {
 				signalizedOsmNodes.remove(fromNode.id);
@@ -901,15 +928,17 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				if (signalizedOsmNodes.contains(signalNode.id) && !isNodeAtJunction(signalNode)) {
 					if ((oneway != null && !oneway.equals("-1") && !oneway.equals("no")) || oneway == null) {
 						endPoint = this.nodes.get(way.nodes.get(way.nodes.size() - 1));
-						if (signalizedOsmNodes.contains(endPoint.id) && isNodeAtJunction(endPoint)
-								&& calcNode2NodeDistance(signalNode, endPoint) < SIGNAL_MERGE_DISTANCE)
+                        if (signalizedOsmNodes.contains(endPoint.id) && isNodeAtJunction(endPoint)
+								&& NetworkUtils.getEuclideanDistance(signalNode.coord.getX(), signalNode.coord.getY(),
+                                endPoint.coord.getX(), endPoint.coord.getY()) < SIGNAL_MERGE_DISTANCE)
 							signalizedOsmNodes.remove(signalNode.id);
 					}
 					if ((oneway != null && !oneway.equals("yes") && !oneway.equals("true") && !oneway.equals("1")
 							&& !oneway.equals("no")) || oneway == null) {
 						endPoint = this.nodes.get(way.nodes.get(0));
-						if (signalizedOsmNodes.contains(endPoint.id) && isNodeAtJunction(endPoint)
-								&& calcNode2NodeDistance(signalNode, endPoint) < SIGNAL_MERGE_DISTANCE)
+                        if (signalizedOsmNodes.contains(endPoint.id) && isNodeAtJunction(endPoint)
+								&& NetworkUtils.getEuclideanDistance(signalNode.coord.getX(), signalNode.coord.getY(),
+                                endPoint.coord.getX(), endPoint.coord.getY()) < SIGNAL_MERGE_DISTANCE)
 							signalizedOsmNodes.remove(signalNode.id);
 					}
 				}
@@ -944,7 +973,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 							}
 						}
 					}
-					if (junctionNode != null && calcNode2NodeDistance(signalNode, junctionNode) < SIGNAL_MERGE_DISTANCE) {
+                    if (junctionNode != null && NetworkUtils.getEuclideanDistance(signalNode.coord.getX(), signalNode.coord.getY(),
+                            junctionNode.coord.getX(), junctionNode.coord.getY()) < SIGNAL_MERGE_DISTANCE) {
 						signalizedOsmNodes.remove(signalNode.id);
 						signalizedOsmNodes.add(junctionNode.id);
 					} else if ((oneway != null && oneway.equals("-1")) || oneway == null) {
@@ -962,7 +992,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 								junctionNode = secondPrevNode;
 							}
 						}
-						if (junctionNode != null && calcNode2NodeDistance(signalNode, junctionNode) < SIGNAL_MERGE_DISTANCE) {
+                        if (junctionNode != null && NetworkUtils.getEuclideanDistance(signalNode.coord.getX(), signalNode.coord.getY(),
+                                junctionNode.coord.getX(), junctionNode.coord.getY()) < SIGNAL_MERGE_DISTANCE) {
 							signalizedOsmNodes.remove(signalNode.id);
 							signalizedOsmNodes.add(junctionNode.id);
 						}
@@ -1990,6 +2021,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 	}
 
+
+	//TODO ist mapping beim Nodemergen der Junction in findingMoreNodeJunctions dann nötig
 	public boolean isNodeAtJunction(OsmNode node) {
 		if (node.endPoint && node.ways.size() > 2)
 			return true;
@@ -2008,16 +2041,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 		return false;
 	}
-	//TODO verwendung ändern zu + löschen:
-	//node1.getDistance(node2) bereits eine Methode
-	private double calcNode2NodeDistance(OsmNode node1, OsmNode node2) {
-		double x = node1.coord.getX() - node2.coord.getX();
-		double y = node1.coord.getY() - node2.coord.getY();
-		double distance = Math.sqrt(x * x + y * y);
-		return distance;
-	}
 
-	private boolean hasNodeOneway(OsmNode node) {
+    private boolean hasNodeOneway(OsmNode node) {
 		boolean hasOneway = false;
 		for (OsmWay way : node.ways.values()) {
 			String oneway = way.tags.get(TAG_ONEWAY);
@@ -2109,7 +2134,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 
 	}
-	//TODO hat er da was geändert von dem Original reader?
 	private static final class OsmRelation {
 		public final long id;
 		public OsmNode resNode;
