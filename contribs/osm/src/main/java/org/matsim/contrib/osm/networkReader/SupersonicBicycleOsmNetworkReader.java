@@ -5,20 +5,17 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 public class SupersonicBicycleOsmNetworkReader {
-
 
 	public static final String BICYCLE_INFRASTRUCTURE_SPEED_FACTOR = "bicycleInfrastructureSpeedFactor";
 	private static final double BIKE_PCU = 0.25;
@@ -47,7 +44,7 @@ public class SupersonicBicycleOsmNetworkReader {
 
 	public Network read(Path inputFile) {
 
-		return SupersonicOsmNetworkReader.builder()
+		Network network = SupersonicOsmNetworkReader.builder()
 				.coordinateTransformation(this.coordinateTransformation)
 				.addOverridingLinkProperties(OsmTags.TRACK, new LinkProperties(9, 1, 30 / 3.6, 1500 * BIKE_PCU, false))
 				.addOverridingLinkProperties(OsmTags.CYCLEWAY, new LinkProperties(9, 1, 30 / 3.6, 1500 * BIKE_PCU, false))
@@ -61,6 +58,14 @@ public class SupersonicBicycleOsmNetworkReader {
 				.afterLinkCreated(this::handleLink)
 				.build()
 				.read(inputFile);
+
+		for (Id<Link> linkId : linksWhichNeedBackwardBicycleDirection.values()) {
+
+			Link forwardLink = network.getLinks().get(linkId);
+			Link reverseLink = createReverseBicycleLink(forwardLink, network.getFactory());
+			network.addLink(reverseLink);
+		}
+		return network;
 	}
 
 	private void handleLink(Link link, Map<String, String> tags, boolean isReverse) {
@@ -116,12 +121,34 @@ public class SupersonicBicycleOsmNetworkReader {
 			link.getAttributes().putAttribute(TransportMode.bike, tags.get(OsmTags.BICYCLE));
 	}
 
+	private Link createReverseBicycleLink(Link forwardLink, NetworkFactory factory) {
+
+		long linkId = Long.parseLong(forwardLink.getId().toString());
+		Link result = factory.createLink(Id.createLinkId(linkId + 1), forwardLink.getToNode(), forwardLink.getFromNode());
+		result.setAllowedModes(new HashSet<>(Collections.singletonList(TransportMode.bike)));
+
+		result.setCapacity(1500 * BIKE_PCU);
+		result.setLength(forwardLink.getLength());
+		result.setFreespeed(30 / 3.6);
+		result.setNumberOfLanes(1);
+		return result;
+	}
+
+	private String createLinkKey(Link link, boolean isReverse) {
+		if (isReverse)
+			return link.getId().toString() + link.getToNode().getId() + link.getFromNode().getId();
+		return link.getId().toString() + link.getFromNode().getId() + link.getToNode().getId();
+	}
+
 	private void collectReverseDirectionForBicycle(Link link, Map<String, String> tags, boolean isReverse) {
 
 		if (isReverse) {
+			// this link has two directions already we don't need to remember it
 			String linkKey = createLinkKey(link, isReverse);
 			linksWhichNeedBackwardBicycleDirection.remove(linkKey);
 		} else {
+			// in case we have a forward link and the bicycle tags indicate a reverse direction we memorize
+			// this link, so that we can add a reverse link for bicycles later.
 			if (tags.containsKey(OsmTags.ONEWAYBICYCLE) && tags.get(OsmTags.ONEWAYBICYCLE).equals("no")) {
 				linksWhichNeedBackwardBicycleDirection.put(createLinkKey(link, isReverse), link.getId());
 			} else if (tags.containsKey(OsmTags.CYCLEWAY)) {
@@ -131,12 +158,6 @@ public class SupersonicBicycleOsmNetworkReader {
 				}
 			}
 		}
-	}
-
-	private String createLinkKey(Link link, boolean isReverse) {
-		if (isReverse)
-			return link.getId().toString() + link.getToNode().getId() + link.getFromNode().getId();
-		return link.getId().toString() + link.getFromNode().getId() + link.getToNode().getId();
 	}
 
 	public static class Builder {

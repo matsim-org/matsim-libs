@@ -8,27 +8,27 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.testcases.MatsimTestUtils;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.junit.Assert.assertTrue;
-
-public class SupersonicOsmNetworkReaderIT {
+public class SuperSonicBicycleOsmNetworkReaderIT {
 
 	private static final CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:32631");
 
 	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
 
 	@Test
-	public void test_andorra() {
+	public void read() {
 
-		Network network = SupersonicOsmNetworkReader.builder()
+		final Path inputFile = Paths.get(matsimTestUtils.getPackageInputDirectory()).resolve("andorra_latest.osm.pbf");
+
+		Network network = SupersonicBicycleOsmNetworkReader.builder()
 				.coordinateTransformation(coordinateTransformation)
 				.build()
-				.read(Paths.get(utils.getPackageInputDirectory()).resolve("andorra-latest.osm.pbf"));
+				.read(inputFile);
 
-		Network expectedResult = NetworkUtils.readNetwork(Paths.get(utils.getInputDirectory()).resolve("expected-result.xml.gz").toString());
+		NetworkUtils.writeNetwork(network, "C:/Users/Janek/Desktop/bike-network-test.xml.gz");
 
-		assertTrue(NetworkUtils.compare(expectedResult, network));
 	}
 }
