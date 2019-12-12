@@ -678,7 +678,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
                             repYmax = tempNodeY;
                         }
 
-
                         circumference += NetworkUtils.getEuclideanDistance(tempNodeX, tempNodeY,
                                 lastNode.coord.getX(), lastNode.coord.getY());
 						lastNode = tempNode;
@@ -1481,7 +1480,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			lane.setCapacityVehiclesPerHour(defaults.laneCapacity);
 			lanesForLink.addLane(lane);
 		}
-		if(l.getNumberOfLanes()==0.5) LOG.warn("ACHTUNG"+ l.getId());
 	}
 
 	private void simplifyLanesAndAddOrigLane(Link link) {
@@ -1490,10 +1488,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		origLane.setStartsAtMeterFromLinkEnd(link.getLength());
 		origLane.setNumberOfRepresentedLanes(link.getNumberOfLanes());
 		// note: lane capacities are set later 
-		/*for(Lane lane : lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().values()){
-			LOG.info(lane.getId().toString());
-			LOG.info(lane.getToLinkIds());
-		}*/
 		// merge duplicated lanes (lanes with same to-links)
 		Set<Id<Lane>> lanesToBeRemoved = new HashSet<>();
 		for (int indexLane1 = 1; indexLane1 <= lanes.getLanesToLinkAssignments().get(link.getId()).getLanes().size(); indexLane1++) {
@@ -2146,7 +2140,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 	}
 
-	//TODO checken ob es schon eine in Java implementierte Klasse gibt, die das macht; wenn compareTo() impl. dann auch verwenden später
+
 	private static final class LinkVector implements Comparable<LinkVector> {
 		private Link link;
 		private double x;
