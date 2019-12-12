@@ -35,6 +35,7 @@ public class OsmTags {
 	public static final String SURFACE = "surface";
 	public static final String SMOOTHNESS = "smoothness";
 	public static final String BICYCLE = "bicycle";
+	public final static String ONEWAYBICYCLE = "oneway:bicycle";
 
 	public static final String MPH = "mph";
 
