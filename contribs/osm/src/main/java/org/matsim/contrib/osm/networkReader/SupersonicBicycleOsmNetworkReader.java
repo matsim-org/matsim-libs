@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
@@ -31,7 +32,7 @@ public class SupersonicBicycleOsmNetworkReader {
 	private Predicate<Long> preserveNodeWithId;
 	private SupersonicOsmNetworkReader.AfterLinkCreated afterLinkCreated;
 
-	private Set<Id<Link>> linksWhichNeedBackwardBicycleDirection = ConcurrentHashMap.newKeySet();
+	private ConcurrentMap<String, Id<Link>> linksWhichNeedBackwardBicycleDirection = new ConcurrentHashMap<>();
 
 	public SupersonicBicycleOsmNetworkReader(CoordinateTransformation coordinateTransformation, BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy, Predicate<Long> preserveNodeWithId, SupersonicOsmNetworkReader.AfterLinkCreated afterLinkCreated) {
 		this.coordinateTransformation = coordinateTransformation;
@@ -76,6 +77,7 @@ public class SupersonicBicycleOsmNetworkReader {
 		link.getAttributes().putAttribute(BICYCLE_INFRASTRUCTURE_SPEED_FACTOR, 0.5);
 
 		//TODO add reverse direction for bicylces if street is only one way. Not sure how to fit that into the model of the reader
+		collectReverseDirectionForBicycle(link, tags, isReverse);
 
 		afterLinkCreated.accept(link, tags, isReverse);
 	}
@@ -112,6 +114,29 @@ public class SupersonicBicycleOsmNetworkReader {
 	private void setRestrictions(Link link, Map<String, String> tags) {
 		if (tags.containsKey(OsmTags.BICYCLE))
 			link.getAttributes().putAttribute(TransportMode.bike, tags.get(OsmTags.BICYCLE));
+	}
+
+	private void collectReverseDirectionForBicycle(Link link, Map<String, String> tags, boolean isReverse) {
+
+		if (isReverse) {
+			String linkKey = createLinkKey(link, isReverse);
+			linksWhichNeedBackwardBicycleDirection.remove(linkKey);
+		} else {
+			if (tags.containsKey(OsmTags.ONEWAYBICYCLE) && tags.get(OsmTags.ONEWAYBICYCLE).equals("no")) {
+				linksWhichNeedBackwardBicycleDirection.put(createLinkKey(link, isReverse), link.getId());
+			} else if (tags.containsKey(OsmTags.CYCLEWAY)) {
+				String tag = tags.get(OsmTags.CYCLEWAY);
+				if (tag.equals("opposite") || tag.equals("opposite_track") || tag.equals("opposite_lane")) {
+					linksWhichNeedBackwardBicycleDirection.put(createLinkKey(link, isReverse), link.getId());
+				}
+			}
+		}
+	}
+
+	private String createLinkKey(Link link, boolean isReverse) {
+		if (isReverse)
+			return link.getId().toString() + link.getToNode().getId() + link.getFromNode().getId();
+		return link.getId().toString() + link.getFromNode().getId() + link.getToNode().getId();
 	}
 
 	public static class Builder {

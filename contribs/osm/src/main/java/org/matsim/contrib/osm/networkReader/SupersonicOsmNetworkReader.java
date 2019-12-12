@@ -300,10 +300,6 @@ public class SupersonicOsmNetworkReader {
 		return properties.lanesPerDirection;
 	}
 
-	public static Builder builder() {
-		return new Builder();
-	}
-
 	private synchronized void addLinkToNetwork(Link link) {
 
 		//we have to test for presence
@@ -322,6 +318,10 @@ public class SupersonicOsmNetworkReader {
 			log.error("The link associated with this id: " + link.toString());
 			throw new RuntimeException("Link id: " + link.getId() + " was already present!");
 		}
+	}
+
+	public static Builder builder() {
+		return new Builder();
 	}
 
 	public static class Builder {
