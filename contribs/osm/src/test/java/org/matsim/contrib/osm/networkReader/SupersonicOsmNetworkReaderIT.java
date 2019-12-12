@@ -29,7 +29,7 @@ public class SupersonicOsmNetworkReaderIT {
 		Network network = SupersonicOsmNetworkReader.builder()
 				.coordinateTransformation(coordinateTransformation)
 				.build()
-				.read(Paths.get(utils.getInputDirectory()).resolve("andorra-latest.osm.pbf"));
+				.read(Paths.get(utils.getPackageInputDirectory()).resolve("andorra-latest.osm.pbf"));
 
 		Network expectedResult = NetworkUtils.readNetwork(Paths.get(utils.getInputDirectory()).resolve("expected-result.xml.gz").toString());
 
