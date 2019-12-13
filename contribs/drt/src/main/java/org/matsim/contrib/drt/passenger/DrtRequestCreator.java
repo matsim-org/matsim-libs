@@ -53,22 +53,15 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 		double latestDepartureTime = departureTime + drtRoute.getMaxWaitTime();
 		double latestArrivalTime = departureTime + drtRoute.getTravelTime();
 
-		log.debug("");
-		log.debug(timer.getTimeOfDay() + " ");
-		log.debug(mode + " ");
-		log.debug(id + " ");
-		log.debug(passengerId + " ");
-		log.debug(fromLink.getId() + " ");
-		log.debug(toLink.getId() + " ");
-		log.debug(drtRoute.getDirectRideTime() + " ");
-		log.debug(drtRoute.getDistance() + " ");
-		log.debug("");
-
 		eventsManager.processEvent(
 				new DrtRequestSubmittedEvent(timer.getTimeOfDay(), mode, id, passengerId, fromLink.getId(),
 						toLink.getId(), drtRoute.getDirectRideTime(), drtRoute.getDistance()));
 
-		return new DrtRequest(id, passengerId, mode, fromLink, toLink, departureTime, latestDepartureTime,
+		DrtRequest request = new DrtRequest(id, passengerId, mode, fromLink, toLink, departureTime, latestDepartureTime,
 				latestArrivalTime, submissionTime);
+
+		log.debug(route);
+		log.debug(request);
+		return request;
 	}
 }
