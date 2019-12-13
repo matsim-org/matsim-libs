@@ -110,7 +110,7 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 		// (1) fill out TripInfo
 		// (2) keep handle so that passenger can accept, or not-confirmed request is eventually deleted again.  Also see doSimStet(...) ;
 
-		Gbl.assertIf(tripInfoRequest.getTimeInterpretation() == TripInfo.TimeInterpretation.departure);
+		Gbl.assertIf(tripInfoRequest.getTimeInterpretation() == TripInfoRequest.TimeInterpretation.departure);
 		Link pickupLink = FacilitiesUtils.decideOnLink(tripInfoRequest.getFromFacility(), network);
 		Link dropoffLink = FacilitiesUtils.decideOnLink(tripInfoRequest.getToFacility(), network);
 		double now = this.mobsimTimer.getTimeOfDay();
