@@ -66,17 +66,20 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 		ConcurrentMap<String, Id<?>> mapId = cacheId.computeIfAbsent(type, k -> new ConcurrentHashMap<>(1000));
 		List<Id<?>> mapIndex = cacheIndex.computeIfAbsent(type, k -> new ArrayList<>(1000));
 
-		synchronized (mapIndex) {
-			Id<?> id = mapId.get(key);
-
-			if (id == null) {
-				int index = mapIndex.size();
-				id = new IdImpl<T>(key, index);
-				mapId.put(key, id);
-				mapIndex.add(id);
+		Id<?> id = mapId.get(key);
+		if (id == null) {
+			//Double-Checked Locking works: mapId is concurrent and IdImpl is immutable
+			synchronized (mapIndex) {
+				id = mapId.get(key);
+				if (id == null) {
+					int index = mapIndex.size();
+					id = new IdImpl<T>(key, index);
+					mapIndex.add(id);
+					mapId.put(key, id);
+				}
 			}
-			return (Id<T>)id;
 		}
+		return (Id<T>)id;
 	}
 
 	public abstract int index();
