@@ -22,15 +22,14 @@ package org.matsim.contrib.drt.passenger;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.routing.DrtRoute;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.framework.PlanAgent;
 
 /**
  * @author michalm
@@ -48,34 +47,21 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 	}
 
 	@Override
-	public DrtRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
+	public DrtRequest createRequest(Id<Request> id, Id<Person> passengerId, Route route, Link fromLink, Link toLink,
 			double departureTime, double submissionTime) {
-		// yyyy remove parameter MobsimPassengerAgent and get necessary info from somewhere else.
-		// (Also in reality, such information is not pushed into the person, but stored somewhere on the provider side.)
-		// kai, gregor, jan'19
-
-		//FIXME this will not work if pre-booking is allowed in DRT
-		Leg leg = (Leg)((PlanAgent)passenger).getCurrentPlanElement();
-		DrtRoute drtRoute = (DrtRoute)leg.getRoute();
+		DrtRoute drtRoute = (DrtRoute)route;
 		double latestDepartureTime = departureTime + drtRoute.getMaxWaitTime();
 		double latestArrivalTime = departureTime + drtRoute.getTravelTime();
 
-		log.debug("");
-		log.debug(timer.getTimeOfDay() + " ");
-		log.debug(mode + " ");
-		log.debug(id + " ");
-		log.debug(passenger.getId() + " ");
-		log.debug(fromLink.getId() + " ");
-		log.debug(toLink.getId() + " ");
-		log.debug(drtRoute.getDirectRideTime() + " ");
-		log.debug(drtRoute.getDistance() + " ");
-		log.debug("");
-		
 		eventsManager.processEvent(
-				new DrtRequestSubmittedEvent(timer.getTimeOfDay(), mode, id, passenger.getId(), fromLink.getId(),
+				new DrtRequestSubmittedEvent(timer.getTimeOfDay(), mode, id, passengerId, fromLink.getId(),
 						toLink.getId(), drtRoute.getDirectRideTime(), drtRoute.getDistance()));
 
-		return new DrtRequest(id, passenger.getId(), mode, fromLink, toLink, departureTime, latestDepartureTime,
+		DrtRequest request = new DrtRequest(id, passengerId, mode, fromLink, toLink, departureTime, latestDepartureTime,
 				latestArrivalTime, submissionTime);
+
+		log.debug(route);
+		log.debug(request);
+		return request;
 	}
 }
