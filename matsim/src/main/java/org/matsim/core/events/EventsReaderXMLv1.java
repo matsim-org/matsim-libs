@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -170,8 +171,19 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 					atts.getValue(ActivityEndEvent.ATTRIBUTE_FACILITY) == null ? null : Id.create(atts.getValue(ActivityEndEvent.ATTRIBUTE_FACILITY), ActivityFacility.class), 
 					atts.getValue(ActivityEndEvent.ATTRIBUTE_ACTTYPE)));
 		} else if (ActivityStartEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new ActivityStartEvent(time, Id.create(atts.getValue(
-				  HasPersonId.ATTRIBUTE_PERSON ), Person.class ), Id.create(atts.getValue(ActivityStartEvent.ATTRIBUTE_LINK ), Link.class ), atts.getValue(ActivityStartEvent.ATTRIBUTE_FACILITY ) == null ? null : Id.create(atts.getValue(ActivityStartEvent.ATTRIBUTE_FACILITY ), ActivityFacility.class ), atts.getValue(ActivityStartEvent.ATTRIBUTE_ACTTYPE )) );
+			Coord coord = null ;
+			if ( atts.getValue( ActivityStartEvent.ATTRIBUTE_X )!=null ) {
+				double xx = Double.parseDouble( atts.getValue( ActivityStartEvent.ATTRIBUTE_X ) ) ;
+				double yy = Double.parseDouble( atts.getValue( ActivityStartEvent.ATTRIBUTE_Y ) ) ;
+				coord = new Coord( xx, yy ) ;
+			}
+			this.events.processEvent(new ActivityStartEvent(
+					time,
+					Id.create(atts.getValue( HasPersonId.ATTRIBUTE_PERSON ), Person.class ),
+					Id.create(atts.getValue(ActivityStartEvent.ATTRIBUTE_LINK ), Link.class ),
+					atts.getValue(ActivityStartEvent.ATTRIBUTE_FACILITY ) == null ? null : Id.create(atts.getValue(ActivityStartEvent.ATTRIBUTE_FACILITY ), ActivityFacility.class ),
+					atts.getValue(ActivityStartEvent.ATTRIBUTE_ACTTYPE ),
+					coord ) ) ;
 		} else if (PersonArrivalEvent.EVENT_TYPE.equals(eventType)) {
 			String legMode = atts.getValue(PersonArrivalEvent.ATTRIBUTE_LEGMODE);
 			String mode = legMode == null ? null : legMode.intern();

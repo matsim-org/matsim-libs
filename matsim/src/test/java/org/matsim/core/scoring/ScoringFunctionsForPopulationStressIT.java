@@ -217,7 +217,7 @@ public class ScoringFunctionsForPopulationStressIT {
 		events.initProcessing();
 		for (int i=0; i<MAX; i++) {
 			events.processEvent(new PersonMoneyEvent(i*200, personId, 1.0));
-			events.processEvent(new ActivityStartEvent(i*200, personId, Id.createLinkId(0), null, "work"));
+			events.processEvent(new ActivityStartEvent(i*200, personId, Id.createLinkId(0), null, "work", null ));
 			events.processEvent(new ActivityEndEvent(i*200 + 100, personId, Id.createLinkId(0), null, "work"));
 			events.processEvent(new PersonDepartureEvent(i*200+100, personId, Id.createLinkId(0), "car"));
 			events.processEvent(new PersonArrivalEvent(i*200+200, personId, Id.createLinkId(0), "car"));
@@ -356,7 +356,7 @@ public class ScoringFunctionsForPopulationStressIT {
 		events.initProcessing();
 		for (int i=0; i<MAX; i++) {
 			events.processEvent(new PersonMoneyEvent(i*200, personId, 1.0));
-			events.processEvent(new ActivityStartEvent(i*200, personId, Id.createLinkId(0), null, "work"));
+			events.processEvent(new ActivityStartEvent(i*200, personId, Id.createLinkId(0), null, "work", null));
 			events.processEvent(new ActivityEndEvent(i*200 + 100, personId, Id.createLinkId(0), null, "work"));
 			events.processEvent(new PersonDepartureEvent(i*200+100, personId, Id.createLinkId(0), "car"));
 			events.processEvent(new PersonArrivalEvent(i*200+200, personId, Id.createLinkId(0), "car"));

@@ -22,31 +22,54 @@ package org.matsim.api.core.v01.events;
 
 import java.util.Map;
 
+import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.facilities.ActivityFacility;
 
-public class ActivityStartEvent extends Event implements HasPersonId {
+public class ActivityStartEvent extends Event implements HasPersonId, BasicLocation{
 
 	public static final String EVENT_TYPE = "actstart";
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_FACILITY = "facility";
 	public static final String ATTRIBUTE_ACTTYPE = "actType";
+	public static final String ATTRIBUTE_X = "x" ;
+	public static final String ATTRIBUTE_Y = "y" ;
+
 
 	private final Id<Person> personId;
+	private final Coord coord;
 	private final Id<Link> linkId;
 	private final Id<ActivityFacility> facilityId;
 	private final String acttype;
-		
-	public ActivityStartEvent(final double time, final Id<Person> agentId, final Id<Link> linkId, 
-			final Id<ActivityFacility> facilityId, final String acttype) {
+
+	/*
+	Possible transition path to "coordinates in event":
+	- invalidate previous constructor so that we see where we have problems.
+	- be minimalistic in repairing (e.g. only in matsim core).  As a tendency, when the event constructor already contains null args (e.g. for facility),
+	 then we can put null for coord as well.
+	- re-instantiate previous constructor.  I find this better than null because one can still set the constructor to deprecated and get compile time
+	warnings.  kai, dec'19
+	 */
+
+	public ActivityStartEvent( final double time, final Id<Person> agentId, final Activity  activity ){
+		this( time, agentId, activity.getLinkId(), activity ) ;
+	}
+	public ActivityStartEvent( final double time, final Id<Person> agentId, final Id<Link> linkId, final Activity activity ) {
+		this( time, agentId, linkId, activity.getFacilityId(), activity.getType(), activity.getCoord() ) ;
+	}
+	public ActivityStartEvent( final double time, final Id<Person> agentId, final Id<Link> linkId,
+		final Id<ActivityFacility> facilityId, final String acttype, Coord coord ) {
 		super(time);
 		this.linkId = linkId;
 		this.facilityId = facilityId;
 		this.acttype = acttype == null ? "" : acttype;
 		this.personId = agentId;
+		this.coord = coord;
 	}
 
 	@Override
@@ -80,7 +103,14 @@ public class ActivityStartEvent extends Event implements HasPersonId {
 		if (this.facilityId != null) {
 			attr.put(ATTRIBUTE_FACILITY, this.facilityId.toString());
 		}
+		if ( this.coord!=null ) {
+			attr.put( ATTRIBUTE_X, String.valueOf( this.coord.getX() ) ) ;
+			attr.put( ATTRIBUTE_Y, String.valueOf( this.coord.getY() ) ) ;
+		}
 		attr.put(ATTRIBUTE_ACTTYPE, this.acttype);
 		return attr;
+	}
+	@Override public Coord getCoord(){
+		return coord;
 	}
 }
