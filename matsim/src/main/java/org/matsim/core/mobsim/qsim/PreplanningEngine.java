@@ -194,7 +194,8 @@ public final class PreplanningEngine implements MobsimEngine {
 
 			// wait for notification:
 //			((Activity)WithinDayAgentUtils.getCurrentPlanElement(agent)).setEndTime(Double.MAX_VALUE);
-			tripInfo.getOriginalRequest().getFromActivity().setEndTime( Double.MAX_VALUE );
+			TripInfoRequestWithActivities tripInfoRequest = (TripInfoRequestWithActivities)tripInfo.getOriginalRequest();
+			tripInfoRequest.getFromActivity().setEndTime(Double.MAX_VALUE);
 
 			// one corner case is that the sim start time is set to later than some agent activity end time.  Then, depending on the order of the engines, it may happen
 			// that the agent departs.  It will _then_ attempt to pre-book the trip, and up here, and then evidently cannot be cast into an activity.
@@ -306,7 +307,8 @@ public final class PreplanningEngine implements MobsimEngine {
 		TripStructureUtils.Trip drtTrip = TripStructureUtils.findTripAtPlanElement(leg, plan );
 		Gbl.assertNotNull(drtTrip );
 
-		final TripInfoRequest request = new TripInfoRequest.Builder(scenario).setFromActivity(drtTrip.getOriginActivity() )
+		final TripInfoRequest request = new TripInfoRequestWithActivities.Builder(scenario).setFromActivity(
+				drtTrip.getOriginActivity())
 												 .setToActivity( drtTrip.getDestinationActivity() )
 												 .setTime(drtTrip.getOriginActivity().getEndTime())
 												 .createRequest();
