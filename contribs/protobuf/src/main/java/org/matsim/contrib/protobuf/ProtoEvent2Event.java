@@ -58,7 +58,7 @@ public abstract class ProtoEvent2Event {
 					}
 					else {
 						if (pe.getType() == ProtobufEvents.Event.Type.PersonArrival) {
-							return new PersonArrivalEvent(pe.getPersonArrival().getTime(), Id.createPersonId(pe.getPersonArrival().getPersId().getId()),
+							return new PersonArrivalEvent(pe.getPersonArrival().getTime(), Id.createPersonId(pe.getPersonArrival().getPersId()),
 									Id.createLinkId(pe.getPersonArrival().getLinkId().getId()), pe.getPersonArrival().getLegMode());
 						}
 						else {

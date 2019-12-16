@@ -24,8 +24,10 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.HasPersonId;
+import org.matsim.core.router.TripStructureUtils;
 
 public class PersonArrivalEvent extends Event implements HasPersonId {
 
@@ -34,17 +36,22 @@ public class PersonArrivalEvent extends Event implements HasPersonId {
 	public static final String ATTRIBUTE_PERSON = "person";
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_LEGMODE = "legMode";
+	private static final String ATTRIBUTE_ROUTINGMODE = "routingMode";
 
 	private final Id<Person> personId;
+	private final String routingMode;
 	private final Id<Link> linkId;
 	private final String legMode;
 
-
-	public PersonArrivalEvent(final double time, final Id<Person> agentId, final Id<Link> linkId, final String legMode) {
+	public PersonArrivalEvent(final double time, final Id<Person> agentId, final Id<Link> linkId, final Leg leg ) {
+		this( time, agentId, linkId, leg.getMode(), TripStructureUtils.getRoutingMode( leg ) ) ;
+	}
+	public PersonArrivalEvent( final double time, final Id<Person> agentId, final Id<Link> linkId,  final String legMode, final String routingMode ) {
 		super(time);
 		this.linkId = linkId;
 		this.legMode = legMode;
 		this.personId = agentId;
+		this.routingMode = routingMode;
 	}
 	
 	public Id<Person> getPersonId() {
@@ -71,6 +78,12 @@ public class PersonArrivalEvent extends Event implements HasPersonId {
 		if (this.legMode != null) {
 			attr.put(ATTRIBUTE_LEGMODE, this.legMode);
 		}
+		if (this.routingMode != null) {
+			attr.put(ATTRIBUTE_ROUTINGMODE, this.routingMode);
+		}
 		return attr;
+	}
+	public String getRoutingMode(){
+		return routingMode;
 	}
 }

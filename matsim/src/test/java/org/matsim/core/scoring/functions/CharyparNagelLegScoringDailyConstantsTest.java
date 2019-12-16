@@ -83,7 +83,7 @@ public class CharyparNagelLegScoringDailyConstantsTest {
 			scoring1.handleEvent( leaveVehicle );
 			scoring2.handleEvent( leaveVehicle );
 
-			final Event arrival = new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), leg.getMode());
+			final Event arrival = new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), leg);
 			scoring1.handleEvent( arrival );
 			scoring2.handleEvent( arrival );
 
@@ -115,7 +115,7 @@ public class CharyparNagelLegScoringDailyConstantsTest {
 			scoring1.handleEvent( leaveVehicle );
 			scoring2.handleEvent( leaveVehicle );
 
-			final Event arrival = new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), leg.getMode());
+			final Event arrival = new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), leg);
 			scoring1.handleEvent( arrival );
 			scoring2.handleEvent( arrival );
 
@@ -147,7 +147,7 @@ public class CharyparNagelLegScoringDailyConstantsTest {
 			scoring1.handleEvent( leaveVehicle );
 			scoring2.handleEvent( leaveVehicle );
 
-			final Event arrival = new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), leg.getMode());
+			final Event arrival = new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), leg);
 			scoring1.handleEvent( arrival );
 			scoring2.handleEvent( arrival );
 

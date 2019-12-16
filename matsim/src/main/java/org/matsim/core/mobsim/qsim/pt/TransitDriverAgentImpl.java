@@ -133,7 +133,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 	@Override
 	public void endLegAndComputeNextState(final double now) {
 		eventsManager.processEvent(
-				new PersonArrivalEvent(now, this.getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
+				new PersonArrivalEvent(now, this.getId(), this.getDestinationLinkId(), this.getCurrentLeg()));
 		this.currentPlanElement = iPlanElement.next();
 		if (this.iUmlaufStueck.hasNext()) {
 			setNextLeg();

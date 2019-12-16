@@ -116,7 +116,7 @@ public class EndLegMessage extends EventMessage {
 		eventsManager.processEvent(event);
 
 		// schedule AgentArrivalEvent
-		event = new PersonArrivalEvent(this.getMessageArrivalTime(), this.vehicle.getOwnerPerson().getId(), this.vehicle.getCurrentLinkId(), this.vehicle.getCurrentLeg().getMode());
+		event = new PersonArrivalEvent(this.getMessageArrivalTime(), this.vehicle.getOwnerPerson().getId(), this.vehicle.getCurrentLinkId(), this.vehicle.getCurrentLeg());
 		eventsManager.processEvent(event);
 
 		// schedule ActStartEvent
