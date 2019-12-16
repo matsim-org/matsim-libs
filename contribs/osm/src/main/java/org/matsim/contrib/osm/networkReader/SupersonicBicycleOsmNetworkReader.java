@@ -123,8 +123,8 @@ public class SupersonicBicycleOsmNetworkReader {
 
 	private Link createReverseBicycleLink(Link forwardLink, NetworkFactory factory) {
 
-		long linkId = Long.parseLong(forwardLink.getId().toString());
-		Link result = factory.createLink(Id.createLinkId(linkId + 1), forwardLink.getToNode(), forwardLink.getFromNode());
+		String linkId = forwardLink.getId().toString() + "_bicycle-reverse";
+		Link result = factory.createLink(Id.createLinkId(linkId), forwardLink.getToNode(), forwardLink.getFromNode());
 		result.setAllowedModes(new HashSet<>(Collections.singletonList(TransportMode.bike)));
 
 		result.setCapacity(1500 * BIKE_PCU);
@@ -163,9 +163,10 @@ public class SupersonicBicycleOsmNetworkReader {
 	public static class Builder {
 
 		private CoordinateTransformation transformation;
-		private BiPredicate<Coord, Integer> linkFilter;
-		private Predicate<Long> preserveNodes;
-		private SupersonicOsmNetworkReader.AfterLinkCreated afterLinkCreated;
+		private BiPredicate<Coord, Integer> linkFilter = (coord, integer) -> true;
+		private Predicate<Long> preserveNodes = id -> false;
+		private SupersonicOsmNetworkReader.AfterLinkCreated afterLinkCreated = (a, b, c) -> {
+		};
 
 		private Builder() {
 		}
