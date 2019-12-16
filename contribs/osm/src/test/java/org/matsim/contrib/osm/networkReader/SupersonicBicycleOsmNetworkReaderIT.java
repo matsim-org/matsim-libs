@@ -11,7 +11,9 @@ import org.matsim.testcases.MatsimTestUtils;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class SuperSonicBicycleOsmNetworkReaderIT {
+import static org.junit.Assert.assertTrue;
+
+public class SupersonicBicycleOsmNetworkReaderIT {
 
 	private static final CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:32631");
 
@@ -19,16 +21,17 @@ public class SuperSonicBicycleOsmNetworkReaderIT {
 	public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
 
 	@Test
-	public void read() {
+	public void test_andorra() {
 
-		final Path inputFile = Paths.get(matsimTestUtils.getPackageInputDirectory()).resolve("andorra_latest.osm.pbf");
+		final Path inputFile = Paths.get(matsimTestUtils.getPackageInputDirectory()).resolve("andorra-latest.osm.pbf");
 
 		Network network = SupersonicBicycleOsmNetworkReader.builder()
 				.coordinateTransformation(coordinateTransformation)
 				.build()
 				.read(inputFile);
 
-		NetworkUtils.writeNetwork(network, "C:/Users/Janek/Desktop/bike-network-test.xml.gz");
+		Network expectedResult = NetworkUtils.readNetwork(Paths.get(matsimTestUtils.getInputDirectory()).resolve("expected-result.xml.gz").toString());
 
+		assertTrue(NetworkUtils.compare(expectedResult, network));
 	}
 }
