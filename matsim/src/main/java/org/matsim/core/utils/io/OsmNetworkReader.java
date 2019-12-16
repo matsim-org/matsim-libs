@@ -113,8 +113,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 
 	// nodes that are definitely to be kept (e.g. for counts later)
 	private Set<Long> nodeIDsToKeep = null;
-	
-	
+
 	/**
 	 * Creates a new Reader to convert OSM data into a MATSim network.
 	 *
@@ -147,12 +146,17 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	 * @param transformation A coordinate transformation to be used. OSM-data comes as WGS84, which is often not optimal for MATSim.
 	 * @param useHighwayDefaults Highway defaults are set to standard values, if true.
 	 * @param useVspAdjustments Highway defaults are set to standard VSP values, if true.
-	 * 
 	 */
 	public OsmNetworkReader(final Network network, final CoordinateTransformation transformation, final boolean useHighwayDefaults, final boolean useVspAdjustments) {
 		this.network = network;
 		this.transform = transformation;
 		this.useVspAdjustments = useVspAdjustments;
+
+        if (useVspAdjustments && !useHighwayDefaults) {
+            log.warn("useVspAdjustments is set to " + useVspAdjustments + ", useHighwayDefaults is set to " + useHighwayDefaults + ". Applying useVspAdjustments is only" +
+                    " recommended if useHighwayDefaults is set to true. If you still want to use useVspAdjustments without useHighwayDefaults, be sure to include all highway" +
+                    " categories at least down to \"living_street\". Otherwise freespeed adjustments based on intersection density will lead to faulty results. dz, dec'19.");
+        }
 
 		if (useHighwayDefaults) {
 			log.info("Falling back to default values.");
@@ -480,7 +484,6 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				}
 			}
 			log.info("... done verifying that we did not mark nodes as unused that build a loop.") ;
-
 		}
 
 		//check here whether node is needed for counts
@@ -614,10 +617,11 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		} else {
 			if (useVspAdjustments) {
 				// For links whose maxspeed is unknown, we assume that links with a length (after removal of purely geometric nodes) of more
-				// than 300m are 'rural' others 'urban'. 'Rural' speed is 100km/h, 'urban' linearly increasing from 10km/h at zero length to
-				// the 'rural' speed for links with a length of 300m. kn,ik,dz, apr'18
-				if(highway.equalsIgnoreCase("primary") || highway.equalsIgnoreCase("secondary") || highway.equalsIgnoreCase("tertiary")
-						|| highway.equalsIgnoreCase("primary_link") || highway.equalsIgnoreCase("secondary_link") || highway.equalsIgnoreCase("tertiary_link")) {
+				// than 300m are 'rural', others 'urban'. 'Rural' freespeed is assumed as 80km/h, 'urban' linearly increasing from 10km/h at
+                // zero length to the 'rural' speed for links with a length of 300m. kn,ik,dz, apr'18
+				if(highway.equalsIgnoreCase("primary") || highway.equalsIgnoreCase("secondary")
+                        || highway.equalsIgnoreCase("tertiary") || highway.equalsIgnoreCase("primary_link")
+                        || highway.equalsIgnoreCase("secondary_link") || highway.equalsIgnoreCase("tertiary_link")) {
 							if (length > 300.) {
 						freespeed = 80. / 3.6; // Might be different (but also not too much different) in other countries				
 					} else {
@@ -628,10 +632,19 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		}
 		
 		if (useVspAdjustments) {
-			// Adjustments that KN had been using for a while: For short links, often roundabouts or short u-turns, etc.
-			if (length < 100 ) {
+			// Adjustments that KN had been using for a while: For short links, often roundabouts, median crossings, etc. kn,ik,dz, apr'18
+            // I reduced this value from 100m to 30m since otherwise many "regular" links will be affected as well. While one can argue that an
+            // increased capacity of a single link in between does not spoil traffic patterns (surrounding links still have the correct capacity
+            // so that a potential congestion is just slightly moved spatially), it impairs network simplification. Affected links can't be merged
+            // anymore as they won't have identical attributes with subsequent links anymore. dz, dec'19
+			if (length < 30) {
 				laneCapacity = 2 * laneCapacity;
 			}
+			// To ensure that links in larger roundabout are still included in capacity increase, introduce a seperate check.
+            // "Circular" is often used for (larger) roundabouts with different right of way (e.g. Grosser Stern in Berlin). dz, dec'19
+			if ("roundabout".equals(way.tags.get(TAG_JUNCTION)) || "circular".equals(way.tags.get(TAG_JUNCTION))) {
+                laneCapacity = 2 * laneCapacity;
+            }
 		}		
 		
 		// check tag "lanes"
