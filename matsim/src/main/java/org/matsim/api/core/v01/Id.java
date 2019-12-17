@@ -20,31 +20,31 @@
 
 package org.matsim.api.core.v01;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 
 /**
  * Represents a unique identifier.
- * 
- * Note that Ids should not contain any whitespace characters (spaces, tabs, newlines, ...), 
+ *
+ * Note that Ids should not contain any whitespace characters (spaces, tabs, newlines, ...),
  * as this may lead to problems when Ids are written to file and read back in.
- * 
+ *
  *  @author mrieser / Senozon AG
  */
 public abstract class Id<T> implements Comparable<Id<T>> {
 
-	private final static Map<Class<?>, Map<String, Id<?>>> cacheId = new ConcurrentHashMap<>();
-	private final static Map<Class<?>, List<Id<?>>> cacheIndex = new ConcurrentHashMap<>();
+	private final static ConcurrentMap<Class<?>, ConcurrentMap<String, Id<?>>> cacheId = new ConcurrentHashMap<>();
+	private final static ConcurrentMap<Class<?>, List<Id<?>>> cacheIndex = new ConcurrentHashMap<>();
 
 	public static <T> Id<T> create(final long key, final Class<T> type) {
 		return create(Long.toString(key), type);
@@ -56,57 +56,58 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 		}
 		return create(id.toString(), type);
 	}
-	
+
 	/**
-	 * This method supports a cache where ids are stored and re-used per type.   
+	 * This method supports a cache where ids are stored and re-used per type.
 	 */
 	public static <T> Id<T> create(final String key, final Class<T> type) {
 		Gbl.assertNotNull(key);
 
-		Map<String, Id<?>> mapId = cacheId.computeIfAbsent(type, k -> new ConcurrentHashMap<>(1000));
-		List<Id<?>> mapIndex = cacheIndex.computeIfAbsent(type, k -> new ArrayList<>(1000));
+		ConcurrentMap<String, Id<?>> mapId = cacheId.computeIfAbsent(type, k -> new ConcurrentHashMap<>(1000));
 
 		Id<?> id = mapId.get(key);
-
 		if (id == null) {
-			int index = mapIndex.size(); // this is not thread safe, but basically all id-generating code is in a single-threaded loop anyway
-			id = new IdImpl<T>(key, index);
-			mapId.put(key, id);
-			mapIndex.add(id);
+			//Double-Checked Locking works: mapId is concurrent and IdImpl is immutable
+			synchronized (mapId) {
+				id = mapId.get(key);
+				if (id == null) {
+					// cannot use cacheIndex.computeIfAbsent():
+					// split into cacheIndex.get() and put() so that mapIndex.add() "happens-before" mapIndex.get()
+					// alternatives:
+					// (1) synchronise mapIndex.get() calls (on mapIndex)
+					// (2) use cacheIndex.compute() instead of get() and put() ==> less readable code...
+					List<Id<?>> mapIndex = mapId.isEmpty() ? new ArrayList<>(1000) : cacheIndex.get(type);
+					int index = mapIndex.size();
+					id = new IdImpl<T>(key, index);
+					mapIndex.add(id);
+					cacheIndex.put(type, mapIndex);
+					mapId.put(key, id);
+				}
+			}
 		}
-
-		return (Id<T>) id;
+		return (Id<T>)id;
 	}
 
 	public abstract int index();
 
 	public static <T> Id<T> get(int index, final Class<T> type) {
 		List<Id<?>> mapIndex = cacheIndex.get(type);
-
-		if (mapIndex == null) {
-			return null;
-		}
-
-		return (Id<T>)mapIndex.get(index);
+		return mapIndex == null ? null : (Id<T>)mapIndex.get(index);
 	}
 
 	public static <T> Id<T> get(String id, final Class<T> type) {
 		Map<String, Id<?>> mapId = cacheId.get(type);
-
-		if (mapId == null) {
-			return null;
-		}
-
-		return (Id<T>)mapId.get(id);
+		return mapId == null ? null : (Id<T>)mapId.get(id);
 	}
 
 	public static <T> int getNumberOfIds(final Class<T> type) {
-		return cacheIndex.getOrDefault(type, Collections.emptyList()).size();
+		Map<String, Id<?>> mapId = cacheId.get(type);
+		return mapId == null ? 0 : mapId.size();
 	}
-	
+
 	/**
 	 * @return <code>0</code> when the two objects being compared are the same objects, other values according to their ids being compared to each other.
-	 * 
+	 *
 	 * @throws IllegalArgumentException when the two objects being compared have the same id, but are not the same object because this means they must have different generic types
 	 */
 	@Override
@@ -114,7 +115,7 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 		return this.toString().compareTo(o.toString());
 //		return Integer.compare(this.index(), o.index()); // this would be more efficient, but changes some test results due to different ordering
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof Id) {
@@ -130,16 +131,16 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 	 * The default implementation to be used for Ids.
 	 * Have this as a separate class instead of integrated into the Id class
 	 * to allow for future optimization of Ids.
-	 * 
+	 *
 	 * @author mrieser
 	 *
 	 * @param <T>
 	 */
 	private static class IdImpl<T> extends Id<T> {
 
-		private final String id; 
+		private final String id;
 		private final int index;
-		
+
 		/*package*/ IdImpl(final String id, final int index) {
 			this.id = id;
 			this.index = index;
@@ -155,13 +156,13 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 			return this.id.hashCode();
 			// this.index  would be an alternative implementation for the hashCode
 		}
-		
+
 		@Override
 		public String toString() {
 			return this.id;
 		}
 	}
-	
+
 	public static <T> String writeId( Id<T> id ) {
 		if ( id==null ) {
 			return "null" ;
@@ -206,5 +207,5 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 	public static Id<Vehicle> createVehicleId( final String str ) {
 		return create( str, Vehicle.class ) ;
 	}
-	
+
 }
