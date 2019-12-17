@@ -71,10 +71,16 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 			synchronized (mapId) {
 				id = mapId.get(key);
 				if (id == null) {
-					List<Id<?>> mapIndex = cacheIndex.computeIfAbsent(type, k -> new ArrayList<>(1000));
+					// cannot use cacheIndex.computeIfAbsent():
+					// split into cacheIndex.get() and put() so that mapIndex.add() "happens-before" mapIndex.get()
+					// alternatives:
+					// (1) synchronise mapIndex.get() calls (on mapIndex)
+					// (2) use cacheIndex.compute() instead of get() and put() ==> less readable code...
+					List<Id<?>> mapIndex = mapId.isEmpty() ? new ArrayList<>(1000) : cacheIndex.get(type);
 					int index = mapIndex.size();
 					id = new IdImpl<T>(key, index);
 					mapIndex.add(id);
+					cacheIndex.put(type, mapIndex);
 					mapId.put(key, id);
 				}
 			}
