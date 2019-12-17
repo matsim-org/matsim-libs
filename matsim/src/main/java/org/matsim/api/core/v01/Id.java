@@ -64,14 +64,14 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 		Gbl.assertNotNull(key);
 
 		ConcurrentMap<String, Id<?>> mapId = cacheId.computeIfAbsent(type, k -> new ConcurrentHashMap<>(1000));
-		List<Id<?>> mapIndex = cacheIndex.computeIfAbsent(type, k -> new ArrayList<>(1000));
 
 		Id<?> id = mapId.get(key);
 		if (id == null) {
 			//Double-Checked Locking works: mapId is concurrent and IdImpl is immutable
-			synchronized (mapIndex) {
+			synchronized (mapId) {
 				id = mapId.get(key);
 				if (id == null) {
+					List<Id<?>> mapIndex = cacheIndex.computeIfAbsent(type, k -> new ArrayList<>(1000));
 					int index = mapIndex.size();
 					id = new IdImpl<T>(key, index);
 					mapIndex.add(id);
