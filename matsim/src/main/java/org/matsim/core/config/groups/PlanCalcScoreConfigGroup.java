@@ -487,12 +487,12 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	@Override
 	public void addParameterSet(final ConfigGroup set) {
 		switch (set.getName()) {
-		case ActivityParams.SET_TYPE:
-			addActivityParams((ActivityParams) set);
-			break;
-		case ModeParams.SET_TYPE:
-			addModeParams((ModeParams) set);
-			break;
+//		case ActivityParams.SET_TYPE:
+//			addActivityParams((ActivityParams) set);
+//			break;
+//		case ModeParams.SET_TYPE:
+//			addModeParams((ModeParams) set);
+//			break;
 		case ScoringParameterSet.SET_TYPE:
 			addScoringParameters((ScoringParameterSet) set);
 			break;
@@ -505,7 +505,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		final ScoringParameterSet previous = this.getScoringParameters(params.getSubpopulation());
 
 		if (previous != null) {
-			log.info("scoring parameters for subpopulation " + previous.getSubpopulation() + " were just replaced.");
+			log.warn("scoring parameters for subpopulation " + previous.getSubpopulation() + " were just replaced.");
 
 			final boolean removed = removeParameterSet(previous);
 			if (!removed)
@@ -531,10 +531,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	@Override
 	public ConfigGroup createParameterSet(final String type) {
 		switch (type) {
-		case ActivityParams.SET_TYPE:
-			return new ActivityParams();
-		case ModeParams.SET_TYPE:
-			return new ModeParams();
+//		case ActivityParams.SET_TYPE:
+//			return new ActivityParams();
+//		case ModeParams.SET_TYPE:
+//			return new ModeParams();
 		case ScoringParameterSet.SET_TYPE:
 			return new ScoringParameterSet();
 		default:
@@ -1206,73 +1206,48 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		private Double waitingPt = null; // if not actively set by user, it will
 											// later be set to "travelingPt".
 
-		@StringGetter(LATE_ARRIVAL)
-		public double getLateArrival_utils_hr() {
+		@StringGetter(LATE_ARRIVAL) public double getLateArrival_utils_hr() {
 			return lateArrival;
 		}
-
-		@StringSetter(LATE_ARRIVAL)
-		public void setLateArrival_utils_hr(double lateArrival) {
+		@StringSetter(LATE_ARRIVAL) public void setLateArrival_utils_hr(double lateArrival) {
 			testForLocked();
 			this.lateArrival = lateArrival;
 		}
-
-		@StringGetter(EARLY_DEPARTURE)
-		public double getEarlyDeparture_utils_hr() {
+		@StringGetter(EARLY_DEPARTURE) public double getEarlyDeparture_utils_hr() {
 			return earlyDeparture;
 		}
-
-		@StringSetter(EARLY_DEPARTURE)
-		public void setEarlyDeparture_utils_hr(double earlyDeparture) {
+		@StringSetter(EARLY_DEPARTURE) public void setEarlyDeparture_utils_hr(double earlyDeparture) {
 			testForLocked();
 			this.earlyDeparture = earlyDeparture;
 		}
-
-		@StringGetter(PERFORMING)
-		public double getPerforming_utils_hr() {
+		@StringGetter(PERFORMING) public double getPerforming_utils_hr() {
 			return performing;
 		}
-
-		@StringSetter(PERFORMING)
-		public void setPerforming_utils_hr(double performing) {
+		@StringSetter(PERFORMING) public void setPerforming_utils_hr(double performing) {
 			this.performing = performing;
 		}
-
-		@StringGetter(MARGINAL_UTL_OF_MONEY)
-		public double getMarginalUtilityOfMoney() {
+		@StringGetter(MARGINAL_UTL_OF_MONEY) public double getMarginalUtilityOfMoney() {
 			return marginalUtilityOfMoney;
 		}
-
-		@StringSetter(MARGINAL_UTL_OF_MONEY)
-		public void setMarginalUtilityOfMoney(double marginalUtilityOfMoney) {
+		@StringSetter(MARGINAL_UTL_OF_MONEY) public void setMarginalUtilityOfMoney(double marginalUtilityOfMoney) {
 			testForLocked();
 			this.marginalUtilityOfMoney = marginalUtilityOfMoney;
 		}
-
-		@StringGetter(UTL_OF_LINE_SWITCH)
-		public double getUtilityOfLineSwitch() {
+		@StringGetter(UTL_OF_LINE_SWITCH) public double getUtilityOfLineSwitch() {
 			return utilityOfLineSwitch;
 		}
-
-		@StringSetter(UTL_OF_LINE_SWITCH)
-		public void setUtilityOfLineSwitch(double utilityOfLineSwitch) {
+		@StringSetter(UTL_OF_LINE_SWITCH) public void setUtilityOfLineSwitch(double utilityOfLineSwitch) {
 			testForLocked();
 			this.utilityOfLineSwitch = utilityOfLineSwitch;
 		}
-
-		@StringGetter(WAITING)
-		public double getMarginalUtlOfWaiting_utils_hr() {
+		@StringGetter(WAITING) public double getMarginalUtlOfWaiting_utils_hr() {
 			return this.waiting;
 		}
-
-		@StringSetter(WAITING)
-		public void setMarginalUtlOfWaiting_utils_hr(final double waiting) {
+		@StringSetter(WAITING) public void setMarginalUtlOfWaiting_utils_hr(final double waiting) {
 			testForLocked();
 			this.waiting = waiting;
 		}
-
-		@StringGetter("subpopulation")
-		public String getSubpopulation() {
+		@StringGetter("subpopulation") public String getSubpopulation() {
 			return subpopulation;
 		}
 
@@ -1290,17 +1265,13 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			this.subpopulation = subpopulation;
 		}
 
-		@StringGetter(WAITING_PT)
-		public double getMarginalUtlOfWaitingPt_utils_hr() {
+		@StringGetter(WAITING_PT) public double getMarginalUtlOfWaitingPt_utils_hr() {
 			return waitingPt != null ? waitingPt
 					: this.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling();
 		}
-
-		@StringSetter(WAITING_PT)
-		public void setMarginalUtlOfWaitingPt_utils_hr(final Double waitingPt) {
+		@StringSetter(WAITING_PT) public void setMarginalUtlOfWaitingPt_utils_hr(final Double waitingPt) {
 			this.waitingPt = waitingPt;
 		}
-
 		/* parameter set handling */
 		@Override
 		public ConfigGroup createParameterSet(final String type) {
