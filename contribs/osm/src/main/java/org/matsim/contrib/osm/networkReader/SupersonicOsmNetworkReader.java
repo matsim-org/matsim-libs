@@ -180,12 +180,9 @@ public class SupersonicOsmNetworkReader {
 		return result.stream();
 	}
 
-	// same here. Node id-creation seems to be tricky when multi-threading
 	private Node createNode(Coord coord, long nodeId) {
-		synchronized (Id.class) {
 			Id<Node> id = Id.createNodeId(nodeId);
 			return network.getFactory().createNode(id, coord);
-		}
 	}
 
 	private Link createLink(Node fromNode, Node toNode, WaySegment segment, boolean isReverse) {
@@ -194,11 +191,7 @@ public class SupersonicOsmNetworkReader {
 		LinkProperties properties = linkProperties.get(highwayType);
 
 		long linkId = isReverse ? segment.getSegmentId() + 1 : segment.getSegmentId();
-		Link link;
-		// my guess is that somehow the creation of ids causes a race condition when adding links to the network
-		synchronized (Id.class) {
-			link = network.getFactory().createLink(Id.createLinkId(linkId), fromNode, toNode);
-		}
+		Link link = network.getFactory().createLink(Id.createLinkId(linkId), fromNode, toNode);
 		link.setLength(segment.getLength());
 		link.setFreespeed(getFreespeed(segment.getTags(), link.getLength(), properties));
 		link.setNumberOfLanes(getNumberOfLanes(segment.getTags(), isReverse, properties));
