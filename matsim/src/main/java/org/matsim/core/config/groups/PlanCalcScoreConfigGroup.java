@@ -78,28 +78,19 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		this.addScoringParameters(new ScoringParameterSet());
 
-		this.addModeParams(new ModeParams(TransportMode.car));
-		this.addModeParams(new ModeParams(TransportMode.pt));
-		this.addModeParams(new ModeParams(TransportMode.walk));
-		this.addModeParams(new ModeParams(TransportMode.bike));
-		this.addModeParams(new ModeParams(TransportMode.ride));
-		this.addModeParams(new ModeParams(TransportMode.other));
+		// don't set default parameters in the following, since they are overwritten if someone uses
+		//		<module name="planCalcScore">
+		//		    <parameterset type="scoringParameters"> (*)
+		//		        <parameterset type="modeParams">
+		// since the line (*) starts a new scoring parameter set for the default subpopulation.
 
-		this.addActivityParams( new ActivityParams("dummy").setTypicalDuration(2. * 3600. ) );
-		// (this is there so that an empty config prints out at least one activity type, so that the explanations of this
-		// important concept show up e.g. in defaultConfig.xml, created from the GUI. kai, jul'17
-//			params.setScoringThisActivityAtAll(false); // no longer minimal when included here. kai, jun'18
+		// The interaction params from network routing are added in checkConsistency (!!).
 
-		// yyyyyy find better solution for this. kai, dec'15
-		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.car ) ).setScoringThisActivityAtAll(false ) );
-		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.pt )).setScoringThisActivityAtAll(false ) );
-		// (need this for self-programmed pseudo pt. kai, nov'16)
-		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.bike ) ).setScoringThisActivityAtAll(false ) );
-		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.drt ) ).setScoringThisActivityAtAll(false ) );
-		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.taxi ) ).setScoringThisActivityAtAll(false ) );
-		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.other ) ).setScoringThisActivityAtAll(false ) );
-		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.walk ) ).setScoringThisActivityAtAll(false ) );
-		// (bushwhacking_walk---network_walk---bushwhacking_walk)
+		// The interaction params for pt and car should are added in ScoringParameterSet.
+
+		// The default mode params are added in ScoringParameterSet.
+
+
 	}
 
 	// ---
@@ -578,15 +569,12 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			// routing. this is strictly speaking
 			// not a consistency check, but I don't know a better place where to
 			// add this. kai, jan'18
-			for (ScoringParameterSet scoringParameterSet : this.getScoringParametersPerSubpopulation().values()) {
+			for (ScoringParameterSet paramsForSubpop : this.getScoringParametersPerSubpopulation().values()) {
 				for (String mode : config.plansCalcRoute().getNetworkModes()) {
-					String interactionActivityType = mode + " interaction";
-					ActivityParams set = scoringParameterSet.getActivityParamsPerType().get(interactionActivityType);
+					String activityType = createStageActivityType( mode );
+					ActivityParams set = paramsForSubpop.getActivityParamsPerType().get(activityType);
 					if (set == null) {
-						ActivityParams params = new ActivityParams();
-						params.setActivityType(interactionActivityType);
-						params.setScoringThisActivityAtAll(false);
-						scoringParameterSet.addActivityParams(params);
+						paramsForSubpop.addActivityParams( new ActivityParams(activityType).setScoringThisActivityAtAll(false ) );
 					}
 				}
 
@@ -1189,6 +1177,26 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		private ScoringParameterSet() {
 			super(SET_TYPE);
+
+			this.addActivityParams( new ActivityParams("dummy").setTypicalDuration(2. * 3600. ) );
+			// (this is there so that an empty config prints out at least one activity type, so that the explanations of this
+			// important concept show up e.g. in defaultConfig.xml, created from the GUI. kai, jul'17
+//			params.setScoringThisActivityAtAll(false); // no longer minimal when included here. kai, jun'18
+
+			this.addModeParams(new ModeParams(TransportMode.car));
+			this.addModeParams(new ModeParams(TransportMode.pt));
+			this.addModeParams(new ModeParams(TransportMode.walk));
+			this.addModeParams(new ModeParams(TransportMode.bike));
+			this.addModeParams(new ModeParams(TransportMode.ride));
+			this.addModeParams(new ModeParams(TransportMode.other));
+
+			this.addActivityParams( new ActivityParams( createStageActivityType(TransportMode.pt) ).setScoringThisActivityAtAll( false ) );
+			this.addActivityParams( new ActivityParams( createStageActivityType(TransportMode.drt) ).setScoringThisActivityAtAll( false ) );
+
+			// NOTE: default params are always debatable, since this is some automagic, which means that generally we discourage such things.  I
+			// have, however, found that such default params lead to standardization: If we force people to set them themselves, they initially
+			// set them to arbitrary values, which makes support even more difficult than it already is.  kai, dec'19
+
 		}
 
 		private String subpopulation = null;
