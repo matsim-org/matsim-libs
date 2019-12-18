@@ -18,21 +18,31 @@
  * *********************************************************************** *
  */
 
-package org.matsim.core.mobsim.qsim.interfaces;
+package org.matsim.contrib.drt.optimizer;
 
-import org.matsim.facilities.Facility;
+import java.util.concurrent.ForkJoinPool;
+
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 
 /**
+ * Keeps a reference to a pool and shuts it down on MobsimBeforeCleanupListener event
+ *
  * @author Michal Maciejewski (michalm)
  */
-public interface TripInfoRequest {
-	enum TimeInterpretation {departure, arrival}
+public class QSimScopeForkJoinPoolHolder implements MobsimBeforeCleanupListener {
+	private final ForkJoinPool forkJoinPool;
 
-	Facility getFromFacility();
+	public QSimScopeForkJoinPoolHolder(int numberOfThreads) {
+		forkJoinPool = new ForkJoinPool(numberOfThreads);
+	}
 
-	Facility getToFacility();
+	public ForkJoinPool getPool() {
+		return forkJoinPool;
+	}
 
-	double getTime();
-
-	TripInfoRequest.TimeInterpretation getTimeInterpretation();
+	@Override
+	public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e) {
+		forkJoinPool.shutdown();
+	}
 }
