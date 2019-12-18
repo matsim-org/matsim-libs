@@ -478,12 +478,12 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	@Override
 	public void addParameterSet(final ConfigGroup set) {
 		switch (set.getName()) {
-//		case ActivityParams.SET_TYPE:
-//			addActivityParams((ActivityParams) set);
-//			break;
-//		case ModeParams.SET_TYPE:
-//			addModeParams((ModeParams) set);
-//			break;
+		case ActivityParams.SET_TYPE:
+			addActivityParams((ActivityParams) set);
+			break;
+		case ModeParams.SET_TYPE:
+			addModeParams((ModeParams) set);
+			break;
 		case ScoringParameterSet.SET_TYPE:
 			addScoringParameters((ScoringParameterSet) set);
 			break;
@@ -522,10 +522,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	@Override
 	public ConfigGroup createParameterSet(final String type) {
 		switch (type) {
-//		case ActivityParams.SET_TYPE:
-//			return new ActivityParams();
-//		case ModeParams.SET_TYPE:
-//			return new ModeParams();
+		case ActivityParams.SET_TYPE:
+			return new ActivityParams();
+		case ModeParams.SET_TYPE:
+			return new ModeParams();
 		case ScoringParameterSet.SET_TYPE:
 			return new ScoringParameterSet();
 		default:
