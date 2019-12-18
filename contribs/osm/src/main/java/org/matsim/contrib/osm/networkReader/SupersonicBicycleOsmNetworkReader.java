@@ -68,7 +68,7 @@ public class SupersonicBicycleOsmNetworkReader {
 		return network;
 	}
 
-	private void handleLink(Link link, Map<String, String> tags, boolean isReverse) {
+	private void handleLink(Link link, Map<String, String> tags, SupersonicOsmNetworkReader.Direction direction) {
 
 		String highwayType = tags.get(OsmTags.HIGHWAY);
 
@@ -82,9 +82,9 @@ public class SupersonicBicycleOsmNetworkReader {
 		link.getAttributes().putAttribute(BICYCLE_INFRASTRUCTURE_SPEED_FACTOR, 0.5);
 
 		//TODO add reverse direction for bicylces if street is only one way. Not sure how to fit that into the model of the reader
-		collectReverseDirectionForBicycle(link, tags, isReverse);
+		collectReverseDirectionForBicycle(link, tags, direction);
 
-		afterLinkCreated.accept(link, tags, isReverse);
+		afterLinkCreated.accept(link, tags, direction);
 	}
 
 	private void setAllowedModes(Link link, String highwayType) {
@@ -134,27 +134,27 @@ public class SupersonicBicycleOsmNetworkReader {
 		return result;
 	}
 
-	private String createLinkKey(Link link, boolean isReverse) {
-		if (isReverse)
+	private String createLinkKey(Link link, SupersonicOsmNetworkReader.Direction direction) {
+		if (direction == SupersonicOsmNetworkReader.Direction.Reverse)
 			return link.getId().toString() + link.getToNode().getId() + link.getFromNode().getId();
 		return link.getId().toString() + link.getFromNode().getId() + link.getToNode().getId();
 	}
 
-	private void collectReverseDirectionForBicycle(Link link, Map<String, String> tags, boolean isReverse) {
+	private void collectReverseDirectionForBicycle(Link link, Map<String, String> tags, SupersonicOsmNetworkReader.Direction direction) {
 
-		if (isReverse) {
+		if (direction == SupersonicOsmNetworkReader.Direction.Reverse) {
 			// this link has two directions already we don't need to remember it
-			String linkKey = createLinkKey(link, isReverse);
+			String linkKey = createLinkKey(link, direction);
 			linksWhichNeedBackwardBicycleDirection.remove(linkKey);
 		} else {
 			// in case we have a forward link and the bicycle tags indicate a reverse direction we memorize
 			// this link, so that we can add a reverse link for bicycles later.
 			if (tags.containsKey(OsmTags.ONEWAYBICYCLE) && tags.get(OsmTags.ONEWAYBICYCLE).equals("no")) {
-				linksWhichNeedBackwardBicycleDirection.put(createLinkKey(link, isReverse), link.getId());
+				linksWhichNeedBackwardBicycleDirection.put(createLinkKey(link, direction), link.getId());
 			} else if (tags.containsKey(OsmTags.CYCLEWAY)) {
 				String tag = tags.get(OsmTags.CYCLEWAY);
 				if (tag.equals("opposite") || tag.equals("opposite_track") || tag.equals("opposite_lane")) {
-					linksWhichNeedBackwardBicycleDirection.put(createLinkKey(link, isReverse), link.getId());
+					linksWhichNeedBackwardBicycleDirection.put(createLinkKey(link, direction), link.getId());
 				}
 			}
 		}
