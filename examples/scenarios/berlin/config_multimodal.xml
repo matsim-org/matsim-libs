@@ -56,22 +56,22 @@
 			<param name="performing" value="+6" />
 			<param name="waiting" value="-0" />
 
-<!--			<parameterset type="modeParams">-->
-<!--				<param name="mode" value="car"/>-->
-<!--				<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />-->
-<!--			</parameterset>-->
-<!--			<parameterset type="modeParams">-->
-<!--				<param name="mode" value="pt"/>-->
-<!--			</parameterset>-->
-<!--			<parameterset type="modeParams">-->
-<!--				<param name="mode" value="walk"/>-->
-<!--			</parameterset>-->
-<!--			<parameterset type="modeParams">-->
-<!--				<param name="mode" value="bike"/>-->
-<!--			</parameterset>-->
-<!--			<parameterset type="modeParams">-->
-<!--				<param name="mode" value="ride"/>-->
-<!--			</parameterset>-->
+			<parameterset type="modeParams">
+				<param name="mode" value="car"/>
+				<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="mode" value="pt"/>
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="mode" value="walk"/>
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="mode" value="bike"/>
+			</parameterset>
+			<parameterset type="modeParams">
+				<param name="mode" value="ride"/>
+			</parameterset>
 
 			<parameterset type="activityParams">
 				<param name="activityType"    value="home" />

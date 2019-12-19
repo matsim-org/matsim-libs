@@ -78,6 +78,21 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		this.addScoringParameters(new ScoringParameterSet());
 
+		// what follows now has somewhat weird consequences:
+		// * the material is added to the ScoringParameterSet of the default subpopulation
+		// * if someone uses the following in the config.xml:
+		//      < ... planCalcScore ... >
+		//            <... modeParams ... >
+		//                   < ... mode ... abc ... />
+		//    then this will be _added_ to the modes info below (same for activities)
+		//  * if, however, someone uses in the config.xml:
+		//      < ... planCalcScore ... >
+		//            < ... scoringParameters ... >
+		//                  <... modeParams ... >
+		//                        < ... mode ... abc ... />
+		//     then the default modes will be removed before adding mode abc.  The reason for this is that the second syntax clears the scoring
+		//     params for the default subpopulation.
+
 		this.addModeParams(new ModeParams(TransportMode.car));
 		this.addModeParams(new ModeParams(TransportMode.pt));
 		this.addModeParams(new ModeParams(TransportMode.walk));
@@ -91,14 +106,14 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 //			params.setScoringThisActivityAtAll(false); // no longer minimal when included here. kai, jun'18
 
 		// yyyyyy find better solution for this. kai, dec'15
-//		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.car ) ).setScoringThisActivityAtAll(false ) );
-//		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.pt )).setScoringThisActivityAtAll(false ) );
-//		// (need this for self-programmed pseudo pt. kai, nov'16)
-//		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.bike ) ).setScoringThisActivityAtAll(false ) );
-//		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.drt ) ).setScoringThisActivityAtAll(false ) );
-//		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.taxi ) ).setScoringThisActivityAtAll(false ) );
-//		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.other ) ).setScoringThisActivityAtAll(false ) );
-//		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.walk ) ).setScoringThisActivityAtAll(false ) );
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.car ) ).setScoringThisActivityAtAll(false ) );
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.pt )).setScoringThisActivityAtAll(false ) );
+		// (need this for self-programmed pseudo pt. kai, nov'16)
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.bike ) ).setScoringThisActivityAtAll(false ) );
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.drt ) ).setScoringThisActivityAtAll(false ) );
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.taxi ) ).setScoringThisActivityAtAll(false ) );
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.other ) ).setScoringThisActivityAtAll(false ) );
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.walk ) ).setScoringThisActivityAtAll(false ) );
 		// (bushwhacking_walk---network_walk---bushwhacking_walk)
 	}
 

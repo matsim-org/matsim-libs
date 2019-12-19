@@ -56,6 +56,12 @@ public class MultiModalModule extends AbstractModule {
 
     @Override
     public void install() {
+        // yyyy with some thinking and testing, the following could be collapsed into nearly nothing:
+        // * Factories for network-based routing can now be provided by config, so no need to provide them here.
+        // * The multi-modal contrib now essentially is (I think) a "parallel" network for each mode.  In consequence, the corresponding network-based router
+        // would just operate on that sub-network.
+        // kai, dec'19
+
         PlansCalcRouteConfigGroup plansCalcRouteConfigGroup = getConfig().plansCalcRoute();
         PlanCalcScoreConfigGroup cnScoringGroup = getConfig().planCalcScore();
         MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
