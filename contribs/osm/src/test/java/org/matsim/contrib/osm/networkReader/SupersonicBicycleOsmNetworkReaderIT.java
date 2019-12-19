@@ -11,6 +11,8 @@ import org.matsim.testcases.MatsimTestUtils;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static org.junit.Assert.assertTrue;
+
 public class SupersonicBicycleOsmNetworkReaderIT {
 
 	private static final CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:32631");
