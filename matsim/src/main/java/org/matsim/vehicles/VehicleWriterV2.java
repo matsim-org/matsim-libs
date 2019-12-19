@@ -19,6 +19,16 @@
  * *********************************************************************** */
 package org.matsim.vehicles;
 
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
@@ -27,11 +37,6 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author dgrether
@@ -75,7 +80,8 @@ final class VehicleWriterV2 extends MatsimXmlWriter {
 	}
 
 	private void writeVehicles(Map<Id<Vehicle>, Vehicle> veh) throws UncheckedIOException {
-		for (Vehicle v : veh.values()) {
+		List<Vehicle> sortedVehicles = veh.values().stream().sorted(comparing(Vehicle::getId)).collect(toList());
+		for (Vehicle v : sortedVehicles) {
 			atts.clear();
 			atts.add(this.createTuple(VehicleSchemaV2Names.ID, v.getId().toString()));
 			atts.add(this.createTuple(VehicleSchemaV2Names.TYPE, v.getType().getId().toString()));
@@ -85,7 +91,11 @@ final class VehicleWriterV2 extends MatsimXmlWriter {
 
 	private void writeVehicleTypes(Map<Id<VehicleType>, VehicleType> vts) throws UncheckedIOException, IOException {
 		this.writer.write("\n");
-		for (VehicleType vt : vts.values()) {
+		List<VehicleType> sortedVehicleTypes = vts.values()
+				.stream()
+				.sorted(Comparator.comparing(VehicleType::getId))
+				.collect(Collectors.toList());
+		for (VehicleType vt : sortedVehicleTypes) {
 			atts.clear();
 			atts.add(this.createTuple(VehicleSchemaV2Names.ID, vt.getId().toString()));
 			this.writeStartTag(VehicleSchemaV2Names.VEHICLETYPE, atts);
