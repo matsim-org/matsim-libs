@@ -8,6 +8,9 @@ import de.topobyte.osm4j.core.model.impl.Tag;
 import de.topobyte.osm4j.core.model.impl.Way;
 import de.topobyte.osm4j.pbf.seq.PbfWriter;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 
@@ -19,6 +22,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class Utils {
 
@@ -95,6 +101,47 @@ public class Utils {
 		);
 
 		return new WaysAndLinks(nodesList, waysList);
+	}
+
+	static void assertEquals(Network expected, Network actual) {
+		// check that all element from expected result are in tested network
+		for (Link link : expected.getLinks().values()) {
+			Link testLink = actual.getLinks().get(link.getId());
+			assertNotNull(testLink);
+			testLinksAreEqual(link, testLink);
+		}
+
+		for (org.matsim.api.core.v01.network.Node node : expected.getNodes().values()) {
+			org.matsim.api.core.v01.network.Node testNode = actual.getNodes().get(node.getId());
+			assertNotNull(testNode);
+			testNodesAreEqual(node, testNode);
+		}
+
+		// also check the other way around, to make sure there are no extra elements in the network
+		for (Link link : actual.getLinks().values()) {
+			Link expectedLink = expected.getLinks().get(link.getId());
+			assertNotNull(expectedLink);
+		}
+
+		for (org.matsim.api.core.v01.network.Node node : actual.getNodes().values()) {
+			org.matsim.api.core.v01.network.Node expectedNode = expected.getNodes().get(node.getId());
+			assertNotNull(expectedNode);
+		}
+	}
+
+	private static void testLinksAreEqual(Link expected, Link actual) {
+
+		expected.getAllowedModes().forEach(mode -> assertTrue(actual.getAllowedModes().contains(mode)));
+		Assert.assertEquals(expected.getCapacity(), actual.getCapacity(), 0.001);
+		Assert.assertEquals(expected.getFlowCapacityPerSec(), actual.getFlowCapacityPerSec(), 0.001);
+		Assert.assertEquals(expected.getFreespeed(), actual.getFreespeed(), 0.001);
+		Assert.assertEquals(expected.getLength(), actual.getLength(), 0.001);
+		Assert.assertEquals(expected.getNumberOfLanes(), actual.getNumberOfLanes(), 0.001);
+	}
+
+	private static void testNodesAreEqual(org.matsim.api.core.v01.network.Node expected, org.matsim.api.core.v01.network.Node actual) {
+		Assert.assertEquals(expected.getCoord().getX(), actual.getCoord().getX(), 0.00000001);
+		Assert.assertEquals(expected.getCoord().getY(), actual.getCoord().getY(), 0.00000001);
 	}
 
 	static class WaysAndLinks {
