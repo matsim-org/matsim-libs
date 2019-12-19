@@ -78,19 +78,28 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		this.addScoringParameters(new ScoringParameterSet());
 
-		// don't set default parameters in the following, since they are overwritten if someone uses
-		//		<module name="planCalcScore">
-		//		    <parameterset type="scoringParameters"> (*)
-		//		        <parameterset type="modeParams">
-		// since the line (*) starts a new scoring parameter set for the default subpopulation.
+		this.addModeParams(new ModeParams(TransportMode.car));
+		this.addModeParams(new ModeParams(TransportMode.pt));
+		this.addModeParams(new ModeParams(TransportMode.walk));
+		this.addModeParams(new ModeParams(TransportMode.bike));
+		this.addModeParams(new ModeParams(TransportMode.ride));
+		this.addModeParams(new ModeParams(TransportMode.other));
 
-		// The interaction params from network routing are added in checkConsistency (!!).
+		this.addActivityParams( new ActivityParams("dummy").setTypicalDuration(2. * 3600. ) );
+		// (this is there so that an empty config prints out at least one activity type, so that the explanations of this
+		// important concept show up e.g. in defaultConfig.xml, created from the GUI. kai, jul'17
+//			params.setScoringThisActivityAtAll(false); // no longer minimal when included here. kai, jun'18
 
-		// The interaction params for pt and car should are added in ScoringParameterSet.
-
-		// The default mode params are added in ScoringParameterSet.
-
-
+		// yyyyyy find better solution for this. kai, dec'15
+//		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.car ) ).setScoringThisActivityAtAll(false ) );
+//		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.pt )).setScoringThisActivityAtAll(false ) );
+//		// (need this for self-programmed pseudo pt. kai, nov'16)
+//		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.bike ) ).setScoringThisActivityAtAll(false ) );
+//		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.drt ) ).setScoringThisActivityAtAll(false ) );
+//		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.taxi ) ).setScoringThisActivityAtAll(false ) );
+//		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.other ) ).setScoringThisActivityAtAll(false ) );
+//		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.walk ) ).setScoringThisActivityAtAll(false ) );
+		// (bushwhacking_walk---network_walk---bushwhacking_walk)
 	}
 
 	// ---
@@ -496,7 +505,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		final ScoringParameterSet previous = this.getScoringParameters(params.getSubpopulation());
 
 		if (previous != null) {
-			log.warn("scoring parameters for subpopulation " + previous.getSubpopulation() + " were just replaced.");
+			log.info("scoring parameters for subpopulation " + previous.getSubpopulation() + " were just replaced.");
 
 			final boolean removed = removeParameterSet(previous);
 			if (!removed)
@@ -569,12 +578,15 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			// routing. this is strictly speaking
 			// not a consistency check, but I don't know a better place where to
 			// add this. kai, jan'18
-			for (ScoringParameterSet paramsForSubpop : this.getScoringParametersPerSubpopulation().values()) {
+			for (ScoringParameterSet scoringParameterSet : this.getScoringParametersPerSubpopulation().values()) {
 				for (String mode : config.plansCalcRoute().getNetworkModes()) {
-					String activityType = createStageActivityType( mode );
-					ActivityParams set = paramsForSubpop.getActivityParamsPerType().get(activityType);
+					String interactionActivityType = mode + " interaction";
+					ActivityParams set = scoringParameterSet.getActivityParamsPerType().get(interactionActivityType);
 					if (set == null) {
-						paramsForSubpop.addActivityParams( new ActivityParams(activityType).setScoringThisActivityAtAll(false ) );
+						ActivityParams params = new ActivityParams();
+						params.setActivityType(interactionActivityType);
+						params.setScoringThisActivityAtAll(false);
+						scoringParameterSet.addActivityParams(params);
 					}
 				}
 
@@ -1177,26 +1189,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		private ScoringParameterSet() {
 			super(SET_TYPE);
-
-			this.addActivityParams( new ActivityParams("dummy").setTypicalDuration(2. * 3600. ) );
-			// (this is there so that an empty config prints out at least one activity type, so that the explanations of this
-			// important concept show up e.g. in defaultConfig.xml, created from the GUI. kai, jul'17
-//			params.setScoringThisActivityAtAll(false); // no longer minimal when included here. kai, jun'18
-
-			this.addModeParams(new ModeParams(TransportMode.car));
-			this.addModeParams(new ModeParams(TransportMode.pt));
-			this.addModeParams(new ModeParams(TransportMode.walk));
-			this.addModeParams(new ModeParams(TransportMode.bike));
-			this.addModeParams(new ModeParams(TransportMode.ride));
-			this.addModeParams(new ModeParams(TransportMode.other));
-
-			this.addActivityParams( new ActivityParams( createStageActivityType(TransportMode.pt) ).setScoringThisActivityAtAll( false ) );
-			this.addActivityParams( new ActivityParams( createStageActivityType(TransportMode.drt) ).setScoringThisActivityAtAll( false ) );
-
-			// NOTE: default params are always debatable, since this is some automagic, which means that generally we discourage such things.  I
-			// have, however, found that such default params lead to standardization: If we force people to set them themselves, they initially
-			// set them to arbitrary values, which makes support even more difficult than it already is.  kai, dec'19
-
 		}
 
 		private String subpopulation = null;
@@ -1214,48 +1206,73 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		private Double waitingPt = null; // if not actively set by user, it will
 											// later be set to "travelingPt".
 
-		@StringGetter(LATE_ARRIVAL) public double getLateArrival_utils_hr() {
+		@StringGetter(LATE_ARRIVAL)
+		public double getLateArrival_utils_hr() {
 			return lateArrival;
 		}
-		@StringSetter(LATE_ARRIVAL) public void setLateArrival_utils_hr(double lateArrival) {
+
+		@StringSetter(LATE_ARRIVAL)
+		public void setLateArrival_utils_hr(double lateArrival) {
 			testForLocked();
 			this.lateArrival = lateArrival;
 		}
-		@StringGetter(EARLY_DEPARTURE) public double getEarlyDeparture_utils_hr() {
+
+		@StringGetter(EARLY_DEPARTURE)
+		public double getEarlyDeparture_utils_hr() {
 			return earlyDeparture;
 		}
-		@StringSetter(EARLY_DEPARTURE) public void setEarlyDeparture_utils_hr(double earlyDeparture) {
+
+		@StringSetter(EARLY_DEPARTURE)
+		public void setEarlyDeparture_utils_hr(double earlyDeparture) {
 			testForLocked();
 			this.earlyDeparture = earlyDeparture;
 		}
-		@StringGetter(PERFORMING) public double getPerforming_utils_hr() {
+
+		@StringGetter(PERFORMING)
+		public double getPerforming_utils_hr() {
 			return performing;
 		}
-		@StringSetter(PERFORMING) public void setPerforming_utils_hr(double performing) {
+
+		@StringSetter(PERFORMING)
+		public void setPerforming_utils_hr(double performing) {
 			this.performing = performing;
 		}
-		@StringGetter(MARGINAL_UTL_OF_MONEY) public double getMarginalUtilityOfMoney() {
+
+		@StringGetter(MARGINAL_UTL_OF_MONEY)
+		public double getMarginalUtilityOfMoney() {
 			return marginalUtilityOfMoney;
 		}
-		@StringSetter(MARGINAL_UTL_OF_MONEY) public void setMarginalUtilityOfMoney(double marginalUtilityOfMoney) {
+
+		@StringSetter(MARGINAL_UTL_OF_MONEY)
+		public void setMarginalUtilityOfMoney(double marginalUtilityOfMoney) {
 			testForLocked();
 			this.marginalUtilityOfMoney = marginalUtilityOfMoney;
 		}
-		@StringGetter(UTL_OF_LINE_SWITCH) public double getUtilityOfLineSwitch() {
+
+		@StringGetter(UTL_OF_LINE_SWITCH)
+		public double getUtilityOfLineSwitch() {
 			return utilityOfLineSwitch;
 		}
-		@StringSetter(UTL_OF_LINE_SWITCH) public void setUtilityOfLineSwitch(double utilityOfLineSwitch) {
+
+		@StringSetter(UTL_OF_LINE_SWITCH)
+		public void setUtilityOfLineSwitch(double utilityOfLineSwitch) {
 			testForLocked();
 			this.utilityOfLineSwitch = utilityOfLineSwitch;
 		}
-		@StringGetter(WAITING) public double getMarginalUtlOfWaiting_utils_hr() {
+
+		@StringGetter(WAITING)
+		public double getMarginalUtlOfWaiting_utils_hr() {
 			return this.waiting;
 		}
-		@StringSetter(WAITING) public void setMarginalUtlOfWaiting_utils_hr(final double waiting) {
+
+		@StringSetter(WAITING)
+		public void setMarginalUtlOfWaiting_utils_hr(final double waiting) {
 			testForLocked();
 			this.waiting = waiting;
 		}
-		@StringGetter("subpopulation") public String getSubpopulation() {
+
+		@StringGetter("subpopulation")
+		public String getSubpopulation() {
 			return subpopulation;
 		}
 
@@ -1273,13 +1290,17 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			this.subpopulation = subpopulation;
 		}
 
-		@StringGetter(WAITING_PT) public double getMarginalUtlOfWaitingPt_utils_hr() {
+		@StringGetter(WAITING_PT)
+		public double getMarginalUtlOfWaitingPt_utils_hr() {
 			return waitingPt != null ? waitingPt
 					: this.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling();
 		}
-		@StringSetter(WAITING_PT) public void setMarginalUtlOfWaitingPt_utils_hr(final Double waitingPt) {
+
+		@StringSetter(WAITING_PT)
+		public void setMarginalUtlOfWaitingPt_utils_hr(final Double waitingPt) {
 			this.waitingPt = waitingPt;
 		}
+
 		/* parameter set handling */
 		@Override
 		public ConfigGroup createParameterSet(final String type) {

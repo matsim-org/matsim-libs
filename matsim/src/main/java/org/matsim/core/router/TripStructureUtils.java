@@ -583,5 +583,9 @@ public class TripStructureUtils {
 		return mode;
 	}
 
+	public static boolean isStageActivityType( String activityType ) {
+		return StageActivityTypeIdentifier.isStageActivity( activityType ) ;
+	}
+
 }
 
