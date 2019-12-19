@@ -2,6 +2,7 @@ package org.matsim.contrib.osm.networkReader;
 
 import com.slimjars.dist.gnu.trove.list.array.TLongArrayList;
 import de.topobyte.osm4j.core.model.iface.OsmNode;
+import de.topobyte.osm4j.core.model.iface.OsmTag;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.core.model.impl.Node;
 import de.topobyte.osm4j.core.model.impl.Tag;
@@ -53,11 +54,15 @@ public class Utils {
 	}
 
 	static WaysAndLinks createSingleLink() {
+		return createSingleLink(Collections.singletonList(new Tag(OsmTags.HIGHWAY, Utils.MOTORWAY)));
+	}
+
+	static WaysAndLinks createSingleLink(List<OsmTag> tags) {
+
 		Node node1 = new Node(1, 0, 0);
 		Node node2 = new Node(2, 100, 100);
 		Node node3 = new Node(3, 0, 200);
 		TLongArrayList nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId(), node3.getId()});
-		List<Tag> tags = Collections.singletonList(new Tag(OsmTags.HIGHWAY, Utils.MOTORWAY));
 		Way way = new Way(1, nodeReference, tags);
 
 		return new WaysAndLinks(Arrays.asList(node1, node2, node3), Collections.singletonList(way));
@@ -140,6 +145,10 @@ public class Utils {
 	}
 
 	private static void testNodesAreEqual(org.matsim.api.core.v01.network.Node expected, org.matsim.api.core.v01.network.Node actual) {
+
+		// test x and y separately, so that we can have a delta.
+		// In java version >=11 Assert.assertEquals(expected.getCoord(), actual.getCoord()) also works
+		// keep this in as long as we use java-8
 		Assert.assertEquals(expected.getCoord().getX(), actual.getCoord().getX(), 0.00000001);
 		Assert.assertEquals(expected.getCoord().getY(), actual.getCoord().getY(), 0.00000001);
 	}

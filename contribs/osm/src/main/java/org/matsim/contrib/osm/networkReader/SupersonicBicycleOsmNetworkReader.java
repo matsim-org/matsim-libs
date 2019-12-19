@@ -81,8 +81,8 @@ public class SupersonicBicycleOsmNetworkReader {
 		// do infrastructure factor
 		link.getAttributes().putAttribute(BICYCLE_INFRASTRUCTURE_SPEED_FACTOR, 0.5);
 
-		//TODO add reverse direction for bicylces if street is only one way. Not sure how to fit that into the model of the reader
-		collectReverseDirectionForBicycle(link, tags, direction);
+		if (link.getAllowedModes().contains(TransportMode.bike))
+			collectReverseDirectionForBicycle(link, tags, direction);
 
 		afterLinkCreated.accept(link, tags, direction);
 	}
@@ -123,7 +123,7 @@ public class SupersonicBicycleOsmNetworkReader {
 
 	private Link createReverseBicycleLink(Link forwardLink, NetworkFactory factory) {
 
-		String linkId = forwardLink.getId().toString() + "_bicycle-reverse";
+		String linkId = forwardLink.getId().toString() + "_bike-reverse";
 		Link result = factory.createLink(Id.createLinkId(linkId), forwardLink.getToNode(), forwardLink.getFromNode());
 		result.setAllowedModes(new HashSet<>(Collections.singletonList(TransportMode.bike)));
 
@@ -131,33 +131,38 @@ public class SupersonicBicycleOsmNetworkReader {
 		result.setLength(forwardLink.getLength());
 		result.setFreespeed(30 / 3.6);
 		result.setNumberOfLanes(1);
+		for (Map.Entry<String, Object> attribute : forwardLink.getAttributes().getAsMap().entrySet()) {
+			result.getAttributes().putAttribute(attribute.getKey(), attribute.getValue());
+		}
 		return result;
 	}
 
 	private String createLinkKey(Link link, SupersonicOsmNetworkReader.Direction direction) {
+		// this relies on internals of the network reader :-(
 		if (direction == SupersonicOsmNetworkReader.Direction.Reverse)
-			return link.getId().toString() + link.getToNode().getId() + link.getFromNode().getId();
-		return link.getId().toString() + link.getFromNode().getId() + link.getToNode().getId();
+			return link.getId().toString().replace("r", "") + link.getToNode().getId() + link.getFromNode().getId();
+		return link.getId().toString().replace("f", "") + link.getFromNode().getId() + link.getToNode().getId();
 	}
 
 	private void collectReverseDirectionForBicycle(Link link, Map<String, String> tags, SupersonicOsmNetworkReader.Direction direction) {
 
-		if (direction == SupersonicOsmNetworkReader.Direction.Reverse) {
-			// this link has two directions already we don't need to remember it
-			String linkKey = createLinkKey(link, direction);
+		String linkKey = createLinkKey(link, direction);
+		if (linksWhichNeedBackwardBicycleDirection.containsKey(linkKey)) {
 			linksWhichNeedBackwardBicycleDirection.remove(linkKey);
-		} else {
+		} else if (isReverseCycleWay(tags)) {
 			// in case we have a forward link and the bicycle tags indicate a reverse direction we memorize
 			// this link, so that we can add a reverse link for bicycles later.
-			if (tags.containsKey(OsmTags.ONEWAYBICYCLE) && tags.get(OsmTags.ONEWAYBICYCLE).equals("no")) {
-				linksWhichNeedBackwardBicycleDirection.put(createLinkKey(link, direction), link.getId());
-			} else if (tags.containsKey(OsmTags.CYCLEWAY)) {
-				String tag = tags.get(OsmTags.CYCLEWAY);
-				if (tag.equals("opposite") || tag.equals("opposite_track") || tag.equals("opposite_lane")) {
-					linksWhichNeedBackwardBicycleDirection.put(createLinkKey(link, direction), link.getId());
-				}
-			}
+			linksWhichNeedBackwardBicycleDirection.put(linkKey, link.getId());
 		}
+	}
+
+	private boolean isReverseCycleWay(Map<String, String> tags) {
+		if (tags.containsKey(OsmTags.ONEWAYBICYCLE) && tags.get(OsmTags.ONEWAYBICYCLE).equals("no")) return true;
+		if (tags.containsKey(OsmTags.CYCLEWAY)) {
+			String tag = tags.get(OsmTags.CYCLEWAY);
+			return (tag.equals("opposite") || tag.equals("opposite_track") || tag.equals("opposite_lane"));
+		}
+		return false;
 	}
 
 	public static class Builder {
@@ -167,9 +172,6 @@ public class SupersonicBicycleOsmNetworkReader {
 		private Predicate<Long> preserveNodes = id -> false;
 		private SupersonicOsmNetworkReader.AfterLinkCreated afterLinkCreated = (a, b, c) -> {
 		};
-
-		private Builder() {
-		}
 
 		public Builder coordinateTransformation(CoordinateTransformation transformation) {
 			this.transformation = transformation;
