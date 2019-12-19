@@ -31,6 +31,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -83,16 +84,16 @@ public class DrtRoutingModule implements RoutingModule {
 				Objects.requireNonNull(fromFacility, "fromFacility is null"),
 				Objects.requireNonNull(toFacility, "toFacility is null"));
 		if (!stops.isPresent()) {
-			logger.debug("No access/egress stops found, agent will use fallback mode " + TripRouter.getFallbackMode(
-					drtCfg.getMode()) + ". Agent Id:\t" + person.getId());
+			logger.debug("No access/egress stops found, agent will use fallback mode as leg mode (usually " + 
+					TransportMode.walk + ") and routing mode " + drtCfg.getMode() + ". Agent Id:\t" + person.getId());
 			return null;
 		}
 
 		Facility accessFacility = stops.get().getLeft();
 		Facility egressFacility = stops.get().getRight();
 		if (accessFacility.getLinkId().equals(egressFacility.getLinkId())) {
-			logger.debug("Start and end stop are the same, agent will use fallback mode " + TripRouter.getFallbackMode(
-					drtCfg.getMode()) + ". Agent Id:\t" + person.getId());
+			logger.debug("Start and end stop are the same, agent will use fallback mode as leg mode (usually " + 
+					TransportMode.walk + ") and routing mode " + drtCfg.getMode() + ". Agent Id:\t" + person.getId());
 			return null;
 		}
 

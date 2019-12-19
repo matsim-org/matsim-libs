@@ -40,8 +40,6 @@ public interface TripInfo{
 	double getLatestDecisionTime() ;
 	TripInfoRequest getOriginalRequest() ;
 
-	enum TimeInterpretation { departure, arrival }
-
 	interface Provider{
 		List<TripInfo> getTripInfos( TripInfoRequest request ) ;
 

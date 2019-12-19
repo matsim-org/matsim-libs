@@ -19,10 +19,8 @@
 
 package org.matsim.contrib.drt.routing;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -37,6 +35,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 
+import com.google.common.collect.ImmutableList;
 import com.google.inject.name.Named;
 
 /**
@@ -53,13 +52,14 @@ public class DrtRouteLegCalculator {
 	public DrtRouteLegCalculator(DrtConfigGroup drtCfg, Network drtNetwork,
 			LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			TravelDisutilityFactory travelDisutilityFactory, Scenario scenario) {
+			TravelDisutilityFactory travelDisutilityFactory, PopulationFactory populationFactory) {
 		// constructor was public when I found it, and cannot be made package private.  Thus now passing scenario as argument so we have a bit more
 		// flexibility for changes without having to change the argument list every time.  kai, jul'19
+		// back to PopulationFactory. The class will be made package-protected in the future... michal
 
 		this.drtCfg = drtCfg;
 		this.travelTime = travelTime;
-		this.populationFactory = scenario.getPopulation().getFactory();
+		this.populationFactory = populationFactory;
 
 		// Euclidean with overdoFactor > 1.0 could lead to 'experiencedTT < unsharedRideTT',
 		// while the benefit would be a marginal reduction of computation time ==> so stick to 1.0
@@ -74,12 +74,22 @@ public class DrtRouteLegCalculator {
 	 * @param unsharedRideTime ride time of the direct (shortest-time) route
 	 * @return maximum travel time
 	 */
-	public static double getMaxTravelTime(DrtConfigGroup drtCfg, double unsharedRideTime) {
+	static double getMaxTravelTime(DrtConfigGroup drtCfg, double unsharedRideTime) {
 		return drtCfg.getMaxTravelTimeAlpha() * unsharedRideTime + drtCfg.getMaxTravelTimeBeta();
 	}
 
-	public List<PlanElement> createRealDrtLeg(final double departureTime, final Link accessActLink,
+	List<PlanElement> createRealDrtLeg(final double departureTime, final Link accessActLink,
 			final Link egressActLink) {
+		DrtRoute route = createDrtRoute(departureTime, accessActLink, egressActLink);
+
+		Leg leg = populationFactory.createLeg(drtCfg.getMode());
+		leg.setDepartureTime(departureTime);
+		leg.setTravelTime(route.getTravelTime());
+		leg.setRoute(route);
+		return ImmutableList.of(leg);
+	}
+
+	DrtRoute createDrtRoute(double departureTime, Link accessActLink, Link egressActLink) {
 		VrpPathWithTravelData unsharedPath = VrpPaths.calcAndCreatePath(accessActLink, egressActLink, departureTime,
 				router, travelTime);
 		double unsharedRideTime = unsharedPath.getTravelTime();//includes first & last link
@@ -92,13 +102,6 @@ public class DrtRouteLegCalculator {
 		route.setTravelTime(maxTravelTime);
 		route.setUnsharedRideTime(unsharedRideTime);
 		route.setMaxWaitTime(drtCfg.getMaxWaitTime());
-
-		Leg leg = populationFactory.createLeg(drtCfg.getMode());
-		leg.setDepartureTime(departureTime);
-		leg.setTravelTime(maxTravelTime);
-		leg.setRoute(route);
-		List<PlanElement> result = new ArrayList<>();
-		result.add(leg);
-		return result;
+		return route;
 	}
 }
