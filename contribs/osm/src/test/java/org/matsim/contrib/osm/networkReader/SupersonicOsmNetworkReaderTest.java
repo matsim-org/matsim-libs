@@ -158,7 +158,7 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		Link link = network.getLinks().get(Id.createLinkId(10001));
+		Link link = network.getLinks().get(Id.createLinkId("10000f"));
 		assertEquals(60 / 3.6, link.getFreespeed(), 0);
 	}
 
@@ -181,7 +181,7 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		Link link = network.getLinks().get(Id.createLinkId(10001));
+		Link link = network.getLinks().get(Id.createLinkId("10000f"));
 		assertEquals(60 * 1.609344 / 3.6, link.getFreespeed(), 0);
 	}
 
@@ -205,7 +205,7 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		Link link = network.getLinks().get(Id.createLinkId(10001));
+		Link link = network.getLinks().get(Id.createLinkId("10000f"));
 		assertEquals(50 / 3.6 * 0.5, link.getFreespeed(), 0);
 	}
 
@@ -229,7 +229,7 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(1, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		Link link = network.getLinks().get(Id.createLinkId(10001));
+		Link link = network.getLinks().get(Id.createLinkId("10000f"));
 		assertEquals(LinkProperties.createMotorway().freespeed, link.getFreespeed(), 0);
 	}
 
@@ -254,7 +254,7 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		Link link = network.getLinks().get(Id.createLinkId(10001));
+		Link link = network.getLinks().get(Id.createLinkId("10000f"));
 		assertEquals(LinkProperties.createTertiary().freespeed, link.getFreespeed(), 0);
 	}
 
@@ -279,7 +279,7 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		Link link = network.getLinks().get(Id.createLinkId(10001));
+		Link link = network.getLinks().get(Id.createLinkId("10000f"));
 
 		// the freespeed for 'urban' links (links without a speed tag and shorter than 300m) freespeed is reduced depending on the length of the link
 		assertTrue(LinkProperties.createTertiary().freespeed > link.getFreespeed());
@@ -305,7 +305,7 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		Link link = network.getLinks().get(Id.createLinkId(10001));
+		Link link = network.getLinks().get(Id.createLinkId("10000f"));
 
 		assertEquals(LinkProperties.createTertiary().lanesPerDirection, link.getNumberOfLanes(), 0);
 	}
@@ -331,7 +331,7 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		Link link = network.getLinks().get(Id.createLinkId(10001));
+		Link link = network.getLinks().get(Id.createLinkId("10000f"));
 
 		assertEquals(2, link.getNumberOfLanes(), 0);
 	}
@@ -356,7 +356,7 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(1, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		Link link = network.getLinks().get(Id.createLinkId(10001));
+		Link link = network.getLinks().get(Id.createLinkId("10000f"));
 
 		assertEquals(4, link.getNumberOfLanes(), 0);
 	}
@@ -381,8 +381,8 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		Link forwardLink = network.getLinks().get(Id.createLinkId(10001));
-		Link backwardLink = network.getLinks().get(Id.createLinkId(10002));
+		Link forwardLink = network.getLinks().get(Id.createLinkId("10000f"));
+		Link backwardLink = network.getLinks().get(Id.createLinkId("10000r"));
 
 		assertEquals(4, forwardLink.getNumberOfLanes(), 0);
 		assertEquals(1, backwardLink.getNumberOfLanes(), 0);
@@ -408,7 +408,7 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		Link link = network.getLinks().get(Id.createLinkId(10001));
+		Link link = network.getLinks().get(Id.createLinkId("10000f"));
 		assertEquals(LinkProperties.createTertiary().laneCapacity, link.getCapacity(), 0);
 	}
 
@@ -432,7 +432,7 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		Link link = network.getLinks().get(Id.createLinkId(10001));
+		Link link = network.getLinks().get(Id.createLinkId("10000f"));
 		assertEquals(LinkProperties.createTertiary().laneCapacity * 2, link.getCapacity(), 0);
 	}
 
@@ -459,7 +459,7 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(2, network.getLinks().size());
 		assertEquals(2, network.getNodes().size());
 
-		Link link = network.getLinks().get(Id.createLinkId(10001));
+		Link link = network.getLinks().get(Id.createLinkId("10000f"));
 		assertEquals(linkProperties.laneCapacity, link.getCapacity(), 0);
 		assertEquals(linkProperties.lanesPerDirection, link.getNumberOfLanes(), 0);
 		assertEquals(linkProperties.freespeed, link.getFreespeed(), 0);
@@ -485,22 +485,22 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(4, network.getLinks().size());
 
 		// check whether the links were correctly split
-		Link link1 = network.getLinks().get(Id.createLinkId(10001));
+		Link link1 = network.getLinks().get(Id.createLinkId("10000f"));
 		assertEquals(Id.createNodeId(1), link1.getFromNode().getId());
 		assertEquals(Id.createNodeId(2), link1.getToNode().getId());
 		assertEquals(CoordUtils.calcEuclideanDistance(link1.getFromNode().getCoord(), link1.getToNode().getCoord()), link1.getLength(), 0);
 
-		Link link2 = network.getLinks().get(Id.createLinkId(10003));
+		Link link2 = network.getLinks().get(Id.createLinkId("10001f"));
 		assertEquals(Id.createNodeId(2), link2.getFromNode().getId());
 		assertEquals(Id.createNodeId(3), link2.getToNode().getId());
 		assertEquals(CoordUtils.calcEuclideanDistance(link2.getFromNode().getCoord(), link2.getToNode().getCoord()), link2.getLength(), 0);
 
-		Link link3 = network.getLinks().get(Id.createLinkId(20001));
+		Link link3 = network.getLinks().get(Id.createLinkId("20000f"));
 		assertEquals(Id.createNodeId(4), link3.getFromNode().getId());
 		assertEquals(Id.createNodeId(2), link3.getToNode().getId());
 		assertEquals(CoordUtils.calcEuclideanDistance(link3.getFromNode().getCoord(), link3.getToNode().getCoord()), link3.getLength(), 0);
 
-		Link link4 = network.getLinks().get(Id.createLinkId(20003));
+		Link link4 = network.getLinks().get(Id.createLinkId("20001f"));
 		assertEquals(Id.createNodeId(2), link4.getFromNode().getId());
 		assertEquals(Id.createNodeId(5), link4.getToNode().getId());
 		assertEquals(CoordUtils.calcEuclideanDistance(link4.getFromNode().getCoord(), link4.getToNode().getCoord()), link4.getLength(), 0);
@@ -528,25 +528,25 @@ public class SupersonicOsmNetworkReaderTest {
 		assertEquals(4, network.getLinks().size());
 
 		// check whether the links were correctly split
-		Link link1 = network.getLinks().get(Id.createLinkId(10001));
+		Link link1 = network.getLinks().get(Id.createLinkId("10000f"));
 		allowedModes.forEach(mode -> assertTrue(link1.getAllowedModes().contains(mode)));
 		assertEquals(Id.createNodeId(1), link1.getFromNode().getId());
 		assertEquals(Id.createNodeId(2), link1.getToNode().getId());
 		assertEquals(CoordUtils.calcEuclideanDistance(link1.getFromNode().getCoord(), link1.getToNode().getCoord()), link1.getLength(), 0);
 
-		Link link2 = network.getLinks().get(Id.createLinkId(10003));
+		Link link2 = network.getLinks().get(Id.createLinkId("10001f"));
 		allowedModes.forEach(mode -> assertTrue(link2.getAllowedModes().contains(mode)));
 		assertEquals(Id.createNodeId(2), link2.getFromNode().getId());
 		assertEquals(Id.createNodeId(3), link2.getToNode().getId());
 		assertEquals(CoordUtils.calcEuclideanDistance(link2.getFromNode().getCoord(), link2.getToNode().getCoord()), link2.getLength(), 0);
 
-		Link link3 = network.getLinks().get(Id.createLinkId(20001));
+		Link link3 = network.getLinks().get(Id.createLinkId("20000f"));
 		allowedModes.forEach(mode -> assertTrue(link3.getAllowedModes().contains(mode)));
 		assertEquals(Id.createNodeId(4), link3.getFromNode().getId());
 		assertEquals(Id.createNodeId(2), link3.getToNode().getId());
 		assertEquals(CoordUtils.calcEuclideanDistance(link3.getFromNode().getCoord(), link3.getToNode().getCoord()), link3.getLength(), 0);
 
-		Link link4 = network.getLinks().get(Id.createLinkId(20003));
+		Link link4 = network.getLinks().get(Id.createLinkId("20001f"));
 		allowedModes.forEach(mode -> assertTrue(link4.getAllowedModes().contains(mode)));
 		assertEquals(Id.createNodeId(2), link4.getFromNode().getId());
 		assertEquals(Id.createNodeId(5), link4.getToNode().getId());
@@ -571,11 +571,11 @@ public class SupersonicOsmNetworkReaderTest {
 				.build()
 				.read(file);
 
-		// node 5 should be simplified
+		// node 3 should be simplified
 		assertEquals(5, network.getNodes().size());
 		assertEquals(4, network.getLinks().size());
 
-		Link simplifiedLink = network.getLinks().get(Id.createLinkId(10005));
+		Link simplifiedLink = network.getLinks().get(Id.createLinkId("10002f"));
 		assertEquals(Id.createNodeId(6), simplifiedLink.getToNode().getId());
 		assertEquals(Id.createNodeId(2), simplifiedLink.getFromNode().getId());
 	}
