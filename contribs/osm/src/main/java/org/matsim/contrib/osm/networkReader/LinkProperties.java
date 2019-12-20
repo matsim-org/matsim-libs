@@ -102,20 +102,20 @@ public class LinkProperties {
 	}
 
     static ConcurrentMap<String, LinkProperties> createLinkProperties() {
-        ConcurrentMap<String, LinkProperties> result = new ConcurrentHashMap<>();
-		result.put("motorway", createMotorway());
-		result.put("motorway_link", createMotorwayLink());
-		result.put("trunk", createTrunk());
-		result.put("trunk_link", createTrunkLink());
-		result.put("primary", createPrimary());
-		result.put("primary_link", createPrimaryLink());
-		result.put("secondary", createSecondary());
-		result.put("secondary_link", createSecondaryLink());
-		result.put("tertiary", createTertiary());
-		result.put("tertiary_link", createTertiaryLink());
-		result.put("unclassified", createUnclassified());
-		result.put("residential", createResidential());
-		result.put("living_street", createLivingStreet());
+		ConcurrentMap<String, LinkProperties> result = new ConcurrentHashMap<>();
+		result.put(OsmTags.MOTORWAY, createMotorway());
+		result.put(OsmTags.MOTORWAY_LINK, createMotorwayLink());
+		result.put(OsmTags.TRUNK, createTrunk());
+		result.put(OsmTags.TRUNK_LINK, createTrunkLink());
+		result.put(OsmTags.PRIMARY, createPrimary());
+		result.put(OsmTags.PRIMARY_LINK, createPrimaryLink());
+		result.put(OsmTags.SECONDARY, createSecondary());
+		result.put(OsmTags.SECONDARY_LINK, createSecondaryLink());
+		result.put(OsmTags.TERTIARY, createTertiary());
+		result.put(OsmTags.TERTIARY_LINK, createTertiaryLink());
+		result.put(OsmTags.UNCLASSIFIED, createUnclassified());
+		result.put(OsmTags.RESIDENTIAL, createResidential());
+		result.put(OsmTags.LIVING_STREET, createLivingStreet());
 		return result;
 	}
 }
