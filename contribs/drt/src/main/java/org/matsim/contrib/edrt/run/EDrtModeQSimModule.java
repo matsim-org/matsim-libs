@@ -23,6 +23,7 @@ package org.matsim.contrib.edrt.run;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
+import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
@@ -116,14 +117,17 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 					}
 				}).asEagerSingleton();
 
-		addModalComponent(DefaultUnplannedRequestInserter.class, modalProvider(
+		addModalComponent(QSimScopeForkJoinPoolHolder.class,
+				() -> new QSimScopeForkJoinPoolHolder(drtCfg.getNumberOfThreads()));
+
+		bindModal(UnplannedRequestInserter.class).toProvider(modalProvider(
 				getter -> new DefaultUnplannedRequestInserter(drtCfg, getter.getModal(Fleet.class),
 						getter.get(MobsimTimer.class), getter.get(EventsManager.class),
 						getter.getModal(RequestInsertionScheduler.class),
 						getter.getModal(VehicleData.EntryFactory.class),
 						getter.getModal(PrecalculablePathDataProvider.class),
-						getter.getModal(InsertionCostCalculator.PenaltyCalculator.class))));
-		bindModal(UnplannedRequestInserter.class).to(modalKey(DefaultUnplannedRequestInserter.class));
+						getter.getModal(InsertionCostCalculator.PenaltyCalculator.class),
+						getter.getModal(QSimScopeForkJoinPoolHolder.class)))).asEagerSingleton();
 
 		bindModal(VehicleData.EntryFactory.class).toProvider(
 				EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider.class).asEagerSingleton();

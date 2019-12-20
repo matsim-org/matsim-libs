@@ -78,6 +78,21 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		this.addScoringParameters(new ScoringParameterSet());
 
+		// what follows now has somewhat weird consequences:
+		// * the material is added to the ScoringParameterSet of the default subpopulation
+		// * if someone uses the following in the config.xml:
+		//      < ... planCalcScore ... >
+		//            <... modeParams ... >
+		//                   < ... mode ... abc ... />
+		//    then this will be _added_ to the modes info below (same for activities)
+		//  * if, however, someone uses in the config.xml:
+		//      < ... planCalcScore ... >
+		//            < ... scoringParameters ... >
+		//                  <... modeParams ... >
+		//                        < ... mode ... abc ... />
+		//     then the default modes will be removed before adding mode abc.  The reason for this is that the second syntax clears the scoring
+		//     params for the default subpopulation.
+
 		this.addModeParams(new ModeParams(TransportMode.car));
 		this.addModeParams(new ModeParams(TransportMode.pt));
 		this.addModeParams(new ModeParams(TransportMode.walk));

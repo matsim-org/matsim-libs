@@ -68,6 +68,7 @@ public class RequestInsertionScheduler {
 		this.travelTime = travelTime;
 		this.scheduleTimingUpdater = scheduleTimingUpdater;
 		this.taskFactory = taskFactory;
+		initSchedules();
 	}
 
 	public void initSchedules() {

@@ -19,9 +19,6 @@
 
 package org.matsim.contrib.parking.parkingsearch.DynAgent.agentLogic;
 
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -45,6 +42,9 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.Iterator;
+import java.util.List;
 
 
 /**
@@ -209,11 +209,15 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		this.currentPlanElement = planElemIter.next();
 		Activity nextPlannedActivity = (Activity) this.currentPlanElement;
 		this.lastParkActionState = LastParkActionState.ACTIVITY;
-		double endTime =nextPlannedActivity.getEndTime() ; 
-		if (endTime == Time.UNDEFINED_TIME){
-			endTime = Double.POSITIVE_INFINITY;
+		double endTime =nextPlannedActivity.getEndTime() ;
+        if (Time.isUndefinedTime(endTime)) {
+            if (Time.isUndefinedTime(nextPlannedActivity.getMaximumDuration())) {
+                endTime = Double.POSITIVE_INFINITY;
+                //last activity of a day
+            } else {
+                endTime = now + nextPlannedActivity.getMaximumDuration();
+            }
 		}
-
 		return new IdleDynActivity(nextPlannedActivity.getType(), endTime);
 		
 	}
