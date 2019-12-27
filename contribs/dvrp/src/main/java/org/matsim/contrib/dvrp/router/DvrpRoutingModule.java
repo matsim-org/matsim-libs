@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,9 +15,10 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.drt.routing;
+package org.matsim.contrib.dvrp.router;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,10 +27,8 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -42,8 +41,8 @@ import org.matsim.facilities.Facility;
  * @author jbischoff
  * @author michalm (Michal Maciejewski)
  */
-public class DrtRoutingModule implements RoutingModule {
-	private static final Logger logger = Logger.getLogger(DrtRoutingModule.class);
+public class DvrpRoutingModule implements RoutingModule {
+	private static final Logger logger = Logger.getLogger(DvrpRoutingModule.class);
 
 	public interface AccessEgressFacilityFinder {
 		Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility);
@@ -56,7 +55,7 @@ public class DrtRoutingModule implements RoutingModule {
 	private final RoutingModule accessRouter;
 	private final RoutingModule egressRouter;
 
-	public DrtRoutingModule(RoutingModule mainRouter, RoutingModule accessRouter, RoutingModule egressRouter,
+	public DvrpRoutingModule(RoutingModule mainRouter, RoutingModule accessRouter, RoutingModule egressRouter,
 			AccessEgressFacilityFinder stopFinder, String mode, Scenario scenario) {
 		this.mainRouter = mainRouter;
 		this.stopFinder = stopFinder;
@@ -139,15 +138,5 @@ public class DrtRoutingModule implements RoutingModule {
 		activity.setMaximumDuration(0);
 		activity.setLinkId(stopFacility.getLinkId());
 		return activity;
-	}
-
-	static Coord getFacilityCoord(Facility facility, Network network) {
-		Coord coord = facility.getCoord();
-		if (coord == null) {
-			coord = network.getLinks().get(facility.getLinkId()).getCoord();
-			if (coord == null)
-				throw new RuntimeException("From facility has neither coordinates nor link Id. Should not happen.");
-		}
-		return coord;
 	}
 }

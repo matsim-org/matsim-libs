@@ -22,28 +22,27 @@ package org.matsim.contrib.drt.run;
 
 import java.net.URL;
 import java.util.List;
-import java.util.Map;
 
 import org.locationtech.jts.geom.prep.PreparedGeometry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.drt.optimizer.rebalancing.NoRebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.DrtModeMinCostFlowRebalancingModule;
-import org.matsim.contrib.drt.routing.ClosestAccessEgressFacilityFinder;
-import org.matsim.contrib.drt.routing.DecideOnLinkAccessEgressFacilityFinder;
 import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtMainLegRouter;
 import org.matsim.contrib.drt.routing.DrtRouteUpdater;
-import org.matsim.contrib.drt.routing.DrtRoutingModule;
-import org.matsim.contrib.drt.routing.DrtRoutingModule.AccessEgressFacilityFinder;
 import org.matsim.contrib.drt.routing.DrtStopFacility;
 import org.matsim.contrib.drt.routing.DrtStopFacilityImpl;
 import org.matsim.contrib.drt.routing.DrtStopNetwork;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
+import org.matsim.contrib.dvrp.router.ClosestAccessEgressFacilityFinder;
+import org.matsim.contrib.dvrp.router.DecideOnLinkAccessEgressFacilityFinder;
+import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
+import org.matsim.contrib.dvrp.router.DvrpRoutingModuleProvider;
+import org.matsim.contrib.dvrp.router.DvrpRoutingModuleProvider.Stage;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -58,19 +57,18 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.QuadTrees;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.gis.shp2matsim.ShpGeometryUtils;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
-import com.google.inject.TypeLiteral;
 import com.google.inject.name.Named;
 
 /**
  * @author michalm (Michal Maciejewski)
  */
 public final class DrtModeModule extends AbstractDvrpModeModule {
-	public enum Stage {ACCESS, MAIN, EGRESS}
 
 	private final DrtConfigGroup drtCfg;
 
@@ -95,9 +93,11 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 			bindModal(RebalancingStrategy.class).to(NoRebalancingStrategy.class).asEagerSingleton();
 		}
 
-		addRoutingModuleBinding(getMode()).toProvider(new DrtRoutingModuleProvider(drtCfg));// not singleton
+		addRoutingModuleBinding(getMode()).toProvider(new DvrpRoutingModuleProvider(getMode()));// not singleton
 
-		modalMapBinder(Stage.class, RoutingModule.class);//empty mapbinder for customising stage routing
+		modalMapBinder(Stage.class, RoutingModule.class).addBinding(Stage.MAIN)
+				.toProvider(new DrtMainLegRouterProvider(drtCfg));// not singleton
+
 		bindModal(DrtStopNetwork.class).toProvider(new DrtStopNetworkProvider(getConfig(), drtCfg)).asEagerSingleton();
 
 		if (drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.door2door) {
@@ -105,9 +105,11 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 					modalProvider(getter -> new DecideOnLinkAccessEgressFacilityFinder(getter.getModal(Network.class))))
 					.asEagerSingleton();
 		} else {
-			bindModal(AccessEgressFacilityFinder.class).toProvider(modalProvider(
-					getter -> new ClosestAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
-							getter.get(Network.class), getter.getModal(DrtStopNetwork.class)))).asEagerSingleton();
+			bindModal(AccessEgressFacilityFinder.class).toProvider(
+					modalProvider(getter -> new ClosestAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
+							getter.get(Network.class),
+							QuadTrees.createQuadTree(getter.getModal(DrtStopNetwork.class).getDrtStops().values()))))
+					.asEagerSingleton();
 		}
 
 		bindModal(DrtRouteUpdater.class).toProvider(new ModalProviders.AbstractProvider<DrtRouteUpdater>(getMode()) {
@@ -132,14 +134,10 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		addControlerListenerBinding().to(modalKey(DrtRouteUpdater.class));
 	}
 
-	private static class DrtRoutingModuleProvider extends ModalProviders.AbstractProvider<DrtRoutingModule> {
+	private static class DrtMainLegRouterProvider extends ModalProviders.AbstractProvider<RoutingModule> {
 		@Inject
 		@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 		private TravelTime travelTime;
-
-		@Inject
-		@Named(TransportMode.walk)
-		private RoutingModule walkRouter;
 
 		@Inject
 		private Scenario scenario;
@@ -148,26 +146,15 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 		private final DrtConfigGroup drtCfg;
 
-		private DrtRoutingModuleProvider(DrtConfigGroup drtCfg) {
+		private DrtMainLegRouterProvider(DrtConfigGroup drtCfg) {
 			super(drtCfg.getMode());
 			this.drtCfg = drtCfg;
 		}
 
 		@Override
-		public DrtRoutingModule get() {
-			Map<Stage, RoutingModule> stageRouters = getModalInstance(new TypeLiteral<Map<Stage, RoutingModule>>() {
-			});
-
-			RoutingModule mainRouter = stageRouters.get(Stage.MAIN);
-			if (mainRouter == null) {
-				mainRouter = new DrtMainLegRouter(drtCfg, getModalInstance(Network.class),
-						leastCostPathCalculatorFactory, travelTime, getModalInstance(TravelDisutilityFactory.class),
-						scenario.getPopulation().getFactory());
-			}
-
-			return new DrtRoutingModule(mainRouter, stageRouters.getOrDefault(Stage.ACCESS, walkRouter),
-					stageRouters.getOrDefault(Stage.EGRESS, walkRouter),
-					getModalInstance(AccessEgressFacilityFinder.class), getMode(), scenario);
+		public RoutingModule get() {
+			return new DrtMainLegRouter(drtCfg, getModalInstance(Network.class), leastCostPathCalculatorFactory,
+					travelTime, getModalInstance(TravelDisutilityFactory.class), scenario.getPopulation().getFactory());
 		}
 	}
 
