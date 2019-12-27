@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.Facility;
@@ -48,7 +49,6 @@ public class DrtRoutingModule implements RoutingModule {
 		Optional<Pair<Facility, Facility>> findFacilities(Facility fromFacility, Facility toFacility);
 	}
 
-	private final DrtStageActivityType drtStageActivityType;
 	private final AccessEgressFacilityFinder stopFinder;
 	private final String mode;
 	private final Scenario scenario;
@@ -62,7 +62,6 @@ public class DrtRoutingModule implements RoutingModule {
 		this.stopFinder = stopFinder;
 		this.mode = mode;
 		this.scenario = scenario;
-		this.drtStageActivityType = new DrtStageActivityType(mode);
 		this.accessRouter = accessRouter;
 		this.egressRouter = egressRouter;
 	}
@@ -135,7 +134,8 @@ public class DrtRoutingModule implements RoutingModule {
 	private Activity createDrtStageActivity(Facility stopFacility) {
 		Activity activity = scenario.getPopulation()
 				.getFactory()
-				.createActivityFromCoord(drtStageActivityType.drtStageActivity, stopFacility.getCoord());
+				.createActivityFromCoord(PlanCalcScoreConfigGroup.createStageActivityType(mode),
+						stopFacility.getCoord());
 		activity.setMaximumDuration(0);
 		activity.setLinkId(stopFacility.getLinkId());
 		return activity;
