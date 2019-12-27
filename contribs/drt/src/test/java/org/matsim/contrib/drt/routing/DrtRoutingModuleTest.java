@@ -90,7 +90,7 @@ public class DrtRoutingModuleTest {
 				new FastAStarEuclideanFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new,
 				scenario.getPopulation().getFactory());
 		DrtRoutingModule drtRoutingModule = new DrtRoutingModule(drtMainLegRouter, walkRouter, walkRouter, stopFinder,
-				drtCfg, scenario);
+				drtMode, scenario);
 
 		// case 1: origin and destination within max walking distance from next stop (200m)
 		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId(1));

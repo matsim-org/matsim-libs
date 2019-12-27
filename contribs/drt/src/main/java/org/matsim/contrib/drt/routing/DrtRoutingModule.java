@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.Facility;
@@ -51,19 +50,19 @@ public class DrtRoutingModule implements RoutingModule {
 
 	private final DrtStageActivityType drtStageActivityType;
 	private final AccessEgressFacilityFinder stopFinder;
-	private final DrtConfigGroup drtCfg;
+	private final String mode;
 	private final Scenario scenario;
 	private final RoutingModule mainRouter;
 	private final RoutingModule accessRouter;
 	private final RoutingModule egressRouter;
 
 	public DrtRoutingModule(RoutingModule mainRouter, RoutingModule accessRouter, RoutingModule egressRouter,
-			AccessEgressFacilityFinder stopFinder, DrtConfigGroup drtCfg, Scenario scenario) {
+			AccessEgressFacilityFinder stopFinder, String mode, Scenario scenario) {
 		this.mainRouter = mainRouter;
 		this.stopFinder = stopFinder;
-		this.drtCfg = drtCfg;
+		this.mode = mode;
 		this.scenario = scenario;
-		this.drtStageActivityType = new DrtStageActivityType(drtCfg.getMode());
+		this.drtStageActivityType = new DrtStageActivityType(mode);
 		this.accessRouter = accessRouter;
 		this.egressRouter = egressRouter;
 	}
@@ -78,7 +77,7 @@ public class DrtRoutingModule implements RoutingModule {
 			logger.debug("No access/egress stops found, agent will use fallback mode as leg mode (usually "
 					+ TransportMode.walk
 					+ ") and routing mode "
-					+ drtCfg.getMode()
+					+ mode
 					+ ". Agent Id:\t"
 					+ person.getId());
 			return null;
@@ -90,7 +89,7 @@ public class DrtRoutingModule implements RoutingModule {
 			logger.debug("Start and end stop are the same, agent will use fallback mode as leg mode (usually "
 					+ TransportMode.walk
 					+ ") and routing mode "
-					+ drtCfg.getMode()
+					+ mode
 					+ ". Agent Id:\t"
 					+ person.getId());
 			return null;
