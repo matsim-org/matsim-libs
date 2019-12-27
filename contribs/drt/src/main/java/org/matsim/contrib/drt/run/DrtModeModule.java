@@ -167,7 +167,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 			return new DrtRoutingModule(mainRouter, stageRouters.getOrDefault(Stage.ACCESS, walkRouter),
 					stageRouters.getOrDefault(Stage.EGRESS, walkRouter),
-					getModalInstance(AccessEgressFacilityFinder.class), drtCfg, scenario);
+					getModalInstance(AccessEgressFacilityFinder.class), getMode(), scenario);
 		}
 	}
 
