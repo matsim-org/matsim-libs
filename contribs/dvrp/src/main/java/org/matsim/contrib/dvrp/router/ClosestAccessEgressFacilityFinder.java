@@ -1,8 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2019 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -14,9 +15,10 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.drt.routing;
+package org.matsim.contrib.dvrp.router;
 
 import java.util.Optional;
 
@@ -26,11 +28,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.collections.QuadTrees;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Verify;
 
 /**
@@ -38,15 +38,14 @@ import com.google.common.base.Verify;
  */
 public class ClosestAccessEgressFacilityFinder implements AccessEgressFacilityFinder {
 	private final Network network;
-	private final QuadTree<DrtStopFacility> drtStopQuadTree;
+	private final QuadTree<? extends Facility> facilityQuadTree;
 	private final double maxDistance;
 
-	public ClosestAccessEgressFacilityFinder(double maxDistance, Network network, DrtStopNetwork drtStopNetwork) {
-		Preconditions.checkArgument(!drtStopNetwork.getDrtStops().isEmpty(), "Empty DrtStopNetwork");
+	public ClosestAccessEgressFacilityFinder(double maxDistance, Network network,
+			QuadTree<? extends Facility> facilityQuadTree) {
 		this.network = network;
+		this.facilityQuadTree = facilityQuadTree;
 		this.maxDistance = maxDistance;
-
-		drtStopQuadTree = QuadTrees.createQuadTree(drtStopNetwork.getDrtStops().values());
 	}
 
 	@Override
@@ -64,7 +63,7 @@ public class ClosestAccessEgressFacilityFinder implements AccessEgressFacilityFi
 
 	private Facility findClosestStop(Facility facility) {
 		Coord coord = getFacilityCoord(facility, network);
-		Facility closestStop = drtStopQuadTree.getClosest(coord.getX(), coord.getY());
+		Facility closestStop = facilityQuadTree.getClosest(coord.getX(), coord.getY());
 		double closestStopDistance = CoordUtils.calcEuclideanDistance(coord, closestStop.getCoord());
 		return closestStopDistance > maxDistance ? null : closestStop;
 	}
