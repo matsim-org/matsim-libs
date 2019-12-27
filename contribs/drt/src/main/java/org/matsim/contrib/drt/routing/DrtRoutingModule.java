@@ -53,13 +53,13 @@ public class DrtRoutingModule implements RoutingModule {
 	private final AccessEgressFacilityFinder stopFinder;
 	private final DrtConfigGroup drtCfg;
 	private final Scenario scenario;
-	private final DrtMainLegRouter drtMainLegRouter;
+	private final RoutingModule mainRouter;
 	private final RoutingModule accessRouter;
 	private final RoutingModule egressRouter;
 
-	public DrtRoutingModule(DrtMainLegRouter drtMainLegRouter, RoutingModule accessRouter, RoutingModule egressRouter,
+	public DrtRoutingModule(RoutingModule mainRouter, RoutingModule accessRouter, RoutingModule egressRouter,
 			AccessEgressFacilityFinder stopFinder, DrtConfigGroup drtCfg, Scenario scenario) {
-		this.drtMainLegRouter = drtMainLegRouter;
+		this.mainRouter = mainRouter;
 		this.stopFinder = stopFinder;
 		this.drtCfg = drtCfg;
 		this.scenario = scenario;
@@ -114,8 +114,7 @@ public class DrtRoutingModule implements RoutingModule {
 		}
 
 		// drt proper leg:
-		List<? extends PlanElement> drtLeg = drtMainLegRouter.calcRoute(accessFacility, egressFacility, now,
-				person);
+		List<? extends PlanElement> drtLeg = mainRouter.calcRoute(accessFacility, egressFacility, now, person);
 		trip.addAll(drtLeg);
 		for (PlanElement planElement : drtLeg) {
 			now = TripRouter.calcEndOfPlanElement(now, planElement, scenario.getConfig());

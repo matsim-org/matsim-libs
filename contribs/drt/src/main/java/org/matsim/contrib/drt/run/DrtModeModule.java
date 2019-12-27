@@ -70,7 +70,7 @@ import com.google.inject.name.Named;
  * @author michalm (Michal Maciejewski)
  */
 public final class DrtModeModule extends AbstractDvrpModeModule {
-	public enum Direction {ACCESS, EGRESS}
+	public enum Stage {ACCESS, MAIN, EGRESS}
 
 	private final DrtConfigGroup drtCfg;
 
@@ -97,7 +97,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 		addRoutingModuleBinding(getMode()).toProvider(new DrtRoutingModuleProvider(drtCfg));// not singleton
 
-		modalMapBinder(Direction.class, RoutingModule.class);//empty mapbinder for customising access/egress routing
+		modalMapBinder(Stage.class, RoutingModule.class);//empty mapbinder for customising stage routing
 		bindModal(DrtStopNetwork.class).toProvider(new DrtStopNetworkProvider(getConfig(), drtCfg)).asEagerSingleton();
 
 		if (drtCfg.getOperationalScheme() == DrtConfigGroup.OperationalScheme.door2door) {
@@ -155,17 +155,18 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 
 		@Override
 		public DrtRoutingModule get() {
-			Map<Direction, RoutingModule> accessEgressRouters = getModalInstance(
-					new TypeLiteral<Map<Direction, RoutingModule>>() {
-					});
+			Map<Stage, RoutingModule> stageRouters = getModalInstance(new TypeLiteral<Map<Stage, RoutingModule>>() {
+			});
 
-			DrtMainLegRouter drtMainLegRouter = new DrtMainLegRouter(drtCfg, getModalInstance(Network.class),
-					leastCostPathCalculatorFactory, travelTime, getModalInstance(TravelDisutilityFactory.class),
-					scenario.getPopulation().getFactory());
+			RoutingModule mainRouter = stageRouters.get(Stage.MAIN);
+			if (mainRouter == null) {
+				mainRouter = new DrtMainLegRouter(drtCfg, getModalInstance(Network.class),
+						leastCostPathCalculatorFactory, travelTime, getModalInstance(TravelDisutilityFactory.class),
+						scenario.getPopulation().getFactory());
+			}
 
-			return new DrtRoutingModule(drtMainLegRouter,
-					accessEgressRouters.getOrDefault(Direction.ACCESS, walkRouter),
-					accessEgressRouters.getOrDefault(Direction.EGRESS, walkRouter),
+			return new DrtRoutingModule(mainRouter, stageRouters.getOrDefault(Stage.ACCESS, walkRouter),
+					stageRouters.getOrDefault(Stage.EGRESS, walkRouter),
 					getModalInstance(AccessEgressFacilityFinder.class), drtCfg, scenario);
 		}
 	}
