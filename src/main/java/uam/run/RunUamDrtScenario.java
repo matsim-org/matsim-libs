@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.drt.routing.DrtStageActivityType;
 import org.matsim.contrib.drt.routing.MultiModeDrtMainModeIdentifier;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
@@ -48,6 +47,7 @@ import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -144,7 +144,7 @@ public class RunUamDrtScenario {
 
 	private static class UamMainModeIdentifier implements MainModeIdentifier {
 		private final String mode = "uam";
-		private final String drtStageActivityType = new DrtStageActivityType(mode).drtStageActivity;
+		private final String drtStageActivityType = PlanCalcScoreConfigGroup.createStageActivityType(mode);
 		private final MultiModeDrtMainModeIdentifier delegate;
 
 		@Inject
