@@ -24,17 +24,21 @@ import java.util.List;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
+import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.facilities.Facility;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.name.Named;
 
@@ -43,13 +47,14 @@ import com.google.inject.name.Named;
  * @author michalm (Michal Maciejewski)
  * @author Kai Nagel
  */
-public class DrtRouteLegCalculator {
+public class DrtMainLegRouter implements RoutingModule {
 	private final DrtConfigGroup drtCfg;
 	private final TravelTime travelTime;
 	private final LeastCostPathCalculator router;
 	private final PopulationFactory populationFactory;
+	private final Network modalNetwork;
 
-	public DrtRouteLegCalculator(DrtConfigGroup drtCfg, Network drtNetwork,
+	public DrtMainLegRouter(DrtConfigGroup drtCfg, Network modalNetwork,
 			LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
 			TravelDisutilityFactory travelDisutilityFactory, PopulationFactory populationFactory) {
@@ -60,10 +65,11 @@ public class DrtRouteLegCalculator {
 		this.drtCfg = drtCfg;
 		this.travelTime = travelTime;
 		this.populationFactory = populationFactory;
+		this.modalNetwork = modalNetwork;
 
 		// Euclidean with overdoFactor > 1.0 could lead to 'experiencedTT < unsharedRideTT',
 		// while the benefit would be a marginal reduction of computation time ==> so stick to 1.0
-		router = leastCostPathCalculatorFactory.createPathCalculator(drtNetwork,
+		router = leastCostPathCalculatorFactory.createPathCalculator(modalNetwork,
 				travelDisutilityFactory.createTravelDisutility(travelTime), travelTime);
 	}
 
@@ -78,8 +84,13 @@ public class DrtRouteLegCalculator {
 		return drtCfg.getMaxTravelTimeAlpha() * unsharedRideTime + drtCfg.getMaxTravelTimeBeta();
 	}
 
-	List<PlanElement> createRealDrtLeg(final double departureTime, final Link accessActLink,
-			final Link egressActLink) {
+	@Override
+	public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime,
+			Person person) {
+		Link accessActLink = Preconditions.checkNotNull(modalNetwork.getLinks().get(fromFacility.getLinkId()),
+				"link: %s does not exist in the network of mode: %s", fromFacility.getLinkId(), drtCfg.getMode());
+		Link egressActLink = Preconditions.checkNotNull(modalNetwork.getLinks().get(toFacility.getLinkId()),
+				"link: %s does not exist in the network of mode: %s", toFacility.getLinkId(), drtCfg.getMode());
 		DrtRoute route = createDrtRoute(departureTime, accessActLink, egressActLink);
 
 		Leg leg = populationFactory.createLeg(drtCfg.getMode());

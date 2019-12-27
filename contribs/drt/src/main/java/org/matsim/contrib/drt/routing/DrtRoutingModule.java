@@ -17,9 +17,6 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- *
- */
 package org.matsim.contrib.drt.routing;
 
 import java.util.ArrayList;
@@ -32,7 +29,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -41,8 +37,6 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.Facility;
-
-import com.google.common.base.Verify;
 
 /**
  * @author jbischoff
@@ -56,23 +50,20 @@ public class DrtRoutingModule implements RoutingModule {
 	}
 
 	private final DrtStageActivityType drtStageActivityType;
-	private final Network modalNetwork;
 	private final AccessEgressFacilityFinder stopFinder;
 	private final DrtConfigGroup drtCfg;
 	private final Scenario scenario;
-	private final DrtRouteLegCalculator drtRouteLegCalculator;
+	private final RoutingModule mainRouter;
 	private final RoutingModule accessRouter;
 	private final RoutingModule egressRouter;
 
-	public DrtRoutingModule(DrtRouteLegCalculator drtRouteLegCalculator, RoutingModule accessRouter,
-			RoutingModule egressRouter, AccessEgressFacilityFinder stopFinder, DrtConfigGroup drtCfg, Scenario scenario,
-			Network modalNetwork) {
-		this.drtRouteLegCalculator = drtRouteLegCalculator;
+	public DrtRoutingModule(RoutingModule mainRouter, RoutingModule accessRouter, RoutingModule egressRouter,
+			AccessEgressFacilityFinder stopFinder, DrtConfigGroup drtCfg, Scenario scenario) {
+		this.mainRouter = mainRouter;
 		this.stopFinder = stopFinder;
 		this.drtCfg = drtCfg;
 		this.scenario = scenario;
 		this.drtStageActivityType = new DrtStageActivityType(drtCfg.getMode());
-		this.modalNetwork = modalNetwork;
 		this.accessRouter = accessRouter;
 		this.egressRouter = egressRouter;
 	}
@@ -84,16 +75,24 @@ public class DrtRoutingModule implements RoutingModule {
 				Objects.requireNonNull(fromFacility, "fromFacility is null"),
 				Objects.requireNonNull(toFacility, "toFacility is null"));
 		if (!stops.isPresent()) {
-			logger.debug("No access/egress stops found, agent will use fallback mode as leg mode (usually " + 
-					TransportMode.walk + ") and routing mode " + drtCfg.getMode() + ". Agent Id:\t" + person.getId());
+			logger.debug("No access/egress stops found, agent will use fallback mode as leg mode (usually "
+					+ TransportMode.walk
+					+ ") and routing mode "
+					+ drtCfg.getMode()
+					+ ". Agent Id:\t"
+					+ person.getId());
 			return null;
 		}
 
 		Facility accessFacility = stops.get().getLeft();
 		Facility egressFacility = stops.get().getRight();
 		if (accessFacility.getLinkId().equals(egressFacility.getLinkId())) {
-			logger.debug("Start and end stop are the same, agent will use fallback mode as leg mode (usually " + 
-					TransportMode.walk + ") and routing mode " + drtCfg.getMode() + ". Agent Id:\t" + person.getId());
+			logger.debug("Start and end stop are the same, agent will use fallback mode as leg mode (usually "
+					+ TransportMode.walk
+					+ ") and routing mode "
+					+ drtCfg.getMode()
+					+ ". Agent Id:\t"
+					+ person.getId());
 			return null;
 		}
 
@@ -115,12 +114,7 @@ public class DrtRoutingModule implements RoutingModule {
 		}
 
 		// drt proper leg:
-		Link accessActLink = Verify.verifyNotNull(modalNetwork.getLinks().get(accessFacility.getLinkId()),
-				"link: %s does not exist in the network of mode: %s", accessFacility.getLinkId(), drtCfg.getMode());
-		Link egressActLink = Verify.verifyNotNull(modalNetwork.getLinks().get(egressFacility.getLinkId()),
-				"link: %s does not exist in the network of mode: %s", egressFacility.getLinkId(), drtCfg.getMode());
-		List<? extends PlanElement> drtLeg = drtRouteLegCalculator.createRealDrtLeg(now, accessActLink,
-				egressActLink);
+		List<? extends PlanElement> drtLeg = mainRouter.calcRoute(accessFacility, egressFacility, now, person);
 		trip.addAll(drtLeg);
 		for (PlanElement planElement : drtLeg) {
 			now = TripRouter.calcEndOfPlanElement(now, planElement, scenario.getConfig());
