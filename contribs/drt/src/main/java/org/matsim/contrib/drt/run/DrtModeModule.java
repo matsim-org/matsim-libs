@@ -36,7 +36,7 @@ import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.DrtModeMinCostFl
 import org.matsim.contrib.drt.routing.ClosestAccessEgressFacilityFinder;
 import org.matsim.contrib.drt.routing.DecideOnLinkAccessEgressFacilityFinder;
 import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
-import org.matsim.contrib.drt.routing.DrtRouteLegCalculator;
+import org.matsim.contrib.drt.routing.DrtMainLegRouter;
 import org.matsim.contrib.drt.routing.DrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtRoutingModule;
 import org.matsim.contrib.drt.routing.DrtRoutingModule.AccessEgressFacilityFinder;
@@ -159,15 +159,14 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 					new TypeLiteral<Map<Direction, RoutingModule>>() {
 					});
 
-			DrtRouteLegCalculator drtRouteLegCalculator = new DrtRouteLegCalculator(drtCfg,
-					getModalInstance(Network.class), leastCostPathCalculatorFactory, travelTime,
-					getModalInstance(TravelDisutilityFactory.class), scenario.getPopulation().getFactory());
+			DrtMainLegRouter drtMainLegRouter = new DrtMainLegRouter(drtCfg, getModalInstance(Network.class),
+					leastCostPathCalculatorFactory, travelTime, getModalInstance(TravelDisutilityFactory.class),
+					scenario.getPopulation().getFactory());
 
-			return new DrtRoutingModule(drtRouteLegCalculator,
+			return new DrtRoutingModule(drtMainLegRouter,
 					accessEgressRouters.getOrDefault(Direction.ACCESS, walkRouter),
 					accessEgressRouters.getOrDefault(Direction.EGRESS, walkRouter),
-					getModalInstance(AccessEgressFacilityFinder.class), drtCfg, scenario,
-					getModalInstance(Network.class));
+					getModalInstance(AccessEgressFacilityFinder.class), drtCfg, scenario);
 		}
 	}
 
