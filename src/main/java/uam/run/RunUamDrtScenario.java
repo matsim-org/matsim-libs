@@ -20,7 +20,7 @@
 
 package uam.run;
 
-import static org.matsim.contrib.drt.run.DrtModeModule.Direction;
+import static org.matsim.contrib.drt.run.DrtModeModule.Stage;
 
 import java.util.Collections;
 import java.util.List;
@@ -112,11 +112,11 @@ public class RunUamDrtScenario {
 
 			@Override
 			public void install() {
-				MapBinder<Direction, RoutingModule> mapBinder = modalMapBinder(Direction.class, RoutingModule.class);
+				MapBinder<Stage, RoutingModule> mapBinder = modalMapBinder(Stage.class, RoutingModule.class);
 				//DRT as access mode (fixed)
-				mapBinder.addBinding(Direction.ACCESS).to(Key.get(RoutingModule.class, Names.named("car")));
+				mapBinder.addBinding(Stage.ACCESS).to(Key.get(RoutingModule.class, Names.named("car")));
 				//more flexible approach
-				mapBinder.addBinding(Direction.EGRESS).toProvider(new UamAccessEgressRoutingModuleProvider());
+				mapBinder.addBinding(Stage.EGRESS).toProvider(new UamAccessEgressRoutingModuleProvider());
 
 				bind(MainModeIdentifier.class).toInstance(new UamMainModeIdentifier(multiModeDrtCfg));
 			}
