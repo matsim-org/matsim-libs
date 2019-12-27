@@ -24,13 +24,14 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.routing.DrtRoutingModule.AccessEgressFacilityFinder;
+import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTrees;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Verify;
 
 /**
  * @author michalm
@@ -62,9 +63,18 @@ public class ClosestAccessEgressFacilityFinder implements AccessEgressFacilityFi
 	}
 
 	private Facility findClosestStop(Facility facility) {
-		Coord coord = DrtRoutingModule.getFacilityCoord(facility, network);
+		Coord coord = getFacilityCoord(facility, network);
 		Facility closestStop = drtStopQuadTree.getClosest(coord.getX(), coord.getY());
 		double closestStopDistance = CoordUtils.calcEuclideanDistance(coord, closestStop.getCoord());
 		return closestStopDistance > maxDistance ? null : closestStop;
+	}
+
+	static Coord getFacilityCoord(Facility facility, Network network) {
+		Coord coord = facility.getCoord();
+		if (coord == null) {
+			coord = network.getLinks().get(facility.getLinkId()).getCoord();
+			Verify.verify(coord != null, "From facility has neither coordinates nor link Id. Should not happen.");
+		}
+		return coord;
 	}
 }

@@ -34,16 +34,16 @@ import org.matsim.contrib.drt.optimizer.rebalancing.NoRebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.DrtModeMinCostFlowRebalancingModule;
 import org.matsim.contrib.drt.routing.ClosestAccessEgressFacilityFinder;
-import org.matsim.contrib.drt.routing.DecideOnLinkAccessEgressFacilityFinder;
 import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtMainLegRouter;
 import org.matsim.contrib.drt.routing.DrtRouteUpdater;
-import org.matsim.contrib.drt.routing.DrtRoutingModule;
-import org.matsim.contrib.drt.routing.DrtRoutingModule.AccessEgressFacilityFinder;
 import org.matsim.contrib.drt.routing.DrtStopFacility;
 import org.matsim.contrib.drt.routing.DrtStopFacilityImpl;
 import org.matsim.contrib.drt.routing.DrtStopNetwork;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
+import org.matsim.contrib.dvrp.router.DecideOnLinkAccessEgressFacilityFinder;
+import org.matsim.contrib.dvrp.router.DvrpRoutingModule;
+import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -132,7 +132,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		addControlerListenerBinding().to(modalKey(DrtRouteUpdater.class));
 	}
 
-	private static class DrtRoutingModuleProvider extends ModalProviders.AbstractProvider<DrtRoutingModule> {
+	private static class DrtRoutingModuleProvider extends ModalProviders.AbstractProvider<DvrpRoutingModule> {
 		@Inject
 		@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 		private TravelTime travelTime;
@@ -154,7 +154,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		}
 
 		@Override
-		public DrtRoutingModule get() {
+		public DvrpRoutingModule get() {
 			Map<Stage, RoutingModule> stageRouters = getModalInstance(new TypeLiteral<Map<Stage, RoutingModule>>() {
 			});
 
@@ -165,7 +165,7 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 						scenario.getPopulation().getFactory());
 			}
 
-			return new DrtRoutingModule(mainRouter, stageRouters.getOrDefault(Stage.ACCESS, walkRouter),
+			return new DvrpRoutingModule(mainRouter, stageRouters.getOrDefault(Stage.ACCESS, walkRouter),
 					stageRouters.getOrDefault(Stage.EGRESS, walkRouter),
 					getModalInstance(AccessEgressFacilityFinder.class), getMode(), scenario);
 		}
