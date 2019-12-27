@@ -20,7 +20,7 @@
 
 package uam.run;
 
-import static org.matsim.contrib.drt.run.DrtModeModule.Stage;
+import static org.matsim.contrib.dvrp.router.DvrpRoutingModuleProvider.Stage;
 
 import java.util.Collections;
 import java.util.List;
