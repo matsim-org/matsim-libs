@@ -49,7 +49,7 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 	private final DrtConfigGroup drtCfg;
 	private final Network network;
 	private final Population population;
-	private final ExecutorServiceWithResource<DrtRouteLegCalculator> executorService;
+	private final ExecutorServiceWithResource<DrtMainLegRouter> executorService;
 
 	public DefaultDrtRouteUpdater(DrtConfigGroup drtCfg, Network network,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
@@ -63,7 +63,7 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 		LeastCostPathCalculatorFactory factory = new FastAStarEuclideanFactory();
 		// XXX uses the global.numberOfThreads, not drt.numberOfThreads, as this is executed in the replanning phase
 		executorService = new ExecutorServiceWithResource<>(IntStream.range(0, config.global().getNumberOfThreads())
-				.mapToObj(i -> new DrtRouteLegCalculator(drtCfg, network, factory, travelTime, travelDisutilityFactory,
+				.mapToObj(i -> new DrtMainLegRouter(drtCfg, network, factory, travelTime, travelDisutilityFactory,
 						population.getFactory()))
 				.collect(Collectors.toList()));
 	}
@@ -77,10 +77,10 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 		executorService.submitRunnablesAndWait(drtLegs.map(l -> (router -> updateDrtRoute(router, l))));
 	}
 
-	private void updateDrtRoute(DrtRouteLegCalculator drtRouteLegCalculator, Leg drtLeg) {
+	private void updateDrtRoute(DrtMainLegRouter drtMainLegRouter, Leg drtLeg) {
 		Link fromLink = network.getLinks().get(drtLeg.getRoute().getStartLinkId());
 		Link toLink = network.getLinks().get(drtLeg.getRoute().getEndLinkId());
-		drtLeg.setRoute(drtRouteLegCalculator.createDrtRoute(drtLeg.getDepartureTime(), fromLink, toLink));
+		drtLeg.setRoute(drtMainLegRouter.createDrtRoute(drtLeg.getDepartureTime(), fromLink, toLink));
 	}
 
 	@Override
