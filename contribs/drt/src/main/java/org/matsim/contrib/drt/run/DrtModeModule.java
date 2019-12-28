@@ -142,6 +142,8 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		@Inject
 		private Scenario scenario;
 
+		// Euclidean with overdoFactor > 1.0 could lead to 'experiencedTT < unsharedRideTT',
+		// while the benefit would be a marginal reduction of computation time ==> so stick to 1.0
 		private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = new FastAStarEuclideanFactory();
 
 		private final DrtConfigGroup drtCfg;

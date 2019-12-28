@@ -67,8 +67,6 @@ public class DrtMainLegRouter implements RoutingModule {
 		this.populationFactory = populationFactory;
 		this.modalNetwork = modalNetwork;
 
-		// Euclidean with overdoFactor > 1.0 could lead to 'experiencedTT < unsharedRideTT',
-		// while the benefit would be a marginal reduction of computation time ==> so stick to 1.0
 		router = leastCostPathCalculatorFactory.createPathCalculator(modalNetwork,
 				travelDisutilityFactory.createTravelDisutility(travelTime), travelTime);
 	}
