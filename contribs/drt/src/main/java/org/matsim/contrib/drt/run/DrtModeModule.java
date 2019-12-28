@@ -43,6 +43,7 @@ import org.matsim.contrib.dvrp.router.DecideOnLinkAccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.router.DefaultMainLegRouter;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingModule;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
+import org.matsim.contrib.dvrp.router.DvrpRoutingModuleProvider;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -52,6 +53,7 @@ import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.router.FastAStarEuclideanFactory;
+import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
@@ -92,7 +94,10 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 			bindModal(RebalancingStrategy.class).to(NoRebalancingStrategy.class).asEagerSingleton();
 		}
 
-		install(new DvrpModeRoutingModule(getMode()));
+		addRoutingModuleBinding(getMode()).toProvider(new DvrpRoutingModuleProvider(getMode()));// not singleton
+		modalMapBinder(DvrpRoutingModuleProvider.Stage.class, RoutingModule.class).addBinding(
+				DvrpRoutingModuleProvider.Stage.MAIN)
+				.toProvider(new DvrpModeRoutingModule.DefaultMainLegRouterProvider(getMode()));// not singleton
 		bindModal(DefaultMainLegRouter.RouteCreator.class).toProvider(
 				new DrtRouteCreatorProvider(drtCfg));// not singleton
 
@@ -103,8 +108,8 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 					modalProvider(getter -> new DecideOnLinkAccessEgressFacilityFinder(getter.getModal(Network.class))))
 					.asEagerSingleton();
 		} else {
-			bindModal(AccessEgressFacilityFinder.class).toProvider(
-					modalProvider(getter -> new ClosestAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
+			bindModal(AccessEgressFacilityFinder.class).toProvider(modalProvider(
+					getter -> new ClosestAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
 							getter.get(Network.class),
 							QuadTrees.createQuadTree(getter.getModal(DrtStopNetwork.class).getDrtStops().values()))))
 					.asEagerSingleton();
