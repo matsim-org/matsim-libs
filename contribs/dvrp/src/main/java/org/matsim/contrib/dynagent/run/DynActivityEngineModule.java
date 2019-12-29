@@ -8,14 +8,10 @@ public class DynActivityEngineModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		bind(DynActivityEngine.class).asEagerSingleton();
-		addQSimComponentBinding( COMPONENT_NAME ).to( DynActivityEngine.class );
+		addQSimComponentBinding(COMPONENT_NAME).to(DynActivityEngine.class);
 	}
 
 	public static void configureComponents(QSimComponentsConfig components) {
-//		components.removeNamedComponent(ActivityEngineModule.COMPONENT_NAME);
-		// do not remove this one any more since multiple activity handlers are allowed. kai, apr'19
-
 		components.addNamedComponent(COMPONENT_NAME);
 	}
 }
