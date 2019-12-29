@@ -19,10 +19,11 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
+
+import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -34,8 +35,6 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.utils.misc.Time;
-
-import javax.inject.Inject;
 
 public class ActivityEngineDefaultImpl implements ActivityEngine {
 	private static final Logger log = Logger.getLogger( ActivityEngineDefaultImpl.class ) ;
@@ -69,31 +68,26 @@ public class ActivityEngineDefaultImpl implements ActivityEngine {
 	}
 
 	private InternalInterface internalInterface;
-	
+
 	/**
 	 * This list needs to be a "blocking" queue since this is needed for
 	 * thread-safety in the parallel qsim. cdobler, oct'10
 	 */
-	private final Queue<AgentEntry> activityEndsList = new PriorityBlockingQueue<>(500, new Comparator<AgentEntry>() {
-
-		@Override
-		public int compare(AgentEntry arg0, AgentEntry arg1) {
-			int cmp = Double.compare(arg0.activityEndTime, arg1.activityEndTime);
-			if (cmp == 0) {
-				// Both depart at the same time -> let the one with the larger id be first (=smaller)
-				//
-				// yy We are not sure what the above comment line is supposed to say.  Presumably, it is supposed
-				// to say that the agent with the larger ID should be "smaller" one in the comparison.
-				// In practice, it seems
-				// that something like "emob_9" is before "emob_8", and something like "emob_10" before "emob_1".
-				// It is unclear why this convention is supposed to be helpful.
-				// kai & dominik, jul'12
-				//
-				return arg1.agent.getId().compareTo(arg0.agent.getId());
-			}
-			return cmp;
+	private final Queue<AgentEntry> activityEndsList = new PriorityBlockingQueue<>(500, (e0, e1) -> {
+		int cmp = Double.compare(e0.activityEndTime, e1.activityEndTime);
+		if (cmp == 0) {
+			// Both depart at the same time -> let the one with the larger id be first (=smaller)
+			//
+			// yy We are not sure what the above comment line is supposed to say.  Presumably, it is supposed
+			// to say that the agent with the larger ID should be "smaller" one in the comparison.
+			// In practice, it seems
+			// that something like "emob_9" is before "emob_8", and something like "emob_10" before "emob_1".
+			// It is unclear why this convention is supposed to be helpful.
+			// kai & dominik, jul'12
+			//
+			return e1.agent.getId().compareTo(e0.agent.getId());
 		}
-
+		return cmp;
 	});
 	
 	// See handleActivity for the reason for this.
