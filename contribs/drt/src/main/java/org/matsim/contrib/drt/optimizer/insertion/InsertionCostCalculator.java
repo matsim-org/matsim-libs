@@ -24,7 +24,7 @@ import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
-import org.matsim.contrib.drt.routing.DrtMainLegRouter;
+import org.matsim.contrib.drt.routing.DrtRouteCreator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtTask;
@@ -225,7 +225,7 @@ public class InsertionCostCalculator {
 
 	/**
 	 * The request constraints are set in {@link DrtRequest}, which is used by {@link DrtRequestCreator},
-	 * which is used by {@link DrtMainLegRouter} and {@link DefaultDrtRouteUpdater}.  kai, nov'18
+	 * which is used by {@link DrtRouteCreator} and {@link DefaultDrtRouteUpdater}.  kai, nov'18
 	 */
 	private double calcSoftConstraintPenalty(DrtRequest drtRequest, VehicleData.Entry vEntry,
 			InsertionWithDetourTimes insertion, double pickupDetourTimeLoss) {

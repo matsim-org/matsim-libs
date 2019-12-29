@@ -39,6 +39,7 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.dvrp.router.ClosestAccessEgressFacilityFinder;
+import org.matsim.contrib.dvrp.router.DefaultMainLegRouter;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
@@ -86,11 +87,12 @@ public class DrtRoutingModuleTest {
 
 		AccessEgressFacilityFinder stopFinder = new ClosestAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
 				scenario.getNetwork(), QuadTrees.createQuadTree(drtStops.values()));
-		DrtMainLegRouter drtMainLegRouter = new DrtMainLegRouter(drtCfg, scenario.getNetwork(),
-				new FastAStarEuclideanFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new,
-				scenario.getPopulation().getFactory());
-		DvrpRoutingModule dvrpRoutingModule = new DvrpRoutingModule(drtMainLegRouter, walkRouter, walkRouter,
-				stopFinder, drtMode, scenario);
+		DrtRouteCreator drtRouteCreator = new DrtRouteCreator(drtCfg, scenario.getNetwork(),
+				new FastAStarEuclideanFactory(), new FreeSpeedTravelTime(), TimeAsTravelDisutility::new);
+		DefaultMainLegRouter mainRouter = new DefaultMainLegRouter(drtMode, scenario.getNetwork(),
+				scenario.getPopulation().getFactory(), drtRouteCreator);
+		DvrpRoutingModule dvrpRoutingModule = new DvrpRoutingModule(mainRouter, walkRouter, walkRouter, stopFinder,
+				drtMode, scenario);
 
 		// case 1: origin and destination within max walking distance from next stop (200m)
 		Person p1 = scenario.getPopulation().getPersons().get(Id.createPersonId(1));

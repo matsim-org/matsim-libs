@@ -32,6 +32,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -45,11 +46,10 @@ import one.util.streamex.StreamEx;
  * @author michalm (Michal Maciejewski)
  */
 public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater {
-
 	private final DrtConfigGroup drtCfg;
 	private final Network network;
 	private final Population population;
-	private final ExecutorServiceWithResource<DrtMainLegRouter> executorService;
+	private final ExecutorServiceWithResource<DrtRouteCreator> executorService;
 
 	public DefaultDrtRouteUpdater(DrtConfigGroup drtCfg, Network network,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
@@ -63,8 +63,7 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 		LeastCostPathCalculatorFactory factory = new FastAStarEuclideanFactory();
 		// XXX uses the global.numberOfThreads, not drt.numberOfThreads, as this is executed in the replanning phase
 		executorService = new ExecutorServiceWithResource<>(IntStream.range(0, config.global().getNumberOfThreads())
-				.mapToObj(i -> new DrtMainLegRouter(drtCfg, network, factory, travelTime, travelDisutilityFactory,
-						population.getFactory()))
+				.mapToObj(i -> new DrtRouteCreator(drtCfg, network, factory, travelTime, travelDisutilityFactory))
 				.collect(Collectors.toList()));
 	}
 
@@ -77,10 +76,11 @@ public class DefaultDrtRouteUpdater implements ShutdownListener, DrtRouteUpdater
 		executorService.submitRunnablesAndWait(drtLegs.map(l -> (router -> updateDrtRoute(router, l))));
 	}
 
-	private void updateDrtRoute(DrtMainLegRouter drtMainLegRouter, Leg drtLeg) {
+	private void updateDrtRoute(DrtRouteCreator drtRouteCreator, Leg drtLeg) {
 		Link fromLink = network.getLinks().get(drtLeg.getRoute().getStartLinkId());
 		Link toLink = network.getLinks().get(drtLeg.getRoute().getEndLinkId());
-		drtLeg.setRoute(drtMainLegRouter.createDrtRoute(drtLeg.getDepartureTime(), fromLink, toLink));
+		RouteFactories routeFactories = population.getFactory().getRouteFactories();
+		drtLeg.setRoute(drtRouteCreator.createRoute(drtLeg.getDepartureTime(), fromLink, toLink, routeFactories));
 	}
 
 	@Override

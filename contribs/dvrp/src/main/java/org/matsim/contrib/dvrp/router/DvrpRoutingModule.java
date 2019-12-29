@@ -110,7 +110,7 @@ public class DvrpRoutingModule implements RoutingModule {
 			now++;
 		}
 
-		// drt proper leg:
+		// dvrp proper leg:
 		List<? extends PlanElement> drtLeg = mainRouter.calcRoute(accessFacility, egressFacility, now, person);
 		trip.addAll(drtLeg);
 		for (PlanElement planElement : drtLeg) {

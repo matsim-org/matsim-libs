@@ -32,7 +32,7 @@ import org.matsim.contrib.drt.optimizer.rebalancing.NoRebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.DrtModeMinCostFlowRebalancingModule;
 import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
-import org.matsim.contrib.drt.routing.DrtMainLegRouter;
+import org.matsim.contrib.drt.routing.DrtRouteCreator;
 import org.matsim.contrib.drt.routing.DrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtStopFacility;
 import org.matsim.contrib.drt.routing.DrtStopFacilityImpl;
@@ -40,9 +40,10 @@ import org.matsim.contrib.drt.routing.DrtStopNetwork;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.router.ClosestAccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.router.DecideOnLinkAccessEgressFacilityFinder;
+import org.matsim.contrib.dvrp.router.DefaultMainLegRouter;
+import org.matsim.contrib.dvrp.router.DvrpModeRoutingModule;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
 import org.matsim.contrib.dvrp.router.DvrpRoutingModuleProvider;
-import org.matsim.contrib.dvrp.router.DvrpRoutingModuleProvider.Stage;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
@@ -94,9 +95,11 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		}
 
 		addRoutingModuleBinding(getMode()).toProvider(new DvrpRoutingModuleProvider(getMode()));// not singleton
-
-		modalMapBinder(Stage.class, RoutingModule.class).addBinding(Stage.MAIN)
-				.toProvider(new DrtMainLegRouterProvider(drtCfg));// not singleton
+		modalMapBinder(DvrpRoutingModuleProvider.Stage.class, RoutingModule.class).addBinding(
+				DvrpRoutingModuleProvider.Stage.MAIN)
+				.toProvider(new DvrpModeRoutingModule.DefaultMainLegRouterProvider(getMode()));// not singleton
+		bindModal(DefaultMainLegRouter.RouteCreator.class).toProvider(
+				new DrtRouteCreatorProvider(drtCfg));// not singleton
 
 		bindModal(DrtStopNetwork.class).toProvider(new DrtStopNetworkProvider(getConfig(), drtCfg)).asEagerSingleton();
 
@@ -105,8 +108,8 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 					modalProvider(getter -> new DecideOnLinkAccessEgressFacilityFinder(getter.getModal(Network.class))))
 					.asEagerSingleton();
 		} else {
-			bindModal(AccessEgressFacilityFinder.class).toProvider(
-					modalProvider(getter -> new ClosestAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
+			bindModal(AccessEgressFacilityFinder.class).toProvider(modalProvider(
+					getter -> new ClosestAccessEgressFacilityFinder(drtCfg.getMaxWalkDistance(),
 							getter.get(Network.class),
 							QuadTrees.createQuadTree(getter.getModal(DrtStopNetwork.class).getDrtStops().values()))))
 					.asEagerSingleton();
@@ -134,27 +137,26 @@ public final class DrtModeModule extends AbstractDvrpModeModule {
 		addControlerListenerBinding().to(modalKey(DrtRouteUpdater.class));
 	}
 
-	private static class DrtMainLegRouterProvider extends ModalProviders.AbstractProvider<RoutingModule> {
+	private static class DrtRouteCreatorProvider extends ModalProviders.AbstractProvider<DrtRouteCreator> {
 		@Inject
 		@Named(DvrpTravelTimeModule.DVRP_ESTIMATED)
 		private TravelTime travelTime;
 
-		@Inject
-		private Scenario scenario;
-
+		// Euclidean with overdoFactor > 1.0 could lead to 'experiencedTT < unsharedRideTT',
+		// while the benefit would be a marginal reduction of computation time ==> so stick to 1.0
 		private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = new FastAStarEuclideanFactory();
 
 		private final DrtConfigGroup drtCfg;
 
-		private DrtMainLegRouterProvider(DrtConfigGroup drtCfg) {
+		private DrtRouteCreatorProvider(DrtConfigGroup drtCfg) {
 			super(drtCfg.getMode());
 			this.drtCfg = drtCfg;
 		}
 
 		@Override
-		public RoutingModule get() {
-			return new DrtMainLegRouter(drtCfg, getModalInstance(Network.class), leastCostPathCalculatorFactory,
-					travelTime, getModalInstance(TravelDisutilityFactory.class), scenario.getPopulation().getFactory());
+		public DrtRouteCreator get() {
+			return new DrtRouteCreator(drtCfg, getModalInstance(Network.class), leastCostPathCalculatorFactory,
+					travelTime, getModalInstance(TravelDisutilityFactory.class));
 		}
 	}
 
