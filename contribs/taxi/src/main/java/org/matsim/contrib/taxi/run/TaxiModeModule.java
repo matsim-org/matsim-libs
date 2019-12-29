@@ -23,7 +23,7 @@ package org.matsim.contrib.taxi.run;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.fleet.FleetModule;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingModule;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
+import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpModes;
@@ -49,8 +49,7 @@ public final class TaxiModeModule extends AbstractDvrpModeModule {
 	public void install() {
 		DvrpModes.registerDvrpMode(binder(), getMode());
 
-		install(DvrpRoutingNetworkProvider.createDvrpModeRoutingNetworkModule(getMode(),
-				taxiCfg.isUseModeFilteredSubnetwork()));
+		install(new DvrpModeRoutingNetworkModule(getMode(), taxiCfg.isUseModeFilteredSubnetwork()));
 		bindModal(TravelDisutilityFactory.class).toInstance(TimeAsTravelDisutility::new);
 
 		install(new DvrpModeRoutingModule(getMode(),
@@ -59,8 +58,7 @@ public final class TaxiModeModule extends AbstractDvrpModeModule {
 		install(new FleetModule(getMode(), taxiCfg.getTaxisFileUrl(getConfig().getContext()),
 				taxiCfg.isChangeStartLinkToLastLinkInSchedule()));
 
-		install(QSimScopeObjectListenerModule.builder(TaxiStatsDumper.class)
-				.mode(getMode())
+		install(QSimScopeObjectListenerModule.builder(TaxiStatsDumper.class).mode(getMode())
 				.objectClass(Fleet.class)
 				.listenerCreator(getter -> new TaxiStatsDumper(taxiCfg, getter.get(OutputDirectoryHierarchy.class),
 						getter.get(IterationCounter.class)))
