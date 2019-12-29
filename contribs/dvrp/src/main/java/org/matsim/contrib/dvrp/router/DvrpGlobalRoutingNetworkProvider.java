@@ -18,35 +18,25 @@
 
 package org.matsim.contrib.dvrp.router;
 
-import java.util.Collections;
-import java.util.Set;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.ModalProviders;
-import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-
-import com.google.inject.Key;
-import com.google.inject.name.Names;
 
 /**
  * @author michalm
  */
-public class DvrpRoutingNetworkProvider implements Provider<Network> {
+public class DvrpGlobalRoutingNetworkProvider implements Provider<Network> {
 	public static final String DVRP_ROUTING = "dvrp_routing";
 
 	private final Network network;
 	private final DvrpConfigGroup dvrpCfg;
 
 	@Inject
-	public DvrpRoutingNetworkProvider(Network network, DvrpConfigGroup dvrpCfg) {
+	public DvrpGlobalRoutingNetworkProvider(Network network, DvrpConfigGroup dvrpCfg) {
 		this.network = network;
 		this.dvrpCfg = dvrpCfg;
 	}
@@ -59,38 +49,6 @@ public class DvrpRoutingNetworkProvider implements Provider<Network> {
 			Network dvrpNetwork = NetworkUtils.createNetwork();
 			new TransportModeNetworkFilter(network).filter(dvrpNetwork, dvrpCfg.getNetworkModes());
 			return dvrpNetwork;
-		}
-	}
-
-	public static AbstractDvrpModeModule createDvrpModeRoutingNetworkModule(String mode,
-			boolean useModeFilteredSubnetwork) {
-		return new AbstractDvrpModeModule(mode) {
-			@Override
-			public void install() {
-				if (useModeFilteredSubnetwork) {
-					checkUseModeFilteredSubnetworkAllowed(getConfig(), getMode());
-					bindModal(Network.class).toProvider(ModalProviders.createProvider(getMode(), getter -> {
-						Network subnetwork = NetworkUtils.createNetwork();
-						new TransportModeNetworkFilter(
-								getter.getNamed(Network.class, DvrpRoutingNetworkProvider.DVRP_ROUTING)).
-								filter(subnetwork, Collections.singleton(getMode()));
-						new NetworkCleaner().run(subnetwork);
-						return subnetwork;
-					})).asEagerSingleton();
-				} else {
-					bindModal(Network.class).to(
-							Key.get(Network.class, Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING)));
-				}
-			}
-		};
-	}
-
-	public static void checkUseModeFilteredSubnetworkAllowed(Config config, String mode) {
-		Set<String> dvrpNetworkModes = DvrpConfigGroup.get(config).getNetworkModes();
-		if (!dvrpNetworkModes.isEmpty() && !dvrpNetworkModes.contains(mode)) {
-			throw new RuntimeException("DvrpConfigGroup.networkModes must contain DVRP mode: "
-					+ mode
-					+ " when 'useModeFilteredSubnetwork' is enabled for this mode");
 		}
 	}
 }

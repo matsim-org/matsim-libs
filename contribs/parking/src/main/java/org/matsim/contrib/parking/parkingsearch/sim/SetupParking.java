@@ -24,8 +24,8 @@ package org.matsim.contrib.parking.parkingsearch.sim;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.router.DvrpGlobalRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.router.DvrpModeRoutingModule;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
@@ -69,9 +69,9 @@ public class SetupParking {
 				bind(TravelDisutilityFactory.class).annotatedWith(DvrpModes.mode(TransportMode.car))
 						.toInstance(TimeAsTravelDisutility::new);
 				bind(Network.class).annotatedWith(DvrpModes.mode(TransportMode.car))
-						.to(Key.get(Network.class, Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING)));
+						.to(Key.get(Network.class, Names.named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)));
 				install(new DvrpModeRoutingModule(TransportMode.car, new AStarEuclideanFactory()));
-				bind(Network.class).annotatedWith(Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING))
+				bind(Network.class).annotatedWith(Names.named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING))
 						.to(Network.class)
 						.asEagerSingleton();
 				bind(ParkingSearchManager.class).to(FacilityBasedParkingManager.class).asEagerSingleton();

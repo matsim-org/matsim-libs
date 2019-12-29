@@ -22,7 +22,7 @@ package org.matsim.contrib.dvrp.run;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleLookup;
 import org.matsim.contrib.dvrp.passenger.PassengerModule;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
+import org.matsim.contrib.dvrp.router.DvrpGlobalRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentQueryHelper;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
@@ -55,8 +55,8 @@ public final class DvrpModule extends AbstractModule {
 
 		install(new DvrpTravelTimeModule());
 
-		bind(Network.class).annotatedWith(Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING))
-				.toProvider(DvrpRoutingNetworkProvider.class)
+		bind(Network.class).annotatedWith(Names.named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING))
+				.toProvider(DvrpGlobalRoutingNetworkProvider.class)
 				.asEagerSingleton();
 
 		installQSimModule(new DynActivityEngineModule());

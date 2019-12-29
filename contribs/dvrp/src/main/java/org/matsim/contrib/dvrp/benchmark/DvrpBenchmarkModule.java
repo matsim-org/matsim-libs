@@ -21,7 +21,7 @@ package org.matsim.contrib.dvrp.benchmark;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicleLookup;
 import org.matsim.contrib.dvrp.passenger.PassengerModule;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
+import org.matsim.contrib.dvrp.router.DvrpGlobalRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
 import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
@@ -44,8 +44,8 @@ public class DvrpBenchmarkModule extends AbstractModule {
 
 		install(new DvrpBenchmarkTravelTimeModule());// fixed travel times
 
-		bind(Network.class).annotatedWith(Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING))
-				.toProvider(DvrpRoutingNetworkProvider.class)
+		bind(Network.class).annotatedWith(Names.named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING))
+				.toProvider(DvrpGlobalRoutingNetworkProvider.class)
 				.asEagerSingleton();
 
 		installQSimModule(new DynActivityEngineModule());
