@@ -29,14 +29,14 @@ import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 /**
  * @author michalm
  */
-public class DvrpRoutingNetworkProvider implements Provider<Network> {
+public class DvrpGlobalRoutingNetworkProvider implements Provider<Network> {
 	public static final String DVRP_ROUTING = "dvrp_routing";
 
 	private final Network network;
 	private final DvrpConfigGroup dvrpCfg;
 
 	@Inject
-	public DvrpRoutingNetworkProvider(Network network, DvrpConfigGroup dvrpCfg) {
+	public DvrpGlobalRoutingNetworkProvider(Network network, DvrpConfigGroup dvrpCfg) {
 		this.network = network;
 		this.dvrpCfg = dvrpCfg;
 	}

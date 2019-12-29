@@ -53,13 +53,15 @@ public class DvrpModeRoutingNetworkModule extends AbstractDvrpModeModule {
 			checkUseModeFilteredSubnetworkAllowed(getConfig(), getMode());
 			bindModal(Network.class).toProvider(ModalProviders.createProvider(getMode(), getter -> {
 				Network subnetwork = NetworkUtils.createNetwork();
-				new TransportModeNetworkFilter(getter.getNamed(Network.class, DvrpRoutingNetworkProvider.DVRP_ROUTING)).
+				new TransportModeNetworkFilter(
+						getter.getNamed(Network.class, DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)).
 						filter(subnetwork, Collections.singleton(getMode()));
 				new NetworkCleaner().run(subnetwork);
 				return subnetwork;
 			})).asEagerSingleton();
 		} else {
-			bindModal(Network.class).to(Key.get(Network.class, Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING)));
+			bindModal(Network.class).to(
+					Key.get(Network.class, Names.named(DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)));
 		}
 	}
 
