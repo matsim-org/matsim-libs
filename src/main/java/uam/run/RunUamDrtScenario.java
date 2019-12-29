@@ -38,6 +38,7 @@ import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
+import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -92,7 +93,7 @@ public class RunUamDrtScenario {
 		controler.addOverridingModule(new AbstractDvrpModeModule(drtCfg.getMode()) {
 			@Override
 			public void install() {
-				DvrpRoutingNetworkProvider.checkUseModeFilteredSubnetworkAllowed(getConfig(), "car");
+				DvrpModeRoutingNetworkModule.checkUseModeFilteredSubnetworkAllowed(getConfig(), "car");
 				bindModal(Network.class).toProvider(ModalProviders.createProvider(getMode(), getter -> {
 					Network subnetwork = NetworkUtils.createNetwork();
 					new TransportModeNetworkFilter(
