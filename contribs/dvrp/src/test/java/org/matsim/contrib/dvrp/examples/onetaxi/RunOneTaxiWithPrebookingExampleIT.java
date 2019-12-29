@@ -38,7 +38,6 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dynagent.run.DynActivityEngine;
-import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -115,7 +114,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 			// this method, other than the methods in addOverriding..., is _not_ additive.  It always starts afresh, from the default configuration.
 			components.removeNamedComponent(ActivityEngineModule.COMPONENT_NAME);// replaced by ActivityEngineWithWakeup
 			components.addNamedComponent("ActivityEngineWithWakeup");
-			components.addNamedComponent(DynActivityEngineModule.COMPONENT_NAME);
+			components.addNamedComponent(DynActivityEngine.COMPONENT_NAME);
 			components.addNamedComponent(PreplanningEngineQSimModule.COMPONENT_NAME);
 			for (String m : new String[] { TransportMode.taxi }) {
 				components.addComponent(DvrpModes.mode(m));
@@ -134,7 +133,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 			@Override
 			protected void configureQSim() {
 				this.addQSimComponentBinding("ActivityEngineWithWakeup").to(ActivityEngineWithWakeup.class);
-				this.addQSimComponentBinding(DynActivityEngineModule.COMPONENT_NAME).to(DynActivityEngine.class);
+				this.addQSimComponentBinding(DynActivityEngine.COMPONENT_NAME).to(DynActivityEngine.class);
 			}
 		});
 

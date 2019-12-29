@@ -36,12 +36,12 @@ public class DynQSimModule extends AbstractQSimModule {
 
 	@Override
 	public void configureQSim() {
-		install(new DynActivityEngineModule());
+		addQSimComponentBinding(DynActivityEngine.COMPONENT_NAME).to(DynActivityEngine.class);
 		addNamedComponent(agentSourceClass, COMPONENT_NAME);
 	}
 
 	public static void configureComponents(QSimComponentsConfig components) {
-		DynActivityEngineModule.configureComponents(components);
+		components.addNamedComponent(DynActivityEngine.COMPONENT_NAME);
 		components.addNamedComponent(COMPONENT_NAME);
 	}
 }
