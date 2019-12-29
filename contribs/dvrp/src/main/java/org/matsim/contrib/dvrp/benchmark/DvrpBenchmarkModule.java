@@ -24,7 +24,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerModule;
 import org.matsim.contrib.dvrp.router.DvrpGlobalRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourceQSimModule;
-import org.matsim.contrib.dynagent.run.DynActivityEngineModule;
+import org.matsim.contrib.dynagent.run.DynActivityEngine;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
@@ -48,10 +48,10 @@ public class DvrpBenchmarkModule extends AbstractModule {
 				.toProvider(DvrpGlobalRoutingNetworkProvider.class)
 				.asEagerSingleton();
 
-		installQSimModule(new DynActivityEngineModule());
 		installQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
+				addQSimComponentBinding(DynActivityEngine.COMPONENT_NAME).to(DynActivityEngine.class);
 				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
 				bind(DvrpVehicleLookup.class).toProvider(DvrpVehicleLookup.DvrpVehicleLookupProvider.class)
 						.asEagerSingleton();

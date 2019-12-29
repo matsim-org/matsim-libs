@@ -51,9 +51,7 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.ActivityEngineModule;
 import org.matsim.core.mobsim.qsim.ActivityEngineWithWakeup;
 import org.matsim.core.mobsim.qsim.PreplanningEngineQSimModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigurator;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -74,8 +72,7 @@ public class RunOneTaxiWithPrebookingExampleIT {
 		// load config
 		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"),
 				"generic_dvrp_one_taxi_config.xml");
-		Config config = ConfigUtils.loadConfig(configUrl, new DvrpConfigGroup(),
-				new OTFVisConfigGroup());
+		Config config = ConfigUtils.loadConfig(configUrl, new DvrpConfigGroup(), new OTFVisConfigGroup());
 		config.controler().setLastIteration(0);
 
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
@@ -113,17 +110,14 @@ public class RunOneTaxiWithPrebookingExampleIT {
 		// setup controler
 		Controler controler = new Controler(scenario);
 
-		controler.configureQSimComponents(new QSimComponentsConfigurator() {
-			@Override
-			public void configure(QSimComponentsConfig components) {
-				// this method, other than the methods in addOverriding..., is _not_ additive.  It always starts afresh, from the default configuration.
-				components.removeNamedComponent(ActivityEngineModule.COMPONENT_NAME);
-				components.addNamedComponent("abc");
-				components.addNamedComponent("def");
-				components.addNamedComponent(PreplanningEngineQSimModule.COMPONENT_NAME);
-				for (String m : new String[] { TransportMode.taxi }) {
-					components.addComponent(DvrpModes.mode(m));
-				}
+		controler.configureQSimComponents(components -> {
+			// this method, other than the methods in addOverriding..., is _not_ additive.  It always starts afresh, from the default configuration.
+			components.removeNamedComponent(ActivityEngineModule.COMPONENT_NAME);// replaced by ActivityEngineWithWakeup
+			components.addNamedComponent("ActivityEngineWithWakeup");
+			components.addNamedComponent(DynActivityEngine.COMPONENT_NAME);
+			components.addNamedComponent(PreplanningEngineQSimModule.COMPONENT_NAME);
+			for (String m : new String[] { TransportMode.taxi }) {
+				components.addComponent(DvrpModes.mode(m));
 			}
 		});
 		// yyyy in the somewhat longer run, would rather not have the components configuration in user code.  kai, mar'19
@@ -138,8 +132,8 @@ public class RunOneTaxiWithPrebookingExampleIT {
 		controler.addOverridingQSimModule(new AbstractQSimModule() {
 			@Override
 			protected void configureQSim() {
-				this.addQSimComponentBinding("def").to(ActivityEngineWithWakeup.class);
-				this.addQSimComponentBinding("abc").to(DynActivityEngine.class);
+				this.addQSimComponentBinding("ActivityEngineWithWakeup").to(ActivityEngineWithWakeup.class);
+				this.addQSimComponentBinding(DynActivityEngine.COMPONENT_NAME).to(DynActivityEngine.class);
 			}
 		});
 

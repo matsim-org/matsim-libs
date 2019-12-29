@@ -108,6 +108,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	public static final String OPERATIONAL_SCHEME = "operationalScheme";
 	static final String OPERATIONAL_SCHEME_EXP = "Operational Scheme, either of door2door, stopbased or serviceAreaBased. door2door by default";
 
+	//TODO consider renaming maxWalkDistance to max access/egress distance (or even have 2 separate params)
 	public static final String MAX_WALK_DISTANCE = "maxWalkDistance";
 	static final String MAX_WALK_DISTANCE_EXP = "Maximum beeline distance (in meters) to next stop location in stopbased system for access/egress walk leg to/from drt. If no stop can be found within this maximum distance will return a direct walk of type drtMode_walk";
 
