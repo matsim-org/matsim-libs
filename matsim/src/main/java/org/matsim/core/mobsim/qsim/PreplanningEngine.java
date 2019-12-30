@@ -70,11 +70,12 @@ import org.matsim.withinday.utils.EditTrips;
 import com.google.inject.Inject;
 
 public final class PreplanningEngine implements MobsimEngine {
+	public static final String PREBOOKING_OFFSET_ATTRIBUTE_NAME = "prebookingOffset_s";
 	// Could implement this as a generalized version of the bdi-abm implementation: can send notifications to agent, and agent can react.  Similar to the drive-to action.
 	// Notifications and corresponding handlers could then be registered. On the other hand, it is easy to add an engine such as this one; how much does it help to have another
 	// layer of infrastructure?  Am currently leaning towards the second argument.  kai, mar'19
 
-	private static final Logger log = Logger.getLogger( PreplanningEngine.class );
+	private static final Logger log = Logger.getLogger(PreplanningEngine.class);
 
 	private final ActivityFacilities facilities;
 
@@ -237,8 +238,8 @@ public final class PreplanningEngine implements MobsimEngine {
 		List<ActivityEngineWithWakeup.AgentEntry> wakeups = new ArrayList<>() ;
 
 		Double prebookingOffset_s = (Double)((PlanAgent)agent).getCurrentPlan()
-											.getAttributes()
-											.getAttribute( ActivityEngineWithWakeup.PREBOOKING_OFFSET_ATTRIBUTE_NAME );
+				.getAttributes()
+				.getAttribute(PREBOOKING_OFFSET_ATTRIBUTE_NAME);
 
 		if ( prebookingOffset_s == null ) {
 			log.warn("not prebooking") ;

@@ -91,16 +91,9 @@ public class RunOneTaxiWithPrebookingExampleIT {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-			Plan plan = person.getSelectedPlan();
-			plan.getAttributes().putAttribute(ActivityEngineWithWakeup.PREBOOKING_OFFSET_ATTRIBUTE_NAME, 900.);
-			//			for( PlanElement pe : plan.getPlanElements() ){
-			//				if ( pe instanceof Leg ) {
-			//					if ( ((Leg) pe).getMode().equals( TransportMode.drt ) || ((Leg) pe).getMode().equals( TransportMode.taxi ) ) {
-			//						log.warn("adding attribute ...") ;
-			//						pe.getAttributes().putAttribute( ActivityEngineWithWakeup.PREBOOKING_OFFSET_ATTRIBUTE_NAME, 900. ) ;
-			//					}
-			//				}
-			//			}
+			person.getSelectedPlan()
+					.getAttributes()
+					.putAttribute(PreplanningEngine.PREBOOKING_OFFSET_ATTRIBUTE_NAME, 900.);
 		}
 
 		//		scenario.getPopulation().getPersons().values().removeIf( result -> !result.getId().toString().equals( "passenger_0" ) );
