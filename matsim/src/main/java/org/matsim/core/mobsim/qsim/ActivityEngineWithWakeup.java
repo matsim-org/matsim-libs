@@ -37,9 +37,6 @@ import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 
 public final class ActivityEngineWithWakeup implements ActivityEngine {
 
-	public static final String PREBOOKING_OFFSET_ATTRIBUTE_NAME = "prebookingOffset_s";
-	// moved to here for time being so I can make some other clase package-private. kai, mar'19
-
 	private final EventsManager eventsManager;
 	private PreplanningEngine preplanningEngine;
 	private ActivityEngine delegate;
