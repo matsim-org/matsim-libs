@@ -222,7 +222,7 @@ public final class PreplanningEngine implements MobsimEngine {
 		tripInfoUpdatesMap.clear();
 	}
 
-	public List<ActivityEngineWithWakeup.AgentEntry> generateWakeups(MobsimAgent agent, double now) {
+	List<ActivityEngineWithWakeup.AgentEntry> generateWakeups( MobsimAgent agent, double now ) {
 		if (!(agent instanceof HasModifiablePlan)) {
 			// (we don't want to treat DvrpAgents, CarrierAgents, TransitVehicleDrivers etc. here)
 			return Collections.emptyList();
@@ -276,7 +276,7 @@ public final class PreplanningEngine implements MobsimEngine {
 		return wakeups;
 	}
 
-	public static List<Leg> findLegsWithModeInFuture(MobsimAgent agent, String mode) {
+	private static List<Leg> findLegsWithModeInFuture( MobsimAgent agent, String mode ) {
 		List<Leg> retVal = new ArrayList<>();
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 		for (int ii = WithinDayAgentUtils.getCurrentPlanElementIndex(agent); ii < plan.getPlanElements().size(); ii++) {

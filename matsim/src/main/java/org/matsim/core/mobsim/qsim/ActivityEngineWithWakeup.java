@@ -36,6 +36,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 
 public final class ActivityEngineWithWakeup implements ActivityEngine {
+	public static final String COMPONENT_NAME = "ActivityEngineWithWakeup";
 
 	private final EventsManager eventsManager;
 	private PreplanningEngine preplanningEngine;
@@ -125,7 +126,7 @@ public final class ActivityEngineWithWakeup implements ActivityEngine {
 	 * cdobler, apr'12
 	 */
 	static class AgentEntry {
-		public AgentEntry(MobsimAgent agent, double time, AgentWakeup agentWakeup) {
+		AgentEntry( MobsimAgent agent, double time, AgentWakeup agentWakeup ) {
 			// yyyy Let us be careful that the executeOnWakeUp does not become overkill here; if we want something more
 			// general, rather move on a completely general MessageQueue.  kai, mar'19
 
@@ -142,7 +143,7 @@ public final class ActivityEngineWithWakeup implements ActivityEngine {
 	public final static class AgentWakeupEvent extends Event implements HasPersonId {
 		private final Id<Person> personId;
 
-		public AgentWakeupEvent(double now, Id<Person> personId) {
+		AgentWakeupEvent( double now, Id<Person> personId ) {
 			super(now);
 			this.personId = personId;
 		}

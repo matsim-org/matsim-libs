@@ -229,7 +229,7 @@ public final class EditPlans {
 	 * Convenience method, clarifying that this can be called without giving the mode.
 	 */
 	public void insertActivity(MobsimAgent agent, int index, Activity activity ) {
-		String mode = TripStructureUtils.identifyMainMode( editTrips.findCurrentTrip(agent).getTripElements() ) ;
+		String mode = TripStructureUtils.identifyMainMode( EditTrips.findCurrentTrip(agent ).getTripElements() ) ;
 		insertActivity( agent, index, activity, mode, mode ) ;
 	}
 
@@ -333,7 +333,7 @@ public final class EditPlans {
 			Activity activity = (Activity) WithinDayAgentUtils.getCurrentPlanElement(agent) ;
 			trip = editTrips.findTripAfterActivity(WithinDayAgentUtils.getModifiablePlan(agent), activity) ;
 		} else {
-			trip = editTrips.findCurrentTrip(agent) ;
+			trip = EditTrips.findCurrentTrip(agent ) ;
 		}
 		return TripStructureUtils.identifyMainMode(trip.getTripElements()) ;
 	}
