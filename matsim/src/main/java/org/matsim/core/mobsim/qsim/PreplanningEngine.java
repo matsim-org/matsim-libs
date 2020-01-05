@@ -55,7 +55,6 @@ import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfo;
-import org.matsim.core.mobsim.qsim.interfaces.TripInfoRequest;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfoWithRequiredBooking;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -93,7 +92,7 @@ public final class PreplanningEngine implements MobsimEngine {
 	// yyyy not sure about possible race conditions here! kai, feb'19
 	// yyyyyy can't have non-sorted maps here because we will get non-deterministic results. kai, mar'19
 
-	private Map<MobsimAgent, TripInfoRequest> tripInfoRequestMap = new TreeMap<>(comparing(Identifiable::getId));
+	private Map<MobsimAgent, TripInfo.Request> tripInfoRequestMap = new TreeMap<>(comparing(Identifiable::getId ));
 	// yyyyyy can't have non-sorted maps here because we will get non-deterministic results. kai, mar'19
 
 	private EditTrips editTrips;
@@ -145,12 +144,12 @@ public final class PreplanningEngine implements MobsimEngine {
 		tripInfoUpdatesMap.put(agent, tripInfoUpdate);
 	}
 
-	synchronized final void notifyTripInfoNeeded(MobsimAgent agent, TripInfoRequest tripInfoRequest) {
+	synchronized final void notifyTripInfoNeeded(MobsimAgent agent, TripInfo.Request tripInfoRequest ) {
 		tripInfoRequestMap.put(agent, tripInfoRequest);
 	}
 
 	private void processTripInfoRequests() {
-		for (Map.Entry<MobsimAgent, TripInfoRequest> entry : tripInfoRequestMap.entrySet()) {
+		for (Map.Entry<MobsimAgent, TripInfo.Request> entry : tripInfoRequestMap.entrySet()) {
 			Map<TripInfo, TripInfo.Provider> allTripInfos = new LinkedHashMap<>();
 			for (TripInfo.Provider provider : tripInfoProviders.values()) {
 				List<TripInfo> tripInfos = provider.getTripInfos(entry.getValue());
@@ -211,7 +210,7 @@ public final class PreplanningEngine implements MobsimEngine {
 				TripInfo actualTripInfo = tripInfo.get();
 				updateAgentPlan(agent, actualTripInfo);
 			} else {
-				TripInfoRequest request = null;
+				TripInfo.Request request = null;
 				//TODO get it from where ??? from TripInfo???
 				//TODO agent should adapt trip info request given that the previous one got rejected??
 				//TODO or it should skip the rejected option during "accept()"
@@ -299,11 +298,11 @@ public final class PreplanningEngine implements MobsimEngine {
 		TripStructureUtils.Trip drtTrip = TripStructureUtils.findTripAtPlanElement(leg, plan);
 		Gbl.assertNotNull(drtTrip);
 
-		final TripInfoRequest request = new TripInfoRequestWithActivities.Builder(scenario).setFromActivity(
-				drtTrip.getOriginActivity())
-				.setToActivity(drtTrip.getDestinationActivity())
-				.setTime(drtTrip.getOriginActivity().getEndTime())
-				.createRequest();
+		final TripInfo.Request request = new TripInfoRequestWithActivities.Builder(scenario).setFromActivity(
+				drtTrip.getOriginActivity() )
+												    .setToActivity(drtTrip.getDestinationActivity())
+												    .setTime(drtTrip.getOriginActivity().getEndTime())
+												    .createRequest();
 
 		//first simulate ActivityEngineWithWakeup and then PreplanningEngine --> decision process
 		//in the same time step
