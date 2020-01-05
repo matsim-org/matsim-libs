@@ -88,11 +88,11 @@ public final class PreplanningEngine implements MobsimEngine {
 	private final Scenario scenario;
 
 	// (we are in the mobsim, so we don't need to play around with IDs)
-	private Map<MobsimAgent, Optional<TripInfo>> tripInfoUpdatesMap = new TreeMap<>(comparing(Identifiable::getId));
+	private final Map<MobsimAgent, Optional<TripInfo>> tripInfoUpdatesMap = new TreeMap<>(comparing(Identifiable::getId ));
 	// yyyy not sure about possible race conditions here! kai, feb'19
 	// yyyyyy can't have non-sorted maps here because we will get non-deterministic results. kai, mar'19
 
-	private Map<MobsimAgent, TripInfo.Request> tripInfoRequestMap = new TreeMap<>(comparing(Identifiable::getId ));
+	private final Map<MobsimAgent, TripInfo.Request> tripInfoRequestMap = new TreeMap<>(comparing(Identifiable::getId ));
 	// yyyyyy can't have non-sorted maps here because we will get non-deterministic results. kai, mar'19
 
 	private EditTrips editTrips;
@@ -128,7 +128,7 @@ public final class PreplanningEngine implements MobsimEngine {
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.editTrips = new EditTrips(tripRouter, scenario, internalInterface);
-		this.editPlans = new EditPlans(internalInterface.getMobsim(), tripRouter, editTrips);
+		this.editPlans = new EditPlans(internalInterface.getMobsim(), editTrips);
 		this.internalInterface = internalInterface;
 	}
 
@@ -136,36 +136,53 @@ public final class PreplanningEngine implements MobsimEngine {
 	public void doSimStep(double time) {
 		//first process requests and then infos --> trips without booking required can be processed in 1 time step
 		//booking confirmation always comes later (e.g. next time step)
-		processTripInfoRequests();
-		processTripInfoUpdates();
+
+		// process all (initial) requests:
+		for (Map.Entry<MobsimAgent, TripInfo.Request> entry : tripInfoRequestMap.entrySet()) {
+			final MobsimAgent mobsimAgent = entry.getKey();
+			final TripInfo.Request request = entry.getValue();
+
+			List<TripInfo> allTripInfos = new ArrayList<>();
+			for (TripInfo.Provider provider : tripInfoProviders.values()) {
+				allTripInfos.addAll( provider.getTripInfos( request ) );
+			}
+
+			// TODO add info for mode that is in agent plan, if not returned by trip info provider
+			decide( mobsimAgent, allTripInfos );
+		}
+
+		tripInfoRequestMap.clear();
+
+		// process all updates:
+		for (Map.Entry<MobsimAgent, Optional<TripInfo>> entry : tripInfoUpdatesMap.entrySet()) {
+			MobsimAgent agent = entry.getKey();
+			Optional<TripInfo> tripInfo = entry.getValue();
+
+			if (tripInfo.isPresent()) {
+				TripInfo actualTripInfo = tripInfo.get();
+				updateAgentPlan(agent, actualTripInfo);
+			} else {
+				TripInfo.Request request = null;
+				//TODO get it from where ??? from TripInfo???
+				//TODO agent should adapt trip info request given that the previous one got rejected??
+				//TODO or it should skip the rejected option during "accept()"
+				notifyTripInfoNeeded(agent, request);//start over again in the next time step
+			}
+		}
+		tripInfoUpdatesMap.clear();
+
+		// (I have inlined the above methods since I find this for the time being easier to read.  Can be extracted again at some later point in time . kai, jan'20)
 	}
 
 	public synchronized final void notifyChangedTripInformation(MobsimAgent agent, Optional<TripInfo> tripInfoUpdate) {
 		tripInfoUpdatesMap.put(agent, tripInfoUpdate);
 	}
 
-	synchronized final void notifyTripInfoNeeded(MobsimAgent agent, TripInfo.Request tripInfoRequest ) {
+	private synchronized void notifyTripInfoNeeded( MobsimAgent agent, TripInfo.Request tripInfoRequest ) {
 		tripInfoRequestMap.put(agent, tripInfoRequest);
 	}
 
-	private void processTripInfoRequests() {
-		for (Map.Entry<MobsimAgent, TripInfo.Request> entry : tripInfoRequestMap.entrySet()) {
-			Map<TripInfo, TripInfo.Provider> allTripInfos = new LinkedHashMap<>();
-			for (TripInfo.Provider provider : tripInfoProviders.values()) {
-				List<TripInfo> tripInfos = provider.getTripInfos(entry.getValue());
-				for (TripInfo tripInfo : tripInfos) {
-					allTripInfos.put(tripInfo, provider);
-				}
-			}
-
-			// TODO add info for mode that is in agent plan, if not returned by trip info provider
-			decide(entry.getKey(), allTripInfos);
-		}
-
-		tripInfoRequestMap.clear();
-	}
-
-	private void decide(MobsimAgent agent, Map<TripInfo, TripInfo.Provider> allTripInfos) {
+	private void decide(MobsimAgent agent, List<TripInfo> allTripInfos) {
 		this.population.getPersons().get(agent.getId()).getAttributes().putAttribute(AgentSnapshotInfo.marker, true);
 
 		if (allTripInfos.isEmpty()) {
@@ -174,12 +191,14 @@ public final class PreplanningEngine implements MobsimEngine {
 
 		// to get started, we assume that we are only getting one drt option back.
 		// TODO: make complete
-		TripInfo tripInfo = allTripInfos.keySet().iterator().next();
+		TripInfo tripInfo = allTripInfos.iterator().next();
 
 		if (tripInfo instanceof TripInfoWithRequiredBooking) {
-			tripInfoProviders.get(tripInfo.getMode())
-					.bookTrip((MobsimPassengerAgent)agent, (TripInfoWithRequiredBooking)tripInfo);
+//			tripInfoProviders.get(tripInfo.getMode())
+//					.bookTrip((MobsimPassengerAgent)agent, (TripInfoWithRequiredBooking)tripInfo);
 			// yyyy can't we really not use the tripInfo handle directly as I had it before?  We may, e.g., have different providers of the same mode.  kai, mar'19
+
+			tripInfo.bookTrip( (MobsimPassengerAgent) agent );
 
 			//to reduce number of possibilities, I would simply assume that notification always comes later
 			//
@@ -199,26 +218,6 @@ public final class PreplanningEngine implements MobsimEngine {
 			notifyChangedTripInformation(agent, Optional.of(tripInfo));//no booking here
 		}
 		log.warn("---");
-	}
-
-	private void processTripInfoUpdates() {
-		for (Map.Entry<MobsimAgent, Optional<TripInfo>> entry : tripInfoUpdatesMap.entrySet()) {
-			MobsimAgent agent = entry.getKey();
-			Optional<TripInfo> tripInfo = entry.getValue();
-
-			if (tripInfo.isPresent()) {
-				TripInfo actualTripInfo = tripInfo.get();
-				updateAgentPlan(agent, actualTripInfo);
-			} else {
-				TripInfo.Request request = null;
-				//TODO get it from where ??? from TripInfo???
-				//TODO agent should adapt trip info request given that the previous one got rejected??
-				//TODO or it should skip the rejected option during "accept()"
-				notifyTripInfoNeeded(agent, request);//start over again in the next time step
-			}
-		}
-
-		tripInfoUpdatesMap.clear();
 	}
 
 	List<ActivityEngineWithWakeup.AgentEntry> generateWakeups( MobsimAgent agent, double now ) {
@@ -254,7 +253,7 @@ public final class PreplanningEngine implements MobsimEngine {
 							(agent1, then) -> wakeUpAgent(agent1, then, drtLeg)));
 				}
 
-				Activity originActivity = editTrips.findTripAtPlanElement(agent, drtLeg).getOriginActivity();
+				Activity originActivity = EditTrips.findTripAtPlanElement(agent, drtLeg ).getOriginActivity();
 				if (originActivity.getEndTime() < now + 2.) {
 					originActivity.setEndTime(now + 2.);
 					WithinDayAgentUtils.resetCaches(agent); // !!!!!!!!

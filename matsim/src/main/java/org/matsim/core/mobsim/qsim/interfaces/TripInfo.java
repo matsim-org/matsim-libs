@@ -39,7 +39,7 @@ public interface TripInfo{
 	String getMode() ;
 	double getLatestDecisionTime() ;
 	Request getOriginalRequest() ;
-	Provider getProvider() ;
+	void bookTrip( MobsimPassengerAgent agent ) ;
 
 
 	interface Provider{
