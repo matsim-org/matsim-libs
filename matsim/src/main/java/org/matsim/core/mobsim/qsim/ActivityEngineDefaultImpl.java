@@ -36,18 +36,19 @@ import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.utils.misc.Time;
 
-public class ActivityEngineDefaultImpl implements ActivityEngine {
+class ActivityEngineDefaultImpl implements ActivityEngine {
 	private static final Logger log = Logger.getLogger( ActivityEngineDefaultImpl.class ) ;
 
-	private EventsManager eventsManager;
+	private final EventsManager eventsManager;
+
 	@Inject
-	public ActivityEngineDefaultImpl( EventsManager eventsManager ) {
+	ActivityEngineDefaultImpl( EventsManager eventsManager ) {
 		this.eventsManager = eventsManager;
 	}
 
-	public ActivityEngineDefaultImpl( EventsManager eventsManager, AgentCounter agentCounter ) {
-		this.eventsManager = eventsManager;
-	}
+//	public ActivityEngineDefaultImpl( EventsManager eventsManager, AgentCounter agentCounter ) {
+//		this.eventsManager = eventsManager;
+//	}
 
 	/**
 	 * Agents cannot be added directly to the activityEndsList since that would
@@ -59,12 +60,12 @@ public class ActivityEngineDefaultImpl implements ActivityEngine {
 	 * cdobler, apr'12
 	 */
 	private static class AgentEntry {
-		public AgentEntry(MobsimAgent agent, double activityEndTime) {
+		AgentEntry( MobsimAgent agent, double activityEndTime ) {
 			this.agent = agent;
 			this.activityEndTime = activityEndTime;
 		}
-		final MobsimAgent agent;
-		final double activityEndTime;
+		private final MobsimAgent agent;
+		private final double activityEndTime;
 	}
 
 	private InternalInterface internalInterface;

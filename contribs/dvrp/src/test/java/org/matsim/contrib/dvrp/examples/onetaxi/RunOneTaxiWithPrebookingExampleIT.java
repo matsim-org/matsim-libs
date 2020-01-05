@@ -37,13 +37,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestScheduledEvent;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpModes;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.contrib.dynagent.run.DynActivityEngine;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -55,9 +54,8 @@ import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 import org.matsim.core.mobsim.qsim.ActivityEngineModule;
 import org.matsim.core.mobsim.qsim.ActivityEngineWithWakeup;
 import org.matsim.core.mobsim.qsim.PreplanningEngine;
-import org.matsim.core.mobsim.qsim.PreplanningEngineQSimModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsConfigGroup;
-import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -90,17 +88,18 @@ public class RunOneTaxiWithPrebookingExampleIT {
 //			components.add(  PreplanningEngineQSimModule.COMPONENT_NAME ); // is in dvrp defaults
 			qsimComponentsConfig.setActiveComponents( components );
 		}
+
+		// ---
 		// load scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-			person.getSelectedPlan()
-					.getAttributes()
-					.putAttribute(PreplanningEngine.PREBOOKING_OFFSET_ATTRIBUTE_NAME, 900.);
+			person.getSelectedPlan().getAttributes().putAttribute(PreplanningEngine.PREBOOKING_OFFSET_ATTRIBUTE_NAME, 900.);
 		}
 
 //		PopulationUtils.writePopulation(scenario.getPopulation(), utils.getOutputDirectory() + "/../pop.xml");
 
+		// ---
 		// setup controler
 		Controler controler = new Controler(scenario);
 
@@ -217,19 +216,19 @@ public class RunOneTaxiWithPrebookingExampleIT {
 		assertActivityEndEvent(activityEndEvents.get(9), 2700, "passenger_9");
 	}
 
-	private void assertWakeupEvent(AgentWakeupEvent event, double time, String personId) {
+	private static void assertWakeupEvent( AgentWakeupEvent event, double time, String personId ) {
 		assertThat(event.getTime()).isEqualTo(time);
 		assertThat(event.getPersonId().toString()).isEqualTo(personId);
 	}
 
-	private void assertRequestScheduledEvent(PassengerRequestScheduledEvent event, String personId, double pickupTime, String requestId) {
+	private static void assertRequestScheduledEvent( PassengerRequestScheduledEvent event, String personId, double pickupTime, String requestId ) {
 		assertThat(event.getVehicleId().toString()).isEqualTo("taxi_one");
 		assertThat(event.getPickupTime()).isCloseTo(pickupTime, Offset.offset(0.01));
 		assertThat(event.getPersonId().toString()).isEqualTo(personId);
 		assertThat(event.getRequestId().toString()).isEqualTo(requestId);
 	}
 
-	private void assertActivityEndEvent(ActivityEndEvent event, double time, String personId) {
+	private static void assertActivityEndEvent( ActivityEndEvent event, double time, String personId ) {
 		assertThat(event.getTime()).isEqualTo(time);
 		assertThat(event.getPersonId().toString()).isEqualTo(personId);
 	}

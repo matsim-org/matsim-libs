@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 
@@ -71,10 +70,11 @@ import org.matsim.withinday.utils.EditTrips;
 import com.google.inject.Inject;
 
 public final class PreplanningEngine implements MobsimEngine {
-	public static final String PREBOOKING_OFFSET_ATTRIBUTE_NAME = "prebookingOffset_s";
 	// Could implement this as a generalized version of the bdi-abm implementation: can send notifications to agent, and agent can react.  Similar to the drive-to action.
 	// Notifications and corresponding handlers could then be registered. On the other hand, it is easy to add an engine such as this one; how much does it help to have another
 	// layer of infrastructure?  Am currently leaning towards the second argument.  kai, mar'19
+
+	public static final String PREBOOKING_OFFSET_ATTRIBUTE_NAME = "prebookingOffset_s";
 
 	private static final Logger log = Logger.getLogger(PreplanningEngine.class);
 
@@ -175,6 +175,8 @@ public final class PreplanningEngine implements MobsimEngine {
 	}
 
 	public synchronized final void notifyChangedTripInformation(MobsimAgent agent, Optional<TripInfo> tripInfoUpdate) {
+		// yyyy My IDE complains about "Optional" in method signatures.  kai, jan'20
+
 		tripInfoUpdatesMap.put(agent, tripInfoUpdate);
 	}
 
@@ -183,6 +185,8 @@ public final class PreplanningEngine implements MobsimEngine {
 	}
 
 	private void decide(MobsimAgent agent, List<TripInfo> allTripInfos) {
+
+		// for otfvis:
 		this.population.getPersons().get(agent.getId()).getAttributes().putAttribute(AgentSnapshotInfo.marker, true);
 
 		if (allTripInfos.isEmpty()) {
@@ -205,9 +209,10 @@ public final class PreplanningEngine implements MobsimEngine {
 			// --> yes, with DRT it will always come in the next time step, I adapted code accordingly (michal)
 
 			// wait for notification:
-			//			((Activity)WithinDayAgentUtils.getCurrentPlanElement(agent)).setEndTime(Double.MAX_VALUE);
-			TripInfoRequestWithActivities tripInfoRequest = (TripInfoRequestWithActivities)tripInfo.getOriginalRequest();
-			tripInfoRequest.getFromActivity().setEndTime(Double.MAX_VALUE);
+			((Activity)WithinDayAgentUtils.getCurrentPlanElement(agent)).setEndTime(Double.MAX_VALUE);
+//			TripInfoRequestWithActivities tripInfoRequest = (TripInfoRequestWithActivities)tripInfo.getOriginalRequest();
+//			tripInfoRequest.getFromActivity().setEndTime(Double.MAX_VALUE);
+			// There is no guarantee that the activity that is in the tripInfoRequest is still the behavioral object of the agent.  kai, jan'20
 
 			// one corner case is that the sim start time is set to later than some agent activity end time.  Then, depending on the order of the engines, it may happen
 			// that the agent departs.  It will _then_ attempt to pre-book the trip, and up here, and then evidently cannot be cast into an activity.
@@ -226,31 +231,24 @@ public final class PreplanningEngine implements MobsimEngine {
 			return Collections.emptyList();
 		}
 
-		List<ActivityEngineWithWakeup.AgentEntry> wakeups = new ArrayList<>();
 
-		Double prebookingOffset_s = (Double)((PlanAgent)agent).getCurrentPlan()
-				.getAttributes()
-				.getAttribute(PREBOOKING_OFFSET_ATTRIBUTE_NAME);
+		Double prebookingOffset_s = (Double)((PlanAgent)agent).getCurrentPlan().getAttributes().getAttribute(PREBOOKING_OFFSET_ATTRIBUTE_NAME);
+		// yyyy prebooking info needs to be in plan since it will not survive in the leg.  :-(  kai, jan'20
 
 		if (prebookingOffset_s == null) {
 			log.warn("not prebooking");
-			return wakeups;
+			return Collections.emptyList();
 		}
 
-		for (String mode : new String[] { TransportMode.drt, TransportMode.taxi }) {
-			for (Leg drtLeg : findLegsWithModeInFuture(agent, mode)) {
-				//				Double prebookingOffset_s = (Double)drtLeg.getAttributes().getAttribute( PREBOOKING_OFFSET_ATTRIBUTE_NAME );
-				// yyyyyy the info will not survive in the leg!
-				//			if (prebookingOffset_s == null) {
-				//				log.warn("not prebooking");
-				//				continue;
-				//			}
+		List<ActivityEngineWithWakeup.AgentEntry> wakeups = new ArrayList<>();
+
+		for (String mode : new String[] { TransportMode.drt, TransportMode.taxi } ) {
+			for (Leg drtLeg : EditPlans.findLegsWithModeInFuture(agent, mode )) {
 				final double prebookingTime = drtLeg.getDepartureTime() - prebookingOffset_s;
 				if (prebookingTime < agent.getActivityEndTime()) {
 					// yyyy and here one sees that having this in the activity engine is not very practical
 					log.info("adding agent to wakeup list");
-					wakeups.add(new ActivityEngineWithWakeup.AgentEntry(agent, prebookingTime,
-							(agent1, then) -> wakeUpAgent(agent1, then, drtLeg)));
+					wakeups.add(new ActivityEngineWithWakeup.AgentEntry(agent, prebookingTime, (agent1, then) -> preplanLeg(agent1, then, drtLeg )) );
 				}
 
 				Activity originActivity = EditTrips.findTripAtPlanElement(agent, drtLeg ).getOriginActivity();
@@ -274,21 +272,7 @@ public final class PreplanningEngine implements MobsimEngine {
 		return wakeups;
 	}
 
-	private static List<Leg> findLegsWithModeInFuture( MobsimAgent agent, String mode ) {
-		List<Leg> retVal = new ArrayList<>();
-		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
-		for (int ii = WithinDayAgentUtils.getCurrentPlanElementIndex(agent); ii < plan.getPlanElements().size(); ii++) {
-			PlanElement pe = plan.getPlanElements().get(ii);
-			if (pe instanceof Leg) {
-				if (Objects.equals(mode, ((Leg)pe).getMode())) {
-					retVal.add((Leg)pe);
-				}
-			}
-		}
-		return retVal;
-	}
-
-	private void wakeUpAgent(MobsimAgent agent, double now, Leg leg) {
+	private void preplanLeg( MobsimAgent agent, double now, Leg leg ) {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 
 		// search for drt trip corresponding to drt leg.  Trick is using our own stage activities (drtStageActivities).
@@ -297,11 +281,11 @@ public final class PreplanningEngine implements MobsimEngine {
 		TripStructureUtils.Trip drtTrip = TripStructureUtils.findTripAtPlanElement(leg, plan);
 		Gbl.assertNotNull(drtTrip);
 
-		final TripInfo.Request request = new TripInfoRequestWithActivities.Builder(scenario).setFromActivity(
-				drtTrip.getOriginActivity() )
-												    .setToActivity(drtTrip.getDestinationActivity())
-												    .setTime(drtTrip.getOriginActivity().getEndTime())
-												    .createRequest();
+		final TripInfo.Request request = new TripInfoRequestWithActivities.Builder(scenario)
+								 .setFromActivity( drtTrip.getOriginActivity() )
+								 .setToActivity(drtTrip.getDestinationActivity())
+								 .setTime(drtTrip.getOriginActivity().getEndTime())
+								 .createRequest();
 
 		//first simulate ActivityEngineWithWakeup and then PreplanningEngine --> decision process
 		//in the same time step
@@ -315,8 +299,7 @@ public final class PreplanningEngine implements MobsimEngine {
 
 		TripStructureUtils.Trip inputTrip = null;
 		Coord pickupCoord = FacilitiesUtils.decideOnCoord(tripInfo.getPickupLocation(), network, scenario.getConfig());
-		Coord dropoffCoord = FacilitiesUtils.decideOnCoord(tripInfo.getDropoffLocation(), network,
-				scenario.getConfig());
+		Coord dropoffCoord = FacilitiesUtils.decideOnCoord(tripInfo.getDropoffLocation(), network, scenario.getConfig());
 		// TODO: check: was PreplanningEngine.drtStageActivities, so drt* interaction only?
 		for (TripStructureUtils.Trip drtTrip : TripStructureUtils.getTrips(plan)) {
 			// recall that we have set the activity end time of the current activity to infinity, so we cannot use that any more.  :-( ?!
@@ -326,8 +309,7 @@ public final class PreplanningEngine implements MobsimEngine {
 			if (CoordUtils.calcEuclideanDistance(coordOrigin, pickupCoord) > 1000.) {
 				continue;
 			}
-			Coord coordDestination = PopulationUtils.decideOnCoordForActivity(drtTrip.getDestinationActivity(),
-					scenario);
+			Coord coordDestination = PopulationUtils.decideOnCoordForActivity(drtTrip.getDestinationActivity(), scenario);
 			if (CoordUtils.calcEuclideanDistance(coordDestination, dropoffCoord) > 1000.) {
 				continue;
 			}

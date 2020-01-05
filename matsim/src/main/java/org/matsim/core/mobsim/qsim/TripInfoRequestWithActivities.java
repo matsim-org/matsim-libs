@@ -28,17 +28,20 @@ import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 
 class TripInfoRequestWithActivities implements TripInfo.Request{
+	// this is a pure data class and so one could decide the not have it behind an interface.  However, having it behind the interface means that only
+	// hte getters are public, which leaves us more room to refactor.  kai, jan'20
+
 	private final Facility fromFacility;
 	private final Facility toFacility;
 	private final double time;
 	private final TimeInterpretation timeInterpretation;
-	private final Activity fromActivity;
-	private final Activity toActivity;
+//	private final Activity fromActivity;
+//	private final Activity toActivity;
 
 	private TripInfoRequestWithActivities(Scenario scenario, Activity fromActivity, Activity toActivity, double time,
 			TimeInterpretation timeInterpretation) {
-		this.fromActivity = fromActivity;
-		this.toActivity = toActivity;
+//		this.fromActivity = fromActivity;
+//		this.toActivity = toActivity;
 		this.fromFacility = FacilitiesUtils.toFacility(fromActivity, scenario.getActivityFacilities());
 		this.toFacility = FacilitiesUtils.toFacility(toActivity, scenario.getActivityFacilities());
 		this.time = time;
@@ -65,13 +68,15 @@ class TripInfoRequestWithActivities implements TripInfo.Request{
 		return timeInterpretation;
 	}
 
-	Activity getFromActivity() {
-		return fromActivity;
-	}
-
-	Activity getToActivity() {
-		return toActivity;
-	}
+//	Activity getFromActivity() {
+//		return fromActivity;
+//	}
+//
+//	Activity getToActivity() {
+//		return toActivity;
+//	}
+	// these were used in the code to actually change the activity end time.  There is, however, no guarantee that these are still the behavioral objects
+	// .  kai, jan'20
 
 	static class Builder {
 		private final Scenario scenario;
