@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.assertj.core.data.Offset;
 import org.junit.Rule;
@@ -113,8 +114,8 @@ public class RunOneTaxiWithPrebookingExampleIT {
 				install( new OneTaxiModule(ConfigGroup.getInputFileURL(config.getContext(), "one_taxi_vehicles.xml") ) );
 				installQSimModule( new AbstractQSimModule(){
 					@Override protected void configureQSim(){
-						this.addQSimComponentBinding( ActivityEngineWithWakeup.COMPONENT_NAME ).to(ActivityEngineWithWakeup.class );
-						this.addQSimComponentBinding(DynActivityEngine.COMPONENT_NAME).to(DynActivityEngine.class);
+						this.addQSimComponentBinding( ActivityEngineWithWakeup.COMPONENT_NAME ).to(ActivityEngineWithWakeup.class ).in( Singleton.class );
+//						this.addQSimComponentBinding(DynActivityEngine.COMPONENT_NAME).to(DynActivityEngine.class);
 					}
 				} );
 			}
