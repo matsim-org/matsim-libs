@@ -119,7 +119,7 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 				new JointMainModeIdentifier(
 						this.mainModeIdentifier );
 
-			for ( TripStructureUtils.Trip trip : TripStructureUtils.getTrips( plan , JointActingTypes.JOINT_STAGE_ACTS ) ) {
+			for ( TripStructureUtils.Trip trip : TripStructureUtils.getTrips( plan , JointActingTypes.JOINT_STAGE_ACTS::contains ) ) {
 				final String mode = mainModeIdentifier.identifyMainMode( trip.getTripElements() );
 
 				if ( mode.equals( TransportMode.car ) ) {

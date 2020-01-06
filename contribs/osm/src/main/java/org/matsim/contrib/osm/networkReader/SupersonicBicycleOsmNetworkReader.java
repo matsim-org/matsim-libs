@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
-public class SupersonicBicycleOsmNetworkReader {
+public final class SupersonicBicycleOsmNetworkReader {
 
 	public static final String BICYCLE_INFRASTRUCTURE_SPEED_FACTOR = "bicycleInfrastructureSpeedFactor";
 	private static final double BIKE_PCU = 0.25;

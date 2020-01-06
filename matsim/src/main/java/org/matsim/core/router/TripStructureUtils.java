@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -49,7 +50,7 @@ import org.matsim.core.gbl.Gbl;
  *
  * @author thibautd
  */
-public class TripStructureUtils {
+public final class TripStructureUtils {
 	private static final Logger log = Logger.getLogger(TripStructureUtils.class);
 	
 	public enum StageActivityHandling { StagesAsNormalActivities, ExcludeStageActivities };
@@ -108,34 +109,25 @@ public class TripStructureUtils {
 		return Collections.unmodifiableList( activities );
 	}
 
-	public static List<Trip> getTrips(
-			final Plan plan) {
-		return getTrips(
-				plan.getPlanElements());
+	public static List<Trip> getTrips( final Plan plan) {
+		return getTrips( plan.getPlanElements());
 	}
 
 	// for contrib socnetsim only
 	@Deprecated
-	public static List<Trip> getTrips(
-			final Plan plan,
-			final Set<String> stageActivityTypes) {
-		return getTrips(
-				plan.getPlanElements(),
-				stageActivityTypes);
+	public static List<Trip> getTrips( final Plan plan, final Predicate<String> isStageActivity) {
+		return getTrips( plan.getPlanElements(), isStageActivity);
 	}
 
-	@SuppressWarnings("unchecked") // we pass an empty set, it does not matter what type could theoretically be in that empty set
-	public static List<Trip> getTrips(
-			final List<? extends PlanElement> planElements) {
-		
-		return getTrips(planElements, Collections.EMPTY_SET);
+	public static List<Trip> getTrips( final List<? extends PlanElement> planElements) {
+		return getTrips(planElements, actType -> false );
 	}
 
 	// for contrib socnetsim only
 	@Deprecated
 	public static List<Trip> getTrips(
 			final List<? extends PlanElement> planElements,
-			final Set<String> stageActivityTypes) {
+			final Predicate<String> isStageActivity ) {
 		final List<Trip> trips = new ArrayList<>();
 
 		int originActivityIndex = -1;
@@ -146,8 +138,14 @@ public class TripStructureUtils {
 			if ( !(pe instanceof Activity) ) continue;
 			final Activity act = (Activity) pe;
 
-			if (StageActivityTypeIdentifier.isStageActivity( act.getType() ) || 
-					stageActivityTypes.contains( act.getType() )) continue;
+//			if (StageActivityTypeIdentifier.isStageActivity( act.getType() ) || stageActivityTypes.contains( act.getType() )) continue;
+//			if (StageActivityTypeIdentifier.isStageActivity( act.getType() ) || isStageActivity.test( act.getType() )) continue;
+			// I I don't like the || (= "or").  If I want to identify subtrips, then I want to put in a reduced number of stage
+			// activities!!!!  kai, jan'20
+			if ( isStageActivity.test( act.getType() ) ) {
+				continue;
+			}
+
 			if ( currentIndex - originActivityIndex > 1 ) {
 				// which means, if I am understanding this right, that two activities without a leg in between will not be considered
 				// a trip.  
@@ -172,11 +170,8 @@ public class TripStructureUtils {
 		return Collections.unmodifiableList( trips );
 	}
 
-	public static Collection<Subtour> getSubtours(
-            final Plan plan) {
-		return getSubtours(
-				plan.getPlanElements()
-        );
+	public static Collection<Subtour> getSubtours( final Plan plan) {
+		return getSubtours( plan.getPlanElements() );
 	}
 
 	/**
@@ -207,34 +202,26 @@ public class TripStructureUtils {
 	 * @throws RuntimeException if the Trip sequence has inconsistent location
 	 * sequence
 	 */
-	@SuppressWarnings("unchecked") // we pass an empty set, it does not matter what type could theoretically be in that empty set
-	public static Collection<Subtour> getSubtours(
-            final List<? extends PlanElement> planElements) {
-
-		return getSubtours(planElements, Collections.EMPTY_SET);
+	public static Collection<Subtour> getSubtours( final List<? extends PlanElement> planElements) {
+		return getSubtours(planElements, anyType -> false );
 	}
 
 	// for contrib socnetsim only
 	@Deprecated
-	public static Collection<Subtour> getSubtours(
-            final Plan plan,
-            final Set<String> stageActivityTypes) {
-		return getSubtours(
-				plan.getPlanElements(),
-				stageActivityTypes
-        );
+	public static Collection<Subtour> getSubtours( final Plan plan, final Predicate<String> isStageActivity) {
+		return getSubtours( plan.getPlanElements(), isStageActivity );
 	}
 	
 	// for contrib socnetsim only
 	@Deprecated
 	public static Collection<Subtour> getSubtours(
             final List<? extends PlanElement> planElements,
-            final Set<String> stageActivityTypes) {
+            final Predicate<String> isStageActivity ) {
 		final List<Subtour> subtours = new ArrayList<>();
 
 		Id<?> destinationId = null;
 		final List<Id<?>> originIds = new ArrayList<>();
-		final List<Trip> trips = getTrips( planElements, stageActivityTypes );
+		final List<Trip> trips = getTrips( planElements, isStageActivity );
 		final List<Trip> nonAllocatedTrips = new ArrayList<>( trips );
 		for (Trip trip : trips) {
             final Id<?> originId;

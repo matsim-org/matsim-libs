@@ -134,7 +134,7 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 			final Plan plan,
 			final Leg leg,
 			final Set<String> stageActivityTypes) {
-		for ( Trip t : TripStructureUtils.getTrips( plan , stageActivityTypes ) ) {
+		for ( Trip t : TripStructureUtils.getTrips( plan , stageActivityTypes::contains ) ) {
 			if ( t.getTripElements().contains( leg ) ) return t;
 		}
 		throw new RuntimeException( plan.getPlanElements() +" doesn't contain "+leg );
