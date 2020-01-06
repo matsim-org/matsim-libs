@@ -30,9 +30,11 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.*;
 import org.matsim.core.router.*;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -148,7 +150,7 @@ class ChoiceSet {
 			for( Id<ActivityFacility> destinationId : this.destinations ){
 				ActivityFacility destinationFacility = this.scenario.getActivityFacilities().getFacilities().get( destinationId );
 				Link destinationLink = FacilitiesUtils.decideOnLink( destinationFacility, network );
-				;
+
 				Node toNode = Objects.requireNonNull( destinationLink ).getToNode();
 
 				InitialNode initialToNode = new InitialNode( toNode, 0.0, 0.0 );
@@ -163,7 +165,8 @@ class ChoiceSet {
 				Node nextActNode = this.network.getLinks().get( PopulationUtils.decideOnLinkIdForActivity( previousActivity, scenario ) ).getToNode();
 
 				forwardMultiNodeDijkstra.setSearchAllEndNodes( true );
-				forwardMultiNodeDijkstra.calcLeastCostPath( nextActNode, destinationNode, previousActivity.getEndTime(), planTmp.getPerson(), null );
+				forwardMultiNodeDijkstra.calcLeastCostPath(nextActNode, destinationNode, PlanRouter.calcEndOfActivity(previousActivity, planTmp, scenario.getConfig()) , planTmp.getPerson(), null);
+//				forwardMultiNodeDijkstra.calcLeastCostPath( nextActNode, destinationNode, previousActivity.getEndTime(), planTmp.getPerson(), null );
 			}
 
 			// (2) backward tree
@@ -173,7 +176,8 @@ class ChoiceSet {
 				Node nextActNode = this.network.getLinks().get( PopulationUtils.decideOnLinkIdForActivity( nextActivity, scenario ) ).getToNode();
 
 				backwardMultiNodeDijkstra.setSearchAllEndNodes( true );
-				backwardMultiNodeDijkstra.calcLeastCostPath( nextActNode, destinationNode, activityToRelocate.getEndTime(), planTmp.getPerson(), null );
+				backwardMultiNodeDijkstra.calcLeastCostPath(nextActNode, destinationNode, PlanRouter.calcEndOfActivity(activityToRelocate, planTmp, scenario.getConfig()) , planTmp.getPerson(), null);
+//				backwardMultiNodeDijkstra.calcLeastCostPath( nextActNode, destinationNode, activityToRelocate.getEndTime(), planTmp.getPerson(), null );
 				// yy it is not clear to me how the dp time is interpreted for the backwards Dijkstra.  kai, mar'19
 			}
 			// ---
@@ -202,33 +206,55 @@ class ChoiceSet {
 						movedActNode = movedActLink.getToNode();
 					}
 					{
-						Node prevActNode;
+						Link link;
 						double startTime;
 						Leg previousLeg = PopulationUtils.getPreviousLeg( planTmp, activityToRelocate );
 						{
 							Activity previousActivity = PopulationUtils.getPreviousActivity( planTmp, previousLeg );
 							Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity( previousActivity, scenario );
-							Link link = scenario.getNetwork().getLinks().get( linkId );
-							prevActNode = link.getToNode();
-
+							link = scenario.getNetwork().getLinks().get( linkId );
 							startTime = PlanRouter.calcEndOfActivity( previousActivity, planTmp, scenario.getConfig() );
 						}
 
-						LeastCostPathCalculator.Path result = this.forwardMultiNodeDijkstra.constructPath( prevActNode, movedActNode, startTime );
+						LeastCostPathCalculator.Path result = this.forwardMultiNodeDijkstra.constructPath( link.getToNode(), movedActNode, startTime );
+						NetworkRoute linkNetworkRouteImpl = RouteUtils.createLinkNetworkRouteImpl(activityToRelocate.getLinkId(), link.getId());
+						double distance = 0;
+						if (result.links != null && !result.links.isEmpty()) {
+							List<Id<Link>> linkIds = new ArrayList<>();
+							for (Link linkInRoute : result.links) {
+								linkIds.add(linkInRoute.getId());
+								distance += linkInRoute.getLength();
+							}
+							linkNetworkRouteImpl.setLinkIds(activityToRelocate.getLinkId(), linkIds, link.getId());
+						}
+						linkNetworkRouteImpl.setDistance(distance);
+						Objects.requireNonNull( previousLeg ).setRoute(linkNetworkRouteImpl);
 						Objects.requireNonNull( previousLeg ).setTravelTime( result.travelTime );
+
 					}
 					{
-						Node nextActNode;
+						Link link;
 						Leg leg = PopulationUtils.getNextLeg( planTmp, activityToRelocate );
 						{
 							Activity nextAct = PopulationUtils.getNextActivity( planTmp, leg );
 							Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity( Objects.requireNonNull( nextAct ), scenario );
-							Link link = scenario.getNetwork().getLinks().get( linkId );
-							nextActNode = link.getToNode();
+							link = scenario.getNetwork().getLinks().get( linkId );
 						}
 						double startTime = PlanRouter.calcEndOfActivity( activityToRelocate, planTmp, scenario.getConfig() );
 
-						LeastCostPathCalculator.Path result = this.backwardMultiNodeDijkstra.constructPath( movedActNode, nextActNode, startTime );
+						LeastCostPathCalculator.Path result = this.backwardMultiNodeDijkstra.constructPath( link.getToNode(), movedActNode, startTime);
+						NetworkRoute linkNetworkRouteImpl = RouteUtils.createLinkNetworkRouteImpl(activityToRelocate.getLinkId(), link.getId());
+						double distance = 0;
+						if (result.links != null && !result.links.isEmpty()) {
+							List<Id<Link>> linkIds = new ArrayList<>();
+							for (Link linkInRoute : result.links) {
+								linkIds.add(linkInRoute.getId());
+								distance += linkInRoute.getLength();
+							}
+							linkNetworkRouteImpl.setLinkIds(activityToRelocate.getLinkId(), linkIds, link.getId());
+						}
+						linkNetworkRouteImpl.setDistance(distance);
+						Objects.requireNonNull( leg ).setRoute(linkNetworkRouteImpl);
 						Objects.requireNonNull( leg ).setTravelTime( result.travelTime );
 					}
 				}
