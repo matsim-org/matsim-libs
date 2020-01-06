@@ -58,7 +58,7 @@ public class TourModeUnifierAlgorithm implements PlanAlgorithm {
 
 	@Override
 	public void run(final Plan plan) {
-		for ( Subtour subtour : TripStructureUtils.getSubtours( plan , stages ) ) {
+		for ( Subtour subtour : TripStructureUtils.getSubtours( plan , stages::contains ) ) {
 			// not clear what we should do with open tours
 			if ( !subtour.isClosed() ) continue;
 			// only consider "root" tours: tours without (closed) parent

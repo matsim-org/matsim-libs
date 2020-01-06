@@ -123,7 +123,7 @@ public class TourModeUnifierAlgorithmTest {
 				"unexpected plan size",
 				2 * nActs - 1,
 				plan.getPlanElements().size() );
-		for ( Trip trip : TripStructureUtils.getTrips( plan , types ) ) {
+		for ( Trip trip : TripStructureUtils.getTrips( plan , types::contains ) ) {
 			Assert.assertEquals(
 					"unexpected size of trip "+trip,
 					1,
@@ -197,7 +197,7 @@ public class TourModeUnifierAlgorithmTest {
 				31,
 				plan.getPlanElements().size() );
 
-		final List<Trip> trips = TripStructureUtils.getTrips( plan , types );
+		final List<Trip> trips = TripStructureUtils.getTrips( plan , types::contains );
 
 		Assert.assertEquals(
 				"unexpected number of trips",
@@ -281,7 +281,7 @@ public class TourModeUnifierAlgorithmTest {
 				2 * nActs - 1,
 				plan.getPlanElements().size() );
 
-		final List<Trip> trips = TripStructureUtils.getTrips( plan , types );
+		final List<Trip> trips = TripStructureUtils.getTrips( plan , types::contains );
 
 		Assert.assertEquals(
 				"unexpected number of trips",
