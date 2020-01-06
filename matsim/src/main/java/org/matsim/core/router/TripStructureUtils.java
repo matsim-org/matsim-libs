@@ -120,7 +120,7 @@ public final class TripStructureUtils {
 	}
 
 	public static List<Trip> getTrips( final List<? extends PlanElement> planElements) {
-		return getTrips(planElements, actType -> false );
+		return getTrips(planElements, TripStructureUtils::isStageActivityType ) ;
 	}
 
 	// for contrib socnetsim only
