@@ -18,7 +18,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-public class SupersonicOsmNetworkReader {
+public final class SupersonicOsmNetworkReader {
 
     private static final Logger log = Logger.getLogger(SupersonicOsmNetworkReader.class);
 
