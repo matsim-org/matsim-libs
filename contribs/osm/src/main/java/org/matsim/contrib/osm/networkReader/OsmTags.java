@@ -38,5 +38,4 @@ public class OsmTags {
 	public final static String ONEWAYBICYCLE = "oneway:bicycle";
 
 	public static final String MPH = "mph";
-
 }
