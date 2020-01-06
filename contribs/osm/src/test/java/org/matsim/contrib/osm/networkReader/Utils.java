@@ -142,6 +142,8 @@ public class Utils {
 		Assert.assertEquals(expected.getFreespeed(), actual.getFreespeed(), 0.001);
 		Assert.assertEquals(expected.getLength(), actual.getLength(), 0.001);
 		Assert.assertEquals(expected.getNumberOfLanes(), actual.getNumberOfLanes(), 0.001);
+		Assert.assertEquals(expected.getFromNode().getId(), actual.getFromNode().getId());
+		Assert.assertEquals(expected.getToNode().getId(), actual.getToNode().getId());
 	}
 
 	private static void testNodesAreEqual(org.matsim.api.core.v01.network.Node expected, org.matsim.api.core.v01.network.Node actual) {
@@ -151,6 +153,8 @@ public class Utils {
 		// keep this in as long as we use java-8
 		Assert.assertEquals(expected.getCoord().getX(), actual.getCoord().getX(), 0.00000001);
 		Assert.assertEquals(expected.getCoord().getY(), actual.getCoord().getY(), 0.00000001);
+		expected.getOutLinks().forEach((id, link) -> Assert.assertEquals(link.getId(), actual.getOutLinks().get(id).getId()));
+		expected.getInLinks().forEach((id, link) -> Assert.assertEquals(link.getId(), actual.getInLinks().get(id).getId()));
 	}
 
 	static class WaysAndLinks {
