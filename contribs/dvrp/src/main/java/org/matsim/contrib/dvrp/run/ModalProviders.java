@@ -109,5 +109,9 @@ public class ModalProviders {
 		protected <I> I getModalInstance(TypeLiteral<I> typeLiteral) {
 			return injector.getInstance(DvrpModes.key(typeLiteral, mode));
 		}
+
+		protected String getMode() {
+			return mode;
+		}
 	}
 }

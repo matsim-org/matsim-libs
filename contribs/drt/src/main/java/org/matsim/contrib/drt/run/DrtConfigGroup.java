@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
+import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -108,6 +108,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	public static final String OPERATIONAL_SCHEME = "operationalScheme";
 	static final String OPERATIONAL_SCHEME_EXP = "Operational Scheme, either of door2door, stopbased or serviceAreaBased. door2door by default";
 
+	//TODO consider renaming maxWalkDistance to max access/egress distance (or even have 2 separate params)
 	public static final String MAX_WALK_DISTANCE = "maxWalkDistance";
 	static final String MAX_WALK_DISTANCE_EXP = "Maximum beeline distance (in meters) to next stop location in stopbased system for access/egress walk leg to/from drt. If no stop can be found within this maximum distance will return a direct walk of type drtMode_walk";
 
@@ -249,8 +250,7 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 				"More then one rebalancing parameter sets is specified");
 
 		if (useModeFilteredSubnetwork) {
-			DvrpRoutingNetworkProvider.
-					checkUseModeFilteredSubnetworkAllowed(config, mode);
+			DvrpModeRoutingNetworkModule.checkUseModeFilteredSubnetworkAllowed(config, mode);
 		}
 	}
 

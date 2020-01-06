@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,31 +16,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dynagent.run;
+package org.matsim.contrib.dvrp.router;
 
-import org.matsim.core.mobsim.framework.AgentSource;
-import org.matsim.core.mobsim.qsim.AbstractQSimModule;
-import org.matsim.core.mobsim.qsim.components.QSimComponentsConfig;
+import javax.inject.Inject;
+import javax.inject.Provider;
+
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 
 /**
- * Enables basic DynAgent functionality in QSim. However, for DVRP simulation, use DvrpQSimModule instead.
+ * @author michalm
  */
-public class DynQSimModule extends AbstractQSimModule {
-	public final static String COMPONENT_NAME = "DynAgentSource";
-	private final Class<? extends AgentSource> agentSourceClass;
+public class DvrpGlobalRoutingNetworkProvider implements Provider<Network> {
+	public static final String DVRP_ROUTING = "dvrp_routing";
 
-	public DynQSimModule(Class<? extends AgentSource> agentSourceClass) {
-		this.agentSourceClass = agentSourceClass;
+	private final Network network;
+	private final DvrpConfigGroup dvrpCfg;
+
+	@Inject
+	public DvrpGlobalRoutingNetworkProvider(Network network, DvrpConfigGroup dvrpCfg) {
+		this.network = network;
+		this.dvrpCfg = dvrpCfg;
 	}
 
 	@Override
-	public void configureQSim() {
-		install(new DynActivityEngineModule());
-		addNamedComponent(agentSourceClass, COMPONENT_NAME);
-	}
-
-	public static void configureComponents(QSimComponentsConfig components) {
-		DynActivityEngineModule.configureComponents(components);
-		components.addNamedComponent(COMPONENT_NAME);
+	public Network get() {
+		if (dvrpCfg.getNetworkModes().isEmpty()) { // no mode filtering
+			return network;
+		} else {
+			Network dvrpNetwork = NetworkUtils.createNetwork();
+			new TransportModeNetworkFilter(network).filter(dvrpNetwork, dvrpCfg.getNetworkModes());
+			return dvrpNetwork;
+		}
 	}
 }
