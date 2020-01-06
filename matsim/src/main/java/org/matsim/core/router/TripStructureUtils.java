@@ -50,7 +50,7 @@ import org.matsim.core.gbl.Gbl;
  *
  * @author thibautd
  */
-public class TripStructureUtils {
+public final class TripStructureUtils {
 	private static final Logger log = Logger.getLogger(TripStructureUtils.class);
 	
 	public enum StageActivityHandling { StagesAsNormalActivities, ExcludeStageActivities };
@@ -109,10 +109,8 @@ public class TripStructureUtils {
 		return Collections.unmodifiableList( activities );
 	}
 
-	public static List<Trip> getTrips(
-			final Plan plan) {
-		return getTrips(
-				plan.getPlanElements());
+	public static List<Trip> getTrips( final Plan plan) {
+		return getTrips( plan.getPlanElements());
 	}
 
 	// for contrib socnetsim only
@@ -172,11 +170,8 @@ public class TripStructureUtils {
 		return Collections.unmodifiableList( trips );
 	}
 
-	public static Collection<Subtour> getSubtours(
-            final Plan plan) {
-		return getSubtours(
-				plan.getPlanElements()
-        );
+	public static Collection<Subtour> getSubtours( final Plan plan) {
+		return getSubtours( plan.getPlanElements() );
 	}
 
 	/**
@@ -207,10 +202,7 @@ public class TripStructureUtils {
 	 * @throws RuntimeException if the Trip sequence has inconsistent location
 	 * sequence
 	 */
-	@SuppressWarnings("unchecked") // we pass an empty set, it does not matter what type could theoretically be in that empty set
-	public static Collection<Subtour> getSubtours(
-            final List<? extends PlanElement> planElements) {
-
+	public static Collection<Subtour> getSubtours( final List<? extends PlanElement> planElements) {
 		return getSubtours(planElements, anyType -> false );
 	}
 
