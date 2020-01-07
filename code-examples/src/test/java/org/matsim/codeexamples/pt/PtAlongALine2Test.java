@@ -75,21 +75,13 @@ public class PtAlongALine2Test{
 		// (as of today, will also influence router. kai, jun'19)
 
 		if(  drtMode == DrtMode.teleportBeeline ){// (configure teleportation router)
-				ModeRoutingParams drtParams = new ModeRoutingParams();
-				drtParams.setMode( TransportMode.drt );
-				drtParams.setTeleportedModeSpeed( 100. / 3.6 );
-				config.plansCalcRoute().addModeRoutingParams(drtParams);
+			config.plansCalcRoute().addModeRoutingParams(
+					new ModeRoutingParams().setMode( TransportMode.drt ).setTeleportedModeSpeed( 100. / 3.6 ) );
 			if( drt2 ){
-				ModeRoutingParams drt2Params = new ModeRoutingParams();
-				drt2Params.setMode( "drt2" );
-				drt2Params.setTeleportedModeSpeed( 100. / 3.6 );
-				config.plansCalcRoute().addModeRoutingParams(drt2Params);
+				config.plansCalcRoute().addModeRoutingParams( new ModeRoutingParams().setMode( "drt2" ).setTeleportedModeSpeed( 100. / 3.6 ) );
 			}
 			if( drt3 ){
-				ModeRoutingParams drt3Params = new ModeRoutingParams();
-				drt3Params.setMode( "drt3" );
-				drt3Params.setTeleportedModeSpeed( 100. / 3.6 );
-				config.plansCalcRoute().addModeRoutingParams(drt3Params);
+				config.plansCalcRoute().addModeRoutingParams( new ModeRoutingParams().setMode( "drt3" ).setTeleportedModeSpeed( 100. / 3.6 ) );
 			}
 			// teleportation router for walk or bike is automatically defined.
 		} else if( drtMode == DrtMode.teleportBasedOnNetworkRoute ){// (route as network route)
@@ -104,11 +96,10 @@ public class PtAlongALine2Test{
 			config.plansCalcRoute().setNetworkModes( networkModes );
 		}
 
+		config.plansCalcRoute().addModeRoutingParams( new ModeRoutingParams().setMode( "walk" ).setTeleportedModeSpeed( 5. / 3.6 ) );
+
 		// set up walk2 so we don't need walk in raptor:
-		ModeRoutingParams walkParams = new ModeRoutingParams();
-		walkParams.setMode( "walk2" );
-		walkParams.setTeleportedModeSpeed( 5. / 3.6 );
-		config.plansCalcRoute().addModeRoutingParams(walkParams);
+		config.plansCalcRoute().addModeRoutingParams( new ModeRoutingParams().setMode( "walk2" ).setTeleportedModeSpeed( 5. / 3.6 ) );
 
 		// === RAPTOR: ===
 		{
@@ -118,44 +109,28 @@ public class PtAlongALine2Test{
 				configRaptor.setUseIntermodalAccessEgress(true);
 				{
 					// Xxx
-					IntermodalAccessEgressParameterSet paramSetXxx = new IntermodalAccessEgressParameterSet();
 					//					paramSetXxx.setMode( TransportMode.walk ); // this does not work because sbb raptor treats it in a special way
-					paramSetXxx.setMode( "walk2" );
-					paramSetXxx.setMaxRadius( 1000000 );
-					paramSetXxx.setInitialSearchRadius( 1000000 );
-					paramSetXxx.setSearchExtensionRadius( 10000 );
-					configRaptor.addIntermodalAccessEgress( paramSetXxx );
+					configRaptor.addIntermodalAccessEgress(
+							new IntermodalAccessEgressParameterSet().setMode( "walk2" ).setMaxRadius( 1000000 ).setInitialSearchRadius( 1000000 ).setSearchExtensionRadius( 10000 ) );
 					// (in principle, walk as alternative to drt will not work, since drt is always faster.  Need to give the ASC to the router!  However, with
 					// the reduced drt network we should be able to see differentiation.)
 				}
 				{
 					// drt
-					IntermodalAccessEgressParameterSet paramSetDrt = new IntermodalAccessEgressParameterSet();
-					paramSetDrt.setMode( TransportMode.drt );
-					paramSetDrt.setMaxRadius( 1000000 );
-					paramSetDrt.setInitialSearchRadius( 1000000 );
-					paramSetDrt.setSearchExtensionRadius( 10000 );
-					configRaptor.addIntermodalAccessEgress( paramSetDrt );
+					configRaptor.addIntermodalAccessEgress(
+							new IntermodalAccessEgressParameterSet().setMode( TransportMode.drt ).setMaxRadius( 1000000 ).setInitialSearchRadius( 1000000 ).setSearchExtensionRadius( 10000 ) );
 				}
 				if ( drt2 ){
-					IntermodalAccessEgressParameterSet paramSetDrt2 = new IntermodalAccessEgressParameterSet();
-					paramSetDrt2.setMode( "drt2" );
-					paramSetDrt2.setMaxRadius( 1000000 );
-					paramSetDrt2.setInitialSearchRadius( 1000000 );
-					paramSetDrt2.setSearchExtensionRadius( 10000 );
 					//				paramSetDrt2.setPersonFilterAttribute( null );
 					//				paramSetDrt2.setStopFilterAttribute( null );
-					configRaptor.addIntermodalAccessEgress( paramSetDrt2 );
+					configRaptor.addIntermodalAccessEgress(
+							new IntermodalAccessEgressParameterSet().setMode( "drt2" ).setMaxRadius( 1000000 ).setInitialSearchRadius( 1000000 ).setSearchExtensionRadius( 10000 ) );
 				}
 				if ( drt3 ){
-					IntermodalAccessEgressParameterSet paramSetDrt3 = new IntermodalAccessEgressParameterSet();
-					paramSetDrt3.setMode( "drt3" );
-					paramSetDrt3.setMaxRadius( 1000000 );
-					paramSetDrt3.setInitialSearchRadius( 1000000 );
-					paramSetDrt3.setSearchExtensionRadius( 10000 );
 					//				paramSetDrt2.setPersonFilterAttribute( null );
 					//				paramSetDrt2.setStopFilterAttribute( null );
-					configRaptor.addIntermodalAccessEgress( paramSetDrt3 );
+					configRaptor.addIntermodalAccessEgress(
+							new IntermodalAccessEgressParameterSet().setMode( "drt3" ).setMaxRadius( 1000000 ).setInitialSearchRadius( 1000000 ).setSearchExtensionRadius( 10000 ) );
 				}
 			}
 
@@ -195,40 +170,22 @@ public class PtAlongALine2Test{
 
 			MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule( config, MultiModeDrtConfigGroup.class );
 			{
-				DrtConfigGroup drtConfig = new DrtConfigGroup();
-				drtConfig.setMaxTravelTimeAlpha( 1.3 );
-				drtConfig.setVehiclesFile( drtVehiclesFile );
-				drtConfig.setMaxTravelTimeBeta( 5. * 60. );
-				drtConfig.setStopDuration( 60. );
-				drtConfig.setMaxWaitTime( Double.MAX_VALUE );
-				drtConfig.setRejectRequestIfMaxWaitOrTravelTimeViolated( false );
-				drtConfig.setMode( TransportMode.drt );
-				drtConfig.setUseModeFilteredSubnetwork( true );
-				mm.addParameterSet( drtConfig );
+				mm.addParameterSet(
+						new DrtConfigGroup().setMode( TransportMode.drt ).setMaxTravelTimeAlpha( 1.3 ).setVehiclesFile( drtVehiclesFile )
+								    .setMaxTravelTimeBeta( 5. * 60. ).setStopDuration( 60. ).setMaxWaitTime( Double.MAX_VALUE )
+								    .setRejectRequestIfMaxWaitOrTravelTimeViolated( false ).setUseModeFilteredSubnetwork( true ) );
 			}
 			if ( drt2 ) {
-				DrtConfigGroup drtConfig = new DrtConfigGroup();
-				drtConfig.setMaxTravelTimeAlpha( 1.3 );
-				drtConfig.setVehiclesFile( drt2VehiclesFile );
-				drtConfig.setMaxTravelTimeBeta( 5. * 60. );
-				drtConfig.setStopDuration( 60. );
-				drtConfig.setMaxWaitTime( Double.MAX_VALUE );
-				drtConfig.setRejectRequestIfMaxWaitOrTravelTimeViolated( false );
-				drtConfig.setMode( "drt2" );
-				drtConfig.setUseModeFilteredSubnetwork( true );
-				mm.addParameterSet( drtConfig );
+				mm.addParameterSet(
+						new DrtConfigGroup().setMode( "drt2" ).setMaxTravelTimeAlpha( 1.3 ).setVehiclesFile( drt2VehiclesFile )
+								    .setMaxTravelTimeBeta( 5. * 60. ).setStopDuration( 60. ).setMaxWaitTime( Double.MAX_VALUE )
+								    .setRejectRequestIfMaxWaitOrTravelTimeViolated( false ).setUseModeFilteredSubnetwork( true ) );
 			}
 			if ( drt2 ) {
-				DrtConfigGroup drtConfig = new DrtConfigGroup();
-				drtConfig.setMaxTravelTimeAlpha( 1.3 );
-				drtConfig.setVehiclesFile( drt3VehiclesFile );
-				drtConfig.setMaxTravelTimeBeta( 5. * 60. );
-				drtConfig.setStopDuration( 60. );
-				drtConfig.setMaxWaitTime( Double.MAX_VALUE );
-				drtConfig.setRejectRequestIfMaxWaitOrTravelTimeViolated( false );
-				drtConfig.setMode( "drt3" );
-				drtConfig.setUseModeFilteredSubnetwork( true );
-				mm.addParameterSet( drtConfig );
+				mm.addParameterSet(
+						new DrtConfigGroup().setMode( "drt3" ).setMaxTravelTimeAlpha( 1.3 ).setVehiclesFile( drt3VehiclesFile )
+								    .setMaxTravelTimeBeta( 5. * 60. ).setStopDuration( 60. ).setMaxWaitTime( Double.MAX_VALUE )
+								    .setRejectRequestIfMaxWaitOrTravelTimeViolated( false ).setUseModeFilteredSubnetwork( true ) );
 			}
 
 			for( DrtConfigGroup drtConfigGroup : mm.getModalElements() ){
@@ -421,7 +378,7 @@ public class PtAlongALine2Test{
 		 */
 		List<PlanElement> planFullCase3a = controler.getScenario().getPopulation().getPersons().get(Id.createPersonId("agent" + testAgents.get(4) )).getSelectedPlan().getPlanElements();
 		List<Leg> planLegCase3a = planFullCase3a.stream().filter(pe -> pe instanceof Leg).map(pe -> (Leg) pe).collect(toList()) ;
-		Assert.assertTrue("Incorrect Mode, case 3a",planLegCase3a.get(0).getMode().equals("transit_walk"));
+		Assert.assertTrue("Incorrect Mode, case 3a",planLegCase3a.get(0).getMode().equals("walk"));
 
 
 		/**
@@ -431,7 +388,7 @@ public class PtAlongALine2Test{
 		 */
 		List<PlanElement> planFullCase3b = controler.getScenario().getPopulation().getPersons().get(Id.createPersonId("agent" + testAgents.get(5) )).getSelectedPlan().getPlanElements();
 		List<Leg> planLegCase3b = planFullCase3b.stream().filter(pe -> pe instanceof Leg).map(pe -> (Leg) pe).collect(toList()) ;
-		Assert.assertTrue("Incorrect Mode, case 3b",planLegCase3b.get(0).getMode().equals("transit_walk"));
+		Assert.assertTrue("Incorrect Mode, case 3b",planLegCase3b.get(0).getMode().equals("walk"));
 
 	}
 
