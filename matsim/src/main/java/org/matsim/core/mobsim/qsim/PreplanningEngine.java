@@ -137,6 +137,9 @@ public final class PreplanningEngine implements MobsimEngine {
 		//first process requests and then infos --> trips without booking required can be processed in 1 time step
 		//booking confirmation always comes later (e.g. next time step)
 
+		// (I have inlined the below methods since I find this for the time being easier to read.  Can be extracted again at some later point in time .
+		// kai, jan'20)
+
 		// process all (initial) requests:
 		for (Map.Entry<MobsimAgent, TripInfo.Request> entry : tripInfoRequestMap.entrySet()) {
 			final MobsimAgent mobsimAgent = entry.getKey();
@@ -148,14 +151,16 @@ public final class PreplanningEngine implements MobsimEngine {
 			}
 
 			// TODO add info for mode that is in agent plan, if not returned by trip info provider
+			// not sure if that is needed. kai, jan'20
+
 			decide( mobsimAgent, allTripInfos );
 		}
-
 		tripInfoRequestMap.clear();
 
 		// process all updates:
 		for (Map.Entry<MobsimAgent, Optional<TripInfo>> entry : tripInfoUpdatesMap.entrySet()) {
 			MobsimAgent agent = entry.getKey();
+
 			Optional<TripInfo> tripInfo = entry.getValue();
 
 			if (tripInfo.isPresent()) {
@@ -278,7 +283,7 @@ public final class PreplanningEngine implements MobsimEngine {
 		// () search for drt trip corresponding to drt leg.  Trick is using our own stage activities (drtStageActivities).
 		// () existing tests pass, but probably it is currently wrong after removing stage activity types
 		// and thereby losing the ability to only consider drtStageActivities as stage activities and nothing else
-		// () I think that this is now fixed.  But there should also be a test for it.  kai, jan'20
+		// () I think that this is now fixed.  yyyy But there should also be a test for it.  kai, jan'20
 		TripStructureUtils.Trip drtTrip = TripStructureUtils.findTripAtPlanElement(leg, plan, TripStructureUtils.createStageActivityType(leg.getMode())::equals );
 		Gbl.assertNotNull(drtTrip);
 
