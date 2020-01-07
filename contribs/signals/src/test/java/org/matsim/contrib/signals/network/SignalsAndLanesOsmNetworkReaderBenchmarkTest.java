@@ -56,7 +56,9 @@ public class SignalsAndLanesOsmNetworkReaderBenchmarkTest {
                 {false, true, true, true, true},
                 {true, false, true, true, true},
                 {true, true, false, true, true},
-                {true, true, true, false, true},};
+                {true, true, true, false, true},
+                {false, false, false, false, false},
+                {true, false, false, false, false},};
         return Arrays.asList(data);
     }
 
@@ -155,10 +157,28 @@ public class SignalsAndLanesOsmNetworkReaderBenchmarkTest {
         int noLinks = network.getLinks().size();
         int noLinksBenchmark = networkBenchmark.getLinks().size();
 
+        int noSignalSystems = signalsData.getSignalGroupsData().getSignalGroupDataBySignalSystemId().size();
+        int noSignalSystemsBenchmark = signalsDataBenchmark.getSignalGroupsData().getSignalGroupDataBySignalSystemId().size();
+
+        int noLinksWithLanes = scenario.getLanes().getLanesToLinkAssignments().size();
+        int noLinksWithLanesBenchmark = scenarioBenchmark.getLanes().getLanesToLinkAssignments().size();
+
+        int NoSignalizedOsmNodes = signalReader.signalizedOsmNodes.size();
+        int NoSignalizedOsmNodesBenchmark = signalReaderBenchmark.signalizedOsmNodes.size();
+
+
 
 
         Assert.assertEquals("Number of Links", noLinks, noLinksBenchmark);
         Assert.assertEquals("Number of Nodes", noNodes, noNodesBenchmark);
+        Assert.assertEquals("Number of SignalSystems",noSignalSystemsBenchmark, noSignalSystems);
+        Assert.assertEquals("Number of Links with Lanes",noLinksWithLanesBenchmark, noLinksWithLanes);
+        Assert.assertEquals("Number of Signalied Osm Nodes", NoSignalizedOsmNodesBenchmark,NoSignalizedOsmNodes);
+
+
+
+
+
         System.out.println("Number of Links: original: " + noLinks + " SignalReader: " + noLinksBenchmark);
         System.out.println("Number of Nodes: original: " + noNodes + " SignalReader: " + noNodesBenchmark);
 
