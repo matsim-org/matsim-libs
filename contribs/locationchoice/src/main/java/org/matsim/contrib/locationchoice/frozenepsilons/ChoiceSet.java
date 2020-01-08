@@ -217,18 +217,20 @@ class ChoiceSet {
 						}
 
 						LeastCostPathCalculator.Path result = this.forwardMultiNodeDijkstra.constructPath( link.getToNode(), movedActNode, startTime );
-						NetworkRoute linkNetworkRouteImpl = RouteUtils.createLinkNetworkRouteImpl(activityToRelocate.getLinkId(), link.getId());
-						double distance = 0;
-						if (result.links != null && !result.links.isEmpty()) {
-							List<Id<Link>> linkIds = new ArrayList<>();
-							for (Link linkInRoute : result.links) {
-								linkIds.add(linkInRoute.getId());
-								distance += linkInRoute.getLength();
+						{
+							NetworkRoute linkNetworkRouteImpl = RouteUtils.createLinkNetworkRouteImpl(activityToRelocate.getLinkId(), link.getId());
+							double distance = 0;
+							if (result.links != null && !result.links.isEmpty()) {
+								List<Id<Link>> linkIds = new ArrayList<>();
+								for (Link linkInRoute : result.links) {
+									linkIds.add(linkInRoute.getId());
+									distance += linkInRoute.getLength();
+								}
+								linkNetworkRouteImpl.setLinkIds(activityToRelocate.getLinkId(), linkIds, link.getId());
 							}
-							linkNetworkRouteImpl.setLinkIds(activityToRelocate.getLinkId(), linkIds, link.getId());
+							linkNetworkRouteImpl.setDistance(distance);
+							Objects.requireNonNull(previousLeg).setRoute(linkNetworkRouteImpl);
 						}
-						linkNetworkRouteImpl.setDistance(distance);
-						Objects.requireNonNull( previousLeg ).setRoute(linkNetworkRouteImpl);
 						Objects.requireNonNull( previousLeg ).setTravelTime( result.travelTime );
 
 					}
@@ -243,18 +245,20 @@ class ChoiceSet {
 						double startTime = PlanRouter.calcEndOfActivity( activityToRelocate, planTmp, scenario.getConfig() );
 
 						LeastCostPathCalculator.Path result = this.backwardMultiNodeDijkstra.constructPath( link.getToNode(), movedActNode, startTime);
-						NetworkRoute linkNetworkRouteImpl = RouteUtils.createLinkNetworkRouteImpl(activityToRelocate.getLinkId(), link.getId());
-						double distance = 0;
-						if (result.links != null && !result.links.isEmpty()) {
-							List<Id<Link>> linkIds = new ArrayList<>();
-							for (Link linkInRoute : result.links) {
-								linkIds.add(linkInRoute.getId());
-								distance += linkInRoute.getLength();
+						{
+							NetworkRoute linkNetworkRouteImpl = RouteUtils.createLinkNetworkRouteImpl(activityToRelocate.getLinkId(), link.getId());
+							double distance = 0;
+							if (result.links != null && !result.links.isEmpty()) {
+								List<Id<Link>> linkIds = new ArrayList<>();
+								for (Link linkInRoute : result.links) {
+									linkIds.add(linkInRoute.getId());
+									distance += linkInRoute.getLength();
+								}
+								linkNetworkRouteImpl.setLinkIds(activityToRelocate.getLinkId(), linkIds, link.getId());
 							}
-							linkNetworkRouteImpl.setLinkIds(activityToRelocate.getLinkId(), linkIds, link.getId());
+							linkNetworkRouteImpl.setDistance(distance);
+							Objects.requireNonNull(leg).setRoute(linkNetworkRouteImpl);
 						}
-						linkNetworkRouteImpl.setDistance(distance);
-						Objects.requireNonNull( leg ).setRoute(linkNetworkRouteImpl);
 						Objects.requireNonNull( leg ).setTravelTime( result.travelTime );
 					}
 				}
