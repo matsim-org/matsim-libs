@@ -2,12 +2,16 @@ package org.matsim.contrib.osm.networkReader;
 
 import com.slimjars.dist.gnu.trove.list.array.TLongArrayList;
 import de.topobyte.osm4j.core.model.iface.OsmNode;
+import de.topobyte.osm4j.core.model.iface.OsmTag;
 import de.topobyte.osm4j.core.model.iface.OsmWay;
 import de.topobyte.osm4j.core.model.impl.Node;
 import de.topobyte.osm4j.core.model.impl.Tag;
 import de.topobyte.osm4j.core.model.impl.Way;
 import de.topobyte.osm4j.pbf.seq.PbfWriter;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 
@@ -19,6 +23,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class Utils {
 
@@ -47,11 +54,15 @@ public class Utils {
 	}
 
 	static WaysAndLinks createSingleLink() {
+		return createSingleLink(Collections.singletonList(new Tag(OsmTags.HIGHWAY, Utils.MOTORWAY)));
+	}
+
+	static WaysAndLinks createSingleLink(List<OsmTag> tags) {
+
 		Node node1 = new Node(1, 0, 0);
 		Node node2 = new Node(2, 100, 100);
 		Node node3 = new Node(3, 0, 200);
 		TLongArrayList nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId(), node3.getId()});
-		List<Tag> tags = Collections.singletonList(new Tag(OsmTags.HIGHWAY, Utils.MOTORWAY));
 		Way way = new Way(1, nodeReference, tags);
 
 		return new WaysAndLinks(Arrays.asList(node1, node2, node3), Collections.singletonList(way));
@@ -95,6 +106,55 @@ public class Utils {
 		);
 
 		return new WaysAndLinks(nodesList, waysList);
+	}
+
+	static void assertEquals(Network expected, Network actual) {
+		// check that all element from expected result are in tested network
+		for (Link link : expected.getLinks().values()) {
+			Link testLink = actual.getLinks().get(link.getId());
+			assertNotNull(testLink);
+			testLinksAreEqual(link, testLink);
+		}
+
+		for (org.matsim.api.core.v01.network.Node node : expected.getNodes().values()) {
+			org.matsim.api.core.v01.network.Node testNode = actual.getNodes().get(node.getId());
+			assertNotNull(testNode);
+			testNodesAreEqual(node, testNode);
+		}
+
+		// also check the other way around, to make sure there are no extra elements in the network
+		for (Link link : actual.getLinks().values()) {
+			Link expectedLink = expected.getLinks().get(link.getId());
+			assertNotNull(expectedLink);
+		}
+
+		for (org.matsim.api.core.v01.network.Node node : actual.getNodes().values()) {
+			org.matsim.api.core.v01.network.Node expectedNode = expected.getNodes().get(node.getId());
+			assertNotNull(expectedNode);
+		}
+	}
+
+	private static void testLinksAreEqual(Link expected, Link actual) {
+
+		expected.getAllowedModes().forEach(mode -> assertTrue(actual.getAllowedModes().contains(mode)));
+		Assert.assertEquals(expected.getCapacity(), actual.getCapacity(), 0.001);
+		Assert.assertEquals(expected.getFlowCapacityPerSec(), actual.getFlowCapacityPerSec(), 0.001);
+		Assert.assertEquals(expected.getFreespeed(), actual.getFreespeed(), 0.001);
+		Assert.assertEquals(expected.getLength(), actual.getLength(), 0.001);
+		Assert.assertEquals(expected.getNumberOfLanes(), actual.getNumberOfLanes(), 0.001);
+		Assert.assertEquals(expected.getFromNode().getId(), actual.getFromNode().getId());
+		Assert.assertEquals(expected.getToNode().getId(), actual.getToNode().getId());
+	}
+
+	private static void testNodesAreEqual(org.matsim.api.core.v01.network.Node expected, org.matsim.api.core.v01.network.Node actual) {
+
+		// test x and y separately, so that we can have a delta.
+		// In java version >=11 Assert.assertEquals(expected.getCoord(), actual.getCoord()) also works
+		// keep this in as long as we use java-8
+		Assert.assertEquals(expected.getCoord().getX(), actual.getCoord().getX(), 0.00000001);
+		Assert.assertEquals(expected.getCoord().getY(), actual.getCoord().getY(), 0.00000001);
+		expected.getOutLinks().forEach((id, link) -> Assert.assertEquals(link.getId(), actual.getOutLinks().get(id).getId()));
+		expected.getInLinks().forEach((id, link) -> Assert.assertEquals(link.getId(), actual.getInLinks().get(id).getId()));
 	}
 
 	static class WaysAndLinks {

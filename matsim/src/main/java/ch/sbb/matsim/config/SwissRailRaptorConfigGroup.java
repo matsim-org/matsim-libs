@@ -411,8 +411,9 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         }
 
         @StringSetter(PARAM_MODE)
-        public void setMode(String mode) {
+        public IntermodalAccessEgressParameterSet setMode(String mode) {
             this.mode = mode;
+            return this ;
         }
 
         @StringGetter(PARAM_MAX_RADIUS)
@@ -421,8 +422,9 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         }
 
         @StringSetter(PARAM_MAX_RADIUS)
-        public void setMaxRadius(double maxRadius) {
+        public IntermodalAccessEgressParameterSet setMaxRadius(double maxRadius) {
             this.maxRadius = maxRadius;
+            return this ;
         }
         
         @StringGetter(PARAM_INITIAL_SEARCH_RADIUS)
@@ -431,8 +433,9 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         }
 
         @StringSetter(PARAM_INITIAL_SEARCH_RADIUS)
-        public void setInitialSearchRadius(double initialSearchRadius) {
+        public IntermodalAccessEgressParameterSet setInitialSearchRadius(double initialSearchRadius) {
             this.initialSearchRadius = initialSearchRadius;
+            return this ;
         }
         
         @StringGetter(PARAM_SEARCH_EXTENSION_RADIUS)
@@ -441,8 +444,9 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         }
 
         @StringSetter(PARAM_SEARCH_EXTENSION_RADIUS)
-        public void setSearchExtensionRadius(double searchExtensionRadius) {
+        public IntermodalAccessEgressParameterSet setSearchExtensionRadius(double searchExtensionRadius) {
             this.searchExtensionRadius = searchExtensionRadius;
+            return this ;
         }
 
         @StringGetter(PARAM_LINKID_ATTRIBUTE)
@@ -451,8 +455,9 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         }
 
         @StringSetter(PARAM_LINKID_ATTRIBUTE)
-        public void setLinkIdAttribute(String linkIdAttribute) {
+        public IntermodalAccessEgressParameterSet setLinkIdAttribute(String linkIdAttribute) {
             this.linkIdAttribute = linkIdAttribute;
+            return this ;
         }
 
         @StringGetter(PARAM_PERSON_FILTER_ATTRIBUTE)
@@ -461,8 +466,9 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         }
 
         @StringSetter(PARAM_PERSON_FILTER_ATTRIBUTE)
-        public void setPersonFilterAttribute(String personFilterAttribute) {
+        public IntermodalAccessEgressParameterSet setPersonFilterAttribute(String personFilterAttribute) {
             this.personFilterAttribute = personFilterAttribute;
+            return this ;
         }
 
         @StringGetter(PARAM_PERSON_FILTER_VALUE)
@@ -471,8 +477,9 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         }
 
         @StringSetter(PARAM_PERSON_FILTER_VALUE)
-        public void setPersonFilterValue(String personFilterValue) {
+        public IntermodalAccessEgressParameterSet setPersonFilterValue(String personFilterValue) {
             this.personFilterValue = personFilterValue;
+            return this ;
         }
 
         @StringGetter(PARAM_STOP_FILTER_ATTRIBUTE)
@@ -481,8 +488,9 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         }
 
         @StringSetter(PARAM_STOP_FILTER_ATTRIBUTE)
-        public void setStopFilterAttribute(String stopFilterAttribute) {
+        public IntermodalAccessEgressParameterSet setStopFilterAttribute(String stopFilterAttribute) {
             this.stopFilterAttribute = stopFilterAttribute;
+            return this ;
         }
 
         @StringGetter(PARAM_STOP_FILTER_VALUE)
@@ -491,8 +499,9 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
         }
 
         @StringSetter(PARAM_STOP_FILTER_VALUE)
-        public void setStopFilterValue(String stopFilterValue) {
+        public IntermodalAccessEgressParameterSet setStopFilterValue(String stopFilterValue) {
             this.stopFilterValue = stopFilterValue;
+            return this ;
         }
 
         @Override

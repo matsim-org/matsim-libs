@@ -5,12 +5,10 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
-@Ignore
 public class VehicleWriteReadTest{
 	private static final Logger log = Logger.getLogger( VehicleWriteReadTest.class ) ;
 

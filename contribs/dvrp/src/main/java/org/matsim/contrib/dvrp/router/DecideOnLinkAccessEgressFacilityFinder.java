@@ -18,14 +18,14 @@
  * *********************************************************************** *
  */
 
-package org.matsim.contrib.drt.routing;
+package org.matsim.contrib.dvrp.router;
 
 import java.util.Optional;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.routing.DrtRoutingModule.AccessEgressFacilityFinder;
+import org.matsim.contrib.dvrp.router.DvrpRoutingModule.AccessEgressFacilityFinder;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
