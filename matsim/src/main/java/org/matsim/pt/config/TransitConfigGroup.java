@@ -47,7 +47,8 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 	private static final String SCHEDULE_CRS = "inputScheduleCRS";
 
 	private static final String INSISTING_ON_USING_DEPRECATED_ATTRIBUTE_FILE = "insistingOnUsingDeprecatedAttributeFiles" ;
-
+	private static final String USING_TRANSIT_IN_MOBSIM = "usingTransitInMobsim" ;
+	
 	public static final String TRANSIT_ATTRIBUTES_DEPRECATION_MESSAGE = "using the separate transit stops and lines attribute files is deprecated." +
 			"  Add the information directly into each stop or line, using " +
 			"the Attributable feature.  If you insist on continuing to use the separate attribute files, set " +
@@ -203,9 +204,11 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 	}
 	
 	private boolean usingTransitInMobsim = true ;
+	@StringSetter( USING_TRANSIT_IN_MOBSIM )
 	public final void setUsingTransitInMobsim( boolean val ) {
 		usingTransitInMobsim = val ;
 	}
+	@StringGetter( USING_TRANSIT_IN_MOBSIM )
 	public final boolean isUsingTransitInMobsim(){
 		return usingTransitInMobsim ;
 	}
