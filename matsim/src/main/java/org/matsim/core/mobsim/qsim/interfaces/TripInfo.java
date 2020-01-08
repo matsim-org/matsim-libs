@@ -24,6 +24,8 @@
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.facilities.Facility;
 
@@ -66,5 +68,7 @@ public interface TripInfo{
 		double getTime();
 
 		TimeInterpretation getTimeInterpretation();
+
+		Route getPlannedRoute();
 	}
 }

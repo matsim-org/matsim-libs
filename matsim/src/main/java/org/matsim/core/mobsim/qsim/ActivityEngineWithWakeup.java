@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 
 public final class ActivityEngineWithWakeup implements ActivityEngine {
@@ -91,9 +92,12 @@ public final class ActivityEngineWithWakeup implements ActivityEngine {
 	public boolean handleActivity(MobsimAgent agent) {
 		double now = this.internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 
-		Activity act = (Activity)WithinDayAgentUtils.getCurrentPlanElement(agent);
-		if (!act.getType().contains("interaction")) {
-			wakeUpList.addAll(preplanningEngine.generateWakeups(agent, now));
+//		Activity act = (Activity)WithinDayAgentUtils.getCurrentPlanElement(agent);
+		if ( agent instanceof PlanAgent ) {
+			Activity act = (Activity) ((PlanAgent) agent).getCurrentPlanElement();
+			if (!act.getType().contains("interaction")) {
+				wakeUpList.addAll(preplanningEngine.generateWakeups(agent, now));
+			}
 		}
 
 		return delegate.handleActivity(agent);

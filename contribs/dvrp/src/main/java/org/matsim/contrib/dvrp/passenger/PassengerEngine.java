@@ -144,7 +144,7 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 		// offers.  We cannot say if advanceRequestStorage is the correct container for this, probably not and you will need yet another one.
 		double now = mobsimTimer.getTimeOfDay();
 		//TODO have a separate request creator for prebooking (accept TripInfo instead of Route)
-		PassengerRequest request = requestCreator.createRequest(createRequestId(), passenger.getId(), null,
+		PassengerRequest request = requestCreator.createRequest(createRequestId(), passenger.getId(), tripInfo.getOriginalRequest().getPlannedRoute(),
 				getLink(tripInfo.getPickupLocation().getLinkId()), getLink(tripInfo.getDropoffLocation().getLinkId()),
 				tripInfo.getExpectedBoardingTime(), now);
 		validateAndSubmitRequest(passenger, request, false, tripInfo.getOriginalRequest());
@@ -167,7 +167,10 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 
 		if (prebookedRequests.isEmpty()) {// this is an immediate request
 			//TODO what if it was already rejected while prebooking??
+
 			Route route = ((Leg)((PlanAgent)passenger).getCurrentPlanElement()).getRoute();
+			// yy one cannot rely on that the agent is a PlanAgent. (Maybe we should change that?) kai, jan'19
+
 			PassengerRequest request = requestCreator.createRequest(createRequestId(), passenger.getId(), route,
 					getLink(fromLinkId), getLink(toLinkId), departureTime, now);
 			validateAndSubmitRequest(passenger, request, false, null);

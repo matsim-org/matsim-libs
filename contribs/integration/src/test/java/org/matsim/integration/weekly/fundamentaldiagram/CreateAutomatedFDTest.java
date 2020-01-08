@@ -106,6 +106,8 @@ public class CreateAutomatedFDTest {
 	private final Map<Id<Person>,String> person2Mode = new HashMap<>();
 
 	@Parameters(name = "{index}: LinkDynamics == {0}; Traffic dynamics == {1};")
+	// the convention is that the output of the method marked by "@Parameters" is taken as input to the constructor
+	// before running each test. kai, jul'16
 	public static Collection<Object[]> createFds() {
 		int combos = LinkDynamics.values().length * TrafficDynamics.values().length ;
 		Object [][] combos2run = new Object [combos][2]; // #ld x #td x #params
@@ -118,8 +120,6 @@ public class CreateAutomatedFDTest {
 		}
 		return Arrays.asList(combos2run);
 		
-		// the convention, I think, is that the output of the method marked by "@Parameters" is taken as input to the constructor
-		// before running each test. kai, jul'16
 	}
 
 	@Test

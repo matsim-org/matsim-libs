@@ -23,6 +23,7 @@ package org.matsim.core.mobsim.qsim;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfo;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
@@ -35,11 +36,13 @@ class TripInfoRequestWithActivities implements TripInfo.Request{
 	private final Facility toFacility;
 	private final double time;
 	private final TimeInterpretation timeInterpretation;
+	private final Route route;
 //	private final Activity fromActivity;
 //	private final Activity toActivity;
 
-	private TripInfoRequestWithActivities(Scenario scenario, Activity fromActivity, Activity toActivity, double time,
-			TimeInterpretation timeInterpretation) {
+	private TripInfoRequestWithActivities( Scenario scenario, Activity fromActivity, Activity toActivity, double time,
+					       TimeInterpretation timeInterpretation, Route route ) {
+		this.route = route;
 //		this.fromActivity = fromActivity;
 //		this.toActivity = toActivity;
 		this.fromFacility = FacilitiesUtils.toFacility(fromActivity, scenario.getActivityFacilities());
@@ -68,6 +71,11 @@ class TripInfoRequestWithActivities implements TripInfo.Request{
 		return timeInterpretation;
 	}
 
+	@Override
+	public Route getPlannedRoute(){
+		return route;
+	}
+
 //	Activity getFromActivity() {
 //		return fromActivity;
 //	}
@@ -80,6 +88,7 @@ class TripInfoRequestWithActivities implements TripInfo.Request{
 
 	static class Builder {
 		private final Scenario scenario;
+		private Route route;
 		// this is deliberately a builder and not a constructor so that we can add arguments later without having to add constructors with longer and longer
 		// argument lists.  kai, mar'19
 
@@ -112,8 +121,13 @@ class TripInfoRequestWithActivities implements TripInfo.Request{
 			return this;
 		}
 
+		Builder setPlannedRoute( Route route ) {
+			this.route = route ;
+			return this ;
+		}
+
 		TripInfo.Request createRequest() {
-			return new TripInfoRequestWithActivities(scenario, fromActivity, toActivity, time, timeInterpretation);
+			return new TripInfoRequestWithActivities(scenario, fromActivity, toActivity, time, timeInterpretation, route);
 		}
 	}
 }

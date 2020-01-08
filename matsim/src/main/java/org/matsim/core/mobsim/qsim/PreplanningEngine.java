@@ -291,6 +291,7 @@ public final class PreplanningEngine implements MobsimEngine {
 								 .setFromActivity( drtTrip.getOriginActivity() )
 								 .setToActivity(drtTrip.getDestinationActivity())
 								 .setTime(drtTrip.getOriginActivity().getEndTime())
+								 .setPlannedRoute( leg.getRoute() )
 								 .createRequest();
 
 		//first simulate ActivityEngineWithWakeup and then PreplanningEngine --> decision process
