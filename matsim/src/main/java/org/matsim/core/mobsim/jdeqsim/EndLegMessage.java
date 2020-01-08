@@ -21,6 +21,7 @@ package org.matsim.core.mobsim.jdeqsim;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -125,8 +126,10 @@ public class EndLegMessage extends EventMessage {
 		if (this.getMessageArrivalTime() > actStartEventTime) {
 			actStartEventTime = this.getMessageArrivalTime();
 		}
+		event = new ActivityStartEvent(actStartEventTime, this.vehicle.getOwnerPerson().getId(), this.vehicle.getCurrentLinkId(),
+				nextAct.getFacilityId(), nextAct.getType(), nextAct.getCoord() );
+		// mobsim needs to know where activity takes place.  jdeqsim does not have access/egress legs; thus using act.getCoord() seems justified.
 
-		event = new ActivityStartEvent(actStartEventTime, this.vehicle.getOwnerPerson().getId(), this.vehicle.getCurrentLinkId(), nextAct );
 		eventsManager.processEvent(event);
 
 	}

@@ -37,8 +37,6 @@ public class ActivityStartEvent extends Event implements HasPersonId, BasicLocat
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_FACILITY = "facility";
 	public static final String ATTRIBUTE_ACTTYPE = "actType";
-	public static final String ATTRIBUTE_X = "x" ;
-	public static final String ATTRIBUTE_Y = "y" ;
 
 
 	private final Id<Person> personId;
@@ -56,12 +54,12 @@ public class ActivityStartEvent extends Event implements HasPersonId, BasicLocat
 	warnings.  kai, dec'19
 	 */
 
-	public ActivityStartEvent( final double time, final Id<Person> agentId, final Activity  activity ){
-		this( time, agentId, activity.getLinkId(), activity ) ;
-	}
-	public ActivityStartEvent( final double time, final Id<Person> agentId, final Id<Link> linkId, final Activity activity ) {
-		this( time, agentId, linkId, activity.getFacilityId(), activity.getType(), activity.getCoord() ) ;
-	}
+//	public ActivityStartEvent( final double time, final Id<Person> agentId, final Activity  activity ){
+//		this( time, agentId, activity.getLinkId(), activity ) ;
+//	}
+//	public ActivityStartEvent( final double time, final Id<Person> agentId, final Id<Link> linkId, final Activity activity ) {
+//		this( time, agentId, linkId, activity.getFacilityId(), activity.getType(), activity.getCoord() ) ;
+//	}
 	public ActivityStartEvent( final double time, final Id<Person> agentId, final Id<Link> linkId,
 		final Id<ActivityFacility> facilityId, final String acttype, Coord coord ) {
 		super(time);
@@ -72,8 +70,7 @@ public class ActivityStartEvent extends Event implements HasPersonId, BasicLocat
 		this.coord = coord;
 	}
 
-	@Override
-	public String getEventType() {
+	@Override public String getEventType() {
 		return EVENT_TYPE;
 	}
 
@@ -96,16 +93,13 @@ public class ActivityStartEvent extends Event implements HasPersonId, BasicLocat
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
+		// personId is automatic in superclass
+		// coord is automatic in superclass
 		if (this.linkId != null) {
 			attr.put(ATTRIBUTE_LINK, this.linkId.toString());
 		}
 		if (this.facilityId != null) {
 			attr.put(ATTRIBUTE_FACILITY, this.facilityId.toString());
-		}
-		if ( this.coord!=null ) {
-			attr.put( ATTRIBUTE_X, String.valueOf( this.coord.getX() ) ) ;
-			attr.put( ATTRIBUTE_Y, String.valueOf( this.coord.getY() ) ) ;
 		}
 		attr.put(ATTRIBUTE_ACTTYPE, this.acttype);
 		return attr;

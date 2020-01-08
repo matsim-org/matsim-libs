@@ -172,9 +172,9 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 					atts.getValue(ActivityEndEvent.ATTRIBUTE_ACTTYPE)));
 		} else if (ActivityStartEvent.EVENT_TYPE.equals(eventType)) {
 			Coord coord = null ;
-			if ( atts.getValue( ActivityStartEvent.ATTRIBUTE_X )!=null ) {
-				double xx = Double.parseDouble( atts.getValue( ActivityStartEvent.ATTRIBUTE_X ) ) ;
-				double yy = Double.parseDouble( atts.getValue( ActivityStartEvent.ATTRIBUTE_Y ) ) ;
+			if ( atts.getValue( Event.ATTRIBUTE_X )!=null ) {
+				double xx = Double.parseDouble( atts.getValue( Event.ATTRIBUTE_X ) ) ;
+				double yy = Double.parseDouble( atts.getValue( Event.ATTRIBUTE_Y ) ) ;
 				coord = new Coord( xx, yy ) ;
 			}
 			this.events.processEvent(new ActivityStartEvent(
