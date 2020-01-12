@@ -61,21 +61,21 @@ public class TestColdEmissionHandler {
 
 		//first event: create and handle
 		Map<String,Double> coldEm1 = new HashMap<String, Double>();
-		coldEm1.put(ColdPollutant.CO.getText(), 7.1);
-		coldEm1.put(ColdPollutant.NOX.getText(), 11.9);
+		coldEm1.put( ColdPollutant.CO.name(), 7.1 );
+		coldEm1.put( ColdPollutant.NOX.name(), 11.9 );
 		ColdEmissionEvent event1 = new ColdEmissionEvent(time1, link1, vehicle1, coldEm1);
 		handler.handleEvent(event1);
 
 		//second event: create and handle
 		Map<String,Double> coldEm2 = new HashMap<String, Double>();
-		coldEm2.put(ColdPollutant.CO.getText(), 23.9);
-		coldEm2.put(ColdPollutant.PM.getText(), 18.1);
+		coldEm2.put( ColdPollutant.CO.name(), 23.9 );
+		coldEm2.put( ColdPollutant.PM.name(), 18.1 );
 		ColdEmissionEvent event2 = new ColdEmissionEvent(time1, link1, vehicle2, coldEm2);
 		handler.handleEvent(event2);
 
 		//third event: create and handle
 		Map<String,Double> coldEm3 = new HashMap<String, Double>();
-		coldEm3.put(ColdPollutant.NOX.getText(), 12.4);
+		coldEm3.put( ColdPollutant.NOX.name(), 12.4 );
 		ColdEmissionEvent event3 = new ColdEmissionEvent(time2, link2, vehicle1, coldEm3);
 		handler.handleEvent(event3);
 
@@ -86,8 +86,8 @@ public class TestColdEmissionHandler {
 
 		//fifth event: create and handle
 		Map<String,Double> coldEm5 = new HashMap<String, Double>();
-		coldEm5.put(ColdPollutant.NOX.getText(), 19.8);
-		coldEm5.put(ColdPollutant.CO.getText(), 10.0);
+		coldEm5.put( ColdPollutant.NOX.name(), 19.8 );
+		coldEm5.put( ColdPollutant.CO.name(), 10.0 );
 		ColdEmissionEvent event5 = new ColdEmissionEvent(time2, link1, vehicle1, coldEm5);
 		handler.handleEvent(event5);
 
@@ -98,12 +98,18 @@ public class TestColdEmissionHandler {
 //			throw new RuntimeException("code below will possibly no longer work, since keys are now strings not enums.  kai, dec'18") ;
 //		}
 
-		if(cepp.get(Id.create("v1", Person.class)).containsKey(ColdPollutant.CO.getText()))actualCO1 = cepp.get(Id.create("v1", Person.class)).get(ColdPollutant.CO.getText());
-		if(cepp.get(Id.create("v1", Person.class)).containsKey(ColdPollutant.NOX.getText()))actualNOX1 = cepp.get(Id.create("v1", Person.class)).get(ColdPollutant.NOX.getText());
-		if(cepp.get(Id.create("v1", Person.class)).containsKey(ColdPollutant.PM.getText()))actualPM1 = cepp.get(Id.create("v1", Person.class)).get(ColdPollutant.PM.getText());
-		if(cepp.get(Id.create("v2", Person.class)).containsKey(ColdPollutant.CO.getText()))actualCO2 = cepp.get(Id.create("v2", Person.class)).get(ColdPollutant.CO.getText());
-		if(cepp.get(Id.create("v2", Person.class)).containsKey(ColdPollutant.NOX.getText()))actualNOX2 = cepp.get(Id.create("v2", Person.class)).get(ColdPollutant.NOX.getText());
-		if(cepp.get(Id.create("v2", Person.class)).containsKey(ColdPollutant.PM.getText()))actualPM2 = cepp.get(Id.create("v2", Person.class)).get(ColdPollutant.PM.getText());
+		if(cepp.get(Id.create("v1", Person.class)).containsKey( ColdPollutant.CO.name() ))
+			actualCO1 = cepp.get( Id.create("v1", Person.class ) ).get( ColdPollutant.CO.name() );
+		if(cepp.get(Id.create("v1", Person.class)).containsKey( ColdPollutant.NOX.name() ))
+			actualNOX1 = cepp.get( Id.create("v1", Person.class ) ).get( ColdPollutant.NOX.name() );
+		if(cepp.get(Id.create("v1", Person.class)).containsKey( ColdPollutant.PM.name() ))
+			actualPM1 = cepp.get( Id.create("v1", Person.class ) ).get( ColdPollutant.PM.name() );
+		if(cepp.get(Id.create("v2", Person.class)).containsKey( ColdPollutant.CO.name() ))
+			actualCO2 = cepp.get( Id.create("v2", Person.class ) ).get( ColdPollutant.CO.name() );
+		if(cepp.get(Id.create("v2", Person.class)).containsKey( ColdPollutant.NOX.name() ))
+			actualNOX2 = cepp.get( Id.create("v2", Person.class ) ).get( ColdPollutant.NOX.name() );
+		if(cepp.get(Id.create("v2", Person.class)).containsKey( ColdPollutant.PM.name() ))
+			actualPM2 = cepp.get( Id.create("v2", Person.class ) ).get( ColdPollutant.PM.name() );
 
 		// assert that values were set correctly
 		Assert.assertEquals("CO of vehicle 1 should be 17.1 but was "+actualCO1, new Double(17.1), actualCO1, MatsimTestUtils.EPSILON);

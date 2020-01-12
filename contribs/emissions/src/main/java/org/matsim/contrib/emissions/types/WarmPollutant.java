@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ColdPollutant.java
+ * WarmPollutant.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,30 +23,4 @@ package org.matsim.contrib.emissions.types;
  * @author benjamin
  *
  */
-public enum ColdPollutant {
-	
-	/*TODO: CO2 not directly available for cold emissions; thus it could be calculated through FC, CO, and HC as follows:
-	get("FC")*0.865 - get("CO")*0.429 - get("HC")*0.866) / 0.273;*/
-	CO("CO"), FC("FC"), HC("HC"), NMHC("NMHC"), NOX("NOx"), NO2("NO2"), PM("PM");
-	
-	private final String key;
-
-	ColdPollutant(String key) {
-		this.key = key;
-	}
-
-	public String getText() {
-		return key;
-	}
-	
-	//TODO: Is this really neccessary? WarmPollutant does not have this method...jk, bk mai'13
-	public static ColdPollutant getValue(String key){
-		for(ColdPollutant cp : ColdPollutant.values()){
-			String cpString = cp.getText();
-			if(cpString.equals(key)){
-				return cp;
-			}
-		}
-		return null;
-	}
-}
+public enum WarmPollutant { CO, CO2_TOTAL, FC, HC, NMHC, NOX, NO2, PM, SO2 }

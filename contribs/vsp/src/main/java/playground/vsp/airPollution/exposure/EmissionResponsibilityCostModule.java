@@ -25,7 +25,6 @@ import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
@@ -68,7 +67,8 @@ public class EmissionResponsibilityCostModule {
 		double warmEmissionCosts = 0.0;
 		
 		for(String wp : warmEmissions.keySet()){
-			if( ! wp.equals(WarmPollutant.CO2_TOTAL.getText()) ) {
+			//		return key;
+			if( ! wp.equals( WarmPollutant.CO2_TOTAL.name() ) ) {
 
 //				if ( true ) {
 //					throw new RuntimeException("pollutants are no longer enums; need to hedge against header changes in upstream input file") ;
@@ -82,8 +82,9 @@ public class EmissionResponsibilityCostModule {
 
 		if(this.considerCO2Costs) {
 			WarmPollutant co2Total = WarmPollutant.CO2_TOTAL;
+			//		return key;
 			return this.emissionCostMultiplicationFactor * warmEmissionCosts * relativeDensity
-					+ warmEmissions.get(co2Total.getText())
+					+ warmEmissions.get( co2Total.name() )
 					* EmissionCostFactors.getCostFactor(co2Total.toString());
 		} else {
 			return this.emissionCostMultiplicationFactor * warmEmissionCosts * relativeDensity;

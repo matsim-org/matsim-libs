@@ -22,7 +22,6 @@ package playground.vsp.airPollution.flatEmissions;
 import java.util.Map;
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
-import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 
@@ -59,7 +58,8 @@ public class EmissionCostModule {
 //				throw new RuntimeException("typed emissions are no longer there; need to hedge against changing headers in the input file.  kai, dec'18") ;
 //			}
 
-			if(wp.equals(WarmPollutant.CO2_TOTAL.getText()) && ! considerCO2Costs) {
+			//		return key;
+			if(wp.equals( WarmPollutant.CO2_TOTAL.name() ) && ! considerCO2Costs) {
 				// do nothing
 			} else {
 				double costFactor = EmissionCostFactors.getCostFactor(wp.toString());

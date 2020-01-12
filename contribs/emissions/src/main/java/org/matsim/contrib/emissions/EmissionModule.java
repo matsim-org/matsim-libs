@@ -55,11 +55,11 @@ public final class EmissionModule {
 
 	//===
 
-	private static URL averageFleetColdEmissionFactorsFile;
-	private static URL averageFleetWarmEmissionFactorsFile;
+	private final URL averageFleetColdEmissionFactorsFile;
+	private final URL averageFleetWarmEmissionFactorsFile;
 
-	private static URL detailedWarmEmissionFactorsFile;
-	private static URL detailedColdEmissionFactorsFile;
+	private final URL detailedWarmEmissionFactorsFile;
+	private final URL detailedColdEmissionFactorsFile;
 	
 	//===
 	private Vehicles vehicles;
@@ -73,8 +73,9 @@ public final class EmissionModule {
 	private Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds;
 
 
-	private Set<String> warmPollutants = new HashSet<>();
-	private Set<String> coldPollutants = new HashSet<>();
+	private final Set<String> warmPollutants = new HashSet<>();
+	private final Set<String> coldPollutants = new HashSet<>();
+	// these are/were the "automatic" maps collected by JM from the hbefa files.  kai, jan'20
 
 	@Inject
 	public EmissionModule(final Scenario scenario, final EventsManager eventsManager) {
@@ -89,6 +90,19 @@ public final class EmissionModule {
 			this.eventsManager = eventsManager;
 		}
 
+		URL context = scenario.getConfig().getContext();
+
+		averageFleetWarmEmissionFactorsFile = emissionConfigGroup.getAverageWarmEmissionFactorsFileURL(context);
+		averageFleetColdEmissionFactorsFile = emissionConfigGroup.getAverageColdEmissionFactorsFileURL(context);
+
+		if(emissionConfigGroup.isUsingDetailedEmissionCalculation()) {
+			detailedWarmEmissionFactorsFile = emissionConfigGroup.getDetailedWarmEmissionFactorsFileURL(context);
+			detailedColdEmissionFactorsFile = emissionConfigGroup.getDetailedColdEmissionFactorsFileURL(context);
+		} else {
+			detailedWarmEmissionFactorsFile = null ;
+			detailedColdEmissionFactorsFile = null ;
+		}
+
 		//TODO: create roadtype mapping here from config
 		createLookupTables();
 		createEmissionHandler();
@@ -99,8 +113,6 @@ public final class EmissionModule {
 	private void createLookupTables() {
 		logger.info("entering createLookupTables");
 		
-		getInputFiles();
-
 		vehicles = scenario.getVehicles();
 
 		if( vehicles == null || vehicles.getVehicleTypes().isEmpty()) {
@@ -129,18 +141,6 @@ public final class EmissionModule {
 			logger.warn("Detailed emission calculation is switched off in " + EmissionsConfigGroup.GROUP_NAME + " config group; Using fleet average values for all vehicles.");
 		}
 		logger.info("leaving createLookupTables");
-	}
-
-	private void getInputFiles() {
-		URL context = scenario.getConfig().getContext();
-
-		averageFleetWarmEmissionFactorsFile = emissionConfigGroup.getAverageWarmEmissionFactorsFileURL(context);
-		averageFleetColdEmissionFactorsFile = emissionConfigGroup.getAverageColdEmissionFactorsFileURL(context);
-		
-		if(emissionConfigGroup.isUsingDetailedEmissionCalculation()) {
-			detailedWarmEmissionFactorsFile = emissionConfigGroup.getDetailedWarmEmissionFactorsFileURL(context);
-			detailedColdEmissionFactorsFile = emissionConfigGroup.getDetailedColdEmissionFactorsFileURL(context);
-		}
 	}
 
 	private void createEmissionHandler() {
