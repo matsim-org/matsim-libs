@@ -30,8 +30,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.common.base.Preconditions;
-
 public class VrpPaths {
 	/**
 	 * ASSUMPTION: A vehicle enters and exits links at their ends (link.getToNode())
@@ -55,7 +53,7 @@ public class VrpPaths {
 			TravelTime travelTime) {
 		return createPath(fromLink, toLink, departureTime, pathData.path, travelTime);
 	}
-
+	
 	public static VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime, Path path,
 			TravelTime travelTime) {
 		return createPath(fromLink, toLink, departureTime, path, travelTime, true);
@@ -69,12 +67,16 @@ public class VrpPaths {
 
 		int count = path.links.size();
 		if (count > 0) {
-			Preconditions.checkArgument(fromLink.getToNode() == path.links.get(0).getFromNode(),
-					"fromLink and path are not connected. From link: %s. First link in path: %s", fromLink,
-					path.links.get(0));
-			Preconditions.checkArgument(path.links.get(count - 1).getToNode() == toLink.getFromNode(),
-					"path and toLink are not connected. To link: %s. Last link in path: %s", toLink,
-					path.links.get(count - 1));
+			if (fromLink.getToNode() != path.links.get(0).getFromNode()) {
+				throw new IllegalArgumentException("fromLink and path are not connected"//
+						+ "\nfromLink: " + fromLink//
+						+ "\npath begining: " + path.links.get(0));
+			}
+			if (path.links.get(count - 1).getToNode() != toLink.getFromNode()) {
+				throw new IllegalArgumentException("path and toLink are not connected"//
+						+ "\npath end: " + path.links.get(count - 1).toString()//
+						+ "\ntoLink: " + toLink.toString());
+			}
 		}
 
 		Link[] links = new Link[count + 2];

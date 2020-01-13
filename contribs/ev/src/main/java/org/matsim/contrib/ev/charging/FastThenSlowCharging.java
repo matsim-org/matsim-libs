@@ -32,14 +32,13 @@ import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 
-import com.google.common.base.Preconditions;
-
 public class FastThenSlowCharging implements BatteryCharging {
 	private final ElectricVehicle electricVehicle;
 
 	public FastThenSlowCharging(ElectricVehicle electricVehicle) {
 		this.electricVehicle = electricVehicle;
 	}
+
 
 	public double calcChargingPower(double maxPower) {
 		Battery b = electricVehicle.getBattery();
@@ -54,35 +53,41 @@ public class FastThenSlowCharging implements BatteryCharging {
 		}
 	}
 
+
 	@Override
 	public double calcChargingTime(Charger charger, double energy) {
-		Preconditions.checkArgument(energy >= 0, "Energy is negative: %s", energy);
+		if (energy < 0) {
+			throw new IllegalArgumentException("Energy must be positive");
+		}
 
 		Battery b = electricVehicle.getBattery();
 		double startSoc = b.getSoc();
 		double endSoc = startSoc + energy;
-		Preconditions.checkArgument(endSoc <= b.getCapacity(), "End SOC greater than battery capacity: %s", endSoc);
+		if (endSoc > b.getCapacity()) {
+			throw new IllegalArgumentException("End SOC must not be greater than 100%");
+		}
 
 		double threshold1 = 0.5 * b.getCapacity();
 		double threshold2 = 0.75 * b.getCapacity();
 		double c = b.getCapacity() / 3600;
 
 		double energyA = startSoc >= threshold1 ? 0 : Math.min(threshold1, endSoc) - startSoc;
-		double timeA = energyA / Math.min(charger.getPlugPower(), 1.75 * c);
+		double timeA = energyA / Math.min(charger.getPower(), 1.75 * c);
 
 		double energyB = startSoc >= threshold2 || endSoc <= threshold1 ?
 				0 :
 				Math.min(threshold2, endSoc) - Math.max(threshold1, startSoc);
-		double timeB = energyB / Math.min(charger.getPlugPower(), 1.25 * c);
+		double timeB = energyB / Math.min(charger.getPower(), 1.25 * c);
 
 		double energyC = endSoc <= threshold2 ? 0 : endSoc - Math.max(threshold2, startSoc);
-		double timeC = energyC / Math.min(charger.getPlugPower(), 0.5 * c);
+		double timeC = energyC / Math.min(charger.getPower(), 0.5 * c);
 
 		return timeA + timeB + timeC;
 	}
 
+
 	@Override
 	public double calcChargingPower(Charger charger) {
-		return calcChargingPower(charger.getPlugPower());
+		return calcChargingPower(charger.getPower());
 	}
 }

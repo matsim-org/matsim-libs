@@ -21,10 +21,11 @@ package org.matsim.contrib.socnetsim.framework.replanning.modules;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
+import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.utils.misc.Time;
 
 import java.util.List;
@@ -40,6 +41,7 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 		Logger.getLogger(BlackListedTimeAllocationMutator.class);
 
 	private final double mutationRange;
+	private final StageActivityTypes blackList;
 	private final Random random;
 	private Setting setting = Setting.MUTATE_END;
 
@@ -50,8 +52,10 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 	}
 
 	public BlackListedTimeAllocationMutator(
+			final StageActivityTypes blackList,
 			final double mutationRange,
 			final Random random) {
+		this.blackList = blackList;
 		this.mutationRange = mutationRange;
 		this.random = random;
 		log.debug( "setting initialized to "+setting );
@@ -59,7 +63,7 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 
 	@Override
 	public void run(final Plan plan) {
-		final List<Activity> activities = TripStructureUtils.getActivities( plan, StageActivityHandling.ExcludeStageActivities );
+		final List<Activity> activities = TripStructureUtils.getActivities( plan , blackList );
 		final int nActs = activities.size();
 		// when mutating durations "blindly", avoid creating activities ending before
 		// the previous activity.

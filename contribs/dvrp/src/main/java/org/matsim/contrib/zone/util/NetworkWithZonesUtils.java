@@ -19,17 +19,14 @@
 
 package org.matsim.contrib.zone.util;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.zone.Zone;
 
 public class NetworkWithZonesUtils {
-	// if CRSs of the network and zones are different, zoneFinder should convert between CRSs
+	// if SRSs of the network and zones are different, zoneFinder should convert between CRSs
 	public static Map<Id<Link>, Zone> createLinkToZoneMap(Network network, ZoneFinder zoneFinder) {
 		Map<Id<Link>, Zone> linkToZone = new HashMap<>();
 

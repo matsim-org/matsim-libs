@@ -27,7 +27,7 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author dziemke
  */
-public class BicycleTravelTime implements TravelTime {
+class BicycleTravelTime implements TravelTime {
 
 	@Inject
 	private BicycleLinkSpeedCalculator linkSpeedCalculator;
@@ -39,6 +39,6 @@ public class BicycleTravelTime implements TravelTime {
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 
-		return link.getLength() / linkSpeedCalculator.getMaximumVelocityForLink(link, vehicle);
+		return link.getLength() / linkSpeedCalculator.getMaximumVelocityForLink(link);
 	}
 }

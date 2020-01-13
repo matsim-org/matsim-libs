@@ -33,12 +33,12 @@ public interface Charger extends BasicLocation, Identifiable<Charger> {
 	String getChargerType();
 
 	/**
-	 * @return max power of a single plug, in [W]
+	 * @return max power at a single plug, in [W]
 	 */
-	double getPlugPower();
+	double getPower();
 
 	/**
 	 * @return number of plugs
 	 */
-	int getPlugCount();
+	int getPlugs();
 }

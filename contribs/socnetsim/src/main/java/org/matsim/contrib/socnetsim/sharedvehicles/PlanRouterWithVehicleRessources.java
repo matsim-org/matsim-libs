@@ -47,12 +47,16 @@ public class PlanRouterWithVehicleRessources implements PlanAlgorithm {
 	@Override
 	public void run(final Plan plan) {
 		final List<Trip> oldTrips =
-			TripStructureUtils.getTrips( plan );
+			TripStructureUtils.getTrips(
+					plan,
+					getTripRouter().getStageActivityTypes() );
 
 		delegate.run( plan );
 
 		final List<Trip> newTrips =
-			TripStructureUtils.getTrips( plan );
+			TripStructureUtils.getTrips(
+					plan,
+					getTripRouter().getStageActivityTypes() );
 
 		transmitVehicleInformation(
 				oldTrips,

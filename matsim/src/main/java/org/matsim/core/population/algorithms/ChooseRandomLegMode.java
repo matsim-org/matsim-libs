@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.TripStructureUtils;
 
 import java.util.List;
 import java.util.Random;
@@ -123,7 +122,6 @@ public final class ChooseRandomLegMode implements PlanAlgorithm {
 			if (pe instanceof Leg) {
 				Leg leg = ((Leg) pe);
 				leg.setMode(newMode);
-				TripStructureUtils.setRoutingMode(leg, newMode);
 				Route route = leg.getRoute();
 				if (route instanceof NetworkRoute) {
 					((NetworkRoute) route).setVehicleId(null);

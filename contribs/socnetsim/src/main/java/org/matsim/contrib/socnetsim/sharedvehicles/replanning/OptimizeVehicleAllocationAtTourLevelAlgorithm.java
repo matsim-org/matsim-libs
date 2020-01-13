@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -36,6 +35,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -60,13 +60,13 @@ import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
  */
 public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPlanAlgorithm<GroupPlans> {
 	private final GenericPlanAlgorithm<GroupPlans> randomAllocator;
-	private final Set<String> stageActs;
+	private final StageActivityTypes stageActs;
 	private final Collection<String> vehicularModes;
 	private final boolean allowNullRoutes;
 	private final VehicleRessources vehicleRessources;
 
 	public OptimizeVehicleAllocationAtTourLevelAlgorithm(
-			final Set<String> stageActivitiesForSubtourDetection,
+			final StageActivityTypes stageActivitiesForSubtourDetection,
 			final Random random,
 			final VehicleRessources vehicleRessources,
 			final Collection<String> modes,

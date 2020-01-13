@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Preconditions;
 
 /**
  * Immutable implementation of ChargerSpecification
@@ -37,18 +36,22 @@ public class ImmutableChargerSpecification implements ChargerSpecification {
 	private final Id<Charger> id;
 	private final Id<Link> linkId;
 	private final String chargerType;
-	private final double plugPower;
+	private final double maxPower;
 	private final int plugCount;
 
 	private ImmutableChargerSpecification(Builder builder) {
 		id = Objects.requireNonNull(builder.id);
 		linkId = Objects.requireNonNull(builder.linkId);
 		chargerType = Objects.requireNonNull(builder.chargerType);
-		plugPower = Objects.requireNonNull(builder.plugPower);
+		maxPower = Objects.requireNonNull(builder.maxPower);
 		plugCount = Objects.requireNonNull(builder.plugCount);
 
-		Preconditions.checkArgument(plugPower >= 0, "Negative plugPower of charger: %s", id);
-		Preconditions.checkArgument(plugCount >= 0, "Negative plugCount of charger: %s", id);
+		if (maxPower < 0) {
+			throw new IllegalArgumentException("Negative maxPower of charger: " + id);
+		}
+		if (plugCount < 0) {
+			throw new IllegalArgumentException("Negative plugCount of charger: " + id);
+		}
 	}
 
 	public static Builder newBuilder() {
@@ -60,7 +63,7 @@ public class ImmutableChargerSpecification implements ChargerSpecification {
 		builder.id = copy.getId();
 		builder.linkId = copy.getLinkId();
 		builder.chargerType = copy.getChargerType();
-		builder.plugPower = copy.getPlugPower();
+		builder.maxPower = copy.getMaxPower();
 		builder.plugCount = copy.getPlugCount();
 		return builder;
 	}
@@ -81,8 +84,8 @@ public class ImmutableChargerSpecification implements ChargerSpecification {
 	}
 
 	@Override
-	public double getPlugPower() {
-		return plugPower;
+	public double getMaxPower() {
+		return maxPower;
 	}
 
 	@Override
@@ -96,7 +99,7 @@ public class ImmutableChargerSpecification implements ChargerSpecification {
 				.add("id", id)
 				.add("linkId", linkId)
 				.add("chargerType", chargerType)
-				.add("plugPower", plugPower)
+				.add("maxPower", maxPower)
 				.add("plugCount", plugCount)
 				.toString();
 	}
@@ -105,7 +108,7 @@ public class ImmutableChargerSpecification implements ChargerSpecification {
 		private Id<Charger> id;
 		private Id<Link> linkId;
 		private String chargerType;
-		private Double plugPower;
+		private Double maxPower;
 		private Integer plugCount;
 
 		private Builder() {
@@ -126,8 +129,8 @@ public class ImmutableChargerSpecification implements ChargerSpecification {
 			return this;
 		}
 
-		public Builder plugPower(double val) {
-			plugPower = val;
+		public Builder maxPower(double val) {
+			maxPower = val;
 			return this;
 		}
 

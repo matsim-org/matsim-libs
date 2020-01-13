@@ -25,13 +25,15 @@ package org.matsim.contrib.noise.examples;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.NoiseModule;
-import org.matsim.contrib.noise.NoiseAllocationApproach;
-import org.matsim.contrib.noise.ProcessNoiseImmissions;
+import org.matsim.contrib.noise.data.NoiseAllocationApproach;
+import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.io.IOException;
 
 /**
  * An example how to use the noise module during a MATSim run (= online noise computation).
@@ -48,13 +50,13 @@ public class NoiseOnlineControlerExample {
 	
 	private static final String configFile = "./contribs/noise/test/input/org/matsim/contrib/noise/config.xml";
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 				
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new NoiseModule());
+		controler.addOverridingModule(new NoiseModule(scenario));
 		
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
@@ -66,4 +68,5 @@ public class NoiseOnlineControlerExample {
 		ProcessNoiseImmissions processNoiseImmissions = new ProcessNoiseImmissions(workingDirectory, receiverPointsFile, noiseParameters.getReceiverPointGap());
 		processNoiseImmissions.run();	
 	}
+	
 }

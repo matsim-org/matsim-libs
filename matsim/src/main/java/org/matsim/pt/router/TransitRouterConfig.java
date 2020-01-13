@@ -26,10 +26,11 @@ import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.pt.config.TransitRouterConfigGroup;
+
+import java.util.Map;
 
 /**
  * Design decisions:<ul>
@@ -39,7 +40,6 @@ import org.matsim.pt.config.TransitRouterConfigGroup;
  *
  */
 public class TransitRouterConfig implements MatsimParameters {
-	private static final Logger log = Logger.getLogger( TransitRouterConfig.class ) ;
 
 	/**
 	 * The distance in meters in which stop facilities should be searched for
@@ -118,10 +118,13 @@ public class TransitRouterConfig implements MatsimParameters {
 		
 		// walk:
 		{
-			ModeRoutingParams params = pcrConfig.getModeRoutingParams().get( TransportMode.walk );
+			for( Map.Entry<String, PlansCalcRouteConfigGroup.ModeRoutingParams> entry : pcrConfig.getModeRoutingParams().entrySet() ){
+				Logger.getLogger( this.getClass() ).warn("mode=" + entry.getKey() + "; params=" + entry.getValue()) ;
+			}
+			final PlansCalcRouteConfigGroup.ModeRoutingParams params = pcrConfig.getModeRoutingParams().get( TransportMode.non_network_walk );
 			Gbl.assertNotNull( params );
 			this.beelineDistanceFactor = params.getBeelineDistanceFactor();
-			this.beelineWalkSpeed = params.getTeleportedModeSpeed() / beelineDistanceFactor;
+			this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get( TransportMode.non_network_walk ) / beelineDistanceFactor;
 		}
 		// yyyyyy the two above need to be moved away from walk since otherwise one is not able to move walk routing to network routing!!!!!! Now trying access_walk ...  kai,
 		// apr'19

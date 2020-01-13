@@ -22,8 +22,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.AbstractRoute;
 
-import com.google.common.base.MoreObjects;
-
 /**
  * Assumptions:
  * <ul>
@@ -35,7 +33,7 @@ import com.google.common.base.MoreObjects;
  * @author michalm (Michal Maciejewski)
  */
 public class DrtRoute extends AbstractRoute {
-	public final static String ROUTE_TYPE = TransportMode.drt;
+    public final static String ROUTE_TYPE = TransportMode.drt;
 
 	private double maxWaitTime;
 	private double directRideTime;
@@ -87,14 +85,5 @@ public class DrtRoute extends AbstractRoute {
 			return value;
 		}
 		throw new IllegalArgumentException("Value: " + value + " must be zero or positive");
-	}
-
-	@Override
-	public String toString() {
-		return MoreObjects.toStringHelper(this)
-				.add("maxWaitTime", maxWaitTime)
-				.add("directRideTime", directRideTime)
-				.add("super", super.toString())
-				.toString();
 	}
 }

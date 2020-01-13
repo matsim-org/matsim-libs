@@ -21,7 +21,6 @@ package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
 
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
@@ -46,16 +45,14 @@ public class GroupTourVehicleAllocationFactory extends AbstractConfigurableSelec
 	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
 	private final Provider<TripRouter> tripRouterFactory;
 	private final PlanLinkIdentifier planLinkIdentifier;
-	private final MainModeIdentifier mainModeIdentifier;
 
 	@Inject
-	GroupTourVehicleAllocationFactory( final Scenario sc , final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory , final Provider<TripRouter> tripRouterFactory ,
-			@Strong final PlanLinkIdentifier planLinkIdentifier, MainModeIdentifier mainModeIdentifier ) {
+	public GroupTourVehicleAllocationFactory( final Scenario sc , final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory , final Provider<TripRouter> tripRouterFactory ,
+			@Strong final PlanLinkIdentifier planLinkIdentifier ) {
 		this.sc = sc;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;
 		this.planLinkIdentifier = planLinkIdentifier;
-		this.mainModeIdentifier = mainModeIdentifier;
 	}
 
 
@@ -69,7 +66,7 @@ public class GroupTourVehicleAllocationFactory extends AbstractConfigurableSelec
 						sc.getConfig().global().getNumberOfThreads(),
 						TransportMode.car,
 						(VehicleRessources) sc.getScenarioElement(
-							VehicleRessources.ELEMENT_NAME ), mainModeIdentifier) ) );
+							VehicleRessources.ELEMENT_NAME ), tripRouterFactory) ) );
 
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createReRouteModule(

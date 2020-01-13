@@ -31,7 +31,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
+				<version>2.3.2</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
@@ -153,7 +153,6 @@
 
 	<modules>
 		<module>accessibility</module>
-		<module>accidents</module>
 		<module>analysis</module>
 		<module>av</module>
 		<module>bicycle</module>
@@ -174,7 +173,6 @@
 		<module>minibus</module>
 		<module>multimodal</module>
 		<module>noise</module>
-		<module>osm</module>
 		<module>otfvis</module>
 		<module>parking</module>
 		<module>protobuf</module>
@@ -183,7 +181,6 @@
 		<module>signals</module>
 		<module>socnetsim</module>
 		<module>taxi</module>
-		<module>vsp</module>
 	</modules>
 	<repositories>
 		<repository>
@@ -201,10 +198,6 @@
 		<repository>
 			<id>matsim</id>
 			<url>http://dl.bintray.com/matsim/matsim</url>
-		</repository>
-		<repository>
-			<id>ch.sbb</id>
-			<url>https://schweizerischebundesbahnen.bintray.com/simba.mvn</url>
 		</repository>
 	</repositories>
 

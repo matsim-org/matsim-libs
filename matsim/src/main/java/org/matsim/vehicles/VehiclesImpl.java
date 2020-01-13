@@ -19,22 +19,24 @@
  * *********************************************************************** */
 package org.matsim.vehicles;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.IdMap;
-import org.matsim.core.utils.misc.Counter;
-
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.misc.Counter;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 
 /**
  * @author dgrether
  * @author jwjoubert
  */
-final class VehiclesImpl implements Vehicles {
+class VehiclesImpl implements Vehicles {
 	private final Map<Id<VehicleType>, VehicleType> vehicleTypes;
-	private final Map<Id<Vehicle>, Vehicle> vehicles;
+	private final LinkedHashMap<Id<Vehicle>, Vehicle> vehicles;
 	private final VehiclesFactoryImpl builder;
+	private final ObjectAttributes vehicleAttributes = new ObjectAttributes();
 
 	private final Counter counter = new Counter("[VehiclesImpl] added vehicle # " );
 
@@ -42,9 +44,9 @@ final class VehiclesImpl implements Vehicles {
 	 * deliberately non-public since there is a factory.  kai, nov'11
 	 */
 	VehiclesImpl(){
-		this.vehicleTypes = new IdMap<>(VehicleType.class); // FIXME potential iteration order change
+		this.vehicleTypes = new LinkedHashMap<>();
 		this.builder = new VehiclesFactoryImpl() ;
-		this.vehicles = new IdMap<>(Vehicle.class); // FIXME potential iteration order change
+		this.vehicles = new LinkedHashMap<>();
 	}
 
 
@@ -80,7 +82,7 @@ final class VehiclesImpl implements Vehicles {
 
 		/* Check if the VehicleType associated with the vehicle already exist.
 		 * Here only an error message is given. A RuntimeException is thrown
-		 * when the MatsimVehicleWriter is called (JWJ, '14). */
+		 * when the VehicleWriterV1 is called (JWJ, '14). */
 		if(!this.vehicleTypes.containsKey(v.getType().getId())){
 			throw new IllegalArgumentException("Cannot add Vehicle with type = " + v.getType().getId().toString() +
 					" if the VehicleType has not been added to the Vehicles container.");
@@ -94,7 +96,7 @@ final class VehiclesImpl implements Vehicles {
 	/**
 	 * Removes the vehicle with the given Id
 	 *
-	 * @param vehicleId
+	 * @param v
 	 */
 	@Override
 	public void removeVehicle(final Id<Vehicle> vehicleId) {
@@ -128,4 +130,10 @@ final class VehiclesImpl implements Vehicles {
 		}
 		this.vehicleTypes.remove(vehicleTypeId);
 	}
+
+	@Override
+	public ObjectAttributes getVehicleAttributes() {
+		return this.vehicleAttributes;
+	}
+
 }

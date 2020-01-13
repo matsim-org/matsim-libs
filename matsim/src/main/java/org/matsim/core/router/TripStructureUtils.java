@@ -23,9 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -43,16 +40,13 @@ import org.matsim.core.gbl.Gbl;
  * Two versions of the methods are provided, working on {@link Plan}s
  * or lists of {@link PlanElement}s.
  * <br>
- * The methods require {@link StageActivityHandling} as a parameter,
- * which is used to decide whether dummy activities such as pt interaction should be
- * handled like normal activities or ignored.
+ * The methods require an instance of {@link StageActivityTypes} as a parameter,
+ * which is used to identify the dummy activities pertaining to trips.
+ * In almost all use-cases, it should come from {@link TripRouter#getStageActivityTypes()}.
  *
  * @author thibautd
  */
 public class TripStructureUtils {
-	private static final Logger log = Logger.getLogger(TripStructureUtils.class);
-	
-	public enum StageActivityHandling { StagesAsNormalActivities, ExcludeStageActivities };
 
 	private TripStructureUtils() {}
 
@@ -75,32 +69,23 @@ public class TripStructureUtils {
 
 	public static List<Activity> getActivities(
 			final Plan plan,
-			final StageActivityHandling stageActivityHandling) {
+			final StageActivityTypes stageActivities) {
 		return getActivities(
 				plan.getPlanElements(),
-				stageActivityHandling);
+				stageActivities);
 	}
 
 	public static List<Activity> getActivities(
 			final List<? extends PlanElement> planElements,
-			final StageActivityHandling stageActivityHandling) {
+			final StageActivityTypes stageActivities) {
 		final List<Activity> activities = new ArrayList<>();
 
 		for (PlanElement pe : planElements) {
 			if ( !(pe instanceof Activity) ) continue;
 			final Activity act = (Activity) pe;
 
-			switch (stageActivityHandling) {
-			case StagesAsNormalActivities:
-				activities.add(act);
-				break;
-			case ExcludeStageActivities:
-				if (!(StageActivityTypeIdentifier.isStageActivity(act.getType()))) {
-					activities.add(act);
-				}
-				break;
-			default:
-				throw new RuntimeException(Gbl.NOT_IMPLEMENTED);
+			if ( stageActivities == null || !stageActivities.isStageActivity( act.getType() ) ) {
+				activities.add( act );
 			}
 		}
 
@@ -109,33 +94,16 @@ public class TripStructureUtils {
 	}
 
 	public static List<Trip> getTrips(
-			final Plan plan) {
-		return getTrips(
-				plan.getPlanElements());
-	}
-
-	// for contrib socnetsim only
-	@Deprecated
-	public static List<Trip> getTrips(
 			final Plan plan,
-			final Set<String> stageActivityTypes) {
+			final StageActivityTypes stageActivities) {
 		return getTrips(
 				plan.getPlanElements(),
-				stageActivityTypes);
+				stageActivities);
 	}
 
-	@SuppressWarnings("unchecked") // we pass an empty set, it does not matter what type could theoretically be in that empty set
-	public static List<Trip> getTrips(
-			final List<? extends PlanElement> planElements) {
-		
-		return getTrips(planElements, Collections.EMPTY_SET);
-	}
-
-	// for contrib socnetsim only
-	@Deprecated
 	public static List<Trip> getTrips(
 			final List<? extends PlanElement> planElements,
-			final Set<String> stageActivityTypes) {
+			final StageActivityTypes stageActivities) {
 		final List<Trip> trips = new ArrayList<>();
 
 		int originActivityIndex = -1;
@@ -146,8 +114,7 @@ public class TripStructureUtils {
 			if ( !(pe instanceof Activity) ) continue;
 			final Activity act = (Activity) pe;
 
-			if (StageActivityTypeIdentifier.isStageActivity( act.getType() ) || 
-					stageActivityTypes.contains( act.getType() )) continue;
+			if (stageActivities.isStageActivity( act.getType() )) continue;
 			if ( currentIndex - originActivityIndex > 1 ) {
 				// which means, if I am understanding this right, that two activities without a leg in between will not be considered
 				// a trip.  
@@ -173,9 +140,11 @@ public class TripStructureUtils {
 	}
 
 	public static Collection<Subtour> getSubtours(
-            final Plan plan) {
+            final Plan plan,
+            final StageActivityTypes stageActivityTypes) {
 		return getSubtours(
-				plan.getPlanElements()
+				plan.getPlanElements(),
+				stageActivityTypes
         );
 	}
 
@@ -207,34 +176,14 @@ public class TripStructureUtils {
 	 * @throws RuntimeException if the Trip sequence has inconsistent location
 	 * sequence
 	 */
-	@SuppressWarnings("unchecked") // we pass an empty set, it does not matter what type could theoretically be in that empty set
-	public static Collection<Subtour> getSubtours(
-            final List<? extends PlanElement> planElements) {
-
-		return getSubtours(planElements, Collections.EMPTY_SET);
-	}
-
-	// for contrib socnetsim only
-	@Deprecated
-	public static Collection<Subtour> getSubtours(
-            final Plan plan,
-            final Set<String> stageActivityTypes) {
-		return getSubtours(
-				plan.getPlanElements(),
-				stageActivityTypes
-        );
-	}
-	
-	// for contrib socnetsim only
-	@Deprecated
 	public static Collection<Subtour> getSubtours(
             final List<? extends PlanElement> planElements,
-            final Set<String> stageActivityTypes) {
+            final StageActivityTypes stageActivityTypes) {
 		final List<Subtour> subtours = new ArrayList<>();
 
 		Id<?> destinationId = null;
 		final List<Id<?>> originIds = new ArrayList<>();
-		final List<Trip> trips = getTrips( planElements, stageActivityTypes );
+		final List<Trip> trips = getTrips( planElements , stageActivityTypes );
 		final List<Trip> nonAllocatedTrips = new ArrayList<>( trips );
 		for (Trip trip : trips) {
             final Id<?> originId;
@@ -511,17 +460,15 @@ public class TripStructureUtils {
 			return "Subtour: "+trips.toString();
 		}
 	}
-
 	@Deprecated // use findTripAtPlanElement(...) instead.
-	public static Trip findCurrentTrip( PlanElement pe, Plan plan ) {
-		return findTripAtPlanElement( pe, plan ) ;
+	public static Trip findCurrentTrip( PlanElement pe, Plan plan, StageActivityTypes sat ) {
+		return findTripAtPlanElement( pe, plan, sat ) ;
 	}
-
-	public static Trip findTripAtPlanElement( PlanElement currentPlanElement, Plan plan ) {
+	public static Trip findTripAtPlanElement( PlanElement currentPlanElement, Plan plan, StageActivityTypes stageActivities ) {
 		if ( currentPlanElement instanceof Activity ) {
-			Gbl.assertIf( StageActivityTypeIdentifier.isStageActivity( ((Activity)currentPlanElement).getType() ) ) ;
+			Gbl.assertIf( stageActivities.isStageActivity( ((Activity)currentPlanElement).getType() ) ) ;
 		}
-		List<Trip> trips = getTrips(plan.getPlanElements()) ;
+		List<Trip> trips = getTrips(plan.getPlanElements(), stageActivities ) ;
 		for ( Trip trip : trips ) {
 			int index = trip.getTripElements().indexOf( currentPlanElement ) ;
 			if ( index != -1 ) {
@@ -530,10 +477,9 @@ public class TripStructureUtils {
 		}
 		return null ;
 	}
-	
-	public static Trip findTripEndingAtActivity(Activity activity, Plan plan) {
-		Gbl.assertIf( ! StageActivityTypeIdentifier.isStageActivity( activity.getType()) ) ;
-		List<Trip> trips = getTrips(plan.getPlanElements()) ;
+	public static Trip findTripEndingAtActivity(Activity activity, Plan plan, StageActivityTypes stageActivities ) {
+		Gbl.assertIf( ! stageActivities.isStageActivity( activity.getType()) ) ;
+		List<Trip> trips = getTrips(plan.getPlanElements(), stageActivities ) ;
 		for ( Trip trip : trips ) {
 			if ( activity.equals( trip.getDestinationActivity() ) ) {
 				return trip;
@@ -541,10 +487,9 @@ public class TripStructureUtils {
 		}
 		return null ;
 	}
-	
-	public static Trip findTripStartingAtActivity( final Activity activity, final Plan plan ) {
-		Gbl.assertIf( ! StageActivityTypeIdentifier.isStageActivity( activity.getType()) ) ;
-		List<Trip> trips = getTrips( plan ) ;
+	public static Trip findTripStartingAtActivity( final Activity activity, final Plan plan, StageActivityTypes stageActivities ) {
+		Gbl.assertIf( ! stageActivities.isStageActivity( activity.getType()) ) ;
+		List<Trip> trips = getTrips( plan, stageActivities ) ;
 		for ( Trip trip : trips ) {
 			if ( trip.getOriginActivity().equals( activity ) ) {
 				return trip ;
@@ -553,39 +498,6 @@ public class TripStructureUtils {
 		return null ;
 	}
 
-	public static String getRoutingMode(Leg leg) {
-		return (String) leg.getAttributes().getAttribute("routingMode");
-	}
-
-	public static void setRoutingMode(Leg leg, String mode) {
-		if ( mode != null ){
-			leg.getAttributes().putAttribute( "routingMode", mode );
-		} else {
-			leg.getAttributes().removeAttribute(  "routingMode" ) ;
-		}
-	}
-
-	@Deprecated // if we make the routing mode identifier replaceable via Guice/Inject, we should return that one here or get rid of the method
-	public static MainModeIdentifier getRoutingModeIdentifier() {
-		return new RoutingModeMainModeIdentifier();
-	}
-
-	public static String identifyMainMode( final List<? extends PlanElement> tripElements) {
-		// first try the routing mode:
-		String mode = TripStructureUtils.getRoutingMode(((Leg) tripElements.get( 0 )));
-		// else see if trip has only one leg, if so, use that mode (situation after initial demand generation)
-		if ( mode == null && tripElements.size()==1 ) {
-			mode = ((Leg) tripElements.get(0)).getMode() ;
-		}
-		if (mode == null) {
-			log.error("Could not find routing mode for trip " + tripElements);
-		}
-		return mode;
-	}
-
-	public static boolean isStageActivityType( String activityType ) {
-		return StageActivityTypeIdentifier.isStageActivity( activityType ) ;
-	}
 
 }
 

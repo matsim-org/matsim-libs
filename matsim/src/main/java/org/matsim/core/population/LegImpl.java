@@ -22,7 +22,6 @@ package org.matsim.core.population;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
@@ -48,9 +47,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	@Override
 	public final void setMode(String transportMode) {
 		this.mode = transportMode;
-		TripStructureUtils.setRoutingMode( this, null );
-//		TripStructureUtils.setRoutingMode( this, null ); // setting routingMode to null leads to exceptions in AttributesXmlWriterDelegate.writeAttributes() : Class<?> clazz = objAttribute.getValue().getClass();
-		// (yyyy or maybe "transportMode" instead of "null"?? kai, oct'19)
 	}
 
 	@Override

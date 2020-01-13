@@ -36,5 +36,5 @@ public interface QVehicle extends QItem, MobsimVehicle {
 	
 	double getMaximumVelocity();
 	
-	double getSizeInEquivalents();
+	double getFlowCapacityConsumptionInEquivalents();
 }

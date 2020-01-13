@@ -21,7 +21,6 @@ package org.matsim.core.router;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -46,8 +45,6 @@ import org.matsim.vehicles.Vehicle;
  * @author thibautd
  */
 public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
-	private static final Logger log = Logger.getLogger( PlanRouter.class ) ;
-	
 	private final TripRouter tripRouter;
 	private final ActivityFacilities facilities;
 
@@ -86,14 +83,12 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 
 	@Override
 	public void run(final Plan plan) {
-		final List<Trip> trips = TripStructureUtils.getTrips( plan );
+		final List<Trip> trips = TripStructureUtils.getTrips( plan , tripRouter.getStageActivityTypes() );
 
 		for (Trip oldTrip : trips) {
-			final String routingMode = TripStructureUtils.identifyMainMode( oldTrip.getTripElements() );
-			log.debug( "about to call TripRouter with routingMode=" + routingMode ) ;
 			final List<? extends PlanElement> newTrip =
 					tripRouter.calcRoute(
-							routingMode,
+							tripRouter.getMainModeIdentifier().identifyMainMode( oldTrip.getTripElements() ),
 						  FacilitiesUtils.toFacility( oldTrip.getOriginActivity(), facilities ),
 						  FacilitiesUtils.toFacility( oldTrip.getDestinationActivity(), facilities ),
 							calcEndOfActivity( oldTrip.getOriginActivity() , plan, tripRouter.getConfig() ),

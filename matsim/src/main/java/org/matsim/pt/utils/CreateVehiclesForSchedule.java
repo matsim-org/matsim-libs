@@ -27,6 +27,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
@@ -50,10 +51,10 @@ public class CreateVehiclesForSchedule {
 	public void run() {
 		VehiclesFactory vb = this.vehicles.getFactory();
 		VehicleType vehicleType = vb.createVehicleType(Id.create("defaultTransitVehicleType", VehicleType.class));
-//		VehicleCapacity capacity = new VehicleCapacity();
-		vehicleType.getCapacity().setSeats( 101 );
-		vehicleType.getCapacity().setStandingRoom( 0 );
-//		vehicleType.setCapacity(capacity);
+		VehicleCapacity capacity = new VehicleCapacityImpl();
+		capacity.setSeats(Integer.valueOf(101));
+		capacity.setStandingRoom(Integer.valueOf(0));
+		vehicleType.setCapacity(capacity);
 		this.vehicles.addVehicleType(vehicleType);
 
 		long vehId = 0;

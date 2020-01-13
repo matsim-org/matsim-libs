@@ -28,8 +28,6 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.taxi.schedule.TaxiDropoffTask;
 import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
 
-import com.google.common.base.MoreObjects;
-
 /**
  * @author michalm
  */
@@ -150,16 +148,6 @@ public class TaxiRequest implements PassengerRequest {
 
 	@Override
 	public String toString() {
-		return MoreObjects.toStringHelper(this)
-				.add("id", id)
-				.add("submissionTime", submissionTime)
-				.add("earliestStartTime", earliestStartTime)
-				.add("passengerId", passengerId)
-				.add("mode", mode)
-				.add("fromLink", fromLink)
-				.add("toLink", toLink)
-				.add("pickupTask", pickupTask)
-				.add("dropoffTask", dropoffTask)
-				.toString();
+		return Request.toString(this);
 	}
 }

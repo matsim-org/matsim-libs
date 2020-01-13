@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -49,7 +48,9 @@ public class TripStructureUtilsTest {
 	private static final PopulationFactory populationFactory =
             ScenarioUtils.createScenario(
 	        ConfigUtils.createConfig()).getPopulation().getFactory();
-    private static final String dummyType = "dummy interaction";
+    private static final String dummyType = "dummy";
+	private static final StageActivityTypes stageActivities =
+		new StageActivityTypesImpl( dummyType );
 
 	private final List<Fixture> fixtures = new ArrayList<Fixture>();
 	private static class Fixture {
@@ -332,7 +333,7 @@ public class TripStructureUtilsTest {
 			final List<Activity> acts =
 				TripStructureUtils.getActivities(
 						fixture.plan, 
-						StageActivityHandling.ExcludeStageActivities);
+						stageActivities);
 
 			assertEquals(
 					"unexpected number of activities in "+acts+" for fixture "+fixture.name,
@@ -342,7 +343,7 @@ public class TripStructureUtilsTest {
 			for (Activity act : acts) {
 				assertFalse(
 						"found a dummy act in "+acts+" for fixture "+fixture.name,
-						StageActivityTypeIdentifier.isStageActivity( act.getType() ));
+						stageActivities.isStageActivity( act.getType() ));
 			}
 		}
 	}
@@ -351,7 +352,9 @@ public class TripStructureUtilsTest {
 	public void testTrips() throws Exception {
 		for (Fixture fixture : fixtures) {
 			final List<Trip> trips =
-				TripStructureUtils.getTrips(fixture.plan);
+				TripStructureUtils.getTrips(
+						fixture.plan, 
+						stageActivities);
 
 			assertEquals(
 					"unexpected number of trips in "+trips+" for fixture "+fixture.name,
@@ -363,7 +366,7 @@ public class TripStructureUtilsTest {
 					if (pe instanceof Leg) continue;
 					assertTrue(
 							"found a non-dummy act in "+trip.getTripElements()+" for fixture "+fixture.name,
-							StageActivityTypeIdentifier.isStageActivity( ((Activity) pe).getType() ));
+							stageActivities.isStageActivity( ((Activity) pe).getType() ));
 				}
 
 				final int indexOfStart =
@@ -389,7 +392,9 @@ public class TripStructureUtilsTest {
 	public void testLegs() throws Exception {
 		for (Fixture fixture : fixtures) {
 			final List<Trip> trips =
-				TripStructureUtils.getTrips(fixture.plan);
+				TripStructureUtils.getTrips(
+						fixture.plan, 
+						stageActivities);
 
 			int countLegs = 0;
 			for (Trip trip : trips) {
@@ -420,7 +425,7 @@ public class TripStructureUtilsTest {
 					"type",
 						new Coord((double) 0, (double) 0)) );
 
-		TripStructureUtils.getSubtours( plan );
+		TripStructureUtils.getSubtours( plan , EmptyStageActivityTypes.INSTANCE );
 	}
 }
 

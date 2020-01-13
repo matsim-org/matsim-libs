@@ -23,14 +23,14 @@ package org.matsim.facilities;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.utils.objectattributes.FailingObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -51,9 +51,11 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, SearchableAct
 	private final ActivityFacilitiesFactory factory ;
 	private final Attributes attributes = new Attributes();
 
-	private final IdMap<ActivityFacility, ActivityFacility> facilities = new IdMap<>(ActivityFacility.class); // FIXME potential iteration order change
+	private final Map<Id<ActivityFacility>, ActivityFacility> facilities = new LinkedHashMap<>();
 
 	private String name;
+
+	private final ObjectAttributes facilityAttributes = new ObjectAttributes();
 
 	private QuadTree<ActivityFacility> facilitiesQuadTree;
 
@@ -141,8 +143,8 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, SearchableAct
 	}
 
 	@Override
-	public FailingObjectAttributes getFacilityAttributes() {
-		return FailingObjectAttributes.createFacilitiesAttributes();
+	public ObjectAttributes getFacilityAttributes() {
+		return this.facilityAttributes;
 	}
 	
 	@Override

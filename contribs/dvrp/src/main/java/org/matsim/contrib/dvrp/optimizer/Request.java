@@ -33,4 +33,8 @@ public interface Request extends Identifiable<Request> {
 	 * @return time at which the request was submitted
 	 */
 	double getSubmissionTime();
+
+	static String toString(Request request) {
+		return "[id=" + request.getId() + "][submissionTime=" + request.getSubmissionTime() + "]";
+	}
 }

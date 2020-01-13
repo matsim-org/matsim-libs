@@ -186,8 +186,14 @@ class LinkToLinkRoutingModule implements RoutingModule
                     .get(Id.create(invLink.getFromNode().getId(), Link.class));
             Link toLink = network.getLinks()
                     .get(Id.create(invLink.getToNode().getId(), Link.class));
-            return linkToLinkTravelTime.getLinkToLinkTravelTime(fromLink, toLink, time, person, vehicle);
+            return linkToLinkTravelTime.getLinkToLinkTravelTime(fromLink, toLink, time);
         }
     }
 
+
+    @Override
+    public StageActivityTypes getStageActivityTypes()
+    {
+		return EmptyStageActivityTypes.INSTANCE;
+    }
 }

@@ -21,11 +21,11 @@ package org.matsim.core.population.algorithms;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.MainModeIdentifier;
+import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -38,22 +38,27 @@ import org.matsim.core.router.TripStructureUtils.Trip;
  * @author thibautd
  */
 public final class TripsToLegsAlgorithm implements PlanAlgorithm {
+	private final StageActivityTypes blackList;
 	private final MainModeIdentifier mainModeIdentifier;
 
 	public TripsToLegsAlgorithm(final TripRouter router) {
-		this( TripStructureUtils.getRoutingModeIdentifier() );
+		this(
+				router.getStageActivityTypes(),
+				router.getMainModeIdentifier() );
 	}
 
 
 	public TripsToLegsAlgorithm(
+			final StageActivityTypes blackList,
 			final MainModeIdentifier mainModeIdentifier) {
+		this.blackList = blackList;
 		this.mainModeIdentifier = mainModeIdentifier;
 	}
 
 	@Override
 	public void run(final Plan plan) {
 		final List<PlanElement> planElements = plan.getPlanElements();
-		final List<Trip> trips = TripStructureUtils.getTrips( plan );
+		final List<Trip> trips = TripStructureUtils.getTrips( plan , blackList );
 
 		for ( Trip trip : trips ) {
 			final List<PlanElement> fullTrip =
@@ -62,9 +67,7 @@ public final class TripsToLegsAlgorithm implements PlanAlgorithm {
 						planElements.indexOf( trip.getDestinationActivity() ));
 			final String mode = mainModeIdentifier.identifyMainMode( fullTrip );
 			fullTrip.clear();
-			Leg leg = PopulationUtils.createLeg(mode);
-			TripStructureUtils.setRoutingMode(leg, mode);
-			fullTrip.add( leg );
+			fullTrip.add( PopulationUtils.createLeg(mode) );
 			if ( fullTrip.size() != 1 ) throw new RuntimeException( fullTrip.toString() );
 		}
 	}

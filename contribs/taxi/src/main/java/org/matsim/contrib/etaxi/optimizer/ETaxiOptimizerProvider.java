@@ -28,6 +28,7 @@ import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentETaxiOptimizerPar
 import org.matsim.contrib.etaxi.optimizer.rules.RuleBasedETaxiOptimizer;
 import org.matsim.contrib.etaxi.optimizer.rules.RuleBasedETaxiOptimizerParams;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -66,16 +67,25 @@ public class ETaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 
 	@Override
 	public TaxiOptimizer get() {
-		String type = taxiCfg.getTaxiOptimizerParams().getName();
-		if (type.equals(RuleBasedETaxiOptimizerParams.SET_NAME)) {
-			return RuleBasedETaxiOptimizer.create(eventsManager, taxiCfg, fleet, eScheduler, network, timer, travelTime,
-					travelDisutility, chargingInfrastructure);
-		} else if (type.equals(AssignmentETaxiOptimizerParams.SET_NAME)) {
-			return AssignmentETaxiOptimizer.create(eventsManager, taxiCfg, fleet, network, timer, travelTime,
-					travelDisutility, eScheduler, chargingInfrastructure);
-		} else {
-			throw new RuntimeException("Unsupported taxi optimizer type: " + taxiCfg.getTaxiOptimizerParams().
-					getName());
+		switch (taxiCfg.getTaxiOptimizerParams().getName()) {
+			case RuleBasedETaxiOptimizerParams.SET_NAME:
+				return RuleBasedETaxiOptimizer.create(eventsManager, taxiCfg, fleet, eScheduler, network, timer,
+						travelTime, travelDisutility, chargingInfrastructure);
+			case AssignmentETaxiOptimizerParams.SET_NAME:
+				return AssignmentETaxiOptimizer.create(eventsManager, taxiCfg, fleet, network, timer, travelTime,
+						travelDisutility, eScheduler, chargingInfrastructure);
+		}
+		throw new RuntimeException("Unsupported taxi optimizer type: " + taxiCfg.getTaxiOptimizerParams().getName());
+	}
+
+	public static AbstractTaxiOptimizerParams createParameterSet(String type) {
+		switch (type) {
+			case AssignmentETaxiOptimizerParams.SET_NAME:
+				return new AssignmentETaxiOptimizerParams();
+			case RuleBasedETaxiOptimizerParams.SET_NAME:
+				return new RuleBasedETaxiOptimizerParams();
+			default:
+				return null;
 		}
 	}
 }

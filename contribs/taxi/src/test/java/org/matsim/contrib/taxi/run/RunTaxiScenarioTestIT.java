@@ -46,13 +46,13 @@ public class RunTaxiScenarioTestIT {
 	}
 
 	private void runMielec(String plansFile, String taxisFile) {
-		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_config.xml");
-		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup(),
-				new OTFVisConfigGroup());
+		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_config.xml");
+		TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
+		Config config = ConfigUtils.loadConfig(configUrl, taxiCfg, new DvrpConfigGroup(), new OTFVisConfigGroup());
 		config.plans().setInputFile(plansFile);
-		TaxiConfigGroup.getSingleModeTaxiConfig(config).setTaxisFile(taxisFile);
+		taxiCfg.setTaxisFile(taxisFile);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setDumpDataAtEnd(false);
-		TaxiControlerCreator.createControlerWithSingleModeTaxi(config, false).run();
+		TaxiControlerCreator.createControlerWithSingleModeDrt(config, false).run();
 	}
 }

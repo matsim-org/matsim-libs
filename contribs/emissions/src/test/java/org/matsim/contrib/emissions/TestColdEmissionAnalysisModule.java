@@ -20,7 +20,8 @@
 
 package org.matsim.contrib.emissions;
 
-import org.apache.log4j.Logger;
+import java.util.*;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -33,10 +34,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import java.util.*;
-
-import static org.matsim.contrib.emissions.HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
-import static org.matsim.contrib.emissions.HbefaVehicleCategory.PASSENGER_CAR;
+import static org.matsim.contrib.emissions.HbefaVehicleCategory.*;
 
 
 /**
@@ -61,7 +59,6 @@ import static org.matsim.contrib.emissions.HbefaVehicleCategory.PASSENGER_CAR;
  */
 
 public class TestColdEmissionAnalysisModule {
-	private static final Logger logger = Logger.getLogger(TestColdEmissionAnalysisModule.class);
 	
 	private ColdEmissionAnalysisModule coldEmissionAnalysisModule;
 	
@@ -158,15 +155,12 @@ public class TestColdEmissionAnalysisModule {
 		testCases.add( testCase6 );
 		
 		for ( List<Object> tc : testCases ) {
-			logger.info("Running testcase: " + testCases.indexOf( tc ) + " " + tc.toString());
 			HandlerToTestEmissionAnalysisModules.reset();
 			Id<Link> linkId = Id.create( "linkId" + testCases.indexOf( tc ), Link.class );
 			Id<Vehicle> vehicleId = Id.create( "vehicleId" + testCases.indexOf( tc ), Vehicle.class );
 			Id<VehicleType> vehicleTypeId = Id.create( tc.get( 0 ) + ";" + tc.get( 1 ) + ";" + tc.get( 2 ) + ";" + tc.get( 3 ), VehicleType.class );
 			
 			Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleId, VehicleUtils.getFactory().createVehicleType( vehicleTypeId ) );
-			logger.info("VehicleId: " + vehicle.getId().toString());
-			logger.info("VehicleTypeId: " + vehicle.getType().getId());
 			
 			coldEmissionAnalysisModule.calculateColdEmissionsAndThrowEvent( linkId, vehicle, startTime, parkingDuration, tableAccDistance );
 			String message = "The expected emissions for " + tc.toString() + " are " +
@@ -252,14 +246,8 @@ public class TestColdEmissionAnalysisModule {
 		Double rescaleFactor = -.001;
 		
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		if ( (Boolean) true ==null ) {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
-		} else if ( true ) {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
-		} else {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
-		}
-
+		ecg.setUsingVehicleTypeIdAsVehicleDescription( true );
+		
 		ColdEmissionAnalysisModule ceam = new ColdEmissionAnalysisModule( new ColdEmissionAnalysisModuleParameter( avgHbefaColdTable, detailedHbefaColdTable, pollutants, ecg), emissionEventManager, rescaleFactor );
 		HandlerToTestEmissionAnalysisModules.reset();
 		
@@ -286,13 +274,7 @@ public class TestColdEmissionAnalysisModule {
 		
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		if ( (Boolean) true ==null ) {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
-		} else if ( true ) {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
-		} else {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
-		}
+		ecg.setUsingVehicleTypeIdAsVehicleDescription( true );
 		coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( new ColdEmissionAnalysisModuleParameter( avgHbefaColdTable, detailedHbefaColdTable, pollutants , ecg), emissionEventManager, null );
 		
 	}

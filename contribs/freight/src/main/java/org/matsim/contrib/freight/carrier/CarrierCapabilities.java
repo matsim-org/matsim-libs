@@ -1,9 +1,11 @@
 package org.matsim.contrib.freight.carrier;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 /**
@@ -28,11 +30,11 @@ public class CarrierCapabilities {
 		
 		public static Builder newInstance(){ return new Builder(); }
 		
-		private Collection<VehicleType> vehicleTypes = new ArrayList<VehicleType>();
-
-		private Map<Id<Vehicle>, CarrierVehicle> vehicles = new LinkedHashMap<>();
+		private Collection<CarrierVehicleType> vehicleTypes = new ArrayList<CarrierVehicleType>();
 		
-		private Set<Id<org.matsim.vehicles.VehicleType>> typeIds = new HashSet<>();
+		private Collection<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>();
+		
+		private Set<Id<VehicleType>> typeIds = new HashSet<>();
 		
 		private FleetSize fleetSize = FleetSize.FINITE;
 		
@@ -41,7 +43,7 @@ public class CarrierCapabilities {
 			return this;
 		}
 		
-		public Builder addType( VehicleType type ){
+		public Builder addType(CarrierVehicleType type){
 			if(!typeIds.contains(type.getId())){
 				vehicleTypes.add(type);
 				typeIds.add(type.getId());
@@ -50,8 +52,8 @@ public class CarrierCapabilities {
 		}
 		
 		public Builder addVehicle(CarrierVehicle carrierVehicle){
-			vehicles.put(carrierVehicle.getId(), carrierVehicle);
-			if(carrierVehicle.getType() != null) addType(carrierVehicle.getType() );
+			vehicles.add(carrierVehicle);
+			if(carrierVehicle.getVehicleType() != null) addType(carrierVehicle.getVehicleType());
 			return this;
 		}
 		
@@ -81,9 +83,9 @@ public class CarrierCapabilities {
 		this.fleetSize = builder.fleetSize;
 	}
 	
-	private Map<Id<Vehicle>, CarrierVehicle> carrierVehicles = new LinkedHashMap<>();
+	private Collection<CarrierVehicle> carrierVehicles = new ArrayList<CarrierVehicle>();
 	
-	private Collection<VehicleType> vehicleTypes = new ArrayList<VehicleType>();
+	private Collection<CarrierVehicleType> vehicleTypes = new ArrayList<CarrierVehicleType>();
 	
 	
 	/**
@@ -107,7 +109,7 @@ public class CarrierCapabilities {
 	 * @return collection of carrierVehicles
 	 * @see CarrierVehicle
 	 */
-	public Map<Id<Vehicle>, CarrierVehicle> getCarrierVehicles() {
+	public Collection<CarrierVehicle> getCarrierVehicles() {
 		return carrierVehicles;
 	}
 	
@@ -128,9 +130,9 @@ public class CarrierCapabilities {
 	 * Returns a collection of CarrierVehicleTypes.
 	 * 
 	 * @return a collection of vehicleTypes
-	 * @see VehicleType
+	 * @see CarrierVehicleType
 	 */
-	public Collection<VehicleType> getVehicleTypes() {
+	public Collection<CarrierVehicleType> getVehicleTypes() {
 		return vehicleTypes;
 	}
 

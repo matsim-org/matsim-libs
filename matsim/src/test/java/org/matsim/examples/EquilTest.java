@@ -22,9 +22,6 @@ package org.matsim.examples;
 
 import java.util.Arrays;
 import java.util.Collection;
-
-import org.apache.log4j.Logger;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,11 +30,10 @@ import org.junit.runners.Parameterized.Parameters;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSimBuilder;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.io.PopulationReader;
@@ -48,10 +44,9 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 @RunWith(Parameterized.class)
-public class EquilTest  {
-	private static final Logger log = Logger.getLogger( EquilTest.class ) ;
+public class EquilTest extends MatsimTestCase {
 	
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
 
 	private final boolean isUsingFastCapacityUpdate;
 
@@ -67,20 +62,21 @@ public class EquilTest  {
 
 	@Test
 	public void testEquil() {
-		Config config = ConfigUtils.createConfig() ;
-		config.controler().setOutputDirectory( utils.getOutputDirectory() );
-		config.qsim().setUsingFastCapacityUpdate(this.isUsingFastCapacityUpdate);
-		config.facilities().setFacilitiesSource( FacilitiesConfigGroup.FacilitiesSource.onePerActivityLinkInPlansFile );
+		Config c = loadConfig(null);
+		
+		c.qsim().setUsingFastCapacityUpdate(this.isUsingFastCapacityUpdate);
 		
 		String netFileName = "test/scenarios/equil/network.xml";
 		String popFileName = "test/scenarios/equil/plans100.xml";
 
-		System.out.println( utils.getInputDirectory() );
-		String referenceFileName = utils.getInputDirectory() + "events.xml.gz";
+		String referenceFileName ;
 		
-		String eventsFileName = utils.getOutputDirectory() + "events.xml.gz";
+		System.out.println(helper.getInputDirectory());
+		referenceFileName = helper.getInputDirectory() + "events.xml.gz";
+		
+		String eventsFileName = getOutputDirectory() + "events.xml.gz";
 
-		MutableScenario scenario = ScenarioUtils.createMutableScenario(config );
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(c);
 
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(netFileName);
 
@@ -93,7 +89,6 @@ public class EquilTest  {
 
 		//		SimulationTimer.setTime(0); // I don't think this is needed. kai, may'10
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-
 		new QSimBuilder(scenario.getConfig()) //
 			.useDefaults() //
 			.build(scenario, events) //
@@ -101,7 +96,6 @@ public class EquilTest  {
 
 		writer.closeFile();
 
-		final EventsFileComparator.Result result = EventsFileComparator.compare( referenceFileName , eventsFileName );
-		Assert.assertEquals("different event files.", EventsFileComparator.Result.FILES_ARE_EQUAL, result );
+		assertEquals("different event files.", EventsFileComparator.compareAndReturnInt(referenceFileName, eventsFileName), 0);
 	}
 }

@@ -19,16 +19,17 @@
 
 package org.matsim.contrib.parking.parkingsearch.DynAgent.agentLogic;
 
-import org.apache.log4j.Logger;
+import java.util.Iterator;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.dynagent.*;
 import org.matsim.contrib.parking.parkingsearch.DynAgent.ParkingDynLeg;
 import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.contrib.parking.parkingsearch.manager.ParkingSearchManager;
+import org.matsim.contrib.parking.parkingsearch.manager.WalkLegFactory;
 import org.matsim.contrib.parking.parkingsearch.manager.vehicleteleportationlogic.VehicleTeleportationLogic;
 import org.matsim.contrib.parking.parkingsearch.routing.ParkingRouter;
 import org.matsim.contrib.parking.parkingsearch.search.ParkingSearchLogic;
@@ -36,15 +37,9 @@ import org.matsim.contrib.parking.parkingsearch.sim.ParkingSearchConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.LinkWrapperFacility;
-import org.matsim.core.router.RoutingModule;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.facilities.Facility;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.Iterator;
-import java.util.List;
 
 
 /**
@@ -67,11 +62,9 @@ public class ParkingAgentLogic implements DynAgentLogic {
 	protected LastParkActionState lastParkActionState;
 	protected DynAgent agent;
 	protected Iterator<PlanElement> planElemIter;
-	protected Plan plan;
 	protected PlanElement currentPlanElement;
 	protected ParkingSearchManager parkingManager;
-	private RoutingModule walkRouter;
-	private Network network;
+	protected WalkLegFactory walkLegFactory;
 	protected ParkingRouter parkingRouter;
 	protected MobsimTimer timer;
 	protected EventsManager events;
@@ -81,20 +74,15 @@ public class ParkingAgentLogic implements DynAgentLogic {
 	protected Id<Vehicle> currentlyAssignedVehicleId = null;
 	protected String stageInteractionType = null;
 	private ParkingSearchConfigGroup configGroup;
-	private static final Logger log = Logger.getLogger(ParkingAgentLogic.class);
 
 	/**
 	 * @param plan
 	 *            (always starts with Activity)
 	 */
-	public ParkingAgentLogic(Plan plan, ParkingSearchManager parkingManager, RoutingModule walkRouter,  Network network, 
-			ParkingRouter parkingRouter, EventsManager events, ParkingSearchLogic parkingLogic, MobsimTimer timer, 
-			VehicleTeleportationLogic teleportationLogic, ParkingSearchConfigGroup configGroup) {
+	public ParkingAgentLogic(Plan plan, ParkingSearchManager parkingManager, WalkLegFactory walkLegFactory, ParkingRouter parkingRouter, EventsManager events, ParkingSearchLogic parkingLogic, MobsimTimer timer, VehicleTeleportationLogic teleportationLogic, ParkingSearchConfigGroup configGroup) {
 		planElemIter = plan.getPlanElements().iterator();
-		this.plan = plan;
 		this.parkingManager = parkingManager;
-		this.walkRouter = walkRouter;
-		this.network = network;
+		this.walkLegFactory = walkLegFactory;
 		this.parkingRouter = parkingRouter;
 		this.timer = timer;
 		this.events = events;
@@ -190,15 +178,8 @@ public class ParkingAgentLogic implements DynAgentLogic {
 	protected DynAction nextStateAfterParkActivity(DynAction oldAction, double now) {
 		// add a walk leg after parking
 		Leg currentPlannedLeg = (Leg) currentPlanElement;
-		Facility fromFacility = new LinkWrapperFacility (network.getLinks().get(agent.getCurrentLinkId()));
-		Facility toFacility = new LinkWrapperFacility (network.getLinks().get(currentPlannedLeg.getRoute().getEndLinkId()));
-		List<? extends PlanElement> walkTrip = walkRouter.calcRoute(fromFacility, toFacility, now, plan.getPerson());
-		if (walkTrip.size() != 1 || ! (walkTrip.get(0) instanceof Leg)) {
-			String message = "walkRouter returned something else than a single Leg, e.g. it routes walk on the network with non_network_walk to access the network. Not implemented in parking yet!";
-			log.error(message);
-			throw new RuntimeException(message);
-		}
-		Leg walkLeg = (Leg) walkTrip.get(0);
+		Id<Link> walkDestination = currentPlannedLeg.getRoute().getEndLinkId();
+		Leg walkLeg = walkLegFactory.createWalkLeg(agent.getCurrentLinkId(), walkDestination, now, TransportMode.non_network_walk );
 		this.lastParkActionState = LastParkActionState.WALKFROMPARK;
 		this.stageInteractionType = null;
 		return new StaticPassengerDynLeg(walkLeg.getRoute(), walkLeg.getMode());
@@ -209,15 +190,11 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		this.currentPlanElement = planElemIter.next();
 		Activity nextPlannedActivity = (Activity) this.currentPlanElement;
 		this.lastParkActionState = LastParkActionState.ACTIVITY;
-		double endTime =nextPlannedActivity.getEndTime() ;
-        if (Time.isUndefinedTime(endTime)) {
-            if (Time.isUndefinedTime(nextPlannedActivity.getMaximumDuration())) {
-                endTime = Double.POSITIVE_INFINITY;
-                //last activity of a day
-            } else {
-                endTime = now + nextPlannedActivity.getMaximumDuration();
-            }
+		double endTime =nextPlannedActivity.getEndTime() ; 
+		if (endTime == Time.UNDEFINED_TIME){
+			endTime = Double.POSITIVE_INFINITY;
 		}
+
 		return new IdleDynActivity(nextPlannedActivity.getType(), endTime);
 		
 	}
@@ -247,20 +224,12 @@ public class ParkingAgentLogic implements DynAgentLogic {
 				parkLink = agent.getCurrentLinkId();
 			}
 
-    		Facility fromFacility = new LinkWrapperFacility (network.getLinks().get(agent.getCurrentLinkId()));
             Id<Link> teleportedParkLink = this.teleportationLogic.getVehicleLocation(agent.getCurrentLinkId(), vehicleId, parkLink, now, currentLeg.getMode());
-    		Facility toFacility = new LinkWrapperFacility (network.getLinks().get(teleportedParkLink));
-    		List<? extends PlanElement> walkTrip = walkRouter.calcRoute(fromFacility, toFacility, now, plan.getPerson());
-    		if (walkTrip.size() != 1 || ! (walkTrip.get(0) instanceof Leg)) {
-    			String message = "walkRouter returned something else than a single Leg, e.g. it routes walk on the network with non_network_walk to access the network. Not implemented in parking yet!";
-    			log.error(message);
-    			throw new RuntimeException(message);
-    		}
-    		Leg walkLeg = (Leg) walkTrip.get(0);
+            Leg walkleg = walkLegFactory.createWalkLeg(agent.getCurrentLinkId(), teleportedParkLink, now, TransportMode.non_network_walk );
 			this.lastParkActionState = LastParkActionState.WALKTOPARK;
 			this.currentlyAssignedVehicleId = vehicleId;
 			this.stageInteractionType = ParkingUtils.PARKACTIVITYTYPE;
-			return new StaticPassengerDynLeg(walkLeg.getRoute(), walkLeg.getMode());
+			return new StaticPassengerDynLeg(walkleg.getRoute(), walkleg.getMode());
 		}
 		else if (currentLeg.getMode().equals(TransportMode.pt)) {
 			if (currentLeg.getRoute() instanceof ExperimentalTransitRoute){

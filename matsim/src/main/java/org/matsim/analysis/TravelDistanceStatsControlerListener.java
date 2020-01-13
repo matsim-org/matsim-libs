@@ -38,19 +38,13 @@ class TravelDistanceStatsControlerListener implements IterationEndsListener, Shu
 	@Inject
 	private TravelDistanceStats travelDistanceStats;
 
-	@Inject
-	private PKMbyModeCalculator PKMbyModeCalculator;
-
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		travelDistanceStats.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
-		PKMbyModeCalculator.addIteration(event.getIteration(),experiencedPlansService.getExperiencedPlans());
 	}
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-
 		travelDistanceStats.close();
-		PKMbyModeCalculator.writeOutput();
 	}
 }

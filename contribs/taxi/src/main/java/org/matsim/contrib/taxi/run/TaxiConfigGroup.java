@@ -20,41 +20,29 @@
 package org.matsim.contrib.taxi.run;
 
 import java.net.URL;
-import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
 
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
+import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.Modal;
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
-import org.matsim.contrib.taxi.optimizer.assignment.AssignmentTaxiOptimizerParams;
-import org.matsim.contrib.taxi.optimizer.fifo.FifoTaxiOptimizerParams;
-import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
-import org.matsim.contrib.taxi.optimizer.zonal.ZonalTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Verify;
-
 public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Modal {
 	public static final String GROUP_NAME = "taxi";
 
-	/**
-	 * @param config
-	 * @return single-mode taxi config (only if there is exactly 1 taxi config group in {@link MultiModeTaxiConfigGroup}.
-	 * Otherwise will fail.
-	 */
-	public static TaxiConfigGroup getSingleModeTaxiConfig(Config config) {
-		Collection<TaxiConfigGroup> taxiConfigGroups = MultiModeTaxiConfigGroup.get(config).getModalElements();
-		Preconditions.checkArgument(taxiConfigGroups.size() == 1,
-				"Supported for only 1 taxi mode in the config. Number of taxi modes: %s", taxiConfigGroups.size());
-		return taxiConfigGroups.iterator().next();
+	@SuppressWarnings("deprecation")
+	public static TaxiConfigGroup get(Config config) {
+		return (TaxiConfigGroup)config.getModule(GROUP_NAME);
 	}
 
 	public static final String MODE = "mode";
@@ -117,6 +105,9 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	static final String DETAILED_STATS_EXP = "If true, detailed hourly taxi stats are dumped after each iteration."
 			+ " False by default.";
 
+	public static final String PRINT_WARNINGS = "plotDetailedWarnings";
+	static final String PRINT_WARNINGS_EXP = "Prints detailed warnings for taxi customers that cannot be served or routed. True by default.";
+
 	public static final String BREAK_IF_NOT_ALL_REQUESTS_SERVED = "breakIfNotAllRequestsServed";
 	static final String BREAK_IF_NOT_ALL_REQUESTS_SERVED_EXP =
 			"Specifies whether the simulation should interrupt if not all requests were performed when"
@@ -150,23 +141,36 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 
 	private boolean breakSimulationIfNotAllRequestsServed = true;
 
+	private boolean printDetailedWarnings = true;
+
+	private final Function<String, AbstractTaxiOptimizerParams> taxiOptimizerParamsCreator;
 	private AbstractTaxiOptimizerParams taxiOptimizerParams;
 
 	public TaxiConfigGroup() {
+		this(DefaultTaxiOptimizerProvider::createParameterSet);
+	}
+
+	public TaxiConfigGroup(Function<String, AbstractTaxiOptimizerParams> taxiOptimizerParamsCreator) {
 		super(GROUP_NAME);
+		this.taxiOptimizerParamsCreator = taxiOptimizerParamsCreator;
 	}
 
 	@Override
 	protected void checkConsistency(Config config) {
 		super.checkConsistency(config);
 
-		Verify.verify(config.qsim().getNumberOfThreads() == 1, "Only a single-threaded QSim allowed");
+		if (config.qsim().getNumberOfThreads() != 1) {
+			throw new RuntimeException("Only a single-threaded QSim allowed");
+		}
 
-		Verify.verify(!isVehicleDiversion() || isOnlineVehicleTracker(),
-				TaxiConfigGroup.VEHICLE_DIVERSION + " requires " + TaxiConfigGroup.ONLINE_VEHICLE_TRACKER);
+		if (isVehicleDiversion() && !isOnlineVehicleTracker()) {
+			throw new RuntimeException(
+					TaxiConfigGroup.VEHICLE_DIVERSION + " requires " + TaxiConfigGroup.ONLINE_VEHICLE_TRACKER);
+		}
 
 		if (useModeFilteredSubnetwork) {
-			DvrpModeRoutingNetworkModule.checkUseModeFilteredSubnetworkAllowed(config, mode);
+			DvrpRoutingNetworkProvider.
+					checkUseModeFilteredSubnetworkAllowed(config, mode);
 		}
 	}
 
@@ -186,6 +190,7 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 		map.put(TIME_PROFILES, TIME_PROFILES_EXP);
 		map.put(DETAILED_STATS, DETAILED_STATS_EXP);
 		map.put(BREAK_IF_NOT_ALL_REQUESTS_SERVED, BREAK_IF_NOT_ALL_REQUESTS_SERVED_EXP);
+		map.put(PRINT_WARNINGS, PRINT_WARNINGS_EXP);
 		return map;
 	}
 
@@ -405,22 +410,8 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 
 	@Override
 	public ConfigGroup createParameterSet(String type) {
-		switch (type) {
-			case AssignmentTaxiOptimizerParams.SET_NAME:
-				return new AssignmentTaxiOptimizerParams();
-			case FifoTaxiOptimizerParams.SET_NAME:
-				return new FifoTaxiOptimizerParams();
-			case RuleBasedTaxiOptimizerParams.SET_NAME:
-				return new RuleBasedTaxiOptimizerParams();
-			case ZonalTaxiOptimizerParams.SET_NAME:
-				return new ZonalTaxiOptimizerParams();
-			default:
-				try {
-					return (AbstractTaxiOptimizerParams)Class.forName(type).getDeclaredConstructor().newInstance();
-				} catch (ReflectiveOperationException e) {
-					throw new RuntimeException("Cannot instantiate taxi optimizer parameter set of type: " + type, e);
-				}
-		}
+		return Objects.requireNonNull(taxiOptimizerParamsCreator.apply(type),
+				"Unable to create a parameter set of type: " + type);
 	}
 
 	@Override
@@ -450,5 +441,15 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 
 	public URL getTaxisFileUrl(URL context) {
 		return ConfigGroup.getInputFileURL(context, this.taxisFile);
+	}
+
+	@StringGetter(PRINT_WARNINGS)
+	public boolean isPrintDetailedWarnings() {
+		return printDetailedWarnings;
+	}
+
+	@StringSetter(PRINT_WARNINGS)
+	public void setPrintDetailedWarnings(boolean printDetailedWarnings) {
+		this.printDetailedWarnings = printDetailedWarnings;
 	}
 }

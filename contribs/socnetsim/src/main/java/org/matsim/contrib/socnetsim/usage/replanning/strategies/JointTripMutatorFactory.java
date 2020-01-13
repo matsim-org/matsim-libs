@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
 
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
@@ -54,17 +53,15 @@ public class JointTripMutatorFactory extends AbstractConfigurableSelectionStrate
 	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
 	private final Provider<TripRouter> tripRouterFactory;
 	private final PlanLinkIdentifier planLinkIdentifier;
-	private final MainModeIdentifier mainModeIdentifier;
 
 
 	@Inject
-	JointTripMutatorFactory( Scenario sc , PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory , Provider<TripRouter> tripRouterFactory ,
-			@Strong PlanLinkIdentifier planLinkIdentifier, MainModeIdentifier mainModeIdentifier ) {
+	public JointTripMutatorFactory( Scenario sc , PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory , Provider<TripRouter> tripRouterFactory ,
+			@Strong PlanLinkIdentifier planLinkIdentifier ) {
 		this.sc = sc;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;
 		this.planLinkIdentifier = planLinkIdentifier;
-		this.mainModeIdentifier = mainModeIdentifier;
 	}
 
 
@@ -89,9 +86,9 @@ public class JointTripMutatorFactory extends AbstractConfigurableSelectionStrate
 						public GenericPlanAlgorithm<JointPlan> createAlgorithm(ReplanningContext replanningContext) {
 							return new JointTripInsertorAndRemoverAlgorithm(
 								sc,
+								tripRouterFactory.get(),
 								MatsimRandom.getLocalInstance(),
-								true,  // "iterative"
-								mainModeIdentifier);
+								true); // "iterative"
 						}
 						
 						@Override

@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.contrib.common.randomizedtransitrouter.RandomizingTransitRouterModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -63,7 +62,12 @@ public class RandomizingTransitRouterIT {
 		}
 
 		@Override public void handleEvent(PersonEntersVehicleEvent event) {
-			cnts.merge( event.getVehicleId() , 1. , Double::sum );
+			final Double oldVal = cnts.get( event.getVehicleId() );
+			if ( oldVal!= null ) {
+				cnts.put( event.getVehicleId(), oldVal + 1. ) ;
+			} else {
+				cnts.put( event.getVehicleId(), 1. ) ;
+			}
 		}
 		
 		void printCounts() {
@@ -98,15 +102,29 @@ public class RandomizingTransitRouterIT {
 		
 		config.global().setNumberOfThreads(1);
 		
-		config.planCalcScore().addActivityParams( new ActivityParams("home").setTypicalDuration( 6*3600. ) );
-		config.planCalcScore().addActivityParams( new ActivityParams("education_100").setTypicalDuration( 6*3600. ) );
-
-//		config.strategy().addStrategySettings( new StrategySettings( ConfigUtils.createAvailableStrategyId(config)).setStrategyName(DefaultStrategy.ReRoute ).setWeight(0.1 ) );
-//		config.strategy().addStrategySettings( new StrategySettings( ConfigUtils.createAvailableStrategyId(config)).setStrategyName(DefaultSelector.ChangeExpBeta ).setWeight(0.9 ) );
-		config.strategy().addStrategySettings( new StrategySettings().setStrategyName(DefaultStrategy.ReRoute ).setWeight(0.1 ) );
-		config.strategy().addStrategySettings( new StrategySettings().setStrategyName(DefaultSelector.ChangeExpBeta ).setWeight(0.9 ) );
-		// yy changing the above (= no longer using createAvailableStrategyId) changes the results.  :-( :-( :-(
-
+		{
+			ActivityParams params = new ActivityParams("home") ;
+			params.setTypicalDuration( 6*3600. );
+			config.planCalcScore().addActivityParams(params);
+		}
+		{
+			ActivityParams params = new ActivityParams("education_100") ;
+			params.setTypicalDuration( 6*3600. );
+			config.planCalcScore().addActivityParams(params);
+		}
+		{
+			StrategySettings stratSets = new StrategySettings(ConfigUtils.createAvailableStrategyId(config)) ;
+			stratSets.setStrategyName(DefaultStrategy.ReRoute);
+			stratSets.setWeight(0.1);
+			config.strategy().addStrategySettings(stratSets);
+		}
+		{
+			StrategySettings stratSets = new StrategySettings(ConfigUtils.createAvailableStrategyId(config)) ;
+			stratSets.setStrategyName(DefaultSelector.ChangeExpBeta);
+			stratSets.setWeight(0.9);
+			config.strategy().addStrategySettings(stratSets);
+		}
+		
 		config.qsim().setEndTime(18.*3600.);
 		
 		config.timeAllocationMutator().setMutationRange(7200);
@@ -114,12 +132,6 @@ public class RandomizingTransitRouterIT {
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		config.qsim().setTrafficDynamics( TrafficDynamics.withHoles );
 		config.qsim().setUsingFastCapacityUpdate(true);
-
-//		config.facilities().setFacilitiesSource( FacilitiesConfigGroup.FacilitiesSource.none );
-		// yyyy changing this setting changes result.  Possible reasons:
-		// * The implicit activity coordinates may be elsewhere.
-		// * The "fudged" walk distances may be different.
-		// * It uses getNearestLinkEXACTLY, and thus activities may be attached to other links.
 		
 		config.vspExperimental().setWritingOutputEvents(true);
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.warn );
@@ -131,7 +143,8 @@ public class RandomizingTransitRouterIT {
 		// ---
 		
 		Controler controler = new Controler( scenario ) ;
-
+//		controler.setDirtyShutdown(true);
+		
 		controler.addOverridingModule( new RandomizingTransitRouterModule() );
 
 		final MyObserver observer = new MyObserver();
@@ -143,13 +156,13 @@ public class RandomizingTransitRouterIT {
 		
 		observer.printCounts(); 
 		
-		// yyyy the following is just a regression test, making sure that results remain stable.  In general, the randomized transit router
+		// the following is just a regression test, making sure that results remain stable.  In general, the randomized transit router 
 		// could be improved, for example along the lines of the randomized regular router, which uses a (hopefully unbiased) lognormal
 		// distribution rather than a biased uniform distribution as is used here.  kai, jul'15
 		
 		Assert.assertEquals(36., observer.getCounts().get( Id.create("1009", Vehicle.class) ), 0.1 );
-		Assert.assertEquals( 8. /*6.*/ , observer.getCounts().get( Id.create("1012", Vehicle.class) ) , 0.1 );
-		Assert.assertEquals(22. /*21.*/, observer.getCounts().get( Id.create("2009", Vehicle.class) ) , 0.1 );
+		Assert.assertEquals( 6., observer.getCounts().get( Id.create("1012", Vehicle.class) ) , 0.1 );
+		Assert.assertEquals(21., observer.getCounts().get( Id.create("2009", Vehicle.class) ) , 0.1 );
 		Assert.assertEquals(36., observer.getCounts().get( Id.create("3009", Vehicle.class) ) , 0.1 );
 		
 		

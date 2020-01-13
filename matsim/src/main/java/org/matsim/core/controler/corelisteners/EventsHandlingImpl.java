@@ -86,7 +86,7 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 				switch (format) {
 				case xml:
 					this.eventWriters.add(new EventWriterXML(controlerIO.getIterationFilename(event.getIteration(), 
-							Controler.DefaultFiles.events)));
+							Controler.FILENAME_EVENTS_XML)));
 					break;
 				default:
 					log.warn("Unknown events file format specified: " + format.toString() + ".");

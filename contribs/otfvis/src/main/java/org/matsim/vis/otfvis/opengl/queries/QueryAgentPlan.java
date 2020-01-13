@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.vis.otfvis.OTFClientControl;
@@ -130,12 +129,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 						continue ; // skip
 					}
 					Coord c2 = getCoord(act);
-					ActivityInfo activityInfo = new ActivityInfo((float) c2.getX(), (float) c2.getY(), act.getType().substring( 0,3 ) );
-
-
-					if ( StageActivityTypeIdentifier.isStageActivity( act.getType() ) ) {
-						activityInfo = new ActivityInfo( (float) c2.getX(), (float) c2.getY(), act.getType().replace( "interaction", "i" ) ) ;
-					}
+					ActivityInfo activityInfo = new ActivityInfo((float) c2.getX(), (float) c2.getY(), act.getType());
 					result.acts.add(activityInfo);
 				}
 			}

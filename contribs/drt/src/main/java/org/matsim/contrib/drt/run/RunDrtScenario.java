@@ -24,21 +24,20 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-import com.google.common.base.Preconditions;
-
 /**
  * @author michalm
  */
 public class RunDrtScenario {
 	public static void run(String configFile, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configFile, new MultiModeDrtConfigGroup(), new DvrpConfigGroup(),
+		Config config = ConfigUtils.loadConfig(configFile, new DrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 		DrtControlerCreator.createControlerWithSingleModeDrt(config, otfvis).run();
 	}
 
 	public static void main(String[] args) {
-		Preconditions.checkArgument(args.length == 1,
-				"RunDrtScenario needs one argument: path to the configuration file");
+		if (args.length != 1) {
+			throw new IllegalArgumentException("RunDrtScenario needs one argument: path to the configuration file");
+		}
 		RunDrtScenario.run(args[0], false);
 	}
 }

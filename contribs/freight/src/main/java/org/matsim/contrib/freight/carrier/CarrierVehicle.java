@@ -11,7 +11,7 @@ import org.matsim.vehicles.VehicleType;
  * @author sschroeder
  *
  */
-public class CarrierVehicle implements Vehicle {
+public class CarrierVehicle {
 
 	/**
 	 * Returns a new instance of carrierVehicle.
@@ -25,14 +25,6 @@ public class CarrierVehicle implements Vehicle {
 	 */
 	public static CarrierVehicle newInstance(Id<Vehicle> vehicleId, Id<Link> locationId){
 		return new CarrierVehicle(vehicleId, locationId);
-	}
-	@Deprecated // refactoring device, please inline
-	public Id<Vehicle> getVehicleId(){
-		return getId() ;
-	}
-	@Deprecated // refactoring device, please inline
-	public void setVehicleType( VehicleType collectionType ){
-		setType( collectionType );
 	}
 
 	/**
@@ -58,8 +50,8 @@ public class CarrierVehicle implements Vehicle {
 		
 		private Id<Link> locationId;
 		private Id<Vehicle> vehicleId;
-		private VehicleType type;
-		private Id<org.matsim.vehicles.VehicleType> typeId;
+		private CarrierVehicleType type;
+		private Id<VehicleType> typeId;
 		private double earliestStart = 0.0;
 		private double latestEnd = Integer.MAX_VALUE;
 		
@@ -69,13 +61,13 @@ public class CarrierVehicle implements Vehicle {
 			this.vehicleId = vehicleId;
 		}
 		
-		public Builder setType( VehicleType type ){
+		public Builder setType(CarrierVehicleType type){
 			this.type=type;
 			return this;
 		}
 		
 		
-		public Builder setTypeId(Id<org.matsim.vehicles.VehicleType> typeId ){
+		public Builder setTypeId(Id<VehicleType> typeId){
 			this.typeId = typeId;
 			return this;
 		}
@@ -100,9 +92,9 @@ public class CarrierVehicle implements Vehicle {
 
 	private final Id<Vehicle> vehicleId;
 	
-	private Id<org.matsim.vehicles.VehicleType> typeId;
+	private Id<VehicleType> typeId;
 
-	private VehicleType vehicleType;
+	private CarrierVehicleType vehicleType;
 
 	private double earliestStartTime;
 
@@ -127,8 +119,8 @@ public class CarrierVehicle implements Vehicle {
 	public Id<Link> getLocation() {
 		return locationId;
 	}
-	@Override
-	public Id<Vehicle> getId() {
+
+	public Id<Vehicle> getVehicleId() {
 		return vehicleId;
 	}
 	
@@ -136,14 +128,15 @@ public class CarrierVehicle implements Vehicle {
 	public String toString() {
 		return vehicleId + " stationed at " + locationId;
 	}
-	@Override
-	public VehicleType getType() {
+
+	public CarrierVehicleType getVehicleType() {
 		return vehicleType;
 	}
 
-	public void setType( VehicleType vehicleType ) {
+	public void setVehicleType(CarrierVehicleType vehicleType) {
 		this.vehicleType = vehicleType;
 	}
+
 
 	/**
 	 * Returns the earliest time a vehicle can be deployed (and thus can departure from its origin).
@@ -168,7 +161,7 @@ public class CarrierVehicle implements Vehicle {
 	}
 
 	
-	public Id<org.matsim.vehicles.VehicleType> getVehicleTypeId() {
+	public Id<VehicleType> getVehicleTypeId() {
 		return typeId;
 	}
 

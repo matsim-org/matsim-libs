@@ -22,8 +22,9 @@ package org.matsim.core.replanning.modules;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.algorithms.TripsToLegsAlgorithm;
+import org.matsim.core.router.CompositeStageActivityTypes;
+import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripStructureUtils;
 
 import javax.inject.Provider;
 
@@ -36,22 +37,44 @@ import javax.inject.Provider;
  */
 public class TripsToLegsModule extends AbstractMultithreadedModule {
 
+	private final StageActivityTypes additionalBlackList;
+	private final Provider<TripRouter> tripRouterProvider;
+
 	/**
+	 * Initializes an instance using the stage activity types from the controler
+	 */
+	public TripsToLegsModule(Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup) {
+		this(null, tripRouterProvider, globalConfigGroup);
+	}
+
+	/**
+	 * Initializes an instance, allowing to specify additional activity types to
+	 * consider as stage activities.
+	 * @param additionalBlackList a {@link StageActivityTypes} instance identifying
 	 * @param tripRouterProvider
 	 * @param globalConfigGroup
 	 */
-	@Deprecated // tripRouterProvider element no longer necessary
-	public TripsToLegsModule(Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup) {
+	public TripsToLegsModule(final StageActivityTypes additionalBlackList, Provider<TripRouter> tripRouterProvider, GlobalConfigGroup globalConfigGroup) {
 		super(globalConfigGroup);
-	}
-	
-	public TripsToLegsModule(GlobalConfigGroup globalConfigGroup) {
-		super(globalConfigGroup);
+		this.tripRouterProvider = tripRouterProvider;
+		this.additionalBlackList = additionalBlackList;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		return new TripsToLegsAlgorithm( TripStructureUtils.getRoutingModeIdentifier() );
+		TripRouter router = tripRouterProvider.get();
+		StageActivityTypes blackListToUse = router.getStageActivityTypes();
+
+		if (additionalBlackList != null) {
+			CompositeStageActivityTypes composite = new CompositeStageActivityTypes();
+			composite.addActivityTypes( blackListToUse );
+			composite.addActivityTypes( additionalBlackList );
+			blackListToUse = composite;
+		}
+
+		return new TripsToLegsAlgorithm( 
+				blackListToUse,
+				router.getMainModeIdentifier() );
 	}
 }
 

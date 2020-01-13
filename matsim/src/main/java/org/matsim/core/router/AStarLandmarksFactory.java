@@ -53,6 +53,10 @@ public class AStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 		this.nThreads = numberOfThreads;
 	}
 
+	public AStarLandmarksFactory() {
+		this(8);
+	}
+
 	@Override
 	public synchronized LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		PreProcessLandmarks preProcessLandmarks = this.preProcessData.get(network);

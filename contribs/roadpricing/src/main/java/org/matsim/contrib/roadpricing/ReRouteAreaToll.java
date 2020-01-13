@@ -28,7 +28,6 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.core.router.TripRouter;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -36,15 +35,11 @@ import javax.inject.Provider;
  class ReRouteAreaToll implements Provider<PlanStrategy> {
 
 	private final Config config;
-	private RoadPricingScheme roadPricingScheme;
-	private Provider<TripRouter> tripRouterFactory;
-//	private final Provider<PlansCalcRouteWithTollOrNot> factory;
+	private final Provider<PlansCalcRouteWithTollOrNot> factory;
 
-	@Inject ReRouteAreaToll( Config config, RoadPricingScheme roadPricingScheme, Provider<TripRouter> tripRouterFactory ) {
+	@Inject ReRouteAreaToll( Config config, Provider<PlansCalcRouteWithTollOrNot> factory ) {
 		this.config = config;
-//		this.factory = factory;
-		this.roadPricingScheme = roadPricingScheme;
-		this.tripRouterFactory = tripRouterFactory;
+		this.factory = factory;
 	}
 
 	@Override
@@ -53,7 +48,7 @@ import javax.inject.Provider;
 		builder.addStrategyModule(new AbstractMultithreadedModule(config.global()) {
 			@Override
 			public PlanAlgorithm getPlanAlgoInstance() {
-				return new PlansCalcRouteWithTollOrNot( roadPricingScheme, tripRouterFactory ) ;
+				return factory.get();
 			}
 		});
 		return builder.build();

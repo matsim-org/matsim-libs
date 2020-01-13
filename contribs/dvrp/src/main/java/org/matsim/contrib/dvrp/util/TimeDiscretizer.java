@@ -21,8 +21,6 @@ package org.matsim.contrib.dvrp.util;
 
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 
-import com.google.common.base.Preconditions;
-
 public class TimeDiscretizer {
 	public enum Type {
 		ACYCLIC, CYCLIC, OPEN_ENDED;
@@ -55,16 +53,24 @@ public class TimeDiscretizer {
 	}
 
 	public TimeDiscretizer(int maxTime, int timeInterval, Type type) {
-		Preconditions.checkArgument(maxTime % timeInterval == 0);
 		this.timeInterval = timeInterval;
 		this.type = type;
+
+		if (maxTime % timeInterval != 0) {
+			throw new IllegalArgumentException();
+		}
+
 		// option: additional open-end bin
 		intervalCount = maxTime / timeInterval + (type == Type.OPEN_ENDED ? 1 : 0);
 	}
 
 	public int getIdx(double time) {
-		Preconditions.checkArgument(time >= 0);
+		if (time < 0) {
+			throw new IllegalArgumentException();
+		}
+
 		int idx = (int)time / timeInterval;// rounding down
+
 		if (idx < intervalCount) {
 			return idx;
 		}
@@ -85,7 +91,8 @@ public class TimeDiscretizer {
 	}
 
 	public int discretize(double time) {
-		return getIdx(time) * timeInterval;
+		int idx = getIdx(time);
+		return idx * timeInterval;
 	}
 
 	public int getTimeInterval() {

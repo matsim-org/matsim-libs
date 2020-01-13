@@ -31,11 +31,13 @@ import java.util.Random;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
@@ -61,11 +63,11 @@ import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils.JointTrip;
  * @author thibautd
  */
 public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPlan> {
+	private final TripRouter router;
 	private final List<String> chainBasedModes;
 	private final double betaDetour;
 	private final double scale;
 	private final Random random;
-	private final MainModeIdentifier mainModeIdentifier;
 
 	private final SocialNetwork socialNetwork;
 
@@ -73,13 +75,13 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 			final Random random,
 			final SocialNetwork socialNetwork,
 			final JointTripInsertorConfigGroup config,
-			final MainModeIdentifier mainModeIdentifier ) {
+			final TripRouter router) {
+		this.router = router;
 		this.socialNetwork = socialNetwork;
 		chainBasedModes = config.getChainBasedModes();
 		betaDetour = config.getBetaDetour();
 		scale = config.getScale();
 		this.random = random;
-		this.mainModeIdentifier = mainModeIdentifier;
 	}
 
 	@Override
@@ -115,11 +117,15 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 			// identify the joint trips as one single trips.
 			// Otherwise, the process will insert joint trips to access pick-ups
 			// or go from drop offs...
+			final CompositeStageActivityTypes types = new CompositeStageActivityTypes();
+			types.addActivityTypes( router.getStageActivityTypes() );
+			types.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
+
 			final MainModeIdentifier mainModeIdentifier =
 				new JointMainModeIdentifier(
-						this.mainModeIdentifier );
+						router.getMainModeIdentifier() );
 
-			for ( TripStructureUtils.Trip trip : TripStructureUtils.getTrips( plan , JointActingTypes.JOINT_STAGE_ACTS ) ) {
+			for ( TripStructureUtils.Trip trip : TripStructureUtils.getTrips( plan , types ) ) {
 				final String mode = mainModeIdentifier.identifyMainMode( trip.getTripElements() );
 
 				if ( mode.equals( TransportMode.car ) ) {

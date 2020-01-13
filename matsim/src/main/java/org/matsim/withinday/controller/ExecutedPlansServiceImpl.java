@@ -22,7 +22,6 @@ package org.matsim.withinday.controller;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -45,6 +44,7 @@ import org.matsim.withinday.mobsim.MobsimDataProvider;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -137,7 +137,7 @@ public class ExecutedPlansServiceImpl implements AfterMobsimListener, ExecutedPl
 
 	@Override
 	public Map<Id<Person>, Plan> getExecutedPlans() {
-		IdMap<Person, Plan> map = new IdMap<>(Person.class) ;
+		Map<Id<Person>,Plan> map = new HashMap<>() ;
 		for ( Person pp : this.experiencedPopulation.getPersons().values() ) {
 			map.put( pp.getId(), pp.getSelectedPlan() ) ;
 		}

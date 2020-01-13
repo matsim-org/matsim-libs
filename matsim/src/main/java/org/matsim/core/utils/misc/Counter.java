@@ -65,8 +65,10 @@ public final class Counter {
 	public void incCounter() {
 		long i = this.counter.incrementAndGet();
 		long n = this.nextCounter.get();
-		if ((i >= n) && (this.nextCounter.compareAndSet(n, n*multiplier))) {
-			log.info(this.prefix + n + this.suffix);
+		if (i >= n) {
+			if (this.nextCounter.compareAndSet(n, n*multiplier)) {
+				log.info(this.prefix + n + this.suffix);
+			}
 		}
 	}
 

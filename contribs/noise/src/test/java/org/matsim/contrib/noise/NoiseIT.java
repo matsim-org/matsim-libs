@@ -37,7 +37,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
@@ -46,26 +45,27 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.noise.data.NoiseAllocationApproach;
+import org.matsim.contrib.noise.data.NoiseContext;
+import org.matsim.contrib.noise.data.NoiseReceiverPoint;
+import org.matsim.contrib.noise.data.PersonActivityInfo;
+import org.matsim.contrib.noise.data.ReceiverPoint;
+import org.matsim.contrib.noise.events.NoiseEventAffected;
+import org.matsim.contrib.noise.events.NoiseEventCaused;
+import org.matsim.contrib.noise.handler.NoiseEquations;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
-
-import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.*;
 
 /**
  * @author ikaddoura
@@ -84,29 +84,17 @@ public class NoiseIT {
 		
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config1.xml";
 
-		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
-		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
-		
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile, new NoiseConfigGroup()));
 				
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) scenario.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) scenario.getConfig().getModule("noise");
 		
 		noiseParameters.setReceiverPointGap(250.);	
 		noiseParameters.setScaleFactor(1.);
 		
 		String[] consideredActivities = {"home", "work"};
 		noiseParameters.setConsideredActivitiesForDamageCalculationArray(consideredActivities);
-
-		com.google.inject.Injector injector = Injector.createInjector( scenario.getConfig() , new AbstractModule(){
-			@Override public void install(){
-				install( new NoiseModule() ) ;
-				install( new ScenarioByInstanceModule( scenario ) ) ;
-				install( new EventsManagerModule() ) ;
-			}
-		} );;
-
-//		NoiseContext noiseContext = new NoiseContext(scenario);
-		NoiseContext noiseContext = injector.getInstance( NoiseContext.class ) ;
+		
+		NoiseContext noiseContext = new NoiseContext(scenario);
 		
 		// test the grid of receiver points
 		Assert.assertEquals("wrong number of receiver points", 16, noiseContext.getReceiverPoints().size(), MatsimTestUtils.EPSILON);
@@ -168,12 +156,6 @@ public class NoiseIT {
 		Config config = ConfigUtils.loadConfig(configFile ) ;
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
-//		{
-//			ModeRoutingParams params = new ModeRoutingParams( TransportMode.non_network_walk );
-//			params.setTeleportedModeSpeed( 2.0 );
-//			params.setBeelineDistanceFactor( 1.3 );
-//			config.plansCalcRoute().addModeRoutingParams( params );
-//		}
 		runTest2a( config ) ;
 	}
 		
@@ -184,8 +166,7 @@ public class NoiseIT {
 		
 		// run the noise analysis for the final iteration (offline)
 		
-		String runDirectory = controler.getConfig().controler().getOutputDirectory();
-		if (!runDirectory.endsWith("/")) runDirectory = runDirectory + "/";
+		String runDirectory = controler.getConfig().controler().getOutputDirectory() + "/";
 		
 		Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
 		config.network().setInputFile(runDirectory + "output_network.xml.gz");
@@ -193,7 +174,7 @@ public class NoiseIT {
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(controler.getConfig().controler().getLastIteration());
 		
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModules().get(NoiseConfigGroup.GROUP_NAME);
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		
 		noiseParameters.setReceiverPointGap(250.);	
 		
@@ -266,7 +247,7 @@ public class NoiseIT {
 		double[] timeSlots = {sevenOclock, endTime, ttOclock};
 		String pathToConsideredAgentUnitsFile;
 		Map<Id<ReceiverPoint>, List<Double>> consideredAgentsPerReceiverPoint = new HashMap<Id<ReceiverPoint>, List<Double>>();
-		Map<String, Integer> idxFromKey = new ConcurrentHashMap<>();
+		Map<String, Integer> idxFromKey = new ConcurrentHashMap<String, Integer>();
 		BufferedReader br;
 		
 		for(double currentTimeSlot : timeSlots){
@@ -303,12 +284,15 @@ public class NoiseIT {
 			}
 			
 		}
-
+		
+		Map<Id<ReceiverPoint>, Double> affectedPersonsPerReceiverPoint = new HashMap<Id<ReceiverPoint>, Double>();
+		
 		int index = 0;
 		
 		for(double currentTimeSlot : timeSlots){
-			final Map<Id<ReceiverPoint>, Double> affectedPersonsPerReceiverPointTest = new HashMap<Id<ReceiverPoint>, Double>();
-						
+			
+			Map<Id<ReceiverPoint>, Double> affectedPersonsPerReceiverPointTest = new HashMap<Id<ReceiverPoint>, Double>();
+			
 			double affectedPersons = 0.;
 			
 			for(Id<Person> personId : scenario.getPopulation().getPersons().keySet()){
@@ -424,12 +408,15 @@ public class NoiseIT {
 							Gbl.assertNotNull( rpId );
 						}
 						
-						if(!affectedPersonsPerReceiverPointTest.containsKey(rpId)){			
+						if(!affectedPersonsPerReceiverPointTest.containsKey(rpId)){
+							
 							affectedPersonsPerReceiverPointTest.put(rpId, affectedPersons);
 							
-						} else{					
+						} else{
+							
 							double n = affectedPersonsPerReceiverPointTest.get(rpId);
-							affectedPersonsPerReceiverPointTest.put(rpId, n + affectedPersons);			
+							affectedPersonsPerReceiverPointTest.put(rpId, n + affectedPersons);
+							
 						}
 						
 					}
@@ -440,11 +427,12 @@ public class NoiseIT {
 			
 			if(currentTimeSlot == endTime){
 				
+				affectedPersonsPerReceiverPoint = affectedPersonsPerReceiverPointTest;
+				// ??? kai, feb'16
+				
 				if ( runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {
-					Assert.assertEquals("Wrong number of affected persons at receiver point 16", 1.48583333333333 /*1.991388888888*/,
+					Assert.assertEquals("Wrong number of affected persons at receiver point 16", 1.991388888888, 
 							affectedPersonsPerReceiverPointTest.get(Id.create("16", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
-					// result changed after setting speed of non_network_walk to walk speed. kai, nov'19
-
 					Assert.assertEquals("Wrong number of affected persons at receiver point 0", 0.479722222222222, 
 							affectedPersonsPerReceiverPointTest.get(Id.create("0", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
 				} else {
@@ -686,9 +674,8 @@ public class NoiseIT {
 			Assert.assertEquals("Wrong damage!", 0.0664164095284536, 
 					damagesPerReceiverPointId.get(Id.create("16", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
 		} else {
-			Assert.assertEquals("Wrong damage!", 0.04193854025561551 /*0.05620815014*/,
+			Assert.assertEquals("Wrong damage!", 0.05620815014, 
 					damagesPerReceiverPointId.get(Id.create("16", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
-			// result changed after setting speed of non_network_walk to walk speed. kai, nov'19
 		}
 		Assert.assertEquals("Wrong damage!", 0., damagesPerReceiverPointId.get(Id.create("0", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
 		
@@ -742,10 +729,9 @@ public class NoiseIT {
 			Assert.assertEquals("Wrong link's damage contribution!", 0.06561786301587, 
 					damagesPerlinkId.get(Id.create("linkA5", Link.class)), MatsimTestUtils.EPSILON);
 		} else {
-			Assert.assertEquals("Wrong link's damage contribution!", 5.042409518667874E-4 /*0.00067580922544*/,
+			Assert.assertEquals("Wrong link's damage contribution!", 0.00067580922544, 
 					damagesPerlinkId.get(Id.create("link2", Link.class)), MatsimTestUtils.EPSILON);
-			// result changed after setting non_network_walk speed to walk speed.  kai, nov'19
-			Assert.assertEquals("Wrong link's damage contribution!", 0.0414342993037486 /*0.0555323409232*/,
+			Assert.assertEquals("Wrong link's damage contribution!", 0.0555323409232, 
 					damagesPerlinkId.get(Id.create("linkA5", Link.class)), MatsimTestUtils.EPSILON);
 		}
 		Assert.assertEquals("Wrong link's damage contribution!", 0., damagesPerlinkId.get(Id.create("linkB5", Link.class)), MatsimTestUtils.EPSILON);
@@ -793,9 +779,9 @@ public class NoiseIT {
 			Assert.assertEquals("Wrong damage per car per link!", 0.06561786301587 / 2.0, 
 					damagesPerCar.get(Id.create("linkA5", Link.class)), MatsimTestUtils.EPSILON);
 		} else {
-			Assert.assertEquals("Wrong damage per car per link!", 2.521204759333937E-4 /*0.00033790461272075167*/,
+			Assert.assertEquals("Wrong damage per car per link!", 0.00033790461272075167, 
 					damagesPerCar.get(Id.create("link2", Link.class)), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Wrong damage per car per link!", 0.0207171496518743 /*0.027766170461620*/,
+			Assert.assertEquals("Wrong damage per car per link!", 0.027766170461620, 
 					damagesPerCar.get(Id.create("linkA5", Link.class)), MatsimTestUtils.EPSILON);
 		}
 		Assert.assertEquals("Wrong damage per car per link!", 0., 
@@ -842,11 +828,11 @@ public class NoiseIT {
 			Assert.assertEquals("Wrong damage per car per link!", 3.440988380343235E-8, 
 					marginaldamagesPerCar.get(Id.create("linkB5", Link.class)), MatsimTestUtils.EPSILON);
 		} else {
-			Assert.assertEquals("Wrong damage per car per link!", 7.573691032229657E-5 /*0.00010150643756312*/,
+			Assert.assertEquals("Wrong damage per car per link!", 0.00010150643756312, 
 					marginaldamagesPerCar.get(Id.create("link2", Link.class)), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Wrong damage per car per link!", 0.0053871600071944414 /*0.007220143967078839*/,
+			Assert.assertEquals("Wrong damage per car per link!", 0.007220143967078839, 
 					marginaldamagesPerCar.get(Id.create("linkA5", Link.class)), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Wrong damage per car per link!", 2.172806851108433E-8 /*2.9121055004910357E-8*/,
+			Assert.assertEquals("Wrong damage per car per link!", 2.9121055004910357E-8, 
 					marginaldamagesPerCar.get(Id.create("linkB5", Link.class)), MatsimTestUtils.EPSILON);
 		}
 		
@@ -864,8 +850,7 @@ public class NoiseIT {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.0328089315079348, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
-					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.0207171496518743 /*0
-					.027766170461620*/,
+					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.027766170461620, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				}
 				counter++;
@@ -874,7 +859,7 @@ public class NoiseIT {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.0328089315079348, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
-					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.0207171496518743 /*0.027766170461620*/,
+					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.027766170461620, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				}
 				counter++;
@@ -883,7 +868,7 @@ public class NoiseIT {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 3.992732562920194E-4, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
-					Assert.assertEquals("wrong cost per car for the given link and time interval", 2.521204759333937E-4 /*3.379046127207E-4 */,
+					Assert.assertEquals("wrong cost per car for the given link and time interval", 3.379046127207E-4, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				}
 				counter++;
@@ -892,7 +877,7 @@ public class NoiseIT {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 3.992732562920194E-4, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
-					Assert.assertEquals("wrong cost per car for the given link and time interval", 2.521204759333937E-4 /*3.379046127207E-4*/,
+					Assert.assertEquals("wrong cost per car for the given link and time interval", 3.379046127207E-4, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				}
 				counter++;
@@ -914,7 +899,7 @@ public class NoiseIT {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.020745817449213576, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
-					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.008506882814982769 /*0.0156416877593*/,
+					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.0156416877593, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				}
 				counter2++;
@@ -923,7 +908,7 @@ public class NoiseIT {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.017444990107520864, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
-					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.005206055473869639 /*0.01234086041763*/,
+					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.01234086041763, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				}
 				counter2++;
@@ -950,35 +935,30 @@ public class NoiseIT {
 	@Test
 	public final void test2b(){
 		
-		String runDirectory = null;
-		int lastIteration = -1;
-		{
-			// start a simple MATSim run with a single iteration
-			String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
-			Config runConfig = ConfigUtils.loadConfig( configFile ) ;
-			runConfig.controler().setOutputDirectory(testUtils.getOutputDirectory());
+		// start a simple MATSim run with a single iteration
+		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
+		Config runConfig = ConfigUtils.loadConfig( configFile ) ;
+		runConfig.controler().setOutputDirectory(testUtils.getOutputDirectory());
 
-			runConfig.plansCalcRoute().setInsertingAccessEgressWalk(false);
-			// I made test2a test both versions, but I don't really want to do that work again myself. kai, feb'16 
-			
-			Controler controler = new Controler(runConfig);
-			controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
-			controler.run();	
-			
-			runDirectory = controler.getConfig().controler().getOutputDirectory() + "/";
-			lastIteration = controler.getConfig().controler().getLastIteration();
-		}
+		runConfig.plansCalcRoute().setInsertingAccessEgressWalk(false);
+		// I made test2a test both versions, but I don't really want to do that work again myself. kai, feb'16 
+		
+		Controler controler = new Controler(runConfig);
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		controler.run();
 		
 		// run the noise analysis for the final iteration (offline)
 		
-		Config config = ConfigUtils.createConfig();
+		String runDirectory = controler.getConfig().controler().getOutputDirectory() + "/";
+
+		Config config = ConfigUtils.createConfig(new NoiseConfigGroup());
 		config.network().setInputFile(runDirectory + "output_network.xml.gz");
 		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
 		config.controler().setOutputDirectory(runDirectory);
-		config.controler().setLastIteration(lastIteration);
+		config.controler().setLastIteration(controler.getConfig().controler().getLastIteration());
 						
 		// adjust the default noise parameters
-		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(config, NoiseConfigGroup.class);
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		noiseParameters.setReceiverPointGap(250.);	
 		
 		String[] consideredActivities = {"home", "work"};
@@ -1067,7 +1047,7 @@ public class NoiseIT {
 		config.controler().setLastIteration(controler.getConfig().controler().getLastIteration());
 						
 		// adjust the default noise parameters
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModules().get(NoiseConfigGroup.GROUP_NAME);
+		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModule("noise");
 		noiseParameters.setReceiverPointGap(250.);	
 		
 		String[] consideredActivities = {"home", "work"};

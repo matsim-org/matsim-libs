@@ -87,7 +87,7 @@ public class SignalGroupsReader20 implements MatsimReader {
 	}
 
 	private XMLSignalGroups readXmlSignalGroups(String filename) {
-		return readXmlSignalGroups( new InputSource( IOUtils.getInputStream(IOUtils.resolveFileOrResource(filename)) ) ) ;
+		return readXmlSignalGroups( new InputSource( IOUtils.getInputStream(filename) ) ) ;
 	}
 
 	private XMLSignalGroups readXmlSignalGroups( InputSource stream ) {

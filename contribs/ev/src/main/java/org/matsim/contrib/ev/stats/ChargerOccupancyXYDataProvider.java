@@ -58,11 +58,11 @@ public class ChargerOccupancyXYDataProvider implements Provider<MobsimListener> 
 
 		return XYDataCollectors.createCalculator(header, charger -> {
 			ChargingLogic logic = charger.getLogic();
-			int plugs = charger.getPlugCount();
+			int plugs = charger.getPlugs();
 			int assignedCount = logic instanceof ChargingWithQueueingAndAssignmentLogic ?
 					((ChargingWithQueueingAndAssignmentLogic)logic).getAssignedVehicles().size() :
 					0;
-			return new String[] { charger.getPlugCount() + "", //
+			return new String[] { charger.getPlugs() + "", //
 					getValue(logic.getPluggedVehicles().size(), plugs, relative),
 					getValue(logic.getQueuedVehicles().size(), plugs, relative),
 					getValue(assignedCount, plugs, relative) };

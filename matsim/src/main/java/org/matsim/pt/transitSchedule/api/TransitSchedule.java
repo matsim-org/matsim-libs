@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
-import org.matsim.utils.objectattributes.FailingObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributable;
 
@@ -59,11 +58,9 @@ public interface TransitSchedule extends MatsimToplevelContainer, Attributable {
 	@Override
 	TransitScheduleFactory getFactory();
 
-	@Deprecated
-	FailingObjectAttributes getTransitLinesAttributes();
-
-	@Deprecated
-	FailingObjectAttributes getTransitStopsAttributes();
+	ObjectAttributes getTransitLinesAttributes();
+	
+	ObjectAttributes getTransitStopsAttributes();
 
 	MinimalTransferTimes getMinimalTransferTimes();
 }

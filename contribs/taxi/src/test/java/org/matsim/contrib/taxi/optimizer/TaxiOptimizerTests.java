@@ -26,7 +26,6 @@ import java.util.Optional;
 
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
-import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -88,11 +87,11 @@ public class TaxiOptimizerTests {
 		private final Controler controler;
 
 		public PreloadedBenchmark(String plansSuffix, String taxisSuffix) {
-			URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
+			URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("mielec"),
 					"mielec_taxi_benchmark_config.xml");
 
-			config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup());
-			TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(config);
+			TaxiConfigGroup taxiCfg = new TaxiConfigGroup();
+			config = ConfigUtils.loadConfig(configUrl, taxiCfg, new DvrpConfigGroup());
 
 			config.plans().setInputFile("plans_only_taxi_mini_benchmark_" + plansSuffix + ".xml.gz");
 			taxiCfg.setTaxisFile("taxis_mini_benchmark-" + taxisSuffix + ".xml");
@@ -103,7 +102,7 @@ public class TaxiOptimizerTests {
 
 	public static void runBenchmark(List<TaxiConfigVariant> variants, AbstractTaxiOptimizerParams taxiOptimizerParams,
 			PreloadedBenchmark benchmark, String outputDir) {
-		TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(benchmark.config);
+		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(benchmark.config);
 		Optional.ofNullable(taxiCfg.getTaxiOptimizerParams()).ifPresent(taxiCfg::removeParameterSet);
 		taxiCfg.addParameterSet(taxiOptimizerParams);
 

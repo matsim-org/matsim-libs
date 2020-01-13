@@ -27,7 +27,5 @@ import org.matsim.api.core.v01.population.PlanElement;
  * @author thibaut
  */
 public interface MainModeIdentifier {
-
 	String identifyMainMode(List<? extends PlanElement> tripElements);
-
 }

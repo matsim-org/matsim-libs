@@ -20,6 +20,7 @@
 
 package org.matsim.core.trafficmonitoring;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 
 /**
@@ -30,13 +31,16 @@ import org.matsim.api.core.v01.network.Link;
  * @author mrieser
  */
 class TravelTimeDataArray extends TravelTimeData {
+	private static final Logger log = Logger.getLogger( TravelTimeDataArray.class ) ;
 
-	private final short[] timeCnt;
+	private final double[] timeSum;
+	private final int[] timeCnt;
 	private final double[] travelTimes;
 	private final Link link;
 
-	TravelTimeDataArray(final Link link, final int numSlots) {
-		this.timeCnt = new short[numSlots];
+	public TravelTimeDataArray(final Link link, final int numSlots) {
+		this.timeSum = new double[numSlots];
+		this.timeCnt = new int[numSlots];
 		this.travelTimes = new double[numSlots];
 		this.link = link;
 		resetTravelTimes();
@@ -44,28 +48,37 @@ class TravelTimeDataArray extends TravelTimeData {
 
 	@Override
 	public void resetTravelTimes() {
-		for (int i = 0; i < this.travelTimes.length; i++) {
+		for (int i = 0; i < this.timeSum.length; i++) {
+			this.timeSum[i] = 0.0;
 			this.timeCnt[i] = 0;
 			this.travelTimes[i] = -1.0;
 		}
 	}
-
+	
+//	@Override
+//	public void resetTravelTime( final int timeSlot ) {
+//		this.timeSum[timeSlot] = 0.0;
+//		this.timeCnt[timeSlot] = 0;
+//		this.travelTimes[timeSlot] = -1.0;
+//	}
+	
 	@Override
 	public void setTravelTime( final int timeSlot, final double traveltime ) {
-		this.timeCnt[timeSlot] = 1;
-		this.travelTimes[timeSlot] = traveltime;
+		this.timeSum[timeSlot] = traveltime ;
+		this.timeCnt[timeSlot] = 1 ;
+		this.travelTimes[timeSlot] = traveltime ; // since this is the only travel time, we do not need to trigger the cache consolidation.
+		// if ever some other value is added, the cache is invalidated in addTravelTime. kai/theresa, may'15
 	}
 
 	@Override
 	public void addTravelTime(final int timeSlot, final double traveltime) {
-		short cnt = this.timeCnt[timeSlot];
-		double sum = this.travelTimes[timeSlot] * cnt;
-
+		double sum = this.timeSum[timeSlot];
+		int cnt = this.timeCnt[timeSlot];
 		sum += traveltime;
 		cnt++;
-
-		this.travelTimes[timeSlot] = sum / cnt;
+		this.timeSum[timeSlot] = sum;
 		this.timeCnt[timeSlot] = cnt;
+		this.travelTimes[timeSlot] = -1.0; // initialize with negative value
 	}
 
 	@Override
@@ -73,10 +86,16 @@ class TravelTimeDataArray extends TravelTimeData {
 		double ttime = this.travelTimes[timeSlot];
 		if (ttime >= 0.0) return ttime; // negative values are invalid.
 
-		// ttime can only be <0 if it never accumulated anything, i.e. if cnt == 9, so just use freespeed
-		double freespeed = this.link.getLength() / this.link.getFreespeed(now);
-		this.travelTimes[timeSlot] = freespeed;
-		return freespeed;
+		int cnt = this.timeCnt[timeSlot];
+		if (cnt == 0) {
+			this.travelTimes[timeSlot] = this.link.getLength() / this.link.getFreespeed(now);
+			return this.travelTimes[timeSlot];
+		}
+
+		double sum = this.timeSum[timeSlot];
+		this.travelTimes[timeSlot] = sum / cnt;
+		return this.travelTimes[timeSlot];
 	}
+	
 
 }

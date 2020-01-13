@@ -23,7 +23,6 @@ package org.matsim.contrib.edrt.run;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
-import org.matsim.contrib.drt.optimizer.QSimScopeForkJoinPoolHolder;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
@@ -86,7 +85,7 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 		install(new PassengerEngineQSimModule(getMode()));
 
 		addModalComponent(DrtOptimizer.class, modalProvider(
-				getter -> new EDrtOptimizer(drtCfg, getter.getModal(DefaultDrtOptimizer.class),
+				getter -> new EDrtOptimizer(getter.getModal(DefaultDrtOptimizer.class),
 						getter.getModal(EmptyVehicleChargingScheduler.class))));
 
 		bindModal(DefaultDrtOptimizer.class).toProvider(modalProvider(
@@ -96,8 +95,6 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 						getter.getModal(EmptyVehicleRelocator.class), getter.getModal(UnplannedRequestInserter.class))))
 				.asEagerSingleton();
 
-		// XXX if overridden to something else, make sure that the depots are equipped with chargers
-		//  otherwise vehicles will not re-charge
 		bindModal(DepotFinder.class).to(NearestChargerAsDepot.class);
 
 		bindModal(PassengerRequestValidator.class).to(DefaultPassengerRequestValidator.class).asEagerSingleton();
@@ -112,30 +109,27 @@ public class EDrtModeQSimModule extends AbstractDvrpModeQSimModule {
 
 					@Override
 					public EmptyVehicleChargingScheduler get() {
+						Network network = getModalInstance(Network.class);
 						DrtTaskFactory taskFactory = getModalInstance(DrtTaskFactory.class);
-						return new EmptyVehicleChargingScheduler(timer, taskFactory, chargingInfrastructure);
+						return new EmptyVehicleChargingScheduler(network, timer, taskFactory, chargingInfrastructure);
 					}
 				}).asEagerSingleton();
 
-		addModalComponent(QSimScopeForkJoinPoolHolder.class,
-				() -> new QSimScopeForkJoinPoolHolder(drtCfg.getNumberOfThreads()));
-
-		bindModal(UnplannedRequestInserter.class).toProvider(modalProvider(
+		addModalComponent(DefaultUnplannedRequestInserter.class, modalProvider(
 				getter -> new DefaultUnplannedRequestInserter(drtCfg, getter.getModal(Fleet.class),
 						getter.get(MobsimTimer.class), getter.get(EventsManager.class),
 						getter.getModal(RequestInsertionScheduler.class),
 						getter.getModal(VehicleData.EntryFactory.class),
 						getter.getModal(PrecalculablePathDataProvider.class),
-						getter.getModal(InsertionCostCalculator.PenaltyCalculator.class),
-						getter.getModal(QSimScopeForkJoinPoolHolder.class)))).asEagerSingleton();
+						getter.getModal(InsertionCostCalculator.PenaltyCalculator.class))));
+		bindModal(UnplannedRequestInserter.class).to(modalKey(DefaultUnplannedRequestInserter.class));
 
 		bindModal(VehicleData.EntryFactory.class).toProvider(
 				EDrtVehicleDataEntryFactory.EDrtVehicleDataEntryFactoryProvider.class).asEagerSingleton();
 
-		bindModal(InsertionCostCalculator.PenaltyCalculator.class).to(
-				drtCfg.isRejectRequestIfMaxWaitOrTravelTimeViolated() ?
-						InsertionCostCalculator.RejectSoftConstraintViolations.class :
-						InsertionCostCalculator.DiscourageSoftConstraintViolations.class).asEagerSingleton();
+		bindModal(InsertionCostCalculator.PenaltyCalculator.class).to(drtCfg.isRequestRejection() ?
+				InsertionCostCalculator.RejectSoftConstraintViolations.class :
+				InsertionCostCalculator.DiscourageSoftConstraintViolations.class).asEagerSingleton();
 
 		bindModal(DrtTaskFactory.class).toInstance(new EDrtTaskFactoryImpl());
 

@@ -20,6 +20,7 @@
 package org.matsim.contrib.socnetsim.jointtrips.replanning.modules;
 
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.router.StageActivityTypes;
 
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
@@ -29,14 +30,18 @@ import org.matsim.contrib.socnetsim.framework.replanning.modules.AbstractMultith
  * @author thibautd
  */
 public class SynchronizeCoTravelerPlansModule extends AbstractMultithreadedGenericStrategyModule<JointPlan> {
+	private final StageActivityTypes checker;
 
-	public SynchronizeCoTravelerPlansModule( final int nThreads ) {
+	public SynchronizeCoTravelerPlansModule(
+			final int nThreads,
+			final StageActivityTypes checker) {
 		super( nThreads );
+		this.checker = checker;
 	}
 
 	@Override
 	public GenericPlanAlgorithm<JointPlan> createAlgorithm(ReplanningContext replanningContext) {
-		return new SynchronizeCoTravelerPlansAlgorithm();
+		return new SynchronizeCoTravelerPlansAlgorithm( checker );
 	}
 }
 

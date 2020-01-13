@@ -80,6 +80,7 @@ public class TripTimeAllocationMutator extends AbstractMultithreadedModule {
 	public PlanAlgorithm getPlanAlgoInstance() {
 		TripPlanMutateTimeAllocation pmta =
 			new TripPlanMutateTimeAllocation(
+					tripRouterProvider.get().getStageActivityTypes(),
 					this.mutationRange,
 					affectingDuration, MatsimRandom.getLocalInstance());
 		pmta.setUseActivityDurations(this.useActivityDurations);

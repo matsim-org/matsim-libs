@@ -28,7 +28,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
-import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
+import org.matsim.core.router.EmptyStageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
 
 import java.util.Random;
 
@@ -51,7 +52,7 @@ public class ActivitySequenceMutatorAlgorithmTest {
 		final PlanAlgorithm testee =
 			new ActivitySequenceMutatorAlgorithm(
 					new Random( 890 ),
-					StageActivityHandling.StagesAsNormalActivities );
+					EmptyStageActivityTypes.INSTANCE );
 		testee.run( plan );
 
 		Assert.assertEquals(
@@ -81,7 +82,7 @@ public class ActivitySequenceMutatorAlgorithmTest {
 		final PlanAlgorithm testee =
 			new ActivitySequenceMutatorAlgorithm(
 					new Random( 890 ),
-					StageActivityHandling.StagesAsNormalActivities );
+					EmptyStageActivityTypes.INSTANCE );
 		testee.run( plan );
 
 		Assert.assertEquals(
@@ -105,7 +106,7 @@ public class ActivitySequenceMutatorAlgorithmTest {
 		final PlanAlgorithm testee =
 			new ActivitySequenceMutatorAlgorithm(
 					new Random( 890 ),
-					StageActivityHandling.StagesAsNormalActivities );
+					EmptyStageActivityTypes.INSTANCE );
 		testee.run( plan );
 
 		Assert.assertEquals(
@@ -131,7 +132,7 @@ public class ActivitySequenceMutatorAlgorithmTest {
 		final PlanAlgorithm testee =
 			new ActivitySequenceMutatorAlgorithm(
 					new Random( 890 ),
-					StageActivityHandling.ExcludeStageActivities );
+					new StageActivityTypesImpl( "stage" ) );
 		testee.run( plan );
 
 		Assert.assertEquals(

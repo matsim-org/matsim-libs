@@ -20,7 +20,6 @@
 package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
 
 import org.matsim.contrib.socnetsim.framework.replanning.modules.ActivitySequenceMutatorModule;
@@ -46,16 +45,14 @@ public class GroupActivitySequenceMutator extends AbstractConfigurableSelectionS
 	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
 	private final Provider<TripRouter> tripRouterFactory;
 	private final PlanLinkIdentifier planLinkIdentifier;
-	private final MainModeIdentifier mainModeIdentifier;
 
 	@Inject
 	public GroupActivitySequenceMutator( Scenario sc , PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory , Provider<TripRouter> tripRouterFactory ,
-			@Strong PlanLinkIdentifier planLinkIdentifier, MainModeIdentifier mainModeIdentifier ) {
+			@Strong PlanLinkIdentifier planLinkIdentifier ) {
 		this.sc = sc;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;
 		this.planLinkIdentifier = planLinkIdentifier;
-		this.mainModeIdentifier = mainModeIdentifier;
 	}
 
 
@@ -66,12 +63,13 @@ public class GroupActivitySequenceMutator extends AbstractConfigurableSelectionS
 		strategy.addStrategyModule(
 				new IndividualBasedGroupStrategyModule(
 					new ActivitySequenceMutatorModule(
-						sc.getConfig().global().getNumberOfThreads()) ) );
+						sc.getConfig().global().getNumberOfThreads(),
+						JointActingTypes.JOINT_STAGE_ACTS, tripRouterFactory) ) );
 	
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createJointTripAwareTourModeUnifierModule(
 					sc.getConfig(),
-					mainModeIdentifier ) );
+					tripRouterFactory ) );
 
 		// TODO: add an option to enable or disable this part?
 		final VehicleRessources vehicles =

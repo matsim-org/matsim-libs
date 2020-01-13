@@ -20,8 +20,6 @@
 package org.matsim.core.router.util;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.vehicles.Vehicle;
 
 
 
@@ -46,6 +44,6 @@ public interface LinkToLinkTravelTime {
 	 * 		<code>fromLink</code> and enter the toLink <code>toLink</code>, 
 	 * departing at time <code>time</code>.
 	 */
-	public double getLinkToLinkTravelTime(Link fromLink, Link toLink, double time, Person person, Vehicle vehicle);
+	public double getLinkToLinkTravelTime(Link fromLink, Link toLink, double time);
 
 }

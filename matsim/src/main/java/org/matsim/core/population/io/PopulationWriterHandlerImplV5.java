@@ -34,13 +34,10 @@ import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.core.utils.io.XmlUtils;
 import org.matsim.core.utils.misc.Time;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-
-import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 
 /**
  * @author mrieser
@@ -66,7 +63,7 @@ import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 	public void startPlans(final Population plans, final BufferedWriter out) throws IOException {
 		out.write("<population");
 		if (plans.getName() != null) {
-			out.write(" desc=\"" + encodeAttributeValue(plans.getName()) + "\"");
+			out.write(" desc=\"" + plans.getName() + "\"");
 		}
 		out.write(">\n\n");
 	}
@@ -108,7 +105,7 @@ import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 
 	private static void startPerson(final Person person, final BufferedWriter out) throws IOException {
 		out.write("\t<person id=\"");
-		out.write(encodeAttributeValue(person.getId().toString()));
+		out.write(person.getId().toString());
 		out.write("\"");
 		if (PersonUtils.getSex(person) != null) {
 			out.write(" sex=\"");
@@ -155,7 +152,7 @@ import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 			out.write(" selected=\"no\"");
 		if ((plan.getType() != null)) {
 			out.write(" type=\"");
-			out.write(encodeAttributeValue(plan.getType()));
+			out.write(plan.getType());
 			out.write("\"");
 		}
 		out.write(">\n");
@@ -167,16 +164,16 @@ import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 
 	private void writeAct(final Activity act, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<act type=\"");
-		out.write(encodeAttributeValue(act.getType()));
+		out.write(act.getType());
 		out.write("\"");
 		if (act.getLinkId() != null) {
 			out.write(" link=\"");
-			out.write(encodeAttributeValue(act.getLinkId().toString()));
+			out.write(act.getLinkId().toString());
 			out.write("\"");
 		}
 		if (act.getFacilityId() != null) {
 			out.write(" facility=\"");
-			out.write(encodeAttributeValue(act.getFacilityId().toString()));
+			out.write(act.getFacilityId().toString());
 			out.write("\"");
 		}
 		if (act.getCoord() != null) {
@@ -207,7 +204,7 @@ import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 
 	private static void startLeg(final Leg leg, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<leg mode=\"");
-		out.write(encodeAttributeValue(leg.getMode()));
+		out.write(leg.getMode());
 		out.write("\"");
 		if (!Time.isUndefinedTime(leg.getDepartureTime())) {
 			out.write(" dep_time=\"");
@@ -239,13 +236,13 @@ import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 	private static void startRoute(final Route route, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<route ");
 		out.write("type=\"");
-		out.write(encodeAttributeValue(route.getRouteType()));
+		out.write(route.getRouteType());
 		out.write("\"");
 		out.write(" start_link=\"");
-		out.write(encodeAttributeValue(route.getStartLinkId().toString()));
+		out.write(route.getStartLinkId().toString());
 		out.write("\"");
 		out.write(" end_link=\"");
-		out.write(encodeAttributeValue(route.getEndLinkId().toString()));
+		out.write(route.getEndLinkId().toString());
 		out.write("\"");
 		out.write(" trav_time=\"");
 		out.write(Time.writeTime(route.getTravelTime()));
@@ -258,13 +255,13 @@ import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 		
 		if ( route instanceof NetworkRoute ) {
 			out.write(" vehicleRefId=\"");
-			out.write(encodeAttributeValue(Id.writeId(((NetworkRoute) route).getVehicleId())));
+			out.write(Id.writeId( ((NetworkRoute) route).getVehicleId() ) );
 			out.write("\"");
 		}
 		out.write(">");
 		String rd = route.getRouteDescription();
 		if (rd != null) {
-			out.write(XmlUtils.encodeContent(rd));
+			out.write(rd);
 		}
 	}
 

@@ -111,7 +111,7 @@ public class FreespeedTravelTimeAndDisutility implements TravelDisutility, Trave
 	 * If travelling freespeed the turning move travel time is not relevant
 	 */
 	@Override
-	public double getLinkToLinkTravelTime(Link fromLink, Link toLink, double time, Person person, Vehicle vehicle) {
+	public double getLinkToLinkTravelTime(Link fromLink, Link toLink, double time) {
 		return this.getLinkTravelTime(fromLink, time, null, null);
 	}
 	

@@ -41,7 +41,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Time;
@@ -163,10 +162,10 @@ import org.matsim.vehicles.VehiclesFactory;
 		Vehicles vehicles = scenario.getTransitVehicles();
         VehiclesFactory vb = vehicles.getFactory();
         VehicleType vehicleType = vb.createVehicleType(Id.create("transitVehicleType", VehicleType.class));
-//        VehicleCapacity capacity = vb.createVehicleCapacity();
-		vehicleType.getCapacity().setSeats(101);
-		vehicleType.getCapacity().setStandingRoom(0);
-//        vehicleType.setCapacity(capacity);
+        VehicleCapacity capacity = vb.createVehicleCapacity();
+        capacity.setSeats(101);
+        capacity.setStandingRoom(0);
+        vehicleType.setCapacity(capacity);
         vehicles.addVehicleType(vehicleType);
         vehicles.addVehicle( vb.createVehicle(Id.create("veh1", Vehicle.class), vehicleType));
         vehicles.addVehicle( vb.createVehicle(Id.create("veh2", Vehicle.class), vehicleType));
@@ -220,13 +219,12 @@ import org.matsim.vehicles.VehiclesFactory;
 		}
 	}
 	
-	/*package*/ Person createPersonAndAdd(Scenario scenario, String id, String legMode, String routingMode) {
+	/*package*/ Person createPersonAndAdd(Scenario scenario, String id, String mode) {
 		Person person = scenario.getPopulation().getFactory().createPerson(Id.create(id, Person.class));
 
 		Activity from = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("0", Link.class));
 		((Activity) from).setCoord(this.nodes[0].getCoord());
-		Leg leg = scenario.getPopulation().getFactory().createLeg(legMode);
-		TripStructureUtils.setRoutingMode(leg, routingMode);
+		Leg leg = scenario.getPopulation().getFactory().createLeg(mode);
 		Activity to = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("3", Link.class));
 		((Activity) to).setCoord(this.nodes[4].getCoord());
 		

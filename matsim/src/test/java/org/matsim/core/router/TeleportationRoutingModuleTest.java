@@ -33,9 +33,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.FacilitiesUtils;
-import org.matsim.facilities.Facility;
 
 /**
  * @author mrieser
@@ -49,12 +46,8 @@ public class TeleportationRoutingModuleTest {
 		RouteFactories routeFactory = new RouteFactories();
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 		Leg leg = PopulationUtils.createLeg(TransportMode.walk);
-//		Activity fromAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 0));
-		Facility fromAct = scenario.getActivityFacilities().getFactory().createActivityFacility( Id.create( "h", ActivityFacility.class ),
-				new Coord(0,0), Id.createLinkId( "h" ) ) ;
-//		Activity toAct = PopulationUtils.createActivityFromCoord("h", new Coord(1000, 0));
-		Facility toAct = scenario.getActivityFacilities().getFactory().createActivityFacility( Id.create( "h", ActivityFacility.class ),
-				new Coord(1000,0), Id.createLinkId( "h" ) ) ;
+		Activity fromAct = PopulationUtils.createActivityFromCoord("h", new Coord(0, 0));
+		Activity toAct = PopulationUtils.createActivityFromCoord("h", new Coord(1000, 0));
 
 		TeleportationRoutingModule router =
 				new TeleportationRoutingModule(
@@ -76,9 +69,7 @@ public class TeleportationRoutingModuleTest {
 		Assert.assertEquals(50.0, leg.getTravelTime(), 10e-7);
 		Assert.assertEquals(50.0, leg.getRoute().getTravelTime(), 10e-7);
 
-//		Activity otherToAct = PopulationUtils.createActivityFromCoord("h", new Coord(1000, 1000));
-		Facility otherToAct = scenario.getActivityFacilities().getFactory().createActivityFacility( Id.create( "h", ActivityFacility.class ),
-				new Coord(1000,1000), Id.createLinkId( "h" ) ) ;
+		Activity otherToAct = PopulationUtils.createActivityFromCoord("h", new Coord(1000, 1000));
 		double manhattanBeelineDistanceFactor = Math.sqrt(2.0);
 		router =
                 new TeleportationRoutingModule(

@@ -51,7 +51,11 @@ public final class RouteFactories {
 	 */
 	@SuppressWarnings("unchecked")
 	public <R extends Route> R createRoute(final Class<R> routeClass, final Id<Link> startLinkId, final Id<Link> endLinkId) {
-		return (R)this.routeFactories.getOrDefault(routeClass, defaultFactory).createRoute(startLinkId, endLinkId);
+		RouteFactory factory = this.routeFactories.get(routeClass);
+		if (factory == null) {
+			factory = this.defaultFactory;
+		}
+		return (R) factory.createRoute(startLinkId, endLinkId);
 	}
 
 	/**
@@ -76,7 +80,11 @@ public final class RouteFactories {
 	}
 
 	public Class<? extends Route> getRouteClassForType(String routeType) {
-		//Route.class will result in a generic route
-		return this.type2class.getOrDefault(routeType, Route.class);
+		Class<? extends Route> routeClass = this.type2class.get(routeType);
+		if (routeClass == null) {
+			routeClass = Route.class; // will result in a generic route
+		}
+		return routeClass;
 	}
+
 }

@@ -53,7 +53,7 @@ public class VehicleChargingHandler
 		implements ActivityStartEventHandler, ActivityEndEventHandler, PersonLeavesVehicleEventHandler,
 		ChargingEndEventHandler, MobsimScopeEventHandler {
 
-	public static final String CHARGING_IDENTIFIER = " charging interaction";
+	public static final String CHARGING_IDENTIFIER = " charging";
 	private Map<Id<Person>, Id<Vehicle>> lastVehicleUsed = new HashMap<>();
 	private Map<Id<ElectricVehicle>, Id<Charger>> vehiclesAtChargers = new HashMap<>();
 

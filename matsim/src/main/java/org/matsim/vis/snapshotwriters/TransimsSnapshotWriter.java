@@ -39,7 +39,7 @@ public class TransimsSnapshotWriter implements SnapshotWriter {
 
 	public TransimsSnapshotWriter(String filename) {
 		try {
-			this.out = IOUtils.getBufferedWriter(IOUtils.getFileUrl(filename), IOUtils.CHARSET_UTF8, true);
+			this.out = IOUtils.getBufferedWriter(filename, true);
 			String header = Labels.VEHICLE
             + "\t" + Labels.TIME
             + "\tLINK"

@@ -52,7 +52,7 @@ public class ScheduledTour {
 
 	@Override
 	public String toString() {
-		return "scheduledTour=[tour="+tour+"][vehicle="+vehicle+"][departureTime="+departureTime+"]";
+		return "[tour="+tour+"][vehicle="+vehicle+"][departureTime="+departureTime+"]";
 	}
 
 }

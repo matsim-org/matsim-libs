@@ -202,13 +202,15 @@ public class AssignmentETaxiOptimizer extends AssignmentTaxiOptimizer {
 		// TODO move it to AssignmentETaxiOptimizerParams
 		double chargingPlanningHorizon = 10 * 60;// 10 minutes (should be longer than socCheckTimeStep)
 		double maxDepartureTime = timer.getTimeOfDay() + chargingPlanningHorizon;
-		Stream<DvrpVehicle> vehiclesBelowMinSocLevel = fleet.getVehicles()
-				.values().stream().filter(v -> isChargingSchedulable((EvDvrpVehicle)v, eScheduler, maxDepartureTime));
+		@SuppressWarnings("unchecked")
+		Stream<EvDvrpVehicle> vehiclesBelowMinSocLevel = ((Stream<EvDvrpVehicle>)fleet.getVehicles()
+				.values()
+				.stream()).filter(v -> isChargingSchedulable(v, eScheduler, maxDepartureTime));
 
 		// filter least charged vehicles
 		// assumption: all b.capacities are equal
-		List<DvrpVehicle> leastChargedVehicles = PartialSort.kSmallestElements(pData.getSize(),
-				vehiclesBelowMinSocLevel, v -> ((EvDvrpVehicle)v).getElectricVehicle().getBattery().getSoc());
+		List<EvDvrpVehicle> leastChargedVehicles = PartialSort.kSmallestElements(pData.getSize(),
+				vehiclesBelowMinSocLevel, v -> v.getElectricVehicle().getBattery().getSoc());
 
 		return new VehicleData(timer.getTimeOfDay(), eScheduler, leastChargedVehicles.stream());
 	}

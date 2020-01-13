@@ -19,8 +19,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointactivities.replanning.modules.prismiclocationchoice;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.router.CompositeStageActivityTypes;
 
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
@@ -50,7 +52,9 @@ public class PrismicLocationChoiceModule  extends AbstractMultithreadedGenericSt
 				(PrismicLocationChoiceConfigGroup) scenario.getConfig().getModule( PrismicLocationChoiceConfigGroup.GROUP_NAME ),
 				scenario.getActivityFacilities(),
 				(SocialNetwork) scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME ),
-				JointActingTypes.JOINT_STAGE_ACTS );
+				new CompositeStageActivityTypes(
+						tripRouterProvider.get().getStageActivityTypes(),
+						JointActingTypes.JOINT_STAGE_ACTS ) );
 	}
 }
 

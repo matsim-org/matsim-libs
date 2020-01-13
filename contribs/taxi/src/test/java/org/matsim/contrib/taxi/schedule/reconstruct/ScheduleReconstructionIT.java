@@ -42,7 +42,6 @@ import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
-import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -63,24 +62,24 @@ public class ScheduleReconstructionIT {
 
 	@Test
 	public void testOneTaxiReconstruction() {
-		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_taxi_benchmark_config.xml");
+		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_taxi_benchmark_config.xml");
 		runReconstruction(configUrl);
 	}
 
 	@Test
 	public void testMielecReconstruction() {
-		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_benchmark_config.xml");
+		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_benchmark_config.xml");
 		runReconstruction(configUrl);
 	}
 
 	@SuppressWarnings("unchecked")
 	private void runReconstruction(URL configUrl) {
-		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup(),
+		Config config = ConfigUtils.loadConfig(configUrl, new TaxiConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setDumpDataAtEnd(false);
 
-		TaxiConfigGroup taxiCfg = TaxiConfigGroup.getSingleModeTaxiConfig(config);
+		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
 		Controler controler = RunTaxiBenchmark.createControler(config, 1);
 		controler.addOverridingModule(new AbstractDvrpModeModule(taxiCfg.getMode()) {
 			@Override

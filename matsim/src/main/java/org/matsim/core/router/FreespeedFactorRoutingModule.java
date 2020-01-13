@@ -84,6 +84,11 @@ public final class FreespeedFactorRoutingModule implements RoutingModule {
 	}
 
 	@Override
+	public StageActivityTypes getStageActivityTypes() {
+		return EmptyStageActivityTypes.INSTANCE;
+	}
+
+	@Override
 	public String toString() {
 		return "[LegRouterWrapper: mode="+this.mode+"]";
 	}

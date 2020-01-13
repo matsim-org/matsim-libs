@@ -23,8 +23,6 @@ import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 
-import com.google.common.base.Preconditions;
-
 /**
  * @author michalm
  */
@@ -36,8 +34,9 @@ public class ChargingTaskImpl extends StayTaskImpl implements ChargingTask {
 
 	public ChargingTaskImpl(double beginTime, double endTime, Charger charger, ElectricVehicle ev, double totalEnergy) {
 		super(beginTime, endTime, charger.getLink());
-		Preconditions.checkArgument(totalEnergy < 0, "Total energy consumption is not negative: %s", totalEnergy);
-
+		if (totalEnergy >= 0) {
+			throw new IllegalArgumentException("Total energy consuption must be negative");
+		}
 		this.chargingLogic = (ChargingWithQueueingAndAssignmentLogic)charger.getLogic();
 		this.ev = ev;
 		this.totalEnergy = totalEnergy;

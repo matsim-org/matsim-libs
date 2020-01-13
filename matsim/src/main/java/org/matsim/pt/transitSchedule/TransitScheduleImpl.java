@@ -30,7 +30,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.utils.objectattributes.FailingObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 
@@ -46,6 +46,8 @@ public class TransitScheduleImpl implements TransitSchedule {
 	private final Map<Id<TransitLine>, TransitLine> transitLines = new TreeMap<>();
 	private final Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities = new TreeMap<>();
 	private final TransitScheduleFactory factory;
+	private final ObjectAttributes transitLinesAttributes = new ObjectAttributes();
+	private final ObjectAttributes transitStopsAttributes = new ObjectAttributes();
 	private final Attributes attributes = new Attributes();
 	private final MinimalTransferTimes minimalTransferTimes = new MinimalTransferTimesImpl();
 
@@ -113,13 +115,13 @@ public class TransitScheduleImpl implements TransitSchedule {
 	}
 
 	@Override
-	public FailingObjectAttributes getTransitLinesAttributes() {
-		return FailingObjectAttributes.createTransitLinesAttributes();
+	public ObjectAttributes getTransitLinesAttributes() {
+		return this.transitLinesAttributes;
 	}
 	
 	@Override
-	public FailingObjectAttributes getTransitStopsAttributes() {
-		return FailingObjectAttributes.createTransitStopsAttributes();
+	public ObjectAttributes getTransitStopsAttributes() {
+		return this.transitStopsAttributes;
 	}
 
 	@Override

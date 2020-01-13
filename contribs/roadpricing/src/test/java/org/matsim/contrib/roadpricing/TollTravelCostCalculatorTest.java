@@ -20,36 +20,19 @@
 
 package org.matsim.contrib.roadpricing;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
-import java.util.List;
-
-import javax.inject.Provider;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.roadpricing.RoadPricingSchemeImpl.Cost;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.AStarLandmarksFactory;
-import org.matsim.core.router.DijkstraFactory;
-import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -59,6 +42,12 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import javax.inject.Provider;
+import java.util.List;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
  * Tests the correct working of {@link TravelDisutilityIncludingToll} by using it
@@ -137,9 +126,10 @@ public class TollTravelCostCalculatorTest {
 		// yy note: this returns a combined TravelTime and TravelDisutility object.  The TravelDisutility object is used in the next three lines to be wrapped, 
 		// and then never again.  Would be nice to be able to get them separately ...  kai, oct'13
 		
-		TravelDisutility costCalc = new TravelDisutilityIncludingToll((TravelDisutility)timeCalc, toll, config); // we use freespeedTravelCosts as base costs
+		TravelDisutility costCalc = new TravelDisutilityIncludingToll((TravelDisutility)timeCalc, toll, config); // we use freespeedTravelCosts as base
+		// costs
 
-		AStarLandmarksFactory aStarLandmarksFactory = new AStarLandmarksFactory(2);
+		AStarLandmarksFactory aStarLandmarksFactory = new AStarLandmarksFactory();
 
 		PreProcessLandmarks commonRouterData = new PreProcessLandmarks((TravelDisutility)timeCalc);
 		commonRouterData.run(network);
@@ -167,7 +157,7 @@ public class TollTravelCostCalculatorTest {
 				costCalc );
 		RoadPricingTestUtils.compareRoutes("2 5 6", (NetworkRoute) ((Leg) (person1.getPlans().get(0).getPlanElements().get(carLegIndex))).getRoute());
 
-		Cost morningCost = toll.createAndAddCost(6*3600, 10*3600, 0.0006); // 0.0006 * link_length(100m) = 0.06, which is slightly below the threshold of 0.0666
+		CostInfo morningCost = toll.createAndAddCost(6*3600, 10*3600, 0.0006 ); // 0.0006 * link_length(100m) = 0.06, which is slightly below the threshold of 0.0666
 		// 2nd case: with a low toll, agent still chooses shortest path
 		clearRoutes(population);
 		routePopulation(
@@ -221,7 +211,7 @@ public class TollTravelCostCalculatorTest {
 		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
 		TravelDisutility costCalc = new TravelDisutilityIncludingToll(timeCostCalc, toll, config); // we use freespeedTravelCosts as base costs
 
-		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory(2);
+		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory();
 
 		PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
 		commonRouterData.run(network);
@@ -260,7 +250,7 @@ public class TollTravelCostCalculatorTest {
 		}
 		RoadPricingTestUtils.compareRoutes("2 5 6", (NetworkRoute) ((Leg) (planElements2.get(carLegIndex))).getRoute());
 
-		Cost morningCost = toll.createAndAddCost(6*3600, 10*3600, 0.06); // 0.06, which is slightly below the threshold of 0.0666
+		CostInfo morningCost = toll.createAndAddCost(6*3600, 10*3600, 0.06 ); // 0.06, which is slightly below the threshold of 0.0666
 		// 2nd case: with a low toll, agent still chooses shortest path
 		clearRoutes(population);
 		routePopulation(
@@ -316,7 +306,7 @@ public class TollTravelCostCalculatorTest {
 		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
 		TravelDisutility costCalc = new TravelDisutilityIncludingToll(timeCostCalc, toll, config); // we use freespeedTravelCosts as base costs
 
-		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory(2);
+		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory();
 
 		int carLegIndex = 1 ;
 		if ( config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
@@ -341,7 +331,7 @@ public class TollTravelCostCalculatorTest {
 		RoadPricingTestUtils.compareRoutes("2 5 6", (NetworkRoute) ((Leg) (person1.getPlans().get(0).getPlanElements().get(carLegIndex))).getRoute());
 
 		// 2nd case: with a low toll, agent still chooses shortest path and pay the toll
-		Cost morningCost = toll.createAndAddCost(6*3600, 10*3600, 0.06);
+		CostInfo morningCost = toll.createAndAddCost(6*3600, 10*3600, 0.06 );
 		clearRoutes(population);
 		routePopulation(
 				scenario,

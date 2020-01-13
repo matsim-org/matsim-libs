@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
@@ -111,10 +112,14 @@ public class VehicleData {
 			ForkJoinPool forkJoinPool) {
 		this.currentTime = currentTime;
 		this.entryFactory = entryFactory;
-		entries = forkJoinPool.submit(() -> vehicles.parallel()
-				.map(v -> entryFactory.create(v, currentTime))
-				.filter(Objects::nonNull)
-				.collect(Collectors.toMap(e -> e.vehicle.getId(), e -> e))).join();
+		try {
+			entries = forkJoinPool.submit(() -> vehicles.parallel()
+					.map(v -> entryFactory.create(v, currentTime))
+					.filter(Objects::nonNull)
+					.collect(Collectors.toMap(e -> e.vehicle.getId(), e -> e))).get();
+		} catch (InterruptedException | ExecutionException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public void updateEntry(DvrpVehicle vehicle) {

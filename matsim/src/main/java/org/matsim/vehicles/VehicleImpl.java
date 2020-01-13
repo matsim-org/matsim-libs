@@ -22,12 +22,12 @@ package org.matsim.vehicles;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 
-final class VehicleImpl implements Vehicle {
+public class VehicleImpl implements Vehicle {
 
 	private VehicleType type;
 	private Id<Vehicle> id;
 
-	VehicleImpl( Id<Vehicle> id , VehicleType type ) {
+	public VehicleImpl(Id<Vehicle> id, VehicleType type) {
 		Gbl.assertNotNull(id);
 		Gbl.assertNotNull(type);
 		this.id = id;

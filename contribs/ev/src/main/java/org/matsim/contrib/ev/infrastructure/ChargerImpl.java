@@ -73,12 +73,12 @@ public class ChargerImpl implements Charger {
 	}
 
 	@Override
-	public double getPlugPower() {
-		return specification.getPlugPower();
+	public double getPower() {
+		return specification.getMaxPower();
 	}
 
 	@Override
-	public int getPlugCount() {
+	public int getPlugs() {
 		return specification.getPlugCount();
 	}
 

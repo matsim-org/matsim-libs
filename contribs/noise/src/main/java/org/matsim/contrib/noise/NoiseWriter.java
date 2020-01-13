@@ -29,11 +29,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.noise.data.NoiseContext;
+import org.matsim.contrib.noise.data.NoiseLink;
+import org.matsim.contrib.noise.data.NoiseReceiverPoint;
+import org.matsim.contrib.noise.data.ReceiverPoint;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -44,14 +47,14 @@ import org.matsim.core.utils.misc.Time;
  * @author ikaddoura
  *
  */
-final class NoiseWriter {
+public class NoiseWriter {
 	private static final Logger log = Logger.getLogger(NoiseWriter.class);
 
 	public static void writeReceiverPoints(NoiseContext noiseContext, String outputPath, boolean useCompression) {
 
 		// csv file
-		Map<Id<ReceiverPoint>,Double> id2xCoord = new HashMap<>();
-		Map<Id<ReceiverPoint>,Double> id2yCoord = new HashMap<>();
+		HashMap<Id<ReceiverPoint>,Double> id2xCoord = new HashMap<>();
+		HashMap<Id<ReceiverPoint>,Double> id2yCoord = new HashMap<>();
 		int c = 0;
 		for(Id<ReceiverPoint> id : noiseContext.getReceiverPoints().keySet()) {
 			c++;
@@ -61,12 +64,12 @@ final class NoiseWriter {
 			id2xCoord.put(id, noiseContext.getReceiverPoints().get(id).getCoord().getX());
 			id2yCoord.put(id, noiseContext.getReceiverPoints().get(id).getCoord().getY());
 		}
-		List<String> headers = new ArrayList<>();
+		List<String> headers = new ArrayList<String>();
 		headers.add("receiverPointId");
 		headers.add("xCoord");
 		headers.add("yCoord");
 		
-		List<Map<Id<ReceiverPoint>,Double>> values = new ArrayList<>();
+		List<HashMap<Id<ReceiverPoint>,Double>> values = new ArrayList<>();
 		values.add(id2xCoord);
 		values.add(id2yCoord);
 		
@@ -96,7 +99,7 @@ final class NoiseWriter {
 //		log.info("Writing receiver points to shapefile... Done. ");
 	}
 	
-	public static void write (String fileName , int columns , List<String> headers , List<Map<Id<ReceiverPoint>,Double>> values, boolean useCompression) {
+	public static void write (String fileName , int columns , List<String> headers , List<HashMap<Id<ReceiverPoint>,Double>> values, boolean useCompression) {
 		
 		File file = new File(fileName);
 		file.mkdirs();
@@ -229,7 +232,7 @@ final class NoiseWriter {
 			
 			for (NoiseReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
 				
-				bw.write(rp.getId() + ";" + rp.getCurrentImmission() + ";" + rp.getCoord().getX() + ";" + rp.getCoord().getY() + ";" + timeInterval );
+				bw.write(rp.getId() + ";" + rp.getFinalImmission() + ";" + rp.getCoord().getX() + ";" + rp.getCoord().getY() + ";" + timeInterval );
 				bw.newLine();
 			}
 			
@@ -257,7 +260,7 @@ final class NoiseWriter {
 		
 	}
 	
-	static void writePersonActivityInfoPerHour( NoiseContext noiseContext , String outputPath ) {
+	public static void writePersonActivityInfoPerHour(NoiseContext noiseContext, String outputPath) {
 		double timeInterval = noiseContext.getCurrentTimeBinEndTime();
 		
 		String outputPathActivityInfo = outputPath + "consideredAgentUnits/";
@@ -265,8 +268,6 @@ final class NoiseWriter {
 		dir.mkdirs();
 		
 		String fileName = outputPathActivityInfo + "consideredAgentUnits_" + timeInterval + ".csv";
-
-		log.warn("writing consideredAgentUnits for timeInterval=" + timeInterval ) ;
 		
 		File file = new File(fileName);
 		

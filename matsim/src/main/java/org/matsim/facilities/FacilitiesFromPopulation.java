@@ -19,10 +19,13 @@
 
 package org.matsim.facilities;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -36,12 +39,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 
 /**
  * Generates {@link ActivityFacility}s from the {@link Activity Activities} in a population
@@ -146,77 +143,54 @@ public final class FacilitiesFromPopulation {
 	}
 
 	private void handleActivities(final Population population) {
-		Gbl.assertNotNull( network ) ;
-
 		int idxCounter = 0;
 		ActivityFacilitiesFactory factory = this.facilities.getFactory();
-		IdMap<Link, ActivityFacility> facilitiesPerLinkId = new IdMap<>(Link.class);
+		Map<Id<Link>, ActivityFacility> facilitiesPerLinkId = new HashMap<>();
 		Map<Coord, ActivityFacility> facilitiesPerCoordinate = new HashMap<>();
 
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Activity) {
-						Activity activity = (Activity) pe;
+						Activity a = (Activity) pe;
 
-						Coord coord = activity.getCoord();
-						Id<Link> linkId = activity.getLinkId();
+						Coord c = a.getCoord();
+						Id<Link> linkId = a.getLinkId();
 						ActivityFacility facility = null;
 
-						if ( linkId == null ) {
-							linkId = NetworkUtils.getNearestLinkExactly(this.network, coord).getId();
+						Gbl.assertNotNull( network ) ;
+
+						if (linkId == null && this.network != null) {
+							linkId = NetworkUtils.getNearestLinkExactly(this.network, c).getId();
 							// yyyy we have been using the non-exact version in other parts of the project. kai, mar'19
 						}
 
 						Gbl.assertNotNull( linkId );
 
-						if ( this.oneFacilityPerLink ) {
+						if (this.oneFacilityPerLink && linkId != null) {
 							facility = facilitiesPerLinkId.get(linkId);
 							if (facility == null) {
-								final Id<ActivityFacility> facilityId = Id.create( this.idPrefix + linkId.toString() , ActivityFacility.class );
-								final ActivityFacility preExistingFacilityIfAny = this.facilities.getFacilities().get( facilityId );
-								if ( preExistingFacilityIfAny == null ){
-									facility = factory.createActivityFacility( facilityId , coord , linkId );
-									facilitiesPerLinkId.put( linkId , facility );
-									this.facilities.addActivityFacility( facility );
-								} else {
-									if ( Objects.equals( preExistingFacilityIfAny.getLinkId() ,
-										  linkId ) && Objects.equals( preExistingFacilityIfAny.getCoord() , coord ) ) {
-										// do nothing; presumably, same auto-generation has been run before
-										facility = preExistingFacilityIfAny;
-									} else {
-										throw new RuntimeException( "Facility with id=" + facilityId + " but different in coordinates and/or linkId already exists." ) ;
-									}
-								}
+								facility = factory.createActivityFacility(Id.create(this.idPrefix + linkId.toString(), ActivityFacility.class), c, linkId);
+								this.facilities.addActivityFacility(facility);
+								facilitiesPerLinkId.put(linkId, facility);
 							}
 						} else {
-							if (coord == null)  {
-								throw new RuntimeException("Coordinate for the activity "+activity+" is null, cannot collect facilities per coordinate. " +
-										"Possibly use " + FacilitiesConfigGroup.FacilitiesSource.onePerActivityLinkInPlansFile + " " +
-													     "instead and collect facilities per link.");
+							if (c == null)  {
+								throw new RuntimeException("Coordinate for the activity "+a+" is null, cannot collect facilities per coordinate. " +
+										"Probably, use " + FacilitiesConfigGroup.FacilitiesSource.onePerActivityLinkInPlansFile + " instead and collect facilities per link.");
 							}
 
-							facility = facilitiesPerCoordinate.get(coord);
+							facility = facilitiesPerCoordinate.get(c);
 							if (facility == null) {
-								final Id<ActivityFacility> facilityId = Id.create( this.idPrefix + idxCounter++ , ActivityFacility.class );
-								final ActivityFacility preExistingFacilityIfAny = this.facilities.getFacilities().get( facilityId );
-								if ( preExistingFacilityIfAny == null ){
-									facility = factory.createActivityFacility( facilityId , coord , linkId );
-									facilitiesPerCoordinate.put( coord , facility );
-									this.facilities.addActivityFacility( facility );
-								} else {
-									if ( Objects.equals( preExistingFacilityIfAny.getLinkId() , linkId ) && Objects.equals( preExistingFacilityIfAny.getCoord() , coord ) ) {
-										// do nothing; presumably, same auto-generation has been run before
-										facility = preExistingFacilityIfAny;
-									} else {
-										throw new RuntimeException( "Facility with id=" + facilityId + " but different in coordinates and/or linkId already exists." ) ;
-									}
-								}
+								facility = factory.createActivityFacility(Id.create(this.idPrefix + idxCounter++, ActivityFacility.class), c,
+									  linkId);
+								this.facilities.addActivityFacility(facility);
+								facilitiesPerCoordinate.put(c, facility);
 							}
 						}
 
 						if (this.addEmptyActivityOptions) {
-							String actType = activity.getType();
+							String actType = a.getType();
 							ActivityOption option = facility.getActivityOptions().get(actType);
 							if (option == null) {
 								option = factory.createActivityOption(actType);
@@ -224,10 +198,10 @@ public final class FacilitiesFromPopulation {
 							}
 						}
 
-						activity.setFacilityId(facility.getId());
+						a.setFacilityId(facility.getId());
 						if (this.removeLinksAndCoordinates) {
-							activity.setLinkId(null);
-							activity.setCoord(null);
+							a.setLinkId(null);
+							a.setCoord(null);
 						}
 					}
 				}

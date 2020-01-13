@@ -78,7 +78,7 @@ final class PlansDumpingImpl implements PlansDumping, BeforeMobsimListener {
 			final String internalCRS = config.global().getCoordinateSystem();
 
 			if ( inputCRS == null ) {
-				new PopulationWriter(population, network).write(controlerIO.getIterationFilename(event.getIteration(), Controler.DefaultFiles.population));
+				new PopulationWriter(population, network).write(controlerIO.getIterationFilename(event.getIteration(), Controler.FILENAME_POPULATION));
 			}
 			else {
 				log.info( "re-projecting population from "+internalCRS+" back to "+inputCRS+" for export" );
@@ -88,7 +88,7 @@ final class PlansDumpingImpl implements PlansDumping, BeforeMobsimListener {
 								internalCRS,
 								inputCRS );
 
-				new PopulationWriter(transformation, population, network).write(controlerIO.getIterationFilename(event.getIteration(), Controler.DefaultFiles.population));
+				new PopulationWriter(transformation, population, network).write(controlerIO.getIterationFilename(event.getIteration(), Controler.FILENAME_POPULATION));
 			}
 			log.info("finished plans dump.");
 			stopwatch.endOperation("dump all plans");

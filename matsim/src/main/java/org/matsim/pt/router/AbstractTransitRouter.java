@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.router.TripStructureUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -63,16 +62,11 @@ public class AbstractTransitRouter {
 		return getTravelDisutility().getWalkTravelTime(person, coord, toCoord) + this.getConfig().getAdditionalTransferTime();
 	}
 
-	/**
-	 * TODO: Replace by FallbackRoutingModule?! - gl-nov'19
-	 */
-	@Deprecated
 	protected final List<Leg> createDirectWalkLegList(Person person, Coord fromCoord, Coord toCoord) {
 		List<Leg> legs = new ArrayList<>();
-		Leg leg = PopulationUtils.createLeg(TransportMode.walk);
+		Leg leg = PopulationUtils.createLeg(TransportMode.transit_walk);
 		double walkTime = getWalkTime(person, fromCoord, toCoord);
 		leg.setTravelTime(walkTime);
-		TripStructureUtils.setRoutingMode(leg, TransportMode.pt);
 		Route walkRoute = RouteUtils.createGenericRouteImpl(null, null);
 		walkRoute.setTravelTime(walkTime);
 		leg.setRoute(walkRoute);
@@ -183,7 +177,7 @@ public class AbstractTransitRouter {
 	}
 
 	private Leg createTransitWalkLeg(Coord fromCoord, Coord toCoord) {
-		Leg leg = PopulationUtils.createLeg(TransportMode.walk);
+		Leg leg = PopulationUtils.createLeg(TransportMode.transit_walk);
 		double walkTime = getWalkTime(null, fromCoord, toCoord);
 		leg.setTravelTime(walkTime);
 		return leg;

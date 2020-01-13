@@ -21,7 +21,6 @@ package org.matsim.contrib.socnetsim.jointtrips;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
@@ -188,9 +187,8 @@ public class JointTravelUtils {
 					}
 				}
 				else if ( pe instanceof Leg ||
-						!(JointActingTypes.JOINT_STAGE_ACTS.contains(
-							((Activity) pe).getType() ) || 
-								StageActivityTypeIdentifier.isStageActivity(((Activity) pe).getType())) ) {
+						!JointActingTypes.JOINT_STAGE_ACTS.isStageActivity(
+							((Activity) pe).getType() ) ) {
 					currentDriverTrip = null;
 				}
 			}

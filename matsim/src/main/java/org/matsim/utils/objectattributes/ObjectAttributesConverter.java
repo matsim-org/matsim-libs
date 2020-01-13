@@ -47,13 +47,13 @@ public class ObjectAttributesConverter {
 	}
 
 	public ObjectAttributesConverter() {
-		this.converters.put(String.class.getName(), new StringConverter() );
-		this.converters.put(Integer.class.getName(), new IntegerConverter() );
-		this.converters.put(Float.class.getName(), new FloatConverter() );
-		this.converters.put(Double.class.getName(), new DoubleConverter() );
-		this.converters.put(Boolean.class.getName(), new BooleanConverter() );
-		this.converters.put(Long.class.getName(), new LongConverter() );
-		this.converters.put(double[].class.getName(), new DoubleArrayConverter());
+		this.converters.put(String.class.getCanonicalName(), new StringConverter() );
+		this.converters.put(Integer.class.getCanonicalName(), new IntegerConverter() );
+		this.converters.put(Float.class.getCanonicalName(), new FloatConverter() );
+		this.converters.put(Double.class.getCanonicalName(), new DoubleConverter() );
+		this.converters.put(Boolean.class.getCanonicalName(), new BooleanConverter() );
+		this.converters.put(Long.class.getCanonicalName(), new LongConverter() );
+		this.converters.put(double[].class.getCanonicalName(), new DoubleArrayConverter());
 	}
 
 	public Object convert(String className, String value) {
@@ -85,7 +85,7 @@ public class ObjectAttributesConverter {
 	}
 
 	public String convertToString(Object o) {
-		AttributeConverter converter = getConverter(o.getClass().getName());
+		AttributeConverter converter = getConverter(o.getClass().getCanonicalName());
 		// is returning null the right approach there?
 		return converter == null ? null : converter.convertToString(o);
 	}
@@ -98,7 +98,7 @@ public class ObjectAttributesConverter {
 	 * @return the previously registered converter for this class, or <code>null</code> if none was set before.
 	 */
 	public AttributeConverter putAttributeConverter(final Class<?> clazz, final AttributeConverter converter) {
-		return this.converters.put(clazz.getName(), converter);
+		return this.converters.put(clazz.getCanonicalName(), converter);
 	}
 
 	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
@@ -114,6 +114,6 @@ public class ObjectAttributesConverter {
 	 * @return the previously registered converter for this class, of <code>null</code> if none was set.
 	 */
 	public AttributeConverter removeAttributeConverter(final Class<?> clazz) {
-		return this.converters.remove(clazz.getName());
+		return this.converters.remove(clazz.getCanonicalName());
 	}
 }

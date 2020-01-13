@@ -60,7 +60,7 @@ public final class EventsFileComparator {
 			String filename1 = args[0];
 			String filename2 = args[1];
 			
-			EventsFileComparator.compare(filename1, filename2);
+			EventsFileComparator.compareAndReturnInt(filename1, filename2);			
 		}
 	}
 	
@@ -146,42 +146,34 @@ public final class EventsFileComparator {
 			Map<String, Counter> map1 = this.worker1.getEventsMap();
 			Map<String, Counter> map2 = this.worker2.getEventsMap();
 
-			boolean problem = false ;
-
 			// check that map2 contains all keys of map1, with the same values
-			for (Entry<String, Counter> entry : map1.entrySet()) {
-				Counter counter = map2.get(entry.getKey());
-				if (counter == null) {
+			for (Entry<String, Counter> e : map1.entrySet()) {
+				Counter c = map2.get(e.getKey());
+				if (c == null) {
 					log.warn("The event:" ) ;
-					log.warn( entry.getKey() );
+					log.warn( e.getKey() );
 					log.warn("is missing in events file:" + worker2.getEventsFile());
 					setExitCode(Result.MISSING_EVENT);
-					problem = true ;
-				} else{
-					if( counter.getCount() != entry.getValue().getCount() ){
-						log.warn(
-							  "Wrong event count for: " + entry.getKey() + "\n" + entry.getValue().getCount() + " times in file:" + worker1.getEventsFile()
-								    + "\n" + counter.getCount() + " times in file:" + worker2.getEventsFile() );
-						setExitCode( Result.WRONG_EVENT_COUNT );
-						problem = true;
-					}
+					return;
+				}
+				if (c.getCount() != e.getValue().getCount()) {
+					log.warn("Wrong event count for: " + e.getKey() + "\n" + e.getValue().getCount() + " times in file:" + worker1.getEventsFile()
+							+ "\n" + c.getCount() + " times in file:" + worker2.getEventsFile());
+					setExitCode(Result.WRONG_EVENT_COUNT);
+					return;
 				}
 			}
 
 			// also check that map1 contains all keys of map2
 			for (Entry<String, Counter> e : map2.entrySet()) {
-				Counter counter = map1.get(e.getKey());
-				if (counter == null) {
+				Counter c = map1.get(e.getKey());
+				if (c == null) {
 					log.warn("The event:");
 					log.warn(e.getKey());
 					log.warn("is missing in events file:" + worker1.getEventsFile());
 					setExitCode(Result.MISSING_EVENT);
-					problem = true ;
+					return;
 				}
-			}
-
-			if ( problem ) {
-				return ;
 			}
 
 			if (this.worker1.isFinished()) {

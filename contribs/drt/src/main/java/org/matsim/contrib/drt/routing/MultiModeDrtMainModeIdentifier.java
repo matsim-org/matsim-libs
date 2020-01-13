@@ -29,46 +29,40 @@ import java.util.stream.Collectors;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
-import org.matsim.core.router.TripRouter;
 
 import com.google.inject.Inject;
 
 public class MultiModeDrtMainModeIdentifier implements MainModeIdentifier {
 
 	private final MainModeIdentifier delegate = new MainModeIdentifierImpl();
-	private final Map<String, String> stageActivityTypeToDrtMode;
-	private final Map<String, String> fallbackModeToDrtMode;
+	private final Map<String, String> drtStageActivityTypes;
+	private final Map<String, String> drtWalkTypes;
 
 	@Inject
 	public MultiModeDrtMainModeIdentifier(MultiModeDrtConfigGroup drtCfg) {
-		stageActivityTypeToDrtMode = drtCfg.getModalElements()
+		drtStageActivityTypes = drtCfg.getModalElements()
 				.stream()
-				.map(DrtConfigGroup::getMode)
-				.collect(Collectors.toMap(PlanCalcScoreConfigGroup::createStageActivityType, s -> s));
-
-		// #deleteBeforeRelease : only used to retrofit plans created since the merge of fallback routing module (sep'-dec'19)
-		fallbackModeToDrtMode = drtCfg.getModalElements()
+				.map(drtConfigGroup -> drtConfigGroup.getMode())
+				.collect(Collectors.toMap(s -> new DrtStageActivityType(s).drtStageActivity, s -> s));
+		drtWalkTypes = drtCfg.getModalElements()
 				.stream()
-				.map(DrtConfigGroup::getMode)
-				.collect(Collectors.toMap(TripRouter::getFallbackMode, s -> s));
+				.map(drtConfigGroup -> drtConfigGroup.getMode())
+				.collect(Collectors.toMap(s -> new DrtStageActivityType(s).drtWalk, s -> s));
 	}
 
 	@Override
 	public String identifyMainMode(List<? extends PlanElement> tripElements) {
 		for (PlanElement pe : tripElements) {
 			if (pe instanceof Activity) {
-				String type = stageActivityTypeToDrtMode.get(((Activity)pe).getType());
+				String type = drtStageActivityTypes.get(((Activity)pe).getType());
 				if (type != null) {
 					return type;
 				}
 			} else if (pe instanceof Leg) {
-				// #deleteBeforeRelease : only used to retrofit plans created since the merge of fallback routing module (sep'-dec'19)
-				String mode = fallbackModeToDrtMode.get(((Leg)pe).getMode());
+				String mode = drtWalkTypes.get(((Leg)pe).getMode());
 				if (mode != null) {
 					return mode;
 				}

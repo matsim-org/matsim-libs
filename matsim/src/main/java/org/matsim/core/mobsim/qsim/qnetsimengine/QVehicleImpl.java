@@ -177,6 +177,10 @@ public class QVehicleImpl implements QVehicle {
         return vehicle.getType().getPcuEquivalents();
     }
 
+    public double getFlowCapacityConsumptionInEquivalents() {
+        return vehicle.getType().getPcuEquivalents() / vehicle.getType().getFlowEfficiencyFactor();
+    }
+
 	@Override
 	public Vehicle getVehicle() {
 		return this.vehicle;

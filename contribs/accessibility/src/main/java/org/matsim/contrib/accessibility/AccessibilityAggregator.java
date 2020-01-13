@@ -28,6 +28,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.ActivityFacility;
 
@@ -40,13 +41,8 @@ public class AccessibilityAggregator implements FacilityDataExchangeInterface {
 	private Map<Tuple<ActivityFacility, Double>, Map<String,Double>> accessibilitiesMap = new HashMap<>();
 
 	@Override
-	public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay, String mode, double accessibility) {
-		Tuple<ActivityFacility, Double> key = new Tuple<>(measurePoint, timeOfDay);
-		if (!accessibilitiesMap.containsKey(key)) {
-			Map<String,Double> accessibilitiesByMode = new HashMap<>();
-			accessibilitiesMap.put(key, accessibilitiesByMode);
-		}
-		accessibilitiesMap.get(key).put(mode, accessibility);
+	public void setFacilityAccessibilities(ActivityFacility measurePoint, Double timeOfDay, Map<String, Double> accessibilities){
+		accessibilitiesMap.put(new Tuple<ActivityFacility, Double>(measurePoint, timeOfDay), accessibilities);
 	}
 
 	@Override

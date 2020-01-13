@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.router.StageActivityTypeIdentifier;
+import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -40,6 +40,7 @@ import org.matsim.core.utils.misc.Time;
  */
 public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 
+	private final  StageActivityTypes stageActivities;
 	private final double mutationRange;
 	private final Random random;
 	private boolean useActivityDurations = true;
@@ -48,14 +49,15 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 	private final Map<String, Double> subpopulationMutationRanges;
 	private final Map<String, Boolean> subpopulationAffectingDuration;
 
-	public TripPlanMutateTimeAllocation(final double mutationRange,
+	public TripPlanMutateTimeAllocation(final StageActivityTypes stageActivities, final double mutationRange,
 			final boolean affectingDuration, final Random random) {
-		this(mutationRange, affectingDuration, random, null, null, null);
+		this(stageActivities, mutationRange, affectingDuration, random, null, null, null);
 	}
 
-	public TripPlanMutateTimeAllocation(final double mutationRange, 
+	public TripPlanMutateTimeAllocation(final StageActivityTypes stageActivities, final double mutationRange, 
 			final boolean affectingDuration, final Random random, final String subpopulationAttribute,
 			final Map<String, Double> subpopulationMutationRanges, final Map<String, Boolean> subpopulationAffectingDuration) {
+		this.stageActivities = stageActivities;
 		this.mutationRange = mutationRange;
 		this.affectingDuration = affectingDuration;
 		this.random = random;
@@ -104,7 +106,7 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 
 					// assume that there will be no delay between arrival time and activity start time
 					act.setStartTime(now);
-					if (!StageActivityTypeIdentifier.isStageActivity(act.getType())) {
+					if (!this.stageActivities.isStageActivity(act.getType())) {
 						if (this.useActivityDurations) {
 							if (!Time.isUndefinedTime(act.getMaximumDuration())) {
 								// mutate the durations of all 'middle' activities

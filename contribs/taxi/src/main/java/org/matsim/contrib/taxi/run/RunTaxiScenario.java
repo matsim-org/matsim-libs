@@ -28,8 +28,8 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class RunTaxiScenario {
 	public static void run(URL configUrl, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup(),
+		Config config = ConfigUtils.loadConfig(configUrl, new TaxiConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
-		TaxiControlerCreator.createControlerWithSingleModeTaxi(config, otfvis).run();
+		TaxiControlerCreator.createControlerWithSingleModeDrt(config, otfvis).run();
 	}
 }
