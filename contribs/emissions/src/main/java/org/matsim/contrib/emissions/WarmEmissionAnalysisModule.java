@@ -45,7 +45,7 @@ import static org.matsim.contrib.emissions.HbefaTrafficSituation.*;
  * @author benjamin
  *
  */
-public final class WarmEmissionAnalysisModule {
+public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator{
 	// cannot make non-public: used at least twice outside package.  kai, jan'19
 
 	private static final Logger logger = Logger.getLogger(WarmEmissionAnalysisModule.class);
@@ -147,7 +147,7 @@ public final class WarmEmissionAnalysisModule {
 		Event warmEmissionEvent = new WarmEmissionEvent(leaveTime, linkId, vehicleId, warmEmissions);
 		this.eventsManager.processEvent(warmEmissionEvent);
 	}
-
+	@Override
 	public Map<WarmPollutant, Double> checkVehicleInfoAndCalculateWarmEmissions(Vehicle vehicle, Link link, double travelTime ){
 		return checkVehicleInfoAndCalculateWarmEmissions( vehicle.getType(), vehicle.getId(), link, travelTime );
 	}

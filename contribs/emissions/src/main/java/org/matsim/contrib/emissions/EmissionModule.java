@@ -49,6 +49,7 @@ public final class EmissionModule {
 	
 	private final Scenario scenario;
 	private WarmEmissionHandler warmEmissionHandler;
+	private ColdEmissionHandler coldEmissionHandler;
 
 	private final EventsManager eventsManager;
 	private final EmissionsConfigGroup emissionConfigGroup;
@@ -158,8 +159,11 @@ public final class EmissionModule {
 
 		warmEmissionHandler = new WarmEmissionHandler(vehicles,	network, parameterObject, eventsManager, emissionConfigGroup
 				.getEmissionEfficiencyFactor());
-		ColdEmissionHandler coldEmissionHandler = new ColdEmissionHandler( vehicles, network, parameterObject2, eventsManager, emissionConfigGroup
-																		       .getEmissionEfficiencyFactor() );
+
+		coldEmissionHandler = new ColdEmissionHandler( vehicles, network, parameterObject2, eventsManager,
+								       emissionConfigGroup.getEmissionEfficiencyFactor() );
+		// this initiates all cold emissions processing!
+
 		logger.info("leaving createEmissionHandler");
 	}
 
@@ -191,42 +195,25 @@ public final class EmissionModule {
 		logger.info("entering createAvgHbefaWarmTable ...");
 		
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgWarmTable = new HashMap<>();
-		
-		try{
-			BufferedReader br = IOUtils.getBufferedReader(filename);
+
+		try( BufferedReader br = IOUtils.getBufferedReader( filename ) ){
 			String strLine = br.readLine();
-			Map<String, Integer> indexFromKey = createIndexFromKey(strLine);
-			
-			while ((strLine = br.readLine()) != null) {
-				String[] array = strLine.split(";");
-				
-				HbefaWarmEmissionFactorKey key = new HbefaWarmEmissionFactorKey();
-				key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
+			Map<String, Integer> indexFromKey = createIndexFromKey( strLine );
 
-				WarmPollutant pollutant = WarmPollutant.valueOf( array[indexFromKey.get("Component")] );
-				// this is where Joe Malloy was just passing strings through all the way to events.  Now this is "typed" again.  There may be
-				// two failures:
-				// (1) The pollutant type is missing from the enum.  In that case, just add it to the enum.
-				// (2) The same pollutant type exists under a different name (e.g. NOx instead of NOX).  In that case, some map for
-				// translation needs to be introduced.  I think that that map should just sit at exactly the place here, and translate.
-				// kai, jan'20
-				warmPollutants.add( pollutant );
-				key.setHbefaComponent(pollutant);
+			while( (strLine = br.readLine()) != null ){
+				Result result = new Result( strLine, indexFromKey ).processMaterialThatIsSameForAverageAndDetailed();
+				String[] array = result.getArray();
+				HbefaWarmEmissionFactorKey key = result.getKey();
 
-				key.setHbefaRoadCategory(mapString2HbefaRoadCategory(array[indexFromKey.get("TrafficSit")]));
-				// yyyyyy what is this???  Why "TrafficSig"?????????
+				key.setHbefaVehicleAttributes( new HbefaVehicleAttributes() );
 
-				key.setHbefaTrafficSituation(mapString2HbefaTrafficSituation(array[indexFromKey.get("TrafficSit")]));
-
-				key.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
-				
 				HbefaWarmEmissionFactor value = new HbefaWarmEmissionFactor();
-				value.setSpeed(Double.parseDouble(array[indexFromKey.get("V_weighted")]));
-				value.setWarmEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA_weighted")]));
-				
-				avgWarmTable.put(key, value);
+				value.setSpeed( Double.parseDouble( array[indexFromKey.get( "V_weighted" )] ) );
+				value.setWarmEmissionFactor( Double.parseDouble( array[indexFromKey.get( "EFA_weighted" )] ) );
+
+				avgWarmTable.put( key, value );
 			}
-		} catch (IOException e) {
+		} catch( IOException e ){
 			e.printStackTrace();
 		}
 
@@ -238,26 +225,18 @@ public final class EmissionModule {
 		logger.info("entering createAvgHbefaColdTable ...");
 		
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgColdTable = new HashMap<>();
-		try{
-			BufferedReader br = IOUtils.getBufferedReader(filename);
+		try ( BufferedReader br = IOUtils.getBufferedReader(filename) ) {
 			String strLine = br.readLine();
 			Map<String, Integer> indexFromKey = createIndexFromKey(strLine);
 			
 			while ((strLine = br.readLine()) != null)   {
-				String[] array = strLine.split(";");
-				
-				HbefaColdEmissionFactorKey key = new HbefaColdEmissionFactorKey();
-				key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
+				Result2 result2 = new Result2( strLine, indexFromKey ).processMaterialThatIsSameForAverageAndDetailed();
+				String[] array = result2.getArray();
+				HbefaColdEmissionFactorKey key = result2.getKey();
 
-				String pollutant = array[indexFromKey.get("Component")];
-				coldPollutants.add(pollutant);
-				key.setHbefaComponent(pollutant);
-
-				key.setHbefaParkingTime(mapAmbientCondPattern2ParkingTime(array[indexFromKey.get("AmbientCondPattern")]));
-				key.setHbefaDistance(mapAmbientCondPattern2Distance(array[indexFromKey.get("AmbientCondPattern")]));
 				key.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
 
-                double weighting = Double.parseDouble(array[indexFromKey.get("EFA_weighted")]); //TODO better name
+				double weighting = Double.parseDouble(array[indexFromKey.get("EFA_weighted")]); //TODO better name
 				HbefaColdEmissionFactor value = new HbefaColdEmissionFactor(weighting);
 				
 				avgColdTable.put(key, value);
@@ -273,25 +252,16 @@ public final class EmissionModule {
 		logger.info("entering createDetailedHbefaWarmTable ...");
 
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> hbefaWarmTableDetailed = new HashMap<>() ;
-		try{
-			BufferedReader br = IOUtils.getBufferedReader(filename);
+		try ( BufferedReader br = IOUtils.getBufferedReader(filename) ) {
 			String strLine = br.readLine();
 
 			Map<String, Integer> indexFromKey = createIndexFromKey(strLine);
 
 			while ((strLine = br.readLine()) != null) {
-				String[] array = strLine.split(";");
+				Result result = new Result( strLine, indexFromKey ).processMaterialThatIsSameForAverageAndDetailed();
+				String[] array = result.getArray();
+				HbefaWarmEmissionFactorKey key = result.getKey();
 
-				HbefaWarmEmissionFactorKey key = new HbefaWarmEmissionFactorKey();
-				key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
-
-				WarmPollutant pollutant = WarmPollutant.valueOf( array[indexFromKey.get("Component" )] );
-				warmPollutants.add(pollutant);
-				key.setHbefaComponent(pollutant);
-				// yyyyyy exactly the same code exists elsewhere.  kai, jan'20
-
-				key.setHbefaRoadCategory(mapString2HbefaRoadCategory(array[indexFromKey.get("TrafficSit")]));
-				key.setHbefaTrafficSituation(mapString2HbefaTrafficSituation(array[indexFromKey.get("TrafficSit")]));
 				HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 				hbefaVehicleAttributes.setHbefaTechnology(array[indexFromKey.get("Technology")]);
 				hbefaVehicleAttributes.setHbefaSizeClass(array[indexFromKey.get("SizeClasse")]);
@@ -310,28 +280,20 @@ public final class EmissionModule {
 		logger.info("entering createDetailedHbefaWarmTable ...");
 		return hbefaWarmTableDetailed;
 	}
-	
+
 	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> createDetailedHbefaColdTable(URL filename) {
 		logger.info("entering createDetailedHbefaColdTable ...");
 		
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> hbefaColdTableDetailed = new HashMap<>();
-		try{
-			BufferedReader br = IOUtils.getBufferedReader(filename);
+		try ( BufferedReader br = IOUtils.getBufferedReader(filename) ) {
 			String strLine = br.readLine();
 			Map<String, Integer> indexFromKey = createIndexFromKey(strLine);
 			
 			while ((strLine = br.readLine()) != null)   {
-				String[] array = strLine.split(";");
-				
-				HbefaColdEmissionFactorKey key = new HbefaColdEmissionFactorKey();
-				key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
+				Result2 result2 = new Result2( strLine, indexFromKey ).processMaterialThatIsSameForAverageAndDetailed();
+				String[] array = result2.getArray();
+				HbefaColdEmissionFactorKey key = result2.getKey();
 
-				String pollutant = array[indexFromKey.get("Component")];
-				coldPollutants.add(pollutant);
-				key.setHbefaComponent(pollutant);
-
-				key.setHbefaParkingTime(mapAmbientCondPattern2ParkingTime(array[indexFromKey.get("AmbientCondPattern")]));
-				key.setHbefaDistance(mapAmbientCondPattern2Distance(array[indexFromKey.get("AmbientCondPattern")]));
 				HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 				hbefaVehicleAttributes.setHbefaTechnology(array[indexFromKey.get("Technology")]);
 				hbefaVehicleAttributes.setHbefaSizeClass(array[indexFromKey.get("SizeClasse")]);
@@ -349,35 +311,115 @@ public final class EmissionModule {
 		logger.info("leaving createDetailedHbefaColdTable ...");
 		return hbefaColdTableDetailed;
 	}
-
-
-
-	private static Integer mapAmbientCondPattern2Distance( String string ) {
-		Integer distance;
-		String distanceString = string.split(",")[2];
-		String upperbound = distanceString.split("-")[1];
-		distance = Integer.parseInt(upperbound.split("k")[0]);
-		return distance;
-	}
-
-	private static Integer mapAmbientCondPattern2ParkingTime( String string ) {
-		int parkingTime;
-		String parkingTimeString = string.split(",")[1];
-		if(parkingTimeString.equals(">12h")){
-			parkingTime = 13 ;
-		} else {
-			String upperbound = parkingTimeString.split("-")[1];
-			parkingTime = Integer.parseInt(upperbound.split("h")[0]);
+	private class Result{
+		private final String strLine;
+		private final Map<String, Integer> indexFromKey;
+		private String[] array;
+		private HbefaWarmEmissionFactorKey key;
+		Result( String strLine, Map<String, Integer> indexFromKey ){
+			this.strLine = strLine;
+			this.indexFromKey = indexFromKey;
 		}
-		return parkingTime;
+		public String[] getArray(){
+			return array;
+		}
+		public HbefaWarmEmissionFactorKey getKey(){
+			return key;
+		}
+		Result processMaterialThatIsSameForAverageAndDetailed(){
+			array = strLine.split( ";" );
+
+			key = new HbefaWarmEmissionFactorKey();
+			key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
+
+			WarmPollutant pollutant = WarmPollutant.valueOf( array[indexFromKey.get("Component" )] );
+			// this is where Joe Malloy was just passing strings through all the way to events.  Now this is "typed" again.  There may be
+			// two failures:
+			// (1) The pollutant type is missing from the enum.  In that case, just add it to the enum.
+			// (2) The same pollutant type exists under a different name (e.g. NOx instead of NOX).  In that case, some map for
+			// translation needs to be introduced.  I think that that map should just sit at exactly the place here, and translate.
+			// kai, jan'20
+			warmPollutants.add(pollutant);
+			key.setHbefaComponent(pollutant);
+
+			key.setHbefaRoadCategory(mapString2HbefaRoadCategory(array[indexFromKey.get("TrafficSit")]));
+			key.setHbefaTrafficSituation(mapString2HbefaTrafficSituation(array[indexFromKey.get("TrafficSit")]));
+			// (both the road category and the traffic situation are in the same column in hbefa.  kai, jan'20)
+			return this;
+		}
+
+		private String mapString2HbefaRoadCategory( String string ) {
+			String hbefaRoadCategory;
+			String[] parts = string.split("/");
+			hbefaRoadCategory = parts[0] + "/" + parts[1] + "/" + parts[2];
+			return hbefaRoadCategory;
+		}
+
+		private HbefaTrafficSituation mapString2HbefaTrafficSituation(String string) {
+			HbefaTrafficSituation hbefaTrafficSituation;
+			if(string.endsWith("Freeflow")) hbefaTrafficSituation = HbefaTrafficSituation.FREEFLOW;
+			else if(string.endsWith("Heavy")) hbefaTrafficSituation = HbefaTrafficSituation.HEAVY;
+			else if(string.endsWith("Satur.")) hbefaTrafficSituation = HbefaTrafficSituation.SATURATED;
+			else if(string.endsWith("St+Go")) hbefaTrafficSituation = HbefaTrafficSituation.STOPANDGO;
+			else {
+				logger.warn("Could not map String " + string + " to any HbefaTrafficSituation; please check syntax in file " + averageFleetWarmEmissionFactorsFile);
+				throw new RuntimeException();
+			}
+			return hbefaTrafficSituation;
+		}
+
 	}
 
+	private class Result2{
+		private final String strLine;
+		private final Map<String, Integer> indexFromKey;
+		private String[] array;
+		private HbefaColdEmissionFactorKey key;
+		Result2( String strLine, Map<String, Integer> indexFromKey ){
+			this.strLine = strLine;
+			this.indexFromKey = indexFromKey;
+		}
+		public String[] getArray(){
+			return array;
+		}
+		public HbefaColdEmissionFactorKey getKey(){
+			return key;
+		}
+		Result2 processMaterialThatIsSameForAverageAndDetailed(){
+			array = strLine.split( ";" );
 
-	private static String mapString2HbefaRoadCategory( String string ) {
-		String hbefaRoadCategory;
-		String[] parts = string.split("/");
-		hbefaRoadCategory = parts[0] + "/" + parts[1] + "/" + parts[2];
-		return hbefaRoadCategory;
+			key = new HbefaColdEmissionFactorKey();
+			key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
+
+			String pollutant = array[indexFromKey.get("Component")];
+			coldPollutants.add(pollutant);
+			key.setHbefaComponent(pollutant);
+
+			key.setHbefaParkingTime(mapAmbientCondPattern2ParkingTime(array[indexFromKey.get("AmbientCondPattern")]));
+			key.setHbefaDistance(mapAmbientCondPattern2Distance(array[indexFromKey.get("AmbientCondPattern")]));
+			return this;
+		}
+
+		private Integer mapAmbientCondPattern2Distance( String string ) {
+			Integer distance;
+			String distanceString = string.split(",")[2];
+			String upperbound = distanceString.split("-")[1];
+			distance = Integer.parseInt(upperbound.split("k")[0]);
+			return distance;
+		}
+
+		private Integer mapAmbientCondPattern2ParkingTime( String string ) {
+			int parkingTime;
+			String parkingTimeString = string.split(",")[1];
+			if(parkingTimeString.equals(">12h")){
+				parkingTime = 13 ;
+			} else {
+				String upperbound = parkingTimeString.split("-")[1];
+				parkingTime = Integer.parseInt(upperbound.split("h")[0]);
+			}
+			return parkingTime;
+		}
+
 	}
 
 //	private SortedSet<String> getCombinedPollutantList() {
@@ -400,26 +442,17 @@ public final class EmissionModule {
 		return hbefaVehicleCategory;
 	}
 
-	private HbefaTrafficSituation mapString2HbefaTrafficSituation(String string) {
-		HbefaTrafficSituation hbefaTrafficSituation;
-		if(string.endsWith("Freeflow")) hbefaTrafficSituation = HbefaTrafficSituation.FREEFLOW;
-		else if(string.endsWith("Heavy")) hbefaTrafficSituation = HbefaTrafficSituation.HEAVY;
-		else if(string.endsWith("Satur.")) hbefaTrafficSituation = HbefaTrafficSituation.SATURATED;
-		else if(string.endsWith("St+Go")) hbefaTrafficSituation = HbefaTrafficSituation.STOPANDGO;
-		else {
-			logger.warn("Could not map String " + string + " to any HbefaTrafficSituation; please check syntax in file " + averageFleetWarmEmissionFactorsFile);
-			throw new RuntimeException();
-		}
-		return hbefaTrafficSituation;
-	}
+	public LinkEmissionsCalculator getWarmEmissionAnalysisModule() {
+		// makes sense to have this public for externalization computations.  kai, jan'20
 
-	public WarmEmissionAnalysisModule getWarmEmissionAnalysisModule() {
 		return this. warmEmissionHandler.getWarmEmissionAnalysisModule();
 	}
 
-//	public ColdEmissionAnalysisModule getColdEmissionAnalysisModule() {
-//		return this. coldEmissionHandler.getColdEmissionAnalysisModule();
-//	}
+	public ColdEmissionAnalysisModule getColdEmissionAnalysisModule() {
+		// makes sense to have this public for externalization computations.  kai, jan'20
+
+		return this.coldEmissionHandler.getColdEmissionAnalysisModule();
+	}
 
 	// probably, this is useful; e.g., emission events are not written and a few handlers must be attached to events manager
 	// for the analysis purpose. Need a test. Amit Apr'17

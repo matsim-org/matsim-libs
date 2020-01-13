@@ -168,7 +168,7 @@ final class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeavesT
         );
     }
 
-    public ColdEmissionAnalysisModule getColdEmissionAnalysisModule(){
+    ColdEmissionAnalysisModule getColdEmissionAnalysisModule(){
         return coldEmissionAnalysisModule;
     }
 }
