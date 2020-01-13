@@ -71,6 +71,7 @@ public class PlanRouterWithVehicleRessourcesTest {
 		firstAct.setEndTime( 223 );
 
 		final Leg leg = factory.createLeg( TransportMode.car );
+		TripStructureUtils.setRoutingMode( leg, leg.getMode() );
 		plan.addLeg( leg );
 		final NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(linkId, Collections.<Id<Link>>emptyList(), linkId);
 		route.setVehicleId( vehicleId );

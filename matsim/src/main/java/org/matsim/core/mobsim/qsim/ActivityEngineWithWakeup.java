@@ -19,6 +19,13 @@
 
 package org.matsim.core.mobsim.qsim;
 
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.PriorityBlockingQueue;
+
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
@@ -27,33 +34,22 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-
-import javax.inject.Inject;
-import java.util.*;
-import java.util.concurrent.PriorityBlockingQueue;
 
 public final class ActivityEngineWithWakeup implements ActivityEngine {
-
-	public static final String PREBOOKING_OFFSET_ATTRIBUTE_NAME = "prebookingOffset_s";
-	// moved to here for time being so I can make some other clase package-private. kai, mar'19
 
 	private final EventsManager eventsManager;
 	private PreplanningEngine preplanningEngine;
 	private ActivityEngine delegate;
 
-	private final Queue<AgentEntry> wakeUpList = new PriorityBlockingQueue<>(500, (o1, o2) -> {
-		int cmp = Double.compare(o1.time, o2.time);
-		return cmp != 0 ? cmp : o1.agent.getId().compareTo(o2.agent.getId());
-	});
+	private final Queue<AgentEntry> wakeUpList = new PriorityBlockingQueue<>(500,
+			Comparator.comparingDouble((AgentEntry o) -> o.time).thenComparing(o -> o.agent.getId()));
 	private InternalInterface internalInterface;
 
 	@Inject
-	ActivityEngineWithWakeup( EventsManager eventsManager, PreplanningEngine preplanningEngine ) {
+	ActivityEngineWithWakeup(EventsManager eventsManager, PreplanningEngine preplanningEngine) {
 		this.delegate = new ActivityEngineDefaultImpl(eventsManager);
 		this.eventsManager = eventsManager;
-		this.preplanningEngine = preplanningEngine ;
+		this.preplanningEngine = preplanningEngine;
 	}
 
 	@Override
@@ -78,7 +74,7 @@ public final class ActivityEngineWithWakeup implements ActivityEngine {
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
-		this.internalInterface = internalInterface ;
+		this.internalInterface = internalInterface;
 		delegate.setInternalInterface(internalInterface);
 	}
 
@@ -92,11 +88,11 @@ public final class ActivityEngineWithWakeup implements ActivityEngine {
 	 */
 	@Override
 	public boolean handleActivity(MobsimAgent agent) {
-		double now = this.internalInterface.getMobsim().getSimTimer().getTimeOfDay() ;
+		double now = this.internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 
-		Activity act = (Activity) WithinDayAgentUtils.getCurrentPlanElement( agent );
-		if ( !act.getType().contains( "interaction" ) ){
-			wakeUpList.addAll( preplanningEngine.generateWakeups( agent, now ) );
+		Activity act = (Activity)WithinDayAgentUtils.getCurrentPlanElement(agent);
+		if (!act.getType().contains("interaction")) {
+			wakeUpList.addAll(preplanningEngine.generateWakeups(agent, now));
 		}
 
 		return delegate.handleActivity(agent);

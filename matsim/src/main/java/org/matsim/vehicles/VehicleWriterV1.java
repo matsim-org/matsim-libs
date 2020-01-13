@@ -19,16 +19,19 @@
  * *********************************************************************** */
 package org.matsim.vehicles;
 
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.toList;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author dgrether
@@ -72,7 +75,8 @@ public final class VehicleWriterV1 extends MatsimXmlWriter {
 	}
 
 	private void writeVehicles(Map<Id<Vehicle>, Vehicle> veh) throws UncheckedIOException {
-		for (Vehicle v : veh.values()) {
+		List<Vehicle> sortedVehicles = veh.values().stream().sorted(comparing(Vehicle::getId)).collect(toList());
+		for (Vehicle v : sortedVehicles) {
 			atts.clear();
 			atts.add(this.createTuple(VehicleSchemaV1Names.ID, v.getId().toString()));
 			atts.add(this.createTuple(VehicleSchemaV1Names.TYPE, v.getType().getId().toString()));
@@ -81,7 +85,11 @@ public final class VehicleWriterV1 extends MatsimXmlWriter {
 	}
 
 	private void writeVehicleTypes(Map<Id<VehicleType>, VehicleType> vts) throws UncheckedIOException {
-		for (VehicleType vt : vts.values()) {
+		List<VehicleType> sortedVehicleTypes = vts.values()
+				.stream()
+				.sorted(comparing(VehicleType::getId))
+				.collect(toList());
+		for (VehicleType vt : sortedVehicleTypes) {
 			atts.clear();
 			atts.add(this.createTuple(VehicleSchemaV1Names.ID, vt.getId().toString()));
 			this.writeStartTag(VehicleSchemaV1Names.VEHICLETYPE, atts);

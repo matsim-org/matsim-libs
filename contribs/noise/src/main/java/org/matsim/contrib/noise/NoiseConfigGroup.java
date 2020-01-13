@@ -106,7 +106,11 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	private String receiverPointsCSVFile = null;
 	private String receiverPointsCSVFileCoordinateSystem = TransformationFactory.DHDN_SoldnerBerlin;
 	
-	private double annualCostRate = (85.0/(1.95583)) * (Math.pow(1.02, (2014-1995)));
+	private static double annualCostRateEws = (85.0/(1.95583)) * (Math.pow(1.02, (2014-1995)));
+	private double annualCostRate = annualCostRateEws ;
+	// -- 1st term is EWS value (85DM/"dB(A) above German threshold value") converted to Euro
+	// -- 2nd term is 2 pct inflation
+
 	private double timeBinSizeNoiseComputation = 3600.0;
 	private double scaleFactor = 1.;
 	private double relevantRadius = 500.;
@@ -200,6 +204,10 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	protected void checkConsistency(Config config) {
 		this.checkGridParametersForConsistency();
 		this.checkNoiseParametersForConsistency(config);
+		if ( Math.abs( this.getAnnualCostRate() - annualCostRateEws ) < 0.001 ) {
+			log.warn( "you are using old EWS noise annual cost rates; please go through https://ec.europa" +
+						  ".eu/transport/themes/sustainable/studies/sustainable_en to find mor modern values.  kai/Ihab, dec'19" );
+		}
 	}
 			
 	private void checkGridParametersForConsistency() {
@@ -790,4 +798,5 @@ public final class NoiseConfigGroup extends ReflectiveConfigGroup {
     public void setNoiseBarriersSourceCRS(String noiseBarriersSourceCrs) {
         this.noiseBarriersSourceCrs = noiseBarriersSourceCrs;
     }
+
 }

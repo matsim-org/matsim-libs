@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
@@ -194,7 +195,9 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 	}
 
 	private Leg getDriverLegIfItIs(final Trip subtrip) {
-		if ( !mainModeIdentifier.identifyMainMode( subtrip.getTripElements() ).equals( JointActingTypes.DRIVER ) ) return null;
+		final String mode = mainModeIdentifier.identifyMainMode( subtrip.getTripElements() );
+		Gbl.assertNotNull( mode );
+		if ( !mode.equals( JointActingTypes.DRIVER ) ) return null;
 		if ( subtrip.getLegsOnly().size() != 1 ) throw new RuntimeException( "unexpected driver subtrip length: "+subtrip );
 		return subtrip.getLegsOnly().get( 0 );
 	}

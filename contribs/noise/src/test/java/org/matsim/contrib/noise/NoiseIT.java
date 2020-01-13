@@ -37,6 +37,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
@@ -48,6 +49,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.Injector;
@@ -62,6 +64,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
+
+import static org.matsim.core.config.groups.PlansCalcRouteConfigGroup.*;
 
 /**
  * @author ikaddoura
@@ -164,6 +168,12 @@ public class NoiseIT {
 		Config config = ConfigUtils.loadConfig(configFile ) ;
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory());
 		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
+//		{
+//			ModeRoutingParams params = new ModeRoutingParams( TransportMode.non_network_walk );
+//			params.setTeleportedModeSpeed( 2.0 );
+//			params.setBeelineDistanceFactor( 1.3 );
+//			config.plansCalcRoute().addModeRoutingParams( params );
+//		}
 		runTest2a( config ) ;
 	}
 		
@@ -431,8 +441,10 @@ public class NoiseIT {
 			if(currentTimeSlot == endTime){
 				
 				if ( runConfig.plansCalcRoute().isInsertingAccessEgressWalk() ) {
-					Assert.assertEquals("Wrong number of affected persons at receiver point 16", 1.991388888888, 
+					Assert.assertEquals("Wrong number of affected persons at receiver point 16", 1.48583333333333 /*1.991388888888*/,
 							affectedPersonsPerReceiverPointTest.get(Id.create("16", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
+					// result changed after setting speed of non_network_walk to walk speed. kai, nov'19
+
 					Assert.assertEquals("Wrong number of affected persons at receiver point 0", 0.479722222222222, 
 							affectedPersonsPerReceiverPointTest.get(Id.create("0", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
 				} else {
@@ -674,8 +686,9 @@ public class NoiseIT {
 			Assert.assertEquals("Wrong damage!", 0.0664164095284536, 
 					damagesPerReceiverPointId.get(Id.create("16", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
 		} else {
-			Assert.assertEquals("Wrong damage!", 0.05620815014, 
+			Assert.assertEquals("Wrong damage!", 0.04193854025561551 /*0.05620815014*/,
 					damagesPerReceiverPointId.get(Id.create("16", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
+			// result changed after setting speed of non_network_walk to walk speed. kai, nov'19
 		}
 		Assert.assertEquals("Wrong damage!", 0., damagesPerReceiverPointId.get(Id.create("0", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
 		
@@ -729,9 +742,10 @@ public class NoiseIT {
 			Assert.assertEquals("Wrong link's damage contribution!", 0.06561786301587, 
 					damagesPerlinkId.get(Id.create("linkA5", Link.class)), MatsimTestUtils.EPSILON);
 		} else {
-			Assert.assertEquals("Wrong link's damage contribution!", 0.00067580922544, 
+			Assert.assertEquals("Wrong link's damage contribution!", 5.042409518667874E-4 /*0.00067580922544*/,
 					damagesPerlinkId.get(Id.create("link2", Link.class)), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Wrong link's damage contribution!", 0.0555323409232, 
+			// result changed after setting non_network_walk speed to walk speed.  kai, nov'19
+			Assert.assertEquals("Wrong link's damage contribution!", 0.0414342993037486 /*0.0555323409232*/,
 					damagesPerlinkId.get(Id.create("linkA5", Link.class)), MatsimTestUtils.EPSILON);
 		}
 		Assert.assertEquals("Wrong link's damage contribution!", 0., damagesPerlinkId.get(Id.create("linkB5", Link.class)), MatsimTestUtils.EPSILON);
@@ -779,9 +793,9 @@ public class NoiseIT {
 			Assert.assertEquals("Wrong damage per car per link!", 0.06561786301587 / 2.0, 
 					damagesPerCar.get(Id.create("linkA5", Link.class)), MatsimTestUtils.EPSILON);
 		} else {
-			Assert.assertEquals("Wrong damage per car per link!", 0.00033790461272075167, 
+			Assert.assertEquals("Wrong damage per car per link!", 2.521204759333937E-4 /*0.00033790461272075167*/,
 					damagesPerCar.get(Id.create("link2", Link.class)), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Wrong damage per car per link!", 0.027766170461620, 
+			Assert.assertEquals("Wrong damage per car per link!", 0.0207171496518743 /*0.027766170461620*/,
 					damagesPerCar.get(Id.create("linkA5", Link.class)), MatsimTestUtils.EPSILON);
 		}
 		Assert.assertEquals("Wrong damage per car per link!", 0., 
@@ -828,11 +842,11 @@ public class NoiseIT {
 			Assert.assertEquals("Wrong damage per car per link!", 3.440988380343235E-8, 
 					marginaldamagesPerCar.get(Id.create("linkB5", Link.class)), MatsimTestUtils.EPSILON);
 		} else {
-			Assert.assertEquals("Wrong damage per car per link!", 0.00010150643756312, 
+			Assert.assertEquals("Wrong damage per car per link!", 7.573691032229657E-5 /*0.00010150643756312*/,
 					marginaldamagesPerCar.get(Id.create("link2", Link.class)), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Wrong damage per car per link!", 0.007220143967078839, 
+			Assert.assertEquals("Wrong damage per car per link!", 0.0053871600071944414 /*0.007220143967078839*/,
 					marginaldamagesPerCar.get(Id.create("linkA5", Link.class)), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Wrong damage per car per link!", 2.9121055004910357E-8, 
+			Assert.assertEquals("Wrong damage per car per link!", 2.172806851108433E-8 /*2.9121055004910357E-8*/,
 					marginaldamagesPerCar.get(Id.create("linkB5", Link.class)), MatsimTestUtils.EPSILON);
 		}
 		
@@ -850,7 +864,8 @@ public class NoiseIT {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.0328089315079348, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
-					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.027766170461620, 
+					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.0207171496518743 /*0
+					.027766170461620*/,
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				}
 				counter++;
@@ -859,7 +874,7 @@ public class NoiseIT {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.0328089315079348, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
-					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.027766170461620, 
+					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.0207171496518743 /*0.027766170461620*/,
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				}
 				counter++;
@@ -868,7 +883,7 @@ public class NoiseIT {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 3.992732562920194E-4, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
-					Assert.assertEquals("wrong cost per car for the given link and time interval", 3.379046127207E-4, 
+					Assert.assertEquals("wrong cost per car for the given link and time interval", 2.521204759333937E-4 /*3.379046127207E-4 */,
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				}
 				counter++;
@@ -877,7 +892,7 @@ public class NoiseIT {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 3.992732562920194E-4, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
-					Assert.assertEquals("wrong cost per car for the given link and time interval", 3.379046127207E-4, 
+					Assert.assertEquals("wrong cost per car for the given link and time interval", 2.521204759333937E-4 /*3.379046127207E-4*/,
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				}
 				counter++;
@@ -899,7 +914,7 @@ public class NoiseIT {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.020745817449213576, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
-					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.0156416877593, 
+					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.008506882814982769 /*0.0156416877593*/,
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				}
 				counter2++;
@@ -908,7 +923,7 @@ public class NoiseIT {
 					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.017444990107520864, 
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				} else {
-					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.01234086041763, 
+					Assert.assertEquals("wrong cost per car for the given link and time interval", 0.005206055473869639 /*0.01234086041763*/,
 							event.getAmount(), MatsimTestUtils.EPSILON);
 				}
 				counter2++;

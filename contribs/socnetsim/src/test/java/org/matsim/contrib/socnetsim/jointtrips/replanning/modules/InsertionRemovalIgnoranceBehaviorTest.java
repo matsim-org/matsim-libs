@@ -33,6 +33,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.contrib.socnetsim.framework.cliques.config.JointTripInsertorConfigGroup;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.population.JointPlanFactory;
@@ -87,7 +88,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 					random,
 					null,
 					(JointTripInsertorConfigGroup) config.getModule( JointTripInsertorConfigGroup.GROUP_NAME ),
-					tripRouter );
+					TripStructureUtils.getRoutingModeIdentifier() ); // yyyyyy ??????
 		
 		JointPlan jointPlan = createPlanWithoutJointTrips();
 

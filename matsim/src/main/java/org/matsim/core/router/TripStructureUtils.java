@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -49,6 +50,7 @@ import org.matsim.core.gbl.Gbl;
  * @author thibautd
  */
 public class TripStructureUtils {
+	private static final Logger log = Logger.getLogger(TripStructureUtils.class);
 	
 	public enum StageActivityHandling { StagesAsNormalActivities, ExcludeStageActivities };
 
@@ -551,6 +553,39 @@ public class TripStructureUtils {
 		return null ;
 	}
 
+	public static String getRoutingMode(Leg leg) {
+		return (String) leg.getAttributes().getAttribute("routingMode");
+	}
+
+	public static void setRoutingMode(Leg leg, String mode) {
+		if ( mode != null ){
+			leg.getAttributes().putAttribute( "routingMode", mode );
+		} else {
+			leg.getAttributes().removeAttribute(  "routingMode" ) ;
+		}
+	}
+
+	@Deprecated // if we make the routing mode identifier replaceable via Guice/Inject, we should return that one here or get rid of the method
+	public static MainModeIdentifier getRoutingModeIdentifier() {
+		return new RoutingModeMainModeIdentifier();
+	}
+
+	public static String identifyMainMode( final List<? extends PlanElement> tripElements) {
+		// first try the routing mode:
+		String mode = TripStructureUtils.getRoutingMode(((Leg) tripElements.get( 0 )));
+		// else see if trip has only one leg, if so, use that mode (situation after initial demand generation)
+		if ( mode == null && tripElements.size()==1 ) {
+			mode = ((Leg) tripElements.get(0)).getMode() ;
+		}
+		if (mode == null) {
+			log.error("Could not find routing mode for trip " + tripElements);
+		}
+		return mode;
+	}
+
+	public static boolean isStageActivityType( String activityType ) {
+		return StageActivityTypeIdentifier.isStageActivity( activityType ) ;
+	}
 
 }
 

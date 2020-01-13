@@ -52,6 +52,8 @@ import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
+import com.google.common.base.MoreObjects;
+
 public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPerson, VehicleUsingAgent, HasModifiablePlan {
 	
 	private static final Logger log = Logger.getLogger(BasicPlanAgentImpl.class);
@@ -416,10 +418,20 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 			// the above assumes alternating acts/legs.  I start having the suspicion that we should revoke our decision to give that up.
 			// If not, one will have to use TripUtils to find the preceeding activity ... but things get more difficult.  Preferably, the
 			// factility should then sit in the leg (since there it is used for routing).  kai, dec'15
-		} else if ( pe instanceof Activity ) {
-			return null ;
+		} else if (pe instanceof Activity) {
+			return null;
 		}
-		throw new RuntimeException("unexpected type of PlanElement") ;
+		throw new RuntimeException("unexpected type of PlanElement");
 	}
 
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this)
+				.add("plan", plan)
+				.add("vehicle", vehicle)
+				.add("state", state)
+				.add("currentPlanElementIndex", currentPlanElementIndex)
+				.add("currentLinkId", currentLinkId)
+				.toString();
+	}
 }

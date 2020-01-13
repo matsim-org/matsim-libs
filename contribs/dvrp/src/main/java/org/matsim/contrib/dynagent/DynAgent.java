@@ -255,11 +255,11 @@ public final class DynAgent implements MobsimDriverPassengerAgent {
 
 	@Override
 	public Facility getCurrentFacility() {
-		throw new RuntimeException("not implemented");
+		throw new UnsupportedOperationException("Teleportation is not supported by DynAgent");
 	}
 
 	@Override
 	public Facility getDestinationFacility() {
-		throw new RuntimeException("not implemented");
+		throw new UnsupportedOperationException("Teleportation is not supported by DynAgent");
 	}
 }

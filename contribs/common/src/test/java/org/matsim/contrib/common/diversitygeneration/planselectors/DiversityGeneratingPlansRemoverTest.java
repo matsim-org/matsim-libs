@@ -116,11 +116,13 @@ public class DiversityGeneratingPlansRemoverTest {
 				{
 					Leg leg = legs.get(0) ;
 					leg.setMode( TransportMode.pt );
+					TripStructureUtils.setRoutingMode(leg, TransportMode.pt );
 					leg.setRoute( pf.getRouteFactories().createRoute( GenericRouteImpl.class , link0_1, link2_3 ) ) ;
 				}
 				{
 					Leg leg = legs.get(1) ;
 					leg.setMode( TransportMode.pt );
+					TripStructureUtils.setRoutingMode(leg, TransportMode.pt );
 					leg.setRoute( pf.getRouteFactories().createRoute( GenericRouteImpl.class , link2_3, link0_1 ) ) ;
 				}
 				person.addPlan( plan ) ;
