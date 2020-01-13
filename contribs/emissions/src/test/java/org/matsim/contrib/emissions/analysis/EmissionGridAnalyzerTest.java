@@ -42,7 +42,7 @@ public class EmissionGridAnalyzerTest {
         return Math.random() * upperBounds;
     }
 
-    private void writeEventsToFile(Path eventsFile, Network network, String pollutant, double pollutionPerEvent, int fromTime, int toTime) {
+    private static void writeEventsToFile( Path eventsFile, Network network, String pollutant, double pollutionPerEvent, int fromTime, int toTime ) {
 
         EventsManager eventsManager = EventsUtils.createEventsManager();
         EventWriter writer = new EventWriterXML(eventsFile.toString());
@@ -82,7 +82,7 @@ public class EmissionGridAnalyzerTest {
         return factory.createNode(Id.createNodeId(UUID.randomUUID().toString()), coord);
     }
 
-    private WarmEmissionEvent createEmissionEvent(double time, Link link, String pollutant, double pollutionPerEvent) {
+    private static WarmEmissionEvent createEmissionEvent( double time, Link link, String pollutant, double pollutionPerEvent ) {
 
         Map<String, Double> emissions = new HashMap<>();
         emissions.put(pollutant, pollutionPerEvent);

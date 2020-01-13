@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.events.EventsReaderXMLv1;
@@ -60,7 +61,7 @@ public final class EmissionEventsReader implements MatsimReader {
 		this.delegate.addCustomEventMapper( WarmEmissionEvent.EVENT_TYPE, (CustomEventMapper<WarmEmissionEvent>) event -> {
 
 			Map<String, String> attributes = event.getAttributes();
-			Map<String, Double> warmEmissions = new LinkedHashMap<>();
+			Map<WarmPollutant, Double> warmEmissions = new LinkedHashMap<>();
 
 			double time = Time.getUndefinedTime();
 			Id<Link> linkId = null;
@@ -80,7 +81,7 @@ public final class EmissionEventsReader implements MatsimReader {
 				} else{
 					String pollutant = entry.getKey();
 					Double value = Double.parseDouble( entry.getValue() );
-					warmEmissions.put( pollutant, value );
+					warmEmissions.put( WarmPollutant.valueOf( pollutant ), value );
 				}
 			}
 

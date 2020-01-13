@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
+import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
@@ -52,7 +53,7 @@ public final class WarmEmissionAnalysisModule {
 	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor>  avgHbefaWarmTable;
 	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
 	private final Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds;
-	private final Set<String> warmPollutants;
+	private final Set<WarmPollutant> warmPollutants;
 
 	private final EventsManager eventsManager;
 	private final Double emissionEfficiencyFactor;
@@ -82,13 +83,13 @@ public final class WarmEmissionAnalysisModule {
 		/*package-private*/ final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
 		private final Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds;
 		private final EmissionsConfigGroup ecg;
-		private final Set<String> warmPollutants;
+		private final Set<WarmPollutant> warmPollutants;
 
 		/*package-private*/ WarmEmissionAnalysisModuleParameter(
 				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable,
 				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable,
 				Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds,
-				Set<String> warmPollutants,
+				Set<WarmPollutant> warmPollutants,
 				EmissionsConfigGroup emissionsConfigGroup) {
 			this.avgHbefaWarmTable = avgHbefaWarmTable;
 			this.detailedHbefaWarmTable = detailedHbefaWarmTable;
@@ -105,8 +106,8 @@ public final class WarmEmissionAnalysisModule {
 		}
 	}
 
-	public WarmEmissionAnalysisModule( WarmEmissionAnalysisModuleParameter parameterObject,
-									   EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
+	WarmEmissionAnalysisModule( WarmEmissionAnalysisModuleParameter parameterObject,
+				    EventsManager emissionEventsManager, Double emissionEfficiencyFactor ) {
 
 		if(parameterObject == null){
 			logger.error("No warm emission analysis module parameter set. Aborting...");
@@ -142,16 +143,16 @@ public final class WarmEmissionAnalysisModule {
 		stopGoKmCounter = 0.0;
 	}
 
-	void throwWarmEmissionEvent( double leaveTime, Id<Link> linkId, Id<Vehicle> vehicleId, Map<String, Double> warmEmissions ){
+	void throwWarmEmissionEvent( double leaveTime, Id<Link> linkId, Id<Vehicle> vehicleId, Map<WarmPollutant, Double> warmEmissions ){
 		Event warmEmissionEvent = new WarmEmissionEvent(leaveTime, linkId, vehicleId, warmEmissions);
 		this.eventsManager.processEvent(warmEmissionEvent);
 	}
 
-	public Map<String, Double> checkVehicleInfoAndCalculateWarmEmissions(Vehicle vehicle, Link link, double travelTime ){
+	public Map<WarmPollutant, Double> checkVehicleInfoAndCalculateWarmEmissions(Vehicle vehicle, Link link, double travelTime ){
 		return checkVehicleInfoAndCalculateWarmEmissions( vehicle.getType(), vehicle.getId(), link, travelTime );
 	}
 
-	/*package-private*/ Map<String, Double> checkVehicleInfoAndCalculateWarmEmissions(VehicleType vehicleType, Id<Vehicle> vehicleId,
+	/*package-private*/ Map<WarmPollutant, Double> checkVehicleInfoAndCalculateWarmEmissions(VehicleType vehicleType, Id<Vehicle> vehicleId,
 																  Link link, double travelTime) {
 
 		String hbefaVehicleTypeDescription = EmissionUtils.getHbefaVehicleDescription( vehicleType, this.ecg );
@@ -170,7 +171,7 @@ public final class WarmEmissionAnalysisModule {
 		double linkLength = link.getLength();
 		String roadType = EmissionUtils.getHbefaRoadType(link);
 
-		Map<String, Double> warmEmissions = calculateWarmEmissions( vehicleId, travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple );
+		Map<WarmPollutant, Double> warmEmissions = calculateWarmEmissions( vehicleId, travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple );
 
 		// a basic apporach to introduce emission reduced cars:
 		if(emissionEfficiencyFactor != null){
@@ -179,8 +180,8 @@ public final class WarmEmissionAnalysisModule {
 		return warmEmissions;
 	}
 
-	private Map<String, Double> rescaleWarmEmissions(Map<String, Double> warmEmissions) {Map<String, Double> rescaledWarmEmissions = new HashMap<>();
-		for(String wp : warmEmissions.keySet()){
+	private Map<WarmPollutant, Double> rescaleWarmEmissions( Map<WarmPollutant, Double> warmEmissions ) {Map<WarmPollutant, Double> rescaledWarmEmissions = new HashMap<>();
+		for(WarmPollutant wp : warmEmissions.keySet()){
 			Double orgValue = warmEmissions.get(wp);
 			Double rescaledValue = emissionEfficiencyFactor * orgValue;
 			rescaledWarmEmissions.put(wp, rescaledValue);
@@ -188,10 +189,10 @@ public final class WarmEmissionAnalysisModule {
 		return rescaledWarmEmissions;
 	}
 
-	private Map<String, Double> calculateWarmEmissions(Id<Vehicle> vehicleId, double travelTime, String roadType, double freeVelocity,
+	private Map<WarmPollutant, Double> calculateWarmEmissions(Id<Vehicle> vehicleId, double travelTime, String roadType, double freeVelocity,
 			double linkLength, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple) {
 
-		Map<String, Double> warmEmissionsOfEvent = new HashMap<>();
+		Map<WarmPollutant, Double> warmEmissionsOfEvent = new HashMap<>();
 
 		final String hbefaRoadTypeName ;
 			hbefaRoadTypeName = roadType;
@@ -203,9 +204,10 @@ public final class WarmEmissionAnalysisModule {
 		} else if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.MOTORCYCLE)) {
 			efkey.setHbefaVehicleCategory(HbefaVehicleCategory.MOTORCYCLE);
 		} else if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.ZERO_EMISSION_VEHICLE)) {
-			for (String warmPollutant : warmPollutants) {
+			for (WarmPollutant warmPollutant : warmPollutants) {
 				warmEmissionsOfEvent.put( warmPollutant, 0.0 );
 			}
+			// yyyyyy I am doubtful that the above is useful ... e.g. tire emissions will also exist for electric vehicles.  kai, jan'20
 			return warmEmissionsOfEvent;
 		} else {
 			efkey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
@@ -243,7 +245,7 @@ public final class WarmEmissionAnalysisModule {
 		HbefaTrafficSituation trafficSituation = getTrafficSituation(efkey, averageSpeed_kmh, freeFlowSpeed_kmh);
 		efkey.setHbefaTrafficSituation(trafficSituation);
 
-		for (String warmPollutant : warmPollutants) {
+		for (WarmPollutant warmPollutant : warmPollutants) {
 			double generatedEmissions;
 
 			efkey.setHbefaComponent(warmPollutant);

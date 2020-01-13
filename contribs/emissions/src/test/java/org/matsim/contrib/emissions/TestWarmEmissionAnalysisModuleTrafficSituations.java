@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
+import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.network.NetworkUtils;
@@ -52,7 +53,8 @@ import static org.matsim.contrib.emissions.HbefaTrafficSituation.*;
 public class TestWarmEmissionAnalysisModuleTrafficSituations {
 
 	//Old list of pollutants
-	private final Set<String> pollutants = new HashSet<>(Arrays.asList("CO", "CO2(total)", "FC", "HC", "NMHC", "NOx", "NO2","PM", "SO2"));
+//	private final Set<String> pollutants = new HashSet<>(Arrays.asList("CO", "CO2(total)", "FC", "HC", "NMHC", "NOx", "NO2","PM", "SO2"));
+	private final Set<WarmPollutant> pollutants = new HashSet<>( Arrays.asList( WarmPollutant.values() ) );
 	private final int numberOfWarmPollutants = pollutants.size();
 	private final String hbefaRoadCategory = "URB";
     private final String roadType = "0";
@@ -66,7 +68,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 	private Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds;
 
     private WarmEmissionAnalysisModule weam;
-	private Map<String, Double> warmEmissions;
+	private Map<WarmPollutant, Double> warmEmissions;
 
 	//average speeds should be the same across all car types, but vary by traffic situation
 	private static final int FF_INDEX = 0;
@@ -213,7 +215,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 			detWarmFactor.setWarmEmissionFactor(factor);
 			detWarmFactor.setSpeed(speed);
 
-			for (String wp: pollutants){
+			for ( WarmPollutant wp: pollutants){
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
 				detWarmKey.setHbefaComponent(wp);
 				detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
@@ -240,7 +242,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 			detWarmFactor.setWarmEmissionFactor(factor);
 			detWarmFactor.setSpeed(speed);
 
-			for (String wp: pollutants){
+			for ( WarmPollutant wp: pollutants){
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
 				detWarmKey.setHbefaComponent(wp);
 				detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);

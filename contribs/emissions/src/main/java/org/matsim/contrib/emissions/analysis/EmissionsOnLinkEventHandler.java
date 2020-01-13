@@ -7,6 +7,7 @@ import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
+import org.matsim.contrib.emissions.types.WarmPollutant;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,8 +40,11 @@ class EmissionsOnLinkEventHandler implements WarmEmissionEventHandler, ColdEmiss
 
     @Override
     public void handleEvent(WarmEmissionEvent event) {
-
-        handleEmissionEvent(event.getTime(), event.getLinkId(), event.getWarmEmissions());
+        Map<String,Double> map = new HashMap<>() ;
+        for( Map.Entry<WarmPollutant, Double> entry : event.getWarmEmissions().entrySet() ){
+            map.put( entry.getKey().name(), entry.getValue() ) ;
+        }
+        handleEmissionEvent(event.getTime(), event.getLinkId(), map );
     }
 
     @Override

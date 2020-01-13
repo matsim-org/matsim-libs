@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions;
 
+import org.matsim.contrib.emissions.types.WarmPollutant;
+
 /**
  * @author benjamin
  *
@@ -26,7 +28,7 @@ package org.matsim.contrib.emissions;
 class HbefaWarmEmissionFactorKey {
 	
 	private HbefaVehicleCategory hbefaVehicleCategory;
-	private String hbefaComponent;
+	private WarmPollutant hbefaComponent;
 	private String hbefaRoadCategory;
 	private HbefaTrafficSituation hbefaTrafficSituation;
 	private HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
@@ -49,12 +51,17 @@ class HbefaWarmEmissionFactorKey {
 		this.hbefaVehicleCategory = hbefaVehicleCategory;
 	}
 
-	private String getHbefaComponent(){
+	private WarmPollutant getHbefaComponent(){
 		return this.hbefaComponent;
 	}
-	
-	public void setHbefaComponent(String warmPollutant) {
+
+	public void setHbefaComponent( WarmPollutant warmPollutant ) {
 		this.hbefaComponent = warmPollutant;
+	}
+
+	@Deprecated // for refactoring
+	public void setHbefaComponent( String warmPollutant ) {
+		this.hbefaComponent = WarmPollutant.valueOf( warmPollutant ) ;
 	}
 
 	String getHbefaRoadCategory() {

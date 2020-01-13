@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
 import org.matsim.contrib.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
+import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -48,7 +49,6 @@ public final class EmissionModule {
 	
 	private final Scenario scenario;
 	private WarmEmissionHandler warmEmissionHandler;
-	private ColdEmissionHandler coldEmissionHandler;
 
 	private final EventsManager eventsManager;
 	private final EmissionsConfigGroup emissionConfigGroup;
@@ -73,7 +73,7 @@ public final class EmissionModule {
 	private Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds;
 
 
-	private final Set<String> warmPollutants = new HashSet<>();
+	private final Set<WarmPollutant> warmPollutants = new HashSet<>();
 	private final Set<String> coldPollutants = new HashSet<>();
 	// these are/were the "automatic" maps collected by JM from the hbefa files.  kai, jan'20
 
@@ -158,8 +158,8 @@ public final class EmissionModule {
 
 		warmEmissionHandler = new WarmEmissionHandler(vehicles,	network, parameterObject, eventsManager, emissionConfigGroup
 				.getEmissionEfficiencyFactor());
-		coldEmissionHandler = new ColdEmissionHandler(vehicles, network, parameterObject2, eventsManager, emissionConfigGroup
-				.getEmissionEfficiencyFactor());
+		ColdEmissionHandler coldEmissionHandler = new ColdEmissionHandler( vehicles, network, parameterObject2, eventsManager, emissionConfigGroup
+																		       .getEmissionEfficiencyFactor() );
 		logger.info("leaving createEmissionHandler");
 	}
 
@@ -170,8 +170,8 @@ public final class EmissionModule {
 			case fromOsm:
 				logger.warn("It is recommended to directly set the HBEFA road types to link attributes and then chose HbefaRoadTypeSource: "+ EmissionsConfigGroup.HbefaRoadTypeSource.fromLinkAttributes );
 				roadTypeMapping = new OsmHbefaMapping();
-                roadTypeMapping.addHbefaMappings(scenario.getNetwork());
-                break;
+				roadTypeMapping.addHbefaMappings(scenario.getNetwork());
+				break;
 			case fromFile:
 				logger.warn("It is recommended to directly set the HBEFA road types to link attributes and then chose HbefaRoadTypeSource: "+ EmissionsConfigGroup.HbefaRoadTypeSource.fromLinkAttributes );
 				URL roadTypeMappingFile = this.emissionConfigGroup.getEmissionRoadTypeMappingFileURL(scenario.getConfig().getContext());
@@ -203,12 +203,21 @@ public final class EmissionModule {
 				HbefaWarmEmissionFactorKey key = new HbefaWarmEmissionFactorKey();
 				key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
 
-				String pollutant = array[indexFromKey.get("Component")];
-				warmPollutants.add(pollutant);
+				WarmPollutant pollutant = WarmPollutant.valueOf( array[indexFromKey.get("Component")] );
+				// this is where Joe Malloy was just passing strings through all the way to events.  Now this is "typed" again.  There may be
+				// two failures:
+				// (1) The pollutant type is missing from the enum.  In that case, just add it to the enum.
+				// (2) The same pollutant type exists under a different name (e.g. NOx instead of NOX).  In that case, some map for
+				// translation needs to be introduced.  I think that that map should just sit at exactly the place here, and translate.
+				// kai, jan'20
+				warmPollutants.add( pollutant );
 				key.setHbefaComponent(pollutant);
 
 				key.setHbefaRoadCategory(mapString2HbefaRoadCategory(array[indexFromKey.get("TrafficSit")]));
+				// yyyyyy what is this???  Why "TrafficSig"?????????
+
 				key.setHbefaTrafficSituation(mapString2HbefaTrafficSituation(array[indexFromKey.get("TrafficSit")]));
+
 				key.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
 				
 				HbefaWarmEmissionFactor value = new HbefaWarmEmissionFactor();
@@ -276,9 +285,10 @@ public final class EmissionModule {
 				HbefaWarmEmissionFactorKey key = new HbefaWarmEmissionFactorKey();
 				key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
 
-				String pollutant = array[indexFromKey.get("Component")];
+				WarmPollutant pollutant = WarmPollutant.valueOf( array[indexFromKey.get("Component" )] );
 				warmPollutants.add(pollutant);
 				key.setHbefaComponent(pollutant);
+				// yyyyyy exactly the same code exists elsewhere.  kai, jan'20
 
 				key.setHbefaRoadCategory(mapString2HbefaRoadCategory(array[indexFromKey.get("TrafficSit")]));
 				key.setHbefaTrafficSituation(mapString2HbefaTrafficSituation(array[indexFromKey.get("TrafficSit")]));
@@ -342,7 +352,7 @@ public final class EmissionModule {
 
 
 
-	private Integer mapAmbientCondPattern2Distance(String string) {
+	private static Integer mapAmbientCondPattern2Distance( String string ) {
 		Integer distance;
 		String distanceString = string.split(",")[2];
 		String upperbound = distanceString.split("-")[1];
@@ -350,8 +360,8 @@ public final class EmissionModule {
 		return distance;
 	}
 
-	private Integer mapAmbientCondPattern2ParkingTime(String string) {
-		Integer parkingTime;
+	private static Integer mapAmbientCondPattern2ParkingTime( String string ) {
+		int parkingTime;
 		String parkingTimeString = string.split(",")[1];
 		if(parkingTimeString.equals(">12h")){
 			parkingTime = 13 ;
@@ -363,20 +373,20 @@ public final class EmissionModule {
 	}
 
 
-	private String mapString2HbefaRoadCategory(String string) {
+	private static String mapString2HbefaRoadCategory( String string ) {
 		String hbefaRoadCategory;
 		String[] parts = string.split("/");
 		hbefaRoadCategory = parts[0] + "/" + parts[1] + "/" + parts[2];
 		return hbefaRoadCategory;
 	}
 
-	private SortedSet<String> getCombinedPollutantList() {
-		SortedSet<String> distinct = new TreeSet<String>();
-		distinct.addAll(warmPollutants);
-		distinct.addAll(coldPollutants);
-		return distinct;
-
-	}
+//	private SortedSet<String> getCombinedPollutantList() {
+//		SortedSet<String> distinct = new TreeSet<String>();
+//		distinct.addAll(warmPollutants);
+//		distinct.addAll(coldPollutants);
+//		return distinct;
+//
+//	}
 
 	private HbefaVehicleCategory mapString2HbefaVehicleCategory(String string) {
 		HbefaVehicleCategory hbefaVehicleCategory;
@@ -407,9 +417,9 @@ public final class EmissionModule {
 		return this. warmEmissionHandler.getWarmEmissionAnalysisModule();
 	}
 
-	public ColdEmissionAnalysisModule getColdEmissionAnalysisModule() {
-		return this. coldEmissionHandler.getColdEmissionAnalysisModule();
-	}
+//	public ColdEmissionAnalysisModule getColdEmissionAnalysisModule() {
+//		return this. coldEmissionHandler.getColdEmissionAnalysisModule();
+//	}
 
 	// probably, this is useful; e.g., emission events are not written and a few handlers must be attached to events manager
 	// for the analysis purpose. Need a test. Amit Apr'17
