@@ -19,8 +19,10 @@ public final class RoadPricingModule extends AbstractModule {
 	private RoadPricingScheme scheme;
 
 	public RoadPricingModule() {	}
-	
-	RoadPricingModule( RoadPricingScheme scheme ) {
+
+	/* For the time being this has to be public, otherwise the roadpricing TollFactor
+	cannot be considered, rendering integration tests useless, JWJ Jan'20 */
+	public RoadPricingModule( RoadPricingScheme scheme ) {
 		this.scheme = scheme;
 	}
 	
