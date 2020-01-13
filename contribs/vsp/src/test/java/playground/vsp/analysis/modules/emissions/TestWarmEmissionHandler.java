@@ -58,41 +58,41 @@ public class TestWarmEmissionHandler {
 		Id<Link> link2 = Id.create("2", Link.class);
 
 		//first event: create and handle
-		Map<String,Double> warmEm1 = new HashMap<String, Double>();
+		Map<WarmPollutant,Double> warmEm1 = new HashMap<>();
 		//		return key;
-		warmEm1.put( WarmPollutant.CO.name(), 7.1 );
+		warmEm1.put( WarmPollutant.CO, 7.1 );
 		//		return key;
-		warmEm1.put( WarmPollutant.NOX.name(), 11.9 );
+		warmEm1.put( WarmPollutant.NOx, 11.9 );
 		WarmEmissionEvent event1 = new WarmEmissionEvent(0., link2, vehicle1, warmEm1);
 		handler.handleEvent(event1);
 
 		//second event: create and handle
-		Map<String,Double> warmEm2 = new HashMap<String, Double>();
+		Map<WarmPollutant,Double> warmEm2 = new HashMap<>();
 		//		return key;
-		warmEm2.put( WarmPollutant.CO.name(), 23.9 );
+		warmEm2.put( WarmPollutant.CO, 23.9 );
 		//		return key;
-		warmEm2.put( WarmPollutant.PM.name(), 18.1 );
+		warmEm2.put( WarmPollutant.PM, 18.1 );
 		WarmEmissionEvent event2 = new WarmEmissionEvent(0.8, link1, vehicle2, warmEm2);
 		handler.handleEvent(event2);
 
 		//third event: create and handle
-		Map<String,Double> warmEm3 = new HashMap<String, Double>();
+		Map<WarmPollutant,Double> warmEm3 = new HashMap<>();
 		//		return key;
-		warmEm3.put( WarmPollutant.NOX.name(), 12.4 );
+		warmEm3.put( WarmPollutant.NOx, 12.4 );
 		WarmEmissionEvent event3 = new WarmEmissionEvent(0., link2, vehicle1, warmEm3);
 		handler.handleEvent(event3);
 
 		//fourth event: create and handle
-		Map<String,Double> warmEm4 = new HashMap<String, Double>();
+		Map<WarmPollutant,Double> warmEm4 = new HashMap<>();
 		WarmEmissionEvent event4 = new WarmEmissionEvent(20., link2, vehicle2, warmEm4);
 		handler.handleEvent(event4);
 
 		//fifth event: create and handle
-		Map<String,Double> warmEm5 = new HashMap<String, Double>();
+		Map<WarmPollutant,Double> warmEm5 = new HashMap<>();
 		//		return key;
-		warmEm5.put( WarmPollutant.NOX.name(), 19.8 );
+		warmEm5.put( WarmPollutant.NOx, 19.8 );
 		//		return key;
-		warmEm5.put( WarmPollutant.CO.name(), 10.0 );
+		warmEm5.put( WarmPollutant.CO, 10.0 );
 		WarmEmissionEvent event5 = new WarmEmissionEvent(55., link1, vehicle1, warmEm5);
 		handler.handleEvent(event5);
 
@@ -101,62 +101,62 @@ public class TestWarmEmissionHandler {
 //			throw new RuntimeException("code below will probably no longer work since keys are now strings not enums.  kai, dec'18") ;
 //		}
 
-		Map<Id<Person>, Map<String, Double>> wepp = handler.getWarmEmissionsPerPerson();
+		Map<Id<Person>, Map<WarmPollutant, Double>> wepp = handler.getWarmEmissionsPerPerson();
 		//CO vehicle 1
 		//		return key;
-		if(wepp.get(Id.create("v1", Person.class)).containsKey( WarmPollutant.CO.name() )){
+		if(wepp.get(Id.create("v1", Person.class)).containsKey( WarmPollutant.CO )){
 			//		return key;
-			Double actualCO1 = wepp.get(Id.create("v1", Person.class)).get( WarmPollutant.CO.name() );
-			Assert.assertEquals("CO of vehicle 1 should be 17.1 but was "+actualCO1, new Double(17.1), actualCO1, MatsimTestUtils.EPSILON);
+			Double actualCO1 = wepp.get(Id.create("v1", Person.class)).get( WarmPollutant.CO );
+			Assert.assertEquals("CO of vehicle 1 should be 17.1 but was "+actualCO1, 17.1, actualCO1, MatsimTestUtils.EPSILON );
 		}else{
 			Assert.fail("No CO values for car 1 found.");
 		}
 		//NOX vehicle 1
 		//		return key;
-		if(wepp.get(Id.create("v1", Person.class)).containsKey( WarmPollutant.NOX.name() )){
+		if(wepp.get(Id.create("v1", Person.class)).containsKey( WarmPollutant.NOx )){
 			//		return key;
-			Double actualNOX1 = wepp.get(Id.create("v1", Person.class)).get( WarmPollutant.NOX.name() );
-			Assert.assertEquals("NOX of vehicle 1 should be 44.1 but was "+actualNOX1, new Double(44.1), actualNOX1, MatsimTestUtils.EPSILON);
+			Double actualNOX1 = wepp.get(Id.create("v1", Person.class)).get( WarmPollutant.NOx );
+			Assert.assertEquals("NOX of vehicle 1 should be 44.1 but was "+actualNOX1, 44.1, actualNOX1, MatsimTestUtils.EPSILON );
 		}else{
 			Assert.fail("No NOX values for car 1 found.");
 		}
 		//PM vehicle 1
 		//		return key;
-		if(wepp.get(Id.create("v1", Person.class)).containsKey( WarmPollutant.PM.name() )){
+		if(wepp.get(Id.create("v1", Person.class)).containsKey( WarmPollutant.PM )){
 			Assert.fail("There should be no PM values for car 1.");
 		}else{
 			//		return key;
-			Assert.assertNull("PM of vehicle 1 should be null.",wepp.get(Id.create("v1", Person.class)).get( WarmPollutant.PM.name() ) );
+			Assert.assertNull("PM of vehicle 1 should be null.",wepp.get(Id.create("v1", Person.class)).get( WarmPollutant.PM ) );
 		}
 		//CO vehicle 2
 		//		return key;
-		if(wepp.get(Id.create("v2", Person.class)).containsKey( WarmPollutant.CO.name() )){
+		if(wepp.get(Id.create("v2", Person.class)).containsKey( WarmPollutant.CO )){
 			//		return key;
-			Double actualCO2 = wepp.get(Id.create("v2", Person.class)).get( WarmPollutant.CO.name() );
-			Assert.assertEquals("CO of vehicle 2 should be 23.9",  new Double(23.9), actualCO2, MatsimTestUtils.EPSILON);
+			Double actualCO2 = wepp.get(Id.create("v2", Person.class)).get( WarmPollutant.CO );
+			Assert.assertEquals("CO of vehicle 2 should be 23.9", 23.9, actualCO2, MatsimTestUtils.EPSILON );
 		}else{
 			Assert.fail("No CO values for car 2 found.");
 		}
 		//NOX vehicle 2
 		//		return key;
-		if(wepp.get(Id.create("v2", Person.class)).containsKey( WarmPollutant.NOX.name() )){
+		if(wepp.get(Id.create("v2", Person.class)).containsKey( WarmPollutant.NOx )){
 			Assert.fail("There should be no NOX values for car 2.");
 		}else{
 			//		return key;
-			Assert.assertNull(wepp.get(Id.create("v2", Person.class)).get( WarmPollutant.NOX.name() ) );
+			Assert.assertNull(wepp.get(Id.create("v2", Person.class)).get( WarmPollutant.NOx ) );
 		}
 		//PM vehicle 2
 		//		return key;
-		if(wepp.get(Id.create("v2", Person.class)).containsKey( WarmPollutant.PM.name() )){
+		if(wepp.get(Id.create("v2", Person.class)).containsKey( WarmPollutant.PM )){
 			//		return key;
-			Double actualPM2 = wepp.get(Id.create("v2", Person.class)).get( WarmPollutant.PM.name() );
-			Assert.assertEquals("PM of vehicle 2 should be 18.1", new Double(18.1), actualPM2, MatsimTestUtils.EPSILON);
+			Double actualPM2 = wepp.get(Id.create("v2", Person.class)).get( WarmPollutant.PM );
+			Assert.assertEquals("PM of vehicle 2 should be 18.1", 18.1, actualPM2, MatsimTestUtils.EPSILON );
 		}else{
 			Assert.fail("No PM values for car 2 found.");
 		}
 		//FC
 		//		return key;
-		Assert.assertNull(wepp.get(Id.create("v1", Person.class)).get( WarmPollutant.FC.name() ) );
+		Assert.assertNull(wepp.get(Id.create("v1", Person.class)).get( WarmPollutant.FC ) );
 
 	}
 }

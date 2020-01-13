@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.WarmEmissionAnalysisModule;
+import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
@@ -117,7 +118,7 @@ public class EmissionResponsibilityTollTimeDistanceTravelDisutility implements T
 		location choice (not implemented)! */
 
         WarmEmissionAnalysisModule warmEmissionAnalysisModule = this.emissionModule.getWarmEmissionAnalysisModule();
-        Map<String, Double> expectedWarmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
+        Map<WarmPollutant, Double> expectedWarmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
                 vehicle,
 ////                NetworkUtils.getType(((Link) link)),
 //                    EmissionUtils.getHbefaRoadType( link ),
@@ -125,7 +126,7 @@ public class EmissionResponsibilityTollTimeDistanceTravelDisutility implements T
 //                distance,
                 link,
                 linkTravelTime
-        );
+                                                                                                                               );
         double expectedEmissionCosts = this.emissionResponsibilityCostModule.calculateWarmEmissionCosts(expectedWarmEmissions, link.getId(), time);
         linkExpectedEmissionDisutility = this.marginalUtlOfMoney * expectedEmissionCosts ;
 

@@ -35,7 +35,7 @@ import org.matsim.contrib.emissions.types.WarmPollutant;
  *
  */
 public class EmissionsPerPersonWarmEventHandler implements WarmEmissionEventHandler {
-	Map<Id<Person>, Map<String, Double>> warmEmissionsTotal = new HashMap<>();
+	private final Map<Id<Person>, Map<WarmPollutant, Double>> warmEmissionsTotal = new HashMap<>();
 
 	public EmissionsPerPersonWarmEventHandler() {
 	}
@@ -44,12 +44,12 @@ public class EmissionsPerPersonWarmEventHandler implements WarmEmissionEventHand
 	public void handleEvent(WarmEmissionEvent event) {
 		// TODO person id statt vehicleid??? woher?
 		Id<Person> personId = Id.create(event.getVehicleId(), Person.class);
-		Map<String, Double> warmEmissionsOfEvent = event.getWarmEmissions();
+		Map<WarmPollutant, Double> warmEmissionsOfEvent = event.getWarmEmissions();
 
 		if(warmEmissionsTotal.get(personId) != null){
-			Map<String, Double> warmEmissionsSoFar = warmEmissionsTotal.get(personId);
-			for(Entry<String, Double> entry : warmEmissionsOfEvent.entrySet()){
-				String pollutant = entry.getKey();
+			Map<WarmPollutant, Double> warmEmissionsSoFar = warmEmissionsTotal.get(personId);
+			for( Entry<WarmPollutant, Double> entry : warmEmissionsOfEvent.entrySet()){
+				WarmPollutant pollutant = entry.getKey();
 				Double eventValue = entry.getValue();
 
 				Double previousValue = warmEmissionsSoFar.get(pollutant);
@@ -62,7 +62,7 @@ public class EmissionsPerPersonWarmEventHandler implements WarmEmissionEventHand
 		}
 	}
 
-	public Map<Id<Person>, Map<String, Double>> getWarmEmissionsPerPerson() {
+	public Map<Id<Person>, Map<WarmPollutant, Double>> getWarmEmissionsPerPerson() {
 		return warmEmissionsTotal;
 	}
 

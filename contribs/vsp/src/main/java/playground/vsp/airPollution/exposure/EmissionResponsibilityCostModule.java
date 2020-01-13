@@ -63,12 +63,12 @@ public class EmissionResponsibilityCostModule {
 		this.responsibilityGridTools = rgt;
 	}
 	
-	public double calculateWarmEmissionCosts(Map<String, Double> warmEmissions, Id<Link> linkId, double time) {
+	public double calculateWarmEmissionCosts( Map<WarmPollutant, Double> warmEmissions, Id<Link> linkId, double time ) {
 		double warmEmissionCosts = 0.0;
 		
-		for(String wp : warmEmissions.keySet()){
+		for( WarmPollutant wp : warmEmissions.keySet()){
 			//		return key;
-			if( ! wp.equals( WarmPollutant.CO2_TOTAL.name() ) ) {
+			if( wp != WarmPollutant.CO2_TOTAL ) {
 
 //				if ( true ) {
 //					throw new RuntimeException("pollutants are no longer enums; need to hedge against header changes in upstream input file") ;
@@ -84,7 +84,7 @@ public class EmissionResponsibilityCostModule {
 			WarmPollutant co2Total = WarmPollutant.CO2_TOTAL;
 			//		return key;
 			return this.emissionCostMultiplicationFactor * warmEmissionCosts * relativeDensity
-					+ warmEmissions.get( co2Total.name() )
+					+ warmEmissions.get( co2Total )
 					* EmissionCostFactors.getCostFactor(co2Total.toString());
 		} else {
 			return this.emissionCostMultiplicationFactor * warmEmissionCosts * relativeDensity;

@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.vehicles.Vehicle;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -43,10 +44,11 @@ public final class WarmEmissionEvent extends Event {
     private final Id<Link> linkId;
 	private final Id<Vehicle> vehicleId;
 	private final Map<WarmPollutant, Double> warmEmissions;
-	
+
 	public WarmEmissionEvent( double time, Id<Link> linkId, Id<Vehicle> vehicleId, Map<WarmPollutant, Double> warmEmissions ) {
-        super(time);
-        this.linkId = linkId;
+		// this is a WARM emission event, and so can accept the typed map. kai, jan'20
+		super(time);
+		this.linkId = linkId;
 		this.vehicleId = vehicleId;
 		this.warmEmissions = warmEmissions;
 	}

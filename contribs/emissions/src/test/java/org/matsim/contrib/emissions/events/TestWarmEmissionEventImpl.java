@@ -32,6 +32,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -51,7 +52,8 @@ public class TestWarmEmissionEventImpl {
     private final Double nx=7.;
     private final Double pm=8.;
     private final Double so=1.6;
-	private final Set<String> pollutants = new HashSet<>(Arrays.asList("CO", "CO2(total)", "FC", "HC", "NMHC", "NOx", "NO2","PM", "SO2"));
+//	private final Set<String> pollutants = new HashSet<>(Arrays.asList("CO", "CO2(total)", "FC", "HC", "NMHC", "NOx", "NO2","PM", "SO2"));
+	private final Set<WarmPollutant> pollutants = new HashSet<>( Arrays.asList( WarmPollutant.values() ) );
 
 
 	@Test
@@ -60,12 +62,27 @@ public class TestWarmEmissionEventImpl {
 		
 		//create a normal event impl
 		Map<String, Double> warmEmissionsMap = new HashMap<>();
-		setWarmEmissions(warmEmissionsMap);
-		WarmEmissionEvent we = new WarmEmissionEvent(0.0, linkId, vehicleId, warmEmissionsMap);
+
+		warmEmissionsMap.put("CO", co );
+		warmEmissionsMap.put("CO2_TOTAL", c2 );
+		warmEmissionsMap.put("FC", fc );
+		warmEmissionsMap.put("HC", hc );
+		warmEmissionsMap.put("NMHC", nm );
+		warmEmissionsMap.put("NO2", n2 );
+		warmEmissionsMap.put("NOx", nx );
+		warmEmissionsMap.put("PM", pm );
+		warmEmissionsMap.put("SO2", so );
+
+		Map<WarmPollutant,Double> map = new LinkedHashMap<>();
+		warmEmissionsMap.forEach( (key,value) -> map.put(  WarmPollutant.valueOf( key ), value ) );
+		// (this could be made more direct)
+
+		WarmEmissionEvent we = new WarmEmissionEvent(0.0, linkId, vehicleId, map);
 		
 		Map<String, String> weg = we.getAttributes();
 		Assert.assertEquals("the CO value of this warm emission event was "+ Double.parseDouble(weg.get("CO"))+ "but should have been "+ co, Double.parseDouble(weg.get("CO")), co, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the CO2 value of this warm emission event was "+ Double.parseDouble(weg.get("CO2(total)"))+ "but should have been "+ c2, Double.parseDouble(weg.get("CO2(total)")), c2, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("the CO2 value of this warm emission event was "+ Double.parseDouble(weg.get("CO2_TOTAL"))+ "but should have been "+ c2,
+				Double.parseDouble(weg.get("CO2_TOTAL")), c2, MatsimTestUtils.EPSILON);
 		Assert.assertEquals("the FC value of this warm emission event was "+ Double.parseDouble(weg.get("FC"))+ "but should have been "+ fc, Double.parseDouble(weg.get("FC")), fc, MatsimTestUtils.EPSILON);
 		Assert.assertEquals("the HC value of this warm emission event was "+ Double.parseDouble(weg.get("HC"))+ "but should have been "+ hc, Double.parseDouble(weg.get("HC")), hc, MatsimTestUtils.EPSILON);
 		Assert.assertEquals("the NMHC value of this warm emission event was "+ Double.parseDouble(weg.get("NMHC"))+ "but should have been "+ nm, Double.parseDouble(weg.get("NMHC")), nm, MatsimTestUtils.EPSILON);
@@ -75,20 +92,7 @@ public class TestWarmEmissionEventImpl {
 		Assert.assertEquals("the SO2 value of this warm emission event was "+ Double.parseDouble(weg.get("SO2"))+ "but should have been "+ so, Double.parseDouble(weg.get("SO2")), so, MatsimTestUtils.EPSILON);
 	}
 
-	private void setWarmEmissions(Map<String, Double> warmEmissionsMap) {
-
-		warmEmissionsMap.put("CO", co);
-		warmEmissionsMap.put("CO2(total)", c2);
-		warmEmissionsMap.put("FC", fc);
-		warmEmissionsMap.put("HC", hc);
-		warmEmissionsMap.put("NMHC", nm);
-		warmEmissionsMap.put("NO2", n2);
-		warmEmissionsMap.put("NOx", nx);
-		warmEmissionsMap.put("PM", pm);
-		warmEmissionsMap.put("SO2", so);
-	}
-	
-		@Test
+	@Test
 		public final void testGetAttributesForIncompleteMaps(){
 			//the getAttributesMethod should
 			// - return null if the emission map is empty
@@ -96,7 +100,7 @@ public class TestWarmEmissionEventImpl {
 			// - throw NullPointerExceptions if no emission map is assigned 
 			
 		//empty map
-		Map<String, Double> emptyMap = new HashMap<>();
+		Map<WarmPollutant, Double> emptyMap = new HashMap<>();
 		WarmEmissionEvent emptyMapEvent = new WarmEmissionEvent(22., linkId, vehicleId, emptyMap);
 		
 		//values not set
@@ -108,7 +112,12 @@ public class TestWarmEmissionEventImpl {
 		valuesNotSet.put("NO2", null);
 		valuesNotSet.put("NOx", null);
 		valuesNotSet.put("PM", null);
-		WarmEmissionEvent valuesNotSetEvent = new WarmEmissionEvent(44., linkId, vehicleId, valuesNotSet);
+
+		Map<WarmPollutant,Double> map = new LinkedHashMap<>();
+		valuesNotSet.forEach( (key,value) -> map.put(  WarmPollutant.valueOf( key ), value ) );
+		// (this could be made more direct)
+
+		WarmEmissionEvent valuesNotSetEvent = new WarmEmissionEvent(44., linkId, vehicleId, map);
 		
 		//no map
 		WarmEmissionEvent noMap = new WarmEmissionEvent(23, linkId, vehicleId, null);
@@ -117,7 +126,9 @@ public class TestWarmEmissionEventImpl {
 
 		int valuesNotSetNullPointers =0, noMapNullPointers=0;
 		
-		for(String wp : pollutants){
+		for(WarmPollutant wpEnum : pollutants){
+			String wp=wpEnum.name();
+
 			//empty map
 			Assert.assertNull(emptyMapEvent.getAttributes().get(wp));
 			

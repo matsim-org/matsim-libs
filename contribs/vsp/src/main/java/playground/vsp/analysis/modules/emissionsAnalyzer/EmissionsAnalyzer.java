@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.EmissionUtils;
 import org.matsim.contrib.emissions.events.EmissionEventsReader;
+import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
@@ -62,7 +63,7 @@ public class EmissionsAnalyzer extends AbstractAnalysisModule{
 	private final String emissionEventsFile;
 	private EmissionsPerPersonWarmEventHandler warmHandler;
 	private EmissionsPerPersonColdEventHandler coldHandler;
-	private Map<Id<Person>, Map<String, Double>> person2warmEmissions;
+	private Map<Id<Person>, Map<WarmPollutant, Double>> person2warmEmissions;
 	private Map<Id<Person>, Map<String, Double>> person2coldEmissions;
 	private Map<Id<Person>, SortedMap<String, Double>> person2totalEmissions;
 	private SortedMap<String, Double> totalEmissions;
@@ -143,7 +144,7 @@ public class EmissionsAnalyzer extends AbstractAnalysisModule{
 		return totalEmissions;
 	}
 
-	public Map<Id<Person>, Map<String, Double>> getPerson2warmEmissions() {
+	public Map<Id<Person>, Map<WarmPollutant, Double>> getPerson2warmEmissions() {
 		return person2warmEmissions;
 	}
 

@@ -38,6 +38,8 @@ import org.matsim.vehicles.VehiclesFactory;
 
 import java.util.*;
 
+import static org.matsim.contrib.emissions.types.WarmPollutant.*;
+
 /**
  * @author julia
  
@@ -201,7 +203,8 @@ public class TestWarmEmissionAnalysisModule {
 		Vehicle vehicle = vehFac.createVehicle(vehicleId, vehFac.createVehicleType(vehicleTypeId));
 
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, mockLink, linkLength/petrolSpeedFf*3.6);
-		Assert.assertEquals(detailedPetrolFactorFf*linkLength/1000., warmEmissions.get("CO2(total)"), MatsimTestUtils.EPSILON);
+//		Assert.assertEquals(detailedPetrolFactorFf*linkLength/1000., warmEmissions.get("CO2(total)"), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(detailedPetrolFactorFf*linkLength/1000., warmEmissions.get( CO2_TOTAL ), MatsimTestUtils.EPSILON );
 		HandlerToTestEmissionAnalysisModules.reset();
 		
 		weam.throwWarmEmissionEvent(leaveTime, mockLink.getId(), vehicleId, warmEmissions);
@@ -225,14 +228,14 @@ public class TestWarmEmissionAnalysisModule {
 		
 		// sub case avg speed = free flow speed
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(pcVehicle, pclink, pclinkLength/pcfreeVelocity*3.6);
-		Assert.assertEquals(detailedPcFactorFf*pclinkLength/1000., warmEmissions.get("NMHC"), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(detailedPcFactorFf*pclinkLength/1000., warmEmissions.get(NMHC), MatsimTestUtils.EPSILON);
 		weam.throwWarmEmissionEvent(leaveTime, pclink.getId(), pcVehicleId, warmEmissions);
 		Assert.assertEquals(numberOfWarmPollutants*detailedPcFactorFf*pclinkLength/1000., HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
 		HandlerToTestEmissionAnalysisModules.reset(); warmEmissions.clear();
 
 		// sub case avg speed = stop go speed
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(pcVehicle, pclink, pclinkLength/pcsgVelocity*3.6);
-		Assert.assertEquals(avgPcFactorSg*pclinkLength/1000., warmEmissions.get("NMHC"), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(avgPcFactorSg*pclinkLength/1000., warmEmissions.get(NMHC), MatsimTestUtils.EPSILON);
 		weam.throwWarmEmissionEvent(leaveTime, pclink.getId(), pcVehicleId, warmEmissions);
 		Assert.assertEquals(numberOfWarmPollutants*avgPcFactorSg*pclinkLength/1000., HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
 		HandlerToTestEmissionAnalysisModules.reset(); warmEmissions.clear();
@@ -255,7 +258,7 @@ public class TestWarmEmissionAnalysisModule {
 		
 		// sub case avg speed = free flow speed
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(dieselVehicle, diesellink,  dieselLinkLength/dieselFreeVelocity*3.6);
-		Assert.assertEquals(avgPcFactorFf*dieselLinkLength/1000., warmEmissions.get("PM"), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(avgPcFactorFf*dieselLinkLength/1000., warmEmissions.get(PM), MatsimTestUtils.EPSILON);
 		HandlerToTestEmissionAnalysisModules.reset();
 		weam.throwWarmEmissionEvent(leaveTime, diesellink.getId(), dieselVehicleId, warmEmissions);
 		Assert.assertEquals(numberOfWarmPollutants*avgPcFactorFf*dieselLinkLength/1000., HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
@@ -263,7 +266,7 @@ public class TestWarmEmissionAnalysisModule {
 
 		// sub case avg speed = stop go speed
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(dieselVehicle, diesellink,  dieselLinkLength/dieselSgVelocity*3.6);
-		Assert.assertEquals(avgPcFactorSg*dieselLinkLength/1000., warmEmissions.get("PM"), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(avgPcFactorSg*dieselLinkLength/1000., warmEmissions.get(PM), MatsimTestUtils.EPSILON);
 		HandlerToTestEmissionAnalysisModules.reset();
 		weam.throwWarmEmissionEvent(leaveTime, diesellink.getId(), dieselVehicleId, warmEmissions);
 		Assert.assertEquals(numberOfWarmPollutants*avgPcFactorSg*dieselLinkLength/1000., HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
@@ -287,7 +290,7 @@ public class TestWarmEmissionAnalysisModule {
 		
 		// sub case avg speed = free flow speed
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(lpgVehicle, lpglink, lpgLinkLength/lpgFreeVelocity*3.6);
-		Assert.assertEquals(avgPcFactorFf*lpgLinkLength/1000., warmEmissions.get("PM"), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(avgPcFactorFf*lpgLinkLength/1000., warmEmissions.get(PM), MatsimTestUtils.EPSILON);
 		HandlerToTestEmissionAnalysisModules.reset();
 		weam.throwWarmEmissionEvent(leaveTime, lpgLinkId, lpgVehicleId, warmEmissions);
 		Assert.assertEquals(numberOfWarmPollutants*avgPcFactorFf*lpgLinkLength/1000., HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
@@ -295,7 +298,7 @@ public class TestWarmEmissionAnalysisModule {
 
 		// sub case avg speed = stop go speed
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(lpgVehicle, lpglink, lpgLinkLength/lpgSgVelocity*3.6);
-		Assert.assertEquals(avgPcFactorSg*lpgLinkLength/1000., warmEmissions.get("PM"), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(avgPcFactorSg*lpgLinkLength/1000., warmEmissions.get(PM), MatsimTestUtils.EPSILON);
 		HandlerToTestEmissionAnalysisModules.reset();
 		weam.throwWarmEmissionEvent(leaveTime, lpgLinkId, lpgVehicleId, warmEmissions);
 		Assert.assertEquals(numberOfWarmPollutants*avgPcFactorSg*lpgLinkLength/1000., HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
@@ -320,7 +323,7 @@ public class TestWarmEmissionAnalysisModule {
 		Vehicle zeroVehicle = vehFac.createVehicle(zeroVehicleId, vehFac.createVehicleType(zeroVehicleTypeId));
 		
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(zeroVehicle, zerolink, 2*zeroLinklength/(zeroFreeVelocity+zeroSgVelocity)*3.6);
-		Assert.assertEquals(detailedZeroFactorFf*zeroLinklength/1000., warmEmissions.get("PM"), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(detailedZeroFactorFf*zeroLinklength/1000., warmEmissions.get(PM), MatsimTestUtils.EPSILON);
 		HandlerToTestEmissionAnalysisModules.reset();
 		
 		weam.throwWarmEmissionEvent(22., lpgLinkId, zeroVehicleId, warmEmissions);
@@ -355,10 +358,10 @@ public class TestWarmEmissionAnalysisModule {
 		//Assert.assertEquals(detailedSgffFactorFf*sgffLinklength/1000., warmEmissions.get(WarmPollutant.NO2), MatsimTestUtils.EPSILON);
 		//avg=ff=sg -> use ff factors
 		warmEmissions= weam.checkVehicleInfoAndCalculateWarmEmissions(sgffVehicle, sgflink, sgffLinklength/sgffDetailedFfSpeed*3.6);
-		Assert.assertEquals(detailedSgffFactorFf*sgffLinklength/1000., warmEmissions.get("NO2"), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(detailedSgffFactorFf*sgffLinklength/1000., warmEmissions.get(NO2), MatsimTestUtils.EPSILON);
 		//avg<sg -> use sg factors 
 		warmEmissions= weam.checkVehicleInfoAndCalculateWarmEmissions(sgffVehicle, sgflink, 2*sgffLinklength/sgffDetailedFfSpeed*3.6);
-		Assert.assertEquals(detailedSgffFactorSg*sgffLinklength/1000., warmEmissions.get("NO2"), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(detailedSgffFactorSg*sgffLinklength/1000., warmEmissions.get(NO2), MatsimTestUtils.EPSILON);
 	}
 	
 	@Test

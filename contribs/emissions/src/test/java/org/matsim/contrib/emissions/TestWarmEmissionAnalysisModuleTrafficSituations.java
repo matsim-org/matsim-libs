@@ -38,6 +38,7 @@ import org.matsim.vehicles.VehiclesFactory;
 import java.util.*;
 
 import static org.matsim.contrib.emissions.HbefaTrafficSituation.*;
+import static org.matsim.contrib.emissions.types.WarmPollutant.NOx;
 
 
 /**
@@ -133,12 +134,12 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 
 		// should be ok
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, pcLink, travelTime*3.6);
-		Assert.assertEquals(detailedPetrolFactor[FF_INDEX]*(linkLength/1000.), warmEmissions.get("NOx"), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(detailedPetrolFactor[FF_INDEX]*(linkLength/1000.), warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
 
 		vehicleTypeId = Id.create(passengercar+ ";"+pcTechnology+";"+pcSizeClass+";"+pcConcept, VehicleType.class);
 		vehicle = vehFac.createVehicle(vehicleId, vehFac.createVehicleType(vehicleTypeId));
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, pcLink, travelTime*3.6);
-		Assert.assertEquals(avgPetrolFactor[FF_INDEX]*(linkLength/1000.), warmEmissions.get("NOx"), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(avgPetrolFactor[FF_INDEX]*(linkLength/1000.), warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
 
 	}
 
@@ -158,38 +159,38 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 		double actualSpeed = avgPassengerCarSpeed[FF_INDEX];
 		double travelTime = linkLength/actualSpeed;
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, pcLink, travelTime*3.6);
-		Assert.assertEquals(detailedPetrolFactor[FF_INDEX]*(linkLength/1000.), warmEmissions.get("NOx"), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(detailedPetrolFactor[FF_INDEX]*(linkLength/1000.), warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
 
 		actualSpeed = avgPassengerCarSpeed[HEAVY_INDEX];
 		travelTime = linkLength/actualSpeed;
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, pcLink, travelTime*3.6);
-		Assert.assertEquals(detailedPetrolFactor[HEAVY_INDEX]*(linkLength/1000.), warmEmissions.get("NOx"), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(detailedPetrolFactor[HEAVY_INDEX]*(linkLength/1000.), warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
 
 		actualSpeed = avgPassengerCarSpeed[SAT_INDEX];
 		travelTime = linkLength/actualSpeed;
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, pcLink, travelTime*3.6);
-		Assert.assertEquals(detailedPetrolFactor[SAT_INDEX]*(linkLength/1000.), warmEmissions.get("NOx"), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(detailedPetrolFactor[SAT_INDEX]*(linkLength/1000.), warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
 
 		actualSpeed = avgPassengerCarSpeed[SG_INDEX];
 		travelTime = linkLength/actualSpeed;
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, pcLink, travelTime*3.6);
-		Assert.assertEquals(detailedPetrolFactor[SG_INDEX]*(linkLength/1000.), warmEmissions.get("NOx"), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(detailedPetrolFactor[SG_INDEX]*(linkLength/1000.), warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
 
 		actualSpeed = avgPassengerCarSpeed[SG_INDEX] + 5;
 		travelTime = linkLength/actualSpeed;
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, pcLink, travelTime*3.6);
-		Assert.assertEquals(detailedPetrolFactor[SAT_INDEX]*(linkLength/1000.), warmEmissions.get("NOx"), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(detailedPetrolFactor[SAT_INDEX]*(linkLength/1000.), warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
 
 		actualSpeed = avgPassengerCarSpeed[SG_INDEX] - 5;
 		travelTime = linkLength/actualSpeed;
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, pcLink, travelTime*3.6);
-		Assert.assertEquals(detailedPetrolFactor[SG_INDEX]*(linkLength/1000.), warmEmissions.get("NOx"), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(detailedPetrolFactor[SG_INDEX]*(linkLength/1000.), warmEmissions.get( NOx ), MatsimTestUtils.EPSILON );
 
 	}
 
 
 
-	private Link createMockLink(String linkId, double linkLength, double ffspeed) {
+	private static Link createMockLink( String linkId, double linkLength, double ffspeed ) {
 		Id<Link> mockLinkId = Id.createLinkId(linkId);
 		Node mockNode1 = NetworkUtils.createNode(Id.createNodeId(1));
 		Node mockNode2 = NetworkUtils.createNode(Id.createNodeId(2));

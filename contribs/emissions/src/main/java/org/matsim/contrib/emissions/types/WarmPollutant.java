@@ -23,4 +23,4 @@ package org.matsim.contrib.emissions.types;
  * @author benjamin
  *
  */
-public enum WarmPollutant { CO, CO2_TOTAL, FC, HC, NMHC, NOX, NO2, PM, SO2 }
+public enum WarmPollutant { CO, CO2_TOTAL, FC, HC, NMHC, NOx, NO2, PM, SO2 }

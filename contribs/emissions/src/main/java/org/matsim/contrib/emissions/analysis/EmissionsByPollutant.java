@@ -8,8 +8,10 @@ import java.util.Map;
  * readability of {@link org.matsim.contrib.emissions.analysis.EmissionsOnLinkEventHandler}
  */
 class EmissionsByPollutant {
+    // The EmissionsByPollutant potentially adds up the same emissions coming from cold and warm.  Thus, this cannot be combined into the enum approach
+    // without some thinking.  kai, jan'20
 
-    private Map<String, Double> emissionByPollutant;
+    private final Map<String, Double> emissionByPollutant;
 
     EmissionsByPollutant(Map<String, Double> emissions) {
         this.emissionByPollutant = emissions;
