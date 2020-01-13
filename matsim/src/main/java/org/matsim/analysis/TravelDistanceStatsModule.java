@@ -29,6 +29,7 @@ public class TravelDistanceStatsModule extends AbstractModule {
 	@Override
 	public void install() {
 		bind(TravelDistanceStats.class).asEagerSingleton();
+		bind(PKMbyModeCalculator.class).asEagerSingleton();
 		addControlerListenerBinding().to(TravelDistanceStatsControlerListener.class);
 	}
 

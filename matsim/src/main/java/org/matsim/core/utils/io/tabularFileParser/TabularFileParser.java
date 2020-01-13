@@ -96,7 +96,7 @@ public class TabularFileParser implements MatsimSomeReader {
         boolean started = (config.getStartRegex() == null);
         boolean ended = false;
         
-        try ( BufferedReader reader = config.getUrl() == null ? IOUtils.getBufferedReader(config.getFile(), config.getCharset()) : IOUtils.getBufferedReader(config.getUrl(), config.getCharset()) ) {
+        try ( BufferedReader reader = config.getUrl() == null ? IOUtils.getBufferedReader(IOUtils.resolveFileOrResource(config.getFile()), config.getCharset()) : IOUtils.getBufferedReader(config.getUrl(), config.getCharset()) ) {
         	String line;
 	        while ((line = reader.readLine()) != null && !ended) {
 	            if (started) {

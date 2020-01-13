@@ -60,9 +60,8 @@ public class ElectricFleetWriter extends MatsimXmlWriter {
 					Tuple.of("battery_capacity", format.format(EvUnits.J_to_kWh(v.getBatteryCapacity())) + ""),
 					//TODO consider renaming to initial_charge -- SOC suggest [%] not [kWh]
 					Tuple.of("initial_soc", format.format(EvUnits.J_to_kWh(v.getInitialSoc())) + ""),
-					//TODO change to: charger_types and vehicle_type in DTD
-					Tuple.of("vehicleType", v.getVehicleType()),
-					Tuple.of("chargerTypes", String.join(",", v.getChargerTypes())));
+					Tuple.of("vehicle_type", v.getVehicleType()),
+					Tuple.of("charger_types", String.join(",", v.getChargerTypes())));
 			writeStartTag("vehicle", atts, true);
 		});
 	}

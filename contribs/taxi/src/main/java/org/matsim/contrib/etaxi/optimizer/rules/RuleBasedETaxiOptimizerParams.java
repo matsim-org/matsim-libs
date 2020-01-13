@@ -27,7 +27,7 @@ import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizerParams;
 import org.matsim.core.config.ConfigGroup;
 
 public final class RuleBasedETaxiOptimizerParams extends AbstractTaxiOptimizerParams {
-	public static final String SET_NAME = "RuleBasedETaxiOptimizer";
+	public static final String SET_NAME = RuleBasedETaxiOptimizer.class.getName();
 
 	public static final String MIN_RELATIVE_SOC = "minRelativeSoc";
 	static final String MIN_RELATIVE_SOC_EXP = "Taxis with SOC below this level are considered undercharged"

@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -48,10 +49,11 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
@@ -487,8 +489,8 @@ public final class PopulationUtils {
 	 * A pointer to material in TripStructureUtils
 	 *
 	 */
-	public static List<Activity> getActivities( Plan plan, StageActivityTypes stageActivities ) {
-		return TripStructureUtils.getActivities(plan, stageActivities ) ;
+	public static List<Activity> getActivities( Plan plan, StageActivityHandling stageActivityHandling ) {
+		return TripStructureUtils.getActivities(plan, stageActivityHandling ) ;
 	}
 
 	/**
@@ -820,6 +822,7 @@ public final class PopulationUtils {
 
 	public static void copyFromTo(Leg in, Leg out) {
 		out.setMode( in.getMode() );
+		TripStructureUtils.setRoutingMode( out, TripStructureUtils.getRoutingMode( in ));
 		out.setDepartureTime(in.getDepartureTime());
 		out.setTravelTime(in.getTravelTime());
 		if (in.getRoute() != null) {
@@ -1045,14 +1048,18 @@ public final class PopulationUtils {
 			Gbl.assertNotNull( facility.getCoord() ) ;
 			return facility.getCoord() ;
 		}
+
 		if ( act.getCoord()!=null ) {
 			return act.getCoord() ;
-		} else {
-			Gbl.assertNotNull( sc.getNetwork() );
-			Link link = sc.getNetwork().getLinks().get( act.getLinkId() ) ;
-			Gbl.assertNotNull( link );
-			return link.getCoord() ;
 		}
+
+		Gbl.assertNotNull( sc.getNetwork() );
+		Link link = sc.getNetwork().getLinks().get( act.getLinkId() ) ;
+		Gbl.assertNotNull( link );
+		Coord fromCoord = link.getFromNode().getCoord() ;
+		Coord toCoord = link.getToNode().getCoord() ;
+		double rel = sc.getConfig().global().getRelativePositionOfEntryExitOnLink() ;
+		return new Coord( fromCoord.getX() + rel*( toCoord.getX() - fromCoord.getX()) , fromCoord.getY() + rel*( toCoord.getY() - fromCoord.getY() ) );
 	}
 	public static double decideOnTravelTimeForLeg( Leg leg ) {
 		if ( leg.getRoute()!=null ) {
@@ -1075,10 +1082,13 @@ public final class PopulationUtils {
 		// In my opinion, that should be done in prepareForSim, not in the parser.  It is commented as such
 		// in the PopulationReader class.  kai, nov'18)
 	}
-
+	public static Population readPopulation( String filename ) {
+		Population population = PopulationUtils.createPopulation( ConfigUtils.createConfig() ) ;
+		readPopulation( population, filename );
+		return population ;
+	}
 	public static boolean comparePopulations( Population population1, Population population2 ) {
-		boolean result = PopulationUtils.equalPopulation( population1, population2 );
-		return result ;
+		return PopulationUtils.equalPopulation( population1, population2 );
 	}
 
 	// ---

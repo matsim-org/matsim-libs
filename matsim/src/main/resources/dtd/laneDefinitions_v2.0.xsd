@@ -76,10 +76,4 @@ the simulation -->
   </xs:complexContent>
 </xs:complexType>
 
-<xs:complexType name="attributeType">
-  <xs:attribute name="key" type="xs:string"/>
-  <xs:attribute name="clazz" type="xs:string"/>
-  <xs:attribute name="value" type="xs:string"/>
-</xs:complexType>
-
 </xs:schema>

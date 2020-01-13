@@ -73,24 +73,33 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 	// not sufficient, people should use AbstractController.  kai, jan'13
 
 	public static final String DIRECTORY_ITERS = "ITERS";
-	public static final String FILENAME_CONFIG = "config.xml";
-	public static final String FILENAME_CONFIG_REDUCED = "config_reduced.xml";
-	public static final String FILENAME_NETWORK = "network.xml.gz";
-	public static final String FILENAME_LANES = "lanes.xml.gz";
-	public static final String FILENAME_CHANGE_EVENTS_XML = "change_events.xml.gz";
-	public static final String FILENAME_COUNTS = "counts.xml.gz" ;
-	public static final String FILENAME_POPULATION = "plans.xml.gz";
-	public static final String FILENAME_EXPERIENCED_PLANS = "experienced_plans.xml.gz";
-	public static final String FILENAME_PERSON_ATTRIBUTES = "personAttributes.xml.gz" ;
-	public static final String FILENAME_HOUSEHOLDS = "households.xml.gz";
-	public static final String FILENAME_FACILITIES = "facilities.xml.gz";
-	public static final String FILENAME_EVENTS_XML = "events.xml.gz";
-	public static final String FILENAME_TRANSIT_SCHEDULE = "transitSchedule.xml.gz";
-	public static final String FILENAME_TRANSIT_VEHICLES = "transitVehicles.xml.gz";
-	public static final String FILENAME_VEHICLES = "vehicles.xml.gz";
-	public static final String FILENAME_LINKSTATS = "linkstats.txt.gz";
-	public static final String FILENAME_TRAVELDISTANCESTATS = "traveldistancestats";
-	public static final String OUTPUT_PREFIX = "output_";
+
+	public enum DefaultFiles {
+		config("config.xml"),
+		configReduced("config_reduced.xml"),
+		network("network.xml"),
+		lanes("lanes.xml"),
+		changeEvents("change_events.xml"),
+		counts("counts.xml"),
+		population("plans.xml"),
+		experiencedPlans("experienced_plans.xml"),
+		households("households.xml"),
+		facilities("facilities.xml"),
+		events("events.xml"),
+		transitSchedule("transitSchedule.xml"),
+		transitVehicles("transitVehicles.xml"),
+		vehicles("vehicles.xml"),
+		linkstats("linkstats.txt")
+		;
+
+		final String filename;
+
+		DefaultFiles(String filename) {
+			this.filename = filename;
+		}
+	}
+
+	static final String OUTPUT_PREFIX = "output_";
 
 	public static final String DIVIDER = "###################################################";
 
@@ -440,21 +449,6 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 		});
 	}
 
-	/**
-	 * Allows you to set a factory for {@link org.matsim.core.router.TripRouter} instances.
-	 * Do this if your use-case requires custom routing logic, for instance if you
-	 * implement your own complex travel mode.
-	 * See {@link org.matsim.core.router.TripRouter} for more information and pointers to examples.
-	 */
-	@Deprecated // yyyy I don't think that it is plausible to have this as an official extension point. kai, mar'19
-	public final void setTripRouterFactory(final javax.inject.Provider<TripRouter> factory) {
-		this.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(TripRouter.class).toProvider(factory);
-			}
-		});
-	}
 	@Override
 	public final Controler addOverridingModule( AbstractModule abstractModule ) {
 		if (this.injectorCreated) {

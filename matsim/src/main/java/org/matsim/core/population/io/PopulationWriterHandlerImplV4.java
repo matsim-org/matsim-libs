@@ -35,10 +35,13 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.io.XmlUtils;
 import org.matsim.core.utils.misc.Time;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+
+import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 
 /*package*/ class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandler {
 
@@ -71,7 +74,7 @@ import java.io.IOException;
 	public void startPlans(final Population plans, final BufferedWriter out) throws IOException {
 		out.write("<plans");
 		if (plans.getName() != null) {
-			out.write(" name=\"" + plans.getName() + "\"");
+			out.write(" name=\"" + encodeAttributeValue(plans.getName()) + "\"");
 		}
 		out.write(">\n\n");
 	}
@@ -88,7 +91,7 @@ import java.io.IOException;
 	@Override
 	public void startPerson(final Person person, final BufferedWriter out) throws IOException {
 		out.write("\t<person id=\"");
-		out.write(person.getId().toString());
+		out.write(encodeAttributeValue(person.getId().toString()));
 		out.write("\"");
 		if (PersonUtils.getSex(person) != null) {
 			out.write(" sex=\"");
@@ -156,7 +159,7 @@ import java.io.IOException;
 			out.write(" selected=\"no\"");
 		if ((plan.getType() != null)) {
 			out.write(" type=\"");
-			out.write(plan.getType());
+			out.write(encodeAttributeValue(plan.getType()));
 			out.write("\"");
 		}
 		out.write(">\n");
@@ -174,16 +177,16 @@ import java.io.IOException;
 	@Override
 	public void startAct(final Activity act, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<act type=\"");
-		out.write(act.getType());
+		out.write(encodeAttributeValue(act.getType()));
 		out.write("\"");
 		if (act.getLinkId() != null) {
 			out.write(" link=\"");
-			out.write(act.getLinkId().toString());
+			out.write(encodeAttributeValue(act.getLinkId().toString()));
 			out.write("\"");
 		}
 		if (act.getFacilityId() != null) {
 			out.write(" facility=\"");
-			out.write(act.getFacilityId().toString());
+			out.write(encodeAttributeValue(act.getFacilityId().toString()));
 			out.write("\"");
 		}
 		if (act.getCoord() != null) {
@@ -280,7 +283,7 @@ import java.io.IOException;
 		} else {
 			String rd = route.getRouteDescription();
 			if (rd != null) {
-				out.write(rd);
+				out.write(XmlUtils.encodeContent(rd));
 				out.write(" "); // this is at the moment only to maintain binary compatibility
 			}
 		}

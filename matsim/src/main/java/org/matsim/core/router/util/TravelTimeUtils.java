@@ -28,7 +28,7 @@ public final class TravelTimeUtils {
 	
 	private TravelTimeUtils(){} ; // do not instantiate
 	
-	public static final TravelTime createFreeSpeedTravelTime() {
+	public static TravelTime createFreeSpeedTravelTime() {
 		return new FreeSpeedTravelTime() ;
 	}
 

@@ -30,19 +30,19 @@ import org.matsim.examples.ExamplesUtils;
 public class RunETaxiScenarioIT {
 	@Test
 	public void testOneTaxi() {
-		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_etaxi_config.xml");
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_etaxi_config.xml");
 		RunETaxiScenario.run(configUrl, false);
 	}
 
 	@Test
 	public void testRuleBased() {
-		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_etaxi_config.xml");
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_etaxi_config.xml");
 		RunETaxiScenario.run(configUrl, false);
 	}
 
 	@Test
 	public void testAssignment() {
-		URL configUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("mielec"),
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
 				"mielec_etaxi_config_assignment.xml");
 		RunETaxiScenario.run(configUrl, false);
 	}

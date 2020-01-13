@@ -28,7 +28,7 @@ import org.matsim.examples.ExamplesUtils;
 public class RunRandomDynAgentExampleTest {
 	@Test
 	public void testRun() {
-		URL networkUrl = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "config.xml");
+		URL networkUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "config.xml");
 		RunRandomDynAgentExample.run(networkUrl, "grid_network.xml", false);
 	}
 }

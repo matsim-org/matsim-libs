@@ -35,7 +35,7 @@ import org.matsim.core.utils.misc.Time;
 public class Road extends SimUnit {
 
 	// default
-	protected static JDEQSimConfigGroup config = new JDEQSimConfigGroup();
+	static JDEQSimConfigGroup config = new JDEQSimConfigGroup();
 
 	public static void setConfig(JDEQSimConfigGroup config) {
 		Road.config = config;

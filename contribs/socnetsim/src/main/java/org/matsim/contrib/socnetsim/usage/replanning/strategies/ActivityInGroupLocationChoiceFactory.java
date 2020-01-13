@@ -20,6 +20,7 @@
 package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
 
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
@@ -27,9 +28,9 @@ import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 import org.matsim.contrib.socnetsim.framework.population.JointPlans;
 import org.matsim.contrib.socnetsim.framework.replanning.GroupPlanStrategy;
 import org.matsim.contrib.socnetsim.usage.replanning.GroupPlanStrategyFactoryUtils;
-import org.matsim.contrib.socnetsim.jointactivities.replanning.modules.MutateActivityLocationsToLocationsOfOthersModule;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier.Strong;
+import org.matsim.contrib.socnetsim.jointactivities.replanning.modules.MutateActivityLocationsToLocationsOfOthersModule;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -44,17 +45,20 @@ public class ActivityInGroupLocationChoiceFactory extends AbstractConfigurableSe
 	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
 	private final Provider<TripRouter> tripRouterFactory;
 	private final PlanLinkIdentifier planLinkIdentifier;
+	private final MainModeIdentifier mainModeIdentifier;
 
 	@Inject
 	public ActivityInGroupLocationChoiceFactory(
 			Scenario sc ,
 			PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory ,
 			Provider<TripRouter> tripRouterFactory ,
-			@Strong PlanLinkIdentifier planLinkIdentifier ) {
+			@Strong PlanLinkIdentifier planLinkIdentifier,
+			MainModeIdentifier mainModeIdentifier) {
 		this.sc = sc;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;
 		this.planLinkIdentifier = planLinkIdentifier;
+		this.mainModeIdentifier = mainModeIdentifier;
 	}
 
 	@Override
@@ -73,7 +77,7 @@ public class ActivityInGroupLocationChoiceFactory extends AbstractConfigurableSe
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createJointTripAwareTourModeUnifierModule(
 					sc.getConfig(),
-					tripRouterFactory ) );
+					mainModeIdentifier ) );
 
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createReRouteModule(

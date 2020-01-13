@@ -49,8 +49,8 @@ public class ChargerWriter extends MatsimXmlWriter {
 		chargerSpecifications.forEach(c -> {
 			List<Tuple<String, String>> atts = Arrays.asList(Tuple.of("id", c.getId().toString()),
 					Tuple.of("link", c.getLinkId() + ""), Tuple.of("type", c.getChargerType()),
-					Tuple.of("power", EvUnits.W_to_kW(c.getMaxPower()) + ""),
-					Tuple.of("capacity", c.getPlugCount() + ""));
+					Tuple.of("plug_power", EvUnits.W_to_kW(c.getPlugPower()) + ""),
+					Tuple.of("plug_count", c.getPlugCount() + ""));
 			writeStartTag("charger", atts, true);
 		});
 	}

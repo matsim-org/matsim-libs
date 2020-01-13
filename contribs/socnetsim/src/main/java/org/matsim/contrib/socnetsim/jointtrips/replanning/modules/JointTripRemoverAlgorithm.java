@@ -35,10 +35,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -59,21 +58,14 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 		Logger.getLogger(JointTripRemoverAlgorithm.class);
 
 	private final Random random;
-	private final StageActivityTypes stages;
-	private final StageActivityTypes stagesWithJointTypes;
+	private final Set<String> stagesWithJointTypes;
 	private final MainModeIdentifier mainModeIdentifier;
 
 	public JointTripRemoverAlgorithm(
 			final Random random,
-			final StageActivityTypes stages,
 			final MainModeIdentifier mainModeIdentifier) {
 		this.random = random;
-		this.stages = stages;
-
-		final CompositeStageActivityTypes compositeStages = new CompositeStageActivityTypes();
-		compositeStages.addActivityTypes( stages );
-		compositeStages.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
-		this.stagesWithJointTypes = compositeStages;
+		this.stagesWithJointTypes = JointActingTypes.JOINT_STAGE_ACTS;
 		this.mainModeIdentifier = mainModeIdentifier;
 	}
 
@@ -141,8 +133,8 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 	private static Trip getTripWithLeg(
 			final Plan plan,
 			final Leg leg,
-			final StageActivityTypes stages) {
-		for ( Trip t : TripStructureUtils.getTrips( plan , stages ) ) {
+			final Set<String> stageActivityTypes) {
+		for ( Trip t : TripStructureUtils.getTrips( plan , stageActivityTypes ) ) {
 			if ( t.getTripElements().contains( leg ) ) return t;
 		}
 		throw new RuntimeException( plan.getPlanElements() +" doesn't contain "+leg );
@@ -203,7 +195,9 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 	}
 
 	private Leg getDriverLegIfItIs(final Trip subtrip) {
-		if ( !mainModeIdentifier.identifyMainMode( subtrip.getTripElements() ).equals( JointActingTypes.DRIVER ) ) return null;
+		final String mode = mainModeIdentifier.identifyMainMode( subtrip.getTripElements() );
+		Gbl.assertNotNull( mode );
+		if ( !mode.equals( JointActingTypes.DRIVER ) ) return null;
 		if ( subtrip.getLegsOnly().size() != 1 ) throw new RuntimeException( "unexpected driver subtrip length: "+subtrip );
 		return subtrip.getLegsOnly().get( 0 );
 	}
@@ -218,7 +212,7 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 		elements.add( driverTrip.getOriginActivity() );
 		elements.addAll( driverTrip.getTripElements() );
 		elements.add( driverTrip.getDestinationActivity() );
-		return TripStructureUtils.getTrips( elements , stages );
+		return TripStructureUtils.getTrips( elements );
 	}
 
 	private static void unregisterPassengerFromDriverRoutes(

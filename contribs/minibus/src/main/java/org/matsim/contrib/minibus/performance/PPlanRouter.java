@@ -81,16 +81,16 @@ final class PPlanRouter implements PlanAlgorithm, PersonAlgorithm {
 
 	@Override
 	public void run(final Plan plan) {
-		final List<Trip> trips = TripStructureUtils.getTrips( plan , routingHandler.getStageActivityTypes() );
+		final List<Trip> trips = TripStructureUtils.getTrips( plan );
 
 		for (Trip trip : trips) {
 			
 			
 			/** That's the only check that got added.... **/
-			if (routingHandler.getMainModeIdentifier().identifyMainMode(trip.getTripElements()).equals(TransportMode.pt)) {
+			if (TripStructureUtils.identifyMainMode(trip.getTripElements()).equals(TransportMode.pt)) {
 				final List<? extends PlanElement> newTrip =
 						routingHandler.calcRoute(
-								routingHandler.getMainModeIdentifier().identifyMainMode( trip.getTripElements() ),
+								TripStructureUtils.identifyMainMode( trip.getTripElements() ),
 								toFacility( trip.getOriginActivity() ),
 								toFacility( trip.getDestinationActivity() ),
 								calcEndOfActivity( trip.getOriginActivity() , plan ),

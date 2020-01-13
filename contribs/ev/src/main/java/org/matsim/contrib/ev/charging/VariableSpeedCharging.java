@@ -25,6 +25,7 @@ import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 
 import com.google.common.base.MoreObjects;
+import com.google.common.base.Preconditions;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -36,12 +37,9 @@ public class VariableSpeedCharging implements ChargingPower {//TODO upgrade to B
 		private final double relativePower;
 
 		public Point(double relativeSoc, double relativeSpeed) {
-			if (relativeSoc < 0 || relativeSoc > 1) {
-				throw new IllegalArgumentException("Relative SOC must be in [0,1]");
-			}
-			if (relativeSpeed <= 0) {//XXX To avoid infinite charging simulation (e.g. at SOC==0 or close to 1.0)
-				throw new IllegalArgumentException("Relative speed must be positive");
-			}
+			Preconditions.checkArgument(relativeSoc >= 0 && relativeSoc <= 1, "Relative SOC must be in [0,1]");
+			//XXX To avoid infinite charging simulation (e.g. at SOC==0 or close to 1.0)
+			Preconditions.checkArgument(relativeSpeed > 0, "Relative speed must be positive");
 			this.relativeSoc = relativeSoc;
 			this.relativePower = relativeSpeed;
 		}
@@ -80,27 +78,16 @@ public class VariableSpeedCharging implements ChargingPower {//TODO upgrade to B
 	public VariableSpeedCharging(ElectricVehicle electricVehicle, Point pointA, Point pointB, Point pointC,
 			Point pointD) {
 		//checks whether the A-B-C-D profile
-		if (pointA.relativeSoc != 0) {
-			throw new IllegalArgumentException("PointA.relativeSoc must be 0");
-		}
-		if (pointD.relativeSoc != 1) {
-			throw new IllegalArgumentException("PointB.relativeSoc must be 1");
-		}
-		if (pointB.relativeSoc == 0) {
-			throw new IllegalArgumentException("PointB.relativeSoc must be greater than 0");
-		}
-		if (pointC.relativeSoc == 1) {
-			throw new IllegalArgumentException("PointB.relativeSoc must be less than 1");
-		}
-		if (pointB.relativeSoc >= pointC.relativeSoc) {
-			throw new IllegalArgumentException("PointB.relativeSoc must be less than PointC.relativeSoc");
-		}
-		if (pointA.relativePower > pointB.relativePower) {
-			throw new IllegalArgumentException("PointA.relativePower must not be greater than PointB.relativePower");
-		}
-		if (pointD.relativePower > pointC.relativePower) {
-			throw new IllegalArgumentException("PointD.relativePower must not be greater than PointC.relativePower");
-		}
+		Preconditions.checkArgument(pointA.relativeSoc == 0, "PointA.relativeSoc must be 0");
+		Preconditions.checkArgument(pointD.relativeSoc == 1, "PointB.relativeSoc must be 1");
+		Preconditions.checkArgument(pointB.relativeSoc != 0, "PointB.relativeSoc must be greater than 0");
+		Preconditions.checkArgument(pointC.relativeSoc != 1, "PointB.relativeSoc must be less than 1");
+		Preconditions.checkArgument(pointB.relativeSoc < pointC.relativeSoc,
+				"PointB.relativeSoc must be less than PointC.relativeSoc");
+		Preconditions.checkArgument(pointA.relativePower <= pointB.relativePower,
+				"PointA.relativePower must not be greater than PointB.relativePower");
+		Preconditions.checkArgument(pointD.relativePower <= pointC.relativePower,
+				"PointD.relativePower must not be greater than PointC.relativePower");
 
 		this.electricVehicle = electricVehicle;
 		this.pointA = pointA;
@@ -116,11 +103,11 @@ public class VariableSpeedCharging implements ChargingPower {//TODO upgrade to B
 		double c = b.getCapacity() / 3600.;
 
 		if (relativeSoc <= pointB.relativeSoc) {
-			return Math.min(charger.getPower(), c * approxRelativePower(relativeSoc, pointA, pointB));
+			return Math.min(charger.getPlugPower(), c * approxRelativePower(relativeSoc, pointA, pointB));
 		} else if (relativeSoc <= pointC.relativeSoc) {
-			return Math.min(charger.getPower(), c * approxRelativePower(relativeSoc, pointB, pointC));
+			return Math.min(charger.getPlugPower(), c * approxRelativePower(relativeSoc, pointB, pointC));
 		} else {
-			return Math.min(charger.getPower(), c * approxRelativePower(relativeSoc, pointC, pointD));
+			return Math.min(charger.getPlugPower(), c * approxRelativePower(relativeSoc, pointC, pointD));
 		}
 	}
 
@@ -134,7 +121,7 @@ public class VariableSpeedCharging implements ChargingPower {//TODO upgrade to B
 		Battery b = electricVehicle.getBattery();
 		double relativeSoc = b.getSoc() / b.getCapacity();
 		double c = b.getCapacity() / 3600.;
-		double relativeChargerPower = charger.getPower() / c;
+		double relativeChargerPower = charger.getPlugPower() / c;
 
 		final Point adjustedPointA;
 		final Point adjustedPointB;

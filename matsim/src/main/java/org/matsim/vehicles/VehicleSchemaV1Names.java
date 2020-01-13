@@ -22,7 +22,7 @@ package org.matsim.vehicles;
 /**
  * @author dgrether
  */
-public interface VehicleSchemaV1Names {
+interface VehicleSchemaV1Names {
 
 	public static final String VEHICLEDEFINITIONS = "vehicleDefinitions";
 	public static final String VEHICLETYPE = "vehicleType";
@@ -53,5 +53,5 @@ public interface VehicleSchemaV1Names {
 	public static final String MODE = "mode";
 	public static final String PASSENGERCAREQUIVALENTS = "passengerCarEquivalents";
 	public static final String PCE = "pce";
-	
+
 }

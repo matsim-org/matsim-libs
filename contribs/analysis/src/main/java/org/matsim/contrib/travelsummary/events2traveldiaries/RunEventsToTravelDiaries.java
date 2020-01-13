@@ -27,7 +27,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.vehicles.MatsimVehicleReader;
 
 import java.io.File;
 import java.io.IOException;
@@ -97,7 +97,7 @@ public class RunEventsToTravelDiaries {
             new TransitScheduleReader(scenario)
                     .readFile(config.transit().getTransitScheduleFile());
 
-            new VehicleReaderV1(scenario.getTransitVehicles())
+            new MatsimVehicleReader(scenario.getTransitVehicles())
                     .readFile(config.transit().getVehiclesFile());
 
         }

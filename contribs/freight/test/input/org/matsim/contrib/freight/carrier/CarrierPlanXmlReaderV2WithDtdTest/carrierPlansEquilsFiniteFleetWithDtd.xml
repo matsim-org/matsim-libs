@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<!--
+  ~ /* *********************************************************************** *
+  ~  * project: org.matsim.*
+  ~  * ${file_name}
+  ~  *                                                                         *
+  ~  * *********************************************************************** *
+  ~  *                                                                         *
+  ~  * copyright       : (C) ${year} by the members listed in the COPYING,        *
+  ~  *                   LICENSE and WARRANTY file.                            *
+  ~  * email           : info at matsim dot org                                *
+  ~  *                                                                         *
+  ~  * *********************************************************************** *
+  ~  *                                                                         *
+  ~  *   This program is free software; you can redistribute it and/or modify  *
+  ~  *   it under the terms of the GNU General Public License as published by  *
+  ~  *   the Free Software Foundation; either version 2 of the License, or     *
+  ~  *   (at your option) any later version.                                   *
+  ~  *   See also COPYING, LICENSE and WARRANTY file                           *
+  ~  *                                                                         *
+  ~  * *********************************************************************** */
+  ~
+  ~ ${filecomment}
+  ~ ${package_declaration}
+  ~
+  ~ ${typecomment}
+  ~ ${type_declaration}
+  -->
+
+<carriers xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/carriersDefinitions_v2.0.xsd">
+		<carrier id="testCarrier">
+			<capabilities fleetSize="finite">
+				
+<!--				<vehicleTypes>-->
+<!--					<vehicleType id="heavy">-->
+<!--						<description>Heavy Vehicle 24t</description>-->
+<!--						<engineInformation fuelType="diesel" gasConsumption="0.02"/>  &lt;!&ndash; gasConsumption in liter per meter &ndash;&gt;-->
+<!--						<capacity unit="">30</capacity>-->
+<!--						<costInformation fix="130" perMeter="0.0008" perSecond="0.008"/>-->
+<!--					</vehicleType>-->
+<!--					<vehicleType id="medium">-->
+<!--						<description>Medium Vehicle 18t</description>-->
+<!--						<allowableWeight weight="18"/>-->
+<!--						<engineInformation fuelType="diesel" gasConsumption="0.02"/>  &lt;!&ndash; gasConsumption in liter per meter &ndash;&gt;-->
+<!--						<capacity unit="">30</capacity>-->
+<!--						<costInformation fix="100" perMeter="0.0006" perSecond="0.008"/>-->
+<!--					</vehicleType>-->
+<!--					<vehicleType id="light">-->
+<!--						<description>Light Vehicle 12t</description>-->
+<!--						<allowableWeight weight="12"/>-->
+<!--						<engineInformation fuelType="gasoline" gasConsumption="0.02"/>  gasConsumption in liter per meter-->
+<!--						<capacity unit="">30</capacity>-->
+<!--						<costInformation fix="70" perMeter="0.0004" perSecond="0.008"/>-->
+<!--					</vehicleType>-->
+<!--				</vehicleTypes>-->
+				
+				<vehicles>
+					<vehicle id="lightVehicle" depotLinkId="1" typeId="light" earliestStart="21900" latestEnd="23:59:59"/>
+					<vehicle id="mediumVehicle" depotLinkId="1" typeId="medium" earliestStart="21900" latestEnd="23:59:59"/>
+					<vehicle id="heavyVehicle" depotLinkId="2" typeId="heavy" earliestStart="21900" latestEnd="23:59:59"/>
+				</vehicles>
+				
+			</capabilities>
+			
+			<shipments>
+				<shipment id="s1" from="15" to="22" size="30" startPickup="21660.0" endPickup="28000.0" startDelivery="0.0" endDelivery="72000.0"/>
+				<shipment id="s2" from="20" to="22" size="10" startPickup="21660.0" endPickup="28000.0" startDelivery="0.0" endDelivery="72000.0"/>
+			</shipments>
+			
+			<plans>
+				<plan score="-100.0" selected="true">
+					<tour vehicleId="lightVehicle">
+						<act type="start" end_time="07:00:00"/>
+						<leg dep_time="07:00:00" transp_time="00:30:00">
+							<route>2 3 4</route>
+						</leg>
+						<act type="pickup" shipmentId="s1" end_time="07:00:00"/>
+						<leg dep_time="07:00:00" transp_time="00:00:00">
+							<route></route>
+						</leg>
+						<act type="delivery" shipmentId="s1" end_time="07:30:00"/>
+						<leg dep_time="07:00:00" transp_time="00:00:00">
+							<route></route>
+						</leg>
+						<act type="pickup" shipmentId="s2" end_time="07:30:00"/>
+						<leg dep_time="07:00:00" transp_time="00:00:00">
+							<route></route>
+						</leg>
+						<act type="delivery" shipmentId="s2" end_time="07:30:00"/>
+						<leg dep_time="07:00:00" transp_time="00:00:00">
+							<route></route>
+						</leg>
+						<act type="end"/>
+					</tour>
+				</plan>
+				
+				<plan score="-1000.0" selected="false">
+					<tour vehicleId="mediumVehicle">
+						<act type="start" end_time="07:00:00"/>
+						<leg dep_time="07:00:00" transp_time="00:30:00">
+							<route>2 3 4</route>
+						</leg>
+						<act type="pickup" shipmentId="s1" end_time="07:00:00"/>
+						<leg dep_time="07:00:00" transp_time="00:00:00">
+							<route></route>
+						</leg>
+						<act type="delivery" shipmentId="s1" end_time="07:30:00"/>
+						<leg dep_time="07:00:00" transp_time="00:00:00">
+							<route></route>
+						</leg>
+						<act type="pickup" shipmentId="s2" end_time="07:30:00"/>
+						<leg dep_time="07:00:00" transp_time="00:00:00">
+							<route></route>
+						</leg>
+						<act type="delivery" shipmentId="s2" end_time="07:30:00"/>
+						<leg dep_time="07:00:00" transp_time="00:00:00">
+							<route></route>
+						</leg>
+						<act type="end"/>
+					</tour>
+				</plan>
+			</plans>
+		</carrier>
+	</carriers>
+	

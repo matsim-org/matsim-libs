@@ -30,7 +30,7 @@ import java.io.IOException;
 public class Benchmark {
 
 	public static void main(String[] args) throws IOException {
-		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("benchmark"), "config.xml"));
+		Config config = ConfigUtils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("benchmark"), "config.xml"));
 		Controler ctl = new Controler(config);
         ctl.getConfig().controler().setCreateGraphs(false);
         ctl.run();

@@ -90,9 +90,9 @@ public class EquilTwoAgentsTest {
 
 	@Test
 	public void testSingleIterationPlansV4() {
-		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
-		ConfigUtils.loadConfig(config, IOUtils.newUrl(utils.classInputResourcePath(), "config.xml"));
-		config.plans().setInputFile(IOUtils.newUrl(utils.classInputResourcePath(), "plans2.xml").toString());
+		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+		ConfigUtils.loadConfig(config, IOUtils.extendUrl(utils.classInputResourcePath(), "config.xml"));
+		config.plans().setInputFile(IOUtils.extendUrl(utils.classInputResourcePath(), "plans2.xml").toString());
 
 		PlanCalcScoreConfigGroup pcsConfig = config.planCalcScore() ;
 		ActivityParams params = new ActivityParams("h") ;

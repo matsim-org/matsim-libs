@@ -95,7 +95,7 @@ public class VariableSpeedChargingTest {
 				.id(Id.create("charger_id", Charger.class))
 				.chargerType(ChargerSpecification.DEFAULT_CHARGER_TYPE)
 				.linkId(Id.createLinkId("link_id"))
-				.maxPower(EvUnits.kW_to_W(chargerPower_kW))
+				.plugPower(EvUnits.kW_to_W(chargerPower_kW))
 				.plugCount(1)
 				.build();
 		Charger charger = ChargerImpl.create(chargerSpecification, new FakeLink(Id.createLinkId("link_id")),
