@@ -33,7 +33,11 @@ import javax.inject.Provider;
  * unable to handle multi-planElement trips.
  * The plan must be re-routed before execution!
  * @author thibautd
+ *
+ * @deprecated -- we think that this should not be used any more, since a consequence is that the routes are no longer there say for scoring of plans outside
+ * the area where it is changed. kai/ihab/md, jan'20 yyyy
  */
+@Deprecated
 public class TripsToLegsModule extends AbstractMultithreadedModule {
 
 	/**

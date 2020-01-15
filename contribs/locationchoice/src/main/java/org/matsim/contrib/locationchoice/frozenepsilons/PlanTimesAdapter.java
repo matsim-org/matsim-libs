@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -77,7 +78,25 @@ class PlanTimesAdapter {
 					travelTime = 0. ;
 				}
 				leg.setTravelTime( travelTime );
+
+				// retrofit routes so that the distance lookup does not fail:
+				// todo yyyy remove this again and instead get rid of TripsToLegs.  kai/ihab/md, jan'20
+				boolean toBeRemovedAgain = false ;
+
+				if ( leg.getRoute()==null ){
+					toBeRemovedAgain = true ;
+					Route route = RouteUtils.createGenericRouteImpl( null, null );
+					route.setDistance( 0. );
+					leg.setRoute( route );
+				}
+
 				scoringFunction.handleLeg( leg );
+
+				// remove routes again so that they do not survive
+				if ( toBeRemovedAgain ) {
+					leg.setRoute( null );
+				}
+
 				now += travelTime ;
 			} else {
 				throw new RuntimeException( "Unsupported PlanElement type" ) ;

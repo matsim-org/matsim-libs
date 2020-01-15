@@ -133,8 +133,25 @@ class ChoiceSet {
 		  Plan planTmp,
 		  TripRouter router ) {
 
+		// yyyy replace the following by using TripStructureUtils, so that a "full" plan can be treated, and not only one that comes from qq
+		// TripsToLegs.  Ihab/kai/MD, jan'20
+
 		// currently handled activity which should be re-located
 		Activity activityToRelocate = (Activity) planTmp.getPlanElements().get(actlegIndex);
+
+		// design start for basing this on trips:
+		// we need to hope that finding the activity by index also works for full plans (including interaction activities)
+//		TripStructureUtils.Trip firstTrip = null ;
+//		TripStructureUtils.Trip secondTrip = null ;
+//		for( TripStructureUtils.Trip trip : TripStructureUtils.getTrips( planTmp ) ){
+//			if ( trip.getDestinationActivity() == activityToRelocate ) {
+//				firstTrip = trip ;
+//			}
+//			if ( trip.getOriginActivity() == activityToRelocate ) {
+//				secondTrip = trip ;
+//			}
+//		}
+
 
 		// We need to calculate the multi node dijkstra stuff only in case localRouting is used.
 		if (this.approximationLevel == FrozenTastesConfigGroup.ApproximationLevel.localRouting )
@@ -162,22 +179,22 @@ class ChoiceSet {
 			{
 				Leg previousLeg = PopulationUtils.getPreviousLeg( planTmp, activityToRelocate );
 				Activity previousActivity = PopulationUtils.getPreviousActivity( planTmp, previousLeg );
-				Node nextActNode = this.network.getLinks().get( PopulationUtils.decideOnLinkIdForActivity( previousActivity, scenario ) ).getToNode();
+				Node prevActToNode = this.network.getLinks().get( PopulationUtils.decideOnLinkIdForActivity( previousActivity, scenario ) ).getToNode();
 
 				forwardMultiNodeDijkstra.setSearchAllEndNodes( true );
-				forwardMultiNodeDijkstra.calcLeastCostPath(nextActNode, destinationNode, PlanRouter.calcEndOfActivity(previousActivity, planTmp, scenario.getConfig()) , planTmp.getPerson(), null);
-//				forwardMultiNodeDijkstra.calcLeastCostPath( nextActNode, destinationNode, previousActivity.getEndTime(), planTmp.getPerson(), null );
+				forwardMultiNodeDijkstra.calcLeastCostPath(prevActToNode, destinationNode, PlanRouter.calcEndOfActivity(previousActivity, planTmp, scenario.getConfig()) , planTmp.getPerson(), null);
+//				forwardMultiNodeDijkstra.calcLeastCostPath( prevActToNode, destinationNode, previousActivity.getEndTime(), planTmp.getPerson(), null );
 			}
 
 			// (2) backward tree
 			{
 				Leg nextLeg = PopulationUtils.getNextLeg( planTmp, activityToRelocate );
 				Activity nextActivity = PopulationUtils.getNextActivity( planTmp, nextLeg );
-				Node nextActNode = this.network.getLinks().get( PopulationUtils.decideOnLinkIdForActivity( nextActivity, scenario ) ).getToNode();
+				Node nextActToNode = this.network.getLinks().get( PopulationUtils.decideOnLinkIdForActivity( nextActivity, scenario ) ).getToNode();
 
 				backwardMultiNodeDijkstra.setSearchAllEndNodes( true );
-				backwardMultiNodeDijkstra.calcLeastCostPath(nextActNode, destinationNode, PlanRouter.calcEndOfActivity(activityToRelocate, planTmp, scenario.getConfig()) , planTmp.getPerson(), null);
-//				backwardMultiNodeDijkstra.calcLeastCostPath( nextActNode, destinationNode, activityToRelocate.getEndTime(), planTmp.getPerson(), null );
+				backwardMultiNodeDijkstra.calcLeastCostPath(nextActToNode, destinationNode, PlanRouter.calcEndOfActivity(activityToRelocate, planTmp, scenario.getConfig()) , planTmp.getPerson(), null);
+//				backwardMultiNodeDijkstra.calcLeastCostPath( nextActToNode, destinationNode, activityToRelocate.getEndTime(), planTmp.getPerson(), null );
 				// yy it is not clear to me how the dp time is interpreted for the backwards Dijkstra.  kai, mar'19
 			}
 			// ---

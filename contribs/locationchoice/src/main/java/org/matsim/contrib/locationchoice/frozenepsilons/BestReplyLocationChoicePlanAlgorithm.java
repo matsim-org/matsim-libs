@@ -41,6 +41,8 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -48,6 +50,10 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.withinday.utils.EditPlans;
+import org.matsim.withinday.utils.EditTrips;
+
+import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.*;
 
 final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	private static final Logger log = Logger.getLogger( BestReplyLocationChoicePlanAlgorithm.class ) ;
@@ -116,6 +122,15 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	}
 
 	private void handleActivities( final Plan plan, final int personIndex ) {
+
+
+		// yyyy todo reconstruct the algo based on PlanElements with algo based on trips, using the following material:
+//		List<Activity> activities = TripStructureUtils.getActivities( plan, ExcludeStageActivities );
+//		for ( int ii=0 ; ii<activities.size() ; ii++ ) {
+//			activities.get( ii ) ;
+//			activities.get( ii-1 ) ;
+//			activities.get( ii+1 ) ;
+//		}
 
 		int actlegIndex = -1;
 		for (PlanElement pe : plan.getPlanElements()) {
