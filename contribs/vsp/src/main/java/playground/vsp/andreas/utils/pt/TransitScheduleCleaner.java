@@ -86,13 +86,12 @@ public class TransitScheduleCleaner {
 	public static TransitSchedule removeStopsNotUsed(TransitSchedule transitSchedule){
 		
 		log.info("Removing stops not used");
-		TransitSchedule tS = TransitScheduleCleaner.makeTransitScheduleModifiable(transitSchedule);
-		printStatistic(tS);
+		printStatistic(transitSchedule);
 		
-		Set<Id> stopsInUse = new TreeSet<Id>();
-		Set<Id> stopsToBeRemoved = new TreeSet<Id>();
+		Set<Id<TransitStopFacility>> stopsInUse = new HashSet<>();
+		Set<TransitStopFacility> stopsToBeRemoved = new HashSet<>();
 		
-		for (TransitLine transitLine : tS.getTransitLines().values()) {
+		for (TransitLine transitLine : transitSchedule.getTransitLines().values()) {
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
 				for (TransitRouteStop stop : transitRoute.getStops()) {
 					stopsInUse.add(stop.getStopFacility().getId());
@@ -100,23 +99,23 @@ public class TransitScheduleCleaner {
 			}
 		}
 		
-		for (TransitStopFacility transitStopFacility : tS.getFacilities().values()) {
+		for (TransitStopFacility transitStopFacility : transitSchedule.getFacilities().values()) {
 			if(!stopsInUse.contains(transitStopFacility.getId())){
-				stopsToBeRemoved.add(transitStopFacility.getId());
+				stopsToBeRemoved.add(transitStopFacility);
 			}
 		}
 		
 		StringBuffer sB = new StringBuffer();
 		
-		for (Id transitStopFacilityId : stopsToBeRemoved) {
-			tS.getFacilities().remove(transitStopFacilityId);
-			sB.append(transitStopFacilityId.toString() + ", ");
+		for (TransitStopFacility transitStopFacility : stopsToBeRemoved) {
+			transitSchedule.removeStopFacility(transitStopFacility);
+			sB.append(transitStopFacility.getId().toString() + ", ");
 		}
 		
-		printStatistic(tS);
+		printStatistic(transitSchedule);
 		log.info("Removed " + stopsToBeRemoved.size() + " stops from transitSchedule: " + sB.toString());	
 		
-		return tS;
+		return transitSchedule;
 	}
 	
 	
