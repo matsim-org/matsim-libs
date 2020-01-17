@@ -59,21 +59,12 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 
 	//Old list of pollutants
 //	private final Set<String> pollutants = new HashSet<>(Arrays.asList("CO", "CO2(total)", "FC", "HC", "NMHC", "NOx", "NO2","PM", "SO2"));
-	private final Set<WarmPollutant> pollutants = new HashSet<>( Arrays.asList( WarmPollutant.values() ) );
-	private final int numberOfWarmPollutants = pollutants.size();
-	private final String hbefaRoadCategory = "URB";
-    private final String roadType = "0";
-	private final int leaveTime = 0;
+	private static final Set<WarmPollutant> pollutants = new HashSet<>( Arrays.asList( WarmPollutant.values() ) );
+	private static final String hbefaRoadCategory = "URB";
 	private final EmissionsComputationMethod emissionsComputationMethod;
-	private boolean excep =false;
 	private final String passengercar= "PASSENGER_CAR";
 
-    private HbefaRoadTypeMapping roadTypeMapping;
-	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
-	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
-	private Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds;
-
-    private WarmEmissionAnalysisModule weam;
+	private WarmEmissionAnalysisModule weam;
 	private Map<WarmPollutant, Double> warmEmissions;
 
 	//average speeds should be the same across all car types, but vary by traffic situation
@@ -84,18 +75,18 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 	private final HbefaTrafficSituation[] trafficSituations = {FREEFLOW, HEAVY, SATURATED, STOPANDGO};
 	private final double[] avgPassengerCarSpeed = {51., 40., 30., 10.};
 
-    // vehicle information for regular test cases
+	// vehicle information for regular test cases
 	// case 1 - data in both tables -> use detailed
-    private final String 	petrolTechnology = "PC petrol <1,4L";
-    private final String petrolSizeClass ="<ECE petrol (4S)";
-    private final String petrolConcept ="<1,4L";
-	private final double[] detailedPetrolFactor = {10, 100, 1000, 10000};
+	private static final String petrolTechnology = "PC petrol <1,4L";
+	private static final String petrolSizeClass ="<ECE petrol (4S)";
+	private static final String petrolConcept ="<1,4L";
+	private static final double[] detailedPetrolFactor = {10, 100, 1000, 10000};
 
 	// case 2 - free flow entry in both tables, stop go entry in average table -> use average
-	private final String 	pcTechnology = "PC petrol <1,4L <ECE";
-	private final String pcSizeClass = "petrol (4S)";
-	private final String pcConcept = "<1,4L";
-	private final double[] avgPetrolFactor = {20, 200, 2000, 20000};
+	private static final String pcTechnology = "PC petrol <1,4L <ECE";
+	private static final String pcSizeClass = "petrol (4S)";
+	private static final String pcConcept = "<1,4L";
+	private static final double[] avgPetrolFactor = {20, 200, 2000, 20000};
 
 	public TestWarmEmissionAnalysisModuleTrafficSituations( EmissionsComputationMethod emissionsComputationMethod ) {
 		this.emissionsComputationMethod = emissionsComputationMethod;
@@ -111,13 +102,14 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 
 	@Before
 	public void setUp() {
-		avgHbefaWarmTable = new HashMap<>();
-		detailedHbefaWarmTable = new HashMap<>();
+		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<>();
+		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable = new HashMap<>();
 
-		fillAverageTable(avgHbefaWarmTable);
-		fillDetailedTable(detailedHbefaWarmTable);
-		hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(avgHbefaWarmTable);
-		addDetailedRecordsToTestSpeedsTable(hbefaRoadTrafficSpeeds, detailedHbefaWarmTable);
+		fillAverageTable( avgHbefaWarmTable );
+		fillDetailedTable( detailedHbefaWarmTable );
+		Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(
+				avgHbefaWarmTable );
+		addDetailedRecordsToTestSpeedsTable( hbefaRoadTrafficSpeeds, detailedHbefaWarmTable );
 
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
         EmissionsConfigGroup ecg = new EmissionsConfigGroup();
@@ -218,8 +210,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 		return l;
 	}
 
-	private void fillDetailedTable(
-			Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable) {
+	private void fillDetailedTable( Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable) {
 
 		for (int i = 0; i < trafficSituations.length; i++) {
 			HbefaTrafficSituation trafficSituation = trafficSituations[i];
