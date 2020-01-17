@@ -21,15 +21,19 @@ package org.matsim.contrib.emissions;/* ****************************************
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.EmissionsComputationMethod;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.objectattributes.ObjectAttributesConverter;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -50,7 +54,7 @@ import static org.matsim.contrib.emissions.types.WarmPollutant.NOx;
  *
  **/
  
-
+@RunWith(Parameterized.class)
 public class TestWarmEmissionAnalysisModuleTrafficSituations {
 
 	//Old list of pollutants
@@ -60,6 +64,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 	private final String hbefaRoadCategory = "URB";
     private final String roadType = "0";
 	private final int leaveTime = 0;
+	private final EmissionsComputationMethod emissionsComputationMethod;
 	private boolean excep =false;
 	private final String passengercar= "PASSENGER_CAR";
 
@@ -92,6 +97,18 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 	private final String pcConcept = "<1,4L";
 	private final double[] avgPetrolFactor = {20, 200, 2000, 20000};
 
+	public TestWarmEmissionAnalysisModuleTrafficSituations( EmissionsComputationMethod emissionsComputationMethod ) {
+		this.emissionsComputationMethod = emissionsComputationMethod;
+	}
+
+	@Parameterized.Parameters( name = "{index}: ComputationMethod={0}")
+	public static Collection<Object[]> createCombinations() {
+		List <Object[]> list = new ArrayList<>();
+		list.add( new Object [] {EmissionsComputationMethod.StopAndGoFraction} ) ;
+		list.add( new Object [] {EmissionsComputationMethod.AverageSpeed} ) ;
+		return list;
+	}
+
 	@Before
 	public void setUp() {
 		avgHbefaWarmTable = new HashMap<>();
@@ -111,10 +128,12 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 		} else {
 			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
 		}
+		ecg.setEmissionsComputationMethod( this.emissionsComputationMethod );
 
 		WarmEmissionAnalysisModuleParameter warmEmissionParameterObject = new WarmEmissionAnalysisModuleParameter(
 				avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, ecg);
 		weam = new WarmEmissionAnalysisModule(warmEmissionParameterObject, emissionEventManager, null);
+
 
 	}
 
@@ -144,7 +163,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 	}
 
 	@Test
-	public void TestTrafficSituations() {
+	public void testTrafficSituations() {
 		Id<Vehicle> vehicleId = Id.create("vehicle 1", Vehicle.class);
 		String roadType = "0";
 		double linkLength = 2*1000.; //in meter

@@ -38,7 +38,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static org.matsim.contrib.emissions.EmissionUtils.convertVehicleDescription2VehicleInformationTuple;
 import static org.matsim.contrib.emissions.HbefaTrafficSituation.*;
 
 /**
@@ -154,16 +153,17 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 	/*package-private*/ Map<WarmPollutant, Double> checkVehicleInfoAndCalculateWarmEmissions(VehicleType vehicleType, Id<Vehicle> vehicleId,
 																  Link link, double travelTime) {
-
-		String hbefaVehicleTypeDescription = EmissionUtils.getHbefaVehicleDescription( vehicleType, this.ecg );
-		Gbl.assertNotNull( hbefaVehicleTypeDescription );
-
+		{
+			String hbefaVehicleTypeDescription = EmissionUtils.getHbefaVehicleDescription( vehicleType, this.ecg );
+			// (this will, importantly, repair the hbefa description in the vehicle type. kai/kai, jan'20)
+			Gbl.assertNotNull( hbefaVehicleTypeDescription );
+		}
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = EmissionUtils.convertVehicleDescription2VehicleInformationTuple(vehicleType );
 		Gbl.assertNotNull( vehicleInformationTuple );
 
 		if (vehicleInformationTuple.getFirst() == null){
 			throw new RuntimeException("Vehicle category for vehicle " + vehicleType + " is not valid. " +
-					"Please make sure that requirements for emission vehicles in " + 
+					"Please make sure that requirements for emission vehicles in " +
 					EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
 
@@ -171,7 +171,22 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		double linkLength = link.getLength();
 		String roadType = EmissionUtils.getHbefaRoadType(link);
 
-		Map<WarmPollutant, Double> warmEmissions = calculateWarmEmissions( vehicleId, travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple );
+		Map<WarmPollutant, Double> warmEmissions = null ;
+		switch( ecg.getEmissionsComputationMethod() ) {
+			case StopAndGoFraction:
+//				warmEmissions = calculateWarmEmissionsStopAndGoFraction(...) ;
+//				break;
+				throw new RuntimeException( "not implemented" );
+				// yyyyyy put in the old computation method (release 10), and adjust tests that will then probably fail.
+			case AverageSpeed:
+				warmEmissions= calculateWarmEmissionsAverageSpeec( vehicleId, travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple );
+				break;
+			default:
+				throw new IllegalStateException( "Unexpected value: " + ecg.getEmissionsComputationMethod() );
+		}
+		// could, if needed, put the different computation method behind an interface.  On the other hand, could also use
+		// "checkVehicleInfoAndCalculateWarmEmissions" as interface, or the method that uses VehicleType as input (instead of the vehicle).  kai, jan'20
+
 
 		// a basic apporach to introduce emission reduced cars:
 		if(emissionEfficiencyFactor != null){
@@ -189,8 +204,8 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		return rescaledWarmEmissions;
 	}
 
-	private Map<WarmPollutant, Double> calculateWarmEmissions(Id<Vehicle> vehicleId, double travelTime, String roadType, double freeVelocity,
-			double linkLength, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple) {
+	private Map<WarmPollutant, Double> calculateWarmEmissionsAverageSpeec( Id<Vehicle> vehicleId, double travelTime, String roadType, double freeVelocity,
+									       double linkLength, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple ) {
 
 		Map<WarmPollutant, Double> warmEmissionsOfEvent = new HashMap<>();
 
@@ -199,19 +214,30 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 		HbefaWarmEmissionFactorKey efkey = new HbefaWarmEmissionFactorKey();
 
-		if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE)){
-			efkey.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
-		} else if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.MOTORCYCLE)) {
-			efkey.setHbefaVehicleCategory(HbefaVehicleCategory.MOTORCYCLE);
-		} else if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.ZERO_EMISSION_VEHICLE)) {
+//		if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE)){
+//			efkey.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
+//		} else if (vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.MOTORCYCLE)) {
+//			efkey.setHbefaVehicleCategory(HbefaVehicleCategory.MOTORCYCLE);
+//		} else if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.ZERO_EMISSION_VEHICLE)) {
+//			for (WarmPollutant warmPollutant : warmPollutants) {
+//				warmEmissionsOfEvent.put( warmPollutant, 0.0 );
+//			}
+//			// yyyyyy I am doubtful that the above is useful ... e.g. tire emissions will also exist for electric vehicles.  kai, jan'20
+//			return warmEmissionsOfEvent;
+//		} else {
+//			efkey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+//		}
+
+		// the above had a fall-through to passenger car ... which for, e.g., bicycles would be totally wrong.  Thus new version follows, which
+		// should crash if enum not known:
+
+		if ( vehicleInformationTuple.getFirst()==HbefaVehicleCategory.NON_HBEFA_VEHICLE ) {
 			for (WarmPollutant warmPollutant : warmPollutants) {
 				warmEmissionsOfEvent.put( warmPollutant, 0.0 );
 			}
-			// yyyyyy I am doubtful that the above is useful ... e.g. tire emissions will also exist for electric vehicles.  kai, jan'20
 			return warmEmissionsOfEvent;
-		} else {
-			efkey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
 		}
+		efkey.setHbefaVehicleCategory( vehicleInformationTuple.getFirst() );
 
 		efkey.setHbefaRoadCategory(hbefaRoadTypeName);
 
