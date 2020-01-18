@@ -37,12 +37,10 @@ import org.matsim.contrib.signals.sensor.DownstreamSensor;
 import org.matsim.contrib.signals.sensor.LinkSensorManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QSignalsNetworkFactory;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
 
+import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
-import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
 
 /**
@@ -96,7 +94,7 @@ class SignalsModule extends AbstractModule {
 			}
 			
 			// general signal bindings
-			bind(SignalSystemsManager.class).toProvider(FromDataBuilder.class);
+			bind(SignalSystemsManager.class).toProvider(FromDataBuilder.class).in(Singleton.class);
 			addMobsimListenerBinding().to(QSimSignalEngine.class);
 //			bind(QNetworkFactory.class).to(QSignalsNetworkFactory.class);
 
