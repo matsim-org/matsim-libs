@@ -52,7 +52,7 @@ public class SignalSystemsIT {
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
 	@Test
-	public void testSignalSystemsWMinOfDurationAndEndTime() {
+	public void testSignalSystems() {
 		Config config = testUtils.loadConfig(testUtils.getClassInputDirectory() + CONFIG_FILE_NAME);
 		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime);
 		String controlerOutputDir = testUtils.getOutputDirectory() + "controlerOutput/";
@@ -88,11 +88,13 @@ public class SignalSystemsIT {
 			//iteration 0 
 			String iterationOutput = controlerOutputDir + "ITERS/it.0/";
 			
-			Assert.assertEquals("different events files after iteration 0 ", EventsFileComparator.compare(inputDirectory + "0.events.xml.gz", iterationOutput + "0.events.xml.gz"), EventsFileComparator.Result.FILES_ARE_EQUAL);
+			Assert.assertEquals("different events files after iteration 0 ",
+					EventsFileComparator.compare(inputDirectory + "0.events.xml.gz", iterationOutput + "0.events.xml.gz"),
+					EventsFileComparator.Result.FILES_ARE_EQUAL);
 			
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimNetworkReader(expectedPopulation.getNetwork()).parse(c.getConfig().network().getInputFileURL(c.getConfig().getContext()));
-			new PopulationReader(expectedPopulation).readFile(testUtils.getInputDirectory() + "0.plans.xml.gz");
+			new PopulationReader(expectedPopulation).readFile(inputDirectory + "0.plans.xml.gz");
 			
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new PopulationReader(actualPopulation).readFile(iterationOutput + "0.plans.xml.gz");
@@ -113,10 +115,9 @@ public class SignalSystemsIT {
 					EventsFileComparator.compare(inputDirectory + "10.events.xml.gz", iterationOutput + "10.events.xml.gz") ==
 							EventsFileComparator.Result.FILES_ARE_EQUAL);
 			
-			
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimNetworkReader(expectedPopulation.getNetwork()).parse(c.getConfig().network().getInputFileURL(c.getConfig().getContext()));
-			new PopulationReader(expectedPopulation).readFile(testUtils.getInputDirectory() + "10.plans.xml.gz");
+			new PopulationReader(expectedPopulation).readFile(inputDirectory + "10.plans.xml.gz");
 			
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new PopulationReader(actualPopulation).readFile(iterationOutput + "10.plans.xml.gz");
@@ -184,10 +185,9 @@ public class SignalSystemsIT {
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimNetworkReader(expectedPopulation.getNetwork()).parse(c.getConfig().network().getInputFileURL(c.getConfig().getContext()));
 			new PopulationReader(expectedPopulation).readFile(testUtils.getInputDirectory() + "0.plans.xml.gz");
-
+			
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new PopulationReader(actualPopulation).readFile(iterationOutput + "0.plans.xml.gz");
-			
 			
 			boolean works = PopulationUtils.equalPopulation(expectedPopulation.getPopulation(), actualPopulation.getPopulation());
 			
@@ -202,13 +202,14 @@ public class SignalSystemsIT {
 			String iterationOutput = controlerOutputDir + "ITERS/it.10/";
 			
 			Assert.assertTrue("different event files after iteration 10",
-					EventsFileComparator.compareAndReturnInt(inputDirectory + "10.events.xml.gz", iterationOutput + "10.events.xml.gz") ==
-							EventsFileComparator.CODE_FILES_ARE_EQUAL);
+					EventsFileComparator.compare(inputDirectory + "10.events.xml.gz", iterationOutput + "10.events.xml.gz") ==
+							EventsFileComparator.Result.FILES_ARE_EQUAL);
 			
 			
 			Scenario expectedPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new MatsimNetworkReader(expectedPopulation.getNetwork()).parse(c.getConfig().network().getInputFileURL(c.getConfig().getContext()));
-			new PopulationReader(expectedPopulation).readFile(testUtils.getInputDirectory() + "10.plans.xml.gz");
+			new PopulationReader(expectedPopulation).readFile(inputDirectory + "10.plans.xml.gz");
+			
 			Scenario actualPopulation = ScenarioUtils.createScenario(c.getConfig());
 			new PopulationReader(actualPopulation).readFile(iterationOutput + "10.plans.xml.gz");
 			
