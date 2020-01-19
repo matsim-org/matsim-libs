@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.pseudosimulation.distributed.scoring.PlanScoreComponent;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.CustomizableUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.attributable.Attributes;
@@ -276,6 +277,7 @@ public class PlanGenome implements Plan {
                 Leg l2 = createAndAddLeg(l.getMode());
                 l2.setDepartureTime(l.getDepartureTime());
                 l2.setTravelTime(l.getTravelTime());
+                TripStructureUtils.setRoutingMode(l2, TripStructureUtils.getRoutingMode(l));
                 if (pe instanceof Leg) {
                     // get the arrival time information only if available
                     Leg r = ((Leg) pe);

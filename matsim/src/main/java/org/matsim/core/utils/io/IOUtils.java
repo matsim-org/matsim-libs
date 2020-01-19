@@ -129,7 +129,7 @@ final public class IOUtils {
 		COMPRESSION_EXTENSIONS.put("gz", CompressionType.GZIP);
 		COMPRESSION_EXTENSIONS.put("lz4", CompressionType.LZ4);
 		COMPRESSION_EXTENSIONS.put("bz2", CompressionType.BZIP2);
-		COMPRESSION_EXTENSIONS.put("zstd", CompressionType.ZSTD);
+		COMPRESSION_EXTENSIONS.put("zst", CompressionType.ZSTD);
 	}
 
 	// Define a number of charsets that are / have been used.
@@ -298,7 +298,7 @@ final public class IOUtils {
 			File file = new File(url.toURI());
 			CompressionType compression = getCompression(url);
 
-			if (compression != null && append && file.exists()) {
+			if ((compression != null && compression != CompressionType.ZSTD) && append && file.exists()) {
 				throw new UncheckedIOException("Cannot append to compressed files.");
 			}
 

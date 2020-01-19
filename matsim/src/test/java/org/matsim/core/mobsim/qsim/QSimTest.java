@@ -80,6 +80,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -141,6 +142,7 @@ public class QSimTest {
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 		a1.setEndTime(6*3600);
 		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 		NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
 		route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 		leg.setRoute(route);
@@ -184,6 +186,7 @@ public class QSimTest {
 		}
 		{
 			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 		}
 		{
 			Activity act = PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link3.getId());
@@ -191,6 +194,7 @@ public class QSimTest {
 		}
 		{
 			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 		}
 		f.plans.addPerson(person);
 		
@@ -245,6 +249,7 @@ public class QSimTest {
 			Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 			a1.setEndTime((6+i)*3600);
 			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
 			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 			leg.setRoute(route);
@@ -284,6 +289,7 @@ public class QSimTest {
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 		a1.setEndTime(6*3600);
 		Leg leg = PopulationUtils.createAndAddLeg( plan, "other" );
+		TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 		Route route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(Route.class, f.link1.getId(), f.link3.getId()); // TODO [MR] use different factory/mode here
 		route.setTravelTime(15.0);
 		leg.setRoute(route);
@@ -330,6 +336,7 @@ public class QSimTest {
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 		a1.setEndTime(0);
 		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 		NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
 		route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 		leg.setRoute(route);
@@ -374,6 +381,7 @@ public class QSimTest {
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 		a1.setEndTime(6*3600);
 		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 		NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link1.getId());
 		route.setLinkIds(f.link1.getId(), new ArrayList<Id<Link>>(0), f.link1.getId());
 		leg.setRoute(route);
@@ -447,6 +455,7 @@ public class QSimTest {
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 		a1.setEndTime(6*3600);
 		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 		NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), loopLink.getId());
 		ArrayList<Id<Link>> links = new ArrayList<Id<Link>>();
 		links.add(f.link2.getId());
@@ -569,6 +578,7 @@ public class QSimTest {
 		Activity act = PopulationUtils.createAndAddActivityFromLinkId(plan, "home", f.link1.getId());
 		act.setEndTime(6.0 * 3600);
 		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.walk );
+		TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 		leg.setRoute(RouteUtils.createGenericRouteImpl(f.link1.getId(), f.link2.getId()));
 		leg.getRoute().setTravelTime(0.); // retrofitting to repair failing test.  kai, apr'15
 		act = PopulationUtils.createAndAddActivityFromLinkId(plan, "work", f.link2.getId());
@@ -615,6 +625,7 @@ public class QSimTest {
 			Activity a = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 			a.setEndTime(7*3600 - 1812);
 			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
 			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 			leg.setRoute(route);
@@ -677,6 +688,7 @@ public class QSimTest {
 			Activity a = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 			a.setEndTime(7*3600 - 1812);
 			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
 			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 			leg.setRoute(route);
@@ -720,6 +732,7 @@ public class QSimTest {
 			Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link2.getId());
 			a2.setEndTime(7*3600 - 1801);
 			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
 			route.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 			leg.setRoute(route);
@@ -771,6 +784,7 @@ public class QSimTest {
 			Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link2.getId());
 			a2.setEndTime(7*3600 - 1801);
 			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
 			route.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 			leg.setRoute(route);
@@ -784,6 +798,7 @@ public class QSimTest {
 			Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 			a2.setEndTime(7*3600 - 1812);
 			Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+			TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 			NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
 			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 			leg.setRoute(route);
@@ -830,12 +845,14 @@ public class QSimTest {
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
-		Leg l1 = PopulationUtils.createAndAddLeg( plan, "other" );
+		Leg l1 = PopulationUtils.createAndAddLeg( plan, TransportMode.other );
+		TripStructureUtils.setRoutingMode( l1, TransportMode.other );
 		l1.setTravelTime(10);
 		l1.setRoute(f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link2.getId()));
 		Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link2.getId());
 		a2.setEndTime(7.0*3600 + 20);
 		Leg l2 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		TripStructureUtils.setRoutingMode( l2, TransportMode.car );
 		NetworkRoute route2 = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
 		route2.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 		l2.setRoute(route2);
@@ -885,12 +902,14 @@ public class QSimTest {
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
-		Leg l1 = PopulationUtils.createAndAddLeg( plan, "other" );
+		Leg l1 = PopulationUtils.createAndAddLeg( plan, TransportMode.other );
+		TripStructureUtils.setRoutingMode( l1, TransportMode.other );
 		l1.setTravelTime(10);
 		l1.setRoute(f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link2.getId()));
 		Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link2.getId());
 		a2.setEndTime(7.0*3600 + 20);
 		Leg l2 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		TripStructureUtils.setRoutingMode( l2, TransportMode.car );
 		NetworkRoute route2 = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
 		route2.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 		l2.setRoute(route2);
@@ -902,13 +921,15 @@ public class QSimTest {
 		Activity aa1 = PopulationUtils.createAndAddActivityFromLinkId(planWhichBringsTheCar, "h", f.link1.getId());
 		aa1.setEndTime(7.0*3600 + 30);
 		Leg ll1 = PopulationUtils.createAndAddLeg( planWhichBringsTheCar, TransportMode.car );
+		TripStructureUtils.setRoutingMode( ll1, TransportMode.car );
 		NetworkRoute route3 = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link2.getId());
 		route3.setLinkIds(f.link1.getId(), f.linkIdsNone, f.link2.getId());
 		route3.setVehicleId(Id.create(1, Vehicle.class)); // We drive the car that person 1 needs.
 		ll1.setRoute(route3);
 		Activity aa2 = PopulationUtils.createAndAddActivityFromLinkId(planWhichBringsTheCar, "w", f.link2.getId());
 		aa2.setEndTime(7.0*3600 + 60);
-		Leg ll2 = PopulationUtils.createAndAddLeg( planWhichBringsTheCar, "other" );
+		Leg ll2 = PopulationUtils.createAndAddLeg( planWhichBringsTheCar, TransportMode.other );
+		TripStructureUtils.setRoutingMode( ll2, TransportMode.other );
 		ll2.setTravelTime(10);
 		ll2.setRoute(f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId()));
 		PopulationUtils.createAndAddActivityFromLinkId(planWhichBringsTheCar, "l", f.link3.getId());
@@ -975,12 +996,14 @@ public class QSimTest {
 		Plan plan = PersonUtils.createAndAddPlan(person, true);
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
-		Leg l1 = PopulationUtils.createAndAddLeg( plan, "other" );
+		Leg l1 = PopulationUtils.createAndAddLeg( plan, TransportMode.other );
+		TripStructureUtils.setRoutingMode( l1, TransportMode.other );
 		l1.setTravelTime(10);
 		l1.setRoute(f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link2.getId())); // TODO [MR] use different factory / TransportationMode
 		Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "w", f.link2.getId());
 		a2.setEndTime(7.0*3600 + 20);
 		Leg l2 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		TripStructureUtils.setRoutingMode( l2, TransportMode.car );
 		NetworkRoute route2 = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
 		route2.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 		l2.setRoute(route2);
@@ -1026,6 +1049,7 @@ public class QSimTest {
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link2.getId());
 		a1.setEndTime(7.0*3600);
 		Leg l1 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		TripStructureUtils.setRoutingMode( l1, TransportMode.car );
 		NetworkRoute route1 = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link2.getId(), f.link3.getId());
 		route1.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 		route1.setVehicleId(Id.create(2, Vehicle.class));
@@ -1082,6 +1106,7 @@ public class QSimTest {
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
 		Leg l1 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		TripStructureUtils.setRoutingMode( l1, TransportMode.car );
 		l1.setTravelTime(10);
 		NetworkRoute netRoute = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link1.getId());
 		List<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
@@ -1139,6 +1164,7 @@ public class QSimTest {
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 		a1.setEndTime(7.0*3600);
 		Leg l1 = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		TripStructureUtils.setRoutingMode( l1, TransportMode.car );
 		l1.setTravelTime(10);
 		NetworkRoute netRoute = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), f.link3.getId());
 		List<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
@@ -1300,12 +1326,14 @@ public class QSimTest {
 		Activity a1 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", f.link1.getId());
 		a1.setEndTime(8*3600);
 		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 		NetworkRoute route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, f.link1.getId(), link5.getId());
 		route.setLinkIds(Id.create(startLinkId, Link.class), NetworkUtils.getLinkIds(linkIds), Id.create(endLinkId, Link.class));
 		leg.setRoute(route);
 		Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "w", link5.getId());
 		a2.setEndTime(9*3600);
 		leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
+		TripStructureUtils.setRoutingMode( leg, TransportMode.car );
 		route = f.scenario.getPopulation().getFactory().getRouteFactories().createRoute(NetworkRoute.class, link5.getId(), link6.getId());
 		route.setLinkIds(link5.getId(), null, link6.getId());
 		leg.setRoute(route);
@@ -1350,6 +1378,7 @@ public class QSimTest {
 		Activity act1 = pb.createActivityFromLinkId("h", link.getId());
 		act1.setEndTime(7.0*3600);
 		Leg leg = pb.createLeg(TransportMode.walk);
+		TripStructureUtils.setRoutingMode( leg, TransportMode.walk );
 		Route route = RouteUtils.createGenericRouteImpl(link.getId(), link.getId());
 		route.setTravelTime(5.0*3600);
 		leg.setRoute(route);
@@ -1421,6 +1450,7 @@ public class QSimTest {
 		Activity act1_1 = pb.createActivityFromLinkId("h", link1.getId());
 		act1_1.setEndTime(simEndTime - 20);
 		Leg leg1 = pb.createLeg(TransportMode.car);
+		TripStructureUtils.setRoutingMode( leg1, TransportMode.car );
 		NetworkRoute route1 = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link2.getId());
 		leg1.setRoute(route1);
 		leg1.setTravelTime(5.0*3600);
@@ -1436,6 +1466,7 @@ public class QSimTest {
 		Activity act2_1 = pb.createActivityFromLinkId("h", link1.getId());
 		act2_1.setEndTime(simEndTime - 1000);
 		Leg leg2 = pb.createLeg(TransportMode.walk);
+		TripStructureUtils.setRoutingMode( leg2, TransportMode.walk );
 		Route route2 = RouteUtils.createGenericRouteImpl(link1.getId(), link2.getId());
 		leg2.setRoute(route2);
 		leg2.setTravelTime(2000);
@@ -1451,6 +1482,7 @@ public class QSimTest {
 		Activity act3_1 = pb.createActivityFromLinkId("h", link1.getId());
 		act3_1.setEndTime(simEndTime + 1000);
 		Leg leg3 = pb.createLeg(TransportMode.walk);
+		TripStructureUtils.setRoutingMode( leg3, TransportMode.walk );
 		Route route3 = RouteUtils.createGenericRouteImpl(link1.getId(), link2.getId());
 		leg3.setRoute(route3);
 		leg3.setTravelTime(1000);

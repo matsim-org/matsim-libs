@@ -80,16 +80,6 @@ public final class RaptorUtils {
             raptorParams.setMarginalUtilityOfTravelTime_utl_s(mode, marginalUtility_utl_s);
         }
         
-		for (String fallbackMode : Arrays.asList(TransportMode.non_network_walk,
-				TransportMode.transit_walk)) {
-			if (!pcsConfig.getModes().containsKey(fallbackMode)) {
-				PlanCalcScoreConfigGroup.ModeParams modeParams = pcsConfig.getModes().get(TransportMode.walk);
-				double marginalUtility_utl_s = modeParams.getMarginalUtilityOfTraveling() / 3600.0
-						- marginalUtilityPerforming;
-				raptorParams.setMarginalUtilityOfTravelTime_utl_s(fallbackMode, marginalUtility_utl_s);
-			}
-		}
-
         double costPerHour = advancedConfig.getTransferPenaltyCostPerTravelTimeHour();
         if (costPerHour == 0.0) {
             // for backwards compatibility, use the default utility of line switch.

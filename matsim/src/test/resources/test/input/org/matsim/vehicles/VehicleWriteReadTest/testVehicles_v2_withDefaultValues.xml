@@ -2,6 +2,24 @@
 
 <vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v2.0.xsd">
 
+	<vehicleType id="defaultValue&gt;Car">
+		<attributes>
+			<attribute name="Attribute1" class="java.lang.String">def</attribute>
+			<attribute name="Attribute2" class="java.lang.Integer">2</attribute>
+		</attributes>
+		<capacity seats="1" standingRoomInPersons="0">
+
+		</capacity>
+		<length meter="7.5"/>
+		<width meter="1.0"/>
+		<costInformation>
+
+		</costInformation>
+		<passengerCarEquivalents pce="1.0"/>
+		<networkMode networkMode="car"/>
+		<flowEfficiencyFactor factor="1.0"/>
+	</vehicleType>
+
 	<vehicleType id="normal&amp;Car">
 		<attributes>
 			<attribute name="Attribute1" class="java.lang.String">abc</attribute>
@@ -36,24 +54,6 @@
 		<flowEfficiencyFactor factor="1.5"/>
 	</vehicleType>
 
-	<vehicleType id="defaultValue&gt;Car">
-		<attributes>
-			<attribute name="Attribute1" class="java.lang.String">def</attribute>
-			<attribute name="Attribute2" class="java.lang.Integer">2</attribute>
-		</attributes>
-		<capacity seats="1" standingRoomInPersons="0">
-
-		</capacity>
-		<length meter="7.5"/>
-		<width meter="1.0"/>
-		<costInformation>
-
-		</costInformation>
-		<passengerCarEquivalents pce="1.0"/>
-		<networkMode networkMode="car"/>
-		<flowEfficiencyFactor factor="1.0"/>
-	</vehicleType>
-
 	<vehicleType id="smallTruck">
 
 		<description>This is a small truck</description>
@@ -79,9 +79,9 @@
 		<flowEfficiencyFactor factor="1.0"/>
 	</vehicleType>
 
+	<vehicle id=" 42  23" type="defaultValue&gt;Car"/>
 	<vehicle id="23" type="normal&amp;Car"/>
 	<vehicle id="42" type="defaultValue&gt;Car"/>
-	<vehicle id=" 42  23" type="defaultValue&gt;Car"/>
 
 
 </vehicleDefinitions>

@@ -51,6 +51,9 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
 import org.matsim.vis.snapshotwriters.VisMobsim;
@@ -320,6 +323,16 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 			throw new RuntimeException( "vehicle with ID " + veh.getId() + " exists twice. Aborting ..." ) ;
 		}
 		this.vehicles.put( veh.getId(), veh ) ;
+
+		final Vehicles allvehicles = VehicleUtils.getOrCreateAllvehicles( scenario );
+		VehicleType vehType = veh.getVehicle().getType();
+		if ( !allvehicles.getVehicleTypes().containsKey( vehType.getId() ) ) {
+			allvehicles.addVehicleType( veh.getVehicle().getType() );
+		}
+		if ( !allvehicles.getVehicles().containsKey( veh.getVehicle().getId() ) ) {
+			allvehicles.addVehicle( veh.getVehicle() );
+		}
+		// yy one might want to check if the types/vehicles here are the same as in previous iterations. kai/kai, jan'20
 	}
 	
 	public Map<Id<Vehicle>,MobsimVehicle> getVehicles() {

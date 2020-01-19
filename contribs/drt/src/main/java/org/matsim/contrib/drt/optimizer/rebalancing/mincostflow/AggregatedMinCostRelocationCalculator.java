@@ -52,7 +52,7 @@ public class AggregatedMinCostRelocationCalculator implements MinCostRelocationC
 	@Override
 	public List<Relocation> calcRelocations(List<Pair<String, Integer>> supply, List<Pair<String, Integer>> demand,
 			Map<String, List<DvrpVehicle>> rebalancableVehiclesPerZone) {
-		List<Triple<String, String, Integer>> interZonalRelocations = new TransportProblem<String, String>(
+		List<Triple<String, String, Integer>> interZonalRelocations = new TransportProblem<>(
 				this::calcStraightLineDistance).solve(supply, demand);
 		return calcRelocations(rebalancableVehiclesPerZone, interZonalRelocations);
 	}

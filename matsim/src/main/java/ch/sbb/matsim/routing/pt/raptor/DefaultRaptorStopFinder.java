@@ -81,8 +81,8 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
 			List<InitialStop> initialStops = stops.stream().map(stop -> {
 				double beelineDistance = CoordUtils.calcEuclideanDistance(stop.getCoord(), facility.getCoord());
 				double travelTime = Math.ceil(beelineDistance / parameters.getBeelineWalkSpeed());
-				double disutility = travelTime * -parameters.getMarginalUtilityOfTravelTime_utl_s(TransportMode.non_network_walk);
-				return new InitialStop(stop, disutility, travelTime, beelineDistance * distanceFactor, TransportMode.non_network_walk);
+				double disutility = travelTime * -parameters.getMarginalUtilityOfTravelTime_utl_s(TransportMode.walk);
+				return new InitialStop(stop, disutility, travelTime, beelineDistance * distanceFactor, TransportMode.walk);
 			}).collect(Collectors.toList());
 			return initialStops;
 		}
@@ -98,8 +98,8 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
 			List<InitialStop> initialStops = stops.stream().map(stop -> {
 				double beelineDistance = CoordUtils.calcEuclideanDistance(stop.getCoord(), facility.getCoord());
 				double travelTime = Math.ceil(beelineDistance / parameters.getBeelineWalkSpeed());
-				double disutility = travelTime * -parameters.getMarginalUtilityOfTravelTime_utl_s(TransportMode.non_network_walk);
-				return new InitialStop(stop, disutility, travelTime, beelineDistance * distanceFactor, TransportMode.non_network_walk);
+				double disutility = travelTime * -parameters.getMarginalUtilityOfTravelTime_utl_s(TransportMode.walk);
+				return new InitialStop(stop, disutility, travelTime, beelineDistance * distanceFactor, TransportMode.walk);
 			}).collect(Collectors.toList());
 			return initialStops;
 		}
@@ -177,7 +177,7 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
 					}
 					if (stopFacility != stop) {
 						if (direction == Direction.ACCESS) {
-							Leg transferLeg = PopulationUtils.createLeg(TransportMode.non_network_walk);
+							Leg transferLeg = PopulationUtils.createLeg(TransportMode.walk);
 							Route transferRoute = RouteUtils.createGenericRouteImpl(stopFacility.getLinkId(), stop.getLinkId());
 							transferRoute.setTravelTime(0);
 							transferRoute.setDistance(0);
@@ -189,7 +189,7 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
 							tmp.add(transferLeg);
 							routeParts = tmp;
 						} else {
-							Leg transferLeg = PopulationUtils.createLeg(TransportMode.non_network_walk);
+							Leg transferLeg = PopulationUtils.createLeg(TransportMode.walk);
 							Route transferRoute = RouteUtils.createGenericRouteImpl(stop.getLinkId(), stopFacility.getLinkId());
 							transferRoute.setTravelTime(0);
 							transferRoute.setDistance(0);

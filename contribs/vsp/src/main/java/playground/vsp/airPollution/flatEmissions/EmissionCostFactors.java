@@ -21,8 +21,16 @@ package playground.vsp.airPollution.flatEmissions;
 /**
  * @author amit
  * These values are taken from Maibach et al. (2008)
+ *
+ * @deprecated see comment in class
  */
+@Deprecated
 public enum EmissionCostFactors {
+	// yyyyyy This needs to be changed as follows:
+	// * Replace enum by interface so that different implementations can be put behind interface.
+	// * User newer numbers from https://ec.europa.eu/transport/themes/sustainable/studies/sustainable_en
+	// * Adapt to hbefa4 (e.g. PM2.5 vs. PM10; tire emissions).
+	// kai/ihab, dec'19
 	
 	NOX (9600. / (1000. * 1000.)), //EURO_PER_GRAMM_NOX
 	NO2 (0.), // NO2 is included in NOX; we are not separately computing possible additional damages of NO2.  kai/ihab, feb'19
@@ -37,7 +45,11 @@ public enum EmissionCostFactors {
 	CO2_TOTAL (70. / (1000. * 1000.)); //EURO_PER_GRAMM_CO2
 
 	private double costFactor;
-	
+
+	/**
+	 * @deprecated see comment in class
+	 */
+	@Deprecated
 	public double getCostFactor(){
 		return costFactor;
 	}
@@ -47,11 +59,19 @@ public enum EmissionCostFactors {
 	 *
 	 * @return cost factor
 	 */
+	/**
+	 * @deprecated see comment in class
+	 */
+	@Deprecated
 	public static double getCostFactor ( String pollutant ) {
 		return EmissionCostFactors.valueOf( pollutant ).getCostFactor() ;
 	}
 
-    EmissionCostFactors(double firstArg) {
+	/**
+	 * @deprecated see comment in class
+	 */
+	@Deprecated
+	EmissionCostFactors(double firstArg) {
 		this.costFactor = firstArg;
 	}
 }

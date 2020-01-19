@@ -19,7 +19,14 @@
 
 package org.matsim.contrib.dvrp.passenger;
 
-import com.google.common.collect.ImmutableList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Queue;
+import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -27,6 +34,8 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -36,13 +45,19 @@ import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.PreplanningEngine;
-import org.matsim.core.mobsim.qsim.interfaces.*;
+import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.interfaces.TripInfo;
+import org.matsim.core.mobsim.qsim.interfaces.TripInfoRequest;
+import org.matsim.core.mobsim.qsim.interfaces.TripInfoWithRequiredBooking;
 import org.matsim.facilities.FacilitiesUtils;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 
 public final class PassengerEngine implements MobsimEngine, DepartureHandler, TripInfo.Provider {
 
@@ -110,7 +125,7 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 		// (1) fill out TripInfo
 		// (2) keep handle so that passenger can accept, or not-confirmed request is eventually deleted again.  Also see doSimStet(...) ;
 
-		Gbl.assertIf(tripInfoRequest.getTimeInterpretation() == TripInfo.TimeInterpretation.departure);
+		Gbl.assertIf(tripInfoRequest.getTimeInterpretation() == TripInfoRequest.TimeInterpretation.departure);
 		Link pickupLink = FacilitiesUtils.decideOnLink(tripInfoRequest.getFromFacility(), network);
 		Link dropoffLink = FacilitiesUtils.decideOnLink(tripInfoRequest.getToFacility(), network);
 		double now = this.mobsimTimer.getTimeOfDay();
@@ -130,10 +145,11 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 		// this is the handle by which the passenger can accept.  This would, we think, easiest go to a container that keeps track of unconfirmed
 		// offers.  We cannot say if advanceRequestStorage is the correct container for this, probably not and you will need yet another one.
 		double now = mobsimTimer.getTimeOfDay();
-
-		PassengerRequest request = createValidateAndSubmitRequest(passenger, tripInfo.getPickupLocation().getLinkId(),
-				tripInfo.getDropoffLocation().getLinkId(), tripInfo.getExpectedBoardingTime(), now, true,
-				tripInfo.getOriginalRequest());
+		//TODO have a separate request creator for prebooking (accept TripInfo instead of Route)
+		PassengerRequest request = requestCreator.createRequest(createRequestId(), passenger.getId(), null,
+				getLink(tripInfo.getPickupLocation().getLinkId()), getLink(tripInfo.getDropoffLocation().getLinkId()),
+				tripInfo.getExpectedBoardingTime(), now);
+		validateAndSubmitRequest(passenger, request, false, tripInfo.getOriginalRequest());
 		advanceRequestStorage.storeRequest(request);
 	}
 
@@ -153,7 +169,10 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 
 		if (prebookedRequests.isEmpty()) {// this is an immediate request
 			//TODO what if it was already rejected while prebooking??
-			createValidateAndSubmitRequest(passenger, fromLinkId, toLinkId, departureTime, now, false, null);
+			Route route = ((Leg)((PlanAgent)passenger).getCurrentPlanElement()).getRoute();
+			PassengerRequest request = requestCreator.createRequest(createRequestId(), passenger.getId(), route,
+					getLink(fromLinkId), getLink(toLinkId), departureTime, now);
+			validateAndSubmitRequest(passenger, request, false, null);
 		} else if (prebookedRequests.size() == 1) {
 			PassengerRequest prebookedRequest = prebookedRequests.get(0);
 			PassengerPickupActivity awaitingPickup = awaitingPickupStorage.retrieveAwaitingPickup(
@@ -170,12 +189,17 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 		return true;
 	}
 
+	private long nextRequestId = 0;
+
+	private Id<Request> createRequestId() {
+		return Id.create(mode + "_" + nextRequestId++, Request.class);
+	}
+
 	// ================ REQUESTS HANDLING
 
-	private PassengerRequest createValidateAndSubmitRequest(MobsimPassengerAgent passenger, Id<Link> fromLinkId,
-			Id<Link> toLinkId, double departureTime, double now, boolean prebooked, TripInfoRequest originalRequest) {
-		// yyyy remove parameter MobsimPassengerAgent. kai/gregor, jan'19
-		PassengerRequest request = createRequest(passenger, fromLinkId, toLinkId, departureTime, now);
+	//TODO have not decided yet how VrpOptimizer determines if request is prebooked, maybe 'boolean prebooked'??
+	private PassengerRequest validateAndSubmitRequest(MobsimPassengerAgent passenger, PassengerRequest request,
+			boolean prebooked, TripInfoRequest originalRequest) {
 		requests.put(request.getId(), new RequestEntry(request, passenger, prebooked, originalRequest));
 		if (validateRequest(request)) {
 			optimizer.requestSubmitted(request);//optimizer can also reject request if cannot handle it
@@ -183,25 +207,8 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 		return request;
 	}
 
-	private long nextId = 0;
-
-	private PassengerRequest createRequest(MobsimPassengerAgent passenger, Id<Link> fromLinkId, Id<Link> toLinkId,
-			double departureTime, double now) {
-		// yyyy remove parameter MobsimPassengerAgent. kai/gregor, jan'19
-
-		Map<Id<Link>, ? extends Link> links = network.getLinks();
-		Link fromLink = links.get(fromLinkId);
-		if (fromLink == null) {
-			throw new RuntimeException("fromLink does not exist. Id " + fromLinkId);
-		}
-		Link toLink = links.get(toLinkId);
-
-		if (toLink == null) {
-			throw new RuntimeException("toLink does not exist. Id " + toLinkId);
-		}
-		Id<Request> id = Id.create(mode + "_" + nextId++, Request.class);
-		//TODO have not decided yet how VrpOptimizer determines if request is prebooked, maybe 'boolean prebooked'??
-		return requestCreator.createRequest(id, passenger, fromLink, toLink, departureTime, now);
+	private Link getLink(Id<Link> linkId) {
+		return Preconditions.checkNotNull(network.getLinks().get(linkId), "Link id=%s does not exist", linkId);
 	}
 
 	private boolean validateRequest(PassengerRequest request) {
@@ -210,7 +217,10 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 			String cause = String.join(", ", violations);
 			LOGGER.warn("Request: "
 					+ request.getId()
-					+ " of mode: " + mode + " will not be served. The agent will get stuck. Cause: " + cause);
+					+ " of mode: "
+					+ mode
+					+ " will not be served. The agent will get stuck. Cause: "
+					+ cause);
 			eventsManager.processEvent(
 					new PassengerRequestRejectedEvent(mobsimTimer.getTimeOfDay(), mode, request.getId(),
 							request.getPassengerId(), cause));
