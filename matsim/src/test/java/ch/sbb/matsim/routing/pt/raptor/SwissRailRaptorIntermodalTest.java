@@ -557,6 +557,7 @@ public class SwissRailRaptorIntermodalTest {
         bikeAccess.setInitialSearchRadius(100);
         bikeAccess.setSearchExtensionRadius(1);
         f.srrConfig.addIntermodalAccessEgress(bikeAccess);
+        f.srrConfig.setIntermodalAccessEgressModeSelection(SwissRailRaptorConfigGroup.IntermodalAccessEgressModeSelection.RandomSelectOneModePerRoutingRequestAndDirection);
 
         Facility fromFac = new FakeFacility(new Coord(10500, 10050), Id.create("from", Link.class)); // stop 3
         Facility toFac = new FakeFacility(new Coord(50000, 10050), Id.create("to", Link.class)); // stop 5
