@@ -21,7 +21,11 @@ package vwExamples.utils.tripAnalyzer;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
 import org.apache.log4j.Logger;
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineSegment;
+import org.locationtech.jts.geom.LineString;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -32,23 +36,16 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
-import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.handler.AgentWaitingForPtEventHandler;
 import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 
-import analysis.drtOccupancy.DynModeTripsAnalyser;
-import scala.Int;
-
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 // One trip is the sum of all legs and "pt interaction" activities between to real, non-"pt interaction", activities
 // Coords unavailable in events -> no coords written
@@ -78,14 +75,16 @@ import java.util.Map.Entry;
  *            origins and to all destinations.
  * @author gleich
  */
-public class DrtPtTripEventHandler implements ActivityStartEventHandler, ActivityEndEventHandler,
-		PersonDepartureEventHandler, PersonArrivalEventHandler, PersonEntersVehicleEventHandler, LinkEnterEventHandler,
-		LinkLeaveEventHandler, TeleportationArrivalEventHandler, AgentWaitingForPtEventHandler,
-		VehicleLeavesTrafficEventHandler, DrtRequestSubmittedEventHandler, TransitDriverStartsEventHandler, PersonStuckEventHandler {
+public class DrtPtTripEventHandler
+		implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler,
+		PersonArrivalEventHandler, PersonEntersVehicleEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler,
+		TeleportationArrivalEventHandler, AgentWaitingForPtEventHandler, VehicleLeavesTrafficEventHandler,
+		DrtRequestSubmittedEventHandler, TransitDriverStartsEventHandler, PersonStuckEventHandler {
 
 	// private Set<Id<Person>> agentsOnMonitoredTrip = new HashSet<>(); ->
 	// agent2CurrentTripStartLink.contains()
 	// private Map<Id<Person>, Boolean> agentHasDrtLeg = new HashMap<>();
+	private Geometry boundary;
 	private Network network;
 	private TransitSchedule ptSchedule;
 	private Map<String, Geometry> zoneMap;
@@ -137,7 +136,8 @@ public class DrtPtTripEventHandler implements ActivityStartEventHandler, Activit
 	 *            origins and to all destinations
 	 */
 	public DrtPtTripEventHandler(Network network, TransitSchedule ptSchedule, Set<String> monitoredModes,
-			Set<Id<Link>> monitoredStartAndEndLinks, Map<Id<Link>, String> link2Zone, Map<String, Geometry> zoneMap) {
+			Set<Id<Link>> monitoredStartAndEndLinks, Map<Id<Link>, String> link2Zone, Map<String, Geometry> zoneMap,
+			Geometry boundary) {
 		this.network = network;
 		this.ptSchedule = ptSchedule;
 		this.monitoredModes = monitoredModes; // pt, transit_walk, drt: walk eigentlich nicht, aber in
@@ -152,7 +152,8 @@ public class DrtPtTripEventHandler implements ActivityStartEventHandler, Activit
 		this.activeVehicle.add(TransportMode.car);
 		this.activeVehicle.add(TransportMode.drt);
 		this.activeVehicle.add("commercial");
-		this.stuckPersonCounter=0;
+		this.stuckPersonCounter = 0;
+		this.boundary = boundary;
 
 		this.ModeMileageMap = new HashMap<String, MutableDouble>();
 
@@ -174,6 +175,7 @@ public class DrtPtTripEventHandler implements ActivityStartEventHandler, Activit
 		ModeMileageMap.put(TransportMode.drt, new MutableDouble(0));
 		ModeMileageMap.put(TransportMode.car, new MutableDouble(0));
 		ModeMileageMap.put("commercial", new MutableDouble(0));
+		ModeMileageMap.put("uam", new MutableDouble(0));
 
 	}
 
@@ -203,14 +205,14 @@ public class DrtPtTripEventHandler implements ActivityStartEventHandler, Activit
 
 			if (vehicleId2Mode.containsKey(vehicleId)) {
 				transportMode = vehicleId2Mode.get(vehicleId);
+
 			} else {
 				// If vehicle is not detected as drt nor pt, it needs to be a car
 				transportMode = TransportMode.car;
-				
-				//Freight agents are counted as commercial
-				if(vehicleId.toString().contains("freight"))
-				{
-					transportMode="commercial";
+
+				// Freight agents are counted as commercial
+				if (vehicleId.toString().contains("freight")) {
+					transportMode = "commercial";
 				}
 
 			}
@@ -250,8 +252,7 @@ public class DrtPtTripEventHandler implements ActivityStartEventHandler, Activit
 	// in-vehicle distances
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		
-		
+
 		if (monitoredVeh2toMonitoredDistance.containsKey(event.getVehicleId())) {
 			monitoredVeh2toMonitoredDistance.put(event.getVehicleId(),
 					monitoredVeh2toMonitoredDistance.get(event.getVehicleId())
@@ -283,27 +284,32 @@ public class DrtPtTripEventHandler implements ActivityStartEventHandler, Activit
 
 					if (personEntry.getValue() == event.getVehicleId()) {
 
+						// First link of UAV legs not part of current legRoute because vehicles is
+						// already standing on this link
+
 						if (agent2CurrentLegRoute.containsKey(personEntry.getKey())) {
 							agent2CurrentLegRoute.get(personEntry.getKey()).add(event.getLinkId());
 
 						} else {
 							agent2CurrentLegRoute.put(personEntry.getKey(), new ArrayList<Id<Link>>());
+							agent2CurrentLegRoute.get(personEntry.getKey()).add(event.getLinkId());
 
 						}
+
 					}
 
 				});
 
-				// transport mode equals car, in this case = 
+				// transport mode equals car, in this case =
 			} else {
 
-				if (agent2CurrentLegRoute.containsKey(Id.create(event.getVehicleId().toString(), Person.class))) {
-					agent2CurrentLegRoute.get(Id.create(event.getVehicleId().toString(), Person.class))
-							.add(event.getLinkId());
+				Id<Person> personId = Id.create(event.getVehicleId().toString(), Person.class);
+				if (agent2CurrentLegRoute.containsKey(personId)) {
+					agent2CurrentLegRoute.get(personId).add(event.getLinkId());
 
 				} else {
-					agent2CurrentLegRoute.put(Id.create(event.getVehicleId().toString(), Person.class),
-							new ArrayList<Id<Link>>());
+					agent2CurrentLegRoute.put(personId, new ArrayList<Id<Link>>());
+					agent2CurrentLegRoute.get(personId).add(event.getLinkId());
 
 				}
 
@@ -334,7 +340,7 @@ public class DrtPtTripEventHandler implements ActivityStartEventHandler, Activit
 	 */
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		if (!(event.getActType().equals("pt interaction") || event.getActType().equals("drt interaction"))) {
+		if (!(event.getActType().contains("interaction"))) {
 			agent2CurrentTripActivityBefore.put(event.getPersonId(), event.getActType());
 		}
 
@@ -344,7 +350,14 @@ public class DrtPtTripEventHandler implements ActivityStartEventHandler, Activit
 	}
 
 	private void handleBeforeScheduleEvent(ActivityEndEvent event) {
-		vehicleId2Mode.put(p2vid(event.getPersonId()), TransportMode.drt);
+
+		if (event.getPersonId().toString().contains("drt")) {
+			vehicleId2Mode.put(p2vid(event.getPersonId()), TransportMode.drt);
+		}
+
+		if (event.getPersonId().toString().contains("UAV")) {
+			vehicleId2Mode.put(p2vid(event.getPersonId()), "uam");
+		}
 	}
 
 	private Id<Vehicle> p2vid(Id<Person> pid) {
@@ -460,8 +473,7 @@ public class DrtPtTripEventHandler implements ActivityStartEventHandler, Activit
 			List<Id<Link>> routeList = new ArrayList<Id<Link>>();
 
 			if (agent2CurrentLegMode.get(event.getPersonId()).equals(event.getLegMode())) {
-							
-				
+
 				double waitTime;
 				double grossWaitTime;
 				double inVehicleTime;
@@ -510,14 +522,15 @@ public class DrtPtTripEventHandler implements ActivityStartEventHandler, Activit
 					ptRoute = Id.create("no pt", TransitRoute.class);
 				}
 
-
 				// Save ExperiencedLeg and remove temporary data
 				agent2CurrentTripExperiencedLegs.get(event.getPersonId())
 						.add(new ExperiencedLeg(event.getPersonId(), agent2CurrentLegStartLink.get(event.getPersonId()),
 								event.getLinkId(), (double) agent2CurrentLegStartTime.get(event.getPersonId()),
 								event.getTime(), event.getLegMode(), waitTime, grossWaitTime, inVehicleTime, distance,
 								ptRoute, agent2CurrentLegStartPtStop.get(event.getPersonId()),
-								agent2CurrentLegEndPtStop.get(event.getPersonId()), routeList));
+								agent2CurrentLegEndPtStop.get(event.getPersonId()), routeList,
+								this.getInReseachAreaRouteDistance(routeList,
+										agent2CurrentLegStartLink.get(event.getPersonId()), event.getLinkId())));
 				agent2CurrentLegMode.remove(event.getPersonId());
 				agent2CurrentLegStartLink.remove(event.getPersonId());
 				agent2CurrentLegStartTime.remove(event.getPersonId());
@@ -544,7 +557,7 @@ public class DrtPtTripEventHandler implements ActivityStartEventHandler, Activit
 		if (agent2CurrentTripStartLink.containsKey(event.getPersonId())) {
 			// Check if this a real activity or whether the trip will continue with another
 			// leg after an "pt interaction"
-			if (!(event.getActType().equals("pt interaction") || event.getActType().equals("drt interaction"))) {
+			if (!(event.getActType().contains("interaction"))) {
 				// Check if trip starts or ends in the monitored area, that means on the
 				// monitored start and end links
 				// monitoredStartAndEndLinks=null -> all links are to be monitored
@@ -584,7 +597,7 @@ public class DrtPtTripEventHandler implements ActivityStartEventHandler, Activit
 	public Map<String, Map<Double, Set<Id<Vehicle>>>> getZone2BinActiveVehicleMap() {
 		return zone2BinActiveVehicleMap;
 	}
-	
+
 	public int getStuckEvents() {
 		return this.stuckPersonCounter;
 	}
@@ -651,11 +664,10 @@ public class DrtPtTripEventHandler implements ActivityStartEventHandler, Activit
 			} else {
 				// If vehicle is not detected as drt nor pt, it needs to be a car
 				transportMode = TransportMode.car;
-				
-				//Freight agents are counted as commercial
-				if(vehicleId.toString().contains("freight"))
-				{
-					transportMode="commercial";
+
+				// Freight agents are counted as commercial
+				if (vehicleId.toString().contains("freight")) {
+					transportMode = "commercial";
 				}
 
 			}
@@ -696,7 +708,30 @@ public class DrtPtTripEventHandler implements ActivityStartEventHandler, Activit
 	@Override
 	public void handleEvent(PersonStuckEvent event) {
 		stuckPersonCounter++;
-		
+
+	}
+
+	double getInReseachAreaRouteDistance(List<Id<Link>> routeList, Id<Link> fromLink, Id<Link> toLink) {
+		double distance = 0.0;
+		if (routeList != null) {
+
+			for (Id<Link> linkeId : routeList) {
+				distance = distance + network.getLinks().get(linkeId).getLength();
+			}
+		} // In case there is no route in this leg it need to be a teleport, thus we
+			// calculate the beeline distance that lies within the reserach area
+		else {
+			Coord from = network.getLinks().get(fromLink).getCoord();
+			Coord to = network.getLinks().get(toLink).getCoord();
+
+			LineString beeline = new LineSegment(new Coordinate(from.getX(), from.getY()),
+					new Coordinate(to.getX(), to.getY())).toGeometry(new GeometryFactory());
+
+			distance = boundary.intersection(beeline).getLength();
+		}
+
+		return distance;
+
 	}
 
 	// @Override
