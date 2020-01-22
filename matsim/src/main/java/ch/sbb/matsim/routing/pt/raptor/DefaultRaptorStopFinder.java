@@ -32,6 +32,7 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
 
 	private final RaptorIntermodalAccessEgress intermodalAE;
 	private final Map<String, RoutingModule> routingModules;
+    private final Random random = MatsimRandom.getLocalInstance();
 
 	@Inject
 	public DefaultRaptorStopFinder(Population population, Config config, RaptorIntermodalAccessEgress intermodalAE, Map<String, Provider<RoutingModule>> routingModuleProviders) {
@@ -111,7 +112,7 @@ public class DefaultRaptorStopFinder implements RaptorStopFinder {
             case RandomSelectOneModePerRoutingRequestAndDirection:
                 int counter = 0;
                 do {
-                    int rndSelector = (int) (MatsimRandom.getRandom().nextDouble() * srrCfg.getIntermodalAccessEgressParameterSets().size());
+                    int rndSelector = random.nextInt(srrCfg.getIntermodalAccessEgressParameterSets().size());
                     addInitialStopsForParamSet(facility, person, departureTime, direction, parameters, data, x, y,
                             initialStops, srrCfg.getIntermodalAccessEgressParameterSets().get(rndSelector));
                     counter++;
