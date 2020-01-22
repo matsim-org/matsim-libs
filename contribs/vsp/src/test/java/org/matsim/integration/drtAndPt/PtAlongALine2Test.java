@@ -133,19 +133,17 @@ public class PtAlongALine2Test{
 
 			if ( drtMode!= DrtMode.none){
 				configRaptor.setUseIntermodalAccessEgress(true);
-				{
-					// Xxx
-					//					paramSetXxx.setMode( TransportMode.walk ); // this does not work because sbb raptor treats it in a special way
-					configRaptor.addIntermodalAccessEgress(
-							new IntermodalAccessEgressParameterSet().setMode( "walk2" ).setMaxRadius( 1000000 ).setInitialSearchRadius( 1000000 ).setSearchExtensionRadius( 10000 ) );
-					// (in principle, walk as alternative to drt will not work, since drt is always faster.  Need to give the ASC to the router!  However, with
-					// the reduced drt network we should be able to see differentiation.)
-				}
-				{
-					// drt
-					configRaptor.addIntermodalAccessEgress(
-							new IntermodalAccessEgressParameterSet().setMode( TransportMode.drt ).setMaxRadius( 1000000 ).setInitialSearchRadius( 1000000 ).setSearchExtensionRadius( 10000 ) );
-				}
+
+				//					paramSetXxx.setMode( TransportMode.walk ); // this does not work because sbb raptor treats it in a special way
+				configRaptor.addIntermodalAccessEgress(
+						new IntermodalAccessEgressParameterSet().setMode( "walk2" ).setMaxRadius( 1000000 ).setInitialSearchRadius( 1000000 ).setSearchExtensionRadius( 10000 ) );
+				// (in principle, walk as alternative to drt will not work, since drt is always faster.  Need to give the ASC to the router!  However, with
+				// the reduced drt network we should be able to see differentiation.)
+
+				// drt
+				configRaptor.addIntermodalAccessEgress(
+						new IntermodalAccessEgressParameterSet().setMode( TransportMode.drt ).setMaxRadius( 1000000 ).setInitialSearchRadius( 1000000 ).setSearchExtensionRadius( 10000 ) );
+
 				if ( drt2 ){
 					//				paramSetDrt2.setPersonFilterAttribute( null );
 					//				paramSetDrt2.setStopFilterAttribute( null );
@@ -207,7 +205,7 @@ public class PtAlongALine2Test{
 								    .setMaxTravelTimeBeta( 5. * 60. ).setStopDuration( 60. ).setMaxWaitTime( Double.MAX_VALUE )
 								    .setRejectRequestIfMaxWaitOrTravelTimeViolated( false ).setUseModeFilteredSubnetwork( true ) );
 			}
-			if ( drt2 ) {
+			if ( drt3 ) {
 				mm.addParameterSet(
 						new DrtConfigGroup().setMode( "drt3" ).setMaxTravelTimeAlpha( 1.3 ).setVehiclesFile( drt3VehiclesFile )
 								    .setMaxTravelTimeBeta( 5. * 60. ).setStopDuration( 60. ).setMaxWaitTime( Double.MAX_VALUE )
@@ -277,7 +275,7 @@ public class PtAlongALine2Test{
 		}
 		if ( drtMode== DrtMode.withPrebooking ) {
 			for (Person person : scenario.getPopulation().getPersons().values()) {
-				person.getSelectedPlan().getAttributes().putAttribute( PreplanningEngine.PREBOOKING_OFFSET_ATTRIBUTE_NAME, 900. );
+				person.getSelectedPlan().getAttributes().putAttribute( PreplanningEngine.PREBOOKING_OFFSET_ATTRIBUTE_NAME, 7200. );
 			}
 		}
 
