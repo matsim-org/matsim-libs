@@ -178,9 +178,9 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		Map<WarmPollutant, Double> warmEmissions = null ;
 		switch( ecg.getEmissionsComputationMethod() ) {
 			case StopAndGoFraction:
-//				warmEmissions = calculateWarmEmissionsStopAndGoFraction(...) ;
-//				break;
-				throw new RuntimeException( "not implemented" );
+				warmEmissions = calculateWarmEmissionsStopAndGo(vehicleId, travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple) ;
+				break;
+//				throw new RuntimeException( "not implemented" );
 				// yyyyyy put in the old computation method (release 10), and adjust tests that will then probably fail.
 			case AverageSpeed:
 				warmEmissions= calculateWarmEmissionsAverageSpeec( vehicleId, travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple );
@@ -207,6 +207,102 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		}
 		return rescaledWarmEmissions;
 	}
+
+    private Map<WarmPollutant, Double> calculateWarmEmissionsStopAndGo( Id<Vehicle> vehicleId, double travelTime, String roadType, double freeVelocity,
+                                                                           double linkLength, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple ) {
+
+        Map<WarmPollutant, Double> warmEmissionsOfEvent = new HashMap<>();
+
+        final String hbefaRoadTypeName ;
+        hbefaRoadTypeName = roadType;
+
+        HbefaWarmEmissionFactorKey efkey = new HbefaWarmEmissionFactorKey();
+
+
+        if ( vehicleInformationTuple.getFirst()==HbefaVehicleCategory.NON_HBEFA_VEHICLE ) {
+            for (WarmPollutant warmPollutant : warmPollutants) {
+                warmEmissionsOfEvent.put( warmPollutant, 0.0 );
+            }
+            return warmEmissionsOfEvent;
+        }
+        efkey.setHbefaVehicleCategory( vehicleInformationTuple.getFirst() );
+
+        efkey.setHbefaRoadCategory(hbefaRoadTypeName);
+
+        if(this.detailedHbefaWarmTable != null){ // check if detailed emission factors file is set in config
+            HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
+            hbefaVehicleAttributes.setHbefaTechnology(vehicleInformationTuple.getSecond().getHbefaTechnology());
+            hbefaVehicleAttributes.setHbefaSizeClass(vehicleInformationTuple.getSecond().getHbefaSizeClass());
+            hbefaVehicleAttributes.setHbefaEmConcept(vehicleInformationTuple.getSecond().getHbefaEmConcept());
+            efkey.setHbefaVehicleAttributes(hbefaVehicleAttributes);
+        }
+
+        double linkLength_km = linkLength / 1000;
+        double travelTime_h = travelTime / 3600;
+        double freeFlowSpeed_kmh = freeVelocity * 3.6;
+        double averageSpeed_kmh = linkLength_km / travelTime_h;
+
+        double ef_gpkm;
+
+        if(averageSpeed_kmh <= 0.0){
+            throw new RuntimeException("Average speed has been calculated to 0.0 or a negative value. Aborting...");
+        }
+        if ((averageSpeed_kmh - freeFlowSpeed_kmh) > 1.0){
+            if (ecg.handlesHighAverageSpeeds()) {
+                logger.warn("averageSpeed was capped from " + averageSpeed_kmh + " to" + freeFlowSpeed_kmh);
+                averageSpeed_kmh = freeFlowSpeed_kmh;
+            } else {
+                throw new RuntimeException("Average speed has been calculated to be greater than free flow speed; this might produce negative warm emissions. Aborting...");
+            }
+        }
+
+        double percentStopGo_km = 0;
+
+        for (WarmPollutant warmPollutant : warmPollutants) {
+            double generatedEmissions;
+
+            efkey.setHbefaComponent(warmPollutant);
+
+            if (ecg.getEmissionsComputationMethod() == StopAndGoFraction) {
+                efkey.setHbefaTrafficSituation(STOPANDGO);
+                percentStopGo_km = getFractionStopAndGo(vehicleId, freeFlowSpeed_kmh, averageSpeed_kmh, vehicleInformationTuple, efkey);
+                double efStopGo_gpkm = getEf(vehicleId, vehicleInformationTuple, efkey).getWarmEmissionFactor();
+
+                efkey.setHbefaTrafficSituation(FREEFLOW);
+                double percentFreeFlow_km = 1 - percentStopGo_km;
+                double efFreeFlow_gpkm = getEf(vehicleId, vehicleInformationTuple, efkey).getWarmEmissionFactor();
+                ef_gpkm = (percentFreeFlow_km * efFreeFlow_gpkm) + (percentStopGo_km * efStopGo_gpkm);
+
+                //TODO: opportunity for refactor of logic here jm oct '18
+                //The logic has changed here, now it will fall back to aggregate factors per traffic scenario, instead of if any scenarios are missing.
+                if(this.detailedHbefaWarmTable != null && this.detailedHbefaWarmTable.get(efkey) != null){
+                    ef_gpkm = this.detailedHbefaWarmTable.get(efkey).getWarmEmissionFactor();
+
+                }
+            } else {
+                vehAttributesNotSpecifiedCnt++;
+                efkey.setHbefaVehicleAttributes(new HbefaVehicleAttributes()); //want to check for average vehicle
+                ef_gpkm = this.avgHbefaWarmTable.get(efkey).getWarmEmissionFactor();
+
+                int maxWarnCnt = 3;
+                if(this.detailedHbefaWarmTable != null && vehAttributesNotSpecifiedCnt <= maxWarnCnt) {
+                    logger.warn("Detailed vehicle attributes are not specified correctly for vehicle " + vehicleId + ": " +
+                            "`" + vehicleInformationTuple.getSecond() + "'. Using fleet average values instead.");
+                    if(vehAttributesNotSpecifiedCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+                }
+            }
+
+            generatedEmissions = linkLength_km * ef_gpkm;
+            warmEmissionsOfEvent.put(warmPollutant, generatedEmissions);
+        }
+
+        // revert from d049b1c : Check if necessary, KMT Jan 19
+        if (ecg.getEmissionsComputationMethod() == StopAndGoFraction) {
+            incrementCountersFractional(linkLength_km, percentStopGo_km);
+        }
+
+        return warmEmissionsOfEvent;
+    }
 
 	private Map<WarmPollutant, Double> calculateWarmEmissionsAverageSpeec( Id<Vehicle> vehicleId, double travelTime, String roadType, double freeVelocity,
 									       double linkLength, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple ) {
@@ -273,34 +369,20 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		}
 
 		double percentStopGo_km = 0;
-		if (ecg.getEmissionsComputationMethod() == AverageSpeed) {
-			HbefaTrafficSituation trafficSituation = getTrafficSituation(efkey, averageSpeed_kmh, freeFlowSpeed_kmh);
-			efkey.setHbefaTrafficSituation(trafficSituation);
-		}
+
+		HbefaTrafficSituation trafficSituation = getTrafficSituation(efkey, averageSpeed_kmh, freeFlowSpeed_kmh);
+		efkey.setHbefaTrafficSituation(trafficSituation);
 
 		for (WarmPollutant warmPollutant : warmPollutants) {
 			double generatedEmissions;
 
 			efkey.setHbefaComponent(warmPollutant);
 
-			if (ecg.getEmissionsComputationMethod() == StopAndGoFraction) {
-				efkey.setHbefaTrafficSituation(STOPANDGO);
-				percentStopGo_km = getFractionStopAndGo(vehicleId, freeFlowSpeed_kmh, averageSpeed_kmh, vehicleInformationTuple, efkey);
-				double efStopGo_gpkm = getEf(vehicleId, vehicleInformationTuple, efkey).getWarmEmissionFactor();
-
-				efkey.setHbefaTrafficSituation(FREEFLOW);
-				double percentFreeFlow_km = 1 - percentStopGo_km;
-				double efFreeFlow_gpkm = getEf(vehicleId, vehicleInformationTuple, efkey).getWarmEmissionFactor();
-				ef_gpkm = (percentFreeFlow_km * efFreeFlow_gpkm) + (percentStopGo_km * efStopGo_gpkm);
-
 			//TODO: opportunity for refactor of logic here jm oct '18
 			//The logic has changed here, now it will fall back to aggregate factors per traffic scenario, instead of if any scenarios are missing.
 			if(this.detailedHbefaWarmTable != null && this.detailedHbefaWarmTable.get(efkey) != null){
 					ef_gpkm = this.detailedHbefaWarmTable.get(efkey).getWarmEmissionFactor();
 
-			} else if (ecg.getEmissionsComputationMethod() == AverageSpeed){
-				ef_gpkm = getEf(vehicleId, vehicleInformationTuple, efkey).getWarmEmissionFactor();
-			}
 			} else {
 				vehAttributesNotSpecifiedCnt++;
 				efkey.setHbefaVehicleAttributes(new HbefaVehicleAttributes()); //want to check for average vehicle
@@ -319,14 +401,9 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		}
 
 		// revert from d049b1c : Check if necessary, KMT Jan 19
-		if (ecg.getEmissionsComputationMethod() == StopAndGoFraction) {
-			incrementCountersFractional(linkLength_km, percentStopGo_km);
-		}
-		else if (ecg.getEmissionsComputationMethod() == AverageSpeed) {
-			incrementCountersAverage(efkey.getHbefaTrafficSituation(), linkLength_km);
-		}
-
+        incrementCountersAverage(efkey.getHbefaTrafficSituation(), linkLength_km);
 //		incrementCounters(trafficSituation, linkLength_km);
+
 		return warmEmissionsOfEvent;
 	}
 
