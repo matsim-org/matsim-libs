@@ -42,7 +42,7 @@ public class SignalsAndLanesOsmNetworkReaderIT {
     CoordinateTransformation ct;
 
 
-    @Test
+    @Ignore
     public void testLinkLaneStructure(){
 
         // create a config

@@ -90,7 +90,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private final static int DEFAULT_LANE_OFFSET = 35;
 	private final static int INTERGREENTIME = 5;
 	private final static int MIN_GREENTIME = 10;
-	private final static double SIGNAL_MERGE_DISTANCE = 40.0;
+	private final static double SIGNAL_MERGE_DISTANCE = 40; //changed from 40m sb 16.01.2020
 	private final static double SIGNAL_LANES_CAPACITY = 2000.0;
 	private final static double THROUGHLINK_ANGLE_TOLERANCE = 0.1666667;
 	private final static int PEDESTRIAN_CROSSING_TIME = 20;
@@ -164,7 +164,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 //		String inputOSM = "C:\\Users\\braun\\Documents\\Uni\\VSP\\shared-svn\\studies\\sbraun\\osmData\\RawOSM/brandenburg.osm";
 //		String outputDir = "../../../../../../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/cottbus/";
 		String inputOSM = "../shared-svn/studies/tthunig/osmData/interpreter.osm";
-		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/";
+		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_01_20_workedOnRoundAbouts";
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84_UTM33N);
 
@@ -186,8 +186,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		SignalsAndLanesOsmNetworkReader reader = new SignalsAndLanesOsmNetworkReader(network, ct, signalsData, lanes);
 
 
-        reader.setMinimizeSmallRoundabouts(false);
-		reader.setMergeOnewaySignalSystems(true);
+        reader.setMinimizeSmallRoundabouts(true);
+		reader.setMergeOnewaySignalSystems(false);
 		reader.setUseRadiusReduction(false);
 		reader.setAllowUTurnAtLeftLaneOnly(true);
 		reader.setMakePedestrianSignals(false);
@@ -221,6 +221,28 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		signalsWriter.setSignalGroupsOutputFilename(outputDir + "signalGroups.xml");
 		signalsWriter.setSignalControlOutputFilename(outputDir + "signalControl.xml");
 		signalsWriter.writeSignalsData(scenario);
+/*
+
+
+		String outputDir1 = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/OriginalReader/UseHighWayDefaults";
+		String outputDir2 = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/OriginalReader/NOTUseHighwayDefaults";
+
+		Config config1 = ConfigUtils.createConfig();
+		Scenario scenario1 = ScenarioUtils.createScenario(config1);
+		Network network1 = scenario1.getNetwork();
+		OsmNetworkReader reader1 = new OsmNetworkReader(network1, ct, true );
+		reader1.parse(inputOSM);
+		new NetworkCleaner().run(network1);
+		new NetworkWriter(network1).write(outputDir1+ "network.xml");
+
+		Config config2 = ConfigUtils.createConfig();
+		Scenario scenario2 = ScenarioUtils.createScenario(config2);
+		Network network2 = scenario2.getNetwork();
+		OsmNetworkReader reader2 = new OsmNetworkReader(network2, ct, false );
+		reader2.parse(inputOSM);
+		new NetworkCleaner().run(network2);
+		new org.matsim.api.core.v01.network.NetworkWriter(network2).write(outputDir2+ "network.xml");*/
+
 	}
 
 	public SignalsAndLanesOsmNetworkReader(Network network, CoordinateTransformation transformation,
@@ -257,6 +279,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
     public void setMergeOnewaySignalSystems(boolean mergeOnewaySignalSystems){
         this.mergeOnewaySignalSystems = mergeOnewaySignalSystems;
     }
+    //TODO That looks not good
     public void setUseRadiusReduction(boolean useRadiusReduction){
         this.useRadiusReduction = mergeOnewaySignalSystems;
     }
@@ -302,9 +325,10 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		List<OsmNode> addingNodes = new ArrayList<>();
 		List<OsmNode> checkedNodes = new ArrayList<>();
 		List<OsmWay> checkedWays = new ArrayList<>();
+		LOG.warn("AAAAAAAAAAAAAAAAAAA" + checkedWays.size());
 		if (this.minimizeSmallRoundabouts)
             findingSmallRoundabouts(addingNodes, checkedNodes, checkedWays);
-
+		LOG.warn("AAAAAAAAAAAAAAAAAAA" + checkedWays.size());
 		findingFourNodeJunctions(addingNodes, checkedNodes);
 
 		findingMoreNodeJunctions(addingNodes, checkedNodes);
@@ -667,16 +691,28 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					    double tempNodeX = tempNode.coord.getX();
                         double tempNodeY = tempNode.coord.getY();
 
-                        if (tempNodeX < repXmin){
-                            repXmin = tempNodeX;
-                        } else if (tempNodeX > repXmax){
-                            repXmax = tempNodeX;
-                        }
-                        if (tempNodeY < repYmin){
-                            repYmin = tempNodeY;
-                        } else if (tempNodeY > repYmax){
-                            repYmax = tempNodeY;
-                        }
+//                        if (tempNodeX < repXmin){
+//                            repXmin = tempNodeX;
+//                        } else if (tempNodeX > repXmax){
+//                            repXmax = tempNodeX;
+//                        }
+//                        if (tempNodeY < repYmin){
+//                            repYmin = tempNodeY;
+//                        } else if (tempNodeY > repYmax){
+//                            repYmax = tempNodeY;
+//                        }
+
+						if (repXmin == 0 || tempNode.coord.getX() < repXmin)
+							repXmin = tempNode.coord.getX();
+						if (repXmax == 0 || tempNode.coord.getX() > repXmax)
+							repXmax = tempNode.coord.getX();
+						if (repYmin == 0 || tempNode.coord.getY() < repYmin)
+							repYmin = tempNode.coord.getY();
+						if (repYmax == 0 || tempNode.coord.getY() > repYmax)
+							repYmax = tempNode.coord.getY();
+
+
+
 
                         circumference += NetworkUtils.getEuclideanDistance(tempNodeX, tempNodeY,
                                 lastNode.coord.getX(), lastNode.coord.getY());
@@ -699,8 +735,12 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						}
 						addingNodes.add(roundaboutNode);
 						id++;
+					} else  {
+						//Fix RoundAbout - Error-Fix 23.01.2020
+						//remove again from checkedNodes
+						checkedWays.remove(way);
 					}
-				}
+				} else checkedWays.remove(way);
 			}
 		}
 	}
@@ -2209,9 +2249,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 
 	//TODO consider moving this out in some utils directory
-	//TODO mit lambok abkürzen - weg
 	private static final class BoundingBox {
-		//Attribute evtl irreführend für Eckpunkte
 		private double south;
 		private double west;
 		private double north;
