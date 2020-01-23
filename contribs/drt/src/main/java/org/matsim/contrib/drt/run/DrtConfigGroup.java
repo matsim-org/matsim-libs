@@ -292,8 +292,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @param mode {@value #MODE_EXP}
 	 */
 	@StringSetter(MODE)
-	public void setMode(String mode) {
+	public DrtConfigGroup setMode(String mode) {
 		this.mode = mode;
+		return this ;
 	}
 
 	/**
@@ -308,8 +309,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @param useModeFilteredSubnetwork {@value #USE_MODE_FILTERED_SUBNETWORK_EXP}
 	 */
 	@StringSetter(USE_MODE_FILTERED_SUBNETWORK)
-	public void setUseModeFilteredSubnetwork(boolean useModeFilteredSubnetwork) {
+	public DrtConfigGroup setUseModeFilteredSubnetwork(boolean useModeFilteredSubnetwork) {
 		this.useModeFilteredSubnetwork = useModeFilteredSubnetwork;
+		return this ;
 	}
 
 	/**
@@ -324,8 +326,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @param -- {@value #STOP_DURATION_EXP}
 	 */
 	@StringSetter(STOP_DURATION)
-	public void setStopDuration(double stopDuration) {
+	public DrtConfigGroup setStopDuration(double stopDuration) {
 		this.stopDuration = stopDuration;
+		return this ;
 	}
 
 	/**
@@ -340,8 +343,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @param -- {@value #MAX_WAIT_TIME_EXP}
 	 */
 	@StringSetter(MAX_WAIT_TIME)
-	public void setMaxWaitTime(double maxWaitTime) {
+	public DrtConfigGroup setMaxWaitTime(double maxWaitTime) {
 		this.maxWaitTime = maxWaitTime;
+		return this ;
 	}
 
 	/**
@@ -360,8 +364,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @param getDrtServiceAreaShapeFile -- {@link #DRT_SERVICE_AREA_SHAPE_FILE_EXP}
 	 */
 	@StringSetter(DRT_SERVICE_AREA_SHAPE_FILE)
-	public void setDrtServiceAreaShapeFile(String getDrtServiceAreaShapeFile) {
+	public DrtConfigGroup setDrtServiceAreaShapeFile(String getDrtServiceAreaShapeFile) {
 		this.drtServiceAreaShapeFile = getDrtServiceAreaShapeFile;
+		return this ;
 	}
 
 	/**
@@ -376,8 +381,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @param maxTravelTimeAlpha {@value #MAX_TRAVEL_TIME_ALPHA_EXP}
 	 */
 	@StringSetter(MAX_TRAVEL_TIME_ALPHA)
-	public void setMaxTravelTimeAlpha(double maxTravelTimeAlpha) {
+	public DrtConfigGroup setMaxTravelTimeAlpha(double maxTravelTimeAlpha) {
 		this.maxTravelTimeAlpha = maxTravelTimeAlpha;
+		return this ;
 	}
 
 	/**
@@ -392,8 +398,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @param maxTravelTimeBeta -- {@value #MAX_TRAVEL_TIME_BETA_EXP}
 	 */
 	@StringSetter(MAX_TRAVEL_TIME_BETA)
-	public void setMaxTravelTimeBeta(double maxTravelTimeBeta) {
+	public DrtConfigGroup setMaxTravelTimeBeta(double maxTravelTimeBeta) {
 		this.maxTravelTimeBeta = maxTravelTimeBeta;
+		return this ;
 	}
 
 	/**
@@ -408,8 +415,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @param rejectRequestIfMaxWaitOrTravelTimeViolated -- {@value #REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED_EXP}
 	 */
 	@StringSetter(REJECT_REQUEST_IF_MAX_WAIT_OR_TRAVEL_TIME_VIOLATED)
-	public void setRejectRequestIfMaxWaitOrTravelTimeViolated(boolean rejectRequestIfMaxWaitOrTravelTimeViolated) {
+	public DrtConfigGroup setRejectRequestIfMaxWaitOrTravelTimeViolated(boolean rejectRequestIfMaxWaitOrTravelTimeViolated) {
 		this.rejectRequestIfMaxWaitOrTravelTimeViolated = rejectRequestIfMaxWaitOrTravelTimeViolated;
+		return this ;
 	}
 
 	/**
@@ -424,8 +432,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @param changeStartLinkToLastLinkInSchedule -- {@value #CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE_EXP}
 	 */
 	@StringSetter(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE)
-	public void setChangeStartLinkToLastLinkInSchedule(boolean changeStartLinkToLastLinkInSchedule) {
+	public DrtConfigGroup setChangeStartLinkToLastLinkInSchedule(boolean changeStartLinkToLastLinkInSchedule) {
 		this.changeStartLinkToLastLinkInSchedule = changeStartLinkToLastLinkInSchedule;
+		return this ;
 	}
 
 	/**
@@ -440,8 +449,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @param vehiclesFile -- {@value #VEHICLES_FILE_EXP}
 	 */
 	@StringSetter(VEHICLES_FILE)
-	public void setVehiclesFile(String vehiclesFile) {
+	public DrtConfigGroup setVehiclesFile(String vehiclesFile) {
 		this.vehiclesFile = vehiclesFile;
+		return this ;
 	}
 
 	/**
@@ -463,8 +473,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @param idleVehiclesReturnToDepots -- {@value #IDLE_VEHICLES_RETURN_TO_DEPOTS_EXP}
 	 */
 	@StringSetter(IDLE_VEHICLES_RETURN_TO_DEPOTS)
-	public void setIdleVehiclesReturnToDepots(boolean idleVehiclesReturnToDepots) {
+	public DrtConfigGroup setIdleVehiclesReturnToDepots(boolean idleVehiclesReturnToDepots) {
 		this.idleVehiclesReturnToDepots = idleVehiclesReturnToDepots;
+		return this ;
 	}
 
 	/**
@@ -479,8 +490,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @param operationalScheme -- {@value #OPERATIONAL_SCHEME_EXP}
 	 */
 	@StringSetter(OPERATIONAL_SCHEME)
-	public void setOperationalScheme(OperationalScheme operationalScheme) {
+	public DrtConfigGroup setOperationalScheme(OperationalScheme operationalScheme) {
 		this.operationalScheme = operationalScheme;
+		return this ;
 	}
 
 	/**
@@ -502,8 +514,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @param-- {@value #TRANSIT_STOP_FILE_EXP}
 	 */
 	@StringSetter(TRANSIT_STOP_FILE)
-	public void setTransitStopFile(String transitStopFile) {
+	public DrtConfigGroup setTransitStopFile(String transitStopFile) {
 		this.transitStopFile = transitStopFile;
+		return this ;
 	}
 
 	/**
@@ -518,8 +531,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @param-- {@value #MAX_WALK_DISTANCE_EXP}
 	 */
 	@StringSetter(MAX_WALK_DISTANCE)
-	public void setMaxWalkDistance(double maximumWalkDistance) {
+	public DrtConfigGroup setMaxWalkDistance(double maximumWalkDistance) {
 		this.maxWalkDistance = maximumWalkDistance;
+		return this ;
 	}
 
 	/**
@@ -534,8 +548,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @param-- {@value #ESTIMATED_DRT_SPEED_EXP}
 	 */
 	@StringSetter(ESTIMATED_DRT_SPEED)
-	public void setEstimatedDrtSpeed(double estimatedSpeed) {
+	public DrtConfigGroup setEstimatedDrtSpeed(double estimatedSpeed) {
 		this.estimatedDrtSpeed = estimatedSpeed;
+		return this ;
 	}
 
 	/**
@@ -550,8 +565,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @param-- {@value #ESTIMATED_BEELINE_DISTANCE_FACTOR_EXP}
 	 */
 	@StringSetter(ESTIMATED_BEELINE_DISTANCE_FACTOR)
-	public void setEstimatedBeelineDistanceFactor(double estimatedBeelineDistanceFactor) {
+	public DrtConfigGroup setEstimatedBeelineDistanceFactor(double estimatedBeelineDistanceFactor) {
 		this.estimatedBeelineDistanceFactor = estimatedBeelineDistanceFactor;
+		return this ;
 	}
 
 	/**
@@ -566,8 +582,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @param -- {@value #WRITE_DETAILED_CUSTOMER_STATS_EXP}
 	 */
 	@StringSetter(WRITE_DETAILED_CUSTOMER_STATS)
-	public void setPlotDetailedCustomerStats(boolean plotDetailedCustomerStats) {
+	public DrtConfigGroup setPlotDetailedCustomerStats(boolean plotDetailedCustomerStats) {
 		this.plotDetailedCustomerStats = plotDetailedCustomerStats;
+		return this ;
 	}
 
 	/**
@@ -582,8 +599,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 	 * @param-- {@value #NUMBER_OF_THREADS_EXP}
 	 */
 	@StringSetter(NUMBER_OF_THREADS)
-	public void setNumberOfThreads(final int numberOfThreads) {
+	public DrtConfigGroup setNumberOfThreads(final int numberOfThreads) {
 		this.numberOfThreads = numberOfThreads;
+		return this ;
 	}
 
 	/**
