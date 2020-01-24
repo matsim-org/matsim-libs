@@ -19,9 +19,10 @@
 
 package org.matsim.testcases;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -30,8 +31,8 @@ import java.util.Objects;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.rules.TestWatchman;
-import org.junit.runners.model.FrameworkMethod;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -42,10 +43,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
-import org.matsim.vehicles.VehicleWriteReadTest;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Some helper methods for writing JUnit 4 tests in MATSim.
@@ -53,16 +50,17 @@ import static org.junit.Assert.assertTrue;
  *
  * @author mrieser
  */
-public final class MatsimTestUtils extends TestWatchman {
-	private static final Logger log = Logger.getLogger( MatsimTestUtils.class ) ;
+public final class MatsimTestUtils extends TestWatcher {
+	private static final Logger log = Logger.getLogger(MatsimTestUtils.class);
 
-	/** A constant for the exactness when comparing doubles. */
+	/**
+	 * A constant for the exactness when comparing doubles.
+	 */
 	public static final double EPSILON = 1e-10;
-	public static void compareFilesLineByLine( String inputFilename, String outputFilename ){
-		try (
-			BufferedReader readerV1Input = IOUtils.getBufferedReader( inputFilename );
-			BufferedReader readerV1Output = IOUtils.getBufferedReader( outputFilename );
-		){
+
+	public static void compareFilesLineByLine(String inputFilename, String outputFilename) {
+		try (BufferedReader readerV1Input = IOUtils.getBufferedReader(inputFilename);
+				BufferedReader readerV1Output = IOUtils.getBufferedReader(outputFilename);) {
 
 			String lineInput;
 			String lineOutput;
@@ -308,15 +306,19 @@ public final class MatsimTestUtils extends TestWatchman {
 	 * @see org.junit.rules.TestName#starting(org.junit.runners.model.FrameworkMethod)
 	 */
 	@Override
-	public void starting(FrameworkMethod method) {
-		super.starting(method);
-		this.testClass = method.getMethod().getDeclaringClass();
-		this.testMethodName = method.getName();
+	public void starting(Description description) {
+		super.starting(description);
+		this.testClass = description.getTestClass();
+		String methodAndParameters = description.getMethodName();
+		int indexOfParameterSection = methodAndParameters.indexOf('[');
+		this.testMethodName = indexOfParameterSection == -1 ?
+				methodAndParameters :
+				methodAndParameters.substring(0, indexOfParameterSection);
 	}
 
 	@Override
-	public void finished(FrameworkMethod method) {
-		super.finished(method);
+	public void finished(Description description) {
+		super.finished(description);
 		this.testClass = null;
 		this.testMethodName = null;
 	}
