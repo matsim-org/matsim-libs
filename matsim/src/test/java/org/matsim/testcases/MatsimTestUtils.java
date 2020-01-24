@@ -28,6 +28,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.Permission;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -102,6 +104,7 @@ public final class MatsimTestUtils extends TestWatcher {
 
 	private Class<?> testClass = null;
 	private String testMethodName = null;
+	private String testParameterSetIndex = null;
 
 	public MatsimTestUtils() {
 		MatsimRandom.reset();
@@ -134,7 +137,7 @@ public final class MatsimTestUtils extends TestWatcher {
 	public URL inputResourcePath() {
 		return getResourceNotNull("/" + getClassInputDirectory() + getMethodName() + "/.");
 	}
-	
+
 	/**
 	 * @return class input directory as URL
 	 */
@@ -230,7 +233,9 @@ public final class MatsimTestUtils extends TestWatcher {
 	 */
 	public String getOutputDirectory() {
 		if (this.outputDirectory == null) {
-			this.outputDirectory = "test/output/" + this.testClass.getCanonicalName().replace('.', '/') + "/" + getMethodName() + "/";
+			String subDirectoryForParametrisedTests = testParameterSetIndex == null ? "" : testParameterSetIndex + "/";
+			this.outputDirectory = "test/output/" + this.testClass.getCanonicalName().replace('.', '/') + "/" + getMethodName()+ "/"
+					+ subDirectoryForParametrisedTests;
 		}
 		createOutputDirectory();
 		return this.outputDirectory;
@@ -254,9 +259,9 @@ public final class MatsimTestUtils extends TestWatcher {
 	 */
 	public String getClassInputDirectory() {
 		if (this.classInputDirectory == null) {
-			
+
 			Logger.getLogger(this.getClass()).info( "user.dir = " + System.getProperty("user.dir") ) ;
-			
+
 			this.classInputDirectory = "test/input/" +
 											   this.testClass.getCanonicalName().replace('.', '/') + "/";
 //			this.classInputDirectory = System.getProperty("user.dir") + "/test/input/" +
@@ -302,6 +307,11 @@ public final class MatsimTestUtils extends TestWatcher {
 		this.testMethodName = method.getName();
 	}
 
+	//captures the method name (group 1) and optionally the index of the parameter set (group 2; only if the test is parametrised)
+	//The matching may fail if the parameter set name does not start with {index} (at least one digit is required at the beginning)
+	private static final Pattern METHOD_PARAMETERS_WITH_INDEX_PATTERN = Pattern.compile(
+			"([\\S]*)(?:\\[(\\d+)[\\s\\S]*\\])?");
+
 	/* inspired by
 	 * @see org.junit.rules.TestName#starting(org.junit.runners.model.FrameworkMethod)
 	 */
@@ -309,11 +319,13 @@ public final class MatsimTestUtils extends TestWatcher {
 	public void starting(Description description) {
 		super.starting(description);
 		this.testClass = description.getTestClass();
-		String methodAndParameters = description.getMethodName();
-		int indexOfParameterSection = methodAndParameters.indexOf('[');
-		this.testMethodName = indexOfParameterSection == -1 ?
-				methodAndParameters :
-				methodAndParameters.substring(0, indexOfParameterSection);
+
+		Matcher matcher = METHOD_PARAMETERS_WITH_INDEX_PATTERN.matcher(description.getMethodName());
+		if (!matcher.matches()) {
+			throw new RuntimeException("The name of the test parameter set must start with {index}");
+		}
+		this.testMethodName = matcher.group(1);
+		this.testParameterSetIndex = matcher.group(2); // null for non-parametrised tests
 	}
 
 	@Override
@@ -342,14 +354,14 @@ public final class MatsimTestUtils extends TestWatcher {
   public static void enableSystemExitCall() {
     System.setSecurityManager(null);
   }
-  
+
   public static int compareEventsFiles( String filename1, String filename2 ) {
 	  return EventsFileComparator.compareAndReturnInt(filename1, filename2) ;
   }
   public static void compareFilesBasedOnCRC( String filename1, String filename2 ) {
 	  long checksum1 = CRCChecksum.getCRCFromFile(filename1) ;
 	  long checksum2 = CRCChecksum.getCRCFromFile(filename2) ;
-	  Assert.assertEquals( "different file checksums", checksum1, checksum2 ); 
+	  Assert.assertEquals( "different file checksums", checksum1, checksum2 );
   }
   public static boolean comparePopulations( Population pop1, Population pop2 ) {
 	  return PopulationUtils.equalPopulation(pop1, pop2) ;
