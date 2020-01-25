@@ -67,12 +67,13 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	private final Map<Id<Vehicle>, Tuple<Id<Link>, Double>> vehicleLeavesTraffic = new HashMap<>();
 	private final Map<Id<Vehicle>, Tuple<Id<Link>, Double>> vehicleEntersTraffic = new HashMap<>();
 
-	/*package-private*/ WarmEmissionHandler(Vehicles emissionVehicles, final Network network, WarmEmissionAnalysisModuleParameter parameterObject,
-						EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
+	/*package-private*/ WarmEmissionHandler( Vehicles emissionVehicles, final Network network, WarmEmissionAnalysisModuleParameter parameterObject,
+						 EventsManager emissionEventsManager,
+						 Double emissionEfficiencyFactor ) {
 
 		this.emissionVehicles = emissionVehicles;
 		this.network = network;
-		this.warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(parameterObject, emissionEventsManager, emissionEfficiencyFactor);
+		this.warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(parameterObject, emissionEventsManager, emissionEfficiencyFactor );
 		// add event handlers here and restrict the access outside the emission Module.  Amit Apr'17.
 		emissionEventsManager.addHandler(this);
 	}
@@ -98,7 +99,7 @@ class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 				nonCarWarn++;
 			}
 		}
-		Tuple<Id<Link>, Double> linkId2Time = new Tuple<Id<Link>, Double>(event.getLinkId(), event.getTime());
+		Tuple<Id<Link>, Double> linkId2Time = new Tuple<>( event.getLinkId(), event.getTime() );
 		this.vehicleLeavesTraffic.put(event.getVehicleId(), linkId2Time);
 
 		// yyyyyy This event should also trigger an emissions calculation, from link entry up to here.  Probably not done since this particular

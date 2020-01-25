@@ -193,6 +193,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		return rescaledWarmEmissions;
 	}
 
+	private static int cnt =10;
 	private Map<Pollutant, Double> calculateWarmEmissions( Id<Vehicle> vehicleId, double travelTime_sec, String roadType, double freeVelocity_ms,
 							       double linkLength_m, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple ) {
 
@@ -220,6 +221,14 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			for ( Pollutant warmPollutant : warmPollutants) {
 				warmEmissionsOfEvent.put( warmPollutant, 0.0 );
 				// yyyyyy todo replace by something more meaningful. kai, jan'20
+			}
+			if ( cnt >0 ) {
+				logger.warn( "Just encountered non hbefa vehicle; currently, this code is setting the emissions of such vehicles to zero.  " +
+							     "Might be necessary to find a better solution for this.  kai, jan'20" );
+				cnt--;
+				if ( cnt ==0 ) {
+					logger.warn( Gbl.FUTURE_SUPPRESSED );
+				}
 			}
 			return warmEmissionsOfEvent;
 		}

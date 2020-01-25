@@ -55,13 +55,6 @@ public final class EmissionModule {
 
 	//===
 
-	private final URL averageFleetColdEmissionFactorsFile;
-	private final URL averageFleetWarmEmissionFactorsFile;
-
-	private final URL detailedWarmEmissionFactorsFile;
-	private final URL detailedColdEmissionFactorsFile;
-	
-	//===
 	private Vehicles vehicles;
 	
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
@@ -92,9 +85,11 @@ public final class EmissionModule {
 
 		URL context = scenario.getConfig().getContext();
 
-		averageFleetWarmEmissionFactorsFile = emissionConfigGroup.getAverageWarmEmissionFactorsFileURL(context);
-		averageFleetColdEmissionFactorsFile = emissionConfigGroup.getAverageColdEmissionFactorsFileURL(context);
+		URL averageFleetWarmEmissionFactorsFile = emissionConfigGroup.getAverageWarmEmissionFactorsFileURL( context );
+		URL averageFleetColdEmissionFactorsFile = emissionConfigGroup.getAverageColdEmissionFactorsFileURL( context );
 
+		URL detailedWarmEmissionFactorsFile;
+		URL detailedColdEmissionFactorsFile;
 		if(emissionConfigGroup.isUsingDetailedEmissionCalculation()) {
 			detailedWarmEmissionFactorsFile = emissionConfigGroup.getDetailedWarmEmissionFactorsFileURL(context);
 			detailedColdEmissionFactorsFile = emissionConfigGroup.getDetailedColdEmissionFactorsFileURL(context);
@@ -104,13 +99,15 @@ public final class EmissionModule {
 		}
 
 		//TODO: create roadtype mapping here from config
-		createLookupTables();
+		createLookupTables( averageFleetWarmEmissionFactorsFile, averageFleetColdEmissionFactorsFile, detailedWarmEmissionFactorsFile,
+				detailedColdEmissionFactorsFile );
 		createEmissionHandler();
 
 		// Event handlers are now added to the event manager inside the respective Handlers, jm march '18
 	}
 	
-	private void createLookupTables() {
+	private void createLookupTables( URL averageFleetWarmEmissionFactorsFile, URL averageFleetColdEmissionFactorsFile,
+					 URL detailedWarmEmissionFactorsFile, URL detailedColdEmissionFactorsFile ) {
 		logger.info("entering createLookupTables");
 		
 		vehicles = scenario.getVehicles();
@@ -150,17 +147,13 @@ public final class EmissionModule {
 
 		loadRoadTypeMappings();
 
-		WarmEmissionAnalysisModuleParameter parameterObject =
-				new WarmEmissionAnalysisModuleParameter(avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, warmPollutants,
-				emissionConfigGroup);
+		WarmEmissionAnalysisModuleParameter parameterObject = new WarmEmissionAnalysisModuleParameter(avgHbefaWarmTable,
+				detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, warmPollutants, emissionConfigGroup);
+		warmEmissionHandler = new WarmEmissionHandler(vehicles, network, parameterObject, eventsManager, emissionConfigGroup.getEmissionEfficiencyFactor());
+
 		ColdEmissionAnalysisModuleParameter parameterObject2 = new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable, coldPollutants,
 				emissionConfigGroup);
-
-		warmEmissionHandler = new WarmEmissionHandler(vehicles,	network, parameterObject, eventsManager, emissionConfigGroup
-				.getEmissionEfficiencyFactor());
-
-		coldEmissionHandler = new ColdEmissionHandler( vehicles, network, parameterObject2, eventsManager,
-								       emissionConfigGroup.getEmissionEfficiencyFactor() );
+		coldEmissionHandler = new ColdEmissionHandler( vehicles, network, parameterObject2, eventsManager, emissionConfigGroup.getEmissionEfficiencyFactor() );
 		// this initiates all cold emissions processing!
 
 		logger.info("leaving createEmissionHandler");
@@ -361,7 +354,7 @@ public final class EmissionModule {
 			else if(string.endsWith("Satur.")) hbefaTrafficSituation = HbefaTrafficSituation.SATURATED;
 			else if(string.endsWith("St+Go")) hbefaTrafficSituation = HbefaTrafficSituation.STOPANDGO;
 			else {
-				logger.warn("Could not map String " + string + " to any HbefaTrafficSituation; please check syntax in file " + averageFleetWarmEmissionFactorsFile);
+				logger.warn("Could not map String " + string + " to any HbefaTrafficSituation; please check syntax in hbefa input file.");
 				throw new RuntimeException();
 			}
 			return hbefaTrafficSituation;
@@ -392,6 +385,12 @@ public final class EmissionModule {
 
 			String pollutant = array[indexFromKey.get("Component")];
 			coldPollutants.add(Pollutant.valueOf(pollutant));
+			// the Pollutant.valueOf(...) should fail if the incoming key is not consistent with what is available in the enum.  Two possibilities:
+			// (1) it is a new pollutant.  In that case, just add to the enum.
+			// (2) It is a different spelling of an already existing pollutant.  In that case, some conversion needs to be done (I would say that
+			// as long as that does not happen very often, it could be done in code here).
+			// kai, jan'20
+
 			key.setHbefaComponent(Pollutant.valueOf(pollutant));
 
 			key.setHbefaParkingTime(mapAmbientCondPattern2ParkingTime(array[indexFromKey.get("AmbientCondPattern")]));
@@ -429,13 +428,13 @@ public final class EmissionModule {
 //
 //	}
 
-	private HbefaVehicleCategory mapString2HbefaVehicleCategory(String string) {
+	private static HbefaVehicleCategory mapString2HbefaVehicleCategory( String string ) {
 		HbefaVehicleCategory hbefaVehicleCategory;
 		if(string.contains("pass. car")) hbefaVehicleCategory = HbefaVehicleCategory.PASSENGER_CAR;
 		else if(string.contains("HGV")) hbefaVehicleCategory = HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
 		else if(string.contains("motorcycle")) hbefaVehicleCategory = HbefaVehicleCategory.MOTORCYCLE;
 		else{
-			logger.warn("Could not map String " + string + " to any HbefaVehicleCategory; please check syntax in file " + averageFleetWarmEmissionFactorsFile);
+			logger.warn("Could not map String " + string + " to any HbefaVehicleCategory; please check syntax in hbefa input file.");
 			throw new RuntimeException();
 		}
 		return hbefaVehicleCategory;
