@@ -88,7 +88,7 @@ public final class EmissionsConfigGroup
 
 	public enum EmissionsComputationMethod {StopAndGoFraction,AverageSpeed}
 	private static final String EMISSIONS_COMPUTATION_METHOD = "emissionsComputationMethod";
-	private EmissionsComputationMethod emissionsComputationMethod = EmissionsComputationMethod.StopAndGoFraction;
+	private EmissionsComputationMethod emissionsComputationMethod = EmissionsComputationMethod.AverageSpeed;
 
 	@Deprecated // should be phased out.  kai, oct'18
 	private static final String EMISSION_ROADTYPE_MAPPING_FILE_CMT = "REQUIRED if source of the HBEFA road type is set to "+HbefaRoadTypeSource.fromFile +". It maps from input road types to HBEFA 3.1 road type strings";

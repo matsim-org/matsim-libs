@@ -53,7 +53,7 @@ import static org.matsim.contrib.emissions.types.WarmPollutant.NOx;
  * test for playground.vsp.emissions.WarmEmissionAnalysisModule
  *
  **/
- 
+
 @RunWith(Parameterized.class)
 public class TestWarmEmissionAnalysisModuleTrafficSituations {
 

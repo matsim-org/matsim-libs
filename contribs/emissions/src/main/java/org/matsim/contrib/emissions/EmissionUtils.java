@@ -243,7 +243,7 @@ public final class EmissionUtils {
 
 		EngineInformation engineInformation;
 		// get information from where it used to be in previous versions and move to where it should be now:
-		logger.debug("found following hbefaDescriptionSource in emissionsConfigGroup ... " + emissionsConfigGroup.getHbefaVehicleDescriptionSource());
+		logger.debug("emissionsConfigGroup.getHbefaVehicleDescriptionSource=" + emissionsConfigGroup.getHbefaVehicleDescriptionSource());
 		switch( emissionsConfigGroup.getHbefaVehicleDescriptionSource() ) {
 			case usingVehicleTypeId:
 				// (v1, hbefa vehicle description is in vehicle type id.  Copy to where it is expected now)

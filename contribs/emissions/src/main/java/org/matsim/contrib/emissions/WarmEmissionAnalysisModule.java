@@ -272,11 +272,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			efkey.setHbefaTrafficSituation( getTrafficSituation( efkey, averageSpeed_kmh, freeVelocity_ms * 3.6 ) );
 		}
 
-		// for the stop-go method, can already compute the stopgo fraction here:
 		double fractionStopGo = 0;
-		if ( ecg.getEmissionsComputationMethod() == AverageSpeed ){
-			fractionStopGo = getFractionStopAndGo( vehicleId, freeVelocity_ms * 3.6, averageSpeed_kmh, vehicleInformationTuple, efkey );
-		}
 
 		// for each pollutant, compute and memorize emissions:
 		for ( WarmPollutant warmPollutant : warmPollutants) {
@@ -286,6 +282,9 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 			double ef_gpkm;
 			if (ecg.getEmissionsComputationMethod() == StopAndGoFraction) {
+
+				// compute faction.  This cannot be done earlier since efkey.component is needed.
+				fractionStopGo = getFractionStopAndGo( vehicleId, freeVelocity_ms * 3.6, averageSpeed_kmh, vehicleInformationTuple, efkey );
 
 				// compute emissions from stop-go fraction:
 				efkey.setHbefaTrafficSituation(STOPANDGO);
@@ -353,6 +352,10 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			vehAttributesNotSpecifiedCnt++;
 			efkey.setHbefaVehicleAttributes(new HbefaVehicleAttributes()); //want to check for average vehicle
 			ef = this.avgHbefaWarmTable.get(efkey);
+			if ( ef==null ) {
+				logger.warn( "efkey=" + efkey );
+			}
+			Gbl.assertNotNull( ef );
 
 			int maxWarnCnt = 3;
 			if(this.detailedHbefaWarmTable != null && vehAttributesNotSpecifiedCnt <= maxWarnCnt) {
@@ -361,6 +364,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				if(vehAttributesNotSpecifiedCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
 			}
 		}
+		Gbl.assertNotNull( ef );
 		return ef;
 	}
 
@@ -472,12 +476,10 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		return emissionEventCounter;
 	}
 
-//	@Deprecated
-	public int getFractionOccurences() {
+	/*package-private*/ int getFractionOccurences() {
 		return fractionCounter;
 	}
-	@Deprecated
-	public double getFractionKmCounter() {
+	/*package-private*/ double getFractionKmCounter() {
 		return getSaturatedKmCounter() + getHeavyFlowKmCounter();
 	}
 
