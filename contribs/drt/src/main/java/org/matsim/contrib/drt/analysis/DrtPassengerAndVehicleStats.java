@@ -68,22 +68,17 @@ public class DrtPassengerAndVehicleStats
 	private final Set<Id<Person>> rejectedPersons = new HashSet<>();
 	private final Map<Id<Request>, Id<Person>> request2person = new HashMap<>();
 	private final String mode;
-	private final int maxcap;
 	private final Network network;
 	private Set<Id<Vehicle>> monitoredVehicles;
-
+	private final FleetSpecification fleetSpecification;
 
 	public DrtPassengerAndVehicleStats(Network network, EventsManager events, DrtConfigGroup drtCfg,
 									   FleetSpecification fleetSpecification) {
 		this.mode = drtCfg.getMode();
 		this.network = network;
 		events.addHandler(this);
-		maxcap = DrtTripsAnalyser.findMaxVehicleCapacity(fleetSpecification);
-		this.monitoredVehicles = fleetSpecification.getVehicleSpecifications()
-				.keySet()
-				.stream()
-				.map(vid -> Id.createVehicleId(vid))
-				.collect(Collectors.toSet());
+		this.fleetSpecification = fleetSpecification;
+		
 		initializeVehicles();
 	}
 
@@ -104,6 +99,13 @@ public class DrtPassengerAndVehicleStats
 
 
 	private void initializeVehicles() {
+		int maxcap = DrtTripsAnalyser.findMaxVehicleCapacity(fleetSpecification);
+		this.monitoredVehicles = fleetSpecification.getVehicleSpecifications()
+				.keySet()
+				.stream()
+				.map(vid -> Id.createVehicleId(vid))
+				.collect(Collectors.toSet());
+		
 		for (Id<Vehicle> vid : monitoredVehicles) {
 			this.inVehicleDistance.put(vid, new HashMap<>());
 			this.vehicleDistances.put(vid, new double[3 + maxcap]);

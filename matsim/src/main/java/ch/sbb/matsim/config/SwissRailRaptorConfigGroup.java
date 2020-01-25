@@ -4,21 +4,14 @@
 
 package ch.sbb.matsim.config;
 
+import com.google.common.base.Verify;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 
-import com.google.common.base.Verify;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author mrieser / SBB
@@ -31,6 +24,8 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     private static final String PARAM_USE_RANGE_QUERY = "useRangeQuery";
     private static final String PARAM_USE_INTERMODAL_ACCESS_EGRESS = "useIntermodalAccessEgress";
     private static final String PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION = "intermodalAccessEgressModeSelection";
+    private static final String PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION_DESC = "Sets whether intermodal access and egress modes are selected by " +
+            "least cost (default) or randomly chosen out of the available access / egress modes.";
     private static final String PARAM_USE_MODE_MAPPING = "useModeMappingForPassengers";
     private static final String PARAM_SCORING_PARAMETERS = "scoringParameters";
     private static final String PARAM_TRANSFER_PENALTY_BASE = "transferPenaltyBaseCost";
@@ -54,7 +49,8 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
     private final Map<String, RouteSelectorParameterSet> routeSelectorPerSubpop = new HashMap<>();
     private final List<IntermodalAccessEgressParameterSet> intermodalAccessEgressSettings = new ArrayList<>();
     private final Map<String, ModeMappingForPassengersParameterSet> modeMappingForPassengersByRouteMode = new HashMap<>();
-    
+
+
     public enum IntermodalAccessEgressModeSelection {
     	CalcLeastCostModePerStop, RandomSelectOneModePerRoutingRequestAndDirection
     }
@@ -559,7 +555,14 @@ public class SwissRailRaptorConfigGroup extends ReflectiveConfigGroup {
             this.passengerMode = passengerMode;
         }
     }
-    
+
+    @Override
+    public Map<String, String> getComments() {
+        Map<String, String> comments = super.getComments();
+        comments.put(PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION, PARAM_INTERMODAL_ACCESS_EGRESS_MODE_SELECTION_DESC);
+        return comments;
+    }
+
     // TODO: add more
 	@Override
 	protected void checkConsistency(Config config) {

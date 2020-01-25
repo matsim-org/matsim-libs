@@ -28,6 +28,17 @@ import org.matsim.core.router.util.TravelTime;
 import java.util.Collections;
 import java.util.Set;
 
+/**
+ * A factory for a disutility that leads to randomized Pareto search.  Starting point is to have something like disutility(link) = alpha * time + beta *
+ * money.  Evidently, for beta=0 one obtains the time-minimal path, and for alpha=0 the money-minimal path.  The current version will randomize the prefactor
+ * of the monetary term.  It is implemented in a way that the random number is drawn once per routing call, i.e. the route is computed with a constant
+ * tradeoff between money and time, but with the next call it will be a different trade-off.
+ * <br/>
+ * The idea is to come up with different routes, with the hope that one of them ends up being a good one for the scoring function.  See, e.g.,
+ * <a href="https://arxiv.org/abs/1002.4330v1">https://arxiv.org/abs/1002.4330v1</a>
+ * for how to generate route alternatives (where Pareto routing is one option), and
+ * <a href="https://doi.org/10.1016/j.procs.2014.05.488">https://doi.org/10.1016/j.procs.2014.05.488</a> for a paper testing the approach.
+ */
 public class RandomizingTimeDistanceTravelDisutilityFactory implements TravelDisutilityFactory {
 	private static final Logger log = Logger.getLogger( RandomizingTimeDistanceTravelDisutilityFactory.class ) ;
 

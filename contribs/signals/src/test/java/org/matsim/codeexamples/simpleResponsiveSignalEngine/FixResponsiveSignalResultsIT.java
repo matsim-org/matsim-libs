@@ -65,10 +65,10 @@ public class FixResponsiveSignalResultsIT {
 		
 		LOG.info("SignalGroup1: onset " + group1Setting.getOnset() + ", dropping " + group1Setting.getDropping());
 		LOG.info("SignalGroup2: onset " + group2Setting.getOnset() + ", dropping " + group2Setting.getDropping());
-		Assert.assertEquals(group1Setting.getOnset(), 0);
-		Assert.assertEquals(group1Setting.getDropping(), 25);
-		Assert.assertEquals(group2Setting.getOnset(), 30);
-		Assert.assertEquals(group2Setting.getDropping(), 55);
+		Assert.assertEquals(0, group1Setting.getOnset());
+		Assert.assertEquals(25, group1Setting.getDropping());
+		Assert.assertEquals(30, group2Setting.getOnset());
+		Assert.assertEquals(55, group2Setting.getDropping());
 	}
 	
 }
