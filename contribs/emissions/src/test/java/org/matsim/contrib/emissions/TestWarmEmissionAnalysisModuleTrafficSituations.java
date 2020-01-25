@@ -27,13 +27,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
-import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.EmissionsComputationMethod;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.utils.objectattributes.ObjectAttributesConverter;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -42,7 +40,7 @@ import org.matsim.vehicles.VehiclesFactory;
 import java.util.*;
 
 import static org.matsim.contrib.emissions.HbefaTrafficSituation.*;
-import static org.matsim.contrib.emissions.types.WarmPollutant.NOx;
+import static org.matsim.contrib.emissions.Pollutant.NOx;
 
 
 /**
@@ -59,13 +57,13 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 
 	//Old list of pollutants
 //	private final Set<String> pollutants = new HashSet<>(Arrays.asList("CO", "CO2(total)", "FC", "HC", "NMHC", "NOx", "NO2","PM", "SO2"));
-	private static final Set<WarmPollutant> pollutants = new HashSet<>( Arrays.asList( WarmPollutant.values() ) );
+	private static final Set<Pollutant> pollutants = new HashSet<>( Arrays.asList( Pollutant.values() ) );
 	private static final String hbefaRoadCategory = "URB";
 	private final EmissionsComputationMethod emissionsComputationMethod;
 	private final String passengercar= "PASSENGER_CAR";
 
 	private WarmEmissionAnalysisModule weam;
-	private Map<WarmPollutant, Double> warmEmissions;
+	private Map<Pollutant, Double> warmEmissions;
 
 	//average speeds should be the same across all car types, but vary by traffic situation
 	private static final int FF_INDEX = 0;
@@ -266,7 +264,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 			detWarmFactor.setWarmEmissionFactor(factor);
 			detWarmFactor.setSpeed(speed);
 
-			for ( WarmPollutant wp: pollutants){
+			for ( Pollutant wp: pollutants){
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
 				detWarmKey.setHbefaComponent(wp);
 				detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);
@@ -293,7 +291,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 			detWarmFactor.setWarmEmissionFactor(factor);
 			detWarmFactor.setSpeed(speed);
 
-			for ( WarmPollutant wp: pollutants){
+			for ( Pollutant wp: pollutants){
 				HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();
 				detWarmKey.setHbefaComponent(wp);
 				detWarmKey.setHbefaRoadCategory(hbefaRoadCategory);

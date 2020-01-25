@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ColdPollutant.java
+ * WarmPollutant.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,17 +17,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.emissions.types;
+package org.matsim.contrib.emissions;
 
 /**
  * @author benjamin
  *
  */
-public enum ColdPollutant {
-	
-	CO, FC, HC, NMHC, NOX, NO2, PM
-	
+public enum Pollutant{ CO, CO2_TOTAL, FC, HC, NMHC, NOx, NO2, PM, SO2 }
+
 	/* CO2 not directly available for cold emissions; thus it could be calculated through FC, CO, and HC as follows:
 	get("FC")*0.865 - get("CO")*0.429 - get("HC")*0.866) / 0.273;*/
-	// ???? kai, jan'20
-}
+// ???? kai, jan'20
+

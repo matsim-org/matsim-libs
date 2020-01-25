@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
 import org.matsim.contrib.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
-import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -74,8 +73,8 @@ public final class EmissionModule {
 	private Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds;
 
 
-	private final Set<WarmPollutant> warmPollutants = new HashSet<>();
-	private final Set<String> coldPollutants = new HashSet<>();
+	private final Set<Pollutant> warmPollutants = new HashSet<>();
+	private final Set<Pollutant> coldPollutants = new HashSet<>();
 	// these are/were the "automatic" maps collected by JM from the hbefa files.  kai, jan'20
 
 	@Inject
@@ -332,11 +331,11 @@ public final class EmissionModule {
 			key = new HbefaWarmEmissionFactorKey();
 			key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
 
-			WarmPollutant pollutant = WarmPollutant.valueOf( array[indexFromKey.get("Component" )] );
+			Pollutant pollutant = Pollutant.valueOf( array[indexFromKey.get("Component" )] );
 			// this is where Joe Malloy was just passing strings through all the way to events.  Now this is "typed" again.  There may be
 			// two failures:
 			// (1) The pollutant type is missing from the enum.  In that case, just add it to the enum.
-			// (2) The same pollutant type exists under a different name (e.g. NOx instead of NOX).  In that case, some map for
+			// (2) The same pollutant type exists under a different name (e.g. NOx instead of NOx).  In that case, some map for
 			// translation needs to be introduced.  I think that that map should just sit at exactly the place here, and translate.
 			// kai, jan'20
 			warmPollutants.add(pollutant);
@@ -392,8 +391,8 @@ public final class EmissionModule {
 			key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
 
 			String pollutant = array[indexFromKey.get("Component")];
-			coldPollutants.add(pollutant);
-			key.setHbefaComponent(pollutant);
+			coldPollutants.add(Pollutant.valueOf(pollutant));
+			key.setHbefaComponent(Pollutant.valueOf(pollutant));
 
 			key.setHbefaParkingTime(mapAmbientCondPattern2ParkingTime(array[indexFromKey.get("AmbientCondPattern")]));
 			key.setHbefaDistance(mapAmbientCondPattern2Distance(array[indexFromKey.get("AmbientCondPattern")]));

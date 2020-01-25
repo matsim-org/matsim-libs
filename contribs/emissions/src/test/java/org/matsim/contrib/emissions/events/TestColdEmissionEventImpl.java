@@ -25,10 +25,13 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.*;
+
+import static org.matsim.contrib.emissions.Pollutant.*;
 
 
 /*
@@ -56,7 +59,7 @@ public class TestColdEmissionEventImpl {
 		//test normal functionality
 
 		//create a normal event impl
-		Map<String, Double> coldEmissionsMap = new HashMap<>();
+		Map<Pollutant, Double> coldEmissionsMap = new HashMap<>();
 		setColdEmissions(coldEmissionsMap);
 		ColdEmissionEvent ce = new ColdEmissionEvent(0.0, linkId, vehicleId, coldEmissionsMap);
 		
@@ -71,14 +74,14 @@ public class TestColdEmissionEventImpl {
 		
 	}
 
-	private void setColdEmissions(Map<String, Double> coldEmissionsMap) {
-		coldEmissionsMap.put("CO", co);
-		coldEmissionsMap.put("FC", fc);
-		coldEmissionsMap.put("HC", hc);
-		coldEmissionsMap.put("NMHC", nm);
-		coldEmissionsMap.put("NO2", n2);
-		coldEmissionsMap.put("NOx", nx);
-		coldEmissionsMap.put("PM", pm);
+	private void setColdEmissions( Map<Pollutant, Double> coldEmissionsMap ) {
+		coldEmissionsMap.put(CO, co);
+		coldEmissionsMap.put(FC, fc);
+		coldEmissionsMap.put(HC, hc);
+		coldEmissionsMap.put(NMHC, nm);
+		coldEmissionsMap.put(NO2, n2);
+		coldEmissionsMap.put(NOx, nx);
+		coldEmissionsMap.put(PM, pm);
 
 	}
 	
@@ -90,18 +93,18 @@ public class TestColdEmissionEventImpl {
 		// - throw NullPointerExceptions if no emission map is assigned 
 		
 		//empty map
-		Map<String, Double> emptyMap = new HashMap<>();
+		Map<Pollutant, Double> emptyMap = new HashMap<>();
 		ColdEmissionEvent emptyMapEvent = new ColdEmissionEvent(22., linkId, vehicleId, emptyMap);
 		
 		//values not set
-		Map<String, Double> valuesNotSet = new HashMap<>();
-		valuesNotSet.put("CO", null);
-		valuesNotSet.put("FC", null);
-		valuesNotSet.put("HC", null);
-		valuesNotSet.put("NMHC", null);
-		valuesNotSet.put("NO2", null);
-		valuesNotSet.put("NOx", null);
-		valuesNotSet.put("PM", null);
+		Map<Pollutant, Double> valuesNotSet = new HashMap<>();
+		valuesNotSet.put(CO, null);
+		valuesNotSet.put(FC, null);
+		valuesNotSet.put(HC, null);
+		valuesNotSet.put(NMHC, null);
+		valuesNotSet.put(NO2, null);
+		valuesNotSet.put(NOx, null);
+		valuesNotSet.put(PM, null);
 		ColdEmissionEvent valuesNotSetEvent = new ColdEmissionEvent(44., linkId, vehicleId, valuesNotSet);
 		
 		//no map

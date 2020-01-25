@@ -37,6 +37,7 @@ import java.util.*;
 
 import static org.matsim.contrib.emissions.HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
 import static org.matsim.contrib.emissions.HbefaVehicleCategory.PASSENGER_CAR;
+import static org.matsim.contrib.emissions.Pollutant.*;
 
 
 /**
@@ -71,7 +72,7 @@ public class TestColdEmissionAnalysisModule {
 	// same values as int for table
 	private static final int tableParkingDuration = (int) Math.round( parkingDuration );
 	private static final int tableAccDistance = 1;
-	private static final Set<String> pollutants = new HashSet<>(Arrays.asList("CO", "CO2(total)", "FC", "HC", "NMHC", "NOx", "NO2","PM", "SO2"));
+	private static final Set<Pollutant> pollutants = new HashSet<>(Arrays.asList(CO, CO2_TOTAL, FC, HC, NMHC, NOx, NO2,PM, SO2));
 	private final int numberOfColdEmissions = pollutants.size();
 	// strings for test cases
 	
@@ -365,7 +366,7 @@ public class TestColdEmissionAnalysisModule {
 	
 	private static void putIntoHbefaColdTable( final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable,
 								 final HbefaVehicleAttributes vehAtt, final HbefaColdEmissionFactor detColdFactor, final HbefaVehicleCategory hbefaVehicleCategory ) {
-		for ( String cp : pollutants ) {
+		for ( Pollutant cp : pollutants ) {
 			HbefaColdEmissionFactorKey detColdKey = new HbefaColdEmissionFactorKey();
 			detColdKey.setHbefaDistance( tableAccDistance );
 			detColdKey.setHbefaParkingTime( tableParkingDuration );

@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.emissions.EmissionUtils;
-import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
@@ -41,6 +41,8 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.matsim.contrib.emissions.Pollutant.*;
 
 
 /*
@@ -779,20 +781,22 @@ public class TestEmissionUtils {
 		
 	}
 
-	public static Map<String, Double> createUntypedEmissions() {
-		return Arrays.asList("co2", "CO", "NOx", "NO", "NO2", "HC").stream()
-				.collect(Collectors.toMap(p -> p, p -> Math.random()));
+	public static Map<Pollutant, Double> createUntypedEmissions() {
+//		return Arrays.asList("co2", "CO", "NOx", "NO", "NO2", "HC").stream()
+//			     .collect(Collectors.toMap(p -> p, p -> Math.random()));
+		return Arrays.asList(CO2_TOTAL, CO, NOx, NO2, HC).stream()
+			     .collect(Collectors.toMap(p -> p, p -> Math.random()));
 	}
-	public static Map<WarmPollutant,Double> createEmissions() {
-		return Arrays.stream( WarmPollutant.values() ).collect( Collectors.toMap( p -> p, p -> Math.random() ) ) ;
+	public static Map<Pollutant,Double> createEmissions() {
+		return Arrays.stream( Pollutant.values() ).collect( Collectors.toMap( p -> p, p -> Math.random() ) ) ;
 	}
 
 //	public static Map<String, Double> createEmissionsWithFixedValue(double value) {
 //		return Arrays.asList("co2", "CO", "NOx", "NO", "NO2", "HC").stream()
 //				.collect(Collectors.toMap(p -> p, p -> value));
 //	}
-	public static Map<WarmPollutant,Double> createEmissionsWithFixedValue( double value ) {
-		return Arrays.stream( WarmPollutant.values() ).collect( Collectors.toMap( p -> p, p -> value ) ) ;
+	public static Map<Pollutant,Double> createEmissionsWithFixedValue( double value ) {
+		return Arrays.stream( Pollutant.values() ).collect( Collectors.toMap( p -> p, p -> value ) ) ;
 	}
 
 	private void addLinksToNetwork(Scenario sc) {

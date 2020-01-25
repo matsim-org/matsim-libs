@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
-import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
@@ -54,7 +53,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor>  avgHbefaWarmTable;
 	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
 	private final Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds;
-	private final Set<WarmPollutant> warmPollutants;
+	private final Set<Pollutant> warmPollutants;
 
 	private final EventsManager eventsManager;
 	private final Double emissionEfficiencyFactor;
@@ -85,13 +84,13 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		/*package-private*/ final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
 		private final Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds;
 		private final EmissionsConfigGroup ecg;
-		private final Set<WarmPollutant> warmPollutants;
+		private final Set<Pollutant> warmPollutants;
 
 		/*package-private*/ WarmEmissionAnalysisModuleParameter(
 				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable,
 				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable,
 				Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds,
-				Set<WarmPollutant> warmPollutants,
+				Set<Pollutant> warmPollutants,
 				EmissionsConfigGroup emissionsConfigGroup) {
 			this.avgHbefaWarmTable = avgHbefaWarmTable;
 			this.detailedHbefaWarmTable = detailedHbefaWarmTable;
@@ -128,7 +127,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		this.ecg = parameterObject.ecg;
 	}
 
-	public void reset() {
+	void reset() {
 		logger.info("resetting counters...");
 		vehAttributesNotSpecifiedCnt = 0;
 
@@ -146,17 +145,17 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		stopGoKmCounter = 0.0;
 	}
 
-	void throwWarmEmissionEvent( double leaveTime, Id<Link> linkId, Id<Vehicle> vehicleId, Map<WarmPollutant, Double> warmEmissions ){
+	void throwWarmEmissionEvent( double leaveTime, Id<Link> linkId, Id<Vehicle> vehicleId, Map<Pollutant, Double> warmEmissions ){
 		Event warmEmissionEvent = new WarmEmissionEvent(leaveTime, linkId, vehicleId, warmEmissions);
 		this.eventsManager.processEvent(warmEmissionEvent);
 	}
 	@Override
-	public Map<WarmPollutant, Double> checkVehicleInfoAndCalculateWarmEmissions(Vehicle vehicle, Link link, double travelTime ){
+	public Map<Pollutant, Double> checkVehicleInfoAndCalculateWarmEmissions( Vehicle vehicle, Link link, double travelTime ){
 		return checkVehicleInfoAndCalculateWarmEmissions( vehicle.getType(), vehicle.getId(), link, travelTime );
 	}
 
-	/*package-private*/ Map<WarmPollutant, Double> checkVehicleInfoAndCalculateWarmEmissions(VehicleType vehicleType, Id<Vehicle> vehicleId,
-																  Link link, double travelTime) {
+	/*package-private*/ Map<Pollutant, Double> checkVehicleInfoAndCalculateWarmEmissions( VehicleType vehicleType, Id<Vehicle> vehicleId,
+											      Link link, double travelTime ) {
 		{
 			String hbefaVehicleTypeDescription = EmissionUtils.getHbefaVehicleDescription( vehicleType, this.ecg );
 			// (this will, importantly, repair the hbefa description in the vehicle type. kai/kai, jan'20)
@@ -173,19 +172,20 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 		double freeVelocity = link.getFreespeed(); //TODO: what about time dependence
 
-		Map<WarmPollutant, Double> warmEmissions
+		Map<Pollutant, Double> warmEmissions
 				= calculateWarmEmissions( vehicleId, travelTime, EmissionUtils.getHbefaRoadType( link ), freeVelocity, link.getLength(), vehicleInformationTuple );
 
 		// a basic apporach to introduce emission reduced cars:
 		// yy this should be deprecated. kai, jan'20
 		if(emissionEfficiencyFactor != null){
-			warmEmissions = rescaleWarmEmissions(warmEmissions);
+			warmEmissions = rescaleWarmEmissions(warmEmissions, emissionEfficiencyFactor);
 		}
 		return warmEmissions;
 	}
 
-	private Map<WarmPollutant, Double> rescaleWarmEmissions( Map<WarmPollutant, Double> warmEmissions ) {Map<WarmPollutant, Double> rescaledWarmEmissions = new HashMap<>();
-		for(WarmPollutant wp : warmEmissions.keySet()){
+	static Map<Pollutant, Double> rescaleWarmEmissions( Map<Pollutant, Double> warmEmissions, double emissionEfficiencyFactor ) {
+		Map<Pollutant, Double> rescaledWarmEmissions = new HashMap<>();
+		for( Pollutant wp : warmEmissions.keySet()){
 			Double orgValue = warmEmissions.get(wp);
 			Double rescaledValue = emissionEfficiencyFactor * orgValue;
 			rescaledWarmEmissions.put(wp, rescaledValue);
@@ -193,10 +193,10 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		return rescaledWarmEmissions;
 	}
 
-	private Map<WarmPollutant, Double> calculateWarmEmissions( Id<Vehicle> vehicleId, double travelTime_sec, String roadType, double freeVelocity_ms,
-								   double linkLength_m, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple ) {
+	private Map<Pollutant, Double> calculateWarmEmissions( Id<Vehicle> vehicleId, double travelTime_sec, String roadType, double freeVelocity_ms,
+							       double linkLength_m, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple ) {
 
-		Map<WarmPollutant, Double> warmEmissionsOfEvent = new HashMap<>();
+		Map<Pollutant, Double> warmEmissionsOfEvent = new HashMap<>();
 
 //		if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE)){
 //			efkey.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
@@ -217,7 +217,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 		// fallback vehicle types that we cannot or do not want to map onto a hbefa vehicle type:
 		if ( vehicleInformationTuple.getFirst()==HbefaVehicleCategory.NON_HBEFA_VEHICLE ) {
-			for (WarmPollutant warmPollutant : warmPollutants) {
+			for ( Pollutant warmPollutant : warmPollutants) {
 				warmEmissionsOfEvent.put( warmPollutant, 0.0 );
 				// yyyyyy todo replace by something more meaningful. kai, jan'20
 			}
@@ -262,7 +262,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		double fractionStopGo = 0;
 
 		// for each pollutant, compute and memorize emissions:
-		for ( WarmPollutant warmPollutant : warmPollutants) {
+		for ( Pollutant warmPollutant : warmPollutants) {
 			double generatedEmissions;
 
 			efkey.setHbefaComponent(warmPollutant);
@@ -278,7 +278,6 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 					// compute emissions from stop-go fraction:
 					efkey.setHbefaTrafficSituation( STOPANDGO );
 					efStopGo_gpkm = getEf( vehicleId, vehicleInformationTuple, efkey ).getWarmEmissionFactor();
-//				logger.warn( "pollutant=" + warmPollutant + "; efStopGo=" + efStopGo_gpkm );
 				}
 
 				double efFreeFlow_gpkm = 0. ;
@@ -290,15 +289,11 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				}
 
 				// sum them up:
-
-//				logger.warn( "fractionStoGo=" + fractionStopGo );
-
 				double fractionFreeFlow = 1 - fractionStopGo;
 				ef_gpkm = (fractionFreeFlow * efFreeFlow_gpkm) + (fractionStopGo * efStopGo_gpkm);
 
 			} else if (ecg.getEmissionsComputationMethod() == AverageSpeed){
 				ef_gpkm = getEf(vehicleId, vehicleInformationTuple, efkey).getWarmEmissionFactor();
-				logger.warn( "pollutant=" + warmPollutant + "; ef=" + ef_gpkm );
 			} else {
 				throw new RuntimeException( Gbl.NOT_IMPLEMENTED );
 			}

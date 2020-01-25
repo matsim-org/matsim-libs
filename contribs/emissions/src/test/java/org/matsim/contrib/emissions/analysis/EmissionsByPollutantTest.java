@@ -1,7 +1,7 @@
 package org.matsim.contrib.emissions.analysis;
 
 import org.junit.Test;
-import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.contrib.emissions.utils.TestEmissionUtils;
 
 import java.util.HashMap;
@@ -10,6 +10,8 @@ import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
+import static org.matsim.contrib.emissions.Pollutant.CO;
+import static org.matsim.contrib.emissions.Pollutant.NO2;
 
 public class EmissionsByPollutantTest {
 
@@ -21,36 +23,36 @@ public class EmissionsByPollutantTest {
     @Test
     public void initialize() {
 
-        Map<WarmPollutant, Double> emissions = TestEmissionUtils.createEmissions();
+        Map<Pollutant, Double> emissions = TestEmissionUtils.createEmissions();
 
-        Map<String,Double> map = new LinkedHashMap<>();
-        emissions.forEach( (key,value) -> map.put( key.name(), value ) ) ;
+        Map<Pollutant,Double> map = new LinkedHashMap<>();
+        emissions.forEach( map::put ) ;
 
         EmissionsByPollutant linkEmissions = new EmissionsByPollutant( map ) ;
 
-        Map<String, Double> emissionsByPollutant = linkEmissions.getEmissions();
+        Map<Pollutant, Double> emissionsByPollutant = linkEmissions.getEmissions();
 
         emissions.forEach((key, value) -> {
-            assertTrue(emissionsByPollutant.containsKey(key.name()));
-            assertEquals(value, emissionsByPollutant.get(key.name()), 0.0001);
+            assertTrue(emissionsByPollutant.containsKey(key));
+            assertEquals(value, emissionsByPollutant.get(key), 0.0001);
         });
     }
 
     @Test
     public void addEmission() {
 
-        Map<WarmPollutant, Double> emissions = TestEmissionUtils.createEmissions();
+        Map<Pollutant, Double> emissions = TestEmissionUtils.createEmissions();
         final double valueToAdd = 5;
-        final WarmPollutant pollutant = WarmPollutant.CO;
+        final Pollutant pollutant = CO;
         final double expectedValue = emissions.get(pollutant) + valueToAdd;
 
-        Map<String,Double> map = new LinkedHashMap<>();
-        emissions.forEach( (key,value) -> map.put( key.name(), value ) ) ;
+        Map<Pollutant,Double> map = new LinkedHashMap<>();
+        emissions.forEach( map::put ) ;
 
         EmissionsByPollutant emissionsByPollutant = new EmissionsByPollutant(map);
 
-        double result = emissionsByPollutant.addEmission(pollutant.name(), valueToAdd);
-        double retrievedResult = emissionsByPollutant.getEmission(pollutant.name());
+        double result = emissionsByPollutant.addEmission(pollutant, valueToAdd);
+        double retrievedResult = emissionsByPollutant.getEmission(pollutant);
 
         assertEquals(expectedValue, result);
         assertEquals(expectedValue, retrievedResult);
@@ -59,10 +61,10 @@ public class EmissionsByPollutantTest {
     @Test
     public void addEmission_PollutantNotPresentYet() {
 
-        Map<String, Double> initialPollutants = new HashMap<>();
-        initialPollutants.put("CO", Math.random());
+        Map<Pollutant, Double> initialPollutants = new HashMap<>();
+        initialPollutants.put(CO, Math.random());
         final double valueToAdd = 5;
-        final String pollutantToAdd = "NO2";
+        final Pollutant pollutantToAdd = NO2;
         EmissionsByPollutant emissionsByPollutant = new EmissionsByPollutant(initialPollutants);
 
         double result = emissionsByPollutant.addEmission(pollutantToAdd, valueToAdd);
@@ -75,23 +77,23 @@ public class EmissionsByPollutantTest {
     @Test
     public void addEmissions() {
 
-        Map<WarmPollutant, Double> emissions = TestEmissionUtils.createEmissions();
+        Map<Pollutant, Double> emissions = TestEmissionUtils.createEmissions();
 
-        Map<String,Double> map = new LinkedHashMap<>();
-        emissions.forEach( (key,value) -> map.put( key.name(), value ) ) ;
+        Map<Pollutant,Double> map = new LinkedHashMap<>();
+        emissions.forEach( map::put ) ;
 
         EmissionsByPollutant linkEmissions = new EmissionsByPollutant(map);
 
-        Map<String,Double> map2 = new LinkedHashMap<>();
-        emissions.forEach( (key,value) -> map2.put( key.name(), value ) ) ;
+        Map<Pollutant,Double> map2 = new LinkedHashMap<>();
+        emissions.forEach( map2::put ) ;
 
         linkEmissions.addEmissions(map2);
 
-        Map<String, Double> emissionsByPollutant = linkEmissions.getEmissions();
+        Map<Pollutant, Double> emissionsByPollutant = linkEmissions.getEmissions();
 
         emissions.forEach((key, value) -> {
-            assertTrue(emissionsByPollutant.containsKey(key.name()));
-            assertEquals(value * 2, emissionsByPollutant.get(key.name()), 0.001);
+            assertTrue(emissionsByPollutant.containsKey(key));
+            assertEquals(value * 2, emissionsByPollutant.get(key), 0.001);
         });
     }
 }

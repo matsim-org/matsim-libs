@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.EmissionModule;
-import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
@@ -115,7 +115,7 @@ public class EmissionTollTimeDistanceTravelDisutility implements TravelDisutilit
 		iteration. Cold emission costs are assumed not to change routing; they might change mode choice or
 		location choice (not implemented)! */
 
-        Map<WarmPollutant, Double> expectedWarmEmissions = this.emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(
+        Map<Pollutant, Double> expectedWarmEmissions = this.emissionModule.getWarmEmissionAnalysisModule().checkVehicleInfoAndCalculateWarmEmissions(
                 vehicle, link, linkTravelTime );
         double expectedEmissionCosts = this.emissionCostModule.calculateWarmEmissionCosts(expectedWarmEmissions);
         linkExpectedEmissionDisutility = this.marginalUtlOfMoney * expectedEmissionCosts ;

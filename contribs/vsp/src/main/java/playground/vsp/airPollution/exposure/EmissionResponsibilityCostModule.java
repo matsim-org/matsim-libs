@@ -25,7 +25,7 @@ import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.contrib.emissions.Pollutant;
 
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import playground.vsp.airPollution.flatEmissions.EmissionCostFactors;
@@ -63,12 +63,12 @@ public class EmissionResponsibilityCostModule {
 		this.responsibilityGridTools = rgt;
 	}
 	
-	public double calculateWarmEmissionCosts( Map<WarmPollutant, Double> warmEmissions, Id<Link> linkId, double time ) {
+	public double calculateWarmEmissionCosts( Map<Pollutant, Double> warmEmissions, Id<Link> linkId, double time ) {
 		double warmEmissionCosts = 0.0;
 		
-		for( WarmPollutant wp : warmEmissions.keySet()){
+		for( Pollutant wp : warmEmissions.keySet()){
 			//		return key;
-			if( wp != WarmPollutant.CO2_TOTAL ) {
+			if( wp != Pollutant.CO2_TOTAL ) {
 
 //				if ( true ) {
 //					throw new RuntimeException("pollutants are no longer enums; need to hedge against header changes in upstream input file") ;
@@ -81,7 +81,7 @@ public class EmissionResponsibilityCostModule {
 		Double relativeDensity = responsibilityGridTools.getFactorForLink(linkId, time);
 
 		if(this.considerCO2Costs) {
-			WarmPollutant co2Total = WarmPollutant.CO2_TOTAL;
+			Pollutant co2Total = Pollutant.CO2_TOTAL;
 			//		return key;
 			return this.emissionCostMultiplicationFactor * warmEmissionCosts * relativeDensity
 					+ warmEmissions.get( co2Total )
@@ -91,10 +91,10 @@ public class EmissionResponsibilityCostModule {
 		}
 	}
 	
-	public double calculateColdEmissionCosts(Map<String, Double> coldEmissions, Id<Link> linkId, double time) {
+	public double calculateColdEmissionCosts( Map<Pollutant, Double> coldEmissions, Id<Link> linkId, double time ) {
 		double coldEmissionCosts = 0.0;
 		
-		for(String cp : coldEmissions.keySet()){
+		for( Pollutant cp : coldEmissions.keySet()){
 			double costFactor = EmissionCostFactors.getCostFactor(cp.toString());
 			coldEmissionCosts += coldEmissions.get(cp) * costFactor ;
 		}

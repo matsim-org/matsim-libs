@@ -32,7 +32,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -53,7 +53,7 @@ public class TestWarmEmissionEventImpl {
     private final Double pm=8.;
     private final Double so=1.6;
 //	private final Set<String> pollutants = new HashSet<>(Arrays.asList("CO", "CO2(total)", "FC", "HC", "NMHC", "NOx", "NO2","PM", "SO2"));
-	private final Set<WarmPollutant> pollutants = new HashSet<>( Arrays.asList( WarmPollutant.values() ) );
+	private final Set<Pollutant> pollutants = new HashSet<>( Arrays.asList( Pollutant.values() ) );
 
 
 	@Test
@@ -73,8 +73,8 @@ public class TestWarmEmissionEventImpl {
 		warmEmissionsMap.put("PM", pm );
 		warmEmissionsMap.put("SO2", so );
 
-		Map<WarmPollutant,Double> map = new LinkedHashMap<>();
-		warmEmissionsMap.forEach( (key,value) -> map.put(  WarmPollutant.valueOf( key ), value ) );
+		Map<Pollutant,Double> map = new LinkedHashMap<>();
+		warmEmissionsMap.forEach( (key,value) -> map.put(  Pollutant.valueOf( key ), value ) );
 		// (this could be made more direct)
 
 		WarmEmissionEvent we = new WarmEmissionEvent(0.0, linkId, vehicleId, map);
@@ -100,7 +100,7 @@ public class TestWarmEmissionEventImpl {
 			// - throw NullPointerExceptions if no emission map is assigned 
 			
 		//empty map
-		Map<WarmPollutant, Double> emptyMap = new HashMap<>();
+		Map<Pollutant, Double> emptyMap = new HashMap<>();
 		WarmEmissionEvent emptyMapEvent = new WarmEmissionEvent(22., linkId, vehicleId, emptyMap);
 		
 		//values not set
@@ -113,8 +113,8 @@ public class TestWarmEmissionEventImpl {
 		valuesNotSet.put("NOx", null);
 		valuesNotSet.put("PM", null);
 
-		Map<WarmPollutant,Double> map = new LinkedHashMap<>();
-		valuesNotSet.forEach( (key,value) -> map.put(  WarmPollutant.valueOf( key ), value ) );
+		Map<Pollutant,Double> map = new LinkedHashMap<>();
+		valuesNotSet.forEach( (key,value) -> map.put(  Pollutant.valueOf( key ), value ) );
 		// (this could be made more direct)
 
 		WarmEmissionEvent valuesNotSetEvent = new WarmEmissionEvent(44., linkId, vehicleId, map);
@@ -126,7 +126,7 @@ public class TestWarmEmissionEventImpl {
 
 		int valuesNotSetNullPointers =0, noMapNullPointers=0;
 		
-		for(WarmPollutant wpEnum : pollutants){
+		for( Pollutant wpEnum : pollutants){
 			String wp=wpEnum.name();
 
 			//empty map

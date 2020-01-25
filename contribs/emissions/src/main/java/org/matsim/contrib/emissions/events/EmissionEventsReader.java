@@ -20,25 +20,17 @@
 package org.matsim.contrib.emissions.events;
 
 import java.net.URL;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Stack;
-import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.MatsimReader;
-import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 import static org.matsim.core.events.EventsReaderXMLv1.*;
 
@@ -61,7 +53,7 @@ public final class EmissionEventsReader implements MatsimReader {
 		this.delegate.addCustomEventMapper( WarmEmissionEvent.EVENT_TYPE, (CustomEventMapper<WarmEmissionEvent>) event -> {
 
 			Map<String, String> attributes = event.getAttributes();
-			Map<WarmPollutant, Double> warmEmissions = new LinkedHashMap<>();
+			Map<Pollutant, Double> warmEmissions = new LinkedHashMap<>();
 
 			double time = Time.getUndefinedTime();
 			Id<Link> linkId = null;
@@ -81,7 +73,7 @@ public final class EmissionEventsReader implements MatsimReader {
 				} else{
 					String pollutant = entry.getKey();
 					Double value = Double.parseDouble( entry.getValue() );
-					warmEmissions.put( WarmPollutant.valueOf( pollutant ), value );
+					warmEmissions.put( Pollutant.valueOf( pollutant ), value );
 				}
 			}
 
@@ -91,7 +83,7 @@ public final class EmissionEventsReader implements MatsimReader {
 		this.delegate.addCustomEventMapper( ColdEmissionEvent.EVENT_TYPE, (CustomEventMapper<ColdEmissionEvent>) event -> {
 
 			Map<String, String> attributes = event.getAttributes();
-			Map<String, Double> coldEmissions = new LinkedHashMap<>();
+			Map<Pollutant, Double> coldEmissions = new LinkedHashMap<>();
 
 			double time = Time.getUndefinedTime();
 			Id<Link> linkId = null;
@@ -111,7 +103,7 @@ public final class EmissionEventsReader implements MatsimReader {
 				} else{
 					String pollutant = entry.getKey();
 					Double value = Double.parseDouble( entry.getValue() );
-					coldEmissions.put( pollutant, value );
+					coldEmissions.put( Pollutant.valueOf(pollutant), value );
 				}
 			}
 			return new ColdEmissionEvent( time, linkId, vehicleId, coldEmissions );
