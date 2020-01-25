@@ -172,27 +172,12 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		}
 
 		double freeVelocity = link.getFreespeed(); //TODO: what about time dependence
-		double linkLength = link.getLength();
-		String roadType = EmissionUtils.getHbefaRoadType(link);
 
-		Map<WarmPollutant, Double> warmEmissions = null ;
-//		switch( ecg.getEmissionsComputationMethod() ) {
-//			case StopAndGoFraction:
-//				warmEmissions = calculateWarmEmissionsStopAndGo(vehicleId, travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple) ;
-//				break;
-////				throw new RuntimeException( "not implemented" );
-//				// yyyyyy put in the old computation method (release 10), and adjust tests that will then probably fail.
-//			case AverageSpeed:
-				warmEmissions= calculateWarmEmissions( vehicleId, travelTime, roadType, freeVelocity, linkLength, vehicleInformationTuple );
-//				break;
-//			default:
-//				throw new IllegalStateException( "Unexpected value: " + ecg.getEmissionsComputationMethod() );
-//		}
-		// could, if needed, put the different computation method behind an interface.  On the other hand, could also use
-		// "checkVehicleInfoAndCalculateWarmEmissions" as interface, or the method that uses VehicleType as input (instead of the vehicle).  kai, jan'20
-
+		Map<WarmPollutant, Double> warmEmissions
+				= calculateWarmEmissions( vehicleId, travelTime, EmissionUtils.getHbefaRoadType( link ), freeVelocity, link.getLength(), vehicleInformationTuple );
 
 		// a basic apporach to introduce emission reduced cars:
+		// yy this should be deprecated. kai, jan'20
 		if(emissionEfficiencyFactor != null){
 			warmEmissions = rescaleWarmEmissions(warmEmissions);
 		}
@@ -269,7 +254,9 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 		// for the average speed method, the traffic situation is already known here:
 		if (ecg.getEmissionsComputationMethod() == AverageSpeed) {
-			efkey.setHbefaTrafficSituation( getTrafficSituation( efkey, averageSpeed_kmh, freeVelocity_ms * 3.6 ) );
+			final HbefaTrafficSituation trafficSituation = getTrafficSituation( efkey, averageSpeed_kmh, freeVelocity_ms * 3.6 );
+			logger.warn( "trafficSituation=" + trafficSituation );
+			efkey.setHbefaTrafficSituation( trafficSituation );
 		}
 
 		double fractionStopGo = 0;
@@ -286,20 +273,32 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				// compute faction.  This cannot be done earlier since efkey.component is needed.
 				fractionStopGo = getFractionStopAndGo( vehicleId, freeVelocity_ms * 3.6, averageSpeed_kmh, vehicleInformationTuple, efkey );
 
-				// compute emissions from stop-go fraction:
-				efkey.setHbefaTrafficSituation(STOPANDGO);
-				double efStopGo_gpkm = getEf(vehicleId, vehicleInformationTuple, efkey).getWarmEmissionFactor();
+				double efStopGo_gpkm = 0. ;
+				if ( fractionStopGo>0 ){
+					// compute emissions from stop-go fraction:
+					efkey.setHbefaTrafficSituation( STOPANDGO );
+					efStopGo_gpkm = getEf( vehicleId, vehicleInformationTuple, efkey ).getWarmEmissionFactor();
+//				logger.warn( "pollutant=" + warmPollutant + "; efStopGo=" + efStopGo_gpkm );
+				}
 
-				// compute emissions for free-flow fraction:
-				efkey.setHbefaTrafficSituation(FREEFLOW);
-				double fractionFreeFlow = 1 - fractionStopGo;
-				double efFreeFlow_gpkm = getEf(vehicleId, vehicleInformationTuple, efkey).getWarmEmissionFactor();
+				double efFreeFlow_gpkm = 0. ;
+				if ( fractionStopGo<1.){
+					// compute emissions for free-flow fraction:
+					efkey.setHbefaTrafficSituation( FREEFLOW );
+					efFreeFlow_gpkm = getEf( vehicleId, vehicleInformationTuple, efkey ).getWarmEmissionFactor();
+					logger.warn( "pollutant=" + warmPollutant + "; efFreeFlow=" + efFreeFlow_gpkm );
+				}
 
 				// sum them up:
+
+//				logger.warn( "fractionStoGo=" + fractionStopGo );
+
+				double fractionFreeFlow = 1 - fractionStopGo;
 				ef_gpkm = (fractionFreeFlow * efFreeFlow_gpkm) + (fractionStopGo * efStopGo_gpkm);
 
 			} else if (ecg.getEmissionsComputationMethod() == AverageSpeed){
 				ef_gpkm = getEf(vehicleId, vehicleInformationTuple, efkey).getWarmEmissionFactor();
+				logger.warn( "pollutant=" + warmPollutant + "; ef=" + ef_gpkm );
 			} else {
 				throw new RuntimeException( Gbl.NOT_IMPLEMENTED );
 			}

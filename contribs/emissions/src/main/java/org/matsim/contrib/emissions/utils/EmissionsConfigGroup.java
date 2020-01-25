@@ -57,7 +57,9 @@ public final class EmissionsConfigGroup
 	private static final String WRITING_EMISSIONS_EVENTS = "isWritingEmissionsEvents";
 	private boolean isWritingEmissionsEvents = true;
 
+	@Deprecated // see comments at getter/setter
 	private static final String EMISSION_EFFICIENCY_FACTOR = "emissionEfficiencyFactor";
+	@Deprecated // see comments at getter/setter
 	private double emissionEfficiencyFactor = 1.0;
 
 	@Deprecated // kai, oct'18
@@ -72,6 +74,7 @@ public final class EmissionsConfigGroup
 
 	private static final String HANDLE_HIGH_AVERAGE_SPEEDS = "handleHighAverageSpeeds";
 	private boolean handleHighAverageSpeeds = false;
+	// yyyy should become an enum.  kai, jan'20
 
 	@Deprecated // See elsewhere in this class.  kai, oct'18
 	public enum HbefaRoadTypeSource { fromFile, fromLinkAttributes, fromOsm }
@@ -354,14 +357,22 @@ public final class EmissionsConfigGroup
 	// ---
 	/**
 	 * @return {@value #EMISSION_EFFICIENCY_FACTOR_CMT}
+	 *
+	 * @deprecated -- I cannot see a goot use case for this: Since this is not even by vehicle type, it could easily be done in the events file
+	 * postprocessing.  kai, jan'20
 	 */
+	@Deprecated
 	@StringGetter(EMISSION_EFFICIENCY_FACTOR)
 	public double getEmissionEfficiencyFactor() {
 		return emissionEfficiencyFactor;
 	}
 	/**
 	 * @param emissionEfficiencyFactor -- {@value #EMISSION_EFFICIENCY_FACTOR_CMT}
+	 *
+	 * @deprecated -- I cannot see a goot use case for this: Since this is not even by vehicle type, it could easily be done in the events file
+	 * postprocessing.  kai, jan'20
 	 */
+	@Deprecated
 	@StringSetter(EMISSION_EFFICIENCY_FACTOR)
 	public void setEmissionEfficiencyFactor(double emissionEfficiencyFactor) {
 		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
