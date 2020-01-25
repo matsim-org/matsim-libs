@@ -73,7 +73,6 @@ final class ColdEmissionAnalysisModule {
 	private final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
 
 	private final EventsManager eventsManager;
-	private final Double emissionEfficiencyFactor;
 	private final EmissionsConfigGroup ecg;
 
 	private int vehInfoWarnHDVCnt = 0;
@@ -82,33 +81,14 @@ final class ColdEmissionAnalysisModule {
 	private int vehInfoWarnMotorCylceCnt = 0;
 	private final Set<Pollutant> coldPollutants;
 	private int noVehWarnCnt = 0;
-
-	/*package-private*/ static class ColdEmissionAnalysisModuleParameter {
-		final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
-		final Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
-		private final Set<Pollutant> coldPollutants;
-		private final EmissionsConfigGroup ecg;
-
-		/*package-private*/ ColdEmissionAnalysisModuleParameter(Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable,
-									Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable,
-									Set<Pollutant> coldPollutants, EmissionsConfigGroup emissionsConfigGroup) {
-			this.avgHbefaColdTable = avgHbefaColdTable;
-			this.detailedHbefaColdTable = detailedHbefaColdTable;
-			this.coldPollutants = coldPollutants;
-			this.ecg = emissionsConfigGroup;
-		}
-	}
-
-	/*package-private*/ ColdEmissionAnalysisModule(
-			ColdEmissionAnalysisModuleParameter parameterObject,
-			EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
-
-		this.avgHbefaColdTable = parameterObject.avgHbefaColdTable;
-		this.detailedHbefaColdTable = parameterObject.detailedHbefaColdTable;
-		this.coldPollutants = parameterObject.coldPollutants;
-		this.ecg = parameterObject.ecg;
-		this.eventsManager = emissionEventsManager;
-		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
+	/*package-private*/ ColdEmissionAnalysisModule( Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable,
+					   Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable, EmissionsConfigGroup ecg,
+					   Set<Pollutant> coldPollutants, EventsManager eventsManager ){
+		this.avgHbefaColdTable = avgHbefaColdTable;
+		this.detailedHbefaColdTable = detailedHbefaColdTable;
+		this.eventsManager = eventsManager;
+		this.ecg = ecg;
+		this.coldPollutants = coldPollutants;
 	}
 
 	public void reset() {
@@ -162,9 +142,9 @@ final class ColdEmissionAnalysisModule {
 			Map<Pollutant, Double> coldEmissions = getColdPollutantDoubleMap( vehicle.getId(), parkingDuration, vehicleInformationTuple, distance_km );
 
 			// a basic apporach to introduce emission reduced cars:
-			if(emissionEfficiencyFactor != null){
-				coldEmissions = WarmEmissionAnalysisModule.rescaleWarmEmissions(coldEmissions, emissionEfficiencyFactor );
-			}
+//			if(emissionEfficiencyFactor != null){
+//				coldEmissions = WarmEmissionAnalysisModule.rescaleWarmEmissions(coldEmissions, emissionEfficiencyFactor );
+//			}
 			Event coldEmissionEvent = new ColdEmissionEvent(eventTime, coldEmissionEventLinkId, vehicle.getId(), coldEmissions);
 			this.eventsManager.processEvent(coldEmissionEvent);
 		}

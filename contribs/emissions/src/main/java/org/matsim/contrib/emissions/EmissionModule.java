@@ -22,20 +22,18 @@ package org.matsim.contrib.emissions;
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
-import org.matsim.contrib.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.Vehicles;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.URL;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import static org.matsim.contrib.emissions.EmissionUtils.createIndexFromKey;
 
@@ -55,8 +53,6 @@ public final class EmissionModule {
 
 	//===
 
-	private Vehicles vehicles;
-	
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
 	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
 
@@ -99,8 +95,8 @@ public final class EmissionModule {
 		}
 
 		//TODO: create roadtype mapping here from config
-		createLookupTables( averageFleetWarmEmissionFactorsFile, averageFleetColdEmissionFactorsFile, detailedWarmEmissionFactorsFile,
-				detailedColdEmissionFactorsFile );
+		createLookupTables( averageFleetWarmEmissionFactorsFile, averageFleetColdEmissionFactorsFile, detailedWarmEmissionFactorsFile, detailedColdEmissionFactorsFile );
+
 		createEmissionHandler();
 
 		// Event handlers are now added to the event manager inside the respective Handlers, jm march '18
@@ -110,21 +106,19 @@ public final class EmissionModule {
 					 URL detailedWarmEmissionFactorsFile, URL detailedColdEmissionFactorsFile ) {
 		logger.info("entering createLookupTables");
 		
-		vehicles = scenario.getVehicles();
-
-		if( vehicles == null || vehicles.getVehicleTypes().isEmpty()) {
-			throw new RuntimeException("For emissions calculations, at least vehicle type information is necessary." +
-					"However, no information is provided. Aborting...");
-		} else {
-			for(VehicleType vehicleType : vehicles.getVehicleTypes().values()) {
-				if (vehicleType.getMaximumVelocity() < 4.0/3.6 ) {
-					// Historically, many emission vehicles file have maximum speed set to 1 m/s which was not used by mobsim before.
-					// However, this should be removed if not set intentionally. Amit May'17
-					logger.warn("The maximum speed of vehicle type "+ vehicleType+ " is less than 4 km/h. " +
-							"\n Please make sure, this is really what you want because this will affect the mobility simulation.");
-				}
-			}
-		}
+//		if( vehicles == null || vehicles.getVehicleTypes().isEmpty()) {
+//			throw new RuntimeException("For emissions calculations, at least vehicle type information is necessary." +
+//					"However, no information is provided. Aborting...");
+//		} else {
+//			for(VehicleType vehicleType : vehicles.getVehicleTypes().values()) {
+//				if (vehicleType.getMaximumVelocity() < 4.0/3.6 ) {
+//					// Historically, many emission vehicles file have maximum speed set to 1 m/s which was not used by mobsim before.
+//					// However, this should be removed if not set intentionally. Amit May'17
+//					logger.warn("The maximum speed of vehicle type "+ vehicleType+ " is less than 4 km/h. " +
+//							"\n Please make sure, this is really what you want because this will affect the mobility simulation.");
+//				}
+//			}
+//		}
 
 		avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
 		avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
@@ -143,17 +137,11 @@ public final class EmissionModule {
 	private void createEmissionHandler() {
 		logger.info("entering createEmissionHandler");
 		
-		Network network = scenario.getNetwork() ;
-
 		loadRoadTypeMappings();
 
-		WarmEmissionAnalysisModuleParameter parameterObject = new WarmEmissionAnalysisModuleParameter(avgHbefaWarmTable,
-				detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, warmPollutants, emissionConfigGroup);
-		warmEmissionHandler = new WarmEmissionHandler(vehicles, network, parameterObject, eventsManager, emissionConfigGroup.getEmissionEfficiencyFactor());
+		warmEmissionHandler = new WarmEmissionHandler(scenario, avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, warmPollutants, eventsManager);
 
-		ColdEmissionAnalysisModuleParameter parameterObject2 = new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable, coldPollutants,
-				emissionConfigGroup);
-		coldEmissionHandler = new ColdEmissionHandler( vehicles, network, parameterObject2, eventsManager, emissionConfigGroup.getEmissionEfficiencyFactor() );
+		coldEmissionHandler = new ColdEmissionHandler( scenario, avgHbefaColdTable, detailedHbefaColdTable, coldPollutants, eventsManager );
 		// this initiates all cold emissions processing!
 
 		logger.info("leaving createEmissionHandler");

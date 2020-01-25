@@ -26,7 +26,6 @@ import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup.EmissionsComputationMethod;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -120,9 +119,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 		}
 		ecg.setEmissionsComputationMethod( this.emissionsComputationMethod );
 
-		WarmEmissionAnalysisModuleParameter warmEmissionParameterObject = new WarmEmissionAnalysisModuleParameter(
-				avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, ecg);
-		weam = new WarmEmissionAnalysisModule(warmEmissionParameterObject, emissionEventManager, null);
+		weam = new WarmEmissionAnalysisModule( avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, emissionEventManager, ecg );
 
 
 	}

@@ -200,7 +200,7 @@ public final class EmissionUtils {
 
 		Gbl.assertNotNull(vehicleType);
 		Gbl.assertNotNull(vehicleType.getEngineInformation());
-		logger.info(vehicleType.getEngineInformation().getAttributes().toString());
+//		logger.info(vehicleType.getEngineInformation().getAttributes().toString());
 		Gbl.assertNotNull(VehicleUtils.getHbefaVehicleCategory( vehicleType.getEngineInformation() ));
 		HbefaVehicleCategory hbefaVehicleCategory = HbefaVehicleCategory.valueOf( VehicleUtils.getHbefaVehicleCategory( vehicleType.getEngineInformation() ) ) ;
 

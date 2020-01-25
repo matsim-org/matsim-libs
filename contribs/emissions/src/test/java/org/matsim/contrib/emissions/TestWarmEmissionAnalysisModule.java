@@ -28,7 +28,6 @@ import org.junit.runners.Parameterized;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.network.NetworkUtils;
@@ -168,24 +167,25 @@ public class TestWarmEmissionAnalysisModule {
 		this.emissionsComputationMethod = emissionsComputationMethod;
 	}
 
-	@Test
-	public void testWarmEmissionAnalysisParameter(){
-		setUp();
-		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		if ( (Boolean) true ==null ) {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
-		} else if ( true ) {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
-		} else {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
-		}
-
-		WarmEmissionAnalysisModuleParameter weamp
-				= new WarmEmissionAnalysisModuleParameter(avgHbefaWarmTable, null, hbefaRoadTrafficSpeeds, pollutants, ecg);
-		Assert.assertEquals(weamp.getClass(), WarmEmissionAnalysisModuleParameter.class);
-		weamp = new WarmEmissionAnalysisModuleParameter(null, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, ecg);
-		Assert.assertEquals(weamp.getClass(), WarmEmissionAnalysisModuleParameter.class);
-	}
+//	@Test
+//	public void testWarmEmissionAnalysisParameter(){
+//		setUp();
+//		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
+//		if ( (Boolean) true ==null ) {
+//			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
+//		} else if ( true ) {
+//			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
+//		} else {
+//			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
+//		}
+//
+//		WarmEmissionAnalysisModuleParameter weamp
+//				= new WarmEmissionAnalysisModuleParameter(avgHbefaWarmTable, null, hbefaRoadTrafficSpeeds, pollutants, ecg);
+//		Assert.assertEquals(weamp.getClass(), WarmEmissionAnalysisModuleParameter.class);
+//		weamp = new WarmEmissionAnalysisModuleParameter(null, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, ecg);
+//		Assert.assertEquals(weamp.getClass(), WarmEmissionAnalysisModuleParameter.class);
+//	}
+	// that parameter object no longer exists.  kai, jan'20
 
 	//@Test
 	//public void testWarmEmissionAnalysisModule_exceptions(){
@@ -981,78 +981,85 @@ public class TestWarmEmissionAnalysisModule {
 		//> ff speed - has been tested to throw runtime exceptions
 	}
 
-	@Test
-	public void rescaleWarmEmissionsTest() {
-		// can not use the setUp method here because the efficiency factor is not null
-		// setup ----
-		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<>();
-		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable = new HashMap<>();
+//	@Test
+//	public void rescaleWarmEmissionsTest() {
+//		// can not use the setUp method here because the efficiency factor is not null
+//		// setup ----
+//		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<>();
+//		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable = new HashMap<>();
+//
+//		fillAverageTable(avgHbefaWarmTable);
+//		fillDetailedTable(detailedHbefaWarmTable);
+//		Map<Pollutant, Double> warmEmissions;
+//
+//		Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds;
+//		hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(avgHbefaWarmTable);
+//		addDetailedRecordsToTestSpeedsTable(hbefaRoadTrafficSpeeds, detailedHbefaWarmTable);
+//
+//		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
+//
+//		double rescaleF = 1.0003;
+//
+//		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
+//		if ( (Boolean) true ==null ) {
+//			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
+//		} else if ( true ) {
+//			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
+//		} else {
+//			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
+//		}
+//		ecg.setEmissionsComputationMethod(AverageSpeed);
+//		// yyyyyy !!!!!!
+//
+////		WarmEmissionAnalysisModuleParameter weamParameter
+////				= new WarmEmissionAnalysisModuleParameter(avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, ecg);
+////		WarmEmissionAnalysisModule weam = new WarmEmissionAnalysisModule(weamParameter , detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, warmPollutants,
+////				emissionEventManager, rescaleF);
+//
+//		WarmEmissionAnalysisModule weam = new WarmEmissionAnalysisModule( avgHbefaWarmTable, detailedHbefaWarmTable,
+//				hbefaRoadTrafficSpeeds, pollutants, null, ecg );
+//
+//		HandlerToTestEmissionAnalysisModules.reset();
+//		// ---- end of setup
+//
+//		// case 3 - stop go entry in both tables, free flow entry in average table -> use average
+//		Id<Link> idForAvgTable = Id.create("link id avg", Link.class);
+//		Id<Vehicle> vehicleIdForAvgTable = Id.create("vehicle avg", Vehicle.class);
+//		Id<VehicleType> dieselVehicleTypeId = Id.create(
+//				PASSENGER_CAR +";"+ dieselTechnology+ ";"+ dieselSizeClass+";"+dieselConcept, VehicleType.class );
+//		double linkLength = 1000.;
+//		VehiclesFactory vehFac = VehicleUtils.getFactory();
+//		Vehicle vehicleForAvgTable = vehFac.createVehicle(vehicleIdForAvgTable, vehFac.createVehicleType(dieselVehicleTypeId));
+//		Link dieselLink = createMockLink("link table", linkLength, dieselFreeVelocity / 3.6);
+//
+//		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicleForAvgTable, dieselLink, linkLength /dieselFreeVelocity*3.6);
+//		weam.throwWarmEmissionEvent(10, idForAvgTable, vehicleIdForAvgTable, warmEmissions);
+//
+//		int numberOfWarmEmissions = pollutants.size();
+//
+//		String message = "The expected rescaled emissions for this event are (calculated emissions * rescalefactor) = "
+//						 + (numberOfWarmEmissions* AVG_PC_FACTOR_FF) + " * " + rescaleF + " = " +
+//						 (numberOfWarmEmissions* AVG_PC_FACTOR_FF *rescaleF) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
+//
+//		Assert.assertEquals(message, rescaleF*numberOfWarmEmissions* AVG_PC_FACTOR_FF, HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
+//
+//		///test the fractional approach with rescaling as well
+//		weam.getEcg().setEmissionsComputationMethod(StopAndGoFraction);
+//		HandlerToTestEmissionAnalysisModules.reset();
+//
+//		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicleForAvgTable, dieselLink, linkLength /dieselFreeVelocity*3.6);
+//		weam.throwWarmEmissionEvent(10, idForAvgTable, vehicleIdForAvgTable, warmEmissions);
+//
+//		numberOfWarmEmissions = pollutants.size();
+//
+//		message = "The expected rescaled emissions with the fractional method for this event are (calculated emissions * rescalefactor) = "
+//					  + (numberOfWarmEmissions* AVG_PC_FACTOR_FF) + " * " + rescaleF + " = " +
+//					  (numberOfWarmEmissions* AVG_PC_FACTOR_FF *rescaleF) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
+//
+//		Assert.assertEquals(message, rescaleF*numberOfWarmEmissions* AVG_PC_FACTOR_FF, HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
+//	}
+	// no longer available.  I didn't know what this would be good for. kai, jan'20
 
-		fillAverageTable(avgHbefaWarmTable);
-		fillDetailedTable(detailedHbefaWarmTable);
-		Map<Pollutant, Double> warmEmissions;
-
-		Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds;
-		hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(avgHbefaWarmTable);
-		addDetailedRecordsToTestSpeedsTable(hbefaRoadTrafficSpeeds, detailedHbefaWarmTable);
-
-		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
-
-		double rescaleF = 1.0003;
-
-		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		if ( (Boolean) true ==null ) {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
-		} else if ( true ) {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
-		} else {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
-		}
-		ecg.setEmissionsComputationMethod(AverageSpeed);
-		// yyyyyy !!!!!!
-
-		WarmEmissionAnalysisModuleParameter weamParameter
-				= new WarmEmissionAnalysisModuleParameter(avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, ecg);
-		WarmEmissionAnalysisModule weam = new WarmEmissionAnalysisModule(weamParameter , emissionEventManager, rescaleF);
-		HandlerToTestEmissionAnalysisModules.reset();
-		// ---- end of setup
-
-		// case 3 - stop go entry in both tables, free flow entry in average table -> use average
-		Id<Link> idForAvgTable = Id.create("link id avg", Link.class);
-		Id<Vehicle> vehicleIdForAvgTable = Id.create("vehicle avg", Vehicle.class);
-		Id<VehicleType> dieselVehicleTypeId = Id.create(
-				PASSENGER_CAR +";"+ dieselTechnology+ ";"+ dieselSizeClass+";"+dieselConcept, VehicleType.class );
-		double linkLength = 1000.;
-		VehiclesFactory vehFac = VehicleUtils.getFactory();
-		Vehicle vehicleForAvgTable = vehFac.createVehicle(vehicleIdForAvgTable, vehFac.createVehicleType(dieselVehicleTypeId));
-		Link dieselLink = createMockLink("link table", linkLength, dieselFreeVelocity / 3.6);
-
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicleForAvgTable, dieselLink, linkLength /dieselFreeVelocity*3.6);
-		weam.throwWarmEmissionEvent(10, idForAvgTable, vehicleIdForAvgTable, warmEmissions);
-
-		int numberOfWarmEmissions = pollutants.size();
-
-		String message = "The expected rescaled emissions for this event are (calculated emissions * rescalefactor) = "
-						 + (numberOfWarmEmissions* AVG_PC_FACTOR_FF) + " * " + rescaleF + " = " +
-						 (numberOfWarmEmissions* AVG_PC_FACTOR_FF *rescaleF) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
-
-		Assert.assertEquals(message, rescaleF*numberOfWarmEmissions* AVG_PC_FACTOR_FF, HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
-
-		///test the fractional approach with rescaling as well
-		weam.getEcg().setEmissionsComputationMethod(StopAndGoFraction);
-		HandlerToTestEmissionAnalysisModules.reset();
-
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicleForAvgTable, dieselLink, linkLength /dieselFreeVelocity*3.6);
-		weam.throwWarmEmissionEvent(10, idForAvgTable, vehicleIdForAvgTable, warmEmissions);
-
-		numberOfWarmEmissions = pollutants.size();
-
-		message = "The expected rescaled emissions with the fractional method for this event are (calculated emissions * rescalefactor) = "
-					  + (numberOfWarmEmissions* AVG_PC_FACTOR_FF) + " * " + rescaleF + " = " +
-					  (numberOfWarmEmissions* AVG_PC_FACTOR_FF *rescaleF) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
-
-		Assert.assertEquals(message, rescaleF*numberOfWarmEmissions* AVG_PC_FACTOR_FF, HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
-	}
 
 	private void setUp() {
 
@@ -1075,9 +1082,13 @@ public class TestWarmEmissionAnalysisModule {
 		}
 		ecg.setEmissionsComputationMethod( this.emissionsComputationMethod );
 
-		WarmEmissionAnalysisModuleParameter warmEmissionParameterObject = new WarmEmissionAnalysisModuleParameter(
-				avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, ecg);
-		weam = new WarmEmissionAnalysisModule(warmEmissionParameterObject, emissionEventManager, null);
+//		WarmEmissionAnalysisModuleParameter warmEmissionParameterObject = new WarmEmissionAnalysisModuleParameter(
+//				avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, ecg);
+//		weam = new WarmEmissionAnalysisModule(warmEmissionParameterObject, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, warmPollutants,
+//				emissionEventManager, null);
+
+		weam = new WarmEmissionAnalysisModule( avgHbefaWarmTable, detailedHbefaWarmTable, hbefaRoadTrafficSpeeds, pollutants, emissionEventManager, ecg );
+
 
 	}
 

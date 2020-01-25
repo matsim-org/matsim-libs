@@ -25,7 +25,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.testcases.MatsimTestUtils;
@@ -239,44 +238,47 @@ public class TestColdEmissionAnalysisModule {
 		
 	}
 	
-	@Test
-	public void rescaleColdEmissionsTest() {
-		
-		// can not use the setUp method here because the efficiency factor is not null
-		// (yy I don't know what this means.  kai, jul'18)
-		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable = new HashMap<>();
-		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable = new HashMap<>();
-		fillAveragesTable( avgHbefaColdTable );
-		fillDetailedTable( detailedHbefaColdTable );
-		
-		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
-		Double rescaleFactor = -.001;
-		
-		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
-		if ( (Boolean) true ==null ) {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
-		} else if ( true ) {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
-		} else {
-			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
-		}
-
-		ColdEmissionAnalysisModule ceam = new ColdEmissionAnalysisModule( new ColdEmissionAnalysisModuleParameter( avgHbefaColdTable, detailedHbefaColdTable, pollutants, ecg), emissionEventManager, rescaleFactor );
-		HandlerToTestEmissionAnalysisModules.reset();
-		
-		Id<Link> idForAvgTable = Id.create( "link id avg", Link.class );
-		Id<Vehicle> vehicleIdForAvgTable = Id.create( "vehicle avg", Vehicle.class );
-		Id<VehicleType> vehicleInfoForAvgCase = Id.create( "PASSENGER_CAR;"+ petrol_technology +";"+ none_sizeClass +";" + none_emConcept, VehicleType.class );
-		
-		Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleIdForAvgTable, VehicleUtils.getFactory().createVehicleType( vehicleInfoForAvgCase ) );
-		
-		ceam.calculateColdEmissionsAndThrowEvent( idForAvgTable, vehicle, startTime, parkingDuration, tableAccDistance );
-		String message = "The expected rescaled emissions for this event are (calculated emissions * rescalefactor) = "
-						     + ( numberOfColdEmissions * averagePetrolFactor ) + " * " + rescaleFactor + " = " +
-						     ( numberOfColdEmissions * averagePetrolFactor * rescaleFactor ) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
-		Assert.assertEquals( message, rescaleFactor * numberOfColdEmissions * averagePetrolFactor, HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
-		
-	}
+//	@Test
+//	public void rescaleColdEmissionsTest() {
+//
+//		// can not use the setUp method here because the efficiency factor is not null
+//		// (yy I don't know what this means.  kai, jul'18)
+//		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable = new HashMap<>();
+//		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable = new HashMap<>();
+//		fillAveragesTable( avgHbefaColdTable );
+//		fillDetailedTable( detailedHbefaColdTable );
+//
+//		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
+//		Double rescaleFactor = -.001;
+//
+//		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
+//		if ( (Boolean) true ==null ) {
+//			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.asEngineInformationAttributes );
+//		} else if ( true ) {
+//			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.usingVehicleTypeId );
+//		} else {
+//			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
+//		}
+//
+////		ColdEmissionAnalysisModule ceam = new ColdEmissionAnalysisModule( new ColdEmissionAnalysisModuleParameter( avgHbefaColdTable, detailedHbefaColdTable, pollutants, ecg), emissionEventManager, rescaleFactor );
+//		ColdEmissionAnalysisModule ceam = new ColdEmissionAnalysisModule( avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants,
+//				emissionEventManager );
+//		HandlerToTestEmissionAnalysisModules.reset();
+//
+//		Id<Link> idForAvgTable = Id.create( "link id avg", Link.class );
+//		Id<Vehicle> vehicleIdForAvgTable = Id.create( "vehicle avg", Vehicle.class );
+//		Id<VehicleType> vehicleInfoForAvgCase = Id.create( "PASSENGER_CAR;"+ petrol_technology +";"+ none_sizeClass +";" + none_emConcept, VehicleType.class );
+//
+//		Vehicle vehicle = VehicleUtils.getFactory().createVehicle( vehicleIdForAvgTable, VehicleUtils.getFactory().createVehicleType( vehicleInfoForAvgCase ) );
+//
+//		ceam.calculateColdEmissionsAndThrowEvent( idForAvgTable, vehicle, startTime, parkingDuration, tableAccDistance );
+//		String message = "The expected rescaled emissions for this event are (calculated emissions * rescalefactor) = "
+//						     + ( numberOfColdEmissions * averagePetrolFactor ) + " * " + rescaleFactor + " = " +
+//						     ( numberOfColdEmissions * averagePetrolFactor * rescaleFactor ) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
+//		Assert.assertEquals( message, rescaleFactor * numberOfColdEmissions * averagePetrolFactor, HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
+//
+//	}
+	// rescale is no longer available. I had no idea what this was good for.  kai, jan'20
 	
 	private void setUp() {
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable = new HashMap<>();
@@ -294,7 +296,8 @@ public class TestColdEmissionAnalysisModule {
 		} else {
 			ecg.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
 		}
-		coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( new ColdEmissionAnalysisModuleParameter( avgHbefaColdTable, detailedHbefaColdTable, pollutants , ecg), emissionEventManager, null );
+//		coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( new ColdEmissionAnalysisModuleParameter( avgHbefaColdTable, detailedHbefaColdTable, pollutants , ecg), emissionEventManager, null );
+		coldEmissionAnalysisModule = new ColdEmissionAnalysisModule( avgHbefaColdTable, detailedHbefaColdTable, ecg, pollutants, emissionEventManager );
 		
 	}
 	

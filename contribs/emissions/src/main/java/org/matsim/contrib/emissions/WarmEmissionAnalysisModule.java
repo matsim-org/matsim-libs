@@ -56,7 +56,6 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 	private final Set<Pollutant> warmPollutants;
 
 	private final EventsManager eventsManager;
-	private final Double emissionEfficiencyFactor;
 	private final EmissionsConfigGroup ecg;
 
 	private int vehAttributesNotSpecifiedCnt = 0;
@@ -78,53 +77,22 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 	private double saturatedKmCounter = 0.0;
 	private double stopGoKmCounter = 0.0;
 
-	/*package-private*/ static class WarmEmissionAnalysisModuleParameter {
+	public WarmEmissionAnalysisModule(
+			Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable,
+			Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable,
+			Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds,
+			Set<Pollutant> warmPollutants, EventsManager eventsManager, EmissionsConfigGroup ecg ){
+		this.ecg = ecg;
 
-		/*package-private*/ final Map<HbefaWarmEmissionFactorKey,  HbefaWarmEmissionFactor> avgHbefaWarmTable;
-		/*package-private*/ final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
-		private final Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds;
-		private final EmissionsConfigGroup ecg;
-		private final Set<Pollutant> warmPollutants;
+		Gbl.assertIf( avgHbefaWarmTable!=null || detailedHbefaWarmTable!=null );
+		this.avgHbefaWarmTable = avgHbefaWarmTable;
+		this.detailedHbefaWarmTable = detailedHbefaWarmTable;
+		this.hbefaRoadTrafficSpeeds = hbefaRoadTrafficSpeeds;
+		this.warmPollutants = warmPollutants;
 
-		/*package-private*/ WarmEmissionAnalysisModuleParameter(
-				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable,
-				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable,
-				Map<HbefaRoadVehicleCategoryKey, Map<HbefaTrafficSituation, Double>> hbefaRoadTrafficSpeeds,
-				Set<Pollutant> warmPollutants,
-				EmissionsConfigGroup emissionsConfigGroup) {
-			this.avgHbefaWarmTable = avgHbefaWarmTable;
-			this.detailedHbefaWarmTable = detailedHbefaWarmTable;
-			this.hbefaRoadTrafficSpeeds = hbefaRoadTrafficSpeeds;
-			this.warmPollutants = warmPollutants;
+		Gbl.assertNotNull( eventsManager );
+		this.eventsManager = eventsManager;
 
-			this.ecg = emissionsConfigGroup;
-			// check if all needed tables are non-null
-
-			if(avgHbefaWarmTable == null && detailedHbefaWarmTable == null){
-				 logger.error("Neither average nor detailed table vor Hbefa warm emissions set. Aborting...");
-				 System.exit(0);
-			}
-		}
-	}
-
-	WarmEmissionAnalysisModule( WarmEmissionAnalysisModuleParameter parameterObject,
-				    EventsManager emissionEventsManager, Double emissionEfficiencyFactor ) {
-
-		if(parameterObject == null){
-			logger.error("No warm emission analysis module parameter set. Aborting...");
-			System.exit(0);
-		}
-		if(emissionEventsManager == null){
-			logger.error("Event manager not set. Please check the configuration of your scenario. Aborting..." );
-			System.exit(0);
-		}
-		this.avgHbefaWarmTable = parameterObject.avgHbefaWarmTable;
-		this.detailedHbefaWarmTable = parameterObject.detailedHbefaWarmTable;
-		this.hbefaRoadTrafficSpeeds = parameterObject.hbefaRoadTrafficSpeeds;
-		this.warmPollutants = parameterObject.warmPollutants;
-		this.eventsManager = emissionEventsManager;
-		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
-		this.ecg = parameterObject.ecg;
 	}
 
 	void reset() {
@@ -177,21 +145,21 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 		// a basic apporach to introduce emission reduced cars:
 		// yy this should be deprecated. kai, jan'20
-		if(emissionEfficiencyFactor != null){
-			warmEmissions = rescaleWarmEmissions(warmEmissions, emissionEfficiencyFactor);
-		}
+//		if( ecg.getEmissionEfficiencyFactor()!=1. ) {
+//			warmEmissions = rescaleWarmEmissions(warmEmissions, ecg.getEmissionEfficiencyFactor();
+//		}
 		return warmEmissions;
 	}
 
-	static Map<Pollutant, Double> rescaleWarmEmissions( Map<Pollutant, Double> warmEmissions, double emissionEfficiencyFactor ) {
-		Map<Pollutant, Double> rescaledWarmEmissions = new HashMap<>();
-		for( Pollutant wp : warmEmissions.keySet()){
-			Double orgValue = warmEmissions.get(wp);
-			Double rescaledValue = emissionEfficiencyFactor * orgValue;
-			rescaledWarmEmissions.put(wp, rescaledValue);
-		}
-		return rescaledWarmEmissions;
-	}
+//	static Map<Pollutant, Double> rescaleWarmEmissions( Map<Pollutant, Double> warmEmissions, double emissionEfficiencyFactor ) {
+//		Map<Pollutant, Double> rescaledWarmEmissions = new HashMap<>();
+//		for( Pollutant wp : warmEmissions.keySet()){
+//			Double orgValue = warmEmissions.get(wp);
+//			Double rescaledValue = emissionEfficiencyFactor * orgValue;
+//			rescaledWarmEmissions.put(wp, rescaledValue);
+//		}
+//		return rescaledWarmEmissions;
+//	}
 
 	private static int cnt =10;
 	private Map<Pollutant, Double> calculateWarmEmissions( Id<Vehicle> vehicleId, double travelTime_sec, String roadType, double freeVelocity_ms,
@@ -264,7 +232,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		// for the average speed method, the traffic situation is already known here:
 		if (ecg.getEmissionsComputationMethod() == AverageSpeed) {
 			final HbefaTrafficSituation trafficSituation = getTrafficSituation( efkey, averageSpeed_kmh, freeVelocity_ms * 3.6 );
-			logger.warn( "trafficSituation=" + trafficSituation );
+//			logger.warn( "trafficSituation=" + trafficSituation );
 			efkey.setHbefaTrafficSituation( trafficSituation );
 		}
 
@@ -438,54 +406,42 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 		}
 	}
-
 	/*package-private*/ int getFreeFlowOccurences() {
 		return freeFlowCounter;
 	}
-
 	/*package-private*/ private int getHeavyOccurences() {
 		return heavyFlowCounter;
 	}
-
 	/*package-private*/ private int getSaturatedOccurences() {
 		return saturatedCounter;
 	}
-
 	/*package-private*/ int getStopGoOccurences() {
 		return stopGoCounter;
 	}
-
 	/*package-private*/ double getKmCounter() {
 		return kmCounter;
 	}
-
 	/*package-private*/ double getFreeFlowKmCounter() {
 		return freeFlowKmCounter;
 	}
-
 	/*package-private*/ private double getHeavyFlowKmCounter() {
 		return heavyFlowKmCounter;
 	}
-
 	/*package-private*/ private double getSaturatedKmCounter() {
 		return saturatedKmCounter;
 	}
-
 	/*package-private*/ double getStopGoKmCounter() {
 		return stopGoKmCounter;
 	}
-
 	/*package-private*/ int getWarmEmissionEventCounter() {
 		return emissionEventCounter;
 	}
-
 	/*package-private*/ int getFractionOccurences() {
 		return fractionCounter;
 	}
 	/*package-private*/ double getFractionKmCounter() {
 		return getSaturatedKmCounter() + getHeavyFlowKmCounter();
 	}
-
 	/*package-private*/ EmissionsConfigGroup getEcg() {
 		return ecg;
 	}

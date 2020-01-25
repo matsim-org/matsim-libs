@@ -353,28 +353,28 @@ public final class EmissionsConfigGroup
 		isWritingEmissionsEvents = writingEmissionsEvents;
 	}
 	// ---
-	/**
-	 * @return {@value #EMISSION_EFFICIENCY_FACTOR_CMT}
-	 *
-	 * @deprecated -- I cannot see a goot use case for this: Since this is not even by vehicle type, it could easily be done in the events file
-	 * postprocessing.  kai, jan'20
-	 */
-	@Deprecated
-	@StringGetter(EMISSION_EFFICIENCY_FACTOR)
-	public double getEmissionEfficiencyFactor() {
-		return emissionEfficiencyFactor;
-	}
-	/**
-	 * @param emissionEfficiencyFactor -- {@value #EMISSION_EFFICIENCY_FACTOR_CMT}
-	 *
-	 * @deprecated -- I cannot see a goot use case for this: Since this is not even by vehicle type, it could easily be done in the events file
-	 * postprocessing.  kai, jan'20
-	 */
-	@Deprecated
-	@StringSetter(EMISSION_EFFICIENCY_FACTOR)
-	public void setEmissionEfficiencyFactor(double emissionEfficiencyFactor) {
-		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
-	}
+//	/**
+//	 * @return {@value #EMISSION_EFFICIENCY_FACTOR_CMT}
+//	 *
+//	 * @deprecated -- I cannot see a goot use case for this: Since this is not even by vehicle type, it could easily be done in the events file
+//	 * postprocessing.  kai, jan'20
+//	 */
+//	@Deprecated
+//	@StringGetter(EMISSION_EFFICIENCY_FACTOR)
+//	public double getEmissionEfficiencyFactor() {
+//		return emissionEfficiencyFactor;
+//	}
+//	/**
+//	 * @param emissionEfficiencyFactor -- {@value #EMISSION_EFFICIENCY_FACTOR_CMT}
+//	 *
+//	 * @deprecated -- I cannot see a goot use case for this: Since this is not even by vehicle type, it could easily be done in the events file
+//	 * postprocessing.  kai, jan'20
+//	 */
+//	@Deprecated
+//	@StringSetter(EMISSION_EFFICIENCY_FACTOR)
+//	public void setEmissionEfficiencyFactor(double emissionEfficiencyFactor) {
+//		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
+//	}
 	// ---
 //	@StringGetter(EMISSION_COST_MULTIPLICATION_FACTOR)
 	// not used in contrib itself --> does not belong here; disable xml functionality and set deprecated in code.  kai, oct'18
