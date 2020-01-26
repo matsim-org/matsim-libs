@@ -27,7 +27,6 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestAcceptedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequests;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
@@ -70,12 +69,6 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
 		if (requiresReoptimization && isNewDecisionEpoch(e, params.getReoptimizationTimeStep())) {
-			for (TaxiRequest req : unplannedRequests) {
-				eventsManager.processEvent(
-						new PassengerRequestAcceptedEvent(e.getSimulationTime(), taxiCfg.getMode(), req.getId(),
-								req.getPassengerId()));
-			}
-
 			if (params.doUnscheduleAwaitingRequests) {
 				unscheduleAwaitingRequests();
 			}
