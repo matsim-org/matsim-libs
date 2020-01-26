@@ -90,7 +90,7 @@ public class GroupPlanStrategyFactoryUtils {
 		return new IndividualBasedGroupStrategyModule(
 				new TourModeUnifierModule(
 					config.global().getNumberOfThreads(),
-					JointActingTypes.JOINT_STAGE_ACTS,
+					JointActingTypes.JOINT_STAGE_ACTS::contains,
 					new MainModeIdentifier() {
 						@Override
 						public String identifyMainMode(
