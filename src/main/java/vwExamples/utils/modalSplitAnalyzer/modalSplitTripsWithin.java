@@ -739,7 +739,7 @@ public class modalSplitTripsWithin {
 						// Collection<Subtour> subtours = TripStructureUtils.getSubtours(plan,
 						// stagesActivities);
 
-						for (Subtour subTour : TripStructureUtils.getSubtours(plan, new HashSet<>(Arrays.asList(ParkingRouterNetworkRoutingModule.parkingStageActivityType)))) {
+						for (Subtour subTour : TripStructureUtils.getSubtours(plan, ParkingRouterNetworkRoutingModule.parkingStageActivityType::equals)) {
 							// List<Integer> replaceTripIndices = null;
 							// replaceTripIndices = getReplaceableTripIndices(subTour, plan);
 							// System.out.println(replaceTripIndices);

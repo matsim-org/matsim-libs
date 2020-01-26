@@ -203,7 +203,7 @@ public class PlanModifierEGrocery {
 
 			PersonUtils.removeUnselectedPlans(person);
 			Plan plan = person.getSelectedPlan();
-            for (Subtour subTour : TripStructureUtils.getSubtours(plan, new HashSet<>(stages))) {
+            for (Subtour subTour : TripStructureUtils.getSubtours(plan, new HashSet<>(stages)::contains)) {
 
 				String subtourMode = getSubtourMode(subTour, plan);
 
@@ -279,7 +279,7 @@ public class PlanModifierEGrocery {
 
 				// Loop over all subtours of this agent
 
-                for (Subtour subTour : TripStructureUtils.getSubtours(plan, new HashSet<>(stages))) {
+                for (Subtour subTour : TripStructureUtils.getSubtours(plan, new HashSet<>(stages)::contains)) {
 
 					double estimatedTourDistance = getBeelineTourLength(subTour);
 					// Get subtour mode
