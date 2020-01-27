@@ -311,7 +311,7 @@ public class NetworkUtilsTest {
 		}
 
 		@Override
-		public double getNumberOfLanes(final double time) {
+		public double getNumberOfLanes() {
 			return this.nOfLanes;
 		}
 	}
