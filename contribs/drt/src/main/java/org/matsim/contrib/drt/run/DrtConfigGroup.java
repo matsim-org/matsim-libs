@@ -612,8 +612,9 @@ public final class DrtConfigGroup extends ReflectiveConfigGroup implements Modal
 		return advanceRequestPlanningHorizon;
 	}
 
-	public void setAdvanceRequestPlanningHorizon(double advanceRequestPlanningHorizon) {
+	public DrtConfigGroup setAdvanceRequestPlanningHorizon(double advanceRequestPlanningHorizon) {
 		this.advanceRequestPlanningHorizon = advanceRequestPlanningHorizon;
+		return this;
 	}
 
 	/**
