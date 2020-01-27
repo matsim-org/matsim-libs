@@ -89,7 +89,7 @@ public class DrtScheduleTimingUpdater {
 			DrtTask task = (DrtTask)tasks.get(i);
 			double calcEndTime = calcNewEndTime(vehicle, task, newBeginTime);
 
-			if (Time.isUndefinedTime(calcEndTime)) {
+			if (calcEndTime == UNDEFINED_TIME) {
 				schedule.removeTask(task);
 				i--;
 			} else if (calcEndTime < newBeginTime) {// 0 s is fine (e.g. last 'wait')
@@ -102,6 +102,8 @@ public class DrtScheduleTimingUpdater {
 		}
 	}
 
+	private final static double UNDEFINED_TIME = Double.NEGATIVE_INFINITY;
+
 	private double calcNewEndTime(DvrpVehicle vehicle, DrtTask task, double newBeginTime) {
 		switch (task.getDrtTaskType()) {
 			case STAY: {
@@ -113,7 +115,7 @@ public class DrtScheduleTimingUpdater {
 					// must have been added at time submissionTime <= t
 					double oldEndTime = task.getEndTime();
 					if (oldEndTime <= newBeginTime) {// may happen if the previous task is delayed
-						return Time.UNDEFINED_TIME;// remove the task
+						return UNDEFINED_TIME;// remove the task
 					} else {
 						return oldEndTime;
 					}
