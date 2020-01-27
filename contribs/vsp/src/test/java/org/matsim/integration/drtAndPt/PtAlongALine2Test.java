@@ -197,7 +197,8 @@ public class PtAlongALine2Test{
 				mm.addParameterSet(
 						new DrtConfigGroup().setMode( TransportMode.drt ).setMaxTravelTimeAlpha( 1.3 ).setVehiclesFile( drtVehiclesFile )
 								    .setMaxTravelTimeBeta( 5. * 60. ).setStopDuration( 60. ).setMaxWaitTime( Double.MAX_VALUE )
-								    .setRejectRequestIfMaxWaitOrTravelTimeViolated( false ).setUseModeFilteredSubnetwork( true ) );
+								    .setRejectRequestIfMaxWaitOrTravelTimeViolated( false ).setUseModeFilteredSubnetwork( true )
+									.setAdvanceRequestPlanningHorizon(900));
 			}
 			if ( drt2 ) {
 				mm.addParameterSet(
