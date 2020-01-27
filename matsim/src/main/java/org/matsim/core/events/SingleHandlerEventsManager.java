@@ -80,8 +80,6 @@ public final class SingleHandlerEventsManager implements EventsManager {
 
 	private static final Logger log = Logger.getLogger(SingleHandlerEventsManager.class);
 	
-	private int iteration = 0;
-
 	/*
 	 * This cannot be just a map<Class, Method> since we need to differentiate between
 	 * a) Class is handled the first time, therefore we have to check whether the Handler can handle it (no HandlerInfo object)
@@ -202,7 +200,7 @@ public final class SingleHandlerEventsManager implements EventsManager {
 
 	@Override
 	public void initProcessing() {
-		resetHandlers(iteration);
+		// nothing to do in this implementation
 	}
 
 	@Override
@@ -212,7 +210,7 @@ public final class SingleHandlerEventsManager implements EventsManager {
 
 	@Override
 	public void finishProcessing() {
-		iteration += 1;
+		// nothing to do in this implementation
 	}
 
 	public EventHandler getEventHandler() {

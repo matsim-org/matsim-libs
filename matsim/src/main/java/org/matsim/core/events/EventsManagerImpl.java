@@ -84,7 +84,6 @@ import org.matsim.core.utils.misc.ClassUtils;
 public final class EventsManagerImpl implements EventsManager {
 
 	private static final Logger log = Logger.getLogger(EventsManagerImpl.class);
-	private int iteration = 0;
 
 	static private class HandlerData {
 
@@ -181,7 +180,7 @@ public final class EventsManagerImpl implements EventsManager {
 	}
 
 	@Override
-	public void resetHandlers(int iteration) {
+	public void resetHandlers(final int iteration) {
 		log.info("resetting Event-Handlers");
 		this.counter = 0;
 		this.nextCounterMsg = 1;
@@ -199,7 +198,7 @@ public final class EventsManagerImpl implements EventsManager {
 
 	@Override
 	public void initProcessing() {
-		resetHandlers(iteration);
+		// nothing to do in this implementation
 	}
 
 	@Override
@@ -209,7 +208,7 @@ public final class EventsManagerImpl implements EventsManager {
 
 	@Override
 	public void finishProcessing() {
-		iteration += 1;
+		// nothing to do in this implementation
 	}
 
 	private void addHandlerInterfaces(final EventHandler handler, final Class<?> handlerClass) {
