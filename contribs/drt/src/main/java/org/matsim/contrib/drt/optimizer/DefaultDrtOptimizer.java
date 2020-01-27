@@ -60,7 +60,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	private final EmptyVehicleRelocator relocator;
 	private final UnplannedRequestInserter requestInserter;
 
-	private final RequestQueue<DrtRequest> unplannedRequests = RequestQueue.withAllAdvanceRequestsScheduling();
+	private final RequestQueue<DrtRequest> unplannedRequests;
 
 	public DefaultDrtOptimizer(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer, DepotFinder depotFinder,
 			RebalancingStrategy rebalancingStrategy, DrtScheduleInquiry scheduleInquiry,
@@ -78,6 +78,8 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		rebalancingInterval = drtCfg.getMinCostFlowRebalancing()
 				.map(MinCostFlowRebalancingParams::getInterval)
 				.orElse(null);
+		unplannedRequests = RequestQueue.withLimitedAdvanceRequestPlanningHorizon(
+				drtCfg.getAdvanceRequestPlanningHorizon());
 	}
 
 	@Override

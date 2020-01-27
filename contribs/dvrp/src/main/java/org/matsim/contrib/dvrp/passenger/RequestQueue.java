@@ -52,12 +52,18 @@ public final class RequestQueue<R extends PassengerRequest> {
 		}
 	}
 
-	public static <R extends PassengerRequest> RequestQueue<R> withAllAdvanceRequestsScheduling() {
+	public static <R extends PassengerRequest> RequestQueue<R> withLimitedAdvanceRequestPlanningHorizon(
+			double planningHorizon) {
+		//all immediate and selected advance (i.e. starting within the planning horizon) requests are scheduled
+		return new RequestQueue<R>(planningHorizon);
+	}
+
+	public static <R extends PassengerRequest> RequestQueue<R> withInfiniteAdvanceRequestPlanningHorizon() {
 		return new RequestQueue<R>(Double.POSITIVE_INFINITY);//all immediate and advance requests are scheduled
 	}
 
-	public static <R extends PassengerRequest> RequestQueue<R> withNoAdvanceRequestScheduling() {
-		return new RequestQueue<R>(0);//reactive scheduling of immediate requests only
+	public static <R extends PassengerRequest> RequestQueue<R> withNoAdvanceRequestPlanningHorizon() {
+		return new RequestQueue<R>(0);//immediate requests only
 	}
 
 	private static final Comparator<PassengerRequest> ABSOLUTE_COMPARATOR = Comparator.comparing(
@@ -76,7 +82,7 @@ public final class RequestQueue<R extends PassengerRequest> {
 
 	private double lastTimeStep = -Double.MAX_VALUE;
 
-	public RequestQueue(double planningHorizon) {
+	private RequestQueue(double planningHorizon) {
 		this.planningHorizon = planningHorizon;
 	}
 

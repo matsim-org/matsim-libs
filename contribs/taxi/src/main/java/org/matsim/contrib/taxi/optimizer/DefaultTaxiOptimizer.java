@@ -41,7 +41,7 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	private final Fleet fleet;
 	private final TaxiScheduler scheduler;
 
-	private final RequestQueue<TaxiRequest> unplannedRequests = RequestQueue.withNoAdvanceRequestScheduling();
+	private final RequestQueue<TaxiRequest> unplannedRequests = RequestQueue.withNoAdvanceRequestPlanningHorizon();
 
 	private final UnplannedRequestInserter requestInserter;
 
