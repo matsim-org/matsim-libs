@@ -35,31 +35,29 @@ public class LinkEnterEvent extends Event implements HasLinkId {
 	
 	private final Id<Link> linkId;
 	private final Id<Vehicle> vehicleId;
+	private final Id<Person> driverId;
 
 	final static String missingVehicleIdMessage = "vehicleId=null in LinkEnter/LeaveEvent; this would cause problems downstream thus we are not accepting it";
 
-	public LinkEnterEvent(final double time, final Id<Vehicle> vehicleId, final Id<Link> linkId) {
+	public LinkEnterEvent(final double time, final Id<Vehicle> vehicleId, final Id<Link> linkId, final Id<Person> driverId) {
 		super(time);
 		this.linkId = linkId;
 		if ( vehicleId==null ) {
 			throw new RuntimeException( missingVehicleIdMessage ) ;
 		}
 		this.vehicleId = vehicleId;
+		this.driverId = driverId;
+	}
+
+	public LinkEnterEvent(final double time, final Id<Vehicle> vehicleId, final Id<Link> linkId) {
+		this(time, vehicleId, linkId, null);
 	}
 
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
 	}
-	
-	/**
-	 * Please use getVehicleId() instead. 
-	 * Vehicle-driver relations can be made by {@link VehicleEntersTrafficEvent} and {@link VehicleLeavesTrafficEvent}.
-	 */
-	@Deprecated
-	public Id<Person> getDriverId() {
-		throw new RuntimeException( LinkLeaveEvent.missingDriverIdMessage ) ;
-	}	
+
 	@Override
 	public Id<Link> getLinkId() {
 		return this.linkId;
@@ -67,6 +65,10 @@ public class LinkEnterEvent extends Event implements HasLinkId {
 	
 	public Id<Vehicle> getVehicleId() {
 		return vehicleId;
+	}
+
+	public Id<Person> getDriverId() {
+		return driverId;
 	}
 
 	@Override

@@ -26,6 +26,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.ParallelEventHandlingConfigGroup;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.hermes.Hermes;
+import org.matsim.core.mobsim.hermes.WorldDumper;
 
 import javax.inject.Inject;
 import java.lang.Thread.UncaughtExceptionHandler;
@@ -64,6 +66,8 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 	
 	private AtomicLong counter;
 	private AtomicReference<Throwable> hadException = new AtomicReference<>();
+	
+	private int iteration = 0;
 
 	@Inject
 	SimStepParallelEventsManagerImpl(ParallelEventHandlingConfigGroup config) {
@@ -94,6 +98,12 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 
 	@Override
 	public void processEvent(final Event event) {
+		if (	Hermes.DEBUG_EVENTS &&
+				event != null &&
+				event.getEventType() != null &&
+				!event.getEventType().equals("simstepend")) {
+			WorldDumper.dumpEvent(event);
+		}
 		this.counter.incrementAndGet();
 		
 		if (parallelMode) {
@@ -172,6 +182,7 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 		 * the EventsProcessingThreads.
 		 */
 		this.parallelMode = true;
+		resetHandlers(iteration);
 	}
 		
 	/*
@@ -211,6 +222,8 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 		if (throwable != null) {
 			throw new RuntimeException("Exception while processing events. Cannot guarantee that all events have been fully processed.", throwable);
 		}
+		
+		iteration += 1;
 	}
 
 	@Override

@@ -30,7 +30,7 @@ public abstract class Event {
 	public final static String ATTRIBUTE_TIME = "time";
 	public final static String ATTRIBUTE_TYPE = "type";
 
-	private final double time;
+	private double time;
 
 	public Event(final double time) {
 		this.time = time;
@@ -53,6 +53,10 @@ public abstract class Event {
 
 	public final double getTime() {
 		return this.time;
+	}
+
+	public void setTime(double time) {
+		this.time = time;
 	}
 	
 	public String toString() {

@@ -25,6 +25,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.utils.MemoryObserver;
+import org.matsim.core.mobsim.hermes.Hermes;
+import org.matsim.core.mobsim.hermes.WorldDumper;
 
 /*package*/ abstract class AbstractController {
     // we already had one case where a method of this was removed, causing downstream failures; better just not
@@ -133,7 +135,8 @@ import org.matsim.utils.MemoryObserver;
             }
         });
 
-        if (iteration > config.controler().getFirstIteration()) {
+        if (iteration > config.controler().getFirstIteration() &&
+              (Hermes.inner_its == 0 || Hermes.iteration % Hermes.inner_its == 0)) {
             iterationStep("replanning", new Runnable() {
                 @Override
                 public void run() {
@@ -142,6 +145,7 @@ import org.matsim.utils.MemoryObserver;
             });
         }
 
+        WorldDumper.setup(config.controler().getOutputDirectory());
         mobsim(config, iteration);
 
         iterationStep("scoring", new Runnable() {
@@ -226,9 +230,12 @@ import org.matsim.utils.MemoryObserver;
     }
 
     private void iterationStep(String iterationStepName, Runnable iterationStep) throws MatsimRuntimeModifications.UnexpectedShutdownException {
+        long time;
         this.getStopwatch().beginOperation(iterationStepName);
+        time = System.currentTimeMillis();
         iterationStep.run();
         this.getStopwatch().endOperation(iterationStepName);
+        log.info(String.format("ETHZ %s took %d ms", iterationStepName, System.currentTimeMillis() - time));
         if (Thread.interrupted()) {
             throw new MatsimRuntimeModifications.UnexpectedShutdownException();
         }
