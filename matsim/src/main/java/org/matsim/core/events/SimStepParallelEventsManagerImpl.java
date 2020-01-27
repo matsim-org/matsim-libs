@@ -66,8 +66,6 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 	
 	private AtomicLong counter;
 	private AtomicReference<Throwable> hadException = new AtomicReference<>();
-	
-	private int iteration = 0;
 
 	@Inject
 	SimStepParallelEventsManagerImpl(ParallelEventHandlingConfigGroup config) {
@@ -182,7 +180,6 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 		 * the EventsProcessingThreads.
 		 */
 		this.parallelMode = true;
-		resetHandlers(iteration);
 	}
 		
 	/*
@@ -204,7 +201,9 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 		if (throwable == null) {
 			try {
 				this.processEvent(new LastEventOfIteration(Double.POSITIVE_INFINITY));
+				System.out.println("########## Going to wait...");
 				iterationEndBarrier.await();
+				System.out.println("########## Going to wait... Done!");
 			} catch (InterruptedException | BrokenBarrierException e) {
 				this.hadException.set(e);
 			}
@@ -222,8 +221,6 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 		if (throwable != null) {
 			throw new RuntimeException("Exception while processing events. Cannot guarantee that all events have been fully processed.", throwable);
 		}
-		
-		iteration += 1;
 	}
 
 	@Override

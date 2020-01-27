@@ -135,8 +135,7 @@ import org.matsim.core.mobsim.hermes.WorldDumper;
             }
         });
 
-        if (iteration > config.controler().getFirstIteration() &&
-              (Hermes.inner_its == 0 || Hermes.iteration % Hermes.inner_its == 0)) {
+        if (iteration > config.controler().getFirstIteration()) {
             iterationStep("replanning", new Runnable() {
                 @Override
                 public void run() {
