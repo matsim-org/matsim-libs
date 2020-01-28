@@ -943,7 +943,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			// TODO what happens for ways that are no oneway??
 		}
 	}
-	//TODO Method name a little bit confousing - maybe integrate in above method
+	//TODO Method name a little bit confusing - maybe integrate in above method
 	private void pushSignalOverShortWay(OsmWay shortWay, OsmNode fromNode, OsmNode toNode) {
         if (shortWay.nodes.size() == 2 && NetworkUtils.getEuclideanDistance(fromNode.coord.getX(), fromNode.coord.getY(),
                 toNode.coord.getX(), toNode.coord.getY()) < SIGNAL_MERGE_DISTANCE) {
@@ -964,6 +964,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				String oneway = way.tags.get(TAG_ONEWAY);
 
 				if (signalizedOsmNodes.contains(signalNode.id) && !isNodeAtJunction(signalNode)) {
+
 					if ((oneway != null && !oneway.equals("-1") && !oneway.equals("no")) || oneway == null) {
 						endPoint = this.nodes.get(way.nodes.get(way.nodes.size() - 1));
                         if (signalizedOsmNodes.contains(endPoint.id) && isNodeAtJunction(endPoint)
@@ -971,6 +972,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
                                 endPoint.coord.getX(), endPoint.coord.getY()) < SIGNAL_MERGE_DISTANCE)
 							signalizedOsmNodes.remove(signalNode.id);
 					}
+					//sbraun20200128: Oneway Street reversed - need to keep that
 					if ((oneway != null && !oneway.equals("yes") && !oneway.equals("true") && !oneway.equals("1")
 							&& !oneway.equals("no")) || oneway == null) {
 						endPoint = this.nodes.get(way.nodes.get(0));
@@ -986,7 +988,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 	// TODO this method already moves signals over crossings to endpoints of ways. do we still need pushingSingnalsIntoEndpoints? 
 	// or, if we need it because it does additional stuff, can we remove the case for crossings/endpoints here in this method??
-	//TODO sbraun 07102019 - We will integrate "pushingSingnalsIntoEndpoints" here as we save one loop over all ways
 	private void pushSignalsIntoNearbyJunctions() {
 		for (OsmWay way : this.ways.values()) {
 			// go through all nodes, except the first and the last
@@ -999,7 +1000,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						// positive oneway or no oneway
 
 						//TODO 20200124 sbraun: loops over all nodes of this way to find the closest junction. The problem seems
-						//that once he found that node he continue to loop over the nodes of the way
+						//that once he found that node he continue to loop over the nodes of the way, so once junction is found it continues to look
 						OsmNode nextNode = this.nodes.get(way.nodes.get(i + 1));
 						if (nextNode.ways.size() > 1) {
 							// either a junction or the end point of this way where a new way start
@@ -1012,13 +1013,13 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 								junctionNode = this.nodes.get(way.nodes.get(i + 2));
 							}
 						}
-						//TODO sbraun 20200124 try to break here
-						//if (junctionNode!= null) break;
 					}
                     if (junctionNode != null && NetworkUtils.getEuclideanDistance(signalNode.coord.getX(), signalNode.coord.getY(),
                             junctionNode.coord.getX(), junctionNode.coord.getY()) < SIGNAL_MERGE_DISTANCE) {
 						signalizedOsmNodes.remove(signalNode.id);
 						signalizedOsmNodes.add(junctionNode.id);
+
+						//TODO sbraun20200128: This could have been checked further up, would be much clearer -> dont have code above double in this method
 					} else if ((oneway != null && oneway.equals("-1")) || oneway == null) {
 						// "else" = no nearby junction found in positive direction. try reverse direction:
 						// "if" = reverse oneway or no oneway (check opposite direction)
@@ -1041,6 +1042,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						}
 					}
 				}
+				//TODO sbraun 20200124 try to break here?  28.01.2020 doesnt do anything in Cottbus
+				//if (junctionNode!= null) break;
 			}
 		}
 	}
@@ -2012,6 +2015,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 	}
 
+
+	//TODO sbraun20200128: Problem mit dem Set signalizedOSMNodes
 	@Override
 	protected void setOrModifyNodeAttributes(Node n, OsmNode node) {
 		// create empty signal system for the node
