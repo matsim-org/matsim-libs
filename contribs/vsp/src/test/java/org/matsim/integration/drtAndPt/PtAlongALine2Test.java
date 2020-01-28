@@ -219,12 +219,12 @@ public class PtAlongALine2Test{
 
 			// TODO: avoid really writing out these files. However so far it is unclear how
 			// to configure DRT and load the vehicles otherwise
-			PtAlongALineTest.createDrtVehiclesFile(drtVehiclesFile, "DRT-", 10, Id.createLinkId("0-1" ) );
+			PtAlongALineTest.createDrtVehiclesFile(drtVehiclesFile, "DRT-", 30, Id.createLinkId("0-1" ), 1);
 			if ( drt2 ){
-				PtAlongALineTest.createDrtVehiclesFile( drt2VehiclesFile, "DRT2-", 10, Id.createLinkId( "999-1000" ) );
+				PtAlongALineTest.createDrtVehiclesFile( drt2VehiclesFile, "DRT2-", 10, Id.createLinkId( "999-1000" ), 4);
 			}
 			if ( drt3 ){
-				PtAlongALineTest.createDrtVehiclesFile( drt3VehiclesFile, "DRT3-", 10, Id.createLinkId( "500-501" ) );
+				PtAlongALineTest.createDrtVehiclesFile( drt3VehiclesFile, "DRT3-", 10, Id.createLinkId( "500-501" ), 4);
 			}
 
 		}

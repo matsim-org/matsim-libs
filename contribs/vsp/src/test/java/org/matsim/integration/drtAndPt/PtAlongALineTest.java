@@ -124,7 +124,7 @@ public class PtAlongALineTest{
 		Path taxisA = Paths.get("./test/input/one_shared_taxi_vehicles_A.xml");
 		// (forward slash should also work on windows.  kai, jun'19)
 
-		createDrtVehiclesFile(taxisA.toString(), "drtA", 200, Id.createLinkId("499-500"));
+		createDrtVehiclesFile(taxisA.toString(), "drtA", 200, Id.createLinkId("499-500"), 4);
 
 		Config config = ConfigUtils.createConfig();
 
@@ -288,7 +288,7 @@ public class PtAlongALineTest{
 		for( DrtConfigGroup drtConfigGroup : mm.getModalElements() ){
 			DrtConfigs.adjustDrtConfig( drtConfigGroup, config.planCalcScore(), config.plansCalcRoute() );
 		}
-		PtAlongALineTest.createDrtVehiclesFile(drtVehiclesFile, "DRT-", 10, Id.createLinkId("0-1" ) );
+		PtAlongALineTest.createDrtVehiclesFile(drtVehiclesFile, "DRT-", 10, Id.createLinkId("0-1" ), 4);
 
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn );
 
@@ -638,14 +638,14 @@ public class PtAlongALineTest{
 		scenario.getActivityFacilities().addActivityFacility( af );
 	}
 
-	static void createDrtVehiclesFile( String taxisFile, String vehPrefix, int numberofVehicles, Id<Link> startLinkId ) {
+	static void createDrtVehiclesFile( String taxisFile, String vehPrefix, int numberofVehicles, Id<Link> startLinkId, int capacity ) {
 		List<DvrpVehicleSpecification> vehicles = new ArrayList<>();
 		for (int i = 0; i< numberofVehicles;i++){
 			//for multi-modal networks: Only links where drts can ride should be used.
 			DvrpVehicleSpecification v = ImmutableDvrpVehicleSpecification.newBuilder()
 													  .id(Id.create(vehPrefix + i, DvrpVehicle.class))
 													  .startLinkId(startLinkId)
-													  .capacity(4)
+													  .capacity(capacity)
 													  .serviceBeginTime(0)
 													  .serviceEndTime(36*3600)
 													  .build();
