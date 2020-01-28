@@ -42,7 +42,7 @@ import javax.inject.Inject;
 public final class ParallelEventsManager implements EventsManager {
 
 	private final static Logger log = Logger.getLogger(ParallelEventsManager.class);
-	
+
 	private Distributor distributor;
 	private EventsManager[] eventsManagers;
 	private final List<EventHandler> eventsHandlers;
@@ -64,11 +64,11 @@ public final class ParallelEventsManager implements EventsManager {
 	public ParallelEventsManager(final boolean syncOnTimeSteps) {
 		this(syncOnTimeSteps, true, -1);
 	}
-	
+
 	public ParallelEventsManager(final boolean syncOnTimeSteps, final int numOfThreads) {
 		this(syncOnTimeSteps, false, numOfThreads);
 	}
-	
+
 	/*package*/ ParallelEventsManager(final boolean syncOnTimeSteps, final boolean oneThreadPerHandler, final int numOfThreads) {
 		this.syncOnTimeSteps = syncOnTimeSteps;
 		this.oneThreadPerHandler = oneThreadPerHandler;
@@ -76,14 +76,14 @@ public final class ParallelEventsManager implements EventsManager {
 		this.hadException = new AtomicBoolean(false);
 		this.eventsHandlers = new ArrayList<EventHandler>();
 		this.eventsArraySize = syncOnTimeSteps ? 512 : 32768;
-		this.uncaughtExceptionHandler = new ExceptionHandler(this.hadException);		
+		this.uncaughtExceptionHandler = new ExceptionHandler(this.hadException);
 	}
-	
-	private void initialize() {	
+
+	private void initialize() {
 		int numHandlers = oneThreadPerHandler ? this.eventsHandlers.size() : Math.min(this.numOfThreads, this.eventsHandlers.size());
 		this.distributor = new Distributor(new ProcessEventsRunnable[numHandlers]);
 		this.eventsManagers = new EventsManager[numHandlers];
-		
+
 		// create event managers
 		if (this.oneThreadPerHandler) {
 			for (int i = 0; i < this.eventsHandlers.size(); i++) {
@@ -97,7 +97,7 @@ public final class ParallelEventsManager implements EventsManager {
 			for (int i = 0; i < this.eventsHandlers.size(); i++) {
 				this.eventsManagers[this.eventsHandlers.size() % numOfThreads].addHandler(this.eventsHandlers.get(i));
 			}
-		}	
+		}
 
 		// initialize runnables (threads that will execute the event managers)
 		for (int i = 0; i < this.eventsManagers.length; i++) {
@@ -114,14 +114,14 @@ public final class ParallelEventsManager implements EventsManager {
 			}
 			processEventsRunnable.start();
 		}
-		
+
 		// initialize the distributor
 		this.distributor.setDaemon(true);
 		this.distributor.setUncaughtExceptionHandler(this.uncaughtExceptionHandler);
 		this.distributor.setName("EventsDistributor");
 		this.distributor.start();
 	}
-	
+
 	private void teardown() {
 		try {
 			for (ProcessEventsRunnable per : distributor.runnables) {
@@ -129,13 +129,13 @@ public final class ParallelEventsManager implements EventsManager {
 				per.join();
 			}
 			distributor.interrupt();
-			distributor.join();	
+			distributor.join();
 		} catch (InterruptedException e) {
 			throw new RuntimeException("Exception while waiting on join..." + e.getMessage());
 		}
-		
+
 	}
-	
+
 	@Override
 	public void processEvent(final Event event) {
 		EventArray array = new EventArray(1);
@@ -144,7 +144,7 @@ public final class ParallelEventsManager implements EventsManager {
 	}
 
 	public void processEvents(final EventArray events) {
-		this.distributor.processEvents(events);		
+		this.distributor.processEvents(events);
 	}
 
 	@Override
@@ -158,7 +158,7 @@ public final class ParallelEventsManager implements EventsManager {
 		// this will be used the next time we start an iteration
 		this.eventsHandlers.remove(handler);
 	}
-	
+
 	@Override
 	public void resetHandlers(int iteration) {
 		for (EventsManager eventsManager : this.eventsManagers) {
@@ -177,9 +177,9 @@ public final class ParallelEventsManager implements EventsManager {
 
 		resetHandlers(iteration);
 	}
-		
+
 	/*
-	 * In some chases Events are created after this method has been called. To ensure that they are processed in 
+	 * In some chases Events are created after this method has been called. To ensure that they are processed in
 	 * real time, we process them not in the parallel thread. To do so, we replace the parallel events manager
 	 * with its EventsManager instance.
 	 */
@@ -188,7 +188,7 @@ public final class ParallelEventsManager implements EventsManager {
 
 		processEvent(new LastEventOfIteration(Double.MAX_VALUE));
 		flush();
-		
+
 		for (EventsManager eventsManager : this.eventsManagers) {
 			eventsManager.finishProcessing();
 		}
@@ -204,10 +204,10 @@ public final class ParallelEventsManager implements EventsManager {
 
 	@Override
 	public void afterSimStep(double time) {
-		
+
 		if (this.syncOnTimeSteps) {
 			processEvent(new LastEventOfSimStep(time));
-			flush();	
+			flush();
 		}
 
 		if (this.hadException.get()) {
@@ -215,7 +215,7 @@ public final class ParallelEventsManager implements EventsManager {
 		}
 
 	}
-	
+
 	private void flush() {
 		try {
 			this.distributor.flush();
@@ -223,7 +223,7 @@ public final class ParallelEventsManager implements EventsManager {
 			throw new RuntimeException("Exception while waiting on flush... " + e.getMessage());
 		}
 	}
-	
+
 	private class Distributor extends Thread {
 
 		private final ProcessEventsRunnable[] runnables;
@@ -233,7 +233,7 @@ public final class ParallelEventsManager implements EventsManager {
 		// This is used when the simulation needs to sync with event processing and make sure there are no unprocessed
 		// events in the system.
 		private boolean shouldFlush = false;
-		
+
 		public Distributor(ProcessEventsRunnable[] runnables) {
 			this.runnables = runnables;
 			this.inputQueue = new ArrayBlockingQueue<>(eventsQueueSize);
@@ -242,25 +242,25 @@ public final class ParallelEventsManager implements EventsManager {
 		public final void processEvents(EventArray events) {
 			this.inputQueue.add(events);
 		}
-	
+
 		// TODO - do we need to support stopping?
 		public void flush() throws InterruptedException {
-			
+
 			System.out.println("#### going to flush...");
 			synchronized (this) {
 				shouldFlush = true;
-				this.wait();	
+				this.wait();
 			}
 			System.out.println("#### going to flush... done!");
 
 		}
-		
+
 		private void distribute(EventArray events) {
 			for (ProcessEventsRunnable runnable : this.runnables) {
 				runnable.eventsQueue.add(events);
 			}
 		}
-		
+
 		@SuppressWarnings("unused")
 		@Override
 		public final void run() {
@@ -268,7 +268,7 @@ public final class ParallelEventsManager implements EventsManager {
 				EventArray events = new EventArray(eventsArraySize);
 				while (true) {
 					EventArray earray = this.inputQueue.poll(100, TimeUnit.MILLISECONDS);
-					
+
 					if (earray == null) {
 						synchronized (this) {
 							// check if we can finish the flush
@@ -283,7 +283,7 @@ public final class ParallelEventsManager implements EventsManager {
 									this.notify();
 									//Gbl.printCurrentThreadCpuTime();
 								}
-							}	
+							}
 						}
 						continue;
 					}
@@ -308,7 +308,7 @@ public final class ParallelEventsManager implements EventsManager {
 								distribute(events);
 								events = new EventArray(eventsArraySize);
 							}
-						}	
+						}
 					}
 				}
 			} catch (InterruptedException e) {
@@ -318,11 +318,11 @@ public final class ParallelEventsManager implements EventsManager {
 	}
 
 	private class ProcessEventsRunnable extends Thread {
-		
+
 		private final EventsManager eventsManager;
 		private final BlockingQueue<EventArray> eventsQueue;
 		private boolean shouldFlush = false;
-		
+
 		public ProcessEventsRunnable(EventsManager eventsManager) {
 			this.eventsManager = eventsManager;
 			this.eventsQueue = new LinkedBlockingQueue<>();
@@ -331,16 +331,16 @@ public final class ParallelEventsManager implements EventsManager {
 		public void flush() throws InterruptedException {
 			synchronized (this) {
 				shouldFlush = true;
-				this.wait();	
+				this.wait();
 			}
 		}
-		
+
 		@Override
 		public void run() {
 			try {
 				while (true) {
 					EventArray events = this.eventsQueue.poll(100, TimeUnit.MILLISECONDS);
-					
+
 					if (events == null) {
 						synchronized (this) {
 							if (shouldFlush) {
@@ -351,7 +351,7 @@ public final class ParallelEventsManager implements EventsManager {
 						}
 						continue;
 					}
-					
+
 					for (int i = 0; i < events.size(); i++) {
 						this.eventsManager.processEvent(events.get(i));
 					}
@@ -359,9 +359,9 @@ public final class ParallelEventsManager implements EventsManager {
 			} catch (InterruptedException e) {
 				return;
 			}
-		}	
+		}
 	}
-	
+
 	/**
 	 * @author mrieser
 	 */
