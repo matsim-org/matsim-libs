@@ -164,7 +164,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 //		String inputOSM = "C:\\Users\\braun\\Documents\\Uni\\VSP\\shared-svn\\studies\\sbraun\\osmData\\RawOSM/brandenburg.osm";
 //		String outputDir = "../../../../../../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/cottbus/";
 		String inputOSM = "../shared-svn/studies/tthunig/osmData/interpreter.osm";
-		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_01_20_workedOnRoundAbouts";
+		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_01_24_workedOnRoundAbouts_MinRoundOFF";
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84_UTM33N);
 
@@ -186,7 +186,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		SignalsAndLanesOsmNetworkReader reader = new SignalsAndLanesOsmNetworkReader(network, ct, signalsData, lanes);
 
 
-        reader.setMinimizeSmallRoundabouts(true);
+        reader.setMinimizeSmallRoundabouts(false);
 		reader.setMergeOnewaySignalSystems(false);
 		reader.setUseRadiusReduction(false);
 		reader.setAllowUTurnAtLeftLaneOnly(true);
@@ -325,10 +325,9 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		List<OsmNode> addingNodes = new ArrayList<>();
 		List<OsmNode> checkedNodes = new ArrayList<>();
 		List<OsmWay> checkedWays = new ArrayList<>();
-		LOG.warn("AAAAAAAAAAAAAAAAAAA" + checkedWays.size());
 		if (this.minimizeSmallRoundabouts)
             findingSmallRoundabouts(addingNodes, checkedNodes, checkedWays);
-		LOG.warn("AAAAAAAAAAAAAAAAAAA" + checkedWays.size());
+
 		findingFourNodeJunctions(addingNodes, checkedNodes);
 
 		findingMoreNodeJunctions(addingNodes, checkedNodes);
@@ -995,13 +994,15 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				OsmNode signalNode = this.nodes.get(way.nodes.get(i));
 				OsmNode junctionNode = null;
 				String oneway = way.tags.get(TAG_ONEWAY);
-    //TODO sbraun 07102019 - Is it sensible to loop over all ways and nodes? Can't we loop over the Set "signalizedOsmNodes"?
 				if (signalizedOsmNodes.contains(signalNode.id) && !isNodeAtJunction(signalNode)) {
 					if ((oneway != null && !oneway.equals("-1")) || oneway == null) {
 						// positive oneway or no oneway
+
+						//TODO 20200124 sbraun: loops over all nodes of this way to find the closest junction. The problem seems
+						//that once he found that node he continue to loop over the nodes of the way
 						OsmNode nextNode = this.nodes.get(way.nodes.get(i + 1));
 						if (nextNode.ways.size() > 1) {
-							// either a junction or the end point of this way where a new way starts
+							// either a junction or the end point of this way where a new way start
 							junctionNode = nextNode;
 						}
 						if (i < way.nodes.size() - 2) {
@@ -1011,6 +1012,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 								junctionNode = this.nodes.get(way.nodes.get(i + 2));
 							}
 						}
+						//TODO sbraun 20200124 try to break here
+						//if (junctionNode!= null) break;
 					}
                     if (junctionNode != null && NetworkUtils.getEuclideanDistance(signalNode.coord.getX(), signalNode.coord.getY(),
                             junctionNode.coord.getX(), junctionNode.coord.getY()) < SIGNAL_MERGE_DISTANCE) {
