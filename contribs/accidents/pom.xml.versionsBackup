@@ -2,17 +2,21 @@
   <parent>
     <groupId>org.matsim</groupId>
     <artifactId>contrib</artifactId>
-    <version>12.0-2020w02-avoev.0</version>
+    <version>12.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.matsim.contrib</groupId>
-  <artifactId>bicycle</artifactId>
-  <name>bicycle</name>
-  <dependencies>
+  <artifactId>accidents</artifactId>
+  <name>accidents</name>
+  
+  	<dependencies>
+		<!-- This dependency is required to be able to push to the GeoServer -->
 		<dependency>
-			<groupId>org.geotools</groupId>
-			<artifactId>gt-geotiff</artifactId>
-			<version>21.1</version>
-		</dependency>
+  		  <groupId>org.geotools.jdbc</groupId>
+  		  <artifactId>gt-jdbc-postgis</artifactId>
+			<version>20.2</version>
+ 		 </dependency>
+		
 	</dependencies>
+  
 </project>
