@@ -32,8 +32,6 @@ public final class Hermes implements Mobsim {
 
     public static final boolean DEBUG_REALMS = false;
     public static final boolean DEBUG_EVENTS = false;
-    public static final boolean DUMP_AGENTS = false;
-    public static final boolean DUMP_SCENARIO_CONVERSION = false;
     public static final boolean CONCURRENT_EVENT_PROCESSING = true;
 
     static {
@@ -68,13 +66,6 @@ public final class Hermes implements Mobsim {
 		si.generate();
 		this.realm = si.realm;
 		this.agents = si.hermes_agents;
-
-		if (DUMP_AGENTS) {
-			WorldDumper.dumpAgents(agents);
-		}
-		if (DUMP_SCENARIO_CONVERSION) {
-			si.dump_conversion();
-		}
 	}
 
 	private void processEvents() {

@@ -1,7 +1,5 @@
 package org.matsim.core.mobsim.hermes;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,7 +37,6 @@ import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.EventArray;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.hermes.Agent.PlanArray;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.facilities.ActivityFacility;
@@ -489,7 +486,6 @@ public class ScenarioImporter {
         VehicleType vt = v.getType();
         int velocity = (int)Math.min( Math.round(v.getType().getMaximumVelocity()), Hermes.MAX_VEHICLE_VELOCITY);
         NetworkRoute nr = tr.getRoute();
-        int startid = nr.getStartLinkId().hashCode();
         int endid = nr.getEndLinkId().hashCode();
 
         Id<Person> driverid = null;
@@ -636,31 +632,6 @@ public class ScenarioImporter {
     private void generatePlans() {
         generatePersonPlans();
         generateVehiclePlans();
-    }
-
-    public void dump_conversion() throws Exception {
-        BufferedWriter log = new BufferedWriter(new FileWriter(WorldDumper.outputPrefix + "/hermes_conversion"));
-        dump_line_of_route(log);
-        dump_route_stops(log);
-        log.close();
-    }
-
-    public void dump_line_of_route(BufferedWriter log) throws Exception {
-        for(int i = 0; i < line_of_route.length; i++) {
-            log.write(String.format("ETHZ Route %d is in Line %d\n",
-                i, line_of_route[i]));
-        }
-
-    }
-
-    public void dump_route_stops(BufferedWriter log) throws Exception {
-        for(int i = 0; i < route_stops_by_index.size(); i++) {
-            ArrayList<Integer> stops_by_index = route_stops_by_index.get(i);
-            for (int j = 0; j < stops_by_index.size(); j++) {
-                log.write(String.format("ETHZ Route %d Contains Stop idx = %d id = %d\n",
-                    i, j, stops_by_index.get(j)));
-            }
-        }
     }
 
 }

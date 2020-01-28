@@ -26,8 +26,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.ParallelEventHandlingConfigGroup;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.hermes.Hermes;
-import org.matsim.core.mobsim.hermes.WorldDumper;
 
 import javax.inject.Inject;
 import java.lang.Thread.UncaughtExceptionHandler;
@@ -96,12 +94,6 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 
 	@Override
 	public void processEvent(final Event event) {
-		if (	Hermes.DEBUG_EVENTS &&
-				event != null &&
-				event.getEventType() != null &&
-				!event.getEventType().equals("simstepend")) {
-			WorldDumper.dumpEvent(event);
-		}
 		this.counter.incrementAndGet();
 		
 		if (parallelMode) {
@@ -201,9 +193,7 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 		if (throwable == null) {
 			try {
 				this.processEvent(new LastEventOfIteration(Double.POSITIVE_INFINITY));
-				System.out.println("########## Going to wait...");
 				iterationEndBarrier.await();
-				System.out.println("########## Going to wait... Done!");
 			} catch (InterruptedException | BrokenBarrierException e) {
 				this.hadException.set(e);
 			}
