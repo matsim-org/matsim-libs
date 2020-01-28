@@ -42,7 +42,7 @@ class NewControler extends AbstractController implements ControlerI {
 	private final EventsHandling eventsHandling;
 	private final PlansDumping plansDumping;
 	private final PlansReplanning plansReplanning;
-	public final Provider<Mobsim> mobsimProvider;
+	private final Provider<Mobsim> mobsimProvider;
 	private final PlansScoring plansScoring;
 	private final TerminationCriterion terminationCriterion;
 	private final DumpDataAtEnd dumpDataAtEnd;

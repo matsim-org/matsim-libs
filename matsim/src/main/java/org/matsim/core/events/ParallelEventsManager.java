@@ -36,9 +36,6 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.hermes.Hermes;
-import org.matsim.core.mobsim.hermes.WorldDumper;
 import javax.inject.Inject;
 
 /**
@@ -273,16 +270,6 @@ public final class ParallelEventsManager implements EventsManager {
 				EventArray events = new EventArray(eventsArraySize);
 				while (true) {
 					EventArray earray = this.inputQueue.poll(100, TimeUnit.MILLISECONDS);
-					
-					// this is just a debug hook
-					if (Hermes.DEBUG_EVENTS && earray != null) {
-						for (int i = 0; i < earray.size(); i++) {
-							Event event = earray.get(i);
-							if (event != null && event.getEventType() != null && !event.getEventType().equals("simstepend")) {
-								WorldDumper.dumpEvent(event);
-							}
-						}
-					}
 					
 					if (earray == null) {
 						synchronized (this) {
