@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.locationtech.jts.geom.Geometry;
 import org.matsim.api.core.v01.Coord;
@@ -43,17 +44,15 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.contrib.drt.routing.DrtStageActivityType;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
-//import org.matsim.core.router.StageActivityTypes;
-//import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
@@ -64,11 +63,11 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.PtConstants;
 import org.opengis.feature.simple.SimpleFeature;
 
-import vwExamples.utils.createShiftingScenario.cityCommuterDRT.assignCityCommuterTourCandidate;
-import vwExamples.utils.createShiftingScenario.cityCommuterDRT.isCityCommuterTourCandidate;
-import vwExamples.utils.createShiftingScenario.cityDRT.isWithinCityTourCandidate;
 import vwExamples.utils.createShiftingScenario.commuterDRT.assignCommuterTourCandidate;
 import vwExamples.utils.createShiftingScenario.commuterDRT.isCommuterTourCandidate;
+
+//import org.matsim.core.router.StageActivityTypes;
+//import org.matsim.core.router.StageActivityTypesImpl;
 
 /**
  * @author saxer
@@ -131,9 +130,9 @@ public class PlanModifierCommuterDRT {
 		// Add staging acts for pt and drt
 		stages = new ArrayList<String>();
 		stages.add(PtConstants.TRANSIT_ACTIVITY_TYPE);
-		stages.add(new DrtStageActivityType("drt").drtStageActivity);
+		stages.add(PlanCalcScoreConfigGroup.createStageActivityType("drt"));
 		stages.add(parking.ParkingRouterNetworkRoutingModule.parkingStageActivityType);
-//		blackList = new StageActivityTypesImpl(stages);
+		//		blackList = new StageActivityTypesImpl(stages);
 
 		subTourValidator = new isCommuterTourCandidate(network, cityZonesMap, serviceAreazonesMap);
 		assignTourValidator = new assignCommuterTourCandidate(network, cityZonesMap, serviceAreazonesMap);

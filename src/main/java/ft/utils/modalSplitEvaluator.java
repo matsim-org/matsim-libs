@@ -509,7 +509,7 @@ public class modalSplitEvaluator {
 						// We dont't need to drop all transit acts
 						// new TransitActsRemover().run(plan, true);
 
-						for (Subtour subTour : TripStructureUtils.getSubtours(plan, new HashSet<>(Arrays.asList(STAGE)))) {
+						for (Subtour subTour : TripStructureUtils.getSubtours(plan, STAGE::equals)) {
 
 							List<Integer> replaceTripIndices = getReplaceableTripIndices(subTour);
 							String SubtourMode = getSubtourMode(subTour);

@@ -52,7 +52,7 @@ public class PlanModeIdentifier {
             Plan plan = person.getSelectedPlan();
             final List<PlanElement> planElements = plan.getPlanElements();
 
-            final List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(plan, new HashSet<String>(Arrays.asList(ParkingRouterNetworkRoutingModule.parkingStageActivityType)));
+            final List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(plan, ParkingRouterNetworkRoutingModule.parkingStageActivityType::equals);
 
             for (TripStructureUtils.Trip trip : trips) {
                 final List<PlanElement> fullTrip =

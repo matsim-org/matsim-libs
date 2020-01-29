@@ -20,7 +20,7 @@
 
 package uam.run;
 
-import static org.matsim.contrib.drt.run.DrtModeModule.Direction;
+import static org.matsim.contrib.dvrp.router.DvrpRoutingModuleProvider.Stage;
 
 import java.util.Collections;
 import java.util.List;
@@ -32,14 +32,14 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.drt.routing.DrtStageActivityType;
 import org.matsim.contrib.drt.routing.MultiModeDrtMainModeIdentifier;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
+import org.matsim.contrib.dvrp.router.DvrpGlobalRoutingNetworkProvider;
+import org.matsim.contrib.dvrp.router.DvrpModeRoutingNetworkModule;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
@@ -48,6 +48,7 @@ import org.matsim.contrib.dvrp.run.ModalProviders;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -81,8 +82,6 @@ public class RunUamDrtScenario {
 		drtCfgMap.values()
 				.forEach(cfg -> DrtConfigs.adjustDrtConfig(cfg, config.planCalcScore(), config.plansCalcRoute()));
 
-		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
-
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
 		ScenarioUtils.loadScenario(scenario);
 
@@ -94,11 +93,11 @@ public class RunUamDrtScenario {
 		controler.addOverridingModule(new AbstractDvrpModeModule(drtCfg.getMode()) {
 			@Override
 			public void install() {
-				DvrpRoutingNetworkProvider.checkUseModeFilteredSubnetworkAllowed(getConfig(), "car");
+				DvrpModeRoutingNetworkModule.checkUseModeFilteredSubnetworkAllowed(getConfig(), "car");
 				bindModal(Network.class).toProvider(ModalProviders.createProvider(getMode(), getter -> {
 					Network subnetwork = NetworkUtils.createNetwork();
 					new TransportModeNetworkFilter(
-							getter.getNamed(Network.class, DvrpRoutingNetworkProvider.DVRP_ROUTING)).
+							getter.getNamed(Network.class, DvrpGlobalRoutingNetworkProvider.DVRP_ROUTING)).
 							filter(subnetwork, Collections.singleton("car"));
 					new NetworkCleaner().run(subnetwork);
 					return subnetwork;
@@ -112,11 +111,11 @@ public class RunUamDrtScenario {
 
 			@Override
 			public void install() {
-				MapBinder<Direction, RoutingModule> mapBinder = modalMapBinder(Direction.class, RoutingModule.class);
+				MapBinder<Stage, RoutingModule> mapBinder = modalMapBinder(Stage.class, RoutingModule.class);
 				//DRT as access mode (fixed)
-				mapBinder.addBinding(Direction.ACCESS).to(Key.get(RoutingModule.class, Names.named("car")));
+				mapBinder.addBinding(Stage.ACCESS).to(Key.get(RoutingModule.class, Names.named("car")));
 				//more flexible approach
-				mapBinder.addBinding(Direction.EGRESS).toProvider(new UamAccessEgressRoutingModuleProvider());
+				mapBinder.addBinding(Stage.EGRESS).toProvider(new UamAccessEgressRoutingModuleProvider());
 
 				bind(MainModeIdentifier.class).toInstance(new UamMainModeIdentifier(multiModeDrtCfg));
 			}
@@ -144,7 +143,7 @@ public class RunUamDrtScenario {
 
 	private static class UamMainModeIdentifier implements MainModeIdentifier {
 		private final String mode = "uam";
-		private final String drtStageActivityType = new DrtStageActivityType(mode).drtStageActivity;
+		private final String drtStageActivityType = PlanCalcScoreConfigGroup.createStageActivityType(mode);
 		private final MultiModeDrtMainModeIdentifier delegate;
 
 		@Inject
