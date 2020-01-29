@@ -23,15 +23,20 @@
 package vwExamples.utils.tripAnalyzer;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryCollection;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineSegment;
 import org.matsim.api.core.v01.Id;
@@ -54,6 +59,11 @@ public class RunExperiencedTripsAnalysisBatch {
 	static Set<String> zones = new HashSet<>();
 	static String shapeFile = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Hannover_Stadtteile.shp";
 	static String shapeFeature = "NO";
+	private static List<Geometry> districtGeometryList = new ArrayList<Geometry>();
+	private static GeometryFactory geomfactory = JTSFactoryFinder.getGeometryFactory(null);
+	private static GeometryCollection geometryCollection = geomfactory.createGeometryCollection(null);
+
+	private static Geometry boundary; // Research boundary in which e.g. mileage or traffic performance is measured
 
 	public static void main(String[] args) {
 
@@ -65,6 +75,8 @@ public class RunExperiencedTripsAnalysisBatch {
 	public static void run(String runDir) {
 
 		readShape(shapeFile, shapeFeature);
+		getResearchAreaBoundary();
+
 		File[] directories = new File(runDir).listFiles(File::isDirectory);
 		for (File scenarioDir : directories) {
 
@@ -72,31 +84,7 @@ public class RunExperiencedTripsAnalysisBatch {
 			String scenarioName = StringList[StringList.length - 1];
 
 			Set<String> scenarioToBeAnalyzed = new HashSet<String>();
-//			scenarioToBeAnalyzed.add("VW243_LocalLinkFlow_1.15_10pct");
-//			scenarioToBeAnalyzed.add("VW243_LocalLinkFlow_1.28_10pct");
-//			scenarioToBeAnalyzed.add("VW243_CityCommuterDRT_10pct300_veh_idx0");
-//			scenarioToBeAnalyzed.add("VW243_CityCommuterDRTAmpel2.0_10pct300_veh_idx0");
-//			scenarioToBeAnalyzed.add("VW243_HomeOfficeInOut1x_10pct");
-//			scenarioToBeAnalyzed.add("VW243_HomeOfficeInOut2x_10pct");
-//			scenarioToBeAnalyzed.add("vw243_cadON_ptSpeedAdj.0.1");
-//			scenarioToBeAnalyzed.add("VW243_Drt_HomeOffice_LinkFlow1.15300_veh_idx0");
-//			scenarioToBeAnalyzed.add("VW251_CityCommuterDRT_100pct2800_veh_idx0");
-//			scenarioToBeAnalyzed.add("vw253.1.0");
-//			scenarioToBeAnalyzed.add("vw256_1.1.0");
-//			scenarioToBeAnalyzed.add("vw243_CityDRT_10pct_0.05300_veh_idx0");
-//			scenarioToBeAnalyzed.add("CT_243.0.1");
-			scenarioToBeAnalyzed.add("VW280_LocalLinkFlow_1.15_10pct");
-//			scenarioToBeAnalyzed.add("VW280_LocalLinkFlow_1.28_10pct");
-//			scenarioToBeAnalyzed.add("vw280_0.1");
-//			scenarioToBeAnalyzed.add("vw280_CityCommuterDRTcarOnly_20pct_0.1_250_veh_idx0");
-//			scenarioToBeAnalyzed.add("vw280_CityDRT_20pctCarOnly_0.1_120_veh_idx0");
-//			scenarioToBeAnalyzed.add("VW280_LocalLinkFlow_1.15_100pct_2");
-//			scenarioToBeAnalyzed.add("VW280_LocalLinkFlow_1.28_100pct_2");
-//			scenarioToBeAnalyzed.add("VW280_CityCommuterDRT_carOnly_100pct_2");
-//			scenarioToBeAnalyzed.add("VW280_CityCommuterDRT_carOnly_100pct_additiv");
-
-			
-			
+			scenarioToBeAnalyzed.add("UAM_test3");
 
 			if (scenarioToBeAnalyzed.contains(scenarioName)) {
 
@@ -129,46 +117,15 @@ public class RunExperiencedTripsAnalysisBatch {
 		monitoredModes.add("bike");
 		monitoredModes.add("ride");
 		monitoredModes.add("stayHome");
+		monitoredModes.add("uam");
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(runPrefix + "output_network.xml.gz");
-//		new PopulationReader(scenario).readFile(runPrefix + "output_plans.xml.gz");
+		// new PopulationReader(scenario).readFile(runPrefix + "output_plans.xml.gz");
 
 		if (useTransitSchedule) {
 			new TransitScheduleReader(scenario).readFile(runPrefix + "output_transitSchedule.xml.gz");
 		}
-		// StreamingPopulationReader spr = new StreamingPopulationReader(scenario);
-		// spr.addAlgorithm(new PersonAlgorithm() {
-		// @Override
-		// public void run(Person person) {
-		// relevantAgents.add(person.getId());
-		// // Take only specific agents
-		// // for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
-		// // if (pe instanceof Activity) {
-		// // if (((Activity) pe).getType().contains("home")) {
-		// //
-		// // Activity activity = ((Activity) pe);
-		// // Coord coord = activity.getCoord();
-		// // if
-		// //
-		// (vwExamples.utils.modalSplitAnalyzer.modalSplitEvaluator.isWithinZone(coord,
-		// // zoneMap)) {
-		// // relevantAgents.add(person.getId());
-		// // // System.out.println(person.getId().toString());
-		// // break;
-		// //
-		// // }
-		// //
-		// // }
-		// // }
-		// // }
-		//
-		// }
-		//
-		// });
-		// spr.readFile(runPrefix + "output_plans.xml.gz");
-
-		// System.out.println(relevantAgents.size());
 
 		// Analysis
 		EventsManager events = EventsUtils.createEventsManager();
@@ -179,15 +136,17 @@ public class RunExperiencedTripsAnalysisBatch {
 		Map<Id<Link>, String> links2ZoneMap = link2Zone(scenario.getNetwork());
 
 		DrtPtTripEventHandler eventHandler = new DrtPtTripEventHandler(scenario.getNetwork(),
-				scenario.getTransitSchedule(), monitoredModes, monitoredStartAndEndLinks, links2ZoneMap, zoneMap);
+				scenario.getTransitSchedule(), monitoredModes, monitoredStartAndEndLinks, links2ZoneMap, zoneMap,
+				boundary);
 		events.addHandler(eventHandler);
 		new DrtEventsReader(events).readFile(runPrefix + "output_events.xml.gz");
 		System.out.println("Start writing trips of " + eventHandler.getPerson2ExperiencedTrips().size() + " agents.");
 		ExperiencedTripsWriter tripsWriter = new ExperiencedTripsWriter(runPrefix + "experiencedTrips.csv",
-				eventHandler.getPerson2ExperiencedTrips(), eventHandler.getZone2BinActiveVehicleMap(), eventHandler.getModeMileageMap(), monitoredModes,
-				scenario.getNetwork(), zoneMap);
+				eventHandler.getPerson2ExperiencedTrips(), eventHandler.getZone2BinActiveVehicleMap(),
+				eventHandler.getModeMileageMap(), monitoredModes, scenario.getNetwork(), zoneMap, boundary);
 		tripsWriter.writeExperiencedTrips();
-//		System.out.print("Counted Stuck Events "+ eventHandler.getStuckEvents());
+		// tripsWriter.writeExperiencedLegs();
+		// System.out.print("Counted Stuck Events "+ eventHandler.getStuckEvents());
 		// ExperiencedTripsWriter legsWriter = new ExperiencedTripsWriter(runPrefix +
 		// "experiencedLegs.csv",
 		// eventHandler.getPerson2ExperiencedTrips(), monitoredModes,
@@ -205,6 +164,19 @@ public class RunExperiencedTripsAnalysisBatch {
 			zones.add(id);
 			zoneMap.put(id, geometry);
 		}
+	}
+
+	public static void getResearchAreaBoundary() {
+		// This class infers the geometric boundary of all network link
+
+		Logger.getLogger(ExperiencedTripsWriter.class).warn("MERGED GEOMETRIES TO ONE LARGE ZONE BOUNDARY");
+		for (Geometry zoneGeom : zoneMap.values()) {
+			districtGeometryList.add(zoneGeom);
+		}
+
+		geometryCollection = (GeometryCollection) geomfactory.buildGeometry(districtGeometryList);
+		boundary = geometryCollection.union();
+
 	}
 
 	public static Map<Id<Link>, String> link2Zone(Network network) {
@@ -228,15 +200,15 @@ public class RunExperiencedTripsAnalysisBatch {
 
 				}
 			}
-			//No zone found for link
-//			link2Zone.put(l.getId(), "1");
-			
-//			if (!link2Zone.containsKey(l.getId()))
-//					{
-////				System.out.println( l.getId() + " not in area, set null "  );
-//				link2Zone.put(l.getId(), null);
-//				
-//					}
+			// No zone found for link
+			// link2Zone.put(l.getId(), "1");
+
+			// if (!link2Zone.containsKey(l.getId()))
+			// {
+			//// System.out.println( l.getId() + " not in area, set null " );
+			// link2Zone.put(l.getId(), null);
+			//
+			// }
 			// System.out.println(linkCounter + " out of " +linkNumber );
 		}
 

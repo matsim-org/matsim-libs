@@ -31,7 +31,7 @@ public class assignAirDRTTourCandidate implements SubTourValidator {
 
 	@Override
 	public boolean isValidSubTour(Subtour subTour) {
-		// Considers that only tour can be assigned to drt if they are within the service area
+		
 		if (((isInboundCommuterTour(subTour) || isOutboundCommuterTour(subTour)) && subTour.getTrips().size()==2)) {
 
 			return true;

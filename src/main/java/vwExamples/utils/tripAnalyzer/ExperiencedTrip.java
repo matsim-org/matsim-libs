@@ -60,6 +60,7 @@ public class ExperiencedTrip {
 	private Double endOfParking = null;
 	private String beeline;
 	private Double totalInVehMilage;
+	private Map<String, Double> mode2inShapeVehicleMilage = new HashMap<>();
 	// Coords unavailable in events
 
 	/**
@@ -103,10 +104,7 @@ public class ExperiencedTrip {
 
 	}
 	
-	double getTotalInVehicleMilage() {
-		return this.totalInVehMilage;
 
-	}
 
 	private void findTransitStopsVisited() {
 		for (ExperiencedLeg leg : legs) {
@@ -134,6 +132,7 @@ public class ExperiencedTrip {
 			mode2waitTime.put(mode, 0.0);
 			mode2maxPerLegWaitTime.put(mode, 0.0);
 			mode2numberOfLegs.put(mode, 0);
+			mode2inShapeVehicleMilage.put(mode, 0.0);
 		}
 		mode2inVehicleTime.put("Other", 0.0);
 		mode2distance.put("Other", 0.0);
@@ -150,6 +149,7 @@ public class ExperiencedTrip {
 				if (mode2maxPerLegWaitTime.get(mode) < leg.getWaitTime()) {
 					mode2maxPerLegWaitTime.put(mode, leg.getWaitTime());
 				}
+				mode2inShapeVehicleMilage.put(mode, mode2inShapeVehicleMilage.get(mode) + leg.getInShapeMileage());
 			} else {
 				mode2inVehicleTime.put("Other", mode2inVehicleTime.get("Other") + leg.getInVehicleTime());
 				mode2distance.put("Other", mode2distance.get("Other") + leg.getDistance());
@@ -185,6 +185,11 @@ public class ExperiencedTrip {
 
 	Map<String, Integer> getMode2numberOfLegs() {
 		return mode2numberOfLegs;
+	}
+	
+	Map<String, Double> getMode2inShapeVehicleMilage() {
+		return mode2inShapeVehicleMilage;
+
 	}
 
 	Id<Person> getAgent() {
@@ -265,7 +270,7 @@ public class ExperiencedTrip {
 
 	String getMainMode() {
 		Set<String> acceptedMainModes = new HashSet<>(
-				Arrays.asList("car", "pt", "drt", "walk", "ride", "bike", "stayHome"));
+				Arrays.asList("car", "pt", "drt", "walk", "ride", "bike", "stayHome","uam"));
 
 		Set<String> seenModesForLegs = new HashSet<String>();
 		for (ExperiencedLeg leg : this.legs) {

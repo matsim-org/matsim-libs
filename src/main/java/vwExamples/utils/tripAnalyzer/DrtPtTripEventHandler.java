@@ -20,6 +20,7 @@
 package vwExamples.utils.tripAnalyzer;
 
 import org.apache.commons.lang3.mutable.MutableDouble;
+import org.apache.commons.lang3.tuple.Triple;
 import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -105,7 +106,7 @@ public class DrtPtTripEventHandler
 	private Map<Id<Person>, Id<TransitStopFacility>> agent2CurrentLegEndPtStop = new HashMap<>();
 	private Map<Id<Person>, Double> agent2CurrentLegEnterVehicleTime = new HashMap<>();
 	private Map<Id<Person>, Double> agent2CurrentLegDistanceOffsetAtEnteringVehicle = new HashMap<>();
-	private Map<Id<Person>, List<Id<Link>>> agent2CurrentLegRoute = new HashMap<>();
+	private Map<Id<Person>, List<Triple<Id<Link>, Double, Double>>> agent2CurrentLegRoute = new ConcurrentHashMap<>();
 	private Map<Id<Person>, Id<Vehicle>> agent2CurrentLegVehicle = new HashMap<>();
 	private Map<Id<Person>, Double> agent2CurrentTeleportDistance = new HashMap<>();
 	private Map<String, Map<Double, Set<Id<Vehicle>>>> zone2BinActiveVehicleMap = new HashMap<>();
@@ -245,28 +246,31 @@ public class DrtPtTripEventHandler
 				}
 			}
 
+
+
+			// Detect transport mode over the vehicleId
+//			String transportMode;
+
+			addLinkToRoute(event,enterTime,leaveTime);
+			
+		
+		
+		
+		
 		}
 
 	}
+	
+	
+	void addLinkToRoute(LinkLeaveEvent event, double enterTime ,double leaveTime)
 
-	// in-vehicle distances
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-
-		if (monitoredVeh2toMonitoredDistance.containsKey(event.getVehicleId())) {
-			monitoredVeh2toMonitoredDistance.put(event.getVehicleId(),
-					monitoredVeh2toMonitoredDistance.get(event.getVehicleId())
-							+ network.getLinks().get(event.getLinkId()).getLength());
-		}
-
-		linkEnterTimes.put(event.getVehicleId(), event.getTime());
-
-		// Add links to routes to allow transport performance calculation
-		if (link2Zone.containsKey(event.getLinkId())) {
-
-			// Detect transport mode over the vehicleId
+	{
+		
+//		if (link2Zone.containsKey(event.getLinkId()))
+		
+		{
+			Triple<Id<Link>, Double, Double> linkTravelTime = Triple.of(event.getLinkId(), enterTime, leaveTime);
 			String transportMode;
-
 			if (vehicleId2Mode.containsKey(event.getVehicleId())) {
 				transportMode = vehicleId2Mode.get(event.getVehicleId());
 			} else {
@@ -288,11 +292,11 @@ public class DrtPtTripEventHandler
 						// already standing on this link
 
 						if (agent2CurrentLegRoute.containsKey(personEntry.getKey())) {
-							agent2CurrentLegRoute.get(personEntry.getKey()).add(event.getLinkId());
+							agent2CurrentLegRoute.get(personEntry.getKey()).add(linkTravelTime);
 
 						} else {
-							agent2CurrentLegRoute.put(personEntry.getKey(), new ArrayList<Id<Link>>());
-							agent2CurrentLegRoute.get(personEntry.getKey()).add(event.getLinkId());
+							agent2CurrentLegRoute.put(personEntry.getKey(), new ArrayList<Triple<Id<Link>, Double, Double>>());
+							agent2CurrentLegRoute.get(personEntry.getKey()).add(linkTravelTime);
 
 						}
 
@@ -305,31 +309,87 @@ public class DrtPtTripEventHandler
 
 				Id<Person> personId = Id.create(event.getVehicleId().toString(), Person.class);
 				if (agent2CurrentLegRoute.containsKey(personId)) {
-					agent2CurrentLegRoute.get(personId).add(event.getLinkId());
+					agent2CurrentLegRoute.get(personId).add(linkTravelTime);
 
 				} else {
-					agent2CurrentLegRoute.put(personId, new ArrayList<Id<Link>>());
-					agent2CurrentLegRoute.get(personId).add(event.getLinkId());
+					agent2CurrentLegRoute.put(personId, new ArrayList<Triple<Id<Link>, Double, Double>>());
+					agent2CurrentLegRoute.get(personId).add(linkTravelTime);
 
 				}
 
 			}
 		}
+		
+		
+	}
 
-		// for (Entry<Id<Person>, Id<Vehicle>> personEntry :
-		// agent2CurrentLegVehicle.entrySet()) {
-		//
-		// if (personEntry.getValue() == event.getVehicleId()) {
-		//
-		// if (agent2CurrentLegRoute.containsKey(personEntry.getKey())) {
-		// agent2CurrentLegRoute.get(personEntry.getKey()).add(event.getLinkId());
-		//
-		// } else {
-		// agent2CurrentLegRoute.put(personEntry.getKey(), new ArrayList<Id<Link>>());
-		//
-		// }
-		// }
-		// }
+	// in-vehicle distances
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
+
+		if (monitoredVeh2toMonitoredDistance.containsKey(event.getVehicleId())) {
+			monitoredVeh2toMonitoredDistance.put(event.getVehicleId(),
+					monitoredVeh2toMonitoredDistance.get(event.getVehicleId())
+							+ network.getLinks().get(event.getLinkId()).getLength());
+		}
+
+		linkEnterTimes.put(event.getVehicleId(), event.getTime());
+
+		// Add links to routes to allow transport performance calculation
+//		if (link2Zone.containsKey(event.getLinkId())) {
+//
+//			// Detect transport mode over the vehicleId
+//			String transportMode;
+//
+//			if (vehicleId2Mode.containsKey(event.getVehicleId())) {
+//				transportMode = vehicleId2Mode.get(event.getVehicleId());
+//			} else {
+//				// If vehicle is not detected as drt nor pt, it needs to be a car
+//				transportMode = TransportMode.car;
+//
+//			}
+//
+//			// If transport mode is e.g. pt or drt this mode is pooled
+//			// We need to look up for which person is this link enter event relevant
+//			// Link enter events are stored to construct routes.
+//			if (transportMode != TransportMode.car) {
+//
+//				agent2CurrentLegVehicle.entrySet().parallelStream().forEach(personEntry -> {
+//
+//					if (personEntry.getValue() == event.getVehicleId()) {
+//
+//						// First link of UAV legs not part of current legRoute because vehicles is
+//						// already standing on this link
+//
+//						if (agent2CurrentLegRoute.containsKey(personEntry.getKey())) {
+//							agent2CurrentLegRoute.get(personEntry.getKey()).add(event.getLinkId());
+//
+//						} else {
+//							agent2CurrentLegRoute.put(personEntry.getKey(), new ArrayList<Id<Link>>());
+//							agent2CurrentLegRoute.get(personEntry.getKey()).add(event.getLinkId());
+//
+//						}
+//
+//					}
+//
+//				});
+//
+//				// transport mode equals car, in this case =
+//			} else {
+//
+//				Id<Person> personId = Id.create(event.getVehicleId().toString(), Person.class);
+//				if (agent2CurrentLegRoute.containsKey(personId)) {
+//					agent2CurrentLegRoute.get(personId).add(event.getLinkId());
+//
+//				} else {
+//					agent2CurrentLegRoute.put(personId, new ArrayList<Id<Link>>());
+//					agent2CurrentLegRoute.get(personId).add(event.getLinkId());
+//
+//				}
+//
+//			}
+//		}
+
 
 	}
 
@@ -470,7 +530,7 @@ public class DrtPtTripEventHandler
 	public void handleEvent(PersonArrivalEvent event) {
 		if (agent2CurrentTripStartLink.containsKey(event.getPersonId())) {
 
-			List<Id<Link>> routeList = new ArrayList<Id<Link>>();
+			List<Triple<Id<Link>, Double, Double>> routeList = new ArrayList<Triple<Id<Link>, Double, Double>>();
 
 			if (agent2CurrentLegMode.get(event.getPersonId()).equals(event.getLegMode())) {
 
@@ -711,12 +771,12 @@ public class DrtPtTripEventHandler
 
 	}
 
-	double getInReseachAreaRouteDistance(List<Id<Link>> routeList, Id<Link> fromLink, Id<Link> toLink) {
+	double getInReseachAreaRouteDistance(List<Triple<Id<Link>, Double, Double>> routeList, Id<Link> fromLink, Id<Link> toLink) {
 		double distance = 0.0;
 		if (routeList != null) {
 
-			for (Id<Link> linkeId : routeList) {
-				distance = distance + network.getLinks().get(linkeId).getLength();
+			for (Triple<Id<Link>, Double, Double> entry : routeList) {
+				distance = distance + network.getLinks().get(entry.getLeft()).getLength();
 			}
 		} // In case there is no route in this leg it need to be a teleport, thus we
 			// calculate the beeline distance that lies within the reserach area

@@ -22,6 +22,7 @@ package vwExamples.utils.tripAnalyzer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.tuple.Triple;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -47,7 +48,8 @@ public class ExperiencedLeg {
     private final double grossWaitTime;
     private final double inVehicleTime;
     private final double distance;
-    private final List<Id<Link>> routeList;
+    private double inShapeMileage;
+    private List<Triple<Id<Link>, Double, Double>> routeList = new ArrayList<Triple<Id<Link>, Double, Double>>();
     private final Id<TransitStopFacility> ptFromStop;
     private final Id<TransitStopFacility> ptToStop;
 
@@ -58,7 +60,7 @@ public class ExperiencedLeg {
                    Id<Link> fromLink, Id<Link> toLink, double startTime,
                    double endTime, String mode, double waitTime, double grossWaitTime, double inVehicleTime,
                    double distance, Id<TransitRoute> transitRouteId,
-                   Id<TransitStopFacility> ptFromStop, Id<TransitStopFacility> ptToStop, List<Id<Link>>  routeList) {
+                   Id<TransitStopFacility> ptFromStop, Id<TransitStopFacility> ptToStop, List<Triple<Id<Link>, Double, Double>>  routeList, double inShapeMileage) {
         this.agent = agent;
 //		this.from = from;
 //		this.to = to;
@@ -75,13 +77,22 @@ public class ExperiencedLeg {
         this.ptFromStop = ptFromStop;
         this.ptToStop = ptToStop;
         this.routeList=routeList;
+        this.inShapeMileage=inShapeMileage;
+        
+        
+		
+
     }
-    List<Id<Link>> getRouteListe() {
+    List<Triple<Id<Link>, Double, Double>> getRouteListe() {
         return routeList;
     }
 
     double getDistance() {
         return distance;
+    }
+    
+    double getInShapeMileage() {
+        return inShapeMileage;
     }
 
     Id<Person> getAgent() {
@@ -137,5 +148,5 @@ public class ExperiencedLeg {
     Id<TransitStopFacility> getPtToStop() {
         return ptToStop;
     }
-
+    
 }

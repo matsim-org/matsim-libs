@@ -85,8 +85,8 @@ public class ActivitiesEventHandler
 	}
 
 	public List<Trip> getTrips() {
-		return getSubTripsByRadom(trips, 10000);
-		//return this.trips;
+//		return getSubTripsByRadom(trips, 10000);
+		return this.trips;
 	}
 
 	public List<Trip> getSubTripsByRadom(List<Trip> list, int count) {

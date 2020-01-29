@@ -62,14 +62,24 @@ import com.opencsv.CSVReader;
  */
 public class UamNetworkFleetCreatorFromCSV {
 
-	static String hubFile = "C://Users//VWBIDGN//Documents//ports.csv";
-	static String inputNetwork = "D://Matsim//Axer//Hannover//Base//vw280_0.1//vw280_0.1.output_network.xml.gz";
-	static String outputFolder = "D://Matsim//Axer//Hannover//ZIM//input//uam";
-	static List<String[]> CSVData;
-	static HashMap<Id<Link>, Double> coord2PortsMap = new HashMap<Id<Link>, Double>();
-	static final String UAM_MODE = "uam";
-	static Network network;
-	static Network filteredCarNetwork;
+	// String hubFile = "C://Users//VWBIDGN//Documents//ports.csv";
+	// String inputNetwork =
+	// "D://Matsim//Axer//Hannover//Base//vw280_0.1//vw280_0.1.output_network.xml.gz";
+	// String outputFolder = "D://Matsim//Axer//Hannover//ZIM//input//uam";
+	String hubFile;
+	String inputNetwork;
+	String outputFolder;
+	List<String[]> CSVData;
+	HashMap<Id<Link>, Integer> coord2PortsMap;
+	final static String UAM_MODE = "uam";
+	Network network;
+	Network uamNetwork;
+	Network filteredCarNetwork;
+	public double weightIn = 0.7;
+	public double weightOut = 0.3;
+	TransitSchedule transitSchedule;
+	Integer totalPorts;
+	List<Node> skyNodes = new ArrayList<>();
 
 	// static final ImmutableList<Id<Link>> SELECTED_LINK_IDS =
 	// ImmutableList.of(Id.createLinkId(187463),
@@ -79,31 +89,45 @@ public class UamNetworkFleetCreatorFromCSV {
 
 	static final String HUB_LINK_ID_PREFIX = "HUB_";
 
-	private static final double UAV_EFFECTIVE_CELL_SIZE = 7.5;// [m]; see DEFAULT_EFFECTIVE_CELL_SIZE
+	private final double UAV_EFFECTIVE_CELL_SIZE = 7.5;// [m]; see DEFAULT_EFFECTIVE_CELL_SIZE
 
 	// XXX could be split into EGRESS and ACCESS links, each 2 min long
-	private static final double HUB_LINK_TRAVEL_TIME = 5 * 60;// [s]; 1 / 5-min frequency per port
-	private static final double HUB_LINK_LENGTH = UAV_EFFECTIVE_CELL_SIZE;// [m] only one UAV per lane at a time
-	private static final double HUB_LINK_NUM_LANES = 5;// [lanes] = number of ports at the hub
-	private static final double HUB_LINK_SPEED = HUB_LINK_LENGTH / HUB_LINK_TRAVEL_TIME;// [m/s]
-	private static final double HUB_LINK_FLOW_CAPACITY = 3600. * HUB_LINK_NUM_LANES / HUB_LINK_TRAVEL_TIME;// 60 [veh/h]
+	private final double HUB_LINK_TRAVEL_TIME = 5 * 60;// [s]; 1 / 5-min frequency per port
+	private final double HUB_LINK_LENGTH = UAV_EFFECTIVE_CELL_SIZE;// [m] only one UAV per lane at a time
+	public double HUB_LINK_NUM_LANES = 5;// [lanes] = number of ports at the hub
+	private final double HUB_LINK_SPEED = HUB_LINK_LENGTH / HUB_LINK_TRAVEL_TIME;// [m/s]
+	private final double HUB_LINK_FLOW_CAPACITY = 3600. * HUB_LINK_NUM_LANES / HUB_LINK_TRAVEL_TIME;// 60 [veh/h]
 
-	private static final double RED_LINK_TRAVEL_TIME = 30;// [s]
-	private static final double RED_LINK_LENGTH = 150;// [m]
-	private static final double RED_LINK_NUM_LANES = UAV_EFFECTIVE_CELL_SIZE / RED_LINK_LENGTH;// [lanes]; only 1 UAV at
-																								// a time
-	private static final double RED_LINK_SPEED = RED_LINK_LENGTH / RED_LINK_TRAVEL_TIME;// 5 [m/s]
-	private static final double RED_LINK_FLOW_CAPACITY = 3600. / RED_LINK_TRAVEL_TIME;// 120 [veh/h]
+	private final double RED_LINK_TRAVEL_TIME = 15;// [s]
+	private final double RED_LINK_LENGTH = 150;// [m]
+	private final double VERTICAL_SEPARATION = 100; // [m]
 
-	private static final double GREEN_LINK_SPEED = 108 / 3.6;// [m/s]; 108 km/h
-	private static final double GREEN_LINK_FLOW_CAPACITY = 60;// [veh/h]
+	/**
+	 * NEED TO KNOW: RED_LINK_NUM_LANES defines implicitly the storage capacity of
+	 * this link. As the storage capacity is calculated by LinkLength/CellSize *
+	 * lanes, one need to down scale RED_LINK_NUM_LANES with the factor
+	 * (UAV_EFFECTIVE_CELL_SIZE / RED_LINK_LENGTH) in order to reduce the effective
+	 * storage capacity
+	 */
 
-	public static void main(String[] args) {
+	private final double RED_LINK_NUM_LANES = UAV_EFFECTIVE_CELL_SIZE / RED_LINK_LENGTH
+			* (RED_LINK_LENGTH / VERTICAL_SEPARATION);// [lanes]; only 1 UAV at	a time
+	private final double RED_LINK_SPEED = RED_LINK_LENGTH / RED_LINK_TRAVEL_TIME;// 5 [m/s]
+	private final double RED_LINK_FLOW_CAPACITY = 3600. / RED_LINK_TRAVEL_TIME;// 120 [veh/h]
+
+	private final double GREEN_LINK_SPEED = 108 / 3.6;// [m/s]; 108 km/h
+	private final double GREEN_LINK_FLOW_CAPACITY = 60;// [veh/h]
+
+	public UamNetworkFleetCreatorFromCSV(String hubFile, String inputNetwork, String outputFolder) {
+		this.hubFile = hubFile;
+		this.inputNetwork = inputNetwork;
+		this.outputFolder = outputFolder;
+		this.coord2PortsMap = new HashMap<Id<Link>, Integer>();
 		// read network (CRS: ETRS89_UTM_zone_32N)
-		network = NetworkUtils.createNetwork();
-		new MatsimNetworkReader(network).readFile(inputNetwork);
+		this.network = NetworkUtils.createNetwork();
+		new MatsimNetworkReader(this.network).readFile(inputNetwork);
 
-		NetworkFilterManager nfm = new NetworkFilterManager(network);
+		NetworkFilterManager nfm = new NetworkFilterManager(this.network);
 		nfm.addLinkFilter(new NetworkLinkFilter() {
 
 			@Override
@@ -115,15 +139,24 @@ public class UamNetworkFleetCreatorFromCSV {
 			}
 		});
 
-		filteredCarNetwork = nfm.applyFilters();
-		readHubsCSV();
+		this.filteredCarNetwork = nfm.applyFilters();
 
-		Network uamNetwork = NetworkUtils.createNetwork();
-		TransitSchedule transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
-		List<Node> skyNodes = new ArrayList<>();
+		this.uamNetwork = NetworkUtils.createNetwork();
+		this.transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
+	}
+
+	public static void main(String[] args) {
+		new UamNetworkFleetCreatorFromCSV("C://Users//VWBIDGN//Documents//ports.csv",
+				"D://Matsim//Axer//Hannover//Base//vw280_0.1//vw280_0.1.output_network.xml.gz",
+				"D://Matsim//Axer//Hannover//ZIM//input//uam").run(500);
+	}
+
+	public void run(Integer totalPorts) {
+		this.totalPorts = totalPorts;
+		readHubsCSV();
 		Set<String> uamLinkModes = ImmutableSet.of(UAM_MODE);
 		int i = 0;
-		for (Entry<Id<Link>, Double> entry : coord2PortsMap.entrySet()) {
+		for (Entry<Id<Link>, Integer> entry : coord2PortsMap.entrySet()) {
 			// TODO currently they are in the middle of each link
 			Coord hubCoord = network.getLinks().get(entry.getKey()).getCoord();
 
@@ -185,21 +218,34 @@ public class UamNetworkFleetCreatorFromCSV {
 		generateFleet();
 	}
 
-	public static void readHubsCSV() {
+	public void readHubsCSV() {
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				"EPSG:25832");
 
+		// "clusterId","demand","lon","lat","demandRel","dir"
 		CSVReader reader = null;
 		try {
 			reader = new CSVReader(new FileReader(hubFile));
 			CSVData = reader.readAll();
 			for (int i = 1; i < CSVData.size(); i++) {
 				String[] lineContents = CSVData.get(i);
-				double lat = Double.parseDouble(lineContents[0]); // lat,
-				double lon = Double.parseDouble(lineContents[1]); // lon,
-				double ports = Integer.parseInt(lineContents[2]);
+				double clusterId = Integer.parseInt(lineContents[0]); // clusterId,
+				double demand = Double.parseDouble(lineContents[1]); // demand,
+				double lat = Double.parseDouble(lineContents[2]); // lon
+				double lon = Double.parseDouble(lineContents[3]); // lat
+				double demandRel = Double.parseDouble(lineContents[4]); // demandRel
+				String dir = lineContents[5]; // dir
+				Integer uavFleetAtPort;
+				if (dir.equals("in")) {
+					uavFleetAtPort = (int) Math.round(demandRel * totalPorts * weightIn);
+				} else if (dir.equals("out")) {
+					uavFleetAtPort = (int) Math.round(demandRel * totalPorts * weightOut);
+				} else {
+					uavFleetAtPort = (int) (demandRel * totalPorts);
+				}
 				Coord transFormedCoord = ct.transform(new Coord(lat, lon));
-				coord2PortsMap.put(NetworkUtils.getNearestLink(filteredCarNetwork, transFormedCoord).getId(), ports);
+				coord2PortsMap.put(NetworkUtils.getNearestLink(filteredCarNetwork, transFormedCoord).getId(),
+						uavFleetAtPort);
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -217,10 +263,10 @@ public class UamNetworkFleetCreatorFromCSV {
 
 	}
 
-	static void generateFleet() {
+	void generateFleet() {
 		FleetSpecification fleet = new FleetSpecificationImpl();
 		int i = 0;
-		for (Entry<Id<Link>, Double> entry : coord2PortsMap.entrySet()) {
+		for (Entry<Id<Link>, Integer> entry : coord2PortsMap.entrySet()) {
 			Id<Link> hub = Id.createLinkId(UamNetworkCreator.HUB_LINK_ID_PREFIX + i);
 
 			int vehicles = entry.getValue().intValue();

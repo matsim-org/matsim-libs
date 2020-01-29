@@ -23,15 +23,11 @@ package vwExamples.Zim;
 import static org.matsim.contrib.drt.run.DrtModeModule.Direction;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -45,22 +41,16 @@ import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtModule;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.AbstractDvrpModeModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.run.DvrpQSimComponents;
-import org.matsim.contrib.dvrp.run.ModalProviders;
-import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
@@ -74,20 +64,28 @@ import com.google.inject.Provider;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
 
+import uam.scenario.UamNetworkFleetCreatorFromCSV;
+
 /**
  * @author Steffen Axer, based on Michal Maciejewski (michalm)
  */
 public class Sim06_AirDRT_Commuter {
-	public void run(String runId, String base, String configFilename, String network, String inputPlans,
-			int fleet, int qsimcores, int hdlcores) throws IOException {
-		
-//		Logger.getRootLogger().setLevel(Level.DEBUG);
-		
+	public void run(String runId, String base, String configFilename, String network, String inputPlans, int fleet,
+			int qsimcores, int hdlcores) throws IOException {
+
+		// Logger.getRootLogger().setLevel(Level.DEBUG);
+
 		String inbase = base;
 		String input = inbase + "input//";
 		final Config config = ConfigUtils.loadConfig(inbase + "//input//" + configFilename,
 				new MultiModeDrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup(), new CadytsConfigGroup());
 
+		UamNetworkFleetCreatorFromCSV fleetCreator= new UamNetworkFleetCreatorFromCSV(input + "uam//ports.csv", input + "//network//" + network, input + "//uam");
+		fleetCreator.weightIn=0.8;
+		fleetCreator.weightOut=0.2;
+		fleetCreator.HUB_LINK_NUM_LANES=200;
+		fleetCreator.run(fleet);
+		
 		DvrpConfigGroup.get(config).setNetworkModesAsString("uam");
 		MultiModeDrtConfigGroup multiModeDrtCfg = MultiModeDrtConfigGroup.get(config);
 
@@ -99,7 +97,7 @@ public class Sim06_AirDRT_Commuter {
 		uamCfg.setStopDuration(105);
 		uamCfg.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
 		uamCfg.setTransitStopFile(inbase + "//input//uam//uam_stops.xml");
-		uamCfg.setMaxWalkDistance(10000.0);
+		uamCfg.setMaxWalkDistance(20000.0);
 		uamCfg.setVehiclesFile(inbase + "//input//uam//uam_fleet.xml");
 		uamCfg.setUseModeFilteredSubnetwork(true);
 		uamCfg.setOperationalScheme(OperationalScheme.stopbased);
@@ -135,14 +133,12 @@ public class Sim06_AirDRT_Commuter {
 		config.qsim().setNumberOfThreads(1);
 
 		// Network with UAM
-		config.network().setInputFile(inbase + "//input//uam/" + network);
+		config.network().setInputFile(inbase + "//input//uam/network_with_uam.xml.gz");
 
 		config.controler().setRunId(runId);
 
 		config.controler().setOutputDirectory(inbase + "//output//" + runId); // Define dynamically the the
 
-		
-		
 		if (true) {
 
 			// Every x-seconds the simulation calls a re-balancing process.
@@ -163,7 +159,7 @@ public class Sim06_AirDRT_Commuter {
 			uamCfg.addParameterSet(rebalancingParams);
 
 		}
-		
+
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
 		ScenarioUtils.loadScenario(scenario);
 

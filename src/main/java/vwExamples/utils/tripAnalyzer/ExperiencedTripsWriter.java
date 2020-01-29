@@ -48,6 +48,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang.mutable.MutableInt;
 import org.apache.commons.lang3.mutable.MutableDouble;
+import org.apache.commons.lang3.tuple.Triple;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.geotools.geometry.jts.JTSFactoryFinder;
@@ -71,6 +72,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.utils.geometry.GeometryUtils;
@@ -95,13 +97,13 @@ public class ExperiencedTripsWriter {
 
 	private Map<String, Geometry> zoneMap;
 	private Geometry boundary;
-	private List<Geometry> districtGeometryList;
-	private GeometryFactory geomfactory;
-	private GeometryCollection geometryCollection;
+	// private List<Geometry> districtGeometryList;
+	// private GeometryFactory geomfactory;
+	// private GeometryCollection geometryCollection;
 	private Map<String, List<ExperiencedTrip>> tourId2trips;
 	private Map<String, List<ParkingEvent>> zoneId2ParkingEvents;
 	private List<ParkingEvent> parkingEvents;
-	private Map<Id<Link>, String> linkToZoneMap;
+	// private Map<Id<Link>, String> linkToZoneMap;
 	private Map<String, MutableInt> zoneToStreetMeters;
 	private Map<String, Map<Double, Set<Id<Vehicle>>>> Zone2BinActiveVehicleMap;
 	private Map<String, MutableDouble> Mode2MileageMap;
@@ -111,10 +113,12 @@ public class ExperiencedTripsWriter {
 	int writeCounter = 0;
 	GeometryFactory f;
 
+	Set<String> acceptedMainModes;
+
 	public ExperiencedTripsWriter(String path, Map<Id<Person>, List<ExperiencedTrip>> agent2trips,
 			Map<String, Map<Double, Set<Id<Vehicle>>>> Zone2BinActiveVehicleMap,
 			Map<String, MutableDouble> Mode2MileageMap, Set<String> monitoredModes, Network network,
-			Map<String, Geometry> zoneMap) {
+			Map<String, Geometry> zoneMap, Geometry boundary) {
 		this.path = path;
 		this.agent2trips = agent2trips;
 		this.network = network;
@@ -122,12 +126,15 @@ public class ExperiencedTripsWriter {
 		this.zoneMap = zoneMap;
 		this.tourId2trips = new HashMap<String, List<ExperiencedTrip>>();
 		this.parkingEvents = new ArrayList<ParkingEvent>();
-		this.linkToZoneMap = new HashMap<Id<Link>, String>();
+		// this.linkToZoneMap = new HashMap<Id<Link>, String>();
 		this.zoneToStreetMeters = new HashMap<String, MutableInt>();
 		this.Zone2BinActiveVehicleMap = Zone2BinActiveVehicleMap;
 		this.Mode2MileageMap = Mode2MileageMap;
 		this.ModalSplitSegments = new HashSet<ModalSplitSegment>();
 		this.f = new GeometryFactory();
+		this.acceptedMainModes = new HashSet<>(
+				Arrays.asList("car", "pt", "drt", "walk", "ride", "bike", "stayHome", "uam"));
+		this.boundary = boundary;
 
 		zone2WKTGeom = new HashMap<String, String>();
 
@@ -140,28 +147,22 @@ public class ExperiencedTripsWriter {
 
 		}
 
-		// potentialHomieAgents = new HashSet<Id<Person>>();
-		// relevantAgents = new HashSet<Id<Person>>();
-
-		districtGeometryList = new ArrayList<Geometry>();
 		zoneId2ParkingEvents = new HashMap<String, List<ParkingEvent>>();
-		geomfactory = JTSFactoryFinder.getGeometryFactory(null);
-		geometryCollection = geomfactory.createGeometryCollection(null);
 
 		try {
 			initialize();
 			calucalteCarLinkLengthPerZone();
-			getResearchAreaBoundary();
 			calcualteTrafficPerformance();
 			tourIdentifier();
 			tourClassifier();
 			getParkingTimes();
 			String folder = new File(path).getParentFile().getName();
 			writeTripLengthDist(new File(path).getParent() + "\\" + folder + ".tripLength");
-			analyseCarParking(new File(path).getParent() + "\\" + folder + ".parking", parkingEvents, 120);
+			analyseCarParking(new File(path).getParent() + "\\" + folder + ".parking", 120);
 			analyseActiveVehicles(new File(path).getParent() + "\\" + folder + ".activeVehicles");
 			writeMileagePerMode(new File(path).getParent() + "\\" + folder + ".mileage");
 			writeModalSplits(new File(path).getParent() + "\\" + folder + ".modalsplit");
+			writeAgentsTrajectories(new File(path).getParent() + "\\" + folder + ".trajectories");
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("could not initialize writer");
@@ -204,24 +205,34 @@ public class ExperiencedTripsWriter {
 				// double beelineTripDist = DistanceUtils.calculateDistance(
 				// network.getLinks().get(trip.getFromLinkId()).getCoord(),
 				// network.getLinks().get(trip.getToLinkId()).getCoord());
-				double totalDrivenTripDist = 0.0;
+				// double totalDrivenTripDist = 0.0;
 
-				for (ExperiencedLeg leg : trip.getLegs()) {
+				// for (ExperiencedLeg leg : trip.getLegs()) {
 
-					List<Id<Link>> routeList = leg.getRouteListe();
+				// if(agentTrips.getKey().toString().equals("na_22_37047201"))
+				// {
 
-					totalDrivenTripDist = totalDrivenTripDist + getRouteDistance(routeList);
+				// System.out.print(trip.getAgent() + ";" + leg.getInShapeMileage() + ";" +
+				// leg.getMode() + "\n");
+				// }
 
-				}
+				// List<Id<Link>> routeList = leg.getRouteListe();
+				// leg.getInShapreMileage();
+				//
+				// totalDrivenTripDist = totalDrivenTripDist + getRouteDistance(routeList);
+
+				// System.out.print(routeList);
+
+				// }
 
 				// In case of beeline modes there will be no in vehicle mileage
 				// Extract part pf the beeline that is within the research boundary
-				Geometry linePart = boundary.intersection(beeline);
-				if (totalDrivenTripDist == 0.0) {
-					totalDrivenTripDist = linePart.getLength();
-				}
+				// Geometry linePart = boundary.intersection(beeline);
+				// if (totalDrivenTripDist == 0.0) {
+				// totalDrivenTripDist = linePart.getLength();
+				// }
 
-				trip.setTotalInVehicleMilage(totalDrivenTripDist);
+				// trip.setTotalInVehicleMilage(totalDrivenTripDist);
 
 				// if (totalDrivenTripDist < beelineTripDist) {
 				// System.out.println(trip.getAgent() + " Mode: " + mode + " Beeline: " +
@@ -238,16 +249,17 @@ public class ExperiencedTripsWriter {
 	private void initialize() throws IOException {
 		bw = IOUtils.getBufferedWriter(path);
 		// write header
-		bw.write("totalVehMilage" + sep + "mainMode" + sep + "tripClass" + sep + "beeline" + sep + "tripId" + sep
-				+ "agent" + sep + "tripNumber" + sep + "activityBefore" + sep + "activityAfter" + sep + "fromLinkId"
-				+ sep + "fromX" + sep + "fromY" + sep + "toLinkId" + sep + "toX" + sep + "toY" + sep + "startTime" + sep
-				+ "endTime" + sep + "totalTravelTime" + sep + "numberOfLegs" + sep + "transitStopsVisited");
+		bw.write("mainMode" + sep + "tripClass" + sep + "beeline" + sep + "tripId" + sep + "agent" + sep + "tripNumber"
+				+ sep + "activityBefore" + sep + "activityAfter" + sep + "fromLinkId" + sep + "fromX" + sep + "fromY"
+				+ sep + "toLinkId" + sep + "toX" + sep + "toY" + sep + "startTime" + sep + "endTime" + sep
+				+ "totalTravelTime" + sep + "numberOfLegs" + sep + "transitStopsVisited");
 		for (String mode : monitoredModes) {
 			bw.write(sep + mode + ".InVehicleTime");
 			bw.write(sep + mode + ".Distance");
 			bw.write(sep + mode + ".WaitTime");
 			bw.write(sep + mode + ".maxPerLegWaitTime");
 			bw.write(sep + mode + ".NumberOfLegs");
+			bw.write(sep + mode + ".inShapeVehMileage");
 		}
 		bw.write(sep + "Other" + ".InVehicleTime");
 		bw.write(sep + "Other" + ".Distance");
@@ -259,8 +271,6 @@ public class ExperiencedTripsWriter {
 
 	private void tourClassifier() {
 		System.out.println("Working Tour Classification");
-		Set<String> acceptedMainModes = new HashSet<>(
-				Arrays.asList("car", "pt", "drt", "walk", "ride", "bike", "stayHome"));
 
 		// Modal Split Classes:
 		// Class 1: tours (no spatial filtering, complete demand model)
@@ -968,18 +978,20 @@ public class ExperiencedTripsWriter {
 
 	}
 
-	public void getResearchAreaBoundary() {
-		// This class infers the geometric boundary of all network link
-
-		Logger.getLogger(ExperiencedTripsWriter.class).warn("MERGED GEOMETRIES TO ONE LARGE ZONE BOUNDARY");
-		for (Geometry zoneGeom : this.zoneMap.values()) {
-			districtGeometryList.add(zoneGeom);
-		}
-
-		geometryCollection = (GeometryCollection) geomfactory.buildGeometry(districtGeometryList);
-		this.boundary = geometryCollection.union();
-
-	}
+	// public void getResearchAreaBoundary() {
+	// // This class infers the geometric boundary of all network link
+	//
+	// Logger.getLogger(ExperiencedTripsWriter.class).warn("MERGED GEOMETRIES TO ONE
+	// LARGE ZONE BOUNDARY");
+	// for (Geometry zoneGeom : this.zoneMap.values()) {
+	// districtGeometryList.add(zoneGeom);
+	// }
+	//
+	// geometryCollection = (GeometryCollection)
+	// geomfactory.buildGeometry(districtGeometryList);
+	// this.boundary = geometryCollection.union();
+	//
+	// }
 
 	private int mod(int x, int y) {
 		int result = x % y;
@@ -1185,7 +1197,7 @@ public class ExperiencedTripsWriter {
 
 	}
 
-	public void analyseCarParking(String fileName, List<ParkingEvent> parkingEvents, int binsize_s) {
+	public void analyseCarParking(String fileName, int binsize_s) {
 
 		for (ParkingEvent event : parkingEvents) {
 			String zoneId = event.getParkingZone();
@@ -1366,14 +1378,13 @@ public class ExperiencedTripsWriter {
 		format.setGroupingUsed(false);
 
 		double[] binBorders = { 0, 0.5, 1, 2, 5, 10, 20, 50, 100 };
-//		double[] binBorders = { 0,2, 4, 6, 8, 10, 20, 50, 100 };
+		// double[] binBorders = { 0,2, 4, 6, 8, 10, 20, 50, 100 };
 
-		for(ModalSplitSegment segment : ModalSplitSegments)
-		
-		
+		for (ModalSplitSegment segment : ModalSplitSegments)
+
 		{
 
-			BufferedWriter bw = IOUtils.getBufferedWriter(fileName+"_"+segment.SegmentClassNr + ".csv");
+			BufferedWriter bw = IOUtils.getBufferedWriter(fileName + "_" + segment.SegmentClassNr + ".csv");
 
 			try {
 				// Write header
@@ -1385,8 +1396,6 @@ public class ExperiencedTripsWriter {
 				bw.newLine();
 
 				int binIdx = 0;
-
-				
 
 				double binRightBorder = Double.NaN;
 
@@ -1474,6 +1483,70 @@ public class ExperiencedTripsWriter {
 
 			e.printStackTrace();
 		}
+	}
+
+	public void writeAgentsTrajectories(String filename) {
+		BufferedWriter bw = IOUtils.getBufferedWriter(filename + ".csv");
+		try {
+			// add header for leg
+			bw.write("agent" + sep + "fromAct" + sep + "toAct" + sep + "legMode" + sep + "linkId" + sep
+					+ "linkEnterTime" + sep + "linkLeaveTime" + sep + "fromNodeX" + sep + "fromNodeY" + sep + "toNodeX"
+					+ sep + "toNode");
+			bw.newLine();
+			for (List<ExperiencedTrip> tripList : agent2trips.values()) {
+				{
+					for (ExperiencedTrip trip : tripList) {
+
+						{
+
+							for (ExperiencedLeg leg : trip.getLegs()) {
+								String row;
+
+								if (leg.getRouteListe() != null) {
+									for (Triple<Id<Link>, Double, Double> trajectoryPart : leg.getRouteListe()) {
+
+										if (trajectoryPart != null) {
+											Link link = network.getLinks().get(trajectoryPart.getLeft());
+											double fromNodeX = link.getFromNode().getCoord().getX();
+											double fromNodeY = link.getFromNode().getCoord().getY();
+											double toNodeX = link.getToNode().getCoord().getX();
+											double toNodeY = link.getToNode().getCoord().getY();
+
+											row = trip.getAgent().toString() + sep + trip.getActivityBefore() + sep
+													+ trip.getActivityAfter() + sep + leg.getMode() + sep
+													+ trajectoryPart.getLeft() + sep + trajectoryPart.getMiddle() + sep
+													+ trajectoryPart.getRight() + sep + fromNodeX + sep + fromNodeY
+													+ sep + toNodeX + sep + toNodeY;
+										} else {
+											row = trip.getAgent().toString() + sep + trip.getActivityBefore() + sep
+													+ trip.getActivityAfter() + sep + leg.getMode() + sep + sep + ""
+													+ sep + "" + sep + "" + sep + "" + sep + "" + sep + "";
+
+										}
+										bw.write(row);
+										bw.newLine();
+									}
+								}
+								// Route list my be null, if leg is a teleport mode, such non-network-work etc.
+								// or if route is outside of the research area
+								row = trip.getAgent().toString() + sep + trip.getActivityBefore() + sep
+										+ trip.getActivityAfter() + sep + leg.getMode() + sep + sep + "" + sep + ""
+										+ sep + "" + sep + "" + sep + "" + sep + "";
+								bw.write(row);
+								bw.newLine();
+
+							}
+						}
+					}
+
+				}
+			}
+			bw.close();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			throw new RuntimeException("could not write");
+		}
+
 	}
 
 	public void writeMileagePerMode(String fileName) {
@@ -1687,43 +1760,6 @@ public class ExperiencedTripsWriter {
 			Set<Double> writtenPcts = new HashSet<Double>();
 			int totalNumberOfTrips = totalNumberTripToBeStored;
 
-			// agent2trips.values().parallelStream().forEach(tripList -> {
-			// for (ExperiencedTrip trip : tripList) {
-			//
-			// double pct = Math.round(((double) writeCounter / (double) totalNumberOfTrips)
-			// * 100.0);
-			//
-			// if ((pct % 5) == 0 && !writtenPcts.contains(pct)) {
-			// System.out.println("Written trips: " + pct + " %");
-			// writtenPcts.add(pct);
-			// // System.out.println(writeCounter);
-			// }
-			//
-			//// Coord from = network.getLinks().get(trip.getFromLinkId()).getCoord();
-			//// Coord to = network.getLinks().get(trip.getToLinkId()).getCoord();
-			////
-			//// LineString beeline = new LineSegment(new Coordinate(from.getX(),
-			// from.getY()),
-			//// new Coordinate(to.getX(), to.getY())).toGeometry(f);
-			////
-			//// String tripClass = intersectShape(beeline);
-			//// // String tripClass = "disabled";
-			////
-			//// trip.setTripClass(tripClass);
-			//// trip.setBeeline(beeline);
-			//
-			// writeExperiencedTrip(trip);
-			// try {
-			// bw.newLine();
-			// } catch (IOException e) {
-			// // TODO Auto-generated catch block
-			// e.printStackTrace();
-			// }
-			// this.writeCounter++;
-			//
-			// }
-			// });
-
 			for (List<ExperiencedTrip> tripList : agent2trips.values()) {
 				for (ExperiencedTrip trip : tripList) {
 
@@ -1734,20 +1770,6 @@ public class ExperiencedTripsWriter {
 						writtenPcts.add(pct);
 						// System.out.println(writeCounter);
 					}
-
-					// Coord from = network.getLinks().get(trip.getFromLinkId()).getCoord();
-					// Coord to = network.getLinks().get(trip.getToLinkId()).getCoord();
-					//
-					// Coordinate start = new Coordinate(from.getX(), from.getY());
-					// Coordinate end = new Coordinate(to.getX(), to.getY());
-					//
-					// LineString beeline = new LineSegment(start, end).toGeometry(f);
-					//
-					// String tripClass = intersectShape(beeline);
-					// // String tripClass = "disabled";
-					//
-					// trip.setTripClass(tripClass);
-					// trip.setBeeline(beeline);
 
 					writeExperiencedTrip(trip);
 					bw.newLine();
@@ -1762,68 +1784,25 @@ public class ExperiencedTripsWriter {
 		}
 	}
 
-	// public boolean intersectShape(Map<String, Geometry> zoneMap, LineString
-	// beeline) {
-	//
-	// for (Entry<String, Geometry> zoneGeom : zoneMap.entrySet()) {
-	// if (zoneGeom.getValue().intersects(beeline)) {
-	// return true;
-	// }
-	// }
-	//
-	// return false;
-	//
-	// }
-
-	// public void writeExperiencedTripsIntersectZoneMap() {
-	// try {
-	// GeometryFactory f = new GeometryFactory();
-	// bw.newLine();
-	// for (List<ExperiencedTrip> tripList : agent2trips.values()) {
-	// for (ExperiencedTrip trip : tripList) {
-	// if (relevantAgents.contains(trip.getAgent())) {
-	//
-	// Coord from = network.getLinks().get(trip.getFromLinkId()).getCoord();
-	// Coord to = network.getLinks().get(trip.getToLinkId()).getCoord();
-	//
-	// Coordinate start = new Coordinate(from.getX(), from.getY());
-	// Coordinate end = new Coordinate(to.getX(), to.getY());
-	//
-	// LineString beeline = new LineSegment(start, end).toGeometry(f);
-	//
-	// if (intersectShape(zoneMap, beeline)) {
-	// writeExperiencedTrip(trip);
-	// bw.newLine();
-	// }
-	//
-	// }
-	// }
-	// }
-	// bw.close();
-	// } catch (IOException e1) {
-	// e1.printStackTrace();
-	// throw new RuntimeException("could not write");
-	// }
-	// }
-
 	public void writeExperiencedLegs() {
 		try {
 			// add header for leg
-			bw.write("legNr" + sep + "legFromLinkId" + sep + "legToLinkId" + sep + "legStartTime" + sep + "legEndTime"
-					+ sep + "legMode" + sep + "legWaitTime" + sep + "legGrossWaitTime" + sep + "legInVehicleTime" + sep
-					+ "legDistance" + sep + "legTransitRouteId" + sep + "legPtFromStop" + sep + "legPtToStop");
+			// bw.write(sep + "legNr" + sep + "legFromLinkId" + sep + "legToLinkId" + sep +
+			// "legStartTime" + sep
+			// + "legEndTime" + sep + "legMode" + sep + "legWaitTime" + sep +
+			// "legGrossWaitTime" + sep
+			// + "legInVehicleTime" + sep + "legDistance" + sep + "legTransitRouteId" + sep
+			// + "legPtFromStop" + sep
+			// + "legPtToStop" + sep + "legTraj");
+			bw.write(sep + "legNr" + sep + "legFromLinkId" + sep + "legToLinkId" + sep + "legStartTime" + sep
+					+ "legEndTime" + sep + "legMode" + sep + "legWaitTime" + sep + "legGrossWaitTime" + sep
+					+ "legInVehicleTime" + sep + "legDistance" + sep + "legTransitRouteId" + sep + "legPtFromStop" + sep
+					+ "legPtToStop");
 			bw.newLine();
 			for (List<ExperiencedTrip> tripList : agent2trips.values()) {
 				{
 					for (ExperiencedTrip trip : tripList) {
-						// Coord from = network.getLinks().get(trip.getFromLinkId()).getCoord();
-						// Coord to = network.getLinks().get(trip.getToLinkId()).getCoord();
 
-						// if
-						// (vwExamples.utils.modalSplitAnalyzer.modalSplitEvaluator.isWithinZone(from,
-						// zoneMap)
-						// && vwExamples.utils.modalSplitAnalyzer.modalSplitEvaluator.isWithinZone(to,
-						// zoneMap))
 						{
 
 							for (int i = 0; i < trip.getLegs().size(); i++) {
@@ -1844,63 +1823,15 @@ public class ExperiencedTripsWriter {
 		}
 	}
 
-	// public void writeExperiencedLegsIntersectZoneMap() {
-	//
-	// GeometryFactory f = new GeometryFactory();
-	//
-	// try {
-	// // add header for leg
-	// bw.write(sep + "legNr" + sep + "legFromLinkId" + sep + "legToLinkId" + sep +
-	// "legStartTime" + sep
-	// + "legEndTime" + sep + "legMode" + sep + "legWaitTime" + sep +
-	// "legGrossWaitTime" + sep
-	// + "legInVehicleTime" + sep + "legDistance" + sep + "legTransitRouteId" + sep
-	// + "legPtFromStop" + sep
-	// + "legPtToStop");
-	// bw.newLine();
-	// for (List<ExperiencedTrip> tripList : agent2trips.values()) {
-	// {
-	// for (ExperiencedTrip trip : tripList) {
-	// if (relevantAgents.contains(trip.getAgent())) {
-	//
-	// Coord from = network.getLinks().get(trip.getFromLinkId()).getCoord();
-	// Coord to = network.getLinks().get(trip.getToLinkId()).getCoord();
-	//
-	// Coordinate start = new Coordinate(from.getX(), from.getY());
-	// Coordinate end = new Coordinate(to.getX(), to.getY());
-	//
-	// LineString beeline = new LineSegment(start, end).toGeometry(f);
-	//
-	// if (intersectShape(zoneMap, beeline)) {
-	//
-	// for (int i = 0; i < trip.getLegs().size(); i++) {
-	// ExperiencedLeg leg = trip.getLegs().get(i);
-	// writeExperiencedTrip(trip);
-	// writeExperiencedLeg(leg, i);
-	// bw.newLine();
-	// }
-	// }
-	// }
-	// }
-	//
-	// }
-	// }
-	// bw.close();
-	// } catch (IOException e1) {
-	// e1.printStackTrace();
-	// throw new RuntimeException("could not write");
-	// }
-	// }
-
 	private void writeExperiencedTrip(ExperiencedTrip trip) {
 		try {
 			Coord from = network.getLinks().get(trip.getFromLinkId()).getCoord();
 			Coord to = network.getLinks().get(trip.getToLinkId()).getCoord();
-			bw.write(trip.getTotalInVehicleMilage() + sep + trip.getMainMode() + sep + trip.getTripClass() + sep
-					+ trip.getBeeline() + sep + trip.getId() + sep + trip.getAgent() + sep + trip.getTripNumber() + sep
-					+ trip.getActivityBefore() + sep + trip.getActivityAfter() + sep + trip.getFromLinkId() + sep
-					+ from.getX() + sep + from.getY() + sep + trip.getToLinkId() + sep + to.getX() + sep + to.getY()
-					+ sep + convertSecondsToTimeString(trip.getStartTime()) + sep
+			bw.write(trip.getMainMode() + sep + trip.getTripClass() + sep + trip.getBeeline() + sep + trip.getId() + sep
+					+ trip.getAgent() + sep + trip.getTripNumber() + sep + trip.getActivityBefore() + sep
+					+ trip.getActivityAfter() + sep + trip.getFromLinkId() + sep + from.getX() + sep + from.getY() + sep
+					+ trip.getToLinkId() + sep + to.getX() + sep + to.getY() + sep
+					+ convertSecondsToTimeString(trip.getStartTime()) + sep
 					+ convertSecondsToTimeString(trip.getEndTime()) + sep + trip.getTotalTravelTime() + sep
 					+ trip.getLegs().size());
 			if (trip.getTransitStopsVisited().size() < 1) {
@@ -1917,7 +1848,8 @@ public class ExperiencedTripsWriter {
 					bw.write(sep + trip.getMode2inVehicleOrMoveTime().get(mode) + sep
 							+ trip.getMode2inVehicleOrMoveDistance().get(mode) + sep + trip.getMode2waitTime().get(mode)
 							+ sep + trip.getMode2maxPerLegWaitTime().get(mode) + sep
-							+ trip.getMode2numberOfLegs().get(mode));
+							+ trip.getMode2numberOfLegs().get(mode) + sep
+							+ trip.getMode2inShapeVehicleMilage().get(mode));
 				} catch (NullPointerException e) {
 					e.printStackTrace();
 					throw new RuntimeException(
@@ -1946,6 +1878,12 @@ public class ExperiencedTripsWriter {
 			} else {
 				bw.write(sep + "no pt" + sep + "no pt");
 			}
+			// Add trajectoryInformation
+			// if (leg.getRouteListe() != null) {
+			// bw.write(sep + leg.getRouteListe().toString());
+			// }
+			// bw.write(sep + "[]");
+
 		} catch (IOException e1) {
 			e1.printStackTrace();
 			throw new RuntimeException("could not write");

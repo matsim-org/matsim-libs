@@ -144,17 +144,18 @@ public class PlanModifierAirDRT {
 
 		subTourValidator = new isCommuterTourCandidate(network, cityZonesMap, serviceAreazonesMap);
 		assignTourValidator = new assignAirDRTTourCandidate(network, cityZonesMap, serviceAreazonesMap);
-		shiftingScenario = new ShiftingScenario(0.10);
+		shiftingScenario = new ShiftingScenario(0.6);
 
 	}
 
 	public static void main(String[] args) {
 
+		
 		PlanModifierAirDRT planmodifier = new PlanModifierAirDRT(
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Hannover_Stadtteile.shp",
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\shp\\Real_Region_Hannover.shp",
-				"D:\\Matsim\\Axer\\Hannover\\Base\\vw280_0.1\\vw280_0.1.output_plans.xml.gz",
-				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\vw280_0.1.output_plans_airDRT.xml.gz",
+				"D:\\Matsim\\Axer\\Hannover\\Base\\vw280_100pct\\vw280_100pct.output_plans.xml.gz",
+				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\vw280_100pct.output_plans_airDRT_0.6.xml.gz",
 				"D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\network\\network.xml.gz");
 		planmodifier.count();
 		planmodifier.assign();
@@ -164,9 +165,7 @@ public class PlanModifierAirDRT {
 	}
 
 	public void writeChangedTripsLog() {
-		String header= "personId;tripClass;tripStartTime;fromAct;toAct;fromX;fromY;toX;toY";
-		
-
+		String header = "personId;tripClass;tripStartTime;fromAct;toAct;fromX;fromY;toX;toY";
 
 		String outputFolder = new File(this.modPlansFile).getParent();
 
@@ -176,13 +175,12 @@ public class PlanModifierAirDRT {
 
 			bw.write(header);
 			bw.newLine();
-	
+
 			for (String trip : changedTripsLog) {
 
 				bw.write(trip);
 				bw.newLine();
 			}
-
 
 			bw.flush();
 			bw.close();
@@ -191,7 +189,6 @@ public class PlanModifierAirDRT {
 			e1.printStackTrace();
 			throw new RuntimeException("Could not write scenario statistics");
 		}
-
 
 	}
 
@@ -245,7 +242,9 @@ public class PlanModifierAirDRT {
 	}
 
 	public void count() {
-
+		int tripCounter = 0;
+		double minTripDistance = 2500.0;
+		double minUAMDistance = 15000.0;
 		// modifiedPopulationWriter.startStreaming(modPlansFile);
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
@@ -254,9 +253,26 @@ public class PlanModifierAirDRT {
 			Plan plan = person.getSelectedPlan();
 			for (Subtour subTour : TripStructureUtils.getSubtours(plan)) {
 
+				double numberOfTrips = subTour.getTrips().size();
+				double estimatedTourDistance = getBeelineTourLength(subTour);
+
+				double meanTripDistance = estimatedTourDistance / numberOfTrips;
+
+				// Get subtour mode
 				String subtourMode = getSubtourMode(subTour, plan);
 
-				if (subTourValidator.isValidSubTour(subTour) && subtourMode.equals("car")) {
+				if (subtourMode.equals("walk")) {
+					minTripDistance = 1700.0;
+				} else if (subtourMode.equals("bike")) {
+					minTripDistance = 3900.0;
+				}
+
+				// Check if this subtour can be shifted to an other mode
+				// It is not allowed to shift an already shifted tour
+				if (assignTourValidator.isValidSubTour(subTour) && meanTripDistance > minUAMDistance
+						&& subtourMode.equals("car")) {
+					// if (subTourValidator.isValidSubTour(subTour) && subtourMode.equals("car")) {
+
 					shiftingScenario.agentSet.add(person.getId());
 					shiftingScenario.totalSubtourCounter.increment();
 
@@ -367,23 +383,18 @@ public class PlanModifierAirDRT {
 									trip.getDestinationActivity());
 
 							String tripClass;
-							if(assignTourValidator.isWithinZone(trip.getDestinationActivity().getCoord()))	
-							{
-								tripClass="inbound";
+							if (assignTourValidator.isWithinZone(trip.getDestinationActivity().getCoord())) {
+								tripClass = "inbound";
+							} else {
+								tripClass = "outbound";
 							}
-							else{
-								tripClass="outbound";
-							}
-							
-							
-							String tripLine = personId.toString()+";"
-									+ tripClass +";"
-									+ trip.getOriginActivity().getEndTime()+";"
-									+ trip.getOriginActivity().getType()+";"
-									+ trip.getDestinationActivity().getType()+";"
-									+ trip.getOriginActivity().getCoord().getX()+";"
-									+ trip.getOriginActivity().getCoord().getY()+";"
-									+ trip.getDestinationActivity().getCoord().getX()+";"
+
+							String tripLine = personId.toString() + ";" + tripClass + ";"
+									+ trip.getOriginActivity().getEndTime() + ";" + trip.getOriginActivity().getType()
+									+ ";" + trip.getDestinationActivity().getType() + ";"
+									+ trip.getOriginActivity().getCoord().getX() + ";"
+									+ trip.getOriginActivity().getCoord().getY() + ";"
+									+ trip.getDestinationActivity().getCoord().getX() + ";"
 									+ trip.getDestinationActivity().getCoord().getY();
 
 							this.changedTripsLog.add(tripLine);
