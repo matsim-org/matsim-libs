@@ -20,7 +20,9 @@ package org.matsim.contrib.drt.scheduler;
 
 import java.util.List;
 
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
@@ -129,8 +131,14 @@ public class DrtScheduleTimingUpdater {
 
 			case STOP: {
 				// TODO does not consider prebooking!!!
+				double maxEarliestStartTime = ((DrtStopTask)task).getPickupRequests()
+						.values()
+						.stream()
+						.mapToDouble(DrtRequest::getEarliestStartTime)
+						.max()
+						.orElse(Double.NEGATIVE_INFINITY);
 				double duration = stopDuration;
-				return newBeginTime + duration;
+				return Math.max(newBeginTime + duration, maxEarliestStartTime);
 			}
 
 			default:
