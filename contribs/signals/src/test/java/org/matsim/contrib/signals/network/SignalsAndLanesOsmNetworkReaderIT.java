@@ -144,9 +144,10 @@ public class SignalsAndLanesOsmNetworkReaderIT {
             }
         }
 
-
         Assert.assertTrue("Not all nodes of working version where in network of Benchmark",allNodesInWorkingVersionAreInBase);
         Assert.assertTrue("Not all nodes of benchmark version where in network of working version",allNodesInBaseAreInWorkingVersion);
+
+
     }
 
     @Ignore
@@ -175,7 +176,7 @@ public class SignalsAndLanesOsmNetworkReaderIT {
 
 
         //TODO Parameterize - but than we have 2^5= 32 combinations
-        signalReader.setMinimizeSmallRoundabouts(true);
+//        signalReader.setMinimizeSmallRoundabouts(true);
         signalReader.setMergeOnewaySignalSystems(true);
         signalReader.setUseRadiusReduction(true);
         signalReader.setAllowUTurnAtLeftLaneOnly(true);
