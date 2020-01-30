@@ -141,8 +141,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	Map<Long, OsmNode> oldToSimplifiedJunctionNodeMap = new HashMap<>();
 	Map<Long, Set<OsmRelation>> osmNodeRestrictions = new HashMap<>();
 	
-
-	private boolean minimizeSmallRoundabouts = true;
 	private boolean mergeOnewaySignalSystems = true;
 	private boolean useRadiusReduction = true;
 	private boolean allowUTurnAtLeftLaneOnly = true;
@@ -186,7 +184,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		SignalsAndLanesOsmNetworkReader reader = new SignalsAndLanesOsmNetworkReader(network, ct, signalsData, lanes);
 
 
-//        reader.setMinimizeSmallRoundabouts(false);
 		reader.setMergeOnewaySignalSystems(false);
 		reader.setUseRadiusReduction(false);
 		reader.setAllowUTurnAtLeftLaneOnly(true);
@@ -273,9 +270,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		this.bbox = new BoundingBox(se.getY(), nw.getX(), nw.getY(), se.getX());
 	}
 
-//	public void setMinimizeSmallRoundabouts(boolean minimizeSmallRoundabouts){
-//        this.minimizeSmallRoundabouts = minimizeSmallRoundabouts;
-//    }
     public void setMergeOnewaySignalSystems(boolean mergeOnewaySignalSystems){
         this.mergeOnewaySignalSystems = mergeOnewaySignalSystems;
     }
@@ -325,8 +319,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		List<OsmNode> addingNodes = new ArrayList<>();
 		List<OsmNode> checkedNodes = new ArrayList<>();
 		List<OsmWay> checkedWays = new ArrayList<>();
-/*		if (this.minimizeSmallRoundabouts)
-            findingSmallRoundabouts(addingNodes, checkedNodes, checkedWays);*/
+
 
 		findingFourNodeJunctions(addingNodes, checkedNodes);
 
@@ -671,94 +664,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	}
 
 
-
-/*	private void findingSmallRoundabouts(List<OsmNode> addingNodes, List<OsmNode> checkedNodes,
-			List<OsmWay> checkedWays) {
-		for (OsmWay way : this.ways.values()) {
-			String roundabout = way.tags.get(TAG_JUNCTION);
-			if (roundabout != null && roundabout.equals("roundabout") && !checkedWays.contains(way)) {
-				List<OsmNode> roundaboutNodes = new ArrayList<>();
-				if (this.nodes.get(way.nodes.get(0)).equals(this.nodes.get(way.nodes.get(way.nodes.size() - 1)))) {
-					checkedWays.add(way);
-					for (Long nodeId : way.nodes) {
-						roundaboutNodes.add(this.nodes.get(nodeId));
-					}
-				}
-
-				//Find middlepoint and circumference of Roundabout
-				if (roundaboutNodes.size() > 1) {
-					OsmNode lastNode = roundaboutNodes.get(0);
-                    double repXmin = lastNode.coord.getX();
-                    double repXmax = lastNode.coord.getX();
-                    double repYmin = lastNode.coord.getY();
-                    double repYmax = lastNode.coord.getY();
-                    double repX;
-                    double repY;
-
-					double circumference = 0;
-
-					for (OsmNode tempNode : roundaboutNodes) {
-					    double tempNodeX = tempNode.coord.getX();
-                        double tempNodeY = tempNode.coord.getY();
-
-//                        if (tempNodeX < repXmin){
-//                            repXmin = tempNodeX;
-//                        } else if (tempNodeX > repXmax){
-//                            repXmax = tempNodeX;
-//                        }
-//                        if (tempNodeY < repYmin){
-//                            repYmin = tempNodeY;
-//                        } else if (tempNodeY > repYmax){
-//                            repYmax = tempNodeY;
-//                        }
-
-						if (repXmin == 0 || tempNode.coord.getX() < repXmin)
-							repXmin = tempNode.coord.getX();
-						if (repXmax == 0 || tempNode.coord.getX() > repXmax)
-							repXmax = tempNode.coord.getX();
-						if (repYmin == 0 || tempNode.coord.getY() < repYmin)
-							repYmin = tempNode.coord.getY();
-						if (repYmax == 0 || tempNode.coord.getY() > repYmax)
-							repYmax = tempNode.coord.getY();
-
-
-
-
-                        circumference += NetworkUtils.getEuclideanDistance(tempNodeX, tempNodeY,
-                                lastNode.coord.getX(), lastNode.coord.getY());
-						lastNode = tempNode;
-					}
-					repX = repXmin + (repXmax - repXmin) / 2;
-					repY = repYmin + (repYmax - repYmin) / 2;
-
-					//If this is a small Roundabout merge it to one point
-					if ((circumference / (2 * Math.PI)) < this.roundaboutRadius) {
-					    OsmNode roundaboutNode = new OsmNode(this.id, new Coord(repX, repY));
-						roundaboutNode.used = true;
-						for (OsmNode tempNode : roundaboutNodes) {
-							oldToSimplifiedJunctionNodeMap.put(tempNode.id, roundaboutNode);
-							if (osmNodeRestrictions.containsKey(tempNode.id)) {
-								osmNodeRestrictions.put(roundaboutNode.id, osmNodeRestrictions.get(tempNode.id));						
-							}
-							checkedNodes.add(tempNode);
-							tempNode.used = true;
-						}
-						addingNodes.add(roundaboutNode);
-						id++;
-					} else  {
-						//Fix RoundAbout - Error-Fix 23.01.2020
-						//remove again from checkedNodes
-						checkedWays.remove(way);
-					}
-				} else checkedWays.remove(way);
-			}
-		}
-	}*/
-
-
-
 	private void findingMoreNodeJunctions(List<OsmNode> addingNodes, List<OsmNode> checkedNodes) {
-
 		for (OsmNode node : this.nodes.values()) {
 			if (!checkedNodes.contains(node) && node.used && node.ways.size() > 1) {
 				List<OsmNode> junctionNodes = new ArrayList<>();
