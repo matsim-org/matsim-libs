@@ -186,7 +186,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		SignalsAndLanesOsmNetworkReader reader = new SignalsAndLanesOsmNetworkReader(network, ct, signalsData, lanes);
 
 
-        reader.setMinimizeSmallRoundabouts(false);
+//        reader.setMinimizeSmallRoundabouts(false);
 		reader.setMergeOnewaySignalSystems(false);
 		reader.setUseRadiusReduction(false);
 		reader.setAllowUTurnAtLeftLaneOnly(true);
@@ -273,9 +273,9 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		this.bbox = new BoundingBox(se.getY(), nw.getX(), nw.getY(), se.getX());
 	}
 
-	public void setMinimizeSmallRoundabouts(boolean minimizeSmallRoundabouts){
-        this.minimizeSmallRoundabouts = minimizeSmallRoundabouts;
-    }
+//	public void setMinimizeSmallRoundabouts(boolean minimizeSmallRoundabouts){
+//        this.minimizeSmallRoundabouts = minimizeSmallRoundabouts;
+//    }
     public void setMergeOnewaySignalSystems(boolean mergeOnewaySignalSystems){
         this.mergeOnewaySignalSystems = mergeOnewaySignalSystems;
     }
@@ -325,8 +325,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		List<OsmNode> addingNodes = new ArrayList<>();
 		List<OsmNode> checkedNodes = new ArrayList<>();
 		List<OsmWay> checkedWays = new ArrayList<>();
-		if (this.minimizeSmallRoundabouts)
-            findingSmallRoundabouts(addingNodes, checkedNodes, checkedWays);
+/*		if (this.minimizeSmallRoundabouts)
+            findingSmallRoundabouts(addingNodes, checkedNodes, checkedWays);*/
 
 		findingFourNodeJunctions(addingNodes, checkedNodes);
 
@@ -630,28 +630,37 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 	}
 
+	//TODO what does this do??
+	// sbraun 20200130 I feel he is just adding Nodes to the list junction Node without checking if these are junctions at all. They are just closer to first node than 30m
 	private void findCloseJunctionNodesWithSignals(OsmNode firstNode, OsmNode node, List<OsmNode> junctionNodes,
 			List<OsmNode> checkedNodes, double distance, boolean getAll) {
+		//Loop over all ways of given node
 		for (OsmWay way : node.ways.values()) {
 			String oneway = way.tags.get(TAG_ONEWAY);
 			if (oneway != null) { // && (oneway.equals("yes") || oneway.equals("true") || oneway.equals("1"))
+				//Again loop over all nodes of way
 				for (int i = way.nodes.indexOf(node.id) + 1; i < way.nodes.size(); i++) {
 					OsmNode otherNode = nodes.get(way.nodes.get(i));
+					//Check if Node has a signal, is already checked and is in not in the list junctionNode
 					if (otherNode.used && !checkedNodes.contains(otherNode) && !junctionNodes.contains(otherNode)) {
+						// if smaller than 30m
                         if (NetworkUtils.getEuclideanDistance(node.coord.getX(), node.coord.getY(),
                                 otherNode.coord.getX(), otherNode.coord.getY()) < distance) {
-							if (otherNode.id == firstNode.id) {
+							//TODO how does he know that otherNode is at a Junction???
+                        	if (otherNode.id == firstNode.id) {
 								junctionNodes.add(otherNode);
 							} else {
 
 								junctionNodes.add(otherNode);
 								findCloseJunctionNodesWithSignals(firstNode, otherNode, junctionNodes, checkedNodes,
 										distance, getAll);
+								//if firstNode is not a junction not forget about this again
 								if (!junctionNodes.contains(firstNode)) {
 									junctionNodes.remove(otherNode);
 								}
 							}
 						}
+                        //if >30m go to next node
 						break;
 					}
 				}
@@ -661,7 +670,9 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 	}
 
-	private void findingSmallRoundabouts(List<OsmNode> addingNodes, List<OsmNode> checkedNodes,
+
+
+/*	private void findingSmallRoundabouts(List<OsmNode> addingNodes, List<OsmNode> checkedNodes,
 			List<OsmWay> checkedWays) {
 		for (OsmWay way : this.ways.values()) {
 			String roundabout = way.tags.get(TAG_JUNCTION);
@@ -742,11 +753,12 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				} else checkedWays.remove(way);
 			}
 		}
-	}
+	}*/
 
 
 
 	private void findingMoreNodeJunctions(List<OsmNode> addingNodes, List<OsmNode> checkedNodes) {
+
 		for (OsmNode node : this.nodes.values()) {
 			if (!checkedNodes.contains(node) && node.used && node.ways.size() > 1) {
 				List<OsmNode> junctionNodes = new ArrayList<>();
@@ -869,6 +881,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			if (!checkedNodes.contains(node) && node.used && signalizedOsmNodes.contains(node.id)
 					&& node.ways.size() > 1) {
 				List<OsmNode> junctionNodes = new ArrayList<>();
+				//TODO this 30m seems very arbitrary
 				double distance = 30;
 				findCloseJunctionNodesWithSignals(node, node, junctionNodes, checkedNodes, distance, false);
 
@@ -996,6 +1009,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				OsmNode junctionNode = null;
 				String oneway = way.tags.get(TAG_ONEWAY);
 				if (signalizedOsmNodes.contains(signalNode.id) && !isNodeAtJunction(signalNode)) {
+
 					if ((oneway != null && !oneway.equals("-1")) || oneway == null) {
 						// positive oneway or no oneway
 
@@ -1006,6 +1020,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 							// either a junction or the end point of this way where a new way start
 							junctionNode = nextNode;
 						}
+
+						//TODO sbraun20200130 This is only used once in Cottbus and it will only rest above junctionNode to Null again.
 						if (i < way.nodes.size() - 2) {
 							OsmNode secondNextNode = this.nodes.get(way.nodes.get(i + 2));
 							if (crossingOsmNodes.contains(nextNode.id) && secondNextNode.ways.size() > 1) {
@@ -1028,22 +1044,23 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 							// either a junction or the start point of this way where another way ends
 							junctionNode = prevNode;
 						}
-						if (i > 1) {
-							OsmNode secondPrevNode = this.nodes.get(way.nodes.get(i - 2));
-							if (crossingOsmNodes.contains(prevNode.id) && secondPrevNode.ways.size() > 1) {
-								// previous node = pedestrian crossing. and the second previous node is either a junction or the start of the way
-								junctionNode = secondPrevNode;
-							}
-						}
+						//TODO sbraun 20203001 Never used - delete???
+//						if (i > 1) {
+//							OsmNode secondPrevNode = this.nodes.get(way.nodes.get(i - 2));
+//							if (crossingOsmNodes.contains(prevNode.id) && secondPrevNode.ways.size() > 1) {
+//								// previous node = pedestrian crossing. and the second previous node is either a junction or the start of the way
+//								junctionNode = secondPrevNode;
+//							}
+//						}
                         if (junctionNode != null && NetworkUtils.getEuclideanDistance(signalNode.coord.getX(), signalNode.coord.getY(),
                                 junctionNode.coord.getX(), junctionNode.coord.getY()) < SIGNAL_MERGE_DISTANCE) {
 							signalizedOsmNodes.remove(signalNode.id);
 							signalizedOsmNodes.add(junctionNode.id);
 						}
 					}
+//					TODO sbraun 20200124 try to break here?  28.01.2020 doesnt do anything in Cottbus
+//					if (junctionNode!= null) break;
 				}
-				//TODO sbraun 20200124 try to break here?  28.01.2020 doesnt do anything in Cottbus
-				//if (junctionNode!= null) break;
 			}
 		}
 	}
