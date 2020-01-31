@@ -234,20 +234,8 @@ class ChoiceSet {
 						}
 
 						LeastCostPathCalculator.Path result = this.forwardMultiNodeDijkstra.constructPath( link.getToNode(), movedActNode, startTime );
-						{
-							NetworkRoute linkNetworkRouteImpl = RouteUtils.createLinkNetworkRouteImpl(activityToRelocate.getLinkId(), link.getId());
-							double distance = 0;
-							if (result.links != null && !result.links.isEmpty()) {
-								List<Id<Link>> linkIds = new ArrayList<>();
-								for (Link linkInRoute : result.links) {
-									linkIds.add(linkInRoute.getId());
-									distance += linkInRoute.getLength();
-								}
-								linkNetworkRouteImpl.setLinkIds(activityToRelocate.getLinkId(), linkIds, link.getId());
-							}
-							linkNetworkRouteImpl.setDistance(distance);
-							Objects.requireNonNull(previousLeg).setRoute(linkNetworkRouteImpl);
-						}
+						NetworkRoute linkNetworkRouteImpl = getNetworkRoute(activityToRelocate, link, result);
+						Objects.requireNonNull(previousLeg).setRoute(linkNetworkRouteImpl);
 						Objects.requireNonNull( previousLeg ).setTravelTime( result.travelTime );
 
 					}
@@ -262,20 +250,8 @@ class ChoiceSet {
 						double startTime = PlanRouter.calcEndOfActivity( activityToRelocate, planTmp, scenario.getConfig() );
 
 						LeastCostPathCalculator.Path result = this.backwardMultiNodeDijkstra.constructPath( link.getToNode(), movedActNode, startTime);
-						{
-							NetworkRoute linkNetworkRouteImpl = RouteUtils.createLinkNetworkRouteImpl(activityToRelocate.getLinkId(), link.getId());
-							double distance = 0;
-							if (result.links != null && !result.links.isEmpty()) {
-								List<Id<Link>> linkIds = new ArrayList<>();
-								for (Link linkInRoute : result.links) {
-									linkIds.add(linkInRoute.getId());
-									distance += linkInRoute.getLength();
-								}
-								linkNetworkRouteImpl.setLinkIds(activityToRelocate.getLinkId(), linkIds, link.getId());
-							}
-							linkNetworkRouteImpl.setDistance(distance);
-							Objects.requireNonNull(leg).setRoute(linkNetworkRouteImpl);
-						}
+						NetworkRoute linkNetworkRouteImpl = getNetworkRoute(activityToRelocate, link, result);
+						Objects.requireNonNull(leg).setRoute(linkNetworkRouteImpl);
 						Objects.requireNonNull( leg ).setTravelTime( result.travelTime );
 					}
 				}
@@ -300,6 +276,21 @@ class ChoiceSet {
 			// I don't think that this can happen.  But it was in the code before, and better safe than sorry.  kai, mar'19
 			return Collections.singletonList( new ScoredAlternative( largestValue, facilityIdWithLargestScore ) )  ;
 		}
+	}
+
+	private NetworkRoute getNetworkRoute(Activity activityToRelocate, Link link, LeastCostPathCalculator.Path result) {
+		NetworkRoute linkNetworkRouteImpl = RouteUtils.createLinkNetworkRouteImpl(activityToRelocate.getLinkId(), link.getId());
+		double distance = 0;
+		if (result.links != null && !result.links.isEmpty()) {
+			List<Id<Link>> linkIds = new ArrayList<>();
+			for (Link linkInRoute : result.links) {
+				linkIds.add(linkInRoute.getId());
+				distance += linkInRoute.getLength();
+			}
+			linkNetworkRouteImpl.setLinkIds(activityToRelocate.getLinkId(), linkIds, link.getId());
+		}
+		linkNetworkRouteImpl.setDistance(distance);
+		return linkNetworkRouteImpl;
 	}
 
 }
