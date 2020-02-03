@@ -208,12 +208,12 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 
 		flowcap_accumulate.setValue(flowCapacityPerTimeStep);
 
-		if ( context.qsimConfig.getTimeStepSize() < 1. ) {
-			throw new RuntimeException("yyyy This will produce weird results because in at least one place "
-					+ "(addFromUpstream(...)) everything is pulled to integer values.  Aborting ... "
-					+ "(This statement may no longer be correct; I think that the incriminating code was modified.  So please test and remove"
-					+ " the warning if it works. kai, sep'14") ;
-		}
+//		if ( context.qsimConfig.getTimeStepSize() < 1. ) {
+//			throw new RuntimeException("yyyy This will produce weird results because in at least one place "
+//					+ "(addFromUpstream(...)) everything is pulled to integer values.  Aborting ... "
+//					+ "(This statement may no longer be correct; I think that the incriminating code was modified.  So please test and remove"
+//					+ " the warning if it works. kai, sep'14") ;
+//		}
 
 	}
 
@@ -680,7 +680,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		QVehicle veh = buffer.poll();
 		bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
 		if( context.qsimConfig.isUsingFastCapacityUpdate() ) {
-			flowcap_accumulate.setTimeStep(now - 1);
+			flowcap_accumulate.setTimeStep(now - context.qsimConfig.getTimeStepSize());
 		}
 		return veh;
 	}
