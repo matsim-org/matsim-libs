@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
@@ -122,8 +123,10 @@ public class SignalsAndLanesOsmNetworkReaderBenchmarkTest {
         SignalsAndLanesOsmNetworkReaderBenchmark signalReaderBenchmark = new SignalsAndLanesOsmNetworkReaderBenchmark(networkBenchmark, ct, signalsDataBenchmark, lanesBenchmark);
 
         //TODO Parameterize - but than we have 2^5= 32 combinations
-        signalReader.setMinimizeSmallRoundabouts(input1);
-        signalReaderBenchmark.setMinimizeSmallRoundabouts(input1);
+//        signalReader.setMinimizeSmallRoundabouts(input1);
+//        signalReaderBenchmark.setMinimizeSmallRoundabouts(input1);
+
+        signalReaderBenchmark.setMinimizeSmallRoundabouts(false);
 
         signalReader.setMergeOnewaySignalSystems(input2);
         signalReaderBenchmark.setMergeOnewaySignalSystems(input2);
@@ -167,6 +170,32 @@ public class SignalsAndLanesOsmNetworkReaderBenchmarkTest {
         int NoSignalizedOsmNodes = signalReader.signalizedOsmNodes.size();
         int NoSignalizedOsmNodesBenchmark = signalReaderBenchmark.signalizedOsmNodes.size();
 
+        //Check in detail if all nodes are identical by coordinate
+        Set nodeCoordinatesBenchmark = new HashSet();
+        Set nodeCoordinates = new HashSet();
+
+        for(Node node : networkBenchmark.getNodes().values()){
+            nodeCoordinatesBenchmark.add(node.getCoord());
+        }
+        boolean allNodesInWorkingVersionAreInBase = true;
+        for (Node node: network.getNodes().values()){
+            nodeCoordinates.add(node.getCoord());
+            if(!(nodeCoordinatesBenchmark.contains(node.getCoord()))){
+                allNodesInWorkingVersionAreInBase = false;
+                System.out.println("Node "+node.getId()+" is not in Benchmark");
+            }
+        }
+        boolean allNodesInBaseAreInWorkingVersion = true;
+        for (Node node: networkBenchmark.getNodes().values()){
+            if(!(nodeCoordinates.contains(node.getCoord()))){
+                allNodesInBaseAreInWorkingVersion = false;
+                System.out.println("Node "+node.getId()+"  from Benchmark is not in Working Version   coord:"+node.getCoord().toString());
+            }
+        }
+
+        Assert.assertTrue("Not all nodes of working version where in network of Benchmark",allNodesInWorkingVersionAreInBase);
+        Assert.assertTrue("Not all nodes of benchmark version where in network of working version",allNodesInBaseAreInWorkingVersion);
+
 
 
 
@@ -177,11 +206,14 @@ public class SignalsAndLanesOsmNetworkReaderBenchmarkTest {
         Assert.assertEquals("Number of Signalied Osm Nodes", NoSignalizedOsmNodesBenchmark,NoSignalizedOsmNodes);
 
 
-
-
-
         System.out.println("Number of Links: original: " + noLinks + " SignalReader: " + noLinksBenchmark);
         System.out.println("Number of Nodes: original: " + noNodes + " SignalReader: " + noNodesBenchmark);
+
+
+
+
+
+
 
     }
 //        //Coordinate Set....
