@@ -105,8 +105,8 @@ public class RunTravelDelayAnalysisBatch {
 //			scenarioToBeAnalyzed.add("VW280_CityDRT_carOnly_100pct");
 //			scenarioToBeAnalyzed.add("VW280_HomeOffice_100pct");
 //			scenarioToBeAnalyzed.add("VW280_LocalLinkFlow_1.15_100pct_Inno");
-			scenarioToBeAnalyzed.add("VW280_CityCommuterDRT_carOnly_100pct_additiv");
-
+//			scenarioToBeAnalyzed.add("VW280_CityCommuterDRT_carOnly_100pct_additiv");
+			scenarioToBeAnalyzed.add("UAM_100pct_0.2_3");
 			
 			
 

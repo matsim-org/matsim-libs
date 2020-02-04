@@ -162,7 +162,7 @@ public class ExperiencedTripsWriter {
 			analyseActiveVehicles(new File(path).getParent() + "\\" + folder + ".activeVehicles");
 			writeMileagePerMode(new File(path).getParent() + "\\" + folder + ".mileage");
 			writeModalSplits(new File(path).getParent() + "\\" + folder + ".modalsplit");
-			writeAgentsTrajectories(new File(path).getParent() + "\\" + folder + ".trajectories");
+//			writeAgentsTrajectories(new File(path).getParent() + "\\" + folder + ".trajectories");
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("could not initialize writer");
@@ -1489,7 +1489,7 @@ public class ExperiencedTripsWriter {
 		BufferedWriter bw = IOUtils.getBufferedWriter(filename + ".csv");
 		try {
 			// add header for leg
-			bw.write("agent" + sep + "fromAct" + sep + "toAct" + sep + "legMode" + sep + "linkId" + sep
+			bw.write("agent" + sep + "tripId" + sep + "fromAct" + sep + "toAct" + sep + "legMode" + sep + "linkId" + sep
 					+ "linkEnterTime" + sep + "linkLeaveTime" + sep + "fromNodeX" + sep + "fromNodeY" + sep + "toNodeX"
 					+ sep + "toNode");
 			bw.newLine();
@@ -1502,43 +1502,51 @@ public class ExperiencedTripsWriter {
 							for (ExperiencedLeg leg : trip.getLegs()) {
 								String row;
 
+								String trpiId = trip.getId().toString();
 								if (leg.getRouteListe() != null) {
 									for (Triple<Id<Link>, Double, Double> trajectoryPart : leg.getRouteListe()) {
 
-										if (trajectoryPart != null) {
+										if (leg.getRouteListe().size() > 0) {
 											Link link = network.getLinks().get(trajectoryPart.getLeft());
 											double fromNodeX = link.getFromNode().getCoord().getX();
 											double fromNodeY = link.getFromNode().getCoord().getY();
 											double toNodeX = link.getToNode().getCoord().getX();
 											double toNodeY = link.getToNode().getCoord().getY();
 
-											row = trip.getAgent().toString() + sep + trip.getActivityBefore() + sep
-													+ trip.getActivityAfter() + sep + leg.getMode() + sep
-													+ trajectoryPart.getLeft() + sep + trajectoryPart.getMiddle() + sep
-													+ trajectoryPart.getRight() + sep + fromNodeX + sep + fromNodeY
-													+ sep + toNodeX + sep + toNodeY;
+											row = trip.getAgent().toString() + sep + trpiId + sep
+													+ trip.getActivityBefore() + sep + trip.getActivityAfter() + sep
+													+ leg.getMode() + sep + trajectoryPart.getLeft() + sep
+													+ trajectoryPart.getMiddle() + sep + trajectoryPart.getRight() + sep
+													+ fromNodeX + sep + fromNodeY + sep + toNodeX + sep + toNodeY;
 										} else {
-											row = trip.getAgent().toString() + sep + trip.getActivityBefore() + sep
-													+ trip.getActivityAfter() + sep + leg.getMode() + sep + sep + ""
-													+ sep + "" + sep + "" + sep + "" + sep + "" + sep + "";
+											row = trip.getAgent().toString() + sep + trpiId + sep
+													+ trip.getActivityBefore() + sep + trip.getActivityAfter() + sep
+													+ leg.getMode() + sep + sep + "" + sep + "" + sep + "" + sep + ""
+													+ sep + "" + sep + "";
 
 										}
+//										System.out.println(row);
 										bw.write(row);
 										bw.newLine();
 									}
-								}
-								// Route list my be null, if leg is a teleport mode, such non-network-work etc.
-								// or if route is outside of the research area
-								row = trip.getAgent().toString() + sep + trip.getActivityBefore() + sep
-										+ trip.getActivityAfter() + sep + leg.getMode() + sep + sep + "" + sep + ""
-										+ sep + "" + sep + "" + sep + "" + sep + "";
-								bw.write(row);
-								bw.newLine();
 
+								} 
+//								else {
+//									// // Route list my be null, if leg is a teleport mode, such non-network-work
+//									// etc.
+//									// // or if route is outside of the research area
+//									row = trip.getAgent().toString() + sep + trpiId + sep + trip.getActivityBefore()
+//											+ sep + trip.getActivityAfter() + sep + leg.getMode() + sep + sep + "" + sep
+//											+ "" + sep + "" + sep + "" + sep + "" + sep + "";
+//									System.out.println(row);
+//									bw.write(row);
+//									bw.newLine();
+//									// }
+//								}
 							}
 						}
-					}
 
+					}
 				}
 			}
 			bw.close();

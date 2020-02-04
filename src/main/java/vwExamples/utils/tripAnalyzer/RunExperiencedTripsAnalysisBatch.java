@@ -47,7 +47,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
@@ -84,7 +83,16 @@ public class RunExperiencedTripsAnalysisBatch {
 			String scenarioName = StringList[StringList.length - 1];
 
 			Set<String> scenarioToBeAnalyzed = new HashSet<String>();
-			scenarioToBeAnalyzed.add("UAM_test3");
+			
+//			scenarioToBeAnalyzed.add("vw280_100pct");
+//			scenarioToBeAnalyzed.add("2019-11-05_21-27-49__cityDRT_100pct");
+//			scenarioToBeAnalyzed.add("VW280_CityCommuterDRT_carOnly_100pct_additiv");
+//			scenarioToBeAnalyzed.add("VW280_HomeOffice_100pct");
+//			scenarioToBeAnalyzed.add("VW280_LocalLinkFlow_1.15_100pct_Inno");
+//			scenarioToBeAnalyzed.add("UAM_100pct_0.2_3");
+			scenarioToBeAnalyzed.add("vw280_0.1");
+			
+						
 
 			if (scenarioToBeAnalyzed.contains(scenarioName)) {
 

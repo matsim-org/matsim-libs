@@ -131,67 +131,71 @@ public class TravelDelayCalculator implements PersonDepartureEventHandler, Perso
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
+		// Only observe delay in car traffic
+		if (network.getLinks().get(event.getLinkId()).getAllowedModes().contains(TransportMode.car)) {
+			if (linkEnterTimes.containsKey(event.getVehicleId())) {
+				double enterTime = linkEnterTimes.remove(event.getVehicleId());
+				double travelTime = event.getTime() - enterTime;
+				Link l = network.getLinks().get(event.getLinkId());
+				double freeSpeedTravelTime = Math.min(l.getLength() / l.getFreespeed(), travelTime);
+				// the last link
+				Id<Person> pid = Id.createPersonId(event.getVehicleId());
+				if (travelTimes.containsKey(pid)) {
+					ArrayList<MutableDouble> t = travelTimes.get(pid);
+					t.get(0).add(freeSpeedTravelTime);
+					t.get(1).add(travelTime);
+					t.get(2).add(l.getLength());
 
-		if (linkEnterTimes.containsKey(event.getVehicleId())) {
-			double enterTime = linkEnterTimes.remove(event.getVehicleId());
-			double travelTime = event.getTime() - enterTime;
-			Link l = network.getLinks().get(event.getLinkId());
-			double freeSpeedTravelTime = Math.min(l.getLength() / l.getFreespeed(), travelTime);
-			// the last link
-			Id<Person> pid = Id.createPersonId(event.getVehicleId());
-			if (travelTimes.containsKey(pid)) {
-				ArrayList<MutableDouble> t = travelTimes.get(pid);
-				t.get(0).add(freeSpeedTravelTime);
-				t.get(1).add(travelTime);
-				t.get(2).add(l.getLength());
+					double congestionIdx = travelTime / freeSpeedTravelTime;
 
-				double congestionIdx = travelTime / freeSpeedTravelTime;
+					if (LinkFlowMap.containsKey(l.getId())) {
+						LinkFlowMap.get(l.getId()).add(1);
 
-				if (LinkFlowMap.containsKey(l.getId())) {
-					LinkFlowMap.get(l.getId()).add(1);
+						LinkDelayMap.get(l.getId()).add(travelTime - freeSpeedTravelTime);
+						CongestionIdxMap.get(l.getId()).add(congestionIdx);
+						// System.out.println(l.getId() + "||" +
+						// LinkDelayMap.get(l.getId()).toString());
 
-					LinkDelayMap.get(l.getId()).add(travelTime - freeSpeedTravelTime);
-					CongestionIdxMap.get(l.getId()).add(congestionIdx);
-					// System.out.println(l.getId() + "||" +
-					// LinkDelayMap.get(l.getId()).toString());
+						// Store vehicle that has left within this interval this link
+						double timeFlowBin = ((Math.floor(enterTime / binSize)) * binSize);
 
-					// Store vehicle that has left within this interval this link
-					double timeFlowBin = ((Math.floor(enterTime / binSize)) * binSize);
+						if (timeDependentFlow.containsKey(timeFlowBin)) {
+							timeDependentFlow.get(timeFlowBin).get(event.getLinkId()).increment();
+							timeDependentDelayIdx.get(timeFlowBin).get(event.getLinkId()).add(congestionIdx);
+							timeDependentDelays.get(timeFlowBin).get(event.getLinkId())
+									.add(travelTime - freeSpeedTravelTime);
+						}
 
-					if (timeDependentFlow.containsKey(timeFlowBin)) {
-						timeDependentFlow.get(timeFlowBin).get(event.getLinkId()).increment();
-						timeDependentDelayIdx.get(timeFlowBin).get(event.getLinkId()).add(congestionIdx);
-						timeDependentDelays.get(timeFlowBin).get(event.getLinkId())
-								.add(travelTime - freeSpeedTravelTime);
-					}
+					} else {
+						LinkFlowMap.put((l.getId()), new MutableDouble());
+						LinkDelayMap.put((l.getId()), new MutableDouble());
+						CongestionIdxMap.put(l.getId(), new ArrayList<Double>());
 
-				} else {
-					LinkFlowMap.put((l.getId()), new MutableDouble());
-					LinkDelayMap.put((l.getId()), new MutableDouble());
-					CongestionIdxMap.put(l.getId(), new ArrayList<Double>());
+						LinkFlowMap.get(l.getId()).add(1);
+						LinkDelayMap.get(l.getId()).add(travelTime - freeSpeedTravelTime);
+						CongestionIdxMap.get(l.getId()).add(congestionIdx);
 
-					LinkFlowMap.get(l.getId()).add(1);
-					LinkDelayMap.get(l.getId()).add(travelTime - freeSpeedTravelTime);
-					CongestionIdxMap.get(l.getId()).add(congestionIdx);
-
-					// Store vehicle that has left within this interval this link
-					double timeFlowBin = ((Math.floor(enterTime / binSize)) * binSize);
-					if (timeDependentFlow.containsKey(timeFlowBin)) {
-						timeDependentFlow.get(timeFlowBin).get(event.getLinkId()).increment();
-						timeDependentDelayIdx.get(timeFlowBin).get(event.getLinkId()).add(congestionIdx);
-						timeDependentDelays.get(timeFlowBin).get(event.getLinkId())
-								.add(travelTime - freeSpeedTravelTime);
+						// Store vehicle that has left within this interval this link
+						double timeFlowBin = ((Math.floor(enterTime / binSize)) * binSize);
+						if (timeDependentFlow.containsKey(timeFlowBin)) {
+							timeDependentFlow.get(timeFlowBin).get(event.getLinkId()).increment();
+							timeDependentDelayIdx.get(timeFlowBin).get(event.getLinkId()).add(congestionIdx);
+							timeDependentDelays.get(timeFlowBin).get(event.getLinkId())
+									.add(travelTime - freeSpeedTravelTime);
+						}
 					}
 				}
+
 			}
-
 		}
-
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		linkEnterTimes.put(event.getVehicleId(), event.getTime());
+		// Only observe delay in car traffic
+		if (network.getLinks().get(event.getLinkId()).getAllowedModes().contains(TransportMode.car)) {
+			linkEnterTimes.put(event.getVehicleId(), event.getTime());
+		}
 	}
 
 	@Override

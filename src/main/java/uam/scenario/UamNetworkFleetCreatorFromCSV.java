@@ -78,7 +78,7 @@ public class UamNetworkFleetCreatorFromCSV {
 	public double weightIn = 0.7;
 	public double weightOut = 0.3;
 	TransitSchedule transitSchedule;
-	Integer totalPorts;
+	Integer totalFleetSize;
 	List<Node> skyNodes = new ArrayList<>();
 
 	// static final ImmutableList<Id<Link>> SELECTED_LINK_IDS =
@@ -87,20 +87,20 @@ public class UamNetworkFleetCreatorFromCSV {
 	// Id.createLinkId(67436),
 	// Id.createLinkId(341408));
 
-	static final String HUB_LINK_ID_PREFIX = "HUB_";
+	static String HUB_LINK_ID_PREFIX = "HUB_";
 
-	private final double UAV_EFFECTIVE_CELL_SIZE = 7.5;// [m]; see DEFAULT_EFFECTIVE_CELL_SIZE
+	private double UAV_EFFECTIVE_CELL_SIZE = 7.5;// [m]; see DEFAULT_EFFECTIVE_CELL_SIZE
 
 	// XXX could be split into EGRESS and ACCESS links, each 2 min long
-	private final double HUB_LINK_TRAVEL_TIME = 5 * 60;// [s]; 1 / 5-min frequency per port
-	private final double HUB_LINK_LENGTH = UAV_EFFECTIVE_CELL_SIZE;// [m] only one UAV per lane at a time
+	private double HUB_LINK_TRAVEL_TIME = 5 * 60;// [s]; 1 / 5-min frequency per port
+	private double HUB_LINK_LENGTH = UAV_EFFECTIVE_CELL_SIZE;// [m] only one UAV per lane at a time
 	public double HUB_LINK_NUM_LANES = 5;// [lanes] = number of ports at the hub
-	private final double HUB_LINK_SPEED = HUB_LINK_LENGTH / HUB_LINK_TRAVEL_TIME;// [m/s]
-	private final double HUB_LINK_FLOW_CAPACITY = 3600. * HUB_LINK_NUM_LANES / HUB_LINK_TRAVEL_TIME;// 60 [veh/h]
+	private double HUB_LINK_FLOW_CAPACITY;
+	private double HUB_LINK_SPEED;
 
-	private final double RED_LINK_TRAVEL_TIME = 15;// [s]
-	private final double RED_LINK_LENGTH = 150;// [m]
-	private final double VERTICAL_SEPARATION = 100; // [m]
+	private double RED_LINK_TRAVEL_TIME = 15;// [s]
+	private double RED_LINK_LENGTH = 150;// [m]
+	private double VERTICAL_SEPARATION = 100; // [m]
 
 	/**
 	 * NEED TO KNOW: RED_LINK_NUM_LANES defines implicitly the storage capacity of
@@ -110,13 +110,12 @@ public class UamNetworkFleetCreatorFromCSV {
 	 * storage capacity
 	 */
 
-	private final double RED_LINK_NUM_LANES = UAV_EFFECTIVE_CELL_SIZE / RED_LINK_LENGTH
-			* (RED_LINK_LENGTH / VERTICAL_SEPARATION);// [lanes]; only 1 UAV at	a time
-	private final double RED_LINK_SPEED = RED_LINK_LENGTH / RED_LINK_TRAVEL_TIME;// 5 [m/s]
-	private final double RED_LINK_FLOW_CAPACITY = 3600. / RED_LINK_TRAVEL_TIME;// 120 [veh/h]
+	private double RED_LINK_NUM_LANES;
+	private double RED_LINK_SPEED;
+	private double RED_LINK_FLOW_CAPACITY;
 
-	private final double GREEN_LINK_SPEED = 108 / 3.6;// [m/s]; 108 km/h
-	private final double GREEN_LINK_FLOW_CAPACITY = 60;// [veh/h]
+	private double GREEN_LINK_SPEED = 108 / 3.6;// [m/s]; 108 km/h
+	private double GREEN_LINK_FLOW_CAPACITY = 60;// [veh/h]
 
 	public UamNetworkFleetCreatorFromCSV(String hubFile, String inputNetwork, String outputFolder) {
 		this.hubFile = hubFile;
@@ -151,8 +150,8 @@ public class UamNetworkFleetCreatorFromCSV {
 				"D://Matsim//Axer//Hannover//ZIM//input//uam").run(500);
 	}
 
-	public void run(Integer totalPorts) {
-		this.totalPorts = totalPorts;
+	public void run(Integer totalFleetSize) {
+		this.totalFleetSize = totalFleetSize;
 		readHubsCSV();
 		Set<String> uamLinkModes = ImmutableSet.of(UAM_MODE);
 		int i = 0;
@@ -237,11 +236,11 @@ public class UamNetworkFleetCreatorFromCSV {
 				String dir = lineContents[5]; // dir
 				Integer uavFleetAtPort;
 				if (dir.equals("in")) {
-					uavFleetAtPort = (int) Math.round(demandRel * totalPorts * weightIn);
+					uavFleetAtPort = (int) Math.round(demandRel * totalFleetSize * weightIn);
 				} else if (dir.equals("out")) {
-					uavFleetAtPort = (int) Math.round(demandRel * totalPorts * weightOut);
+					uavFleetAtPort = (int) Math.round(demandRel * totalFleetSize * weightOut);
 				} else {
-					uavFleetAtPort = (int) (demandRel * totalPorts);
+					uavFleetAtPort = (int) (demandRel * totalFleetSize);
 				}
 				Coord transFormedCoord = ct.transform(new Coord(lat, lon));
 				coord2PortsMap.put(NetworkUtils.getNearestLink(filteredCarNetwork, transFormedCoord).getId(),
@@ -282,6 +281,15 @@ public class UamNetworkFleetCreatorFromCSV {
 		}
 		new FleetWriter(fleet.getVehicleSpecifications().values().stream()).write(outputFolder + "/uam_fleet.xml");
 
+	}
+
+	public void updateAirNetworkParams() {
+		HUB_LINK_SPEED = HUB_LINK_LENGTH / HUB_LINK_TRAVEL_TIME;// [m/s]
+		HUB_LINK_FLOW_CAPACITY = 3600. * HUB_LINK_NUM_LANES / HUB_LINK_TRAVEL_TIME;// 60 [veh/h]
+		// [lanes]; only 1 UAV at a time
+		RED_LINK_NUM_LANES = UAV_EFFECTIVE_CELL_SIZE / RED_LINK_LENGTH * (RED_LINK_LENGTH / VERTICAL_SEPARATION);
+		RED_LINK_SPEED = RED_LINK_LENGTH / RED_LINK_TRAVEL_TIME;// 5 [m/s]
+		RED_LINK_FLOW_CAPACITY = 3600. / RED_LINK_TRAVEL_TIME;// 120 // [veh/h]
 	}
 
 }
