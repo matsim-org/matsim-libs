@@ -195,10 +195,11 @@ public class PtAlongALine2Test{
 			MultiModeDrtConfigGroup mm = ConfigUtils.addOrGetModule( config, MultiModeDrtConfigGroup.class );
 			{
 				mm.addParameterSet(
-						new DrtConfigGroup().setMode( TransportMode.drt ).setMaxTravelTimeAlpha( 1.3 ).setVehiclesFile( drtVehiclesFile )
+						new DrtConfigGroup().setMode( TransportMode.drt ).setMaxTravelTimeAlpha( 2.0 ).setVehiclesFile( drtVehiclesFile )
 								    .setMaxTravelTimeBeta( 5. * 60. ).setStopDuration( 60. ).setMaxWaitTime( Double.MAX_VALUE )
 								    .setRejectRequestIfMaxWaitOrTravelTimeViolated( false ).setUseModeFilteredSubnetwork( true )
-									.setAdvanceRequestPlanningHorizon(7200));
+									.setEstimatedBeelineDistanceFactor(1.0).setEstimatedDrtSpeed(15)
+									.setAdvanceRequestPlanningHorizon(99999));
 			}
 			if ( drt2 ) {
 				mm.addParameterSet(
