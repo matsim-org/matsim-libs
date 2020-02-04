@@ -162,7 +162,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 //		String inputOSM = "C:\\Users\\braun\\Documents\\Uni\\VSP\\shared-svn\\studies\\sbraun\\osmData\\RawOSM/brandenburg.osm";
 //		String outputDir = "../../../../../../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/cottbus/";
 		String inputOSM = "../shared-svn/studies/tthunig/osmData/interpreter.osm";
-		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_01_24_workedOnRoundAbouts_MinRoundOFF";
+		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_01_24ChangePushIntoCloseByJunction";
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84_UTM33N);
 
@@ -630,7 +630,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		//Loop over all ways of given node
 		for (OsmWay way : node.ways.values()) {
 			String oneway = way.tags.get(TAG_ONEWAY);
-			if (oneway != null) { // && (oneway.equals("yes") || oneway.equals("true") || oneway.equals("1"))
+			//if (oneway != null) { // && (oneway.equals("yes") || oneway.equals("true") || oneway.equals("1"))   //sbraun20200204 check why this was commented out??
+			if (oneway != null && (oneway.equals("yes") || oneway.equals("true") || oneway.equals("1"))) { //
 				//Again loop over all nodes of way
 				for (int i = way.nodes.indexOf(node.id) + 1; i < way.nodes.size(); i++) {
 					OsmNode otherNode = nodes.get(way.nodes.get(i));
@@ -859,12 +860,13 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				// oneway in negative direction
 				pushSignalOverShortWay(way, this.nodes.get(way.nodes.get(1)), this.nodes.get(way.nodes.get(0)));
 			}
-			// TODO what happens for ways that are no oneway??
+			// TODO what happens for ways that are no oneway?? sbraun20200402 we than decide randomly Problem was at node 3366211397
+			pushSignalOverShortWay(way, this.nodes.get(way.nodes.get(0)), this.nodes.get(way.nodes.get(1)));
 		}
 	}
 	//TODO Method name a little bit confusing - maybe integrate in above method
 	private void pushSignalOverShortWay(OsmWay shortWay, OsmNode fromNode, OsmNode toNode) {
-        if (shortWay.nodes.size() == 2 && NetworkUtils.getEuclideanDistance(fromNode.coord.getX(), fromNode.coord.getY(),
+		if (shortWay.nodes.size() == 2 && NetworkUtils.getEuclideanDistance(fromNode.coord.getX(), fromNode.coord.getY(),
                 toNode.coord.getX(), toNode.coord.getY()) < SIGNAL_MERGE_DISTANCE) {
 			if (fromNode.ways.size() == 2 && toNode.ways.size() > 2
 					&& signalizedOsmNodes.contains(fromNode.id) && !signalizedOsmNodes.contains(toNode.id)) {
@@ -1940,6 +1942,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 
 	//TODO sbraun20200128: Problem mit dem Set signalizedOSMNodes
+	//sbraun 20200204 Node n wird gar nicht benutzt
 	@Override
 	protected void setOrModifyNodeAttributes(Node n, OsmNode node) {
 		// create empty signal system for the node
