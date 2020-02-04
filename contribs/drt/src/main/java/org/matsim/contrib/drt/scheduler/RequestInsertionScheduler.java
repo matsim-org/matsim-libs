@@ -137,6 +137,7 @@ public class RequestInsertionScheduler {
 				// add pickup request to stop task
 				stopTask.addPickupRequest(request);
 				request.setPickupTask(stopTask);
+				stopTask.setEndTime(Math.max(stopTask.getBeginTime() + stopDuration, request.getEarliestStartTime()));
 
 				/// ADDED
 				//// TODO this is copied, but has not been updated !!!!!!!!!!!!!!!
@@ -207,7 +208,7 @@ public class RequestInsertionScheduler {
 		double startTime = beforePickupTask.getEndTime();
 		int taskIdx = beforePickupTask.getTaskIdx() + 1;
 		DrtStopTask pickupStopTask = taskFactory.createStopTask(vehicleEntry.vehicle, startTime,
-				startTime + stopDuration, request.getFromLink());
+				Math.max(startTime + stopDuration, request.getEarliestStartTime()), request.getFromLink());
 		schedule.addTask(taskIdx, pickupStopTask);
 		pickupStopTask.addPickupRequest(request);
 		request.setPickupTask(pickupStopTask);
@@ -216,7 +217,7 @@ public class RequestInsertionScheduler {
 		Link toLink = pickupIdx == dropoffIdx ? request.getToLink() // pickup->dropoff
 				: stops.get(pickupIdx).task.getLink(); // pickup->i+1
 
-		VrpPathWithTravelData vrpPath = VrpPaths.createPath(request.getFromLink(), toLink, startTime + stopDuration,
+		VrpPathWithTravelData vrpPath = VrpPaths.createPath(request.getFromLink(), toLink, pickupStopTask.getEndTime(),
 				insertion.getPathFromPickup(), travelTime);
 		Task driveFromPickupTask = taskFactory.createDriveTask(vehicleEntry.vehicle, vrpPath);
 		schedule.addTask(taskIdx + 1, driveFromPickupTask);
