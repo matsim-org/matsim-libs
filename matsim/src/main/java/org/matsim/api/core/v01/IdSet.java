@@ -1,16 +1,16 @@
 package org.matsim.api.core.v01;
 
+import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import java.util.Set;
 
 /**
  * @author mrieser / Simunto GmbH
  */
-public class IdSet<T> implements Set<Id<T>> {
+public class IdSet<T> extends AbstractSet<Id<T>> {
 
 	private Class<T> idClass;
 	private int size = 0;

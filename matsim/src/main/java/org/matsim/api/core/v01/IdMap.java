@@ -1,5 +1,7 @@
 package org.matsim.api.core.v01;
 
+import java.util.AbstractMap;
+import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -13,7 +15,7 @@ import java.util.function.BiConsumer;
 /**
  * @author mrieser / Simunto GmbH
  */
-public class IdMap<T, V> implements Map<Id<T>, V>, Iterable<V> {
+public class IdMap<T, V> extends AbstractMap<Id<T>, V> implements Iterable<V> {
 
 	private Class<T> idClass;
 	private int size = 0;
@@ -419,7 +421,7 @@ public class IdMap<T, V> implements Map<Id<T>, V>, Iterable<V> {
 		}
 	}
 
-	private static class KeySet<T, V> implements Set<Id<T>> {
+	private static class KeySet<T, V> extends AbstractSet<Id<T>> {
 
 		private final IdMap<T, V> map;
 
@@ -486,7 +488,10 @@ public class IdMap<T, V> implements Map<Id<T>, V>, Iterable<V> {
 
 		@Override
 		public boolean containsAll(Collection<?> c) {
-			return false;
+			for (Object e : c)
+	            if (!contains(e))
+	                return false;
+	        return true;
 		}
 
 		@Override
@@ -544,7 +549,7 @@ public class IdMap<T, V> implements Map<Id<T>, V>, Iterable<V> {
 		}
 	}
 
-	private static class EntrySet<T, V> implements Set<Map.Entry<Id<T>, V>> {
+	private static class EntrySet<T, V> extends AbstractSet<Map.Entry<Id<T>, V>> {
 
 		private final IdMap<T, V> map;
 
@@ -678,21 +683,27 @@ public class IdMap<T, V> implements Map<Id<T>, V>, Iterable<V> {
 		public V setValue(V value) {
 			return this.map.put(this.index, value);
 		}
-
+		
 		@Override
 		public boolean equals(Object o) {
 			if (this == o) return true;
-			if (o == null || getClass() != o.getClass()) return false;
-			Entry<?, ?> entry = (Entry<?, ?>) o;
-			return this.index == entry.index &&
-					this.map.equals(entry.map) &&
-					this.value.equals(entry.value);
-		}
+            if (!(o instanceof Map.Entry))
+                return false;
+            if (o instanceof Entry) {
+            	Entry<?, ?> e = (Entry<?, ?>) o;
+            	return this.index == e.index && this.value.equals(e.value); // Since our values should never be null we can skip the null-check they do in AbstractMap#eq(Object, Object)
+            } else {
+	            Map.Entry<?,?> e = (Map.Entry<?,?>)o;
+	            if (e.getKey() == null || e.getValue() == null)
+	            	return false; // our keys and values should never be null
+	            return this.getKey().equals(e.getKey()) && this.value.equals(e.getValue());
+	        }
+        }
 
-		@Override
-		public int hashCode() {
-			return Objects.hash(this.map, this.value, this.index);
-		}
+        @Override
+        public int hashCode() {
+            return index ^ (value == null ? 0 : value.hashCode());
+        }
 	}
 
 	private static class EntryIterator<T, V> implements Iterator<Map.Entry<Id<T>, V>> {
