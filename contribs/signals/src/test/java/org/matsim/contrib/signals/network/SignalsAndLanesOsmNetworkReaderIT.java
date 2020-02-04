@@ -88,6 +88,21 @@ public class SignalsAndLanesOsmNetworkReaderIT {
         SignalsAndLanesOsmNetworkReaderBenchmark signalReaderBase = new SignalsAndLanesOsmNetworkReaderBenchmark(networkBase, ct, signalsDataBase, lanesBase);
         SignalsAndLanesOsmNetworkReader signalReader = new SignalsAndLanesOsmNetworkReader(network, ct, signalsData, lanes);
 
+        signalReaderBase.setMinimizeSmallRoundabouts(false);
+        signalReaderBase.setMergeOnewaySignalSystems(true);
+        signalReaderBase.setUseRadiusReduction(false);
+        signalReaderBase.setAllowUTurnAtLeftLaneOnly(true);
+        signalReaderBase.setMakePedestrianSignals(false);
+
+//        signalReader.setMinimizeSmallRoundabouts(false);
+        signalReader.setMergeOnewaySignalSystems(true);
+        signalReader.setUseRadiusReduction(false);
+        signalReader.setAllowUTurnAtLeftLaneOnly(true);
+        signalReader.setMakePedestrianSignals(false);
+
+
+
+
         signalReaderBase.setBoundingBox(51.7464, 14.3087, 51.7761, 14.3639);
         signalReader.setBoundingBox(51.7464, 14.3087, 51.7761, 14.3639);
 
@@ -125,6 +140,7 @@ public class SignalsAndLanesOsmNetworkReaderIT {
         //Check in detail if all nodes are identical by coordinate
         Set nodeCoordinatesBase = new HashSet();
         Set nodeCoordinates = new HashSet();
+
         for(Node node : networkBase.getNodes().values()){
             nodeCoordinatesBase.add(node.getCoord());
         }
@@ -140,7 +156,7 @@ public class SignalsAndLanesOsmNetworkReaderIT {
         for (Node node: networkBase.getNodes().values()){
             if(!(nodeCoordinates.contains(node.getCoord()))){
                 allNodesInBaseAreInWorkingVersion = false;
-                System.out.println("Node "+node.getId()+"  from Benchmark is not in Working Version");
+                System.out.println("Node "+node.getId()+"  from Benchmark is not in Working Version   coord:"+node.getCoord().toString());
             }
         }
 
