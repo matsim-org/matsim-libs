@@ -21,6 +21,7 @@ package org.matsim.contrib.accidents.runExample;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
@@ -48,7 +49,7 @@ public class RunAccidents {
 		main.run();
 	}
 
-	private void run() {
+	private void run() throws MalformedURLException, IOException {
 		log.info("Loading scenario...");
 		
 		String configFile = "path/to/configFile.xml";
