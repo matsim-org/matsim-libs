@@ -247,14 +247,10 @@ public final class ParallelEventsManager implements EventsManager {
 
 		// TODO - do we need to support stopping?
 		public void flush() throws InterruptedException {
-
-			System.out.println("#### going to flush...");
 			synchronized (this) {
 				shouldFlush = true;
 				this.wait();
 			}
-			System.out.println("#### going to flush... done!");
-
 		}
 
 		private void distribute(EventArray events) {
