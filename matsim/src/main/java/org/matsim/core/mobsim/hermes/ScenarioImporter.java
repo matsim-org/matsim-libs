@@ -95,8 +95,14 @@ public class ScenarioImporter {
         generateAgents();
     }
 
+    public static void flush() {
+    	instance = null;
+    }
+    
     public static ScenarioImporter instance(Scenario scenario, EventsManager eventsManager) {
-    	if (instance == null) {
+    	// if instance is null or the scenario changed or events manager changed, re-do everything. 
+    	if (instance == null || !scenario.equals(instance.scenario) || !eventsManager.equals(instance.eventsManager)) {
+    		System.out.println("ETHZ rebuilding scenario!");
             instance = new ScenarioImporter(scenario, eventsManager);
     	}
 		return instance;

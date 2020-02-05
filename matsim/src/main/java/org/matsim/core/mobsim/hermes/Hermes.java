@@ -42,11 +42,6 @@ public final class Hermes implements Mobsim {
     	}
     }
 
-    public static int iteration = 0;
-    // Inner iterations is used to run several iterations with the sample plans. Zero means disable inner iterations.
-    // Any value above zero means running a number of iterations with the same plans.
-    public final static int inner_its = 0;
-
     // Reamls that compose this World.
     private Realm realm;
     // Agents that circulate within the World.
@@ -105,8 +100,6 @@ public final class Hermes implements Mobsim {
 			si.reset();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
-		} finally {
-			Hermes.iteration += 1;
 		}
 	}
 }
