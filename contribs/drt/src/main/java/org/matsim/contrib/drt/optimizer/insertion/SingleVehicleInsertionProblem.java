@@ -22,10 +22,10 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import java.util.List;
 import java.util.Optional;
 
-import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.optimizer.insertion.PathDataProvider.PathDataSet;
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 
 /**
@@ -68,8 +68,9 @@ public class SingleVehicleInsertionProblem {
 			}
 		}
 
-		return minCost == InsertionCostCalculator.INFEASIBLE_SOLUTION_COST ? Optional.empty()
-				: Optional.of(new BestInsertion(bestInsertion, vEntry, minCost));
+		return minCost == InsertionCostCalculator.INFEASIBLE_SOLUTION_COST ?
+				Optional.empty() :
+				Optional.of(new BestInsertion(bestInsertion, vEntry, minCost));
 	}
 
 	private InsertionWithPathData createInsertionWithPathData(Insertion insertion, PathDataSet set, int stopCount) {
