@@ -43,12 +43,18 @@ public abstract class Event {
 		Map<String, String> attr = new LinkedHashMap<String, String>();
 		attr.put(ATTRIBUTE_TIME, Double.toString(this.time));
 		attr.put(ATTRIBUTE_TYPE, getEventType());
-		if ( this instanceof HasPersonId ) {
+		if ( this instanceof HasPersonId && ((HasPersonId) this).getPersonId()!=null) {
 			attr.put( HasPersonId.ATTRIBUTE_PERSON, ((HasPersonId) this).getPersonId().toString() ) ;
 			// many derived types do this by themselves, for historical reasons.  Since the information is put into a map, it still exists only once under that key.  kai,
 			// mar'19
 		}
-		if ( this instanceof BasicLocation ) {
+		if ( this instanceof HasFacilityId && ((HasFacilityId) this).getFacilityId()!=null ) {
+			attr.put( HasFacilityId.ATTRIBUTE_FACILITY, ((HasFacilityId) this).getFacilityId().toString() );
+		}
+		if ( this instanceof HasLinkId && ((HasLinkId) this).getLinkId()!=null) {
+			attr.put( HasLinkId.ATTRIBUTE_LINK, ((HasLinkId) this).getLinkId().toString() );
+		}
+		if ( this instanceof BasicLocation && ((BasicLocation) this).getCoord()!=null ) {
 			if ( ((BasicLocation) this).getCoord()!=null ) {
 				attr.put( ATTRIBUTE_X, String.valueOf( ((BasicLocation) this).getCoord().getX() ) ) ;
 				attr.put( ATTRIBUTE_Y, String.valueOf( ((BasicLocation) this).getCoord().getY() ) ) ;

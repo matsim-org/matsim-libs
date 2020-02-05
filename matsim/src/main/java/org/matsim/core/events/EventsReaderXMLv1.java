@@ -26,23 +26,8 @@ import java.util.Stack;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.GenericEvent;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.PersonMoneyEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.VehicleAbortsEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
@@ -166,9 +151,10 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 		else if (ActivityEndEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new ActivityEndEvent(
 					time, 
-					Id.create(atts.getValue(ActivityEndEvent.ATTRIBUTE_PERSON), Person.class), 
-					Id.create(atts.getValue(ActivityEndEvent.ATTRIBUTE_LINK), Link.class), 
-					atts.getValue(ActivityEndEvent.ATTRIBUTE_FACILITY) == null ? null : Id.create(atts.getValue(ActivityEndEvent.ATTRIBUTE_FACILITY), ActivityFacility.class), 
+					Id.create(atts.getValue(HasPersonId.ATTRIBUTE_PERSON), Person.class),
+					Id.create(atts.getValue(HasLinkId.ATTRIBUTE_LINK), Link.class),
+					atts.getValue(HasFacilityId.ATTRIBUTE_FACILITY) == null ? null : Id.create(atts.getValue(HasFacilityId.ATTRIBUTE_FACILITY),
+							ActivityFacility.class),
 					atts.getValue(ActivityEndEvent.ATTRIBUTE_ACTTYPE)));
 		} else if (ActivityStartEvent.EVENT_TYPE.equals(eventType)) {
 			Coord coord = null ;
@@ -180,8 +166,9 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 			this.events.processEvent(new ActivityStartEvent(
 					time,
 					Id.create(atts.getValue( HasPersonId.ATTRIBUTE_PERSON ), Person.class ),
-					Id.create(atts.getValue(ActivityStartEvent.ATTRIBUTE_LINK ), Link.class ),
-					atts.getValue(ActivityStartEvent.ATTRIBUTE_FACILITY ) == null ? null : Id.create(atts.getValue(ActivityStartEvent.ATTRIBUTE_FACILITY ), ActivityFacility.class ),
+					Id.create(atts.getValue( HasLinkId.ATTRIBUTE_LINK ), Link.class ),
+					atts.getValue( HasFacilityId.ATTRIBUTE_FACILITY ) == null ? null : Id.create(atts.getValue(
+							HasFacilityId.ATTRIBUTE_FACILITY ), ActivityFacility.class ),
 					atts.getValue(ActivityStartEvent.ATTRIBUTE_ACTTYPE ),
 					coord ) ) ;
 		} else if (PersonArrivalEvent.EVENT_TYPE.equals(eventType)) {
