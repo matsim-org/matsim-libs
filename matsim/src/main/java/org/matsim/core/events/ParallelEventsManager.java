@@ -270,11 +270,15 @@ public final class ParallelEventsManager implements EventsManager {
 				EventArray events = new EventArray(eventsArraySize);
 				while (true) {
 					EventArray earray = this.inputQueue.poll(100, TimeUnit.MILLISECONDS);
-
 					if (earray == null) {
 						synchronized (this) {
 							// check if we can finish the flush
 							if (shouldFlush) {
+								// distribute missing events
+								if (events.size() > 0) {
+									distribute(events);
+									events = new EventArray(eventsArraySize);
+								}
 								// flush all runnables
 								for (ProcessEventsRunnable runnable : this.runnables) {
 									runnable.flush();
@@ -306,7 +310,7 @@ public final class ParallelEventsManager implements EventsManager {
 							Event event = earray.get(i);
 							events.add(event);
 							// if the buffer is full or if we need to flush
-							if (events.size() == eventsArraySize || shouldFlush) {
+							if (events.size() == eventsArraySize || shouldFlush) { // TODO - I think we can eliminate this "shouldFlush"
 								distribute(events);
 								events = new EventArray(eventsArraySize);
 							}

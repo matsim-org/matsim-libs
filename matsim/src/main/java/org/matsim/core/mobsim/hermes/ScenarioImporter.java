@@ -159,7 +159,7 @@ public class ScenarioImporter {
             int flow = (int) Math.round(matsim_link.getFlowCapacityPerSec());
             int lanes = (int) Math.round(matsim_link.getNumberOfLanes());
             int capacity = (int) (matsim_link.getLength() / 7.5 * lanes);
-            int link_id  = matsim_link.getId().hashCode();
+            int link_id  = matsim_link.getId().index();
 
             if (link_id > Hermes.MAX_LINK_ID) {
                 throw new RuntimeException("exceeded maximum number of links");
@@ -188,17 +188,17 @@ public class ScenarioImporter {
         int transit_line_counter = 0;
 
         for (TransitLine tl: ts.getTransitLines().values()) {
-        	int tid = tl.getId().hashCode();
+        	int tid = tl.getId().index();
         	transit_line_counter += 1;
             for (TransitRoute tr : tl.getRoutes().values()) {
-            	int rid = tr.getId().hashCode();
+            	int rid = tr.getId().index();
 
                 // Initialize line of route
                 line_of_route[rid] = tid;
                 // Initialize stops in route
                 route_stops_by_index.set(rid, new ArrayList<>(tr.getStops().size()));
                 for (TransitRouteStop trs : tr.getStops()) {
-                	int sid = trs.getStopFacility().getId().hashCode();
+                	int sid = trs.getStopFacility().getId().index();
                 	if (stopIds.contains(sid)) {
                 	} else {
                 		stopIds.add(sid);
@@ -323,14 +323,14 @@ public class ScenarioImporter {
                 v.getId();
         int velocity = v == null ?
             Hermes.MAX_VEHICLE_VELOCITY : (int) Math.round(v.getType().getMaximumVelocity());
-        int egressId = endLId.hashCode();
+        int egressId = endLId.index();
         events.add(new PersonEntersVehicleEvent(0, id, vid));
         events.add(new VehicleEntersTrafficEvent(0, id, startLId, vid, leg.getMode(), 1));
         if (startLId != endLId) {
             events.add(new LinkLeaveEvent(0, vid, startLId, id));
         }
         for (Id<org.matsim.api.core.v01.network.Link> linkid : netroute.getLinkIds()) {
-            int linkId = linkid.hashCode();
+            int linkId = linkid.index();
             events.add(new LinkEnterEvent(0, vid, linkid, id));
             flatplan.add(Agent.prepareLinkEntry(events.size() - 1, linkId, velocity));
             events.add(new LinkLeaveEvent(0, vid, linkid, id));
@@ -358,10 +358,10 @@ public class ScenarioImporter {
             ExperimentalTransitRoute troute) {
         Id<TransitStopFacility> access = troute.getAccessStopId();
         Id<TransitStopFacility> egress = troute.getEgressStopId();
-        int routeid = troute.getRouteId().hashCode();
+        int routeid = troute.getRouteId().index();
         int lineid = line_of_route[routeid];
-        int accessid = access.hashCode();
-        int egressid = egress.hashCode();
+        int accessid = access.index();
+        int egressid = egress.index();
 
         populateStops(accessid, lineid, egressid);
 
@@ -480,13 +480,13 @@ public class ScenarioImporter {
         List<TransitRouteStop> trs = tr.getStops();
         TransitRouteStop next = trs.get(0);
         int stopidx = 0;
-        int rid = tr.getId().hashCode();
+        int rid = tr.getId().index();
         ArrayList<Integer> stop_ids = route_stops_by_index.get(rid);
         Vehicle v = scenario.getTransitVehicles().getVehicles().get(depart.getVehicleId());
         VehicleType vt = v.getType();
         int velocity = (int)Math.min( Math.round(v.getType().getMaximumVelocity()), Hermes.MAX_VEHICLE_VELOCITY);
         NetworkRoute nr = tr.getRoute();
-        int endid = nr.getEndLinkId().hashCode();
+        int endid = nr.getEndLinkId().index();
 
         Id<Person> driverid = null;
         String legmode = null;
@@ -526,7 +526,7 @@ public class ScenarioImporter {
 
         // For each link (exclucing the first and the last)
         for (Id<org.matsim.api.core.v01.network.Link> link : nr.getLinkIds()) {
-            int linkid = link.hashCode();
+            int linkid = link.index();
             flatevents.add(new LinkEnterEvent(0, v.getId(), link, driverid));
             flatplan.add(Agent.prepareLinkEntry(flatevents.size() - 1, linkid, velocity));
             // Adding link and possibly a stop.
@@ -567,7 +567,7 @@ public class ScenarioImporter {
             for (TransitRoute tr : tl.getRoutes().values()) {
                 for (Departure depart : tr.getDepartures().values()) {
                 	Vehicle v = vehicles.get(depart.getVehicleId());
-                	int hermes_id = hermes_id(v.getId().hashCode(), true);
+                	int hermes_id = hermes_id(v.getId().index(), true);
                 	PlanArray plan = hermes_agents[hermes_id].plan();
                 	EventArray events = hermes_agents[hermes_id].events();
                     generateVehicleTrip(plan, events, tl, tr, depart);
@@ -579,7 +579,7 @@ public class ScenarioImporter {
     private void generatePersonPlans() {
         Population population = scenario.getPopulation();
         population.getPersons().values().parallelStream().forEach((person) -> {
-        	int hermes_id = hermes_id(person.getId().hashCode(), false);
+        	int hermes_id = hermes_id(person.getId().index(), false);
         	PlanArray plan = hermes_agents[hermes_id].plan();
         	EventArray events = hermes_agents[hermes_id].events();
             for (PlanElement element: person.getSelectedPlan().getPlanElements()) {
@@ -598,7 +598,7 @@ public class ScenarioImporter {
 
         // Generate persons
         for (Person person : population.getPersons().values()) {
-        	int hermes_id = hermes_id(person.getId().hashCode(), false);
+        	int hermes_id = hermes_id(person.getId().index(), false);
         	assert hermes_agents[hermes_id] == null;
             generateAgent(hermes_id, 0, new PlanArray(), new EventArray ());
         }
@@ -607,7 +607,7 @@ public class ScenarioImporter {
         for (Vehicle vehicle : vehicles.values()) {
             VehicleCapacity vc = vehicle.getType().getCapacity();
             int capacity = vc.getSeats() + vc.getStandingRoom();
-            int hermes_id = hermes_id(vehicle.getId().hashCode(), true);
+            int hermes_id = hermes_id(vehicle.getId().index(), true);
             assert hermes_agents[hermes_id] == null;
             generateAgent(hermes_id, capacity, new PlanArray(), new EventArray());
         }

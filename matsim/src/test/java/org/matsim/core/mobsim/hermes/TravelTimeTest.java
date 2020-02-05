@@ -70,16 +70,16 @@ public class TravelTimeTest {
 			.run();
 
 		Map<Id<Link>, Double> travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
-		Assert.assertEquals(360.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(180.0, travelTimes.get(Id.create(15, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(358.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(179.0, travelTimes.get(Id.create(15, Link.class)).intValue(), MatsimTestUtils.EPSILON);
 		// this one is NOT a travel time (it includes two activities and a zero-length trip)
-		Assert.assertEquals(13560.0, travelTimes.get(Id.create(20, Link.class)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(360.0, travelTimes.get(Id.create(21, Link.class)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1260.0, travelTimes.get(Id.create(22, Link.class)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(360.0, travelTimes.get(Id.create(23, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(13558.0, travelTimes.get(Id.create(20, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(358.0, travelTimes.get(Id.create(21, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(1251.0, travelTimes.get(Id.create(22, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(358.0, travelTimes.get(Id.create(23, Link.class)).intValue(), MatsimTestUtils.EPSILON);
 	}
 
-	//@Test
+	@Test
 	/**
 	 * This test shows that the Netsim always rounds up link travel times.
 	 * Please note that a computed link travel time of 400.0s is treated the same,
@@ -97,15 +97,14 @@ public class TravelTimeTest {
 
 		ScenarioUtils.loadScenario(scenario);
 
-		EventsManager events = EventsUtils.createEventsManager();
+		EventsManager events = new ParallelEventsManager(false);
 		events.addHandler(new EventTestHandler(agentTravelTimes));
 
 		// Travel time 359.9712023038
 		scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setFreespeed(27.78);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		new QSimBuilder(scenario.getConfig()) //
-			.useDefaults() //
+		new HermesBuilder() //
 			.build(scenario, events) //
 			.run();
 
@@ -116,8 +115,7 @@ public class TravelTimeTest {
 		scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setFreespeed(27.85);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		new QSimBuilder(scenario.getConfig()) //
-			.useDefaults() //
+		new HermesBuilder() //
 			.build(scenario, events) //
 			.run();
 
@@ -128,8 +126,7 @@ public class TravelTimeTest {
 		scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setFreespeed(27.85);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		new QSimBuilder(scenario.getConfig()) //
-			.useDefaults() //
+		new HermesBuilder() //
 			.build(scenario, events) //
 			.run();
 
@@ -140,8 +137,7 @@ public class TravelTimeTest {
 		scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setFreespeed(27.9);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		new QSimBuilder(scenario.getConfig()) //
-			.useDefaults() //
+		new HermesBuilder() //
 			.build(scenario, events) //
 			.run();
 
@@ -152,8 +148,7 @@ public class TravelTimeTest {
 		scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setFreespeed(27.75);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		new QSimBuilder(scenario.getConfig()) //
-			.useDefaults() //
+		new HermesBuilder() //
 			.build(scenario, events) //
 			.run();
 
@@ -165,8 +160,7 @@ public class TravelTimeTest {
 		scenario.getNetwork().getLinks().get(Id.createLinkId("6")).setFreespeed(25.0);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		new QSimBuilder(scenario.getConfig()) //
-			.useDefaults() //
+		new HermesBuilder() //
 			.build(scenario, events) //
 			.run();
 

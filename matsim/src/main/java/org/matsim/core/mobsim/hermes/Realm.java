@@ -296,7 +296,7 @@ public class Realm {
 
             if (Hermes.DEBUG_REALMS) log(secs, String.format("Processed %d agents", routed));
 
-            if (Hermes.CONCURRENT_EVENT_PROCESSING && secs % 3600 == 0) {
+            if (Hermes.CONCURRENT_EVENT_PROCESSING && secs % 3600 == 0 && sorted_events.size() > 0) {
                 eventsManager.processEvents(sorted_events);
                 sorted_events = new EventArray();
             }
