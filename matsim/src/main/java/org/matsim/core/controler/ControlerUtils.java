@@ -22,9 +22,12 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.scenario.ScenarioByInstanceModule;
 
 /**
  * @author nagel
@@ -32,7 +35,25 @@ import org.matsim.core.gbl.Gbl;
  */
 public final class ControlerUtils {
 	private static final Logger log = Logger.getLogger( ControlerUtils.class ) ;
-	
+	/**
+	 * This is meant for creating the matsim injector if one does not need/want {@link Controler}.  Technical reason is that {@link Controler} creates
+	 * the injector in the run method, and then it is too late to extract material in a direct way.
+	 *
+	 * @param config
+	 * @param scenario
+	 * @return
+	 */
+	public static com.google.inject.Injector createAdhocInjector( Config config, Scenario scenario ){
+		return Injector.createInjector( config, new AbstractModule(){
+					@Override public void install(){
+						install( new NewControlerModule() );
+						install( new ControlerDefaultCoreListenersModule() );
+						install( new ControlerDefaultsModule() );
+						install( new ScenarioByInstanceModule( scenario ) );
+					}
+				} );
+	}
+
 	private ControlerUtils() {} // namespace for static methods only should not be instantiated
 
 	/**

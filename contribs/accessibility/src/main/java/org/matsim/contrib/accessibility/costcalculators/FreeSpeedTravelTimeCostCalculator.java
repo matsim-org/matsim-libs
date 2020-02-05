@@ -26,30 +26,31 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * This cost calulator is based on freespeed travel times 
+ * This cost calulator is based on freespeed travel times
  * tnicolai feb'12
- * 
- * @author thomas
  *
+ * @author thomas
  */
 public class FreeSpeedTravelTimeCostCalculator implements TravelDisutility {
-	
+
 	private static final Logger log = Logger.getLogger(FreeSpeedTravelTimeCostCalculator.class);
-	
+
 	@Override
-	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-		if(link!=null)
-			return link.getLength() / link.getFreespeed();
-		log.warn("Link is null. Returned 0 as free speed time.");
-		return 0.;
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person,
+			final Vehicle vehicle) {
+		return getLinkTravelDisutilityImpl(link);
 	}
 
 	@Override
 	public double getLinkMinimumTravelDisutility(Link link) {
-		if(link!=null)
+		return getLinkTravelDisutilityImpl(link);
+	}
+
+	private double getLinkTravelDisutilityImpl(Link link) {
+		if (link != null) {
 			return link.getLength() / link.getFreespeed();
+		}
 		log.warn("Link is null. Returned 0 as free speed time.");
 		return 0.;
 	}
-
 }

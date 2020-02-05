@@ -375,7 +375,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 			TaxiTask task = (TaxiTask)tasks.get(i);
 			double calcEndTime = calcNewEndTime(vehicle, task, newBeginTime);
 
-			if (calcEndTime == Time.UNDEFINED_TIME) {
+			if (calcEndTime == REMOVE_STAY_TASK) {
 				schedule.removeTask(task);
 				i--;
 			} else if (calcEndTime < newBeginTime) {// 0 s is fine (e.g. last 'wait')
@@ -388,6 +388,8 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		}
 	}
 
+	private final static double REMOVE_STAY_TASK = Double.NEGATIVE_INFINITY;
+
 	protected double calcNewEndTime(DvrpVehicle vehicle, TaxiTask task, double newBeginTime) {
 		switch (task.getTaxiTaskType()) {
 			case STAY: {
@@ -399,7 +401,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 					// must have been added at time submissionTime <= t
 					double oldEndTime = task.getEndTime();
 					if (oldEndTime <= newBeginTime) {// may happen if the previous task is delayed
-						return Time.UNDEFINED_TIME;// remove the task
+						return REMOVE_STAY_TASK;// remove the task
 					} else {
 						return oldEndTime;
 					}

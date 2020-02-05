@@ -433,22 +433,22 @@
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>6.0.9.Final</version>
+			<version>6.1.1.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator-annotation-processor</artifactId>
-			<version>6.0.9.Final</version>
+			<version>6.1.1.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish</groupId>
 			<artifactId>javax.el</artifactId>
-			<version>3.0.1-b10</version>
+			<version>3.0.1-b11</version>
 		</dependency>
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
-			<version>3.12.2</version>
+			<version>3.14.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

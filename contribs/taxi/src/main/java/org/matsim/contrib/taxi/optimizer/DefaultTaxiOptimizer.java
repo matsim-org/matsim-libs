@@ -19,16 +19,12 @@
 
 package org.matsim.contrib.taxi.optimizer;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestAcceptedEvent;
-import org.matsim.contrib.dvrp.passenger.PassengerRequests;
+import org.matsim.contrib.dvrp.passenger.RequestQueue;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -42,14 +38,11 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
  * @author michalm
  */
 public class DefaultTaxiOptimizer implements TaxiOptimizer {
-	private static final Logger log = Logger.getLogger(DefaultTaxiOptimizer.class);
-
-	private final EventsManager eventsManager;
 	private final Fleet fleet;
 	private final TaxiScheduler scheduler;
 
-	private final Collection<TaxiRequest> unplannedRequests = new TreeSet<TaxiRequest>(
-			PassengerRequests.ABSOLUTE_COMPARATOR);
+	private final RequestQueue<TaxiRequest> unplannedRequests = RequestQueue.withNoAdvanceRequestPlanningHorizon();
+
 	private final UnplannedRequestInserter requestInserter;
 
 	private final TaxiConfigGroup taxiCfg;
@@ -59,7 +52,6 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 
 	public DefaultTaxiOptimizer(EventsManager eventsManager, TaxiConfigGroup taxiCfg, Fleet fleet,
 			TaxiScheduler scheduler, UnplannedRequestInserter requestInserter) {
-		this.eventsManager = eventsManager;
 		this.fleet = fleet;
 		this.scheduler = scheduler;
 		this.requestInserter = requestInserter;
@@ -69,13 +61,10 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
-		if (requiresReoptimization && isNewDecisionEpoch(e, params.getReoptimizationTimeStep())) {
-			for (TaxiRequest req : unplannedRequests) {
-				eventsManager.processEvent(
-						new PassengerRequestAcceptedEvent(e.getSimulationTime(), taxiCfg.getMode(), req.getId(),
-								req.getPassengerId()));
-			}
+		unplannedRequests.updateQueuesOnNextTimeSteps(e.getSimulationTime());
+		requiresReoptimization |= !unplannedRequests.getSchedulableRequests().isEmpty();
 
+		if (requiresReoptimization && isNewDecisionEpoch(e, params.getReoptimizationTimeStep())) {
 			if (params.doUnscheduleAwaitingRequests) {
 				unscheduleAwaitingRequests();
 			}
@@ -88,10 +77,10 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 				}
 			}
 
-			scheduleUnplannedRequests();
+			requestInserter.scheduleUnplannedRequests(unplannedRequests.getSchedulableRequests());
 
 			if (params.doUnscheduleAwaitingRequests && taxiCfg.isVehicleDiversion()) {
-				handleAimlessDriveTasks();
+				scheduler.stopAllAimlessDriveTasks();
 			}
 
 			requiresReoptimization = false;
@@ -105,21 +94,12 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 
 	protected void unscheduleAwaitingRequests() {
 		List<TaxiRequest> removedRequests = scheduler.removeAwaitingRequestsFromAllSchedules();
-		unplannedRequests.addAll(removedRequests);
-	}
-
-	protected void scheduleUnplannedRequests() {
-		requestInserter.scheduleUnplannedRequests(unplannedRequests);
-	}
-
-	protected void handleAimlessDriveTasks() {
-		scheduler.stopAllAimlessDriveTasks();
+		removedRequests.forEach(unplannedRequests::addRequest);
 	}
 
 	@Override
 	public void requestSubmitted(Request request) {
-		unplannedRequests.add((TaxiRequest)request);
-		requiresReoptimization = true;
+		unplannedRequests.addRequest((TaxiRequest)request);
 	}
 
 	@Override
@@ -127,7 +107,6 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 		scheduler.updateBeforeNextTask(vehicle);
 
 		Task newCurrentTask = vehicle.getSchedule().nextTask();
-
 		if (!requiresReoptimization && newCurrentTask != null) {// schedule != COMPLETED
 			requiresReoptimization = doReoptimizeAfterNextTask((TaxiTask)newCurrentTask);
 		}

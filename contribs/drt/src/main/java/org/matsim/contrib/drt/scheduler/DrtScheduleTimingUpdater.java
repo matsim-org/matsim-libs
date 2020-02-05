@@ -20,7 +20,9 @@ package org.matsim.contrib.drt.scheduler;
 
 import java.util.List;
 
+import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
@@ -31,7 +33,6 @@ import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.TaskTrackers;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.utils.misc.Time;
 
 import com.google.inject.Inject;
 
@@ -89,7 +90,7 @@ public class DrtScheduleTimingUpdater {
 			DrtTask task = (DrtTask)tasks.get(i);
 			double calcEndTime = calcNewEndTime(vehicle, task, newBeginTime);
 
-			if (Time.isUndefinedTime(calcEndTime)) {
+			if (calcEndTime == REMOVE_STAY_TASK) {
 				schedule.removeTask(task);
 				i--;
 			} else if (calcEndTime < newBeginTime) {// 0 s is fine (e.g. last 'wait')
@@ -102,6 +103,8 @@ public class DrtScheduleTimingUpdater {
 		}
 	}
 
+	private final static double REMOVE_STAY_TASK = Double.NEGATIVE_INFINITY;
+
 	private double calcNewEndTime(DvrpVehicle vehicle, DrtTask task, double newBeginTime) {
 		switch (task.getDrtTaskType()) {
 			case STAY: {
@@ -113,7 +116,7 @@ public class DrtScheduleTimingUpdater {
 					// must have been added at time submissionTime <= t
 					double oldEndTime = task.getEndTime();
 					if (oldEndTime <= newBeginTime) {// may happen if the previous task is delayed
-						return Time.UNDEFINED_TIME;// remove the task
+						return REMOVE_STAY_TASK;// remove the task
 					} else {
 						return oldEndTime;
 					}
@@ -128,9 +131,14 @@ public class DrtScheduleTimingUpdater {
 			}
 
 			case STOP: {
-				// TODO does not consider prebooking!!!
+				double maxEarliestPickupTime = ((DrtStopTask)task).getPickupRequests()
+						.values()
+						.stream()
+						.mapToDouble(DrtRequest::getEarliestStartTime)
+						.max()
+						.orElse(Double.NEGATIVE_INFINITY);
 				double duration = stopDuration;
-				return newBeginTime + duration;
+				return Math.max(newBeginTime + duration, maxEarliestPickupTime);
 			}
 
 			default:
