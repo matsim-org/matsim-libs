@@ -115,6 +115,8 @@ public abstract class Event2ProtoEvent {
 													.setTime(event.getTime())
 													.setPersId(ProtobufEvents.PersonId.newBuilder().setId(((PersonMoneyEvent) event).getPersonId().toString()))
 													.setAmount(((PersonMoneyEvent) event).getAmount());
+													.setPurpose(((PersonMoneyEvent) event).getPurpose());
+													.setTransactionPartner(((PersonMoneyEvent) event).getTransactionPartner());
 											eb.setType(ProtobufEvents.Event.Type.PersonMoney).setPersonMoney(pm);
 										}
 										else {
