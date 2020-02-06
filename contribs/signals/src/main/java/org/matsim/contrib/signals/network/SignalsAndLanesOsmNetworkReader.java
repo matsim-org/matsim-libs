@@ -162,7 +162,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 //		String inputOSM = "C:\\Users\\braun\\Documents\\Uni\\VSP\\shared-svn\\studies\\sbraun\\osmData\\RawOSM/brandenburg.osm";
 //		String outputDir = "../../../../../../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/cottbus/";
 		String inputOSM = "../shared-svn/studies/tthunig/osmData/interpreter.osm";
-		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_01_24ChangePushIntoCloseByJunction";
+		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_02_06";
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84_UTM33N);
 
@@ -852,24 +852,18 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 	private void pushSignalsOverShortWays() {
 		for (OsmWay way : this.ways.values()) {
-			String oneway = way.tags.get(TAG_ONEWAY);
-			if (oneway != null && !oneway.equals("-1") && !oneway.equals("no")) {
-				// oneway in positive direction
-				pushSignalOverShortWay(way, this.nodes.get(way.nodes.get(0)), this.nodes.get(way.nodes.get(1)));
-			} else if (oneway != null && oneway.equals("-1")) {
-				// oneway in negative direction
-				pushSignalOverShortWay(way, this.nodes.get(way.nodes.get(1)), this.nodes.get(way.nodes.get(0)));
-			}
-			// TODO what happens for ways that are no oneway?? sbraun20200402 we than decide randomly Problem was at node 3366211397
-			pushSignalOverShortWay(way, this.nodes.get(way.nodes.get(0)), this.nodes.get(way.nodes.get(1)));
+			if(way.nodes.size()==2) {
+                pushSignalOverShortWay(way, this.nodes.get(way.nodes.get(0)), this.nodes.get(way.nodes.get(1)));
+                pushSignalOverShortWay(way, this.nodes.get(way.nodes.get(1)), this.nodes.get(way.nodes.get(0)));
+            }
 		}
 	}
 	//TODO Method name a little bit confusing - maybe integrate in above method
 	private void pushSignalOverShortWay(OsmWay shortWay, OsmNode fromNode, OsmNode toNode) {
-		if (shortWay.nodes.size() == 2 && NetworkUtils.getEuclideanDistance(fromNode.coord.getX(), fromNode.coord.getY(),
+		if (NetworkUtils.getEuclideanDistance(fromNode.coord.getX(), fromNode.coord.getY(),
                 toNode.coord.getX(), toNode.coord.getY()) < SIGNAL_MERGE_DISTANCE) {
 			if (fromNode.ways.size() == 2 && toNode.ways.size() > 2
-					&& signalizedOsmNodes.contains(fromNode.id) && !signalizedOsmNodes.contains(toNode.id)) {
+					&& signalizedOsmNodes.contains(fromNode.id)) {
 				signalizedOsmNodes.remove(fromNode.id);
 				signalizedOsmNodes.add(toNode.id);
 				LOG.info("signal pushed over short way @ Node " + toNode.id);
