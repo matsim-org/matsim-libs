@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -41,6 +42,7 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -48,6 +50,9 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.ExcludeStageActivities;
+import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.StagesAsNormalActivities;
 
 final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	private static final Logger log = Logger.getLogger( BestReplyLocationChoicePlanAlgorithm.class ) ;
@@ -117,55 +122,107 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 
 	private void handleActivities( final Plan plan, final int personIndex ) {
 
-		int actlegIndex = -1;
-		for (PlanElement pe : plan.getPlanElements()) {
-			actlegIndex++;
-			if (pe instanceof Activity) {
-				String actType = ((Activity) plan.getPlanElements().get(actlegIndex)).getType();
-				if (actlegIndex > 0 && this.scaleEpsilon.isFlexibleType(actType)) {
+		// yyyy todo reconstruct the algo based on PlanElements with algo based on trips, using the following material:
+		List<Activity> activities = TripStructureUtils.getActivities( plan, ExcludeStageActivities );
+		List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(plan);
+		if (trips.size() + 1 != activities.size()) {
+			throw new ValueException("Wrong amount of trips or activities");
+		}
 
-					List<? extends PlanElement> actslegs = plan.getPlanElements();
-					final Activity actToMove = (Activity) pe;
-					final PlanElement prevAct = actslegs.get( actlegIndex - 2 );
-					if ( ! ( prevAct instanceof Activity ) ) {
-						log.warn("") ;
-						log.warn( "prevAct is not an activity; agentId=" + plan.getPerson().getId() ) ;
-						log.warn( "prevAct=" + prevAct ) ;
-						log.warn("") ;
-						for( PlanElement planElement : plan.getPlanElements() ){
-							log.warn( planElement ) ;
-						}
-						log.warn("") ;
-					}
-					final Activity actPre = (Activity) prevAct;
-
-					final Activity actPost = (Activity) actslegs.get(actlegIndex + 2);
-					final Coord coordPre = PopulationUtils.decideOnCoordForActivity( actPre, scenario ) ;
-					final Coord coordPost = PopulationUtils.decideOnCoordForActivity( actPost, scenario ) ;
-					double distanceDirect = CoordUtils.calcEuclideanDistance( coordPre, coordPost );
-					double maximumDistance = this.convertEpsilonIntoDistance(plan.getPerson(),
-						  actToMove.getType() );
-
-					double maxRadius = (distanceDirect +  maximumDistance) / 2.0;
-
-					double x = (coordPre.getX() + coordPost.getX()) / 2.0;
-					double y = (coordPre.getY() + coordPost.getY()) / 2.0;
-					Coord center = new Coord(x, y);
-
-					ChoiceSet cs = createChoiceSetFromCircle(plan, personIndex, this.dccg.getTravelTimeApproximationLevel(), actToMove, maxRadius, center );
-
-					// === this is where the work is done:
-					final Id<ActivityFacility> choice = cs.getWeightedRandomChoice(
-							actlegIndex, this.scoringFunctionFactory, plan, this.tripRouter, this.lcContext.getPersonsKValuesArray()[personIndex],
-							this.forwardMultiNodeDijkstra, this.backwardMultiNodeDijkstra, this.iteration);
-					// yy This looks like method envy, i.e. the method should rather be in this class here.  kai, mar'19
-					// ===
-
-					this.setLocationOfActivityToFacilityId(actToMove, choice );
-
+		int actLegIndex = -1;
+		for (Activity activity : activities) {
+			actLegIndex++;
+			if (this.scaleEpsilon.isFlexibleType(activity.getType())) {
+				final Activity actToMove = activity;
+				if (actLegIndex < 1) {
+					throw new RuntimeException("can't get the previous activity from the first activity in the plan");
 				}
+				final Activity actPre = activities.get(actLegIndex - 1);
+				if (activities.size() <= actLegIndex + 1) {
+					throw new RuntimeException("can't get the post activity from the last activity in the plan");
+				}
+				final Activity actPost = activities.get(actLegIndex + 1);
+				final Coord coordPre = PopulationUtils.decideOnCoordForActivity( actPre, scenario ) ;
+				final Coord coordPost = PopulationUtils.decideOnCoordForActivity( actPost, scenario ) ;
+
+				double distanceDirect = CoordUtils.calcEuclideanDistance( coordPre, coordPost );
+				double maximumDistance = this.convertEpsilonIntoDistance(plan.getPerson(),
+						actToMove.getType() );
+
+				double maxRadius = (distanceDirect +  maximumDistance) / 2.0;
+
+				double x = (coordPre.getX() + coordPost.getX()) / 2.0;
+				double y = (coordPre.getY() + coordPost.getY()) / 2.0;
+				Coord center = new Coord(x, y);
+
+				ChoiceSet cs = createChoiceSetFromCircle(plan, personIndex, this.dccg.getTravelTimeApproximationLevel(), actToMove, maxRadius, center );
+
+				// === this is where the work is done:
+				final Id<ActivityFacility> choice = cs.getWeightedRandomChoice(
+						actLegIndex, this.scoringFunctionFactory, plan, this.tripRouter, this.lcContext.getPersonsKValuesArray()[personIndex],
+						this.forwardMultiNodeDijkstra, this.backwardMultiNodeDijkstra, this.iteration);
+				// yy This looks like method envy, i.e. the method should rather be in this class here.  kai, mar'19
+				// ===
+
+				this.setLocationOfActivityToFacilityId(actToMove, choice );
+
 			}
-		}		
+
+
+		}
+
+
+
+
+//		int actlegIndex = -1;
+//		for (PlanElement pe : plan.getPlanElements()) {
+//			actlegIndex++;
+//			if (pe instanceof Activity) {
+//				String actType = ((Activity) plan.getPlanElements().get(actlegIndex)).getType();
+//				if (actlegIndex > 0 && this.scaleEpsilon.isFlexibleType(actType)) {
+//
+//					List<? extends PlanElement> actslegs = plan.getPlanElements();
+//					final Activity actToMove = (Activity) pe;
+//					final PlanElement prevAct = actslegs.get( actlegIndex - 2 );
+//					if ( ! ( prevAct instanceof Activity ) ) {
+//						log.warn("") ;
+//						log.warn( "prevAct is not an activity; agentId=" + plan.getPerson().getId() ) ;
+//						log.warn( "prevAct=" + prevAct ) ;
+//						log.warn("") ;
+//						for( PlanElement planElement : plan.getPlanElements() ){
+//							log.warn( planElement ) ;
+//						}
+//						log.warn("") ;
+//					}
+//					final Activity actPre = (Activity) prevAct;
+//
+//					final Activity actPost = (Activity) actslegs.get(actlegIndex + 2);
+//					final Coord coordPre = PopulationUtils.decideOnCoordForActivity( actPre, scenario ) ;
+//					final Coord coordPost = PopulationUtils.decideOnCoordForActivity( actPost, scenario ) ;
+//					double distanceDirect = CoordUtils.calcEuclideanDistance( coordPre, coordPost );
+//					double maximumDistance = this.convertEpsilonIntoDistance(plan.getPerson(),
+//						  actToMove.getType() );
+//
+//					double maxRadius = (distanceDirect +  maximumDistance) / 2.0;
+//
+//					double x = (coordPre.getX() + coordPost.getX()) / 2.0;
+//					double y = (coordPre.getY() + coordPost.getY()) / 2.0;
+//					Coord center = new Coord(x, y);
+//
+//					ChoiceSet cs = createChoiceSetFromCircle(plan, personIndex, this.dccg.getTravelTimeApproximationLevel(), actToMove, maxRadius, center );
+//
+//					// === this is where the work is done:
+//					final Id<ActivityFacility> choice = cs.getWeightedRandomChoice(
+//							actlegIndex, this.scoringFunctionFactory, plan, this.tripRouter, this.lcContext.getPersonsKValuesArray()[personIndex],
+//							this.forwardMultiNodeDijkstra, this.backwardMultiNodeDijkstra, this.iteration);
+//					// yy This looks like method envy, i.e. the method should rather be in this class here.  kai, mar'19
+//					// ===
+//
+//					this.setLocationOfActivityToFacilityId(actToMove, choice );
+//
+//				}
+//			}
+//		}
 	}
 
 	private ChoiceSet createChoiceSetFromCircle(Plan plan, int personIndex,
