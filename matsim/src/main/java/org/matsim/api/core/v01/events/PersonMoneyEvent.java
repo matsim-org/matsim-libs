@@ -36,13 +36,17 @@ import org.matsim.core.api.internal.HasPersonId;
  */
 public final class PersonMoneyEvent extends Event implements HasPersonId {
 
-	public static final String ATTRIBUTE_AMOUNT = "amount";
-
 	public static final String EVENT_TYPE = "personMoney";
+	
 	public static final String ATTRIBUTE_PERSON = "person";
+	public static final String ATTRIBUTE_AMOUNT = "amount";
+	public static final String ATTRIBUTE_PURPOSE = "purpose";
+	public static final String ATTRIBUTE_TRANSACTION_PARTNER = "transactionPartner";
 
 	private final Id<Person> personId;
 	private final double amount;
+	private final String purpose;
+	private final String transactionPartner;
 
 	/**
 	 * Creates a new event describing that the given <tt>agent</tt> has <em>gained</em>
@@ -53,10 +57,13 @@ public final class PersonMoneyEvent extends Event implements HasPersonId {
 	 * @param agentId
 	 * @param amount
 	 */
-	public PersonMoneyEvent(final double time, final Id<Person> agentId, final double amount) {
+	public PersonMoneyEvent(final double time, final Id<Person> agentId, final double amount, final String purpose, 
+			final String transactionPartner) {
 		super(time);
 		this.personId = agentId;
 		this.amount = amount;
+		this.purpose = purpose;
+		this.transactionPartner = transactionPartner;
 	}
 
 	public Id<Person> getPersonId() {
@@ -65,6 +72,14 @@ public final class PersonMoneyEvent extends Event implements HasPersonId {
 	
 	public double getAmount() {
 		return this.amount;
+	}
+	
+	public String getPurpose() {
+		return this.purpose;
+	}
+	
+	public String getTransactionPartner() {
+		return this.transactionPartner;
 	}
 
 	@Override
@@ -77,6 +92,8 @@ public final class PersonMoneyEvent extends Event implements HasPersonId {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_AMOUNT, Double.toString(this.amount));
 		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
+		attr.put(ATTRIBUTE_PURPOSE, purpose);
+		attr.put(ATTRIBUTE_TRANSACTION_PARTNER, transactionPartner);
 		return attr;
 	}
 }
