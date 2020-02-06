@@ -228,7 +228,7 @@ class ChoiceSet {
 						}
 						double startTime = PlanRouter.calcEndOfActivity( activityToRelocate, planTmp, scenario.getConfig() );
 
-						LeastCostPathCalculator.Path result = this.backwardMultiNodeDijkstra.constructPath( movedActNode, nextActNode, startTime );
+						LeastCostPathCalculator.Path result = this.backwardMultiNodeDijkstra.constructPath( nextActNode, movedActNode, startTime );
 						Objects.requireNonNull( leg ).setTravelTime( result.travelTime );
 					}
 				}
