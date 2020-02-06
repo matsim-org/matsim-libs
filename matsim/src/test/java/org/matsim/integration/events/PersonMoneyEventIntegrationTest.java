@@ -40,8 +40,8 @@ import org.matsim.testcases.utils.EventsCollector;
 public class PersonMoneyEventIntegrationTest extends MatsimTestCase {
 
 	public void testWriteReadXxml() {
-		final PersonMoneyEvent event1 = new PersonMoneyEvent(7.0*3600, Id.create(1, Person.class), 2.34, "tollRefund", "ASFINAG");
-		final PersonMoneyEvent event2 = new PersonMoneyEvent(8.5*3600, Id.create(2, Person.class), -3.45, "toll", "ASFINAG");
+		final PersonMoneyEvent event1 = new PersonMoneyEvent(7.0*3600, Id.create(1, Person.class), 2.34, "tollRefund", "motorwayOperator");
+		final PersonMoneyEvent event2 = new PersonMoneyEvent(8.5*3600, Id.create(2, Person.class), -3.45, "toll", "motorwayOperator");
 
 		// write some events to file
 
