@@ -92,8 +92,12 @@ public final class PersonMoneyEvent extends Event implements HasPersonId {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_AMOUNT, Double.toString(this.amount));
 		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
-		attr.put(ATTRIBUTE_PURPOSE, purpose);
-		attr.put(ATTRIBUTE_TRANSACTION_PARTNER, transactionPartner);
+		if (this.purpose != null) {
+			attr.put(ATTRIBUTE_PURPOSE, purpose);
+		}
+		if (this.transactionPartner != null) {
+			attr.put(ATTRIBUTE_TRANSACTION_PARTNER, transactionPartner);
+		}
 		return attr;
 	}
 }
