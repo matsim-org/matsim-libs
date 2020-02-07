@@ -91,19 +91,12 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 	private void assignKValuesPersons() {
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			p.getAttributes().putAttribute( "k", rnd.getUniform(1.0));
-			this.personsKValues.putAttribute(p.getId().toString(), "k", rnd.getUniform(1.0));
 		}
-		// write person k values
-		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.personsKValues);
-		attributesWriter.writeFile(config.controler().getOutputDirectory() + pkValuesFile);
-	}	
+	}
 	private void assignKValuesAlternatives() {
 		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
 			facility.getAttributes().putAttribute("k", rnd.getUniform(1.0));
-			this.facilitiesKValues.putAttribute(facility.getId().toString(), "k", rnd.getUniform(1.0));
 		}
-		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.facilitiesKValues);
-		attributesWriter.writeFile(config.controler().getOutputDirectory() + fkValuesFile);
 	}
 	
 	public ObjectAttributes getFacilitiesKValues() {
