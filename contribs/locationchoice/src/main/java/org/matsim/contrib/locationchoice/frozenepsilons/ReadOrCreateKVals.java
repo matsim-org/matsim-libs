@@ -90,6 +90,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 	// does not matter which distribution is chosen here
 	private void assignKValuesPersons() {
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
+			p.getAttributes().putAttribute( "k", rnd.getUniform(1.0));
 			this.personsKValues.putAttribute(p.getId().toString(), "k", rnd.getUniform(1.0));
 		}
 		// write person k values
@@ -98,6 +99,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 	}	
 	private void assignKValuesAlternatives() {
 		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
+			facility.getAttributes().putAttribute("k", rnd.getUniform(1.0));
 			this.facilitiesKValues.putAttribute(facility.getId().toString(), "k", rnd.getUniform(1.0));
 		}
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.facilitiesKValues);

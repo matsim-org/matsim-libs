@@ -97,7 +97,10 @@ class ReadOrComputeMaxDCScore {
 		for (Person person : this.scenario.getPopulation().getPersons().values()) {
 			for (String flexibleType : this.flexibleTypes) {
 				double maxType = (Double)person.getCustomAttributes().get(flexibleType);
-				this.personsMaxDCScoreUnscaled.putAttribute(person.getId().toString(), flexibleType, maxType);
+				if (maxType != 0.0) {
+					person.getAttributes().putAttribute(flexibleType, maxType);
+					this.personsMaxDCScoreUnscaled.putAttribute(person.getId().toString(), flexibleType, maxType);
+				}
 			}
 		}
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.personsMaxDCScoreUnscaled);

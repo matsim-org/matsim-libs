@@ -226,9 +226,14 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	 */
 	private double convertEpsilonIntoDistance(Person person, String type) {
 		double maxDCScore = 0.0;
-		double scale = this.scaleEpsilon.getEpsilonFactor(type);		
-		maxDCScore = (Double) this.personsMaxDCScoreUnscaled.getAttribute(person.getId().toString(), type);
-		maxDCScore *= scale; // apply the scale factors given in the config file
+		double scale = this.scaleEpsilon.getEpsilonFactor(type);
+		if(person.getAttributes().getAttribute(type) != null) {
+			maxDCScore = (Double) person.getAttributes().getAttribute(type);
+			maxDCScore *= scale;
+		}
+
+//		maxDCScore = (Double) this.personsMaxDCScoreUnscaled.getAttribute(person.getId().toString(), type);
+//		maxDCScore *= scale; // apply the scale factors given in the config file
 
 		/* 
 		 * here one could do a much more sophisticated calculation including time use and travel speed estimations (from previous iteration)
