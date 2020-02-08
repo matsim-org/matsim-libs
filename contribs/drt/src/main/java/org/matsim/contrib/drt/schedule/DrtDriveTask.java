@@ -20,12 +20,12 @@
 package org.matsim.contrib.drt.schedule;
 
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
-import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
+import org.matsim.contrib.dvrp.schedule.DriveTask;
 
 /**
  * @author michalm
  */
-public class DrtDriveTask extends DriveTaskImpl implements DrtTask {
+public class DrtDriveTask extends DriveTask implements DrtTask {
 	public DrtDriveTask(VrpPathWithTravelData path) {
 		super(path);
 	}

@@ -19,14 +19,23 @@
 
 package org.matsim.contrib.dvrp.schedule;
 
-import org.matsim.contrib.dvrp.path.*;
+import org.matsim.contrib.dvrp.path.DivertedVrpPath;
+import org.matsim.contrib.dvrp.path.VrpPath;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 
-/**
- * @author (of documentation) maciejewski, nagel
- *
- */
-public interface DriveTask extends Task {
-	VrpPath getPath();
+import com.google.common.base.MoreObjects;
+
+public class DriveTask extends AbstractTask {
+	private VrpPath path;
+
+	public DriveTask(VrpPathWithTravelData path) {
+		super(path.getDepartureTime(), path.getArrivalTime());
+		this.path = path;
+	}
+
+	public VrpPath getPath() {
+		return path;
+	}
 
 	/**
 	 * Vehicle changes its path. Just replaces the previous VrpPath with this one; this will work (if consistent) since
@@ -41,5 +50,21 @@ public interface DriveTask extends Task {
 	 * <li>...
 	 * </ul>
 	 */
-	void pathDiverted(DivertedVrpPath divertedPath, double newEndTime);
+	public void pathDiverted(DivertedVrpPath divertedPath, double newEndTime) {
+		// can only divert an ongoing task
+		if (getStatus() != TaskStatus.STARTED) {
+			throw new IllegalStateException();
+		}
+
+		path = divertedPath;
+		setEndTime(newEndTime);
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this)
+				.add("super", super.toString())
+				.add("path", path)
+				.toString();
+	}
 }
