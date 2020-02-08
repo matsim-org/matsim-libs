@@ -23,7 +23,7 @@ import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 
-public class TaxiOccupiedDriveTask extends DriveTask implements TaxiTask {
+public class TaxiOccupiedDriveTask extends DriveTask implements HasTaxiTaskType {
 	public TaxiOccupiedDriveTask(VrpPathWithTravelData path, TaxiRequest request) {
 		super(path);
 
@@ -33,7 +33,7 @@ public class TaxiOccupiedDriveTask extends DriveTask implements TaxiTask {
 	}
 
 	@Override
-	public TaxiTaskType getTaxiTaskType() {
+	public TaxiTaskType getTaskType() {
 		return TaxiTaskType.OCCUPIED_DRIVE;
 	}
 }

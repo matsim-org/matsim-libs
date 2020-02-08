@@ -22,13 +22,13 @@ package org.matsim.contrib.taxi.schedule;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 
-public class TaxiEmptyDriveTask extends DriveTask implements TaxiTask {
+public class TaxiEmptyDriveTask extends DriveTask implements HasTaxiTaskType {
 	public TaxiEmptyDriveTask(VrpPathWithTravelData path) {
 		super(path);
 	}
 
 	@Override
-	public TaxiTaskType getTaxiTaskType() {
+	public TaxiTaskType getTaskType() {
 		return TaxiTaskType.EMPTY_DRIVE;
 	}
 }

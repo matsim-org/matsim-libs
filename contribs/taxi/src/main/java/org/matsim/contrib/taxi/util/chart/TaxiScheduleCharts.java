@@ -8,7 +8,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.util.chart.ScheduleCharts;
 import org.matsim.contrib.dvrp.util.chart.ScheduleCharts.DescriptionCreator;
 import org.matsim.contrib.dvrp.util.chart.ScheduleCharts.PaintSelector;
-import org.matsim.contrib.taxi.schedule.TaxiTask;
+import org.matsim.contrib.taxi.schedule.HasTaxiTaskType;
 import org.matsim.contrib.taxi.schedule.TaxiTaskWithRequest;
 
 public class TaxiScheduleCharts {
@@ -16,15 +16,15 @@ public class TaxiScheduleCharts {
 		return ScheduleCharts.chartSchedule(vehicles, TAXI_DESCRIPTION_CREATOR, TAXI_PAINT_SELECTOR);
 	}
 
-	public static final DescriptionCreator TAXI_DESCRIPTION_CREATOR = task -> ((TaxiTask)task).getTaxiTaskType().name();
+	public static final DescriptionCreator TAXI_DESCRIPTION_CREATOR = task -> ((HasTaxiTaskType)task).getTaskType().name();
 
 	public static final DescriptionCreator TAXI_DESCRIPTION_WITH_PASSENGER_ID_CREATOR = task -> {
 		if (task instanceof TaxiTaskWithRequest) {
 			TaxiTaskWithRequest taskWithReq = (TaxiTaskWithRequest)task;
-			return taskWithReq.getTaxiTaskType().name() + "_" + taskWithReq.getRequest().getPassengerId();
+			return taskWithReq.getTaskType().name() + "_" + taskWithReq.getRequest().getPassengerId();
 		}
 
-		return ((TaxiTask)task).getTaxiTaskType().name();
+		return ((HasTaxiTaskType)task).getTaskType().name();
 	};
 
 	private static final Color OCCUPIED_DRIVE_COLOR = new Color(200, 0, 0);
@@ -34,7 +34,7 @@ public class TaxiScheduleCharts {
 	private static final Color STAY_COLOR = new Color(0, 0, 100);
 
 	public static final PaintSelector TAXI_PAINT_SELECTOR = task -> {
-		switch (((TaxiTask)task).getTaxiTaskType()) {
+		switch (((HasTaxiTaskType)task).getTaskType()) {
 			case PICKUP:
 			case DROPOFF:
 				return PICKUP_DROPOFF_COLOR;

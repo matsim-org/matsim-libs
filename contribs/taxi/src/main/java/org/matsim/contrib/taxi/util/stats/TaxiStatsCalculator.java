@@ -28,8 +28,8 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
-import org.matsim.contrib.taxi.schedule.TaxiTask;
-import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
+import org.matsim.contrib.taxi.schedule.HasTaxiTaskType;
+import org.matsim.contrib.taxi.schedule.HasTaxiTaskType.TaxiTaskType;
 import org.matsim.contrib.util.LongEnumAdder;
 
 public class TaxiStatsCalculator {
@@ -70,7 +70,7 @@ public class TaxiStatsCalculator {
 		LongEnumAdder<TaxiTaskType>[] vehicleHourlySums = new LongEnumAdder[hours];
 
 		for (Task t : schedule.getTasks()) {
-			TaxiTask tt = (TaxiTask)t;
+			HasTaxiTaskType tt = (HasTaxiTaskType)t;
 			int[] hourlyDurations = TaxiStatsCalculators.calcHourlyDurations((int)t.getBeginTime(),
 					(int)t.getEndTime());
 			int fromHour = TaxiStatsCalculators.getHour(t.getBeginTime());
@@ -78,7 +78,7 @@ public class TaxiStatsCalculator {
 				includeTaskIntoHourlySums(vehicleHourlySums, fromHour + i, tt, hourlyDurations[i]);
 			}
 
-			if (tt.getTaxiTaskType() == TaxiTaskType.PICKUP) {
+			if (tt.getTaskType() == TaxiTaskType.PICKUP) {
 				TaxiRequest req = ((TaxiPickupTask)t).getRequest();
 				double waitTime = Math.max(t.getBeginTime() - req.getEarliestStartTime(), 0);
 				int hour = TaxiStatsCalculators.getHour(req.getEarliestStartTime());
@@ -90,13 +90,13 @@ public class TaxiStatsCalculator {
 		includeVehicleHourlySumsIntoStats(vehicleHourlySums);
 	}
 
-	private void includeTaskIntoHourlySums(LongEnumAdder<TaxiTaskType>[] hourlySums, int hour, TaxiTask task,
+	private void includeTaskIntoHourlySums(LongEnumAdder<TaxiTaskType>[] hourlySums, int hour, HasTaxiTaskType task,
 			int duration) {
 		if (duration > 0) {
 			if (hourlySums[hour] == null) {
 				hourlySums[hour] = new LongEnumAdder<>(TaxiTaskType.class);
 			}
-			hourlySums[hour].add(task.getTaxiTaskType(), duration);
+			hourlySums[hour].add(task.getTaskType(), duration);
 		}
 	}
 

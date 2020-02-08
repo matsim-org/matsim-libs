@@ -35,7 +35,7 @@ public class TaxiDropoffTask extends StayTask implements TaxiTaskWithRequest {
 	}
 
 	@Override
-	public TaxiTaskType getTaxiTaskType() {
+	public TaxiTaskType getTaskType() {
 		return TaxiTaskType.DROPOFF;
 	}
 
