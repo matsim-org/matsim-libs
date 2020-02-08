@@ -22,7 +22,7 @@ package org.matsim.contrib.dvrp.schedule;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.optimizer.Request;
 
-public class ServeRequestTask extends StayTaskImpl {
+public class ServeRequestTask extends StayTask {
 	private final Request request;
 
 	public ServeRequestTask(double beginTime, double endTime, Link link, Request request) {

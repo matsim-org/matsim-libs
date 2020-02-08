@@ -21,6 +21,7 @@ package org.matsim.contrib.dvrp.schedule;
 
 import org.matsim.contrib.dvrp.tracker.TaskTracker;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 
 /**
@@ -89,7 +90,13 @@ public abstract class AbstractTask implements Task {
 		this.taskTracker = taskTracker;
 	}
 
-	protected String commonToString() {
-		return " [" + beginTime + " : " + endTime + "]";
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this)
+				.add("taskIdx", taskIdx)
+				.add("status", status)
+				.add("beginTime", beginTime)
+				.add("endTime", endTime)
+				.toString();
 	}
 }
