@@ -19,7 +19,7 @@ package org.matsim.contrib.drt.util.stats;
 
 import org.apache.commons.math3.stat.descriptive.rank.Max;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.drt.schedule.HasDrtTaskType;
+import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -92,7 +92,7 @@ public class DrtVehicleOccupancyProfileCalculator {
 		int occupancy = 0;
 		for (Task t : vehicle.getSchedule().getTasks()) {
 			Task drtTask = t;
-			switch (((HasDrtTaskType.DrtTaskType)drtTask.getTaskType())) {
+			switch (((DrtTaskType)drtTask.getTaskType())) {
 				case DRIVE:
 					increment(vehicleOccupancyProfilesInSeconds[occupancy], drtTask);
 					break;

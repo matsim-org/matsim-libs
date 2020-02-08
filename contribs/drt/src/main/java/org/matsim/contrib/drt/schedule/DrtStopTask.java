@@ -38,7 +38,7 @@ import com.google.common.base.MoreObjects;
  *
  * @author michalm
  */
-public class DrtStopTask extends StayTask implements HasDrtTaskType {
+public class DrtStopTask extends StayTask {
 	private final Map<Id<Request>, DrtRequest> dropoffRequests = new LinkedHashMap<>();
 	private final Map<Id<Request>, DrtRequest> pickupRequests = new LinkedHashMap<>();
 

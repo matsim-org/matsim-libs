@@ -18,7 +18,7 @@
 
 package org.matsim.contrib.drt.scheduler;
 
-import org.matsim.contrib.drt.schedule.HasDrtTaskType.DrtTaskType;
+import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
