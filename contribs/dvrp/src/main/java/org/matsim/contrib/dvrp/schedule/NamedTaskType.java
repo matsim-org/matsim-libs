@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,31 +15,29 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.dvrp.examples.onetruck;
+package org.matsim.contrib.dvrp.schedule;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.schedule.StayTask;
+import com.google.common.base.MoreObjects;
 
 /**
- * @author michalm
+ * @author Michal Maciejewski (michalm)
  */
-public class OneTruckServeTask extends StayTask {
-	private final OneTruckRequest request;
-	private final boolean isPickup;// pickup or delivery
+public class NamedTaskType implements Task.TaskType {
+	private final String name;
 
-	public OneTruckServeTask(double beginTime, double endTime, Link link, boolean isPickup, OneTruckRequest request) {
-		super(isPickup ? "pickup" : "delivery", beginTime, endTime, link);
-		this.request = request;
-		this.isPickup = isPickup;
+	public NamedTaskType(String name) {
+		this.name = name;
 	}
 
-	public OneTruckRequest getRequest() {
-		return request;
+	public String getName() {
+		return name;
 	}
 
-	public boolean isPickup() {
-		return isPickup;
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this).add("name", name).toString();
 	}
 }

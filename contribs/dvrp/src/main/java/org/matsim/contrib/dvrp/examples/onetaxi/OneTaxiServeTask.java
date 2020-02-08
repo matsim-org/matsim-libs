@@ -30,7 +30,7 @@ public class OneTaxiServeTask extends StayTask {
 	private final boolean isPickup;// pickup or dropoff
 
 	public OneTaxiServeTask(double beginTime, double endTime, Link link, boolean isPickup, OneTaxiRequest request) {
-		super(beginTime, endTime, link, isPickup ? "pickup" : "dropoff");
+		super(isPickup ? "pickup" : "dropoff", beginTime, endTime, link);
 		this.request = request;
 		this.isPickup = isPickup;
 	}

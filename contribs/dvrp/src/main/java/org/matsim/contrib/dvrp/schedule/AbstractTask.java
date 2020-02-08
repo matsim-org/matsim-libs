@@ -33,15 +33,23 @@ public abstract class AbstractTask implements Task {
 	TaskStatus status;
 	// ==== END: fields managed by ScheduleImpl
 
+	private final TaskType taskType;
+
 	private double beginTime;
 	private double endTime;
 
 	private TaskTracker taskTracker;
 
-	public AbstractTask(double beginTime, double endTime) {
+	public AbstractTask(TaskType taskType, double beginTime, double endTime) {
 		Preconditions.checkArgument(beginTime <= endTime, "beginTime=%s; endTime=%s", beginTime, endTime);
+		this.taskType = Preconditions.checkNotNull(taskType);
 		this.beginTime = beginTime;
 		this.endTime = endTime;
+	}
+
+	@Override
+	public TaskType getTaskType() {
+		return taskType;
 	}
 
 	@Override
@@ -93,6 +101,7 @@ public abstract class AbstractTask implements Task {
 	@Override
 	public String toString() {
 		return MoreObjects.toStringHelper(this)
+				.add("taskType", taskType)
 				.add("taskIdx", taskIdx)
 				.add("status", status)
 				.add("beginTime", beginTime)

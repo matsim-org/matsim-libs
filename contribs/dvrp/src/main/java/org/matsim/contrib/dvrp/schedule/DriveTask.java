@@ -28,8 +28,12 @@ import com.google.common.base.MoreObjects;
 public class DriveTask extends AbstractTask {
 	private VrpPath path;
 
-	public DriveTask(VrpPathWithTravelData path) {
-		super(path.getDepartureTime(), path.getArrivalTime());
+	public DriveTask(String taskType, VrpPathWithTravelData path) {
+		this(new NamedTaskType(taskType), path);
+	}
+
+	public DriveTask(TaskType taskType, VrpPathWithTravelData path) {
+		super(taskType, path.getDepartureTime(), path.getArrivalTime());
 		this.path = path;
 	}
 
@@ -62,9 +66,6 @@ public class DriveTask extends AbstractTask {
 
 	@Override
 	public String toString() {
-		return MoreObjects.toStringHelper(this)
-				.add("super", super.toString())
-				.add("path", path)
-				.toString();
+		return MoreObjects.toStringHelper(this).add("super", super.toString()).add("path", path).toString();
 	}
 }
