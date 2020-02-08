@@ -31,7 +31,6 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
-import org.matsim.contrib.edrt.schedule.EDrtTask;
 import org.matsim.contrib.ev.dvrp.ChargingTask;
 import org.matsim.contrib.ev.dvrp.ETask;
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
