@@ -60,13 +60,12 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 
 		Schedule schedule = vehicle.getSchedule();
 		@SuppressWarnings("unchecked")
-		List<HasDrtTaskType> tasks = (List<HasDrtTaskType>)schedule.getTasks();
 
 		LinkTimePair start;
 		int nextTaskIdx;
 		if (schedule.getStatus() == ScheduleStatus.STARTED) {
 			Task currentTask = schedule.getCurrentTask();
-			switch (((HasDrtTaskType)currentTask).getTaskType()) {
+			switch (((DrtTaskType)currentTask.getTaskType())) {
 				case DRIVE:
 					DrtDriveTask driveTask = (DrtDriveTask)currentTask;
 					start = ((OnlineDriveTaskTracker)driveTask.getTaskTracker()).getDiversionPoint();
@@ -95,8 +94,9 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 			nextTaskIdx = 0;
 		}
 
+		List<Task> tasks = (List<Task>)schedule.getTasks();
 		List<DrtStopTask> stopTasks = new ArrayList<>();
-		for (HasDrtTaskType task : tasks.subList(nextTaskIdx, tasks.size())) {
+		for (Task task : tasks.subList(nextTaskIdx, tasks.size())) {
 			if (task.getTaskType() == DrtTaskType.STOP) {
 				stopTasks.add((DrtStopTask)task);
 			}

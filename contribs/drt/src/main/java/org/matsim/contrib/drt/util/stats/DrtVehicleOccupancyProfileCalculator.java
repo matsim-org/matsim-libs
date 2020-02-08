@@ -66,8 +66,8 @@ public class DrtVehicleOccupancyProfileCalculator {
 		for (int t = 0; t < timeDiscretizer.getIntervalCount(); t++) {
 			idleVehicleProfileRelative[t] = (double)idleVehicleProfileInSeconds[t] / timeDiscretizer.getTimeInterval();
 			for (int o = 0; o < vehicleOccupancyProfilesInSeconds.length; o++) {
-				vehicleOccupancyProfilesRelative[o][t] =
-						(double)vehicleOccupancyProfilesInSeconds[o][t] / timeDiscretizer.getTimeInterval();
+				vehicleOccupancyProfilesRelative[o][t] = (double)vehicleOccupancyProfilesInSeconds[o][t]
+						/ timeDiscretizer.getTimeInterval();
 			}
 		}
 	}
@@ -92,7 +92,7 @@ public class DrtVehicleOccupancyProfileCalculator {
 		int occupancy = 0;
 		for (Task t : vehicle.getSchedule().getTasks()) {
 			Task drtTask = t;
-			switch (((HasDrtTaskType)drtTask).getTaskType()) {
+			switch (((HasDrtTaskType.DrtTaskType)drtTask.getTaskType())) {
 				case DRIVE:
 					increment(vehicleOccupancyProfilesInSeconds[occupancy], drtTask);
 					break;

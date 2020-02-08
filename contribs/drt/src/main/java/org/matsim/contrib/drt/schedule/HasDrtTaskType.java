@@ -30,6 +30,4 @@ public interface HasDrtTaskType {
 		STOP, // stopped to drop off and pick up passengers
 		DRIVE; // driving with/without passengers
 	}
-
-	DrtTaskType getTaskType();
 }

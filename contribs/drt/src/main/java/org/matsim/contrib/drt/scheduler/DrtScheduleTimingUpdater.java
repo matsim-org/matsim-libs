@@ -106,7 +106,7 @@ public class DrtScheduleTimingUpdater {
 	private final static double REMOVE_STAY_TASK = Double.NEGATIVE_INFINITY;
 
 	private double calcNewEndTime(DvrpVehicle vehicle, Task task, double newBeginTime) {
-		switch (((HasDrtTaskType)task).getTaskType()) {
+		switch (((HasDrtTaskType.DrtTaskType)task.getTaskType())) {
 			case STAY: {
 				if (Schedules.getLastTask(vehicle.getSchedule()).equals(task)) {// last task
 					// even if endTime=beginTime, do not remove this task!!! A DRT schedule should end with WAIT
