@@ -42,13 +42,12 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.contrib.taxi.schedule.HasTaxiTaskType.TaxiTaskType;
 import org.matsim.contrib.taxi.schedule.TaxiDropoffTask;
 import org.matsim.contrib.taxi.schedule.TaxiEmptyDriveTask;
 import org.matsim.contrib.taxi.schedule.TaxiOccupiedDriveTask;
 import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
-import org.matsim.contrib.taxi.schedule.HasTaxiTaskType;
-import org.matsim.contrib.taxi.schedule.HasTaxiTaskType.TaxiTaskType;
 import org.matsim.contrib.taxi.schedule.TaxiTaskWithRequest;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.FastAStarEuclideanFactory;
@@ -93,7 +92,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 
 		Task currentTask = schedule.getCurrentTask();
 		return currentTask.getTaskIdx() == schedule.getTaskCount() - 1 // last task
-				&& ((HasTaxiTaskType)currentTask).getTaskType() == TaxiTaskType.STAY;
+				&& currentTask.getTaskType() == TaxiTaskType.STAY;
 	}
 
 	/**
@@ -127,7 +126,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 			case STARTED:
 				Task lastTask = Schedules.getLastTask(schedule);
 
-				switch (((HasTaxiTaskType)lastTask).getTaskType()) {
+				switch (((TaxiTaskType)lastTask.getTaskType())) {
 					case STAY:
 						Link link = ((StayTask)lastTask).getLink();
 						double time = Math.max(lastTask.getBeginTime(), timer.getTimeOfDay());// TODO very optimistic!!!
@@ -141,8 +140,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 						// unfinished)
 
 					default:
-						throw new IllegalStateException(
-								"Type of the last task is wrong: " + ((HasTaxiTaskType)lastTask).getTaskType());
+						throw new IllegalStateException("Type of the last task is wrong: " + lastTask.getTaskType());
 				}
 
 			case COMPLETED:
@@ -173,7 +171,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		Task currentTask = schedule.getCurrentTask();
 		// no prebooking ==> we can divert vehicle whose current task is an empty drive at the end of the schedule
 		if (currentTask.getTaskIdx() != schedule.getTaskCount() - 1 // not last task
-				|| ((HasTaxiTaskType)currentTask).getTaskType() != TaxiTaskType.EMPTY_DRIVE) {
+				|| currentTask.getTaskType() != TaxiTaskType.EMPTY_DRIVE) {
 			return null;
 		}
 
@@ -210,8 +208,8 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 	}
 
 	protected void divertOrAppendDrive(Schedule schedule, VrpPathWithTravelData vrpPath) {
-		HasTaxiTaskType lastTask = (HasTaxiTaskType)Schedules.getLastTask(schedule);
-		switch (lastTask.getTaskType()) {
+		Task lastTask = Schedules.getLastTask(schedule);
+		switch ((TaxiTaskType)lastTask.getTaskType()) {
 			case EMPTY_DRIVE:
 				divertDrive((TaxiEmptyDriveTask)lastTask, vrpPath);
 				return;
@@ -304,7 +302,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		updateTimelineImpl(vehicle, timer.getTimeOfDay());
 
 		if (!taxiCfg.isDestinationKnown()) {
-			HasTaxiTaskType currentTask = (HasTaxiTaskType)schedule.getCurrentTask();
+			Task currentTask = schedule.getCurrentTask();
 			if (currentTask.getTaskType() == TaxiTaskType.PICKUP) {
 				appendOccupiedDriveAndDropoff(schedule);
 				appendTasksAfterDropoff(vehicle);
@@ -388,7 +386,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 	private final static double REMOVE_STAY_TASK = Double.NEGATIVE_INFINITY;
 
 	protected double calcNewEndTime(DvrpVehicle vehicle, Task task, double newBeginTime) {
-		switch (((HasTaxiTaskType)task).getTaskType()) {
+		switch (((TaxiTaskType)task.getTaskType())) {
 			case STAY: {
 				if (Schedules.getLastTask(vehicle.getSchedule()).equals(task)) {// last task
 					// even if endTime=beginTime, do not remove this task!!! A taxi schedule should end with WAIT
@@ -478,8 +476,8 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 	}
 
 	protected Integer countUnremovablePlannedTasks(Schedule schedule) {
-		HasTaxiTaskType currentTask = (HasTaxiTaskType)schedule.getCurrentTask();
-		switch (currentTask.getTaskType()) {
+		Task currentTask = schedule.getCurrentTask();
+		switch ((TaxiTaskType)currentTask.getTaskType()) {
 			case PICKUP:
 				return taxiCfg.isDestinationKnown() ? 2 : null;
 
@@ -491,7 +489,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 					return 0;
 				}
 
-				if (((HasTaxiTaskType)Schedules.getNextTask(schedule)).getTaskType() == TaxiTaskType.PICKUP) {
+				if (Schedules.getNextTask(schedule).getTaskType() == TaxiTaskType.PICKUP) {
 					// if no diversion and driving to pick up sb then serve that request
 					return taxiCfg.isDestinationKnown() ? 3 : null;
 				}
@@ -522,7 +520,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		if (task instanceof TaxiTaskWithRequest) {
 			TaxiRequest request = ((TaxiTaskWithRequest)task).getRequest();
 
-			TaxiTaskType taskType = ((HasTaxiTaskType)task).getTaskType();
+			TaxiTaskType taskType = (TaxiTaskType)task.getTaskType();
 			if (taskType == TaxiTaskType.PICKUP) {
 				request.setPickupTask(null);
 				removedRequests.add(request);
@@ -546,7 +544,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		double tBegin = schedule.getEndTime();
 		double tEnd = Math.max(tBegin, vehicle.getServiceEndTime());
 
-		switch (((HasTaxiTaskType)lastTask).getTaskType()) {
+		switch (((TaxiTaskType)lastTask.getTaskType())) {
 			case STAY:
 				lastTask.setEndTime(tEnd);
 				return;

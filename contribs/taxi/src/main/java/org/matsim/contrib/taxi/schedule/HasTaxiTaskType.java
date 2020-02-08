@@ -28,6 +28,4 @@ public interface HasTaxiTaskType {
 		PICKUP, OCCUPIED_DRIVE, DROPOFF, // serving a customer (TaxiTaskWithRequest)
 		STAY;// not directly related to any customer
 	}
-
-	TaxiTaskType getTaskType();
 }

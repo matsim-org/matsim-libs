@@ -44,7 +44,6 @@ import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.run.MultiModeTaxiConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.schedule.HasTaxiTaskType;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -63,13 +62,15 @@ public class ScheduleReconstructionIT {
 
 	@Test
 	public void testOneTaxiReconstruction() {
-		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"), "one_taxi_benchmark_config.xml");
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("dvrp-grid"),
+				"one_taxi_benchmark_config.xml");
 		runReconstruction(configUrl);
 	}
 
 	@Test
 	public void testMielecReconstruction() {
-		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"), "mielec_taxi_benchmark_config.xml");
+		URL configUrl = IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("mielec"),
+				"mielec_taxi_benchmark_config.xml");
 		runReconstruction(configUrl);
 	}
 
@@ -159,7 +160,7 @@ public class ScheduleReconstructionIT {
 			Assert.assertEquals(o.getBeginTime(), r.getBeginTime(), 0);
 			Assert.assertEquals(o.getEndTime(), r.getEndTime(), 0);
 			Assert.assertEquals(o.getTaskIdx(), r.getTaskIdx());
-			Assert.assertEquals(((HasTaxiTaskType)o).getTaskType(), ((HasTaxiTaskType)r).getTaskType());
+			Assert.assertEquals(o.getTaskType(), r.getTaskType());
 
 			Assert.assertEquals(TaskStatus.PERFORMED, o.getStatus());
 			Assert.assertEquals(TaskStatus.PLANNED, r.getStatus());

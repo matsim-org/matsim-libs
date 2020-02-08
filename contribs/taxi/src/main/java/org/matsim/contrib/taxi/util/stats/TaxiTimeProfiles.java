@@ -21,14 +21,13 @@ package org.matsim.contrib.taxi.util.stats;
 
 import java.util.Collection;
 
-import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.passenger.TaxiRequests;
-import org.matsim.contrib.taxi.schedule.HasTaxiTaskType;
 import org.matsim.contrib.taxi.schedule.HasTaxiTaskType.TaxiTaskType;
 import org.matsim.contrib.util.LongEnumAdder;
 import org.matsim.contrib.util.timeprofile.TimeProfileCollector.ProfileCalculator;
@@ -41,7 +40,7 @@ public class TaxiTimeProfiles {
 	}
 
 	public static ProfileCalculator createCurrentTaxiTaskTypeCounter(final Fleet fleet) {
-		String[] header = TimeProfiles.combineValuesIntoStrings((Object[])TaxiTaskType.values());
+		String[] header = TimeProfiles.combineValuesIntoStrings(TaxiTaskType.values());
 		return TimeProfiles.createProfileCalculator(header, () -> calculateTaxiTaskTypeCounts(fleet));
 	}
 
@@ -49,8 +48,7 @@ public class TaxiTimeProfiles {
 		LongEnumAdder<TaxiTaskType> counter = new LongEnumAdder<>(TaxiTaskType.class);
 		for (DvrpVehicle veh : fleet.getVehicles().values()) {
 			if (veh.getSchedule().getStatus() == ScheduleStatus.STARTED) {
-				HasTaxiTaskType currentTask = (HasTaxiTaskType)veh.getSchedule().getCurrentTask();
-				counter.increment(currentTask.getTaskType());
+				counter.increment((TaxiTaskType)veh.getSchedule().getCurrentTask().getTaskType());
 			}
 		}
 

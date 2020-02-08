@@ -16,15 +16,15 @@ public class TaxiScheduleCharts {
 		return ScheduleCharts.chartSchedule(vehicles, TAXI_DESCRIPTION_CREATOR, TAXI_PAINT_SELECTOR);
 	}
 
-	public static final DescriptionCreator TAXI_DESCRIPTION_CREATOR = task -> ((HasTaxiTaskType)task).getTaskType().name();
+	public static final DescriptionCreator TAXI_DESCRIPTION_CREATOR = task -> task.getTaskType() + "";
 
 	public static final DescriptionCreator TAXI_DESCRIPTION_WITH_PASSENGER_ID_CREATOR = task -> {
 		if (task instanceof TaxiTaskWithRequest) {
 			TaxiTaskWithRequest taskWithReq = (TaxiTaskWithRequest)task;
-			return taskWithReq.getTaskType().name() + "_" + taskWithReq.getRequest().getPassengerId();
+			return task.getTaskType() + "_" + taskWithReq.getRequest().getPassengerId();
 		}
 
-		return ((HasTaxiTaskType)task).getTaskType().name();
+		return task.getTaskType() + "";
 	};
 
 	private static final Color OCCUPIED_DRIVE_COLOR = new Color(200, 0, 0);
@@ -34,7 +34,7 @@ public class TaxiScheduleCharts {
 	private static final Color STAY_COLOR = new Color(0, 0, 100);
 
 	public static final PaintSelector TAXI_PAINT_SELECTOR = task -> {
-		switch (((HasTaxiTaskType)task).getTaskType()) {
+		switch (((HasTaxiTaskType.TaxiTaskType)task.getTaskType())) {
 			case PICKUP:
 			case DROPOFF:
 				return PICKUP_DROPOFF_COLOR;

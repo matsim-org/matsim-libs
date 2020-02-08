@@ -37,8 +37,8 @@ import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.schedule.TaxiStayTask;
 import org.matsim.contrib.taxi.schedule.HasTaxiTaskType;
+import org.matsim.contrib.taxi.schedule.TaxiStayTask;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelDisutility;
@@ -103,7 +103,7 @@ public class ETaxiScheduler extends TaxiScheduler {
 	@Override
 	protected Integer countUnremovablePlannedTasks(Schedule schedule) {
 		Task currentTask = schedule.getCurrentTask();
-		switch (((HasTaxiTaskType)currentTask).getTaskType()) {
+		switch (((HasTaxiTaskType.TaxiTaskType)currentTask.getTaskType())) {
 			case EMPTY_DRIVE:
 				Task nextTask = Schedules.getNextTask(schedule);
 				if (!(nextTask instanceof ETaxiChargingTask)) {
