@@ -43,7 +43,7 @@ public class DrtStopTask extends StayTask implements HasDrtTaskType {
 	private final Map<Id<Request>, DrtRequest> pickupRequests = new LinkedHashMap<>();
 
 	public DrtStopTask(double beginTime, double endTime, Link link) {
-		super(beginTime, endTime, link);
+		super(DrtTaskType.STOP, beginTime, endTime, link);
 	}
 
 	@Override

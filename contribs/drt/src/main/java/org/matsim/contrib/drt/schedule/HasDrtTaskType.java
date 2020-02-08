@@ -25,7 +25,7 @@ import org.matsim.contrib.dvrp.schedule.Task;
  * @author michalm
  */
 public interface HasDrtTaskType {
-	enum DrtTaskType {
+	enum DrtTaskType implements Task.TaskType {
 		STAY, // idle
 		STOP, // stopped to drop off and pick up passengers
 		DRIVE; // driving with/without passengers

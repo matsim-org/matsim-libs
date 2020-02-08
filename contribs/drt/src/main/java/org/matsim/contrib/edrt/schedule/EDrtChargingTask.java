@@ -26,7 +26,7 @@ import org.matsim.contrib.ev.infrastructure.Charger;
 
 public class EDrtChargingTask extends ChargingTaskImpl implements HasDrtTaskType {
 	public EDrtChargingTask(double beginTime, double endTime, Charger charger, ElectricVehicle ev, double totalEnergy) {
-		super(beginTime, endTime, charger, ev, totalEnergy);
+		super(DrtTaskType.STAY, beginTime, endTime, charger, ev, totalEnergy);
 	}
 
 	@Override
