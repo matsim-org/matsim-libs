@@ -56,7 +56,7 @@ public class CustomizedDrtActionCreator implements VrpAgentLogic.DynActionCreato
 	@Override
 	public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
 		Task task = vehicle.getSchedule().getCurrentTask();
-		switch (((HasDrtTaskType)task).getTaskType()) {
+		switch (((HasDrtTaskType.DrtTaskType)task.getTaskType())) {
 			case DRIVE:
 				return legFactory.create(vehicle);
 

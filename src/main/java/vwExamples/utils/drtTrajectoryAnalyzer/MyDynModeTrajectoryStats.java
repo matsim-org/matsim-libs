@@ -57,6 +57,7 @@ import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEvent;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestRejectedEventHandler;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.ev.EvUnits;
 import org.matsim.contrib.ev.MobsimScopeEventHandler;
@@ -93,9 +94,8 @@ public class MyDynModeTrajectoryStats
 	private String sep = ",";
 	private final ElectricFleet electricFleet;
 
-
-	public MyDynModeTrajectoryStats(Network network, DrtConfigGroup drtCfg,
-									ElectricFleet electricFleet, Fleet fleet, MobsimScopeEventHandling eventHandling) {
+	public MyDynModeTrajectoryStats(Network network, DrtConfigGroup drtCfg, ElectricFleet electricFleet, Fleet fleet,
+			MobsimScopeEventHandling eventHandling) {
 		eventHandling.addMobsimScopeHandler(this);
 		this.mode = drtCfg.getMode();
 		this.network = network;
@@ -104,7 +104,6 @@ public class MyDynModeTrajectoryStats
 		this.fleet = fleet;
 
 	}
-
 
 	private static class VehDrive {
 		private final Id<Vehicle> vehicleId;
@@ -251,8 +250,7 @@ public class MyDynModeTrajectoryStats
 		if (fleet.getVehicles().containsKey(vehicleId)) {// handle all drt
 			activeVehicle.add(vehicleId);
 
-			vehDrives.put(vehicleId,
-					new VehDrive(vehicleId, fleet.getVehicles().get(vehicleId)));
+			vehDrives.put(vehicleId, new VehDrive(vehicleId, fleet.getVehicles().get(vehicleId)));
 
 			double acutalTime = event.getTime();
 			String vehicleID = event.getVehicleId().toString();
@@ -262,7 +260,7 @@ public class MyDynModeTrajectoryStats
 			double y = network.getLinks().get(event.getLinkId()).getCoord().getY();
 
 			double tt = Double.NaN;
-			HasDrtTaskType actualTask = (HasDrtTaskType)fleet.getVehicles()
+			Task actualTask = fleet.getVehicles()
 					.get(Id.create(vehicleID, DvrpVehicle.class))
 					.getSchedule()
 					.getCurrentTask();
@@ -307,8 +305,7 @@ public class MyDynModeTrajectoryStats
 		if (fleet.getVehicles().containsKey(vehicleId)) {// handle all drt
 			activeVehicle.add(vehicleId);
 
-			vehDrives.remove(vehicleId,
-					new VehDrive(vehicleId, fleet.getVehicles().get(vehicleId)));
+			vehDrives.remove(vehicleId, new VehDrive(vehicleId, fleet.getVehicles().get(vehicleId)));
 
 			double acutalTime = event.getTime();
 			String vehicleID = event.getVehicleId().toString();
@@ -322,7 +319,7 @@ public class MyDynModeTrajectoryStats
 
 			double v_meterPerSec = Double.NaN;
 
-			HasDrtTaskType actualTask = (HasDrtTaskType)fleet.getVehicles()
+			Task actualTask = fleet.getVehicles()
 					.get(Id.create(vehicleID, DvrpVehicle.class))
 					.getSchedule()
 					.getCurrentTask();
@@ -397,7 +394,7 @@ public class MyDynModeTrajectoryStats
 			vehDrive.movedOverNodeTime = event.getTime();
 			double v_meterPerSec = distance / tt;
 
-			HasDrtTaskType actualTask = (HasDrtTaskType)fleet.getVehicles()
+			Task actualTask = fleet.getVehicles()
 					.get(Id.create(vehicleID, DvrpVehicle.class))
 					.getSchedule()
 					.getCurrentTask();
