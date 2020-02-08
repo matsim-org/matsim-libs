@@ -22,7 +22,7 @@ package org.matsim.contrib.taxi.schedule;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 
-public class TaxiStayTask extends StayTask implements HasTaxiTaskType {
+public class TaxiStayTask extends StayTask {
 	public TaxiStayTask(double beginTime, double endTime, Link link) {
 		super(TaxiTaskType.STAY, beginTime, endTime, link);
 	}

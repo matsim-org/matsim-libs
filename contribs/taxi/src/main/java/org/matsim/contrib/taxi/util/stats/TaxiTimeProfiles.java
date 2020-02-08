@@ -28,7 +28,7 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.passenger.TaxiRequests;
-import org.matsim.contrib.taxi.schedule.HasTaxiTaskType.TaxiTaskType;
+import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.contrib.util.LongEnumAdder;
 import org.matsim.contrib.util.timeprofile.TimeProfileCollector.ProfileCalculator;
 import org.matsim.contrib.util.timeprofile.TimeProfiles;

@@ -28,7 +28,7 @@ import org.matsim.contrib.dvrp.passenger.RequestQueue;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.schedule.HasTaxiTaskType.TaxiTaskType;
+import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;

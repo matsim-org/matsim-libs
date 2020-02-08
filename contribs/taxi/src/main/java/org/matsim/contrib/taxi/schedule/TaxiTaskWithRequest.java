@@ -21,6 +21,6 @@ package org.matsim.contrib.taxi.schedule;
 
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 
-public interface TaxiTaskWithRequest extends HasTaxiTaskType {
+public interface TaxiTaskWithRequest {
 	TaxiRequest getRequest();
 }

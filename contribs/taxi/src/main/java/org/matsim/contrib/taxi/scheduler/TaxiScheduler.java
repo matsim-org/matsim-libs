@@ -42,7 +42,7 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.schedule.HasTaxiTaskType.TaxiTaskType;
+import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.contrib.taxi.schedule.TaxiDropoffTask;
 import org.matsim.contrib.taxi.schedule.TaxiEmptyDriveTask;
 import org.matsim.contrib.taxi.schedule.TaxiOccupiedDriveTask;

@@ -22,7 +22,7 @@ package org.matsim.contrib.taxi.schedule;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 
-public class TaxiEmptyDriveTask extends DriveTask implements HasTaxiTaskType {
+public class TaxiEmptyDriveTask extends DriveTask {
 	public TaxiEmptyDriveTask(VrpPathWithTravelData path) {
 		super(TaxiTaskType.EMPTY_DRIVE, path);
 	}

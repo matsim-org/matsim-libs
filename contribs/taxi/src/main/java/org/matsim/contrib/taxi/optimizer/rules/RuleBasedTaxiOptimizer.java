@@ -31,7 +31,7 @@ import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizer;
 import org.matsim.contrib.taxi.optimizer.UnplannedRequestInserter;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.schedule.HasTaxiTaskType.TaxiTaskType;
+import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.contrib.zone.SquareGridSystem;

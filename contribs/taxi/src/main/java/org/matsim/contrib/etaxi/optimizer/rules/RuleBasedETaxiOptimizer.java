@@ -40,7 +40,7 @@ import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
 import org.matsim.contrib.taxi.optimizer.rules.UnplannedRequestZonalRegistry;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.schedule.HasTaxiTaskType.TaxiTaskType;
+import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.contrib.zone.SquareGridSystem;
 import org.matsim.contrib.zone.ZonalSystem;
 import org.matsim.core.api.experimental.events.EventsManager;

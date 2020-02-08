@@ -8,7 +8,7 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.util.chart.ScheduleCharts;
 import org.matsim.contrib.dvrp.util.chart.ScheduleCharts.DescriptionCreator;
 import org.matsim.contrib.dvrp.util.chart.ScheduleCharts.PaintSelector;
-import org.matsim.contrib.taxi.schedule.HasTaxiTaskType;
+import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.contrib.taxi.schedule.TaxiTaskWithRequest;
 
 public class TaxiScheduleCharts {
@@ -34,7 +34,7 @@ public class TaxiScheduleCharts {
 	private static final Color STAY_COLOR = new Color(0, 0, 100);
 
 	public static final PaintSelector TAXI_PAINT_SELECTOR = task -> {
-		switch (((HasTaxiTaskType.TaxiTaskType)task.getTaskType())) {
+		switch (((TaxiTaskType)task.getTaskType())) {
 			case PICKUP:
 			case DROPOFF:
 				return PICKUP_DROPOFF_COLOR;

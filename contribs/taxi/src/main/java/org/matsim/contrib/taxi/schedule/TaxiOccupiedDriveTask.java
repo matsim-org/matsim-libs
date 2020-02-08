@@ -19,13 +19,13 @@
 
 package org.matsim.contrib.taxi.schedule;
 
-import static org.matsim.contrib.taxi.schedule.HasTaxiTaskType.TaxiTaskType.OCCUPIED_DRIVE;
+import static org.matsim.contrib.taxi.schedule.TaxiTaskType.OCCUPIED_DRIVE;
 
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 
-public class TaxiOccupiedDriveTask extends DriveTask implements HasTaxiTaskType {
+public class TaxiOccupiedDriveTask extends DriveTask {
 	public TaxiOccupiedDriveTask(VrpPathWithTravelData path, TaxiRequest request) {
 		super(OCCUPIED_DRIVE, path);
 		if (request.getFromLink() != path.getFromLink() && request.getToLink() != path.getToLink()) {
