@@ -27,7 +27,7 @@ import org.matsim.contrib.ev.dvrp.ETask;
 /**
  * @author michalm
  */
-public class EDrtStopTask extends DrtStopTask implements HasDrtTaskType, ETask {
+public class EDrtStopTask extends DrtStopTask implements ETask {
 	private final double consumedEnergy;
 
 	public EDrtStopTask(double beginTime, double endTime, Link link, double consumedEnergy) {

@@ -27,7 +27,7 @@ import org.matsim.contrib.ev.dvrp.ETask;
 /**
  * @author michalm
  */
-public class EDrtStayTask extends DrtStayTask implements HasDrtTaskType, ETask {
+public class EDrtStayTask extends DrtStayTask implements ETask {
 	private final double consumedEnergy;
 
 	public EDrtStayTask(double beginTime, double endTime, Link link, double consumedEnergy) {
