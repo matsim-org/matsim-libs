@@ -24,7 +24,7 @@ import org.matsim.contrib.dvrp.schedule.DriveTask;
 
 public class TaxiEmptyDriveTask extends DriveTask implements HasTaxiTaskType {
 	public TaxiEmptyDriveTask(VrpPathWithTravelData path) {
-		super(path);
+		super(TaxiTaskType.EMPTY_DRIVE, path);
 	}
 
 	@Override

@@ -28,8 +28,7 @@ public class TaxiPickupTask extends StayTask implements TaxiTaskWithRequest {
 	private final TaxiRequest request;
 
 	public TaxiPickupTask(double beginTime, double endTime, TaxiRequest request) {
-		super(beginTime, endTime, request.getFromLink());
-
+		super(TaxiTaskType.PICKUP, beginTime, endTime, request.getFromLink());
 		this.request = request;
 		request.setPickupTask(this);
 	}
@@ -45,9 +44,6 @@ public class TaxiPickupTask extends StayTask implements TaxiTaskWithRequest {
 
 	@Override
 	public String toString() {
-		return MoreObjects.toStringHelper(this)
-				.add("request", request)
-				.add("super", super.toString())
-				.toString();
+		return MoreObjects.toStringHelper(this).add("request", request).add("super", super.toString()).toString();
 	}
 }

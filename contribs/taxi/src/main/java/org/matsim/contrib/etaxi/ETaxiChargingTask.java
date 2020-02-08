@@ -27,7 +27,7 @@ import org.matsim.contrib.taxi.schedule.HasTaxiTaskType;
 public class ETaxiChargingTask extends ChargingTaskImpl implements HasTaxiTaskType {
 	public ETaxiChargingTask(double beginTime, double endTime, Charger charger, ElectricVehicle ev,
 			double totalEnergy) {
-		super(beginTime, endTime, charger, ev, totalEnergy);
+		super(TaxiTaskType.STAY, beginTime, endTime, charger, ev, totalEnergy);
 	}
 
 	@Override

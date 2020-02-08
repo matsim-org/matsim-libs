@@ -24,7 +24,7 @@ import org.matsim.contrib.dvrp.schedule.StayTask;
 
 public class TaxiStayTask extends StayTask implements HasTaxiTaskType {
 	public TaxiStayTask(double beginTime, double endTime, Link link) {
-		super(beginTime, endTime, link);
+		super(TaxiTaskType.STAY, beginTime, endTime, link);
 	}
 
 	@Override

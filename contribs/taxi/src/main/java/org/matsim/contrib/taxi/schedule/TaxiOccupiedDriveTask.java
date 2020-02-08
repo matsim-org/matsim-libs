@@ -19,14 +19,15 @@
 
 package org.matsim.contrib.taxi.schedule;
 
+import static org.matsim.contrib.taxi.schedule.HasTaxiTaskType.TaxiTaskType.OCCUPIED_DRIVE;
+
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 
 public class TaxiOccupiedDriveTask extends DriveTask implements HasTaxiTaskType {
 	public TaxiOccupiedDriveTask(VrpPathWithTravelData path, TaxiRequest request) {
-		super(path);
-
+		super(OCCUPIED_DRIVE, path);
 		if (request.getFromLink() != path.getFromLink() && request.getToLink() != path.getToLink()) {
 			throw new IllegalArgumentException();
 		}
@@ -34,6 +35,6 @@ public class TaxiOccupiedDriveTask extends DriveTask implements HasTaxiTaskType 
 
 	@Override
 	public TaxiTaskType getTaskType() {
-		return TaxiTaskType.OCCUPIED_DRIVE;
+		return OCCUPIED_DRIVE;
 	}
 }

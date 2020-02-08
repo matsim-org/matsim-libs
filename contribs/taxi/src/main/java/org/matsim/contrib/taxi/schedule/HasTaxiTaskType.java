@@ -19,8 +19,10 @@
 
 package org.matsim.contrib.taxi.schedule;
 
+import org.matsim.contrib.dvrp.schedule.Task;
+
 public interface HasTaxiTaskType {
-	enum TaxiTaskType {
+	enum TaxiTaskType implements Task.TaskType {
 		EMPTY_DRIVE, // not directly related to any customer (although may be related to serving a customer; e.g. a
 		// pickup drive)
 		PICKUP, OCCUPIED_DRIVE, DROPOFF, // serving a customer (TaxiTaskWithRequest)
