@@ -28,11 +28,12 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.drt.schedule.DrtTask;
-import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
+import org.matsim.contrib.drt.schedule.HasDrtTaskType;
+import org.matsim.contrib.drt.schedule.HasDrtTaskType.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
@@ -59,13 +60,13 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 
 		Schedule schedule = vehicle.getSchedule();
 		@SuppressWarnings("unchecked")
-		List<DrtTask> tasks = (List<DrtTask>)schedule.getTasks();
+		List<HasDrtTaskType> tasks = (List<HasDrtTaskType>)schedule.getTasks();
 
 		LinkTimePair start;
 		int nextTaskIdx;
 		if (schedule.getStatus() == ScheduleStatus.STARTED) {
-			DrtTask currentTask = (DrtTask)schedule.getCurrentTask();
-			switch (currentTask.getDrtTaskType()) {
+			Task currentTask = schedule.getCurrentTask();
+			switch (((HasDrtTaskType)currentTask).getTaskType()) {
 				case DRIVE:
 					DrtDriveTask driveTask = (DrtDriveTask)currentTask;
 					start = ((OnlineDriveTaskTracker)driveTask.getTaskTracker()).getDiversionPoint();
@@ -95,8 +96,8 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 		}
 
 		List<DrtStopTask> stopTasks = new ArrayList<>();
-		for (DrtTask task : tasks.subList(nextTaskIdx, tasks.size())) {
-			if (task.getDrtTaskType() == DrtTaskType.STOP) {
+		for (HasDrtTaskType task : tasks.subList(nextTaskIdx, tasks.size())) {
+			if (task.getTaskType() == DrtTaskType.STOP) {
 				stopTasks.add((DrtStopTask)task);
 			}
 		}

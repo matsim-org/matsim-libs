@@ -24,11 +24,12 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
-import org.matsim.contrib.drt.schedule.DrtTask;
-import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
+import org.matsim.contrib.drt.schedule.HasDrtTaskType;
+import org.matsim.contrib.drt.schedule.HasDrtTaskType.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.util.distance.DistanceUtils;
 
 /**
@@ -44,15 +45,15 @@ public class Depots {
 		}
 
 		// current task is STAY
-		DrtTask currentTask = (DrtTask)schedule.getCurrentTask();
-		if (currentTask.getDrtTaskType() != DrtTaskType.STAY) {
+		Task currentTask = schedule.getCurrentTask();
+		if (((HasDrtTaskType)currentTask).getTaskType() != DrtTaskType.STAY) {
 			return false;
 		}
 
 		// previous task was STOP
 		int previousTaskIdx = currentTask.getTaskIdx() - 1;
 		return (previousTaskIdx >= 0
-				&& ((DrtTask)schedule.getTasks().get(previousTaskIdx)).getDrtTaskType() == DrtTaskType.STOP);
+				&& ((HasDrtTaskType)schedule.getTasks().get(previousTaskIdx)).getTaskType() == DrtTaskType.STOP);
 	}
 
 	public static Link findStraightLineNearestDepot(DvrpVehicle vehicle, Set<Link> links) {

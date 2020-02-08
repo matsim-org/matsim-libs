@@ -38,7 +38,7 @@ import com.google.common.base.MoreObjects;
  *
  * @author michalm
  */
-public class DrtStopTask extends StayTask implements DrtTask {
+public class DrtStopTask extends StayTask implements HasDrtTaskType {
 	private final Map<Id<Request>, DrtRequest> dropoffRequests = new LinkedHashMap<>();
 	private final Map<Id<Request>, DrtRequest> pickupRequests = new LinkedHashMap<>();
 
@@ -47,7 +47,7 @@ public class DrtStopTask extends StayTask implements DrtTask {
 	}
 
 	@Override
-	public DrtTaskType getDrtTaskType() {
+	public DrtTaskType getTaskType() {
 		return DrtTaskType.STOP;
 	}
 

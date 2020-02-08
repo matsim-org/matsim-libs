@@ -18,11 +18,11 @@
 
 package org.matsim.contrib.edrt.schedule;
 
-import org.matsim.contrib.drt.schedule.DrtTask;
+import org.matsim.contrib.drt.schedule.HasDrtTaskType;
 import org.matsim.contrib.ev.dvrp.ETask;
 
 /**
  * @author michalm
  */
-public interface EDrtTask extends DrtTask, ETask {
+public interface EDrtTask extends HasDrtTaskType, ETask {
 }
