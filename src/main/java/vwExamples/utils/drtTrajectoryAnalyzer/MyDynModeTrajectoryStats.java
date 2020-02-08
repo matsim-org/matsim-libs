@@ -51,7 +51,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.schedule.DrtTask;
+import org.matsim.contrib.drt.schedule.HasDrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
@@ -262,11 +262,11 @@ public class MyDynModeTrajectoryStats
 			double y = network.getLinks().get(event.getLinkId()).getCoord().getY();
 
 			double tt = Double.NaN;
-			DrtTask actualTask = (DrtTask)fleet.getVehicles()
+			HasDrtTaskType actualTask = (HasDrtTaskType)fleet.getVehicles()
 					.get(Id.create(vehicleID, DvrpVehicle.class))
 					.getSchedule()
 					.getCurrentTask();
-			String actualTaskType = actualTask.getDrtTaskType().toString();
+			String actualTaskType = actualTask.getTaskType().toString();
 
 			double v_meterPerSec = Double.NaN;
 			Id<ElectricVehicle> evId = Id.create(event.getVehicleId(), ElectricVehicle.class);
@@ -322,11 +322,11 @@ public class MyDynModeTrajectoryStats
 
 			double v_meterPerSec = Double.NaN;
 
-			DrtTask actualTask = (DrtTask)fleet.getVehicles()
+			HasDrtTaskType actualTask = (HasDrtTaskType)fleet.getVehicles()
 					.get(Id.create(vehicleID, DvrpVehicle.class))
 					.getSchedule()
 					.getCurrentTask();
-			String actualTaskType = actualTask.getDrtTaskType().toString();
+			String actualTaskType = actualTask.getTaskType().toString();
 
 			Id<ElectricVehicle> evId = Id.create(event.getVehicleId(), ElectricVehicle.class);
 			double currentSoc = EvUnits.J_to_kWh(electricFleet.getElectricVehicles().get(evId).getBattery().getSoc());
@@ -397,11 +397,11 @@ public class MyDynModeTrajectoryStats
 			vehDrive.movedOverNodeTime = event.getTime();
 			double v_meterPerSec = distance / tt;
 
-			DrtTask actualTask = (DrtTask)fleet.getVehicles()
+			HasDrtTaskType actualTask = (HasDrtTaskType)fleet.getVehicles()
 					.get(Id.create(vehicleID, DvrpVehicle.class))
 					.getSchedule()
 					.getCurrentTask();
-			String actualTaskType = actualTask.getDrtTaskType().toString();
+			String actualTaskType = actualTask.getTaskType().toString();
 
 			Id<ElectricVehicle> evId = Id.create(event.getVehicleId(), ElectricVehicle.class);
 			double currentSoc = EvUnits.J_to_kWh(electricFleet.getElectricVehicles().get(evId).getBattery().getSoc());

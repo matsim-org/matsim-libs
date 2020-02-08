@@ -21,10 +21,11 @@
 package peoplemover.stop;
 
 import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.drt.schedule.DrtTask;
+import org.matsim.contrib.drt.schedule.HasDrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineTrackerListener;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
@@ -54,8 +55,8 @@ public class CustomizedDrtActionCreator implements VrpAgentLogic.DynActionCreato
 
 	@Override
 	public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
-		DrtTask task = (DrtTask)vehicle.getSchedule().getCurrentTask();
-		switch (task.getDrtTaskType()) {
+		Task task = vehicle.getSchedule().getCurrentTask();
+		switch (((HasDrtTaskType)task).getTaskType()) {
 			case DRIVE:
 				return legFactory.create(vehicle);
 
