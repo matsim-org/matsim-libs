@@ -37,7 +37,6 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.DijkstraFactory;
@@ -71,7 +70,7 @@ final class OneTruckOptimizer implements VrpOptimizer {
 
 		vehicle = fleet.getVehicles().values().iterator().next();
 		vehicle.getSchedule()
-				.addTask(new StayTaskImpl(vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
+				.addTask(new StayTask(vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
 						vehicle.getStartLink(), "wait"));
 	}
 
@@ -120,7 +119,7 @@ final class OneTruckOptimizer implements VrpOptimizer {
 
 		// just wait (and be ready) till the end of the vehicle's time window (T1)
 		double tEnd = Math.max(t4, vehicle.getServiceEndTime());
-		schedule.addTask(new StayTaskImpl(t4, tEnd, toLink, "wait"));
+		schedule.addTask(new StayTask(t4, tEnd, toLink, "wait"));
 	}
 
 	@Override

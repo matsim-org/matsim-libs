@@ -18,7 +18,7 @@
 
 package org.matsim.contrib.ev.dvrp;
 
-import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
+import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
@@ -29,7 +29,7 @@ import com.google.common.base.Preconditions;
 /**
  * @author michalm
  */
-public class ChargingTaskImpl extends StayTaskImpl implements ChargingTask {
+public class ChargingTaskImpl extends StayTask implements ChargingTask {
 	private final ChargingWithQueueingAndAssignmentLogic chargingLogic;
 	private final ElectricVehicle ev;
 	private Double chargingStartedTime;

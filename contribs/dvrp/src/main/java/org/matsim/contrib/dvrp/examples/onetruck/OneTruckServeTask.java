@@ -20,12 +20,12 @@
 package org.matsim.contrib.dvrp.examples.onetruck;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
+import org.matsim.contrib.dvrp.schedule.StayTask;
 
 /**
  * @author michalm
  */
-public class OneTruckServeTask extends StayTaskImpl {
+public class OneTruckServeTask extends StayTask {
 	private final OneTruckRequest request;
 	private final boolean isPickup;// pickup or delivery
 

@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
+import org.matsim.contrib.dvrp.schedule.StayTask;
 
 import com.google.common.base.MoreObjects;
 
@@ -38,7 +38,7 @@ import com.google.common.base.MoreObjects;
  *
  * @author michalm
  */
-public class DrtStopTask extends StayTaskImpl implements DrtTask {
+public class DrtStopTask extends StayTask implements DrtTask {
 	private final Map<Id<Request>, DrtRequest> dropoffRequests = new LinkedHashMap<>();
 	private final Map<Id<Request>, DrtRequest> pickupRequests = new LinkedHashMap<>();
 
