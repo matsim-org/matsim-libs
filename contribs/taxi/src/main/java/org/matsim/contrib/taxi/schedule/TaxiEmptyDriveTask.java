@@ -31,9 +31,4 @@ public class TaxiEmptyDriveTask extends DriveTaskImpl implements TaxiTask {
 	public TaxiTaskType getTaxiTaskType() {
 		return TaxiTaskType.EMPTY_DRIVE;
 	}
-
-	@Override
-	protected String commonToString() {
-		return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
-	}
 }

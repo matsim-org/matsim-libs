@@ -34,9 +34,4 @@ public class DrtStayTask extends StayTaskImpl implements DrtTask {
 	public DrtTaskType getDrtTaskType() {
 		return DrtTaskType.STAY;
 	}
-
-	@Override
-	protected String commonToString() {
-		return "[" + getDrtTaskType().name() + "]" + super.commonToString();
-	}
 }

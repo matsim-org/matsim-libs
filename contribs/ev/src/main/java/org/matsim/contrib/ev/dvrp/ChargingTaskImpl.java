@@ -23,6 +23,7 @@ import org.matsim.contrib.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.contrib.ev.fleet.ElectricVehicle;
 import org.matsim.contrib.ev.infrastructure.Charger;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 
 /**
@@ -69,7 +70,13 @@ public class ChargingTaskImpl extends StayTaskImpl implements ChargingTask {
 	}
 
 	@Override
-	protected String commonToString() {
-		return "[CHARGING]" + super.commonToString();
+	public String toString() {
+		return MoreObjects.toStringHelper(this)
+				.add("chargingLogic", chargingLogic)
+				.add("ev", ev)
+				.add("chargingStartedTime", chargingStartedTime)
+				.add("totalEnergy", totalEnergy)
+				.add("super", super.toString())
+				.toString();
 	}
 }

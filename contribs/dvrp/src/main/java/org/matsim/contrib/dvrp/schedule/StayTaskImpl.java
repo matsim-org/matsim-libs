@@ -21,6 +21,8 @@ package org.matsim.contrib.dvrp.schedule;
 
 import org.matsim.api.core.v01.network.Link;
 
+import com.google.common.base.MoreObjects;
+
 public class StayTaskImpl extends AbstractTask implements StayTask {
 	private final Link link;
 	private final String name;
@@ -46,6 +48,10 @@ public class StayTaskImpl extends AbstractTask implements StayTask {
 
 	@Override
 	public String toString() {
-		return "S(" + (name != null ? name : "") + "@" + link.getId() + ")" + commonToString();
+		return MoreObjects.toStringHelper(this)
+				.add("super", super.toString())
+				.add("link", link)
+				.add("name", name)
+				.toString();
 	}
 }

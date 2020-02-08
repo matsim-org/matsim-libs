@@ -31,9 +31,4 @@ public class TaxiStayTask extends StayTaskImpl implements TaxiTask {
 	public TaxiTaskType getTaxiTaskType() {
 		return TaxiTaskType.STAY;
 	}
-
-	@Override
-	protected String commonToString() {
-		return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
-	}
 }

@@ -19,7 +19,11 @@
 
 package org.matsim.contrib.dvrp.schedule;
 
-import org.matsim.contrib.dvrp.path.*;
+import org.matsim.contrib.dvrp.path.DivertedVrpPath;
+import org.matsim.contrib.dvrp.path.VrpPath;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+
+import com.google.common.base.MoreObjects;
 
 public class DriveTaskImpl extends AbstractTask implements DriveTask {
 	private VrpPath path;
@@ -47,6 +51,9 @@ public class DriveTaskImpl extends AbstractTask implements DriveTask {
 
 	@Override
 	public String toString() {
-		return "D(@" + path.getFromLink().getId() + "->@" + path.getToLink().getId() + ")" + commonToString();
+		return MoreObjects.toStringHelper(this)
+				.add("super", super.toString())
+				.add("path", path)
+				.toString();
 	}
 }

@@ -29,6 +29,8 @@ import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 
+import com.google.common.base.MoreObjects;
+
 /**
  * A task representing stopping at a bus stop with at least one or more passengers being picked up or dropped off.
  * <p>
@@ -72,7 +74,11 @@ public class DrtStopTask extends StayTaskImpl implements DrtTask {
 	}
 
 	@Override
-	protected String commonToString() {
-		return "[" + getDrtTaskType().name() + "]" + super.commonToString();
+	public String toString() {
+		return MoreObjects.toStringHelper(this)
+				.add("dropoffRequests", dropoffRequests)
+				.add("pickupRequests", pickupRequests)
+				.add("super", super.toString())
+				.toString();
 	}
 }
