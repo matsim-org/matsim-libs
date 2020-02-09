@@ -28,12 +28,12 @@ import com.google.common.base.MoreObjects;
 public class DriveTask extends AbstractTask {
 	private VrpPath path;
 
-	public DriveTask(VrpPathWithTravelData path) {
-		super(path.getDepartureTime(), path.getArrivalTime());
+	public DriveTask(TaskType taskType, VrpPathWithTravelData path) {
+		super(taskType, path.getDepartureTime(), path.getArrivalTime());
 		this.path = path;
 	}
 
-	public VrpPath getPath() {
+	public final VrpPath getPath() {
 		return path;
 	}
 
@@ -50,7 +50,7 @@ public class DriveTask extends AbstractTask {
 	 * <li>...
 	 * </ul>
 	 */
-	public void pathDiverted(DivertedVrpPath divertedPath, double newEndTime) {
+	public final void pathDiverted(DivertedVrpPath divertedPath, double newEndTime) {
 		// can only divert an ongoing task
 		if (getStatus() != TaskStatus.STARTED) {
 			throw new IllegalStateException();
@@ -62,9 +62,6 @@ public class DriveTask extends AbstractTask {
 
 	@Override
 	public String toString() {
-		return MoreObjects.toStringHelper(this)
-				.add("super", super.toString())
-				.add("path", path)
-				.toString();
+		return MoreObjects.toStringHelper(this).add("super", super.toString()).add("path", path).toString();
 	}
 }

@@ -1,8 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -14,15 +15,29 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.edrt.schedule;
+package org.matsim.contrib.dvrp.schedule;
 
-import org.matsim.contrib.drt.schedule.DrtTask;
-import org.matsim.contrib.ev.dvrp.ETask;
+import com.google.common.base.MoreObjects;
 
 /**
- * @author michalm
+ * @author Michal Maciejewski (michalm)
  */
-public interface EDrtTask extends DrtTask, ETask {
+public class NamedTaskType implements Task.TaskType {
+	private final String name;
+
+	public NamedTaskType(String name) {
+		this.name = name;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this).add("name", name).toString();
+	}
 }

@@ -25,13 +25,8 @@ import org.matsim.contrib.dvrp.schedule.StayTask;
 /**
  * @author michalm
  */
-public class DrtStayTask extends StayTask implements DrtTask {
+public class DrtStayTask extends StayTask {
 	public DrtStayTask(double beginTime, double endTime, Link link) {
-		super(beginTime, endTime, link);
-	}
-
-	@Override
-	public DrtTaskType getDrtTaskType() {
-		return DrtTaskType.STAY;
+		super(DrtTaskType.STAY, beginTime, endTime, link);
 	}
 }

@@ -24,19 +24,13 @@ import org.matsim.contrib.taxi.passenger.TaxiRequest;
 
 import com.google.common.base.MoreObjects;
 
-public class TaxiPickupTask extends StayTask implements TaxiTaskWithRequest {
+public class TaxiPickupTask extends StayTask {
 	private final TaxiRequest request;
 
 	public TaxiPickupTask(double beginTime, double endTime, TaxiRequest request) {
-		super(beginTime, endTime, request.getFromLink());
-
+		super(TaxiTaskType.PICKUP, beginTime, endTime, request.getFromLink());
 		this.request = request;
 		request.setPickupTask(this);
-	}
-
-	@Override
-	public TaxiTaskType getTaxiTaskType() {
-		return TaxiTaskType.PICKUP;
 	}
 
 	public TaxiRequest getRequest() {
@@ -45,9 +39,6 @@ public class TaxiPickupTask extends StayTask implements TaxiTaskWithRequest {
 
 	@Override
 	public String toString() {
-		return MoreObjects.toStringHelper(this)
-				.add("request", request)
-				.add("super", super.toString())
-				.toString();
+		return MoreObjects.toStringHelper(this).add("request", request).add("super", super.toString()).toString();
 	}
 }

@@ -38,17 +38,12 @@ import com.google.common.base.MoreObjects;
  *
  * @author michalm
  */
-public class DrtStopTask extends StayTask implements DrtTask {
+public class DrtStopTask extends StayTask {
 	private final Map<Id<Request>, DrtRequest> dropoffRequests = new LinkedHashMap<>();
 	private final Map<Id<Request>, DrtRequest> pickupRequests = new LinkedHashMap<>();
 
 	public DrtStopTask(double beginTime, double endTime, Link link) {
-		super(beginTime, endTime, link);
-	}
-
-	@Override
-	public DrtTaskType getDrtTaskType() {
-		return DrtTaskType.STOP;
+		super(DrtTaskType.STOP, beginTime, endTime, link);
 	}
 
 	/**

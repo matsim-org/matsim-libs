@@ -1,9 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -15,21 +15,18 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
 package org.matsim.contrib.drt.schedule;
 
 import org.matsim.contrib.dvrp.schedule.Task;
 
 /**
- * @author michalm
+ * @author Michal Maciejewski (michalm)
  */
-public interface DrtTask extends Task {
-	enum DrtTaskType {
-		STAY, // idle
-		STOP, // stopped to drop off and pick up passengers
-		DRIVE; // driving with/without passengers
-	}
-
-	DrtTaskType getDrtTaskType();
+public enum DrtTaskType implements Task.TaskType {
+	STAY, // idle
+	STOP, // stopped to drop off and pick up passengers
+	DRIVE; // driving with/without passengers
 }
