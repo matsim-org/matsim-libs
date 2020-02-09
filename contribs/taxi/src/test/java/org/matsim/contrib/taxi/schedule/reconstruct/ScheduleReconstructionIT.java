@@ -74,7 +74,6 @@ public class ScheduleReconstructionIT {
 		runReconstruction(configUrl);
 	}
 
-	@SuppressWarnings("unchecked")
 	private void runReconstruction(URL configUrl) {
 		Config config = ConfigUtils.loadConfig(configUrl, new MultiModeTaxiConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());

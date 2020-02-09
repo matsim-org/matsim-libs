@@ -58,8 +58,6 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 		}
 
 		Schedule schedule = vehicle.getSchedule();
-		@SuppressWarnings("unchecked")
-
 		LinkTimePair start;
 		int nextTaskIdx;
 		if (schedule.getStatus() == ScheduleStatus.STARTED) {
