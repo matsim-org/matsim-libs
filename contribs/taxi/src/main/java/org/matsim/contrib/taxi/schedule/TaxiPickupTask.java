@@ -33,11 +33,6 @@ public class TaxiPickupTask extends StayTask implements TaxiTaskWithRequest {
 		request.setPickupTask(this);
 	}
 
-	@Override
-	public TaxiTaskType getTaskType() {
-		return TaxiTaskType.PICKUP;
-	}
-
 	public TaxiRequest getRequest() {
 		return request;
 	}

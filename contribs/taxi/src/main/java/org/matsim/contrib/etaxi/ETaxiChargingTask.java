@@ -29,9 +29,4 @@ public class ETaxiChargingTask extends ChargingTaskImpl {
 			double totalEnergy) {
 		super(TaxiTaskType.STAY, beginTime, endTime, charger, ev, totalEnergy);
 	}
-
-	@Override
-	public TaxiTaskType getTaskType() {
-		return TaxiTaskType.STAY;
-	}
 }

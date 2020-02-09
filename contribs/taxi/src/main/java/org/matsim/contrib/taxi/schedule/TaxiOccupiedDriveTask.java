@@ -32,9 +32,4 @@ public class TaxiOccupiedDriveTask extends DriveTask {
 			throw new IllegalArgumentException();
 		}
 	}
-
-	@Override
-	public TaxiTaskType getTaskType() {
-		return OCCUPIED_DRIVE;
-	}
 }

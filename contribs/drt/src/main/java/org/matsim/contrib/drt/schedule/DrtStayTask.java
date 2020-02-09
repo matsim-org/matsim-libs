@@ -29,9 +29,4 @@ public class DrtStayTask extends StayTask {
 	public DrtStayTask(double beginTime, double endTime, Link link) {
 		super(DrtTaskType.STAY, beginTime, endTime, link);
 	}
-
-	@Override
-	public DrtTaskType getTaskType() {
-		return DrtTaskType.STAY;
-	}
 }

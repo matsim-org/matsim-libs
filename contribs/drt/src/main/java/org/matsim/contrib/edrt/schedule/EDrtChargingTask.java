@@ -28,9 +28,4 @@ public class EDrtChargingTask extends ChargingTaskImpl {
 	public EDrtChargingTask(double beginTime, double endTime, Charger charger, ElectricVehicle ev, double totalEnergy) {
 		super(DrtTaskType.STAY, beginTime, endTime, charger, ev, totalEnergy);
 	}
-
-	@Override
-	public DrtTaskType getTaskType() {
-		return DrtTaskType.STAY;
-	}
 }

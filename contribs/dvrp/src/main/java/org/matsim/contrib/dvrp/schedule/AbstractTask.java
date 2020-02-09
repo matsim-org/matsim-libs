@@ -48,7 +48,7 @@ public abstract class AbstractTask implements Task {
 	}
 
 	@Override
-	public TaskType getTaskType() {
+	public final TaskType getTaskType() {
 		return taskType;
 	}
 

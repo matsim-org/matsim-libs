@@ -46,11 +46,6 @@ public class DrtStopTask extends StayTask {
 		super(DrtTaskType.STOP, beginTime, endTime, link);
 	}
 
-	@Override
-	public DrtTaskType getTaskType() {
-		return DrtTaskType.STOP;
-	}
-
 	/**
 	 * @return requests associated with passengers being dropped off at this stop
 	 */

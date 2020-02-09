@@ -29,9 +29,4 @@ public class DrtDriveTask extends DriveTask {
 	public DrtDriveTask(VrpPathWithTravelData path) {
 		super(DrtTaskType.DRIVE, path);
 	}
-
-	@Override
-	public DrtTaskType getTaskType() {
-		return DrtTaskType.DRIVE;
-	}
 }

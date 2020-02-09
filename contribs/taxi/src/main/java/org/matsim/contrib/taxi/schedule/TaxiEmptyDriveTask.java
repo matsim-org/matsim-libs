@@ -26,9 +26,4 @@ public class TaxiEmptyDriveTask extends DriveTask {
 	public TaxiEmptyDriveTask(VrpPathWithTravelData path) {
 		super(TaxiTaskType.EMPTY_DRIVE, path);
 	}
-
-	@Override
-	public TaxiTaskType getTaskType() {
-		return TaxiTaskType.EMPTY_DRIVE;
-	}
 }

@@ -26,9 +26,4 @@ public class TaxiStayTask extends StayTask {
 	public TaxiStayTask(double beginTime, double endTime, Link link) {
 		super(TaxiTaskType.STAY, beginTime, endTime, link);
 	}
-
-	@Override
-	public TaxiTaskType getTaskType() {
-		return TaxiTaskType.STAY;
-	}
 }
