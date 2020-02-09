@@ -34,6 +34,7 @@ import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.DvrpMode;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
+import org.matsim.contrib.dvrp.schedule.NamedTaskType;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
@@ -74,8 +75,8 @@ final class OneTaxiOptimizer implements VrpOptimizer {
 
 		vehicle = fleet.getVehicles().values().iterator().next();
 		vehicle.getSchedule()
-				.addTask(new StayTask("wait", vehicle.getServiceBeginTime(), vehicle.getServiceEndTime(),
-						vehicle.getStartLink()));
+				.addTask(new StayTask(new NamedTaskType("wait"), vehicle.getServiceBeginTime(),
+						vehicle.getServiceEndTime(), vehicle.getStartLink()));
 	}
 
 	@Override
@@ -109,14 +110,14 @@ final class OneTaxiOptimizer implements VrpOptimizer {
 
 		VrpPathWithTravelData pathToCustomer = VrpPaths.calcAndCreatePath(lastTask.getLink(), fromLink, t0, router,
 				travelTime);
-		schedule.addTask(new DriveTask("empty_drive", pathToCustomer));
+		schedule.addTask(new DriveTask(new NamedTaskType("empty_drive"), pathToCustomer));
 
 		double t1 = pathToCustomer.getArrivalTime();
 		double t2 = t1 + PICKUP_DURATION;// 2 minutes for picking up the passenger
 		schedule.addTask(new OneTaxiServeTask(t1, t2, fromLink, true, req));
 
 		VrpPathWithTravelData pathWithCustomer = VrpPaths.calcAndCreatePath(fromLink, toLink, t2, router, travelTime);
-		schedule.addTask(new DriveTask("occupied_drive", pathWithCustomer));
+		schedule.addTask(new DriveTask(new NamedTaskType("occupied_drive"), pathWithCustomer));
 
 		double t3 = pathWithCustomer.getArrivalTime();
 		double t4 = t3 + DROPOFF_DURATION;// 1 minute for dropping off the passenger
@@ -124,7 +125,7 @@ final class OneTaxiOptimizer implements VrpOptimizer {
 
 		// just wait (and be ready) till the end of the vehicle's time window (T1)
 		double tEnd = Math.max(t4, vehicle.getServiceEndTime());
-		schedule.addTask(new StayTask("wait", t4, tEnd, toLink));
+		schedule.addTask(new StayTask(new NamedTaskType("wait"), t4, tEnd, toLink));
 
 		eventsManager.processEvent(
 				new PassengerRequestScheduledEvent(timer.getTimeOfDay(), TransportMode.taxi, request.getId(),

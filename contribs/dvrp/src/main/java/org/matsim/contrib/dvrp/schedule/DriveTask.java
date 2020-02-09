@@ -28,10 +28,6 @@ import com.google.common.base.MoreObjects;
 public class DriveTask extends AbstractTask {
 	private VrpPath path;
 
-	public DriveTask(String taskType, VrpPathWithTravelData path) {
-		this(new NamedTaskType(taskType), path);
-	}
-
 	public DriveTask(TaskType taskType, VrpPathWithTravelData path) {
 		super(taskType, path.getDepartureTime(), path.getArrivalTime());
 		this.path = path;

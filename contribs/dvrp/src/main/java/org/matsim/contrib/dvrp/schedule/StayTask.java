@@ -26,10 +26,6 @@ import com.google.common.base.MoreObjects;
 public class StayTask extends AbstractTask {
 	private final Link link;
 
-	public StayTask(String taskType, double beginTime, double endTime, Link link) {
-		this(new NamedTaskType(taskType), beginTime, endTime, link);
-	}
-
 	public StayTask(TaskType taskType, double beginTime, double endTime, Link link) {
 		super(taskType, beginTime, endTime);
 		this.link = link;
