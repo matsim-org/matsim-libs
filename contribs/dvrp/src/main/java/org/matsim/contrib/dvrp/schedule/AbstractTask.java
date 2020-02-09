@@ -27,7 +27,7 @@ import com.google.common.base.Preconditions;
 /**
  * @author michalm
  */
-public abstract class AbstractTask implements Task {
+abstract class AbstractTask implements Task {
 	// ==== BEGIN: fields managed by ScheduleImpl
 	int taskIdx;
 	TaskStatus status;
@@ -40,7 +40,7 @@ public abstract class AbstractTask implements Task {
 
 	private TaskTracker taskTracker;
 
-	public AbstractTask(TaskType taskType, double beginTime, double endTime) {
+	AbstractTask(TaskType taskType, double beginTime, double endTime) {
 		Preconditions.checkArgument(beginTime <= endTime, "beginTime=%s; endTime=%s", beginTime, endTime);
 		this.taskType = Preconditions.checkNotNull(taskType);
 		this.beginTime = beginTime;
