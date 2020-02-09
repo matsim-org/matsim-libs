@@ -42,13 +42,12 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.passenger.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.contrib.taxi.schedule.TaxiDropoffTask;
 import org.matsim.contrib.taxi.schedule.TaxiEmptyDriveTask;
 import org.matsim.contrib.taxi.schedule.TaxiOccupiedDriveTask;
 import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
-import org.matsim.contrib.taxi.schedule.TaxiTaskWithRequest;
+import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -517,16 +516,14 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 	}
 
 	protected void taskRemovedFromSchedule(DvrpVehicle vehicle, Task task) {
-		if (task instanceof TaxiTaskWithRequest) {
-			TaxiRequest request = ((TaxiTaskWithRequest)task).getRequest();
-
-			TaxiTaskType taskType = (TaxiTaskType)task.getTaskType();
-			if (taskType == TaxiTaskType.PICKUP) {
-				request.setPickupTask(null);
-				removedRequests.add(request);
-			} else if (taskType == TaxiTaskType.DROPOFF) {
-				request.setDropoffTask(null);
-			}
+		TaxiTaskType taskType = (TaxiTaskType)task.getTaskType();
+		if (taskType == TaxiTaskType.PICKUP) {
+			TaxiRequest request = ((TaxiPickupTask)task).getRequest();
+			request.setPickupTask(null);
+			removedRequests.add(request);
+		} else if (taskType == TaxiTaskType.DROPOFF) {
+			TaxiRequest request = ((TaxiDropoffTask)task).getRequest();
+			request.setDropoffTask(null);
 		}
 	}
 

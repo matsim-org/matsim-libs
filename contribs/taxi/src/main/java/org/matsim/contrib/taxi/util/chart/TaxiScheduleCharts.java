@@ -8,8 +8,9 @@ import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.util.chart.ScheduleCharts;
 import org.matsim.contrib.dvrp.util.chart.ScheduleCharts.DescriptionCreator;
 import org.matsim.contrib.dvrp.util.chart.ScheduleCharts.PaintSelector;
+import org.matsim.contrib.taxi.schedule.TaxiDropoffTask;
+import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
 import org.matsim.contrib.taxi.schedule.TaxiTaskType;
-import org.matsim.contrib.taxi.schedule.TaxiTaskWithRequest;
 
 public class TaxiScheduleCharts {
 	public static JFreeChart chartSchedule(Collection<? extends DvrpVehicle> vehicles) {
@@ -19,11 +20,12 @@ public class TaxiScheduleCharts {
 	public static final DescriptionCreator TAXI_DESCRIPTION_CREATOR = task -> task.getTaskType() + "";
 
 	public static final DescriptionCreator TAXI_DESCRIPTION_WITH_PASSENGER_ID_CREATOR = task -> {
-		if (task instanceof TaxiTaskWithRequest) {
-			TaxiTaskWithRequest taskWithReq = (TaxiTaskWithRequest)task;
-			return task.getTaskType() + "_" + taskWithReq.getRequest().getPassengerId();
+		if (task.getTaskType() == TaxiTaskType.PICKUP) {
+			return task.getTaskType() + "_" + ((TaxiPickupTask)task).getRequest().getPassengerId();
 		}
-
+		if (task.getTaskType() == TaxiTaskType.DROPOFF) {
+			return task.getTaskType() + "_" + ((TaxiDropoffTask)task).getRequest().getPassengerId();
+		}
 		return task.getTaskType() + "";
 	};
 

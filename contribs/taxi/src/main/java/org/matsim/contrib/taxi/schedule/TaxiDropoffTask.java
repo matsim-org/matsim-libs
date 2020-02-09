@@ -24,7 +24,7 @@ import org.matsim.contrib.taxi.passenger.TaxiRequest;
 
 import com.google.common.base.MoreObjects;
 
-public class TaxiDropoffTask extends StayTask implements TaxiTaskWithRequest {
+public class TaxiDropoffTask extends StayTask {
 	private final TaxiRequest request;
 
 	public TaxiDropoffTask(double beginTime, double endTime, TaxiRequest request) {
