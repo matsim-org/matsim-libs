@@ -19,8 +19,9 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
+import static org.matsim.contrib.dvrp.examples.onetaxi.OneTaxiOptimizer.OneTaxiTaskType;
+
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.schedule.NamedTaskType;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 
 /**
@@ -28,19 +29,14 @@ import org.matsim.contrib.dvrp.schedule.StayTask;
  */
 public class OneTaxiServeTask extends StayTask {
 	private final OneTaxiRequest request;
-	private final boolean isPickup;// pickup or dropoff
 
-	public OneTaxiServeTask(double beginTime, double endTime, Link link, boolean isPickup, OneTaxiRequest request) {
-		super(new NamedTaskType(isPickup ? "pickup" : "dropoff"), beginTime, endTime, link);
+	public OneTaxiServeTask(OneTaxiTaskType taskType, double beginTime, double endTime, Link link,
+			OneTaxiRequest request) {
+		super(taskType, beginTime, endTime, link);
 		this.request = request;
-		this.isPickup = isPickup;
 	}
 
 	public OneTaxiRequest getRequest() {
 		return request;
-	}
-
-	public boolean isPickup() {
-		return isPickup;
 	}
 }
