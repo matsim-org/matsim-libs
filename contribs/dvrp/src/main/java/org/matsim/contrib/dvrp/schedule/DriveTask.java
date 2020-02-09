@@ -33,7 +33,7 @@ public class DriveTask extends AbstractTask {
 		this.path = path;
 	}
 
-	public VrpPath getPath() {
+	public final VrpPath getPath() {
 		return path;
 	}
 
@@ -50,7 +50,7 @@ public class DriveTask extends AbstractTask {
 	 * <li>...
 	 * </ul>
 	 */
-	public void pathDiverted(DivertedVrpPath divertedPath, double newEndTime) {
+	public final void pathDiverted(DivertedVrpPath divertedPath, double newEndTime) {
 		// can only divert an ongoing task
 		if (getStatus() != TaskStatus.STARTED) {
 			throw new IllegalStateException();
