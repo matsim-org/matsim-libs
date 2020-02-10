@@ -52,10 +52,17 @@ public final class PersonMoneyEvent extends Event implements HasPersonId {
 	 * Creates a new event describing that the given <tt>agent</tt> has <em>gained</em>
 	 * some money at the specified <tt>time</tt>. Positive values for <tt>amount</tt>
 	 * mean the agent has gained money, negative values that the agent has paid money.
+	 * <br>
+	 * There are two optional fields: <tt>purpose</tt> and <tt>transactionPartner</tt>.
+	 * Those are currently not read by any core MATSim code, but can be useful for 
+	 * analysis, e.g. calculate the drt fare revenue (purpose = "drtFare") by 
+	 * drt operator (transactionPartner = "Greedy Shared Taxis Inc.").
 	 *
 	 * @param time
 	 * @param agentId
 	 * @param amount
+	 * @param purpose (not required by dtd)
+	 * @param transactionPartner (not required by dtd)
 	 */
 	public PersonMoneyEvent(final double time, final Id<Person> agentId, final double amount, final String purpose, 
 			final String transactionPartner) {
