@@ -53,7 +53,6 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	private static final Logger log = Logger.getLogger( BestReplyLocationChoicePlanAlgorithm.class ) ;
 	
 	private final ActivityFacilities facilities;
-	private final ObjectAttributes personsMaxDCScoreUnscaled;
 	private final ScaleEpsilon scaleEpsilon;
 //	private final ActTypeConverter actTypeConverter;
 	private final DestinationSampler sampler;
@@ -62,22 +61,17 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	private final BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra;
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final int iteration;
-	private final Map<Id<ActivityFacility>, Id<Link>> nearestLinks;
-	private final Map<String, Double> teleportedModeSpeeds;
-	private final Map<String, Double> beelineDistanceFactors;
 	private TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType;
 	private final TripRouter tripRouter;
 	private final FrozenTastesConfigGroup dccg;
 	private final Scenario scenario;
 
 	public BestReplyLocationChoicePlanAlgorithm(
-		  TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quad_trees,
-		  ObjectAttributes personsMaxDCScoreUnscaled, DestinationChoiceContext lcContext,
+		  TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quad_trees, DestinationChoiceContext lcContext,
 		  DestinationSampler sampler, TripRouter tripRouter, MultiNodeDijkstra forwardMultiNodeDijkstra,
 		  BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra, ScoringFunctionFactory scoringFunctionFactory,
 		  int iteration, Map<Id<ActivityFacility>, Id<Link>> nearestLinks ) {
 		this.facilities = lcContext.getScenario().getActivityFacilities();
-		this.personsMaxDCScoreUnscaled = personsMaxDCScoreUnscaled;
 		this.scaleEpsilon = lcContext.getScaleEpsilon();
 //		this.actTypeConverter = lcContext.getConverter();
 		this.sampler = sampler;
@@ -86,12 +80,9 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 		this.backwardMultiNodeDijkstra = backwardMultiNodeDijkstra;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.iteration = iteration;
-		this.nearestLinks = nearestLinks;
-		
+
 		// Cache maps since otherwise they would be created on the fly every time when accessing them via the config object.
-		this.teleportedModeSpeeds = this.lcContext.getScenario().getConfig().plansCalcRoute().getTeleportedModeSpeeds();
-		this.beelineDistanceFactors = this.lcContext.getScenario().getConfig().plansCalcRoute().getBeelineDistanceFactors();
-		
+
 		this.quadTreesOfType = quad_trees;
 		this.tripRouter = tripRouter;
 

@@ -59,7 +59,6 @@ final class BestReplyLocationChoiceStrategymodule extends AbstractMultithreadedM
 	private static final Logger log = Logger.getLogger( BestReplyLocationChoiceStrategymodule.class );
 	private final Provider<TripRouter> tripRouterProvider;
 
-	private ObjectAttributes personsMaxEpsUnscaled;
 	private DestinationSampler sampler;
 	private TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType = new TreeMap<>();
 //	private TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<>();
@@ -89,7 +88,6 @@ final class BestReplyLocationChoiceStrategymodule extends AbstractMultithreadedM
 		}
 		this.lcContext = lcContext;
 		this.scenario = lcContext.getScenario();
-		this.personsMaxEpsUnscaled = personsMaxDCScoreUnscaled;
 		this.forwardMultiNodeDijsktaFactory = new FastMultiNodeDijkstraFactory(true);
 		this.backwardMultiNodeDijsktaFactory = new BackwardFastMultiNodeDijkstraFactory(true);
 
@@ -150,7 +148,7 @@ final class BestReplyLocationChoiceStrategymodule extends AbstractMultithreadedM
 		TripRouter tripRouter = tripRouterProvider.get();
 		int iteration = replanningContext.getIteration();
 
-		return new BestReplyLocationChoicePlanAlgorithm(this.quadTreesOfType, this.personsMaxEpsUnscaled,
+		return new BestReplyLocationChoicePlanAlgorithm(this.quadTreesOfType,
 			  this.lcContext, this.sampler, tripRouter, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra, scoringFunctionFactory, iteration, this.nearestLinks);
 	}
 }
