@@ -74,8 +74,8 @@ final class BestReplyLocationChoiceStrategymodule extends AbstractMultithreadedM
 	private Map<String, TravelTime> travelTimes;
 	private Map<String, TravelDisutilityFactory> travelDisutilities;
 
-	public BestReplyLocationChoiceStrategymodule( Provider<TripRouter> tripRouterProvider, DestinationChoiceContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled,
-								    ScoringFunctionFactory scoringFunctionFactory, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilities ) {
+	public BestReplyLocationChoiceStrategymodule( Provider<TripRouter> tripRouterProvider, DestinationChoiceContext lcContext,
+												  ScoringFunctionFactory scoringFunctionFactory, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilities ) {
 		super(lcContext.getScenario().getConfig().global());
 		this.tripRouterProvider = tripRouterProvider;
 		this.scoringFunctionFactory = scoringFunctionFactory;
