@@ -34,18 +34,13 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 	
 	private static final Logger log = Logger.getLogger(ReadOrCreateKVals.class);
 	
-	public static String fkValuesFile = "facilitiesKValues.xml";
-	public static String pkValuesFile = "personsKValues.xml";
-	
-	private Scenario scenario;	
+	private Scenario scenario;
 	private ObjectAttributes facilitiesKValues = new ObjectAttributes();
 	private ObjectAttributes personsKValues = new ObjectAttributes();
-	private Config config;	
 	private RandomFromVarDistr rnd;
 	
 	public ReadOrCreateKVals(long seed, Scenario scenario) {
 		this.scenario = scenario;
-		this.config = scenario.getConfig();
 		this.rnd = new RandomFromVarDistr();
 		this.rnd.setSeed(seed);
 	}
@@ -99,11 +94,4 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 		}
 	}
 	
-	public ObjectAttributes getFacilitiesKValues() {
-		return this.facilitiesKValues;
-	}
-	
-	public ObjectAttributes getPersonsKValues() {
-		return this.personsKValues;
-	}
 }

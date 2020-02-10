@@ -35,9 +35,6 @@ class ReadOrComputeMaxDCScore {
 
 	private final static Logger log = Logger.getLogger(ReadOrComputeMaxDCScore.class);
 
-	public static String maxEpsFile = "personsMaxDCScoreUnscaled.xml";
-
-	private Config config;
 	private Scenario scenario;
 	private FrozenTastesConfigGroup dccg;
 	private DestinationChoiceContext lcContext;
@@ -47,7 +44,6 @@ class ReadOrComputeMaxDCScore {
 
 	public ReadOrComputeMaxDCScore(DestinationChoiceContext lcContext) {
 		this.scenario = lcContext.getScenario();
-		this.config = this.scenario.getConfig();
 		this.dccg = (FrozenTastesConfigGroup) scenario.getConfig().getModule( FrozenTastesConfigGroup.GROUP_NAME );
 		this.scaleEpsilon = lcContext.getScaleEpsilon();
 		this.flexibleTypes = lcContext.getFlexibleTypes();
@@ -57,8 +53,8 @@ class ReadOrComputeMaxDCScore {
 	public void readOrCreateMaxDCScore( boolean arekValsRead ) {
 		String maxEpsValuesFileName = this.dccg.getMaxEpsFile();
 		if (maxEpsValuesFileName != null && arekValsRead) {
-			ObjectAttributesXmlReader maxEpsReader = new ObjectAttributesXmlReader(this.personsMaxDCScoreUnscaled);
 			try {
+				ObjectAttributesXmlReader maxEpsReader = new ObjectAttributesXmlReader(this.personsMaxDCScoreUnscaled);
 				maxEpsReader.readFile(maxEpsValuesFileName);
 				log.info("reading maxEpsilons from file:\n"+ maxEpsValuesFileName);
 			} catch  (UncheckedIOException e) {
@@ -99,12 +95,9 @@ class ReadOrComputeMaxDCScore {
 				double maxType = (Double)person.getCustomAttributes().get(flexibleType);
 				if (maxType != 0.0) {
 					person.getAttributes().putAttribute(flexibleType, maxType);
-					this.personsMaxDCScoreUnscaled.putAttribute(person.getId().toString(), flexibleType, maxType);
 				}
 			}
 		}
-		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.personsMaxDCScoreUnscaled);
-		attributesWriter.writeFile(this.config.controler().getOutputDirectory() + maxEpsFile);
 	}
 
 	public ObjectAttributes getPersonsMaxEpsUnscaled() {
