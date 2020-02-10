@@ -25,11 +25,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.utils.ScaleEpsilon;
-import org.matsim.core.config.Config;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 class ReadOrComputeMaxDCScore {
 
