@@ -104,8 +104,8 @@ public class Agent {
     public Agent(int id, int capacity, PlanArray plan, EventArray events) {
         this(id, plan, events);
         this.capacity = capacity;
-        this.passagersByStop = new ArrayList<>(Hermes.MAX_STOP_IDX + 1);
-        for(int i = 0; i < Hermes.MAX_STOP_IDX  + 1; i++) {
+        this.passagersByStop = new ArrayList<>(HermesConfig.MAX_STOP_IDX + 1);
+        for(int i = 0; i < HermesConfig.MAX_STOP_IDX  + 1; i++) {
             this.passagersByStop.add(new ArrayList<>());
         }
     }
@@ -118,7 +118,7 @@ public class Agent {
     	linkFinishTime = 0;
     	if (capacity > 0) {
     		passagersInside = 0;
-    		for(int i = 0; i < Hermes.MAX_STOP_IDX  + 1; i++) {
+    		for(int i = 0; i < HermesConfig.MAX_STOP_IDX  + 1; i++) {
                 this.passagersByStop.get(i).clear();
     		}
     	}
@@ -190,48 +190,45 @@ public class Agent {
 
     public static long preparePlanEventEntry(long type, long element) {
         long planEntry = (type << 60) | element;
-        if (Hermes.DEBUG_EVENTS) {
+        if (HermesConfig.DEBUG_EVENTS) {
             validatePlanEntry(planEntry);
         }
         return planEntry;
     }
 
     public static long preparePlanEventEntry(long type, long eventid, long element) {
-        if (eventid > Hermes.MAX_EVENTS_AGENT) {
+        if (eventid > HermesConfig.MAX_EVENTS_AGENT) {
             throw new RuntimeException(String.format("eventid above limit: %d", eventid));
         }
         return preparePlanEventEntry(type, (eventid << 40) | element);
     }
 
     public static long prepareStopDelay(long type, long departure, long element) {
-    	if (departure > Hermes.SIM_STEPS) {
-            throw new RuntimeException(String.format("departure above limit: %d", departure));
-        }
     	return preparePlanEventEntry(type, (departure << 40) | element);
     }
 
     private static long prepapreLinkEntryElement(long linkid, long velocity) {
-        if (linkid > Hermes.MAX_LINK_ID) {
+        if (linkid > HermesConfig.MAX_LINK_ID) {
             throw new RuntimeException("exceeded maximum number of links");
         }
 
         // Checking for velocities that are too high.
-        velocity = Math.min(velocity, Hermes.MAX_VEHICLE_VELOCITY);
+        velocity = Math.min(velocity, HermesConfig.MAX_VEHICLE_VELOCITY);
 
         // Checking for velocities that are too low.
-        velocity = velocity < 0 ? Hermes.MAX_VEHICLE_VELOCITY : velocity;
+        velocity = velocity < 0 ? HermesConfig.MAX_VEHICLE_VELOCITY : velocity;
 
         return (linkid << 8) | velocity;
     }
 
     private static long prepareRouteStopEntry(long routeid, long stopid, long stopidx) {
-        if (stopid > Hermes.MAX_STOP_ROUTE_ID) {
+        if (stopid > HermesConfig.MAX_STOP_ROUTE_ID) {
             throw new RuntimeException(String.format("stopid above limit: %d", stopid));
         }
-        if (routeid > Hermes.MAX_STOP_ROUTE_ID) {
+        if (routeid > HermesConfig.MAX_STOP_ROUTE_ID) {
             throw new RuntimeException(String.format("routeid above limit: %d", routeid));
         }
-        if (stopidx > Hermes.MAX_STOP_IDX) {
+        if (stopidx > HermesConfig.MAX_STOP_IDX) {
             throw new RuntimeException(String.format("station index above limit: %d", stopidx));
         }
         return (stopidx << 32) | (routeid << 16) | stopid;

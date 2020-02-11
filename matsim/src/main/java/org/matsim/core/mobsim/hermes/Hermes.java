@@ -12,43 +12,10 @@ import org.matsim.core.mobsim.framework.Mobsim;
 public final class Hermes implements Mobsim {
 
 	final private static Logger log = Logger.getLogger(Hermes.class);
-
-    // Maximum number of links (limited to 24 bits in the plan)
-    public static final int MAX_LINK_ID = 16777216;
-    // Maximum number of stops in a link (limited to 8 bits in the plan)
-    public static final int MAX_STOP_IDX = 255;
-    // Maximum number of stops (limited to 20bits in the plan)
-    public static final int MAX_STOP_ROUTE_ID = 65536;
-    // Maximum vehicle velocity (limited to 8 bits in the plan)
-    public static final int MAX_VEHICLE_VELOCITY = 255;
-    // Maximum number of events per agent (limited to 16 bits in the plan)
-    public static final int MAX_EVENTS_AGENT = 65536;
-    // Number of simulation steps
-    public static final int SIM_STEPS = 60 * 60 * 30; // TODO - get this from config file!
-    // Number of ticks that are added to every agent advancing links.
-    public static final int LINK_ADVANCE_DELAY = 1;
-
-    public static final boolean SBB_SCENARIO;
-
-    public static final boolean DEBUG_REALMS = false;
-    public static final boolean DEBUG_EVENTS = false;
-    public static final boolean CONCURRENT_EVENT_PROCESSING = true;
-
-    static {
-    	if (System.getProperty("scenario") != null && System.getProperty("scenario").equals("sbb")) {
-    		SBB_SCENARIO = true;
-    	} else {
-    		SBB_SCENARIO = false;
-    	}
-    }
-
-    // Reamls that compose this World.
     private Realm realm;
-    // Agents that circulate within the World.
     private Agent[] agents;
-
+	private ScenarioImporter si; // TODO - I don't really need this!
 	private final Scenario scenario;
-	private ScenarioImporter si;
     private final ParallelEventsManager eventsManager;
 
 	public Hermes(Scenario scenario, EventsManager eventsManager) {
@@ -71,7 +38,7 @@ public final class Hermes implements Mobsim {
 				int matsim_id = si.matsim_id(agent.id(),  false);
 				eventsManager.processEvent(
 						new PersonStuckEvent(
-								Hermes.SIM_STEPS, Id.get(matsim_id, Person.class), Id.createLinkId("0"), "zero"));
+								HermesConfig.SIM_STEPS, Id.get(matsim_id, Person.class), Id.createLinkId("0"), "zero"));
 			}
 		}
 	}
@@ -96,7 +63,7 @@ public final class Hermes implements Mobsim {
 			eventsManager.finishProcessing();
 			log.info(String.format("ETHZ matsim event processing took %d ms", System.currentTimeMillis() - time));
 
-			// Launch scenario imported in backgroud
+			// Launch scenario imported in background
 			si.reset();
 		} catch (Exception e) {
 			throw new RuntimeException(e);

@@ -187,8 +187,6 @@ public final class ParallelEventsManager implements EventsManager {
 	 */
 	@Override
 	public synchronized void finishProcessing() {
-
-		processEvent(new LastEventOfIteration(Double.MAX_VALUE));
 		flush();
 
 		for (EventsManager eventsManager : this.eventsManagers) {
@@ -206,9 +204,7 @@ public final class ParallelEventsManager implements EventsManager {
 
 	@Override
 	public void afterSimStep(double time) {
-
 		if (this.syncOnTimeSteps) {
-			processEvent(new LastEventOfSimStep(time));
 			flush();
 		}
 

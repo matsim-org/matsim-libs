@@ -118,7 +118,7 @@ public class ScenarioImporter {
     	log.info(String.format("ETHZ reset took %d ms  (%d agents %d links)", System.currentTimeMillis() - time, hermes_agents.length, hermes_links.length));
     	time = System.currentTimeMillis();
     	generatePlans();
-    	log.info(String.format("ETHZ generatePlans (SBB mode %b) took %d ms", Hermes.SBB_SCENARIO, System.currentTimeMillis() - time));
+    	log.info(String.format("ETHZ generatePlans (SBB mode %b) took %d ms", HermesConfig.SBB_SCENARIO, System.currentTimeMillis() - time));
     	time = System.currentTimeMillis();
         generateRealms();
         log.info(String.format("ETHZ generateRealms took %d ms", System.currentTimeMillis() - time));
@@ -167,7 +167,7 @@ public class ScenarioImporter {
             int capacity = (int) (matsim_link.getLength() / 7.5 * lanes);
             int link_id  = matsim_link.getId().index();
 
-            if (link_id > Hermes.MAX_LINK_ID) {
+            if (link_id > HermesConfig.MAX_LINK_ID) {
                 throw new RuntimeException("exceeded maximum number of links");
             }
 
@@ -250,7 +250,7 @@ public class ScenarioImporter {
                 case Agent.SleepForType:
                 case Agent.SleepUntilType:
                     int sleep = Agent.getSleepPlanEntry(planentry);
-                    realm.delayedAgents().get(sleep).add(agent);
+                    realm.delayedAgents().get(Math.min(sleep, HermesConfig.SIM_STEPS + 1)).add(agent);
                     break;
                 default:
                     Realm.log(0, String.format("ERROR -> unknow plan element type %d",type));
@@ -328,11 +328,11 @@ public class ScenarioImporter {
                     Id.createVehicleId(id.toString()) :
                 v.getId();
         int velocity = v == null ?
-            Hermes.MAX_VEHICLE_VELOCITY : (int) Math.round(v.getType().getMaximumVelocity());
+        		HermesConfig.MAX_VEHICLE_VELOCITY : (int) Math.round(v.getType().getMaximumVelocity());
         int egressId = endLId.index();
         events.add(new PersonEntersVehicleEvent(0, id, vid));
         events.add(new VehicleEntersTrafficEvent(0, id, startLId, vid, leg.getMode(), 1));
-        if (startLId != endLId) {
+        if (netroute.getLinkIds().size() > 1) {
             events.add(new LinkLeaveEvent(0, vid, startLId, id));
         }
         for (Id<org.matsim.api.core.v01.network.Link> linkid : netroute.getLinkIds()) {
@@ -341,7 +341,7 @@ public class ScenarioImporter {
             flatplan.add(Agent.prepareLinkEntry(events.size() - 1, linkId, velocity));
             events.add(new LinkLeaveEvent(0, vid, linkid, id));
         }
-        if (startLId != endLId) {
+        if (netroute.getLinkIds().size() > 1) {
             events.add(new LinkEnterEvent(0, vid, endLId, id));
             flatplan.add(Agent.prepareLinkEntry(events.size() - 1, egressId, velocity));
         }
@@ -419,7 +419,8 @@ public class ScenarioImporter {
                 case TransportMode.non_network_walk:
                 case "bike":
                 case "bicycle":
-                    int time = (int) Math.round(route.getTravelTime());
+                case "other":
+                    int time = (int) Math.round(Math.max(route.getTravelTime(), ((Leg)element ).getTravelTime()));
                     flatplan.add(Agent.prepareSleepForEntry(events.size() - 1, time));
                     events.add(new TeleportationArrivalEvent(0, id, route.getDistance()));
                     break;
@@ -442,7 +443,7 @@ public class ScenarioImporter {
             PlanArray flatplan,
             EventArray events) {
 
-        if (events.size() >= Hermes.MAX_EVENTS_AGENT) {
+        if (events.size() >= HermesConfig.MAX_EVENTS_AGENT) {
             throw new RuntimeException("exceeded maximum number of agent events");
         }
 
@@ -490,14 +491,14 @@ public class ScenarioImporter {
         ArrayList<Integer> stop_ids = route_stops_by_index.get(rid);
         Vehicle v = scenario.getTransitVehicles().getVehicles().get(depart.getVehicleId());
         VehicleType vt = v.getType();
-        int velocity = (int)Math.min( Math.round(v.getType().getMaximumVelocity()), Hermes.MAX_VEHICLE_VELOCITY);
+        int velocity = (int)Math.min( Math.round(v.getType().getMaximumVelocity()), HermesConfig.MAX_VEHICLE_VELOCITY);
         NetworkRoute nr = tr.getRoute();
         int endid = nr.getEndLinkId().index();
 
         Id<Person> driverid = null;
         String legmode = null;
 
-        if (Hermes.SBB_SCENARIO) {
+        if (HermesConfig.SBB_SCENARIO) {
             driverid = Id.createPersonId("pt_" + tl.getId().toString() + "_" + tr.getId().toString() + "_" + depart.getId().toString());
         } else {
             driverid = Id.createPersonId("pt_" + v.getId() + "_" + vt.getId());
