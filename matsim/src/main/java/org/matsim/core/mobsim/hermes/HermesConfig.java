@@ -16,8 +16,8 @@ public class HermesConfig {
     // Number of ticks that are added to every agent advancing links.
     public static final int LINK_ADVANCE_DELAY = 1;
 
-    public static final boolean DEBUG_REALMS = true;
-    public static final boolean DEBUG_EVENTS = true;
+    public static final boolean DEBUG_REALMS = false;
+    public static final boolean DEBUG_EVENTS = false;
     public static final boolean CONCURRENT_EVENT_PROCESSING = true;
     public static final boolean SBB_SCENARIO;
     
