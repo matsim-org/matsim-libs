@@ -42,7 +42,6 @@ import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.handler.AgentWaitingForPtEventHandler;
 import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 
@@ -126,6 +125,7 @@ public class DrtPtTripEventHandler
 	private int interval;
 	private Set<String> activeVehicle;
 	private int stuckPersonCounter;
+	GeometryFactory gf = new GeometryFactory();
 
 	/**
 	 * @param network
@@ -548,8 +548,7 @@ public class DrtPtTripEventHandler
 						grossWaitTime = waitTime;
 					}
 
-					if(agent2CurrentLegRoute.get(event.getPersonId()) != null)
-					{
+					if (agent2CurrentLegRoute.get(event.getPersonId()) != null) {
 						routeList = agent2CurrentLegRoute.get(event.getPersonId());
 					}
 
@@ -580,12 +579,6 @@ public class DrtPtTripEventHandler
 					ptRoute = Id.create("no pt", TransitRoute.class);
 				}
 
-				double dist = this.getInReseachAreaRouteDistance(routeList,
-						agent2CurrentLegStartLink.get(event.getPersonId()), event.getLinkId());
-
-
-//					System.out.println(dist + "    " + event.getLegMode());
-				
 				// Save ExperiencedLeg and remove temporary data
 				agent2CurrentTripExperiencedLegs.get(event.getPersonId())
 						.add(new ExperiencedLeg(event.getPersonId(), agent2CurrentLegStartLink.get(event.getPersonId()),
@@ -778,12 +771,13 @@ public class DrtPtTripEventHandler
 	double getInReseachAreaRouteDistance(List<Triple<Id<Link>, Double, Double>> routeList, Id<Link> fromLink,
 			Id<Link> toLink) {
 		double distance = 0.0;
-		if (routeList.size()>0) {
+		if (routeList.size() > 0) {
 
 			for (Triple<Id<Link>, Double, Double> entry : routeList) {
 				// Check if link is in research area
 
-				if (boundary.intersects(MGC.coord2Point(network.getLinks().get(entry.getLeft()).getCoord()))) {
+				if (link2Zone.containsKey(entry.getLeft())) {
+
 					distance = distance + network.getLinks().get(entry.getLeft()).getLength();
 				}
 
@@ -794,6 +788,7 @@ public class DrtPtTripEventHandler
 			Coord from = network.getLinks().get(fromLink).getCoord();
 			Coord to = network.getLinks().get(toLink).getCoord();
 
+			
 			LineString beeline = new LineSegment(new Coordinate(from.getX(), from.getY()),
 					new Coordinate(to.getX(), to.getY())).toGeometry(new GeometryFactory());
 

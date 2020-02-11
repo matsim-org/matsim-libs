@@ -69,6 +69,7 @@ public class RunExperiencedTripsAnalysisBatch {
 		run("D:\\Matsim\\Axer\\Hannover\\ZIM\\output\\");
 		run("D:\\Matsim\\Axer\\Hannover\\Base\\");
 		run("D:\\Matsim\\Axer\\Hannover\\WV\\");
+//		run("C:\\temp\\");
 	}
 
 	public static void run(String runDir) {
@@ -90,7 +91,9 @@ public class RunExperiencedTripsAnalysisBatch {
 //			scenarioToBeAnalyzed.add("VW280_HomeOffice_100pct");
 //			scenarioToBeAnalyzed.add("VW280_LocalLinkFlow_1.15_100pct_Inno");
 //			scenarioToBeAnalyzed.add("UAM_100pct_0.2_3");
-			scenarioToBeAnalyzed.add("vw280_0.1");
+//			scenarioToBeAnalyzed.add("vw280_0.1");
+			scenarioToBeAnalyzed.add("UAM_100pct_0.2_12");
+			
 			
 						
 

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package vwExamples.utils;
+package vwExamples.utils.addAttribute;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -30,7 +30,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 /**
  * @author saxer
  */
-public class SelectOnlySelectedPlans {
+public class AddAttributeToPerson {
 
 
     public static void main(String[] args) {
@@ -39,8 +39,8 @@ public class SelectOnlySelectedPlans {
         //Create a Scenario
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         //Fill this Scenario with a population.
-        new PopulationReader(scenario).readFile("D:\\Matsim\\Axer\\Hannover\\ZIM\\output\\vw281_0.1_DCM_draft_2\\vw281_0.1_DCM_draft_2.output_plans.xml");
-        String randomOrderedPop = "D:\\Matsim\\Axer\\Hannover\\ZIM\\output\\vw281_0.1_DCM_draft_2\\vw281_0.1_DCM_draft_2.output_plans_selected.xml";
+        new PopulationReader(scenario).readFile("D:\\Matsim\\Axer\\Hannover\\Base\\vw280_100pct\\vw280_100pct.output_plans.xml.gz");
+        String randomOrderedPop = "D:\\Matsim\\Axer\\Hannover\\ZIM\\input\\plans\\vw280_100pct.output_plans_selectedOnly.xml.gz";
         StreamingPopulationWriter filteredPop = new StreamingPopulationWriter();
         filteredPop.startStreaming(randomOrderedPop);
 

@@ -21,14 +21,20 @@
 package vwExamples.Zim;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.Random;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingParams;
 import org.matsim.contrib.drt.routing.MultiModeDrtMainModeIdentifier;
@@ -49,7 +55,9 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
@@ -79,22 +87,23 @@ public class Sim06_AirDRT_Commuter {
 		final Config config = ConfigUtils.loadConfig(inbase + "//input//" + configFilename,
 				new MultiModeDrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup(), new CadytsConfigGroup());
 
-		UamNetworkFleetCreatorFromCSV fleetAndNetworkCreator= new UamNetworkFleetCreatorFromCSV(input + "uam//ports.csv", input + "//network//" + network, input + "//uam");
-		fleetAndNetworkCreator.weightIn=0.8;
-		fleetAndNetworkCreator.weightOut=0.2;
-		fleetAndNetworkCreator.HUB_LINK_NUM_LANES=200;
+		UamNetworkFleetCreatorFromCSV fleetAndNetworkCreator = new UamNetworkFleetCreatorFromCSV(
+				input + "uam//ports.csv", input + "//network//" + network, input + "//uam");
+		fleetAndNetworkCreator.weightIn = 0.9;
+		fleetAndNetworkCreator.weightOut = 0.1;
+		fleetAndNetworkCreator.HUB_LINK_NUM_LANES = 200;
 		fleetAndNetworkCreator.updateAirNetworkParams();
 		fleetAndNetworkCreator.run(fleet);
-		
+
 		DvrpConfigGroup.get(config).setNetworkModesAsString("uam");
 		MultiModeDrtConfigGroup multiModeDrtCfg = MultiModeDrtConfigGroup.get(config);
 
 		DrtConfigGroup uamCfg = new DrtConfigGroup();
 		uamCfg.setMode("uam");
-		uamCfg.setMaxTravelTimeBeta(900.0);
+		uamCfg.setMaxTravelTimeBeta(600.0);
 		uamCfg.setMaxTravelTimeAlpha(1.0);
-		uamCfg.setMaxWaitTime(900.0);
-		uamCfg.setStopDuration(105);
+		uamCfg.setMaxWaitTime(600.0);
+		uamCfg.setStopDuration(1);
 		uamCfg.setRejectRequestIfMaxWaitOrTravelTimeViolated(false);
 		uamCfg.setTransitStopFile(inbase + "//input//uam//uam_stops.xml");
 		uamCfg.setMaxWalkDistance(20000.0);
@@ -109,11 +118,20 @@ public class Sim06_AirDRT_Commuter {
 		drtCfgMap.values()
 				.forEach(cfg -> DrtConfigs.adjustDrtConfig(cfg, config.planCalcScore(), config.plansCalcRoute()));
 
-		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
+		// config.plansCalcRoute().setInsertingAccessEgressWalk(true);
 
 		config.plans().setInputFile(inbase + "//input//plans//" + inputPlans);
 
-		config.controler().setLastIteration(1); // Number of simulation iterations
+		config.controler().setLastIteration(4); // Number of simulation iterations
+
+		// Disable innovation
+		config.strategy().clearStrategySettings();
+		StrategySettings strat = new StrategySettings();
+
+		strat.setStrategyName(DefaultSelector.KeepLastSelected.toString());
+		strat.setWeight(1.0);
+		config.strategy().addStrategySettings(strat);
+		config.strategy().setFractionOfIterationsToDisableInnovation(0);
 
 		config.transit().setTransitScheduleFile(input + "transit//vw280_0.1.output_transitSchedule.xml.gz");
 		config.transit().setVehiclesFile(input + "transit//vw280_0.1.output_transitVehicles.xml.gz");
@@ -150,18 +168,24 @@ public class Sim06_AirDRT_Commuter {
 
 			MinCostFlowRebalancingParams rebalancingParams = new MinCostFlowRebalancingParams();
 
-			rebalancingParams.setInterval(1800);
+			rebalancingParams.setInterval(600);
 			rebalancingParams.setCellSize(500);
-			rebalancingParams.setTargetAlpha(0.25);
+			rebalancingParams.setTargetAlpha(1.0);
 			rebalancingParams.setTargetBeta(0.3);
-			rebalancingParams.setMaxTimeBeforeIdle(900);
+			rebalancingParams.setMaxTimeBeforeIdle(600);
 			rebalancingParams.setMinServiceTime(3600);
 			uamCfg.addParameterSet(rebalancingParams);
 
 		}
 
+		
+		
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
+		
+		
+		
 		ScenarioUtils.loadScenario(scenario);
+		scaleDown(scenario.getPopulation(), 0.9); // To make it run quicker
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new DvrpModule());
@@ -179,7 +203,7 @@ public class Sim06_AirDRT_Commuter {
 				mapBinder.addBinding(Stage.ACCESS).to(Key.get(RoutingModule.class, Names.named("car")));
 				// more flexible approach
 				mapBinder.addBinding(Stage.EGRESS).to(Key.get(RoutingModule.class, Names.named("car")));
-
+				
 				bind(MainModeIdentifier.class).toInstance(new UamMainModeIdentifier(multiModeDrtCfg));
 			}
 		});
@@ -199,6 +223,22 @@ public class Sim06_AirDRT_Commuter {
 					.calcRoute(mode, fromFacility, toFacility, departureTime, person);
 		}
 	}
+	
+	
+	
+	static private void scaleDown(Population population, double removalProbability) {
+		Set<Id<Person>> removeIds = new HashSet<>(); 	 	
+		Random random = new Random(0);
+
+		for (Person person : population.getPersons().values()) {
+			if (random.nextDouble() <= removalProbability) {
+				removeIds.add(person.getId());
+			}
+		}
+
+		removeIds.forEach(population::removePerson);
+	}
+	
 
 	private static class UamMainModeIdentifier implements MainModeIdentifier {
 		private final String mode = "uam";
@@ -214,10 +254,10 @@ public class Sim06_AirDRT_Commuter {
 		public String identifyMainMode(List<? extends PlanElement> tripElements) {
 			for (PlanElement pe : tripElements) {
 				if (pe instanceof Activity) {
-					if (((Activity)pe).getType().equals(drtStageActivityType))
+					if (((Activity) pe).getType().equals(drtStageActivityType))
 						return mode;
 				} else if (pe instanceof Leg) {
-					if (TripRouter.isFallbackMode(((Leg)pe).getMode())) {
+					if (TripRouter.isFallbackMode(((Leg) pe).getMode())) {
 						return mode;
 					}
 				}

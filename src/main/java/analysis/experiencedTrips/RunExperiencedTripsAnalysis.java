@@ -35,8 +35,8 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 public class RunExperiencedTripsAnalysis {
 	public static void main(String[] args) {
 		
-		String runDirectory = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/drt_test_Scenarios/BS_DRT/output/0.1_drt_100veh";
-		String runId = "0.1_drt_100veh.";
+		String runDirectory = "D://Matsim//Axer//Hannover//Base//vw280_0.1";
+		String runId = "vw280_0.1.";
 		String runPrefix = runDirectory+"/"+runId;
 		
 		Set<String> monitoredModes = new HashSet<>();
@@ -44,6 +44,9 @@ public class RunExperiencedTripsAnalysis {
 		monitoredModes.add("drt");
 		monitoredModes.add("drt_walk");
 		monitoredModes.add("transit_walk");
+		monitoredModes.add("bike");
+		monitoredModes.add("walk");
+		monitoredModes.add("non_network_walk");
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(runPrefix+"output_network.xml.gz");

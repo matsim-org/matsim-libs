@@ -98,22 +98,19 @@ public class RunTravelDelayAnalysisBatch {
 			String scenarioName = StringList[StringList.length - 1];
 
 			Set<String> scenarioToBeAnalyzed = new HashSet<String>();
-//			scenarioToBeAnalyzed.add("vw280_0.1");
-//			scenarioToBeAnalyzed.add("vw280_CityCommuterDRTcarOnly_20pct_0.1_250_veh_idx0");
-//			scenarioToBeAnalyzed.add("vw280_CityDRT_20pctCarOnly_0.1_120_veh_idx0");
-//			scenarioToBeAnalyzed.add("vw280_HomeOffice_6pct_0.1");
-//			scenarioToBeAnalyzed.add("VW280_CityDRT_carOnly_100pct");
-//			scenarioToBeAnalyzed.add("VW280_HomeOffice_100pct");
-//			scenarioToBeAnalyzed.add("VW280_LocalLinkFlow_1.15_100pct_Inno");
-//			scenarioToBeAnalyzed.add("VW280_CityCommuterDRT_carOnly_100pct_additiv");
-			scenarioToBeAnalyzed.add("UAM_100pct_0.2_3");
-			
-			
+			scenarioToBeAnalyzed.add("UAM_100pct_0.2_12");
+			// scenarioToBeAnalyzed.add("vw280_CityCommuterDRTcarOnly_20pct_0.1_250_veh_idx0");
+			// scenarioToBeAnalyzed.add("vw280_CityDRT_20pctCarOnly_0.1_120_veh_idx0");
+			// scenarioToBeAnalyzed.add("vw280_HomeOffice_6pct_0.1");
+			// scenarioToBeAnalyzed.add("VW280_CityDRT_carOnly_100pct");
+			// scenarioToBeAnalyzed.add("VW280_HomeOffice_100pct");
+			// scenarioToBeAnalyzed.add("VW280_LocalLinkFlow_1.15_100pct_Inno");
+			// scenarioToBeAnalyzed.add("VW280_CityCommuterDRT_carOnly_100pct_additiv");
+			// scenarioToBeAnalyzed.add("UAM_100pct_0.2_3");
 
 			//
 
 			if (scenarioToBeAnalyzed.contains(scenarioName)) {
-
 
 				Network network = NetworkUtils.createNetwork();
 				new MatsimNetworkReader(network).readFile(scenarioDir + "\\" + scenarioName + ".output_network.xml.gz");
@@ -209,7 +206,6 @@ public class RunTravelDelayAnalysisBatch {
 
 	}
 
-	
 	public static void writeTimeDependentData(String fileName, TravelDelayCalculator tdc) {
 		DecimalFormat format = new DecimalFormat();
 		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
@@ -221,7 +217,7 @@ public class RunTravelDelayAnalysisBatch {
 
 		SortedSet<Double> timeBins = new TreeSet<>(tdc.getTimeDependentDelays().keySet());
 
-		//Write: mean delay, flowPerHour, mean congestion index
+		// Write: mean delay, flowPerHour, mean congestion index
 		try {
 
 			bw.write("hour;linkId;meanDelay_sec;flow_perHour");
