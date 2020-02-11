@@ -29,9 +29,7 @@ import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 public class EventsUtils {
 
     public static EventsManager createEventsManager() {
-		final EventsManagerImpl events = new EventsManagerImpl();
-//		events.initProcessing();
-		return events;
+		return new ParallelEventsManager(false);
     }
 
     public static EventsManager createEventsManager(Config config) {
