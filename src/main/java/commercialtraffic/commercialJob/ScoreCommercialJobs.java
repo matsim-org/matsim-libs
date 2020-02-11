@@ -105,7 +105,9 @@ class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityEndEvent
 
             double timeDifference = calcDifference(job, event.getTime());
             double score = scoreCalculator.calcScore(timeDifference);
-            eventsManager.processEvent(new PersonMoneyEvent(event.getTime(), customerAboutToBeServed, score));
+
+            //TODO: we need direct scoring here!! this implies the marginal utility of money to be 1!
+            eventsManager.processEvent(new PersonMoneyEvent(event.getTime(), customerAboutToBeServed, score, "jobStart_" + job.getId(), ""));
             logEntries.add(new DeliveryLogEntry(customerAboutToBeServed, carrier.getId(), event.getTime(), score, event.getLinkId(), timeDifference, event.getPersonId()));
         }
     }
