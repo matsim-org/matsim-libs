@@ -312,7 +312,14 @@ public final class EmissionModule {
 			key = new HbefaWarmEmissionFactorKey();
 			key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
 
-			Pollutant pollutant = Pollutant.valueOf( array[indexFromKey.get("Component" )] );
+			String pollutantString = array[indexFromKey.get("Component")];
+			Pollutant pollutant;
+			if(pollutantString.contains("CO2(total)")) {
+				pollutant = Pollutant.CO2_TOTAL;
+			} else {
+				pollutant = Pollutant.valueOf(pollutantString);
+			}
+
 			// this is where Joe Malloy was just passing strings through all the way to events.  Now this is "typed" again.  There may be
 			// two failures:
 			// (1) The pollutant type is missing from the enum.  In that case, just add it to the enum.
@@ -371,15 +378,21 @@ public final class EmissionModule {
 			key = new HbefaColdEmissionFactorKey();
 			key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
 
-			String pollutant = array[indexFromKey.get("Component")];
-			coldPollutants.add(Pollutant.valueOf(pollutant));
+			String pollutantString = array[indexFromKey.get("Component")];
+			Pollutant pollutant;
+			if(pollutantString.contains("CO2(total)")) {
+				pollutant = Pollutant.CO2_TOTAL;
+			} else {
+				pollutant = Pollutant.valueOf(pollutantString);
+			}
 			// the Pollutant.valueOf(...) should fail if the incoming key is not consistent with what is available in the enum.  Two possibilities:
 			// (1) it is a new pollutant.  In that case, just add to the enum.
 			// (2) It is a different spelling of an already existing pollutant.  In that case, some conversion needs to be done (I would say that
 			// as long as that does not happen very often, it could be done in code here).
 			// kai, jan'20
 
-			key.setHbefaComponent(Pollutant.valueOf(pollutant));
+			coldPollutants.add(pollutant);
+			key.setHbefaComponent(pollutant);
 
 			key.setHbefaParkingTime(mapAmbientCondPattern2ParkingTime(array[indexFromKey.get("AmbientCondPattern")]));
 			key.setHbefaDistance(mapAmbientCondPattern2Distance(array[indexFromKey.get("AmbientCondPattern")]));
