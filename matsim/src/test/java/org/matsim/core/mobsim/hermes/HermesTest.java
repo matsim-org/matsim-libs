@@ -29,6 +29,7 @@ import java.util.List;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -102,19 +103,21 @@ public class HermesTest {
 	}
 
 	private static Hermes createHermes(MutableScenario scenario, EventsManager events) {
-		// TODO - fix these two!
-		ScenarioImporter.flush();
-		HermesConfig.SIM_STEPS = 30*60*60;
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		return new HermesBuilder().build(scenario, events);
 	}
 
 	private static Hermes createHermes(Fixture f, EventsManager events) {
-		// TODO - fix these two!
-		ScenarioImporter.flush();
-		HermesConfig.SIM_STEPS = 30*60*60;
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
 		return new HermesBuilder().build(f.scenario, events);
+	}
+
+	@Before
+	public void prepareTest() {
+		// TODO - fix these two!
+		Id.flush();
+		ScenarioImporter.flush();
+		HermesConfig.SIM_STEPS = 30*60*60;
 	}
 
 	/**
@@ -123,7 +126,7 @@ public class HermesTest {
 	 *
 	 * @author mrieser
 	 */
-	//@Test
+	@Test
 	public void testSingleAgent() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
@@ -163,7 +166,7 @@ public class HermesTest {
 	 * @author mrieser
 	 * @author Kai Nagel
 	 */
-	//@Test
+	@Test
 	public void testSingleAgentWithEndOnLeg() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
@@ -209,7 +212,7 @@ public class HermesTest {
 	 *
 	 * @author mrieser
 	 */
-	//@Test
+	@Test
 	public void testTwoAgent() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
@@ -250,7 +253,7 @@ public class HermesTest {
 	 *
 	 * @author mrieser
 	 */
-	//@Test
+	@Test
 	public void testTeleportationSingleAgent() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
@@ -277,7 +280,7 @@ public class HermesTest {
 		sim.run();
 
 		List<Event> allEvents = collector.getEvents();
-		Assert.assertEquals("wrong number of events.", 6, collector.getEvents().size());
+		Assert.assertEquals("wrong number of events.", 5, collector.getEvents().size());
 		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
 		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
 		Assert.assertEquals("wrong type of event.", TeleportationArrivalEvent.class, allEvents.get(2).getClass());
@@ -297,7 +300,7 @@ public class HermesTest {
 	 *
 	 * @author cdobler
 	 */
-	//@Test
+	@Test
 	public void testSingleAgentImmediateDeparture() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
@@ -320,8 +323,8 @@ public class HermesTest {
 		events.addHandler(collector);
 
 		/* run sim */
-		f.config.qsim().setEndTime(10*3600);
 		Hermes sim = createHermes(f, events);
+		HermesConfig.SIM_STEPS = 10*3600;
 		sim.run();
 
 		/* finish */
@@ -342,7 +345,7 @@ public class HermesTest {
 	 *
 	 * @author mrieser
 	 */
-	//@Test
+	@Test
 	public void testSingleAgent_EmptyRoute() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
@@ -373,7 +376,7 @@ public class HermesTest {
 		for (Event event : allEvents) {
 			System.out.println(event);
 		}
-		Assert.assertEquals("wrong number of events.", 9, allEvents.size());
+		Assert.assertEquals("wrong number of events.", 8, allEvents.size());
 
 
 		Assert.assertEquals("wrong type of 1st event.", ActivityEndEvent.class, allEvents.get(0).getClass());
@@ -415,7 +418,7 @@ public class HermesTest {
 	 *
 	 * @author mrieser
 	 */
-	//@Test
+	@Test
 	public void testSingleAgent_LastLinkIsLoop() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Link loopLink = NetworkUtils.createAndAddLink(f.network,Id.create("loop", Link.class), f.node4, f.node4, 100.0, 10.0, 500, 1 );
@@ -451,7 +454,7 @@ public class HermesTest {
 		for (Event event : allEvents) {
 			System.out.println(event);
 		}
-		Assert.assertEquals("wrong number of events.", 15, allEvents.size());
+		Assert.assertEquals("wrong number of events.", 14, allEvents.size());
 		Assert.assertEquals("wrong type of 1st event.", ActivityEndEvent.class, allEvents.get(0).getClass());
 		Assert.assertEquals("wrong type of 2nd event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
 		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(2).getClass());
@@ -485,7 +488,7 @@ public class HermesTest {
 	 *
 	 * @author mrieser
 	 */
-	//@Test
+	@Test
 	public void testAgentWithoutLeg() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
@@ -512,7 +515,7 @@ public class HermesTest {
 	 *
 	 * @author mrieser
 	 */
-	//@Test
+	@Test
 	public void testAgentWithoutLegWithEndtime() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
@@ -540,7 +543,7 @@ public class HermesTest {
 	 *
 	 * @author mrieser
 	 */
-	//@Test
+	@Test
 	public void testAgentWithLastActWithEndtime() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
@@ -575,7 +578,7 @@ public class HermesTest {
 	 *
 	 * @author mrieser
 	 */
-	//@Test // TODO - later!
+	//@Test // TODO - later, Hermes is not currently modeling flow capacity
 	public void testFlowCapacityDriving() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
@@ -637,7 +640,7 @@ public class HermesTest {
 	 *
 	 * @author michaz
 	 */
-	//@Test // TODO - later!
+	//@Test // TODO - later, Hermes is not currently modeling flow capacity
 	public void testFlowCapacityDrivingFraction() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		f.link2.setCapacity(900.0); // One vehicle every 4 seconds
@@ -692,7 +695,7 @@ public class HermesTest {
 	 *
 	 * @author mrieser
 	 */
-	//@Test // TODO - later!
+	//@Test // TODO - later, Hermes is not currently modeling flow capacity
 	public void testFlowCapacityStarting() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
@@ -744,7 +747,7 @@ public class HermesTest {
 	 *
 	 * @author mrieser
 	 */
-	//@Test // TODO - later!
+	//@Test // TODO - later, Hermes is not currently modeling flow capacity
 	public void testFlowCapacityMixed() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 
@@ -809,7 +812,7 @@ public class HermesTest {
 	 *
 	 * @author mrieser
 	 */
-	//@Test
+	@Test
 	public void testVehicleTeleportationTrue() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
@@ -840,7 +843,7 @@ public class HermesTest {
 		sim.run();
 
 		List<Event> allEvents = collector.getEvents();
-		Assert.assertEquals("wrong number of events.", 16, allEvents.size());
+		Assert.assertEquals("wrong number of events.", 15, allEvents.size());
 		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
 		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
 		Assert.assertEquals("wrong type of event.", TeleportationArrivalEvent.class, allEvents.get(2).getClass());
@@ -864,7 +867,7 @@ public class HermesTest {
 	 *
 	 * @author michaz
 	 */
-	//@Test // TODO - later!
+	//@Test // TODO - later, Hermes does not model cars individually
 	public void testWaitingForCar() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.wait);
@@ -959,7 +962,7 @@ public class HermesTest {
 	 *
 	 * @author mrieser
 	 */
-	//@Test // TODO - later!
+	//@Test // TODO - later, Hermes does not model cars individually
 	public void testVehicleTeleportationFalse() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.exception);
@@ -1011,7 +1014,7 @@ public class HermesTest {
 	 *
 	 * @author mrieser
 	 */
-	//@Test
+	@Test
 	public void testCircleAsRoute() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Link link4 = NetworkUtils.createAndAddLink(f.network,Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0 ); // close the network
@@ -1047,7 +1050,7 @@ public class HermesTest {
 			System.out.println(event);
 		}
 
-		Assert.assertEquals("wrong number of events.", 17, allEvents.size());
+		Assert.assertEquals("wrong number of events.", 16, allEvents.size());
 		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
 		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
 		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(2).getClass());
@@ -1073,7 +1076,7 @@ public class HermesTest {
 	 *
 	 * @author mrieser
 	 */
-	//@Test
+	@Test
 	public void testRouteWithEndLinkTwice() {
 		Fixture f = new Fixture(isUsingFastCapacityUpdate);
 		Link link4 = NetworkUtils.createAndAddLink(f.network,Id.create(4, Link.class), f.node4, f.node1, 1000.0, 100.0, 6000, 1.0 ); // close the network
@@ -1109,7 +1112,7 @@ public class HermesTest {
 			System.out.println(event);
 		}
 
-		Assert.assertEquals("wrong number of events.", 21, allEvents.size());
+		Assert.assertEquals("wrong number of events.", 20, allEvents.size());
 		Assert.assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
 		Assert.assertEquals("wrong type of event.", PersonDepartureEvent.class, allEvents.get(1).getClass());
 		Assert.assertEquals("wrong type of event.", PersonEntersVehicleEvent.class, allEvents.get(2).getClass());
@@ -1138,7 +1141,7 @@ public class HermesTest {
 	 *
 	 * @author mrieser
 	 */
-	//@Test
+	//@Test // TODO - later, Hermes assumes all routes are legal and does not check network topology
 	public void testConsistentRoutes_WrongRoute() {
 		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
@@ -1154,7 +1157,7 @@ public class HermesTest {
 	 *
 	 * @author mrieser
 	 */
-	//@Test
+	//@Test // TODO - later, Hermes assumes all routes are legal and does not check network topology
 	public void testConsistentRoutes_WrongStartLink() {
 		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
@@ -1170,7 +1173,7 @@ public class HermesTest {
 	 *
 	 * @author mrieser
 	 */
-	//@Test
+	//@Test // TODO - later, Hermes assumes all routes are legal and does not check network topology
 	public void testConsistentRoutes_WrongEndLink() {
 		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
@@ -1187,7 +1190,7 @@ public class HermesTest {
 	 *
 	 * @author mrieser
 	 */
-	//@Test
+	//@Test // TODO - later, Hermes assumes all routes are legal and does not check network topology
 	public void testConsistentRoutes_ImpossibleRoute() {
 		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
@@ -1203,7 +1206,7 @@ public class HermesTest {
 	 *
 	 * @author mrieser
 	 */
-	@Test
+	//@Test // TODO - later, Hermes assumes all routes are legal and does not check network topology
 	public void testConsistentRoutes_MissingRoute() {
 		EventsManager events = EventsUtils.createEventsManager();
 		EnterLinkEventCounter counter = new EnterLinkEventCounter("6");
@@ -1272,7 +1275,7 @@ public class HermesTest {
 		return logger;
 	}
 
-	//@Test
+	@Test
 	public void testStartAndEndTime() {
 
 		final Config config = ConfigUtils.createConfig();
@@ -1425,7 +1428,7 @@ public class HermesTest {
 	 *
 	 * @author mrieser
 	 */
-	private final static class EnterLinkEventCounter implements LinkEnterEventHandler {
+	/*package*/ final static class EnterLinkEventCounter implements LinkEnterEventHandler {
 		private final String linkId;
 		private int counter = 0;
 		public EnterLinkEventCounter(final String linkId) {
