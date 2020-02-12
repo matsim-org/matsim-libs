@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package commercialtraffic.commercialJob;
+package org.matsim.contrib.commercialTrafficApplications.jointDemand;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;

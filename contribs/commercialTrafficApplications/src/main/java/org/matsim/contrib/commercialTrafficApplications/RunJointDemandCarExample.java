@@ -17,14 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package commercialtraffic;/*
+package org.matsim.contrib.commercialTrafficApplications;/*
  * created by jbischoff, 03.05.2019
  */
 
-import commercialtraffic.commercialJob.ChangeCommercialJobOperator;
-import commercialtraffic.commercialJob.CommercialTrafficConfigGroup;
-import commercialtraffic.commercialJob.CommercialTrafficModule;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.ChangeCommercialJobOperator;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.CommercialTrafficConfigGroup;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.CommercialTrafficModule;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
@@ -36,24 +36,23 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 
 import static org.matsim.core.config.ConfigUtils.createConfig;
+import static org.matsim.core.config.ConfigUtils.loadConfig;
 import static org.matsim.core.scenario.ScenarioUtils.loadScenario;
 
-class RunCommercialTrafficExample {
+class RunJointDemandCarExample {
     public static void main(String[] args) {
 
 
-        String inputDir = "input/commercialtrafficIt/";
-
-        Config config = createConfig();
+        Config config = loadConfig("jointDemand/config.xml");
         CommercialTrafficConfigGroup commercialTrafficConfigGroup = ConfigUtils.addOrGetModule(config, CommercialTrafficConfigGroup.class);
         commercialTrafficConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
 
         FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
         freightConfigGroup.setTravelTimeSliceWidth(3600);
-        freightConfigGroup.setCarriersFile(inputDir + "test-carriers-car.xml");
-        freightConfigGroup.setCarriersVehicleTypesFile(inputDir + "vehicleTypes.xml");
+        freightConfigGroup.setCarriersFile("test-carriers-car.xml");
+        freightConfigGroup.setCarriersVehicleTypesFile("vehicleTypes.xml");
 
-        prepareConfig(config, inputDir);
+        prepareConfig(config);
 
         Scenario scenario = loadScenario(config);
         FreightUtils.loadCarriersAccordingToFreightConfig(scenario); //assumes that input file paths are set in FreightConfigGroup
@@ -65,7 +64,7 @@ class RunCommercialTrafficExample {
         controler.run();
     }
 
-    private static void prepareConfig(Config config, String inputDir) {
+    private static void prepareConfig(Config config) {
         StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
         changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
         changeExpBeta.setWeight(0.5);
@@ -87,10 +86,8 @@ class RunCommercialTrafficExample {
         config.planCalcScore().addActivityParams(work);
         config.controler().setLastIteration(100);
         config.controler().setWriteEventsInterval(5);
-        config.controler().setOutputDirectory("output/commercialtraffictestrunWithCar");
+        config.controler().setOutputDirectory("output/RunJointDemandCarExample");
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-        config.network().setInputFile(inputDir + "grid_network.xml");
-        config.plans().setInputFile(inputDir + "testpop.xml");
         config.controler().setLastIteration(5);
     }
 }

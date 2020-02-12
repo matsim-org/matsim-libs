@@ -4,7 +4,7 @@ This contribution represents a collection of applications of the freight contrib
 with one or more other contribs.
 Applications are kept separated in packages.
 
-##jointDemand
+#jointDemand
 The jointDemand package provides functionality to link demand for freight with the demand for passenger transportation.
 That means, that "normal" population agents can induce freight traffic by ordering 'commercial jobs' or 'services' of different types,
 e.g. deliveries, maintenance or health care.
