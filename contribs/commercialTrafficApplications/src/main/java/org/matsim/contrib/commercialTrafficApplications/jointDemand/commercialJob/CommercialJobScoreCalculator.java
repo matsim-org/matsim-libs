@@ -1,4 +1,4 @@
-package org.matsim.contrib.commercialTrafficApplications.jointDemand;
+package org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob;
 
 interface CommercialJobScoreCalculator {
 

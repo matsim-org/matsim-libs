@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.commercialTrafficApplications;/*
+package org.matsim.contrib.commercialTrafficApplications.jointDemand;/*
  * created by jbischoff, 03.05.2019
  */
 
@@ -25,9 +25,9 @@ import static org.matsim.core.config.ConfigUtils.createConfig;
 import static org.matsim.core.config.ConfigUtils.loadConfig;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.commercialTrafficApplications.jointDemand.ChangeCommercialJobOperator;
-import org.matsim.contrib.commercialTrafficApplications.jointDemand.CommercialTrafficConfigGroup;
-import org.matsim.contrib.commercialTrafficApplications.jointDemand.CommercialTrafficModule;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.ChangeCommercialJobOperator;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.CommercialTrafficConfigGroup;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.CommercialTrafficModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
