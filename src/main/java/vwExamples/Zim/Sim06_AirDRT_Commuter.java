@@ -30,6 +30,9 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -118,11 +121,11 @@ public class Sim06_AirDRT_Commuter {
 		drtCfgMap.values()
 				.forEach(cfg -> DrtConfigs.adjustDrtConfig(cfg, config.planCalcScore(), config.plansCalcRoute()));
 
-		// config.plansCalcRoute().setInsertingAccessEgressWalk(true);
+		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
 
 		config.plans().setInputFile(inbase + "//input//plans//" + inputPlans);
 
-		config.controler().setLastIteration(4); // Number of simulation iterations
+		config.controler().setLastIteration(3); // Number of simulation iterations
 
 		// Disable innovation
 		config.strategy().clearStrategySettings();
@@ -137,7 +140,7 @@ public class Sim06_AirDRT_Commuter {
 		config.transit().setVehiclesFile(input + "transit//vw280_0.1.output_transitVehicles.xml.gz");
 
 		config.qsim().setStartTime(0);
-		config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
+		config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(true); //required in order to access UAM hubs by walk
 		config.qsim().setSimStarttimeInterpretation(StarttimeInterpretation.onlyUseStarttime);
 		// config.qsim().setFlowCapFactor(0.1);
 		// config.qsim().setStorageCapFactor(0.11);
@@ -186,7 +189,7 @@ public class Sim06_AirDRT_Commuter {
 		
 		ScenarioUtils.loadScenario(scenario);
 		scaleDown(scenario.getPopulation(), 0.9); // To make it run quicker
-
+		
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new DvrpModule());
 		controler.addOverridingModule(new MultiModeDrtModule());
@@ -208,8 +211,20 @@ public class Sim06_AirDRT_Commuter {
 			}
 		});
 
+		adjustPtNetworkCapacity(controler.getScenario().getNetwork(), config.qsim().getFlowCapFactor());
+
 		// run simulation
 		controler.run();
+	}
+	
+	private static void adjustPtNetworkCapacity(Network network, double flowCapacityFactor){
+		if (flowCapacityFactor<1.0){
+			for (Link l : network.getLinks().values()){
+				if (l.getAllowedModes().contains(TransportMode.pt)){
+					l.setCapacity(l.getCapacity()/flowCapacityFactor);
+				}
+			}
+		}
 	}
 
 	private static class UamAccessEgressRoutingModuleProvider implements Provider<RoutingModule> {
