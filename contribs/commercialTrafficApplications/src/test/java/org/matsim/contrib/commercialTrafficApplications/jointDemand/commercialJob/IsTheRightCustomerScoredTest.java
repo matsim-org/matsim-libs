@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package commercialtraffic.commercialJob;
+package org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob;
 
 import org.junit.Assert;
 import org.junit.Before;

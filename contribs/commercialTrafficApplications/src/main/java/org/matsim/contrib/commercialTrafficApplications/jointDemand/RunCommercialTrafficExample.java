@@ -17,14 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package commercialtraffic;/*
+package org.matsim.contrib.commercialTrafficApplications.jointDemand;/*
  * created by jbischoff, 03.05.2019
  */
 
-import commercialtraffic.commercialJob.ChangeCommercialJobOperator;
-import commercialtraffic.commercialJob.CommercialTrafficConfigGroup;
-import commercialtraffic.commercialJob.CommercialTrafficModule;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.ChangeCommercialJobOperator;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.CommercialTrafficConfigGroup;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.CommercialTrafficModule;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
@@ -42,7 +42,7 @@ class RunCommercialTrafficExample {
     public static void main(String[] args) {
 
 
-        String inputDir = "input/commercialtrafficIt/";
+        String inputDir = "jointDemand/";
 
         Config config = createConfig();
         CommercialTrafficConfigGroup commercialTrafficConfigGroup = ConfigUtils.addOrGetModule(config, CommercialTrafficConfigGroup.class);

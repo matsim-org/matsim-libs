@@ -1,4 +1,4 @@
-package commercialtraffic.commercialJob;
+package org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;

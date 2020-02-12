@@ -1,10 +1,10 @@
-package commercialtraffic.commercialJob;
+package org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob;
 
-import commercialtraffic.TestScenarioGeneration;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.TestScenarioGeneration;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeWriter;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;

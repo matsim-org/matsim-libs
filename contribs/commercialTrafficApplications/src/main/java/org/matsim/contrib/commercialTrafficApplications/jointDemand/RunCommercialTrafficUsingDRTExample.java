@@ -17,13 +17,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package commercialtraffic;/*
+package org.matsim.contrib.commercialTrafficApplications.jointDemand;/*
  * created by jbischoff, 03.05.2019
  */
 
 import static org.matsim.core.config.ConfigUtils.createConfig;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.ChangeCommercialJobOperator;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.CommercialTrafficConfigGroup;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.CommercialTrafficModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -42,9 +45,6 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import commercialtraffic.commercialJob.ChangeCommercialJobOperator;
-import commercialtraffic.commercialJob.CommercialTrafficConfigGroup;
-import commercialtraffic.commercialJob.CommercialTrafficModule;
 
 class RunCommercialTrafficUsingDRTExample {
     public static void main(String[] args) {
