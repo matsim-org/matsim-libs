@@ -310,7 +310,7 @@ public final class EmissionModule {
 			array = strLine.split( ";" );
 
 			key = new HbefaWarmEmissionFactorKey();
-			key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
+			key.setHbefaVehicleCategory(EmissionUtils.mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
 
 			String pollutantString = array[indexFromKey.get("Component")];
 			Pollutant pollutant;
@@ -376,7 +376,7 @@ public final class EmissionModule {
 			array = strLine.split( ";" );
 
 			key = new HbefaColdEmissionFactorKey();
-			key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
+			key.setHbefaVehicleCategory(EmissionUtils.mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
 
 			String pollutantString = array[indexFromKey.get("Component")];
 			Pollutant pollutant;
@@ -429,19 +429,7 @@ public final class EmissionModule {
 //
 //	}
 
-	private static HbefaVehicleCategory mapString2HbefaVehicleCategory( String string ) {
-		HbefaVehicleCategory hbefaVehicleCategory;
-		if(string.contains("pass. car")) hbefaVehicleCategory = HbefaVehicleCategory.PASSENGER_CAR;
-		else if(string.contains("HGV")) hbefaVehicleCategory = HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
-		else if(string.contains("motorcycle")) hbefaVehicleCategory = HbefaVehicleCategory.MOTORCYCLE;
-		else{
-			logger.warn("Could not map String " + string + " to any HbefaVehicleCategory; please check syntax in hbefa input file.");
-			throw new RuntimeException();
-		}
-		return hbefaVehicleCategory;
-	}
-
-	public LinkEmissionsCalculator getWarmEmissionAnalysisModule() {
+    public LinkEmissionsCalculator getWarmEmissionAnalysisModule() {
 		// makes sense to have this public for externalization computations.  kai, jan'20
 
 		return this. warmEmissionHandler.getWarmEmissionAnalysisModule();

@@ -202,7 +202,7 @@ public final class EmissionUtils {
 		Gbl.assertNotNull(vehicleType.getEngineInformation());
 //		logger.info(vehicleType.getEngineInformation().getAttributes().toString());
 		Gbl.assertNotNull(VehicleUtils.getHbefaVehicleCategory( vehicleType.getEngineInformation() ));
-		HbefaVehicleCategory hbefaVehicleCategory = HbefaVehicleCategory.valueOf( VehicleUtils.getHbefaVehicleCategory( vehicleType.getEngineInformation() ) ) ;
+		HbefaVehicleCategory hbefaVehicleCategory = mapString2HbefaVehicleCategory( VehicleUtils.getHbefaVehicleCategory( vehicleType.getEngineInformation() ) ) ;
 
 		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 
@@ -325,5 +325,17 @@ public final class EmissionUtils {
 		strb.append( ";" ) ;
 		strb.append( VehicleUtils.getHbefaEmissionsConcept( engineInfo ) );
 		return strb.toString() ;
+	}
+
+	static HbefaVehicleCategory mapString2HbefaVehicleCategory(String string) {
+		HbefaVehicleCategory hbefaVehicleCategory;
+		if(string.contains("pass. car")) hbefaVehicleCategory = HbefaVehicleCategory.PASSENGER_CAR;
+		else if(string.contains("HGV")) hbefaVehicleCategory = HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
+		else if(string.contains("motorcycle")) hbefaVehicleCategory = HbefaVehicleCategory.MOTORCYCLE;
+		else{
+			logger.warn("Could not map String " + string + " to any HbefaVehicleCategory; please check syntax in hbefa input file.");
+			throw new RuntimeException();
+		}
+		return hbefaVehicleCategory;
 	}
 }
