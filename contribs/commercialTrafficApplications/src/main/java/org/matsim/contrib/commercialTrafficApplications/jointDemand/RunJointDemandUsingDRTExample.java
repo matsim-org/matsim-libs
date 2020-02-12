@@ -21,7 +21,7 @@ package org.matsim.contrib.commercialTrafficApplications.jointDemand;/*
  * created by jbischoff, 03.05.2019
  */
 
-import static org.matsim.core.config.ConfigUtils.createConfig;
+import static org.matsim.core.config.ConfigUtils.loadConfig;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.ChangeCommercialJobOperator;
@@ -46,16 +46,12 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
-class RunCommercialTrafficUsingDRTExample {
+class RunJointDemandUsingDRTExample {
     public static void main(String[] args) {
 
-        String inputDir = "input/commercialtrafficIt/";
-
-        Config config = createConfig();
-
-        loadConfigGroups(inputDir, config);
-        prepareConfig(inputDir, config);
-		DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.planCalcScore(),
+        Config config = loadConfig("jointDemand/config.xml");
+        prepareConfig(config);
+        DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.planCalcScore(),
 				config.plansCalcRoute());
 
         Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
@@ -74,7 +70,10 @@ class RunCommercialTrafficUsingDRTExample {
 
     }
 
-    private static void prepareConfig(String inputDir, Config config) {
+    private static void prepareConfig(Config config) {
+        loadConfigGroups(config);
+
+
         config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
         StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
         changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
@@ -96,11 +95,9 @@ class RunCommercialTrafficUsingDRTExample {
         config.planCalcScore().addActivityParams(work);
         config.controler().setLastIteration(10);
         config.controler().setWriteEventsInterval(1);
-        config.controler().setOutputDirectory("output/commercialtraffictestrunWithDRT");
+        config.controler().setOutputDirectory("output/commercialTrafficApplications/jointDemand/RunJointDemandUsingDRTExample");
         config.controler()
                 .setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
-        config.network().setInputFile(inputDir + "grid_network.xml");
-        config.plans().setInputFile(inputDir + "testpop.xml");
 
         config.qsim().setEndTime(26 * 3600);
         config.qsim().setSimEndtimeInterpretation(QSimConfigGroup.EndtimeInterpretation.onlyUseEndtime);
@@ -108,7 +105,7 @@ class RunCommercialTrafficUsingDRTExample {
         config.controler().setLastIteration(5);
     }
 
-    private static void loadConfigGroups(String inputDir, Config config) {
+    private static void loadConfigGroups(Config config) {
         ConfigUtils.addOrGetModule(config, DvrpConfigGroup.class);
         MultiModeDrtConfigGroup multiModeDrtConfigGroup = ConfigUtils.addOrGetModule(config, MultiModeDrtConfigGroup.class);
 
@@ -117,14 +114,14 @@ class RunCommercialTrafficUsingDRTExample {
         drtCfg.setMaxTravelTimeAlpha(5);
         drtCfg.setMaxTravelTimeBeta(15 * 60);
         drtCfg.setStopDuration(60);
-        drtCfg.setVehiclesFile(inputDir + "drtVehicles.xml");
+        drtCfg.setVehiclesFile("drtVehicles.xml");
         multiModeDrtConfigGroup.addParameterSet(drtCfg);
 
         CommercialTrafficConfigGroup commercialTrafficConfigGroup = ConfigUtils.addOrGetModule(config, CommercialTrafficConfigGroup.class);
         commercialTrafficConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
 
         FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
-        freightConfigGroup.setCarriersFile(inputDir + "test-carriers-drt.xml");
-        freightConfigGroup.setCarriersVehicleTypesFile(inputDir + "vehicleTypes.xml");
+        freightConfigGroup.setCarriersFile("test-carriers-drt.xml");
+        freightConfigGroup.setCarriersVehicleTypesFile("vehicleTypes.xml");
     }
 }
