@@ -21,7 +21,6 @@ package org.matsim.contrib.commercialTrafficApplications.jointDemand;/*
  * created by jbischoff, 03.05.2019
  */
 
-import static org.matsim.core.config.ConfigUtils.createConfig;
 import static org.matsim.core.config.ConfigUtils.loadConfig;
 
 import org.matsim.api.core.v01.Scenario;
@@ -50,8 +49,6 @@ class RunJointDemandDRTExample {
     public static void main(String[] args) {
 
         Config config = loadConfig("jointDemand/config.xml");
-
-        loadConfigGroups(config);
         prepareConfig(config);
 		DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.planCalcScore(),
 				config.plansCalcRoute());
@@ -73,6 +70,9 @@ class RunJointDemandDRTExample {
     }
 
     private static void prepareConfig(Config config) {
+        loadConfigGroups(config);
+
+
         config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
         StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings();
         changeExpBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
@@ -94,7 +94,7 @@ class RunJointDemandDRTExample {
         config.planCalcScore().addActivityParams(work);
         config.controler().setLastIteration(10);
         config.controler().setWriteEventsInterval(1);
-        config.controler().setOutputDirectory("output/RunJointDemandDRTExample");
+        config.controler().setOutputDirectory("output/commercialTrafficApplications/jointDemand/RunJointDemandUsingDRTExample");
         config.controler()
                 .setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 

@@ -86,7 +86,7 @@ class RunJointDemandCarExample {
         config.planCalcScore().addActivityParams(work);
         config.controler().setLastIteration(100);
         config.controler().setWriteEventsInterval(5);
-        config.controler().setOutputDirectory("output/RunJointDemandCarExample");
+        config.controler().setOutputDirectory("output/commercialTrafficApplications/jointDemand/RunJointDemandCarExample");
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         config.controler().setLastIteration(5);
     }
