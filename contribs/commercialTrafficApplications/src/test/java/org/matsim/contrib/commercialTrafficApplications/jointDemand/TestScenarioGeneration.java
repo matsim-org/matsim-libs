@@ -38,16 +38,15 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import static org.matsim.core.config.ConfigUtils.createConfig;
+import static org.matsim.core.config.ConfigUtils.loadConfig;
 import static org.matsim.core.scenario.ScenarioUtils.createScenario;
 
 public class TestScenarioGeneration {
 
 
     public static Scenario generateScenario(){
-        Config config = createConfig(new CommercialTrafficConfigGroup());
+        Config config = loadConfig("config.xml",new CommercialTrafficConfigGroup());
         Scenario scenario = createScenario(config);
-        new MatsimNetworkReader(scenario.getNetwork()).readFile("input/commercialtrafficIT/grid_network.xml");
         addPopulation(scenario);
         return scenario;
     }

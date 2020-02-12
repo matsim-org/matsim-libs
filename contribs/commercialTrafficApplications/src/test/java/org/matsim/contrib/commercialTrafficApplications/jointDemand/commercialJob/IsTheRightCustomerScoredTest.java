@@ -48,7 +48,7 @@ public class IsTheRightCustomerScoredTest {
     @Before
     public void setUp() {
 
-        Config config = ConfigUtils.loadConfig("input/commercialtrafficIT/config.xml");
+        Config config = ConfigUtils.loadConfig("config.xml");
         config.controler().setLastIteration(0);
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
         CommercialTrafficConfigGroup commercialTrafficConfigGroup = ConfigUtils.addOrGetModule(config, CommercialTrafficConfigGroup.class);
