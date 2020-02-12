@@ -82,6 +82,8 @@ public class RunUamDrtScenario {
 		drtCfgMap.values()
 				.forEach(cfg -> DrtConfigs.adjustDrtConfig(cfg, config.planCalcScore(), config.plansCalcRoute()));
 
+		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
+
 		Scenario scenario = DrtControlerCreator.createScenarioWithDrtRouteFactory(config);
 		ScenarioUtils.loadScenario(scenario);
 
