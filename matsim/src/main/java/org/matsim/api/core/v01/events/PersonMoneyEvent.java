@@ -38,7 +38,6 @@ public final class PersonMoneyEvent extends Event implements HasPersonId {
 
 	public static final String EVENT_TYPE = "personMoney";
 	
-	public static final String ATTRIBUTE_PERSON = "person";
 	public static final String ATTRIBUTE_AMOUNT = "amount";
 	public static final String ATTRIBUTE_PURPOSE = "purpose";
 	public static final String ATTRIBUTE_TRANSACTION_PARTNER = "transactionPartner";
@@ -64,13 +63,20 @@ public final class PersonMoneyEvent extends Event implements HasPersonId {
 	 * @param purpose (not required by dtd)
 	 * @param transactionPartner (not required by dtd)
 	 */
-	public PersonMoneyEvent(final double time, final Id<Person> agentId, final double amount, final String purpose, 
-			final String transactionPartner) {
+	public PersonMoneyEvent(final double time, final Id<Person> agentId, final double amount, final String purpose,
+				final String transactionPartner) {
 		super(time);
 		this.personId = agentId;
 		this.amount = amount;
 		this.purpose = purpose;
 		this.transactionPartner = transactionPartner;
+	}
+	/**
+	 * @deprecated -- add "purpose" and "transactionPartner"
+	 */
+	@Deprecated // add "purpose" and "transactionPartner"
+	public PersonMoneyEvent(final double time, final Id<Person> agentId, final double amount) {
+		this( time, agentId, amount, null, null);
 	}
 
 	public Id<Person> getPersonId() {
@@ -97,8 +103,8 @@ public final class PersonMoneyEvent extends Event implements HasPersonId {
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
+		// personId is treated in upstream
 		attr.put(ATTRIBUTE_AMOUNT, Double.toString(this.amount));
-		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
 		if (this.purpose != null) {
 			attr.put(ATTRIBUTE_PURPOSE, this.purpose);
 		}
