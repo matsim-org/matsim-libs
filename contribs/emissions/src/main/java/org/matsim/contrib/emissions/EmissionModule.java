@@ -312,20 +312,8 @@ public final class EmissionModule {
 			key = new HbefaWarmEmissionFactorKey();
 			key.setHbefaVehicleCategory(EmissionUtils.mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
 
-			String pollutantString = array[indexFromKey.get("Component")];
-			Pollutant pollutant;
-			if(pollutantString.contains("CO2(total)")) {
-				pollutant = Pollutant.CO2_TOTAL;
-			} else {
-				pollutant = Pollutant.valueOf(pollutantString);
-			}
+			Pollutant pollutant = EmissionUtils.getPollutant( array[indexFromKey.get("Component" )] );
 
-			// this is where Joe Malloy was just passing strings through all the way to events.  Now this is "typed" again.  There may be
-			// two failures:
-			// (1) The pollutant type is missing from the enum.  In that case, just add it to the enum.
-			// (2) The same pollutant type exists under a different name (e.g. NOx instead of NOx).  In that case, some map for
-			// translation needs to be introduced.  I think that that map should just sit at exactly the place here, and translate.
-			// kai, jan'20
 			warmPollutants.add(pollutant);
 			key.setHbefaComponent(pollutant);
 
@@ -379,17 +367,7 @@ public final class EmissionModule {
 			key.setHbefaVehicleCategory(EmissionUtils.mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
 
 			String pollutantString = array[indexFromKey.get("Component")];
-			Pollutant pollutant;
-			if(pollutantString.contains("CO2(total)")) {
-				pollutant = Pollutant.CO2_TOTAL;
-			} else {
-				pollutant = Pollutant.valueOf(pollutantString);
-			}
-			// the Pollutant.valueOf(...) should fail if the incoming key is not consistent with what is available in the enum.  Two possibilities:
-			// (1) it is a new pollutant.  In that case, just add to the enum.
-			// (2) It is a different spelling of an already existing pollutant.  In that case, some conversion needs to be done (I would say that
-			// as long as that does not happen very often, it could be done in code here).
-			// kai, jan'20
+			Pollutant pollutant = EmissionUtils.getPollutant( pollutantString );
 
 			coldPollutants.add(pollutant);
 			key.setHbefaComponent(pollutant);

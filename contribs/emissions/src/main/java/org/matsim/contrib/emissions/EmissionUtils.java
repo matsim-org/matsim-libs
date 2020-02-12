@@ -44,8 +44,9 @@ import java.util.stream.Stream;
 public final class EmissionUtils {
 	private static final Logger logger = Logger.getLogger(EmissionUtils.class);
 
-	private static final String HBEFA_VEHICLE_DESCRIPTION = "hbefaVehicleTypeDescription";
 	private enum EmissionSpecificationMarker {BEGIN_EMISSIONS , END_EMISSIONS }
+
+	private EmissionUtils(){ } // do not instantiate
 
 	static Map<String, Integer> createIndexFromKey(String strLine) {
 		String[] keys = strLine.split(";");
@@ -229,7 +230,7 @@ public final class EmissionUtils {
 			HbefaTrafficSituation hbefaTrafficSituation = warmEmissionFactorKey.getHbefaTrafficSituation();
 			double speed = emissionFactor.getSpeed();
 
-			table.putIfAbsent(roadVehicleCategoryKey, new HashMap<>());
+			table.putIfAbsent(roadVehicleCategoryKey, new EnumMap<>( HbefaTrafficSituation.class ));
 			table.get(roadVehicleCategoryKey).put(hbefaTrafficSituation, speed);
 		});
 
@@ -313,10 +314,10 @@ public final class EmissionUtils {
 		return getHbefaVehicleDescription( vehicleType ) ;
 	}
 
-	public static String getHbefaVehicleDescription(VehicleType vehicleType) {
+	private static String getHbefaVehicleDescription( VehicleType vehicleType ) {
 		// not yet clear if this can be public (without access to config). kai/kai, sep'19
 		EngineInformation engineInfo = vehicleType.getEngineInformation();;
-		StringBuffer strb = new StringBuffer();
+		StringBuilder strb = new StringBuilder();
 		strb.append( VehicleUtils.getHbefaVehicleCategory( engineInfo ) ) ;
 		strb.append( ";" ) ;
 		strb.append( VehicleUtils.getHbefaTechnology( engineInfo ) ) ;
@@ -342,4 +343,22 @@ public final class EmissionUtils {
 		}
 		return hbefaVehicleCategory;
 	}
+        static Pollutant getPollutant( String pollutantString ){
+		// for the time being, we just manually add alternative spellings here, and map them all to the established enums.  One option to make this
+		// configurable would be to add corresponding maps into the emissions config, in the sense of
+		//    setCo2TotalKeys( Set<String> keys )
+		// as we have it, e.g., with network modes.  kai, feb'20
+
+                Pollutant pollutant;
+                if( pollutantString.contains( "CO2(total)" ) ){
+                        pollutant = Pollutant.CO2_TOTAL;
+                } else{
+                        pollutant = Pollutant.valueOf( pollutantString );
+                }
+                // the Pollutant.valueOf(...) should fail if the incoming key is not consistent with what is available in the enum.  Two possibilities:
+                // (1) it is a new pollutant.  In that case, just add to the enum.
+                // (2) It is a different spelling of an already existing pollutant.  In that case, see above.
+                // kai, jan'20
+                return pollutant;
+        }
 }
