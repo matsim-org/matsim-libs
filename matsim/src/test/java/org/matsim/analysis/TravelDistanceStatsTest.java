@@ -40,12 +40,12 @@ public class TravelDistanceStatsTest {
 	HashMap<String, Integer> person2modes = new HashMap<String, Integer>();
 	private static int avglegdis;
 	private static int avgtripdis;
-	private Double planlegsum;
-	private Double plan2legsum;
-	private Double plan3legsum;
-	private long planTotalleg;
-	private long plan2Totalleg;
-	private long plan3Totalleg;
+	private Double person1legsum;
+	private Double person2legsum;
+	private Double person3legsum;
+	private long person1TotalNumberOfLegs;
+	private long person2TotalNumberOfLegs;
+	private long person3TotalNumberOfLegs;
 	Person person3 = PopulationUtils.getFactory().createPerson(Id.create(3, Person.class));
 	Person person = PopulationUtils.getFactory().createPerson(Id.create(1, Person.class));
 	Person person2 = PopulationUtils.getFactory().createPerson(Id.create(2, Person.class));
@@ -198,12 +198,12 @@ public class TravelDistanceStatsTest {
 		Activity act19 = PopulationUtils.createActivityFromLinkId("home", link1);// main mode car
 		plan.addActivity(act19);
 
-		planlegsum = plan.getPlanElements().stream().filter(Leg.class::isInstance)
+		person1legsum = plan.getPlanElements().stream().filter(Leg.class::isInstance)
 				.collect(Collectors.summingDouble(l -> {
 					Leg leg = (Leg) l;
 					return leg.getRoute() != null ? leg.getRoute().getDistance() : 0;
 				}));
-		planTotalleg = plan.getPlanElements().stream().filter(Leg.class::isInstance).count();
+		person1TotalNumberOfLegs = plan.getPlanElements().stream().filter(Leg.class::isInstance).count();
 		map.put(person.getId(), plan);
 
 		/* ########Person 2######### --- creating person 2 */
@@ -267,12 +267,12 @@ public class TravelDistanceStatsTest {
 		Activity actp2_9 = PopulationUtils.createActivityFromLinkId("home", link1);// main mode car
 		plan2.addActivity(actp2_9);
 
-		plan2legsum = plan2.getPlanElements().stream().filter(Leg.class::isInstance)
+		person2legsum = plan2.getPlanElements().stream().filter(Leg.class::isInstance)
 				.collect(Collectors.summingDouble(l -> {
 					Leg leg = (Leg) l;
 					return leg.getRoute() != null ? leg.getRoute().getDistance() : 0;
 				}));
-		plan2Totalleg = plan2.getPlanElements().stream().filter(Leg.class::isInstance).count();
+		person2TotalNumberOfLegs = plan2.getPlanElements().stream().filter(Leg.class::isInstance).count();
 		map.put(person2.getId(), plan2);
 
 		/* ########Person 3######### --- creating person 3 */
@@ -322,12 +322,12 @@ public class TravelDistanceStatsTest {
 		Activity actp3_8 = PopulationUtils.createActivityFromLinkId("home", link1);// main mode car
 		plan3.addActivity(actp3_8);
 
-		plan3legsum = plan3.getPlanElements().stream().filter(Leg.class::isInstance)
+		person3legsum = plan3.getPlanElements().stream().filter(Leg.class::isInstance)
 				.collect(Collectors.summingDouble(l -> {
 					Leg leg = (Leg) l;
 					return leg.getRoute() != null ? leg.getRoute().getDistance() : 0;
 				}));
-		plan3Totalleg = plan3.getPlanElements().stream().filter(Leg.class::isInstance).count();
+		person3TotalNumberOfLegs = plan3.getPlanElements().stream().filter(Leg.class::isInstance).count();
 		plan3.getPlanElements().stream().filter(Leg.class::isInstance).count();
 		map.put(person3.getId(), plan3);
 
@@ -344,14 +344,14 @@ public class TravelDistanceStatsTest {
 		controlerConfigGroup.setLastIteration(10);
 		TravelDistanceStats travelDistanceStats = new TravelDistanceStats(controlerConfigGroup, controlerIO);
 		travelDistanceStats.addIteration(0, map);
-		readAndValidateValues(0, planlegsum + plan2legsum + plan3legsum, 12,
-				planTotalleg + plan2Totalleg + plan3Totalleg);
+		readAndValidateValues(0, person1legsum + person2legsum + person3legsum, 12,
+				person1TotalNumberOfLegs + person2TotalNumberOfLegs + person3TotalNumberOfLegs);
 		map.remove(person2.getId());
 		travelDistanceStats.addIteration(1, map);
-		readAndValidateValues(1, planlegsum + plan3legsum, 8, planTotalleg + plan3Totalleg);
+		readAndValidateValues(1, person1legsum + person3legsum, 8, person1TotalNumberOfLegs + person3TotalNumberOfLegs);
 		map.remove(person3.getId());
 		travelDistanceStats.addIteration(2, map);
-		readAndValidateValues(2, planlegsum, 6, planTotalleg);
+		readAndValidateValues(2, person1legsum, 6, person1TotalNumberOfLegs);
 		travelDistanceStats.close();
 	}
 
