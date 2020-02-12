@@ -333,8 +333,12 @@ public final class EmissionUtils {
 		else if(string.contains("HGV")) hbefaVehicleCategory = HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
 		else if(string.contains("motorcycle")) hbefaVehicleCategory = HbefaVehicleCategory.MOTORCYCLE;
 		else{
-			logger.warn("Could not map String " + string + " to any HbefaVehicleCategory; please check syntax in hbefa input file.");
-			throw new RuntimeException();
+			try{
+				hbefaVehicleCategory = HbefaVehicleCategory.valueOf(string);
+			} catch (IllegalArgumentException e) {
+				logger.warn("Could not map String " + string + " to any HbefaVehicleCategory; please check syntax in hbefa input file.");
+				throw new RuntimeException();
+			}
 		}
 		return hbefaVehicleCategory;
 	}
