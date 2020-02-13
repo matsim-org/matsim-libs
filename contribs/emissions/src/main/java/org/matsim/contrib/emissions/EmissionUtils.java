@@ -349,16 +349,34 @@ public final class EmissionUtils {
 		//    setCo2TotalKeys( Set<String> keys )
 		// as we have it, e.g., with network modes.  kai, feb'20
 
-                Pollutant pollutant;
-                if( pollutantString.contains( "CO2(total)" ) ){
-                        pollutant = Pollutant.CO2_TOTAL;
-                } else{
-                        pollutant = Pollutant.valueOf( pollutantString );
-                }
-                // the Pollutant.valueOf(...) should fail if the incoming key is not consistent with what is available in the enum.  Two possibilities:
-                // (1) it is a new pollutant.  In that case, just add to the enum.
-                // (2) It is a different spelling of an already existing pollutant.  In that case, see above.
-                // kai, jan'20
-                return pollutant;
-        }
+		Pollutant pollutant;
+		switch( pollutantString ){
+			case "CO2(total)":
+				pollutant = Pollutant.CO2_TOTAL;
+				break;
+			case "CO2(rep)":
+				pollutant = Pollutant.CO2_rep;
+				break;
+			case "PM2.5 (non-exhaust)":
+				pollutant = Pollutant.PM2_5_non_exhaust;
+				break;
+			case "PM (non-exhaust)":
+				pollutant = Pollutant.PM_non_exhaust;
+				break;
+			case "BC (exhaust)":
+				pollutant = Pollutant.BC_exhaust;
+				break;
+			case "BC (non-exhaust)":
+				pollutant = Pollutant.BC_non_exhaust;
+				break;
+			default:
+				pollutant = Pollutant.valueOf( pollutantString );
+				// the Pollutant.valueOf(...) should fail if the incoming key is not consistent with what is available in the enum.  Two possibilities:
+				// (1) it is a new pollutant.  In that case, just add to the enum.
+				// (2) It is a different spelling of an already existing pollutant.  In that case, see above.
+				// kai, jan'20
+		}
+		return pollutant;
+	}
+
 }

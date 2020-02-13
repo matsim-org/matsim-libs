@@ -23,7 +23,31 @@ package org.matsim.contrib.emissions;
  * @author benjamin
  *
  */
-public enum Pollutant{ CO, CO2_TOTAL, FC, HC, NMHC, NOx, NO2, PM, SO2 }
+public enum Pollutant{
+        CO,
+        CO2_TOTAL,
+        FC, // fuel consumption. yyyy unit = ??
+        HC, // hydro carbons
+        NMHC,  // non-methane hydro carbons
+        NOx,
+        NO2,
+        PM,
+        SO2,
+        FC_MJ,  // fuel consumption in MJ
+        CO2_rep, // yyyyyy ???
+        CO2e, // CO2 equivalent (WTW basis)
+        PM2_5, // yyyy unit = ??
+        PM2_5_non_exhaust, // tire wear!
+        PM_non_exhaust, // tire wear!
+        BC_exhaust, // black carbon
+        BC_non_exhaust,
+        Benzene,
+        PN, // yyyyyy ????
+        Pb, // lead
+        CH4, // methane
+        N2O,
+        NH3
+}
 
 	/* CO2 not directly available for cold emissions; thus it could be calculated through FC, CO, and HC as follows:
 	get("FC")*0.865 - get("CO")*0.429 - get("HC")*0.866) / 0.273;*/
