@@ -19,7 +19,7 @@ package org.matsim.contrib.drt.util.stats;
 
 import org.apache.commons.math3.stat.descriptive.rank.Max;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.drt.schedule.DrtTask;
+import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -66,8 +66,8 @@ public class DrtVehicleOccupancyProfileCalculator {
 		for (int t = 0; t < timeDiscretizer.getIntervalCount(); t++) {
 			idleVehicleProfileRelative[t] = (double)idleVehicleProfileInSeconds[t] / timeDiscretizer.getTimeInterval();
 			for (int o = 0; o < vehicleOccupancyProfilesInSeconds.length; o++) {
-				vehicleOccupancyProfilesRelative[o][t] =
-						(double)vehicleOccupancyProfilesInSeconds[o][t] / timeDiscretizer.getTimeInterval();
+				vehicleOccupancyProfilesRelative[o][t] = (double)vehicleOccupancyProfilesInSeconds[o][t]
+						/ timeDiscretizer.getTimeInterval();
 			}
 		}
 	}
@@ -91,8 +91,8 @@ public class DrtVehicleOccupancyProfileCalculator {
 	private void updateProfiles(DvrpVehicle vehicle) {
 		int occupancy = 0;
 		for (Task t : vehicle.getSchedule().getTasks()) {
-			DrtTask drtTask = (DrtTask)t;
-			switch (drtTask.getDrtTaskType()) {
+			Task drtTask = t;
+			switch (((DrtTaskType)drtTask.getTaskType())) {
 				case DRIVE:
 					increment(vehicleOccupancyProfilesInSeconds[occupancy], drtTask);
 					break;

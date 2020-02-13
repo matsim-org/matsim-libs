@@ -1,8 +1,9 @@
-/* *********************************************************************** *
+/*
+ * *********************************************************************** *
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2018 by the members listed in the COPYING,        *
+ * copyright       : (C) 2020 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -14,15 +15,19 @@
  *   (at your option) any later version.                                   *
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
- * *********************************************************************** */
+ * *********************************************************************** *
+ */
 
-package org.matsim.contrib.edrt.schedule;
+package org.matsim.contrib.taxi.schedule;
 
-import org.matsim.contrib.drt.schedule.DrtTask;
-import org.matsim.contrib.ev.dvrp.ETask;
+import org.matsim.contrib.dvrp.schedule.Task;
 
 /**
- * @author michalm
+ * @author Michal Maciejewski (michalm)
  */
-public interface EDrtTask extends DrtTask, ETask {
+public enum TaxiTaskType implements Task.TaskType {
+	EMPTY_DRIVE, // not directly related to any customer (although may be related to serving a customer; e.g. a
+	// pickup drive)
+	PICKUP, OCCUPIED_DRIVE, DROPOFF, // serving a customer (TaxiTaskWithRequest)
+	STAY;// not directly related to any customer
 }
