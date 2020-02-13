@@ -24,7 +24,7 @@ public class EmissionEventsToNetCdf {
 
 	public static void main(String[] args) {
 
-		Path path = Paths.get("C:\\Users\\Janek\\repos\\shared-svn\\projects\\mosaik-2\\data\\emission-driver-input\\erp_itm_chemistry.nc");
+		Path path = Paths.get("C:\\Users\\Janekdererste\\repos\\shared-svn\\projects\\mosaik-2\\data\\emission-driver-input\\erp_itm_chemistry.nc");
 		try (NetcdfFile file = NetcdfFile.open(path.toString())) {
 
 			List<Integer> times = toIntList(file.findVariable("time"));
@@ -35,22 +35,23 @@ public class EmissionEventsToNetCdf {
 
 			Variable emissionValues = file.findVariable("emission_values");
 
-			Dimension zDimention = new Dimension("z", 1);
-			emissionValues = emissionValues.reduce(Collections.singletonList(zDimention)); // remove z dimension, since it is not used
+			Dimension zDimension = new Dimension("z", 1);
+			emissionValues = emissionValues.reduce(Collections.singletonList(zDimension)); // remove z dimension, since it is not used
 
 			List<XYTPollutantValue> valuesGreaterZero = new ArrayList<>();
 
-			for (Integer time : times) {
-				Array timeSlice = getTimeStep(time, x.size(), y.size(), emissionNames.size(), emissionValues);
+			for (int ti = 0; ti < times.size(); ti++) {
 				for (int xi = 0; xi < x.size(); xi++) {
-					Array xValues = getXValues(xi, y.size(), emissionNames.size(), timeSlice);
 					for (int yi = 0; yi < y.size(); yi++) {
-						Array yValues = getYValues(yi, emissionNames.size(), xValues);
-						float[] a = (float[]) yValues.copyTo1DJavaArray();
-						for (int ei = 0; ei < a.length; ei++) {
-							if (a[ei] > 0) {
-								XYTPollutantValue value = new XYTPollutantValue(x.get(xi), y.get(yi), timestamps.get(time - 1), emissionNames.get(ei), a[ei]);
+
+						Array pollution = emissionValues.read(new int[]{ti, xi, yi, 0}, new int[]{1, 1, 1, emissionNames.size()});
+						float[] values = (float[]) pollution.copyTo1DJavaArray();
+
+						for (int ei = 0; ei < values.length; ei++) {
+							if (values[ei] > 0) {
+								XYTPollutantValue value = new XYTPollutantValue(x.get(xi), y.get(yi), timestamps.get(ti), emissionNames.get(ei), values[ei]);
 								valuesGreaterZero.add(value);
+								logger.info(value.getTimestamp() + " (" + value.getX() + "," + value.getY() + ") -> " + value.getName() + ": " + value.getValue());
 							}
 						}
 					}
@@ -62,19 +63,6 @@ public class EmissionEventsToNetCdf {
 			e.printStackTrace();
 		}
 
-	}
-
-	private static Array getXValues(int xValue, int size, int size1, Array timeSlice) throws InvalidRangeException {
-		return timeSlice.section(new int[]{xValue, 0, 0}, new int[]{1, size, size1}).reduce();
-	}
-
-	private static Array getYValues(int yValue, int size1, Array timeSlice) throws InvalidRangeException {
-		return timeSlice.section(new int[]{yValue, 0,}, new int[]{1, size1}).reduce();
-	}
-
-	private static Array getTimeStep(int timestep, int xSize, int ySize, int namesSize, Variable data) throws IOException, InvalidRangeException {
-
-		return data.read(new int[]{timestep - 1, 0, 0, 0}, new int[]{1, xSize, ySize, namesSize}).reduce();
 	}
 
 	private static List<Integer> toIntList(Variable oneDimensionalVariable) throws IOException {
