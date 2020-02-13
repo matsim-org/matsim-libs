@@ -37,7 +37,7 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class CommercialTrafficModule extends AbstractModule {
+public class JointDemandModule extends AbstractModule {
 
     @Override
     public void install() {

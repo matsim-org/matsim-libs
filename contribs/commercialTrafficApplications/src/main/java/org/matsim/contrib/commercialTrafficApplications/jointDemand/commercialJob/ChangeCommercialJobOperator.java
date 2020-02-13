@@ -53,23 +53,23 @@ public final class ChangeCommercialJobOperator extends AbstractMultithreadedModu
     public PlanAlgorithm getPlanAlgoInstance() {
         Random random = MatsimRandom.getLocalInstance();
         return plan -> {
-            List<Activity> activitiesWithJobs = new ArrayList<>(CommercialJobUtils.getCustomerActivitiesExpectingJobs(plan));
+            List<Activity> activitiesWithJobs = new ArrayList<>(JointDemandUtils.getCustomerActivitiesExpectingJobs(plan));
             if (activitiesWithJobs.isEmpty()) {
                 return;
             }
             int randomActIdx = random.nextInt(activitiesWithJobs.size());
 
             Activity selectedActivity = activitiesWithJobs.get(randomActIdx);
-            int randomJobIdx = random.nextInt(CommercialJobUtils.getNumberOfJobsForActivity(selectedActivity)) + 1; //the smallest index is 1.
+            int randomJobIdx = random.nextInt(JointDemandUtils.getNumberOfJobsForActivity(selectedActivity)) + 1; //the smallest index is 1.
 
-            Id<Carrier> currentCarrier = CommercialJobUtils.getCurrentlySelectedCarrierForJob(selectedActivity, randomJobIdx);
-            String market = CommercialJobUtils.getCarrierMarket(carriers.getCarriers().get(currentCarrier));
-            Set<Id<Carrier>> operators4Market = CommercialJobUtils.getExistingOperatorsForMarket(carriers, market);
+            Id<Carrier> currentCarrier = JointDemandUtils.getCurrentlySelectedCarrierForJob(selectedActivity, randomJobIdx);
+            String market = JointDemandUtils.getCarrierMarket(carriers.getCarriers().get(currentCarrier));
+            Set<Id<Carrier>> operators4Market = JointDemandUtils.getExistingOperatorsForMarket(carriers, market);
 
             if (operators4Market.remove(currentCarrier)) {
                 if (!operators4Market.isEmpty()) {
                     Id<Carrier> newCarrier = operators4Market.stream().skip(random.nextInt(operators4Market.size())).findFirst().orElse(currentCarrier);
-                    CommercialJobUtils.setJobCarrier(selectedActivity, randomJobIdx, newCarrier);
+                    JointDemandUtils.setJobCarrier(selectedActivity, randomJobIdx, newCarrier);
                 }
             } else
                 throw new RuntimeException(currentCarrier.toString() + " is not part of the commercial traffic carriers for market " + market);

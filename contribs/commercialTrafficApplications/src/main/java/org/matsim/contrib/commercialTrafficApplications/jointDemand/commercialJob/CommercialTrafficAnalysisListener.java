@@ -85,7 +85,7 @@ class CommercialTrafficAnalysisListener implements IterationEndsListener {
     private void analyzeCarrierMarketShares(int iteration) {
 
 
-        Map<String, Set<Id<Carrier>>> carriersSplitByMarket = CommercialJobUtils.splitCarriersByMarket(carriers);
+        Map<String, Set<Id<Carrier>>> carriersSplitByMarket = JointDemandUtils.splitCarriersByMarket(carriers);
 
 
         for (Map.Entry<String, Set<Id<Carrier>>> entry : carriersSplitByMarket.entrySet()) {
@@ -155,7 +155,7 @@ class CommercialTrafficAnalysisListener implements IterationEndsListener {
     private void writeIterationCarrierStats(IterationEndsEvent event) {
         for (Carrier carrier : carriers.getCarriers().values()) {
             DoubleSummaryStatistics distances = tourLengthAnalyzer.getDeliveryAgentDistances().entrySet().stream()
-                    .filter(entry -> CommercialJobUtils.getCarrierIdFromDriver(entry.getKey()).equals(carrier.getId()))
+                    .filter(entry -> JointDemandUtils.getCarrierIdFromDriver(entry.getKey()).equals(carrier.getId()))
                     .mapToDouble(Map.Entry::getValue)
                     .summaryStatistics();
             DoubleSummaryStatistics scores = scoreCommercialJobs.getLogEntries().stream()

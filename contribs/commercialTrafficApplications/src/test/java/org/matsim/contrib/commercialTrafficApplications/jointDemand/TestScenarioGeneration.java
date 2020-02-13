@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.CommercialJobUtils;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.JointDemandUtils;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.CommercialTrafficConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.config.Config;
@@ -57,17 +57,17 @@ public class TestScenarioGeneration {
         Carrier italianPizzaPlace = CarrierImpl.newInstance(Id.create("pizza_italian", Carrier.class));
         CarrierUtils.setCarrierMode(italianPizzaPlace, TransportMode.car);
         CarrierUtils.setJspritIterations(italianPizzaPlace, 20);
-        italianPizzaPlace.getAttributes().putAttribute(CommercialJobUtils.CARRIER_MARKET_ATTRIBUTE_NAME, "pizza");
+        italianPizzaPlace.getAttributes().putAttribute(JointDemandUtils.CARRIER_MARKET_ATTRIBUTE_NAME, "pizza");
 
         Carrier americanPizzaPlace = CarrierImpl.newInstance(Id.create("pizza_american", Carrier.class));
         CarrierUtils.setCarrierMode(americanPizzaPlace, TransportMode.car);
         CarrierUtils.setJspritIterations(americanPizzaPlace, 20);
-        americanPizzaPlace.getAttributes().putAttribute(CommercialJobUtils.CARRIER_MARKET_ATTRIBUTE_NAME, "pizza");
+        americanPizzaPlace.getAttributes().putAttribute(JointDemandUtils.CARRIER_MARKET_ATTRIBUTE_NAME, "pizza");
 
         Carrier shopping_1 = CarrierImpl.newInstance(Id.create("shopping_1", Carrier.class));
         CarrierUtils.setCarrierMode(shopping_1, TransportMode.car);
         CarrierUtils.setJspritIterations(shopping_1, 20);
-        shopping_1.getAttributes().putAttribute(CommercialJobUtils.CARRIER_MARKET_ATTRIBUTE_NAME, "shopping");
+        shopping_1.getAttributes().putAttribute(JointDemandUtils.CARRIER_MARKET_ATTRIBUTE_NAME, "shopping");
 
         VehicleType type = createLightType();
 
@@ -110,7 +110,7 @@ public class TestScenarioGeneration {
         work.setLinkId(Id.createLinkId(259));
         work.setEndTime(16 * 3600);
 
-        work.getAttributes().putAttribute(CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_NAME + "1", "pizza_italian;1;" + 12 * 3600 + ";" + 13 * 3600 + ";180");
+        work.getAttributes().putAttribute(JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_NAME + "1", "pizza_italian;1;" + 12 * 3600 + ";" + 13 * 3600 + ";180");
         plan.addActivity(work);
         plan.addLeg(PopulationUtils.createLeg(TransportMode.car));
 

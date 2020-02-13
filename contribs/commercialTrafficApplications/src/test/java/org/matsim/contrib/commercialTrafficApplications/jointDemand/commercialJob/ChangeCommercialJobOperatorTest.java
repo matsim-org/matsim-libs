@@ -31,18 +31,18 @@ public class ChangeCommercialJobOperatorTest {
         Plan testPlan = scenario.getPopulation().getPersons().get(Id.createPersonId(1)).getSelectedPlan();
         Activity work = (Activity) testPlan.getPlanElements().get(2);
 
-        Id<Carrier> carrierId = CommercialJobUtils.getCurrentlySelectedCarrierForJob(work, 1);
-        Assert.assertEquals("the person should expect a pizza", "pizza", CommercialJobUtils.getCarrierMarket(carriers.getCarriers().get(carrierId)));
+        Id<Carrier> carrierId = JointDemandUtils.getCurrentlySelectedCarrierForJob(work, 1);
+        Assert.assertEquals("the person should expect a pizza", "pizza", JointDemandUtils.getCarrierMarket(carriers.getCarriers().get(carrierId)));
         Assert.assertTrue("the person should expect a pizza from the italian place", carrierId.toString().contains("italian"));
 
         changeCommercialJobOperator.getPlanAlgoInstance().run(testPlan);
 
-        carrierId = CommercialJobUtils.getCurrentlySelectedCarrierForJob(work, 1);
+        carrierId = JointDemandUtils.getCurrentlySelectedCarrierForJob(work, 1);
         Assert.assertTrue("the person should expect a pizza from the american place", carrierId.toString().contains("american"));
 
         changeCommercialJobOperator.getPlanAlgoInstance().run(testPlan);
 
-        carrierId = CommercialJobUtils.getCurrentlySelectedCarrierForJob(work, 1);
+        carrierId = JointDemandUtils.getCurrentlySelectedCarrierForJob(work, 1);
         Assert.assertTrue("the person should expect a pizza from the italian place", carrierId.toString().contains("italian"));
 
     }

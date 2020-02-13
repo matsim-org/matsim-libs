@@ -123,27 +123,27 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
 
         population.getPersons().values().forEach(p ->
         {
-            Set<Activity> activitiesWithServices = CommercialJobUtils.getCustomerActivitiesExpectingJobs(p.getSelectedPlan());
+            Set<Activity> activitiesWithServices = JointDemandUtils.getCustomerActivitiesExpectingJobs(p.getSelectedPlan());
             if(!activitiesWithServices.isEmpty()) customer2ActsWithJobs.put(p,activitiesWithServices);
         });
         for(Person customer : customer2ActsWithJobs.keySet()){
             for (Activity activity : customer2ActsWithJobs.get(customer)) {
-                Map<String,Object> commercialJobAttributes = CommercialJobUtils.getCommercialJobAttributes(activity);
+                Map<String,Object> commercialJobAttributes = JointDemandUtils.getCommercialJobAttributes(activity);
                 for (String commercialJobAttributeKey : commercialJobAttributes.keySet()) {
-                    String[] commercialJobProperties = String.valueOf(commercialJobAttributes.get(commercialJobAttributeKey)).split(CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_DELIMITER);
+                    String[] commercialJobProperties = String.valueOf(commercialJobAttributes.get(commercialJobAttributeKey)).split(JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_DELIMITER);
 
-                    int jobIdx = Integer.parseInt(commercialJobAttributeKey.substring(CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_NAME.length()));
+                    int jobIdx = Integer.parseInt(commercialJobAttributeKey.substring(JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_NAME.length()));
                     Id<CarrierService> serviceId = createCarrierServiceIdXForCustomer(customer,jobIdx);
 
-                    double earliestStart = Double.parseDouble(commercialJobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_START_IDX]);
-                    double latestStart = Double.parseDouble(commercialJobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_END_IDX]);
+                    double earliestStart = Double.parseDouble(commercialJobProperties[JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_START_IDX]);
+                    double latestStart = Double.parseDouble(commercialJobProperties[JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_END_IDX]);
 
                     CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(serviceId, activity.getLinkId());
-                    serviceBuilder.setCapacityDemand(Integer.parseInt(commercialJobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_AMOUNT_IDX]));
-                    serviceBuilder.setServiceDuration(Double.parseDouble(commercialJobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_DURATION_IDX]));
+                    serviceBuilder.setCapacityDemand(Integer.parseInt(commercialJobProperties[JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_AMOUNT_IDX]));
+                    serviceBuilder.setServiceDuration(Double.parseDouble(commercialJobProperties[JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_DURATION_IDX]));
                     serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(earliestStart,latestStart));
 
-                    Id<Carrier> carrierId = CommercialJobUtils.getCurrentlySelectedCarrierForJob(activity, jobIdx);
+                    Id<Carrier> carrierId = JointDemandUtils.getCurrentlySelectedCarrierForJob(activity, jobIdx);
                     if (carriers.getCarriers().containsKey(carrierId)) {
                         Carrier carrier = carriers.getCarriers().get(carrierId);
                         CarrierService service = serviceBuilder.build();
@@ -196,7 +196,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
 
                 CarrierVehicle carrierVehicle = scheduledTour.getVehicle();
 
-                Id<Person> driverId = CommercialJobUtils.generateDriverId(carrier, carrierVehicle, nextId);
+                Id<Person> driverId = JointDemandUtils.generateDriverId(carrier, carrierVehicle, nextId);
                 nextId++;
 
                 Person driverPerson = createDriverPerson(driverId);

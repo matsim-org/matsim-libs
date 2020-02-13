@@ -72,7 +72,7 @@ class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityEndEvent
         freightAgent2Jobs.clear();
 
         Set<Plan> freightPlans = population.getPersons().values().stream()
-                .filter(p -> p.getId().toString().startsWith(CommercialJobUtils.FREIGHT_DRIVER_PREFIX))
+                .filter(p -> p.getId().toString().startsWith(JointDemandUtils.FREIGHT_DRIVER_PREFIX))
                 .map(HasPlansAndId::getSelectedPlan)
                 .collect(Collectors.toSet());
 
@@ -97,7 +97,7 @@ class ScoreCommercialJobs implements ActivityStartEventHandler, ActivityEndEvent
             activeDeliveryAgents.remove(event.getPersonId());
         } else if (event.getActType().startsWith(CommercialJobGenerator.COMMERCIALJOB_ACTIVITYTYPE_PREFIX)) {
 
-            Id<Carrier> carrierId = CommercialJobUtils.getCarrierIdFromDriver(event.getPersonId());
+            Id<Carrier> carrierId = JointDemandUtils.getCarrierIdFromDriver(event.getPersonId());
             Carrier carrier = carriers.getCarriers().get(carrierId);
             CarrierService job = carrier.getServices().get(freightAgent2Jobs.get(event.getPersonId()).poll());
 

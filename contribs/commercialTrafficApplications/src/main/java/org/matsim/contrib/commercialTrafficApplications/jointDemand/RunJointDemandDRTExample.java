@@ -26,7 +26,7 @@ import static org.matsim.core.config.ConfigUtils.loadConfig;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.ChangeCommercialJobOperator;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.CommercialTrafficConfigGroup;
-import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.CommercialTrafficModule;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.JointDemandModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
@@ -62,7 +62,7 @@ class RunJointDemandDRTExample {
         Controler controler = new Controler(scenario);
 
         controler.addOverridingModule(
-                new CommercialTrafficModule() );
+                new JointDemandModule() );
 
         controler.configureQSimComponents(DvrpQSimComponents.activateAllModes(MultiModeDrtConfigGroup.get(config)));
         controler.run();

@@ -24,7 +24,7 @@ package org.matsim.contrib.commercialTrafficApplications.jointDemand;/*
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.ChangeCommercialJobOperator;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.CommercialTrafficConfigGroup;
-import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.CommercialTrafficModule;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.JointDemandModule;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.utils.FreightUtils;
 import org.matsim.core.config.Config;
@@ -60,7 +60,7 @@ class RunJointDemandCarExample {
         //FreightUtils.getCarriers(scenario) and FreightUtils.getCarrierVehicleTypes(scenario)
 
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new CommercialTrafficModule() );
+        controler.addOverridingModule(new JointDemandModule() );
         controler.run();
     }
 

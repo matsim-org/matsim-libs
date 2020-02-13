@@ -23,7 +23,7 @@ public class CommercialTrafficIntegrationTest {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new CommercialTrafficModule());
+        controler.addOverridingModule(new JointDemandModule());
         controler.run();
     }
 

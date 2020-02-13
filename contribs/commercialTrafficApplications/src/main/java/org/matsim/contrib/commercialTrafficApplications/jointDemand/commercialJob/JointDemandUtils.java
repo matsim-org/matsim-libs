@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class CommercialJobUtils {
+public class JointDemandUtils {
 
     public static final String COMMERCIALJOB_ATTRIBUTE_NAME = "commercialJob";
     public static final String CARRIER_MARKET_ATTRIBUTE_NAME = "market";

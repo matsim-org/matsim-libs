@@ -65,7 +65,7 @@ public class IsTheRightCustomerScoredTest {
         preparePopulation(scenario);
 
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new CommercialTrafficModule());
+        controler.addOverridingModule(new JointDemandModule());
         controler.run();
     }
 
@@ -86,7 +86,7 @@ public class IsTheRightCustomerScoredTest {
         Id<Carrier> pizzaCarrier = Id.create("salamiPizza", Carrier.class);
         Plan planCustomerOrderingForParty = factory.createPlan();
         Activity pizzaParty = factory.createActivityFromLinkId("pizzaAlone", Id.createLinkId("116"));
-        CommercialJobUtils.addCustomerCommercialJobAttribute(pizzaParty, pizzaCarrier, 6,
+        JointDemandUtils.addCustomerCommercialJobAttribute(pizzaParty, pizzaCarrier, 6,
                 6 * 3600, 7 * 3600, 180);
         planCustomerOrderingForParty.addActivity(pizzaParty);
         customerOrderingForParty.addPlan(planCustomerOrderingForParty);
@@ -94,7 +94,7 @@ public class IsTheRightCustomerScoredTest {
 
         Plan planCustomerOrderingJustForItself = factory.createPlan();
         Activity pizzaAlone = factory.createActivityFromLinkId("pizzaAlone", Id.createLinkId("116"));
-        CommercialJobUtils.addCustomerCommercialJobAttribute(pizzaAlone, pizzaCarrier, 2,
+        JointDemandUtils.addCustomerCommercialJobAttribute(pizzaAlone, pizzaCarrier, 2,
                 6 * 3600, 7 * 3600, 180);
         planCustomerOrderingJustForItself.addActivity(pizzaAlone);
         customerOrderingJustForItself.addPlan(planCustomerOrderingJustForItself);

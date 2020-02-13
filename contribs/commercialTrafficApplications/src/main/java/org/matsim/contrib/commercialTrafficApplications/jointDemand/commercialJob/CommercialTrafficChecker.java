@@ -50,7 +50,7 @@ class CommercialTrafficChecker {
         final MutableBoolean fail = new MutableBoolean(false);
         for (Person p : population.getPersons().values()) {
             for (Plan plan : p.getPlans()) {
-                for (Activity activity : CommercialJobUtils.getCustomerActivitiesExpectingJobs(plan)) {
+                for (Activity activity : JointDemandUtils.getCustomerActivitiesExpectingJobs(plan)) {
                         if (checkActivityConsistency(activity, p.getId())) fail.setTrue();
                     }
             }
@@ -60,19 +60,19 @@ class CommercialTrafficChecker {
 
     private static boolean checkActivityConsistency(Activity activity, Id<Person> pid) {
         boolean fail = false;
-        Map<String, Object> attributes = CommercialJobUtils.getCommercialJobAttributes(activity);
+        Map<String, Object> attributes = JointDemandUtils.getCommercialJobAttributes(activity);
         for (String attribute : attributes.keySet()) {
-            if(attribute.split(CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_NAME)[1].equals("0")){
+            if(attribute.split(JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_NAME)[1].equals("0")){
                 log.error("index 0 is not supported for commercial job attributes. please start with index 1. See activity " + activity + " of person " + pid);
                 fail = true;
             }
-            String[] jobProperties = ((String) (attributes.get(attribute))).split(CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_DELIMITER);
+            String[] jobProperties = ((String) (attributes.get(attribute))).split(JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_DELIMITER);
             if (jobProperties.length != 5) {
                 log.error("Activity " + activity + " of person " + pid + " defines commercialJob attribute " + attribute + " with a wrong number of properties. Length should be 6");
                 fail = true;
             }
-            Double timeWindowStart = Double.valueOf(jobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_START_IDX]);
-            Double timeWindowEnd = Double.valueOf(jobProperties[CommercialJobUtils.COMMERCIALJOB_ATTRIBUTE_END_IDX]);
+            Double timeWindowStart = Double.valueOf(jobProperties[JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_START_IDX]);
+            Double timeWindowEnd = Double.valueOf(jobProperties[JointDemandUtils.COMMERCIALJOB_ATTRIBUTE_END_IDX]);
             if (timeWindowEnd < timeWindowStart) {
                 log.error("Person " + pid + " has an error in properties of job attribute " + attribute + " in activity " + activity.getType() + ".TimeWindow: start=" + timeWindowStart + " end=" + timeWindowEnd);
                 fail = true;
@@ -88,7 +88,7 @@ class CommercialTrafficChecker {
     private static boolean checkCarrierConsistency(Carriers carriers) {
         boolean fail = false;
         for (Carrier carrier : carriers.getCarriers().values()) {
-            if (carrier.getAttributes().getAttribute(CommercialJobUtils.CARRIER_MARKET_ATTRIBUTE_NAME) == null) {
+            if (carrier.getAttributes().getAttribute(JointDemandUtils.CARRIER_MARKET_ATTRIBUTE_NAME) == null) {
                 log.error("carrier " + carrier.getId() + " has no market attribute set. this is mandatory in the commercialTraffic set up.");
                 fail = true;
             }
