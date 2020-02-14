@@ -118,6 +118,18 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 	public final boolean isInsistingOnUsingDeprecatedPersonAttributeFile() {
 		return insistingOnUsingDeprecatedPersonAttributeFile;
 	}
+	
+	private boolean insistingOnUsingDeprecatedPlansWithoutRoutingMode = false ;
+	private static final String INSISTING_ON_USING_DEPRECATED_PLANS_WITHOUT_ROUTING_MODE = "insistingOnUsingDeprecatedPlansWithoutRoutingMode" ;
+	@StringSetter(INSISTING_ON_USING_DEPRECATED_PLANS_WITHOUT_ROUTING_MODE)
+	public final void setInsistingOnUsingDeprecatedPlansWithoutRoutingMode( boolean val ) {
+		this.insistingOnUsingDeprecatedPlansWithoutRoutingMode = val ;
+	}
+	@StringGetter(INSISTING_ON_USING_DEPRECATED_PLANS_WITHOUT_ROUTING_MODE)
+	public final boolean isInsistingOnUsingDeprecatedPlansWithoutRoutingMode() {
+		return insistingOnUsingDeprecatedPlansWithoutRoutingMode;
+	}
+	
 	@StringGetter( INPUT_PERSON_ATTRIBUTES_FILE )
 	@Deprecated // I think that this should be phased out; use Attributes inside each facility.  kai, mar'19
 	public String getInputPersonAttributeFile() {
