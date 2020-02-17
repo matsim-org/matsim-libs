@@ -1,0 +1,29 @@
+﻿Case;VehCat;Year;TrafficScenario;Component;RoadCat;TrafficSit;Gradient;V_weighted;EFA_weighted;AmbientCondPattern;EFA_WTT_weighted;EFA_WTW_weighted
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;HC;Urban;URB/Trunk-City/50/Freeflow;0%;49.35812759;0.009990068;ØGermany;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;CO;Urban;URB/Trunk-City/50/Freeflow;0%;49.35812759;0.190928459;ØGermany;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;NOx;Urban;URB/Trunk-City/50/Freeflow;0%;49.35812759;0.288880438;ØGermany;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;FC;Urban;URB/Trunk-City/50/Freeflow;0%;49.35812759;47.67198181;ØGermany;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;FC_MJ;Urban;URB/Trunk-City/50/Freeflow;0%;49.35812759;2.019207954;ØGermany;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;PM;Urban;URB/Trunk-City/50/Freeflow;0%;49.35812759;0.002621636;ØGermany;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;PN;Urban;URB/Trunk-City/50/Freeflow;0%;49.35812759;2.6125E+12;ØGermany;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;CO2(rep);Urban;URB/Trunk-City/50/Freeflow;0%;49.35812759;137.9187164;ØGermany;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;CO2(total);Urban;URB/Trunk-City/50/Freeflow;0%;49.35812759;146.9839325;ØGermany;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;NO2;Urban;URB/Trunk-City/50/Freeflow;0%;49.35812759;0.090735368;ØGermany;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;CH4;Urban;URB/Trunk-City/50/Freeflow;0%;49.35812759;0.004903179;ØGermany;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;NMHC;Urban;URB/Trunk-City/50/Freeflow;0%;49.35812759;0.005086887;ØGermany;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;Pb;Urban;URB/Trunk-City/50/Freeflow;0%;49.35812759;0;ØGermany;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;SO2;Urban;URB/Trunk-City/50/Freeflow;0%;49.35812759;0.000714889;ØGermany;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;N2O;Urban;URB/Trunk-City/50/Freeflow;0%;48.98519516;0.004822957;ØGermany;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;NH3;Urban;URB/Trunk-City/50/Freeflow;0%;48.98519516;0.014256096;ØGermany;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;PM (non-exhaust);Urban;URB/Trunk-City/50/Freeflow;0%;49.35812759;0.025999999;ØGermany;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;Benzene;Urban;URB/Trunk-City/50/Freeflow;0%;49.35812759;0.000302175;ØGermany;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;PM2.5;Urban;URB/Trunk-City/50/Freeflow;0%;49.35812759;0.002621636;ØGermany;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;BC (exhaust);Urban;URB/Trunk-City/50/Freeflow;0%;49.35812759;0.001519785;ØGermany;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;PM2.5 (non-exhaust);Urban;URB/Trunk-City/50/Freeflow;0%;49.35812759;0.014;ØGermany;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;BC (non-exhaust);Urban;URB/Trunk-City/50/Freeflow;0%;49.35812759;0.0014;ØGermany;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;CO2e;Urban;URB/Trunk-City/50/Freeflow;0%;49.35812759;139.4785461;ØGermany;33.29774094;172.7762909
+2020_Average_perVehCat[4.1];LCV;2020;REF D HB41;CO2(total);Urban;URB/Trunk-City/50/Freeflow;0%;49.35812378;185.4692383;ØGermany;;
+2020_Average_perVehCat[4.1];coach;2020;REF D HB41;CO2(total);Urban;URB/Trunk-City/50/Freeflow;0%;46.47158432;670.2495728;;;
+2020_Average_perVehCat[4.1];urban bus;2020;REF D HB41;CO2(total);Urban;URB/Trunk-City/50/Freeflow;0%;37.25711823;680.5205688;;;
+2020_Average_perVehCat[4.1];motorcycle;2020;REF D HB41;CO2(total);Urban;URB/Trunk-City/50/Freeflow;0%;42.43803406;83.31721497;;;
+2020_Average_perVehCat[4.1];HGV;2020;REF D HB41;CO2(total);Urban;URB/Trunk-City/50/Freeflow;0%;46.32941818;667.8599243;;;

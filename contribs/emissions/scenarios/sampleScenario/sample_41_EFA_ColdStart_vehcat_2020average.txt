@@ -1,0 +1,19 @@
+﻿Case;VehCat;Year;TrafficScenario;Component;RoadCat;AmbientCondPattern;EFA_weighted;EFA_km_weighted;EFA_WTT_weighted;EFA_WTT_km_weighted;EFA_WTW_weighted;EFA_WTW_km_weighted
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;HC;Urban;ØGermany;0.863833249;;;;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;CO;Urban;ØGermany;4.374863625;;;;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;NOx;Urban;ØGermany;0.191557616;;;;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;FC;Urban;ØGermany;22.01299858;;;;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;FC_MJ;Urban;ØGermany;0.927957356;;;;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;PM;Urban;ØGermany;0.003969038;;;;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;PN;Urban;ØGermany;1.71365E+12;;;;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;CO2(rep);Urban;ØGermany;63.57273483;;;;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;CO2(total);Urban;ØGermany;67.73334503;;;;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;NO2;Urban;ØGermany;0.011588012;;;;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;CH4;Urban;ØGermany;0.045869406;;;;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;NMHC;Urban;ØGermany;0.817963719;;;;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;Pb;Urban;ØGermany;0;;;;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;SO2;Urban;ØGermany;0.00033121;;;;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;Benzene;Urban;ØGermany;0.056042179;;;;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;PM2.5;Urban;ØGermany;0.003969038;;;;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;BC (exhaust);Urban;ØGermany;0.002482888;;;;;
+2020_Average_perVehCat[4.1];pass. car;2020;REF D HB41;CO2e;Urban;ØGermany;64.71948242;;15.08737373;;79.80685425;
