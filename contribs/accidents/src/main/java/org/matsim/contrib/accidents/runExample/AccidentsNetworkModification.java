@@ -104,7 +104,7 @@ public class AccidentsNetworkModification {
 			}
 			linkCounter++;			
 			
-			link.getAttributes().putAttribute(accidentsCfg.getAccidentsComputationMethodAttributeName(), AccidentsConfigGroup.AccidentsComputationMethod.BVWP);
+			link.getAttributes().putAttribute(accidentsCfg.getAccidentsComputationMethodAttributeName(), AccidentsConfigGroup.AccidentsComputationMethod.BVWP.toString());
 							
 			ArrayList<Integer> bvwpRoadType = new ArrayList<>();
 			
