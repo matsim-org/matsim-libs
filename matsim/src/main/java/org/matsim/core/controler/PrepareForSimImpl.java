@@ -30,7 +30,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.HandlingOfPlansWithoutRoutingMode;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -75,16 +77,18 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	private final Provider<TripRouter> tripRouterProvider;
 	private final QSimConfigGroup qSimConfigGroup;
 	private final FacilitiesConfigGroup facilitiesConfigGroup;
+	private final PlansConfigGroup plansConfigGroup;
 	private final MainModeIdentifier backwardCompatibilityMainModeIdentifier;
 
 	/**
-	 * TODO: backwardCompatibilityMainModeIdentifier should be a separate MainModeidentifier, neither the routing mode identifier from TripStructureUtils, 
-	 * nor the MainModeidentifier used for analysis (ModeStats etc.).
+	 * backwardCompatibilityMainModeIdentifier should be a separate MainModeidentifier, neither the routing mode identifier from TripStructureUtils, 
+	 * nor the AnalysisMainModeidentifier used for analysis (ModeStats etc.).
 	 */
 	@Inject
 	PrepareForSimImpl(GlobalConfigGroup globalConfigGroup, Scenario scenario, Network network,
 				Population population, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider,
 				QSimConfigGroup qSimConfigGroup, FacilitiesConfigGroup facilitiesConfigGroup, 
+				PlansConfigGroup plansConfigGroup, 
 				MainModeIdentifier backwardCompatibilityMainModeIdentifier) {
 		this.globalConfigGroup = globalConfigGroup;
 		this.scenario = scenario;
@@ -94,6 +98,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		this.tripRouterProvider = tripRouterProvider;
 		this.qSimConfigGroup = qSimConfigGroup;
 		this.facilitiesConfigGroup = facilitiesConfigGroup;
+		this.plansConfigGroup = plansConfigGroup;
 		this.backwardCompatibilityMainModeIdentifier = backwardCompatibilityMainModeIdentifier;
 	}
 
@@ -307,23 +312,26 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 								String oldMainMode = replaceOutdatedFallbackModesAndReturnOldMainMode(legs.get(0),
 										null);
 								if (oldMainMode != null) {
-									if (true /* config switch insisting on bla */) {
-										routingMode = oldMainMode;
-										TripStructureUtils.setRoutingMode(legs.get(0), routingMode);
-									} else {
-										// error config switch insisting on bla
-									}
+									routingMode = oldMainMode;
+									TripStructureUtils.setRoutingMode(legs.get(0), routingMode);
 								} else {
 									// leg has a real mode (not an outdated fallback mode)
 									routingMode = legs.get(0).getMode();
 									TripStructureUtils.setRoutingMode(legs.get(0), routingMode);
 								}
 							} else {
-								if (true /* config switch insisting on bla */) {
+								if (plansConfigGroup.getHandlingOfPlansWithoutRoutingMode().equals(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier)) {
 									routingMode = getAndAddRoutingModeFromBackwardCompatibilityMainModeIdentifier(
 											person, trip);
 								} else {
-									// error config switch insisting on bla
+									String errorMessage = "Found a trip with multiple legs and no routingMode. "
+											+ "Person id " + person.getId().toString()
+											+ "\nTrip: " + trip.getTripElements().toString()
+											+ "\nTerminating. Take care to inject an adequate MainModeIdentifier and set config switch "
+											+ "plansConfigGroup.setHandlingOfPlansWithoutRoutingMode(" 
+											+ HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier.toString() + ").";
+									log.error(errorMessage);
+									throw new RuntimeException(errorMessage);
 								}
 							}
 						}
