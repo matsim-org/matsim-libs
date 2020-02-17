@@ -68,7 +68,7 @@ import cadyts.supply.SimResults;
  */
 public class CadytsPtContext implements StartupListener, IterationEndsListener, BeforeMobsimListener, AfterMobsimListener,
 CadytsContextI<TransitStopFacility> {
-	// can remain public as long as constructor is package-private. kai, feb'20
+	// can be/remain public as long as constructor is package-private. kai, feb'20
 
 	private final static Logger log = Logger.getLogger(CadytsPtContext.class);
 
@@ -78,7 +78,7 @@ CadytsContextI<TransitStopFacility> {
 
 	private AnalyticalCalibrator<TransitStopFacility> calibrator = null;
 	private final SimResults<TransitStopFacility> simResults;
-	private final Counts occupCounts = new Counts();
+	private final Counts<TransitStopFacility> occupCounts = new Counts<>();
 	//	private final Counts boardCounts = new Counts();
 	//	private final Counts alightCounts = new Counts();
 	private final CadytsPtOccupancyAnalyzerI cadytsPtOccupAnalyzer;

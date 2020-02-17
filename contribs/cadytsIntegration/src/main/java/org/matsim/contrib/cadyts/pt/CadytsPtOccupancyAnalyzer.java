@@ -69,7 +69,7 @@ final class CadytsPtOccupancyAnalyzer implements CadytsPtOccupancyAnalyzerI {
 
 	@Inject
 	CadytsPtOccupancyAnalyzer( Config config ) {
-		CadytsConfigGroup ccc = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class ) ;
+		CadytsConfigGroup ccc = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.class ) ;
 
 		this.calibratedLines = toTransitLineIdSet( ccc.getCalibratedLines() ) ;
 		this.timeBinSize = ccc.getTimeBinSize() ;
@@ -210,7 +210,7 @@ final class CadytsPtOccupancyAnalyzer implements CadytsPtOccupancyAnalyzerI {
 	}
 
 	@Override
-	public void writeResultsForSelectedStopIds(final String filename, final Counts<Link> occupCounts, final Collection<Id<TransitStopFacility>> stopIds) {
+	public void writeResultsForSelectedStopIds(final String filename, final Counts<TransitStopFacility> occupCounts, final Collection<Id<TransitStopFacility>> stopIds) {
 		SimpleWriter writer = new SimpleWriter(filename);
 
 		final String TAB = "\t";
@@ -229,8 +229,8 @@ final class CadytsPtOccupancyAnalyzer implements CadytsPtOccupancyAnalyzerI {
 		// write content
 		for (Id<TransitStopFacility> stopId : stopIds) {
 			// get count data
-			Count count = occupCounts.getCounts().get(Id.create(stopId, Link.class));
-			if (!occupCounts.getCounts().containsKey(Id.create(stopId, Link.class))) {
+			Count count = occupCounts.getCounts().get(Id.create(stopId, TransitStopFacility.class));
+			if (!occupCounts.getCounts().containsKey(Id.create(stopId, TransitStopFacility.class))) {
 				continue;
 			}
 
