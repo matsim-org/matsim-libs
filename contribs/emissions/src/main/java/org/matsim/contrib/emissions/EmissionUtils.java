@@ -334,6 +334,8 @@ public final class EmissionUtils {
 		else if(string.contains("HGV")) hbefaVehicleCategory = HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
 		else if(string.contains("LCV")) hbefaVehicleCategory = HbefaVehicleCategory.LIGHT_COMMERCIAL_VEHICLE;
 		else if(string.contains("motorcycle")) hbefaVehicleCategory = HbefaVehicleCategory.MOTORCYCLE;
+        else if(string.contains("coach")) hbefaVehicleCategory = HbefaVehicleCategory.COACH;
+        else if(string.contains("urban bus")) hbefaVehicleCategory = HbefaVehicleCategory.URBAN_BUS;
 		else{
 			try{
 				hbefaVehicleCategory = HbefaVehicleCategory.valueOf(string);
