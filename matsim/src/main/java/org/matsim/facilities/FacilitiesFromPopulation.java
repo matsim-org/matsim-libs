@@ -36,6 +36,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.PopulationUtils;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,6 +59,7 @@ public final class FacilitiesFromPopulation {
 	private final static Logger log = Logger.getLogger(FacilitiesFromPopulation.class);
 
 	private final ActivityFacilities facilities;
+	private Scenario scenario;
 	private boolean oneFacilityPerLink ;
 	private String idPrefix = "";
 	private Network network = null;
@@ -88,6 +90,7 @@ public final class FacilitiesFromPopulation {
 		}
 		this.network = scenario.getNetwork() ;
 		this.planCalcScoreConfigGroup = scenario.getConfig().planCalcScore() ;
+		this.scenario = scenario;
 	}
 
 	/**
@@ -159,8 +162,8 @@ public final class FacilitiesFromPopulation {
 					if (pe instanceof Activity) {
 						Activity activity = (Activity) pe;
 
-						Coord coord = activity.getCoord();
-						Id<Link> linkId = activity.getLinkId();
+						Coord coord = PopulationUtils.decideOnCoordForActivity( activity, scenario );
+						Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity( activity, scenario );
 						ActivityFacility facility = null;
 
 						if ( linkId == null ) {
