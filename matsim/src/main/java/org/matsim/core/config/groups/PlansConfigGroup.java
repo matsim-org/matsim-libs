@@ -119,15 +119,16 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 		return insistingOnUsingDeprecatedPersonAttributeFile;
 	}
 	
-	private boolean insistingOnUsingDeprecatedPlansWithoutRoutingMode = false ;
-	private static final String INSISTING_ON_USING_DEPRECATED_PLANS_WITHOUT_ROUTING_MODE = "insistingOnUsingDeprecatedPlansWithoutRoutingMode" ;
-	@StringSetter(INSISTING_ON_USING_DEPRECATED_PLANS_WITHOUT_ROUTING_MODE)
-	public final void setInsistingOnUsingDeprecatedPlansWithoutRoutingMode( boolean val ) {
-		this.insistingOnUsingDeprecatedPlansWithoutRoutingMode = val ;
+	public static enum HandlingOfPlansWithoutRoutingMode { reject, useMainModeIdentifier };
+	private HandlingOfPlansWithoutRoutingMode handlingOfPlansWithoutRoutingMode = HandlingOfPlansWithoutRoutingMode.reject ;
+	private static final String HANDLING_OF_PLANS_WITHOUT_ROUTING_MODE = "handlingOfPlansWithoutRoutingMode" ;
+	@StringSetter(HANDLING_OF_PLANS_WITHOUT_ROUTING_MODE)
+	public final void setHandlingOfPlansWithoutRoutingMode( HandlingOfPlansWithoutRoutingMode val ) {
+		this.handlingOfPlansWithoutRoutingMode = val ;
 	}
-	@StringGetter(INSISTING_ON_USING_DEPRECATED_PLANS_WITHOUT_ROUTING_MODE)
-	public final boolean isInsistingOnUsingDeprecatedPlansWithoutRoutingMode() {
-		return insistingOnUsingDeprecatedPlansWithoutRoutingMode;
+	@StringGetter(HANDLING_OF_PLANS_WITHOUT_ROUTING_MODE)
+	public final HandlingOfPlansWithoutRoutingMode getHandlingOfPlansWithoutRoutingMode() {
+		return handlingOfPlansWithoutRoutingMode;
 	}
 	
 	@StringGetter( INPUT_PERSON_ATTRIBUTES_FILE )

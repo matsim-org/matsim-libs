@@ -43,6 +43,7 @@ import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlansConfigGroup.HandlingOfPlansWithoutRoutingMode;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -616,7 +617,7 @@ public class CadytsPtIT {
 		config.network().setInputFile(inputDir + "network.xml") ;
 		// ---
 		config.plans().setInputFile(inputDir + "4plans.xml") ;
-		config.plans().setInsistingOnUsingDeprecatedPlansWithoutRoutingMode(true);
+		config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
 		// ---
 		config.transit().setUseTransit(true) ;
 		// ---

@@ -32,6 +32,7 @@ import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.HandlingOfPlansWithoutRoutingMode;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -319,7 +320,7 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 									TripStructureUtils.setRoutingMode(legs.get(0), routingMode);
 								}
 							} else {
-								if (plansConfigGroup.isInsistingOnUsingDeprecatedPlansWithoutRoutingMode()) {
+								if (plansConfigGroup.getHandlingOfPlansWithoutRoutingMode().equals(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier)) {
 									routingMode = getAndAddRoutingModeFromBackwardCompatibilityMainModeIdentifier(
 											person, trip);
 								} else {
@@ -327,7 +328,8 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 											+ "Person id " + person.getId().toString()
 											+ "\nTrip: " + trip.getTripElements().toString()
 											+ "\nTerminating. Take care to inject an adequate MainModeIdentifier and set config switch "
-											+ "plansConfigGroup.setInsistingOnUsingDeprecatedPlansWithoutRoutingMode(true).";
+											+ "plansConfigGroup.setHandlingOfPlansWithoutRoutingMode(" 
+											+ HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier.toString() + ").";
 									log.error(errorMessage);
 									throw new RuntimeException(errorMessage);
 								}
