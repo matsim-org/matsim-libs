@@ -457,7 +457,7 @@ public class PrepareForSimImplTest {
 			person.addPlan(plan);
 			pop.addPerson(person);
 			
-			// Should give an exception with default: config.plans().setInsistingOnUsingDeprecatedPlansWithoutRoutingMode(false);
+			// Should give an exception with default: config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.reject);
 			try {
 				final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
 						pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
@@ -467,7 +467,7 @@ public class PrepareForSimImplTest {
 				Assert.fail("expected Exception, got none.");
 			} catch (RuntimeException expected) {}
 			
-			// Should work with config.plans().setInsistingOnUsingDeprecatedPlansWithoutRoutingMode(true);
+			// Should work with config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
 			config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
 			final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
 					pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
@@ -512,7 +512,7 @@ public class PrepareForSimImplTest {
 			pop.addPerson(person);
 			
 			config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.reject);
-			// Should give an exception with default: config.plans().setInsistingOnUsingDeprecatedPlansWithoutRoutingMode(false);
+			// Should give an exception with default: config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.reject);
 			try {
 				final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
 						pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
@@ -522,7 +522,7 @@ public class PrepareForSimImplTest {
 				Assert.fail("expected Exception, got none.");
 			} catch (RuntimeException expected) {}
 			
-			// Should work with config.plans().setInsistingOnUsingDeprecatedPlansWithoutRoutingMode(true);
+			// Should work with config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
 			config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
 			final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
 					pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
@@ -587,7 +587,7 @@ public class PrepareForSimImplTest {
 			pop.addPerson(person);
 			
 			config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.reject);
-			// Should give an exception with default: config.plans().setInsistingOnUsingDeprecatedPlansWithoutRoutingMode(false);
+			// Should give an exception with default: config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.reject);
 			try {
 				final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
 						pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
@@ -597,7 +597,7 @@ public class PrepareForSimImplTest {
 				Assert.fail("expected Exception, got none.");
 			} catch (RuntimeException expected) {}
 			
-			// Should work with config.plans().setInsistingOnUsingDeprecatedPlansWithoutRoutingMode(true);
+			// Should work with config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
 			config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
 			final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
 					pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
@@ -620,7 +620,7 @@ public class PrepareForSimImplTest {
 			 * in the old setup, we would probably have to overwrite the MainModeIdentifier with a custom
 			 * MainModeIdentifier able to understand intermodal trips.
 			 * 
-			 * For the scope of thios test it is sufficient, that the MainModeIdentifier is run, returns a main mode
+			 * For the scope of this test it is sufficient, that the MainModeIdentifier is run, returns a main mode
 			 * and that this main mode is assigned as routingMode to all legs. 
 			 */
 			Assert.assertEquals("wrong routing mode!", TransportMode.drt, TripStructureUtils.getRoutingMode(leg1));
@@ -677,7 +677,7 @@ public class PrepareForSimImplTest {
 			person.addPlan(plan);
 			pop.addPerson(person);
 			
-			// Should give an exception with default: config.plans().setInsistingOnUsingDeprecatedPlansWithoutRoutingMode(false);
+			// Should give an exception with default: config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.reject);
 			try {
 				final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
 						pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
@@ -687,7 +687,7 @@ public class PrepareForSimImplTest {
 				Assert.fail("expected Exception, got none.");
 			} catch (RuntimeException expected) {}
 			
-			// Should work with config.plans().setInsistingOnUsingDeprecatedPlansWithoutRoutingMode(true);
+			// Should work with config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
 			config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
 			final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
 					pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
