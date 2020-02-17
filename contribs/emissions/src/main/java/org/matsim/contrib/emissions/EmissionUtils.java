@@ -332,6 +332,7 @@ public final class EmissionUtils {
 		HbefaVehicleCategory hbefaVehicleCategory;
 		if(string.contains("pass. car")) hbefaVehicleCategory = HbefaVehicleCategory.PASSENGER_CAR;
 		else if(string.contains("HGV")) hbefaVehicleCategory = HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
+		else if(string.contains("LCV")) hbefaVehicleCategory = HbefaVehicleCategory.LIGHT_COMMERCIAL_VEHICLE;
 		else if(string.contains("motorcycle")) hbefaVehicleCategory = HbefaVehicleCategory.MOTORCYCLE;
 		else{
 			try{
@@ -359,6 +360,9 @@ public final class EmissionUtils {
 				break;
 			case "PM2.5 (non-exhaust)":
 				pollutant = Pollutant.PM2_5_non_exhaust;
+				break;
+			case "PM2.5":
+				pollutant = Pollutant.PM2_5;
 				break;
 			case "PM (non-exhaust)":
 				pollutant = Pollutant.PM_non_exhaust;
