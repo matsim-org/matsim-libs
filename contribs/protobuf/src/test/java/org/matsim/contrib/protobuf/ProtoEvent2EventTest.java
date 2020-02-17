@@ -160,7 +160,7 @@ public class ProtoEvent2EventTest {
 	@Test
 	public final void testProtoEvent2EventPersonMoney() {
 		ProtobufEvents.PersonMoneyEvent.Builder le = ProtobufEvents.PersonMoneyEvent.newBuilder().setTime(42.0).
-				setPersId(ProtobufEvents.PersonId.newBuilder().setId("Alice")).setAmount(-123.45);
+				setPersId(ProtobufEvents.PersonId.newBuilder().setId("Alice")).setAmount(-123.45).setPurpose("flightFare").setTransactionPartner("greedyAir");
 
 		ProtobufEvents.Event pe = ProtobufEvents.Event.newBuilder().setType(ProtobufEvents.Event.Type.PersonMoney).
 				setPersonMoney(le).build();
@@ -170,6 +170,8 @@ public class ProtoEvent2EventTest {
 		Assert.assertEquals(42.0, e.getTime(), 0.);
 		Assert.assertEquals("Alice", ((PersonMoneyEvent) e).getPersonId().toString());
 		Assert.assertEquals(-123.45, ((PersonMoneyEvent) e).getAmount(), 0.);
+		Assert.assertEquals("flightFare", ((PersonMoneyEvent) e).getPurpose());
+		Assert.assertEquals("greedyAir", ((PersonMoneyEvent) e).getTransactionPartner());
 	}
 
 	@Test

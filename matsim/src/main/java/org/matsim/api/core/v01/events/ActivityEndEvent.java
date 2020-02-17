@@ -28,12 +28,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.facilities.ActivityFacility;
 
-public final class ActivityEndEvent extends Event implements HasPersonId {
+public final class ActivityEndEvent extends Event implements HasPersonId, HasLinkId, HasFacilityId {
 
-	public static final String ATTRIBUTE_PERSON = "person";
 	public static final String EVENT_TYPE = "actend";
-	public static final String ATTRIBUTE_LINK = "link";
-	public static final String ATTRIBUTE_FACILITY = "facility";
 	public static final String ATTRIBUTE_ACTTYPE = "actType";
 
 	private final Id<Person> personId;
@@ -59,28 +56,22 @@ public final class ActivityEndEvent extends Event implements HasPersonId {
 		return this.acttype;
 	}
 
-	public Id<Link> getLinkId() {
+	@Override public Id<Link> getLinkId() {
 		return this.linkId;
 	}
 
-	public Id<ActivityFacility> getFacilityId() {
+	@Override public Id<ActivityFacility> getFacilityId() {
 		return this.facilityId;
 	}
-	
-	public Id<Person> getPersonId() {
+
+	@Override public Id<Person> getPersonId() {
 		return this.personId;
 	}
 	
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
-		if (this.linkId != null) {
-			attr.put(ATTRIBUTE_LINK, this.linkId.toString());
-		}
-		if (this.facilityId != null) {
-			attr.put(ATTRIBUTE_FACILITY, this.facilityId.toString());
-		}
+		// person, link, facility done by superclass
 		attr.put(ATTRIBUTE_ACTTYPE, this.acttype);
 		return attr;
 	}

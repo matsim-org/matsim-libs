@@ -19,8 +19,6 @@
 
 package org.matsim.contrib.emissions.utils;
 
-import com.sun.org.apache.bcel.internal.classfile.Unknown;
-import org.matsim.contrib.emissions.EmissionUtils;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 

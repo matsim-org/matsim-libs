@@ -61,6 +61,43 @@
 
 <!-- ====================================================================== -->
 
+	<person id="100">
+		<plan selected="yes">
+			<activity type="h" x="7712.0" y="2580.0" end_time="08:38:53" >
+			</activity>
+			<leg mode="pt">
+			</leg>
+			<activity type="w" x="1000.0" y="3000.0" end_time="16:21:16" >
+			</activity>
+			<leg mode="pt">
+			</leg>
+			<activity type="h" x="7712.0" y="2580.0" >
+			</activity>
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+	<person id="101">
+		<plan selected="yes">
+			<activity type="h" x="6012.0" y="1080.0" end_time="08:38:53" >
+			</activity>
+			<leg mode="pt">
+			</leg>
+			<activity type="w" x="1000.0" y="3000.0" end_time="16:21:16" >
+			</activity>
+			<leg mode="pt">
+			</leg>
+			<activity type="h" x="6012.0" y="1080.0" >
+			</activity>
+		</plan>
+
+	</person>
+
+<!-- ====================================================================== -->
+
+
 	<person id="11">
 		<plan selected="yes">
 			<activity type="h" x="679.0" y="3901.0" end_time="07:19:04" >

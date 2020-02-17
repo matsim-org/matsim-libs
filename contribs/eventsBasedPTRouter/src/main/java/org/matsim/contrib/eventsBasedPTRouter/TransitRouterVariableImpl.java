@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.InitialNode;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -125,7 +126,8 @@ public class TransitRouterVariableImpl implements TransitRouter {
 					p.getToNode()).initialCost;
 		if (directWalkCost < pathCost) {
 			List<Leg> legs = new ArrayList<Leg>();
-			Leg leg = PopulationUtils.createLeg(TransportMode.transit_walk);
+			Leg leg = PopulationUtils.createLeg(TransportMode.walk); // formerly transit_walk
+			TripStructureUtils.setRoutingMode(leg, TransportMode.pt);
 			double walkDistance = CoordUtils.calcEuclideanDistance(fromFacility.getCoord(), toFacility.getCoord());
 			Route walkRoute = RouteUtils.createGenericRouteImpl(null, null);
 			walkRoute.setDistance(walkDistance);
@@ -190,7 +192,8 @@ public class TransitRouterVariableImpl implements TransitRouter {
 			}
 			else if(l.toNode.route!=null) {
 				//wait link
-				leg = PopulationUtils.createLeg(TransportMode.transit_walk);
+				leg = PopulationUtils.createLeg(TransportMode.walk);
+				TripStructureUtils.setRoutingMode(leg, TransportMode.pt);
 				walkDistance = CoordUtils.calcEuclideanDistance(coord, l.toNode.stop.getStopFacility().getCoord()); 
 				walkWaitTime = walkDistance/this.config.getBeelineWalkSpeed()/*+ttCalculator.getLinkTravelTime(l, time+walkDistance/this.config.getBeelineWalkSpeed(), person, null)*/;
 				walkRoute = RouteUtils.createGenericRouteImpl(stop==null?null:stop.getStopFacility().getLinkId(), l.toNode.stop.getStopFacility().getLinkId());
@@ -203,7 +206,8 @@ public class TransitRouterVariableImpl implements TransitRouter {
 			}
 			
 		}
-		leg = PopulationUtils.createLeg(TransportMode.transit_walk);
+		leg = PopulationUtils.createLeg(TransportMode.walk);
+		TripStructureUtils.setRoutingMode(leg, TransportMode.pt);
 		walkDistance = CoordUtils.calcEuclideanDistance(coord, toCoord); 
 		walkWaitTime = walkDistance/this.config.getBeelineWalkSpeed();
 		walkRoute = RouteUtils.createGenericRouteImpl(stop==null?null:stop.getStopFacility().getLinkId(), null);

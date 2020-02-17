@@ -22,11 +22,13 @@ package org.matsim.vehicles;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 
 /**
@@ -273,6 +275,15 @@ public final class VehicleUtils {
 	@Deprecated
 	static void setFuelConsumption(EngineInformation engineInformation, double fuelConsumption ){
 		engineInformation.getAttributes().putAttribute( FUELCONSUMPTION,  fuelConsumption);
+	}
+
+	public static Vehicles getOrCreateAllvehicles( Scenario  scenario ) {
+		Vehicles map = (Vehicles) scenario.getScenarioElement( "allvehicles" );
+		if ( map==null ) {
+			map = new VehiclesImpl();
+			scenario.addScenarioElement("allvehicles" , map);
+		}
+		return map;
 	}
 
 }

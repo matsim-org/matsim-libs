@@ -14,8 +14,8 @@ import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
 
 public class MultiModeDrtMainModeIdentifierTest {
@@ -43,14 +43,14 @@ public class MultiModeDrtMainModeIdentifierTest {
 			Assert.assertEquals(drtMode, mmi.identifyMainMode(testElements));
 		}
 		{
-			DrtStageActivityType drtStageActivityType = new DrtStageActivityType(drtMode);
+			String drtStageActivityType = PlanCalcScoreConfigGroup.createStageActivityType(drtMode);
 			List<PlanElement> testElements = new ArrayList<>();
+
+			// #deleteBeforeRelease : only used to retrofit plans created since the merge of fallback routing module (sep'-dec'19)
 			Leg l1 = PopulationUtils.createLeg(TripRouter.getFallbackMode(drtMode));
-			Activity a2 = PopulationUtils.createActivityFromCoord(drtStageActivityType.drtStageActivity,
-					new Coord(0, 0));
+			Activity a2 = PopulationUtils.createActivityFromCoord(drtStageActivityType, new Coord(0, 0));
 			Leg l2 = PopulationUtils.createLeg(drtMode);
-			Activity a3 = PopulationUtils.createActivityFromCoord(drtStageActivityType.drtStageActivity,
-					new Coord(0, 0));
+			Activity a3 = PopulationUtils.createActivityFromCoord(drtStageActivityType, new Coord(0, 0));
 			Leg l3 = PopulationUtils.createLeg(TripRouter.getFallbackMode(drtMode));
 
 			testElements.add(l1);

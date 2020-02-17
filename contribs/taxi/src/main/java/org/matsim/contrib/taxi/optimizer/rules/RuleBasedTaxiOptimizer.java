@@ -26,13 +26,13 @@ import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizer;
 import org.matsim.contrib.taxi.optimizer.UnplannedRequestInserter;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
-import org.matsim.contrib.taxi.schedule.TaxiTask;
-import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.contrib.zone.SquareGridSystem;
 import org.matsim.contrib.zone.ZonalSystem;
@@ -104,7 +104,7 @@ public class RuleBasedTaxiOptimizer extends DefaultTaxiOptimizer {
 			idleTaxiRegistry.addVehicle(vehicle);
 		} else {
 			if (schedule.getCurrentTask().getTaskIdx() != 0) {// not first task
-				TaxiTask previousTask = (TaxiTask)Schedules.getPreviousTask(schedule);
+				Task previousTask = Schedules.getPreviousTask(schedule);
 				if (isWaitStay(previousTask)) {
 					idleTaxiRegistry.removeVehicle(vehicle);
 				}
@@ -113,11 +113,11 @@ public class RuleBasedTaxiOptimizer extends DefaultTaxiOptimizer {
 	}
 
 	@Override
-	protected boolean doReoptimizeAfterNextTask(TaxiTask newCurrentTask) {
+	protected boolean doReoptimizeAfterNextTask(Task newCurrentTask) {
 		return isWaitStay(newCurrentTask);
 	}
 
-	protected boolean isWaitStay(TaxiTask task) {
-		return task.getTaxiTaskType() == TaxiTaskType.STAY;
+	protected boolean isWaitStay(Task task) {
+		return task.getTaskType() == TaxiTaskType.STAY;
 	}
 }

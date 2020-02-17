@@ -40,11 +40,11 @@ public class IntermodalAwareRouterModeIdentifierTest {
         Config config = ConfigUtils.createConfig();
         IntermodalAwareRouterModeIdentifier identifier = new IntermodalAwareRouterModeIdentifier(config);
         List<PlanElement> tripElements = Arrays.asList(
-                PopulationUtils.createLeg(TransportMode.non_network_walk),
+                PopulationUtils.createLeg(TransportMode.walk),
                 PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord(0, 0)),
                 PopulationUtils.createLeg(TransportMode.pt),
                 PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord(0, 0)),
-                PopulationUtils.createLeg(TransportMode.non_network_walk)
+                PopulationUtils.createLeg(TransportMode.walk)
         );
         String identifiedMode = identifier.identifyMainMode(tripElements);
         Assert.assertEquals(TransportMode.pt, identifiedMode);
@@ -57,16 +57,16 @@ public class IntermodalAwareRouterModeIdentifierTest {
         Config config = ConfigUtils.createConfig();
         IntermodalAwareRouterModeIdentifier identifier = new IntermodalAwareRouterModeIdentifier(config);
         List<PlanElement> tripElements = Arrays.asList(
-                PopulationUtils.createLeg(TransportMode.non_network_walk),
+                PopulationUtils.createLeg(TransportMode.walk),
                 PopulationUtils.createActivityFromCoord("bike interaction", new Coord(0, 0)),
                 PopulationUtils.createLeg(TransportMode.pt),
-                PopulationUtils.createLeg(TransportMode.non_network_walk),
+                PopulationUtils.createLeg(TransportMode.walk),
                 PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord(0, 0)),
-                PopulationUtils.createLeg(TransportMode.non_network_walk),
+                PopulationUtils.createLeg(TransportMode.walk),
                 PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord(0, 0)),
                 PopulationUtils.createLeg(TransportMode.pt),
                 PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord(0, 0)),
-                PopulationUtils.createLeg(TransportMode.non_network_walk)
+                PopulationUtils.createLeg(TransportMode.walk)
         );
         String identifiedMode = identifier.identifyMainMode(tripElements);
         Assert.assertEquals(TransportMode.pt, identifiedMode);
@@ -77,19 +77,19 @@ public class IntermodalAwareRouterModeIdentifierTest {
         Config config = ConfigUtils.createConfig();
         IntermodalAwareRouterModeIdentifier identifier = new IntermodalAwareRouterModeIdentifier(config);
         List<PlanElement> tripElements = Arrays.asList(
-                PopulationUtils.createLeg(TransportMode.non_network_walk),
+                PopulationUtils.createLeg(TransportMode.walk),
                 PopulationUtils.createActivityFromCoord("drt_interaction", new Coord(0, 0)),
                 PopulationUtils.createLeg(TransportMode.drt),
                 PopulationUtils.createActivityFromCoord("drt_interaction", new Coord(0, 0)),
-                PopulationUtils.createLeg(TransportMode.non_network_walk),
+                PopulationUtils.createLeg(TransportMode.walk),
                 PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord(0, 0)),
                 PopulationUtils.createLeg(TransportMode.pt),
                 PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord(0, 0)),
-                PopulationUtils.createLeg(TransportMode.non_network_walk),
+                PopulationUtils.createLeg(TransportMode.walk),
                 PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord(0, 0)),
                 PopulationUtils.createLeg(TransportMode.pt),
                 PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord(0, 0)),
-                PopulationUtils.createLeg(TransportMode.non_network_walk)
+                PopulationUtils.createLeg(TransportMode.walk)
         );
         String identifiedMode = identifier.identifyMainMode(tripElements);
         Assert.assertEquals(TransportMode.pt, identifiedMode);
@@ -100,19 +100,19 @@ public class IntermodalAwareRouterModeIdentifierTest {
         Config config = ConfigUtils.createConfig();
         IntermodalAwareRouterModeIdentifier identifier = new IntermodalAwareRouterModeIdentifier(config);
         List<PlanElement> tripElements = Arrays.asList(
-                PopulationUtils.createLeg(TransportMode.non_network_walk),
+                PopulationUtils.createLeg(TransportMode.walk),
                 PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord(0, 0)),
                 PopulationUtils.createLeg(TransportMode.pt),
                 PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord(0, 0)),
-                PopulationUtils.createLeg(TransportMode.non_network_walk),
+                PopulationUtils.createLeg(TransportMode.walk),
                 PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord(0, 0)),
                 PopulationUtils.createLeg(TransportMode.pt),
                 PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord(0, 0)),
-                PopulationUtils.createLeg(TransportMode.non_network_walk),
+                PopulationUtils.createLeg(TransportMode.walk),
                 PopulationUtils.createActivityFromCoord("drt2_interaction", new Coord(0, 0)),
                 PopulationUtils.createLeg("drt2"),
                 PopulationUtils.createActivityFromCoord("drt2_interaction", new Coord(0, 0)),
-                PopulationUtils.createLeg(TransportMode.non_network_walk)
+                PopulationUtils.createLeg(TransportMode.walk)
         );
         String identifiedMode = identifier.identifyMainMode(tripElements);
         Assert.assertEquals(TransportMode.pt, identifiedMode);
@@ -124,11 +124,11 @@ public class IntermodalAwareRouterModeIdentifierTest {
         config.transit().setTransitModes(CollectionUtils.stringToSet("train,bus"));
         IntermodalAwareRouterModeIdentifier identifier = new IntermodalAwareRouterModeIdentifier(config);
         List<PlanElement> tripElements = Arrays.asList(
-                PopulationUtils.createLeg(TransportMode.non_network_walk),
+                PopulationUtils.createLeg(TransportMode.walk),
                 PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord(0, 0)),
                 PopulationUtils.createLeg("train"),
                 PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord(0, 0)),
-                PopulationUtils.createLeg(TransportMode.non_network_walk)
+                PopulationUtils.createLeg(TransportMode.walk)
         );
         String identifiedMode = identifier.identifyMainMode(tripElements);
         Assert.assertEquals("train", identifiedMode);
@@ -161,11 +161,11 @@ public class IntermodalAwareRouterModeIdentifierTest {
         Config config = ConfigUtils.createConfig();
         IntermodalAwareRouterModeIdentifier identifier = new IntermodalAwareRouterModeIdentifier(config);
         List<PlanElement> tripElements = Arrays.asList(
-                PopulationUtils.createLeg(TransportMode.non_network_walk),
+                PopulationUtils.createLeg(TransportMode.walk),
                 PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord(0, 0)),
                 PopulationUtils.createLeg(TransportMode.bike),
                 PopulationUtils.createActivityFromCoord(PtConstants.TRANSIT_ACTIVITY_TYPE, new Coord(0, 0)),
-                PopulationUtils.createLeg(TransportMode.non_network_walk)
+                PopulationUtils.createLeg(TransportMode.walk)
         );
         String identifiedMode = identifier.identifyMainMode(tripElements);
         Assert.assertEquals(TransportMode.bike, identifiedMode);

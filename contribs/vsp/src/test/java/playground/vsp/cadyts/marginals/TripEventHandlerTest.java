@@ -85,23 +85,23 @@ public class TripEventHandlerTest {
 		List<TripEventHandler.Trip> tripsOfPerson102 = personTrips.get(Id.createPersonId("102"));
 		assertEquals(3, tripsOfPerson102.size());
 
-		// this trip is non_network_walk -> pt -> non_network_walk
+		// this trip is walk -> pt -> walk
 		assertEquals(TransportMode.pt, tripsOfPerson102.get(0).getMainMode());
 		assertEquals(3, tripsOfPerson102.get(0).getLegs().size());
-		assertEquals(TransportMode.non_network_walk, tripsOfPerson102.get(0).getLegs().get(0).getMode());
+		assertEquals(TransportMode.walk, tripsOfPerson102.get(0).getLegs().get(0).getMode());
 		assertEquals(TransportMode.pt, tripsOfPerson102.get(0).getLegs().get(1).getMode());
-		assertEquals(TransportMode.non_network_walk, tripsOfPerson102.get(0).getLegs().get(2).getMode());
+		assertEquals(TransportMode.walk, tripsOfPerson102.get(0).getLegs().get(2).getMode());
 
 		// this trip is only transit_walk
-		assertEquals(TransportMode.pt, tripsOfPerson102.get(1).getMainMode());
+		assertEquals(TransportMode.walk, tripsOfPerson102.get(1).getMainMode());
 		assertEquals(1, tripsOfPerson102.get(1).getLegs().size());
-		assertEquals(TransportMode.transit_walk, tripsOfPerson102.get(1).getLegs().get(0).getMode());
+		assertEquals(TransportMode.walk, tripsOfPerson102.get(1).getLegs().get(0).getMode());
 
-		// this trip is non_network_walk -> pt -> non_network_walk
+		// this trip is walk -> pt -> walk
 		assertEquals(TransportMode.pt, tripsOfPerson102.get(2).getMainMode());
 		assertEquals(3, tripsOfPerson102.get(2).getLegs().size());
-		assertEquals(TransportMode.non_network_walk, tripsOfPerson102.get(2).getLegs().get(0).getMode());
+		assertEquals(TransportMode.walk, tripsOfPerson102.get(2).getLegs().get(0).getMode());
 		assertEquals(TransportMode.pt, tripsOfPerson102.get(2).getLegs().get(1).getMode());
-		assertEquals(TransportMode.non_network_walk, tripsOfPerson102.get(2).getLegs().get(2).getMode());
+		assertEquals(TransportMode.walk, tripsOfPerson102.get(2).getLegs().get(2).getMode());
 	}
 }

@@ -44,7 +44,31 @@ public class PlansCalcRouteConfigGroupTest {
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void test1() {
+	public void testAddModeParamsTwice() {
+		String outdir = utils.getOutputDirectory();
+		final String filename = outdir + "config.xml";
+		{
+			Config config = ConfigUtils.createConfig();
+			PlansCalcRouteConfigGroup group = config.plansCalcRoute();
+			Assert.assertEquals( N_MODE_ROUTING_PARAMS_DEFAULT, group.getModeRoutingParams().size() );
+			group.clearModeRoutingParams();
+//			group.setTeleportedModeSpeed( TransportMode.bike, 1. );
+//			Assert.assertEquals( 1, group.getModeRoutingParams().size() );
+//			group.setTeleportedModeSpeed( TransportMode.bike, 2. );
+//			Assert.assertEquals( 2, group.getModeRoutingParams().size() );
+//			group.clearModeRoutingParams();
+//			Assert.assertEquals( 0, group.getModeRoutingParams().size() );
+
+			ConfigUtils.writeConfig( config, filename );
+		}
+		{
+			Config config = ConfigUtils.loadConfig( filename ) ;
+			PlansCalcRouteConfigGroup group = config.plansCalcRoute();
+			Assert.assertEquals( 0, group.getModeRoutingParams().size() );
+		}
+	}
+	@Test
+	public void testClearParamsWriteRead() {
 		String outdir = utils.getOutputDirectory();
 		final String filename = outdir + "config.xml";
 		{
@@ -68,7 +92,7 @@ public class PlansCalcRouteConfigGroupTest {
 		}
 	}
 	@Test
-	public void test1b() {
+	public void testRemoveParamsWriteRead() {
 		String outdir = utils.getOutputDirectory();
 		final String filename = outdir + "config.xml";
 		{
@@ -93,7 +117,7 @@ public class PlansCalcRouteConfigGroupTest {
 		}
 	}
 	@Test
-	public void test2() {
+	public void testClearDefaults() {
 		Config config = ConfigUtils.createConfig(  ) ;
 		PlansCalcRouteConfigGroup group = config.plansCalcRoute() ;
 		Assert.assertEquals( N_MODE_ROUTING_PARAMS_DEFAULT, group.getModeRoutingParams().size() );
@@ -112,7 +136,7 @@ public class PlansCalcRouteConfigGroupTest {
 		group.setClearingDefaultModeRoutingParams( true ); // should be ok
 	}
 	@Test( expected = RuntimeException.class )
-	public void test4() {
+	public void testInconsistencyBetweenActionAndState() {
 		PlansCalcRouteConfigGroup group = new PlansCalcRouteConfigGroup() ;
 		group.clearModeRoutingParams();
 		group.setClearingDefaultModeRoutingParams( false ); // should fail
