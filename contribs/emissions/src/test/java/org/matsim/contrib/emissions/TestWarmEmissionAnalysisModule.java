@@ -268,7 +268,7 @@ public class TestWarmEmissionAnalysisModule {
 			// test resulting event:
 			switch( emissionsComputationMethod ) {
 				case StopAndGoFraction:
-					Assert.assertEquals( 0.9, HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON );
+					Assert.assertEquals( 2.3, HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON ); //seems to be (0.1 * number of entries in enum Pollutant)
 					break;
 				case AverageSpeed:
 					Assert.assertEquals( pollutants.size() * DETAILED_PC_FACTOR_FF * pclinkLength / 1000., HandlerToTestEmissionAnalysisModules.getSum(),
