@@ -59,6 +59,14 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 				persKValuesReader.readFile(pkValuesFileName);
 				facKValuesReader.readFile(fkValuesFileName);
 				log.info("reading kvals from files:\n"+ pkValuesFileName + "\n" + fkValuesFileName);
+
+				for (Person p : this.scenario.getPopulation().getPersons().values()) {
+					p.getAttributes().putAttribute( "k", personsKValues.getAttribute(p.getId().toString(), "k"));
+				}
+				for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
+					facility.getAttributes().putAttribute("k", facilitiesKValues.getAttribute(facility.getId().toString(), "k"));
+				}
+
 				return 0;
 			} catch  (UncheckedIOException e) {
 				// reading was not successful
