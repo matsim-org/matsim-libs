@@ -54,7 +54,8 @@ import org.matsim.vehicles.Vehicle;
  * (obviously) depends on the fact that the counts are actually what it thinks, and so it makes sense to decouple this from the upstream
  * counting method and leave it here. kai, sep'13 
  */
-public class CadytsPtOccupancyAnalyzer implements CadytsPtOccupancyAnalyzerI {
+final class CadytsPtOccupancyAnalyzer implements CadytsPtOccupancyAnalyzerI {
+	// can be/remain public as long as constructor is package-private.  kai, feb'20
 
 	private final int timeBinSize, maxSlotIndex;
 	private final double maxTime;
@@ -67,10 +68,10 @@ public class CadytsPtOccupancyAnalyzer implements CadytsPtOccupancyAnalyzerI {
 	private final Set<Id<TransitLine>> calibratedLines;
 
 	@Inject
-	public CadytsPtOccupancyAnalyzer( Config config ) {
+	CadytsPtOccupancyAnalyzer( Config config ) {
 		CadytsConfigGroup ccc = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class ) ;
 
-		this.calibratedLines = toTransitLineIdSet( ccc.getCalibratedItems() ) ;
+		this.calibratedLines = toTransitLineIdSet( ccc.getCalibratedLines() ) ;
 		this.timeBinSize = ccc.getTimeBinSize() ;
 
 		this.maxTime = Time.MIDNIGHT-1; //24 * 3600 - 1;

@@ -74,8 +74,8 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 	private VolumesAnalyzer volumesAnalyzer;
 	private OutputDirectoryHierarchy controlerIO;
 
-	@Inject
-	CadytsContext(Config config, Scenario scenario, @Named("calibration") Counts<Link> calibrationCounts, EventsManager eventsManager, VolumesAnalyzer volumesAnalyzer, OutputDirectoryHierarchy controlerIO) {
+	@Inject CadytsContext( Config config, Scenario scenario, @Named(CadytsCarModule.CALIBRATION) Counts<Link> calibrationCounts,
+			       EventsManager eventsManager, VolumesAnalyzer volumesAnalyzer, OutputDirectoryHierarchy controlerIO) {
 		this.scenario = scenario;
 		this.calibrationCounts = calibrationCounts;
 		this.eventsManager = eventsManager;
@@ -83,9 +83,11 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		this.controlerIO = controlerIO;
 		this.countsScaleFactor = config.counts().getCountsScaleFactor();
 
-		CadytsConfigGroup cadytsConfig = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
-		// addModule() also initializes the config group with the values read from the config file
+		CadytsConfigGroup cadytsConfig = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.class);
+		// (also initializes the config group with the values read from the config file)
+
 		cadytsConfig.setWriteAnalysisFile(true);
+		// yyyy not so good to just overwrite config.  kai, feb'20
 
 
 		Set<String> countedLinks = new TreeSet<>();
@@ -93,7 +95,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 			countedLinks.add(id.toString());
 		}
 
-		cadytsConfig.setCalibratedItems(countedLinks);
+		cadytsConfig.setCalibratedLinks(countedLinks);
 
 		this.writeAnalysisFile = cadytsConfig.isWriteAnalysisFile();
 	}

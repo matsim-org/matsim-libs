@@ -23,6 +23,7 @@ import cadyts.interfaces.matsim.MATSimUtilityModificationCalibrator;
 import org.apache.commons.math3.geometry.euclidean.threed.NotARotationMatrixException;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -51,7 +52,7 @@ public class CadytsConfigGroup extends ReflectiveConfigGroup{
 
 	private static final String CALIBRATED_LINKS = "calibratedLinks";
 	public static final String CALIBRATED_LINES = "calibratedLines";
-	private static final String CALIBRATED_ITEMS = "calibratedItems";
+//	private static final String CALIBRATED_ITEMS = "calibratedItems";
 
 	private double regressionInertia = MATSimUtilityModificationCalibrator.DEFAULT_REGRESSION_INERTIA;
 	private double minFlowStddev = MATSimUtilityModificationCalibrator.DEFAULT_MIN_FLOW_STDDEV_VEH_H;
@@ -65,6 +66,8 @@ public class CadytsConfigGroup extends ReflectiveConfigGroup{
 	private int timeBinSize = 3600 ;
 
 	private final Set<String> calibratedItems = new HashSet<>();
+	private final Set<String> calibratedLines = new HashSet<>();
+	private final Set<String> calibratedLinks = new HashSet<>();
 
 	public CadytsConfigGroup() {
 		super(GROUP_NAME);
@@ -109,7 +112,7 @@ public class CadytsConfigGroup extends ReflectiveConfigGroup{
 	public final Map<String, String> getComments() {
 		Map<String, String> comments = super.getComments();
 
-		comments.put(CALIBRATED_ITEMS, "Comma-separated list of items with counts  to be calibrated.");
+//		comments.put(CALIBRATED_ITEMS, "Comma-separated list of items with counts  to be calibrated.");
 		comments.put(START_TIME, "The first second of the day to be used for calibration.  hh:mm:ss format");
 		comments.put(END_TIME, "The last second of the day to be used for calibration.  hh:mm:ss format");
 		comments.put(TIME_BIN_SIZE, "Length of time bin for which counts are aggregated.  IN SECONDS!!!!  Default is 3600.") ;
@@ -213,27 +216,47 @@ public class CadytsConfigGroup extends ReflectiveConfigGroup{
 	public final int getEndTime() {
 		return this.endTime;
 	}
-	// ---
-	@StringGetter( CALIBRATED_ITEMS )
-	private String getCalibratedItemsAsString() { return CollectionUtils.setToString( this.calibratedItems ); }
-	@StringSetter( CALIBRATED_ITEMS )
-	private void setCalibratedItemsAsString( String string ) { setCalibratedItems( CollectionUtils.stringToSet( string ) ); }
-	@StringGetter( CALIBRATED_LINES )
-	private String getCalibratedLinesAsString() { return CollectionUtils.setToString( this.calibratedItems ); }
-	@StringSetter( CALIBRATED_LINES )
-	private void setCalibratedLinesAsString( String string ) { setCalibratedItems( CollectionUtils.stringToSet( string ) ); }
-	@StringGetter( CALIBRATED_LINKS )
-	private String getCalibratedLinksAsString() { return CollectionUtils.setToString( this.calibratedItems ); }
-	@StringSetter( CALIBRATED_LINKS )
-	private void setCalibratedLinksAsString( String string ) { setCalibratedItems( CollectionUtils.stringToSet( string ) ); }
-	// ---
-	public final Set<String> getCalibratedItems() {
-		return Collections.unmodifiableSet(this.calibratedItems);
-	}
+	// ===
+//	@StringGetter( CALIBRATED_ITEMS )
+//	private String getCalibratedItemsAsString() { return CollectionUtils.setToString( this.calibratedItems ); }
+//	@StringSetter( CALIBRATED_ITEMS )
+//	private void setCalibratedItemsAsString( String string ) { setCalibratedItems( CollectionUtils.stringToSet( string ) ); }
+//	// ---
+//	public final Set<String> getCalibratedItems() {
+//		return Collections.unmodifiableSet(this.calibratedItems);
+//	}
 	public final void setCalibratedItems(final Set<String> links) {
-		this.calibratedItems.clear();
-		this.calibratedItems.addAll(links);
+//		this.calibratedItems.clear();
+//		this.calibratedItems.addAll(links);
+		throw new RuntimeException( Gbl.NOT_IMPLEMENTED );
 	}
+	// ===
+	@StringGetter( CALIBRATED_LINES )
+	private String getCalibratedLinesAsString() { return CollectionUtils.setToString( this.calibratedLines ); }
+	@StringSetter( CALIBRATED_LINES )
+	private void setCalibratedLinesAsString( String string ) { setCalibratedLines( CollectionUtils.stringToSet( string ) ); }
+	// ---
+	public final Set<String> getCalibratedLines() {
+		return Collections.unmodifiableSet(this.calibratedLines);
+	}
+	public final void setCalibratedLines(final Set<String> links) {
+		this.calibratedLines.clear();
+		this.calibratedLines.addAll(links);
+	}
+	// ===
+	@StringGetter( CALIBRATED_LINKS )
+	private String getCalibratedLinksAsString() { return CollectionUtils.setToString( this.calibratedLinks ); }
+	@StringSetter( CALIBRATED_LINKS )
+	private void setCalibratedLinksAsString( String string ) { setCalibratedLinks( CollectionUtils.stringToSet( string ) ); }
+	// ---
+	public final Set<String> getCalibratedLinks() {
+		return Collections.unmodifiableSet(this.calibratedLinks);
+	}
+	public final void setCalibratedLinks(final Set<String> links) {
+		this.calibratedLinks.clear();
+		this.calibratedLinks.addAll(links);
+	}
+	// ===
 	@StringGetter( TIME_BIN_SIZE )
 	public final int getTimeBinSize() {
 		return timeBinSize;
