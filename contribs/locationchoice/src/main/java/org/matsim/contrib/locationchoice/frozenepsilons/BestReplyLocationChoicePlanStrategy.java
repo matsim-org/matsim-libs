@@ -68,8 +68,6 @@ class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 
 		DestinationChoiceContext lcContext = (DestinationChoiceContext) scenario.getScenarioElement(DestinationChoiceContext.ELEMENT_NAME);
 
-		MaxDCScoreWrapper maxDcScoreWrapper = (MaxDCScoreWrapper)scenario.getScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME);
-
 		if ( !FrozenTastesConfigGroup.Algotype.bestResponse.equals(dccg.getAlgorithm() )) {
 			throw new RuntimeException("wrong class for selected location choice algorithm type; aborting ...") ;
 		}
