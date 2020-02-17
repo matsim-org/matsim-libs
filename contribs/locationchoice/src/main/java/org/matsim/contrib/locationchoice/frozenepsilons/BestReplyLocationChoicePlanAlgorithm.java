@@ -124,10 +124,6 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 
 		// yyyy todo reconstruct the algo based on PlanElements with algo based on trips, using the following material:
 		List<Activity> activities = TripStructureUtils.getActivities( plan, ExcludeStageActivities );
-		List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(plan);
-		if (trips.size() + 1 != activities.size()) {
-			throw new ValueException("Wrong amount of trips or activities");
-		}
 
 		int actLegIndex = -1;
 		for (Activity activity : activities) {

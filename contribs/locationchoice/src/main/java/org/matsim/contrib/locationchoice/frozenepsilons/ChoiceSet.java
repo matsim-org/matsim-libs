@@ -107,8 +107,7 @@ class ChoiceSet {
 		} else {
 			// if we have no destinations defined so far, we can shorten this
 			// currently handled activity which should be re-located
-			List<Activity> activities = TripStructureUtils.getActivities( plan, ExcludeStageActivities );
-			Activity act = activities.get(actlegIndex);
+			Activity act = TripStructureUtils.getActivities( plan, ExcludeStageActivities ).get(actlegIndex);
 			//			list = createEmptyChoiceMap( act.getFacilityId() );
 			list = Collections.singletonList( new ScoredAlternative( 0., act.getFacilityId() ) ) ;
 			// (the "0" is a dummy entry!)
@@ -127,8 +126,12 @@ class ChoiceSet {
 	}
 
 	/**
+	 * the following two lines seem to be outdated:
 	 * The "score", which is behind the "Double" in the TreeMap, is some pseudo score 0.6, 0.84, ..., see {ChoiceSet#generateReducedChoiceSet(ArrayList)}.
 	 * Well, no, not any more, just setting all of them to 0.2.
+	 *
+	 *
+	 *
 	 */
 	private List<ScoredAlternative> createReducedChoiceSetWithPseudoScores(
 		  int actlegIndex,
@@ -214,7 +217,6 @@ class ChoiceSet {
 
 						{
 							Activity previousActivity = activities.get(actlegIndex - 1);
-							deleteUslessPlanElements(actlegIndex, planTmp, activities, -1);
 							Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity( previousActivity, scenario );
 							link = scenario.getNetwork().getLinks().get( linkId );
 
@@ -231,7 +233,6 @@ class ChoiceSet {
 						Leg nextLeg = PopulationUtils.getNextLeg( planTmp, activityToRelocate );
 						{
 							Activity nextAct = activities.get(actlegIndex + 1);
-							deleteUslessPlanElements(actlegIndex, planTmp, activities, 1);
 							Id<Link> linkId = PopulationUtils.decideOnLinkIdForActivity( Objects.requireNonNull( nextAct ), scenario );
 							link = scenario.getNetwork().getLinks().get( linkId );
 						}
@@ -263,32 +264,6 @@ class ChoiceSet {
 		} else  {
 			// I don't think that this can happen.  But it was in the code before, and better safe than sorry.  kai, mar'19
 			return Collections.singletonList( new ScoredAlternative( largestValue, facilityIdWithLargestScore ) )  ;
-		}
-	}
-
-	private void deleteUslessPlanElements(int actlegIndex, Plan planTmp, List<Activity> activities, int indexOtherActivity) {
-		boolean deletPe = false;
-		for (PlanElement pe : planTmp.getPlanElements()) {
-			if (pe instanceof Activity) {
-				Activity activity = (Activity) pe;
-				if (activity.toString().equals(activities.get(actlegIndex + indexOtherActivity).toString())) {
-					if (indexOtherActivity > 0) {
-						return;
-					}
-					deletPe = true;
-				}
-				if (activity.toString().equals(activities.get(actlegIndex).toString())) {
-					if (indexOtherActivity < 0) {
-						return;
-					}
-					deletPe = true;
-				}
-			}
-			if (deletPe && pe instanceof Leg) {
-				Leg leg = (Leg) pe;
-				leg.getRoute().setTravelTime(0);
-				leg.getRoute().setDistance(0);
-			}
 		}
 	}
 
