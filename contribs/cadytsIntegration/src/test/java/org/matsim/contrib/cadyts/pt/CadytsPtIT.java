@@ -649,10 +649,13 @@ public class CadytsPtIT {
 			params.setTypicalDuration(8*60*60.) ;
 		}
 		// ---
-		ConfigGroup cadytsPtConfig = config.createModule(CadytsConfigGroup.GROUP_NAME ) ;
+//		ConfigGroup cadytsPtConfig = config.createModule(CadytsConfigGroup.GROUP_NAME ) ;
+		CadytsConfigGroup cadytsPtConfig = ConfigUtils.addOrGetModule( config, CadytsConfigGroup.class );
 
-		cadytsPtConfig.addParam(CadytsConfigGroup.START_TIME, "04:00:00") ;
-		cadytsPtConfig.addParam(CadytsConfigGroup.END_TIME, "20:00:00" ) ;
+//		cadytsPtConfig.addParam(CadytsConfigGroup.START_TIME, "04:00:00") ;
+		cadytsPtConfig.setStartTime( 4*3600 );
+//		cadytsPtConfig.addParam(CadytsConfigGroup.END_TIME, "20:00:00" ) ;
+		cadytsPtConfig.setEndTime( 20*3600 );
 		cadytsPtConfig.addParam(CadytsConfigGroup.REGRESSION_INERTIA, "0.95") ;
 		cadytsPtConfig.addParam(CadytsConfigGroup.USE_BRUTE_FORCE, "true") ;
 		cadytsPtConfig.addParam(CadytsConfigGroup.MIN_FLOW_STDDEV, "8") ;
@@ -660,8 +663,8 @@ public class CadytsPtIT {
 		cadytsPtConfig.addParam(CadytsConfigGroup.TIME_BIN_SIZE, "3600") ;
 		cadytsPtConfig.addParam(CadytsConfigGroup.CALIBRATED_LINES, "M44,M43") ;
 
-		CadytsConfigGroup ccc = new CadytsConfigGroup() ;
-		config.addModule(ccc) ;
+//		CadytsConfigGroup ccc = new CadytsConfigGroup() ;
+//		config.addModule(ccc) ;
 
 
 		// ---
