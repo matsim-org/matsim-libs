@@ -99,6 +99,7 @@ public class NonAlternatingPlanElementsIT {
 		Config config = this.utils.loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setMobsim("qsim");
 		config.controler().setLastIteration(10);
+		config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
 		config.strategy().addParam("Module_2", "ReRoute");
 		config.strategy().addParam("ModuleProbability_2", "1.0");
 		config.transit().setUseTransit(true);
