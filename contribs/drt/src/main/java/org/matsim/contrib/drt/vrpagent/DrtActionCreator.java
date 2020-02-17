@@ -20,11 +20,12 @@
 package org.matsim.contrib.drt.vrpagent;
 
 import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.drt.schedule.DrtTask;
+import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.passenger.BusStopActivity;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineTrackerListener;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
@@ -54,8 +55,8 @@ public class DrtActionCreator implements VrpAgentLogic.DynActionCreator {
 
 	@Override
 	public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
-		DrtTask task = (DrtTask)vehicle.getSchedule().getCurrentTask();
-		switch (task.getDrtTaskType()) {
+		Task task = vehicle.getSchedule().getCurrentTask();
+		switch (((DrtTaskType)task.getTaskType())) {
 			case DRIVE:
 				return legFactory.create(vehicle);
 

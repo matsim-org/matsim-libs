@@ -28,8 +28,7 @@ import org.matsim.contrib.dvrp.passenger.RequestQueue;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.passenger.TaxiRequest;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.schedule.TaxiTask;
-import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
+import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -108,12 +107,12 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 
 		Task newCurrentTask = vehicle.getSchedule().nextTask();
 		if (!requiresReoptimization && newCurrentTask != null) {// schedule != COMPLETED
-			requiresReoptimization = doReoptimizeAfterNextTask((TaxiTask)newCurrentTask);
+			requiresReoptimization = doReoptimizeAfterNextTask(newCurrentTask);
 		}
 	}
 
-	protected boolean doReoptimizeAfterNextTask(TaxiTask newCurrentTask) {
-		return !taxiCfg.isDestinationKnown() && newCurrentTask.getTaxiTaskType() == TaxiTaskType.OCCUPIED_DRIVE;
+	protected boolean doReoptimizeAfterNextTask(Task newCurrentTask) {
+		return !taxiCfg.isDestinationKnown() && newCurrentTask.getTaskType() == TaxiTaskType.OCCUPIED_DRIVE;
 	}
 
 	protected void setRequiresReoptimization(boolean requiresReoptimization) {
