@@ -616,6 +616,7 @@ public class CadytsPtIT {
 		config.network().setInputFile(inputDir + "network.xml") ;
 		// ---
 		config.plans().setInputFile(inputDir + "4plans.xml") ;
+		config.plans().setInsistingOnUsingDeprecatedPlansWithoutRoutingMode(true);
 		// ---
 		config.transit().setUseTransit(true) ;
 		// ---

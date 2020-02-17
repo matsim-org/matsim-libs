@@ -46,6 +46,7 @@ public class TransitLoadIntegrationTest {
 	public void testIntegration() {
 		final Config cfg = this.util.loadConfig("test/scenarios/pt-tutorial/0.config.xml");
 		cfg.controler().setLastIteration(0);
+		cfg.plans().setInsistingOnUsingDeprecatedPlansWithoutRoutingMode(true);
 		final Scenario s = ScenarioUtils.loadScenario(cfg);
 		final Controler c = new Controler(s);
 		final TransitLoad transitload = new TransitLoad();

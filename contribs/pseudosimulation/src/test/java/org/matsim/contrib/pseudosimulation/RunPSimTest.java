@@ -80,7 +80,7 @@ public class RunPSimTest {
 		config.controler().setOutputDirectory( outDir );
 		config.controler().setLastIteration(20);
 //		config.controler().setDumpDataAtEnd(false);
-
+		config.plans().setInsistingOnUsingDeprecatedPlansWithoutRoutingMode(true);
 //		config.strategy().setFractionOfIterationsToDisableInnovation( 0.8 ); // crashes
 
 
@@ -122,6 +122,7 @@ public class RunPSimTest {
 		config.controler().setLastIteration(2);
 		config.controler().setCreateGraphs(false);
 		config.controler().setDumpDataAtEnd(false);
+		config.plans().setInsistingOnUsingDeprecatedPlansWithoutRoutingMode(true);
 		Controler controler = new Controler(config);
 		ExecScoreTracker execScoreTracker = new ExecScoreTracker(controler);
 		controler.addControlerListener(execScoreTracker);

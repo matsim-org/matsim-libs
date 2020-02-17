@@ -43,6 +43,7 @@ public class TripEventHandlerTest {
 		// url is such a weird api
 		URL ptTutorial = URI.create(ExamplesUtils.getTestScenarioURL("pt-tutorial").toString() + "0.config.xml").toURL();
 		Config config = ConfigUtils.loadConfig(ptTutorial);
+        config.plans().setInsistingOnUsingDeprecatedPlansWithoutRoutingMode(true);
 
 		// use the config and run only one iteration
 		config.controler().setFirstIteration(0);
