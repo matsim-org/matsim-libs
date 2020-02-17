@@ -66,6 +66,7 @@ import org.matsim.core.mobsim.qsim.SingletonUmlaufBuilderImpl;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine.TransitAgentTriesToTeleportException;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -781,12 +782,14 @@ public class TransitQueueSimulationTest {
         route1.setTravelTime(10.0);
         route1.setDistance(10.0);
         leg1.setRoute(route1);
+        TripStructureUtils.setRoutingMode(leg1, TransportMode.pt);
         Activity act2 = pb.createActivityFromLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, link1.getId());
         act2.setEndTime(0.0);
         Leg leg2 = pb.createLeg(TransportMode.pt);
         Route route2 = new ExperimentalTransitRoute(stopFacility1, tLine, tRoute, stopFacility2);
         route2.setTravelTime(100.0);
         leg2.setRoute(route2);
+        TripStructureUtils.setRoutingMode(leg2, TransportMode.pt);
         Activity act3 = pb.createActivityFromLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, link1.getId());
         act3.setEndTime(0.0);
         Leg leg3 = pb.createLeg(TransportMode.walk);
@@ -794,6 +797,7 @@ public class TransitQueueSimulationTest {
         route3.setTravelTime(10.0);
         route3.setDistance(10.0);
         leg3.setRoute(route3);
+        TripStructureUtils.setRoutingMode(leg3, TransportMode.pt);
         Activity act4 = pb.createActivityFromLinkId("w", link2.getId());
 
         plan.addActivity(act1);

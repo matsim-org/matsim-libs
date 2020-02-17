@@ -18,6 +18,7 @@ import org.matsim.contrib.pseudosimulation.mobsim.transitperformance.TransitEmul
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.HandlingOfPlansWithoutRoutingMode;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
@@ -80,7 +81,7 @@ public class RunPSimTest {
 		config.controler().setOutputDirectory( outDir );
 		config.controler().setLastIteration(20);
 //		config.controler().setDumpDataAtEnd(false);
-
+		config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
 //		config.strategy().setFractionOfIterationsToDisableInnovation( 0.8 ); // crashes
 
 
@@ -122,6 +123,7 @@ public class RunPSimTest {
 		config.controler().setLastIteration(2);
 		config.controler().setCreateGraphs(false);
 		config.controler().setDumpDataAtEnd(false);
+		config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
 		Controler controler = new Controler(config);
 		ExecScoreTracker execScoreTracker = new ExecScoreTracker(controler);
 		controler.addControlerListener(execScoreTracker);
