@@ -49,6 +49,8 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static org.matsim.contrib.cadyts.general.CadytsBuilderImpl.*;
+
 /**
  * {@link PlanStrategy Plan Strategy} used for replanning in MATSim which uses Cadyts to
  * select plans that better match to given occupancy counts.
@@ -109,7 +111,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		this.plansTranslator = new PlansTranslatorBasedOnEvents(scenario);
 		this.eventsManager.addHandler(plansTranslator);
 
-		this.calibrator = new CadytsBuilderImpl().buildCalibratorAndAddMeasurements(scenario.getConfig(), this.calibrationCounts , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/, Link.class);
+		this.calibrator = buildCalibratorAndAddMeasurements(scenario.getConfig(), this.calibrationCounts , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/, Link.class );
 	}
 
 	@Override

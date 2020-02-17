@@ -95,8 +95,10 @@ public class CadytsCarIT {
 		strategySettings.setWeight(1.0) ;
 		config.strategy().addStrategySettings(strategySettings);
 		CadytsConfigGroup cadytsCar = ConfigUtils.addOrGetModule(config, CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class);
-		cadytsCar.addParam("startTime", "04:00:00");
-		cadytsCar.addParam("endTime", "20:00:00");
+//		cadytsCar.addParam("startTime", "04:00:00");
+		cadytsCar.setStartTime( 4*3600 );
+//		cadytsCar.addParam("endTime", "20:00:00");
+		cadytsCar.setEndTime( 20*3600 );
 		cadytsCar.addParam("regressionInertia", "0.95");
 		cadytsCar.addParam("useBruteForce", "true");
 		cadytsCar.addParam("minFlowStddevVehH", "8");

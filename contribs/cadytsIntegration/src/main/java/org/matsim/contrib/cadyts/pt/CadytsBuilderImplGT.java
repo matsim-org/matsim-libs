@@ -38,7 +38,11 @@ import cadyts.measurements.SingleLinkMeasurement;
  * @author mrieser
  */
 public final class CadytsBuilderImplGT {
+	// yyyy why "GT"?  Is this a typo and should have been PT (or Pt, to be consistent with other classes)? kai, feb'20
+
 	private static Logger log = Logger.getLogger( CadytsBuilderImplGT.class ) ;
+
+	private CadytsBuilderImplGT(){} // do not instantiate
 
 	public static <T> AnalyticalCalibrator<T> buildCalibratorAndAddMeasurements(final Config config, final Counts<T> occupCounts,
 																		 LookUpItemFromId<T> lookUp, Class<T> idType ) {
