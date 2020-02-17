@@ -89,14 +89,17 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		cadytsConfig.setWriteAnalysisFile(true);
 		// yyyy not so good to just overwrite config.  kai, feb'20
 
+		if ( cadytsConfig.getCalibratedLinks().isEmpty() ){
+			// found this without the above condition, i.e. it would always set the calibrated links to all links for which there exist counts.
+			// However, the logic for ptCounts is different, and there it would probably make sense to keep the functionality that only some
+			// lines are calibrated.  So, for symmetry, would make sense to also make it functional here.  ????  kai, feb'20
 
-		Set<String> countedLinks = new TreeSet<>();
-		for (Id<Link> id : this.calibrationCounts.getCounts().keySet()) {
-			countedLinks.add(id.toString());
+			Set<String> countedLinks = new TreeSet<>();
+			for( Id<Link> id : this.calibrationCounts.getCounts().keySet() ){
+				countedLinks.add( id.toString() );
+			}
+			cadytsConfig.setCalibratedLinks( countedLinks );
 		}
-
-		cadytsConfig.setCalibratedLinks(countedLinks);
-
 		this.writeAnalysisFile = cadytsConfig.isWriteAnalysisFile();
 	}
 
