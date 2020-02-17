@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.JointDemandUtils;
-import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.CommercialTrafficConfigGroup;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.JointDemandConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
@@ -44,7 +44,7 @@ public class TestScenarioGeneration {
 
 
     public static Scenario generateScenario(){
-        Config config = loadConfig("config.xml",new CommercialTrafficConfigGroup());
+        Config config = loadConfig("config.xml",new JointDemandConfigGroup());
         Scenario scenario = createScenario(config);
         addPopulation(scenario);
         return scenario;

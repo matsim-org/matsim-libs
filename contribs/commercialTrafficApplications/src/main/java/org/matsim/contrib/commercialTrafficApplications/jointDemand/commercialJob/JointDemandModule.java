@@ -46,7 +46,7 @@ public class JointDemandModule extends AbstractModule {
             installDRT();
         }
 
-        CommercialTrafficConfigGroup ctcg = CommercialTrafficConfigGroup.get(getConfig());
+        JointDemandConfigGroup ctcg = JointDemandConfigGroup.get(getConfig());
 
         bind(CommercialJobScoreCalculator.class).toInstance(new DefaultCommercialServiceScore(ctcg.getMaxJobScore(), ctcg.getMinJobScore(), ctcg.getZeroUtilityDelay()));
         bind(Carriers.class).toProvider(new CarrierProvider());
