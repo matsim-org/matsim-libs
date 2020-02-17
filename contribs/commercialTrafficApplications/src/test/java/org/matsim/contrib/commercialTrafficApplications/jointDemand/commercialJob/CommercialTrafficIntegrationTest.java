@@ -16,7 +16,7 @@ public class CommercialTrafficIntegrationTest {
     public void runCommercialTrafficIT() {
         Config config = ConfigUtils.loadConfig("config.xml");
         config.controler().setLastIteration(5);
-        ConfigUtils.addOrGetModule(config, CommercialTrafficConfigGroup.class);
+        ConfigUtils.addOrGetModule(config, JointDemandConfigGroup.class);
         FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
         freightConfigGroup.setCarriersFile("test-carriers-car.xml");
         freightConfigGroup.setCarriersVehicleTypesFile("vehicleTypes.xml");

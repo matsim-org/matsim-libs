@@ -51,8 +51,8 @@ public class IsTheRightCustomerScoredTest {
         Config config = ConfigUtils.loadConfig("config.xml");
         config.controler().setLastIteration(0);
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-        CommercialTrafficConfigGroup commercialTrafficConfigGroup = ConfigUtils.addOrGetModule(config, CommercialTrafficConfigGroup.class);
-        commercialTrafficConfigGroup.setMaxJobScore(MAX_JOB_SCORE);
+        JointDemandConfigGroup jointDemandConfigGroup = ConfigUtils.addOrGetModule(config, JointDemandConfigGroup.class);
+        jointDemandConfigGroup.setMaxJobScore(MAX_JOB_SCORE);
         FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
         freightConfigGroup.setCarriersFile("test-carriers-car.xml");
         freightConfigGroup.setCarriersVehicleTypesFile("vehicleTypes.xml");
