@@ -25,7 +25,7 @@ import static org.matsim.core.config.ConfigUtils.loadConfig;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.ChangeCommercialJobOperator;
-import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.CommercialTrafficConfigGroup;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.JointDemandConfigGroup;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.JointDemandModule;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtConfigs;
@@ -116,8 +116,8 @@ class RunJointDemandDRTExample {
         drtCfg.setVehiclesFile("drtVehicles.xml");
         multiModeDrtConfigGroup.addParameterSet(drtCfg);
 
-        CommercialTrafficConfigGroup commercialTrafficConfigGroup = ConfigUtils.addOrGetModule(config, CommercialTrafficConfigGroup.class);
-        commercialTrafficConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
+        JointDemandConfigGroup jointDemandConfigGroup = ConfigUtils.addOrGetModule(config, JointDemandConfigGroup.class);
+        jointDemandConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
 
         FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
         freightConfigGroup.setCarriersFile("test-carriers-drt.xml");
