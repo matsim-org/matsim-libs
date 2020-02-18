@@ -76,7 +76,7 @@ import static org.matsim.contrib.emissions.utils.EmissionsConfigGroup.EmissionsC
 public class TestWarmEmissionAnalysisModule {
 
 	//Old list of pollutants
-//	private final Set<String> pollutants = new HashSet<>(Arrays.asList("CO", "CO2(total)", "FC", "HC", "NMHC", "NOx", "NO2","PM", "SO2"));
+//	private final Set<String> pollutants = new HashSet<>(Arrays.asList(CO, CO2_TOTAL, FC, HC, NMHC, NOx, NO2,PM, SO2));
 	private static final Set<Pollutant> pollutants = new HashSet<>( Arrays.asList( Pollutant.values() ));
 	private static final String HBEFA_ROAD_CATEGORY = "URB";
 	private final int leaveTime = 0;
@@ -214,7 +214,7 @@ public class TestWarmEmissionAnalysisModule {
 		Vehicle vehicle = vehFac.createVehicle(vehicleId, vehFac.createVehicleType(vehicleTypeId));
 
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, mockLink, linkLength/ PETROL_SPEED_FF *3.6 );
-//		Assert.assertEquals(detailedPetrolFactorFf*linkLength/1000., warmEmissions.get("CO2(total)"), MatsimTestUtils.EPSILON);
+//		Assert.assertEquals(detailedPetrolFactorFf*linkLength/1000., warmEmissions.get(CO2_TOTAL), MatsimTestUtils.EPSILON);
 		Assert.assertEquals( DETAILED_PETROL_FACTOR_FF *linkLength/1000., warmEmissions.get( CO2_TOTAL ), MatsimTestUtils.EPSILON );
 		HandlerToTestEmissionAnalysisModules.reset();
 

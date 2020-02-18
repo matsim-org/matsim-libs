@@ -52,6 +52,6 @@ public enum Pollutant{
 }
 
 	/* CO2 not directly available for cold emissions; thus it could be calculated through FC, CO, and HC as follows:
-	get("FC")*0.865 - get("CO")*0.429 - get("HC")*0.866) / 0.273;*/
+	get("FC")*0.865 - get(CO)*0.429 - get("HC")*0.866) / 0.273;*/
 // ???? kai, jan'20
 

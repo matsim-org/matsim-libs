@@ -52,7 +52,7 @@ public class TestColdEmissionEventImpl {
     private final Id<Vehicle> vehicleId = Id.create("veh 1", Vehicle.class);
     private final Id<Link> linkId = Id.create("link 1", Link.class);
 
-	private final Set<String> coldPollutants = new HashSet<>(Arrays.asList("CO", "FC", "HC", "NMHC", "NOx", "NO2","PM"));
+	private final Set<Pollutant> coldPollutants = new HashSet<>(Arrays.asList(CO, FC, HC, NMHC, NOx, NO2,PM));
 
 	@Test
 	public final void testGetAttributesForCompleteEmissionMaps(){
@@ -64,13 +64,20 @@ public class TestColdEmissionEventImpl {
 		ColdEmissionEvent ce = new ColdEmissionEvent(0.0, linkId, vehicleId, coldEmissionsMap);
 		
 		Map<String, String> ceg = ce.getAttributes();
-		Assert.assertEquals("the CO value of this cold emission event was "+ Double.parseDouble(ceg.get("CO"))+ "but should have been "+ co, Double.parseDouble(ceg.get("CO")), co, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the FC value of this cold emission event was "+ Double.parseDouble(ceg.get("FC"))+ "but should have been "+ fc, Double.parseDouble(ceg.get("FC")), fc, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the HC value of this cold emission event was "+ Double.parseDouble(ceg.get("HC"))+ "but should have been "+ hc, Double.parseDouble(ceg.get("HC")), hc, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the NMHC value of this cold emission event was "+ Double.parseDouble(ceg.get("NMHC"))+ "but should have been "+ nm, Double.parseDouble(ceg.get("NMHC")), nm, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the NO2 value of this cold emission event was "+ Double.parseDouble(ceg.get("NO2"))+ "but should have been "+ n2, Double.parseDouble(ceg.get("NO2")), n2, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the NOx value of this cold emission event was "+ Double.parseDouble(ceg.get("NOx"))+ "but should have been "+ nx, Double.parseDouble(ceg.get("NOx")), nx, MatsimTestUtils.EPSILON);
-		Assert.assertEquals("the PM value of this cold emission event was "+ Double.parseDouble(ceg.get("PM"))+ "but should have been "+ pm, Double.parseDouble(ceg.get("PM")), pm, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("the CO value of this cold emission event was "+ Double.parseDouble(ceg.get(CO.name()))+ "but should have been "+ co,
+				Double.parseDouble(ceg.get(CO.name())), co, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("the FC value of this cold emission event was "+ Double.parseDouble(ceg.get(FC.name()))+ "but should have been "+ fc,
+				Double.parseDouble(ceg.get(FC.name())), fc, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("the HC value of this cold emission event was "+ Double.parseDouble(ceg.get(HC.name()))+ "but should have been "+ hc,
+				Double.parseDouble(ceg.get(HC.name())), hc, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("the NMHC value of this cold emission event was "+ Double.parseDouble(ceg.get(NMHC.name()))+ "but should have been "+ nm,
+				Double.parseDouble(ceg.get(NMHC.name())), nm, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("the NO2 value of this cold emission event was "+ Double.parseDouble(ceg.get(NO2.name()))+ "but should have been "+ n2,
+				Double.parseDouble(ceg.get(NO2.name())), n2, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("the NOx value of this cold emission event was "+ Double.parseDouble(ceg.get(NOx.name()))+ "but should have been "+ nx,
+				Double.parseDouble(ceg.get(NOx.name())), nx, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("the PM value of this cold emission event was "+ Double.parseDouble(ceg.get(PM.name()))+ "but should have been "+ pm,
+				Double.parseDouble(ceg.get(PM.name())), pm, MatsimTestUtils.EPSILON);
 		
 	}
 
@@ -114,7 +121,7 @@ public class TestColdEmissionEventImpl {
 
 		int valNullPointers = 0, noMapNullPointers=0;
 		
-		for(String cp : coldPollutants){
+		for(Pollutant cp : coldPollutants){
 
 			//empty map
 			Assert.assertNull(emptyMapEvent.getAttributes().get(cp));

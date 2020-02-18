@@ -70,9 +70,9 @@ public final class EmissionUtils {
 		return (String) link.getAttributes().getAttribute(HBEFA_ROAD_TYPE);
 	}
 
-	public static Map<String, Double> sumUpEmissions(Map<String, Double> warmEmissions, Map<String, Double> coldEmissions) {
+	public static Map<Pollutant, Double> sumUpEmissions(Map<Pollutant, Double> warmEmissions, Map<Pollutant, Double> coldEmissions) {
 
-		Map<String, Double> pollutant2sumOfEmissions =
+		Map<Pollutant, Double> pollutant2sumOfEmissions =
 				Stream.concat(warmEmissions.entrySet().stream(), coldEmissions.entrySet().stream())
 						.collect(Collectors.toMap(
 								Entry::getKey, // The key
@@ -84,40 +84,40 @@ public final class EmissionUtils {
 		return pollutant2sumOfEmissions;
 	}
 
-	public static <T> Map<Id<T>, Map<String, Double>> sumUpEmissionsPerId(
-			Map<Id<T>, Map<String, Double>> warmEmissions,
-			Map<Id<T>, Map<String, Double>> coldEmissions) {
+	public static <T> Map<Id<T>, Map<Pollutant, Double>> sumUpEmissionsPerId(
+			Map<Id<T>, Map<Pollutant, Double>> warmEmissions,
+			Map<Id<T>, Map<Pollutant, Double>> coldEmissions) {
 
 		if (warmEmissions == null)
 			return coldEmissions;
 		if (coldEmissions == null)
 			return warmEmissions;
 
-		Map<Id<T>, Map<String, Double>> totalEmissions = warmEmissions.entrySet().stream().map(entry -> {
+		Map<Id<T>, Map<Pollutant, Double>> totalEmissions = warmEmissions.entrySet().stream().map(entry -> {
 			Id<T> id = entry.getKey();
-			Map<String, Double> warmEm = entry.getValue();
-			Map<String, Double> coldEm = coldEmissions.getOrDefault(id, new HashMap<>());
+			Map<Pollutant, Double> warmEm = entry.getValue();
+			Map<Pollutant, Double> coldEm = coldEmissions.getOrDefault(id, new HashMap<>());
 
-			Map<String, Double> totalPollutantCounts = sumUpEmissions(warmEm, coldEm);
+			Map<Pollutant, Double> totalPollutantCounts = sumUpEmissions(warmEm, coldEm);
 			return new Tuple<>(id, totalPollutantCounts);
 		}).collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
 
 		return totalEmissions;
 	}
 
-	public static Map<Id<Person>, SortedMap<String, Double>> setNonCalculatedEmissionsForPopulation(Population population, Map<Id<Person>, SortedMap<String, Double>> totalEmissions, Set<String> pollutants) {
-		Map<Id<Person>, SortedMap<String, Double>> personId2Emissions = new HashMap<>();
+	public static Map<Id<Person>, SortedMap<Pollutant, Double>> setNonCalculatedEmissionsForPopulation(Population population, Map<Id<Person>, SortedMap<Pollutant, Double>> totalEmissions, Set<Pollutant> pollutants) {
+		Map<Id<Person>, SortedMap<Pollutant, Double>> personId2Emissions = new HashMap<>();
 		for (Person person : population.getPersons().values()) {
 			Id<Person> personId = person.getId();
-			SortedMap<String, Double> emissionType2Value;
+			SortedMap<Pollutant, Double> emissionType2Value;
 			if (totalEmissions.get(personId) == null) { // person not in map (e.g. pt user)
 				emissionType2Value = new TreeMap<>();
-				for (String pollutant : pollutants) {
+				for (Pollutant pollutant : pollutants) {
 					emissionType2Value.put(pollutant, 0.0);
 				}
 			} else { // person in map, but some emissions are not set; setting these to 0.0 
 				emissionType2Value = totalEmissions.get(personId);
-				for (String pollutant : emissionType2Value.keySet()) {
+				for (Pollutant pollutant : emissionType2Value.keySet()) {
 					// else do nothing
 					emissionType2Value.putIfAbsent(pollutant, 0.0);
 				}
@@ -132,21 +132,21 @@ public final class EmissionUtils {
 		return pollutants;
 	}
 
-	public static Map<Id<Link>, SortedMap<String, Double>> setNonCalculatedEmissionsForNetwork(Network network, Map<Id<Link>, SortedMap<String, Double>> totalEmissions, Set<String> pollutants) {
-		Map<Id<Link>, SortedMap<String, Double>> linkId2Emissions = new HashMap<>();
+	public static Map<Id<Link>, SortedMap<Pollutant, Double>> setNonCalculatedEmissionsForNetwork(Network network, Map<Id<Link>, SortedMap<Pollutant, Double>> totalEmissions, Set<Pollutant> pollutants) {
+		Map<Id<Link>, SortedMap<Pollutant, Double>> linkId2Emissions = new HashMap<>();
 
 		for (Link link : network.getLinks().values()) {
 			Id<Link> linkId = link.getId();
-			SortedMap<String, Double> emissionType2Value;
+			SortedMap<Pollutant, Double> emissionType2Value;
 
 			if (totalEmissions.get(linkId) == null) {
 				emissionType2Value = new TreeMap<>();
-				for (String pollutant : pollutants) {
+				for (Pollutant pollutant : pollutants) {
 					emissionType2Value.put(pollutant, 0.0);
 				}
 			} else {
 				emissionType2Value = totalEmissions.get(linkId);
-				for (String pollutant : pollutants) {
+				for (Pollutant pollutant : pollutants) {
 					if (emissionType2Value.get(pollutant) == null) {
 						emissionType2Value.put(pollutant, 0.0);
 					} else {
@@ -160,13 +160,13 @@ public final class EmissionUtils {
 		return linkId2Emissions;
 	}
 
-	public static <T> SortedMap<String, Double> getTotalEmissions(Map<Id<T>, SortedMap<String, Double>> person2TotalEmissions) {
-		SortedMap<String, Double> totalEmissions = new TreeMap<>();
+	public static <T> SortedMap<Pollutant, Double> getTotalEmissions(Map<Id<T>, SortedMap<Pollutant, Double>> person2TotalEmissions) {
+		SortedMap<Pollutant, Double> totalEmissions = new TreeMap<>();
 
 		for (Id<T> personId : person2TotalEmissions.keySet()) {
-			SortedMap<String, Double> individualEmissions = person2TotalEmissions.get(personId);
+			SortedMap<Pollutant, Double> individualEmissions = person2TotalEmissions.get(personId);
 			double sumOfPollutant;
-			for (String pollutant : individualEmissions.keySet()) {
+			for (Pollutant pollutant : individualEmissions.keySet()) {
 				if (totalEmissions.containsKey(pollutant)) {
 					sumOfPollutant = totalEmissions.get(pollutant) + individualEmissions.get(pollutant);
 				} else {

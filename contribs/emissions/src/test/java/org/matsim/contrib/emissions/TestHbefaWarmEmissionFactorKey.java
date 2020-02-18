@@ -27,6 +27,9 @@ import org.matsim.contrib.emissions.HbefaVehicleAttributes;
 import org.matsim.contrib.emissions.HbefaVehicleCategory;
 import org.matsim.contrib.emissions.HbefaWarmEmissionFactorKey;
 
+import static org.matsim.contrib.emissions.Pollutant.CO;
+import static org.matsim.contrib.emissions.Pollutant.FC;
+
 
 public class TestHbefaWarmEmissionFactorKey{
 
@@ -43,7 +46,7 @@ public class TestHbefaWarmEmissionFactorKey{
 	private String hbefaRoadCategory;
 	private HbefaTrafficSituation hbefaTrafficSituation;
 	private HbefaVehicleCategory hbefaVehicleCategory;
-	private String warmPollutant;
+	private Pollutant warmPollutant;
 	private String message;
     private String message2;
 	private HbefaWarmEmissionFactorKey normal;
@@ -59,7 +62,7 @@ public class TestHbefaWarmEmissionFactorKey{
 		hbefaRoadCategory = "road type";		
 		hbefaTrafficSituation = HbefaTrafficSituation.FREEFLOW;
 		hbefaVehicleCategory = HbefaVehicleCategory.PASSENGER_CAR;
-		warmPollutant = "FC";
+		warmPollutant = FC;
 		
 	}
 
@@ -73,7 +76,7 @@ public class TestHbefaWarmEmissionFactorKey{
 		
 		// generate a warm emission factor key equal to 'normal' 
 		HbefaWarmEmissionFactorKey compare = new HbefaWarmEmissionFactorKey();
-		compare.setHbefaComponent("FC");
+		compare.setHbefaComponent(FC);
 		compare.setHbefaRoadCategory(hbefaRoadCategory);
 		compare.setHbefaTrafficSituation(hbefaTrafficSituation);
 		compare.setHbefaVehicleAttributes(hbefaVehicleAttributes);
@@ -85,7 +88,7 @@ public class TestHbefaWarmEmissionFactorKey{
 		
 		//two unequal but complete objects
 		HbefaWarmEmissionFactorKey different = new HbefaWarmEmissionFactorKey();
-		different.setHbefaComponent("CO");
+		different.setHbefaComponent(CO);
 		different.setHbefaRoadCategory("another road category");
 		different.setHbefaTrafficSituation(HbefaTrafficSituation.SATURATED);
 		HbefaVehicleAttributes attrForDifferent = new HbefaVehicleAttributes();
