@@ -36,6 +36,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.PopulationUtils;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,6 +59,7 @@ public final class FacilitiesFromPopulation {
 	private final static Logger log = Logger.getLogger(FacilitiesFromPopulation.class);
 
 	private final ActivityFacilities facilities;
+	private Scenario scenario;
 	private boolean oneFacilityPerLink ;
 	private String idPrefix = "";
 	private Network network = null;
@@ -88,6 +90,7 @@ public final class FacilitiesFromPopulation {
 		}
 		this.network = scenario.getNetwork() ;
 		this.planCalcScoreConfigGroup = scenario.getConfig().planCalcScore() ;
+		this.scenario = scenario;
 	}
 
 	/**
@@ -160,12 +163,22 @@ public final class FacilitiesFromPopulation {
 						Activity activity = (Activity) pe;
 
 						Coord coord = activity.getCoord();
+						// (may be null, and we are not fixing it at this point)
+
 						Id<Link> linkId = activity.getLinkId();
-						ActivityFacility facility = null;
+						// (may be null, and we are not fixing it at this point)
+
+						Gbl.assertIf( coord!=null || linkId!=null );
+						// (need one of them non-null!)
+
+						ActivityFacility facility;
 
 						if ( linkId == null ) {
 							linkId = NetworkUtils.getNearestLinkExactly(this.network, coord).getId();
 							// yyyy we have been using the non-exact version in other parts of the project. kai, mar'19
+						}
+						if ( coord==null ) {
+							coord = PopulationUtils.decideOnCoordForActivity( activity, scenario );
 						}
 
 						Gbl.assertNotNull( linkId );
