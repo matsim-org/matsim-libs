@@ -323,10 +323,6 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			vehAttributesNotSpecifiedCnt++;
 			efkey.setHbefaVehicleAttributes(new HbefaVehicleAttributes()); //want to check for average vehicle
 			ef = this.avgHbefaWarmTable.get(efkey);
-			if ( ef==null ) {
-				logger.warn( "efkey=" + efkey );
-			}
-			Gbl.assertNotNull( ef );
 
 			int maxWarnCnt = 3;
 			if(this.detailedHbefaWarmTable != null && vehAttributesNotSpecifiedCnt <= maxWarnCnt) {
@@ -334,6 +330,12 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 						"`" + vehicleInformationTuple.getSecond() + "'. Using fleet average values instead.");
 				if(vehAttributesNotSpecifiedCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
 			}
+			
+			if ( ef==null ) {
+//				logger.warn( "efkey=" + efkey ); //better throw RuntimeException with meaningful message instead
+				logger.error("Aborting... Did not found neither detailed nor average value for efkey = " + efkey , new RuntimeException());
+			}
+//			Gbl.assertNotNull( ef ); //duplicate check
 		}
 		Gbl.assertNotNull( ef );
 		return ef;
