@@ -286,14 +286,28 @@ public final class VehicleUtils {
 		}
 		return map;
 	}
+	private static int tryStdCnt = 5;
+	private static int tryTrnCnt = 5;
 	public static Vehicle findVehicle( Id<Vehicle> vehicleId, Scenario scenario) {
 		Vehicle vehicle = getOrCreateAllvehicles( scenario ).getVehicles().get( vehicleId );
 		if ( vehicle==null ) {
-			log.info( "vehicleId=" + vehicleId + " not in allVehicles; trying standard vehicles container ..." );
+			if ( tryStdCnt>0){
+				tryStdCnt--;
+				log.info( "vehicleId=" + vehicleId + " not in allVehicles; trying standard vehicles container ..." );
+				if ( tryStdCnt==0 ) {
+					log.info( Gbl.FUTURE_SUPPRESSED );
+				}
+			}
 			vehicle = scenario.getVehicles().getVehicles().get(  vehicleId );
 		}
 		if ( vehicle==null ) {
-			log.info( "vehicleId=" + vehicleId + " not in allVehicles; trying transit vehicles container ..." );
+			if ( tryTrnCnt>0 ) {
+				tryTrnCnt--;
+				log.info( "vehicleId=" + vehicleId + " not in allVehicles; trying transit vehicles container ..." );
+				if ( tryTrnCnt==0 ) {
+					log.info(  Gbl.FUTURE_SUPPRESSED );
+				}
+			}
 			vehicle = scenario.getVehicles().getVehicles().get(  vehicleId );
 		}
 		if ( vehicle==null ) {
