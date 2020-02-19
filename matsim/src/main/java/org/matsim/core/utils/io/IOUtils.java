@@ -129,7 +129,7 @@ final public class IOUtils {
 		COMPRESSION_EXTENSIONS.put("gz", CompressionType.GZIP);
 		COMPRESSION_EXTENSIONS.put("lz4", CompressionType.LZ4);
 		COMPRESSION_EXTENSIONS.put("bz2", CompressionType.BZIP2);
-		COMPRESSION_EXTENSIONS.put("zstd", CompressionType.ZSTD);
+		COMPRESSION_EXTENSIONS.put("zst", CompressionType.ZSTD);
 	}
 
 	// Define a number of charsets that are / have been used.
@@ -161,7 +161,7 @@ final public class IOUtils {
 	public static URL resolveFileOrResource(String filename) throws UncheckedIOException {
 		try {
 			// I) do not handle URLs
-			if (filename.startsWith("jar:file:") || filename.startsWith("file:")) {
+			if (filename.startsWith("jar:file:") || filename.startsWith("file:") || filename.startsWith( "https:" )) {
 				// looks like an URI
 				return new URL(filename);
 			}
@@ -298,7 +298,7 @@ final public class IOUtils {
 			File file = new File(url.toURI());
 			CompressionType compression = getCompression(url);
 
-			if (compression != null && append && file.exists()) {
+			if ((compression != null && compression != CompressionType.ZSTD) && append && file.exists()) {
 				throw new UncheckedIOException("Cannot append to compressed files.");
 			}
 

@@ -60,15 +60,15 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 
 		// Get the activity currently performed by the agent as well as the subsequent trip.
 		Activity currentActivity = (Activity) WithinDayAgentUtils.getCurrentPlanElement(withinDayAgent);
-		Trip trip = TripStructureUtils.findTripStartingAtActivity(currentActivity, executedPlan, this.tripRouter.getStageActivityTypes() );
+		Trip trip = TripStructureUtils.findTripStartingAtActivity( currentActivity, executedPlan );
 
 		// If there is no trip after the activity.
 		if (trip == null) return false;
 		
-		String mainMode = this.tripRouter.getMainModeIdentifier().identifyMainMode(trip.getTripElements());
+		String routingMode = TripStructureUtils.identifyMainMode(trip.getTripElements());
 		double departureTime = TripStructureUtils.getDepartureTime(trip);
 		// To replan pt legs, we would need internalInterface of type InternalInterface.class
-		new EditTrips( this.tripRouter, scenario, null ).replanFutureTrip(trip, executedPlan, mainMode, departureTime );
+		new EditTrips( this.tripRouter, scenario, null ).replanFutureTrip(trip, executedPlan, routingMode, departureTime );
 		
 		return true;
 	}

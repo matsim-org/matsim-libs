@@ -79,9 +79,9 @@ class CarrierVehicleTypeReaderV1 extends MatsimXmlParser {
 			if(fix == null || perMeter == null || perSecond == null) throw new IllegalStateException("cannot read costInformation correctly. probably the paramName was written wrongly");
 //			CostInformation vehicleCosts = new CostInformation();
 			CostInformation vehicleCosts = this.currentType.getCostInformation();;
-			vehicleCosts.setFixedCost( Double.parseDouble( fix ) );
-			vehicleCosts.setCostsPerMeter( Double.parseDouble( perMeter ) );
-			vehicleCosts.setCostsPerSecond( Double.parseDouble( perSecond ) );
+			vehicleCosts.setFixedCost( Double.valueOf( fix ) );
+			vehicleCosts.setCostsPerMeter( Double.valueOf( perMeter ) );
+			vehicleCosts.setCostsPerSecond( Double.valueOf( perSecond ) );
 //			this.currentVehicleCosts = vehicleCosts;
 		}
 	}

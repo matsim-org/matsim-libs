@@ -32,5 +32,5 @@ import com.google.common.collect.ImmutableMap;
  * @author michalm
  */
 public interface ElectricFleet {
-	ImmutableMap<Id<ElectricVehicle>, ? extends ElectricVehicle> getElectricVehicles();
+	ImmutableMap<Id<ElectricVehicle>, ElectricVehicle> getElectricVehicles();
 }

@@ -78,6 +78,38 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		this.addScoringParameters(new ScoringParameterSet());
 
+		// what follows now has weird consequences:
+		// * the material is added to the ScoringParameterSet of the default subpopulation
+		// * if someone uses the following in the config.xml:
+		//      < ... planCalcScore ... >
+		//            <... modeParams ... >
+		//                   < ... mode ... abc ... />
+		//    then abc will be _added_ to the modes info below (same for activities)
+		//  * if, however, someone uses in the config.xml:
+		//      < ... planCalcScore ... >
+		//            < ... scoringParameters ... >
+		//                  <... modeParams ... >
+		//                        < ... mode ... abc ... />
+		//     (= fully hierarchical format), then the default modes will be removed before adding mode abc.  The reason for this is that the second
+		//     syntax clears the scoring params for the default subpopulation.
+
+		//  Unfortunately, it continues:
+		//  * Normally, we need a "clear defaults with first configured entry" (see PlansCalcRouteConfigGroup).  Otherwise, we fail the write-read
+		//  test: Assume we end up with a config that has _less_ material than the defaults.  Then we write this to file, and read it back in.  If
+		//  the defaults are not cleared, they would now be fully there.
+		//  * The reason why this works here is that all the material is written out with the fully hierarchical format.  I.e. it actually clears the
+		//  defaults when being read it.
+
+		// I am not sure if it can stay the way it is right now; took me several hours to understand it (and fix a problem we had not by
+		// trial-and-error but by understanding the root cause).  Considerations:
+		// * Easiest would be to not have defaults.  However, defaults are helpful in particular to avoid that everybody uses different parameters.
+		// * We could also have the "manual addition triggers clearing" logic.  In PlansCalcRouteConfigGroup I now have this with a warning, which
+		// can be switched off with a switch.  I find this a good solution; I am, however, not 100% certain that it is robust since that switch is a
+		// "state" while "clearing the defaults" is an action, and I am not sure if they can be mapped into each other in all cases.
+		// * We could, together with the previous point, disallow the not fully hierarchical format.
+
+		// kai, dec'19
+
 		this.addModeParams(new ModeParams(TransportMode.car));
 		this.addModeParams(new ModeParams(TransportMode.pt));
 		this.addModeParams(new ModeParams(TransportMode.walk));
@@ -85,56 +117,21 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		this.addModeParams(new ModeParams(TransportMode.ride));
 		this.addModeParams(new ModeParams(TransportMode.other));
 
-		{
-			ActivityParams params = new ActivityParams("dummy");
-			params.setTypicalDuration(2. * 3600.);
+		this.addActivityParams( new ActivityParams("dummy").setTypicalDuration(2. * 3600. ) );
+		// (this is there so that an empty config prints out at least one activity type, so that the explanations of this
+		// important concept show up e.g. in defaultConfig.xml, created from the GUI. kai, jul'17
 //			params.setScoringThisActivityAtAll(false); // no longer minimal when included here. kai, jun'18
-			this.addActivityParams(params);
-			// (this is there so that an empty config prints out at least one
-			// activity type,
-			// so that the explanations of this important concept show up e.g.
-			// in defaultConfig.xml, created from the GUI. kai, jul'17
-		}
 
 		// yyyyyy find better solution for this. kai, dec'15
-		{
-			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.car ) ) ;
-			params.setScoringThisActivityAtAll(false);
-			this.addActivityParams(params);
-		}
-		{
-			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.pt ));
-			// need this for self-programmed pseudo pt. kai, nov'16
-
-			params.setScoringThisActivityAtAll(false);
-			this.addActivityParams(params);
-		}
-		{
-			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.bike ) ) ;
-			params.setScoringThisActivityAtAll(false);
-			this.addActivityParams(params);
-		}
-		{
-			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.drt ) ) ;
-			params.setScoringThisActivityAtAll(false);
-			this.addActivityParams(params);
-		}
-		{
-			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.taxi ) ) ;
-			params.setScoringThisActivityAtAll(false);
-			this.addActivityParams(params);
-		}
-		{
-			ActivityParams params = new ActivityParams(createStageActivityType( TransportMode.other ) ) ;
-			params.setScoringThisActivityAtAll(false);
-			this.addActivityParams(params);
-		}
-		{
-			ActivityParams params = new ActivityParams( createStageActivityType( TransportMode.walk ) );
-			params.setScoringThisActivityAtAll(false);
-			this.addActivityParams(params);
-			// bushwhacking_walk---network_walk---bushwhacking_walk
-		}
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.car ) ).setScoringThisActivityAtAll(false ) );
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.pt )).setScoringThisActivityAtAll(false ) );
+		// (need this for self-programmed pseudo pt. kai, nov'16)
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.bike ) ).setScoringThisActivityAtAll(false ) );
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.drt ) ).setScoringThisActivityAtAll(false ) );
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.taxi ) ).setScoringThisActivityAtAll(false ) );
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.other ) ).setScoringThisActivityAtAll(false ) );
+		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.walk ) ).setScoringThisActivityAtAll(false ) );
+		// (bushwhacking_walk---network_walk---bushwhacking_walk)
 	}
 
 	// ---
@@ -789,10 +786,8 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	// CLASSES
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public static class ActivityParams extends ReflectiveConfigGroup implements MatsimParameters {
-		// in normal pgm execution, code will presumably lock instance of
-		// PlanCalcScoreConfigGroup, but not instance of
-		// ActivityParams. I will try to pass the locked setting through the
-		// getters. kai, jun'15
+		// in normal pgm execution, code will presumably lock instance of PlanCalcScoreConfigGroup, but not instance of
+		// ActivityParams. I will try to pass the locked setting through the getters. kai, jun'15
 
 		public final static String SET_TYPE = "activityParams";
 		
@@ -1313,6 +1308,9 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			return subpopulation;
 		}
 
+		/**
+		 * This method is there to make the StringSetter/Getter automagic happy, but it is not meant to be used.
+		 */
 		@StringSetter("subpopulation")
 		public void setSubpopulation(String subpopulation) {
 			// TODO: handle case of default subpopulation

@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.StageActivityTypeIdentifier;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.vis.otfvis.OTFClientControl;
@@ -129,7 +130,12 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 						continue ; // skip
 					}
 					Coord c2 = getCoord(act);
-					ActivityInfo activityInfo = new ActivityInfo((float) c2.getX(), (float) c2.getY(), act.getType());
+					ActivityInfo activityInfo = new ActivityInfo((float) c2.getX(), (float) c2.getY(), getSubstring( act ) );
+
+
+					if ( StageActivityTypeIdentifier.isStageActivity( act.getType() ) ) {
+						activityInfo = new ActivityInfo( (float) c2.getX(), (float) c2.getY(), act.getType().replace( "interaction", "i" ) ) ;
+					}
 					result.acts.add(activityInfo);
 				}
 			}
@@ -147,12 +153,19 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		if (act != null) {
 			Coord c2 = getCoord(act);
 			if (simulationView.getTime() > act.getStartTime() && simulationView.getTime() <= act.getEndTime()) {
-				ActivityInfo activityInfo = new ActivityInfo((float) c2.getX(), (float) c2.getY(), act.getType());
+				ActivityInfo activityInfo = new ActivityInfo((float) c2.getX(), (float) c2.getY(), getSubstring( act ) );
 				activityInfo.finished = (simulationView.getTime() - act.getStartTime()) / (act.getEndTime() - act.getStartTime());
 				result.acts.add(activityInfo);
 			}
 		}
 		return result;
+	}
+	private static String getSubstring( Activity act ){
+		String substring = act.getType();
+		if ( substring.length() >3 ){
+			substring = act.getType().substring( 0, 3 );
+		}
+		return substring;
 	}
 
 	private Coord getCoord( Activity act) {
@@ -226,7 +239,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 					} else if( mode.contains( TransportMode.walk ) ){
 						color = Color.GREEN;
 					} else if( mode.contains( TransportMode.drt ) ){
-						color = Color.CYAN;
+						color = Color.RED;
 					} else if( mode.equals( TransportMode.non_network_walk ) ){
 						color = Color.GREEN;
 					}

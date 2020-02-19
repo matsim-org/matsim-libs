@@ -91,8 +91,8 @@ public class ModalDistanceCadytsContext implements CadytsContextI<Id<DistanceDis
 		// copy the bins from expected distance distribution
 		DistanceDistribution simulatedDistanceDistribution = expectedDistanceDistribution.copyWithEmptyBins();
 
-		for (Map.Entry<Id<Person>, List<TripEventHandler.BeelineTrip>> entry : tripEventHandler.getTrips().entrySet()) {
-			for (TripEventHandler.BeelineTrip trip : entry.getValue()) {
+		for (Map.Entry<Id<Person>, List<TripEventHandler.Trip>> entry : tripEventHandler.getTrips().entrySet()) {
+			for (TripEventHandler.Trip trip : entry.getValue()) {
 
 				double distance = calculateBeelineDistance(trip);
 
@@ -117,7 +117,9 @@ public class ModalDistanceCadytsContext implements CadytsContextI<Id<DistanceDis
 		// as a parameter it takes a SimResults function. As our result we just return the count value of the distance
 		// bin defined by the bin id. This safes us at least three classes
 		this.calibrator.afterNetworkLoading((binId, lower, upper, type) ->
-				simulatedDistanceDistribution.getBin(binId).getValue() * simulatedDistanceDistribution.getScalingFactor());
+				simulatedDistanceDistribution.getBin(binId).getValue() * config.counts().getCountsScaleFactor());
+		// if more flexibility regariding measurment scaling is required, one could replace this by
+		//... getValue() * scalingCorrection.getFactor() where scaling correction is an injected instance
 
 		String offsetFilename = outputDirectoryHierarchy.getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
 		try {
@@ -128,7 +130,7 @@ public class ModalDistanceCadytsContext implements CadytsContextI<Id<DistanceDis
 		}
 	}
 
-	private double calculateBeelineDistance(TripEventHandler.BeelineTrip trip) {
+	private double calculateBeelineDistance(TripEventHandler.Trip trip) {
 
 		if (scenario.getActivityFacilities().getFacilities().containsKey(trip.getDepartureFacility()) ||
 				scenario.getActivityFacilities().getFacilities().containsKey(trip.getArrivalFacility())

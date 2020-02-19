@@ -22,6 +22,7 @@ package org.matsim.core.events.algorithms;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -61,7 +62,7 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 	private final Network network;
 	private int lastSnapshotIndex = -1;
 	private final double snapshotPeriod;
-	private final HashMap<Id<Link>, EventLink> eventLinks;
+	private final IdMap<Link, EventLink> eventLinks;
 	private final ArrayList<EventLink> linkList;
 	private final HashMap<Id<Person>, EventAgent> eventAgents;
 	private final List<SnapshotWriter> snapshotWriters = new ArrayList<>();
@@ -77,7 +78,7 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 	public SnapshotGenerator(final Network network, final double snapshotPeriod, final QSimConfigGroup config) {
 		this.network = network;
 		int initialCapacity = (int)(network.getLinks().size()*1.1);
-		this.eventLinks = new HashMap<>(initialCapacity, 0.95f);
+		this.eventLinks = new IdMap<>(Link.class);
 		this.linkList = new ArrayList<>(initialCapacity);
 		this.eventAgents = new HashMap<>(1000, 0.95f);
 		this.snapshotPeriod = snapshotPeriod;
@@ -361,7 +362,7 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 				int cmp = (int) (agent.time + this.freespeedTravelTime + this.inverseTimeCap + 2.0);
 				double speed = (time > cmp) ? 0.0 : this.link.getFreespeed(time);
 				agent.speed = speed;
-				int lane = 1 + (agent.intId % NetworkUtils.getNumberOfLanesAsInt(Time.getUndefinedTime(), this.link));
+				int lane = 1 + (agent.intId % NetworkUtils.getNumberOfLanesAsInt(this.link));
 				AgentSnapshotInfo position = snapshotInfoFactory.createAgentSnapshotInfo(agent.id, this.link, distanceOnLink/* + NetworkLayer.CELL_LENGTH*/, lane);
 				position.setColorValueBetweenZeroAndOne( agent.speed) ;
 				position.setAgentState(AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
@@ -372,7 +373,7 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 			/* Put the vehicles from the waiting list in positions.
 			 * Their actual position doesn't matter, so they are just placed
 			 * to the coordinates of the from node */
-			int lane = NetworkUtils.getNumberOfLanesAsInt(Time.getUndefinedTime(), this.link) + 1; // place them next to the link
+			int lane = NetworkUtils.getNumberOfLanesAsInt(this.link) + 1; // place them next to the link
 			for (EventAgent agent : this.waitingQueue) {
 				AgentSnapshotInfo position = snapshotInfoFactory.createAgentSnapshotInfo(agent.id, this.link, this.effectiveCellSize, lane);
 				position.setColorValueBetweenZeroAndOne( 0.0) ;
@@ -383,7 +384,7 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 			/* put the vehicles from the parking list in positions
 			 * their actual position doesn't matter, so they are just placed
 			 * to the coordinates of the from node */
-			lane = NetworkUtils.getNumberOfLanesAsInt(Time.getUndefinedTime(), this.link) + 2; // place them next to the link
+			lane = NetworkUtils.getNumberOfLanesAsInt(this.link) + 2; // place them next to the link
 			for (EventAgent agent : this.parkingQueue) {
 				AgentSnapshotInfo position = snapshotInfoFactory.createAgentSnapshotInfo(agent.id, this.link, this.effectiveCellSize, lane);
 				position.setColorValueBetweenZeroAndOne(0.0) ;

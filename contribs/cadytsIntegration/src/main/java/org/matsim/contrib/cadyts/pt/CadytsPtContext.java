@@ -68,6 +68,7 @@ import cadyts.supply.SimResults;
  */
 public class CadytsPtContext implements StartupListener, IterationEndsListener, BeforeMobsimListener, AfterMobsimListener,
 CadytsContextI<TransitStopFacility> {
+	// can be/remain public as long as constructor is package-private. kai, feb'20
 
 	private final static Logger log = Logger.getLogger(CadytsPtContext.class);
 
@@ -77,7 +78,7 @@ CadytsContextI<TransitStopFacility> {
 
 	private AnalyticalCalibrator<TransitStopFacility> calibrator = null;
 	private final SimResults<TransitStopFacility> simResults;
-	private final Counts occupCounts = new Counts();
+	private final Counts<TransitStopFacility> occupCounts = new Counts<>();
 	//	private final Counts boardCounts = new Counts();
 	//	private final Counts alightCounts = new Counts();
 	private final CadytsPtOccupancyAnalyzerI cadytsPtOccupAnalyzer;
@@ -148,7 +149,7 @@ CadytsContextI<TransitStopFacility> {
 		this.calibrator = CadytsBuilderImpl.buildCalibratorAndAddMeasurements(scenario.getConfig(), this.occupCounts, new TransitStopFacilityLookUp(scenario) , TransitStopFacility.class);
 
 		// === find out which plan is contributing what to each measurement:
-		this.ptStep = new PtPlanToPlanStepBasedOnEvents<>(scenario, CadytsPtOccupancyAnalyzer.toTransitLineIdSet(cadytsConfig.getCalibratedItems()));
+		this.ptStep = new PtPlanToPlanStepBasedOnEvents<>(scenario, CadytsPtOccupancyAnalyzer.toTransitLineIdSet(cadytsConfig.getCalibratedLines()));
 		events.addHandler(ptStep);
 	}
 
@@ -166,7 +167,7 @@ CadytsContextI<TransitStopFacility> {
 
 		// Get all stations of all analyzed lines and invoke the method write to get all information of them
 		Set<Id<TransitStopFacility>> stopIds = new HashSet<>();
-		for ( String pseudoLineId : this.cadytsConfig.getCalibratedItems()) {
+		for ( String pseudoLineId : this.cadytsConfig.getCalibratedLines()) {
 			Id<TransitLine> lineId = Id.create(pseudoLineId, TransitLine.class);
 			TransitLine line = scenario.getTransitSchedule().getTransitLines().get(lineId);
 			for (TransitRoute route : line.getRoutes().values()) {

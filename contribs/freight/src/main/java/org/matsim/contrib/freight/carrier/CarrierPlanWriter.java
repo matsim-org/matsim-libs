@@ -84,7 +84,7 @@ public class CarrierPlanWriter extends MatsimXmlWriter {
 	private void writeVehicles(Carrier carrier, BufferedWriter writer)
 			throws IOException {
 		writer.write("\t\t\t<vehicles>\n");
-		for (CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles()) {
+		for (CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles().values()) {
 			writer.write("\t\t\t\t<vehicle id=\"" + v.getId()
 					+ "\" linkId=\"" + v.getLocation() + "\"" + "\" typeId=\""
 					+ v.getVehicleTypeId().toString()
@@ -98,7 +98,7 @@ public class CarrierPlanWriter extends MatsimXmlWriter {
 	private void writeShipments(Carrier carrier, BufferedWriter writer)
 			throws IOException {
 		writer.write("\t\t\t<shipments>\n");
-		for (CarrierShipment s : carrier.getShipments()) {
+		for (CarrierShipment s : carrier.getShipments().values()) {
 			// CarrierShipment s = contract.getShipment();
 			Id<Shipment> shipmentId = Id.create(++idCounter, Shipment.class);
 			registeredShipments.put(s, shipmentId);

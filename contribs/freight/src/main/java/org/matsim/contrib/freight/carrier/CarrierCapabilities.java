@@ -1,11 +1,9 @@
 package org.matsim.contrib.freight.carrier;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 /**
@@ -31,8 +29,8 @@ public class CarrierCapabilities {
 		public static Builder newInstance(){ return new Builder(); }
 		
 		private Collection<VehicleType> vehicleTypes = new ArrayList<VehicleType>();
-		
-		private Collection<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>();
+
+		private Map<Id<Vehicle>, CarrierVehicle> vehicles = new LinkedHashMap<>();
 		
 		private Set<Id<org.matsim.vehicles.VehicleType>> typeIds = new HashSet<>();
 		
@@ -52,7 +50,7 @@ public class CarrierCapabilities {
 		}
 		
 		public Builder addVehicle(CarrierVehicle carrierVehicle){
-			vehicles.add(carrierVehicle);
+			vehicles.put(carrierVehicle.getId(), carrierVehicle);
 			if(carrierVehicle.getType() != null) addType(carrierVehicle.getType() );
 			return this;
 		}
@@ -83,7 +81,7 @@ public class CarrierCapabilities {
 		this.fleetSize = builder.fleetSize;
 	}
 	
-	private Collection<CarrierVehicle> carrierVehicles = new ArrayList<CarrierVehicle>();
+	private Map<Id<Vehicle>, CarrierVehicle> carrierVehicles = new LinkedHashMap<>();
 	
 	private Collection<VehicleType> vehicleTypes = new ArrayList<VehicleType>();
 	
@@ -109,7 +107,7 @@ public class CarrierCapabilities {
 	 * @return collection of carrierVehicles
 	 * @see CarrierVehicle
 	 */
-	public Collection<CarrierVehicle> getCarrierVehicles() {
+	public Map<Id<Vehicle>, CarrierVehicle> getCarrierVehicles() {
 		return carrierVehicles;
 	}
 	

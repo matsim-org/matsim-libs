@@ -27,6 +27,7 @@ import java.util.List;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.router.AnalysisMainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifier;
 
 /**
@@ -36,7 +37,7 @@ import org.matsim.core.router.MainModeIdentifier;
  * @author nagel
  *
  */
-public final class TransportPlanningMainModeIdentifier implements MainModeIdentifier {
+public final class TransportPlanningMainModeIdentifier implements AnalysisMainModeIdentifier {
 	// I am against other people changing this lightheartedly since some of my analysis depends on it.  So either please discuss,
 	// or use your own variant.  kai, sep'16
 
@@ -45,7 +46,6 @@ public final class TransportPlanningMainModeIdentifier implements MainModeIdenti
 	private final List<String> modeHierarchy = new ArrayList<>() ;
 
 	public TransportPlanningMainModeIdentifier() {
-		modeHierarchy.add( TransportMode.non_network_walk ) ;
 		modeHierarchy.add( TransportMode.non_network_walk ) ;
 		modeHierarchy.add( "undefined" ) ;
 		modeHierarchy.add( TransportMode.other ) ;

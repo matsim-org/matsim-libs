@@ -20,10 +20,10 @@
 package org.matsim.contrib.socnetsim.sharedvehicles.replanning;
 
 import java.util.Collection;
+import java.util.Set;
 
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.router.StageActivityTypes;
 
 import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
@@ -36,12 +36,12 @@ import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
 public class OptimizeVehicleAllocationAtTourLevelModule  extends AbstractMultithreadedGenericStrategyModule<GroupPlans> {
 	private final Collection<String> vehicularModes;
 	private final boolean allowNullRoutes;
-	private final StageActivityTypes stageActs;
+	private final Set<String> stageActs;
 	private final VehicleRessources vehicleRessources;
 
 	public OptimizeVehicleAllocationAtTourLevelModule(
 			final int nThreads,
-			final StageActivityTypes stageActivitiesForSubtourDetection,
+			final Set<String> stageActivitiesForSubtourDetection,
 			final VehicleRessources vehicleRessources,
 			final Collection<String> modes,
 			final boolean allowNullRoutes) {

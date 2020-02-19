@@ -114,7 +114,7 @@ public class RunBicycleExample {
 		scenario.getVehicles().addVehicleType(car);
 
 		VehicleType bicycle = VehicleUtils.getFactory().createVehicleType(Id.create("bicycle", VehicleType.class));
-		bicycle.setMaximumVelocity(20.0 / 3.6);
+		bicycle.setMaximumVelocity(4.16666666); // 15km/h
 		bicycle.setPcuEquivalents(0.25);
 		scenario.getVehicles().addVehicleType(bicycle);
 

@@ -94,6 +94,11 @@
 			<version>${matsim.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>signals</artifactId>
+			<version>${matsim.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.openstreetmap.osmosis</groupId>
 			<artifactId>osmosis-core</artifactId>
 			<version>0.45</version>
@@ -141,12 +146,11 @@
 			<artifactId>jsch</artifactId>
 			<version>0.1.54</version>
 		</dependency>
-
-		<!-- for accessibility contrib -->
+				<!--to get ExamplesUtils:-->
 		<dependency>
-			<groupId>ch.sbb</groupId>
-			<artifactId>matsim-sbb-extensions</artifactId>
-			<version>11.5</version>
+			<groupId>org.matsim</groupId>
+			<artifactId>matsim-examples</artifactId>
+			<version>${matsim.version}</version>
 		</dependency>
 
 	</dependencies>

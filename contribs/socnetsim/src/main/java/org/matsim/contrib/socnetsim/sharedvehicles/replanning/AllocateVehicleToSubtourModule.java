@@ -23,6 +23,7 @@ import com.google.inject.Inject;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
 
@@ -35,16 +36,17 @@ public class AllocateVehicleToSubtourModule extends AbstractMultithreadedModule 
 	private final String mode;
 	private final VehicleRessources ressources;
 
-	private final Provider<TripRouter> tripRouterProvider;
+	private final MainModeIdentifier mainModeIdentifier;
 
 	public AllocateVehicleToSubtourModule(
 			final int nThreads,
 			final String mode,
-			final VehicleRessources ressources, Provider<TripRouter> tripRouterProvider) {
+			final VehicleRessources ressources,
+			final MainModeIdentifier mainModeIdentifier) {
 		super( nThreads );
 		this.mode = mode;
 		this.ressources = ressources;
-		this.tripRouterProvider = tripRouterProvider;
+		this.mainModeIdentifier = mainModeIdentifier;
 	}
 
 	@Override
@@ -52,8 +54,8 @@ public class AllocateVehicleToSubtourModule extends AbstractMultithreadedModule 
 		return new AllocateVehicleToSubtourAlgorithm(
 				MatsimRandom.getLocalInstance(),
 				mode,
-				tripRouterProvider.get(),
-				ressources);
+				ressources,
+				mainModeIdentifier);
 	}
 }
 
