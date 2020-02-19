@@ -34,7 +34,7 @@ import org.matsim.facilities.ActivityFacility;
 /**
  * @author dziemke
  */
-public class AccessibilityAggregator implements FacilityDataExchangeInterface {
+class AccessibilityAggregator implements FacilityDataExchangeInterface {
 	private final Logger LOG = Logger.getLogger(AccessibilityAggregator.class);
 
 	private Map<Tuple<ActivityFacility, Double>, Map<String,Double>> accessibilitiesMap = new HashMap<>();

@@ -21,16 +21,16 @@
 /**
  * 
  */
-package org.matsim.contrib.accessibility.gis;
-
-import java.io.BufferedReader;
-import java.io.IOException;
+package org.matsim.contrib.accessibility;
 
 import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.utils.io.IOUtils;
+
+import java.io.BufferedReader;
+import java.io.IOException;
 
 /**
  * The spatial grid saves the data values of a study area in a matrix.
@@ -400,7 +400,7 @@ public final class SpatialGrid{
 	 * @param filename
 	 */
 	public void writeToFile(String filename){
-		GridUtils.writeSpatialGridTable(this, filename);
+		GridUtils.writeSpatialGridTable(this, filename );
 	}
 	
 	/**

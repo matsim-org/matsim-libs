@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.accessibility.costcalculators;
+package org.matsim.contrib.accessibility;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -26,14 +26,13 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * This cost calulator is based on freespeed travel times
- * tnicolai feb'12
+ * cost calculator for travel distances
  *
  * @author thomas
  */
-public class FreeSpeedTravelTimeCostCalculator implements TravelDisutility {
+class TravelDistanceCalculator implements TravelDisutility{
 
-	private static final Logger log = Logger.getLogger(FreeSpeedTravelTimeCostCalculator.class);
+	private static final Logger log = Logger.getLogger(TravelDistanceCalculator.class);
 
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person,
@@ -48,9 +47,9 @@ public class FreeSpeedTravelTimeCostCalculator implements TravelDisutility {
 
 	private double getLinkTravelDisutilityImpl(Link link) {
 		if (link != null) {
-			return link.getLength() / link.getFreespeed();
+			return link.getLength();    // travel distance in meter
 		}
-		log.warn("Link is null. Returned 0 as free speed time.");
+		log.warn("Link is null. Returned 0 as distance.");
 		return 0.;
 	}
 }
