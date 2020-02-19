@@ -65,8 +65,8 @@ public class EmissionsAnalyzer extends AbstractAnalysisModule{
 	private EmissionsPerPersonColdEventHandler coldHandler;
 	private Map<Id<Person>, Map<Pollutant, Double>> person2warmEmissions;
 	private Map<Id<Person>, Map<Pollutant, Double>> person2coldEmissions;
-	private Map<Id<Person>, SortedMap<String, Double>> person2totalEmissions;
-	private SortedMap<String, Double> totalEmissions;
+	private Map<Id<Person>, SortedMap<Pollutant, Double>> person2totalEmissions;
+	private SortedMap<Pollutant, Double> totalEmissions;
 	
 	public EmissionsAnalyzer(String emissionsEventsFile) {
 		super(EmissionsAnalyzer.class.getSimpleName());
@@ -126,7 +126,7 @@ public class EmissionsAnalyzer extends AbstractAnalysisModule{
 //			}
 			bw.newLine();
 
-			for(String pollutant : this.totalEmissions.keySet()){
+			for(Pollutant pollutant : this.totalEmissions.keySet()){
 				Double pollutantValue = this.totalEmissions.get(pollutant);
 				bw.write(pollutantValue.toString() + "\t");
 			}
@@ -140,7 +140,7 @@ public class EmissionsAnalyzer extends AbstractAnalysisModule{
 		}
 	}
 	
-	public SortedMap<String, Double> getTotalEmissions() {
+	public SortedMap<Pollutant,Double> getTotalEmissions() {
 		return totalEmissions;
 	}
 
@@ -152,7 +152,7 @@ public class EmissionsAnalyzer extends AbstractAnalysisModule{
 		return person2coldEmissions;
 	}
 
-	public Map<Id<Person>, SortedMap<String, Double>> getPerson2totalEmissions() {
+	public Map<Id<Person>, SortedMap<Pollutant, Double>> getPerson2totalEmissions() {
 		return person2totalEmissions;
 	}
 	
