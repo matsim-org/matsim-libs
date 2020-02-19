@@ -203,8 +203,9 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	 * @param mode {@value #MODE_EXP}
 	 */
 	@StringSetter(MODE)
-	public void setMode(String mode) {
+	public TaxiConfigGroup setMode(String mode) {
 		this.mode = mode;
+		return this;
 	}
 
 	/**
@@ -219,8 +220,9 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	 * @param useModeFilteredSubnetwork {@value #USE_MODE_FILTERED_SUBNETWORK_EXP}
 	 */
 	@StringSetter(USE_MODE_FILTERED_SUBNETWORK)
-	public void setUseModeFilteredSubnetwork(boolean useModeFilteredSubnetwork) {
+	public TaxiConfigGroup setUseModeFilteredSubnetwork(boolean useModeFilteredSubnetwork) {
 		this.useModeFilteredSubnetwork = useModeFilteredSubnetwork;
+		return this;
 	}
 
 	/**
@@ -235,8 +237,9 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	 * @param destinationKnown {@value #DESTINATION_KNOWN_EXP}
 	 */
 	@StringSetter(DESTINATION_KNOWN)
-	public void setDestinationKnown(boolean destinationKnown) {
+	public TaxiConfigGroup setDestinationKnown(boolean destinationKnown) {
 		this.destinationKnown = destinationKnown;
+		return this;
 	}
 
 	/**
@@ -251,8 +254,9 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	 * @param vehicleDiversion {@value #VEHICLE_DIVERSION_EXP}
 	 */
 	@StringSetter(VEHICLE_DIVERSION)
-	public void setVehicleDiversion(boolean vehicleDiversion) {
+	public TaxiConfigGroup setVehicleDiversion(boolean vehicleDiversion) {
 		this.vehicleDiversion = vehicleDiversion;
+		return this;
 	}
 
 	/**
@@ -267,8 +271,9 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	 * @param pickupDuration {@value #PICKUP_DURATION_EXP}
 	 */
 	@StringSetter(PICKUP_DURATION)
-	public void setPickupDuration(double pickupDuration) {
+	public TaxiConfigGroup setPickupDuration(double pickupDuration) {
 		this.pickupDuration = pickupDuration;
+		return this;
 	}
 
 	/**
@@ -283,8 +288,9 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	 * @param dropoffDuration {@value #DROPOFF_DURATION_EXP}
 	 */
 	@StringSetter(DROPOFF_DURATION)
-	public void setDropoffDuration(double dropoffDuration) {
+	public TaxiConfigGroup setDropoffDuration(double dropoffDuration) {
 		this.dropoffDuration = dropoffDuration;
+		return this;
 	}
 
 	/**
@@ -299,8 +305,9 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	 * @param aStarEuclideanOverdoFactor {@value #A_STAR_EUCLIDEAN_OVERDO_FACTOR_EXP}
 	 */
 	@StringSetter(A_STAR_EUCLIDEAN_OVERDO_FACTOR)
-	public void setAStarEuclideanOverdoFactor(double aStarEuclideanOverdoFactor) {
+	public TaxiConfigGroup setAStarEuclideanOverdoFactor(double aStarEuclideanOverdoFactor) {
 		AStarEuclideanOverdoFactor = aStarEuclideanOverdoFactor;
+		return this;
 	}
 
 	/**
@@ -315,8 +322,9 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	 * @param onlineVehicleTracker {@value #ONLINE_VEHICLE_TRACKER_EXP}
 	 */
 	@StringSetter(ONLINE_VEHICLE_TRACKER)
-	public void setOnlineVehicleTracker(boolean onlineVehicleTracker) {
+	public TaxiConfigGroup setOnlineVehicleTracker(boolean onlineVehicleTracker) {
 		this.onlineVehicleTracker = onlineVehicleTracker;
+		return this;
 	}
 
 	/**
@@ -331,8 +339,9 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	 * @param changeStartLinkToLastLinkInSchedule {@value #CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE_EXP}
 	 */
 	@StringSetter(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE)
-	public void setChangeStartLinkToLastLinkInSchedule(boolean changeStartLinkToLastLinkInSchedule) {
+	public TaxiConfigGroup setChangeStartLinkToLastLinkInSchedule(boolean changeStartLinkToLastLinkInSchedule) {
 		this.changeStartLinkToLastLinkInSchedule = changeStartLinkToLastLinkInSchedule;
+		return this;
 	}
 
 	/**
@@ -347,8 +356,9 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	 * @param taxisFile {@value #TAXIS_FILE_EXP}
 	 */
 	@StringSetter(TAXIS_FILE)
-	public void setTaxisFile(String taxisFile) {
+	public TaxiConfigGroup setTaxisFile(String taxisFile) {
 		this.taxisFile = taxisFile;
+		return this;
 	}
 
 	/**
@@ -363,8 +373,9 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	 * @param timeProfiles {@value #TIME_PROFILES_EXP}
 	 */
 	@StringSetter(TIME_PROFILES)
-	public void setTimeProfiles(boolean timeProfiles) {
+	public TaxiConfigGroup setTimeProfiles(boolean timeProfiles) {
 		this.timeProfiles = timeProfiles;
+		return this;
 	}
 
 	/**
@@ -379,8 +390,9 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	 * @param detailedStats {@value #DETAILED_STATS_EXP}
 	 */
 	@StringSetter(DETAILED_STATS)
-	public void setDetailedStats(boolean detailedStats) {
+	public TaxiConfigGroup setDetailedStats(boolean detailedStats) {
 		this.detailedStats = detailedStats;
+		return this;
 	}
 
 	/**
@@ -395,8 +407,9 @@ public final class TaxiConfigGroup extends ReflectiveConfigGroup implements Moda
 	 * @param breakSimulationIfNotAllRequestsServed {@value #BREAK_IF_NOT_ALL_REQUESTS_SERVED_EXP}
 	 */
 	@StringSetter(BREAK_IF_NOT_ALL_REQUESTS_SERVED)
-	public void setBreakSimulationIfNotAllRequestsServed(boolean breakSimulationIfNotAllRequestsServed) {
+	public TaxiConfigGroup setBreakSimulationIfNotAllRequestsServed(boolean breakSimulationIfNotAllRequestsServed) {
 		this.breakSimulationIfNotAllRequestsServed = breakSimulationIfNotAllRequestsServed;
+		return this;
 	}
 
 	public AbstractTaxiOptimizerParams getTaxiOptimizerParams() {

@@ -19,14 +19,7 @@
 
 package org.matsim.contrib.accessibility;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
-import javax.inject.Provider;
-
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -36,10 +29,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.MeasurePointGeometryProvision;
-import org.matsim.contrib.accessibility.gis.GridUtils;
-import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.GeoserverUpdater;
-import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -56,7 +46,8 @@ import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 
-import com.google.inject.Inject;
+import javax.inject.Provider;
+import java.util.*;
 
 /**
  * @author dziemke
@@ -150,41 +141,49 @@ public final class AccessibilityModule extends AbstractModule {
 				String outputDirectory = scenario.getConfig().controler().getOutputDirectory() + "/" + activityType;
 				AccessibilityComputationShutdownListener accessibilityShutdownListener = new AccessibilityComputationShutdownListener(scenario, measuringPoints, opportunities, outputDirectory);
 
-				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
-					AccessibilityContributionCalculator calculator;
-					switch(mode) {
-					case freespeed: {
+//				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
+				for( String mode : acg.getModes() ){
+					AccessibilityContributionCalculator calculator = null;
+					if ( Modes4Accessibility.freespeed.name().equals( mode  ) ) {
+						// freespeed car, special case
 						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get(TransportMode.car);
 						Gbl.assertNotNull(travelDisutilityFactory);
-						calculator = new NetworkModeAccessibilityExpContributionCalculator(mode.name(), new FreeSpeedTravelTime(), travelDisutilityFactory, scenario);
-						break; }
-					case car: {
-						final TravelTime carTravelTime = travelTimes.get(mode.name());
-						Gbl.assertNotNull(carTravelTime);
-						final TravelDisutilityFactory carTravelDisutilityFactory = travelDisutilityFactories.get(mode.name());
-						calculator = new NetworkModeAccessibilityExpContributionCalculator(mode.name(), carTravelTime, carTravelDisutilityFactory, scenario);
-						break; }
-					case bike:
-                        calculator = new ConstantSpeedAccessibilityExpContributionCalculator(mode.name(), scenario);
-                        break;
-					case walk:
-						calculator = new ConstantSpeedAccessibilityExpContributionCalculator(mode.name(), scenario);
-						break;
-					case matrixBasedPt:
-						throw new RuntimeException("currently not supported because implementation not consistent with guice grapher.  kai, " +
-											     "sep'19") ;
+						calculator = new NetworkModeAccessibilityExpContributionCalculator(mode, new FreeSpeedTravelTime(), travelDisutilityFactory, scenario);
+					} else if ( config.plansCalcRoute().getNetworkModes().contains( mode ) ) {
+						final TravelTime nwModeTravelTime = travelTimes.get(mode);
+						Gbl.assertNotNull(nwModeTravelTime);
+						final TravelDisutilityFactory nwModeTravelDisutility = travelDisutilityFactories.get(mode);
+						Gbl.assertNotNull( nwModeTravelDisutility );
+						calculator = new NetworkModeAccessibilityExpContributionCalculator(mode, nwModeTravelTime, nwModeTravelDisutility, scenario);
+					} else if ( TransportMode.pt.equals( mode ) ){
+						calculator = new SwissRailRaptorAccessibilityContributionCalculator( mode, config.planCalcScore(), scenario );
+					} else if ( Modes4Accessibility.matrixBasedPt.name().equals( mode ) ) {
+						throw new RuntimeException("currently not supported because implementation not consistent with guice grapher.  kai, sep'19") ;
 //						calculator = new LeastCostPathCalculatorAccessibilityContributionCalculator(
 //								config.planCalcScore(),	ptMatrix.asPathCalculator(config.planCalcScore()), scenario);
-//						break;
-					case pt:
-						calculator = new SwissRailRaptorAccessibilityContributionCalculator(mode.name(), config.planCalcScore(), scenario);
-						break;
-					default:
-						calculator = new TripRouterAccessibilityContributionCalculator(mode.name(), tripRouter, config.planCalcScore(), scenario,
-								travelTimes.get(TransportMode.car), travelDisutilityFactories.get(TransportMode.car));
-
+					} else if ( TransportMode.walk.equals( mode ) || TransportMode.bike.equals( mode ) ) {
+						// special case(s), since often in the simulation this is not treated as network route
+						calculator = new ConstantSpeedAccessibilityExpContributionCalculator( mode, scenario ) ;
+					} else {
+						// see if we find a trip router for that mode
+						final TravelTime travelTime = travelTimes.get( mode );
+						final TravelDisutilityFactory travelDisutilityFactory = travelDisutilityFactories.get( mode );
+						if ( travelTime==null ) {
+							throw new RuntimeException("mode=" + mode + "; travelTime is null!") ;
+						}
+						if ( travelDisutilityFactory==null ) {
+							throw new RuntimeException("mode=" + mode + "; travelDisutilityFactory is null!") ;
+						}
+						calculator = new TripRouterAccessibilityContributionCalculator(mode, tripRouter, config.planCalcScore(), scenario,
+							  travelTime, travelDisutilityFactory );
 					}
-					accessibilityShutdownListener.putAccessibilityContributionCalculator(mode.name(), calculator);
+
+					if ( calculator!=null ){
+						accessibilityShutdownListener.putAccessibilityContributionCalculator( mode, calculator );
+					} else {
+						LOG.warn(  "accessibility contribution calculator for mode=" + mode + " was null.  Will not compute accessibility for " +
+									 "that mode." );
+					}
 
 
 				}

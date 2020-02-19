@@ -362,7 +362,7 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 				int cmp = (int) (agent.time + this.freespeedTravelTime + this.inverseTimeCap + 2.0);
 				double speed = (time > cmp) ? 0.0 : this.link.getFreespeed(time);
 				agent.speed = speed;
-				int lane = 1 + (agent.intId % NetworkUtils.getNumberOfLanesAsInt(Time.getUndefinedTime(), this.link));
+				int lane = 1 + (agent.intId % NetworkUtils.getNumberOfLanesAsInt(this.link));
 				AgentSnapshotInfo position = snapshotInfoFactory.createAgentSnapshotInfo(agent.id, this.link, distanceOnLink/* + NetworkLayer.CELL_LENGTH*/, lane);
 				position.setColorValueBetweenZeroAndOne( agent.speed) ;
 				position.setAgentState(AgentSnapshotInfo.AgentState.PERSON_DRIVING_CAR);
@@ -373,7 +373,7 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 			/* Put the vehicles from the waiting list in positions.
 			 * Their actual position doesn't matter, so they are just placed
 			 * to the coordinates of the from node */
-			int lane = NetworkUtils.getNumberOfLanesAsInt(Time.getUndefinedTime(), this.link) + 1; // place them next to the link
+			int lane = NetworkUtils.getNumberOfLanesAsInt(this.link) + 1; // place them next to the link
 			for (EventAgent agent : this.waitingQueue) {
 				AgentSnapshotInfo position = snapshotInfoFactory.createAgentSnapshotInfo(agent.id, this.link, this.effectiveCellSize, lane);
 				position.setColorValueBetweenZeroAndOne( 0.0) ;
@@ -384,7 +384,7 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 			/* put the vehicles from the parking list in positions
 			 * their actual position doesn't matter, so they are just placed
 			 * to the coordinates of the from node */
-			lane = NetworkUtils.getNumberOfLanesAsInt(Time.getUndefinedTime(), this.link) + 2; // place them next to the link
+			lane = NetworkUtils.getNumberOfLanesAsInt(this.link) + 2; // place them next to the link
 			for (EventAgent agent : this.parkingQueue) {
 				AgentSnapshotInfo position = snapshotInfoFactory.createAgentSnapshotInfo(agent.id, this.link, this.effectiveCellSize, lane);
 				position.setColorValueBetweenZeroAndOne(0.0) ;

@@ -221,12 +221,14 @@ public final class NetworkUtils {
 	 */
 	public static int getNumberOfLanesAsInt(final double time, final Link link) {
 		int numberOfLanes = (int) link.getNumberOfLanes(time);
-		if (numberOfLanes == 0) {
-			return 1;
-		} else {
-			return numberOfLanes;
-		}
+		return Math.max(1, numberOfLanes);
 	}
+
+	public static int getNumberOfLanesAsInt(final Link link) {
+		int numberOfLanes = (int) link.getNumberOfLanes();
+		return Math.max(1, numberOfLanes);
+	}
+
 
 	public static boolean isMultimodal(final Network network) {
 		String mode = null;

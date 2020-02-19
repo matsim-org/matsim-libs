@@ -101,7 +101,7 @@ public class EquilTest  {
 
 		writer.closeFile();
 
-		final EventsFileComparator.Result result = EventsFileComparator.compare( referenceFileName , eventsFileName );
+		final EventsFileComparator.Result result = new EventsFileComparator().setIgnoringCoordinates( true ).runComparison( referenceFileName , eventsFileName );
 		Assert.assertEquals("different event files.", EventsFileComparator.Result.FILES_ARE_EQUAL, result );
 	}
 }

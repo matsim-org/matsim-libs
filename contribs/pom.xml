@@ -159,6 +159,7 @@
 		<module>bicycle</module>
 		<module>cadytsIntegration</module>
 		<module>carsharing</module>
+		<module>commercialTrafficApplications</module>
 		<module>common</module>
 		<module>decongestion</module>
 		<module>drt</module>

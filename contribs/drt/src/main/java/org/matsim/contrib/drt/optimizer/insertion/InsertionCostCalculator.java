@@ -27,8 +27,7 @@ import org.matsim.contrib.drt.routing.DefaultDrtRouteUpdater;
 import org.matsim.contrib.drt.routing.DrtRouteCreator;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
-import org.matsim.contrib.drt.schedule.DrtTask;
-import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
+import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
@@ -116,7 +115,7 @@ public class InsertionCostCalculator {
 		Schedule schedule = vEntry.vehicle.getSchedule();
 		boolean ongoingStopTask = pickupIdx == 0
 				&& schedule.getStatus() == ScheduleStatus.STARTED
-				&& ((DrtTask)schedule.getCurrentTask()).getDrtTaskType() == DrtTaskType.STOP;
+				&& schedule.getCurrentTask().getTaskType() == DrtTaskType.STOP;
 
 		if ((ongoingStopTask && drtRequest.getFromLink() == vEntry.start.link) //
 				|| (pickupIdx > 0 //

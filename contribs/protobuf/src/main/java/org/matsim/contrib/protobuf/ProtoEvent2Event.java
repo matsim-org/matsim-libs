@@ -91,7 +91,7 @@ public abstract class ProtoEvent2Event {
 											else {
 												if (pe.getType() == ProtobufEvents.Event.Type.PersonMoney) {
 													return new PersonMoneyEvent(pe.getPersonMoney().getTime(), Id.createPersonId(pe.getPersonMoney().getPersId().getId()),
-															pe.getPersonMoney().getAmount());
+															pe.getPersonMoney().getAmount(), pe.getPersonMoney().getPurpose(), pe.getPersonMoney().getTransactionPartner());
 												}
 												else {
 													if (pe.getType() == ProtobufEvents.Event.Type.PersonStuck) {

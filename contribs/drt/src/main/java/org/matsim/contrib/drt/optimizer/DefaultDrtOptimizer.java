@@ -19,9 +19,7 @@
 
 package org.matsim.contrib.drt.optimizer;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.TreeSet;
 import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
@@ -41,7 +39,7 @@ import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
 import org.matsim.contrib.dvrp.optimizer.Request;
-import org.matsim.contrib.dvrp.passenger.PassengerRequests;
+import org.matsim.contrib.dvrp.passenger.RequestQueue;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
@@ -62,9 +60,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	private final EmptyVehicleRelocator relocator;
 	private final UnplannedRequestInserter requestInserter;
 
-	private final Collection<DrtRequest> unplannedRequests = new TreeSet<DrtRequest>(
-			PassengerRequests.ABSOLUTE_COMPARATOR);
-	private boolean requiresReoptimization = false;
+	private final RequestQueue<DrtRequest> unplannedRequests;
 
 	public DefaultDrtOptimizer(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer, DepotFinder depotFinder,
 			RebalancingStrategy rebalancingStrategy, DrtScheduleInquiry scheduleInquiry,
@@ -82,17 +78,20 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		rebalancingInterval = drtCfg.getMinCostFlowRebalancing()
 				.map(MinCostFlowRebalancingParams::getInterval)
 				.orElse(null);
+		unplannedRequests = RequestQueue.withLimitedAdvanceRequestPlanningHorizon(
+				drtCfg.getAdvanceRequestPlanningHorizon());
 	}
 
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
-		if (requiresReoptimization) {
+		unplannedRequests.updateQueuesOnNextTimeSteps(e.getSimulationTime());
+
+		if (!unplannedRequests.getSchedulableRequests().isEmpty()) {
 			for (DvrpVehicle v : fleet.getVehicles().values()) {
 				scheduleTimingUpdater.updateTimings(v);
 			}
 
-			requestInserter.scheduleUnplannedRequests(unplannedRequests);
-			requiresReoptimization = false;
+			requestInserter.scheduleUnplannedRequests(unplannedRequests.getSchedulableRequests());
 		}
 
 		if (rebalancingInterval != null && e.getSimulationTime() % rebalancingInterval == 0) {
@@ -122,8 +121,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 
 	@Override
 	public void requestSubmitted(Request request) {
-		unplannedRequests.add((DrtRequest)request);
-		requiresReoptimization = true;
+		unplannedRequests.addRequest((DrtRequest)request);
 	}
 
 	@Override

@@ -13,7 +13,8 @@ jobs:
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/av                  && ${MVN_IT_CMD} 
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/analysis            && ${MVN_IT_CMD} 
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/cadytsIntegration   && ${MVN_IT_CMD} 
-    - script: cd ${TRAVIS_BUILD_DIR}/contribs/carsharing          && ${MVN_IT_CMD} 
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/carsharing          && ${MVN_IT_CMD}
+    - script: cd ${TRAVIS_BUILD_DIR}/contribs/commercialTrafficApplications                && ${MVN_IT_CMD}
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/drt                 && ${MVN_IT_CMD} 
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/dvrp                && ${MVN_IT_CMD} 
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/taxi                && ${MVN_IT_CMD} 
