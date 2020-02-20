@@ -395,6 +395,12 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			return this.detailedHbefaWarmTable.get( efkey2 );
 		}
 
+		// try "<technology>; average; average":
+		attribs2.setHbefaSizeClass( "average" );
+		if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
+			return this.detailedHbefaWarmTable.get( efkey2 );
+		}
+
 		logger.warn( "did not find emission factor for efkey=" + efkey );
 		logger.warn( " re-written to " + efkey2 );
 		throw new RuntimeException( );
