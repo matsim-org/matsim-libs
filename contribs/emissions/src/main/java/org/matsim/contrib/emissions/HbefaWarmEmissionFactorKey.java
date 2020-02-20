@@ -39,6 +39,7 @@ class HbefaWarmEmissionFactorKey {
         this.hbefaComponent = key.hbefaComponent;
         this.hbefaRoadCategory = key.hbefaRoadCategory;
         this.hbefaVehicleAttributes = key.hbefaVehicleAttributes;
+        this.hbefaTrafficSituation = key.hbefaTrafficSituation;
     }
 
     HbefaVehicleCategory getHbefaVehicleCategory() {
@@ -98,10 +99,10 @@ class HbefaWarmEmissionFactorKey {
 	         }
 	         HbefaWarmEmissionFactorKey key = (HbefaWarmEmissionFactorKey) obj;
 	         return
-	            hbefaVehicleCategory.equals(key.getHbefaVehicleCategory())
-	         && hbefaComponent.equals(key.getHbefaComponent())
+				 hbefaVehicleCategory == key.getHbefaVehicleCategory()
+	         && hbefaComponent == key.getHbefaComponent()
 	         && hbefaRoadCategory.equals(key.getHbefaRoadCategory())
-	         && hbefaTrafficSituation.equals(key.getHbefaTrafficSituation())
+	         && hbefaTrafficSituation == key.getHbefaTrafficSituation()
 	         && hbefaVehicleAttributes.equals(key.getHbefaVehicleAttributes());
 	}
 

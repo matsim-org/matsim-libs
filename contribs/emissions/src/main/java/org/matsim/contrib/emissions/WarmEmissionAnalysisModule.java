@@ -33,9 +33,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.matsim.contrib.emissions.HbefaTrafficSituation.*;
 import static org.matsim.contrib.emissions.utils.EmissionsConfigGroup.EmissionsComputationMethod.AverageSpeed;
@@ -315,30 +313,118 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 	}
 
 	private HbefaWarmEmissionFactor getEf(Id<Vehicle> vehicleId, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, HbefaWarmEmissionFactorKey efkey) {
-		HbefaWarmEmissionFactor ef;
-		//The logic has changed here, now it will fall back to aggregate factors per traffic scenario, instead of if any scenarios are missing.
-		if(this.detailedHbefaWarmTable != null && this.detailedHbefaWarmTable.get(efkey) != null){
-			ef = this.detailedHbefaWarmTable.get(efkey);
-		} else {
-			vehAttributesNotSpecifiedCnt++;
-			efkey.setHbefaVehicleAttributes(new HbefaVehicleAttributes()); //want to check for average vehicle
-			ef = this.avgHbefaWarmTable.get(efkey);
 
-			int maxWarnCnt = 3;
-			if(this.detailedHbefaWarmTable != null && vehAttributesNotSpecifiedCnt <= maxWarnCnt) {
-				logger.warn("Detailed vehicle attributes are not specified correctly for vehicle " + vehicleId + ": " +
-						"`" + vehicleInformationTuple.getSecond() + "'. Using fleet average values instead.");
-				if(vehAttributesNotSpecifiedCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
-			}
-			
-			if ( ef==null ) {
-//				logger.warn( "efkey=" + efkey ); //better throw RuntimeException with meaningful message instead
-				logger.error("Aborting... Did not found neither detailed nor average value for efkey = " + efkey , new RuntimeException());
-			}
-//			Gbl.assertNotNull( ef ); //duplicate check
+		// if no detailed table, get result from average table:
+		if ( this.detailedHbefaWarmTable==null ) {
+			HbefaWarmEmissionFactor ef = this.avgHbefaWarmTable.get( efkey );
+			Gbl.assertNotNull( ef );
+			return ef;
 		}
-		Gbl.assertNotNull( ef );
-		return ef;
+
+		// try lookup in detailed table:
+		if ( this.detailedHbefaWarmTable.get( efkey ) != null ) {
+			return this.detailedHbefaWarmTable.get( efkey );
+		}
+
+		// if vehicle deliberately specified as average;average;average, the lookup needs to be in the average table:
+		HbefaVehicleAttributes attributes = vehicleInformationTuple.getSecond();
+		if ( "average".equals( attributes.getHbefaEmConcept() ) && "average".equals( attributes.getHbefaSizeClass() ) && "average".equals( attributes.getHbefaTechnology() ) ) {
+			HbefaWarmEmissionFactor ef = this.avgHbefaWarmTable.get( efkey );
+			Gbl.assertNotNull( ef );
+			return ef;
+		}
+
+		// try to re-write the key from hbefa3.x to hbefa4.x:
+		HbefaVehicleAttributes attribs2 = new HbefaVehicleAttributes();
+
+		// technology is copied:
+		attribs2.setHbefaTechnology( vehicleInformationTuple.getSecond().getHbefaTechnology() );
+
+		// size class is "not specified":
+		attribs2.setHbefaSizeClass( "not specified" );
+
+		// em concept is re-written with different dashes:
+		switch( vehicleInformationTuple.getSecond().getHbefaEmConcept() ) {
+			case "PC-P-Euro-1":
+				attribs2.setHbefaEmConcept( "PC P Euro-1" );
+				break;
+			case "PC-P-Euro-2":
+				attribs2.setHbefaEmConcept( "PC P Euro-2" );
+				break;
+			case "PC-P-Euro-3":
+				attribs2.setHbefaEmConcept( "PC P Euro-3" );
+				break;
+			case "PC-P-Euro-4":
+				attribs2.setHbefaEmConcept( "PC P Euro-4" );
+				break;
+			case "PC-P-Euro-5":
+				attribs2.setHbefaEmConcept( "PC P Euro-5" );
+				break;
+			case "PC-P-Euro-6":
+				attribs2.setHbefaEmConcept( "PC P Euro-6" );
+				break;
+			case "PC-D-Euro-1":
+				attribs2.setHbefaEmConcept( "PC D Euro-1" );
+				break;
+			case "PC-D-Euro-2":
+				attribs2.setHbefaEmConcept( "PC D Euro-2" );
+				break;
+			case "PC-D-Euro-3":
+				attribs2.setHbefaEmConcept( "PC D Euro-3" );
+				break;
+			case "PC-D-Euro-4":
+				attribs2.setHbefaEmConcept( "PC D Euro-4" );
+				break;
+			case "PC-D-Euro-5":
+				attribs2.setHbefaEmConcept( "PC D Euro-5" );
+				break;
+			case "PC-D-Euro-6":
+				attribs2.setHbefaEmConcept( "PC D Euro-6" );
+				break;
+		}
+
+		// note that the above should allow for something like "diesel; not specified; average".
+		// It will not allow for something like "diesel; average; average"; that would need to be programmed separately if needed.
+
+		// put this into a new key ...
+		HbefaWarmEmissionFactorKey efkey2 = new HbefaWarmEmissionFactorKey( efkey );
+		efkey2.setHbefaVehicleAttributes( attribs2 );
+
+		// ... and try to look up:
+		if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
+			return this.detailedHbefaWarmTable.get( efkey2 );
+		}
+
+		logger.warn( "did not find emission factor for efkey=" + efkey );
+		logger.warn( " re-written to " + efkey2 );
+		throw new RuntimeException( );
+
+
+		// the above code is replacing the code below.
+
+//		//The logic has changed here, now it will fall back to aggregate factors per traffic scenario, instead of if any scenarios are missing.
+//		if(this.detailedHbefaWarmTable != null && this.detailedHbefaWarmTable.get(efkey) != null){
+//			ef = this.detailedHbefaWarmTable.get(efkey);
+//		} else {
+//			vehAttributesNotSpecifiedCnt++;
+//			efkey.setHbefaVehicleAttributes(new HbefaVehicleAttributes()); //want to check for average vehicle
+//			ef = this.avgHbefaWarmTable.get(efkey);
+//
+//			int maxWarnCnt = 3;
+//			if(this.detailedHbefaWarmTable != null && vehAttributesNotSpecifiedCnt <= maxWarnCnt) {
+//				logger.warn("Detailed vehicle attributes are not specified correctly for vehicle " + vehicleId + ": " +
+//						"`" + vehicleInformationTuple.getSecond() + "'. Using fleet average values instead.");
+//				if(vehAttributesNotSpecifiedCnt == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
+//			}
+//
+//			if ( ef==null ) {
+////				logger.warn( "efkey=" + efkey ); //better throw RuntimeException with meaningful message instead
+//				logger.error("Aborting... Did not found neither detailed nor average value for efkey = " + efkey , new RuntimeException());
+//			}
+////			Gbl.assertNotNull( ef ); //duplicate check
+//		}
+//		Gbl.assertNotNull( ef );
+//		return ef;
 	}
 
 	//TODO: this is based on looking at the speeds in the HBEFA files, using an MFP, maybe from A.Loder would be nicer, jm  oct'18
