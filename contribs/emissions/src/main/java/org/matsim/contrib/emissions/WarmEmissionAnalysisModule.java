@@ -383,9 +383,6 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 				break;
 		}
 
-		// note that the above should allow for something like "diesel; not specified; average".
-		// It will not allow for something like "diesel; average; average"; that would need to be programmed separately if needed.
-
 		// put this into a new key ...
 		HbefaWarmEmissionFactorKey efkey2 = new HbefaWarmEmissionFactorKey( efkey );
 		efkey2.setHbefaVehicleAttributes( attribs2 );
@@ -397,6 +394,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 		// try "<technology>; average; average":
 		attribs2.setHbefaSizeClass( "average" );
+		attribs2.setHbefaEmConcept( "average" );
 		if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
 			return this.detailedHbefaWarmTable.get( efkey2 );
 		}
