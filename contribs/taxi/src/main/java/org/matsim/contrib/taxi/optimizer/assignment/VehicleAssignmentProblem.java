@@ -28,7 +28,7 @@ import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.locationchoice.router.BackwardMultiNodePathCalculator;
+import org.matsim.core.router.util.BackwardMultiNodePathCalculator;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.VehicleData;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;

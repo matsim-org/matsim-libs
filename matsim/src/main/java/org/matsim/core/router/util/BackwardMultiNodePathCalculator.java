@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.matsim.contrib.locationchoice.router;
+package org.matsim.core.router.util;
 
 import org.matsim.core.router.MultiNodePathCalculator;
 

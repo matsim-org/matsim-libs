@@ -23,8 +23,8 @@ import java.util.List;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.Fleet;
-import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstraFactory;
-import org.matsim.contrib.locationchoice.router.BackwardMultiNodePathCalculator;
+import org.matsim.core.router.util.BackwardFastMultiNodeDijkstraFactory;
+import org.matsim.core.router.util.BackwardMultiNodePathCalculator;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.UnplannedRequestInserter;
 import org.matsim.contrib.taxi.optimizer.VehicleData;

@@ -36,8 +36,8 @@ import org.matsim.contrib.etaxi.optimizer.assignment.AssignmentChargerPlugData.C
 import org.matsim.contrib.ev.dvrp.EvDvrpVehicle;
 import org.matsim.contrib.ev.fleet.Battery;
 import org.matsim.contrib.ev.infrastructure.ChargingInfrastructure;
-import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstraFactory;
-import org.matsim.contrib.locationchoice.router.BackwardMultiNodePathCalculator;
+import org.matsim.core.router.util.BackwardFastMultiNodeDijkstraFactory;
+import org.matsim.core.router.util.BackwardMultiNodePathCalculator;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.VehicleData;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData;

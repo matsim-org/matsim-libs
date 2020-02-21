@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.locationchoice.router;
+package org.matsim.core.router.util;
 
 import java.util.HashMap;
 import java.util.Map;
