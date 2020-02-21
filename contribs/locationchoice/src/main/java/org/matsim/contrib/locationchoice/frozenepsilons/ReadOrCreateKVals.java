@@ -52,7 +52,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 		String pkValuesFileName = dccg.getpkValuesFile();
 		String fkValuesFileName = dccg.getfkValuesFile();
 		String maxEpsValuesFileName = dccg.getMaxEpsFile();
-		if (exisitingKValues()) {
+		if (existingKValues()) {
 			log.info("reading the kvals from the input plans file and facility file");
 			return 1;
 		}
@@ -87,7 +87,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 		}
 	}
 
-	 private boolean exisitingKValues() {
+	 private boolean existingKValues() {
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			Object kAttribute = person.getAttributes().getAttribute("k");
 			if (kAttribute == null) {
