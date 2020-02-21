@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.accessibility.costcalculators;
+package org.matsim.contrib.accessibility;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -36,7 +36,7 @@ import org.matsim.vehicles.Vehicle;
  *
  * @author mrieser, thomas
  */
-public class TravelTimeBasedTravelDisutility implements TravelDisutility{
+class TravelTimeBasedTravelDisutility implements TravelDisutility{
 	
 	protected final TravelTime timeCalculator;
 	private final double marginalCostOfTime;

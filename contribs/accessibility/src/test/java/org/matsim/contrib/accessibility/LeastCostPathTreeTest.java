@@ -1,4 +1,4 @@
-package org.matsim.contrib.accessibility.leastcostpath;
+package org.matsim.contrib.accessibility;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -10,8 +10,8 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.accessibility.costcalculators.TravelDistanceCalculator;
-import org.matsim.contrib.accessibility.costcalculators.TravelTimeCostCalculator;
+import org.matsim.contrib.accessibility.TravelDistanceCalculator;
+import org.matsim.contrib.accessibility.TravelTimeCostCalculator;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.router.util.TravelTime;
