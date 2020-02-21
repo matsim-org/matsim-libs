@@ -20,14 +20,20 @@
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
 import java.util.HashSet;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.locationchoice.utils.ScaleEpsilon;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+
+import static org.matsim.core.router.TripStructureUtils.StageActivityHandling.*;
 
 class ReadOrComputeMaxDCScore {
 
@@ -50,6 +56,11 @@ class ReadOrComputeMaxDCScore {
 
 	public void readOrCreateMaxDCScore( boolean arekValsRead ) {
 		String maxEpsValuesFileName = this.dccg.getMaxEpsFile();
+		if (existingFlexibleTypeValue()) {
+			log.info("reading MaxDCScore from plans file");
+			return;
+		}
+		log.info("at least one facility value is missing, start crating all values");
 		if (maxEpsValuesFileName != null && arekValsRead) {
 			try {
 				ObjectAttributesXmlReader maxEpsReader = new ObjectAttributesXmlReader(this.personsMaxDCScoreUnscaled);
@@ -76,6 +87,23 @@ class ReadOrComputeMaxDCScore {
 			log.info("computing maxDCScore");
 			this.computeMaxDCScore();
 		}
+	}
+
+	private boolean existingFlexibleTypeValue() {
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			Plan plan = person.getSelectedPlan();
+			List<Activity> activities = TripStructureUtils.getActivities(plan, ExcludeStageActivities);
+			for (String flexibleType : this.flexibleTypes) {
+				for (Activity activity : activities) {
+					if (activity.getType().equals(flexibleType)) {
+						if (person.getAttributes().getAttribute(flexibleType) == null) {
+							return false;
+						}
+					}
+				}
+			}
+		}
+		return true;
 	}
 
 	private void computeMaxDCScore() {

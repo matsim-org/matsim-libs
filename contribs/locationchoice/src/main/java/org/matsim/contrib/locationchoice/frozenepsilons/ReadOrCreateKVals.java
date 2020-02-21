@@ -52,6 +52,11 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 		String pkValuesFileName = dccg.getpkValuesFile();
 		String fkValuesFileName = dccg.getfkValuesFile();
 		String maxEpsValuesFileName = dccg.getMaxEpsFile();
+		if (exisitingKValues()) {
+			log.info("reading the kvals from the input plans file and facility file");
+			return 1;
+		}
+		log.info("at least one facility kValue or person kValue is missing, start crating all values");
 		if (pkValuesFileName != null && fkValuesFileName != null && maxEpsValuesFileName != null) {			
 			ObjectAttributesXmlReader persKValuesReader = new ObjectAttributesXmlReader(this.personsKValues);
 			ObjectAttributesXmlReader facKValuesReader = new ObjectAttributesXmlReader(this.facilitiesKValues);
@@ -81,8 +86,24 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 			return 1;
 		}
 	}
-		
-	public void assignKValues() {
+
+	 private boolean exisitingKValues() {
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			Object kAttribute = person.getAttributes().getAttribute("k");
+			if (kAttribute == null) {
+				return false;
+			}
+		}
+		for (ActivityFacility activityFacility : scenario.getActivityFacilities().getFacilities().values()) {
+			Object kAttribute = activityFacility.getAttributes().getAttribute("k");
+			if (kAttribute == null) {
+				return false;
+			}
+		}
+		return true;
+	 }
+
+	 public void assignKValues() {
 		log.info("generating kVals");
 		this.assignKValuesPersons();
 		this.assignKValuesAlternatives();
