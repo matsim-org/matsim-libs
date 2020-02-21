@@ -18,14 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.router.util;
+package org.matsim.core.router;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.router.ArrayFastRouterDelegateFactory;
-import org.matsim.core.router.FastRouterDelegateFactory;
+import org.matsim.core.router.util.*;
 
 /**
  * Creates a MultiNodeDijkstra which is routing backwards. To do so,
@@ -34,7 +33,7 @@ import org.matsim.core.router.FastRouterDelegateFactory;
  *
  * @author cdobler
  */
-public class BackwardFastMultiNodeDijkstraFactory implements LeastCostPathCalculatorFactory {
+public final class BackwardFastMultiNodeDijkstraFactory implements LeastCostPathCalculatorFactory{
 
 	private final boolean searchAllEndNodes;
 	private final boolean usePreProcessData;

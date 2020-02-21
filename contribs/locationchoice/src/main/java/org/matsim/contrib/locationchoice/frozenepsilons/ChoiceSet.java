@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.router.util.BackwardFastMultiNodeDijkstra;
+import org.matsim.core.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.*;

@@ -18,12 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.router.util;
+package org.matsim.core.router;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.FastMultiNodeDijkstra;
 import org.matsim.core.router.FastRouterDelegateFactory;
+import org.matsim.core.router.util.*;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
 
 import java.util.ArrayList;
@@ -35,11 +36,11 @@ import java.util.ArrayList;
  * 
  * @author cdobler
  */
-public final class BackwardFastMultiNodeDijkstra extends FastMultiNodeDijkstra implements BackwardMultiNodePathCalculator {
+public final class BackwardFastMultiNodeDijkstra extends FastMultiNodeDijkstraImpl implements BackwardMultiNodePathCalculator{
 	
-	BackwardFastMultiNodeDijkstra(final RoutingNetwork routingNetwork, final TravelDisutility costFunction,
-			final TravelTime timeFunction, final PreProcessDijkstra preProcessData, 
-			final FastRouterDelegateFactory fastRouterFactory, boolean searchAllEndNodes) {
+	BackwardFastMultiNodeDijkstra( final RoutingNetwork routingNetwork, final TravelDisutility costFunction,
+				       final TravelTime timeFunction, final PreProcessDijkstra preProcessData,
+				       final FastRouterDelegateFactory fastRouterFactory, boolean searchAllEndNodes) {
 		super(routingNetwork, costFunction, timeFunction, preProcessData, fastRouterFactory, searchAllEndNodes);
 	}
 	

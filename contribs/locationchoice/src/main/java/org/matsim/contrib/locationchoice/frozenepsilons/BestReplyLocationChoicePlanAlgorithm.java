@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.locationchoice.frozenepsilons.DestinationChoiceContext.ActivityFacilityWithIndex;
-import org.matsim.core.router.util.BackwardFastMultiNodeDijkstra;
+import org.matsim.core.router.BackwardFastMultiNodeDijkstra;
 //import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.ScaleEpsilon;
 import org.matsim.core.config.ConfigUtils;
