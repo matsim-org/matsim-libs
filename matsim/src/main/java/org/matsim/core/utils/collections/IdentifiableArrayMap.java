@@ -89,8 +89,7 @@ public class IdentifiableArrayMap<S, T extends Identifiable<S>> implements Map<I
 	public T put(final T value) {
 		return put(value.getId(), value);
 	}
-	
-	@SuppressWarnings("unchecked")
+
 	@Override
 	public T put(final Id<S> key, final T value) {
 		for (int i = 0; i < this.data.length; i++) {

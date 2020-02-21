@@ -22,7 +22,7 @@ package org.matsim.contrib.taxi.util.stats;
 import java.util.List;
 
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
-import org.matsim.contrib.taxi.schedule.TaxiTask;
+import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.contrib.util.CSVLineBuilder;
 import org.matsim.contrib.util.CompactCSVWriter;
 import org.matsim.core.utils.io.IOUtils;
@@ -104,14 +104,14 @@ public class TaxiStatsWriter {
 	private void writeTaskTypeSums(CompactCSVWriter writer) {
 		writer.writeNext("Total duration of tasks by type [h]");
 		CSVLineBuilder headerBuilder = new CSVLineBuilder().add("hour");
-		for (TaxiTask.TaxiTaskType t : TaxiTask.TaxiTaskType.values()) {
+		for (TaxiTaskType t : TaxiTaskType.values()) {
 			headerBuilder.add(t.name());
 		}
 		writer.writeNext(headerBuilder.add("all"));
 
 		for (TaxiStats s : taxiStats) {
 			CSVLineBuilder lineBuilder = new CSVLineBuilder().add(s.id);
-			for (TaxiTask.TaxiTaskType t : TaxiTask.TaxiTaskType.values()) {
+			for (TaxiTaskType t : TaxiTaskType.values()) {
 				lineBuilder.addf("%.2f", s.taskTimeSumsByType.get(t).doubleValue() / 3600);
 			}
 			lineBuilder.addf("%.2f", s.taskTimeSumsByType.getTotal().doubleValue() / 3600);

@@ -181,10 +181,11 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 		DriveEnergyConsumption driveEnergyConsumption = pseudoVehicle.getDriveEnergyConsumption();
 		AuxEnergyConsumption auxEnergyConsumption = pseudoVehicle.getAuxEnergyConsumption();
 		double lastSoc = pseudoVehicle.getBattery().getSoc();
+		double linkEnterTime = basicLeg.getDepartureTime();
 		for (Link l : links) {
 			double travelT = travelTime.getLinkTravelTime(l, basicLeg.getDepartureTime(), null, null);
 
-			double consumption = driveEnergyConsumption.calcEnergyConsumption(l, travelT, Time.getUndefinedTime())
+			double consumption = driveEnergyConsumption.calcEnergyConsumption(l, travelT, linkEnterTime)
 					+ auxEnergyConsumption.calcEnergyConsumption(basicLeg.getDepartureTime(), travelT, l.getId());
 			pseudoVehicle.getBattery().changeSoc(-consumption);
 			double currentSoc = pseudoVehicle.getBattery().getSoc();
@@ -192,6 +193,7 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 			double consumptionDiff = (lastSoc - currentSoc);
 			lastSoc = currentSoc;
 			consumptions.put(l, consumptionDiff);
+			linkEnterTime += travelT;
 		}
 		return consumptions;
 	}

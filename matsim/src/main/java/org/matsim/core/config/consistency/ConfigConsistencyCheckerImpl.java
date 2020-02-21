@@ -52,7 +52,6 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 		checkPlanCalcScore(config);
 		checkTransit(config);
 		checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
-		new BeanValidationConfigConsistencyChecker().checkConsistency(config);
 	}
 
 	static boolean checkConsistencyBetweenRouterAndTravelTimeCalculator( final Config config ) {

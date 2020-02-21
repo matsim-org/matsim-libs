@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.MultiModeDrtConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripRouter;
@@ -48,7 +49,9 @@ public class MultiModeDrtMainModeIdentifier implements MainModeIdentifier {
 		stageActivityTypeToDrtMode = drtCfg.getModalElements()
 				.stream()
 				.map(DrtConfigGroup::getMode)
-				.collect(Collectors.toMap(s -> new DrtStageActivityType(s).drtStageActivity, s -> s));
+				.collect(Collectors.toMap(PlanCalcScoreConfigGroup::createStageActivityType, s -> s));
+
+		// #deleteBeforeRelease : only used to retrofit plans created since the merge of fallback routing module (sep'-dec'19)
 		fallbackModeToDrtMode = drtCfg.getModalElements()
 				.stream()
 				.map(DrtConfigGroup::getMode)
@@ -64,6 +67,7 @@ public class MultiModeDrtMainModeIdentifier implements MainModeIdentifier {
 					return type;
 				}
 			} else if (pe instanceof Leg) {
+				// #deleteBeforeRelease : only used to retrofit plans created since the merge of fallback routing module (sep'-dec'19)
 				String mode = fallbackModeToDrtMode.get(((Leg)pe).getMode());
 				if (mode != null) {
 					return mode;

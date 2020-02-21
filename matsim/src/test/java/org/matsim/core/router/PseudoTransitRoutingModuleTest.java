@@ -129,6 +129,10 @@ public class PseudoTransitRoutingModuleTest {
 
 		public Fixture() {
 			s.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+			ModeRoutingParams walk = new ModeRoutingParams(TransportMode.walk);
+			walk.setBeelineDistanceFactor(1.3);
+			walk.setTeleportedModeSpeed(3.0 / 3.6);
+			s.getConfig().plansCalcRoute().addModeRoutingParams(walk);
 			
 			Network net = this.s.getNetwork();
 			NetworkFactory nf = net.getFactory();

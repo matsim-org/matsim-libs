@@ -31,7 +31,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class AgentMoneyEventTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
-		final PersonMoneyEvent event1 = new PersonMoneyEvent(25560.23, Id.create("1", Person.class), 2.71828);
+		final PersonMoneyEvent event1 = new PersonMoneyEvent(25560.23, Id.create("1", Person.class), 2.71828, "tollRefund", "motorwayOperator");
 		final PersonMoneyEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
 		assertEquals(event1.getTime(), event2.getTime(), EPSILON);
 		assertEquals(event1.getPersonId().toString(), event2.getPersonId().toString());

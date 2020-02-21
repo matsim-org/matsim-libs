@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansConfigGroup.HandlingOfPlansWithoutRoutingMode;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -43,6 +44,7 @@ public class TripEventHandlerTest {
 		// url is such a weird api
 		URL ptTutorial = URI.create(ExamplesUtils.getTestScenarioURL("pt-tutorial").toString() + "0.config.xml").toURL();
 		Config config = ConfigUtils.loadConfig(ptTutorial);
+		config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
 
 		// use the config and run only one iteration
 		config.controler().setFirstIteration(0);
@@ -85,23 +87,23 @@ public class TripEventHandlerTest {
 		List<TripEventHandler.Trip> tripsOfPerson102 = personTrips.get(Id.createPersonId("102"));
 		assertEquals(3, tripsOfPerson102.size());
 
-		// this trip is non_network_walk -> pt -> non_network_walk
+		// this trip is walk -> pt -> walk
 		assertEquals(TransportMode.pt, tripsOfPerson102.get(0).getMainMode());
 		assertEquals(3, tripsOfPerson102.get(0).getLegs().size());
-		assertEquals(TransportMode.non_network_walk, tripsOfPerson102.get(0).getLegs().get(0).getMode());
+		assertEquals(TransportMode.walk, tripsOfPerson102.get(0).getLegs().get(0).getMode());
 		assertEquals(TransportMode.pt, tripsOfPerson102.get(0).getLegs().get(1).getMode());
-		assertEquals(TransportMode.non_network_walk, tripsOfPerson102.get(0).getLegs().get(2).getMode());
+		assertEquals(TransportMode.walk, tripsOfPerson102.get(0).getLegs().get(2).getMode());
 
 		// this trip is only transit_walk
-		assertEquals(TransportMode.pt, tripsOfPerson102.get(1).getMainMode());
+		assertEquals(TransportMode.walk, tripsOfPerson102.get(1).getMainMode());
 		assertEquals(1, tripsOfPerson102.get(1).getLegs().size());
-		assertEquals(TransportMode.transit_walk, tripsOfPerson102.get(1).getLegs().get(0).getMode());
+		assertEquals(TransportMode.walk, tripsOfPerson102.get(1).getLegs().get(0).getMode());
 
-		// this trip is non_network_walk -> pt -> non_network_walk
+		// this trip is walk -> pt -> walk
 		assertEquals(TransportMode.pt, tripsOfPerson102.get(2).getMainMode());
 		assertEquals(3, tripsOfPerson102.get(2).getLegs().size());
-		assertEquals(TransportMode.non_network_walk, tripsOfPerson102.get(2).getLegs().get(0).getMode());
+		assertEquals(TransportMode.walk, tripsOfPerson102.get(2).getLegs().get(0).getMode());
 		assertEquals(TransportMode.pt, tripsOfPerson102.get(2).getLegs().get(1).getMode());
-		assertEquals(TransportMode.non_network_walk, tripsOfPerson102.get(2).getLegs().get(2).getMode());
+		assertEquals(TransportMode.walk, tripsOfPerson102.get(2).getLegs().get(2).getMode());
 	}
 }

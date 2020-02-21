@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
+import static org.matsim.contrib.dvrp.examples.onetaxi.OneTaxiOptimizer.OneTaxiTaskType;
+
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
@@ -26,7 +28,6 @@ import org.matsim.contrib.dvrp.passenger.SinglePassengerDropoffActivity;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerPickupActivity;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpMode;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
@@ -56,20 +57,26 @@ final class OneTaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 	@Override
 	public DynAction createAction(DynAgent dynAgent, DvrpVehicle vehicle, double now) {
 		Task task = vehicle.getSchedule().getCurrentTask();
-		if (task instanceof DriveTask) {
-			return VrpLegFactory.createWithOfflineTracker(mobsimMode, vehicle, timer);
-		} else if (task instanceof OneTaxiServeTask) { // PICKUP or DROPOFF
-			final OneTaxiServeTask serveTask = (OneTaxiServeTask)task;
+		switch ((OneTaxiTaskType)task.getTaskType()) {
+			case EMPTY_DRIVE:
+			case OCCUPIED_DRIVE:
+				return VrpLegFactory.createWithOfflineTracker(mobsimMode, vehicle, timer);
 
-			if (serveTask.isPickup()) {
-				return new SinglePassengerPickupActivity(passengerEngine, dynAgent, serveTask, serveTask.getRequest(),
+			case PICKUP:
+				OneTaxiServeTask pickupTask = (OneTaxiServeTask)task;
+				return new SinglePassengerPickupActivity(passengerEngine, dynAgent, pickupTask, pickupTask.getRequest(),
 						"OneTaxiPickup");
-			} else {
-				return new SinglePassengerDropoffActivity(passengerEngine, dynAgent, serveTask, serveTask.getRequest(),
-						"OneTaxiDropoff");
-			}
-		} else { // WAIT
-			return new IdleDynActivity("OneTaxiStay", task::getEndTime);
+
+			case DROPOFF:
+				OneTaxiServeTask dropoffTask = (OneTaxiServeTask)task;
+				return new SinglePassengerDropoffActivity(passengerEngine, dynAgent, dropoffTask,
+						dropoffTask.getRequest(), "OneTaxiDropoff");
+
+			case WAIT:
+				return new IdleDynActivity("OneTaxiStay", task::getEndTime);
+
+			default:
+				throw new IllegalStateException();
 		}
 	}
 }

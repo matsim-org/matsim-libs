@@ -160,12 +160,14 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 	 * @param networkModesString {@value #NETWORK_MODES_EXP}
 	 */
 	@StringSetter(NETWORK_MODES)
-	public void setNetworkModesAsString(String networkModesString) {
+	public DvrpConfigGroup setNetworkModesAsString(String networkModesString) {
 		this.networkModes = ImmutableSet.copyOf(StringUtils.explode(networkModesString, ','));
+		return this;
 	}
 
-	public void setNetworkModes(ImmutableSet<String> networkModes) {
+	public DvrpConfigGroup setNetworkModes(ImmutableSet<String> networkModes) {
 		this.networkModes = networkModes;
+		return this;
 	}
 
 	/**
@@ -180,8 +182,9 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 	 * @param networkMode {@value #MOBSIM_MODE_EXP}
 	 */
 	@StringSetter(MOBSIM_MODE)
-	public void setMobsimMode(String networkMode) {
+	public DvrpConfigGroup setMobsimMode(String networkMode) {
 		this.mobsimMode = networkMode;
+		return this;
 	}
 
 	/**
@@ -196,8 +199,9 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 	 * @param travelTimeEstimationAlpha {@value #TRAVEL_TIME_ESTIMATION_ALPHA_EXP}
 	 */
 	@StringSetter(TRAVEL_TIME_ESTIMATION_ALPHA)
-	public void setTravelTimeEstimationAlpha(double travelTimeEstimationAlpha) {
+	public DvrpConfigGroup setTravelTimeEstimationAlpha(double travelTimeEstimationAlpha) {
 		this.travelTimeEstimationAlpha = travelTimeEstimationAlpha;
+		return this;
 	}
 
 	/**
@@ -212,7 +216,8 @@ public final class DvrpConfigGroup extends ReflectiveConfigGroup {
 	 * @param travelTimeEstimationBeta {@value #TRAVEL_TIME_ESTIMATION_BETA_EXP}
 	 */
 	@StringSetter(TRAVEL_TIME_ESTIMATION_BETA)
-	public void setTravelTimeEstimationBeta(double travelTimeEstimationBeta) {
+	public DvrpConfigGroup setTravelTimeEstimationBeta(double travelTimeEstimationBeta) {
 		this.travelTimeEstimationBeta = travelTimeEstimationBeta;
+		return this;
 	}
 }

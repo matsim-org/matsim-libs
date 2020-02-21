@@ -27,18 +27,23 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.HandlingOfPlansWithoutRoutingMode;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.population.algorithms.PersonPrepareForSim;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesFromPopulation;
@@ -48,8 +53,10 @@ import org.matsim.vehicles.VehicleUtils;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -70,11 +77,19 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 	private final Provider<TripRouter> tripRouterProvider;
 	private final QSimConfigGroup qSimConfigGroup;
 	private final FacilitiesConfigGroup facilitiesConfigGroup;
+	private final PlansConfigGroup plansConfigGroup;
+	private final MainModeIdentifier backwardCompatibilityMainModeIdentifier;
 
+	/**
+	 * backwardCompatibilityMainModeIdentifier should be a separate MainModeidentifier, neither the routing mode identifier from TripStructureUtils, 
+	 * nor the AnalysisMainModeidentifier used for analysis (ModeStats etc.).
+	 */
 	@Inject
 	PrepareForSimImpl(GlobalConfigGroup globalConfigGroup, Scenario scenario, Network network,
 				Population population, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider,
-				QSimConfigGroup qSimConfigGroup, FacilitiesConfigGroup facilitiesConfigGroup) {
+				QSimConfigGroup qSimConfigGroup, FacilitiesConfigGroup facilitiesConfigGroup, 
+				PlansConfigGroup plansConfigGroup, 
+				MainModeIdentifier backwardCompatibilityMainModeIdentifier) {
 		this.globalConfigGroup = globalConfigGroup;
 		this.scenario = scenario;
 		this.network = network;
@@ -83,6 +98,8 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		this.tripRouterProvider = tripRouterProvider;
 		this.qSimConfigGroup = qSimConfigGroup;
 		this.facilitiesConfigGroup = facilitiesConfigGroup;
+		this.plansConfigGroup = plansConfigGroup;
+		this.backwardCompatibilityMainModeIdentifier = backwardCompatibilityMainModeIdentifier;
 	}
 
 
@@ -145,13 +162,16 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 		// the person (maybe via the household).    kai, feb'18
 		// each agent receives a vehicle for each main mode now. janek, aug'19
 		createAndAddVehiclesForEveryNetworkMode();
+		
+		adaptOutdatedPlansForRoutingMode();
 
 		// make sure all routes are calculated.
 		// the above creation of vehicles per agent has to be run before executing the initial routing here. janek, aug'19
 		// At least xy2links is needed here, i.e. earlier than PrepareForMobsimImpl.  It could, however, presumably be separated out
 		// (i.e. we introduce a separate PersonPrepareForMobsim).  kai, jul'18
 		ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(),
-				() -> new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, carOnlyNetwork)
+				() -> new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, 
+						carOnlyNetwork)
 		);
 		
 		if (scenario instanceof Lockable) {
@@ -246,5 +266,172 @@ public final class PrepareForSimImpl implements PrepareForSim, PrepareForMobsim 
 					throw new RuntimeException("Expecting a vehicle id which is missing in the vehicles database: " + vehicleId);
 			}
 		}
+	}
+	
+	private static boolean insistingOnPlansWithoutRoutingModeLogWarnNotShownYet = true;
+	
+	private void adaptOutdatedPlansForRoutingMode() {
+		population.getPersons().values().stream().forEach(person -> {
+			for (Plan plan : person.getPlans()) {
+				for (Trip trip : TripStructureUtils.getTrips(plan.getPlanElements())) {
+					List<Leg> legs = trip.getLegsOnly();
+					if (legs.size() >= 1) {
+						String routingMode = TripStructureUtils.getRoutingMode(legs.get(0));
+
+						for (Leg leg : legs) {
+							// 1. check all legs either have the same routing mode or all have routingMode==null
+							if (TripStructureUtils.getRoutingMode(leg) == null) {
+								if (routingMode == null) {
+									// outdated initial plan without routingMode
+								} else {
+									String errorMessage = "Found a mixed trip having some legs with routingMode set and others without. "
+											+ "This is inconsistent. Agent id: " + person.getId().toString()
+											+ "\nTrip: " + trip.getTripElements().toString();
+									log.error(errorMessage);
+									throw new RuntimeException(errorMessage);
+								}
+							} else {
+								if (routingMode.equals(TripStructureUtils.getRoutingMode(leg))) {
+									TripStructureUtils.setRoutingMode(leg, routingMode);
+								} else {
+									String errorMessage = "Found a trip whose legs have different routingModes. "
+											+ "This is inconsistent. Agent id: " + person.getId().toString()
+											+ "\nTrip: " + trip.getTripElements().toString();
+									log.error(errorMessage);
+									throw new RuntimeException(errorMessage);
+								}
+							}
+						}
+
+						// add routing mode
+						if (routingMode == null) {
+							if (legs.size() == 1) {
+								// there is only a single leg (e.g. after Trips2Legs and a mode choice replanning
+								// module)
+
+								String oldMainMode = replaceOutdatedFallbackModesAndReturnOldMainMode(legs.get(0),
+										null);
+								if (oldMainMode != null) {
+									routingMode = oldMainMode;
+									TripStructureUtils.setRoutingMode(legs.get(0), routingMode);
+								} else {
+									// leg has a real mode (not an outdated fallback mode)
+									routingMode = legs.get(0).getMode();
+									TripStructureUtils.setRoutingMode(legs.get(0), routingMode);
+								}
+							} else {
+								if (plansConfigGroup.getHandlingOfPlansWithoutRoutingMode().equals(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier)) {
+									routingMode = getAndAddRoutingModeFromBackwardCompatibilityMainModeIdentifier(
+											person, trip);
+								} else {
+									String errorMessage = "Found a trip with multiple legs and no routingMode. "
+											+ "Person id " + person.getId().toString()
+											+ "\nTrip: " + trip.getTripElements().toString()
+											+ "\nTerminating. Take care to inject an adequate MainModeIdentifier and set config switch "
+											+ "plansConfigGroup.setHandlingOfPlansWithoutRoutingMode(" 
+											+ HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier.toString() + ").";
+									log.error(errorMessage);
+									throw new RuntimeException(errorMessage);
+								}
+							}
+						}
+
+						for (Leg leg : legs) {
+							// check before replaceOutdatedAccessEgressHelperModes
+							if (leg.getMode().equals(TransportMode.walk) && leg.getRoute() instanceof NetworkRoute) {
+								log.error(
+										"Found a walk leg with a NetworkRoute. This is the only allowed use case of having "
+												+ "non_network_walk as an access/egress mode. PrepareForSimImpl replaces "
+												+ "non_network_walk with walk, because access/egress to modes other than walk should "
+												+ "use the walk Router. If this causes any problem please report to gleich or kai -nov'19");
+							}
+						}
+
+						for (Leg leg : legs) {
+							replaceOutdatedAccessEgressHelperModes(leg, routingMode);
+							replaceOutdatedFallbackModesAndReturnOldMainMode(leg, routingMode);
+						}
+					}
+				}
+			}
+		});
+	}
+
+	private String getAndAddRoutingModeFromBackwardCompatibilityMainModeIdentifier(Person person, Trip trip) {
+		String routingMode;
+		if (insistingOnPlansWithoutRoutingModeLogWarnNotShownYet) {
+			log.warn(
+					"Insisting on using backward compatibility MainModeIdentifier instead of setting routingMode directly.");
+			insistingOnPlansWithoutRoutingModeLogWarnNotShownYet = false;
+		}
+		if (backwardCompatibilityMainModeIdentifier == null) {
+			log.error(
+					"Found a trip without routingMode, but there is no MainModeIdentifier set up for PrepareForSim, so cannot infer the routing mode from a MainModeIdentifier. Trip: "
+							+ trip.getTripElements());
+			new RuntimeException("no MainModeIdentifier set up for PrepareForSim");
+		}
+		routingMode = backwardCompatibilityMainModeIdentifier.identifyMainMode(trip.getTripElements());
+		if (routingMode != null) {
+			for (Leg leg : trip.getLegsOnly()) {
+				TripStructureUtils.setRoutingMode(leg, routingMode);
+			}
+		} else {
+			String errorMessage = "Found a trip whose legs had no routingMode. "
+					+ "The backwardCompatibilityMainModeIdentifier could not identify the mode. " + "Agent id: "
+					+ person.getId().toString() + "\nTrip: " + trip.getTripElements().toString();
+			log.error(errorMessage);
+			throw new RuntimeException(errorMessage);
+		}
+		return routingMode;
+	}
+
+	private void replaceOutdatedAccessEgressHelperModes(Leg leg, String routingMode) {
+		// access_walk and egress_walk were replaced by non_network_walk
+		if (leg.getMode().equals("access_walk") || leg.getMode().equals("egress_walk")) {
+			leg.setMode(TransportMode.non_network_walk);
+			TripStructureUtils.setRoutingMode(leg, routingMode);
+		}
+
+		// non_network_walk as access/egress to modes other than walk on the network was replaced by walk. -
+		// kn/gl-nov'19
+		if (leg.getMode().equals(TransportMode.non_network_walk)) {
+			leg.setMode(TransportMode.walk);
+			TripStructureUtils.setRoutingMode(leg, routingMode);
+		}
+	}
+
+	/**
+	 * Method to replace outdated TransportModes such as drt_fallback or transit_walk.
+	 * Some of those were also used as access/egress to pt/drt helper modes.
+	 * 
+	 * @param leg
+	 * @param routingMode new routingMode which will be set at the leg
+	 * @return null if no fallback mode was found or the main mode of the fallback mode found
+	 */
+	private String replaceOutdatedFallbackModesAndReturnOldMainMode(Leg leg, String routingMode) {
+		// transit_walk was replaced by walk (formerly fallback and access/egress/transfer to pt mode)
+		if (leg.getMode().equals(TransportMode.transit_walk)) {
+			leg.setMode(TransportMode.walk);
+			TripStructureUtils.setRoutingMode(leg, routingMode);
+			return TransportMode.pt;
+		}
+
+		// replace drt_walk etc. (formerly fallback and access/egress to drt modes)
+		if (leg.getMode().endsWith("_walk") && !leg.getMode().equals(TransportMode.non_network_walk)) {
+			String oldMainMode = leg.getMode().substring(0, leg.getMode().length() - 5);
+			leg.setMode(TransportMode.walk);
+			TripStructureUtils.setRoutingMode(leg, routingMode);
+			return oldMainMode;
+		}
+
+		// replace drt_fallback etc. (formerly fallback for drt modes)
+		if (leg.getMode().endsWith("_fallback")) {
+			String oldMainMode = leg.getMode().substring(0, leg.getMode().length() - 9);
+			leg.setMode(TransportMode.walk);
+			TripStructureUtils.setRoutingMode(leg, routingMode);
+			return oldMainMode;
+		}
+
+		return null;
 	}
 }

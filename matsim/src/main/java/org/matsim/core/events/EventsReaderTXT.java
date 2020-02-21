@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.vehicles.Vehicle;
@@ -75,7 +74,7 @@ public final class EventsReaderTXT {
 			} else if (typeIndex == PersonArrival.ordinal()) {
 				e = new PersonArrivalEvent(time, Id.createPersonId(vehicleId), linkId, "car");
 			} else if (typeIndex == ActivityStart.ordinal()) {
-				e = new ActivityStartEvent(time, Id.createPersonId(vehicleId), linkId, null, null);
+				e = new ActivityStartEvent(time, Id.createPersonId(vehicleId), linkId, null, null, null );
 			} else {
 				throw new RuntimeException("Unsupported event type:" + l);
 			}
