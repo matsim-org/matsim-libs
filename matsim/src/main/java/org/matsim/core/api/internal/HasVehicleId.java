@@ -24,6 +24,7 @@ package org.matsim.core.api.internal;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author nagel
@@ -32,5 +33,5 @@ import org.matsim.api.core.v01.population.Person;
 public interface HasVehicleId{
 	String ATTRIBUTE_VEHICLE = "vehicle";
 
-	Id<Person> getVehicleId() ;
+	Id<Vehicle> getVehicleId() ;
 }

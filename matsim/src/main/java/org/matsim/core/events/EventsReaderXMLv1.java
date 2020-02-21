@@ -107,7 +107,7 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 			// (this is the new version, marked by the new events name)
 
 			this.events.processEvent(new VehicleEntersTrafficEvent(time, 
-					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_DRIVER), Person.class), 
+					Id.create(atts.getValue(HasPersonId.ATTRIBUTE_PERSON), Person.class),
 					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_LINK), Link.class), 
 					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE), Vehicle.class),
 					atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_NETWORKMODE), 
@@ -122,7 +122,7 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 				vehicleId = Id.create( atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_VEHICLE), Vehicle.class ) ;
 			} else {
 				// for the old events type, we set the vehicle id to the driver id if the vehicle id does not exist:
-				vehicleId = Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_DRIVER), Vehicle.class);
+				vehicleId = Id.create(atts.getValue(HasPersonId.ATTRIBUTE_PERSON), Vehicle.class);
 			}
 			// retrofit position:
 			double position ;
@@ -132,7 +132,7 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 				position = 1.0 ;
 			}
 			this.events.processEvent(new VehicleEntersTrafficEvent(time, 
-					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_DRIVER), Person.class), 
+					Id.create(atts.getValue(HasPersonId.ATTRIBUTE_PERSON), Person.class),
 					Id.create(atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_LINK), Link.class), 
 					vehicleId,
 					atts.getValue(VehicleEntersTrafficEvent.ATTRIBUTE_NETWORKMODE), 
