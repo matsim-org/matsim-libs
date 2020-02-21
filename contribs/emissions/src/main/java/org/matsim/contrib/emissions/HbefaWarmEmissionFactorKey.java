@@ -99,11 +99,15 @@ class HbefaWarmEmissionFactorKey {
 	         }
 	         HbefaWarmEmissionFactorKey key = (HbefaWarmEmissionFactorKey) obj;
 	         return
-				 hbefaVehicleCategory == key.getHbefaVehicleCategory()
-	         && hbefaComponent == key.getHbefaComponent()
+				 hbefaVehicleCategory.equals(key.getHbefaVehicleCategory())
+	         && hbefaComponent.equals(key.getHbefaComponent())
 	         && hbefaRoadCategory.equals(key.getHbefaRoadCategory())
-	         && hbefaTrafficSituation == key.getHbefaTrafficSituation()
+	         && hbefaTrafficSituation.equals(key.getHbefaTrafficSituation())
 	         && hbefaVehicleAttributes.equals(key.getHbefaVehicleAttributes());
+
+	         // yy The "equals" need to remain there for the time being despite having moved to enums, since some of the tests depend
+		// on the null pointer exception caused by "null.equals(...)" but not by "null == ...".  I can't say if this behavior is also used later in
+		// the lookups.  kai, feb'20
 	}
 
 	// if "equals" is implemented, "hashCode also needs to be implemented

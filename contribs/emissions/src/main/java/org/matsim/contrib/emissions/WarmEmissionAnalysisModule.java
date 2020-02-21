@@ -316,6 +316,9 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 		// if no detailed table, get result from average table:
 		if ( this.detailedHbefaWarmTable==null ) {
+			// set vehicle attributes to "average; average; average":
+			efkey.setHbefaVehicleAttributes( new HbefaVehicleAttributes() );
+
 			HbefaWarmEmissionFactor ef = this.avgHbefaWarmTable.get( efkey );
 			Gbl.assertNotNull( ef );
 			return ef;
@@ -392,15 +395,43 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			return this.detailedHbefaWarmTable.get( efkey2 );
 		}
 
-		// try "<technology>; average; average":
-		attribs2.setHbefaSizeClass( "average" );
-		attribs2.setHbefaEmConcept( "average" );
-		if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
-			return this.detailedHbefaWarmTable.get( efkey2 );
+//		// try "<technology>; average; average":
+//		attribs2.setHbefaSizeClass( "average" );
+//		attribs2.setHbefaEmConcept( "average" );
+//		if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
+//			return this.detailedHbefaWarmTable.get( efkey2 );
+//		}
+		// lookups of type "<technology>; average; average" should, I think, just be entered as such. kai, feb'20
+
+//		logger.warn( "did not find emission factor for efkey=" + efkey );
+//		logger.warn( " re-written to " + efkey2 );
+//		logger.warn( "" );
+//		logger.warn( "full table:" );
+//		List<String> list = new ArrayList<>();
+//		for( HbefaWarmEmissionFactorKey key : this.detailedHbefaWarmTable.keySet() ){
+//			list.add( key.toString() );
+//		}
+//		list.sort( String::compareTo );
+//		for( String str : list ){
+//			logger.warn( str );
+//		}
+
+
+		// set vehicle attributes to "average; average; average":
+		efkey.setHbefaVehicleAttributes( new HbefaVehicleAttributes() );
+
+		// try average emissions:
+		if ( this.avgHbefaWarmTable.get( efkey )!=null ) {
+			return this.avgHbefaWarmTable.get( efkey );
+		} else {
+			logger.warn( "did not find average emission factor for efkey=" + efkey );
+			List<HbefaWarmEmissionFactorKey> list = new ArrayList<>( this.avgHbefaWarmTable.keySet() );
+			list.sort( Comparator.comparing( HbefaWarmEmissionFactorKey::toString ) );
+			for( HbefaWarmEmissionFactorKey key : list ){
+				logger.warn( key.toString() );
+			}
 		}
 
-		logger.warn( "did not find emission factor for efkey=" + efkey );
-		logger.warn( " re-written to " + efkey2 );
 		throw new RuntimeException( );
 
 

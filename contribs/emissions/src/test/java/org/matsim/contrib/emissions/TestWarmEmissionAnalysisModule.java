@@ -247,6 +247,9 @@ public class TestWarmEmissionAnalysisModule {
 			// compute warm emissions with travel time coming from free flow:
 			warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions( pcVehicle, pclink, pclinkLength / PC_FREE_VELOCITY_KMH * 3.6 );
 
+//			2020-02-21 19:55:37,509  WARN WarmEmissionAnalysisModule:403 did not find emission factor for efkey=PASSENGER_CAR; PM_non_exhaust; URB; STOPANDGO; PC petrol <1,4L <ECE; petrol (4S); <1,4L
+
+
 			// test result:
 			switch( this.emissionsComputationMethod ) {
 				case StopAndGoFraction:
@@ -436,6 +439,7 @@ public class TestWarmEmissionAnalysisModule {
 
 		// case 5 - no entry in any table - must be different to other test case's strings
 		//With the bug fix to handle missing values - this test should no longer throw an error - jm oct'18
+
 		Id<Vehicle> noeVehicleId = Id.create("veh 5", Vehicle.class);
 		double noeLinkLength = 22.;
 		Link noelink = createMockLink("link 5", noeLinkLength, noeFreeSpeed);
@@ -455,7 +459,9 @@ public class TestWarmEmissionAnalysisModule {
 		}catch(Exception e){
 			excep = true;
 		}
-		Assert.assertFalse(excep); excep=false;
+		Assert.assertFalse(excep);
+
+		excep=false;
 	}
 
 	@Test
