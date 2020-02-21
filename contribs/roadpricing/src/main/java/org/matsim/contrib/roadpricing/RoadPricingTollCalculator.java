@@ -226,7 +226,7 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 					RoadPricingTollCalculator.this.agents.put(driverId, info);
 				}
 				info.toll += newToll;
-				events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-newToll));
+				events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-newToll,"toll",null));
 
 			}
 		}
@@ -262,7 +262,7 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 					RoadPricingTollCalculator.this.agents.put(driverId, info);
 				}
 				info.toll += cost.amount;
-				events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-cost.amount));
+				events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-cost.amount,"toll",null));
 			}
 		}
 	}
@@ -304,7 +304,7 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 					/* The toll amount comes from the current link, but should 
 					 * be the same for all links. */
 					info.toll = cost.amount;
-					events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-cost.amount));
+					events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-cost.amount,"toll",null));
 				}
 			}
 		}
@@ -352,7 +352,7 @@ public final class RoadPricingTollCalculator implements LinkEnterEventHandler, V
 					// agent was outside before, now inside the toll area --> agent has to pay
 					info.insideCordonArea = true;
 					info.toll += cost.amount;
-					events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-cost.amount));
+					events.processEvent(new PersonMoneyEvent(event.getTime(),driverId,-cost.amount,"toll",null));
 				}
 				// else: agent was already in toll area, does not have to pay again (this implementation is a bit unusual!)
 			} else {

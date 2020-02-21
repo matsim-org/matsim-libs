@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.fleet.Fleet;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.etaxi.ETaxiChargingTask;
 import org.matsim.contrib.etaxi.ETaxiScheduler;
 import org.matsim.contrib.etaxi.optimizer.BestChargerFinder;
@@ -39,8 +40,7 @@ import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
 import org.matsim.contrib.taxi.optimizer.rules.UnplannedRequestZonalRegistry;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.schedule.TaxiTask;
-import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
+import org.matsim.contrib.taxi.schedule.TaxiTaskType;
 import org.matsim.contrib.zone.SquareGridSystem;
 import org.matsim.contrib.zone.ZonalSystem;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -125,8 +125,8 @@ public class RuleBasedETaxiOptimizer extends RuleBasedTaxiOptimizer {
 	}
 
 	@Override
-	protected boolean isWaitStay(TaxiTask task) {
-		return task.getTaxiTaskType() == TaxiTaskType.STAY && !(task instanceof ETaxiChargingTask);
+	protected boolean isWaitStay(Task task) {
+		return task.getTaskType() == TaxiTaskType.STAY && !(task instanceof ETaxiChargingTask);
 	}
 
 	private boolean isUndercharged(EvDvrpVehicle v) {

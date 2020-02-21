@@ -21,11 +21,12 @@ package org.matsim.contrib.edrt.schedule;
 
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.ev.dvrp.ETask;
 
 /**
  * @author michalm
  */
-public class EDrtDriveTask extends DrtDriveTask implements EDrtTask {
+public class EDrtDriveTask extends DrtDriveTask implements ETask {
 	private final double consumedEnergy;
 
 	public EDrtDriveTask(VrpPathWithTravelData path, double consumedEnergy) {

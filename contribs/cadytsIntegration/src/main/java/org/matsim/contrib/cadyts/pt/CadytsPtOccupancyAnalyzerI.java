@@ -17,7 +17,7 @@ PersonLeavesVehicleEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDe
 
 	int getOccupancyVolumeForStopAndTime(Id<TransitStopFacility> stopId, int time_s);
 
-	void writeResultsForSelectedStopIds(String filename, Counts<Link> occupCounts, Collection<Id<TransitStopFacility>> stopIds);
+	void writeResultsForSelectedStopIds(String filename, Counts<TransitStopFacility> occupCounts, Collection<Id<TransitStopFacility>> stopIds);
 
 	int[] getOccupancyVolumesForStop(Id<TransitStopFacility> stopId);
 

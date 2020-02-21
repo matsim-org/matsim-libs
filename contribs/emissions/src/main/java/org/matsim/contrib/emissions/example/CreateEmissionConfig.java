@@ -133,7 +133,7 @@ public final class CreateEmissionConfig {
 	        ecg.setWritingEmissionsEvents(false);
 	        ecg.setEmissionCostMultiplicationFactor(1.0);
 	        ecg.setConsideringCO2Costs(true);
-	        ecg.setEmissionEfficiencyFactor(1.0);
+//	        ecg.setEmissionEfficiencyFactor(1.0);
 	        
 	   // write config     
 	        ConfigWriter cw = new ConfigWriter(config);
