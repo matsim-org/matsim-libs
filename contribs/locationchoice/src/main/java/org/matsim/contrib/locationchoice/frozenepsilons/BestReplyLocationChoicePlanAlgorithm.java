@@ -53,6 +53,7 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	private static final Logger log = Logger.getLogger( BestReplyLocationChoicePlanAlgorithm.class ) ;
 	
 	private final ActivityFacilities facilities;
+	private final ObjectAttributes personsMaxDCScoreUnscaled;
 	private final ScaleEpsilon scaleEpsilon;
 //	private final ActTypeConverter actTypeConverter;
 	private final DestinationSampler sampler;
@@ -67,11 +68,13 @@ final class BestReplyLocationChoicePlanAlgorithm implements PlanAlgorithm {
 	private final Scenario scenario;
 
 	public BestReplyLocationChoicePlanAlgorithm(
-		  TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quad_trees, DestinationChoiceContext lcContext,
+		  TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quad_trees,
+		  ObjectAttributes personsMaxDCScoreUnscaled, DestinationChoiceContext lcContext,
 		  DestinationSampler sampler, TripRouter tripRouter, MultiNodeDijkstra forwardMultiNodeDijkstra,
 		  BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra, ScoringFunctionFactory scoringFunctionFactory,
 		  int iteration, Map<Id<ActivityFacility>, Id<Link>> nearestLinks ) {
 		this.facilities = lcContext.getScenario().getActivityFacilities();
+		this.personsMaxDCScoreUnscaled = personsMaxDCScoreUnscaled;
 		this.scaleEpsilon = lcContext.getScaleEpsilon();
 //		this.actTypeConverter = lcContext.getConverter();
 		this.sampler = sampler;

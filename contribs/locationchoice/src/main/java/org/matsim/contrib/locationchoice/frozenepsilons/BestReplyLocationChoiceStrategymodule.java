@@ -59,6 +59,7 @@ final class BestReplyLocationChoiceStrategymodule extends AbstractMultithreadedM
 	private static final Logger log = Logger.getLogger( BestReplyLocationChoiceStrategymodule.class );
 	private final Provider<TripRouter> tripRouterProvider;
 
+	private ObjectAttributes personsMaxEpsUnscaled;
 	private DestinationSampler sampler;
 	private TreeMap<String, QuadTree<ActivityFacilityWithIndex>> quadTreesOfType = new TreeMap<>();
 //	private TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<>();
@@ -74,8 +75,8 @@ final class BestReplyLocationChoiceStrategymodule extends AbstractMultithreadedM
 	private Map<String, TravelTime> travelTimes;
 	private Map<String, TravelDisutilityFactory> travelDisutilities;
 
-	public BestReplyLocationChoiceStrategymodule( Provider<TripRouter> tripRouterProvider, DestinationChoiceContext lcContext,
-												  ScoringFunctionFactory scoringFunctionFactory, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilities ) {
+	public BestReplyLocationChoiceStrategymodule( Provider<TripRouter> tripRouterProvider, DestinationChoiceContext lcContext, ObjectAttributes personsMaxDCScoreUnscaled,
+								    ScoringFunctionFactory scoringFunctionFactory, Map<String, TravelTime> travelTimes, Map<String, TravelDisutilityFactory> travelDisutilities ) {
 		super(lcContext.getScenario().getConfig().global());
 		this.tripRouterProvider = tripRouterProvider;
 		this.scoringFunctionFactory = scoringFunctionFactory;
@@ -88,6 +89,7 @@ final class BestReplyLocationChoiceStrategymodule extends AbstractMultithreadedM
 		}
 		this.lcContext = lcContext;
 		this.scenario = lcContext.getScenario();
+		this.personsMaxEpsUnscaled = personsMaxDCScoreUnscaled;
 		this.forwardMultiNodeDijsktaFactory = new FastMultiNodeDijkstraFactory(true);
 		this.backwardMultiNodeDijsktaFactory = new BackwardFastMultiNodeDijkstraFactory(true);
 
@@ -148,7 +150,7 @@ final class BestReplyLocationChoiceStrategymodule extends AbstractMultithreadedM
 		TripRouter tripRouter = tripRouterProvider.get();
 		int iteration = replanningContext.getIteration();
 
-		return new BestReplyLocationChoicePlanAlgorithm(this.quadTreesOfType,
+		return new BestReplyLocationChoicePlanAlgorithm(this.quadTreesOfType, this.personsMaxEpsUnscaled,
 			  this.lcContext, this.sampler, tripRouter, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra, scoringFunctionFactory, iteration, this.nearestLinks);
 	}
 }

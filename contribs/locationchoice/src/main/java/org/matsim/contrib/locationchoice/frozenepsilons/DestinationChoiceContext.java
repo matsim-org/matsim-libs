@@ -119,9 +119,7 @@ class DestinationChoiceContext implements MatsimToplevelContainer {
 	private void readOrCreateKVals(long seed) {
 		ReadOrCreateKVals computer = new ReadOrCreateKVals(seed, this.scenario);
 		this.arekValsRead = computer.run();
-//		ObjectAttributes personsKValues = computer.getPersonsKValues();
-//		ObjectAttributes facilitiesKValues = computer.getFacilitiesKValues();
-		
+
 		this.personIndices = new TObjectIntHashMap<>();
 		this.personsKValuesArray = new double[this.scenario.getPopulation().getPersons().size()];
 		int personIndex = 0;

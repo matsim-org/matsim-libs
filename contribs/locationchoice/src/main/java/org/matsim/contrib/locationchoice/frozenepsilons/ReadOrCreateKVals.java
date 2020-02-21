@@ -64,7 +64,6 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 				persKValuesReader.readFile(pkValuesFileName);
 				facKValuesReader.readFile(fkValuesFileName);
 				log.info("reading kvals from files:\n"+ pkValuesFileName + "\n" + fkValuesFileName);
-
 				for (Person p : this.scenario.getPopulation().getPersons().values()) {
 					p.getAttributes().putAttribute( "k", personsKValues.getAttribute(p.getId().toString(), "k"));
 				}

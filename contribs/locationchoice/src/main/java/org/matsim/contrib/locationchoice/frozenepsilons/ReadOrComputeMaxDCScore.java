@@ -65,7 +65,6 @@ class ReadOrComputeMaxDCScore {
 			try {
 				ObjectAttributesXmlReader maxEpsReader = new ObjectAttributesXmlReader(this.personsMaxDCScoreUnscaled);
 				maxEpsReader.readFile(maxEpsValuesFileName);
-
 				for (Person p : this.scenario.getPopulation().getPersons().values()) {
 					for (String flexibleType : this.flexibleTypes){
 						double maxType = (Double) personsMaxDCScoreUnscaled.getAttribute(p.getId().toString(), flexibleType);
