@@ -17,6 +17,8 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 public class CadytsCarModule extends AbstractModule {
+	static final String CALIBRATION="calibration";
+	// yy should presumably be "car_calibration" or "link_calibration".  kai, feb'20
 
 	private final Counts<Link> calibrationCounts;
 
@@ -31,14 +33,14 @@ public class CadytsCarModule extends AbstractModule {
 	@Override
 	public void install() {
 		if (calibrationCounts != null) {
-			bind(Key.get(new TypeLiteral<Counts<Link>>(){}, Names.named("calibration"))).toInstance(calibrationCounts);
+			bind(Key.get(new TypeLiteral<Counts<Link>>(){}, Names.named( CALIBRATION ) ) ).toInstance(calibrationCounts );
 		} else {
-			bind(Key.get(new TypeLiteral<Counts<Link>>(){}, Names.named("calibration"))).toProvider(CalibrationCountsProvider.class).in(Singleton.class);
+			bind(Key.get(new TypeLiteral<Counts<Link>>(){}, Names.named( CALIBRATION ) ) ).toProvider(CalibrationCountsProvider.class ).in(Singleton.class );
 		}
 		// In principle this is bind(Counts<Link>).to...  But it wants to keep the option of multiple counts, under different names, open.
 		// I think.  kai, jan'16
 		
-		bind(CadytsContext.class).asEagerSingleton();
+		bind(CadytsContext.class).in( Singleton.class );
 		addControlerListenerBinding().to(CadytsContext.class);
 	}
 

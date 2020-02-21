@@ -28,7 +28,7 @@ import java.awt.Color;
  * @author jillenberger
  * 
  */
-public interface Colorizable {
+interface Colorizable {
 
 	/**
 	 * Returns the color used to display <tt>object</tt>.
