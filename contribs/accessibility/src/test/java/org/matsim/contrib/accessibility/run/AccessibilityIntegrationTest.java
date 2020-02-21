@@ -39,13 +39,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.accessibility.AccessibilityAttributes;
-import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.*;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
-import org.matsim.contrib.accessibility.AccessibilityModule;
-import org.matsim.contrib.accessibility.Modes4Accessibility;
-import org.matsim.contrib.accessibility.FacilityDataExchangeInterface;
-import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
+import org.matsim.contrib.accessibility.AccessibilityUtils;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
@@ -424,6 +420,12 @@ public class AccessibilityIntegrationTest {
 //		network.getAttributes().putAttribute("coordinateReferenceSystem", TransformationFactory.ATLANTIS);
 //		scenario.setNetwork(network);
 
+		for( Link link : scenario.getNetwork().getLinks().values() ){
+			Set<String> modes = new HashSet<>( link.getAllowedModes() ) ;
+			modes.add( TransportMode.walk ) ;
+			link.setAllowedModes( modes );
+		}
+
 		// Creating test opportunities (facilities); one on each link with same ID as link and coord on center of link
 		final ActivityFacilities opportunities = scenario.getActivityFacilities();
 		for (Link link : scenario.getNetwork().getLinks().values()) {
@@ -443,7 +445,7 @@ public class AccessibilityIntegrationTest {
 		final ActivityFacilities opportunities = scenario.getActivityFacilities();
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			ActivityFacility facility = opportunities.getFactory().createActivityFacility(Id.create(link.getId(), ActivityFacility.class), link.getCoord());
-			facility.getAttributes().putAttribute(AccessibilityAttributes.WEIGHT, 2.);
+			facility.getAttributes().putAttribute( Labels.WEIGHT, 2. );
 			opportunities.addActivityFacility(facility);
 		}
 		scenario.getConfig().facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.setInScenario);

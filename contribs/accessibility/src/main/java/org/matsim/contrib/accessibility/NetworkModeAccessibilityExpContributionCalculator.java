@@ -28,7 +28,7 @@ import java.util.Set;
 /**
  * @author thibautd, dziemke
  */
- public final class NetworkModeAccessibilityExpContributionCalculator implements AccessibilityContributionCalculator {
+final class NetworkModeAccessibilityExpContributionCalculator implements AccessibilityContributionCalculator {
 	private static final Logger LOG = Logger.getLogger( NetworkModeAccessibilityExpContributionCalculator.class );
 
 	private final String mode;
@@ -50,8 +50,9 @@ import java.util.Set;
 	//private final MultiNodePathCalculator multiNodePathCalculator;
 	//private ImaginaryNode aggregatedToNodes;
 
-	Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregatedMeasurePoints;
-    Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities;
+	private Map<Id<? extends BasicLocation>, ArrayList<ActivityFacility>> aggregatedMeasurePoints;
+	private Map<Id<? extends BasicLocation>, AggregationObject> aggregatedOpportunities;
+
 
 
 	public NetworkModeAccessibilityExpContributionCalculator(String mode, final TravelTime travelTime, final TravelDisutilityFactory travelDisutilityFactory, Scenario scenario) {
