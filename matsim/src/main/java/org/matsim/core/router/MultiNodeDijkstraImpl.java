@@ -85,14 +85,6 @@ class MultiNodeDijkstraImpl extends DijkstraImpl implements MultiNodePathCalcula
 		this.searchAllEndNodes = searchAllEndNodes;
 	}
 	
-	public static ImaginaryNode createImaginaryNode(Collection<? extends InitialNode> nodes) {
-		return new ImaginaryNode(nodes);
-	}
-	
-	public static ImaginaryNode createImaginaryNode(Collection<? extends InitialNode> nodes, Coord coord) {
-		return new ImaginaryNode(nodes, coord);
-	}
-	
 	/*
 	 * We have to extend this method from the original Dijkstra. The given input nodes might be
 	 * ImaginaryNodes which contain multiple start / end nodes for the routing process. Those

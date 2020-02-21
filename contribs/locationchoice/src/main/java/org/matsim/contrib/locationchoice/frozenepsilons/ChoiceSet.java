@@ -154,7 +154,7 @@ class ChoiceSet {
 				InitialNode initialToNode = new InitialNode( toNode, 0.0, 0.0 );
 				destinationNodes.add( initialToNode );
 			}
-			ImaginaryNode destinationNode = MultiNodeDijkstra.createImaginaryNode( destinationNodes );
+			ImaginaryNode destinationNode = MultiNodePathCalculator.createImaginaryNode( destinationNodes );
 
 			// (1) forward tree
 			{

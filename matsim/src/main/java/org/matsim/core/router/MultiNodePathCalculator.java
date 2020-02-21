@@ -20,8 +20,11 @@
 
 package org.matsim.core.router;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+
+import java.util.Collection;
 
 /**
  * Marker interface so that one can program against an interface rather than against a very specific implementation.
@@ -42,5 +45,15 @@ public interface MultiNodePathCalculator extends LeastCostPathCalculator {
 	 * possibly throw runtime exceptions.
 	 */
 	Path constructPath(Node fromNode, Node node, double startTime);
+
+	public static ImaginaryNode createImaginaryNode( Collection<? extends InitialNode> nodes ) {
+		return new ImaginaryNode(nodes);
+	}
+
+	public static ImaginaryNode createImaginaryNode(Collection<? extends InitialNode> nodes, Coord coord ) {
+		return new ImaginaryNode(nodes, coord);
+	}
+
+
 
 }

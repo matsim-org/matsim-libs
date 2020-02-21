@@ -125,7 +125,7 @@ public class FastMultiNodeTest {
 		toNodes.add(new InitialNode(toNode1, 0.0, 0.0));
 		toNodes.add(new InitialNode(toNode2, 0.0, 0.0));
 		toNodes.add(new InitialNode(toNode3, 0.0, 0.0));
-		Node toNode = dijkstra.createImaginaryNode(toNodes);
+		Node toNode = MultiNodePathCalculator.createImaginaryNode(toNodes);
 		
 		/*
 		 * test calcLeastCostPath method
@@ -213,7 +213,7 @@ public class FastMultiNodeTest {
 		toNodes.add(new InitialNode(toNode1, 0.0, 0.0));
 		toNodes.add(new InitialNode(toNode2, 0.0, 0.0));
 		toNodes.add(new InitialNode(toNode3, 0.0, 0.0));
-		Node toNode = dijkstra.createImaginaryNode(toNodes);
+		Node toNode = MultiNodePathCalculator.createImaginaryNode(toNodes);
 		
 		/*
 		 * test calcLeastCostPath method

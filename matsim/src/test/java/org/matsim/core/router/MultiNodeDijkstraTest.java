@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -49,11 +50,11 @@ public class MultiNodeDijkstraTest {
 
 	private final static Logger log = Logger.getLogger(MultiNodeDijkstraTest.class);
 
-	private MultiNodeDijkstra makeMultiNodeDikstra(Network network, TravelDisutility travelDisutility, TravelTime travelTime,
+	private MultiNodePathCalculator makeMultiNodeDikstra(Network network, TravelDisutility travelDisutility, TravelTime travelTime,
 			boolean fastRouter) {
 		if (fastRouter) {
-			return (MultiNodeDijkstra) new FastMultiNodeDijkstraFactory().createPathCalculator(network, travelDisutility, travelTime);
-		} else return (MultiNodeDijkstra) new MultiNodeDijkstraFactory().createPathCalculator(network, travelDisutility, travelTime);
+			return (MultiNodePathCalculator) new FastMultiNodeDijkstraFactory().createPathCalculator(network, travelDisutility, travelTime);
+		} else return (MultiNodePathCalculator) new MultiNodeDijkstraFactory().createPathCalculator(network, travelDisutility, travelTime);
 	}
 	
 	@Test
@@ -72,8 +73,8 @@ public class MultiNodeDijkstraTest {
 		tc.setData(Id.create(5, Link.class), 1.0, 1.0);
 		tc.setData(Id.create(6, Link.class), 3.0, 3.0);
 		tc.setData(Id.create(7, Link.class), 4.0, 4.0);
-		
-		MultiNodeDijkstra dijkstra = makeMultiNodeDikstra(f.network, tc, tc, fastRouter);
+
+		MultiNodePathCalculator dijkstra = makeMultiNodeDikstra(f.network, tc, tc, fastRouter);
 		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
 		List<InitialNode> toNodes = new ArrayList<InitialNode>();
 		
@@ -82,8 +83,8 @@ public class MultiNodeDijkstraTest {
 		fromNodes.add(new InitialNode(f.network.getNodes().get(Id.create(3, Node.class)), 2.0, 2.0));
 		toNodes.add(new InitialNode(f.network.getNodes().get(Id.create(5, Node.class)), 0.0, 0.0));
 		
-		Node fromNode = dijkstra.createImaginaryNode(fromNodes);
-		Node toNode = dijkstra.createImaginaryNode(toNodes);
+		Node fromNode = MultiNodePathCalculator.createImaginaryNode(fromNodes);
+		Node toNode = MultiNodePathCalculator.createImaginaryNode(toNodes);
 
 		Path p = createPath(dijkstra, fromNode, toNode);
 
@@ -130,8 +131,8 @@ public class MultiNodeDijkstraTest {
 		tc.setData(Id.create(5, Link.class), 3.0, 3.0);
 		tc.setData(Id.create(6, Link.class), 7.0, 7.0);
 		tc.setData(Id.create(7, Link.class), 4.0, 4.0);
-		
-		MultiNodeDijkstra dijkstra = makeMultiNodeDikstra(f.network, tc, tc, fastRouter);
+
+		MultiNodePathCalculator dijkstra = makeMultiNodeDikstra(f.network, tc, tc, fastRouter);
 		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
 		List<InitialNode> toNodes = new ArrayList<InitialNode>();
 		
@@ -140,8 +141,8 @@ public class MultiNodeDijkstraTest {
 		toNodes.add(new InitialNode(f.network.getNodes().get(Id.create(5, Node.class)), 4.0, 4.0));
 		toNodes.add(new InitialNode(f.network.getNodes().get(Id.create(6, Node.class)), 1.0, 1.0));
 		
-		Node fromNode = dijkstra.createImaginaryNode(fromNodes);
-		Node toNode = dijkstra.createImaginaryNode(toNodes);
+		Node fromNode = MultiNodePathCalculator.createImaginaryNode(fromNodes);
+		Node toNode = MultiNodePathCalculator.createImaginaryNode(toNodes);
 
 		Path p = createPath(dijkstra, fromNode, toNode);
 		
@@ -188,8 +189,8 @@ public class MultiNodeDijkstraTest {
 		tc.setData(Id.create(5, Link.class), 3.0, 3.0);
 		tc.setData(Id.create(6, Link.class), 7.0, 7.0);
 		tc.setData(Id.create(7, Link.class), 4.0, 4.0);
-		
-		MultiNodeDijkstra dijkstra = makeMultiNodeDikstra(f.network, tc, tc, fastRouter);
+
+		MultiNodePathCalculator dijkstra = makeMultiNodeDikstra(f.network, tc, tc, fastRouter);
 		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
 		List<InitialNode> toNodes = new ArrayList<InitialNode>();
 		
@@ -199,8 +200,8 @@ public class MultiNodeDijkstraTest {
 		toNodes.add(new InitialNode(f.network.getNodes().get(Id.create(5, Node.class)), 4.0, 4.0));
 		toNodes.add(new InitialNode(f.network.getNodes().get(Id.create(6, Node.class)), 1.0, 1.0));
 		
-		Node fromNode = dijkstra.createImaginaryNode(fromNodes);
-		Node toNode = dijkstra.createImaginaryNode(toNodes);
+		Node fromNode = MultiNodePathCalculator.createImaginaryNode(fromNodes);
+		Node toNode = MultiNodePathCalculator.createImaginaryNode(toNodes);
 
 		Path p = createPath(dijkstra, fromNode, toNode);
 
@@ -255,8 +256,8 @@ public class MultiNodeDijkstraTest {
 		tc.setData(Id.create(5, Link.class), 1.0, 1.0);
 		tc.setData(Id.create(6, Link.class), 3.0, 3.0);
 		tc.setData(Id.create(7, Link.class), 4.0, 4.0);
-		
-		MultiNodeDijkstra dijkstra = makeMultiNodeDikstra(f.network, tc, tc, fastRouter);
+
+		MultiNodePathCalculator dijkstra = makeMultiNodeDikstra(f.network, tc, tc, fastRouter);
 		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
 		List<InitialNode> toNodes = new ArrayList<InitialNode>();
 		
@@ -264,8 +265,8 @@ public class MultiNodeDijkstraTest {
 		fromNodes.add(new InitialNode(f.network.getNodes().get(Id.create(4, Node.class)), 4.0, 4.0));
 		toNodes.add(new InitialNode(f.network.getNodes().get(Id.create(5, Node.class)), 0.0, 0.0));
 		
-		Node fromNode = dijkstra.createImaginaryNode(fromNodes);
-		Node toNode = dijkstra.createImaginaryNode(toNodes);
+		Node fromNode = MultiNodePathCalculator.createImaginaryNode(fromNodes);
+		Node toNode = MultiNodePathCalculator.createImaginaryNode(toNodes);
 
 		Path p = createPath(dijkstra, fromNode, toNode);
 		
@@ -292,8 +293,8 @@ public class MultiNodeDijkstraTest {
 		tc.setData(Id.create(5, Link.class), 1.0, 1.0);
 		tc.setData(Id.create(6, Link.class), 3.0, 3.0);
 		tc.setData(Id.create(7, Link.class), 4.0, 4.0);
-		
-		MultiNodeDijkstra dijkstra = makeMultiNodeDikstra(f.network, tc, tc, fastRouter);
+
+		MultiNodePathCalculator dijkstra = makeMultiNodeDikstra(f.network, tc, tc, fastRouter);
 		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
 		List<InitialNode> toNodes = new ArrayList<InitialNode>();
 		
@@ -301,8 +302,8 @@ public class MultiNodeDijkstraTest {
 		toNodes.add(new InitialNode(f.network.getNodes().get(Id.create(8, Node.class)), 3.0, 3.0));
 		toNodes.add(new InitialNode(f.network.getNodes().get(Id.create(5, Node.class)), 1.0, 1.0));
 		
-		Node fromNode = dijkstra.createImaginaryNode(fromNodes);
-		Node toNode = dijkstra.createImaginaryNode(toNodes);
+		Node fromNode = MultiNodePathCalculator.createImaginaryNode(fromNodes);
+		Node toNode = MultiNodePathCalculator.createImaginaryNode(toNodes);
 
 		Path p = createPath(dijkstra, fromNode, toNode);
 		
@@ -337,16 +338,16 @@ public class MultiNodeDijkstraTest {
 		tc.setData(Id.create(5, Link.class), 1.0, 1.0);
 		tc.setData(Id.create(6, Link.class), 3.0, 3.0);
 		tc.setData(Id.create(7, Link.class), 4.0, 4.0);
-		
-		MultiNodeDijkstra dijkstra = makeMultiNodeDikstra(f.network, tc, tc, fastRouter);
+
+		MultiNodePathCalculator dijkstra = makeMultiNodeDikstra(f.network, tc, tc, fastRouter);
 		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
 		List<InitialNode> toNodes = new ArrayList<InitialNode>();
 		
 		fromNodes.add(new InitialNode(f.network.getNodes().get(Id.create(2, Node.class)), 1.0, 1.0));
 		toNodes.add(new InitialNode(f.network.getNodes().get(Id.create(2, Node.class)), 3.0, 3.0));
 		
-		Node fromNode = dijkstra.createImaginaryNode(fromNodes);
-		Node toNode = dijkstra.createImaginaryNode(toNodes);
+		Node fromNode = MultiNodePathCalculator.createImaginaryNode(fromNodes);
+		Node toNode = MultiNodePathCalculator.createImaginaryNode(toNodes);
 
 		Path p = createPath(dijkstra, fromNode, toNode);
 		
@@ -377,8 +378,8 @@ public class MultiNodeDijkstraTest {
 		tc.setData(Id.create(5, Link.class), 1.0, 1.0);
 		tc.setData(Id.create(6, Link.class), 3.0, 3.0);
 		tc.setData(Id.create(7, Link.class), 4.0, 4.0);
-		
-		MultiNodeDijkstra dijkstra = makeMultiNodeDikstra(f.network, tc, tc, fastRouter);
+
+		MultiNodePathCalculator dijkstra = makeMultiNodeDikstra(f.network, tc, tc, fastRouter);
 		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
 		List<InitialNode> toNodes = new ArrayList<InitialNode>();
 		
@@ -387,8 +388,8 @@ public class MultiNodeDijkstraTest {
 		toNodes.add(new InitialNode(f.network.getNodes().get(Id.create(4, Node.class)), 1.0, 1.0));
 		toNodes.add(new InitialNode(f.network.getNodes().get(Id.create(6, Node.class)), 3.0, 3.0));
 		
-		Node fromNode = dijkstra.createImaginaryNode(fromNodes);
-		Node toNode = dijkstra.createImaginaryNode(toNodes);
+		Node fromNode = MultiNodePathCalculator.createImaginaryNode(fromNodes);
+		Node toNode = MultiNodePathCalculator.createImaginaryNode(toNodes);
 
 		Path p = createPath(dijkstra, fromNode, toNode);
 		
@@ -419,8 +420,8 @@ public class MultiNodeDijkstraTest {
 		tc.setData(Id.create(5, Link.class), 1.0, 1.0);
 		tc.setData(Id.create(6, Link.class), 3.0, 3.0);
 		tc.setData(Id.create(7, Link.class), 4.0, 4.0);
-		
-		MultiNodeDijkstra dijkstra = makeMultiNodeDikstra(f.network, tc, tc, fastRouter);
+
+		MultiNodePathCalculator dijkstra = makeMultiNodeDikstra(f.network, tc, tc, fastRouter);
 		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
 		List<InitialNode> toNodes = new ArrayList<InitialNode>();
 		
@@ -429,8 +430,8 @@ public class MultiNodeDijkstraTest {
 		toNodes.add(new InitialNode(f.network.getNodes().get(Id.create(4, Node.class)), 8.0, 8.0));
 		toNodes.add(new InitialNode(f.network.getNodes().get(Id.create(6, Node.class)), 3.0, 3.0));
 		
-		Node fromNode = dijkstra.createImaginaryNode(fromNodes);
-		Node toNode = dijkstra.createImaginaryNode(toNodes);
+		Node fromNode = MultiNodePathCalculator.createImaginaryNode(fromNodes);
+		Node toNode = MultiNodePathCalculator.createImaginaryNode(toNodes);
 
 		Path p = createPath(dijkstra, fromNode, toNode);
 		
@@ -460,8 +461,8 @@ public class MultiNodeDijkstraTest {
 		tc.setData(Id.create(5, Link.class), 1.0, 1.0);
 		tc.setData(Id.create(6, Link.class), 3.0, 3.0);
 		tc.setData(Id.create(7, Link.class), 4.0, 4.0);
-		
-		MultiNodeDijkstra dijkstra = makeMultiNodeDikstra(f.network, tc, tc, fastRouter);
+
+		MultiNodePathCalculator dijkstra = makeMultiNodeDikstra(f.network, tc, tc, fastRouter);
 		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
 		List<InitialNode> toNodes = new ArrayList<InitialNode>();
 		
@@ -470,8 +471,8 @@ public class MultiNodeDijkstraTest {
 		toNodes.add(new InitialNode(f.network.getNodes().get(Id.create(5, Node.class)), 1.0, 1.0));
 		toNodes.add(new InitialNode(f.network.getNodes().get(Id.create(3, Node.class)), 3.0, 3.0)); // cannot be reached!
 		
-		Node fromNode = dijkstra.createImaginaryNode(fromNodes);
-		Node toNode = dijkstra.createImaginaryNode(toNodes);
+		Node fromNode = MultiNodePathCalculator.createImaginaryNode(fromNodes);
+		Node toNode = MultiNodePathCalculator.createImaginaryNode(toNodes);
 
 		Path p = createPath(dijkstra, fromNode, toNode);
 		
@@ -501,8 +502,8 @@ public class MultiNodeDijkstraTest {
 		tc.setData(Id.create(5, Link.class), 1.0, 1.0);
 		tc.setData(Id.create(6, Link.class), 3.0, 3.0);
 		tc.setData(Id.create(7, Link.class), 4.0, 4.0);
-		
-		MultiNodeDijkstra dijkstra = makeMultiNodeDikstra(f.network, tc, tc, fastRouter);
+
+		MultiNodePathCalculator dijkstra = makeMultiNodeDikstra(f.network, tc, tc, fastRouter);
 		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
 		List<InitialNode> toNodes = new ArrayList<InitialNode>();
 		
@@ -511,8 +512,8 @@ public class MultiNodeDijkstraTest {
 		toNodes.add(new InitialNode(f.network.getNodes().get(Id.create(5, Node.class)), 1.0, 1.0));
 		toNodes.add(new InitialNode(f.network.getNodes().get(Id.create(3, Node.class)), 3.0, 3.0));
 		
-		Node fromNode = dijkstra.createImaginaryNode(fromNodes);
-		Node toNode = dijkstra.createImaginaryNode(toNodes);
+		Node fromNode = MultiNodePathCalculator.createImaginaryNode(fromNodes);
+		Node toNode = MultiNodePathCalculator.createImaginaryNode(toNodes);
 
 		Path p = createPath(dijkstra, fromNode, toNode);
 		
@@ -539,16 +540,16 @@ public class MultiNodeDijkstraTest {
 		tc.setData(Id.create(5, Link.class), 1.0, 1.0);
 		tc.setData(Id.create(6, Link.class), 3.0, 3.0);
 		tc.setData(Id.create(7, Link.class), 4.0, 4.0);
-		
-		MultiNodeDijkstra dijkstra = makeMultiNodeDikstra(f.network, tc, tc, fastRouter);
+
+		MultiNodePathCalculator dijkstra = makeMultiNodeDikstra(f.network, tc, tc, fastRouter);
 		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
 		List<InitialNode> toNodes = new ArrayList<InitialNode>();
 		
 		fromNodes.add(new InitialNode(f.network.getNodes().get(Id.create(1, Node.class)), 1.0, 1.0));
 		toNodes.add(new InitialNode(f.network.getNodes().get(Id.create(2, Node.class)), 3.0, 3.0));
 		
-		Node fromNode = dijkstra.createImaginaryNode(fromNodes);
-		Node toNode = dijkstra.createImaginaryNode(toNodes);
+		Node fromNode = MultiNodePathCalculator.createImaginaryNode(fromNodes);
+		Node toNode = MultiNodePathCalculator.createImaginaryNode(toNodes);
 
 		Path p = createPath(dijkstra, fromNode, toNode);
 		
@@ -575,16 +576,16 @@ public class MultiNodeDijkstraTest {
 		tc.setData(Id.create(5, Link.class), 100.0, 200.0);
 		tc.setData(Id.create(6, Link.class), 100.0, 200.0);
 		tc.setData(Id.create(7, Link.class), 100.0, 200.0);
-		
-		MultiNodeDijkstra dijkstra = makeMultiNodeDikstra(f.network, tc, tc, fastRouter);
+
+		MultiNodePathCalculator dijkstra = makeMultiNodeDikstra(f.network, tc, tc, fastRouter);
 		List<InitialNode> fromNodes = new ArrayList<InitialNode>();
 		List<InitialNode> toNodes = new ArrayList<InitialNode>();
 		
 		fromNodes.add(new InitialNode(f.network.getNodes().get(Id.create(1, Node.class)), 10000.0, 10000.0));
 		toNodes.add(new InitialNode(f.network.getNodes().get(Id.create(6, Node.class)), 20000.0, 20000.0));
 		
-		Node fromNode = dijkstra.createImaginaryNode(fromNodes);
-		Node toNode = dijkstra.createImaginaryNode(toNodes);
+		Node fromNode = MultiNodePathCalculator.createImaginaryNode(fromNodes);
+		Node toNode = MultiNodePathCalculator.createImaginaryNode(toNodes);
 
 		Path p = createPath(dijkstra, fromNode, toNode);
 		
@@ -593,7 +594,7 @@ public class MultiNodeDijkstraTest {
 		Assert.assertEquals(600.0, p.travelCost, 0.0);
 	}
 	
-	/*package*/ static Path createPath( DijkstraImpl dijsktra, Node fromNode, Node toNode ) {
+	/*package*/ static Path createPath( LeastCostPathCalculator dijsktra, Node fromNode, Node toNode ) {
 		Path path = dijsktra.calcLeastCostPath(fromNode, toNode, 0., null, null);
 		
 		if (path == null) return path;

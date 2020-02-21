@@ -129,7 +129,7 @@ public class BackwardFastMultiNodeTest {
 		toNodes.add(new InitialNode(toNode1, 0.0, 0.0));
 		toNodes.add(new InitialNode(toNode2, 0.0, 0.0));
 		toNodes.add(new InitialNode(toNode3, 0.0, 0.0));
-		Node toNode = dijkstra.createImaginaryNode(toNodes);
+		Node toNode = MultiNodeDijkstra.createImaginaryNode(toNodes);
 		
 		/*
 		 * test calcLeastCostPath method
@@ -217,7 +217,7 @@ public class BackwardFastMultiNodeTest {
 		toNodes.add(new InitialNode(toNode1, 0.0, 0.0));
 		toNodes.add(new InitialNode(toNode2, 0.0, 0.0));
 		toNodes.add(new InitialNode(toNode3, 0.0, 0.0));
-		Node toNode = dijkstra.createImaginaryNode(toNodes);
+		Node toNode = MultiNodeDijkstra.createImaginaryNode(toNodes);
 		
 		/*
 		 * test calcLeastCostPath method
