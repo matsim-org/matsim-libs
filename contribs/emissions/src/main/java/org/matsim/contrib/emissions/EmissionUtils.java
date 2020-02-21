@@ -44,8 +44,9 @@ import java.util.stream.Stream;
 public final class EmissionUtils {
 	private static final Logger logger = Logger.getLogger(EmissionUtils.class);
 
-	private static final String HBEFA_VEHICLE_DESCRIPTION = "hbefaVehicleTypeDescription";
 	private enum EmissionSpecificationMarker {BEGIN_EMISSIONS , END_EMISSIONS }
+
+	private EmissionUtils(){ } // do not instantiate
 
 	static Map<String, Integer> createIndexFromKey(String strLine) {
 		String[] keys = strLine.split(";");
@@ -69,9 +70,9 @@ public final class EmissionUtils {
 		return (String) link.getAttributes().getAttribute(HBEFA_ROAD_TYPE);
 	}
 
-	public static Map<String, Double> sumUpEmissions(Map<String, Double> warmEmissions, Map<String, Double> coldEmissions) {
+	public static Map<Pollutant, Double> sumUpEmissions(Map<Pollutant, Double> warmEmissions, Map<Pollutant, Double> coldEmissions) {
 
-		Map<String, Double> pollutant2sumOfEmissions =
+		Map<Pollutant, Double> pollutant2sumOfEmissions =
 				Stream.concat(warmEmissions.entrySet().stream(), coldEmissions.entrySet().stream())
 						.collect(Collectors.toMap(
 								Entry::getKey, // The key
@@ -83,40 +84,40 @@ public final class EmissionUtils {
 		return pollutant2sumOfEmissions;
 	}
 
-	public static <T> Map<Id<T>, Map<String, Double>> sumUpEmissionsPerId(
-			Map<Id<T>, Map<String, Double>> warmEmissions,
-			Map<Id<T>, Map<String, Double>> coldEmissions) {
+	public static <T> Map<Id<T>, Map<Pollutant, Double>> sumUpEmissionsPerId(
+			Map<Id<T>, Map<Pollutant, Double>> warmEmissions,
+			Map<Id<T>, Map<Pollutant, Double>> coldEmissions) {
 
 		if (warmEmissions == null)
 			return coldEmissions;
 		if (coldEmissions == null)
 			return warmEmissions;
 
-		Map<Id<T>, Map<String, Double>> totalEmissions = warmEmissions.entrySet().stream().map(entry -> {
+		Map<Id<T>, Map<Pollutant, Double>> totalEmissions = warmEmissions.entrySet().stream().map(entry -> {
 			Id<T> id = entry.getKey();
-			Map<String, Double> warmEm = entry.getValue();
-			Map<String, Double> coldEm = coldEmissions.getOrDefault(id, new HashMap<>());
+			Map<Pollutant, Double> warmEm = entry.getValue();
+			Map<Pollutant, Double> coldEm = coldEmissions.getOrDefault(id, new HashMap<>());
 
-			Map<String, Double> totalPollutantCounts = sumUpEmissions(warmEm, coldEm);
+			Map<Pollutant, Double> totalPollutantCounts = sumUpEmissions(warmEm, coldEm);
 			return new Tuple<>(id, totalPollutantCounts);
 		}).collect(Collectors.toMap(Tuple::getFirst, Tuple::getSecond));
 
 		return totalEmissions;
 	}
 
-	public static Map<Id<Person>, SortedMap<String, Double>> setNonCalculatedEmissionsForPopulation(Population population, Map<Id<Person>, SortedMap<String, Double>> totalEmissions, Set<String> pollutants) {
-		Map<Id<Person>, SortedMap<String, Double>> personId2Emissions = new HashMap<>();
+	public static Map<Id<Person>, SortedMap<Pollutant, Double>> setNonCalculatedEmissionsForPopulation(Population population, Map<Id<Person>, SortedMap<Pollutant, Double>> totalEmissions, Set<Pollutant> pollutants) {
+		Map<Id<Person>, SortedMap<Pollutant, Double>> personId2Emissions = new HashMap<>();
 		for (Person person : population.getPersons().values()) {
 			Id<Person> personId = person.getId();
-			SortedMap<String, Double> emissionType2Value;
+			SortedMap<Pollutant, Double> emissionType2Value;
 			if (totalEmissions.get(personId) == null) { // person not in map (e.g. pt user)
 				emissionType2Value = new TreeMap<>();
-				for (String pollutant : pollutants) {
+				for (Pollutant pollutant : pollutants) {
 					emissionType2Value.put(pollutant, 0.0);
 				}
 			} else { // person in map, but some emissions are not set; setting these to 0.0 
 				emissionType2Value = totalEmissions.get(personId);
-				for (String pollutant : emissionType2Value.keySet()) {
+				for (Pollutant pollutant : emissionType2Value.keySet()) {
 					// else do nothing
 					emissionType2Value.putIfAbsent(pollutant, 0.0);
 				}
@@ -131,21 +132,21 @@ public final class EmissionUtils {
 		return pollutants;
 	}
 
-	public static Map<Id<Link>, SortedMap<String, Double>> setNonCalculatedEmissionsForNetwork(Network network, Map<Id<Link>, SortedMap<String, Double>> totalEmissions, Set<String> pollutants) {
-		Map<Id<Link>, SortedMap<String, Double>> linkId2Emissions = new HashMap<>();
+	public static Map<Id<Link>, SortedMap<Pollutant, Double>> setNonCalculatedEmissionsForNetwork(Network network, Map<Id<Link>, SortedMap<Pollutant, Double>> totalEmissions, Set<Pollutant> pollutants) {
+		Map<Id<Link>, SortedMap<Pollutant, Double>> linkId2Emissions = new HashMap<>();
 
 		for (Link link : network.getLinks().values()) {
 			Id<Link> linkId = link.getId();
-			SortedMap<String, Double> emissionType2Value;
+			SortedMap<Pollutant, Double> emissionType2Value;
 
 			if (totalEmissions.get(linkId) == null) {
 				emissionType2Value = new TreeMap<>();
-				for (String pollutant : pollutants) {
+				for (Pollutant pollutant : pollutants) {
 					emissionType2Value.put(pollutant, 0.0);
 				}
 			} else {
 				emissionType2Value = totalEmissions.get(linkId);
-				for (String pollutant : pollutants) {
+				for (Pollutant pollutant : pollutants) {
 					if (emissionType2Value.get(pollutant) == null) {
 						emissionType2Value.put(pollutant, 0.0);
 					} else {
@@ -159,13 +160,13 @@ public final class EmissionUtils {
 		return linkId2Emissions;
 	}
 
-	public static <T> SortedMap<String, Double> getTotalEmissions(Map<Id<T>, SortedMap<String, Double>> person2TotalEmissions) {
-		SortedMap<String, Double> totalEmissions = new TreeMap<>();
+	public static <T> SortedMap<Pollutant, Double> getTotalEmissions(Map<Id<T>, SortedMap<Pollutant, Double>> person2TotalEmissions) {
+		SortedMap<Pollutant, Double> totalEmissions = new TreeMap<>();
 
 		for (Id<T> personId : person2TotalEmissions.keySet()) {
-			SortedMap<String, Double> individualEmissions = person2TotalEmissions.get(personId);
+			SortedMap<Pollutant, Double> individualEmissions = person2TotalEmissions.get(personId);
 			double sumOfPollutant;
-			for (String pollutant : individualEmissions.keySet()) {
+			for (Pollutant pollutant : individualEmissions.keySet()) {
 				if (totalEmissions.containsKey(pollutant)) {
 					sumOfPollutant = totalEmissions.get(pollutant) + individualEmissions.get(pollutant);
 				} else {
@@ -200,9 +201,9 @@ public final class EmissionUtils {
 
 		Gbl.assertNotNull(vehicleType);
 		Gbl.assertNotNull(vehicleType.getEngineInformation());
-		logger.info(vehicleType.getEngineInformation().getAttributes().toString());
+//		logger.info(vehicleType.getEngineInformation().getAttributes().toString());
 		Gbl.assertNotNull(VehicleUtils.getHbefaVehicleCategory( vehicleType.getEngineInformation() ));
-		HbefaVehicleCategory hbefaVehicleCategory = HbefaVehicleCategory.valueOf( VehicleUtils.getHbefaVehicleCategory( vehicleType.getEngineInformation() ) ) ;
+		HbefaVehicleCategory hbefaVehicleCategory = mapString2HbefaVehicleCategory( VehicleUtils.getHbefaVehicleCategory( vehicleType.getEngineInformation() ) ) ;
 
 		HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
 
@@ -229,7 +230,7 @@ public final class EmissionUtils {
 			HbefaTrafficSituation hbefaTrafficSituation = warmEmissionFactorKey.getHbefaTrafficSituation();
 			double speed = emissionFactor.getSpeed();
 
-			table.putIfAbsent(roadVehicleCategoryKey, new HashMap<>());
+			table.putIfAbsent(roadVehicleCategoryKey, new EnumMap<>( HbefaTrafficSituation.class ));
 			table.get(roadVehicleCategoryKey).put(hbefaTrafficSituation, speed);
 		});
 
@@ -243,7 +244,7 @@ public final class EmissionUtils {
 
 		EngineInformation engineInformation;
 		// get information from where it used to be in previous versions and move to where it should be now:
-		logger.debug("found following hbefaDescriptionSource in emissionsConfigGroup ... " + emissionsConfigGroup.getHbefaVehicleDescriptionSource());
+		logger.debug("emissionsConfigGroup.getHbefaVehicleDescriptionSource=" + emissionsConfigGroup.getHbefaVehicleDescriptionSource());
 		switch( emissionsConfigGroup.getHbefaVehicleDescriptionSource() ) {
 			case usingVehicleTypeId:
 				// (v1, hbefa vehicle description is in vehicle type id.  Copy to where it is expected now)
@@ -313,10 +314,10 @@ public final class EmissionUtils {
 		return getHbefaVehicleDescription( vehicleType ) ;
 	}
 
-	public static String getHbefaVehicleDescription(VehicleType vehicleType) {
+	private static String getHbefaVehicleDescription( VehicleType vehicleType ) {
 		// not yet clear if this can be public (without access to config). kai/kai, sep'19
 		EngineInformation engineInfo = vehicleType.getEngineInformation();;
-		StringBuffer strb = new StringBuffer();
+		StringBuilder strb = new StringBuilder();
 		strb.append( VehicleUtils.getHbefaVehicleCategory( engineInfo ) ) ;
 		strb.append( ";" ) ;
 		strb.append( VehicleUtils.getHbefaTechnology( engineInfo ) ) ;
@@ -326,4 +327,62 @@ public final class EmissionUtils {
 		strb.append( VehicleUtils.getHbefaEmissionsConcept( engineInfo ) );
 		return strb.toString() ;
 	}
+
+	static HbefaVehicleCategory mapString2HbefaVehicleCategory(String string) {
+		HbefaVehicleCategory hbefaVehicleCategory;
+		if(string.contains("pass. car")) hbefaVehicleCategory = HbefaVehicleCategory.PASSENGER_CAR;
+		else if(string.contains("HGV")) hbefaVehicleCategory = HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
+		else if(string.contains("LCV")) hbefaVehicleCategory = HbefaVehicleCategory.LIGHT_COMMERCIAL_VEHICLE;
+		else if(string.contains("motorcycle")) hbefaVehicleCategory = HbefaVehicleCategory.MOTORCYCLE;
+        else if(string.contains("coach")) hbefaVehicleCategory = HbefaVehicleCategory.COACH;
+        else if(string.contains("urban bus")) hbefaVehicleCategory = HbefaVehicleCategory.URBAN_BUS;
+		else{
+			try{
+				hbefaVehicleCategory = HbefaVehicleCategory.valueOf(string);
+			} catch (IllegalArgumentException e) {
+				logger.warn("Could not map String " + string + " to any HbefaVehicleCategory; please check syntax in hbefa input file.");
+				throw new RuntimeException();
+			}
+		}
+		return hbefaVehicleCategory;
+	}
+        static Pollutant getPollutant( String pollutantString ){
+		// for the time being, we just manually add alternative spellings here, and map them all to the established enums.  One option to make this
+		// configurable would be to add corresponding maps into the emissions config, in the sense of
+		//    setCo2TotalKeys( Set<String> keys )
+		// as we have it, e.g., with network modes.  kai, feb'20
+
+		Pollutant pollutant;
+		switch( pollutantString ){
+			case "CO2(total)":
+				pollutant = Pollutant.CO2_TOTAL;
+				break;
+			case "CO2(rep)":
+				pollutant = Pollutant.CO2_rep;
+				break;
+			case "PM2.5 (non-exhaust)":
+				pollutant = Pollutant.PM2_5_non_exhaust;
+				break;
+			case "PM2.5":
+				pollutant = Pollutant.PM2_5;
+				break;
+			case "PM (non-exhaust)":
+				pollutant = Pollutant.PM_non_exhaust;
+				break;
+			case "BC (exhaust)":
+				pollutant = Pollutant.BC_exhaust;
+				break;
+			case "BC (non-exhaust)":
+				pollutant = Pollutant.BC_non_exhaust;
+				break;
+			default:
+				pollutant = Pollutant.valueOf( pollutantString );
+				// the Pollutant.valueOf(...) should fail if the incoming key is not consistent with what is available in the enum.  Two possibilities:
+				// (1) it is a new pollutant.  In that case, just add to the enum.
+				// (2) It is a different spelling of an already existing pollutant.  In that case, see above.
+				// kai, jan'20
+		}
+		return pollutant;
+	}
+
 }

@@ -30,7 +30,7 @@
 
 <!-- ====================================================================== -->
 
-	<links capperiod="16:00:00" effectivecellsize="7.5" effectivelanewidth="NaN">
+	<links capperiod="16:00:00">
 		<link id="link12" from="node1" to="node2" length="200.0" freespeed="9.722222222222221" capacity="8400.0" permlanes="1.0" oneway="1" modes="car" >
 			<attributes>
 				<attribute name="hbefa_road_type" class="java.lang.String" >URB/Local/50</attribute>

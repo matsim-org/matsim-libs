@@ -25,9 +25,9 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
-import org.matsim.contrib.emissions.types.ColdPollutant;
 
 /**
  * @author benjamin
@@ -35,18 +35,18 @@ import org.matsim.contrib.emissions.types.ColdPollutant;
  */
 public class EmissionsPerPersonColdEventHandler implements ColdEmissionEventHandler {
 
-	Map<Id<Person>, Map<String, Double>> coldEmissionsTotal = new HashMap<>();
+	Map<Id<Person>, Map<Pollutant, Double>> coldEmissionsTotal = new HashMap<>();
 
 	@Override
 	public void handleEvent(ColdEmissionEvent event) {
 		// TODO person id statt vehicleid??? woher?
 		Id<Person> personId = Id.create(event.getVehicleId(), Person.class);
-		Map<String, Double> coldEmissionsOfEvent = event.getColdEmissions();
+		Map<Pollutant, Double> coldEmissionsOfEvent = event.getColdEmissions();
 
 		if(coldEmissionsTotal.get(personId) != null){
-			Map<String, Double> coldEmissionsSoFar = coldEmissionsTotal.get(personId);
-			for(Entry<String, Double> entry : coldEmissionsOfEvent.entrySet()){
-				String pollutant = entry.getKey();
+			Map<Pollutant, Double> coldEmissionsSoFar = coldEmissionsTotal.get(personId );
+			for( Entry<Pollutant, Double> entry : coldEmissionsOfEvent.entrySet()){
+				Pollutant pollutant = entry.getKey();
 				Double eventValue = entry.getValue();
 
 				Double previousValue = coldEmissionsSoFar.get(pollutant);
@@ -59,7 +59,7 @@ public class EmissionsPerPersonColdEventHandler implements ColdEmissionEventHand
 		}
 	}
 
-	public Map<Id<Person>, Map<String, Double>> getColdEmissionsPerPerson() {
+	public Map<Id<Person>, Map<Pollutant, Double>> getColdEmissionsPerPerson() {
 		return coldEmissionsTotal;
 	}
 

@@ -26,7 +26,7 @@ package org.matsim.contrib.emissions;
 class HbefaWarmEmissionFactorKey {
 	
 	private HbefaVehicleCategory hbefaVehicleCategory;
-	private String hbefaComponent;
+	private Pollutant hbefaComponent;
 	private String hbefaRoadCategory;
 	private HbefaTrafficSituation hbefaTrafficSituation;
 	private HbefaVehicleAttributes hbefaVehicleAttributes = new HbefaVehicleAttributes();
@@ -39,6 +39,7 @@ class HbefaWarmEmissionFactorKey {
         this.hbefaComponent = key.hbefaComponent;
         this.hbefaRoadCategory = key.hbefaRoadCategory;
         this.hbefaVehicleAttributes = key.hbefaVehicleAttributes;
+        this.hbefaTrafficSituation = key.hbefaTrafficSituation;
     }
 
     HbefaVehicleCategory getHbefaVehicleCategory() {
@@ -49,12 +50,17 @@ class HbefaWarmEmissionFactorKey {
 		this.hbefaVehicleCategory = hbefaVehicleCategory;
 	}
 
-	private String getHbefaComponent(){
+	private Pollutant getHbefaComponent(){
 		return this.hbefaComponent;
 	}
-	
-	public void setHbefaComponent(String warmPollutant) {
+
+	public void setHbefaComponent( Pollutant warmPollutant ) {
 		this.hbefaComponent = warmPollutant;
+	}
+
+	@Deprecated // for refactoring
+	public void setHbefaComponent( String warmPollutant ) {
+		this.hbefaComponent = Pollutant.valueOf( warmPollutant ) ;
 	}
 
 	String getHbefaRoadCategory() {
@@ -93,11 +99,15 @@ class HbefaWarmEmissionFactorKey {
 	         }
 	         HbefaWarmEmissionFactorKey key = (HbefaWarmEmissionFactorKey) obj;
 	         return
-	            hbefaVehicleCategory.equals(key.getHbefaVehicleCategory())
+				 hbefaVehicleCategory.equals(key.getHbefaVehicleCategory())
 	         && hbefaComponent.equals(key.getHbefaComponent())
 	         && hbefaRoadCategory.equals(key.getHbefaRoadCategory())
 	         && hbefaTrafficSituation.equals(key.getHbefaTrafficSituation())
 	         && hbefaVehicleAttributes.equals(key.getHbefaVehicleAttributes());
+
+	         // yy The "equals" need to remain there for the time being despite having moved to enums, since some of the tests depend
+		// on the null pointer exception caused by "null.equals(...)" but not by "null == ...".  I can't say if this behavior is also used later in
+		// the lookups.  kai, feb'20
 	}
 
 	// if "equals" is implemented, "hashCode also needs to be implemented
