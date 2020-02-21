@@ -24,6 +24,7 @@
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -162,7 +163,8 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 
 	private void initializeActivity(Activity act, double now) {
 		this.setState(MobsimAgent.State.ACTIVITY) ;
-		this.getEvents().processEvent( new ActivityStartEvent(now, this.getId(), this.getCurrentLinkId(), act.getFacilityId(), act.getType()));
+		this.getEvents().processEvent( new ActivityStartEvent(now, this.getId(), this.getCurrentLinkId(), act.getFacilityId(), act.getType(),
+				act.getCoord() ) );
 		calculateAndSetDepartureTime(act);
 		getModifiablePlan(); // this is necessary to make the plan modifiable, so that setting the start time (next line) is actually feasible. kai/mz, oct'16
 		((Activity) getCurrentPlanElement()).setStartTime(now);

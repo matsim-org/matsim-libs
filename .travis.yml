@@ -85,6 +85,7 @@ env:
     - MODULE=contribs/bicycle
     - MODULE=contribs/cadytsIntegration
     - MODULE=contribs/carsharing
+    - MODULE=contribs/commercialTrafficApplications
     - MODULE=contribs/drt
     - MODULE=contribs/locationchoice
     - MODULE=contribs/av

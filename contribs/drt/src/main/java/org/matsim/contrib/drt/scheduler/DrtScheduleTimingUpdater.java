@@ -23,7 +23,7 @@ import java.util.List;
 import org.matsim.contrib.drt.passenger.DrtRequest;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.drt.schedule.DrtTask;
+import org.matsim.contrib.drt.schedule.DrtTaskType;
 import org.matsim.contrib.dvrp.fleet.DvrpVehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
@@ -87,7 +87,7 @@ public class DrtScheduleTimingUpdater {
 		List<? extends Task> tasks = schedule.getTasks();
 
 		for (int i = startIdx; i < tasks.size(); i++) {
-			DrtTask task = (DrtTask)tasks.get(i);
+			Task task = tasks.get(i);
 			double calcEndTime = calcNewEndTime(vehicle, task, newBeginTime);
 
 			if (calcEndTime == REMOVE_STAY_TASK) {
@@ -105,8 +105,8 @@ public class DrtScheduleTimingUpdater {
 
 	private final static double REMOVE_STAY_TASK = Double.NEGATIVE_INFINITY;
 
-	private double calcNewEndTime(DvrpVehicle vehicle, DrtTask task, double newBeginTime) {
-		switch (task.getDrtTaskType()) {
+	private double calcNewEndTime(DvrpVehicle vehicle, Task task, double newBeginTime) {
+		switch (((DrtTaskType)task.getTaskType())) {
 			case STAY: {
 				if (Schedules.getLastTask(vehicle.getSchedule()).equals(task)) {// last task
 					// even if endTime=beginTime, do not remove this task!!! A DRT schedule should end with WAIT

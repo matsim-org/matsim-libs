@@ -38,7 +38,8 @@ env:
     - MODULE=contribs/av                   
     - MODULE=contribs/analysis             
     - MODULE=contribs/cadytsIntegration    
-    - MODULE=contribs/carsharing           
+    - MODULE=contribs/carsharing
+    - MODULE=contribs/commercialTrafficApplications
     - MODULE=contribs/drt                  
     - MODULE=contribs/dvrp
     - MODULE=contribs/ev

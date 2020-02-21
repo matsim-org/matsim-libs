@@ -3,7 +3,7 @@ package org.matsim.contrib.accessibility.grid;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.accessibility.gis.SpatialGrid;
+import org.matsim.contrib.accessibility.SpatialGrid;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.testcases.MatsimTestCase;
