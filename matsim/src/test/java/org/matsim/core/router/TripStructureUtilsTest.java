@@ -345,25 +345,25 @@ public class TripStructureUtilsTest {
 		nLegs++ ;
 		plan.addLeg( populationFactory.createLeg( "walk mode" ) );
 
-		nActs++ ;
+//		nActs++ ; // stage activities are not counted here
 		plan.addActivity( populationFactory.createActivityFromLinkId( TripStructureUtils.createStageActivityType( "access mode" ), linkId ) );
 
 		nLegs++ ;
 		plan.addLeg( populationFactory.createLeg( "access mode" ) );
 
-		nActs++ ;
+//		nActs++ ;
 		plan.addActivity( populationFactory.createActivityFromLinkId( TripStructureUtils.createStageActivityType( "access mode" ), linkId ) );
 
 		nLegs++ ;
 		plan.addLeg( populationFactory.createLeg( "walk mode" ) );
 
-		nActs++ ;
+//		nActs++ ;
 		plan.addActivity( populationFactory.createActivityFromLinkId( TripStructureUtils.createStageActivityType( "main mode" ), linkId ) );
 
 		nLegs++ ;
 		plan.addLeg( populationFactory.createLeg( "main mode" ) );
 
-		nActs++ ;
+//		nActs++ ;
 		plan.addActivity( populationFactory.createActivityFromLinkId( TripStructureUtils.createStageActivityType( "main mode" ), linkId ) );
 
 		nLegs++ ;
