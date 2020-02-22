@@ -1,4 +1,4 @@
-package org.matsim.contrib.accessibility.gis;
+package org.matsim.contrib.accessibility;
 
 import java.io.IOException;
 import java.util.List;
@@ -12,7 +12,6 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.accessibility.CSVWriter;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -20,7 +19,7 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
-public final class GridUtils {
+final class GridUtils {
 	private static final Logger LOG = Logger.getLogger(GridUtils.class);
 
 	/**
@@ -31,7 +30,7 @@ public final class GridUtils {
 
 		try{
 			// get boundaries of study area
-			Set<SimpleFeature> featureSet = FeatureSHP.readFeatures(shapeFileName);
+			Set<SimpleFeature> featureSet = FeatureSHP.readFeatures(shapeFileName );
 			// yyyy I find this quite terrible to have the reader hidden in here.  Now I cannot pass a shape file which
 			// I may have gotten in some way, but need to first write it to file. kai, mar'14
 

@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ColdPollutant.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,36 +16,41 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.emissions.types;
+
+package org.matsim.contrib.accessibility;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.vehicles.Vehicle;
 
 /**
- * @author benjamin
+ * This cost calulator is based on freespeed travel times
+ * tnicolai feb'12
  *
+ * @author thomas
  */
-public enum ColdPollutant {
-	
-	/*TODO: CO2 not directly available for cold emissions; thus it could be calculated through FC, CO, and HC as follows:
-	get("FC")*0.865 - get("CO")*0.429 - get("HC")*0.866) / 0.273;*/
-	CO("CO"), FC("FC"), HC("HC"), NMHC("NMHC"), NOX("NOx"), NO2("NO2"), PM("PM");
-	
-	private final String key;
+class FreeSpeedTravelTimeCostCalculator implements TravelDisutility {
 
-	ColdPollutant(String key) {
-		this.key = key;
+	private static final Logger log = Logger.getLogger(FreeSpeedTravelTimeCostCalculator.class);
+
+	@Override
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person,
+			final Vehicle vehicle) {
+		return getLinkTravelDisutilityImpl(link);
 	}
 
-	public String getText() {
-		return key;
+	@Override
+	public double getLinkMinimumTravelDisutility(Link link) {
+		return getLinkTravelDisutilityImpl(link);
 	}
-	
-	//TODO: Is this really neccessary? WarmPollutant does not have this method...jk, bk mai'13
-	public static ColdPollutant getValue(String key){
-		for(ColdPollutant cp : ColdPollutant.values()){
-			String cpString = cp.getText();
-			if(cpString.equals(key)){
-				return cp;
-			}
+
+	private double getLinkTravelDisutilityImpl(Link link) {
+		if (link != null) {
+			return link.getLength() / link.getFreespeed();
 		}
-		return null;
+		log.warn("Link is null. Returned 0 as free speed time.");
+		return 0.;
 	}
 }

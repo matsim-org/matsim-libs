@@ -21,7 +21,7 @@ import java.util.Map;
 // It might make sense to split this further, into travel time estimation
 // and utility estimation. Ideally, one would actually not need any additional
 // interface compared to what MATSim provides. Not there yet [td, june 15]
-public interface AccessibilityContributionCalculator {
+interface AccessibilityContributionCalculator {
 
 	void initialize(ActivityFacilities measuringPoints, ActivityFacilities opportunities);
 

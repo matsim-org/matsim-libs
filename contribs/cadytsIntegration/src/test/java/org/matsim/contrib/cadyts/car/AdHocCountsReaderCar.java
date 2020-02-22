@@ -36,18 +36,18 @@ import org.matsim.core.utils.misc.StringUtils;
  * At this stage all original pt code is still included here, but outcommeted, to make the adaptions
  * from pt to car well traceable in case of any errors.
  */
-class CountsReaderCar {
+class AdHocCountsReaderCar{
 
-	private final static Logger log = Logger.getLogger(CountsReaderCar.class);
+	private final static Logger log = Logger.getLogger( AdHocCountsReaderCar.class );
 
 	// final String STOP_ID_STRING_0 = "StopId :";
 	// final String HEAD_STRING_0 = "hour";
 	// final String ZERO = "0.0";
 
-	String countsTextFile;
-	Map<Id<Link>, Map<String, double[]>> count = new TreeMap<>();
+	private String countsTextFile;
+	private Map<Id<Link>, Map<String, double[]>> count = new TreeMap<>();
 
-	public CountsReaderCar(final String countsTextFile){
+	AdHocCountsReaderCar( final String countsTextFile ){
 		this.countsTextFile = countsTextFile;
 		readValues();
 	}
@@ -75,7 +75,7 @@ class CountsReaderCar {
 						// it does nothing, correct this condition
 					//} else {
 						if (!this.count.containsKey(id)) {
-							this.count.put(id, new TreeMap<String, double[]>());
+							this.count.put(id, new TreeMap<>() );
 						}
 						// this.count.get(id).put(values[0],
 						

@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WarmPollutant.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,23 +16,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.emissions.types;
+
+package org.matsim.contrib.accessibility;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.vehicles.Vehicle;
 
 /**
- * @author benjamin
+ * cost calculator for travel distances
  *
+ * @author thomas
  */
-public enum WarmPollutant {
-	
-	CO("CO"), CO2_TOTAL("CO2_TOTAL"), FC("FC"), HC("HC"), NMHC("NMHC"), NOX("NOX"), NO2("NO2"), PM("PM"), SO2("SO2");
-	
-	private final String key;
+class TravelDistanceCalculator implements TravelDisutility{
 
-	WarmPollutant(String key) {
-		this.key = key;
+	private static final Logger log = Logger.getLogger(TravelDistanceCalculator.class);
+
+	@Override
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person,
+			final Vehicle vehicle) {
+		return getLinkTravelDisutilityImpl(link);
 	}
 
-	public String getText() {
-		return key;
+	@Override
+	public double getLinkMinimumTravelDisutility(Link link) {
+		return getLinkTravelDisutilityImpl(link);
+	}
+
+	private double getLinkTravelDisutilityImpl(Link link) {
+		if (link != null) {
+			return link.getLength();    // travel distance in meter
+		}
+		log.warn("Link is null. Returned 0 as distance.");
+		return 0.;
 	}
 }

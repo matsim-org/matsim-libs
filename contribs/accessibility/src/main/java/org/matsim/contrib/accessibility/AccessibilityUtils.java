@@ -16,10 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.accessibility.utils;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+package org.matsim.contrib.accessibility;
 
 import org.apache.log4j.Logger;
 import org.locationtech.jts.geom.Coordinate;
@@ -30,15 +27,8 @@ import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.accessibility.AccessibilityAttributes;
-import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
-import org.matsim.contrib.accessibility.Modes4Accessibility;
-import org.matsim.contrib.accessibility.gis.GridUtils;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -48,14 +38,11 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacilitiesFactory;
-import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityOption;
-import org.matsim.facilities.ActivityOptionImpl;
-import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.facilities.*;
 import org.opengis.feature.simple.SimpleFeature;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author dziemke
@@ -72,7 +59,7 @@ public class AccessibilityUtils {
 	 *     k2 k3
 	 */
 	public static final Map<Id<? extends BasicLocation>, AggregationObject> aggregateOpportunitiesWithSameNearestNode(
-			final ActivityFacilities opportunities, Network network, Config config) {
+			final ActivityFacilities opportunities, Network network, Config config ) {
 		// yyyy this method ignores the "capacities" of the facilities. kai, mar'14
 		// for now, we decided not to add "capacities" as it is not needed for current projects. dz, feb'16
 
@@ -100,10 +87,10 @@ public class AccessibilityUtils {
 				opportunityClusterMap.put(nearestNode.getId(), jco);
 			}
 			if (acg.isUseOpportunityWeights()) {
-				if (opportunity.getAttributes().getAttribute(AccessibilityAttributes.WEIGHT) == null) {
-					throw new RuntimeException("If option \"useOpportunityWeights\" is used, the facilities must have an attribute with key " + AccessibilityAttributes.WEIGHT + ".");
+				if (opportunity.getAttributes().getAttribute( Labels.WEIGHT ) == null) {
+					throw new RuntimeException("If option \"useOpportunityWeights\" is used, the facilities must have an attribute with key " + Labels.WEIGHT + ".");
 				} else {
-					double weight = Double.parseDouble(opportunity.getAttributes().getAttribute(AccessibilityAttributes.WEIGHT).toString());
+					double weight = Double.parseDouble(opportunity.getAttributes().getAttribute( Labels.WEIGHT ).toString() );
 					jco.addObject(opportunity.getId(), expVjk * Math.pow(weight, acg.getWeightExponent()));
 				}
 			} else {

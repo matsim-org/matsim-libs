@@ -55,7 +55,9 @@ public final class EmissionsConfigGroup
 	private static final String WRITING_EMISSIONS_EVENTS = "isWritingEmissionsEvents";
 	private boolean isWritingEmissionsEvents = true;
 
+	@Deprecated // see comments at getter/setter
 	private static final String EMISSION_EFFICIENCY_FACTOR = "emissionEfficiencyFactor";
+	@Deprecated // see comments at getter/setter
 	private double emissionEfficiencyFactor = 1.0;
 
 	@Deprecated // kai, oct'18
@@ -70,6 +72,7 @@ public final class EmissionsConfigGroup
 
 	private static final String HANDLE_HIGH_AVERAGE_SPEEDS = "handleHighAverageSpeeds";
 	private boolean handleHighAverageSpeeds = false;
+	// yyyy should become an enum.  kai, jan'20
 
 	@Deprecated // See elsewhere in this class.  kai, oct'18
 	public enum HbefaRoadTypeSource { fromFile, fromLinkAttributes, fromOsm }
@@ -86,7 +89,7 @@ public final class EmissionsConfigGroup
 
 	public enum EmissionsComputationMethod {StopAndGoFraction,AverageSpeed}
 	private static final String EMISSIONS_COMPUTATION_METHOD = "emissionsComputationMethod";
-	private EmissionsComputationMethod emissionsComputationMethod = EmissionsComputationMethod.StopAndGoFraction;
+	private EmissionsComputationMethod emissionsComputationMethod = EmissionsComputationMethod.AverageSpeed;
 
 	@Deprecated // should be phased out.  kai, oct'18
 	private static final String EMISSION_ROADTYPE_MAPPING_FILE_CMT = "REQUIRED if source of the HBEFA road type is set to "+HbefaRoadTypeSource.fromFile +". It maps from input road types to HBEFA 3.1 road type strings";
@@ -350,20 +353,28 @@ public final class EmissionsConfigGroup
 		isWritingEmissionsEvents = writingEmissionsEvents;
 	}
 	// ---
-	/**
-	 * @return {@value #EMISSION_EFFICIENCY_FACTOR_CMT}
-	 */
-	@StringGetter(EMISSION_EFFICIENCY_FACTOR)
-	public double getEmissionEfficiencyFactor() {
-		return emissionEfficiencyFactor;
-	}
-	/**
-	 * @param emissionEfficiencyFactor -- {@value #EMISSION_EFFICIENCY_FACTOR_CMT}
-	 */
-	@StringSetter(EMISSION_EFFICIENCY_FACTOR)
-	public void setEmissionEfficiencyFactor(double emissionEfficiencyFactor) {
-		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
-	}
+//	/**
+//	 * @return {@value #EMISSION_EFFICIENCY_FACTOR_CMT}
+//	 *
+//	 * @deprecated -- I cannot see a goot use case for this: Since this is not even by vehicle type, it could easily be done in the events file
+//	 * postprocessing.  kai, jan'20
+//	 */
+//	@Deprecated
+//	@StringGetter(EMISSION_EFFICIENCY_FACTOR)
+//	public double getEmissionEfficiencyFactor() {
+//		return emissionEfficiencyFactor;
+//	}
+//	/**
+//	 * @param emissionEfficiencyFactor -- {@value #EMISSION_EFFICIENCY_FACTOR_CMT}
+//	 *
+//	 * @deprecated -- I cannot see a goot use case for this: Since this is not even by vehicle type, it could easily be done in the events file
+//	 * postprocessing.  kai, jan'20
+//	 */
+//	@Deprecated
+//	@StringSetter(EMISSION_EFFICIENCY_FACTOR)
+//	public void setEmissionEfficiencyFactor(double emissionEfficiencyFactor) {
+//		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
+//	}
 	// ---
 //	@StringGetter(EMISSION_COST_MULTIPLICATION_FACTOR)
 	// not used in contrib itself --> does not belong here; disable xml functionality and set deprecated in code.  kai, oct'18

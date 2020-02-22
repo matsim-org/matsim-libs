@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.accessibility.costcalculators;
+package org.matsim.contrib.accessibility;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -34,7 +34,7 @@ import org.matsim.vehicles.Vehicle;
  *
  * @author thomas
  */
-public class TravelWalkTimeCostCalculator implements TravelDisutility {
+class TravelWalkTimeCostCalculator implements TravelDisutility{
 
 	private static final Logger log = Logger.getLogger(TravelWalkTimeCostCalculator.class);
 

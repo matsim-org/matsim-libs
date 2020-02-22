@@ -27,7 +27,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 import javax.validation.constraints.Positive;
 import java.util.Map;
 
-public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
+public class JointDemandConfigGroup extends ReflectiveConfigGroup {
 
     @Positive
     private double firstLegTraveltimeBufferFactor = 2.0;
@@ -52,12 +52,12 @@ public class CommercialTrafficConfigGroup extends ReflectiveConfigGroup {
 
     public static final String GROUP_NAME = "commercialTraffic";
 
-    public CommercialTrafficConfigGroup() {
+    public JointDemandConfigGroup() {
         super(GROUP_NAME);
     }
 
-    public static CommercialTrafficConfigGroup get(Config config) {
-        return (CommercialTrafficConfigGroup) config.getModules().get(GROUP_NAME);
+    public static JointDemandConfigGroup get(Config config) {
+        return (JointDemandConfigGroup) config.getModules().get(GROUP_NAME);
     }
 
 

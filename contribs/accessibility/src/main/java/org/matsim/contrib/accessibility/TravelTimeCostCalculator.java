@@ -17,39 +17,46 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.accessibility.costcalculators;
+package org.matsim.contrib.accessibility;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
-/**
- * cost calculator for travel distances
- *
- * @author thomas
- */
-public class TravelDistanceCalculator implements TravelDisutility {
+class TravelTimeCostCalculator implements TravelDisutility {
 
-	private static final Logger log = Logger.getLogger(TravelDistanceCalculator.class);
-
-	@Override
-	public double getLinkTravelDisutility(final Link link, final double time, final Person person,
-			final Vehicle vehicle) {
-		return getLinkTravelDisutilityImpl(link);
+	private static final Logger log = Logger.getLogger(TravelTimeCostCalculator.class);
+	
+	protected final TravelTime timeCalculator;
+	
+	/**
+	 * constructor
+	 * 
+	 * @param timeCalculator
+	 * @param cnScoringGroup
+	 */
+	public TravelTimeCostCalculator(final TravelTime timeCalculator){
+		this.timeCalculator = timeCalculator;
 	}
-
+	
 	@Override
-	public double getLinkMinimumTravelDisutility(Link link) {
-		return getLinkTravelDisutilityImpl(link);
-	}
-
-	private double getLinkTravelDisutilityImpl(Link link) {
-		if (link != null) {
-			return link.getLength();    // travel distance in meter
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
+		if(link != null){
+			double travelTime = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);
+			return travelTime; 	// travel time in seconds
 		}
-		log.warn("Link is null. Returned 0 as distance.");
+		log.warn("Link is null. Returned 0 as car time.");
+		return 0.;
+	}
+	
+	@Override
+	public double getLinkMinimumTravelDisutility(final Link link) {
+		if(link != null) 		// travel time in seconds
+			return (link.getLength() / link.getFreespeed());
+		log.warn("Link is null. Returned 0 as walk time.");
 		return 0.;
 	}
 }

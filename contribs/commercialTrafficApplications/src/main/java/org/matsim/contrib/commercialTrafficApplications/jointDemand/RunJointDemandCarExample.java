@@ -23,7 +23,7 @@ package org.matsim.contrib.commercialTrafficApplications.jointDemand;/*
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.ChangeCommercialJobOperator;
-import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.CommercialTrafficConfigGroup;
+import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.JointDemandConfigGroup;
 import org.matsim.contrib.commercialTrafficApplications.jointDemand.commercialJob.JointDemandModule;
 import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.utils.FreightUtils;
@@ -44,8 +44,8 @@ class RunJointDemandCarExample {
 
 
         Config config = loadConfig("jointDemand/config.xml");
-        CommercialTrafficConfigGroup commercialTrafficConfigGroup = ConfigUtils.addOrGetModule(config, CommercialTrafficConfigGroup.class);
-        commercialTrafficConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
+        JointDemandConfigGroup jointDemandConfigGroup = ConfigUtils.addOrGetModule(config, JointDemandConfigGroup.class);
+        jointDemandConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
 
         FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
         freightConfigGroup.setTravelTimeSliceWidth(3600);
