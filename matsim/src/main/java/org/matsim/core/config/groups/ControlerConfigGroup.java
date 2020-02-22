@@ -91,7 +91,6 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 
 	private int writeEventsInterval=10;
 	private int writePlansInterval=10;
-	private Set<String> snapshotFormat = Collections.emptySet();
 	private String mobsim = MobsimType.qsim.toString();
 	private int writeSnapshotsInterval = 1;
 	private boolean createGraphs = true;
@@ -254,42 +253,45 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	public void setEventsFileFormats(final Set<EventsFileFormat> eventsFileFormats) {
 		this.eventsFileFormats = Collections.unmodifiableSet(EnumSet.copyOf(eventsFileFormats));
 	}
+	// ---
+	public enum SnapshotFormat { transims, googleearth, otfvis, positionevents }
+	private Set<SnapshotFormat> snapshotFormat = Collections.emptySet();
 
 	@StringSetter( SNAPSHOT_FORMAT )
 	private void setSnapshotFormats( final String value ) {
 		String[] parts = StringUtils.explode(value, ',');
-		Set<String> formats = new HashSet<>();
+		Set<SnapshotFormat> formats = EnumSet.noneOf( SnapshotFormat.class );
 		for (String part : parts) {
 			String trimmed = part.trim();
 			if (trimmed.length() > 0) {
-				formats.add(trimmed);
+				formats.add(SnapshotFormat.valueOf( trimmed ) );
 			}
 		}
 		this.snapshotFormat = formats;
 	}
 
-    @StringGetter( SNAPSHOT_FORMAT )
+	@StringGetter( SNAPSHOT_FORMAT )
 	private String getSnapshotFormatAsString() {
 		boolean isFirst = true;
 		StringBuilder str = new StringBuilder();
-		for (String format : this.snapshotFormat) {
+		for (SnapshotFormat format : this.snapshotFormat) {
 			if (!isFirst) {
 				str.append(',');
 			}
-			str.append(format);
+			str.append(format.name());
 			isFirst = false;
 		}
 		return str.toString();
 	}
 
-	public void setSnapshotFormat(final Collection<String> snapshotFormat) {
-		this.snapshotFormat = Collections.unmodifiableSet(new HashSet<>(snapshotFormat));
+	public void setSnapshotFormat(final Collection<SnapshotFormat> snapshotFormat) {
+		this.snapshotFormat = Collections.unmodifiableSet(EnumSet.copyOf( snapshotFormat) );
 	}
 
-	public Collection<String> getSnapshotFormat() {
+	public Collection<SnapshotFormat> getSnapshotFormat() {
 		return this.snapshotFormat;
 	}
-
+	// ---
 	@StringGetter( WRITE_EVENTS_INTERVAL )
 	public int getWriteEventsInterval() {
 		return this.writeEventsInterval;

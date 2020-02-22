@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.core.api.internal.HasPersonId;
+import org.matsim.core.api.internal.HasVehicleId;
 
 public abstract class Event {
 
@@ -59,6 +60,9 @@ public abstract class Event {
 				attr.put( ATTRIBUTE_X, String.valueOf( ((BasicLocation) this).getCoord().getX() ) ) ;
 				attr.put( ATTRIBUTE_Y, String.valueOf( ((BasicLocation) this).getCoord().getY() ) ) ;
 			}
+		}
+		if ( this instanceof HasVehicleId && ((HasVehicleId) this).getVehicleId()!=null ) {
+			attr.put( HasVehicleId.ATTRIBUTE_VEHICLE, ((HasVehicleId) this).getVehicleId().toString() );
 		}
 		return attr;
 	}
