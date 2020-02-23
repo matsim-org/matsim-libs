@@ -468,81 +468,52 @@ public class PtAlongALine2Test{
 
 		config.qsim().setVehiclesSource( QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData );
 		// (as of today, will also influence router. kai, jun'19)
-		{
-			Set<String> networkModes = new HashSet<>( );
-			networkModes.add( TransportMode.drt );
-			networkModes.add( "drt2" );
-			config.plansCalcRoute().setNetworkModes( networkModes );
-		}
+
+		config.plansCalcRoute().setNetworkModes( new HashSet<>( Arrays.asList( TransportMode.drt, "drt2" ) ) );
 
 		// set up walk2 so we don't use faulty walk in raptor:
-		{
-			ModeRoutingParams wlk = new ModeRoutingParams(  ) ;
-			wlk.setMode( "walk2" ) ;
-			wlk.setTeleportedModeSpeed( 5./3.6 ) ;
-			config.plansCalcRoute().addModeRoutingParams( wlk );
-		}
+		config.plansCalcRoute().addModeRoutingParams( new ModeRoutingParams( "walk2" ).setTeleportedModeSpeed( 5./3.6 ) );
+
+		config.plansCalcRoute().addModeRoutingParams( new ModeRoutingParams( TransportMode.walk ).setTeleportedModeSpeed( 0. ) );
+		// (when specifying "walk2", all default routing params are cleared.  However, swiss rail raptor needs "walk" to function. kai, feb'20)
 
 		// === RAPTOR: ===
 		{
 			SwissRailRaptorConfigGroup configRaptor = ConfigUtils.addOrGetModule( config, SwissRailRaptorConfigGroup.class ) ;
+			configRaptor.setUseIntermodalAccessEgress(true);
 
-			{
-				configRaptor.setUseIntermodalAccessEgress(true);
-				{
-					// Xxx
-					IntermodalAccessEgressParameterSet paramSetXxx = new IntermodalAccessEgressParameterSet();
-					//					paramSetXxx.setMode( TransportMode.walk ); // this does not work because sbb raptor treats it in a special way
-					paramSetXxx.setMode( "walk2" );
-					paramSetXxx.setMaxRadius( 1000000 );
-					paramSetXxx.setInitialSearchRadius( 1000000 );
-					paramSetXxx.setSearchExtensionRadius( 10000 );
-					configRaptor.addIntermodalAccessEgress( paramSetXxx );
-					// (in principle, walk as alternative to drt will not work, since drt is always faster.  Need to give the ASC to the router!  However, with
-					// the reduced drt network we should be able to see differentiation.)
-				}
-				{
-					// drt
-					IntermodalAccessEgressParameterSet paramSetDrt = new IntermodalAccessEgressParameterSet();
-					paramSetDrt.setMode( TransportMode.drt );
-					paramSetDrt.setMaxRadius( 1000000 );
-					paramSetDrt.setInitialSearchRadius( 1000000 );
-					paramSetDrt.setSearchExtensionRadius( 10000 );
-					configRaptor.addIntermodalAccessEgress( paramSetDrt );
-				}
-				if ( drt2 ){
-					IntermodalAccessEgressParameterSet paramSetDrt2 = new IntermodalAccessEgressParameterSet();
-					paramSetDrt2.setMode( "drt2" );
-					paramSetDrt2.setMaxRadius( 1000000 );
-					paramSetDrt2.setInitialSearchRadius( 1000000 );
-					paramSetDrt2.setSearchExtensionRadius( 10000 );
-					//				paramSetDrt2.setPersonFilterAttribute( null );
-					//				paramSetDrt2.setStopFilterAttribute( null );
-					configRaptor.addIntermodalAccessEgress( paramSetDrt2 );
-				}
+			// "walk":
+			configRaptor.addIntermodalAccessEgress( new IntermodalAccessEgressParameterSet().setMode( "walk2" )
+													.setMaxRadius( 1000000 ).setInitialSearchRadius( 1000000 )
+													.setSearchExtensionRadius( 10000 ) );
+			// (in principle, walk as alternative to drt will not work, since drt is always faster.  Need to give the ASC to the router!  However, with
+			// the reduced drt network we should be able to see differentiation.)
+
+			// when we constructed this test, this did not work with "walk" since sbb raptor treats the walk mode in some special way.
+			// don't know if this got cleaned up.  kai, feb'20
+
+			// drt
+			configRaptor.addIntermodalAccessEgress( new IntermodalAccessEgressParameterSet().setMode( TransportMode.drt )
+													.setMaxRadius( 1000000 ).setInitialSearchRadius( 1000000 )
+													.setSearchExtensionRadius( 10000 ) );
+
+			if ( drt2 ){
+				configRaptor.addIntermodalAccessEgress( new IntermodalAccessEgressParameterSet().setMode( "drt2" )
+														.setMaxRadius( 1000000 ).setInitialSearchRadius( 1000000 )
+														.setSearchExtensionRadius( 10000 ) );
+
+				//				paramSetDrt2.setPersonFilterAttribute( null );
+				//				paramSetDrt2.setStopFilterAttribute( null );
 			}
-
 		}
 
 		// === SCORING: ===
-
-		double margUtlTravPt = config.planCalcScore().getModes().get( TransportMode.pt ).getMarginalUtilityOfTraveling();;
 		{
-			ModeParams modeParams = new ModeParams(TransportMode.drt);
-			modeParams.setMarginalUtilityOfTraveling( margUtlTravPt );
-			config.planCalcScore().addModeParams(modeParams);
+			double margUtlTravPt = config.planCalcScore().getModes().get( TransportMode.pt ).getMarginalUtilityOfTraveling();
+			config.planCalcScore().addModeParams( new ModeParams( TransportMode.drt ).setMarginalUtilityOfTraveling( margUtlTravPt ) );
+			config.planCalcScore().addModeParams( new ModeParams( "drt2" ).setMarginalUtilityOfTraveling( margUtlTravPt ) );
+			config.planCalcScore().addModeParams( new ModeParams( "walk2" ).setMarginalUtilityOfTraveling( margUtlTravPt ) );
 		}
-		{
-				ModeParams modeParams = new ModeParams("drt2");
-				modeParams.setMarginalUtilityOfTraveling( margUtlTravPt );
-				config.planCalcScore().addModeParams(modeParams);
-		}
-		{
-			ModeParams modeParams = new ModeParams("walk2");
-			modeParams.setMarginalUtilityOfTraveling( margUtlTravPt );
-			config.planCalcScore().addModeParams(modeParams);
-		}
-
 		// === QSIM: ===
 
 		config.qsim().setSimStarttimeInterpretation( QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime );
@@ -566,20 +537,12 @@ public class PtAlongALine2Test{
 		// The following is for the _router_, not the qsim!  kai, jun'19
 		VehiclesFactory vf = scenario.getVehicles().getFactory();
 		if ( drt2 ) {
-			VehicleType vehType = vf.createVehicleType( Id.create( "drt2", VehicleType.class ) );
-			vehType.setMaximumVelocity( 25./3.6 );
-			scenario.getVehicles().addVehicleType( vehType );
-		}{
-			VehicleType vehType = vf.createVehicleType( Id.create( TransportMode.drt, VehicleType.class ) );
-			vehType.setMaximumVelocity( 25./3.6 );
-			scenario.getVehicles().addVehicleType( vehType );
+			scenario.getVehicles().addVehicleType( vf.createVehicleType( Id.create( "drt2", VehicleType.class ) ).setMaximumVelocity( 25./3.6 ) );
 		}
-		{
-			// (does not work without; I don't really know why. kai)
-			VehicleType vehType = vf.createVehicleType( Id.create( TransportMode.car, VehicleType.class ) );
-			vehType.setMaximumVelocity( 100./3.6 );
-			scenario.getVehicles().addVehicleType( vehType );
-		}
+		scenario.getVehicles().addVehicleType( vf.createVehicleType( Id.create( TransportMode.drt, VehicleType.class ) ).setMaximumVelocity( 25./3.6 ) );
+
+		scenario.getVehicles().addVehicleType( vf.createVehicleType( Id.create( TransportMode.car, VehicleType.class ) ).setMaximumVelocity( 100./3.6 ) );
+		// (does not work without; I don't really know why. kai)
 
 		scenario.getPopulation().getPersons().values().removeIf( person -> !person.getId().toString().equals( "3" ) );
 
