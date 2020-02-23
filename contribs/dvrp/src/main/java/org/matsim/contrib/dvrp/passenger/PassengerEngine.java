@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.dvrp.optimizer.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
@@ -52,7 +51,6 @@ import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfo;
-import org.matsim.core.mobsim.qsim.interfaces.TripInfoRequest;
 import org.matsim.core.mobsim.qsim.interfaces.TripInfoWithRequiredBooking;
 import org.matsim.facilities.FacilitiesUtils;
 
@@ -79,7 +77,7 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 	private final AwaitingPickupStorage awaitingPickupStorage = new AwaitingPickupStorage();
 
 	//keeps all received requests until rejection or dropoff
-	private final Map<Id<Request>, RequestEntry> requests = new HashMap<>();
+	private final Map<Id<org.matsim.contrib.dvrp.optimizer.Request>, RequestEntry> requests = new HashMap<>();
 
 	//package protected -> meant to be instantiated via PassengerEngineQSimModule
 	PassengerEngine(String mode, EventsManager eventsManager, MobsimTimer mobsimTimer,
@@ -120,12 +118,12 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 	}
 
 	@Override
-	public final List<TripInfo> getTripInfos(TripInfoRequest tripInfoRequest) {
+	public final List<TripInfo> getTripInfos( TripInfo.Request tripInfoRequest ) {
 		// idea is to be able to return multiple trip options, cf. public transit router.  In the case here, we will need only one.  I.e. goals of this method are:
 		// (1) fill out TripInfo
 		// (2) keep handle so that passenger can accept, or not-confirmed request is eventually deleted again.  Also see doSimStet(...) ;
 
-		Gbl.assertIf(tripInfoRequest.getTimeInterpretation() == TripInfoRequest.TimeInterpretation.departure);
+		Gbl.assertIf(tripInfoRequest.getTimeInterpretation() == TripInfo.Request.TimeInterpretation.departure );
 		Link pickupLink = FacilitiesUtils.decideOnLink(tripInfoRequest.getFromFacility(), network);
 		Link dropoffLink = FacilitiesUtils.decideOnLink(tripInfoRequest.getToFacility(), network);
 		double now = this.mobsimTimer.getTimeOfDay();
@@ -133,7 +131,7 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 		//FIXME we need to send TripInfoRequest to VrpOptimizer and actually get TripInfos from there
 		// for the time being: generating TripInfo object that will be returned to the potential passenger:
 		return ImmutableList.of(
-				new DvrpTripInfo(mode, pickupLink, dropoffLink, tripInfoRequest.getTime(), now, tripInfoRequest));
+				new DvrpTripInfo(mode, pickupLink, dropoffLink, tripInfoRequest.getTime(), now, tripInfoRequest, this ) );
 	}
 
 	/**
@@ -146,7 +144,7 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 		// offers.  We cannot say if advanceRequestStorage is the correct container for this, probably not and you will need yet another one.
 		double now = mobsimTimer.getTimeOfDay();
 		//TODO have a separate request creator for prebooking (accept TripInfo instead of Route)
-		PassengerRequest request = requestCreator.createRequest(createRequestId(), passenger.getId(), null,
+		PassengerRequest request = requestCreator.createRequest(createRequestId(), passenger.getId(), tripInfo.getOriginalRequest().getPlannedRoute(),
 				getLink(tripInfo.getPickupLocation().getLinkId()), getLink(tripInfo.getDropoffLocation().getLinkId()),
 				tripInfo.getExpectedBoardingTime(), now);
 		validateAndSubmitRequest(passenger, request, false, tripInfo.getOriginalRequest());
@@ -169,7 +167,10 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 
 		if (prebookedRequests.isEmpty()) {// this is an immediate request
 			//TODO what if it was already rejected while prebooking??
+
 			Route route = ((Leg)((PlanAgent)passenger).getCurrentPlanElement()).getRoute();
+			// yy one cannot rely on that the agent is a PlanAgent. (Maybe we should change that?) kai, jan'19
+
 			PassengerRequest request = requestCreator.createRequest(createRequestId(), passenger.getId(), route,
 					getLink(fromLinkId), getLink(toLinkId), departureTime, now);
 			validateAndSubmitRequest(passenger, request, false, null);
@@ -191,15 +192,15 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 
 	private long nextRequestId = 0;
 
-	private Id<Request> createRequestId() {
-		return Id.create(mode + "_" + nextRequestId++, Request.class);
+	private Id<org.matsim.contrib.dvrp.optimizer.Request> createRequestId() {
+		return Id.create(mode + "_" + nextRequestId++, org.matsim.contrib.dvrp.optimizer.Request.class );
 	}
 
 	// ================ REQUESTS HANDLING
 
 	//TODO have not decided yet how VrpOptimizer determines if request is prebooked, maybe 'boolean prebooked'??
 	private PassengerRequest validateAndSubmitRequest(MobsimPassengerAgent passenger, PassengerRequest request,
-			boolean prebooked, TripInfoRequest originalRequest) {
+			boolean prebooked, TripInfo.Request originalRequest ) {
 		requests.put(request.getId(), new RequestEntry(request, passenger, prebooked, originalRequest));
 		if (validateRequest(request)) {
 			optimizer.requestSubmitted(request);//optimizer can also reject request if cannot handle it
@@ -313,7 +314,7 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 				PassengerRequest request = requestEntry.request;
 				preplanningEngine.notifyChangedTripInformation(requestEntry.passenger, Optional.of(
 						new DvrpTripInfo(mode, request.getFromLink(), request.getToLink(), event.getPickupTime(),
-								event.getTime(), requestEntry.originalRequest)));
+								event.getTime(), requestEntry.originalRequest, this ) ) );
 			}
 		}
 	}
@@ -322,10 +323,10 @@ public final class PassengerEngine implements MobsimEngine, DepartureHandler, Tr
 		private final PassengerRequest request;
 		private final MobsimPassengerAgent passenger;
 		private final boolean prebooked; // != immediate request
-		private final TripInfoRequest originalRequest;
+		private final TripInfo.Request originalRequest;
 
 		private RequestEntry(PassengerRequest request, MobsimPassengerAgent passenger, boolean prebooked,
-				TripInfoRequest originalRequest) {
+				TripInfo.Request originalRequest ) {
 			this.request = request;
 			this.passenger = passenger;
 			this.prebooked = prebooked;

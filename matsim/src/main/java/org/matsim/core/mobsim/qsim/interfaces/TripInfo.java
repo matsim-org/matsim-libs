@@ -24,6 +24,8 @@
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.facilities.Facility;
 
@@ -38,10 +40,12 @@ public interface TripInfo{
 	Map<String,String> getAdditionalAttributes() ;
 	String getMode() ;
 	double getLatestDecisionTime() ;
-	TripInfoRequest getOriginalRequest() ;
+	Request getOriginalRequest() ;
+	void bookTrip( MobsimPassengerAgent agent ) ;
+
 
 	interface Provider{
-		List<TripInfo> getTripInfos( TripInfoRequest request ) ;
+		List<TripInfo> getTripInfos( Request request ) ;
 
 		String getMode();
 		// not sure if I like that, but with current design (where the confirmation goes to the TripInfo.Provider, not to the TripInfo instance that we have) I am not sure
@@ -50,4 +54,21 @@ public interface TripInfo{
 		void bookTrip( MobsimPassengerAgent agent, TripInfoWithRequiredBooking tripInfo );
 	}
 
+
+	/**
+	 * @author Michal Maciejewski (michalm)
+	 */
+	interface Request{
+		enum TimeInterpretation {departure, arrival}
+
+		Facility getFromFacility();
+
+		Facility getToFacility();
+
+		double getTime();
+
+		TimeInterpretation getTimeInterpretation();
+
+		Route getPlannedRoute();
+	}
 }

@@ -281,6 +281,7 @@ public final class VehicleUtils {
 	public static Vehicles getOrCreateAllvehicles( Scenario  scenario ) {
 		Vehicles map = (Vehicles) scenario.getScenarioElement( "allvehicles" );
 		if ( map==null ) {
+			log.info( "adding scenario element for allvehicles container" );
 			map = new VehiclesImpl();
 			scenario.addScenarioElement("allvehicles" , map);
 		}
