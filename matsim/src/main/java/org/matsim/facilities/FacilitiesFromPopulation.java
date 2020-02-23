@@ -44,6 +44,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import static org.matsim.core.config.groups.FacilitiesConfigGroup.*;
+
 /**
  * Generates {@link ActivityFacility}s from the {@link Activity Activities} in a population
  * and assigns the activity facilities as the activity locations in the population while
@@ -60,7 +62,7 @@ public final class FacilitiesFromPopulation {
 
 	private final ActivityFacilities facilities;
 	private Scenario scenario;
-	private boolean oneFacilityPerLink ;
+	private FacilitiesSource facilitiesSource;
 	private String idPrefix = "";
 	private Network network = null;
 	private boolean removeLinksAndCoordinates = true;
@@ -81,27 +83,29 @@ public final class FacilitiesFromPopulation {
 		this.removeLinksAndCoordinates = false ;
 //		this.addEmptyActivityOptions = facilityConfigGroup.isAddEmptyActivityOption();
 		this.addEmptyActivityOptions = true ;
-		if ( facilityConfigGroup.getFacilitiesSource()== FacilitiesConfigGroup.FacilitiesSource.onePerActivityLinkInPlansFile ) {
-			oneFacilityPerLink = true;
-		} else if ( facilityConfigGroup.getFacilitiesSource()== FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile ) {
-			oneFacilityPerLink = false;
-		} else {
-			throw new RuntimeException( Gbl.INVALID );
-		}
+		this.facilitiesSource = facilityConfigGroup.getFacilitiesSource();
 		this.network = scenario.getNetwork() ;
 		this.planCalcScoreConfigGroup = scenario.getConfig().planCalcScore() ;
 		this.scenario = scenario;
 	}
-
+	public void setFacilitiesSource( final FacilitiesSource facilitiesSource ) {
+		this.facilitiesSource = facilitiesSource;
+	}
 	/**
 	 * Sets whether all activities on a link should be collected within one ActivityFacility.
 	 * Default is <code>true</code>. If set to <code>false</code>, for each coordinate
 	 * found in the population's activities a separate ActivityFacility will be created.
 	 *
 	 * @param oneFacilityPerLink
+	 *
+	 * @deprecated -- better use {@link #setFacilitiesSource(FacilitiesSource)}
 	 */
 	public void setOneFacilityPerLink(final boolean oneFacilityPerLink) {
-		this.oneFacilityPerLink = oneFacilityPerLink;
+		if ( oneFacilityPerLink ) {
+			this.facilitiesSource = FacilitiesSource.onePerActivityLinkInPlansFile;
+		} else{
+			this.facilitiesSource = FacilitiesSource.onePerActivityLocationInPlansFile;
+		}
 	}
 
 	public void setIdPrefix(final String prefix) {
@@ -171,7 +175,7 @@ public final class FacilitiesFromPopulation {
 						Gbl.assertIf( coord!=null || linkId!=null );
 						// (need one of them non-null!)
 
-						ActivityFacility facility;
+						ActivityFacility facility ;
 
 						if ( linkId == null ) {
 							linkId = NetworkUtils.getNearestLinkExactly(this.network, coord).getId();
@@ -183,7 +187,9 @@ public final class FacilitiesFromPopulation {
 
 						Gbl.assertNotNull( linkId );
 
-						if ( this.oneFacilityPerLink ) {
+						if ( this.facilitiesSource==FacilitiesSource.onePerActivityLinkInPlansFile
+								     || ( this.facilitiesSource==FacilitiesSource.onePerActivityLinkInPlansFileExceptWhenCoordinatesAreGiven && coord==null )
+						) {
 							facility = facilitiesPerLinkId.get(linkId);
 							if (facility == null) {
 								final Id<ActivityFacility> facilityId = Id.create( this.idPrefix + linkId.toString() , ActivityFacility.class );
@@ -201,11 +207,14 @@ public final class FacilitiesFromPopulation {
 										throw new RuntimeException( "Facility with id=" + facilityId + " but different in coordinates and/or linkId already exists." ) ;
 									}
 								}
+								// above code is a duplicate, but they are difficult to merge because facilitiesPerLinkId is an IdMap while facilitiesPerCoord is a normal Map.  kai, feb'20
 							}
-						} else {
+						} else if ( this.facilitiesSource==FacilitiesSource.onePerActivityLocationInPlansFile
+															      || ( this.facilitiesSource==FacilitiesSource.onePerActivityLinkInPlansFileExceptWhenCoordinatesAreGiven && coord!=null )
+						) {
 							if (coord == null)  {
 								throw new RuntimeException("Coordinate for the activity "+activity+" is null, cannot collect facilities per coordinate. " +
-										"Possibly use " + FacilitiesConfigGroup.FacilitiesSource.onePerActivityLinkInPlansFile + " " +
+										"Possibly use " + FacilitiesSource.onePerActivityLinkInPlansFile + " " +
 													     "instead and collect facilities per link.");
 							}
 
@@ -225,7 +234,13 @@ public final class FacilitiesFromPopulation {
 										throw new RuntimeException( "Facility with id=" + facilityId + " but different in coordinates and/or linkId already exists." ) ;
 									}
 								}
+								// above code is a duplicate, but they are difficult to merge because facilitiesPerLinkId is an IdMap while facilitiesPerCoord is a normal Map.  kai, feb'20
 							}
+						} else {
+							throw new RuntimeException( "should never get to this location; either class/method used with invalid" +
+												    " setting of facilitiesSource, or something there is " +
+												    "something that was not understood while implementing " +
+												    "this." );
 						}
 
 						if (this.addEmptyActivityOptions) {
