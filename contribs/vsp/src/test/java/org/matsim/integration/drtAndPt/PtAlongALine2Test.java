@@ -101,8 +101,7 @@ public class PtAlongALine2Test{
 		// (as of today, will also influence router. kai, jun'19)
 
 		if(  drtMode == DrtMode.teleportBeeline ){// (configure teleportation router)
-			config.plansCalcRoute().addModeRoutingParams(
-					new ModeRoutingParams().setMode( TransportMode.drt ).setTeleportedModeSpeed( 100. / 3.6 ) );
+			config.plansCalcRoute().addModeRoutingParams( new ModeRoutingParams().setMode( TransportMode.drt ).setTeleportedModeSpeed( 100. / 3.6 ) );
 			if( drt2 ){
 				config.plansCalcRoute().addModeRoutingParams( new ModeRoutingParams().setMode( "drt2" ).setTeleportedModeSpeed( 100. / 3.6 ) );
 			}
@@ -198,8 +197,8 @@ public class PtAlongALine2Test{
 						new DrtConfigGroup().setMode( TransportMode.drt ).setMaxTravelTimeAlpha( 2.0 ).setVehiclesFile( drtVehiclesFile )
 								    .setMaxTravelTimeBeta( 5. * 60. ).setStopDuration( 60. ).setMaxWaitTime( Double.MAX_VALUE )
 								    .setRejectRequestIfMaxWaitOrTravelTimeViolated( false ).setUseModeFilteredSubnetwork( true )
-									.setEstimatedBeelineDistanceFactor(1.0).setEstimatedDrtSpeed(15)
-									.setAdvanceRequestPlanningHorizon(99999));
+								    .setEstimatedBeelineDistanceFactor(1.0).setEstimatedDrtSpeed(15)
+								    .setAdvanceRequestPlanningHorizon(99999));
 			}
 			if ( drt2 ) {
 				mm.addParameterSet(
@@ -337,9 +336,11 @@ public class PtAlongALine2Test{
 			} ) ;
 		}
 
-		// This will start otfvis.  Comment out if not needed.
-		controler.addOverridingModule( new OTFVisLiveModule() );
-		// !! does not work together with parameterized tests :-( !!
+		if ( "true".equals( System.getProperty( "runOTFVis" ) ) ){
+			// This will start otfvis
+			controler.addOverridingModule( new OTFVisLiveModule() );
+			// !! does not work together with parameterized tests :-( !!
+		}
 
 		controler.run();
 		
