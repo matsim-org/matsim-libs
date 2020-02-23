@@ -64,9 +64,8 @@ public interface Route extends MatsimPopulationObject {
 	 */
 	public String getRouteType();
 	
-	/** make the clone method public, but do NOT implement Cloneable
-	 * so that implementations can decide on their own if they support
-	 * Cloneable or not.
+	/** make the clone method public, but do NOT extend Cloneable so that implementations can decide on their own if they support
+	 * Cloneable or use some other way to make a copy..
 	 * <p></p>
 	 * Design comments:<ul>
 	 * <li>Do we really want this?  Martin ("Clean code") argues for the difference between data objects and behavioral objects.  Data objects should

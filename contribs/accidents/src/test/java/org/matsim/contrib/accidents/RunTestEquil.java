@@ -58,9 +58,9 @@ public class RunTestEquil {
 			}
 			
 			if (link.getFreespeed() > 16.) {
-				link.getAttributes().putAttribute(accidentsSettings.getBvwpRoadTypeAttributeName(), "1,0," + numberOfLanesBVWP);
+				link.getAttributes().putAttribute( AccidentsConfigGroup.BVWP_ROAD_TYPE_ATTRIBUTE_NAME, "1,0," + numberOfLanesBVWP);
 			} else {
-				link.getAttributes().putAttribute(accidentsSettings.getBvwpRoadTypeAttributeName(), "1,2," + numberOfLanesBVWP);
+				link.getAttributes().putAttribute( AccidentsConfigGroup.BVWP_ROAD_TYPE_ATTRIBUTE_NAME, "1,2," + numberOfLanesBVWP);
 			}		
 		}
     

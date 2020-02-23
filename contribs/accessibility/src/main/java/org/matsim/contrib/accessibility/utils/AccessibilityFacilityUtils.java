@@ -29,7 +29,7 @@ import org.matsim.contrib.accessibility.FacilityTypes;
 /**
  * @author dziemke
  */
-public class AccessibilityFacilityUtils {
+class AccessibilityFacilityUtils {
 	// Activites in SrV		
 	// eigener Arbeitsplatz
 	// anderer Dienstort/-weg

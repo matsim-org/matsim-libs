@@ -3,12 +3,13 @@ package org.matsim.contrib.freight.usecases.chessboard;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.Freight;
+import org.matsim.contrib.freight.FreightConfigGroup;
 import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
-import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
-import org.matsim.contrib.freight.replanning.modules.TimeAllocationMutator;
-import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
+import org.matsim.contrib.freight.controler.CarrierModule;
+import org.matsim.contrib.freight.controler.CarrierPlanStrategyManagerFactory;
+import org.matsim.contrib.freight.controler.ReRouteVehicles;
+import org.matsim.contrib.freight.controler.TimeAllocationMutator;
+import org.matsim.contrib.freight.controler.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.usecases.analysis.CarrierScoreStats;
 import org.matsim.contrib.freight.usecases.analysis.LegHistogram;
 import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl.DriversActivityScoring;
@@ -61,16 +62,8 @@ public final class RunChessboard {
             prepareScenario() ;
         }
 
-        // yyyy from here ...
-        final URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
-
-        final Carriers carriers = FreightUtils.getCarriers( scenario ) ;
-        new CarrierPlanXmlReader(carriers).readURL( IOUtils.extendUrl(url, "carrierPlans.xml" ) );
-
-        final CarrierVehicleTypes types = new CarrierVehicleTypes();
-        new CarrierVehicleTypeReader(types).readURL( IOUtils.extendUrl(url, "vehicleTypes.xml" ) );
-        new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(types);
-        // ... to here should really be done in prepareScenario.  kai, feb'19
+        Carriers carriers = FreightUtils.getOrCreateCarriers(scenario);
+        CarrierVehicleTypes types = FreightUtils.getCarrierVehicleTypes(scenario);
 
         Controler controler = new Controler(scenario);
 
@@ -86,14 +79,10 @@ public final class RunChessboard {
         }
 
 
-        Freight.configure( controler );
-
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                //                CarrierModule carrierModule = new CarrierModule(carriers);
-                //                carrierModule.setPhysicallyEnforceTimeWindowBeginnings(true);
-                //                install(carrierModule);
+                install(new CarrierModule());
                 bind(CarrierPlanStrategyManagerFactory.class).toInstance( new MyCarrierPlanStrategyManagerFactory(types) );
                 bind(CarrierScoringFunctionFactory.class).toInstance( new MyCarrierScoringFunctionFactory() );
             }
@@ -144,6 +133,7 @@ public final class RunChessboard {
             prepareConfig() ;
         }
         scenario = ScenarioUtils.loadScenario( config ) ;
+        FreightUtils.loadCarriersAccordingToFreightConfig(scenario);
         return scenario ;
     }
 
@@ -151,6 +141,9 @@ public final class RunChessboard {
         final URL url = ExamplesUtils.getTestScenarioURL("freight-chessboard-9x9");
         final URL configURL = IOUtils.extendUrl(url, "config.xml");
         config = ConfigUtils.loadConfig(configURL  );
+        FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
+        freightConfigGroup.setCarriersFile("carrierPlans.xml");
+        freightConfigGroup.setCarriersVehicleTypesFile("vehicleTypes.xml");
         config.controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
         config.global().setRandomSeed(4177);
         config.controler().setOutputDirectory("./output/");

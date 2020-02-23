@@ -120,106 +120,108 @@ public final class NetworkSimplifier {
 			
 			if(this.nodeTopoToMerge.contains(nodeTopo.getTopoType(node)) && (!this.nodesNotToMerge.contains(node.getId())) ){
 
+				List<Link> removedLinks = new ArrayList<>();
+
 				List<Link> iLinks = new ArrayList<>(node.getInLinks().values());
+				List<Link> oLinks = new ArrayList<>(node.getOutLinks().values());
 
-				for (Link iL : iLinks) {
-					Link inLink = iL;
+				for (Link inLink : iLinks) {
+					for (Link outLink : oLinks) {
 
-					List<Link> oLinks = new ArrayList<>(node.getOutLinks().values());
+						if(  areLinksMergeable(inLink, outLink) ){
+							if(this.mergeLinksWithDifferentAttributes){
 
-					for (Link oL : oLinks) {
-						Link outLink = oL;
+								// Only merge if threshold criteria is met.
+								boolean criteria = false;
+								switch (type) {
+								case BOTH:
+									criteria = bothLinksAreShorterThanThreshold(inLink, outLink, thresholdLength);
+									break;
+								case EITHER:
+									criteria = eitherLinkIsShorterThanThreshold(inLink, outLink, thresholdLength);
+									break;
+								default:
+									break;
+								}
 
-						if(inLink != null && outLink != null){
-//							if(!outLink.getToNode().equals(inLink.getFromNode())){
-							if(  areLinksMergeable(inLink, outLink) ){
-								if(this.mergeLinksWithDifferentAttributes){
+								// yyyy The approach here depends on the sequence in which this goes through the nodes:
+								// * in the "EITHER" situation, a long link may gobble up short neighboring links
+								// until it hits another long link doing the same.
+								// * In the "BOTH" situation, something like going through nodes randomly will often merge
+								// the neighboring links, while going through the nodes along some path will mean that it will
+								// gobble up until the threshold is met.
+								// I would strongly advise against setting thresholdLength to anything other than POSITIVE_INFINITY.
+								// kai, feb'18
 
-									// Only merge if threshold criteria is met.  
-									boolean criteria = false;
+								if(criteria){
+									// Try to merge both links by guessing the resulting links attributes
+									Link link = network.getFactory().createLink(
+											Id.create(inLink.getId() + "-" + outLink.getId(), Link.class),
+											inLink.getFromNode(),
+											outLink.getToNode());
+
+									// length can be summed up
+									link.setLength(inLink.getLength() + outLink.getLength());
+
+									// freespeed depends on total length and time needed for inLink and outLink
+									link.setFreespeed(
+											(inLink.getLength() + outLink.getLength()) /
+											(NetworkUtils.getFreespeedTravelTime(inLink) + NetworkUtils.getFreespeedTravelTime(outLink))
+											);
+
+									// the capacity and the new links end is important, thus it will be set to the minimum
+									link.setCapacity(Math.min(inLink.getCapacity(), outLink.getCapacity()));
+
+									// number of lanes can be derived from the storage capacity of both links
+									link.setNumberOfLanes((inLink.getLength() * inLink.getNumberOfLanes()
+											+ outLink.getLength() * outLink.getNumberOfLanes())
+											/ (inLink.getLength() + outLink.getLength())
+											);
+
+//									inLink.getOrigId() + "-" + outLink.getOrigId(),
+									network.addLink(link);
+									network.removeLink(inLink.getId());
+									network.removeLink(outLink.getId());
+									removedLinks.add(inLink);
+									removedLinks.add(outLink);
+									collectMergedLinkNodeInfo(inLink, outLink, link.getId());
+								}
+							} else {
+
+								// Only merge links with same attributes
+								if(bothLinksHaveSameLinkStats(inLink, outLink)){
+
+									// Only merge if threshold criteria is met.
+									boolean isHavingShortLinks = false;
 									switch (type) {
 									case BOTH:
-										criteria = bothLinksAreShorterThanThreshold(inLink, outLink, thresholdLength);
+										isHavingShortLinks = bothLinksAreShorterThanThreshold(inLink, outLink, thresholdLength);
 										break;
 									case EITHER:
-										criteria = eitherLinkIsShorterThanThreshold(inLink, outLink, thresholdLength);
+										isHavingShortLinks = eitherLinkIsShorterThanThreshold(inLink, outLink, thresholdLength);
 										break;
 									default:
 										break;
 									}
-									
-									// yyyy The approach here depends on the sequence in which this goes through the nodes:
-									// * in the "EITHER" situation, a long link may gobble up short neighboring links
-									// until it hits another long link doing the same.
-									// * In the "BOTH" situation, something like going through nodes randomly will often merge
-									// the neighboring links, while going through the nodes along some path will mean that it will
-									// gobble up until the threshold is met.
-									// I would strongly advise against setting thresholdLength to anything other than POSITIVE_INFINITY.
-									// kai, feb'18
-									
-									if(criteria){
-										// Try to merge both links by guessing the resulting links attributes
-										Link link = network.getFactory().createLink(
-												Id.create(inLink.getId() + "-" + outLink.getId(), Link.class),
-												inLink.getFromNode(),
-												outLink.getToNode());
-										
-										// length can be summed up
-										link.setLength(inLink.getLength() + outLink.getLength());
-										
-										// freespeed depends on total length and time needed for inLink and outLink
-										link.setFreespeed(
-												(inLink.getLength() + outLink.getLength()) /
-												(NetworkUtils.getFreespeedTravelTime(inLink) + NetworkUtils.getFreespeedTravelTime(outLink))
-												);
-										
-										// the capacity and the new links end is important, thus it will be set to the minimum
-										link.setCapacity(Math.min(inLink.getCapacity(), outLink.getCapacity()));
-										
-										// number of lanes can be derived from the storage capacity of both links
-										link.setNumberOfLanes((inLink.getLength() * inLink.getNumberOfLanes()
-												+ outLink.getLength() * outLink.getNumberOfLanes())
-												/ (inLink.getLength() + outLink.getLength())
-												);
-										
-//									inLink.getOrigId() + "-" + outLink.getOrigId(),
-										network.addLink(link);
+
+									if(isHavingShortLinks){
+										Link newLink = NetworkUtils.createAndAddLink(network,Id.create(inLink.getId() + "-" + outLink.getId(), Link.class), inLink.getFromNode(), outLink.getToNode(), inLink.getLength() + outLink.getLength(), inLink.getFreespeed(), inLink.getCapacity(), inLink.getNumberOfLanes(), NetworkUtils.getOrigId( inLink ) + "-" + NetworkUtils.getOrigId( outLink ), null);
+
+										newLink.setAllowedModes(inLink.getAllowedModes());
+
 										network.removeLink(inLink.getId());
 										network.removeLink(outLink.getId());
-										collectMergedLinkNodeInfo(inLink, outLink, link.getId());
-									}
-								} else {
-
-									// Only merge links with same attributes
-									if(bothLinksHaveSameLinkStats(inLink, outLink)){
-										
-										// Only merge if threshold criteria is met.  
-										boolean isHavingShortLinks = false;
-										switch (type) {
-										case BOTH:
-											isHavingShortLinks = bothLinksAreShorterThanThreshold(inLink, outLink, thresholdLength);
-											break;
-										case EITHER:
-											isHavingShortLinks = eitherLinkIsShorterThanThreshold(inLink, outLink, thresholdLength);
-											break;
-										default:
-											break;
-										}
-																				
-										if(isHavingShortLinks){
-											Link newLink = NetworkUtils.createAndAddLink(network,Id.create(inLink.getId() + "-" + outLink.getId(), Link.class), inLink.getFromNode(), outLink.getToNode(), inLink.getLength() + outLink.getLength(), inLink.getFreespeed(), inLink.getCapacity(), inLink.getNumberOfLanes(), NetworkUtils.getOrigId( inLink ) + "-" + NetworkUtils.getOrigId( outLink ), null);
-											
-											newLink.setAllowedModes(inLink.getAllowedModes());
-											
-											network.removeLink(inLink.getId());
-											network.removeLink(outLink.getId());
-											collectMergedLinkNodeInfo(inLink, outLink, newLink.getId());
-										}
+										removedLinks.add(inLink);
+										removedLinks.add(outLink);
+										collectMergedLinkNodeInfo(inLink, outLink, newLink.getId());
 									}
 								}
 							}
 						}
 					}
+				}
+				for (Link removedLink : removedLinks) {
+					this.mergedLinksToIntermediateNodes.remove(removedLink.getId());
 				}
 			}
 		}
@@ -234,26 +236,32 @@ public final class NetworkSimplifier {
 	}
 
 	private boolean areLinksMergeable(Link inLink, Link outLink) {
-		List<Node> fromNodes = this.mergedLinksToIntermediateNodes.get(inLink.getId());
-		if (fromNodes==null) fromNodes = new ArrayList<>();
+		Set<Node> fromNodes = new HashSet<>();
+		List<Node> tmp = this.mergedLinksToIntermediateNodes.get(inLink.getId());
+		if (tmp != null) fromNodes.addAll(tmp);
 		fromNodes.add(inLink.getFromNode());
 
-		List<Node> toNodes = this.mergedLinksToIntermediateNodes.get(outLink.getId());
-		if(toNodes==null) toNodes = new ArrayList<>();
+		Set<Node> toNodes = new HashSet<>();
+		tmp = this.mergedLinksToIntermediateNodes.get(outLink.getId());
+		if (tmp != null) toNodes.addAll(tmp);
 		toNodes.add(outLink.getToNode());
 
-		for(Node n :fromNodes) {
-			if (toNodes.contains(n)) return false;
-		}
-		return true;
+		// build intersection of from-nodes and to-nodes
+		fromNodes.retainAll(toNodes);
+		// there should be no intersection in order to merge the links
+		return fromNodes.isEmpty();
 	}
 
 	private void collectMergedLinkNodeInfo(Link inLink, Link outLink, Id<Link> mergedLinkId) {
 		List<Node> nodes = new ArrayList<>();
-		if (this.mergedLinksToIntermediateNodes.containsKey(inLink.getId())) nodes.addAll(this.mergedLinksToIntermediateNodes
-				.remove(inLink.getId()));
-		if (this.mergedLinksToIntermediateNodes.containsKey(outLink.getId())) nodes.addAll(this.mergedLinksToIntermediateNodes
-				.remove(outLink.getId()));
+		List<Node> tmp = this.mergedLinksToIntermediateNodes.get(inLink.getId());
+		if (tmp != null) {
+			nodes.addAll(tmp);
+		}
+		tmp = this.mergedLinksToIntermediateNodes.get(outLink.getId());
+		if (tmp != null) {
+			nodes.addAll(tmp);
+		}
 		nodes.add(inLink.getToNode());
 
 		this.mergedLinksToIntermediateNodes.put(mergedLinkId, nodes);

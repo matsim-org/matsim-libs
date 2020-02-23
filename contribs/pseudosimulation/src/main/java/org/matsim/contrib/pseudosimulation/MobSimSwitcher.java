@@ -31,7 +31,7 @@ public class MobSimSwitcher implements IterationEndsListener,
 	private int iterationsPerCycle = 0;
 	private Map<Id<Person>, Double> selectedPlanScoreMemory;
 	@Inject private PlanCatcher plancatcher;
-	@Inject private PSimProvider pSimProvider;
+//	@Inject private PSimProvider pSimProvider;
 
 	@Inject
 	public
@@ -40,9 +40,9 @@ public class MobSimSwitcher implements IterationEndsListener,
 		this.scenario = scenario;
 	}
 
-	public PSimProvider getpSimProvider() {
-		return pSimProvider;
-	}
+//	public PSimProvider getpSimProvider() {
+//		return pSimProvider;
+//	}
 
 	public boolean isQSimIteration() {
 		return isQSimIteration;

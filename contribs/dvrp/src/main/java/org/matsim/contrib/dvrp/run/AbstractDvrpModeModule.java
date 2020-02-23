@@ -26,7 +26,9 @@ import org.matsim.core.controler.AbstractModule;
 
 import com.google.inject.Key;
 import com.google.inject.Provider;
+import com.google.inject.TypeLiteral;
 import com.google.inject.binder.LinkedBindingBuilder;
+import com.google.inject.multibindings.MapBinder;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -46,8 +48,20 @@ public abstract class AbstractDvrpModeModule extends AbstractModule {
 		return DvrpModes.key(type, mode);
 	}
 
+	protected <T> Key<T> modalKey(TypeLiteral<T> typeLiteral) {
+		return DvrpModes.key(typeLiteral, mode);
+	}
+
 	protected <T> LinkedBindingBuilder<T> bindModal(Class<T> type) {
 		return bind(modalKey(type));
+	}
+
+	protected <T> LinkedBindingBuilder<T> bindModal(TypeLiteral<T> typeLiteral) {
+		return bind(modalKey(typeLiteral));
+	}
+
+	protected <K, V> MapBinder<K, V> modalMapBinder(Class<K> keyType, Class<V> valueType) {
+		return MapBinder.newMapBinder(binder(), keyType, valueType, DvrpModes.mode(getMode()));
 	}
 
 	protected <T> Provider<T> modalProvider(Function<ModalProviders.InstanceGetter, T> delegate) {

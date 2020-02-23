@@ -39,7 +39,7 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypeIdentifier;
 
 /**
  * (1) Handles departure and arrival events and store total travel time of a person and 
@@ -52,7 +52,7 @@ import org.matsim.core.router.StageActivityTypes;
  */
 
 public class ModalTripTravelTimeHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler, 
-TransitDriverStartsEventHandler, ActivityStartEventHandler, StageActivityTypes {
+TransitDriverStartsEventHandler, ActivityStartEventHandler {
 
 	private static final Logger LOGGER = Logger.getLogger(ModalTripTravelTimeHandler.class);
 	private static final int MAX_STUCK_AND_ABORT_WARNINGS = 5;
@@ -133,7 +133,7 @@ TransitDriverStartsEventHandler, ActivityStartEventHandler, StageActivityTypes {
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		if( person2Modes.containsKey(event.getPersonId()) ) {
-			if(! isStageActivity(event.getActType()) ) {
+			if(! StageActivityTypeIdentifier.isStageActivity(event.getActType()) ) {
 				List<String> modes = person2Modes.remove(event.getPersonId());
 				String legMode = getMainMode(modes);
 				double departureTime = personId2DepartureTime.remove(event.getPersonId());
@@ -145,11 +145,6 @@ TransitDriverStartsEventHandler, ActivityStartEventHandler, StageActivityTypes {
 		} else {
 			throw new RuntimeException("Person "+event.getPersonId()+" is not registered.");
 		}
-	}
-
-	@Override
-	public boolean isStageActivity(String actType){
-		return actType.endsWith("interaction");
 	}
 
 	private String getMainMode(List<String> modes){

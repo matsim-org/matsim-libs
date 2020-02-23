@@ -22,6 +22,7 @@ package org.matsim.contrib.emissions.events;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.Map;
@@ -41,11 +42,12 @@ public final class WarmEmissionEvent extends Event {
     public final static String ATTRIBUTE_VEHICLE_ID = "vehicleId";
     private final Id<Link> linkId;
 	private final Id<Vehicle> vehicleId;
-	private final Map<String, Double> warmEmissions;
-	
-	public WarmEmissionEvent(double time, Id<Link> linkId, Id<Vehicle> vehicleId, Map<String, Double> warmEmissions) {
-        super(time);
-        this.linkId = linkId;
+	private final Map<Pollutant, Double> warmEmissions;
+
+	public WarmEmissionEvent( double time, Id<Link> linkId, Id<Vehicle> vehicleId, Map<Pollutant, Double> warmEmissions ) {
+		// this is a WARM emission event, and so can accept the typed map. kai, jan'20
+		super(time);
+		this.linkId = linkId;
 		this.vehicleId = vehicleId;
 		this.warmEmissions = warmEmissions;
 	}
@@ -58,7 +60,7 @@ public final class WarmEmissionEvent extends Event {
 		return vehicleId;
 	}
 	
-	public Map<String, Double> getWarmEmissions() {
+	public Map<Pollutant, Double> getWarmEmissions() {
 		return warmEmissions;
 	}
 
@@ -67,8 +69,8 @@ public final class WarmEmissionEvent extends Event {
 		Map<String, String> attributes = super.getAttributes();
 		attributes.put(ATTRIBUTE_LINK_ID, this.linkId.toString());
 		attributes.put(ATTRIBUTE_VEHICLE_ID, this.vehicleId.toString());
-		for(Entry<String, Double> entry : warmEmissions.entrySet()){
-			String pollutant = entry.getKey();
+		for( Entry<Pollutant, Double> entry : warmEmissions.entrySet()){
+			String pollutant = entry.getKey().name();
 			Double value = entry.getValue();
 			attributes.put(pollutant, value.toString());
 		}

@@ -3,16 +3,16 @@ package playground.vsp.airPollution.flatEmissions;
 import org.junit.Test;
 
 import static junit.framework.TestCase.fail;
-import static playground.vsp.airPollution.flatEmissions.EmissionCostFactors.NOX;
+import static playground.vsp.airPollution.flatEmissions.EmissionCostFactors.NOx;
 
 public class EmissionCostFactorsTest{
 
     @Test
 	public void test() {
 
-		System.out.println( "name=" + NOX.name() + "; factor=" + NOX.getCostFactor() );
+		System.out.println( "name=" + NOx.name() + "; factor=" + NOx.getCostFactor() );
 
-		System.out.println( "noxFactor=" + EmissionCostFactors.getCostFactor( "NOX" ) ) ;
+		System.out.println( "noxFactor=" + EmissionCostFactors.getCostFactor( "NOx" ) ) ;
 	}
 
 	@Test(expected = IllegalArgumentException.class)

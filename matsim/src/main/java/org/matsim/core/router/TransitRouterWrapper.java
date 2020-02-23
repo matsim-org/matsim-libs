@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouter;
@@ -43,8 +44,6 @@ import java.util.List;
  * @author thibautd
  */
 public class TransitRouterWrapper implements RoutingModule {
-	private static final StageActivityTypes CHECKER =
-			new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE);
 	private final TransitRouter router;
 	private final RoutingModule walkRouter;
 	private final TransitSchedule transitSchedule;
@@ -91,7 +90,7 @@ public class TransitRouterWrapper implements RoutingModule {
 		// mode" flag should be put to the mode of the routing module.
 		return baseTrip != null ?
 				fillWithActivities(baseTrip, fromFacility, toFacility, departureTime, person) :
-					walkRouter.calcRoute(fromFacility, toFacility, departureTime, person);
+					null;
 	}
 
 	/**
@@ -165,8 +164,4 @@ public class TransitRouterWrapper implements RoutingModule {
 		return route;
 	}
 
-	@Override
-	public StageActivityTypes getStageActivityTypes() {
-		return CHECKER;
-	}
 } 

@@ -27,14 +27,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.Distances;
 import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -45,7 +43,7 @@ import java.util.*;
 /**
  * @author thibautd, dziemke
  */
-public final class ConstantSpeedAccessibilityExpContributionCalculator implements AccessibilityContributionCalculator {
+final class ConstantSpeedAccessibilityExpContributionCalculator implements AccessibilityContributionCalculator {
 	private static final Logger LOG = Logger.getLogger(ConstantSpeedAccessibilityExpContributionCalculator.class);
 
 	// Estimates travel time by a constant speed along network, considering all links (including highways, which seems

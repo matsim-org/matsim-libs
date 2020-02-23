@@ -6,6 +6,7 @@ package ch.sbb.matsim.routing.pt.raptor;
 
 import com.google.inject.name.Named;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.router.RoutingModule;
 
 import javax.inject.Inject;
@@ -24,7 +25,7 @@ public class SwissRailRaptorRoutingModuleProvider implements Provider<RoutingMod
     private final RoutingModule transitWalkRouter;
 
     @Inject
-    SwissRailRaptorRoutingModuleProvider(SwissRailRaptor raptor, Scenario scenario, @Named("transit_walk") RoutingModule transitWalkRouter) {
+    SwissRailRaptorRoutingModuleProvider(SwissRailRaptor raptor, Scenario scenario, @Named(TransportMode.walk) RoutingModule transitWalkRouter) {
         this.raptor = raptor;
         this.scenario = scenario;
         this.transitWalkRouter = transitWalkRouter;

@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.EmissionUtils;
 import org.matsim.contrib.emissions.events.EmissionEventsReader;
+import org.matsim.contrib.emissions.Pollutant;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
@@ -62,10 +63,10 @@ public class EmissionsAnalyzer extends AbstractAnalysisModule{
 	private final String emissionEventsFile;
 	private EmissionsPerPersonWarmEventHandler warmHandler;
 	private EmissionsPerPersonColdEventHandler coldHandler;
-	private Map<Id<Person>, Map<String, Double>> person2warmEmissions;
-	private Map<Id<Person>, Map<String, Double>> person2coldEmissions;
-	private Map<Id<Person>, SortedMap<String, Double>> person2totalEmissions;
-	private SortedMap<String, Double> totalEmissions;
+	private Map<Id<Person>, Map<Pollutant, Double>> person2warmEmissions;
+	private Map<Id<Person>, Map<Pollutant, Double>> person2coldEmissions;
+	private Map<Id<Person>, SortedMap<Pollutant, Double>> person2totalEmissions;
+	private SortedMap<Pollutant, Double> totalEmissions;
 	
 	public EmissionsAnalyzer(String emissionsEventsFile) {
 		super(EmissionsAnalyzer.class.getSimpleName());
@@ -125,7 +126,7 @@ public class EmissionsAnalyzer extends AbstractAnalysisModule{
 //			}
 			bw.newLine();
 
-			for(String pollutant : this.totalEmissions.keySet()){
+			for(Pollutant pollutant : this.totalEmissions.keySet()){
 				Double pollutantValue = this.totalEmissions.get(pollutant);
 				bw.write(pollutantValue.toString() + "\t");
 			}
@@ -139,19 +140,19 @@ public class EmissionsAnalyzer extends AbstractAnalysisModule{
 		}
 	}
 	
-	public SortedMap<String, Double> getTotalEmissions() {
+	public SortedMap<Pollutant,Double> getTotalEmissions() {
 		return totalEmissions;
 	}
 
-	public Map<Id<Person>, Map<String, Double>> getPerson2warmEmissions() {
+	public Map<Id<Person>, Map<Pollutant, Double>> getPerson2warmEmissions() {
 		return person2warmEmissions;
 	}
 
-	public Map<Id<Person>, Map<String, Double>> getPerson2coldEmissions() {
+	public Map<Id<Person>, Map<Pollutant, Double>> getPerson2coldEmissions() {
 		return person2coldEmissions;
 	}
 
-	public Map<Id<Person>, SortedMap<String, Double>> getPerson2totalEmissions() {
+	public Map<Id<Person>, SortedMap<Pollutant, Double>> getPerson2totalEmissions() {
 		return person2totalEmissions;
 	}
 	

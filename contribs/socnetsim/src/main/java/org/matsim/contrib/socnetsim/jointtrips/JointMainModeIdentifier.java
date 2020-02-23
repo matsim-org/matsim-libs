@@ -46,6 +46,11 @@ public class JointMainModeIdentifier implements MainModeIdentifier {
 				return mode;
 			}
 		}
+		
+		// If there is a joint leg, return the whole trip as joint.   The above implementation seems incomplete in the sense
+		// that it only looks at the _first_ occurence of a joint leg, i.e. someone who starts as a passenger always needs to be
+		// a passenger, etc.
+
 		return d.identifyMainMode( tripElements );
 	}
 }

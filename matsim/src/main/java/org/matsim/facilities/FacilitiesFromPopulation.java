@@ -19,11 +19,10 @@
 
 package org.matsim.facilities;
 
-import java.util.*;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -37,6 +36,13 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.population.PopulationUtils;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Generates {@link ActivityFacility}s from the {@link Activity Activities} in a population
@@ -53,6 +59,7 @@ public final class FacilitiesFromPopulation {
 	private final static Logger log = Logger.getLogger(FacilitiesFromPopulation.class);
 
 	private final ActivityFacilities facilities;
+	private Scenario scenario;
 	private boolean oneFacilityPerLink ;
 	private String idPrefix = "";
 	private Network network = null;
@@ -83,6 +90,7 @@ public final class FacilitiesFromPopulation {
 		}
 		this.network = scenario.getNetwork() ;
 		this.planCalcScoreConfigGroup = scenario.getConfig().planCalcScore() ;
+		this.scenario = scenario;
 	}
 
 	/**
@@ -141,12 +149,12 @@ public final class FacilitiesFromPopulation {
 	}
 
 	private void handleActivities(final Population population) {
+		Gbl.assertNotNull( network ) ;
+
 		int idxCounter = 0;
 		ActivityFacilitiesFactory factory = this.facilities.getFactory();
-		Map<Id<Link>, ActivityFacility> facilitiesPerLinkId = new HashMap<>();
+		IdMap<Link, ActivityFacility> facilitiesPerLinkId = new IdMap<>(Link.class);
 		Map<Coord, ActivityFacility> facilitiesPerCoordinate = new HashMap<>();
-
-		Gbl.assertNotNull( network ) ;
 
 		for (Person person : population.getPersons().values()) {
 			for (Plan plan : person.getPlans()) {
@@ -155,12 +163,22 @@ public final class FacilitiesFromPopulation {
 						Activity activity = (Activity) pe;
 
 						Coord coord = activity.getCoord();
+						// (may be null, and we are not fixing it at this point)
+
 						Id<Link> linkId = activity.getLinkId();
-						ActivityFacility facility = null;
+						// (may be null, and we are not fixing it at this point)
+
+						Gbl.assertIf( coord!=null || linkId!=null );
+						// (need one of them non-null!)
+
+						ActivityFacility facility;
 
 						if ( linkId == null ) {
 							linkId = NetworkUtils.getNearestLinkExactly(this.network, coord).getId();
 							// yyyy we have been using the non-exact version in other parts of the project. kai, mar'19
+						}
+						if ( coord==null ) {
+							coord = PopulationUtils.decideOnCoordForActivity( activity, scenario );
 						}
 
 						Gbl.assertNotNull( linkId );

@@ -32,5 +32,5 @@ import com.google.common.collect.ImmutableMap;
  * @author michalm
  */
 public interface Fleet {
-	ImmutableMap<Id<DvrpVehicle>, ? extends DvrpVehicle> getVehicles();
+	ImmutableMap<Id<DvrpVehicle>, DvrpVehicle> getVehicles();
 }

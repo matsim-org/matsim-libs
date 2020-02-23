@@ -50,7 +50,6 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
@@ -79,34 +78,6 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 	private final String stageActivityType;
 	private final String vehicleSuffix;
 	private final EvConfigGroup evConfigGroup;
-
-	private final class EvCharingStageActivityType implements StageActivityTypes {
-		@Override
-		public boolean isStageActivity(String activityType) {
-			if (EvNetworkRoutingModule.this.stageActivityType.equals(activityType)) {
-				return true;
-			} else if (activityType.endsWith("interaction")) {
-				return true;
-			}
-			{
-				return false;
-			}
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (!(obj instanceof EvCharingStageActivityType)) {
-				return false;
-			}
-			EvCharingStageActivityType other = (EvCharingStageActivityType)obj;
-			return other.isStageActivity(EvNetworkRoutingModule.this.stageActivityType);
-		}
-
-		@Override
-		public int hashCode() {
-			return EvNetworkRoutingModule.this.stageActivityType.hashCode();
-		}
-	}
 
 	public EvNetworkRoutingModule(final String mode, final Network network, RoutingModule delegate,
 			ElectricFleetSpecification electricFleet,
@@ -210,10 +181,11 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 		DriveEnergyConsumption driveEnergyConsumption = pseudoVehicle.getDriveEnergyConsumption();
 		AuxEnergyConsumption auxEnergyConsumption = pseudoVehicle.getAuxEnergyConsumption();
 		double lastSoc = pseudoVehicle.getBattery().getSoc();
+		double linkEnterTime = basicLeg.getDepartureTime();
 		for (Link l : links) {
 			double travelT = travelTime.getLinkTravelTime(l, basicLeg.getDepartureTime(), null, null);
 
-			double consumption = driveEnergyConsumption.calcEnergyConsumption(l, travelT, Time.getUndefinedTime())
+			double consumption = driveEnergyConsumption.calcEnergyConsumption(l, travelT, linkEnterTime)
 					+ auxEnergyConsumption.calcEnergyConsumption(basicLeg.getDepartureTime(), travelT, l.getId());
 			pseudoVehicle.getBattery().changeSoc(-consumption);
 			double currentSoc = pseudoVehicle.getBattery().getSoc();
@@ -221,13 +193,9 @@ public final class EvNetworkRoutingModule implements RoutingModule {
 			double consumptionDiff = (lastSoc - currentSoc);
 			lastSoc = currentSoc;
 			consumptions.put(l, consumptionDiff);
+			linkEnterTime += travelT;
 		}
 		return consumptions;
-	}
-
-	@Override
-	public StageActivityTypes getStageActivityTypes() {
-		return new EvCharingStageActivityType();
 	}
 
 	@Override

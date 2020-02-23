@@ -26,6 +26,9 @@ import org.matsim.contrib.emissions.HbefaColdEmissionFactorKey;
 import org.matsim.contrib.emissions.HbefaVehicleAttributes;
 import org.matsim.contrib.emissions.HbefaVehicleCategory;
 
+import static org.matsim.contrib.emissions.Pollutant.CO;
+import static org.matsim.contrib.emissions.Pollutant.FC;
+
 
 /*
 	* test for playground.vsp.emissions.types.HbefaColdEmissionFactorKey
@@ -39,7 +42,7 @@ public class TestHbefaColdEmissionFactorKey {
 	
 	private Integer distance;
     private Integer parkingTime;
-	private String coldPollutant;
+	private Pollutant coldPollutant;
 	private HbefaVehicleAttributes hbefaVehicleAttributes;
 	private HbefaVehicleCategory hbefaVehCategory;
 	private String message;
@@ -55,7 +58,7 @@ public class TestHbefaColdEmissionFactorKey {
 		hbefaVehicleAttributes.setHbefaTechnology("technology");
 		distance = 4;
 		parkingTime = 5;
-		coldPollutant = "FC";
+		coldPollutant = FC;
 		hbefaVehCategory = HbefaVehicleCategory.PASSENGER_CAR;
 		equalErr = false;
 	}
@@ -88,7 +91,7 @@ public class TestHbefaColdEmissionFactorKey {
 		
 		//different HbefaColdEmissionFactorKey, does not equal 'normal'
 		HbefaColdEmissionFactorKey different = new HbefaColdEmissionFactorKey();
-		different.setHbefaComponent("CO");
+		different.setHbefaComponent(CO);
 		different.setHbefaDistance(2);
 		different.setHbefaParkingTime(50);
 		HbefaVehicleAttributes attForDifferent= new HbefaVehicleAttributes();

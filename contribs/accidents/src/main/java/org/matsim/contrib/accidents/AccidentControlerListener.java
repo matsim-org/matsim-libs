@@ -90,10 +90,10 @@ import com.google.inject.Inject;
 				}
 				
 				if (linkAccidentsComputationMethod.equals( AccidentsComputationMethod.BVWP.toString() )) {
-					String bvwpRoadTypeString = (String) link.getAttributes().getAttribute(accidentsCfg.getBvwpRoadTypeAttributeName());
+					String bvwpRoadTypeString = (String) link.getAttributes().getAttribute( AccidentsConfigGroup.BVWP_ROAD_TYPE_ATTRIBUTE_NAME );
 
 					if (bvwpRoadTypeString == null) {
-						throw new RuntimeException("Required link attribute " + accidentsCfg.getBvwpRoadTypeAttributeName() + " is null."
+						throw new RuntimeException("Required link attribute " + AccidentsConfigGroup.BVWP_ROAD_TYPE_ATTRIBUTE_NAME + " is null."
 								+ " Please pre-process your network and specify the link attributes that are required to compute accident costs. Aborting...");
 					}
 					

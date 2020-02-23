@@ -84,6 +84,7 @@ public class Assignment extends PApplet {
 			float boxY = 20 ;
 			float boxZ = 20 ;
 			translate(boxX/2,boxY/2,-boxZ/2-boxZ*level) ;
+			//			translate(boxX/2,boxY + level*boxY,0) ; // spread horizontally instead of stacking vertically
 			this.box( boxX, boxY, boxZ ) ;
 		}
 		popMatrix() ;

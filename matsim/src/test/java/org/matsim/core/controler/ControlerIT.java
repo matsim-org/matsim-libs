@@ -24,12 +24,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.matsim.core.config.groups.ControlerConfigGroup.*;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.EnumSet;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -494,7 +492,7 @@ public class ControlerIT {
 	public void testCompressionType() {
 		final Config config = utils.loadConfig(IOUtils.extendUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(0);
-		config.controler().setCompressionType(ControlerConfigGroup.CompressionType.zst);
+		config.controler().setCompressionType( CompressionType.zst );
 
 		final Controler controler = new Controler(config);
 
@@ -895,12 +893,12 @@ public class ControlerIT {
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		config.controler().setMobsim("qsim");
-		config.controler().setSnapshotFormat(Arrays.asList("googleearth"));
+		config.controler().setSnapshotFormat( Collections.singletonList( SnapshotFormat.googleearth ) );
 		config.qsim().setSnapshotPeriod(600);
 		config.qsim().setSnapshotStyle( SnapshotStyle.equiDist ) ;
 
 		final Controler controler = new Controler(config);
-        controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
@@ -933,7 +931,7 @@ public class ControlerIT {
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		config.controler().setMobsim("qsim");
-		config.controler().setSnapshotFormat(Arrays.asList("transims"));
+		config.controler().setSnapshotFormat( Collections.singletonList( SnapshotFormat.transims ) );
 		config.qsim().setSnapshotPeriod(600);
 		config.qsim().setSnapshotStyle( SnapshotStyle.equiDist ) ;;
 

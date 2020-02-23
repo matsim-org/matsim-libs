@@ -22,6 +22,7 @@ package org.matsim.contrib.socnetsim.usage.replanning.strategies;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
 
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
@@ -53,15 +54,18 @@ public class JointPrismLocationChoiceWithJointTripInsertionStrategyFactory exten
 	private final Provider<TripRouter> tripRouterFactory;
 	private final PlanLinkIdentifier planLinkIdentifier;
 	private javax.inject.Provider<TripRouter> tripRouterProvider;
+	private final MainModeIdentifier mainModeIdentifier;
 
 	@Inject
 	public JointPrismLocationChoiceWithJointTripInsertionStrategyFactory(Scenario sc, PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory,
-																		 Provider<TripRouter> tripRouterFactory, @Strong PlanLinkIdentifier planLinkIdentifier, javax.inject.Provider<TripRouter> tripRouterProvider) {
+																		 Provider<TripRouter> tripRouterFactory, @Strong PlanLinkIdentifier planLinkIdentifier, 
+																		 javax.inject.Provider<TripRouter> tripRouterProvider, MainModeIdentifier mainModeIdentifier) {
 		this.sc = sc;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;
 		this.planLinkIdentifier = planLinkIdentifier;
 		this.tripRouterProvider = tripRouterProvider;
+		this.mainModeIdentifier = mainModeIdentifier;
 	}
 
 
@@ -76,7 +80,7 @@ public class JointPrismLocationChoiceWithJointTripInsertionStrategyFactory exten
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createJointTripAwareTourModeUnifierModule(
 						sc.getConfig(),
-						tripRouterFactory) );
+						mainModeIdentifier) );
 		
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
@@ -93,7 +97,7 @@ public class JointPrismLocationChoiceWithJointTripInsertionStrategyFactory exten
 								MatsimRandom.getLocalInstance(),
 								(SocialNetwork) sc.getScenarioElement(  SocialNetwork.ELEMENT_NAME ),
 								(JointTripInsertorConfigGroup) sc.getConfig().getModule( JointTripInsertorConfigGroup.GROUP_NAME ),
-								tripRouterFactory.get());
+								mainModeIdentifier);
 						}
 						
 						@Override
