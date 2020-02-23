@@ -114,4 +114,8 @@ public interface MobsimAgent extends NetworkAgent, Identifiable<Person> {
     public Facility getCurrentFacility() ;
     
     public Facility getDestinationFacility() ;
+
+    String getActivityType();
+    // we are also having "getMode()", so we can as well have this here.  kai, feb'20
+
 }

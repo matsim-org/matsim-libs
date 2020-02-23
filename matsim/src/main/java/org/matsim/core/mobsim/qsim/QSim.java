@@ -22,9 +22,11 @@ package org.matsim.core.mobsim.qsim;
 
 import com.google.inject.Injector;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -50,6 +52,10 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.facilities.Facility;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -462,6 +468,26 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	}
 
 	private void arrangeAgentActivity(final MobsimAgent agent) {
+
+		// the activity start event used to be thrown by each agent.  one may argue that this is the right place, since maybe the agent wants to add
+		// information into the event that is not known by the framework.  on the other hand, there are some advantages of throwing this by the
+		// framework ... in particular, agents cannot "forget" throwing this.  Yet, it is quite difficult to also throw the activity end event at the
+		// level of the framework.  So we could say that if we throw the activity start event here, we will at least notice problems.  kai, feb'20
+
+		double now = this.getSimTimer().getTimeOfDay();
+
+		Id<? extends Facility> facilityId = null;
+		Facility facility = agent.getCurrentFacility();
+		if ( facility instanceof ActivityFacility ) {
+			facilityId = ((ActivityFacility) facility).getId();
+		} else if ( facility instanceof TransitStopFacility ) {
+			facilityId = ((TransitStopFacility) facility).getId();
+		}
+
+		Coord coord = FacilitiesUtils.decideOnCoord( facility, this.getNetsimNetwork().getNetwork(), this.scenario.getConfig() );
+
+		events.processEvent( new ActivityStartEvent( now, agent.getId(), agent.getCurrentLinkId(), facilityId, agent.getActivityType(), coord) );
+
 		for (ActivityHandler activityHandler : this.activityHandlers) {
 			if (activityHandler.handleActivity(agent)) {
 				return;
