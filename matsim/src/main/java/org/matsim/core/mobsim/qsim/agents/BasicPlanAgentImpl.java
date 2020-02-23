@@ -425,6 +425,15 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 		}
 		throw new RuntimeException("unexpected type of PlanElement");
 	}
+	@Override public String getActivityType(){
+		PlanElement planElement = this.getCurrentPlanElement();
+		if ( planElement instanceof Activity ) {
+			return ((Activity) planElement).getType();
+		} else if ( planElement instanceof Leg ) {
+			return null;
+		}
+		throw new RuntimeException( "unexpected type of PlanElement" );
+	}
 
 	@Override
 	public String toString() {

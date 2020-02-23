@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -321,6 +322,15 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	 * for junit tests in same package
 	 */
 	abstract /*package*/ Leg getCurrentLeg() ;
+
+	@Override public String getActivityType(){
+		if ( this.getCurrentPlanElement() instanceof Activity ) {
+			return ((Activity) this.getCurrentPlanElement()).getType();
+		} else if ( this.getCurrentPlanElement() instanceof Leg ) {
+			return null;
+		}
+		throw new RuntimeException( "unknown activity type" );
+	}
 
 
 	/**

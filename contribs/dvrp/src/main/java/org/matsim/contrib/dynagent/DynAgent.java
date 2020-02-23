@@ -262,4 +262,7 @@ public final class DynAgent implements MobsimDriverPassengerAgent {
 	public Facility getDestinationFacility() {
 		throw new UnsupportedOperationException("Teleportation is not supported by DynAgent");
 	}
+	@Override public String getActivityType(){
+		return this.dynActivity.getActivityType();
+	}
 }

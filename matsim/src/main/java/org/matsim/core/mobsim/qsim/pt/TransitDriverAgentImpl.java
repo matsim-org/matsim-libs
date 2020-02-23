@@ -316,7 +316,5 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 		throw new RuntimeException("unexpected type of PlanElement") ;
 	}
 
-	
-	
 
 }

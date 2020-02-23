@@ -467,6 +467,9 @@ public class CreateAutomatedFDTest {
 		public Facility getDestinationFacility() {
 			throw new RuntimeException("not implemented") ;
 		}
+		@Override public String getActivityType(){
+			throw new RuntimeException( "not implemented" );
+		}
 	}
 
 	private void storeVehicleTypeInfo() {

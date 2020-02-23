@@ -193,6 +193,9 @@ public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent
 	public Facility getDestinationFacility() {
 		return this.basicAgentDelegate.getDestinationFacility();
 	}
+	@Override public String getActivityType(){
+		return this.basicAgentDelegate.getActivityType();
+	}
 
 	@Override
 	public Plan getModifiablePlan() {

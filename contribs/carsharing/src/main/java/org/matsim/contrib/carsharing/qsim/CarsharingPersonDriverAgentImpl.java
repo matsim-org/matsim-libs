@@ -272,6 +272,9 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	public Facility getDestinationFacility() {
 		return this.basicAgentDelegate.getDestinationFacility();
 	}
+	@Override public String getActivityType(){
+		return this.basicAgentDelegate.getActivityType();
+	}
 
 	public final PlanElement getPreviousPlanElement() {
 		return this.basicAgentDelegate.getPreviousPlanElement();

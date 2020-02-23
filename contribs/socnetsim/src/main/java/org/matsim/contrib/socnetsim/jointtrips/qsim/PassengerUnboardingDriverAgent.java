@@ -327,4 +327,7 @@ public class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAg
 	public Facility getDestinationFacility() {
 		return this.delegate.getDestinationFacility();
 	}
+	@Override public String getActivityType(){
+		return this.delegate.getActivityType();
+	}
 }

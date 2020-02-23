@@ -249,6 +249,9 @@ public class AgentNotificationTest {
 			public Facility getDestinationFacility() {
 				return delegate.getDestinationFacility() ;
 			}
+			@Override public String getActivityType(){
+				return delegate.getActivityType();
+			}
 
 			@Override
 			public PlanElement getPreviousPlanElement() {

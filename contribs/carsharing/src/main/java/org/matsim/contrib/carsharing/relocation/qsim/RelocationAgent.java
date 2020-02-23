@@ -376,4 +376,7 @@ public class RelocationAgent implements MobsimDriverAgent {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	@Override public String getActivityType(){
+		throw new RuntimeException( "not implemented" );
+	}
 }

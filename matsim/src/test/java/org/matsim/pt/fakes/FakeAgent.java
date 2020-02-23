@@ -194,5 +194,8 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 	public Facility getDestinationFacility() {
 		throw new RuntimeException("not implemented") ;
 	}
-	
+	@Override public String getActivityType(){
+		throw new RuntimeException( "not implemented" );
+	}
+
 }

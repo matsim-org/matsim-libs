@@ -63,7 +63,8 @@ public class ActivityStartEvent extends Event implements HasFacilityId, HasPerso
 	 * @deprecated -- add Coord as argument
 	 */
 	@Deprecated // add Coord as argument
-	public ActivityStartEvent( final double time, final Id<Person> agentId, final Id<Link> linkId, final Id<ActivityFacility> facilityId, final String acttype ){
+	public ActivityStartEvent( final double time, final Id<Person> agentId, final Id<Link> linkId, final Id<? extends Facility> facilityId,
+				   final String acttype ){
 		this( time, agentId, linkId, facilityId, acttype, null);
 	}
 	// this is the new constructor:
