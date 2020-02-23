@@ -71,11 +71,6 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.withinday.utils.EditTrips;
 import org.matsim.withinday.utils.ReplanningException;
@@ -286,7 +281,7 @@ public class RunExamplePtDisturbances {
 			TripStructureUtils.Trip currentTrip;
 
 			try{
-				currentTrip = editTrips.findCurrentTrip( agent );
+				currentTrip = EditTrips.findCurrentTrip( agent );
 			} catch( ReplanningException e ){
 				// The agent might not be on a trip at the moment (but at a "real" activity).
 				currentTrip = null;

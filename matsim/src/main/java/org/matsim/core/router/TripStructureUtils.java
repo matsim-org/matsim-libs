@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 
 /**
@@ -508,11 +509,15 @@ public final class TripStructureUtils {
 		return findTripAtPlanElement( pe, plan ) ;
 	}
 
-	public static Trip findTripAtPlanElement( PlanElement currentPlanElement, Plan plan ) {
+	public static Trip findTripAtPlanElement( PlanElement currentPlanElement, Plan plan ){
+		return findTripAtPlanElement( currentPlanElement, plan, TripStructureUtils::isStageActivityType ) ;
+	}
+	public static Trip findTripAtPlanElement( PlanElement currentPlanElement, Plan plan, Predicate<String> isStageActivity ) {
 		if ( currentPlanElement instanceof Activity ) {
-			Gbl.assertIf( StageActivityTypeIdentifier.isStageActivity( ((Activity)currentPlanElement).getType() ) ) ;
+//			Gbl.assertIf( StageActivityTypeIdentifier.isStageActivity( ((Activity)currentPlanElement).getType() ) ) ;
+			Gbl.assertIf( isStageActivity.test( ((Activity)currentPlanElement).getType() ) ) ;
 		}
-		List<Trip> trips = getTrips(plan.getPlanElements()) ;
+		List<Trip> trips = getTrips(plan.getPlanElements(), isStageActivity) ;
 		for ( Trip trip : trips ) {
 			int index = trip.getTripElements().indexOf( currentPlanElement ) ;
 			if ( index != -1 ) {
@@ -576,6 +581,9 @@ public final class TripStructureUtils {
 
 	public static boolean isStageActivityType( String activityType ) {
 		return StageActivityTypeIdentifier.isStageActivity( activityType ) ;
+	}
+	public static String createStageActivityType( String mode ) {
+		return PlanCalcScoreConfigGroup.createStageActivityType( mode ) ;
 	}
 
 }
