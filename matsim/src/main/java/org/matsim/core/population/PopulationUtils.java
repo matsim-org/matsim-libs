@@ -1111,4 +1111,7 @@ public final class PopulationUtils {
 		person.getAttributes().clear();
 	}
 
+        public static String getSubpopulation( Person p, Config config ){
+		return (String) getPersonAttribute( p, config.plans().getSubpopulationAttributeName() );
+        }
 }

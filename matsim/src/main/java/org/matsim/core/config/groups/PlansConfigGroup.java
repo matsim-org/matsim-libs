@@ -21,6 +21,8 @@
 package org.matsim.core.config.groups;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
@@ -160,17 +162,24 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 	public void setNetworkRouteType(final String routeType) {
 		this.networkRouteType = routeType;
 	}
-
+	// ---
+	/**
+	 * @deprecated -- use {@link org.matsim.core.population.PopulationUtils#getSubpopulation(Person, Config)}
+	 */
+	@Deprecated
 	@StringGetter( SUBPOPULATION_ATTRIBUTE )
 	public String getSubpopulationAttributeName() {
 		return subpopulationAttributeName;
 	}
-
+	/**
+	 * @deprecated -- do not set away from default
+	 */
+	@Deprecated
 	@StringSetter( SUBPOPULATION_ATTRIBUTE )
 	public void setSubpopulationAttributeName(String subpopulationAttributeName) {
 		this.subpopulationAttributeName = subpopulationAttributeName;
 	}
-	
+	// ---
 	@StringGetter(ACTIVITY_DURATION_INTERPRETATION)
 	public PlansConfigGroup.ActivityDurationInterpretation getActivityDurationInterpretation() {
 		return this.activityDurationInterpretation ;
