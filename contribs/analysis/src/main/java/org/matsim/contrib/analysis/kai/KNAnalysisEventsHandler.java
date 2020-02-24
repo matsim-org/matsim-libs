@@ -324,7 +324,7 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 	}
 	private String getSubpopName( Person person, Config config ) {
 //		String subpop = (String) personAttributes.getAttribute( personId.toString(), subpopAttrName ) ;
-		String subpop = PopulationUtils.getSubpopulation(person,  config );
+		String subpop = PopulationUtils.getSubpopulation(person );
 		return "subpop_" + subpop;
 	}
 

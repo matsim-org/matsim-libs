@@ -122,7 +122,7 @@ public class GroupStrategyManager {
 		String name = null;
 
 		for ( Person p : g.getPersons() ) {
-			final String persSubPop = PopulationUtils.getSubpopulation( p, sc.getConfig() );
+			final String persSubPop = PopulationUtils.getSubpopulation( p );
 			if ( persSubPop == null && name != null ) throw new RuntimeException( "inconsistent subpopulations in group "+g );
 			if ( name != null && !name.equals( persSubPop ) ) throw new RuntimeException( "inconsistent subpopulations in group "+g );
 			name = persSubPop;

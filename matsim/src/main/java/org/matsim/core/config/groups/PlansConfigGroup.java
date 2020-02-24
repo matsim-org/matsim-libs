@@ -42,13 +42,13 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 	private static final String INPUT_FILE = "inputPlansFile";
 	private static final String INPUT_PERSON_ATTRIBUTES_FILE = "inputPersonAttributesFile";
 	private static final String NETWORK_ROUTE_TYPE = "networkRouteType";
-	private static final String SUBPOPULATION_ATTRIBUTE = "subpopulationAttributeName";
+//	private static final String SUBPOPULATION_ATTRIBUTE = "subpopulationAttributeName";
 	private static final String INPUT_CRS = "inputCRS";
 
 	private String inputFile = null;
 	private String networkRouteType = NetworkRouteType.LinkNetworkRoute;
 	private String inputPersonAttributeFile = null;
-	private String subpopulationAttributeName = "subpopulation";
+//	private String subpopulationAttributeName = "subpopulation";
 	private String inputCRS = null;
 	
 	//--
@@ -73,10 +73,10 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 //		comments.put(
 //				INPUT_PERSON_ATTRIBUTES_FILE,
 //				"Path to a file containing person attributes (required file format: ObjectAttributes).");
-		comments.put(
-				SUBPOPULATION_ATTRIBUTE,
-				"Name of the (Object)Attribute defining the subpopulation to which pertains a Person"+
-				" (as freight, through traffic, etc.). The attribute must be of String type.  Change away from default only in desperate situations." );
+//		comments.put(
+//				SUBPOPULATION_ATTRIBUTE,
+//				"Name of the (Object)Attribute defining the subpopulation to which pertains a Person"+
+//				" (as freight, through traffic, etc.). The attribute must be of String type.  Change away from default only in desperate situations." );
 
 		StringBuilder str = new StringBuilder() ;
 		for ( PlansConfigGroup.ActivityDurationInterpretation itp : PlansConfigGroup.ActivityDurationInterpretation.values() ) {
@@ -134,7 +134,7 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 	}
 	
 	@StringGetter( INPUT_PERSON_ATTRIBUTES_FILE )
-	@Deprecated // I think that this should be phased out; use Attributes inside each facility.  kai, mar'19
+	@Deprecated // this should be phased out; use Attributes inside each person.  kai, mar'19
 	public String getInputPersonAttributeFile() {
 		return this.inputPersonAttributeFile;
 	}
@@ -143,12 +143,12 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 						 "insistingOnUsingDeprecatedPersonAttributeFile to true.  The file will then be read, but the values " +
 						 "will be entered into each person using Attributable, and written as such to output_plans.  kai, may'19";
 	@StringSetter( INPUT_PERSON_ATTRIBUTES_FILE )
-	@Deprecated // I think that this should be phased out; use Attributes inside each facility.  kai, mar'19
+	@Deprecated // this should be phased out; use Attributes inside each person.  kai, mar'19
 	public void setInputPersonAttributeFile(final String inputPersonAttributeFile) {
 		this.inputPersonAttributeFile = inputPersonAttributeFile;
 	}
 
-	@Deprecated // I think that this should be phased out; use Attributes inside each facility.  kai, mar'19
+	@Deprecated // this should be phased out; use Attributes inside each person.  kai, mar'19
 	public URL getInputPersonAttributeFileURL(URL context) {
 		return ConfigGroup.getInputFileURL(context, this.inputPersonAttributeFile);
 	}
@@ -163,22 +163,22 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 		this.networkRouteType = routeType;
 	}
 	// ---
-	/**
-	 * @deprecated -- use {@link org.matsim.core.population.PopulationUtils#getSubpopulation(Person, Config)}
-	 */
-	@Deprecated
-	@StringGetter( SUBPOPULATION_ATTRIBUTE )
-	public String getSubpopulationAttributeName() {
-		return subpopulationAttributeName;
-	}
-	/**
-	 * @deprecated -- do not set away from default
-	 */
-	@Deprecated
-	@StringSetter( SUBPOPULATION_ATTRIBUTE )
-	public void setSubpopulationAttributeName(String subpopulationAttributeName) {
-		this.subpopulationAttributeName = subpopulationAttributeName;
-	}
+//	/**
+//	 * @deprecated -- use {@link org.matsim.core.population.PopulationUtils#getSubpopulation(Person, Config)}
+//	 */
+//	@Deprecated
+//	@StringGetter( SUBPOPULATION_ATTRIBUTE )
+//	public String getSubpopulationAttributeName() {
+//		return subpopulationAttributeName;
+//	}
+//	/**
+//	 * @deprecated -- do not set away from default
+//	 */
+//	@Deprecated
+//	@StringSetter( SUBPOPULATION_ATTRIBUTE )
+//	public void setSubpopulationAttributeName(String subpopulationAttributeName) {
+//		this.subpopulationAttributeName = subpopulationAttributeName;
+//	}
 	// ---
 	@StringGetter(ACTIVITY_DURATION_INTERPRETATION)
 	public PlansConfigGroup.ActivityDurationInterpretation getActivityDurationInterpretation() {
