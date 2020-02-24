@@ -26,12 +26,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.contrib.parking.parkingproxy.config.ParkingProxyConfigGroup;
-import org.matsim.contrib.parking.parkingproxy.penaltyCalculator.ExponentialPenaltyFunctionWithCap;
-import org.matsim.contrib.parking.parkingproxy.penaltyCalculator.InitialLoadGenerator;
-import org.matsim.contrib.parking.parkingproxy.penaltyCalculator.LinearPenaltyFunctionWithCap;
-import org.matsim.contrib.parking.parkingproxy.penaltyCalculator.MovingEntityCounter;
-import org.matsim.contrib.parking.parkingproxy.penaltyCalculator.ParkingVehiclesCountEventHandler;
-import org.matsim.contrib.parking.parkingproxy.penaltyCalculator.PenaltyFunction;
 
 /**
  * <p>
@@ -58,9 +52,10 @@ public class ParkingProxyModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		ParkingProxyConfigGroup parkingConfig = (ParkingProxyConfigGroup) ConfigUtils.addOrGetModule(getConfig(), ParkingProxyConfigGroup.class);
+		ParkingProxyConfigGroup parkingConfig = ConfigUtils.addOrGetModule(getConfig(), ParkingProxyConfigGroup.class );
 		
 		InitialLoadGenerator loadGenerator = new InitialLoadGenerator(scenario.getPopulation().getPersons().values(), parkingConfig.getScenarioScaleFactor());
+//		bind( InitialLoadGenerator.class ).toInstance( loadGenerator );
 		Collection<Tuple<Coord, Integer>> initialLoad = loadGenerator.calculateInitialCarPositions(parkingConfig.getCarsPer1000Persons());
 		MovingEntityCounter carCounter = new MovingEntityCounter(
 				initialLoad, 

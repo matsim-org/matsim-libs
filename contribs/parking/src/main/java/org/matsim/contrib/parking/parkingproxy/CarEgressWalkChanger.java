@@ -26,11 +26,7 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.contrib.parking.parkingproxy.penaltyCalculator.PenaltyCalculator;
-import org.matsim.contrib.parking.parkingproxy.penaltyCalculator.PenaltyFunction;
-import org.matsim.contrib.parking.parkingproxy.penaltyCalculator.PenaltyGenerator;
-import org.matsim.contrib.parking.parkingproxy.utils.AccessEgressFinder;
-import org.matsim.contrib.parking.parkingproxy.utils.AccessEgressFinder.LegActPair;
+import org.matsim.contrib.parking.parkingproxy.AccessEgressFinder.LegActPair;
 
 /**
  * <p>
@@ -52,7 +48,7 @@ import org.matsim.contrib.parking.parkingproxy.utils.AccessEgressFinder.LegActPa
  * @author tkohl / Senozon
  *
  */
-public class CarEgressWalkChanger implements BeforeMobsimListener, AfterMobsimListener {
+class CarEgressWalkChanger implements BeforeMobsimListener, AfterMobsimListener {
 	
 	private final CarEgressWalkObserver observer;
 	private final AccessEgressFinder egressFinder = new AccessEgressFinder(TransportMode.car);

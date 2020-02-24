@@ -23,9 +23,6 @@ import java.io.File;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.contrib.parking.parkingproxy.penaltyCalculator.PenaltyCalculator;
-import org.matsim.contrib.parking.parkingproxy.penaltyCalculator.PenaltyFunction;
-import org.matsim.contrib.parking.parkingproxy.penaltyCalculator.PenaltyGenerator;
 
 /**
  * Before the mobsim, gets the current {@linkplain PenaltyCalculator} from the provided {@linkplain PenaltyGenerator} and
@@ -36,7 +33,7 @@ import org.matsim.contrib.parking.parkingproxy.penaltyCalculator.PenaltyGenerato
  * @author tkohl / Senozon
  *
  */
-public class CarEgressWalkObserver implements BeforeMobsimListener {
+class CarEgressWalkObserver implements BeforeMobsimListener {
 	
 	private static final String INSERTIONKEY = "[INSERTIONKEY]";
 	public static final String OUTFILE_PENALTIES = "penalties_iter" + INSERTIONKEY + ".csv";

@@ -36,7 +36,7 @@ public class ParkingProxyConfigGroup extends ReflectiveConfigGroup {
 	public static final String GRID_SIZE = "gridSize";
 	public static final String CARS_PER_1000_PERSONS = "carsPer1000Persons";
 	
-	private CalculationMethod method = CalculationMethod.none;
+	private CalculationMethod method = CalculationMethod.events;
 	private boolean observeOnly = false;
 	private double delayPerCar = 2.5;
 	private double maxDelay = 900;
