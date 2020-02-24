@@ -20,6 +20,13 @@
 
 package org.matsim.core.population.io;
 
+import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
+import static org.matsim.core.utils.io.XmlUtils.encodeContent;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -38,13 +45,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 import org.matsim.vehicles.Vehicle;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Map;
-
-import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
-import static org.matsim.core.utils.io.XmlUtils.encodeContent;
 
 /**
  * @author thibautd
@@ -198,14 +198,14 @@ import static org.matsim.core.utils.io.XmlUtils.encodeContent;
 			out.write(Time.writeTime(act.getMaximumDuration()));
 			out.write("\"");
 		}
-		if (!Time.isUndefinedTime(act.getEndTime())) {
+		if (!act.isEndTimeUndefined()) {
 			out.write(" end_time=\"");
 			out.write(Time.writeTime(act.getEndTime()));
 			out.write("\"");
 		}
 		out.write(" >\n");
 
-		this.attributesWriter.writeAttributes( "\t\t\t\t" , out , act.getAttributes() );
+		this.attributesWriter.writeAttributes("\t\t\t\t", out, act.getAttributes());
 
 		out.write("\t\t\t</activity>\n");
 	}

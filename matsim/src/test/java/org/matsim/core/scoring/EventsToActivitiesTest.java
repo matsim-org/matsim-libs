@@ -66,7 +66,7 @@ public class EventsToActivitiesTest {
 				"home", new Coord( 123., 4.56 ) ) );
 		testee.finish();
 		Assert.assertNotNull(ah.handledActivity);
-		Assert.assertEquals(Time.UNDEFINED_TIME, ah.handledActivity.getActivity().getEndTime(), 1e-8);
+		Assert.assertTrue(ah.handledActivity.getActivity().isEndTimeUndefined());
 		Assert.assertEquals(90.0, ah.handledActivity.getActivity().getStartTime(), 1e-8);
 		Assert.assertEquals( 123., ah.handledActivity.getActivity().getCoord().getX(), 0. );
 		Assert.assertEquals( 4.56, ah.handledActivity.getActivity().getCoord().getY(), 0. );

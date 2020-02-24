@@ -70,7 +70,7 @@ public final class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
 	public void run(final Plan plan) {
 		for ( Activity act : TripStructureUtils.getActivities( plan , stageActivityHandling ) ) {
 			// this is deliberately simplistic.  Cleanup up of the time information should be done somewhere else.
-			if ( !Time.isUndefinedTime( act.getEndTime() ) ) {
+			if ( !act.isEndTimeUndefined() ) {
 				act.setEndTime(mutateTime(act.getEndTime()));
 			}
 			if ( affectingDuration ) {

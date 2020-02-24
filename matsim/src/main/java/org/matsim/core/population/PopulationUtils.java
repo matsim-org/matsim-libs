@@ -24,7 +24,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -33,8 +40,15 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -53,7 +67,6 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
@@ -413,20 +426,20 @@ public final class PopulationUtils {
 	 */
 	public static double decideOnActivityEndTime( Activity act, double now, Config config ) {
 		switch ( config.plans().getActivityDurationInterpretation() ) {
-		case endTimeOnly:
-			return act.getEndTime() ;
-		case tryEndTimeThenDuration:
-			if ( !Time.isUndefinedTime(act.getEndTime()) ) {
-				return act.getEndTime() ;
-			} else if ( !Time.isUndefinedTime(act.getMaximumDuration()) ) {
-				return now + act.getMaximumDuration() ;
-			} else {
-				return Time.getUndefinedTime();
-			}
-		case minOfDurationAndEndTime:
-			return Math.min( now + act.getMaximumDuration() , act.getEndTime() ) ;
-		default:
-			break ;
+			case endTimeOnly:
+				return act.getEndTime();
+			case tryEndTimeThenDuration:
+				if (!act.isEndTimeUndefined()) {
+					return act.getEndTime();
+				} else if (!Time.isUndefinedTime(act.getMaximumDuration())) {
+					return now + act.getMaximumDuration();
+				} else {
+					return Time.getUndefinedTime();
+				}
+			case minOfDurationAndEndTime:
+				return Math.min(now + act.getMaximumDuration(), act.getEndTime());
+			default:
+				break;
 		}
 		return Time.getUndefinedTime();
 	}
@@ -593,7 +606,8 @@ public final class PopulationUtils {
 			}
 
 			// activity end times
-			if ( Double.isInfinite( act1.getEndTime() ) && Double.isInfinite( act2.getEndTime() ) ){
+			if (  act1.isEndTimeUndefined() && act2.isEndTimeUndefined() ){
+				// TODO: isInfinite() is broader than isUndefined()
 				// both activities have no end time, no need to compute a similarity penalty
 			} else {
 				// both activities have an end time, comparing the end times
@@ -835,14 +849,14 @@ public final class PopulationUtils {
 		Coord coord = act.getCoord() == null ? null : new Coord(act.getCoord().getX(), act.getCoord().getY());
 		// (we don't want to copy the coord ref, but rather the contents!)
 		newAct.setCoord(coord);
-		newAct.setType( act.getType() );
+		newAct.setType(act.getType());
 		newAct.setLinkId(act.getLinkId());
 		newAct.setStartTime(act.getStartTime());
-		newAct.setEndTime(act.getEndTime());
+		newAct.setEndTime(act.isEndTimeUndefined() ? Time.UNDEFINED_TIME : act.getEndTime());
 		newAct.setMaximumDuration(act.getMaximumDuration());
 		newAct.setFacilityId(act.getFacilityId());
 
-		AttributesUtils.copyAttributesFromTo( act , newAct );
+		AttributesUtils.copyAttributesFromTo(act, newAct);
 	}
 
 	// --- copy factories:

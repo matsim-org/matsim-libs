@@ -20,6 +20,11 @@
 
 package org.matsim.core.population.io;
 
+import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -37,11 +42,6 @@ import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.XmlUtils;
 import org.matsim.core.utils.misc.Time;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-
-import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 
 /*package*/ class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandler {
 
@@ -207,7 +207,7 @@ import static org.matsim.core.utils.io.XmlUtils.encodeAttributeValue;
 				out.write(Time.writeTime(act.getMaximumDuration()));
 				out.write("\"");
 			}
-		if (!Time.isUndefinedTime(act.getEndTime())) {
+		if (!act.isEndTimeUndefined()) {
 			out.write(" end_time=\"");
 			out.write(Time.writeTime(act.getEndTime()));
 			out.write("\"");

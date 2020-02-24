@@ -26,11 +26,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
-import org.matsim.core.utils.misc.Time;
-
-import org.matsim.contrib.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 
 /**
  * Links plans with "joinable" activities, that is,
@@ -111,7 +109,7 @@ public class JoinableActivitiesPlanLinkIdentifier implements PlanLinkIdentifier 
 			// correct times if inconsistent
 			lastEnd = Math.max(
 				lastEnd,
-				act.getEndTime() != Time.UNDEFINED_TIME ?
+				!act.isEndTimeUndefined() ?
 					act.getEndTime() :
 					lastEnd + act.getMaximumDuration() );
 

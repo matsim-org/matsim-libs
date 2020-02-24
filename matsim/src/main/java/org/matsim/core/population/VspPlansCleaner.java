@@ -19,22 +19,30 @@
  * *********************************************************************** */
 package org.matsim.core.population;
 
-import com.google.inject.Inject;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.utils.misc.Time;
 
+import com.google.inject.Inject;
+
 /**
  * @author nagel
- *
+ * <p>
  * Use with caution! (jb, Oct 2018)
  */
 /* deliberately package */ class VspPlansCleaner implements BeforeMobsimListener {
 
-	@Inject private PlansConfigGroup plansConfigGroup;
-	@Inject private Population population;
+	@Inject
+	private PlansConfigGroup plansConfigGroup;
+	@Inject
+	private Population population;
 
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
@@ -58,13 +66,13 @@ import org.matsim.core.utils.misc.Time;
 						// always set duration to undefined:
 						act.setMaximumDuration( Time.getUndefinedTime()) ;
 						
-					} else if ( actDurInterp == PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration ) {
-						
+					} else if ( actDurInterp == PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration) {
+
 						// set duration to undefined if there is an activity end time:
-						if ( !Time.isUndefinedTime(act.getEndTime()) ) {
-							act.setMaximumDuration(Time.getUndefinedTime()) ;
+						if (!act.isEndTimeUndefined()) {
+							act.setMaximumDuration(Time.getUndefinedTime());
 						}
-						
+
 					} else {
 						throw new IllegalStateException("should not happen") ;
 					}

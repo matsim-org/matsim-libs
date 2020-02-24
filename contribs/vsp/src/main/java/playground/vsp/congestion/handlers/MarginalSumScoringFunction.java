@@ -105,7 +105,7 @@ public class MarginalSumScoringFunction {
         	throw new RuntimeException("activityMorning is not the first activity. Or why does it have a start time? Aborting...");
         }
         
-        if (activityEvening.getStartTime() != Time.UNDEFINED_TIME && activityEvening.getEndTime() == Time.UNDEFINED_TIME) {
+        if (activityEvening.getStartTime() != Time.UNDEFINED_TIME && activityEvening.isEndTimeUndefined()) {
         	// 'eveningActivity' is the last activity
         } else {
         	throw new RuntimeException("activityEvening is not the last activity. Or why does it have an end time? Aborting...");

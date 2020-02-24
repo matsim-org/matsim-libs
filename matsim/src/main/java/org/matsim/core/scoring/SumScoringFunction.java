@@ -21,14 +21,14 @@
 
  package org.matsim.core.scoring;
 
+import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.misc.Time;
-
-import java.util.ArrayList;
 
 public final class SumScoringFunction implements ScoringFunction {
 
@@ -87,22 +87,22 @@ public final class SumScoringFunction implements ScoringFunction {
 	@Override
 	public final void handleActivity(Activity activity) {
 		double startTime = activity.getStartTime();
-		double endTime = activity.getEndTime();
-		if (Time.isUndefinedTime(startTime) && !Time.isUndefinedTime(endTime)) {
+		//		double endTime = activity.getEndTime();
+		if (Time.isUndefinedTime(startTime) && !activity.isEndTimeUndefined()) {
 			for (ActivityScoring activityScoringFunction : this.activityScoringFunctions) {
 				activityScoringFunction.handleFirstActivity(activity);
 			}
-		} else if (!Time.isUndefinedTime(startTime) && !Time.isUndefinedTime(endTime)) {
+		} else if (!Time.isUndefinedTime(startTime) && !activity.isEndTimeUndefined()) {
 			for (ActivityScoring activityScoringFunction : this.activityScoringFunctions) {
 				activityScoringFunction.handleActivity(activity);
 			}
-		} else if (!Time.isUndefinedTime(startTime) && Time.isUndefinedTime(endTime)) {
+		} else if (!Time.isUndefinedTime(startTime) && activity.isEndTimeUndefined()) {
 			for (ActivityScoring activityScoringFunction : this.activityScoringFunctions) {
 				activityScoringFunction.handleLastActivity(activity);
 			}
 		} else {
-			throw new RuntimeException("Trying to score an activity without start or end time. Should not happen. Activity="
-			+ activity );
+			throw new RuntimeException(
+					"Trying to score an activity without start or end time. Should not happen. Activity=" + activity);
 		}
 	}
 

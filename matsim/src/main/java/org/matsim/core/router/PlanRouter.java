@@ -33,7 +33,6 @@ import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils.Trip;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.vehicles.Vehicle;
@@ -154,7 +153,8 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 		// yyyy similar method in PopulationUtils.  TripRouter.calcEndOfPlanElement in fact uses it.  However, this seems doubly inefficient; calling the
 		// method in PopulationUtils directly would probably be faster.  kai, jul'19
 
-		if (!Time.isUndefinedTime(activity.getEndTime())) return activity.getEndTime();
+		if (!activity.isEndTimeUndefined())
+			return activity.getEndTime();
 
 		// no sufficient information in the activity...
 		// do it the long way.
@@ -164,7 +164,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 		double now = 0;
 
 		for (PlanElement pe : plan.getPlanElements()) {
-			now = TripRouter.calcEndOfPlanElement( now, pe, config );
+			now = TripRouter.calcEndOfPlanElement(now, pe, config);
 			if (pe == activity) return now;
 		}
 

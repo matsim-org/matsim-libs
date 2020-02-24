@@ -41,11 +41,11 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	// Case (0): comes with coord and linkId.  No problem.
 	// Case (1): comes with linkId but w/o coord.  Coord is (presumably) set in prepareForIterations.
 	// Case (2): comes with coord but w/o linkId.  LinkId is (presumably) set in prepareForIterations.
-	
+
 	// Case (X): facilityId inconsistent with linkId, coord.  Idea: mobsim takes the facilityId and (a) checks the other
 	// attribs or (b) ignores them.
 
-	private double endTime = Time.getUndefinedTime();
+	private Double endTime = null;
 
 	/**
 	 * Used for reporting outcomes in the scoring. Not interpreted for the demand.
@@ -72,7 +72,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	@Override
 	public final void setEndTime(final double endTime) {
-		this.endTime = endTime;
+		this.endTime = Time.isUndefinedTime(endTime) ? null : endTime;
 	}
 
 	/**
@@ -136,13 +136,26 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	@Override
 	public final String toString() {
-		return "act [type=" + this.getType() + "]" +
-				"[coord=" + this.getCoord() + "]" +
-				"[linkId=" + this.linkId + "]" +
-				"[startTime=" + Time.writeTime(this.getStartTime()) + "]" +
-				"[endTime=" + Time.writeTime(this.getEndTime()) + "]" +
-				"[duration=" + Time.writeTime(this.getMaximumDuration()) + "]" +
-				"[facilityId=" + this.facilityId + "]" ;
+		return "act [type="
+				+ this.getType()
+				+ "]"
+				+ "[coord="
+				+ this.getCoord()
+				+ "]"
+				+ "[linkId="
+				+ this.linkId
+				+ "]"
+				+ "[startTime="
+				+ Time.writeTime(this.getStartTime())
+				+ "]"
+				+ "[endTime="
+				+ Time.writeTime(isEndTimeUndefined() ? Time.UNDEFINED_TIME : this.getEndTime())
+				+ "]"
+				+ "[duration="
+				+ Time.writeTime(this.getMaximumDuration())
+				+ "]"
+				+ "[facilityId="
+				+ this.facilityId + "]" ;
 	}
 
 	@Override

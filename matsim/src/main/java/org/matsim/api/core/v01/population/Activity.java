@@ -27,9 +27,17 @@ import org.matsim.facilities.ActivityFacility;
 
 /**
  * Specifies the kind of activity an agent performs during its day.
- * 
  */
 public interface Activity extends PlanElement {
+
+	default boolean isEndTimeUndefined() {
+		try {
+			getEndTime();
+			return false;
+		} catch (NullPointerException e) {
+			return true;
+		}
+	}
 
 	public double getEndTime();
 

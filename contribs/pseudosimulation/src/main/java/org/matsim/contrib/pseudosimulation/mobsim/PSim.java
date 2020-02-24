@@ -162,8 +162,7 @@ public class PSim implements Mobsim {
                     /*
                      * Make sure that the activity does not end before the previous activity.
                      */
-                    double actEndTime = Math.max( prevEndTime + MIN_ACT_DURATION, act.getEndTime() );
-
+                    double actEndTime = Math.max( prevEndTime + MIN_ACT_DURATION, act.isEndTimeUndefined() ? 0 : act.getEndTime());
                     if( idx > 0 ){
                         /*
                          * If this is not the first activity, then there must exist a leg before.

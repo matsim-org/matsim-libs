@@ -22,10 +22,12 @@ package org.matsim.pt.router;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
@@ -570,9 +572,9 @@ public class TransitRouterImplTest {
 		for (PlanElement pe : planElements) {			
 			if (pe instanceof Activity) {
 				Activity act = (Activity) pe;
-				double endTime = act.getEndTime();
 				double startTime = act.getStartTime();
-				if (startTime != Time.UNDEFINED_TIME && endTime != Time.UNDEFINED_TIME) {
+				if (startTime != Time.UNDEFINED_TIME && act.isEndTimeUndefined()) {
+					double endTime = act.getEndTime();
 					duration += (endTime - startTime);
 				}
 			} else if (pe instanceof Leg) {
