@@ -67,16 +67,8 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -467,26 +459,36 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		}
 	}
 
-	private void arrangeAgentActivity(final MobsimAgent agent) {
+	private Set<MobsimAgent> startedAgents = new HashSet<>() ;
 
-		// the activity start event used to be thrown by each agent.  one may argue that this is the right place, since maybe the agent wants to add
-		// information into the event that is not known by the framework.  on the other hand, there are some advantages of throwing this by the
-		// framework ... in particular, agents cannot "forget" throwing this.  Yet, it is quite difficult to also throw the activity end event at the
-		// level of the framework.  So we could say that if we throw the activity start event here, we will at least notice problems.  kai, feb'20
+	private void arrangeAgentActivity(final MobsimAgent agent){
 
-		double now = this.getSimTimer().getTimeOfDay();
+		if( startedAgents.contains( agent ) ){
 
-		Id<? extends Facility> facilityId = null;
-		Facility facility = agent.getCurrentFacility();
-		if ( facility instanceof ActivityFacility ) {
-			facilityId = ((ActivityFacility) facility).getId();
-		} else if ( facility instanceof TransitStopFacility ) {
-			facilityId = ((TransitStopFacility) facility).getId();
+			// the activity start event used to be thrown by each agent.  one may argue that this is the right place, since maybe the agent wants to add
+			// information into the event that is not known by the framework.  on the other hand, there are some advantages of throwing this by the
+			// framework ... in particular, agents cannot "forget" throwing this.  Yet, it is quite difficult to also throw the activity end event at the
+			// level of the framework.  So we could say that if we throw the activity start event here, we will at least notice problems.  kai, feb'20
+
+			double now = this.getSimTimer().getTimeOfDay();
+
+			Id<? extends Facility> facilityId = null;
+			Facility facility = agent.getCurrentFacility();
+			if( facility instanceof ActivityFacility ){
+				facilityId = ((ActivityFacility) facility).getId();
+			} else if( facility instanceof TransitStopFacility ){
+				facilityId = ((TransitStopFacility) facility).getId();
+			}
+
+			Coord coord = FacilitiesUtils.decideOnCoord( facility, this.scenario.getNetwork(), this.scenario.getConfig() );
+
+			events.processEvent( new ActivityStartEvent( now, agent.getId(), agent.getCurrentLinkId(), facilityId, agent.getActivityType(), coord ) );
+
+		} else {
+
+			startedAgents.add( agent );
 		}
-
-		Coord coord = FacilitiesUtils.decideOnCoord( facility, this.getNetsimNetwork().getNetwork(), this.scenario.getConfig() );
-
-		events.processEvent( new ActivityStartEvent( now, agent.getId(), agent.getCurrentLinkId(), facilityId, agent.getActivityType(), coord) );
+		// (We do not write events for the start of the first activity since we do not know when that has happened. kai, feb'20)
 
 		for (ActivityHandler activityHandler : this.activityHandlers) {
 			if (activityHandler.handleActivity(agent)) {

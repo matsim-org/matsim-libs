@@ -85,7 +85,8 @@ public final class DynAgent implements MobsimDriverPassengerAgent {
 		if (nextDynAction instanceof DynActivity) {
 			dynActivity = (DynActivity)nextDynAction;
 			state = MobsimAgent.State.ACTIVITY;
-			events.processEvent(new ActivityStartEvent(now, id, currentLinkId, null, dynActivity.getActivityType()));
+//			events.processEvent(new ActivityStartEvent(now, id, currentLinkId, null, dynActivity.getActivityType()));
+			// now in framework code.  kai, feb'20
 		} else {
 			dynLeg = (DynLeg)nextDynAction;
 			state = MobsimAgent.State.LEG;

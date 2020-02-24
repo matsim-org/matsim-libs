@@ -238,6 +238,7 @@ public class PSim implements Mobsim {
                         PersonArrivalEvent arrivalEvent = new PersonArrivalEvent( arrivalTime, personId, act.getLinkId(), prevLeg.getMode() );
                         eventQueue.add( arrivalEvent );
                         ActivityStartEvent startEvent = new ActivityStartEvent( arrivalTime, personId, act.getLinkId(), act.getFacilityId(), act.getType() );
+                        // this may now be in framework code; I can't really say.  kai, feb'20
                         eventQueue.add( startEvent );
                     }
 
