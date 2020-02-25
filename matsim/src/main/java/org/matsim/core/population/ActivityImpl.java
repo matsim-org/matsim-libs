@@ -50,7 +50,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	/**
 	 * Used for reporting outcomes in the scoring. Not interpreted for the demand.
 	 */
-	private double startTime = Time.getUndefinedTime();
+	private Double startTime = null;
 
 	private double dur = Time.getUndefinedTime();
 
@@ -88,7 +88,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	 */
 	@Override
 	public final void setStartTime(final double startTime) {
-		this.startTime = startTime;
+		this.startTime = Time.isUndefinedTime(startTime) ? null : startTime;
 	}
 
 	@Override
@@ -146,10 +146,10 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 				+ this.linkId
 				+ "]"
 				+ "[startTime="
-				+ Time.writeTime(this.getStartTime())
+				+ Time.writeTime(isStartTimeUndefined()? Time.getUndefinedTime() : this.getStartTime())
 				+ "]"
 				+ "[endTime="
-				+ Time.writeTime(isEndTimeUndefined() ? Time.UNDEFINED_TIME : this.getEndTime())
+				+ Time.writeTime(isEndTimeUndefined() ? Time.getUndefinedTime() : this.getEndTime())
 				+ "]"
 				+ "[duration="
 				+ Time.writeTime(this.getMaximumDuration())

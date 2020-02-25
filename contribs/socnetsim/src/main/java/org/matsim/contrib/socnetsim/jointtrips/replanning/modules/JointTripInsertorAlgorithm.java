@@ -35,25 +35,24 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.misc.Time;
-
-import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.contrib.socnetsim.framework.cliques.config.JointTripInsertorConfigGroup;
-import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
-import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
 import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import org.matsim.contrib.socnetsim.jointtrips.JointMainModeIdentifier;
 import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils;
 import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils.JointTravelStructure;
 import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils.JointTrip;
+import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.router.MainModeIdentifier;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.utils.collections.MapUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * An algorithm which creates joint trips from nothing,
@@ -352,18 +351,17 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 			final PlanElement pe) {
 		if (pe instanceof Activity) {
 			Activity act = (Activity) pe;
-			double endTime = act.getEndTime();
-			double startTime = act.getStartTime();
-			double dur = (act instanceof Activity ? ((Activity) act).getMaximumDuration() : Time.UNDEFINED_TIME);
-			if (endTime != Time.UNDEFINED_TIME) {
+			double startTime = act.isStartTimeUndefined() ? Time.getUndefinedTime() : act.getStartTime();
+			double dur = act.getMaximumDuration();
+			if (!act.isEndTimeUndefined()) {
 				// use fromAct.endTime as time for routing
-				return endTime;
+				return act.getEndTime();
 			}
-			else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
+			else if (!Time.isUndefinedTime(startTime) && !Time.isUndefinedTime(dur)) {
 				// use fromAct.startTime + fromAct.duration as time for routing
 				return startTime + dur;
 			}
-			else if (dur != Time.UNDEFINED_TIME) {
+			else if (!Time.isUndefinedTime(dur)) {
 				// use last used time + fromAct.duration as time for routing
 				return now + dur;
 			}
@@ -372,7 +370,7 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 			}
 		}
 		double tt = ((Leg) pe).getTravelTime();
-		return now + (tt != Time.UNDEFINED_TIME ? tt : 0);
+		return now + (!Time.isUndefinedTime(tt) ? tt : 0);
 	}	
 
 	// /////////////////////////////////////////////////////////////////////////

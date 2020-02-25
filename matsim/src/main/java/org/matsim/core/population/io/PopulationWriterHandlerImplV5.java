@@ -187,7 +187,7 @@ import org.matsim.core.utils.misc.Time;
 			out.write(Double.toString( coord.getY() ));
 			out.write("\"");
 		}
-		if (!Time.isUndefinedTime(act.getStartTime())) {
+		if (!act.isStartTimeUndefined()) {
 			out.write(" start_time=\"");
 			out.write(Time.writeTime(act.getStartTime()));
 			out.write("\"");

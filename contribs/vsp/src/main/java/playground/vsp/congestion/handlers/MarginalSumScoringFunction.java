@@ -26,7 +26,6 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * @author ikaddoura
@@ -60,7 +59,7 @@ public class MarginalSumScoringFunction {
 		SumScoringFunction sumScoringB = new SumScoringFunction() ;
 		sumScoringB.addScoringFunction(activityScoringB);
 			
-		if (activity.getStartTime() != Time.UNDEFINED_TIME && activity.getEndTime() != Time.UNDEFINED_TIME) {
+		if (!activity.isStartTimeUndefined() && !activity.isEndTimeUndefined()) {
         	// activity is not the first and not the last activity
         } else {
         	throw new RuntimeException("Missing start or end time! The provided activity is probably the first or last activity. Aborting...");
@@ -98,14 +97,14 @@ public class MarginalSumScoringFunction {
 		
 		SumScoringFunction delegateB = new SumScoringFunction() ;
 		delegateB.addScoringFunction(activityScoringB);
-		
-        if (activityMorning.getStartTime() == Time.UNDEFINED_TIME && activityMorning.getEndTime() != Time.UNDEFINED_TIME) {
+
+		if (activityMorning.isStartTimeUndefined() && !activityMorning.isEndTimeUndefined()) {
         	// 'morningActivity' is the first activity
         } else {
         	throw new RuntimeException("activityMorning is not the first activity. Or why does it have a start time? Aborting...");
         }
-        
-        if (activityEvening.getStartTime() != Time.UNDEFINED_TIME && activityEvening.isEndTimeUndefined()) {
+
+		if (!activityEvening.isStartTimeUndefined() && activityEvening.isEndTimeUndefined()) {
         	// 'eveningActivity' is the last activity
         } else {
         	throw new RuntimeException("activityEvening is not the last activity. Or why does it have an end time? Aborting...");

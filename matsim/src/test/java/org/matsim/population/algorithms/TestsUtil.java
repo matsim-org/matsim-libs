@@ -22,16 +22,14 @@ package org.matsim.population.algorithms;
 import java.util.List;
 
 import org.junit.Ignore;
-import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -94,10 +92,16 @@ public class TestsUtil {
 			if (o2 instanceof Activity) {
 				Activity activity1 = (Activity) o1;
 				Activity activity2 = (Activity) o2;
-				if (activity1.getEndTime() != activity2.getEndTime()) {
+				if (activity1.isEndTimeUndefined() ^ activity2.isEndTimeUndefined()) {
 					return false;
 				}
-				if (activity1.getStartTime() != activity2.getStartTime()) {
+				if (!activity1.isEndTimeUndefined() && activity1.getEndTime() != activity2.getEndTime()) {
+					return false;
+				}
+				if (activity1.isStartTimeUndefined() ^ activity2.isStartTimeUndefined()) {
+					return false;
+				}
+				if (!activity1.isStartTimeUndefined() && activity1.getStartTime() != activity2.getStartTime()) {
 					return false;
 				}
 			} else {

@@ -23,6 +23,7 @@ package org.matsim.api.core.v01.population;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 
 /**
@@ -32,12 +33,24 @@ public interface Activity extends PlanElement {
 
 	default boolean isEndTimeUndefined() {
 		try {
-			getEndTime();
-			return false;
+			double endTime = getEndTime();
+			//only ActivityImpl has been adapted to Double, so we need to keep this additional check for other Activity classes
+			return Time.isUndefinedTime(endTime);
 		} catch (NullPointerException e) {
 			return true;
 		}
 	}
+
+	default boolean isStartTimeUndefined() {
+		try {
+			double startTime = getStartTime();
+			//only ActivityImpl has been adapted to Double, so we need to keep this additional check for other Activity classes
+			return Time.isUndefinedTime(startTime);
+		} catch (NullPointerException e) {
+			return true;
+		}
+	}
+
 
 	public double getEndTime();
 

@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.router.TripStructureUtils.Trip;
-import org.matsim.core.utils.misc.Time;
 
 public final class SumScoringFunction implements ScoringFunction {
 
@@ -86,17 +85,15 @@ public final class SumScoringFunction implements ScoringFunction {
 
 	@Override
 	public final void handleActivity(Activity activity) {
-		double startTime = activity.getStartTime();
-		//		double endTime = activity.getEndTime();
-		if (Time.isUndefinedTime(startTime) && !activity.isEndTimeUndefined()) {
+		if (activity.isStartTimeUndefined() && !activity.isEndTimeUndefined()) {
 			for (ActivityScoring activityScoringFunction : this.activityScoringFunctions) {
 				activityScoringFunction.handleFirstActivity(activity);
 			}
-		} else if (!Time.isUndefinedTime(startTime) && !activity.isEndTimeUndefined()) {
+		} else if (!activity.isStartTimeUndefined() && !activity.isEndTimeUndefined()) {
 			for (ActivityScoring activityScoringFunction : this.activityScoringFunctions) {
 				activityScoringFunction.handleActivity(activity);
 			}
-		} else if (!Time.isUndefinedTime(startTime) && activity.isEndTimeUndefined()) {
+		} else if (!activity.isStartTimeUndefined() && activity.isEndTimeUndefined()) {
 			for (ActivityScoring activityScoringFunction : this.activityScoringFunctions) {
 				activityScoringFunction.handleLastActivity(activity);
 			}

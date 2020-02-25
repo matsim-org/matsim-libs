@@ -572,8 +572,8 @@ public class TransitRouterImplTest {
 		for (PlanElement pe : planElements) {			
 			if (pe instanceof Activity) {
 				Activity act = (Activity) pe;
-				double startTime = act.getStartTime();
-				if (startTime != Time.UNDEFINED_TIME && act.isEndTimeUndefined()) {
+				if (!act.isStartTimeUndefined() && !act.isEndTimeUndefined()) {
+					double startTime = act.getStartTime();
 					double endTime = act.getEndTime();
 					duration += (endTime - startTime);
 				}
