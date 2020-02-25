@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /*deliberately package*/ class LinkImpl implements Link {
@@ -210,7 +209,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	@Override
 	public double getFlowCapacityPerSec() {
-		return getFlowCapacityPerSec(Time.getUndefinedTime());
+		return this.getCapacity() / network.getCapacityPeriod();
 	}
 	@Override
 	public double getFlowCapacityPerSec(@SuppressWarnings("unused") final double time) {
