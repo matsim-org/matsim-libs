@@ -83,7 +83,6 @@ public abstract class AbstractModule implements Module {
 	private Multibinder<MobsimListener> mobsimListenerMultibinder;
 	private Multibinder<SnapshotWriter> snapshotWriterMultibinder;
 	private MapBinder<Class<?>, AttributeConverter<?>> attributeConverterMapBinder;
-	private Multibinder<AbstractQSimModule> qsimModulesMultibinder;
 
 	@Inject
 	com.google.inject.Injector bootstrapInjector;
@@ -114,7 +113,6 @@ public abstract class AbstractModule implements Module {
 						this.binder,
 						new TypeLiteral<Class<?>>(){},
 						new TypeLiteral<AttributeConverter<?>>() {} );
-		this.qsimModulesMultibinder = Multibinder.newSetBinder(this.binder, AbstractQSimModule.class);
 		this.install();
 	}
 
@@ -134,7 +132,7 @@ public abstract class AbstractModule implements Module {
 	}
 	
 	protected final void installQSimModule(AbstractQSimModule qsimModule) {
-		qsimModulesMultibinder.addBinding().toInstance(qsimModule);
+		install(qsimModule);
 	}
 	
 	/**
