@@ -24,10 +24,10 @@ class OsmNetworkParser {
 	private final CoordinateTransformation transformation;
 	private final ConcurrentMap<String, LinkProperties> linkProperties;
 	private final BiPredicate<Coord, Integer> linkFilter;
-	private final ExecutorService executor;
-	private Map<Long, ProcessedOsmWay> ways;
-	private Map<Long, ProcessedOsmNode> nodes;
-	private Map<Long, List<ProcessedOsmWay>> nodeReferences;
+	final ExecutorService executor;
+	Map<Long, ProcessedOsmWay> ways;
+	Map<Long, ProcessedOsmNode> nodes;
+	Map<Long, List<ProcessedOsmWay>> nodeReferences;
 
 	OsmNetworkParser(CoordinateTransformation transformation, ConcurrentMap<String, LinkProperties> linkProperties, BiPredicate<Coord, Integer> linkFilter, ExecutorService executor) {
 		this.transformation = transformation;

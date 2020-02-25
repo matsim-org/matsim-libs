@@ -19,7 +19,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-public final class SupersonicOsmNetworkReader {
+public class SupersonicOsmNetworkReader {
 
     private static final Logger log = Logger.getLogger(SupersonicOsmNetworkReader.class);
 
@@ -34,10 +34,10 @@ public final class SupersonicOsmNetworkReader {
 
     private Network network;
 
-    private SupersonicOsmNetworkReader(OsmNetworkParser parser,
-                                       Predicate<Long> preserveNodeWithId,
-                                       BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy,
-                                       AfterLinkCreated afterLinkCreated) {
+    SupersonicOsmNetworkReader(OsmNetworkParser parser,
+                               Predicate<Long> preserveNodeWithId,
+                               BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy,
+                               AfterLinkCreated afterLinkCreated) {
         this.includeLinkAtCoordWithHierarchy = includeLinkAtCoordWithHierarchy;
         this.afterLinkCreated = afterLinkCreated;
         this.preserveNodeWithId = preserveNodeWithId;
@@ -311,45 +311,59 @@ public final class SupersonicOsmNetworkReader {
         void accept(Link link, Map<String, String> osmTags, Direction direction);
     }
 
-	public static Builder builder() {
-		return new Builder();
-	}
+    public static Builder builder() {
+        return new Builder();
+    }
 
-	public static class Builder {
+    public static abstract class AbstractBuilder<T> {
 
-        private ConcurrentMap<String, LinkProperties> linkProperties = LinkProperties.createLinkProperties();
-        private BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy = (coord, level) -> true;
-        private Predicate<Long> preserveNodeWithId = id -> false;
-        private AfterLinkCreated afterLinkCreated = (link, tags, isReverse) -> {
+        ConcurrentMap<String, LinkProperties> linkProperties = LinkProperties.createLinkProperties();
+        BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy = (coord, level) -> true;
+        Predicate<Long> preserveNodeWithId = id -> false;
+        AfterLinkCreated afterLinkCreated = (link, tags, isReverse) -> {
         };
-        private CoordinateTransformation coordinateTransformation;
+        CoordinateTransformation coordinateTransformation;
 
-        public Builder coordinateTransformation(CoordinateTransformation coordinateTransformation) {
-            this.coordinateTransformation = coordinateTransformation;
+        public AbstractBuilder<T> setLinkProperties(ConcurrentMap<String, LinkProperties> linkProperties) {
+            this.linkProperties = linkProperties;
             return this;
         }
 
-        public Builder includeLinkAtCoordWithHierarchy(BiPredicate<Coord, Integer> predicate) {
-            this.includeLinkAtCoordWithHierarchy = predicate;
-            return this;
-        }
-
-        public Builder preserveNodeWithId(Predicate<Long> predicate) {
-            this.preserveNodeWithId = predicate;
-            return this;
-        }
-
-        public Builder afterLinkCreated(AfterLinkCreated consumer) {
-            this.afterLinkCreated = consumer;
-            return this;
-        }
-
-        public Builder addOverridingLinkProperties(String highwayType, LinkProperties properties) {
+        public AbstractBuilder<T> addOverridingLinkProperties(String highwayType, LinkProperties properties) {
             linkProperties.put(highwayType, properties);
             return this;
         }
 
-        public SupersonicOsmNetworkReader build() {
+        public AbstractBuilder<T> setIncludeLinkAtCoordWithHierarchy(BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy) {
+            this.includeLinkAtCoordWithHierarchy = includeLinkAtCoordWithHierarchy;
+            return this;
+        }
+
+        public AbstractBuilder<T> setPreserveNodeWithId(Predicate<Long> preserveNodeWithId) {
+            this.preserveNodeWithId = preserveNodeWithId;
+            return this;
+        }
+
+        public AbstractBuilder<T> setAfterLinkCreated(AfterLinkCreated afterLinkCreated) {
+            this.afterLinkCreated = afterLinkCreated;
+            return this;
+        }
+
+        public AbstractBuilder<T> setCoordinateTransformation(CoordinateTransformation coordinateTransformation) {
+            this.coordinateTransformation = coordinateTransformation;
+            return this;
+        }
+
+        public T build() {
+            return createInstance();
+        }
+
+        abstract T createInstance();
+    }
+
+    public static class Builder extends AbstractBuilder<SupersonicOsmNetworkReader> {
+
+        SupersonicOsmNetworkReader createInstance() {
 
             if (coordinateTransformation == null) {
                 throw new IllegalArgumentException("Target coordinate transformation is required parameter!");
@@ -358,6 +372,7 @@ public final class SupersonicOsmNetworkReader {
             OsmNetworkParser parser = new OsmNetworkParser(
                     coordinateTransformation, linkProperties, includeLinkAtCoordWithHierarchy,
                     Executors.newWorkStealingPool());
+
             return new SupersonicOsmNetworkReader(
                     parser, preserveNodeWithId,
                     includeLinkAtCoordWithHierarchy,

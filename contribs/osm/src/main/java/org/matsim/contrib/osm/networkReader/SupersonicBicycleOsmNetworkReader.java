@@ -45,7 +45,7 @@ public final class SupersonicBicycleOsmNetworkReader {
 	public Network read(Path inputFile) {
 
 		Network network = SupersonicOsmNetworkReader.builder()
-				.coordinateTransformation(this.coordinateTransformation)
+				.setCoordinateTransformation(this.coordinateTransformation)
 				.addOverridingLinkProperties(OsmTags.TRACK, new LinkProperties(9, 1, 30 / 3.6, 1500 * BIKE_PCU, false))
 				.addOverridingLinkProperties(OsmTags.CYCLEWAY, new LinkProperties(9, 1, 30 / 3.6, 1500 * BIKE_PCU, false))
 				.addOverridingLinkProperties(OsmTags.SERVICE, new LinkProperties(9, 1, 10 / 3.6, 100 * BIKE_PCU, false))
@@ -53,9 +53,9 @@ public final class SupersonicBicycleOsmNetworkReader {
 				.addOverridingLinkProperties(OsmTags.PEDESTRIAN, new LinkProperties(10, 1, 10 / 3.6, 600 * BIKE_PCU, false))
 				.addOverridingLinkProperties(OsmTags.PATH, new LinkProperties(10, 1, 20 / 3.6, 600 * BIKE_PCU, false))
 				.addOverridingLinkProperties(OsmTags.STEPS, new LinkProperties(11, 1, 1 / 3.6, 50 * BIKE_PCU, false))
-				.includeLinkAtCoordWithHierarchy(this.includeLinkAtCoordWithHierarchy)
-				.preserveNodeWithId(this.preserveNodeWithId)
-				.afterLinkCreated(this::handleLink)
+				.setIncludeLinkAtCoordWithHierarchy(this.includeLinkAtCoordWithHierarchy)
+				.setPreserveNodeWithId(this.preserveNodeWithId)
+				.setAfterLinkCreated(this::handleLink)
 				.build()
 				.read(inputFile);
 

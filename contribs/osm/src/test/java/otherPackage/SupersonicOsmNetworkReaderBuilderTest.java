@@ -12,7 +12,7 @@ public class SupersonicOsmNetworkReaderBuilderTest {
 	public void testPublicApi() {
 
 		SupersonicOsmNetworkReader reader = SupersonicOsmNetworkReader.builder()
-				.coordinateTransformation(new IdentityTransformation())
+				.setCoordinateTransformation(new IdentityTransformation())
 				.build();
 
 		assertNotNull(reader);

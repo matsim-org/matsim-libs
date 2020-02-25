@@ -15,7 +15,7 @@ public class RunSimpleNetworkReader {
 	public static void main(String[] args) {
 
 		Network network = SupersonicOsmNetworkReader.builder()
-				.coordinateTransformation(coordinateTransformation)
+				.setCoordinateTransformation(coordinateTransformation)
 				.build()
 				.read(inputFile);
 
