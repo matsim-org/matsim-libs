@@ -22,6 +22,8 @@
  package org.matsim.analysis;
 
 
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -32,6 +34,8 @@ import javax.inject.Inject;
 
 class IterationTravelStatsControlerListener implements IterationEndsListener, ShutdownListener {
 
+    @Inject
+    Config config;
 	@Inject
 	private ExperiencedPlansService experiencedPlansService;
 
@@ -40,17 +44,33 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
 
 	@Inject
     private PKMbyModeCalculator pkMbyModeCalculator;
-
+    @Inject
+    OutputDirectoryHierarchy outputDirectoryHierarchy;
 	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
-		travelDistanceStats.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
+    public void notifyIterationEnds(IterationEndsEvent event) {
+        travelDistanceStats.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
         pkMbyModeCalculator.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
-	}
+        if (config.controler().getWriteTripsInterval() > 0 & config.controler().getWriteTripsInterval() % event.getIteration() == 0) {
+            String end = getEnding();
+            new TripsCSVWriter().write(outputDirectoryHierarchy.getIterationFilename(event.getIteration(), "trips.csv" + end));
+        }
+    }
+
+    private String getEnding() {
+        String end = config.controler().getCompressionType().toString();
+        if (end != null) {
+            end = "." + end;
+        } else end = "";
+        return end;
+    }
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-
 		travelDistanceStats.close();
         pkMbyModeCalculator.writeOutput();
+        if (config.controler().getDumpDataAtEnd()) {
+            new TripsCSVWriter().write(outputDirectoryHierarchy.getOutputFilename("trips.csv" + getEnding()));
+
+        }
 	}
 }
