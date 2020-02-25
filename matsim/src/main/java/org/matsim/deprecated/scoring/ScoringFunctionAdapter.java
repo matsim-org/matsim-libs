@@ -41,7 +41,7 @@ public abstract class ScoringFunctionAdapter implements ScoringFunction {
         if (!activity.isStartTimeUndefined()) {
             startActivity(activity.getStartTime(), activity);
         }
-        if (!activity.isEndTimeUndefined()) {
+        if (activity.getOptionalEndTime().isPresent()) {
             endActivity(activity.getEndTime(), activity);
         }
     }

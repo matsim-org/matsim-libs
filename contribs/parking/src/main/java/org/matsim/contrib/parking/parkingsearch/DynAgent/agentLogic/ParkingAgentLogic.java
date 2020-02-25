@@ -219,7 +219,7 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		Activity nextPlannedActivity = (Activity) this.currentPlanElement;
 		this.lastParkActionState = LastParkActionState.ACTIVITY;
 		final double endTime;
-        if (nextPlannedActivity.isEndTimeUndefined()) {
+		if (!nextPlannedActivity.getOptionalEndTime().isPresent()) {
             if (Time.isUndefinedTime(nextPlannedActivity.getMaximumDuration())) {
                 endTime = Double.POSITIVE_INFINITY;
                 //last activity of a day

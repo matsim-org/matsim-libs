@@ -37,7 +37,7 @@ public class ActivityDurationUtils {
 	 */
 	
 	public static double calculateDepartureTime(Activity act, double now, PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation) {
-		if (act.isMaximumDurationUndefined() && act.isEndTimeUndefined()) {
+		if (act.isMaximumDurationUndefined() && !act.getOptionalEndTime().isPresent()) {
 			return Double.POSITIVE_INFINITY;
 		} else {
 			double departure = 0;
@@ -59,7 +59,7 @@ public class ActivityDurationUtils {
 				}
 			} else if (activityDurationInterpretation.equals(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration )) {
 				// In fact, as of now I think that _this_ should be the default behavior.  kai, aug'10
-				if (!act.isEndTimeUndefined()) {
+				if (act.getOptionalEndTime().isPresent()) {
 					departure = act.getEndTime();
 				} else if (!Time.isUndefinedTime(act.getMaximumDuration())) {
 					departure = now + act.getMaximumDuration();

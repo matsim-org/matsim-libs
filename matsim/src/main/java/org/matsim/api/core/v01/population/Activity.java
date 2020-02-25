@@ -33,10 +33,6 @@ import org.matsim.facilities.ActivityFacility;
  */
 public interface Activity extends PlanElement {
 
-	default boolean isEndTimeUndefined() {
-		return !getOptionalEndTime().isPresent();
-	}
-
 	default boolean isStartTimeUndefined() {
 		try {
 			double startTime = getStartTime();

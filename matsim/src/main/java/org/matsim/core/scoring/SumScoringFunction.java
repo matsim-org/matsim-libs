@@ -85,15 +85,15 @@ public final class SumScoringFunction implements ScoringFunction {
 
 	@Override
 	public final void handleActivity(Activity activity) {
-		if (activity.isStartTimeUndefined() && !activity.isEndTimeUndefined()) {
+		if (activity.isStartTimeUndefined() && activity.getOptionalEndTime().isPresent()) {
 			for (ActivityScoring activityScoringFunction : this.activityScoringFunctions) {
 				activityScoringFunction.handleFirstActivity(activity);
 			}
-		} else if (!activity.isStartTimeUndefined() && !activity.isEndTimeUndefined()) {
+		} else if (!activity.isStartTimeUndefined() && activity.getOptionalEndTime().isPresent()) {
 			for (ActivityScoring activityScoringFunction : this.activityScoringFunctions) {
 				activityScoringFunction.handleActivity(activity);
 			}
-		} else if (!activity.isStartTimeUndefined() && activity.isEndTimeUndefined()) {
+		} else if (!activity.isStartTimeUndefined() && !activity.getOptionalEndTime().isPresent()) {
 			for (ActivityScoring activityScoringFunction : this.activityScoringFunctions) {
 				activityScoringFunction.handleLastActivity(activity);
 			}

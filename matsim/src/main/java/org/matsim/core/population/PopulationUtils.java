@@ -430,7 +430,7 @@ public final class PopulationUtils {
 			case endTimeOnly:
 				return act.getEndTime();
 			case tryEndTimeThenDuration:
-				if (!act.isEndTimeUndefined()) {
+				if (act.getOptionalEndTime().isPresent()) {
 					return act.getEndTime();
 				} else if (!act.isMaximumDurationUndefined()) {
 					return now + act.getMaximumDuration();
@@ -607,7 +607,7 @@ public final class PopulationUtils {
 			}
 
 			// activity end times
-			if (  act1.isEndTimeUndefined() && act2.isEndTimeUndefined() ){
+			if (  !act1.getOptionalEndTime().isPresent() && !act2.getOptionalEndTime().isPresent()){
 				// TODO: isInfinite() is broader than isUndefined()
 				// both activities have no end time, no need to compute a similarity penalty
 			} else {
@@ -853,7 +853,7 @@ public final class PopulationUtils {
 		newAct.setType(act.getType());
 		newAct.setLinkId(act.getLinkId());
 		newAct.setStartTime(act.isStartTimeUndefined() ? Time.getUndefinedTime() : act.getStartTime());
-		newAct.setEndTime(act.isEndTimeUndefined() ? Time.getUndefinedTime() : act.getEndTime());
+		newAct.setEndTime(!act.getOptionalEndTime().isPresent() ? Time.getUndefinedTime() : act.getEndTime());
 		newAct.setMaximumDuration(act.isMaximumDurationUndefined() ? Time.getUndefinedTime() : act.getMaximumDuration());
 		newAct.setFacilityId(act.getFacilityId());
 

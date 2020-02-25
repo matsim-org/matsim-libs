@@ -197,7 +197,7 @@ import org.matsim.core.utils.misc.Time;
 			out.write(Time.writeTime(act.getMaximumDuration()));
 			out.write("\"");
 		}
-		if (!act.isEndTimeUndefined()) {
+		if (act.getOptionalEndTime().isPresent()) {
 			out.write(" end_time=\"");
 			out.write(Time.writeTime(act.getEndTime()));
 			out.write("\"");

@@ -69,7 +69,7 @@ import com.google.inject.Inject;
 					} else if ( actDurInterp == PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration) {
 
 						// set duration to undefined if there is an activity end time:
-						if (!act.isEndTimeUndefined()) {
+						if (act.getOptionalEndTime().isPresent()) {
 							act.setMaximumDuration(Time.getUndefinedTime());
 						}
 

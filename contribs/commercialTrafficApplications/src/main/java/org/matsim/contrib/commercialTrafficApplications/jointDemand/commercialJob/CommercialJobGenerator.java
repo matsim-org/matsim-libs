@@ -245,7 +245,7 @@ class CommercialJobGenerator implements BeforeMobsimListener, AfterMobsimListene
                         plan.addLeg(leg);
                         if (lastTourElementActivity != null) {
                             lastTourElementActivity.setEndTime(tourLeg.getExpectedDepartureTime());
-                            if (startActivity.isEndTimeUndefined()) {
+                            if (!startActivity.getOptionalEndTime().isPresent()) {
                                 startActivity.setEndTime(lastTourElementActivity.getEndTime() - lastTourElementActivity.getMaximumDuration() - lastTourLeg.getTravelTime() * firsttourTraveltimeBuffer);
                                 lastTourElementActivity.setMaximumDuration(Time.getUndefinedTime());
                             }

@@ -153,7 +153,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 		// yyyy similar method in PopulationUtils.  TripRouter.calcEndOfPlanElement in fact uses it.  However, this seems doubly inefficient; calling the
 		// method in PopulationUtils directly would probably be faster.  kai, jul'19
 
-		if (!activity.isEndTimeUndefined())
+		if (activity.getOptionalEndTime().isPresent())
 			return activity.getEndTime();
 
 		// no sufficient information in the activity...

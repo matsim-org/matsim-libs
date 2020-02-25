@@ -151,7 +151,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 				+ Time.writeTime(isStartTimeUndefined() ? Time.getUndefinedTime() : this.getStartTime())
 				+ "]"
 				+ "[endTime="
-				+ Time.writeTime(isEndTimeUndefined() ? Time.getUndefinedTime() : this.getEndTime())
+				+ Time.writeTime(!getOptionalEndTime().isPresent() ? Time.getUndefinedTime() : this.getEndTime())
 				+ "]"
 				+ "[duration="
 				+ Time.writeTime(isMaximumDurationUndefined() ? Time.getUndefinedTime() : this.getMaximumDuration())
