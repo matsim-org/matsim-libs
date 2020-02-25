@@ -40,6 +40,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.config.consistency.UnmaterializedConfigGroupChecker;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
@@ -106,7 +108,7 @@ public final class Controler implements ControlerI, MatsimServices {
 	private static final Logger log = Logger.getLogger(Controler.class);
 
 	public static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout(
-		  "%d{ISO8601} %5p %C{1}:%L %m%n");
+			"%d{ISO8601} %5p %C{1}:%L %m%n");
 
 	private final Config config;
 	private Scenario scenario;
@@ -192,8 +194,8 @@ public final class Controler implements ControlerI, MatsimServices {
 		this.config.parallelEventHandling().makeLocked();
 		this.scenario = scenario;
 		this.overrides = scenario == null ?
-						 new ScenarioByConfigModule() :
-						 new ScenarioByInstanceModule(this.scenario);
+				new ScenarioByConfigModule() :
+				new ScenarioByInstanceModule(this.scenario);
 
 		this.config.qsim().setLocked();
 		// yy this is awfully ad-hoc.  kai, jul'18
@@ -228,20 +230,25 @@ public final class Controler implements ControlerI, MatsimServices {
 		config.checkConsistency();
 		config.addConfigConsistencyChecker( new UnmaterializedConfigGroupChecker() );
 
+		SimpleScope iterationScope = new SimpleScope();
 		final Set<AbstractModule> standardModules = Collections.singleton(
-			  new AbstractModule(){
-				  @Override
-				  public void install(){
-					  install( new NewControlerModule() );
-					  install( new ControlerDefaultCoreListenersModule() );
-					  for( AbstractModule module : modules ){
-						  install( module );
-					  }
-					  // should not be necessary: created in the controler
-					  //install(new ScenarioByInstanceModule(scenario));
-				  }
-			  }
-												  );
+				new AbstractModule(){
+					@Override
+					public void install(){
+						binder().bindScope(IterationScoped.class, iterationScope);
+						addControlerListenerBinding().toInstance((BeforeMobsimListener) event -> iterationScope.enter());
+						addControlerListenerBinding().toInstance((AfterMobsimListener) event -> iterationScope.exit());
+
+						install( new NewControlerModule() );
+						install( new ControlerDefaultCoreListenersModule() );
+						for( AbstractModule module : modules ){
+							install( module );
+						}
+						// should not be necessary: created in the controler
+						//install(new ScenarioByInstanceModule(scenario));
+					}
+				}
+		);
 		this.injector = Injector.createInjector( config, AbstractModule.override( standardModules, overrides ) );
 		ControlerI controler = injector.getInstance(ControlerI.class);
 		controler.run();
@@ -256,7 +263,7 @@ public final class Controler implements ControlerI, MatsimServices {
 	@Override
 	public final TravelTime getLinkTravelTimes() {
 		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelTime>>() {}))
-					  .get(TransportMode.car);
+				.get(TransportMode.car);
 	}
 
 	/**
@@ -389,7 +396,7 @@ public final class Controler implements ControlerI, MatsimServices {
 	@Override
 	public final TravelDisutilityFactory getTravelDisutilityFactory() {
 		return this.injector.getInstance(com.google.inject.Injector.class).getInstance(Key.get(new TypeLiteral<Map<String, TravelDisutilityFactory>>(){}))
-					  .get(TransportMode.car);
+				.get(TransportMode.car);
 	}
 
 	/**
@@ -431,7 +438,7 @@ public final class Controler implements ControlerI, MatsimServices {
 	}
 
 	public final void setScoringFunctionFactory(
-		  final ScoringFunctionFactory scoringFunctionFactory) {
+			final ScoringFunctionFactory scoringFunctionFactory) {
 		this.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -481,9 +488,9 @@ public final class Controler implements ControlerI, MatsimServices {
 		return this ;
 	}
 
-    /**
-     * Only use if you know what you are doing, for experts only.
-     */
+	/**
+	 * Only use if you know what you are doing, for experts only.
+	 */
 	public final Controler configureQSimComponents(QSimComponentsConfigurator configurator) {
 		this.addOverridingModule(new AbstractModule() {
 			@Override

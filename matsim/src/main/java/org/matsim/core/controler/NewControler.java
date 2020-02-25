@@ -51,16 +51,15 @@ class NewControler extends AbstractController implements ControlerI {
 	private final Set<ControlerListener> controlerListenersDeclaredByModules;
 	private final ControlerConfigGroup controlerConfigGroup;
 	private final OutputDirectoryHierarchy outputDirectoryHierarchy;
-	
+
 	@Inject
 	NewControler(Config config, ControlerListenerManagerImpl controlerListenerManager, MatsimServices matsimServices,
-			 IterationStopWatch stopWatch, PrepareForSim prepareForSim, EventsHandling eventsHandling,
-			 PlansDumping plansDumping, PlansReplanning plansReplanning, Provider<Mobsim> mobsimProvider,
-			 PlansScoring plansScoring, TerminationCriterion terminationCriterion, DumpDataAtEnd dumpDataAtEnd,
-			 Set<ControlerListener> controlerListenersDeclaredByModules, ControlerConfigGroup controlerConfigGroup,
-			 OutputDirectoryHierarchy outputDirectoryHierarchy
-			, PrepareForMobsim prepareForMobsim
- ) {
+				 IterationStopWatch stopWatch, PrepareForSim prepareForSim, EventsHandling eventsHandling,
+				 PlansDumping plansDumping, PlansReplanning plansReplanning, Provider<Mobsim> mobsimProvider,
+				 PlansScoring plansScoring, TerminationCriterion terminationCriterion, DumpDataAtEnd dumpDataAtEnd,
+				 Set<ControlerListener> controlerListenersDeclaredByModules, ControlerConfigGroup controlerConfigGroup,
+				 OutputDirectoryHierarchy outputDirectoryHierarchy, PrepareForMobsim prepareForMobsim
+	) {
 		super(controlerListenerManager, stopWatch, matsimServices);
 		this.config = config;
 		this.prepareForMobsim = prepareForMobsim;
@@ -114,11 +113,10 @@ class NewControler extends AbstractController implements ControlerI {
 	protected final void prepareForSim() {
 		this.prepareForSim.run();
 	}
-	
+
 	@Override
 	protected final void prepareForMobsim() {
 		this.prepareForMobsim.run() ;
-//		this.prepareForSim.run() ;
 	}
 
 	@Override

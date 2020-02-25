@@ -23,6 +23,7 @@
 
 import com.google.inject.Inject;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.IterationScoped;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
@@ -31,7 +32,7 @@ public class TransitEngineModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		bind(TransitQSimEngine.class).asEagerSingleton();
+		bind(TransitQSimEngine.class).in(IterationScoped.class);
 		addNamedComponent(TransitQSimEngine.class, TRANSIT_ENGINE_NAME);
 
 		if ( this.getConfig().transit().isUseTransit() && this.getConfig().transit().isUsingTransitInMobsim() ) {

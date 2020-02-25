@@ -32,6 +32,7 @@ import javax.inject.Inject;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.IterationScoped;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsModule;
 import org.matsim.core.mobsim.qsim.components.QSimComponentsModule;
@@ -98,7 +99,7 @@ public class QSimModule extends AbstractModule {
 			// this binds all the default modules, i.e. sets up the default QSim
 		}
 
-		bind(QSim.class).asEagerSingleton();
+		bind(QSim.class).in(IterationScoped.class);
 		bind(Netsim.class).to(QSim.class);
 		bind(Mobsim.class).toProvider(QSimProvider.class);
 	}

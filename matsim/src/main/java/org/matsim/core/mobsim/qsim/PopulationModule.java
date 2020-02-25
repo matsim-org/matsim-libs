@@ -23,6 +23,7 @@
 
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import org.matsim.core.controler.IterationScoped;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
@@ -37,12 +38,12 @@ public class PopulationModule extends AbstractQSimModule {
 
 	@Override
 	protected void configureQSim() {
-		bind(PopulationAgentSource.class).asEagerSingleton();
+		bind(PopulationAgentSource.class).in(IterationScoped.class);
 		addNamedComponent(PopulationAgentSource.class, COMPONENT_NAME);
 	}
 
 	@Provides
-	@Singleton
+	@IterationScoped
 	AgentFactory provideAgentFactory(TransitConfigGroup config, Netsim simulation) {
 		if (config.isUseTransit()) {
 			return new TransitAgentFactory(simulation);
@@ -52,7 +53,7 @@ public class PopulationModule extends AbstractQSimModule {
 	}
 	
 	@Provides
-	@Singleton
+	@IterationScoped
 	QVehicleFactory provideQVehicleFactory( ) {
 		return QVehicleImpl::new;
 	}

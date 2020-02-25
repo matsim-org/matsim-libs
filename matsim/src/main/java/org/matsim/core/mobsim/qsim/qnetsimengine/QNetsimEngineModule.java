@@ -23,6 +23,7 @@
 
 import com.google.inject.Inject;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.IterationScoped;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.AbstractQSimModule;
 
@@ -31,13 +32,13 @@ public class QNetsimEngineModule extends AbstractQSimModule {
 	
 	@Override
 	protected void configureQSim() {
-		bind(QNetsimEngine.class).asEagerSingleton();
-		bind(VehicularDepartureHandler.class).toProvider(QNetsimEngineDepartureHandlerProvider.class).asEagerSingleton();
+		bind(QNetsimEngine.class).in(IterationScoped.class);
+		bind(VehicularDepartureHandler.class).toProvider(QNetsimEngineDepartureHandlerProvider.class).in(IterationScoped.class);
 
 		if ( this.getConfig().qsim().isUseLanes() ) {
-			bind(QNetworkFactory.class).to( QLanesNetworkFactory.class ) ;
+			bind(QNetworkFactory.class).to(QLanesNetworkFactory.class).in(IterationScoped.class);
 		} else {
-			bind(QNetworkFactory.class).to( DefaultQNetworkFactory.class ) ;
+			bind(QNetworkFactory.class).to(DefaultQNetworkFactory.class).in(IterationScoped.class);
 		}
 		
 		addNamedComponent(VehicularDepartureHandler.class, COMPONENT_NAME);

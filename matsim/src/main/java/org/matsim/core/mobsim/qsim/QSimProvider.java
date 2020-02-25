@@ -24,6 +24,8 @@ package org.matsim.core.mobsim.qsim;
 
 import com.google.inject.*;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -52,10 +54,7 @@ public class QSimProvider implements Provider<QSim> {
 
 	@Override
 	public QSim get() {
-		Injector qsimInjector = injector.createChildInjector();
-
-		QSim qSim = qsimInjector.getInstance(QSim.class);
-
+		QSim qSim = new QSim(injector.getInstance(Scenario.class), injector.getInstance(EventsManager.class), injector);
 		for (Object activeComponent : components.getActiveComponents()) {
 			Key<Collection<Provider<QSimComponent>>> activeComponentKey;
 			if (activeComponent instanceof Annotation) {
@@ -64,7 +63,7 @@ public class QSimProvider implements Provider<QSim> {
 				activeComponentKey = Key.get(new TypeLiteral<Collection<Provider<QSimComponent>>>(){}, (Class<? extends Annotation>) activeComponent);
 			}
 
-			Collection<Provider<QSimComponent>> providers = qsimInjector.getInstance(activeComponentKey);
+			Collection<Provider<QSimComponent>> providers = injector.getInstance(activeComponentKey);
 			for (Provider<QSimComponent> provider : providers) {
 				QSimComponent qSimComponent = provider.get();
 				if (qSimComponent instanceof MobsimEngine) {
