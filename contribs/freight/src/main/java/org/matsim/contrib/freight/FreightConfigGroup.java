@@ -46,6 +46,11 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
     private static final String TRAVELTIMESLICEWIDTHDESC = "time slice width used for calculation of travel times in seconds." +
             " The smaller the value, the more precise the calculation of routing costs but the longer the computation time." +
             " Default value is 1800 seconds.";
+    
+    public enum UseDistanceConstraint {noDistanceConstraint, basedOnEnergyConsumption};
+    private static final String USE_DISTANCE_CONSTRAINT = "useDistanceConstraint";
+    private UseDistanceConstraint useDistanceConstraint = UseDistanceConstraint.noDistanceConstraint;
+    private static final String USE_DISTANCE_CONSTRAINT_DESC = "Using Distant constraint within tour planning. This does NOT ensure that the tours in MATSim will respect this limitation";
 
     public FreightConfigGroup() {
         super(GROUPNAME);
@@ -123,12 +128,33 @@ public class FreightConfigGroup extends ReflectiveConfigGroup {
     }
     // ---
 
-    @Override
+    
+    //---
+    //---
+    /**
+	 * @return useDistanceConstraint
+	 */
+    @StringGetter(USE_DISTANCE_CONSTRAINT)
+	public UseDistanceConstraint getUseDistanceConstraint() {
+		return useDistanceConstraint;
+	}
+	/**
+	 * @param useDistanceConstraint {@value #USE_DISTANCE_CONSTRAINT_DESC}
+	 */
+    @StringSetter(USE_DISTANCE_CONSTRAINT)
+	public void setUseDistanceConstraint(UseDistanceConstraint useDistanceConstraint) {
+		this.useDistanceConstraint = useDistanceConstraint;
+	}
+
+	//---
+	//---
+	@Override
     public Map<String, String> getComments() {
         Map<String, String> map = super.getComments();
         map.put(CARRIERSFILEDE, CARRIERSFILEDESC);
         map.put(CARRIERSVEHICLETYPED, CARRIERSVEHICLETYPEDESC);
         map.put(TRAVELTIMESLICEWIDTH, TRAVELTIMESLICEWIDTHDESC);
+        map.put(USE_DISTANCE_CONSTRAINT, USE_DISTANCE_CONSTRAINT_DESC);
         return map;
     }
 
