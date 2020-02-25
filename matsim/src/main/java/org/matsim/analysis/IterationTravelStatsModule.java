@@ -1,7 +1,7 @@
 
 /* *********************************************************************** *
  * project: org.matsim.*
- * TravelDistanceStatsControlerListener.java
+ * TravelDistanceStatsModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,35 +22,15 @@
  package org.matsim.analysis;
 
 
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.scoring.ExperiencedPlansService;
+import org.matsim.core.controler.AbstractModule;
 
-import javax.inject.Inject;
-
-class TravelDistanceStatsControlerListener implements IterationEndsListener, ShutdownListener {
-
-	@Inject
-	private ExperiencedPlansService experiencedPlansService;
-
-	@Inject
-	private TravelDistanceStats travelDistanceStats;
-
-	@Inject
-	private PKMbyModeCalculator PKMbyModeCalculator;
+public class IterationTravelStatsModule extends AbstractModule {
 
 	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
-		travelDistanceStats.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
-		PKMbyModeCalculator.addIteration(event.getIteration(),experiencedPlansService.getExperiencedPlans());
+	public void install() {
+		bind(TravelDistanceStats.class).asEagerSingleton();
+		bind(PKMbyModeCalculator.class).asEagerSingleton();
+		addControlerListenerBinding().to(IterationTravelStatsControlerListener.class);
 	}
 
-	@Override
-	public void notifyShutdown(ShutdownEvent event) {
-
-		travelDistanceStats.close();
-		PKMbyModeCalculator.writeOutput();
-	}
 }
