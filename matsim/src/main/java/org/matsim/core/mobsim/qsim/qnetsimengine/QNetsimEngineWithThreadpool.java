@@ -114,19 +114,19 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine {
 		// as input for the domain decomposition under (b).
 
 		// set current Time
-		for (QNetsimEngineRunner engine : this.getQnetsimEngineRunner()) {
+		for (AbstractQNetsimEngineRunner engine : this.getQnetsimEngineRunner()) {
 			engine.setTime(time);
 		}
 
 		try {
-			for (QNetsimEngineRunner engine : this.getQnetsimEngineRunner()) {
-				engine.setMovingNodes(true);
+			for (AbstractQNetsimEngineRunner engine : this.getQnetsimEngineRunner()) {
+				((QNetsimEngineRunnerWithThreadpool) engine).setMovingNodes(true);
 			}
 			for (Future<Boolean> future : pool.invokeAll(this.getQnetsimEngineRunner())) {
 				future.get();
 			}
-			for (QNetsimEngineRunner engine : this.getQnetsimEngineRunner()) {
-				engine.setMovingNodes(false);
+			for (AbstractQNetsimEngineRunner engine : this.getQnetsimEngineRunner()) {
+				((QNetsimEngineRunnerWithThreadpool) engine).setMovingNodes(false);
 			}
 			for (Future<Boolean> future : pool.invokeAll(this.getQnetsimEngineRunner())) {
 				future.get();
@@ -148,10 +148,10 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine {
 	}
 
 	@Override
-	protected List<QNetsimEngineRunner> initQSimEngineRunner() {
-		List<QNetsimEngineRunner> engines = new ArrayList<>();
+	protected List<AbstractQNetsimEngineRunner> initQSimEngineRunner() {
+		List<AbstractQNetsimEngineRunner> engines = new ArrayList<>();
 		for (int i = 0; i < numOfRunners; i++) {
-			QNetsimEngineRunner engine = new QNetsimEngineRunner();
+			AbstractQNetsimEngineRunner engine = new QNetsimEngineRunnerWithThreadpool();
 			engines.add(engine);
 		}
 		return engines;

@@ -118,7 +118,7 @@ final class QNetsimEngineWithBarriers extends AbstractQNetsimEngine {
 		// as input for the domain decomposition under (b).
 
 		// set current Time
-		for (QNetsimEngineRunner engine : this.getQnetsimEngineRunner()) {
+		for (AbstractQNetsimEngineRunner engine : this.getQnetsimEngineRunner()) {
 			engine.setTime(time);
 		}
 		this.startBarrier.arriveAndAwaitAdvance();
@@ -126,13 +126,13 @@ final class QNetsimEngineWithBarriers extends AbstractQNetsimEngine {
 	}
 
 	@Override
-	protected List<QNetsimEngineRunner> initQSimEngineRunner() {
+	protected List<AbstractQNetsimEngineRunner> initQSimEngineRunner() {
 		this.startBarrier = new Phaser(this.numOfThreads + 1);
 		Phaser separationBarrier = new Phaser(this.numOfThreads);
 		this.endBarrier = new Phaser(this.numOfThreads + 1);
-		List<QNetsimEngineRunner> engines = new ArrayList<>();
+		List<AbstractQNetsimEngineRunner> engines = new ArrayList<>();
 		for(int i = 0; i < this.numOfThreads; i++) {
-			QNetsimEngineRunner engine = new QNetsimEngineRunner(this.startBarrier, separationBarrier, endBarrier);
+			AbstractQNetsimEngineRunner engine = new QNetsimEngineRunnerWithBarriers(this.startBarrier, separationBarrier, endBarrier);
 			engines.add(engine);
 		}
 		return engines;
@@ -146,8 +146,6 @@ final class QNetsimEngineWithBarriers extends AbstractQNetsimEngine {
 			thread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically
 			thread.start();
 		}
-
-		
 	}
 
 }

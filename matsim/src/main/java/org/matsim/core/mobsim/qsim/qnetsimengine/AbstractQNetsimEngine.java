@@ -91,7 +91,7 @@ abstract class AbstractQNetsimEngine implements QNetsimEngineI {
 	protected final QNetwork network;
 
 	private double infoTime = 0;
-	private List<QNetsimEngineRunner> engines;
+	private List<AbstractQNetsimEngineRunner> engines;
 	private InternalInterface internalInterface = null;
 	
 	AbstractQNetsimEngine(final QSim sim, QNetworkFactory netsimNetworkFactory) {
@@ -171,7 +171,7 @@ abstract class AbstractQNetsimEngine implements QNetsimEngineI {
 	}
 	
 	/** 
-	 * do everything necessary to start the threads for {@link QNetsimEngineRunner}
+	 * do everything necessary to start the threads for {@link AbstractQNetsimEngineRunner}
 	 */
 	protected abstract void initMultiThreading();
 	
@@ -183,7 +183,7 @@ abstract class AbstractQNetsimEngine implements QNetsimEngineI {
 		 * Calling the afterSim Method of the QSimEngineThreads
 		 * will set their simulationRunning flag to false.
 		 */
-		for (QNetsimEngineRunner engine : this.getQnetsimEngineRunner()) {
+		for (AbstractQNetsimEngineRunner engine : this.getQnetsimEngineRunner()) {
 			engine.afterSim();
 		}
 
@@ -206,18 +206,18 @@ abstract class AbstractQNetsimEngine implements QNetsimEngineI {
 
 	/**
 	 * called during {@link #doSimStep(double)}. Should perform the 
-	 * simstep-logic in {@link QNetsimEngineRunner} provided by {@link #getQnetsimEngineRunner()} 
+	 * simstep-logic in {@link AbstractQNetsimEngineRunner} provided by {@link #getQnetsimEngineRunner()} 
 	 * 
 	 * @param time
 	 */
 	protected abstract void run(double time); 
 
 	/**
-	 * create all necessary {@link QNetsimEngineRunner}. Will be called during {@link #onPrepareSim()}.
+	 * create all necessary {@link AbstractQNetsimEngineRunner}. Will be called during {@link #onPrepareSim()}.
 	 * 
 	 * @return
 	 */
-	protected abstract List<QNetsimEngineRunner> initQSimEngineRunner() ;
+	protected abstract List<AbstractQNetsimEngineRunner> initQSimEngineRunner() ;
 	
 	/**
 	 * Implements one simulation step, called from simulation framework
@@ -258,7 +258,7 @@ abstract class AbstractQNetsimEngine implements QNetsimEngineI {
 
 		int numLinks = 0;
 
-		for (QNetsimEngineRunner engine : this.engines) {
+		for (AbstractQNetsimEngineRunner engine : this.engines) {
 			numLinks = numLinks + engine.getNumberOfSimulatedLinks();
 		}
 
@@ -269,7 +269,7 @@ abstract class AbstractQNetsimEngine implements QNetsimEngineI {
 
 		int numNodes = 0;
 
-		for (QNetsimEngineRunner engine : this.engines) {
+		for (AbstractQNetsimEngineRunner engine : this.engines) {
 			numNodes = numNodes + engine.getNumberOfSimulatedNodes();
 		}
 
@@ -334,7 +334,7 @@ abstract class AbstractQNetsimEngine implements QNetsimEngineI {
 			sb.append("\t" + i);
 			long min = Long.MAX_VALUE;
 			long max = Long.MIN_VALUE;
-			for (QNetsimEngineRunner runner : this.engines) {
+			for (AbstractQNetsimEngineRunner runner : this.engines) {
 				long runTime = runner.runTimes[i];
 				sum += runTime;
 				if (runTime < min) min = runTime;
@@ -437,9 +437,9 @@ abstract class AbstractQNetsimEngine implements QNetsimEngineI {
 	}
 	
 	/**
-	 * @return the {@link QNetsimEngineRunner} created by {@link #initQSimEngineRunner()}
+	 * @return the {@link AbstractQNetsimEngineRunner} created by {@link #initQSimEngineRunner()}
 	 */
-	protected List<QNetsimEngineRunner> getQnetsimEngineRunner(){
+	protected List<AbstractQNetsimEngineRunner> getQnetsimEngineRunner(){
 		return this.engines;
 	}
 }
