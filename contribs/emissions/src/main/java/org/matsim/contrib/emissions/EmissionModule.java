@@ -267,7 +267,7 @@ public final class EmissionModule {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		logger.info("entering createDetailedHbefaWarmTable ...");
+		logger.info("leaving createDetailedHbefaWarmTable ...");
 		return hbefaWarmTableDetailed;
 	}
 
