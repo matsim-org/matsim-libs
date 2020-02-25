@@ -387,17 +387,17 @@
 		<dependency>
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
-			<version>4.1.0</version>
+			<version>${guice.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject.extensions</groupId>
 			<artifactId>guice-multibindings</artifactId>
-			<version>4.1.0</version>
+			<version>${guice.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.inject.extensions</groupId>
 			<artifactId>guice-grapher</artifactId>
-			<version>4.1.0</version>
+			<version>${guice.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jgrapht</groupId>
@@ -480,5 +480,6 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<geotools.version>21.1</geotools.version>
-    </properties>
+		<guice.version>4.2.2</guice.version>
+	</properties>
 </project>
