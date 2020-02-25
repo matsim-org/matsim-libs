@@ -42,7 +42,7 @@ public class Time {
 	 * is independent of the start time. */
 	@Deprecated // rather use Time.isUndefinedTime( time ), since that opens up the path to a later change
 	// of the convention.  kai, nov'17
-	public final static double UNDEFINED_TIME = Double.NEGATIVE_INFINITY;
+	private final static double UNDEFINED_TIME = Double.NEGATIVE_INFINITY;
 	/**
 	 * The end of a day in MATSim in seconds
 	 */
