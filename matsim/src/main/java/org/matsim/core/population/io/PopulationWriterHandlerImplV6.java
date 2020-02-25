@@ -193,7 +193,7 @@ import org.matsim.vehicles.Vehicle;
 			out.write(Time.writeTime(act.getStartTime()));
 			out.write("\"");
 		}
-		if (!Time.isUndefinedTime(act.getMaximumDuration())) {
+		if (!act.isMaximumDurationUndefined()) {
 			out.write(" max_dur=\"");
 			out.write(Time.writeTime(act.getMaximumDuration()));
 			out.write("\"");

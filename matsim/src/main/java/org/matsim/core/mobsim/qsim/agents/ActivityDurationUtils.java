@@ -37,7 +37,7 @@ public class ActivityDurationUtils {
 	 */
 	
 	public static double calculateDepartureTime(Activity act, double now, PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation) {
-		if (Time.isUndefinedTime(act.getMaximumDuration()) && (act.isEndTimeUndefined())) {
+		if (act.isMaximumDurationUndefined() && act.isEndTimeUndefined()) {
 			return Double.POSITIVE_INFINITY;
 		} else {
 			double departure = 0;

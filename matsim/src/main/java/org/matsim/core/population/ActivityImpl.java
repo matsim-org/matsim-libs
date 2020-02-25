@@ -52,7 +52,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	 */
 	private Double startTime = null;
 
-	private double dur = Time.getUndefinedTime();
+	private Double dur = null;
 
 	private String type;
 	private Coord coord = null;
@@ -146,13 +146,13 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 				+ this.linkId
 				+ "]"
 				+ "[startTime="
-				+ Time.writeTime(isStartTimeUndefined()? Time.getUndefinedTime() : this.getStartTime())
+				+ Time.writeTime(isStartTimeUndefined() ? Time.getUndefinedTime() : this.getStartTime())
 				+ "]"
 				+ "[endTime="
 				+ Time.writeTime(isEndTimeUndefined() ? Time.getUndefinedTime() : this.getEndTime())
 				+ "]"
 				+ "[duration="
-				+ Time.writeTime(this.getMaximumDuration())
+				+ Time.writeTime(isMaximumDurationUndefined() ? Time.getUndefinedTime() : this.getMaximumDuration())
 				+ "]"
 				+ "[facilityId="
 				+ this.facilityId + "]" ;
@@ -165,7 +165,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 	@Override
 	public void setMaximumDuration(final double dur) {
-		this.dur = dur;
+		this.dur = Time.isUndefinedTime(dur) ? null : dur;
 	}
 
 	@Override

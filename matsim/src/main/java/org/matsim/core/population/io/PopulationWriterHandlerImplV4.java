@@ -202,11 +202,11 @@ import org.matsim.core.utils.misc.Time;
 			out.write(Time.writeTime(act.getStartTime()));
 			out.write("\"");
 		}
-			if (!Time.isUndefinedTime(act.getMaximumDuration())) {
-				out.write(" dur=\"");
-				out.write(Time.writeTime(act.getMaximumDuration()));
-				out.write("\"");
-			}
+		if (!act.isMaximumDurationUndefined()) {
+			out.write(" dur=\"");
+			out.write(Time.writeTime(act.getMaximumDuration()));
+			out.write("\"");
+		}
 		if (!act.isEndTimeUndefined()) {
 			out.write(" end_time=\"");
 			out.write(Time.writeTime(act.getEndTime()));

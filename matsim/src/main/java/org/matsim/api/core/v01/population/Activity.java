@@ -51,6 +51,16 @@ public interface Activity extends PlanElement {
 		}
 	}
 
+	default boolean isMaximumDurationUndefined() {
+		try {
+			double maxDuration = getMaximumDuration();
+			//only ActivityImpl has been adapted to Double, so we need to keep this additional check for other Activity classes
+			return Time.isUndefinedTime(maxDuration);
+		} catch (NullPointerException e) {
+			return true;
+		}
+	}
+
 
 	public double getEndTime();
 
