@@ -71,7 +71,7 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 					break;
 				case MUTATE_END:
 					a.setEndTime( mutateTime( a.getEndTime() ) );
-					if ( a.getEndTime() != Time.getUndefinedTime() &&
+					if ( Time.isUndefinedTime(a.getEndTime()) &&
 							a.getEndTime() < lastEndTime ) {
 						a.setEndTime( lastEndTime );
 					}
@@ -79,7 +79,7 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 					break;
 				case MUTATE_END_AS_DUR:
 					final double oldTime = a.getEndTime();
-					if ( oldTime == Time.getUndefinedTime() ) break;
+					if ( Time.isUndefinedTime(oldTime) ) break;
 					final double newTime = mutateTime( oldTime );
 					// doing this so rather than sampling mut directly allows
 					// to avoid negative times
@@ -97,7 +97,7 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 
 	private double mutateTime(final double time) {
 		// do not do anything if time is undefined
-		if ( time == Time.getUndefinedTime() ) return time;
+		if ( Time.isUndefinedTime(time) ) return time;
 		if ( Double.isNaN( time ) ) throw new IllegalArgumentException( ""+time );
 
 		final double t = time + (int)((this.random.nextDouble() * 2.0 - 1.0) * mutationRange);

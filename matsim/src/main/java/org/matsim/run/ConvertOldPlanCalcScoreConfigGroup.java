@@ -393,10 +393,10 @@ final class OldToNewPlanCalcScoreConfigGroup extends ConfigGroup {
 			if ( actType.isScoringThisActivityAtAll() ) {
 				// (checking consistency only if activity is scored at all)
 
-				if ((actType.getOpeningTime() != Time.getUndefinedTime()) && (actType.getClosingTime() != Time.getUndefinedTime())) {
+				if ((!Time.isUndefinedTime(actType.getOpeningTime())) && (!Time.isUndefinedTime(actType.getClosingTime()))) {
 					hasOpeningAndClosingTime = true;
 				}
-				if ((actType.getOpeningTime() != Time.getUndefinedTime()) && (getLateArrival_utils_hr() < -0.001)) {
+				if ((!Time.isUndefinedTime(actType.getOpeningTime())) && (getLateArrival_utils_hr() < -0.001)) {
 					hasOpeningTimeAndLatePenalty = true;
 				}
 				if ( actType.getOpeningTime()==0. && actType.getClosingTime()>24.*3600-1 ) {

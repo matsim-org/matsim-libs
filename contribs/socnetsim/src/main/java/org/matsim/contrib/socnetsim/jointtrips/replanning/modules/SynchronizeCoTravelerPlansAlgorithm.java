@@ -95,10 +95,10 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 				final Leg leg = (Leg) pe;
 				final Route route = leg.getRoute();
 
-				final double legDur = route != null && route.getTravelTime() != Time.getUndefinedTime() ?
+				final double legDur = route != null && !Time.isUndefinedTime(route.getTravelTime()) ?
 					route.getTravelTime() : leg.getTravelTime();
 
-				if ( legDur != Time.getUndefinedTime() ) {
+				if ( !Time.isUndefinedTime(legDur) ) {
 					now -= legDur;
 				}
 				else {
@@ -129,7 +129,7 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 					!(StageActivityTypeIdentifier.isStageActivity( ((Activity) pe).getType() )  ||
 					stageTypes.contains(((Activity) pe).getType())) ){
 				final double endTime = ((Activity) pe).getEndTime();
-				if ( endTime == Time.getUndefinedTime() ) throw new RuntimeException( "undefined end time" );
+				if ( Time.isUndefinedTime(endTime) ) throw new RuntimeException( "undefined end time" );
 				return endTime + tt;
 			}
 
@@ -137,10 +137,10 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 				final Leg leg = (Leg) pe;
 				final Route route = leg.getRoute();
 
-				final double legDur = route != null && route.getTravelTime() != Time.getUndefinedTime() ?
+				final double legDur = route != null && !Time.isUndefinedTime(route.getTravelTime()) ?
 					route.getTravelTime() : leg.getTravelTime();
 
-				if ( legDur != Time.getUndefinedTime() ) {
+				if ( !Time.isUndefinedTime(legDur) ) {
 					tt += legDur;
 				}
 				else {

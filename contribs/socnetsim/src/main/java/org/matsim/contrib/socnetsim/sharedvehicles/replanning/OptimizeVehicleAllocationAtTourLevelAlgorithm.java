@@ -286,7 +286,7 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 			
 			final Trip firstTrip = subtour.getTrips().get( 0 );
 			this.startTime = firstTrip.getOriginActivity().getEndTime();
-			if ( startTime == Time.getUndefinedTime() ) throw new RuntimeException( "no end time in "+firstTrip.getOriginActivity() );
+			if ( Time.isUndefinedTime(startTime) ) throw new RuntimeException( "no end time in "+firstTrip.getOriginActivity() );
 
 			final Trip lastTrip = subtour.getTrips().get( subtour.getTrips().size() - 1 );
 			this.endTime = calcArrivalTime( lastTrip );
@@ -329,17 +329,17 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 		for ( final PlanElement pe : trip.getTripElements() ) {
 			if ( pe instanceof Activity ) {
 				final double end = ((Activity) pe).getEndTime();
-				now = end != Time.getUndefinedTime() ? end : now + ((Activity) pe).getMaximumDuration();
+				now = !Time.isUndefinedTime(end) ? end : now + ((Activity) pe).getMaximumDuration();
 				// TODO: do not fail *that* badly, but just revert to random alloc
-				if ( now == Time.getUndefinedTime() ) throw new RuntimeException( "could not get time from "+pe );
+				if ( Time.isUndefinedTime(now) ) throw new RuntimeException( "could not get time from "+pe );
 			}
 			else if ( pe instanceof Leg ) {
 				final Route r = ((Leg) pe).getRoute();
-				if ( r != null && r.getTravelTime() != Time.getUndefinedTime() ) {
+				if ( r != null && !Time.isUndefinedTime(r.getTravelTime()) ) {
 					now += r.getTravelTime();
 				}
 				else {
-					now += ((Leg) pe).getTravelTime() != Time.getUndefinedTime() ?
+					now += !Time.isUndefinedTime(((Leg) pe).getTravelTime()) ?
 							((Leg) pe).getTravelTime() :
 							0; // no info: just assume instantaneous. This will give poor results!
 				}

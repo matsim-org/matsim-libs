@@ -117,7 +117,7 @@ class ActivityEngineDefaultImpl implements ActivityEngine {
 	public void afterSim() {
 		double now = this.internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 		for (AgentEntry entry : activityEndsList) {
-			if (entry.activityEndTime!=Double.POSITIVE_INFINITY && entry.activityEndTime!=Time.getUndefinedTime()) {
+			if (entry.activityEndTime!=Double.POSITIVE_INFINITY && !Time.isUndefinedTime(entry.activityEndTime)) {
 				// since we are at an activity, it is not plausible to assume that the agents know mode or destination
 				// link id.  Thus generating the event with ``null'' in the corresponding entries.  kai, mar'12
 				eventsManager.processEvent(new PersonStuckEvent(now, entry.agent.getId(), null, null));

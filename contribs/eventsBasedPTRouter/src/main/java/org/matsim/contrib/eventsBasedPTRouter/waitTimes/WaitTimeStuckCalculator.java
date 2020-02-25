@@ -96,14 +96,14 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 						cacheWaitTimes[i] = Time.getUndefinedTime();
 						SORTED_DEPARTURES:
 						for(double departure:sortedDepartures) {
-							double arrivalTime = departure+(stop.getArrivalOffset()!=Time.getUndefinedTime()?stop.getArrivalOffset():stop.getDepartureOffset());
+							double arrivalTime = departure+(!Time.isUndefinedTime(stop.getArrivalOffset())?stop.getArrivalOffset():stop.getDepartureOffset());
 							if(arrivalTime>=endTime) {
 								cacheWaitTimes[i] = arrivalTime-endTime;
 								break SORTED_DEPARTURES;
 							}
 						}
-						if(cacheWaitTimes[i]==Time.getUndefinedTime())
-							cacheWaitTimes[i] = sortedDepartures[0]+24*3600+(stop.getArrivalOffset()!=Time.getUndefinedTime()?stop.getArrivalOffset():stop.getDepartureOffset())-endTime;
+						if(Time.isUndefinedTime(cacheWaitTimes[i]))
+							cacheWaitTimes[i] = sortedDepartures[0]+24*3600+(!Time.isUndefinedTime(stop.getArrivalOffset())?stop.getArrivalOffset():stop.getDepartureOffset())-endTime;
 					}
 					stopsScheduledMap.put(stop.getStopFacility().getId(), cacheWaitTimes);
 				}

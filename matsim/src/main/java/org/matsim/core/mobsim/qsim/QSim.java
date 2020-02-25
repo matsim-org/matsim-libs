@@ -501,10 +501,10 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		QSimConfigGroup qSimConfigGroup = this.scenario.getConfig().qsim();
 		Double configuredStartTime = qSimConfigGroup.getStartTime();
 		this.stopTime = qSimConfigGroup.getEndTime();
-		if (configuredStartTime == Time.getUndefinedTime()) {
+		if (Time.isUndefinedTime(configuredStartTime)) {
 			configuredStartTime = 0.0;
 		}
-		if ((this.stopTime == Time.getUndefinedTime()) || (this.stopTime == 0)) {
+		if ((Time.isUndefinedTime(this.stopTime)) || (this.stopTime == 0)) {
 			this.stopTime = Double.MAX_VALUE;
 		}
 

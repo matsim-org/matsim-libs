@@ -248,7 +248,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 
 	protected double longerStopTimeIfWeAreAheadOfSchedule(final double now,
 			final double stopTime) {
-		if ((this.nextStop.isAwaitDepartureTime()) && (this.nextStop.getDepartureOffset() != Time.getUndefinedTime())) {
+		if ((this.nextStop.isAwaitDepartureTime()) && (!Time.isUndefinedTime(this.nextStop.getDepartureOffset() ))) {
 			double earliestDepTime = getActivityEndTime() + this.nextStop.getDepartureOffset();
 			if (now + stopTime < earliestDepTime) {
 				return earliestDepTime - now;

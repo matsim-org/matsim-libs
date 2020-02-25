@@ -82,7 +82,7 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
-		if ( agent.getExpectedTravelTime()==null || agent.getExpectedTravelTime()==Time.getUndefinedTime() ) {
+		if ( agent.getExpectedTravelTime()==null || Time.isUndefinedTime(agent.getExpectedTravelTime()) ) {
 			Logger.getLogger( this.getClass() ).info( "mode: " + agent.getMode() );
 			throw new RuntimeException("teleportation does not work when travel time is undefined.  There is also really no magic fix for this,"
 					+ " since we cannot guess travel times for arbitrary modes and arbitrary landscapes.  kai/mz, apr'15 & feb'16") ;
