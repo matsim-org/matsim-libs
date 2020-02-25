@@ -31,7 +31,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.Phaser;
 import java.util.concurrent.ThreadFactory;
 
 import javax.inject.Inject;
@@ -84,7 +83,6 @@ final class QNetsimEngineWithThreadpool implements QNetsimEngineI {
 	} ;
 
 	private static final Logger log = Logger.getLogger(QNetsimEngineWithThreadpool.class);
-
 	private static final int INFO_PERIOD = 3600;
 
 	private QNetwork network;
@@ -101,9 +99,6 @@ final class QNetsimEngineWithThreadpool implements QNetsimEngineI {
 
 	private List<QNetsimEngineRunner> engines;
 
-	private Phaser startBarrier;
-	private Phaser endBarrier;
-
 	private final Set<QLinkI> linksToActivateInitially = new HashSet<>();
 
 	private InternalInterface internalInterface = null;
@@ -111,8 +106,6 @@ final class QNetsimEngineWithThreadpool implements QNetsimEngineI {
 	private int numOfRunners;
 
 	private ExecutorService pool;
-
-	private final boolean usingThreadpool;
 	
 	// for detailed run time analysis - used in combination with QSim.analyzeRunTimes
 	public static int numObservedTimeSteps = 24*3600;
@@ -132,13 +125,9 @@ final class QNetsimEngineWithThreadpool implements QNetsimEngineI {
 		this.qsim = sim;
 
 		final Config config = sim.getScenario().getConfig();
-		final QSimConfigGroup qsimConfigGroup = config.qsim();
-		this.usingThreadpool = qsimConfigGroup.isUsingThreadpool();
-
+		final QSimConfigGroup qSimConfigGroup = config.qsim();
 
 		// configuring the car departure hander (including the vehicle behavior)
-		QSimConfigGroup qSimConfigGroup = this.qsim.getScenario().getConfig().qsim();
-
 		VehicleBehavior vehicleBehavior = qSimConfigGroup.getVehicleBehavior();
 		switch(vehicleBehavior) {
 		case exception:
@@ -234,16 +223,7 @@ final class QNetsimEngineWithThreadpool implements QNetsimEngineI {
 			engine.afterSim();
 		}
 
-		if (this.usingThreadpool) {
-			this.pool.shutdown();
-		} else {
-			/*
-			 * Triggering the startBarrier of the QSimEngineThreads.
-			 * They will check whether the Simulation is still running.
-			 * It is not, so the Threads will stop running.
-			 */
-			this.startBarrier.arriveAndAwaitAdvance();
-		}
+		this.pool.shutdown();
 
 		/* Reset vehicles on ALL links. We cannot iterate only over the active links
 		 * (this.simLinksArray), because there may be links that have vehicles only
@@ -306,28 +286,23 @@ final class QNetsimEngineWithThreadpool implements QNetsimEngineI {
 			engine.setTime(time);
 		}
 
-		if (this.usingThreadpool) {
-			try {
-				for (QNetsimEngineRunner engine : this.engines) {
-					engine.setMovingNodes(true);
-				}
-				for (Future<Boolean> future : pool.invokeAll(this.engines)) {
-					future.get();
-				}
-				for (QNetsimEngineRunner engine : this.engines) {
-					engine.setMovingNodes(false);
-				}
-				for (Future<Boolean> future : pool.invokeAll(this.engines)) {
-					future.get();
-				}
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e) ;
-			} catch (ExecutionException e) {
-				throw new RuntimeException(e.getCause());
+		try {
+			for (QNetsimEngineRunner engine : this.engines) {
+				engine.setMovingNodes(true);
 			}
-		} else {
-			this.startBarrier.arriveAndAwaitAdvance();
-			this.endBarrier.arriveAndAwaitAdvance();
+			for (Future<Boolean> future : pool.invokeAll(this.engines)) {
+				future.get();
+			}
+			for (QNetsimEngineRunner engine : this.engines) {
+				engine.setMovingNodes(false);
+			}
+			for (Future<Boolean> future : pool.invokeAll(this.engines)) {
+				future.get();
+			}
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e) ;
+		} catch (ExecutionException e) {
+			throw new RuntimeException(e.getCause());
 		}
 	}
 
@@ -364,11 +339,6 @@ final class QNetsimEngineWithThreadpool implements QNetsimEngineI {
 
 		return numNodes;
 	}
-
-//	QSim getMobsim() {
-//		return this.qsim;
-//	}
-	// do not hand out back pointers! kai, mar'16
 
 	public NetsimNetwork getNetsimNetwork() {
 		return this.network;
@@ -415,32 +385,17 @@ final class QNetsimEngineWithThreadpool implements QNetsimEngineI {
 
 		this.engines = new ArrayList<>();
 
-		this.startBarrier = new Phaser(this.numOfThreads + 1);
-		Phaser separationBarrier = new Phaser(this.numOfThreads);
-		this.endBarrier = new Phaser(this.numOfThreads + 1);
-
-		numOfRunners = this.numOfThreads;
-		if (this.usingThreadpool) {
-			// The number of runners should be larger than the number of threads, yes,
-			// but see MATSIM-404 - Simulation result still depends on the number of runners.
+		this.numOfRunners = this.numOfThreads;
+		// The number of runners should be larger than the number of threads, yes,
+		// but see MATSIM-404 - Simulation result still depends on the number of runners.
 //			numOfRunners *= 10 ;
-			this.pool = Executors.newFixedThreadPool(
-					this.numOfThreads,
-					new NamedThreadFactory());
-		}
+		this.pool = Executors.newFixedThreadPool(
+				this.numOfThreads,
+				new NamedThreadFactory());
 
 		// setup threads
 		for (int i = 0; i < numOfRunners; i++) {
-			QNetsimEngineRunner engine ;
-			if (this.usingThreadpool) {
-				engine = new QNetsimEngineRunner();
-			} else {
-				engine = new QNetsimEngineRunner(this.startBarrier, separationBarrier, endBarrier);
-				Thread thread = new Thread(engine);
-				thread.setName("QNetsimEngineRunner_" + i);
-				thread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically
-				thread.start();
-			}
+			QNetsimEngineRunner engine = new QNetsimEngineRunner();
 			this.engines.add(engine);
 		}
 
