@@ -21,12 +21,7 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -35,86 +30,26 @@ import java.util.concurrent.ThreadFactory;
 
 import javax.inject.Inject;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
-import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
-import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
-import org.matsim.core.config.groups.QSimConfigGroup.VehicleBehavior;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
  *
+ * @author droeder@Senozon after
+ * 
  * @author mrieser
  * @author dgrether
  * @author dstrippgen
  */
-final class QNetsimEngineWithThreadpool implements QNetsimEngineI {
+final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine {
 
-	private NetsimInternalInterface ii = new NetsimInternalInterface(){
-		@Override public QNetwork getNetsimNetwork() {
-			return network ;
-		}
-		@Override public void arrangeNextAgentState(MobsimAgent driver) {
-			QNetsimEngineWithThreadpool.this.arrangeNextAgentState(driver);
-		}
-		@Override public void letVehicleArrive(QVehicle veh) {
-			QNetsimEngineWithThreadpool.this.letVehicleArrive( veh ) ;
-		}
-	} ;
-
-	private static final Logger log = Logger.getLogger(QNetsimEngineWithThreadpool.class);
-	private static final int INFO_PERIOD = 3600;
-
-	private QNetwork network;
-
-	private final Map<Id<Vehicle>, QVehicle> vehicles = new HashMap<>();
-
-	private final QSim qsim;
-
-	private final VehicularDepartureHandler dpHandler;
-
-	private double infoTime = 0;
-
-	private final int numOfThreads;
-
-	private List<QNetsimEngineRunner> engines;
-
-	private final Set<QLinkI> linksToActivateInitially = new HashSet<>();
-
-	private InternalInterface internalInterface = null;
-
-	private int numOfRunners;
-
-	private ExecutorService pool;
-	
-	// for detailed run time analysis - used in combination with QSim.analyzeRunTimes
 	public static int numObservedTimeSteps = 24*3600;
 	public static boolean printRunTimesPerTimeStep = false;
+
+	private final int numOfRunners;
 	
-	@Override
-	public void setInternalInterface( InternalInterface internalInterface) {
-		this.internalInterface = internalInterface;
-	}
+	private ExecutorService pool;
+	
 
 	public QNetsimEngineWithThreadpool(final QSim sim) {
 		this(sim, null);
@@ -122,141 +57,38 @@ final class QNetsimEngineWithThreadpool implements QNetsimEngineI {
 
 	@Inject
 	public QNetsimEngineWithThreadpool(final QSim sim, QNetworkFactory netsimNetworkFactory) {
-		this.qsim = sim;
-
-		final Config config = sim.getScenario().getConfig();
-		final QSimConfigGroup qSimConfigGroup = config.qsim();
-
-		// configuring the car departure hander (including the vehicle behavior)
-		VehicleBehavior vehicleBehavior = qSimConfigGroup.getVehicleBehavior();
-		switch(vehicleBehavior) {
-		case exception:
-		case teleport:
-		case wait:
-			break;
-		default:
-			throw new RuntimeException("Unknown vehicle behavior option.");			
-		}
-		dpHandler = new VehicularDepartureHandler(this, vehicleBehavior, qSimConfigGroup);
-		
-		if(qSimConfigGroup.getLinkDynamics().equals(LinkDynamics.SeepageQ)) {
-			log.info("Seepage is allowed. Seep mode(s) is(are) " + qSimConfigGroup.getSeepModes() + ".");
-			if(qSimConfigGroup.isSeepModeStorageFree()) {
-				log.warn("Seep mode(s) " + qSimConfigGroup.getSeepModes() + " does not take storage space thus only considered for flow capacities.");
-			}
-		}
-		
-		if (netsimNetworkFactory != null){
-			network = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory ) ;
-		} else {
-			Scenario scenario = sim.getScenario();
-			EventsManager events = sim.getEventsManager() ;
-			final DefaultQNetworkFactory netsimNetworkFactory2 = new DefaultQNetworkFactory( events, scenario );
-			MobsimTimer mobsimTimer = sim.getSimTimer() ;
-			AgentCounter agentCounter = sim.getAgentCounter() ;
-			netsimNetworkFactory2.initializeFactory(agentCounter, mobsimTimer, ii );
-			network = new QNetwork(sim.getScenario().getNetwork(), netsimNetworkFactory2 );
-		}
-		network.initialize(this, sim.getAgentCounter(), sim.getSimTimer() );
-
-		this.numOfThreads = sim.getScenario().getConfig().qsim().getNumberOfThreads();
+		super(sim, netsimNetworkFactory);
+		this.numOfRunners = this.numOfThreads;
 	}
-
-	private static int wrnCnt = 0;
-	public void addParkedVehicle(MobsimVehicle veh, Id<Link> startLinkId) {
-		if (this.vehicles.put(veh.getId(), (QVehicle) veh) != null) {
-			if (wrnCnt < 1) {
-				wrnCnt++ ;
-				log.warn("existing vehicle in mobsim was just overwritten by other vehicle with same ID.  Not clear what this means.  Continuing anyways ...") ;
-				log.warn(Gbl.ONLYONCE);
-			}
-		}
-		QLinkI qlink = network.getNetsimLinks().get(startLinkId);
-		if (qlink == null) {
-			throw new RuntimeException("requested link with id=" + startLinkId + " does not exist in network. Possible vehicles "
-					+ "or activities or facilities are registered to a different network.") ;
-		}
-		qlink.addParkedVehicle(veh);
-	}
-
-	static AbstractAgentSnapshotInfoBuilder createAgentSnapshotInfoBuilder(Scenario scenario, SnapshotLinkWidthCalculator linkWidthCalculator) {
-		final SnapshotStyle snapshotStyle = scenario.getConfig().qsim().getSnapshotStyle();
-		switch(snapshotStyle) {
-		case queue:
-			return new QueueAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
-		case withHoles:
-		case withHolesAndShowHoles:
-			// the difference is not in the spacing, thus cannot be differentiated by using different classes.  kai, sep'14
-			// ??? kai, nov'15
-			return new QueueAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
-		case kinematicWaves:
-			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not explicitly supported. Using \""+SnapshotStyle.withHoles+ "\" instead.");
-			return new QueueAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
-		case equiDist:
-			return new EquiDistAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
-		default:
-			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported. Using equiDist");
-			return new EquiDistAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
-		}
-	}
+//
+//
+//	static AbstractAgentSnapshotInfoBuilder createAgentSnapshotInfoBuilder(Scenario scenario, SnapshotLinkWidthCalculator linkWidthCalculator) {
+//		final SnapshotStyle snapshotStyle = scenario.getConfig().qsim().getSnapshotStyle();
+//		switch(snapshotStyle) {
+//		case queue:
+//			return new QueueAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
+//		case withHoles:
+//		case withHolesAndShowHoles:
+//			// the difference is not in the spacing, thus cannot be differentiated by using different classes.  kai, sep'14
+//			// ??? kai, nov'15
+//			return new QueueAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
+//		case kinematicWaves:
+//			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not explicitly supported. Using \""+SnapshotStyle.withHoles+ "\" instead.");
+//			return new QueueAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
+//		case equiDist:
+//			return new EquiDistAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
+//		default:
+//			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported. Using equiDist");
+//			return new EquiDistAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
+//		}
+//	}
 
 	@Override
-	public void onPrepareSim() {
-		this.infoTime = 
-				Math.floor(internalInterface.getMobsim().getSimTimer().getSimStartTime() / INFO_PERIOD) * INFO_PERIOD; 
-		/*
-		 * infoTime may be < simStartTime, this ensures to print out the
-		 * info at the very first timestep already 
-		 */
-
-		initQSimEngineThreads();
-	}
-
-	@Override
-	public void afterSim() {
-
-		/*
-		 * Calling the afterSim Method of the QSimEngineThreads
-		 * will set their simulationRunning flag to false.
-		 */
-		for (QNetsimEngineRunner engine : this.engines) {
-			engine.afterSim();
-		}
-
+	public void finishMultiThreading() {
 		this.pool.shutdown();
-
-		/* Reset vehicles on ALL links. We cannot iterate only over the active links
-		 * (this.simLinksArray), because there may be links that have vehicles only
-		 * in the buffer (such links are *not* active, as the buffer gets emptied
-		 * when handling the nodes.
-		 */
-		for (QLinkI link : network.getNetsimLinks().values()) {
-			link.clearVehicles();
-		}
 	}
 
-	/**
-	 * Implements one simulation step, called from simulation framework
-	 * @param time The current time in the simulation.
-	 */
-	@Override
-	public void doSimStep(final double time) {
-		run(time);
-
-		this.printSimLog(time);
-	}
-
-	/*
-	 * The Threads are waiting at the startBarrier.
-	 * We trigger them by reaching this Barrier. Now the
-	 * Threads will start moving the Nodes and Links. We wait
-	 * until all of them reach the endBarrier to move
-	 * on. We should not have any Problems with Race Conditions
-	 * because even if the Threads would be faster than this
-	 * Thread, means the reach the endBarrier before
-	 * this Method does, it should work anyway.
-	 */
-	private void run(double time) {
+	protected void run(double time) {
 		// yy Acceleration options to try out (kai, jan'15):
 
 		// (a) Try to do without barriers.  With our 
@@ -282,21 +114,21 @@ final class QNetsimEngineWithThreadpool implements QNetsimEngineI {
 		// as input for the domain decomposition under (b).
 
 		// set current Time
-		for (QNetsimEngineRunner engine : this.engines) {
+		for (QNetsimEngineRunner engine : this.getQnetsimEngineRunner()) {
 			engine.setTime(time);
 		}
 
 		try {
-			for (QNetsimEngineRunner engine : this.engines) {
+			for (QNetsimEngineRunner engine : this.getQnetsimEngineRunner()) {
 				engine.setMovingNodes(true);
 			}
-			for (Future<Boolean> future : pool.invokeAll(this.engines)) {
+			for (Future<Boolean> future : pool.invokeAll(this.getQnetsimEngineRunner())) {
 				future.get();
 			}
-			for (QNetsimEngineRunner engine : this.engines) {
+			for (QNetsimEngineRunner engine : this.getQnetsimEngineRunner()) {
 				engine.setMovingNodes(false);
 			}
-			for (Future<Boolean> future : pool.invokeAll(this.engines)) {
+			for (Future<Boolean> future : pool.invokeAll(this.getQnetsimEngineRunner())) {
 				future.get();
 			}
 		} catch (InterruptedException e) {
@@ -304,206 +136,6 @@ final class QNetsimEngineWithThreadpool implements QNetsimEngineI {
 		} catch (ExecutionException e) {
 			throw new RuntimeException(e.getCause());
 		}
-	}
-
-
-	/*package*/ void printSimLog(double time) {
-		if (time >= this.infoTime) {
-			this.infoTime += INFO_PERIOD;
-			int nofActiveLinks = this.getNumberOfSimulatedLinks();
-			int nofActiveNodes = this.getNumberOfSimulatedNodes();
-			log.info("SIMULATION (QNetsimEngine) AT " + Time.writeTime(time)
-					+ " : #links=" + nofActiveLinks
-					+ " #nodes=" + nofActiveNodes);
-		}
-	}
-
-	public int getNumberOfSimulatedLinks() {
-
-		int numLinks = 0;
-
-		for (QNetsimEngineRunner engine : this.engines) {
-			numLinks = numLinks + engine.getNumberOfSimulatedLinks();
-		}
-
-		return numLinks;
-	}
-
-	public int getNumberOfSimulatedNodes() {
-
-		int numNodes = 0;
-
-		for (QNetsimEngineRunner engine : this.engines) {
-			numNodes = numNodes + engine.getNumberOfSimulatedNodes();
-		}
-
-		return numNodes;
-	}
-
-	public NetsimNetwork getNetsimNetwork() {
-		return this.network;
-	}
-
-	public VehicularDepartureHandler getDepartureHandler() {
-		return dpHandler;
-	}
-
-	public final Map<Id<Vehicle>, QVehicle> getVehicles() {
-		return Collections.unmodifiableMap(this.vehicles);
-	}
-
-	public final void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
-		Id<Link> linkId = planAgent.getCurrentLinkId(); 
-		if (linkId != null) { // may be bushwacking
-			QLinkI qLink = this.network.getNetsimLink(linkId);
-			if ( qLink==null ) {
-				throw new RuntimeException("netsim link lookup failed; agentId=" + planAgent.getId() + "; linkId=" + linkId ) ;
-			}
-			qLink.registerAdditionalAgentOnLink(planAgent);
-		}
-	}
-
-	public MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId) {
-		if  (linkId == null) { // seems that this can happen in tests; not sure if it can happen in regular code. kai, jun'15
-			return null;
-		}
-		QLinkI qLink = this.network.getNetsimLink(linkId);
-		return qLink.unregisterAdditionalAgentOnLink(agentId);
-	}
-
-	private void letVehicleArrive(QVehicle veh) {
-		double now = this.qsim.getSimTimer().getTimeOfDay();
-		MobsimDriverAgent driver = veh.getDriver();
-		this.qsim.getEventsManager().processEvent(new PersonLeavesVehicleEvent(now, driver.getId(), veh.getId()));
-		// reset vehicles driver
-		veh.setDriver(null);
-		driver.endLegAndComputeNextState(now);
-		this.internalInterface.arrangeNextAgentState(driver);
-	}
-
-	private void initQSimEngineThreads() {
-
-		this.engines = new ArrayList<>();
-
-		this.numOfRunners = this.numOfThreads;
-		// The number of runners should be larger than the number of threads, yes,
-		// but see MATSIM-404 - Simulation result still depends on the number of runners.
-//			numOfRunners *= 10 ;
-		this.pool = Executors.newFixedThreadPool(
-				this.numOfThreads,
-				new NamedThreadFactory());
-
-		// setup threads
-		for (int i = 0; i < numOfRunners; i++) {
-			QNetsimEngineRunner engine = new QNetsimEngineRunner();
-			this.engines.add(engine);
-		}
-
-		/*
-		 *  Assign every Link and Node to an Activator. By doing so, the
-		 *  activateNode(...) and activateLink(...) methods in this class
-		 *  should become obsolete.
-		 */
-		assignNetElementActivators();
-	}
-
-	/*
-	 * Within the MoveThreads Links are only activated when a Vehicle is moved
-	 * over a Node which is processed by that Thread. So we can assign each QLink
-	 * to the Thread that handles its InNode.
-	 */
-	private void assignNetElementActivators() {
-
-		// only for statistics
-		int nodes[] = new int[numOfRunners];
-		int links[] = new int[numOfRunners];
-
-		int roundRobin = 0;
-		for (QNodeI node : network.getNetsimNodes().values()) {
-			int i = roundRobin % this.numOfRunners;
-			if( node instanceof AbstractQNode){
-				((AbstractQNode) node).setNetElementActivationRegistry(this.engines.get(i));
-			}
-			nodes[i]++;
-
-			// set activator for out links
-			for (Link outLink : node.getNode().getOutLinks().values()) {
-				AbstractQLink qLink = (AbstractQLink) network.getNetsimLink(outLink.getId());
-				// (must be of this type to work.  kai, feb'12)
-
-				// removing qsim as "person in the middle".  not fully sure if this is the same in the parallel impl.  kai, oct'10
-				qLink.setNetElementActivationRegistry(this.engines.get(i));
-
-				/*
-				 * If the QLink contains agents that end their activity in the first time
-				 * step, the link should be activated.
-				 */
-				if (linksToActivateInitially.remove(qLink) 
-						|| qsim.getScenario().getConfig().qsim().getSimStarttimeInterpretation()==StarttimeInterpretation.onlyUseStarttime) {
-					this.engines.get(i).registerLinkAsActive(qLink);
-				}
-
-				links[i]++;
-
-			}
-
-			roundRobin++;
-		}
-
-		// print some statistics
-		for (int i = 0; i < this.engines.size(); i++) {
-			log.info("Assigned " + nodes[i] + " nodes and " + links[i] + " links to QSimEngineRunner #" + i);
-		}
-
-		this.linksToActivateInitially.clear();
-	}
-
-	public void printEngineRunTimes() {
-		if (!QSim.analyzeRunTimes) return;
-		
-		if (printRunTimesPerTimeStep) log.info("detailed QNetsimEngineRunner run times per time step:");
-		{
-			StringBuffer sb = new StringBuffer();
-			sb.append("\t");
-			sb.append("time");
-			for (int i = 0; i < this.engines.size(); i++) {
-				sb.append("\t");
-				sb.append("thread_");
-				sb.append(Integer.toString(i));
-			}
-			sb.append("\t");
-			sb.append("min");
-			sb.append("\t");
-			sb.append("max");
-			if (printRunTimesPerTimeStep) log.info(sb.toString());
-		}
-		long sum = 0;
-		long sumMin = 0;
-		long sumMax = 0;
-		for (int i = 0; i < numObservedTimeSteps; i++) {
-			StringBuffer sb = new StringBuffer();
-			sb.append("\t" + i);
-			long min = Long.MAX_VALUE;
-			long max = Long.MIN_VALUE;
-			for (QNetsimEngineRunner runner : this.engines) {
-				long runTime = runner.runTimes[i];
-				sum += runTime;
-				if (runTime < min) min = runTime;
-				if (runTime > max) max = runTime;
-				sb.append("\t");
-				sb.append(Long.toString(runTime));
-			}
-			sb.append("\t");
-			sb.append(Long.toString(min));
-			sb.append("\t");
-			sb.append(Long.toString(max));
-			if (printRunTimesPerTimeStep) log.info(sb.toString());
-			sumMin += min;
-			sumMax += max;
-		}
-		log.info("sum min run times: " + sumMin);
-		log.info("sum max run times: " + sumMax);
-		log.info("sum all run times / num threads: " + sum / this.numOfThreads);
 	}
 	
 	private static class NamedThreadFactory implements ThreadFactory {
@@ -515,12 +147,20 @@ final class QNetsimEngineWithThreadpool implements QNetsimEngineI {
 		}
 	}
 
-	private final void arrangeNextAgentState(MobsimAgent pp) {
-		internalInterface.arrangeNextAgentState(pp);
-	}
-	
 	@Override
-	public NetsimInternalInterface getNetsimInternalInterface() {
-		return ii;
+	protected List<QNetsimEngineRunner> initQSimEngineRunner() {
+		List<QNetsimEngineRunner> engines = new ArrayList<>();
+		for (int i = 0; i < numOfRunners; i++) {
+			QNetsimEngineRunner engine = new QNetsimEngineRunner();
+			engines.add(engine);
+		}
+		return engines;
+	}
+
+	@Override
+	protected void initMultiThreading() {
+		this.pool = Executors.newFixedThreadPool(
+				this.numOfThreads,
+				new NamedThreadFactory());		
 	}
 }

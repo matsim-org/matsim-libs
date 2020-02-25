@@ -7,6 +7,11 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.vehicles.Vehicle;
 
+/**
+ * 
+ * @author droeder@Senozon 
+ *
+ */
 public interface QNetsimEngineI extends MobsimEngine, NetsimEngine {
 	
 	interface NetsimInternalInterface {
@@ -16,10 +21,6 @@ public interface QNetsimEngineI extends MobsimEngine, NetsimEngine {
 	}
 
 
-	/**
-	 * Implements one simulation step, called from simulation framework
-	 * @param time The current time in the simulation.
-	 */
 	void doSimStep(double time);
 
 	int getNumberOfSimulatedLinks();
