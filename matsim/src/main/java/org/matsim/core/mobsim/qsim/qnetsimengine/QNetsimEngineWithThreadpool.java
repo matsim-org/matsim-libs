@@ -34,6 +34,8 @@ import org.matsim.core.mobsim.qsim.QSim;
 
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
+ * Split Up the old {@code QNetsimEngineRunner} which was implementing
+ * 2 different approaches parallel.
  *
  * @author droeder@Senozon after
  * 
@@ -43,14 +45,9 @@ import org.matsim.core.mobsim.qsim.QSim;
  */
 final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine {
 
-	public static int numObservedTimeSteps = 24*3600;
-	public static boolean printRunTimesPerTimeStep = false;
-
 	private final int numOfRunners;
-	
 	private ExecutorService pool;
 	
-
 	public QNetsimEngineWithThreadpool(final QSim sim) {
 		this(sim, null);
 	}
@@ -60,28 +57,6 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine {
 		super(sim, netsimNetworkFactory);
 		this.numOfRunners = this.numOfThreads;
 	}
-//
-//
-//	static AbstractAgentSnapshotInfoBuilder createAgentSnapshotInfoBuilder(Scenario scenario, SnapshotLinkWidthCalculator linkWidthCalculator) {
-//		final SnapshotStyle snapshotStyle = scenario.getConfig().qsim().getSnapshotStyle();
-//		switch(snapshotStyle) {
-//		case queue:
-//			return new QueueAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
-//		case withHoles:
-//		case withHolesAndShowHoles:
-//			// the difference is not in the spacing, thus cannot be differentiated by using different classes.  kai, sep'14
-//			// ??? kai, nov'15
-//			return new QueueAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
-//		case kinematicWaves:
-//			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not explicitly supported. Using \""+SnapshotStyle.withHoles+ "\" instead.");
-//			return new QueueAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
-//		case equiDist:
-//			return new EquiDistAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
-//		default:
-//			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported. Using equiDist");
-//			return new EquiDistAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
-//		}
-//	}
 
 	@Override
 	public void finishMultiThreading() {
@@ -148,7 +123,7 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine {
 	}
 
 	@Override
-	protected List<AbstractQNetsimEngineRunner> initQSimEngineRunner() {
+	protected List<AbstractQNetsimEngineRunner> initQSimEngineRunners() {
 		List<AbstractQNetsimEngineRunner> engines = new ArrayList<>();
 		for (int i = 0; i < numOfRunners; i++) {
 			AbstractQNetsimEngineRunner engine = new QNetsimEngineRunnerWithThreadpool();

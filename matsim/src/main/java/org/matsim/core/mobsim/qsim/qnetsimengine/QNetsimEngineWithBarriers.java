@@ -29,7 +29,9 @@ import javax.inject.Inject;
 import org.matsim.core.mobsim.qsim.QSim;
 
 /**
- * Coordinates the movement of vehicles on the links and the nodes.
+ * Coordinates the movement of vehicles on the links and nodes. 
+ * Split Up the old {@code QNetsimEngineRunner} which was implementing
+ * 2 different approaches parallel. 
  *
  * @author droeder@Senozon after
  * 
@@ -38,10 +40,6 @@ import org.matsim.core.mobsim.qsim.QSim;
  * @author dstrippgen
  */
 final class QNetsimEngineWithBarriers extends AbstractQNetsimEngine {
-
-	// for detailed run time analysis - used in combination with QSim.analyzeRunTimes
-	public static int numObservedTimeSteps = 24*3600;
-	public static boolean printRunTimesPerTimeStep = false;
 	
 	private Phaser startBarrier;
 	private Phaser endBarrier;
@@ -55,32 +53,10 @@ final class QNetsimEngineWithBarriers extends AbstractQNetsimEngine {
 		super(sim, netsimNetworkFactory);
 	}
 
-//	static AbstractAgentSnapshotInfoBuilder createAgentSnapshotInfoBuilder(Scenario scenario, SnapshotLinkWidthCalculator linkWidthCalculator) {
-//		final SnapshotStyle snapshotStyle = scenario.getConfig().qsim().getSnapshotStyle();
-//		switch(snapshotStyle) {
-//		case queue:
-//			return new QueueAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
-//		case withHoles:
-//		case withHolesAndShowHoles:
-//			// the difference is not in the spacing, thus cannot be differentiated by using different classes.  kai, sep'14
-//			// ??? kai, nov'15
-//			return new QueueAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
-//		case kinematicWaves:
-//			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not explicitly supported. Using \""+SnapshotStyle.withHoles+ "\" instead.");
-//			return new QueueAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
-//		case equiDist:
-//			return new EquiDistAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
-//		default:
-//			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported. Using equiDist");
-//			return new EquiDistAgentSnapshotInfoBuilder(scenario, linkWidthCalculator);
-//		}
-//	}
-
 	@Override
 	public void finishMultiThreading() {
 		this.startBarrier.arriveAndAwaitAdvance();
 	}
-
 
 	/*
 	 * The Threads are waiting at the startBarrier.
@@ -126,7 +102,7 @@ final class QNetsimEngineWithBarriers extends AbstractQNetsimEngine {
 	}
 
 	@Override
-	protected List<AbstractQNetsimEngineRunner> initQSimEngineRunner() {
+	protected List<AbstractQNetsimEngineRunner> initQSimEngineRunners() {
 		this.startBarrier = new Phaser(this.numOfThreads + 1);
 		Phaser separationBarrier = new Phaser(this.numOfThreads);
 		this.endBarrier = new Phaser(this.numOfThreads + 1);

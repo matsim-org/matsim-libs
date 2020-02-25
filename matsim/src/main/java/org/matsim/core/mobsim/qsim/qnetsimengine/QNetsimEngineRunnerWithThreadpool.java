@@ -23,9 +23,10 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import org.matsim.core.gbl.Gbl;
 
 /**
+ * Split up the old {@code QNetsimEngineRunner} which was implementing
+ * 2 different approaches.
  * 
  * @author droeder @ Senozon Deutschland GmbH
- *
  */
 final class QNetsimEngineRunnerWithThreadpool extends AbstractQNetsimEngineRunner{
 	
@@ -52,7 +53,7 @@ final class QNetsimEngineRunnerWithThreadpool extends AbstractQNetsimEngineRunne
 
 	@Override
 	public void run() {
-		call();
+		throw new RuntimeException("This method is only here for backwar-compatibility and should be used only by " + QNetsimEngineRunnerWithBarriers.class.getCanonicalName());
 	}
 
 	public final void afterSim() {

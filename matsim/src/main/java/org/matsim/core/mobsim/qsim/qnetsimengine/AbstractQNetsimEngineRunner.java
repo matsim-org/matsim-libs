@@ -33,6 +33,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 /**
  * These are the "threads" of the {@link QNetsimEngineWithThreadpool}. The "run()" method is implicitly called by starting the thread.
  * 
+ * @author droeder after
  * @author (of this documentation) nagel
  *
  */

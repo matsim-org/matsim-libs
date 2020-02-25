@@ -25,9 +25,10 @@ import java.util.concurrent.Phaser;
 import org.matsim.core.gbl.Gbl;
 
 /**
+ * Split up the old {@code QNetsimEngineRunner} which was implementing
+ * 2 different approaches.
  * 
  * @author droeder @ Senozon Deutschland GmbH
- *
  */
 class QNetsimEngineRunnerWithBarriers extends AbstractQNetsimEngineRunner {
 
@@ -89,6 +90,5 @@ class QNetsimEngineRunnerWithBarriers extends AbstractQNetsimEngineRunner {
 
 	@Override
 	public void afterSim() {
-		
 	}
 }

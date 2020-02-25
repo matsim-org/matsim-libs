@@ -22,10 +22,8 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -38,7 +36,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
-import org.matsim.core.config.groups.QSimConfigGroup.StarttimeInterpretation;
 import org.matsim.core.config.groups.QSimConfigGroup.VehicleBehavior;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -86,7 +83,7 @@ abstract class AbstractQNetsimEngine implements QNetsimEngineI {
 	private final Map<Id<Vehicle>, QVehicle> vehicles = new HashMap<>();
 	private final QSim qsim;
 	private final VehicularDepartureHandler dpHandler;
-	private final Set<QLinkI> linksToActivateInitially = new HashSet<>();
+//	private final Set<QLinkI> linksToActivateInitially = new HashSet<>();
 	protected final int numOfThreads;
 	protected final QNetwork network;
 
@@ -165,7 +162,7 @@ abstract class AbstractQNetsimEngine implements QNetsimEngineI {
 		 * info at the very first timestep already 
 		 */
 
-		this.engines = initQSimEngineRunner();
+		this.engines = initQSimEngineRunners();
 		assignNetElementActivators();
 		initMultiThreading();
 	}
@@ -200,7 +197,7 @@ abstract class AbstractQNetsimEngine implements QNetsimEngineI {
 	}
 
 	/** 
-	 * do everything to finish multithreading {@link #afterSim()}
+	 * do everything to finish multithreading {@link #afterSim()}, e.g. shut down a threadpool
 	 */
 	protected abstract void finishMultiThreading();
 
@@ -215,9 +212,9 @@ abstract class AbstractQNetsimEngine implements QNetsimEngineI {
 	/**
 	 * create all necessary {@link AbstractQNetsimEngineRunner}. Will be called during {@link #onPrepareSim()}.
 	 * 
-	 * @return
+	 * @return the list of {@link AbstractQNetsimEngineRunner}
 	 */
-	protected abstract List<AbstractQNetsimEngineRunner> initQSimEngineRunner() ;
+	protected abstract List<AbstractQNetsimEngineRunner> initQSimEngineRunners() ;
 	
 	/**
 	 * Implements one simulation step, called from simulation framework
@@ -412,10 +409,11 @@ abstract class AbstractQNetsimEngine implements QNetsimEngineI {
 				 * If the QLink contains agents that end their activity in the first time
 				 * step, the link should be activated.
 				 */
-				if (linksToActivateInitially.remove(qLink) 
-						|| qsim.getScenario().getConfig().qsim().getSimStarttimeInterpretation()==StarttimeInterpretation.onlyUseStarttime) {
-					this.engines.get(i).registerLinkAsActive(qLink);
-				}
+				// this set is always empty...
+//				if (linksToActivateInitially.remove(qLink) 
+//						|| qsim.getScenario().getConfig().qsim().getSimStarttimeInterpretation()==StarttimeInterpretation.onlyUseStarttime) {
+//					this.engines.get(i).registerLinkAsActive(qLink);
+//				}
 
 				links[i]++;
 
@@ -429,7 +427,7 @@ abstract class AbstractQNetsimEngine implements QNetsimEngineI {
 			log.info("Assigned " + nodes[i] + " nodes and " + links[i] + " links to QSimEngineRunner #" + i);
 		}
 
-		this.linksToActivateInitially.clear();
+//		this.linksToActivateInitially.clear();
 	}
 
 	private final void arrangeNextAgentState(MobsimAgent pp) {
@@ -437,7 +435,7 @@ abstract class AbstractQNetsimEngine implements QNetsimEngineI {
 	}
 	
 	/**
-	 * @return the {@link AbstractQNetsimEngineRunner} created by {@link #initQSimEngineRunner()}
+	 * @return the {@link AbstractQNetsimEngineRunner} created by {@link #initQSimEngineRunners()}
 	 */
 	protected List<AbstractQNetsimEngineRunner> getQnetsimEngineRunner(){
 		return this.engines;
