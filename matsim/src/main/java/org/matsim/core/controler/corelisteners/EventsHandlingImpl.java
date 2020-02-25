@@ -20,6 +20,7 @@
 
 package org.matsim.core.controler.corelisteners;
 
+import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -37,10 +38,12 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.events.algorithms.EventWriter;
+import org.matsim.core.events.algorithms.EventWriterPB;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.matsim.core.utils.io.IOUtils;
 
 @Singleton
 final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
@@ -84,12 +87,17 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 		if (writingEventsAtAll && (regularWriteEvents||earlyIteration || lastIteration ) ) {
 			for (EventsFileFormat format : eventsFileFormats) {
 				switch (format) {
-				case xml:
-					this.eventWriters.add(new EventWriterXML(controlerIO.getIterationFilename(event.getIteration(), 
-							Controler.DefaultFiles.events)));
-					break;
-				default:
-					log.warn("Unknown events file format specified: " + format.toString() + ".");
+					case xml:
+						this.eventWriters.add(new EventWriterXML(controlerIO.getIterationFilename(event.getIteration(),
+								Controler.DefaultFiles.events)));
+						break;
+					case pb:
+						OutputStream out = IOUtils.getOutputStream(IOUtils.getFileUrl(controlerIO.getIterationFilename(event.getIteration(),
+								Controler.DefaultFiles.events.toString().replace(".xml", ".pb"))), false);
+						this.eventWriters.add(new EventWriterPB(out));
+						break;
+					default:
+						log.warn("Unknown events file format specified: " + format.toString() + ".");
 				}
 			}
 			for (EventWriter writer : this.eventWriters) {

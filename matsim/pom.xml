@@ -52,6 +52,14 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
+		<extensions>
+			<!-- Provides operation system information as property -->
+			<extension>
+				<groupId>kr.motd.maven</groupId>
+				<artifactId>os-maven-plugin</artifactId>
+				<version>1.4.1.Final</version>
+			</extension>
+		</extensions>
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -224,6 +232,24 @@
 						<goals>
 							<goal>integration-test</goal>
 							<goal>verify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.xolstice.maven.plugins</groupId>
+				<artifactId>protobuf-maven-plugin</artifactId>
+				<version>0.6.1</version>
+				<configuration>
+					<protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
+					<useArgumentFile>true</useArgumentFile>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compile</goal>
+							<goal>compile-python</goal>
+							<goal>test-compile</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -461,6 +487,11 @@
 		  <artifactId>commons-csv</artifactId>
 		  <version>1.5</version>
 	  </dependency>
+		<dependency>
+			<groupId>com.google.protobuf</groupId>
+			<artifactId>protobuf-java</artifactId>
+			<version>${protobuf.version}</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>
@@ -493,5 +524,6 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<geotools.version>21.1</geotools.version>
+		<protobuf.version>3.11.4</protobuf.version>
     </properties>
 </project>

@@ -1,0 +1,132 @@
+
+syntax = "proto3";
+
+option java_package = "org.matsim.core.utils.pb";
+option java_outer_classname = "ProtoEvents";
+
+import "matsim/Ids.proto";
+
+/*
+ * Protobuf event definition. For detailed event documentation refer to the corresponding java code.
+ */
+message Event {
+
+    double time = 1;
+
+    // X & Y ?
+
+    oneof type {
+        GenericEvent generic = 2;
+        ActivityEndEvent activityEnd = 3;
+        ActivityStartEvent activityStart = 4;
+        LinkEnterEvent linkEnter = 5;
+        LinkLeaveEvent linkLeave = 6;
+        PersonArrivalEvent personalArrival = 7;
+        PersonDepartureEvent personDeparture = 8;
+        PersonEntersVehicleEvent personEntersVehicle = 9;
+        PersonLeavesVehicleEvent personLeavesVehicle = 10;
+        PersonMoneyEvent personMoney = 11;
+        PersonStuckEvent personStuck = 12;
+        TransitDriverStartsEvent transitDriverStarts = 13;
+        VehicleAbortsEvent vehicleAborts = 14;
+        VehicleEntersTrafficEvent vehicleEntersTraffic = 15;
+        VehicleLeavesTrafficEvent vehicleLeavesTraffic = 16;
+    }
+}
+
+
+message GenericEvent {
+
+    string type = 1;
+    map<string, string> attrs = 2;
+
+}
+
+message ActivityEndEvent {
+
+    LinkId linkId = 1;
+    ActivityFacilityId facilityId = 2;
+    PersonId personId = 3;
+    string acttype = 4;
+}
+
+message ActivityStartEvent {
+    LinkId linkId = 1;
+    ActivityFacilityId facilityId = 2;
+    PersonId personId = 3;
+    string acttype = 4;
+}
+
+message LinkEnterEvent {
+    LinkId linkId = 1;
+    VehicleId vehicleId = 2;
+}
+
+message LinkLeaveEvent {
+    LinkId linkId = 1;
+    VehicleId vehicleId = 2;
+}
+
+message PersonArrivalEvent {
+    LinkId linkId = 1;
+    string legMode = 2;
+    PersonId personId = 3;
+}
+
+message PersonDepartureEvent {
+    LinkId linkId = 1;
+    string legMode = 2;
+    PersonId personId = 3;
+}
+
+message PersonEntersVehicleEvent {
+    PersonId personId = 1;
+    VehicleId vehicleId = 2;
+}
+
+message PersonLeavesVehicleEvent {
+    PersonId personId = 1;
+    VehicleId vehicleId = 2;
+}
+
+message PersonMoneyEvent {
+    PersonId personId = 1;
+    double amount = 2;
+    string purpose = 3;
+    string transactionPartner = 4;
+}
+
+message PersonStuckEvent {
+    PersonId personId = 1;
+    LinkId linkId = 2;
+    string legMode = 3;
+}
+
+message TransitDriverStartsEvent {
+    PersonId driverId = 1;
+    VehicleId vehicleId = 2;
+    TransitRouteId transitRouteId = 3;
+    TransitLineId transitLineId = 4;
+    DepartureId departureId = 5;
+}
+
+message VehicleAbortsEvent {
+    VehicleId vehicleId = 1;
+    LinkId linkId = 2;
+}
+
+message VehicleEntersTrafficEvent {
+    PersonId driverId = 1;
+    LinkId linkId = 2;
+    VehicleId vehicleId = 3;
+    string networkMode = 4;
+    double relativePositionOnLink = 5;
+}
+
+message VehicleLeavesTrafficEvent {
+    PersonId driverId = 1;
+    LinkId linkId = 2;
+    VehicleId vehicleId = 3;
+    string networkMode = 4;
+    double relativePositionOnLink = 5;
+}
