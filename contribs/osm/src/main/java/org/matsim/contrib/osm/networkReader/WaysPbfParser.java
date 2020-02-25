@@ -1,35 +1,8 @@
 package org.matsim.contrib.osm.networkReader;
 
-import de.topobyte.osm4j.core.access.OsmHandler;
-import de.topobyte.osm4j.core.model.iface.OsmBounds;
-import de.topobyte.osm4j.core.model.iface.OsmNode;
-import de.topobyte.osm4j.core.model.iface.OsmRelation;
-import de.topobyte.osm4j.core.model.iface.OsmWay;
-import de.topobyte.osm4j.core.model.util.OsmModelUtil;
-import de.topobyte.osm4j.pbf.protobuf.Osmformat;
-import de.topobyte.osm4j.pbf.seq.PrimParser;
-import de.topobyte.osm4j.pbf.util.PbfUtil;
-import org.apache.log4j.Logger;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Phaser;
-import java.util.concurrent.atomic.AtomicInteger;
-
-class WaysPbfParser extends PbfParser implements OsmHandler {
-
+class WaysPbfParser {
+/*
     private static Logger log = Logger.getLogger(WaysPbfParser.class);
-
-    private final Phaser phaser = new Phaser();
-    private final ExecutorService executor;
 
     private final ConcurrentMap<Long, ProcessedOsmWay> ways = new ConcurrentHashMap<>();
     private final ConcurrentMap<Long, List<ProcessedOsmWay>> nodes = new ConcurrentHashMap<>();
@@ -37,6 +10,7 @@ class WaysPbfParser extends PbfParser implements OsmHandler {
     private final AtomicInteger counter = new AtomicInteger();
 
     public WaysPbfParser(ExecutorService executor, ConcurrentMap<String, LinkProperties> linkPropertiesMap) {
+        super(null, way -> handle(way), relationHandler, executor);
         this.executor = executor;
         this.linkPropertiesMap = linkPropertiesMap;
     }
@@ -145,5 +119,7 @@ class WaysPbfParser extends PbfParser implements OsmHandler {
     @Override
     public void complete() {
     }
-
+ */
 }
+
+

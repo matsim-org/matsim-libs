@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executors;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -26,25 +27,21 @@ public final class SupersonicOsmNetworkReader {
     private static final Set<String> oneWayTags = new HashSet<>(Arrays.asList("yes", "true", "1"));
     private static final Set<String> notOneWayTags = new HashSet<>(Arrays.asList("no", "false", "0"));
 
-    private final ConcurrentMap<String, LinkProperties> linkProperties;
-    private final BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy;
     private final Predicate<Long> preserveNodeWithId;
     private final AfterLinkCreated afterLinkCreated;
-    private final CoordinateTransformation coordinateTransformation;
+    private final BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy;
+    private final OsmNetworkParser parser;
 
     private Network network;
 
-    private SupersonicOsmNetworkReader(CoordinateTransformation coordinateTransformation,
-                                       ConcurrentMap<String, LinkProperties> linkPropertiesMap,
-                                       BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy, Predicate<Long> preserveNodeWithId,
+    private SupersonicOsmNetworkReader(OsmNetworkParser parser,
+                                       Predicate<Long> preserveNodeWithId,
+                                       BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy,
                                        AfterLinkCreated afterLinkCreated) {
-
-        this.coordinateTransformation = coordinateTransformation;
         this.includeLinkAtCoordWithHierarchy = includeLinkAtCoordWithHierarchy;
         this.afterLinkCreated = afterLinkCreated;
         this.preserveNodeWithId = preserveNodeWithId;
-
-        this.linkProperties = linkPropertiesMap;
+        this.parser = parser;
     }
 
     public Network read(String inputFile) {
@@ -53,11 +50,11 @@ public final class SupersonicOsmNetworkReader {
 
     public Network read(Path inputFile) {
 
-        NodesAndWays nodesAndWays = OsmNetworkParser.parse(inputFile, linkProperties, coordinateTransformation, includeLinkAtCoordWithHierarchy);
+        parser.parse(inputFile);
         this.network = NetworkUtils.createNetwork();
 
         log.info("starting convertion \uD83D\uDE80");
-        convert(nodesAndWays.getWays(), nodesAndWays.getNodes());
+        convert(parser.getWays(), parser.getNodes());
 
         log.info("finished convertion");
         return network;
@@ -181,7 +178,7 @@ public final class SupersonicOsmNetworkReader {
     private Link createLink(Node fromNode, Node toNode, WaySegment segment, Direction direction) {
 
         String highwayType = segment.getTags().get(OsmTags.HIGHWAY);
-        LinkProperties properties = linkProperties.get(highwayType);
+        LinkProperties properties = segment.getLinkProperties();
 
         String linkId = direction == Direction.Forward ? segment.getSegmentId() + "f" : segment.getSegmentId() + "r";
         Link link = network.getFactory().createLink(Id.createLinkId(linkId), fromNode, toNode);
@@ -358,9 +355,13 @@ public final class SupersonicOsmNetworkReader {
                 throw new IllegalArgumentException("Target coordinate transformation is required parameter!");
             }
 
-            return new SupersonicOsmNetworkReader(
+            OsmNetworkParser parser = new OsmNetworkParser(
                     coordinateTransformation, linkProperties, includeLinkAtCoordWithHierarchy,
-                    preserveNodeWithId, afterLinkCreated
+                    Executors.newWorkStealingPool());
+            return new SupersonicOsmNetworkReader(
+                    parser, preserveNodeWithId,
+                    includeLinkAtCoordWithHierarchy,
+                    afterLinkCreated
             );
         }
     }

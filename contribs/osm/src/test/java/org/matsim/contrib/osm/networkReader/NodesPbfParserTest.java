@@ -1,28 +1,8 @@
 package org.matsim.contrib.osm.networkReader;
 
-import de.topobyte.osm4j.core.model.iface.OsmNode;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.AtlantisToWGS84;
-import org.matsim.testcases.MatsimTestUtils;
-
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import static org.junit.Assert.assertEquals;
-
 public class NodesPbfParserTest {
 
-	private static ExecutorService executor = Executors.newSingleThreadExecutor();
+	/*private static ExecutorService executor = Executors.newSingleThreadExecutor();
 
 	@Rule
 	public MatsimTestUtils matsimUtils = new MatsimTestUtils();
@@ -174,4 +154,6 @@ public class NodesPbfParserTest {
 			}
 		}
 	}
+
+	 */
 }

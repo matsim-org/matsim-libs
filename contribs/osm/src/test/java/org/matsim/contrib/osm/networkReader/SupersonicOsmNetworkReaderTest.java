@@ -61,7 +61,7 @@ public class SupersonicOsmNetworkReaderTest {
 	@Test
 	public void singleLink() {
 
-		Utils.WaysAndLinks singleLink = Utils.createSingleLink();
+		Utils.OsmData singleLink = Utils.createSingleLink();
 
 		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-one-way.pbf");
 		writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
@@ -104,7 +104,7 @@ public class SupersonicOsmNetworkReaderTest {
 	@Test
 	public void singleLinkPreserveMiddleNode() {
 
-		Utils.WaysAndLinks singleLink = Utils.createSingleLink();
+		Utils.OsmData singleLink = Utils.createSingleLink();
 
 		Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "single-link-preserve-node.pbf");
 
@@ -583,7 +583,7 @@ public class SupersonicOsmNetworkReaderTest {
 	@Test
 	public void linkGrid_oneWayNotInFilter() {
 
-		Utils.WaysAndLinks grid = Utils.createGridWithDifferentLevels();
+		Utils.OsmData grid = Utils.createGridWithDifferentLevels();
 		final Path file = Paths.get(matsimTestUtils.getOutputDirectory(), "grid-with-filter.pbf");
 		writeOsmData(grid.getNodes(), grid.getWays(), file);
 

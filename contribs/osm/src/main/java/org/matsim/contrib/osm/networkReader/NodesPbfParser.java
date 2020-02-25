@@ -1,33 +1,7 @@
 package org.matsim.contrib.osm.networkReader;
 
-import de.topobyte.osm4j.core.access.OsmHandler;
-import de.topobyte.osm4j.core.model.iface.OsmBounds;
-import de.topobyte.osm4j.core.model.iface.OsmNode;
-import de.topobyte.osm4j.core.model.iface.OsmRelation;
-import de.topobyte.osm4j.core.model.iface.OsmWay;
-import de.topobyte.osm4j.pbf.protobuf.Osmformat;
-import de.topobyte.osm4j.pbf.seq.PrimParser;
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.NumberFormat;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Phaser;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiPredicate;
-import java.util.stream.Collectors;
-
-
-class NodesPbfParser extends PbfParser implements OsmHandler {
-
+class NodesPbfParser {
+/*
     private static final Logger log = Logger.getLogger(NodesPbfParser.class);
 
     private final Phaser phaser = new Phaser();
@@ -41,7 +15,8 @@ class NodesPbfParser extends PbfParser implements OsmHandler {
     private final ConcurrentMap<Long, ProcessedOsmNode> nodes = new ConcurrentHashMap<>();
 
     public NodesPbfParser(ExecutorService executor, BiPredicate<Coord, Integer> linkFilter, ConcurrentMap<Long, List<ProcessedOsmWay>> nodesToKeep, CoordinateTransformation coordinateTransformation) {
-        this.executor = executor;
+		super(nodeHandler, waysHandler, relationHandler, executor);
+		this.executor = executor;
         this.linkFilter = linkFilter;
         this.nodesToKeep = nodesToKeep;
         this.coordinateTransformation = coordinateTransformation;
@@ -166,4 +141,6 @@ class NodesPbfParser extends PbfParser implements OsmHandler {
     @Override
     public void complete() {
     }
+
+ */
 }

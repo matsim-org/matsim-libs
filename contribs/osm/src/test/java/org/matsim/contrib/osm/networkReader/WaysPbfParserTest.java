@@ -1,24 +1,8 @@
 package org.matsim.contrib.osm.networkReader;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-import static org.junit.Assert.assertEquals;
-
 public class WaysPbfParserTest {
 
-    private static ExecutorService executor = Executors.newSingleThreadExecutor();
+   /* private static ExecutorService executor = Executors.newSingleThreadExecutor();
 
     @Rule
     public MatsimTestUtils matsimTestUtils = new MatsimTestUtils();
@@ -73,4 +57,6 @@ public class WaysPbfParserTest {
         assertEquals(1, nodes.get(1L).size());
         assertEquals(1, nodes.get(1L).size());
     }
+    */
+
 }
