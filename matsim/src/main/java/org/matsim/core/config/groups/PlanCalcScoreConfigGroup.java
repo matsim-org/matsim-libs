@@ -118,28 +118,8 @@ public final class PlanCalcScoreConfigGroup extends ReflectiveConfigGroup {
 
 		// kai, dec'19
 
-		this.addModeParams(new ModeParams(TransportMode.car));
-		this.addModeParams(new ModeParams(TransportMode.pt));
-		this.addModeParams(new ModeParams(TransportMode.walk));
-		this.addModeParams(new ModeParams(TransportMode.bike));
-		this.addModeParams(new ModeParams(TransportMode.ride));
-		this.addModeParams(new ModeParams(TransportMode.other));
-
-		this.addActivityParams( new ActivityParams("dummy").setTypicalDuration(2. * 3600. ) );
-		// (this is there so that an empty config prints out at least one activity type, so that the explanations of this
-		// important concept show up e.g. in defaultConfig.xml, created from the GUI. kai, jul'17
-//			params.setScoringThisActivityAtAll(false); // no longer minimal when included here. kai, jun'18
-
-		// yyyyyy find better solution for this. kai, dec'15
-		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.car ) ).setScoringThisActivityAtAll(false ) );
-		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.pt )).setScoringThisActivityAtAll(false ) );
-		// (need this for self-programmed pseudo pt. kai, nov'16)
-		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.bike ) ).setScoringThisActivityAtAll(false ) );
-		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.drt ) ).setScoringThisActivityAtAll(false ) );
-		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.taxi ) ).setScoringThisActivityAtAll(false ) );
-		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.other ) ).setScoringThisActivityAtAll(false ) );
-		this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.walk ) ).setScoringThisActivityAtAll(false ) );
-		// (bushwhacking_walk---network_walk---bushwhacking_walk)
+		// TODO: what happens when something gets added?
+		this.addScoringParameters(new ScoringParameterSet(DEFAULT_SUBPOPULATION));
 	}
 
 	// ---
@@ -346,12 +326,6 @@ public final class PlanCalcScoreConfigGroup extends ReflectiveConfigGroup {
 	@Override
 	public void addParameterSet(final ConfigGroup set) {
 		switch (set.getName()) {
-		case ActivityParams.SET_TYPE:
-			addActivityParams((ActivityParams) set);
-			break;
-		case ModeParams.SET_TYPE:
-			addModeParams((ModeParams) set);
-			break;
 		case ScoringParameterSet.SET_TYPE:
 			addScoringParameters((ScoringParameterSet) set);
 			break;
@@ -895,6 +869,31 @@ public final class PlanCalcScoreConfigGroup extends ReflectiveConfigGroup {
 		private ScoringParameterSet(final String subpopulation) {
 			this();
 			this.subpopulation = subpopulation;
+
+			// TODO what happens shen adding things (erasing defaults)?
+
+			this.addModeParams(new ModeParams(TransportMode.car));
+			this.addModeParams(new ModeParams(TransportMode.pt));
+			this.addModeParams(new ModeParams(TransportMode.walk));
+			this.addModeParams(new ModeParams(TransportMode.bike));
+			this.addModeParams(new ModeParams(TransportMode.ride));
+			this.addModeParams(new ModeParams(TransportMode.other));
+
+			this.addActivityParams( new ActivityParams("dummy").setTypicalDuration(2. * 3600. ) );
+			// (this is there so that an empty config prints out at least one activity type, so that the explanations of this
+			// important concept show up e.g. in defaultConfig.xml, created from the GUI. kai, jul'17
+	//			params.setScoringThisActivityAtAll(false); // no longer minimal when included here. kai, jun'18
+
+			// yyyyyy find better solution for this. kai, dec'15
+			this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.car ) ).setScoringThisActivityAtAll(false ) );
+			this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.pt )).setScoringThisActivityAtAll(false ) );
+			// (need this for self-programmed pseudo pt. kai, nov'16)
+			this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.bike ) ).setScoringThisActivityAtAll(false ) );
+			this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.drt ) ).setScoringThisActivityAtAll(false ) );
+			this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.taxi ) ).setScoringThisActivityAtAll(false ) );
+			this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.other ) ).setScoringThisActivityAtAll(false ) );
+			this.addActivityParams( new ActivityParams(createStageActivityType( TransportMode.walk ) ).setScoringThisActivityAtAll(false ) );
+			// (bushwhacking_walk---network_walk---bushwhacking_walk)
 		}
 
 		private ScoringParameterSet() {
