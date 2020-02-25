@@ -9,6 +9,8 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.freight.FreightConfigGroup;
+import org.matsim.contrib.freight.FreightConfigGroup.UseDistanceConstraint;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
@@ -32,6 +34,7 @@ import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.CompressionType;
 import org.matsim.core.controler.Controler;
@@ -80,6 +83,9 @@ public class TestDistanceConstraint {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOutputDirectory("output/original_Chessboard_Test/Version1");
 		config.network().setInputFile(original_Chessboard);
+		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
+		freightConfigGroup.setUseDistanceConstraint(UseDistanceConstraint.basedOnEnergyConsumption);
+		String test = config.getModules().get("freight").getParams().get("useDistanceConstraint");
 		config = prepareConfig(config, 0);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -528,7 +534,6 @@ public class TestDistanceConstraint {
 	private static void solveWithJsprit(Scenario scenario, Carriers carriers, int jspritIteration,
 			CarrierVehicleTypes vehicleTypes) {
 
-		// Netzwerk integrieren und Kosten für jsprit
 		Network network = scenario.getNetwork();
 		Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(network,
 				vehicleTypes.getVehicleTypes().values());
@@ -541,7 +546,6 @@ public class TestDistanceConstraint {
 			VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(singleCarrier,
 					network);
 			vrpBuilder.setRoutingCost(netBasedCosts);
-			// VehicleRoutingProblem problem = vrpBuilder.build();
 
 			VehicleRoutingTransportCostsMatrix distanceMatrix = DistanceConstraintUtils.createMatrix(vrpBuilder,
 					singleCarrier, network, netBuilder);
