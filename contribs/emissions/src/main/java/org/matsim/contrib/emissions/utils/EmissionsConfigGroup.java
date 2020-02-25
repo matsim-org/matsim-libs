@@ -91,11 +91,20 @@ public final class EmissionsConfigGroup
 	private static final String EMISSIONS_COMPUTATION_METHOD = "emissionsComputationMethod";
 	private EmissionsComputationMethod emissionsComputationMethod = EmissionsComputationMethod.AverageSpeed;
 
+	public enum DetailedFallbackBehaviour {abort, tryTechnologyAverageOrAbort, tryTechnologyAverageOrVehicleTypeAverage}
+	private static final String DETAILED_FALLBACK_BEHAVIOUR = "detailedFallbackBehaviour";
+	private DetailedFallbackBehaviour detailedFallbackBehaviour = DetailedFallbackBehaviour.abort;
+
 	@Deprecated // should be phased out.  kai, oct'18
 	private static final String EMISSION_ROADTYPE_MAPPING_FILE_CMT = "REQUIRED if source of the HBEFA road type is set to "+HbefaRoadTypeSource.fromFile +". It maps from input road types to HBEFA 3.1 road type strings";
 	private static final String EMISSION_FACTORS_WARM_FILE_AVERAGE_CMT = "REQUIRED: file with HBEFA 3.1 fleet average warm emission factors";
 	private static final String EMISSION_FACTORS_COLD_FILE_AVERAGE_CMT = "REQUIRED: file with HBEFA 3.1 fleet average cold emission factors";
 	private static final String USING_DETAILED_EMISSION_CALCULATION_CMT = "if true then detailed emission factor files must be provided!";
+	private static final String DETAILED_EMISSION_FALLBACK_CMT = "What should be done if values are not found in detailed table? Options are:"+  "\n\t\t" +
+																		"abort; " +  "\n\t\t" +
+																		"tryOnlyTechnologyAverage: try to use semi-detailed values for 'vehicleType,technology,average,average', if not found abort;" +  "\n\t\t" +
+																		"ryTechnologyAverageOrVehicleTypeAverage: to use average values for 'vehicleType,technology,average,average', if not found use average calculation " +  "\n\t\t" +
+																		"Default is: 'abort'";
 	private static final String EMISSION_FACTORS_WARM_FILE_DETAILED_CMT = "OPTIONAL: file with HBEFA 3.1 detailed warm emission factors";
 	private static final String EMISSION_FACTORS_COLD_FILE_DETAILED_CMT = "OPTIONAL: file with HBEFA 3.1 detailed cold emission factors";
 	@Deprecated // should be phased out.  kai, oct'18
@@ -156,6 +165,8 @@ public final class EmissionsConfigGroup
 		map.put(EMISSION_FACTORS_COLD_FILE_AVERAGE, EMISSION_FACTORS_COLD_FILE_AVERAGE_CMT);
 
 		map.put(USING_DETAILED_EMISSION_CALCULATION, USING_DETAILED_EMISSION_CALCULATION_CMT);
+
+		map.put(DETAILED_FALLBACK_BEHAVIOUR, DETAILED_EMISSION_FALLBACK_CMT);
 
 		map.put(EMISSION_FACTORS_WARM_FILE_DETAILED, EMISSION_FACTORS_WARM_FILE_DETAILED_CMT) ;
 
@@ -244,6 +255,20 @@ public final class EmissionsConfigGroup
 	public void setUsingDetailedEmissionCalculation(final boolean isUsingDetailedEmissionCalculation) {
 		this.isUsingDetailedEmissionCalculation = isUsingDetailedEmissionCalculation;
 	}
+
+	/**
+	 * @param detailedFallbackBehaviour -- {@value #DETAILED_EMISSION_FALLBACK_CMT}
+	 */
+	@StringSetter(DETAILED_FALLBACK_BEHAVIOUR)
+	public void setDetailedFallbackBehaviour(DetailedFallbackBehaviour detailedFallbackBehaviour) {
+		this.detailedFallbackBehaviour = detailedFallbackBehaviour;
+	}
+
+	@StringGetter(DETAILED_FALLBACK_BEHAVIOUR)
+	public DetailedFallbackBehaviour getDetailedFallbackBehaviour() {
+		return this.detailedFallbackBehaviour;
+	}
+
 	/**
 	 * @param detailedWarmEmissionFactorsFile -- {@value #EMISSION_FACTORS_WARM_FILE_DETAILED_CMT}
 	 */
