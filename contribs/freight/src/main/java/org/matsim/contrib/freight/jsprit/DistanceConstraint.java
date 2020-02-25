@@ -30,6 +30,7 @@ import com.graphhopper.jsprit.core.algorithm.state.StateManager;
 import com.graphhopper.jsprit.core.algorithm.state.StateUpdater;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.constraint.HardActivityConstraint;
+import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
 import com.graphhopper.jsprit.core.problem.misc.JobInsertionContext;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
@@ -51,114 +52,6 @@ import com.graphhopper.jsprit.core.util.VehicleRoutingTransportCostsMatrix;
  *         beginning.
  *
  */
-class DistanceConstraintUtils {
-	static final Logger log = Logger.getLogger(DistanceConstraint.class);
-
-	/**
-	 * Creates a VehicleRoutingCostMatrix for calculating the distance between all
-	 * different locations of a carrier. Matrix has informations about the distance
-	 * and the travelTime between every location. This is necessary for the
-	 * distanceConstraint for the electric vehicles, because in the normal
-	 * netBasedCosts only costs and travelTimes are calculated. Therefore for every
-	 * from/to pair a jsprit searches the a good route (depends on the number of
-	 * iterations for this little jsprit problem with one simple service). Perhaps a
-	 * better solution for creating this matrix is possible.
-	 * 
-	 * @param vrpBuilder
-	 * @param singleCarrier
-	 * @param network
-	 * @param netBuilder
-	 * @return
-	 */
-
-	static VehicleRoutingTransportCostsMatrix createMatrix(VehicleRoutingProblem.Builder vrpBuilder,
-			Carrier singleCarrier, Network network, Builder netBuilder) {
-
-		double distance = 0;
-		int startTime = 10000000;
-		int endTime = 0;
-		int duration = 0;
-
-		VehicleRoutingTransportCostsMatrix.Builder distanceMatrixBuilder = VehicleRoutingTransportCostsMatrix.Builder
-				.newInstance(false);
-
-		final NetworkBasedTransportCosts netBasedCostsMatrix = netBuilder.build();
-
-		for (String from : vrpBuilder.getLocationMap().keySet()) {
-			for (String to : vrpBuilder.getLocationMap().keySet()) {
-
-				if (from.equals(to)) {
-					distanceMatrixBuilder.addTransportDistance(from, to, 0);
-					distanceMatrixBuilder.addTransportTime(from, to, (0));
-
-				} else {
-
-					Carrier oneShipmentCarrier = CarrierUtils.createCarrier(Id.create("OneShipment", Carrier.class));
-					for (VehicleType vehicleType : singleCarrier.getCarrierCapabilities().getVehicleTypes()) {
-
-						CarrierVehicle testVehicle = CarrierVehicle.Builder
-								.newInstance(Id.create("testVehicle", Vehicle.class), Id.createLinkId(from))
-								.setEarliestStart(0).setLatestEnd(72 * 3600).setType(vehicleType)
-								.setTypeId(vehicleType.getId()).build();
-						oneShipmentCarrier.getCarrierCapabilities().getVehicleTypes().add(vehicleType);
-						CarrierUtils.addCarrierVehicle(oneShipmentCarrier, testVehicle);
-						oneShipmentCarrier.getCarrierCapabilities().setFleetSize(FleetSize.FINITE);
-						break;
-					}
-
-					CarrierService testService = CarrierService.Builder
-							.newInstance(Id.create("singleService", CarrierService.class), Id.createLinkId(to))
-							.setServiceDuration(0).build();
-					CarrierUtils.addService(oneShipmentCarrier, testService);
-
-					VehicleRoutingProblem.Builder vrpBuilder2 = MatsimJspritFactory
-							.createRoutingProblemBuilder(oneShipmentCarrier, network);
-					vrpBuilder2.setRoutingCost(netBasedCostsMatrix);
-					VehicleRoutingProblem problem = vrpBuilder2.build();
-					VehicleRoutingAlgorithm algorithm = new SchrimpfFactory().createAlgorithm(problem);
-					algorithm.setMaxIterations(25);
-					Collection<VehicleRoutingProblemSolution> solutions = algorithm.searchSolutions();
-					VehicleRoutingProblemSolution bestSolution = Solutions.bestOf(solutions);
-					CarrierPlan carrierPlanServices = MatsimJspritFactory.createPlan(oneShipmentCarrier, bestSolution);
-					NetworkRouter.routePlan(carrierPlanServices, netBasedCostsMatrix);
-					oneShipmentCarrier.setSelectedPlan(carrierPlanServices);
-
-					for (ScheduledTour tour : carrierPlanServices.getScheduledTours()) {
-						distance = 0.0;
-
-						for (Tour.TourElement element : tour.getTour().getTourElements()) {
-							if (element instanceof Tour.Leg) {
-								Tour.Leg legElement = (Tour.Leg) element;
-								if (legElement.getRoute().getDistance() != 0 && legElement.getRoute() != null)
-									distance = distance + RouteUtils.calcDistance((NetworkRoute) legElement.getRoute(),
-											0, 0, network);
-
-								if (startTime > legElement.getExpectedDepartureTime())
-									startTime = (int) legElement.getExpectedDepartureTime();
-								if (endTime < (legElement.getExpectedDepartureTime()
-										+ legElement.getExpectedTransportTime()))
-									endTime = (int) (legElement.getExpectedDepartureTime()
-											+ legElement.getExpectedTransportTime());
-							}
-							if (element instanceof Tour.ServiceActivity) {
-								break;
-							}
-						}
-						duration = endTime - startTime;
-
-						distanceMatrixBuilder.addTransportDistance(from, to, distance);
-						distanceMatrixBuilder.addTransportTime(from, to, (duration));
-					}
-				}
-
-			}
-		}
-
-		return distanceMatrixBuilder.build();
-	}
-
-}
-
 /**
  * Creates the distance constrain
  *
@@ -167,18 +60,18 @@ class DistanceConstraint implements HardActivityConstraint {
 
 	private final StateManager stateManager;
 
-	private final VehicleRoutingTransportCostsMatrix costsMatrix;
-
 	private final StateId distanceStateId;
 
 	private final CarrierVehicleTypes vehicleTypes;
 
-	DistanceConstraint(StateId distanceStateId, StateManager stateManager,
-			VehicleRoutingTransportCostsMatrix transportCosts, CarrierVehicleTypes vehicleTypes) {
-		this.costsMatrix = transportCosts;
+	private final NetworkBasedTransportCosts netBasedCosts;
+
+	DistanceConstraint(StateId distanceStateId, StateManager stateManager, CarrierVehicleTypes vehicleTypes,
+			NetworkBasedTransportCosts netBasedCosts) {
 		this.stateManager = stateManager;
 		this.distanceStateId = distanceStateId;
 		this.vehicleTypes = vehicleTypes;
+		this.netBasedCosts = netBasedCosts;
 	}
 
 	/**
@@ -203,8 +96,8 @@ class DistanceConstraint implements HardActivityConstraint {
 		VehicleType vehicleTypeOfNewVehicle = vehicleTypes.getVehicleTypes()
 				.get(Id.create(context.getNewVehicle().getType().getTypeId().toString(), VehicleType.class));
 
-		if (vehicleTypeOfNewVehicle.getEngineInformation().getAttributes()
-				.getAttribute("fuelType").equals("electricity")) {
+		if (vehicleTypeOfNewVehicle.getEngineInformation().getAttributes().getAttribute("fuelType")
+				.equals("electricity")) {
 
 			Double electricityCapacityinkWh = (Double) vehicleTypeOfNewVehicle.getEngineInformation().getAttributes()
 					.getAttribute("engeryCapacity");
@@ -328,7 +221,10 @@ class DistanceConstraint implements HardActivityConstraint {
 	}
 
 	private double getDistance(TourActivity from, TourActivity to) {
-		return costsMatrix.getDistance(from.getLocation().getId(), to.getLocation().getId());
+		return netBasedCosts.getTransportDistance(from.getLocation(), to.getLocation(), 0, null, null);
+
+		// return costsMatrix.getDistance(from.getLocation().getId(),
+		// to.getLocation().getId());
 	}
 }
 
@@ -340,8 +236,6 @@ class DistanceUpdater implements StateUpdater, ActivityVisitor {
 
 	private final StateManager stateManager;
 
-	private final VehicleRoutingTransportCostsMatrix costMatrix;
-
 	private final StateId distanceStateId;
 
 	private VehicleRoute vehicleRoute;
@@ -350,11 +244,13 @@ class DistanceUpdater implements StateUpdater, ActivityVisitor {
 
 	private TourActivity prevAct;
 
+	private final NetworkBasedTransportCosts netBasedCosts;
+
 	public DistanceUpdater(StateId distanceStateId, StateManager stateManager,
-			VehicleRoutingTransportCostsMatrix transportCosts) {
-		this.costMatrix = transportCosts;
+			NetworkBasedTransportCosts netBasedCosts) {
 		this.stateManager = stateManager;
 		this.distanceStateId = distanceStateId;
+		this.netBasedCosts = netBasedCosts;
 	}
 
 	@Override
@@ -377,6 +273,8 @@ class DistanceUpdater implements StateUpdater, ActivityVisitor {
 	}
 
 	double getDistance(TourActivity from, TourActivity to) {
-		return costMatrix.getDistance(from.getLocation().getId(), to.getLocation().getId());
+		return netBasedCosts.getTransportDistance(from.getLocation(), to.getLocation(), 0, null, null);
+		// return costMatrix.getDistance(from.getLocation().getId(),
+		// to.getLocation().getId());
 	}
 }

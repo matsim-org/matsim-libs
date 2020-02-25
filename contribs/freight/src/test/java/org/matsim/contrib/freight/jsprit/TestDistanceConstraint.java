@@ -547,20 +547,17 @@ public class TestDistanceConstraint {
 					network);
 			vrpBuilder.setRoutingCost(netBasedCosts);
 
-			VehicleRoutingTransportCostsMatrix distanceMatrix = DistanceConstraintUtils.createMatrix(vrpBuilder,
-					singleCarrier, network, netBuilder);
-
 			VehicleRoutingProblem problem = vrpBuilder.build();
 
 			StateManager stateManager = new StateManager(problem);
 
 			StateId distanceStateId = stateManager.createStateId("distance");
 
-			stateManager.addStateUpdater(new DistanceUpdater(distanceStateId, stateManager, distanceMatrix));
+			stateManager.addStateUpdater(new DistanceUpdater(distanceStateId, stateManager, netBasedCosts));
 
 			ConstraintManager constraintManager = new ConstraintManager(problem, stateManager);
 			constraintManager.addConstraint(
-					new DistanceConstraint(distanceStateId, stateManager, distanceMatrix, vehicleTypes),
+					new DistanceConstraint(distanceStateId, stateManager, vehicleTypes, netBasedCosts),
 					ConstraintManager.Priority.CRITICAL);
 
 			// get the algorithm out-of-the-box, search solution and get the best one.
