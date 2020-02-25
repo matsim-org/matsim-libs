@@ -74,31 +74,11 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
-				<configuration>
-					<release>11</release>
-					<showWarnings>false</showWarnings>
-					<showDeprecation>false</showDeprecation>
-					<encoding>UTF-8</encoding>
-					<!-- configure initial and maximal memory for compiling -->
-					<fork>true</fork>
-					<meminitial>128m</meminitial>
-					<maxmem>512m</maxmem>
-					<compilerArguments>
-						<Xmaxwarns>4000</Xmaxwarns>
-						<Xmaxerrs>100</Xmaxerrs>
-					</compilerArguments>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.19</version>
+				<version>2.22.2</version>
 				<configuration>
 					<excludes>
 						<exclude>**/*$*</exclude> <!-- exclude all inner classes -->
-						<exclude>org/matsim/testcases/TestDepth.java</exclude>
 						<exclude>org/matsim/testcases/MatsimTestCase.java</exclude>
 					</excludes>
 					<forkMode>once</forkMode>
@@ -112,7 +92,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3.1</version>
+				<version>3.2.0</version>
 				<executions>
 					<execution>
 						<goals>
@@ -133,7 +113,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>2.2.1</version>
+				<version>3.2.0</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -146,7 +126,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.10.1</version>
+				<version>3.1.1</version>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
@@ -156,7 +136,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<source>8</source><!--can be skipped from maven-javadoc-plugin 3.1.0-->
+					<!--source>8</source--><!--can be skipped from maven-javadoc-plugin 3.1.0-->
 					<quiet>true</quiet>
 					<header>MATSim API</header>
 					<excludePackageNames>org.matsim.jaxb:org.matsim.jaxb.*</excludePackageNames>
@@ -191,14 +171,13 @@
 						</group>
 					</groups>
 					<detectLinks>true</detectLinks>
-					<additionalparam>-Xdoclint:none</additionalparam>
+					<additionalJOption>-Xdoclint:none</additionalJOption>
 					<linksource>true</linksource>
 				</configuration>
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2.1</version>
-				<!-- Setting this to 2.2.1 because I want to be able to skip assembly from the command line.  kai, jun'17  -->
+				<version>3.2.0</version>
 				<configuration>
 					<descriptors>
 						<descriptor>src/main/assembly/assembly-release.xml</descriptor>
@@ -217,7 +196,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-failsafe-plugin</artifactId>
-				<version>2.19.1</version>
+				<version>2.22.2</version>
 				<executions>
 					<execution>
 						<goals>
@@ -259,12 +238,12 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>2.22.0</version>
+				<version>2.22.2</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-pmd-plugin</artifactId>
-				<version>3.10.0</version>
+				<version>3.13.0</version>
 				<configuration>
 					<sourceEncoding>utf-8</sourceEncoding>
 					<targetJdk>1.8</targetJdk>
@@ -272,13 +251,8 @@
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>javancss-maven-plugin</artifactId>
-				<version>2.1</version>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>findbugs-maven-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.0.5</version>
 				<configuration>
 					<effort>Max</effort>
 					<threshold>Low</threshold>
@@ -479,6 +453,9 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<maven.compiler.source>11</maven.compiler.source>
+		<maven.compiler.target>11</maven.compiler.target>
 		<geotools.version>21.1</geotools.version>
 		<guice.version>4.2.2</guice.version>
 	</properties>
