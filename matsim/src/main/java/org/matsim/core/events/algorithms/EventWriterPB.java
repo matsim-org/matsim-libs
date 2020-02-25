@@ -1,18 +1,9 @@
 package org.matsim.core.events.algorithms;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.utils.pb.*;
-import org.matsim.core.utils.pb.ActivityFacilityId;
-import org.matsim.core.utils.pb.ContentType;
-import org.matsim.core.utils.pb.DepartureId;
-import org.matsim.core.utils.pb.LinkId;
-import org.matsim.core.utils.pb.PBFileHeader;
-import org.matsim.core.utils.pb.PersonId;
-import org.matsim.core.utils.pb.ProtoEvents;
-import org.matsim.core.utils.pb.TransitLineId;
-import org.matsim.core.utils.pb.TransitRouteId;
-import org.matsim.core.utils.pb.VehicleId;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,7 +20,6 @@ public class EventWriterPB implements EventWriter, BasicEventHandler {
     public EventWriterPB(OutputStream out) {
 
         this.out = out;
-
         PBFileHeader header = PBFileHeader.newBuilder()
                 .setVersion(PBVersion.EVENTS)
                 .setContentType(ContentType.EVENTS)
@@ -78,76 +68,76 @@ public class EventWriterPB implements EventWriter, BasicEventHandler {
                     .putAllAttrs(event.getAttributes());
         } else if (event instanceof ActivityEndEvent) {
             builder.getActivityEndBuilder()
-                    .setLinkId(LinkId.newBuilder().setId(((ActivityEndEvent) event).getLinkId().toString()))
-                    .setFacilityId(ActivityFacilityId.newBuilder().setId(((ActivityEndEvent) event).getFacilityId().toString()))
-                    .setPersonId(PersonId.newBuilder().setId(((ActivityEndEvent) event).getPersonId().toString()))
+                    .setLinkId(convertId(((ActivityEndEvent) event).getLinkId()))
+                    .setFacilityId(convertId(((ActivityEndEvent) event).getFacilityId()))
+                    .setPersonId(convertId(((ActivityEndEvent) event).getPersonId()))
                     .setActtype(((ActivityEndEvent) event).getActType());
         } else if (event instanceof ActivityStartEvent) {
             builder.getActivityStartBuilder()
-                    .setLinkId(LinkId.newBuilder().setId(((ActivityStartEvent) event).getLinkId().toString()))
-                    .setFacilityId(ActivityFacilityId.newBuilder().setId(((ActivityStartEvent) event).getFacilityId().toString()))
-                    .setPersonId(PersonId.newBuilder().setId(((ActivityStartEvent) event).getPersonId().toString()))
+                    .setLinkId(convertId(((ActivityStartEvent) event).getLinkId()))
+                    .setFacilityId(convertId(((ActivityStartEvent) event).getFacilityId()))
+                    .setPersonId(convertId(((ActivityStartEvent) event).getPersonId()))
                     .setActtype(((ActivityStartEvent) event).getActType());
         } else if (event instanceof LinkEnterEvent) {
             builder.getLinkEnterBuilder()
-                    .setLinkId(LinkId.newBuilder().setId(((LinkEnterEvent) event).getLinkId().toString()))
-                    .setVehicleId(VehicleId.newBuilder().setId(((LinkEnterEvent) event).getVehicleId().toString()));
+                    .setLinkId(convertId(((LinkEnterEvent) event).getLinkId()))
+                    .setVehicleId(convertId(((LinkEnterEvent) event).getVehicleId()));
         } else if (event instanceof LinkLeaveEvent) {
             builder.getLinkLeaveBuilder()
-                    .setLinkId(LinkId.newBuilder().setId(((LinkLeaveEvent) event).getLinkId().toString()))
-                    .setVehicleId(VehicleId.newBuilder().setId(((LinkLeaveEvent) event).getVehicleId().toString()));
+                    .setLinkId(convertId(((LinkLeaveEvent) event).getLinkId()))
+                    .setVehicleId(convertId(((LinkLeaveEvent) event).getVehicleId()));
         } else if (event instanceof PersonArrivalEvent) {
             builder.getPersonalArrivalBuilder()
-                    .setLinkId(LinkId.newBuilder().setId(((PersonArrivalEvent) event).getLinkId().toString()))
+                    .setLinkId(convertId(((PersonArrivalEvent) event).getLinkId()))
                     .setLegMode(((PersonArrivalEvent) event).getLegMode())
-                    .setPersonId(PersonId.newBuilder().setId(((PersonArrivalEvent) event).getPersonId().toString()));
+                    .setPersonId(convertId(((PersonArrivalEvent) event).getPersonId()));
         } else if (event instanceof PersonDepartureEvent) {
             builder.getPersonDepartureBuilder()
-                    .setLinkId(LinkId.newBuilder().setId(((PersonDepartureEvent) event).getLinkId().toString()))
+                    .setLinkId(convertId(((PersonDepartureEvent) event).getLinkId()))
                     .setLegMode(((PersonDepartureEvent) event).getLegMode())
-                    .setPersonId(PersonId.newBuilder().setId(((PersonDepartureEvent) event).getPersonId().toString()));
+                    .setPersonId(convertId(((PersonDepartureEvent) event).getPersonId()));
         } else if (event instanceof PersonEntersVehicleEvent) {
             builder.getPersonEntersVehicleBuilder()
-                    .setVehicleId(VehicleId.newBuilder().setId(((PersonEntersVehicleEvent) event).getVehicleId().toString()))
-                    .setPersonId(PersonId.newBuilder().setId(((PersonEntersVehicleEvent) event).getPersonId().toString()));
+                    .setVehicleId(convertId(((PersonEntersVehicleEvent) event).getVehicleId()))
+                    .setPersonId(convertId(((PersonEntersVehicleEvent) event).getPersonId()));
         } else if (event instanceof PersonLeavesVehicleEvent) {
             builder.getPersonLeavesVehicleBuilder()
-                    .setVehicleId(VehicleId.newBuilder().setId(((PersonLeavesVehicleEvent) event).getVehicleId().toString()))
-                    .setPersonId(PersonId.newBuilder().setId(((PersonLeavesVehicleEvent) event).getPersonId().toString()));
+                    .setVehicleId(convertId(((PersonLeavesVehicleEvent) event).getVehicleId()))
+                    .setPersonId(convertId(((PersonLeavesVehicleEvent) event).getPersonId()));
         } else if (event instanceof PersonMoneyEvent) {
             builder.getPersonMoneyBuilder()
-                    .setPersonId(PersonId.newBuilder().setId(((PersonMoneyEvent) event).getPersonId().toString()))
+                    .setPersonId(convertId(((PersonMoneyEvent) event).getPersonId()))
                     .setAmount(((PersonMoneyEvent) event).getAmount())
                     .setPurpose(((PersonMoneyEvent) event).getPurpose())
                     .setTransactionPartner(((PersonMoneyEvent) event).getTransactionPartner());
         } else if (event instanceof PersonStuckEvent) {
             builder.getPersonStuckBuilder()
-                    .setLinkId(LinkId.newBuilder().setId(((PersonStuckEvent) event).getLinkId().toString()))
-                    .setPersonId(PersonId.newBuilder().setId(((PersonStuckEvent) event).getPersonId().toString()))
+                    .setLinkId(convertId(((PersonStuckEvent) event).getLinkId()))
+                    .setPersonId(convertId(((PersonStuckEvent) event).getPersonId()))
                     .setLegMode(((PersonStuckEvent) event).getLegMode());
         } else if (event instanceof TransitDriverStartsEvent) {
             builder.getTransitDriverStartsBuilder()
-                    .setDriverId(PersonId.newBuilder().setId(((TransitDriverStartsEvent) event).getDriverId().toString()))
-                    .setVehicleId(VehicleId.newBuilder().setId(((TransitDriverStartsEvent) event).getVehicleId().toString()))
-                    .setTransitRouteId(TransitRouteId.newBuilder().setId(((TransitDriverStartsEvent) event).getTransitRouteId().toString()))
-                    .setTransitLineId(TransitLineId.newBuilder().setId(((TransitDriverStartsEvent) event).getTransitLineId().toString()))
-                    .setDepartureId(DepartureId.newBuilder().setId(((TransitDriverStartsEvent) event).getDepartureId().toString()));
+                    .setDriverId(convertId(((TransitDriverStartsEvent) event).getDriverId()))
+                    .setVehicleId(convertId(((TransitDriverStartsEvent) event).getVehicleId()))
+                    .setTransitRouteId(convertId(((TransitDriverStartsEvent) event).getTransitRouteId()))
+                    .setTransitLineId(convertId(((TransitDriverStartsEvent) event).getTransitLineId()))
+                    .setDepartureId(convertId(((TransitDriverStartsEvent) event).getDepartureId()));
         } else if (event instanceof VehicleAbortsEvent) {
             builder.getVehicleAbortsBuilder()
-                    .setVehicleId(VehicleId.newBuilder().setId(((VehicleAbortsEvent) event).getVehicleId().toString()))
-                    .setLinkId(LinkId.newBuilder().setId(((VehicleAbortsEvent) event).getLinkId().toString()));
+                    .setVehicleId(convertId(((VehicleAbortsEvent) event).getVehicleId()))
+                    .setLinkId(convertId(((VehicleAbortsEvent) event).getLinkId()));
         } else if (event instanceof VehicleEntersTrafficEvent) {
             builder.getVehicleEntersTrafficBuilder()
-                    .setDriverId(PersonId.newBuilder().setId(((VehicleEntersTrafficEvent) event).getPersonId().toString()))
-                    .setLinkId(LinkId.newBuilder().setId(((VehicleEntersTrafficEvent) event).getLinkId().toString()))
-                    .setVehicleId(VehicleId.newBuilder().setId(((VehicleEntersTrafficEvent) event).getVehicleId().toString()))
+                    .setDriverId(convertId(((VehicleEntersTrafficEvent) event).getPersonId()))
+                    .setLinkId(convertId(((VehicleEntersTrafficEvent) event).getLinkId()))
+                    .setVehicleId(convertId(((VehicleEntersTrafficEvent) event).getVehicleId()))
                     .setNetworkMode(((VehicleEntersTrafficEvent) event).getNetworkMode())
                     .setRelativePositionOnLink(((VehicleEntersTrafficEvent) event).getRelativePositionOnLink());
         } else if (event instanceof VehicleLeavesTrafficEvent) {
             builder.getVehicleLeavesTrafficBuilder()
-                    .setDriverId(PersonId.newBuilder().setId(((VehicleLeavesTrafficEvent) event).getPersonId().toString()))
-                    .setLinkId(LinkId.newBuilder().setId(((VehicleLeavesTrafficEvent) event).getLinkId().toString()))
-                    .setVehicleId(VehicleId.newBuilder().setId(((VehicleLeavesTrafficEvent) event).getVehicleId().toString()))
+                    .setDriverId(convertId(((VehicleLeavesTrafficEvent) event).getPersonId()))
+                    .setLinkId(convertId(((VehicleLeavesTrafficEvent) event).getLinkId()))
+                    .setVehicleId(convertId(((VehicleLeavesTrafficEvent) event).getVehicleId()))
                     .setNetworkMode(((VehicleLeavesTrafficEvent) event).getNetworkMode())
                     .setRelativePositionOnLink(((VehicleLeavesTrafficEvent) event).getRelativePositionOnLink());
         } else {
@@ -159,4 +149,20 @@ public class EventWriterPB implements EventWriter, BasicEventHandler {
 
         return builder.build();
     }
+
+    /**
+     * Convert any id to protobuf equivalent.
+     * @return {@link ProtoId} default instance if null
+     */
+    public static ProtoId convertId(Id<?> id) {
+
+        if (id == null) {
+            return ProtoId.getDefaultInstance();
+        }
+
+        // TODO: types or indices are not converted yet
+
+        return ProtoId.newBuilder().setId(id.toString()).build();
+    }
+
 }

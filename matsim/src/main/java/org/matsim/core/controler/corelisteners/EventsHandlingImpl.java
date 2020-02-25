@@ -21,6 +21,7 @@
 package org.matsim.core.controler.corelisteners;
 
 import java.io.OutputStream;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -92,9 +93,10 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 								Controler.DefaultFiles.events)));
 						break;
 					case pb:
-						OutputStream out = IOUtils.getOutputStream(IOUtils.getFileUrl(controlerIO.getIterationFilename(event.getIteration(),
-								Controler.DefaultFiles.events.toString().replace(".xml", ".pb"))), false);
-						this.eventWriters.add(new EventWriterPB(out));
+						// TODO: .xml suffix is hardcoded in the default files and not accessible
+						URL url = IOUtils.getFileUrl(controlerIO.getIterationFilename(event.getIteration(),
+								Controler.DefaultFiles.events.name() + ".pb.gz"));
+						this.eventWriters.add(new EventWriterPB(IOUtils.getOutputStream(url, false)));
 						break;
 					default:
 						log.warn("Unknown events file format specified: " + format.toString() + ".");

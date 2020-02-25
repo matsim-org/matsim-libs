@@ -44,89 +44,89 @@ message GenericEvent {
 
 message ActivityEndEvent {
 
-    LinkId linkId = 1;
-    ActivityFacilityId facilityId = 2;
-    PersonId personId = 3;
+    ProtoId linkId = 1;
+    ProtoId facilityId = 2;
+    ProtoId personId = 3;
     string acttype = 4;
 }
 
 message ActivityStartEvent {
-    LinkId linkId = 1;
-    ActivityFacilityId facilityId = 2;
-    PersonId personId = 3;
+    ProtoId linkId = 1;
+    ProtoId facilityId = 2;
+    ProtoId personId = 3;
     string acttype = 4;
 }
 
 message LinkEnterEvent {
-    LinkId linkId = 1;
-    VehicleId vehicleId = 2;
+    ProtoId linkId = 1;
+    ProtoId vehicleId = 2;
 }
 
 message LinkLeaveEvent {
-    LinkId linkId = 1;
-    VehicleId vehicleId = 2;
+    ProtoId linkId = 1;
+    ProtoId vehicleId = 2;
 }
 
 message PersonArrivalEvent {
-    LinkId linkId = 1;
+    ProtoId linkId = 1;
     string legMode = 2;
-    PersonId personId = 3;
+    ProtoId personId = 3;
 }
 
 message PersonDepartureEvent {
-    LinkId linkId = 1;
+    ProtoId linkId = 1;
     string legMode = 2;
-    PersonId personId = 3;
+    ProtoId personId = 3;
 }
 
 message PersonEntersVehicleEvent {
-    PersonId personId = 1;
-    VehicleId vehicleId = 2;
+    ProtoId personId = 1;
+    ProtoId vehicleId = 2;
 }
 
 message PersonLeavesVehicleEvent {
-    PersonId personId = 1;
-    VehicleId vehicleId = 2;
+    ProtoId personId = 1;
+    ProtoId vehicleId = 2;
 }
 
 message PersonMoneyEvent {
-    PersonId personId = 1;
+    ProtoId personId = 1;
     double amount = 2;
     string purpose = 3;
     string transactionPartner = 4;
 }
 
 message PersonStuckEvent {
-    PersonId personId = 1;
-    LinkId linkId = 2;
+    ProtoId personId = 1;
+    ProtoId linkId = 2;
     string legMode = 3;
 }
 
 message TransitDriverStartsEvent {
-    PersonId driverId = 1;
-    VehicleId vehicleId = 2;
-    TransitRouteId transitRouteId = 3;
-    TransitLineId transitLineId = 4;
-    DepartureId departureId = 5;
+    ProtoId driverId = 1;
+    ProtoId vehicleId = 2;
+    ProtoId transitRouteId = 3;
+    ProtoId transitLineId = 4;
+    ProtoId departureId = 5;
 }
 
 message VehicleAbortsEvent {
-    VehicleId vehicleId = 1;
-    LinkId linkId = 2;
+    ProtoId vehicleId = 1;
+    ProtoId linkId = 2;
 }
 
 message VehicleEntersTrafficEvent {
-    PersonId driverId = 1;
-    LinkId linkId = 2;
-    VehicleId vehicleId = 3;
+    ProtoId driverId = 1;
+    ProtoId linkId = 2;
+    ProtoId vehicleId = 3;
     string networkMode = 4;
     double relativePositionOnLink = 5;
 }
 
 message VehicleLeavesTrafficEvent {
-    PersonId driverId = 1;
-    LinkId linkId = 2;
-    VehicleId vehicleId = 3;
+    ProtoId driverId = 1;
+    ProtoId linkId = 2;
+    ProtoId vehicleId = 3;
     string networkMode = 4;
     double relativePositionOnLink = 5;
 }

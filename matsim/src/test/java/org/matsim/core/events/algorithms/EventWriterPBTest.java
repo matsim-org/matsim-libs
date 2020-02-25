@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.core.utils.pb.ProtoEvents;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,4 +37,27 @@ public class EventWriterPBTest {
                 .hasFieldOrPropertyWithValue("legMode", "test")
                 .has(new Condition<>(e -> e.getPersonId().getId().equals("15") && e.getLinkId().getId().equals("20"),"Ids correct"));
     }
+
+    @Test
+    public void convertId() {
+
+        Id<Vehicle> id = Id.createVehicleId(123);
+
+        ProtoEvents.LinkEnterEvent msg = ProtoEvents.LinkEnterEvent
+                .newBuilder()
+                .setLinkId(EventWriterPB.convertId(id))
+                .build();
+
+        assertThat(msg.hasLinkId());
+
+
+        msg = ProtoEvents.LinkEnterEvent
+                .newBuilder()
+                .setLinkId(EventWriterPB.convertId(null))
+                .build();
+
+
+        assertThat(!msg.hasLinkId());
+    }
+
 }

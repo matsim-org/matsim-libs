@@ -21,7 +21,6 @@ package org.matsim.core.controler.corelisteners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -136,22 +135,42 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		if (!event.isUnexpected() && this.vspConfig.isWritingOutputEvents() && (this.controlerConfigGroup.getWriteEventsInterval()!=0)) {
 			dumpOutputEvents();
 		}
-		
-		dumpExperiencedPlans() ;
+
+		dumpExperiencedPlans();
 	}
 
 	private void dumpOutputEvents() {
-		try {
-			File toFile = new File(this.controlerIO.getOutputFilename(Controler.DefaultFiles.events));
-			File fromFile = new File(this.controlerIO.getIterationFilename(this.controlerConfigGroup.getLastIteration(), Controler.DefaultFiles.events));
+
+		for (ControlerConfigGroup.EventsFileFormat format : controlerConfigGroup.getEventsFileFormats()) {
 			try {
-				Files.copy(fromFile.toPath(), toFile.toPath(),StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.COPY_ATTRIBUTES);
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
+				File toFile;
+				File fromFile;
+
+				switch (format) {
+					case xml:
+						toFile = new File(this.controlerIO.getOutputFilename(Controler.DefaultFiles.events));
+						fromFile = new File(this.controlerIO.getIterationFilename(this.controlerConfigGroup.getLastIteration(), Controler.DefaultFiles.events));
+						break;
+					case pb:
+						// OUTPUT_PREFIX is not visible, but also not used consistently
+						toFile = new File(this.controlerIO.getOutputFilename("output_" + Controler.DefaultFiles.events.name() + ".pb.gz"));
+						// same ending as in EventsHandlingImpl
+						fromFile = new File(this.controlerIO.getIterationFilename(this.controlerConfigGroup.getLastIteration(),
+								Controler.DefaultFiles.events.name() + ".pb.gz"));
+						break;
+					default:
+						continue;
+				}
+
+				try {
+					Files.copy(fromFile.toPath(), toFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
+			} catch (Exception ee) {
+				Logger.getLogger(this.getClass()).error("writing output events did not work; probably parameters were such that no events were "
+						+ "generated in the final iteration");
 			}
-		} catch ( Exception ee ) {
-			Logger.getLogger(this.getClass()).error("writing output events did not work; probably parameters were such that no events were "
-					+ "generated in the final iteration" );
 		}
 	}
 
