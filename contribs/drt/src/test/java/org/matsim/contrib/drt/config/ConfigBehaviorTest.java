@@ -28,10 +28,12 @@ public class ConfigBehaviorTest{
                         {
                                 ConfigGroup abc = multiModeDrtConfigGroup.createParameterSet( DrtConfigGroup.GROUP_NAME );
                                 abc.addParam( "mode", "drt20" );
+                                multiModeDrtConfigGroup.addParameterSet(abc);
                         }
                         {
                                 ConfigGroup abc = multiModeDrtConfigGroup.createParameterSet( DrtConfigGroup.GROUP_NAME );
                                 abc.addParam( "mode", "drt20000" );
+                                multiModeDrtConfigGroup.addParameterSet(abc);
                         }
                         ConfigUtils.writeConfig( config, utils.getOutputDirectory() + "ad-hoc-config.xml" );
                 }
