@@ -30,6 +30,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.ScoringParameters;
+
 import java.util.*;
 
 /**
@@ -234,12 +236,6 @@ public final class PlanCalcScoreConfigGroup extends ReflectiveConfigGroup {
 		this.writeExperiencedPlans = writeExperiencedPlans;
 	}
 
-
-	public ModeParams getOrCreateModeParams(String modeName) {
-		return getScoringParameters(null).getOrCreateModeParams(modeName);
-	}
-
-
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String, String> map = super.getComments();
@@ -291,7 +287,7 @@ public final class PlanCalcScoreConfigGroup extends ReflectiveConfigGroup {
 			Set<String> activities = new HashSet<>();
 			getScoringParametersPerSubpopulation().values().forEach(item -> activities.addAll(item.getActivityParamsPerType().keySet()));
 			return activities;
-	}
+		}
 	}
 
 	/*
@@ -310,26 +306,6 @@ public final class PlanCalcScoreConfigGroup extends ReflectiveConfigGroup {
 		
 	}
 	
-	public Collection<ActivityParams> getActivityParams() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getActivityParams();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getActivityParams();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
-	}
-
-	public Map<String, ModeParams> getModes() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getModes();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getModes();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
-	}
-
-	
-	
 	public Map<String, ScoringParameterSet> getScoringParametersPerSubpopulation() {
 		@SuppressWarnings("unchecked")
 		final Collection<ScoringParameterSet> parameters = (Collection<ScoringParameterSet>) getParameterSets(
@@ -346,37 +322,14 @@ public final class PlanCalcScoreConfigGroup extends ReflectiveConfigGroup {
 		return map;
 	}
 
-	/* direct access */
-
-	public double getMarginalUtlOfWaitingPt_utils_hr() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getMarginalUtlOfWaitingPt_utils_hr();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getMarginalUtlOfWaitingPt_utils_hr();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
-
-	}
-
-	public void setMarginalUtlOfWaitingPt_utils_hr(double val) {
-		getScoringParameters(null).setMarginalUtlOfWaitingPt_utils_hr(val);
-	}
-
-	public ActivityParams getActivityParams(final String actType) {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getActivityParams(actType);
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getActivityParams(actType);
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
-
-	}
-
 	public ScoringParameterSet getScoringParameters(String subpopulation) {
 		final ScoringParameterSet params = getScoringParametersPerSubpopulation().get(subpopulation);
-		// If no config parameters defined for a specific subpopulation,
-		// use the ones of the "default" subpopulation
-		return params != null ? params : getScoringParametersPerSubpopulation().get(null);
+		if (params == null) {
+			throw new IllegalStateException("No scoring parameters for subpopulation "+subpopulation+
+				"Please explicitly define scoring parameters for all subpopulations in "+GROUP_NAME
+			);
+		}
+		return params;
 	}
 
 	public ScoringParameterSet getOrCreateScoringParameters(String subpopulation) {
@@ -419,14 +372,6 @@ public final class PlanCalcScoreConfigGroup extends ReflectiveConfigGroup {
 		}
 
 		super.addParameterSet(params);
-	}
-
-	public void addModeParams(final ModeParams params) {
-		getScoringParameters(null).addModeParams(params);
-	}
-
-	public void addActivityParams(final ActivityParams params) {
-		getScoringParameters(null).addActivityParams(params);
 	}
 
 	public enum TypicalDurationScoreComputation {
@@ -495,11 +440,13 @@ public final class PlanCalcScoreConfigGroup extends ReflectiveConfigGroup {
 			}
 		}
 
-		for (ActivityParams params : this.getActivityParams()) {
-			if (params.isScoringThisActivityAtAll() && Time.isUndefinedTime(params.getTypicalDuration())) {
-				throw new RuntimeException("In activity type=" + params.getActivityType()
-						+ ", the typical duration is undefined.  This will lead to errors that are difficult to debug, "
-						+ "so rather aborting here.");
+		for (ScoringParameterSet params : this.getScoringParametersPerSubpopulation().values()) {
+			for (ActivityParams activityParams : params.getActivityParams()) {
+				if (activityParams.isScoringThisActivityAtAll() && Time.isUndefinedTime(activityParams.getTypicalDuration())) {
+					throw new RuntimeException("In activity type=" + activityParams.getActivityType()
+							+ ", the typical duration is undefined.  This will lead to errors that are difficult to debug, "
+							+ "so rather aborting here.");
+				}
 			}
 		}
 
@@ -511,97 +458,6 @@ public final class PlanCalcScoreConfigGroup extends ReflectiveConfigGroup {
 
 	public void setMemorizingExperiencedPlans(boolean memorizingExperiencedPlans) {
 		this.memorizingExperiencedPlans = memorizingExperiencedPlans;
-	}
-
-	public double getLateArrival_utils_hr() {
-
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getLateArrival_utils_hr();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getLateArrival_utils_hr();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
-
-	}
-
-	public void setLateArrival_utils_hr(double lateArrival) {
-		getScoringParameters(null).setLateArrival_utils_hr(lateArrival);
-	}
-
-	public double getEarlyDeparture_utils_hr() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getEarlyDeparture_utils_hr();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getEarlyDeparture_utils_hr();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
-
-	}
-
-	public void setEarlyDeparture_utils_hr(double earlyDeparture) {
-		getScoringParameters(null).setEarlyDeparture_utils_hr(earlyDeparture);
-	}
-
-	public double getPerforming_utils_hr() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getPerforming_utils_hr();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getPerforming_utils_hr();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
-
-	}
-
-	public void setPerforming_utils_hr(double performing) {
-		getScoringParameters(null).setPerforming_utils_hr(performing);
-	}
-
-	public double getMarginalUtilityOfMoney() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getMarginalUtilityOfMoney();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getMarginalUtilityOfMoney();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
-
-	}
-
-	public void setMarginalUtilityOfMoney(double marginalUtilityOfMoney) {
-		getScoringParameters(null).setMarginalUtilityOfMoney(marginalUtilityOfMoney);
-	}
-
-	public double getUtilityOfLineSwitch() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getUtilityOfLineSwitch();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getUtilityOfLineSwitch();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
-
-	}
-
-	public void setUtilityOfLineSwitch(double utilityOfLineSwitch) {
-		getScoringParameters(null).setUtilityOfLineSwitch(utilityOfLineSwitch);
-	}
-
-
-	public double getMarginalUtlOfWaiting_utils_hr() {
-		if (getScoringParameters(null) != null)
-			return getScoringParameters(null).getMarginalUtlOfWaiting_utils_hr();
-		else if (getScoringParameters(DEFAULT_SUBPOPULATION) != null)
-			return getScoringParameters(DEFAULT_SUBPOPULATION).getMarginalUtlOfWaiting_utils_hr();
-		else
-			throw new RuntimeException("Default subpopulation is not defined");
-
-	}
-
-	public void setMarginalUtlOfWaiting_utils_hr(double waiting) {
-		getScoringParameters(null).setMarginalUtlOfWaiting_utils_hr(waiting);
-	}
-
-	@Override
-	public final void setLocked() {
-		super.setLocked();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
