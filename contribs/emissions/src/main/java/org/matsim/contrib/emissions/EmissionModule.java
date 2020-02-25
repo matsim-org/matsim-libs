@@ -120,9 +120,10 @@ public final class EmissionModule {
 //			}
 //		}
 
-		avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
-		avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
-		hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(avgHbefaWarmTable);
+		if (!emissionConfigGroup.isUsingDetailedEmissionCalculation() || emissionConfigGroup.getDetailedFallbackBehaviour() == EmissionsConfigGroup.DetailedFallbackBehaviour.tryTechnologyAverageOrVehicleTypeAverage) {
+			avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
+			avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
+		}
 
 		if(emissionConfigGroup.isUsingDetailedEmissionCalculation()){
 			detailedHbefaWarmTable = createDetailedHbefaWarmTable(detailedWarmEmissionFactorsFile);
@@ -132,6 +133,15 @@ public final class EmissionModule {
 			logger.warn("Detailed emission calculation is switched off in " + EmissionsConfigGroup.GROUP_NAME + " config group; Using fleet average values for all vehicles.");
 		}
 		logger.info("leaving createLookupTables");
+
+		//create HBEFA Speed tables. try on detailed values first.
+		if (detailedHbefaWarmTable != null){
+			hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(detailedHbefaWarmTable);
+		} else if (avgHbefaWarmTable != null){
+			hbefaRoadTrafficSpeeds = EmissionUtils.createHBEFASpeedsTable(avgHbefaWarmTable);
+		} else {
+			throw new RuntimeException("hbefaRoadTrafficSpeed table not created");		//Is table mandantory? -> If yes throw exception
+		}
 	}
 
 	private void createEmissionHandler() {
