@@ -65,7 +65,7 @@ public class DelayTracker {
 		}
 		
 		if (stop.getStopFacility().getId().equals(stopFacilityId)) {
-			double scheduledTime = d.departureTime + (stop.getArrivalOffset() == Time.UNDEFINED_TIME ? stop.getDepartureOffset() : stop.getArrivalOffset());
+			double scheduledTime = d.departureTime + (stop.getArrivalOffset() == Time.getUndefinedTime() ? stop.getDepartureOffset() : stop.getArrivalOffset());
 			return arrivalTime - scheduledTime;
 		}
 		return Double.NaN;

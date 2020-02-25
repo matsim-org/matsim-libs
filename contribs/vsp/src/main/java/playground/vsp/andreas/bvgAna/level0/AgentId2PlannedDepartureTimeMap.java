@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -81,7 +80,7 @@ public class AgentId2PlannedDepartureTimeMap {
 							runningTime = act.getEndTime();
 							firstActDone = true;
 						} else {
-							if(act.getMaximumDuration() != Time.UNDEFINED_TIME){
+							if(act.getMaximumDuration() != Time.getUndefinedTime()){
 								runningTime += act.getMaximumDuration();
 							} else {
 								runningTime = act.getEndTime();

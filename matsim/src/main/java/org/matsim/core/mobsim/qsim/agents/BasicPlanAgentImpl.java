@@ -24,7 +24,6 @@
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -68,7 +67,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 	private final EventsManager events;
 	private final MobsimTimer simTimer;
 	private MobsimVehicle vehicle ;
-	private double activityEndTime = Time.UNDEFINED_TIME;
+	private double activityEndTime = Time.getUndefinedTime();
 	private MobsimAgent.State state = MobsimAgent.State.ABORT;
 	private Id<Link> currentLinkId = null;
 	/**
@@ -258,9 +257,9 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 			return null;
 		}
 		final double travelTimeFromRoute = ((Leg) currentPlanElement).getRoute().getTravelTime();
-		if (  travelTimeFromRoute != Time.UNDEFINED_TIME ) {
+		if (  travelTimeFromRoute != Time.getUndefinedTime() ) {
 			return travelTimeFromRoute ;
-		} else if ( ((Leg) currentPlanElement).getTravelTime() != Time.UNDEFINED_TIME ) {
+		} else if ( ((Leg) currentPlanElement).getTravelTime() != Time.getUndefinedTime() ) {
 			return ((Leg) currentPlanElement).getTravelTime()  ;
 		} else {
 			return null ;

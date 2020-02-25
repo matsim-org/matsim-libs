@@ -27,15 +27,14 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.router.StageActivityTypeIdentifier;
-import org.matsim.core.utils.misc.Time;
-
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils;
 import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils.JointTravelStructure;
 import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils.JointTrip;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.core.router.StageActivityTypeIdentifier;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * An algorithm which attempts to synchronize the plans of passengers
@@ -87,7 +86,7 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 			if ( pe instanceof Activity && 
 					!(StageActivityTypeIdentifier.isStageActivity( ((Activity) pe).getType() )  ||
 					stageTypes.contains(((Activity) pe).getType())) ){
-				((Activity) pe).setMaximumDuration( Time.UNDEFINED_TIME );
+				((Activity) pe).setMaximumDuration( Time.getUndefinedTime() );
 				((Activity) pe).setEndTime( now > 0 ? now : 0 );
 				return;
 			}
@@ -96,10 +95,10 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 				final Leg leg = (Leg) pe;
 				final Route route = leg.getRoute();
 
-				final double legDur = route != null && route.getTravelTime() != Time.UNDEFINED_TIME ?
+				final double legDur = route != null && route.getTravelTime() != Time.getUndefinedTime() ?
 					route.getTravelTime() : leg.getTravelTime();
 
-				if ( legDur != Time.UNDEFINED_TIME ) {
+				if ( legDur != Time.getUndefinedTime() ) {
 					now -= legDur;
 				}
 				else {
@@ -130,7 +129,7 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 					!(StageActivityTypeIdentifier.isStageActivity( ((Activity) pe).getType() )  ||
 					stageTypes.contains(((Activity) pe).getType())) ){
 				final double endTime = ((Activity) pe).getEndTime();
-				if ( endTime == Time.UNDEFINED_TIME ) throw new RuntimeException( "undefined end time" );
+				if ( endTime == Time.getUndefinedTime() ) throw new RuntimeException( "undefined end time" );
 				return endTime + tt;
 			}
 
@@ -138,10 +137,10 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 				final Leg leg = (Leg) pe;
 				final Route route = leg.getRoute();
 
-				final double legDur = route != null && route.getTravelTime() != Time.UNDEFINED_TIME ?
+				final double legDur = route != null && route.getTravelTime() != Time.getUndefinedTime() ?
 					route.getTravelTime() : leg.getTravelTime();
 
-				if ( legDur != Time.UNDEFINED_TIME ) {
+				if ( legDur != Time.getUndefinedTime() ) {
 					tt += legDur;
 				}
 				else {

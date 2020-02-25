@@ -226,7 +226,7 @@ import org.matsim.vehicles.Vehicle;
 		}
 //		if (leg instanceof LegImpl) {
 //			LegImpl l = (LegImpl)leg;
-//			if (l.getDepartureTime() + l.getTravelTime() != Time.UNDEFINED_TIME) {
+//			if (l.getDepartureTime() + l.getTravelTime() != Time.getUndefinedTime()) {
 //				out.write(" arr_time=\"");
 //				out.write(Time.writeTime(l.getDepartureTime() + l.getTravelTime()));
 //				out.write("\"");

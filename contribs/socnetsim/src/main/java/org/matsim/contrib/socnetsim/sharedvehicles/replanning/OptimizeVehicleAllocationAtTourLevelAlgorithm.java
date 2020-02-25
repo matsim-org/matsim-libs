@@ -35,16 +35,15 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
+import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
+import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
-
-import org.matsim.contrib.socnetsim.framework.replanning.GenericPlanAlgorithm;
-import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupPlans;
-import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
 
 /**
  * Optimizes vehicle allocation at the tour level, by minimizing the estimated
@@ -287,7 +286,7 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 			
 			final Trip firstTrip = subtour.getTrips().get( 0 );
 			this.startTime = firstTrip.getOriginActivity().getEndTime();
-			if ( startTime == Time.UNDEFINED_TIME ) throw new RuntimeException( "no end time in "+firstTrip.getOriginActivity() );
+			if ( startTime == Time.getUndefinedTime() ) throw new RuntimeException( "no end time in "+firstTrip.getOriginActivity() );
 
 			final Trip lastTrip = subtour.getTrips().get( subtour.getTrips().size() - 1 );
 			this.endTime = calcArrivalTime( lastTrip );
@@ -330,17 +329,17 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 		for ( final PlanElement pe : trip.getTripElements() ) {
 			if ( pe instanceof Activity ) {
 				final double end = ((Activity) pe).getEndTime();
-				now = end != Time.UNDEFINED_TIME ? end : now + ((Activity) pe).getMaximumDuration();
+				now = end != Time.getUndefinedTime() ? end : now + ((Activity) pe).getMaximumDuration();
 				// TODO: do not fail *that* badly, but just revert to random alloc
-				if ( now == Time.UNDEFINED_TIME ) throw new RuntimeException( "could not get time from "+pe );
+				if ( now == Time.getUndefinedTime() ) throw new RuntimeException( "could not get time from "+pe );
 			}
 			else if ( pe instanceof Leg ) {
 				final Route r = ((Leg) pe).getRoute();
-				if ( r != null && r.getTravelTime() != Time.UNDEFINED_TIME ) {
+				if ( r != null && r.getTravelTime() != Time.getUndefinedTime() ) {
 					now += r.getTravelTime();
 				}
 				else {
-					now += ((Leg) pe).getTravelTime() != Time.UNDEFINED_TIME ?
+					now += ((Leg) pe).getTravelTime() != Time.getUndefinedTime() ?
 							((Leg) pe).getTravelTime() :
 							0; // no info: just assume instantaneous. This will give poor results!
 				}

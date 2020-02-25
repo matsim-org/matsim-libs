@@ -122,7 +122,7 @@ public class OpeningTimeImpl implements OpeningTime {
 	}
 
 	private final void validateTimes() {
-		if (this.startTime != Time.UNDEFINED_TIME && this.endTime != Time.UNDEFINED_TIME && this.startTime >= this.endTime) {
+		if (this.startTime != Time.getUndefinedTime() && this.endTime != Time.getUndefinedTime() && this.startTime >= this.endTime) {
 			throw new RuntimeException(this + "[startTime=" + this.startTime + " >= endTime=" + this.endTime + " not allowed]");
 		}
 	}

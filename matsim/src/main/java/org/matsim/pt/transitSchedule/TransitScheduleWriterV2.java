@@ -212,10 +212,10 @@ public class TransitScheduleWriterV2 extends MatsimXmlWriter implements MatsimSo
 		for (TransitRouteStop stop : stops) {
 			attributes.clear();
 			attributes.add(createTuple(Constants.REF_ID, stop.getStopFacility().getId().toString()));
-			if (stop.getArrivalOffset() != Time.UNDEFINED_TIME) {
+			if (stop.getArrivalOffset() != Time.getUndefinedTime()) {
 				attributes.add(createTimeTuple(Constants.ARRIVAL_OFFSET, stop.getArrivalOffset()));
 			}
-			if (stop.getDepartureOffset() != Time.UNDEFINED_TIME) {
+			if (stop.getDepartureOffset() != Time.getUndefinedTime()) {
 				attributes.add(createTimeTuple(Constants.DEPARTURE_OFFSET, stop.getDepartureOffset()));
 			}
 			attributes.add(createTuple(Constants.AWAIT_DEPARTURE, String.valueOf(stop.isAwaitDepartureTime())));

@@ -851,8 +851,8 @@ public final class PopulationUtils {
 		newAct.setCoord(coord);
 		newAct.setType(act.getType());
 		newAct.setLinkId(act.getLinkId());
-		newAct.setStartTime(act.isStartTimeUndefined() ? Time.UNDEFINED_TIME : act.getStartTime());
-		newAct.setEndTime(act.isEndTimeUndefined() ? Time.UNDEFINED_TIME : act.getEndTime());
+		newAct.setStartTime(act.isStartTimeUndefined() ? Time.getUndefinedTime() : act.getStartTime());
+		newAct.setEndTime(act.isEndTimeUndefined() ? Time.getUndefinedTime() : act.getEndTime());
 		newAct.setMaximumDuration(act.getMaximumDuration());
 		newAct.setFacilityId(act.getFacilityId());
 

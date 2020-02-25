@@ -117,7 +117,7 @@ public class VehiclePlannedRealizedMissedDepartures {
 			/* this could happen if a stop is served only by few lines (e.g. night-buses), but the simulation
 			 * stops before ever a single vehicle could reach that stop
 			 */
-			return new Tuple<Double, Integer>(new Double(Time.UNDEFINED_TIME), 1);
+			return new Tuple<Double, Integer>(new Double(Time.getUndefinedTime()), 1);
 		}
 		for (StopId2RouteId2DelayAtStopMapData delayContainer : possibleRoutes.values()) {
 

@@ -20,15 +20,15 @@
 
 package org.matsim.deprecated.scoring.functions;
 
+import java.util.Iterator;
+import java.util.Set;
+
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.OpeningTime;
-
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  * Same as CharyparNagelScoringFunction, but retrieves opening time information
@@ -54,7 +54,7 @@ public class CharyparNagelOpenTimesActivityScoring extends CharyparNagelActivity
 		// openInterval has two values
 		// openInterval[0] will be the opening time
 		// openInterval[1] will be the closing time
-		double[] openInterval = new double[]{Time.UNDEFINED_TIME, Time.UNDEFINED_TIME};
+		double[] openInterval = new double[]{Time.getUndefinedTime(), Time.getUndefinedTime()};
 
 		boolean foundAct = false;
 

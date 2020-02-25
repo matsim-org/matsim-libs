@@ -19,6 +19,9 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import java.util.List;
+import java.util.ListIterator;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -43,9 +46,6 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.List;
-import java.util.ListIterator;
 
 public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, PlanAgent {
 
@@ -248,7 +248,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 
 	protected double longerStopTimeIfWeAreAheadOfSchedule(final double now,
 			final double stopTime) {
-		if ((this.nextStop.isAwaitDepartureTime()) && (this.nextStop.getDepartureOffset() != Time.UNDEFINED_TIME)) {
+		if ((this.nextStop.isAwaitDepartureTime()) && (this.nextStop.getDepartureOffset() != Time.getUndefinedTime())) {
 			double earliestDepTime = getActivityEndTime() + this.nextStop.getDepartureOffset();
 			if (now + stopTime < earliestDepTime) {
 				return earliestDepTime - now;

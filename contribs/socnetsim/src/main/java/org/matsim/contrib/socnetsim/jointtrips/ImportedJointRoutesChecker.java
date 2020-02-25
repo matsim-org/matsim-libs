@@ -27,11 +27,11 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
 import org.matsim.facilities.FacilitiesUtils;
 
 /**
@@ -92,15 +92,15 @@ public class ImportedJointRoutesChecker implements PlanAlgorithm, PersonAlgorith
 			final Activity act) {
 		double e = act.getEndTime();
 		double d = act.getMaximumDuration();
-		return e != Time.UNDEFINED_TIME ? e :
-			currTime + ( d != Time.UNDEFINED_TIME ? d : 0 );
+		return e != Time.getUndefinedTime() ? e :
+			currTime + ( d != Time.getUndefinedTime() ? d : 0 );
 	}
 
 	private static double updateTime(
 			final double currTime,
 			final Leg leg) {
 		double tt = leg.getTravelTime();
-		return tt != Time.UNDEFINED_TIME ? currTime + tt : currTime;
+		return tt != Time.getUndefinedTime() ? currTime + tt : currTime;
 	}
 }
 

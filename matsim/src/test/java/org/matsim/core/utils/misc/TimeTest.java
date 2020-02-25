@@ -101,12 +101,12 @@ public class TimeTest extends TestCase {
 
 	public void testUndefined() {
 		// test writing
-		assertEquals("undefined", Time.writeTime(Time.UNDEFINED_TIME));
+		assertEquals("undefined", Time.writeTime(Time.getUndefinedTime()));
 
 		// test reading
-		assertEquals(Time.UNDEFINED_TIME, Time.parseTime("undefined"), 0.0);
-		assertEquals(Time.UNDEFINED_TIME, Time.parseTime(""), 0.0);
-		assertEquals(Time.UNDEFINED_TIME, Time.parseTime(null), 0.0);
+		assertEquals(Time.getUndefinedTime(), Time.parseTime("undefined"), 0.0);
+		assertEquals(Time.getUndefinedTime(), Time.parseTime(""), 0.0);
+		assertEquals(Time.getUndefinedTime(), Time.parseTime(null), 0.0);
 	}
 
 	public void testSetDefault() {

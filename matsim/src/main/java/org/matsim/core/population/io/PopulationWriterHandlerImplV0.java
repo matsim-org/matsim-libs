@@ -20,6 +20,9 @@
 
 package org.matsim.core.population.io;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -35,9 +38,6 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
 
 	/*package*/ class PopulationWriterHandlerImplV0 extends AbstractPopulationWriterHandler {
 
@@ -168,7 +168,7 @@ import java.io.IOException;
 			out.write(" trav_time=\"" + Time.writeTime(leg.getTravelTime()) + "\"");
 //		if (leg instanceof LegImpl){
 //			LegImpl l = (LegImpl)leg;
-//			if (l.getDepartureTime() + l.getTravelTime() != Time.UNDEFINED_TIME)
+//			if (l.getDepartureTime() + l.getTravelTime() != Time.getUndefinedTime())
 //				out.write(" arr_time=\"" + Time.writeTime(l.getDepartureTime() + l.getTravelTime()) + "\"");
 //		}
 		// arrival time is in dtd, but no longer evaluated in code (according to not being in API).  kai, jun'16

@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
-import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.utils.misc.Time;
 
 class ActivityEngineDefaultImpl implements ActivityEngine {
@@ -118,7 +117,7 @@ class ActivityEngineDefaultImpl implements ActivityEngine {
 	public void afterSim() {
 		double now = this.internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 		for (AgentEntry entry : activityEndsList) {
-			if (entry.activityEndTime!=Double.POSITIVE_INFINITY && entry.activityEndTime!=Time.UNDEFINED_TIME) {
+			if (entry.activityEndTime!=Double.POSITIVE_INFINITY && entry.activityEndTime!=Time.getUndefinedTime()) {
 				// since we are at an activity, it is not plausible to assume that the agents know mode or destination
 				// link id.  Thus generating the event with ``null'' in the corresponding entries.  kai, mar'12
 				eventsManager.processEvent(new PersonStuckEvent(now, entry.agent.getId(), null, null));

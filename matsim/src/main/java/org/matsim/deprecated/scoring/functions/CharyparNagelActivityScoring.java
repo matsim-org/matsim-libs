@@ -45,7 +45,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 	private double firstActivityEndTime;
 
 	private static final double INITIAL_LAST_TIME = 0.0;
-	private static final double INITIAL_FIRST_ACT_END_TIME = Time.UNDEFINED_TIME;
+	private static final double INITIAL_FIRST_ACT_END_TIME = Time.getUndefinedTime();
 	private static final double INITIAL_SCORE = 0.0;
 
 	private static int firstLastActWarning = 0;

@@ -329,7 +329,7 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 	private static double calcEndOfActivity(
 			final Activity activity,
 			final Plan plan) {
-		if (activity.getEndTime() != Time.UNDEFINED_TIME) return activity.getEndTime();
+		if (activity.getEndTime() != Time.getUndefinedTime()) return activity.getEndTime();
 
 		// no sufficient information in the activity...
 		// do it the long way.

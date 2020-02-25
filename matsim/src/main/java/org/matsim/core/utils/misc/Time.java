@@ -187,7 +187,7 @@ public class Time {
 	 */
 	public static final double parseTime(final String time, final char separator) {
 		if (time == null || time.length() == 0 || time.equals("undefined")) {
-			return Time.UNDEFINED_TIME;
+			return Time.getUndefinedTime();
 		}
 		boolean isNegative = (time.charAt(0) == '-');
 		String[] strings = (isNegative
