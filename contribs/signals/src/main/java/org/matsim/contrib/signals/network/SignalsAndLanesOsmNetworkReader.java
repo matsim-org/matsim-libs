@@ -134,18 +134,22 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private final Map<Id<Lane>, List<Id<Lane>>> nonCritLanes = new HashMap<>();
 	private final Map<Id<Lane>, List<Id<Lane>>> critLanes = new HashMap<>();
 	private final Map<Long, Double> turnRadii = new HashMap<>();
-	
+	private Map<Id<Link>, Coord> linkToOrigToNodeCoord = new HashMap<>();
+	private Map<Id<Link>, Coord> linkToOrigFromNodeCoord = new HashMap<>();
+
 	// Node stuff
 	Set<Long> signalizedOsmNodes = new HashSet<>();
 	Set<Long> crossingOsmNodes = new HashSet<>();
 	Map<Long, OsmNode> oldToSimplifiedJunctionNodeMap = new HashMap<>();
 	Map<Long, Set<OsmRelation>> osmNodeRestrictions = new HashMap<>();
+	// we change a few Nodes in setOrModifyLinkAttributes -> idea: save old Links as key and the old coordinates of 1. FromNode, 2. ToNode
+	Map<Id<Link>,List<Coord>> manipulatedLinks = new HashMap();
 	
 	private boolean mergeOnewaySignalSystems = true;
 	private boolean useRadiusReduction = true;
 	private boolean allowUTurnAtLeftLaneOnly = true;
 	private boolean makePedestrianSignals = false;
-	private boolean acceptFourPlusCrossings = false;
+	private boolean acceptFourPlusCrossings = true;
 
 	private final SignalSystemsData systems;
 	private final SignalGroupsData groups;
@@ -162,7 +166,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 //		String inputOSM = "C:\\Users\\braun\\Documents\\Uni\\VSP\\shared-svn\\studies\\sbraun\\osmData\\RawOSM/brandenburg.osm";
 //		String outputDir = "../../../../../../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/cottbus/";
 		String inputOSM = "../shared-svn/studies/tthunig/osmData/interpreter.osm";
-		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_02_06";
+		String outputDir = "../shared-svn/studies/sbraun/osmData/signalsAndLanesReader/Lanes/2020_02_25_changedLinkVectorLogic";
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84_UTM33N);
 
@@ -184,7 +188,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		SignalsAndLanesOsmNetworkReader reader = new SignalsAndLanesOsmNetworkReader(network, ct, signalsData, lanes);
 
 
-		reader.setMergeOnewaySignalSystems(false);
+		reader.setMergeOnewaySignalSystems(true);
 		reader.setUseRadiusReduction(false);
 		reader.setAllowUTurnAtLeftLaneOnly(true);
 		reader.setMakePedestrianSignals(false);
@@ -275,7 +279,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
     }
     //TODO That looks not good
     public void setUseRadiusReduction(boolean useRadiusReduction){
-        this.useRadiusReduction = mergeOnewaySignalSystems;
+        this.useRadiusReduction = useRadiusReduction;
     }
     public void setAllowUTurnAtLeftLaneOnly(boolean allowUTurnAtLeftLaneOnly){
         this.allowUTurnAtLeftLaneOnly = allowUTurnAtLeftLaneOnly;
@@ -333,6 +337,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		for (OsmNode node : addingNodes) {
 			super.nodes.put(node.id, node);
 		}
+
+
 		addingNodes.clear();
 		checkedNodes.clear();
 		// TODO check and clean this methods
@@ -728,6 +734,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					}
 				}
 				if (suit) {
+					Set<OsmNode> tempNodes = new HashSet<>();
 					for (OsmWay way : node.ways.values()) {
 						String oneway = way.tags.get(TAG_ONEWAY);
 						if (oneway != null && !oneway.equals("no"))
@@ -739,11 +746,15 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 							boolean nodeSignalized = signalizedOsmNodes.contains(node.id);
 							boolean otherNodeSignalized = signalizedOsmNodes.contains(otherNode.id);
+
+							//Only checks one way out of node: There are sometimes Nodes in the mid of a junction; try to fix in else statement
                             if (NetworkUtils.getEuclideanDistance(node.coord.getX(), node.coord.getY(),
                                     otherNode.coord.getX(), otherNode.coord.getY()) < SIGNAL_MERGE_DISTANCE
 									&& !checkedNodes.contains(otherNode) && isNodeAtJunction(otherNode)
 									&& otherNode.used && !node.equals(otherNode)
 									&& nodeSignalized == otherNodeSignalized) {
+
+
 								for (OsmWay otherWay : otherNode.ways.values()) {
 									if (!node.ways.containsKey(otherWay.id)) {
 										String otherOneway = otherWay.tags.get(TAG_ONEWAY);
@@ -753,6 +764,43 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 										}
 									}
 								}
+								//sbraun20200218 I added this to check if this solves something
+							} else if (!node.equals(otherNode)) {
+
+								double distance = NetworkUtils.getEuclideanDistance(node.coord.getX(), node.coord.getY(),
+										otherNode.coord.getX(), otherNode.coord.getY());
+								OsmWay origWay = way;
+								int counter = 0;
+								while (counter < 3 && (otherNode.ways.size()==2 && distance < SIGNAL_MERGE_DISTANCE && !isNodeAtJunction(otherNode) )){
+									counter++;
+									if (!checkedNodes.contains(otherNode)) {
+										for (OsmWay tempWay : otherNode.ways.values()) {
+											if (!(origWay.id == tempWay.id)) {
+												tempNodes.add(otherNode);
+												OsmNode tempNode = nodes.get(origWay.nodes.get(0));
+												distance += NetworkUtils.getEuclideanDistance(tempNode.coord.getX(), tempNode.coord.getY(),
+														otherNode.coord.getX(), otherNode.coord.getY());
+
+												otherNodeSignalized = signalizedOsmNodes.contains(tempNode.id);
+												otherNode = tempNode;
+												origWay = tempWay;
+												break;
+											}
+										}
+										if(otherNodeSignalized==nodeSignalized && isNodeAtJunction(otherNode) && !node.equals(otherNode)){
+											break;
+										}
+
+									}
+								}
+
+								String otherOneway = origWay.tags.get(TAG_ONEWAY);
+								if (otherOneway != null && !otherOneway.equals("no")||otherOneway==null) {
+									otherSuit = true;
+									break;
+								}
+
+
 							}
 						}
 						if (suit == true && otherSuit == true)
@@ -774,6 +822,22 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						if (osmNodeRestrictions.containsKey(otherNode.id)) {
 							osmNodeRestrictions.put(junctionNode.id, osmNodeRestrictions.get(otherNode.id));						
 						}
+						//sbraun20200218 I added this to check if this solves something
+
+						//node.used = false;
+						//otherNode.used = false;
+						if (tempNodes.size()!=0) {
+							for (OsmNode tempNode: tempNodes){
+								oldToSimplifiedJunctionNodeMap.put(tempNode.id, junctionNode);
+								if (osmNodeRestrictions.containsKey(tempNode.id)) {
+									osmNodeRestrictions.put(junctionNode.id, osmNodeRestrictions.get(tempNode.id));
+								}
+								checkedNodes.add(tempNode);
+								//tempNode.used = false;
+							}
+						}
+
+
 						checkedNodes.add(otherNode);
 						addingNodes.add(junctionNode);
 						id++;
@@ -1547,8 +1611,25 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 		List<LinkVector> inLinkVectors = new ArrayList<LinkVector>();
 		for (int i = 0; i < inLinks.size(); i++) {
-			LinkVector inLink = new LinkVector(inLinks.get(i));
-			inLinkVectors.add(inLink);
+			//sbraun20200225: added this so we are using old degrees for vectors
+			if (linkToOrigToNodeCoord.containsKey(inLinks.get(i).getId())|| linkToOrigFromNodeCoord.containsKey(inLinks.get(i).getId())){
+				Coord oldToNode = inLinks.get(i).getToNode().getCoord();
+				Coord oldFromNode = inLinks.get(i).getFromNode().getCoord();
+				if (linkToOrigToNodeCoord.containsKey(inLinks.get(i).getId())){
+					oldToNode = linkToOrigToNodeCoord.get(inLinks.get(i).getId());
+				}
+				if (linkToOrigFromNodeCoord.containsKey(inLinks.get(i).getId())){
+					oldFromNode = linkToOrigFromNodeCoord.get(inLinks.get(i).getId());
+				}
+
+				LinkVector inLink = new LinkVector(inLinks.get(i),oldFromNode,oldToNode);
+				inLinkVectors.add(inLink);
+
+			} else {
+				LinkVector inLink = new LinkVector(inLinks.get(i));
+				inLinkVectors.add(inLink);
+			}
+
 		}
 		return inLinkVectors;
 	}
@@ -1895,11 +1976,53 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 	private List<LinkVector> orderToLinks(Link link, List<Link> toLinks) {
 		List<LinkVector> toLinkList = new ArrayList<LinkVector>();
-		LinkVector fromLink = new LinkVector(link);
+		LinkVector fromLink;
+		//sbraun20200225: added this so we are using old degrees for vectors
+		if (linkToOrigToNodeCoord.containsKey(link.getId())|| linkToOrigFromNodeCoord.containsKey(link.getId())) {
+			Coord oldToNode = link.getToNode().getCoord();
+			Coord oldFromNode = link.getFromNode().getCoord();
+			if (linkToOrigToNodeCoord.containsKey(link.getId())) {
+				oldToNode = linkToOrigToNodeCoord.get(link.getId());
+			}
+			if (linkToOrigFromNodeCoord.containsKey(link.getId())) {
+				oldFromNode = linkToOrigFromNodeCoord.get(link.getId());
+			}
+			fromLink = new LinkVector(link,oldFromNode,oldToNode);
+		} else {
+			fromLink = new LinkVector(link);
+		}
+
+
+		//sbraun20200225: added this so we are using old degrees for vectors
+
 		for (int i = 0; i < toLinks.size(); i++) {
-			LinkVector toLink = new LinkVector(toLinks.get(i));
-			toLink.calculateRotation(fromLink);
-			toLinkList.add(toLink);
+			LinkVector toLink;// = new LinkVector(toLinks.get(i));
+			//sbraun20200225: added this so we are using old degrees for vectors
+			if (linkToOrigToNodeCoord.containsKey(toLinks.get(i).getId())|| linkToOrigFromNodeCoord.containsKey(toLinks.get(i).getId())){
+				Coord oldToNode = toLinks.get(i).getToNode().getCoord();
+				Coord oldFromNode = toLinks.get(i).getFromNode().getCoord();
+				if (linkToOrigToNodeCoord.containsKey(toLinks.get(i).getId())){
+					oldToNode = linkToOrigToNodeCoord.get(toLinks.get(i).getId());
+				}
+				if (linkToOrigFromNodeCoord.containsKey(toLinks.get(i).getId())){
+					oldFromNode = linkToOrigFromNodeCoord.get(toLinks.get(i).getId());
+				}
+
+				toLink = new LinkVector(toLinks.get(i),oldFromNode,oldToNode);
+				toLink.calculateRotation(fromLink);
+				toLinkList.add(toLink);
+
+			} else {
+				toLink = new LinkVector(toLinks.get(i));
+				toLink.calculateRotation(fromLink);
+
+				toLinkList.add(toLink);
+
+			}
+
+
+			//toLink.calculateRotation(fromLink);
+			//toLinkList.add(toLink);
 		}
 		Collections.sort(toLinkList);
 		return toLinkList;
@@ -1951,6 +2074,26 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 	@Override
 	protected void setOrModifyLinkAttributes(Link l, OsmWay way, boolean forwardDirection) {
+		// modify to/from nodes if they have been simplified (earlier in simplifyOsmData)
+		long toNodeOsmId = Long.valueOf(l.getToNode().getId().toString());
+		long fromNodeOsmId = Long.valueOf(l.getFromNode().getId().toString());
+		if (oldToSimplifiedJunctionNodeMap.containsKey(toNodeOsmId)) {
+			//remember old toNode for LinkVector calculation
+			linkToOrigToNodeCoord.put(l.getId(), l.getToNode().getCoord());
+			//change toNode
+			long simplifiedOsmNodeId = oldToSimplifiedJunctionNodeMap.get(toNodeOsmId).id;
+			l.setToNode(network.getNodes().get(Id.createNodeId(simplifiedOsmNodeId)));
+			l.setLength(NetworkUtils.getEuclideanDistance(l.getFromNode().getCoord(), l.getToNode().getCoord()));
+		}
+		if (oldToSimplifiedJunctionNodeMap.containsKey(fromNodeOsmId)) {
+			//remember old fromNode for LinkVector calculation
+			linkToOrigFromNodeCoord.put(l.getId(), l.getFromNode().getCoord());
+			//change fromNode
+			long simplifiedOsmNodeId = oldToSimplifiedJunctionNodeMap.get(fromNodeOsmId).id;
+			l.setFromNode(network.getNodes().get(Id.createNodeId(simplifiedOsmNodeId)));
+			l.setLength(NetworkUtils.getEuclideanDistance(l.getFromNode().getCoord(), l.getToNode().getCoord()));
+		}
+
 		// convert lane directions
 		String turnLanesOsm;
 		if (forwardDirection) {
@@ -2120,6 +2263,14 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			this.link = link;
 			this.x = this.link.getToNode().getCoord().getX() - link.getFromNode().getCoord().getX();
 			this.y = this.link.getToNode().getCoord().getY() - link.getFromNode().getCoord().getY();
+			this.calculateTheta();
+		}
+
+		//sbraun second constructor since we changed coordinates
+		public LinkVector(Link link, Coord oldToNode, Coord oldFromNode){
+			this.link = link;
+			this.x = oldToNode.getX() - oldFromNode.getX();
+			this.y = oldToNode.getY() - oldFromNode.getY();
 			this.calculateTheta();
 		}
 
