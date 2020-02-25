@@ -20,6 +20,8 @@
 
 package org.matsim.core.utils.misc;
 
+import java.util.OptionalDouble;
+
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 
@@ -27,7 +29,7 @@ import org.matsim.core.router.util.TravelTime;
 public class Time {
 	// yy there is now java.time, which integrates joda.time into the standard
 	// jdk.  should we consider looking into this?  kai, dec'17
-	
+
 	
 	private Time() {} // namespace only, do not instantiate
 
@@ -70,6 +72,16 @@ public class Time {
 	public static double getVeryLargeTime() {
 		// give the option to change the convention at some point in time.  kai, nov'17
 		return Long.MAX_VALUE ;
+	}
+
+	/**
+	 * a bit more strict than the regular OptionalDouble as NaNs are not allowed
+	 */
+	public static OptionalDouble timeAsOptionalDouble(double time) {
+		if (Double.isNaN(time)) {
+			throw new IllegalArgumentException("NaN time is not allowed");
+		}
+		return time == Time.UNDEFINED_TIME ? OptionalDouble.empty() : OptionalDouble.of(time);
 	}
 
 	static {

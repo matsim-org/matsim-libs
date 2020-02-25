@@ -1,5 +1,7 @@
 package org.matsim.contrib.freight.controler;
 
+import java.util.OptionalDouble;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -25,8 +27,8 @@ public class FreightActivity implements Activity {
 	}
 
 	@Override
-	public double getEndTime() {
-		return act.getEndTime();
+	public OptionalDouble getOptionalEndTime() {
+		return act.getOptionalEndTime();
 	}
 
 	@Override

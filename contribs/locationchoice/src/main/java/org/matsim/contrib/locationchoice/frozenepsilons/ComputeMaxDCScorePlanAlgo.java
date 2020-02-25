@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.locationchoice.frozenepsilons;
 
+import java.util.OptionalDouble;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -107,9 +109,10 @@ class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 		private final Id<Link> linkId;
 		
 		public DummyActivity(Id<Link> linkId) { this.linkId = linkId; }
-		
+
+		private static final OptionalDouble ZERO_TIME = OptionalDouble.of(0);
 		@Override
-		public double getEndTime() { return 0; }
+		public OptionalDouble getOptionalEndTime() { return ZERO_TIME; }
 
 		@Override
 		public void setEndTime(double seconds) { }

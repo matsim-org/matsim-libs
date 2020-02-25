@@ -20,6 +20,8 @@
 
 package org.matsim.core.population;
 
+import java.util.OptionalDouble;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -45,7 +47,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	// Case (X): facilityId inconsistent with linkId, coord.  Idea: mobsim takes the facilityId and (a) checks the other
 	// attribs or (b) ignores them.
 
-	private Double endTime = null;
+	private OptionalDouble endTime = OptionalDouble.empty();
 
 	/**
 	 * Used for reporting outcomes in the scoring. Not interpreted for the demand.
@@ -66,13 +68,13 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 	@Override
-	public final double getEndTime() {
+	public final OptionalDouble getOptionalEndTime() {
 		return this.endTime;
 	}
 
 	@Override
 	public final void setEndTime(final double endTime) {
-		this.endTime = Time.isUndefinedTime(endTime) ? null : endTime;
+		this.endTime = Time.timeAsOptionalDouble(endTime);
 	}
 
 	/**

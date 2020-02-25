@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalDouble;
 import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -230,8 +231,8 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public double getEndTime() {
-			return this.delegate.getEndTime() ;
+		public OptionalDouble getOptionalEndTime() {
+			return this.delegate.getOptionalEndTime();
 		}
 
 		@Override

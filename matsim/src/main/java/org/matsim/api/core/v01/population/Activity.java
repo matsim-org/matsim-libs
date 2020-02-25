@@ -20,6 +20,8 @@
 
 package org.matsim.api.core.v01.population;
 
+import java.util.OptionalDouble;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -32,13 +34,7 @@ import org.matsim.facilities.ActivityFacility;
 public interface Activity extends PlanElement {
 
 	default boolean isEndTimeUndefined() {
-		try {
-			double endTime = getEndTime();
-			//only ActivityImpl has been adapted to Double, so we need to keep this additional check for other Activity classes
-			return Time.isUndefinedTime(endTime);
-		} catch (NullPointerException e) {
-			return true;
-		}
+		return !getOptionalEndTime().isPresent();
 	}
 
 	default boolean isStartTimeUndefined() {
@@ -62,7 +58,11 @@ public interface Activity extends PlanElement {
 	}
 
 
-	public double getEndTime();
+	public OptionalDouble getOptionalEndTime();
+
+	default double getEndTime() {
+		return getOptionalEndTime().getAsDouble();
+	}
 
 	public void setEndTime(final double seconds);
 
