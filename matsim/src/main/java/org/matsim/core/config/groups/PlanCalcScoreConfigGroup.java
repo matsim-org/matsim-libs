@@ -47,7 +47,7 @@ import java.util.*;
  * @author nagel
  *
  */
-public final class PlanCalcScoreConfigGroup extends ConfigGroup {
+public final class PlanCalcScoreConfigGroup extends ReflectiveConfigGroup {
 
 	private static final Logger log = Logger.getLogger(PlanCalcScoreConfigGroup.class);
 
@@ -69,9 +69,15 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 	private static final String UTL_OF_LINE_SWITCH = "utilityOfLineSwitch";
 
-	private final ReflectiveDelegate delegate = new ReflectiveDelegate();
-	
-	private boolean usesDeprecatedSyntax = false ;
+	private double learningRate = 1.0;
+	private double brainExpBeta = 1.0;
+	private double pathSizeLogitBeta = 1.0;
+
+	private boolean writeExperiencedPlans = false;
+
+	private Double fractionOfIterationsToStartScoreMSA = null;
+
+	private boolean usingOldScoringBelowZeroUtilityDuration = false;
 
 	public PlanCalcScoreConfigGroup() {
 		super(GROUP_NAME);
@@ -159,212 +165,80 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 	// ---
 
-	@Override
-	public String getValue(final String key) {
-		throw new IllegalArgumentException(key + ": getValue access disabled; use direct getter");
-	}
-	
-	private static final String msg = " is deprecated config syntax; please use the more " +
-								    "modern hierarchical format; your output_config.xml " +
-								    "will be in the correct version; the old version will fail eventually, since we want to reduce the " +
-								    "workload on this backwards compatibility (look into " +
-								    "PlanCalcScoreConfigGroup or PlanCalcRouteConfigGroup if you want to know what we mean).";
-	
-	@Override
-	public void addParam(final String key, final String value) {
-		if (key.startsWith("monetaryDistanceCostRate")) {
-			throw new RuntimeException("Please use monetaryDistanceRate (without `cost').  Even better, use config v2, "
-					+ "mode-parameters (see output of any recent run), and mode-specific monetary " + "distance rate.");
-		} else if (WAITING_PT.equals(key)) {
-			setMarginalUtlOfWaitingPt_utils_hr(Double.parseDouble(value));
-		}
-
-		// backward compatibility: underscored
-		else if (key.startsWith("activityType_")) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			
-			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityType_".length()));
-
-			actParams.setActivityType(value);
-			getScoringParameters(null).removeParameterSet(actParams);
-			addActivityParams(actParams);
-		} else if (key.startsWith("activityPriority_")) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityPriority_".length()));
-			actParams.setPriority(Double.parseDouble(value));
-		} else if (key.startsWith("activityTypicalDuration_")) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityTypicalDuration_".length()));
-			actParams.setTypicalDuration(Time.parseTime(value));
-		} else if (key.startsWith("activityMinimalDuration_")) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityMinimalDuration_".length()));
-			actParams.setMinimalDuration(Time.parseTime(value));
-		} else if (key.startsWith("activityOpeningTime_")) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityOpeningTime_".length()));
-			actParams.setOpeningTime(Time.parseTime(value));
-		} else if (key.startsWith("activityLatestStartTime_")) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityLatestStartTime_".length()));
-			actParams.setLatestStartTime(Time.parseTime(value));
-		} else if (key.startsWith("activityEarliestEndTime_")) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityEarliestEndTime_".length()));
-			actParams.setEarliestEndTime(Time.parseTime(value));
-		} else if (key.startsWith("activityClosingTime_")) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			ActivityParams actParams = getActivityTypeByNumber(key.substring("activityClosingTime_".length()));
-			actParams.setClosingTime(Time.parseTime(value));
-		} else if (key.startsWith("scoringThisActivityAtAll_")) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			ActivityParams actParams = getActivityTypeByNumber(key.substring("scoringThisActivityAtAll_".length()));
-			actParams.setScoringThisActivityAtAll(Boolean.parseBoolean(value));
-		} else if (key.startsWith("traveling_")) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			ModeParams modeParams = getOrCreateModeParams(key.substring("traveling_".length()));
-			modeParams.setMarginalUtilityOfTraveling(Double.parseDouble(value));
-		} else if (key.startsWith("marginalUtlOfDistance_")) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			ModeParams modeParams = getOrCreateModeParams(key.substring("marginalUtlOfDistance_".length()));
-			modeParams.setMarginalUtilityOfDistance(Double.parseDouble(value));
-		} else if (key.startsWith("monetaryDistanceRate_")) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			ModeParams modeParams = getOrCreateModeParams(key.substring("monetaryDistanceRate_".length()));
-			modeParams.setMonetaryDistanceRate(Double.parseDouble(value));
-		} else if ("monetaryDistanceRateCar".equals(key)) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			ModeParams modeParams = getOrCreateModeParams(TransportMode.car);
-			modeParams.setMonetaryDistanceRate(Double.parseDouble(value));
-		} else if ("monetaryDistanceRatePt".equals(key)) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			ModeParams modeParams = getOrCreateModeParams(TransportMode.pt);
-			modeParams.setMonetaryDistanceRate(Double.parseDouble(value));
-		} else if (key.startsWith("constant_")) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			ModeParams modeParams = getOrCreateModeParams(key.substring("constant_".length()));
-			modeParams.setConstant(Double.parseDouble(value));
-		}
-
-		// backward compatibility: "typed" traveling
-		else if ("traveling".equals(key)) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			this.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(Double.parseDouble(value));
-		} else if ("travelingPt".equals(key)) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			this.getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(Double.parseDouble(value));
-		} else if ("travelingWalk".equals(key)) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			this.getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(Double.parseDouble(value));
-		} else if ("travelingOther".equals(key)) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			this.getModes().get(TransportMode.other).setMarginalUtilityOfTraveling(Double.parseDouble(value));
-		} else if ("travelingBike".equals(key)) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			this.getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(Double.parseDouble(value));
-		}
-
-		// backward compatibility: "typed" util of distance
-		else if ("marginalUtlOfDistanceCar".equals(key)) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			this.getModes().get(TransportMode.car).setMarginalUtilityOfDistance(Double.parseDouble(value));
-		} else if ("marginalUtlOfDistancePt".equals(key)) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			this.getModes().get(TransportMode.pt).setMarginalUtilityOfDistance(Double.parseDouble(value));
-		} else if ("marginalUtlOfDistanceWalk".equals(key)) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			this.getModes().get(TransportMode.walk).setMarginalUtilityOfDistance(Double.parseDouble(value));
-		} else if ("marginalUtlOfDistanceOther".equals(key)) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			this.getModes().get(TransportMode.other).setMarginalUtilityOfDistance(Double.parseDouble(value));
-		}
-
-		// backward compatibility: "typed" constants
-		else if ("constantCar".equals(key)) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			getModes().get(TransportMode.car).setConstant(Double.parseDouble(value));
-		} else if ("constantWalk".equals(key)) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			getModes().get(TransportMode.walk).setConstant(Double.parseDouble(value));
-		} else if ("constantOther".equals(key)) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			getModes().get(TransportMode.other).setConstant(Double.parseDouble(value));
-		} else if ("constantPt".equals(key)) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			getModes().get(TransportMode.pt).setConstant(Double.parseDouble(value));
-		} else if ("constantBike".equals(key)) {
-			log.warn( key + msg );
-			usesDeprecatedSyntax = true ;
-			getModes().get(TransportMode.bike).setConstant(Double.parseDouble(value));
-		}
-
-		// old-fashioned scoring parameters: default subpopulation
-		else if (Arrays
-				.asList(LATE_ARRIVAL, EARLY_DEPARTURE, PERFORMING, MARGINAL_UTL_OF_MONEY, UTL_OF_LINE_SWITCH, WAITING)
-				.contains(key)) {
-//			log.warn( key + msg );
-//			usesDeprecatedSyntax = true ;
-			// this is the stuff with the default subpopulation
-			
-			getScoringParameters(null).addParam(key, value);
-		}
-
-		else {
-			delegate.addParam(key, value);
-		}
+	@StringGetter(FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA)
+	public Double getFractionOfIterationsToStartScoreMSA() {
+		return fractionOfIterationsToStartScoreMSA;
 	}
 
-	/* for the backward compatibility nonsense */
-	private final Map<String, ActivityParams> activityTypesByNumber = new HashMap<>();
-
-	private ActivityParams getActivityTypeByNumber(final String number) {
-		ActivityParams actType = this.activityTypesByNumber.get(number);
-		if ((actType == null)) {
-			// not sure what this means, but I found it so...
-			// TD, sep'14
-			actType = new ActivityParams(number);
-			this.activityTypesByNumber.put(number, actType);
-			addParameterSet(actType);
-		}
-		return actType;
+	@StringSetter(FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA)
+	public void setFractionOfIterationsToStartScoreMSA(Double fractionOfIterationsToStartScoreMSA) {
+		testForLocked();
+		this.fractionOfIterationsToStartScoreMSA = fractionOfIterationsToStartScoreMSA;
 	}
+
+	@StringGetter(LEARNING_RATE)
+	public double getLearningRate() {
+		return learningRate;
+	}
+
+	@StringSetter(LEARNING_RATE)
+	public void setLearningRate(double learningRate) {
+		testForLocked();
+		this.learningRate = learningRate;
+	}
+
+	@StringGetter(BRAIN_EXP_BETA)
+	public double getBrainExpBeta() {
+		return brainExpBeta;
+	}
+
+	@StringSetter(BRAIN_EXP_BETA)
+	public void setBrainExpBeta(double brainExpBeta) {
+		testForLocked();
+		this.brainExpBeta = brainExpBeta;
+	}
+
+	@StringGetter(PATH_SIZE_LOGIT_BETA)
+	public double getPathSizeLogitBeta() {
+		return pathSizeLogitBeta;
+	}
+
+	@StringSetter(PATH_SIZE_LOGIT_BETA)
+	public void setPathSizeLogitBeta(double beta) {
+		testForLocked();
+		if (beta != 0.) {
+			log.warn("Setting pathSizeLogitBeta different from zero is experimental.  KN, Sep'08");
+		}
+		this.pathSizeLogitBeta = beta;
+	}
+
+	@StringGetter(USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION)
+	public boolean isUsingOldScoringBelowZeroUtilityDuration() {
+		return usingOldScoringBelowZeroUtilityDuration;
+	}
+
+	@StringSetter(USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION)
+	public void setUsingOldScoringBelowZeroUtilityDuration(boolean usingOldScoringBelowZeroUtilityDuration) {
+		testForLocked();
+		this.usingOldScoringBelowZeroUtilityDuration = usingOldScoringBelowZeroUtilityDuration;
+	}
+
+	@StringGetter(WRITE_EXPERIENCED_PLANS)
+	public boolean isWriteExperiencedPlans() {
+		return writeExperiencedPlans;
+	}
+
+	@StringSetter(WRITE_EXPERIENCED_PLANS)
+	public void setWriteExperiencedPlans(boolean writeExperiencedPlans) {
+		testForLocked();
+		this.writeExperiencedPlans = writeExperiencedPlans;
+	}
+
 
 	public ModeParams getOrCreateModeParams(String modeName) {
 		return getScoringParameters(null).getOrCreateModeParams(modeName);
 	}
 
-	@Override
-	public Map<String, String> getParams() {
-		return delegate.getParams();
-	}
 
 	@Override
 	public final Map<String, String> getComments() {
@@ -595,10 +469,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	protected final void checkConsistency(final Config config) {
 		super.checkConsistency(config);
 		
-		if ( usesDeprecatedSyntax && !config.global().isInsistingOnDeprecatedConfigVersion() ) {
-			throw new RuntimeException( msg ) ;
-		}
-		
 		if (getScoringParametersPerSubpopulation().size()>1){
 			if (!getScoringParametersPerSubpopulation().containsKey(PlanCalcScoreConfigGroup.DEFAULT_SUBPOPULATION)){
 				throw new RuntimeException("Using several subpopulations in "+PlanCalcScoreConfigGroup.GROUP_NAME+" requires defining a \""+PlanCalcScoreConfigGroup.DEFAULT_SUBPOPULATION+" \" subpopulation."
@@ -641,30 +511,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 	public void setMemorizingExperiencedPlans(boolean memorizingExperiencedPlans) {
 		this.memorizingExperiencedPlans = memorizingExperiencedPlans;
-	}
-
-	public double getLearningRate() {
-		return delegate.getLearningRate();
-	}
-
-	public void setLearningRate(double learningRate) {
-		delegate.setLearningRate(learningRate);
-	}
-
-	public double getBrainExpBeta() {
-		return delegate.getBrainExpBeta();
-	}
-
-	public void setBrainExpBeta(double brainExpBeta) {
-		delegate.setBrainExpBeta(brainExpBeta);
-	}
-
-	public double getPathSizeLogitBeta() {
-		return delegate.getPathSizeLogitBeta();
-	}
-
-	public void setPathSizeLogitBeta(double beta) {
-		delegate.setPathSizeLogitBeta(beta);
 	}
 
 	public double getLateArrival_utils_hr() {
@@ -738,21 +584,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		getScoringParameters(null).setUtilityOfLineSwitch(utilityOfLineSwitch);
 	}
 
-	public boolean isUsingOldScoringBelowZeroUtilityDuration() {
-		return delegate.isUsingOldScoringBelowZeroUtilityDuration();
-	}
-
-	public void setUsingOldScoringBelowZeroUtilityDuration(boolean usingOldScoringBelowZeroUtilityDuration) {
-		delegate.setUsingOldScoringBelowZeroUtilityDuration(usingOldScoringBelowZeroUtilityDuration);
-	}
-
-	public boolean isWriteExperiencedPlans() {
-		return delegate.isWriteExperiencedPlans();
-	}
-
-	public void setWriteExperiencedPlans(boolean writeExperiencedPlans) {
-		delegate.setWriteExperiencedPlans(writeExperiencedPlans);
-	}
 
 	public double getMarginalUtlOfWaiting_utils_hr() {
 		if (getScoringParameters(null) != null)
@@ -768,18 +599,9 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		getScoringParameters(null).setMarginalUtlOfWaiting_utils_hr(waiting);
 	}
 
-	public void setFractionOfIterationsToStartScoreMSA(Double val) {
-		delegate.setFractionOfIterationsToStartScoreMSA(val);
-	}
-
-	public Double getFractionOfIterationsToStartScoreMSA() {
-		return delegate.getFractionOfIterationsToStartScoreMSA();
-	}
-
 	@Override
 	public final void setLocked() {
 		super.setLocked();
-		this.delegate.setLocked();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1528,92 +1350,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 						+ "in the past for pt routing; if you did that, consider setting the new "
 						+ "parameter waitingPt instead.");
 			}
-		}
-
-	}
-
-	private static class ReflectiveDelegate extends ReflectiveConfigGroup {
-		private ReflectiveDelegate() {
-			super(PlanCalcScoreConfigGroup.GROUP_NAME);
-		}
-
-		private double learningRate = 1.0;
-		private double brainExpBeta = 1.0;
-		private double pathSizeLogitBeta = 1.0;
-
-		private boolean writeExperiencedPlans = false;
-
-		private Double fractionOfIterationsToStartScoreMSA = null;
-
-		private boolean usingOldScoringBelowZeroUtilityDuration = false;
-
-		@StringGetter(FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA)
-		public Double getFractionOfIterationsToStartScoreMSA() {
-			return fractionOfIterationsToStartScoreMSA;
-		}
-
-		@StringSetter(FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA)
-		public void setFractionOfIterationsToStartScoreMSA(Double fractionOfIterationsToStartScoreMSA) {
-			testForLocked();
-			this.fractionOfIterationsToStartScoreMSA = fractionOfIterationsToStartScoreMSA;
-		}
-
-		@StringGetter(LEARNING_RATE)
-		public double getLearningRate() {
-			return learningRate;
-		}
-
-		@StringSetter(LEARNING_RATE)
-		public void setLearningRate(double learningRate) {
-			testForLocked();
-			this.learningRate = learningRate;
-		}
-
-		@StringGetter(BRAIN_EXP_BETA)
-		public double getBrainExpBeta() {
-			return brainExpBeta;
-		}
-
-		@StringSetter(BRAIN_EXP_BETA)
-		public void setBrainExpBeta(double brainExpBeta) {
-			testForLocked();
-			this.brainExpBeta = brainExpBeta;
-		}
-
-		@StringGetter(PATH_SIZE_LOGIT_BETA)
-		public double getPathSizeLogitBeta() {
-			return pathSizeLogitBeta;
-		}
-
-		@StringSetter(PATH_SIZE_LOGIT_BETA)
-		public void setPathSizeLogitBeta(double beta) {
-			testForLocked();
-			if (beta != 0.) {
-				log.warn("Setting pathSizeLogitBeta different from zero is experimental.  KN, Sep'08");
-			}
-			this.pathSizeLogitBeta = beta;
-		}
-
-		@StringGetter(USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION)
-		public boolean isUsingOldScoringBelowZeroUtilityDuration() {
-			return usingOldScoringBelowZeroUtilityDuration;
-		}
-
-		@StringSetter(USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION)
-		public void setUsingOldScoringBelowZeroUtilityDuration(boolean usingOldScoringBelowZeroUtilityDuration) {
-			testForLocked();
-			this.usingOldScoringBelowZeroUtilityDuration = usingOldScoringBelowZeroUtilityDuration;
-		}
-
-		@StringGetter(WRITE_EXPERIENCED_PLANS)
-		public boolean isWriteExperiencedPlans() {
-			return writeExperiencedPlans;
-		}
-
-		@StringSetter(WRITE_EXPERIENCED_PLANS)
-		public void setWriteExperiencedPlans(boolean writeExperiencedPlans) {
-			testForLocked();
-			this.writeExperiencedPlans = writeExperiencedPlans;
 		}
 
 	}
