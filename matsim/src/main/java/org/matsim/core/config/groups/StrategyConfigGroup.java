@@ -41,26 +41,97 @@ import java.util.Map;
  *
  * @author mrieser
  */
-public final class StrategyConfigGroup extends ConfigGroup {
+public final class StrategyConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "strategy";
-	
-	// in the following, it is still named "module", for the following reason:
-	// the "right" side is the outside interface, used in the config files, which is left with the old keys for backwards compatibility.
-	// kai/mz, dec'14
-	private static final String MODULE = "Module_";
-	private static final String MODULE_PROBABILITY = "ModuleProbability_";
-	private static final String MODULE_DISABLE_AFTER_ITERATION = "ModuleDisableAfterIteration_";
-	private static final String MODULE_EXE_PATH = "ModuleExePath_";
-	private static final String MODULE_SUBPOPULATION = "ModuleSubpopulation_";
 
-	private final ReflectiveDelegate delegate = new ReflectiveDelegate();
-	// yy could you please describe why this indirect design was done?  Was ist just because it made refactoring easier, or does it provide
-	// an advantage or is even necessary?  Thanks ...  kai, oct'14
-	// To maintain backwards compatibility (underscored parameters), one needs to override the "getValue" and "add_param" methods,
-	// which are final in ReflectiveModule. However, using reflective module for the 
-	// rest of the parameters still made refactoring much easier. So let's call
-	// this "necessary". td, apr'15
+	static final String MAX_AGENT_PLAN_MEMORY_SIZE = "maxAgentPlanMemorySize";
+	static final String EXTERNAL_EXE_CONFIG_TEMPLATE = "ExternalExeConfigTemplate";
+	static final String EXTERNAL_EXE_TMP_FILE_ROOT_DIR = "ExternalExeTmpFileRootDir";
+	static final String EXTERNAL_EXE_TIME_OUT = "ExternalExeTimeOut";
+	static final String ITERATION_FRACTION_TO_DISABLE_INNOVATION = "fractionOfIterationsToDisableInnovation" ;
+	static final String PLAN_SELECTOR_FOR_REMOVAL = "planSelectorForRemoval" ;
+
+	private int maxAgentPlanMemorySize = 5;
+	private String externalExeConfigTemplate = null;
+	private String externalExeTmpFileRootDir = null;
+	private long externalExeTimeOut = 3600;
+
+	private String planSelectorForRemoval = "WorstPlanSelector";
+	
+	//---
+	private double fraction = Double.POSITIVE_INFINITY ;
+	//---
+
+	@StringSetter( MAX_AGENT_PLAN_MEMORY_SIZE )
+	public void setMaxAgentPlanMemorySize(final int maxAgentPlanMemorySize) {
+		this.maxAgentPlanMemorySize = maxAgentPlanMemorySize;
+	}
+
+	@StringGetter( MAX_AGENT_PLAN_MEMORY_SIZE )
+	public int getMaxAgentPlanMemorySize() {
+		return this.maxAgentPlanMemorySize;
+	}
+
+	@StringSetter( EXTERNAL_EXE_CONFIG_TEMPLATE )
+	public void setExternalExeConfigTemplate(final String externalExeConfigTemplate) {
+		this.externalExeConfigTemplate = externalExeConfigTemplate;
+	}
+
+	@StringGetter( EXTERNAL_EXE_CONFIG_TEMPLATE )
+	public String getExternalExeConfigTemplate() {
+		return this.externalExeConfigTemplate;
+	}
+
+	@StringSetter( EXTERNAL_EXE_TMP_FILE_ROOT_DIR )
+	public void setExternalExeTmpFileRootDir(final String externalExeTmpFileRootDir) {
+		this.externalExeTmpFileRootDir = externalExeTmpFileRootDir;
+	}
+
+	@StringGetter( EXTERNAL_EXE_TMP_FILE_ROOT_DIR )
+	public String getExternalExeTmpFileRootDir() {
+		return this.externalExeTmpFileRootDir;
+	}
+
+	@StringSetter( EXTERNAL_EXE_TIME_OUT )
+	public void setExternalExeTimeOut(final long externalExeTimeOut) {
+		this.externalExeTimeOut = externalExeTimeOut;
+	}
+
+	@StringGetter( EXTERNAL_EXE_TIME_OUT )
+	public long getExternalExeTimeOut() {
+		return this.externalExeTimeOut;
+	}
+
+	@StringGetter( PLAN_SELECTOR_FOR_REMOVAL )
+	public String getPlanSelectorForRemoval() {
+		return planSelectorForRemoval;
+	}
+
+	@StringSetter( PLAN_SELECTOR_FOR_REMOVAL )
+	public void setPlanSelectorForRemoval(String planSelectorForRemoval) {
+		switch ( planSelectorForRemoval ) {
+		case "SelectExpBeta" :
+			throw new RuntimeException("'SelectExpBeta' was replaced by 'SelectExpBetaForRemoval' in the plans removal setting" ) ;
+		case "ChangeExpBeta" :
+			throw new RuntimeException("'ChangeExpBeta' was replaced by 'ChangeExpBetaForRemoval' in the plans removal setting" ) ;
+		case "PathSizeLogitSelector" :
+			throw new RuntimeException("'PathSizeLogitSelector' was replaced by 'PathSizeLogitSelectorForRemoval' in the plans removal setting" ) ;
+		default: 
+			this.planSelectorForRemoval = planSelectorForRemoval;
+		}
+	}
+
+	@StringGetter( ITERATION_FRACTION_TO_DISABLE_INNOVATION )
+	public double getFractionOfIterationsToDisableInnovation() {
+		return fraction;
+	}
+
+	@StringSetter( ITERATION_FRACTION_TO_DISABLE_INNOVATION )
+	public void setFractionOfIterationsToDisableInnovation(double fraction) {
+		this.fraction = fraction;
+	}
+
 
 	public static class StrategySettings extends ReflectiveConfigGroup implements MatsimParameters {
 		public static final String SET_NAME = "strategysettings";
@@ -198,90 +269,27 @@ public final class StrategyConfigGroup extends ConfigGroup {
 		super(GROUP_NAME);
 	}
 
-	@Override
-	public String getValue(final String key) {
-		// first check if the parameter is in "underscored" form
-		if ( key.startsWith(MODULE)
-				|| key.startsWith(MODULE_PROBABILITY)
-				|| key.startsWith(MODULE_DISABLE_AFTER_ITERATION)
-				|| key.startsWith(MODULE_EXE_PATH)
-				|| key.startsWith(MODULE_SUBPOPULATION) ) {
-			throw new IllegalArgumentException( "getting underscored parameter "+key+" is not allowed anymore. The supported way to get those parameters is via parameter sets." );
-		}
-
-		return delegate.getValue( key );
-	}
-
-	@Override
-	public void addParam(final String key, final String value) {
-		// adding underscore parameters is still supported for backward compatibility.
-		if (key != null && key.startsWith(MODULE)) {
-			StrategySettings settings = getStrategySettings(Id.create(key.substring(MODULE.length()), StrategySettings.class), true);
-			settings.addParam( "strategyName" , value);
-		}
-		else if (key != null && key.startsWith(MODULE_PROBABILITY)) {
-			StrategySettings settings = getStrategySettings(Id.create(key.substring(MODULE_PROBABILITY.length()), StrategySettings.class), true);
-			settings.addParam( "weight" , value );
-		}
-		else if (key != null && key.startsWith(MODULE_DISABLE_AFTER_ITERATION)) {
-			StrategySettings settings = getStrategySettings(Id.create(key.substring(MODULE_DISABLE_AFTER_ITERATION.length()), StrategySettings.class), true);
-			settings.setDisableAfter(Integer.parseInt(value));
-			settings.addParam( "disableAfterIteration" , value );
-		}
-		else if (key != null && key.startsWith(MODULE_EXE_PATH)) {
-			StrategySettings settings = getStrategySettings(Id.create(key.substring(MODULE_EXE_PATH.length()), StrategySettings.class), true);
-			settings.addParam( "executionPath" , value );
-		}
-		else if (key != null && key.startsWith(MODULE_SUBPOPULATION)) {
-			StrategySettings settings = getStrategySettings(Id.create(key.substring(MODULE_SUBPOPULATION.length()), StrategySettings.class), true);
-			settings.addParam( "subpopulation" , value );
-		}
-		else {
-			delegate.addParam( key , value );
-		}
-	}
-
-	private StrategySettings getStrategySettings(final Id<StrategySettings> index, final boolean createIfMissing) {
-		StrategySettings settings = null;
-
-		// should be in a map, but it is difficult to keep consistency with the
-		// delegate...
-		for ( StrategySettings s : getStrategySettings() ) {
-			if ( !s.getId().equals( index ) ) continue;
-			if ( settings != null ) throw new IllegalStateException( "several settings with id "+index );
-			settings = s;
-		}
-
-		if (settings == null && createIfMissing) {
-			settings = new StrategySettings(index);
-			addStrategySettings( settings );
-		}
-
-		return settings;
-	}
-
-
 	/////////////////////////////////
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
-		map.put(ReflectiveDelegate.ITERATION_FRACTION_TO_DISABLE_INNOVATION, "fraction of iterations where innovative strategies are switched off.  Something like 0.8 should be good.  E.g. if you run from iteration 400 to iteration 500, innovation is switched off at iteration 480" ) ;
-		map.put(ReflectiveDelegate.MAX_AGENT_PLAN_MEMORY_SIZE, "maximum number of plans per agent.  ``0'' means ``infinity''.  Currently (2010), ``5'' is a good number");
+		map.put(ITERATION_FRACTION_TO_DISABLE_INNOVATION, "fraction of iterations where innovative strategies are switched off.  Something like 0.8 should be good.  E.g. if you run from iteration 400 to iteration 500, innovation is switched off at iteration 480" ) ;
+		map.put(MAX_AGENT_PLAN_MEMORY_SIZE, "maximum number of plans per agent.  ``0'' means ``infinity''.  Currently (2010), ``5'' is a good number");
 
 		StringBuilder strb = new StringBuilder() ;
 		for ( DefaultPlansRemover name : DefaultPlansRemover.values() ) {
 			strb.append( name.toString() + " " ) ;
 		}
-		map.put(ReflectiveDelegate.PLAN_SELECTOR_FOR_REMOVAL,"strategyName of PlanSelector for plans removal.  "
+		map.put(PLAN_SELECTOR_FOR_REMOVAL,"strategyName of PlanSelector for plans removal.  "
 				+ "Possible defaults: " + strb.toString() + ". The current default, WorstPlanSelector is not a good " +
 				"choice from a discrete choice theoretical perspective. Alternatives, however, have not been systematically " +
 				"tested. kai, feb'12") ;
 		
-		map.put(ReflectiveDelegate.EXTERNAL_EXE_CONFIG_TEMPLATE,"the external executable will be called with a config file as argument.  This is the pathname to a possible "
+		map.put(EXTERNAL_EXE_CONFIG_TEMPLATE,"the external executable will be called with a config file as argument.  This is the pathname to a possible "
 				+ "skeleton config, to which additional information will be added.  Can be null.");
-		map.put(ReflectiveDelegate.EXTERNAL_EXE_TMP_FILE_ROOT_DIR, "root directory for temporary files generated by the external executable. Provided as a service; "
+		map.put(EXTERNAL_EXE_TMP_FILE_ROOT_DIR, "root directory for temporary files generated by the external executable. Provided as a service; "
 				+ "I don't think this is used by MATSim.") ;
-		map.put(ReflectiveDelegate.EXTERNAL_EXE_TIME_OUT, "time out value (in seconds) after which matsim will consider the external strategy as failed") ;
+		map.put(EXTERNAL_EXE_TIME_OUT, "time out value (in seconds) after which matsim will consider the external strategy as failed") ;
 		return map ;
 	}
 
@@ -335,153 +343,6 @@ public final class StrategyConfigGroup extends ConfigGroup {
 	protected void checkConsistency(Config config) {
 		// to make available to tests
 		super.checkConsistency(config);
-	}
-
-	public void setMaxAgentPlanMemorySize(int maxAgentPlanMemorySize) {
-		delegate.setMaxAgentPlanMemorySize(maxAgentPlanMemorySize);
-	}
-
-	public int getMaxAgentPlanMemorySize() {
-		return delegate.getMaxAgentPlanMemorySize();
-	}
-
-	public void setExternalExeConfigTemplate(String externalExeConfigTemplate) {
-		delegate.setExternalExeConfigTemplate(externalExeConfigTemplate);
-	}
-
-	public String getExternalExeConfigTemplate() {
-		return delegate.getExternalExeConfigTemplate();
-	}
-
-	public void setExternalExeTmpFileRootDir(String externalExeTmpFileRootDir) {
-		delegate.setExternalExeTmpFileRootDir(externalExeTmpFileRootDir);
-	}
-
-	public String getExternalExeTmpFileRootDir() {
-		return delegate.getExternalExeTmpFileRootDir();
-	}
-
-	public void setExternalExeTimeOut(long externalExeTimeOut) {
-		delegate.setExternalExeTimeOut(externalExeTimeOut);
-	}
-
-	public long getExternalExeTimeOut() {
-		return delegate.getExternalExeTimeOut();
-	}
-
-	public String getPlanSelectorForRemoval() {
-		return delegate.getPlanSelectorForRemoval();
-	}
-
-	public void setPlanSelectorForRemoval(String planSelectorForRemoval) {
-		switch ( planSelectorForRemoval ) {
-		case "SelectExpBeta" :
-			throw new RuntimeException("'SelectExpBeta' was replaced by 'SelectExpBetaForRemoval' in the plans removal setting" ) ;
-		case "ChangeExpBeta" :
-			throw new RuntimeException("'ChangeExpBeta' was replaced by 'ChangeExpBetaForRemoval' in the plans removal setting" ) ;
-		case "PathSizeLogitSelector" :
-			throw new RuntimeException("'PathSizeLogitSelector' was replaced by 'PathSizeLogitSelectorForRemoval' in the plans removal setting" ) ;
-		default: 
-			delegate.setPlanSelectorForRemoval(planSelectorForRemoval) ;
-		}
-	}
-
-	public double getFractionOfIterationsToDisableInnovation() {
-		return delegate.getFractionOfIterationsToDisableInnovation();
-	}
-
-	public void setFractionOfIterationsToDisableInnovation(double fraction) {
-		delegate.setFractionOfIterationsToDisableInnovation(fraction);
-	}
-
-	@Override
-	public final Map<String, String> getParams() {
-		return delegate.getParams();
-	}
-
-	private static class ReflectiveDelegate extends ReflectiveConfigGroup {
-		 static final String MAX_AGENT_PLAN_MEMORY_SIZE = "maxAgentPlanMemorySize";
-		 static final String EXTERNAL_EXE_CONFIG_TEMPLATE = "ExternalExeConfigTemplate";
-		 static final String EXTERNAL_EXE_TMP_FILE_ROOT_DIR = "ExternalExeTmpFileRootDir";
-		 static final String EXTERNAL_EXE_TIME_OUT = "ExternalExeTimeOut";
-		 static final String ITERATION_FRACTION_TO_DISABLE_INNOVATION = "fractionOfIterationsToDisableInnovation" ;
-		 static final String PLAN_SELECTOR_FOR_REMOVAL = "planSelectorForRemoval" ;
-
-		private int maxAgentPlanMemorySize = 5;
-		private String externalExeConfigTemplate = null;
-		private String externalExeTmpFileRootDir = null;
-		private long externalExeTimeOut = 3600;
-
-		private String planSelectorForRemoval = "WorstPlanSelector";
-		
-		//---
-		private double fraction = Double.POSITIVE_INFINITY ;
-		//---
-
-		public ReflectiveDelegate() {
-			super( StrategyConfigGroup.GROUP_NAME );
-		}
-
-
-		@StringSetter( MAX_AGENT_PLAN_MEMORY_SIZE )
-		public void setMaxAgentPlanMemorySize(final int maxAgentPlanMemorySize) {
-			this.maxAgentPlanMemorySize = maxAgentPlanMemorySize;
-		}
-
-		@StringGetter( MAX_AGENT_PLAN_MEMORY_SIZE )
-		public int getMaxAgentPlanMemorySize() {
-			return this.maxAgentPlanMemorySize;
-		}
-
-		@StringSetter( EXTERNAL_EXE_CONFIG_TEMPLATE )
-		public void setExternalExeConfigTemplate(final String externalExeConfigTemplate) {
-			this.externalExeConfigTemplate = externalExeConfigTemplate;
-		}
-
-		@StringGetter( EXTERNAL_EXE_CONFIG_TEMPLATE )
-		public String getExternalExeConfigTemplate() {
-			return this.externalExeConfigTemplate;
-		}
-
-		@StringSetter( EXTERNAL_EXE_TMP_FILE_ROOT_DIR )
-		public void setExternalExeTmpFileRootDir(final String externalExeTmpFileRootDir) {
-			this.externalExeTmpFileRootDir = externalExeTmpFileRootDir;
-		}
-
-		@StringGetter( EXTERNAL_EXE_TMP_FILE_ROOT_DIR )
-		public String getExternalExeTmpFileRootDir() {
-			return this.externalExeTmpFileRootDir;
-		}
-
-		@StringSetter( EXTERNAL_EXE_TIME_OUT )
-		public void setExternalExeTimeOut(final long externalExeTimeOut) {
-			this.externalExeTimeOut = externalExeTimeOut;
-		}
-
-		@StringGetter( EXTERNAL_EXE_TIME_OUT )
-		public long getExternalExeTimeOut() {
-			return this.externalExeTimeOut;
-		}
-
-		@StringGetter( PLAN_SELECTOR_FOR_REMOVAL )
-		public String getPlanSelectorForRemoval() {
-			return planSelectorForRemoval;
-		}
-
-		@StringSetter( PLAN_SELECTOR_FOR_REMOVAL )
-		public void setPlanSelectorForRemoval(String planSelectorForRemoval) {
-			this.planSelectorForRemoval = planSelectorForRemoval;
-		}
-
-		@StringGetter( ITERATION_FRACTION_TO_DISABLE_INNOVATION )
-		public double getFractionOfIterationsToDisableInnovation() {
-			return fraction;
-		}
-
-		@StringSetter( ITERATION_FRACTION_TO_DISABLE_INNOVATION )
-		public void setFractionOfIterationsToDisableInnovation(double fraction) {
-			this.fraction = fraction;
-		}
 	}
 }
 
