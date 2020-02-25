@@ -8,10 +8,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.text.NumberFormat;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
@@ -21,6 +19,7 @@ import java.util.stream.Collectors;
 class OsmNetworkParser {
 
 	private static Logger log = Logger.getLogger(OsmNetworkParser.class);
+	private static NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.UK);
 
 	private final CoordinateTransformation transformation;
 	private final ConcurrentMap<String, LinkProperties> linkProperties;
@@ -85,9 +84,11 @@ class OsmNetworkParser {
 
 			ProcessedOsmNode result = new ProcessedOsmNode(osmNode.getId(), filteredReferencingLinks, transformedCoord);
 			this.nodes.put(result.getId(), result);
-		}
 
-		// TODO add message for progress report
+			if (nodes.size() % 10000 == 0) {
+				log.info("Added " + numberFormat.format(nodes.size()) + " nodes");
+			}
+		}
 	}
 
 	void handleWay(OsmWay osmWay) {
@@ -107,7 +108,9 @@ class OsmNetworkParser {
 						.add(processedWay);
 			}
 
-			//TODO could have a logging statement here for progress report
+			if (ways.size() % 10000 == 0) {
+				log.info("Added " + numberFormat.format(ways.size()) + " ways");
+			}
 		}
 	}
 

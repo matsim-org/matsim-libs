@@ -28,7 +28,7 @@ public class OsmNetworkParserTest {
 	public MatsimTestUtils matsimUtils = new MatsimTestUtils();
 
 	@Test
-	public void parseSingleLink() {
+	public void parse_singleLink() {
 
 		Utils.OsmData singleLink = Utils.createSingleLink();
 		Path file = Paths.get(matsimUtils.getOutputDirectory(), "parser_single-link.pbf");
@@ -59,7 +59,7 @@ public class OsmNetworkParserTest {
 	}
 
 	@Test
-	public void test_twoIntersectingWays() {
+	public void parse_twoIntersectingWays() {
 
 		Utils.OsmData twoIntersectingLinks = Utils.createTwoIntersectingLinksWithDifferentLevels();
 		Path file = Paths.get(matsimUtils.getOutputDirectory(), "parser_two-intersecting-ways.pbf");
