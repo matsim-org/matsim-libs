@@ -12,3 +12,6 @@ matsimExamples
 
 # ignore output directories:
 output/
+
+# created by VS code
+.factorypath
