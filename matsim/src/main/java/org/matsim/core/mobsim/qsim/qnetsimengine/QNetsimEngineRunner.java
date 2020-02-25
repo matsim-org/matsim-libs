@@ -20,16 +20,20 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.qsim.QSim;
-
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Phaser;
 
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.qsim.QSim;
+
 /**
- * These are the "threads" of the {@link QNetsimEngine}. The "run()" method is implicitly called by starting the thread.
+ * These are the "threads" of the {@link QNetsimEngineWithThreadpool}. The "run()" method is implicitly called by starting the thread.
  * 
  * @author (of this documentation) nagel
  *
@@ -79,7 +83,7 @@ class QNetsimEngineRunner extends NetElementActivationRegistry implements Runnab
 	/*package*/ long[] runTimes;
 	private long startTime = 0;
 	{	
-		if (QSim.analyzeRunTimes) runTimes = new long[QNetsimEngine.numObservedTimeSteps];
+		if (QSim.analyzeRunTimes) runTimes = new long[QNetsimEngineWithThreadpool.numObservedTimeSteps];
 		else runTimes = null;
 	}
 	

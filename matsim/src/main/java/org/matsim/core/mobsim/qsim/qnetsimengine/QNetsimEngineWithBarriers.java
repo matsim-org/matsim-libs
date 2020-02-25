@@ -20,6 +20,22 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.Phaser;
+import java.util.concurrent.ThreadFactory;
+
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -47,21 +63,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.Phaser;
-import java.util.concurrent.ThreadFactory;
-
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
  *
@@ -69,27 +70,21 @@ import java.util.concurrent.ThreadFactory;
  * @author dgrether
  * @author dstrippgen
  */
-public class QNetsimEngine implements MobsimEngine, NetsimEngine {
+final class QNetsimEngineWithBarriers implements MobsimEngine, NetsimEngine, QNetsimEngineI {
 
-	public interface NetsimInternalInterface {
-		QNetwork getNetsimNetwork();
-		void arrangeNextAgentState(MobsimAgent pp);
-		void letVehicleArrive(QVehicle veh);
-	}
-
-	NetsimInternalInterface ii = new NetsimInternalInterface(){
+	private NetsimInternalInterface ii = new NetsimInternalInterface(){
 		@Override public QNetwork getNetsimNetwork() {
 			return network ;
 		}
 		@Override public void arrangeNextAgentState(MobsimAgent driver) {
-			QNetsimEngine.this.arrangeNextAgentState(driver);
+			QNetsimEngineWithBarriers.this.arrangeNextAgentState(driver);
 		}
 		@Override public void letVehicleArrive(QVehicle veh) {
-			QNetsimEngine.this.letVehicleArrive( veh ) ;
+			QNetsimEngineWithBarriers.this.letVehicleArrive( veh ) ;
 		}
 	} ;
 
-	private static final Logger log = Logger.getLogger(QNetsimEngine.class);
+	private static final Logger log = Logger.getLogger(QNetsimEngineWithBarriers.class);
 
 	private static final int INFO_PERIOD = 3600;
 
@@ -129,12 +124,12 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 		this.internalInterface = internalInterface;
 	}
 
-	public QNetsimEngine(final QSim sim) {
+	public QNetsimEngineWithBarriers(final QSim sim) {
 		this(sim, null);
 	}
 
 	@Inject
-	public QNetsimEngine(final QSim sim, QNetworkFactory netsimNetworkFactory) {
+	public QNetsimEngineWithBarriers(final QSim sim, QNetworkFactory netsimNetworkFactory) {
 		this.qsim = sim;
 
 		final Config config = sim.getScenario().getConfig();
@@ -568,5 +563,10 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 
 	private final void arrangeNextAgentState(MobsimAgent pp) {
 		internalInterface.arrangeNextAgentState(pp);
+	}
+	
+	@Override
+	public NetsimInternalInterface getNetsimInternalInterface() {
+		return ii;
 	}
 }

@@ -20,7 +20,20 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import com.google.inject.Injector;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
+
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.IdMap;
@@ -47,7 +60,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineI;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
@@ -60,18 +73,7 @@ import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 
-import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
+import com.google.inject.Injector;
 
 /**
  * This has developed over the last couple of months/years towards an increasingly pluggable module.  The current (dec'2011)
@@ -361,8 +363,8 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 				log.info(entry.getKey().getClass().toString() + " cpu time (nanos): " + entry.getValue().get());				
 			}
 			log.info("");
-			if ( this.netEngine instanceof QNetsimEngine ) {
-				((QNetsimEngine)this.netEngine).printEngineRunTimes();
+			if ( this.netEngine instanceof QNetsimEngineI ) {
+				((QNetsimEngineI)this.netEngine).printEngineRunTimes();
 				// (yy should somehow be in afterSim()).
 			}
 		}
