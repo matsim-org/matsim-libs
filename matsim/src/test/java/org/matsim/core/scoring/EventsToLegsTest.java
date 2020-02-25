@@ -72,6 +72,8 @@ public class EventsToLegsTest {
 		eventsToLegs.handleEvent(new VehicleLeavesTrafficEvent(30.0, agentId, Id.createLinkId("l3"), vehId, "car", 1.0));
 		eventsToLegs.handleEvent(new PersonArrivalEvent(30.0, agentId, Id.createLinkId("l3"), "car"));
 		assertLeg(lh, 10., 20., 550.0, "car");
+		Assert.assertEquals(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME + " missing or incorrect!", 
+				10.0, lh.handledLeg.getLeg().getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME));
 	}
 
 	@Test
@@ -112,6 +114,8 @@ public class EventsToLegsTest {
 
 		eventsToLegs.handleEvent(new PersonArrivalEvent(30.0, agentId1, Id.createLinkId("l3"), "car"));
 		assertLeg(lh, 10., 20., 550.0, "car");
+		Assert.assertEquals(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME + " missing or incorrect!", 
+				10.0, lh.handledLeg.getLeg().getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME));
 	}
 
 	@Test
@@ -128,6 +132,8 @@ public class EventsToLegsTest {
 		//driver leaves out vehicle after 10 seconds, no driving at all
 		eventsToLegs.handleEvent(new PersonArrivalEvent(20.0, agentId1, Id.createLinkId("l1"), "car"));
 		assertLeg(lh, 10., 10., 0.0, "car");
+		Assert.assertEquals(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME + " missing or incorrect!", 
+				10.0, lh.handledLeg.getLeg().getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME));
 	}
 
 	@Test
@@ -148,6 +154,8 @@ public class EventsToLegsTest {
 				new VehicleLeavesTrafficEvent(25.0, agentId1, Id.createLinkId("l1"), vehId, "car", 1.0));
 		eventsToLegs.handleEvent(new PersonArrivalEvent(20.0, agentId1, Id.createLinkId("l1"), "car"));
 		assertLeg(lh, 10., 10., 500.0, "car");
+		Assert.assertEquals(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME + " missing or incorrect!", 
+				10.0, lh.handledLeg.getLeg().getAttributes().getAttribute(EventsToLegs.ENTER_VEHICLE_TIME_ATTRIBUTE_NAME));
 	}
 
 
