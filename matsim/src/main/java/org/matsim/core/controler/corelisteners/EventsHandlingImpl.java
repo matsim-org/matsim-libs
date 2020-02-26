@@ -20,10 +20,8 @@
 
 package org.matsim.core.controler.corelisteners;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.ControlerConfigGroup;
@@ -37,10 +35,13 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.events.algorithms.EventWriter;
+import org.matsim.core.events.algorithms.EventWriterJson;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 @Singleton
 final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
@@ -87,6 +88,10 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 				case xml:
 					this.eventWriters.add(new EventWriterXML(controlerIO.getIterationFilename(event.getIteration(), 
 							Controler.DefaultFiles.events)));
+					break;
+				case json:
+					this.eventWriters.add(new EventWriterJson(new File(controlerIO.getIterationFilename(event.getIteration(),
+							Controler.DefaultFiles.eventsJson))));
 					break;
 				default:
 					log.warn("Unknown events file format specified: " + format.toString() + ".");

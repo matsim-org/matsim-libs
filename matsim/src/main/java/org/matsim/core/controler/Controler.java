@@ -86,6 +86,7 @@ public final class Controler implements ControlerI, MatsimServices, AllowsConfig
 		households("households.xml"),
 		facilities("facilities.xml"),
 		events("events.xml"),
+		eventsJson("events.ndjson"),
 		transitSchedule("transitSchedule.xml"),
 		transitVehicles("transitVehicles.xml"),
 		vehicles("vehicles.xml"),
