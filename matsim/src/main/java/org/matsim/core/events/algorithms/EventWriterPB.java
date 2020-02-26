@@ -1,5 +1,6 @@
 package org.matsim.core.events.algorithms;
 
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -8,6 +9,7 @@ import org.matsim.core.utils.pb.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
+import java.util.Map;
 
 /**
  * Event writer for protobuf format according to {@link org.matsim.core.utils.pb.Wireformat}
@@ -62,10 +64,21 @@ public class EventWriterPB implements EventWriter, BasicEventHandler {
         ProtoEvents.Event.Builder builder = ProtoEvents.Event.newBuilder()
                 .setTime(event.getTime());
 
+        if (event instanceof BasicLocation && ((BasicLocation) event).getCoord() != null) {
+            builder.getCoordsBuilder()
+                    .setX(((BasicLocation) event).getCoord().getX())
+                    .setY(((BasicLocation) event).getCoord().getY());
+        }
+
         if (event instanceof GenericEvent) {
+            Map<String, String> attrs = event.getAttributes();
+            // Checking references is safe here because they are constant
+            attrs.keySet().removeIf(key -> key == Event.ATTRIBUTE_X || key == Event.ATTRIBUTE_Y ||
+                    key == Event.ATTRIBUTE_TIME || key == Event.ATTRIBUTE_TYPE);
+
             builder.getGenericBuilder()
                     .setType(event.getEventType())
-                    .putAllAttrs(event.getAttributes());
+                    .putAllAttrs(attrs);
         } else if (event instanceof ActivityEndEvent) {
             builder.getActivityEndBuilder()
                     .setLinkId(convertId(((ActivityEndEvent) event).getLinkId()))
@@ -152,6 +165,7 @@ public class EventWriterPB implements EventWriter, BasicEventHandler {
 
     /**
      * Convert any id to protobuf equivalent.
+     *
      * @return {@link ProtoId} default instance if null
      */
     public static ProtoId convertId(Id<?> id) {

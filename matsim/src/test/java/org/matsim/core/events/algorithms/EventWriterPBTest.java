@@ -4,9 +4,11 @@ import org.assertj.core.api.Condition;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.core.utils.pb.ProtoEvents;
+import org.matsim.core.utils.pb.ProtoId;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -29,13 +31,15 @@ public class EventWriterPBTest {
                 .hasFieldOrPropertyWithValue("time", 10.0)
                 .extracting(ProtoEvents.Event::getGeneric)
                 .hasFieldOrPropertyWithValue("type", "test")
-                .extracting(ProtoEvents.GenericEvent::getAttrsMap).has(new Condition<>(m -> m.get("sample").equals("15"), "contains attribute"));
+                .extracting(ProtoEvents.GenericEvent::getAttrsMap)
+                .has(new Condition<>(m -> m.get("sample").equals("15"), "contains custom attribute"))
+                .has(new Condition<>(m -> !m.containsKey(Event.ATTRIBUTE_TIME) && !m.containsKey(Event.ATTRIBUTE_X), "does not contain common attributes"));
 
         assertThat(EventWriterPB.convertEvent(new PersonDepartureEvent(15.0, Id.createPersonId(15), Id.createLinkId(20), "test")))
                 .hasFieldOrPropertyWithValue("time", 15.0)
                 .extracting(ProtoEvents.Event::getPersonDeparture)
                 .hasFieldOrPropertyWithValue("legMode", "test")
-                .has(new Condition<>(e -> e.getPersonId().getId().equals("15") && e.getLinkId().getId().equals("20"),"Ids correct"));
+                .has(new Condition<>(e -> e.getPersonId().getId().equals("15") && e.getLinkId().getId().equals("20"), "Ids correct"));
     }
 
     @Test
@@ -50,14 +54,20 @@ public class EventWriterPBTest {
 
         assertThat(msg.hasLinkId());
 
-
         msg = ProtoEvents.LinkEnterEvent
                 .newBuilder()
                 .setLinkId(EventWriterPB.convertId(null))
                 .build();
 
-
         assertThat(!msg.hasLinkId());
+
+        // check that empty string is a valid id
+        msg = ProtoEvents.LinkEnterEvent.newBuilder()
+                .setLinkId(ProtoId.newBuilder().setId(""))
+                .build();
+
+        assertThat(msg.hasLinkId());
+
     }
 
 }

@@ -1,10 +1,12 @@
 
 syntax = "proto3";
+package matsim.pb;
 
 option java_package = "org.matsim.core.utils.pb";
 option java_outer_classname = "ProtoEvents";
 
-import "matsim/Ids.proto";
+import "matsim/pb/Ids.proto";
+import "matsim/pb/Model.proto";
 
 /*
  * Protobuf event definition. For detailed event documentation refer to the corresponding java code.
@@ -12,25 +14,24 @@ import "matsim/Ids.proto";
 message Event {
 
     double time = 1;
-
-    // X & Y ?
+    Coordinate coords = 2;
 
     oneof type {
-        GenericEvent generic = 2;
-        ActivityEndEvent activityEnd = 3;
-        ActivityStartEvent activityStart = 4;
-        LinkEnterEvent linkEnter = 5;
-        LinkLeaveEvent linkLeave = 6;
-        PersonArrivalEvent personalArrival = 7;
-        PersonDepartureEvent personDeparture = 8;
-        PersonEntersVehicleEvent personEntersVehicle = 9;
-        PersonLeavesVehicleEvent personLeavesVehicle = 10;
-        PersonMoneyEvent personMoney = 11;
-        PersonStuckEvent personStuck = 12;
-        TransitDriverStartsEvent transitDriverStarts = 13;
-        VehicleAbortsEvent vehicleAborts = 14;
-        VehicleEntersTrafficEvent vehicleEntersTraffic = 15;
-        VehicleLeavesTrafficEvent vehicleLeavesTraffic = 16;
+        GenericEvent generic = 3;
+        ActivityEndEvent activityEnd = 4;
+        ActivityStartEvent activityStart = 5;
+        LinkEnterEvent linkEnter = 6;
+        LinkLeaveEvent linkLeave = 7;
+        PersonArrivalEvent personalArrival = 8;
+        PersonDepartureEvent personDeparture = 9;
+        PersonEntersVehicleEvent personEntersVehicle = 10;
+        PersonLeavesVehicleEvent personLeavesVehicle = 11;
+        PersonMoneyEvent personMoney = 12;
+        PersonStuckEvent personStuck = 13;
+        TransitDriverStartsEvent transitDriverStarts = 14;
+        VehicleAbortsEvent vehicleAborts = 15;
+        VehicleEntersTrafficEvent vehicleEntersTraffic = 16;
+        VehicleLeavesTrafficEvent vehicleLeavesTraffic = 17;
     }
 }
 
