@@ -103,12 +103,7 @@ public final class FreespeedFactorRoutingModule implements RoutingModule {
 
 			// we're still missing the time on the final link, which the agent has to drive on in the java mobsim
 			// so let's calculate the final part.
-			
-			// get freespeed travel time:
-			double travelTimeLastLink = NetworkUtils.getFreespeedTravelTime(toLink, depTime + path.travelTime);
-			
-			// re-engineer the speed:
-			double speed = toLink.getLength() / travelTimeLastLink ;
+			double speed = toLink.getFreespeed(depTime + path.travelTime);
 			
 			// correct by speed limit:
 			if ( speed > params.getTeleportedModeFreespeedLimit() ) {
@@ -116,7 +111,7 @@ public final class FreespeedFactorRoutingModule implements RoutingModule {
 			}
 			
 			// now correct the travel time:
-			travelTimeLastLink = toLink.getLength() / speed ;
+			double travelTimeLastLink = toLink.getLength() / speed ;
 			
 			travTime = (int) (((int) path.travelTime + travelTimeLastLink) * this.params.getTeleportedModeFreespeedFactor());
 			Route route = this.populationFactory.getRouteFactories().createRoute(Route.class, fromLink.getId(), toLink.getId());
