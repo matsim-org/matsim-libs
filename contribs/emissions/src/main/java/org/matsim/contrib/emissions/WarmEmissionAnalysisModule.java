@@ -317,7 +317,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		//specified to use detailed value
 		if (ecg.isUsingDetailedEmissionCalculation()) {
 			if (this.detailedHbefaWarmTable == null) {
-				switch (ecg.getDetailedFallbackBehaviour()) {
+				switch (ecg.getDetailedVsAverageLookupBehavior()) {
 					case onlyTryDetailedElseAbort:
 						throw new RuntimeException("Missing detailed emissions factor table ... aborting.");
 					case tryDetailedThenTechnologyAverageElseAbort:
@@ -400,7 +400,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		}
 
 		// try "<technology>; average; average":
-		if (ecg.getDetailedFallbackBehaviour() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort || ecg.getDetailedFallbackBehaviour() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable ) {
+		if (ecg.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort || ecg.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable ) {
 			attribs2.setHbefaSizeClass( "average" );
 			attribs2.setHbefaEmConcept( "average" );
 			logger.warn( "did not find emission factor for efkey=" + efkey );
@@ -425,7 +425,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		}
 
 		// set vehicle attributes to "average; average; average":
-		if (ecg.getDetailedFallbackBehaviour() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable ) {
+		if (ecg.getDetailedVsAverageLookupBehavior() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable ) {
 			logger.warn("Now trying with setting to vehicle attributes to \"average; average; average\" and try it with average table");
 			efkey.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
 		}

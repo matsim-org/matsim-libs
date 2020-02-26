@@ -140,7 +140,7 @@ public class TestWarmEmissionAnalysisModuleTrafficSituations {
 		Link pcLink = createMockLink("link", linkLength, ffspeed / 3.6);
 
 		//allow fallback to average table
-		weam.getEcg().setDetailedFallbackBehaviour( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
+		weam.getEcg().setDetailedVsAverageLookupBehavior( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
 
 		// should be ok
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, pcLink, travelTime*3.6);
