@@ -130,8 +130,6 @@ public class PHbyModeCalculator {
                 csvPrinter.print(mode + TRAVEL_TIME_SUFFIX);
                 csvPrinter.print(mode + WAIT_TIME_SUFFIX);
             }
-            
-            csvPrinter.printRecord(allModes);
 
             for (Map.Entry<Integer,Map<String,TravelTimeAndWaitTime>> e : phtPerIteration.entrySet()){
                 csvPrinter.print(e.getKey());
