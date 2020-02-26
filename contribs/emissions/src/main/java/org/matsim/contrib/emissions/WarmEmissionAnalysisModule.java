@@ -403,32 +403,34 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		if (ecg.getDetailedFallbackBehaviour() == EmissionsConfigGroup.DetailedFallbackBehaviour.tryTechnologyAverageOrAbort || ecg.getDetailedFallbackBehaviour() == EmissionsConfigGroup.DetailedFallbackBehaviour.tryTechnologyAverageOrVehicleTypeAverage) {
 			attribs2.setHbefaSizeClass( "average" );
 			attribs2.setHbefaEmConcept( "average" );
+			logger.warn( "did not find emission factor for efkey=" + efkey );
+			logger.warn( " re-written to " + efkey2 );
+			logger.warn("will try it with '<technology>; average; average'");
+
 			if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
 				return this.detailedHbefaWarmTable.get( efkey2 );
 			}
 			//lookups of type "<technology>; average; average" should, I think, just be entered as such. kai, feb'20
-
-			logger.warn( "did not find emission factor for efkey=" + efkey );
-			logger.warn( " re-written to " + efkey2 );
-			logger.warn( "" );
-			logger.warn( "full table:" );
-			List<String> list = new ArrayList<>();
-			for( HbefaWarmEmissionFactorKey key : this.detailedHbefaWarmTable.keySet() ){
-				list.add( key.toString() );
-			}
-			list.sort( String::compareTo );
-			for( String str : list ){
-				logger.warn( str );
-			}
+			logger.warn( "That also did not worked " );
+//			logger.warn( "" );
+//			logger.warn( "full table:" );
+//			List<String> list = new ArrayList<>();
+//			for( HbefaWarmEmissionFactorKey key : this.detailedHbefaWarmTable.keySet() ){
+//				list.add( key.toString() );
+//			}
+//			list.sort( String::compareTo );
+//			for( String str : list ){
+//				logger.warn( str );
+//			}
 		}
-
 
 		// set vehicle attributes to "average; average; average":
 		if (ecg.getDetailedFallbackBehaviour() == EmissionsConfigGroup.DetailedFallbackBehaviour.tryTechnologyAverageOrVehicleTypeAverage) {
+			logger.warn("Now trying with setting to vehicle attributes to \"average; average; average\" and try it with average table");
 			efkey.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
 		}
 
-		// try average emissions:
+		// and try average emissions table:
 		if (this.avgHbefaWarmTable.get(efkey) != null) {
 			return this.avgHbefaWarmTable.get(efkey);
 		} else {
@@ -440,15 +442,23 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 			}
 		}
 
-		throw new RuntimeException();
-
 	} else { // Lookup in average table
 			// if vehicle deliberately specified as average;average;average, the lookup needs to be in the average table:
+			logger.info("Try lookup in average table");
 			HbefaVehicleAttributes attributes = vehicleInformationTuple.getSecond();
 			if ("average".equals(attributes.getHbefaEmConcept()) && "average".equals(attributes.getHbefaSizeClass()) && "average".equals(attributes.getHbefaTechnology())) {
 				HbefaWarmEmissionFactor ef = this.avgHbefaWarmTable.get(efkey);
 				Gbl.assertNotNull(ef);
 				return ef;
+			} else {
+				logger.warn("did not find average emission factor for efkey=" + efkey);
+				logger.warn("");
+				logger.warn("full table:");
+				List<HbefaWarmEmissionFactorKey> list = new ArrayList<>(this.avgHbefaWarmTable.keySet());
+				list.sort(Comparator.comparing(HbefaWarmEmissionFactorKey::toString));
+				for (HbefaWarmEmissionFactorKey key : list) {
+					logger.warn(key.toString());
+				}
 			}
 		}
 		// the above code is replacing the code below.
@@ -476,7 +486,8 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 //		}
 //		Gbl.assertNotNull( ef );
 //		return ef;
-		throw new RuntimeException("Was not able to lookup emissions factor for: " + efkey.toString());
+		throw new RuntimeException("Was not able to lookup emissions factor. Maybe you wanted to look up detailed values and did not specified this in the config OR " +
+				"you should use an other fallback setting when using detailed calculation OR values ar missing in your emissions table(s) either average or detailed OR... ? efkey: " + efkey.toString());
 	}
 
 	//TODO: this is based on looking at the speeds in the HBEFA files, using an MFP, maybe from A.Loder would be nicer, jm  oct'18
