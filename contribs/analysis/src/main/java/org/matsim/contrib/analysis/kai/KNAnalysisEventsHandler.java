@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.roadpricing.*;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
@@ -319,11 +320,11 @@ public class KNAnalysisEventsHandler implements PersonDepartureEventHandler, Per
 	}
 
 	private String getSubpopName(Person person) {
-		return "yy_" + getSubpopName( person, this.scenario.getConfig().plans().getSubpopulationAttributeName() ) ;
+		return "yy_" + getSubpopName( person, this.scenario.getConfig() ) ;
 	}
-	private String getSubpopName( Person person, String subpopAttrName ) {
+	private String getSubpopName( Person person, Config config ) {
 //		String subpop = (String) personAttributes.getAttribute( personId.toString(), subpopAttrName ) ;
-		String subpop = (String) PopulationUtils.getPersonAttribute( person, subpopAttrName) ;
+		String subpop = PopulationUtils.getSubpopulation(person );
 		return "subpop_" + subpop;
 	}
 
