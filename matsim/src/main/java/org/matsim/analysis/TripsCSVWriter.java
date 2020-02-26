@@ -154,7 +154,7 @@ public class TripsCSVWriter {
             record.add(Double.toString(toCoord.getY()));
 
             if (callcustomwriters) {
-                record.addAll(extension.getAdditionalColumns(experiencedPlan));
+                record.addAll(extension.getAdditionalColumns(trip));
                 if (HEADER.length != record.size()) {
                     throw new RuntimeException("Custom CSV Writer Extension does not provide a sufficient number of additional columns. Must be " + HEADER.length + " , but is " + record.size());
                 }
@@ -182,6 +182,6 @@ public class TripsCSVWriter {
     interface CustomTripsWriterExtension {
         String[] getAdditionalHeader();
 
-        List<String> getAdditionalColumns(Plan experiencedPlan);
+        List<String> getAdditionalColumns(TripStructureUtils.Trip trip);
     }
 }
