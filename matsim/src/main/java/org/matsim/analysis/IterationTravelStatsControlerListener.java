@@ -22,6 +22,7 @@
  package org.matsim.analysis;
 
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -36,6 +37,9 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
 
     @Inject
     Config config;
+
+    @Inject
+    Scenario scenario;
 	@Inject
 	private ExperiencedPlansService experiencedPlansService;
 
@@ -50,9 +54,9 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
     public void notifyIterationEnds(IterationEndsEvent event) {
         travelDistanceStats.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
         pkMbyModeCalculator.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
-        if (config.controler().getWriteTripsInterval() > 0 & config.controler().getWriteTripsInterval() % event.getIteration() == 0) {
+        if (config.controler().getWriteTripsInterval() > 0 && config.controler().getWriteTripsInterval() % event.getIteration() == 0) {
             String end = getEnding();
-            new TripsCSVWriter().write(outputDirectoryHierarchy.getIterationFilename(event.getIteration(), "trips.csv" + end));
+            new TripsCSVWriter(scenario).write(experiencedPlansService.getExperiencedPlans(), outputDirectoryHierarchy.getIterationFilename(event.getIteration(), "trips.csv" + end));
         }
     }
 
@@ -69,7 +73,7 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
 		travelDistanceStats.close();
         pkMbyModeCalculator.writeOutput();
         if (config.controler().getDumpDataAtEnd()) {
-            new TripsCSVWriter().write(outputDirectoryHierarchy.getOutputFilename("trips.csv" + getEnding()));
+            new TripsCSVWriter(scenario).write(experiencedPlansService.getExperiencedPlans(), outputDirectoryHierarchy.getOutputFilename("trips.csv" + getEnding()));
 
         }
 	}
