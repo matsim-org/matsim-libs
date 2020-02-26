@@ -94,7 +94,7 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 					act.setEndTime(mutateTime(act.getEndTime().seconds(), mutationRange));
 					// calculate resulting duration
 					if (affectingDuration) {
-						act.setMaximumDuration(act.getEndTime().seconds() - act.getStartTime());
+						act.setMaximumDuration(act.getEndTime().seconds() - act.getStartTime().seconds());
 					}
 					// move now pointer
 					now += act.getEndTime().seconds();

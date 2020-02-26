@@ -38,8 +38,8 @@ import org.matsim.core.scoring.ScoringFunction;
 public abstract class ScoringFunctionAdapter implements ScoringFunction {
 
     public final void handleActivity(Activity activity) {
-		if (!activity.getOptionalStartTime().isUndefined()) {
-            startActivity(activity.getStartTime(), activity);
+		if (!activity.getStartTime().isUndefined()) {
+            startActivity(activity.getStartTime().seconds(), activity);
         }
         if (activity.getEndTime().isDefined()) {
 			endActivity(activity.getEndTime().seconds(), activity);

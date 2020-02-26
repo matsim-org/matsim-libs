@@ -453,7 +453,7 @@ public class BetaTravelTest66IT extends MatsimTestCase {
 					if (i == 0) {
 						act.setStartTime(now); // set start to midnight
 						act.setEndTime(mutateTime(act.getEndTime().seconds())); // mutate the end time of the first activity
-						act.setMaximumDuration(act.getEndTime().seconds() - act.getStartTime()); // calculate resulting duration
+						act.setMaximumDuration(act.getEndTime().seconds() - act.getStartTime().seconds()); // calculate resulting duration
 						now += act.getEndTime().seconds(); // move now pointer
 					} else if (i < (max - 1)) {
 						// handle middle activities

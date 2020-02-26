@@ -74,7 +74,7 @@ class LCActivity implements Activity, LCPlanElement {
 	}
 	
 	@Override
-	public final OptionalTime getOptionalStartTime() {
+	public final OptionalTime getStartTime() {
 		return OptionalTime.of(this.plan.startTimes[this.arrayIndex]);
 	}
 

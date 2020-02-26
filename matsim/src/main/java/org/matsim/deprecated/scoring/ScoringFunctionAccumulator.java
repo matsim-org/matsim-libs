@@ -110,8 +110,8 @@ public final class ScoringFunctionAccumulator implements ScoringFunction {
 
 	@Override
 	public final void handleActivity(Activity activity) {
-		if (!activity.getOptionalStartTime().isUndefined()) {
-            startActivity(activity.getStartTime(), activity);
+		if (!activity.getStartTime().isUndefined()) {
+			startActivity(activity.getStartTime().seconds(), activity);
         }
 		if (activity.getEndTime().isDefined()) {
 			endActivity(activity.getEndTime().seconds(), activity);

@@ -116,7 +116,7 @@ class PlanSerializable implements Serializable {
             facIdString = act.getFacilityId() == null ? null : act.getFacilityId().toString();
             linkIdString = act.getLinkId() == null ? null : act.getLinkId().toString();
             maximumDuration = act.getMaximumDuration();
-            startTime = act.getStartTime();
+			startTime = act.getStartTime().seconds();
             type = act.getType();
         }
 

@@ -77,7 +77,7 @@ public class PRPlanMutateTimeAllocation implements PlanAlgorithm {
 					// mutate the end time of the first activity
 					act.setEndTime(mutateTime(act.getEndTime().seconds()));
 					// calculate resulting duration
-					act.setMaximumDuration(act.getEndTime().seconds() - act.getStartTime());
+					act.setMaximumDuration(act.getEndTime().seconds() - act.getStartTime().seconds());
 					// move now pointer
 					now += act.getEndTime().seconds();
 

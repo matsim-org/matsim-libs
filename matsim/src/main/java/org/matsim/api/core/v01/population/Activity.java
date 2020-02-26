@@ -59,11 +59,7 @@ public interface Activity extends PlanElement {
 	 */
 	public Coord getCoord();
 
-	default double getStartTime() {
-		return getOptionalStartTime().seconds();
-	}
-
-	public OptionalTime getOptionalStartTime();
+	public OptionalTime getStartTime();
 
 	/**
 	 * Used for reporting outcomes in the scoring. Not interpreted for the demand.

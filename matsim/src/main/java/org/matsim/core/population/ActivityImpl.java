@@ -80,7 +80,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	 * Used for reporting outcomes in the scoring. Not interpreted for the demand.
 	 */
 	@Override
-	public final OptionalTime getOptionalStartTime() {
+	public final OptionalTime getStartTime() {
 		return this.startTime;
 	}
 
@@ -147,7 +147,8 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 				+ this.linkId
 				+ "]"
 				+ "[startTime="
-				+ Time.writeTime(getOptionalStartTime().isUndefined() ? Time.getUndefinedTime() : this.getStartTime())
+				+ Time.writeTime(getStartTime().isUndefined() ? Time.getUndefinedTime() :
+				getStartTime().seconds())
 				+ "]"
 				+ "[endTime="
 				+ Time.writeTime(endTime)

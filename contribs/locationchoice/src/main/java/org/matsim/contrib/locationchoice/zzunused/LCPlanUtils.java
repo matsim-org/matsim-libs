@@ -62,7 +62,7 @@ import org.matsim.facilities.ActivityFacility;
 				((Activity) pe).setFacilityId(actTemplate.getFacilityId());
 				((Activity) pe).setLinkId(actTemplate.getLinkId());
 				((Activity) pe).setMaximumDuration(actTemplate.getMaximumDuration());
-				((Activity) pe).setStartTime(actTemplate.getStartTime());
+				((Activity) pe).setStartTime(actTemplate.getStartTime().seconds());
 				((Activity) pe).setType(actTemplate.getType());
 			} else if (pe instanceof Leg) {
 				Leg legTemplate = ((Leg)planTemplate.getPlanElements().get(actLegIndex));
@@ -89,7 +89,7 @@ import org.matsim.facilities.ActivityFacility;
 				((Activity) pe).setFacilityId(actTemplate.getFacilityId());
 				((Activity) pe).setLinkId(actTemplate.getLinkId());
 				((Activity) pe).setMaximumDuration(actTemplate.getMaximumDuration());
-				((Activity) pe).setStartTime(actTemplate.getStartTime());
+				((Activity) pe).setStartTime(actTemplate.getStartTime().seconds());
 				((Activity) pe).setType(actTemplate.getType());
 			} else if (pe instanceof Leg) {
 				LCLeg legTemplate = ((LCLeg) planTemplate.getPlanElements().get(actLegIndex));
@@ -116,7 +116,7 @@ import org.matsim.facilities.ActivityFacility;
 				((LCActivity) pe).setFacilityId(actTemplate.getFacilityId());
 				((LCActivity) pe).setLinkId(actTemplate.getLinkId());
 				((LCActivity) pe).setMaximumDuration(actTemplate.getMaximumDuration());
-				((LCActivity) pe).setStartTime(actTemplate.getStartTime());
+				((LCActivity) pe).setStartTime(actTemplate.getStartTime().seconds());
 				((LCActivity) pe).setType(actTemplate.getType());
 			} else if (pe instanceof LCLeg) {
 				LCLeg legTemplate = ((LCLeg) planTemplate.getPlanElements().get(actLegIndex));

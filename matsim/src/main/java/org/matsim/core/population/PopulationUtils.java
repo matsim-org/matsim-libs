@@ -256,8 +256,8 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public OptionalTime getOptionalStartTime() {
-			return this.delegate.getOptionalStartTime() ;
+		public OptionalTime getStartTime() {
+			return this.delegate.getStartTime() ;
 		}
 
 		@Override
@@ -852,7 +852,8 @@ public final class PopulationUtils {
 		newAct.setCoord(coord);
 		newAct.setType(act.getType());
 		newAct.setLinkId(act.getLinkId());
-		newAct.setStartTime(act.getOptionalStartTime().isUndefined() ? Time.getUndefinedTime() : act.getStartTime());
+		newAct.setStartTime(act.getStartTime().isUndefined() ? Time.getUndefinedTime() :
+				act.getStartTime().seconds());
 		newAct.setEndTime(!act.getEndTime().isDefined() ? Time.getUndefinedTime() :
 				act.getEndTime().seconds());
 		newAct.setMaximumDuration(act.isMaximumDurationUndefined() ? Time.getUndefinedTime() : act.getMaximumDuration());

@@ -43,7 +43,7 @@ public class EventsToActivitiesTest {
 		testee.handleEvent(new ActivityEndEvent(30.0, Id.create("1", Person.class), Id.create("l1", Link.class), Id.create("l1", ActivityFacility.class),
 				"work"));
 		Assert.assertNotNull(ah.handledActivity);
-		Assert.assertEquals(10.0, ah.handledActivity.getActivity().getStartTime(), 1e-8);
+		Assert.assertEquals(10.0, ah.handledActivity.getActivity().getStartTime().seconds(), 1e-8);
 		Assert.assertEquals(30.0, ah.handledActivity.getActivity().getEndTime().seconds(), 1e-8);
 		Assert.assertEquals( 123., ah.handledActivity.getActivity().getCoord().getX(), 0. );
 		Assert.assertEquals( 4.56, ah.handledActivity.getActivity().getCoord().getY(), 0. );
@@ -58,7 +58,7 @@ public class EventsToActivitiesTest {
 		testee.handleEvent(new ActivityEndEvent(10.0, Id.create("1", Person.class), Id.create("l1", Link.class), Id.create("l1", ActivityFacility.class),
 				"home"));
 		Assert.assertNotNull(ah.handledActivity);
-		Assert.assertTrue(ah.handledActivity.getActivity().getOptionalStartTime().isUndefined());
+		Assert.assertTrue(ah.handledActivity.getActivity().getStartTime().isUndefined());
 		Assert.assertEquals(10.0, ah.handledActivity.getActivity().getEndTime().seconds(), 1e-8);
 		ah.reset();
 		testee.handleEvent(new ActivityStartEvent(90.0, Id.create("1", Person.class), Id.create("l1", Link.class), Id.create("l1", ActivityFacility.class),
@@ -66,7 +66,7 @@ public class EventsToActivitiesTest {
 		testee.finish();
 		Assert.assertNotNull(ah.handledActivity);
 		Assert.assertTrue(!ah.handledActivity.getActivity().getEndTime().isDefined());
-		Assert.assertEquals(90.0, ah.handledActivity.getActivity().getStartTime(), 1e-8);
+		Assert.assertEquals(90.0, ah.handledActivity.getActivity().getStartTime().seconds(), 1e-8);
 		Assert.assertEquals( 123., ah.handledActivity.getActivity().getCoord().getX(), 0. );
 		Assert.assertEquals( 4.56, ah.handledActivity.getActivity().getCoord().getY(), 0. );
 	}
@@ -79,7 +79,7 @@ public class EventsToActivitiesTest {
 		testee.reset(0);
 		testee.handleEvent(new ActivityEndEvent(10.0, Id.create("1", Person.class), Id.create("l1", Link.class), Id.create("f1", ActivityFacility.class), "home"));
 		Assert.assertNotNull(ah.handledActivity);
-		Assert.assertTrue(ah.handledActivity.getActivity().getOptionalStartTime().isUndefined()) ;
+		Assert.assertTrue(ah.handledActivity.getActivity().getStartTime().isUndefined()) ;
 		Assert.assertEquals(10.0, ah.handledActivity.getActivity().getEndTime().seconds(), 1e-8);
 		ah.reset();
 		testee.finish();

@@ -341,12 +341,12 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 
 	@Override
 	public void handleActivity(Activity act) {
-		this.score += calcActScore(act.getStartTime(), act.getEndTime().seconds(), act);
+		this.score += calcActScore(act.getStartTime().seconds(), act.getEndTime().seconds(), act);
 	}
 
 	@Override
 	public void handleLastActivity(Activity act) {
-		this.currentActivityStartTime = act.getStartTime();
+		this.currentActivityStartTime = act.getStartTime().seconds();
 		this.handleOvernightActivity(act);
 		this.firstActivity = null;
 	}

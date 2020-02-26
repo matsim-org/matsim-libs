@@ -188,9 +188,9 @@ import org.matsim.vehicles.Vehicle;
 				out.write("\"");
 			}
 		}
-		if (!act.getOptionalStartTime().isUndefined()) {
+		if (!act.getStartTime().isUndefined()) {
 			out.write(" start_time=\"");
-			out.write(Time.writeTime(act.getStartTime()));
+			out.write(Time.writeTime(act.getStartTime().seconds()));
 			out.write("\"");
 		}
 		if (!act.isMaximumDurationUndefined()) {

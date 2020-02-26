@@ -83,11 +83,11 @@ public final class PersonCalcTimes extends AbstractPersonAlgorithm {
 							time = 24*3600;
 						}
 						act.setEndTime(time);
-						act.setMaximumDuration(time - act.getStartTime());
+						act.setMaximumDuration(time - act.getStartTime().seconds());
 					}
 					else {
 						act.setStartTime(leg.getDepartureTime() + leg.getTravelTime());
-						act.setEndTime(act.getStartTime()+act.getMaximumDuration());
+						act.setEndTime(act.getStartTime().seconds() +act.getMaximumDuration());
 					}
 				}
 				if (pe instanceof Leg) {

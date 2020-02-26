@@ -201,9 +201,8 @@ public final class ParkingChoiceSimulation
 				parkingAttributes.facilityId = firstActivityAfterLastCarLegOfDay.getFacilityId();
 				parkingAttributes.actType = firstActivityAfterLastCarLegOfDay.getType();
 
-				double startTime = firstActivityAfterLastCarLegOfDay.getOptionalStartTime().isUndefined() ?
-						Time.getUndefinedTime() :
-						firstActivityAfterLastCarLegOfDay.getStartTime();
+				double startTime = firstActivityAfterLastCarLegOfDay.getStartTime().isUndefined() ?
+						Time.getUndefinedTime() : firstActivityAfterLastCarLegOfDay.getStartTime().seconds();
 				if (Time.isUndefinedTime(startTime) || startTime == Double.POSITIVE_INFINITY) {
 					parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(0,
 							firstActivityOfDayBeforeDepartingWithCar.getEndTime().seconds());

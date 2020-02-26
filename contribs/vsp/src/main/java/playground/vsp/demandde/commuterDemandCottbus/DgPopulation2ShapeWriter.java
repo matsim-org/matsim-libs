@@ -78,7 +78,7 @@ public class DgPopulation2ShapeWriter {
 							
 							String id = p.getId().toString();
 							String type = activity.getType();
-							Double startTime = activity.getStartTime();
+							Double startTime = activity.getStartTime().seconds();
 							Double endTime = activity.getEndTime().seconds();
 
 							Coordinate actCoordinate = MGC.coord2Coordinate(activity.getCoord());
