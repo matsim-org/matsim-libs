@@ -91,7 +91,7 @@ public class ImportedJointRoutesChecker implements PlanAlgorithm, PersonAlgorith
 			final double currTime,
 			final Activity act) {
 		double e = act.getEndTime().seconds();
-		double d = act.getMaximumDuration();
+		double d = act.getMaximumDuration().seconds();
 		return !Time.isUndefinedTime(e) ? e :
 			currTime + ( !Time.isUndefinedTime(d) ? d : 0 );
 	}

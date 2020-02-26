@@ -53,12 +53,8 @@ public interface Activity extends PlanElement {
 	 * Used for reporting outcomes in the scoring. Not interpreted for the demand.
 	 */
 	public void setStartTime(double seconds);
-	
-	public default double getMaximumDuration() {
-		return getOptionalMaximumDuration().seconds();
-	}
 
-	public OptionalTime getOptionalMaximumDuration();
+	public OptionalTime getMaximumDuration();
 	
 	public void setMaximumDuration(double seconds) ;
 

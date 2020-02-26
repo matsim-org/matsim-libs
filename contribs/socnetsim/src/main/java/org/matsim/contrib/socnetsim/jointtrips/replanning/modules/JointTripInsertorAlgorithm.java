@@ -354,7 +354,7 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 			Activity act = (Activity) pe;
 			double startTime = act.getStartTime().isUndefined() ? Time.getUndefinedTime() :
 					act.getStartTime().seconds();
-			double dur = act.getMaximumDuration();
+			double dur = act.getMaximumDuration().seconds();
 			if (act.getEndTime().isDefined()) {
 				// use fromAct.endTime as time for routing
 				return act.getEndTime().seconds();

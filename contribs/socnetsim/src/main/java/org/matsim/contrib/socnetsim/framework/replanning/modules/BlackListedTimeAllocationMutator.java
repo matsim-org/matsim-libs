@@ -67,7 +67,7 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 		for ( Activity a : activities ) {
 			switch ( setting ) {
 				case MUTATE_DUR:
-					((Activity) a).setMaximumDuration( mutateTime( a.getMaximumDuration() ) );
+					((Activity) a).setMaximumDuration( mutateTime(a.getMaximumDuration().seconds()) );
 					break;
 				case MUTATE_END:
 					a.setEndTime( mutateTime(a.getEndTime().seconds()) );

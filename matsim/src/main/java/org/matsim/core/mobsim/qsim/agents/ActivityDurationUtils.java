@@ -37,19 +37,19 @@ public class ActivityDurationUtils {
 	 */
 	
 	public static double calculateDepartureTime(Activity act, double now, PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation) {
-		if (act.getOptionalMaximumDuration().isUndefined() && !act.getEndTime().isDefined()) {
+		if (act.getMaximumDuration().isUndefined() && !act.getEndTime().isDefined()) {
 			return Double.POSITIVE_INFINITY;
 		} else {
 			double departure = 0;
 			if (activityDurationInterpretation.equals(
 					PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime)) {
 				// person stays at the activity either until its duration is over or until its end time, whatever comes first
-				if (act.getOptionalMaximumDuration().isUndefined()) {
+				if (act.getMaximumDuration().isUndefined()) {
 					departure = act.getEndTime().seconds();
 				} else if (!act.getEndTime().isDefined()) {
-					departure = now + act.getMaximumDuration();
+					departure = now + act.getMaximumDuration().seconds();
 				} else {
-					departure = Math.min(act.getEndTime().seconds(), now + act.getMaximumDuration());
+					departure = Math.min(act.getEndTime().seconds(), now + act.getMaximumDuration().seconds());
 				}
 			} else if (activityDurationInterpretation.equals(PlansConfigGroup.ActivityDurationInterpretation.endTimeOnly )) {
 				if (!Time.isUndefinedTime(act.getEndTime().seconds())) {
@@ -61,8 +61,8 @@ public class ActivityDurationUtils {
 				// In fact, as of now I think that _this_ should be the default behavior.  kai, aug'10
 				if (act.getEndTime().isDefined()) {
 					departure = act.getEndTime().seconds();
-				} else if (!Time.isUndefinedTime(act.getMaximumDuration())) {
-					departure = now + act.getMaximumDuration();
+				} else if (!Time.isUndefinedTime(act.getMaximumDuration().seconds())) {
+					departure = now + act.getMaximumDuration().seconds();
 				} else {
 					throw new IllegalStateException(
 							"neither activity end time nor activity duration defined; don't know what to do.");

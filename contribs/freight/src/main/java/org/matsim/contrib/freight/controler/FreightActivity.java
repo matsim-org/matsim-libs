@@ -61,8 +61,8 @@ public class FreightActivity implements Activity {
 	}
 
 	@Override
-	public OptionalTime getOptionalMaximumDuration() {
-		return act.getOptionalMaximumDuration();
+	public OptionalTime getMaximumDuration() {
+		return act.getMaximumDuration();
 	}
 
 	@Override

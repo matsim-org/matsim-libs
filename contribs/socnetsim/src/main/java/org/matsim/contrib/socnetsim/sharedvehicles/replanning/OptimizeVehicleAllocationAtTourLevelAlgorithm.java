@@ -329,7 +329,7 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 		for ( final PlanElement pe : trip.getTripElements() ) {
 			if ( pe instanceof Activity ) {
 				final double end = ((Activity)pe).getEndTime().seconds();
-				now = !Time.isUndefinedTime(end) ? end : now + ((Activity) pe).getMaximumDuration();
+				now = !Time.isUndefinedTime(end) ? end : now + ((Activity)pe).getMaximumDuration().seconds();
 				// TODO: do not fail *that* badly, but just revert to random alloc
 				if ( Time.isUndefinedTime(now) ) throw new RuntimeException( "could not get time from "+pe );
 			}

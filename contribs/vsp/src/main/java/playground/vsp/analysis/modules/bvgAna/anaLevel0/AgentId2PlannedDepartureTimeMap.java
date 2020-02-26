@@ -75,8 +75,8 @@ public class AgentId2PlannedDepartureTimeMap {
 						runningTime = act.getEndTime().seconds();
 						firstActDone = true;
 					} else {
-						if(!Time.isUndefinedTime(act.getMaximumDuration())){
-							runningTime += act.getMaximumDuration();
+						if(!Time.isUndefinedTime(act.getMaximumDuration().seconds())){
+							runningTime += act.getMaximumDuration().seconds();
 						} else {
 							runningTime = act.getEndTime().seconds();
 						}

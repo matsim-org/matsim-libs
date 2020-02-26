@@ -20,14 +20,14 @@
 
 package org.matsim.core.population.algorithms;
 
+import java.util.List;
+import java.util.Random;
+
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.utils.misc.Time;
-
-import java.util.List;
-import java.util.Random;
 
 /**
  * Mutates the duration of activities randomly within a specified range.
@@ -85,10 +85,10 @@ public final class PlanMutateTimeAllocation implements PlanAlgorithm {
 
 					// assume that there will be no delay between arrival time and activity start time
 					act.setStartTime(now);
-						if (!Time.isUndefinedTime(act.getMaximumDuration())) {
+					if (!Time.isUndefinedTime(act.getMaximumDuration().seconds())) {
 							// mutate the durations of all 'middle' activities
-							act.setMaximumDuration(mutateTime(act.getMaximumDuration()));
-							now += act.getMaximumDuration();
+						act.setMaximumDuration(mutateTime(act.getMaximumDuration().seconds()));
+						now += act.getMaximumDuration().seconds();
 							// set end time accordingly
 							act.setEndTime(now);
 						} else {

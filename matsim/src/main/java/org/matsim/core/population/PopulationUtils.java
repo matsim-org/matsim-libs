@@ -266,8 +266,8 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public OptionalTime getOptionalMaximumDuration() {
-			return this.delegate.getOptionalMaximumDuration() ;
+		public OptionalTime getMaximumDuration() {
+			return this.delegate.getMaximumDuration() ;
 		}
 
 		@Override
@@ -432,13 +432,13 @@ public final class PopulationUtils {
 			case tryEndTimeThenDuration:
 				if (act.getEndTime().isDefined()) {
 					return act.getEndTime().seconds();
-				} else if (!act.getOptionalMaximumDuration().isUndefined()) {
-					return now + act.getMaximumDuration();
+				} else if (!act.getMaximumDuration().isUndefined()) {
+					return now + act.getMaximumDuration().seconds();
 				} else {
 					return Time.getUndefinedTime();
 				}
 			case minOfDurationAndEndTime:
-				return Math.min(now + act.getMaximumDuration(), act.getEndTime().seconds());
+				return Math.min(now + act.getMaximumDuration().seconds(), act.getEndTime().seconds());
 			default:
 				break;
 		}
@@ -856,7 +856,8 @@ public final class PopulationUtils {
 				act.getStartTime().seconds());
 		newAct.setEndTime(!act.getEndTime().isDefined() ? Time.getUndefinedTime() :
 				act.getEndTime().seconds());
-		newAct.setMaximumDuration(act.getOptionalMaximumDuration().isUndefined() ? Time.getUndefinedTime() : act.getMaximumDuration());
+		newAct.setMaximumDuration(act.getMaximumDuration().isUndefined() ? Time.getUndefinedTime() :
+				act.getMaximumDuration().seconds());
 		newAct.setFacilityId(act.getFacilityId());
 
 		AttributesUtils.copyAttributesFromTo(act, newAct);

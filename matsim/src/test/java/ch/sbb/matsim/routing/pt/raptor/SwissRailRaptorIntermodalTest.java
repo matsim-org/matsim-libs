@@ -4,8 +4,11 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
-import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -32,12 +35,16 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.PtConstants;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup;
+import ch.sbb.matsim.config.SwissRailRaptorConfigGroup.IntermodalAccessEgressParameterSet;
 
 /**
  * @author mrieser / SBB
@@ -185,10 +192,10 @@ public class SwissRailRaptorIntermodalTest {
         Assert.assertEquals(TransportMode.walk, ((Leg) planElements.get(6)).getMode());
         Assert.assertEquals(TransportMode.bike, ((Leg) planElements.get(8)).getMode());
 
-        Assert.assertEquals(0.0, ((Activity) planElements.get(1)).getMaximumDuration(), 0.0);
-        Assert.assertEquals(0.0, ((Activity) planElements.get(3)).getMaximumDuration(), 0.0);
-        Assert.assertEquals(0.0, ((Activity) planElements.get(5)).getMaximumDuration(), 0.0);
-        Assert.assertEquals(0.0, ((Activity) planElements.get(7)).getMaximumDuration(), 0.0);
+		Assert.assertEquals(0.0, ((Activity)planElements.get(1)).getMaximumDuration().seconds(), 0.0);
+		Assert.assertEquals(0.0, ((Activity)planElements.get(3)).getMaximumDuration().seconds(), 0.0);
+		Assert.assertEquals(0.0, ((Activity)planElements.get(5)).getMaximumDuration().seconds(), 0.0);
+		Assert.assertEquals(0.0, ((Activity)planElements.get(7)).getMaximumDuration().seconds(), 0.0);
     }
 
     @Test

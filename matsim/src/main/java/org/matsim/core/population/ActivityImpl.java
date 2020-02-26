@@ -154,14 +154,15 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 				+ Time.writeTime(endTime)
 				+ "]"
 				+ "[duration="
-				+ Time.writeTime(getOptionalMaximumDuration().isUndefined() ? Time.getUndefinedTime() : this.getMaximumDuration())
+				+ Time.writeTime(getMaximumDuration().isUndefined() ? Time.getUndefinedTime() :
+				getMaximumDuration().seconds())
 				+ "]"
 				+ "[facilityId="
 				+ this.facilityId + "]" ;
 	}
 
 	@Override
-	public OptionalTime getOptionalMaximumDuration() {
+	public OptionalTime getMaximumDuration() {
 		return this.dur;
 	}
 

@@ -141,7 +141,7 @@ public final class ParkingChoiceSimulation
 					
 					for (int i = currentPlanElementIndex.get(personId); i < planElements.size(); i++) {
 						if (planElements.get(i) instanceof Activity) {
-							parkingDuration+= ((Activity) planElements.get(i)).getMaximumDuration();
+							parkingDuration+= ((Activity)planElements.get(i)).getMaximumDuration().seconds();
 						}
 						
 						if (planElements.get(i) == activityBeforeNextCarLeg) {

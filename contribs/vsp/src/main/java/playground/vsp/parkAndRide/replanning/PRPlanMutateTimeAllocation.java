@@ -89,10 +89,10 @@ public class PRPlanMutateTimeAllocation implements PlanAlgorithm {
 					if (act.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE) || act.getType().equals(PRConstants.PARKANDRIDE_ACTIVITY_TYPE)) {
 					} else {
 						if (this.useActivityDurations) {
-							if (!Time.isUndefinedTime(act.getMaximumDuration())) {
+							if (!Time.isUndefinedTime(act.getMaximumDuration().seconds())) {
 								// mutate the durations of all 'middle' activities
-								act.setMaximumDuration(mutateTime(act.getMaximumDuration()));
-								now += act.getMaximumDuration();
+								act.setMaximumDuration(mutateTime(act.getMaximumDuration().seconds()));
+								now += act.getMaximumDuration().seconds();
 								// set end time accordingly
 								act.setEndTime(now);
 							} else {

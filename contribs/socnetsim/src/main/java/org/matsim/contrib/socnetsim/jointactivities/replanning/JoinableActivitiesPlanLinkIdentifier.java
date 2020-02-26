@@ -114,7 +114,7 @@ public class JoinableActivitiesPlanLinkIdentifier implements PlanLinkIdentifier 
 				// correct times if inconsistent
 				lastEnd = Math.max(lastEnd, act.getEndTime().isDefined()
 						? act.getEndTime().seconds()
-						: lastEnd + act.getMaximumDuration());
+						: lastEnd + act.getMaximumDuration().seconds());
 			}
 
 			if ( log.isTraceEnabled() ) {

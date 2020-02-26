@@ -195,8 +195,8 @@ public class TripRouterTest {
 			this.delegate.setStartTime(seconds);
 		}
 		@Override
-		public OptionalTime getOptionalMaximumDuration() {
-			return this.delegate.getOptionalMaximumDuration();
+		public OptionalTime getMaximumDuration() {
+			return this.delegate.getMaximumDuration();
 		}
 		@Override
 		public void setMaximumDuration(double seconds) {
