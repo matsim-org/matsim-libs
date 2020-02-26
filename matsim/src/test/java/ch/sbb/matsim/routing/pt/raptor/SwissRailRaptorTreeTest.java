@@ -33,7 +33,7 @@ public class SwissRailRaptorTreeTest {
         SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), config, f.scenario.getNetwork());
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-                new LeastCostRaptorRouteSelector(), stopFinder, null );
+                new LeastCostRaptorRouteSelector(), stopFinder );
 
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
 
@@ -78,7 +78,7 @@ public class SwissRailRaptorTreeTest {
         SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork());
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-            new LeastCostRaptorRouteSelector(), stopFinder, null );
+            new LeastCostRaptorRouteSelector(), stopFinder );
 
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
 
@@ -125,7 +125,7 @@ public class SwissRailRaptorTreeTest {
         SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), config, f.scenario.getNetwork());
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-            new LeastCostRaptorRouteSelector(), stopFinder, null );
+            new LeastCostRaptorRouteSelector(), stopFinder );
 
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
 
@@ -171,7 +171,7 @@ public class SwissRailRaptorTreeTest {
         SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork());
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-            new LeastCostRaptorRouteSelector(), stopFinder, null );
+            new LeastCostRaptorRouteSelector(), stopFinder );
 
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
 
@@ -219,7 +219,7 @@ public class SwissRailRaptorTreeTest {
         SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), config, f.scenario.getNetwork());
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-            new LeastCostRaptorRouteSelector(), stopFinder, null );
+            new LeastCostRaptorRouteSelector(), stopFinder );
 
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
 
@@ -268,7 +268,7 @@ public class SwissRailRaptorTreeTest {
         SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), RaptorUtils.createStaticConfig(f.config), f.scenario.getNetwork());
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-            new LeastCostRaptorRouteSelector(), stopFinder, null );
+            new LeastCostRaptorRouteSelector(), stopFinder );
 
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
 
@@ -319,7 +319,7 @@ public class SwissRailRaptorTreeTest {
         SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), config, f.scenario.getNetwork());
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-            new LeastCostRaptorRouteSelector(), stopFinder, null );
+            new LeastCostRaptorRouteSelector(), stopFinder );
 
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
 
@@ -354,7 +354,7 @@ public class SwissRailRaptorTreeTest {
         SwissRailRaptorData data = SwissRailRaptorData.create(f.scenario.getTransitSchedule(), config, f.scenario.getNetwork());
         DefaultRaptorStopFinder stopFinder = new DefaultRaptorStopFinder(null, new DefaultRaptorIntermodalAccessEgress(), null);
         SwissRailRaptor raptor = new SwissRailRaptor(data, new DefaultRaptorParametersForPerson(f.scenario.getConfig()),
-            new LeastCostRaptorRouteSelector(), stopFinder, null );
+            new LeastCostRaptorRouteSelector(), stopFinder );
 
         RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
 
