@@ -86,6 +86,9 @@ public final class PopulationUtils {
 	private static final PopulationFactory populationFactory = createPopulation( new PlansConfigGroup(), null  ).getFactory() ;
 	// try to avoid misleading comment about config context.  kai, dec'18
 
+	private static final String SUBPOPULATION_ATTRIBUTE_NAME = "subpopulation";
+
+
 	/**
 	 * Is a namespace, so don't instantiate:
 	 */
@@ -1113,7 +1116,7 @@ public final class PopulationUtils {
 		}
 		return null;
 	}
-	public static void putPersonAttribute( Person person, String key, Object value ) {
+	public static void putPersonAttribute( HasPlansAndId<?,?> person, String key, Object value ) {
 		person.getAttributes().putAttribute( key, value ) ;
 	}
 	public static Object removePersonAttribute( Person person, String key ) {
@@ -1125,4 +1128,10 @@ public final class PopulationUtils {
 		person.getAttributes().clear();
 	}
 
+        public static String getSubpopulation( HasPlansAndId<?,?> person ){
+		return (String) getPersonAttribute( person, SUBPOPULATION_ATTRIBUTE_NAME );
+        }
+        public static void putSubpopulation( HasPlansAndId<?,?> person, String subpopulation ) {
+		putPersonAttribute( person, SUBPOPULATION_ATTRIBUTE_NAME, subpopulation );
+	}
 }

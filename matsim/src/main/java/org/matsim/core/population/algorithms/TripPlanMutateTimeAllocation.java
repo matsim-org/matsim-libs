@@ -44,22 +44,22 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 	private final Random random;
 	private boolean useActivityDurations = true;
 	private final boolean affectingDuration;
-	private final String subpopulationAttribute;
+//	private final String subpopulationAttribute;
 	private final Map<String, Double> subpopulationMutationRanges;
 	private final Map<String, Boolean> subpopulationAffectingDuration;
 
 	public TripPlanMutateTimeAllocation(final double mutationRange,
 			final boolean affectingDuration, final Random random) {
-		this(mutationRange, affectingDuration, random, null, null, null);
+		this(mutationRange, affectingDuration, random, null, null );
 	}
 
-	public TripPlanMutateTimeAllocation(final double mutationRange, 
-			final boolean affectingDuration, final Random random, final String subpopulationAttribute,
-			final Map<String, Double> subpopulationMutationRanges, final Map<String, Boolean> subpopulationAffectingDuration) {
+	public TripPlanMutateTimeAllocation( final double mutationRange,
+					     final boolean affectingDuration, final Random random,
+					     final Map<String, Double> subpopulationMutationRanges, final Map<String, Boolean> subpopulationAffectingDuration ) {
 		this.mutationRange = mutationRange;
 		this.affectingDuration = affectingDuration;
 		this.random = random;
-		this.subpopulationAttribute = subpopulationAttribute;
+//		this.subpopulationAttribute = subpopulationAttribute;
 		this.subpopulationMutationRanges = subpopulationMutationRanges;
 		this.subpopulationAffectingDuration = subpopulationAffectingDuration;
 	}
@@ -180,9 +180,10 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 	}
 	
 	private final String getSubpopulation(final Plan plan) {
-		if (this.subpopulationAttribute == null) return null;
+//		if (this.subpopulationAttribute == null) return null;
 		if (plan.getPerson() == null) return null;
-		return (String) PopulationUtils.getPersonAttribute(plan.getPerson(), this.subpopulationAttribute);
+//		return (String) PopulationUtils.getPersonAttribute(plan.getPerson(), this.subpopulationAttribute);
+		return PopulationUtils.getSubpopulation( plan.getPerson() );
 	}
 	
 	private final boolean isAffectingDuration(final String subpopulation) {

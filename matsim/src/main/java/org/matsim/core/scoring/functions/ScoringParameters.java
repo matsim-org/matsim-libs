@@ -101,11 +101,7 @@ public class ScoringParameters implements MatsimParameters {
 				final Person person ) {
 			this(
 					scenario.getConfig().planCalcScore(),
-					scenario.getConfig().planCalcScore().getScoringParameters(
-							(String)
-									PopulationUtils.getPersonAttribute(
-										  person, scenario.getConfig().plans().getSubpopulationAttributeName()
-														    ) ),
+					scenario.getConfig().planCalcScore().getScoringParameters( PopulationUtils.getSubpopulation( person ) ),
 					scenario.getConfig().scenario() );
 		}
 
