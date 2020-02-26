@@ -24,6 +24,7 @@
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -58,19 +59,13 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
         travelDistanceStats.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
         pHbyModeCalculator.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
         pkMbyModeCalculator.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
-        if (config.controler().getWriteTripsInterval() > 0 && config.controler().getWriteTripsInterval() % event.getIteration() == 0) {
-            String end = getEnding();
-            new TripsCSVWriter(scenario).write(experiencedPlansService.getExperiencedPlans(), outputDirectoryHierarchy.getIterationFilename(event.getIteration(), "trips.csv" + end));
+        final boolean writingTripsAtAll = config.controler().getWriteTripsInterval() > 0;
+        final boolean regularWriteEvents = writingTripsAtAll && (event.getIteration() > 0 && event.getIteration() % config.controler().getWriteTripsInterval() == 0);
+        if (regularWriteEvents || (writingTripsAtAll && event.getIteration() == 0)) {
+            new TripsCSVWriter(scenario).write(experiencedPlansService.getExperiencedPlans(), outputDirectoryHierarchy.getIterationFilename(event.getIteration(), Controler.DefaultFiles.tripscsv));
         }
     }
 
-    private String getEnding() {
-        String end = config.controler().getCompressionType().toString();
-        if (end != null) {
-            end = "." + end;
-        } else end = "";
-        return end;
-    }
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
@@ -78,9 +73,5 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
 		// TODO: this way the statistics are written only at the end. Better after each iteration?
         pHbyModeCalculator.writeOutput();
         pkMbyModeCalculator.writeOutput();
-        if (config.controler().getDumpDataAtEnd()) {
-            new TripsCSVWriter(scenario).write(experiencedPlansService.getExperiencedPlans(), outputDirectoryHierarchy.getOutputFilename("trips.csv" + getEnding()));
-
-        }
 	}
 }

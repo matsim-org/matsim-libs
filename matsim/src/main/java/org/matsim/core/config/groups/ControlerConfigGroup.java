@@ -86,7 +86,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 
 	private int writeEventsInterval=10;
 	private int writePlansInterval=10;
-    private int writeTripsInterval = 0;
+	private int writeTripsInterval = 10;
 	private String mobsim = MobsimType.qsim.toString();
 	private int writeSnapshotsInterval = 1;
 	private boolean createGraphs = true;

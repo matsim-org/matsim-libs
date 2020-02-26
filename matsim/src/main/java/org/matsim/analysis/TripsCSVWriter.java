@@ -43,6 +43,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -80,8 +81,8 @@ public class TripsCSVWriter {
     public void write(IdMap<Person, Plan> experiencedPlans, String filename) {
         try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(filename)),
                 CSVFormat.DEFAULT.withDelimiter(separator.charAt(0)).withHeader(HEADER))) {
-            for (Plan experiencedPlan : experiencedPlans) {
-                csvPrinter.printRecords(getCSVRecord(experiencedPlan));
+            for (Map.Entry<Id<Person>, Plan> entry : experiencedPlans.entrySet()) {
+                csvPrinter.printRecords(getCSVRecord(entry.getValue(), entry.getKey()));
             }
         } catch (IOException e) {
 
@@ -89,14 +90,14 @@ public class TripsCSVWriter {
         }
     }
 
-    private Iterable<?> getCSVRecord(Plan experiencedPlan) {
+    private Iterable<?> getCSVRecord(Plan experiencedPlan, Id<Person> personId) {
         List<List<String>> records = new ArrayList<>();
         List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(experiencedPlan);
 
         for (TripStructureUtils.Trip trip : trips) {
             List<String> record = new ArrayList<>();
             records.add(record);
-            record.add(experiencedPlan.getPerson().getId().toString());
+            record.add(personId.toString());
             double distance = 0.0;
             double departureTime = trip.getOriginActivity().getEndTime();
             double travelTime = trip.getDestinationActivity().getStartTime() - departureTime;
@@ -135,7 +136,7 @@ public class TripsCSVWriter {
             record.add(Time.writeTime(departureTime));
             record.add(Time.writeTime(travelTime));
             record.add(Time.writeTime(totalWaitingTime));
-            record.add(Time.writeTime(distance));
+            record.add(Integer.toString((int) Math.round(distance)));
             record.add(currentModeWithLongestShare);
             record.add(modes.stream().collect(Collectors.joining("-")));
             record.add(lastActivityType);
