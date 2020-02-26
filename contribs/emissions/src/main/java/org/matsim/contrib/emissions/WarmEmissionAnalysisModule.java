@@ -314,127 +314,143 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 
 	private HbefaWarmEmissionFactor getEf(Id<Vehicle> vehicleId, Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple, HbefaWarmEmissionFactorKey efkey) {
 
-		// if no detailed table, get result from average table:
-		if ( this.detailedHbefaWarmTable==null ) {
-			// set vehicle attributes to "average; average; average":
-			efkey.setHbefaVehicleAttributes( new HbefaVehicleAttributes() );
+		//specified to use detailed value
+		if (ecg.isUsingDetailedEmissionCalculation()) {
+			if (this.detailedHbefaWarmTable == null) {
+				switch (ecg.getDetailedFallbackBehaviour()) {
+					case abort:
+						throw new RuntimeException("Missing detailed emissions factor table ... aborting.");
+					case tryTechnologyAverageOrAbort:
+						//technologyAverage values should be also part of the detailed table -> can abort here
+						throw new RuntimeException("Missing detailed emissions factor table. This should also contain the fallback 'technologyAverage' values, so fallback is not possible ... aborting.");
+					case tryTechnologyAverageOrVehicleTypeAverage:
+						//technologyAverage values should be also part of the detailed table -> directly go to Average table
+						// set vehicle attributes to "average; average; average":
+						logger.warn("Detailed emissions factor table is null. Trying to use average values from average table");
+						efkey.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
+						HbefaWarmEmissionFactor ef = this.avgHbefaWarmTable.get(efkey);
+						Gbl.assertNotNull(ef);
+						return ef;
+					default:
+						throw new RuntimeException("Default fallback behavior for missing detailed table is not defined ... aborting.");
+				}
+			}
 
-			HbefaWarmEmissionFactor ef = this.avgHbefaWarmTable.get( efkey );
-			Gbl.assertNotNull( ef );
-			return ef;
-		}
-
-		// try lookup in detailed table:
-		if ( this.detailedHbefaWarmTable.get( efkey ) != null ) {
-			return this.detailedHbefaWarmTable.get( efkey );
-		}
-
-		// if vehicle deliberately specified as average;average;average, the lookup needs to be in the average table:
-		HbefaVehicleAttributes attributes = vehicleInformationTuple.getSecond();
-		if ( "average".equals( attributes.getHbefaEmConcept() ) && "average".equals( attributes.getHbefaSizeClass() ) && "average".equals( attributes.getHbefaTechnology() ) ) {
-			HbefaWarmEmissionFactor ef = this.avgHbefaWarmTable.get( efkey );
-			Gbl.assertNotNull( ef );
-			return ef;
-		}
+			// try lookup in detailed table:
+			if (this.detailedHbefaWarmTable.get(efkey) != null) {
+				return this.detailedHbefaWarmTable.get(efkey);
+			}
 
 		// try to re-write the key from hbefa3.x to hbefa4.x:
 		HbefaVehicleAttributes attribs2 = new HbefaVehicleAttributes();
 
 		// technology is copied:
-		attribs2.setHbefaTechnology( vehicleInformationTuple.getSecond().getHbefaTechnology() );
+		attribs2.setHbefaTechnology(vehicleInformationTuple.getSecond().getHbefaTechnology());
 
 		// size class is "not specified":
-		attribs2.setHbefaSizeClass( "not specified" );
+		attribs2.setHbefaSizeClass("not specified");
 
 		// em concept is re-written with different dashes:
-		switch( vehicleInformationTuple.getSecond().getHbefaEmConcept() ) {
+		switch (vehicleInformationTuple.getSecond().getHbefaEmConcept()) {
 			case "PC-P-Euro-1":
-				attribs2.setHbefaEmConcept( "PC P Euro-1" );
+				attribs2.setHbefaEmConcept("PC P Euro-1");
 				break;
 			case "PC-P-Euro-2":
-				attribs2.setHbefaEmConcept( "PC P Euro-2" );
+				attribs2.setHbefaEmConcept("PC P Euro-2");
 				break;
 			case "PC-P-Euro-3":
-				attribs2.setHbefaEmConcept( "PC P Euro-3" );
+				attribs2.setHbefaEmConcept("PC P Euro-3");
 				break;
 			case "PC-P-Euro-4":
-				attribs2.setHbefaEmConcept( "PC P Euro-4" );
+				attribs2.setHbefaEmConcept("PC P Euro-4");
 				break;
 			case "PC-P-Euro-5":
-				attribs2.setHbefaEmConcept( "PC P Euro-5" );
+				attribs2.setHbefaEmConcept("PC P Euro-5");
 				break;
 			case "PC-P-Euro-6":
-				attribs2.setHbefaEmConcept( "PC P Euro-6" );
+				attribs2.setHbefaEmConcept("PC P Euro-6");
 				break;
 			case "PC-D-Euro-1":
-				attribs2.setHbefaEmConcept( "PC D Euro-1" );
+				attribs2.setHbefaEmConcept("PC D Euro-1");
 				break;
 			case "PC-D-Euro-2":
-				attribs2.setHbefaEmConcept( "PC D Euro-2" );
+				attribs2.setHbefaEmConcept("PC D Euro-2");
 				break;
 			case "PC-D-Euro-3":
-				attribs2.setHbefaEmConcept( "PC D Euro-3" );
+				attribs2.setHbefaEmConcept("PC D Euro-3");
 				break;
 			case "PC-D-Euro-4":
-				attribs2.setHbefaEmConcept( "PC D Euro-4" );
+				attribs2.setHbefaEmConcept("PC D Euro-4");
 				break;
 			case "PC-D-Euro-5":
-				attribs2.setHbefaEmConcept( "PC D Euro-5" );
+				attribs2.setHbefaEmConcept("PC D Euro-5");
 				break;
 			case "PC-D-Euro-6":
-				attribs2.setHbefaEmConcept( "PC D Euro-6" );
+				attribs2.setHbefaEmConcept("PC D Euro-6");
 				break;
 		}
 
 		// put this into a new key ...
-		HbefaWarmEmissionFactorKey efkey2 = new HbefaWarmEmissionFactorKey( efkey );
-		efkey2.setHbefaVehicleAttributes( attribs2 );
+		HbefaWarmEmissionFactorKey efkey2 = new HbefaWarmEmissionFactorKey(efkey);
+		efkey2.setHbefaVehicleAttributes(attribs2);
 
 		// ... and try to look up:
-		if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
-			return this.detailedHbefaWarmTable.get( efkey2 );
+		if (this.detailedHbefaWarmTable.get(efkey2) != null) {
+			return this.detailedHbefaWarmTable.get(efkey2);
 		}
 
-//		// try "<technology>; average; average":
-//		attribs2.setHbefaSizeClass( "average" );
-//		attribs2.setHbefaEmConcept( "average" );
-//		if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
-//			return this.detailedHbefaWarmTable.get( efkey2 );
-//		}
-		// lookups of type "<technology>; average; average" should, I think, just be entered as such. kai, feb'20
+		// try "<technology>; average; average":
+		if (ecg.getDetailedFallbackBehaviour() == EmissionsConfigGroup.DetailedFallbackBehaviour.tryTechnologyAverageOrAbort || ecg.getDetailedFallbackBehaviour() == EmissionsConfigGroup.DetailedFallbackBehaviour.tryTechnologyAverageOrVehicleTypeAverage) {
+			attribs2.setHbefaSizeClass( "average" );
+			attribs2.setHbefaEmConcept( "average" );
+			if ( this.detailedHbefaWarmTable.get( efkey2 ) != null ) {
+				return this.detailedHbefaWarmTable.get( efkey2 );
+			}
+			//lookups of type "<technology>; average; average" should, I think, just be entered as such. kai, feb'20
 
-//		logger.warn( "did not find emission factor for efkey=" + efkey );
-//		logger.warn( " re-written to " + efkey2 );
-//		logger.warn( "" );
-//		logger.warn( "full table:" );
-//		List<String> list = new ArrayList<>();
-//		for( HbefaWarmEmissionFactorKey key : this.detailedHbefaWarmTable.keySet() ){
-//			list.add( key.toString() );
-//		}
-//		list.sort( String::compareTo );
-//		for( String str : list ){
-//			logger.warn( str );
-//		}
-
-
-		// set vehicle attributes to "average; average; average":
-		efkey.setHbefaVehicleAttributes( new HbefaVehicleAttributes() );
-
-		// try average emissions:
-		if ( this.avgHbefaWarmTable.get( efkey )!=null ) {
-			return this.avgHbefaWarmTable.get( efkey );
-		} else {
-			logger.warn( "did not find average emission factor for efkey=" + efkey );
-			List<HbefaWarmEmissionFactorKey> list = new ArrayList<>( this.avgHbefaWarmTable.keySet() );
-			list.sort( Comparator.comparing( HbefaWarmEmissionFactorKey::toString ) );
-			for( HbefaWarmEmissionFactorKey key : list ){
-				logger.warn( key.toString() );
+			logger.warn( "did not find emission factor for efkey=" + efkey );
+			logger.warn( " re-written to " + efkey2 );
+			logger.warn( "" );
+			logger.warn( "full table:" );
+			List<String> list = new ArrayList<>();
+			for( HbefaWarmEmissionFactorKey key : this.detailedHbefaWarmTable.keySet() ){
+				list.add( key.toString() );
+			}
+			list.sort( String::compareTo );
+			for( String str : list ){
+				logger.warn( str );
 			}
 		}
 
-		throw new RuntimeException( );
 
+		// set vehicle attributes to "average; average; average":
+		if (ecg.getDetailedFallbackBehaviour() == EmissionsConfigGroup.DetailedFallbackBehaviour.tryTechnologyAverageOrVehicleTypeAverage) {
+			efkey.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
+		}
 
+		// try average emissions:
+		if (this.avgHbefaWarmTable.get(efkey) != null) {
+			return this.avgHbefaWarmTable.get(efkey);
+		} else {
+			logger.warn("did not find average emission factor for efkey=" + efkey);
+			List<HbefaWarmEmissionFactorKey> list = new ArrayList<>(this.avgHbefaWarmTable.keySet());
+			list.sort(Comparator.comparing(HbefaWarmEmissionFactorKey::toString));
+			for (HbefaWarmEmissionFactorKey key : list) {
+				logger.warn(key.toString());
+			}
+		}
+
+		throw new RuntimeException();
+
+	} else { // Lookup in average table
+			// if vehicle deliberately specified as average;average;average, the lookup needs to be in the average table:
+			HbefaVehicleAttributes attributes = vehicleInformationTuple.getSecond();
+			if ("average".equals(attributes.getHbefaEmConcept()) && "average".equals(attributes.getHbefaSizeClass()) && "average".equals(attributes.getHbefaTechnology())) {
+				HbefaWarmEmissionFactor ef = this.avgHbefaWarmTable.get(efkey);
+				Gbl.assertNotNull(ef);
+				return ef;
+			}
+		}
 		// the above code is replacing the code below.
 
 //		//The logic has changed here, now it will fall back to aggregate factors per traffic scenario, instead of if any scenarios are missing.
@@ -460,6 +476,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 //		}
 //		Gbl.assertNotNull( ef );
 //		return ef;
+		throw new RuntimeException("Was not able to lookup emissions factor for: " + efkey.toString());
 	}
 
 	//TODO: this is based on looking at the speeds in the HBEFA files, using an MFP, maybe from A.Loder would be nicer, jm  oct'18
