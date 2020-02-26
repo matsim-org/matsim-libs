@@ -256,8 +256,8 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public double getStartTime() {
-			return this.delegate.getStartTime() ;
+		public OptionalTime getOptionalStartTime() {
+			return this.delegate.getOptionalStartTime() ;
 		}
 
 		@Override

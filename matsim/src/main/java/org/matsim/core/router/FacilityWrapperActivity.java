@@ -63,7 +63,7 @@ public class FacilityWrapperActivity implements Activity {
 	}
 
 	@Override
-	public double getStartTime() {
+	public OptionalTime getOptionalStartTime() {
 		throw new UnsupportedOperationException( "only facility fields access are supported" );
 	}
 

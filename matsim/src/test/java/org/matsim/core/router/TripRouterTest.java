@@ -187,8 +187,8 @@ public class TripRouterTest {
 			return this.delegate.getCoord();
 		}
 		@Override
-		public double getStartTime() {
-			return this.delegate.getStartTime();
+		public OptionalTime getOptionalStartTime() {
+			return this.delegate.getOptionalStartTime();
 		}
 		@Override
 		public void setStartTime(double seconds) {

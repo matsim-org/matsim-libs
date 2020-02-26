@@ -51,7 +51,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	/**
 	 * Used for reporting outcomes in the scoring. Not interpreted for the demand.
 	 */
-	private Double startTime = null;
+	private OptionalTime startTime = OptionalTime.undefined();
 
 	private Double dur = null;
 
@@ -80,7 +80,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	 * Used for reporting outcomes in the scoring. Not interpreted for the demand.
 	 */
 	@Override
-	public final double getStartTime() {
+	public final OptionalTime getOptionalStartTime() {
 		return this.startTime;
 	}
 
@@ -89,7 +89,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	 */
 	@Override
 	public final void setStartTime(final double startTime) {
-		this.startTime = Time.isUndefinedTime(startTime) ? null : startTime;
+		this.startTime = OptionalTime.of(startTime);
 	}
 
 	@Override

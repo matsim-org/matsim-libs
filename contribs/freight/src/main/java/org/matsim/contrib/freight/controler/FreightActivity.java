@@ -51,8 +51,8 @@ public class FreightActivity implements Activity {
 	}
 
 	@Override
-	public double getStartTime() {
-		return act.getStartTime();
+	public OptionalTime getOptionalStartTime() {
+		return act.getOptionalStartTime();
 	}
 
 	@Override

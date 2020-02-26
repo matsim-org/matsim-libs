@@ -33,13 +33,7 @@ import org.matsim.facilities.ActivityFacility;
 public interface Activity extends PlanElement {
 
 	default boolean isStartTimeUndefined() {
-		try {
-			double startTime = getStartTime();
-			//only ActivityImpl has been adapted to Double, so we need to keep this additional check for other Activity classes
-			return Time.isUndefinedTime(startTime);
-		} catch (NullPointerException e) {
-			return true;
-		}
+		return getOptionalStartTime().isUndefined();
 	}
 
 	default boolean isMaximumDurationUndefined() {
@@ -69,7 +63,11 @@ public interface Activity extends PlanElement {
 	 */
 	public Coord getCoord();
 
-	public double getStartTime();
+	default double getStartTime() {
+		return getOptionalStartTime().seconds();
+	}
+
+	public OptionalTime getOptionalStartTime();
 
 	/**
 	 * Used for reporting outcomes in the scoring. Not interpreted for the demand.
