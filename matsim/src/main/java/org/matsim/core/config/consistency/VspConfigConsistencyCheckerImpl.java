@@ -27,6 +27,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSet;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
@@ -43,60 +44,62 @@ import java.util.Set;
  *
  */
 public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
-	private static Logger log = Logger.getLogger(VspConfigConsistencyCheckerImpl.class) ;
-	
+	private static Logger log = Logger.getLogger(VspConfigConsistencyCheckerImpl.class);
+
 	public VspConfigConsistencyCheckerImpl() {
-		// empty.  only here to find out where it is called.
+		// empty. only here to find out where it is called.
 	}
 
 	@Override
 	public void checkConsistency(Config config) {
-		Level lvl ;
-		
-		switch ( config.vspExperimental().getVspDefaultsCheckingLevel() ) {
-		case ignore:
-			log.info( "NOT running vsp config consistency check because vsp defaults checking level is set to IGNORE"); 
-			return ;
-		case info:
-			lvl = Level.INFO ;
-			break ;
-		case warn:
-			lvl = Level.WARN ;
-			break;
-		case abort:
-			lvl = Level.WARN ;
-			break;
-		default:
-			throw new RuntimeException("not implemented");
+		Level lvl;
+
+		switch (config.vspExperimental().getVspDefaultsCheckingLevel()) {
+			case ignore:
+				log.info(
+						"NOT running vsp config consistency check because vsp defaults checking level is set to IGNORE");
+				return;
+			case info:
+				lvl = Level.INFO;
+				break;
+			case warn:
+				lvl = Level.WARN;
+				break;
+			case abort:
+				lvl = Level.WARN;
+				break;
+			default:
+				throw new RuntimeException("not implemented");
 		}
 		log.info("running checkConsistency ...");
-		
-		boolean problem = false ; // ini
-		
+
+		boolean problem = false; // ini
+
 		// yy: sort the config groups alphabetically
-		
+
 		// === global:
-		
-		if ( config.global().isInsistingOnDeprecatedConfigVersion() ) {
-			problem = true ;
+
+		if (config.global().isInsistingOnDeprecatedConfigVersion()) {
+			problem = true;
 			System.out.flush();
-			log.log( lvl, "you are insisting on config v1.  vsp default is using v2." ) ;
-		}
-		
-		// === controler:
-		
-		Set<EventsFileFormat> formats = config.controler().getEventsFileFormats();
-		if ( !formats.contains(EventsFileFormat.xml) ) {
-			problem = true ;
-			System.out.flush() ;
-			log.log( lvl, "did not find xml as one of the events file formats. vsp default is using xml events.");
+			log.log(lvl, "you are insisting on config v1.  vsp default is using v2.");
 		}
 
-		switch ( config.controler().getRoutingAlgorithmType() ) {
+		// === controler:
+
+		Set<EventsFileFormat> formats = config.controler().getEventsFileFormats();
+		if (!formats.contains(EventsFileFormat.xml)) {
+			problem = true;
+			System.out.flush();
+			log.log(lvl, "did not find xml as one of the events file formats. vsp default is using xml events.");
+		}
+
+		switch (config.controler().getRoutingAlgorithmType()) {
 			case Dijkstra:
 			case AStarLandmarks:
 			case FastDijkstra:
-				log.log( lvl, "you are not using FastAStarLandmarks as routing algorithm.  vsp default is to use FastAStarLandmarks.") ;
+				log.log(lvl,
+						"you are not using FastAStarLandmarks as routing algorithm.  vsp default is to use FastAStarLandmarks.");
 				System.out.flush();
 				break;
 			case FastAStarLandmarks:
@@ -104,93 +107,99 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 
 		// === location choice:
-		
-		boolean usingLocationChoice = false ;
-		if ( config.getModule("locationchoice")!=null ) {
-			usingLocationChoice = true ;
+
+		boolean usingLocationChoice = false;
+		if (config.getModule("locationchoice") != null) {
+			usingLocationChoice = true;
 		}
-		
-		if ( usingLocationChoice ) {
+
+		if (usingLocationChoice) {
 			final String samplePercent = config.findParam("locationchoice", "destinationSamplePercent");
-			if ( samplePercent!=null && !samplePercent.equals("100.") ) {
-				problem = true ;
-				System.out.flush() ;
-				log.error("vsp will not accept location choice destination sample percent other than 100 until the corresponding warning in " +
-						"DestinationSampler is resolved.  kai, jan'13") ;
+			if (samplePercent != null && !samplePercent.equals("100.")) {
+				problem = true;
+				System.out.flush();
+				log.error(
+						"vsp will not accept location choice destination sample percent other than 100 until the corresponding warning in "
+								+ "DestinationSampler is resolved.  kai, jan'13");
 			}
-//			if ( !config.locationchoice().getProbChoiceExponent().equals("1.") ) {
-//				//			problem = true ;
-//				log.error("vsp will not accept location choice prob choice exponents other than 1 until the corresponding warning in " +
-//				"ChoiceSet is resolved.  kai, jan'13") ;
-//			}
-			if ( !config.vspExperimental().isUsingOpportunityCostOfTimeForLocationChoice() ) {
-				problem = true ;
-				System.out.flush() ;
-				log.error("vsp will not accept location choice without including opportunity cost of time into the approximation. kai,jan'13") ;
+			// if ( !config.locationchoice().getProbChoiceExponent().equals("1.") ) {
+			// // problem = true ;
+			// log.error("vsp will not accept location choice prob choice exponents other
+			// than 1 until the corresponding warning in " +
+			// "ChoiceSet is resolved. kai, jan'13") ;
+			// }
+			if (!config.vspExperimental().isUsingOpportunityCostOfTimeForLocationChoice()) {
+				problem = true;
+				System.out.flush();
+				log.error(
+						"vsp will not accept location choice without including opportunity cost of time into the approximation. kai,jan'13");
 			}
 		}
-		
+
 		// === planCalcScore:
-		
+
 		// use beta_brain=1 // added as of nov'12
-		if ( config.planCalcScore().getBrainExpBeta() != 1. ) {
-			problem = true ;
-			System.out.flush() ;
-			log.log( lvl, "You are using a brainExpBeta != 1; vsp default is 1.  (Different values may cause conceptual " +
-					"problems during paper writing.) This means you have to add the following lines to your config file: ") ;
-			log.log( lvl, "<module name=\"planCalcScore\">");
-			log.log( lvl, "	<param name=\"BrainExpBeta\" value=\"1.0\" />");
-			log.log( lvl, "</module>");
+		if (config.planCalcScore().getBrainExpBeta() != 1.) {
+			problem = true;
+			System.out.flush();
+			log.log(lvl, "You are using a brainExpBeta != 1; vsp default is 1.  (Different values may cause conceptual "
+					+ "problems during paper writing.) This means you have to add the following lines to your config file: ");
+			log.log(lvl, "<module name=\"planCalcScore\">");
+			log.log(lvl, "	<param name=\"BrainExpBeta\" value=\"1.0\" />");
+			log.log(lvl, "</module>");
 		}
-				
-		// added apr'15:
-		for ( ActivityParams params : config.planCalcScore().getActivityParams() ) {
-			if ( PtConstants.TRANSIT_ACTIVITY_TYPE.equals( params.getActivityType() ) ) {
-				// they have typicalDurationScoreComputation==relative, but are not scored anyways. benjamin/kai, nov'15
-				continue ;
+
+		for (ScoringParameterSet scoringParameters : config.planCalcScore().getScoringParametersPerSubpopulation().values()) {
+			// added apr'15:
+			for ( ActivityParams params : scoringParameters.getActivityParams() ) {
+				if ( PtConstants.TRANSIT_ACTIVITY_TYPE.equals( params.getActivityType() ) ) {
+					// they have typicalDurationScoreComputation==relative, but are not scored anyways. benjamin/kai, nov'15
+					continue ;
+				}
+				switch( params.getTypicalDurationScoreComputation() ) {
+				case relative:
+					break;
+				case uniform:
+	//				problem = true ;
+					log.log( lvl,  "found `typicalDurationScoreComputation == uniform' for activity type " + params.getActivityType() + "; vsp should use `relative'. ") ;
+					break;
+				default:
+					throw new RuntimeException("unexpected setting; aborting ... ") ;
+				}
 			}
-			switch( params.getTypicalDurationScoreComputation() ) {
-			case relative:
-				break;
-			case uniform:
-//				problem = true ;
-				log.log( lvl,  "found `typicalDurationScoreComputation == uniform' for activity type " + params.getActivityType() + "; vsp should use `relative'. ") ;
-				break;
-			default:
-				throw new RuntimeException("unexpected setting; aborting ... ") ;
+			for ( ModeParams params : scoringParameters.getModes().values() ) {
+				if ( params.getMonetaryDistanceRate() > 0. ) {
+					problem = true ;
+					System.out.flush() ;
+					log.error("found monetary distance rate for mode " + params.getMode() + " > 0.  You probably want a value < 0 here.\n" ) ;
+				}
+				if ( params.getMonetaryDistanceRate() < -0.01 ) {
+					System.out.flush() ;
+					log.error("found monetary distance rate for mode " + params.getMode() + " < -0.01.  -0.01 per meter means -10 per km.  You probably want to divide your value by 1000." ) ;
+				}
 			}
-		}
-		for ( ModeParams params : config.planCalcScore().getModes().values() ) {
-			if ( params.getMonetaryDistanceRate() > 0. ) {
+			
+			if ( scoringParameters.getModes().get(TransportMode.car) != null && scoringParameters.getModes().get(TransportMode.car).getMonetaryDistanceRate() > 0 ) {
+				problem = true ;
+			}
+
+			final ModeParams modeParamsPt = scoringParameters.getModes().get(TransportMode.pt);
+			if ( modeParamsPt!=null && modeParamsPt.getMonetaryDistanceRate() > 0 ) {
 				problem = true ;
 				System.out.flush() ;
-				log.error("found monetary distance rate for mode " + params.getMode() + " > 0.  You probably want a value < 0 here.\n" ) ;
+				log.error("found monetary distance rate pt > 0.  You probably want a value < 0 here." ) ;
 			}
-			if ( params.getMonetaryDistanceRate() < -0.01 ) {
+			if ( scoringParameters.getMarginalUtilityOfMoney() < 0. ) {
+				problem = true ;
 				System.out.flush() ;
-				log.error("found monetary distance rate for mode " + params.getMode() + " < -0.01.  -0.01 per meter means -10 per km.  You probably want to divide your value by 1000." ) ;
+				log.error("found marginal utility of money < 0.  You almost certainly want a value > 0 here. " ) ;
 			}
-		}
-		
-		if ( config.planCalcScore().getModes().get(TransportMode.car) != null && config.planCalcScore().getModes().get(TransportMode.car).getMonetaryDistanceRate() > 0 ) {
-			problem = true ;
-		}
-		final ModeParams modeParamsPt = config.planCalcScore().getModes().get(TransportMode.pt);
-		if ( modeParamsPt!=null && modeParamsPt.getMonetaryDistanceRate() > 0 ) {
-			problem = true ;
-			System.out.flush() ;
-			log.error("found monetary distance rate pt > 0.  You probably want a value < 0 here." ) ;
-		}
-		if ( config.planCalcScore().getMarginalUtilityOfMoney() < 0. ) {
-			problem = true ;
-			System.out.flush() ;
-			log.error("found marginal utility of money < 0.  You almost certainly want a value > 0 here. " ) ;
-		}
-		// added aug'13:
-		if ( config.planCalcScore().getMarginalUtlOfWaiting_utils_hr() != 0. ) {
-			problem = true ;
-			System.out.flush() ;
-			log.error("found marginal utility of waiting != 0.  vsp default is setting this to 0. " ) ;
+			// added aug'13:
+			if ( scoringParameters.getMarginalUtlOfWaiting_utils_hr() != 0. ) {
+				problem = true ;
+				System.out.flush() ;
+				log.error("found marginal utility of waiting != 0.  vsp default is setting this to 0. " ) ;
+			}
 		}
 		
 		// added oct'17:

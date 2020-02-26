@@ -27,6 +27,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSet;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -36,10 +37,10 @@ import org.matsim.pt.PtConstants;
  */
 public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 
-	private static final Logger log = Logger
-			.getLogger(ConfigConsistencyCheckerImpl.class);
+	private static final Logger log = Logger.getLogger(ConfigConsistencyCheckerImpl.class);
 
-	public ConfigConsistencyCheckerImpl() { // explicit constructor so that I can eclipse-search for instantiation.  kai, may'11
+	public ConfigConsistencyCheckerImpl() { // explicit constructor so that I can eclipse-search for instantiation. kai,
+											// may'11
 		// nothing to do
 	}
 
@@ -51,57 +52,68 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 		checkLaneDefinitionRoutingConfiguration(config);
 		checkPlanCalcScore(config);
 		checkTransit(config);
-		checkConsistencyBetweenRouterAndTravelTimeCalculator( config );
+		checkConsistencyBetweenRouterAndTravelTimeCalculator(config);
 	}
 
-	static boolean checkConsistencyBetweenRouterAndTravelTimeCalculator( final Config config ) {
-		boolean problem = false ;
-//		if ( config.travelTimeCalculator().getSeparateModes() ) {
-//			if ( ! config.travelTimeCalculator().getAnalyzedModes().containsAll( config.plansCalcRoute().getNetworkModes() ) ) {
-//				log.warn("AnalyzedModes in travelTimeCalculator config is not superset of network routing modes.  Will fail later except when defined by other means.");
-//				problem = true ;
-//			}
-//		}
-		// not sure if it ever worked like this, but now the analyzedModes are honoured only when separateModes is false and so the check does not make
-		// sense IMO.  kai, jun'19
-		return problem ;
+	static boolean checkConsistencyBetweenRouterAndTravelTimeCalculator(final Config config) {
+		boolean problem = false;
+		// if ( config.travelTimeCalculator().getSeparateModes() ) {
+		// if ( ! config.travelTimeCalculator().getAnalyzedModes().containsAll(
+		// config.plansCalcRoute().getNetworkModes() ) ) {
+		// log.warn("AnalyzedModes in travelTimeCalculator config is not superset of
+		// network routing modes. Will fail later except when defined by other means.");
+		// problem = true ;
+		// }
+		// }
+		// not sure if it ever worked like this, but now the analyzedModes are honoured
+		// only when separateModes is false and so the check does not make
+		// sense IMO. kai, jun'19
+		return problem;
 	}
 
-	/*package because of test */ static void checkPlanCalcScore(final Config c) {
-		ModeParams ptModeParams = c.planCalcScore().getModes().get(TransportMode.pt);
-		if (ptModeParams!=null && ptModeParams.getMarginalUtilityOfTraveling() > 0) {
-			log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".travelingPt is > 0. This values specifies a utility. " +
-					"Typically, this should be a disutility, i.e. have a negative value.");
-		}
-		ModeParams carModeParams = c.planCalcScore().getModes().get(TransportMode.car);
-		if (carModeParams!=null && carModeParams.getMarginalUtilityOfTraveling() > 0) {
-			log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".traveling is > 0. This values specifies a utility. " +
-			"Typically, this should be a disutility, i.e. have a negative value.");
-		}
-		ModeParams bikeModeParams = c.planCalcScore().getModes().get(TransportMode.bike);
-		if (bikeModeParams!=null && bikeModeParams.getMarginalUtilityOfTraveling() > 0) {
-			log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".travelingBike is > 0. This values specifies a utility. " +
-			"Typically, this should be a disutility, i.e. have a negative value.");
-		}
-		ModeParams walkModeParams = c.planCalcScore().getModes().get(TransportMode.walk);
-		if (walkModeParams!=null && walkModeParams.getMarginalUtilityOfTraveling() > 0) {
-			log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".travelingWalk is > 0. This values specifies a utility. " +
-			"Typically, this should be a disutility, i.e. have a negative value.");
-		}
-		
+	/* package because of test */ static void checkPlanCalcScore(final Config c) {
+		for (ScoringParameterSet scoringParameters : c.planCalcScore().getScoringParametersPerSubpopulation().values()) {
+			final String subpopulation = scoringParameters.getSubpopulation();
+
+			ModeParams ptModeParams = scoringParameters.getModes().get(TransportMode.pt);
+			if (ptModeParams!=null && ptModeParams.getMarginalUtilityOfTraveling() > 0) {
+				log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".travelingPt is > 0 for subpopulation "+subpopulation+
+						"This values specifies a utility. " +
+						"Typically, this should be a disutility, i.e. have a negative value.");
+			}
+			ModeParams carModeParams = scoringParameters.getModes().get(TransportMode.car);
+			if (carModeParams!=null && carModeParams.getMarginalUtilityOfTraveling() > 0) {
+				log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".traveling is > 0 for subpopulation "+subpopulation+
+				"This values specifies a utility. " +
+				"Typically, this should be a disutility, i.e. have a negative value.");
+			}
+			ModeParams bikeModeParams = scoringParameters.getModes().get(TransportMode.bike);
+			if (bikeModeParams!=null && bikeModeParams.getMarginalUtilityOfTraveling() > 0) {
+				log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".travelingBike is > 0 for subpopulation "+subpopulation+
+				"This values specifies a utility. " +
+				"Typically, this should be a disutility, i.e. have a negative value.");
+			}
+			ModeParams walkModeParams = scoringParameters.getModes().get(TransportMode.walk);
+			if (walkModeParams!=null && walkModeParams.getMarginalUtilityOfTraveling() > 0) {
+				log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".travelingWalk is > 0 for subpopulation "+subpopulation+
+				"This values specifies a utility. " +
+				"Typically, this should be a disutility, i.e. have a negative value.");
+			}
 			
-		ActivityParams ptAct = c.planCalcScore().getActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE) ;
-		if ( ptAct != null ) {
-//			if ( ptAct.getClosingTime()!=0. && ptAct.getClosingTime()!=Time.UNDEFINED_TIME ) {
-//				if ( !c.vspExperimental().isAbleToOverwritePtInteractionParams()==true ) {
-//					throw new RuntimeException("setting the pt interaction activity closing time away from 0/undefined is not allowed because it breaks pt scoring." +
-//					" If you need this anyway (for backwards compatibility reasons), you can allow this by a parameter in VspExperimentalConfigGroup.") ;
-//				}
-//			}
-			if ( ptAct.isScoringThisActivityAtAll() ) {
-				if ( !c.vspExperimental().isAbleToOverwritePtInteractionParams() ) {
-					throw new RuntimeException("Scoring " + ptAct.getActivityType() + " is not allowed because it breaks pt scoring." +
-					" If you need this anyway (for backwards compatibility reasons), you can allow this by a parameter in VspExperimentalConfigGroup.") ;
+				
+			ActivityParams ptAct = scoringParameters.getActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE) ;
+			if ( ptAct != null ) {
+	//			if ( ptAct.getClosingTime()!=0. && ptAct.getClosingTime()!=Time.UNDEFINED_TIME ) {
+	//				if ( !c.vspExperimental().isAbleToOverwritePtInteractionParams()==true ) {
+	//					throw new RuntimeException("setting the pt interaction activity closing time away from 0/undefined is not allowed because it breaks pt scoring." +
+	//					" If you need this anyway (for backwards compatibility reasons), you can allow this by a parameter in VspExperimentalConfigGroup.") ;
+	//				}
+	//			}
+				if ( ptAct.isScoringThisActivityAtAll() ) {
+					if ( !c.vspExperimental().isAbleToOverwritePtInteractionParams() ) {
+						throw new RuntimeException("Scoring " + ptAct.getActivityType() + " is not allowed because it breaks pt scoring." +
+						" If you need this anyway (for backwards compatibility reasons), you can allow this by a parameter in VspExperimentalConfigGroup.") ;
+					}
 				}
 			}
 		}
