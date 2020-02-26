@@ -1,5 +1,6 @@
 package org.matsim.contrib.osm.networkReader;
 
+import de.topobyte.osm4j.core.model.iface.EntityType;
 import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmRelation;
 import de.topobyte.osm4j.core.model.iface.OsmRelationMember;
@@ -9,8 +10,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
@@ -19,6 +22,17 @@ import java.util.function.BiPredicate;
 class OsmSignalsParser extends OsmNetworkParser {
 
 	private Logger log = Logger.getLogger(OsmSignalsParser.class);
+
+	private Map<Long, Set<ProcessedRelation>> nodeRestrictions = new ConcurrentHashMap<>();
+	private Map<Long, String> signalizedNodes = new ConcurrentHashMap<>();
+
+	public Map<Long, Set<ProcessedRelation>> getNodeRestrictions() {
+		return nodeRestrictions;
+	}
+
+	public Map<Long, String> getSignalizedNodes() {
+		return signalizedNodes;
+	}
 
 	OsmSignalsParser(CoordinateTransformation transformation, ConcurrentMap<String, LinkProperties> linkProperties, BiPredicate<Coord, Integer> linkFilter, ExecutorService executor) {
 		super(transformation, linkProperties, linkFilter, executor);
@@ -34,7 +48,7 @@ class OsmSignalsParser extends OsmNetworkParser {
 
 		// parse ways and relations first
 		new PbfParser.Builder()
-				.setWaysHandler(super::handleWay)
+				.setWaysHandler(this::handleWay)
 				.setRelationHandler(this::handleRelation)
 				.setExecutor(executor)
 				.build()
@@ -47,36 +61,61 @@ class OsmSignalsParser extends OsmNetworkParser {
 				.build()
 				.parse(inputFile);
 
+		log.info("done");
 	}
 
 	private void handleRelation(OsmRelation osmRelation) {
 
-		Map<String, String> tags = OsmModelUtil.getTagsAsMap(osmRelation);
-		if (tags.containsKey("type") && tags.get("type").equals("restriction")) {
-			if (tags.containsKey("restriction") && tags.get("restriction").startsWith("no")) {
-				log.info(tags.get("restriction") + " is a no restriction");
-			} else if (tags.containsKey("restriction") && tags.get("restriction").startsWith("only")) {
-				log.info(tags.get("restriction") + " should be an only restriction");
+
+		// we only consider restrictions if they have from, to and via members set
+		if (osmRelation.getNumberOfMembers() == 3) {
+
+			Map<String, String> tags = OsmModelUtil.getTagsAsMap(osmRelation);
+
+			// if the relation is of type restriction, we consider doing something with it.
+			// also test, whether the restriction type is set, which has restriction as key.
+			if (tags.containsKey(OsmTags.TYPE) && tags.get(OsmTags.TYPE).equals(OsmTags.RESTRICTION) && tags.containsKey(OsmTags.RESTRICTION)) {
+
+				String restrictionTag = tags.get(OsmTags.RESTRICTION);
+				ProcessedRelation.Type type = restrictionTag.startsWith("only") ? ProcessedRelation.Type.IMPERATIVE : ProcessedRelation.Type.PROHIBITIVE;
+
+				OsmRelationMember via = null;
+				OsmRelationMember from = null;
+				OsmRelationMember to = null;
+
+				for (int i = 0; i < osmRelation.getNumberOfMembers(); i++) {
+					OsmRelationMember member = osmRelation.getMember(i);
+					if (member.getRole().equals("via") && member.getType().equals(EntityType.Node)) {
+						via = member;
+					} else if (member.getRole().equals("from") && member.getType().equals(EntityType.Way)) {
+						from = member;
+					} else if (member.getRole().equals("to") && member.getType().equals(EntityType.Way)) {
+						to = member;
+					}
+				}
+				if (via != null && from != null && to != null) {
+					nodeRestrictions.computeIfAbsent(via.getId(), id -> Collections.synchronizedSet(new HashSet<>()))
+							.add(new ProcessedRelation(via.getId(), from.getId(), to.getId(), type));
+				}
 			}
-
-			List<OsmRelationMember> members = OsmModelUtil.membersAsList(osmRelation);
 		}
-
-
 	}
 
 	@Override
 	void handleNode(OsmNode osmNode) {
 		super.handleNode(osmNode);
 
-		Map<String, String> tags = OsmModelUtil.getTagsAsMap(osmNode);
+		// if the node was added by parent parser, check whether we should do anything signals related
+		if (super.nodes.containsKey(osmNode.getId())) {
+			Map<String, String> tags = OsmModelUtil.getTagsAsMap(osmNode);
 
-		if (tags.containsKey("highway") && tags.get("highway").equals("traffic_signals")) {
-			log.info("a traffic signals node");
-		}
-		if (tags.containsKey("highway") && tags.get("highway").equals("crossing")) {
-			log.info("crossing");
-		}
+			if (tags.containsKey(OsmTags.HIGHWAY)) {
+				String highwayTag = tags.get(OsmTags.HIGHWAY);
 
+				if (highwayTag.equals(OsmTags.TRAFFIC_SINGALS) || highwayTag.equals(OsmTags.CROSSING)) {
+					signalizedNodes.put(osmNode.getId(), highwayTag);
+				}
+			}
+		}
 	}
 }

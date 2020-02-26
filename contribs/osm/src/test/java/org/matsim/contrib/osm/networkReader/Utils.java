@@ -85,7 +85,7 @@ public class Utils {
 		TLongArrayList nodeReference = new TLongArrayList(new long[]{node1.getId(), node2.getId(), node3.getId()});
 		Way way = new Way(1, nodeReference, tags);
 
-		return new OsmData(Arrays.asList(node1, node2, node3), Collections.singletonList(way));
+		return new OsmData(Arrays.asList(node1, node2, node3), Collections.singletonList(way), Collections.emptyList());
 	}
 
 	static OsmData createTwoIntersectingLinksWithDifferentLevels() {
