@@ -38,9 +38,63 @@ public class RunDetailedEmissionToolOnlineExampleIT {
 	/**
 	 * Test method for {@link RunDetailedEmissionToolOnlineExample#main(java.lang.String[])}.
 	 */
+
+	/*
+	 *
+	 * Abort if values are not found in detailled table
+	 * This is by now (feb'20) the default. Setting it here for the tests explicitly
+	 *
+	 * */
+
 	@SuppressWarnings("static-method")
 	@Test
 	public final void testDetailed_vehTypeV1() {
+		try {
+			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml"} ) ;
+			config.controler().setOutputDirectory( utils.getOutputDirectory() );
+			config.controler().setLastIteration( 1 );
+			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
+			emissionsConfig.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
+			emissionsConfig.setDetailedFallbackBehaviour(EmissionsConfigGroup.DetailedFallbackBehaviour.abort);
+			Scenario scenario = RunDetailedEmissionToolOnlineExample.prepareScenario( config ) ;
+			RunDetailedEmissionToolOnlineExample.run( scenario ) ;
+		} catch ( Exception ee ) {
+			ee.printStackTrace();
+			fail("something did not work" ) ;
+		}
+	}
+
+	/**
+	 * Test method for {@link RunDetailedEmissionToolOnlineExample#main(java.lang.String[])}.
+	 */
+	@SuppressWarnings("static-method")
+	@Test
+	public final void testDetailed_vehTypeV2() {
+		try {
+			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml"} ) ;
+			config.controler().setOutputDirectory( utils.getOutputDirectory() );
+			config.controler().setLastIteration( 1 );
+			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
+			emissionsConfig.setDetailedFallbackBehaviour(EmissionsConfigGroup.DetailedFallbackBehaviour.abort);
+			Scenario scenario = RunDetailedEmissionToolOnlineExample.prepareScenario( config ) ;
+			RunDetailedEmissionToolOnlineExample.run( scenario ) ;
+		} catch ( Exception ee ) {
+			ee.printStackTrace();
+			fail("something did not work" ) ;
+		}
+	}
+
+
+	/*
+	 *
+	 * Fallback to Average
+	 * this was the previous behaviour.
+	 *
+	 * */
+
+	@SuppressWarnings("static-method")
+	@Test
+	public final void testDetailed_vehTypeV1_FallbackToAverage() {
 		try {
 			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv1/config_detailed.xml"} ) ;
 			config.controler().setOutputDirectory( utils.getOutputDirectory() );
@@ -61,7 +115,7 @@ public class RunDetailedEmissionToolOnlineExampleIT {
 	 */
 	@SuppressWarnings("static-method")
 	@Test
-	public final void testDetailed_vehTypeV2() {
+	public final void testDetailed_vehTypeV2_FallbackToAverage() {
 		try {
 			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml"} ) ;
 			config.controler().setOutputDirectory( utils.getOutputDirectory() );
