@@ -24,7 +24,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.OptionalDouble;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -35,6 +34,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
@@ -167,7 +167,7 @@ public class TripRouterTest {
 	private static class EqualsActivity implements Activity {
 		Activity delegate ;
 		@Override
-		public OptionalDouble getOptionalEndTime() {
+		public OptionalTime getOptionalEndTime() {
 			return this.delegate.getOptionalEndTime();
 		}
 		@Override

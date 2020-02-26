@@ -21,12 +21,11 @@
 
  package org.matsim.core.router;
 
-import java.util.OptionalDouble;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
@@ -39,7 +38,7 @@ public class FacilityWrapperActivity implements Activity {
 	}
 
 	@Override
-	public OptionalDouble getOptionalEndTime() {
+	public OptionalTime getOptionalEndTime() {
 		throw new UnsupportedOperationException( "only facility fields access are supported" );
 	}
 

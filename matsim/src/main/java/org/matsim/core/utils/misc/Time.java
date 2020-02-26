@@ -20,8 +20,6 @@
 
 package org.matsim.core.utils.misc;
 
-import java.util.OptionalDouble;
-
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 
@@ -44,7 +42,7 @@ public class Time {
 	 * is independent of the start time. */
 	@Deprecated // rather use Time.isUndefinedTime( time ), since that opens up the path to a later change
 	// of the convention.  kai, nov'17
-	private final static double UNDEFINED_TIME = Double.NEGATIVE_INFINITY;
+	final static double UNDEFINED_TIME = Double.NEGATIVE_INFINITY;
 	/**
 	 * The end of a day in MATSim in seconds
 	 */
@@ -72,16 +70,6 @@ public class Time {
 	public static double getVeryLargeTime() {
 		// give the option to change the convention at some point in time.  kai, nov'17
 		return Long.MAX_VALUE ;
-	}
-
-	/**
-	 * a bit more strict than the regular OptionalDouble as NaNs are not allowed
-	 */
-	public static OptionalDouble timeAsOptionalDouble(double time) {
-		if (Double.isNaN(time)) {
-			throw new IllegalArgumentException("NaN time is not allowed");
-		}
-		return time == Time.UNDEFINED_TIME ? OptionalDouble.empty() : OptionalDouble.of(time);
 	}
 
 	static {
@@ -114,6 +102,10 @@ public class Time {
 
 	public static final String writeTime(final double seconds) {
 		return writeTime(seconds, defaultTimeFormat, ':');
+	}
+
+	public static final String writeTime(final OptionalTime time) {
+		return writeTime(time.orElse(UNDEFINED_TIME));
 	}
 
 	/**

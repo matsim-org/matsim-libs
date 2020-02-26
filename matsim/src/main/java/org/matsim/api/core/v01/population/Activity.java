@@ -20,11 +20,10 @@
 
 package org.matsim.api.core.v01.population;
 
-import java.util.OptionalDouble;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 
@@ -54,10 +53,10 @@ public interface Activity extends PlanElement {
 	}
 
 
-	public OptionalDouble getOptionalEndTime();
+	public OptionalTime getOptionalEndTime();
 
 	default double getEndTime() {
-		return getOptionalEndTime().getAsDouble();
+		return getOptionalEndTime().seconds();
 	}
 
 	public void setEndTime(final double seconds);

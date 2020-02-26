@@ -20,12 +20,11 @@
 
 package org.matsim.contrib.locationchoice.zzunused;
 
-import java.util.OptionalDouble;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
@@ -45,9 +44,9 @@ class LCActivity implements Activity, LCPlanElement {
 	}
 	
 	@Override
-	public final OptionalDouble getOptionalEndTime() {
+	public final OptionalTime getOptionalEndTime() {
 		//consider having an array of OptionalDoubles instead...
-		return OptionalDouble.of(this.plan.endTimes[this.arrayIndex]);
+		return OptionalTime.of(this.plan.endTimes[this.arrayIndex]);
 	}
 
 	@Override

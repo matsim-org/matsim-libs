@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.OptionalDouble;
 import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -70,6 +69,7 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -231,7 +231,7 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public OptionalDouble getOptionalEndTime() {
+		public OptionalTime getOptionalEndTime() {
 			return this.delegate.getOptionalEndTime();
 		}
 

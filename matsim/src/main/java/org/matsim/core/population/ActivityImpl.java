@@ -20,12 +20,11 @@
 
 package org.matsim.core.population;
 
-import java.util.OptionalDouble;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
@@ -47,7 +46,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	// Case (X): facilityId inconsistent with linkId, coord.  Idea: mobsim takes the facilityId and (a) checks the other
 	// attribs or (b) ignores them.
 
-	private OptionalDouble endTime = OptionalDouble.empty();
+	private OptionalTime endTime = OptionalTime.undefined();
 
 	/**
 	 * Used for reporting outcomes in the scoring. Not interpreted for the demand.
@@ -68,13 +67,13 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 	@Override
-	public final OptionalDouble getOptionalEndTime() {
+	public final OptionalTime getOptionalEndTime() {
 		return this.endTime;
 	}
 
 	@Override
 	public final void setEndTime(final double endTime) {
-		this.endTime = Time.timeAsOptionalDouble(endTime);
+		this.endTime = OptionalTime.of(endTime);
 	}
 
 	/**
@@ -151,7 +150,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 				+ Time.writeTime(isStartTimeUndefined() ? Time.getUndefinedTime() : this.getStartTime())
 				+ "]"
 				+ "[endTime="
-				+ Time.writeTime(!getOptionalEndTime().isPresent() ? Time.getUndefinedTime() : this.getEndTime())
+				+ Time.writeTime(endTime)
 				+ "]"
 				+ "[duration="
 				+ Time.writeTime(isMaximumDurationUndefined() ? Time.getUndefinedTime() : this.getMaximumDuration())
