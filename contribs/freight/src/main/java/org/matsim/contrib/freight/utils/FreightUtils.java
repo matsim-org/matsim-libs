@@ -21,6 +21,7 @@ package org.matsim.contrib.freight.utils;
 import com.graphhopper.jsprit.analysis.toolbox.StopWatch;
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
+import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
 import com.graphhopper.jsprit.core.algorithm.listener.VehicleRoutingAlgorithmListeners;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
@@ -87,11 +88,11 @@ public class FreightUtils {
 		Carriers carriers = FreightUtils.getCarriers(controler.getScenario());
 
 		for (Carrier carrier : carriers.getCarriers().values()){
-				VehicleRoutingProblem vrp = MatsimJspritFactory.createRoutingProblemBuilder(carrier, controler.getScenario().getNetwork())
+				VehicleRoutingProblem problem = MatsimJspritFactory.createRoutingProblemBuilder(carrier, controler.getScenario().getNetwork())
 					.setRoutingCost(netBasedCosts)
 					.build();
 
-			VehicleRoutingAlgorithm vra;
+			VehicleRoutingAlgorithm algorithm;
 			final String vehicleRoutingAlgortihmFile = freightConfig.getVehicleRoutingAlgortihmFile();
 			if(vehicleRoutingAlgortihmFile != null && !vehicleRoutingAlgortihmFile.equals(""))	{
 				log.info("Will read in VehicleRoutingAlgorithm from " + vehicleRoutingAlgortihmFile);
@@ -101,21 +102,22 @@ public class FreightUtils {
 				} catch (Exception e){
 					throw new RuntimeException(e);
 				}
-				vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, vraURL);
+				algorithm = VehicleRoutingAlgorithms.readAndCreateAlgorithm(problem, vraURL);
 			} else {
 				log.info("Use a VehicleRoutingAlgorithm out of the box.");
-				vra = Jsprit.Builder.newInstance(vrp).setProperty(Jsprit.Parameter.THREADS, "5").buildAlgorithm();
+				algorithm = new SchrimpfFactory().createAlgorithm(problem);
+		//		vra = Jsprit.Builder.newInstance(vrp).setProperty(Jsprit.Parameter.THREADS, "5").buildAlgorithm();
 			}
 
-			vra.getAlgorithmListeners().addListener(new StopWatch(), VehicleRoutingAlgorithmListeners.Priority.HIGH);
+			algorithm.getAlgorithmListeners().addListener(new StopWatch(), VehicleRoutingAlgorithmListeners.Priority.HIGH);
 			int jspritIterations = CarrierUtils.getJspritIterations(carrier);
 			if(jspritIterations > 0) {
-				vra.setMaxIterations(jspritIterations);
+				//algorithm.setMaxIterations(jspritIterations);
 			} else {
 				throw new InvalidAttributeValueException ("Carrier has invalid number of jsprit iterations. They must be positive." + carrier.getId().toString());
 			}
 
-			VehicleRoutingProblemSolution solution = Solutions.bestOf(vra.searchSolutions());
+			VehicleRoutingProblemSolution solution = Solutions.bestOf(algorithm.searchSolutions());
 
 			CarrierPlan newPlan = MatsimJspritFactory.createPlan(carrier, solution) ;
 
