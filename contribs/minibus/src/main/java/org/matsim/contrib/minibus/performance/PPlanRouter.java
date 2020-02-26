@@ -133,7 +133,7 @@ final class PPlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	private static double calcEndOfActivity(
 			final Activity activity,
 			final Plan plan) {
-		if (!Time.isUndefinedTime(activity.getEndTime().seconds()))
+		if (activity.getEndTime().isDefined())
 			return activity.getEndTime().seconds();
 
 		// no sufficient information in the activity...

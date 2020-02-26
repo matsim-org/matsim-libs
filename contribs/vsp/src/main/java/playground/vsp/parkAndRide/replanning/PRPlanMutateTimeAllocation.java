@@ -89,7 +89,7 @@ public class PRPlanMutateTimeAllocation implements PlanAlgorithm {
 					if (act.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE) || act.getType().equals(PRConstants.PARKANDRIDE_ACTIVITY_TYPE)) {
 					} else {
 						if (this.useActivityDurations) {
-							if (!Time.isUndefinedTime(act.getMaximumDuration().seconds())) {
+							if (act.getMaximumDuration().isDefined()) {
 								// mutate the durations of all 'middle' activities
 								act.setMaximumDuration(mutateTime(act.getMaximumDuration().seconds()));
 								now += act.getMaximumDuration().seconds();
@@ -105,7 +105,7 @@ public class PRPlanMutateTimeAllocation implements PlanAlgorithm {
 							}
 						}
 						else {
-							if (Time.isUndefinedTime(act.getEndTime().seconds())) {
+							if (act.getEndTime().isUndefined()) {
 								throw new IllegalStateException("Can not mutate activity end time because it is not set for Person: " + plan.getPerson().getId());
 							}
 							double newEndTime = mutateTime(act.getEndTime().seconds());

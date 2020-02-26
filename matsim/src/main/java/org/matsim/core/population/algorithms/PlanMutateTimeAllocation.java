@@ -85,7 +85,7 @@ public final class PlanMutateTimeAllocation implements PlanAlgorithm {
 
 					// assume that there will be no delay between arrival time and activity start time
 					act.setStartTime(now);
-					if (!Time.isUndefinedTime(act.getMaximumDuration().seconds())) {
+					if (act.getMaximumDuration().isDefined()) {
 							// mutate the durations of all 'middle' activities
 						act.setMaximumDuration(mutateTime(act.getMaximumDuration().seconds()));
 						now += act.getMaximumDuration().seconds();

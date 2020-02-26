@@ -21,7 +21,6 @@ package org.matsim.core.mobsim.qsim.agents;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.utils.misc.Time;
 
 public class ActivityDurationUtils {
 
@@ -52,7 +51,7 @@ public class ActivityDurationUtils {
 					departure = Math.min(act.getEndTime().seconds(), now + act.getMaximumDuration().seconds());
 				}
 			} else if (activityDurationInterpretation.equals(PlansConfigGroup.ActivityDurationInterpretation.endTimeOnly )) {
-				if (!Time.isUndefinedTime(act.getEndTime().seconds())) {
+				if (act.getEndTime().isDefined()) {
 					departure = act.getEndTime().seconds();
 				} else {
 					throw new IllegalStateException("activity end time not set and using something else not allowed.");
@@ -61,7 +60,7 @@ public class ActivityDurationUtils {
 				// In fact, as of now I think that _this_ should be the default behavior.  kai, aug'10
 				if (act.getEndTime().isDefined()) {
 					departure = act.getEndTime().seconds();
-				} else if (!Time.isUndefinedTime(act.getMaximumDuration().seconds())) {
+				} else if (act.getMaximumDuration().isDefined()) {
 					departure = now + act.getMaximumDuration().seconds();
 				} else {
 					throw new IllegalStateException(

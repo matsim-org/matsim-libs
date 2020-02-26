@@ -143,7 +143,7 @@ import org.matsim.core.utils.misc.Time;
 			out.write(" link=\"" + act.getLinkId() + "\"");
 		if (act.getStartTime().seconds() != Integer.MIN_VALUE)
 			out.write(" start_time=\"" + Time.writeTime(act.getStartTime().seconds()) + "\"");
-		if (!Time.isUndefinedTime(act.getMaximumDuration().seconds()))
+		if (act.getMaximumDuration().isDefined())
 			out.write(" dur=\"" + Time.writeTime(act.getMaximumDuration().seconds()) + "\"");
 		if (act.getEndTime().seconds() != Integer.MIN_VALUE)
 			out.write(" end_time=\"" + Time.writeTime(act.getEndTime().seconds()) + "\"");

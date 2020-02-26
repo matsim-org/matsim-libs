@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 
 /**
@@ -80,7 +79,7 @@ public class AgentId2PlannedDepartureTimeMap {
 							runningTime = act.getEndTime().seconds();
 							firstActDone = true;
 						} else {
-							if(Time.isUndefinedTime(act.getMaximumDuration().seconds())){
+							if(act.getMaximumDuration().isUndefined()){
 								runningTime += act.getMaximumDuration().seconds();
 							} else {
 								runningTime = act.getEndTime().seconds();

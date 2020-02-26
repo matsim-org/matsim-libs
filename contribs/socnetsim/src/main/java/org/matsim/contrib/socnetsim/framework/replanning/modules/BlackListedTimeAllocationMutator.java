@@ -71,7 +71,7 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 					break;
 				case MUTATE_END:
 					a.setEndTime( mutateTime(a.getEndTime().seconds()) );
-					if ( Time.isUndefinedTime(a.getEndTime().seconds()) &&
+					if ( a.getEndTime().isUndefined() &&
 							a.getEndTime().seconds() < lastEndTime ) {
 						a.setEndTime( lastEndTime );
 					}

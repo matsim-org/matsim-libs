@@ -126,7 +126,7 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 							}
 						}
 						else {
-							if (Time.isUndefinedTime(act.getEndTime().seconds())) {
+							if (act.getEndTime().isUndefined()) {
 								throw new IllegalStateException("Can not mutate activity end time because it is not set for Person: " + plan.getPerson().getId());
 							}
 							double newEndTime = mutateTime(act.getEndTime().seconds(), mutationRange);
