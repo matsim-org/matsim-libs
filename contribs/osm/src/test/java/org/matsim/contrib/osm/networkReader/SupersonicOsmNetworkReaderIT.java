@@ -22,7 +22,7 @@ public class SupersonicOsmNetworkReaderIT {
 	@Test
 	public void test_andorra() {
 
-		Network network = SupersonicOsmNetworkReader.builder()
+		Network network = new SupersonicOsmNetworkReader.Builder()
 				.setCoordinateTransformation(coordinateTransformation)
 				.build()
 				.read(Paths.get(utils.getPackageInputDirectory()).resolve("andorra-latest.osm.pbf"));

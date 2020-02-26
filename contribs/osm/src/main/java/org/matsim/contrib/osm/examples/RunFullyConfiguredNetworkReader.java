@@ -31,7 +31,7 @@ public class RunFullyConfiguredNetworkReader {
 
 	public static void main(String[] args) {
 
-		Network network = SupersonicOsmNetworkReader.builder()
+		Network network = new SupersonicOsmNetworkReader.Builder()
 				.setCoordinateTransformation(coordinateTransformation)
 				.setIncludeLinkAtCoordWithHierarchy((coord, hierachyLevel) -> hierachyLevel == LinkProperties.LEVEL_MOTORWAY)
 				.setPreserveNodeWithId(id -> id == 2)

@@ -5,7 +5,6 @@ import de.topobyte.osm4j.core.model.impl.Node;
 import de.topobyte.osm4j.core.model.impl.Relation;
 import de.topobyte.osm4j.core.model.impl.RelationMember;
 import de.topobyte.osm4j.core.model.impl.Tag;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -20,7 +19,8 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class OsmSignalsParserTest {
 
@@ -202,22 +202,6 @@ public class OsmSignalsParserTest {
 		assertEquals(data.getWays().get(1).getId(), restriction.getToWayId());
 		assertEquals(data.getNodes().get(1).getId(), restriction.getNodeId());
 		assertEquals(ProcessedRelation.Type.IMPERATIVE, restriction.getType());
-	}
-
-	@Test
-	@Ignore
-	public void parse() {
-
-		Path file = Paths.get(utils.getPackageInputDirectory()).resolve("andorra-latest.osm.pbf");
-
-		OsmSignalsParser parser = new OsmSignalsParser(coordinateTransformation,
-				LinkProperties.createLinkProperties(),
-				(coord, id) -> true, executor);
-
-		parser.parse(file);
-
-		fail();
-
 	}
 
 	private OsmSignalsParser createDefaultParser() {

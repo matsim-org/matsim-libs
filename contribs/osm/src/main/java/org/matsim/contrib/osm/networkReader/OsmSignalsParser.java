@@ -5,7 +5,6 @@ import de.topobyte.osm4j.core.model.iface.OsmNode;
 import de.topobyte.osm4j.core.model.iface.OsmRelation;
 import de.topobyte.osm4j.core.model.iface.OsmRelationMember;
 import de.topobyte.osm4j.core.model.util.OsmModelUtil;
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
@@ -20,8 +19,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.function.BiPredicate;
 
 class OsmSignalsParser extends OsmNetworkParser {
-
-	private Logger log = Logger.getLogger(OsmSignalsParser.class);
 
 	private Map<Long, Set<ProcessedRelation>> nodeRestrictions = new ConcurrentHashMap<>();
 	private Map<Long, String> signalizedNodes = new ConcurrentHashMap<>();
@@ -60,12 +57,9 @@ class OsmSignalsParser extends OsmNetworkParser {
 				.setExecutor(executor)
 				.build()
 				.parse(inputFile);
-
-		log.info("done");
 	}
 
 	private void handleRelation(OsmRelation osmRelation) {
-
 
 		// we only consider restrictions if they have from, to and via members set
 		if (osmRelation.getNumberOfMembers() == 3) {

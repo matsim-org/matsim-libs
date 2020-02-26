@@ -42,8 +42,8 @@ public class SuperSonicBicycleOsmNetworkReaderTest {
 		Path file = Paths.get(testUtils.getOutputDirectory()).resolve("single-link.osm.pbf");
 		Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
-		Network network = new SupersonicBicycleOsmNetworkReader.Builder()
-				.coordinateTransformation(Utils.transformation)
+		Network network = new OsmBicycleReader.Builder()
+				.setCoordinateTransformation(Utils.transformation)
 				.build()
 				.read(file);
 
@@ -68,8 +68,8 @@ public class SuperSonicBicycleOsmNetworkReaderTest {
 		Path file = Paths.get(testUtils.getOutputDirectory()).resolve("single-link.osm.pbf");
 		Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
-		Network network = new SupersonicBicycleOsmNetworkReader.Builder()
-				.coordinateTransformation(Utils.transformation)
+		Network network = new OsmBicycleReader.Builder()
+				.setCoordinateTransformation(Utils.transformation)
 				.build()
 				.read(file);
 
@@ -91,8 +91,8 @@ public class SuperSonicBicycleOsmNetworkReaderTest {
 		Path file = Paths.get(testUtils.getOutputDirectory()).resolve("single-link.osm.pbf");
 		Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
-		Network network = new SupersonicBicycleOsmNetworkReader.Builder()
-				.coordinateTransformation(Utils.transformation)
+		Network network = new OsmBicycleReader.Builder()
+				.setCoordinateTransformation(Utils.transformation)
 				.build()
 				.read(file);
 
@@ -115,8 +115,8 @@ public class SuperSonicBicycleOsmNetworkReaderTest {
 		Path file = Paths.get(testUtils.getOutputDirectory()).resolve("single-link.osm.pbf");
 		Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
-		Network network = new SupersonicBicycleOsmNetworkReader.Builder()
-				.coordinateTransformation(Utils.transformation)
+		Network network = new OsmBicycleReader.Builder()
+				.setCoordinateTransformation(Utils.transformation)
 				.build()
 				.read(file);
 
@@ -144,8 +144,8 @@ public class SuperSonicBicycleOsmNetworkReaderTest {
 		Path file = Paths.get(testUtils.getOutputDirectory()).resolve("single-link.osm.pbf");
 		Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
-		Network network = new SupersonicBicycleOsmNetworkReader.Builder()
-				.coordinateTransformation(Utils.transformation)
+		Network network = new OsmBicycleReader.Builder()
+				.setCoordinateTransformation(Utils.transformation)
 				.build()
 				.read(file);
 
@@ -177,8 +177,8 @@ public class SuperSonicBicycleOsmNetworkReaderTest {
 		Path file = Paths.get(testUtils.getOutputDirectory()).resolve("single-link.osm.pbf");
 		Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
-		Network network = new SupersonicBicycleOsmNetworkReader.Builder()
-				.coordinateTransformation(Utils.transformation)
+		Network network = new OsmBicycleReader.Builder()
+				.setCoordinateTransformation(Utils.transformation)
 				.build()
 				.read(file);
 
@@ -210,8 +210,8 @@ public class SuperSonicBicycleOsmNetworkReaderTest {
 		Path file = Paths.get(testUtils.getOutputDirectory()).resolve("single-link.osm.pbf");
 		Utils.writeOsmData(singleLink.getNodes(), singleLink.getWays(), file);
 
-		Network network = new SupersonicBicycleOsmNetworkReader.Builder()
-				.coordinateTransformation(Utils.transformation)
+		Network network = new OsmBicycleReader.Builder()
+				.setCoordinateTransformation(Utils.transformation)
 				.build()
 				.read(file);
 

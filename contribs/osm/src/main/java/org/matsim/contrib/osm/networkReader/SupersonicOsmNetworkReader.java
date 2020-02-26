@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -17,7 +18,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 public class SupersonicOsmNetworkReader {
 
@@ -30,7 +30,7 @@ public class SupersonicOsmNetworkReader {
     private final Predicate<Long> preserveNodeWithId;
     private final AfterLinkCreated afterLinkCreated;
     private final BiPredicate<Coord, Integer> includeLinkAtCoordWithHierarchy;
-    private final OsmNetworkParser parser;
+    final OsmNetworkParser parser;
 
     private Network network;
 
@@ -63,12 +63,12 @@ public class SupersonicOsmNetworkReader {
     private void convert(Map<Long, ProcessedOsmWay> ways, Map<Long, ProcessedOsmNode> nodes) {
 
         ways.values().parallelStream()
-                .flatMap(way -> this.createWaySegments(nodes, way))
-                .flatMap(this::createLinks)
+                .flatMap(way -> this.createWaySegments(nodes, way).stream())
+                .flatMap(segment -> this.createLinks(segment, network.getFactory()).stream())
                 .forEach(this::addLinkToNetwork);
     }
 
-    private Stream<WaySegment> createWaySegments(Map<Long, ProcessedOsmNode> nodes, ProcessedOsmWay way) {
+    Collection<WaySegment> createWaySegments(Map<Long, ProcessedOsmNode> nodes, ProcessedOsmWay way) {
 
         List<WaySegment> segments = new ArrayList<>();
         double segmentLength = 0;
@@ -106,7 +106,7 @@ public class SupersonicOsmNetworkReader {
                 fromNodeForSegment = toOsmNode;
             }
         }
-        return segments.stream();
+        return segments;
     }
 
     private boolean isCreateSegment(ProcessedOsmNode from, ProcessedOsmNode to, ProcessedOsmWay way) {
@@ -149,7 +149,7 @@ public class SupersonicOsmNetworkReader {
         return result;
     }
 
-    private Stream<Link> createLinks(WaySegment segment) {
+    Collection<Link> createLinks(WaySegment segment, NetworkFactory factory) {
 
         LinkProperties properties = segment.getLinkProperties();
         List<Link> result = new ArrayList<>();
@@ -158,16 +158,16 @@ public class SupersonicOsmNetworkReader {
         Node toNode = createNode(segment.getToNode().getCoord(), segment.getToNode().getId());
 
         if (!isOnewayReverse(segment.tags)) {
-            Link forwardLink = createLink(fromNode, toNode, segment, Direction.Forward);
+            Link forwardLink = createLink(fromNode, toNode, segment, Direction.Forward, factory);
             result.add(forwardLink);
         }
 
         if (!isOneway(segment.getTags(), properties)) {
-            Link reverseLink = createLink(toNode, fromNode, segment, Direction.Reverse);
+            Link reverseLink = createLink(toNode, fromNode, segment, Direction.Reverse, factory);
             result.add(reverseLink);
         }
 
-        return result.stream();
+        return result;
     }
 
     private Node createNode(Coord coord, long nodeId) {
@@ -175,13 +175,13 @@ public class SupersonicOsmNetworkReader {
         return network.getFactory().createNode(id, coord);
     }
 
-    private Link createLink(Node fromNode, Node toNode, WaySegment segment, Direction direction) {
+    Link createLink(Node fromNode, Node toNode, WaySegment segment, Direction direction, NetworkFactory factory) {
 
         String highwayType = segment.getTags().get(OsmTags.HIGHWAY);
         LinkProperties properties = segment.getLinkProperties();
 
         String linkId = direction == Direction.Forward ? segment.getSegmentId() + "f" : segment.getSegmentId() + "r";
-        Link link = network.getFactory().createLink(Id.createLinkId(linkId), fromNode, toNode);
+        Link link = factory.createLink(Id.createLinkId(linkId), fromNode, toNode);
         link.setLength(segment.getLength());
         link.setFreespeed(getFreespeed(segment.getTags(), link.getLength(), properties));
         link.setNumberOfLanes(getNumberOfLanes(segment.getTags(), direction, properties));
@@ -193,7 +193,7 @@ public class SupersonicOsmNetworkReader {
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    private boolean isOneway(Map<String, String> tags, LinkProperties properties) {
+    boolean isOneway(Map<String, String> tags, LinkProperties properties) {
 
         if (tags.containsKey(OsmTags.ONEWAY)) {
             String tag = tags.get(OsmTags.ONEWAY);
@@ -208,7 +208,7 @@ public class SupersonicOsmNetworkReader {
         return properties.oneway;
     }
 
-    private boolean isOnewayReverse(Map<String, String> tags) {
+    boolean isOnewayReverse(Map<String, String> tags) {
 
         if (tags.containsKey(OsmTags.ONEWAY)) {
             String tag = tags.get(OsmTags.ONEWAY);
@@ -311,10 +311,6 @@ public class SupersonicOsmNetworkReader {
         void accept(Link link, Map<String, String> osmTags, Direction direction);
     }
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
     public static abstract class AbstractBuilder<T> {
 
         ConcurrentMap<String, LinkProperties> linkProperties = LinkProperties.createLinkProperties();
@@ -381,7 +377,7 @@ public class SupersonicOsmNetworkReader {
         }
     }
 
-    private static class WaySegment {
+    static class WaySegment {
         private final ProcessedOsmNode fromNode;
         private final ProcessedOsmNode toNode;
         private final double length;
