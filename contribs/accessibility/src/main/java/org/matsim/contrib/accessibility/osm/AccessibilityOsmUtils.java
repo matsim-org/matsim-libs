@@ -22,7 +22,7 @@ package org.matsim.contrib.accessibility.osm;
 /**
  * @author dziemke
  */
-public class AccessibilityOsmUtils {
+class AccessibilityOsmUtils {
 	
 	public static String simplifyString(String name) {
 		if(name != null) {

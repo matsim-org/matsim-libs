@@ -21,11 +21,12 @@ package org.matsim.contrib.edrt.schedule;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
+import org.matsim.contrib.ev.dvrp.ETask;
 
 /**
  * @author michalm
  */
-public class EDrtStayTask extends DrtStayTask implements EDrtTask {
+public class EDrtStayTask extends DrtStayTask implements ETask {
 	private final double consumedEnergy;
 
 	public EDrtStayTask(double beginTime, double endTime, Link link, double consumedEnergy) {

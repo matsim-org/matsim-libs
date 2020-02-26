@@ -1,5 +1,6 @@
 package org.matsim.contrib.osm.networkReader;
 
+import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.network.Network;
@@ -10,11 +11,10 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import java.nio.file.Paths;
 
-import static org.junit.Assert.assertTrue;
-
 public class SupersonicOsmNetworkReaderIT {
 
 	private static final CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:32631");
+	private static final Logger log = Logger.getLogger(SupersonicOsmNetworkReaderIT.class);
 
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
@@ -25,10 +25,13 @@ public class SupersonicOsmNetworkReaderIT {
 		Network network = SupersonicOsmNetworkReader.builder()
 				.coordinateTransformation(coordinateTransformation)
 				.build()
-				.read(Paths.get(utils.getInputDirectory()).resolve("andorra-latest.osm.pbf"));
+				.read(Paths.get(utils.getPackageInputDirectory()).resolve("andorra-latest.osm.pbf"));
 
 		Network expectedResult = NetworkUtils.readNetwork(Paths.get(utils.getInputDirectory()).resolve("expected-result.xml.gz").toString());
 
-		assertTrue(NetworkUtils.compare(expectedResult, network));
+		log.info("expected result contains: " + expectedResult.getLinks().size() + " links and " + expectedResult.getNodes().size() + " nodes");
+		log.info("result contains: " + network.getLinks().size() + " links and " + network.getNodes().size() + " nodes");
+
+		Utils.assertEquals(expectedResult, network);
 	}
 }

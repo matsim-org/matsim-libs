@@ -4,6 +4,9 @@
 
 package ch.sbb.matsim.routing.pt.raptor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -19,9 +22,6 @@ import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This replicates the functionality of {@link org.matsim.core.router.TransitRouterWrapper},
@@ -66,8 +66,12 @@ public class SwissRailRaptorRoutingModule implements RoutingModule {
             if (prevLeg != null) {
                 Coord coord = findCoordinate(prevLeg, leg);
                 Id<Link> linkId = leg.getRoute().getStartLinkId();
-                Activity act = PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, coord, linkId);
+                Activity act = PopulationUtils.createActivityFromCoordAndLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE,
+                        coord, linkId);
                 act.setMaximumDuration(0.0);
+                double time = prevLeg.getDepartureTime() + prevLeg.getTravelTime();
+                act.setStartTime(time);
+                act.setEndTime(time);
                 planElements.add(act);
             }
             planElements.add(leg);

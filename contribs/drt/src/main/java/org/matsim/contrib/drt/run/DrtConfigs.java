@@ -21,11 +21,8 @@
 package org.matsim.contrib.drt.run;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.drt.routing.DrtStageActivityType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.router.TripRouter;
 
 /**
  * @author Michal Maciejewski (michalm)
@@ -40,16 +37,11 @@ public class DrtConfigs {
 		}
 	}
 
-	public static void adjustDrtConfig(DrtConfigGroup drtCfg, PlanCalcScoreConfigGroup planCalcScoreCfg, 
+	public static void adjustDrtConfig(DrtConfigGroup drtCfg, PlanCalcScoreConfigGroup planCalcScoreCfg,
 			PlansCalcRouteConfigGroup plansCalcRouteCfg) {
-		DrtStageActivityType drtStageActivityType = new DrtStageActivityType(drtCfg.getMode());
-		if (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stopbased) ||
-				drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.serviceAreaBased) ||
-						( drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.door2door) && 
-								plansCalcRouteCfg.isInsertingAccessEgressWalk()) ) {
-			if (planCalcScoreCfg.getActivityParams(drtStageActivityType.drtStageActivity) == null) {
-				addDrtStageActivityParams(planCalcScoreCfg, drtStageActivityType.drtStageActivity);
-			}
+		String drtStageActivityType = PlanCalcScoreConfigGroup.createStageActivityType(drtCfg.getMode());
+		if (planCalcScoreCfg.getActivityParams(drtStageActivityType) == null) {
+			addDrtStageActivityParams(planCalcScoreCfg, drtStageActivityType);
 		}
 	}
 
@@ -58,7 +50,8 @@ public class DrtConfigs {
 		params.setTypicalDuration(1);
 		params.setScoringThisActivityAtAll(false);
 		planCalcScoreCfg.getScoringParametersPerSubpopulation().values().forEach(k -> k.addActivityParams(params));
-		if (planCalcScoreCfg.getScoringParameters(null) != null) planCalcScoreCfg.addActivityParams(params);
+		if (planCalcScoreCfg.getScoringParameters(null) != null)
+			planCalcScoreCfg.addActivityParams(params);
 		LOGGER.info("drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
 	}
 

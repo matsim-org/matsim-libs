@@ -39,6 +39,7 @@ public class QuadTrees {
 	public static <E> QuadTree<E> createQuadTree(Collection<E> elements, Function<E, Coord> coordFunction,
 			double buffer) {
 		Preconditions.checkArgument(buffer >= 0, "Only non-negative buffer allowed");
+		Preconditions.checkArgument(!elements.isEmpty(), "Elements must not be empty");
 		double minX = Double.POSITIVE_INFINITY;
 		double minY = Double.POSITIVE_INFINITY;
 		double maxX = Double.NEGATIVE_INFINITY;

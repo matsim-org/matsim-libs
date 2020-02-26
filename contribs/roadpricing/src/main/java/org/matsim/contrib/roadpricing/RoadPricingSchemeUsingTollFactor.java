@@ -74,9 +74,9 @@ public final class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme
 
 	}
 
-	public static void createAndRegisterRoadPricingSchemeUsingTollFactor(URL pricingSchemeFileName, TollFactor tollFactor,
+	public static RoadPricingSchemeUsingTollFactor createAndRegisterRoadPricingSchemeUsingTollFactor(URL pricingSchemeFileName, TollFactor tollFactor,
 																																			 Scenario scenario ){
-		new RoadPricingSchemeUsingTollFactor( pricingSchemeFileName, tollFactor, scenario );
+		return new RoadPricingSchemeUsingTollFactor( pricingSchemeFileName, tollFactor, scenario );
 		// yy todo: inline constructor. kai, jul'19
 	}
 

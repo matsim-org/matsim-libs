@@ -77,7 +77,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 						insertionCostCalculator).findBestInsertion(drtRequest, e.getKey(), e.getValue()))
 				.filter(Optional::isPresent)
 				.map(Optional::get)
-				.min(Comparator.comparing(i -> i.cost))).join();
+				.min(Comparator.comparingDouble(i -> i.cost))).join();
 	}
 
 	private static class DetourLinksStats {

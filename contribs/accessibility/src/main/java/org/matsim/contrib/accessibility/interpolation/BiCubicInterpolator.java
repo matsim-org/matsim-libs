@@ -6,7 +6,7 @@ import org.apache.commons.math.analysis.BivariateRealFunction;
 import org.apache.commons.math.analysis.interpolation.BicubicSplineInterpolator;
 import org.apache.commons.math.analysis.interpolation.BivariateRealGridInterpolator;
 import org.apache.log4j.Logger;
-import org.matsim.contrib.accessibility.gis.SpatialGrid;
+import org.matsim.contrib.accessibility.SpatialGrid;
 
 /**
  * Interpolates data on a SpatialGrid with bicubic spline interpolation from apache (http://commons.apache.org).

@@ -111,6 +111,10 @@ public class SignalSystemImpl implements SignalSystem {
 
 	@Override
 	public void simulationInitialized(double simStartTimeSeconds) {
+		// new iteration starts: clear reset lists from the last iteration
+		this.sortedRequests.clear();
+		this.requests.clear();
+		
 		this.signalController.simulationInitialized(simStartTimeSeconds);
 	}
 

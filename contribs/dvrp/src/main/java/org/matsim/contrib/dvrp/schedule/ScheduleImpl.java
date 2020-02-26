@@ -33,7 +33,7 @@ import com.google.common.base.Preconditions;
 /**
  * @author michalm
  */
-public class ScheduleImpl implements Schedule {
+final class ScheduleImpl implements Schedule {
 	private final DvrpVehicleSpecification vehicleSpecification;
 
 	private final List<AbstractTask> tasks = new ArrayList<>();
@@ -42,7 +42,7 @@ public class ScheduleImpl implements Schedule {
 	private ScheduleStatus status = ScheduleStatus.UNPLANNED;
 	private AbstractTask currentTask = null;
 
-	public ScheduleImpl(DvrpVehicleSpecification vehicleSpecification) {
+	ScheduleImpl(DvrpVehicleSpecification vehicleSpecification) {
 		this.vehicleSpecification = vehicleSpecification;
 	}
 
@@ -61,10 +61,12 @@ public class ScheduleImpl implements Schedule {
 		return tasks.size();
 	}
 
+	@Override
 	public void addTask(Task task) {
 		addTask(tasks.size(), task);
 	}
 
+	@Override
 	public void addTask(int taskIdx, Task task) {
 		validateArgsBeforeAddingTask(taskIdx, task);
 

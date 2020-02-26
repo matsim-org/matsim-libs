@@ -41,6 +41,7 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitScheduleChangedEvent;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -208,10 +209,19 @@ public class SwissRailRaptorModuleTest {
         Assert.assertEquals(TransportMode.walk, ((Leg) planElements.get(7)).getMode());
         Assert.assertEquals(TransportMode.bike, ((Leg) planElements.get(9)).getMode());
 
-        Assert.assertEquals(0.0, ((Activity) planElements.get(2)).getMaximumDuration(), 0.0);
-        Assert.assertEquals(0.0, ((Activity) planElements.get(4)).getMaximumDuration(), 0.0);
-        Assert.assertEquals(0.0, ((Activity) planElements.get(6)).getMaximumDuration(), 0.0);
-        Assert.assertEquals(0.0, ((Activity) planElements.get(8)).getMaximumDuration(), 0.0);
+//        Assert.assertEquals(0.0, ((Activity) planElements.get(2)).getMaximumDuration(), 0.0);
+//        Assert.assertEquals(0.0, ((Activity) planElements.get(4)).getMaximumDuration(), 0.0);
+//        Assert.assertEquals(0.0, ((Activity) planElements.get(6)).getMaximumDuration(), 0.0);
+//        Assert.assertEquals(0.0, ((Activity) planElements.get(8)).getMaximumDuration(), 0.0);
+
+        // MM started filling the times of the swiss rail raptor pt interaction activities with content and so the above (evidently) started failing.  I am
+        // fixing it here. kai, feb'20
+
+        Assert.assertTrue( Time.isUndefinedTime( ((Activity) planElements.get( 2)).getMaximumDuration() ) ) ;
+        Assert.assertTrue( Time.isUndefinedTime( ((Activity) planElements.get( 4)).getMaximumDuration() ) ) ;
+        Assert.assertTrue( Time.isUndefinedTime( ((Activity) planElements.get( 6)).getMaximumDuration() ) ) ;
+        Assert.assertTrue( Time.isUndefinedTime( ((Activity) planElements.get( 8)).getMaximumDuration() ) ) ;
+
     }
     
     /**

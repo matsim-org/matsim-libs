@@ -327,7 +327,6 @@ public class TransitLeastCostPathTree {
 	 *          the leastCostPath between the fromNode and the toNode.
 	 *          Will be null if the path could not be found.
 	 */
-	@SuppressWarnings("unchecked")
 	public Path getPath(final Map<Node, InitialNode> toNodes) {
 
 		//find the best node

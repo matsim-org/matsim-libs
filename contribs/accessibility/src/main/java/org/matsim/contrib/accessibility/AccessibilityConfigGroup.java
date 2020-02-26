@@ -19,10 +19,7 @@
 
 package org.matsim.contrib.accessibility;
 
-import java.util.EnumSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -156,6 +153,13 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 
 	public Set<Modes4Accessibility> getIsComputingMode() {
 		return isComputingMode;
+	}
+	public Set<String> getModes() {
+		Set<String> result = new HashSet<>() ;
+		for( Modes4Accessibility modes4Accessibility : isComputingMode ){
+			result.add(  modes4Accessibility.name() ) ;
+		}
+		return result ;
 	}
 
 	

@@ -43,6 +43,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansConfigGroup.HandlingOfPlansWithoutRoutingMode;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.MainModeIdentifierImpl;
@@ -93,7 +94,7 @@ public class PrepareForSimImplTest {
 
 			final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
 					pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
-					new MainModeIdentifierImpl());
+					config.plans(), new MainModeIdentifierImpl());
 			
 			prepareForSimImpl.run();
 
@@ -119,7 +120,7 @@ public class PrepareForSimImplTest {
 
 			final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
 					pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
-					new MainModeIdentifierImpl());
+					config.plans(), new MainModeIdentifierImpl());
 			
 			prepareForSimImpl.run();
 
@@ -154,7 +155,7 @@ public class PrepareForSimImplTest {
 
 			final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
 					pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
-					new MainModeIdentifierImpl());
+					config.plans(), new MainModeIdentifierImpl());
 			
 			prepareForSimImpl.run();
 
@@ -181,7 +182,7 @@ public class PrepareForSimImplTest {
 
 			final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
 					pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
-					new MainModeIdentifierImpl());
+					config.plans(), new MainModeIdentifierImpl());
 			
 			prepareForSimImpl.run();
 
@@ -226,7 +227,7 @@ public class PrepareForSimImplTest {
 			
 			final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
 					pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
-					new MainModeIdentifierImpl());
+					config.plans(), new MainModeIdentifierImpl());
 			
 			prepareForSimImpl.run();
 			
@@ -308,7 +309,7 @@ public class PrepareForSimImplTest {
 			
 			final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
 					pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
-					new MainModeIdentifierImpl());
+					config.plans(), new MainModeIdentifierImpl());
 			
 			prepareForSimImpl.run();
 			
@@ -379,7 +380,7 @@ public class PrepareForSimImplTest {
 			try {
 				final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
 						pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
-						new MainModeIdentifierImpl());
+						config.plans(), new MainModeIdentifierImpl());
 				
 				prepareForSimImpl.run();
 				Assert.fail("expected Exception, got none.");
@@ -414,7 +415,7 @@ public class PrepareForSimImplTest {
 			try {
 				final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
 						pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
-						new MainModeIdentifierImpl());
+						config.plans(), new MainModeIdentifierImpl());
 				
 				prepareForSimImpl.run();
 				Assert.fail("expected Exception, got none.");
@@ -426,6 +427,7 @@ public class PrepareForSimImplTest {
 	public void testOutdatedHelperModesReplacement() {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.reject);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		createAndAddNetwork(scenario);
 		Population pop = scenario.getPopulation();
@@ -455,9 +457,21 @@ public class PrepareForSimImplTest {
 			person.addPlan(plan);
 			pop.addPerson(person);
 			
+			// Should give an exception with default: config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.reject);
+			try {
+				final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
+						pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
+						config.plans(), new MainModeIdentifierImpl());
+				
+				prepareForSimImpl.run();
+				Assert.fail("expected Exception, got none.");
+			} catch (RuntimeException expected) {}
+			
+			// Should work with config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
+			config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
 			final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
 					pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
-					new MainModeIdentifierImpl());
+					config.plans(), new MainModeIdentifierImpl());
 			
 			prepareForSimImpl.run();
 			
@@ -497,9 +511,22 @@ public class PrepareForSimImplTest {
 			person.addPlan(plan);
 			pop.addPerson(person);
 			
+			config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.reject);
+			// Should give an exception with default: config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.reject);
+			try {
+				final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
+						pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
+						config.plans(), new MainModeIdentifierImpl());
+				
+				prepareForSimImpl.run();
+				Assert.fail("expected Exception, got none.");
+			} catch (RuntimeException expected) {}
+			
+			// Should work with config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
+			config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
 			final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
 					pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
-					new MainModeIdentifierImpl());
+					config.plans(), new MainModeIdentifierImpl());
 			
 			prepareForSimImpl.run();
 			
@@ -559,9 +586,22 @@ public class PrepareForSimImplTest {
 			person.addPlan(plan);
 			pop.addPerson(person);
 			
+			config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.reject);
+			// Should give an exception with default: config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.reject);
+			try {
+				final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
+						pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
+						config.plans(), new MainModeIdentifierImpl());
+				
+				prepareForSimImpl.run();
+				Assert.fail("expected Exception, got none.");
+			} catch (RuntimeException expected) {}
+			
+			// Should work with config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
+			config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
 			final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
 					pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
-					new MainModeIdentifierImpl());
+					config.plans(), new MainModeIdentifierImpl());
 			
 			prepareForSimImpl.run();
 			
@@ -580,7 +620,7 @@ public class PrepareForSimImplTest {
 			 * in the old setup, we would probably have to overwrite the MainModeIdentifier with a custom
 			 * MainModeIdentifier able to understand intermodal trips.
 			 * 
-			 * For the scope of thios test it is sufficient, that the MainModeIdentifier is run, returns a main mode
+			 * For the scope of this test it is sufficient, that the MainModeIdentifier is run, returns a main mode
 			 * and that this main mode is assigned as routingMode to all legs. 
 			 */
 			Assert.assertEquals("wrong routing mode!", TransportMode.drt, TripStructureUtils.getRoutingMode(leg1));
@@ -597,6 +637,7 @@ public class PrepareForSimImplTest {
 	public void testOutdatedFallbackAndHelperModesReplacement() {
 		Config config = ConfigUtils.createConfig();
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.reject);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		createAndAddNetwork(scenario);
 		Population pop = scenario.getPopulation();
@@ -636,9 +677,21 @@ public class PrepareForSimImplTest {
 			person.addPlan(plan);
 			pop.addPerson(person);
 			
+			// Should give an exception with default: config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.reject);
+			try {
+				final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
+						pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
+						config.plans(), new MainModeIdentifierImpl());
+				
+				prepareForSimImpl.run();
+				Assert.fail("expected Exception, got none.");
+			} catch (RuntimeException expected) {}
+			
+			// Should work with config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
+			config.plans().setHandlingOfPlansWithoutRoutingMode(HandlingOfPlansWithoutRoutingMode.useMainModeIdentifier);
 			final PrepareForSimImpl prepareForSimImpl = new PrepareForSimImpl(config.global(), scenario, scenario.getNetwork(), 
 					pop, scenario.getActivityFacilities(), new DummyTripRouterProvider(), config.qsim(), config.facilities(), 
-					new MainModeIdentifierImpl());
+					config.plans(), new MainModeIdentifierImpl());
 			
 			prepareForSimImpl.run();
 			

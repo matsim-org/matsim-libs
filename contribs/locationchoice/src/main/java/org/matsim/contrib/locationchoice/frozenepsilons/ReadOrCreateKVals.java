@@ -23,29 +23,22 @@ package org.matsim.contrib.locationchoice.frozenepsilons;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.Config;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
  class ReadOrCreateKVals {
 	
 	private static final Logger log = Logger.getLogger(ReadOrCreateKVals.class);
 	
-	public static String fkValuesFile = "facilitiesKValues.xml";
-	public static String pkValuesFile = "personsKValues.xml";
-	
-	private Scenario scenario;	
+	private Scenario scenario;
 	private ObjectAttributes facilitiesKValues = new ObjectAttributes();
 	private ObjectAttributes personsKValues = new ObjectAttributes();
-	private Config config;	
 	private RandomFromVarDistr rnd;
 	
 	public ReadOrCreateKVals(long seed, Scenario scenario) {
 		this.scenario = scenario;
-		this.config = scenario.getConfig();
 		this.rnd = new RandomFromVarDistr();
 		this.rnd.setSeed(seed);
 	}
@@ -59,6 +52,11 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 		String pkValuesFileName = dccg.getpkValuesFile();
 		String fkValuesFileName = dccg.getfkValuesFile();
 		String maxEpsValuesFileName = dccg.getMaxEpsFile();
+		if (existingKValues()) {
+			log.info("reading the kvals from the input plans file and facility file");
+			return 1;
+		}
+		log.info("at least one facility kValue or person kValue is missing, start crating all values");
 		if (pkValuesFileName != null && fkValuesFileName != null && maxEpsValuesFileName != null) {			
 			ObjectAttributesXmlReader persKValuesReader = new ObjectAttributesXmlReader(this.personsKValues);
 			ObjectAttributesXmlReader facKValuesReader = new ObjectAttributesXmlReader(this.facilitiesKValues);
@@ -66,6 +64,13 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 				persKValuesReader.readFile(pkValuesFileName);
 				facKValuesReader.readFile(fkValuesFileName);
 				log.info("reading kvals from files:\n"+ pkValuesFileName + "\n" + fkValuesFileName);
+				for (Person p : this.scenario.getPopulation().getPersons().values()) {
+					p.getAttributes().putAttribute( "k", personsKValues.getAttribute(p.getId().toString(), "k"));
+				}
+				for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
+					facility.getAttributes().putAttribute("k", facilitiesKValues.getAttribute(facility.getId().toString(), "k"));
+				}
+
 				return 0;
 			} catch  (UncheckedIOException e) {
 				// reading was not successful
@@ -80,8 +85,24 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 			return 1;
 		}
 	}
-		
-	public void assignKValues() {
+
+	 private boolean existingKValues() {
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			Object kAttribute = person.getAttributes().getAttribute("k");
+			if (kAttribute == null) {
+				return false;
+			}
+		}
+		for (ActivityFacility activityFacility : scenario.getActivityFacilities().getFacilities().values()) {
+			Object kAttribute = activityFacility.getAttributes().getAttribute("k");
+			if (kAttribute == null) {
+				return false;
+			}
+		}
+		return true;
+	 }
+
+	 public void assignKValues() {
 		log.info("generating kVals");
 		this.assignKValuesPersons();
 		this.assignKValuesAlternatives();
@@ -90,25 +111,13 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 	// does not matter which distribution is chosen here
 	private void assignKValuesPersons() {
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
-			this.personsKValues.putAttribute(p.getId().toString(), "k", rnd.getUniform(1.0));
+			p.getAttributes().putAttribute( "k", rnd.getUniform(1.0));
 		}
-		// write person k values
-		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.personsKValues);
-		attributesWriter.writeFile(config.controler().getOutputDirectory() + pkValuesFile);
-	}	
+	}
 	private void assignKValuesAlternatives() {
 		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
-			this.facilitiesKValues.putAttribute(facility.getId().toString(), "k", rnd.getUniform(1.0));
+			facility.getAttributes().putAttribute("k", rnd.getUniform(1.0));
 		}
-		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.facilitiesKValues);
-		attributesWriter.writeFile(config.controler().getOutputDirectory() + fkValuesFile);
 	}
 	
-	public ObjectAttributes getFacilitiesKValues() {
-		return this.facilitiesKValues;
-	}
-	
-	public ObjectAttributes getPersonsKValues() {
-		return this.personsKValues;
-	}
 }

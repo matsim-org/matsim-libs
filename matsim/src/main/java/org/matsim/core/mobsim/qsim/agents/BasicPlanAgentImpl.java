@@ -24,6 +24,7 @@
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -51,6 +52,8 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
+
+import com.google.common.base.MoreObjects;
 
 public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPerson, VehicleUsingAgent, HasModifiablePlan {
 	
@@ -160,7 +163,8 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 
 	private void initializeActivity(Activity act, double now) {
 		this.setState(MobsimAgent.State.ACTIVITY) ;
-		this.getEvents().processEvent( new ActivityStartEvent(now, this.getId(), this.getCurrentLinkId(), act.getFacilityId(), act.getType()));
+		this.getEvents().processEvent( new ActivityStartEvent(now, this.getId(), this.getCurrentLinkId(), act.getFacilityId(), act.getType(),
+				act.getCoord() ) );
 		calculateAndSetDepartureTime(act);
 		getModifiablePlan(); // this is necessary to make the plan modifiable, so that setting the start time (next line) is actually feasible. kai/mz, oct'16
 		((Activity) getCurrentPlanElement()).setStartTime(now);
@@ -416,10 +420,20 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 			// the above assumes alternating acts/legs.  I start having the suspicion that we should revoke our decision to give that up.
 			// If not, one will have to use TripUtils to find the preceeding activity ... but things get more difficult.  Preferably, the
 			// factility should then sit in the leg (since there it is used for routing).  kai, dec'15
-		} else if ( pe instanceof Activity ) {
-			return null ;
+		} else if (pe instanceof Activity) {
+			return null;
 		}
-		throw new RuntimeException("unexpected type of PlanElement") ;
+		throw new RuntimeException("unexpected type of PlanElement");
 	}
 
+	@Override
+	public String toString() {
+		return MoreObjects.toStringHelper(this)
+				.add("plan", plan)
+				.add("vehicle", vehicle)
+				.add("state", state)
+				.add("currentPlanElementIndex", currentPlanElementIndex)
+				.add("currentLinkId", currentLinkId)
+				.toString();
+	}
 }

@@ -23,6 +23,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -53,9 +54,8 @@ import org.matsim.pt.transitSchedule.api.Transit;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.utils.objectattributes.AttributeConverter;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.vehicles.MatsimVehicleWriter;
+import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
 import java.io.File;
@@ -105,6 +105,9 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	@Inject
 	private Lanes lanes;
+
+	@Inject
+	private Scenario scenario;
 
 	@Inject
 	private OutputDirectoryHierarchy controlerIO;
@@ -196,7 +199,9 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	private void dumpLanes() {
 		try {
-			new LanesWriter(this.lanes).write(this.controlerIO.getOutputFilename(Controler.DefaultFiles.lanes));
+			if ( this.lanes!=null && !this.lanes.getLanesToLinkAssignments().isEmpty() ){
+				new LanesWriter( this.lanes ).write( this.controlerIO.getOutputFilename( Controler.DefaultFiles.lanes ) );
+			}
 		} catch ( Exception ee ) {
 			log.error("Exception writing lanes.", ee);
 		}
@@ -213,6 +218,10 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	private void dumpVehicles() {
 		try {
 			new MatsimVehicleWriter(this.vehicles).writeFile(this.controlerIO.getOutputFilename(Controler.DefaultFiles.vehicles));
+			Vehicles allVehicles = VehicleUtils.getOrCreateAllvehicles( scenario );
+			if ( allVehicles!=null && !allVehicles.getVehicleTypes().isEmpty() ){
+				new MatsimVehicleWriter( allVehicles ).writeFile( this.controlerIO.getOutputFilename( Controler.DefaultFiles.allVehicles ) );
+			}
 		} catch ( Exception ee ) {
 			log.error("Exception writing vehicles.", ee);
 		}

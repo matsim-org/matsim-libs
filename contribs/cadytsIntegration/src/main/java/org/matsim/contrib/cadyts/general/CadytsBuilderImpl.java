@@ -41,6 +41,8 @@ import java.util.Map;
 public final class CadytsBuilderImpl {
 	private static Logger log = Logger.getLogger( CadytsBuilderImpl.class ) ;
 
+	private CadytsBuilderImpl(){} // do not instantiate
+
 	public static <T> AnalyticalCalibrator<T> buildCalibratorAndAddMeasurements(final Config config, final Counts<T> occupCounts,
 																				LookUpItemFromId<T> lookUp, Class<T> idType) {
 		
