@@ -822,7 +822,7 @@ public final class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWri
 			StringBuilder buffer = new StringBuilder(100);
 			buffer.append("hour \t mean relative error \t mean absolute bias");
 			bwriter.write(buffer.toString());
-			bwriter.newLine();
+			bwriter.write("\n");
 			for (int i = 0; i < meanError.length; i++) {
 				buffer.delete(0, buffer.length());
 				buffer.append(i + 1);
@@ -831,7 +831,7 @@ public final class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWri
 				buffer.append('\t');
 				buffer.append(meanBias[i]);
 				bwriter.write(buffer.toString());
-				bwriter.newLine();
+				bwriter.write("\n");
 			}
 			bwriter.close();
 		} catch (IOException e) {

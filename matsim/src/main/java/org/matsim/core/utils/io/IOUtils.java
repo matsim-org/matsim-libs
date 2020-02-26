@@ -136,8 +136,8 @@ final public class IOUtils {
 	public static final Charset CHARSET_UTF8 = StandardCharsets.UTF_8;
 	public static final Charset CHARSET_WINDOWS_ISO88591 = StandardCharsets.ISO_8859_1;
 
-	// Define new line character depending on system
-	public static final String NATIVE_NEWLINE = System.getProperty("line.separator");
+	// We niw use Unix line endings everywhere.
+	public static final String NATIVE_NEWLINE = "\n";
 
 	// Logger
 	private final static Logger logger = Logger.getLogger(IOUtils.class);
