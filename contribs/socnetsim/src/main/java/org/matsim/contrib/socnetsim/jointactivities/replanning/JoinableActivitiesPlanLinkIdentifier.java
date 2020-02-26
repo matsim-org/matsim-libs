@@ -112,7 +112,7 @@ public class JoinableActivitiesPlanLinkIdentifier implements PlanLinkIdentifier 
 
 			if (i < activities.size() - 1) { // skip the last activity
 				// correct times if inconsistent
-				lastEnd = Math.max(lastEnd, act.getEndTime().isPresent()
+				lastEnd = Math.max(lastEnd, act.getEndTime().isDefined()
 						? act.getEndTime().seconds()
 						: lastEnd + act.getMaximumDuration());
 			}

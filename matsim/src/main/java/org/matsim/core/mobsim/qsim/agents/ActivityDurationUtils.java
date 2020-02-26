@@ -37,7 +37,7 @@ public class ActivityDurationUtils {
 	 */
 	
 	public static double calculateDepartureTime(Activity act, double now, PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation) {
-		if (act.isMaximumDurationUndefined() && !act.getEndTime().isPresent()) {
+		if (act.isMaximumDurationUndefined() && !act.getEndTime().isDefined()) {
 			return Double.POSITIVE_INFINITY;
 		} else {
 			double departure = 0;
@@ -46,7 +46,7 @@ public class ActivityDurationUtils {
 				// person stays at the activity either until its duration is over or until its end time, whatever comes first
 				if (act.isMaximumDurationUndefined()) {
 					departure = act.getEndTime().seconds();
-				} else if (!act.getEndTime().isPresent()) {
+				} else if (!act.getEndTime().isDefined()) {
 					departure = now + act.getMaximumDuration();
 				} else {
 					departure = Math.min(act.getEndTime().seconds(), now + act.getMaximumDuration());
@@ -59,7 +59,7 @@ public class ActivityDurationUtils {
 				}
 			} else if (activityDurationInterpretation.equals(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration )) {
 				// In fact, as of now I think that _this_ should be the default behavior.  kai, aug'10
-				if (act.getEndTime().isPresent()) {
+				if (act.getEndTime().isDefined()) {
 					departure = act.getEndTime().seconds();
 				} else if (!Time.isUndefinedTime(act.getMaximumDuration())) {
 					departure = now + act.getMaximumDuration();

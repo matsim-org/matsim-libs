@@ -113,7 +113,7 @@ public final class ScoringFunctionAccumulator implements ScoringFunction {
         if (!activity.isStartTimeUndefined()) {
             startActivity(activity.getStartTime(), activity);
         }
-		if (activity.getEndTime().isPresent()) {
+		if (activity.getEndTime().isDefined()) {
 			endActivity(activity.getEndTime().seconds(), activity);
         }
     }

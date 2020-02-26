@@ -92,10 +92,10 @@ public class TestsUtil {
 			if (o2 instanceof Activity) {
 				Activity activity1 = (Activity) o1;
 				Activity activity2 = (Activity) o2;
-				if (!activity1.getEndTime().isPresent() ^ !activity2.getEndTime().isPresent()) {
+				if (!activity1.getEndTime().isDefined() ^ !activity2.getEndTime().isDefined()) {
 					return false;
 				}
-				if (activity1.getEndTime().isPresent() && activity1.getEndTime().seconds()
+				if (activity1.getEndTime().isDefined() && activity1.getEndTime().seconds()
 						!= activity2.getEndTime().seconds()) {
 					return false;
 				}

@@ -78,10 +78,6 @@ public final class OptionalTime {
 		return seconds;
 	}
 
-	public boolean isPresent() {///FIXME remove
-		return isDefined();
-	}
-
 	public boolean isDefined() {
 		return seconds != Time.UNDEFINED_TIME;
 	}
