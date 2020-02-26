@@ -90,6 +90,10 @@ public final class OptionalTime {
 		return seconds != Time.UNDEFINED_TIME ? seconds : supplier.getAsDouble();
 	}
 
+	public double orElseUndefined() {
+		return seconds;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)

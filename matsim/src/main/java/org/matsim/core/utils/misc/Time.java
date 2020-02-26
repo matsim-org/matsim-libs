@@ -105,7 +105,7 @@ public class Time {
 	}
 
 	public static final String writeTime(final OptionalTime time) {
-		return writeTime(time.orElse(UNDEFINED_TIME));
+		return writeTime(time.orElseUndefined());
 	}
 
 	/**

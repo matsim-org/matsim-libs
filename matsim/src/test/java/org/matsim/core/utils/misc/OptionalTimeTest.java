@@ -97,6 +97,12 @@ public class OptionalTimeTest {
 		assertThat(OptionalTime.defined(1).orElseGet(() -> 0)).isEqualTo(1);
 	}
 
+	@Test
+	public void test_orElseUndefined() {
+		assertThat(OptionalTime.undefined().orElseUndefined()).isEqualTo(Time.UNDEFINED_TIME);
+		assertThat(OptionalTime.defined(1).orElseUndefined()).isEqualTo(1);
+	}
+
 	public void test_equals() {
 		assertThat(OptionalTime.undefined()).isEqualTo(OptionalTime.undefined());
 		assertThat(OptionalTime.undefined()).isNotEqualTo(OptionalTime.defined(0));
@@ -107,7 +113,7 @@ public class OptionalTimeTest {
 	}
 
 	public void test_hashCode() {
-		assertThat(OptionalTime.undefined()).hasSameHashCodeAs(Time.getUndefinedTime());
+		assertThat(OptionalTime.undefined()).hasSameHashCodeAs(Time.UNDEFINED_TIME);
 		assertThat(OptionalTime.defined(0)).hasSameHashCodeAs(0.);
 		assertThat(OptionalTime.defined(-Double.MAX_VALUE)).hasSameHashCodeAs(-Double.MAX_VALUE);
 		assertThat(OptionalTime.defined(Double.POSITIVE_INFINITY)).hasSameHashCodeAs(Double.POSITIVE_INFINITY);

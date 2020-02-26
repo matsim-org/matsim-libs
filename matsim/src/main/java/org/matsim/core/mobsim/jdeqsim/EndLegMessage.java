@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.mobsim.qsim.agents.ActivityDurationUtils;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * The micro-simulation internal handler for ending a leg.
@@ -121,7 +120,7 @@ public class EndLegMessage extends EventMessage {
 
 		// schedule ActStartEvent
 		Activity nextAct = this.vehicle.getNextActivity();
-		double actStartEventTime = nextAct.getStartTime().orElse(Time.getUndefinedTime());
+		double actStartEventTime = nextAct.getStartTime().orElseUndefined();
 
 		if (this.getMessageArrivalTime() > actStartEventTime) {
 			actStartEventTime = this.getMessageArrivalTime();
