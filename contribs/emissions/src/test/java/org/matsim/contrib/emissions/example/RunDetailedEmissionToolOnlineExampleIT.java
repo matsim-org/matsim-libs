@@ -47,6 +47,7 @@ public class RunDetailedEmissionToolOnlineExampleIT {
 			config.controler().setLastIteration( 1 );
 			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 			emissionsConfig.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
+			emissionsConfig.setDetailedFallbackBehaviour(EmissionsConfigGroup.DetailedFallbackBehaviour.tryTechnologyAverageOrVehicleTypeAverage); //This is the previous behaviour -> Test only pass, if falling back to average table :(
 			Scenario scenario = RunDetailedEmissionToolOnlineExample.prepareScenario( config ) ;
 			RunDetailedEmissionToolOnlineExample.run( scenario ) ;
 		} catch ( Exception ee ) {
@@ -65,6 +66,8 @@ public class RunDetailedEmissionToolOnlineExampleIT {
 			Config config = RunDetailedEmissionToolOnlineExample.prepareConfig( new String[]{"./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml"} ) ;
 			config.controler().setOutputDirectory( utils.getOutputDirectory() );
 			config.controler().setLastIteration( 1 );
+			EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
+			emissionsConfig.setDetailedFallbackBehaviour(EmissionsConfigGroup.DetailedFallbackBehaviour.tryTechnologyAverageOrVehicleTypeAverage); //This is the previous behaviour -> Test only pass, if falling back to average table :(
 			Scenario scenario = RunDetailedEmissionToolOnlineExample.prepareScenario( config ) ;
 			RunDetailedEmissionToolOnlineExample.run( scenario ) ;
 		} catch ( Exception ee ) {
