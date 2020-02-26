@@ -1,43 +1,19 @@
 package org.matsim.contrib.freight.jsprit;
 
-import java.util.Collection;
-
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierPlan;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.CarrierUtils;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
-import org.matsim.contrib.freight.carrier.ScheduledTour;
-import org.matsim.contrib.freight.carrier.Tour;
-import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
-import org.matsim.contrib.freight.jsprit.NetworkRouter;
-import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
 import com.graphhopper.jsprit.core.algorithm.state.StateId;
 import com.graphhopper.jsprit.core.algorithm.state.StateManager;
 import com.graphhopper.jsprit.core.algorithm.state.StateUpdater;
-import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.constraint.HardActivityConstraint;
-import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
 import com.graphhopper.jsprit.core.problem.misc.JobInsertionContext;
-import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.ActivityVisitor;
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
-import com.graphhopper.jsprit.core.util.Solutions;
-import com.graphhopper.jsprit.core.util.VehicleRoutingTransportCostsMatrix;
+import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 
 /**
  * @author rewert
@@ -53,7 +29,7 @@ import com.graphhopper.jsprit.core.util.VehicleRoutingTransportCostsMatrix;
  *
  */
 /**
- * Creates the distance constrain
+ * Creates the distance constraint.
  *
  */
 class DistanceConstraint implements HardActivityConstraint {
@@ -221,10 +197,7 @@ class DistanceConstraint implements HardActivityConstraint {
 	}
 
 	private double getDistance(TourActivity from, TourActivity to) {
-		return netBasedCosts.getTransportDistance(from.getLocation(), to.getLocation(), 0, null, null);
-
-		// return costsMatrix.getDistance(from.getLocation().getId(),
-		// to.getLocation().getId());
+		return netBasedCosts.getTransportDistance(from.getLocation(), to.getLocation(), 0, null, null); //TODO add vehicle instead of null
 	}
 }
 
@@ -274,7 +247,5 @@ class DistanceUpdater implements StateUpdater, ActivityVisitor {
 
 	double getDistance(TourActivity from, TourActivity to) {
 		return netBasedCosts.getTransportDistance(from.getLocation(), to.getLocation(), 0, null, null);
-		// return costMatrix.getDistance(from.getLocation().getId(),
-		// to.getLocation().getId());
 	}
 }

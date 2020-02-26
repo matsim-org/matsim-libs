@@ -40,6 +40,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup.CompressionType;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.replanning.GenericStrategyManager;
@@ -49,11 +50,14 @@ import org.matsim.testcases.MatsimTestUtils;
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import com.graphhopper.jsprit.core.algorithm.box.Jsprit;
 import com.graphhopper.jsprit.core.algorithm.box.Jsprit.Strategy;
+import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
 import com.graphhopper.jsprit.core.algorithm.state.StateId;
 import com.graphhopper.jsprit.core.algorithm.state.StateManager;
+import com.graphhopper.jsprit.core.problem.Location;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import com.graphhopper.jsprit.core.util.Coordinate;
 import com.graphhopper.jsprit.core.util.Solutions;
 import com.graphhopper.jsprit.core.util.VehicleRoutingTransportCostsMatrix;
 
@@ -62,7 +66,8 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 /**
- * Test for the distance constraint. 4 different setups are used to control the correct working of the constraint
+ * Test for the distance constraint. 4 different setups are used to control the
+ * correct working of the constraint
  * 
  * @author rewert
  *
@@ -85,7 +90,6 @@ public class TestDistanceConstraint {
 		config.network().setInputFile(original_Chessboard);
 		FreightConfigGroup freightConfigGroup = ConfigUtils.addOrGetModule(config, FreightConfigGroup.class);
 		freightConfigGroup.setUseDistanceConstraint(UseDistanceConstraint.basedOnEnergyConsumption);
-		String test = config.getModules().get("freight").getParams().get("useDistanceConstraint");
 		config = prepareConfig(config, 0);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -120,7 +124,11 @@ public class TestDistanceConstraint {
 		createCarriers(carriers, fleetSize, carrierV1, scenario, vehicleTypes);
 
 		int jspritIterations = 100;
-		solveJspritAndMATSim(scenario, vehicleTypes, carriers, jspritIterations);
+		Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(),
+				vehicleTypes.getVehicleTypes().values());
+		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
+		netBuilder.setTimeSliceWidth(1800);
+		solveJspritAndMATSim(scenario, vehicleTypes, carriers, jspritIterations, netBasedCosts);
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
 				carrierV1.getSelectedPlan().getScheduledTours().size());
@@ -136,8 +144,14 @@ public class TestDistanceConstraint {
 
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30, maxDistanceVehicle1,
 				MatsimTestUtils.EPSILON);
-
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30, maxDistanceVehilce2,
+				MatsimTestUtils.EPSILON);
+		
+		Location from = Location.Builder.newInstance().setId("i(1,8)").setCoordinate(Coordinate.newInstance(500, 8000))
+				.build();
+		Location to = Location.Builder.newInstance().setId("j(0,3)R").setCoordinate(Coordinate.newInstance(0, 2500))
+				.build();
+		Assert.assertEquals("Checks if the calculated distance is correct", 9000, netBasedCosts.getTransportDistance(from, to, 0, null, null),
 				MatsimTestUtils.EPSILON);
 
 		double distanceTour = 0.0;
@@ -199,7 +213,11 @@ public class TestDistanceConstraint {
 		createCarriers(carriers, fleetSize, carrierV2, scenario, vehicleTypes);
 
 		int jspritIterations = 100;
-		solveJspritAndMATSim(scenario, vehicleTypes, carriers, jspritIterations);
+		Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(),
+				vehicleTypes.getVehicleTypes().values());
+		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
+		netBuilder.setTimeSliceWidth(1800);
+		solveJspritAndMATSim(scenario, vehicleTypes, carriers, jspritIterations, netBasedCosts);
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 1,
 				carrierV2.getSelectedPlan().getScheduledTours().size());
@@ -215,10 +233,16 @@ public class TestDistanceConstraint {
 
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30, maxDistanceVehicle3,
 				MatsimTestUtils.EPSILON);
-
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 15, maxDistanceVehilce4,
 				MatsimTestUtils.EPSILON);
-
+		
+		Location from = Location.Builder.newInstance().setId("i(1,8)").setCoordinate(Coordinate.newInstance(500, 8000))
+				.build();
+		Location to = Location.Builder.newInstance().setId("j(0,3)R").setCoordinate(Coordinate.newInstance(0, 2500))
+				.build();
+		Assert.assertEquals("Checks if the calculated distance is correct", 9000, netBasedCosts.getTransportDistance(from, to, 0, null, null),
+				MatsimTestUtils.EPSILON);
+		
 		double distanceTour = 0.0;
 		List<Tour.TourElement> elements = carrierV2.getSelectedPlan().getScheduledTours().iterator().next().getTour()
 				.getTourElements();
@@ -279,7 +303,11 @@ public class TestDistanceConstraint {
 		createCarriers(carriers, fleetSize, carrierV3, scenario, vehicleTypes);
 
 		int jspritIterations = 100;
-		solveJspritAndMATSim(scenario, vehicleTypes, carriers, jspritIterations);
+		Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(),
+				vehicleTypes.getVehicleTypes().values());
+		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
+		netBuilder.setTimeSliceWidth(1800);
+		solveJspritAndMATSim(scenario, vehicleTypes, carriers, jspritIterations, netBasedCosts);
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 2,
 				carrierV3.getSelectedPlan().getScheduledTours().size());
@@ -296,7 +324,13 @@ public class TestDistanceConstraint {
 
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30, maxDistanceVehilce6,
 				MatsimTestUtils.EPSILON);
-
+		Location from = Location.Builder.newInstance().setId("i(1,8)").setCoordinate(Coordinate.newInstance(500, 8000))
+				.build();
+		Location to = Location.Builder.newInstance().setId("j(0,3)R").setCoordinate(Coordinate.newInstance(0, 2500))
+				.build();
+		Assert.assertEquals("Checks if the calculated distance is correct", 9000, netBasedCosts.getTransportDistance(from, to, 0, null, null),
+				MatsimTestUtils.EPSILON);
+		
 		for (ScheduledTour scheduledTour : carrierV3.getSelectedPlan().getScheduledTours()) {
 
 			double distanceTour = 0.0;
@@ -371,7 +405,11 @@ public class TestDistanceConstraint {
 		createCarriers(carriers, fleetSize, carrierV4, scenario, vehicleTypes);
 
 		int jspritIterations = 100;
-		solveJspritAndMATSim(scenario, vehicleTypes, carriers, jspritIterations);
+		Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(scenario.getNetwork(),
+				vehicleTypes.getVehicleTypes().values());
+		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
+		netBuilder.setTimeSliceWidth(1800);
+		solveJspritAndMATSim(scenario, vehicleTypes, carriers, jspritIterations, netBasedCosts);
 
 		Assert.assertEquals("Not the correct amout of scheduled tours", 2,
 				carrierV4.getSelectedPlan().getScheduledTours().size());
@@ -387,6 +425,12 @@ public class TestDistanceConstraint {
 				MatsimTestUtils.EPSILON);
 
 		Assert.assertEquals("Wrong maximum distance of the tour of this vehicleType", 30, maxDistanceVehilce8,
+				MatsimTestUtils.EPSILON);
+		Location from = Location.Builder.newInstance().setId("i(1,8)").setCoordinate(Coordinate.newInstance(500, 8000))
+				.build();
+		Location to = Location.Builder.newInstance().setId("j(0,3)R").setCoordinate(Coordinate.newInstance(0, 2500))
+				.build();
+		Assert.assertEquals("Checks if the calculated distance is correct", 9000, netBasedCosts.getTransportDistance(from, to, 0, null, null),
 				MatsimTestUtils.EPSILON);
 
 		for (ScheduledTour scheduledTour : carrierV4.getSelectedPlan().getScheduledTours()) {
@@ -515,8 +559,8 @@ public class TestDistanceConstraint {
 	}
 
 	private static void solveJspritAndMATSim(Scenario scenario, CarrierVehicleTypes vehicleTypes, Carriers carriers,
-			int jspritIterations) {
-		solveWithJsprit(scenario, carriers, jspritIterations, vehicleTypes);
+			int jspritIterations, NetworkBasedTransportCosts netBasedCosts) {
+		solveWithJsprit(scenario, carriers, jspritIterations, vehicleTypes, netBasedCosts);
 		final Controler controler = new Controler(scenario);
 
 		scoringAndManagerFactory(scenario, carriers, controler);
@@ -531,17 +575,18 @@ public class TestDistanceConstraint {
 	 * 
 	 * @param
 	 */
-	private static void solveWithJsprit(Scenario scenario, Carriers carriers, int jspritIteration,
-			CarrierVehicleTypes vehicleTypes) {
+
+	private static NetworkBasedTransportCosts solveWithJsprit(Scenario scenario, Carriers carriers, int jspritIteration,
+			CarrierVehicleTypes vehicleTypes, NetworkBasedTransportCosts netBasedCosts) {
 
 		Network network = scenario.getNetwork();
-		Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(network,
-				vehicleTypes.getVehicleTypes().values());
-		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
+//		Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance(network,
+//				vehicleTypes.getVehicleTypes().values());
+//		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build();
 
 		for (Carrier singleCarrier : carriers.getCarriers().values()) {
 
-			netBuilder.setTimeSliceWidth(1800);
+//			netBuilder.setTimeSliceWidth(1800);
 
 			VehicleRoutingProblem.Builder vrpBuilder = MatsimJspritFactory.createRoutingProblemBuilder(singleCarrier,
 					network);
@@ -576,6 +621,7 @@ public class TestDistanceConstraint {
 			singleCarrier.setSelectedPlan(carrierPlanServices);
 
 		}
+		return netBasedCosts;
 	}
 
 	/**
