@@ -1,4 +1,4 @@
-package org.matsim.core.utils.pb;
+package org.matsim.contrib.protobuf;
 
 /**
  * Holds the current version of the protobuf wireformat for each type.
