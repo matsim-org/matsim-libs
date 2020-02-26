@@ -419,7 +419,7 @@
 		<param name="removingUnnecessaryPlanAttributes" value="false" />
 
 		<!-- Name of the (Object)Attribute defining the subpopulation to which pertains a Person (as freight, through traffic, etc.). The attribute must be of String type.  Change away from default only in desperate situations. -->
-		<param name="subpopulationAttributeName" value="subpopulation" />
+<!--		<param name="subpopulationAttributeName" value="subpopulation" />-->
 	</module>
 
 <!-- ====================================================================== -->
