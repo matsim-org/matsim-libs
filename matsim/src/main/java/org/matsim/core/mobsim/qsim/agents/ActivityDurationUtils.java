@@ -44,9 +44,9 @@ public class ActivityDurationUtils {
 			if (activityDurationInterpretation.equals(
 					PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime)) {
 				// person stays at the activity either until its duration is over or until its end time, whatever comes first
-				if (Time.isUndefinedTime(act.getMaximumDuration())) {
+				if (act.isMaximumDurationUndefined()) {
 					departure = act.getEndTime();
-				} else if (Time.isUndefinedTime(act.getEndTime())) {
+				} else if (!act.getOptionalEndTime().isPresent()) {
 					departure = now + act.getMaximumDuration();
 				} else {
 					departure = Math.min(act.getEndTime(), now + act.getMaximumDuration());

@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.jointactivities.replanning;
 
+import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
@@ -95,7 +96,10 @@ public class JoinableActivitiesPlanLinkIdentifier implements PlanLinkIdentifier 
 		final Id personId = plan.getPerson().getId();
 		double lastEnd = 0;
 		int ind = 0;
-		for ( Activity act : TripStructureUtils.getActivities( plan , StageActivityHandling.ExcludeStageActivities ) ) {
+		List<Activity> activities = TripStructureUtils.getActivities(plan,
+				StageActivityHandling.ExcludeStageActivities);
+		for ( int i = 0; i < activities.size(); i++) {
+			Activity act = activities.get(i);
 			final Id loc = act.getFacilityId();
 
 			final LocationEvent event =
@@ -106,12 +110,12 @@ public class JoinableActivitiesPlanLinkIdentifier implements PlanLinkIdentifier 
 						loc,
 						lastEnd );
 
-			// correct times if inconsistent
-			lastEnd = Math.max(
-				lastEnd,
-				act.getOptionalEndTime().isPresent() ?
-					act.getEndTime() :
-					lastEnd + act.getMaximumDuration() );
+			if (i < activities.size() - 1) { // skip the last activity
+				// correct times if inconsistent
+				lastEnd = Math.max(lastEnd, act.getOptionalEndTime().isPresent()
+						? act.getEndTime()
+						: lastEnd + act.getMaximumDuration());
+			}
 
 			if ( log.isTraceEnabled() ) {
 				log.trace( "add event "+event+" to queue" );
