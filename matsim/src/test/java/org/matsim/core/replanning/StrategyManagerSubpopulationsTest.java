@@ -36,7 +36,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 
 public class StrategyManagerSubpopulationsTest {
-	private static final String SUBPOP_ATT_NAME = "subpopulation";
+//	private static final String SUBPOP_ATT_NAME = "subpopulation";
 
 	private static final String POP_NAME_1 = "mangeurs_de_boudin";
 	private static final String POP_NAME_2 = "buveurs_de_vin";
@@ -58,12 +58,14 @@ public class StrategyManagerSubpopulationsTest {
 			case 1:
 //				population.getPersonAttributes().putAttribute(
 //						p.getId().toString(), SUBPOP_ATT_NAME, POP_NAME_1);
-				PopulationUtils.putPersonAttribute( p, SUBPOP_ATT_NAME, POP_NAME_1 );
+//				PopulationUtils.putPersonAttribute( p, SUBPOP_ATT_NAME, POP_NAME_1 );
+				PopulationUtils.putSubpopulation( p, POP_NAME_1 );
 				break;
 			case 2:
 //				population.getPersonAttributes().putAttribute(
 //						p.getId().toString(), SUBPOP_ATT_NAME, POP_NAME_2);
-				PopulationUtils.putPersonAttribute( p, SUBPOP_ATT_NAME, POP_NAME_2 );
+//				PopulationUtils.putPersonAttribute( p, SUBPOP_ATT_NAME, POP_NAME_2 );
+				PopulationUtils.putSubpopulation( p, POP_NAME_2 );
 				break;
 			default:
 				throw new RuntimeException(group + " ???");
@@ -71,7 +73,7 @@ public class StrategyManagerSubpopulationsTest {
 		}
 
 		final Counter counter = new Counter( "test person # " );
-		manager.setSubpopulationAttributeName(SUBPOP_ATT_NAME);
+//		manager.setSubpopulationAttributeName(SUBPOP_ATT_NAME);
 		manager.addStrategy(new PlanStrategy() {
 					@Override
 					public void run(HasPlansAndId<Plan, Person> person) {
@@ -80,7 +82,8 @@ public class StrategyManagerSubpopulationsTest {
 						Gbl.assertNotNull( person1 );
 						Assert.assertNull(
 							"unexpected subpopulation",
-							  PopulationUtils.getPersonAttribute( person1, SUBPOP_ATT_NAME) );
+//							  PopulationUtils.getPersonAttribute( person1, SUBPOP_ATT_NAME) );
+								PopulationUtils.getSubpopulation( person1 ) );
 
 					}
 
@@ -101,7 +104,8 @@ public class StrategyManagerSubpopulationsTest {
 						Assert.assertEquals(
 							"unexpected subpopulation",
 							POP_NAME_1,
-							  PopulationUtils.getPersonAttribute( person1, SUBPOP_ATT_NAME) );
+//							  PopulationUtils.getPersonAttribute( person1, SUBPOP_ATT_NAME) );
+								PopulationUtils.getSubpopulation( person1 ) );
 					}
 
 					@Override
@@ -121,7 +125,8 @@ public class StrategyManagerSubpopulationsTest {
 						Assert.assertEquals(
 							"unexpected subpopulation",
 							POP_NAME_2,
-							  PopulationUtils.getPersonAttribute( person1, SUBPOP_ATT_NAME) );
+//							  PopulationUtils.getPersonAttribute( person1, SUBPOP_ATT_NAME) );
+								PopulationUtils.getSubpopulation( person1 ) );
 					}
 
 					@Override
