@@ -205,7 +205,7 @@ public class PSim implements Mobsim {
                                 travelTime = route.getTravelTime();
                                 eventQueue.add( new TeleportationArrivalEvent( prevEndTime + travelTime, personId,
                                         route.getDistance()
-                                        // Double.NaN
+                                        ,prevLeg.getMode()
                                 ) );
                             } catch( NullPointerException e ){
                                 Logger.getLogger( this.getClass() ).error( "No route for this leg. Continuing with next leg" );
