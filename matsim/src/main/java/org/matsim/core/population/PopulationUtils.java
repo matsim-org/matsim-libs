@@ -607,8 +607,7 @@ public final class PopulationUtils {
 			}
 
 			// activity end times
-			if (  !act1.getEndTime().isDefined() && !act2.getEndTime().isDefined()){
-				// TODO: isInfinite() is broader than isUndefined()
+			if ( act1.getEndTime().isUndefined() && act2.getEndTime().isUndefined()){
 				// both activities have no end time, no need to compute a similarity penalty
 			} else {
 				// both activities have an end time, comparing the end times

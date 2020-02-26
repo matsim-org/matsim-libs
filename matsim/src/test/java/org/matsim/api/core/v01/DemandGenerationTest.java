@@ -187,7 +187,7 @@ public class DemandGenerationTest extends MatsimTestCase {
 			assertEquals(Id.create(1, Link.class), ((Activity)p.getPlanElements().get(0)).getLinkId());
 			assertEquals(workEndTime, ((Activity)p.getPlanElements().get(2)).getEndTime().seconds(), EPSILON);
 			assertEquals(Id.create(3, Link.class), ((Activity)p.getPlanElements().get(2)).getLinkId());
-			assertTrue(!((Activity)p.getPlanElements().get(4)).getEndTime().isDefined());
+			assertTrue(((Activity)p.getPlanElements().get(4)).getEndTime().isUndefined());
 			assertEquals(Id.create(1, Link.class), ((Activity)p.getPlanElements().get(4)).getLinkId());
 
 			assertEquals(TransportMode.car, ((Leg)p.getPlanElements().get(1)).getMode());

@@ -36,7 +36,7 @@ public class ActivityDurationUtils {
 	 */
 	
 	public static double calculateDepartureTime(Activity act, double now, PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation) {
-		if (act.getMaximumDuration().isUndefined() && !act.getEndTime().isDefined()) {
+		if (act.getMaximumDuration().isUndefined() && act.getEndTime().isUndefined()) {
 			return Double.POSITIVE_INFINITY;
 		} else {
 			double departure = 0;
@@ -45,7 +45,7 @@ public class ActivityDurationUtils {
 				// person stays at the activity either until its duration is over or until its end time, whatever comes first
 				if (act.getMaximumDuration().isUndefined()) {
 					departure = act.getEndTime().seconds();
-				} else if (!act.getEndTime().isDefined()) {
+				} else if (act.getEndTime().isUndefined()) {
 					departure = now + act.getMaximumDuration().seconds();
 				} else {
 					departure = Math.min(act.getEndTime().seconds(), now + act.getMaximumDuration().seconds());
