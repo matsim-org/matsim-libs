@@ -24,6 +24,7 @@ package org.matsim.core.router.costcalculators;
 
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 
 public class TravelDisutilityModule extends AbstractModule {
 
@@ -31,8 +32,11 @@ public class TravelDisutilityModule extends AbstractModule {
     public void install() {
         PlansCalcRouteConfigGroup routeConfigGroup = getConfig().plansCalcRoute();
         for (String mode : routeConfigGroup.getNetworkModes()) {
-            addTravelDisutilityFactoryBinding(mode).toInstance(
-                    new RandomizingTimeDistanceTravelDisutilityFactory(mode, getConfig().planCalcScore()));
+
+            final RandomizingTimeDistanceTravelDisutilityFactory builder = new RandomizingTimeDistanceTravelDisutilityFactory( mode, getConfig().planCalcScore() );
+            builder.setSigma( routeConfigGroup.getRoutingRandomness() );
+
+            addTravelDisutilityFactoryBinding(mode ).toInstance( builder );
         }
     }
 
