@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -59,22 +60,14 @@ public class TripsCSVWriter {
             "destinationLinkId", "toX", "toY"};
     private final String separator;
     private final CustomTripsWriterExtension extension;
-    private final boolean callcustomwriters;
     private final Scenario scenario;
 
-    public TripsCSVWriter(Scenario scenario) {
-        this.scenario = scenario;
-        this.separator = scenario.getConfig().global().getDefaultDelimiter();
-        this.extension = null;
-        callcustomwriters = false;
-    }
 
     public TripsCSVWriter(Scenario scenario, CustomTripsWriterExtension extension) {
         this.scenario = scenario;
         this.separator = scenario.getConfig().global().getDefaultDelimiter();
         HEADER = ArrayUtils.addAll(HEADER, extension.getAdditionalHeader());
         this.extension = extension;
-        callcustomwriters = true;
 
     }
 
@@ -153,11 +146,9 @@ public class TripsCSVWriter {
             record.add(Double.toString(toCoord.getX()));
             record.add(Double.toString(toCoord.getY()));
 
-            if (callcustomwriters) {
-                record.addAll(extension.getAdditionalColumns(trip));
-                if (HEADER.length != record.size()) {
+            record.addAll(extension.getAdditionalColumns(trip));
+            if (HEADER.length != record.size()) {
                     throw new RuntimeException("Custom CSV Writer Extension does not provide a sufficient number of additional columns. Must be " + HEADER.length + " , but is " + record.size());
-                }
             }
         }
 
@@ -183,5 +174,17 @@ public class TripsCSVWriter {
         String[] getAdditionalHeader();
 
         List<String> getAdditionalColumns(TripStructureUtils.Trip trip);
+    }
+
+    static class NoExtension implements CustomTripsWriterExtension {
+        @Override
+        public String[] getAdditionalHeader() {
+            return new String[0];
+        }
+
+        @Override
+        public List<String> getAdditionalColumns(TripStructureUtils.Trip trip) {
+            return Collections.EMPTY_LIST;
+        }
     }
 }
