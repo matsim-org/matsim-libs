@@ -147,7 +147,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 				+ this.linkId
 				+ "]"
 				+ "[startTime="
-				+ Time.writeTime(isStartTimeUndefined() ? Time.getUndefinedTime() : this.getStartTime())
+				+ Time.writeTime(getOptionalStartTime().isUndefined() ? Time.getUndefinedTime() : this.getStartTime())
 				+ "]"
 				+ "[endTime="
 				+ Time.writeTime(endTime)

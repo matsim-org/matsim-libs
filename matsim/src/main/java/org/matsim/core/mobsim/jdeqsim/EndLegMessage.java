@@ -121,7 +121,7 @@ public class EndLegMessage extends EventMessage {
 
 		// schedule ActStartEvent
 		Activity nextAct = this.vehicle.getNextActivity();
-		double actStartEventTime = nextAct.isStartTimeUndefined() ? Time.getUndefinedTime() : nextAct.getStartTime();
+		double actStartEventTime = nextAct.getOptionalStartTime().isUndefined() ? Time.getUndefinedTime() : nextAct.getStartTime();
 
 		if (this.getMessageArrivalTime() > actStartEventTime) {
 			actStartEventTime = this.getMessageArrivalTime();

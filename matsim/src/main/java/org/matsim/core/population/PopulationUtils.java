@@ -852,7 +852,7 @@ public final class PopulationUtils {
 		newAct.setCoord(coord);
 		newAct.setType(act.getType());
 		newAct.setLinkId(act.getLinkId());
-		newAct.setStartTime(act.isStartTimeUndefined() ? Time.getUndefinedTime() : act.getStartTime());
+		newAct.setStartTime(act.getOptionalStartTime().isUndefined() ? Time.getUndefinedTime() : act.getStartTime());
 		newAct.setEndTime(!act.getEndTime().isDefined() ? Time.getUndefinedTime() :
 				act.getEndTime().seconds());
 		newAct.setMaximumDuration(act.isMaximumDurationUndefined() ? Time.getUndefinedTime() : act.getMaximumDuration());

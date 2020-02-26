@@ -99,10 +99,10 @@ public class TestsUtil {
 						!= activity2.getEndTime().seconds()) {
 					return false;
 				}
-				if (activity1.isStartTimeUndefined() ^ activity2.isStartTimeUndefined()) {
+				if (activity1.getOptionalStartTime().isUndefined() ^ activity2.getOptionalStartTime().isUndefined()) {
 					return false;
 				}
-				if (!activity1.isStartTimeUndefined() && activity1.getStartTime() != activity2.getStartTime()) {
+				if (!activity1.getOptionalStartTime().isUndefined() && activity1.getStartTime() != activity2.getStartTime()) {
 					return false;
 				}
 			} else {

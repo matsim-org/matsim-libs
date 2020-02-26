@@ -156,7 +156,7 @@ final class PPlanRouter implements PlanAlgorithm, PersonAlgorithm {
 			final PlanElement pe) {
 		if (pe instanceof Activity) {
 			Activity act = (Activity) pe;
-			double startTime = act.isStartTimeUndefined() ? Time.getUndefinedTime() : act.getStartTime();
+			double startTime = act.getOptionalStartTime().isUndefined() ? Time.getUndefinedTime() : act.getStartTime();
 			double dur = act.getMaximumDuration();
 			if (act.getEndTime().isDefined()) {
 				// use fromAct.endTime as time for routing

@@ -201,7 +201,7 @@ public final class ParkingChoiceSimulation
 				parkingAttributes.facilityId = firstActivityAfterLastCarLegOfDay.getFacilityId();
 				parkingAttributes.actType = firstActivityAfterLastCarLegOfDay.getType();
 
-				double startTime = firstActivityAfterLastCarLegOfDay.isStartTimeUndefined() ?
+				double startTime = firstActivityAfterLastCarLegOfDay.getOptionalStartTime().isUndefined() ?
 						Time.getUndefinedTime() :
 						firstActivityAfterLastCarLegOfDay.getStartTime();
 				if (Time.isUndefinedTime(startTime) || startTime == Double.POSITIVE_INFINITY) {
