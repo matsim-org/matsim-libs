@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSet;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
@@ -268,13 +269,19 @@ public final class FacilitiesFromPopulation {
 		for (ActivityFacility af : this.facilities.getFacilities().values()) {
 			for (ActivityOption ao : af.getActivityOptions().values()) {
 				String actType = ao.getType();
-				ActivityParams params = this.planCalcScoreConfigGroup.getActivityParams(actType);
-				if (params == null) {
-					if (missingActTypes.add(actType)) {
-						log.error("No information for activity type " + actType + " found in given configuration.");
+
+				boolean foundTimes = false;
+				for (ScoringParameterSet scoringParams : planCalcScoreConfigGroup.getScoringParametersPerSubpopulation().values()) {
+					ActivityParams params = scoringParams.getActivityParams(actType);
+					if (params != null) {
+						// XXX Note that what happens if several subpopulations have different opening times is not clear...
+						foundTimes = true;
+						ao.addOpeningTime(new OpeningTimeImpl(params.getOpeningTime(), params.getClosingTime()));
 					}
-				} else {
-					ao.addOpeningTime(new OpeningTimeImpl(params.getOpeningTime(), params.getClosingTime()));
+				}
+
+				if (!foundTimes || missingActTypes.add(actType)) {
+					log.error("No information for activity type " + actType + " found in given configuration.");
 				}
 			}
 		}
