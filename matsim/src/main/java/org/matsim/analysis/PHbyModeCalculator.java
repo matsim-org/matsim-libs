@@ -154,7 +154,7 @@ public class PHbyModeCalculator {
                 categories[i++] = it.toString();
             }
 
-            StackedBarChart chart = new StackedBarChart("Passenger hours traveled per Mode","Iteration","ph",categories);
+            StackedBarChart chart = new StackedBarChart("Passenger hours traveled per Mode","Iteration","person hours",categories);
             //rotate x-axis by 90degrees
             chart.getChart().getCategoryPlot().getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.UP_90);
 
