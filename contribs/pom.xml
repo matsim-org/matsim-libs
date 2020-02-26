@@ -22,7 +22,7 @@
 		<snapshotRepository>
 			<id>oss-jfrog-artifactory</id>
 			<name>artifactory-snapshots</name>
-			<url>http://oss.jfrog.org/oss-snapshot-local</url>
+			<url>https://oss.jfrog.org/oss-snapshot-local</url>
 		</snapshotRepository>
 	</distributionManagement>
 
@@ -185,14 +185,8 @@
 			<url>http://download.osgeo.org/webdav/geotools</url>
 		</repository>
 		<repository>
-			<!-- For some dependencies of Geotools which are not on Maven central -->
-			<id>maven2-repository.dev.java.net</id>
-			<name>Java.net repository</name>
-			<url>http://download.java.net/maven/2</url>
-		</repository>
-		<repository>
 			<id>matsim</id>
-			<url>http://dl.bintray.com/matsim/matsim</url>
+			<url>https://dl.bintray.com/matsim/matsim</url>
 		</repository>
 		<repository>
 			<id>ch.sbb</id>

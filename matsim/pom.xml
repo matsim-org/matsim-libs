@@ -32,7 +32,7 @@
 		<snapshotRepository>
 			<id>oss-jfrog-artifactory</id>
 			<name>artifactory-snapshots</name>
-			<url>http://oss.jfrog.org/oss-snapshot-local</url>
+			<url>https://oss.jfrog.org/oss-snapshot-local</url>
 		</snapshotRepository>
 	</distributionManagement>
 	<build>
@@ -243,12 +243,12 @@
 		</repository>
         <repository>
             <id>matsim</id>
-            <url>http://dl.bintray.com/matsim/matsim</url>
+            <url>https://dl.bintray.com/matsim/matsim</url>
         </repository>
 	<repository>
 	  <!-- For MATSim snapshots: -->
 	  <id>ojo-snapshots</id>
-	  <url>http://oss.jfrog.org/libs-snapshot</url>
+	  <url>https://oss.jfrog.org/libs-snapshot</url>
 	</repository>
 	</repositories>
 
