@@ -1,45 +1,47 @@
-///* *********************************************************************** *
-// * project: org.matsim.*
-// *                                                                         *
-// * *********************************************************************** *
-// *                                                                         *
-// * copyright       : (C) 2012 by the members listed in the COPYING,        *
-// *                   LICENSE and WARRANTY file.                            *
-// * email           : info at matsim dot org                                *
-// *                                                                         *
-// * *********************************************************************** *
-// *                                                                         *
-// *   This program is free software; you can redistribute it and/or modify  *
-// *   it under the terms of the GNU General Public License as published by  *
-// *   the Free Software Foundation; either version 2 of the License, or     *
-// *   (at your option) any later version.                                   *
-// *   See also COPYING, LICENSE and WARRANTY file                           *
-// *                                                                         *
-// * *********************************************************************** */
-//
-//package org.matsim.contrib.cadyts.pt;
-//
-//import java.util.Map;
-//
-//import org.apache.log4j.Logger;
-//import org.matsim.api.core.v01.Id;
-//import org.matsim.contrib.cadyts.general.CadytsBuilderImpl;
-//import org.matsim.contrib.cadyts.general.LookUpItemFromId;
-//import org.matsim.core.config.Config;
-//import org.matsim.counts.Count;
-//import org.matsim.counts.Counts;
-//import org.matsim.counts.Volume;
-//
-//import cadyts.calibrators.analytical.AnalyticalCalibrator;
-//import cadyts.measurements.SingleLinkMeasurement;
-//
-///**
-// * @author nagel
-// * @author mrieser
-// */
-//public final class CadytsBuilderImplGT {
-//	// yyyy why "GT"?  Is this a typo and should have been PT (or Pt, to be consistent with other classes)? kai, feb'20
-//
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package org.matsim.contrib.cadyts.pt;
+
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.cadyts.general.CadytsBuilderImpl;
+import org.matsim.contrib.cadyts.general.LookUpItemFromId;
+import org.matsim.core.config.Config;
+import org.matsim.counts.Count;
+import org.matsim.counts.Counts;
+import org.matsim.counts.Volume;
+
+import cadyts.calibrators.analytical.AnalyticalCalibrator;
+import cadyts.measurements.SingleLinkMeasurement;
+
+/**
+ * @author nagel
+ * @author mrieser
+ */
+public final class CadytsBuilderImplGT {
+	// yyyy why "GT"?  Is this a typo and should have been PT (or Pt, to be consistent with other classes)? kai, feb'20
+
+        // yy I also don't know where and when this is used to I am commenting it out to see if someone complains.  kai, feb'20
+
 //	private static Logger log = Logger.getLogger( CadytsBuilderImplGT.class ) ;
 //
 //	private CadytsBuilderImplGT(){} // do not instantiate
@@ -81,4 +83,4 @@
 //		}
 //		return matsimCalibrator;
 //	}
-//}
+}
