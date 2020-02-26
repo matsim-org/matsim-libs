@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.functions.ModeUtilityParameters;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
@@ -33,7 +34,8 @@ public class IndividualRaptorParametersForPerson implements RaptorParametersForP
 
 	@Override
 	public RaptorParameters getRaptorParameters(Person person) {
-		RaptorParameters raptorParameters = RaptorUtils.createParameters(config);
+		final String subpopulation = PopulationUtils.getSubpopulation(person);
+		RaptorParameters raptorParameters = RaptorUtils.createParameters(config, subpopulation);
 		ScoringParameters scoringParameters = parametersForPerson.getScoringParameters(person);
 
 		double marginalUtilityOfPerforming = scoringParameters.marginalUtilityOfPerforming_s;
@@ -43,7 +45,7 @@ public class IndividualRaptorParametersForPerson implements RaptorParametersForP
 
 		PlanCalcScoreConfigGroup pcsConfig = config.planCalcScore();
 
-		for (Map.Entry<String, PlanCalcScoreConfigGroup.ModeParams> e : pcsConfig.getModes().entrySet()) {
+		for (Map.Entry<String, PlanCalcScoreConfigGroup.ModeParams> e : pcsConfig.getScoringParameters(subpopulation).getModes().entrySet()) {
 			String mode = e.getKey();
 			ModeUtilityParameters modeParams = scoringParameters.modeParams.get(mode);
 

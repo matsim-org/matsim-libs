@@ -71,7 +71,7 @@ public class SwissRailRaptorTest {
     public void testSingleLine() {
         Fixture f = new Fixture();
         f.init();
-        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
+        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config, null);
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         Coord fromCoord = new Coord(3800, 5100);
         Coord toCoord = new Coord(16100, 5050);
@@ -103,7 +103,7 @@ public class SwissRailRaptorTest {
     public void testSingleLine_linkIds() {
         Fixture f = new Fixture();
         f.init();
-        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
+        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config, null);
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         Coord fromCoord = new Coord(3800, 5100);
         Coord toCoord = new Coord(16100, 5050);
@@ -135,7 +135,7 @@ public class SwissRailRaptorTest {
     public void testWalkDurations() {
         Fixture f = new Fixture();
         f.init();
-        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
+        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config, null);
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         Coord fromCoord = new Coord(3800, 5100);
         Coord toCoord = new Coord(16100, 5050);
@@ -155,7 +155,7 @@ public class SwissRailRaptorTest {
     public void testWalkDurations_range() {
         Fixture f = new Fixture();
         f.init();
-        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
+        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config, null);
         SwissRailRaptor router = createTransitRouter(f.schedule, f.config, f.network);
         Coord fromCoord = new Coord(3800, 5100);
         Coord toCoord = new Coord(16100, 5050);
@@ -200,7 +200,7 @@ public class SwissRailRaptorTest {
     public void testDirectWalkCheaper() {
         Fixture f = new Fixture();
         f.init();
-        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
+        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config, null);
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         Coord fromCoord = new Coord(4000, 3000);
         Coord toCoord = new Coord(8000, 3000);
@@ -219,7 +219,7 @@ public class SwissRailRaptorTest {
         Fixture f = new Fixture();
         f.init();
         f.config.transitRouter().setDirectWalkFactor(100.0);
-        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
+        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config, null);
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         Coord fromCoord = new Coord(4000, 3000);
         Coord toCoord = new Coord(8000, 3000);
@@ -269,7 +269,7 @@ public class SwissRailRaptorTest {
     public void testLineChange() {
         Fixture f = new Fixture();
         f.init();
-        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
+        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config, null);
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         Coord toCoord = new Coord(16100, 10050);
         List<Leg> legs = router.calcRoute(new FakeFacility(new Coord(3800, 5100)), new FakeFacility(toCoord), 6.0*3600, null);
@@ -310,7 +310,7 @@ public class SwissRailRaptorTest {
          */
         Fixture f = new Fixture();
         f.init();
-        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
+        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config, null);
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         Coord toCoord = new Coord(28100, 4950);
         List<Leg> legs = router.calcRoute(new FakeFacility( new Coord(3800, 5100)), new FakeFacility(toCoord), 5.0*3600 + 40.0*60, null);
@@ -352,8 +352,8 @@ public class SwissRailRaptorTest {
          */
         Fixture f = new Fixture();
         f.init();
-        f.config.planCalcScore().setUtilityOfLineSwitch(0);
-        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config);
+        f.config.planCalcScore().getScoringParameters(null).setUtilityOfLineSwitch(0);
+        RaptorParameters raptorParams = RaptorUtils.createParameters(f.config, null);
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         List<Leg> legs = router.calcRoute(new FakeFacility(new Coord(11900, 5100)), new FakeFacility(new Coord(24100, 4950)), 6.0*3600 - 5.0*60, null);
         assertEquals("wrong number of legs", 5, legs.size());
@@ -367,8 +367,8 @@ public class SwissRailRaptorTest {
 
         Config config = ConfigUtils.createConfig();
         double transferUtility = 300.0 * raptorParams.getMarginalUtilityOfTravelTime_utl_s(TransportMode.pt); // corresponds to 5 minutes transit travel time
-        config.planCalcScore().setUtilityOfLineSwitch(transferUtility);
-        raptorParams = RaptorUtils.createParameters(config);
+        config.planCalcScore().getScoringParameters(null).setUtilityOfLineSwitch(transferUtility);
+        raptorParams = RaptorUtils.createParameters(config, null);
         Assert.assertEquals(-transferUtility, raptorParams.getTransferPenaltyFixCostPerTransfer(), 0.0);
         router = createTransitRouter(f.schedule, config, f.network);
         legs = router.calcRoute(new FakeFacility(new Coord(11900, 5100)), new FakeFacility(new Coord(24100, 4950)), 6.0*3600 - 5.0*60, null);
@@ -391,7 +391,7 @@ public class SwissRailRaptorTest {
          */
         Fixture f = new Fixture();
         f.init();
-        f.config.planCalcScore().setUtilityOfLineSwitch(0);
+        f.config.planCalcScore().getScoringParameters(null).setUtilityOfLineSwitch(0);
         f.config.transitRouter().setAdditionalTransferTime(0);
         TransitRouter router = createTransitRouter(f.schedule, f.config, f.network);
         List<Leg> legs = router.calcRoute(new FakeFacility(new Coord(11900, 5100)), new FakeFacility(new Coord(24100, 4950)), 6.0*3600 - 5.0*60, null);
@@ -742,7 +742,7 @@ public class SwissRailRaptorTest {
             Assert.assertEquals(1, routes.size());
             RaptorRoute route1 = routes.get(0);
 
-            RaptorParameters params = RaptorUtils.createParameters(config);
+            RaptorParameters params = RaptorUtils.createParameters(config, null);
 
             double expectedTravelTime = 35*60; // 35 minutes: 15 Blue, 5 Transfer, 15 Red
             double expectedAccessEgressTime = 2 * 100; // 2 * 100 meters at 1m/s beeline walk speed (beeline factor included)
@@ -762,7 +762,7 @@ public class SwissRailRaptorTest {
             Assert.assertEquals(1, routes.size());
             RaptorRoute route1 = routes.get(0);
 
-            RaptorParameters params = RaptorUtils.createParameters(config);
+            RaptorParameters params = RaptorUtils.createParameters(config, null);
 
             double expectedTravelTime = 35*60; // 35 minutes: 15 Blue, 5 Transfer, 15 Red
             double expectedAccessEgressTime = 2 * 100;  // 2 * 100 meters at 1m/s
@@ -782,7 +782,7 @@ public class SwissRailRaptorTest {
             Assert.assertEquals(1, routes.size());
             RaptorRoute route1 = routes.get(0);
 
-            RaptorParameters params = RaptorUtils.createParameters(config);
+            RaptorParameters params = RaptorUtils.createParameters(config, null);
 
             double expectedTravelTime = 35*60; // 35 minutes: 15 Blue, 5 Transfer, 15 Red
             double expectedAccessEgressTime = 2 * 100;  // 2 * 100 meters at 1m/s
@@ -802,7 +802,7 @@ public class SwissRailRaptorTest {
             Assert.assertEquals(1, routes.size());
             RaptorRoute route1 = routes.get(0);
 
-            RaptorParameters params = RaptorUtils.createParameters(config);
+            RaptorParameters params = RaptorUtils.createParameters(config, null);
 
             double expectedTravelTime = 65*60; // 65 minutes: 15 Blue, 5 Transfer, 45 Red
             double expectedAccessEgressTime = 2 * 100;  // 2 * 100 meters at 1m/s
@@ -1318,7 +1318,7 @@ public class SwissRailRaptorTest {
         private NightBusFixture() {
             this.config = ConfigUtils.createConfig();
             this.scenario = ScenarioUtils.createScenario(this.config);
-            this.routerConfig = RaptorUtils.createParameters(this.scenario.getConfig());
+            this.routerConfig = RaptorUtils.createParameters(this.scenario.getConfig(), null);
 
             // schedule
             this.schedule = this.scenario.getTransitSchedule();

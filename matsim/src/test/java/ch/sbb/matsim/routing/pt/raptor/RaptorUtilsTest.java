@@ -52,7 +52,7 @@ public class RaptorUtilsTest {
         Assert.assertEquals(ConfigGroup.class, srrConfig2.getClass());
 
         // create RaptorConfig, test if SwissRailRaptorConfigGroup got created
-        RaptorParameters raptorParams = RaptorUtils.createParameters(config2);
+        RaptorParameters raptorParams = RaptorUtils.createParameters(config2, null);
         srrConfig2 = config2.getModules().get(SwissRailRaptorConfigGroup.GROUP);
         Assert.assertNotNull(srrConfig2);
         Assert.assertEquals(SwissRailRaptorConfigGroup.class, srrConfig2.getClass());
@@ -60,7 +60,7 @@ public class RaptorUtilsTest {
         Assert.assertNotNull(raptorParams.getConfig());
         Assert.assertEquals(srrConfig2, raptorParams.getConfig());
 
-        RaptorParameters raptorParams2 = RaptorUtils.createParameters(config2);
+        RaptorParameters raptorParams2 = RaptorUtils.createParameters(config2, null);
         Assert.assertEquals("the same config object should be returned in subsequent calls.", srrConfig2, raptorParams2.getConfig());
 
         // check that the config is actually what we configured

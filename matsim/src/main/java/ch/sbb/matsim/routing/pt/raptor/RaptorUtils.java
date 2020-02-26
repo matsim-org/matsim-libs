@@ -58,7 +58,7 @@ public final class RaptorUtils {
         return staticConfig;
     }
 
-    public static RaptorParameters createParameters(Config config) {
+    public static RaptorParameters createParameters(Config config, String subpopulation) {
         SwissRailRaptorConfigGroup advancedConfig = ConfigUtils.addOrGetModule(config, SwissRailRaptorConfigGroup.class);
 
         TransitRouterConfig trConfig = new TransitRouterConfig(config);
@@ -72,8 +72,8 @@ public final class RaptorUtils {
         raptorParams.setMarginalUtilityOfWaitingPt_utl_s(trConfig.getMarginalUtilityOfWaitingPt_utl_s());
 
         PlanCalcScoreConfigGroup pcsConfig = config.planCalcScore();
-        double marginalUtilityPerforming = pcsConfig.getPerforming_utils_hr() / 3600.0;
-        for (Map.Entry<String, PlanCalcScoreConfigGroup.ModeParams> e : pcsConfig.getModes().entrySet()) {
+        double marginalUtilityPerforming = pcsConfig.getScoringParameters(subpopulation).getPerforming_utils_hr() / 3600.0;
+        for (Map.Entry<String, PlanCalcScoreConfigGroup.ModeParams> e : pcsConfig.getScoringParameters(subpopulation).getModes().entrySet()) {
             String mode = e.getKey();
             PlanCalcScoreConfigGroup.ModeParams modeParams = e.getValue();
             double marginalUtility_utl_s = modeParams.getMarginalUtilityOfTraveling()/3600.0 - marginalUtilityPerforming;
