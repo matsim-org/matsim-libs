@@ -84,8 +84,8 @@ class LCActivity implements Activity, LCPlanElement {
 	}
 
 	@Override
-	public final double getMaximumDuration() {
-		return this.plan.durations[this.arrayIndex];
+	public final OptionalTime getOptionalMaximumDuration() {
+		return OptionalTime.of(this.plan.durations[this.arrayIndex]);
 	}
 
 	@Override

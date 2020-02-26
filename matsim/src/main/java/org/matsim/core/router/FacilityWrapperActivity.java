@@ -73,7 +73,7 @@ public class FacilityWrapperActivity implements Activity {
 	}
 
 	@Override
-	public double getMaximumDuration() {
+	public OptionalTime getOptionalMaximumDuration() {
 		throw new UnsupportedOperationException( "only facility fields access are supported" );
 	}
 

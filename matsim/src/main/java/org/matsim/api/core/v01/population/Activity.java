@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.misc.OptionalTime;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 
 /**
@@ -33,13 +32,7 @@ import org.matsim.facilities.ActivityFacility;
 public interface Activity extends PlanElement {
 
 	default boolean isMaximumDurationUndefined() {
-		try {
-			double maxDuration = getMaximumDuration();
-			//only ActivityImpl has been adapted to Double, so we need to keep this additional check for other Activity classes
-			return Time.isUndefinedTime(maxDuration);
-		} catch (NullPointerException e) {
-			return true;
-		}
+		return getOptionalMaximumDuration().isUndefined();
 	}
 
 
@@ -66,7 +59,11 @@ public interface Activity extends PlanElement {
 	 */
 	public void setStartTime(double seconds);
 	
-	public double getMaximumDuration() ;
+	public default double getMaximumDuration() {
+		return getOptionalMaximumDuration().seconds();
+	}
+
+	public OptionalTime getOptionalMaximumDuration();
 	
 	public void setMaximumDuration(double seconds) ;
 

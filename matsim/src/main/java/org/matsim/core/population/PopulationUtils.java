@@ -266,8 +266,8 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public double getMaximumDuration() {
-			return this.delegate.getMaximumDuration() ;
+		public OptionalTime getOptionalMaximumDuration() {
+			return this.delegate.getOptionalMaximumDuration() ;
 		}
 
 		@Override

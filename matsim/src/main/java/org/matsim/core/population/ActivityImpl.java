@@ -53,7 +53,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	 */
 	private OptionalTime startTime = OptionalTime.undefined();
 
-	private Double dur = null;
+	private OptionalTime dur = OptionalTime.undefined();
 
 	private String type;
 	private Coord coord = null;
@@ -161,13 +161,13 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 	@Override
-	public double getMaximumDuration() {
+	public OptionalTime getOptionalMaximumDuration() {
 		return this.dur;
 	}
 
 	@Override
 	public void setMaximumDuration(final double dur) {
-		this.dur = Time.isUndefinedTime(dur) ? null : dur;
+		this.dur = OptionalTime.of(dur);
 	}
 
 	@Override
