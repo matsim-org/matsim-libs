@@ -25,7 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Queue;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.core.mobsim.qsim.QSim;
@@ -37,7 +36,7 @@ import org.matsim.core.mobsim.qsim.QSim;
  * @author (of this documentation) nagel
  *
  */
-abstract class AbstractQNetsimEngineRunner extends NetElementActivationRegistry implements Callable<Boolean>, Runnable {
+abstract class AbstractQNetsimEngineRunner extends NetElementActivationRegistry {
 
 	private double time = 0.0;
 

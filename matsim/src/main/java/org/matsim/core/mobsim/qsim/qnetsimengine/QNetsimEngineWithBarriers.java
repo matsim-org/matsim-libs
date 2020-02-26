@@ -39,7 +39,7 @@ import org.matsim.core.mobsim.qsim.QSim;
  * @author dgrether
  * @author dstrippgen
  */
-final class QNetsimEngineWithBarriers extends AbstractQNetsimEngine {
+final class QNetsimEngineWithBarriers extends AbstractQNetsimEngine<QNetsimEngineRunnerWithBarriers> {
 	
 	private Phaser startBarrier;
 	private Phaser endBarrier;
@@ -102,13 +102,13 @@ final class QNetsimEngineWithBarriers extends AbstractQNetsimEngine {
 	}
 
 	@Override
-	protected List<AbstractQNetsimEngineRunner> initQSimEngineRunners() {
+	protected List<QNetsimEngineRunnerWithBarriers> initQSimEngineRunners() {
 		this.startBarrier = new Phaser(this.numOfThreads + 1);
 		Phaser separationBarrier = new Phaser(this.numOfThreads);
 		this.endBarrier = new Phaser(this.numOfThreads + 1);
-		List<AbstractQNetsimEngineRunner> engines = new ArrayList<>();
+		List<QNetsimEngineRunnerWithBarriers> engines = new ArrayList<>();
 		for(int i = 0; i < this.numOfThreads; i++) {
-			AbstractQNetsimEngineRunner engine = new QNetsimEngineRunnerWithBarriers(this.startBarrier, separationBarrier, endBarrier);
+			QNetsimEngineRunnerWithBarriers engine = new QNetsimEngineRunnerWithBarriers(this.startBarrier, separationBarrier, endBarrier);
 			engines.add(engine);
 		}
 		return engines;

@@ -59,7 +59,7 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
  * @author dgrether
  * @author dstrippgen
  */
-abstract class AbstractQNetsimEngine implements QNetsimEngineI {
+abstract class AbstractQNetsimEngine<A extends AbstractQNetsimEngineRunner> implements QNetsimEngineI {
 
 	private NetsimInternalInterface ii = new NetsimInternalInterface(){
 		@Override public QNetwork getNetsimNetwork() {
@@ -88,7 +88,7 @@ abstract class AbstractQNetsimEngine implements QNetsimEngineI {
 	protected final QNetwork network;
 
 	private double infoTime = 0;
-	private List<AbstractQNetsimEngineRunner> engines;
+	private List<A> engines;
 	private InternalInterface internalInterface = null;
 	
 	AbstractQNetsimEngine(final QSim sim, QNetworkFactory netsimNetworkFactory) {
@@ -214,7 +214,7 @@ abstract class AbstractQNetsimEngine implements QNetsimEngineI {
 	 * 
 	 * @return the list of {@link AbstractQNetsimEngineRunner}
 	 */
-	protected abstract List<AbstractQNetsimEngineRunner> initQSimEngineRunners() ;
+	protected abstract List<A> initQSimEngineRunners() ;
 	
 	/**
 	 * Implements one simulation step, called from simulation framework
@@ -437,7 +437,7 @@ abstract class AbstractQNetsimEngine implements QNetsimEngineI {
 	/**
 	 * @return the {@link AbstractQNetsimEngineRunner} created by {@link #initQSimEngineRunners()}
 	 */
-	protected List<AbstractQNetsimEngineRunner> getQnetsimEngineRunner(){
+	protected List<A> getQnetsimEngineRunner(){
 		return this.engines;
 	}
 }

@@ -43,7 +43,7 @@ import org.matsim.core.mobsim.qsim.QSim;
  * @author dgrether
  * @author dstrippgen
  */
-final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine {
+final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine<QNetsimEngineRunnerForThreadpool> {
 
 	private final int numOfRunners;
 	private ExecutorService pool;
@@ -95,13 +95,13 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine {
 
 		try {
 			for (AbstractQNetsimEngineRunner engine : this.getQnetsimEngineRunner()) {
-				((QNetsimEngineRunnerWithThreadpool) engine).setMovingNodes(true);
+				((QNetsimEngineRunnerForThreadpool) engine).setMovingNodes(true);
 			}
 			for (Future<Boolean> future : pool.invokeAll(this.getQnetsimEngineRunner())) {
 				future.get();
 			}
 			for (AbstractQNetsimEngineRunner engine : this.getQnetsimEngineRunner()) {
-				((QNetsimEngineRunnerWithThreadpool) engine).setMovingNodes(false);
+				((QNetsimEngineRunnerForThreadpool) engine).setMovingNodes(false);
 			}
 			for (Future<Boolean> future : pool.invokeAll(this.getQnetsimEngineRunner())) {
 				future.get();
@@ -123,10 +123,10 @@ final class QNetsimEngineWithThreadpool extends AbstractQNetsimEngine {
 	}
 
 	@Override
-	protected List<AbstractQNetsimEngineRunner> initQSimEngineRunners() {
-		List<AbstractQNetsimEngineRunner> engines = new ArrayList<>();
+	protected List<QNetsimEngineRunnerForThreadpool> initQSimEngineRunners() {
+		List<QNetsimEngineRunnerForThreadpool> engines = new ArrayList<>();
 		for (int i = 0; i < numOfRunners; i++) {
-			AbstractQNetsimEngineRunner engine = new QNetsimEngineRunnerWithThreadpool();
+			QNetsimEngineRunnerForThreadpool engine = new QNetsimEngineRunnerForThreadpool();
 			engines.add(engine);
 		}
 		return engines;

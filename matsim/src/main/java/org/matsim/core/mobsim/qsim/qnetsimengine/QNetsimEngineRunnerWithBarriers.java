@@ -30,7 +30,7 @@ import org.matsim.core.gbl.Gbl;
  * 
  * @author droeder @ Senozon Deutschland GmbH
  */
-class QNetsimEngineRunnerWithBarriers extends AbstractQNetsimEngineRunner {
+class QNetsimEngineRunnerWithBarriers extends AbstractQNetsimEngineRunner implements Runnable {
 
 	private volatile boolean simulationRunning = true;
 
@@ -42,13 +42,6 @@ class QNetsimEngineRunnerWithBarriers extends AbstractQNetsimEngineRunner {
 		this.startBarrier = startBarrier;
 		this.separationBarrier = separationBarrier;
 		this.endBarrier = endBarrier;
-	}
-
-
-	@Override
-	public Boolean call() {
-		run();
-		return true ;
 	}
 
 	@Override

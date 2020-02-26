@@ -20,6 +20,8 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.concurrent.Callable;
+
 import org.matsim.core.gbl.Gbl;
 
 /**
@@ -28,12 +30,12 @@ import org.matsim.core.gbl.Gbl;
  * 
  * @author droeder @ Senozon Deutschland GmbH
  */
-final class QNetsimEngineRunnerWithThreadpool extends AbstractQNetsimEngineRunner{
+final class QNetsimEngineRunnerForThreadpool extends AbstractQNetsimEngineRunner implements Callable<Boolean>{
 	
 	private volatile boolean simulationRunning = true;
 	private boolean movingNodes;
 
-	QNetsimEngineRunnerWithThreadpool() {
+	QNetsimEngineRunnerForThreadpool() {
 	}
 
 	@Override
@@ -49,11 +51,6 @@ final class QNetsimEngineRunnerWithThreadpool extends AbstractQNetsimEngineRunne
 			moveLinks();
 		}
 		return true ;
-	}
-
-	@Override
-	public void run() {
-		throw new RuntimeException("This method is only here for backwar-compatibility and should be used only by " + QNetsimEngineRunnerWithBarriers.class.getCanonicalName());
 	}
 
 	public final void afterSim() {
