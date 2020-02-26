@@ -67,10 +67,6 @@ public final class OptionalTime {
 		this.seconds = seconds;
 	}
 
-	public double getAsDouble() {///FIXME remove
-		return seconds();
-	}
-
 	public double seconds() {
 		if (seconds == Time.UNDEFINED_TIME) {
 			throw new NoSuchElementException("Undefined time");
