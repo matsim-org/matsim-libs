@@ -59,7 +59,7 @@ public final class HybridNetworkFactory implements QNetworkFactory {
 		if (! Double.isNaN(network.getEffectiveLaneWidth())){
 			linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
 		}
-		AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
+		AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = AbstractQNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 
 		this.context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, snapshotInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator ) ;
 		
