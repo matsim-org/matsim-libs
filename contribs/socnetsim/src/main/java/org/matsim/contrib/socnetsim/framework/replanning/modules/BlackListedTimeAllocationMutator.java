@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.StageActivityHandling;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.misc.OptionalTime;
 
 /**
  * A time allocation mutator to use with multi-leg routing.
@@ -67,10 +67,10 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 		for ( Activity a : activities ) {
 			switch ( setting ) {
 				case MUTATE_DUR:
-					((Activity) a).setMaximumDuration( mutateTime(a.getMaximumDuration().seconds()) );
+					a.setMaximumDuration( mutateTime(a.getMaximumDuration()) );
 					break;
 				case MUTATE_END:
-					a.setEndTime( mutateTime(a.getEndTime().seconds()) );
+					a.setEndTime( mutateTime(a.getEndTime()) );
 					if ( a.getEndTime().isUndefined() &&
 							a.getEndTime().seconds() < lastEndTime ) {
 						a.setEndTime( lastEndTime );
@@ -78,12 +78,12 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 					lastEndTime = a.getEndTime().seconds();
 					break;
 				case MUTATE_END_AS_DUR:
-					final double oldTime = a.getEndTime().seconds();
-					if ( Time.isUndefinedTime(oldTime) ) break;
+					final OptionalTime oldTime = a.getEndTime();
+					if ( oldTime.isUndefined() ) break;
 					final double newTime = mutateTime( oldTime );
 					// doing this so rather than sampling mut directly allows
 					// to avoid negative times
-					final double mut = newTime - oldTime;
+					final double mut = newTime - oldTime.seconds();
 					// shift all times after the mutated time (as if we were working on durations)
 					for ( Activity currAct : activities.subList( activities.indexOf( a ) , nActs ) ) {
 						currAct.setEndTime( currAct.getEndTime().seconds() + mut );
@@ -95,12 +95,11 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 		}
 	}
 
-	private double mutateTime(final double time) {
+	private double mutateTime(final OptionalTime time) {
 		// do not do anything if time is undefined
-		if ( Time.isUndefinedTime(time) ) return time;
-		if ( Double.isNaN( time ) ) throw new IllegalArgumentException( ""+time );
+		if ( time.isUndefined() ) return time.seconds();
 
-		final double t = time + (int)((this.random.nextDouble() * 2.0 - 1.0) * mutationRange);
+		final double t = time.seconds() + (int)((this.random.nextDouble() * 2.0 - 1.0) * mutationRange);
 		assert !Double.isNaN( t ) : t;
 		assert !Double.isInfinite( t ) : t;
 		return t < 0 ? 0 : t;

@@ -175,17 +175,13 @@ public class TimeAllocationMutatorModuleTest extends MatsimTestCase {
 			if (diff > maxDiff1) maxDiff1 = diff;
 			if (diff < minDiff1) minDiff1 = diff;
 			act1Dur = act1.getMaximumDuration().seconds();
-			if (!Time.isUndefinedTime(act1Dur)) {
-				assertTrue("activity duration cannot be smaller than 0, is " + act1Dur, act1Dur >= 0.0);
-			}
+			assertTrue("activity duration cannot be smaller than 0, is " + act1Dur, act1Dur >= 0.0);
 			// test duration of act2
 			diff = act2Dur - act2.getMaximumDuration().seconds();
 			if (diff > maxDiff2) maxDiff2 = diff;
 			if (diff < minDiff2) minDiff2 = diff;
 			act2Dur = act2.getMaximumDuration().seconds();
-			if (!Time.isUndefinedTime(act2Dur)) {
-				assertTrue("activity duration cannot be smaller than 0, is " + act2Dur, act2Dur >= 0.0);
-			}
+			assertTrue("activity duration cannot be smaller than 0, is " + act2Dur, act2Dur >= 0.0);
 		}
 		assertTrue("mutation range differences wrong (act1).", minDiff1 <= maxDiff1);
 		assertTrue("mutation range differences wrong (act2).", minDiff2 <= maxDiff2);
@@ -260,17 +256,13 @@ public class TimeAllocationMutatorModuleTest extends MatsimTestCase {
 			if (diff > maxDiff1) maxDiff1 = diff;
 			if (diff < minDiff1) minDiff1 = diff;
 			act1End = act1.getEndTime().seconds();
-			if (!Time.isUndefinedTime(act1End)) {
-				assertTrue("activity end time cannot be smaller than 0, is " + act1End, act1End >= 0.0);
-			}
+			assertTrue("activity end time cannot be smaller than 0, is " + act1End, act1End >= 0.0);
 			// test end time of act2
 			diff = act2Dur - act2.getMaximumDuration().seconds();
 			if (diff > maxDiff2) maxDiff2 = diff;
 			if (diff < minDiff2) minDiff2 = diff;
 			act2Dur = act2.getMaximumDuration().seconds();
-			if (!Time.isUndefinedTime(act2Dur)) {
-				assertTrue("activity duration cannot be smaller than 0, is " + act2Dur, act2Dur >= 0.0);
-			}
+			assertTrue("activity duration cannot be smaller than 0, is " + act2Dur, act2Dur >= 0.0);
 		}
 		assertTrue("mutation range differences wrong (act1).", minDiff1 <= maxDiff1);
 		assertTrue("mutation range differences wrong (act2).", minDiff2 <= maxDiff2);

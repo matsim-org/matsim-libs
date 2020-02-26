@@ -52,6 +52,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -352,20 +353,19 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 			final PlanElement pe) {
 		if (pe instanceof Activity) {
 			Activity act = (Activity) pe;
-			double startTime = act.getStartTime().isUndefined() ? Time.getUndefinedTime() :
-					act.getStartTime().seconds();
-			double dur = act.getMaximumDuration().seconds();
+			OptionalTime startTime = act.getStartTime();
+			OptionalTime dur = act.getMaximumDuration();
 			if (act.getEndTime().isDefined()) {
 				// use fromAct.endTime as time for routing
 				return act.getEndTime().seconds();
 			}
-			else if (!Time.isUndefinedTime(startTime) && !Time.isUndefinedTime(dur)) {
+			else if (startTime.isDefined() && dur.isDefined()) {
 				// use fromAct.startTime + fromAct.duration as time for routing
-				return startTime + dur;
+				return startTime.seconds() + dur.seconds();
 			}
-			else if (!Time.isUndefinedTime(dur)) {
+			else if (dur.isDefined()) {
 				// use last used time + fromAct.duration as time for routing
-				return now + dur;
+				return now + dur.seconds();
 			}
 			else {
 				throw new RuntimeException("activity has neither end-time nor duration." + act);

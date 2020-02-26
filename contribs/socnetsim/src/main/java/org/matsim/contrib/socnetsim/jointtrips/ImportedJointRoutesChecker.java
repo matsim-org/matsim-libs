@@ -31,6 +31,7 @@ import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.FacilitiesUtils;
 
@@ -90,10 +91,9 @@ public class ImportedJointRoutesChecker implements PlanAlgorithm, PersonAlgorith
 	private static double updateTime(
 			final double currTime,
 			final Activity act) {
-		double e = act.getEndTime().seconds();
-		double d = act.getMaximumDuration().seconds();
-		return !Time.isUndefinedTime(e) ? e :
-			currTime + ( !Time.isUndefinedTime(d) ? d : 0 );
+		OptionalTime e = act.getEndTime();
+		OptionalTime d = act.getMaximumDuration();
+		return e.orElseGet(() -> currTime + d.orElse(0));
 	}
 
 	private static double updateTime(

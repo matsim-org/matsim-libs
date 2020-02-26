@@ -34,6 +34,7 @@ import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils.JointTravelStruc
 import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils.JointTrip;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.core.router.StageActivityTypeIdentifier;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -128,9 +129,8 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 			if ( pe instanceof Activity &&
 					!(StageActivityTypeIdentifier.isStageActivity( ((Activity) pe).getType() )  ||
 					stageTypes.contains(((Activity) pe).getType())) ){
-				final double endTime = ((Activity)pe).getEndTime().seconds();
-				if ( Time.isUndefinedTime(endTime) ) throw new RuntimeException( "undefined end time" );
-				return endTime + tt;
+				final OptionalTime endTime = ((Activity)pe).getEndTime();
+				return endTime.seconds() + tt;
 			}
 
 			if ( pe instanceof Leg ) {

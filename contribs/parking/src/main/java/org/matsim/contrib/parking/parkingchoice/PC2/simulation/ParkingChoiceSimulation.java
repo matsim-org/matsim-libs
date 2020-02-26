@@ -42,7 +42,7 @@ import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
 import org.matsim.contrib.parking.parkingchoice.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.parkingchoice.lib.obj.IntegerValueHashMap;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.utils.misc.OptionalTime;
 
 public final class ParkingChoiceSimulation
 		implements PersonDepartureEventHandler, PersonArrivalEventHandler, ActivityEndEventHandler {
@@ -201,13 +201,12 @@ public final class ParkingChoiceSimulation
 				parkingAttributes.facilityId = firstActivityAfterLastCarLegOfDay.getFacilityId();
 				parkingAttributes.actType = firstActivityAfterLastCarLegOfDay.getType();
 
-				double startTime = firstActivityAfterLastCarLegOfDay.getStartTime().isUndefined() ?
-						Time.getUndefinedTime() : firstActivityAfterLastCarLegOfDay.getStartTime().seconds();
-				if (Time.isUndefinedTime(startTime) || startTime == Double.POSITIVE_INFINITY) {
+				OptionalTime startTime = firstActivityAfterLastCarLegOfDay.getStartTime();
+				if (startTime.isUndefined() || startTime.seconds() == Double.POSITIVE_INFINITY) {
 					parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(0,
 							firstActivityOfDayBeforeDepartingWithCar.getEndTime().seconds());
 				} else {
-					parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(startTime,
+					parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(startTime.seconds(),
 							firstActivityOfDayBeforeDepartingWithCar.getEndTime().seconds());
 				}
 				parkingAttributes.legIndex = 0;

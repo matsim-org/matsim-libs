@@ -42,6 +42,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
+import org.matsim.core.utils.misc.OptionalTime;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
@@ -286,7 +287,6 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 			
 			final Trip firstTrip = subtour.getTrips().get( 0 );
 			this.startTime = firstTrip.getOriginActivity().getEndTime().seconds();
-			if ( Time.isUndefinedTime(startTime) ) throw new RuntimeException( "no end time in "+firstTrip.getOriginActivity() );
 
 			final Trip lastTrip = subtour.getTrips().get( subtour.getTrips().size() - 1 );
 			this.endTime = calcArrivalTime( lastTrip );
@@ -328,10 +328,8 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 		double now = trip.getOriginActivity().getEndTime().seconds();
 		for ( final PlanElement pe : trip.getTripElements() ) {
 			if ( pe instanceof Activity ) {
-				final double end = ((Activity)pe).getEndTime().seconds();
-				now = !Time.isUndefinedTime(end) ? end : now + ((Activity)pe).getMaximumDuration().seconds();
-				// TODO: do not fail *that* badly, but just revert to random alloc
-				if ( Time.isUndefinedTime(now) ) throw new RuntimeException( "could not get time from "+pe );
+				final OptionalTime end = ((Activity)pe).getEndTime();
+				now = end.isDefined() ? end.seconds() : now + ((Activity)pe).getMaximumDuration().seconds();
 			}
 			else if ( pe instanceof Leg ) {
 				final Route r = ((Leg) pe).getRoute();
