@@ -82,7 +82,7 @@ public class TimeAllocationMutatorModuleTest extends MatsimTestCase {
 		String freightSubpopulation = "freight";
 		
 		Config config  = ConfigUtils.createConfig();
-		config.plans().setSubpopulationAttributeName("subpopulation");
+//		config.plans().setSubpopulationAttributeName("subpopulation");
 		config.timeAllocationMutator().setUseIndividualSettingsForSubpopulations(true);
 		config.timeAllocationMutator().setMutationRange(1800.0);
 		
@@ -123,7 +123,7 @@ public class TimeAllocationMutatorModuleTest extends MatsimTestCase {
 	 * @param tripPlanMutateTimeAllocation A preset TimeAllocationMutator to be used for the tests.
 	 * @param expectedMutationRange The expected range for mutation.
 	 */
-	private void runMutationRangeTest(final PlanAlgorithm tripPlanMutateTimeAllocation, final int expectedMutationRange) {
+	private static void runMutationRangeTest( final PlanAlgorithm tripPlanMutateTimeAllocation, final int expectedMutationRange ) {
 		// setup network
 		Network network = NetworkUtils.createNetwork();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
