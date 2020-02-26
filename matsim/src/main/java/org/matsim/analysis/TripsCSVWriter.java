@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
  * @author jbischoff / SBB
  */
 public class TripsCSVWriter {
-    public static String[] HEADER = {"PersonId",
+    public static String[] HEADER = {"PersonId", "TripNumber",
             "DepartureTime", "TravelTime", "TotalWaitingTime", "TotalDistance",
             "ModeWithLongestShare", "Modes", "originActivityType",
             "destinationActivityType", "originFacilityId", "originLinkId",
@@ -94,10 +94,12 @@ public class TripsCSVWriter {
         List<List<String>> records = new ArrayList<>();
         List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(experiencedPlan);
 
-        for (TripStructureUtils.Trip trip : trips) {
+        for (int i = 0; i < trips.size(); i++) {
+            TripStructureUtils.Trip trip = trips.get(i);
             List<String> record = new ArrayList<>();
             records.add(record);
             record.add(personId.toString());
+            record.add(Integer.toString(i + 1)); // trip number, numbered starting with 1
             double distance = 0.0;
             double departureTime = trip.getOriginActivity().getEndTime();
             double travelTime = trip.getDestinationActivity().getStartTime() - departureTime;

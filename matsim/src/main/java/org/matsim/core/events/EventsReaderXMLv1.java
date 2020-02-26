@@ -20,21 +20,12 @@
 
 package org.matsim.core.events;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
-import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
-import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
+import org.matsim.core.api.experimental.events.*;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -44,6 +35,10 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
 
 public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 
@@ -201,9 +196,9 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 			this.events.processEvent(new PersonLeavesVehicleEvent(time, pId, vId));
 		} else if (TeleportationArrivalEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new TeleportationArrivalEvent(
-					time, 
-					Id.create(atts.getValue(TeleportationArrivalEvent.ATTRIBUTE_PERSON), Person.class), 
-					Double.parseDouble(atts.getValue(TeleportationArrivalEvent.ATTRIBUTE_DISTANCE))));
+					time,
+					Id.create(atts.getValue(TeleportationArrivalEvent.ATTRIBUTE_PERSON), Person.class),
+					Double.parseDouble(atts.getValue(TeleportationArrivalEvent.ATTRIBUTE_DISTANCE)), atts.getValue(TeleportationArrivalEvent.ATTRIBUTE_MODE)));
 		} else if (VehicleArrivesAtFacilityEvent.EVENT_TYPE.equals(eventType)) {
 			String delay = atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_DELAY);
 			this.events.processEvent(new VehicleArrivesAtFacilityEvent(time, Id.create(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_VEHICLE), Vehicle.class), Id.create(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_FACILITY), TransitStopFacility.class), delay == null ? 0.0 : Double.parseDouble(delay)));

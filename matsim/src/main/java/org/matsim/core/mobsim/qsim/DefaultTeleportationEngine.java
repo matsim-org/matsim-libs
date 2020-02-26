@@ -31,15 +31,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.TeleportationVisData;
-import org.matsim.vis.snapshotwriters.VisData;
 
 import javax.inject.Inject;
 import java.util.*;
@@ -134,7 +131,7 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 				personAgent.notifyArrivalOnLinkByNonNetworkMode(personAgent
 						.getDestinationLinkId());
 				double distance = personAgent.getExpectedTravelDistance();
-				this.eventsManager.processEvent(new TeleportationArrivalEvent(this.internalInterface.getMobsim().getSimTimer().getTimeOfDay(), personAgent.getId(), distance));
+				this.eventsManager.processEvent(new TeleportationArrivalEvent(this.internalInterface.getMobsim().getSimTimer().getTimeOfDay(), personAgent.getId(), distance, personAgent.getMode()));
 				personAgent.endLegAndComputeNextState(now);
 				this.teleportationData.remove(personAgent.getId());
 				internalInterface.arrangeNextAgentState(personAgent);

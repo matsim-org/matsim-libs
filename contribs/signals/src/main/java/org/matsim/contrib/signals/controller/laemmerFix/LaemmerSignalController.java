@@ -19,13 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.controller.laemmerFix;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -44,7 +38,7 @@ import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.lanes.Lane;
 import org.matsim.lanes.Lanes;
 
-import com.google.inject.Inject;
+import java.util.*;
 
 
 /**
@@ -98,6 +92,7 @@ public final class LaemmerSignalController extends AbstractSignalController impl
 		laemmerSignals.clear();
 		activeRequest = null;
 		regulationQueue.clear();
+        systemOutflowCapacity = 0;
 
 		this.initializeSensoring();
 		for (SignalGroup group : this.system.getSignalGroups().values()) {

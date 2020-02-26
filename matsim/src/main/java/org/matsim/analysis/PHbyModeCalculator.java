@@ -38,7 +38,6 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.DecimalFormat;
 import java.util.AbstractMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -56,7 +55,6 @@ public class PHbyModeCalculator {
     private final OutputDirectoryHierarchy controlerIO;
     private final static char DEL = '\t';
     private final static String FILENAME = "ph_modestats";
-    private final DecimalFormat df = new DecimalFormat();
 
     private static final String TRAVEL_TIME_SUFFIX = "_travel";
     private static final String WAIT_TIME_SUFFIX = "_wait";
@@ -130,15 +128,14 @@ public class PHbyModeCalculator {
                 csvPrinter.print(mode + TRAVEL_TIME_SUFFIX);
                 csvPrinter.print(mode + WAIT_TIME_SUFFIX);
             }
+            csvPrinter.println();
             
-            csvPrinter.printRecord(allModes);
-
             for (Map.Entry<Integer,Map<String,TravelTimeAndWaitTime>> e : phtPerIteration.entrySet()){
                 csvPrinter.print(e.getKey());
                 for (String mode : allModes){
                 	TravelTimeAndWaitTime travelTimeAndWaitTime = e.getValue().getOrDefault(mode,new TravelTimeAndWaitTime(0.0, 0.0));
-                    csvPrinter.print(df.format(travelTimeAndWaitTime.travelTime/3600.0));
-                    csvPrinter.print(df.format(travelTimeAndWaitTime.waitTime/3600.0));
+                    csvPrinter.print(travelTimeAndWaitTime.travelTime / 3600.0);
+                    csvPrinter.print(travelTimeAndWaitTime.waitTime / 3600.0);
                 }
                 csvPrinter.println();
             }
