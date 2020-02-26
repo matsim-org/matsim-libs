@@ -35,12 +35,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.EventsToLegs;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -72,7 +71,7 @@ public class TripsCSVWriter {
     }
 
     public void write(IdMap<Person, Plan> experiencedPlans, String filename) {
-        try (CSVPrinter csvPrinter = new CSVPrinter(Files.newBufferedWriter(Paths.get(filename)),
+        try (CSVPrinter csvPrinter = new CSVPrinter(IOUtils.getBufferedWriter(filename),
                 CSVFormat.DEFAULT.withDelimiter(separator.charAt(0)).withHeader(HEADER))) {
             for (Map.Entry<Id<Person>, Plan> entry : experiencedPlans.entrySet()) {
                 csvPrinter.printRecords(getCSVRecord(entry.getValue(), entry.getKey()));
@@ -172,7 +171,6 @@ public class TripsCSVWriter {
 
     interface CustomTripsWriterExtension {
         String[] getAdditionalHeader();
-
         List<String> getAdditionalColumns(TripStructureUtils.Trip trip);
     }
 
