@@ -46,7 +46,7 @@ public class TestScenarioGeneration {
 
     public static Scenario generateScenario(){
 
-        Config config = loadConfig("scenarios/grid/jointDemand_config.xml",new JointDemandConfigGroup());
+        Config config = loadConfig("./scenarios/grid/jointDemand_config.xml",new JointDemandConfigGroup());
         Scenario scenario = createScenario(config);
         addPopulation(scenario);
         return scenario;

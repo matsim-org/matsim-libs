@@ -42,7 +42,7 @@ import static org.matsim.core.scenario.ScenarioUtils.loadScenario;
 class RunJointDemandCarExample {
     public static void main(String[] args) {
 
-        Config config = loadConfig("scenarios/grid/jointDemand_config.xml");
+        Config config = loadConfig("./scenarios/grid/jointDemand_config.xml");
         JointDemandConfigGroup jointDemandConfigGroup = ConfigUtils.addOrGetModule(config, JointDemandConfigGroup.class);
         jointDemandConfigGroup.setFirstLegTraveltimeBufferFactor(1.5);
 

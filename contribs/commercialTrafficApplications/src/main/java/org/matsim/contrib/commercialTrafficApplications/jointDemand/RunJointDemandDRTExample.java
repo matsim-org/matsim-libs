@@ -48,7 +48,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 class RunJointDemandDRTExample {
     public static void main(String[] args) {
 
-        Config config = loadConfig("scenarios/grid/jointDemand_config.xml");
+        Config config = loadConfig("./scenarios/grid/jointDemand_config.xml");
         prepareConfig(config);
 		DrtConfigs.adjustMultiModeDrtConfig(MultiModeDrtConfigGroup.get(config), config.planCalcScore(),
 				config.plansCalcRoute());

@@ -48,7 +48,7 @@ public class IsTheRightCustomerScoredTest {
     @Before
     public void setUp() {
 
-        Config config = ConfigUtils.loadConfig("scenarios/grid/jointDemand_config.xml");
+        Config config = ConfigUtils.loadConfig("./scenarios/grid/jointDemand_config.xml");
         config.controler().setLastIteration(0);
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
         JointDemandConfigGroup jointDemandConfigGroup = ConfigUtils.addOrGetModule(config, JointDemandConfigGroup.class);
