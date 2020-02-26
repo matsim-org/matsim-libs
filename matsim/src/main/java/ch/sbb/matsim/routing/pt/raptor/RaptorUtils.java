@@ -69,7 +69,7 @@ public final class RaptorUtils {
         raptorParams.setExtensionRadius(config.transitRouter().getExtensionRadius());
         raptorParams.setDirectWalkFactor(config.transitRouter().getDirectWalkFactor());
 
-        raptorParams.setMarginalUtilityOfWaitingPt_utl_s(trConfig.getMarginalUtilityOfWaitingPt_utl_s());
+        raptorParams.setMarginalUtilityOfWaitingPt_utl_s(trConfig.getUtilityParameters(subpopulation).getMarginalUtilityOfWaitingPt_utl_s());
 
         PlanCalcScoreConfigGroup pcsConfig = config.planCalcScore();
         double marginalUtilityPerforming = pcsConfig.getScoringParameters(subpopulation).getPerforming_utils_hr() / 3600.0;
@@ -83,7 +83,7 @@ public final class RaptorUtils {
         double costPerHour = advancedConfig.getTransferPenaltyCostPerTravelTimeHour();
         if (costPerHour == 0.0) {
             // for backwards compatibility, use the default utility of line switch.
-            raptorParams.setTransferPenaltyFixCostPerTransfer(-trConfig.getUtilityOfLineSwitch_utl());
+            raptorParams.setTransferPenaltyFixCostPerTransfer(-trConfig.getUtilityParameters(subpopulation).getUtilityOfLineSwitch_utl());
         } else {
             raptorParams.setTransferPenaltyFixCostPerTransfer(advancedConfig.getTransferPenaltyBaseCost());
         }

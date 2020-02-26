@@ -35,23 +35,24 @@ public class TransitRouterConfigTest {
 	
 	@Test
 	public void testConstructor() {
+		final String subpopulation = null;
 		PlanCalcScoreConfigGroup planScoring = new PlanCalcScoreConfigGroup();
 		PlansCalcRouteConfigGroup planRouting = new PlansCalcRouteConfigGroup();
 		TransitRouterConfigGroup transitRouting = new TransitRouterConfigGroup();
 		VspExperimentalConfigGroup vspConfig = new VspExperimentalConfigGroup() ;
 
 		final double travelingPt = -9.0;
-		planScoring.getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(travelingPt);
+		planScoring.getScoringParameters(subpopulation).getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(travelingPt);
 		final double travelingWalk = -11.0;
-		planScoring.getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(travelingWalk);
+		planScoring.getScoringParameters(subpopulation).getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(travelingWalk);
 
 //		planScoring.setMarginalUtlOfWaiting_utils_hr(-13.0);
-		planScoring.setMarginalUtlOfWaitingPt_utils_hr(-13.0);
+		planScoring.getScoringParameters(subpopulation).setMarginalUtlOfWaitingPt_utils_hr(-13.0);
 		// naturally, this failed after the functionality was moved to a separate planCalcScore parameter.  kai, oct'12
 
-		planScoring.setPerforming_utils_hr(+6.0);
+		planScoring.getScoringParameters(subpopulation).setPerforming_utils_hr(+6.0);
 		
-		planScoring.setUtilityOfLineSwitch(-2.34);
+		planScoring.getScoringParameters(subpopulation).setUtilityOfLineSwitch(-2.34);
 		
 		planRouting.setTeleportedModeSpeed(TransportMode.walk, 1.37 );
 		// (this will clear all defaults!)
@@ -72,11 +73,11 @@ public class TransitRouterConfigTest {
 		// a number of changes related to the fact that the opportunity cost of time is now 
 		// included in the pt routing.  Either the test here or some scoring
 		// test needs to be adapted; this seems the better place. kai/benjamin, oct'12
-		Assert.assertEquals(-15.0/3600, config.getMarginalUtilityOfTravelTimePt_utl_s(), 1e-8);
-		Assert.assertEquals(-17.0/3600, config.getMarginalUtilityOfTravelTimeWalk_utl_s(), 1e-8);
-		Assert.assertEquals(-19.0/3600, config.getMarginalUtilityOfWaitingPt_utl_s(), 1e-8);
+		Assert.assertEquals(-15.0/3600, config.getUtilityParameters(subpopulation).getMarginalUtilityOfTravelTimePt_utl_s(), 1e-8);
+		Assert.assertEquals(-17.0/3600, config.getUtilityParameters(subpopulation).getMarginalUtilityOfTravelTimeWalk_utl_s(), 1e-8);
+		Assert.assertEquals(-19.0/3600, config.getUtilityParameters(subpopulation).getMarginalUtilityOfWaitingPt_utl_s(), 1e-8);
 
-		Assert.assertEquals(-2.34, config.getUtilityOfLineSwitch_utl(), 1e-8);
+		Assert.assertEquals(-2.34, config.getUtilityParameters(subpopulation).getUtilityOfLineSwitch_utl(), 1e-8);
 		Assert.assertEquals(1.37 / 1.2, config.getBeelineWalkSpeed(), 1e-8);
 		
 		Assert.assertEquals(128.0, config.getAdditionalTransferTime(), 1e-8);
@@ -89,10 +90,10 @@ public class TransitRouterConfigTest {
 		{
 		TransitRouterConfig config = new TransitRouterConfig(planScoring, planRouting, transitRouting, vspConfig );
 		
-		Assert.assertEquals(-15.0/3600, config.getMarginalUtilityOfTravelTimePt_utl_s(), 1e-8);
-		Assert.assertEquals(-17.0/3600, config.getMarginalUtilityOfTravelTimeWalk_utl_s(), 1e-8);
-		Assert.assertEquals(-19.0/3600, config.getMarginalUtilityOfWaitingPt_utl_s(), 1e-8);
-		Assert.assertEquals(-2.34, config.getUtilityOfLineSwitch_utl(), 1e-8);
+		Assert.assertEquals(-15.0/3600, config.getUtilityParameters(subpopulation).getMarginalUtilityOfTravelTimePt_utl_s(), 1e-8);
+		Assert.assertEquals(-17.0/3600, config.getUtilityParameters(subpopulation).getMarginalUtilityOfTravelTimeWalk_utl_s(), 1e-8);
+		Assert.assertEquals(-19.0/3600, config.getUtilityParameters(subpopulation).getMarginalUtilityOfWaitingPt_utl_s(), 1e-8);
+		Assert.assertEquals(-2.34, config.getUtilityParameters(subpopulation).getUtilityOfLineSwitch_utl(), 1e-8);
 		Assert.assertEquals(1.37 / 1.2, config.getBeelineWalkSpeed(), 1e-8);
 		
 		Assert.assertEquals(128.0, config.getAdditionalTransferTime(), 1e-8);

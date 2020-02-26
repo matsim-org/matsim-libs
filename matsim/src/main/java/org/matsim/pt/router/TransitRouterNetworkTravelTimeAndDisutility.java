@@ -24,6 +24,7 @@ package org.matsim.pt.router;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
@@ -74,11 +75,12 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 			cost = defaultTransferCost(link, time, person, vehicle);
 			
 		} else {
+			final String subpopulation = PopulationUtils.getSubpopulation(person);
 			double offVehWaitTime = offVehicleWaitTime(link, time);		
 			double inVehTime = getLinkTravelTime(link,time, person, vehicle) - offVehWaitTime;		
-			cost = - inVehTime       * this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
-			       -offVehWaitTime   * this.config.getMarginalUtilityOfWaitingPt_utl_s()
-			       -link.getLength() * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
+			cost = - inVehTime       * this.config.getUtilityParameters(subpopulation).getMarginalUtilityOfTravelTimePt_utl_s() 
+			       -offVehWaitTime   * this.config.getUtilityParameters(subpopulation).getMarginalUtilityOfWaitingPt_utl_s()
+			       -link.getLength() * this.config.getUtilityParameters(subpopulation).getMarginalUtilityOfTravelDistancePt_utl_m();
 
 		}
 		return cost;
@@ -125,10 +127,11 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 		// (note that this is the same "additional disutl of wait" as in the scoring function.  Its default is zero.
 		// only if you are "including the opportunity cost of time into the router", then the disutility of waiting will
 		// be the same as the marginal opprotunity cost of time).  kai, nov'11
-		cost = - walktime * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s()
-		       - walkDistance * this.config.getMarginalUtilityOfTravelDistanceWalk_utl_m() 
-		       - waittime * this.config.getMarginalUtilityOfWaitingPt_utl_s()
-		       - this.config.getUtilityOfLineSwitch_utl();
+		String subpopulation = PopulationUtils.getSubpopulation(person);
+		cost = - walktime * this.config.getUtilityParameters(subpopulation).getMarginalUtilityOfTravelTimeWalk_utl_s()
+		       - walkDistance * this.config.getUtilityParameters(subpopulation).getMarginalUtilityOfTravelDistanceWalk_utl_m() 
+		       - waittime * this.config.getUtilityParameters(subpopulation).getMarginalUtilityOfWaitingPt_utl_s()
+		       - this.config.getUtilityParameters(subpopulation).getUtilityOfLineSwitch_utl();
 		return cost;
 	}
 	
@@ -199,12 +202,13 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 
 	@Override
 	public double getWalkTravelDisutility(Person person, Coord coord, Coord toCoord) {
+		final String subpopulation = PopulationUtils.getSubpopulation(person);
 		//  getMarginalUtilityOfTravelTimeWalk INCLUDES the opportunity cost of time.  kai, dec'12
-		double timeCost = - getWalkTravelTime(person, coord, toCoord) * config.getMarginalUtilityOfTravelTimeWalk_utl_s() ;
+		double timeCost = - getWalkTravelTime(person, coord, toCoord) * config.getUtilityParameters(subpopulation).getMarginalUtilityOfTravelTimeWalk_utl_s() ;
 		// (sign: margUtl is negative; overall it should be positive because it is a cost.)
 		
 		double distanceCost = - CoordUtils.calcEuclideanDistance(coord,toCoord) * 
-				config.getBeelineDistanceFactor() * config.getMarginalUtilityOfTravelDistanceWalk_utl_m();
+				config.getBeelineDistanceFactor() * config.getUtilityParameters(subpopulation).getMarginalUtilityOfTravelDistanceWalk_utl_m();
 		// (sign: same as above)
 		
 		return timeCost + distanceCost ;

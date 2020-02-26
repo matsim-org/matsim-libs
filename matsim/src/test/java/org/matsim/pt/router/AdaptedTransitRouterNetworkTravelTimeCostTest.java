@@ -167,12 +167,13 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 			}
 		}
 
-		double oldCost = - conf.getUtilityOfLineSwitch_utl();
+		final String subpopulation = null;
+		double oldCost = - conf.getUtilityParameters(subpopulation).getUtilityOfLineSwitch_utl();
 		double cost1 = tc.getLinkTravelDisutility(testLink, 7.0*3600, null, null, null);
-		conf.setUtilityOfLineSwitch_utl(0.0);
+		conf.getUtilityParameters(subpopulation).setUtilityOfLineSwitch_utl(0.0);
 		double cost2 = tc.getLinkTravelDisutility(testLink, 6.0*3600, null, null, null); // use different time because of internal caching effects
 		assertEquals(oldCost, cost1 - cost2, MatsimTestCase.EPSILON);
-		conf.setUtilityOfLineSwitch_utl(-40.125);
+		conf.getUtilityParameters(subpopulation).setUtilityOfLineSwitch_utl(-40.125);
 		double cost3 = tc.getLinkTravelDisutility(testLink, 5.0*3600, null, null, null);
 		assertEquals(40.125, cost3 - cost2, MatsimTestCase.EPSILON);
 	}
