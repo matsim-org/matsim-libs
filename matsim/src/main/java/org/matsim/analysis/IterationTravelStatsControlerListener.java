@@ -43,12 +43,16 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
 	private TravelDistanceStats travelDistanceStats;
 
 	@Inject
+    private PHbyModeCalculator pHbyModeCalculator;
+	
+	@Inject
     private PKMbyModeCalculator pkMbyModeCalculator;
     @Inject
     OutputDirectoryHierarchy outputDirectoryHierarchy;
 	@Override
     public void notifyIterationEnds(IterationEndsEvent event) {
         travelDistanceStats.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
+        pHbyModeCalculator.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
         pkMbyModeCalculator.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
         if (config.controler().getWriteTripsInterval() > 0 && config.controler().getWriteTripsInterval() % event.getIteration() == 0) {
             String end = getEnding();
@@ -67,6 +71,8 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		travelDistanceStats.close();
+		// TODO: this way the statistics are written only at the end. Better after each iteration?
+        pHbyModeCalculator.writeOutput();
         pkMbyModeCalculator.writeOutput();
         if (config.controler().getDumpDataAtEnd()) {
             new TripsCSVWriter().write(outputDirectoryHierarchy.getOutputFilename("trips.csv" + getEnding()));

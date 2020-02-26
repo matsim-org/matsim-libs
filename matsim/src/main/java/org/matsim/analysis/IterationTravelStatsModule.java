@@ -30,6 +30,7 @@ public class IterationTravelStatsModule extends AbstractModule {
 	public void install() {
 		bind(TravelDistanceStats.class).asEagerSingleton();
 		bind(PKMbyModeCalculator.class).asEagerSingleton();
+		bind(PHbyModeCalculator.class).asEagerSingleton();
 		addControlerListenerBinding().to(IterationTravelStatsControlerListener.class);
 	}
 
