@@ -140,28 +140,22 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	}
 
 	private void dumpOutputEvents() {
-
 		for (ControlerConfigGroup.EventsFileFormat format : controlerConfigGroup.getEventsFileFormats()) {
 			try {
-				File toFile;
-				File fromFile;
-
+				Controler.DefaultFiles file;
 				switch (format) {
 					case xml:
-						toFile = new File(this.controlerIO.getOutputFilename(Controler.DefaultFiles.events));
-						fromFile = new File(this.controlerIO.getIterationFilename(this.controlerConfigGroup.getLastIteration(), Controler.DefaultFiles.events));
+						file = Controler.DefaultFiles.events;
 						break;
 					case pb:
-						// OUTPUT_PREFIX is not visible, but also not used consistently
-						toFile = new File(this.controlerIO.getOutputFilename("output_" + Controler.DefaultFiles.events.name() + ".pb.gz"));
-						// same ending as in EventsHandlingImpl
-						fromFile = new File(this.controlerIO.getIterationFilename(this.controlerConfigGroup.getLastIteration(),
-								Controler.DefaultFiles.events.name() + ".pb.gz"));
+						file = Controler.DefaultFiles.eventsPb;
 						break;
 					default:
 						continue;
 				}
 
+				File toFile = new File(this.controlerIO.getOutputFilename(file));
+				File fromFile = new File(this.controlerIO.getIterationFilename(this.controlerConfigGroup.getLastIteration(), file));
 				try {
 					Files.copy(fromFile.toPath(), toFile.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
 				} catch (IOException e) {
@@ -171,6 +165,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 				Logger.getLogger(this.getClass()).error("writing output events did not work; probably parameters were such that no events were "
 						+ "generated in the final iteration");
 			}
+
 		}
 	}
 

@@ -1,5 +1,6 @@
-package org.matsim.core.events.algorithms;
+package org.matsim.contrib.protobuf;
 
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.Condition;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,21 +53,21 @@ public class EventWriterPBTest {
                 .setLinkId(EventWriterPB.convertId(id))
                 .build();
 
-        assertThat(msg.hasLinkId());
+        Assertions.assertThat(msg.hasLinkId());
 
         msg = ProtoEvents.LinkEnterEvent
                 .newBuilder()
                 .setLinkId(EventWriterPB.convertId(null))
                 .build();
 
-        assertThat(!msg.hasLinkId());
+        Assertions.assertThat(!msg.hasLinkId());
 
         // check that empty string is a valid id
         msg = ProtoEvents.LinkEnterEvent.newBuilder()
                 .setLinkId(ProtoId.newBuilder().setId(""))
                 .build();
 
-        assertThat(msg.hasLinkId());
+        Assertions.assertThat(msg.hasLinkId());
 
     }
 

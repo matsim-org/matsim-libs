@@ -21,6 +21,7 @@
 package org.matsim.core.controler.corelisteners;
 
 import java.io.OutputStream;
+import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,7 +40,6 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.events.algorithms.EventWriter;
-import org.matsim.core.events.algorithms.EventWriterPB;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
 import com.google.inject.Inject;
@@ -93,10 +93,17 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 								Controler.DefaultFiles.events)));
 						break;
 					case pb:
-						// TODO: .xml suffix is hardcoded in the default files and not accessible
-						URL url = IOUtils.getFileUrl(controlerIO.getIterationFilename(event.getIteration(),
-								Controler.DefaultFiles.events.name() + ".pb.gz"));
-						this.eventWriters.add(new EventWriterPB(IOUtils.getOutputStream(url, false)));
+						// The pb dependency is optional at the moment so we search it first
+						URL url = IOUtils.getFileUrl(controlerIO.getIterationFilename(event.getIteration(), Controler.DefaultFiles.eventsPb));
+						try {
+							Class<?> writerClass = ClassLoader.getSystemClassLoader().loadClass("org.matsim.contrib.protobuf.EventWriterPB");
+							Constructor<?> constructor = writerClass.getConstructor(OutputStream.class);
+							EventWriter writer = (EventWriter) constructor.newInstance(IOUtils.getOutputStream(url, false));
+							this.eventWriters.add(writer);
+						} catch (ReflectiveOperationException e) {
+							log.warn("Error using the PBWriter. Please make sure protobuf contrib is imported and on the classpath.", e);
+						}
+
 						break;
 					default:
 						log.warn("Unknown events file format specified: " + format.toString() + ".");

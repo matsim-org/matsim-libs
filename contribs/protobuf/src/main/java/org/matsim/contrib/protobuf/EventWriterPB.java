@@ -1,8 +1,9 @@
-package org.matsim.core.events.algorithms;
+package org.matsim.contrib.protobuf;
 
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
+import org.matsim.core.events.algorithms.EventWriter;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.utils.pb.*;
 
@@ -17,7 +18,6 @@ import java.util.Map;
 public class EventWriterPB implements EventWriter, BasicEventHandler {
 
     private final OutputStream out;
-
 
     public EventWriterPB(OutputStream out) {
 
