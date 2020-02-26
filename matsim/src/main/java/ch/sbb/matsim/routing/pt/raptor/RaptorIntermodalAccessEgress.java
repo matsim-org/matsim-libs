@@ -7,6 +7,8 @@ package ch.sbb.matsim.routing.pt.raptor;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 
+import ch.sbb.matsim.routing.pt.raptor.RaptorStopFinder.Direction;
+
 import java.util.List;
 
 /**
@@ -14,7 +16,7 @@ import java.util.List;
  */
 public interface RaptorIntermodalAccessEgress {
 
-    RIntermodalAccessEgress calcIntermodalAccessEgress(List<? extends PlanElement> legs, RaptorParameters params, Person person);
+    RIntermodalAccessEgress calcIntermodalAccessEgress(List<? extends PlanElement> legs, RaptorParameters params, Person person, Direction direction);
 
     class RIntermodalAccessEgress {
 
