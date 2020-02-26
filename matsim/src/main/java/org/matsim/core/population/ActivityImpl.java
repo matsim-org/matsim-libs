@@ -147,15 +147,13 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 				+ this.linkId
 				+ "]"
 				+ "[startTime="
-				+ Time.writeTime(getStartTime().isUndefined() ? Time.getUndefinedTime() :
-				getStartTime().seconds())
+				+ Time.writeTime(getStartTime())
 				+ "]"
 				+ "[endTime="
 				+ Time.writeTime(endTime)
 				+ "]"
 				+ "[duration="
-				+ Time.writeTime(getMaximumDuration().isUndefined() ? Time.getUndefinedTime() :
-				getMaximumDuration().seconds())
+				+ Time.writeTime(getMaximumDuration())
 				+ "]"
 				+ "[facilityId="
 				+ this.facilityId + "]" ;

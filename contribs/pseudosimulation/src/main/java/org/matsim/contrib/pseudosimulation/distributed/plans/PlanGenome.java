@@ -151,7 +151,6 @@ public class PlanGenome implements Plan {
                 Leg prev_leg = (Leg) getPlanElements().get(index - 1); // prev leg;
                 prev_leg.setDepartureTime(Time.getUndefinedTime());
                 prev_leg.setTravelTime(Time.getUndefinedTime());
-                prev_leg.setTravelTime( Time.getUndefinedTime() - prev_leg.getDepartureTime() );
                 prev_leg.setRoute(null);
 
                 getPlanElements().remove(index + 1); // following leg
@@ -179,7 +178,6 @@ public class PlanGenome implements Plan {
                 Leg next_leg = (Leg) getPlanElements().get(index + 2);
                 next_leg.setDepartureTime(Time.getUndefinedTime());
                 next_leg.setTravelTime(Time.getUndefinedTime());
-                next_leg.setTravelTime( Time.getUndefinedTime() - next_leg.getDepartureTime() );
                 next_leg.setRoute(null);
             }
             getPlanElements().remove(index + 1); // following act

@@ -227,7 +227,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	@Override
 	public double getFreespeed() {
 		return this.freespeed;
-//		return getFreespeed(Time.getUndefinedTime());
 	}
 
 	/**
@@ -261,7 +260,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	@Override
 	public double getNumberOfLanes() {
 		return this.nofLanes;
-//		return this.getNumberOfLanes(Time.getUndefinedTime());
 	}
 
 	@Override
