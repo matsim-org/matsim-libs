@@ -22,7 +22,11 @@
  package org.matsim.analysis;
 
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -31,8 +35,13 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.scoring.ExperiencedPlansService;
+import org.matsim.core.utils.io.IOUtils;
 
 import javax.inject.Inject;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 class IterationTravelStatsControlerListener implements IterationEndsListener, ShutdownListener {
 
@@ -77,5 +86,33 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
 		// TODO: this way the statistics are written only at the end. Better after each iteration?
         pHbyModeCalculator.writeOutput();
         pkMbyModeCalculator.writeOutput();
-	}
+        if (config.controler().getWriteTripsInterval() > 0) {
+            writePersonsCSV();
+        }
+    }
+
+    private void writePersonsCSV() {
+        Logger.getLogger(getClass()).info("Writing all Person and Attributes to " + Controler.DefaultFiles.personscsv);
+        List<String> attributes = new ArrayList<>(scenario.getPopulation().getPersons().values().parallelStream().flatMap(p -> p.getAttributes().getAsMap().keySet().stream()).collect(Collectors.toSet()));
+        attributes.remove("vehicles");
+        List<String> header = new ArrayList<>();
+        header.add("PersonId");
+        header.addAll(attributes);
+        try (CSVPrinter csvPrinter = new CSVPrinter(IOUtils.getBufferedWriter(outputDirectoryHierarchy.getOutputFilename(Controler.DefaultFiles.personscsv)),
+                CSVFormat.DEFAULT.withDelimiter(config.global().getDefaultDelimiter().charAt(0)).withHeader(header.stream().toArray(String[]::new)))) {
+            for (Person p : scenario.getPopulation().getPersons().values()) {
+                List<String> line = new ArrayList<>();
+                line.add(p.getId().toString());
+                for (String attribute : attributes) {
+                    Object value = p.getAttributes().getAttribute(attribute);
+                    String result = value != null ? String.valueOf(value) : "";
+                    line.add(result);
+                }
+                csvPrinter.printRecord(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Logger.getLogger(getClass()).info("...done");
+    }
 }
