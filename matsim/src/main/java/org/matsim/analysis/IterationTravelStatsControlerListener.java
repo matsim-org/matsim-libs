@@ -58,7 +58,7 @@ class IterationTravelStatsControlerListener implements IterationEndsListener, Sh
         travelDistanceStats.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
         pHbyModeCalculator.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
         pkMbyModeCalculator.addIteration(event.getIteration(), experiencedPlansService.getExperiencedPlans());
-        if (config.controler().getWriteTripsInterval() > 0 && config.controler().getWriteTripsInterval() % event.getIteration() == 0) {
+        if (config.controler().getWriteTripsInterval() > 0 && event.getIteration() % config.controler().getWriteTripsInterval() == 0) {
             String end = getEnding();
             new TripsCSVWriter(scenario).write(experiencedPlansService.getExperiencedPlans(), outputDirectoryHierarchy.getIterationFilename(event.getIteration(), "trips.csv" + end));
         }
