@@ -102,7 +102,7 @@ public class TestsUtil {
 				if (activity1.getStartTime().isUndefined() ^ activity2.getStartTime().isUndefined()) {
 					return false;
 				}
-				if (!activity1.getStartTime().isUndefined() && activity1.getStartTime().seconds()
+				if (activity1.getStartTime().isDefined() && activity1.getStartTime().seconds()
 						!= activity2.getStartTime().seconds()) {
 					return false;
 				}

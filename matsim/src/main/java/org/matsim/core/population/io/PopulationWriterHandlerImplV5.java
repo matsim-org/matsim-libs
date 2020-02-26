@@ -187,12 +187,12 @@ import org.matsim.core.utils.misc.Time;
 			out.write(Double.toString( coord.getY() ));
 			out.write("\"");
 		}
-		if (!act.getStartTime().isUndefined()) {
+		if (act.getStartTime().isDefined()) {
 			out.write(" start_time=\"");
 			out.write(Time.writeTime(act.getStartTime().seconds()));
 			out.write("\"");
 		}
-		if (!act.getMaximumDuration().isUndefined()) {
+		if (act.getMaximumDuration().isDefined()) {
 			out.write(" max_dur=\"");
 			out.write(Time.writeTime(act.getMaximumDuration().seconds()));
 			out.write("\"");

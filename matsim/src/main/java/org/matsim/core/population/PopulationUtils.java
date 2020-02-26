@@ -432,7 +432,7 @@ public final class PopulationUtils {
 			case tryEndTimeThenDuration:
 				if (act.getEndTime().isDefined()) {
 					return act.getEndTime().seconds();
-				} else if (!act.getMaximumDuration().isUndefined()) {
+				} else if (act.getMaximumDuration().isDefined()) {
 					return now + act.getMaximumDuration().seconds();
 				} else {
 					return Time.getUndefinedTime();

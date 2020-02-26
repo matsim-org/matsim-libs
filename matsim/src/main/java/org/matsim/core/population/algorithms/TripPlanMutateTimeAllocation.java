@@ -106,7 +106,7 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 					act.setStartTime(now);
 					if (!StageActivityTypeIdentifier.isStageActivity(act.getType())) {
 						if (this.useActivityDurations) {
-							if (!act.getMaximumDuration().isUndefined()) {
+							if (act.getMaximumDuration().isDefined()) {
 								// mutate the durations of all 'middle' activities
 								if (affectingDuration) {
 									act.setMaximumDuration(mutateTime(act.getMaximumDuration().seconds(), mutationRange));

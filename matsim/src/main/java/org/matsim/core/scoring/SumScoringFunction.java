@@ -89,11 +89,11 @@ public final class SumScoringFunction implements ScoringFunction {
 			for (ActivityScoring activityScoringFunction : this.activityScoringFunctions) {
 				activityScoringFunction.handleFirstActivity(activity);
 			}
-		} else if (!activity.getStartTime().isUndefined() && activity.getEndTime().isDefined()) {
+		} else if (activity.getStartTime().isDefined() && activity.getEndTime().isDefined()) {
 			for (ActivityScoring activityScoringFunction : this.activityScoringFunctions) {
 				activityScoringFunction.handleActivity(activity);
 			}
-		} else if (!activity.getStartTime().isUndefined() && !activity.getEndTime().isDefined()) {
+		} else if (activity.getStartTime().isDefined() && !activity.getEndTime().isDefined()) {
 			for (ActivityScoring activityScoringFunction : this.activityScoringFunctions) {
 				activityScoringFunction.handleLastActivity(activity);
 			}

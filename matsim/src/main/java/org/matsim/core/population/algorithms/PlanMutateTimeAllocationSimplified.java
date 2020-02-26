@@ -73,7 +73,7 @@ public final class PlanMutateTimeAllocationSimplified implements PlanAlgorithm {
 				act.setEndTime(mutateTime(act.getEndTime().seconds()));
 			}
 			if ( affectingDuration ) {
-				if ( !act.getMaximumDuration().isUndefined()) {
+				if ( act.getMaximumDuration().isDefined()) {
 					act.setMaximumDuration(mutateTime(act.getMaximumDuration().seconds()));
 				}
 			}

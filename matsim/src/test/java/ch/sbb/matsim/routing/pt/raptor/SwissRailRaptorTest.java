@@ -590,7 +590,7 @@ public class SwissRailRaptorTest {
         for (PlanElement pe : planElements) {
             if (pe instanceof Activity) {
                 Activity act = (Activity)pe;
-				if (!act.getStartTime().isUndefined() && act.getEndTime().isDefined()) {
+				if (act.getStartTime().isDefined() && act.getEndTime().isDefined()) {
                     double startTime = act.getStartTime().seconds();
 					double endTime = act.getEndTime().seconds();
                     duration += (endTime - startTime);
