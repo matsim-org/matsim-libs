@@ -203,7 +203,7 @@ public final class EventsReaderXMLv1 extends MatsimXmlEventsParser {
 			this.events.processEvent(new TeleportationArrivalEvent(
 					time, 
 					Id.create(atts.getValue(TeleportationArrivalEvent.ATTRIBUTE_PERSON), Person.class), 
-					Double.parseDouble(atts.getValue(TeleportationArrivalEvent.ATTRIBUTE_DISTANCE))));
+					Double.parseDouble(atts.getValue(TeleportationArrivalEvent.ATTRIBUTE_DISTANCE)),atts.getValue(TeleportationArrivalEvent.ATTRIBUTE_MODE)));
 		} else if (VehicleArrivesAtFacilityEvent.EVENT_TYPE.equals(eventType)) {
 			String delay = atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_DELAY);
 			this.events.processEvent(new VehicleArrivesAtFacilityEvent(time, Id.create(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_VEHICLE), Vehicle.class), Id.create(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_FACILITY), TransitStopFacility.class), delay == null ? 0.0 : Double.parseDouble(delay)));
