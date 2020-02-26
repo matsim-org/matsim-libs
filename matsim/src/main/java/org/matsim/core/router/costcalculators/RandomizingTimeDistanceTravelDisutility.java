@@ -100,7 +100,8 @@ final class RandomizingTimeDistanceTravelDisutility implements TravelDisutility 
 
 	@Override
 	public double getLinkMinimumTravelDisutility(final Link link) {
-		return (link.getLength() / link.getFreespeed()) * this.marginalCostOfTime + this.marginalCostOfDistance * link.getLength();
+		// to be minimal over all values of the log normal random term, the cost of distance should be ignored.
+		return (link.getLength() / link.getFreespeed()) * this.marginalCostOfTime;// + this.marginalCostOfDistance * link.getLength();
 	}
 
 }
