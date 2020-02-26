@@ -67,7 +67,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	}
 
 	@Override
-	public final OptionalTime getOptionalEndTime() {
+	public final OptionalTime getEndTime() {
 		return this.endTime;
 	}
 

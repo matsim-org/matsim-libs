@@ -129,8 +129,8 @@ public final class ParkingChoiceSimulation
 						firstDepartureTimeOfDay.get(personId));
 			} else {
 				Activity activityBeforeNextCarLeg = getActivityBeforeNextCarLeg(personId);
-				
-				double endTime=activityBeforeNextCarLeg.getEndTime();
+
+				double endTime= activityBeforeNextCarLeg.getEndTime().seconds();
 				double parkingDuration=0;
 				
 				if (endTime==Double.NEGATIVE_INFINITY || endTime==Double.POSITIVE_INFINITY){
@@ -206,10 +206,10 @@ public final class ParkingChoiceSimulation
 						firstActivityAfterLastCarLegOfDay.getStartTime();
 				if (Time.isUndefinedTime(startTime) || startTime == Double.POSITIVE_INFINITY) {
 					parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(0,
-							firstActivityOfDayBeforeDepartingWithCar.getEndTime());
+							firstActivityOfDayBeforeDepartingWithCar.getEndTime().seconds());
 				} else {
 					parkingAttributes.parkingDurationInSeconds = GeneralLib.getIntervalDuration(startTime,
-							firstActivityOfDayBeforeDepartingWithCar.getEndTime());
+							firstActivityOfDayBeforeDepartingWithCar.getEndTime().seconds());
 				}
 				parkingAttributes.legIndex = 0;
 

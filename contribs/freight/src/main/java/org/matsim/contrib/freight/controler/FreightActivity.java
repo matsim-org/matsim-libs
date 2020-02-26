@@ -26,8 +26,8 @@ public class FreightActivity implements Activity {
 	}
 
 	@Override
-	public OptionalTime getOptionalEndTime() {
-		return act.getOptionalEndTime();
+	public OptionalTime getEndTime() {
+		return act.getEndTime();
 	}
 
 	@Override

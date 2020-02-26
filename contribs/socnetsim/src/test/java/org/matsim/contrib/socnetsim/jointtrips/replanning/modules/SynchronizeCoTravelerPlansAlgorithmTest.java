@@ -332,8 +332,7 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 
 					Assert.assertEquals(
 							"unexpected end time for "+activity,
-							endTime.doubleValue(),
-							activity.getEndTime(),
+							endTime.doubleValue(), activity.getEndTime().seconds(),
 							MatsimTestUtils.EPSILON);
 				}
 			}

@@ -37,7 +37,7 @@ public class ActivityDurationUtils {
 	 */
 	
 	public static double calculateDepartureTime(Activity act, double now, PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation) {
-		if (act.isMaximumDurationUndefined() && !act.getOptionalEndTime().isPresent()) {
+		if (act.isMaximumDurationUndefined() && !act.getEndTime().isPresent()) {
 			return Double.POSITIVE_INFINITY;
 		} else {
 			double departure = 0;
@@ -45,22 +45,22 @@ public class ActivityDurationUtils {
 					PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime)) {
 				// person stays at the activity either until its duration is over or until its end time, whatever comes first
 				if (act.isMaximumDurationUndefined()) {
-					departure = act.getEndTime();
-				} else if (!act.getOptionalEndTime().isPresent()) {
+					departure = act.getEndTime().seconds();
+				} else if (!act.getEndTime().isPresent()) {
 					departure = now + act.getMaximumDuration();
 				} else {
-					departure = Math.min(act.getEndTime(), now + act.getMaximumDuration());
+					departure = Math.min(act.getEndTime().seconds(), now + act.getMaximumDuration());
 				}
 			} else if (activityDurationInterpretation.equals(PlansConfigGroup.ActivityDurationInterpretation.endTimeOnly )) {
-				if (!Time.isUndefinedTime(act.getEndTime())) {
-					departure = act.getEndTime();
+				if (!Time.isUndefinedTime(act.getEndTime().seconds())) {
+					departure = act.getEndTime().seconds();
 				} else {
 					throw new IllegalStateException("activity end time not set and using something else not allowed.");
 				}
 			} else if (activityDurationInterpretation.equals(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration )) {
 				// In fact, as of now I think that _this_ should be the default behavior.  kai, aug'10
-				if (act.getOptionalEndTime().isPresent()) {
-					departure = act.getEndTime();
+				if (act.getEndTime().isPresent()) {
+					departure = act.getEndTime().seconds();
 				} else if (!Time.isUndefinedTime(act.getMaximumDuration())) {
 					departure = now + act.getMaximumDuration();
 				} else {

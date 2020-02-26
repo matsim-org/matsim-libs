@@ -278,13 +278,13 @@ public final class CharyparNagelActivityScoring implements org.matsim.core.scori
 	@Override
 	public void handleFirstActivity(Activity act) {
 		assert act != null;
-		this.firstActivityEndTime = act.getEndTime();
+		this.firstActivityEndTime = act.getEndTime().seconds();
 		this.firstActivity = act;
 	}
 
 	@Override
 	public void handleActivity(Activity act) {
-		this.score += calcActScore(act.getStartTime(), act.getEndTime(), act);
+		this.score += calcActScore(act.getStartTime(), act.getEndTime().seconds(), act);
 	}
 
 	@Override

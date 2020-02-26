@@ -285,7 +285,7 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 			this.subtour = subtour;
 			
 			final Trip firstTrip = subtour.getTrips().get( 0 );
-			this.startTime = firstTrip.getOriginActivity().getEndTime();
+			this.startTime = firstTrip.getOriginActivity().getEndTime().seconds();
 			if ( Time.isUndefinedTime(startTime) ) throw new RuntimeException( "no end time in "+firstTrip.getOriginActivity() );
 
 			final Trip lastTrip = subtour.getTrips().get( subtour.getTrips().size() - 1 );
@@ -325,10 +325,10 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 	}
 
 	private static double calcArrivalTime(final Trip trip) {
-		double now = trip.getOriginActivity().getEndTime();
+		double now = trip.getOriginActivity().getEndTime().seconds();
 		for ( final PlanElement pe : trip.getTripElements() ) {
 			if ( pe instanceof Activity ) {
-				final double end = ((Activity) pe).getEndTime();
+				final double end = ((Activity)pe).getEndTime().seconds();
 				now = !Time.isUndefinedTime(end) ? end : now + ((Activity) pe).getMaximumDuration();
 				// TODO: do not fail *that* badly, but just revert to random alloc
 				if ( Time.isUndefinedTime(now) ) throw new RuntimeException( "could not get time from "+pe );

@@ -188,7 +188,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 				Activity activity = (Activity) planElement;
 				destPlan.planElements.add(new LCActivity(destPlan, activityCount, planElementCount));
 				destPlan.startTimes[activityCount] = activity.getStartTime();
-				destPlan.endTimes[activityCount] = activity.getEndTime();
+				destPlan.endTimes[activityCount] = activity.getEndTime().seconds();
 				destPlan.durations[activityCount] = activity.getMaximumDuration();
 				destPlan.types[activityCount] = activity.getType();
 				destPlan.coords[activityCount] = activity.getCoord();

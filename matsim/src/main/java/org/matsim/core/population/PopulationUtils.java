@@ -231,8 +231,8 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public OptionalTime getOptionalEndTime() {
-			return this.delegate.getOptionalEndTime();
+		public OptionalTime getEndTime() {
+			return this.delegate.getEndTime();
 		}
 
 		@Override
@@ -428,17 +428,17 @@ public final class PopulationUtils {
 	public static double decideOnActivityEndTime( Activity act, double now, Config config ) {
 		switch ( config.plans().getActivityDurationInterpretation() ) {
 			case endTimeOnly:
-				return act.getEndTime();
+				return act.getEndTime().seconds();
 			case tryEndTimeThenDuration:
-				if (act.getOptionalEndTime().isPresent()) {
-					return act.getEndTime();
+				if (act.getEndTime().isPresent()) {
+					return act.getEndTime().seconds();
 				} else if (!act.isMaximumDurationUndefined()) {
 					return now + act.getMaximumDuration();
 				} else {
 					return Time.getUndefinedTime();
 				}
 			case minOfDurationAndEndTime:
-				return Math.min(now + act.getMaximumDuration(), act.getEndTime());
+				return Math.min(now + act.getMaximumDuration(), act.getEndTime().seconds());
 			default:
 				break;
 		}
@@ -607,14 +607,14 @@ public final class PopulationUtils {
 			}
 
 			// activity end times
-			if (  !act1.getOptionalEndTime().isPresent() && !act2.getOptionalEndTime().isPresent()){
+			if (  !act1.getEndTime().isPresent() && !act2.getEndTime().isPresent()){
 				// TODO: isInfinite() is broader than isUndefined()
 				// both activities have no end time, no need to compute a similarity penalty
 			} else {
 				// both activities have an end time, comparing the end times
 
 				// 300/ln(2) means a penalty of 0.5 for 300 sec difference
-				double delta = Math.abs(act1.getEndTime() - act2.getEndTime()) ;
+				double delta = Math.abs(act1.getEndTime().seconds() - act2.getEndTime().seconds()) ;
 				simil += actTimeParameter * Math.exp( - delta/(300/Math.log(2)) ) ;
 			}
 
@@ -853,7 +853,8 @@ public final class PopulationUtils {
 		newAct.setType(act.getType());
 		newAct.setLinkId(act.getLinkId());
 		newAct.setStartTime(act.isStartTimeUndefined() ? Time.getUndefinedTime() : act.getStartTime());
-		newAct.setEndTime(!act.getOptionalEndTime().isPresent() ? Time.getUndefinedTime() : act.getEndTime());
+		newAct.setEndTime(!act.getEndTime().isPresent() ? Time.getUndefinedTime() :
+				act.getEndTime().seconds());
 		newAct.setMaximumDuration(act.isMaximumDurationUndefined() ? Time.getUndefinedTime() : act.getMaximumDuration());
 		newAct.setFacilityId(act.getFacilityId());
 

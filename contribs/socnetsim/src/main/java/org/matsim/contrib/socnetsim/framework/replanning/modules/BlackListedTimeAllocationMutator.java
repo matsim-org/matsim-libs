@@ -70,15 +70,15 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 					((Activity) a).setMaximumDuration( mutateTime( a.getMaximumDuration() ) );
 					break;
 				case MUTATE_END:
-					a.setEndTime( mutateTime( a.getEndTime() ) );
-					if ( Time.isUndefinedTime(a.getEndTime()) &&
-							a.getEndTime() < lastEndTime ) {
+					a.setEndTime( mutateTime(a.getEndTime().seconds()) );
+					if ( Time.isUndefinedTime(a.getEndTime().seconds()) &&
+							a.getEndTime().seconds() < lastEndTime ) {
 						a.setEndTime( lastEndTime );
 					}
-					lastEndTime = a.getEndTime();
+					lastEndTime = a.getEndTime().seconds();
 					break;
 				case MUTATE_END_AS_DUR:
-					final double oldTime = a.getEndTime();
+					final double oldTime = a.getEndTime().seconds();
 					if ( Time.isUndefinedTime(oldTime) ) break;
 					final double newTime = mutateTime( oldTime );
 					// doing this so rather than sampling mut directly allows
@@ -86,7 +86,7 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 					final double mut = newTime - oldTime;
 					// shift all times after the mutated time (as if we were working on durations)
 					for ( Activity currAct : activities.subList( activities.indexOf( a ) , nActs ) ) {
-						currAct.setEndTime( currAct.getEndTime() + mut );
+						currAct.setEndTime( currAct.getEndTime().seconds() + mut );
 					}
 					break;
 				default:

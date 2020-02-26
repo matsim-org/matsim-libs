@@ -162,7 +162,7 @@ public class TimeAllocationMutatorModuleTest extends MatsimTestCase {
 		}
 
 		// run test
-		double act1Dur = act1.getEndTime();
+		double act1Dur = act1.getEndTime().seconds();
 		double minDiff1 = Double.POSITIVE_INFINITY;
 		double maxDiff1 = Double.NEGATIVE_INFINITY;
 		double act2Dur = act2.getMaximumDuration();
@@ -247,7 +247,7 @@ public class TimeAllocationMutatorModuleTest extends MatsimTestCase {
 		}
 
 		// run test
-		double act1End = act1.getEndTime();
+		double act1End = act1.getEndTime().seconds();
 		double minDiff1 = Double.POSITIVE_INFINITY;
 		double maxDiff1 = Double.NEGATIVE_INFINITY;
 		double act2Dur = act2.getMaximumDuration();
@@ -256,10 +256,10 @@ public class TimeAllocationMutatorModuleTest extends MatsimTestCase {
 		for (int i = 0; i < 150; i++) {
 			tripPlanMutateTimeAllocation.run(plan);
 			// get end time of act1
-			double diff = act1End - act1.getEndTime();
+			double diff = act1End - act1.getEndTime().seconds();
 			if (diff > maxDiff1) maxDiff1 = diff;
 			if (diff < minDiff1) minDiff1 = diff;
-			act1End = act1.getEndTime();
+			act1End = act1.getEndTime().seconds();
 			if (!Time.isUndefinedTime(act1End)) {
 				assertTrue("activity end time cannot be smaller than 0, is " + act1End, act1End >= 0.0);
 			}

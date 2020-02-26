@@ -111,7 +111,7 @@ class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 
 		private static final OptionalTime ZERO_TIME = OptionalTime.of(0);
 		@Override
-		public OptionalTime getOptionalEndTime() { return ZERO_TIME; }
+		public OptionalTime getEndTime() { return ZERO_TIME; }
 
 		@Override
 		public void setEndTime(double seconds) { }

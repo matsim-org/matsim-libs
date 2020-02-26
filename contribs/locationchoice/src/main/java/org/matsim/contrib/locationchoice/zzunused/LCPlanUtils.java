@@ -57,7 +57,7 @@ import org.matsim.facilities.ActivityFacility;
 		for (PlanElement pe : planTarget.getPlanElements()) {
 			if (pe instanceof Activity) {
 				Activity actTemplate = ((Activity) planTemplate.getPlanElements().get(actLegIndex));
-				((Activity) pe).setEndTime(actTemplate.getEndTime());
+				((Activity) pe).setEndTime(actTemplate.getEndTime().seconds());
 				((Activity) pe).setCoord(actTemplate.getCoord());
 				((Activity) pe).setFacilityId(actTemplate.getFacilityId());
 				((Activity) pe).setLinkId(actTemplate.getLinkId());
@@ -84,7 +84,7 @@ import org.matsim.facilities.ActivityFacility;
 		for (PlanElement pe : planTarget.getPlanElements()) {
 			if (pe instanceof Activity) {
 				LCActivity actTemplate = ((LCActivity) planTemplate.getPlanElements().get(actLegIndex));
-				((Activity) pe).setEndTime(actTemplate.getEndTime());
+				((Activity) pe).setEndTime(actTemplate.getEndTime().seconds());
 				((Activity) pe).setCoord(actTemplate.getCoord());
 				((Activity) pe).setFacilityId(actTemplate.getFacilityId());
 				((Activity) pe).setLinkId(actTemplate.getLinkId());
@@ -111,7 +111,7 @@ import org.matsim.facilities.ActivityFacility;
 		for (PlanElement pe : planTarget.getPlanElements()) {
 			if (pe instanceof LCActivity) {
 				LCActivity actTemplate = ((LCActivity) planTemplate.getPlanElements().get(actLegIndex));
-				((LCActivity) pe).setEndTime(actTemplate.getEndTime());
+				((LCActivity) pe).setEndTime(actTemplate.getEndTime().seconds());
 				((LCActivity) pe).setCoord(actTemplate.getCoord());
 				((LCActivity) pe).setFacilityId(actTemplate.getFacilityId());
 				((LCActivity) pe).setLinkId(actTemplate.getLinkId());

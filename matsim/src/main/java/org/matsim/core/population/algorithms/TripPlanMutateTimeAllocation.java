@@ -91,13 +91,13 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 					// set start to midnight
 					act.setStartTime(now);
 					// mutate the end time of the first activity
-					act.setEndTime(mutateTime(act.getEndTime(), mutationRange));
+					act.setEndTime(mutateTime(act.getEndTime().seconds(), mutationRange));
 					// calculate resulting duration
 					if (affectingDuration) {
-						act.setMaximumDuration(act.getEndTime() - act.getStartTime());
+						act.setMaximumDuration(act.getEndTime().seconds() - act.getStartTime());
 					}
 					// move now pointer
-					now += act.getEndTime();
+					now += act.getEndTime().seconds();
 
 				// handle middle activities
 				} else if (act != lastAct) {
@@ -117,7 +117,7 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 								// set end time accordingly
 								act.setEndTime(now);
 							} else {
-								double newEndTime = mutateTime(act.getEndTime(), mutationRange);
+								double newEndTime = mutateTime(act.getEndTime().seconds(), mutationRange);
 								if (newEndTime < now) {
 									newEndTime = now;
 								}
@@ -126,10 +126,10 @@ public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 							}
 						}
 						else {
-							if (Time.isUndefinedTime(act.getEndTime())) {
+							if (Time.isUndefinedTime(act.getEndTime().seconds())) {
 								throw new IllegalStateException("Can not mutate activity end time because it is not set for Person: " + plan.getPerson().getId());
 							}
-							double newEndTime = mutateTime(act.getEndTime(), mutationRange);
+							double newEndTime = mutateTime(act.getEndTime().seconds(), mutationRange);
 							if (newEndTime < now) {
 								newEndTime = now;
 							}

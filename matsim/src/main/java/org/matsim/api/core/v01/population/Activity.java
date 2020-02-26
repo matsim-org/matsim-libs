@@ -53,11 +53,7 @@ public interface Activity extends PlanElement {
 	}
 
 
-	public OptionalTime getOptionalEndTime();
-
-	default double getEndTime() {
-		return getOptionalEndTime().seconds();
-	}
+	public OptionalTime getEndTime();
 
 	public void setEndTime(final double seconds);
 

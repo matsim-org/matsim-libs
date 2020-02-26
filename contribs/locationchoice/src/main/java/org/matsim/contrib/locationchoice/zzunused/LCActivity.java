@@ -44,7 +44,7 @@ class LCActivity implements Activity, LCPlanElement {
 	}
 	
 	@Override
-	public final OptionalTime getOptionalEndTime() {
+	public final OptionalTime getEndTime() {
 		//consider having an array of OptionalDoubles instead...
 		return OptionalTime.of(this.plan.endTimes[this.arrayIndex]);
 	}

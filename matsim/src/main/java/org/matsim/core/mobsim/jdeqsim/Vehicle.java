@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.population.routes.NetworkRoute;
 
 /**
@@ -92,7 +91,7 @@ public class Vehicle extends SimUnit {
 		setCurrentLeg((Leg) actsLegs.get(legIndex));
 		Activity firstAct = (Activity) actsLegs.get(0);
 		// an agent starts the first leg at the end_time of the fist act
-		double departureTime = firstAct.getEndTime();
+		double departureTime = firstAct.getEndTime().seconds();
 
 		// this is the link, where the first activity took place
 		setCurrentLinkId(firstAct.getLinkId());

@@ -128,7 +128,7 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 			if ( pe instanceof Activity &&
 					!(StageActivityTypeIdentifier.isStageActivity( ((Activity) pe).getType() )  ||
 					stageTypes.contains(((Activity) pe).getType())) ){
-				final double endTime = ((Activity) pe).getEndTime();
+				final double endTime = ((Activity)pe).getEndTime().seconds();
 				if ( Time.isUndefinedTime(endTime) ) throw new RuntimeException( "undefined end time" );
 				return endTime + tt;
 			}

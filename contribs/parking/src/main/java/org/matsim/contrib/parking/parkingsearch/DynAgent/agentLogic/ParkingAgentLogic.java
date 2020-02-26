@@ -122,7 +122,7 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		Activity act = (Activity) currentPlanElement;
 		//TODO: assume something different regarding initial parking location
 
-		return new IdleDynActivity(act.getType(), act.getEndTime());
+		return new IdleDynActivity(act.getType(), act.getEndTime().seconds());
 	}
 
 	@Override
@@ -219,7 +219,7 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		Activity nextPlannedActivity = (Activity) this.currentPlanElement;
 		this.lastParkActionState = LastParkActionState.ACTIVITY;
 		final double endTime;
-		if (!nextPlannedActivity.getOptionalEndTime().isPresent()) {
+		if (!nextPlannedActivity.getEndTime().isPresent()) {
             if (nextPlannedActivity.isMaximumDurationUndefined()) {
                 endTime = Double.POSITIVE_INFINITY;
                 //last activity of a day
@@ -227,7 +227,7 @@ public class ParkingAgentLogic implements DynAgentLogic {
                 endTime = now + nextPlannedActivity.getMaximumDuration();
             }
 		} else {
-        	endTime = nextPlannedActivity.getEndTime();
+			endTime = nextPlannedActivity.getEndTime().seconds();
 		}
 		return new IdleDynActivity(nextPlannedActivity.getType(), endTime);
 		

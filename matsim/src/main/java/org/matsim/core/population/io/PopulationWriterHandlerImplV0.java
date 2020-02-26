@@ -145,8 +145,8 @@ import org.matsim.core.utils.misc.Time;
 			out.write(" start_time=\"" + Time.writeTime(act.getStartTime()) + "\"");
 		if (!Time.isUndefinedTime(act.getMaximumDuration()))
 			out.write(" dur=\"" + Time.writeTime(act.getMaximumDuration()) + "\"");
-		if (act.getEndTime() != Integer.MIN_VALUE)
-			out.write(" end_time=\"" + Time.writeTime(act.getEndTime()) + "\"");
+		if (act.getEndTime().seconds() != Integer.MIN_VALUE)
+			out.write(" end_time=\"" + Time.writeTime(act.getEndTime().seconds()) + "\"");
 		out.write(" />\n");
 	}
 

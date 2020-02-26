@@ -442,9 +442,9 @@ public class BetaTravelTest6IT extends MatsimTestCase {
 					// handle first activity
 					if (i == 0) {
 						act.setStartTime(now); // set start to midnight
-						act.setEndTime(mutateTime(act.getEndTime())); // mutate the end time of the first activity
-						act.setMaximumDuration(act.getEndTime() - act.getStartTime()); // calculate resulting duration
-						now += act.getEndTime(); // move now pointer
+						act.setEndTime(mutateTime(act.getEndTime().seconds())); // mutate the end time of the first activity
+						act.setMaximumDuration(act.getEndTime().seconds() - act.getStartTime()); // calculate resulting duration
+						now += act.getEndTime().seconds(); // move now pointer
 					} else if (i < (max - 1)) {
 						// handle middle activities
 						act.setStartTime(now); // assume that there will be no delay between arrival time and activity start time

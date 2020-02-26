@@ -333,7 +333,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 	@Override
 	public void handleFirstActivity(Activity act) {
 		assert act != null;
-		this.firstActivityEndTime = act.getEndTime();
+		this.firstActivityEndTime = act.getEndTime().seconds();
 		this.firstActivity = act;
 		this.firstAct = false;
 
@@ -341,7 +341,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, SumScoring
 
 	@Override
 	public void handleActivity(Activity act) {
-		this.score += calcActScore(act.getStartTime(), act.getEndTime(), act);
+		this.score += calcActScore(act.getStartTime(), act.getEndTime().seconds(), act);
 	}
 
 	@Override

@@ -206,7 +206,7 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 		Activity a = (Activity) plan.getPlanElements().get(index + 1);
 
 		//return a.getEndTime() - time > 0.0 ? a.getEndTime() - time : 0.0;
-		return !a.getOptionalEndTime().isPresent() ? 0 : a.getEndTime() - time;
+		return !a.getEndTime().isPresent() ? 0 : a.getEndTime().seconds() - time;
 	}
 
 	private boolean willUseTheVehicleLaterFromLocation(Id<Link> linkId, Plan plan, Leg currentLeg) {

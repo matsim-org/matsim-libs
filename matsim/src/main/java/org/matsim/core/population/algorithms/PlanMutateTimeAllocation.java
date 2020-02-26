@@ -74,11 +74,11 @@ public final class PlanMutateTimeAllocation implements PlanAlgorithm {
 					// set start to midnight
 					act.setStartTime(now);
 					// mutate the end time of the first activity
-					act.setEndTime(mutateTime(act.getEndTime()));
+					act.setEndTime(mutateTime(act.getEndTime().seconds()));
 					// calculate resulting duration
-					act.setMaximumDuration(act.getEndTime() - act.getStartTime());
+					act.setMaximumDuration(act.getEndTime().seconds() - act.getStartTime());
 					// move now pointer
-					now += act.getEndTime();
+					now += act.getEndTime().seconds();
 
 				// handle middle activities
 				} else if (i < (max - 1)) {
@@ -92,7 +92,7 @@ public final class PlanMutateTimeAllocation implements PlanAlgorithm {
 							// set end time accordingly
 							act.setEndTime(now);
 						} else {
-							double newEndTime = mutateTime(act.getEndTime());
+							double newEndTime = mutateTime(act.getEndTime().seconds());
 							if (newEndTime < now) {
 								newEndTime = now;
 							}
