@@ -23,11 +23,13 @@ public interface RaptorIntermodalAccessEgress {
         public final List<? extends PlanElement> routeParts;
         public final double disutility;
         public final double travelTime;
+        public final Direction direction;
 
-        public RIntermodalAccessEgress(List<? extends PlanElement> planElements, double disutility, double travelTime) {
+        public RIntermodalAccessEgress(List<? extends PlanElement> planElements, double disutility, double travelTime, Direction direction) {
             this.routeParts = planElements;
             this.disutility = disutility;
             this.travelTime = travelTime;
+            this.direction = direction;
         }
     }
 }

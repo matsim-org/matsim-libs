@@ -35,6 +35,6 @@ public class DefaultRaptorIntermodalAccessEgress implements RaptorIntermodalAcce
                 }
             }
         }
-        return new RIntermodalAccessEgress(legs, disutility, tTime);
+        return new RIntermodalAccessEgress(legs, disutility, tTime, direction);
     }
 }
