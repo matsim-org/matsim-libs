@@ -318,12 +318,12 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		if (ecg.isUsingDetailedEmissionCalculation()) {
 			if (this.detailedHbefaWarmTable == null) {
 				switch (ecg.getDetailedFallbackBehaviour()) {
-					case abort:
+					case onlyTryDetailedElseAbort:
 						throw new RuntimeException("Missing detailed emissions factor table ... aborting.");
-					case tryTechnologyAverageOrAbort:
+					case tryDetailedThenTechnologyAverageElseAbort:
 						//technologyAverage values should be also part of the detailed table -> can abort here
 						throw new RuntimeException("Missing detailed emissions factor table. This should also contain the fallback 'technologyAverage' values, so fallback is not possible ... aborting.");
-					case tryTechnologyAverageOrVehicleTypeAverage:
+					case tryDetailedThenTechnologyAverageThenAverageTable:
 						//technologyAverage values should be also part of the detailed table -> directly go to Average table
 						// set vehicle attributes to "average; average; average":
 						logger.warn("Detailed emissions factor table is null. Trying to use average values from average table");
@@ -400,7 +400,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		}
 
 		// try "<technology>; average; average":
-		if (ecg.getDetailedFallbackBehaviour() == EmissionsConfigGroup.DetailedFallbackBehaviour.tryTechnologyAverageOrAbort || ecg.getDetailedFallbackBehaviour() == EmissionsConfigGroup.DetailedFallbackBehaviour.tryTechnologyAverageOrVehicleTypeAverage) {
+		if (ecg.getDetailedFallbackBehaviour() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageElseAbort || ecg.getDetailedFallbackBehaviour() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable ) {
 			attribs2.setHbefaSizeClass( "average" );
 			attribs2.setHbefaEmConcept( "average" );
 			logger.warn( "did not find emission factor for efkey=" + efkey );
@@ -425,7 +425,7 @@ public final class WarmEmissionAnalysisModule implements LinkEmissionsCalculator
 		}
 
 		// set vehicle attributes to "average; average; average":
-		if (ecg.getDetailedFallbackBehaviour() == EmissionsConfigGroup.DetailedFallbackBehaviour.tryTechnologyAverageOrVehicleTypeAverage) {
+		if (ecg.getDetailedFallbackBehaviour() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable ) {
 			logger.warn("Now trying with setting to vehicle attributes to \"average; average; average\" and try it with average table");
 			efkey.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
 		}

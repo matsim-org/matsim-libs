@@ -79,6 +79,43 @@ public final class EmissionModule {
 			this.eventsManager = eventsManager;
 		}
 
+		switch( this.emissionConfigGroup.getDetailedFallbackBehaviour() ){
+			case directlyTryAverageTable:
+				if ( this.emissionConfigGroup.getAverageColdEmissionFactorsFile()==null || this.emissionConfigGroup.getAverageColdEmissionFactorsFile().equals( "" ) ) {
+					throw new RuntimeException( "You have requested " + this.emissionConfigGroup.getDetailedFallbackBehaviour() + " but are not providing a corresponding" +
+										    " cold emissions file.") ;
+				}
+				if ( this.emissionConfigGroup.getAverageWarmEmissionFactorsFile()==null || this.emissionConfigGroup.getAverageWarmEmissionFactorsFile().equals( "" ) ) {
+					throw new RuntimeException( "You have requested " + this.emissionConfigGroup.getDetailedFallbackBehaviour() + " but are not providing a corresponding" +
+										    " warm emissions file.") ;
+				}
+				break;
+			case tryDetailedThenTechnologyAverageThenAverageTable:
+				if ( this.emissionConfigGroup.getAverageColdEmissionFactorsFile()==null || this.emissionConfigGroup.getAverageColdEmissionFactorsFile().equals( "" ) ) {
+					throw new RuntimeException( "You have requested " + this.emissionConfigGroup.getDetailedFallbackBehaviour() + " but are not providing a corresponding" +
+										    " cold emissions file.") ;
+				}
+				if ( this.emissionConfigGroup.getAverageWarmEmissionFactorsFile()==null || this.emissionConfigGroup.getAverageWarmEmissionFactorsFile().equals( "" ) ) {
+					throw new RuntimeException( "You have requested " + this.emissionConfigGroup.getDetailedFallbackBehaviour() + " but are not providing a corresponding" +
+										    " warm emissions file.") ;
+				}
+				// fall-through
+			case onlyTryDetailedElseAbort:
+				// fall-through
+			case tryDetailedThenTechnologyAverageElseAbort:
+				if ( this.emissionConfigGroup.getDetailedColdEmissionFactorsFile()==null || this.emissionConfigGroup.getDetailedColdEmissionFactorsFile().equals( "" ) ) {
+					throw new RuntimeException( "You have requested " + this.emissionConfigGroup.getDetailedFallbackBehaviour() + " but are not providing a corresponding" +
+										    " cold emissions file.") ;
+				}
+				if ( this.emissionConfigGroup.getDetailedWarmEmissionFactorsFile()==null || this.emissionConfigGroup.getDetailedWarmEmissionFactorsFile().equals( "" ) ) {
+					throw new RuntimeException( "You have requested " + this.emissionConfigGroup.getDetailedFallbackBehaviour() + " but are not providing a corresponding" +
+										    " warm emissions file.") ;
+				}
+				break;
+			default:
+				throw new IllegalStateException( "Unexpected value: " + this.emissionConfigGroup.getDetailedFallbackBehaviour() );
+		}
+
 		URL context = scenario.getConfig().getContext();
 
 		URL averageFleetWarmEmissionFactorsFile = emissionConfigGroup.getAverageWarmEmissionFactorsFileURL( context );
@@ -120,7 +157,7 @@ public final class EmissionModule {
 //			}
 //		}
 
-		if (!emissionConfigGroup.isUsingDetailedEmissionCalculation() || emissionConfigGroup.getDetailedFallbackBehaviour() == EmissionsConfigGroup.DetailedFallbackBehaviour.tryTechnologyAverageOrVehicleTypeAverage) {
+		if (!emissionConfigGroup.isUsingDetailedEmissionCalculation() || emissionConfigGroup.getDetailedFallbackBehaviour() == EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable ) {
 			avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
 			avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
 		}

@@ -43,8 +43,12 @@ public final class EmissionsConfigGroup
 	private static final String EMISSION_FACTORS_COLD_FILE_AVERAGE = "averageFleetColdEmissionFactorsFile";
 	private String averageFleetColdEmissionFactorsFile = null;
 
+	/**
+	 * @deprecated -- use {{@link #DETAILED_FALLBACK_BEHAVIOUR}}
+	 */
+	@Deprecated
 	private static final String USING_DETAILED_EMISSION_CALCULATION = "usingDetailedEmissionCalculation";
-	private boolean isUsingDetailedEmissionCalculation = false;
+//	private boolean isUsingDetailedEmissionCalculation = false;
 
 	private static final String EMISSION_FACTORS_WARM_FILE_DETAILED = "detailedWarmEmissionFactorsFile" ;
 	private String detailedWarmEmissionFactorsFile = null;
@@ -91,9 +95,9 @@ public final class EmissionsConfigGroup
 	private static final String EMISSIONS_COMPUTATION_METHOD = "emissionsComputationMethod";
 	private EmissionsComputationMethod emissionsComputationMethod = EmissionsComputationMethod.AverageSpeed;
 
-	public enum DetailedFallbackBehaviour {abort, tryTechnologyAverageOrAbort, tryTechnologyAverageOrVehicleTypeAverage}
-	private static final String DETAILED_FALLBACK_BEHAVIOUR = "detailedFallbackBehaviour";
-	private DetailedFallbackBehaviour detailedFallbackBehaviour = DetailedFallbackBehaviour.abort;
+	public enum DetailedVsAverageLookupBehavior{onlyTryDetailedElseAbort, tryDetailedThenTechnologyAverageElseAbort, tryDetailedThenTechnologyAverageThenAverageTable, directlyTryAverageTable}
+	private static final String DETAILED_FALLBACK_BEHAVIOUR = "detailedVsAverageLookupBehavior";
+	private DetailedVsAverageLookupBehavior detailedFallbackBehaviour = DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort;
 
 	@Deprecated // should be phased out.  kai, oct'18
 	private static final String EMISSION_ROADTYPE_MAPPING_FILE_CMT = "REQUIRED if source of the HBEFA road type is set to "+HbefaRoadTypeSource.fromFile +". It maps from input road types to HBEFA 3.1 road type strings";
@@ -245,27 +249,46 @@ public final class EmissionsConfigGroup
 	}
 
 	@StringGetter(USING_DETAILED_EMISSION_CALCULATION)
+	@Deprecated
 	public boolean isUsingDetailedEmissionCalculation(){
-		return this.isUsingDetailedEmissionCalculation;
+		throw new RuntimeException( "use " + DETAILED_FALLBACK_BEHAVIOUR + " instead." ) ;
+////		return this.isUsingDetailedEmissionCalculation;
+//		switch( this.detailedFallbackBehaviour ) {
+//			case tryTechnologyAverageThenAverageTable:
+//				return true;
+//			case directlyTryAverageTable:
+//				return false;
+//			case abort:
+//				// fall-through
+//			case tryTechnologyAverageOrAbort:
+//				throw new IllegalStateException( "Config setting of "  + DETAILED_FALLBACK_BEHAVIOUR + " cannot be mapped onto requested boolean.");
+//			default:
+//				throw new IllegalStateException( "Unexpected value: " + this.detailedFallbackBehaviour );
+//		}
 	}
 	/**
-	 * @param isUsingDetailedEmissionCalculation -- {@value #USING_DETAILED_EMISSION_CALCULATION_CMT}
+	 * @param usingDetailedEmissionCalculation -- {@value #USING_DETAILED_EMISSION_CALCULATION_CMT}
 	 */
 	@StringSetter(USING_DETAILED_EMISSION_CALCULATION)
-	public void setUsingDetailedEmissionCalculation(final boolean isUsingDetailedEmissionCalculation) {
-		this.isUsingDetailedEmissionCalculation = isUsingDetailedEmissionCalculation;
+	public void setUsingDetailedEmissionCalculation(final boolean usingDetailedEmissionCalculation) {
+//		this.usingDetailedEmissionCalculation = usingDetailedEmissionCalculation;
+		if ( usingDetailedEmissionCalculation ) {
+			this.detailedFallbackBehaviour = DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable;
+		} else {
+			this.detailedFallbackBehaviour = DetailedVsAverageLookupBehavior.directlyTryAverageTable;
+		}
 	}
 
 	/**
 	 * @param detailedFallbackBehaviour -- {@value #DETAILED_EMISSION_FALLBACK_CMT}
 	 */
 	@StringSetter(DETAILED_FALLBACK_BEHAVIOUR)
-	public void setDetailedFallbackBehaviour(DetailedFallbackBehaviour detailedFallbackBehaviour) {
+	public void setDetailedFallbackBehaviour( DetailedVsAverageLookupBehavior detailedFallbackBehaviour ) {
 		this.detailedFallbackBehaviour = detailedFallbackBehaviour;
 	}
 
 	@StringGetter(DETAILED_FALLBACK_BEHAVIOUR)
-	public DetailedFallbackBehaviour getDetailedFallbackBehaviour() {
+	public DetailedVsAverageLookupBehavior getDetailedFallbackBehaviour() {
 		return this.detailedFallbackBehaviour;
 	}
 

@@ -20,8 +20,6 @@ package org.matsim.contrib.emissions.example;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.emissions.example.RunAverageEmissionToolOfflineExample;
-import org.matsim.contrib.emissions.example.RunDetailedEmissionToolOfflineExample;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -48,7 +46,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 		emissionsConfig.setAverageColdEmissionFactorsFile(""); //setting empty to avoid effects from loaded config.
 		emissionsConfig.setAverageWarmEmissionFactorsFile(""); //setting empty to avoid effects from loaded config.
 		emissionsConfig.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
-		emissionsConfig.setDetailedFallbackBehaviour(EmissionsConfigGroup.DetailedFallbackBehaviour.abort);
+		emissionsConfig.setDetailedFallbackBehaviour( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		offlineExample.run();
 	}
@@ -60,7 +58,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 		emissionsConfig.setAverageColdEmissionFactorsFile(""); //setting empty to avoid effects from loaded config.
 		emissionsConfig.setAverageWarmEmissionFactorsFile(""); //setting empty to avoid effects from loaded config.
-		emissionsConfig.setDetailedFallbackBehaviour(EmissionsConfigGroup.DetailedFallbackBehaviour.abort);
+		emissionsConfig.setDetailedFallbackBehaviour( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		offlineExample.run();
 	}
@@ -72,7 +70,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 		emissionsConfig.setAverageColdEmissionFactorsFile(""); //setting empty to avoid effects from loaded config.
 		emissionsConfig.setAverageWarmEmissionFactorsFile(""); //setting empty to avoid effects from loaded config.
-		emissionsConfig.setDetailedFallbackBehaviour(EmissionsConfigGroup.DetailedFallbackBehaviour.abort);
+		emissionsConfig.setDetailedFallbackBehaviour( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.onlyTryDetailedElseAbort );
 		// --- Change input to hbefa4 sample
 		emissionsConfig.setDetailedColdEmissionFactorsFile("../sample_41_EFA_ColdStart_SubSegm_2020detailed.txt");
 		emissionsConfig.setDetailedWarmEmissionFactorsFile("../sample_41_EFA_HOT_SubSegm_2020detailed.txt");
@@ -97,7 +95,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 		emissionsConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.txt");
 		emissionsConfig.setAverageWarmEmissionFactorsFile( "../sample_41_EFA_HOT_vehcat_2020average.txt" );
 		emissionsConfig.setHbefaVehicleDescriptionSource( EmissionsConfigGroup.HbefaVehicleDescriptionSource.fromVehicleTypeDescription );
-		emissionsConfig.setDetailedFallbackBehaviour(EmissionsConfigGroup.DetailedFallbackBehaviour.tryTechnologyAverageOrVehicleTypeAverage);
+		emissionsConfig.setDetailedFallbackBehaviour( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		offlineExample.run();
 	}
@@ -109,7 +107,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
 		emissionsConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.txt");
 		emissionsConfig.setAverageWarmEmissionFactorsFile( "../sample_41_EFA_HOT_vehcat_2020average.txt" );
-		emissionsConfig.setDetailedFallbackBehaviour(EmissionsConfigGroup.DetailedFallbackBehaviour.tryTechnologyAverageOrVehicleTypeAverage);
+		emissionsConfig.setDetailedFallbackBehaviour( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		offlineExample.run();
 	}
@@ -119,7 +117,7 @@ public class RunDetailedEmissionToolOfflineExampleIT {
 		RunDetailedEmissionToolOfflineExample offlineExample = new RunDetailedEmissionToolOfflineExample();
 		Config config = offlineExample.prepareConfig("./scenarios/sampleScenario/testv2_Vehv2/config_detailed.xml");
 		EmissionsConfigGroup emissionsConfig = ConfigUtils.addOrGetModule( config, EmissionsConfigGroup.class );
-		emissionsConfig.setDetailedFallbackBehaviour(EmissionsConfigGroup.DetailedFallbackBehaviour.tryTechnologyAverageOrVehicleTypeAverage);
+		emissionsConfig.setDetailedFallbackBehaviour( EmissionsConfigGroup.DetailedVsAverageLookupBehavior.tryDetailedThenTechnologyAverageThenAverageTable );
 		emissionsConfig.setAverageColdEmissionFactorsFile("../sample_41_EFA_ColdStart_vehcat_2020average.txt");
 		emissionsConfig.setDetailedColdEmissionFactorsFile("../sample_41_EFA_ColdStart_SubSegm_2020detailed.txt");
 		emissionsConfig.setAverageWarmEmissionFactorsFile( "../sample_41_EFA_HOT_vehcat_2020average.txt" );
