@@ -18,7 +18,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class SuperSonicBicycleOsmNetworkReaderTest {
+public class OsmBicycleReaderTest {
 
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
